@@ -1,0 +1,3 @@
+Wroclaw 51.6 17.2
+Gdansk 54.22 18.36
+Krakow 50.4 19.56

@@ -1,0 +1,10 @@
+c:\users\strugala\documents\visual studio 2017\Projects\Parallel Ants\Parallel Ants\obj\Debug\Parallel Ants.csprojResolveAssemblyReference.cache
+c:\users\strugala\documents\visual studio 2017\Projects\Parallel Ants\Parallel Ants\obj\Debug\Parallel_Ants.Properties.Resources.resources
+c:\users\strugala\documents\visual studio 2017\Projects\Parallel Ants\Parallel Ants\obj\Debug\Parallel Ants.csproj.GenerateResource.Cache
+c:\users\strugala\documents\visual studio 2017\Projects\Parallel Ants\Parallel Ants\bin\Debug\Parallel Ants.exe.config
+c:\users\strugala\documents\visual studio 2017\Projects\Parallel Ants\Parallel Ants\bin\Debug\Parallel Ants.exe
+c:\users\strugala\documents\visual studio 2017\Projects\Parallel Ants\Parallel Ants\bin\Debug\Parallel Ants.pdb
+c:\users\strugala\documents\visual studio 2017\Projects\Parallel Ants\Parallel Ants\obj\Debug\Parallel Ants.exe
+c:\users\strugala\documents\visual studio 2017\Projects\Parallel Ants\Parallel Ants\obj\Debug\Parallel Ants.pdb
+C:\Users\strugala\documents\visual studio 2017\Projects\Parallel Ants\Parallel Ants\bin\Debug\System.ValueTuple.dll
+C:\Users\strugala\documents\visual studio 2017\Projects\Parallel Ants\Parallel Ants\obj\Debug\Parallel_Ants.ParallelAntsFrm.resources

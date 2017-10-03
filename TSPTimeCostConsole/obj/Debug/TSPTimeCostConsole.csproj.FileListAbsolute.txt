@@ -1,0 +1,6 @@
+D:\GitHub\TSPTimeCost\TSPTimeCostConsole\bin\Debug\TSPTimeCostConsole.exe.config
+D:\GitHub\TSPTimeCost\TSPTimeCostConsole\bin\Debug\TSPTimeCostConsole.exe
+D:\GitHub\TSPTimeCost\TSPTimeCostConsole\bin\Debug\TSPTimeCostConsole.pdb
+D:\GitHub\TSPTimeCost\TSPTimeCostConsole\obj\Debug\TSPTimeCostConsole.exe
+D:\GitHub\TSPTimeCost\TSPTimeCostConsole\obj\Debug\TSPTimeCostConsole.pdb
+D:\GitHub\TSPTimeCost\TSPTimeCostConsole\obj\Debug\TSPTimeCostConsole.csprojResolveAssemblyReference.cache

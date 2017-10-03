@@ -1,0 +1,10 @@
+D:\GitHub\TSPTimeCost\Parallel Ants\obj\Debug\TSPTimeCost.csprojResolveAssemblyReference.cache
+D:\GitHub\TSPTimeCost\Parallel Ants\obj\Debug\TSPTimeCost.ParallelAntsFrm.resources
+D:\GitHub\TSPTimeCost\Parallel Ants\obj\Debug\Parallel_Ants.Properties.Resources.resources
+D:\GitHub\TSPTimeCost\Parallel Ants\obj\Debug\TSPTimeCost.csproj.GenerateResource.Cache
+D:\GitHub\TSPTimeCost\Parallel Ants\obj\Debug\Parallel Ants.exe
+D:\GitHub\TSPTimeCost\Parallel Ants\obj\Debug\Parallel Ants.pdb
+D:\GitHub\TSPTimeCost\Parallel Ants\bin\Debug\Parallel Ants.exe.config
+D:\GitHub\TSPTimeCost\Parallel Ants\bin\Debug\Parallel Ants.exe
+D:\GitHub\TSPTimeCost\Parallel Ants\bin\Debug\Parallel Ants.pdb
+D:\GitHub\TSPTimeCost\Parallel Ants\bin\Debug\System.ValueTuple.dll
