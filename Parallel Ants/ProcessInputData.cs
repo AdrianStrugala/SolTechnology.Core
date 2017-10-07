@@ -2,7 +2,11 @@
 using System.Collections.Generic;
 using System.IO;
 using System.IO.MemoryMappedFiles;
+using System.Net;
+using System.Runtime.Serialization.Json;
 using System.Text;
+using Microsoft.Net.Http.Server;
+using Parallel_Ants;
 
 /**********************************************************
  * Process input from list of cities with coordinates     *
@@ -37,6 +41,17 @@ namespace TSPTimeCost {
 
             return result;
         }
+
+        public List<string> ReadCities()
+        {
+            List<string> cities = new List<string>();
+            cities.Add("Modena");
+            cities.Add("Verona");
+            cities.Add("Bergamo");
+
+            return cities;
+        }
+
 
         public double ConvertDegreeAngleToDouble(double coordinates) {
             //Decimal degrees = 
@@ -82,6 +97,37 @@ namespace TSPTimeCost {
             for (int i = 0; i < noOfCities; i++) {
                 BestPath.Instance.order[i] = i;
             }
+        }
+
+        private void GetResponse(Uri uri, Action<Response> callback)
+        {
+            WebClient wc = new WebClient();
+            wc.OpenReadCompleted += (o, a) =>
+            {
+                if (callback != null)
+                {
+                    DataContractJsonSerializer ser = new DataContractJsonSerializer(typeof(Response));
+                    callback(ser.ReadObject(a.Result) as Response);
+                }
+            };
+            wc.OpenReadAsync(uri);
+        }
+
+        public List<City> GetCitiesFromGoogleApi()
+        {
+            List<City> cities = new List<City>();
+            List<string> citiNames = ReadCities();
+
+            Uri geocodeRequest = new Uri(string.Format("https://maps.googleapis.com/maps/api/geocode/json?address={0}&key=AIzaSyBgCjCJuGQsXlAz6BUXPIL2_RSxgXUaCcM", "Wroclaw"));
+
+            GetResponse(geocodeRequest, (x) =>
+            {
+
+            });
+
+
+
+            return cities;
         }
     }
 }

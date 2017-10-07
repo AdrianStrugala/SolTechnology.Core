@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Windows.Forms;
 using System.Windows.Forms.DataVisualization.Charting;
+using Parallel_Ants;
 
 namespace TSPTimeCost {
     public partial class ParallelAntsFrm : Form {
@@ -10,7 +11,7 @@ namespace TSPTimeCost {
             InitializeComponent();
         }
 
-        public List<Road> cities = new List<Road>();
+        public List<City> cities = new List<City>();
 
         private void Form1_Load(object sender, EventArgs e) {
 
@@ -18,7 +19,11 @@ namespace TSPTimeCost {
 
             ProcessInputData processInputData = new ProcessInputData();
 
-            cities = processInputData.ReadInputFile();
+            //cities = processInputData.ReadInputFile();
+
+            cities = processInputData.GetCitiesFromGoogleApi();
+
+
             foreach (var city in cities) {
               //  processInputData.ConvertCoordinatesToDecimal(city);
             }

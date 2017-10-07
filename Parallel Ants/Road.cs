@@ -1,11 +1,11 @@
-﻿namespace TSPTimeCost {
+﻿namespace TSPTimeCost
+{
     public class Road
     {
-
         public string Beginning { get; set; }
         public string Ending { get; set; }
         public double Time { get; set; }
         public double Cost { get; set; }
-        public double? TimeDecimal{get; set;}
-}
+        public double? TimeDecimal { get; set; }
+    }
 }
