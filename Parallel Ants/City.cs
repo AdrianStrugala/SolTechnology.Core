@@ -12,8 +12,5 @@ namespace Parallel_Ants
         public string Name { get; set; }
         public double Latitude { get; set; }
         public double Longitude { get; set; }
-        public double? X { get; set; }
-        public double? Y { get; set; }
-
     }
 }

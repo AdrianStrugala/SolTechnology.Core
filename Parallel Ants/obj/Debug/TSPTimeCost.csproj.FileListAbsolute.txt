@@ -19,3 +19,5 @@ D:\GitHub\TSPTimeCost\Parallel Ants\bin\Debug\Microsoft.Extensions.Primitives.xm
 D:\GitHub\TSPTimeCost\Parallel Ants\bin\Debug\Microsoft.Net.Http.Server.xml
 D:\GitHub\TSPTimeCost\Parallel Ants\bin\Debug\StoryTeller.pdb
 D:\GitHub\TSPTimeCost\Parallel Ants\bin\Debug\System.Runtime.CompilerServices.Unsafe.xml
+D:\GitHub\TSPTimeCost\Parallel Ants\bin\Debug\Newtonsoft.Json.dll
+D:\GitHub\TSPTimeCost\Parallel Ants\bin\Debug\Newtonsoft.Json.xml
