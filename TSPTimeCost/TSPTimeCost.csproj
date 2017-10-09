@@ -6,8 +6,8 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{F73D2686-8B20-4BC7-A743-79633CA2CD0B}</ProjectGuid>
     <OutputType>WinExe</OutputType>
-    <RootNamespace>Parallel_Ants</RootNamespace>
-    <AssemblyName>Parallel Ants</AssemblyName>
+    <RootNamespace>TSPTimeCost</RootNamespace>
+    <AssemblyName>TSPTimeCost</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
@@ -74,10 +74,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="BestPath.cs" />
-    <Compile Include="City.cs" />
-    <Compile Include="Road.cs" />
-    <Compile Include="DistanceMatrix.cs" />
+    <Compile Include="Models\BestPath.cs" />
+    <Compile Include="Models\City.cs" />
+    <Compile Include="Models\Road.cs" />
+    <Compile Include="Models\DistanceMatrix.cs" />
     <Compile Include="Form1.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -87,8 +87,8 @@
     <Compile Include="ProcessInputData.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="AntColony.cs" />
-    <Compile Include="VertexAndProbability.cs" />
+    <Compile Include="TSP\AntColony.cs" />
+    <Compile Include="Models\VertexAndProbability.cs" />
     <EmbeddedResource Include="Form1.resx">
       <DependentUpon>Form1.cs</DependentUpon>
     </EmbeddedResource>

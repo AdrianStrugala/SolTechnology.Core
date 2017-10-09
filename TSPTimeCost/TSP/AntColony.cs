@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Parallel_Ants.Models;
 
-namespace TSPTimeCost {
+namespace TSPTimeCost.TSP {
 
     class AntColony {
         // Algorithm parameters
@@ -160,8 +161,8 @@ namespace TSPTimeCost {
             VertexAndProbability[] result = new VertexAndProbability[noOfPoints];
             for (int i = 0; i < noOfPoints; i++) {
                 result[i] = new VertexAndProbability() {
-                    probability = probabilityMatrix[path[q - 1] * noOfPoints + i],
-                    vertex = i
+                    Probability = probabilityMatrix[path[q - 1] * noOfPoints + i],
+                    Vertex = i
                 };
             }
 
@@ -169,16 +170,16 @@ namespace TSPTimeCost {
         }
 
         private static VertexAndProbability[] NormalizeProbabilityValues(VertexAndProbability[] row) {
-            double sum = row.Sum(value => value.probability);
+            double sum = row.Sum(value => value.Probability);
 
             foreach (var value in row) {
-                value.probability /= sum;
+                value.Probability /= sum;
             }
             return row;
         }
 
         private static VertexAndProbability[] SortRowByProbability(VertexAndProbability[] row) {
-            Array.Sort(row, (one, two) => one.probability.CompareTo(two.probability));
+            Array.Sort(row, (one, two) => one.Probability.CompareTo(two.Probability));
             return row;
         }
 
@@ -186,16 +187,16 @@ namespace TSPTimeCost {
             double randomLessThan1 = DrawRandomLessThan1();
             double sum = 0;
             for (int i = 0; i < noOfPoints; i++) {
-                double temp = row[i].probability;
-                row[i].probability += sum;
+                double temp = row[i].Probability;
+                row[i].Probability += sum;
                 sum += temp;
             }
 
             int result = -1;
 
             for (int i = 0; i < noOfPoints; i++) {
-                if (row[i].probability >= randomLessThan1 && !path.Contains(row[i].vertex)) {
-                    result = row[i].vertex;
+                if (row[i].Probability >= randomLessThan1 && !path.Contains(row[i].Vertex)) {
+                    result = row[i].Vertex;
                     break;
                 }
             }

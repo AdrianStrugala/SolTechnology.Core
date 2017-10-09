@@ -23,28 +23,28 @@
         /// the contents of this method with the code editor.
         /// </summary>
         private void InitializeComponent() {
-            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea2 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
-            System.Windows.Forms.DataVisualization.Charting.Legend legend2 = new System.Windows.Forms.DataVisualization.Charting.Legend();
-            System.Windows.Forms.DataVisualization.Charting.Series series2 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea1 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
+            System.Windows.Forms.DataVisualization.Charting.Legend legend1 = new System.Windows.Forms.DataVisualization.Charting.Legend();
+            System.Windows.Forms.DataVisualization.Charting.Series series1 = new System.Windows.Forms.DataVisualization.Charting.Series();
             this.Area = new System.Windows.Forms.DataVisualization.Charting.Chart();
             this.CityOrder = new System.Windows.Forms.Label();
-            this.AntColonyBtn = new System.Windows.Forms.Button();
+            this.ClassicTSPBtn = new System.Windows.Forms.Button();
             this.ResetBtn = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.Area)).BeginInit();
             this.SuspendLayout();
             // 
             // Area
             // 
-            chartArea2.Name = "ChartArea1";
-            this.Area.ChartAreas.Add(chartArea2);
-            legend2.Name = "Legend1";
-            this.Area.Legends.Add(legend2);
+            chartArea1.Name = "ChartArea1";
+            this.Area.ChartAreas.Add(chartArea1);
+            legend1.Name = "Legend1";
+            this.Area.Legends.Add(legend1);
             this.Area.Location = new System.Drawing.Point(12, 12);
             this.Area.Name = "Area";
-            series2.ChartArea = "ChartArea1";
-            series2.Legend = "Legend1";
-            series2.Name = "Series1";
-            this.Area.Series.Add(series2);
+            series1.ChartArea = "ChartArea1";
+            series1.Legend = "Legend1";
+            series1.Name = "Series1";
+            this.Area.Series.Add(series1);
             this.Area.Size = new System.Drawing.Size(802, 666);
             this.Area.TabIndex = 0;
             this.Area.Text = "Area";
@@ -57,15 +57,15 @@
             this.CityOrder.Size = new System.Drawing.Size(0, 17);
             this.CityOrder.TabIndex = 1;
             // 
-            // AntColonyBtn
+            // ClassicTSPBtn
             // 
-            this.AntColonyBtn.Location = new System.Drawing.Point(849, 33);
-            this.AntColonyBtn.Name = "AntColonyBtn";
-            this.AntColonyBtn.Size = new System.Drawing.Size(140, 48);
-            this.AntColonyBtn.TabIndex = 2;
-            this.AntColonyBtn.Text = "Ant Colony";
-            this.AntColonyBtn.UseVisualStyleBackColor = true;
-            this.AntColonyBtn.Click += new System.EventHandler(this.AntColonyBtn_Click);
+            this.ClassicTSPBtn.Location = new System.Drawing.Point(849, 33);
+            this.ClassicTSPBtn.Name = "ClassicTSPBtn";
+            this.ClassicTSPBtn.Size = new System.Drawing.Size(140, 48);
+            this.ClassicTSPBtn.TabIndex = 2;
+            this.ClassicTSPBtn.Text = "Classic TSP";
+            this.ClassicTSPBtn.UseVisualStyleBackColor = true;
+            this.ClassicTSPBtn.Click += new System.EventHandler(this.AntColonyBtn_Click);
             // 
             // ResetBtn
             // 
@@ -83,7 +83,7 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1010, 729);
             this.Controls.Add(this.ResetBtn);
-            this.Controls.Add(this.AntColonyBtn);
+            this.Controls.Add(this.ClassicTSPBtn);
             this.Controls.Add(this.CityOrder);
             this.Controls.Add(this.Area);
             this.Name = "ParallelAntsFrm";
@@ -99,7 +99,7 @@
 
         private System.Windows.Forms.DataVisualization.Charting.Chart Area;
         private System.Windows.Forms.Label CityOrder;
-        private System.Windows.Forms.Button AntColonyBtn;
+        private System.Windows.Forms.Button ClassicTSPBtn;
         private System.Windows.Forms.Button ResetBtn;
     }
 }
