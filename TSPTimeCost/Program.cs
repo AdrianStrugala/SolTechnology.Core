@@ -10,7 +10,7 @@ namespace TSPTimeCost {
 
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new ParallelAntsFrm());
+            Application.Run(new TspTimeCostFrm());
 
 
         }

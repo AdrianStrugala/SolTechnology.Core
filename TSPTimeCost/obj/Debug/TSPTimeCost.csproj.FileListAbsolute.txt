@@ -39,9 +39,9 @@ C:\Projects\TSPTimeCost\TSPTimeCost\bin\Debug\Newtonsoft.Json.xml
 C:\Projects\TSPTimeCost\TSPTimeCost\bin\Debug\StoryTeller.pdb
 C:\Projects\TSPTimeCost\TSPTimeCost\bin\Debug\System.Runtime.CompilerServices.Unsafe.xml
 C:\Projects\TSPTimeCost\TSPTimeCost\obj\Debug\TSPTimeCost.csprojResolveAssemblyReference.cache
-C:\Projects\TSPTimeCost\TSPTimeCost\obj\Debug\TSPTimeCost.ParallelAntsFrm.resources
 C:\Projects\TSPTimeCost\TSPTimeCost\obj\Debug\TSPTimeCost.Properties.Resources.resources
 C:\Projects\TSPTimeCost\TSPTimeCost\obj\Debug\TSPTimeCost.csproj.GenerateResource.Cache
 C:\Projects\TSPTimeCost\TSPTimeCost\obj\Debug\TSPTimeCost.csproj.CoreCompileInputs.cache
 C:\Projects\TSPTimeCost\TSPTimeCost\obj\Debug\TSPTimeCost.exe
 C:\Projects\TSPTimeCost\TSPTimeCost\obj\Debug\TSPTimeCost.pdb
+C:\Projects\TSPTimeCost\TSPTimeCost\obj\Debug\TSPTimeCost.TspTimeCostFrm.resources

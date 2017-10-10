@@ -7,8 +7,8 @@ using Parallel_Ants;
 using TSPTimeCost.TSP;
 
 namespace TSPTimeCost {
-    public partial class ParallelAntsFrm : Form {
-        public ParallelAntsFrm() {
+    public partial class TspTimeCostFrm : Form {
+        public TspTimeCostFrm() {
             InitializeComponent();
         }
 
@@ -24,8 +24,10 @@ namespace TSPTimeCost {
             DrawCities();
 
             _processInputData.InitializeSingletons(Cities.Count);
-            _processInputData.CalculateDistanceMatrix(Cities);
-            BestPath.Instance.distance = new AntColony().CalculateDistanceInPath(BestPath.Instance.order);
+            _processInputData.CalculateDistanceMatrixForTollRoads(Cities);
+            _processInputData.CalculateDistanceMatrixForFreeRoads(Cities);
+
+            BestPath.Instance.distance = new AntColonyToll().CalculateDistanceInPath(BestPath.Instance.order);
 
         }
 
@@ -37,10 +39,15 @@ namespace TSPTimeCost {
             Area.Series[0].MarkerStyle = MarkerStyle.Circle;
             Area.ChartAreas[0].AxisY.IsStartedFromZero = false;
 
+            Area.Series.Add("TollTSP");
+            Area.Series["TollTSP"].IsVisibleInLegend = true;
+            Area.Series["TollTSP"].Color = Color.Blue;
+
             Area.Series.Add("ClassicTSP");
             Area.Series["ClassicTSP"].IsVisibleInLegend = true;
             Area.Series["ClassicTSP"].Color = Color.Red;
         }
+
 
         public void DrawCities() {
             foreach (var city in Cities) {
@@ -48,11 +55,11 @@ namespace TSPTimeCost {
             }
         }
 
-        public void ShowRoute() {
+        public void ShowRoute(string nameOfSeries) {
 
-            Area.Series["ClassicTSP"].Points.Clear();
+            Area.Series[nameOfSeries].Points.Clear();
             WriteOrder();
-            DrawRoute();
+            DrawRoute(nameOfSeries);
         }
 
         public void WriteOrder() {
@@ -61,34 +68,43 @@ namespace TSPTimeCost {
                 _text += Cities[BestPath.Instance.order[i]].Name + "->";
             }
             _text += Cities[BestPath.Instance.order[Cities.Count - 1]].Name;
-            _text += "\nDistance: " + BestPath.Instance.distance;
+            _text += "\nDuration: " + BestPath.Instance.distance;
 
             CityOrder.Text = _text;
         }
 
-        public void DrawRoute() {
+        public void DrawRoute(string nameOfSeries) {
 
 
             for (int i = 0; i < Cities.Count - 1; i++) {
 
-                Area.Series["ClassicTSP"].Points.AddXY(Cities[BestPath.Instance.order[i]].Longitude, Cities[BestPath.Instance.order[i]].Latitude);
-                Area.Series["ClassicTSP"].Points.AddXY(Cities[BestPath.Instance.order[i + 1]].Longitude, Cities[BestPath.Instance.order[i + 1]].Latitude);
-                Area.Series["ClassicTSP"].ChartType = SeriesChartType.Line;
+                Area.Series[nameOfSeries].Points.AddXY(Cities[BestPath.Instance.order[i]].Longitude, Cities[BestPath.Instance.order[i]].Latitude);
+                Area.Series[nameOfSeries].Points.AddXY(Cities[BestPath.Instance.order[i + 1]].Longitude, Cities[BestPath.Instance.order[i + 1]].Latitude);
+                Area.Series[nameOfSeries].ChartType = SeriesChartType.Line;
             }
 
         }
 
-        private void AntColonyBtn_Click(object sender, EventArgs e) {
+        private void TollTSPBtn_Click(object sender, EventArgs e) {
 
-            AntColony ants = new AntColony();
+            AntColonyToll ants = new AntColonyToll();
             ants.AntColonySingleThread();
 
-            ShowRoute();
+            ShowRoute("TollTSP");
         }
 
         private void ResetBtn_Click(object sender, EventArgs e) {
+            Area.Series["TollTSP"].Points.Clear();
             Area.Series["ClassicTSP"].Points.Clear();
             CityOrder.Text = "";
+        }
+
+        private void ClassicTSPBtn_Click(object sender, EventArgs e) {
+
+            AntColonyClassic ants = new AntColonyClassic();
+            ants.AntColonySingleThread();
+
+            ShowRoute("ClassicTSP");
         }
     }
 }

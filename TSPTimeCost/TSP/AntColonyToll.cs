@@ -5,7 +5,7 @@ using Parallel_Ants.Models;
 
 namespace TSPTimeCost.TSP {
 
-    class AntColony {
+    class AntColonyToll {
         // Algorithm parameters
         private const int noOfAnts = 50;
         private const double trailEvaporationCoefficient = 0.3;
@@ -60,21 +60,21 @@ namespace TSPTimeCost.TSP {
             int noOfPoints = path.Length;
 
             for (int i = 0; i < noOfPoints - 1; i++) {
-                result += DistanceMatrix.Instance.value[path[i] * noOfPoints + path[i + 1]];
+                result += DistanceMatrixForTollRoads.Instance.Value[path[i] * noOfPoints + path[i + 1]];
             }
             return result;
         }
 
         private void InitializeParameters() {
             pheromonePower = BestPath.Instance.distance;
-            matrixSize = DistanceMatrix.Instance.value.Length;
+            matrixSize = DistanceMatrixForTollRoads.Instance.Value.Length;
             noOfPoints = (int)Math.Sqrt(matrixSize);
             trialsMatrix = new double[matrixSize];
             attractivenessMatrix = new double[matrixSize];
         }
         private void FillAttractivenessMatrix() {
             for (int i = 0; i < attractivenessMatrix.Length; i++) {
-                attractivenessMatrix[i] = (1 / (DistanceMatrix.Instance.value[i]));
+                attractivenessMatrix[i] = (1 / (DistanceMatrixForTollRoads.Instance.Value[i]));
             }
         }
 

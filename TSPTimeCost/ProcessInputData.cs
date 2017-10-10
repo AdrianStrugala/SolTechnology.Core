@@ -48,26 +48,42 @@ namespace TSPTimeCost {
             return _cities;
         }
 
+        public void CalculateDistanceMatrixForFreeRoads(List<City> cities) {
 
-        public void CalculateDistanceMatrix(List<City> cities) {
-
-            DistanceMatrix.Instance.value = new double[cities.Count * cities.Count];
+            DistanceMatrixForFreeRoads.Instance.Value = new double[cities.Count * cities.Count];
 
             for (int i = 0; i < cities.Count; i++) {
                 for (int j = 0; j < cities.Count; j++) {
                     if (i == j) {
-                        DistanceMatrix.Instance.value[j + i * cities.Count] = Double.MaxValue;
+                        DistanceMatrixForFreeRoads.Instance.Value[j + i * cities.Count] = Double.MaxValue;
                     }
                     else {
-                        DistanceMatrix.Instance.value[j + i * cities.Count] =
-                            GetDurationBetweenTwoCitiesByRoad(cities[i].Name, cities[j].Name);
+                        DistanceMatrixForFreeRoads.Instance.Value[j + i * cities.Count] =
+                            GetDurationBetweenTwoCitiesByFreeRoad(cities[i].Name, cities[j].Name);
+                    }
+                }
+            }
+        }
+
+        public void CalculateDistanceMatrixForTollRoads(List<City> cities) {
+
+            DistanceMatrixForTollRoads.Instance.Value = new double[cities.Count * cities.Count];
+
+            for (int i = 0; i < cities.Count; i++) {
+                for (int j = 0; j < cities.Count; j++) {
+                    if (i == j) {
+                        DistanceMatrixForTollRoads.Instance.Value[j + i * cities.Count] = Double.MaxValue;
+                    }
+                    else {
+                        DistanceMatrixForTollRoads.Instance.Value[j + i * cities.Count] =
+                            GetDurationBetweenTwoCitiesByTollRoad(cities[i].Name, cities[j].Name);
                     }
                 }
             }
         }
 
 
-        private int GetDurationBetweenTwoCitiesByRoad(string origin, string destination) {
+        private int GetDurationBetweenTwoCitiesByTollRoad(string origin, string destination) {
 
             string _url =
                 string.Format(
@@ -94,9 +110,37 @@ namespace TSPTimeCost {
 
         }
 
+        private int GetDurationBetweenTwoCitiesByFreeRoad(string origin, string destination) {
+
+            string _url =
+                string.Format(
+                    "https://maps.googleapis.com/maps/api/distancematrix/json?units=imperial&origins={0}&destinations={1}&avoid=tolls&key=AIzaSyCdHbtbmF8Y2nfesiu0KUUJagdG7_oui1k", origin, destination);
+
+            HttpWebRequest _request = (HttpWebRequest)WebRequest.Create(_url);
+
+            _request.Method = "GET";
+            _request.UserAgent = "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36";
+            _request.AutomaticDecompression = DecompressionMethods.Deflate | DecompressionMethods.GZip;
+
+            HttpWebResponse _response = (HttpWebResponse)_request.GetResponse();
+
+            string _content;
+            using (Stream _stream = _response.GetResponseStream()) {
+                using (StreamReader _sr = new StreamReader(_stream)) {
+                    _content = _sr.ReadToEnd();
+                }
+            }
+
+            var _json = JObject.Parse(_content);
+
+            return _json["rows"][0]["elements"][0]["duration"]["value"].Value<int>();
+
+        }
+
         public void InitializeSingletons(int noOfCities) {
             BestPath.Instance.order = new int[noOfCities];
-            DistanceMatrix.Instance.value = new double[noOfCities * noOfCities];
+            DistanceMatrixForTollRoads.Instance.Value = new double[noOfCities * noOfCities];
+            DistanceMatrixForFreeRoads.Instance.Value = new double[noOfCities * noOfCities];
 
             //Fist bestPath is just cities in input order
             for (int i = 0; i < noOfCities; i++) {
