@@ -77,7 +77,6 @@
     <Compile Include="Models\BestPath.cs" />
     <Compile Include="Models\City.cs" />
     <Compile Include="Models\DistanceMatrixForFreeRoads.cs" />
-    <Compile Include="Models\Road.cs" />
     <Compile Include="Models\DistanceMatrixForTollRoads.cs" />
     <Compile Include="Form1.cs">
       <SubType>Form</SubType>

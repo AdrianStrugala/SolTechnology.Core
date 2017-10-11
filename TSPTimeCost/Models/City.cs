@@ -4,7 +4,7 @@
  * X,Y coordinates (on surface)                           *
  * *******************************************************/
 
-namespace Parallel_Ants
+namespace TSPTimeCost.Models
 {
     public class City
     {

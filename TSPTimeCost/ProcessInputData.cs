@@ -4,7 +4,7 @@ using System.IO;
 using System.Net;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using Parallel_Ants;
+using TSPTimeCost.Models;
 
 /**********************************************************
  * Process input from list of cities                      *

@@ -4,7 +4,7 @@
 /* Singleton containing distance matrix            */
 /***************************************************/
 
-namespace TSPTimeCost {
+namespace TSPTimeCost.Models {
     public sealed class DistanceMatrixForTollRoads {
 
         public double[] Value { get; set; }

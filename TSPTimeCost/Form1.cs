@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Windows.Forms;
 using System.Windows.Forms.DataVisualization.Charting;
-using Parallel_Ants;
+using TSPTimeCost.Models;
 using TSPTimeCost.TSP;
 
 namespace TSPTimeCost {
@@ -50,8 +50,8 @@ namespace TSPTimeCost {
 
 
         public void DrawCities() {
-            foreach (var city in Cities) {
-                Area.Series[0].Points.AddXY(city.Longitude, city.Latitude);
+            foreach (var _city in Cities) {
+                Area.Series[0].Points.AddXY(_city.Longitude, _city.Latitude);
             }
         }
 
@@ -78,11 +78,40 @@ namespace TSPTimeCost {
 
             for (int i = 0; i < Cities.Count - 1; i++) {
 
-                Area.Series[nameOfSeries].Points.AddXY(Cities[BestPath.Instance.order[i]].Longitude, Cities[BestPath.Instance.order[i]].Latitude);
-                Area.Series[nameOfSeries].Points.AddXY(Cities[BestPath.Instance.order[i + 1]].Longitude, Cities[BestPath.Instance.order[i + 1]].Latitude);
-                Area.Series[nameOfSeries].ChartType = SeriesChartType.Line;
+                if (IsTollFragment(Cities[BestPath.Instance.order[i]], Cities[BestPath.Instance.order[i + 1]])) {
+
+                    Area.Series[nameOfSeries].Points.AddXY(Cities[BestPath.Instance.order[i]].Longitude,
+                        Cities[BestPath.Instance.order[i]].Latitude);
+                    Area.Series[nameOfSeries].Points.AddXY(Cities[BestPath.Instance.order[i + 1]].Longitude,
+                        Cities[BestPath.Instance.order[i + 1]].Latitude);
+                    Area.Series[nameOfSeries].BorderDashStyle = ChartDashStyle.Dot;
+                    Area.Series[nameOfSeries].ChartType = SeriesChartType.Line;
+                }
+                else {
+
+                    Area.Series[nameOfSeries].Points.AddXY(Cities[BestPath.Instance.order[i]].Longitude,
+                        Cities[BestPath.Instance.order[i]].Latitude);
+                    Area.Series[nameOfSeries].Points.AddXY(Cities[BestPath.Instance.order[i + 1]].Longitude,
+                        Cities[BestPath.Instance.order[i + 1]].Latitude);
+                    Area.Series[nameOfSeries].BorderDashStyle = ChartDashStyle.Solid;
+                    Area.Series[nameOfSeries].ChartType = SeriesChartType.Line;
+                }
             }
 
+        }
+
+        private bool IsTollFragment(City origin, City destination) {
+            var _indexOrigin = Cities.IndexOf(origin);
+            var _indexDestination = Cities.IndexOf(destination);
+
+            return 
+
+                //TODO Modify BestPath that it keeps partially distances :/
+                (
+                && !Equals(
+                DistanceMatrixForTollRoads.Instance.Value[_indexOrigin + Cities.Count * _indexDestination],
+                DistanceMatrixForFreeRoads.Instance.Value[_indexOrigin + Cities.Count * _indexDestination])
+                );
         }
 
         private void TollTSPBtn_Click(object sender, EventArgs e) {

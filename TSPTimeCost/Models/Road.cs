@@ -1,4 +1,4 @@
-﻿namespace TSPTimeCost
+﻿namespace TSPTimeCost.Models
 {
     public class Road
     {

@@ -1,4 +1,4 @@
-﻿namespace Parallel_Ants.Models {
+﻿namespace TSPTimeCost.Models {
     class VertexAndProbability {
         public int Vertex { get; set; }
         public double Probability { get; set; }
