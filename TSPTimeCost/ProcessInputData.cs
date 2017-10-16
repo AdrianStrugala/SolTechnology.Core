@@ -43,8 +43,8 @@ namespace TSPTimeCost {
 //        }
 
         public List<string> ReadCities() {
-           // List<string> _cities = new List<string> { "Como","Verona","Florence","Pisa","Turin","Milan","Genoa","Bergamo" };
-            List<string> _cities = new List<string> { "Wroclaw", "Lodz", "Warszawa", "Krakow", "Poznan", "Gdansk", "Lublin", "Bialystok" };
+            List<string> _cities = new List<string> { "Como","Verona","Florence","Pisa","Turin","Milan","Genoa","Bergamo" };
+           // List<string> _cities = new List<string> { "Wroclaw", "Lodz", "Warszawa", "Krakow", "Poznan", "Gdansk", "Lublin", "Bialystok" };
 
             return _cities;
         }

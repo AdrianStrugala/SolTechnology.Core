@@ -49,7 +49,7 @@ namespace TSPTimeCost
             Area.Series.Add("TollTSP");
             Area.Series["TollTSP"].IsVisibleInLegend = false;
             Area.Series["TollTSP"].BorderWidth = 6;
-            Area.Series["TollTSP"].BorderDashStyle = ChartDashStyle.Solid;
+            // Area.Series["TollTSP"].BorderDashStyle = ChartDashStyle.Solid;
             Area.Series["TollTSP"].ChartType = SeriesChartType.Line;
             Area.Series["TollTSP"].Color = Color.Blue;
 
@@ -57,7 +57,7 @@ namespace TSPTimeCost
             Area.Series.Add("ClassicTSP");
             Area.Series["ClassicTSP"].IsVisibleInLegend = false;
             Area.Series["ClassicTSP"].BorderWidth = 6;
-            Area.Series["ClassicTSP"].BorderDashStyle = ChartDashStyle.Solid;
+            //  Area.Series["ClassicTSP"].BorderDashStyle = ChartDashStyle.Solid;
             Area.Series["ClassicTSP"].ChartType = SeriesChartType.Line;
             Area.Series["ClassicTSP"].Color = Color.Red;
         }
@@ -97,10 +97,29 @@ namespace TSPTimeCost
 
             for (int i = 0; i < Cities.Count - 1; i++)
             {
-                Area.Series[nameOfSeries].Points.AddXY(Cities[BestPath.Instance.order[i]].Longitude,
-                    Cities[BestPath.Instance.order[i]].Latitude);
-                Area.Series[nameOfSeries].Points.AddXY(Cities[BestPath.Instance.order[i + 1]].Longitude,
-                    Cities[BestPath.Instance.order[i + 1]].Latitude);
+
+                if (IsTollFragment(i) == "(T)")
+                {
+                    Area.Series[nameOfSeries].Points.AddXY(Cities[BestPath.Instance.order[i]].Longitude,
+                        Cities[BestPath.Instance.order[i]].Latitude);
+                    Area.Series[nameOfSeries].Points.AddXY(Cities[BestPath.Instance.order[i + 1]].Longitude,
+                        Cities[BestPath.Instance.order[i + 1]].Latitude);
+
+                    Area.Series[nameOfSeries].Points[i * 2].BorderDashStyle = ChartDashStyle.Dot;
+                    Area.Series[nameOfSeries].Points[i * 2 + 1].BorderDashStyle = ChartDashStyle.Dot;
+
+                }
+
+                else
+                {
+                    Area.Series[nameOfSeries].Points.AddXY(Cities[BestPath.Instance.order[i]].Longitude,
+                        Cities[BestPath.Instance.order[i]].Latitude);
+                    Area.Series[nameOfSeries].Points.AddXY(Cities[BestPath.Instance.order[i + 1]].Longitude,
+                        Cities[BestPath.Instance.order[i + 1]].Latitude);
+
+                    Area.Series[nameOfSeries].Points[i * 2].BorderDashStyle = ChartDashStyle.Solid;
+                    Area.Series[nameOfSeries].Points[i * 2 + 1].BorderDashStyle = ChartDashStyle.Solid;
+                }
 
             }
         }
