@@ -30,6 +30,8 @@ namespace TSPTimeCost
             _processInputData.InitializeSingletons(Cities.Count);
             _processInputData.CalculateDistanceMatrixForTollRoads(Cities);
             _processInputData.CalculateDistanceMatrixForFreeRoads(Cities);
+            _processInputData.CalculateCostMatrix(Cities);
+
 
             BestPath.Instance.distance = new AntColonyToll().CalculateDistanceInPath(BestPath.Instance.order);
 
