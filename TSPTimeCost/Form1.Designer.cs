@@ -105,7 +105,7 @@
             this.tollTSPChck.Size = new System.Drawing.Size(15, 14);
             this.tollTSPChck.TabIndex = 5;
             this.tollTSPChck.UseVisualStyleBackColor = true;
-            this.tollTSPChck.CheckedChanged += new System.EventHandler(this.tollTSPChck_CheckedChanged);
+            this.tollTSPChck.CheckedChanged += new System.EventHandler(this.TollTSPChck_CheckedChanged);
             // 
             // classicTSPChck
             // 
@@ -117,7 +117,7 @@
             this.classicTSPChck.Size = new System.Drawing.Size(15, 14);
             this.classicTSPChck.TabIndex = 6;
             this.classicTSPChck.UseVisualStyleBackColor = true;
-            this.classicTSPChck.CheckedChanged += new System.EventHandler(this.classicTSPChck_CheckedChanged);
+            this.classicTSPChck.CheckedChanged += new System.EventHandler(this.ClassicTSPChck_CheckedChanged);
             // 
             // TspTimeCostFrm
             // 

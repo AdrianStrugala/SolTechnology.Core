@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Net;
 using System.Xml;
 using Newtonsoft.Json;
@@ -46,12 +45,12 @@ namespace TSPTimeCost
         //            return result;
         //        }
 
-        public List<string> ReadCities()
+        private static List<string> ReadCities()
         {
-            List<string> _cities = new List<string> { "Como", "Verona", "Florence", "Pisa", "Turin", "Milan", "Genoa", "Bergamo" };
+            List<string> cities = new List<string> { "Como", "Verona", "Florence", "Pisa", "Turin", "Milan", "Genoa", "Bergamo" };
             // List<string> _cities = new List<string> { "Wroclaw", "Lodz", "Warszawa", "Krakow", "Poznan", "Gdansk", "Lublin", "Bialystok" };
 
-            return _cities;
+            return cities;
         }
 
         public void CalculateCostMatrix(List<City> cities)
@@ -65,7 +64,7 @@ namespace TSPTimeCost
                 {
                     if (i == j)
                     {
-                        CostMatrix.Instance.Value[j + i * cities.Count] = Double.MaxValue;
+                        CostMatrix.Instance.Value[j + i * cities.Count] = double.MaxValue;
                     }
                     else
                     {
@@ -74,6 +73,22 @@ namespace TSPTimeCost
                     }
                 }
             }
+
+//            //save to file (in case of licence expirence)
+//            using (StreamWriter file =
+//                new StreamWriter(@"..\..\CostMatrix.txt"))
+//            {
+//                for (int i = 0; i < cities.Count; i++)
+//                {
+//                    for (int j = 0; j < cities.Count; j++)
+//                    {
+//                        file.Write(CostMatrix.Instance.Value[j + i * cities.Count] + " ");
+//
+//                    }
+//                    file.Write("\n");
+//                }
+//
+//            }
         }
 
         public void CalculateDistanceMatrixForFreeRoads(List<City> cities)
@@ -87,7 +102,7 @@ namespace TSPTimeCost
                 {
                     if (i == j)
                     {
-                        DistanceMatrixForFreeRoads.Instance.Value[j + i * cities.Count] = Double.MaxValue;
+                        DistanceMatrixForFreeRoads.Instance.Value[j + i * cities.Count] = double.MaxValue;
                     }
                     else
                     {
@@ -98,7 +113,7 @@ namespace TSPTimeCost
             }
         }
 
-        public void CalculateDistanceMatrixForTollRoads(List<City> cities)
+        public static void CalculateDistanceMatrixForTollRoads(List<City> cities)
         {
 
             DistanceMatrixForTollRoads.Instance.Value = new double[cities.Count * cities.Count];
@@ -120,33 +135,32 @@ namespace TSPTimeCost
             }
         }
 
-        private double GetCostBetweenTwoCities(City origin, City destination)
+        private static double GetCostBetweenTwoCities(City origin, City destination)
         {
 
-            string _url =
-                string.Format(
-                    "http://apir.viamichelin.com/apir/1/route.xml/fra?steps=1:e:{0}:{1};1:e:{2}:{3}&authkey=RESTGP20171016131341697440740272", origin.Longitude, origin.Latitude, destination.Longitude, destination.Latitude);
+            string url =
+                $"http://apir.viamichelin.com/apir/1/route.xml/fra?steps=1:e:{origin.Longitude}:{origin.Latitude};1:e:{destination.Longitude}:{destination.Latitude}&authkey=RESTGP20171016131341697440740272";
 
-            HttpWebRequest _request = (HttpWebRequest)WebRequest.Create(_url);
+            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(url);
 
-            _request.Method = "GET";
-            _request.UserAgent = "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36";
-            _request.AutomaticDecompression = DecompressionMethods.Deflate | DecompressionMethods.GZip;
+            request.Method = "GET";
+            request.UserAgent = "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36";
+            request.AutomaticDecompression = DecompressionMethods.Deflate | DecompressionMethods.GZip;
 
-            HttpWebResponse _response = (HttpWebResponse)_request.GetResponse();
+            HttpWebResponse response = (HttpWebResponse)request.GetResponse();
 
-            string _content;
-            using (Stream _stream = _response.GetResponseStream())
+            string content;
+            using (Stream stream = response.GetResponseStream())
             {
-                using (StreamReader _sr = new StreamReader(_stream))
+                using (StreamReader sr = new StreamReader(stream))
                 {
-                    _content = _sr.ReadToEnd();
+                    content = sr.ReadToEnd();
                 }
             }
 
             XmlDocument doc = new XmlDocument();
 
-            doc.LoadXml(_content);
+            doc.LoadXml(content);
 
             XmlNode node = doc.DocumentElement.SelectSingleNode("/response/iti/header/summaries/summary/tollCost/car");
             double result = Convert.ToDouble(node.InnerText);
@@ -154,123 +168,119 @@ namespace TSPTimeCost
             return result / 100;
         }
 
-        private int GetDurationBetweenTwoCitiesByTollRoad(string origin, string destination)
+        private static int GetDurationBetweenTwoCitiesByTollRoad(string origin, string destination)
         {
 
-            string _url =
-                string.Format(
-                    "https://maps.googleapis.com/maps/api/distancematrix/json?units=imperial&origins={0}&destinations={1}&key=AIzaSyCdHbtbmF8Y2nfesiu0KUUJagdG7_oui1k", origin, destination);
+            string url =
+                $"https://maps.googleapis.com/maps/api/distancematrix/json?units=imperial&origins={origin}&destinations={destination}&key=AIzaSyCdHbtbmF8Y2nfesiu0KUUJagdG7_oui1k";
 
-            HttpWebRequest _request = (HttpWebRequest)WebRequest.Create(_url);
+            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(url);
 
-            _request.Method = "GET";
-            _request.UserAgent = "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36";
-            _request.AutomaticDecompression = DecompressionMethods.Deflate | DecompressionMethods.GZip;
+            request.Method = "GET";
+            request.UserAgent = "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36";
+            request.AutomaticDecompression = DecompressionMethods.Deflate | DecompressionMethods.GZip;
 
-            HttpWebResponse _response = (HttpWebResponse)_request.GetResponse();
+            HttpWebResponse response = (HttpWebResponse)request.GetResponse();
 
-            string _content;
-            using (Stream _stream = _response.GetResponseStream())
+            string content;
+            using (Stream stream = response.GetResponseStream())
             {
-                using (StreamReader _sr = new StreamReader(_stream))
+                using (StreamReader sr = new StreamReader(stream))
                 {
-                    _content = _sr.ReadToEnd();
+                    content = sr.ReadToEnd();
                 }
             }
 
-            var _json = JObject.Parse(_content);
+            var json = JObject.Parse(content);
 
 
-            return _json["rows"][0]["elements"][0]["duration"]["value"].Value<int>();
+            return json["rows"][0]["elements"][0]["duration"]["value"].Value<int>();
 
         }
 
-        private int GetDurationBetweenTwoCitiesByFreeRoad(string origin, string destination)
+        private static int GetDurationBetweenTwoCitiesByFreeRoad(string origin, string destination)
         {
 
-            string _url =
-                string.Format(
-                    "https://maps.googleapis.com/maps/api/distancematrix/json?units=imperial&origins={0}&destinations={1}&avoid=tolls&key=AIzaSyCdHbtbmF8Y2nfesiu0KUUJagdG7_oui1k", origin, destination);
+            string url =
+                $"https://maps.googleapis.com/maps/api/distancematrix/json?units=imperial&origins={origin}&destinations={destination}&avoid=tolls&key=AIzaSyCdHbtbmF8Y2nfesiu0KUUJagdG7_oui1k";
 
-            HttpWebRequest _request = (HttpWebRequest)WebRequest.Create(_url);
+            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(url);
 
-            _request.Method = "GET";
-            _request.UserAgent = "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36";
-            _request.AutomaticDecompression = DecompressionMethods.Deflate | DecompressionMethods.GZip;
+            request.Method = "GET";
+            request.UserAgent = "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36";
+            request.AutomaticDecompression = DecompressionMethods.Deflate | DecompressionMethods.GZip;
 
-            HttpWebResponse _response = (HttpWebResponse)_request.GetResponse();
+            HttpWebResponse response = (HttpWebResponse)request.GetResponse();
 
-            string _content;
-            using (Stream _stream = _response.GetResponseStream())
+            string content;
+            using (Stream stream = response.GetResponseStream())
             {
-                using (StreamReader _sr = new StreamReader(_stream))
+                using (StreamReader sr = new StreamReader(stream))
                 {
-                    _content = _sr.ReadToEnd();
+                    content = sr.ReadToEnd();
                 }
             }
 
-            var _json = JObject.Parse(_content);
+            var json = JObject.Parse(content);
 
-            return _json["rows"][0]["elements"][0]["duration"]["value"].Value<int>();
+            return json["rows"][0]["elements"][0]["duration"]["value"].Value<int>();
 
         }
 
-        public void InitializeSingletons(int noOfCities)
+        public static void InitializeSingletons(int noOfCities)
         {
-            BestPath.Instance.order = new int[noOfCities];
+            BestPath.Instance.Order = new int[noOfCities];
             DistanceMatrixForTollRoads.Instance.Value = new double[noOfCities * noOfCities];
             DistanceMatrixForFreeRoads.Instance.Value = new double[noOfCities * noOfCities];
 
             //Fist bestPath is just cities in input order
             for (int i = 0; i < noOfCities; i++)
             {
-                BestPath.Instance.order[i] = i;
+                BestPath.Instance.Order[i] = i;
             }
 
-            BestPath.Instance.disnancesInOrder = new double[noOfCities - 1];
+            BestPath.Instance.DisnancesInOrder = new double[noOfCities - 1];
 
         }
 
 
         public List<City> GetCitiesFromGoogleApi()
         {
-            List<City> _cities = new List<City>();
-            List<string> _cityNames = ReadCities();
+            List<City> cities = new List<City>();
+            List<string> cityNames = ReadCities();
 
-            foreach (var _cityName in _cityNames)
+            foreach (var cityName in cityNames)
             {
-                City _toAdd = new City { Name = _cityName };
+                City toAdd = new City { Name = cityName };
 
-                JObject _locationJson = GetLocationJson(_cityName);
-                _toAdd.Latitude = _locationJson["results"][0]["geometry"]["location"]["lat"].Value<double>();
-                _toAdd.Longitude = _locationJson["results"][0]["geometry"]["location"]["lng"].Value<double>();
+                JObject locationJson = GetLocationJson(cityName);
+                toAdd.Latitude = locationJson["results"][0]["geometry"]["location"]["lat"].Value<double>();
+                toAdd.Longitude = locationJson["results"][0]["geometry"]["location"]["lng"].Value<double>();
 
-                _cities.Add(_toAdd);
+                cities.Add(toAdd);
             }
 
-            return _cities;
+            return cities;
         }
 
-        JObject GetLocationJson(string cityName)
+        private static JObject GetLocationJson(string cityName)
         {
-            string _url =
-            string.Format(
-                "https://maps.googleapis.com/maps/api/geocode/json?address={0}&key=AIzaSyBgCjCJuGQsXlAz6BUXPIL2_RSxgXUaCcM",
-                cityName);
+            string url =
+                $"https://maps.googleapis.com/maps/api/geocode/json?address={cityName}&key=AIzaSyBgCjCJuGQsXlAz6BUXPIL2_RSxgXUaCcM";
 
-            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(_url);
+            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(url);
             request.AutomaticDecompression = DecompressionMethods.GZip;
 
-            using (HttpWebResponse _response = (HttpWebResponse)request.GetResponse())
-            using (Stream _stream = _response.GetResponseStream())
-            using (StreamReader reader = new StreamReader(_stream))
+            using (HttpWebResponse response = (HttpWebResponse)request.GetResponse())
+            using (Stream stream = response.GetResponseStream())
+            using (StreamReader reader = new StreamReader(stream))
             {
-                var _serializer = new JsonSerializer();
+                var serializer = new JsonSerializer();
 
-                using (var _jsonTextReader = new JsonTextReader(reader))
+                using (var jsonTextReader = new JsonTextReader(reader))
                 {
-                    JObject _json = (JObject)_serializer.Deserialize(_jsonTextReader);
-                    return _json;
+                    JObject json = (JObject)serializer.Deserialize(jsonTextReader);
+                    return json;
                 }
             }
 

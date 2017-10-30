@@ -65,7 +65,7 @@ namespace TSPTimeCost.TSP
         public double CalculateDistanceInPath(int[] path)
         {
             double result = 0;
-            int noOfPoints = path.Length;
+            noOfPoints = path.Length;
 
             for (int i = 0; i < noOfPoints - 1; i++)
             {
@@ -76,7 +76,7 @@ namespace TSPTimeCost.TSP
 
         private void InitializeParameters()
         {
-            pheromonePower = BestPath.Instance.distance;
+            pheromonePower = BestPath.Instance.Distance;
             matrixSize = DistanceMatrixForTollRoads.Instance.Value.Length;
             noOfPoints = (int)Math.Sqrt(matrixSize);
             trialsMatrix = new double[matrixSize];
@@ -102,12 +102,12 @@ namespace TSPTimeCost.TSP
         {
             for (int i = 0; i < noOfAnts; i++)
             {
-                pathList.Add(InitalizePath(noOfPoints));
+                pathList.Add(InitalizePath());
             }
             return pathList;
         }
 
-        private static int[] InitalizePath(int noOfPoints)
+        private static int[] InitalizePath()
         {
             int[] path = new int[noOfPoints];
             for (int i = 0; i < noOfPoints; i++) { path[i] = -1; }
@@ -120,7 +120,7 @@ namespace TSPTimeCost.TSP
         private int[] CalculatePathForSingleAnt()
         {
             double[] probabilityMatrix = new double[matrixSize];
-            var path = InitalizePath(noOfPoints);
+            var path = InitalizePath();
             path = SetFirstAndLastPointInPath(path);
             probabilityMatrix = InitializeMatrixWithZeros(probabilityMatrix);
             probabilityMatrix = FillProbabilityMatrix(probabilityMatrix);
@@ -141,8 +141,8 @@ namespace TSPTimeCost.TSP
 
         private static int[] SetFirstAndLastPointInPath(int[] path)
         {
-            path[0] = BestPath.Instance.order[0];
-            path[path.Length - 1] = BestPath.Instance.order[path.Length - 1];
+            path[0] = BestPath.Instance.Order[0];
+            path[path.Length - 1] = BestPath.Instance.Order[path.Length - 1];
             return path;
         }
 
@@ -184,7 +184,7 @@ namespace TSPTimeCost.TSP
             return result;
         }
 
-        private VertexAndProbability[] CopyRowFromProbabilityMatrix(int q, int[] path, double[] probabilityMatrix)
+        private static VertexAndProbability[] CopyRowFromProbabilityMatrix(int q, int[] path, double[] probabilityMatrix)
         {
             VertexAndProbability[] result = new VertexAndProbability[noOfPoints];
             for (int i = 0; i < noOfPoints; i++)
@@ -216,7 +216,7 @@ namespace TSPTimeCost.TSP
             return row;
         }
 
-        private int DrawNewPointByProbability(VertexAndProbability[] row, int[] path)
+        private static int DrawNewPointByProbability(VertexAndProbability[] row, int[] path)
         {
             double randomLessThan1 = DrawRandomLessThan1();
             double sum = 0;
@@ -240,7 +240,7 @@ namespace TSPTimeCost.TSP
             return result;
         }
 
-        private double[] ClearProbabilityRowsForGivenPoint(int nr, double[] probabilityMatrix)
+        private static double[] ClearProbabilityRowsForGivenPoint(int nr, double[] probabilityMatrix)
         {
             for (int i = 0; i < noOfPoints; i++)
             {
@@ -287,13 +287,13 @@ namespace TSPTimeCost.TSP
         private static void ReplaceBestPathWithCurrentBest(List<int[]> pathList, double minimumPathInThisIteration,
             int minimumPathNumber)
         {
-            BestPath.Instance.distance = minimumPathInThisIteration;
-            BestPath.Instance.order = pathList[minimumPathNumber];
+            BestPath.Instance.Distance = minimumPathInThisIteration;
+            BestPath.Instance.Order = pathList[minimumPathNumber];
 
             for (int i = 0; i < noOfPoints - 1; i++)
             {
-                BestPath.Instance.disnancesInOrder[i] =
-                    DistanceMatrixForTollRoads.Instance.Value[BestPath.Instance.order[i] + noOfPoints * BestPath.Instance.order[i + 1]];
+                BestPath.Instance.DisnancesInOrder[i] =
+                    DistanceMatrixForTollRoads.Instance.Value[BestPath.Instance.Order[i] + noOfPoints * BestPath.Instance.Order[i + 1]];
             }
         }
 

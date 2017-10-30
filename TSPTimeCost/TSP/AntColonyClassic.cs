@@ -55,9 +55,9 @@ namespace TSPTimeCost.TSP {
         }//end of Ant Colony
 
 
-        public double CalculateDistanceInPath(int[] path) {
+        private double CalculateDistanceInPath(int[] path) {
             double result = 0;
-            int noOfPoints = path.Length;
+            noOfPoints = path.Length;
 
             for (int i = 0; i < noOfPoints - 1; i++) {
                 result += DistanceMatrixForFreeRoads.Instance.Value[path[i] * noOfPoints + path[i + 1]];
@@ -66,7 +66,7 @@ namespace TSPTimeCost.TSP {
         }
 
         private void InitializeParameters() {
-            pheromonePower = BestPath.Instance.distance;
+            pheromonePower = BestPath.Instance.Distance;
             matrixSize = DistanceMatrixForFreeRoads.Instance.Value.Length;
             noOfPoints = (int)Math.Sqrt(matrixSize);
             trialsMatrix = new double[matrixSize];
@@ -86,12 +86,12 @@ namespace TSPTimeCost.TSP {
 
         private List<int[]> InitializePathList(List<int[]> pathList) {
             for (int i = 0; i < noOfAnts; i++) {
-                pathList.Add(InitalizePath(noOfPoints));
+                pathList.Add(InitalizePath());
             }
             return pathList;
         }
 
-        private static int[] InitalizePath(int noOfPoints) {
+        private static int[] InitalizePath() {
             int[] path = new int[noOfPoints];
             for (int i = 0; i < noOfPoints; i++) { path[i] = -1; }
             return path;
@@ -102,7 +102,7 @@ namespace TSPTimeCost.TSP {
         //RETURNS PATH CHOSEN BY THIS ANT
         private int[] CalculatePathForSingleAnt() {
             double[] probabilityMatrix = new double[matrixSize];
-            var path = InitalizePath(noOfPoints);
+            var path = InitalizePath();
             path = SetFirstAndLastPointInPath(path);
             probabilityMatrix = InitializeMatrixWithZeros(probabilityMatrix);
             probabilityMatrix = FillProbabilityMatrix(probabilityMatrix);
@@ -121,8 +121,8 @@ namespace TSPTimeCost.TSP {
         }
 
         private static int[] SetFirstAndLastPointInPath(int[] path) {
-            path[0] = BestPath.Instance.order[0];
-            path[path.Length - 1] = BestPath.Instance.order[path.Length - 1];
+            path[0] = BestPath.Instance.Order[0];
+            path[path.Length - 1] = BestPath.Instance.Order[path.Length - 1];
             return path;
         }
 
@@ -241,13 +241,13 @@ namespace TSPTimeCost.TSP {
         private static void ReplaceBestPathWithCurrentBest(List<int[]> pathList, double minimumPathInThisIteration,
             int minimumPathNumber) {
         
-            BestPath.Instance.distance = minimumPathInThisIteration;
-            BestPath.Instance.order = pathList[minimumPathNumber];
+            BestPath.Instance.Distance = minimumPathInThisIteration;
+            BestPath.Instance.Order = pathList[minimumPathNumber];
 
             for (int i = 0; i < noOfPoints - 1; i++)
             {
-                BestPath.Instance.disnancesInOrder[i] =
-                    DistanceMatrixForFreeRoads.Instance.Value[BestPath.Instance.order[i] + noOfPoints * BestPath.Instance.order[i+1]];
+                BestPath.Instance.DisnancesInOrder[i] =
+                    DistanceMatrixForFreeRoads.Instance.Value[BestPath.Instance.Order[i] + noOfPoints * BestPath.Instance.Order[i+1]];
             }
 
         }

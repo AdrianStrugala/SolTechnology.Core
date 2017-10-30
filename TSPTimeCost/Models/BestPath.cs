@@ -1,30 +1,28 @@
-﻿using System;
-
-/***************************************************/
+﻿/***************************************************/
 /* Singleton containing best path as order of cities */
 /***************************************************/
 
 namespace TSPTimeCost.Models {
     public sealed class BestPath {
 
-        public int[] order { get; set; }
-        public double[] disnancesInOrder { get; set; }
-        public double distance { get; set; }
-        private static volatile BestPath instance;
-        private static object syncRoot = new Object();
+        public int[] Order { get; set; }
+        public double[] DisnancesInOrder { get; set; }
+        public double Distance { get; set; }
+        private static volatile BestPath _instance;
+        private static readonly object SyncRoot = new object();
 
         private BestPath() { }
 
         public static BestPath Instance {
             get {
-                if (instance == null) {
-                    lock (syncRoot) {
-                        if (instance == null)
-                            instance = new BestPath();
+                if (_instance == null) {
+                    lock (SyncRoot) {
+                        if (_instance == null)
+                            _instance = new BestPath();
                     }
                 }
 
-                return instance;
+                return _instance;
             }
         }
     }

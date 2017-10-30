@@ -21,30 +21,6 @@ D:\GitHub\TSPTimeCost\Parallel Ants\bin\Debug\StoryTeller.pdb
 D:\GitHub\TSPTimeCost\Parallel Ants\bin\Debug\System.Runtime.CompilerServices.Unsafe.xml
 D:\GitHub\TSPTimeCost\Parallel Ants\bin\Debug\Newtonsoft.Json.dll
 D:\GitHub\TSPTimeCost\Parallel Ants\bin\Debug\Newtonsoft.Json.xml
-C:\Projects\TSPTimeCost\TSPTimeCost\bin\Debug\TSPTimeCost.exe.config
-C:\Projects\TSPTimeCost\TSPTimeCost\bin\Debug\TSPTimeCost.exe
-C:\Projects\TSPTimeCost\TSPTimeCost\bin\Debug\TSPTimeCost.pdb
-C:\Projects\TSPTimeCost\TSPTimeCost\bin\Debug\Microsoft.Extensions.Logging.Abstractions.dll
-C:\Projects\TSPTimeCost\TSPTimeCost\bin\Debug\Microsoft.Extensions.Primitives.dll
-C:\Projects\TSPTimeCost\TSPTimeCost\bin\Debug\Microsoft.Net.Http.Server.dll
-C:\Projects\TSPTimeCost\TSPTimeCost\bin\Debug\Newtonsoft.Json.dll
-C:\Projects\TSPTimeCost\TSPTimeCost\bin\Debug\StoryTeller.dll
-C:\Projects\TSPTimeCost\TSPTimeCost\bin\Debug\System.Runtime.CompilerServices.Unsafe.dll
-C:\Projects\TSPTimeCost\TSPTimeCost\bin\Debug\System.Runtime.InteropServices.RuntimeInformation.dll
-C:\Projects\TSPTimeCost\TSPTimeCost\bin\Debug\System.ValueTuple.dll
-C:\Projects\TSPTimeCost\TSPTimeCost\bin\Debug\Microsoft.Extensions.Logging.Abstractions.xml
-C:\Projects\TSPTimeCost\TSPTimeCost\bin\Debug\Microsoft.Extensions.Primitives.xml
-C:\Projects\TSPTimeCost\TSPTimeCost\bin\Debug\Microsoft.Net.Http.Server.xml
-C:\Projects\TSPTimeCost\TSPTimeCost\bin\Debug\Newtonsoft.Json.xml
-C:\Projects\TSPTimeCost\TSPTimeCost\bin\Debug\StoryTeller.pdb
-C:\Projects\TSPTimeCost\TSPTimeCost\bin\Debug\System.Runtime.CompilerServices.Unsafe.xml
-C:\Projects\TSPTimeCost\TSPTimeCost\obj\Debug\TSPTimeCost.csprojResolveAssemblyReference.cache
-C:\Projects\TSPTimeCost\TSPTimeCost\obj\Debug\TSPTimeCost.Properties.Resources.resources
-C:\Projects\TSPTimeCost\TSPTimeCost\obj\Debug\TSPTimeCost.csproj.GenerateResource.Cache
-C:\Projects\TSPTimeCost\TSPTimeCost\obj\Debug\TSPTimeCost.csproj.CoreCompileInputs.cache
-C:\Projects\TSPTimeCost\TSPTimeCost\obj\Debug\TSPTimeCost.exe
-C:\Projects\TSPTimeCost\TSPTimeCost\obj\Debug\TSPTimeCost.pdb
-C:\Projects\TSPTimeCost\TSPTimeCost\obj\Debug\TSPTimeCost.TspTimeCostFrm.resources
 D:\GitHub\TSPTimeCost\TSPTimeCost\obj\Debug\TSPTimeCost.csprojResolveAssemblyReference.cache
 D:\GitHub\TSPTimeCost\TSPTimeCost\obj\Debug\TSPTimeCost.TspTimeCostFrm.resources
 D:\GitHub\TSPTimeCost\TSPTimeCost\obj\Debug\TSPTimeCost.Properties.Resources.resources
@@ -68,3 +44,26 @@ D:\GitHub\TSPTimeCost\TSPTimeCost\bin\Debug\Microsoft.Net.Http.Server.xml
 D:\GitHub\TSPTimeCost\TSPTimeCost\bin\Debug\Newtonsoft.Json.xml
 D:\GitHub\TSPTimeCost\TSPTimeCost\bin\Debug\StoryTeller.pdb
 D:\GitHub\TSPTimeCost\TSPTimeCost\bin\Debug\System.Runtime.CompilerServices.Unsafe.xml
+C:\Projects\TSPTimeCost\TSPTimeCost\bin\Debug\TSPTimeCost.exe.config
+C:\Projects\TSPTimeCost\TSPTimeCost\bin\Debug\TSPTimeCost.exe
+C:\Projects\TSPTimeCost\TSPTimeCost\bin\Debug\TSPTimeCost.pdb
+C:\Projects\TSPTimeCost\TSPTimeCost\bin\Debug\Microsoft.Extensions.Logging.Abstractions.dll
+C:\Projects\TSPTimeCost\TSPTimeCost\bin\Debug\Microsoft.Extensions.Primitives.dll
+C:\Projects\TSPTimeCost\TSPTimeCost\bin\Debug\Microsoft.Net.Http.Server.dll
+C:\Projects\TSPTimeCost\TSPTimeCost\bin\Debug\Newtonsoft.Json.dll
+C:\Projects\TSPTimeCost\TSPTimeCost\bin\Debug\StoryTeller.dll
+C:\Projects\TSPTimeCost\TSPTimeCost\bin\Debug\System.Runtime.CompilerServices.Unsafe.dll
+C:\Projects\TSPTimeCost\TSPTimeCost\bin\Debug\System.Runtime.InteropServices.RuntimeInformation.dll
+C:\Projects\TSPTimeCost\TSPTimeCost\bin\Debug\System.ValueTuple.dll
+C:\Projects\TSPTimeCost\TSPTimeCost\bin\Debug\Microsoft.Extensions.Logging.Abstractions.xml
+C:\Projects\TSPTimeCost\TSPTimeCost\bin\Debug\Microsoft.Extensions.Primitives.xml
+C:\Projects\TSPTimeCost\TSPTimeCost\bin\Debug\Microsoft.Net.Http.Server.xml
+C:\Projects\TSPTimeCost\TSPTimeCost\bin\Debug\Newtonsoft.Json.xml
+C:\Projects\TSPTimeCost\TSPTimeCost\bin\Debug\StoryTeller.pdb
+C:\Projects\TSPTimeCost\TSPTimeCost\bin\Debug\System.Runtime.CompilerServices.Unsafe.xml
+C:\Projects\TSPTimeCost\TSPTimeCost\obj\Debug\TSPTimeCost.TspTimeCostFrm.resources
+C:\Projects\TSPTimeCost\TSPTimeCost\obj\Debug\TSPTimeCost.Properties.Resources.resources
+C:\Projects\TSPTimeCost\TSPTimeCost\obj\Debug\TSPTimeCost.csproj.GenerateResource.Cache
+C:\Projects\TSPTimeCost\TSPTimeCost\obj\Debug\TSPTimeCost.csproj.CoreCompileInputs.cache
+C:\Projects\TSPTimeCost\TSPTimeCost\obj\Debug\TSPTimeCost.exe
+C:\Projects\TSPTimeCost\TSPTimeCost\obj\Debug\TSPTimeCost.pdb

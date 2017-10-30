@@ -1,6 +1,4 @@
-﻿using System;
-
-/***************************************************/
+﻿/***************************************************/
 /* Singleton containing distance matrix            */
 /***************************************************/
 
@@ -9,14 +7,14 @@ namespace TSPTimeCost.Models {
 
         public double[] Value { get; set; }
         private static volatile DistanceMatrixForFreeRoads _instance;
-        private static object syncRoot = new Object();
+        private static readonly object SyncRoot = new object();
 
         private DistanceMatrixForFreeRoads() {}
 
         public static DistanceMatrixForFreeRoads Instance {
             get {
                 if (_instance == null) {
-                    lock (syncRoot) {
+                    lock (SyncRoot) {
                         if (_instance == null)
                             _instance = new DistanceMatrixForFreeRoads();
                     }
