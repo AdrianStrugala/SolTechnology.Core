@@ -50,6 +50,9 @@ namespace TSPTimeCost.TSP {
                 if (j == noOfIterations - 1) {
                     (minimumPathNumber, minimumPathInThisIteration) = FindMinimumPathInThisIteration(pathList, minimumPathInThisIteration, minimumPathNumber);
                     ReplaceBestPathWithCurrentBest(pathList, minimumPathInThisIteration, minimumPathNumber);
+
+                    BestPath.Instance.Cost = 0;
+                    NormalizeDistances();
                 }
             }
         }//end of Ant Colony
@@ -246,10 +249,19 @@ namespace TSPTimeCost.TSP {
 
             for (int i = 0; i < noOfPoints - 1; i++)
             {
-                BestPath.Instance.DisnancesInOrder[i] =
+                BestPath.Instance.DistancesInOrder[i] =
                     DistanceMatrixForFreeRoads.Instance.Value[BestPath.Instance.Order[i] + noOfPoints * BestPath.Instance.Order[i+1]];
             }
 
+        }
+
+        private void NormalizeDistances()
+        {
+            BestPath.Instance.Distance = 0;
+            for (int i = 0; i < noOfPoints - 1; i++)
+            {
+                BestPath.Instance.Distance += BestPath.Instance.DistancesInOrder[i];
+            }
         }
 
 

@@ -239,7 +239,7 @@ namespace TSPTimeCost
                 BestPath.Instance.Order[i] = i;
             }
 
-            BestPath.Instance.DisnancesInOrder = new double[noOfCities - 1];
+            BestPath.Instance.DistancesInOrder = new double[noOfCities - 1];
 
         }
 

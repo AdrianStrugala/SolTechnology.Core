@@ -6,7 +6,7 @@ using TSPTimeCost.Models;
 namespace TSPTimeCost.TSP
 {
 
-    class AntColonyToll
+    class AntColonyWithLimit
     {
         // Algorithm parameters
         private const int noOfAnts = 50;
@@ -22,6 +22,12 @@ namespace TSPTimeCost.TSP
         private static int noOfPoints;
         private double[] attractivenessMatrix;
         private double[] trialsMatrix;
+        private double _limit;
+
+        public AntColonyWithLimit(double limit)
+        {
+            _limit = limit;
+        }
 
         public void AntColonySingleThread(List<City> cities)
         {
@@ -58,25 +64,38 @@ namespace TSPTimeCost.TSP
                     (minimumPathNumber, minimumPathInThisIteration) = FindMinimumPathInThisIteration(pathList, minimumPathInThisIteration, minimumPathNumber);
                     ReplaceBestPathWithCurrentBest(pathList, minimumPathInThisIteration, minimumPathNumber);
 
-                    var worthList = CalculateWorthList(cities);
 
-                    BestPath.Instance.Cost = 0;
+                    List<TimeDifferenceAndCost> worthList = CalculateWorthList(cities);
+                    worthList.Sort((x, y) => -1 * x.WorthParameter.CompareTo(y.WorthParameter));
+
+                    double overallCost = 0;
+
                     foreach (var item in worthList)
                     {
                         if (item.TimeDifference == 0) continue;
-                        BestPath.Instance.Cost += item.Cost;
+                        if (overallCost + item.Cost <= _limit)
+                        {
+                            overallCost += item.Cost;
+                        }
+                        else
+                        {
+                            BestPath.Instance.DistancesInOrder[item.Index] = DistanceMatrixForFreeRoads.Instance.Value[BestPath.Instance.Order[item.Index] + noOfPoints * BestPath.Instance.Order[item.Index + 1]];
+
+                        }
                     }
+
+                    BestPath.Instance.Cost = overallCost;
 
                     NormalizeDistances();
                 }
             }
-        }//end of Ant Colony
+        }
+        //end of Ant Colony
+        
 
-
-        public double CalculateDistanceInPath(int[] path)
+        private double CalculateDistanceInPath(int[] path)
         {
             double result = 0;
-            noOfPoints = path.Length;
 
             for (int i = 0; i < noOfPoints - 1; i++)
             {
@@ -347,7 +366,6 @@ namespace TSPTimeCost.TSP
                 BestPath.Instance.Distance += BestPath.Instance.DistancesInOrder[i];
             }
         }
-
 
     }
 

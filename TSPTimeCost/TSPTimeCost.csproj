@@ -85,10 +85,12 @@
     <Compile Include="Form1.Designer.cs">
       <DependentUpon>Form1.cs</DependentUpon>
     </Compile>
+    <Compile Include="Models\TimeDifferenceAndCost.cs" />
     <Compile Include="ProcessInputData.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TSP\AntColonyClassic.cs" />
+    <Compile Include="TSP\AntColonyWithLimit.cs" />
     <Compile Include="TSP\AntColonyToll.cs" />
     <Compile Include="Models\VertexAndProbability.cs" />
     <EmbeddedResource Include="Form1.resx">

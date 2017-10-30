@@ -67,3 +67,4 @@ C:\Projects\TSPTimeCost\TSPTimeCost\obj\Debug\TSPTimeCost.csproj.GenerateResourc
 C:\Projects\TSPTimeCost\TSPTimeCost\obj\Debug\TSPTimeCost.csproj.CoreCompileInputs.cache
 C:\Projects\TSPTimeCost\TSPTimeCost\obj\Debug\TSPTimeCost.exe
 C:\Projects\TSPTimeCost\TSPTimeCost\obj\Debug\TSPTimeCost.pdb
+C:\Projects\TSPTimeCost\TSPTimeCost\obj\Debug\TSPTimeCost.csprojResolveAssemblyReference.cache
