@@ -3,7 +3,20 @@
 /***************************************************/
 
 namespace TSPTimeCost.Models {
-    public sealed class DistanceMatrixForTollRoads {
+    public sealed class DistanceMatrixForTollRoads : IDistanceMatrix {
+        public IDistanceMatrix GetInstance()
+        {
+            if (_instance == null)
+            {
+                lock (SyncRoot)
+                {
+                    if (_instance == null)
+                        _instance = new DistanceMatrixForTollRoads();
+                }
+            }
+
+            return _instance;
+        }
 
         public double[] Value { get; set; }
         private static volatile DistanceMatrixForTollRoads _instance;
@@ -11,7 +24,7 @@ namespace TSPTimeCost.Models {
 
         private DistanceMatrixForTollRoads() {}
 
-        public static DistanceMatrixForTollRoads Instance {
+        public static IDistanceMatrix Instance {
             get {
                 if (_instance == null) {
                     lock (SyncRoot) {

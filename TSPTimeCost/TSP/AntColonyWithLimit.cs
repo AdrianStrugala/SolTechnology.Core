@@ -6,34 +6,20 @@ using TSPTimeCost.Models;
 namespace TSPTimeCost.TSP
 {
 
-    class AntColonyWithLimit
+    class AntColonyWithLimit : AntColony
     {
-        // Algorithm parameters
-        private const int noOfAnts = 50;
-        private const double trailEvaporationCoefficient = 0.3;
-        private const double basicTrialValue = 1;
-
-        //if attractivenesParameter >> trialPreference, program basicaly choses closest city every time
-        private const double trialPreference = 1;
-        private const double attractivenessParameter = 10;
-        private double pheromonePower;
-        private const int noOfIterations = 10;
-        private int matrixSize;
-        private static int noOfPoints;
-        private double[] attractivenessMatrix;
-        private double[] trialsMatrix;
-        private double _limit;
+        private readonly double _limit;
 
         public AntColonyWithLimit(double limit)
         {
             _limit = limit;
         }
 
-        public void AntColonySingleThread(List<City> cities)
+        public override void AntColonySingleThread(List<City> cities)
         {
 
-            InitializeParameters();
-            FillAttractivenessMatrix();
+            InitializeParameters(DistanceMatrixForTollRoads.Instance);
+            FillAttractivenessMatrix(DistanceMatrixForTollRoads.Instance);
             FillTrialsMatrix();
 
             //each iteration is one trip of the ants
@@ -53,7 +39,7 @@ namespace TSPTimeCost.TSP
                 //must be separate, to not affect ants in the same iteration
                 for (int i = 0; i < noOfAnts; i++)
                 {
-                    UpdateTrialsMatrix(pathList[i]);
+                    UpdateTrialsMatrix(pathList[i], DistanceMatrixForTollRoads.Instance);
                 }
 
                 EvaporateTrialsMatrix();
@@ -61,8 +47,8 @@ namespace TSPTimeCost.TSP
                 //if its last iteration
                 if (j == noOfIterations - 1)
                 {
-                    (minimumPathNumber, minimumPathInThisIteration) = FindMinimumPathInThisIteration(pathList, minimumPathInThisIteration, minimumPathNumber);
-                    ReplaceBestPathWithCurrentBest(pathList, minimumPathInThisIteration, minimumPathNumber);
+                    (minimumPathNumber, minimumPathInThisIteration) = FindMinimumPathInThisIteration(pathList, minimumPathInThisIteration, minimumPathNumber, DistanceMatrixForTollRoads.Instance);
+                    ReplaceBestPathWithCurrentBest(pathList, minimumPathInThisIteration, minimumPathNumber, DistanceMatrixForTollRoads.Instance);
 
 
                     List<TimeDifferenceAndCost> worthList = CalculateWorthList(cities);
@@ -70,19 +56,7 @@ namespace TSPTimeCost.TSP
 
                     double overallCost = 0;
 
-                    foreach (var item in worthList)
-                    {
-                        if (item.TimeDifference == 0) continue;
-                        if (overallCost + item.Cost <= _limit)
-                        {
-                            overallCost += item.Cost;
-                        }
-                        else
-                        {
-                            BestPath.Instance.DistancesInOrder[item.Index] = DistanceMatrixForFreeRoads.Instance.Value[BestPath.Instance.Order[item.Index] + noOfPoints * BestPath.Instance.Order[item.Index + 1]];
-
-                        }
-                    }
+                    overallCost = UpdateCostsAndBestPath(overallCost, worthList);
 
                     BestPath.Instance.Cost = overallCost;
 
@@ -90,282 +64,28 @@ namespace TSPTimeCost.TSP
                 }
             }
         }
+
+        private double UpdateCostsAndBestPath(double overallCost, List<TimeDifferenceAndCost> worthList)
+        {
+            foreach (var item in worthList)
+            {
+                if (item.TimeDifference == 0) continue;
+                if (overallCost + item.Cost <= _limit)
+                {
+                    overallCost += item.Cost;
+                }
+                else
+                {
+                    BestPath.Instance.DistancesInOrder[item.Index] =
+                        DistanceMatrixForFreeRoads.Instance.Value[
+                            BestPath.Instance.Order[item.Index] + noOfPoints * BestPath.Instance.Order[item.Index + 1]];
+                }
+            }
+            return overallCost;
+        }
         //end of Ant Colony
-        
-
-        private double CalculateDistanceInPath(int[] path)
-        {
-            double result = 0;
-
-            for (int i = 0; i < noOfPoints - 1; i++)
-            {
-                result += DistanceMatrixForTollRoads.Instance.Value[path[i] * noOfPoints + path[i + 1]];
-            }
-            return result;
-        }
-
-        private void InitializeParameters()
-        {
-            pheromonePower = BestPath.Instance.Distance;
-            matrixSize = DistanceMatrixForTollRoads.Instance.Value.Length;
-            noOfPoints = (int)Math.Sqrt(matrixSize);
-            trialsMatrix = new double[matrixSize];
-            attractivenessMatrix = new double[matrixSize];
-        }
-        private void FillAttractivenessMatrix()
-        {
-            for (int i = 0; i < attractivenessMatrix.Length; i++)
-            {
-                attractivenessMatrix[i] = (1 / (DistanceMatrixForTollRoads.Instance.Value[i]));
-            }
-        }
-
-        private void FillTrialsMatrix()
-        {
-            for (int i = 0; i < trialsMatrix.Length; i++)
-            {
-                trialsMatrix[i] = basicTrialValue;
-            }
-        }
-
-        private List<int[]> InitializePathList(List<int[]> pathList)
-        {
-            for (int i = 0; i < noOfAnts; i++)
-            {
-                pathList.Add(InitalizePath());
-            }
-            return pathList;
-        }
-
-        private static int[] InitalizePath()
-        {
-            int[] path = new int[noOfPoints];
-            for (int i = 0; i < noOfPoints; i++) { path[i] = -1; }
-            return path;
-        }
 
 
-        //REPRESENTATION OF ANT.
-        //RETURNS PATH CHOSEN BY THIS ANT
-        private int[] CalculatePathForSingleAnt()
-        {
-            double[] probabilityMatrix = new double[matrixSize];
-            var path = InitalizePath();
-            path = SetFirstAndLastPointInPath(path);
-            probabilityMatrix = InitializeMatrixWithZeros(probabilityMatrix);
-            probabilityMatrix = FillProbabilityMatrix(probabilityMatrix);
-            probabilityMatrix = ClearProbabilityRowsForFirstAndLastPoint(path, probabilityMatrix);
-
-            //chosing next point until path is full
-            for (int j = 1; j < noOfPoints - 1; j++)
-            {
-                var row = CopyRowFromProbabilityMatrix(j, path, probabilityMatrix);
-                row = NormalizeProbabilityValues(row);
-                row = SortRowByProbability(row);
-
-                path[j] = DrawNewPointByProbability(row, path);
-                probabilityMatrix = ClearProbabilityRowsForGivenPoint(path[j], probabilityMatrix);
-            }
-            return path;
-        }
-
-        private static int[] SetFirstAndLastPointInPath(int[] path)
-        {
-            path[0] = BestPath.Instance.Order[0];
-            path[path.Length - 1] = BestPath.Instance.Order[path.Length - 1];
-            return path;
-        }
-
-        private double[] InitializeMatrixWithZeros(double[] matrix)
-        {
-            for (int i = 0; i < matrix.Length; i++)
-            {
-                matrix[i] = 0;
-            }
-            return matrix;
-        }
-
-        private double[] FillProbabilityMatrix(double[] probabilityMatrix)
-        {
-            for (int i = 0; i < noOfPoints * noOfPoints; i++)
-            {
-
-                probabilityMatrix[i] = Math.Pow(trialsMatrix[i], trialPreference) *
-                                       Math.Pow(attractivenessMatrix[i], attractivenessParameter);
-            }
-            return probabilityMatrix;
-        }
-
-        private double[] ClearProbabilityRowsForFirstAndLastPoint(int[] path, double[] probabilityMatrix)
-        {
-            for (int i = 0; i < noOfPoints; i++)
-            {
-                probabilityMatrix[path[path[0]] + i * noOfPoints] = 0;
-                probabilityMatrix[path[path[noOfPoints - 1]] + i * noOfPoints] = 0;
-            }
-            return probabilityMatrix;
-        }
-
-        private static double DrawRandomLessThan1()
-        {
-            Random ran = new Random();
-            double result = ran.Next(100);
-            result = result / 100;
-            return result;
-        }
-
-        private static VertexAndProbability[] CopyRowFromProbabilityMatrix(int q, int[] path, double[] probabilityMatrix)
-        {
-            VertexAndProbability[] result = new VertexAndProbability[noOfPoints];
-            for (int i = 0; i < noOfPoints; i++)
-            {
-                result[i] = new VertexAndProbability()
-                {
-                    Probability = probabilityMatrix[path[q - 1] * noOfPoints + i],
-                    Vertex = i
-                };
-            }
-
-            return result;
-        }
-
-        private static VertexAndProbability[] NormalizeProbabilityValues(VertexAndProbability[] row)
-        {
-            double sum = row.Sum(value => value.Probability);
-
-            foreach (var value in row)
-            {
-                value.Probability /= sum;
-            }
-            return row;
-        }
-
-        private static VertexAndProbability[] SortRowByProbability(VertexAndProbability[] row)
-        {
-            Array.Sort(row, (one, two) => one.Probability.CompareTo(two.Probability));
-            return row;
-        }
-
-        private static int DrawNewPointByProbability(VertexAndProbability[] row, int[] path)
-        {
-            double randomLessThan1 = DrawRandomLessThan1();
-            double sum = 0;
-            for (int i = 0; i < noOfPoints; i++)
-            {
-                double temp = row[i].Probability;
-                row[i].Probability += sum;
-                sum += temp;
-            }
-
-            int result = -1;
-
-            for (int i = 0; i < noOfPoints; i++)
-            {
-                if (row[i].Probability >= randomLessThan1 && !path.Contains(row[i].Vertex))
-                {
-                    result = row[i].Vertex;
-                    break;
-                }
-            }
-            return result;
-        }
-
-        private static double[] ClearProbabilityRowsForGivenPoint(int nr, double[] probabilityMatrix)
-        {
-            for (int i = 0; i < noOfPoints; i++)
-            {
-                probabilityMatrix[nr + i * noOfPoints] = 0;
-            }
-            return probabilityMatrix;
-        }
-
-        private (int, double) FindMinimumPathInThisIteration(List<int[]> pathList, double min, int nr)
-        {
-            double[] distances = new double[pathList.Count];
-
-            for (int i = 0; i < pathList.Count; i++)
-            {
-                distances[i] = CalculateDistanceInPath(pathList[i]);
-
-                if (distances[i] < min)
-                {
-                    min = distances[i];
-                    nr = i;
-                }
-            }
-            return (nr, min);
-        }
-
-        private void UpdateTrialsMatrix(int[] path)
-        {
-            for (int i = 0; i < noOfPoints - 1; i++)
-            {
-                double distance = CalculateDistanceInPath(path);
-                trialsMatrix[path[i] * noOfPoints + path[i + 1]] += (pheromonePower * trailEvaporationCoefficient / distance / noOfAnts);
-                trialsMatrix[path[i + 1] * noOfPoints + path[i]] += (pheromonePower * trailEvaporationCoefficient / distance / noOfAnts);
-            }
-        }
-
-        private void EvaporateTrialsMatrix()
-        {
-            for (int i = 0; i < matrixSize; i++)
-            {
-                trialsMatrix[i] -= trailEvaporationCoefficient * trialsMatrix[i];
-            }
-        }
-
-        private static void ReplaceBestPathWithCurrentBest(List<int[]> pathList, double minimumPathInThisIteration,
-            int minimumPathNumber)
-        {
-            BestPath.Instance.Distance = minimumPathInThisIteration;
-            BestPath.Instance.Order = pathList[minimumPathNumber];
-
-            for (int i = 0; i < noOfPoints - 1; i++)
-            {
-                BestPath.Instance.DistancesInOrder[i] =
-                    DistanceMatrixForTollRoads.Instance.Value[BestPath.Instance.Order[i] + noOfPoints * BestPath.Instance.Order[i + 1]];
-            }
-        }
-
-        private List<TimeDifferenceAndCost> CalculateWorthList(List<City> cities)
-        {
-            List<TimeDifferenceAndCost> worthList = new List<TimeDifferenceAndCost>();
-
-
-            for (int i = 0; i < cities.Count - 1; i++)
-            {
-                City origin = cities[BestPath.Instance.Order[i]];
-                City destination = cities[BestPath.Instance.Order[i + 1]];
-                var indexOrigin = cities.IndexOf(origin);
-                var indexDestination = cities.IndexOf(destination);
-
-                TimeDifferenceAndCost item =
-                    new TimeDifferenceAndCost
-                    {
-                        Cost = CostMatrix.Instance.Value[indexOrigin + cities.Count * indexDestination],
-                        Index = i,
-                        TimeDifference =
-                            DistanceMatrixForFreeRoads.Instance.Value[indexOrigin + cities.Count * indexDestination] -
-                            DistanceMatrixForTollRoads.Instance.Value[indexOrigin + cities.Count * indexDestination]
-                    };
-
-                item.WorthParameter = item.TimeDifference / item.Cost;
-
-
-                worthList.Add(item);
-            }
-
-            return worthList;
-        }
-
-        private void NormalizeDistances()
-        {
-            BestPath.Instance.Distance = 0;
-            for (int i = 0; i < noOfPoints - 1; i++)
-            {
-                BestPath.Instance.Distance += BestPath.Instance.DistancesInOrder[i];
-            }
-        }
 
     }
 

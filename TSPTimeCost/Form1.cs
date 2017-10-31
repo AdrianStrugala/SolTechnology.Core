@@ -33,7 +33,7 @@ namespace TSPTimeCost
             processInputData.CalculateCostMatrix(_cities);
 
 
-            BestPath.Instance.Distance = new AntColonyToll().CalculateDistanceInPath(BestPath.Instance.Order);
+            BestPath.Instance.Distance = new AntColonyToll().CalculateDistanceInPath(BestPath.Instance.Order, DistanceMatrixForTollRoads.Instance);
 
         }
 
@@ -173,7 +173,7 @@ namespace TSPTimeCost
         {
 
             AntColonyClassic ants = new AntColonyClassic();
-            ants.AntColonySingleThread();
+            ants.AntColonySingleThread(_cities);
 
             ShowRoute("ClassicTSP");
         }
