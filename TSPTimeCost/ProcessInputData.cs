@@ -47,7 +47,8 @@ namespace TSPTimeCost
 
         private static List<string> ReadCities()
         {
-            List<string> cities = new List<string> { "Como", "Verona", "Florence", "Pisa", "Turin", "Milan", "Genoa", "Bergamo" };
+           // List<string> cities = new List<string> { "Como", "Verona", "Florence", "Pisa", "Turin", "Milan", "Genoa", "Bergamo" };
+            List<string> cities = new List<string> { "Como", "Verona", "Florence", "Turin", "Milan"};
             // List<string> _cities = new List<string> { "Wroclaw", "Lodz", "Warszawa", "Krakow", "Poznan", "Gdansk", "Lublin", "Bialystok" };
 
             return cities;
@@ -107,7 +108,7 @@ namespace TSPTimeCost
                     else
                     {
                         DistanceMatrixForFreeRoads.Instance.Value[j + i * cities.Count] =
-                            GetDurationBetweenTwoCitiesByFreeRoad(cities[i].Name, cities[j].Name);
+                            GetDurationBetweenTwoCitiesByFreeRoad(cities[i].Latitude, cities[i].Longitude, cities[j].Latitude, cities[j].Longitude);
                     }
                 }
             }
@@ -129,7 +130,7 @@ namespace TSPTimeCost
                     else
                     {
                         DistanceMatrixForTollRoads.Instance.Value[j + i * cities.Count] =
-                            GetDurationBetweenTwoCitiesByTollRoad(cities[i].Name, cities[j].Name);
+                            GetDurationBetweenTwoCitiesByTollRoad(cities[i].Latitude, cities[i].Longitude, cities[j].Latitude, cities[j].Longitude);
                     }
                 }
             }
@@ -168,11 +169,11 @@ namespace TSPTimeCost
             return result / 100;
         }
 
-        private static int GetDurationBetweenTwoCitiesByTollRoad(string origin, string destination)
+        private static int GetDurationBetweenTwoCitiesByTollRoad(double originLan, double originLon, double destinationLan, double destinationLon)
         {
 
             string url =
-                $"https://maps.googleapis.com/maps/api/distancematrix/json?units=imperial&origins={origin}&destinations={destination}&key=AIzaSyCdHbtbmF8Y2nfesiu0KUUJagdG7_oui1k";
+                $"https://maps.googleapis.com/maps/api/distancematrix/json?units=imperial&origins={originLan},{originLon}&destinations={destinationLan},{destinationLon}&key=AIzaSyCdHbtbmF8Y2nfesiu0KUUJagdG7_oui1k";
 
             HttpWebRequest request = (HttpWebRequest)WebRequest.Create(url);
 
@@ -198,11 +199,12 @@ namespace TSPTimeCost
 
         }
 
-        private static int GetDurationBetweenTwoCitiesByFreeRoad(string origin, string destination)
+        private int GetDurationBetweenTwoCitiesByFreeRoad(double originLan, double originLon, double destinationLan, double destinationLon)
         {
 
             string url =
-                $"https://maps.googleapis.com/maps/api/distancematrix/json?units=imperial&origins={origin}&destinations={destination}&avoid=tolls&key=AIzaSyCdHbtbmF8Y2nfesiu0KUUJagdG7_oui1k";
+                $"https://maps.googleapis.com/maps/api/distancematrix/json?units=imperial&origins={originLan},{originLon}&destinations={destinationLan},{destinationLon}&avoid=tolls&key=AIzaSyCdHbtbmF8Y2nfesiu0KUUJagdG7_oui1k";
+          //  string url = $"https://maps.googleapis.com/maps/api/distancematrix/json?units=imperial&origins={originLan},{originLon}&destinations={destinationLan},{destinationLon}&mode=walking&avoid=tolls&key=AIzaSyCdHbtbmF8Y2nfesiu0KUUJagdG7_oui1k";
 
             HttpWebRequest request = (HttpWebRequest)WebRequest.Create(url);
 
