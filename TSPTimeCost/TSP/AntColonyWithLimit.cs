@@ -51,8 +51,8 @@ namespace TSPTimeCost.TSP
                     ReplaceBestPathWithCurrentBest(pathList, minimumPathInThisIteration, minimumPathNumber, DistanceMatrixForTollRoads.Instance);
 
 
-                    List<TimeDifferenceAndCost> worthList = CalculateWorthList(cities);
-                    worthList.Sort((x, y) => -1 * x.WorthParameter.CompareTo(y.WorthParameter));
+                    List<TimeDifferenceAndCost> worthList = CalculateGoal(cities);
+                    worthList.Sort((x, y) => 1 * x.Goal.CompareTo(y.Goal));
 
                     double overallCost = 0;
 
@@ -70,15 +70,19 @@ namespace TSPTimeCost.TSP
             foreach (var item in worthList)
             {
                 if (item.TimeDifference == 0) continue;
-                if (overallCost + item.Cost <= _limit)
+                if (overallCost + item.FeeCost <= _limit)
                 {
-                    overallCost += item.Cost;
+                    overallCost += item.FeeCost;
                 }
                 else
                 {
                     BestPath.Instance.DistancesInOrder[item.Index] =
                         DistanceMatrixForFreeRoads.Instance.Value[
                             BestPath.Instance.Order[item.Index] + noOfPoints * BestPath.Instance.Order[item.Index + 1]];
+
+                    item.Goal = GoalFreeRoad;
+                    BestPath.Instance.Goal[item.Index] = GoalFreeRoad;
+                    item.TimeDifference = 0;
                 }
             }
             return overallCost;

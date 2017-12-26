@@ -42,13 +42,13 @@ namespace TSPTimeCost.TSP
                     (minimumPathNumber, minimumPathInThisIteration) = FindMinimumPathInThisIteration(pathList, minimumPathInThisIteration, minimumPathNumber, DistanceMatrixForTollRoads.Instance);
                     ReplaceBestPathWithCurrentBest(pathList, minimumPathInThisIteration, minimumPathNumber, DistanceMatrixForTollRoads.Instance);
 
-                    var worthList = CalculateWorthList(cities);
+                    var worthList = CalculateGoal(cities);
 
                     BestPath.Instance.Cost = 0;
                     foreach (var item in worthList)
                     {
                         if (item.TimeDifference == 0) continue;
-                        BestPath.Instance.Cost += item.Cost;
+                        BestPath.Instance.Cost += item.FeeCost;
                     }
 
                     NormalizeDistances();

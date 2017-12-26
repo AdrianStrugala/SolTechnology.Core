@@ -5,8 +5,17 @@ using TSPTimeCost.Models;
 
 namespace TSPTimeCost.TSP
 {
+
     abstract class AntColony
     {
+        //Goal parameters
+
+        public static double FuelPrice { get; } = 1.26;
+        public static double RoadVelocity { get; } = 70;
+        public static double HighwayVelocity { get; } = 120;
+        public static double RoadCombustion { get; } = 0.06; //per km
+        public static double GoalFreeRoad { get; } = RoadVelocity * RoadCombustion * FuelPrice;
+
         // Algorithm parameters
         protected const int noOfAnts = 50;
         private const double trailEvaporationCoefficient = 0.3;
@@ -273,9 +282,10 @@ namespace TSPTimeCost.TSP
             }
         }
 
-        protected List<TimeDifferenceAndCost> CalculateWorthList(List<City> cities)
+        //G=  ΔC/ΔT
+        protected List<TimeDifferenceAndCost> CalculateGoal(List<City> cities)
         {
-            List<TimeDifferenceAndCost> worthList = new List<TimeDifferenceAndCost>();
+            List<TimeDifferenceAndCost> goalList = new List<TimeDifferenceAndCost>();
 
 
             for (int i = 0; i < cities.Count - 1; i++)
@@ -285,23 +295,42 @@ namespace TSPTimeCost.TSP
                 var indexOrigin = cities.IndexOf(origin);
                 var indexDestination = cities.IndexOf(destination);
 
-                TimeDifferenceAndCost item =
+                TimeDifferenceAndCost goalItem =
                     new TimeDifferenceAndCost
                     {
-                        Cost = CostMatrix.Instance.Value[indexOrigin + cities.Count * indexDestination],
+                        FeeCost = CostMatrix.Instance.Value[indexOrigin + cities.Count * indexDestination],
                         Index = i,
                         TimeDifference =
                             DistanceMatrixForFreeRoads.Instance.Value[indexOrigin + cities.Count * indexDestination] -
                             DistanceMatrixForTollRoads.Instance.Value[indexOrigin + cities.Count * indexDestination]
                     };
 
-                item.WorthParameter = item.TimeDifference / item.Cost;
+                // C_G=s×combustion×fuel price [€]
+                goalItem.GasolineCostFree =
+                    DistanceMatrixForFreeRoads.Instance.Value[indexOrigin + cities.Count * indexDestination] /
+                    3600 * RoadVelocity * RoadCombustion * FuelPrice;
 
+                goalItem.GasolineCostToll =
+                    DistanceMatrixForTollRoads.Instance.Value[indexOrigin + cities.Count * indexDestination] /
+                    3600 * HighwayVelocity * RoadCombustion * 1.25 * FuelPrice;
 
-                worthList.Add(item);
+                if (BestPath.Instance.DistancesInOrder[i] == DistanceMatrixForFreeRoads.Instance.Value[indexOrigin + cities.Count * indexDestination]) //free road
+                {
+                   // goalItem.Goal = goalItem.GasolineCostFree / (DistanceMatrixForFreeRoads.Instance.Value[indexOrigin + cities.Count * indexDestination] / 3600);
+                    goalItem.Goal = GoalFreeRoad; //const value, equal to above
+                }
+
+                else // C_G = s × combustion × fuel price [€] 
+                {                  
+                    goalItem.Goal = (goalItem.FeeCost + goalItem.GasolineCostToll - goalItem.GasolineCostFree) / (goalItem.TimeDifference / 3600);
+                }
+               
+                BestPath.Instance.Goal[i] = goalItem.Goal;
+
+                goalList.Add(goalItem);
             }
 
-            return worthList;
+            return goalList;
         }
 
     }

@@ -46,6 +46,8 @@ namespace TSPTimeCost.TSP
 
                     BestPath.Instance.Cost = 0;
                     NormalizeDistances();
+
+                    CalculateGoal(cities);
                 }
             }
         } //end of Ant Colony

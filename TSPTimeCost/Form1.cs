@@ -32,11 +32,6 @@ namespace TSPTimeCost
             processInputData.CalculateDistanceMatrixForFreeRoads(_cities);
             processInputData.CalculateCostMatrix(_cities);
 
-           var test1 =  DistanceMatrixForFreeRoads.Instance.GetInstance().Value;
-            var test2 = DistanceMatrixForTollRoads.Instance.GetInstance().Value; 
-            var test3 = CostMatrix.Instance.Value;
-
-
             BestPath.Instance.Distance = new AntColonyToll().CalculateDistanceInPath(BestPath.Instance.Order, DistanceMatrixForTollRoads.Instance);
 
         }
@@ -58,7 +53,6 @@ namespace TSPTimeCost
             Area.Series["TollTSP"].ChartType = SeriesChartType.Line;
             Area.Series["TollTSP"].Color = Color.Blue;
 
-
             Area.Series.Add("ClassicTSP");
             Area.Series["ClassicTSP"].IsVisibleInLegend = false;
             Area.Series["ClassicTSP"].BorderWidth = 6;
@@ -71,6 +65,12 @@ namespace TSPTimeCost
             Area.Series["LimitTSP"].BorderWidth = 6;
             Area.Series["LimitTSP"].ChartType = SeriesChartType.Line;
             Area.Series["LimitTSP"].Color = Color.Black;
+
+            Area.Series.Add("EvaluationTSP");
+            Area.Series["EvaluationTSP"].IsVisibleInLegend = false;
+            Area.Series["EvaluationTSP"].BorderWidth = 6;
+            Area.Series["EvaluationTSP"].ChartType = SeriesChartType.Line;
+            Area.Series["EvaluationTSP"].Color = Color.Green;
         }
 
 
@@ -98,7 +98,20 @@ namespace TSPTimeCost
                 text += _cities[BestPath.Instance.Order[i]].Name + "-" + IsTollFragment(i) + ">";
             }
             text += _cities[BestPath.Instance.Order[_cities.Count - 1]].Name;
-            text += "\nDuration: " + BestPath.Instance.Distance + "    Cost: " + BestPath.Instance.Cost;
+
+            text += "\nGoal values: ";
+            double goalSum = 0;
+            for (int i = 0; i < _cities.Count - 1; i++)
+            {
+                text += BestPath.Instance.Goal[i].ToString("#.000") + "  ";
+                goalSum += BestPath.Instance.Goal[i];
+            }
+
+            int hours = (int)(BestPath.Instance.Distance / 3600);
+            int minutes = (int)((BestPath.Instance.Distance - hours * 3600) / 60);
+            int seconds = (int)(BestPath.Instance.Distance % 60);
+
+            text += $"\nDuration: {hours}:{minutes:00}:{seconds:00}   Cost: {BestPath.Instance.Cost}";
 
             CityOrder.Text = text;
         }
@@ -175,7 +188,6 @@ namespace TSPTimeCost
 
         private void ClassicTSPBtn_Click(object sender, EventArgs e)
         {
-
             AntColonyClassic ants = new AntColonyClassic();
             ants.AntColonySingleThread(_cities);
 
@@ -193,6 +205,14 @@ namespace TSPTimeCost
             ShowRoute("LimitTSP");
         }
 
+        private void btnEvaluate_Click(object sender, EventArgs e)
+        {
+            AntColonyEvaluation ants = new AntColonyEvaluation();
+            ants.AntColonySingleThread(_cities);
+
+            ShowRoute("EvaluationTSP");
+        }
+
         private void TollTSPChck_CheckedChanged(object sender, EventArgs e)
         {
             Area.Series["TollTSP"].Enabled = tollTSPChck.Checked;
@@ -208,9 +228,21 @@ namespace TSPTimeCost
             Area.Series["LimitTSP"].Enabled = limitTSPChck.Checked;
         }
 
+        private void EvaluationTSPChck_CheckedChanged(object sender, EventArgs e)
+        {
+            Area.Series["EvaluationTSP"].Enabled = evaluationTSPChck.Checked;
+        }
+
         private void limitTxt_TextChanged(object sender, EventArgs e)
         {
 
         }
+
+        private void Area_Click(object sender, EventArgs e)
+        {
+
+        }
+
+
     }
 }
