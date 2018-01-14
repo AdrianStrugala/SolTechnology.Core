@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Drawing;
 using System.Windows.Forms;
 using System.Windows.Forms.DataVisualization.Charting;
@@ -10,30 +9,23 @@ namespace TSPTimeCost
 {
     public partial class TspTimeCostFrm : Form
     {
+        private static Controller _controller;
+        private static ViewModel _viewModel;
+
         public TspTimeCostFrm()
         {
+            _controller = new Controller();
+            _viewModel = new ViewModel();
             InitializeComponent();
-        }
 
-        private List<City> _cities = new List<City>();
+        }
 
         private void Form1_Load(object sender, EventArgs e)
         {
-
+            _controller.Initialize();
             InitializeSeries();
 
-            ProcessInputData processInputData = new ProcessInputData();
-
-            _cities = processInputData.GetCitiesFromGoogleApi();
             DrawCities();
-
-            ProcessInputData.InitializeSingletons(_cities.Count);
-            ProcessInputData.CalculateDistanceMatrixForTollRoads(_cities);
-            processInputData.CalculateDistanceMatrixForFreeRoads(_cities);
-            processInputData.CalculateCostMatrix(_cities);
-
-            BestPath.Instance.Distance = new AntColonyToll().CalculateDistanceInPath(BestPath.Instance.Order, DistanceMatrixForTollRoads.Instance);
-
         }
 
 
@@ -46,37 +38,25 @@ namespace TSPTimeCost
             Area.Series[0].MarkerSize = 10;
             Area.Series[0].Color = Color.Magenta;
 
-            Area.Series.Add("TollTSP");
-            Area.Series["TollTSP"].IsVisibleInLegend = false;
-            Area.Series["TollTSP"].BorderWidth = 6;
-            // Area.Series["TollTSP"].BorderDashStyle = ChartDashStyle.Solid;
-            Area.Series["TollTSP"].ChartType = SeriesChartType.Line;
-            Area.Series["TollTSP"].Color = Color.Blue;
+            InitializeSerie("TollTSP", Color.Blue);
+            InitializeSerie("ClassicTSP", Color.Red);
+            InitializeSerie("LimitTSP", Color.Black);
+            InitializeSerie("EvaluationTSP", Color.Green);
+        }
 
-            Area.Series.Add("ClassicTSP");
-            Area.Series["ClassicTSP"].IsVisibleInLegend = false;
-            Area.Series["ClassicTSP"].BorderWidth = 6;
-            //  Area.Series["ClassicTSP"].BorderDashStyle = ChartDashStyle.Solid;
-            Area.Series["ClassicTSP"].ChartType = SeriesChartType.Line;
-            Area.Series["ClassicTSP"].Color = Color.Red;
-
-            Area.Series.Add("LimitTSP");
-            Area.Series["LimitTSP"].IsVisibleInLegend = false;
-            Area.Series["LimitTSP"].BorderWidth = 6;
-            Area.Series["LimitTSP"].ChartType = SeriesChartType.Line;
-            Area.Series["LimitTSP"].Color = Color.Black;
-
-            Area.Series.Add("EvaluationTSP");
-            Area.Series["EvaluationTSP"].IsVisibleInLegend = false;
-            Area.Series["EvaluationTSP"].BorderWidth = 6;
-            Area.Series["EvaluationTSP"].ChartType = SeriesChartType.Line;
-            Area.Series["EvaluationTSP"].Color = Color.Green;
+        private void InitializeSerie(string name, Color color)
+        {
+            Area.Series.Add(name);
+            Area.Series[name].IsVisibleInLegend = false;
+            Area.Series[name].BorderWidth = 6;
+            Area.Series[name].ChartType = SeriesChartType.Line;
+            Area.Series[name].Color = color;
         }
 
 
         private void DrawCities()
         {
-            foreach (var city in _cities)
+            foreach (var city in _viewModel.Cities)
             {
                 Area.Series[0].Points.AddXY(city.Longitude, city.Latitude);
             }
@@ -84,50 +64,26 @@ namespace TSPTimeCost
 
         private void ShowRoute(string nameOfSeries)
         {
-
             Area.Series[nameOfSeries].Points.Clear();
-            WriteOrder();
+            orderLbl.Text = _controller.GetOrder();
+            goalLbl.Text = _controller.GetGoals();
+            durationLbl.Text = _controller.GetDuration();
             DrawRoute(nameOfSeries);
         }
 
-        private void WriteOrder()
-        {
-            string text = "Order: ";
-            for (int i = 0; i < _cities.Count - 1; i++)
-            {
-                text += _cities[BestPath.Instance.Order[i]].Name + "-" + IsTollFragment(i) + ">";
-            }
-            text += _cities[BestPath.Instance.Order[_cities.Count - 1]].Name;
-
-            text += "\nGoal values: ";
-            double goalSum = 0;
-            for (int i = 0; i < _cities.Count - 1; i++)
-            {
-                text += BestPath.Instance.Goal[i].ToString("#.000") + "  ";
-                goalSum += BestPath.Instance.Goal[i];
-            }
-
-            int hours = (int)(BestPath.Instance.Distance / 3600);
-            int minutes = (int)((BestPath.Instance.Distance - hours * 3600) / 60);
-            int seconds = (int)(BestPath.Instance.Distance % 60);
-
-            text += $"\nDuration: {hours}:{minutes:00}:{seconds:00}   Cost: {BestPath.Instance.Cost}";
-
-            CityOrder.Text = text;
-        }
 
         private void DrawRoute(string nameOfSeries)
         {
 
-            for (int i = 0; i < _cities.Count - 1; i++)
+            for (int i = 0; i < _viewModel.Cities.Count - 1; i++)
             {
 
-                if (IsTollFragment(i) == "(T)")
+                if (_controller.IsTollFragmentInformation(i) == "(T)")
                 {
-                    Area.Series[nameOfSeries].Points.AddXY(_cities[BestPath.Instance.Order[i]].Longitude,
-                        _cities[BestPath.Instance.Order[i]].Latitude);
-                    Area.Series[nameOfSeries].Points.AddXY(_cities[BestPath.Instance.Order[i + 1]].Longitude,
-                        _cities[BestPath.Instance.Order[i + 1]].Latitude);
+                    Area.Series[nameOfSeries].Points.AddXY(_viewModel.Cities[BestPath.Instance.Order[i]].Longitude,
+                        _viewModel.Cities[BestPath.Instance.Order[i]].Latitude);
+                    Area.Series[nameOfSeries].Points.AddXY(_viewModel.Cities[BestPath.Instance.Order[i + 1]].Longitude,
+                        _viewModel.Cities[BestPath.Instance.Order[i + 1]].Latitude);
 
                     Area.Series[nameOfSeries].Points[i * 2].BorderDashStyle = ChartDashStyle.Dot;
                     Area.Series[nameOfSeries].Points[i * 2 + 1].BorderDashStyle = ChartDashStyle.Dot;
@@ -136,10 +92,10 @@ namespace TSPTimeCost
 
                 else
                 {
-                    Area.Series[nameOfSeries].Points.AddXY(_cities[BestPath.Instance.Order[i]].Longitude,
-                        _cities[BestPath.Instance.Order[i]].Latitude);
-                    Area.Series[nameOfSeries].Points.AddXY(_cities[BestPath.Instance.Order[i + 1]].Longitude,
-                        _cities[BestPath.Instance.Order[i + 1]].Latitude);
+                    Area.Series[nameOfSeries].Points.AddXY(_viewModel.Cities[BestPath.Instance.Order[i]].Longitude,
+                        _viewModel.Cities[BestPath.Instance.Order[i]].Latitude);
+                    Area.Series[nameOfSeries].Points.AddXY(_viewModel.Cities[BestPath.Instance.Order[i + 1]].Longitude,
+                        _viewModel.Cities[BestPath.Instance.Order[i + 1]].Latitude);
 
                     Area.Series[nameOfSeries].Points[i * 2].BorderDashStyle = ChartDashStyle.Solid;
                     Area.Series[nameOfSeries].Points[i * 2 + 1].BorderDashStyle = ChartDashStyle.Solid;
@@ -148,33 +104,9 @@ namespace TSPTimeCost
             }
         }
 
-        private string IsTollFragment(int indexInBestPath)
-        {
-            City origin = _cities[BestPath.Instance.Order[indexInBestPath]];
-            City destination = _cities[BestPath.Instance.Order[indexInBestPath + 1]];
-            var indexOrigin = _cities.IndexOf(origin);
-            var indexDestination = _cities.IndexOf(destination);
-
-
-            if (Equals(
-                BestPath.Instance.DistancesInOrder[indexInBestPath],
-                DistanceMatrixForTollRoads.Instance.Value[indexOrigin + _cities.Count * indexDestination])
-                && !Equals(
-                    DistanceMatrixForTollRoads.Instance.Value[indexOrigin + _cities.Count * indexDestination],
-                    DistanceMatrixForFreeRoads.Instance.Value[indexOrigin + _cities.Count * indexDestination])
-            )
-            {
-                return "(T)";
-            }
-            return "(F)";
-        }
-
         private void TollTSPBtn_Click(object sender, EventArgs e)
         {
-
-            AntColonyToll ants = new AntColonyToll();
-            ants.AntColonySingleThread(_cities);
-
+            _controller.TollTSP();
             ShowRoute("TollTSP");
 
         }
@@ -183,33 +115,27 @@ namespace TSPTimeCost
         {
             Area.Series["TollTSP"].Points.Clear();
             Area.Series["ClassicTSP"].Points.Clear();
-            CityOrder.Text = "";
+            orderLbl.Text = "";
+            goalLbl.Text = "";
+            durationLbl.Text = "";
         }
 
         private void ClassicTSPBtn_Click(object sender, EventArgs e)
         {
-            AntColonyClassic ants = new AntColonyClassic();
-            ants.AntColonySingleThread(_cities);
-
+            _controller.ClassicTSP();
             ShowRoute("ClassicTSP");
         }
 
         private void LimitTSPBtn_Click(object sender, EventArgs e)
         {
-
-            double limit = Convert.ToDouble(limitTxt.Text);
-
-            AntColonyWithLimit ants = new AntColonyWithLimit(limit);
-            ants.AntColonySingleThread(_cities);
-
+            _viewModel.Limit = Convert.ToDouble(limitTxt.Text);
+            _controller.LimitTSP();
             ShowRoute("LimitTSP");
         }
 
         private void btnEvaluate_Click(object sender, EventArgs e)
         {
-            AntColonyEvaluation ants = new AntColonyEvaluation();
-            ants.AntColonySingleThread(_cities);
-
+            _controller.EvaluationTSP();
             ShowRoute("EvaluationTSP");
         }
 

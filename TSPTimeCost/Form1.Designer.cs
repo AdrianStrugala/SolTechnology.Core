@@ -27,7 +27,7 @@
             System.Windows.Forms.DataVisualization.Charting.Legend legend1 = new System.Windows.Forms.DataVisualization.Charting.Legend();
             System.Windows.Forms.DataVisualization.Charting.Series series1 = new System.Windows.Forms.DataVisualization.Charting.Series();
             this.Area = new System.Windows.Forms.DataVisualization.Charting.Chart();
-            this.CityOrder = new System.Windows.Forms.Label();
+            this.orderLbl = new System.Windows.Forms.Label();
             this.TollTSPBtn = new System.Windows.Forms.Button();
             this.ResetBtn = new System.Windows.Forms.Button();
             this.ClassicTSPBtn = new System.Windows.Forms.Button();
@@ -39,6 +39,9 @@
             this.limitTxt = new System.Windows.Forms.TextBox();
             this.btnEvaluate = new System.Windows.Forms.Button();
             this.evaluationTSPChck = new System.Windows.Forms.CheckBox();
+            this.label1 = new System.Windows.Forms.Label();
+            this.goalLbl = new System.Windows.Forms.Label();
+            this.durationLbl = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.Area)).BeginInit();
             this.SuspendLayout();
             // 
@@ -60,14 +63,14 @@
             this.Area.Text = "Area";
             this.Area.Click += new System.EventHandler(this.Area_Click);
             // 
-            // CityOrder
+            // orderLbl
             // 
-            this.CityOrder.AutoSize = true;
-            this.CityOrder.Location = new System.Drawing.Point(9, 553);
-            this.CityOrder.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
-            this.CityOrder.Name = "CityOrder";
-            this.CityOrder.Size = new System.Drawing.Size(0, 13);
-            this.CityOrder.TabIndex = 1;
+            this.orderLbl.AutoSize = true;
+            this.orderLbl.Location = new System.Drawing.Point(9, 553);
+            this.orderLbl.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
+            this.orderLbl.Name = "orderLbl";
+            this.orderLbl.Size = new System.Drawing.Size(0, 13);
+            this.orderLbl.TabIndex = 1;
             // 
             // TollTSPBtn
             // 
@@ -192,11 +195,41 @@
             this.evaluationTSPChck.UseVisualStyleBackColor = true;
             this.evaluationTSPChck.CheckedChanged += new System.EventHandler(this.EvaluationTSPChck_CheckedChanged);
             // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(396, 295);
+            this.label1.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(0, 13);
+            this.label1.TabIndex = 13;
+            // 
+            // goalLbl
+            // 
+            this.goalLbl.AutoSize = true;
+            this.goalLbl.Location = new System.Drawing.Point(9, 566);
+            this.goalLbl.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
+            this.goalLbl.Name = "goalLbl";
+            this.goalLbl.Size = new System.Drawing.Size(0, 13);
+            this.goalLbl.TabIndex = 14;
+            // 
+            // durationLbl
+            // 
+            this.durationLbl.AutoSize = true;
+            this.durationLbl.Location = new System.Drawing.Point(9, 580);
+            this.durationLbl.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
+            this.durationLbl.Name = "durationLbl";
+            this.durationLbl.Size = new System.Drawing.Size(0, 13);
+            this.durationLbl.TabIndex = 15;
+            // 
             // TspTimeCostFrm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(792, 592);
+            this.ClientSize = new System.Drawing.Size(792, 602);
+            this.Controls.Add(this.durationLbl);
+            this.Controls.Add(this.goalLbl);
+            this.Controls.Add(this.label1);
             this.Controls.Add(this.evaluationTSPChck);
             this.Controls.Add(this.btnEvaluate);
             this.Controls.Add(this.limitTxt);
@@ -208,7 +241,7 @@
             this.Controls.Add(this.ClassicTSPBtn);
             this.Controls.Add(this.ResetBtn);
             this.Controls.Add(this.TollTSPBtn);
-            this.Controls.Add(this.CityOrder);
+            this.Controls.Add(this.orderLbl);
             this.Controls.Add(this.Area);
             this.Margin = new System.Windows.Forms.Padding(2);
             this.Name = "TspTimeCostFrm";
@@ -223,7 +256,7 @@
         #endregion
 
         private System.Windows.Forms.DataVisualization.Charting.Chart Area;
-        private System.Windows.Forms.Label CityOrder;
+        private System.Windows.Forms.Label orderLbl;
         private System.Windows.Forms.Button TollTSPBtn;
         private System.Windows.Forms.Button ResetBtn;
         private System.Windows.Forms.Button ClassicTSPBtn;
@@ -235,6 +268,9 @@
         private System.Windows.Forms.TextBox limitTxt;
         private System.Windows.Forms.Button btnEvaluate;
         private System.Windows.Forms.CheckBox evaluationTSPChck;
+        private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.Label goalLbl;
+        private System.Windows.Forms.Label durationLbl;
     }
 }
 

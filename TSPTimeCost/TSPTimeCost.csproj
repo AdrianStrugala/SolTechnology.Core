@@ -74,6 +74,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Controller.cs" />
     <Compile Include="Models\BestPath.cs" />
     <Compile Include="Models\City.cs" />
     <Compile Include="Models\CostMatrix.cs" />
@@ -96,6 +97,7 @@
     <Compile Include="TSP\AntColonyWithLimit.cs" />
     <Compile Include="TSP\AntColonyToll.cs" />
     <Compile Include="Models\VertexAndProbability.cs" />
+    <Compile Include="ViewModel.cs" />
     <EmbeddedResource Include="Form1.resx">
       <DependentUpon>Form1.cs</DependentUpon>
     </EmbeddedResource>

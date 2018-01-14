@@ -50,7 +50,7 @@ namespace TSPTimeCost
 
         private static List<string> ReadCities()
         {
-            List<string> cities = new List<string> { "Como", "Verona", "Florence", "Pisa", "Turin", "Milan", "Genoa", "Bergamo" };
+            List<string> cities = new List<string> { "Como, Italy", "Verona", "Florence", "Pisa", "Turin", "Milan", "Genoa", "Bergamo" };
           //  List<string> cities = new List<string> { "Como", "Verona", "Florence", "Turin", "Milan"};
             // List<string> _cities = new List<string> { "Wroclaw", "Lodz", "Warszawa", "Krakow", "Poznan", "Gdansk", "Lublin", "Bialystok" };
 
@@ -229,9 +229,14 @@ namespace TSPTimeCost
 
             var json = JObject.Parse(content);
 
-
-            return json["rows"][0]["elements"][0]["duration"]["value"].Value<int>();
-
+            try
+            {
+                return json["rows"][0]["elements"][0]["duration"]["value"].Value<int>();
+            }
+            catch (Exception ex)
+            {
+            }
+            return 0;
         }
 
         private int GetDurationBetweenTwoCitiesByFreeRoad(double originLan, double originLon, double destinationLan, double destinationLon)
