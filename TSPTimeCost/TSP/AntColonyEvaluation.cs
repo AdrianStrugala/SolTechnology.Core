@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using TSPTimeCost.Models;
+using TSPTimeCost.Singletons;
 
 namespace TSPTimeCost.TSP
 {
@@ -9,7 +9,7 @@ namespace TSPTimeCost.TSP
     class AntColonyEvaluation : AntColony
     {
         private const double TimeCostEvaluation = 20.00;
-        public override void AntColonySingleThread(List<City> cities)
+        public override void SolveTSP()
         {
 
             InitializeParameters(DistanceMatrixForTollRoads.Instance);
@@ -17,7 +17,7 @@ namespace TSPTimeCost.TSP
             FillTrialsMatrix();
 
             //each iteration is one trip of the ants
-            for (int j = 0; j < noOfIterations; j++)
+            for (int j = 0; j < NoOfIterations; j++)
             {
                 List<int[]> pathList = new List<int[]>();
                 double minimumPathInThisIteration = Double.MaxValue;
@@ -26,12 +26,12 @@ namespace TSPTimeCost.TSP
                 pathList = InitializePathList(pathList);
 
                 //proceed for each ant
-                for (int i = 0; i < noOfAnts; i++)
+                for (int i = 0; i < NoOfAnts; i++)
                 {
                     pathList[i] = CalculatePathForSingleAnt();
                 }
                 //must be separate, to not affect ants in the same iteration
-                for (int i = 0; i < noOfAnts; i++)
+                for (int i = 0; i < NoOfAnts; i++)
                 {
                     UpdateTrialsMatrix(pathList[i], DistanceMatrixForTollRoads.Instance);
                 }
@@ -39,13 +39,13 @@ namespace TSPTimeCost.TSP
                 EvaporateTrialsMatrix();
 
                 //if its last iteration
-                if (j == noOfIterations - 1)
+                if (j == NoOfIterations - 1)
                 {
                     (minimumPathNumber, minimumPathInThisIteration) = FindMinimumPathInThisIteration(pathList, minimumPathInThisIteration, minimumPathNumber, DistanceMatrixForTollRoads.Instance);
                     ReplaceBestPathWithCurrentBest(pathList, minimumPathInThisIteration, minimumPathNumber, DistanceMatrixForTollRoads.Instance);
 
 
-                    List<TimeDifferenceAndCost> worthList = CalculateGoal(cities);
+                    List<TimeDifferenceAndCost> worthList = CalculateGoal();
                     worthList.Sort((x, y) => 1 * x.Goal.CompareTo(y.Goal));
 
                     double overallCost = 0;
@@ -72,10 +72,13 @@ namespace TSPTimeCost.TSP
                 {
                     BestPath.Instance.DistancesInOrder[item.Index] =
                         DistanceMatrixForFreeRoads.Instance.Value[
-                            BestPath.Instance.Order[item.Index] + noOfPoints * BestPath.Instance.Order[item.Index + 1]];
+                            BestPath.Instance.Order[item.Index] + NoOfCities * BestPath.Instance.Order[item.Index + 1]];
 
-                    item.Goal = GoalFreeRoad;
-                    BestPath.Instance.Goal[item.Index] = GoalFreeRoad;
+                    item.Goal = CalculateGoalForFreeRoad(Cities.Instance.ListOfCities, BestPath.Instance.Order[item.Index],
+                        BestPath.Instance.Order[item.Index + 1],item).Goal;
+
+                    BestPath.Instance.Goal[item.Index] = CalculateGoalForFreeRoad(Cities.Instance.ListOfCities, BestPath.Instance.Order[item.Index],
+                        BestPath.Instance.Order[item.Index + 1], item).Goal;
                     item.TimeDifference = 0;
                 }
             }

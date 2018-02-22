@@ -23,9 +23,9 @@
         /// the contents of this method with the code editor.
         /// </summary>
         private void InitializeComponent() {
-            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea1 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
-            System.Windows.Forms.DataVisualization.Charting.Legend legend1 = new System.Windows.Forms.DataVisualization.Charting.Legend();
-            System.Windows.Forms.DataVisualization.Charting.Series series1 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea2 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
+            System.Windows.Forms.DataVisualization.Charting.Legend legend2 = new System.Windows.Forms.DataVisualization.Charting.Legend();
+            System.Windows.Forms.DataVisualization.Charting.Series series2 = new System.Windows.Forms.DataVisualization.Charting.Series();
             this.Area = new System.Windows.Forms.DataVisualization.Charting.Chart();
             this.orderLbl = new System.Windows.Forms.Label();
             this.TollTSPBtn = new System.Windows.Forms.Button();
@@ -42,22 +42,24 @@
             this.label1 = new System.Windows.Forms.Label();
             this.goalLbl = new System.Windows.Forms.Label();
             this.durationLbl = new System.Windows.Forms.Label();
+            this.AttentionWhoreBtn = new System.Windows.Forms.Button();
+            this.AttentionWhoreChck = new System.Windows.Forms.CheckBox();
             ((System.ComponentModel.ISupportInitialize)(this.Area)).BeginInit();
             this.SuspendLayout();
             // 
             // Area
             // 
-            chartArea1.Name = "ChartArea1";
-            this.Area.ChartAreas.Add(chartArea1);
-            legend1.Name = "Legend1";
-            this.Area.Legends.Add(legend1);
+            chartArea2.Name = "ChartArea1";
+            this.Area.ChartAreas.Add(chartArea2);
+            legend2.Name = "Legend1";
+            this.Area.Legends.Add(legend2);
             this.Area.Location = new System.Drawing.Point(9, 10);
             this.Area.Margin = new System.Windows.Forms.Padding(2);
             this.Area.Name = "Area";
-            series1.ChartArea = "ChartArea1";
-            series1.Legend = "Legend1";
-            series1.Name = "Series1";
-            this.Area.Series.Add(series1);
+            series2.ChartArea = "ChartArea1";
+            series2.Legend = "Legend1";
+            series2.Name = "Series1";
+            this.Area.Series.Add(series2);
             this.Area.Size = new System.Drawing.Size(602, 541);
             this.Area.TabIndex = 0;
             this.Area.Text = "Area";
@@ -222,11 +224,36 @@
             this.durationLbl.Size = new System.Drawing.Size(0, 13);
             this.durationLbl.TabIndex = 15;
             // 
+            // AttentionWhoreBtn
+            // 
+            this.AttentionWhoreBtn.Location = new System.Drawing.Point(639, 295);
+            this.AttentionWhoreBtn.Margin = new System.Windows.Forms.Padding(2);
+            this.AttentionWhoreBtn.Name = "AttentionWhoreBtn";
+            this.AttentionWhoreBtn.Size = new System.Drawing.Size(105, 39);
+            this.AttentionWhoreBtn.TabIndex = 16;
+            this.AttentionWhoreBtn.Text = "Attention Whore";
+            this.AttentionWhoreBtn.UseVisualStyleBackColor = true;
+            this.AttentionWhoreBtn.Click += new System.EventHandler(this.AttentionWhoreBtn_Click);
+            // 
+            // AttentionWhoreChck
+            // 
+            this.AttentionWhoreChck.AutoSize = true;
+            this.AttentionWhoreChck.Checked = true;
+            this.AttentionWhoreChck.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.AttentionWhoreChck.Location = new System.Drawing.Point(757, 308);
+            this.AttentionWhoreChck.Name = "AttentionWhoreChck";
+            this.AttentionWhoreChck.Size = new System.Drawing.Size(15, 14);
+            this.AttentionWhoreChck.TabIndex = 17;
+            this.AttentionWhoreChck.UseVisualStyleBackColor = true;
+            this.AttentionWhoreChck.CheckedChanged += new System.EventHandler(this.AttentionWhoreChck_CheckedChanged);
+            // 
             // TspTimeCostFrm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(792, 602);
+            this.Controls.Add(this.AttentionWhoreChck);
+            this.Controls.Add(this.AttentionWhoreBtn);
             this.Controls.Add(this.durationLbl);
             this.Controls.Add(this.goalLbl);
             this.Controls.Add(this.label1);
@@ -271,6 +298,8 @@
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Label goalLbl;
         private System.Windows.Forms.Label durationLbl;
+        private System.Windows.Forms.Button AttentionWhoreBtn;
+        private System.Windows.Forms.CheckBox AttentionWhoreChck;
     }
 }
 

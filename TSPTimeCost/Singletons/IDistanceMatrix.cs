@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace TSPTimeCost.Models
+namespace TSPTimeCost.Singletons
 {
     public interface IDistanceMatrix
     {

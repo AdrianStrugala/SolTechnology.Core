@@ -2,7 +2,7 @@
 /* Singleton containing distance matrix            */
 /***************************************************/
 
-namespace TSPTimeCost.Models {
+namespace TSPTimeCost.Singletons {
     public sealed class CostMatrix {
 
         public double[] Value { get; set; }

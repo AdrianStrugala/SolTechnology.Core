@@ -1,13 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using TSPTimeCost.Models;
+using TSPTimeCost.Singletons;
 
 namespace TSPTimeCost.TSP
 {
 
     class AntColonyToll : AntColony
     {
-        public override void AntColonySingleThread(List<City> cities)
+        public override void SolveTSP()
         {
 
             InitializeParameters(DistanceMatrixForTollRoads.Instance);
@@ -15,7 +16,7 @@ namespace TSPTimeCost.TSP
             FillTrialsMatrix();
 
             //each iteration is one trip of the ants
-            for (int j = 0; j < noOfIterations; j++)
+            for (int j = 0; j < NoOfIterations; j++)
             {
                 List<int[]> pathList = new List<int[]>();
                 double minimumPathInThisIteration = Double.MaxValue;
@@ -24,12 +25,12 @@ namespace TSPTimeCost.TSP
                 pathList = InitializePathList(pathList);
 
                 //proceed for each ant
-                for (int i = 0; i < noOfAnts; i++)
+                for (int i = 0; i < NoOfAnts; i++)
                 {
                     pathList[i] = CalculatePathForSingleAnt();
                 }
                 //must be separate, to not affect ants in the same iteration
-                for (int i = 0; i < noOfAnts; i++)
+                for (int i = 0; i < NoOfAnts; i++)
                 {
                     UpdateTrialsMatrix(pathList[i], DistanceMatrixForTollRoads.Instance);
                 }
@@ -37,12 +38,12 @@ namespace TSPTimeCost.TSP
                 EvaporateTrialsMatrix();
 
                 //if its last iteration
-                if (j == noOfIterations - 1)
+                if (j == NoOfIterations - 1)
                 {
                     (minimumPathNumber, minimumPathInThisIteration) = FindMinimumPathInThisIteration(pathList, minimumPathInThisIteration, minimumPathNumber, DistanceMatrixForTollRoads.Instance);
                     ReplaceBestPathWithCurrentBest(pathList, minimumPathInThisIteration, minimumPathNumber, DistanceMatrixForTollRoads.Instance);
 
-                    var worthList = CalculateGoal(cities);
+                    var worthList = CalculateGoal();
 
                     BestPath.Instance.Cost = 0;
                     foreach (var item in worthList)

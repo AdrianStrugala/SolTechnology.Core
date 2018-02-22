@@ -2,8 +2,7 @@
 using System.Drawing;
 using System.Windows.Forms;
 using System.Windows.Forms.DataVisualization.Charting;
-using TSPTimeCost.Models;
-using TSPTimeCost.TSP;
+using TSPTimeCost.Singletons;
 
 namespace TSPTimeCost
 {
@@ -42,6 +41,7 @@ namespace TSPTimeCost
             InitializeSerie("ClassicTSP", Color.Red);
             InitializeSerie("LimitTSP", Color.Black);
             InitializeSerie("EvaluationTSP", Color.Green);
+            InitializeSerie("AttentionWhore", Color.Pink);
         }
 
         private void InitializeSerie(string name, Color color)
@@ -56,7 +56,7 @@ namespace TSPTimeCost
 
         private void DrawCities()
         {
-            foreach (var city in _viewModel.Cities)
+            foreach (var city in Cities.Instance.ListOfCities)
             {
                 Area.Series[0].Points.AddXY(city.Longitude, city.Latitude);
             }
@@ -75,15 +75,15 @@ namespace TSPTimeCost
         private void DrawRoute(string nameOfSeries)
         {
 
-            for (int i = 0; i < _viewModel.Cities.Count - 1; i++)
+            for (int i = 0; i < Cities.Instance.ListOfCities.Count - 1; i++)
             {
 
                 if (_controller.IsTollFragmentInformation(i) == "(T)")
                 {
-                    Area.Series[nameOfSeries].Points.AddXY(_viewModel.Cities[BestPath.Instance.Order[i]].Longitude,
-                        _viewModel.Cities[BestPath.Instance.Order[i]].Latitude);
-                    Area.Series[nameOfSeries].Points.AddXY(_viewModel.Cities[BestPath.Instance.Order[i + 1]].Longitude,
-                        _viewModel.Cities[BestPath.Instance.Order[i + 1]].Latitude);
+                    Area.Series[nameOfSeries].Points.AddXY(Cities.Instance.ListOfCities[BestPath.Instance.Order[i]].Longitude,
+                        Cities.Instance.ListOfCities[BestPath.Instance.Order[i]].Latitude);
+                    Area.Series[nameOfSeries].Points.AddXY(Cities.Instance.ListOfCities[BestPath.Instance.Order[i + 1]].Longitude,
+                        Cities.Instance.ListOfCities[BestPath.Instance.Order[i + 1]].Latitude);
 
                     Area.Series[nameOfSeries].Points[i * 2].BorderDashStyle = ChartDashStyle.Dot;
                     Area.Series[nameOfSeries].Points[i * 2 + 1].BorderDashStyle = ChartDashStyle.Dot;
@@ -92,10 +92,10 @@ namespace TSPTimeCost
 
                 else
                 {
-                    Area.Series[nameOfSeries].Points.AddXY(_viewModel.Cities[BestPath.Instance.Order[i]].Longitude,
-                        _viewModel.Cities[BestPath.Instance.Order[i]].Latitude);
-                    Area.Series[nameOfSeries].Points.AddXY(_viewModel.Cities[BestPath.Instance.Order[i + 1]].Longitude,
-                        _viewModel.Cities[BestPath.Instance.Order[i + 1]].Latitude);
+                    Area.Series[nameOfSeries].Points.AddXY(Cities.Instance.ListOfCities[BestPath.Instance.Order[i]].Longitude,
+                        Cities.Instance.ListOfCities[BestPath.Instance.Order[i]].Latitude);
+                    Area.Series[nameOfSeries].Points.AddXY(Cities.Instance.ListOfCities[BestPath.Instance.Order[i + 1]].Longitude,
+                        Cities.Instance.ListOfCities[BestPath.Instance.Order[i + 1]].Latitude);
 
                     Area.Series[nameOfSeries].Points[i * 2].BorderDashStyle = ChartDashStyle.Solid;
                     Area.Series[nameOfSeries].Points[i * 2 + 1].BorderDashStyle = ChartDashStyle.Solid;
@@ -169,6 +169,15 @@ namespace TSPTimeCost
 
         }
 
+        private void AttentionWhoreBtn_Click(object sender, EventArgs e)
+        {
+            _controller.AttentionWhore();
+            ShowRoute("AttentionWhore");
+        }
 
+        private void AttentionWhoreChck_CheckedChanged(object sender, EventArgs e)
+        {
+                Area.Series["AttentionWhore"].Enabled = limitTSPChck.Checked;
+        }
     }
 }

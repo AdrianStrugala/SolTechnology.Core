@@ -9,6 +9,7 @@ using System.Xml;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using TSPTimeCost.Models;
+using TSPTimeCost.Singletons;
 
 /**********************************************************
  * Process input from list of cities                      *
@@ -57,9 +58,9 @@ namespace TSPTimeCost
             return cities;
         }
 
-        public void CalculateCostMatrix(List<City> cities)
+        public void CalculateCostMatrix()
         {
-
+            List<City> cities = Cities.Instance.ListOfCities;
             CostMatrix.Instance.Value = new double[cities.Count * cities.Count];
 
             //            for (int i = 0; i < cities.Count; i++)
@@ -127,9 +128,9 @@ namespace TSPTimeCost
 //            }
         }
 
-        public void CalculateDistanceMatrixForFreeRoads(List<City> cities)
+        public void CalculateDistanceMatrixForFreeRoads()
         {
-
+            List<City> cities = Cities.Instance.ListOfCities;
             DistanceMatrixForFreeRoads.Instance.Value = new double[cities.Count * cities.Count];
 
             for (int i = 0; i < cities.Count; i++)
@@ -149,9 +150,9 @@ namespace TSPTimeCost
             }
         }
 
-        public static void CalculateDistanceMatrixForTollRoads(List<City> cities)
+        public static void CalculateDistanceMatrixForTollRoads()
         {
-
+            List<City> cities = Cities.Instance.ListOfCities;
             DistanceMatrixForTollRoads.Instance.Value = new double[cities.Count * cities.Count];
 
             for (int i = 0; i < cities.Count; i++)
@@ -269,12 +270,16 @@ namespace TSPTimeCost
 
         }
 
-        public static void InitializeSingletons(int noOfCities)
+        public static void InitializeSingletons()
         {
+            Cities.Instance.ListOfCities = new List<City>();
+            Cities.Instance.ListOfCities = GetCitiesFromGoogleApi();
+            int noOfCities = Cities.Instance.ListOfCities.Count;
             BestPath.Instance.Order = new int[noOfCities];
             BestPath.Instance.Goal = new double[noOfCities];
             DistanceMatrixForTollRoads.Instance.Value = new double[noOfCities * noOfCities];
             DistanceMatrixForFreeRoads.Instance.Value = new double[noOfCities * noOfCities];
+            
 
             //Fist bestPath is just cities in input order
             for (int i = 0; i < noOfCities; i++)
@@ -292,7 +297,7 @@ namespace TSPTimeCost
         }
 
 
-        public List<City> GetCitiesFromGoogleApi()
+        public static List<City> GetCitiesFromGoogleApi()
         {
             List<City> cities = new List<City>();
             List<string> cityNames = ReadCities();

@@ -1,11 +1,13 @@
-﻿using System.Collections.Generic;
-using TSPTimeCost.Models;
+﻿using TSPTimeCost.Models;
+using TSPTimeCost.Singletons;
 using TSPTimeCost.TSP;
+using AttentionWhore = TSPTimeCost.TSP.AttentionWhore;
 
 namespace TSPTimeCost
 {
     class Controller
     {
+        private double goalSum;
         private readonly ViewModel _viewModel;
 
 
@@ -19,34 +21,33 @@ namespace TSPTimeCost
         {
             ProcessInputData processInputData = new ProcessInputData();
 
-            _viewModel.Cities = new List<City>();
-            _viewModel.Cities = processInputData.GetCitiesFromGoogleApi();
 
-            ProcessInputData.InitializeSingletons(_viewModel.Cities.Count);
-            ProcessInputData.CalculateDistanceMatrixForTollRoads(_viewModel.Cities);
-            processInputData.CalculateDistanceMatrixForFreeRoads(_viewModel.Cities);
-            processInputData.CalculateCostMatrix(_viewModel.Cities);
+            ProcessInputData.InitializeSingletons();
+            ProcessInputData.CalculateDistanceMatrixForTollRoads();
+            processInputData.CalculateDistanceMatrixForFreeRoads();
+            processInputData.CalculateCostMatrix();
 
             BestPath.Instance.Distance = new AntColonyToll().CalculateDistanceInPath(BestPath.Instance.Order, DistanceMatrixForTollRoads.Instance);
+
         }
 
         public string GetOrder()
         {
             string text = "Order: ";
-            for (int i = 0; i < _viewModel.Cities.Count - 1; i++)
+            for (int i = 0; i < Cities.Instance.ListOfCities.Count - 1; i++)
             {
-                text += _viewModel.Cities[BestPath.Instance.Order[i]].Name + "-" + IsTollFragmentInformation(i) + ">";
+                text += Cities.Instance.ListOfCities[BestPath.Instance.Order[i]].Name + "-" + IsTollFragmentInformation(i) + ">";
             }
-            text += _viewModel.Cities[BestPath.Instance.Order[_viewModel.Cities.Count - 1]].Name;
+            text += Cities.Instance.ListOfCities[BestPath.Instance.Order[Cities.Instance.ListOfCities.Count - 1]].Name;
 
             return text;
         }
 
         public string GetGoals()
         {
+            goalSum = 0;
             string text = "Goal values: ";
-            double goalSum = 0;
-            for (int i = 0; i < _viewModel.Cities.Count - 1; i++)
+            for (int i = 0; i < Cities.Instance.ListOfCities.Count - 1; i++)
             {
                 text += BestPath.Instance.Goal[i].ToString("#.000") + "  ";
                 goalSum += BestPath.Instance.Goal[i];
@@ -61,23 +62,23 @@ namespace TSPTimeCost
             int minutes = (int)((BestPath.Instance.Distance - hours * 3600) / 60);
             int seconds = (int)(BestPath.Instance.Distance % 60);
 
-            return $"Duration: {hours}:{minutes:00}:{seconds:00}   Cost: {BestPath.Instance.Cost}";
+            return $"Duration: {hours}:{minutes:00}:{seconds:00}   Cost: {BestPath.Instance.Cost}   Goal: {goalSum}";
         }
 
         public string IsTollFragmentInformation(int indexInBestPath)
         {
-            City origin = _viewModel.Cities[BestPath.Instance.Order[indexInBestPath]];
-            City destination = _viewModel.Cities[BestPath.Instance.Order[indexInBestPath + 1]];
-            var indexOrigin = _viewModel.Cities.IndexOf(origin);
-            var indexDestination = _viewModel.Cities.IndexOf(destination);
+            City origin = Cities.Instance.ListOfCities[BestPath.Instance.Order[indexInBestPath]];
+            City destination = Cities.Instance.ListOfCities[BestPath.Instance.Order[indexInBestPath + 1]];
+            var indexOrigin = Cities.Instance.ListOfCities.IndexOf(origin);
+            var indexDestination = Cities.Instance.ListOfCities.IndexOf(destination);
 
 
             if (Equals(
                     BestPath.Instance.DistancesInOrder[indexInBestPath],
-                    DistanceMatrixForTollRoads.Instance.Value[indexOrigin + _viewModel.Cities.Count * indexDestination])
+                    DistanceMatrixForTollRoads.Instance.Value[indexOrigin + Cities.Instance.ListOfCities.Count * indexDestination])
                 && !Equals(
-                    DistanceMatrixForTollRoads.Instance.Value[indexOrigin + _viewModel.Cities.Count * indexDestination],
-                    DistanceMatrixForFreeRoads.Instance.Value[indexOrigin + _viewModel.Cities.Count * indexDestination])
+                    DistanceMatrixForTollRoads.Instance.Value[indexOrigin + Cities.Instance.ListOfCities.Count * indexDestination],
+                    DistanceMatrixForFreeRoads.Instance.Value[indexOrigin + Cities.Instance.ListOfCities.Count * indexDestination])
             )
             {
                 return "(T)";
@@ -88,28 +89,33 @@ namespace TSPTimeCost
         public void TollTSP()
         {
             AntColonyToll ants = new AntColonyToll();
-            ants.AntColonySingleThread(_viewModel.Cities);
+            ants.SolveTSP();
         }
 
         public void ClassicTSP()
         {
             AntColonyClassic ants = new AntColonyClassic();
-            ants.AntColonySingleThread(_viewModel.Cities);
+            ants.SolveTSP();
         }
 
         public void LimitTSP()
         {
             AntColonyWithLimit ants = new AntColonyWithLimit(_viewModel.Limit);
-            ants.AntColonySingleThread(_viewModel.Cities);
+            ants.SolveTSP();
         }
 
         public void EvaluationTSP()
         {
             AntColonyEvaluation ants = new AntColonyEvaluation();
-            ants.AntColonySingleThread(_viewModel.Cities);
+            ants.SolveTSP();
         }
 
 
+        public void AttentionWhore()
+        {
+            AttentionWhore attentionWhore = new AttentionWhore();
+            attentionWhore.SolveTSP();
+        }
     }
 }
 

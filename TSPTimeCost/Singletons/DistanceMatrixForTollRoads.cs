@@ -2,10 +2,8 @@
 /* Singleton containing distance matrix            */
 /***************************************************/
 
-namespace TSPTimeCost.Models
-{
-    public sealed class DistanceMatrixForFreeRoads : IDistanceMatrix
-    {
+namespace TSPTimeCost.Singletons {
+    public sealed class DistanceMatrixForTollRoads : IDistanceMatrix {
         public IDistanceMatrix GetInstance()
         {
             if (_instance == null)
@@ -13,7 +11,7 @@ namespace TSPTimeCost.Models
                 lock (SyncRoot)
                 {
                     if (_instance == null)
-                        _instance = new DistanceMatrixForFreeRoads();
+                        _instance = new DistanceMatrixForTollRoads();
                 }
             }
 
@@ -21,21 +19,17 @@ namespace TSPTimeCost.Models
         }
 
         public double[] Value { get; set; }
-        private static volatile DistanceMatrixForFreeRoads _instance;
+        private static volatile DistanceMatrixForTollRoads _instance;
         private static readonly object SyncRoot = new object();
 
-        private DistanceMatrixForFreeRoads() { }
+        private DistanceMatrixForTollRoads() {}
 
-        public static IDistanceMatrix Instance
-        {
-            get
-            {
-                if (_instance == null)
-                {
-                    lock (SyncRoot)
-                    {
+        public static IDistanceMatrix Instance {
+            get {
+                if (_instance == null) {
+                    lock (SyncRoot) {
                         if (_instance == null)
-                            _instance = new DistanceMatrixForFreeRoads();
+                            _instance = new DistanceMatrixForTollRoads();
                     }
                 }
 

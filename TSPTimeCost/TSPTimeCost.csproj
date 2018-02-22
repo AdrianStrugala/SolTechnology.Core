@@ -75,18 +75,19 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Controller.cs" />
-    <Compile Include="Models\BestPath.cs" />
+    <Compile Include="Singletons\BestPath.cs" />
     <Compile Include="Models\City.cs" />
-    <Compile Include="Models\CostMatrix.cs" />
-    <Compile Include="Models\DistanceMatrixForFreeRoads.cs" />
-    <Compile Include="Models\DistanceMatrixForTollRoads.cs" />
+    <Compile Include="Singletons\Cities.cs" />
+    <Compile Include="Singletons\CostMatrix.cs" />
+    <Compile Include="Singletons\DistanceMatrixForFreeRoads.cs" />
+    <Compile Include="Singletons\DistanceMatrixForTollRoads.cs" />
     <Compile Include="Form1.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Form1.Designer.cs">
       <DependentUpon>Form1.cs</DependentUpon>
     </Compile>
-    <Compile Include="Models\IDistanceMatrix.cs" />
+    <Compile Include="Singletons\IDistanceMatrix.cs" />
     <Compile Include="Models\TimeDifferenceAndCost.cs" />
     <Compile Include="ProcessInputData.cs" />
     <Compile Include="Program.cs" />
@@ -97,6 +98,9 @@
     <Compile Include="TSP\AntColonyWithLimit.cs" />
     <Compile Include="TSP\AntColonyToll.cs" />
     <Compile Include="Models\VertexAndProbability.cs" />
+    <Compile Include="TSP\AttentionWhore.cs" />
+    <Compile Include="Models\FanAndStar.cs" />
+    <Compile Include="TSP\TSP.cs" />
     <Compile Include="ViewModel.cs" />
     <EmbeddedResource Include="Form1.resx">
       <DependentUpon>Form1.cs</DependentUpon>

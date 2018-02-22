@@ -2,81 +2,61 @@
 using System.Collections.Generic;
 using System.Linq;
 using TSPTimeCost.Models;
+using TSPTimeCost.Singletons;
 
 namespace TSPTimeCost.TSP
 {
 
-    abstract class AntColony
+    abstract class AntColony : TSP
     {
-        //Goal parameters
 
-        public static double FuelPrice { get; } = 1.26;
-        public static double RoadVelocity { get; } = 70;
-        public static double HighwayVelocity { get; } = 120;
-        public static double RoadCombustion { get; } = 0.06; //per km
-        public static double GoalFreeRoad { get; } = RoadVelocity * RoadCombustion * FuelPrice;
 
         // Algorithm parameters
-        protected const int noOfAnts = 50;
-        private const double trailEvaporationCoefficient = 0.3;
-        private const double basicTrialValue = 1;
+        protected const int NoOfAnts = 50;
+        private const double TrailEvaporationCoefficient = 0.3;
+        private const double BasicTrialValue = 1;
 
         //if attractivenesParameter >> trialPreference, program basicaly choses closest city every time
-        private const double trialPreference = 1;
-        private const double attractivenessParameter = 10;
-        private double pheromonePower;
-        protected const int noOfIterations = 10;
-        private int matrixSize;
-        protected static int noOfPoints;
-        private double[] attractivenessMatrix;
-        private double[] trialsMatrix;
+        private const double TrialPreference = 1;
+        private const double AttractivenessParameter = 10;
+        private double _pheromonePower;
+        protected const int NoOfIterations = 10;
+        private int _matrixSize;
+        protected static int NoOfCities;
+        private double[] _attractivenessMatrix;
+        private double[] _trialsMatrix;
 
-
-        public abstract void AntColonySingleThread(List<City> cities);
-
-
-        public double CalculateDistanceInPath(int[] path, IDistanceMatrix distanceMatrix)
-        {
-            double result = 0;
-            noOfPoints = path.Length;
-
-            for (int i = 0; i < noOfPoints - 1; i++)
-            {
-                result += distanceMatrix.GetInstance().Value[path[i] * noOfPoints + path[i + 1]];
-            }
-            return result;
-        }
 
         protected void InitializeParameters(IDistanceMatrix distanceMatrix)
         {
-            pheromonePower = BestPath.Instance.Distance;
-            matrixSize = distanceMatrix.GetInstance().Value.Length;
-            noOfPoints = (int)Math.Sqrt(matrixSize);
-            trialsMatrix = new double[matrixSize];
-            attractivenessMatrix = new double[matrixSize];
+            _pheromonePower = BestPath.Instance.Distance;
+            _matrixSize = distanceMatrix.GetInstance().Value.Length;
+            NoOfCities = BestPath.Instance.Order.Length;
+            _trialsMatrix = new double[_matrixSize];
+            _attractivenessMatrix = new double[_matrixSize];
         }
 
 
         protected void FillAttractivenessMatrix(IDistanceMatrix distanceMatrix)
         {
-            for (int i = 0; i < attractivenessMatrix.Length; i++)
+            for (int i = 0; i < _attractivenessMatrix.Length; i++)
             {
-                attractivenessMatrix[i] = 1 / distanceMatrix.GetInstance().Value[i];
+                _attractivenessMatrix[i] = 1 / distanceMatrix.GetInstance().Value[i];
             }
         }
 
 
         protected void FillTrialsMatrix()
         {
-            for (int i = 0; i < trialsMatrix.Length; i++)
+            for (int i = 0; i < _trialsMatrix.Length; i++)
             {
-                trialsMatrix[i] = basicTrialValue;
+                _trialsMatrix[i] = BasicTrialValue;
             }
         }
 
         protected List<int[]> InitializePathList(List<int[]> pathList)
         {
-            for (int i = 0; i < noOfAnts; i++)
+            for (int i = 0; i < NoOfAnts; i++)
             {
                 pathList.Add(InitalizePath());
             }
@@ -85,8 +65,8 @@ namespace TSPTimeCost.TSP
 
         private static int[] InitalizePath()
         {
-            int[] path = new int[noOfPoints];
-            for (int i = 0; i < noOfPoints; i++) { path[i] = -1; }
+            int[] path = new int[NoOfCities];
+            for (int i = 0; i < NoOfCities; i++) { path[i] = -1; }
             return path;
         }
 
@@ -95,7 +75,7 @@ namespace TSPTimeCost.TSP
         //RETURNS PATH CHOSEN BY THIS ANT
         protected int[] CalculatePathForSingleAnt()
         {
-            double[] probabilityMatrix = new double[matrixSize];
+            double[] probabilityMatrix = new double[_matrixSize];
             var path = InitalizePath();
             path = SetFirstAndLastPointInPath(path);
             probabilityMatrix = InitializeMatrixWithZeros(probabilityMatrix);
@@ -103,7 +83,7 @@ namespace TSPTimeCost.TSP
             probabilityMatrix = ClearProbabilityRowsForFirstAndLastPoint(path, probabilityMatrix);
 
             //chosing next point until path is full
-            for (int j = 1; j < noOfPoints - 1; j++)
+            for (int j = 1; j < NoOfCities - 1; j++)
             {
                 var row = CopyRowFromProbabilityMatrix(j, path, probabilityMatrix);
                 row = NormalizeProbabilityValues(row);
@@ -133,21 +113,21 @@ namespace TSPTimeCost.TSP
 
         private double[] FillProbabilityMatrix(double[] probabilityMatrix)
         {
-            for (int i = 0; i < noOfPoints * noOfPoints; i++)
+            for (int i = 0; i < NoOfCities * NoOfCities; i++)
             {
 
-                probabilityMatrix[i] = Math.Pow(trialsMatrix[i], trialPreference) *
-                                       Math.Pow(attractivenessMatrix[i], attractivenessParameter);
+                probabilityMatrix[i] = Math.Pow(_trialsMatrix[i], TrialPreference) *
+                                       Math.Pow(_attractivenessMatrix[i], AttractivenessParameter);
             }
             return probabilityMatrix;
         }
 
         private double[] ClearProbabilityRowsForFirstAndLastPoint(int[] path, double[] probabilityMatrix)
         {
-            for (int i = 0; i < noOfPoints; i++)
+            for (int i = 0; i < NoOfCities; i++)
             {
-                probabilityMatrix[path[path[0]] + i * noOfPoints] = 0;
-                probabilityMatrix[path[path[noOfPoints - 1]] + i * noOfPoints] = 0;
+                probabilityMatrix[path[path[0]] + i * NoOfCities] = 0;
+                probabilityMatrix[path[path[NoOfCities - 1]] + i * NoOfCities] = 0;
             }
             return probabilityMatrix;
         }
@@ -162,12 +142,12 @@ namespace TSPTimeCost.TSP
 
         private VertexAndProbability[] CopyRowFromProbabilityMatrix(int q, int[] path, double[] probabilityMatrix)
         {
-            VertexAndProbability[] result = new VertexAndProbability[noOfPoints];
-            for (int i = 0; i < noOfPoints; i++)
+            VertexAndProbability[] result = new VertexAndProbability[NoOfCities];
+            for (int i = 0; i < NoOfCities; i++)
             {
                 result[i] = new VertexAndProbability()
                 {
-                    Probability = probabilityMatrix[path[q - 1] * noOfPoints + i],
+                    Probability = probabilityMatrix[path[q - 1] * NoOfCities + i],
                     Vertex = i
                 };
             }
@@ -196,7 +176,7 @@ namespace TSPTimeCost.TSP
         {
             double randomLessThan1 = DrawRandomLessThan1();
             double sum = 0;
-            for (int i = 0; i < noOfPoints; i++)
+            for (int i = 0; i < NoOfCities; i++)
             {
                 double temp = row[i].Probability;
                 row[i].Probability += sum;
@@ -205,7 +185,7 @@ namespace TSPTimeCost.TSP
 
             int result = -1;
 
-            for (int i = 0; i < noOfPoints; i++)
+            for (int i = 0; i < NoOfCities; i++)
             {
                 if (row[i].Probability >= randomLessThan1 && !path.Contains(row[i].Vertex))
                 {
@@ -218,9 +198,9 @@ namespace TSPTimeCost.TSP
 
         private double[] ClearProbabilityRowsForGivenPoint(int nr, double[] probabilityMatrix)
         {
-            for (int i = 0; i < noOfPoints; i++)
+            for (int i = 0; i < NoOfCities; i++)
             {
-                probabilityMatrix[nr + i * noOfPoints] = 0;
+                probabilityMatrix[nr + i * NoOfCities] = 0;
             }
             return probabilityMatrix;
         }
@@ -244,19 +224,19 @@ namespace TSPTimeCost.TSP
 
         protected void UpdateTrialsMatrix(int[] path, IDistanceMatrix distanceMatrix)
         {
-            for (int i = 0; i < noOfPoints - 1; i++)
+            for (int i = 0; i < NoOfCities - 1; i++)
             {
                 double distance = CalculateDistanceInPath(path, distanceMatrix);
-                trialsMatrix[path[i] * noOfPoints + path[i + 1]] += (pheromonePower * trailEvaporationCoefficient / distance / noOfAnts);
-                trialsMatrix[path[i + 1] * noOfPoints + path[i]] += (pheromonePower * trailEvaporationCoefficient / distance / noOfAnts);
+                _trialsMatrix[path[i] * NoOfCities + path[i + 1]] += (_pheromonePower * TrailEvaporationCoefficient / distance / NoOfAnts);
+                _trialsMatrix[path[i + 1] * NoOfCities + path[i]] += (_pheromonePower * TrailEvaporationCoefficient / distance / NoOfAnts);
             }
         }
 
         protected void EvaporateTrialsMatrix()
         {
-            for (int i = 0; i < matrixSize; i++)
+            for (int i = 0; i < _matrixSize; i++)
             {
-                trialsMatrix[i] -= trailEvaporationCoefficient * trialsMatrix[i];
+                _trialsMatrix[i] -= TrailEvaporationCoefficient * _trialsMatrix[i];
             }
         }
 
@@ -265,10 +245,10 @@ namespace TSPTimeCost.TSP
             BestPath.Instance.Distance = minimumPathInThisIteration;
             BestPath.Instance.Order = pathList[minimumPathNumber];
 
-            for (int i = 0; i < noOfPoints - 1; i++)
+            for (int i = 0; i < NoOfCities - 1; i++)
             {
                 BestPath.Instance.DistancesInOrder[i] =
-                    distanceMatrix.GetInstance().Value[BestPath.Instance.Order[i] + noOfPoints * BestPath.Instance.Order[i + 1]];
+                    distanceMatrix.GetInstance().Value[BestPath.Instance.Order[i] + NoOfCities * BestPath.Instance.Order[i + 1]];
             }
         }
 
@@ -276,61 +256,10 @@ namespace TSPTimeCost.TSP
         protected void NormalizeDistances()
         {
             BestPath.Instance.Distance = 0;
-            for (int i = 0; i < noOfPoints - 1; i++)
+            for (int i = 0; i < NoOfCities - 1; i++)
             {
                 BestPath.Instance.Distance += BestPath.Instance.DistancesInOrder[i];
             }
-        }
-
-        //G=  ΔC/ΔT
-        protected List<TimeDifferenceAndCost> CalculateGoal(List<City> cities)
-        {
-            List<TimeDifferenceAndCost> goalList = new List<TimeDifferenceAndCost>();
-
-
-            for (int i = 0; i < cities.Count - 1; i++)
-            {
-                City origin = cities[BestPath.Instance.Order[i]];
-                City destination = cities[BestPath.Instance.Order[i + 1]];
-                var indexOrigin = cities.IndexOf(origin);
-                var indexDestination = cities.IndexOf(destination);
-
-                TimeDifferenceAndCost goalItem =
-                    new TimeDifferenceAndCost
-                    {
-                        FeeCost = CostMatrix.Instance.Value[indexOrigin + cities.Count * indexDestination],
-                        Index = i,
-                        TimeDifference =
-                            DistanceMatrixForFreeRoads.Instance.Value[indexOrigin + cities.Count * indexDestination] -
-                            DistanceMatrixForTollRoads.Instance.Value[indexOrigin + cities.Count * indexDestination]
-                    };
-
-                // C_G=s×combustion×fuel price [€]
-                goalItem.GasolineCostFree =
-                    DistanceMatrixForFreeRoads.Instance.Value[indexOrigin + cities.Count * indexDestination] /
-                    3600 * RoadVelocity * RoadCombustion * FuelPrice;
-
-                goalItem.GasolineCostToll =
-                    DistanceMatrixForTollRoads.Instance.Value[indexOrigin + cities.Count * indexDestination] /
-                    3600 * HighwayVelocity * RoadCombustion * 1.25 * FuelPrice;
-
-                if (BestPath.Instance.DistancesInOrder[i] == DistanceMatrixForFreeRoads.Instance.Value[indexOrigin + cities.Count * indexDestination]) //free road
-                {
-                   // goalItem.Goal = goalItem.GasolineCostFree / (DistanceMatrixForFreeRoads.Instance.Value[indexOrigin + cities.Count * indexDestination] / 3600);
-                    goalItem.Goal = GoalFreeRoad; //const value, equal to above
-                }
-
-                else // C_G = s × combustion × fuel price [€] 
-                {                  
-                    goalItem.Goal = (goalItem.FeeCost + goalItem.GasolineCostToll - goalItem.GasolineCostFree) / (goalItem.TimeDifference / 3600);
-                }
-               
-                BestPath.Instance.Goal[i] = goalItem.Goal;
-
-                goalList.Add(goalItem);
-            }
-
-            return goalList;
         }
 
     }

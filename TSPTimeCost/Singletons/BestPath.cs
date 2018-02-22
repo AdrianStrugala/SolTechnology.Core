@@ -2,10 +2,7 @@
 /* Singleton containing best path as order of cities */
 /***************************************************/
 
-using System.Collections.Generic;
-using System.Dynamic;
-
-namespace TSPTimeCost.Models {
+namespace TSPTimeCost.Singletons {
     public sealed class BestPath {
 
         public int[] Order { get; set; }
