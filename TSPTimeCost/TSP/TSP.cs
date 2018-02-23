@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-using TSPTimeCost.Models;
-using TSPTimeCost.Singletons;
+﻿using TSPTimeCost.Singletons;
 
 namespace TSPTimeCost.TSP
 {

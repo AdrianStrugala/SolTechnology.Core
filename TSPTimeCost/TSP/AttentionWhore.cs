@@ -16,7 +16,7 @@ namespace TSPTimeCost.TSP
         {
             _fansAndStars = new List<FanAndStar>();
             _whoreList = new List<int>();
-            _noOfCities = BestPath.Instance.Order.Length;
+            _noOfCities = Cities.Instance.ListOfCities.Count;
 
             InitateFansAndStars();
 
@@ -27,16 +27,13 @@ namespace TSPTimeCost.TSP
 
             ConnectLastCityWithFirst();
 
-            int whore = -1;
-            do
+            int whore = FindWhore();
+            while (whore != -1)
             {
-                whore = FindWhore();
                 _whoreList.Add(whore);
-
                 CopulateFans(whore);
-
-
-            } while (whore != -1);
+                whore = FindWhore();
+            }
 
 
             RewriteFoundPathToBestPath();
@@ -68,12 +65,10 @@ namespace TSPTimeCost.TSP
                 if (DistanceMatrixEvaluated.Instance.Distances[fanAndStar.Fan + _noOfCities * fanAndStar.Star] >
                     DistanceMatrixEvaluated.Instance.Distances[fanAndStar.Fan + _noOfCities * star])
                 {
-
-                    if (FirstNotConnectedWithLast(fanAndStar.Fan, star) && star != 0 && _fansAndStars[star].Star != fanAndStar.Fan)
+                    if (FirstNotConnectedWithLast(fanAndStar.Fan, star) && star != 0 &&
+                        _fansAndStars[star].Star != fanAndStar.Fan)
                     {
-                        {
-                            fanAndStar.Star = star;
-                        }
+                        fanAndStar.Star = star;
                     }
                 }
             }
