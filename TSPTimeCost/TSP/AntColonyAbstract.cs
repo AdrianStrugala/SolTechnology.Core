@@ -7,9 +7,8 @@ using TSPTimeCost.Singletons;
 namespace TSPTimeCost.TSP
 {
 
-    abstract class AntColony : TSP
+    abstract class AntColonyAbstract : TSP
     {
-
 
         // Algorithm parameters
         protected const int NoOfAnts = 50;
@@ -30,7 +29,7 @@ namespace TSPTimeCost.TSP
         protected void InitializeParameters(IDistanceMatrix distanceMatrix)
         {
             _pheromonePower = BestPath.Instance.Distance;
-            _matrixSize = distanceMatrix.GetInstance().Value.Length;
+            _matrixSize = distanceMatrix.GetInstance().Distances.Length;
             NoOfCities = BestPath.Instance.Order.Length;
             _trialsMatrix = new double[_matrixSize];
             _attractivenessMatrix = new double[_matrixSize];
@@ -41,7 +40,7 @@ namespace TSPTimeCost.TSP
         {
             for (int i = 0; i < _attractivenessMatrix.Length; i++)
             {
-                _attractivenessMatrix[i] = 1 / distanceMatrix.GetInstance().Value[i];
+                _attractivenessMatrix[i] = 1 / distanceMatrix.GetInstance().Distances[i];
             }
         }
 
@@ -248,20 +247,15 @@ namespace TSPTimeCost.TSP
             for (int i = 0; i < NoOfCities - 1; i++)
             {
                 BestPath.Instance.DistancesInOrder[i] =
-                    distanceMatrix.GetInstance().Value[BestPath.Instance.Order[i] + NoOfCities * BestPath.Instance.Order[i + 1]];
+                    distanceMatrix.GetInstance().Distances[BestPath.Instance.Order[i] + NoOfCities * BestPath.Instance.Order[i + 1]];
             }
         }
 
 
-        protected void NormalizeDistances()
+        public override void SolveTSP()
         {
-            BestPath.Instance.Distance = 0;
-            for (int i = 0; i < NoOfCities - 1; i++)
-            {
-                BestPath.Instance.Distance += BestPath.Instance.DistancesInOrder[i];
-            }
+            
         }
-
     }
 
 }

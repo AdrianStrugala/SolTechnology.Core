@@ -7,7 +7,7 @@ using TSPTimeCost.Singletons;
 namespace TSPTimeCost.TSP
 {
 
-    class AntColonyWithLimit : AntColony
+    class AntColonyWithLimit : AntColonyAbstract
     {
         private readonly double _limit;
 
@@ -61,7 +61,7 @@ namespace TSPTimeCost.TSP
 
                     BestPath.Instance.Cost = overallCost;
 
-                    NormalizeDistances();
+                    CalculateDistance();
                 }
             }
         }
@@ -78,12 +78,12 @@ namespace TSPTimeCost.TSP
                 else
                 {
                     BestPath.Instance.DistancesInOrder[item.Index] =
-                        DistanceMatrixForFreeRoads.Instance.Value[
+                        DistanceMatrixForFreeRoads.Instance.Distances[
                             BestPath.Instance.Order[item.Index] + NoOfCities * BestPath.Instance.Order[item.Index + 1]];
 
-                    item.Goal = CalculateGoalForFreeRoad(Cities.Instance.ListOfCities, BestPath.Instance.Order[item.Index],
+                    item.Goal = CalculateGoalForFreeRoad(BestPath.Instance.Order[item.Index],
                         BestPath.Instance.Order[item.Index + 1], item).Goal;
-                    BestPath.Instance.Goal[item.Index] = CalculateGoalForFreeRoad(Cities.Instance.ListOfCities, BestPath.Instance.Order[item.Index],
+                    BestPath.Instance.Goal[item.Index] = CalculateGoalForFreeRoad(BestPath.Instance.Order[item.Index],
                         BestPath.Instance.Order[item.Index + 1], item).Goal;
                     item.TimeDifference = 0;
                 }

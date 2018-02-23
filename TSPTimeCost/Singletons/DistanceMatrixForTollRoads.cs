@@ -18,7 +18,8 @@ namespace TSPTimeCost.Singletons {
             return _instance;
         }
 
-        public double[] Value { get; set; }
+        public double[] Distances { get; set; }
+        public double[] Goals { get; set; }
         private static volatile DistanceMatrixForTollRoads _instance;
         private static readonly object SyncRoot = new object();
 

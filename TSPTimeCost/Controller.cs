@@ -23,9 +23,10 @@ namespace TSPTimeCost
 
 
             ProcessInputData.InitializeSingletons();
-            ProcessInputData.CalculateDistanceMatrixForTollRoads();
+            ProcessInputData.CalculateDistanceMatrixForTollRoads();          
             processInputData.CalculateDistanceMatrixForFreeRoads();
             processInputData.CalculateCostMatrix();
+            ProcessInputData.CalculateDistanceMatrixEvaluated();
 
             BestPath.Instance.Distance = new AntColonyToll().CalculateDistanceInPath(BestPath.Instance.Order, DistanceMatrixForTollRoads.Instance);
 
@@ -75,10 +76,10 @@ namespace TSPTimeCost
 
             if (Equals(
                     BestPath.Instance.DistancesInOrder[indexInBestPath],
-                    DistanceMatrixForTollRoads.Instance.Value[indexOrigin + Cities.Instance.ListOfCities.Count * indexDestination])
+                    DistanceMatrixForTollRoads.Instance.Distances[indexOrigin + Cities.Instance.ListOfCities.Count * indexDestination])
                 && !Equals(
-                    DistanceMatrixForTollRoads.Instance.Value[indexOrigin + Cities.Instance.ListOfCities.Count * indexDestination],
-                    DistanceMatrixForFreeRoads.Instance.Value[indexOrigin + Cities.Instance.ListOfCities.Count * indexDestination])
+                    DistanceMatrixForTollRoads.Instance.Distances[indexOrigin + Cities.Instance.ListOfCities.Count * indexDestination],
+                    DistanceMatrixForFreeRoads.Instance.Distances[indexOrigin + Cities.Instance.ListOfCities.Count * indexDestination])
             )
             {
                 return "(T)";

@@ -177,7 +177,7 @@ namespace TSPTimeCost
 
         private void AttentionWhoreChck_CheckedChanged(object sender, EventArgs e)
         {
-                Area.Series["AttentionWhore"].Enabled = limitTSPChck.Checked;
+            Area.Series["AttentionWhore"].Enabled = AttentionWhoreChck.Checked;
         }
     }
 }

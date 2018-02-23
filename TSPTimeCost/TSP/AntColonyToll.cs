@@ -1,12 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using TSPTimeCost.Models;
 using TSPTimeCost.Singletons;
 
 namespace TSPTimeCost.TSP
 {
 
-    class AntColonyToll : AntColony
+    class AntColonyToll : AntColonyAbstract
     {
         public override void SolveTSP()
         {
@@ -52,7 +51,7 @@ namespace TSPTimeCost.TSP
                         BestPath.Instance.Cost += item.FeeCost;
                     }
 
-                    NormalizeDistances();
+                    CalculateDistance();
                 }
             }
         }//end of Ant Colony

@@ -18,37 +18,16 @@ namespace TSPTimeCost.TSP
             _whoreList = new List<int>();
             _noOfCities = BestPath.Instance.Order.Length;
 
-
-            for (int fan = 0; fan < _noOfCities; fan++)
-            {
-                FanAndStar toadd = new FanAndStar(fan, fan);
-                _fansAndStars.Add(toadd);
-            }
+            InitateFansAndStars();
 
             foreach (var fanAndStar in _fansAndStars)
             {
-                for (int star = 0; star < _noOfCities; star++)
-                {
-
-                    if (DistanceMatrixForFreeRoads.Instance.Value[fanAndStar.Fan + _noOfCities * fanAndStar.Star] >
-                        DistanceMatrixForFreeRoads.Instance.Value[fanAndStar.Fan + _noOfCities * star])
-                    {
-
-                        if (FirstNotConnectedWithLast(fanAndStar.Fan, star) && star != 0 )
-                        {
-                            {
-                                fanAndStar.Star = star;
-                            }
-                        }
-                    }
-                }
+                FindNearestNeighbour(fanAndStar);
             }
-            _fansAndStars[_noOfCities - 1].Star = 0;
 
-            var xd = _fansAndStars;
+            ConnectLastCityWithFirst();
 
             int whore = -1;
-
             do
             {
                 whore = FindWhore();
@@ -56,74 +35,92 @@ namespace TSPTimeCost.TSP
 
                 CopulateFans(whore);
 
-                var xd2 = _fansAndStars;
 
             } while (whore != -1);
 
-            var xd3 = _fansAndStars;
 
+            RewriteFoundPathToBestPath();
+
+            CalculateDistance();
+
+            CalculateGoal();
+        }
+
+//        private static void CalculateDistance()
+//        {
+//            BestPath.Instance.Distance = 0;
+//            for (int i = 0; i < _noOfCities - 1; i++)
+//            {
+//                BestPath.Instance.Distance += DistanceMatrixEvaluated.Instance.Distances[BestPath.Instance.Order[i] * _noOfCities + BestPath.Instance.Order[i + 1]];
+//            }
+//        }
+
+        private static void RewriteFoundPathToBestPath()
+        {
             for (int i = 1; i <= _noOfCities - 1; i++)
             {
                 BestPath.Instance.Order[i] = _fansAndStars.First(element => element.Fan == BestPath.Instance.Order[i - 1]).Star;
             }
+        }
 
-            var xd4 = BestPath.Instance.Order;
+        private static void ConnectLastCityWithFirst()
+        {
+            _fansAndStars[_noOfCities - 1].Star = 0;
+        }
 
-            BestPath.Instance.Distance = 0;
-            for (int i = 0; i < _noOfCities - 1; i++)
+        private static void FindNearestNeighbour(FanAndStar fanAndStar)
+        {
+            for (int star = 0; star < _noOfCities; star++)
             {
-                BestPath.Instance.Distance += DistanceMatrixForFreeRoads.Instance.Value[BestPath.Instance.Order[i] * _noOfCities + BestPath.Instance.Order[i + 1]];
-            }
 
-            CalculateGoal();
+                if (DistanceMatrixEvaluated.Instance.Distances[fanAndStar.Fan + _noOfCities * fanAndStar.Star] >
+                    DistanceMatrixEvaluated.Instance.Distances[fanAndStar.Fan + _noOfCities * star])
+                {
+
+                    if (FirstNotConnectedWithLast(fanAndStar.Fan, star) && star != 0 && _fansAndStars[star].Star != fanAndStar.Fan)
+                    {
+                        {
+                            fanAndStar.Star = star;
+                        }
+                    }
+                }
+            }
+        }
+
+        private static void InitateFansAndStars()
+        {
+            for (int fan = 0; fan < _noOfCities; fan++)
+            {
+                FanAndStar toadd = new FanAndStar(fan, fan);
+                _fansAndStars.Add(toadd);
+            }
         }
 
         private static void CopulateFans(int whore)
         {
             IEnumerable<FanAndStar> fans = _fansAndStars.Where(element => element.Star == whore);
 
-            List<int> loosers = new List<int>();
-            for (int i = 1; i < _noOfCities; i++)
-            {
-                loosers.Add(i);
-            }
-
-            foreach (var fanAndStar in _fansAndStars)
-            {
-                if (loosers.Contains(fanAndStar.Star))
-                {
-                    loosers.Remove(fanAndStar.Star);
-                }
-            }
-
-            foreach (var fan in fans)
-            {
-                loosers.Add(fan.Fan);
-            }    
-
             double minRoad = double.MaxValue;
             FanAndStar newPair = new FanAndStar(-1, -1);
 
-
-            foreach (var origin in loosers)
+            var fanAndStars = fans as FanAndStar[] ?? fans.ToArray();
+            foreach (var origin in fanAndStars)
             {
-                foreach (var destination in loosers)
+                foreach (var destination in fanAndStars)
                 {
-                    if (!_whoreList.Contains(destination) && destination != 0)
+                    if (!_whoreList.Contains(destination.Fan) && destination.Fan != 0)
                     {
                         if (minRoad >
-                            DistanceMatrixForFreeRoads.Instance.Value[origin + _noOfCities * destination])
+                            DistanceMatrixEvaluated.Instance.Distances[origin.Fan + _noOfCities * destination.Fan])
                         {
                             minRoad =
-                                DistanceMatrixForFreeRoads.Instance.Value[origin + _noOfCities * destination];
-                            newPair.Fan = origin;
-                            newPair.Star = destination;
+                                DistanceMatrixEvaluated.Instance.Distances[origin.Fan + _noOfCities * destination.Fan];
+                            newPair.Fan = origin.Fan;
+                            newPair.Star = destination.Fan;
                         }
                     }
                 }
             }
-
-            var xd6 = newPair;
 
             foreach (var fanAndStar in _fansAndStars.Where(element => element.Fan == newPair.Fan))
                 fanAndStar.Star = newPair.Star;
@@ -153,9 +150,6 @@ namespace TSPTimeCost.TSP
 
     }
 }
-
-
-
 
 
 //using System.Collections.Generic;
@@ -190,11 +184,11 @@ namespace TSPTimeCost.TSP
 //                for (int star = 0; star < _noOfCities; star++)
 //                {
 //
-//                    if (DistanceMatrixForFreeRoads.Instance.Value[fanAndStar.Fan + _noOfCities * fanAndStar.Star] >
-//                        DistanceMatrixForFreeRoads.Instance.Value[fanAndStar.Fan + _noOfCities * star])
+//                    if (DistanceMatrixForFreeRoads.Instance.Distances[fanAndStar.Fan + _noOfCities * fanAndStar.Star] >
+//                        DistanceMatrixForFreeRoads.Instance.Distances[fanAndStar.Fan + _noOfCities * star])
 //                    {
 //
-//                        if (FirstNotConnectedWithLast(fanAndStar.Fan, star) && star != 0 && _fansAndStars[star].Star != fanAndStar.Fan)
+//                        if (FirstNotConnectedWithLast(fanAndStar.Fan, star) && star != 0 )
 //                        {
 //                            {
 //                                fanAndStar.Star = star;
@@ -222,9 +216,9 @@ namespace TSPTimeCost.TSP
 //
 //            var xd3 = _fansAndStars;
 //
-//            for (int i=1; i <= _noOfCities-1; i ++)
+//            for (int i = 1; i <= _noOfCities - 1; i++)
 //            {
-//                BestPath.Instance.Order[i] = _fansAndStars.First(element => element.Fan == BestPath.Instance.Order[i-1]).Star;
+//                BestPath.Instance.Order[i] = _fansAndStars.First(element => element.Fan == BestPath.Instance.Order[i - 1]).Star;
 //            }
 //
 //            var xd4 = BestPath.Instance.Order;
@@ -232,7 +226,7 @@ namespace TSPTimeCost.TSP
 //            BestPath.Instance.Distance = 0;
 //            for (int i = 0; i < _noOfCities - 1; i++)
 //            {
-//                BestPath.Instance.Distance += DistanceMatrixForFreeRoads.Instance.Value[BestPath.Instance.Order[i] * _noOfCities + BestPath.Instance.Order[i + 1]];
+//                BestPath.Instance.Distance += DistanceMatrixForFreeRoads.Instance.Distances[BestPath.Instance.Order[i] * _noOfCities + BestPath.Instance.Order[i + 1]];
 //            }
 //
 //            CalculateGoal();
@@ -242,29 +236,54 @@ namespace TSPTimeCost.TSP
 //        {
 //            IEnumerable<FanAndStar> fans = _fansAndStars.Where(element => element.Star == whore);
 //
+//            List<int> loosers = new List<int>();
+//            for (int i = 1; i < _noOfCities; i++)
+//            {
+//                loosers.Add(i);
+//            }
+//
+//            foreach (var fanAndStar in _fansAndStars)
+//            {
+//                if (loosers.Contains(fanAndStar.Star))
+//                {
+//                    loosers.Remove(fanAndStar.Star);
+//                }
+//            }
+//
+//            foreach (var fan in fans)
+//            {
+//                loosers.Add(fan.Fan);
+//            }    
+//
 //            double minRoad = double.MaxValue;
 //            FanAndStar newPair = new FanAndStar(-1, -1);
 //
-//            foreach (var origin in fans)
+//
+//            foreach (var origin in loosers)
 //            {
-//                foreach (var destination in fans)
+//                foreach (var destination in loosers)
 //                {
-//                    if (!_whoreList.Contains(destination.Fan) && destination.Fan != 0)
+//                    if (!_whoreList.Contains(destination) && destination != 0)
 //                    {
 //                        if (minRoad >
-//                            DistanceMatrixForFreeRoads.Instance.Value[origin.Fan + _noOfCities * destination.Fan])
+//                            DistanceMatrixForFreeRoads.Instance.Distances[origin + _noOfCities * destination])
 //                        {
 //                            minRoad =
-//                                DistanceMatrixForFreeRoads.Instance.Value[origin.Fan + _noOfCities * destination.Fan];
-//                            newPair.Fan = origin.Fan;
-//                            newPair.Star = destination.Fan;
+//                                DistanceMatrixForFreeRoads.Instance.Distances[origin + _noOfCities * destination];
+//                            newPair.Fan = origin;
+//                            newPair.Star = destination;
 //                        }
 //                    }
 //                }
 //            }
 //
-//            foreach (var fanAndStar in _fansAndStars.Where(element => element.Fan == newPair.Fan))
-//                fanAndStar.Star = newPair.Star;
+//            var xd6 = newPair;
+//
+//            _fansAndStars.First(n => n.Fan == newPair.Fan).Star = newPair.Star;
+//
+////            foreach (var fanAndStar in _fansAndStars.Where(element => element.Fan == newPair.Fan))
+////                fanAndStar.Star = newPair.Star;
+//            var xd7 = _fansAndStars;
 //        }
 //
 //        private static int FindWhore()

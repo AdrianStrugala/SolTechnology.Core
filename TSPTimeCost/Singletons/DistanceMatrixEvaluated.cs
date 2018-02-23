@@ -4,7 +4,7 @@
 
 namespace TSPTimeCost.Singletons
 {
-    public sealed class DistanceMatrixForFreeRoads : IDistanceMatrix
+    public sealed class DistanceMatrixEvaluated : IDistanceMatrix
     {
         public IDistanceMatrix GetInstance()
         {
@@ -13,7 +13,7 @@ namespace TSPTimeCost.Singletons
                 lock (SyncRoot)
                 {
                     if (_instance == null)
-                        _instance = new DistanceMatrixForFreeRoads();
+                        _instance = new DistanceMatrixEvaluated();
                 }
             }
 
@@ -22,10 +22,10 @@ namespace TSPTimeCost.Singletons
 
         public double[] Distances { get; set; }
         public double[] Goals { get; set; }
-        private static volatile DistanceMatrixForFreeRoads _instance;
+        private static volatile DistanceMatrixEvaluated _instance;
         private static readonly object SyncRoot = new object();
 
-        private DistanceMatrixForFreeRoads() { }
+        private DistanceMatrixEvaluated() { }
 
         public static IDistanceMatrix Instance
         {
@@ -36,7 +36,7 @@ namespace TSPTimeCost.Singletons
                     lock (SyncRoot)
                     {
                         if (_instance == null)
-                            _instance = new DistanceMatrixForFreeRoads();
+                            _instance = new DistanceMatrixEvaluated();
                     }
                 }
 
