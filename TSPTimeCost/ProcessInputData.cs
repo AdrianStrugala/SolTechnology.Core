@@ -285,7 +285,10 @@ namespace TSPTimeCost
             BestPath.Instance.Goal = new double[noOfCities];
             DistanceMatrixForTollRoads.Instance.Distances = new double[noOfCities * noOfCities];
             DistanceMatrixForFreeRoads.Instance.Distances = new double[noOfCities * noOfCities];
-            DistanceMatrixEvaluated.Instance.Distances = new double[noOfCities * noOfCities]; DistanceMatrixEvaluated.Instance.Goals = new double[noOfCities * noOfCities];
+            DistanceMatrixEvaluated.Instance.Distances = new double[noOfCities * noOfCities];
+            DistanceMatrixEvaluated.Instance.Goals = new double[noOfCities * noOfCities];
+            DistanceMatrixForTollRoads.Instance.Goals = new double[noOfCities * noOfCities];
+            DistanceMatrixForFreeRoads.Instance.Goals = new double[noOfCities * noOfCities];
 
 
             //Fist bestPath is just cities in input order
@@ -365,12 +368,15 @@ namespace TSPTimeCost
                         DistanceMatrixForTollRoads.Instance.Distances[j + i * cities.Count] /
                         3600 * HighwayVelocity * RoadCombustion * 1.25 * FuelPrice;
 
-                    double tollGoal = gasolineCostToll *
+                    var tollGoal = DistanceMatrixForTollRoads.Instance.Goals[
+                            j + i * cities.Count] = gasolineCostToll *
                                    (DistanceMatrixForTollRoads.Instance.Distances[
                                         j + i * cities.Count] / 3600);
-                    double freeGoal = gasolineCostFree *
-                                   (DistanceMatrixForFreeRoads.Instance.Distances[
-                                        j + i * cities.Count] / 3600);
+
+                    var freeGoal = DistanceMatrixForFreeRoads.Instance.Goals[
+                             j + i * cities.Count] = gasolineCostFree *
+                                                     (DistanceMatrixForFreeRoads.Instance.Distances[
+                                                          j + i * cities.Count] / 3600);
 
                     if (i == j)
                     {

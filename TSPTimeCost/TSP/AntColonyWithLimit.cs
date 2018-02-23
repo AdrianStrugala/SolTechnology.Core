@@ -9,6 +9,7 @@ namespace TSPTimeCost.TSP
 
     class AntColonyWithLimit : AntColonyAbstract
     {
+        private new static readonly int NoOfCities = Cities.Instance.ListOfCities.Count;
         private readonly double _limit;
 
         public AntColonyWithLimit(double limit)
@@ -81,10 +82,9 @@ namespace TSPTimeCost.TSP
                         DistanceMatrixForFreeRoads.Instance.Distances[
                             BestPath.Instance.Order[item.Index] + NoOfCities * BestPath.Instance.Order[item.Index + 1]];
 
-                    item.Goal = CalculateGoalForFreeRoad(BestPath.Instance.Order[item.Index],
-                        BestPath.Instance.Order[item.Index + 1], item).Goal;
-                    BestPath.Instance.Goal[item.Index] = CalculateGoalForFreeRoad(BestPath.Instance.Order[item.Index],
-                        BestPath.Instance.Order[item.Index + 1], item).Goal;
+                    item.Goal = DistanceMatrixForFreeRoads.Instance.Goals[BestPath.Instance.Order[item.Index] + NoOfCities * BestPath.Instance.Order[item.Index + 1]];
+                    BestPath.Instance.Goal[item.Index] = item.Goal;
+
                     item.TimeDifference = 0;
                 }
             }
@@ -93,7 +93,44 @@ namespace TSPTimeCost.TSP
         //end of Ant Colony
 
 
+        private static TimeDifferenceAndCost InitializeGoalItem(int i, int indexOrigin, int indexDestination)
+        {
+            TimeDifferenceAndCost goalItem =
+                new TimeDifferenceAndCost
+                {
+                    FeeCost = CostMatrix.Instance.Value[indexOrigin + NoOfCities * indexDestination],
+                    Index = i,
+                    TimeDifference =
+                        DistanceMatrixForFreeRoads.Instance.Distances[indexOrigin + NoOfCities * indexDestination] -
+                        DistanceMatrixForTollRoads.Instance.Distances[indexOrigin + NoOfCities * indexDestination],
+                };
+            return goalItem;
+        }
 
+
+        private List<TimeDifferenceAndCost> CalculateGoal()
+        {
+            List<City> cities = Cities.Instance.ListOfCities;
+            List<TimeDifferenceAndCost> goalList = new List<TimeDifferenceAndCost>();
+
+            for (int i = 0; i < NoOfCities - 1; i++)
+            {
+                City origin = cities[BestPath.Instance.Order[i]];
+                City destination = cities[BestPath.Instance.Order[i + 1]];
+                var indexOrigin = cities.IndexOf(origin);
+                var indexDestination = cities.IndexOf(destination);
+
+                TimeDifferenceAndCost goalItem = InitializeGoalItem(i, indexOrigin, indexDestination);
+
+                goalItem.Goal = IsFreeRoad(i, indexOrigin, indexDestination) ? DistanceMatrixForFreeRoads.Instance.Goals[indexOrigin + NoOfCities * indexDestination] : DistanceMatrixForTollRoads.Instance.Goals[indexOrigin + NoOfCities * indexDestination];
+
+                BestPath.Instance.Goal[i] = goalItem.Goal;
+
+                goalList.Add(goalItem);
+            }
+
+            return goalList;
+        }
     }
 
 }

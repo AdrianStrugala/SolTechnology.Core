@@ -46,8 +46,8 @@ namespace TSPTimeCost.TSP
                     ReplaceBestPathWithCurrentBest(pathList, minimumPathInThisIteration, minimumPathNumber,
                         DistanceMatrixEvaluated.Instance);
 
-                    UpdateGoal();
-                    UpdateCost();
+                    CalculateGoal(DistanceMatrixEvaluated.Instance);
+                    CalculateCost();
 
                     CalculateDistance();
                 }

@@ -46,7 +46,7 @@ namespace TSPTimeCost.TSP
                     BestPath.Instance.Cost = 0;
                     CalculateDistance();
 
-                    CalculateGoal();
+                    CalculateGoal(DistanceMatrixForFreeRoads.Instance);
                 }
             }
         } //end of Ant Colony

@@ -41,19 +41,11 @@ namespace TSPTimeCost.TSP
 
             RewriteFoundPathToBestPath();
 
+            CalculateGoal(DistanceMatrixEvaluated.Instance);
+            CalculateCost();
             CalculateDistance();
-
-            CalculateGoal();
         }
 
-//        private static void CalculateDistance()
-//        {
-//            BestPath.Instance.Distance = 0;
-//            for (int i = 0; i < _noOfCities - 1; i++)
-//            {
-//                BestPath.Instance.Distance += DistanceMatrixEvaluated.Instance.Distances[BestPath.Instance.Order[i] * _noOfCities + BestPath.Instance.Order[i + 1]];
-//            }
-//        }
 
         private static void RewriteFoundPathToBestPath()
         {
