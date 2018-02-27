@@ -41,7 +41,8 @@ namespace TSPTimeCost
             InitializeSerie("ClassicTSP", Color.Red);
             InitializeSerie("LimitTSP", Color.Black);
             InitializeSerie("EvaluationTSP", Color.Green);
-            InitializeSerie("AttentionWhore", Color.Pink);
+            InitializeSerie("AttentionWhore", Color.LightSalmon);
+            InitializeSerie("God", Color.Gold);
         }
 
         private void InitializeSerie(string name, Color color)
@@ -178,6 +179,17 @@ namespace TSPTimeCost
         private void AttentionWhoreChck_CheckedChanged(object sender, EventArgs e)
         {
             Area.Series["AttentionWhore"].Enabled = AttentionWhoreChck.Checked;
+        }
+
+        private void godBtn_Click(object sender, EventArgs e)
+        {
+            _controller.God();
+            ShowRoute("God");
+        }
+
+        private void GodChck_CheckedChanged(object sender, EventArgs e)
+        {
+            Area.Series["God"].Enabled = GodChck.Checked;
         }
     }
 }

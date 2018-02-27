@@ -1,15 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using TSPTimeCost.Models;
 using TSPTimeCost.Singletons;
 
-namespace TSPTimeCost.TSP
+namespace TSPTimeCost.TSP.AntColony
 {
 
     class AntColonyWithLimit : AntColonyAbstract
     {
-        private new static readonly int NoOfCities = Cities.Instance.ListOfCities.Count;
+
         private readonly double _limit;
 
         public AntColonyWithLimit(double limit)
@@ -20,8 +19,8 @@ namespace TSPTimeCost.TSP
         public override void SolveTSP()
         {
 
-            InitializeParameters(DistanceMatrixForTollRoads.Instance);
-            FillAttractivenessMatrix(DistanceMatrixForTollRoads.Instance);
+            InitializeParameters(TollMatrix);
+            FillAttractivenessMatrix(TollMatrix);
             FillTrialsMatrix();
 
             //each iteration is one trip of the ants
@@ -41,7 +40,7 @@ namespace TSPTimeCost.TSP
                 //must be separate, to not affect ants in the same iteration
                 for (int i = 0; i < NoOfAnts; i++)
                 {
-                    UpdateTrialsMatrix(pathList[i], DistanceMatrixForTollRoads.Instance);
+                    UpdateTrialsMatrix(pathList[i], TollMatrix);
                 }
 
                 EvaporateTrialsMatrix();
@@ -49,8 +48,8 @@ namespace TSPTimeCost.TSP
                 //if its last iteration
                 if (j == NoOfIterations - 1)
                 {
-                    (minimumPathNumber, minimumPathInThisIteration) = FindMinimumPathInThisIteration(pathList, minimumPathInThisIteration, minimumPathNumber, DistanceMatrixForTollRoads.Instance);
-                    ReplaceBestPathWithCurrentBest(pathList, minimumPathInThisIteration, minimumPathNumber, DistanceMatrixForTollRoads.Instance);
+                    (minimumPathNumber, minimumPathInThisIteration) = FindMinimumPathInThisIteration(pathList, minimumPathInThisIteration, minimumPathNumber, TollMatrix);
+                    ReplaceBestPathWithCurrentBest(pathList, minimumPathInThisIteration, minimumPathNumber, TollMatrix);
 
 
                     List<TimeDifferenceAndCost> worthList = CalculateGoal();
@@ -60,7 +59,7 @@ namespace TSPTimeCost.TSP
 
                     overallCost = UpdateCostsAndBestPath(overallCost, worthList);
 
-                    BestPath.Instance.Cost = overallCost;
+                    BestPath.Cost = overallCost;
 
                     CalculateDistance();
                 }
@@ -78,12 +77,10 @@ namespace TSPTimeCost.TSP
                 }
                 else
                 {
-                    BestPath.Instance.DistancesInOrder[item.Index] =
-                        DistanceMatrixForFreeRoads.Instance.Distances[
-                            BestPath.Instance.Order[item.Index] + NoOfCities * BestPath.Instance.Order[item.Index + 1]];
+                    BestPath.DistancesInOrder[item.Index] = FreeMatrix.Distances[BestPath.Order[item.Index] + NoOfCities * BestPath.Order[item.Index + 1]];
 
-                    item.Goal = DistanceMatrixForFreeRoads.Instance.Goals[BestPath.Instance.Order[item.Index] + NoOfCities * BestPath.Instance.Order[item.Index + 1]];
-                    BestPath.Instance.Goal[item.Index] = item.Goal;
+                    item.Goal = FreeMatrix.Goals[BestPath.Order[item.Index] + NoOfCities * BestPath.Order[item.Index + 1]];
+                    BestPath.Goal[item.Index] = item.Goal;
 
                     item.TimeDifference = 0;
                 }
@@ -100,9 +97,7 @@ namespace TSPTimeCost.TSP
                 {
                     FeeCost = CostMatrix.Instance.Value[indexOrigin + NoOfCities * indexDestination],
                     Index = i,
-                    TimeDifference =
-                        DistanceMatrixForFreeRoads.Instance.Distances[indexOrigin + NoOfCities * indexDestination] -
-                        DistanceMatrixForTollRoads.Instance.Distances[indexOrigin + NoOfCities * indexDestination],
+                    TimeDifference = FreeMatrix.Distances[indexOrigin + NoOfCities * indexDestination] - TollMatrix.Distances[indexOrigin + NoOfCities * indexDestination],
                 };
             return goalItem;
         }
@@ -115,16 +110,16 @@ namespace TSPTimeCost.TSP
 
             for (int i = 0; i < NoOfCities - 1; i++)
             {
-                City origin = cities[BestPath.Instance.Order[i]];
-                City destination = cities[BestPath.Instance.Order[i + 1]];
+                City origin = cities[BestPath.Order[i]];
+                City destination = cities[BestPath.Order[i + 1]];
                 var indexOrigin = cities.IndexOf(origin);
                 var indexDestination = cities.IndexOf(destination);
 
                 TimeDifferenceAndCost goalItem = InitializeGoalItem(i, indexOrigin, indexDestination);
 
-                goalItem.Goal = IsFreeRoad(i, indexOrigin, indexDestination) ? DistanceMatrixForFreeRoads.Instance.Goals[indexOrigin + NoOfCities * indexDestination] : DistanceMatrixForTollRoads.Instance.Goals[indexOrigin + NoOfCities * indexDestination];
+                goalItem.Goal = IsFreeRoad(i, indexOrigin, indexDestination) ? FreeMatrix.Goals[indexOrigin + NoOfCities * indexDestination] : TollMatrix.Goals[indexOrigin + NoOfCities * indexDestination];
 
-                BestPath.Instance.Goal[i] = goalItem.Goal;
+                BestPath.Goal[i] = goalItem.Goal;
 
                 goalList.Add(goalItem);
             }

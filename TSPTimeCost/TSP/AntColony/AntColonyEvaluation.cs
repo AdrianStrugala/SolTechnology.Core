@@ -1,17 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using TSPTimeCost.Singletons;
+﻿using System.Collections.Generic;
 
-namespace TSPTimeCost.TSP
+namespace TSPTimeCost.TSP.AntColony
 {
 
-    class AntColonyClassic : AntColonyAbstract
+    class AntColonyEvaluation : AntColonyAbstract
     {
+        //     private const double TimeCostEvaluation = 20.00;
         public override void SolveTSP()
         {
 
-            InitializeParameters(DistanceMatrixForFreeRoads.Instance);
-            FillAttractivenessMatrix(DistanceMatrixForFreeRoads.Instance);
+            InitializeParameters(EvaluatedMatrix);
+            FillAttractivenessMatrix(EvaluatedMatrix);
             FillTrialsMatrix();
 
             //each iteration is one trip of the ants
@@ -28,10 +27,11 @@ namespace TSPTimeCost.TSP
                 {
                     pathList[i] = CalculatePathForSingleAnt();
                 }
+
                 //must be separate, to not affect ants in the same iteration
                 for (int i = 0; i < NoOfAnts; i++)
                 {
-                    UpdateTrialsMatrix(pathList[i], DistanceMatrixForFreeRoads.Instance);
+                    UpdateTrialsMatrix(pathList[i], EvaluatedMatrix);
                 }
 
                 EvaporateTrialsMatrix();
@@ -39,16 +39,20 @@ namespace TSPTimeCost.TSP
                 //if its last iteration
                 if (j == NoOfIterations - 1)
                 {
-                    (minimumPathNumber, minimumPathInThisIteration) =
-                        FindMinimumPathInThisIteration(pathList, minimumPathInThisIteration, minimumPathNumber, DistanceMatrixForFreeRoads.Instance);
-                    ReplaceBestPathWithCurrentBest(pathList, minimumPathInThisIteration, minimumPathNumber, DistanceMatrixForFreeRoads.Instance);
+                    (minimumPathNumber, minimumPathInThisIteration) = FindMinimumPathInThisIteration(pathList,
+                        minimumPathInThisIteration, minimumPathNumber, EvaluatedMatrix);
 
-                    BestPath.Instance.Cost = 0;
+                    ReplaceBestPathWithCurrentBest(pathList, minimumPathInThisIteration, minimumPathNumber, EvaluatedMatrix);
+
+                    CalculateGoal(EvaluatedMatrix);
+                    CalculateCost();
+
                     CalculateDistance();
-
-                    CalculateGoal(DistanceMatrixForFreeRoads.Instance);
                 }
             }
-        } //end of Ant Colony
+        }
+
+        //end of Ant Colony
     }
+
 }

@@ -4,7 +4,7 @@ using System.Linq;
 using TSPTimeCost.Models;
 using TSPTimeCost.Singletons;
 
-namespace TSPTimeCost.TSP
+namespace TSPTimeCost.TSP.AntColony
 {
 
     abstract class AntColonyAbstract : TSP
@@ -12,25 +12,23 @@ namespace TSPTimeCost.TSP
 
         // Algorithm parameters
         protected const int NoOfAnts = 50;
-        private const double TrailEvaporationCoefficient = 0.3;
-        private const double BasicTrialValue = 1;
+        private const double trailEvaporationCoefficient = 0.3;
+        private const double basicTrialValue = 1;
 
         //if attractivenesParameter >> trialPreference, program basicaly choses closest city every time
-        private const double TrialPreference = 1;
-        private const double AttractivenessParameter = 10;
+        private const double trialPreference = 1;
+        private const double attractivenessParameter = 10;
         private double _pheromonePower;
         protected const int NoOfIterations = 10;
         private int _matrixSize;
-        protected static int NoOfCities;
         private double[] _attractivenessMatrix;
         private double[] _trialsMatrix;
 
 
         protected void InitializeParameters(IDistanceMatrix distanceMatrix)
         {
-            _pheromonePower = BestPath.Instance.Distance;
+            _pheromonePower = BestPath.Distance;
             _matrixSize = distanceMatrix.GetInstance().Distances.Length;
-            NoOfCities = BestPath.Instance.Order.Length;
             _trialsMatrix = new double[_matrixSize];
             _attractivenessMatrix = new double[_matrixSize];
         }
@@ -49,7 +47,7 @@ namespace TSPTimeCost.TSP
         {
             for (int i = 0; i < _trialsMatrix.Length; i++)
             {
-                _trialsMatrix[i] = BasicTrialValue;
+                _trialsMatrix[i] = basicTrialValue;
             }
         }
 
@@ -96,8 +94,8 @@ namespace TSPTimeCost.TSP
 
         private static int[] SetFirstAndLastPointInPath(int[] path)
         {
-            path[0] = BestPath.Instance.Order[0];
-            path[path.Length - 1] = BestPath.Instance.Order[path.Length - 1];
+            path[0] = BestPath.Order[0];
+            path[path.Length - 1] = BestPath.Order[path.Length - 1];
             return path;
         }
 
@@ -115,8 +113,8 @@ namespace TSPTimeCost.TSP
             for (int i = 0; i < NoOfCities * NoOfCities; i++)
             {
 
-                probabilityMatrix[i] = Math.Pow(_trialsMatrix[i], TrialPreference) *
-                                       Math.Pow(_attractivenessMatrix[i], AttractivenessParameter);
+                probabilityMatrix[i] = Math.Pow(_trialsMatrix[i], trialPreference) *
+                                       Math.Pow(_attractivenessMatrix[i], attractivenessParameter);
             }
             return probabilityMatrix;
         }
@@ -221,13 +219,30 @@ namespace TSPTimeCost.TSP
             return (nr, min);
         }
 
+        protected int FindMinimumPathInThisIteration2(List<int[]> pathList, double min, int nr, IDistanceMatrix distanceMatrix)
+        {
+            double[] distances = new double[pathList.Count];
+
+            for (int i = 0; i < pathList.Count; i++)
+            {
+                distances[i] = CalculateDistanceInPath(pathList[i], distanceMatrix);
+
+                if (distances[i] < min)
+                {
+                    min = distances[i];
+                    nr = i;
+                }
+            }
+            return nr;
+        }
+
         protected void UpdateTrialsMatrix(int[] path, IDistanceMatrix distanceMatrix)
         {
             for (int i = 0; i < NoOfCities - 1; i++)
             {
                 double distance = CalculateDistanceInPath(path, distanceMatrix);
-                _trialsMatrix[path[i] * NoOfCities + path[i + 1]] += (_pheromonePower * TrailEvaporationCoefficient / distance / NoOfAnts);
-                _trialsMatrix[path[i + 1] * NoOfCities + path[i]] += (_pheromonePower * TrailEvaporationCoefficient / distance / NoOfAnts);
+                _trialsMatrix[path[i] * NoOfCities + path[i + 1]] += (_pheromonePower * trailEvaporationCoefficient / distance / NoOfAnts);
+                _trialsMatrix[path[i + 1] * NoOfCities + path[i]] += (_pheromonePower * trailEvaporationCoefficient / distance / NoOfAnts);
             }
         }
 
@@ -235,19 +250,19 @@ namespace TSPTimeCost.TSP
         {
             for (int i = 0; i < _matrixSize; i++)
             {
-                _trialsMatrix[i] -= TrailEvaporationCoefficient * _trialsMatrix[i];
+                _trialsMatrix[i] -= trailEvaporationCoefficient * _trialsMatrix[i];
             }
         }
 
         protected static void ReplaceBestPathWithCurrentBest(List<int[]> pathList, double minimumPathInThisIteration, int minimumPathNumber, IDistanceMatrix distanceMatrix)
         {
-            BestPath.Instance.Distance = minimumPathInThisIteration;
-            BestPath.Instance.Order = pathList[minimumPathNumber];
+            BestPath.Distance = minimumPathInThisIteration;
+            BestPath.Order = pathList[minimumPathNumber];
 
             for (int i = 0; i < NoOfCities - 1; i++)
             {
-                BestPath.Instance.DistancesInOrder[i] =
-                    distanceMatrix.GetInstance().Distances[BestPath.Instance.Order[i] + NoOfCities * BestPath.Instance.Order[i + 1]];
+                BestPath.DistancesInOrder[i] =
+                    distanceMatrix.GetInstance().Distances[BestPath.Order[i] + NoOfCities * BestPath.Order[i + 1]];
             }
         }
 

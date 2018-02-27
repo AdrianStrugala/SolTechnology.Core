@@ -1,6 +1,7 @@
 ﻿using TSPTimeCost.Models;
 using TSPTimeCost.Singletons;
 using TSPTimeCost.TSP;
+using TSPTimeCost.TSP.AntColony;
 using AttentionWhore = TSPTimeCost.TSP.AttentionWhore;
 
 namespace TSPTimeCost
@@ -63,7 +64,7 @@ namespace TSPTimeCost
             int minutes = (int)((BestPath.Instance.Distance - hours * 3600) / 60);
             int seconds = (int)(BestPath.Instance.Distance % 60);
 
-            return $"Duration: {hours}:{minutes:00}:{seconds:00}   Cost: {BestPath.Instance.Cost}   Goal: {goalSum}";
+            return $"Duration: {hours}:{minutes:00}:{seconds:00}   Cost: {BestPath.Instance.Cost}   Goal: {goalSum:000.000}";
         }
 
         public string IsTollFragmentInformation(int indexInBestPath)
@@ -74,17 +75,9 @@ namespace TSPTimeCost
             var indexDestination = Cities.Instance.ListOfCities.IndexOf(destination);
 
 
-            if (Equals(
-                    BestPath.Instance.DistancesInOrder[indexInBestPath],
-                    DistanceMatrixForTollRoads.Instance.Distances[indexOrigin + Cities.Instance.ListOfCities.Count * indexDestination])
-                && !Equals(
-                    DistanceMatrixForTollRoads.Instance.Distances[indexOrigin + Cities.Instance.ListOfCities.Count * indexDestination],
-                    DistanceMatrixForFreeRoads.Instance.Distances[indexOrigin + Cities.Instance.ListOfCities.Count * indexDestination])
-            )
-            {
-                return "(T)";
-            }
-            return "(F)";
+            return Equals(
+                BestPath.Instance.DistancesInOrder[indexInBestPath],
+                DistanceMatrixForFreeRoads.Instance.Distances[indexOrigin + Cities.Instance.ListOfCities.Count * indexDestination]) ? "(F)" : "(T)";
         }
 
         public void TollTSP()
@@ -116,6 +109,12 @@ namespace TSPTimeCost
         {
             AttentionWhore attentionWhore = new AttentionWhore();
             attentionWhore.SolveTSP();
+        }
+
+        public void God()
+        {
+            God god = new God();
+            god.SolveTSP();
         }
     }
 }

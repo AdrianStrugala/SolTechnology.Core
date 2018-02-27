@@ -1,14 +1,11 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using TSPTimeCost.Models;
-using TSPTimeCost.Singletons;
 
 namespace TSPTimeCost.TSP
 {
     class AttentionWhore : TSP
     {
-
-        private static int _noOfCities;
         private static List<FanAndStar> _fansAndStars;
         private static List<int> _whoreList;
 
@@ -16,7 +13,6 @@ namespace TSPTimeCost.TSP
         {
             _fansAndStars = new List<FanAndStar>();
             _whoreList = new List<int>();
-            _noOfCities = Cities.Instance.ListOfCities.Count;
 
             InitateFansAndStars();
 
@@ -35,35 +31,27 @@ namespace TSPTimeCost.TSP
                 whore = FindWhore();
             }
 
-
-            RewriteFoundPathToBestPath();
-
-            CalculateGoal(DistanceMatrixEvaluated.Instance);
-            CalculateCost();
+            RewriteFoundPathToBestPath(_fansAndStars);
+            CalculateBestPathDistances(EvaluatedMatrix);
             CalculateDistance();
+            CalculateCost();
+            CalculateGoal(EvaluatedMatrix);
         }
 
 
-        private static void RewriteFoundPathToBestPath()
-        {
-            for (int i = 1; i <= _noOfCities - 1; i++)
-            {
-                BestPath.Instance.Order[i] = _fansAndStars.First(element => element.Fan == BestPath.Instance.Order[i - 1]).Star;
-            }
-        }
 
         private static void ConnectLastCityWithFirst()
         {
-            _fansAndStars[_noOfCities - 1].Star = 0;
+            _fansAndStars[NoOfCities - 1].Star = 0;
         }
 
         private static void FindNearestNeighbour(FanAndStar fanAndStar)
         {
-            for (int star = 0; star < _noOfCities; star++)
+            for (int star = 0; star < NoOfCities; star++)
             {
 
-                if (DistanceMatrixEvaluated.Instance.Distances[fanAndStar.Fan + _noOfCities * fanAndStar.Star] >
-                    DistanceMatrixEvaluated.Instance.Distances[fanAndStar.Fan + _noOfCities * star])
+                if (EvaluatedMatrix.Distances[fanAndStar.Fan + NoOfCities * fanAndStar.Star] >
+                    EvaluatedMatrix.Distances[fanAndStar.Fan + NoOfCities * star])
                 {
                     if (FirstNotConnectedWithLast(fanAndStar.Fan, star) && star != 0 &&
                         _fansAndStars[star].Star != fanAndStar.Fan)
@@ -76,7 +64,7 @@ namespace TSPTimeCost.TSP
 
         private static void InitateFansAndStars()
         {
-            for (int fan = 0; fan < _noOfCities; fan++)
+            for (int fan = 0; fan < NoOfCities; fan++)
             {
                 FanAndStar toadd = new FanAndStar(fan, fan);
                 _fansAndStars.Add(toadd);
@@ -98,10 +86,10 @@ namespace TSPTimeCost.TSP
                     if (!_whoreList.Contains(destination.Fan) && destination.Fan != 0)
                     {
                         if (minRoad >
-                            DistanceMatrixEvaluated.Instance.Distances[origin.Fan + _noOfCities * destination.Fan])
+                            EvaluatedMatrix.Distances[origin.Fan + NoOfCities * destination.Fan])
                         {
                             minRoad =
-                                DistanceMatrixEvaluated.Instance.Distances[origin.Fan + _noOfCities * destination.Fan];
+                                EvaluatedMatrix.Distances[origin.Fan + NoOfCities * destination.Fan];
                             newPair.Fan = origin.Fan;
                             newPair.Star = destination.Fan;
                         }
@@ -118,7 +106,7 @@ namespace TSPTimeCost.TSP
             int whore = -1;
             int actualnoOfFans = 1;
 
-            for (int i = 1; i <= _noOfCities; i++)
+            for (int i = 1; i <= NoOfCities; i++)
             {
                 int noOfFans = _fansAndStars.Count(num => num.Star == i);
                 if (noOfFans > actualnoOfFans)
@@ -132,7 +120,7 @@ namespace TSPTimeCost.TSP
 
         private static bool FirstNotConnectedWithLast(int fan, int star)
         {
-            return !(fan == 0 && star == _noOfCities - 1) && !(fan == _noOfCities - 1 && star == 0);
+            return !(fan == 0 && star == NoOfCities - 1) && !(fan == NoOfCities - 1 && star == 0);
         }
 
     }
@@ -149,7 +137,7 @@ namespace TSPTimeCost.TSP
 //    class AttentionWhore : TSP
 //    {
 //
-//        private static int _noOfCities;
+//        private static int NoOfCities;
 //        private static List<FanAndStar> _fansAndStars;
 //        private static List<int> _whoreList;
 //
@@ -157,10 +145,10 @@ namespace TSPTimeCost.TSP
 //        {
 //            _fansAndStars = new List<FanAndStar>();
 //            _whoreList = new List<int>();
-//            _noOfCities = BestPath.Instance.Order.Length;
+//            NoOfCities = BestPath.Order.Length;
 //
 //
-//            for (int fan = 0; fan < _noOfCities; fan++)
+//            for (int fan = 0; fan < NoOfCities; fan++)
 //            {
 //                FanAndStar toadd = new FanAndStar(fan, fan);
 //                _fansAndStars.Add(toadd);
@@ -168,11 +156,11 @@ namespace TSPTimeCost.TSP
 //
 //            foreach (var fanAndStar in _fansAndStars)
 //            {
-//                for (int star = 0; star < _noOfCities; star++)
+//                for (int star = 0; star < NoOfCities; star++)
 //                {
 //
-//                    if (DistanceMatrixForFreeRoads.Instance.Distances[fanAndStar.Fan + _noOfCities * fanAndStar.Star] >
-//                        DistanceMatrixForFreeRoads.Instance.Distances[fanAndStar.Fan + _noOfCities * star])
+//                    if (DistanceMatrixForFreeRoads.Instance.Distances[fanAndStar.Fan + NoOfCities * fanAndStar.Star] >
+//                        DistanceMatrixForFreeRoads.Instance.Distances[fanAndStar.Fan + NoOfCities * star])
 //                    {
 //
 //                        if (FirstNotConnectedWithLast(fanAndStar.Fan, star) && star != 0 )
@@ -184,7 +172,7 @@ namespace TSPTimeCost.TSP
 //                    }
 //                }
 //            }
-//            _fansAndStars[_noOfCities - 1].Star = 0;
+//            _fansAndStars[NoOfCities - 1].Star = 0;
 //
 //            var xd = _fansAndStars;
 //
@@ -203,17 +191,17 @@ namespace TSPTimeCost.TSP
 //
 //            var xd3 = _fansAndStars;
 //
-//            for (int i = 1; i <= _noOfCities - 1; i++)
+//            for (int i = 1; i <= NoOfCities - 1; i++)
 //            {
-//                BestPath.Instance.Order[i] = _fansAndStars.First(element => element.Fan == BestPath.Instance.Order[i - 1]).Star;
+//                BestPath.Order[i] = _fansAndStars.First(element => element.Fan == BestPath.Order[i - 1]).Star;
 //            }
 //
-//            var xd4 = BestPath.Instance.Order;
+//            var xd4 = BestPath.Order;
 //
-//            BestPath.Instance.Distance = 0;
-//            for (int i = 0; i < _noOfCities - 1; i++)
+//            BestPath.Distance = 0;
+//            for (int i = 0; i < NoOfCities - 1; i++)
 //            {
-//                BestPath.Instance.Distance += DistanceMatrixForFreeRoads.Instance.Distances[BestPath.Instance.Order[i] * _noOfCities + BestPath.Instance.Order[i + 1]];
+//                BestPath.Distance += DistanceMatrixForFreeRoads.Instance.Distances[BestPath.Order[i] * NoOfCities + BestPath.Order[i + 1]];
 //            }
 //
 //            CalculateGoal();
@@ -224,7 +212,7 @@ namespace TSPTimeCost.TSP
 //            IEnumerable<FanAndStar> fans = _fansAndStars.Where(element => element.Star == whore);
 //
 //            List<int> loosers = new List<int>();
-//            for (int i = 1; i < _noOfCities; i++)
+//            for (int i = 1; i < NoOfCities; i++)
 //            {
 //                loosers.Add(i);
 //            }
@@ -253,10 +241,10 @@ namespace TSPTimeCost.TSP
 //                    if (!_whoreList.Contains(destination) && destination != 0)
 //                    {
 //                        if (minRoad >
-//                            DistanceMatrixForFreeRoads.Instance.Distances[origin + _noOfCities * destination])
+//                            DistanceMatrixForFreeRoads.Instance.Distances[origin + NoOfCities * destination])
 //                        {
 //                            minRoad =
-//                                DistanceMatrixForFreeRoads.Instance.Distances[origin + _noOfCities * destination];
+//                                DistanceMatrixForFreeRoads.Instance.Distances[origin + NoOfCities * destination];
 //                            newPair.Fan = origin;
 //                            newPair.Star = destination;
 //                        }
@@ -278,7 +266,7 @@ namespace TSPTimeCost.TSP
 //            int whore = -1;
 //            int actualnoOfFans = 1;
 //
-//            for (int i = 1; i <= _noOfCities; i++)
+//            for (int i = 1; i <= NoOfCities; i++)
 //            {
 //                int noOfFans = _fansAndStars.Count(num => num.Star == i);
 //                if (noOfFans > actualnoOfFans)
@@ -292,7 +280,7 @@ namespace TSPTimeCost.TSP
 //
 //        private static bool FirstNotConnectedWithLast(int fan, int star)
 //        {
-//            return !(fan == 0 && star == _noOfCities - 1) && !(fan == _noOfCities - 1 && star == 0);
+//            return !(fan == 0 && star == NoOfCities - 1) && !(fan == NoOfCities - 1 && star == 0);
 //        }
 //
 //    }

@@ -1,17 +1,15 @@
 ﻿using System.Collections.Generic;
-using TSPTimeCost.Singletons;
 
-namespace TSPTimeCost.TSP
+namespace TSPTimeCost.TSP.AntColony
 {
 
-    class AntColonyEvaluation : AntColonyAbstract
+    class AntColonyClassic : AntColonyAbstract
     {
-        //     private const double TimeCostEvaluation = 20.00;
         public override void SolveTSP()
         {
 
-            InitializeParameters(DistanceMatrixEvaluated.Instance);
-            FillAttractivenessMatrix(DistanceMatrixEvaluated.Instance);
+            InitializeParameters(FreeMatrix);
+            FillAttractivenessMatrix(FreeMatrix);
             FillTrialsMatrix();
 
             //each iteration is one trip of the ants
@@ -28,11 +26,10 @@ namespace TSPTimeCost.TSP
                 {
                     pathList[i] = CalculatePathForSingleAnt();
                 }
-
                 //must be separate, to not affect ants in the same iteration
                 for (int i = 0; i < NoOfAnts; i++)
                 {
-                    UpdateTrialsMatrix(pathList[i], DistanceMatrixEvaluated.Instance);
+                    UpdateTrialsMatrix(pathList[i], FreeMatrix);
                 }
 
                 EvaporateTrialsMatrix();
@@ -40,21 +37,17 @@ namespace TSPTimeCost.TSP
                 //if its last iteration
                 if (j == NoOfIterations - 1)
                 {
-                    (minimumPathNumber, minimumPathInThisIteration) = FindMinimumPathInThisIteration(pathList,
-                        minimumPathInThisIteration, minimumPathNumber, DistanceMatrixEvaluated.Instance);
+                    minimumPathNumber =
+                        FindMinimumPathInThisIteration2(pathList, minimumPathInThisIteration, minimumPathNumber, FreeMatrix);
 
-                    ReplaceBestPathWithCurrentBest(pathList, minimumPathInThisIteration, minimumPathNumber,
-                        DistanceMatrixEvaluated.Instance);
 
-                    CalculateGoal(DistanceMatrixEvaluated.Instance);
-                    CalculateCost();
-
+                    RewriteFoundPathToBestPath(pathList[minimumPathNumber]);
+                    CalculateBestPathDistances(FreeMatrix);
                     CalculateDistance();
+                    CalculateCost();
+                    CalculateGoal(FreeMatrix);
                 }
             }
-        }
-
-        //end of Ant Colony
+        } //end of Ant Colony
     }
-
 }

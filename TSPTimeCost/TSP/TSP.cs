@@ -1,33 +1,74 @@
-﻿using TSPTimeCost.Singletons;
+﻿using System.Collections.Generic;
+using System.Linq;
+using TSPTimeCost.Models;
+using TSPTimeCost.Singletons;
 
 namespace TSPTimeCost.TSP
 {
     abstract class TSP
     {
-        private static readonly int NoOfCities = Cities.Instance.ListOfCities.Count;
+        protected static readonly IDistanceMatrix TollMatrix = DistanceMatrixForTollRoads.Instance;
+        protected static readonly IDistanceMatrix FreeMatrix = DistanceMatrixForFreeRoads.Instance;
+        protected static readonly IDistanceMatrix EvaluatedMatrix = DistanceMatrixEvaluated.Instance;
+        protected static readonly BestPath BestPath = BestPath.Instance;
+
+        protected static readonly int NoOfCities = Cities.Instance.ListOfCities.Count;
 
         public abstract void SolveTSP();
 
-        protected void CalculateDistance()
+        protected static void RewriteFoundPathToBestPath(List<int> path)
         {
-            BestPath.Instance.Distance = 0;
+            for (int i = 0; i < NoOfCities; i++)
+            {
+                BestPath.Order[i] = path[i];
+            }
+        }
+
+        protected static void RewriteFoundPathToBestPath(int[] path)
+        {
+            for (int i = 0; i < NoOfCities; i++)
+            {
+                BestPath.Order[i] = path[i];
+            }
+        }
+
+        protected static void RewriteFoundPathToBestPath(List<FanAndStar> fansAndStars)
+        {
+            for (int i = 1; i <= NoOfCities - 1; i++)
+            {
+                BestPath.Order[i] = fansAndStars.First(element => element.Fan == BestPath.Order[i - 1]).Star;
+            }
+        }
+
+        protected static void CalculateBestPathDistances(IDistanceMatrix distanceMatrix)
+        {
             for (int i = 0; i < NoOfCities - 1; i++)
             {
-                BestPath.Instance.Distance += BestPath.Instance.DistancesInOrder[i];
+                BestPath.DistancesInOrder[i] =
+                    distanceMatrix.GetInstance().Distances[BestPath.Order[i] + NoOfCities * BestPath.Order[i + 1]];
+            }
+        }
+
+        protected void CalculateDistance()
+        {
+            BestPath.Distance = 0;
+            for (int i = 0; i < NoOfCities - 1; i++)
+            {
+                BestPath.Distance += BestPath.DistancesInOrder[i];
             }
         }
 
         protected void CalculateCost()
         {
-            BestPath.Instance.Cost = 0;
+            BestPath.Cost = 0;
 
             for (int i = 0; i < NoOfCities - 1; i++)
             {
-                if (BestPath.Instance.DistancesInOrder[i] == DistanceMatrixForTollRoads.Instance.Distances[
-                    BestPath.Instance.Order[i] + NoOfCities * BestPath.Instance.Order[i + 1]])
+                if (BestPath.DistancesInOrder[i] != FreeMatrix.Distances[
+                    BestPath.Order[i] + NoOfCities * BestPath.Order[i + 1]])
                 {
-                    BestPath.Instance.Cost += CostMatrix.Instance.Value[
-                        BestPath.Instance.Order[i] + NoOfCities * BestPath.Instance.Order[i + 1]];
+                    BestPath.Cost += CostMatrix.Instance.Value[
+                        BestPath.Order[i] + NoOfCities * BestPath.Order[i + 1]];
                 }
             }
         }
@@ -36,11 +77,13 @@ namespace TSPTimeCost.TSP
         {
             for (int i = 0; i < NoOfCities - 1; i++)
             {
-                BestPath.Instance.Goal[i] =
+                BestPath.Goal[i] =
                     distanceMatrix.GetInstance().Goals[
-                        BestPath.Instance.Order[i] * NoOfCities + BestPath.Instance.Order[i + 1]];
+                        BestPath.Order[i] * NoOfCities + BestPath.Order[i + 1]];
             }
         }
+
+
 
         public double CalculateDistanceInPath(int[] path, IDistanceMatrix distanceMatrix)
         {
@@ -56,9 +99,7 @@ namespace TSPTimeCost.TSP
 
         protected static bool IsFreeRoad(int i, int indexOrigin, int indexDestination)
         {
-            return BestPath.Instance.DistancesInOrder[i] == DistanceMatrixForFreeRoads.Instance.Distances[indexOrigin + NoOfCities * indexDestination];
+            return BestPath.DistancesInOrder[i] == DistanceMatrixForFreeRoads.Instance.Distances[indexOrigin + NoOfCities * indexDestination];
         }
-
-      
     }
 }
