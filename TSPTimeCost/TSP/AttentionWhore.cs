@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using TSPTimeCost.Models;
+using TSPTimeCost.Singletons;
 
 namespace TSPTimeCost.TSP
 {
@@ -31,11 +32,7 @@ namespace TSPTimeCost.TSP
                 whore = FindWhore();
             }
 
-            RewriteFoundPathToBestPath(_fansAndStars);
-            CalculateBestPathDistances(EvaluatedMatrix);
-            CalculateDistance();
-            CalculateCost();
-            CalculateGoal(EvaluatedMatrix);
+            UpdateBestPath(_fansAndStars, EvaluatedMatrix);
         }
 
 

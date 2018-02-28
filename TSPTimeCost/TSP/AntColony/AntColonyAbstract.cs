@@ -202,25 +202,11 @@ namespace TSPTimeCost.TSP.AntColony
             return probabilityMatrix;
         }
 
-        protected (int, double) FindMinimumPathInThisIteration(List<int[]> pathList, double min, int nr, IDistanceMatrix distanceMatrix)
+
+        protected int FindMinimumPathInThisIteration(List<int[]> pathList, IDistanceMatrix distanceMatrix)
         {
-            double[] distances = new double[pathList.Count];
-
-            for (int i = 0; i < pathList.Count; i++)
-            {
-                distances[i] = CalculateDistanceInPath(pathList[i], distanceMatrix);
-
-                if (distances[i] < min)
-                {
-                    min = distances[i];
-                    nr = i;
-                }
-            }
-            return (nr, min);
-        }
-
-        protected int FindMinimumPathInThisIteration2(List<int[]> pathList, double min, int nr, IDistanceMatrix distanceMatrix)
-        {
+            double min = double.MaxValue;
+            int nr = -1;
             double[] distances = new double[pathList.Count];
 
             for (int i = 0; i < pathList.Count; i++)

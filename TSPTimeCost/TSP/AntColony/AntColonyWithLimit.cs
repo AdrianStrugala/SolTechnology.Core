@@ -48,7 +48,7 @@ namespace TSPTimeCost.TSP.AntColony
                 //if its last iteration
                 if (j == NoOfIterations - 1)
                 {
-                    (minimumPathNumber, minimumPathInThisIteration) = FindMinimumPathInThisIteration(pathList, minimumPathInThisIteration, minimumPathNumber, TollMatrix);
+                    (minimumPathNumber, minimumPathInThisIteration) = FindMinimumPathInThisIterationForLimit(pathList, minimumPathInThisIteration, minimumPathNumber, TollMatrix);
                     ReplaceBestPathWithCurrentBest(pathList, minimumPathInThisIteration, minimumPathNumber, TollMatrix);
 
 
@@ -100,6 +100,23 @@ namespace TSPTimeCost.TSP.AntColony
                     TimeDifference = FreeMatrix.Distances[indexOrigin + NoOfCities * indexDestination] - TollMatrix.Distances[indexOrigin + NoOfCities * indexDestination],
                 };
             return goalItem;
+        }
+
+        protected (int, double) FindMinimumPathInThisIterationForLimit(List<int[]> pathList, double min, int nr, IDistanceMatrix distanceMatrix)
+        {
+            double[] distances = new double[pathList.Count];
+
+            for (int i = 0; i < pathList.Count; i++)
+            {
+                distances[i] = CalculateDistanceInPath(pathList[i], distanceMatrix);
+
+                if (distances[i] < min)
+                {
+                    min = distances[i];
+                    nr = i;
+                }
+            }
+            return (nr, min);
         }
 
 

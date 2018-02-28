@@ -1,7 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Drawing;
+using System.Linq;
 using System.Windows.Forms;
 using System.Windows.Forms.DataVisualization.Charting;
+using TSPTimeCost.Models;
 using TSPTimeCost.Singletons;
 
 namespace TSPTimeCost
@@ -21,6 +24,7 @@ namespace TSPTimeCost
 
         private void Form1_Load(object sender, EventArgs e)
         {
+            _viewModel.Cities = CitiesTxt.Text;
             _controller.Initialize();
             InitializeSeries();
 
@@ -57,18 +61,23 @@ namespace TSPTimeCost
 
         private void DrawCities()
         {
-            foreach (var city in Cities.Instance.ListOfCities)
+            for (int i = 0; i < Cities.Instance.ListOfCities.Count; i++)
             {
+                var city = Cities.Instance.ListOfCities[i];
                 Area.Series[0].Points.AddXY(city.Longitude, city.Latitude);
+                Area.Series[0].Points[i].Label = city.Name;
             }
         }
 
         private void ShowRoute(string nameOfSeries)
         {
             Area.Series[nameOfSeries].Points.Clear();
-            orderLbl.Text = _controller.GetOrder();
-            goalLbl.Text = _controller.GetGoals();
-            durationLbl.Text = _controller.GetDuration();
+          //  orderLbl.Text = _controller.GetOrder();
+          //  goalLbl.Text = _controller.GetGoals();
+          //  durationLbl.Text = _controller.GetDuration();
+
+            goalLbl.Text = _controller.GetDuration();
+
             DrawRoute(nameOfSeries);
         }
 
@@ -190,6 +199,18 @@ namespace TSPTimeCost
         private void GodChck_CheckedChanged(object sender, EventArgs e)
         {
             Area.Series["God"].Enabled = GodChck.Checked;
+        }
+
+        private void label2_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void CitiesTxt_LostFocus(object sender, EventArgs e)
+        {
+            _viewModel.Cities = CitiesTxt.Text;
+            _controller.Initialize();
+            DrawCities();
         }
     }
 }

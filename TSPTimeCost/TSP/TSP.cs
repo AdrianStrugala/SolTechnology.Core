@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 using TSPTimeCost.Models;
 using TSPTimeCost.Singletons;
@@ -22,6 +23,29 @@ namespace TSPTimeCost.TSP
             {
                 BestPath.Order[i] = path[i];
             }
+        }
+
+        protected void UpdateBestPath(IEnumerable minimumPath, IDistanceMatrix distanceMatrix)
+        {
+            if (minimumPath is List<int>)
+            {
+                RewriteFoundPathToBestPath((List<int>) minimumPath);
+            }
+
+            else if (minimumPath is List<FanAndStar>)
+            {
+                RewriteFoundPathToBestPath((List<FanAndStar>)minimumPath);
+            }
+
+            else if (minimumPath is int[])
+            {
+                RewriteFoundPathToBestPath((int[])minimumPath);
+            }
+            
+            CalculateBestPathDistances(distanceMatrix);
+            CalculateDistance();
+            CalculateCost();
+            CalculateGoal(distanceMatrix);
         }
 
         protected static void RewriteFoundPathToBestPath(int[] path)

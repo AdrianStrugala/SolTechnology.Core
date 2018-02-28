@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.IO.MemoryMappedFiles;
+using System.Linq;
 using System.Net;
 using System.Text;
 using Newtonsoft.Json;
@@ -18,6 +19,12 @@ namespace TSPTimeCost
 {
     class ProcessInputData
     {
+        private static  ViewModel _viewModel;
+
+        public ProcessInputData()
+        {
+            _viewModel = new ViewModel();
+        }
 
         private static double FuelPrice { get; } = 1.26;
         private static double RoadVelocity { get; } = 70;
@@ -53,11 +60,16 @@ namespace TSPTimeCost
 
         private static List<string> ReadCities()
         {
-            List<string> cities = new List<string> { "Como, Italy", "Verona", "Florence", "Pisa", "Turin", "Milan", "Genoa", "Bergamo" };
+            string[] cities = _viewModel.Cities.Split(
+                new[] { "\r\n", "\r", "\n" },
+                StringSplitOptions.None
+            );
+
+            // List<string> cities = new List<string> { "Como, Italy", "Verona", "Florence", "Pisa", "Turin", "Milan", "Genoa", "Bergamo" };
             //  List<string> cities = new List<string> { "Como", "Verona", "Florence", "Turin", "Milan"};
             // List<string> _cities = new List<string> { "Wroclaw", "Lodz", "Warszawa", "Krakow", "Poznan", "Gdansk", "Lublin", "Bialystok" };
 
-            return cities;
+            return cities.Where(x => !string.IsNullOrEmpty(x)).ToList();
         }
 
         public void CalculateCostMatrix()

@@ -9,11 +9,7 @@ namespace TSPTimeCost.TSP
         {
             List<int> randomRoute = FindRandomRoute();
 
-            RewriteFoundPathToBestPath(randomRoute);
-            CalculateBestPathDistances(EvaluatedMatrix);
-            CalculateDistance();
-            CalculateCost();
-            CalculateGoal(EvaluatedMatrix);
+            UpdateBestPath(randomRoute, EvaluatedMatrix);
         }
 
 

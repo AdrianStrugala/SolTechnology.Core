@@ -8,7 +8,7 @@ namespace TSPTimeCost
 {
     class Controller
     {
-        private double goalSum;
+        private double _goalSum;
         private readonly ViewModel _viewModel;
 
 
@@ -47,12 +47,11 @@ namespace TSPTimeCost
 
         public string GetGoals()
         {
-            goalSum = 0;
+            _goalSum = 0;
             string text = "Goal values: ";
             for (int i = 0; i < Cities.Instance.ListOfCities.Count - 1; i++)
             {
                 text += BestPath.Instance.Goal[i].ToString("#.000") + "  ";
-                goalSum += BestPath.Instance.Goal[i];
             }
 
             return text;
@@ -64,7 +63,13 @@ namespace TSPTimeCost
             int minutes = (int)((BestPath.Instance.Distance - hours * 3600) / 60);
             int seconds = (int)(BestPath.Instance.Distance % 60);
 
-            return $"Duration: {hours}:{minutes:00}:{seconds:00}   Cost: {BestPath.Instance.Cost}   Goal: {goalSum:000.000}";
+            _goalSum = 0;
+            for (int i = 0; i < Cities.Instance.ListOfCities.Count - 1; i++)
+            {
+                _goalSum += BestPath.Instance.Goal[i];
+            }
+
+            return $"Duration: {hours}:{minutes:00}:{seconds:00}   Cost: {BestPath.Instance.Cost}   Goal: {_goalSum:000.000}";
         }
 
         public string IsTollFragmentInformation(int indexInBestPath)

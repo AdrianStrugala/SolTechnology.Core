@@ -2,7 +2,6 @@
 
 namespace TSPTimeCost.TSP.AntColony
 {
-
     class AntColonyToll : AntColonyAbstract
     {
         public override void SolveTSP()
@@ -15,8 +14,6 @@ namespace TSPTimeCost.TSP.AntColony
             for (int j = 0; j < NoOfIterations; j++)
             {
                 List<int[]> pathList = new List<int[]>();
-                double minimumPathInThisIteration = double.MaxValue;
-                int minimumPathNumber = -1;
 
                 pathList = InitializePathList(pathList);
 
@@ -25,6 +22,7 @@ namespace TSPTimeCost.TSP.AntColony
                 {
                     pathList[i] = CalculatePathForSingleAnt();
                 }
+
                 //must be separate, to not affect ants in the same iteration
                 for (int i = 0; i < NoOfAnts; i++)
                 {
@@ -36,17 +34,10 @@ namespace TSPTimeCost.TSP.AntColony
                 //if its last iteration
                 if (j == NoOfIterations - 1)
                 {
-                    (minimumPathNumber, minimumPathInThisIteration) = FindMinimumPathInThisIteration(pathList, minimumPathInThisIteration, minimumPathNumber, TollMatrix);
-                    ReplaceBestPathWithCurrentBest(pathList, minimumPathInThisIteration, minimumPathNumber, TollMatrix);
-
-                    CalculateGoal(TollMatrix);
-                    CalculateCost();
-
-                    CalculateDistance();
+                    int[] minimumPath = pathList[FindMinimumPathInThisIteration(pathList, TollMatrix)];
+                    UpdateBestPath(minimumPath, TollMatrix);
                 }
             }
         }//end of Ant Colony
-
     }
-
 }
