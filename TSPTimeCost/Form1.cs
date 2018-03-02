@@ -203,7 +203,7 @@ namespace TSPTimeCost
 
         private void label2_Click(object sender, EventArgs e)
         {
-
+             
         }
 
         private void CitiesTxt_LostFocus(object sender, EventArgs e)
