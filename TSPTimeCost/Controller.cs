@@ -1,4 +1,6 @@
-﻿using TSPTimeCost.Models;
+﻿using System.Diagnostics;
+using System.Threading.Tasks;
+using TSPTimeCost.Models;
 using TSPTimeCost.Singletons;
 using TSPTimeCost.TSP;
 using TSPTimeCost.TSP.AntColony;
@@ -18,19 +20,16 @@ namespace TSPTimeCost
         }
 
 
-        public void Initialize()
+        public async Task InitializeAsync()
         {
-            ProcessInputData processInputData = new ProcessInputData();
-
-
-            ProcessInputData.InitializeSingletons();
-            ProcessInputData.CalculateDistanceMatrixForTollRoads();          
-            processInputData.CalculateDistanceMatrixForFreeRoads();
-            processInputData.CalculateCostMatrix();
-            ProcessInputData.CalculateDistanceMatrixEvaluated();
-
+            Task initializeSingletons = Task.Factory.StartNew(ProcessInputData.InitializeSingletons) ;
+            initializeSingletons.Wait();
+            await Task.Factory.StartNew(ProcessInputData.CalculateDistanceMatrixForFreeRoads);
+            await Task.Factory.StartNew(ProcessInputData.CalculateDistanceMatrixForTollRoads);
+            await Task.Factory.StartNew(ProcessInputData.CalculateDistanceMatrixEvaluated);
+            await Task.Factory.StartNew(ProcessInputData.CalculateCostMatrix);
+            
             BestPath.Instance.Distance = new AntColonyToll().CalculateDistanceInPath(BestPath.Instance.Order, DistanceMatrixForTollRoads.Instance);
-
         }
 
         public string GetOrder()

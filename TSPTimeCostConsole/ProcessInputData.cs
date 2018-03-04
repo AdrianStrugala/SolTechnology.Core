@@ -78,22 +78,25 @@ namespace TSPTimeCostConsole
                     }
                 }*/
 
-        public void CreateMatrixes(List<Road> roads)
-        {
-            foreach (var road in roads)
-            {
-                if (road.Cost == 0)
-                    AddToNoCostMatrix(road);
-                else 
-                    AddToCostMatrix(road);
-            }
-
-            foreach (var record in NoCostMatrix.Instance.value)
-            {
-                if(record == 0)
-                    record = Double.MaxValue;
-            }
-        }
+//        public void CreateMatrixes(List<Road> roads)
+//        {
+//            foreach (var road in roads)
+//            {
+//                if (road.Cost == 0)
+//                    AddToNoCostMatrix(road);
+//                else 
+//                    AddToCostMatrix(road);
+//            }
+//
+//            foreach (var record in NoCostMatrix.Instance.value)
+//            {
+//                if(record == 0)
+//                {
+//                    var maxValue = record;
+//                    record = Double.MaxValue;
+//                }
+//            }
+//        }
         //TODO
         private void AddToCostMatrix(Road road)
         {

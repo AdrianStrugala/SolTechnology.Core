@@ -23,9 +23,9 @@
         /// the contents of this method with the code editor.
         /// </summary>
         private void InitializeComponent() {
-            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea3 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
-            System.Windows.Forms.DataVisualization.Charting.Legend legend3 = new System.Windows.Forms.DataVisualization.Charting.Legend();
-            System.Windows.Forms.DataVisualization.Charting.Series series3 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea1 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
+            System.Windows.Forms.DataVisualization.Charting.Legend legend1 = new System.Windows.Forms.DataVisualization.Charting.Legend();
+            System.Windows.Forms.DataVisualization.Charting.Series series1 = new System.Windows.Forms.DataVisualization.Charting.Series();
             this.Area = new System.Windows.Forms.DataVisualization.Charting.Chart();
             this.orderLbl = new System.Windows.Forms.Label();
             this.TollTSPBtn = new System.Windows.Forms.Button();
@@ -48,22 +48,23 @@
             this.GodChck = new System.Windows.Forms.CheckBox();
             this.CitiesLbl = new System.Windows.Forms.Label();
             this.CitiesTxt = new System.Windows.Forms.TextBox();
+            this.UpdateBtn = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.Area)).BeginInit();
             this.SuspendLayout();
             // 
             // Area
             // 
-            chartArea3.Name = "ChartArea1";
-            this.Area.ChartAreas.Add(chartArea3);
-            legend3.Name = "Legend1";
-            this.Area.Legends.Add(legend3);
+            chartArea1.Name = "ChartArea1";
+            this.Area.ChartAreas.Add(chartArea1);
+            legend1.Name = "Legend1";
+            this.Area.Legends.Add(legend1);
             this.Area.Location = new System.Drawing.Point(9, 10);
             this.Area.Margin = new System.Windows.Forms.Padding(2);
             this.Area.Name = "Area";
-            series3.ChartArea = "ChartArea1";
-            series3.Legend = "Legend1";
-            series3.Name = "Series1";
-            this.Area.Series.Add(series3);
+            series1.ChartArea = "ChartArea1";
+            series1.Legend = "Legend1";
+            series1.Name = "Series1";
+            this.Area.Series.Add(series1);
             this.Area.Size = new System.Drawing.Size(602, 541);
             this.Area.TabIndex = 0;
             this.Area.Text = "Area";
@@ -299,11 +300,23 @@
             this.CitiesTxt.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             this.CitiesTxt.LostFocus += new System.EventHandler(this.CitiesTxt_LostFocus);
             // 
+            // UpdateBtn
+            // 
+            this.UpdateBtn.Location = new System.Drawing.Point(676, 555);
+            this.UpdateBtn.Margin = new System.Windows.Forms.Padding(2);
+            this.UpdateBtn.Name = "UpdateBtn";
+            this.UpdateBtn.Size = new System.Drawing.Size(73, 25);
+            this.UpdateBtn.TabIndex = 22;
+            this.UpdateBtn.Text = "Update";
+            this.UpdateBtn.UseVisualStyleBackColor = true;
+            this.UpdateBtn.Click += new System.EventHandler(this.UpdateBtn_Click);
+            // 
             // TspTimeCostFrm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(970, 602);
+            this.Controls.Add(this.UpdateBtn);
             this.Controls.Add(this.CitiesTxt);
             this.Controls.Add(this.CitiesLbl);
             this.Controls.Add(this.GodChck);
@@ -360,6 +373,7 @@
         private System.Windows.Forms.CheckBox GodChck;
         private System.Windows.Forms.Label CitiesLbl;
         public System.Windows.Forms.TextBox CitiesTxt;
+        private System.Windows.Forms.Button UpdateBtn;
     }
 }
 

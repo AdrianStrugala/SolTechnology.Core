@@ -11,23 +11,38 @@ namespace TSPTimeCostConsole
     {
         static void Main(string[] args)
         {
-            List<Road> roads = new List<Road>();
+            //            List<Road> roads = new List<Road>();
+            //
+            //            ProcessInputData PID = new ProcessInputData();
+            //
+            //            roads = PID.ReadInputFile();
+            //
+            //            foreach (var road in roads)
+            //            {
+            //                PID.ConvertTimeToDecimal(road);
+            //            }
+            //
+            //            PID.CreateListOfCities(roads);
+            //            PID.InitializeSingletons(ListOfCities.Instance.value.Count);
+            //            PID.CreateMatrixes(roads);
+            //
+            //            int i = NoCostMatrix.Instance.value.Length;
+            //            int j = CostMatrix.Instance.value.Length;
 
-            ProcessInputData PID = new ProcessInputData();
 
-            roads = PID.ReadInputFile();
 
-            foreach (var road in roads)
-            {
-                PID.ConvertTimeToDecimal(road);
+            Task taskA = Task.Factory.StartNew(() => DoSomeWork(10000, "A"));
+
+            Task taskB = Task.Factory.StartNew(() => DoSomeWork(10000, "B"));
+
+            Console.ReadKey();
+        }
+
+        private static void DoSomeWork(int p0, string letter)
+        {
+            for (int i = 0;  i < p0; i++) {
+                Console.WriteLine(letter + i);
             }
-
-            PID.CreateListOfCities(roads);
-            PID.InitializeSingletons(ListOfCities.Instance.value.Count);
-            PID.CreateMatrixes(roads);
-
-            int i = NoCostMatrix.Instance.value.Length;
-            int j = CostMatrix.Instance.value.Length;
         }
     }
 }

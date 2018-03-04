@@ -1,10 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
-using System.Linq;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Windows.Forms.DataVisualization.Charting;
-using TSPTimeCost.Models;
 using TSPTimeCost.Singletons;
 
 namespace TSPTimeCost
@@ -22,12 +21,11 @@ namespace TSPTimeCost
 
         }
 
-        private void Form1_Load(object sender, EventArgs e)
+        private async void Form1_Load(object sender, EventArgs e)
         {
             _viewModel.Cities = CitiesTxt.Text;
-            _controller.Initialize();
+            await _controller.InitializeAsync();
             InitializeSeries();
-
             DrawCities();
         }
 
@@ -208,8 +206,13 @@ namespace TSPTimeCost
 
         private void CitiesTxt_LostFocus(object sender, EventArgs e)
         {
+
+        }
+
+        private async void UpdateBtn_Click(object sender, EventArgs e)
+        {
             _viewModel.Cities = CitiesTxt.Text;
-            _controller.Initialize();
+            await _controller.InitializeAsync();
             DrawCities();
         }
     }

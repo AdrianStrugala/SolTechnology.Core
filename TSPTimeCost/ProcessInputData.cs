@@ -21,11 +21,6 @@ namespace TSPTimeCost
     {
         private static  ViewModel _viewModel;
 
-        public ProcessInputData()
-        {
-            _viewModel = new ViewModel();
-        }
-
         private static double FuelPrice { get; } = 1.26;
         private static double RoadVelocity { get; } = 70;
         private static double HighwayVelocity { get; } = 120;
@@ -60,6 +55,7 @@ namespace TSPTimeCost
 
         private static List<string> ReadCities()
         {
+            _viewModel = new ViewModel();
             string[] cities = _viewModel.Cities.Split(
                 new[] { "\r\n", "\r", "\n" },
                 StringSplitOptions.None
@@ -72,7 +68,7 @@ namespace TSPTimeCost
             return cities.Where(x => !string.IsNullOrEmpty(x)).ToList();
         }
 
-        public void CalculateCostMatrix()
+        public static void CalculateCostMatrix()
         {
             List<City> cities = Cities.Instance.ListOfCities;
             CostMatrix.Instance.Value = new double[cities.Count * cities.Count];
@@ -146,7 +142,7 @@ namespace TSPTimeCost
             //            }
         }
 
-        public void CalculateDistanceMatrixForFreeRoads()
+        public static void CalculateDistanceMatrixForFreeRoads()
         {
             List<City> cities = Cities.Instance.ListOfCities;
             DistanceMatrixForFreeRoads.Instance.Distances = new double[cities.Count * cities.Count];
@@ -258,7 +254,7 @@ namespace TSPTimeCost
             return 0;
         }
 
-        private int GetDurationBetweenTwoCitiesByFreeRoad(double originLan, double originLon, double destinationLan, double destinationLon)
+        private static int GetDurationBetweenTwoCitiesByFreeRoad(double originLan, double originLon, double destinationLan, double destinationLon)
         {
 
             string url =
@@ -293,6 +289,7 @@ namespace TSPTimeCost
             Cities.Instance.ListOfCities = new List<City>();
             Cities.Instance.ListOfCities = GetCitiesFromGoogleApi();
             int noOfCities = Cities.Instance.ListOfCities.Count;
+
             BestPath.Instance.Order = new int[noOfCities];
             BestPath.Instance.Goal = new double[noOfCities];
             DistanceMatrixForTollRoads.Instance.Distances = new double[noOfCities * noOfCities];
