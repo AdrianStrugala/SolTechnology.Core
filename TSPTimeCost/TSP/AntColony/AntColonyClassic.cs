@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Diagnostics;
 using TSPTimeCost.Singletons;
 
 namespace TSPTimeCost.TSP.AntColony
@@ -8,6 +9,9 @@ namespace TSPTimeCost.TSP.AntColony
     {
         public override void SolveTSP()
         {
+            Stopwatch stopwatch = new Stopwatch();
+            stopwatch.Start();
+
             InitializeParameters(FreeMatrix);
             FillAttractivenessMatrix(FreeMatrix);
             FillTrialsMatrix();
@@ -40,6 +44,8 @@ namespace TSPTimeCost.TSP.AntColony
                     UpdateBestPath(minimumPath, FreeMatrix);
                 }
             }
+            var s = stopwatch.Elapsed;
+            stopwatch.Stop();
         } //end of Ant Colony
     }
 }
