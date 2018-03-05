@@ -34,7 +34,7 @@ namespace TSPTimeCost.TSP.AntColony
                 //if its last iteration
                 if (j == NoOfIterations - 1)
                 {
-                    int[] minimumPath = pathList[FindMinimumPathInThisIteration(pathList, TollMatrix)];
+                    int[] minimumPath = pathList[FindMinimumPathInListOfPaths(pathList, TollMatrix)];
                     UpdateBestPath(minimumPath, TollMatrix);
                 }
             }

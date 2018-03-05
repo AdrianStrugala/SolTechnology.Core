@@ -13,7 +13,7 @@ namespace TSPTimeCost.TSP
         protected static readonly IDistanceMatrix EvaluatedMatrix = DistanceMatrixEvaluated.Instance;
         protected static readonly BestPath BestPath = BestPath.Instance;
 
-        protected static readonly int NoOfCities = Cities.Instance.ListOfCities.Count;
+        protected static int NoOfCities = Cities.Instance.ListOfCities.Count;
 
         public abstract void SolveTSP();
 
@@ -29,7 +29,7 @@ namespace TSPTimeCost.TSP
         {
             if (minimumPath is List<int>)
             {
-                RewriteFoundPathToBestPath((List<int>) minimumPath);
+                RewriteFoundPathToBestPath((List<int>)minimumPath);
             }
 
             else if (minimumPath is List<FanAndStar>)
@@ -41,7 +41,7 @@ namespace TSPTimeCost.TSP
             {
                 RewriteFoundPathToBestPath((int[])minimumPath);
             }
-            
+
             CalculateBestPathDistances(distanceMatrix);
             CalculateDistance();
             CalculateCost();
@@ -113,13 +113,35 @@ namespace TSPTimeCost.TSP
         {
             double result = 0;
 
-            for (int i = 0; i < path.Length - 1; i++)
+            if (path != null)
             {
-                result += distanceMatrix.GetInstance().Distances[path[i] * path.Length + path[i + 1]];
+                for (int i = 0; i < path.Length - 1; i++)
+                {
+                    result += distanceMatrix.GetInstance().Distances[path[i] * path.Length + path[i + 1]];
+                }
             }
+
             return result;
         }
 
+        protected int FindMinimumPathInListOfPaths(List<int[]> pathList, IDistanceMatrix distanceMatrix)
+        {
+            double min = double.MaxValue;
+            int nr = -1;
+            double[] distances = new double[pathList.Count];
+
+            for (int i = 0; i < pathList.Count; i++)
+            {
+                distances[i] = CalculateDistanceInPath(pathList[i], distanceMatrix);
+
+                if (distances[i] < min)
+                {
+                    min = distances[i];
+                    nr = i;
+                }
+            }
+            return nr;
+        }
 
         protected static bool IsFreeRoad(int i, int indexOrigin, int indexDestination)
         {

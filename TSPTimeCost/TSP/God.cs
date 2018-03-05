@@ -1,23 +1,40 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
+using TSPTimeCost.Singletons;
 
 namespace TSPTimeCost.TSP
 {
     class God : TSP
     {
+        private int noOfUniverses = 200;
+        private List<int[]> _paths;
         public override void SolveTSP()
         {
-            List<int> randomRoute = FindRandomRoute();
+            _paths = new List<int[]>();
+            TSP.NoOfCities = Cities.Instance.ListOfCities.Count;
 
-            UpdateBestPath(randomRoute, EvaluatedMatrix);
+            Parallel.For(0, noOfUniverses, calc => CreateUniverse());
+
+            int[] minimumPath = _paths[FindMinimumPathInListOfPaths(_paths, EvaluatedMatrix)];
+            UpdateBestPath(minimumPath, EvaluatedMatrix);
         }
 
+        private void CreateUniverse()
+        {
+            int[] randomRoute = FindRandomRoute();
+            _paths.Add(randomRoute);
+        }
 
-
-        List<int> FindRandomRoute()
+        int[] FindRandomRoute()
         {
             List<int> toDraw = new List<int>();
-            List<int> foundPath = new List<int> {BestPath.Order[0]};
+
+
+            int[] foundPath = new int[NoOfCities];
+            for (int i = 0; i < NoOfCities; i++) { foundPath[i] = -1; }
+            foundPath[0] = BestPath.Order[0];
+
             Random ran = new Random();
 
             for (int i = 1; i < NoOfCities - 1; i++)
@@ -25,14 +42,14 @@ namespace TSPTimeCost.TSP
                 toDraw.Add(i);
             }
 
-            while (foundPath.Count < NoOfCities - 1)
+            for (int i = 1; i < NoOfCities - 1; i++)
             {
                 int draw = toDraw[ran.Next(toDraw.Count)];
-                foundPath.Add(draw);
+                foundPath[i] = draw;
                 toDraw.Remove(draw);
             }
 
-            foundPath.Add(BestPath.Order[NoOfCities - 1]);
+            foundPath[NoOfCities - 1] = BestPath.Order[NoOfCities - 1];
 
             return foundPath;
         }

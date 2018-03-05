@@ -211,6 +211,9 @@ namespace TSPTimeCost
 
         private async void UpdateBtn_Click(object sender, EventArgs e)
         {
+            Area.Series[0].Points.Clear();
+            _controller = new Controller();
+            _viewModel = new ViewModel();
             _viewModel.Cities = CitiesTxt.Text;
             await _controller.InitializeAsync();
             DrawCities();

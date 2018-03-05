@@ -31,7 +31,8 @@ namespace TSPTimeCost.TSP.AntColony
             _matrixSize = distanceMatrix.GetInstance().Distances.Length;
             _trialsMatrix = new double[_matrixSize];
             _attractivenessMatrix = new double[_matrixSize];
-        }
+            TSP.NoOfCities = Cities.Instance.ListOfCities.Count;
+    }
 
 
         protected void FillAttractivenessMatrix(IDistanceMatrix distanceMatrix)
@@ -203,24 +204,6 @@ namespace TSPTimeCost.TSP.AntColony
         }
 
 
-        protected int FindMinimumPathInThisIteration(List<int[]> pathList, IDistanceMatrix distanceMatrix)
-        {
-            double min = double.MaxValue;
-            int nr = -1;
-            double[] distances = new double[pathList.Count];
-
-            for (int i = 0; i < pathList.Count; i++)
-            {
-                distances[i] = CalculateDistanceInPath(pathList[i], distanceMatrix);
-
-                if (distances[i] < min)
-                {
-                    min = distances[i];
-                    nr = i;
-                }
-            }
-            return nr;
-        }
 
         protected void UpdateTrialsMatrix(int[] path, IDistanceMatrix distanceMatrix)
         {

@@ -14,6 +14,7 @@ namespace TSPTimeCost.TSP
         {
             _fansAndStars = new List<FanAndStar>();
             _whoreList = new List<int>();
+            TSP.NoOfCities = Cities.Instance.ListOfCities.Count;
 
             InitateFansAndStars();
 

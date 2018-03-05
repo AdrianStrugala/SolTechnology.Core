@@ -4,3 +4,10 @@ D:\GitHub\TSPTimeCost\TSPTimeCostConsole\bin\Debug\TSPTimeCostConsole.pdb
 D:\GitHub\TSPTimeCost\TSPTimeCostConsole\obj\Debug\TSPTimeCostConsole.exe
 D:\GitHub\TSPTimeCost\TSPTimeCostConsole\obj\Debug\TSPTimeCostConsole.pdb
 D:\GitHub\TSPTimeCost\TSPTimeCostConsole\obj\Debug\TSPTimeCostConsole.csprojResolveAssemblyReference.cache
+C:\workspace\TSPTimeCost\TSPTimeCostConsole\bin\Debug\TSPTimeCostConsole.exe.config
+C:\workspace\TSPTimeCost\TSPTimeCostConsole\bin\Debug\TSPTimeCostConsole.exe
+C:\workspace\TSPTimeCost\TSPTimeCostConsole\bin\Debug\TSPTimeCostConsole.pdb
+C:\workspace\TSPTimeCost\TSPTimeCostConsole\obj\Debug\TSPTimeCostConsole.csprojResolveAssemblyReference.cache
+C:\workspace\TSPTimeCost\TSPTimeCostConsole\obj\Debug\TSPTimeCostConsole.csproj.CoreCompileInputs.cache
+C:\workspace\TSPTimeCost\TSPTimeCostConsole\obj\Debug\TSPTimeCostConsole.exe
+C:\workspace\TSPTimeCost\TSPTimeCostConsole\obj\Debug\TSPTimeCostConsole.pdb
