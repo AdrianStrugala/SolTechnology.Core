@@ -1,4 +1,7 @@
 ﻿using System.Collections.Generic;
+using System.Diagnostics;
+using System.Threading.Tasks;
+using TSPTimeCost.Singletons;
 
 namespace TSPTimeCost.TSP.AntColony
 {
@@ -7,6 +10,10 @@ namespace TSPTimeCost.TSP.AntColony
     {
         public override void SolveTSP()
         {
+            //stopwatch
+            Stopwatch stopwatch = new Stopwatch();
+            stopwatch.Start();
+
             InitializeParameters(EvaluatedMatrix);
             FillAttractivenessMatrix(EvaluatedMatrix);
             FillTrialsMatrix();
@@ -19,28 +26,27 @@ namespace TSPTimeCost.TSP.AntColony
                 pathList = InitializePathList(pathList);
 
                 //proceed for each ant
-                for (int i = 0; i < NoOfAnts; i++)
-                {
-                    pathList[i] = CalculatePathForSingleAnt();
-                }
+                Parallel.For(0, NoOfAnts, i =>
+                    pathList[i] = CalculatePathForSingleAnt());
 
                 //must be separate, to not affect ants in the same iteration
-                for (int i = 0; i < NoOfAnts; i++)
-                {
-                    UpdateTrialsMatrix(pathList[i], EvaluatedMatrix);
-                }
+                Parallel.For(0, NoOfAnts, i =>
+                    UpdateTrialsMatrix(pathList[i], EvaluatedMatrix)
+                );
 
                 EvaporateTrialsMatrix();
 
                 //if its last iteration
                 if (j == NoOfIterations - 1)
                 {
-                    int[] minimumPath = pathList[FindMinimumPathInListOfPaths(pathList, EvaluatedMatrix)];
+                    int[] minimumPath = FindMinimumPathInListOfPaths(pathList, EvaluatedMatrix);
                     UpdateBestPath(minimumPath, EvaluatedMatrix);
                 }
             }
-        }
-        //end of Ant Colony
+            //stopwatch
+            BestPath.Instance.TimeOfExecution = stopwatch.Elapsed.ToString();
+            stopwatch.Stop();
+        }//end of Ant Colony
     }
 
 }

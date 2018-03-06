@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.Threading.Tasks;
 using TSPTimeCost.Models;
 using TSPTimeCost.Singletons;
 
@@ -18,6 +20,9 @@ namespace TSPTimeCost.TSP.AntColony
 
         public override void SolveTSP()
         {
+            //stopwatch
+            Stopwatch stopwatch = new Stopwatch();
+            stopwatch.Start();
 
             InitializeParameters(TollMatrix);
             FillAttractivenessMatrix(TollMatrix);
@@ -33,15 +38,14 @@ namespace TSPTimeCost.TSP.AntColony
                 pathList = InitializePathList(pathList);
 
                 //proceed for each ant
-                for (int i = 0; i < NoOfAnts; i++)
-                {
-                    pathList[i] = CalculatePathForSingleAnt();
-                }
+                Parallel.For(0, NoOfAnts, i =>
+                    pathList[i] = CalculatePathForSingleAnt()
+                );
+
                 //must be separate, to not affect ants in the same iteration
-                for (int i = 0; i < NoOfAnts; i++)
-                {
-                    UpdateTrialsMatrix(pathList[i], TollMatrix);
-                }
+                Parallel.For(0, NoOfAnts, i =>
+                    UpdateTrialsMatrix(pathList[i], TollMatrix)
+                );
 
                 EvaporateTrialsMatrix();
 
@@ -64,7 +68,10 @@ namespace TSPTimeCost.TSP.AntColony
                     CalculateDistance();
                 }
             }
-        }
+            //stopwatch
+            BestPath.Instance.TimeOfExecution = stopwatch.Elapsed.ToString();
+            stopwatch.Stop();
+        }//end of ant colony
 
         private double UpdateCostsAndBestPath(double overallCost, List<TimeDifferenceAndCost> worthList)
         {

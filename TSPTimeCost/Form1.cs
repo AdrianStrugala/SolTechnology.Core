@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Diagnostics;
 using System.Drawing;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Windows.Forms.DataVisualization.Charting;
 using TSPTimeCost.Singletons;
@@ -75,6 +73,7 @@ namespace TSPTimeCost
           //  durationLbl.Text = _controller.GetDuration();
 
             goalLbl.Text = _controller.GetDuration();
+            durationLbl.Text = $@"Time of execution: {BestPath.Instance.TimeOfExecution}";
 
             DrawRoute(nameOfSeries);
         }

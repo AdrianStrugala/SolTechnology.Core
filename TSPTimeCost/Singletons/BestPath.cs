@@ -2,6 +2,8 @@
 /* Singleton containing best path as order of cities */
 /***************************************************/
 
+using System;
+
 namespace TSPTimeCost.Singletons {
     public sealed class BestPath {
 
@@ -9,6 +11,7 @@ namespace TSPTimeCost.Singletons {
         public double[] DistancesInOrder { get; set; }
         public double Distance { get; set; }
         public double Cost { get; set; }
+        public string TimeOfExecution { get; set; }
         public double[] Goal { get; set; }
 
         private static volatile BestPath _instance;

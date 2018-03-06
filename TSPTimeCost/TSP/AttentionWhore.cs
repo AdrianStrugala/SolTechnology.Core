@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using TSPTimeCost.Models;
 using TSPTimeCost.Singletons;
@@ -12,6 +13,10 @@ namespace TSPTimeCost.TSP
 
         public override void SolveTSP()
         {
+            //stopwatch
+            Stopwatch stopwatch = new Stopwatch();
+            stopwatch.Start();
+
             _fansAndStars = new List<FanAndStar>();
             _whoreList = new List<int>();
             TSP.NoOfCities = Cities.Instance.ListOfCities.Count;
@@ -34,6 +39,10 @@ namespace TSPTimeCost.TSP
             }
 
             UpdateBestPath(_fansAndStars, EvaluatedMatrix);
+
+            //stopwatch
+            BestPath.Instance.TimeOfExecution = stopwatch.Elapsed.ToString();
+            stopwatch.Stop();
         }
 
 

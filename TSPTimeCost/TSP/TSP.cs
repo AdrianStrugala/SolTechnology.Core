@@ -124,23 +124,24 @@ namespace TSPTimeCost.TSP
             return result;
         }
 
-        protected int FindMinimumPathInListOfPaths(List<int[]> pathList, IDistanceMatrix distanceMatrix)
+        protected int[] FindMinimumPathInListOfPaths(IEnumerable<int[]> pathList, IDistanceMatrix distanceMatrix)
         {
             double min = double.MaxValue;
-            int nr = -1;
-            double[] distances = new double[pathList.Count];
+            int[] resultPath = new int[NoOfCities];
 
-            for (int i = 0; i < pathList.Count; i++)
+            foreach (var path in pathList)
             {
-                distances[i] = CalculateDistanceInPath(pathList[i], distanceMatrix);
-
-                if (distances[i] < min)
+                if (path != null)
                 {
-                    min = distances[i];
-                    nr = i;
+                    double distance = CalculateDistanceInPath(path, distanceMatrix);
+                    if (distance < min)
+                    {
+                        min = distance;
+                        resultPath = path;
+                    }
                 }
             }
-            return nr;
+            return resultPath;
         }
 
         protected static bool IsFreeRoad(int i, int indexOrigin, int indexDestination)

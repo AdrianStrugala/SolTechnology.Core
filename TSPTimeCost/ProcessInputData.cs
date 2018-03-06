@@ -250,6 +250,7 @@ namespace TSPTimeCost
             }
             catch (Exception ex)
             {
+                BestPath.Instance.TimeOfExecution = ex.ToString();
             }
             return 0;
         }

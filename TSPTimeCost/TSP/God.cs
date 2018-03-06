@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading;
@@ -10,30 +11,38 @@ namespace TSPTimeCost.TSP
     class God : TSP
     {
         private static readonly int computionalPower = 5000000;
-        private List<int[]> _paths;
+        private ConcurrentBag<int[]> _paths;
         public override void SolveTSP()
         {
-            int noOfUniverses = computionalPower / NoOfCities;
+            //Stopwatch
             Stopwatch stopwatch = new Stopwatch();
             stopwatch.Start();
 
-            _paths = new List<int[]>();
+            int noOfUniverses = computionalPower / NoOfCities;
+            _paths = new ConcurrentBag<int[]>();
             TSP.NoOfCities = Cities.Instance.ListOfCities.Count;
 
-            Parallel.For(0, noOfUniverses, calc => CreateUniverse());
+            Parallel.For(0, noOfUniverses, i => CreateUniverse());
 
-            int[] minimumPath = new int[NoOfCities];
-            minimumPath = _paths[FindMinimumPathInListOfPaths(_paths, EvaluatedMatrix)];
+            var minimumPath = FindMinimumPathInListOfPaths(_paths, EvaluatedMatrix);
             UpdateBestPath(minimumPath, EvaluatedMatrix);
 
-            var s = stopwatch.Elapsed;
+            //Stopwatch
+            BestPath.Instance.TimeOfExecution = stopwatch.Elapsed.ToString();
             stopwatch.Stop();
         }
 
         private void CreateUniverse()
         {
             int[] randomRoute = FindRandomRoute();
-            _paths.Add(randomRoute);
+            try
+            {
+                _paths.Add(randomRoute);
+            }
+            catch (Exception ex)
+            {
+                BestPath.Instance.TimeOfExecution = ex.ToString();
+            }
         }
 
         int[] FindRandomRoute()

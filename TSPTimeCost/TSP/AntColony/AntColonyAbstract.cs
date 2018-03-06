@@ -11,15 +11,15 @@ namespace TSPTimeCost.TSP.AntColony
     {
 
         // Algorithm parameters
-        protected const int NoOfAnts = 50;
+        protected const int NoOfIterations = 10;
+        protected static readonly int NoOfAnts = 5000000/NoOfCities/NoOfCities/NoOfIterations;
         private const double trailEvaporationCoefficient = 0.3;
         private const double basicTrialValue = 1;
 
         //if attractivenesParameter >> trialPreference, program basicaly choses closest city every time
         private const double trialPreference = 1;
         private const double attractivenessParameter = 10;
-        private double _pheromonePower;
-        protected const int NoOfIterations = 10;
+        private double _pheromonePower;     
         private int _matrixSize;
         private double[] _attractivenessMatrix;
         private double[] _trialsMatrix;
