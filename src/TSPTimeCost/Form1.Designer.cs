@@ -26,6 +26,7 @@
             System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea1 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
             System.Windows.Forms.DataVisualization.Charting.Legend legend1 = new System.Windows.Forms.DataVisualization.Charting.Legend();
             System.Windows.Forms.DataVisualization.Charting.Series series1 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(TspTimeCostFrm));
             this.Area = new System.Windows.Forms.DataVisualization.Charting.Chart();
             this.orderLbl = new System.Windows.Forms.Label();
             this.TollTSPBtn = new System.Windows.Forms.Button();
@@ -58,14 +59,14 @@
             this.Area.ChartAreas.Add(chartArea1);
             legend1.Name = "Legend1";
             this.Area.Legends.Add(legend1);
-            this.Area.Location = new System.Drawing.Point(9, 10);
-            this.Area.Margin = new System.Windows.Forms.Padding(2);
+            this.Area.Location = new System.Drawing.Point(12, 12);
+            this.Area.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.Area.Name = "Area";
             series1.ChartArea = "ChartArea1";
             series1.Legend = "Legend1";
             series1.Name = "Series1";
             this.Area.Series.Add(series1);
-            this.Area.Size = new System.Drawing.Size(602, 541);
+            this.Area.Size = new System.Drawing.Size(803, 666);
             this.Area.TabIndex = 0;
             this.Area.Text = "Area";
             this.Area.Click += new System.EventHandler(this.Area_Click);
@@ -73,18 +74,17 @@
             // orderLbl
             // 
             this.orderLbl.AutoSize = true;
-            this.orderLbl.Location = new System.Drawing.Point(9, 553);
-            this.orderLbl.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
+            this.orderLbl.Location = new System.Drawing.Point(12, 681);
             this.orderLbl.Name = "orderLbl";
-            this.orderLbl.Size = new System.Drawing.Size(0, 13);
+            this.orderLbl.Size = new System.Drawing.Size(0, 17);
             this.orderLbl.TabIndex = 1;
             // 
             // TollTSPBtn
             // 
-            this.TollTSPBtn.Location = new System.Drawing.Point(822, 90);
-            this.TollTSPBtn.Margin = new System.Windows.Forms.Padding(2);
+            this.TollTSPBtn.Location = new System.Drawing.Point(1096, 111);
+            this.TollTSPBtn.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.TollTSPBtn.Name = "TollTSPBtn";
-            this.TollTSPBtn.Size = new System.Drawing.Size(105, 39);
+            this.TollTSPBtn.Size = new System.Drawing.Size(140, 48);
             this.TollTSPBtn.TabIndex = 2;
             this.TollTSPBtn.Text = "Toll";
             this.TollTSPBtn.UseVisualStyleBackColor = true;
@@ -92,10 +92,10 @@
             // 
             // ResetBtn
             // 
-            this.ResetBtn.Location = new System.Drawing.Point(870, 551);
-            this.ResetBtn.Margin = new System.Windows.Forms.Padding(2);
+            this.ResetBtn.Location = new System.Drawing.Point(1160, 678);
+            this.ResetBtn.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.ResetBtn.Name = "ResetBtn";
-            this.ResetBtn.Size = new System.Drawing.Size(56, 19);
+            this.ResetBtn.Size = new System.Drawing.Size(75, 23);
             this.ResetBtn.TabIndex = 3;
             this.ResetBtn.Text = "Reset";
             this.ResetBtn.UseVisualStyleBackColor = true;
@@ -103,10 +103,10 @@
             // 
             // ClassicTSPBtn
             // 
-            this.ClassicTSPBtn.Location = new System.Drawing.Point(822, 29);
-            this.ClassicTSPBtn.Margin = new System.Windows.Forms.Padding(2);
+            this.ClassicTSPBtn.Location = new System.Drawing.Point(1096, 36);
+            this.ClassicTSPBtn.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.ClassicTSPBtn.Name = "ClassicTSPBtn";
-            this.ClassicTSPBtn.Size = new System.Drawing.Size(105, 39);
+            this.ClassicTSPBtn.Size = new System.Drawing.Size(140, 48);
             this.ClassicTSPBtn.TabIndex = 4;
             this.ClassicTSPBtn.Text = "Classic";
             this.ClassicTSPBtn.UseVisualStyleBackColor = true;
@@ -117,9 +117,10 @@
             this.tollTSPChck.AutoSize = true;
             this.tollTSPChck.Checked = true;
             this.tollTSPChck.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.tollTSPChck.Location = new System.Drawing.Point(941, 103);
+            this.tollTSPChck.Location = new System.Drawing.Point(1255, 127);
+            this.tollTSPChck.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.tollTSPChck.Name = "tollTSPChck";
-            this.tollTSPChck.Size = new System.Drawing.Size(15, 14);
+            this.tollTSPChck.Size = new System.Drawing.Size(18, 17);
             this.tollTSPChck.TabIndex = 5;
             this.tollTSPChck.UseVisualStyleBackColor = true;
             this.tollTSPChck.CheckedChanged += new System.EventHandler(this.TollTSPChck_CheckedChanged);
@@ -129,9 +130,10 @@
             this.classicTSPChck.AutoSize = true;
             this.classicTSPChck.Checked = true;
             this.classicTSPChck.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.classicTSPChck.Location = new System.Drawing.Point(941, 42);
+            this.classicTSPChck.Location = new System.Drawing.Point(1255, 52);
+            this.classicTSPChck.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.classicTSPChck.Name = "classicTSPChck";
-            this.classicTSPChck.Size = new System.Drawing.Size(15, 14);
+            this.classicTSPChck.Size = new System.Drawing.Size(18, 17);
             this.classicTSPChck.TabIndex = 6;
             this.classicTSPChck.UseVisualStyleBackColor = true;
             this.classicTSPChck.CheckedChanged += new System.EventHandler(this.ClassicTSPChck_CheckedChanged);
@@ -141,19 +143,20 @@
             this.limitTSPChck.AutoSize = true;
             this.limitTSPChck.Checked = true;
             this.limitTSPChck.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.limitTSPChck.Location = new System.Drawing.Point(941, 163);
+            this.limitTSPChck.Location = new System.Drawing.Point(1255, 201);
+            this.limitTSPChck.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.limitTSPChck.Name = "limitTSPChck";
-            this.limitTSPChck.Size = new System.Drawing.Size(15, 14);
+            this.limitTSPChck.Size = new System.Drawing.Size(18, 17);
             this.limitTSPChck.TabIndex = 8;
             this.limitTSPChck.UseVisualStyleBackColor = true;
             this.limitTSPChck.CheckedChanged += new System.EventHandler(this.LimitTSPChck_CheckedChanged);
             // 
             // LimitTSPBtn
             // 
-            this.LimitTSPBtn.Location = new System.Drawing.Point(822, 149);
-            this.LimitTSPBtn.Margin = new System.Windows.Forms.Padding(2);
+            this.LimitTSPBtn.Location = new System.Drawing.Point(1096, 183);
+            this.LimitTSPBtn.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.LimitTSPBtn.Name = "LimitTSPBtn";
-            this.LimitTSPBtn.Size = new System.Drawing.Size(105, 39);
+            this.LimitTSPBtn.Size = new System.Drawing.Size(140, 48);
             this.LimitTSPBtn.TabIndex = 7;
             this.LimitTSPBtn.Text = "Limit";
             this.LimitTSPBtn.UseVisualStyleBackColor = true;
@@ -162,29 +165,28 @@
             // limitLbl
             // 
             this.limitLbl.AutoSize = true;
-            this.limitLbl.Location = new System.Drawing.Point(830, 208);
-            this.limitLbl.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
+            this.limitLbl.Location = new System.Drawing.Point(1107, 256);
             this.limitLbl.Name = "limitLbl";
-            this.limitLbl.Size = new System.Drawing.Size(31, 13);
+            this.limitLbl.Size = new System.Drawing.Size(41, 17);
             this.limitLbl.TabIndex = 9;
             this.limitLbl.Text = "Limit:";
             // 
             // limitTxt
             // 
-            this.limitTxt.Location = new System.Drawing.Point(866, 206);
-            this.limitTxt.Margin = new System.Windows.Forms.Padding(2);
+            this.limitTxt.Location = new System.Drawing.Point(1155, 254);
+            this.limitTxt.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.limitTxt.Name = "limitTxt";
-            this.limitTxt.Size = new System.Drawing.Size(62, 20);
+            this.limitTxt.Size = new System.Drawing.Size(81, 22);
             this.limitTxt.TabIndex = 10;
             this.limitTxt.Text = "100.0";
             this.limitTxt.TextChanged += new System.EventHandler(this.limitTxt_TextChanged);
             // 
             // btnEvaluate
             // 
-            this.btnEvaluate.Location = new System.Drawing.Point(822, 249);
-            this.btnEvaluate.Margin = new System.Windows.Forms.Padding(2);
+            this.btnEvaluate.Location = new System.Drawing.Point(1096, 306);
+            this.btnEvaluate.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.btnEvaluate.Name = "btnEvaluate";
-            this.btnEvaluate.Size = new System.Drawing.Size(105, 39);
+            this.btnEvaluate.Size = new System.Drawing.Size(140, 48);
             this.btnEvaluate.TabIndex = 11;
             this.btnEvaluate.Text = "Evaluate";
             this.btnEvaluate.UseVisualStyleBackColor = true;
@@ -195,9 +197,10 @@
             this.evaluationTSPChck.AutoSize = true;
             this.evaluationTSPChck.Checked = true;
             this.evaluationTSPChck.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.evaluationTSPChck.Location = new System.Drawing.Point(941, 262);
+            this.evaluationTSPChck.Location = new System.Drawing.Point(1255, 322);
+            this.evaluationTSPChck.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.evaluationTSPChck.Name = "evaluationTSPChck";
-            this.evaluationTSPChck.Size = new System.Drawing.Size(15, 14);
+            this.evaluationTSPChck.Size = new System.Drawing.Size(18, 17);
             this.evaluationTSPChck.TabIndex = 12;
             this.evaluationTSPChck.UseVisualStyleBackColor = true;
             this.evaluationTSPChck.CheckedChanged += new System.EventHandler(this.EvaluationTSPChck_CheckedChanged);
@@ -205,36 +208,33 @@
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(396, 295);
-            this.label1.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
+            this.label1.Location = new System.Drawing.Point(528, 363);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(0, 13);
+            this.label1.Size = new System.Drawing.Size(0, 17);
             this.label1.TabIndex = 13;
             // 
             // goalLbl
             // 
             this.goalLbl.AutoSize = true;
-            this.goalLbl.Location = new System.Drawing.Point(9, 566);
-            this.goalLbl.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
+            this.goalLbl.Location = new System.Drawing.Point(12, 697);
             this.goalLbl.Name = "goalLbl";
-            this.goalLbl.Size = new System.Drawing.Size(0, 13);
+            this.goalLbl.Size = new System.Drawing.Size(0, 17);
             this.goalLbl.TabIndex = 14;
             // 
             // durationLbl
             // 
             this.durationLbl.AutoSize = true;
-            this.durationLbl.Location = new System.Drawing.Point(9, 580);
-            this.durationLbl.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
+            this.durationLbl.Location = new System.Drawing.Point(12, 714);
             this.durationLbl.Name = "durationLbl";
-            this.durationLbl.Size = new System.Drawing.Size(0, 13);
+            this.durationLbl.Size = new System.Drawing.Size(0, 17);
             this.durationLbl.TabIndex = 15;
             // 
             // AttentionWhoreBtn
             // 
-            this.AttentionWhoreBtn.Location = new System.Drawing.Point(823, 351);
-            this.AttentionWhoreBtn.Margin = new System.Windows.Forms.Padding(2);
+            this.AttentionWhoreBtn.Location = new System.Drawing.Point(1097, 432);
+            this.AttentionWhoreBtn.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.AttentionWhoreBtn.Name = "AttentionWhoreBtn";
-            this.AttentionWhoreBtn.Size = new System.Drawing.Size(105, 39);
+            this.AttentionWhoreBtn.Size = new System.Drawing.Size(140, 48);
             this.AttentionWhoreBtn.TabIndex = 16;
             this.AttentionWhoreBtn.Text = "Attention Whore";
             this.AttentionWhoreBtn.UseVisualStyleBackColor = true;
@@ -245,19 +245,20 @@
             this.AttentionWhoreChck.AutoSize = true;
             this.AttentionWhoreChck.Checked = true;
             this.AttentionWhoreChck.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.AttentionWhoreChck.Location = new System.Drawing.Point(941, 364);
+            this.AttentionWhoreChck.Location = new System.Drawing.Point(1255, 448);
+            this.AttentionWhoreChck.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.AttentionWhoreChck.Name = "AttentionWhoreChck";
-            this.AttentionWhoreChck.Size = new System.Drawing.Size(15, 14);
+            this.AttentionWhoreChck.Size = new System.Drawing.Size(18, 17);
             this.AttentionWhoreChck.TabIndex = 17;
             this.AttentionWhoreChck.UseVisualStyleBackColor = true;
             this.AttentionWhoreChck.CheckedChanged += new System.EventHandler(this.AttentionWhoreChck_CheckedChanged);
             // 
             // GodBtn
             // 
-            this.GodBtn.Location = new System.Drawing.Point(823, 406);
-            this.GodBtn.Margin = new System.Windows.Forms.Padding(2);
+            this.GodBtn.Location = new System.Drawing.Point(1097, 500);
+            this.GodBtn.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.GodBtn.Name = "GodBtn";
-            this.GodBtn.Size = new System.Drawing.Size(105, 39);
+            this.GodBtn.Size = new System.Drawing.Size(140, 48);
             this.GodBtn.TabIndex = 18;
             this.GodBtn.Text = "God";
             this.GodBtn.UseVisualStyleBackColor = true;
@@ -268,9 +269,10 @@
             this.GodChck.AutoSize = true;
             this.GodChck.Checked = true;
             this.GodChck.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.GodChck.Location = new System.Drawing.Point(941, 420);
+            this.GodChck.Location = new System.Drawing.Point(1255, 517);
+            this.GodChck.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.GodChck.Name = "GodChck";
-            this.GodChck.Size = new System.Drawing.Size(15, 14);
+            this.GodChck.Size = new System.Drawing.Size(18, 17);
             this.GodChck.TabIndex = 19;
             this.GodChck.UseVisualStyleBackColor = true;
             this.GodChck.CheckedChanged += new System.EventHandler(this.GodChck_CheckedChanged);
@@ -279,22 +281,21 @@
             // 
             this.CitiesLbl.AutoSize = true;
             this.CitiesLbl.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
-            this.CitiesLbl.Location = new System.Drawing.Point(693, 20);
-            this.CitiesLbl.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
+            this.CitiesLbl.Location = new System.Drawing.Point(924, 25);
             this.CitiesLbl.Name = "CitiesLbl";
-            this.CitiesLbl.Size = new System.Drawing.Size(44, 16);
+            this.CitiesLbl.Size = new System.Drawing.Size(57, 20);
             this.CitiesLbl.TabIndex = 20;
             this.CitiesLbl.Text = "Cities:";
             this.CitiesLbl.Click += new System.EventHandler(this.label2_Click);
             // 
             // CitiesTxt
             // 
-            this.CitiesTxt.Location = new System.Drawing.Point(646, 48);
-            this.CitiesTxt.Margin = new System.Windows.Forms.Padding(2);
+            this.CitiesTxt.Location = new System.Drawing.Point(861, 59);
+            this.CitiesTxt.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.CitiesTxt.Multiline = true;
             this.CitiesTxt.Name = "CitiesTxt";
             this.CitiesTxt.ScrollBars = System.Windows.Forms.ScrollBars.Both;
-            this.CitiesTxt.Size = new System.Drawing.Size(145, 503);
+            this.CitiesTxt.Size = new System.Drawing.Size(192, 618);
             this.CitiesTxt.TabIndex = 21;
             this.CitiesTxt.Text = "Como, Italy\r\nVerona\r\nFlorence\r\nPisa\r\nTurin\r\nMilan\r\nGenoa\r\nBergamo\r\n";
             this.CitiesTxt.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
@@ -302,10 +303,10 @@
             // 
             // UpdateBtn
             // 
-            this.UpdateBtn.Location = new System.Drawing.Point(676, 555);
-            this.UpdateBtn.Margin = new System.Windows.Forms.Padding(2);
+            this.UpdateBtn.Location = new System.Drawing.Point(901, 683);
+            this.UpdateBtn.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.UpdateBtn.Name = "UpdateBtn";
-            this.UpdateBtn.Size = new System.Drawing.Size(73, 25);
+            this.UpdateBtn.Size = new System.Drawing.Size(97, 31);
             this.UpdateBtn.TabIndex = 22;
             this.UpdateBtn.Text = "Update";
             this.UpdateBtn.UseVisualStyleBackColor = true;
@@ -313,9 +314,9 @@
             // 
             // TspTimeCostFrm
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(970, 602);
+            this.ClientSize = new System.Drawing.Size(1293, 741);
             this.Controls.Add(this.UpdateBtn);
             this.Controls.Add(this.CitiesTxt);
             this.Controls.Add(this.CitiesLbl);
@@ -339,7 +340,8 @@
             this.Controls.Add(this.TollTSPBtn);
             this.Controls.Add(this.orderLbl);
             this.Controls.Add(this.Area);
-            this.Margin = new System.Windows.Forms.Padding(2);
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
+            this.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.Name = "TspTimeCostFrm";
             this.Text = "Traveling Eco-Salesman";
             this.Load += new System.EventHandler(this.Form1_Load);
