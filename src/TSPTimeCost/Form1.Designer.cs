@@ -118,7 +118,7 @@
             this.tollTSPChck.Checked = true;
             this.tollTSPChck.CheckState = System.Windows.Forms.CheckState.Checked;
             this.tollTSPChck.Location = new System.Drawing.Point(1255, 127);
-            this.tollTSPChck.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.tollTSPChck.Margin = new System.Windows.Forms.Padding(4);
             this.tollTSPChck.Name = "tollTSPChck";
             this.tollTSPChck.Size = new System.Drawing.Size(18, 17);
             this.tollTSPChck.TabIndex = 5;
@@ -131,7 +131,7 @@
             this.classicTSPChck.Checked = true;
             this.classicTSPChck.CheckState = System.Windows.Forms.CheckState.Checked;
             this.classicTSPChck.Location = new System.Drawing.Point(1255, 52);
-            this.classicTSPChck.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.classicTSPChck.Margin = new System.Windows.Forms.Padding(4);
             this.classicTSPChck.Name = "classicTSPChck";
             this.classicTSPChck.Size = new System.Drawing.Size(18, 17);
             this.classicTSPChck.TabIndex = 6;
@@ -144,7 +144,7 @@
             this.limitTSPChck.Checked = true;
             this.limitTSPChck.CheckState = System.Windows.Forms.CheckState.Checked;
             this.limitTSPChck.Location = new System.Drawing.Point(1255, 201);
-            this.limitTSPChck.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.limitTSPChck.Margin = new System.Windows.Forms.Padding(4);
             this.limitTSPChck.Name = "limitTSPChck";
             this.limitTSPChck.Size = new System.Drawing.Size(18, 17);
             this.limitTSPChck.TabIndex = 8;
@@ -198,7 +198,7 @@
             this.evaluationTSPChck.Checked = true;
             this.evaluationTSPChck.CheckState = System.Windows.Forms.CheckState.Checked;
             this.evaluationTSPChck.Location = new System.Drawing.Point(1255, 322);
-            this.evaluationTSPChck.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.evaluationTSPChck.Margin = new System.Windows.Forms.Padding(4);
             this.evaluationTSPChck.Name = "evaluationTSPChck";
             this.evaluationTSPChck.Size = new System.Drawing.Size(18, 17);
             this.evaluationTSPChck.TabIndex = 12;
@@ -246,7 +246,7 @@
             this.AttentionWhoreChck.Checked = true;
             this.AttentionWhoreChck.CheckState = System.Windows.Forms.CheckState.Checked;
             this.AttentionWhoreChck.Location = new System.Drawing.Point(1255, 448);
-            this.AttentionWhoreChck.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.AttentionWhoreChck.Margin = new System.Windows.Forms.Padding(4);
             this.AttentionWhoreChck.Name = "AttentionWhoreChck";
             this.AttentionWhoreChck.Size = new System.Drawing.Size(18, 17);
             this.AttentionWhoreChck.TabIndex = 17;
@@ -270,7 +270,7 @@
             this.GodChck.Checked = true;
             this.GodChck.CheckState = System.Windows.Forms.CheckState.Checked;
             this.GodChck.Location = new System.Drawing.Point(1255, 517);
-            this.GodChck.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.GodChck.Margin = new System.Windows.Forms.Padding(4);
             this.GodChck.Name = "GodChck";
             this.GodChck.Size = new System.Drawing.Size(18, 17);
             this.GodChck.TabIndex = 19;
@@ -297,8 +297,9 @@
             this.CitiesTxt.ScrollBars = System.Windows.Forms.ScrollBars.Both;
             this.CitiesTxt.Size = new System.Drawing.Size(192, 618);
             this.CitiesTxt.TabIndex = 21;
-            this.CitiesTxt.Text = "Como, Italy\r\nVerona\r\nFlorence\r\nPisa\r\nTurin\r\nMilan\r\nGenoa\r\nBergamo\r\n";
+            this.CitiesTxt.Text = "Como (Italy)\r\nMilan\r\nTurin\r\nFirenze\r\nGenoa\r\nPisa\r\nBergamo";
             this.CitiesTxt.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            this.CitiesTxt.TextChanged += new System.EventHandler(this.CitiesTxt_TextChanged);
             this.CitiesTxt.LostFocus += new System.EventHandler(this.CitiesTxt_LostFocus);
             // 
             // UpdateBtn

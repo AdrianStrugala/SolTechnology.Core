@@ -217,5 +217,10 @@ namespace TSPTimeCost
             await _controller.InitializeAsync();
             DrawCities();
         }
+
+        private void CitiesTxt_TextChanged(object sender, EventArgs e)
+        {
+
+        }
     }
 }

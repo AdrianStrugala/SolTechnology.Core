@@ -5,6 +5,7 @@ using System.IO.MemoryMappedFiles;
 using System.Linq;
 using System.Net;
 using System.Text;
+using System.Xml;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using TSPTimeCost.Models;
@@ -19,7 +20,7 @@ namespace TSPTimeCost
 {
     class ProcessInputData
     {
-        private static  ViewModel _viewModel;
+        private static ViewModel _viewModel;
 
         private static double FuelPrice { get; } = 1.26;
         private static double RoadVelocity { get; } = 70;
@@ -73,47 +74,47 @@ namespace TSPTimeCost
             List<City> cities = Cities.Instance.ListOfCities;
             CostMatrix.Instance.Value = new double[cities.Count * cities.Count];
 
-            //            for (int i = 0; i < cities.Count; i++)
-            //            {
-            //                for (int j = 0; j < cities.Count; j++)
-            //                {
-            //                    if (i == j)
-            //                    {
-            //                        CostMatrix.Instance.Distances[j + i * cities.Count] = double.MaxValue;
-            //                    }
-            //                    else
-            //                    {
-            //                        CostMatrix.Instance.Distances[j + i * cities.Count] =
-            //                            GetCostBetweenTwoCities(cities[i], cities[j]);
-            //                    }
-            //                }
-            //            }
-
-            using (var mappedFile1 = MemoryMappedFile.CreateFromFile(@"..\..\CostMatrix.txt"))
+            for (int i = 0; i < cities.Count; i++)
             {
-                using (Stream mmStream = mappedFile1.CreateViewStream())
+                for (int j = 0; j < cities.Count; j++)
                 {
-                    using (StreamReader sr = new StreamReader(mmStream, Encoding.ASCII))
+                    if (i == j)
                     {
-                        while (!sr.EndOfStream)
-                        {
-
-
-                            for (int i = 0; i < 8; i++)
-                            {
-                                var line = sr.ReadLine();
-                                var lineWords = line.Split(' ');
-
-                                for (int j = 0; j < 8; j++)
-                                {
-                                    CostMatrix.Instance.Value[i * 8 + j] = Convert.ToDouble(lineWords[j]);
-                                }
-                            }
-
-                        }
+                        CostMatrix.Instance.Value[j + i * cities.Count] = double.MaxValue;
+                    }
+                    else
+                    {
+                        CostMatrix.Instance.Value[j + i * cities.Count] =
+                            GetCostBetweenTwoCities(cities[i], cities[j]);
                     }
                 }
             }
+            //
+            //            using (var mappedFile1 = MemoryMappedFile.CreateFromFile(@"..\..\CostMatrix.txt"))
+            //            {
+            //                using (Stream mmStream = mappedFile1.CreateViewStream())
+            //                {
+            //                    using (StreamReader sr = new StreamReader(mmStream, Encoding.ASCII))
+            //                    {
+            //                        while (!sr.EndOfStream)
+            //                        {
+            //
+            //
+            //                            for (int i = 0; i < 8; i++)
+            //                            {
+            //                                var line = sr.ReadLine();
+            //                                var lineWords = line.Split(' ');
+            //
+            //                                for (int j = 0; j < 8; j++)
+            //                                {
+            //                                    CostMatrix.Instance.Value[i * 8 + j] = Convert.ToDouble(lineWords[j]);
+            //                                }
+            //                            }
+            //
+            //                        }
+            //                    }
+            //                }
+            //            }
             //
             //            CostMatrix.Instance.Distances = {
             //                double.MaxValue; 11.9, 37.6, 31.4, 23.2, 3.9 15.1 4.5
@@ -186,38 +187,38 @@ namespace TSPTimeCost
             }
         }
 
-        //        private static double GetCostBetweenTwoCities(City origin, City destination)
-        //        {
-        //
-        //            string url =
-        //                $"http://apir.viamichelin.com/apir/1/route.xml/fra?steps=1:e:{origin.Longitude}:{origin.Latitude};1:e:{destination.Longitude}:{destination.Latitude}&authkey=RESTGP20171016131341697440740272";
-        //
-        //            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(url);
-        //
-        //            request.Method = "GET";
-        //            request.UserAgent = "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36";
-        //            request.AutomaticDecompression = DecompressionMethods.Deflate | DecompressionMethods.GZip;
-        //
-        //            HttpWebResponse response = (HttpWebResponse)request.GetResponse();
-        //
-        //            string content;
-        //            using (Stream stream = response.GetResponseStream())
-        //            {
-        //                using (StreamReader sr = new StreamReader(stream))
-        //                {
-        //                    content = sr.ReadToEnd();
-        //                }
-        //            }
-        //
-        //            XmlDocument doc = new XmlDocument();
-        //
-        //            doc.LoadXml(content);
-        //
-        //            XmlNode node = doc.DocumentElement.SelectSingleNode("/response/iti/header/summaries/summary/tollCost/car");
-        //            double result = Convert.ToDouble(node.InnerText);
-        //
-        //            return result / 100;
-        //        }
+        private static double GetCostBetweenTwoCities(City origin, City destination)
+        {
+
+            string url =
+                $"http://apir.viamichelin.com/apir/1/route.xml/fra?steps=1:e:{origin.Longitude}:{origin.Latitude};1:e:{destination.Longitude}:{destination.Latitude}&authkey=JSBS20101202150903217741708195";
+
+            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(url);
+
+            request.Method = "GET";
+            request.UserAgent = "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36";
+            request.AutomaticDecompression = DecompressionMethods.Deflate | DecompressionMethods.GZip;
+
+            HttpWebResponse response = (HttpWebResponse)request.GetResponse();
+
+            string content;
+            using (Stream stream = response.GetResponseStream())
+            {
+                using (StreamReader sr = new StreamReader(stream))
+                {
+                    content = sr.ReadToEnd();
+                }
+            }
+
+            XmlDocument doc = new XmlDocument();
+
+            doc.LoadXml(content);
+
+            XmlNode node = doc.DocumentElement.SelectSingleNode("/response/iti/header/summaries/summary/tollCost/car");
+            double result = Convert.ToDouble(node.InnerText);
+
+            return result / 100;
+        }
 
         private static int GetDurationBetweenTwoCitiesByTollRoad(double originLan, double originLon, double destinationLan, double destinationLon)
         {
@@ -369,24 +370,24 @@ namespace TSPTimeCost
             {
                 for (int j = 0; j < cities.Count; j++)
                 {
-                    // C_G=s×combustion×fuel price [€]
+                    // C_G=s×combustion×fuel price [€] = v x t x combustion x fuel 
                     double gasolineCostFree =
                         DistanceMatrixForFreeRoads.Instance.Distances[j + i * cities.Count] /
                         3600 * RoadVelocity * RoadCombustion * FuelPrice;
 
+                    // 
                     double gasolineCostToll =
                         DistanceMatrixForTollRoads.Instance.Distances[j + i * cities.Count] /
                         3600 * HighwayVelocity * RoadCombustion * 1.25 * FuelPrice;
 
-                    var tollGoal = DistanceMatrixForTollRoads.Instance.Goals[
-                            j + i * cities.Count] = gasolineCostToll *
-                                   (DistanceMatrixForTollRoads.Instance.Distances[
-                                        j + i * cities.Count] / 3600);
 
-                    var freeGoal = DistanceMatrixForFreeRoads.Instance.Goals[
-                             j + i * cities.Count] = gasolineCostFree *
-                                                     (DistanceMatrixForFreeRoads.Instance.Distances[
-                                                          j + i * cities.Count] / 3600);
+                    //toll goal = (cost of gasoline + cost of toll fee) * time of toll
+                    var tollGoal = DistanceMatrixForTollRoads.Instance.Goals[j + i * cities.Count] =
+                        (gasolineCostToll + CostMatrix.Instance.Value[j + i * cities.Count]) *
+                                   (DistanceMatrixForTollRoads.Instance.Distances[j + i * cities.Count] / 3600) * (DistanceMatrixForTollRoads.Instance.Distances[j + i * cities.Count] / DistanceMatrixForFreeRoads.Instance.Distances[j + i * cities.Count]);
+
+                    var freeGoal = DistanceMatrixForFreeRoads.Instance.Goals[j + i * cities.Count] = 
+                        gasolineCostFree * (DistanceMatrixForFreeRoads.Instance.Distances[j + i * cities.Count] / 3600);
 
                     if (i == j)
                     {

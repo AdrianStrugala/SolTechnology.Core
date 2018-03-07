@@ -26,9 +26,10 @@ namespace TSPTimeCost
             initializeSingletons.Wait();
             await Task.Factory.StartNew(ProcessInputData.CalculateDistanceMatrixForFreeRoads);
             await Task.Factory.StartNew(ProcessInputData.CalculateDistanceMatrixForTollRoads);
-            await Task.Factory.StartNew(ProcessInputData.CalculateDistanceMatrixEvaluated);
             await Task.Factory.StartNew(ProcessInputData.CalculateCostMatrix);
-            
+            await Task.Factory.StartNew(ProcessInputData.CalculateDistanceMatrixEvaluated);
+
+           
             BestPath.Instance.Distance = new AntColonyToll().CalculateDistanceInPath(BestPath.Instance.Order, DistanceMatrixForTollRoads.Instance);
         }
 
