@@ -27,10 +27,10 @@ namespace TSPTimeCost
             Parallel.Invoke(
                 ProcessInputData.CalculateDistanceMatrixForFreeRoads,
                 ProcessInputData.CalculateDistanceMatrixForTollRoads,
-                ProcessInputData.CalculateCostMatrix,
-                ProcessInputData.CalculateDistanceMatrixEvaluated
+                ProcessInputData.CalculateCostMatrix               
                 );
 
+            ProcessInputData.CalculateDistanceMatrixEvaluated();
 
             BestPath.Instance.Distance = new AntColonyToll().CalculateDistanceInPath(BestPath.Instance.Order, DistanceMatrixForTollRoads.Instance);
         }

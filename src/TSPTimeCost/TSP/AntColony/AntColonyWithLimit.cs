@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading.Tasks;
 using TSPTimeCost.Models;
@@ -32,8 +31,6 @@ namespace TSPTimeCost.TSP.AntColony
             for (int j = 0; j < NoOfIterations; j++)
             {
                 List<int[]> pathList = new List<int[]>();
-                double minimumPathInThisIteration = Double.MaxValue;
-                int minimumPathNumber = -1;
 
                 pathList = InitializePathList(pathList);
 
@@ -52,9 +49,8 @@ namespace TSPTimeCost.TSP.AntColony
                 //if its last iteration
                 if (j == NoOfIterations - 1)
                 {
-                    (minimumPathNumber, minimumPathInThisIteration) = FindMinimumPathInThisIterationForLimit(pathList, minimumPathInThisIteration, minimumPathNumber, TollMatrix);
-                    ReplaceBestPathWithCurrentBest(pathList, minimumPathInThisIteration, minimumPathNumber, TollMatrix);
-
+                    int[] minimumPath = FindMinimumPathInListOfPaths(pathList, TollMatrix);
+                    UpdateBestPath(minimumPath, TollMatrix);
 
                     List<TimeDifferenceAndCost> worthList = CalculateGoal();
                     worthList.Sort((x, y) => 1 * x.Goal.CompareTo(y.Goal));
@@ -108,24 +104,6 @@ namespace TSPTimeCost.TSP.AntColony
                 };
             return goalItem;
         }
-
-        protected (int, double) FindMinimumPathInThisIterationForLimit(List<int[]> pathList, double min, int nr, IDistanceMatrix distanceMatrix)
-        {
-            double[] distances = new double[pathList.Count];
-
-            for (int i = 0; i < pathList.Count; i++)
-            {
-                distances[i] = CalculateDistanceInPath(pathList[i], distanceMatrix);
-
-                if (distances[i] < min)
-                {
-                    min = distances[i];
-                    nr = i;
-                }
-            }
-            return (nr, min);
-        }
-
 
         private List<TimeDifferenceAndCost> CalculateGoal()
         {
