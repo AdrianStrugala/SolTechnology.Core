@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
-using System.IO.MemoryMappedFiles;
 using System.Linq;
 using System.Net;
-using System.Text;
+using System.Threading.Tasks;
 using System.Xml;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -74,9 +74,9 @@ namespace TSPTimeCost
             List<City> cities = Cities.Instance.ListOfCities;
             CostMatrix.Instance.Value = new double[cities.Count * cities.Count];
 
-            for (int i = 0; i < cities.Count; i++)
+            Parallel.For(0, cities.Count, i =>
             {
-                for (int j = 0; j < cities.Count; j++)
+                Parallel.For(0, cities.Count, j =>
                 {
                     if (i == j)
                     {
@@ -87,8 +87,8 @@ namespace TSPTimeCost
                         CostMatrix.Instance.Value[j + i * cities.Count] =
                             GetCostBetweenTwoCities(cities[i], cities[j]);
                     }
-                }
-            }
+                });
+            });
             //
             //            using (var mappedFile1 = MemoryMappedFile.CreateFromFile(@"..\..\CostMatrix.txt"))
             //            {
@@ -145,24 +145,30 @@ namespace TSPTimeCost
 
         public static void CalculateDistanceMatrixForFreeRoads()
         {
+            Stopwatch stopwatch = new Stopwatch();
+            stopwatch.Start();
+
             List<City> cities = Cities.Instance.ListOfCities;
             DistanceMatrixForFreeRoads.Instance.Distances = new double[cities.Count * cities.Count];
 
-            for (int i = 0; i < cities.Count; i++)
-            {
-                for (int j = 0; j < cities.Count; j++)
+            Parallel.For(0, cities.Count, i =>
                 {
-                    if (i == j)
+                    Parallel.For(0, cities.Count, j =>
                     {
-                        DistanceMatrixForFreeRoads.Instance.Distances[j + i * cities.Count] = double.MaxValue;
-                    }
-                    else
-                    {
-                        DistanceMatrixForFreeRoads.Instance.Distances[j + i * cities.Count] =
-                            GetDurationBetweenTwoCitiesByFreeRoad(cities[i].Latitude, cities[i].Longitude, cities[j].Latitude, cities[j].Longitude);
-                    }
-                }
-            }
+                        if (i == j)
+                        {
+                            DistanceMatrixForFreeRoads.Instance.Distances[j + i * cities.Count] = double.MaxValue;
+                        }
+                        else
+                        {
+                            DistanceMatrixForFreeRoads.Instance.Distances[j + i * cities.Count] =
+                                GetDurationBetweenTwoCitiesByFreeRoad(cities[i].Latitude, cities[i].Longitude,
+                                    cities[j].Latitude, cities[j].Longitude);
+                        }
+                    });
+                });
+            var s = stopwatch.Elapsed;
+            stopwatch.Stop();
         }
 
         public static void CalculateDistanceMatrixForTollRoads()
@@ -170,9 +176,9 @@ namespace TSPTimeCost
             List<City> cities = Cities.Instance.ListOfCities;
             DistanceMatrixForTollRoads.Instance.Distances = new double[cities.Count * cities.Count];
 
-            for (int i = 0; i < cities.Count; i++)
+            Parallel.For(0, cities.Count, i =>
             {
-                for (int j = 0; j < cities.Count; j++)
+                Parallel.For(0, cities.Count, j =>
                 {
                     if (i == j)
                     {
@@ -181,10 +187,11 @@ namespace TSPTimeCost
                     else
                     {
                         DistanceMatrixForTollRoads.Instance.Distances[j + i * cities.Count] =
-                            GetDurationBetweenTwoCitiesByTollRoad(cities[i].Latitude, cities[i].Longitude, cities[j].Latitude, cities[j].Longitude);
+                            GetDurationBetweenTwoCitiesByTollRoad(cities[i].Latitude, cities[i].Longitude,
+                                cities[j].Latitude, cities[j].Longitude);
                     }
-                }
-            }
+                });
+            });
         }
 
         private static double GetCostBetweenTwoCities(City origin, City destination)
@@ -292,15 +299,16 @@ namespace TSPTimeCost
             Cities.Instance.ListOfCities = GetCitiesFromGoogleApi();
             int noOfCities = Cities.Instance.ListOfCities.Count;
 
-            BestPath.Instance.Order = new int[noOfCities];
-            BestPath.Instance.Goal = new double[noOfCities];
-            DistanceMatrixForTollRoads.Instance.Distances = new double[noOfCities * noOfCities];
-            DistanceMatrixForFreeRoads.Instance.Distances = new double[noOfCities * noOfCities];
-            DistanceMatrixEvaluated.Instance.Distances = new double[noOfCities * noOfCities];
-            DistanceMatrixEvaluated.Instance.Goals = new double[noOfCities * noOfCities];
-            DistanceMatrixForTollRoads.Instance.Goals = new double[noOfCities * noOfCities];
-            DistanceMatrixForFreeRoads.Instance.Goals = new double[noOfCities * noOfCities];
-
+            Parallel.Invoke(
+            () => BestPath.Instance.Order = new int[noOfCities],
+            () => BestPath.Instance.Goal = new double[noOfCities],
+            () => DistanceMatrixForTollRoads.Instance.Distances = new double[noOfCities * noOfCities],
+            () => DistanceMatrixForFreeRoads.Instance.Distances = new double[noOfCities * noOfCities],
+            () => DistanceMatrixEvaluated.Instance.Distances = new double[noOfCities * noOfCities],
+            () => DistanceMatrixEvaluated.Instance.Goals = new double[noOfCities * noOfCities],
+            () => DistanceMatrixForTollRoads.Instance.Goals = new double[noOfCities * noOfCities],
+            () => DistanceMatrixForFreeRoads.Instance.Goals = new double[noOfCities * noOfCities]
+            );
 
             //Fist bestPath is just cities in input order
             for (int i = 0; i < noOfCities; i++)
@@ -366,9 +374,9 @@ namespace TSPTimeCost
 
             DistanceMatrixEvaluated.Instance.Distances = new double[cities.Count * cities.Count];
 
-            for (int i = 0; i < cities.Count; i++)
+            Parallel.For(0, cities.Count, i =>
             {
-                for (int j = 0; j < cities.Count; j++)
+                Parallel.For(0, cities.Count, j =>
                 {
                     // C_G=s×combustion×fuel price [€] = v x t x combustion x fuel 
                     double gasolineCostFree =
@@ -384,9 +392,11 @@ namespace TSPTimeCost
                     //toll goal = (cost of gasoline + cost of toll fee) * time of toll
                     var tollGoal = DistanceMatrixForTollRoads.Instance.Goals[j + i * cities.Count] =
                         (gasolineCostToll + CostMatrix.Instance.Value[j + i * cities.Count]) *
-                                   (DistanceMatrixForTollRoads.Instance.Distances[j + i * cities.Count] / 3600) * (DistanceMatrixForTollRoads.Instance.Distances[j + i * cities.Count] / DistanceMatrixForFreeRoads.Instance.Distances[j + i * cities.Count]);
+                        (DistanceMatrixForTollRoads.Instance.Distances[j + i * cities.Count] / 3600) *
+                        (DistanceMatrixForTollRoads.Instance.Distances[j + i * cities.Count] /
+                         DistanceMatrixForFreeRoads.Instance.Distances[j + i * cities.Count]);
 
-                    var freeGoal = DistanceMatrixForFreeRoads.Instance.Goals[j + i * cities.Count] = 
+                    var freeGoal = DistanceMatrixForFreeRoads.Instance.Goals[j + i * cities.Count] =
                         gasolineCostFree * (DistanceMatrixForFreeRoads.Instance.Distances[j + i * cities.Count] / 3600);
 
                     if (i == j)
@@ -405,8 +415,8 @@ namespace TSPTimeCost
                             DistanceMatrixForTollRoads.Instance.Distances[j + i * cities.Count];
                         DistanceMatrixEvaluated.Instance.Goals[j + i * cities.Count] = tollGoal;
                     }
-                }
-            }
+                });
+            });
         }
     }
 }

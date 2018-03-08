@@ -1,7 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
 
 namespace TSPTimeCost
 {
+    [Serializable]
     public class ViewModel
     {
         private static double _limit;
@@ -13,7 +14,7 @@ namespace TSPTimeCost
         }
 
         private static string _cities;
-
+        
         public string Cities
         {
             get => _cities;

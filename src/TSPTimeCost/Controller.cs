@@ -20,16 +20,18 @@ namespace TSPTimeCost
         }
 
 
-        public async Task InitializeAsync()
+        public void Initialize()
         {
-            Task initializeSingletons = Task.Factory.StartNew(ProcessInputData.InitializeSingletons) ;
-            initializeSingletons.Wait();
-            await Task.Factory.StartNew(ProcessInputData.CalculateDistanceMatrixForFreeRoads);
-            await Task.Factory.StartNew(ProcessInputData.CalculateDistanceMatrixForTollRoads);
-            await Task.Factory.StartNew(ProcessInputData.CalculateCostMatrix);
-            await Task.Factory.StartNew(ProcessInputData.CalculateDistanceMatrixEvaluated);
+            ProcessInputData.InitializeSingletons();
 
-           
+            Parallel.Invoke(
+                ProcessInputData.CalculateDistanceMatrixForFreeRoads,
+                ProcessInputData.CalculateDistanceMatrixForTollRoads,
+                ProcessInputData.CalculateCostMatrix,
+                ProcessInputData.CalculateDistanceMatrixEvaluated
+                );
+
+
             BestPath.Instance.Distance = new AntColonyToll().CalculateDistanceInPath(BestPath.Instance.Order, DistanceMatrixForTollRoads.Instance);
         }
 

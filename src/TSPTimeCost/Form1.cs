@@ -8,21 +8,18 @@ namespace TSPTimeCost
 {
     public partial class TspTimeCostFrm : Form
     {
-        private static Controller _controller;
-        private static ViewModel _viewModel;
+        private static Controller _controller = new Controller();
+        private static ViewModel _viewModel = new ViewModel();
 
         public TspTimeCostFrm()
         {
-            _controller = new Controller();
-            _viewModel = new ViewModel();
             InitializeComponent();
-
         }
 
-        private async void Form1_Load(object sender, EventArgs e)
+        private void Form1_Load(object sender, EventArgs e)
         {
             _viewModel.Cities = CitiesTxt.Text;
-            await _controller.InitializeAsync();
+            _controller.Initialize();
             InitializeSeries();
             DrawCities();
         }
@@ -68,9 +65,9 @@ namespace TSPTimeCost
         private void ShowRoute(string nameOfSeries)
         {
             Area.Series[nameOfSeries].Points.Clear();
-          //  orderLbl.Text = _controller.GetOrder();
-          //  goalLbl.Text = _controller.GetGoals();
-          //  durationLbl.Text = _controller.GetDuration();
+            //  orderLbl.Text = _controller.GetOrder();
+            //  goalLbl.Text = _controller.GetGoals();
+            //  durationLbl.Text = _controller.GetDuration();
 
             goalLbl.Text = _controller.GetDuration();
             durationLbl.Text = $@"Time of execution: {BestPath.Instance.TimeOfExecution}";
@@ -200,7 +197,7 @@ namespace TSPTimeCost
 
         private void label2_Click(object sender, EventArgs e)
         {
-             
+
         }
 
         private void CitiesTxt_LostFocus(object sender, EventArgs e)
@@ -208,19 +205,18 @@ namespace TSPTimeCost
 
         }
 
-        private async void UpdateBtn_Click(object sender, EventArgs e)
+        private void UpdateBtn_Click(object sender, EventArgs e)
         {
             Area.Series[0].Points.Clear();
             _controller = new Controller();
             _viewModel = new ViewModel();
             _viewModel.Cities = CitiesTxt.Text;
-            await _controller.InitializeAsync();
+            _controller.Initialize();
             DrawCities();
         }
 
         private void CitiesTxt_TextChanged(object sender, EventArgs e)
         {
-
         }
     }
 }
