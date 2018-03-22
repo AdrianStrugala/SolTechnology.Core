@@ -1,0 +1,42 @@
+﻿@{
+    ViewData["Title"] = "Traveling Eco-Salesman";
+}
+
+<style>
+    /* Optional: Makes the sample page fill the window. */
+    html, body {
+        float: left;
+        height: 98vh;
+        margin: 0;
+        padding: 0;
+    }
+    /* Always set the map height explicitly to define the size of the div
+        * element that contains the map. */
+    #map {
+        float: left;
+        height: 98vh;
+        width: 98vw;
+        margin: 0;
+        padding: 0;
+    }
+</style>
+
+
+<div id="map"></div>
+
+@section Scripts
+    {
+    <script>
+        var map;
+
+        function initMap() {
+            map = new google.maps.Map(document.getElementById('map'),
+                {
+                    center: { lat: 0, lng: 0 },
+                    zoom: 4
+                });
+        }
+    </script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyC8ZkBAtPiwp0rk4SRdhH6vufM39eDMmHY&callback=initMap"
+            async defer></script>
+}

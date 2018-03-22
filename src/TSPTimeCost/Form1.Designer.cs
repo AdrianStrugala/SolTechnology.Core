@@ -236,7 +236,7 @@
             this.AttentionWhoreBtn.Name = "AttentionWhoreBtn";
             this.AttentionWhoreBtn.Size = new System.Drawing.Size(140, 48);
             this.AttentionWhoreBtn.TabIndex = 16;
-            this.AttentionWhoreBtn.Text = "Attention Whore";
+            this.AttentionWhoreBtn.Text = "Nearest Neighbour";
             this.AttentionWhoreBtn.UseVisualStyleBackColor = true;
             this.AttentionWhoreBtn.Click += new System.EventHandler(this.AttentionWhoreBtn_Click);
             // 
