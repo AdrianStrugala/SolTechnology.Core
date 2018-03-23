@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using TESWebUI.Models;
 
@@ -13,6 +9,12 @@ namespace TESWebUI.Controllers
         public IActionResult Index()
         {
             return View();
+        }
+
+        [HttpGet]
+        public IActionResult CalculateBestPath()
+        {
+            return Content("Torino; Verona; Milan");
         }
 
 

@@ -1,182 +1,82 @@
-﻿@{
+﻿@model TESViewModel
+
+@{
     ViewData["Title"] = "Traveling Eco-Salesman";
 }
 
-<style>
-    /* Optional: Makes the sample page fill the window. */
-    html, body {
-        float: left;
-        height: 98vh;
-        margin: 0;
-        padding: 0;
-    }
-    /* Always set the map height explicitly to define the size of the div
-        * element that contains the map. */
-    #map {
-        float: left;
-        height: 98vh;
-        width: 98vw;
-        margin: 0;
-        padding: 0;
-    }
-</style>
+<!-- Modal -->
+<div id="listOfCitiesModal" class="modal fade" role="dialog">
+    <div class="modal-dialog">
 
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
 
+                <h4 class="modal-title">Insert list of cities:</h4>
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <textarea onkeyup="auto_grow(this)" id="listOfCities">City one
+City two</textarea>
+            </div>
+        </div>
 
-@*<div id="floating-panel">*@
-@*    <b>Start: </b>*@
-@*    <select id="start">*@
-@*        <option value="chicago, il">Chicago</option>*@
-@*        <option value="st louis, mo">St Louis</option>*@
-@*        <option value="joplin, mo">Joplin, MO</option>*@
-@*        <option value="oklahoma city, ok">Oklahoma City</option>*@
-@*        <option value="amarillo, tx">Amarillo</option>*@
-@*        <option value="gallup, nm">Gallup, NM</option>*@
-@*        <option value="flagstaff, az">Flagstaff, AZ</option>*@
-@*        <option value="winona, az">Winona</option>*@
-@*        <option value="kingman, az">Kingman</option>*@
-@*        <option value="barstow, ca">Barstow</option>*@
-@*        <option value="san bernardino, ca">San Bernardino</option>*@
-@*        <option value="los angeles, ca">Los Angeles</option>*@
-@*    </select>*@
-@*    <b>End: </b>*@
-@*    <select id="end">*@
-@*        <option value="chicago, il">Chicago</option>*@
-@*        <option value="st louis, mo">St Louis</option>*@
-@*        <option value="joplin, mo">Joplin, MO</option>*@
-@*        <option value="oklahoma city, ok">Oklahoma City</option>*@
-@*        <option value="amarillo, tx">Amarillo</option>*@
-@*        <option value="gallup, nm">Gallup, NM</option>*@
-@*        <option value="flagstaff, az">Flagstaff, AZ</option>*@
-@*        <option value="winona, az">Winona</option>*@
-@*        <option value="kingman, az">Kingman</option>*@
-@*        <option value="barstow, ca">Barstow</option>*@
-@*        <option value="san bernardino, ca">San Bernardino</option>*@
-@*        <option value="los angeles, ca">Los Angeles</option>*@
-@*    </select>*@
-@*</div>*@
+    </div>
+</div>
+
+<div id="btnModal">
+    <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#listOfCitiesModal">Cities</button>
+</div>
 
 <div id="map"></div>
 
+
 @section Scripts
     {
-        <script>
-    
-            function initMap() {
-                var map = new google.maps.Map(document.getElementById('map'),
-                    {
-                        center: { lat: 0, lng: 0 },
-                        zoom: 4
-                    });
-            }
-        </script>
-    
-    
-    
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyC8ZkBAtPiwp0rk4SRdhH6vufM39eDMmHY&callback=initMap"
+            async defer></script>
 
     <script>
 
-//        function initMap() {
-//            var directionsService = new google.maps.DirectionsService;
-//            var directionsDisplay = new google.maps.DirectionsRenderer;
-//            var map = new google.maps.Map(document.getElementById('map'), {
-//                zoom: 4,
-//                center: { lat: 0, lng: 0 }
-//            });
-
-//            function drawMap() {
-//                var directionDisplay;
-//                var directionsService = new google.maps.DirectionsService();
-//                var map;
-//
-//                var start = new google.maps.LatLng(51.47482547819850, -0.37739553384529);
-//                var myOptions = {
-//                    zoom: 7,
-//                    mapTypeId: google.maps.MapTypeId.ROADMAP,
-//                    center: start
-//                }
-//                map = new google.maps.Map(document.getElementById("map_canvas"), myOptions);
-//
-//
-//
-//                function renderDirections(result) {
-//                    var directionsRenderer = new google.maps.DirectionsRenderer();
-//                    directionsRenderer.setMap(map);
-//                    directionsRenderer.setDirections(result);
-//                }
-//
-//                function requestDirections(start, end) {
-//                    directionsService.route({
-//                        origin: start,
-//                        destination: end,
-//                        travelMode: google.maps.DirectionsTravelMode.DRIVING
-//                    }, function (result) {
-//                        renderDirections(result);
-//                    });
-//                }
-//
-//                requestDirections('(51.47482547819850,-0.37739553384529)', '(51.59512428598160,-0.17190814889409)');
-//                requestDirections('EC1V 0AH', '(51.47615506206120, -0.37795315370703)');
+        function initMap() {
+            var directionsService = new google.maps.DirectionsService;
+            var map = new google.maps.Map(document.getElementById('map'),
+                {
+                    zoom: 4,
+                    center: { lat: 0, lng: 0 }
+                });
 
 
-//        function initMap() {
-//            var directionsService = new google.maps.DirectionsService;
-//            var directionsDisplay = new google.maps.DirectionsRenderer;
-//            var map = new google.maps.Map(document.getElementById('map'), {
-//                zoom: 4,
-//                center: { lat: 0, lng: 0 }
-//            });
-//            directionsDisplay.setMap(map);
-//
-//            var onChangeHandler = function () {
-//             //   calculateAndDisplayRoute(directionsService, directionsDisplay);
-//                calculateAndDisplayRoute2(directionsService, directionsDisplay);
-//            };
-//            document.getElementById('start').addEventListener('change', onChangeHandler);
-//            document.getElementById('end').addEventListener('change', onChangeHandler);
-//        }
-//
-//        function calculateAndDisplayRoute(directionsService, directionsDisplay) {
-//            directionsService.route({
-//                origin: document.getElementById('start').value,
-//                destination: document.getElementById('end').value,
-//                travelMode: 'DRIVING'
-//            }, function (response, status) {
-//                if (status === 'OK') {
-//                    directionsDisplay.setDirections(response);
-//                } else {
-//                    window.alert('Directions request failed due to ' + status);
-//                }
-//            });
-//        }
-//
-//        function calculateAndDisplayRoute2(directionsService, directionsDisplay) {
-//            directionsService.route({
-//                origin: 'Milan',
-//                destination: 'Torino',
-//                travelMode: 'DRIVING'
-//            }, function (response, status) {
-//                if (status === 'OK') {
-//                    directionsDisplay.setDirections(response);
-//                } else {
-//                    window.alert('Directions request failed due to ' + status);
-//                }
-//                });
-//
-//            directionsService.route({
-//                origin: 'Verona',
-//                destination: 'Bergamo',
-//                travelMode: 'DRIVING'
-//            }, function (response, status) {
-//                if (status === 'OK') {
-//                    directionsDisplay.setDirections(response);
-//                } else {
-//                    window.alert('Directions request failed due to ' + status);
-//                }
-//            });
-//        }
+            var onChangeHandler = function () {
 
+                $.ajax({
+                    type: 'GET',
+                    dataType: 'html',
+                    url: '@Url.Action("CalculateBestPath", "Home")',
+                    success: function(data) {
+                        alert(data);
+
+                        var citiesList = data.split(';');
+
+                        for (var i = 0; i < 3; i++) {
+                            calculateAndDisplayRoute(directionsService, map, citiesList[i], citiesList[i + 1], true);
+                        };
+                    },
+                    statusCode: {
+                        404: function (content) { alert('cannot find resource'); },
+                        500: function (content) { alert('internal server error'); }
+                    },
+                    error: function (req, status, errorObj) {
+                        // handle status === "timeout"
+                        // handle other errors
+                    }
+                });
+
+             //    calculateAndDisplayRoute(directionsService, map, 'Milan', 'Bergamo', true);
+            }
+
+            document.getElementById('listOfCitiesModal').addEventListener('change', onChangeHandler);
+
+        }
     </script>
-    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyC8ZkBAtPiwp0rk4SRdhH6vufM39eDMmHY&callback=initMap"
-            async defer></script>
 }
