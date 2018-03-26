@@ -1,6 +1,4 @@
-﻿@model TESViewModel
-
-@{
+﻿@{
     ViewData["Title"] = "Traveling Eco-Salesman";
 }
 
@@ -118,19 +116,28 @@ City two</textarea>
             var onChangeHandler = function () {
                 var listOfCities = document.getElementById("listOfCities").value;
 
+                var markersList = listOfCities.split(';');
+
+                for (var i = 0; i < markersList.length; i++) {
+                    var marker = new google.maps.Marker({
+                        position: markersList[i],
+                        map: map,
+                        title: markersList[i]
+                    });
+                }
+                
+
                 $.ajax({
                     type: 'POST',
                     dataType: 'html',
                      url: '@Url.Action("CalculateBestPath", "Home")',
                      data: { cities: listOfCities },
-             //       url: '@Url.Action("CalculateBestPath", "Home")',
-//
                     success: function(msg) {
                         alert(msg);
 
-                        var citiesList = data.split('\n');
+                        var citiesList = msg.split(';');
 
-                        for (var i = 0; i < citiesList.length; i++) {
+                        for (var i = 0; i < citiesList.length-1; i++) {
                             calculateAndDisplayRoute(directionsService, map, citiesList[i], citiesList[i + 1], true);
                         };
                     },

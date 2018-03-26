@@ -1,4 +1,7 @@
-﻿using System.Diagnostics;
+﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
 using Microsoft.AspNetCore.Mvc;
 using TESWebUI.Models;
 
@@ -14,7 +17,23 @@ namespace TESWebUI.Controllers
         [HttpPost]
         public IActionResult CalculateBestPath(string cities)
         {
-            return Content(cities);
+            List<string> listOfCitiesAsStrings = ProcessInputData.ReadCities(cities);
+            DistanceMatrixEvaluated matrixEvaluated = new DistanceMatrixEvaluated(listOfCitiesAsStrings.Count);
+            List<City> listOfCities = ProcessInputData.GetCitiesFromGoogleApi(listOfCitiesAsStrings);
+
+            matrixEvaluated.FillWithData(listOfCities);
+            int[] result = God.SolveTSP(matrixEvaluated);
+
+            string resultAsString = null;
+
+            for (int i = 0; i < result.Length - 1; i++)
+            {
+                resultAsString += listOfCities[result[i]].Name + ";";
+            }
+
+            resultAsString += listOfCities[result[result.Length - 1]].Name;
+
+            return Content(resultAsString);
         }
 
 
