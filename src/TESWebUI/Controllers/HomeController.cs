@@ -11,10 +11,10 @@ namespace TESWebUI.Controllers
             return View();
         }
 
-        [HttpGet]
-        public IActionResult CalculateBestPath()
+        [HttpPost]
+        public IActionResult CalculateBestPath(string cities)
         {
-            return Content("Torino; Verona; Milan");
+            return Content(cities);
         }
 
 

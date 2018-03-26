@@ -4,6 +4,51 @@
     ViewData["Title"] = "Traveling Eco-Salesman";
 }
 
+<head>
+    <style>
+        /* Optional: Makes the sample page fill the window. */
+        html, body {
+            float: left;
+            height: 100vh;
+            margin: 0;
+            padding: 0;
+        }
+        /* Always set the map height explicitly to define the size of the div
+        * element that contains the map. */
+        #map {
+            float: left;
+            height: 98vh;
+            width: 98vw;
+            margin: 0;
+            padding: 0;
+        }
+
+
+        #btnModal {
+            position: absolute;
+            z-index: 99 !important;
+            margin-left: 10%;
+            margin-top: 0.7%;
+        }
+
+        .modal-dialog {
+            position: relative;
+            display: table; /* This is important */
+            overflow-y: auto;
+            overflow-x: auto;
+            width: auto;
+            min-width: 300px;
+        }
+
+        #listOfCities {
+            resize: both;
+            width: 100%;
+            resize: none;
+            overflow: hidden;
+        }
+    </style>
+</head>
+
 <!-- Modal -->
 <div id="listOfCitiesModal" class="modal fade" role="dialog">
     <div class="modal-dialog">
@@ -37,6 +82,29 @@ City two</textarea>
             async defer></script>
 
     <script>
+        function calculateAndDisplayRoute(directionsService, map, origin, destination, toll) {
+            var directionsDisplay = new google.maps.DirectionsRenderer;
+            directionsDisplay.setMap(map);
+            directionsService.route({
+                    origin: origin,
+                    destination: destination,
+                    travelMode: 'DRIVING',
+                    avoidTolls: toll
+                },
+                function (response, status) {
+                    if (status === 'OK') {
+                        directionsDisplay.setDirections(response);
+                    } else {
+                        window.alert('Directions request failed due to ' + status);
+                    }
+                });
+        }
+
+
+        function auto_grow(element) {
+            element.style.height = "5px";
+            element.style.height = (element.scrollHeight) + "px";
+        }
 
         function initMap() {
             var directionsService = new google.maps.DirectionsService;
@@ -48,17 +116,21 @@ City two</textarea>
 
 
             var onChangeHandler = function () {
+                var listOfCities = document.getElementById("listOfCities").value;
 
                 $.ajax({
-                    type: 'GET',
+                    type: 'POST',
                     dataType: 'html',
-                    url: '@Url.Action("CalculateBestPath", "Home")',
-                    success: function(data) {
-                        alert(data);
+                     url: '@Url.Action("CalculateBestPath", "Home")',
+                     data: { cities: listOfCities },
+             //       url: '@Url.Action("CalculateBestPath", "Home")',
+//
+                    success: function(msg) {
+                        alert(msg);
 
-                        var citiesList = data.split(';');
+                        var citiesList = data.split('\n');
 
-                        for (var i = 0; i < 3; i++) {
+                        for (var i = 0; i < citiesList.length; i++) {
                             calculateAndDisplayRoute(directionsService, map, citiesList[i], citiesList[i + 1], true);
                         };
                     },
@@ -71,8 +143,6 @@ City two</textarea>
                         // handle other errors
                     }
                 });
-
-             //    calculateAndDisplayRoute(directionsService, map, 'Milan', 'Bergamo', true);
             }
 
             document.getElementById('listOfCitiesModal').addEventListener('change', onChangeHandler);
