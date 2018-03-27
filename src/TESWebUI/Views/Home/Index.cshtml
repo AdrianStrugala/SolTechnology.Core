@@ -126,7 +126,7 @@ City two</textarea>
                     travelMode: 'DRIVING',
                     avoidTolls: toll
                 },
-                function (response, status) {
+                function(response, status) {
                     if (status === 'OK') {
                         directionsDisplay.setDirections(response);
                     } else {
@@ -150,18 +150,9 @@ City two</textarea>
                 });
 
 
-            var onChangeHandler = function () {
+            var onChangeHandler = function() {
                 var listOfCities = document.getElementById("listOfCities").value;
 
-//                var markersList = listOfCities.split(';');
-//
-//                for (var i = 0; i < markersList.length; i++) {
-//                    var marker = new google.maps.Marker({
-//                        position: markersList[i],
-//                        map: map,
-//                        title: markersList[i]
-//                    });
-//                }
                 document.getElementById("loader").style.display = "block";
 
                 $.ajax({
@@ -182,16 +173,28 @@ City two</textarea>
                             if (pathList[i].Cost === 0) {
                                 isToll = false;
                             }
-                            calculateAndDisplayRoute(directionsService, map, pathList[i].StartingCity.Name, pathList[i].EndingCity.Name, isToll);
+                            calculateAndDisplayRoute(directionsService,
+                                map,
+                                pathList[i].StartingCity.Name,
+                                pathList[i].EndingCity.Name,
+                                isToll);
                         };
 
                         document.getElementById("loader").style.display = "none";
+
+//                        for (var i = 0; i < pathList.length; i++) {
+//                            var marker = new google.maps.Marker({
+//                                position: new google.maps.LatLng(pathList[i].StartingCity.Latitude,
+//                                    pathList[i].StartingCity.Longitude),
+//                                map: map
+//                            });
+//                        }
                     },
                     statusCode: {
-                        404: function (content) { alert('cannot find resource'); },
-                        500: function (content) { alert('internal server error'); }
+                        404: function (msg) { alert('cannot find resource'); },
+                        500: function (msg) { alert('internal server error'); }
                     },
-                    error: function (req, status, errorObj) {
+                    error: function(req, status, errorObj) {
                         // handle status === "timeout"
                         // handle other errors
                     }
