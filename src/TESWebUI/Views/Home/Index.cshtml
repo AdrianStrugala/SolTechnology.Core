@@ -44,6 +44,42 @@
             resize: none;
             overflow: hidden;
         }
+
+        #loader {
+            border: 16px solid #f3f3f3;
+            border-radius: 50%;
+            border-top: 16px solid #0e2f61;
+            width: 300px;
+            height: 300px;
+            -webkit-animation: spin 2s linear infinite; /* Safari */
+            animation: spin 2s linear infinite;
+            display: none;
+            position: absolute;
+            left: 40%;
+            top: 30%;
+            z-index: 1;
+        }
+
+        /* Safari */
+        @@-webkit-keyframes spin {
+            0% {
+                -webkit-transform: rotate(0deg);
+            }
+
+            100% {
+                -webkit-transform: rotate(360deg);
+            }
+        }
+
+        @@keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
     </style>
 </head>
 
@@ -70,7 +106,7 @@ City two</textarea>
 <div id="btnModal">
     <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#listOfCitiesModal">Cities</button>
 </div>
-
+<div id="loader"></div>
 <div id="map"></div>
 
 
@@ -80,6 +116,7 @@ City two</textarea>
             async defer></script>
 
     <script>
+
         function calculateAndDisplayRoute(directionsService, map, origin, destination, toll) {
             var directionsDisplay = new google.maps.DirectionsRenderer;
             directionsDisplay.setMap(map);
@@ -116,37 +153,39 @@ City two</textarea>
             var onChangeHandler = function () {
                 var listOfCities = document.getElementById("listOfCities").value;
 
-                var markersList = listOfCities.split(';');
-
-                for (var i = 0; i < markersList.length; i++) {
-                    var marker = new google.maps.Marker({
-                        position: markersList[i],
-                        map: map,
-                        title: markersList[i]
-                    });
-                }
-                
+//                var markersList = listOfCities.split(';');
+//
+//                for (var i = 0; i < markersList.length; i++) {
+//                    var marker = new google.maps.Marker({
+//                        position: markersList[i],
+//                        map: map,
+//                        title: markersList[i]
+//                    });
+//                }
+                document.getElementById("loader").style.display = "block";
 
                 $.ajax({
                     type: 'POST',
                     dataType: 'html',
-                     url: '@Url.Action("CalculateBestPath", "Home")',
-                     data: { cities: listOfCities },
+                    url: '@Url.Action("CalculateBestPath", "Home")',
+                    data: { cities: listOfCities },
                     success: function(msg) {
-                        alert(msg);                      
+                        alert(msg);
 
                         var pathList = JSON.parse(msg);
-                        alert(pathList.length); 
+                        alert(pathList.length);
 
                         for (var i = 0; i < pathList.length; i++) {
 
-                            var isToll = true; 
+                            var isToll = true;
 
                             if (pathList[i].Cost === 0) {
                                 isToll = false;
                             }
                             calculateAndDisplayRoute(directionsService, map, pathList[i].StartingCity.Name, pathList[i].EndingCity.Name, isToll);
                         };
+
+                        document.getElementById("loader").style.display = "none";
                     },
                     statusCode: {
                         404: function (content) { alert('cannot find resource'); },
