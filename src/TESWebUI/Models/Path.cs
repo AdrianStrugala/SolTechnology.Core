@@ -3,13 +3,12 @@
 /***************************************************/
 
 namespace TESWebUI.Models {
-    public sealed class BestPath {
+    public sealed class Path {
 
-        public int[] Order { get; set; }
-        public double[] DistancesInOrder { get; set; }
+        public City StartingCity { get; set; }
+        public City EndingCity { get; set; }
         public double Distance { get; set; }
         public double Cost { get; set; }
-        public string TimeOfExecution { get; set; }
-        public double[] Goal { get; set; }
+        public double Goal { get; set; }
     }
 }

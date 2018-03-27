@@ -21,19 +21,25 @@ namespace TESWebUI.Controllers
             DistanceMatrixEvaluated matrixEvaluated = new DistanceMatrixEvaluated(listOfCitiesAsStrings.Count);
             List<City> listOfCities = ProcessInputData.GetCitiesFromGoogleApi(listOfCitiesAsStrings);
 
-            matrixEvaluated.FillWithData(listOfCities);
+            matrixEvaluated.DownloadData(listOfCities);
             int[] result = God.SolveTSP(matrixEvaluated);
 
-            string resultAsString = null;
-
+            List<Path> paths = new List<Path>();
             for (int i = 0; i < result.Length - 1; i++)
             {
-                resultAsString += listOfCities[result[i]].Name + ";";
+                Path currentPath = new Path
+                {
+                    StartingCity = listOfCities[i],
+                    EndingCity = listOfCities[i + 1],
+                    Cost = matrixEvaluated.Costs[(i + 1) + i * listOfCitiesAsStrings.Count],
+                    Distance = matrixEvaluated.Distances[(i + 1) + i  * listOfCitiesAsStrings.Count],
+                    Goal = matrixEvaluated.Goals[(i + 1) + i * listOfCitiesAsStrings.Count]
+                };
+
+                paths.Add(currentPath);
             }
 
-            resultAsString += listOfCities[result[result.Length - 1]].Name;
-
-            return Content(resultAsString);
+            return Content(Newtonsoft.Json.JsonConvert.SerializeObject(paths));
         }
 
 

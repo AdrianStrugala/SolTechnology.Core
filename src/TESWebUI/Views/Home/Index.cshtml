@@ -133,12 +133,19 @@ City two</textarea>
                      url: '@Url.Action("CalculateBestPath", "Home")',
                      data: { cities: listOfCities },
                     success: function(msg) {
-                        alert(msg);
+                        alert(msg);                      
 
-                        var citiesList = msg.split(';');
+                        var pathList = JSON.parse(msg);
+                        alert(pathList.length); 
 
-                        for (var i = 0; i < citiesList.length-1; i++) {
-                            calculateAndDisplayRoute(directionsService, map, citiesList[i], citiesList[i + 1], true);
+                        for (var i = 0; i < pathList.length; i++) {
+
+                            var isToll = true; 
+
+                            if (pathList[i].Cost === 0) {
+                                isToll = false;
+                            }
+                            calculateAndDisplayRoute(directionsService, map, pathList[i].StartingCity.Name, pathList[i].EndingCity.Name, isToll);
                         };
                     },
                     statusCode: {

@@ -32,70 +32,70 @@ namespace TESWebUI.Models
             }
         }
 
-        internal void FillWithData(List<City> listOfCities)
+        internal void DownloadData(List<City> listOfCities)
         {
-            Parallel.For(0, listOfCities.Count, i =>
-           {
-               Parallel.For(0, listOfCities.Count, j =>
-                   {
+            for (int i = 0; i < listOfCities.Count; i++)
+            {
+                for (int j = 0; j < listOfCities.Count; j++)
+                {
 
-                       if (i == j)
-                       {
-                           Distances[j + i * listOfCities.Count] = double.MaxValue;
-                           Goals[j + i * listOfCities.Count] = double.MaxValue;
-                           Costs[j + i * listOfCities.Count] = double.MaxValue;
-                       }
-                       else
-                       {
-                           int timeFree = -1;
-                           int timeToll = -1;
-                           double costToll = -1;
+                    if (i == j)
+                    {
+                        Distances[j + i * listOfCities.Count] = double.MaxValue;
+                        Goals[j + i * listOfCities.Count] = double.MaxValue;
+                        Costs[j + i * listOfCities.Count] = double.MaxValue;
+                    }
+                    else
+                    {
+                        int timeFree = -1;
+                        int timeToll = -1;
+                        double costToll = -1;
 
-                           Parallel.Invoke(
-                               () => timeFree =
-                                   ProcessInputData.GetDurationBetweenTwoCitiesByFreeRoad(listOfCities[i],
-                                       listOfCities[j]),
-                               () => timeToll =
-                                   ProcessInputData.GetDurationBetweenTwoCitiesByTollRoad(listOfCities[i],
-                                       listOfCities[j]),
-                               () => costToll =
-                                   ProcessInputData.GetCostBetweenTwoCities(listOfCities[i], listOfCities[j])
-                           );
-                           // C_G=s×combustion×fuel price [€] = v x t x combustion x fuel 
-                           double gasolineCostFree =
-                               timeFree /
-                               3600 * RoadVelocity * RoadCombustion * FuelPrice;
+                        Parallel.Invoke(
+                            () => timeFree =
+                                ProcessInputData.GetDurationBetweenTwoCitiesByFreeRoad(listOfCities[i],
+                                    listOfCities[j]),
+                            () => timeToll =
+                                ProcessInputData.GetDurationBetweenTwoCitiesByTollRoad(listOfCities[i],
+                                    listOfCities[j]),
+                            () => costToll =
+                                ProcessInputData.GetCostBetweenTwoCities(listOfCities[i], listOfCities[j])
+                        );
+                        // C_G=s×combustion×fuel price [€] = v x t x combustion x fuel 
+                        double gasolineCostFree =
+                            timeFree /
+                            3600.0 * RoadVelocity * RoadCombustion * FuelPrice;
 
-                           // 
-                           double gasolineCostToll =
-                               timeToll /
-                               3600 * HighwayVelocity * RoadCombustion * 1.25 * FuelPrice;
+                        // 
+                        double gasolineCostToll =
+                            timeToll /
+                            3600.0 * HighwayVelocity * RoadCombustion * 1.25 * FuelPrice;
 
 
-                           //toll goal = (cost of gasoline + cost of toll fee) * time of toll
-                           var tollGoal =
-                               (gasolineCostToll + costToll) *
-                               (timeToll / 3600) *
-                               (timeToll / timeFree);
+                        //toll goal = (cost of gasoline + cost of toll fee) * time of toll
+                        double cost = (gasolineCostToll + costToll);
+                        double time = (timeToll / 3600.0);
+                        double importance = (timeToll * 1.0 / timeFree * 1.0);
+                        double tollGoal = cost * time * importance;
 
-                           var freeGoal =
-                               gasolineCostFree * (timeFree / 3600);
+                        var freeGoal =
+                            gasolineCostFree * (timeFree / 3600.0);
 
-                           if (freeGoal < tollGoal)
-                           {
-                               Distances[j + i * listOfCities.Count] = timeFree;
-                               Goals[j + i * listOfCities.Count] = freeGoal;
-                               Costs[j + i * listOfCities.Count] = 0;
-                           }
-                           else
-                           {
-                               Distances[j + i * listOfCities.Count] = timeToll;
-                               Goals[j + i * listOfCities.Count] = tollGoal;
-                               Costs[j + i * listOfCities.Count] = costToll;
-                           }
-                       }
-                   });
-           });
+                        if (freeGoal < tollGoal)
+                        {
+                            Distances[j + i * listOfCities.Count] = timeFree;
+                            Goals[j + i * listOfCities.Count] = freeGoal;
+                            Costs[j + i * listOfCities.Count] = 0;
+                        }
+                        else
+                        {
+                            Distances[j + i * listOfCities.Count] = timeToll;
+                            Goals[j + i * listOfCities.Count] = tollGoal;
+                            Costs[j + i * listOfCities.Count] = costToll;
+                        }
+                    }
+                }
+            }
         }
 
 
