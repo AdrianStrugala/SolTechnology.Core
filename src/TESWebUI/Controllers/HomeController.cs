@@ -29,11 +29,11 @@ namespace TESWebUI.Controllers
             {
                 Path currentPath = new Path
                 {
-                    StartingCity = listOfCities[i],
-                    EndingCity = listOfCities[i + 1],
-                    Cost = matrixEvaluated.Costs[(i + 1) + i * listOfCitiesAsStrings.Count],
-                    Distance = matrixEvaluated.Distances[(i + 1) + i  * listOfCitiesAsStrings.Count],
-                    Goal = matrixEvaluated.Goals[(i + 1) + i * listOfCitiesAsStrings.Count]
+                    StartingCity = listOfCities[result[i]],
+                    EndingCity = listOfCities[result[i + 1]],
+                    Cost = matrixEvaluated.Costs[result[i + 1] + result[i] * listOfCitiesAsStrings.Count],
+                    Distance = matrixEvaluated.Distances[result[i + 1] + result[i]  * listOfCitiesAsStrings.Count],
+                    Goal = matrixEvaluated.Goals[result[i + 1] + result[i] * listOfCitiesAsStrings.Count]
                 };
 
                 paths.Add(currentPath);

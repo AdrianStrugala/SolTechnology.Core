@@ -34,9 +34,9 @@ namespace TESWebUI.Models
 
         internal void DownloadData(List<City> listOfCities)
         {
-            for (int i = 0; i < listOfCities.Count; i++)
+            Parallel.For(0, listOfCities.Count, i =>
             {
-                for (int j = 0; j < listOfCities.Count; j++)
+                Parallel.For(0, listOfCities.Count, j =>
                 {
 
                     if (i == j)
@@ -94,8 +94,8 @@ namespace TESWebUI.Models
                             Costs[j + i * listOfCities.Count] = costToll;
                         }
                     }
-                }
-            }
+                });
+            });
         }
 
 
