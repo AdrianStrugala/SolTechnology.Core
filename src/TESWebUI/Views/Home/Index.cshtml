@@ -117,12 +117,12 @@ City two</textarea>
 
     <script>
 
-        function calculateAndDisplayRoute(directionsService, map, origin, destination, toll) {
+        function calculateAndDisplayRoute(directionsService, map, originLat, originLng, destinationLat, destinationLng, toll) {
             var directionsDisplay = new google.maps.DirectionsRenderer;
             directionsDisplay.setMap(map);
             directionsService.route({
-                    origin: origin,
-                    destination: destination,
+                origin: new google.maps.LatLng(originLat, originLng),
+                destination: new google.maps.LatLng(destinationLat, destinationLng),
                     travelMode: 'DRIVING',
                     avoidTolls: toll
                 },
@@ -164,7 +164,6 @@ City two</textarea>
                         alert(msg);
 
                         var pathList = JSON.parse(msg);
-                        alert(pathList.length);
 
                         for (var i = 0; i < pathList.length; i++) {
 
@@ -175,8 +174,10 @@ City two</textarea>
                             }
                             calculateAndDisplayRoute(directionsService,
                                 map,
-                                pathList[i].StartingCity.Name,
-                                pathList[i].EndingCity.Name,
+                                pathList[i].StartingCity.Latitude,
+                                pathList[i].StartingCity.Longitude,
+                                pathList[i].EndingCity.Latitude,
+                                pathList[i].EndingCity.Longitude,
                                 isToll);
                         };
 
