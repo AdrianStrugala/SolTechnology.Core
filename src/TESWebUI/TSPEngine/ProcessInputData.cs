@@ -8,7 +8,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using TESWebUI.Models;
 
-namespace TESWebUI
+namespace TESWebUI.TSPEngine
 {
     public class ProcessInputData
     {
@@ -125,7 +125,7 @@ namespace TESWebUI
             {
                 return json["rows"][0]["elements"][0]["duration"]["value"].Value<int>();
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return -1;
             }

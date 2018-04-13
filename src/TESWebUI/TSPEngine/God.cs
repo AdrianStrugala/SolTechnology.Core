@@ -5,23 +5,23 @@ using System.Threading;
 using System.Threading.Tasks;
 using TESWebUI.Models;
 
-namespace TESWebUI
+namespace TESWebUI.TSPEngine
 {
     class God
     {
-        private static readonly int computionalPower = 5000000;
+        private const int ComputionalPower = 5000000;
         private static ConcurrentBag<int[]> _paths;
 
-        public static int[] SolveTSP(DistanceMatrixEvaluated EvaluatedMatrix)
+        public static int[] SolveTSP(DistanceMatrixEvaluated evaluatedMatrix)
         {
-            int noOfCities = (int) Math.Sqrt(EvaluatedMatrix.Distances.Length);
+            int noOfCities = (int) Math.Sqrt(evaluatedMatrix.Distances.Length);
 
-            int noOfUniverses = computionalPower / noOfCities;
+            int noOfUniverses = ComputionalPower / noOfCities;
             _paths = new ConcurrentBag<int[]>();
 
             Parallel.For(0, noOfUniverses, i => CreateUniverse(noOfCities));
 
-            var minimumPath = FindMinimumPathInListOfPaths(_paths, EvaluatedMatrix, noOfCities);
+            var minimumPath = FindMinimumPathInListOfPaths(_paths, evaluatedMatrix, noOfCities);
 
             return minimumPath;
         }
@@ -33,9 +33,9 @@ namespace TESWebUI
             {
                 _paths.Add(randomRoute);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-
+                // ignored
             }
         }
 
