@@ -1,5 +1,5 @@
 ﻿@{
-    ViewData["Title"] = "Traveling Eco-Salesman";
+    ViewData["Title"] = "Dream Travel";
 }
 
 <head>
@@ -25,7 +25,7 @@
         #btnModal {
             position: absolute;
             z-index: 99 !important;
-            margin-left: 10%;
+            margin-left: 90%;
             margin-top: 0.7%;
         }
 
@@ -49,8 +49,9 @@
             border: 16px solid #f3f3f3;
             border-radius: 50%;
             border-top: 16px solid #0e2f61;
-            width: 300px;
-            height: 300px;
+            width: 30vh;
+            height: 30vh;
+            ;
             -webkit-animation: spin 2s linear infinite; /* Safari */
             animation: spin 2s linear infinite;
             display: none;
@@ -111,18 +112,24 @@ City two</textarea>
 
 
 @section Scripts
-    {
+{
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyC8ZkBAtPiwp0rk4SRdhH6vufM39eDMmHY&callback=initMap"
             async defer></script>
 
     <script>
 
-        function calculateAndDisplayRoute(directionsService, map, originLat, originLng, destinationLat, destinationLng, toll) {
+        function calculateAndDisplayRoute(directionsService,
+            map,
+            originLat,
+            originLng,
+            destinationLat,
+            destinationLng,
+            toll) {
             var directionsDisplay = new google.maps.DirectionsRenderer;
             directionsDisplay.setMap(map);
             directionsService.route({
-                origin: new google.maps.LatLng(originLat, originLng),
-                destination: new google.maps.LatLng(destinationLat, destinationLng),
+                    origin: new google.maps.LatLng(originLat, originLng),
+                    destination: new google.maps.LatLng(destinationLat, destinationLng),
                     travelMode: 'DRIVING',
                     avoidTolls: toll
                 },
@@ -161,9 +168,22 @@ City two</textarea>
                     url: '@Url.Action("CalculateBestPath", "Home")',
                     data: { cities: listOfCities },
                     success: function(msg) {
-                        alert(msg);
 
                         var pathList = JSON.parse(msg);
+
+                        var routeString="Your path: \n"
+                        for (var i = 0; i < pathList.length; i++) {
+                            routeString +=
+                                "From " +
+                                pathList[i].StartingCity.Name +
+                                " to " +
+                                pathList[i].EndingCity.Name +
+                                ". Cost: " +
+                                pathList[i].Cost +
+                                "\n";
+                        }
+
+                        alert(routeString);
 
                         for (var i = 0; i < pathList.length; i++) {
 
@@ -192,8 +212,8 @@ City two</textarea>
 //                        }
                     },
                     statusCode: {
-                        404: function (msg) { alert('cannot find resource'); },
-                        500: function (msg) { alert('internal server error'); }
+                        404: function(msg) { alert('cannot find resource'); },
+                        500: function(msg) { alert('internal server error'); }
                     },
                     error: function(req, status, errorObj) {
                         // handle status === "timeout"
