@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
-using System.Threading.Tasks;
 using System.Xml;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -39,7 +38,6 @@ namespace TESWebUI
 
             return cities;
         }
-
 
 
         private static JObject GetLocationJson(string cityName)
