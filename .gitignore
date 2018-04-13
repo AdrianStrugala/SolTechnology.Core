@@ -5,3 +5,4 @@ src/TESWebUI/bin/**/*
 src/TESWebUI/obj/**/*
 src/TESWebUI/obj/*
 src/TESWebUI/bin/*
+*.cache
