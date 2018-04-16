@@ -6,6 +6,47 @@
 <head>
 </head>
 
+
+@*<div class="navbar navbar-expand-lg fixed-top navbar-dark bg-primary">*@
+@*    <div class="container">*@
+@*        <a href="" class="navbar-brand">PG</a>*@
+@*        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">*@
+@*            <span class="navbar-toggler-icon"></span>*@
+@*        </button>*@
+@*        <div class="collapse navbar-collapse" id="navbarResponsive">*@
+@*            <ul class="navbar-nav">*@
+@*                <li class="nav-item">*@
+@*                    <a href="#utility" class="btn btn-outline-secondary" value="Submit">Utility</a>*@
+@*                </li>*@
+@*                <li class="nav-item">*@
+@*                    <a href="#internal" class="btn btn-outline-secondary" value="Submit">Internal Connections</a>*@
+@*                </li>*@
+@*                <li class="nav-item">*@
+@*                    <a href="#wiki" class="btn btn-outline-secondary" value="Submit">Wiki</a>*@
+@*                </li>*@
+@*                <li class="nav-item">*@
+@*                    <tr><td><a href="#branch" class="btn btn-outline-secondary" value="Submit">BRANCH</a></td></tr>*@
+@*                </li>*@
+@*                <li class="nav-item">*@
+@*                    <a href="#dev" class="btn btn-outline-secondary" value="Submit">DEV</a>*@
+@*                </li>*@
+@*                <li class="nav-item">*@
+@*                    <a href="#itg" class="btn btn-outline-secondary" value="Submit">ITG</a>*@
+@*                </li>*@
+@*                <li class="nav-item">*@
+@*                    <a href="#train" class="btn btn-outline-secondary" value="Submit">TRAIN</a>*@
+@*                </li>*@
+@*                <li class="nav-item">*@
+@*                    <a href="#prod" class="btn btn-outline-secondary" value="Submit">PROD</a>*@
+@*                </li>*@
+@*            </ul>*@
+@**@
+@*        </div>*@
+@*    </div>*@
+@*</div>*@
+
+
+
 <!-- Modal -->
 <div id="listOfCitiesModal" class="modal fade" role="dialog">
     <div class="modal-dialog">
@@ -123,16 +164,20 @@ City two</textarea>
                                 isToll);
                         };
 
+                        //TODO: display markers
+                        for (var i = 0; i < pathList.length; i++) {
+                            var marker = new google.maps.Marker({
+                                position: new google.maps.LatLng(pathList[i].StartingCity.Latitude,
+                                    pathList[i].StartingCity.Longitude),
+                                map: map,
+                                title: i
+                            });
+                            marker.setMap(map);
+                        }
+
                         document.getElementById("loader").style.display = "none";
 
-                        //TODO: display markers
-//                        for (var i = 0; i < pathList.length; i++) {
-//                            var marker = new google.maps.Marker({
-//                                position: new google.maps.LatLng(pathList[i].StartingCity.Latitude,
-//                                    pathList[i].StartingCity.Longitude),
-//                                map: map
-//                            });
-//                        }
+
                     },
                     statusCode: {
                         404: function(msg) { alert('cannot find resource'); },
