@@ -6,3 +6,4 @@ src/TESWebUI/obj/**/*
 src/TESWebUI/obj/*
 src/TESWebUI/bin/*
 *.cache
+src/packages/**/*

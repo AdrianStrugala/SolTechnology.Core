@@ -1,0 +1,113 @@
+body {
+    padding-top: 0;
+    padding-bottom: 0;
+}
+
+/* Wrapping element */
+/* Set some basic padding to keep content from hitting the edges */
+.body-content {
+    padding-left: 0;
+    padding-right: 0;
+}
+
+/* Carousel */
+.carousel-caption p {
+    font-size: 20px;
+    line-height: 1.4;
+}
+
+/* Make .svg files in the carousel display properly in older browsers */
+.carousel-inner .item img[src$=".svg"] {
+    width: 100%;
+}
+
+/* QR code generator */
+#qrCode {
+    margin: 15px;
+}
+
+/* Hide/rearrange for smaller screens */
+@media screen and (max-width: 767px) {
+    /* Hide captions */
+    .carousel-caption {
+        display: none;
+    }
+}
+
+/* Optional: Makes the sample page fill the window. */
+html, body {
+    float: left;
+    height: 100vh;
+    margin: 0;
+    padding: 0;
+}
+/* Always set the map height explicitly to define the size of the div
+        * element that contains the map. */
+#map {
+    float: left;
+    height: 100vh;
+    width: 100vw;
+    margin: 0;
+    padding: 0;
+}
+
+
+#btnModal {
+    position: absolute;
+    z-index: 99 !important;
+    margin-left: 60%;
+    margin-top: 0.7%;
+}
+
+.modal-dialog {
+    position: relative;
+    display: table; /* This is important */
+    overflow-y: auto;
+    overflow-x: auto;
+    width: auto;
+    min-width: 300px;
+}
+
+#listOfCities {
+    resize: both;
+    width: 100%;
+    resize: none;
+    overflow: hidden;
+}
+
+#loader {
+    border: 16px solid #f3f3f3;
+    border-radius: 50%;
+    border-top: 16px solid #0e2f61;
+    width: 30vh;
+    height: 30vh;
+    ;
+    -webkit-animation: spin 2s linear infinite; /* Safari */
+    animation: spin 2s linear infinite;
+    display: none;
+    position: absolute;
+    left: 40%;
+    top: 30%;
+    z-index: 1;
+}
+
+/* Safari */
+@-webkit-keyframes spin {
+    0% {
+        -webkit-transform: rotate(0deg);
+    }
+
+    100% {
+        -webkit-transform: rotate(360deg);
+    }
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
