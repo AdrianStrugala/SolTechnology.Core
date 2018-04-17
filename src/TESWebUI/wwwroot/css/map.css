@@ -14,9 +14,19 @@ html, body {
     margin-top: 8vh;
     padding: 0;
 }
-.navbar{
-    height: 8vh;
+/*.navbar{*/
+/*    height: 8vh;*/
+/*}*/
+
+
+#infoText { 
+    color: #e9ecef;
+    background-color: transparent;
+    background-image: none;
+    border-color: #e9ecef;
+    margin-left: 1vw;
 }
+
 
 
 .dropdown-menu {

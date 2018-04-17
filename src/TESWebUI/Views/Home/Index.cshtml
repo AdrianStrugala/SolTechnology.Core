@@ -16,34 +16,16 @@
                     <li class="nav-item">
                         <button type="button" class="btn btn-outline-secondary" data-toggle="modal" data-target="#listOfCitiesModal">Cities</button>
                     </li>
-
-                    @*                    <li class="nav-item">*@
-                    @*                        <div class="btn-group" role="group" aria-label="Button group with nested dropdown">*@
-                    @*                            <button type="button" class="btn btn-outline-secondary">Your travel</button>*@
-                    @*                            <div class="btn-group" role="group">*@
-                    @*                                <button id="btnGroupDrop1" type="button" class="btn btn-outline-secondary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>*@
-                    @*                                <div class="dropdown-menu" aria-labelledby="btnGroupDrop1" x-placement="bottom-start" style="position: absolute; will-change: transform; top: 0px; left: 0px; transform: translate3d(0px, 38px, 0px);">*@
-                    @*                                    <a class="dropdown-item" href="#">Dropdown link</a>*@
-                    @*                                    <a class="dropdown-item" href="#">Dropdown link</a>*@
-                    @*                                </div>*@
-                    @*                            </div>*@
-                    @*                        </div>*@
-                    @*                    </li>*@
-
-                    <li class="dropdown">
+                    <li class="dropdown nav-item">
                         <a href="#" class="btn btn-outline-secondary dropdown-toggle" data-toggle="dropdown">Your travel</a>
                         <ul class="dropdown-menu" id="projectSelectorDropdown"></ul>
+                    </li>
+                    <li class ="nav-item" id="infoText">
                     </li>
                 </ul>
 
             </div>
         </div>
-    </div>
-
-    <div id="routeInfo" class="collapse">
-        Lorem ipsum dolor sit amet, consectetur adipisicing elit,
-        sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
-        quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
     </div>
 
     <!-- Modal -->
@@ -67,10 +49,6 @@ City two</textarea>
     </div>
 
 
-
-    @*    <div id="btnModal">*@
-    @*        <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#listOfCitiesModal">Cities</button>*@
-    @*    </div>*@
     <div id="loader"></div>
     <div id="map"></div>
 
@@ -114,9 +92,7 @@ City two</textarea>
             }
 
         function pad2(number) {
-
             return (number < 10 ? '0' : '') + number;
-
         }
 
         function initMap() {
@@ -126,7 +102,6 @@ City two</textarea>
                     zoom: 4,
                     center: { lat: 0, lng: 0 }
                 });
-
 
             var onChangeHandler = function() {
                 var listOfCities = document.getElementById("listOfCities").value;
@@ -143,10 +118,14 @@ City two</textarea>
                         var pathList = JSON.parse(msg);
 
                         var list = document.getElementById("projectSelectorDropdown");
+                        var totalCost = 0;
+                        var totalTime = 0;
                         for (var i = 0; i < pathList.length; i++) {
+                            totalCost += pathList[i].Cost;
+                            totalTime += pathList[i].Distance;
 
-                            var hours = (pathList[i].Distance / 3600);
-                            var minutes = ((pathList[i].Distance - hours * 3600) / 60);
+                            var hours = Math.floor(pathList[i].Distance / 3600);
+                            var minutes = Math.floor((pathList[i].Distance - Math.floor(hours) * 3600) / 60);
                             var seconds = (pathList[i].Distance % 60);
 
                             var routeString2 =
@@ -155,8 +134,8 @@ City two</textarea>
                                 " to " +
                                 pathList[i].EndingCity.Name +
                                 ". Cost: " +
-                                pathList[i].Cost.toFixed(2) +
-                                ". Time: " +
+                                pathList[i].Cost.toFixed(2) + " €." +
+                                " Time: " +
                                 Math.floor(hours) + ":" + pad2(Math.floor(minutes)) + ":" + pad2(Math.floor(seconds)) +
                                 "\n";
                             var li = document.createElement("li");
@@ -166,20 +145,6 @@ City two</textarea>
                             // alert("option " + opt);
                             list.appendChild(li);
                         }
-
-                        var routeString = "Your path: \n";
-                        for (var i = 0; i < pathList.length; i++) {
-                            routeString +=
-                                "From " +
-                                pathList[i].StartingCity.Name +
-                                " to " +
-                                pathList[i].EndingCity.Name +
-                                ". Cost: " +
-                                pathList[i].Cost +
-                                "\n";
-                        }
-
-                        alert(routeString);
 
                         for (var i = 0; i < pathList.length; i++) {
 
@@ -197,6 +162,14 @@ City two</textarea>
                                 isToll);
                         };
 
+                        var totalHours = Math.floor(totalTime / 3600);
+                        var totalMinutes = Math.floor((totalTime - Math.floor(totalHours) * 3600) / 60);
+                        var totalSeconds = (totalTime % 60);
+
+                        $('#infoText').html(
+                            "Total cost of toll fee: " + totalCost.toFixed(2) + " €. \n" +
+                            "Total travel time: " + Math.floor(totalHours) + ":" + pad2(Math.floor(totalMinutes)) + ":" + pad2(Math.floor(totalSeconds)) + ".");
+
                         //TODO: display markers
                         for (var i = 0; i < pathList.length; i++) {
                             var marker = new google.maps.Marker({
@@ -209,7 +182,6 @@ City two</textarea>
                         }
 
                         document.getElementById("loader").style.display = "none";
-
 
                     },
                     statusCode: {

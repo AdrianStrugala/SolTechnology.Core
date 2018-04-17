@@ -45,18 +45,40 @@ html, body {
         * element that contains the map. */
 #map {
     float: left;
-    height: 100vh;
+    height: 92vh;
     width: 100vw;
-    margin: 0;
+    margin-top: 8vh;
     padding: 0;
 }
+/*.navbar{*/
+/*    height: 8vh;*/
+/*}*/
 
+
+#infoText { 
+    color: #e9ecef;
+    background-color: transparent;
+    background-image: none;
+    border-color: #e9ecef;
+    margin-left: 1vw;
+}
+
+
+
+.dropdown-menu {
+    width: 40vw;
+}
+
+#routeInfo {
+    position: absolute;
+    z-index: 99 !important;
+}
 
 #btnModal {
     position: absolute;
     z-index: 99 !important;
     margin-left: 60%;
-    margin-top: 0.7%;
+    margin-top: 10vh;
 }
 
 .modal-dialog {
@@ -90,6 +112,7 @@ html, body {
     top: 30%;
     z-index: 1;
 }
+
 
 /* Safari */
 @-webkit-keyframes spin {
