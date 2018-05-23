@@ -9,14 +9,13 @@ namespace TESWebUI.TSPEngine
 {
     class God
     {
-        private const int ComputionalPower = 5000000;
         private static ConcurrentBag<int[]> _paths;
 
         public static int[] SolveTSP(DistanceMatrixEvaluated evaluatedMatrix)
         {
             int noOfCities = (int) Math.Sqrt(evaluatedMatrix.Distances.Length);
 
-            int noOfUniverses = ComputionalPower / noOfCities;
+            int noOfUniverses = noOfCities * noOfCities * 100;
             _paths = new ConcurrentBag<int[]>();
 
             Parallel.For(0, noOfUniverses, i => CreateUniverse(noOfCities));
