@@ -35,7 +35,6 @@
             <!-- Modal content-->
             <div class="modal-content">
                 <div class="modal-header">
-
                     <h4 class="modal-title">Insert list of cities:</h4>
                     <button type="button" class="close" data-dismiss="modal">&times;</button>
                 </div>
@@ -43,6 +42,9 @@
                     <textarea onkeyup="auto_grow(this)" id="listOfCities">City one
 City two</textarea>
                 </div>
+                <footer class="modal-footer">
+                    <button type="button" class="btn btn-info" id="runTSPBtn" data-dismiss="modal">Apply</button>
+                </footer>
             </div>
 
         </div>
@@ -54,150 +56,175 @@ City two</textarea>
 
 
     @section Scripts
-        {
+    {
         <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyC8ZkBAtPiwp0rk4SRdhH6vufM39eDMmHY&callback=initMap"
                 async defer></script>
 
 
         <script>
-        //TODO Route Display details after click
-        function calculateAndDisplayRoute(directionsService,
-            map,
-            originLat,
-            originLng,
-            destinationLat,
-            destinationLng,
-            toll) {
-            var directionsDisplay = new google.maps.DirectionsRenderer;
-            directionsDisplay.setMap(map);
-            directionsService.route({
-                    origin: new google.maps.LatLng(originLat, originLng),
-                    destination: new google.maps.LatLng(destinationLat, destinationLng),
-                    travelMode: 'DRIVING',
-                    avoidTolls: toll
-                },
-                function(response, status) {
-                    if (status === 'OK') {
-                        directionsDisplay.setDirections(response);
-                    } else {
-                        window.alert('Directions request failed due to ' + status);
-                    }
-                });
-        }
-
-
-        function auto_grow(element) {
-            element.style.height = "5px";
-            element.style.height = (element.scrollHeight) + "px";
+            //TODO Route Display details after click
+            function calculateAndDisplayRoute(directionsService,
+                map,
+                originLat,
+                originLng,
+                destinationLat,
+                destinationLng,
+                toll) {
+                var directionsDisplay = new google.maps.DirectionsRenderer({ suppressMarkers: true });
+                directionsDisplay.setMap(map);
+                directionsService.route({
+                        origin: new google.maps.LatLng(originLat, originLng),
+                        destination: new google.maps.LatLng(destinationLat, destinationLng),
+                        travelMode: 'DRIVING',
+                        avoidTolls: toll
+                    },
+                    function(response, status) {
+                        if (status === 'OK') {
+                            directionsDisplay.setDirections(response);
+                        } else {
+                            window.alert('Directions request failed due to ' + status);
+                        }
+                    });
             }
 
-        function pad2(number) {
-            return (number < 10 ? '0' : '') + number;
-        }
 
-        function initMap() {
-            var directionsService = new google.maps.DirectionsService;
-            var map = new google.maps.Map(document.getElementById('map'),
-                {
-                    zoom: 4,
-                    center: { lat: 0, lng: 0 }
-                });
+            function auto_grow(element) {
+                element.style.height = "5px";
+                element.style.height = (element.scrollHeight) + "px";
+            }
 
-            var onChangeHandler = function() {
-                var listOfCities = document.getElementById("listOfCities").value;
+            function pad2(number) {
+                return (number < 10 ? '0' : '') + number;
+            }
 
-                document.getElementById("loader").style.display = "block";
+            function initMap() {
+                var directionsService = new google.maps.DirectionsService;
+                var map = new google.maps.Map(document.getElementById('map'),
+                    {
+                        zoom: 4,
+                        center: { lat: 0, lng: 0 }
+                    });
 
-                $.ajax({
-                    type: 'POST',
-                    dataType: 'html',
-                    url: '@Url.Action("CalculateBestPath", "Home")',
-                    data: { cities: listOfCities },
-                    success: function(msg) {
+                var onChangeHandler = function() {
+                    var listOfCities = document.getElementById("listOfCities").value;
 
-                        var pathList = JSON.parse(msg);
+                    document.getElementById("loader").style.display = "block";
 
-                        var list = document.getElementById("projectSelectorDropdown");
-                        var totalCost = 0;
-                        var totalTime = 0;
-                        for (var i = 0; i < pathList.length; i++) {
-                            totalCost += pathList[i].Cost;
-                            totalTime += pathList[i].Distance;
+                    $.ajax({
+                        type: 'POST',
+                        dataType: 'html',
+                        url: '@Url.Action("CalculateBestPath", "Home")',
+                        data: { cities: listOfCities },
+                        success: function(msg) {
 
-                            var hours = Math.floor(pathList[i].Distance / 3600);
-                            var minutes = Math.floor((pathList[i].Distance - Math.floor(hours) * 3600) / 60);
-                            var seconds = (pathList[i].Distance % 60);
+                            var pathList = JSON.parse(msg);
 
-                            var routeString2 =
-                                "From " +
-                                pathList[i].StartingCity.Name +
-                                " to " +
-                                pathList[i].EndingCity.Name +
-                                ". Cost: " +
-                                pathList[i].Cost.toFixed(2) + " €." +
-                                " Time: " +
-                                Math.floor(hours) + ":" + pad2(Math.floor(minutes)) + ":" + pad2(Math.floor(seconds)) +
-                                "\n";
-                            var li = document.createElement("li");
-                            var text = document.createTextNode(routeString2);
-                            text.href = "#";
-                            li.appendChild(text);
-                            // alert("option " + opt);
-                            list.appendChild(li);
-                        }
+                            var list = document.getElementById("projectSelectorDropdown");
+                            var totalCost = 0;
+                            var totalTime = 0;
+                            for (var i = 0; i < pathList.length; i++) {
+                                totalCost += pathList[i].Cost;
+                                totalTime += pathList[i].Distance;
 
-                        for (var i = 0; i < pathList.length; i++) {
+                                var hours = Math.floor(pathList[i].Distance / 3600);
+                                var minutes = Math.floor((pathList[i].Distance - Math.floor(hours) * 3600) / 60);
+                                var seconds = (pathList[i].Distance % 60);
 
-                            var isToll = true;
-
-                            if (pathList[i].Cost === 0) {
-                                isToll = false;
+                                var routeString2 =
+                                    "From " +
+                                        pathList[i].StartingCity.Name +
+                                        " to " +
+                                        pathList[i].EndingCity.Name +
+                                        ". Cost: " +
+                                        pathList[i].Cost.toFixed(2) +
+                                        " €." +
+                                        " Time: " +
+                                        Math.floor(hours) +
+                                        ":" +
+                                        pad2(Math.floor(minutes)) +
+                                        ":" +
+                                        pad2(Math.floor(seconds)) +
+                                        "\n";
+                                var li = document.createElement("li");
+                                var text = document.createTextNode(routeString2);
+                                text.href = "#";
+                                li.appendChild(text);
+                                // alert("option " + opt);
+                                list.appendChild(li);
                             }
-                            calculateAndDisplayRoute(directionsService,
-                                map,
-                                pathList[i].StartingCity.Latitude,
-                                pathList[i].StartingCity.Longitude,
-                                pathList[i].EndingCity.Latitude,
-                                pathList[i].EndingCity.Longitude,
-                                isToll);
-                        };
 
-                        var totalHours = Math.floor(totalTime / 3600);
-                        var totalMinutes = Math.floor((totalTime - Math.floor(totalHours) * 3600) / 60);
-                        var totalSeconds = (totalTime % 60);
+                            for (var i = 0; i < pathList.length; i++) {
 
-                        $('#infoText').html(
-                            "Total cost of toll fee: " + totalCost.toFixed(2) + " €. \n" +
-                            "Total travel time: " + Math.floor(totalHours) + ":" + pad2(Math.floor(totalMinutes)) + ":" + pad2(Math.floor(totalSeconds)) + ".");
+                                var isToll = true;
 
-                        //TODO: display markers
-                        for (var i = 0; i < pathList.length; i++) {
-                            var marker = new google.maps.Marker({
-                                position: new google.maps.LatLng(pathList[i].StartingCity.Latitude,
-                                    pathList[i].StartingCity.Longitude),
+                                if (pathList[i].Cost === 0) {
+                                    isToll = false;
+                                }
+                                calculateAndDisplayRoute(directionsService,
+                                    map,
+                                    pathList[i].StartingCity.Latitude,
+                                    pathList[i].StartingCity.Longitude,
+                                    pathList[i].EndingCity.Latitude,
+                                    pathList[i].EndingCity.Longitude,
+                                    isToll);
+                            };
+
+                            var totalHours = Math.floor(totalTime / 3600);
+                            var totalMinutes = Math.floor((totalTime - Math.floor(totalHours) * 3600) / 60);
+                            var totalSeconds = (totalTime % 60);
+
+                            $('#infoText').html(
+                                "Total cost of toll fee: " +
+                                totalCost.toFixed(2) +
+                                " €. \n" +
+                                "Total travel time: " +
+                                Math.floor(totalHours) +
+                                ":" +
+                                pad2(Math.floor(totalMinutes)) +
+                                ":" +
+                                pad2(Math.floor(totalSeconds)) +
+                                ".");
+
+                            var noOfPaths = pathList.length;
+
+                            for (var i = 0; i < noOfPaths; i++) {
+                                new google.maps.Marker({
+                                    position: {
+                                        lat: pathList[i].StartingCity.Latitude,
+                                        lng: pathList[i].StartingCity.Longitude
+                                    },
+                                    map: map,
+                                    label: { text: i.toString(), color: "white", fontWeight: "bold" } 
+                                });
+                            }
+                            new google.maps.Marker({
+                                position: {
+                                    lat: pathList[noOfPaths - 1].EndingCity.Latitude,
+                                    lng: pathList[noOfPaths - 1].EndingCity.Longitude
+                                },
                                 map: map,
-                                title: i
+                                label: { text: noOfPaths.toString(), color: "white", fontWeight: "bold" }
                             });
-                            marker.setMap(map);
+
+
+                            document.getElementById("loader").style.display = "none";
+
+                        },
+                        statusCode: {
+                            404: function(msg) { alert('cannot find resource'); },
+                            500: function(msg) { alert('internal server error'); }
+                        },
+                        error: function(req, status, errorObj) {
+                            // handle status === "timeout"
+                            // handle other errors
                         }
+                    });
+                }
 
-                        document.getElementById("loader").style.display = "none";
+//            document.getElementById('listOfCitiesModal').addEventListener('change', onChangeHandler);
+                document.getElementById('runTSPBtn').onclick = onChangeHandler;
 
-                    },
-                    statusCode: {
-                        404: function(msg) { alert('cannot find resource'); },
-                        500: function(msg) { alert('internal server error'); }
-                    },
-                    error: function(req, status, errorObj) {
-                        // handle status === "timeout"
-                        // handle other errors
-                    }
-                });
             }
-
-            document.getElementById('listOfCitiesModal').addEventListener('change', onChangeHandler);
-
-        }
         </script>
     }
 </body>

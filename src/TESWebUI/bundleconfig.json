@@ -16,18 +16,19 @@
     }
   },
   {
-    "outputFileName": "wwwroot/css/bundle.css",
-    "inputFiles": [
-      "wwwroot/css/site.css",
-      "wwwroot/css/map.css"
-    ]
-  },
-  {
     "outputFileName": "wwwroot/css/bundle.min.css",
     "inputFiles": [
       "wwwroot/css/bootstrap.css",
       "wwwroot/css/map.css",
       "wwwroot/css/site.css"
+    ]
+  },
+  {
+    "outputFileName": "wwwroot/css/bundle.css",
+    "inputFiles": [
+      "wwwroot/css/site.css",
+      "wwwroot/css/map.css",
+      "wwwroot/css/bootstrap.css"
     ]
   }
 ]
