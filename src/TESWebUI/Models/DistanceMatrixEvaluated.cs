@@ -1,8 +1,4 @@
-﻿/***************************************************/
-/* Singleton containing distance matrix            */
-/***************************************************/
-
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using TESWebUI.TSPEngine;
 
@@ -35,6 +31,8 @@ namespace TESWebUI.Models
 
         internal void DownloadData(List<City> listOfCities)
         {
+            ProcessInputData processInputData = new ProcessInputData();
+
             Parallel.For(0, listOfCities.Count, i =>
             {
                 Parallel.For(0, listOfCities.Count, j =>
@@ -54,13 +52,13 @@ namespace TESWebUI.Models
 
                         Parallel.Invoke(
                             () => timeFree =
-                                ProcessInputData.GetDurationBetweenTwoCitiesByFreeRoad(listOfCities[i],
+                                processInputData.GetDurationBetweenTwoCitiesByFreeRoadCall(listOfCities[i],
                                     listOfCities[j]),
                             () => timeToll =
-                                ProcessInputData.GetDurationBetweenTwoCitiesByTollRoad(listOfCities[i],
+                                processInputData.DurationBetweenTwoCitiesByTollRoadCall(listOfCities[i],
                                     listOfCities[j]),
                             () => costToll =
-                                ProcessInputData.GetCostBetweenTwoCities(listOfCities[i], listOfCities[j])
+                                processInputData.CostBetweenTwoCitiesCall(listOfCities[i], listOfCities[j])
                         );
                         // C_G=s×combustion×fuel price [€] = v x t x combustion x fuel 
                         double gasolineCostFree =

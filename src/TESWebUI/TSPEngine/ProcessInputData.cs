@@ -2,11 +2,9 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using System.Xml;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using TESWebUI.Models;
@@ -15,9 +13,17 @@ namespace TESWebUI.TSPEngine
 {
     public class ProcessInputData
     {
-        private static HttpClient _httpClient;
+        private readonly HttpClient _httpClient;
 
-        public static List<string> ReadCities(string incomingCities)
+        public ProcessInputData()
+        {
+            if (_httpClient == null)
+            {
+                _httpClient = new HttpClient();
+            }
+        }
+
+        public List<string> ReadCities(string incomingCities)
         {
             string[] cities = incomingCities.Split(
                 new[] { "\r\n", "\r", "\n" },
@@ -26,14 +32,14 @@ namespace TESWebUI.TSPEngine
             return cities.Where(x => !string.IsNullOrEmpty(x)).ToList();
         }
 
-        public static List<City> GetCitiesFromGoogleApi(List<string> cityNames)
+        public List<City> GetCitiesFromGoogleApi(List<string> cityNames)
         {
             List<City> cities = new List<City>();
             foreach (var cityName in cityNames)
             {
                 City toAdd = new City { Name = cityName };
 
-                JObject locationJson = GetLocationJson(cityName);
+                JObject locationJson = LocationCallToGoogleMapsAPI(cityName);
                 toAdd.Latitude = locationJson["results"][0]["geometry"]["location"]["lat"].Value<double>();
                 toAdd.Longitude = locationJson["results"][0]["geometry"]["location"]["lng"].Value<double>();
 
@@ -44,44 +50,40 @@ namespace TESWebUI.TSPEngine
         }
 
 
-        private static JObject GetLocationJson(string cityName)
+        private JObject LocationCallToGoogleMapsAPI(string cityName)
         {
+
             string url =
                 $"https://maps.googleapis.com/maps/api/geocode/json?address={cityName}&key=AIzaSyBgCjCJuGQsXlAz6BUXPIL2_RSxgXUaCcM";
 
-            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(url);
-            request.AutomaticDecompression = DecompressionMethods.GZip;
+            Task<HttpResponseMessage> getAsync = _httpClient.GetAsync(url);
+            getAsync.Wait();
 
-            using (HttpWebResponse response = (HttpWebResponse)request.GetResponse())
-            using (Stream stream = response.GetResponseStream())
-            using (StreamReader reader = new StreamReader(stream))
+            using (Stream stream = getAsync.Result.Content.ReadAsStreamAsync().Result ??
+                                   throw new ArgumentNullException(
+                                       $"Execption on [{System.Reflection.MethodBase.GetCurrentMethod().Name}]"))
             {
-                var serializer = new JsonSerializer();
-
-                using (var jsonTextReader = new JsonTextReader(reader))
+                using (var jsonTextReader = new JsonTextReader(new StreamReader(stream)))
                 {
-                    JObject json = (JObject)serializer.Deserialize(jsonTextReader);
+                    JObject json = (JObject)new JsonSerializer().Deserialize(jsonTextReader);
                     return json;
                 }
             }
-
         }
 
-        public static double GetCostBetweenTwoCities(City origin, City destination)
+
+        public double CostBetweenTwoCitiesCall(City origin, City destination)
         {
             string url =
                 $"http://apir.viamichelin.com/apir/1/route.xml/fra?steps=1:e:{origin.Longitude}:{origin.Latitude};1:e:{destination.Longitude}:{destination.Latitude}&authkey=JSBS20101202150903217741708195";
-
-            if (_httpClient == null)
-            {
-                _httpClient = new HttpClient();
-            }
 
             Task<HttpResponseMessage> getAsync = _httpClient.GetAsync(url);
             getAsync.Wait();
 
             string content;
-            using (Stream stream = getAsync.Result.Content.ReadAsStreamAsync().Result ?? throw new ArgumentNullException($"Execption on [{System.Reflection.MethodBase.GetCurrentMethod().Name}]"))
+            using (Stream stream = getAsync.Result.Content.ReadAsStreamAsync().Result ??
+                                   throw new ArgumentNullException(
+                                       $"Execption on [{System.Reflection.MethodBase.GetCurrentMethod().Name}]"))
             {
                 using (StreamReader sr = new StreamReader(stream))
                 {
@@ -90,101 +92,75 @@ namespace TESWebUI.TSPEngine
             }
 
             XmlDocument doc = new XmlDocument();
-
             doc.LoadXml(content);
 
             XmlNode node = doc.DocumentElement.SelectSingleNode("/response/iti/header/summaries/summary/tollCost/car");
-            double result = Convert.ToDouble(node.InnerText);
+            double tollCost = Convert.ToDouble(node.InnerText);
 
-//            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(url);
+            XmlNode vinietaNode = doc.DocumentElement.SelectSingleNode("/response/iti/header/summaries/summary/CCZCost/car");
+            double vinietaCost = Convert.ToDouble(vinietaNode.InnerText);
 
-//            request.Method = "GET";
-//            request.UserAgent = "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36";
-//            request.AutomaticDecompression = DecompressionMethods.Deflate | DecompressionMethods.GZip;
-//
-//            HttpWebResponse response = (HttpWebResponse)request.GetResponse();
-//
-//            string content;
-//            using (Stream stream = response.GetResponseStream())
-//            {
-//                using (StreamReader sr = new StreamReader(stream))
-//                {
-//                    content = sr.ReadToEnd();
-//                }
-//            }
-//
-//            XmlDocument doc = new XmlDocument();
-//
-//            doc.LoadXml(content);
-//
-//            XmlNode node = doc.DocumentElement.SelectSingleNode("/response/iti/header/summaries/summary/tollCost/car");
-//            double result = Convert.ToDouble(node.InnerText);
+            double result = tollCost + vinietaCost;
 
             return result / 100;
         }
 
-        public static int GetDurationBetweenTwoCitiesByTollRoad(City origin, City destination)
+        public int DurationBetweenTwoCitiesByTollRoadCall(City origin, City destination)
         {
 
             string url =
                 $"https://maps.googleapis.com/maps/api/distancematrix/json?units=imperial&origins={origin.Latitude},{origin.Longitude}&destinations={destination.Latitude},{destination.Longitude}&key=AIzaSyCdHbtbmF8Y2nfesiu0KUUJagdG7_oui1k";
 
-            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(url);
+            Task<HttpResponseMessage> getAsync = _httpClient.GetAsync(url);
+            getAsync.Wait();
 
-            request.Method = "GET";
-            request.UserAgent = "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36";
-            request.AutomaticDecompression = DecompressionMethods.Deflate | DecompressionMethods.GZip;
-
-            HttpWebResponse response = (HttpWebResponse)request.GetResponse();
-
-            string content;
-            using (Stream stream = response.GetResponseStream())
+            using (Stream stream = getAsync.Result.Content.ReadAsStreamAsync().Result ??
+                                   throw new ArgumentNullException(
+                                       $"Execption on [{System.Reflection.MethodBase.GetCurrentMethod().Name}]"))
             {
-                using (StreamReader sr = new StreamReader(stream))
+                using (var jsonTextReader = new JsonTextReader(new StreamReader(stream)))
                 {
-                    content = sr.ReadToEnd();
+                    JObject json = (JObject)new JsonSerializer().Deserialize(jsonTextReader);
+
+                    try
+                    {
+                        return json["rows"][0]["elements"][0]["duration"]["value"].Value<int>();
+                    }
+                    catch (Exception)
+                    {
+                        return -1;
+                    }
                 }
             }
-
-            var json = JObject.Parse(content);
-
-            try
-            {
-                return json["rows"][0]["elements"][0]["duration"]["value"].Value<int>();
-            }
-            catch (Exception)
-            {
-                return -1;
-            }
-            
         }
 
-        public static int GetDurationBetweenTwoCitiesByFreeRoad(City origin, City destination)
+        public int GetDurationBetweenTwoCitiesByFreeRoadCall(City origin, City destination)
         {
-
             string url =
                 $"https://maps.googleapis.com/maps/api/distancematrix/json?units=imperial&origins={origin.Latitude},{origin.Longitude}&destinations={destination.Latitude},{destination.Longitude}&avoid=tolls&key=AIzaSyCdHbtbmF8Y2nfesiu0KUUJagdG7_oui1k";
- 
-            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(url);
 
-            request.Method = "GET";
-            request.UserAgent = "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36";
-            request.AutomaticDecompression = DecompressionMethods.Deflate | DecompressionMethods.GZip;
 
-            HttpWebResponse response = (HttpWebResponse)request.GetResponse();
+            Task<HttpResponseMessage> getAsync = _httpClient.GetAsync(url);
+            getAsync.Wait();
 
-            string content;
-            using (Stream stream = response.GetResponseStream())
+            using (Stream stream = getAsync.Result.Content.ReadAsStreamAsync().Result ??
+                                   throw new ArgumentNullException(
+                                       $"Execption on [{System.Reflection.MethodBase.GetCurrentMethod().Name}]"))
             {
-                using (StreamReader sr = new StreamReader(stream))
+                using (var jsonTextReader = new JsonTextReader(new StreamReader(stream)))
                 {
-                    content = sr.ReadToEnd();
+                    JObject json = (JObject)new JsonSerializer().Deserialize(jsonTextReader);
+
+                    try
+                    {
+                        return json["rows"][0]["elements"][0]["duration"]["value"].Value<int>();
+                    }
+                    catch (Exception)
+                    {
+                        return -1;
+                    }
                 }
             }
-
-            var json = JObject.Parse(content);
-
-            return json["rows"][0]["elements"][0]["duration"]["value"].Value<int>();
 
         }
     }

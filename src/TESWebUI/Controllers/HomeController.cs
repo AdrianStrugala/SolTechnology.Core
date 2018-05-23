@@ -16,9 +16,11 @@ namespace TESWebUI.Controllers
         [HttpPost]
         public IActionResult CalculateBestPath(string cities)
         {
-            List<string> listOfCitiesAsStrings = ProcessInputData.ReadCities(cities);
+            ProcessInputData processInputData = new ProcessInputData();
+
+            List<string> listOfCitiesAsStrings = processInputData.ReadCities(cities);
             DistanceMatrixEvaluated matrixEvaluated = new DistanceMatrixEvaluated(listOfCitiesAsStrings.Count);
-            List<City> listOfCities = ProcessInputData.GetCitiesFromGoogleApi(listOfCitiesAsStrings);
+            List<City> listOfCities = processInputData.GetCitiesFromGoogleApi(listOfCitiesAsStrings);
 
             matrixEvaluated.DownloadData(listOfCities);
             int[] result = God.SolveTSP(matrixEvaluated);

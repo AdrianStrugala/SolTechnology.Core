@@ -39,7 +39,7 @@ namespace TESWebUI.TSPEngine
             }
         }
 
-        static int[] FindRandomRoute(int noOfCities)
+        private static int[] FindRandomRoute(int noOfCities)
         {
             List<int> toDraw = new List<int>();
 
