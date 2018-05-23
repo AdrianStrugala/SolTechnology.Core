@@ -7,7 +7,12 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TSPEngine", "TSPTimeCost\TS
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TSPTimeCostConsole", "TSPTimeCostConsole\TSPTimeCostConsole.csproj", "{A9F40BBA-87CA-4703-9399-5DAE89BEB378}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TESWebUI", "TESWebUI\TESWebUI.csproj", "{168BFFED-EC60-4CBE-8948-1633BE6E439A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TESWebUI", "TESWebUI\TESWebUI.csproj", "{168BFFED-EC60-4CBE-8948-1633BE6E439A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TESWebUITests", "..\tests\TESWebUITests\TESWebUITests.csproj", "{81A9D1C9-0236-4BB7-86E2-0694C4BC7A88}"
+	ProjectSection(ProjectDependencies) = postProject
+		{168BFFED-EC60-4CBE-8948-1633BE6E439A} = {168BFFED-EC60-4CBE-8948-1633BE6E439A}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -27,6 +32,10 @@ Global
 		{168BFFED-EC60-4CBE-8948-1633BE6E439A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{168BFFED-EC60-4CBE-8948-1633BE6E439A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{168BFFED-EC60-4CBE-8948-1633BE6E439A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{81A9D1C9-0236-4BB7-86E2-0694C4BC7A88}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{81A9D1C9-0236-4BB7-86E2-0694C4BC7A88}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{81A9D1C9-0236-4BB7-86E2-0694C4BC7A88}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{81A9D1C9-0236-4BB7-86E2-0694C4BC7A88}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

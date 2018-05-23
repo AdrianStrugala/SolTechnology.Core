@@ -5,5 +5,13 @@ src/TESWebUI/bin/**/*
 src/TESWebUI/obj/**/*
 src/TESWebUI/obj/*
 src/TESWebUI/bin/*
+tests/**/bin/*
+tests/**/obj/*
 *.cache
 src/packages/**/*
+*.ide-shm
+*.ide
+*.cache
+*.ide-wal
+*.ide
+*.user

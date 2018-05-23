@@ -3,7 +3,10 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Net.Http;
+using System.Threading.Tasks;
 using System.Xml;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using TESWebUI.Models;
@@ -12,6 +15,7 @@ namespace TESWebUI.TSPEngine
 {
     public class ProcessInputData
     {
+        private static HttpClient _httpClient;
 
         public static List<string> ReadCities(string incomingCities)
         {
@@ -65,20 +69,19 @@ namespace TESWebUI.TSPEngine
 
         public static double GetCostBetweenTwoCities(City origin, City destination)
         {
-
             string url =
                 $"http://apir.viamichelin.com/apir/1/route.xml/fra?steps=1:e:{origin.Longitude}:{origin.Latitude};1:e:{destination.Longitude}:{destination.Latitude}&authkey=JSBS20101202150903217741708195";
 
-            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(url);
+            if (_httpClient == null)
+            {
+                _httpClient = new HttpClient();
+            }
 
-            request.Method = "GET";
-            request.UserAgent = "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36";
-            request.AutomaticDecompression = DecompressionMethods.Deflate | DecompressionMethods.GZip;
-
-            HttpWebResponse response = (HttpWebResponse)request.GetResponse();
+            Task<HttpResponseMessage> getAsync = _httpClient.GetAsync(url);
+            getAsync.Wait();
 
             string content;
-            using (Stream stream = response.GetResponseStream())
+            using (Stream stream = getAsync.Result.Content.ReadAsStreamAsync().Result ?? throw new ArgumentNullException($"Execption on [{System.Reflection.MethodBase.GetCurrentMethod().Name}]"))
             {
                 using (StreamReader sr = new StreamReader(stream))
                 {
@@ -92,6 +95,30 @@ namespace TESWebUI.TSPEngine
 
             XmlNode node = doc.DocumentElement.SelectSingleNode("/response/iti/header/summaries/summary/tollCost/car");
             double result = Convert.ToDouble(node.InnerText);
+
+//            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(url);
+
+//            request.Method = "GET";
+//            request.UserAgent = "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36";
+//            request.AutomaticDecompression = DecompressionMethods.Deflate | DecompressionMethods.GZip;
+//
+//            HttpWebResponse response = (HttpWebResponse)request.GetResponse();
+//
+//            string content;
+//            using (Stream stream = response.GetResponseStream())
+//            {
+//                using (StreamReader sr = new StreamReader(stream))
+//                {
+//                    content = sr.ReadToEnd();
+//                }
+//            }
+//
+//            XmlDocument doc = new XmlDocument();
+//
+//            doc.LoadXml(content);
+//
+//            XmlNode node = doc.DocumentElement.SelectSingleNode("/response/iti/header/summaries/summary/tollCost/car");
+//            double result = Convert.ToDouble(node.InnerText);
 
             return result / 100;
         }
