@@ -28,7 +28,7 @@ namespace TESWebUITests.TSPEngine
             };
             
             //Act
-            var result = processingInputData.DurationBetweenTwoCitiesByTollRoadCall(firstCity, secondCity);
+            var result = processingInputData.GetDurationBetweenTwoCitiesByTollRoad(firstCity, secondCity);
 
             //Assert
             Assert.NotEqual(0,result);
@@ -55,7 +55,7 @@ namespace TESWebUITests.TSPEngine
             };
 
             //Act
-            var result = processingInputData.GetDurationBetweenTwoCitiesByFreeRoadCall(firstCity, secondCity);
+            var result = processingInputData.GetDurationBetweenTwoCitiesByFreeRoad(firstCity, secondCity);
 
             //Assert
             Assert.NotEqual(0, result);
@@ -82,7 +82,7 @@ namespace TESWebUITests.TSPEngine
             };
 
             //Act
-            var result = processingInputData.CostBetweenTwoCitiesCall(firstCity, secondCity);
+            var result = processingInputData.GetCostBetweenTwoCities(firstCity, secondCity);
 
             //Assert
             Assert.NotEqual(0, result);

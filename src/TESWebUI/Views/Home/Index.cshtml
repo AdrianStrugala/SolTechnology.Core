@@ -20,7 +20,7 @@
                         <a href="#" class="btn btn-outline-secondary dropdown-toggle" data-toggle="dropdown">Your travel</a>
                         <ul class="dropdown-menu" id="projectSelectorDropdown"></ul>
                     </li>
-                    <li class ="nav-item" id="infoText">
+                    <li class="nav-item" id="infoText">
                     </li>
                 </ul>
 
@@ -44,7 +44,8 @@ City two</textarea>
                 </div>
                 <footer class="modal-footer">
                     <button type="button" class="btn btn-info" id="runTSPBtn" data-dismiss="modal">Apply</button>
-                </footer>
+                </footer>
+
             </div>
 
         </div>
@@ -56,7 +57,7 @@ City two</textarea>
 
 
     @section Scripts
-    {
+        {
         <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyC8ZkBAtPiwp0rk4SRdhH6vufM39eDMmHY&callback=initMap"
                 async defer></script>
 
@@ -149,7 +150,6 @@ City two</textarea>
                                 var text = document.createTextNode(routeString2);
                                 text.href = "#";
                                 li.appendChild(text);
-                                // alert("option " + opt);
                                 list.appendChild(li);
                             }
 
@@ -194,7 +194,7 @@ City two</textarea>
                                         lng: pathList[i].StartingCity.Longitude
                                     },
                                     map: map,
-                                    label: { text: i.toString(), color: "white", fontWeight: "bold" } 
+                                    label: { text: i.toString(), color: "white", fontWeight: "bold" }
                                 });
                             }
                             new google.maps.Marker({
@@ -221,9 +221,7 @@ City two</textarea>
                     });
                 }
 
-//            document.getElementById('listOfCitiesModal').addEventListener('change', onChangeHandler);
                 document.getElementById('runTSPBtn').onclick = onChangeHandler;
-
             }
         </script>
     }

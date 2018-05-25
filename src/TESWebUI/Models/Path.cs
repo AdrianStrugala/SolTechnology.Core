@@ -1,8 +1,4 @@
-﻿/***************************************************/
-/* Singleton containing best path as order of cities */
-/***************************************************/
-
-namespace TESWebUI.Models {
+﻿namespace TESWebUI.Models {
     public sealed class Path {
 
         public City StartingCity { get; set; }
