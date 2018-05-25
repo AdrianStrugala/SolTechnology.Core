@@ -22,7 +22,7 @@ namespace TESWebUI.Controllers
             DistanceMatrixEvaluated matrixEvaluated = new DistanceMatrixEvaluated(listOfCitiesAsStrings.Count);
             List<City> listOfCities = processInputData.GetCitiesFromGoogleApi(listOfCitiesAsStrings);
 
-            matrixEvaluated.DownloadData(listOfCities);
+            matrixEvaluated.DownloadDataToMatrix(listOfCities);
             int[] result = God.SolveTSP(matrixEvaluated);
 
             List<Path> paths = new List<Path>();
