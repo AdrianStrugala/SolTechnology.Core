@@ -5,14 +5,20 @@ VisualStudioVersion = 15.0.27130.2036
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TSPEngine", "TSPTimeCost\TSPEngine.csproj", "{F73D2686-8B20-4BC7-A743-79633CA2CD0B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TSPTimeCostConsole", "TSPTimeCostConsole\TSPTimeCostConsole.csproj", "{A9F40BBA-87CA-4703-9399-5DAE89BEB378}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TESWebUI", "TESWebUI\TESWebUI.csproj", "{168BFFED-EC60-4CBE-8948-1633BE6E439A}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TESWebUITests", "..\tests\TESWebUITests\TESWebUITests.csproj", "{81A9D1C9-0236-4BB7-86E2-0694C4BC7A88}"
 	ProjectSection(ProjectDependencies) = postProject
+		{890C2C9C-DEA5-439C-A3FF-11D88F2DEAB0} = {890C2C9C-DEA5-439C-A3FF-11D88F2DEAB0}
+	EndProjectSection
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TESWebUITests", "..\tests\TESWebUITests\TESWebUITests.csproj", "{81A9D1C9-0236-4BB7-86E2-0694C4BC7A88}"
+	ProjectSection(ProjectDependencies) = postProject
+		{890C2C9C-DEA5-439C-A3FF-11D88F2DEAB0} = {890C2C9C-DEA5-439C-A3FF-11D88F2DEAB0}
 		{168BFFED-EC60-4CBE-8948-1633BE6E439A} = {168BFFED-EC60-4CBE-8948-1633BE6E439A}
 	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TravelingSalesmanProblem", "TravelingSalesmanProblem\TravelingSalesmanProblem.csproj", "{890C2C9C-DEA5-439C-A3FF-11D88F2DEAB0}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{55867FA2-33B1-48B4-AC03-D2F72DD60441}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -24,10 +30,6 @@ Global
 		{F73D2686-8B20-4BC7-A743-79633CA2CD0B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F73D2686-8B20-4BC7-A743-79633CA2CD0B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F73D2686-8B20-4BC7-A743-79633CA2CD0B}.Release|Any CPU.Build.0 = Release|Any CPU
-		{A9F40BBA-87CA-4703-9399-5DAE89BEB378}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{A9F40BBA-87CA-4703-9399-5DAE89BEB378}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{A9F40BBA-87CA-4703-9399-5DAE89BEB378}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{A9F40BBA-87CA-4703-9399-5DAE89BEB378}.Release|Any CPU.Build.0 = Release|Any CPU
 		{168BFFED-EC60-4CBE-8948-1633BE6E439A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{168BFFED-EC60-4CBE-8948-1633BE6E439A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{168BFFED-EC60-4CBE-8948-1633BE6E439A}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -36,9 +38,16 @@ Global
 		{81A9D1C9-0236-4BB7-86E2-0694C4BC7A88}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{81A9D1C9-0236-4BB7-86E2-0694C4BC7A88}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{81A9D1C9-0236-4BB7-86E2-0694C4BC7A88}.Release|Any CPU.Build.0 = Release|Any CPU
+		{890C2C9C-DEA5-439C-A3FF-11D88F2DEAB0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{890C2C9C-DEA5-439C-A3FF-11D88F2DEAB0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{890C2C9C-DEA5-439C-A3FF-11D88F2DEAB0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{890C2C9C-DEA5-439C-A3FF-11D88F2DEAB0}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{81A9D1C9-0236-4BB7-86E2-0694C4BC7A88} = {55867FA2-33B1-48B4-AC03-D2F72DD60441}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {00F9DE65-0AAA-464E-9C25-8FC931194B32}

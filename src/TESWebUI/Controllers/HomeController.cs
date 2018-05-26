@@ -1,8 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
-using TESWebUI.Models;
-using TESWebUI.TSPEngine;
+using TESWebUI.ExternalConnection;
+using TESWebUI.Models.ViewModels;
+using TravelingSalesmanProblem.Models;
 
 namespace TESWebUI.Controllers
 {
@@ -16,14 +17,15 @@ namespace TESWebUI.Controllers
         [HttpPost]
         public IActionResult CalculateBestPath(string cities)
         {
+            var TSPSolver = new TravelingSalesmanProblem.God();
             ProcessInputData processInputData = new ProcessInputData();
 
             List<string> listOfCitiesAsStrings = processInputData.ReadCities(cities);
             DistanceMatrixEvaluated matrixEvaluated = new DistanceMatrixEvaluated(listOfCitiesAsStrings.Count);
-            List<City> listOfCities = processInputData.GetCitiesFromGoogleApi(listOfCitiesAsStrings);
+            var listOfCities = processInputData.GetCitiesFromGoogleApi(listOfCitiesAsStrings);
 
-            matrixEvaluated.DownloadDataToMatrix(listOfCities);
-            int[] result = God.SolveTSP(matrixEvaluated);
+            matrixEvaluated = processInputData.FillMatrixWithData(listOfCities, matrixEvaluated);
+            int[] result = TSPSolver.SolveTSP(matrixEvaluated);
 
             List<Path> paths = new List<Path>();
             for (int i = 0; i < result.Length - 1; i++)
@@ -36,10 +38,8 @@ namespace TESWebUI.Controllers
                     Distance = matrixEvaluated.Distances[result[i + 1] + result[i]  * listOfCitiesAsStrings.Count],
                     Goal = matrixEvaluated.Goals[result[i + 1] + result[i] * listOfCitiesAsStrings.Count]
                 };
-
                 paths.Add(currentPath);
             }
-
             return Content(Newtonsoft.Json.JsonConvert.SerializeObject(paths));
         }
 

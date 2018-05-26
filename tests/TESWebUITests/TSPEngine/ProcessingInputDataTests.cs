@@ -1,6 +1,6 @@
 using System.Collections.Generic;
-using TESWebUI.Models;
-using TESWebUI.TSPEngine;
+using TESWebUI.ExternalConnection;
+using TravelingSalesmanProblem.Models;
 using Xunit;
 
 namespace TESWebUITests.TSPEngine

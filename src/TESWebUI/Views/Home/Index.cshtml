@@ -5,6 +5,7 @@
 
 <body style="margin: 0;">
 
+    <!-- Navbar -->
     <div class="navbar navbar-expand-lg fixed-top navbar-dark bg-primary">
         <div class="container">
             <a href="" class="navbar-brand">Dream Travel</a>
@@ -55,29 +56,39 @@ City two</textarea>
     <div id="loader"></div>
     <div id="map"></div>
 
-
     @section Scripts
         {
-        <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyC8ZkBAtPiwp0rk4SRdhH6vufM39eDMmHY&callback=initMap"
-                async defer></script>
+        <script>
+            function auto_grow(element) {
+                element.style.height = "5px";
+                element.style.height = (element.scrollHeight) + "px";
+            }
+        </script>
 
+        <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyC8ZkBAtPiwp0rk4SRdhH6vufM39eDMmHY&callback=initMap"
+                async defer>
+        </script>
 
         <script>
+            var markers = [];
+            var routes = [];
+
             //TODO Route Display details after click
-            function calculateAndDisplayRoute(directionsService,
-                map,
-                originLat,
-                originLng,
-                destinationLat,
-                destinationLng,
-                toll) {
-                var directionsDisplay = new google.maps.DirectionsRenderer({ suppressMarkers: true });
+            function displayRoute(directionsService, map, path)
+            {
+                var isToll = false;
+                if (path.Cost === 0) {
+                    isToll = true;
+                }
+
+                var directionsDisplay = new window.google.maps.DirectionsRenderer({ suppressMarkers: true });
                 directionsDisplay.setMap(map);
+
                 directionsService.route({
-                        origin: new google.maps.LatLng(originLat, originLng),
-                        destination: new google.maps.LatLng(destinationLat, destinationLng),
+                    origin: new window.google.maps.LatLng(path.StartingCity.Latitude, path.StartingCity.Longitude),
+                    destination: new window.google.maps.LatLng(path.EndingCity.Latitude, path.EndingCity.Longitude),
                         travelMode: 'DRIVING',
-                        avoidTolls: toll
+                    avoidTolls: isToll
                     },
                     function(response, status) {
                         if (status === 'OK') {
@@ -86,21 +97,93 @@ City two</textarea>
                             window.alert('Directions request failed due to ' + status);
                         }
                     });
+
+                routes.push(directionsDisplay);
             }
 
-
-            function auto_grow(element) {
-                element.style.height = "5px";
-                element.style.height = (element.scrollHeight) + "px";
+            function displayMarker(map, latitude, longtitude, number) {
+                var marker = new window.google.maps.Marker({
+                    position: {
+                        lat: latitude,
+                        lng: longtitude
+                    },
+                    map: map,
+                    label: {
+                        text: number.toString(),
+                        color: "white",
+                        fontWeight: "bold"
+                    }
+                });
+                markers.push(marker);
             }
 
             function pad2(number) {
                 return (number < 10 ? '0' : '') + number;
             }
 
+            function cleanMap(list) {
+                for (var i = 0; i < routes.length; i++) {
+                    routes[i].setMap(null);
+                }
+                routes = [];
+
+                for (var i = 0; i < markers.length; i++) {
+                    markers[i].setMap(null);
+                }
+                markers = [];
+
+                list.innerHTML = "";
+            }
+
+            function writePathInfo(path, list) {
+
+                var hours = Math.floor(path.Distance / 3600);
+                var minutes = Math.floor((path.Distance - Math.floor(hours) * 3600) / 60);
+                var seconds = (path.Distance % 60);
+
+                var routeString2 =
+                    "From " +
+                        path.StartingCity.Name +
+                        " to " +
+                        path.EndingCity.Name +
+                        ". Cost: " +
+                        path.Cost.toFixed(2) +
+                        " €." +
+                        " Time: " +
+                        Math.floor(hours) +
+                        ":" +
+                        pad2(Math.floor(minutes)) +
+                        ":" +
+                        pad2(Math.floor(seconds)) +
+                        "\n";
+                var li = document.createElement("li");
+                var text = document.createTextNode(routeString2);
+                text.href = "#";
+                li.appendChild(text);
+                list.appendChild(li);
+            }
+
+            function writeInfo(totalTime, totalCost) {
+                var totalHours = Math.floor(totalTime / 3600);
+                var totalMinutes = Math.floor((totalTime - Math.floor(totalHours) * 3600) / 60);
+                var totalSeconds = (totalTime % 60);
+
+                $('#infoText').html(
+                    "Total cost of toll fee: " +
+                    totalCost.toFixed(2) +
+                    " €. \n" +
+                    "Total travel time: " +
+                    Math.floor(totalHours) +
+                    ":" +
+                    pad2(Math.floor(totalMinutes)) +
+                    ":" +
+                    pad2(Math.floor(totalSeconds)) +
+                    ".");
+            }
+
             function initMap() {
-                var directionsService = new google.maps.DirectionsService;
-                var map = new google.maps.Map(document.getElementById('map'),
+                var directionsService = new window.google.maps.DirectionsService;
+                var map = new window.google.maps.Map(document.getElementById('map'),
                     {
                         zoom: 4,
                         center: { lat: 0, lng: 0 }
@@ -108,7 +191,6 @@ City two</textarea>
 
                 var onChangeHandler = function() {
                     var listOfCities = document.getElementById("listOfCities").value;
-
                     document.getElementById("loader").style.display = "block";
 
                     $.ajax({
@@ -118,97 +200,29 @@ City two</textarea>
                         data: { cities: listOfCities },
                         success: function(msg) {
 
-                            var pathList = JSON.parse(msg);
-
-                            var list = document.getElementById("projectSelectorDropdown");
                             var totalCost = 0;
                             var totalTime = 0;
-                            for (var i = 0; i < pathList.length; i++) {
+
+                            var pathList = JSON.parse(msg);
+                            var noOfPaths = pathList.length;
+                            var list = document.getElementById("projectSelectorDropdown");
+
+                            cleanMap(list);
+
+                            for (var i = 0; i < noOfPaths; i++) {
                                 totalCost += pathList[i].Cost;
                                 totalTime += pathList[i].Distance;
 
-                                var hours = Math.floor(pathList[i].Distance / 3600);
-                                var minutes = Math.floor((pathList[i].Distance - Math.floor(hours) * 3600) / 60);
-                                var seconds = (pathList[i].Distance % 60);
+                                writePathInfo(pathList[i], list);
+                                displayRoute(directionsService,map,pathList[i]);
 
-                                var routeString2 =
-                                    "From " +
-                                        pathList[i].StartingCity.Name +
-                                        " to " +
-                                        pathList[i].EndingCity.Name +
-                                        ". Cost: " +
-                                        pathList[i].Cost.toFixed(2) +
-                                        " €." +
-                                        " Time: " +
-                                        Math.floor(hours) +
-                                        ":" +
-                                        pad2(Math.floor(minutes)) +
-                                        ":" +
-                                        pad2(Math.floor(seconds)) +
-                                        "\n";
-                                var li = document.createElement("li");
-                                var text = document.createTextNode(routeString2);
-                                text.href = "#";
-                                li.appendChild(text);
-                                list.appendChild(li);
+                                displayMarker(map, pathList[i].StartingCity.Latitude, pathList[i].StartingCity.Longitude, i);
                             }
 
-                            for (var i = 0; i < pathList.length; i++) {
-
-                                var isToll = true;
-
-                                if (pathList[i].Cost === 0) {
-                                    isToll = false;
-                                }
-                                calculateAndDisplayRoute(directionsService,
-                                    map,
-                                    pathList[i].StartingCity.Latitude,
-                                    pathList[i].StartingCity.Longitude,
-                                    pathList[i].EndingCity.Latitude,
-                                    pathList[i].EndingCity.Longitude,
-                                    isToll);
-                            };
-
-                            var totalHours = Math.floor(totalTime / 3600);
-                            var totalMinutes = Math.floor((totalTime - Math.floor(totalHours) * 3600) / 60);
-                            var totalSeconds = (totalTime % 60);
-
-                            $('#infoText').html(
-                                "Total cost of toll fee: " +
-                                totalCost.toFixed(2) +
-                                " €. \n" +
-                                "Total travel time: " +
-                                Math.floor(totalHours) +
-                                ":" +
-                                pad2(Math.floor(totalMinutes)) +
-                                ":" +
-                                pad2(Math.floor(totalSeconds)) +
-                                ".");
-
-                            var noOfPaths = pathList.length;
-
-                            for (var i = 0; i < noOfPaths; i++) {
-                                new google.maps.Marker({
-                                    position: {
-                                        lat: pathList[i].StartingCity.Latitude,
-                                        lng: pathList[i].StartingCity.Longitude
-                                    },
-                                    map: map,
-                                    label: { text: i.toString(), color: "white", fontWeight: "bold" }
-                                });
-                            }
-                            new google.maps.Marker({
-                                position: {
-                                    lat: pathList[noOfPaths - 1].EndingCity.Latitude,
-                                    lng: pathList[noOfPaths - 1].EndingCity.Longitude
-                                },
-                                map: map,
-                                label: { text: noOfPaths.toString(), color: "white", fontWeight: "bold" }
-                            });
-
+                            displayMarker(map, pathList[noOfPaths-1].EndingCity.Latitude, pathList[noOfPaths-1].EndingCity.Longitude, noOfPaths);
+                            writeInfo(totalTime, totalCost);
 
                             document.getElementById("loader").style.display = "none";
-
                         },
                         statusCode: {
                             404: function(msg) { alert('cannot find resource'); },
@@ -220,7 +234,6 @@ City two</textarea>
                         }
                     });
                 }
-
                 document.getElementById('runTSPBtn').onclick = onChangeHandler;
             }
         </script>

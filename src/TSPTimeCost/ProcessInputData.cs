@@ -209,12 +209,10 @@ namespace TSPTimeCost
             HttpWebResponse response = (HttpWebResponse)request.GetResponse();
 
             string content;
-            using (Stream stream = response.GetResponseStream())
+
+            using (StreamReader sr = new StreamReader(response.GetResponseStream()))
             {
-                using (StreamReader sr = new StreamReader(stream))
-                {
-                    content = sr.ReadToEnd();
-                }
+                content = sr.ReadToEnd();
             }
 
             XmlDocument doc = new XmlDocument();
@@ -242,12 +240,10 @@ namespace TSPTimeCost
             HttpWebResponse response = (HttpWebResponse)request.GetResponse();
 
             string content;
-            using (Stream stream = response.GetResponseStream())
+
+            using (StreamReader sr = new StreamReader(response.GetResponseStream()))
             {
-                using (StreamReader sr = new StreamReader(stream))
-                {
-                    content = sr.ReadToEnd();
-                }
+                content = sr.ReadToEnd();
             }
 
             var json = JObject.Parse(content);
@@ -279,12 +275,9 @@ namespace TSPTimeCost
             HttpWebResponse response = (HttpWebResponse)request.GetResponse();
 
             string content;
-            using (Stream stream = response.GetResponseStream())
+            using (StreamReader sr = new StreamReader(response.GetResponseStream()))
             {
-                using (StreamReader sr = new StreamReader(stream))
-                {
-                    content = sr.ReadToEnd();
-                }
+                content = sr.ReadToEnd();
             }
 
             var json = JObject.Parse(content);
