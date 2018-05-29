@@ -8,7 +8,7 @@ namespace TESWebUITests.TSPEngine
     public class ProcessingInputDataTests
     {
         [Fact]
-        public void DurationBetweenTwoCitiesByTollRoadCall_ReturnsSomeDuration()
+        public void GetDurationBetweenTwoCitiesByTollRoad_InvokeWithValidCities_ReturnsSomeDuration()
         {
             //Arrange
             ProcessInputData processingInputData = new ProcessInputData();
@@ -35,7 +35,7 @@ namespace TESWebUITests.TSPEngine
         }
 
         [Fact]
-        public void GetDurationBetweenTwoCitiesByFreeRoadCall_ReturnsSomeDuration()
+        public void GetDurationBetweenTwoCitiesByFreeRoad_InvokeWithValidCities_ReturnsSomeDuration()
         {
             //Arrange
             ProcessInputData processingInputData = new ProcessInputData();
@@ -62,7 +62,7 @@ namespace TESWebUITests.TSPEngine
         }
 
         [Fact]
-        public void GetCostBetweenTwoCities_ReturnsAnyCost()
+        public void GetCostBetweenTwoCities_InvokeWithValidCities_ReturnsSomeCost()
         {
             //Arrange
             ProcessInputData processingInputData = new ProcessInputData();
@@ -90,7 +90,7 @@ namespace TESWebUITests.TSPEngine
 
 
         [Fact]
-        public void GetCityByName_ReturnsCityObject()
+        public void GetCityByName_InvokeWithRealName_ReturnsCityObject()
         {
             //Arrange
             ProcessInputData processingInputData = new ProcessInputData();

@@ -16,3 +16,6 @@ src/packages/**/*
 *.ide
 *.user
 *.ide
+src/TravelingSalesmanProblem/obj/TravelingSalesmanProblem.csproj.nuget.g.props
+src/TravelingSalesmanProblem/obj/TravelingSalesmanProblem.csproj.nuget.g.targets
+src/TravelingSalesmanProblem/obj/project.assets.json

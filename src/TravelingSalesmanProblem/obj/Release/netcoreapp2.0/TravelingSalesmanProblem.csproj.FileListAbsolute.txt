@@ -1,8 +1,9 @@
-D:\Github\DreamTravel\Traveling-Eco-Salesman\src\TravelingSalesmanProblem\bin\Release\netcoreapp2.0\TravelingSalesmanProblem.deps.json
-D:\Github\DreamTravel\Traveling-Eco-Salesman\src\TravelingSalesmanProblem\bin\Release\netcoreapp2.0\TravelingSalesmanProblem.dll
-D:\Github\DreamTravel\Traveling-Eco-Salesman\src\TravelingSalesmanProblem\bin\Release\netcoreapp2.0\TravelingSalesmanProblem.pdb
-D:\Github\DreamTravel\Traveling-Eco-Salesman\src\TravelingSalesmanProblem\obj\Release\netcoreapp2.0\TravelingSalesmanProblem.csproj.CoreCompileInputs.cache
-D:\Github\DreamTravel\Traveling-Eco-Salesman\src\TravelingSalesmanProblem\obj\Release\netcoreapp2.0\TravelingSalesmanProblem.AssemblyInfoInputs.cache
-D:\Github\DreamTravel\Traveling-Eco-Salesman\src\TravelingSalesmanProblem\obj\Release\netcoreapp2.0\TravelingSalesmanProblem.AssemblyInfo.cs
-D:\Github\DreamTravel\Traveling-Eco-Salesman\src\TravelingSalesmanProblem\obj\Release\netcoreapp2.0\TravelingSalesmanProblem.dll
-D:\Github\DreamTravel\Traveling-Eco-Salesman\src\TravelingSalesmanProblem\obj\Release\netcoreapp2.0\TravelingSalesmanProblem.pdb
+C:\workspace\DreamTravel\src\TravelingSalesmanProblem\bin\Release\netcoreapp2.0\TravelingSalesmanProblem.deps.json
+C:\workspace\DreamTravel\src\TravelingSalesmanProblem\bin\Release\netcoreapp2.0\TravelingSalesmanProblem.dll
+C:\workspace\DreamTravel\src\TravelingSalesmanProblem\bin\Release\netcoreapp2.0\TravelingSalesmanProblem.pdb
+C:\workspace\DreamTravel\src\TravelingSalesmanProblem\obj\Release\netcoreapp2.0\TravelingSalesmanProblem.csprojResolveAssemblyReference.cache
+C:\workspace\DreamTravel\src\TravelingSalesmanProblem\obj\Release\netcoreapp2.0\TravelingSalesmanProblem.csproj.CoreCompileInputs.cache
+C:\workspace\DreamTravel\src\TravelingSalesmanProblem\obj\Release\netcoreapp2.0\TravelingSalesmanProblem.AssemblyInfoInputs.cache
+C:\workspace\DreamTravel\src\TravelingSalesmanProblem\obj\Release\netcoreapp2.0\TravelingSalesmanProblem.AssemblyInfo.cs
+C:\workspace\DreamTravel\src\TravelingSalesmanProblem\obj\Release\netcoreapp2.0\TravelingSalesmanProblem.dll
+C:\workspace\DreamTravel\src\TravelingSalesmanProblem\obj\Release\netcoreapp2.0\TravelingSalesmanProblem.pdb
