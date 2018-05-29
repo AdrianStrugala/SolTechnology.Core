@@ -4,7 +4,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Xml;
 using Newtonsoft.Json.Linq;
-using TESWebUI.Models;
 using TravelingSalesmanProblem.Models;
 
 namespace TESWebUI.ExternalConnection

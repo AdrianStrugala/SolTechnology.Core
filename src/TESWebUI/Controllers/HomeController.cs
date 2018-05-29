@@ -1,8 +1,6 @@
 ﻿using System.Collections.Generic;
-using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using TESWebUI.ExternalConnection;
-using TESWebUI.Models.ViewModels;
 using TravelingSalesmanProblem.Models;
 
 namespace TESWebUI.Controllers
@@ -30,12 +28,6 @@ namespace TESWebUI.Controllers
 
             List<Path> paths = processOutputData.FormOutputFromTSFResult(listOfCities, orderOfCities, matrixEvaluated);
             return Content(Newtonsoft.Json.JsonConvert.SerializeObject(paths));
-        }
-
-
-        public IActionResult Error()
-        {
-            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
     }
 }

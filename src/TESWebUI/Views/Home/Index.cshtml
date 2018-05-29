@@ -141,7 +141,7 @@ City two</textarea>
                 var minutes = Math.floor((path.Distance - Math.floor(hours) * 3600) / 60);
                 var seconds = (path.Distance % 60);
 
-                var routeString2 =
+                var routeString =
                     "From " +
                         path.StartingCity.Name +
                         " to " +
@@ -157,7 +157,7 @@ City two</textarea>
                         pad2(Math.floor(seconds)) +
                         "\n";
                 var li = document.createElement("li");
-                var text = document.createTextNode(routeString2);
+                var text = document.createTextNode(routeString);
                 text.href = "#";
                 li.appendChild(text);
                 list.appendChild(li);
