@@ -100,5 +100,21 @@ namespace TESWebUITests.TSPEngine
             Assert.NotEqual(0, cities[0].Latitude);
             Assert.NotEqual(0, cities[0].Longitude);
         }
+
+
+        [Fact]
+        public void ReadCities_ProvideValidEntryString_ReturnsListOfCities()
+        {
+            //Arrange
+            string entryString = "Wroclaw\nKrakow\rGdansk\r\nWarszawa";
+            //Act
+            var cities = _sut.ReadCities(entryString);
+
+            //Assert
+            Assert.Equal("Wroclaw", cities[0]);
+            Assert.Equal("Krakow", cities[1]);
+            Assert.Equal("Gdansk", cities[2]);
+            Assert.Equal("Warszawa", cities[3]);
+        }
     }
 }
