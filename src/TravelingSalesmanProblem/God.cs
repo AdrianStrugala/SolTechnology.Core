@@ -10,15 +10,15 @@ namespace TravelingSalesmanProblem
         private static ConcurrentBag<int[]> _paths;
         private const int NoOfUniverses = 500000;
 
-        public override int[] SolveTSP(IDistanceMatrix evaluatedMatrix)
+        public override int[] SolveTSP(IDistanceMatrix distanceMatrix)
         {
-            int noOfCities = (int) Math.Sqrt(evaluatedMatrix.Distances.Length);
+            int noOfCities = (int) Math.Sqrt(distanceMatrix.Distances.Length);
 
             _paths = new ConcurrentBag<int[]>();
 
             Parallel.For(0, NoOfUniverses, i => CreateUniverse(noOfCities));
 
-            var minimumPath = FindMinimumPathInListOfPaths(_paths, evaluatedMatrix, noOfCities);
+            var minimumPath = FindMinimumPathInListOfPaths(_paths, distanceMatrix, noOfCities);
 
             return minimumPath;
         }

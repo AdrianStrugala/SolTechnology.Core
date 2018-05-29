@@ -19,27 +19,16 @@ namespace TESWebUI.Controllers
         {
             var TSPSolver = new TravelingSalesmanProblem.God();
             ProcessInputData processInputData = new ProcessInputData();
+            ProcessOutputData processOutputData = new ProcessOutputData();
 
             List<string> listOfCitiesAsStrings = processInputData.ReadCities(cities);
             DistanceMatrixEvaluated matrixEvaluated = new DistanceMatrixEvaluated(listOfCitiesAsStrings.Count);
             var listOfCities = processInputData.GetCitiesFromGoogleApi(listOfCitiesAsStrings);
 
             matrixEvaluated = processInputData.FillMatrixWithData(listOfCities, matrixEvaluated);
-            int[] result = TSPSolver.SolveTSP(matrixEvaluated);
+            int[] orderOfCities = TSPSolver.SolveTSP(matrixEvaluated);
 
-            List<Path> paths = new List<Path>();
-            for (int i = 0; i < result.Length - 1; i++)
-            {
-                Path currentPath = new Path
-                {
-                    StartingCity = listOfCities[result[i]],
-                    EndingCity = listOfCities[result[i + 1]],
-                    Cost = matrixEvaluated.Costs[result[i + 1] + result[i] * listOfCitiesAsStrings.Count],
-                    Distance = matrixEvaluated.Distances[result[i + 1] + result[i]  * listOfCitiesAsStrings.Count],
-                    Goal = matrixEvaluated.Goals[result[i + 1] + result[i] * listOfCitiesAsStrings.Count]
-                };
-                paths.Add(currentPath);
-            }
+            List<Path> paths = processOutputData.FormOutputFromTSFResult(listOfCities, orderOfCities, matrixEvaluated);
             return Content(Newtonsoft.Json.JsonConvert.SerializeObject(paths));
         }
 
