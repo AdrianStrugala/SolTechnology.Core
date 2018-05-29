@@ -73,7 +73,7 @@ namespace TravelingSalesmanProblem
             return result;
         }
 
-        public static class StaticRandom
+        protected static class StaticRandom
         {
             static int _seed = Environment.TickCount;
 
