@@ -5,7 +5,7 @@ using Xunit;
 
 namespace TravelingSalesmanProblemTests
 {
-    public class UnitTest1
+    public class GodTests
     {
         readonly God _sut = new God();
 

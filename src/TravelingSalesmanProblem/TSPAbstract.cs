@@ -37,15 +37,14 @@ namespace TravelingSalesmanProblem
             return foundPath;
         }
 
-        protected static int[] FindMinimumPathInListOfPaths(IEnumerable<int[]> pathList, IDistanceMatrix distanceMatrix,
-            int noOfCities)
+        protected int[] FindMinimumPathInListOfPaths(IEnumerable<int[]> pathList, IDistanceMatrix distanceMatrix, int noOfCities)
         {
             double min = double.MaxValue;
             int[] resultPath = new int[noOfCities];
 
             foreach (var path in pathList)
             {
-                if (path != null)
+                if (path != null && path.Length == noOfCities)
                 {
                     double distance = CalculateDistanceInPath(path, distanceMatrix);
                     if (distance < min)
@@ -58,7 +57,7 @@ namespace TravelingSalesmanProblem
             return resultPath;
         }
 
-        public static double CalculateDistanceInPath(int[] path, IDistanceMatrix distanceMatrix)
+        public double CalculateDistanceInPath(int[] path, IDistanceMatrix distanceMatrix)
         {
             double result = 0;
 
@@ -69,7 +68,6 @@ namespace TravelingSalesmanProblem
                     result += distanceMatrix.Distances[path[i] * path.Length + path[i + 1]];
                 }
             }
-
             return result;
         }
 
