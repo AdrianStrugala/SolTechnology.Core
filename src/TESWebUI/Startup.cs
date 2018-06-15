@@ -19,6 +19,21 @@ namespace TESWebUI
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMvc();
+
+
+            //AUTHENTICATION TURNED OFF
+
+//            var configurationRoot = new ConfigurationBuilder()
+//                .AddJsonFile("appsettings.json")
+//                .AddEnvironmentVariables("APPSETTING_")
+//                .Build();
+//
+//            services.AddAuthentication(DreamAuthenticationOptions.AuthenticationScheme)
+//                .AddScheme<DreamAuthenticationOptions, DreamAuthentication>(
+//                    DreamAuthenticationOptions.AuthenticationScheme,
+//                    null);
+
+//            services.Configure<DreamAuthenticationOptions>(DreamAuthenticationOptions.AuthenticationScheme, configurationRoot);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

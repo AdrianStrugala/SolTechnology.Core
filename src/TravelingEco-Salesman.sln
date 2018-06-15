@@ -25,8 +25,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TravelingSalesmanProblemTes
 		{890C2C9C-DEA5-439C-A3FF-11D88F2DEAB0} = {890C2C9C-DEA5-439C-A3FF-11D88F2DEAB0}
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Authentication", "Authentication\Authentication.csproj", "{066FB93B-28D2-4F65-A3EA-173AEC70BC47}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -53,10 +51,6 @@ Global
 		{15E7697D-59D6-426F-A9A9-A3ABA90A070A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{15E7697D-59D6-426F-A9A9-A3ABA90A070A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{15E7697D-59D6-426F-A9A9-A3ABA90A070A}.Release|Any CPU.Build.0 = Release|Any CPU
-		{066FB93B-28D2-4F65-A3EA-173AEC70BC47}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{066FB93B-28D2-4F65-A3EA-173AEC70BC47}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{066FB93B-28D2-4F65-A3EA-173AEC70BC47}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{066FB93B-28D2-4F65-A3EA-173AEC70BC47}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
