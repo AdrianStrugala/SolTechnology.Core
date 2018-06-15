@@ -41,7 +41,7 @@ namespace TESWebUI.Authentication
 
             if (!DreamAuthenticationOptions.AuthenticationScheme.Equals(headerValue.Scheme, StringComparison.OrdinalIgnoreCase))
             {
-                _logger.LogWarning($"Not ComparexAuthentication schema");
+                _logger.LogWarning($"Not DreamAuthentication schema");
                 return AuthenticateResult.Fail("Not DreamAuthentication schema");
             }
 
