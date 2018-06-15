@@ -664,30 +664,35 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\Adrian\\.nuget\\packages\\": {},
-    "c:\\program files\\dotnet\\sdk\\NuGetFallbackFolder": {}
+    "C:\\Users\\Adrian.Strugala\\.nuget\\packages\\": {},
+    "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackagesFallback\\": {},
+    "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "D:\\Github\\DreamTravel\\Traveling-Eco-Salesman\\src\\TravelingSalesmanProblem\\TravelingSalesmanProblem.csproj",
+      "projectUniqueName": "C:\\workspace\\DreamTravel\\src\\TravelingSalesmanProblem\\TravelingSalesmanProblem.csproj",
       "projectName": "TravelingSalesmanProblem",
-      "projectPath": "D:\\Github\\DreamTravel\\Traveling-Eco-Salesman\\src\\TravelingSalesmanProblem\\TravelingSalesmanProblem.csproj",
-      "packagesPath": "C:\\Users\\Adrian\\.nuget\\packages\\",
-      "outputPath": "D:\\Github\\DreamTravel\\Traveling-Eco-Salesman\\src\\TravelingSalesmanProblem\\obj\\",
+      "projectPath": "C:\\workspace\\DreamTravel\\src\\TravelingSalesmanProblem\\TravelingSalesmanProblem.csproj",
+      "packagesPath": "C:\\Users\\Adrian.Strugala\\.nuget\\packages\\",
+      "outputPath": "C:\\workspace\\DreamTravel\\src\\TravelingSalesmanProblem\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
-        "c:\\program files\\dotnet\\sdk\\NuGetFallbackFolder"
+        "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackagesFallback\\",
+        "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
       ],
       "configFilePaths": [
-        "C:\\Users\\Adrian\\AppData\\Roaming\\NuGet\\NuGet.Config",
-        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+        "C:\\Users\\Adrian.Strugala\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config",
+        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.Fallback.config"
       ],
       "originalTargetFrameworks": [
         "netcoreapp2.0"
       ],
       "sources": {
         "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+        "C:\\workspace\\PMP\\Libs\\Telemetry.Infrastructure": {},
+        "http://nuget.org/api/v2/": {},
         "https://api.nuget.org/v3/index.json": {}
       },
       "frameworks": {

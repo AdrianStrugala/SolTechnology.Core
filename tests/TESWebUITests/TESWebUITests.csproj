@@ -14,7 +14,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\TESWebUI\TESWebUI.csproj" />
+    <ProjectReference Include="..\..\src\DreamTravel\DreamTravel.csproj" />
+    <ProjectReference Include="..\..\src\TravelingSalesmanProblem\TravelingSalesmanProblem.csproj" />
   </ItemGroup>
 
 </Project>

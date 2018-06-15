@@ -1,0 +1,241 @@
+﻿@{
+    Layout = "_Layout";
+    ViewData["Title"] = "Dream Travel";
+}
+
+<body style="margin: 0;">
+
+    <!-- Navbar -->
+    <div class="navbar navbar-expand-lg fixed-top navbar-dark bg-primary">
+        <div class="container">
+            <a href="" class="navbar-brand">Dream Travel</a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarResponsive">
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <button type="button" class="btn btn-outline-secondary" data-toggle="modal" data-target="#listOfCitiesModal">Cities</button>
+                    </li>
+                    <li class="dropdown nav-item">
+                        <a href="#" class="btn btn-outline-secondary dropdown-toggle" data-toggle="dropdown">Your travel</a>
+                        <ul class="dropdown-menu" id="projectSelectorDropdown"></ul>
+                    </li>
+                    <li class="nav-item" id="infoText">
+                    </li>
+                </ul>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal -->
+    <div id="listOfCitiesModal" class="modal fade" role="dialog">
+        <div class="modal-dialog">
+
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Insert list of cities:</h4>
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <textarea onkeyup="auto_grow(this)" id="listOfCities">City one
+City two</textarea>
+                </div>
+                <footer class="modal-footer">
+                    <button type="button" class="btn btn-info" id="runTSPBtn" data-dismiss="modal">Apply</button>
+                </footer>
+
+            </div>
+
+        </div>
+    </div>
+
+
+    <div id="loader"></div>
+    <div id="map"></div>
+
+    @section Scripts
+        {
+        <script>
+            function auto_grow(element) {
+                element.style.height = "5px";
+                element.style.height = (element.scrollHeight) + "px";
+            }
+        </script>
+
+        <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyC8ZkBAtPiwp0rk4SRdhH6vufM39eDMmHY&callback=initMap"
+                async defer>
+        </script>
+
+        <script>
+            var markers = [];
+            var routes = [];
+
+            //TODO Route Display details after click
+            function displayRoute(directionsService, map, path)
+            {
+                var isToll = false;
+                if (path.Cost === 0) {
+                    isToll = true;
+                }
+
+                var directionsDisplay = new window.google.maps.DirectionsRenderer({ suppressMarkers: true });
+                directionsDisplay.setMap(map);
+
+                directionsService.route({
+                    origin: new window.google.maps.LatLng(path.StartingCity.Latitude, path.StartingCity.Longitude),
+                    destination: new window.google.maps.LatLng(path.EndingCity.Latitude, path.EndingCity.Longitude),
+                        travelMode: 'DRIVING',
+                    avoidTolls: isToll
+                    },
+                    function(response, status) {
+                        if (status === 'OK') {
+                            directionsDisplay.setDirections(response);
+                        } else {
+                            window.alert('Directions request failed due to ' + status);
+                        }
+                    });
+
+                routes.push(directionsDisplay);
+            }
+
+            function displayMarker(map, latitude, longtitude, number) {
+                var marker = new window.google.maps.Marker({
+                    position: {
+                        lat: latitude,
+                        lng: longtitude
+                    },
+                    map: map,
+                    label: {
+                        text: number.toString(),
+                        color: "white",
+                        fontWeight: "bold"
+                    }
+                });
+                markers.push(marker);
+            }
+
+            function pad2(number) {
+                return (number < 10 ? '0' : '') + number;
+            }
+
+            function cleanMap(list) {
+                for (var i = 0; i < routes.length; i++) {
+                    routes[i].setMap(null);
+                }
+                routes = [];
+
+                for (var i = 0; i < markers.length; i++) {
+                    markers[i].setMap(null);
+                }
+                markers = [];
+
+                list.innerHTML = "";
+            }
+
+            function writePathInfo(path, list) {
+
+                var hours = Math.floor(path.Distance / 3600);
+                var minutes = Math.floor((path.Distance - Math.floor(hours) * 3600) / 60);
+                var seconds = (path.Distance % 60);
+
+                var routeString =
+                    "From " +
+                        path.StartingCity.Name +
+                        " to " +
+                        path.EndingCity.Name +
+                        ". Cost: " +
+                        path.Cost.toFixed(2) +
+                        " €." +
+                        " Time: " +
+                        Math.floor(hours) +
+                        ":" +
+                        pad2(Math.floor(minutes)) +
+                        ":" +
+                        pad2(Math.floor(seconds)) +
+                        "\n";
+                var li = document.createElement("li");
+                var text = document.createTextNode(routeString);
+                text.href = "#";
+                li.appendChild(text);
+                list.appendChild(li);
+            }
+
+            function writeInfo(totalTime, totalCost) {
+                var totalHours = Math.floor(totalTime / 3600);
+                var totalMinutes = Math.floor((totalTime - Math.floor(totalHours) * 3600) / 60);
+                var totalSeconds = (totalTime % 60);
+
+                $('#infoText').html(
+                    "Total cost of toll fee: " +
+                    totalCost.toFixed(2) +
+                    " €. \n" +
+                    "Total travel time: " +
+                    Math.floor(totalHours) +
+                    ":" +
+                    pad2(Math.floor(totalMinutes)) +
+                    ":" +
+                    pad2(Math.floor(totalSeconds)) +
+                    ".");
+            }
+
+            function initMap() {
+                var directionsService = new window.google.maps.DirectionsService;
+                var map = new window.google.maps.Map(document.getElementById('map'),
+                    {
+                        zoom: 4,
+                        center: { lat: 0, lng: 0 }
+                    });
+
+                var onChangeHandler = function() {
+                    var listOfCities = document.getElementById("listOfCities").value;
+                    document.getElementById("loader").style.display = "block";
+
+                    $.ajax({
+                        type: 'POST',
+                        dataType: 'html',
+                        url: '@Url.Action("CalculateBestPath", "Home")',
+                        data: { cities: listOfCities },
+                        success: function(msg) {
+
+                            var totalCost = 0;
+                            var totalTime = 0;
+
+                            var pathList = JSON.parse(msg);
+                            var noOfPaths = pathList.length;
+                            var list = document.getElementById("projectSelectorDropdown");
+
+                            cleanMap(list);
+
+                            for (var i = 0; i < noOfPaths; i++) {
+                                totalCost += pathList[i].Cost;
+                                totalTime += pathList[i].Distance;
+
+                                writePathInfo(pathList[i], list);
+                                displayRoute(directionsService,map,pathList[i]);
+
+                                displayMarker(map, pathList[i].StartingCity.Latitude, pathList[i].StartingCity.Longitude, i);
+                            }
+
+                            displayMarker(map, pathList[noOfPaths-1].EndingCity.Latitude, pathList[noOfPaths-1].EndingCity.Longitude, noOfPaths);
+                            writeInfo(totalTime, totalCost);
+
+                            document.getElementById("loader").style.display = "none";
+                        },
+                        statusCode: {
+                            404: function(msg) { alert('cannot find resource'); },
+                            500: function(msg) { alert('internal server error'); }
+                        },
+                        error: function(req, status, errorObj) {
+                            // handle status === "timeout"
+                            // handle other errors
+                        }
+                    });
+                }
+                document.getElementById('runTSPBtn').onclick = onChangeHandler;
+            }
+        </script>
+    }
+</body>
