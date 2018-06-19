@@ -17,7 +17,7 @@
                     <li class="nav-item">
                         <button type="button" class="btn btn-outline-secondary" data-toggle="modal" data-target="#listOfCitiesModal">Cities</button>
                     </li>
-                    <li class="dropdown nav-item">
+                    <li class="dropdown nav-item" id="listOfCitiesBtn" display="none">
                         <a href="#" class="btn btn-outline-secondary dropdown-toggle" data-toggle="dropdown">Your travel</a>
                         <ul class="dropdown-menu" id="projectSelectorDropdown"></ul>
                     </li>
@@ -40,8 +40,10 @@
                     <button type="button" class="close" data-dismiss="modal">&times;</button>
                 </div>
                 <div class="modal-body">
-                    <textarea onkeyup="auto_grow(this)" id="listOfCities">City one
-City two</textarea>
+                    <textarea onkeyup="auto_grow(this)" id="listOfCities">
+First City
+Last City
+</textarea>
                 </div>
                 <footer class="modal-footer">
                     <button type="button" class="btn btn-info" id="runTSPBtn" data-dismiss="modal">Apply</button>
@@ -182,6 +184,7 @@ City two</textarea>
             }
 
             function initMap() {
+                document.getElementById("listOfCitiesBtn").style.display = "none";
                 var directionsService = new window.google.maps.DirectionsService;
                 var map = new window.google.maps.Map(document.getElementById('map'),
                     {
@@ -222,6 +225,7 @@ City two</textarea>
                             displayMarker(map, pathList[noOfPaths-1].EndingCity.Latitude, pathList[noOfPaths-1].EndingCity.Longitude, noOfPaths);
                             writeInfo(totalTime, totalCost);
 
+                            document.getElementById("listOfCitiesBtn").style.display = "initial";
                             document.getElementById("loader").style.display = "none";
                         },
                         statusCode: {
