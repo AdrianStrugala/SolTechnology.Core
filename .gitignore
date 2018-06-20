@@ -11,3 +11,4 @@ src/packages/**/*
 *.ide
 *.user
 *.ide
+*.dbmdl
