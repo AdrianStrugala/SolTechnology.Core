@@ -13,8 +13,10 @@ namespace DreamTravel.Controllers
         }
 
         [HttpPost]
-        public IActionResult CalculateBestPath(string cities)
+        public IActionResult CalculateBestPath(string cities, string sessionId)
         {
+            var xd = sessionId;
+
             var TSPSolver = new TravelingSalesmanProblem.God();
             ProcessInputData processInputData = new ProcessInputData();
             ProcessOutputData processOutputData = new ProcessOutputData();

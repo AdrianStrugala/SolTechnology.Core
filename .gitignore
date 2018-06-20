@@ -12,3 +12,4 @@ src/packages/**/*
 *.user
 *.ide
 *.dbmdl
+*.jfm
