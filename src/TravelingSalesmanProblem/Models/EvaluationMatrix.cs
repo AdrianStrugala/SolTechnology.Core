@@ -2,13 +2,13 @@
 
 namespace TravelingSalesmanProblem.Models
 {
-    public sealed class DistanceMatrixEvaluated : IDistanceMatrix
+    public sealed class EvaluationMatrix : IEvaluationMatrix
     {
         public double[] Distances { get; set; }
         public double[] Goals { get; set; }
         public double[] Costs { get; set; }
 
-        public DistanceMatrixEvaluated(int noOfCities)
+        public EvaluationMatrix(int noOfCities)
         {
             Parallel.Invoke(
                 () => Distances = new double[noOfCities * noOfCities],

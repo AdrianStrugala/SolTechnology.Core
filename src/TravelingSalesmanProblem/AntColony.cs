@@ -24,11 +24,11 @@ namespace TravelingSalesmanProblem
         private int[] _bestPath;
         private static int _noOfCities;
 
-        public override int[] SolveTSP(IDistanceMatrix distanceMatrix)
+        public override int[] SolveTSP(double[] distances)
         {
-            _noOfCities = (int)Math.Sqrt(distanceMatrix.Distances.Length);
-            InitializeParameters(distanceMatrix);
-            FillAttractivenessMatrix(distanceMatrix);
+            _noOfCities = (int)Math.Sqrt(distances.Length);
+            InitializeParameters(distances);
+            FillAttractivenessMatrix(distances);
             FillTrialsMatrix();
 
             List<int[]> pathList = new List<int[]>();
@@ -47,30 +47,30 @@ namespace TravelingSalesmanProblem
 
                 //must be separate, to not affect ants in the same iteration
                 Parallel.For(0, NoOfAnts, i =>
-                    UpdateTrialsMatrix(pathList[i], distanceMatrix)
+                    UpdateTrialsMatrix(pathList[i], distances)
                 );
 
                 EvaporateTrialsMatrix();
             }
-            return FindMinimumPathInListOfPaths(pathList, distanceMatrix, _noOfCities);
+            return FindMinimumPathInListOfPaths(pathList, distances, _noOfCities);
         }//end of Ant Colony
 
 
-        private void InitializeParameters(IDistanceMatrix distanceMatrix)
+        private void InitializeParameters(double[] distances)
         {
             _bestPath = new int[_noOfCities];
             for (int i = 0; i < _noOfCities; i++) { _bestPath[i] = i; }
-            _pheromonePower = CalculateDistanceInPath(_bestPath, distanceMatrix);
-            _matrixSize = distanceMatrix.Distances.Length;
+            _pheromonePower = CalculateDistanceInPath(_bestPath, distances);
+            _matrixSize = distances.Length;
             _trialsMatrix = new double[_matrixSize];
             _attractivenessMatrix = new double[_matrixSize];
         }
 
-        private void FillAttractivenessMatrix(IDistanceMatrix distanceMatrix)
+        private void FillAttractivenessMatrix(double[] distances)
         {
             for (int i = 0; i < _attractivenessMatrix.Length; i++)
             {
-                _attractivenessMatrix[i] = 1 / distanceMatrix.Distances[i];
+                _attractivenessMatrix[i] = 1 / distances[i];
             }
         }
 
@@ -81,18 +81,7 @@ namespace TravelingSalesmanProblem
             {
                 _trialsMatrix[i] = BasicTrialValue;
             }
-        }
-         
-
-        private List<int[]> InitializePathList(List<int[]> pathList)
-        {
-            for (int i = 0; i < NoOfAnts; i++)
-            {
-                pathList.Add(InitalizePath(_noOfCities));
-            }
-            return pathList;
-        }
-        
+        }        
 
         private static int[] InitalizePath(int noOfCities)
         {
@@ -247,11 +236,11 @@ namespace TravelingSalesmanProblem
         }
 
 
-        private void UpdateTrialsMatrix(int[] path, IDistanceMatrix distanceMatrix)
+        private void UpdateTrialsMatrix(int[] path, double[] distances)
         {
             for (int i = 0; i < _noOfCities - 1; i++)
             {
-                double distance = CalculateDistanceInPath(path, distanceMatrix);
+                double distance = CalculateDistanceInPath(path, distances);
                 _trialsMatrix[path[i] * _noOfCities + path[i + 1]] += (_pheromonePower * TrailEvaporationCoefficient / distance / NoOfAnts);
                 _trialsMatrix[path[i + 1] * _noOfCities + path[i]] += (_pheromonePower * TrailEvaporationCoefficient / distance / NoOfAnts);
             }

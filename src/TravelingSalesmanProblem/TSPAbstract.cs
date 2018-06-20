@@ -7,7 +7,7 @@ namespace TravelingSalesmanProblem
 {
     public abstract class TSPAbstract
     {
-        public abstract int[] SolveTSP(IDistanceMatrix distanceMatrix);
+        public abstract int[] SolveTSP(double[] distances);
 
         protected static int[] FindRandomRoute(int noOfCities)
         {
@@ -37,7 +37,7 @@ namespace TravelingSalesmanProblem
             return foundPath;
         }
 
-        protected int[] FindMinimumPathInListOfPaths(IEnumerable<int[]> pathList, IDistanceMatrix distanceMatrix, int noOfCities)
+        protected int[] FindMinimumPathInListOfPaths(IEnumerable<int[]> pathList, double[] distances, int noOfCities)
         {
             double min = double.MaxValue;
             int[] resultPath = new int[noOfCities];
@@ -46,7 +46,7 @@ namespace TravelingSalesmanProblem
             {
                 if (path != null && path.Length == noOfCities)
                 {
-                    double distance = CalculateDistanceInPath(path, distanceMatrix);
+                    double distance = CalculateDistanceInPath(path, distances);
                     if (distance < min)
                     {
                         min = distance;
@@ -57,7 +57,7 @@ namespace TravelingSalesmanProblem
             return resultPath;
         }
 
-        public double CalculateDistanceInPath(int[] path, IDistanceMatrix distanceMatrix)
+        public double CalculateDistanceInPath(int[] path, double[] distances)
         {
             double result = 0;
 
@@ -65,7 +65,7 @@ namespace TravelingSalesmanProblem
             {
                 for (int i = 0; i < path.Length - 1; i++)
                 {
-                    result += distanceMatrix.Distances[path[i] * path.Length + path[i + 1]];
+                    result += distances[path[i] * path.Length + path[i + 1]];
                 }
             }
             return result;

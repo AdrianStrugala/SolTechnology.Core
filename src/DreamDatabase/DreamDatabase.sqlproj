@@ -61,7 +61,4 @@
   <ItemGroup>
     <Build Include="User.sql" />
   </ItemGroup>
-  <ItemGroup>
-    <RefactorLog Include="DreamDatabase.refactorlog" />
-  </ItemGroup>
 </Project>

@@ -42,10 +42,10 @@ namespace TESWebUITests.TSPEngine
             orderOfCities[1] = 2;
             orderOfCities[2] = 1;
 
-            DistanceMatrixEvaluated distanceMatrix = new DistanceMatrixEvaluated(noOfCities);
+            EvaluationMatrix evaluationMatrix = new EvaluationMatrix(noOfCities);
 
             //Act
-            var result = _sut.FormOutputFromTSFResult(listOfCities, orderOfCities, distanceMatrix);
+            var result = _sut.FormOutputFromTSFResult(listOfCities, orderOfCities, evaluationMatrix);
 
             //Assert
             Assert.Equal(noOfCities-1, result.Count);

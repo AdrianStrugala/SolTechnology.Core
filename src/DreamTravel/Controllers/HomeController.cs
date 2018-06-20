@@ -15,20 +15,18 @@ namespace DreamTravel.Controllers
         [HttpPost]
         public IActionResult CalculateBestPath(string cities, string sessionId)
         {
-            var xd = sessionId;
-
             var TSPSolver = new TravelingSalesmanProblem.God();
             ProcessInputData processInputData = new ProcessInputData();
             ProcessOutputData processOutputData = new ProcessOutputData();
 
             List<string> listOfCitiesAsStrings = processInputData.ReadCities(cities);
-            DistanceMatrixEvaluated matrixEvaluated = new DistanceMatrixEvaluated(listOfCitiesAsStrings.Count);
+            EvaluationMatrix matrix = new EvaluationMatrix(listOfCitiesAsStrings.Count);
             var listOfCities = processInputData.GetCitiesFromGoogleApi(listOfCitiesAsStrings);
 
-            matrixEvaluated = processInputData.FillMatrixWithData(listOfCities, matrixEvaluated);
-            int[] orderOfCities = TSPSolver.SolveTSP(matrixEvaluated);
+            matrix = processInputData.FillMatrixWithData(listOfCities, matrix);
+            int[] orderOfCities = TSPSolver.SolveTSP(matrix.Distances);
 
-            List<Path> paths = processOutputData.FormOutputFromTSFResult(listOfCities, orderOfCities, matrixEvaluated);
+            List<Path> paths = processOutputData.FormOutputFromTSFResult(listOfCities, orderOfCities, matrix);
             return Content(Newtonsoft.Json.JsonConvert.SerializeObject(paths));
         }
     }

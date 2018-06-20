@@ -5,7 +5,7 @@ namespace DreamTravel.ExternalConnection
 {
     public class ProcessOutputData
     {
-        public List<Path> FormOutputFromTSFResult(List<City> listOfCities, int[] orderOfCities, IDistanceMatrix distanceMatrix)
+        public List<Path> FormOutputFromTSFResult(List<City> listOfCities, int[] orderOfCities, IEvaluationMatrix evaluationMatrix)
         {
             int noOfCities = orderOfCities.Length;
             int noOfPaths = noOfCities - 1;
@@ -18,9 +18,9 @@ namespace DreamTravel.ExternalConnection
                 {
                     StartingCity = listOfCities[orderOfCities[i]],
                     EndingCity = listOfCities[orderOfCities[i + 1]],
-                    Cost = distanceMatrix.Costs[orderOfCities[i + 1] + orderOfCities[i] * noOfCities],
-                    Distance = distanceMatrix.Distances[orderOfCities[i + 1] + orderOfCities[i] * noOfCities],
-                    Goal = distanceMatrix.Goals[orderOfCities[i + 1] + orderOfCities[i] * noOfCities]
+                    Cost = evaluationMatrix.Costs[orderOfCities[i + 1] + orderOfCities[i] * noOfCities],
+                    Distance = evaluationMatrix.Distances[orderOfCities[i + 1] + orderOfCities[i] * noOfCities],
+                    Goal = evaluationMatrix.Goals[orderOfCities[i + 1] + orderOfCities[i] * noOfCities]
                 };
                 paths.Add(currentPath);
             }

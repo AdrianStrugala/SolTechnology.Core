@@ -14,10 +14,10 @@ namespace TravelingSalesmanProblemTests
         {
             //Arrange
             int noOfCities = 4;
-            DistanceMatrixEvaluated distanceMatrix = new DistanceMatrixEvaluated(noOfCities);
+            EvaluationMatrix evaluationMatrix = new EvaluationMatrix(noOfCities);
 
             //Act
-            var result = _sut.SolveTSP(distanceMatrix);
+            var result = _sut.SolveTSP(evaluationMatrix.Distances);
 
             //Assert
             Assert.Equal(0, result[0]);
@@ -29,10 +29,10 @@ namespace TravelingSalesmanProblemTests
         {
             //Arrange
             int noOfCities = 7;
-            DistanceMatrixEvaluated distanceMatrix = new DistanceMatrixEvaluated(noOfCities);
+            EvaluationMatrix evaluationMatrix = new EvaluationMatrix(noOfCities);
 
             //Act
-            var result = _sut.SolveTSP(distanceMatrix);
+            var result = _sut.SolveTSP(evaluationMatrix.Distances);
 
             //Assert
             Assert.Equal(1, result.Count(i => i.Equals(0)));

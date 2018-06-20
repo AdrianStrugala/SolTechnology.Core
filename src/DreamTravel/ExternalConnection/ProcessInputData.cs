@@ -23,7 +23,7 @@ namespace DreamTravel.ExternalConnection
             _APICaller = new CallAPI();
         }
 
-        internal DistanceMatrixEvaluated FillMatrixWithData(List<City> listOfCities, DistanceMatrixEvaluated distanceMatrix)
+        internal EvaluationMatrix FillMatrixWithData(List<City> listOfCities, EvaluationMatrix evaluationMatrix)
         {
             ProcessInputData processInputData = new ProcessInputData();
 
@@ -33,9 +33,9 @@ namespace DreamTravel.ExternalConnection
                 {
                     if (i == j)
                     {
-                        distanceMatrix.Distances[j + i * listOfCities.Count] = Double.MaxValue;
-                        distanceMatrix.Goals[j + i * listOfCities.Count] = Double.MaxValue;
-                        distanceMatrix.Costs[j + i * listOfCities.Count] = Double.MaxValue;
+                        evaluationMatrix.Distances[j + i * listOfCities.Count] = Double.MaxValue;
+                        evaluationMatrix.Goals[j + i * listOfCities.Count] = Double.MaxValue;
+                        evaluationMatrix.Costs[j + i * listOfCities.Count] = Double.MaxValue;
                     }
                     else
                     {
@@ -74,21 +74,21 @@ namespace DreamTravel.ExternalConnection
 
                         if (freeGoal < tollGoal)
                         {
-                            distanceMatrix.Distances[j + i * listOfCities.Count] = timeFree;
-                            distanceMatrix.Goals[j + i * listOfCities.Count] = freeGoal;
-                            distanceMatrix.Costs[j + i * listOfCities.Count] = 0;
+                            evaluationMatrix.Distances[j + i * listOfCities.Count] = timeFree;
+                            evaluationMatrix.Goals[j + i * listOfCities.Count] = freeGoal;
+                            evaluationMatrix.Costs[j + i * listOfCities.Count] = 0;
                         }
                         else
                         {
-                            distanceMatrix.Distances[j + i * listOfCities.Count] = timeToll;
-                            distanceMatrix.Goals[j + i * listOfCities.Count] = tollGoal;
-                            distanceMatrix.Costs[j + i * listOfCities.Count] = costToll;
+                            evaluationMatrix.Distances[j + i * listOfCities.Count] = timeToll;
+                            evaluationMatrix.Goals[j + i * listOfCities.Count] = tollGoal;
+                            evaluationMatrix.Costs[j + i * listOfCities.Count] = costToll;
                         }
                     }
                 });
             });
 
-            return distanceMatrix;
+            return evaluationMatrix;
         }
 
         public List<string> ReadCities(string incomingCities)
