@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using DreamTravel.ExternalConnection;
+using DreamTravel.Models;
 using Microsoft.AspNetCore.Mvc;
-using TravelingSalesmanProblem.Models;
 
 namespace DreamTravel.Controllers
 {
@@ -20,13 +20,13 @@ namespace DreamTravel.Controllers
             ProcessOutputData processOutputData = new ProcessOutputData();
 
             List<string> listOfCitiesAsStrings = processInputData.ReadCities(cities);
-            EvaluationMatrix matrix = new EvaluationMatrix(listOfCitiesAsStrings.Count);
+            EvaluationMatrix matrices = new EvaluationMatrix(listOfCitiesAsStrings.Count);
             var listOfCities = processInputData.GetCitiesFromGoogleApi(listOfCitiesAsStrings);
 
-            matrix = processInputData.FillMatrixWithData(listOfCities, matrix);
-            int[] orderOfCities = TSPSolver.SolveTSP(matrix.Distances);
+            matrices = processInputData.FillMatrixWithData(listOfCities, matrices);
+            int[] orderOfCities = TSPSolver.SolveTSP(matrices.OptimalDistances);
 
-            List<Path> paths = processOutputData.FormOutputFromTSFResult(listOfCities, orderOfCities, matrix);
+            List<Path> paths = processOutputData.FormOutputFromTSFResult(listOfCities, orderOfCities, matrices);
             return Content(Newtonsoft.Json.JsonConvert.SerializeObject(paths));
         }
     }

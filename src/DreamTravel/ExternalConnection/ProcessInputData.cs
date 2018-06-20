@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Xml;
+using DreamTravel.Models;
 using Newtonsoft.Json.Linq;
-using TravelingSalesmanProblem.Models;
 
 namespace DreamTravel.ExternalConnection
 {
@@ -31,64 +31,73 @@ namespace DreamTravel.ExternalConnection
             {
                 Parallel.For(0, listOfCities.Count, j =>
                 {
+                    int iterator = j + i * listOfCities.Count;
+
                     if (i == j)
                     {
-                        evaluationMatrix.Distances[j + i * listOfCities.Count] = Double.MaxValue;
-                        evaluationMatrix.Goals[j + i * listOfCities.Count] = Double.MaxValue;
-                        evaluationMatrix.Costs[j + i * listOfCities.Count] = Double.MaxValue;
+                        SetTablesValueAsMax(evaluationMatrix, iterator);
                     }
+
                     else
                     {
-                        int timeFree = -1;
-                        int timeToll = -1;
-                        double costToll = -1;
-
                         Parallel.Invoke(
-                            () => timeFree =
+                            () => evaluationMatrix.FreeDistances[iterator] =
                                 processInputData.GetDurationBetweenTwoCitiesByFreeRoad(listOfCities[i],
                                     listOfCities[j]),
-                            () => timeToll =
+                            () => evaluationMatrix.TollDistances[iterator] =
                                 processInputData.GetDurationBetweenTwoCitiesByTollRoad(listOfCities[i],
                                     listOfCities[j]),
-                            () => costToll =
+                            () => evaluationMatrix.Costs[iterator] =
                                 processInputData.GetCostBetweenTwoCities(listOfCities[i], listOfCities[j])
                         );
-                        // C_G=s×combustion×fuel price [€] = v x t x combustion x fuel 
-                        double gasolineCostFree =
-                            timeFree /
-                            3600.0 * RoadVelocity * RoadCombustion * FuelPrice;
 
-                        // 
-                        double gasolineCostToll =
-                            timeToll /
-                            3600.0 * HighwayVelocity * RoadCombustion * 1.25 * FuelPrice;
-
-                        //toll goal = (cost of gasoline + cost of toll fee) * time of toll
-                        double cost = (gasolineCostToll + costToll);
-                        double time = (timeToll / 3600.0);
-                        double importance = (timeToll * 1.0 / timeFree * 1.0);
-                        double tollGoal = cost * time * importance;
-
-                        var freeGoal =
-                            gasolineCostFree * (timeFree / 3600.0);
-
-                        if (freeGoal < tollGoal)
+                        if (IsTollRoadProfitable(evaluationMatrix, iterator))
                         {
-                            evaluationMatrix.Distances[j + i * listOfCities.Count] = timeFree;
-                            evaluationMatrix.Goals[j + i * listOfCities.Count] = freeGoal;
-                            evaluationMatrix.Costs[j + i * listOfCities.Count] = 0;
+                            evaluationMatrix.OptimalDistances[iterator] = evaluationMatrix.TollDistances[iterator];
+                            evaluationMatrix.OptimalCosts[iterator] = evaluationMatrix.Costs[iterator];
                         }
                         else
                         {
-                            evaluationMatrix.Distances[j + i * listOfCities.Count] = timeToll;
-                            evaluationMatrix.Goals[j + i * listOfCities.Count] = tollGoal;
-                            evaluationMatrix.Costs[j + i * listOfCities.Count] = costToll;
+                            evaluationMatrix.OptimalDistances[iterator] = evaluationMatrix.FreeDistances[iterator];
+                            evaluationMatrix.OptimalCosts[iterator] = 0;
                         }
                     }
                 });
             });
 
             return evaluationMatrix;
+        }
+
+        private static bool IsTollRoadProfitable(EvaluationMatrix evaluationMatrix, int iterator)
+        {
+            // C_G=s×combustion×fuel price [€] = v x t x combustion x fuel 
+            double gasolineCostFree =
+                evaluationMatrix.FreeDistances[iterator] /
+                3600.0 * RoadVelocity * RoadCombustion * FuelPrice;
+
+            // 
+            double gasolineCostToll =
+                evaluationMatrix.TollDistances[iterator] /
+                3600.0 * HighwayVelocity * RoadCombustion * 1.25 * FuelPrice;
+
+            //toll goal = (cost of gasoline + cost of toll fee) * time of toll
+            double cost = (gasolineCostToll + evaluationMatrix.Costs[iterator]);
+            double time = (evaluationMatrix.TollDistances[iterator] / 3600.0);
+            double importance = (evaluationMatrix.TollDistances[iterator] * 1.0 / evaluationMatrix.FreeDistances[iterator] * 1.0);
+            var tollGoal = cost * time * importance;
+            var freeGoal = gasolineCostFree * (evaluationMatrix.FreeDistances[iterator] / 3600.0);
+
+            return freeGoal > tollGoal;
+        }
+
+        private static void SetTablesValueAsMax(EvaluationMatrix evaluationMatrix, int iterator)
+        {
+            evaluationMatrix.FreeDistances[iterator] = Double.MaxValue;
+            evaluationMatrix.TollDistances[iterator] = Double.MaxValue;
+            evaluationMatrix.OptimalDistances[iterator] = Double.MaxValue;
+            evaluationMatrix.Goals[iterator] = Double.MaxValue;
+            evaluationMatrix.Costs[iterator] = Double.MaxValue;
+            evaluationMatrix.OptimalCosts[iterator] = Double.MaxValue;
         }
 
         public List<string> ReadCities(string incomingCities)

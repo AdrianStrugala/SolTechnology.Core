@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using DreamTravel.ExternalConnection;
+using DreamTravel.Models;
 using TravelingSalesmanProblem.Models;
 using Xunit;
 

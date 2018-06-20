@@ -3,9 +3,9 @@ using System.IO;
 using System.Net.Http;
 using System.Reflection;
 using System.Threading.Tasks;
+using DreamTravel.Models;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using TravelingSalesmanProblem.Models;
 
 namespace DreamTravel.ExternalConnection
 {

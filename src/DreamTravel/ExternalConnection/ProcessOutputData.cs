@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using DreamTravel.Models;
 using TravelingSalesmanProblem.Models;
 
 namespace DreamTravel.ExternalConnection
@@ -18,8 +19,8 @@ namespace DreamTravel.ExternalConnection
                 {
                     StartingCity = listOfCities[orderOfCities[i]],
                     EndingCity = listOfCities[orderOfCities[i + 1]],
-                    Cost = evaluationMatrix.Costs[orderOfCities[i + 1] + orderOfCities[i] * noOfCities],
-                    Distance = evaluationMatrix.Distances[orderOfCities[i + 1] + orderOfCities[i] * noOfCities],
+                    Cost = evaluationMatrix.OptimalCosts[orderOfCities[i + 1] + orderOfCities[i] * noOfCities],
+                    Distance = evaluationMatrix.OptimalDistances[orderOfCities[i + 1] + orderOfCities[i] * noOfCities],
                     Goal = evaluationMatrix.Goals[orderOfCities[i + 1] + orderOfCities[i] * noOfCities]
                 };
                 paths.Add(currentPath);

@@ -1,4 +1,5 @@
 using System.Linq;
+using DreamTravel.Models;
 using TravelingSalesmanProblem;
 using TravelingSalesmanProblem.Models;
 using Xunit;
@@ -17,7 +18,7 @@ namespace TravelingSalesmanProblemTests
             EvaluationMatrix evaluationMatrix = new EvaluationMatrix(noOfCities);
 
             //Act
-            var result = _sut.SolveTSP(evaluationMatrix.Distances);
+            var result = _sut.SolveTSP(evaluationMatrix.OptimalDistances);
 
             //Assert
             Assert.Equal(0, result[0]);
@@ -32,7 +33,7 @@ namespace TravelingSalesmanProblemTests
             EvaluationMatrix evaluationMatrix = new EvaluationMatrix(noOfCities);
 
             //Act
-            var result = _sut.SolveTSP(evaluationMatrix.Distances);
+            var result = _sut.SolveTSP(evaluationMatrix.OptimalDistances);
 
             //Assert
             Assert.Equal(1, result.Count(i => i.Equals(0)));
