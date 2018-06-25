@@ -60,5 +60,6 @@
   </ItemGroup>
   <ItemGroup>
     <Build Include="User.sql" />
+    <Build Include="Session.sql" />
   </ItemGroup>
 </Project>

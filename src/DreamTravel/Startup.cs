@@ -1,7 +1,9 @@
-﻿using Microsoft.AspNetCore.Builder;
+﻿using System;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using StackExchange.Redis;
 
 namespace DreamTravel
 {
@@ -19,7 +21,14 @@ namespace DreamTravel
         {
             services.AddMvc();
 
-            services.AddSingleton(Configuration.Get<DbConnectionFactory>());
+            services.AddSingleton(Configuration.Get<DbConnectionFactory>())
+                .AddSingleton<IConnectionMultiplexer>(sp =>
+                {
+                    var lazyCm = new Lazy<ConnectionMultiplexer>(() => ConnectionMultiplexer.Connect(Configuration["CacheConnectionString"]));
+
+                    return lazyCm.Value;
+                })
+                .AddTransient<IDatabase>(provider => provider.GetService<IConnectionMultiplexer>().GetDatabase());
 
             //AUTHENTICATION TURNED OFF
 
