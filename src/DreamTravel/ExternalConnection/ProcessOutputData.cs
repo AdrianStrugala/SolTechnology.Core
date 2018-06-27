@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using DreamTravel.Models;
-using TravelingSalesmanProblem.Models;
 
 namespace DreamTravel.ExternalConnection
 {

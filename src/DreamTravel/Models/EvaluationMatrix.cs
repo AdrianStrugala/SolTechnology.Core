@@ -1,5 +1,4 @@
 ﻿using System.Threading.Tasks;
-using TravelingSalesmanProblem.Models;
 
 namespace DreamTravel.Models
 {

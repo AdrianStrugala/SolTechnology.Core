@@ -208,7 +208,7 @@ Last City
                     $.ajax({
                         type: 'POST',
                         dataType: 'html',
-                        url: '@Url.Action("CalculateBestPath", "Home")',
+                        url: '@Url.Action("CalculateBestPath", "TSP")',
                         data: { cities: listOfCities, sessionId: sessionId},
                         success: function(msg) {
 

@@ -1,9 +1,4 @@
-﻿/**********************************************************
- * Reprezents City as name, geographical coordinates and  *
- * X,Y coordinates (on surface)                           *
- * *******************************************************/
-
-namespace DreamTravel.Models
+﻿namespace DreamTravel.Models
 {
     public class City
     {

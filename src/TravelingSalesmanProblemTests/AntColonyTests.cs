@@ -1,7 +1,6 @@
 using System.Linq;
 using DreamTravel.Models;
 using TravelingSalesmanProblem;
-using TravelingSalesmanProblem.Models;
 using Xunit;
 
 namespace TravelingSalesmanProblemTests
