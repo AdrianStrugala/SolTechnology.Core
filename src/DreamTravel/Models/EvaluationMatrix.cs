@@ -11,6 +11,11 @@ namespace DreamTravel.Models
         public double[] Costs { get; set; }
         public double[] OptimalCosts { get; set; }
 
+        public EvaluationMatrix()
+        {
+            
+        }
+
         public EvaluationMatrix(int noOfCities)
         {
             Parallel.Invoke(

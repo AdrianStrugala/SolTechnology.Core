@@ -1,4 +1,5 @@
 ﻿using System;
+using DreamTravel.Models;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -21,14 +22,11 @@ namespace DreamTravel
         {
             services.AddMvc();
 
-            services.AddSingleton(Configuration.Get<DbConnectionFactory>())
-                .AddSingleton<IConnectionMultiplexer>(sp =>
-                {
-                    var lazyCm = new Lazy<ConnectionMultiplexer>(() => ConnectionMultiplexer.Connect(Configuration["CacheConnectionString"]));
+            services.AddSingleton(Configuration.Get<DbConnectionFactory>());
+            services.AddDistributedMemoryCache();
+            services.AddSession(
+            );
 
-                    return lazyCm.Value;
-                })
-                .AddTransient<IDatabase>(provider => provider.GetService<IConnectionMultiplexer>().GetDatabase());
 
             //AUTHENTICATION TURNED OFF
 
@@ -59,6 +57,8 @@ namespace DreamTravel
             }
 
             app.UseStaticFiles();
+            app.UseCookiePolicy();
+            app.UseSession();
 
             app.UseMvc(routes =>
             {

@@ -28,7 +28,7 @@ namespace DreamTravel.Controllers
                 await _userRepository.Add(toAdd);
 
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 return BadRequest();
             }
@@ -45,7 +45,7 @@ namespace DreamTravel.Controllers
             {
                 user = await _userRepository.Get(name);
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 return BadRequest();
             }

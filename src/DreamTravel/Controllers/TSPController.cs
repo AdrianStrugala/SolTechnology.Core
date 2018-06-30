@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using DreamTravel.ExternalConnection;
 using DreamTravel.Models;
-using DreamTravel.Repositories;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using StackExchange.Redis;
@@ -12,14 +12,14 @@ namespace DreamTravel.Controllers
 {
     public class TSPController : Controller
     {
-        private readonly IDatabase _redisStore;
-        private readonly SessionRepository _sessionRepository;
         private ProcessInputData _processInputData;
+
+        private const string MatricesKeyName = "_Matrices";
+        private const string PathsKeyName = "_Paths";
+        private const string CitiesKeyName = "_Cities";
 
         public TSPController(IDatabase redisStore)
         {
-            _redisStore = redisStore;
-            _sessionRepository = new SessionRepository(_redisStore);
         }
 
         [HttpPost]
@@ -29,20 +29,21 @@ namespace DreamTravel.Controllers
             {
                 var TSPSolver = new TravelingSalesmanProblem.God();
                 _processInputData = new ProcessInputData();
-                ProcessOutputData processOutputData = new ProcessOutputData();               
+                ProcessOutputData processOutputData = new ProcessOutputData();
 
                 List<string> listOfCitiesAsStrings = _processInputData.ReadCities(cities);
                 EvaluationMatrix matrices = new EvaluationMatrix(listOfCitiesAsStrings.Count);
                 var listOfCities = _processInputData.GetCitiesFromGoogleApi(listOfCitiesAsStrings);
-
                 matrices = _processInputData.FillMatrixWithData(listOfCities, matrices);
                 int[] orderOfCities = TSPSolver.SolveTSP(matrices.OptimalDistances);
 
                 List<Path> paths = processOutputData.FormOutputFromTSFResult(listOfCities, orderOfCities, matrices);
 
-                Session currentSession = _sessionRepository.WriteToSession(sessionId, matrices);
-                await _sessionRepository.AddCache(currentSession);
+                HttpContext.Session.SetString(sessionId + MatricesKeyName, JsonConvert.SerializeObject(matrices));
+                HttpContext.Session.SetString(sessionId + PathsKeyName, JsonConvert.SerializeObject(paths));
+                HttpContext.Session.SetString(sessionId + CitiesKeyName, JsonConvert.SerializeObject(listOfCities));
 
+                // return Ok();
                 return Content(JsonConvert.SerializeObject(paths));
             }
 
@@ -53,28 +54,21 @@ namespace DreamTravel.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> LimitCost(int costLimit, string sessionId, string paths, string cities)
+        public async Task<IActionResult> LimitCost(int costLimit, string sessionId)
         {
             try
             {
+                List<Path> paths = JsonConvert.DeserializeObject<List<Path>>(HttpContext.Session.GetString(sessionId + PathsKeyName));
+                EvaluationMatrix matrices = JsonConvert.DeserializeObject<EvaluationMatrix>(HttpContext.Session.GetString(sessionId + MatricesKeyName));
+                List<City> listOfCities = JsonConvert.DeserializeObject<List<City>>(HttpContext.Session.GetString(sessionId + CitiesKeyName));
+
                 var costLimitBreaker = new CostLimitBreaker();
 
-                Session session = await _sessionRepository.GetCache(sessionId);              
-                EvaluationMatrix matrices = _sessionRepository.ReadFromSession(session);
-                List<Path> pathList = (List<Path>) JsonConvert.DeserializeObject(paths);
-                List<string> listOfCitiesAsStrings = _processInputData.ReadCities(cities);
+                paths = costLimitBreaker.AdjustPaths(costLimit, paths, matrices, listOfCities);
 
-                List<int> orderOfCities = new List<int>();
-
-                for (int i = 0; i < listOfCitiesAsStrings.Count-1; i++)
-                {
-                    orderOfCities.Add(pathList.FindIndex(p => p.StartingCity.Name.Equals(listOfCitiesAsStrings[i])));
-                }
-                orderOfCities.Add(listOfCitiesAsStrings.Count-1);
-
-                pathList = costLimitBreaker.AdjustPaths(pathList, costLimit, cities);
-
-                return Content(JsonConvert.SerializeObject("cos"));
+                HttpContext.Session.SetString(sessionId + PathsKeyName, JsonConvert.SerializeObject(paths));
+                // return Ok();
+                return Content(JsonConvert.SerializeObject(paths));
             }
 
             catch (Exception)

@@ -13,3 +13,5 @@ src/packages/**/*
 *.ide
 *.dbmdl
 *.jfm
+*.ide
+src/.vs/TravelingEco-Salesman/v15/.suo
