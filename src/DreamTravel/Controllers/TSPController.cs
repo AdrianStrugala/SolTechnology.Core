@@ -14,13 +14,8 @@ namespace DreamTravel.Controllers
     {
         private ProcessInputData _processInputData;
 
-        private const string MatricesKeyName = "_Matrices";
         private const string PathsKeyName = "_Paths";
-        private const string CitiesKeyName = "_Cities";
 
-        public TSPController(IDatabase redisStore)
-        {
-        }
 
         [HttpPost]
         public async Task<IActionResult> CalculateBestPath(string cities, string sessionId)
@@ -39,9 +34,7 @@ namespace DreamTravel.Controllers
 
                 List<Path> paths = processOutputData.FormOutputFromTSFResult(listOfCities, orderOfCities, matrices);
 
-                HttpContext.Session.SetString(sessionId + MatricesKeyName, JsonConvert.SerializeObject(matrices));
                 HttpContext.Session.SetString(sessionId + PathsKeyName, JsonConvert.SerializeObject(paths));
-                HttpContext.Session.SetString(sessionId + CitiesKeyName, JsonConvert.SerializeObject(listOfCities));
 
                 // return Ok();
                 return Content(JsonConvert.SerializeObject(paths));
@@ -58,13 +51,10 @@ namespace DreamTravel.Controllers
         {
             try
             {
-                List<Path> paths = JsonConvert.DeserializeObject<List<Path>>(HttpContext.Session.GetString(sessionId + PathsKeyName));
-                EvaluationMatrix matrices = JsonConvert.DeserializeObject<EvaluationMatrix>(HttpContext.Session.GetString(sessionId + MatricesKeyName));
-                List<City> listOfCities = JsonConvert.DeserializeObject<List<City>>(HttpContext.Session.GetString(sessionId + CitiesKeyName));
-
                 var costLimitBreaker = new CostLimitBreaker();
+                List<Path> paths = JsonConvert.DeserializeObject<List<Path>>(HttpContext.Session.GetString(sessionId + PathsKeyName));
 
-                paths = costLimitBreaker.AdjustPaths(costLimit, paths, matrices, listOfCities);
+                paths = costLimitBreaker.AdjustPaths(costLimit, paths);
 
                 HttpContext.Session.SetString(sessionId + PathsKeyName, JsonConvert.SerializeObject(paths));
                 // return Ok();

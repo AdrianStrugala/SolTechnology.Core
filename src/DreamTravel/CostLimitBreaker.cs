@@ -8,7 +8,12 @@ namespace DreamTravel
 {
     public class CostLimitBreaker
     {
-        public List<Path> AdjustPaths(int costLimit, List<Path> paths, EvaluationMatrix matrices, List<City> listOfCities)
+        internal List<Path> AdjustPaths(int costLimit, List<Path> paths)
+        {
+            throw new NotImplementedException();
+        }
+
+        internal List<Path> AdjustPaths(int costLimit, List<Path> paths, EvaluationMatrix matrices, List<City> listOfCities)
         {
             throw new NotImplementedException();
         }

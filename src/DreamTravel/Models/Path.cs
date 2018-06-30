@@ -6,5 +6,6 @@
         public double Distance { get; set; }
         public double Cost { get; set; }
         public double Goal { get; set; }
+        public double MaxCost { get; set; }
     }
 }

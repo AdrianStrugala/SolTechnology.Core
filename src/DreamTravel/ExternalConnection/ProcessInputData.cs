@@ -15,6 +15,8 @@ namespace DreamTravel.ExternalConnection
         private const double TollRoadCombustionMultiplexer = 1.25;
         private const double RoadCombustion = 0.07; //per km
 
+        private int Happiness = 175;
+
         private readonly CallAPI _APICaller;
 
 
@@ -53,21 +55,25 @@ namespace DreamTravel.ExternalConnection
 
                         //if no toll road
                         if (Math.Abs(evaluationMatrix.FreeDistances[iterator] - evaluationMatrix.TollDistances[iterator]) < 1)
-                        {
+                        {                        
                             evaluationMatrix.OptimalDistances[iterator] = evaluationMatrix.FreeDistances[iterator];
                             evaluationMatrix.OptimalCosts[iterator] = 0;
+                            evaluationMatrix.Goals[iterator] = 0;
                         }
                         else
                         {
-                            if (IsTollRoadProfitable(evaluationMatrix, iterator))
+                            double goal= CalculateGoal(evaluationMatrix, iterator);
+                            if (goal < Happiness)
                             {
                                 evaluationMatrix.OptimalDistances[iterator] = evaluationMatrix.TollDistances[iterator];
                                 evaluationMatrix.OptimalCosts[iterator] = evaluationMatrix.Costs[iterator];
+                                evaluationMatrix.Goals[iterator] = goal;
                             }
                             else
                             {
                                 evaluationMatrix.OptimalDistances[iterator] = evaluationMatrix.FreeDistances[iterator];
                                 evaluationMatrix.OptimalCosts[iterator] = 0;
+                                evaluationMatrix.Goals[iterator] = goal;
                             }
                         }
                     }
@@ -77,7 +83,7 @@ namespace DreamTravel.ExternalConnection
             return evaluationMatrix;
         }
 
-        private static bool IsTollRoadProfitable(EvaluationMatrix evaluationMatrix, int iterator, int happiness = 175)
+        private static double CalculateGoal(EvaluationMatrix evaluationMatrix, int iterator)
       {
             // C_G=s×combustion×fuel price [€] = v x t x combustion x fuel 
             double costFree =
@@ -93,8 +99,8 @@ namespace DreamTravel.ExternalConnection
             double goal = (relativeCost / relativeTime)*100;
 
             //if goal < happiness parameter
-            return goal < happiness;
-        }
+          return goal;
+      }
 
         private static void SetTablesValueAsMax(EvaluationMatrix evaluationMatrix, int iterator)
         {

@@ -20,7 +20,8 @@ namespace DreamTravel.ExternalConnection
                     EndingCity = listOfCities[orderOfCities[i + 1]],
                     Cost = evaluationMatrix.OptimalCosts[orderOfCities[i + 1] + orderOfCities[i] * noOfCities],
                     Distance = evaluationMatrix.OptimalDistances[orderOfCities[i + 1] + orderOfCities[i] * noOfCities],
-                    Goal = evaluationMatrix.Goals[orderOfCities[i + 1] + orderOfCities[i] * noOfCities]
+                    Goal = evaluationMatrix.Goals[orderOfCities[i + 1] + orderOfCities[i] * noOfCities],
+                    MaxCost = evaluationMatrix.Costs[orderOfCities[i + 1] + orderOfCities[i] * noOfCities]
                 };
                 paths.Add(currentPath);
             }
