@@ -26,6 +26,11 @@
                         @*                        temp*@
                         <button type="button" class="btn btn-outline-secondary" id="costLimitModal">Change cost limit</button>
                     </li>
+                    <li class="nav-item">
+                        <textarea id="limitValue"> 50
+                        </textarea>
+                    </li>
+
                     <li class="nav-item" id="infoText">
                     </li>
                 </ul>
@@ -85,7 +90,7 @@ Last City
         function displayRoute(directionsService, map, path)
         {
             var isToll = false;
-            if (path.Cost === 0) {
+            if (path.OptimalCost === 0) {
                 isToll = true;
             }
 
@@ -152,17 +157,17 @@ Last City
 
         function writePathInfo(path, list) {
 
-            var hours = Math.floor(path.Distance / 3600);
-            var minutes = Math.floor((path.Distance - Math.floor(hours) * 3600) / 60);
-            var seconds = (path.Distance % 60);
+            var hours = Math.floor(path.OptimalDistance / 3600);
+            var minutes = Math.floor((path.OptimalDistance - Math.floor(hours) * 3600) / 60);
+            var seconds = (path.OptimalDistance % 60);
 
             var routeString =
                 "From " +
                     path.StartingCity.Name +
                     " to " +
                     path.EndingCity.Name +
-                    ". Cost: " +
-                    path.Cost.toFixed(2) +
+                    ". OptimalCost: " +
+                    path.OptimalCost.toFixed(2) +
                     " €." +
                     " Time: " +
                     Math.floor(hours) +
@@ -227,8 +232,8 @@ Last City
                         cleanMap(list);
 
                         for (var i = 0; i < noOfPaths; i++) {
-                            totalCost += pathList[i].Cost;
-                            totalTime += pathList[i].Distance;
+                            totalCost += pathList[i].OptimalCost;
+                            totalTime += pathList[i].OptimalDistance;
 
                             writePathInfo(pathList[i], list);
                             displayRoute(directionsService,map,pathList[i]);
@@ -257,12 +262,13 @@ Last City
                 var limitCostHandler = function() {
 //                    var listOfCities = document.getElementById("listOfCities").value;
 //                    document.getElementById("loader").style.display = "block";
+                    var limit = document.getElementById("limitValue").value;
 
                     $.ajax({
                         type: 'POST',
                         dataType: 'html',
                         url: '@Url.Action("LimitCost", "TSP")',
-                        data: { costLimit: 100, sessionId: sessionId},
+                        data: { costLimit: limit, sessionId: sessionId},
                         success: function(msg) {
 
                             var totalCost = 0;
@@ -275,8 +281,8 @@ Last City
                             cleanMap(list);
 
                             for (var i = 0; i < noOfPaths; i++) {
-                                totalCost += pathList[i].Cost;
-                                totalTime += pathList[i].Distance;
+                                totalCost += pathList[i].OptimalCost;
+                                totalTime += pathList[i].OptimalDistance;
 
                                 writePathInfo(pathList[i], list);
                                 displayRoute(directionsService,map,pathList[i]);

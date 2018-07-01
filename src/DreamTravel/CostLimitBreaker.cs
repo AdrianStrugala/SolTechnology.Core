@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 using DreamTravel.Models;
 
 namespace DreamTravel
@@ -10,12 +7,28 @@ namespace DreamTravel
     {
         internal List<Path> AdjustPaths(int costLimit, List<Path> paths)
         {
-            throw new NotImplementedException();
-        }
+            paths.Sort((x, y) => 1 * x.Goal.CompareTo(y.Goal));
 
-        internal List<Path> AdjustPaths(int costLimit, List<Path> paths, EvaluationMatrix matrices, List<City> listOfCities)
-        {
-            throw new NotImplementedException();
+            double overallCost = 0;
+            foreach (var path in paths)
+            {
+                if (path.Goal == 0) continue;
+                if (overallCost + path.Cost <= costLimit)
+                {
+                    overallCost += path.Cost;
+                    path.OptimalCost = path.Cost;
+                    path.OptimalDistance = path.TollDistance;
+                }
+                else
+                {
+                    path.OptimalCost = 0;
+                    path.OptimalDistance = path.FreeDistance;
+                }
+            }
+
+            paths.Sort((x, y) => 1 * x.Index.CompareTo(y.Index));
+
+            return paths;
         }
     }
 }

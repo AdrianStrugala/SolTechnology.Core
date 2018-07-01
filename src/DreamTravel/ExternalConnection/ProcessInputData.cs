@@ -10,12 +10,10 @@ namespace DreamTravel.ExternalConnection
 {
     public class ProcessInputData
     {
-        private const double FuelPrice = 1.26;
-        private const double RoadVelocity = 100;
-        private const double TollRoadCombustionMultiplexer = 1.25;
-        private const double RoadCombustion = 0.07; //per km
-
-        private int Happiness = 175;
+        private static double FuelPrice { get; } = 1.26;
+        private static double RoadVelocity { get; } = 70;
+        private static double HighwayVelocity { get; } = 120;
+        private static double RoadCombustion { get; } = 0.06; //per km
 
         private readonly CallAPI _APICaller;
 
@@ -53,28 +51,22 @@ namespace DreamTravel.ExternalConnection
                                 processInputData.GetCostBetweenTwoCities(listOfCities[i], listOfCities[j])
                         );
 
-                        //if no toll road
-                        if (Math.Abs(evaluationMatrix.FreeDistances[iterator] - evaluationMatrix.TollDistances[iterator]) < 1)
-                        {                        
-                            evaluationMatrix.OptimalDistances[iterator] = evaluationMatrix.FreeDistances[iterator];
-                            evaluationMatrix.OptimalCosts[iterator] = 0;
-                            evaluationMatrix.Goals[iterator] = 0;
+                        //if toll takes more time than regular -> pretend it does not exist
+                        if (evaluationMatrix.TollDistances[iterator] > evaluationMatrix.FreeDistances[iterator])
+                        {
+                            evaluationMatrix.TollDistances[iterator] = evaluationMatrix.FreeDistances[iterator];
+                            evaluationMatrix.Costs[iterator] = 0;
+                        }
+
+                        if (IsTollRoadProfitable(evaluationMatrix, iterator))
+                        {
+                            evaluationMatrix.OptimalDistances[iterator] = evaluationMatrix.TollDistances[iterator];
+                            evaluationMatrix.OptimalCosts[iterator] = evaluationMatrix.Costs[iterator];
                         }
                         else
                         {
-                            double goal= CalculateGoal(evaluationMatrix, iterator);
-                            if (goal < Happiness)
-                            {
-                                evaluationMatrix.OptimalDistances[iterator] = evaluationMatrix.TollDistances[iterator];
-                                evaluationMatrix.OptimalCosts[iterator] = evaluationMatrix.Costs[iterator];
-                                evaluationMatrix.Goals[iterator] = goal;
-                            }
-                            else
-                            {
-                                evaluationMatrix.OptimalDistances[iterator] = evaluationMatrix.FreeDistances[iterator];
-                                evaluationMatrix.OptimalCosts[iterator] = 0;
-                                evaluationMatrix.Goals[iterator] = goal;
-                            }
+                            evaluationMatrix.OptimalDistances[iterator] = evaluationMatrix.FreeDistances[iterator];
+                            evaluationMatrix.OptimalCosts[iterator] = 0;
                         }
                     }
                 });
@@ -83,24 +75,30 @@ namespace DreamTravel.ExternalConnection
             return evaluationMatrix;
         }
 
-        private static double CalculateGoal(EvaluationMatrix evaluationMatrix, int iterator)
-      {
+        private static bool IsTollRoadProfitable(EvaluationMatrix evaluationMatrix, int iterator)
+        {
             // C_G=s×combustion×fuel price [€] = v x t x combustion x fuel 
-            double costFree =
+            double gasolineCostFree =
                 evaluationMatrix.FreeDistances[iterator] /
                 3600.0 * RoadVelocity * RoadCombustion * FuelPrice;
-            double costToll = costFree * TollRoadCombustionMultiplexer + evaluationMatrix.Costs[iterator];
-            double relativeCost = (costToll - costFree) / costFree;
 
-            double relativeTime =
-                (evaluationMatrix.FreeDistances[iterator] - evaluationMatrix.TollDistances[iterator]) /
-                evaluationMatrix.FreeDistances[iterator];
+            // 
+            double gasolineCostToll =
+                evaluationMatrix.TollDistances[iterator] /
+                3600.0 * HighwayVelocity * RoadCombustion * 1.25 * FuelPrice;
 
-            double goal = (relativeCost / relativeTime)*100;
+            //toll goal = (cost of gasoline + cost of toll fee) * time of toll
+            double cost = (gasolineCostToll + evaluationMatrix.Costs[iterator]);
+            double time = (evaluationMatrix.TollDistances[iterator] / 3600.0);
+            double importance = (evaluationMatrix.TollDistances[iterator] * 1.0 / evaluationMatrix.FreeDistances[iterator] * 1.0);
+            var tollGoal = cost * time * importance;
+            var freeGoal = gasolineCostFree * (evaluationMatrix.FreeDistances[iterator] / 3600.0);
 
-            //if goal < happiness parameter
-          return goal;
-      }
+
+            evaluationMatrix.Goals[iterator] = tollGoal;
+
+            return freeGoal > tollGoal;
+        }
 
         private static void SetTablesValueAsMax(EvaluationMatrix evaluationMatrix, int iterator)
         {

@@ -6,7 +6,6 @@ using DreamTravel.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
-using StackExchange.Redis;
 
 namespace DreamTravel.Controllers
 {
@@ -15,7 +14,6 @@ namespace DreamTravel.Controllers
         private ProcessInputData _processInputData;
 
         private const string PathsKeyName = "_Paths";
-
 
         [HttpPost]
         public async Task<IActionResult> CalculateBestPath(string cities, string sessionId)
@@ -51,8 +49,8 @@ namespace DreamTravel.Controllers
         {
             try
             {
-                var costLimitBreaker = new CostLimitBreaker();
                 List<Path> paths = JsonConvert.DeserializeObject<List<Path>>(HttpContext.Session.GetString(sessionId + PathsKeyName));
+                var costLimitBreaker = new CostLimitBreaker();
 
                 paths = costLimitBreaker.AdjustPaths(costLimit, paths);
 

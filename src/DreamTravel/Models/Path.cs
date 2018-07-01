@@ -1,11 +1,14 @@
 ﻿namespace DreamTravel.Models {
     public sealed class Path
     {
+        public int Index { get; set; }
         public City StartingCity { get; set; }
         public City EndingCity { get; set; }
-        public double Distance { get; set; }
-        public double Cost { get; set; }
+        public double OptimalDistance { get; set; }
+        public double OptimalCost { get; set; }
         public double Goal { get; set; }
-        public double MaxCost { get; set; }
+        public double Cost { get; set; }
+        public double FreeDistance { get; set; }
+        public double TollDistance { get; set; }
     }
 }
