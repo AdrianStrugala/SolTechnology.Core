@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using DreamTravel.Models;
 
-namespace DreamTravel
+namespace DreamTravel.TSPControllerHandlers
 {
     public class CostLimitBreaker
     {

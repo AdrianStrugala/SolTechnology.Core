@@ -22,7 +22,6 @@ namespace DreamTravel
         {
             services.AddMvc();
 
-            services.AddSingleton(Configuration.Get<DbConnectionFactory>());
             services.AddDistributedMemoryCache();
             services.AddSession(
             );

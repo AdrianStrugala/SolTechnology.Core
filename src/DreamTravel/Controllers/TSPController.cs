@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using DreamTravel.ExternalConnection;
 using DreamTravel.Models;
+using DreamTravel.TSPControllerHandlers;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
@@ -11,8 +12,6 @@ namespace DreamTravel.Controllers
 {
     public class TSPController : Controller
     {
-        private ProcessInputData _processInputData;
-
         private const string PathsKeyName = "_Paths";
 
         [HttpPost]
@@ -20,20 +19,11 @@ namespace DreamTravel.Controllers
         {
             try
             {
-                var TSPSolver = new TravelingSalesmanProblem.God();
-                _processInputData = new ProcessInputData();
-                ProcessOutputData processOutputData = new ProcessOutputData();
+                BestPathCalculator bestPathCalculator = new BestPathCalculator();
 
-                List<string> listOfCitiesAsStrings = _processInputData.ReadCities(cities);
-                EvaluationMatrix matrices = new EvaluationMatrix(listOfCitiesAsStrings.Count);
-                var listOfCities = _processInputData.GetCitiesFromGoogleApi(listOfCitiesAsStrings);
-                matrices = _processInputData.FillMatrixWithData(listOfCities, matrices);
-                int[] orderOfCities = TSPSolver.SolveTSP(matrices.OptimalDistances);
-
-                List<Path> paths = processOutputData.FormOutputFromTSFResult(listOfCities, orderOfCities, matrices);
+                List<Path> paths = bestPathCalculator.CalculateBestPath(cities);
 
                 HttpContext.Session.SetString(sessionId + PathsKeyName, JsonConvert.SerializeObject(paths));
-
                 // return Ok();
                 return Content(JsonConvert.SerializeObject(paths));
             }
