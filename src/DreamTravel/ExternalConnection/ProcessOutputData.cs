@@ -3,9 +3,9 @@ using DreamTravel.Models;
 
 namespace DreamTravel.ExternalConnection
 {
-    public class ProcessOutputData
+    public class ProcessOutputData : IProcessOutputData
     {
-        public List<Path> FormOutputFromTSFResult(List<City> listOfCities, int[] orderOfCities, IEvaluationMatrix evaluationMatrix)
+        public List<Path> FormOutputFromTSPResult(List<City> listOfCities, int[] orderOfCities, IEvaluationMatrix evaluationMatrix)
         {
             int noOfCities = orderOfCities.Length;
             int noOfPaths = noOfCities - 1;

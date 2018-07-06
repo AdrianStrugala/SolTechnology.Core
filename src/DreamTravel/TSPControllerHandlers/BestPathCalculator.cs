@@ -1,24 +1,21 @@
 ﻿using System.Collections.Generic;
 using DreamTravel.ExternalConnection;
 using DreamTravel.Models;
+using TravelingSalesmanProblem;
 
 namespace DreamTravel.TSPControllerHandlers
 {
-    public class BestPathCalculator
+    public class BestPathCalculator : IBestPathCalculator
     {
-        public List<Path> CalculateBestPath(string cities)
+        public List<Path> CalculateBestPath(string cities, IProcessInputData processInputData, IProcessOutputData processOutputData, ITSP TSPSolver)
         {
-            var TSPSolver = new TravelingSalesmanProblem.God();
-            ProcessInputData processInputData = new ProcessInputData();
-            ProcessOutputData processOutputData = new ProcessOutputData();
-
             List<string> listOfCitiesAsStrings = processInputData.ReadCities(cities);
             EvaluationMatrix matrices = new EvaluationMatrix(listOfCitiesAsStrings.Count);
             var listOfCities = processInputData.GetCitiesFromGoogleApi(listOfCitiesAsStrings);
             matrices = processInputData.FillMatrixWithData(listOfCities, matrices);
             int[] orderOfCities = TSPSolver.SolveTSP(matrices.OptimalDistances);
 
-            return processOutputData.FormOutputFromTSFResult(listOfCities, orderOfCities, matrices);
+            return processOutputData.FormOutputFromTSPResult(listOfCities, orderOfCities, matrices);
         }
 
     }

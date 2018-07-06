@@ -1,10 +1,13 @@
 ﻿using System;
+using DreamTravel.ExternalConnection;
 using DreamTravel.Models;
+using DreamTravel.TSPControllerHandlers;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using StackExchange.Redis;
+using TravelingSalesmanProblem;
 
 namespace DreamTravel
 {
@@ -23,8 +26,18 @@ namespace DreamTravel
             services.AddMvc();
 
             services.AddDistributedMemoryCache();
-            services.AddSession(
-            );
+
+
+            services.AddTransient<ICallAPI, CallAPI>();
+            services.AddTransient<IProcessInputData, ProcessInputData>();
+            services.AddTransient<IProcessOutputData, ProcessOutputData>();
+            services.AddTransient<IBestPathCalculator, BestPathCalculator>();
+            services.AddTransient<ITSP, Itsp>();
+
+
+
+
+            services.AddSession();
 
 
             //AUTHENTICATION TURNED OFF

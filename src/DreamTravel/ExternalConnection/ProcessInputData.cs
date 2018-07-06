@@ -8,7 +8,7 @@ using Newtonsoft.Json.Linq;
 
 namespace DreamTravel.ExternalConnection
 {
-    public class ProcessInputData
+    public class ProcessInputData : IProcessInputData
     {
         private static double FuelPrice { get; } = 1.26;
         private static double RoadVelocity { get; } = 70;
@@ -23,7 +23,7 @@ namespace DreamTravel.ExternalConnection
             _APICaller = new CallAPI();
         }
 
-        internal EvaluationMatrix FillMatrixWithData(List<City> listOfCities, EvaluationMatrix evaluationMatrix)
+        public EvaluationMatrix FillMatrixWithData(List<City> listOfCities, EvaluationMatrix evaluationMatrix)
         {
             ProcessInputData processInputData = new ProcessInputData();
 

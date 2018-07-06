@@ -45,7 +45,7 @@ namespace TESWebUITests.TSPEngine
             EvaluationMatrix evaluationMatrix = new EvaluationMatrix(noOfCities);
 
             //Act
-            var result = _sut.FormOutputFromTSFResult(listOfCities, orderOfCities, evaluationMatrix);
+            var result = _sut.FormOutputFromTSPResult(listOfCities, orderOfCities, evaluationMatrix);
 
             //Assert
             Assert.Equal(noOfCities-1, result.Count);

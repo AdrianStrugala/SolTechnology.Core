@@ -9,7 +9,7 @@ using Newtonsoft.Json.Linq;
 
 namespace DreamTravel.ExternalConnection
 {
-    public class CallAPI
+    public class CallAPI : ICallAPI
     {
         private readonly HttpClient _httpClient;
 
