@@ -1,13 +1,21 @@
 using System.Collections.Generic;
 using DreamTravel.ExternalConnection;
 using DreamTravel.Models;
+using NSubstitute;
 using Xunit;
 
 namespace TESWebUITests.TSPEngine
 {
     public class ProcessInputDataTests
     {
-        private readonly ProcessInputData _sut = new ProcessInputData();
+        private readonly ProcessInputData _sut; 
+
+        public ProcessInputDataTests()
+        {
+            ICallAPI apiCaller = new CallAPI();
+
+            _sut = new ProcessInputData(apiCaller);
+        }
         [Fact]
         public void GetDurationBetweenTwoCitiesByTollRoad_InvokeWithValidCities_ReturnsSomeDuration()
         {

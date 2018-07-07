@@ -13,24 +13,11 @@ namespace DreamTravel.Controllers
 {
     public class TSPController : Controller
     {
-        private readonly IProcessInputData _processInputData;
-        private readonly IProcessOutputData _processOutputData;
-        private ICallAPI _callAPI;
-        private IBestPathCalculator _bestPathCalculator;
-        private ITSP _tspSolver;
+        private readonly IBestPathCalculator _bestPathCalculator;
 
-        public TSPController
-            (IProcessInputData processInputData, 
-            IProcessOutputData processOutputData, 
-            ICallAPI callAPI, 
-            IBestPathCalculator bestPathCalculator,
-            ITSP tspSolver)
+        public TSPController(IBestPathCalculator bestPathCalculator)
         {
-            _processInputData = processInputData;
-            _processOutputData = processOutputData;
-            _callAPI = callAPI;
             _bestPathCalculator = bestPathCalculator;
-            _tspSolver = tspSolver;
         }
 
         private const string PathsKeyName = "_Paths";
@@ -40,7 +27,7 @@ namespace DreamTravel.Controllers
         {
             try
             {
-                List<Path> paths = _bestPathCalculator.CalculateBestPath(cities, _processInputData, _processOutputData, _tspSolver);
+                List<Path> paths = _bestPathCalculator.CalculateBestPath(cities);
 
                 HttpContext.Session.SetString(sessionId + PathsKeyName, JsonConvert.SerializeObject(paths));
                 // return Ok();
