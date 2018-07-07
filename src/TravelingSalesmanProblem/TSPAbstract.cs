@@ -4,7 +4,7 @@ using System.Threading;
 
 namespace TravelingSalesmanProblem
 {
-    public abstract class Itsp : ITSP
+    public abstract class TSPAbstract : ITSP
     {
         public abstract int[] SolveTSP(double[] distances);
 

@@ -13,8 +13,8 @@ namespace DreamTravel.Controllers
 {
     public class TSPController : Controller
     {
-        private IProcessInputData _processInputData;
-        private IProcessOutputData _processOutputData;
+        private readonly IProcessInputData _processInputData;
+        private readonly IProcessOutputData _processOutputData;
         private ICallAPI _callAPI;
         private IBestPathCalculator _bestPathCalculator;
         private ITSP _tspSolver;

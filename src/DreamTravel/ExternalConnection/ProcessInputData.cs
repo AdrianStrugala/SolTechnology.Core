@@ -15,18 +15,16 @@ namespace DreamTravel.ExternalConnection
         private static double HighwayVelocity { get; } = 120;
         private static double RoadCombustion { get; } = 0.06; //per km
 
-        private readonly CallAPI _APICaller;
+        private readonly ICallAPI _APICaller;
 
 
-        public ProcessInputData()
+        public ProcessInputData(ICallAPI apiCaller)
         {
-            _APICaller = new CallAPI();
+            _APICaller = apiCaller;
         }
 
         public EvaluationMatrix FillMatrixWithData(List<City> listOfCities, EvaluationMatrix evaluationMatrix)
         {
-            ProcessInputData processInputData = new ProcessInputData();
-
             Parallel.For(0, listOfCities.Count, i =>
             {
                 Parallel.For(0, listOfCities.Count, j =>
@@ -42,13 +40,13 @@ namespace DreamTravel.ExternalConnection
                     {
                         Parallel.Invoke(
                             () => evaluationMatrix.FreeDistances[iterator] =
-                                processInputData.GetDurationBetweenTwoCitiesByFreeRoad(listOfCities[i],
+                                GetDurationBetweenTwoCitiesByFreeRoad(listOfCities[i],
                                     listOfCities[j]),
                             () => evaluationMatrix.TollDistances[iterator] =
-                                processInputData.GetDurationBetweenTwoCitiesByTollRoad(listOfCities[i],
+                                GetDurationBetweenTwoCitiesByTollRoad(listOfCities[i],
                                     listOfCities[j]),
                             () => evaluationMatrix.Costs[iterator] =
-                                processInputData.GetCostBetweenTwoCities(listOfCities[i], listOfCities[j])
+                                GetCostBetweenTwoCities(listOfCities[i], listOfCities[j])
                         );
 
                         //if toll takes more time than regular -> pretend it does not exist

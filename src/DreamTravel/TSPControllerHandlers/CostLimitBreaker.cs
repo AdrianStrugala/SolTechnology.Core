@@ -3,9 +3,9 @@ using DreamTravel.Models;
 
 namespace DreamTravel.TSPControllerHandlers
 {
-    public class CostLimitBreaker
+    public class CostLimitBreaker : ICostLimitBreaker
     {
-        internal List<Path> AdjustPaths(int costLimit, List<Path> paths)
+        public List<Path> AdjustPaths(int costLimit, List<Path> paths)
         {
             paths.Sort((x, y) => 1 * x.Goal.CompareTo(y.Goal));
 

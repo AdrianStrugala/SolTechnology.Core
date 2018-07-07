@@ -15,3 +15,5 @@ src/packages/**/*
 *.jfm
 *.ide
 src/.vs/TravelingEco-Salesman/v15/.suo
+src/.vs/*
+src/.vs/**/*

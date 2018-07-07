@@ -7,15 +7,26 @@ namespace DreamTravel.TSPControllerHandlers
 {
     public class BestPathCalculator : IBestPathCalculator
     {
-        public List<Path> CalculateBestPath(string cities, IProcessInputData processInputData, IProcessOutputData processOutputData, ITSP TSPSolver)
-        {
-            List<string> listOfCitiesAsStrings = processInputData.ReadCities(cities);
-            EvaluationMatrix matrices = new EvaluationMatrix(listOfCitiesAsStrings.Count);
-            var listOfCities = processInputData.GetCitiesFromGoogleApi(listOfCitiesAsStrings);
-            matrices = processInputData.FillMatrixWithData(listOfCities, matrices);
-            int[] orderOfCities = TSPSolver.SolveTSP(matrices.OptimalDistances);
+        private readonly IProcessInputData _processInputData;
+        private readonly IProcessOutputData _processOutputData;
+        private readonly ITSP _TSPSolver;
 
-            return processOutputData.FormOutputFromTSPResult(listOfCities, orderOfCities, matrices);
+        public BestPathCalculator(IProcessInputData processInputData, IProcessOutputData processOutputData, ITSP TSPSolver)
+        {
+            _processInputData = processInputData;
+            _processOutputData = processOutputData;
+            _TSPSolver = TSPSolver;
+        }
+
+        public List<Path> CalculateBestPath(string cities)
+        {
+            List<string> listOfCitiesAsStrings = _processInputData.ReadCities(cities);
+            EvaluationMatrix matrices = new EvaluationMatrix(listOfCitiesAsStrings.Count);
+            var listOfCities = _processInputData.GetCitiesFromGoogleApi(listOfCitiesAsStrings);
+            matrices = _processInputData.FillMatrixWithData(listOfCities, matrices);
+            int[] orderOfCities = _TSPSolver.SolveTSP(matrices.OptimalDistances);
+
+            return _processOutputData.FormOutputFromTSPResult(listOfCities, orderOfCities, matrices);
         }
 
     }

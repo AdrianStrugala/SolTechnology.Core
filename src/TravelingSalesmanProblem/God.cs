@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 
 namespace TravelingSalesmanProblem
 {
-    public class God : Itsp
+    public class God : TSPAbstract
     {
         private static ConcurrentBag<int[]> _paths;
         private const int NoOfUniverses = 500000;

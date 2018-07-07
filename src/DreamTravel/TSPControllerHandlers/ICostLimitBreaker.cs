@@ -3,8 +3,8 @@ using DreamTravel.Models;
 
 namespace DreamTravel.TSPControllerHandlers
 {
-    public interface IBestPathCalculator
+    public interface ICostLimitBreaker
     {
-        List<Path> CalculateBestPath(string cities);
+        List<Path> AdjustPaths(int costLimit, List<Path> paths);
     }
 }

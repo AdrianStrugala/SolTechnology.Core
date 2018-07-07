@@ -6,7 +6,7 @@ using TravelingSalesmanProblem.Models;
 
 namespace TravelingSalesmanProblem
 {
-    public class AntColony : Itsp
+    public class AntColony : TSPAbstract
     {
         // Algorithm parameters
         protected const int NoOfIterations = 10;

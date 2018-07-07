@@ -32,7 +32,11 @@ namespace DreamTravel
             services.AddTransient<IProcessInputData, ProcessInputData>();
             services.AddTransient<IProcessOutputData, ProcessOutputData>();
             services.AddTransient<IBestPathCalculator, BestPathCalculator>();
-            services.AddTransient<ITSP, Itsp>();
+            services.AddTransient<ICostLimitBreaker, CostLimitBreaker>();
+
+            //TSP engine
+            services.AddTransient<ITSP, God>();
+            
 
 
 
