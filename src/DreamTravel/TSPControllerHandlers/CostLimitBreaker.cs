@@ -7,7 +7,7 @@ namespace DreamTravel.TSPControllerHandlers
     public class CostLimitBreaker : ICostLimitBreaker
     {
         private double conversionError = 0.000001;
-        public List<Path> AdjustPaths(int costLimit, List<Path> paths)
+        public List<Path> Handle(int costLimit, List<Path> paths)
         {
             paths.Sort((x, y) => 1 * x.Goal.CompareTo(y.Goal));
 

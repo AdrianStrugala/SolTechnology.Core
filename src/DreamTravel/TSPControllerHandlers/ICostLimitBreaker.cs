@@ -5,6 +5,6 @@ namespace DreamTravel.TSPControllerHandlers
 {
     public interface ICostLimitBreaker
     {
-        List<Path> AdjustPaths(int costLimit, List<Path> paths);
+        List<Path> Handle(int costLimit, List<Path> paths);
     }
 }

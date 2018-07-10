@@ -4,7 +4,7 @@ html, body {
     height: 100vh;
     margin: 0;
     padding: 0;
-    background-color: #2fa4e7;
+    background-color: #2FA4E7;
 }
 /* Always set the map height explicitly to define the size of the div
         * element that contains the map. */
@@ -15,19 +15,14 @@ html, body {
     margin-top: 8vh;
     padding: 0;
 }
-/*.navbar{*/
-/*    height: 8vh;*/
-/*}*/
 
 
-#infoText { 
+#infoText {
     color: #e9ecef;
     background-color: transparent;
     background-image: none;
-    border-color: #e9ecef;
     margin-left: 1vw;
 }
-
 
 
 .dropdown-menu {
@@ -65,10 +60,9 @@ html, body {
 #loader {
     border: 16px solid #f3f3f3;
     border-radius: 50%;
-    border-top: 16px solid #0e2f61;
+    border-top: 16px solid #2FA4E7;
     width: 30vh;
     height: 30vh;
-    ;
     -webkit-animation: spin 2s linear infinite; /* Safari */
     animation: spin 2s linear infinite;
     display: none;
@@ -78,24 +72,52 @@ html, body {
     z-index: 1;
 }
 
-
-/* Safari */
-@-webkit-keyframes spin {
-    0% {
-        -webkit-transform: rotate(0deg);
-    }
-
-    100% {
-        -webkit-transform: rotate(360deg);
-    }
+#limitValue {
+    width: 100%;
+    font-weight: bold;
+    color: #2FA4E7;
+    text-align: center;
+    font-size: 200%;
 }
 
-@keyframes spin {
-    0% {
-        transform: rotate(0deg);
-    }
 
-    100% {
-        transform: rotate(360deg);
-    }
+.slider {
+    -webkit-appearance: none;
+    width: 100%;
+    height: 15px;
+    border-radius: 5px;
+    background: #d3d3d3;
+    outline: none;
+    opacity: 0.7;
+    -webkit-transition: .2s;
+    transition: opacity .2s;
+}
+
+/* Mouse-over effects */
+.slider:hover {
+    opacity: 1; /* Fully shown on mouse-over */
+}
+
+.slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 25px;
+    height: 25px;
+    border-radius: 50%;
+    background: #2FA4E7;
+    cursor: pointer;
+}
+
+.slider::-moz-range-thumb {
+    width: 25px;
+    height: 25px;
+    border-radius: 50%;
+    background: #2FA4E7;
+    cursor: pointer;
+}
+
+.btn-info {
+    background-image: -webkit-gradient(linear, left top, left bottom, from(#2fa4e7), color-stop(60%, #2fa4e7), to(#2fa4e7));
+    background-color: #2FA4E7;
+    border-color: #2FA4E7;
 }

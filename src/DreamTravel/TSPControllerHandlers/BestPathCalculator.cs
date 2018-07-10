@@ -18,7 +18,7 @@ namespace DreamTravel.TSPControllerHandlers
             _TSPSolver = TSPSolver;
         }
 
-        public List<Path> CalculateBestPath(string cities)
+        public List<Path> Handle(string cities)
         {
             List<string> listOfCitiesAsStrings = _processInputData.ReadCities(cities);
             EvaluationMatrix matrices = new EvaluationMatrix(listOfCitiesAsStrings.Count);

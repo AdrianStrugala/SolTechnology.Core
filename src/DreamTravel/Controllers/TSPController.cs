@@ -1,13 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using DreamTravel.ExternalConnection;
 using DreamTravel.Models;
 using DreamTravel.TSPControllerHandlers;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
-using TravelingSalesmanProblem;
 
 namespace DreamTravel.Controllers
 {
@@ -27,7 +25,7 @@ namespace DreamTravel.Controllers
         {
             try
             {
-                List<Path> paths = _bestPathCalculator.CalculateBestPath(cities);
+                List<Path> paths = _bestPathCalculator.Handle(cities);
 
                 HttpContext.Session.SetString(sessionId + PathsKeyName, JsonConvert.SerializeObject(paths));
                 // return Ok();
@@ -48,7 +46,7 @@ namespace DreamTravel.Controllers
                 List<Path> paths = JsonConvert.DeserializeObject<List<Path>>(HttpContext.Session.GetString(sessionId + PathsKeyName));
                 var costLimitBreaker = new CostLimitBreaker();
 
-                paths = costLimitBreaker.AdjustPaths(costLimit, paths);
+                paths = costLimitBreaker.Handle(costLimit, paths);
 
                 HttpContext.Session.SetString(sessionId + PathsKeyName, JsonConvert.SerializeObject(paths));
                 // return Ok();
