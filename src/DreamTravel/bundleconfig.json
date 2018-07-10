@@ -12,7 +12,7 @@
     ]
   },
   {
-    "outputFileName": "wwwroot/css/bundle.min.css",
+    "outputFileName": "wwwroot/css/bundle.css",
     "inputFiles": [
       "wwwroot/css/bootstrap.css",
       "wwwroot/css/map.css",
@@ -20,11 +20,11 @@
     ]
   },
   {
-    "outputFileName": "wwwroot/css/bundle.css",
+    "outputFileName": "wwwroot/css/bundle.min.css",
     "inputFiles": [
-      "wwwroot/css/bootstrap.css",
+      "wwwroot/css/site.css",
       "wwwroot/css/map.css",
-      "wwwroot/css/site.css"
+      "wwwroot/css/bootstrap.css"
     ]
   }
 ]
