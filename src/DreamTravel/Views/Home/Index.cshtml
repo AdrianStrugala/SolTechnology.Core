@@ -297,7 +297,7 @@ Last City
 //                            $('#limitValue').innerHTML = $('#costSlider').value + " €"; // Display the default slider value
                         },
                         statusCode: {
-                            400: function (msg) { alert('Error during processing'); },
+                            400: function (msg) { alert(JSON.parse(msg)); },
                             404: function(msg) { alert('cannot find resource'); },
                             500: function(msg) { alert('internal server error'); }
                         },
@@ -346,7 +346,7 @@ Last City
                             document.getElementById("loader").style.display = "none";
                         },
                         statusCode: {
-                            400: function(msg) { alert('Error during processing'); },
+                            400: function (msg) { alert(msg); },
                             404: function(msg) { alert('cannot find resource'); },
                             500: function(msg) { alert('internal server error'); }
                         },
