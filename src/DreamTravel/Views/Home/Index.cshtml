@@ -296,21 +296,17 @@ Last City
 //                            $('#costSlider').setAttribute('value', optimalCost);
 //                            $('#limitValue').innerHTML = $('#costSlider').value + " €"; // Display the default slider value
                         },
-                        statusCode: {
-                            400: function (msg) { alert(JSON.parse(msg)); },
-                            404: function(msg) { alert('cannot find resource'); },
-                            500: function(msg) { alert('internal server error'); }
-                        },
-                        error: function(req, status, errorObj) {
-                            // handle status === "timeout"
-                            // handle other errors
+                        error: function (req, status, errorObj) {
+                            document.getElementById("loader").style.display = "none";
+                            var alertMessage = JSON.parse(req.responseText);
+                            alert(alertMessage);
                         }
                     });
                 }
 
                 var limitCostHandler = function() {
 //                    var listOfCities = document.getElementById("listOfCities").value;
-//                    document.getElementById("loader").style.display = "block";
+                    document.getElementById("loader").style.display = "block";
                     var limit = document.getElementById("costSlider").value;
 
                     $.ajax({
@@ -345,14 +341,10 @@ Last City
                             document.getElementById("listOfCitiesBtn").style.display = "initial";
                             document.getElementById("loader").style.display = "none";
                         },
-                        statusCode: {
-                            400: function (msg) { alert(msg); },
-                            404: function(msg) { alert('cannot find resource'); },
-                            500: function(msg) { alert('internal server error'); }
-                        },
-                        error: function(req, status, errorObj) {
-                            // handle status === "timeout"
-                            // handle other errors
+                        error: function (req, status, errorObj) {
+                            document.getElementById("loader").style.display = "none";
+                            var alertMessage = JSON.parse(req.responseText);
+                            alert(alertMessage);
                         }
                     });
                 }
