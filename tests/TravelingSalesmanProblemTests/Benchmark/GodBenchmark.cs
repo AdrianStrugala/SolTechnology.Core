@@ -6,7 +6,7 @@ using Xunit;
 
 namespace TravelingSalesmanProblemTests.Benchmark
 {
-
+    [Collection("Benchmark")]
     public class GodBenchmark
     {
         private const int NumberOfExecutions = 50;

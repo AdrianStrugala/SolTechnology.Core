@@ -6,7 +6,7 @@ using Xunit;
 
 namespace TravelingSalesmanProblemTests.Benchmark
 {
-
+    [Collection("Benchmark")]
     public class AntColonyBenchmark
     {
         private const int NumberOfExecutions = 50;
