@@ -28,13 +28,15 @@ namespace DreamTravel.Controllers
                 List<Path> paths = _bestPathCalculator.Handle(cities);
 
                 HttpContext.Session.SetString(sessionId + PathsKeyName, JsonConvert.SerializeObject(paths));
-                // return Ok();
-                return Content(JsonConvert.SerializeObject(paths));
+
+                string message = JsonConvert.SerializeObject(paths);
+                return Ok(message);
             }
 
-            catch (Exception)
+            catch (Exception ex)
             {
-                return BadRequest();
+                string message = JsonConvert.SerializeObject(ex.Message);
+                return BadRequest(message);
             }
         }
 
@@ -49,13 +51,14 @@ namespace DreamTravel.Controllers
                 paths = costLimitBreaker.Handle(costLimit, paths);
 
                 HttpContext.Session.SetString(sessionId + PathsKeyName, JsonConvert.SerializeObject(paths));
-                // return Ok();
-                return Content(JsonConvert.SerializeObject(paths));
+
+                string message = JsonConvert.SerializeObject(paths);
+                return Ok(message);
             }
 
-            catch (Exception)
+            catch (Exception ex)
             {
-                return BadRequest();
+                return BadRequest(ex.Message);
             }
         }
     }

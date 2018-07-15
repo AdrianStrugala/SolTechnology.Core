@@ -24,86 +24,115 @@ namespace DreamTravel.ExternalConnection
 
         public JObject DownloadLocationOfCity(string cityName)
         {
-
-            string url =
-                $"https://maps.googleapis.com/maps/api/geocode/json?address={cityName}&key=AIzaSyBgCjCJuGQsXlAz6BUXPIL2_RSxgXUaCcM";
-
-            Task<HttpResponseMessage> getAsync = _httpClient.GetAsync(url);
-            getAsync.Wait();
-
-            using (Stream stream = getAsync.Result.Content.ReadAsStreamAsync().Result ??
-                                   throw new ArgumentNullException(
-                                       $"Execption on [{MethodBase.GetCurrentMethod().Name}]"))
+            try
             {
-                using (var jsonTextReader = new JsonTextReader(new StreamReader(stream)))
+                string url =
+                    $"https://maps.googleapis.com/maps/api/geocode/json?address={cityName}&key=AIzaSyBgCjCJuGQsXlAz6BUXPIL2_RSxgXUaCcM";
+
+                Task<HttpResponseMessage> getAsync = _httpClient.GetAsync(url);
+                getAsync.Wait();
+
+                using (Stream stream = getAsync.Result.Content.ReadAsStreamAsync().Result ??
+                                       throw new ArgumentNullException(
+                                           $"Execption on [{MethodBase.GetCurrentMethod().Name}]"))
                 {
-                    JObject json = (JObject)new JsonSerializer().Deserialize(jsonTextReader);
-                    return json;
+                    using (var jsonTextReader = new JsonTextReader(new StreamReader(stream)))
+                    {
+                        JObject json = (JObject)new JsonSerializer().Deserialize(jsonTextReader);
+                        return json;
+                    }
                 }
+            }
+            catch (Exception)
+            {
+                throw new InvalidDataException($"Cannot find city {cityName}");
             }
         }
 
         public string DowloadCostBetweenTwoCities(City origin, City destination)
         {
-            string url =
-                $"http://apir.viamichelin.com/apir/1/route.xml/fra?steps=1:e:{origin.Longitude}:{origin.Latitude};1:e:{destination.Longitude}:{destination.Latitude}&authkey=JSBS20101202150903217741708195";
-
-            Task<HttpResponseMessage> getAsync = _httpClient.GetAsync(url);
-            getAsync.Wait();
-
-            string content;
-            using (Stream stream = getAsync.Result.Content.ReadAsStreamAsync().Result ??
-                                   throw new ArgumentNullException(
-                                       $"Execption on [{MethodBase.GetCurrentMethod().Name}]"))
+            try
             {
-                using (StreamReader sr = new StreamReader(stream))
-                {
-                    content = sr.ReadToEnd();
-                }
-            }
+                string url =
+                    $"http://apir.viamichelin.com/apir/1/route.xml/fra?steps=1:e:{origin.Longitude}:{origin.Latitude};1:e:{destination.Longitude}:{destination.Latitude}&authkey=JSBS20101202150903217741708195";
 
-            return content;
+                Task<HttpResponseMessage> getAsync = _httpClient.GetAsync(url);
+                getAsync.Wait();
+
+                string content;
+                using (Stream stream = getAsync.Result.Content.ReadAsStreamAsync().Result ??
+                                       throw new ArgumentNullException(
+                                           $"Execption on [{MethodBase.GetCurrentMethod().Name}]"))
+                {
+                    using (StreamReader sr = new StreamReader(stream))
+                    {
+                        content = sr.ReadToEnd();
+                    }
+                }
+
+                return content;
+            }
+            catch (Exception)
+            {
+                throw new InvalidDataException(
+                    $"Cannot get data about cost between {origin.Name} and {destination.Name}");
+            }
         }
 
         public JObject DowloadDurationBetweenTwoCitesByTollRoad(City origin, City destination)
         {
-            string url =
-                $"https://maps.googleapis.com/maps/api/distancematrix/json?units=imperial&origins={origin.Latitude},{origin.Longitude}&destinations={destination.Latitude},{destination.Longitude}&key=AIzaSyCdHbtbmF8Y2nfesiu0KUUJagdG7_oui1k";
-
-            Task<HttpResponseMessage> getAsync = _httpClient.GetAsync(url);
-            getAsync.Wait();
-
-            using (Stream stream = getAsync.Result.Content.ReadAsStreamAsync().Result ??
-                                   throw new ArgumentNullException(
-                                       $"Execption on [{MethodBase.GetCurrentMethod().Name}]"))
+            try
             {
-                using (var jsonTextReader = new JsonTextReader(new StreamReader(stream)))
-                {
-                    JObject json = (JObject)new JsonSerializer().Deserialize(jsonTextReader);
+                string url =
+                    $"https://maps.googleapis.com/maps/api/distancematrix/json?units=imperial&origins={origin.Latitude},{origin.Longitude}&destinations={destination.Latitude},{destination.Longitude}&key=AIzaSyCdHbtbmF8Y2nfesiu0KUUJagdG7_oui1k";
 
-                    return json;
+                Task<HttpResponseMessage> getAsync = _httpClient.GetAsync(url);
+                getAsync.Wait();
+
+                using (Stream stream = getAsync.Result.Content.ReadAsStreamAsync().Result ??
+                                       throw new ArgumentNullException(
+                                           $"Execption on [{MethodBase.GetCurrentMethod().Name}]"))
+                {
+                    using (var jsonTextReader = new JsonTextReader(new StreamReader(stream)))
+                    {
+                        JObject json = (JObject)new JsonSerializer().Deserialize(jsonTextReader);
+
+                        return json;
+                    }
                 }
+            }
+            catch (Exception)
+            {
+                throw new InvalidDataException(
+                    $"Cannot get data about road between {origin.Name} and {destination.Name}");
             }
         }
 
         public JObject DowloadDurationBetweenTwoCitesByFreeRoad(City origin, City destination)
         {
-            string url =
-                $"https://maps.googleapis.com/maps/api/distancematrix/json?units=imperial&origins={origin.Latitude},{origin.Longitude}&destinations={destination.Latitude},{destination.Longitude}&avoid=tolls&key=AIzaSyCdHbtbmF8Y2nfesiu0KUUJagdG7_oui1k";
-
-            Task<HttpResponseMessage> getAsync = _httpClient.GetAsync(url);
-            getAsync.Wait();
-
-            using (Stream stream = getAsync.Result.Content.ReadAsStreamAsync().Result ??
-                                   throw new ArgumentNullException(
-                                       $"Execption on [{MethodBase.GetCurrentMethod().Name}]"))
+            try
             {
-                using (var jsonTextReader = new JsonTextReader(new StreamReader(stream)))
-                {
-                    JObject json = (JObject)new JsonSerializer().Deserialize(jsonTextReader);
+                string url =
+                    $"https://maps.googleapis.com/maps/api/distancematrix/json?units=imperial&origins={origin.Latitude},{origin.Longitude}&destinations={destination.Latitude},{destination.Longitude}&avoid=tolls&key=AIzaSyCdHbtbmF8Y2nfesiu0KUUJagdG7_oui1k";
 
-                    return json;
+                Task<HttpResponseMessage> getAsync = _httpClient.GetAsync(url);
+                getAsync.Wait();
+
+                using (Stream stream = getAsync.Result.Content.ReadAsStreamAsync().Result ??
+                                       throw new ArgumentNullException(
+                                           $"Execption on [{MethodBase.GetCurrentMethod().Name}]"))
+                {
+                    using (var jsonTextReader = new JsonTextReader(new StreamReader(stream)))
+                    {
+                        JObject json = (JObject)new JsonSerializer().Deserialize(jsonTextReader);
+
+                        return json;
+                    }
                 }
+            }
+            catch (Exception)
+            {
+                throw new InvalidDataException($"Cannot get data about road between {origin.Name} and {destination.Name}");
             }
         }
     }
