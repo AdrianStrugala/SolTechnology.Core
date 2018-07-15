@@ -7,7 +7,7 @@ namespace TravelingSalesmanProblemTests
 {
     public class AntColonyTests
     {
-        readonly AntColony _sut = new AntColony();
+        readonly TravelingSalesmanProblem.AntColony _sut = new TravelingSalesmanProblem.AntColony();
 
         [Fact]
         public void SolveTSP_RunWithValidParameters_FirstAndLastCitiesStaysTheSame()

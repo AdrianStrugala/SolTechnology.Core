@@ -1,14 +1,13 @@
 using System.Linq;
 using DreamTravel.Models;
 using TravelingSalesmanProblem;
-using TravelingSalesmanProblem.Models;
 using Xunit;
 
 namespace TravelingSalesmanProblemTests
 {
     public class GodTests
     {
-        readonly God _sut = new God();
+        readonly TravelingSalesmanProblem.God _sut = new TravelingSalesmanProblem.God();
 
         [Fact]
         public void SolveTSP_RunWithValidParameters_FirstAndLastCitiesStaysTheSame()

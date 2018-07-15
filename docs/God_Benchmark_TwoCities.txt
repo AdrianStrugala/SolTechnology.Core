@@ -1,0 +1,4 @@
+God: Two Cities 
+Minimal Distance: 151522 
+Average Time: 0.00325282313333333 min 
+Recurrence: 100 %

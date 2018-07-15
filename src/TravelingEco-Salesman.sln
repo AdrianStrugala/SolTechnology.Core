@@ -14,7 +14,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TravelingSalesmanProblem", 
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{55867FA2-33B1-48B4-AC03-D2F72DD60441}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TravelingSalesmanProblemTests", "TravelingSalesmanProblemTests\TravelingSalesmanProblemTests.csproj", "{15E7697D-59D6-426F-A9A9-A3ABA90A070A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TravelingSalesmanProblemTests", "..\tests\TravelingSalesmanProblemTests\TravelingSalesmanProblemTests.csproj", "{15E7697D-59D6-426F-A9A9-A3ABA90A070A}"
 	ProjectSection(ProjectDependencies) = postProject
 		{890C2C9C-DEA5-439C-A3FF-11D88F2DEAB0} = {890C2C9C-DEA5-439C-A3FF-11D88F2DEAB0}
 	EndProjectSection
