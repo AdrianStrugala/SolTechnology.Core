@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using DreamTravel.ExternalConnection;
 using DreamTravel.Models;
 using TravelingSalesmanProblem;
@@ -18,12 +19,13 @@ namespace DreamTravel.TSPControllerHandlers
             _TSPSolver = TSPSolver;
         }
 
-        public List<Path> Handle(string cities)
+        public async Task<List<Path>> Handle(string cities)
         {
             List<string> listOfCitiesAsStrings = _processInputData.ReadCities(cities);
             EvaluationMatrix matrices = new EvaluationMatrix(listOfCitiesAsStrings.Count);
-            var listOfCities = _processInputData.GetCitiesFromGoogleApi(listOfCitiesAsStrings);
-            matrices = _processInputData.FillMatrixWithData(listOfCities, matrices);
+            var listOfCities = await _processInputData.GetCitiesFromGoogleApi(listOfCitiesAsStrings);
+            matrices = await _processInputData.DownloadExternalData(listOfCities, matrices);
+            matrices = await _processInputData.EvaluateCostAsync(matrices, listOfCities.Count);
             int[] orderOfCities = _TSPSolver.SolveTSP(matrices.OptimalDistances);
 
             return _processOutputData.FormOutputFromTSPResult(listOfCities, orderOfCities, matrices);

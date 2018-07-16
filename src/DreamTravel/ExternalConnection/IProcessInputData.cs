@@ -1,20 +1,22 @@
 ﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using DreamTravel.Models;
 
 namespace DreamTravel.ExternalConnection
 {
     public interface IProcessInputData
     {
-        List<City> GetCitiesFromGoogleApi(List<string> cityNames);
+        Task<List<City>> GetCitiesFromGoogleApi(List<string> cityNames);
 
-        double GetCostBetweenTwoCities(City origin, City destination);
+        Task<double> GetCostBetweenTwoCities(City origin, City destination);
 
-        int GetDurationBetweenTwoCitiesByFreeRoad(City origin, City destination);
+        Task<int> GetDurationBetweenTwoCitiesByFreeRoad(City origin, City destination);
 
-        int GetDurationBetweenTwoCitiesByTollRoad(City origin, City destination);
+        Task<int> GetDurationBetweenTwoCitiesByTollRoad(City origin, City destination);
 
         List<string> ReadCities(string incomingCities);
 
-        EvaluationMatrix FillMatrixWithData(List<City> listOfCities, EvaluationMatrix evaluationMatrix);
+        Task<EvaluationMatrix> DownloadExternalData(List<City> listOfCities, EvaluationMatrix evaluationMatrix);
+        Task<EvaluationMatrix> EvaluateCostAsync(EvaluationMatrix evaluationMatrix, int noOfCities);
     }
 }

@@ -25,7 +25,7 @@ namespace DreamTravel.Controllers
         {
             try
             {
-                List<Path> paths = _bestPathCalculator.Handle(cities);
+                List<Path> paths = await _bestPathCalculator.Handle(cities);
 
                 HttpContext.Session.SetString(sessionId + PathsKeyName, JsonConvert.SerializeObject(paths));
 

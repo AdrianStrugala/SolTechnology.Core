@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using DreamTravel.ExternalConnection;
 using DreamTravel.Models;
 using NSubstitute;
@@ -17,7 +18,7 @@ namespace TESWebUITests.TSPEngine
             _sut = new ProcessInputData(apiCaller);
         }
         [Fact]
-        public void GetDurationBetweenTwoCitiesByTollRoad_InvokeWithValidCities_ReturnsSomeDuration()
+        public async Task GetDurationBetweenTwoCitiesByTollRoad_InvokeWithValidCities_ReturnsSomeDuration()
         {
             //Arrange
             City firstCity = new City
@@ -35,14 +36,14 @@ namespace TESWebUITests.TSPEngine
             };
             
             //Act
-            var result = _sut.GetDurationBetweenTwoCitiesByTollRoad(firstCity, secondCity);
+            var result = await _sut.GetDurationBetweenTwoCitiesByTollRoad(firstCity, secondCity);
 
             //Assert
             Assert.NotEqual(0,result);
         }
 
         [Fact]
-        public void GetDurationBetweenTwoCitiesByFreeRoad_InvokeWithValidCities_ReturnsSomeDuration()
+        public async Task GetDurationBetweenTwoCitiesByFreeRoad_InvokeWithValidCities_ReturnsSomeDuration()
         {
             //Arrange
             City firstCity = new City
@@ -60,14 +61,14 @@ namespace TESWebUITests.TSPEngine
             };
 
             //Act
-            var result = _sut.GetDurationBetweenTwoCitiesByFreeRoad(firstCity, secondCity);
+            var result = await _sut.GetDurationBetweenTwoCitiesByFreeRoad(firstCity, secondCity);
 
             //Assert
             Assert.NotEqual(0, result);
         }
 
         [Fact]
-        public void GetCostBetweenTwoCities_InvokeWithValidCities_ReturnsSomeCost()
+        public async Task GetCostBetweenTwoCities_InvokeWithValidCities_ReturnsSomeCost()
         {
             //Arrange
             City firstCity = new City
@@ -85,7 +86,7 @@ namespace TESWebUITests.TSPEngine
             };
 
             //Act
-            var result = _sut.GetCostBetweenTwoCities(firstCity, secondCity);
+            var result = await _sut.GetCostBetweenTwoCities(firstCity, secondCity);
 
             //Assert
             Assert.NotEqual(0, result);
@@ -93,7 +94,7 @@ namespace TESWebUITests.TSPEngine
 
 
         [Fact]
-        public void GetCityByName_InvokeWithRealName_ReturnsCityObject()
+        public async Task GetCityByName_InvokeWithRealName_ReturnsCityObject()
         {
             //Arrange
             List<string> cityNames = new List<string>();
@@ -101,7 +102,7 @@ namespace TESWebUITests.TSPEngine
             List<City> cities = new List<City>();
 
             //Act
-            cities = _sut.GetCitiesFromGoogleApi(cityNames);
+            cities = await _sut.GetCitiesFromGoogleApi(cityNames);
 
             //Assert
             Assert.Equal("Wroclaw", cities[0].Name);

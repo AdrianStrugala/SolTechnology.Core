@@ -33,7 +33,7 @@ namespace TESWebUITests.TSPControllerHandlersTests
             //Arrange
             _processInputData.ReadCities(Arg.Any<string>()).Returns(new List<string>());
             _processInputData.GetCitiesFromGoogleApi(Arg.Any<List<string>>()).Returns(new List<City>());
-            _processInputData.FillMatrixWithData(Arg.Any<List<City>>(), Arg.Any<EvaluationMatrix>()).Returns(new EvaluationMatrix(1));
+            _processInputData.DownloadExternalData(Arg.Any<List<City>>(), Arg.Any<EvaluationMatrix>()).Returns(new EvaluationMatrix(1));
             _tspSolver.SolveTSP(Arg.Any<double[]>()).Returns(new int[1]);
             _processOutputData
                 .FormOutputFromTSPResult(Arg.Any<List<City>>(), Arg.Any<int[]>(), Arg.Any<EvaluationMatrix>())
@@ -49,7 +49,7 @@ namespace TESWebUITests.TSPControllerHandlersTests
 
             _processInputData.Received(1).ReadCities(Arg.Any<string>());
             _processInputData.Received(1).GetCitiesFromGoogleApi(Arg.Any<List<string>>());
-            _processInputData.Received(1).FillMatrixWithData(Arg.Any<List<City>>(), Arg.Any<EvaluationMatrix>());
+            _processInputData.Received(1).DownloadExternalData(Arg.Any<List<City>>(), Arg.Any<EvaluationMatrix>());
             _tspSolver.Received(1).SolveTSP(Arg.Any<double[]>());
             _processOutputData.Received(1)
                 .FormOutputFromTSPResult(Arg.Any<List<City>>(), Arg.Any<int[]>(), Arg.Any<EvaluationMatrix>());

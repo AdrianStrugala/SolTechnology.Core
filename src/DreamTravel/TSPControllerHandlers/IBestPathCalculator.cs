@@ -1,10 +1,11 @@
 ﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using DreamTravel.Models;
 
 namespace DreamTravel.TSPControllerHandlers
 {
     public interface IBestPathCalculator
     {
-        List<Path> Handle(string cities);
+        Task<List<Path>> Handle(string cities);
     }
 }

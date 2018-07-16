@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Xml;
 using DreamTravel.Models;
@@ -23,11 +24,12 @@ namespace DreamTravel.ExternalConnection
             _APICaller = apiCaller;
         }
 
-        public EvaluationMatrix FillMatrixWithData(List<City> listOfCities, EvaluationMatrix evaluationMatrix)
+        public async Task<EvaluationMatrix> DownloadExternalData(List<City> listOfCities,
+            EvaluationMatrix evaluationMatrix)
         {
-            Parallel.For(0, listOfCities.Count, i =>
+            await listOfCities.Count.ForEachAsync(async i =>
             {
-                Parallel.For(0, listOfCities.Count, j =>
+                await listOfCities.Count.ForEachAsync(async j =>
                 {
                     int iterator = j + i * listOfCities.Count;
 
@@ -38,35 +40,54 @@ namespace DreamTravel.ExternalConnection
 
                     else
                     {
-                        Parallel.Invoke(
-                            () => evaluationMatrix.FreeDistances[iterator] =
-                                GetDurationBetweenTwoCitiesByFreeRoad(listOfCities[i],
-                                    listOfCities[j]),
-                            () => evaluationMatrix.TollDistances[iterator] =
-                                GetDurationBetweenTwoCitiesByTollRoad(listOfCities[i],
-                                    listOfCities[j]),
-                            () => evaluationMatrix.Costs[iterator] =
-                                GetCostBetweenTwoCities(listOfCities[i], listOfCities[j])
-                        );
+                        Task freeDistancesCaller = Task.Run(async () => evaluationMatrix.FreeDistances[iterator] =
+                            await GetDurationBetweenTwoCitiesByFreeRoad(listOfCities[i], listOfCities[j]));
 
-                        //if toll takes more time than regular -> pretend it does not exist
-                        if (evaluationMatrix.TollDistances[iterator] > evaluationMatrix.FreeDistances[iterator])
-                        {
-                            evaluationMatrix.TollDistances[iterator] = evaluationMatrix.FreeDistances[iterator];
-                            evaluationMatrix.Costs[iterator] = 0;
-                        }
+                        Task tollDistancesCaller = Task.Run(async () => evaluationMatrix.TollDistances[iterator] =
+                            await GetDurationBetweenTwoCitiesByTollRoad(listOfCities[i], listOfCities[j]));
 
-                        if (IsTollRoadProfitable(evaluationMatrix, iterator))
-                        {
-                            evaluationMatrix.OptimalDistances[iterator] = evaluationMatrix.TollDistances[iterator];
-                            evaluationMatrix.OptimalCosts[iterator] = evaluationMatrix.Costs[iterator];
-                        }
-                        else
-                        {
-                            evaluationMatrix.OptimalDistances[iterator] = evaluationMatrix.FreeDistances[iterator];
-                            evaluationMatrix.OptimalCosts[iterator] = 0;
-                        }
+                        Task costCaller = Task.Run(async () => evaluationMatrix.Costs[iterator] =
+                            await GetCostBetweenTwoCities(listOfCities[i], listOfCities[j]));
+
+                        await Task.WhenAll(freeDistancesCaller, tollDistancesCaller, costCaller);
                     }
+                });
+            });
+
+            return evaluationMatrix;
+        }
+
+        public async Task<EvaluationMatrix> EvaluateCostAsync(EvaluationMatrix evaluationMatrix, int noOfCities)
+        {
+            await noOfCities.ForEachAsync(async i =>
+            {
+                await noOfCities.ForEachAsync(async j =>
+                {
+                    await Task.Run(() =>
+                    {
+                        if (i != j)
+                        {
+                            int iterator = j + i * noOfCities;
+
+                            //if toll takes more time than regular -> pretend it does not exist
+                            if (evaluationMatrix.TollDistances[iterator] > evaluationMatrix.FreeDistances[iterator])
+                            {
+                                evaluationMatrix.TollDistances[iterator] = evaluationMatrix.FreeDistances[iterator];
+                                evaluationMatrix.Costs[iterator] = 0;
+                            }
+
+                            if (IsTollRoadProfitable(evaluationMatrix, iterator))
+                            {
+                                evaluationMatrix.OptimalDistances[iterator] = evaluationMatrix.TollDistances[iterator];
+                                evaluationMatrix.OptimalCosts[iterator] = evaluationMatrix.Costs[iterator];
+                            }
+                            else
+                            {
+                                evaluationMatrix.OptimalDistances[iterator] = evaluationMatrix.FreeDistances[iterator];
+                                evaluationMatrix.OptimalCosts[iterator] = 0;
+                            }
+                        }
+                    });
                 });
             });
 
@@ -88,7 +109,8 @@ namespace DreamTravel.ExternalConnection
             //toll goal = (cost of gasoline + cost of toll fee) * time of toll
             double cost = (gasolineCostToll + evaluationMatrix.Costs[iterator]);
             double time = (evaluationMatrix.TollDistances[iterator] / 3600.0);
-            double importance = (evaluationMatrix.TollDistances[iterator] * 1.0 / evaluationMatrix.FreeDistances[iterator] * 1.0);
+            double importance = (evaluationMatrix.TollDistances[iterator] * 1.0 /
+                                 evaluationMatrix.FreeDistances[iterator] * 1.0);
             var tollGoal = cost * time * importance;
             var freeGoal = gasolineCostFree * (evaluationMatrix.FreeDistances[iterator] / 3600.0);
 
@@ -117,65 +139,50 @@ namespace DreamTravel.ExternalConnection
             return cities.Where(x => !String.IsNullOrEmpty(x)).ToList();
         }
 
-        public List<City> GetCitiesFromGoogleApi(List<string> cityNames)
+        public async Task<List<City>> GetCitiesFromGoogleApi(List<string> cityNames)
         {
             List<City> cities = new List<City>();
             foreach (var cityName in cityNames)
             {
-                City toAdd = new City { Name = cityName };
-
-                JObject locationJson = _APICaller.DownloadLocationOfCity(cityName);
-                toAdd.Latitude = locationJson["results"][0]["geometry"]["location"]["lat"].Value<double>();
-                toAdd.Longitude = locationJson["results"][0]["geometry"]["location"]["lng"].Value<double>();
-
-                cities.Add(toAdd);
+                City downloadedCity = await _APICaller.DownloadLocationOfCity(cityName);
+                cities.Add(downloadedCity);
             }
 
             return cities;
         }
 
-        public double GetCostBetweenTwoCities(City origin, City destination)
+        public async Task<double> GetCostBetweenTwoCities(City origin, City destination)
         {
-            var content = _APICaller.DowloadCostBetweenTwoCities(origin, destination);
-
-            XmlDocument doc = new XmlDocument();
-            doc.LoadXml(content);
-
-            XmlNode node = doc.DocumentElement.SelectSingleNode("/response/iti/header/summaries/summary/tollCost/car");
-            double tollCost = Convert.ToDouble(node.InnerText);
-
-            XmlNode vinietaNode = doc.DocumentElement.SelectSingleNode("/response/iti/header/summaries/summary/CCZCost/car");
-            double vinietaCost = Convert.ToDouble(vinietaNode.InnerText);
-
-            double result = tollCost + vinietaCost;
-
-            return result / 100;
+            var costInCents = await _APICaller.DowloadCostBetweenTwoCities(origin, destination);
+            return costInCents / 100;
         }
 
-        public int GetDurationBetweenTwoCitiesByTollRoad(City origin, City destination)
+        public async Task<int> GetDurationBetweenTwoCitiesByTollRoad(City origin, City destination)
         {
-            JObject json = _APICaller.DowloadDurationBetweenTwoCitesByTollRoad(origin, destination);
+            return await _APICaller.DowloadDurationBetweenTwoCitesByTollRoad(origin, destination);
+        }
 
-            try
+        public async Task<int> GetDurationBetweenTwoCitiesByFreeRoad(City origin, City destination)
+        {
+            return await _APICaller.DowloadDurationBetweenTwoCitesByFreeRoad(origin, destination);
+        }
+    }
+
+    public static class Extensions
+    {
+        public static async Task ForEachAsync<T>(this List<T> list, Func<T, Task> func)
+        {
+            foreach (var value in list)
             {
-                return json["rows"][0]["elements"][0]["duration"]["value"].Value<int>();
-            }
-            catch (Exception)
-            {
-                return -1;
+                await func(value);
             }
         }
 
-        public int GetDurationBetweenTwoCitiesByFreeRoad(City origin, City destination)
+        public static async Task ForEachAsync(this int iterator, Func<int, Task> func)
         {
-            JObject json = _APICaller.DowloadDurationBetweenTwoCitesByFreeRoad(origin, destination);
-            try
+            for (int i = 0; i < iterator; i++)
             {
-                return json["rows"][0]["elements"][0]["duration"]["value"].Value<int>();
-            }
-            catch (Exception)
-            {
-                return -1;
+                await func(i);
             }
         }
     }
