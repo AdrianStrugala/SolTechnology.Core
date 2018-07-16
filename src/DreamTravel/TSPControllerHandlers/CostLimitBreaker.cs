@@ -6,7 +6,7 @@ namespace DreamTravel.TSPControllerHandlers
 {
     public class CostLimitBreaker : ICostLimitBreaker
     {
-        private double conversionError = 0.000001;
+        private const double ConversionError = 0.000001;
         public List<Path> Handle(int costLimit, List<Path> paths)
         {
             paths.Sort((x, y) => 1 * x.Goal.CompareTo(y.Goal));
@@ -14,7 +14,7 @@ namespace DreamTravel.TSPControllerHandlers
             double overallCost = 0;
             foreach (var path in paths)
             {
-                if (Math.Abs(path.Goal) < conversionError) continue;
+                if (Math.Abs(path.Goal) < ConversionError) continue;
                 if (overallCost + path.Cost <= costLimit)
                 {
                     overallCost += path.Cost;

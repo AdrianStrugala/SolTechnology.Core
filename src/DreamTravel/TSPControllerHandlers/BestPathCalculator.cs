@@ -10,13 +10,15 @@ namespace DreamTravel.TSPControllerHandlers
     {
         private readonly IProcessInputData _processInputData;
         private readonly IProcessOutputData _processOutputData;
-        private readonly ITSP _TSPSolver;
+        private readonly ITSP _tspSolver;
+        private readonly IEvaluationBrain _evaluationBrain;
 
-        public BestPathCalculator(IProcessInputData processInputData, IProcessOutputData processOutputData, ITSP TSPSolver)
+        public BestPathCalculator(IProcessInputData processInputData, IProcessOutputData processOutputData, ITSP tspSolver, IEvaluationBrain evaluationBrain)
         {
             _processInputData = processInputData;
             _processOutputData = processOutputData;
-            _TSPSolver = TSPSolver;
+            _tspSolver = tspSolver;
+            _evaluationBrain = evaluationBrain;
         }
 
         public async Task<List<Path>> Handle(string cities)
@@ -25,8 +27,8 @@ namespace DreamTravel.TSPControllerHandlers
             EvaluationMatrix matrices = new EvaluationMatrix(listOfCitiesAsStrings.Count);
             var listOfCities = await _processInputData.GetCitiesFromGoogleApi(listOfCitiesAsStrings);
             matrices = await _processInputData.DownloadExternalData(listOfCities, matrices);
-            matrices = await _processInputData.EvaluateCostAsync(matrices, listOfCities.Count);
-            int[] orderOfCities = _TSPSolver.SolveTSP(matrices.OptimalDistances);
+            matrices = await _evaluationBrain.EvaluateCostAsync(matrices, listOfCities.Count);
+            int[] orderOfCities = _tspSolver.SolveTSP(matrices.OptimalDistances);
 
             return _processOutputData.FormOutputFromTSPResult(listOfCities, orderOfCities, matrices);
         }

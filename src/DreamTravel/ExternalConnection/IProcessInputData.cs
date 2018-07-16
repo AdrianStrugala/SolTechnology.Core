@@ -17,6 +17,5 @@ namespace DreamTravel.ExternalConnection
         List<string> ReadCities(string incomingCities);
 
         Task<EvaluationMatrix> DownloadExternalData(List<City> listOfCities, EvaluationMatrix evaluationMatrix);
-        Task<EvaluationMatrix> EvaluateCostAsync(EvaluationMatrix evaluationMatrix, int noOfCities);
     }
 }
