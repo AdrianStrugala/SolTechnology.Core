@@ -1,0 +1,4 @@
+Ant Colony: Sixteen Cities 
+Minimal Distance: 111011 
+Average Time: 7.925269926 s 
+Recurrence: 74 %

@@ -50,7 +50,7 @@ namespace TravelingSalesmanProblemTests.Benchmark
                 TSPResults.Add(_tspEngine.SolveTSP(_twoCitiesMatrix));
             }
 
-            var totalTime = stopwatch.Elapsed.TotalMinutes;
+            var totalTime = stopwatch.Elapsed.TotalSeconds;
             stopwatch.Stop();
 
 
@@ -69,13 +69,13 @@ namespace TravelingSalesmanProblemTests.Benchmark
 
             //RESULTS
             var minimalDistance = resuts.Min(resut => resut);
-            var recurrencePercentage = (resuts.Count(result => result.Equals(minimalDistance))) / NumberOfExecutions * 100;
+            var recurrencePercentage = (resuts.Count(result => result.Equals(minimalDistance)) * 100) / NumberOfExecutions;
             var averageTime = totalTime / NumberOfExecutions;
 
             System.IO.File.WriteAllText(@"..\..\..\..\..\docs\God_Benchmark_TwoCities.txt",
                 $"God: Two Cities \n" +
                 $"Minimal Distance: {minimalDistance} \n" +
-                $"Average Time: {averageTime} min \n" +
+                $"Average Time: {averageTime} s \n" +
                 $"Recurrence: {recurrencePercentage} %");
         }
 
@@ -98,7 +98,7 @@ namespace TravelingSalesmanProblemTests.Benchmark
                 TSPResults.Add(_tspEngine.SolveTSP(_fourCitiesMatrix));
             }
 
-            var totalTime = stopwatch.Elapsed.TotalMinutes;
+            var totalTime = stopwatch.Elapsed.TotalSeconds;
             stopwatch.Stop();
 
 
@@ -117,13 +117,13 @@ namespace TravelingSalesmanProblemTests.Benchmark
 
             //RESULTS
             var minimalDistance = resuts.Min(resut => resut);
-            var recurrencePercentage = (resuts.Count(result => result.Equals(minimalDistance))) / NumberOfExecutions * 100;
+            var recurrencePercentage = (resuts.Count(result => result.Equals(minimalDistance)) * 100) / NumberOfExecutions;
             var averageTime = totalTime / NumberOfExecutions;
 
             System.IO.File.WriteAllText(@"..\..\..\..\..\docs\God_Benchmark_FourCities.txt",
                 $"God: Four Cities \n" +
                 $"Minimal Distance: {minimalDistance} \n" +
-                $"Average Time: {averageTime} min \n" +
+                $"Average Time: {averageTime} s \n" +
                 $"Recurrence: {recurrencePercentage} %");
         }
 
@@ -146,7 +146,7 @@ namespace TravelingSalesmanProblemTests.Benchmark
                 TSPResults.Add(_tspEngine.SolveTSP(_eightCitiesMatrix));
             }
 
-            var totalTime = stopwatch.Elapsed.TotalMinutes;
+            var totalTime = stopwatch.Elapsed.TotalSeconds;
             stopwatch.Stop();
 
 
@@ -165,13 +165,13 @@ namespace TravelingSalesmanProblemTests.Benchmark
 
             //RESULTS
             var minimalDistance = resuts.Min(resut => resut);
-            var recurrencePercentage = (resuts.Count(result => result.Equals(minimalDistance))) / NumberOfExecutions * 100;
+            var recurrencePercentage = (resuts.Count(result => result.Equals(minimalDistance)) * 100) / NumberOfExecutions;
             var averageTime = totalTime / NumberOfExecutions;
 
             System.IO.File.WriteAllText(@"..\..\..\..\..\docs\God_Benchmark_EightCities.txt",
                 $"God: Eight Cities \n" +
                 $"Minimal Distance: {minimalDistance} \n" +
-                $"Average Time: {averageTime} min \n" +
+                $"Average Time: {averageTime} s \n" +
                 $"Recurrence: {recurrencePercentage} %");
         }
 
@@ -194,7 +194,7 @@ namespace TravelingSalesmanProblemTests.Benchmark
                 TSPResults.Add(_tspEngine.SolveTSP(_sixteenCitiesMatrix));
             }
 
-            var totalTime = stopwatch.Elapsed.TotalMinutes;
+            var totalTime = stopwatch.Elapsed.TotalSeconds;
             stopwatch.Stop();
 
 
@@ -213,13 +213,13 @@ namespace TravelingSalesmanProblemTests.Benchmark
 
             //RESULTS
             var minimalDistance = resuts.Min(resut => resut);
-            var recurrencePercentage = (resuts.Count(result => result.Equals(minimalDistance))) / NumberOfExecutions * 100;
+            var recurrencePercentage = (resuts.Count(result => result.Equals(minimalDistance)) * 100) / NumberOfExecutions;
             var averageTime = totalTime / NumberOfExecutions;
 
             System.IO.File.WriteAllText(@"..\..\..\..\..\docs\God_Benchmark_SixteenCities.txt",
                 $"God: Sixteen Cities \n" +
                 $"Minimal Distance: {minimalDistance} \n" +
-                $"Average Time: {averageTime} min \n" +
+                $"Average Time: {averageTime} s \n" +
                 $"Recurrence: {recurrencePercentage} %");
         }
     }
