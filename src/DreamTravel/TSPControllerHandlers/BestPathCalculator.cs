@@ -27,7 +27,7 @@ namespace DreamTravel.TSPControllerHandlers
             EvaluationMatrix matrices = new EvaluationMatrix(listOfCitiesAsStrings.Count);
             var listOfCities = await _processInputData.GetCitiesFromGoogleApi(listOfCitiesAsStrings);
             matrices = await _processInputData.DownloadExternalData(listOfCities, matrices);
-            matrices = await _evaluationBrain.EvaluateCostAsync(matrices, listOfCities.Count);
+            matrices = _evaluationBrain.EvaluateCost(matrices, listOfCities.Count);
             int[] orderOfCities = _tspSolver.SolveTSP(matrices.OptimalDistances);
 
             return _processOutputData.FormOutputFromTSPResult(listOfCities, orderOfCities, matrices);

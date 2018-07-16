@@ -10,37 +10,34 @@ namespace DreamTravel.TSPControllerHandlers
         private static double HighwayVelocity { get; } = 120;
         private static double RoadCombustion { get; } = 0.06; //per km
 
-        public async Task<EvaluationMatrix> EvaluateCostAsync(EvaluationMatrix evaluationMatrix, int noOfCities)
+        public EvaluationMatrix EvaluateCost(EvaluationMatrix evaluationMatrix, int noOfCities)
         {
-            await noOfCities.ForEachAsync(async i =>
+            Parallel.For(0, noOfCities, i =>
             {
-                await noOfCities.ForEachAsync(async j =>
+                Parallel.For(0, noOfCities, j =>
                 {
-                    await Task.Run(() =>
+                    if (i != j)
                     {
-                        if (i != j)
+                        int iterator = j + i * noOfCities;
+
+                        //if toll takes more time than regular -> pretend it does not exist
+                        if (evaluationMatrix.TollDistances[iterator] > evaluationMatrix.FreeDistances[iterator])
                         {
-                            int iterator = j + i * noOfCities;
-
-                            //if toll takes more time than regular -> pretend it does not exist
-                            if (evaluationMatrix.TollDistances[iterator] > evaluationMatrix.FreeDistances[iterator])
-                            {
-                                evaluationMatrix.TollDistances[iterator] = evaluationMatrix.FreeDistances[iterator];
-                                evaluationMatrix.Costs[iterator] = 0;
-                            }
-
-                            if (IsTollRoadProfitable(evaluationMatrix, iterator))
-                            {
-                                evaluationMatrix.OptimalDistances[iterator] = evaluationMatrix.TollDistances[iterator];
-                                evaluationMatrix.OptimalCosts[iterator] = evaluationMatrix.Costs[iterator];
-                            }
-                            else
-                            {
-                                evaluationMatrix.OptimalDistances[iterator] = evaluationMatrix.FreeDistances[iterator];
-                                evaluationMatrix.OptimalCosts[iterator] = 0;
-                            }
+                            evaluationMatrix.TollDistances[iterator] = evaluationMatrix.FreeDistances[iterator];
+                            evaluationMatrix.Costs[iterator] = 0;
                         }
-                    });
+
+                        if (IsTollRoadProfitable(evaluationMatrix, iterator))
+                        {
+                            evaluationMatrix.OptimalDistances[iterator] = evaluationMatrix.TollDistances[iterator];
+                            evaluationMatrix.OptimalCosts[iterator] = evaluationMatrix.Costs[iterator];
+                        }
+                        else
+                        {
+                            evaluationMatrix.OptimalDistances[iterator] = evaluationMatrix.FreeDistances[iterator];
+                            evaluationMatrix.OptimalCosts[iterator] = 0;
+                        }
+                    }
                 });
             });
 
@@ -54,7 +51,7 @@ namespace DreamTravel.TSPControllerHandlers
             double gasolineCostFree =
                 evaluationMatrix.FreeDistances[iterator] /
                 3600.0 * RoadVelocity * RoadCombustion * FuelPrice;
- 
+
             double gasolineCostToll =
                 evaluationMatrix.TollDistances[iterator] /
                 3600.0 * HighwayVelocity * RoadCombustion * 1.25 * FuelPrice;

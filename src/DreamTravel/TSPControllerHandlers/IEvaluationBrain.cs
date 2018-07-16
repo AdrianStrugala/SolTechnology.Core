@@ -1,10 +1,9 @@
-﻿using System.Threading.Tasks;
-using DreamTravel.Models;
+﻿using DreamTravel.Models;
 
 namespace DreamTravel.TSPControllerHandlers
 {
     public interface IEvaluationBrain
     {
-        Task<EvaluationMatrix> EvaluateCostAsync(EvaluationMatrix evaluationMatrix, int noOfCities);
+        EvaluationMatrix EvaluateCost(EvaluationMatrix evaluationMatrix, int noOfCities);
     }
 }
