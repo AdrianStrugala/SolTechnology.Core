@@ -2,10 +2,9 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using DreamTravel.ExternalConnection;
 using DreamTravel.Models;
-using NSubstitute;
 using Xunit;
 
-namespace TESWebUITests.TSPEngine
+namespace TESWebUITests.ExternalConnection
 {
     public class ProcessInputDataTests
     {
@@ -124,6 +123,45 @@ namespace TESWebUITests.TSPEngine
             Assert.Equal("Krakow", cities[1]);
             Assert.Equal("Gdansk", cities[2]);
             Assert.Equal("Warszawa", cities[3]);
+        }
+
+        [Fact]
+        public void DownloadExternalData_ValidConditions_MatrixIsPopulated()
+        {
+            //Arrange
+            City firstCity = new City
+            {
+                Name = "first",
+                Latitude = 51,
+                Longitude = 17
+            };
+
+            City secondCity = new City
+            {
+                Name = "second",
+                Latitude = 53,
+                Longitude = 19
+            };
+
+            List<City> cities = new List<City> {firstCity, secondCity};
+
+            EvaluationMatrix matrix = new EvaluationMatrix(2);
+
+
+            //Act
+            _sut.DownloadExternalData(cities, matrix);
+
+
+            //Assert
+            Assert.Equal(4, matrix.Costs.Length);
+            Assert.Equal(4, matrix.FreeDistances.Length);
+            Assert.Equal(4, matrix.TollDistances.Length);
+
+            //valid values
+            Assert.Equal(double.MaxValue, matrix.FreeDistances[0]);
+            Assert.Equal(double.MaxValue, matrix.FreeDistances[3]);
+            Assert.NotEqual(double.MaxValue, matrix.FreeDistances[1]);
+            Assert.NotEqual(double.MaxValue, matrix.FreeDistances[2]);
         }
     }
 }

@@ -22,25 +22,29 @@ namespace TESWebUITests.TSPControllerHandlersTests
             paths.Add(new Path()
             {
                 Cost = 10,
-                Index = 0
+                Index = 0,
+                Goal = 3
             });
 
             paths.Add(new Path()
             {
                 Cost = 15,
-                Index = 1
+                Index = 1,
+                Goal = 5
             });
 
             paths.Add(new Path()
             {
                 Cost = 0,
-                Index = 2
+                Index = 2,
+                Goal = 7,
             });
 
             paths.Add(new Path()
             {
                 Cost = 83,
-                Index = 3
+                Index = 3,
+                Goal = 1
             });
 
 

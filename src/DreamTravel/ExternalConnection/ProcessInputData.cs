@@ -15,15 +15,17 @@ namespace DreamTravel.ExternalConnection
             _apiCaller = apiCaller;
         }
 
-        public async Task<EvaluationMatrix> DownloadExternalData(List<City> listOfCities,
+        public EvaluationMatrix DownloadExternalData(List<City> listOfCities,
             EvaluationMatrix evaluationMatrix)
         {
-            await listOfCities.Count.ForEachAsync(async i =>
+            SetTablesValueAsMax(evaluationMatrix, 0);
+
+            Parallel.For(0, listOfCities.Count, i =>
             {
-                await listOfCities.Count.ForEachAsync(async j =>
+                Parallel.For(0, listOfCities.Count, async j =>
                 {
                     int iterator = j + i * listOfCities.Count;
-
+                  
                     if (i == j)
                     {
                         SetTablesValueAsMax(evaluationMatrix, iterator);

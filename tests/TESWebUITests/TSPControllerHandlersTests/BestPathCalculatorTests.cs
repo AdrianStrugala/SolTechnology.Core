@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
 using DreamTravel.ExternalConnection;
 using DreamTravel.Models;
 using DreamTravel.TSPControllerHandlers;
@@ -16,6 +14,7 @@ namespace TESWebUITests.TSPControllerHandlersTests
         private readonly IProcessInputData _processInputData;
         private readonly IProcessOutputData _processOutputData;
         private readonly ITSP _tspSolver;
+        private readonly IEvaluationBrain _evaluationBrain;
 
         private readonly BestPathCalculator _sut;
         public BestPathCalculatorTests()
@@ -23,8 +22,9 @@ namespace TESWebUITests.TSPControllerHandlersTests
             _processInputData = Substitute.For<IProcessInputData>();
             _processOutputData = Substitute.For<IProcessOutputData>();
             _tspSolver = Substitute.For<ITSP>();
+            _evaluationBrain = Substitute.For<IEvaluationBrain>();
 
-            _sut = new BestPathCalculator(_processInputData, _processOutputData, _tspSolver);
+            _sut = new BestPathCalculator(_processInputData, _processOutputData, _tspSolver, _evaluationBrain);
         }
 
         [Fact]
@@ -34,6 +34,7 @@ namespace TESWebUITests.TSPControllerHandlersTests
             _processInputData.ReadCities(Arg.Any<string>()).Returns(new List<string>());
             _processInputData.GetCitiesFromGoogleApi(Arg.Any<List<string>>()).Returns(new List<City>());
             _processInputData.DownloadExternalData(Arg.Any<List<City>>(), Arg.Any<EvaluationMatrix>()).Returns(new EvaluationMatrix(1));
+            _evaluationBrain.EvaluateCost(Arg.Any<EvaluationMatrix>(), Arg.Any<int>()).Returns(new EvaluationMatrix(1));
             _tspSolver.SolveTSP(Arg.Any<double[]>()).Returns(new int[1]);
             _processOutputData
                 .FormOutputFromTSPResult(Arg.Any<List<City>>(), Arg.Any<int[]>(), Arg.Any<EvaluationMatrix>())
@@ -50,6 +51,7 @@ namespace TESWebUITests.TSPControllerHandlersTests
             _processInputData.Received(1).ReadCities(Arg.Any<string>());
             _processInputData.Received(1).GetCitiesFromGoogleApi(Arg.Any<List<string>>());
             _processInputData.Received(1).DownloadExternalData(Arg.Any<List<City>>(), Arg.Any<EvaluationMatrix>());
+            _evaluationBrain.Received(1).EvaluateCost(Arg.Any<EvaluationMatrix>(), Arg.Any<int>());
             _tspSolver.Received(1).SolveTSP(Arg.Any<double[]>());
             _processOutputData.Received(1)
                 .FormOutputFromTSPResult(Arg.Any<List<City>>(), Arg.Any<int[]>(), Arg.Any<EvaluationMatrix>());
