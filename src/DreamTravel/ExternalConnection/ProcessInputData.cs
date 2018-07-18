@@ -20,7 +20,7 @@ namespace DreamTravel.ExternalConnection
         {
             SetTablesValueAsMax(evaluationMatrix, 0);
 
-            Parallel.For(0, listOfCities.Count, async i =>
+            Parallel.For(0, listOfCities.Count, i =>
             {
                 for (int j = 0; j < listOfCities.Count; j++)
                 {
@@ -33,14 +33,16 @@ namespace DreamTravel.ExternalConnection
 
                     else
                     {
-                        evaluationMatrix.FreeDistances[iterator] =
-                            await GetDurationBetweenTwoCitiesByFreeRoad(listOfCities[i], listOfCities[j]);
+                        Parallel.Invoke(
+                            () => evaluationMatrix.FreeDistances[iterator] =
+                                _apiCaller.DowloadDurationBetweenTwoCitesByFreeRoad(listOfCities[i], listOfCities[j]),
 
-                        evaluationMatrix.TollDistances[iterator] =
-                            await GetDurationBetweenTwoCitiesByTollRoad(listOfCities[i], listOfCities[j]);
+                            () => evaluationMatrix.TollDistances[iterator] =
+                            _apiCaller.DowloadDurationBetweenTwoCitesByTollRoad(listOfCities[i], listOfCities[j]),
 
-                        evaluationMatrix.Costs[iterator] =
-                            await GetCostBetweenTwoCities(listOfCities[i], listOfCities[j]);
+                            () => evaluationMatrix.Costs[iterator] =
+                                _apiCaller.DowloadCostBetweenTwoCities(listOfCities[i], listOfCities[j]) / 100
+                            );
                     }
                 }
             });
@@ -77,22 +79,6 @@ namespace DreamTravel.ExternalConnection
             }
 
             return cities;
-        }
-
-        public async Task<double> GetCostBetweenTwoCities(City origin, City destination)
-        {
-            var costInCents = await _apiCaller.DowloadCostBetweenTwoCities(origin, destination);
-            return costInCents / 100;
-        }
-
-        public async Task<int> GetDurationBetweenTwoCitiesByTollRoad(City origin, City destination)
-        {
-            return await _apiCaller.DowloadDurationBetweenTwoCitesByTollRoad(origin, destination);
-        }
-
-        public async Task<int> GetDurationBetweenTwoCitiesByFreeRoad(City origin, City destination)
-        {
-            return await _apiCaller.DowloadDurationBetweenTwoCitesByFreeRoad(origin, destination);
         }
     }
 }

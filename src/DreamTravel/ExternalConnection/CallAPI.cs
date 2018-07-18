@@ -53,14 +53,14 @@ namespace DreamTravel.ExternalConnection
             }
         }
 
-        public async Task<double> DowloadCostBetweenTwoCities(City origin, City destination)
+        public double DowloadCostBetweenTwoCities(City origin, City destination)
         {
             try
             {
                 string url =
                     $"http://apir.viamichelin.com/apir/1/route.xml/fra?steps=1:e:{origin.Longitude}:{origin.Latitude};1:e:{destination.Longitude}:{destination.Latitude}&authkey=JSBS20101202150903217741708195";
 
-                HttpResponseMessage getAsync = await  _httpClient.GetAsync(url);
+                HttpResponseMessage getAsync = _httpClient.GetAsync(url).Result;
 
                 double result;
                 using (Stream stream = getAsync.Content.ReadAsStreamAsync().Result ??
@@ -93,14 +93,14 @@ namespace DreamTravel.ExternalConnection
             }
         }
 
-        public async Task<int> DowloadDurationBetweenTwoCitesByTollRoad(City origin, City destination)
+        public int DowloadDurationBetweenTwoCitesByTollRoad(City origin, City destination)
         {
             try
             {
                 string url =
                     $"https://maps.googleapis.com/maps/api/distancematrix/json?units=imperial&origins={origin.Latitude},{origin.Longitude}&destinations={destination.Latitude},{destination.Longitude}&key=AIzaSyCdHbtbmF8Y2nfesiu0KUUJagdG7_oui1k";
 
-                HttpResponseMessage getAsync = await _httpClient.GetAsync(url);
+                HttpResponseMessage getAsync = _httpClient.GetAsync(url).Result;
 
                 using (Stream stream = getAsync.Content.ReadAsStreamAsync().Result ??
                                        throw new ArgumentNullException(
@@ -120,14 +120,14 @@ namespace DreamTravel.ExternalConnection
             }
         }
 
-        public async Task<int> DowloadDurationBetweenTwoCitesByFreeRoad(City origin, City destination)
+        public int DowloadDurationBetweenTwoCitesByFreeRoad(City origin, City destination)
         {
             try
             {
                 string url =
                     $"https://maps.googleapis.com/maps/api/distancematrix/json?units=imperial&origins={origin.Latitude},{origin.Longitude}&destinations={destination.Latitude},{destination.Longitude}&avoid=tolls&key=AIzaSyCdHbtbmF8Y2nfesiu0KUUJagdG7_oui1k";
 
-                HttpResponseMessage getAsync = await _httpClient.GetAsync(url);
+                HttpResponseMessage getAsync = _httpClient.GetAsync(url).Result;
 
                 using (Stream stream = getAsync.Content.ReadAsStreamAsync().Result ??
                                        throw new ArgumentNullException(

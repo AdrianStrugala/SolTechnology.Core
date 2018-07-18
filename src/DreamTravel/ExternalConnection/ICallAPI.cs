@@ -6,9 +6,9 @@ namespace DreamTravel.ExternalConnection
 {
     public interface ICallAPI
     {
-        Task<double> DowloadCostBetweenTwoCities(City origin, City destination);
-        Task<int> DowloadDurationBetweenTwoCitesByFreeRoad(City origin, City destination);
-        Task<int> DowloadDurationBetweenTwoCitesByTollRoad(City origin, City destination);
+        double DowloadCostBetweenTwoCities(City origin, City destination);
+        int DowloadDurationBetweenTwoCitesByFreeRoad(City origin, City destination);
+        int DowloadDurationBetweenTwoCitesByTollRoad(City origin, City destination);
         Task<City> DownloadLocationOfCity(string cityName);
     }
 }

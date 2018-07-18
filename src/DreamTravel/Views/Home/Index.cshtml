@@ -132,12 +132,12 @@ Last City
             //TODO Route Display details after click
             function displayRoute(directionsService, map, path) {
 
-                var roadColour = "blue";
+                var roadColour = "black";
                 var isToll = false;
 
                 if (path.OptimalCost === 0) {
                     isToll = true;
-                    roadColour = "black";
+                    roadColour = "#0080ff";
                 }
 
                 var directionsDisplay = new window.google.maps.DirectionsRenderer({
