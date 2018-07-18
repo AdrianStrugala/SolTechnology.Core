@@ -43,6 +43,8 @@
         </div>
     </div>
 
+
+
     <!-- Cities Modal -->
     <div id="listOfCitiesModal" class="modal fade" role="dialog">
         <div class="modal-dialog">
@@ -65,6 +67,8 @@ Last City
             </div>
         </div>
     </div>
+
+
 
     <!-- Limit Modal -->
     <div id="limitCostModal" class="modal fade" role="dialog">
@@ -106,7 +110,7 @@ Last City
         <script>
             var slider = document.getElementById("costSlider");
             var output = document.getElementById("limitValue");
-  
+
             slider.oninput = function () {
                 output.innerHTML = this.value + " €";
             }
@@ -126,14 +130,22 @@ Last City
             var totalCost;
 
             //TODO Route Display details after click
-            function displayRoute(directionsService, map, path)
-            {
+            function displayRoute(directionsService, map, path) {
+
+                var roadColour = "blue";
                 var isToll = false;
+
                 if (path.OptimalCost === 0) {
                     isToll = true;
+                    roadColour = "black";
                 }
 
-                var directionsDisplay = new window.google.maps.DirectionsRenderer({ suppressMarkers: true });
+                var directionsDisplay = new window.google.maps.DirectionsRenderer({
+                    suppressMarkers: true,
+                    polylineOptions: {
+                        strokeColor: roadColour
+                    }
+                });
                 directionsDisplay.setMap(map);
 
                 directionsService.route({
@@ -237,7 +249,7 @@ Last City
                     pad2(Math.floor(totalMinutes)) +
                     ":" +
                     pad2(Math.floor(totalSeconds)) +
-                    ".");           
+                    ".");
             }
 
             function initMap() {

@@ -20,12 +20,12 @@ namespace DreamTravel.ExternalConnection
         {
             SetTablesValueAsMax(evaluationMatrix, 0);
 
-            Parallel.For(0, listOfCities.Count, i =>
+            Parallel.For(0, listOfCities.Count, async i =>
             {
-                Parallel.For(0, listOfCities.Count, async j =>
+                for (int j = 0; j < listOfCities.Count; j++)
                 {
                     int iterator = j + i * listOfCities.Count;
-                  
+
                     if (i == j)
                     {
                         SetTablesValueAsMax(evaluationMatrix, iterator);
@@ -33,18 +33,16 @@ namespace DreamTravel.ExternalConnection
 
                     else
                     {
-                        Task freeDistancesCaller = Task.Run(async () => evaluationMatrix.FreeDistances[iterator] =
-                            await GetDurationBetweenTwoCitiesByFreeRoad(listOfCities[i], listOfCities[j]));
+                        evaluationMatrix.FreeDistances[iterator] =
+                            await GetDurationBetweenTwoCitiesByFreeRoad(listOfCities[i], listOfCities[j]);
 
-                        Task tollDistancesCaller = Task.Run(async () => evaluationMatrix.TollDistances[iterator] =
-                            await GetDurationBetweenTwoCitiesByTollRoad(listOfCities[i], listOfCities[j]));
+                        evaluationMatrix.TollDistances[iterator] =
+                            await GetDurationBetweenTwoCitiesByTollRoad(listOfCities[i], listOfCities[j]);
 
-                        Task costCaller = Task.Run(async () => evaluationMatrix.Costs[iterator] =
-                            await GetCostBetweenTwoCities(listOfCities[i], listOfCities[j]));
-
-                        await Task.WhenAll(freeDistancesCaller, tollDistancesCaller, costCaller);
+                        evaluationMatrix.Costs[iterator] =
+                            await GetCostBetweenTwoCities(listOfCities[i], listOfCities[j]);
                     }
-                });
+                }
             });
 
             return evaluationMatrix;
