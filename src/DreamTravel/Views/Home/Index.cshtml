@@ -98,7 +98,7 @@ Last City
     <div id="map"></div>
 
     @section Scripts
-        {
+    {
         <script>
             function auto_grow(element) {
                 element.style.height = "5px";
@@ -111,7 +111,7 @@ Last City
             var slider = document.getElementById("costSlider");
             var output = document.getElementById("limitValue");
 
-            slider.oninput = function () {
+            slider.oninput = function() {
                 output.innerHTML = this.value + " €";
             }
         </script>
@@ -128,6 +128,7 @@ Last City
             var optimalCost;
             var optimalTime;
             var totalCost;
+            var pathsToRetry = [];
 
             //TODO Route Display details after click
             function displayRoute(directionsService, map, path) {
@@ -143,7 +144,9 @@ Last City
                 var directionsDisplay = new window.google.maps.DirectionsRenderer({
                     suppressMarkers: true,
                     polylineOptions: {
-                        strokeColor: roadColour
+                        strokeColor: roadColour,
+                        strokeWeight: 6,
+                        strokeOpacity: 0.6
                     }
                 });
                 directionsDisplay.setMap(map);
@@ -157,6 +160,8 @@ Last City
                     function(response, status) {
                         if (status === 'OK') {
                             directionsDisplay.setDirections(response);
+                        } else if (status === 'OVER_QUERY_LIMIT') {
+                            pathsToRetry.push(path);
                         } else {
                             window.alert('Directions request failed due to ' + status);
                         }
@@ -186,10 +191,11 @@ Last City
             }
 
             function Guid() {
-                return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-                    var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
-                    return v.toString(16);
-                });
+                return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g,
+                    function(c) {
+                        var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+                        return v.toString(16);
+                    });
             }
 
             function cleanMap(list) {
@@ -202,6 +208,7 @@ Last City
                     markers[i].setMap(null);
                 }
                 markers = [];
+                pathsToRetry = [];
 
                 list.innerHTML = "";
             }
@@ -234,6 +241,15 @@ Last City
                 list.appendChild(li);
             }
 
+            function sleep(milliseconds) {
+                var start = new Date().getTime();
+                for (var i = 0; i < 1e7; i++) {
+                    if ((new Date().getTime() - start) > milliseconds){
+                        break;
+                    }
+                }
+            }
+
             function writeInfo(totalTime, totalCost) {
                 var totalHours = Math.floor(totalTime / 3600);
                 var totalMinutes = Math.floor((totalTime - Math.floor(totalHours) * 3600) / 60);
@@ -251,6 +267,7 @@ Last City
                     pad2(Math.floor(totalSeconds)) +
                     ".");
             }
+
 
             function initMap() {
                 document.getElementById("listOfCitiesBtn").style.display = "none";
@@ -271,7 +288,7 @@ Last City
                         type: 'POST',
                         dataType: 'html',
                         url: '@Url.Action("CalculateBestPath", "TSP")',
-                        data: { cities: listOfCities, sessionId: sessionId},
+                        data: { cities: listOfCities, sessionId: sessionId },
                         success: function(msg) {
 
                             optimalCost = 0;
@@ -290,25 +307,30 @@ Last City
                                 totalCost += pathList[i].Cost;
 
                                 writePathInfo(pathList[i], list);
-                                displayRoute(directionsService,map,pathList[i]);
+                                displayRoute(directionsService, map, pathList[i]);
 
-                                displayMarker(map, pathList[i].StartingCity.Latitude, pathList[i].StartingCity.Longitude, i);
+                                displayMarker(map,
+                                    pathList[i].StartingCity.Latitude,
+                                    pathList[i].StartingCity.Longitude,
+                                    i);
                             }
 
-                            displayMarker(map, pathList[noOfPaths-1].EndingCity.Latitude, pathList[noOfPaths-1].EndingCity.Longitude, noOfPaths);
+                            displayMarker(map,
+                                pathList[noOfPaths - 1].EndingCity.Latitude,
+                                pathList[noOfPaths - 1].EndingCity.Longitude,
+                                noOfPaths);
                             writeInfo(optimalTime, optimalCost);
 
                             document.getElementById("costSlider").setAttribute('value', optimalCost);
                             document.getElementById("costSlider").setAttribute('max', totalCost + 1);
-                            document.getElementById("limitValue").innerHTML = document.getElementById("costSlider").value + " €";
+                            document.getElementById("limitValue").innerHTML =
+                                document.getElementById("costSlider").value + " €";
 
                             document.getElementById("listOfCitiesBtn").style.display = "initial";
                             document.getElementById("costLimiBtn").style.display = "initial";
                             document.getElementById("loader").style.display = "none";
-//                            $('#costSlider').setAttribute('value', optimalCost);
-//                            $('#limitValue').innerHTML = $('#costSlider').value + " €"; // Display the default slider value
                         },
-                        error: function (req, status, errorObj) {
+                        error: function(req, status, errorObj) {
                             document.getElementById("loader").style.display = "none";
                             var alertMessage = JSON.parse(req.responseText);
                             alert(alertMessage);
@@ -317,7 +339,6 @@ Last City
                 }
 
                 var limitCostHandler = function() {
-//                    var listOfCities = document.getElementById("listOfCities").value;
                     document.getElementById("loader").style.display = "block";
                     var limit = document.getElementById("costSlider").value;
 
@@ -325,7 +346,7 @@ Last City
                         type: 'POST',
                         dataType: 'html',
                         url: '@Url.Action("LimitCost", "TSP")',
-                        data: { costLimit: limit, sessionId: sessionId},
+                        data: { costLimit: limit, sessionId: sessionId },
                         success: function(msg) {
 
                             var totalCost = 0;
@@ -342,18 +363,32 @@ Last City
                                 totalTime += pathList[i].OptimalDistance;
 
                                 writePathInfo(pathList[i], list);
-                                displayRoute(directionsService,map,pathList[i]);
+                                displayRoute(directionsService, map, pathList[i]);
 
-                                displayMarker(map, pathList[i].StartingCity.Latitude, pathList[i].StartingCity.Longitude, i);
+                                displayMarker(map,
+                                    pathList[i].StartingCity.Latitude,
+                                    pathList[i].StartingCity.Longitude,
+                                    i);
                             }
 
-                            displayMarker(map, pathList[noOfPaths-1].EndingCity.Latitude, pathList[noOfPaths-1].EndingCity.Longitude, noOfPaths);
+                            if (pathsToRetry.length > 0) {
+                                sleep(1000);
+                                for (var i = 0; i < pathsToRetry.length; i++) {
+                                    displayRoute(directionsService, map, pathsToRetry[i]);
+                                }
+                                pathsToRetry = [];
+                            }
+
+                            displayMarker(map,
+                                pathList[noOfPaths - 1].EndingCity.Latitude,
+                                pathList[noOfPaths - 1].EndingCity.Longitude,
+                                noOfPaths);
                             writeInfo(totalTime, totalCost);
 
                             document.getElementById("listOfCitiesBtn").style.display = "initial";
                             document.getElementById("loader").style.display = "none";
                         },
-                        error: function (req, status, errorObj) {
+                        error: function(req, status, errorObj) {
                             document.getElementById("loader").style.display = "none";
                             var alertMessage = JSON.parse(req.responseText);
                             alert(alertMessage);
