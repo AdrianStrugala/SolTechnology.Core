@@ -98,7 +98,7 @@ Last City
     <div id="map"></div>
 
     @section Scripts
-    {
+        {
         <script>
             function auto_grow(element) {
                 element.style.height = "5px";
@@ -106,12 +106,12 @@ Last City
             }
         </script>
 
-        // Update the current slider value (each time you drag the slider handle)
+
         <script>
             var slider = document.getElementById("costSlider");
             var output = document.getElementById("limitValue");
 
-            slider.oninput = function() {
+            slider.oninput = function () {
                 output.innerHTML = this.value + " €";
             }
         </script>
@@ -143,6 +143,7 @@ Last City
 
                 var directionsDisplay = new window.google.maps.DirectionsRenderer({
                     suppressMarkers: true,
+                    preserveViewport: true,
                     polylineOptions: {
                         strokeColor: roadColour,
                         strokeWeight: 6,
@@ -319,6 +320,13 @@ Last City
                                 pathList[noOfPaths - 1].EndingCity.Latitude,
                                 pathList[noOfPaths - 1].EndingCity.Longitude,
                                 noOfPaths);
+
+                            var bounds = new google.maps.LatLngBounds();
+                            for (var i = 0; i < markers.length; i++){
+                                bounds.extend(markers[i].position);
+                                }
+                            map.fitBounds(bounds);
+
                             writeInfo(optimalTime, optimalCost);
 
                             document.getElementById("costSlider").setAttribute('value', optimalCost);
