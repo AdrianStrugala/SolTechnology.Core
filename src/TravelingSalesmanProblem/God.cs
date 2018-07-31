@@ -7,15 +7,25 @@ namespace TravelingSalesmanProblem
     public class God : TSPAbstract
     {
         private static ConcurrentBag<int[]> _paths;
-        private const int NoOfUniverses = 500000;
+        private const int MaxNoOfUniverses = 1000000;
 
         public override int[] SolveTSP(double[] distances)
         {
             int noOfCities = (int) Math.Sqrt(distances.Length);
 
-            _paths = new ConcurrentBag<int[]>();
+            int Factorial(int x) => x <= 1 ? 1 : x * Factorial(x - 1);
+            int noOfCitiesFactorial = Factorial(noOfCities);
+            int noOfUniverses = MaxNoOfUniverses;
+            if (noOfCitiesFactorial < MaxNoOfUniverses/10)
+            {
+                noOfUniverses = noOfCitiesFactorial * 10;
+            }
 
-            Parallel.For(0, NoOfUniverses, i => CreateUniverse(noOfCities));
+            _paths = new ConcurrentBag<int[]>();
+            
+
+            Parallel.For(0, noOfUniverses, 
+                i => CreateUniverse(noOfCities));
 
             var minimumPath = FindMinimumPathInListOfPaths(_paths, distances, noOfCities);
 

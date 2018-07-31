@@ -1,4 +1,4 @@
 God: Four Cities 
 Minimal Distance: 103983 
-Average Time: 0.204046246 s 
+Average Time: 0.000128676 s 
 Recurrence: 100 %
