@@ -10,7 +10,7 @@ namespace TravelingSalesmanProblem
     {
         // Algorithm parameters
         protected const int NoOfIterations = 10;
-        protected static readonly int NoOfAnts = 100000 / NoOfIterations;
+        protected static readonly int NoOfAnts = 10000 / NoOfIterations;
         private const double TrailEvaporationCoefficient = 0.3;
         private const double BasicTrialValue = 1;
 
@@ -31,16 +31,10 @@ namespace TravelingSalesmanProblem
             FillAttractivenessMatrix(distances);
             FillTrialsMatrix();
 
-            List<int[]> pathList = new List<int[]>();
+            List<int[]> pathList = new List<int[]>(NoOfAnts);
             //each iteration is one trip of the ants
             for (int j = 0; j < NoOfIterations; j++)
             {
-               // pathList = InitializePathList(pathList);
-
-                //proceed for each ant
-//                Parallel.For(0, NoOfAnts, i =>
-//                    pathList.Add(CalculatePathForSingleAnt()));
-
                 for(int i = 0; i <NoOfAnts; i++) {
                     pathList.Add(CalculatePathForSingleAnt());
                 }

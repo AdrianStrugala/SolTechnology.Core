@@ -7,9 +7,9 @@
   },
 
   "AntColony": {
-    "TwoCities": false,
-    "FourCities": false,
-    "EightCities": false,
-    "SixteenCities": false
+    "TwoCities": true,
+    "FourCities": true,
+    "EightCities": true,
+    "SixteenCities": true
   }
 }

@@ -36,7 +36,7 @@ namespace DreamTravel
             services.AddTransient<IEvaluationBrain, EvaluationBrain>();
 
             //TSP engine
-            services.AddTransient<ITSP, God>();
+            services.AddTransient<ITSP, AntColony>();
             
 
             services.AddSession();
