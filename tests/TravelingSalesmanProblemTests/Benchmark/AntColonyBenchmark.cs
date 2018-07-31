@@ -9,15 +9,18 @@ namespace TravelingSalesmanProblemTests.Benchmark
     [Collection("Benchmark")]
     public class AntColonyBenchmark
     {
-        private const int NumberOfExecutions = 50;
+        private const int NumberOfExecutions = 100;
         private readonly Configuration _config;
 
         private readonly double[] _twoCitiesMatrix;
         private readonly double[] _fourCitiesMatrix;
         private readonly double[] _eightCitiesMatrix;
         private readonly double[] _sixteenCitiesMatrix;
+        private readonly double[] _twelveCitiesMatrix;
+        private readonly double[] _twentyCitiesMatrix;
 
         readonly TravelingSalesmanProblem.AntColony _tspEngine;
+        
 
         public AntColonyBenchmark()
         {
@@ -25,7 +28,9 @@ namespace TravelingSalesmanProblemTests.Benchmark
             _twoCitiesMatrix = JsonConvert.DeserializeObject<double[]>(System.IO.File.ReadAllText(@".\Benchmark\TestData\twoCities.txt"));
             _fourCitiesMatrix = JsonConvert.DeserializeObject<double[]>(System.IO.File.ReadAllText(@".\Benchmark\TestData\fourCities.txt"));
             _eightCitiesMatrix = JsonConvert.DeserializeObject<double[]>(System.IO.File.ReadAllText(@".\Benchmark\TestData\eightCities.txt"));
+            _twelveCitiesMatrix = JsonConvert.DeserializeObject<double[]>(System.IO.File.ReadAllText(@".\Benchmark\TestData\twelveCities.txt"));
             _sixteenCitiesMatrix = JsonConvert.DeserializeObject<double[]>(System.IO.File.ReadAllText(@".\Benchmark\TestData\sixteenCities.txt"));
+            _twentyCitiesMatrix = JsonConvert.DeserializeObject<double[]>(System.IO.File.ReadAllText(@".\Benchmark\TestData\twentyCities.txt"));
 
             _tspEngine = new TravelingSalesmanProblem.AntColony();
         }
@@ -71,10 +76,12 @@ namespace TravelingSalesmanProblemTests.Benchmark
             var minimalDistance = resuts.Min(resut => resut);
             int recurrencePercentage = (resuts.Count(result => result.Equals(minimalDistance)) * 100) / NumberOfExecutions;
             var averageTime = totalTime / NumberOfExecutions;
+            var averageDistance = resuts.Sum() / NumberOfExecutions;
 
             System.IO.File.WriteAllText(@"..\..\..\..\..\docs\AntColony_Benchmark_TwoCities.txt",
                 $"Ant Colony: Two Cities \n" +
                 $"Minimal Distance: {minimalDistance} \n" +
+                $"Average Distance: {averageDistance} \n" +
                 $"Average Time: {averageTime} s \n" +
                 $"Recurrence: {recurrencePercentage} %");
         }
@@ -119,10 +126,12 @@ namespace TravelingSalesmanProblemTests.Benchmark
             var minimalDistance = resuts.Min(resut => resut);
             var recurrencePercentage = (resuts.Count(result => result.Equals(minimalDistance)) * 100) / NumberOfExecutions;
             var averageTime = totalTime / NumberOfExecutions;
+            var averageDistance = resuts.Sum() / NumberOfExecutions;
 
             System.IO.File.WriteAllText(@"..\..\..\..\..\docs\AntColony_Benchmark_FourCities.txt",
                 $"Ant Colony: Four Cities \n" +
                 $"Minimal Distance: {minimalDistance} \n" +
+                $"Average Distance: {averageDistance} \n" +
                 $"Average Time: {averageTime} s \n" +
                 $"Recurrence: {recurrencePercentage} %");
         }
@@ -167,12 +176,22 @@ namespace TravelingSalesmanProblemTests.Benchmark
             var minimalDistance = resuts.Min(resut => resut);
             var recurrencePercentage = (resuts.Count(result => result.Equals(minimalDistance)) * 100) / NumberOfExecutions;
             var averageTime = totalTime / NumberOfExecutions;
+            var averageDistance = resuts.Sum() / NumberOfExecutions;
 
             System.IO.File.WriteAllText(@"..\..\..\..\..\docs\AntColony_Benchmark_EightCities.txt",
                 $"Ant Colony: Eight Cities \n" +
                 $"Minimal Distance: {minimalDistance} \n" +
+                $"Average Distance: {averageDistance} \n" +
                 $"Average Time: {averageTime} s \n" +
                 $"Recurrence: {recurrencePercentage} %");
+        }
+
+        [Fact]
+        void TwelveCities()
+        {
+            if (!_config.AntColony.TwelveCities) { return; }
+
+            Benchmark.RunTest(NumberOfExecutions, _twelveCitiesMatrix, 12, _tspEngine, "AntColony");
         }
 
         [Fact]
@@ -215,12 +234,22 @@ namespace TravelingSalesmanProblemTests.Benchmark
             var minimalDistance = resuts.Min(resut => resut);
             var recurrencePercentage = (resuts.Count(result => result.Equals(minimalDistance)) * 100) / NumberOfExecutions;
             var averageTime = totalTime / NumberOfExecutions;
+            var averageDistance = resuts.Sum() / NumberOfExecutions;
 
             System.IO.File.WriteAllText(@"..\..\..\..\..\docs\AntColony_Benchmark_SixteenCities.txt",
                 $"Ant Colony: Sixteen Cities \n" +
                 $"Minimal Distance: {minimalDistance} \n" +
+                $"Average Distance: {averageDistance} \n" +
                 $"Average Time: {averageTime} s \n" +
                 $"Recurrence: {recurrencePercentage} %");
+        }
+
+        [Fact]
+        void TwentyCities()
+        {
+            if (!_config.AntColony.TwentyCities) { return; }
+
+            Benchmark.RunTest(NumberOfExecutions, _twentyCitiesMatrix, 20, _tspEngine, "AntColony");
         }
     }
 }

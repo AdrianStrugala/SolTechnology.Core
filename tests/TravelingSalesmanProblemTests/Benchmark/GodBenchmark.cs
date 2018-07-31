@@ -16,6 +16,8 @@ namespace TravelingSalesmanProblemTests.Benchmark
         private readonly double[] _fourCitiesMatrix;
         private readonly double[] _eightCitiesMatrix;
         private readonly double[] _sixteenCitiesMatrix;
+        private readonly double[] _twelveCitiesMatrix;
+        private readonly double[] _twentyCitiesMatrix;
 
         readonly TravelingSalesmanProblem.God _tspEngine;
 
@@ -25,7 +27,9 @@ namespace TravelingSalesmanProblemTests.Benchmark
             _twoCitiesMatrix = JsonConvert.DeserializeObject<double[]>(System.IO.File.ReadAllText(@".\Benchmark\TestData\twoCities.txt"));
             _fourCitiesMatrix = JsonConvert.DeserializeObject<double[]>(System.IO.File.ReadAllText(@".\Benchmark\TestData\fourCities.txt"));
             _eightCitiesMatrix = JsonConvert.DeserializeObject<double[]>(System.IO.File.ReadAllText(@".\Benchmark\TestData\eightCities.txt"));
+            _twelveCitiesMatrix = JsonConvert.DeserializeObject<double[]>(System.IO.File.ReadAllText(@".\Benchmark\TestData\twelveCities.txt"));
             _sixteenCitiesMatrix = JsonConvert.DeserializeObject<double[]>(System.IO.File.ReadAllText(@".\Benchmark\TestData\sixteenCities.txt"));
+            _twentyCitiesMatrix = JsonConvert.DeserializeObject<double[]>(System.IO.File.ReadAllText(@".\Benchmark\TestData\twentyCities.txt"));
 
             _tspEngine = new TravelingSalesmanProblem.God();
         }
@@ -71,10 +75,12 @@ namespace TravelingSalesmanProblemTests.Benchmark
             var minimalDistance = resuts.Min(resut => resut);
             var recurrencePercentage = (resuts.Count(result => result.Equals(minimalDistance)) * 100) / NumberOfExecutions;
             var averageTime = totalTime / NumberOfExecutions;
+            var averageDistance = resuts.Sum() / NumberOfExecutions;
 
             System.IO.File.WriteAllText(@"..\..\..\..\..\docs\God_Benchmark_TwoCities.txt",
                 $"God: Two Cities \n" +
                 $"Minimal Distance: {minimalDistance} \n" +
+                $"Average Distance: {averageDistance} \n" +
                 $"Average Time: {averageTime} s \n" +
                 $"Recurrence: {recurrencePercentage} %");
         }
@@ -119,10 +125,12 @@ namespace TravelingSalesmanProblemTests.Benchmark
             var minimalDistance = resuts.Min(resut => resut);
             var recurrencePercentage = (resuts.Count(result => result.Equals(minimalDistance)) * 100) / NumberOfExecutions;
             var averageTime = totalTime / NumberOfExecutions;
+            var averageDistance = resuts.Sum() / NumberOfExecutions;
 
             System.IO.File.WriteAllText(@"..\..\..\..\..\docs\God_Benchmark_FourCities.txt",
                 $"God: Four Cities \n" +
                 $"Minimal Distance: {minimalDistance} \n" +
+                $"Average Distance: {averageDistance} \n" +
                 $"Average Time: {averageTime} s \n" +
                 $"Recurrence: {recurrencePercentage} %");
         }
@@ -167,12 +175,22 @@ namespace TravelingSalesmanProblemTests.Benchmark
             var minimalDistance = resuts.Min(resut => resut);
             var recurrencePercentage = (resuts.Count(result => result.Equals(minimalDistance)) * 100) / NumberOfExecutions;
             var averageTime = totalTime / NumberOfExecutions;
+            var averageDistance = resuts.Sum() / NumberOfExecutions;
 
             System.IO.File.WriteAllText(@"..\..\..\..\..\docs\God_Benchmark_EightCities.txt",
                 $"God: Eight Cities \n" +
                 $"Minimal Distance: {minimalDistance} \n" +
+                $"Average Distance: {averageDistance} \n" +
                 $"Average Time: {averageTime} s \n" +
                 $"Recurrence: {recurrencePercentage} %");
+        }
+
+        [Fact]
+        void TwelveCities()
+        {
+            if (!_config.God.TwelveCities) { return; }
+
+            Benchmark.RunTest(NumberOfExecutions, _twelveCitiesMatrix, 12, _tspEngine, "God");
         }
 
         [Fact]
@@ -215,12 +233,22 @@ namespace TravelingSalesmanProblemTests.Benchmark
             var minimalDistance = resuts.Min(resut => resut);
             var recurrencePercentage = (resuts.Count(result => result.Equals(minimalDistance)) * 100) / NumberOfExecutions;
             var averageTime = totalTime / NumberOfExecutions;
+            var averageDistance = resuts.Sum() / NumberOfExecutions;
 
             System.IO.File.WriteAllText(@"..\..\..\..\..\docs\God_Benchmark_SixteenCities.txt",
                 $"God: Sixteen Cities \n" +
                 $"Minimal Distance: {minimalDistance} \n" +
+                $"Average Distance: {averageDistance} \n" +
                 $"Average Time: {averageTime} s \n" +
                 $"Recurrence: {recurrencePercentage} %");
+        }
+
+        [Fact]
+        void TwentyCities()
+        {
+            if (!_config.God.TwentyCities) { return; }
+
+            Benchmark.RunTest(NumberOfExecutions, _twentyCitiesMatrix, 20, _tspEngine, "God");
         }
     }
 }

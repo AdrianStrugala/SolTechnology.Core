@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 using DreamTravel.ExternalConnection;
 using DreamTravel.Models;
 using DreamTravel.TSPControllerHandlers;
@@ -60,6 +61,12 @@ namespace DreamTravel
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
+            var cultureInfo = new CultureInfo("en-US");
+            cultureInfo.NumberFormat.CurrencySymbol = "€";
+
+            CultureInfo.DefaultThreadCurrentCulture = cultureInfo;
+            CultureInfo.DefaultThreadCurrentUICulture = cultureInfo;
+
             if (env.IsDevelopment())
             {
                 app.UseBrowserLink();

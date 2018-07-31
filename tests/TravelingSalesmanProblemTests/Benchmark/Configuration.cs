@@ -15,6 +15,8 @@ class God
     public bool FourCities { get; set; }
     public bool EightCities { get; set; }
     public bool SixteenCities { get; set; }
+    public bool TwelveCities { get; set; }
+    public bool TwentyCities { get; set; }
 }
 
 class AntColony
@@ -23,4 +25,6 @@ class AntColony
     public bool FourCities { get; set; }
     public bool EightCities { get; set; }
     public bool SixteenCities { get; set; }
+    public bool TwelveCities { get; set; }
+    public bool TwentyCities { get; set; }
 }

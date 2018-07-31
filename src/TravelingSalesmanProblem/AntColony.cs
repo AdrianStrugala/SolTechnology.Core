@@ -11,12 +11,12 @@ namespace TravelingSalesmanProblem
         // Algorithm parameters
         protected const int NoOfIterations = 10;
         protected static readonly int NoOfAnts = 10000 / NoOfIterations;
-        private const double TrailEvaporationCoefficient = 0.3;
+        private const double TrailEvaporationCoefficient = 0.99;
         private const double BasicTrialValue = 1;
 
         //if attractivenesParameter >> trialPreference, program basicaly choses closest city every time
         private const double TrialPreference = 1;
-        private const double AttractivenessParameter = 10;
+        private const double AttractivenessParameter = 4.2;
         private double _pheromonePower;
         private int _matrixSize;
         private double[] _attractivenessMatrix;

@@ -1,4 +1,5 @@
 Ant Colony: Eight Cities 
 Minimal Distance: 53164 
-Average Time: 0.239199938 s 
+Average Distance: 53164 
+Average Time: 0,204141065 s 
 Recurrence: 100 %

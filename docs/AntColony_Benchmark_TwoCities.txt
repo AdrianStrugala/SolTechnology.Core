@@ -1,4 +1,5 @@
 Ant Colony: Two Cities 
 Minimal Distance: 151522 
-Average Time: 0.00734153 s 
+Average Distance: 151522 
+Average Time: 0,006088091 s 
 Recurrence: 100 %

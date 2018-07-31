@@ -1,4 +1,5 @@
 God: Eight Cities 
 Minimal Distance: 53164 
-Average Time: 0.268718704 s 
+Average Distance: 53164 
+Average Time: 0,19733672 s 
 Recurrence: 100 %

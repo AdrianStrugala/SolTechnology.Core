@@ -10,6 +10,8 @@
     <None Remove="Benchmark\TestData\eightCities.txt" />
     <None Remove="Benchmark\TestData\fourCities.txt" />
     <None Remove="Benchmark\TestData\sixteenCities.txt" />
+    <None Remove="Benchmark\TestData\twelveCities.txt" />
+    <None Remove="Benchmark\TestData\twentyCities.txt" />
     <None Remove="Benchmark\TestData\twoCities.txt" />
   </ItemGroup>
 
@@ -18,6 +20,12 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="Benchmark\TestData\fourCities.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Benchmark\TestData\twelveCities.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Benchmark\TestData\twentyCities.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="Benchmark\TestData\twoCities.txt">
