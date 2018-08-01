@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Net.Http;
 using System.Reflection;
+using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
 using DreamTravel.Models;
@@ -93,12 +95,20 @@ namespace DreamTravel.ExternalConnection
             }
         }
 
-        public int DowloadDurationBetweenTwoCitesByTollRoad(City origin, City destination)
+        public double[] DowloadDurationMatrixByTollRoad(List<City> listOfCities)
         {
+            double[] result = new double[listOfCities.Count * listOfCities.Count];
+
+            StringBuilder coordinates = new StringBuilder();
+            foreach (City city in listOfCities)
+            {
+                coordinates.AppendFormat($"{city.Latitude},{city.Longitude}|");
+            }
+
             try
             {
                 string url =
-                    $"https://maps.googleapis.com/maps/api/distancematrix/json?units=imperial&origins={origin.Latitude},{origin.Longitude}&destinations={destination.Latitude},{destination.Longitude}&key=AIzaSyCdHbtbmF8Y2nfesiu0KUUJagdG7_oui1k";
+                    $"https://maps.googleapis.com/maps/api/distancematrix/json?units=imperial&origins={coordinates}&destinations={coordinates}&key=AIzaSyCdHbtbmF8Y2nfesiu0KUUJagdG7_oui1k";
 
                 HttpResponseMessage getAsync = _httpClient.GetAsync(url).Result;
 
@@ -109,23 +119,39 @@ namespace DreamTravel.ExternalConnection
                     using (var jsonTextReader = new JsonTextReader(new StreamReader(stream)))
                     {
                         JObject json = (JObject)new JsonSerializer().Deserialize(jsonTextReader);
-                        return json["rows"][0]["elements"][0]["duration"]["value"].Value<int>();
+
+                        for (int i = 0; i < listOfCities.Count; i++)
+                        {
+                            for (int j = 0; j < listOfCities.Count; j++)
+                            {
+                                result[j + i * listOfCities.Count] = json["rows"][i]["elements"][j]["duration"]["value"].Value<int>();
+                            }
+                        }
+
+                        return result;
                     }
                 }
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                throw new InvalidDataException(
-                    $"Cannot get data about road between [{origin.Name}] and [{destination.Name}]");
+                throw new InvalidDataException(e.Message);
             }
         }
 
-        public int DowloadDurationBetweenTwoCitesByFreeRoad(City origin, City destination)
-        {
+        public double[] DowloadDurationMatrixByFreeRoad(List<City> listOfCities)
+        {         
+            double[] result = new double[listOfCities.Count * listOfCities.Count];
+
+            StringBuilder coordinates = new StringBuilder();
+            foreach (City city in listOfCities)
+            {
+                coordinates.AppendFormat($"{city.Latitude},{city.Longitude}|");
+            }
+
             try
             {
                 string url =
-                    $"https://maps.googleapis.com/maps/api/distancematrix/json?units=imperial&origins={origin.Latitude},{origin.Longitude}&destinations={destination.Latitude},{destination.Longitude}&avoid=tolls&key=AIzaSyCdHbtbmF8Y2nfesiu0KUUJagdG7_oui1k";
+                    $"https://maps.googleapis.com/maps/api/distancematrix/json?units=imperial&origins={coordinates}&destinations={coordinates}&avoid=tolls&key=AIzaSyCdHbtbmF8Y2nfesiu0KUUJagdG7_oui1k";
 
                 HttpResponseMessage getAsync = _httpClient.GetAsync(url).Result;
 
@@ -136,13 +162,22 @@ namespace DreamTravel.ExternalConnection
                     using (var jsonTextReader = new JsonTextReader(new StreamReader(stream)))
                     {
                         JObject json = (JObject)new JsonSerializer().Deserialize(jsonTextReader);
-                        return json["rows"][0]["elements"][0]["duration"]["value"].Value<int>();
+
+                        for (int i = 0; i < listOfCities.Count; i++)
+                        {
+                            for (int j = 0; j < listOfCities.Count; j++)
+                            {
+                                result[j + i * listOfCities.Count] = json["rows"][i]["elements"][j]["duration"]["value"].Value<int>();
+                            }
+                        }
+
+                        return result;
                     }
                 }
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                throw new InvalidDataException($"Cannot get data about road between [{origin.Name}] and [{destination.Name}]");
+                throw new InvalidDataException(e.Message);
             }
         }
     }

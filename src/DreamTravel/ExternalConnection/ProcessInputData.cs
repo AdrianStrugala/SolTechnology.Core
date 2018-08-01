@@ -20,6 +20,13 @@ namespace DreamTravel.ExternalConnection
         {
             SetTablesValueAsMax(evaluationMatrix, 0);
 
+            Parallel.Invoke
+            (
+                () => evaluationMatrix.TollDistances = _apiCaller.DowloadDurationMatrixByTollRoad(listOfCities),
+                () => evaluationMatrix.FreeDistances = _apiCaller.DowloadDurationMatrixByFreeRoad(listOfCities)
+            );
+
+
             Parallel.For(0, listOfCities.Count, i =>
             {
                 for (int j = 0; j < listOfCities.Count; j++)
@@ -33,16 +40,8 @@ namespace DreamTravel.ExternalConnection
 
                     else
                     {
-                        Parallel.Invoke(
-                            () => evaluationMatrix.FreeDistances[iterator] =
-                                _apiCaller.DowloadDurationBetweenTwoCitesByFreeRoad(listOfCities[i], listOfCities[j]),
-
-                            () => evaluationMatrix.TollDistances[iterator] =
-                            _apiCaller.DowloadDurationBetweenTwoCitesByTollRoad(listOfCities[i], listOfCities[j]),
-
-                            () => evaluationMatrix.Costs[iterator] =
-                                _apiCaller.DowloadCostBetweenTwoCities(listOfCities[i], listOfCities[j]) / 100
-                            );
+                        evaluationMatrix.Costs[iterator] =
+                            _apiCaller.DowloadCostBetweenTwoCities(listOfCities[i], listOfCities[j]) / 100;
                     }
                 }
             });
