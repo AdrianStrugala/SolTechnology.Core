@@ -1,5 +1,5 @@
 Ant Colony: Four Cities 
 Minimal Distance: 103983 
 Average Distance: 103983 
-Average Time: 0,059847336 s 
+Average Time: 0.070433228 s 
 Recurrence: 100 %

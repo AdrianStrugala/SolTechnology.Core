@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using DreamTravel.Models;
 using TravelingSalesmanProblem;
@@ -13,8 +14,15 @@ namespace TravelingSalesmanProblemTests
         public void SolveTSP_RunWithValidParameters_FirstAndLastCitiesStaysTheSame()
         {
             //Arrange
+            Random random = new Random();
+
             int noOfCities = 4;
             EvaluationMatrix evaluationMatrix = new EvaluationMatrix(noOfCities);
+
+            for (int i = 0; i < evaluationMatrix.OptimalDistances.Length; i++)
+            {
+                evaluationMatrix.OptimalDistances[i] = random.NextDouble() * 1000;
+            }
 
             //Act
             var result = _sut.SolveTSP(evaluationMatrix.OptimalDistances);
@@ -28,8 +36,15 @@ namespace TravelingSalesmanProblemTests
         public void SolveTSP_RunWithValidParameters_EachCityAppearsOnlyOnce()
         {
             //Arrange
+            Random random = new Random();
+
             int noOfCities = 7;
             EvaluationMatrix evaluationMatrix = new EvaluationMatrix(noOfCities);
+
+            for (int i = 0; i < evaluationMatrix.OptimalDistances.Length; i++)
+            {
+                evaluationMatrix.OptimalDistances[i] = random.NextDouble() * 1000;
+            }
 
             //Act
             var result = _sut.SolveTSP(evaluationMatrix.OptimalDistances);

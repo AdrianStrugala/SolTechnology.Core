@@ -35,7 +35,8 @@ namespace TravelingSalesmanProblem
             //each iteration is one trip of the ants
             for (int j = 0; j < NoOfIterations; j++)
             {
-                for(int i = 0; i <NoOfAnts; i++) {
+                for (int i = 0; i < NoOfAnts; i++)
+                {
                     pathList.Add(CalculatePathForSingleAnt());
                 }
 
@@ -75,7 +76,7 @@ namespace TravelingSalesmanProblem
             {
                 _trialsMatrix[i] = BasicTrialValue;
             }
-        }        
+        }
 
         private static int[] InitalizePath(int noOfCities)
         {
@@ -92,7 +93,6 @@ namespace TravelingSalesmanProblem
             double[] probabilityMatrix = new double[_matrixSize];
             int[] path = InitalizePath(_noOfCities);
             path = SetFirstAndLastPointInPath(path);
-            probabilityMatrix = InitializeMatrixWithZeros(probabilityMatrix);
             probabilityMatrix = FillProbabilityMatrix(probabilityMatrix);
             probabilityMatrix = ClearProbabilityRowsForFirstAndLastPoint(path, probabilityMatrix);
 
@@ -118,21 +118,10 @@ namespace TravelingSalesmanProblem
         }
 
 
-        private double[] InitializeMatrixWithZeros(double[] matrix)
-        {
-            for (int i = 0; i < matrix.Length; i++)
-            {
-                matrix[i] = 0;
-            }
-            return matrix;
-        }
-
-
         private double[] FillProbabilityMatrix(double[] probabilityMatrix)
         {
             for (int i = 0; i < _noOfCities * _noOfCities; i++)
             {
-
                 probabilityMatrix[i] = Math.Pow(_trialsMatrix[i], TrialPreference) *
                                        Math.Pow(_attractivenessMatrix[i], AttractivenessParameter);
             }

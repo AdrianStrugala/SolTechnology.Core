@@ -22,16 +22,6 @@ namespace DreamTravel.Models
                 () => Costs = new double[noOfCities * noOfCities],
                 () => OptimalCosts = new double[noOfCities * noOfCities]
             );
-
-            Parallel.For(0, noOfCities * noOfCities, i =>
-            {
-                FreeDistances[i] = -1;
-                TollDistances[i] = -1;
-                OptimalDistances[i] = -1;
-                Goals[i] = -1;
-                Costs[i] = -1;
-                OptimalCosts[i] = -1;
-            });
         }
     }
 }
