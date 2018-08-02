@@ -81,6 +81,11 @@ namespace TravelingSalesmanProblem
             {
                 return Random.Value.Next(max);
             }
+
+            public static double RandomDouble()
+            {
+                return Random.Value.NextDouble();
+            }
         }
     }
 }

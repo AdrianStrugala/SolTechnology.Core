@@ -140,15 +140,6 @@ namespace TravelingSalesmanProblem
         }
 
 
-        private static double DrawRandomLessThan1()
-        {
-            Random ran = new Random();
-            double result = ran.Next(100);
-            result = result / 100;
-            return result;
-        }
-
-
         private VertexAndProbability[] CopyRowFromProbabilityMatrix(int q, int[] path, double[] probabilityMatrix)
         {
             VertexAndProbability[] result = new VertexAndProbability[_noOfCities];
@@ -186,7 +177,7 @@ namespace TravelingSalesmanProblem
 
         private int DrawNewPointByProbability(VertexAndProbability[] row, int[] path)
         {
-            double randomLessThan1 = DrawRandomLessThan1();
+            double randomLessThan1 = StaticRandom.RandomDouble();
             double sum = 0;
             for (int i = 0; i < _noOfCities; i++)
             {
