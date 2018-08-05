@@ -8,7 +8,7 @@ namespace DreamTravel.ExternalConnection
     {
         Task<List<City>> GetCitiesFromGoogleApi(List<string> cityNames);
 
-        List<string> ReadCities(string incomingCities);
+        List<string> ReadCities(string[] incomingCities);
 
         EvaluationMatrix DownloadExternalData(List<City> listOfCities, EvaluationMatrix evaluationMatrix);
     }

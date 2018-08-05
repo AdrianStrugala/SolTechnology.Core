@@ -2,7 +2,6 @@
     Layout = "_Layout";
     ViewData["Title"] = "Dream Travel";
 }
-@using Microsoft.AspNetCore.Http
 
 <body style="margin: 0;">
 
@@ -17,11 +16,6 @@
             </button>
             <div class="collapse navbar-collapse" id="navbarResponsive">
                 <ul class="navbar-nav">
-
-                    <!-- Cities button -->
-                    <li class="nav-item">
-                        <button type="button" class="btn btn-outline-secondary" data-toggle="modal" data-target="#listOfCitiesModal">Cities</button>
-                    </li>
 
                     <!-- Journey list -->
                     <li class="dropdown nav-item" id="listOfCitiesBtn" display="none">
@@ -44,50 +38,16 @@
     </div>
 
 
-
-    @*     <!-- Cities Modal --> *@
-    @* <div id="listOfCitiesModal" class="modal fade" role="dialog"> *@
-    @*     <div class="modal-dialog"> *@
-    @* *@
-    @*         <!-- Modal content--> *@
-    @*         <div class="modal-content"> *@
-    @*             <div class="modal-header"> *@
-    @*                 <h4 class="modal-title">Insert list of cities:</h4> *@
-    @*                 <button type="button" class="close" data-dismiss="modal">&times;</button> *@
-    @*             </div> *@
-    @*             <div class="modal-body"> *@
-    @*                 <textarea onkeyup="auto_grow(this)" id="listOfCities"> *@
-    @* First City *@
-    @* Last City *@
-    @* </textarea> *@
-    @*             </div> *@
-    @*             <footer class="modal-footer"> *@
-    @*                 <button type="button" class="btn btn-info" id="runTSPBtn" data-dismiss="modal">Apply</button> *@
-    @*             </footer> *@
-    @*         </div> *@
-    @*     </div> *@
-    @* </div> *@
-
-
     <!-- Cities Panel -->
     <div id="listOfCitiesPanel">
         <h4 class="modal-title" align="center"> List of cities:</h4>
         <br />
+
         <div id="listOfCities">
-            <textarea class="city" id="cityTemplate" rows="1" onfocusout="displayCity(this)">kupa</textarea>
+            <textarea class="city" rows="1" onchange="displayCityHandler(this)"></textarea>
         </div>
-
-
         <button type="button" class="btn btn-success" id="addCityBtn">+</button>
 
-        @*                 <button type="button" class="close" data-dismiss="modal">&times;</button> *@
-        @*             </div> *@
-        @*             <div class="modal-body"> *@
-        @*                 <textarea onkeyup="auto_grow(this)" id="listOfCities"> *@
-        @* First City *@
-        @* Last City *@
-        @* </textarea> *@
-        @*             </div> *@
         <footer class="modal-footer">
             <button type="button" class="btn btn-info" id="runTSPBtn">Apply</button>
         </footer>
@@ -125,13 +85,6 @@
 
     @section Scripts
         {
-        <script>
-            function auto_grow(element) {
-                element.style.height = "5px";
-                element.style.height = (element.scrollHeight) + "px";
-            }
-        </script>
-
 
         <script>
             var slider = document.getElementById("costSlider");
@@ -148,10 +101,7 @@
         </script>
 
         <script>
-            var displayCity = function(item) {
-                alert("Display city: " + item.value);
-            }
-
+            var cities = [];
             var markers = [];
             var routes = [];
             var sessionId;
@@ -239,6 +189,7 @@
                     markers[i].setMap(null);
                 }
                 markers = [];
+                cities = [];
                 pathsToRetry = [];
 
                 list.innerHTML = "";
@@ -299,27 +250,56 @@
                     ".");
             }
 
+            var displayCityHandler = function(item) {
+
+                $.ajax({
+                    type: 'POST',
+                    dataType: 'html',
+                    url: '@Url.Action("FindCity", "TSP")',
+                    data: { name: item.value, sessionId: sessionId },
+                    success: function(msg) {
+
+                        var city = JSON.parse(msg);
+                        
+                        displayMarker(map,
+                            city.Latitude,
+                            city.Longitude,
+                            "✓");
+
+                        cities.push(city);
+                        map.setCenter(markers[markers.length-1].getPosition());
+                    },
+
+                    error: function(req, status, errorObj) {
+                        var alertMessage = JSON.parse(req.responseText);
+                        alert(alertMessage);
+                    }
+                });
+            }
+
 
             function initMap() {
                 document.getElementById("listOfCitiesBtn").style.display = "none";
                 document.getElementById("costLimiBtn").style.display = "none";
                 sessionId = Guid();
                 var directionsService = new window.google.maps.DirectionsService;
-                var map = new window.google.maps.Map(document.getElementById('map'),
+                map = new window.google.maps.Map(document.getElementById('map'),
                     {
                         zoom: 4,
                         center: { lat: 0, lng: 0 }
                     });
 
-                var onChangeHandler = function() {
-                    var listOfCities = document.getElementById("listOfCities").value;
+
+                var runTSPHandler = function() {                   
                     document.getElementById("loader").style.display = "block";
+
+                    alert(JSON.stringify(cities));
 
                     $.ajax({
                         type: 'POST',
                         dataType: 'html',
                         url: '@Url.Action("CalculateBestPath", "TSP")',
-                        data: { cities: listOfCities, sessionId: sessionId },
+                        data: { cities: cities, sessionId: sessionId },
                         success: function(msg) {
 
                             optimalCost = 0;
@@ -379,88 +359,89 @@
                 var listOfCitiesHandler = function() {
                     var textArea = document.createElement("textarea");
 
-                textArea.className = "listOfCities";
-                textArea.rows = "1";
-                textArea.onfocusout = "displayCity(this)";
-                textArea.onfocusout = "1";
-                listOfCities.appendChild(textArea);
-                textArea.focus();
-            }
+                    textArea.className = "city";
+                    textArea.rows = "1";
+                    var att = document.createAttribute("onfocusout");
+                    att.value = "displayCityHandler(this)";
+                    textArea.setAttributeNode(att);
+                    listOfCities.appendChild(textArea);
+                    textArea.focus();
+                }
 
 
-            var limitCostHandler = function() {
-                document.getElementById("loader").style.display = "block";
-                var limit = document.getElementById("costSlider").value;
+                var limitCostHandler = function() {
+                    document.getElementById("loader").style.display = "block";
+                    var limit = document.getElementById("costSlider").value;
 
-                $.ajax({
-                    type: 'POST',
-                    dataType: 'html',
-                    url: '@Url.Action("LimitCost", "TSP")',
-                    data: { costLimit: limit, sessionId: sessionId },
-                    success: function(msg) {
+                    $.ajax({
+                        type: 'POST',
+                        dataType: 'html',
+                        url: '@Url.Action("LimitCost", "TSP")',
+                        data: { costLimit: limit, sessionId: sessionId },
+                        success: function(msg) {
 
-                        var totalCost = 0;
-                        var totalTime = 0;
+                            var totalCost = 0;
+                            var totalTime = 0;
 
-                        var pathList = JSON.parse(msg);
-                        var noOfPaths = pathList.length;
-                        var list = document.getElementById("projectSelectorDropdown");
+                            var pathList = JSON.parse(msg);
+                            var noOfPaths = pathList.length;
+                            var list = document.getElementById("projectSelectorDropdown");
 
-                        cleanMap(list);
+                            cleanMap(list);
 
-                        for (var i = 0; i < noOfPaths; i++) {
-                            totalCost += pathList[i].OptimalCost;
-                            totalTime += pathList[i].OptimalDistance;
+                            for (var i = 0; i < noOfPaths; i++) {
+                                totalCost += pathList[i].OptimalCost;
+                                totalTime += pathList[i].OptimalDistance;
 
-                            writePathInfo(pathList[i], list);
-                            displayRoute(directionsService, map, pathList[i]);
+                                writePathInfo(pathList[i], list);
+                                displayRoute(directionsService, map, pathList[i]);
+
+                                displayMarker(map,
+                                    pathList[i].StartingCity.Latitude,
+                                    pathList[i].StartingCity.Longitude,
+                                    i);
+                            }
+
+                            if (pathsToRetry.length > 0) {
+                                sleep(1000);
+                                for (var i = 0; i < pathsToRetry.length; i++) {
+                                    displayRoute(directionsService, map, pathsToRetry[i]);
+                                }
+                                pathsToRetry = [];
+                            }
 
                             displayMarker(map,
-                                pathList[i].StartingCity.Latitude,
-                                pathList[i].StartingCity.Longitude,
-                                i);
+                                pathList[noOfPaths - 1].EndingCity.Latitude,
+                                pathList[noOfPaths - 1].EndingCity.Longitude,
+                                noOfPaths);
+                            writeInfo(totalTime, totalCost);
+
+                            document.getElementById("listOfCitiesBtn").style.display = "initial";
+                            document.getElementById("loader").style.display = "none";
+                        },
+                        error: function(req, status, errorObj) {
+                            document.getElementById("loader").style.display = "none";
+                            var alertMessage = JSON.parse(req.responseText);
+                            alert(alertMessage);
                         }
+                    });
+                }
 
-                        if (pathsToRetry.length > 0) {
-                            sleep(1000);
-                            for (var i = 0; i < pathsToRetry.length; i++) {
-                                displayRoute(directionsService, map, pathsToRetry[i]);
-                            }
-                            pathsToRetry = [];
+                document.getElementById('runTSPBtn').onclick = runTSPHandler;
+                document.getElementById('runLimitBtn').onclick = limitCostHandler;
+
+                $(document).keyup(function(event) {
+                    if (event.which == 13) { //Enter
+                        if (event.target.type === "textarea") { //removes the enter sign
+                            //event.preventDefault();
+                            var el = event.target.value;
+                            event.target.value = el.substring(0, el.length - 1);
                         }
-
-                        displayMarker(map,
-                            pathList[noOfPaths - 1].EndingCity.Latitude,
-                            pathList[noOfPaths - 1].EndingCity.Longitude,
-                            noOfPaths);
-                        writeInfo(totalTime, totalCost);
-
-                        document.getElementById("listOfCitiesBtn").style.display = "initial";
-                        document.getElementById("loader").style.display = "none";
-                    },
-                    error: function(req, status, errorObj) {
-                        document.getElementById("loader").style.display = "none";
-                        var alertMessage = JSON.parse(req.responseText);
-                        alert(alertMessage);
+                        listOfCitiesHandler();
                     }
                 });
+                document.getElementById('addCityBtn').onclick = listOfCitiesHandler;
             }
-
-            document.getElementById('runTSPBtn').onclick = onChangeHandler;
-            document.getElementById('runLimitBtn').onclick = limitCostHandler;
-
-            $(document).keyup(function(event) {
-                if (event.which == 13) { //Enter
-                    if (event.target.type === "textarea") { //removes the enter sign
-                        //event.preventDefault();
-                        var el = event.target.value;
-                        event.target.value = el.substring(0, el.length - 1);
-                    }
-                    listOfCitiesHandler();
-                }
-            });
-            document.getElementById('addCityBtn').onclick = listOfCitiesHandler;
-        }
 
         </script>
     }

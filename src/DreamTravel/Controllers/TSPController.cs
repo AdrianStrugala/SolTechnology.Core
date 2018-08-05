@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using DreamTravel.ExternalConnection;
 using DreamTravel.Models;
 using DreamTravel.TSPControllerHandlers;
 using Microsoft.AspNetCore.Http;
@@ -21,7 +22,26 @@ namespace DreamTravel.Controllers
         private const string PathsKeyName = "_Paths";
 
         [HttpPost]
-        public async Task<IActionResult> CalculateBestPath(string cities, string sessionId)
+        public async Task<IActionResult> FindCity(string name, string sessionId)
+        {
+            try
+            {
+                var apiCaller = new CallAPI();
+                City city = await apiCaller.DownloadLocationOfCity(name);
+
+                string message = JsonConvert.SerializeObject(city);
+                return Ok(message);
+            }
+
+            catch (Exception ex)
+            {
+                string message = JsonConvert.SerializeObject(ex.Message);
+                return BadRequest(message);
+            }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> CalculateBestPath(List<City> cities, string sessionId)
         {
             try
             {

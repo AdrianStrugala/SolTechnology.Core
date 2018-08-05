@@ -59,13 +59,9 @@ namespace DreamTravel.ExternalConnection
             evaluationMatrix.OptimalCosts[iterator] = Double.MaxValue;
         }
 
-        public List<string> ReadCities(string incomingCities)
+        public List<string> ReadCities(string[] incomingCities)
         {
-            string[] cities = incomingCities.Split(
-                new[] { "\r\n", "\r", "\n" },
-                StringSplitOptions.None
-            );
-            return cities.Where(x => !String.IsNullOrEmpty(x)).ToList();
+            return incomingCities.Where(x => !string.IsNullOrEmpty(x)).ToList();
         }
 
         public async Task<List<City>> GetCitiesFromGoogleApi(List<string> cityNames)

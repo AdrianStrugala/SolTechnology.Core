@@ -24,19 +24,17 @@ namespace DreamTravel.TSPControllerHandlers
             _evaluationBrain = evaluationBrain;
         }
 
-        public async Task<List<Path>> Handle(string cities)
-        {
-            List<string> listOfCitiesAsStrings = _processInputData.ReadCities(cities);
-            EvaluationMatrix matrices = new EvaluationMatrix(listOfCitiesAsStrings.Count);
-            var listOfCities = await _processInputData.GetCitiesFromGoogleApi(listOfCitiesAsStrings);
-            matrices = _processInputData.DownloadExternalData(listOfCities, matrices);
-            matrices = _evaluationBrain.EvaluateCost(matrices, listOfCities.Count);          
+        public async Task<List<Path>> Handle(List<City> cities)
+        {         
+            EvaluationMatrix matrices = new EvaluationMatrix(cities.Count);
+            matrices = _processInputData.DownloadExternalData(cities, matrices);
+            matrices = _evaluationBrain.EvaluateCost(matrices, cities.Count);          
             int[] orderOfCities = _tspSolver.SolveTSP(matrices.OptimalDistances);
 
             //to have a possiblity to store cities data
            // File.WriteAllText("./twentyCities.txt", JsonConvert.SerializeObject(matrices.OptimalDistances));
 
-            return _processOutputData.FormOutputFromTSPResult(listOfCities, orderOfCities, matrices);
+            return _processOutputData.FormOutputFromTSPResult(cities, orderOfCities, matrices);
         }
 
     }

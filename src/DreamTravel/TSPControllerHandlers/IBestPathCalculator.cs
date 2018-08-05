@@ -6,6 +6,6 @@ namespace DreamTravel.TSPControllerHandlers
 {
     public interface IBestPathCalculator
     {
-        Task<List<Path>> Handle(string cities);
+        Task<List<Path>> Handle(List<City> cities);
     }
 }
