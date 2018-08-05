@@ -11,10 +11,28 @@ html, body {
 #map {
     float: left;
     height: 92vh;
-    width: 100vw;
+    width: 85vw;
     margin-top: 8vh;
+    margin-left: 15vw;
     padding: 0;
 }
+
+#listOfCitiesPanel {
+    height: 92vh;
+    margin-top: 8vh;
+    width: 15vw;
+    position: fixed;
+    z-index: 1;
+    top: 0;
+    left: 0;
+    background-color: white;
+    overflow-x: hidden;
+    border-style: solid;
+    border-color: #2FA4E7;
+    border-width: 0.5vw;
+    border-radius: 1vw;
+}
+
 
 
 #infoText {
@@ -50,8 +68,8 @@ html, body {
     min-width: 300px;
 }
 
-#listOfCities {
-    resize: both;
+.city {
+    /* resize: both; */
     width: 100%;
     resize: none;
     overflow: hidden;
