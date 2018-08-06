@@ -12,11 +12,17 @@ namespace DreamTravel.Controllers
 {
     public class TSPController : Controller
     {
-        private readonly IBestPathCalculator _bestPathCalculator;
+        private readonly ICalculateBestPath _calculateBestPath;
+        private readonly IDownloadLocationOfCity _downloadLocationOfCity;
+        private readonly IBreakCostLimit _breakBreakCostLimit;
 
-        public TSPController(IBestPathCalculator bestPathCalculator)
+        public TSPController(ICalculateBestPath calculateBestPath, 
+                             IDownloadLocationOfCity downloadLocationOfCity,
+                             IBreakCostLimit breakBreakCostLimit)
         {
-            _bestPathCalculator = bestPathCalculator;
+            _calculateBestPath = calculateBestPath;
+            _downloadLocationOfCity = downloadLocationOfCity;
+            _breakBreakCostLimit = breakBreakCostLimit;
         }
 
         private const string PathsKeyName = "_Paths";
@@ -26,8 +32,7 @@ namespace DreamTravel.Controllers
         {
             try
             {
-                var apiCaller = new CallAPI();
-                City city = await apiCaller.DownloadLocationOfCity(name);
+                City city = await _downloadLocationOfCity.Execute(name);
 
                 string message = JsonConvert.SerializeObject(city);
                 return Ok(message);
@@ -45,7 +50,7 @@ namespace DreamTravel.Controllers
         {
             try
             {
-                List<Path> paths = await _bestPathCalculator.Handle(cities);
+                List<Path> paths = await _calculateBestPath.Execute(cities);
 
                 HttpContext.Session.SetString(sessionId + PathsKeyName, JsonConvert.SerializeObject(paths));
 
@@ -66,9 +71,8 @@ namespace DreamTravel.Controllers
             try
             {
                 List<Path> paths = JsonConvert.DeserializeObject<List<Path>>(HttpContext.Session.GetString(sessionId + PathsKeyName));
-                var costLimitBreaker = new CostLimitBreaker();
 
-                paths = costLimitBreaker.Handle(costLimit, paths);
+                paths = _breakBreakCostLimit.Execute(costLimit, paths);
 
                 HttpContext.Session.SetString(sessionId + PathsKeyName, JsonConvert.SerializeObject(paths));
 

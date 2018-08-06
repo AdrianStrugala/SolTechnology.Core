@@ -7,7 +7,7 @@ namespace TESWebUITests.TSPEngine
 {
     public class ProcessOutputDataTests
     {
-        private readonly ProcessOutputData _sut = new ProcessOutputData();
+        private readonly FormOutputDataForBestPath _sut = new FormOutputDataForBestPath();
 
         [Fact]
         public void GetDurationBetweenTwoCitiesByTollRoad_InvokeWithValidCities_ReturnsSomeDuration()
@@ -45,7 +45,7 @@ namespace TESWebUITests.TSPEngine
             EvaluationMatrix evaluationMatrix = new EvaluationMatrix(noOfCities);
 
             //Act
-            var result = _sut.FormOutputFromTSPResult(listOfCities, orderOfCities, evaluationMatrix);
+            var result = _sut.Execute(listOfCities, orderOfCities, evaluationMatrix);
 
             //Assert
             Assert.Equal(noOfCities-1, result.Count);

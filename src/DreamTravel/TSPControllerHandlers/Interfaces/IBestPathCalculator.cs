@@ -4,8 +4,8 @@ using DreamTravel.Models;
 
 namespace DreamTravel.TSPControllerHandlers
 {
-    public interface IBestPathCalculator
+    public interface ICalculateBestPath
     {
-        Task<List<Path>> Handle(List<City> cities);
+        Task<List<Path>> Execute(List<City> cities);
     }
 }

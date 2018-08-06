@@ -9,32 +9,32 @@ using Path = DreamTravel.Models.Path;
 
 namespace DreamTravel.TSPControllerHandlers
 {
-    public class BestPathCalculator : IBestPathCalculator
+    public class CalculateBestPath : ICalculateBestPath
     {
         private readonly IProcessInputData _processInputData;
-        private readonly IProcessOutputData _processOutputData;
+        private readonly IFormOutputDataForBestPath _formOutputDataForBestPath;
         private readonly ITSP _tspSolver;
         private readonly IEvaluationBrain _evaluationBrain;
 
-        public BestPathCalculator(IProcessInputData processInputData, IProcessOutputData processOutputData, ITSP tspSolver, IEvaluationBrain evaluationBrain)
+        public CalculateBestPath(IProcessInputData processInputData, IFormOutputDataForBestPath formOutputDataForBestPath, ITSP tspSolver, IEvaluationBrain evaluationBrain)
         {
             _processInputData = processInputData;
-            _processOutputData = processOutputData;
+            _formOutputDataForBestPath = formOutputDataForBestPath;
             _tspSolver = tspSolver;
             _evaluationBrain = evaluationBrain;
         }
 
-        public async Task<List<Path>> Handle(List<City> cities)
+        public async Task<List<Path>> Execute(List<City> cities)
         {         
             EvaluationMatrix matrices = new EvaluationMatrix(cities.Count);
-            matrices = _processInputData.DownloadExternalData(cities, matrices);
-            matrices = _evaluationBrain.EvaluateCost(matrices, cities.Count);          
+            matrices = _processInputData.Execute(cities, matrices);
+            matrices = _evaluationBrain.Execute(matrices, cities.Count);          
             int[] orderOfCities = _tspSolver.SolveTSP(matrices.OptimalDistances);
 
             //to have a possiblity to store cities data
            // File.WriteAllText("./twentyCities.txt", JsonConvert.SerializeObject(matrices.OptimalDistances));
 
-            return _processOutputData.FormOutputFromTSPResult(cities, orderOfCities, matrices);
+            return _formOutputDataForBestPath.Execute(cities, orderOfCities, matrices);
         }
 
     }

@@ -43,7 +43,7 @@ namespace TESWebUITests.TSPControllerHandlersTests
 
 
             //Act 
-            var result = _sut.EvaluateCost(matrix, noOfCities);
+            var result = _sut.Execute(matrix, noOfCities);
 
 
             //Assert

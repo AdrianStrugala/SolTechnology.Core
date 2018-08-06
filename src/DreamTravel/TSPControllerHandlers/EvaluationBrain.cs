@@ -10,7 +10,7 @@ namespace DreamTravel.TSPControllerHandlers
         private static double HighwayVelocity { get; } = 120;
         private static double RoadCombustion { get; } = 0.06; //per km
 
-        public EvaluationMatrix EvaluateCost(EvaluationMatrix evaluationMatrix, int noOfCities)
+        public EvaluationMatrix Execute(EvaluationMatrix evaluationMatrix, int noOfCities)
         {
             Parallel.For(0, noOfCities, i =>
             {

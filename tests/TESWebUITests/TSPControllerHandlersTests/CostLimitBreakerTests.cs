@@ -7,10 +7,10 @@ namespace TESWebUITests.TSPControllerHandlersTests
 {
     public class CostLimitBreakerTests
     {
-        private readonly CostLimitBreaker _sut;
+        private readonly BreakCostLimit _sut;
         public CostLimitBreakerTests()
         {
-            _sut = new CostLimitBreaker();
+            _sut = new BreakCostLimit();
         }
 
         [Fact]
@@ -49,7 +49,7 @@ namespace TESWebUITests.TSPControllerHandlersTests
 
 
             //Act
-            var result = _sut.Handle(costLimit, paths);
+            var result = _sut.Execute(costLimit, paths);
 
             //Assert
             Assert.Equal(0, result[0].Index);

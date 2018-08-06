@@ -15,7 +15,7 @@ namespace DreamTravel.ExternalConnection
             _apiCaller = apiCaller;
         }
 
-        public EvaluationMatrix DownloadExternalData(List<City> listOfCities,
+        public EvaluationMatrix Execute(List<City> listOfCities,
             EvaluationMatrix evaluationMatrix)
         {
             SetTablesValueAsMax(evaluationMatrix, 0);
@@ -57,23 +57,6 @@ namespace DreamTravel.ExternalConnection
             evaluationMatrix.Goals[iterator] = Double.MaxValue;
             evaluationMatrix.Costs[iterator] = Double.MaxValue;
             evaluationMatrix.OptimalCosts[iterator] = Double.MaxValue;
-        }
-
-        public List<string> ReadCities(string[] incomingCities)
-        {
-            return incomingCities.Where(x => !string.IsNullOrEmpty(x)).ToList();
-        }
-
-        public async Task<List<City>> GetCitiesFromGoogleApi(List<string> cityNames)
-        {
-            List<City> cities = new List<City>();
-            foreach (var cityName in cityNames)
-            {
-                City downloadedCity = await _apiCaller.DownloadLocationOfCity(cityName);
-                cities.Add(downloadedCity);
-            }
-
-            return cities;
         }
     }
 }

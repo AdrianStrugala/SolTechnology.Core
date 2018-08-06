@@ -3,8 +3,8 @@ using DreamTravel.Models;
 
 namespace DreamTravel.TSPControllerHandlers
 {
-    public interface ICostLimitBreaker
+    public interface IBreakCostLimit
     {
-        List<Path> Handle(int costLimit, List<Path> paths);
+        List<Path> Execute(int costLimit, List<Path> paths);
     }
 }

@@ -1,13 +1,10 @@
-﻿using System;
-using System.Globalization;
+﻿using System.Globalization;
 using DreamTravel.ExternalConnection;
-using DreamTravel.Models;
 using DreamTravel.TSPControllerHandlers;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using StackExchange.Redis;
 using TravelingSalesmanProblem;
 
 namespace DreamTravel
@@ -31,10 +28,11 @@ namespace DreamTravel
 
             services.AddTransient<ICallAPI, CallAPI>();
             services.AddTransient<IProcessInputData, ProcessInputData>();
-            services.AddTransient<IProcessOutputData, ProcessOutputData>();
-            services.AddTransient<IBestPathCalculator, BestPathCalculator>();
-            services.AddTransient<ICostLimitBreaker, CostLimitBreaker>();
+            services.AddTransient<IFormOutputDataForBestPath, FormOutputDataForBestPath>();
+            services.AddTransient<ICalculateBestPath, CalculateBestPath>();
+            services.AddTransient<IBreakCostLimit, BreakCostLimit>();
             services.AddTransient<IEvaluationBrain, EvaluationBrain>();
+            services.AddTransient<IDownloadLocationOfCity, DownloadLocationOfCity>();
 
             //TSP engine
             services.AddTransient<ITSP, AntColony>();
