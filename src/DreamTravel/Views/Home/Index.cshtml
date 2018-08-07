@@ -44,7 +44,7 @@
         <br />
 
         <div id="listOfCities">
-            <textarea class="city" rows="1" onchange="displayCityHandler(this)"></textarea>
+            <textarea class="city" id="cityRow1" rows="1" onchange="displayCityHandler(this)"></textarea>
         </div>
         <button type="button" class="btn btn-success" id="addCityBtn">+</button>
 
@@ -84,13 +84,13 @@
     <div id="map"></div>
 
     @section Scripts
-        {
+    {
 
         <script>
             var slider = document.getElementById("costSlider");
             var output = document.getElementById("limitValue");
 
-            slider.oninput = function () {
+            slider.oninput = function() {
                 output.innerHTML = this.value + " €";
             }
         </script>
@@ -109,6 +109,7 @@
             var optimalTime;
             var totalCost;
             var pathsToRetry = [];
+            var noOfCityRows = 1;
 
             //TODO Route Display details after click
             function displayRoute(directionsService, map, path) {
@@ -164,7 +165,7 @@
                         fontWeight: "bold"
                     }
                 });
-                markers.push(marker);
+                return marker;
             }
 
             function pad2(number) {
@@ -184,12 +185,6 @@
                     routes[i].setMap(null);
                 }
                 routes = [];
-
-                for (var i = 0; i < markers.length; i++) {
-                    markers[i].setMap(null);
-                }
-                markers = [];
-                cities = [];
                 pathsToRetry = [];
 
                 list.innerHTML = "";
@@ -260,14 +255,20 @@
                     success: function(msg) {
 
                         var city = JSON.parse(msg);
-                        
-                        displayMarker(map,
-                            city.Latitude,
-                            city.Longitude,
-                            "✓");
 
-                        cities.push(city);
-                        map.setCenter(markers[markers.length-1].getPosition());
+                        $("#listOfCities").children().each(function(index) {
+
+                            if ($(this).attr('id') == item.id) {
+//                                markers[index] = null;
+                                cities[index] = city;
+                                markers[index] = displayMarker(map,
+                                                city.Latitude,
+                                                city.Longitude,
+                                                "✓");
+                            }
+                        });
+
+                        map.setCenter(markers[markers.length - 1].getPosition());
                     },
 
                     error: function(req, status, errorObj) {
@@ -290,7 +291,7 @@
                     });
 
 
-                var runTSPHandler = function() {                   
+                var runTSPHandler = function() {
                     document.getElementById("loader").style.display = "block";
 
                     alert(JSON.stringify(cities));
@@ -357,11 +358,15 @@
                 }
 
                 var listOfCitiesHandler = function() {
-                    var textArea = document.createElement("textarea");
+                    noOfCityRows++;
 
+                    var textArea = document.createElement("textarea");
                     textArea.className = "city";
+                    var attId = document.createAttribute("id");
+                    attId.value = "cityRow" + noOfCityRows.toString();
+                    textArea.setAttributeNode(attId);
                     textArea.rows = "1";
-                    var att = document.createAttribute("onfocusout");
+                    var att = document.createAttribute("onchange");
                     att.value = "displayCityHandler(this)";
                     textArea.setAttributeNode(att);
                     listOfCities.appendChild(textArea);
