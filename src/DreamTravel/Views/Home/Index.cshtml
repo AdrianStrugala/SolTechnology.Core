@@ -256,17 +256,29 @@
 
                         var city = JSON.parse(msg);
 
+                        var found = false;
                         $("#listOfCities").children().each(function(index) {
+                            if ($(this).attr('id') == item.id && index < cities.length) {
 
-                            if ($(this).attr('id') == item.id) {
-//                                markers[index] = null;
+                                markers[index].setMap(null);
                                 cities[index] = city;
                                 markers[index] = displayMarker(map,
-                                                city.Latitude,
-                                                city.Longitude,
-                                                "✓");
+                                    city.Latitude,
+                                    city.Longitude,
+                                    "✓");
+
+                                found = true;
                             }
+
                         });
+
+                        if (!found) {
+                            cities.push(city);
+                            markers.push(displayMarker(map,
+                                city.Latitude,
+                                city.Longitude,
+                                "✓"));
+                        }
 
                         map.setCenter(markers[markers.length - 1].getPosition());
                     },
@@ -294,8 +306,6 @@
                 var runTSPHandler = function() {
                     document.getElementById("loader").style.display = "block";
 
-                    alert(JSON.stringify(cities));
-
                     $.ajax({
                         type: 'POST',
                         dataType: 'html',
@@ -321,13 +331,15 @@
                                 writePathInfo(pathList[i], list);
                                 displayRoute(directionsService, map, pathList[i]);
 
-                                displayMarker(map,
+                                markers[i].setMap(null);
+                                markers[i] = displayMarker(map,
                                     pathList[i].StartingCity.Latitude,
                                     pathList[i].StartingCity.Longitude,
                                     i);
                             }
 
-                            displayMarker(map,
+                            markers[markers.length-1].setMap(null);
+                            markers[markers.length-1] = displayMarker(map,
                                 pathList[noOfPaths - 1].EndingCity.Latitude,
                                 pathList[noOfPaths - 1].EndingCity.Longitude,
                                 noOfPaths);
