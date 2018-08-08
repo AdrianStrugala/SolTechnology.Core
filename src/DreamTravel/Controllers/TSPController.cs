@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using DreamTravel.ExternalConnection;
+using DreamTravel.ExternalConnection.Interfaces;
 using DreamTravel.Models;
-using DreamTravel.TSPControllerHandlers;
+using DreamTravel.TSPControllerHandlers.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
@@ -16,7 +16,7 @@ namespace DreamTravel.Controllers
         private readonly IDownloadLocationOfCity _downloadLocationOfCity;
         private readonly IBreakCostLimit _breakBreakCostLimit;
 
-        public TSPController(ICalculateBestPath calculateBestPath, 
+        public TSPController(ICalculateBestPath calculateBestPath,
                              IDownloadLocationOfCity downloadLocationOfCity,
                              IBreakCostLimit breakBreakCostLimit)
         {
@@ -66,7 +66,7 @@ namespace DreamTravel.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> LimitCost(int costLimit, string sessionId)
+        public IActionResult LimitCost(int costLimit, string sessionId)
         {
             try
             {
