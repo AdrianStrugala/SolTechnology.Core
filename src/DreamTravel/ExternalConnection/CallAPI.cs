@@ -5,6 +5,7 @@ using System.Net.Http;
 using System.Reflection;
 using System.Text;
 using System.Xml;
+using DreamTravel.ExternalConnection.Interfaces;
 using DreamTravel.Models;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;

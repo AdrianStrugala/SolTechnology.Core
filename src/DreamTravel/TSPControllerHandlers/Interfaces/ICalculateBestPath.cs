@@ -2,7 +2,7 @@
 using System.Threading.Tasks;
 using DreamTravel.Models;
 
-namespace DreamTravel.TSPControllerHandlers
+namespace DreamTravel.TSPControllerHandlers.Interfaces
 {
     public interface ICalculateBestPath
     {

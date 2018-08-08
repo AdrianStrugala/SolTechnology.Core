@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using DreamTravel.Models;
 
-namespace DreamTravel.TSPControllerHandlers
+namespace DreamTravel.TSPControllerHandlers.Interfaces
 {
     public interface IBreakCostLimit
     {

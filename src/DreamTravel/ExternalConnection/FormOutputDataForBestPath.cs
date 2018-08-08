@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using DreamTravel.ExternalConnection.Interfaces;
 using DreamTravel.Models;
 
 namespace DreamTravel.ExternalConnection

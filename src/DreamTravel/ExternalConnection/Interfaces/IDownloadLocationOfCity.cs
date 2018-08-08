@@ -1,7 +1,7 @@
 ﻿using System.Threading.Tasks;
 using DreamTravel.Models;
 
-namespace DreamTravel.ExternalConnection
+namespace DreamTravel.ExternalConnection.Interfaces
 {
     public interface IDownloadLocationOfCity
     {

@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using DreamTravel.Models;
 
-namespace DreamTravel.ExternalConnection
+namespace DreamTravel.ExternalConnection.Interfaces
 {
     public interface ICallAPI
     {

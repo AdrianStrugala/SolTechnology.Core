@@ -2,7 +2,9 @@
 using System.IO;
 using System.Threading.Tasks;
 using DreamTravel.ExternalConnection;
+using DreamTravel.ExternalConnection.Interfaces;
 using DreamTravel.Models;
+using DreamTravel.TSPControllerHandlers.Interfaces;
 using Newtonsoft.Json;
 using TravelingSalesmanProblem;
 using Path = DreamTravel.Models.Path;

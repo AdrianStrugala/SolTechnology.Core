@@ -1,6 +1,8 @@
 ﻿using System.Globalization;
 using DreamTravel.ExternalConnection;
+using DreamTravel.ExternalConnection.Interfaces;
 using DreamTravel.TSPControllerHandlers;
+using DreamTravel.TSPControllerHandlers.Interfaces;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;

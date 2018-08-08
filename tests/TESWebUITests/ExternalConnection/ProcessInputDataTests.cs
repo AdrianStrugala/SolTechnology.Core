@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using DreamTravel.ExternalConnection;
+using DreamTravel.ExternalConnection.Interfaces;
 using DreamTravel.Models;
 using Xunit;
 

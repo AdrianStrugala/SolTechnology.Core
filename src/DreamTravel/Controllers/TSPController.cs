@@ -14,15 +14,15 @@ namespace DreamTravel.Controllers
     {
         private readonly ICalculateBestPath _calculateBestPath;
         private readonly IDownloadLocationOfCity _downloadLocationOfCity;
-        private readonly IBreakCostLimit _breakBreakCostLimit;
+        private readonly IBreakCostLimit _breakCostLimit;
 
         public TSPController(ICalculateBestPath calculateBestPath,
                              IDownloadLocationOfCity downloadLocationOfCity,
-                             IBreakCostLimit breakBreakCostLimit)
+                             IBreakCostLimit breakCostLimit)
         {
             _calculateBestPath = calculateBestPath;
             _downloadLocationOfCity = downloadLocationOfCity;
-            _breakBreakCostLimit = breakBreakCostLimit;
+            _breakCostLimit = breakCostLimit;
         }
 
         private const string PathsKeyName = "_Paths";
@@ -72,7 +72,7 @@ namespace DreamTravel.Controllers
             {
                 List<Path> paths = JsonConvert.DeserializeObject<List<Path>>(HttpContext.Session.GetString(sessionId + PathsKeyName));
 
-                paths = _breakBreakCostLimit.Execute(costLimit, paths);
+                paths = _breakCostLimit.Execute(costLimit, paths);
 
                 HttpContext.Session.SetString(sessionId + PathsKeyName, JsonConvert.SerializeObject(paths));
 

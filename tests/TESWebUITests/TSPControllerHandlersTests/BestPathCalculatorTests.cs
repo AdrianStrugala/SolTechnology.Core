@@ -1,7 +1,9 @@
 ﻿using System.Collections.Generic;
 using DreamTravel.ExternalConnection;
+using DreamTravel.ExternalConnection.Interfaces;
 using DreamTravel.Models;
 using DreamTravel.TSPControllerHandlers;
+using DreamTravel.TSPControllerHandlers.Interfaces;
 using NSubstitute;
 using TravelingSalesmanProblem;
 using Xunit;

@@ -1,6 +1,6 @@
 ﻿using DreamTravel.Models;
 
-namespace DreamTravel.TSPControllerHandlers
+namespace DreamTravel.TSPControllerHandlers.Interfaces
 {
     public interface IEvaluationBrain
     {
