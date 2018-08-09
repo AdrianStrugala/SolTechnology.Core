@@ -87,8 +87,8 @@
     {
 
         <script>
-            var slider = document.getElementById("costSlider");
-            var output = document.getElementById("limitValue");
+            var slider = $("#costSlider")[0];
+            var output = $("#limitValue")[0];
 
             slider.oninput = function() {
                 output.innerHTML = this.value + " €";
@@ -168,17 +168,9 @@
                 return marker;
             }
 
-            function pad2(number) {
-                return (number < 10 ? '0' : '') + number;
-            }
 
-            function Guid() {
-                return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g,
-                    function(c) {
-                        var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
-                        return v.toString(16);
-                    });
-            }
+
+
 
             function cleanMap(list) {
                 for (var i = 0; i < routes.length; i++) {
