@@ -46,10 +46,10 @@
         <div id="listOfCities">
             <textarea class="city" id="cityRow1" rows="1" onchange="displayCityHandler(this)"></textarea>
         </div>
-        <button type="button" class="btn btn-success" id="addCityBtn">+</button>
+        <button type="button" class="btn btn-success" onclick = "addCityHandler()" id="addCityBtn">+</button>
 
         <footer class="modal-footer">
-            <button type="button" class="btn btn-info" id="runTSPBtn">Apply</button>
+            <button type="button" class="btn btn-info" onclick = "runTSPHandler()" id="runTSPBtn">Apply</button>
         </footer>
 
     </div>
@@ -71,7 +71,7 @@
                     <input type="range" min="0" max="100" value="0" class="slider" id="costSlider">
                 </div>
                 <footer class="modal-footer">
-                    <button type="button" class="btn btn-info" id="runLimitBtn" data-dismiss="modal">Apply</button>
+                    <button type="button" class="btn btn-info" id="runLimitBtn" onclick="limitCostHandler()" data-dismiss="modal">Apply</button>
                 </footer>
             </div>
         </div>
@@ -92,236 +92,17 @@
 
         <script>
 
-
-          
-
-            
-
-
-
-
-
-            function cleanMap(list) {
-                for (var i = 0; i < routes.length; i++) {
-                    routes[i].setMap(null);
-                }
-                routes = [];
-                pathsToRetry = [];
-
-                list.innerHTML = "";
-            }
-
-            function writePathInfo(path, list) {
-
-                var hours = Math.floor(path.OptimalDistance / 3600);
-                var minutes = Math.floor((path.OptimalDistance - Math.floor(hours) * 3600) / 60);
-                var seconds = (path.OptimalDistance % 60);
-
-                var routeString =
-                    "From " +
-                        path.StartingCity.Name +
-                        " to " +
-                        path.EndingCity.Name +
-                        ". Cost of fee: " +
-                        path.OptimalCost.toFixed(2) +
-                        " €." +
-                        " Time: " +
-                        Math.floor(hours) +
-                        ":" +
-                        pad2(Math.floor(minutes)) +
-                        ":" +
-                        pad2(Math.floor(seconds)) +
-                        "\n";
-                var li = document.createElement("li");
-                var text = document.createTextNode(routeString);
-                text.href = "#";
-                li.appendChild(text);
-                list.appendChild(li);
-            }
-
-            function sleep(milliseconds) {
-                var start = new Date().getTime();
-                for (var i = 0; i < 1e7; i++) {
-                    if ((new Date().getTime() - start) > milliseconds) {
-                        break;
-                    }
-                }
-            }
-
-            function writeInfo(totalTime, totalCost) {
-                var totalHours = Math.floor(totalTime / 3600);
-                var totalMinutes = Math.floor((totalTime - Math.floor(totalHours) * 3600) / 60);
-                var totalSeconds = (totalTime % 60);
-
-                $('#infoText').html(
-                    "Total cost of toll fee: " +
-                    totalCost.toFixed(2) +
-                    " €. \n" +
-                    "Total travel time: " +
-                    Math.floor(totalHours) +
-                    ":" +
-                    pad2(Math.floor(totalMinutes)) +
-                    ":" +
-                    pad2(Math.floor(totalSeconds)) +
-                    ".");
-            }
-            
-
             function initMap() {
                 document.getElementById("listOfCitiesBtn").style.display = "none";
                 document.getElementById("costLimiBtn").style.display = "none";
                 sessionId = Guid();
-                var directionsService = new window.google.maps.DirectionsService;
+                directionsService = new window.google.maps.DirectionsService;
                 map = new window.google.maps.Map(document.getElementById('map'),
                     {
                         zoom: 4,
                         center: { lat: 0, lng: 0 }
                     });
 
-
-                var runTSPHandler = function() {
-                    document.getElementById("loader").style.display = "block";
-
-                    $.ajax({
-                        type: 'POST',
-                        dataType: 'html',
-                        url: '@Url.Action("CalculateBestPath", "TSP")',
-                        data: { cities: cities, sessionId: sessionId },
-                        success: function(msg) {
-
-                            optimalCost = 0;
-                            optimalTime = 0;
-                            totalCost = 0;
-
-                            var pathList = JSON.parse(msg);
-                            var noOfPaths = pathList.length;
-                            var list = document.getElementById("projectSelectorDropdown");
-
-                            cleanMap(list);
-
-                            for (var i = 0; i < noOfPaths; i++) {
-                                optimalCost += pathList[i].OptimalCost;
-                                optimalTime += pathList[i].OptimalDistance;
-                                totalCost += pathList[i].Cost;
-
-                                writePathInfo(pathList[i], list);
-                                displayRouteHandler(directionsService, map, pathList[i]);
-
-                                markers[i].setMap(null);
-                                markers[i] = displayMarkerHandler(map,
-                                    pathList[i].StartingCity.Latitude,
-                                    pathList[i].StartingCity.Longitude,
-                                    i);
-                            }
-
-                            markers[markers.length-1].setMap(null);
-                            markers[markers.length - 1] = displayMarkerHandler(map,
-                                pathList[noOfPaths - 1].EndingCity.Latitude,
-                                pathList[noOfPaths - 1].EndingCity.Longitude,
-                                noOfPaths);
-
-                            var bounds = new google.maps.LatLngBounds();
-                            for (var i = 0; i < markers.length; i++) {
-                                bounds.extend(markers[i].position);
-                            }
-                            map.fitBounds(bounds);
-
-                            writeInfo(optimalTime, optimalCost);
-
-                            document.getElementById("costSlider").setAttribute('value', optimalCost);
-                            document.getElementById("costSlider").setAttribute('max', totalCost + 1);
-                            document.getElementById("limitValue").innerHTML =
-                                document.getElementById("costSlider").value + " €";
-
-                            document.getElementById("listOfCitiesBtn").style.display = "initial";
-                            document.getElementById("costLimiBtn").style.display = "initial";
-                            document.getElementById("loader").style.display = "none";
-                        },
-                        error: function(req, status, errorObj) {
-                            document.getElementById("loader").style.display = "none";
-                            var alertMessage = JSON.parse(req.responseText);
-                            alert(alertMessage);
-                        }
-                    });
-                }
-
-                var listOfCitiesHandler = function() {
-                    noOfCityRows++;
-
-                    var textArea = document.createElement("textarea");
-                    textArea.className = "city";
-                    var attId = document.createAttribute("id");
-                    attId.value = "cityRow" + noOfCityRows.toString();
-                    textArea.setAttributeNode(attId);
-                    textArea.rows = "1";
-                    var att = document.createAttribute("onchange");
-                    att.value = "displayCityHandler(this)";
-                    textArea.setAttributeNode(att);
-                    listOfCities.appendChild(textArea);
-                    textArea.focus();
-                }
-
-
-                var limitCostHandler = function() {
-                    document.getElementById("loader").style.display = "block";
-                    var limit = document.getElementById("costSlider").value;
-
-                    $.ajax({
-                        type: 'POST',
-                        dataType: 'html',
-                        url: '@Url.Action("LimitCost", "TSP")',
-                        data: { costLimit: limit, sessionId: sessionId },
-                        success: function(msg) {
-
-                            var totalCost = 0;
-                            var totalTime = 0;
-
-                            var pathList = JSON.parse(msg);
-                            var noOfPaths = pathList.length;
-                            var list = document.getElementById("projectSelectorDropdown");
-
-                            cleanMap(list);
-
-                            for (var i = 0; i < noOfPaths; i++) {
-                                totalCost += pathList[i].OptimalCost;
-                                totalTime += pathList[i].OptimalDistance;
-
-                                writePathInfo(pathList[i], list);
-                                displayRouteHandler(directionsService, map, pathList[i]);
-
-                                displayMarkerHandler(map,
-                                    pathList[i].StartingCity.Latitude,
-                                    pathList[i].StartingCity.Longitude,
-                                    i);
-                            }
-
-                            if (pathsToRetry.length > 0) {
-                                sleep(1000);
-                                for (var i = 0; i < pathsToRetry.length; i++) {
-                                    displayRouteHandler(directionsService, map, pathsToRetry[i]);
-                                }
-                                pathsToRetry = [];
-                            }
-
-                            displayMarkerHandler(map,
-                                pathList[noOfPaths - 1].EndingCity.Latitude,
-                                pathList[noOfPaths - 1].EndingCity.Longitude,
-                                noOfPaths);
-                            writeInfo(totalTime, totalCost);
-
-                            document.getElementById("listOfCitiesBtn").style.display = "initial";
-                            document.getElementById("loader").style.display = "none";
-                        },
-                        error: function(req, status, errorObj) {
-                            document.getElementById("loader").style.display = "none";
-                            var alertMessage = JSON.parse(req.responseText);
-                            alert(alertMessage);
-                        }
-                    });
-                }
-
-                document.getElementById('runTSPBtn').onclick = runTSPHandler;
-                document.getElementById('runLimitBtn').onclick = limitCostHandler;
 
                 $(document).keyup(function(event) {
                     if (event.which == 13) { //Enter
@@ -330,10 +111,9 @@
                             var el = event.target.value;
                             event.target.value = el.substring(0, el.length - 1);
                         }
-                        listOfCitiesHandler();
+                        addCityHandler();
                     }
                 });
-                document.getElementById('addCityBtn').onclick = listOfCitiesHandler;
             }
 
             $("#costSlider")[0].oninput = function () {

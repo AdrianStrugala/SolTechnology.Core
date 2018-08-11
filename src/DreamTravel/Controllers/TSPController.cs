@@ -82,7 +82,8 @@ namespace DreamTravel.Controllers
 
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                string message = JsonConvert.SerializeObject(ex.Message);
+                return BadRequest(message);
             }
         }
     }

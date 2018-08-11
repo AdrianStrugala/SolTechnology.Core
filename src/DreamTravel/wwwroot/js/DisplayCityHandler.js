@@ -15,7 +15,6 @@
 
                     markers[index].setMap(null);
                     cities[index] = city;
-                    alert(cities[0]);
                     markers[index] = displayMarkerHandler(map,
                         city.Latitude,
                         city.Longitude,
