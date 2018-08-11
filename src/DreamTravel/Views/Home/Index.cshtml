@@ -86,16 +86,6 @@
     @section Scripts
         {
 
-        <script>
-            var slider = $("#costSlider")[0];
-            var output = $("#limitValue")[0];
-
-            slider.oninput = function () {
-                output.innerHTML = this.value + " €";
-            }
-        </script>
-
-
         <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyC8ZkBAtPiwp0rk4SRdhH6vufM39eDMmHY&callback=initMap"
                 async defer>
         </script>
@@ -103,62 +93,9 @@
         <script>
 
 
-            //TODO Route Display details after click
-            function displayRoute(directionsService, map, path) {
+          
 
-                var roadColour = "black";
-                var isToll = false;
-
-                if (path.OptimalCost === 0) {
-                    isToll = true;
-                    roadColour = "#0080ff";
-                }
-
-                var directionsDisplay = new window.google.maps.DirectionsRenderer({
-                    suppressMarkers: true,
-                    preserveViewport: true,
-                    polylineOptions: {
-                        strokeColor: roadColour,
-                        strokeWeight: 6,
-                        strokeOpacity: 0.6
-                    }
-                });
-                directionsDisplay.setMap(map);
-
-                directionsService.route({
-                        origin: new window.google.maps.LatLng(path.StartingCity.Latitude, path.StartingCity.Longitude),
-                        destination: new window.google.maps.LatLng(path.EndingCity.Latitude, path.EndingCity.Longitude),
-                        travelMode: 'DRIVING',
-                        avoidTolls: isToll
-                    },
-                    function(response, status) {
-                        if (status === 'OK') {
-                            directionsDisplay.setDirections(response);
-                        } else if (status === 'OVER_QUERY_LIMIT') {
-                            pathsToRetry.push(path);
-                        } else {
-                            window.alert('Directions request failed due to ' + status);
-                        }
-                    });
-
-                routes.push(directionsDisplay);
-            }
-
-            function displayMarker(map, latitude, longtitude, number) {
-                var marker = new window.google.maps.Marker({
-                    position: {
-                        lat: latitude,
-                        lng: longtitude
-                    },
-                    map: map,
-                    label: {
-                        text: number.toString(),
-                        color: "white",
-                        fontWeight: "bold"
-                    }
-                });
-                return marker;
-            }
+            
 
 
 
@@ -228,52 +165,7 @@
                     pad2(Math.floor(totalSeconds)) +
                     ".");
             }
-
-//            var displayCityHandler = function(item) {
-//
-//                $.ajax({
-//                    type: 'POST',
-//                    dataType: 'html',
-//                    url: '@Url.Action("FindCity", "TSP")',
-//                    data: { name: item.value, sessionId: sessionId },
-//                    success: function(msg) {
-//
-//                        var city = JSON.parse(msg);
-//
-//                        var found = false;
-//                        $("#listOfCities").children().each(function(index) {
-//                            if ($(this).attr('id') == item.id && index < cities.length) {
-//
-//                                markers[index].setMap(null);
-//                                cities[index] = city;
-//                                markers[index] = displayMarker(map,
-//                                    city.Latitude,
-//                                    city.Longitude,
-//                                    "✓");
-//
-//                                found = true;
-//                            }
-//
-//                        });
-//
-//                        if (!found) {
-//                            cities.push(city);
-//                            markers.push(displayMarker(map,
-//                                city.Latitude,
-//                                city.Longitude,
-//                                "✓"));
-//                        }
-//
-//                        map.setCenter(markers[markers.length - 1].getPosition());
-//                    },
-//
-//                    error: function(req, status, errorObj) {
-//                        var alertMessage = JSON.parse(req.responseText);
-//                        alert(alertMessage);
-//                    }
-//                });
-//            }
-
+            
 
             function initMap() {
                 document.getElementById("listOfCitiesBtn").style.display = "none";
@@ -313,17 +205,17 @@
                                 totalCost += pathList[i].Cost;
 
                                 writePathInfo(pathList[i], list);
-                                displayRoute(directionsService, map, pathList[i]);
+                                displayRouteHandler(directionsService, map, pathList[i]);
 
                                 markers[i].setMap(null);
-                                markers[i] = displayMarker(map,
+                                markers[i] = displayMarkerHandler(map,
                                     pathList[i].StartingCity.Latitude,
                                     pathList[i].StartingCity.Longitude,
                                     i);
                             }
 
                             markers[markers.length-1].setMap(null);
-                            markers[markers.length-1] = displayMarker(map,
+                            markers[markers.length - 1] = displayMarkerHandler(map,
                                 pathList[noOfPaths - 1].EndingCity.Latitude,
                                 pathList[noOfPaths - 1].EndingCity.Longitude,
                                 noOfPaths);
@@ -395,9 +287,9 @@
                                 totalTime += pathList[i].OptimalDistance;
 
                                 writePathInfo(pathList[i], list);
-                                displayRoute(directionsService, map, pathList[i]);
+                                displayRouteHandler(directionsService, map, pathList[i]);
 
-                                displayMarker(map,
+                                displayMarkerHandler(map,
                                     pathList[i].StartingCity.Latitude,
                                     pathList[i].StartingCity.Longitude,
                                     i);
@@ -406,12 +298,12 @@
                             if (pathsToRetry.length > 0) {
                                 sleep(1000);
                                 for (var i = 0; i < pathsToRetry.length; i++) {
-                                    displayRoute(directionsService, map, pathsToRetry[i]);
+                                    displayRouteHandler(directionsService, map, pathsToRetry[i]);
                                 }
                                 pathsToRetry = [];
                             }
 
-                            displayMarker(map,
+                            displayMarkerHandler(map,
                                 pathList[noOfPaths - 1].EndingCity.Latitude,
                                 pathList[noOfPaths - 1].EndingCity.Longitude,
                                 noOfPaths);
@@ -444,6 +336,9 @@
                 document.getElementById('addCityBtn').onclick = listOfCitiesHandler;
             }
 
+            $("#costSlider")[0].oninput = function () {
+                $("#limitValue")[0].innerHTML = this.value + " €";
+            }
         </script>
     }
 </body>

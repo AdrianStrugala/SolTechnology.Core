@@ -1,4 +1,4 @@
-﻿var displayCityHandler = function (item) {
+﻿function displayCityHandler (item) {
 
     $.ajax({
         type: 'POST',
@@ -16,7 +16,7 @@
                     markers[index].setMap(null);
                     cities[index] = city;
                     alert(cities[0]);
-                    markers[index] = displayMarker(map,
+                    markers[index] = displayMarkerHandler(map,
                         city.Latitude,
                         city.Longitude,
                         "✓");
@@ -28,7 +28,7 @@
 
             if (!found) {
                 cities.push(city);
-                markers.push(displayMarker(map,
+                markers.push(displayMarkerHandler(map,
                     city.Latitude,
                     city.Longitude,
                     "✓"));
