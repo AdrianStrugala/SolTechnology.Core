@@ -84,13 +84,13 @@
     <div id="map"></div>
 
     @section Scripts
-    {
+        {
 
         <script>
             var slider = $("#costSlider")[0];
             var output = $("#limitValue")[0];
 
-            slider.oninput = function() {
+            slider.oninput = function () {
                 output.innerHTML = this.value + " €";
             }
         </script>
@@ -101,15 +101,7 @@
         </script>
 
         <script>
-            var cities = [];
-            var markers = [];
-            var routes = [];
-            var sessionId;
-            var optimalCost;
-            var optimalTime;
-            var totalCost;
-            var pathsToRetry = [];
-            var noOfCityRows = 1;
+
 
             //TODO Route Display details after click
             function displayRoute(directionsService, map, path) {
@@ -237,50 +229,50 @@
                     ".");
             }
 
-            var displayCityHandler = function(item) {
-
-                $.ajax({
-                    type: 'POST',
-                    dataType: 'html',
-                    url: '@Url.Action("FindCity", "TSP")',
-                    data: { name: item.value, sessionId: sessionId },
-                    success: function(msg) {
-
-                        var city = JSON.parse(msg);
-
-                        var found = false;
-                        $("#listOfCities").children().each(function(index) {
-                            if ($(this).attr('id') == item.id && index < cities.length) {
-
-                                markers[index].setMap(null);
-                                cities[index] = city;
-                                markers[index] = displayMarker(map,
-                                    city.Latitude,
-                                    city.Longitude,
-                                    "✓");
-
-                                found = true;
-                            }
-
-                        });
-
-                        if (!found) {
-                            cities.push(city);
-                            markers.push(displayMarker(map,
-                                city.Latitude,
-                                city.Longitude,
-                                "✓"));
-                        }
-
-                        map.setCenter(markers[markers.length - 1].getPosition());
-                    },
-
-                    error: function(req, status, errorObj) {
-                        var alertMessage = JSON.parse(req.responseText);
-                        alert(alertMessage);
-                    }
-                });
-            }
+//            var displayCityHandler = function(item) {
+//
+//                $.ajax({
+//                    type: 'POST',
+//                    dataType: 'html',
+//                    url: '@Url.Action("FindCity", "TSP")',
+//                    data: { name: item.value, sessionId: sessionId },
+//                    success: function(msg) {
+//
+//                        var city = JSON.parse(msg);
+//
+//                        var found = false;
+//                        $("#listOfCities").children().each(function(index) {
+//                            if ($(this).attr('id') == item.id && index < cities.length) {
+//
+//                                markers[index].setMap(null);
+//                                cities[index] = city;
+//                                markers[index] = displayMarker(map,
+//                                    city.Latitude,
+//                                    city.Longitude,
+//                                    "✓");
+//
+//                                found = true;
+//                            }
+//
+//                        });
+//
+//                        if (!found) {
+//                            cities.push(city);
+//                            markers.push(displayMarker(map,
+//                                city.Latitude,
+//                                city.Longitude,
+//                                "✓"));
+//                        }
+//
+//                        map.setCenter(markers[markers.length - 1].getPosition());
+//                    },
+//
+//                    error: function(req, status, errorObj) {
+//                        var alertMessage = JSON.parse(req.responseText);
+//                        alert(alertMessage);
+//                    }
+//                });
+//            }
 
 
             function initMap() {

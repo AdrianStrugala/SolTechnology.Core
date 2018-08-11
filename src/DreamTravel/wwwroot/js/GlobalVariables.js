@@ -1,0 +1,9 @@
+﻿var cities = [];
+var markers = [];
+var routes = [];
+var sessionId;
+var optimalCost;
+var optimalTime;
+var totalCost;
+var pathsToRetry = [];
+var noOfCityRows = 1;
