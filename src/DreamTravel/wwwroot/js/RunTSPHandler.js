@@ -46,14 +46,14 @@
 
             $("#costSlider")[0].setAttribute('value', optimalCost);
             $("#costSlider")[0].setAttribute('max', Math.ceil(totalCost));
-            document.getElementById("limitValue").innerHTML = $("#costSlider")[0].value + " €";
+            $("#limitValue")[0].innerHTML = $("#costSlider")[0].value + " €";
 
-            document.getElementById("listOfCitiesBtn").style.display = "initial";
-            document.getElementById("costLimiBtn").style.display = "initial";
-            document.getElementById("loader").style.display = "none";
+            $("#listOfCitiesBtn")[0].style.display = "initial";
+            $("#costLimiBtn")[0].style.display = "initial";
+            $("#loader")[0].style.display = "none";
         },
         error: function (req, status, errorObj) {
-            document.getElementById("loader").style.display = "none";
+            $("#loader")[0].style.display = "none";
             var alertMessage = JSON.parse(req.responseText);
             alert(alertMessage);
         }
