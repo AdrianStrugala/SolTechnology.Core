@@ -1,6 +1,7 @@
 ﻿function runTSPHandler(){
-    document.getElementById("loader").style.display = "block";
+    $("#loader")[0].style.display = "block";
 
+    //Request
     $.ajax({
         type: 'POST',
         dataType: 'html',
@@ -8,16 +9,17 @@
         data: { cities: cities, sessionId: sessionId },
         success: function (msg) {
 
+            //Initialize display
             optimalCost = 0;
             optimalTime = 0;
             totalCost = 0;
-
             var pathList = JSON.parse(msg);
             var noOfPaths = pathList.length;
-            var list = document.getElementById("projectSelectorDropdown");
+            var list = $("#projectSelectorDropdown")[0];
 
             cleanMapHandler(list);
 
+            //Read information
             for (var i = 0; i < noOfPaths; i++) {
                 optimalCost += pathList[i].OptimalCost;
                 optimalTime += pathList[i].OptimalDistance;
@@ -37,13 +39,15 @@
                 pathList[noOfPaths - 1].EndingCity.Longitude,
                 noOfPaths);
 
+            //Adjust map bounds
             var bounds = new google.maps.LatLngBounds();
             for (var i = 0; i < markers.length; i++) {
                 bounds.extend(markers[i].position);
             }
             map.fitBounds(bounds);
-            writeSummaryInfoHandler(optimalTime, optimalCost);
 
+            //Finalize display
+            writeSummaryInfoHandler(optimalTime, optimalCost);
             $("#costSlider")[0].setAttribute('value', optimalCost);
             $("#costSlider")[0].setAttribute('max', Math.ceil(totalCost));
             $("#limitValue")[0].innerHTML = $("#costSlider")[0].value + " €";
@@ -52,6 +56,7 @@
             $("#costLimiBtn")[0].style.display = "initial";
             $("#loader")[0].style.display = "none";
         },
+
         error: function (req, status, errorObj) {
             $("#loader")[0].style.display = "none";
             var alertMessage = JSON.parse(req.responseText);
