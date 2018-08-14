@@ -1,4 +1,4 @@
-﻿function runTSPHandler(){
+﻿function runTSPHandler() {
     $("#loader")[0].style.display = "block";
 
     //Request

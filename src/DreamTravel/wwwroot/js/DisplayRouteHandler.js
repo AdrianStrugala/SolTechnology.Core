@@ -22,11 +22,11 @@
     directionsDisplay.setMap(map);
 
     directionsService.route({
-            origin: new window.google.maps.LatLng(path.StartingCity.Latitude, path.StartingCity.Longitude),
-            destination: new window.google.maps.LatLng(path.EndingCity.Latitude, path.EndingCity.Longitude),
-            travelMode: 'DRIVING',
-            avoidTolls: isToll
-        },
+        origin: new window.google.maps.LatLng(path.StartingCity.Latitude, path.StartingCity.Longitude),
+        destination: new window.google.maps.LatLng(path.EndingCity.Latitude, path.EndingCity.Longitude),
+        travelMode: 'DRIVING',
+        avoidTolls: isToll
+    },
         function (response, status) {
             if (status === 'OK') {
                 directionsDisplay.setDirections(response);

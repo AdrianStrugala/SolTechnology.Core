@@ -1,4 +1,4 @@
-﻿function displayCityHandler (item) {
+﻿function displayCityHandler(item) {
 
     $.ajax({
         type: 'POST',

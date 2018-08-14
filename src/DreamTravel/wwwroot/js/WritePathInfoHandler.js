@@ -6,19 +6,20 @@
 
     var routeString =
         "From " +
-            path.StartingCity.Name +
-            " to " +
-            path.EndingCity.Name +
-            ". Cost of fee: " +
-            path.OptimalCost.toFixed(2) +
-            " €." +
-            " Time: " +
-            Math.floor(hours) +
-            ":" +
-            pad2(Math.floor(minutes)) +
-            ":" +
-            pad2(Math.floor(seconds)) +
-            "\n";
+        path.StartingCity.Name +
+        " to " +
+        path.EndingCity.Name +
+        ". Cost of fee: " +
+        path.OptimalCost.toFixed(2) +
+        " €." +
+        " Time: " +
+        Math.floor(hours) +
+        ":" +
+        pad2(Math.floor(minutes)) +
+        ":" +
+        pad2(Math.floor(seconds)) +
+        "\n";
+
     var li = document.createElement("li");
     var text = document.createTextNode(routeString);
     text.href = "#";

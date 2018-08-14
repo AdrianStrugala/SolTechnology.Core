@@ -1,7 +1,7 @@
 ﻿function limitCostHandler() {
 
-    document.getElementById("loader").style.display = "block";
-    var limit = document.getElementById("costSlider").value;
+    $("#loader")[0].style.display = "block";
+    var limit = $("#costSlider")[0].value;
 
     $.ajax({
         type: 'POST',
@@ -15,7 +15,7 @@
 
             var pathList = JSON.parse(msg);
             var noOfPaths = pathList.length;
-            var list = document.getElementById("projectSelectorDropdown");
+            var list = $("#projectSelectorDropdown")[0];
 
             cleanMapHandler(list);
 
@@ -46,11 +46,11 @@
                 noOfPaths);
             writeSummaryInfoHandler(totalTime, totalCost);
 
-            document.getElementById("listOfCitiesBtn").style.display = "initial";
-            document.getElementById("loader").style.display = "none";
+            $("#listOfCitiesBtn")[0].style.display = "initial";
+            $("#loader")[0].style.display = "none";
         },
         error: function (req, status, errorObj) {
-            document.getElementById("loader").style.display = "none";
+            $("#loader")[0].style.display = "none";
             var alertMessage = JSON.parse(req.responseText);
             alert(alertMessage);
         }
