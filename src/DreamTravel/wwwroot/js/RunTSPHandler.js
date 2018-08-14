@@ -45,7 +45,7 @@
             writeSummaryInfoHandler(optimalTime, optimalCost);
 
             document.getElementById("costSlider").setAttribute('value', optimalCost);
-            document.getElementById("costSlider").setAttribute('max', totalCost + 1);
+            document.getElementById("costSlider").setAttribute('max', Math.ceil(totalCost));
             document.getElementById("limitValue").innerHTML =
                 document.getElementById("costSlider").value + " €";
 

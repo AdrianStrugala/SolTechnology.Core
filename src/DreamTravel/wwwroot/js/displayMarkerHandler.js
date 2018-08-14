@@ -1,4 +1,7 @@
 ﻿function displayMarkerHandler(map, latitude, longtitude, number) {
+
+    //TODO Marker manipulation
+
     var marker = new window.google.maps.Marker({
         position: {
             lat: latitude,

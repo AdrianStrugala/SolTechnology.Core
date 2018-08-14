@@ -9,7 +9,7 @@
 
             var city = JSON.parse(msg);
 
-            var found = false;
+            var alreadyExists = false;
             $("#listOfCities").children().each(function (index) {
                 if ($(this).attr('id') == item.id && index < cities.length) {
 
@@ -20,12 +20,11 @@
                         city.Longitude,
                         "✓");
 
-                    found = true;
+                    alreadyExists = true;
                 }
-
             });
 
-            if (!found) {
+            if (!alreadyExists) {
                 cities.push(city);
                 markers.push(displayMarkerHandler(map,
                     city.Latitude,
