@@ -44,10 +44,9 @@
             map.fitBounds(bounds);
             writeSummaryInfoHandler(optimalTime, optimalCost);
 
-            document.getElementById("costSlider").setAttribute('value', optimalCost);
-            document.getElementById("costSlider").setAttribute('max', Math.ceil(totalCost));
-            document.getElementById("limitValue").innerHTML =
-                document.getElementById("costSlider").value + " €";
+            $("#costSlider")[0].setAttribute('value', optimalCost);
+            $("#costSlider")[0].setAttribute('max', Math.ceil(totalCost));
+            document.getElementById("limitValue").innerHTML = $("#costSlider")[0].value + " €";
 
             document.getElementById("listOfCitiesBtn").style.display = "initial";
             document.getElementById("costLimiBtn").style.display = "initial";
