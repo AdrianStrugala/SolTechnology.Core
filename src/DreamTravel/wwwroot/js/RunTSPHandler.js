@@ -21,6 +21,7 @@
 
             //Read information
             for (var i = 0; i < noOfPaths; i++) {
+
                 optimalCost += pathList[i].OptimalCost;
                 optimalTime += pathList[i].OptimalDistance;
                 totalCost += pathList[i].Cost;

@@ -15,14 +15,17 @@ namespace DreamTravel.Controllers
         private readonly ICalculateBestPath _calculateBestPath;
         private readonly IDownloadLocationOfCity _downloadLocationOfCity;
         private readonly IBreakCostLimit _breakCostLimit;
+        private IDownloadCityNameByLocation _downloadCityNameByLocation;
 
         public TSPController(ICalculateBestPath calculateBestPath,
                              IDownloadLocationOfCity downloadLocationOfCity,
+                             IDownloadCityNameByLocation downloadCityNameByLocation,
                              IBreakCostLimit breakCostLimit)
         {
             _calculateBestPath = calculateBestPath;
             _downloadLocationOfCity = downloadLocationOfCity;
             _breakCostLimit = breakCostLimit;
+            _downloadCityNameByLocation = downloadCityNameByLocation;
         }
 
         private const string PathsKeyName = "_Paths";
@@ -35,6 +38,30 @@ namespace DreamTravel.Controllers
                 City city = await _downloadLocationOfCity.Execute(name);
 
                 string message = JsonConvert.SerializeObject(city);
+                return Ok(message);
+            }
+
+            catch (Exception ex)
+            {
+                string message = JsonConvert.SerializeObject(ex.Message);
+                return BadRequest(message);
+            }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> FindCityByLocation(double lat, double lng, string sessionId)
+        {
+            try
+            {
+                City result = new City
+                {
+                    Latitude = lat,
+                    Longitude = lng
+                };
+
+                result = await _downloadCityNameByLocation.Execute(result);
+
+                string message = JsonConvert.SerializeObject(result);
                 return Ok(message);
             }
 

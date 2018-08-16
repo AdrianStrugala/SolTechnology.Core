@@ -35,6 +35,7 @@ namespace DreamTravel
             services.AddTransient<IBreakCostLimit, BreakCostLimit>();
             services.AddTransient<IEvaluationBrain, EvaluationBrain>();
             services.AddTransient<IDownloadLocationOfCity, DownloadLocationOfCity>();
+            services.AddTransient<IDownloadCityNameByLocation, DownloadCityNameByLocation>();
 
             //TSP engine
             services.AddTransient<ITSP, AntColony>();
