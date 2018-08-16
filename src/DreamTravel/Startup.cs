@@ -1,10 +1,14 @@
 ﻿using System.Globalization;
+using DreamTravel.Authentication;
 using DreamTravel.ExternalConnection;
 using DreamTravel.ExternalConnection.Interfaces;
 using DreamTravel.TSPControllerHandlers;
 using DreamTravel.TSPControllerHandlers.Interfaces;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using TravelingSalesmanProblem;
@@ -23,10 +27,19 @@ namespace DreamTravel
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddMvc();
+            var policy = new AuthorizationPolicyBuilder()
+                .RequireAuthenticatedUser()
+                .Build();
+
+            services.AddMvc(opts =>
+            {
+                opts.Filters.Add(new AuthorizeFilter(policy));
+            });
 
             services.AddDistributedMemoryCache();
 
+            //TSP engine
+            services.AddTransient<ITSP, AntColony>();
 
             services.AddTransient<ICallAPI, CallAPI>();
             services.AddTransient<IProcessInputData, ProcessInputData>();
@@ -37,29 +50,21 @@ namespace DreamTravel
             services.AddTransient<IDownloadLocationOfCity, DownloadLocationOfCity>();
             services.AddTransient<IDownloadCityNameByLocation, DownloadCityNameByLocation>();
 
-            //TSP engine
-            services.AddTransient<ITSP, AntColony>();
-            
-
             services.AddSession();
 
+            var configurationRoot = new ConfigurationBuilder()
+                .AddJsonFile("appsettings.json")
+                .AddEnvironmentVariables("APPSETTING_")
+                .Build();
 
-            //AUTHENTICATION TURNED OFF
-
-            //            var configurationRoot = new ConfigurationBuilder()
-            //                .AddJsonFile("appsettings.json")
-            //                .AddEnvironmentVariables("APPSETTING_")
-            //                .Build();
-            //
-            //            services.AddAuthentication(DreamAuthenticationOptions.AuthenticationScheme)
-            //                .AddScheme<DreamAuthenticationOptions, DreamAuthentication>(
-            //                    DreamAuthenticationOptions.AuthenticationScheme,
-            //                    null);
-
-            //            services.Configure<DreamAuthenticationOptions>(DreamAuthenticationOptions.AuthenticationScheme, configurationRoot);
+            services.AddAuthentication(DreamAuthenticationOptions.AuthenticationScheme)
+                .AddScheme<DreamAuthenticationOptions, DreamAuthentication>(
+                    DreamAuthenticationOptions.AuthenticationScheme,
+                    null);
+            services.Configure<DreamAuthenticationOptions>(DreamAuthenticationOptions.AuthenticationScheme, configurationRoot);
+            services.AddSingleton<IAuthenticationHandler, DreamAuthentication>();
         }
 
-        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
             var cultureInfo = new CultureInfo("en-US");
@@ -82,6 +87,7 @@ namespace DreamTravel
             app.UseCookiePolicy();
             app.UseSession();
 
+            app.UseAuthentication();
             app.UseMvc(routes =>
             {
                 routes.MapRoute(
