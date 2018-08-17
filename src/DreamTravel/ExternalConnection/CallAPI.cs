@@ -77,30 +77,29 @@ namespace DreamTravel.ExternalConnection
 
             try
             {
-                string url =
-                    $"https://maps.googleapis.com/maps/api/distancematrix/json?units=imperial&origins={coordinates}&destinations={coordinates}&key=AIzaSyCdHbtbmF8Y2nfesiu0KUUJagdG7_oui1k";
-
-                HttpResponseMessage getAsync = _httpClient.GetAsync(url).Result;
-
-                using (Stream stream = getAsync.Content.ReadAsStreamAsync().Result ??
-                                       throw new ArgumentNullException(
-                                           $"Execption on [{MethodBase.GetCurrentMethod().Name}]"))
+                for (int i = 0; i < listOfCities.Count; i++)
                 {
-                    using (var jsonTextReader = new JsonTextReader(new StreamReader(stream)))
-                    {
-                        JObject json = (JObject)new JsonSerializer().Deserialize(jsonTextReader);
+                    string url =
+                        $"https://maps.googleapis.com/maps/api/distancematrix/json?units=imperial&origins={listOfCities[i].Latitude},{listOfCities[i].Longitude}&destinations={coordinates}&key=AIzaSyCdHbtbmF8Y2nfesiu0KUUJagdG7_oui1k";
 
-                        for (int i = 0; i < listOfCities.Count; i++)
+                    HttpResponseMessage getAsync = _httpClient.GetAsync(url).Result;
+
+                    using (Stream stream = getAsync.Content.ReadAsStreamAsync().Result ??
+                                           throw new ArgumentNullException(
+                                               $"Execption on [{MethodBase.GetCurrentMethod().Name}]"))
+                    {
+                        using (var jsonTextReader = new JsonTextReader(new StreamReader(stream)))
                         {
+                            JObject json = (JObject)new JsonSerializer().Deserialize(jsonTextReader);
+
                             for (int j = 0; j < listOfCities.Count; j++)
                             {
-                                result[j + i * listOfCities.Count] = json["rows"][i]["elements"][j]["duration"]["value"].Value<int>();
+                                result[j + i * listOfCities.Count] = json["rows"][0]["elements"][j]["duration"]["value"].Value<int>();
                             }
                         }
-
-                        return result;
                     }
                 }
+                return result;
             }
             catch (Exception e)
             {
@@ -109,7 +108,7 @@ namespace DreamTravel.ExternalConnection
         }
 
         public double[] DowloadDurationMatrixByFreeRoad(List<City> listOfCities)
-        {         
+        {
             double[] result = new double[listOfCities.Count * listOfCities.Count];
 
             StringBuilder coordinates = new StringBuilder();
@@ -120,30 +119,29 @@ namespace DreamTravel.ExternalConnection
 
             try
             {
-                string url =
-                    $"https://maps.googleapis.com/maps/api/distancematrix/json?units=imperial&origins={coordinates}&destinations={coordinates}&avoid=tolls&key=AIzaSyCdHbtbmF8Y2nfesiu0KUUJagdG7_oui1k";
-
-                HttpResponseMessage getAsync = _httpClient.GetAsync(url).Result;
-
-                using (Stream stream = getAsync.Content.ReadAsStreamAsync().Result ??
-                                       throw new ArgumentNullException(
-                                           $"Execption on [{MethodBase.GetCurrentMethod().Name}]"))
+                for (int i = 0; i < listOfCities.Count; i++)
                 {
-                    using (var jsonTextReader = new JsonTextReader(new StreamReader(stream)))
-                    {
-                        JObject json = (JObject)new JsonSerializer().Deserialize(jsonTextReader);
+                    string url =
+                        $"https://maps.googleapis.com/maps/api/distancematrix/json?units=imperial&origins={listOfCities[i].Latitude},{listOfCities[i].Longitude}&destinations={coordinates}&avoid=tolls&key=AIzaSyCdHbtbmF8Y2nfesiu0KUUJagdG7_oui1k";
 
-                        for (int i = 0; i < listOfCities.Count; i++)
+                    HttpResponseMessage getAsync = _httpClient.GetAsync(url).Result;
+
+                    using (Stream stream = getAsync.Content.ReadAsStreamAsync().Result ??
+                                           throw new ArgumentNullException(
+                                               $"Execption on [{MethodBase.GetCurrentMethod().Name}]"))
+                    {
+                        using (var jsonTextReader = new JsonTextReader(new StreamReader(stream)))
                         {
+                            JObject json = (JObject)new JsonSerializer().Deserialize(jsonTextReader);
+
                             for (int j = 0; j < listOfCities.Count; j++)
                             {
-                                result[j + i * listOfCities.Count] = json["rows"][i]["elements"][j]["duration"]["value"].Value<int>();
+                                result[j + i * listOfCities.Count] = json["rows"][0]["elements"][j]["duration"]["value"].Value<int>();
                             }
                         }
-
-                        return result;
                     }
                 }
+                return result;
             }
             catch (Exception e)
             {
