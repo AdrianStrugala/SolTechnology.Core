@@ -11,6 +11,9 @@
         type: 'POST',
         dataType: 'html',
         url: window.location + 'TSP/FindCityByLocation',
+        headers: {
+            'Authorization': 'DreamAuthentication TestAuthentication'
+        },
         data: { lat: event.latLng.lat(), lng: event.latLng.lng(), sessionId: sessionId },
         success: function (msg) {
 

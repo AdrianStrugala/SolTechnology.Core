@@ -4,6 +4,9 @@
         type: 'POST',
         dataType: 'html',
         url: window.location + 'TSP/FindCity',
+        headers: {
+            'Authorization': 'DreamAuthentication TestAuthentication'
+        },
         data: { name: item.value, sessionId: sessionId },
         success: function (msg) {
 
