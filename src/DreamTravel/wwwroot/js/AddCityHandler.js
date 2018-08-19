@@ -4,9 +4,7 @@
 
     var textArea = document.createElement("textarea");
     textArea.className = "city";
-    var attId = document.createAttribute("id");
-    attId.value = "cityRow" + noOfCityRows.toString();
-    textArea.setAttributeNode(attId);
+    textArea.id = "cityRow" + noOfCityRows.toString();
     textArea.rows = "1";
     var att = document.createAttribute("onchange");
     att.value = "displayCityHandler(this)";

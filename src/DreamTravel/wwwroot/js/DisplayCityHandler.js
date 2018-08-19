@@ -24,6 +24,7 @@
                         "✓");
 
                     alreadyExists = true;
+                    map.setCenter(markers[index].getPosition());
                 }
             });
 
@@ -33,9 +34,9 @@
                     city.Latitude,
                     city.Longitude,
                     "✓"));
-            }
 
-            map.setCenter(markers[markers.length - 1].getPosition());
+                map.setCenter(markers[markers.length - 1].getPosition());
+            }           
         },
 
         error: function (req, status, errorObj) {
