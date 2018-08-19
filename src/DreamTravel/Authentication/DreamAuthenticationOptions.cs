@@ -6,6 +6,6 @@ namespace DreamTravel.Authentication
     {
         public const string AuthenticationHeaderName = "Authorization";
         public const string AuthenticationScheme = "DreamAuthentication";
-        public string ProviderAuthenticationKey { get; set; }
+        public string AuthenticationKey { get; set; }
     }
 }

@@ -6,6 +6,9 @@
         type: 'POST',
         dataType: 'html',
         url: window.location + 'TSP/CalculateBestPath',
+        headers: {
+            'Authorization': 'DreamAuthentication U29sVWJlckFsbGVz'
+        },
         data: { cities: cities, sessionId: sessionId },
         success: function (msg) {
 
