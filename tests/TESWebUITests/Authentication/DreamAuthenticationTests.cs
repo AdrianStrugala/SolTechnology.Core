@@ -78,11 +78,10 @@ namespace DreamTravelITests.Authentication
         public async Task HandleAuthenticateAsync_ValidRequest_Authorized()
         {
             //Arrange
-            _httpServer.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(DreamAuthenticationOptions.AuthenticationScheme, "TestAuthentication");
+            _httpServer.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(DreamAuthenticationOptions.AuthenticationScheme, "U29sVWJlckFsbGVz");
 
             //Act
             var result = await _httpServer.PostAsync(TestUrl, new StringContent(""));
-
 
             //Assert
             Assert.Equal(HttpStatusCode.BadRequest, result.StatusCode);

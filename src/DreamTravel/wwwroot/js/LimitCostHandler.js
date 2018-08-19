@@ -8,7 +8,7 @@
         dataType: 'html',
         url: window.location + 'TSP/LimitCost',
         headers: {
-            'Authorization': 'DreamAuthentication TestAuthentication'
+            'Authorization': 'DreamAuthentication U29sVWJlckFsbGVz'
         },
         data: { costLimit: limit, sessionId: sessionId },
         success: function (msg) {

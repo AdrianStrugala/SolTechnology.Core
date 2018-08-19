@@ -7,7 +7,7 @@
         dataType: 'html',
         url: window.location + 'TSP/CalculateBestPath',
         headers: {
-            'Authorization': 'DreamAuthentication TestAuthentication'
+            'Authorization': 'DreamAuthentication U29sVWJlckFsbGVz'
         },
         data: { cities: cities, sessionId: sessionId },
         success: function (msg) {

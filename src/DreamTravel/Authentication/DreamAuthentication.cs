@@ -46,9 +46,9 @@ namespace DreamTravel.Authentication
             }
 
             //_logger.LogInformation($"Decoding incoming authentication key");
-            //string headerParameterDecoded = Base64Decode(headerValue.Parameter);
+            string headerParameterDecoded = Base64Decode(headerValue.Parameter);
 
-            if (!Options.AuthenticationKey.Equals(headerValue.Parameter,
+            if (!Options.AuthenticationKey.Equals(headerParameterDecoded,
                 StringComparison.OrdinalIgnoreCase))
             {
               //  _logger.LogWarning($"Invalid authentication key");

@@ -12,7 +12,7 @@
         dataType: 'html',
         url: window.location + 'TSP/FindCityByLocation',
         headers: {
-            'Authorization': 'DreamAuthentication TestAuthentication'
+            'Authorization': 'DreamAuthentication U29sVWJlckFsbGVz'
         },
         data: { lat: event.latLng.lat(), lng: event.latLng.lng(), sessionId: sessionId },
         success: function (msg) {
