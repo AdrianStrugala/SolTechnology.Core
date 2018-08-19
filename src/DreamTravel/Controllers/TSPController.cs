@@ -15,7 +15,7 @@ namespace DreamTravel.Controllers
         private readonly ICalculateBestPath _calculateBestPath;
         private readonly IDownloadLocationOfCity _downloadLocationOfCity;
         private readonly IBreakCostLimit _breakCostLimit;
-        private IDownloadCityNameByLocation _downloadCityNameByLocation;
+        private readonly IDownloadCityNameByLocation _downloadCityNameByLocation;
 
         public TSPController(ICalculateBestPath calculateBestPath,
                              IDownloadLocationOfCity downloadLocationOfCity,
