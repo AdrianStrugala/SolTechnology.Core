@@ -29,7 +29,8 @@
                 writePathInfoHandler(pathList[i], list);
                 displayRouteHandler(directionsService, map, pathList[i]);
 
-                displayMarkerHandler(map,
+                markers[i].setMap(null);
+                markers[i] = displayMarkerHandler(map,
                     pathList[i].StartingCity.Latitude,
                     pathList[i].StartingCity.Longitude,
                     i);
@@ -42,8 +43,8 @@
                 }
                 pathsToRetry = [];
             }
-
-            displayMarkerHandler(map,
+            markers[markers.length - 1].setMap(null);
+            markers[markers.length - 1] = displayMarkerHandler(map,
                 pathList[noOfPaths - 1].EndingCity.Latitude,
                 pathList[noOfPaths - 1].EndingCity.Longitude,
                 noOfPaths);
