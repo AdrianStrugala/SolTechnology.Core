@@ -11,4 +11,8 @@
     textArea.setAttributeNode(att);
     listOfCities.appendChild(textArea);
     textArea.focus();
+
+    if (noOfCityRows > 2) {
+        $("#runTSPBtn")[0].disabled = false;
+    }
 }
