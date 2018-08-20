@@ -1,6 +1,6 @@
 ﻿function displayCityHandler(item) {
 
-    $.ajax({
+    DisplayCityAjaxCalls.push($.ajax({
         type: 'POST',
         dataType: 'html',
         url: window.location + 'TSP/FindCity',
@@ -36,12 +36,12 @@
                     "✓"));
 
                 map.setCenter(markers[markers.length - 1].getPosition());
-            }           
+            }
         },
 
         error: function (req, status, errorObj) {
             var alertMessage = JSON.parse(req.responseText);
             alert(alertMessage);
         }
-    });
+    }));
 }
