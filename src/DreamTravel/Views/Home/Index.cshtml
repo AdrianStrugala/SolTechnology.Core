@@ -44,12 +44,17 @@
         <br />
 
         <div id="listOfCities">
-            <textarea class="city" id="cityRow1" rows="1" onchange="displayCityHandler(this)"></textarea>
+            <div id="cityRow">
+                ---------------------------------
+                <textarea class="city" id="cityRow1" rows="1" onchange="displayCityHandler(this)"></textarea>
+                <button type="button" class="btn btn-danger" onclick="" id="removeCity1">X</button>
+                ----------------------------------
+            </div>
         </div>
-        <button type="button" class="btn btn-success" onclick = "addCityHandler()" id="addCityBtn">+</button>
+        <button type="button" class="btn btn-success" onclick="addCityHandler()" id="addCityBtn">+</button>
 
         <footer class="modal-footer">
-            <button type="button" class="btn btn-info" disabled="disabled" onclick = "runTSPHandler()" id="runTSPBtn">Apply</button>
+            <button type="button" class="btn btn-info" disabled="disabled" onclick="runTSPHandler()" id="runTSPBtn">Apply</button>
         </footer>
 
     </div>
@@ -104,7 +109,7 @@
                     });
 
 
-                $(document).keyup(function(event) {
+                $(document).keyup(function (event) {
                     if (event.which == 13) { //Enter
                         if (event.target.type === "textarea") { //removes the enter sign
                             //event.preventDefault();

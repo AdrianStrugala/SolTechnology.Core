@@ -33,7 +33,15 @@ html, body {
     border-radius: 1vw;
 }
 
+#cityRow {
+    height: 3vh;
+}
 
+.btn-danger {
+    margin: 0;
+    height: inherit;
+    resize: none;
+}
 
 #infoText {
     color: #e9ecef;
@@ -70,9 +78,10 @@ html, body {
 
 .city {
     /* resize: both; */
-    width: 100%;
+    width: 80%;
     resize: none;
     overflow: hidden;
+    height: inherit;
 }
 
 #loader {
