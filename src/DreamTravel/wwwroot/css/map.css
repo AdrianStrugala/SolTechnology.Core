@@ -20,7 +20,7 @@ html, body {
 #listOfCitiesPanel {
     height: 92vh;
     margin-top: 8vh;
-    width: 15vw;
+    width: 15rem;
     position: fixed;
     z-index: 1;
     top: 0;
@@ -43,8 +43,8 @@ html, body {
     border-width: 1px;
 }
 
-.cityRow {
-    height: 5vh;
+.cityBlock {
+    height: 2rem;
     display: block;
     position: relative;
 }
@@ -53,8 +53,11 @@ html, body {
     margin: 0;
     vertical-align: top;
     margin-top: 0;
-    height: inherit;
     resize: none;
+}
+
+.btn-success {
+    margin-top: 1rem
 }
 
 #infoText {
@@ -92,10 +95,12 @@ html, body {
 
 .city {
     /* resize: both; */
+    margin-top: 0.2rem;
     width: 80%;
     resize: none;
     overflow: hidden;
     height: inherit;
+    vertical-align: middle;
 }
 
 #loader {
