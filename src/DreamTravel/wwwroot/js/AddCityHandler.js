@@ -6,10 +6,10 @@
     div.className = "cityBlock";
 
     var hr = document.createElement("hr");
-    hr.ClassName = "line";
+    hr.className = "line";
 
     var hr2 = document.createElement("hr");
-    hr.ClassName = "line";
+    hr.className = "line";
 
     var textArea = document.createElement("textarea");
     textArea.className = "city";

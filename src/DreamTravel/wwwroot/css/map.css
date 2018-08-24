@@ -35,8 +35,11 @@ html, body {
 
 .line {
     display: block;
-    margin-top: 0.5vh;
-    margin-bottom: 0.5vh;
+    position: relative;
+    /* margin-top: 0.5vh; */
+    /* margin-bottom: 0.5vh; */
+    margin-bottom: 0vh;
+    margin-top: 0vh;
     margin-left: auto;
     margin-right: auto;
     border-style: inset;
@@ -45,19 +48,19 @@ html, body {
 
 .cityBlock {
     height: 2rem;
-    display: block;
+    display: contents; 
     position: relative;
 }
 
 .btn-danger {
-    margin: 0;
     vertical-align: top;
-    margin-top: 0;
+    margin: 0;
     resize: none;
+   
 }
 
 .btn-success {
-    margin-top: 1rem
+    justify-content: flex-start;
 }
 
 #infoText {
