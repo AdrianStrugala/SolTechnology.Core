@@ -33,12 +33,26 @@ html, body {
     border-radius: 1vw;
 }
 
-#cityRow {
-    height: 3vh;
+.line {
+    display: block;
+    margin-top: 0.5vh;
+    margin-bottom: 0.5vh;
+    margin-left: auto;
+    margin-right: auto;
+    border-style: inset;
+    border-width: 1px;
+}
+
+.cityRow {
+    height: 5vh;
+    display: block;
+    position: relative;
 }
 
 .btn-danger {
     margin: 0;
+    vertical-align: top;
+    margin-top: 0;
     height: inherit;
     resize: none;
 }
@@ -120,28 +134,28 @@ html, body {
     transition: opacity .2s;
 }
 
-/* Mouse-over effects */
-.slider:hover {
-    opacity: 1; /* Fully shown on mouse-over */
-}
+    /* Mouse-over effects */
+    .slider:hover {
+        opacity: 1; /* Fully shown on mouse-over */
+    }
 
-.slider::-webkit-slider-thumb {
-    -webkit-appearance: none;
-    appearance: none;
-    width: 25px;
-    height: 25px;
-    border-radius: 50%;
-    background: #2FA4E7;
-    cursor: pointer;
-}
+    .slider::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        appearance: none;
+        width: 25px;
+        height: 25px;
+        border-radius: 50%;
+        background: #2FA4E7;
+        cursor: pointer;
+    }
 
-.slider::-moz-range-thumb {
-    width: 25px;
-    height: 25px;
-    border-radius: 50%;
-    background: #2FA4E7;
-    cursor: pointer;
-}
+    .slider::-moz-range-thumb {
+        width: 25px;
+        height: 25px;
+        border-radius: 50%;
+        background: #2FA4E7;
+        cursor: pointer;
+    }
 
 .btn-info {
     background-image: -webkit-gradient(linear, left top, left bottom, from(#2fa4e7), color-stop(60%, #2fa4e7), to(#2fa4e7));
