@@ -11,9 +11,9 @@ html, body {
 #map {
     float: left;
     height: 92vh;
-    width: 85vw;
+    width: calc(100vw - 15rem);
     margin-top: 8vh;
-    margin-left: 15vw;
+    margin-left: 15rem;
     padding: 0;
 }
 
@@ -29,17 +29,15 @@ html, body {
     overflow-x: hidden;
     border-style: solid;
     border-color: #2FA4E7;
-    border-width: 0.5vw;
-    border-radius: 1vw;
+    border-width: 0.3rem;
+    border-radius: 0.6rem;
 }
 
 .line {
     display: block;
     position: relative;
-    /* margin-top: 0.5vh; */
-    /* margin-bottom: 0.5vh; */
-    margin-bottom: 0vh;
-    margin-top: 0vh;
+    margin-top: 0.5rem;
+    margin-bottom: 0.5rem;
     margin-left: auto;
     margin-right: auto;
     border-style: inset;
@@ -48,7 +46,7 @@ html, body {
 
 .cityBlock {
     height: 2rem;
-    display: contents; 
+    display: contents;
     position: relative;
 }
 
@@ -57,11 +55,9 @@ html, body {
     margin: 0;
     resize: none;
     text-align: center;
+    margin-left: 0.6rem;
 }
 
-.btn-success {
-    justify-content: flex-start;
-}
 
 #infoText {
     color: #e9ecef;
@@ -99,11 +95,12 @@ html, body {
 .city {
     /* resize: both; */
     margin-top: 0.2rem;
-    width: 80%;
+    width: 11rem;
     resize: none;
     overflow: hidden;
     height: inherit;
     vertical-align: middle;
+    float: left;
 }
 
 #loader {

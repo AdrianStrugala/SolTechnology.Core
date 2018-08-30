@@ -5,8 +5,6 @@
     var div = document.createElement("div");
     div.className = "cityBlock";
 
-    var br = document.createElement("br");
-
     var hr = document.createElement("hr");
     hr.className = "line";
 
@@ -30,7 +28,6 @@
     button.id = "removeCity" + noOfCityRows.toString();
     button.innerHTML = "X";
 
-    div.appendChild(br);
     div.appendChild(hr);
     div.appendChild(textArea);
     div.appendChild(button);
