@@ -5,11 +5,13 @@
     var div = document.createElement("div");
     div.className = "cityBlock";
 
+    var br = document.createElement("br");
+
     var hr = document.createElement("hr");
     hr.className = "line";
 
     var hr2 = document.createElement("hr");
-    hr.className = "line";
+    hr2.className = "line";
 
     var textArea = document.createElement("textarea");
     textArea.className = "city";
@@ -22,12 +24,13 @@
     var button = document.createElement("button");
     button.type = "button";
     button.className = "btn btn-danger";
-    button.id = "removeCity" + noOfCityRows.toString();
     var attOnClick = document.createAttribute("onclick");
     attOnClick.value = "";
     button.setAttributeNode(attOnClick);
+    button.id = "removeCity" + noOfCityRows.toString();
     button.innerHTML = "X";
 
+    div.appendChild(br);
     div.appendChild(hr);
     div.appendChild(textArea);
     div.appendChild(button);
