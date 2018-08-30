@@ -4,6 +4,7 @@
 
     var div = document.createElement("div");
     div.className = "cityBlock";
+    div.id = "cityBlock" + noOfCityRows.toString();
 
     var hr = document.createElement("hr");
     hr.className = "line";
@@ -13,7 +14,7 @@
 
     var textArea = document.createElement("textarea");
     textArea.className = "city";
-    textArea.id = "cityRow" + noOfCityRows.toString();
+    textArea.id = noOfCityRows.toString();
     textArea.rows = "1";
     var att = document.createAttribute("onchange");
     att.value = "displayCityHandler(this)";
@@ -23,9 +24,9 @@
     button.type = "button";
     button.className = "btn btn-danger";
     var attOnClick = document.createAttribute("onclick");
-    attOnClick.value = "";
+    attOnClick.value = "removeCityHandler(this)";
     button.setAttributeNode(attOnClick);
-    button.id = "removeCity" + noOfCityRows.toString();
+    button.id = noOfCityRows.toString();
     button.innerHTML = "X";
 
     div.appendChild(hr);
@@ -36,7 +37,7 @@
     listOfCities.appendChild(div);
     textArea.focus();
 
-    if (noOfCityRows > 2) {
+    if (noOfCityRows >= 2) {
         $("#runTSPBtn")[0].disabled = false;
     }
 }

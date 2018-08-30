@@ -1,4 +1,4 @@
-var cities = [];
+﻿var cities = [];
 var markers = [];
 var routes = [];
 var sessionId;
@@ -9,4 +9,3 @@ var pathsToRetry = [];
 var noOfCityRows = 1;
 var directionsService;
 var DisplayCityAjaxCalls = [];
-//# sourceMappingURL=GlobalVariables.js.map

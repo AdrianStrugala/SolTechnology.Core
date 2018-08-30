@@ -14,7 +14,7 @@
 
             var alreadyExists = false;
             $("#listOfCities").children().each(function (index) {
-                if ($(this).attr('id') == item.id && index < cities.length) {
+                if ($(this).attr('id') == "cityBlock" + item.id && index < cities.length) {
 
                     markers[index].setMap(null);
                     cities[index] = city;

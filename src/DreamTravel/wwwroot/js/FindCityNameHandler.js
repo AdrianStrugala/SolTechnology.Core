@@ -19,6 +19,7 @@
 
             var city = JSON.parse(msg);
             cities[index] = city;
+//            $("#listOfCities").children()[index]
             $("#listOfCities").children()[index].value = city.Name;
         },
 

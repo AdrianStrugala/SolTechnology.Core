@@ -2,7 +2,14 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp2.0</TargetFramework>
+    <TypeScriptToolsVersion>2.8</TypeScriptToolsVersion>
   </PropertyGroup>
+
+  <ItemGroup>
+    <Content Remove="wwwroot\js\lib\jquery.d.ts" />
+    <Content Remove="wwwroot\js\RemoveCityHandler.ts" />
+    <Content Remove="wwwroot\js\Utils\GlobalVariables.ts" />
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Dapper" Version="1.50.5" />
@@ -23,6 +30,12 @@
 
   <ItemGroup>
     <ProjectReference Include="..\TravelingSalesmanProblem\TravelingSalesmanProblem.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <TypeScriptCompile Include="wwwroot\js\lib\jquery.d.ts" />
+    <TypeScriptCompile Include="wwwroot\js\RemoveCityHandler.ts" />
+    <TypeScriptCompile Include="wwwroot\js\GlobalVariables.ts" />
   </ItemGroup>
 
   <ItemGroup>
