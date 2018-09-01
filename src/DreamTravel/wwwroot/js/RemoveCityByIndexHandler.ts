@@ -5,6 +5,4 @@
         $("#listOfCities").children()[index].removeChild($("#listOfCities").children()[index].firstChild);
     }
     $("#listOfCities").children()[index].remove();
-
-    noOfCityRows--;
 }

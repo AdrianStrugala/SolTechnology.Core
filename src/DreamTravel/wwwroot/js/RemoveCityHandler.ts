@@ -2,7 +2,7 @@
     $("#listOfCities").children().each(function (index) {
         if ($(this).attr('id').toString() == "cityBlock" + city.id.toString()) {
 
-            if (markers != null) {
+            if (markers[index] != null) {
                 markers[index].setMap(null);
             }
             markers.splice(index, 1);
@@ -13,5 +13,4 @@
             $("#listOfCities").children()[index].remove();
         }
     });
-    noOfCityRows--;
 }

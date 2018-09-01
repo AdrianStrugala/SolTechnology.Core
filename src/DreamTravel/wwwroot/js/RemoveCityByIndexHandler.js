@@ -5,6 +5,5 @@ function removeCityByIndexHandler(index) {
         $("#listOfCities").children()[index].removeChild($("#listOfCities").children()[index].firstChild);
     }
     $("#listOfCities").children()[index].remove();
-    noOfCityRows--;
 }
 //# sourceMappingURL=RemoveCityByIndexHandler.js.map
