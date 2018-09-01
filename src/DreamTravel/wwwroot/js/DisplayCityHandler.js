@@ -12,32 +12,22 @@
 
             var city = JSON.parse(msg);
 
-            var alreadyExists = false;
             $("#listOfCities").children().each(function (index) {
                 if ($(this).attr('id') == "cityBlock" + item.id && index < cities.length) {
 
-                    markers[index].setMap(null);
+                    if (markers[index] != null) {
+                        markers[index].setMap(null);
+                    }
                     cities[index] = city;
                     markers[index] = displayMarkerHandler(map,
                         city.Latitude,
                         city.Longitude,
                         "✓");
 
-                    alreadyExists = true;
                     map.setCenter(markers[index].getPosition());
                 }
             });
-
-            if (!alreadyExists) {
-                cities.push(city);
-                markers.push(displayMarkerHandler(map,
-                    city.Latitude,
-                    city.Longitude,
-                    "✓"));
-
-                map.setCenter(markers[markers.length - 1].getPosition());
-            }
-        },
+      },
 
         error: function (req, status, errorObj) {
             var alertMessage = JSON.parse(req.responseText);

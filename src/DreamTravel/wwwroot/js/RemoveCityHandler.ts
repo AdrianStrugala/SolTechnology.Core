@@ -1,21 +1,15 @@
-﻿function removeCityHandler(city) {
-
-    $("#listOfCities").children().each(function (index) {
-        if ($(this).attr('id').toString() == "cityBlock" + city.id.toString()) {
+﻿function removeCityHandler(index) {
 
             markers[index].setMap(null);
-            markers.splice(index);
+            markers.splice(index, 1);
 
-            cities.splice(index);
+            cities.splice(index, 1);
 
             
             while ($("#listOfCities").children()[index].firstChild) {
                 $("#listOfCities").children()[index].removeChild($("#listOfCities").children()[index].firstChild);
             }
             $("#listOfCities").children()[index].remove();
-
-        }
-    });
     
     noOfCityRows--;
 }

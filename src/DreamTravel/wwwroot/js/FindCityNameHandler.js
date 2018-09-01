@@ -19,8 +19,7 @@
 
             var city = JSON.parse(msg);
             cities[index] = city;
-//            $("#listOfCities").children()[index]
-            $("#listOfCities").children()[index].value = city.Name;
+            $("#listOfCities").children().eq(index).children()[1].value = city.Name;
         },
 
         error: function (req, status, errorObj) {

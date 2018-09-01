@@ -48,7 +48,7 @@
             <div class="cityBlock" id="cityBlock0">
                 <hr class="line">
                 <textarea class="city" id="0" rows="1" onchange="displayCityHandler(this)"></textarea>
-                <button type="button" class="btn btn-danger" onclick="removeCityHandler(this)" id="0">X</button>
+                <button type="button" class="btn btn-danger" onclick="removeCityHandler(this.id)" id="0">X</button>
                 <hr class="line">
             </div>
 
@@ -111,6 +111,8 @@
                         center: { lat: 0, lng: 0 }
                     });
 
+                cities.push(null);
+                markers.push(null);
 
                 $(document).keyup(function (event) {
                     if (event.which == 13) { //Enter

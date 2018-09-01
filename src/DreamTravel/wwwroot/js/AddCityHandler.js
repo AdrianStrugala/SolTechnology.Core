@@ -24,7 +24,7 @@
     button.type = "button";
     button.className = "btn btn-danger";
     var attOnClick = document.createAttribute("onclick");
-    attOnClick.value = "removeCityHandler(this)";
+    attOnClick.value = "removeCityHandler(this.id)";
     button.setAttributeNode(attOnClick);
     button.id = noOfCityRows.toString();
     button.innerHTML = "X";
@@ -36,6 +36,9 @@
 
     listOfCities.appendChild(div);
     textArea.focus();
+
+    cities.push(null);
+    markers.push(null);
 
     if (noOfCityRows >= 2) {
         $("#runTSPBtn")[0].disabled = false;
