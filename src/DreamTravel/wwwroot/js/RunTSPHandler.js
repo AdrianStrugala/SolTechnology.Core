@@ -3,6 +3,19 @@
 
     // wait for all Display City ajax calls to finish
     Promise.all(DisplayCityAjaxCalls).then(() => {
+
+        //remove all empty cities
+        var citiesToRemove = [];
+        for (var i = 0; i < cities.length; i++)
+        {
+            if (cities[i] === null) {
+                citiesToRemove.push(i);
+            }
+        }
+        for (var i = 0; i < citiesToRemove.length; i++) {
+            removeCityHandler(citiesToRemove[i]);
+        }
+
         //Request
         $.ajax({
             type: 'POST',

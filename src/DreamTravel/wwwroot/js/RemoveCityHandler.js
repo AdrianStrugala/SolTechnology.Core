@@ -1,5 +1,7 @@
 function removeCityHandler(index) {
-    markers[index].setMap(null);
+    if (markers[index] != null) {
+        markers[index].setMap(null);
+    }
     markers.splice(index, 1);
     cities.splice(index, 1);
     while ($("#listOfCities").children()[index].firstChild) {
