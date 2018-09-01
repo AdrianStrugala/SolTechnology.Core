@@ -7,6 +7,7 @@
 
   <ItemGroup>
     <Content Remove="wwwroot\js\lib\jquery.d.ts" />
+    <Content Remove="wwwroot\js\RemoveCityByIndexHandler.ts" />
     <Content Remove="wwwroot\js\RemoveCityHandler.ts" />
     <Content Remove="wwwroot\js\Utils\GlobalVariables.ts" />
   </ItemGroup>
@@ -34,6 +35,7 @@
 
   <ItemGroup>
     <TypeScriptCompile Include="wwwroot\js\lib\jquery.d.ts" />
+    <TypeScriptCompile Include="wwwroot\js\RemoveCityByIndexHandler.ts" />
     <TypeScriptCompile Include="wwwroot\js\RemoveCityHandler.ts" />
     <TypeScriptCompile Include="wwwroot\js\GlobalVariables.ts" />
   </ItemGroup>

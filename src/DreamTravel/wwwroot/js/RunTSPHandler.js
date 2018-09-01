@@ -13,7 +13,7 @@
             }
         }
         for (var i = 0; i < citiesToRemove.length; i++) {
-            removeCityHandler(citiesToRemove[i]);
+            removeCityByIndexHandler(citiesToRemove[i]);
         }
 
         //Request

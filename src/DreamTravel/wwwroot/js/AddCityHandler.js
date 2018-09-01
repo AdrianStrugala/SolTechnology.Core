@@ -24,7 +24,7 @@
     button.type = "button";
     button.className = "btn btn-danger";
     var attOnClick = document.createAttribute("onclick");
-    attOnClick.value = "removeCityHandler(this.id)";
+    attOnClick.value = "removeCityHandler(this)";
     button.setAttributeNode(attOnClick);
     button.id = noOfCityRows.toString();
     button.innerHTML = "X";
