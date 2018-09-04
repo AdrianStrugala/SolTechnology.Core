@@ -17,7 +17,7 @@
     textArea.id = noOfCityRows.toString();
     textArea.rows = "1";
     var att = document.createAttribute("onchange");
-    att.value = "displayCityHandler(this)";
+    att.value = "displayCityHandler(this, map)";
     textArea.setAttributeNode(att);
 
     var button = document.createElement("button");
@@ -44,12 +44,3 @@
         $("#runTSPBtn")[0].disabled = false;
     }
 }
-
-
-
-//<div class="cityBlock">
-//    <hr class="line">
-//    <textarea class="city" id="cityRow1" rows="1" onchange="displayCityHandler(this)"></textarea>
-//    <button type="button" class="btn btn-danger" onclick="" id="removeCity1">X</button>
-//    <hr class="line">
-//</div>

@@ -8,4 +8,4 @@ var totalCost;
 var pathsToRetry = [];
 var noOfCityRows = 1;
 var directionsService;
-var DisplayCityAjaxCalls = [];
+var displayCityAjaxCalls = [];

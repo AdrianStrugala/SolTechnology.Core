@@ -2,7 +2,7 @@
     $("#loader")[0].style.display = "block";
 
     // wait for all Display City ajax calls to finish
-    Promise.all(DisplayCityAjaxCalls).then(() => {
+    Promise.all(displayCityAjaxCalls).then(() => {
 
         //remove all empty cities
         var citiesToRemove = [];
@@ -45,21 +45,9 @@
                     writePathInfoHandler(pathList[i], list);
                     displayRouteHandler(directionsService, map, pathList[i]);
 
-                    markers[i].setMap(null);
-                    markers[i] = displayMarkerHandler(map,
-                        pathList[i].StartingCity.Latitude,
-                        pathList[i].StartingCity.Longitude,
-                        i);
-                    cities[i] = pathList[i].StartingCity;
-                    $("#listOfCities").children().eq(i).children()[1].value = pathList[i].StartingCity.Name;
+                    updateCityHandler(i, pathList[i].StartingCity, map);
                 }
-                markers[markers.length - 1].setMap(null);
-                markers[markers.length - 1] = displayMarkerHandler(map,
-                    pathList[noOfPaths - 1].EndingCity.Latitude,
-                    pathList[noOfPaths - 1].EndingCity.Longitude,
-                    noOfPaths);
-                cities[cities.length - 1] = pathList[noOfPaths - 1].EndingCity;
-                $("#listOfCities").children().eq(cities.length - 1).children()[1].value = pathList[noOfPaths - 1].EndingCity.Name;
+                updateCityHandler(markers.length - 1, pathList[noOfPaths - 1].EndingCity, map);
 
                 //Adjust map bounds
                 var bounds = new google.maps.LatLngBounds();

@@ -6,6 +6,14 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Content Remove="wwwroot\js\DisplayCityHandler.ts" />
+    <Content Remove="wwwroot\js\DisplayMarkerHandler.ts" />
+    <Content Remove="wwwroot\js\FindCityNameHandler.ts" />
+    <Content Remove="wwwroot\js\UpdateCityHandler.ts" />
+    <Content Remove="wwwroot\lib\googleMaps\googleMaps.d.ts" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Dapper" Version="1.50.5" />
     <PackageReference Include="Microsoft.AspNetCore.All" Version="2.0.5" />
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="2.0.3" />
@@ -24,6 +32,14 @@
 
   <ItemGroup>
     <ProjectReference Include="..\TravelingSalesmanProblem\TravelingSalesmanProblem.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <TypeScriptCompile Include="wwwroot\js\DisplayCityHandler.ts" />
+    <TypeScriptCompile Include="wwwroot\js\DisplayMarkerHandler.ts" />
+    <TypeScriptCompile Include="wwwroot\js\FindCityNameHandler.ts" />
+    <TypeScriptCompile Include="wwwroot\js\UpdateCityHandler.ts" />
+    <TypeScriptCompile Include="wwwroot\lib\googleMaps\googleMaps.d.ts" />
   </ItemGroup>
 
   <ItemGroup>

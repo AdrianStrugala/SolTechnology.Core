@@ -1,4 +1,5 @@
-/// <reference path="../lib/googleMaps/googleMaps.d.ts" />
+﻿/// <reference path="../lib/googleMaps/googleMaps.d.ts" />
+
 function displayMarkerHandler(map, latitude, longtitude, number) {
     var marker = new google.maps.Marker(({
         position: {
@@ -12,8 +13,8 @@ function displayMarkerHandler(map, latitude, longtitude, number) {
             color: "white",
             fontWeight: "bold"
         }
-    }));
+    }) as any);
+
     marker.addListener('dragend', findCityNameHandler);
     return marker;
 }
-//# sourceMappingURL=DisplayMarkerHandler.js.map

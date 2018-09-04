@@ -1,4 +1,5 @@
-function displayCityHandler(item, map) {
+﻿function displayCityHandler(item, map) {
+
     displayCityAjaxCalls.push($.ajax({
         type: 'POST',
         dataType: 'html',
@@ -7,23 +8,30 @@ function displayCityHandler(item, map) {
             'Authorization': 'DreamAuthentication U29sVWJlckFsbGVz'
         },
         data: { name: item.value, sessionId: sessionId },
-        success: function (msg) {
+        success(msg) {
+
             var city = JSON.parse(msg);
+
             $("#listOfCities").children().each(function (index) {
                 if ($(this).attr('id') == "cityBlock" + item.id && index < cities.length) {
+
                     if (markers[index] != null) {
                         markers[index].setMap(null);
                     }
                     cities[index] = city;
-                    markers[index] = displayMarkerHandler(map, city.Latitude, city.Longitude, "✓");
+                    markers[index] = displayMarkerHandler(map,
+                        city.Latitude,
+                        city.Longitude,
+                        "✓");
+
                     map.setCenter(markers[index].getPosition());
                 }
             });
         },
+
         error: function (req, status, errorObj) {
             var alertMessage = JSON.parse(req.responseText);
             alert(alertMessage);
         }
     }));
 }
-//# sourceMappingURL=DisplayCityHandler.js.map

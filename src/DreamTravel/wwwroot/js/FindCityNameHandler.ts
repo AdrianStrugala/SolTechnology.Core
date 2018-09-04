@@ -1,5 +1,6 @@
-function findCityNameHandler(event) {
+﻿function findCityNameHandler(event) {
     var index;
+
     //get index of event source city
     for (var i = 0; i < markers.length; i++) {
         if (markers[i] != null) {
@@ -9,6 +10,7 @@ function findCityNameHandler(event) {
             }
         }
     }
+
     $.ajax({
         type: 'POST',
         dataType: 'html',
@@ -17,15 +19,17 @@ function findCityNameHandler(event) {
             'Authorization': 'DreamAuthentication U29sVWJlckFsbGVz'
         },
         data: { lat: event.latLng.lat(), lng: event.latLng.lng(), sessionId: sessionId },
-        success: function (msg) {
+        success(msg) {
+
             var city = JSON.parse(msg);
             cities[index] = city;
-            $("#listOfCities").children().eq(index).children()[1].value = city.Name;
+            (<HTMLInputElement>$("#listOfCities").children().eq(index).children()[1]).value = city.Name;
         },
-        error: function (req, status, errorObj) {
+
+        error(req, status, errorObj) {
             var alertMessage = JSON.parse(req.responseText);
             alert(alertMessage);
         }
     });
+
 }
-//# sourceMappingURL=FindCityNameHandler.js.map
