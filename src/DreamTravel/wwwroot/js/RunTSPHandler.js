@@ -11,7 +11,7 @@
                 citiesToRemove.push(i);
             }
         }
-        for (var i = 0; i < citiesToRemove.length; i++) {
+        for (var i = citiesToRemove.length - 1; i >= 0; i--) {
             removeCityByIndexHandler(citiesToRemove[i]);
         }
 
