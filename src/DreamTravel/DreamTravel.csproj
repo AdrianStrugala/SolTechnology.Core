@@ -1,8 +1,9 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
     <TargetFramework>netcoreapp2.0</TargetFramework>
     <TypeScriptToolsVersion>2.8</TypeScriptToolsVersion>
+    <MvcRazorCompileOnPublish>true</MvcRazorCompileOnPublish>
   </PropertyGroup>
 
   <ItemGroup>
@@ -47,5 +48,19 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
+
+  <Target Name="SetMvcRazorOutputPath">
+    <PropertyGroup>
+      <MvcRazorOutputPath>$(OutputPath)</MvcRazorOutputPath>
+    </PropertyGroup>
+  </Target>
+  <Target Name="_MvcRazorPrecompileOnBuild" DependsOnTargets="SetMvcRazorOutputPath;MvcRazorPrecompile" AfterTargets="Build" Condition=" '$(IsCrossTargetingBuild)' != 'true' " />
+  <Target Name="IncludePrecompiledViewsInPublishOutput" DependsOnTargets="_MvcRazorPrecompileOnBuild" BeforeTargets="PrepareForPublish" Condition=" '$(IsCrossTargetingBuild)' != 'true' ">
+    <ItemGroup>
+      <_PrecompiledViewsOutput Include="$(MvcRazorOutputPath)$(MSBuildProjectName).PrecompiledViews.dll" />
+      <_PrecompiledViewsOutput Include="$(MvcRazorOutputPath)$(MSBuildProjectName).PrecompiledViews.pdb" />
+      <ContentWithTargetPath Include="@(_PrecompiledViewsOutput->'%(FullPath)')" RelativePath="%(_PrecompiledViewsOutput.Identity)" TargetPath="%(_PrecompiledViewsOutput.Filename)%(_PrecompiledViewsOutput.Extension)" CopyToPublishDirectory="PreserveNewest" />
+    </ItemGroup>
+  </Target>
 
 </Project>
