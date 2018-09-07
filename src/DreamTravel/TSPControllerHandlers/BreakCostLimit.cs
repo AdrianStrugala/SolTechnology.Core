@@ -15,7 +15,6 @@ namespace DreamTravel.TSPControllerHandlers
             double overallCost = 0;
             foreach (var path in paths)
             {
-                if (Math.Abs(path.Goal) < ConversionError) continue;
                 if (overallCost + path.Cost <= costLimit)
                 {
                     overallCost += path.Cost;
