@@ -3,7 +3,7 @@ using DreamTravel.ExternalConnection;
 using DreamTravel.Models;
 using Xunit;
 
-namespace TESWebUITests.ExternalConnection
+namespace DreamTravelITests.ExternalConnection
 {
     public class ApiCallerTests
     {

@@ -1,12 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.IO;
 using System.Threading.Tasks;
 using DreamTravel.ExternalConnection;
-using DreamTravel.Models;
 using Xunit;
 
-namespace TESWebUITests.ExternalConnection
+namespace DreamTravelITests.ExternalConnection
 {
     public class DownloadLocationOfCityTests
     {
@@ -30,6 +27,20 @@ namespace TESWebUITests.ExternalConnection
             Assert.Equal("Wroclaw", result.Name);
             Assert.NotEqual(0, result.Latitude);
             Assert.NotEqual(0, result.Longitude);
+        }
+
+        [Fact]
+        public async Task GetCityByName_NonExistingCity_ExceptionIsThrown()
+        {
+            //Arrange
+            string cityName = "DUPA";
+
+            //Act
+            // ReSharper disable once PossibleNullReferenceException
+            var exception = await Record.ExceptionAsync(async () => await _sut.Execute(cityName));
+
+            //Assert
+            Assert.IsType<InvalidDataException>(exception);
         }
 
     }

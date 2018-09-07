@@ -1,19 +1,19 @@
 using System.Collections.Generic;
-using System.Threading.Tasks;
 using DreamTravel.ExternalConnection;
 using DreamTravel.ExternalConnection.Interfaces;
 using DreamTravel.Models;
+using NSubstitute;
 using Xunit;
 
-namespace TESWebUITests.ExternalConnection
+namespace DreamTravelITests.ExternalConnection
 {
     public class ProcessInputDataTests
     {
-        private readonly ProcessInputData _sut; 
+        private readonly ProcessInputData _sut;
 
         public ProcessInputDataTests()
         {
-            ICallAPI apiCaller = new CallAPI();
+            ICallAPI apiCaller = Substitute.For<CallAPI>();
 
             _sut = new ProcessInputData(apiCaller);
         }
@@ -37,7 +37,7 @@ namespace TESWebUITests.ExternalConnection
                 Longitude = 19
             };
 
-            List<City> cities = new List<City> {firstCity, secondCity};
+            List<City> cities = new List<City> { firstCity, secondCity };
 
             EvaluationMatrix matrix = new EvaluationMatrix(2);
 

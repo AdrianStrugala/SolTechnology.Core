@@ -3,7 +3,7 @@ using DreamTravel.Models;
 using DreamTravel.TSPControllerHandlers;
 using Xunit;
 
-namespace TESWebUITests.TSPControllerHandlersTests
+namespace DreamTravelITests.TSPControllerHandlersTests
 {
     public class CostLimitBreakerTests
     {

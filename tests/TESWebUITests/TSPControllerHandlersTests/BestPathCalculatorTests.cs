@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using DreamTravel.ExternalConnection;
 using DreamTravel.ExternalConnection.Interfaces;
 using DreamTravel.Models;
 using DreamTravel.TSPControllerHandlers;
@@ -8,7 +7,7 @@ using NSubstitute;
 using TravelingSalesmanProblem;
 using Xunit;
 
-namespace TESWebUITests.TSPControllerHandlersTests
+namespace DreamTravelITests.TSPControllerHandlersTests
 {
     
     public class BestPathCalculatorTests

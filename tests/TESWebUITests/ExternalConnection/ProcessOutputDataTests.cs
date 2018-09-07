@@ -3,7 +3,7 @@ using DreamTravel.ExternalConnection;
 using DreamTravel.Models;
 using Xunit;
 
-namespace TESWebUITests.TSPEngine
+namespace DreamTravelITests.ExternalConnection
 {
     public class ProcessOutputDataTests
     {
