@@ -1,14 +1,18 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using TravelingSalesmanProblem;
 
 namespace TravelingSalesmanProblemTests.Benchmark
 {
-    class Benchmark
+    static class Benchmark
     {
-        public static void RunTest(int numberOfExecutions, double[] distanceMatrix, int noOfCities, ITSP tspEngine, string nameOfEngine)
+        public static void RunTest(int numberOfExecutions, double[] distanceMatrix, ITSP tspEngine, string nameOfEngine)
         {
+            //Arrange
+            int noOfCities = (int)Math.Sqrt(distanceMatrix.Length);
+
             List<int[]> tspResults = new List<int[]>();
             List<double> resuts = new List<double>();
 
@@ -50,6 +54,5 @@ namespace TravelingSalesmanProblemTests.Benchmark
                 $"Average Time: {averageTime} s \n" +
                 $"Recurrence: {recurrencePercentage} %");
         }
-
     }
 }

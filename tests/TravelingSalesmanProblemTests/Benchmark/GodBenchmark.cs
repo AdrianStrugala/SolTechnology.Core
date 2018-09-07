@@ -1,7 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using Xunit;
 
 namespace TravelingSalesmanProblemTests.Benchmark
@@ -40,49 +37,7 @@ namespace TravelingSalesmanProblemTests.Benchmark
         {
             if (!_config.God.TwoCities) { return; }
 
-            //Arrange
-            int NoOfCities = 2;
-
-            List<int[]> TSPResults = new List<int[]>();
-            List<double> resuts = new List<double>();
-
-
-            //Act
-            Stopwatch stopwatch = Stopwatch.StartNew();
-            for (int i = 0; i < NumberOfExecutions; i++)
-            {
-                TSPResults.Add(_tspEngine.SolveTSP(_twoCitiesMatrix));
-            }
-
-            var totalTime = stopwatch.Elapsed.TotalSeconds;
-            stopwatch.Stop();
-
-
-            //Prepair result
-            foreach (var TSPResult in TSPResults)
-            {
-                double totalDistance = 0;
-
-                for (int i = 0; i < NoOfCities - 1; i++)
-                {
-                    totalDistance += _twoCitiesMatrix[TSPResult[i] + TSPResult[i + 1] * NoOfCities];
-                }
-                resuts.Add(totalDistance);
-            }
-
-
-            //RESULTS
-            var minimalDistance = resuts.Min(resut => resut);
-            var recurrencePercentage = (resuts.Count(result => result.Equals(minimalDistance)) * 100) / NumberOfExecutions;
-            var averageTime = totalTime / NumberOfExecutions;
-            var averageDistance = resuts.Sum() / NumberOfExecutions;
-
-            System.IO.File.WriteAllText(@"..\..\..\..\..\docs\God_Benchmark_TwoCities.txt",
-                $"God: Two Cities \n" +
-                $"Minimal Distance: {minimalDistance} \n" +
-                $"Average Distance: {averageDistance} \n" +
-                $"Average Time: {averageTime} s \n" +
-                $"Recurrence: {recurrencePercentage} %");
+            Benchmark.RunTest(NumberOfExecutions, _twoCitiesMatrix, _tspEngine, "God");
         }
 
         [Fact]
@@ -90,49 +45,7 @@ namespace TravelingSalesmanProblemTests.Benchmark
         {
             if (!_config.God.FourCities) { return; }
 
-            //Arrange
-            int NoOfCities = 4;
-
-            List<int[]> TSPResults = new List<int[]>();
-            List<double> resuts = new List<double>();
-
-
-            //Act
-            Stopwatch stopwatch = Stopwatch.StartNew();
-            for (int i = 0; i < NumberOfExecutions; i++)
-            {
-                TSPResults.Add(_tspEngine.SolveTSP(_fourCitiesMatrix));
-            }
-
-            var totalTime = stopwatch.Elapsed.TotalSeconds;
-            stopwatch.Stop();
-
-
-            //Prepair result
-            foreach (var TSPResult in TSPResults)
-            {
-                double totalDistance = 0;
-
-                for (int i = 0; i < NoOfCities - 1; i++)
-                {
-                    totalDistance += _fourCitiesMatrix[TSPResult[i] + TSPResult[i + 1] * NoOfCities];
-                }
-                resuts.Add(totalDistance);
-            }
-
-
-            //RESULTS
-            var minimalDistance = resuts.Min(resut => resut);
-            var recurrencePercentage = (resuts.Count(result => result.Equals(minimalDistance)) * 100) / NumberOfExecutions;
-            var averageTime = totalTime / NumberOfExecutions;
-            var averageDistance = resuts.Sum() / NumberOfExecutions;
-
-            System.IO.File.WriteAllText(@"..\..\..\..\..\docs\God_Benchmark_FourCities.txt",
-                $"God: Four Cities \n" +
-                $"Minimal Distance: {minimalDistance} \n" +
-                $"Average Distance: {averageDistance} \n" +
-                $"Average Time: {averageTime} s \n" +
-                $"Recurrence: {recurrencePercentage} %");
+            Benchmark.RunTest(NumberOfExecutions, _fourCitiesMatrix, _tspEngine, "God");
         }
 
         [Fact]
@@ -140,49 +53,7 @@ namespace TravelingSalesmanProblemTests.Benchmark
         {
             if (!_config.God.EightCities) { return; }
 
-            //Arrange
-            int NoOfCities = 8;
-
-            List<int[]> TSPResults = new List<int[]>();
-            List<double> resuts = new List<double>();
-
-
-            //Act
-            Stopwatch stopwatch = Stopwatch.StartNew();
-            for (int i = 0; i < NumberOfExecutions; i++)
-            {
-                TSPResults.Add(_tspEngine.SolveTSP(_eightCitiesMatrix));
-            }
-
-            var totalTime = stopwatch.Elapsed.TotalSeconds;
-            stopwatch.Stop();
-
-
-            //Prepair result
-            foreach (var TSPResult in TSPResults)
-            {
-                double totalDistance = 0;
-
-                for (int i = 0; i < NoOfCities - 1; i++)
-                {
-                    totalDistance += _eightCitiesMatrix[TSPResult[i] + TSPResult[i + 1] * NoOfCities];
-                }
-                resuts.Add(totalDistance);
-            }
-
-
-            //RESULTS
-            var minimalDistance = resuts.Min(resut => resut);
-            var recurrencePercentage = (resuts.Count(result => result.Equals(minimalDistance)) * 100) / NumberOfExecutions;
-            var averageTime = totalTime / NumberOfExecutions;
-            var averageDistance = resuts.Sum() / NumberOfExecutions;
-
-            System.IO.File.WriteAllText(@"..\..\..\..\..\docs\God_Benchmark_EightCities.txt",
-                $"God: Eight Cities \n" +
-                $"Minimal Distance: {minimalDistance} \n" +
-                $"Average Distance: {averageDistance} \n" +
-                $"Average Time: {averageTime} s \n" +
-                $"Recurrence: {recurrencePercentage} %");
+            Benchmark.RunTest(NumberOfExecutions, _eightCitiesMatrix, _tspEngine, "God");
         }
 
         [Fact]
@@ -190,7 +61,7 @@ namespace TravelingSalesmanProblemTests.Benchmark
         {
             if (!_config.God.TwelveCities) { return; }
 
-            Benchmark.RunTest(NumberOfExecutions, _twelveCitiesMatrix, 12, _tspEngine, "God");
+            Benchmark.RunTest(NumberOfExecutions, _twelveCitiesMatrix, _tspEngine, "God");
         }
 
         [Fact]
@@ -198,49 +69,7 @@ namespace TravelingSalesmanProblemTests.Benchmark
         {
             if (!_config.God.SixteenCities) { return; }
 
-            //Arrange
-            int NoOfCities = 16;
-
-            List<int[]> TSPResults = new List<int[]>();
-            List<double> resuts = new List<double>();
-
-
-            //Act
-            Stopwatch stopwatch = Stopwatch.StartNew();
-            for (int i = 0; i < NumberOfExecutions; i++)
-            {
-                TSPResults.Add(_tspEngine.SolveTSP(_sixteenCitiesMatrix));
-            }
-
-            var totalTime = stopwatch.Elapsed.TotalSeconds;
-            stopwatch.Stop();
-
-
-            //Prepair result
-            foreach (var TSPResult in TSPResults)
-            {
-                double totalDistance = 0;
-
-                for (int i = 0; i < NoOfCities - 1; i++)
-                {
-                    totalDistance += _sixteenCitiesMatrix[TSPResult[i] + TSPResult[i + 1] * NoOfCities];
-                }
-                resuts.Add(totalDistance);
-            }
-
-
-            //RESULTS
-            var minimalDistance = resuts.Min(resut => resut);
-            var recurrencePercentage = (resuts.Count(result => result.Equals(minimalDistance)) * 100) / NumberOfExecutions;
-            var averageTime = totalTime / NumberOfExecutions;
-            var averageDistance = resuts.Sum() / NumberOfExecutions;
-
-            System.IO.File.WriteAllText(@"..\..\..\..\..\docs\God_Benchmark_SixteenCities.txt",
-                $"God: Sixteen Cities \n" +
-                $"Minimal Distance: {minimalDistance} \n" +
-                $"Average Distance: {averageDistance} \n" +
-                $"Average Time: {averageTime} s \n" +
-                $"Recurrence: {recurrencePercentage} %");
+            Benchmark.RunTest(NumberOfExecutions, _sixteenCitiesMatrix, _tspEngine, "God");
         }
 
         [Fact]
@@ -248,7 +77,7 @@ namespace TravelingSalesmanProblemTests.Benchmark
         {
             if (!_config.God.TwentyCities) { return; }
 
-            Benchmark.RunTest(NumberOfExecutions, _twentyCitiesMatrix, 20, _tspEngine, "God");
+            Benchmark.RunTest(NumberOfExecutions, _twentyCitiesMatrix, _tspEngine, "God");
         }
     }
 }
