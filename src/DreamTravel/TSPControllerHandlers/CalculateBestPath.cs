@@ -26,15 +26,15 @@ namespace DreamTravel.TSPControllerHandlers
             _evaluationBrain = evaluationBrain;
         }
 
-        public async Task<List<Path>> Execute(List<City> cities)
-        {         
+        public List<Path> Execute(List<City> cities)
+        {
             EvaluationMatrix matrices = new EvaluationMatrix(cities.Count);
             matrices = _processInputData.Execute(cities, matrices);
-            matrices = _evaluationBrain.Execute(matrices, cities.Count);          
+            matrices = _evaluationBrain.Execute(matrices, cities.Count);
             int[] orderOfCities = _tspSolver.SolveTSP(matrices.OptimalDistances);
 
             //to have a possiblity to store cities data
-           // File.WriteAllText("./twentyCities.txt", JsonConvert.SerializeObject(matrices.OptimalDistances));
+            // File.WriteAllText("./twentyCities.txt", JsonConvert.SerializeObject(matrices.OptimalDistances));
 
             return _formOutputDataForBestPath.Execute(cities, orderOfCities, matrices);
         }

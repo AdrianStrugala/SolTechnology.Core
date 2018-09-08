@@ -73,11 +73,11 @@ namespace DreamTravel.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> CalculateBestPath(List<City> cities, string sessionId)
+        public IActionResult CalculateBestPath(List<City> cities, string sessionId)
         {
             try
             {
-                List<Path> paths = await _calculateBestPath.Execute(cities);
+                List<Path> paths = _calculateBestPath.Execute(cities);
 
                 HttpContext.Session.SetString(sessionId + PathsKeyName, JsonConvert.SerializeObject(paths));
 
