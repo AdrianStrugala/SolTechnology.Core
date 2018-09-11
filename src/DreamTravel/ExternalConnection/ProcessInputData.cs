@@ -40,8 +40,8 @@ namespace DreamTravel.ExternalConnection
 
                     else
                     {
-                        evaluationMatrix.Costs[iterator] =
-                            _apiCaller.DowloadCostBetweenTwoCities(listOfCities[i], listOfCities[j]) / 100;
+                        (evaluationMatrix.Costs[iterator], evaluationMatrix.VinietaCosts[iterator]) =
+                            _apiCaller.DowloadCostBetweenTwoCities(listOfCities[i], listOfCities[j]);
                     }
                 }
             });

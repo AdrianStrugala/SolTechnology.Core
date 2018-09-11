@@ -25,7 +25,7 @@ namespace DreamTravel.ExternalConnection
 
         }
 
-        public double DowloadCostBetweenTwoCities(City origin, City destination)
+        public (double, double) DowloadCostBetweenTwoCities(City origin, City destination)
         {
             try
             {
@@ -35,6 +35,7 @@ namespace DreamTravel.ExternalConnection
                 HttpResponseMessage getAsync = _httpClient.GetAsync(url).Result;
 
                 double result;
+                double vinietaCost;
                 using (Stream stream = getAsync.Content.ReadAsStreamAsync().Result ??
                                        throw new ArgumentNullException(
                                            $"Execption on [{MethodBase.GetCurrentMethod().Name}]"))
@@ -50,13 +51,13 @@ namespace DreamTravel.ExternalConnection
                         double tollCost = Convert.ToDouble(node.InnerText);
 
                         XmlNode vinietaNode = doc.DocumentElement.SelectSingleNode("/response/iti/header/summaries/summary/CCZCost/car");
-                        double vinietaCost = Convert.ToDouble(vinietaNode.InnerText);
+                        vinietaCost = Convert.ToDouble(vinietaNode.InnerText);
 
                         result = tollCost + vinietaCost;
                     }
                 }
 
-                return result;
+                return (result / 100, vinietaCost / 100);
             }
             catch (Exception)
             {
