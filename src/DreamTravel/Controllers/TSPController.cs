@@ -6,6 +6,7 @@ using DreamTravel.Models;
 using DreamTravel.TSPControllerHandlers.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 
 namespace DreamTravel.Controllers
@@ -16,16 +17,19 @@ namespace DreamTravel.Controllers
         private readonly IDownloadLocationOfCity _downloadLocationOfCity;
         private readonly IBreakCostLimit _breakCostLimit;
         private readonly IDownloadCityNameByLocation _downloadCityNameByLocation;
+        private readonly ILogger<TSPController> _logger;
 
         public TSPController(ICalculateBestPath calculateBestPath,
                              IDownloadLocationOfCity downloadLocationOfCity,
                              IDownloadCityNameByLocation downloadCityNameByLocation,
-                             IBreakCostLimit breakCostLimit)
+                             IBreakCostLimit breakCostLimit,
+                             ILogger<TSPController> logger)
         {
             _calculateBestPath = calculateBestPath;
             _downloadLocationOfCity = downloadLocationOfCity;
             _breakCostLimit = breakCostLimit;
             _downloadCityNameByLocation = downloadCityNameByLocation;
+            _logger = logger;
         }
 
         private const string PathsKeyName = "_Paths";
@@ -35,6 +39,8 @@ namespace DreamTravel.Controllers
         {
             try
             {
+                _logger.LogInformation("Looking for city: " + name);
+
                 City city = await _downloadLocationOfCity.Execute(name);
 
                 string message = JsonConvert.SerializeObject(city);
@@ -43,6 +49,7 @@ namespace DreamTravel.Controllers
 
             catch (Exception ex)
             {
+                _logger.LogError(ex.ToString());
                 string message = JsonConvert.SerializeObject(ex.Message);
                 return BadRequest(message);
             }
@@ -53,6 +60,7 @@ namespace DreamTravel.Controllers
         {
             try
             {
+                _logger.LogInformation("Looking for city: " + lat + ";" + lng);
                 City result = new City
                 {
                     Latitude = lat,
@@ -67,6 +75,7 @@ namespace DreamTravel.Controllers
 
             catch (Exception ex)
             {
+                _logger.LogError(ex.ToString());
                 string message = JsonConvert.SerializeObject(ex.Message);
                 return BadRequest(message);
             }
@@ -77,6 +86,7 @@ namespace DreamTravel.Controllers
         {
             try
             {
+                _logger.LogInformation("TSP Engine: Fire!");
                 List<Path> paths = _calculateBestPath.Execute(cities);
 
                 HttpContext.Session.SetString(sessionId + PathsKeyName, JsonConvert.SerializeObject(paths));
@@ -87,6 +97,7 @@ namespace DreamTravel.Controllers
 
             catch (Exception ex)
             {
+                _logger.LogError(ex.ToString());
                 string message = JsonConvert.SerializeObject(ex.Message);
                 return BadRequest(message);
             }
@@ -97,6 +108,7 @@ namespace DreamTravel.Controllers
         {
             try
             {
+                _logger.LogInformation("Limit Cost Engine: Fire!");
                 List<Path> paths = JsonConvert.DeserializeObject<List<Path>>(HttpContext.Session.GetString(sessionId + PathsKeyName));
 
                 paths = _breakCostLimit.Execute(costLimit, paths);
@@ -109,6 +121,7 @@ namespace DreamTravel.Controllers
 
             catch (Exception ex)
             {
+                _logger.LogError(ex.ToString());
                 string message = JsonConvert.SerializeObject(ex.Message);
                 return BadRequest(message);
             }

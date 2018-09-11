@@ -28,30 +28,30 @@ namespace DreamTravel.Authentication
 
             if (!Request.Headers.ContainsKey(DreamAuthenticationOptions.AuthenticationHeaderName))
             {
-               // _logger.LogWarning($"Missing authentication header");
+                _logger.LogWarning($"Missing authentication header");
                 return AuthenticateResult.Fail("Missing authentication header");
             }
 
             if (!AuthenticationHeaderValue.TryParse(Request.Headers[DreamAuthenticationOptions.AuthenticationHeaderName],
                 out AuthenticationHeaderValue headerValue))
             {
-               // _logger.LogWarning($"Invalid authentication header");
+                _logger.LogWarning($"Invalid authentication header");
                 return AuthenticateResult.Fail("Invalid authentication header");
             }
 
             if (!DreamAuthenticationOptions.AuthenticationScheme.Equals(headerValue.Scheme, StringComparison.OrdinalIgnoreCase))
             {
-               // _logger.LogWarning($"Not DreamAuthentication schema");
+                _logger.LogWarning($"Not DreamAuthentication schema");
                 return AuthenticateResult.Fail("Not DreamAuthentication schema");
             }
 
-            //_logger.LogInformation($"Decoding incoming authentication key");
+            _logger.LogInformation($"Decoding incoming authentication key");
             string headerParameterDecoded = Base64Decode(headerValue.Parameter);
 
             if (!Options.AuthenticationKey.Equals(headerParameterDecoded,
                 StringComparison.OrdinalIgnoreCase))
             {
-              //  _logger.LogWarning($"Invalid authentication key");
+                _logger.LogWarning($"Invalid authentication key");
                 return AuthenticateResult.Fail("Invalid authentication key");
             }
 
@@ -63,7 +63,7 @@ namespace DreamTravel.Authentication
             var principal = new ClaimsPrincipal(identity);
             var ticket = new AuthenticationTicket(principal, Scheme.Name);
 
-            //_logger.LogInformation($"Authenticated user: [{principal}]");
+            _logger.LogInformation($"Authenticated user: [{principal}]");
             return AuthenticateResult.Success(ticket);
         }
 
@@ -74,9 +74,9 @@ namespace DreamTravel.Authentication
             {
                 base64EncodedBytes = Convert.FromBase64String(base64EncodedData);
             }
-            catch (FormatException)
+            catch (FormatException e)
             {
-               // _logger.LogWarning($"Incoming key [{base64EncodedData}] was in incorrenct format, {e}");
+                _logger.LogWarning($"Incoming key [{base64EncodedData}] was in incorrenct format, {e}");
             }
 
             return System.Text.Encoding.UTF8.GetString(base64EncodedBytes);

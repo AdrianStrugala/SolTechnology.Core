@@ -1,4 +1,5 @@
-﻿using System.Globalization;
+﻿using System;
+using System.Globalization;
 using DreamTravel.Authentication;
 using DreamTravel.ExternalConnection;
 using DreamTravel.ExternalConnection.Interfaces;
@@ -11,6 +12,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using TravelingSalesmanProblem;
 
 namespace DreamTravel
@@ -65,7 +67,7 @@ namespace DreamTravel
             services.AddSingleton<IAuthenticationHandler, DreamAuthentication>();
         }
 
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
         {
             var cultureInfo = new CultureInfo("en-US");
             cultureInfo.NumberFormat.CurrencySymbol = "€";
@@ -83,6 +85,7 @@ namespace DreamTravel
                 app.UseExceptionHandler("/Home/Error");
             }
 
+            loggerFactory.AddLog4Net();
             app.UseStaticFiles();
             app.UseCookiePolicy();
             app.UseSession();
