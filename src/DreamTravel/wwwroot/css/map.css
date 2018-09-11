@@ -113,8 +113,8 @@ html, body {
     animation: spin 2s linear infinite;
     display: none;
     position: absolute;
-    left: calc(50vw-15vh);
-    top: calc(50vh-15vh);
+    left: calc(50% - 15vh);
+    top: calc(50% - 15vh);
     z-index: 1;
 }
 
