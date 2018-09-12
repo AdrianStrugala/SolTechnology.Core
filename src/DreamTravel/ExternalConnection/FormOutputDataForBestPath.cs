@@ -21,6 +21,7 @@ namespace DreamTravel.ExternalConnection
                     StartingCity = listOfCities[orderOfCities[i]],
                     EndingCity = listOfCities[orderOfCities[i + 1]],
                     OptimalCost = evaluationMatrix.OptimalCosts[orderOfCities[i + 1] + orderOfCities[i] * noOfCities],
+                    VinietaCost = evaluationMatrix.VinietaCosts[orderOfCities[i + 1] + orderOfCities[i] * noOfCities],
                     OptimalDistance = evaluationMatrix.OptimalDistances[orderOfCities[i + 1] + orderOfCities[i] * noOfCities],
                     Goal = evaluationMatrix.Goals[orderOfCities[i + 1] + orderOfCities[i] * noOfCities],
                     Cost = evaluationMatrix.Costs[orderOfCities[i + 1] + orderOfCities[i] * noOfCities],

@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Linq;
+using System.Threading.Tasks;
 using DreamTravel.Models;
 using DreamTravel.TSPControllerHandlers.Interfaces;
 
@@ -48,12 +49,14 @@ namespace DreamTravel.TSPControllerHandlers
                 if (evaluationMatrix.VinietaCosts[i] != 0 && evaluationMatrix.OptimalCosts[i] != 0)
                 {
                     double vinietaCost = evaluationMatrix.VinietaCosts[i];
+                    int roadsUsingThisVinieta = evaluationMatrix.VinietaCosts.Count(x => x.Equals(vinietaCost)) / 2;
+
                     for (int j = 0; j < evaluationMatrix.VinietaCosts.Length; j++)
                     {
                         if (evaluationMatrix.VinietaCosts[j] == vinietaCost)
                         {
                             evaluationMatrix.OptimalDistances[j] = evaluationMatrix.TollDistances[j];
-                            evaluationMatrix.OptimalCosts[j] = evaluationMatrix.Costs[j];
+                            evaluationMatrix.OptimalCosts[j] = evaluationMatrix.Costs[j] + (vinietaCost / roadsUsingThisVinieta);
                         }
                     }
                 }

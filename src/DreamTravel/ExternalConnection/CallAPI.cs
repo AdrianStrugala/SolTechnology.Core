@@ -34,7 +34,7 @@ namespace DreamTravel.ExternalConnection
 
                 HttpResponseMessage getAsync = _httpClient.GetAsync(url).Result;
 
-                double result;
+                double tollCost;
                 double vinietaCost;
                 using (Stream stream = getAsync.Content.ReadAsStreamAsync().Result ??
                                        throw new ArgumentNullException(
@@ -48,16 +48,14 @@ namespace DreamTravel.ExternalConnection
                         doc.LoadXml(content);
 
                         XmlNode node = doc.DocumentElement.SelectSingleNode("/response/iti/header/summaries/summary/tollCost/car");
-                        double tollCost = Convert.ToDouble(node.InnerText);
+                        tollCost = Convert.ToDouble(node.InnerText);
 
                         XmlNode vinietaNode = doc.DocumentElement.SelectSingleNode("/response/iti/header/summaries/summary/CCZCost/car");
                         vinietaCost = Convert.ToDouble(vinietaNode.InnerText);
-
-                        result = tollCost + vinietaCost;
                     }
                 }
 
-                return (result / 100, vinietaCost / 100);
+                return (tollCost / 100, vinietaCost / 100);
             }
             catch (Exception)
             {

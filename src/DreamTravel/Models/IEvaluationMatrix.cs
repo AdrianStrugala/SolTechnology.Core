@@ -8,5 +8,6 @@
         double[] Goals { get; set; }
         double[] Costs { get; set; }
         double[] OptimalCosts { get; set; }
+        double[] VinietaCosts { get; set; }
     }
 }
