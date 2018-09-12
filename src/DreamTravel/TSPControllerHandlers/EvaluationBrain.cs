@@ -29,6 +29,13 @@ namespace DreamTravel.TSPControllerHandlers
                             evaluationMatrix.Costs[iterator] = 0;
                         }
 
+                        //increase of cost of roads using vinieta
+                        if (evaluationMatrix.VinietaCosts[iterator] != 0)
+                        {
+                            int roadsUsingThisVinieta = evaluationMatrix.VinietaCosts.Count(x => x.Equals(evaluationMatrix.VinietaCosts[iterator])) / 2;
+                            evaluationMatrix.Costs[iterator] += (evaluationMatrix.VinietaCosts[iterator] / roadsUsingThisVinieta);
+                        }
+
                         if (IsTollRoadProfitable(evaluationMatrix, iterator))
                         {
                             evaluationMatrix.OptimalDistances[iterator] = evaluationMatrix.TollDistances[iterator];
@@ -43,31 +50,18 @@ namespace DreamTravel.TSPControllerHandlers
                 });
             });
 
-            //if any road using specified vinieta is profitable -> every road using this vinieta is profitable
-            for (int i = 0; i < evaluationMatrix.VinietaCosts.Length; i++)
-            {
-                if (evaluationMatrix.VinietaCosts[i] != 0 && evaluationMatrix.OptimalCosts[i] != 0)
-                {
-                    double vinietaCost = evaluationMatrix.VinietaCosts[i];
-                    int roadsUsingThisVinieta = evaluationMatrix.VinietaCosts.Count(x => x.Equals(vinietaCost)) / 2;
-
-                    for (int j = 0; j < evaluationMatrix.VinietaCosts.Length; j++)
-                    {
-                        if (evaluationMatrix.VinietaCosts[j] == vinietaCost)
-                        {
-                            evaluationMatrix.OptimalDistances[j] = evaluationMatrix.TollDistances[j];
-                            evaluationMatrix.OptimalCosts[j] = evaluationMatrix.Costs[j] + (vinietaCost / roadsUsingThisVinieta);
-                        }
-                    }
-                }
-            }
-
             return evaluationMatrix;
         }
 
 
         private static bool IsTollRoadProfitable(EvaluationMatrix evaluationMatrix, int iterator)
         {
+            //roads using vinieta are never profitable
+            if (evaluationMatrix.VinietaCosts[iterator] != 0)
+            {
+                return false;
+            }
+
             // C_G=s×combustion×fuel price [€] = v x t x combustion x fuel 
             double gasolineCostFree =
                 evaluationMatrix.FreeDistances[iterator] /
@@ -78,7 +72,7 @@ namespace DreamTravel.TSPControllerHandlers
                 3600.0 * HighwayVelocity * RoadCombustion * 1.25 * FuelPrice;
 
             //toll goal = (cost of gasoline + cost of toll fee) * time of toll
-            double cost = (gasolineCostToll + evaluationMatrix.Costs[iterator] + evaluationMatrix.VinietaCosts[iterator]);
+            double cost = (gasolineCostToll + evaluationMatrix.Costs[iterator]);
             double time = (evaluationMatrix.TollDistances[iterator] / 3600.0);
             double importance = (evaluationMatrix.TollDistances[iterator] * 1.0 /
                                  evaluationMatrix.FreeDistances[iterator] * 1.0);
