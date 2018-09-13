@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using DreamTravel.CostLimit.Interfaces;
 using DreamTravel.SharedModels;
 
@@ -14,16 +15,31 @@ namespace DreamTravel.CostLimit
             double overallCost = 0;
             foreach (var path in paths)
             {
-                if (overallCost + path.Cost <= costLimit)
+                if (path.VinietaCost > 0)
                 {
-                    overallCost += path.Cost;
-                    path.OptimalCost = path.Cost;
-                    path.OptimalDistance = path.TollDistance;
+                    if (!(overallCost + path.VinietaCost <= costLimit)) continue;
+                    overallCost += path.VinietaCost;
+
+                    paths.Where(x => x.VinietaCost.Equals(path.VinietaCost)).ToList()
+                        .ForEach(y =>
+                        {
+                            y.OptimalCost = y.Cost;
+                            y.OptimalDistance = y.TollDistance;
+                        });
                 }
                 else
                 {
-                    path.OptimalCost = 0;
-                    path.OptimalDistance = path.FreeDistance;
+                    if (overallCost + path.Cost <= costLimit)
+                    {
+                        overallCost += path.Cost;
+                        path.OptimalCost = path.Cost;
+                        path.OptimalDistance = path.TollDistance;
+                    }
+                    else
+                    {
+                        path.OptimalCost = 0;
+                        path.OptimalDistance = path.FreeDistance;
+                    }
                 }
             }
 
