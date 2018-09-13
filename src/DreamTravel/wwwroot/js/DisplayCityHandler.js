@@ -2,7 +2,7 @@ function displayCityHandler(item, map) {
     displayCityAjaxCalls.push($.ajax({
         type: 'POST',
         dataType: 'html',
-        url: window.location + 'TSP/FindCity',
+        url: window.location + 'api/FindLocationOfCity',
         headers: {
             'Authorization': 'DreamAuthentication U29sVWJlckFsbGVz'
         },

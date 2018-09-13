@@ -19,7 +19,7 @@
         $.ajax({
             type: 'POST',
             dataType: 'html',
-            url: window.location + 'TSP/CalculateBestPath',
+            url: window.location + 'api/CalculateBestPath',
             headers: {
                 'Authorization': 'DreamAuthentication U29sVWJlckFsbGVz'
             },

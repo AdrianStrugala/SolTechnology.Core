@@ -14,7 +14,7 @@
     $.ajax({
         type: 'POST',
         dataType: 'html',
-        url: window.location + 'TSP/FindCityByLocation',
+        url: window.location + 'api/FindNameOfCity',
         headers: {
             'Authorization': 'DreamAuthentication U29sVWJlckFsbGVz'
         },

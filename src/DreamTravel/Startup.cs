@@ -1,10 +1,16 @@
-﻿using System;
-using System.Globalization;
+﻿using System.Globalization;
 using DreamTravel.Authentication;
+using DreamTravel.BestPath;
+using DreamTravel.BestPath.DataAccess;
+using DreamTravel.BestPath.Interfaces;
+using DreamTravel.CostLimit;
+using DreamTravel.CostLimit.Interfaces;
 using DreamTravel.ExternalConnection;
 using DreamTravel.ExternalConnection.Interfaces;
-using DreamTravel.TSPControllerHandlers;
-using DreamTravel.TSPControllerHandlers.Interfaces;
+using DreamTravel.LocationOfCity;
+using DreamTravel.LocationOfCity.Interfaces;
+using DreamTravel.NameOfCity;
+using DreamTravel.NameOfCity.Interfaces;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
@@ -43,14 +49,16 @@ namespace DreamTravel
             //TSP engine
             services.AddTransient<ITSP, AntColony>();
 
-            services.AddTransient<ICallAPI, CallAPI>();
-            services.AddTransient<IProcessInputData, ProcessInputData>();
-            services.AddTransient<IFormOutputDataForBestPath, FormOutputDataForBestPath>();
+            services.AddTransient<IDownloadDurationMatrixByTollRoad, DownloadDurationMatrixByTollRoad>();
+            services.AddTransient<IDownloadDurationMatrixByFreeRoad, DownloadDurationMatrixByFreeRoad>();
+            services.AddTransient<IDownloadCostBetweenTwoCities, DownloadCostBetweenTwoCities>();
+            services.AddTransient<IDownloadRoadData, DownloadRoadData>();
+            services.AddTransient<IFormOutputData, FormOutputData>();
             services.AddTransient<ICalculateBestPath, CalculateBestPath>();
             services.AddTransient<IBreakCostLimit, BreakCostLimit>();
             services.AddTransient<IEvaluationBrain, EvaluationBrain>();
-            services.AddTransient<IDownloadLocationOfCity, DownloadLocationOfCity>();
-            services.AddTransient<IDownloadCityNameByLocation, DownloadCityNameByLocation>();
+            services.AddTransient<IFindLocationOfCity, FindLocationOfCity>();
+            services.AddTransient<IFindNameOfCity, FindNameOfCity>();
 
             services.AddSession();
 

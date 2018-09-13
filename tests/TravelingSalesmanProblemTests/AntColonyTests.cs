@@ -1,6 +1,6 @@
 using System;
 using System.Linq;
-using DreamTravel.Models;
+using DreamTravel.BestPath.Models;
 using TravelingSalesmanProblem;
 using Xunit;
 

@@ -6,7 +6,7 @@
     $.ajax({
         type: 'POST',
         dataType: 'html',
-        url: window.location + 'TSP/LimitCost',
+        url: window.location + 'api/LimitCost',
         headers: {
             'Authorization': 'DreamAuthentication U29sVWJlckFsbGVz'
         },

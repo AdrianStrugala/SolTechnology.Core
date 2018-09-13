@@ -14,7 +14,7 @@ namespace DreamTravelITests.Authentication
 
     {
         private readonly HttpClient _httpServer;
-        private const string TestUrl = "TSP/FindCity";
+        private const string TestUrl = "api/FindLocationOfCity";
         public DreamAuthenticationTests()
         {
             var webHostBuilder = new WebHostBuilder()
