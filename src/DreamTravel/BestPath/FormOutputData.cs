@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using DreamTravel.BestPath.Interfaces;
 using DreamTravel.SharedModels;
 
@@ -32,6 +33,18 @@ namespace DreamTravel.BestPath
             }
 
             //increase cost of each road using vinieta (divide by number of roads using this vinieta)
+
+            foreach (var path in paths)
+            {
+                if (path.VinietaCost == 0) continue;
+                double vinietaCost = path.VinietaCost;
+                var pathsUsingThisVinieta = paths.Where(x => x.VinietaCost.Equals(vinietaCost)).ToList();
+
+                foreach (var pathOnThisVinieta in pathsUsingThisVinieta)
+                {
+                    pathOnThisVinieta.Cost += vinietaCost / pathsUsingThisVinieta.Count / pathsUsingThisVinieta.Count;
+                }
+            }
 
             return paths;
         }
