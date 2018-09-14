@@ -53,11 +53,11 @@
             </div>
 
         </div>
-        <button type="button" class="btn btn-success" onclick="addCityHandler()" id="addCityBtn">+</button>
+        <button type="button" class="btn btn-success" onclick="addCityHandler(map)" id="addCityBtn">+</button>
 
         <footer class="modal-footer">
 
-            <button type="button" class="btn btn-info" disabled="disabled" onclick="runTSPHandler()" id="runTSPBtn">Apply</button>
+            <button type="button" class="btn btn-info" disabled="disabled" onclick="runTSPHandler(map)" id="runTSPBtn">Apply</button>
         </footer>
 
     </div>
@@ -79,7 +79,7 @@
                     <input type="range" min="0" max="100" value="0" class="slider" id="costSlider">
                 </div>
                 <footer class="modal-footer">
-                    <button type="button" class="btn btn-info" id="runLimitBtn" onclick="limitCostHandler()" data-dismiss="modal">Apply</button>
+                    <button type="button" class="btn btn-info" id="runLimitBtn" onclick="limitCostHandler(map)" data-dismiss="modal">Apply</button>
                 </footer>
             </div>
         </div>
@@ -121,7 +121,7 @@
                             var el = event.target.value;
                             event.target.value = el.substring(0, el.length - 1);
                         }
-                        addCityHandler();
+                        addCityHandler(map);
                     }
                 });
             }

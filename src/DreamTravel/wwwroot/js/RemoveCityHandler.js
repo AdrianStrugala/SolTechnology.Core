@@ -1,3 +1,5 @@
+/// <reference path="../lib/jquery/jquery.d.ts" />
+/// <reference path="./GlobalVariables.ts"/>
 function removeCityHandler(city) {
     $("#listOfCities").children().each(function (index) {
         if ($(this).attr('id').toString() == "cityBlock" + city.id.toString()) {

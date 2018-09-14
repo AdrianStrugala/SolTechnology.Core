@@ -7,10 +7,20 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Content Remove="wwwroot\js\AddCityHandler.ts" />
+    <Content Remove="wwwroot\js\ClearMapHandler.ts" />
     <Content Remove="wwwroot\js\DisplayCityHandler.ts" />
     <Content Remove="wwwroot\js\DisplayMarkerHandler.ts" />
+    <Content Remove="wwwroot\js\DisplayRouteHandler.ts" />
     <Content Remove="wwwroot\js\FindCityNameHandler.ts" />
+    <Content Remove="wwwroot\js\LimitCostHandler.ts" />
+    <Content Remove="wwwroot\js\RunTSPHandler.ts" />
     <Content Remove="wwwroot\js\UpdateCityHandler.ts" />
+    <Content Remove="wwwroot\js\Utils\Guid.ts" />
+    <Content Remove="wwwroot\js\Utils\Pad2.ts" />
+    <Content Remove="wwwroot\js\Utils\Sleep.ts" />
+    <Content Remove="wwwroot\js\Utils\WritePathInfoHandler.ts" />
+    <Content Remove="wwwroot\js\WriteSummaryInfoHandler.ts" />
     <Content Remove="wwwroot\lib\googleMaps\googleMaps.d.ts" />
   </ItemGroup>
 
@@ -37,10 +47,20 @@
   </ItemGroup>
 
   <ItemGroup>
+    <TypeScriptCompile Include="wwwroot\js\AddCityHandler.ts" />
+    <TypeScriptCompile Include="wwwroot\js\ClearMapHandler.ts" />
     <TypeScriptCompile Include="wwwroot\js\DisplayCityHandler.ts" />
     <TypeScriptCompile Include="wwwroot\js\DisplayMarkerHandler.ts" />
+    <TypeScriptCompile Include="wwwroot\js\DisplayRouteHandler.ts" />
     <TypeScriptCompile Include="wwwroot\js\FindCityNameHandler.ts" />
+    <TypeScriptCompile Include="wwwroot\js\LimitCostHandler.ts" />
+    <TypeScriptCompile Include="wwwroot\js\RunTSPHandler.ts" />
     <TypeScriptCompile Include="wwwroot\js\UpdateCityHandler.ts" />
+    <TypeScriptCompile Include="wwwroot\js\Utils\Guid.ts" />
+    <TypeScriptCompile Include="wwwroot\js\Utils\Pad2.ts" />
+    <TypeScriptCompile Include="wwwroot\js\Utils\Sleep.ts" />
+    <TypeScriptCompile Include="wwwroot\js\WritePathInfoHandler.ts" />
+    <TypeScriptCompile Include="wwwroot\js\WriteSummaryInfoHandler.ts" />
     <TypeScriptCompile Include="wwwroot\lib\googleMaps\googleMaps.d.ts" />
   </ItemGroup>
 
