@@ -61,7 +61,7 @@ function runTSPHandler(map) {
 
                 //Finalize display
                 writeSummaryInfoHandler(optimalTime, optimalCost);
-                writeSummaryInfoHandler(optimalTime, optimalCost);
+
                 (<HTMLInputElement>$("#costSlider")[0]).value = optimalCost;
                 (<HTMLInputElement>$("#costSlider")[0]).max = String(Math.ceil(totalCost));
                 $("#limitValue")[0].innerHTML = (<HTMLInputElement>$("#costSlider")[0]).value + " €";

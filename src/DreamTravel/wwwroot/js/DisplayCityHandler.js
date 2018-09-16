@@ -10,7 +10,7 @@ function displayCityHandler(item, map) {
         success: function (msg) {
             var city = JSON.parse(msg);
             $("#listOfCities").children().each(function (index) {
-                if ($(this).attr('id') == "cityBlock" + item.id && index < cities.length) {
+                if ($(this).attr('id') == "cityRow" + item.id && index < cities.length) {
                     if (markers[index] != null) {
                         markers[index].setMap(null);
                     }

@@ -33,6 +33,6 @@ function displayRouteHandler(directionsService, map, path) {
             window.alert('Directions request failed due to ' + status);
         }
     });
-    routes.push(directionsDisplay);
+    paths.push(directionsDisplay);
 }
 //# sourceMappingURL=DisplayRouteHandler.js.map

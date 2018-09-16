@@ -1,8 +1,8 @@
 function cleanMapHandler(list) {
-    for (var i = 0; i < routes.length; i++) {
-        routes[i].setMap(null);
+    for (var i = 0; i < paths.length; i++) {
+        paths[i].setMap(null);
     }
-    routes = [];
+    paths = [];
     pathsToRetry = [];
     list.innerHTML = "";
 }

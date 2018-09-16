@@ -13,7 +13,7 @@
             var city = JSON.parse(msg);
 
             $("#listOfCities").children().each(function (index) {
-                if ($(this).attr('id') == "cityBlock" + item.id && index < cities.length) {
+                if ($(this).attr('id') == "cityRow" + item.id && index < cities.length) {
 
                     if (markers[index] != null) {
                         markers[index].setMap(null);
@@ -29,7 +29,7 @@
             });
         },
 
-        error: function (req, status, errorObj) {
+        error(req, status, errorObj) {
             var alertMessage = JSON.parse(req.responseText);
             alert(alertMessage);
         }

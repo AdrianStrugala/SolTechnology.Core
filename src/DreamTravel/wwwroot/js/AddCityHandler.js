@@ -2,14 +2,14 @@
 function addCityHandler(map) {
     noOfCityRows++;
     var div = document.createElement("div");
-    div.className = "cityBlock";
-    div.id = "cityBlock" + noOfCityRows.toString();
+    div.className = "cityRow";
+    div.id = "cityRow" + noOfCityRows.toString();
     var hr = document.createElement("hr");
     hr.className = "line";
     var hr2 = document.createElement("hr");
     hr2.className = "line";
     var textArea = document.createElement("textarea");
-    textArea.className = "city";
+    textArea.className = "cityText";
     textArea.id = noOfCityRows.toString();
     textArea.rows = 1;
     textArea.onchange = function () { displayCityHandler(this, map); };

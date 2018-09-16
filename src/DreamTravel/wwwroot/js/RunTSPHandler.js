@@ -49,7 +49,6 @@ function runTSPHandler(map) {
                 map.fitBounds(bounds);
                 //Finalize display
                 writeSummaryInfoHandler(optimalTime, optimalCost);
-                writeSummaryInfoHandler(optimalTime, optimalCost);
                 $("#costSlider")[0].value = optimalCost;
                 $("#costSlider")[0].max = String(Math.ceil(totalCost));
                 $("#limitValue")[0].innerHTML = $("#costSlider")[0].value + " €";

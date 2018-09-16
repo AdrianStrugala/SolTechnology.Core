@@ -3,7 +3,7 @@
 
 function removeCityHandler(city) {
     $("#listOfCities").children().each(function (index) {
-        if ($(this).attr('id').toString() == "cityBlock" + city.id.toString()) {
+        if ($(this).attr('id').toString() == "cityRow" + city.id.toString()) {
 
             if (markers[index] != null) {
                 markers[index].setMap(null);

@@ -1,6 +1,6 @@
 var cities = [];
 var markers = [];
-var routes = [];
+var paths = [];
 var sessionId;
 var optimalCost;
 var optimalTime;

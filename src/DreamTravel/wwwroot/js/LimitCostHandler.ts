@@ -11,7 +11,7 @@
             'Authorization': 'DreamAuthentication U29sVWJlckFsbGVz'
         },
         data: { costLimit: limit, sessionId: sessionId },
-        success: function (msg) {
+        success(msg) {
 
             var totalCost = 0;
             var totalTime = 0;

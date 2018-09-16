@@ -39,5 +39,5 @@ function displayRouteHandler(directionsService, map, path) {
             }
         });
 
-    routes.push(directionsDisplay);
+    paths.push(directionsDisplay);
 }

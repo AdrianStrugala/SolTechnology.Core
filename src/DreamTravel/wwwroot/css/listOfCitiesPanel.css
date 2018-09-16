@@ -1,0 +1,58 @@
+﻿#listOfCitiesPanel {
+    height: 92vh;
+    margin-top: 8vh;
+    width: 15rem;
+    position: fixed;
+    z-index: 1;
+    top: 0;
+    left: 0;
+    background-color: white;
+    overflow-x: hidden;
+    border-style: solid;
+    border-color: #2FA4E7;
+    border-width: 0.3rem;
+    border-radius: 0.6rem;
+}
+
+.line {
+    display: block;
+    position: relative;
+    margin-top: 0.5rem;
+    margin-bottom: 0.5rem;
+    margin-left: auto;
+    margin-right: auto;
+    border-style: inset;
+    border-width: 1px;
+}
+
+.cityRow {
+    height: 2rem;
+    display: contents;
+    position: relative;
+}
+
+.btn-danger {
+    vertical-align: top;
+    margin: 0;
+    resize: none;
+    text-align: center;
+    margin-left: 0.6rem;
+}
+
+.cityText {
+    /* resize: both; */
+    margin-top: 0.2rem;
+    margin-left: 0.25rem;
+    width: 11rem;
+    resize: none;
+    overflow: hidden;
+    height: inherit;
+    vertical-align: middle;
+    float: left;
+}
+
+.btn-info {
+    background-image: -webkit-gradient(linear, left top, left bottom, from(#2fa4e7), color-stop(60%, #2fa4e7), to(#2fa4e7));
+    background-color: #2FA4E7;
+    border-color: #2FA4E7;
+}
