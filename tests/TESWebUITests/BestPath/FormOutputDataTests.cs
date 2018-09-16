@@ -4,7 +4,7 @@ using DreamTravel.BestPath.Models;
 using DreamTravel.SharedModels;
 using Xunit;
 
-namespace DreamTravelITests.ExternalConnection
+namespace DreamTravelITests.BestPath
 {
     public class FormOutputDataTests
     {

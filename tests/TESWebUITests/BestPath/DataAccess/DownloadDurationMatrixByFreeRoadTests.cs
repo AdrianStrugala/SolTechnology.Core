@@ -4,7 +4,7 @@ using DreamTravel.BestPath.DataAccess;
 using DreamTravel.SharedModels;
 using Xunit;
 
-namespace DreamTravelITests.ExternalConnection
+namespace DreamTravelITests.BestPath.DataAccess
 {
     public class DownloadDurationMatrixByFreeRoadTests
     {

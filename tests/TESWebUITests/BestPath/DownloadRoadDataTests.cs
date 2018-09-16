@@ -2,12 +2,11 @@ using System.Collections.Generic;
 using DreamTravel.BestPath.DataAccess;
 using DreamTravel.BestPath.Interfaces;
 using DreamTravel.BestPath.Models;
-using DreamTravel.ExternalConnection;
 using DreamTravel.SharedModels;
 using NSubstitute;
 using Xunit;
 
-namespace DreamTravelITests.ExternalConnection
+namespace DreamTravelITests.BestPath
 {
     public class DownloadRoadDataTests
     {
@@ -60,6 +59,38 @@ namespace DreamTravelITests.ExternalConnection
             Assert.Equal(double.MaxValue, matrix.FreeDistances[3]);
             Assert.NotEqual(double.MaxValue, matrix.FreeDistances[1]);
             Assert.NotEqual(double.MaxValue, matrix.FreeDistances[2]);
+        }
+
+        //can always download data of at least 30 cities
+        [Fact]
+        public void Execute_InputHas30Cities_AllTheDataIsDownloaded()
+        {
+            int noOfCities = 30;
+
+            //Arrange
+            City city = new City
+            {
+                Name = "name",
+                Latitude = 51,
+                Longitude = 17
+            };
+
+            List<City> cities = new List<City>();
+            for (int i = 0; i < noOfCities; i++)
+            {
+                cities.Add(city);
+            }
+
+            EvaluationMatrix matrix = new EvaluationMatrix(noOfCities);
+
+
+            //Act
+            _sut.Execute(cities, matrix);
+
+
+            //Assert
+
+            //if test is green all the data is downloaded (no exception thrown) 
         }
     }
 }

@@ -7,7 +7,7 @@ using Xunit;
 //Reference
 //https://github.com/nchaulet/node-geocoder/blob/master/lib/geocoder/googlegeocoder.js
 
-namespace DreamTravelITests.ExternalConnection
+namespace DreamTravelITests.NameOfCity
 {
     public class FindNameOfCityTests
     {

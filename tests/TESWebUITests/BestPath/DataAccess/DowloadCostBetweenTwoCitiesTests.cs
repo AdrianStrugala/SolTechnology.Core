@@ -1,14 +1,13 @@
-﻿using System.Collections.Generic;
-using System.IO;
+﻿using System.IO;
 using DreamTravel.BestPath.DataAccess;
 using DreamTravel.SharedModels;
 using Xunit;
 
-namespace DreamTravelITests.ExternalConnection
+namespace DreamTravelITests.BestPath.DataAccess
 {
     public class DowloadCostBetweenTwoCitiesTests
     {
-        readonly DownloadCostBetweenTwoCities _sut = new DownloadCostBetweenTwoCities();
+        private readonly DownloadCostBetweenTwoCities _sut = new DownloadCostBetweenTwoCities();
 
 
 
