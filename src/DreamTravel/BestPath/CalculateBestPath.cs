@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using DreamTravel.BestPath.Interfaces;
 using DreamTravel.BestPath.Models;
 using DreamTravel.ExternalConnection.Interfaces;
@@ -23,12 +24,22 @@ namespace DreamTravel.BestPath
             _evaluationBrain = evaluationBrain;
         }
 
-        public List<Path> Execute(List<City> cities)
+        public List<Path> Execute(List<City> cities, bool optimizePath)
         {
             EvaluationMatrix matrices = new EvaluationMatrix(cities.Count);
             matrices = _downloadRoadData.Execute(cities, matrices);
             matrices = _evaluationBrain.Execute(matrices, cities.Count);
-            int[] orderOfCities = _tspSolver.SolveTSP(matrices.OptimalDistances);
+
+            int[] orderOfCities;
+            if (optimizePath)
+            {
+                orderOfCities = _tspSolver.SolveTSP(matrices.OptimalDistances);
+            }
+            else
+            {
+                orderOfCities = Enumerable.Range(0, cities.Count).ToArray();
+            }
+
 
             //to have a possiblity to store cities data
             // File.WriteAllText("./twentyCities.txt", JsonConvert.SerializeObject(matrices.OptimalDistances));

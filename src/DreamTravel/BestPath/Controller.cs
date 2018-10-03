@@ -28,12 +28,12 @@ namespace DreamTravel.BestPath
 
 
         [HttpPost]
-        public IActionResult CalculateBestPath(List<City> cities, string sessionId)
+        public IActionResult CalculateBestPath(List<City> cities, string sessionId, bool optimizePath)
         {
             try
             {
                 _logger.LogInformation("TSP Engine: Fire!");
-                List<Path> paths = _calculateBestPath.Execute(cities);
+                List<Path> paths = _calculateBestPath.Execute(cities, optimizePath);
 
                 HttpContext.Session.SetString(sessionId + PathsKeyName, JsonConvert.SerializeObject(paths));
 

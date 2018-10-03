@@ -21,7 +21,7 @@ function runTSPHandler(map) {
             headers: {
                 'Authorization': 'DreamAuthentication U29sVWJlckFsbGVz'
             },
-            data: { cities: cities, sessionId: sessionId },
+            data: { cities: cities, sessionId: sessionId, optimizePath: true },
             success: function (msg) {
                 //Initialize display
                 optimalCost = 0;
