@@ -44,7 +44,8 @@ namespace DreamTravel.BestPath
             //to have a possiblity to store cities data
             // File.WriteAllText("./twentyCities.txt", JsonConvert.SerializeObject(matrices.OptimalDistances));
 
-            return _formOutputData.Execute(cities, orderOfCities, matrices);
+            var result = _formOutputData.Execute(cities, orderOfCities, matrices);
+            return result;
         }
 
     }
