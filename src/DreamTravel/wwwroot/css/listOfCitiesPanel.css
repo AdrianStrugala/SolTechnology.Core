@@ -14,6 +14,31 @@
     border-radius: 0.6rem;
 }
 
+#optimizeRoad {
+    margin-top: 0.5rem;
+    margin-left: 0.5rem;
+}
+
+@supports (zoom:2) {
+    input[type="radio"], input[type=checkbox] {
+        zoom: 2;
+    }
+}
+
+label {
+    /* fix vertical align issues */
+    display: inline-block;
+    vertical-align: top;
+}
+
+.delimeter {
+    height: 0.3rem;
+    display: block;
+    position: relative;
+    color: #2FA4E7;
+    background-color: #2FA4E7;
+}
+
 .line {
     display: block;
     position: relative;

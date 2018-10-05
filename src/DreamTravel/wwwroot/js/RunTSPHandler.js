@@ -13,6 +13,7 @@ function runTSPHandler(map) {
         for (var i = citiesToRemove.length - 1; i >= 0; i--) {
             removeCityByIndexHandler(citiesToRemove[i]);
         }
+        var optimizeRoadChck = $("#optimizeRoad")[0].checked;
         //Request
         $.ajax({
             type: 'POST',
@@ -21,7 +22,7 @@ function runTSPHandler(map) {
             headers: {
                 'Authorization': 'DreamAuthentication U29sVWJlckFsbGVz'
             },
-            data: { cities: cities, sessionId: sessionId, optimizePath: true },
+            data: { cities: cities, sessionId: sessionId, optimizePath: optimizeRoadChck },
             success: function (msg) {
                 //Initialize display
                 optimalCost = 0;
