@@ -1,5 +1,5 @@
-God: Four Cities 
+God: 4 Cities 
 Minimal Distance: 103983 
 Average Distance: 103983 
-Average Time: 9.7596E-05 s 
+Average Time: 6.155E-05 s 
 Recurrence: 100 %

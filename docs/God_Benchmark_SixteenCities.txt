@@ -1,5 +1,0 @@
-God: Sixteen Cities 
-Minimal Distance: 120995 
-Average Distance: 132713.16 
-Average Time: 0.95179548 s 
-Recurrence: 2 %
