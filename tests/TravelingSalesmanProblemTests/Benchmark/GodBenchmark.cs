@@ -3,6 +3,8 @@ using Xunit;
 
 namespace TravelingSalesmanProblemTests.Benchmark
 {
+    using System.Threading.Tasks;
+
     [Collection("Benchmark")]
     public class GodBenchmark
     {
@@ -33,51 +35,51 @@ namespace TravelingSalesmanProblemTests.Benchmark
 
 
         [Fact]
-        void TwoCities()
+        async Task TwoCities()
         {
             if (!_config.God.TwoCities) { return; }
 
-            Benchmark.RunTest(NumberOfExecutions, _twoCitiesMatrix, _tspEngine, "God");
+            await Benchmark.RunTest(NumberOfExecutions, _twoCitiesMatrix, _tspEngine, "God");
         }
 
         [Fact]
-        void FourCities()
+        async Task FourCities()
         {
             if (!_config.God.FourCities) { return; }
 
-            Benchmark.RunTest(NumberOfExecutions, _fourCitiesMatrix, _tspEngine, "God");
+            await Benchmark.RunTest(NumberOfExecutions, _fourCitiesMatrix, _tspEngine, "God");
         }
 
         [Fact]
-        void EightCities()
+        async Task EightCities()
         {
             if (!_config.God.EightCities) { return; }
 
-            Benchmark.RunTest(NumberOfExecutions, _eightCitiesMatrix, _tspEngine, "God");
+            await Benchmark.RunTest(NumberOfExecutions, _eightCitiesMatrix, _tspEngine, "God");
         }
 
         [Fact]
-        void TwelveCities()
+        async Task TwelveCities()
         {
             if (!_config.God.TwelveCities) { return; }
 
-            Benchmark.RunTest(NumberOfExecutions, _twelveCitiesMatrix, _tspEngine, "God");
+            await Benchmark.RunTest(NumberOfExecutions, _twelveCitiesMatrix, _tspEngine, "God");
         }
 
         [Fact]
-        void SixteenCities()
+        async Task SixteenCities()
         {
             if (!_config.God.SixteenCities) { return; }
 
-            Benchmark.RunTest(NumberOfExecutions, _sixteenCitiesMatrix, _tspEngine, "God");
+            await Benchmark.RunTest(NumberOfExecutions, _sixteenCitiesMatrix, _tspEngine, "God");
         }
 
         [Fact]
-        void TwentyCities()
+        async Task TwentyCities()
         {
             if (!_config.God.TwentyCities) { return; }
 
-            Benchmark.RunTest(NumberOfExecutions, _twentyCitiesMatrix, _tspEngine, "God");
+            await Benchmark.RunTest(NumberOfExecutions, _twentyCitiesMatrix, _tspEngine, "God");
         }
     }
 }

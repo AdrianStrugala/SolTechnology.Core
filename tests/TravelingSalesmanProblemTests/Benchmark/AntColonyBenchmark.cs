@@ -3,6 +3,8 @@ using Xunit;
 
 namespace TravelingSalesmanProblemTests.Benchmark
 {
+    using System.Threading.Tasks;
+
     [Collection("Benchmark")]
     public class AntColonyBenchmark
     {
@@ -34,51 +36,51 @@ namespace TravelingSalesmanProblemTests.Benchmark
 
 
         [Fact]
-        void TwoCities()
+        async Task TwoCities()
         {
             if (!_config.AntColony.TwoCities) { return; }
 
-            Benchmark.RunTest(NumberOfExecutions, _twoCitiesMatrix, _tspEngine, "AntColony");
+            await Benchmark.RunTest(NumberOfExecutions, _twoCitiesMatrix, _tspEngine, "AntColony");
         }
 
         [Fact]
-        void FourCities()
+        async Task FourCities()
         {
             if (!_config.AntColony.FourCities) { return; }
 
-            Benchmark.RunTest(NumberOfExecutions, _fourCitiesMatrix, _tspEngine, "AntColony");
+            await Benchmark.RunTest(NumberOfExecutions, _fourCitiesMatrix, _tspEngine, "AntColony");
         }
 
         [Fact]
-        void EightCities()
+        async Task EightCities()
         {
             if (!_config.AntColony.EightCities) { return; }
 
-            Benchmark.RunTest(NumberOfExecutions, _eightCitiesMatrix, _tspEngine, "AntColony");
+            await Benchmark.RunTest(NumberOfExecutions, _eightCitiesMatrix, _tspEngine, "AntColony");
         }
 
         [Fact]
-        void TwelveCities()
+        async Task TwelveCities()
         {
             if (!_config.AntColony.TwelveCities) { return; }
 
-            Benchmark.RunTest(NumberOfExecutions, _twelveCitiesMatrix, _tspEngine, "AntColony");
+            await Benchmark.RunTest(NumberOfExecutions, _twelveCitiesMatrix, _tspEngine, "AntColony");
         }
 
         [Fact]
-        void SixteenCities()
+        async Task SixteenCities()
         {
             if (!_config.AntColony.SixteenCities) { return; }
 
-            Benchmark.RunTest(NumberOfExecutions, _sixteenCitiesMatrix, _tspEngine, "AntColony");
+            await Benchmark.RunTest(NumberOfExecutions, _sixteenCitiesMatrix, _tspEngine, "AntColony");
         }
 
         [Fact]
-        void TwentyCities()
+        async Task TwentyCities()
         {
             if (!_config.AntColony.TwentyCities) { return; }
 
-            Benchmark.RunTest(NumberOfExecutions, _twentyCitiesMatrix, _tspEngine, "AntColony");
+            await Benchmark.RunTest(NumberOfExecutions, _twentyCitiesMatrix, _tspEngine, "AntColony");
         }
     }
 }
