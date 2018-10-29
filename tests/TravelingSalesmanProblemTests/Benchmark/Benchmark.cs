@@ -62,14 +62,14 @@ namespace TravelingSalesmanProblemTests.Benchmark
             benchmarkResult.NoOfCities = noOfCities;
             benchmarkResult.MinimalDistance = resuts.Min(resut => resut);
             benchmarkResult.Recurrence = (resuts.Count(result => result.Equals(benchmarkResult.MinimalDistance)) * 100) / numberOfExecutions;
-            benchmarkResult.AverageExecutionTime = totalTime / numberOfExecutions;
+            benchmarkResult.AverageExecutionTime = totalTime / numberOfExecutions * 1000;
             benchmarkResult.AverageDistance = resuts.Sum() / numberOfExecutions;
 
             System.IO.File.WriteAllText($@"..\..\..\..\..\docs\{nameOfAlgorithm}_Benchmark_{noOfCities}Cities.txt",
                 $"{nameOfAlgorithm}: {noOfCities} Cities \n" +
                 $"Minimal Distance: {benchmarkResult.MinimalDistance} \n" +
                 $"Average Distance: {benchmarkResult.AverageDistance} \n" +
-                $"Average Time: { benchmarkResult.AverageExecutionTime} s \n" +
+                $"Average Time: { benchmarkResult.AverageExecutionTime} ms \n" +
                 $"Recurrence: {benchmarkResult.Recurrence} %");
 
             //Request to DreamTravel.Benchmark

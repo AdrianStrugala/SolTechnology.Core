@@ -6,11 +6,11 @@
 
         public int NoOfCities { get; set; }
 
-        public double AverageExecutionTime { get; set; }
+        public int AverageExecutionTime { get; set; }
 
-        public double MinimalDistance { get; set; }
+        public int MinimalDistance { get; set; }
 
-        public double AverageDistance { get; set; }
+        public int AverageDistance { get; set; }
 
         public int? Recurrence { get; set; }
     }
