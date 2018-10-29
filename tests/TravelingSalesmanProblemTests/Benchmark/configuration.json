@@ -5,7 +5,7 @@
     "EightCities": true,
     "TwelveCities": true,
     "SixteenCities": true,
-    "TwentyCities": true
+    "TwentyCities": false
   },
 
   "AntColony": {
