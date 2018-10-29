@@ -30,7 +30,7 @@ namespace TravelingSalesmanProblemTests.Benchmark
             int noOfCities = (int)Math.Sqrt(distanceMatrix.Length);
 
             List<int[]> tspResults = new List<int[]>();
-            List<double> resuts = new List<double>();
+            List<double> results = new List<double>();
 
 
             //Act
@@ -45,7 +45,7 @@ namespace TravelingSalesmanProblemTests.Benchmark
 
 
 
-            //Prepair result
+            //Prepare result
             foreach (var tspResult in tspResults)
             {
                 double totalDistance = 0;
@@ -53,17 +53,17 @@ namespace TravelingSalesmanProblemTests.Benchmark
                 {
                     totalDistance += distanceMatrix[tspResult[i] + tspResult[i + 1] * noOfCities];
                 }
-                resuts.Add(totalDistance);
+                results.Add(totalDistance);
             }
 
 
             //RESULTS
             benchmarkResult.Algorithm = nameOfAlgorithm;
             benchmarkResult.NoOfCities = noOfCities;
-            benchmarkResult.MinimalDistance = resuts.Min(resut => resut);
-            benchmarkResult.Recurrence = (resuts.Count(result => result.Equals(benchmarkResult.MinimalDistance)) * 100) / numberOfExecutions;
-            benchmarkResult.AverageExecutionTime = totalTime / numberOfExecutions * 1000;
-            benchmarkResult.AverageDistance = resuts.Sum() / numberOfExecutions;
+            benchmarkResult.MinimalDistance = (int) results.Min(result => result);
+            benchmarkResult.Recurrence = (results.Count(result => result.Equals(benchmarkResult.MinimalDistance)) * 100) / numberOfExecutions;
+            benchmarkResult.AverageExecutionTime = (int) (totalTime / numberOfExecutions * 1000);
+            benchmarkResult.AverageDistance = (int) (results.Sum() / numberOfExecutions);
 
             System.IO.File.WriteAllText($@"..\..\..\..\..\docs\{nameOfAlgorithm}_Benchmark_{noOfCities}Cities.txt",
                 $"{nameOfAlgorithm}: {noOfCities} Cities \n" +
