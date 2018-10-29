@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using System.Collections.Generic;
+using Newtonsoft.Json;
 using Xunit;
 
 namespace TravelingSalesmanProblemTests.Benchmark
@@ -11,12 +12,12 @@ namespace TravelingSalesmanProblemTests.Benchmark
         private const int NumberOfExecutions = 100;
         private readonly Configuration _config;
 
-        private readonly double[] _twoCitiesMatrix;
-        private readonly double[] _fourCitiesMatrix;
-        private readonly double[] _eightCitiesMatrix;
-        private readonly double[] _sixteenCitiesMatrix;
-        private readonly double[] _twelveCitiesMatrix;
-        private readonly double[] _twentyCitiesMatrix;
+        private readonly List<double> _twoCitiesMatrix;
+        private readonly List<double> _fourCitiesMatrix;
+        private readonly List<double> _eightCitiesMatrix;
+        private readonly List<double> _sixteenCitiesMatrix;
+        private readonly List<double> _twelveCitiesMatrix;
+        private readonly List<double> _twentyCitiesMatrix;
 
         readonly TravelingSalesmanProblem.AntColony _tspEngine;
 
@@ -24,12 +25,12 @@ namespace TravelingSalesmanProblemTests.Benchmark
         public AntColonyBenchmark()
         {
             _config = JsonConvert.DeserializeObject<Configuration>(System.IO.File.ReadAllText("Benchmark\\configuration.json"));
-            _twoCitiesMatrix = JsonConvert.DeserializeObject<double[]>(System.IO.File.ReadAllText(@".\Benchmark\TestData\twoCities.txt"));
-            _fourCitiesMatrix = JsonConvert.DeserializeObject<double[]>(System.IO.File.ReadAllText(@".\Benchmark\TestData\fourCities.txt"));
-            _eightCitiesMatrix = JsonConvert.DeserializeObject<double[]>(System.IO.File.ReadAllText(@".\Benchmark\TestData\eightCities.txt"));
-            _twelveCitiesMatrix = JsonConvert.DeserializeObject<double[]>(System.IO.File.ReadAllText(@".\Benchmark\TestData\twelveCities.txt"));
-            _sixteenCitiesMatrix = JsonConvert.DeserializeObject<double[]>(System.IO.File.ReadAllText(@".\Benchmark\TestData\sixteenCities.txt"));
-            _twentyCitiesMatrix = JsonConvert.DeserializeObject<double[]>(System.IO.File.ReadAllText(@".\Benchmark\TestData\twentyCities.txt"));
+            _twoCitiesMatrix = JsonConvert.DeserializeObject<List<double>>(System.IO.File.ReadAllText(@".\Benchmark\TestData\twoCities.txt"));
+            _fourCitiesMatrix = JsonConvert.DeserializeObject<List<double>>(System.IO.File.ReadAllText(@".\Benchmark\TestData\fourCities.txt"));
+            _eightCitiesMatrix = JsonConvert.DeserializeObject<List<double>>(System.IO.File.ReadAllText(@".\Benchmark\TestData\eightCities.txt"));
+            _twelveCitiesMatrix = JsonConvert.DeserializeObject<List<double>>(System.IO.File.ReadAllText(@".\Benchmark\TestData\twelveCities.txt"));
+            _sixteenCitiesMatrix = JsonConvert.DeserializeObject<List<double>>(System.IO.File.ReadAllText(@".\Benchmark\TestData\sixteenCities.txt"));
+            _twentyCitiesMatrix = JsonConvert.DeserializeObject<List<double>>(System.IO.File.ReadAllText(@".\Benchmark\TestData\twentyCities.txt"));
 
             _tspEngine = new TravelingSalesmanProblem.AntColony();
         }

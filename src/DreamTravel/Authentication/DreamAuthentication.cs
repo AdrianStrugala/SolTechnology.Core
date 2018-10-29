@@ -23,7 +23,7 @@ namespace DreamTravel.Authentication
 
 
         protected override async Task<AuthenticateResult> HandleAuthenticateAsync()
-        {
+        {          
             _logger.LogInformation($"Authentication for request [{Context.Request.Path} started");
 
             if (!Request.Headers.ContainsKey(DreamAuthenticationOptions.AuthenticationHeaderName))
@@ -64,7 +64,8 @@ namespace DreamTravel.Authentication
             var ticket = new AuthenticationTicket(principal, Scheme.Name);
 
             _logger.LogInformation($"Authenticated user: [{principal}]");
-            return AuthenticateResult.Success(ticket);
+
+            return await Task.FromResult(AuthenticateResult.Success(ticket));
         }
 
         public static string Base64Decode(string base64EncodedData)

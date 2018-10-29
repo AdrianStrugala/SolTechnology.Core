@@ -1,7 +1,9 @@
-﻿namespace TravelingSalesmanProblem
+﻿using System.Collections.Generic;
+
+namespace TravelingSalesmanProblem
 {
     public interface ITSP
     {
-        int[] SolveTSP(double[] distances);
+        List<int> SolveTSP(List<double> distances);
     }
 }
