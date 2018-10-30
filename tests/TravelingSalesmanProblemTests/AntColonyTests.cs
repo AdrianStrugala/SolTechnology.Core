@@ -16,11 +16,11 @@ namespace TravelingSalesmanProblemTests
             Random random = new Random();
 
             int noOfCities = 4;
-            EvaluationMatrix evaluationMatrix = new EvaluationMatrix(noOfCities * noOfCities);
+            EvaluationMatrix evaluationMatrix = new EvaluationMatrix(noOfCities);
 
-            for (int i = 0; i < noOfCities * noOfCities; i++)
+            for (int i = 0; i < evaluationMatrix.OptimalDistances.Count; i++)
             {
-                evaluationMatrix.OptimalDistances.Add(random.NextDouble() * 1000);
+                evaluationMatrix.OptimalDistances[i] = random.NextDouble() * 1000;
             }
 
             //Act
@@ -38,7 +38,7 @@ namespace TravelingSalesmanProblemTests
             Random random = new Random();
 
             int noOfCities = 7;
-            EvaluationMatrix evaluationMatrix = new EvaluationMatrix(noOfCities * noOfCities);
+            EvaluationMatrix evaluationMatrix = new EvaluationMatrix(noOfCities);
 
             for (int i = 0; i < noOfCities * noOfCities; i++)
             {

@@ -54,27 +54,27 @@ namespace TravelingSalesmanProblem
         private void InitializeParameters(List<double> distances)
         {
             _bestPath = new List<int>(_noOfCities);
-            for (int i = 0; i < _noOfCities; i++) { _bestPath.Insert(i, i); }
+            for (int i = 0; i < _noOfCities; i++) { _bestPath.Add(i); }
             _pheromonePower = CalculateDistanceInPath(_bestPath, distances);
             _matrixSize = distances.Count;
-            _attractivenessMatrix = new List<double>(_matrixSize);
             _trialsMatrix = new List<double>(_matrixSize);
+            _attractivenessMatrix = new List<double>(_matrixSize);
         }
 
         private void FillAttractivenessMatrix(List<double> distances)
         {
-            for (int i = 0; i < _matrixSize; i++)
+            for (int i = 0; i < _attractivenessMatrix.Count; i++)
             {
-                _attractivenessMatrix.Add(1 / distances[i]);
+                _attractivenessMatrix[i] = 1 / distances[i];
             }
         }
 
 
         private void FillTrialsMatrix()
         {
-            for (int i = 0; i < _matrixSize; i++)
+            for (int i = 0; i < _trialsMatrix.Count; i++)
             {
-                _trialsMatrix.Add(BasicTrialValue);
+                _trialsMatrix[i] = BasicTrialValue;
             }
         }
 
@@ -113,17 +113,17 @@ namespace TravelingSalesmanProblem
         private List<int> SetFirstAndLastPointInPath(List<int> path)
         {
             path[0] = _bestPath[0];
-            path[_noOfCities - 1] = _bestPath[_noOfCities - 1];
+            path[path.Count - 1] = _bestPath[path.Count - 1];
             return path;
         }
 
 
         private List<double> FillProbabilityMatrix(List<double> probabilityMatrix)
         {
-            for (int i = 0; i < _matrixSize; i++)
+            for (int i = 0; i < _noOfCities * _noOfCities; i++)
             {
                 probabilityMatrix.Add(Math.Pow(_trialsMatrix[i], TrialPreference) *
-                                            Math.Pow(_attractivenessMatrix[i], AttractivenessParameter));
+                                       Math.Pow(_attractivenessMatrix[i], AttractivenessParameter));
             }
             return probabilityMatrix;
         }
