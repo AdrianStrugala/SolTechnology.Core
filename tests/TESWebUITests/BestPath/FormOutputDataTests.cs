@@ -1,7 +1,7 @@
+using System.Collections.Generic;
 using DreamTravel.BestPath;
 using DreamTravel.BestPath.Models;
 using DreamTravel.SharedModels;
-using System.Collections.Generic;
 using Xunit;
 
 namespace DreamTravelITests.BestPath
@@ -36,9 +36,12 @@ namespace DreamTravelITests.BestPath
                 Latitude = 55,
                 Longitude = 21
             };
-            List<City> listOfCities = new List<City> { firstCity, secondCity, thirdCity };
+            List<City> listOfCities = new List<City> {firstCity, secondCity, thirdCity};
 
-            List<int> orderOfCities = new List<int> { 0, 2, 1 };
+            int[] orderOfCities = new int[noOfCities];
+            orderOfCities[0] = 0;
+            orderOfCities[1] = 2;
+            orderOfCities[2] = 1;
 
             EvaluationMatrix evaluationMatrix = new EvaluationMatrix(noOfCities);
 
@@ -46,7 +49,7 @@ namespace DreamTravelITests.BestPath
             var result = _sut.Execute(listOfCities, orderOfCities, evaluationMatrix);
 
             //Assert
-            Assert.Equal(noOfCities - 1, result.Count);
+            Assert.Equal(noOfCities-1, result.Count);
             Assert.Equal("first", result[0].StartingCity.Name);
             Assert.Equal("third", result[1].StartingCity.Name);
             Assert.Equal("second", result[1].EndingCity.Name);

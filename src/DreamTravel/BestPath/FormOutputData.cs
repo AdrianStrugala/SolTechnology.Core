@@ -7,9 +7,9 @@ namespace DreamTravel.BestPath
 {
     public class FormOutputData : IFormOutputData
     {
-        public List<Path> Execute(List<City> listOfCities, List<int> orderOfCities, IEvaluationMatrix evaluationMatrix)
+        public List<Path> Execute(List<City> listOfCities, int[] orderOfCities, IEvaluationMatrix evaluationMatrix)
         {
-            int noOfCities = orderOfCities.Count;
+            int noOfCities = orderOfCities.Length;
             int noOfPaths = noOfCities - 1;
             List<Path> paths = new List<Path>();
 

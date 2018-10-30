@@ -30,14 +30,14 @@ namespace DreamTravel.BestPath
             matrices = _downloadRoadData.Execute(cities, matrices);
             matrices = _evaluationBrain.Execute(matrices, cities.Count);
 
-            List<int> orderOfCities;
+            int[] orderOfCities;
             if (optimizePath)
             {
                 orderOfCities = _tspSolver.SolveTSP(matrices.OptimalDistances);
             }
             else
             {
-                orderOfCities = Enumerable.Range(0, cities.Count).ToList();
+                orderOfCities = Enumerable.Range(0, cities.Count).ToArray();
             }
 
 

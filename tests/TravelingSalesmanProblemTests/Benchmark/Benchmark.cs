@@ -17,7 +17,7 @@ namespace TravelingSalesmanProblemTests.Benchmark
 
         private const string BenchmarkServiceUrl = "http://dreamtravel-benchmark.azurewebsites.net/PostBenchmarkResult";
 
-        public static async Task RunTest(int numberOfExecutions, List<double> distanceMatrix, ITSP algorithm, string nameOfAlgorithm)
+        public static async Task RunTest(int numberOfExecutions, double[] distanceMatrix, ITSP algorithm, string nameOfAlgorithm)
         {
             //Arrange
             if (_httpClient == null)
@@ -27,9 +27,9 @@ namespace TravelingSalesmanProblemTests.Benchmark
 
             BenchmarkResult benchmarkResult = new BenchmarkResult();
 
-            int noOfCities = (int)Math.Sqrt(distanceMatrix.Count);
+            int noOfCities = (int)Math.Sqrt(distanceMatrix.Length);
 
-            List<List<int>> tspResults = new List<List<int>>();
+            List<int[]> tspResults = new List<int[]>();
             List<double> results = new List<double>();
 
 
@@ -60,10 +60,10 @@ namespace TravelingSalesmanProblemTests.Benchmark
             //RESULTS
             benchmarkResult.Algorithm = nameOfAlgorithm;
             benchmarkResult.NoOfCities = noOfCities;
-            benchmarkResult.MinimalDistance = (int)results.Min(result => result);
+            benchmarkResult.MinimalDistance = (int) results.Min(result => result);
             benchmarkResult.Recurrence = (results.Count(result => result.Equals(benchmarkResult.MinimalDistance)) * 100) / numberOfExecutions;
-            benchmarkResult.AverageExecutionTime = (int)(totalTime / numberOfExecutions * 1000);
-            benchmarkResult.AverageDistance = (int)(results.Sum() / numberOfExecutions);
+            benchmarkResult.AverageExecutionTime = (int) (totalTime / numberOfExecutions * 1000);
+            benchmarkResult.AverageDistance = (int) (results.Sum() / numberOfExecutions);
 
             System.IO.File.WriteAllText($@"..\..\..\..\..\docs\{nameOfAlgorithm}_Benchmark_{noOfCities}Cities.txt",
                 $"{nameOfAlgorithm}: {noOfCities} Cities \n" +

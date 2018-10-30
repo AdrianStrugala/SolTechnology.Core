@@ -1,6 +1,5 @@
-﻿using DreamTravel.BestPath.Interfaces;
-using System.Collections.Generic;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
+using DreamTravel.BestPath.Interfaces;
 
 namespace DreamTravel.BestPath.Models
 {
@@ -8,7 +7,7 @@ namespace DreamTravel.BestPath.Models
     {
         public double[] FreeDistances { get; set; }
         public double[] TollDistances { get; set; }
-        public List<double> OptimalDistances { get; set; }
+        public double[] OptimalDistances { get; set; }
         public double[] Goals { get; set; }
         public double[] Costs { get; set; }
         public double[] OptimalCosts { get; set; }
@@ -20,7 +19,7 @@ namespace DreamTravel.BestPath.Models
             Parallel.Invoke(
                 () => FreeDistances = new double[noOfCities * noOfCities],
                 () => TollDistances = new double[noOfCities * noOfCities],
-                () => OptimalDistances = new List<double>(noOfCities * noOfCities),
+                () => OptimalDistances = new double[noOfCities * noOfCities],
                 () => Goals = new double[noOfCities * noOfCities],
                 () => Costs = new double[noOfCities * noOfCities],
                 () => OptimalCosts = new double[noOfCities * noOfCities],

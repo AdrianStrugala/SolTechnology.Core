@@ -1,6 +1,7 @@
-using DreamTravel.BestPath.Models;
 using System;
 using System.Linq;
+using DreamTravel.BestPath.Models;
+using TravelingSalesmanProblem;
 using Xunit;
 
 namespace TravelingSalesmanProblemTests
@@ -18,7 +19,7 @@ namespace TravelingSalesmanProblemTests
             int noOfCities = 4;
             EvaluationMatrix evaluationMatrix = new EvaluationMatrix(noOfCities);
 
-            for (int i = 0; i < evaluationMatrix.OptimalDistances.Count; i++)
+            for (int i = 0; i < evaluationMatrix.OptimalDistances.Length; i++)
             {
                 evaluationMatrix.OptimalDistances[i] = random.NextDouble() * 1000;
             }
@@ -28,7 +29,7 @@ namespace TravelingSalesmanProblemTests
 
             //Assert
             Assert.Equal(0, result[0]);
-            Assert.Equal(noOfCities - 1, result.Last());
+            Assert.Equal(noOfCities-1, result.Last());
         }
 
         [Fact]
@@ -40,9 +41,9 @@ namespace TravelingSalesmanProblemTests
             int noOfCities = 7;
             EvaluationMatrix evaluationMatrix = new EvaluationMatrix(noOfCities);
 
-            for (int i = 0; i < noOfCities * noOfCities; i++)
+            for (int i = 0; i < evaluationMatrix.OptimalDistances.Length; i++)
             {
-                evaluationMatrix.OptimalDistances.Add(random.NextDouble() * 1000);
+                evaluationMatrix.OptimalDistances[i] = random.NextDouble() * 1000;
             }
 
             //Act
