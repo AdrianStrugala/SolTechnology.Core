@@ -5,6 +5,8 @@ using DreamTravel.BestPath.DataAccess;
 using DreamTravel.BestPath.Interfaces;
 using DreamTravel.CostLimit;
 using DreamTravel.CostLimit.Interfaces;
+using DreamTravel.ExternalConnection;
+using DreamTravel.ExternalConnection.Interfaces;
 using DreamTravel.LocationOfCity;
 using DreamTravel.LocationOfCity.Interfaces;
 using DreamTravel.NameOfCity;

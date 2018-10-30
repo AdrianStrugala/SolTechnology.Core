@@ -8,11 +8,9 @@ using Xunit;
 
 namespace DreamTravelITests.BestPath
 {
-    using DreamTravel.BestPath;
-
     public class DownloadRoadDataTests
     {
-        private readonly DownloadRoadData _sut;
+        private readonly DreamTravel.ExternalConnection.DownloadRoadData _sut;
 
         public DownloadRoadDataTests()
         {
@@ -20,7 +18,7 @@ namespace DreamTravelITests.BestPath
             IDownloadDurationMatrixByFreeRoad downloadDurationMatrixByFreeRoad = Substitute.For<DownloadDurationMatrixByFreeRoad>();
             IDownloadCostBetweenTwoCities downloadCostBetweenTwoCities = Substitute.For<DownloadCostBetweenTwoCities>();
 
-            _sut = new DownloadRoadData(downloadDurationMatrixByTollRoad, downloadDurationMatrixByFreeRoad, downloadCostBetweenTwoCities);
+            _sut = new DreamTravel.ExternalConnection.DownloadRoadData(downloadDurationMatrixByTollRoad, downloadDurationMatrixByFreeRoad, downloadCostBetweenTwoCities);
         }
 
 

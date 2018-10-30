@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
+using DreamTravel.ExternalConnection.Interfaces;
 using DreamTravel.NameOfCity.Interfaces;
 using DreamTravel.SharedModels;
 using Microsoft.AspNetCore.Mvc;

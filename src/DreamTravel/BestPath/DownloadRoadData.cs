@@ -1,11 +1,12 @@
-﻿namespace DreamTravel.BestPath
-{
-    using System.Collections.Generic;
-    using System.Threading.Tasks;
-    using Interfaces;
-    using Models;
-    using SharedModels;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
+using DreamTravel.BestPath.Interfaces;
+using DreamTravel.BestPath.Models;
+using DreamTravel.ExternalConnection.Interfaces;
+using DreamTravel.SharedModels;
 
+namespace DreamTravel.ExternalConnection
+{
     public class DownloadRoadData : IDownloadRoadData
     {
         private readonly IDownloadDurationMatrixByTollRoad _downloadDurationMatrixByTollRoad;

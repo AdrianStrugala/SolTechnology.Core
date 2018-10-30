@@ -1,11 +1,10 @@
-using DreamTravel.BestPath.Models;
 using System.Linq;
+using DreamTravel.BestPath.Models;
+using TravelingSalesmanProblem;
 using Xunit;
 
 namespace TravelingSalesmanProblemTests
 {
-    using System;
-
     public class GodTests
     {
         readonly TravelingSalesmanProblem.God _sut = new TravelingSalesmanProblem.God();
@@ -15,22 +14,14 @@ namespace TravelingSalesmanProblemTests
         {
             //Arrange
             int noOfCities = 4;
-            EvaluationMatrix evaluationMatrix = new EvaluationMatrix(noOfCities * noOfCities);
-
-            Random random = new Random();
-            for (int i = 0; i < noOfCities * noOfCities; i++)
-            {
-                evaluationMatrix.OptimalDistances[i] = random.NextDouble() * 1000;
-            }
-
+            EvaluationMatrix evaluationMatrix = new EvaluationMatrix(noOfCities);
 
             //Act
-            var result = _sut.SolveTSP(evaluationMatrix.OptimalDistances.ToList());
-
+            var result = _sut.SolveTSP(evaluationMatrix.OptimalDistances);
 
             //Assert
             Assert.Equal(0, result[0]);
-            Assert.Equal(noOfCities - 1, result.Last());
+            Assert.Equal(noOfCities-1, result.Last());
         }
 
         [Fact]
@@ -38,18 +29,10 @@ namespace TravelingSalesmanProblemTests
         {
             //Arrange
             int noOfCities = 7;
-            EvaluationMatrix evaluationMatrix = new EvaluationMatrix(noOfCities * noOfCities);
-
-            Random random = new Random();
-            for (int i = 0; i < noOfCities * noOfCities; i++)
-            {
-                evaluationMatrix.OptimalDistances[i] = (random.NextDouble() * 1000);
-            }
-
+            EvaluationMatrix evaluationMatrix = new EvaluationMatrix(noOfCities);
 
             //Act
-            var result = _sut.SolveTSP(evaluationMatrix.OptimalDistances.ToList());
-
+            var result = _sut.SolveTSP(evaluationMatrix.OptimalDistances);
 
             //Assert
             Assert.Equal(1, result.Count(i => i.Equals(0)));
