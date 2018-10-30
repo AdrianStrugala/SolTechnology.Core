@@ -15,7 +15,7 @@ namespace TravelingSalesmanProblemTests
         {
             //Arrange
             int noOfCities = 4;
-            EvaluationMatrix evaluationMatrix = new EvaluationMatrix(noOfCities * noOfCities);
+            EvaluationMatrix evaluationMatrix = new EvaluationMatrix(noOfCities);
 
             Random random = new Random();
             for (int i = 0; i < noOfCities * noOfCities; i++)
@@ -38,7 +38,7 @@ namespace TravelingSalesmanProblemTests
         {
             //Arrange
             int noOfCities = 7;
-            EvaluationMatrix evaluationMatrix = new EvaluationMatrix(noOfCities * noOfCities);
+            EvaluationMatrix evaluationMatrix = new EvaluationMatrix(noOfCities);
 
             Random random = new Random();
             for (int i = 0; i < noOfCities * noOfCities; i++)
