@@ -4,6 +4,7 @@ using System.IO;
 using System.Net.Http;
 using System.Reflection;
 using System.Text;
+using System.Xml;
 using DreamTravel.BestPath.Interfaces;
 using DreamTravel.SharedModels;
 using Newtonsoft.Json;

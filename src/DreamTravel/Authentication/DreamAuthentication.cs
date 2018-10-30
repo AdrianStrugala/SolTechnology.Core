@@ -28,30 +28,30 @@ namespace DreamTravel.Authentication
 
             if (!Request.Headers.ContainsKey(DreamAuthenticationOptions.AuthenticationHeaderName))
             {
-                _logger.LogWarning("Missing authentication header");
+                _logger.LogWarning($"Missing authentication header");
                 return AuthenticateResult.Fail("Missing authentication header");
             }
 
             if (!AuthenticationHeaderValue.TryParse(Request.Headers[DreamAuthenticationOptions.AuthenticationHeaderName],
                 out AuthenticationHeaderValue headerValue))
             {
-                _logger.LogWarning("Invalid authentication header");
+                _logger.LogWarning($"Invalid authentication header");
                 return AuthenticateResult.Fail("Invalid authentication header");
             }
 
             if (!DreamAuthenticationOptions.AuthenticationScheme.Equals(headerValue.Scheme, StringComparison.OrdinalIgnoreCase))
             {
-                _logger.LogWarning("Not DreamAuthentication schema");
+                _logger.LogWarning($"Not DreamAuthentication schema");
                 return AuthenticateResult.Fail("Not DreamAuthentication schema");
             }
 
-            _logger.LogInformation("Decoding incoming authentication key");
+            _logger.LogInformation($"Decoding incoming authentication key");
             string headerParameterDecoded = Base64Decode(headerValue.Parameter);
 
             if (!Options.AuthenticationKey.Equals(headerParameterDecoded,
                 StringComparison.OrdinalIgnoreCase))
             {
-                _logger.LogWarning("Invalid authentication key");
+                _logger.LogWarning($"Invalid authentication key");
                 return AuthenticateResult.Fail("Invalid authentication key");
             }
 

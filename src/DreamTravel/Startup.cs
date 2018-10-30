@@ -1,4 +1,5 @@
-﻿using DreamTravel.Authentication;
+﻿using System.Globalization;
+using DreamTravel.Authentication;
 using DreamTravel.BestPath;
 using DreamTravel.BestPath.DataAccess;
 using DreamTravel.BestPath.Interfaces;
@@ -16,7 +17,6 @@ using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using System.Globalization;
 using TravelingSalesmanProblem;
 
 namespace DreamTravel
@@ -75,7 +75,8 @@ namespace DreamTravel
 
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
         {
-            var cultureInfo = new CultureInfo("en-US") { NumberFormat = { CurrencySymbol = "€" } };
+            var cultureInfo = new CultureInfo("en-US");
+            cultureInfo.NumberFormat.CurrencySymbol = "€";
 
             CultureInfo.DefaultThreadCurrentCulture = cultureInfo;
             CultureInfo.DefaultThreadCurrentUICulture = cultureInfo;
