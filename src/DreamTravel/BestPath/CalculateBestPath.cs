@@ -1,9 +1,8 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using DreamTravel.BestPath.Interfaces;
+﻿using DreamTravel.BestPath.Interfaces;
 using DreamTravel.BestPath.Models;
-using DreamTravel.ExternalConnection.Interfaces;
 using DreamTravel.SharedModels;
+using System.Collections.Generic;
+using System.Linq;
 using TravelingSalesmanProblem;
 using Path = DreamTravel.SharedModels.Path;
 
@@ -33,7 +32,7 @@ namespace DreamTravel.BestPath
             List<int> orderOfCities;
             if (optimizePath)
             {
-                orderOfCities = _tspSolver.SolveTSP(matrices.OptimalDistances);
+                orderOfCities = _tspSolver.SolveTSP(matrices.OptimalDistances.ToList());
             }
             else
             {

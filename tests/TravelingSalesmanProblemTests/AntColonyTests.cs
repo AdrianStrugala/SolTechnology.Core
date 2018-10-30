@@ -20,11 +20,11 @@ namespace TravelingSalesmanProblemTests
 
             for (int i = 0; i < noOfCities * noOfCities; i++)
             {
-                evaluationMatrix.OptimalDistances.Add(random.NextDouble() * 1000);
+                evaluationMatrix.OptimalDistances[i] = (random.NextDouble() * 1000);
             }
 
             //Act
-            var result = _sut.SolveTSP(evaluationMatrix.OptimalDistances);
+            var result = _sut.SolveTSP(evaluationMatrix.OptimalDistances.ToList());
 
             //Assert
             Assert.Equal(0, result[0]);
@@ -42,11 +42,11 @@ namespace TravelingSalesmanProblemTests
 
             for (int i = 0; i < noOfCities * noOfCities; i++)
             {
-                evaluationMatrix.OptimalDistances.Add(random.NextDouble() * 1000);
+                evaluationMatrix.OptimalDistances[i] = (random.NextDouble() * 1000);
             }
 
             //Act
-            var result = _sut.SolveTSP(evaluationMatrix.OptimalDistances);
+            var result = _sut.SolveTSP(evaluationMatrix.OptimalDistances.ToList());
 
             //Assert
             Assert.Equal(1, result.Count(i => i.Equals(0)));
