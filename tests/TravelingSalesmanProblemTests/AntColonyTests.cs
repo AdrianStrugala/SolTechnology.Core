@@ -25,7 +25,7 @@ namespace TravelingSalesmanProblemTests
             }
 
             //Act
-            var result = _sut.SolveTSP(evaluationMatrix.OptimalDistances);
+            var result = _sut.SolveTSP(evaluationMatrix.OptimalDistances.ToList());
 
             //Assert
             Assert.Equal(0, result[0]);
@@ -47,7 +47,7 @@ namespace TravelingSalesmanProblemTests
             }
 
             //Act
-            var result = _sut.SolveTSP(evaluationMatrix.OptimalDistances);
+            var result = _sut.SolveTSP(evaluationMatrix.OptimalDistances.ToList());
 
             //Assert
             Assert.Equal(1, result.Count(i => i.Equals(0)));

@@ -1,15 +1,15 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using DreamTravel.BestPath.Interfaces;
+﻿using DreamTravel.BestPath.Interfaces;
 using DreamTravel.SharedModels;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace DreamTravel.BestPath
 {
     public class FormOutputData : IFormOutputData
     {
-        public List<Path> Execute(List<City> listOfCities, int[] orderOfCities, IEvaluationMatrix evaluationMatrix)
+        public List<Path> Execute(List<City> listOfCities, List<int> orderOfCities, IEvaluationMatrix evaluationMatrix)
         {
-            int noOfCities = orderOfCities.Length;
+            int noOfCities = orderOfCities.Count;
             int noOfPaths = noOfCities - 1;
             List<Path> paths = new List<Path>();
 

@@ -29,7 +29,7 @@ namespace TravelingSalesmanProblemTests.Benchmark
 
             int noOfCities = (int)Math.Sqrt(distanceMatrix.Length);
 
-            List<int[]> tspResults = new List<int[]>();
+            List<List<int>> tspResults = new List<List<int>>();
             List<double> results = new List<double>();
 
 
@@ -37,7 +37,7 @@ namespace TravelingSalesmanProblemTests.Benchmark
             Stopwatch stopwatch = Stopwatch.StartNew();
             for (int i = 0; i < numberOfExecutions; i++)
             {
-                tspResults.Add(algorithm.SolveTSP(distanceMatrix));
+                tspResults.Add(algorithm.SolveTSP(distanceMatrix.ToList()));
             }
 
             var totalTime = stopwatch.Elapsed.TotalSeconds;

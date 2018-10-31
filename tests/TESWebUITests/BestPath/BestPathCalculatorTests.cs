@@ -1,10 +1,10 @@
-﻿using System.Collections.Generic;
-using DreamTravel.BestPath;
+﻿using DreamTravel.BestPath;
 using DreamTravel.BestPath.Interfaces;
 using DreamTravel.BestPath.Models;
 using DreamTravel.ExternalConnection.Interfaces;
 using DreamTravel.SharedModels;
 using NSubstitute;
+using System.Collections.Generic;
 using TravelingSalesmanProblem;
 using Xunit;
 
@@ -34,7 +34,7 @@ namespace DreamTravelITests.BestPath
             //Arrange
             _downloadRoadData.Execute(Arg.Any<List<City>>(), Arg.Any<EvaluationMatrix>()).Returns(new EvaluationMatrix(1));
             _evaluationBrain.Execute(Arg.Any<EvaluationMatrix>(), Arg.Any<int>()).Returns(new EvaluationMatrix(1));
-            _tspSolver.SolveTSP(Arg.Any<double[]>()).Returns(new int[1]);
+            _tspSolver.SolveTSP(Arg.Any<List<double>>()).Returns(new List<int> { 1 });
 
             List<City> cities = new List<City> { new City { Name = "Wroclaw", Latitude = 21, Longitude = 37 } };
 
@@ -46,7 +46,7 @@ namespace DreamTravelITests.BestPath
 
             _downloadRoadData.Received(1).Execute(Arg.Any<List<City>>(), Arg.Any<EvaluationMatrix>());
             _evaluationBrain.Received(1).Execute(Arg.Any<EvaluationMatrix>(), Arg.Any<int>());
-            _tspSolver.Received(1).SolveTSP(Arg.Any<double[]>());
+            _tspSolver.Received(1).SolveTSP(Arg.Any<List<double>>());
         }
 
         [Fact]
@@ -55,8 +55,8 @@ namespace DreamTravelITests.BestPath
             //Arrange
             _downloadRoadData.Execute(Arg.Any<List<City>>(), Arg.Any<EvaluationMatrix>()).Returns(new EvaluationMatrix(3));
             _evaluationBrain.Execute(Arg.Any<EvaluationMatrix>(), Arg.Any<int>()).Returns(new EvaluationMatrix(3));
-            int[] order = { 0, 2, 1 };
-            _tspSolver.SolveTSP(Arg.Any<double[]>()).Returns(order);
+            List<int> order = new List<int> { 0, 2, 1 };
+            _tspSolver.SolveTSP(Arg.Any<List<double>>()).Returns(order);
 
             List<City> cities = new List<City>
             {

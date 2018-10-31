@@ -1,9 +1,9 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using DreamTravel.BestPath.Interfaces;
+﻿using DreamTravel.BestPath.Interfaces;
 using DreamTravel.BestPath.Models;
 using DreamTravel.ExternalConnection.Interfaces;
 using DreamTravel.SharedModels;
+using System.Collections.Generic;
+using System.Linq;
 using TravelingSalesmanProblem;
 using Path = DreamTravel.SharedModels.Path;
 
@@ -30,14 +30,14 @@ namespace DreamTravel.BestPath
             matrices = _downloadRoadData.Execute(cities, matrices);
             matrices = _evaluationBrain.Execute(matrices, cities.Count);
 
-            int[] orderOfCities;
+            List<int> orderOfCities;
             if (optimizePath)
             {
-                orderOfCities = _tspSolver.SolveTSP(matrices.OptimalDistances);
+                orderOfCities = _tspSolver.SolveTSP(matrices.OptimalDistances.ToList());
             }
             else
             {
-                orderOfCities = Enumerable.Range(0, cities.Count).ToArray();
+                orderOfCities = Enumerable.Range(0, cities.Count).ToList();
             }
 
 

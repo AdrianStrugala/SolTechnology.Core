@@ -88,7 +88,7 @@ namespace TravelingSalesmanProblem
 
             List<double> probabilityMatrix = new List<double>(_matrixSize);
             probabilityMatrix = FillProbabilityMatrix(probabilityMatrix);
-            probabilityMatrix = ClearProbabilityRowsForFirstAndLastPoint(path, probabilityMatrix);
+            probabilityMatrix = ClearProbabilityRowsForFirstAndLastPoint(probabilityMatrix);
 
             //chosing next point until path is full
             for (int j = 1; j < _noOfCities - 1; j++)
@@ -117,12 +117,12 @@ namespace TravelingSalesmanProblem
         }
 
 
-        private List<double> ClearProbabilityRowsForFirstAndLastPoint(List<int> path, List<double> probabilityMatrix)
+        private List<double> ClearProbabilityRowsForFirstAndLastPoint(List<double> probabilityMatrix)
         {
             for (int i = 0; i < _noOfCities; i++)
             {
-                probabilityMatrix[path[path[0]] + i * _noOfCities] = 0;
-                probabilityMatrix[path[path[_noOfCities - 1]] + i * _noOfCities] = 0;
+                probabilityMatrix[_bestPath[0] + i * _noOfCities] = 0;
+                probabilityMatrix[_bestPath[_noOfCities - 1] + i * _noOfCities] = 0;
             }
             return probabilityMatrix;
         }
