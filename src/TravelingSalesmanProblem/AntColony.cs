@@ -54,7 +54,7 @@ namespace TravelingSalesmanProblem
         private void InitializeParameters(List<double> distances)
         {
             _bestPath = new List<int>(_noOfCities);
-            for (int i = 0; i < _noOfCities; i++) { _bestPath.Insert(i, i); }
+            for (int i = 0; i < _noOfCities; i++) { _bestPath.Add(i); }
             _pheromonePower = CalculateDistanceInPath(_bestPath, distances);
             _matrixSize = distances.Count;
             _attractivenessMatrix = new List<double>(_matrixSize);
