@@ -73,7 +73,7 @@ namespace TravelingSalesmanProblemTests.Benchmark
                 $"Minimal Distance: {benchmarkResult.MinimalDistance} \n" +
                 $"Average Distance: {benchmarkResult.AverageDistance} \n" +
                 $"Average Time: { benchmarkResult.AverageExecutionTime} ms \n" +
-                $"Recurrence: {benchmarkResult.Recurrence} %" +
+                $"Recurrence: {benchmarkResult.Recurrence} % \n" +
                 $"Benchmark entry status: {response.StatusCode}");
 
 
