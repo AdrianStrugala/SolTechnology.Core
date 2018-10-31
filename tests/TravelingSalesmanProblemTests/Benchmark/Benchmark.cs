@@ -56,6 +56,9 @@ namespace TravelingSalesmanProblemTests.Benchmark
                 results.Add(totalDistance);
             }
 
+            //Request to DreamTravel.Benchmark
+
+            var response = await _httpClient.PostAsJson(BenchmarkServiceUrl, benchmarkResult);
 
             //RESULTS
             benchmarkResult.Algorithm = nameOfAlgorithm;
@@ -70,11 +73,10 @@ namespace TravelingSalesmanProblemTests.Benchmark
                 $"Minimal Distance: {benchmarkResult.MinimalDistance} \n" +
                 $"Average Distance: {benchmarkResult.AverageDistance} \n" +
                 $"Average Time: { benchmarkResult.AverageExecutionTime} ms \n" +
-                $"Recurrence: {benchmarkResult.Recurrence} %");
+                $"Recurrence: {benchmarkResult.Recurrence} % \n" +
+                $"Request response status: {response.StatusCode}");
 
-            //Request to DreamTravel.Benchmark
 
-            await _httpClient.PostAsJson(BenchmarkServiceUrl, benchmarkResult);
         }
 
         public static async Task<HttpResponseMessage> PostAsJson(this HttpClient httpClient, string requestUri, object content)
