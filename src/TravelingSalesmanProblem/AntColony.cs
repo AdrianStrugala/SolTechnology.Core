@@ -21,7 +21,7 @@ namespace TravelingSalesmanProblem
         private int _matrixSize;
         private double[] _attractivenessMatrix;
         private double[] _trialsMatrix;
-        private List<int> _bestPath;
+        private int[] _bestPath;
         private static int _noOfCities;
 
         public override int[] SolveTSP(double[] distances)
@@ -31,7 +31,7 @@ namespace TravelingSalesmanProblem
             FillAttractivenessMatrix(distances);
             FillTrialsMatrix();
 
-            List<List<int>> pathList = new List<List<int>>(NoOfAnts);
+            List<int[]> pathList = new List<int[]>(NoOfAnts);
             //each iteration is one trip of the ants
             for (int j = 0; j < NoOfIterations; j++)
             {
@@ -53,8 +53,8 @@ namespace TravelingSalesmanProblem
 
         private void InitializeParameters(double[] distances)
         {
-            _bestPath = new List<int>(_noOfCities);
-            for (int i = 0; i < _noOfCities; i++) { _bestPath.Add(i); }
+            _bestPath = new int[_noOfCities];
+            for (int i = 0; i < _noOfCities; i++) { _bestPath[i] = i; }
             _pheromonePower = CalculateDistanceInPath(_bestPath, distances);
             _matrixSize = distances.Length;
             _trialsMatrix = new double[_matrixSize];
@@ -78,18 +78,23 @@ namespace TravelingSalesmanProblem
             }
         }
 
+        private static int[] InitalizePath(int noOfCities)
+        {
+            int[] path = new int[noOfCities];
+            for (int i = 0; i < noOfCities; i++) { path[i] = -1; }
+            return path;
+        }
+
 
         //REPRESENTATION OF ANT.
         //RETURNS PATH CHOSEN BY THIS ANT
-        private List<int> CalculatePathForSingleAnt()
+        private int[] CalculatePathForSingleAnt()
         {
-            List<int> path = new List<int>(_noOfCities);
-            path.Add(_bestPath[0]);
-
-            List<double> probabilityMatrix = new List<double>(_matrixSize);
-
+            double[] probabilityMatrix = new double[_matrixSize];
+            int[] path = InitalizePath(_noOfCities);
+            path = SetFirstAndLastPointInPath(path);
             probabilityMatrix = FillProbabilityMatrix(probabilityMatrix);
-            probabilityMatrix = ClearProbabilityRowsForFirstAndLastPoint(probabilityMatrix);
+            probabilityMatrix = ClearProbabilityRowsForFirstAndLastPoint(path, probabilityMatrix);
 
             //chosing next point until path is full
             for (int j = 1; j < _noOfCities - 1; j++)
@@ -98,12 +103,20 @@ namespace TravelingSalesmanProblem
                 row = NormalizeProbabilityValues(row);
                 row = SortRowByProbability(row);
 
-                path.Add(DrawNewPointByProbability(row, path));
+                path[j] = DrawNewPointByProbability(row, path);
                 probabilityMatrix = ClearProbabilityRowsForGivenPoint(path[j], probabilityMatrix);
             }
-
             return path;
         }
+
+
+        private int[] SetFirstAndLastPointInPath(int[] path)
+        {
+            path[0] = _bestPath[0];
+            path[path.Length - 1] = _bestPath[path.Length - 1];
+            return path;
+        }
+
 
         private double[] FillProbabilityMatrix(double[] probabilityMatrix)
         {
@@ -116,24 +129,23 @@ namespace TravelingSalesmanProblem
         }
 
 
-
-        private List<double> ClearProbabilityRowsForFirstAndLastPoint(List<double> probabilityMatrix)
+        private double[] ClearProbabilityRowsForFirstAndLastPoint(int[] path, double[] probabilityMatrix)
         {
             for (int i = 0; i < _noOfCities; i++)
             {
-                probabilityMatrix[_bestPath[0] + i * _noOfCities] = 0;
-                probabilityMatrix[_bestPath[_noOfCities - 1] + i * _noOfCities] = 0;
+                probabilityMatrix[path[path[0]] + i * _noOfCities] = 0;
+                probabilityMatrix[path[path[_noOfCities - 1]] + i * _noOfCities] = 0;
             }
             return probabilityMatrix;
         }
 
 
-        private VertexAndProbability[] CopyRowFromProbabilityMatrix(int q, List<int> path, double[] probabilityMatrix)
+        private VertexAndProbability[] CopyRowFromProbabilityMatrix(int q, int[] path, double[] probabilityMatrix)
         {
             VertexAndProbability[] result = new VertexAndProbability[_noOfCities];
             for (int i = 0; i < _noOfCities; i++)
             {
-                result[i] = new VertexAndProbability
+                result[i] = new VertexAndProbability()
                 {
                     Probability = probabilityMatrix[path[q - 1] * _noOfCities + i],
                     Vertex = i
@@ -163,7 +175,7 @@ namespace TravelingSalesmanProblem
         }
 
 
-        private int DrawNewPointByProbability(VertexAndProbability[] row, List<int> path)
+        private int DrawNewPointByProbability(VertexAndProbability[] row, int[] path)
         {
             double randomLessThan1 = StaticRandom.RandomDouble();
             double sum = 0;
@@ -198,7 +210,7 @@ namespace TravelingSalesmanProblem
         }
 
 
-        private void UpdateTrialsMatrix(List<int> path, double[] distances)
+        private void UpdateTrialsMatrix(int[] path, double[] distances)
         {
             for (int i = 0; i < _noOfCities - 1; i++)
             {
