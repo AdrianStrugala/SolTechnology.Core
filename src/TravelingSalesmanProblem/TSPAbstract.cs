@@ -6,19 +6,14 @@ namespace TravelingSalesmanProblem
 {
     public abstract class TSPAbstract : ITSP
     {
-        public abstract int[] SolveTSP(double[] distances);
+        public abstract List<int> SolveTSP(List<double> distances);
 
-        protected static int[] FindRandomRoute(int noOfCities)
+        protected static List<int> FindRandomRoute(int noOfCities)
         {
             List<int> toDraw = new List<int>();
 
-            int[] foundPath = new int[noOfCities];
-            for (int i = 0; i < noOfCities; i++)
-            {
-                foundPath[i] = -1;
-            }
-
-            foundPath[0] = 0;
+            List<int> foundPath = new List<int>(noOfCities);
+            foundPath.Add(0);
 
             for (int i = 1; i < noOfCities - 1; i++)
             {
@@ -28,22 +23,22 @@ namespace TravelingSalesmanProblem
             for (int i = 1; i < noOfCities - 1; i++)
             {
                 int draw = toDraw[StaticRandom.Rand(toDraw.Count)];
-                foundPath[i] = draw;
+                foundPath.Add(draw);
                 toDraw.Remove(draw);
             }
 
-            foundPath[noOfCities - 1] = noOfCities - 1;
+            foundPath.Add(noOfCities - 1);
             return foundPath;
         }
 
-        protected int[] FindMinimumPathInListOfPaths(IEnumerable<int[]> pathList, double[] distances, int noOfCities)
+        protected List<int> FindMinimumPathInListOfPaths(IEnumerable<List<int>> pathList, List<double> distances, int noOfCities)
         {
             double min = double.MaxValue;
-            int[] resultPath = new int[noOfCities];
+            List<int> resultPath = new List<int>();
 
             foreach (var path in pathList)
             {
-                if (path != null && path.Length == noOfCities)
+                if (path != null && path.Count == noOfCities)
                 {
                     double distance = CalculateDistanceInPath(path, distances);
                     if (distance < min)
@@ -56,15 +51,15 @@ namespace TravelingSalesmanProblem
             return resultPath;
         }
 
-        public double CalculateDistanceInPath(int[] path, double[] distances)
+        public double CalculateDistanceInPath(List<int> path, List<double> distances)
         {
             double result = 0;
 
             if (path != null)
             {
-                for (int i = 0; i < path.Length - 1; i++)
+                for (int i = 0; i < path.Count - 1; i++)
                 {
-                    result += distances[path[i] * path.Length + path[i + 1]];
+                    result += distances[path[i] * path.Count + path[i + 1]];
                 }
             }
             return result;
