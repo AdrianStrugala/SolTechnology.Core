@@ -1,5 +1,5 @@
 God: 4 Cities 
 Minimal Distance: 103983 
 Average Distance: 103983 
-Average Time: 6.155E-05 s 
+Average Time: 0 ms 
 Recurrence: 100 %

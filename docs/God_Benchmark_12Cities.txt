@@ -1,5 +1,5 @@
 God: 12 Cities 
 Minimal Distance: 134999 
-Average Distance: 136425 
-Average Time: 0.70071834 s 
-Recurrence: 24 %
+Average Distance: 136925 
+Average Time: 880 ms 
+Recurrence: 16 %
