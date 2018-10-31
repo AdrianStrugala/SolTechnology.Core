@@ -36,14 +36,14 @@ namespace TravelingSalesmanProblem
             return foundPath;
         }
 
-        protected int[] FindMinimumPathInListOfPaths(IEnumerable<int[]> pathList, double[] distances, int noOfCities)
+        protected List<int> FindMinimumPathInListOfPaths(IEnumerable<List<int>> pathList, double[] distances, int noOfCities)
         {
             double min = double.MaxValue;
-            int[] resultPath = new int[noOfCities];
+            List<int> resultPath = new List<int>(noOfCities);
 
             foreach (var path in pathList)
             {
-                if (path != null && path.Length == noOfCities)
+                if (path != null && path.Count == noOfCities)
                 {
                     double distance = CalculateDistanceInPath(path, distances);
                     if (distance < min)
@@ -56,15 +56,15 @@ namespace TravelingSalesmanProblem
             return resultPath;
         }
 
-        public double CalculateDistanceInPath(int[] path, double[] distances)
+        public double CalculateDistanceInPath(List<int> path, double[] distances)
         {
             double result = 0;
 
             if (path != null)
             {
-                for (int i = 0; i < path.Length - 1; i++)
+                for (int i = 0; i < path.Count - 1; i++)
                 {
-                    result += distances[path[i] * path.Length + path[i + 1]];
+                    result += distances[path[i] * path.Count + path[i + 1]];
                 }
             }
             return result;

@@ -1,5 +1,6 @@
 AntColony: 16 Cities 
 Minimal Distance: 111011 
-Average Distance: 111053.65 
-Average Time: 0.457468017 s 
-Recurrence: 89 %
+Average Distance: 111038 
+Average Time: 600 ms 
+Recurrence: 90 % 
+Request response status: BadRequest
