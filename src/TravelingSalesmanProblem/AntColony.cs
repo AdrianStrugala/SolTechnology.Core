@@ -78,23 +78,17 @@ namespace TravelingSalesmanProblem
             }
         }
 
-        private List<int> InitializePath(int noOfCities)
-        {
-            List<int> path = new List<int>(noOfCities);
-            for (int i = 0; i < noOfCities; i++) { path.Add(-1); }
-            return path;
-        }
-
 
         //REPRESENTATION OF ANT.
         //RETURNS PATH CHOSEN BY THIS ANT
         private List<int> CalculatePathForSingleAnt()
         {
+            List<int> path = new List<int>(_noOfCities);
+            path.Add(_bestPath[0]);
+
             List<double> probabilityMatrix = new List<double>(_matrixSize);
-            List<int> path = InitializePath(_noOfCities);
-            path = SetFirstAndLastPointInPath(path);
             probabilityMatrix = FillProbabilityMatrix(probabilityMatrix);
-            probabilityMatrix = ClearProbabilityRowsForFirstAndLastPoint(path, probabilityMatrix);
+            probabilityMatrix = ClearProbabilityRowsForFirstAndLastPoint(probabilityMatrix);
 
             //chosing next point until path is full
             for (int j = 1; j < _noOfCities - 1; j++)
@@ -103,17 +97,11 @@ namespace TravelingSalesmanProblem
                 row = NormalizeProbabilityValues(row);
                 row = SortRowByProbability(row);
 
-                path[j] = DrawNewPointByProbability(row, path);
+                path.Add(DrawNewPointByProbability(row, path));
                 probabilityMatrix = ClearProbabilityRowsForGivenPoint(path[j], probabilityMatrix);
             }
-            return path;
-        }
 
-
-        private List<int> SetFirstAndLastPointInPath(List<int> path)
-        {
-            path[0] = _bestPath[0];
-            path[_noOfCities - 1] = _bestPath[_noOfCities - 1];
+            path.Add(_bestPath[_noOfCities - 1]);
             return path;
         }
 
@@ -129,12 +117,12 @@ namespace TravelingSalesmanProblem
         }
 
 
-        private List<double> ClearProbabilityRowsForFirstAndLastPoint(List<int> path, List<double> probabilityMatrix)
+        private List<double> ClearProbabilityRowsForFirstAndLastPoint(List<double> probabilityMatrix)
         {
             for (int i = 0; i < _noOfCities; i++)
             {
-                probabilityMatrix[path[path[0]] + i * _noOfCities] = 0;
-                probabilityMatrix[path[path[_noOfCities - 1]] + i * _noOfCities] = 0;
+                probabilityMatrix[_bestPath[0] + i * _noOfCities] = 0;
+                probabilityMatrix[_bestPath[_noOfCities - 1] + i * _noOfCities] = 0;
             }
             return probabilityMatrix;
         }
@@ -145,7 +133,7 @@ namespace TravelingSalesmanProblem
             VertexAndProbability[] result = new VertexAndProbability[_noOfCities];
             for (int i = 0; i < _noOfCities; i++)
             {
-                result[i] = new VertexAndProbability()
+                result[i] = new VertexAndProbability
                 {
                     Probability = probabilityMatrix[path[q - 1] * _noOfCities + i],
                     Vertex = i
