@@ -101,7 +101,7 @@ namespace TravelingSalesmanProblem
                 probabilityMatrix = ClearProbabilityRowsForGivenPoint(path[j], probabilityMatrix);
             }
 
-            path.Add(_bestPath[path.Count - 1]);
+            path.Add(_bestPath[_noOfCities - 1]);
             return path;
         }
 

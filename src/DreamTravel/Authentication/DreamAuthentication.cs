@@ -1,11 +1,11 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Authentication;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using System;
 using System.Net.Http.Headers;
 using System.Security.Claims;
 using System.Text.Encodings.Web;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authentication;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 
 namespace DreamTravel.Authentication
 {
@@ -64,7 +64,7 @@ namespace DreamTravel.Authentication
             var ticket = new AuthenticationTicket(principal, Scheme.Name);
 
             _logger.LogInformation($"Authenticated user: [{principal}]");
-            return AuthenticateResult.Success(ticket);
+            return await Task.FromResult(AuthenticateResult.Success(ticket));
         }
 
         public static string Base64Decode(string base64EncodedData)

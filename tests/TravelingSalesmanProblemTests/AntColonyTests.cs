@@ -6,9 +6,10 @@ using Xunit;
 
 namespace TravelingSalesmanProblemTests
 {
+    [Collection("Benchmark")]
     public class AntColonyTests
     {
-        readonly TravelingSalesmanProblem.AntColony _sut = new TravelingSalesmanProblem.AntColony();
+        readonly AntColony _sut = new AntColony();
 
         [Fact]
         public void SolveTSP_RunWithValidParameters_FirstAndLastCitiesStaysTheSame()
