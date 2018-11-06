@@ -13,6 +13,7 @@
     <Content Remove="wwwroot\js\DisplayMarkerHandler.ts" />
     <Content Remove="wwwroot\js\DisplayRouteHandler.ts" />
     <Content Remove="wwwroot\js\FindCityNameHandler.ts" />
+    <Content Remove="wwwroot\js\Instruction.ts" />
     <Content Remove="wwwroot\js\LimitCostHandler.ts" />
     <Content Remove="wwwroot\js\RunTSPHandler.ts" />
     <Content Remove="wwwroot\js\UpdateCityHandler.ts" />
@@ -53,6 +54,7 @@
     <TypeScriptCompile Include="wwwroot\js\DisplayMarkerHandler.ts" />
     <TypeScriptCompile Include="wwwroot\js\DisplayRouteHandler.ts" />
     <TypeScriptCompile Include="wwwroot\js\FindCityNameHandler.ts" />
+    <TypeScriptCompile Include="wwwroot\js\Instruction.ts" />
     <TypeScriptCompile Include="wwwroot\js\LimitCostHandler.ts" />
     <TypeScriptCompile Include="wwwroot\js\RunTSPHandler.ts" />
     <TypeScriptCompile Include="wwwroot\js\UpdateCityHandler.ts" />
