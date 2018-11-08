@@ -7,10 +7,10 @@
     margin: auto;
 }
 
-/* Hide the images by default */
-.mySlides {
-    display: none;
-}
+ /* Hide the images by default  */
+ .mySlides { 
+     display: none; 
+ } 
 
 /* Next & previous buttons */
 .prev, .next {
@@ -74,20 +74,20 @@
     background-color: #717171;
 }
 
-/* Fading animation */
-.fade {
-    -webkit-animation-name: fade;
-    -webkit-animation-duration: 1.5s;
-    animation-name: fade;
-    animation-duration: 1.5s;
-}
+ Fading animation 
+ .fade { 
+     -webkit-animation-name: fade; 
+     -webkit-animation-duration: 1.5s; 
+     animation-name: fade; 
+     animation-duration: 1.5s; 
+ } 
 
-@-webkit-keyframes fade {
-    from {opacity: .4} 
-    to {opacity: 1}
-}
-
-@keyframes fade {
-    from {opacity: .4} 
-    to {opacity: 1}
-}
+ @-webkit-keyframes fade { 
+     from {opacity: .4}  
+     to {opacity: 1} 
+ } 
+ 
+ @keyframes fade { 
+     from {opacity: .4}  
+     to {opacity: 1} 
+ } 
