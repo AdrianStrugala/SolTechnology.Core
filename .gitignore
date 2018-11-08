@@ -38,3 +38,4 @@ src/DreamTravel/wwwroot/js/Utils/Pad2.js
 src/DreamTravel/wwwroot/js/Utils/Sleep.js
 src/DreamTravel/wwwroot/js/WritePathInfoHandler.js
 src/DreamTravel/wwwroot/js/WriteSummaryInfoHandler.js
+src/DreamTravel/wwwroot/js/Instruction.js
