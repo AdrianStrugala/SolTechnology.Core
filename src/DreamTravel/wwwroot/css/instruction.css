@@ -7,10 +7,14 @@
     margin: auto;
 }
 
- /* Hide the images by default  */
- .mySlides { 
-     display: none; 
- }
+#instructionBtn {
+    font-size: 1.5rem;
+    padding: 0rem 0.75rem 0rem;
+}
+/* Hide the images by default  */
+.mySlides {
+    display: none;
+}
 
 .prev {
     font-size: 30px;
