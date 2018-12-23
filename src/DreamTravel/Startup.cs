@@ -1,5 +1,4 @@
-﻿using System.Globalization;
-using DreamTravel.Authentication;
+﻿using DreamTravel.Authentication;
 using DreamTravel.BestPath;
 using DreamTravel.BestPath.DataAccess;
 using DreamTravel.BestPath.Interfaces;
@@ -19,12 +18,17 @@ using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using System.Globalization;
 using TravelingSalesmanProblem;
 
 namespace DreamTravel
 {
+    using System;
+
     public class Startup
     {
+        public static Action<IServiceCollection> RegisterServices;
+
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
@@ -73,6 +77,9 @@ namespace DreamTravel
                     null);
             services.Configure<DreamAuthenticationOptions>(DreamAuthenticationOptions.AuthenticationScheme, configurationRoot);
             services.AddSingleton<IAuthenticationHandler, DreamAuthentication>();
+
+            RegisterServices?.Invoke(services);
+            RegisterServices = null;
         }
 
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)

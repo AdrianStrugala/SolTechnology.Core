@@ -1,19 +1,19 @@
 ﻿{
   "God": {
-    "TwoCities": true,
-    "FourCities": true,
-    "EightCities": true,
-    "TwelveCities": true,
-    "SixteenCities": true,
+    "TwoCities": false,
+    "FourCities": false,
+    "EightCities": false,
+    "TwelveCities": false,
+    "SixteenCities": false,
     "TwentyCities": false
   },
 
   "AntColony": {
-    "TwoCities": true,
-    "FourCities": true,
-    "EightCities": true,
-    "TwelveCities": true,
-    "SixteenCities": true,
-    "TwentyCities": true
+    "TwoCities": false,
+    "FourCities": false,
+    "EightCities": false,
+    "TwelveCities": false,
+    "SixteenCities": false,
+    "TwentyCities": false
   }
 }

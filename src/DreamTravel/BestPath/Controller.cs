@@ -1,11 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using DreamTravel.BestPath.Interfaces;
+﻿using DreamTravel.BestPath.Interfaces;
 using DreamTravel.SharedModels;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+using System;
+using System.Collections.Generic;
 
 namespace DreamTravel.BestPath
 {
@@ -28,14 +28,14 @@ namespace DreamTravel.BestPath
 
 
         [HttpPost]
-        public IActionResult CalculateBestPath(List<City> cities, string sessionId, bool optimizePath)
+        public IActionResult CalculateBestPath([FromBody]Query query)
         {
             try
             {
                 _logger.LogInformation("TSP Engine: Fire!");
-                List<Path> paths = _calculateBestPath.Execute(cities, optimizePath);
+                List<Path> paths = _calculateBestPath.Execute(query.Cities, query.OptimizePath);
 
-                HttpContext.Session.SetString(sessionId + PathsKeyName, JsonConvert.SerializeObject(paths));
+                HttpContext.Session.SetString(query.SessionId + PathsKeyName, JsonConvert.SerializeObject(paths));
 
                 string message = JsonConvert.SerializeObject(paths);
                 return Ok(message);

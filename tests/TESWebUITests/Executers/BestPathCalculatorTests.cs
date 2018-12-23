@@ -1,15 +1,14 @@
-﻿using DreamTravel.BestPath;
-using DreamTravel.BestPath.Interfaces;
-using DreamTravel.BestPath.Models;
-using DreamTravel.ExternalConnection.Interfaces;
-using DreamTravel.SharedModels;
-using NSubstitute;
-using System.Collections.Generic;
-using TravelingSalesmanProblem;
-using Xunit;
-
-namespace DreamTravelITests.BestPath
+﻿namespace DreamTravelITests.Executers
 {
+    using System.Collections.Generic;
+    using DreamTravel.BestPath;
+    using DreamTravel.BestPath.Interfaces;
+    using DreamTravel.BestPath.Models;
+    using DreamTravel.ExternalConnection.Interfaces;
+    using DreamTravel.SharedModels;
+    using NSubstitute;
+    using TravelingSalesmanProblem;
+    using Xunit;
 
     public class BestPathCalculatorTests
     {

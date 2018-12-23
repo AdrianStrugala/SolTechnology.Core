@@ -76,7 +76,7 @@ namespace DreamTravel.Authentication
             }
             catch (FormatException e)
             {
-                _logger.LogWarning($"Incoming key [{base64EncodedData}] was in incorrenct format, {e}");
+                _logger.LogWarning($"Incoming key [{base64EncodedData}] was in incorrect format, {e}");
             }
 
             return System.Text.Encoding.UTF8.GetString(base64EncodedBytes);
