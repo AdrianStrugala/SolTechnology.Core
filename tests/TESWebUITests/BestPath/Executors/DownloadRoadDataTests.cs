@@ -1,16 +1,17 @@
-using System.Collections.Generic;
-using DreamTravel.BestPath.DataAccess;
-using DreamTravel.BestPath.Interfaces;
-using DreamTravel.BestPath.Models;
-using DreamTravel.SharedModels;
-using NSubstitute;
-using Xunit;
-
-namespace DreamTravelITests.BestPath
+namespace DreamTravelITests.BestPath.Executors
 {
+    using System.Collections.Generic;
+    using DreamTravel.BestPath.DataAccess;
+    using DreamTravel.BestPath.Executors;
+    using DreamTravel.BestPath.Interfaces;
+    using DreamTravel.BestPath.Models;
+    using DreamTravel.SharedModels;
+    using NSubstitute;
+    using Xunit;
+
     public class DownloadRoadDataTests
     {
-        private readonly DreamTravel.ExternalConnection.DownloadRoadData _sut;
+        private readonly DownloadRoadData _sut;
 
         public DownloadRoadDataTests()
         {
@@ -18,7 +19,7 @@ namespace DreamTravelITests.BestPath
             IDownloadDurationMatrixByFreeRoad downloadDurationMatrixByFreeRoad = Substitute.For<DownloadDurationMatrixByFreeRoad>();
             IDownloadCostBetweenTwoCities downloadCostBetweenTwoCities = Substitute.For<DownloadCostBetweenTwoCities>();
 
-            _sut = new DreamTravel.ExternalConnection.DownloadRoadData(downloadDurationMatrixByTollRoad, downloadDurationMatrixByFreeRoad, downloadCostBetweenTwoCities);
+            _sut = new DownloadRoadData(downloadDurationMatrixByTollRoad, downloadDurationMatrixByFreeRoad, downloadCostBetweenTwoCities);
         }
 
 

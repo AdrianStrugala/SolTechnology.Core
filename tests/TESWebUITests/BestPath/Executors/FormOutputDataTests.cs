@@ -1,11 +1,11 @@
-using DreamTravel.BestPath;
-using DreamTravel.BestPath.Models;
-using DreamTravel.SharedModels;
-using System.Collections.Generic;
-using Xunit;
-
-namespace DreamTravelITests.BestPath
+namespace DreamTravelITests.BestPath.Executors
 {
+    using System.Collections.Generic;
+    using DreamTravel.BestPath.Executors;
+    using DreamTravel.BestPath.Models;
+    using DreamTravel.SharedModels;
+    using Xunit;
+
     public class FormOutputDataTests
     {
         private readonly FormOutputData _sut = new FormOutputData();

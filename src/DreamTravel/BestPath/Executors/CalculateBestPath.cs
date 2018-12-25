@@ -1,14 +1,13 @@
-﻿using DreamTravel.BestPath.Interfaces;
-using DreamTravel.BestPath.Models;
-using DreamTravel.ExternalConnection.Interfaces;
-using DreamTravel.SharedModels;
-using System.Collections.Generic;
-using System.Linq;
-using TravelingSalesmanProblem;
-using Path = DreamTravel.SharedModels.Path;
+﻿using Path = DreamTravel.SharedModels.Path;
 
-namespace DreamTravel.BestPath
+namespace DreamTravel.BestPath.Executors
 {
+    using System.Collections.Generic;
+    using System.Linq;
+    using Interfaces;
+    using Models;
+    using TravelingSalesmanProblem;
+
     public class CalculateBestPath : ICalculateBestPath
     {
         private readonly IDownloadRoadData _downloadRoadData;
@@ -24,27 +23,27 @@ namespace DreamTravel.BestPath
             _evaluationBrain = evaluationBrain;
         }
 
-        public List<Path> Execute(List<City> cities, bool optimizePath)
+        public List<Path> Execute(Command command)
         {
-            EvaluationMatrix matrices = new EvaluationMatrix(cities.Count);
-            matrices = _downloadRoadData.Execute(cities, matrices);
-            matrices = _evaluationBrain.Execute(matrices, cities.Count);
+            EvaluationMatrix matrices = new EvaluationMatrix(command.Cities.Count);
+            matrices = _downloadRoadData.Execute(command.Cities, matrices);
+            matrices = _evaluationBrain.Execute(matrices, command.Cities.Count);
 
             List<int> orderOfCities;
-            if (optimizePath)
+            if (command.OptimizePath)
             {
                 orderOfCities = _tspSolver.SolveTSP(matrices.OptimalDistances.ToList());
             }
             else
             {
-                orderOfCities = Enumerable.Range(0, cities.Count).ToList();
+                orderOfCities = Enumerable.Range(0, command.Cities.Count).ToList();
             }
 
 
             //to have a possiblity to store cities data
             // File.WriteAllText("./twentyCities.txt", JsonConvert.SerializeObject(matrices.OptimalDistances));
 
-            var result = _formOutputData.Execute(cities, orderOfCities, matrices);
+            var result = _formOutputData.Execute(command.Cities, orderOfCities, matrices);
             return result;
         }
 

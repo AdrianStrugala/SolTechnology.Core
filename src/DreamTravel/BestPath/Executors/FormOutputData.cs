@@ -1,10 +1,10 @@
-﻿using DreamTravel.BestPath.Interfaces;
-using DreamTravel.SharedModels;
-using System.Collections.Generic;
-using System.Linq;
-
-namespace DreamTravel.BestPath
+﻿namespace DreamTravel.BestPath.Executors
 {
+    using System.Collections.Generic;
+    using System.Linq;
+    using Interfaces;
+    using SharedModels;
+
     public class FormOutputData : IFormOutputData
     {
         public List<Path> Execute(List<City> listOfCities, List<int> orderOfCities, IEvaluationMatrix evaluationMatrix)

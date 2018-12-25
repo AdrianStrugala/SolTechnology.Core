@@ -33,7 +33,13 @@ namespace DreamTravel.BestPath
             try
             {
                 _logger.LogInformation("TSP Engine: Fire!");
-                List<Path> paths = _calculateBestPath.Execute(query.Cities, query.OptimizePath);
+
+                Command command = new Command
+                {
+                    Cities = query.Cities,
+                    OptimizePath = query.OptimizePath
+                };                
+                List<Path> paths = _calculateBestPath.Execute(command);
 
                 HttpContext.Session.SetString(query.SessionId + PathsKeyName, JsonConvert.SerializeObject(paths));
 

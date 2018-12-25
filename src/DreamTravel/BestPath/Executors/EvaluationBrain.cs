@@ -1,9 +1,9 @@
-﻿using System.Threading.Tasks;
-using DreamTravel.BestPath.Interfaces;
-using DreamTravel.BestPath.Models;
-
-namespace DreamTravel.BestPath
+﻿namespace DreamTravel.BestPath.Executors
 {
+    using System.Threading.Tasks;
+    using Interfaces;
+    using Models;
+
     public class EvaluationBrain : IEvaluationBrain
     {
         private static double FuelPrice { get; } = 1.26;

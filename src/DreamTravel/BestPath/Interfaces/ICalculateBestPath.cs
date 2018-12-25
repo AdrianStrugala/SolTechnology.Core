@@ -5,6 +5,6 @@ namespace DreamTravel.BestPath.Interfaces
 {
     public interface ICalculateBestPath
     {
-        List<Path> Execute(List<City> cities, bool optimizePath);
+        List<Path> Execute(Command command);
     }
 }

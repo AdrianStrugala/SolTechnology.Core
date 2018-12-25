@@ -1,10 +1,10 @@
-﻿using System;
-using DreamTravel.BestPath;
-using DreamTravel.BestPath.Models;
-using Xunit;
-
-namespace DreamTravelITests.BestPath
+﻿namespace DreamTravelITests.BestPath.Executors
 {
+    using System;
+    using DreamTravel.BestPath.Executors;
+    using DreamTravel.BestPath.Models;
+    using Xunit;
+
     public class EvaluationBrainTests
     {
         private readonly EvaluationBrain _sut;

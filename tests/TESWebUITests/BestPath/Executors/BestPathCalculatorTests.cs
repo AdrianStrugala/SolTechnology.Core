@@ -1,12 +1,12 @@
-﻿namespace DreamTravelITests.Executers
+﻿namespace DreamTravelITests.BestPath.Executors
 {
-    using System.Collections.Generic;
     using DreamTravel.BestPath;
+    using DreamTravel.BestPath.Executors;
     using DreamTravel.BestPath.Interfaces;
     using DreamTravel.BestPath.Models;
-    using DreamTravel.ExternalConnection.Interfaces;
     using DreamTravel.SharedModels;
     using NSubstitute;
+    using System.Collections.Generic;
     using TravelingSalesmanProblem;
     using Xunit;
 
@@ -37,8 +37,10 @@
 
             List<City> cities = new List<City> { new City { Name = "Wroclaw", Latitude = 21, Longitude = 37 } };
 
+            Command command = new Command { Cities = cities, OptimizePath = true };
+
             //Act
-            var result = _sut.Execute(cities, true);
+            var result = _sut.Execute(command);
 
             //Assert
             Assert.NotNull(result);
@@ -64,8 +66,10 @@
                 new City { Name = "WroclawSouth", Latitude = 20, Longitude = 37 }
             };
 
+            Command command = new Command { Cities = cities, OptimizePath = false };
+
             //Act
-            var result = _sut.Execute(cities, false);
+            var result = _sut.Execute(command);
 
             //Assert
             Assert.NotNull(result);
