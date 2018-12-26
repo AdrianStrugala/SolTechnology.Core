@@ -1,19 +1,22 @@
 ﻿using DreamTravel.BestPath.Interfaces;
-using DreamTravel.SharedModels;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using System;
-using System.Collections.Generic;
 
 namespace DreamTravel.BestPath
 {
+    using SharedModels;
+    using System.Collections.Generic;
+
     [Route(Route)]
     public class Controller : Microsoft.AspNetCore.Mvc.Controller
     {
         public const string Route = "api/CalculateBestPath";
         private const string PathsKeyName = "_Paths";
+        private const string CitiesKeyName = "_Cities";
+        private const string AllPathsKeyName = "_AllPaths";
 
         private readonly ICalculateBestPath _calculateBestPath;
         private readonly ILogger<Controller> _logger;
@@ -28,22 +31,34 @@ namespace DreamTravel.BestPath
 
 
         [HttpPost]
-        public IActionResult CalculateBestPath([FromBody]Query query)
+        public IActionResult CalculateBestPath(Query query)
         {
             try
             {
                 _logger.LogInformation("TSP Engine: Fire!");
-
                 Command command = new Command
                 {
                     Cities = query.Cities,
                     OptimizePath = query.OptimizePath
-                };                
-                List<Path> bestPaths = _calculateBestPath.Execute(command).BestPaths;
+                };
 
-                HttpContext.Session.SetString(query.SessionId + PathsKeyName, JsonConvert.SerializeObject(bestPaths));
+                try
+                {
+                    command.KnownCities = JsonConvert.DeserializeObject<List<City>>(HttpContext.Session.GetString(query.SessionId + CitiesKeyName));
+                }
+                catch (Exception)
+                {
+                    _logger.LogInformation($"No cities saved for session: {query.SessionId}");
+                }
 
-                string message = JsonConvert.SerializeObject(bestPaths);
+
+                Result result = _calculateBestPath.Execute(command);
+
+                HttpContext.Session.SetString(query.SessionId + PathsKeyName, JsonConvert.SerializeObject(result.BestPaths));
+                HttpContext.Session.SetString(query.SessionId + CitiesKeyName, JsonConvert.SerializeObject(result.Cities));
+                HttpContext.Session.SetString(query.SessionId + AllPathsKeyName, JsonConvert.SerializeObject(result.AllPaths));
+
+                string message = JsonConvert.SerializeObject(result.BestPaths);
                 return Ok(message);
             }
 
