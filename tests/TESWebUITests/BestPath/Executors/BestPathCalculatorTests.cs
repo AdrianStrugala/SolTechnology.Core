@@ -20,7 +20,7 @@
         public BestPathCalculatorTests()
         {
             _downloadRoadData = Substitute.For<IDownloadRoadData>();
-            IFormOutputData formOutputData = new FormOutputData();
+            IFormOutputData formOutputData = new FormPathsFromMatrices();
             _tspSolver = Substitute.For<ITSP>();
             _evaluationBrain = Substitute.For<IEvaluationBrain>();
 
@@ -69,7 +69,7 @@
             Command command = new Command { Cities = cities, OptimizePath = false };
 
             //Act
-            var result = _sut.Execute(command);
+            var result = _sut.Execute(command).BestPaths;
 
             //Assert
             Assert.NotNull(result);

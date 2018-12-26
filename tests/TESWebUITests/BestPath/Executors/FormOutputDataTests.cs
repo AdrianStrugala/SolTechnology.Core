@@ -8,7 +8,7 @@ namespace DreamTravelITests.BestPath.Executors
 
     public class FormOutputDataTests
     {
-        private readonly FormOutputData _sut = new FormOutputData();
+        private readonly FormPathsFromMatrices _sut = new FormPathsFromMatrices();
 
         [Fact]
         public void GetDurationBetweenTwoCitiesByTollRoad_InvokeWithValidCities_ReturnsSomeDuration()
@@ -43,7 +43,7 @@ namespace DreamTravelITests.BestPath.Executors
             EvaluationMatrix evaluationMatrix = new EvaluationMatrix(noOfCities);
 
             //Act
-            var result = _sut.Execute(listOfCities, orderOfCities, evaluationMatrix);
+            var result = _sut.Execute(listOfCities, evaluationMatrix, orderOfCities);
 
             //Assert
             Assert.Equal(noOfCities - 1, result.Count);

@@ -39,11 +39,11 @@ namespace DreamTravel.BestPath
                     Cities = query.Cities,
                     OptimizePath = query.OptimizePath
                 };                
-                List<Path> paths = _calculateBestPath.Execute(command);
+                List<Path> bestPaths = _calculateBestPath.Execute(command).BestPaths;
 
-                HttpContext.Session.SetString(query.SessionId + PathsKeyName, JsonConvert.SerializeObject(paths));
+                HttpContext.Session.SetString(query.SessionId + PathsKeyName, JsonConvert.SerializeObject(bestPaths));
 
-                string message = JsonConvert.SerializeObject(paths);
+                string message = JsonConvert.SerializeObject(bestPaths);
                 return Ok(message);
             }
 

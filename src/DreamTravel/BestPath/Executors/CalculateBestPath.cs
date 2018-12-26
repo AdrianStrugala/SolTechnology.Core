@@ -1,11 +1,9 @@
-﻿using Path = DreamTravel.SharedModels.Path;
-
-namespace DreamTravel.BestPath.Executors
+﻿namespace DreamTravel.BestPath.Executors
 {
-    using System.Collections.Generic;
-    using System.Linq;
     using Interfaces;
     using Models;
+    using System.Collections.Generic;
+    using System.Linq;
     using TravelingSalesmanProblem;
 
     public class CalculateBestPath : ICalculateBestPath
@@ -23,7 +21,7 @@ namespace DreamTravel.BestPath.Executors
             _evaluationBrain = evaluationBrain;
         }
 
-        public List<Path> Execute(Command command)
+        public Result Execute(Command command)
         {
             EvaluationMatrix matrices = new EvaluationMatrix(command.Cities.Count);
             matrices = _downloadRoadData.Execute(command.Cities, matrices);
@@ -43,7 +41,12 @@ namespace DreamTravel.BestPath.Executors
             //to have a possiblity to store cities data
             // File.WriteAllText("./twentyCities.txt", JsonConvert.SerializeObject(matrices.OptimalDistances));
 
-            var result = _formOutputData.Execute(command.Cities, orderOfCities, matrices);
+            Result result = new Result
+            {
+                Cities = command.Cities,
+                AllPaths = _formOutputData.Execute(command.Cities, matrices),
+                BestPaths = _formOutputData.Execute(command.Cities, matrices, orderOfCities)
+            };
             return result;
         }
 

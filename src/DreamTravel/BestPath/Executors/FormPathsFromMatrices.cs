@@ -1,14 +1,19 @@
 ﻿namespace DreamTravel.BestPath.Executors
 {
-    using System.Collections.Generic;
-    using System.Linq;
     using Interfaces;
     using SharedModels;
+    using System.Collections.Generic;
+    using System.Linq;
 
-    public class FormOutputData : IFormOutputData
+    public class FormPathsFromMatrices : IFormOutputData
     {
-        public List<Path> Execute(List<City> listOfCities, List<int> orderOfCities, IEvaluationMatrix evaluationMatrix)
+        public List<Path> Execute(List<City> listOfCities, IEvaluationMatrix evaluationMatrix, List<int> orderOfCities = null)
         {
+            if (orderOfCities == null)
+            {
+                orderOfCities = Enumerable.Range(0, listOfCities.Count).ToList();
+            }
+
             int noOfCities = orderOfCities.Count;
             int noOfPaths = noOfCities - 1;
             List<Path> paths = new List<Path>();

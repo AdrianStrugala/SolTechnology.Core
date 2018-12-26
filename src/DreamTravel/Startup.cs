@@ -56,7 +56,7 @@ namespace DreamTravel
             services.AddTransient<IDownloadDurationMatrixByFreeRoad, DownloadDurationMatrixByFreeRoad>();
             services.AddTransient<IDownloadCostBetweenTwoCities, DownloadCostBetweenTwoCities>();
             services.AddTransient<IDownloadRoadData, DownloadRoadData>();
-            services.AddTransient<IFormOutputData, FormOutputData>();
+            services.AddTransient<IFormOutputData, FormPathsFromMatrices>();
             services.AddTransient<ICalculateBestPath, CalculateBestPath>();
             services.AddTransient<IBreakCostLimit, BreakCostLimit>();
             services.AddTransient<IEvaluationBrain, EvaluationBrain>();

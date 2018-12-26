@@ -40,7 +40,7 @@
             //Arrange
             Query query = _fixture.Create<Query>();
 
-            _calculateBestPath.Execute(Arg.Any<Command>()).Returns(new List<Path>());
+            _calculateBestPath.Execute(Arg.Any<Command>()).Returns(new Result());
 
 
             //Act
@@ -82,7 +82,7 @@
             //Arrange
             Query query = _fixture.Create<Query>();
 
-            _calculateBestPath.Execute(Arg.Any<Command>()).Returns(new List<Path>());
+            _calculateBestPath.Execute(Arg.Any<Command>()).Returns(new Result());
 
 
             //Act
