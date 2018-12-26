@@ -23,6 +23,9 @@
 
         public Result Execute(Command command)
         {
+            //TODO Reduce number of cities to download data by already known
+            
+
             EvaluationMatrix matrices = new EvaluationMatrix(command.Cities.Count);
             matrices = _downloadRoadData.Execute(command.Cities, matrices);
             matrices = _evaluationBrain.Execute(matrices, command.Cities.Count);
