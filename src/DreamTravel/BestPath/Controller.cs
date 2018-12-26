@@ -45,6 +45,7 @@ namespace DreamTravel.BestPath
                 try
                 {
                     command.KnownCities = JsonConvert.DeserializeObject<List<City>>(HttpContext.Session.GetString(query.SessionId + CitiesKeyName));
+                    command.KnownPaths = JsonConvert.DeserializeObject<List<Path>>(HttpContext.Session.GetString(query.SessionId + AllPathsKeyName));
                 }
                 catch (Exception)
                 {
