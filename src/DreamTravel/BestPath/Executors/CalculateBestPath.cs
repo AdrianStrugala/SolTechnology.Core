@@ -2,6 +2,7 @@
 {
     using Interfaces;
     using Models;
+    using SharedModels;
     using System.Collections.Generic;
     using System.Linq;
     using TravelingSalesmanProblem;
@@ -12,19 +13,20 @@
         private readonly IFormOutputData _formOutputData;
         private readonly ITSP _tspSolver;
         private readonly IEvaluationBrain _evaluationBrain;
+        private IIdentifyUnknownCities _identifyUnknownCities;
 
-        public CalculateBestPath(IDownloadRoadData downloadRoadData, IFormOutputData formOutputData, ITSP tspSolver, IEvaluationBrain evaluationBrain)
+        public CalculateBestPath(IDownloadRoadData downloadRoadData, IFormOutputData formOutputData, ITSP tspSolver, IEvaluationBrain evaluationBrain, IIdentifyUnknownCities identifyUnknownCities)
         {
             _downloadRoadData = downloadRoadData;
             _formOutputData = formOutputData;
             _tspSolver = tspSolver;
             _evaluationBrain = evaluationBrain;
+            _identifyUnknownCities = identifyUnknownCities;
         }
 
         public Result Execute(Command command)
         {
-            //TODO Reduce number of cities to download data by already known
-            
+            List<City> newCities = _identifyUnknownCities.Execute(command.Cities, command.KnownCities);
 
             EvaluationMatrix matrices = new EvaluationMatrix(command.Cities.Count);
             matrices = _downloadRoadData.Execute(command.Cities, matrices);

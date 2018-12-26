@@ -62,6 +62,7 @@ namespace DreamTravel
             services.AddTransient<IEvaluationBrain, EvaluationBrain>();
             services.AddTransient<IFindLocationOfCity, FindLocationOfCity>();
             services.AddTransient<IFindNameOfCity, FindNameOfCity>();
+            services.AddTransient<IIdentifyUnknownCities, IdentifyUnknownCities>();
 
             services.AddSession();
 
