@@ -1,5 +1,4 @@
 ﻿using DreamTravel.Authentication;
-using DreamTravel.BestPath;
 using DreamTravel.BestPath.DataAccess;
 using DreamTravel.BestPath.Interfaces;
 using DreamTravel.CostLimit;
@@ -26,7 +25,7 @@ namespace DreamTravel
 
     public class Startup
     {
-        public static Action<IServiceCollection> RegisterServices;
+        public static Action<IServiceCollection> _registerServices;
 
         public Startup(IConfiguration configuration)
         {
@@ -77,8 +76,8 @@ namespace DreamTravel
             services.Configure<DreamAuthenticationOptions>(DreamAuthenticationOptions.AuthenticationScheme, configurationRoot);
             services.AddSingleton<IAuthenticationHandler, DreamAuthentication>();
 
-            RegisterServices?.Invoke(services);
-            RegisterServices = null;
+            _registerServices?.Invoke(services);
+            _registerServices = null;
         }
 
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)

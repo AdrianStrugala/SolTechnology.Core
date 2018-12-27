@@ -1,7 +1,7 @@
 ﻿namespace DreamTravel.BestPath
 {
     using System.Threading.Tasks;
-    using DreamTravel.BestPath.Interfaces;
+    using Interfaces;
     using Microsoft.AspNetCore.Http;
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.Extensions.Logging;

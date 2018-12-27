@@ -1,11 +1,9 @@
-﻿using DreamTravel.BestPath.DataAccess;
-using DreamTravel.SharedModels;
-using System.IO;
-using Xunit;
-
-namespace DreamTravelITests.BestPath.DataAccess
+﻿namespace DreamTravelITests.BestPath.DataAccess
 {
-    using System.Threading.Tasks;
+    using DreamTravel.BestPath.DataAccess;
+    using DreamTravel.SharedModels;
+    using System.IO;
+    using Xunit;
 
     public class DowloadCostBetweenTwoCitiesTests
     {
@@ -37,7 +35,7 @@ namespace DreamTravelITests.BestPath.DataAccess
             //Assert
             Assert.NotEqual((0, 0), result);
         }
-        
+
 
         [Fact]
         public void DowloadCostBetweenTwoCities_InvalidCities_ExceptionIsThrown()

@@ -2,16 +2,11 @@
 {
     using DreamTravel;
     using DreamTravel.BestPath;
-    using DreamTravel.BestPath.Interfaces;
-    using DreamTravel.SharedModels;
     using Microsoft.AspNetCore.Hosting;
     using Microsoft.AspNetCore.TestHost;
     using Microsoft.Extensions.DependencyInjection;
-    using Microsoft.Extensions.DependencyInjection.Extensions;
     using Newtonsoft.Json;
-    using NSubstitute;
     using System;
-    using System.Collections.Generic;
     using System.Net.Http;
     using System.Net.Http.Headers;
     using System.Text;
@@ -23,11 +18,11 @@
         public TestServer Server { get; }
 
 
-        public TestServerSession(Action<IServiceCollection> RegisterServices)
+        public TestServerSession(Action<IServiceCollection> registerServices)
         {
 
 
-            Startup.RegisterServices = RegisterServices;
+            Startup._registerServices = registerServices;
 
             Server = new TestServer(new WebHostBuilder().UseStartup<Startup>());
         }

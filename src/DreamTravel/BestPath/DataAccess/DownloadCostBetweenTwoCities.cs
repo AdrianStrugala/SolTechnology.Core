@@ -1,14 +1,11 @@
-﻿using DreamTravel.BestPath.Interfaces;
-using DreamTravel.SharedModels;
-using System;
-using System.IO;
-using System.Net.Http;
-using System.Xml;
-
-namespace DreamTravel.BestPath.DataAccess
+﻿namespace DreamTravel.BestPath.DataAccess
 {
-    using System.Collections.Generic;
-    using System.Threading.Tasks;
+    using Interfaces;
+    using SharedModels;
+    using System;
+    using System.IO;
+    using System.Net.Http;
+    using System.Xml;
 
     public class DownloadCostBetweenTwoCities : IDownloadCostBetweenTwoCities
     {

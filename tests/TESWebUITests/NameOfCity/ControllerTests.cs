@@ -1,17 +1,15 @@
-﻿using System.IO;
-using System.Threading.Tasks;
-using DreamTravel.LocationOfCity.Interfaces;
-using DreamTravel.NameOfCity.Interfaces;
-using DreamTravel.SharedModels;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
-using NSubstitute;
-using NSubstitute.ExceptionExtensions;
-using Xunit;
-
-namespace DreamTravelITests.NameOfCity
+﻿namespace DreamTravelITests.NameOfCity
 {
+    using System.IO;
+    using System.Threading.Tasks;
+    using DreamTravel.NameOfCity.Interfaces;
+    using DreamTravel.SharedModels;
+    using Microsoft.AspNetCore.Mvc;
+    using Microsoft.Extensions.Logging;
+    using Newtonsoft.Json;
+    using NSubstitute;
+    using NSubstitute.ExceptionExtensions;
+    using Xunit;
     public class ControllerTests
     {
         private readonly DreamTravel.NameOfCity.Controller _sut;

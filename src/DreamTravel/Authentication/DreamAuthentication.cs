@@ -69,7 +69,7 @@ namespace DreamTravel.Authentication
 
         public static string Base64Decode(string base64EncodedData)
         {
-            byte[] base64EncodedBytes = new byte[] { };
+            byte[] base64EncodedBytes = { };
             try
             {
                 base64EncodedBytes = Convert.FromBase64String(base64EncodedData);

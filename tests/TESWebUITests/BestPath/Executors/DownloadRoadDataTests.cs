@@ -65,7 +65,7 @@ namespace DreamTravelITests.BestPath.Executors
 
         //can always download data of at least 30 cities
         [Fact]
-        public void Execute_InputHas30Cities_AllTheDataIsDownloaded()
+        public async Task Execute_InputHas30Cities_AllTheDataIsDownloaded()
         {
             int noOfCities = 30;
 
@@ -87,7 +87,7 @@ namespace DreamTravelITests.BestPath.Executors
 
 
             //Act
-            _sut.Execute(cities, matrix);
+            await _sut.Execute(cities, matrix);
 
 
             //Assert

@@ -7,7 +7,6 @@ namespace DreamTravel.CostLimit
 {
     public class BreakCostLimit : IBreakCostLimit
     {
-        private const double ConversionError = 0.000001;
         public List<Path> Execute(int costLimit, List<Path> paths)
         {
             paths.Sort((x, y) => 1 * x.Goal.CompareTo(y.Goal));

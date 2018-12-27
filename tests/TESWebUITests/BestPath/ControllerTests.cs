@@ -60,10 +60,7 @@
             //Arrange
             Query query = new Query
             {
-                Cities = new List<City>
-                {
-
-                },
+                Cities = new List<City>(),
                 OptimizePath = true,
                 SessionId = "dupa"
             };
