@@ -41,7 +41,7 @@
 
 
             //to have a possiblity to store cities data
-            // File.WriteAllText("./twentyCities.txt", JsonConvert.SerializeObject(matrices.OptimalDistances));
+            // File.WriteAllText("./xCities.txt", JsonConvert.SerializeObject(evaluationMatrix.OptimalDistances));
 
             Result result = new Result
             {

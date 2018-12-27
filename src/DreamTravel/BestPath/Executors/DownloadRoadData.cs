@@ -31,7 +31,6 @@
                 Task.Run(async () => evaluationMatrix.TollDistances = await _downloadDurationMatrixByTollRoad.Execute(listOfCities)),
                 Task.Run(async () => evaluationMatrix.FreeDistances = await _downloadDurationMatrixByFreeRoad.Execute(listOfCities))
             };
-
             await Task.WhenAll(tasks);
 
             Parallel.For(0, listOfCities.Count, i =>

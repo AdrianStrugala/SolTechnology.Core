@@ -48,10 +48,9 @@ namespace DreamTravel.BestPath.DataAccess
                         result[j + i * listOfCities.Count] = json["rows"][0]["elements"][j]["duration"]["value"].Value<int>();
                     }
                 }
-
-
                 return result;
             }
+
             catch (Exception e)
             {
                 throw new InvalidDataException(e.Message);
