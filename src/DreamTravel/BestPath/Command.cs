@@ -7,15 +7,11 @@
     {
         public List<City> Cities { get; set; }
         public bool OptimizePath { get; set; }
-        public List<City> KnownCities { get; set; }
-        public List<Path> KnownPaths { get; set; }
 
 
         public Command()
         {
             Cities = new List<City>();
-            KnownCities = new List<City>();
-            KnownPaths = new List<Path>();
         }
     }
 }

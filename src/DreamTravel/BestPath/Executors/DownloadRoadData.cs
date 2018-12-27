@@ -4,7 +4,6 @@
     using Models;
     using SharedModels;
     using System.Collections.Generic;
-    using System.Linq;
     using System.Threading.Tasks;
 
     public class DownloadRoadData : IDownloadRoadData
@@ -22,50 +21,15 @@
             _downloadCostBetweenTwoCities = downloadCostBetweenTwoCities;
         }
 
-        public EvaluationMatrix Execute(List<City> listOfCities,
-            EvaluationMatrix evaluationMatrix)
-        {
-            SetTablesValueAsMax(evaluationMatrix, 0);
-
-            Parallel.Invoke
-            (
-                () => evaluationMatrix.TollDistances = _downloadDurationMatrixByTollRoad.Execute(listOfCities),
-                () => evaluationMatrix.FreeDistances = _downloadDurationMatrixByFreeRoad.Execute(listOfCities)
-            );
-
-
-            Parallel.For(0, listOfCities.Count, i =>
-            {
-                for (int j = 0; j < listOfCities.Count; j++)
-                {
-                    int iterator = j + i * listOfCities.Count;
-
-                    if (i == j)
-                    {
-                        SetTablesValueAsMax(evaluationMatrix, iterator);
-                    }
-
-                    else
-                    {
-                        (evaluationMatrix.Costs[iterator], evaluationMatrix.VinietaCosts[iterator]) =
-                            _downloadCostBetweenTwoCities.Execute(listOfCities[i], listOfCities[j]);
-                    }
-                }
-            });
-
-            return evaluationMatrix;
-        }
-
-
-        public async Task<EvaluationMatrix> ExecuteV4(List<City> listOfCities,
+        public async Task<EvaluationMatrix> Execute(List<City> listOfCities,
             EvaluationMatrix evaluationMatrix)
         {
             SetTablesValueAsMax(evaluationMatrix, 0);
 
             List<Task> tasks = new List<Task>
             {
-                Task.Run(async () => evaluationMatrix.TollDistances = await _downloadDurationMatrixByTollRoad.ExecuteV4(listOfCities)),
-                Task.Run(async () => evaluationMatrix.FreeDistances = await _downloadDurationMatrixByFreeRoad.ExecuteV4(listOfCities))
+                Task.Run(async () => evaluationMatrix.TollDistances = await _downloadDurationMatrixByTollRoad.Execute(listOfCities)),
+                Task.Run(async () => evaluationMatrix.FreeDistances = await _downloadDurationMatrixByFreeRoad.Execute(listOfCities))
             };
 
             await Task.WhenAll(tasks);
@@ -90,59 +54,6 @@
             });
 
             return evaluationMatrix;
-        }
-
-
-        public async Task<List<Path>> ExecuteV2(City origin, List<City> destinations)
-        {
-            Path[] result = new Path[destinations.Count];
-
-
-            double[] tollDistances = new double[destinations.Count];
-            double[] freeDistances = new double[destinations.Count];
-
-            List<Task> tasks = new List<Task>
-            {
-                Task.Run(async () => tollDistances = await _downloadDurationMatrixByTollRoad.ExecuteV2(origin, destinations)),
-                Task.Run(async () => freeDistances = await _downloadDurationMatrixByFreeRoad.ExecuteV2(origin, destinations))
-            };
-
-            await Task.WhenAll(tasks);
-
-            for (int i = 0; i < destinations.Count; i++)
-            {
-                Path pathToAdd = new Path();
-
-                pathToAdd.StartingCity = origin;
-                pathToAdd.EndingCity = destinations[i];
-
-                if (pathToAdd.StartingCity.Name != pathToAdd.EndingCity.Name)
-                {
-                    (pathToAdd.Cost, pathToAdd.VinietaCost) = await _downloadCostBetweenTwoCities.ExecuteV4(pathToAdd.StartingCity, pathToAdd.EndingCity);
-
-                    pathToAdd.FreeDistance = freeDistances[i];
-                    pathToAdd.TollDistance = tollDistances[i];
-                }
-                else
-                {
-                    SetPathValuesAsMax(pathToAdd);
-                }
-
-                result[i] = pathToAdd;
-            }
-
-
-            return result.ToList();
-        }
-
-        private void SetPathValuesAsMax(Path path)
-        {
-            path.FreeDistance = double.MaxValue;
-            path.TollDistance = double.MaxValue;
-            path.OptimalDistance = double.MaxValue;
-            path.Goal = double.MaxValue;
-            path.Cost = double.MaxValue;
-            path.OptimalCost = double.MaxValue;
         }
 
         private static void SetTablesValueAsMax(EvaluationMatrix evaluationMatrix, int iterator)

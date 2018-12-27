@@ -1,14 +1,11 @@
-﻿using System.Collections.Generic;
-using DreamTravel.SharedModels;
-
-namespace DreamTravel.BestPath.Interfaces
+﻿namespace DreamTravel.BestPath.Interfaces
 {
     using System.Threading.Tasks;
+    using SharedModels;
+    using System.Collections.Generic;
 
     public interface IDownloadDurationMatrixByFreeRoad
     {
-        double[] Execute(List<City> listOfCities);
-        Task<double[]> ExecuteV2(City origin, List<City> destinations);
-        Task<double[]> ExecuteV4(List<City> listOfCities);
+        Task<double[]> Execute(List<City> listOfCities);
     }
 }

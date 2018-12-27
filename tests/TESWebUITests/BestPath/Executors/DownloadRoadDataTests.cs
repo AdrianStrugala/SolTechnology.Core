@@ -1,6 +1,7 @@
 namespace DreamTravelITests.BestPath.Executors
 {
     using System.Collections.Generic;
+    using System.Threading.Tasks;
     using DreamTravel.BestPath.DataAccess;
     using DreamTravel.BestPath.Executors;
     using DreamTravel.BestPath.Interfaces;
@@ -24,7 +25,7 @@ namespace DreamTravelITests.BestPath.Executors
 
 
         [Fact]
-        public void DownloadExternalData_ValidConditions_MatrixIsPopulated()
+        public async Task DownloadExternalData_ValidConditions_MatrixIsPopulated()
         {
             //Arrange
             City firstCity = new City
@@ -47,7 +48,7 @@ namespace DreamTravelITests.BestPath.Executors
 
 
             //Act
-            _sut.Execute(cities, matrix);
+            matrix = await _sut.Execute(cities, matrix);
 
 
             //Assert

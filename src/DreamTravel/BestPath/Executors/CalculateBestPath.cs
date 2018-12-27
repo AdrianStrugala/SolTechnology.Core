@@ -2,9 +2,7 @@
 {
     using Interfaces;
     using Models;
-    using SharedModels;
     using System.Collections.Generic;
-    using System.Diagnostics;
     using System.Linq;
     using System.Threading.Tasks;
     using TravelingSalesmanProblem;
@@ -15,65 +13,26 @@
         private readonly IFormOutputData _formOutputData;
         private readonly ITSP _tspSolver;
         private readonly IEvaluationBrain _evaluationBrain;
-        private readonly IIdentifyUnknownCities _identifyUnknownCities;
 
-        public CalculateBestPath(IDownloadRoadData downloadRoadData, IFormOutputData formOutputData, ITSP tspSolver, IEvaluationBrain evaluationBrain, IIdentifyUnknownCities identifyUnknownCities)
+        public CalculateBestPath(IDownloadRoadData downloadRoadData, IFormOutputData formOutputData, ITSP tspSolver, IEvaluationBrain evaluationBrain)
         {
             _downloadRoadData = downloadRoadData;
             _formOutputData = formOutputData;
             _tspSolver = tspSolver;
             _evaluationBrain = evaluationBrain;
-            _identifyUnknownCities = identifyUnknownCities;
         }
 
         public async Task<Result> Execute(Command command)
         {
-            List<City> newCities = _identifyUnknownCities.Execute(command.Cities, command.KnownCities);
+            EvaluationMatrix evaluationMatrix = new EvaluationMatrix(command.Cities.Count);
+            evaluationMatrix = await _downloadRoadData.Execute(command.Cities, evaluationMatrix);
+            evaluationMatrix = _evaluationBrain.Execute(evaluationMatrix, command.Cities.Count);
 
-            List<Path> allPaths = new List<Path>();
-            //            allPaths.AddRange(command.KnownPaths);
-
-            Stopwatch s = Stopwatch.StartNew();
-            foreach (var newCity in newCities)
-            {
-
-                allPaths.AddRange(await _downloadRoadData.ExecuteV2(newCity, command.Cities));
-            }
-
-            var xd = s.ElapsedMilliseconds;
-
-
-            //            var invertPaths = new List<Path>();
-            //            foreach (var path in allPaths)
-            //            {
-            //                City pivot = path.StartingCity;
-            //                path.StartingCity = path.EndingCity;
-            //                path.EndingCity = pivot;
-            //
-            //                invertPaths.Add(path);
-            //            }
-            //
-            //            allPaths.AddRange(invertPaths);
-
-            EvaluationMatrix matrices = new EvaluationMatrix(command.Cities.Count);
-
-            Stopwatch s2 = Stopwatch.StartNew();
-            matrices = _downloadRoadData.Execute(command.Cities, matrices);
-            var xd2 = s2.ElapsedMilliseconds;
-
-
-            EvaluationMatrix matricesv4 = new EvaluationMatrix(command.Cities.Count);
-            Stopwatch s4 = Stopwatch.StartNew();
-            matricesv4 = await _downloadRoadData.ExecuteV4(command.Cities, matricesv4);
-            var xd4 = s4.ElapsedMilliseconds;
-
-
-            matrices = _evaluationBrain.Execute(matrices, command.Cities.Count);
 
             List<int> orderOfCities;
             if (command.OptimizePath)
             {
-                orderOfCities = _tspSolver.SolveTSP(matrices.OptimalDistances.ToList());
+                orderOfCities = _tspSolver.SolveTSP(evaluationMatrix.OptimalDistances.ToList());
             }
             else
             {
@@ -87,8 +46,7 @@
             Result result = new Result
             {
                 Cities = command.Cities,
-                AllPaths = _formOutputData.Execute(command.Cities, matrices),
-                BestPaths = _formOutputData.Execute(command.Cities, matrices, orderOfCities)
+                BestPaths = _formOutputData.Execute(command.Cities, evaluationMatrix, orderOfCities)
             };
             return result;
         }

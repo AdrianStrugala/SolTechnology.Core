@@ -7,6 +7,7 @@
     using DreamTravel.SharedModels;
     using NSubstitute;
     using System.Collections.Generic;
+    using System.Threading.Tasks;
     using TravelingSalesmanProblem;
     using Xunit;
 
@@ -23,9 +24,8 @@
             IFormOutputData formOutputData = new FormPathsFromMatrices();
             _tspSolver = Substitute.For<ITSP>();
             _evaluationBrain = Substitute.For<IEvaluationBrain>();
-            var identify = Substitute.For<IIdentifyUnknownCities>();
 
-            _sut = new CalculateBestPath(_downloadRoadData, formOutputData, _tspSolver, _evaluationBrain, identify);
+            _sut = new CalculateBestPath(_downloadRoadData, formOutputData, _tspSolver, _evaluationBrain);
         }
 
         [Fact]
@@ -40,8 +40,10 @@
 
             Command command = new Command { Cities = cities, OptimizePath = true };
 
+
             //Act
             var result = _sut.Execute(command);
+
 
             //Assert
             Assert.NotNull(result);
@@ -52,7 +54,7 @@
         }
 
         [Fact]
-        void Handle_DoNotOptimizePath_ResultOrderIsTheSameAsInput()
+        async Task Handle_DoNotOptimizePath_ResultOrderIsTheSameAsInput()
         {
             //Arrange
             _downloadRoadData.Execute(Arg.Any<List<City>>(), Arg.Any<EvaluationMatrix>()).Returns(new EvaluationMatrix(3));
@@ -69,14 +71,17 @@
 
             Command command = new Command { Cities = cities, OptimizePath = false };
 
+
             //Act
-            var result = _sut.Execute(command).BestPaths;
+            var result = await _sut.Execute(command);
+            var bestPaths = result.BestPaths;
+
 
             //Assert
             Assert.NotNull(result);
-            Assert.Equal(cities[0], result[0].StartingCity);
-            Assert.Equal(cities[1], result[1].StartingCity);
-            Assert.Equal(cities[2], result[1].EndingCity);
+            Assert.Equal(cities[0], bestPaths[0].StartingCity);
+            Assert.Equal(cities[1], bestPaths[1].StartingCity);
+            Assert.Equal(cities[2], bestPaths[1].EndingCity);
         }
     }
 }

@@ -1,14 +1,13 @@
-﻿using DreamTravel.BestPath.Interfaces;
-using DreamTravel.SharedModels;
-using Newtonsoft.Json.Linq;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Net.Http;
-using System.Text;
-
-namespace DreamTravel.BestPath.DataAccess
+﻿namespace DreamTravel.BestPath.DataAccess
 {
+    using Interfaces;
+    using Newtonsoft.Json.Linq;
+    using SharedModels;
+    using System;
+    using System.Collections.Generic;
+    using System.IO;
+    using System.Net.Http;
+    using System.Text;
     using System.Threading.Tasks;
 
     public class DownloadDurationMatrixByTollRoad : IDownloadDurationMatrixByTollRoad
@@ -24,43 +23,8 @@ namespace DreamTravel.BestPath.DataAccess
 
         }
 
-        public double[] Execute(List<City> listOfCities)
-        {
-            double[] result = new double[listOfCities.Count * listOfCities.Count];
 
-            StringBuilder coordinates = new StringBuilder();
-            foreach (City city in listOfCities)
-            {
-                coordinates.AppendFormat($"{city.Latitude},{city.Longitude}|");
-            }
-
-            try
-            {
-                for (int i = 0; i < listOfCities.Count; i++)
-                {
-                    string url =
-                        $"https://maps.googleapis.com/maps/api/distancematrix/json?units=imperial&origins={listOfCities[i].Latitude},{listOfCities[i].Longitude}&destinations={coordinates}&key=AIzaSyBgCjCJuGQsXlAz6BUXPIL2_RSxgXUaCcM";
-
-                    string response = _httpClient.GetStringAsync(url).Result;
-                    JObject json = JObject.Parse(response);
-
-                    for (int j = 0; j < listOfCities.Count; j++)
-                    {
-                        result[j + i * listOfCities.Count] =
-                            json["rows"][0]["elements"][j]["duration"]["value"].Value<int>();
-                    }
-                }
-
-                return result;
-            }
-            catch (Exception e)
-            {
-                throw new InvalidDataException(e.Message);
-            }
-        }
-
-
-        public async Task<double[]> ExecuteV4(List<City> listOfCities)
+        public async Task<double[]> Execute(List<City> listOfCities)
         {
             double[] result = new double[listOfCities.Count * listOfCities.Count];
 
@@ -85,39 +49,6 @@ namespace DreamTravel.BestPath.DataAccess
                         result[j + i * listOfCities.Count] = json["rows"][0]["elements"][j]["duration"]["value"].Value<int>();
                     }
                 }
-                return result;
-            }
-            catch (Exception e)
-            {
-                throw new InvalidDataException(e.Message);
-            }
-        }
-
-        public async Task<double[]> ExecuteV2(City origin, List<City> destinations)
-        {
-            double[] result = new double[destinations.Count];
-
-            StringBuilder coordinates = new StringBuilder();
-            foreach (City city in destinations)
-            {
-                coordinates.AppendFormat($"{city.Latitude},{city.Longitude}|");
-            }
-
-            try
-            {
-                string url =
-                    $"https://maps.googleapis.com/maps/api/distancematrix/json?units=imperial&origins={origin.Latitude},{origin.Longitude}&destinations={coordinates}&key=AIzaSyBgCjCJuGQsXlAz6BUXPIL2_RSxgXUaCcM";
-
-                var response = await _httpClient.GetStringAsync(url);
-                JObject json = JObject.Parse(response);
-
-                for (int j = 0; j < destinations.Count; j++)
-                {
-                    result[j] = json["rows"][0]["elements"][j]["duration"]["value"].Value<int>();
-                }
-
-
-
                 return result;
             }
             catch (Exception e)

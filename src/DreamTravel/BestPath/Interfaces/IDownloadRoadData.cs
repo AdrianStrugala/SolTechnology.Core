@@ -7,10 +7,7 @@
 
     public interface IDownloadRoadData
     {
-        EvaluationMatrix Execute(List<City> listOfCities, EvaluationMatrix evaluationMatrix);
-        Task<List<Path>> ExecuteV2(City origin, List<City> destinations);
-        
-        Task<EvaluationMatrix> ExecuteV4(List<City> listOfCities,
+        Task<EvaluationMatrix> Execute(List<City> listOfCities,
             EvaluationMatrix evaluationMatrix);
     }
 }

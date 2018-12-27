@@ -6,13 +6,15 @@ using Xunit;
 
 namespace DreamTravelITests.BestPath.DataAccess
 {
+    using System.Threading.Tasks;
+
     public class DownloadDurationMatrixByFreeRoadTests
     {
         readonly DownloadDurationMatrixByFreeRoad _sut = new DownloadDurationMatrixByFreeRoad();
 
 
         [Fact]
-        public void DowloadDurationMatrixByFreeRoad_InvokeWithValidCities_ReturnsSomeDuration()
+        public async Task DowloadDurationMatrixByFreeRoad_InvokeWithValidCities_ReturnsSomeDuration()
         {
             //Arrange
             City firstCity = new City
@@ -32,7 +34,7 @@ namespace DreamTravelITests.BestPath.DataAccess
             var list = new List<City> { firstCity, secondCity };
 
             //Act
-            var result = _sut.Execute(list);
+            var result = await _sut.Execute(list);
 
             //Assert
             Assert.NotEqual(0, result[1]);
@@ -40,7 +42,7 @@ namespace DreamTravelITests.BestPath.DataAccess
         }
 
         [Fact]
-        public void DowloadDurationMatrixByFreeRoad_InvalidCities_ExceptionIsThrown()
+        public async Task DowloadDurationMatrixByFreeRoad_InvalidCities_ExceptionIsThrown()
         {
             //Arrange
             City firstCity = new City
@@ -60,7 +62,7 @@ namespace DreamTravelITests.BestPath.DataAccess
             var list = new List<City> { firstCity, secondCity };
 
             //Act
-            var exception = Record.Exception(() => _sut.Execute(list));
+            var exception = await Record.ExceptionAsync( async () => await _sut.Execute(list));
 
             //Assert
             Assert.IsType<InvalidDataException>(exception);

@@ -1,6 +1,6 @@
-﻿using System.IO;
-using DreamTravel.BestPath.DataAccess;
+﻿using DreamTravel.BestPath.DataAccess;
 using DreamTravel.SharedModels;
+using System.IO;
 using Xunit;
 
 namespace DreamTravelITests.BestPath.DataAccess
@@ -37,32 +37,7 @@ namespace DreamTravelITests.BestPath.DataAccess
             //Assert
             Assert.NotEqual((0, 0), result);
         }
-
-
-        [Fact]
-        public async Task DowloadCostBetweenTwoCities_InvokeWithValidCities_RetaurnsSomeCost()
-        {
-            //Arrange
-            City firstCity = new City
-            {
-                Name = "first",
-                Latitude = 51,
-                Longitude = 17
-            };
-
-            City secondCity = new City
-            {
-                Name = "second",
-                Latitude = 53,
-                Longitude = 19
-            };
-
-            //Act
-            var result = _sut.ExecuteV4(firstCity, secondCity);
-
-            //Assert
-            Assert.NotEqual((0, 0), result);
-        }
+        
 
         [Fact]
         public void DowloadCostBetweenTwoCities_InvalidCities_ExceptionIsThrown()
