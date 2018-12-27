@@ -62,18 +62,13 @@
         {
             SetTablesValueAsMax(evaluationMatrix, 0);
 
-            //            Parallel.Invoke
-            //            (
-            //                () => evaluationMatrix.TollDistances = _downloadDurationMatrixByTollRoad.Execute(listOfCities),
-            //                () => evaluationMatrix.FreeDistances = _downloadDurationMatrixByFreeRoad.Execute(listOfCities)
-            //            );
-
-            var tasks = new List<Task>();
-            tasks.Add(new Task(async () => evaluationMatrix.TollDistances = await _downloadDurationMatrixByTollRoad.ExecuteV4(listOfCities)));
-          //  tasks.Add(new Task(() => evaluationMatrix.FreeDistances = _downloadDurationMatrixByFreeRoad.ExecuteV4(listOfCities)));
+            List<Task> tasks = new List<Task>
+            {
+                Task.Run(async () => evaluationMatrix.TollDistances = await _downloadDurationMatrixByTollRoad.ExecuteV4(listOfCities)),
+                Task.Run(async () => evaluationMatrix.FreeDistances = await _downloadDurationMatrixByFreeRoad.ExecuteV4(listOfCities))
+            };
 
             await Task.WhenAll(tasks);
-
 
             Parallel.For(0, listOfCities.Count, i =>
             {
@@ -89,7 +84,7 @@
                     else
                     {
                         (evaluationMatrix.Costs[iterator], evaluationMatrix.VinietaCosts[iterator]) =
-                            _downloadCostBetweenTwoCities.ExecuteV4(listOfCities[i], listOfCities[j]);
+                            _downloadCostBetweenTwoCities.Execute(listOfCities[i], listOfCities[j]);
                     }
                 }
             });
@@ -98,7 +93,7 @@
         }
 
 
-        public List<Path> ExecuteV2(City origin, List<City> destinations)
+        public async Task<List<Path>> ExecuteV2(City origin, List<City> destinations)
         {
             Path[] result = new Path[destinations.Count];
 
@@ -106,15 +101,15 @@
             double[] tollDistances = new double[destinations.Count];
             double[] freeDistances = new double[destinations.Count];
 
-            Parallel.Invoke
-            (
-                () => tollDistances = _downloadDurationMatrixByTollRoad.ExecuteV2(origin, destinations),
-                () => freeDistances = _downloadDurationMatrixByFreeRoad.ExecuteV2(origin, destinations)
-            );
+            List<Task> tasks = new List<Task>
+            {
+                Task.Run(async () => tollDistances = await _downloadDurationMatrixByTollRoad.ExecuteV2(origin, destinations)),
+                Task.Run(async () => freeDistances = await _downloadDurationMatrixByFreeRoad.ExecuteV2(origin, destinations))
+            };
 
+            await Task.WhenAll(tasks);
 
             for (int i = 0; i < destinations.Count; i++)
-            // Parallel.For(0, destinations.Count, i =>
             {
                 Path pathToAdd = new Path();
 
@@ -123,10 +118,8 @@
 
                 if (pathToAdd.StartingCity.Name != pathToAdd.EndingCity.Name)
                 {
-                    (double cost, double vinietaCost) = _downloadCostBetweenTwoCities.Execute(pathToAdd.StartingCity, pathToAdd.EndingCity);
+                    (pathToAdd.Cost, pathToAdd.VinietaCost) = await _downloadCostBetweenTwoCities.ExecuteV4(pathToAdd.StartingCity, pathToAdd.EndingCity);
 
-                    pathToAdd.Cost = cost;
-                    pathToAdd.VinietaCost = vinietaCost;
                     pathToAdd.FreeDistance = freeDistances[i];
                     pathToAdd.TollDistance = tollDistances[i];
                 }

@@ -6,6 +6,7 @@
     using System.Collections.Generic;
     using System.Diagnostics;
     using System.Linq;
+    using System.Threading.Tasks;
     using TravelingSalesmanProblem;
 
     public class CalculateBestPath : ICalculateBestPath
@@ -25,7 +26,7 @@
             _identifyUnknownCities = identifyUnknownCities;
         }
 
-        public Result Execute(Command command)
+        public async Task<Result> Execute(Command command)
         {
             List<City> newCities = _identifyUnknownCities.Execute(command.Cities, command.KnownCities);
 
@@ -36,7 +37,7 @@
             foreach (var newCity in newCities)
             {
 
-                allPaths.AddRange(_downloadRoadData.ExecuteV2(newCity, command.Cities));
+                allPaths.AddRange(await _downloadRoadData.ExecuteV2(newCity, command.Cities));
             }
 
             var xd = s.ElapsedMilliseconds;
@@ -61,10 +62,10 @@
             var xd2 = s2.ElapsedMilliseconds;
 
 
-//            EvaluationMatrix matricesv4 = new EvaluationMatrix(command.Cities.Count);
-//            Stopwatch s4 = Stopwatch.StartNew();
-//            matricesv4 = _downloadRoadData.ExecuteV4(command.Cities, matricesv4);
-//            var xd4 = s4.ElapsedMilliseconds;
+            EvaluationMatrix matricesv4 = new EvaluationMatrix(command.Cities.Count);
+            Stopwatch s4 = Stopwatch.StartNew();
+            matricesv4 = await _downloadRoadData.ExecuteV4(command.Cities, matricesv4);
+            var xd4 = s4.ElapsedMilliseconds;
 
 
             matrices = _evaluationBrain.Execute(matrices, command.Cities.Count);

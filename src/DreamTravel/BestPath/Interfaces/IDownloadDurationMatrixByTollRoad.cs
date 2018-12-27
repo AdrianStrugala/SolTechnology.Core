@@ -8,7 +8,7 @@ namespace DreamTravel.BestPath.Interfaces
     public interface IDownloadDurationMatrixByTollRoad
     {
         double[] Execute(List<City> listOfCities);
-        double[] ExecuteV2(City origin, List<City> destinations);
+        Task<double[]> ExecuteV2(City origin, List<City> destinations);
         Task<double[]> ExecuteV4(List<City> listOfCities);
     }
 }

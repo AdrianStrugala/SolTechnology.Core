@@ -1,7 +1,9 @@
 ﻿namespace DreamTravel.BestPath.Interfaces
 {
+    using System.Threading.Tasks;
+
     public interface ICalculateBestPath
     {
-        Result Execute(Command command);
+        Task<Result> Execute(Command command);
     }
 }

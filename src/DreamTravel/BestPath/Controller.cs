@@ -9,6 +9,7 @@ namespace DreamTravel.BestPath
 {
     using SharedModels;
     using System.Collections.Generic;
+    using System.Threading.Tasks;
 
     [Route(Route)]
     public class Controller : Microsoft.AspNetCore.Mvc.Controller
@@ -31,7 +32,7 @@ namespace DreamTravel.BestPath
 
 
         [HttpPost]
-        public IActionResult CalculateBestPath(Query query)
+        public async Task<IActionResult> CalculateBestPath(Query query)
         {
             try
             {
@@ -53,7 +54,7 @@ namespace DreamTravel.BestPath
                 }
 
 
-                Result result = _calculateBestPath.Execute(command);
+                Result result = await _calculateBestPath.Execute(command);
 
                 HttpContext.Session.SetString(query.SessionId + PathsKeyName, JsonConvert.SerializeObject(result.BestPaths));
                 HttpContext.Session.SetString(query.SessionId + CitiesKeyName, JsonConvert.SerializeObject(result.Cities));
