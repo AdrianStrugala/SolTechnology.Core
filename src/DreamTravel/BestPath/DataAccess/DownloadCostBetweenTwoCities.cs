@@ -9,6 +9,7 @@ using System.Xml;
 namespace DreamTravel.BestPath.DataAccess
 {
     using System.Collections.Generic;
+    using System.Threading.Tasks;
 
     public class DownloadCostBetweenTwoCities : IDownloadCostBetweenTwoCities
     {
@@ -64,6 +65,36 @@ namespace DreamTravel.BestPath.DataAccess
         }
 
 
+        public async Task<(double, double)> ExecuteV4(City origin, City destination)
+        {
+            try
+            {
+                string url =
+                    $"http://apir.viamichelin.com/apir/1/route.xml/fra?steps=1:e:{origin.Longitude}:{origin.Latitude};1:e:{destination.Longitude}:{destination.Latitude}&authkey=JSBS20101202150903217741708195";
+
+                var response = await _httpClient.GetStringAsync(url);
+                XmlDocument doc = new XmlDocument();
+                doc.LoadXml(response);
+
+                XmlNode node =
+                    doc.DocumentElement.SelectSingleNode("/response/iti/header/summaries/summary/tollCost/car");
+                var tollCost = Convert.ToDouble(node.InnerText);
+
+                XmlNode vinietaNode =
+                    doc.DocumentElement.SelectSingleNode("/response/iti/header/summaries/summary/CCZCost/car");
+                var vinietaCost = Convert.ToDouble(vinietaNode.InnerText);
+
+
+                return (tollCost / 100, vinietaCost / 100);
+            }
+            catch (Exception)
+            {
+                throw new InvalidDataException(
+                    $"Cannot get data about cost between [{origin.Name}] and [{destination.Name}]");
+            }
+        }
+
+
         public (double[], double[]) ExecuteV3(List<City> listOfCities)
         {
             double[] costMatrix = new double[listOfCities.Count * listOfCities.Count];
@@ -80,8 +111,6 @@ namespace DreamTravel.BestPath.DataAccess
 
                         HttpResponseMessage getAsync = _httpClient.GetAsync(url).Result;
 
-                        double tollCost;
-                        double vinietaCost;
                         using (Stream stream = getAsync.Content.ReadAsStreamAsync().Result ??
                                                throw new ArgumentNullException(
                                                    $"Exception on [{MethodBase.GetCurrentMethod().Name}]"))

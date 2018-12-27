@@ -27,11 +27,11 @@
         {
             SetTablesValueAsMax(evaluationMatrix, 0);
 
-//            Task[] tasks = new Task[2];
-//            tasks[0] = new Task(() => evaluationMatrix.TollDistances = _downloadDurationMatrixByTollRoad.Execute(listOfCities));
-//            tasks[1] = new Task(() => evaluationMatrix.FreeDistances = _downloadDurationMatrixByFreeRoad.Execute(listOfCities));
-//            // tasks[2] = new Task(() => (evaluationMatrix.Costs, evaluationMatrix.VinietaCosts) = _downloadCostBetweenTwoCities.ExecuteV3(listOfCities));
-//            Task.WaitAll(tasks);
+            //            Task[] tasks = new Task[2];
+            //            tasks[0] = new Task(() => evaluationMatrix.TollDistances = _downloadDurationMatrixByTollRoad.Execute(listOfCities));
+            //            tasks[1] = new Task(() => evaluationMatrix.FreeDistances = _downloadDurationMatrixByFreeRoad.Execute(listOfCities));
+            //            // tasks[2] = new Task(() => (evaluationMatrix.Costs, evaluationMatrix.VinietaCosts) = _downloadCostBetweenTwoCities.ExecuteV3(listOfCities));
+            //            Task.WaitAll(tasks);
 
             Parallel.Invoke
             (
@@ -55,6 +55,41 @@
                     {
                         (evaluationMatrix.Costs[iterator], evaluationMatrix.VinietaCosts[iterator]) =
                             _downloadCostBetweenTwoCities.Execute(listOfCities[i], listOfCities[j]);
+                    }
+                }
+            });
+
+            return evaluationMatrix;
+        }
+
+
+        public EvaluationMatrix ExecuteV4(List<City> listOfCities,
+            EvaluationMatrix evaluationMatrix)
+        {
+            SetTablesValueAsMax(evaluationMatrix, 0);
+
+            Parallel.Invoke
+            (
+                () => evaluationMatrix.TollDistances = _downloadDurationMatrixByTollRoad.Execute(listOfCities),
+                () => evaluationMatrix.FreeDistances = _downloadDurationMatrixByFreeRoad.Execute(listOfCities)
+            );
+
+
+            Parallel.For(0, listOfCities.Count, async i =>
+            {
+                for (int j = 0; j < listOfCities.Count; j++)
+                {
+                    int iterator = j + i * listOfCities.Count;
+
+                    if (i == j)
+                    {
+                        SetTablesValueAsMax(evaluationMatrix, iterator);
+                    }
+
+                    else
+                    {
+                        (evaluationMatrix.Costs[iterator], evaluationMatrix.VinietaCosts[iterator]) = await
+                            _downloadCostBetweenTwoCities.ExecuteV4(listOfCities[i], listOfCities[j]);
                     }
                 }
             });
