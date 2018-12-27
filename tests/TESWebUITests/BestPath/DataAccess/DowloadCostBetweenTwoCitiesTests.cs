@@ -5,6 +5,8 @@ using Xunit;
 
 namespace DreamTravelITests.BestPath.DataAccess
 {
+    using System.Threading.Tasks;
+
     public class DowloadCostBetweenTwoCitiesTests
     {
         private readonly DownloadCostBetweenTwoCities _sut = new DownloadCostBetweenTwoCities();
@@ -31,6 +33,32 @@ namespace DreamTravelITests.BestPath.DataAccess
 
             //Act
             var result = _sut.Execute(firstCity, secondCity);
+
+            //Assert
+            Assert.NotEqual((0, 0), result);
+        }
+
+
+        [Fact]
+        public async Task DowloadCostBetweenTwoCities_InvokeWithValidCities_RetaurnsSomeCost()
+        {
+            //Arrange
+            City firstCity = new City
+            {
+                Name = "first",
+                Latitude = 51,
+                Longitude = 17
+            };
+
+            City secondCity = new City
+            {
+                Name = "second",
+                Latitude = 53,
+                Longitude = 19
+            };
+
+            //Act
+            var result = _sut.ExecuteV4(firstCity, secondCity);
 
             //Assert
             Assert.NotEqual((0, 0), result);

@@ -60,15 +60,11 @@
             matrices = _downloadRoadData.Execute(command.Cities, matrices);
             var xd2 = s2.ElapsedMilliseconds;
 
-            EvaluationMatrix matricesv3 = new EvaluationMatrix(command.Cities.Count);
-            Stopwatch s3 = Stopwatch.StartNew();
-            matricesv3 = _downloadRoadData.ExecuteV3(command.Cities, matricesv3);
-            var xd3 = s3.ElapsedMilliseconds;
 
-            EvaluationMatrix matricesv4 = new EvaluationMatrix(command.Cities.Count);
-            Stopwatch s4 = Stopwatch.StartNew();
-            matricesv4 = _downloadRoadData.ExecuteV4(command.Cities, matricesv3);
-            var xd4 = s4.ElapsedMilliseconds;
+//            EvaluationMatrix matricesv4 = new EvaluationMatrix(command.Cities.Count);
+//            Stopwatch s4 = Stopwatch.StartNew();
+//            matricesv4 = _downloadRoadData.ExecuteV4(command.Cities, matricesv4);
+//            var xd4 = s4.ElapsedMilliseconds;
 
 
             matrices = _evaluationBrain.Execute(matrices, command.Cities.Count);

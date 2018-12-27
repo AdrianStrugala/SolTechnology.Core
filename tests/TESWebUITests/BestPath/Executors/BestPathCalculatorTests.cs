@@ -23,8 +23,9 @@
             IFormOutputData formOutputData = new FormPathsFromMatrices();
             _tspSolver = Substitute.For<ITSP>();
             _evaluationBrain = Substitute.For<IEvaluationBrain>();
+            var identify = Substitute.For<IIdentifyUnknownCities>();
 
-            _sut = new CalculateBestPath(_downloadRoadData, formOutputData, _tspSolver, _evaluationBrain);
+            _sut = new CalculateBestPath(_downloadRoadData, formOutputData, _tspSolver, _evaluationBrain, identify);
         }
 
         [Fact]

@@ -1,14 +1,13 @@
-﻿using System;
+﻿using DreamTravel.BestPath.Interfaces;
+using DreamTravel.SharedModels;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Net.Http;
 using System.Reflection;
 using System.Text;
-using System.Xml;
-using DreamTravel.BestPath.Interfaces;
-using DreamTravel.SharedModels;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 
 namespace DreamTravel.BestPath.DataAccess
 {
@@ -41,23 +40,16 @@ namespace DreamTravel.BestPath.DataAccess
                     string url =
                         $"https://maps.googleapis.com/maps/api/distancematrix/json?units=imperial&origins={listOfCities[i].Latitude},{listOfCities[i].Longitude}&destinations={coordinates}&avoid=tolls&key=AIzaSyBgCjCJuGQsXlAz6BUXPIL2_RSxgXUaCcM";
 
-                    HttpResponseMessage getAsync = _httpClient.GetAsync(url).Result;
+                    string response = _httpClient.GetStringAsync(url).Result;
+                    JObject json = JObject.Parse(response);
 
-                    using (Stream stream = getAsync.Content.ReadAsStreamAsync().Result ??
-                                           throw new ArgumentNullException(
-                                               $"Exception on [{MethodBase.GetCurrentMethod().Name}]"))
+                    for (int j = 0; j < listOfCities.Count; j++)
                     {
-                        using (var jsonTextReader = new JsonTextReader(new StreamReader(stream)))
-                        {
-                            JObject json = (JObject)new JsonSerializer().Deserialize(jsonTextReader);
-
-                            for (int j = 0; j < listOfCities.Count; j++)
-                            {
-                                result[j + i * listOfCities.Count] = json["rows"][0]["elements"][j]["duration"]["value"].Value<int>();
-                            }
-                        }
+                        result[j + i * listOfCities.Count] = json["rows"][0]["elements"][j]["duration"]["value"].Value<int>();
                     }
                 }
+
+
                 return result;
             }
             catch (Exception e)

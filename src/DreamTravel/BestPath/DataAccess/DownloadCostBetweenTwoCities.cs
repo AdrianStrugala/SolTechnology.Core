@@ -30,30 +30,18 @@ namespace DreamTravel.BestPath.DataAccess
                 string url =
                     $"http://apir.viamichelin.com/apir/1/route.xml/fra?steps=1:e:{origin.Longitude}:{origin.Latitude};1:e:{destination.Longitude}:{destination.Latitude}&authkey=JSBS20101202150903217741708195";
 
-                HttpResponseMessage getAsync = _httpClient.GetAsync(url).Result;
+                var response = _httpClient.GetStringAsync(url).Result;
+                XmlDocument doc = new XmlDocument();
+                doc.LoadXml(response);
 
-                double tollCost;
-                double vinietaCost;
-                using (Stream stream = getAsync.Content.ReadAsStreamAsync().Result ??
-                                       throw new ArgumentNullException(
-                                           $"Exception on [{MethodBase.GetCurrentMethod().Name}]"))
-                {
-                    using (StreamReader sr = new StreamReader(stream))
-                    {
-                        var content = sr.ReadToEnd();
+                XmlNode node =
+                    doc.DocumentElement.SelectSingleNode("/response/iti/header/summaries/summary/tollCost/car");
+                var tollCost = Convert.ToDouble(node.InnerText);
 
-                        XmlDocument doc = new XmlDocument();
-                        doc.LoadXml(content);
+                XmlNode vinietaNode =
+                    doc.DocumentElement.SelectSingleNode("/response/iti/header/summaries/summary/CCZCost/car");
+                var vinietaCost = Convert.ToDouble(vinietaNode.InnerText);
 
-                        XmlNode node =
-                            doc.DocumentElement.SelectSingleNode("/response/iti/header/summaries/summary/tollCost/car");
-                        tollCost = Convert.ToDouble(node.InnerText);
-
-                        XmlNode vinietaNode =
-                            doc.DocumentElement.SelectSingleNode("/response/iti/header/summaries/summary/CCZCost/car");
-                        vinietaCost = Convert.ToDouble(vinietaNode.InnerText);
-                    }
-                }
 
                 return (tollCost / 100, vinietaCost / 100);
             }
@@ -65,14 +53,14 @@ namespace DreamTravel.BestPath.DataAccess
         }
 
 
-        public async Task<(double, double)> ExecuteV4(City origin, City destination)
+        public (double, double) ExecuteV4(City origin, City destination)
         {
             try
             {
                 string url =
                     $"http://apir.viamichelin.com/apir/1/route.xml/fra?steps=1:e:{origin.Longitude}:{origin.Latitude};1:e:{destination.Longitude}:{destination.Latitude}&authkey=JSBS20101202150903217741708195";
 
-                var response = await _httpClient.GetStringAsync(url);
+                var response = _httpClient.GetStringAsync(url).Result;
                 XmlDocument doc = new XmlDocument();
                 doc.LoadXml(response);
 
