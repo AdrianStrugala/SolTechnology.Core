@@ -1,10 +1,11 @@
-﻿using System.Collections.Generic;
-using DreamTravel.SharedModels;
+﻿using DreamTravel.SharedModels;
+using System.Collections.Generic;
 
 namespace DreamTravel.BestPath.Interfaces
 {
     public interface IDownloadDurationMatrixByTollRoad
     {
         double[] Execute(List<City> listOfCities);
+        double[] ExecuteV2(City origin, List<City> destinations);
     }
 }

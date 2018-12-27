@@ -45,7 +45,7 @@ namespace DreamTravel.BestPath.DataAccess
 
                     using (Stream stream = getAsync.Content.ReadAsStreamAsync().Result ??
                                            throw new ArgumentNullException(
-                                               $"Execption on [{MethodBase.GetCurrentMethod().Name}]"))
+                                               $"Exception on [{MethodBase.GetCurrentMethod().Name}]"))
                     {
                         using (var jsonTextReader = new JsonTextReader(new StreamReader(stream)))
                         {
@@ -58,6 +58,46 @@ namespace DreamTravel.BestPath.DataAccess
                         }
                     }
                 }
+                return result;
+            }
+            catch (Exception e)
+            {
+                throw new InvalidDataException(e.Message);
+            }
+        }
+
+        public double[] ExecuteV2(City origin, List<City> destinations)
+        {
+            double[] result = new double[destinations.Count];
+
+            StringBuilder coordinates = new StringBuilder();
+            foreach (City city in destinations)
+            {
+                coordinates.AppendFormat($"{city.Latitude},{city.Longitude}|");
+            }
+
+            try
+            {
+                string url =
+                    $"https://maps.googleapis.com/maps/api/distancematrix/json?units=imperial&origins={origin.Latitude},{origin.Longitude}&destinations={coordinates}&avoid=tolls&key=AIzaSyBgCjCJuGQsXlAz6BUXPIL2_RSxgXUaCcM";
+
+                HttpResponseMessage getAsync = _httpClient.GetAsync(url).Result;
+
+                using (Stream stream = getAsync.Content.ReadAsStreamAsync().Result ??
+                                       throw new ArgumentNullException(
+                                           $"Exception on [{MethodBase.GetCurrentMethod().Name}]"))
+                {
+                    using (var jsonTextReader = new JsonTextReader(new StreamReader(stream)))
+                    {
+                        JObject json = (JObject)new JsonSerializer().Deserialize(jsonTextReader);
+
+                        for (int j = 0; j < destinations.Count; j++)
+                        {
+                            result[j] = json["rows"][0]["elements"][j]["duration"]["value"].Value<int>();
+                        }
+                    }
+                }
+
                 return result;
             }
             catch (Exception e)

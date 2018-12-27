@@ -1,13 +1,15 @@
-﻿using System;
+﻿using DreamTravel.BestPath.Interfaces;
+using DreamTravel.SharedModels;
+using System;
 using System.IO;
 using System.Net.Http;
 using System.Reflection;
 using System.Xml;
-using DreamTravel.BestPath.Interfaces;
-using DreamTravel.SharedModels;
 
 namespace DreamTravel.BestPath.DataAccess
 {
+    using System.Collections.Generic;
+
     public class DownloadCostBetweenTwoCities : IDownloadCostBetweenTwoCities
     {
         private readonly HttpClient _httpClient;
@@ -33,7 +35,7 @@ namespace DreamTravel.BestPath.DataAccess
                 double vinietaCost;
                 using (Stream stream = getAsync.Content.ReadAsStreamAsync().Result ??
                                        throw new ArgumentNullException(
-                                           $"Execption on [{MethodBase.GetCurrentMethod().Name}]"))
+                                           $"Exception on [{MethodBase.GetCurrentMethod().Name}]"))
                 {
                     using (StreamReader sr = new StreamReader(stream))
                     {
@@ -42,10 +44,12 @@ namespace DreamTravel.BestPath.DataAccess
                         XmlDocument doc = new XmlDocument();
                         doc.LoadXml(content);
 
-                        XmlNode node = doc.DocumentElement.SelectSingleNode("/response/iti/header/summaries/summary/tollCost/car");
+                        XmlNode node =
+                            doc.DocumentElement.SelectSingleNode("/response/iti/header/summaries/summary/tollCost/car");
                         tollCost = Convert.ToDouble(node.InnerText);
 
-                        XmlNode vinietaNode = doc.DocumentElement.SelectSingleNode("/response/iti/header/summaries/summary/CCZCost/car");
+                        XmlNode vinietaNode =
+                            doc.DocumentElement.SelectSingleNode("/response/iti/header/summaries/summary/CCZCost/car");
                         vinietaCost = Convert.ToDouble(vinietaNode.InnerText);
                     }
                 }
@@ -57,6 +61,59 @@ namespace DreamTravel.BestPath.DataAccess
                 throw new InvalidDataException(
                     $"Cannot get data about cost between [{origin.Name}] and [{destination.Name}]");
             }
+        }
+
+
+        public (double[], double[]) ExecuteV3(List<City> listOfCities)
+        {
+            double[] costMatrix = new double[listOfCities.Count * listOfCities.Count];
+            double[] vinitaMatrix = new double[listOfCities.Count * listOfCities.Count];
+
+            for (int i = 0; i < listOfCities.Count; i++)
+            {
+                for (int j = 0; j < listOfCities.Count; j++)
+                {
+                    try
+                    {
+                        string url =
+                            $"http://apir.viamichelin.com/apir/1/route.xml/fra?steps=1:e:{listOfCities[i].Longitude}:{listOfCities[i].Latitude};1:e:{listOfCities[j].Longitude}:{listOfCities[j].Latitude}&authkey=JSBS20101202150903217741708195";
+
+                        HttpResponseMessage getAsync = _httpClient.GetAsync(url).Result;
+
+                        double tollCost;
+                        double vinietaCost;
+                        using (Stream stream = getAsync.Content.ReadAsStreamAsync().Result ??
+                                               throw new ArgumentNullException(
+                                                   $"Exception on [{MethodBase.GetCurrentMethod().Name}]"))
+                        {
+                            using (StreamReader sr = new StreamReader(stream))
+                            {
+                                var content = sr.ReadToEnd();
+
+                                XmlDocument doc = new XmlDocument();
+                                doc.LoadXml(content);
+
+                                XmlNode node =
+                                    doc.DocumentElement.SelectSingleNode(
+                                        "/response/iti/header/summaries/summary/tollCost/car");
+                                costMatrix[j + i * listOfCities.Count] = Convert.ToDouble(node.InnerText);
+
+                                XmlNode vinietaNode =
+                                    doc.DocumentElement.SelectSingleNode(
+                                        "/response/iti/header/summaries/summary/CCZCost/car");
+                                vinitaMatrix[j + i * listOfCities.Count] = Convert.ToDouble(vinietaNode.InnerText);
+                            }
+                        }
+                    }
+                    catch (Exception)
+                    {
+                        throw new InvalidDataException(
+                            $"Cannot get data about cost between [{listOfCities[i].Name}] and [{listOfCities[j].Name}]");
+                    }
+                }
+            }
+
+            return (costMatrix, vinitaMatrix);
         }
     }
 }

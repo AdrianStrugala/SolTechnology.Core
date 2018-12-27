@@ -4,6 +4,7 @@
     using Models;
     using SharedModels;
     using System.Collections.Generic;
+    using System.Diagnostics;
     using System.Linq;
     using TravelingSalesmanProblem;
 
@@ -13,7 +14,7 @@
         private readonly IFormOutputData _formOutputData;
         private readonly ITSP _tspSolver;
         private readonly IEvaluationBrain _evaluationBrain;
-        private IIdentifyUnknownCities _identifyUnknownCities;
+        private readonly IIdentifyUnknownCities _identifyUnknownCities;
 
         public CalculateBestPath(IDownloadRoadData downloadRoadData, IFormOutputData formOutputData, ITSP tspSolver, IEvaluationBrain evaluationBrain, IIdentifyUnknownCities identifyUnknownCities)
         {
@@ -28,8 +29,43 @@
         {
             List<City> newCities = _identifyUnknownCities.Execute(command.Cities, command.KnownCities);
 
+            List<Path> allPaths = new List<Path>();
+            //            allPaths.AddRange(command.KnownPaths);
+
+            Stopwatch s = Stopwatch.StartNew();
+            foreach (var newCity in newCities)
+            {
+
+                allPaths.AddRange(_downloadRoadData.ExecuteV2(newCity, command.Cities));
+            }
+
+            var xd = s.ElapsedMilliseconds;
+
+
+            //            var invertPaths = new List<Path>();
+            //            foreach (var path in allPaths)
+            //            {
+            //                City pivot = path.StartingCity;
+            //                path.StartingCity = path.EndingCity;
+            //                path.EndingCity = pivot;
+            //
+            //                invertPaths.Add(path);
+            //            }
+            //
+            //            allPaths.AddRange(invertPaths);
+
             EvaluationMatrix matrices = new EvaluationMatrix(command.Cities.Count);
+
+            Stopwatch s2 = Stopwatch.StartNew();
             matrices = _downloadRoadData.Execute(command.Cities, matrices);
+            var xd2 = s2.ElapsedMilliseconds;
+
+            EvaluationMatrix matricesv3 = new EvaluationMatrix(command.Cities.Count);
+            Stopwatch s3 = Stopwatch.StartNew();
+            matricesv3 = _downloadRoadData.ExecuteV3(command.Cities, matrices);
+            var xd3 = s3.ElapsedMilliseconds;
+
+
             matrices = _evaluationBrain.Execute(matrices, command.Cities.Count);
 
             List<int> orderOfCities;

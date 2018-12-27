@@ -1,10 +1,11 @@
 ﻿namespace DreamTravel.BestPath.Executors
 {
-    using System.Collections.Generic;
-    using System.Threading.Tasks;
     using Interfaces;
     using Models;
     using SharedModels;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Threading.Tasks;
 
     public class DownloadRoadData : IDownloadRoadData
     {
@@ -25,6 +26,12 @@
             EvaluationMatrix evaluationMatrix)
         {
             SetTablesValueAsMax(evaluationMatrix, 0);
+
+//            Task[] tasks = new Task[2];
+//            tasks[0] = new Task(() => evaluationMatrix.TollDistances = _downloadDurationMatrixByTollRoad.Execute(listOfCities));
+//            tasks[1] = new Task(() => evaluationMatrix.FreeDistances = _downloadDurationMatrixByFreeRoad.Execute(listOfCities));
+//            // tasks[2] = new Task(() => (evaluationMatrix.Costs, evaluationMatrix.VinietaCosts) = _downloadCostBetweenTwoCities.ExecuteV3(listOfCities));
+//            Task.WaitAll(tasks);
 
             Parallel.Invoke
             (
@@ -53,6 +60,88 @@
             });
 
             return evaluationMatrix;
+        }
+
+
+        public EvaluationMatrix ExecuteV3(List<City> listOfCities,
+            EvaluationMatrix evaluationMatrix)
+        {
+            SetTablesValueAsMax(evaluationMatrix, 0);
+
+            Parallel.Invoke(
+                () => evaluationMatrix.TollDistances = _downloadDurationMatrixByTollRoad.Execute(listOfCities),
+                () => evaluationMatrix.FreeDistances = _downloadDurationMatrixByFreeRoad.Execute(listOfCities),
+                () => (evaluationMatrix.Costs, evaluationMatrix.VinietaCosts) = _downloadCostBetweenTwoCities.ExecuteV3(listOfCities)
+            );
+
+
+            for (int i = 0; i < listOfCities.Count; i++)
+            {
+                for (int j = 0; j < listOfCities.Count; j++)
+                {
+                    if (i == j)
+                    {
+                        SetTablesValueAsMax(evaluationMatrix, j + i * listOfCities.Count);
+                    }
+                }
+            }
+
+            return evaluationMatrix;
+        }
+
+
+        public List<Path> ExecuteV2(City origin, List<City> destinations)
+        {
+            Path[] result = new Path[destinations.Count];
+
+
+            double[] tollDistances = new double[destinations.Count];
+            double[] freeDistances = new double[destinations.Count];
+
+            Parallel.Invoke
+            (
+                () => tollDistances = _downloadDurationMatrixByTollRoad.ExecuteV2(origin, destinations),
+                () => freeDistances = _downloadDurationMatrixByFreeRoad.ExecuteV2(origin, destinations)
+            );
+
+
+            for (int i = 0; i < destinations.Count; i++)
+            // Parallel.For(0, destinations.Count, i =>
+            {
+                Path pathToAdd = new Path();
+
+                pathToAdd.StartingCity = origin;
+                pathToAdd.EndingCity = destinations[i];
+
+                if (pathToAdd.StartingCity.Name != pathToAdd.EndingCity.Name)
+                {
+                    (double cost, double vinietaCost) = _downloadCostBetweenTwoCities.Execute(pathToAdd.StartingCity, pathToAdd.EndingCity);
+
+                    pathToAdd.Cost = cost;
+                    pathToAdd.VinietaCost = vinietaCost;
+                    pathToAdd.FreeDistance = freeDistances[i];
+                    pathToAdd.TollDistance = tollDistances[i];
+                }
+                else
+                {
+                    SetPathValuesAsMax(pathToAdd);
+                }
+
+                result[i] = pathToAdd;
+            }
+
+
+            return result.ToList();
+        }
+
+        private void SetPathValuesAsMax(Path path)
+        {
+            path.FreeDistance = double.MaxValue;
+            path.TollDistance = double.MaxValue;
+            path.OptimalDistance = double.MaxValue;
+            path.Goal = double.MaxValue;
+            path.Cost = double.MaxValue;
+            path.OptimalCost = double.MaxValue;
         }
 
         private static void SetTablesValueAsMax(EvaluationMatrix evaluationMatrix, int iterator)
