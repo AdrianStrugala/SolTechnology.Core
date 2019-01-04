@@ -1,10 +1,4 @@
-﻿import { html2canvas } from '../lib/html2canvas.js';
-
-html2canvas(document.body).then(function (canvas) {
-    document.body.appendChild(canvas);
-});
-
-var slideIndex = 1;
+﻿var slideIndex = 1;
 showSlides(slideIndex);
 
 // Next/previous controls

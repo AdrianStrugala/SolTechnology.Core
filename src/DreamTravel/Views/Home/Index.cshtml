@@ -206,7 +206,6 @@
         </script>
 
         <script>
-
             function initMap() {
                 document.getElementById("listOfCitiesBtn").style.display = "none";
                 document.getElementById("costLimiBtn").style.display = "none";
@@ -228,6 +227,11 @@
                             var el = event.target.value;
                             event.target.value = el.substring(0, el.length - 1);
                         }
+
+                        //TODO: SCREENSHOT
+                        html2canvas(document.body).then(function(canvas) {
+                            document.body.appendChild(canvas);
+                        });
                         addCityHandler(map);
                     }
                 });
@@ -235,7 +239,7 @@
 
             $("#costSlider")[0].oninput = function () {
                 $("#limitValue")[0].innerHTML = this.value + " €";
-            }
+            };
         </script>
     }
 </body>
