@@ -1,4 +1,10 @@
-﻿var slideIndex = 1;
+﻿import { html2canvas } from '../lib/html2canvas.js';
+
+html2canvas(document.body).then(function (canvas) {
+    document.body.appendChild(canvas);
+});
+
+var slideIndex = 1;
 showSlides(slideIndex);
 
 // Next/previous controls
@@ -13,6 +19,7 @@ function currentSlide(n) {
 
 function showSlides(n) {
     var i;
+
     var slides = <HTMLCollectionOf<HTMLElement>>document.getElementsByClassName("mySlides");
     var dots = document.getElementsByClassName("dot");
     if (n > slides.length) { slideIndex = 1 }
