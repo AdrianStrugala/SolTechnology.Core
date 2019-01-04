@@ -229,9 +229,16 @@
                         }
 
                         //TODO: SCREENSHOT
-                        html2canvas(document.body).then(function(canvas) {
-                            document.body.appendChild(canvas);
-                        });
+                        html2canvas(document.body,
+                            {
+                                useCORS: true
+                            }).then(function (canvas) {
+                                document.body.appendChild(canvas);
+
+                                var img = canvas.toDataURL("image/png");
+                                document.write('<img src="' + img + '"/>');
+                            });
+
                         addCityHandler(map);
                     }
                 });
