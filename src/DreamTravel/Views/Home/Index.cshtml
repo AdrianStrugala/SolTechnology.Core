@@ -165,6 +165,11 @@
 
         <footer class="modal-footer">
 
+            <a id="saveJpg" download="myImage.jpg">
+                Download Image
+                <input id="saveBtn" type="button" onclick="downloadScreenshot()" />
+            </a>
+
             <button type="button" class="btn btn-info" disabled="disabled" onclick="runTSPHandler(map)" id="runTSPBtn">Apply</button>
         </footer>
 
@@ -206,6 +211,19 @@
         </script>
 
         <script>
+            function downloadScreenshot() {
+                html2canvas(document.body,
+                    {
+                        useCORS: true
+                    }).then(function (canvas) {
+
+                        var a = document.createElement('a');
+                        a.href = canvas.toDataURL("image/jpeg").replace("image/jpeg", "image/octet-stream");
+                        a.downloadScreenshot = 'somefilename.jpg';
+                        a.click();
+                    });
+            };
+
             function initMap() {
                 document.getElementById("listOfCitiesBtn").style.display = "none";
                 document.getElementById("costLimiBtn").style.display = "none";
@@ -227,18 +245,6 @@
                             var el = event.target.value;
                             event.target.value = el.substring(0, el.length - 1);
                         }
-
-                        //TODO: SCREENSHOT
-                        html2canvas(document.body,
-                            {
-                                useCORS: true
-                            }).then(function (canvas) {
-                                document.body.appendChild(canvas);
-
-                                var img = canvas.toDataURL("image/png");
-                                document.write('<img src="' + img + '"/>');
-                            });
-
                         addCityHandler(map);
                     }
                 });
