@@ -217,9 +217,13 @@
                         useCORS: true
                     }).then(function (canvas) {
 
+                        var cityName = $("#listOfCities").children().eq(0).children()[1].value;
+
+                        alert(cityName);
+
                         var a = document.createElement('a');
                         a.href = canvas.toDataURL("image/jpeg").replace("image/jpeg", "image/octet-stream");
-                        a.downloadScreenshot = 'somefilename.jpg';
+                        a.download = (cityName.toString() + 'somefilename.jpg');
                         a.click();
                     });
             };
