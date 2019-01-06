@@ -22,6 +22,11 @@
                         <button type="button" class="btn btn-outline-secondary" data-toggle="modal" data-target="#instructionModal" id="instructionBtn" display="none">Info</button>
                     </li>
 
+                    <!-- Save screenshot button -->
+                    <li class="nav-item">
+                        <button type="button" class="btn btn-outline-secondary" onclick="saveMap()" id="saveMapBtn" display="none">Save map</button>
+                    </li>
+
                     <!-- Journey list -->
                     <li class="dropdown nav-item" id="listOfCitiesBtn" display="none">
                         <a href="#" class="btn btn-outline-secondary dropdown-toggle" data-toggle="dropdown">Your travel</a>
@@ -164,12 +169,6 @@
         <button type="button" class="btn btn-success" onclick="addCityHandler(map)" id="addCityBtn">+</button>
 
         <footer class="modal-footer">
-
-            <a id="saveJpg" download="myImage.jpg">
-                Download Image
-                <input id="saveBtn" type="button" onclick="downloadScreenshot()" />
-            </a>
-
             <button type="button" class="btn btn-info" disabled="disabled" onclick="runTSPHandler(map)" id="runTSPBtn">Apply</button>
         </footer>
 
@@ -211,7 +210,7 @@
         </script>
 
         <script>
-            function downloadScreenshot() {
+            function saveMap() {
                 html2canvas(document.body,
                     {
                         useCORS: true
