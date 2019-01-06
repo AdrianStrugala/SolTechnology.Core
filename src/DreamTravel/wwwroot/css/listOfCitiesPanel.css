@@ -1,6 +1,6 @@
 ﻿#listOfCitiesPanel {
-    height: 92vh;
-    margin-top: 8vh;
+    height: calc(100vh - 3.5rem);
+    margin-top: 3.5rem;
     width: 15rem;
     position: fixed;
     z-index: 1;

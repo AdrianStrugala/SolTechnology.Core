@@ -10,9 +10,10 @@ html, body {
         * element that contains the map. */
 #map {
     float: left;
-    height: 92vh;
+    vertical-align: top;
+    height: calc(100vh - 3.5rem);
     width: calc(100vw - 15rem);
-    margin-top: 8vh;
+    margin-top: 3.5rem;
     margin-left: 15rem;
     padding: 0;
 }
@@ -32,6 +33,3 @@ html, body {
     top: calc(50% - 15vh);
     z-index: 1;
 }
-
-
-
