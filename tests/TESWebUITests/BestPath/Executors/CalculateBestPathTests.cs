@@ -1,24 +1,26 @@
-﻿namespace DreamTravelITests.BestPath.Executors
+using DreamTravel.BestPath;
+using DreamTravel.BestPath.Executors;
+using DreamTravel.BestPath.Interfaces;
+using NSubstitute;
+using System.Threading.Tasks;
+using TravelingSalesmanProblem;
+using Xunit;
+
+namespace DreamTravelITests.BestPath.Executors
 {
-    using DreamTravel.BestPath;
-    using DreamTravel.BestPath.Executors;
-    using DreamTravel.BestPath.Interfaces;
+    using System.Collections.Generic;
     using DreamTravel.BestPath.Models;
     using DreamTravel.SharedModels;
-    using NSubstitute;
-    using System.Collections.Generic;
-    using System.Threading.Tasks;
-    using TravelingSalesmanProblem;
-    using Xunit;
 
-    public class BestPathCalculatorTests
+    public class CalculateBestPathTests
     {
         private readonly IDownloadRoadData _downloadRoadData;
         private readonly ITSP _tspSolver;
         private readonly IEvaluationBrain _evaluationBrain;
 
         private readonly CalculateBestPath _sut;
-        public BestPathCalculatorTests()
+
+        public CalculateBestPathTests()
         {
             _downloadRoadData = Substitute.For<IDownloadRoadData>();
             IFormOutputData formOutputData = new FormPathsFromMatrices();
