@@ -1,4 +1,3 @@
-using DreamTravel.BestPath;
 using DreamTravel.BestPath.Executors;
 using DreamTravel.BestPath.Interfaces;
 using NSubstitute;
@@ -39,12 +38,9 @@ namespace DreamTravelITests.BestPath.Executors
             _tspSolver.SolveTSP(Arg.Any<List<double>>()).Returns(new List<int> { 1 });
 
             List<City> cities = new List<City> { new City { Name = "Wroclaw", Latitude = 21, Longitude = 37 } };
-
-            Command command = new Command { Cities = cities, OptimizePath = true };
-
-
+            
             //Act
-            var result = _sut.Execute(command);
+            var result = _sut.Execute(cities, true);
 
 
             //Assert
@@ -70,12 +66,9 @@ namespace DreamTravelITests.BestPath.Executors
                 new City { Name = "WroclawNorth", Latitude = 22, Longitude = 37 },
                 new City { Name = "WroclawSouth", Latitude = 20, Longitude = 37 }
             };
-
-            Command command = new Command { Cities = cities, OptimizePath = false };
-
-
+            
             //Act
-            var result = await _sut.Execute(command);
+            var result = await _sut.Execute(cities, false);
             var bestPaths = result.BestPaths;
 
 

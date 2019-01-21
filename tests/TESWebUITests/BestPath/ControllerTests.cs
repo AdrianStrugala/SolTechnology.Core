@@ -42,7 +42,7 @@
             //Arrange
             Query query = _fixture.Create<Query>();
 
-            _calculateBestPath.Execute(Arg.Any<Command>()).Returns(new Result());
+            _calculateBestPath.Execute(Arg.Any<List<City>>(), Arg.Any<bool>()).Returns(new Result());
 
 
             //Act
@@ -65,7 +65,7 @@
                 SessionId = "dupa"
             };
 
-            _calculateBestPath.Execute(Arg.Any<Command>()).Throws(new Exception());
+            _calculateBestPath.Execute(Arg.Any<List<City>>(), Arg.Any<bool>()).Throws(new Exception());
 
             //Act
             var response = await _session.PostCalculateBestPath(query);

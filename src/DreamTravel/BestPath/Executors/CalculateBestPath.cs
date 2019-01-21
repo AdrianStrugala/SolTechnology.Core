@@ -2,6 +2,7 @@
 {
     using Interfaces;
     using Models;
+    using SharedModels;
     using System.Collections.Generic;
     using System.Linq;
     using System.Threading.Tasks;
@@ -22,21 +23,21 @@
             _evaluationBrain = evaluationBrain;
         }
 
-        public async Task<Result> Execute(Command command)
+        public async Task<Result> Execute(List<City> cities, bool optimizePath)
         {
-            EvaluationMatrix evaluationMatrix = new EvaluationMatrix(command.Cities.Count);
-            evaluationMatrix = await _downloadRoadData.Execute(command.Cities, evaluationMatrix);
-            evaluationMatrix = _evaluationBrain.Execute(evaluationMatrix, command.Cities.Count);
+            EvaluationMatrix evaluationMatrix = new EvaluationMatrix(cities.Count);
+            evaluationMatrix = await _downloadRoadData.Execute(cities, evaluationMatrix);
+            evaluationMatrix = _evaluationBrain.Execute(evaluationMatrix, cities.Count);
 
 
             List<int> orderOfCities;
-            if (command.OptimizePath)
+            if (optimizePath)
             {
                 orderOfCities = _tspSolver.SolveTSP(evaluationMatrix.OptimalDistances.ToList());
             }
             else
             {
-                orderOfCities = Enumerable.Range(0, command.Cities.Count).ToList();
+                orderOfCities = Enumerable.Range(0, cities.Count).ToList();
             }
 
 
@@ -45,8 +46,8 @@
 
             Result result = new Result
             {
-                Cities = command.Cities,
-                BestPaths = _formOutputData.Execute(command.Cities, evaluationMatrix, orderOfCities)
+                Cities = cities,
+                BestPaths = _formOutputData.Execute(cities, evaluationMatrix, orderOfCities)
             };
             return result;
         }

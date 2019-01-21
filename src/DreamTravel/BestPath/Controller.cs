@@ -1,12 +1,12 @@
 ﻿namespace DreamTravel.BestPath
 {
-    using System.Threading.Tasks;
     using Interfaces;
     using Microsoft.AspNetCore.Http;
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.Extensions.Logging;
     using Newtonsoft.Json;
     using System;
+    using System.Threading.Tasks;
 
     [Route(Route)]
     public class Controller : Microsoft.AspNetCore.Mvc.Controller
@@ -32,14 +32,7 @@
             try
             {
                 _logger.LogInformation("TSP Engine: Fire!");
-                Command command = new Command
-                {
-                    Cities = query.Cities,
-                    OptimizePath = query.OptimizePath
-                };
-                
-
-                Result result = await _calculateBestPath.Execute(command);
+                Result result = await _calculateBestPath.Execute(query.Cities, query.OptimizePath);
 
 
                 HttpContext.Session.SetString(query.SessionId + PathsKeyName, JsonConvert.SerializeObject(result.BestPaths));
