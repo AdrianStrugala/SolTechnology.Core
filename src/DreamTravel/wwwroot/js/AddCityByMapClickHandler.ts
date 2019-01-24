@@ -1,6 +1,6 @@
 ﻿function addCityByMapClickHandler(position, map) {
 
-    if (noOfCityRows > 1) {
+    if ((<HTMLInputElement>$("#listOfCities").children().eq(0).children()[1]).value !== "") {
         addCityHandler(map);
     }
 
