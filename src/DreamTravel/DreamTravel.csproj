@@ -8,6 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Content Remove="wwwroot\js\AddCityByMapClickHandler.ts" />
     <Content Remove="wwwroot\js\AddCityHandler.ts" />
     <Content Remove="wwwroot\js\ClearMapHandler.ts" />
     <Content Remove="wwwroot\js\DisplayCityHandler.ts" />
@@ -52,6 +53,7 @@
   <ItemGroup>
     <TypeScriptCompile Include="wwwroot\js\AddCityHandler.ts" />
     <TypeScriptCompile Include="wwwroot\js\ClearMapHandler.ts" />
+    <TypeScriptCompile Include="wwwroot\js\AddCityByMapClickHandler.ts" />
     <TypeScriptCompile Include="wwwroot\js\DisplayCityHandler.ts" />
     <TypeScriptCompile Include="wwwroot\js\DisplayMarkerHandler.ts" />
     <TypeScriptCompile Include="wwwroot\js\DisplayRouteHandler.ts" />
