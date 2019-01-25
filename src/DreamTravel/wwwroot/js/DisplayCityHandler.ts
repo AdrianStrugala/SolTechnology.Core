@@ -30,6 +30,7 @@
         },
 
         error(req, status, errorObj) {
+            displayCityAjaxCalls.pop();
             var alertMessage = JSON.parse(req.responseText);
             alert(alertMessage);
         }

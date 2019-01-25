@@ -1,9 +1,4 @@
 ﻿function addCityByMapClickHandler(position, map) {
-
-    if ((<HTMLInputElement>$("#listOfCities").children().eq(0).children()[1]).value !== "") {
-        addCityHandler(map);
-    }
-
     displayCityAjaxCalls.push($.ajax({
         type: 'POST',
         dataType: 'html',
@@ -16,6 +11,9 @@
 
             var city = JSON.parse(msg);
 
+            if ((<HTMLInputElement>$("#listOfCities").children().eq(0).children()[1]).value !== "") {
+                addCityHandler(map);
+            }
 
             $("#listOfCities").children().each(function (index) {
                 if ($(this).attr('id') == "cityRow" + noOfCityRows.toString()) {
@@ -38,6 +36,7 @@
         },
 
         error(req, status, errorObj) {
+            displayCityAjaxCalls.pop();
             var alertMessage = JSON.parse(req.responseText);
             alert(alertMessage);
         }
