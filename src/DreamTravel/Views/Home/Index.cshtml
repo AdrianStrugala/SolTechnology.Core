@@ -159,10 +159,18 @@
         <div id="listOfCities">
 
             <div class="cityRow" id="cityRow1">
-                <hr class="line">
-                <textarea class="cityText" id="0" rows="1" onchange="displayCityHandler(this, map)"></textarea>
-                <button type="button" class="btn btn-danger" onclick="removeCityHandler(this)" id="0">X</button>
-                <hr class="line">
+                <hr class="line" ondrop="drop(event)" ondragover="allowDrop(event)">
+                <textarea class="cityText" id="1" rows="1" onchange="displayCityHandler(this, map)" draggable="true"></textarea>
+                <button type="button" class="btn btn-danger" onclick="removeCityHandler(this)" id="1">X</button>
+                <hr class="line" ondrop="drop(event)" ondragover="allowDrop(event)">
+            </div>
+            
+            @* temporary *@
+            <div class="cityRow" id="cityRow2">
+                @* <hr class="line" ondrop="drop(event)" ondragover="allowDrop(event)"> *@
+                <textarea class="cityText" id="2" rows="1" onchange="displayCityHandler(this, map)" draggable="true" ondragstart="drag(event)"></textarea>
+                <button type="button" class="btn btn-danger" onclick="removeCityHandler(this)" id="2">X</button>
+                <hr class="line" ondrop="drop(event)" ondragover="allowDrop(event)">
             </div>
 
         </div>
@@ -242,6 +250,22 @@
             $("#costSlider")[0].oninput = function () {
                 $("#limitValue")[0].innerHTML = this.value + " €";
             };
+
+//            temporary
+            //this is ok
+            function allowDrop(ev) {
+                ev.preventDefault();
+            }
+
+            function drag(ev) {
+                ev.dataTransfer.setData("text", ev.source.value);
+            }
+
+            function drop(ev) {
+                ev.preventDefault();
+                var data = ev.dataTransfer.getData("text");
+                ev.target.appendChild(document.getElementById(data));
+            }
         </script>
     }
 </body>
