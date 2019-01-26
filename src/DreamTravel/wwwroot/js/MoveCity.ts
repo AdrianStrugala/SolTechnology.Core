@@ -12,7 +12,7 @@
         runTSP(map);
     }
 
-    if (sourceIndex < targetIndex) {
+    else if (sourceIndex < targetIndex) {
         targetIndex = targetIndex - 1;
         var temp = cities[sourceIndex];
 

@@ -15,14 +15,7 @@
             $("#listOfCities").children().each(function (index) {
                 if ($(this).attr('id') == "cityRow" + item.id && index < cities.length) {
                     
-                    if (markers[index] != null) {
-                        markers[index].setMap(null);
-                    }
-                    cities[index] = city;
-                    markers[index] = displayMarker(map,
-                        city.Latitude,
-                        city.Longitude,
-                        "✓");
+                    updateCity(index, city, map, "✓");
 
                     map.setCenter(markers[index].getPosition());
                 }
