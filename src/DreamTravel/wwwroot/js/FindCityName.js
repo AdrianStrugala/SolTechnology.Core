@@ -20,7 +20,7 @@ function findCityName(event) {
         success: function (msg) {
             var city = JSON.parse(msg);
             cities[index] = city;
-            $("#listOfCities").children().eq(index).children()[0].value = city.Name;
+            setCityNameOnPanel(index, city.Name);
         },
         error: function (req, status, errorObj) {
             var alertMessage = JSON.parse(req.responseText);

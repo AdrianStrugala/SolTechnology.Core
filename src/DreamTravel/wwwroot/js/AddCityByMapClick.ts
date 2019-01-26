@@ -11,7 +11,7 @@
 
             var city = JSON.parse(msg);
 
-            if ((<HTMLInputElement>$("#listOfCities").children().eq(0).children()[0]).value !== "") {
+            if (getCityNameFromPanel(0) !== "") {
                 addCity(map);
             }
 
@@ -28,7 +28,7 @@
                         city.Longitude,
                         "✓");
 
-                    (<HTMLInputElement>$("#listOfCities").children().eq(index).children()[0]).value = city.Name;
+                    setCityNameOnPanel(index, city.Name);
 
                     map.setCenter(markers[index].getPosition());
                 }

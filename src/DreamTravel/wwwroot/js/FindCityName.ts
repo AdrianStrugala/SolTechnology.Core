@@ -23,7 +23,7 @@
 
             var city = JSON.parse(msg);
             cities[index] = city;
-            (<HTMLInputElement>$("#listOfCities").children().eq(index).children()[0]).value = city.Name;
+            setCityNameOnPanel(index, city.Name);
         },
 
         error(req, status, errorObj) {

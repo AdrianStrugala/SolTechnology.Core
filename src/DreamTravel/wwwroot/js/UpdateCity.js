@@ -6,6 +6,6 @@ function updateCity(index, city, map) {
     }
     markers[index] = displayMarker(map, city.Latitude, city.Longitude, index);
     cities[index] = city;
-    $("#listOfCities").children().eq(index).children()[0].value = city.Name;
+    setCityNameOnPanel(index, city.Name);
 }
 //# sourceMappingURL=UpdateCity.js.map

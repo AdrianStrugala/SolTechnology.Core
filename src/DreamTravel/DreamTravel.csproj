@@ -11,6 +11,7 @@
     <Content Remove="wwwroot\DragAndDropCityHandler.ts" />
     <Content Remove="wwwroot\js\AddCity.ts" />
     <Content Remove="wwwroot\js\AddCityByMapClick.ts" />
+    <Content Remove="wwwroot\js\CitiesPanelRepository.ts" />
     <Content Remove="wwwroot\js\ClearMap.ts" />
     <Content Remove="wwwroot\js\DisplayCity.ts" />
     <Content Remove="wwwroot\js\DisplayMarker.ts" />
@@ -62,6 +63,7 @@
     <TypeScriptCompile Include="wwwroot\js\DisplayMarker.ts" />
     <TypeScriptCompile Include="wwwroot\js\DisplayRoute.ts" />
     <TypeScriptCompile Include="wwwroot\js\FindCityName.ts" />
+    <TypeScriptCompile Include="wwwroot\js\CitiesPanelRepository.ts" />
     <TypeScriptCompile Include="wwwroot\js\GetIndexOfCity.ts" />
     <TypeScriptCompile Include="wwwroot\js\Instruction.ts" />
     <TypeScriptCompile Include="wwwroot\js\LimitCost.ts" />

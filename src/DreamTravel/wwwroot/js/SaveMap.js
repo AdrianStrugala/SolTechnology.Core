@@ -19,8 +19,8 @@ function saveMap() {
         var fileName = "newTravel-" + timeStamp + '.jpg';
         var noOfCities = $("#listOfCities").children().length;
         if (noOfCities >= 2) {
-            var firstCityName = $("#listOfCities").children().eq(0).children()[0].value;
-            var lastCityName = $("#listOfCities").children().eq(noOfCities - 1).children()[0].value;
+            var firstCityName = getCityNameFromPanel(0);
+            var lastCityName = getCityNameFromPanel(noOfCities - 1);
             fileName = firstCityName + "-" + lastCityName + "-" + timeStamp + ".jpg";
         }
         //transform back
