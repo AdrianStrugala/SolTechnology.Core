@@ -7,6 +7,6 @@ function drag(ev) {
 function drop(ev, map) {
     ev.preventDefault();
     var sourceIndex = ev.dataTransfer.getData("sourceIndex");
-    moveCity(sourceIndex, ev.target.id, map);
+    moveCity(parseInt(sourceIndex), parseInt(ev.target.id), map);
 }
 //# sourceMappingURL=DragAndDropCity.js.map

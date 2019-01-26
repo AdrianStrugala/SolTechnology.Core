@@ -9,7 +9,7 @@ function addCityByMapClick(position, map) {
         data: { lat: position.lat(), lng: position.lng(), sessionId: sessionId },
         success: function (msg) {
             var city = JSON.parse(msg);
-            if ($("#listOfCities").children().eq(0).children()[1].value !== "") {
+            if ($("#listOfCities").children().eq(0).children()[0].value !== "") {
                 addCity(map);
             }
             $("#listOfCities").children().each(function (index) {
@@ -19,7 +19,7 @@ function addCityByMapClick(position, map) {
                     }
                     cities[index] = city;
                     markers[index] = displayMarker(map, city.Latitude, city.Longitude, "✓");
-                    $("#listOfCities").children().eq(index).children()[1].value = city.Name;
+                    $("#listOfCities").children().eq(index).children()[0].value = city.Name;
                     map.setCenter(markers[index].getPosition());
                 }
             });

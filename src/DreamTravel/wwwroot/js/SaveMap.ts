@@ -25,8 +25,8 @@ function saveMap() {
             var noOfCities = $("#listOfCities").children().length;
             if (noOfCities >= 2) {
 
-                var firstCityName = (<HTMLInputElement>$("#listOfCities").children().eq(0).children()[1]).value;
-                var lastCityName = (<HTMLInputElement>$("#listOfCities").children().eq(noOfCities - 1).children()[1]).value;
+                var firstCityName = (<HTMLInputElement>$("#listOfCities").children().eq(0).children()[0]).value;
+                var lastCityName = (<HTMLInputElement>$("#listOfCities").children().eq(noOfCities - 1).children()[0]).value;
                 fileName = firstCityName + "-" + lastCityName + "-" + timeStamp + ".jpg";
             }
 

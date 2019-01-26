@@ -155,11 +155,11 @@
 
         <h4 class="modal-title" align="center"> List of cities:</h4>
         <br />
-
-        <div id="listOfCities">
-
+             
+        <hr class="line" ondrop="drop(event, map)" ondragover="allowDrop(event)" id="0">
+        
+        <div id="listOfCities">              
             <div class="cityRow" id="cityRow1">
-                <hr class="line" ondrop="drop(event, map)" ondragover="allowDrop(event)" id="0">
                 <textarea class="cityText" id="1" rows="1" onchange="displayCity(this, map)" draggable="true" ondragstart="drag(event)"></textarea>
                 <button type="button" class="btn btn-danger" onclick="removeCity(this)" id="1">X</button>
                 <hr class="line" ondrop="drop(event, map)" ondragover="allowDrop(event)" id="1">

@@ -23,7 +23,7 @@
 
             var city = JSON.parse(msg);
             cities[index] = city;
-            (<HTMLInputElement>$("#listOfCities").children().eq(index).children()[1]).value = city.Name;
+            (<HTMLInputElement>$("#listOfCities").children().eq(index).children()[0]).value = city.Name;
         },
 
         error(req, status, errorObj) {

@@ -11,13 +11,13 @@
 
             var city = JSON.parse(msg);
 
-            if ((<HTMLInputElement>$("#listOfCities").children().eq(0).children()[1]).value !== "") {
+            if ((<HTMLInputElement>$("#listOfCities").children().eq(0).children()[0]).value !== "") {
                 addCity(map);
             }
 
             $("#listOfCities").children().each(function (index) {
                 if ($(this).attr('id') == "cityRow" + noOfCityRows.toString()) {
-
+                    
                     if (markers[index] != null) {
                         markers[index].setMap(null);
                     }
@@ -28,7 +28,7 @@
                         city.Longitude,
                         "✓");
 
-                    (<HTMLInputElement>$("#listOfCities").children().eq(index).children()[1]).value = city.Name;
+                    (<HTMLInputElement>$("#listOfCities").children().eq(index).children()[0]).value = city.Name;
 
                     map.setCenter(markers[index].getPosition());
                 }

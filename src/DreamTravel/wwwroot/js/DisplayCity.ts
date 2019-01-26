@@ -14,7 +14,7 @@
 
             $("#listOfCities").children().each(function (index) {
                 if ($(this).attr('id') == "cityRow" + item.id && index < cities.length) {
-
+                    
                     if (markers[index] != null) {
                         markers[index].setMap(null);
                     }

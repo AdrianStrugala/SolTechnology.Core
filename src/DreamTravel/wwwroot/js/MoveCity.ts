@@ -13,6 +13,7 @@
     }
 
     if (sourceIndex < targetIndex) {
+        targetIndex = targetIndex - 1;
         var temp = cities[sourceIndex];
 
         for (var i = sourceIndex; i < targetIndex; i++) {
