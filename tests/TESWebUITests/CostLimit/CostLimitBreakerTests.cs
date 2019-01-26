@@ -74,6 +74,7 @@ namespace DreamTravelITests.CostLimit
             List<Path> paths = new List<Path>();
             paths.Add(new Path
             {
+                Cost = 10,
                 VinietaCost = 10,
                 OptimalCost = 10,
                 Index = 0,
@@ -87,6 +88,41 @@ namespace DreamTravelITests.CostLimit
 
             //Assert
             Assert.Equal(0, result[0].OptimalCost);
+        }
+
+
+        [Fact]
+        void Handle_2PathsUsingTheSameVinieta_ResultContainsOptimalCostForThem()
+        {
+            //Arrange
+            int costLimit = 11;
+            List<Path> paths = new List<Path>();
+            paths.Add(new Path
+            {
+                Cost = 5,
+                VinietaCost = 10,
+                OptimalCost = 0,
+                Index = 0,
+                Goal = 3
+            });
+
+            paths.Add(new Path
+            {
+                Cost = 5,
+                VinietaCost = 10,
+                OptimalCost = 0,
+                Index = 1,
+                Goal = 3
+            });
+
+
+            //Act
+            var result = _sut.Execute(costLimit, paths);
+
+
+            //Assert
+            Assert.Equal(5, result[0].OptimalCost);
+            Assert.Equal(5, result[1].OptimalCost);
         }
     }
 }

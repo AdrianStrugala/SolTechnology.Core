@@ -9,6 +9,8 @@ namespace DreamTravel.CostLimit
     {
         public List<Path> Execute(int costLimit, List<Path> paths)
         {
+            List<double> consideredVinietas = new List<double>();
+
             paths.Sort((x, y) => 1 * x.Goal.CompareTo(y.Goal));
 
             double overallCost = 0;
@@ -16,6 +18,7 @@ namespace DreamTravel.CostLimit
             {
                 if (path.VinietaCost > 0)
                 {
+                    if (consideredVinietas.Contains(path.VinietaCost)) continue;
                     if (overallCost + path.VinietaCost > costLimit)
                     {
                         paths.Where(x => x.VinietaCost.Equals(path.VinietaCost)).ToList()
@@ -36,6 +39,7 @@ namespace DreamTravel.CostLimit
                                 y.OptimalDistance = y.TollDistance;
                             });
                     }
+                    consideredVinietas.Add(path.VinietaCost);
                 }
                 else
                 {
