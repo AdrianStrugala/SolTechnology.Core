@@ -1,5 +1,5 @@
 /// <reference path="../lib/googleMaps/googleMaps.d.ts" />
-function displayMarker(map, latitude, longtitude, number) {
+function displayMarker(map, latitude, longtitude, label) {
     var marker = new google.maps.Marker(({
         position: {
             lat: latitude,
@@ -8,7 +8,7 @@ function displayMarker(map, latitude, longtitude, number) {
         map: map,
         draggable: true,
         label: {
-            text: number.toString(),
+            text: label.toString(),
             color: "white",
             fontWeight: "bold"
         }

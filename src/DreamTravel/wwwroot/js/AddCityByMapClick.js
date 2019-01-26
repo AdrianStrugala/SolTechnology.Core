@@ -14,12 +14,7 @@ function addCityByMapClick(position, map) {
             }
             $("#listOfCities").children().each(function (index) {
                 if ($(this).attr('id') == "cityRow" + noOfCityRows.toString()) {
-                    if (markers[index] != null) {
-                        markers[index].setMap(null);
-                    }
-                    cities[index] = city;
-                    markers[index] = displayMarker(map, city.Latitude, city.Longitude, "✓");
-                    setCityNameOnPanel(index, city.Name);
+                    updateCity(index, city, map, "✓");
                     map.setCenter(markers[index].getPosition());
                 }
             });
