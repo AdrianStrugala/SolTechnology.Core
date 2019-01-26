@@ -1,7 +1,7 @@
-﻿/// <reference path="./RemoveCityByIndexHandler.ts"/>
+﻿/// <reference path="./RemoveCityByIndex.ts"/>
 declare const Promise: any;
 
-function runTSPHandler(map) {
+function runTSP(map) {
     $("#loader")[0].style.display = "block";
 
     // wait for all Display City ajax calls to finish
@@ -15,7 +15,7 @@ function runTSPHandler(map) {
             }
         }
         for (var i = citiesToRemove.length - 1; i >= 0; i--) {
-            removeCityByIndexHandler(citiesToRemove[i]);
+            removeCityByIndex(citiesToRemove[i]);
         }
 
         var optimizeRoadChck = (<HTMLInputElement>$("#optimizeRoad")[0]).checked;
@@ -39,7 +39,7 @@ function runTSPHandler(map) {
                 var noOfPaths = pathList.length;
                 var list = $("#projectSelectorDropdown")[0];
 
-                cleanMapHandler(list);
+                cleanMap(list);
 
                 //Read information
                 for (var i = 0; i < noOfPaths; i++) {
@@ -47,12 +47,12 @@ function runTSPHandler(map) {
                     optimalCost += pathList[i].OptimalCost;
                     optimalTime += pathList[i].OptimalDistance;
                     totalCost += pathList[i].Cost;
-                    writePathInfoHandler(pathList[i], list);
-                    displayRouteHandler(directionsService, map, pathList[i]);
+                    displayPathInfo(pathList[i], list);
+                    displayRoute(directionsService, map, pathList[i]);
 
-                    updateCityHandler(i, pathList[i].StartingCity, map);
+                    updateCity(i, pathList[i].StartingCity, map);
                 }
-                updateCityHandler(markers.length - 1, pathList[noOfPaths - 1].EndingCity, map);
+                updateCity(markers.length - 1, pathList[noOfPaths - 1].EndingCity, map);
 
                 //Adjust map bounds
                 var bounds = new google.maps.LatLngBounds();
@@ -62,7 +62,7 @@ function runTSPHandler(map) {
                 map.fitBounds(bounds);
 
                 //Finalize display
-                writeSummaryInfoHandler(optimalTime, optimalCost);
+                displaySummaryInfo(optimalTime, optimalCost);
 
                 (<HTMLInputElement>$("#costSlider")[0]).value = optimalCost;
                 (<HTMLInputElement>$("#costSlider")[0]).max = String(Math.ceil(totalCost));

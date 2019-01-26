@@ -1,4 +1,4 @@
-﻿function findCityNameHandler(event) {
+﻿function findCityName(event) {
     var index;
 
     //get index of event source city

@@ -1,10 +1,8 @@
-﻿/// <reference path="../lib/jquery/jquery.d.ts" />
+/// <reference path="../lib/jquery/jquery.d.ts" />
 /// <reference path="./GlobalVariables.ts"/>
-
-function removeCityHandler(city) {
+function removeCity(city) {
     $("#listOfCities").children().each(function (index) {
         if ($(this).attr('id').toString() == "cityRow" + city.id.toString()) {
-
             if (markers[index] != null) {
                 markers[index].setMap(null);
             }
@@ -17,3 +15,4 @@ function removeCityHandler(city) {
         }
     });
 }
+//# sourceMappingURL=RemoveCity.js.map

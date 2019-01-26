@@ -1,4 +1,4 @@
-﻿function writeSummaryInfoHandler(totalTime, totalCost) {
+﻿function displaySummaryInfo(totalTime, totalCost) {
     var totalHours = Math.floor(totalTime / 3600);
     var totalMinutes = Math.floor((totalTime - Math.floor(totalHours) * 3600) / 60);
     var totalSeconds = (totalTime % 60);

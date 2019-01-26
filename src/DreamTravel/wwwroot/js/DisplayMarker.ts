@@ -1,6 +1,6 @@
 ﻿/// <reference path="../lib/googleMaps/googleMaps.d.ts" />
 
-function displayMarkerHandler(map, latitude, longtitude, number) {
+function displayMarker(map, latitude, longtitude, number) {
     var marker = new google.maps.Marker(({
         position: {
             lat: latitude,
@@ -15,6 +15,6 @@ function displayMarkerHandler(map, latitude, longtitude, number) {
         }
     }) as any);
 
-    marker.addListener('dragend', findCityNameHandler);
+    marker.addListener('dragend', findCityName);
     return marker;
 }

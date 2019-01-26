@@ -8,23 +8,26 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Content Remove="wwwroot\js\AddCityByMapClickHandler.ts" />
-    <Content Remove="wwwroot\js\AddCityHandler.ts" />
-    <Content Remove="wwwroot\js\ClearMapHandler.ts" />
-    <Content Remove="wwwroot\js\DisplayCityHandler.ts" />
-    <Content Remove="wwwroot\js\DisplayMarkerHandler.ts" />
-    <Content Remove="wwwroot\js\DisplayRouteHandler.ts" />
-    <Content Remove="wwwroot\js\FindCityNameHandler.ts" />
+    <Content Remove="wwwroot\DragAndDropCityHandler.ts" />
+    <Content Remove="wwwroot\js\AddCity.ts" />
+    <Content Remove="wwwroot\js\AddCityByMapClick.ts" />
+    <Content Remove="wwwroot\js\ClearMap.ts" />
+    <Content Remove="wwwroot\js\DisplayCity.ts" />
+    <Content Remove="wwwroot\js\DisplayMarker.ts" />
+    <Content Remove="wwwroot\js\DisplayRoute.ts" />
+    <Content Remove="wwwroot\js\DisplaySummaryInfo.ts" />
+    <Content Remove="wwwroot\js\FindCityName.ts" />
+    <Content Remove="wwwroot\js\GetIndexOfCity.ts" />
     <Content Remove="wwwroot\js\Instruction.ts" />
-    <Content Remove="wwwroot\js\LimitCostHandler.ts" />
-    <Content Remove="wwwroot\js\RunTSPHandler.ts" />
-    <Content Remove="wwwroot\js\SaveMapHandler.ts" />
-    <Content Remove="wwwroot\js\UpdateCityHandler.ts" />
+    <Content Remove="wwwroot\js\LimitCost.ts" />
+    <Content Remove="wwwroot\js\MoveCity.ts" />
+    <Content Remove="wwwroot\js\RunTSP.ts" />
+    <Content Remove="wwwroot\js\SaveMap.ts" />
+    <Content Remove="wwwroot\js\UpdateCity.ts" />
     <Content Remove="wwwroot\js\Utils\Guid.ts" />
     <Content Remove="wwwroot\js\Utils\Pad2.ts" />
     <Content Remove="wwwroot\js\Utils\Sleep.ts" />
     <Content Remove="wwwroot\js\Utils\WritePathInfoHandler.ts" />
-    <Content Remove="wwwroot\js\WriteSummaryInfoHandler.ts" />
     <Content Remove="wwwroot\lib\googleMaps\googleMaps.d.ts" />
   </ItemGroup>
 
@@ -51,23 +54,26 @@
   </ItemGroup>
 
   <ItemGroup>
-    <TypeScriptCompile Include="wwwroot\js\AddCityHandler.ts" />
-    <TypeScriptCompile Include="wwwroot\js\ClearMapHandler.ts" />
-    <TypeScriptCompile Include="wwwroot\js\AddCityByMapClickHandler.ts" />
-    <TypeScriptCompile Include="wwwroot\js\DisplayCityHandler.ts" />
-    <TypeScriptCompile Include="wwwroot\js\DisplayMarkerHandler.ts" />
-    <TypeScriptCompile Include="wwwroot\js\DisplayRouteHandler.ts" />
-    <TypeScriptCompile Include="wwwroot\js\FindCityNameHandler.ts" />
+    <TypeScriptCompile Include="wwwroot\js\DragAndDropCity.ts" />
+    <TypeScriptCompile Include="wwwroot\js\AddCity.ts" />
+    <TypeScriptCompile Include="wwwroot\js\ClearMap.ts" />
+    <TypeScriptCompile Include="wwwroot\js\AddCityByMapClick.ts" />
+    <TypeScriptCompile Include="wwwroot\js\DisplayCity.ts" />
+    <TypeScriptCompile Include="wwwroot\js\DisplayMarker.ts" />
+    <TypeScriptCompile Include="wwwroot\js\DisplayRoute.ts" />
+    <TypeScriptCompile Include="wwwroot\js\FindCityName.ts" />
+    <TypeScriptCompile Include="wwwroot\js\GetIndexOfCity.ts" />
     <TypeScriptCompile Include="wwwroot\js\Instruction.ts" />
-    <TypeScriptCompile Include="wwwroot\js\LimitCostHandler.ts" />
-    <TypeScriptCompile Include="wwwroot\js\RunTSPHandler.ts" />
-    <TypeScriptCompile Include="wwwroot\js\SaveMapHandler.ts" />
-    <TypeScriptCompile Include="wwwroot\js\UpdateCityHandler.ts" />
+    <TypeScriptCompile Include="wwwroot\js\LimitCost.ts" />
+    <TypeScriptCompile Include="wwwroot\js\MoveCity.ts" />
+    <TypeScriptCompile Include="wwwroot\js\RunTSP.ts" />
+    <TypeScriptCompile Include="wwwroot\js\SaveMap.ts" />
+    <TypeScriptCompile Include="wwwroot\js\UpdateCity.ts" />
     <TypeScriptCompile Include="wwwroot\js\Utils\Guid.ts" />
     <TypeScriptCompile Include="wwwroot\js\Utils\Pad2.ts" />
     <TypeScriptCompile Include="wwwroot\js\Utils\Sleep.ts" />
-    <TypeScriptCompile Include="wwwroot\js\WritePathInfoHandler.ts" />
-    <TypeScriptCompile Include="wwwroot\js\WriteSummaryInfoHandler.ts" />
+    <TypeScriptCompile Include="wwwroot\js\DisplayPathInfo.ts" />
+    <TypeScriptCompile Include="wwwroot\js\DisplaySummaryInfo.ts" />
     <TypeScriptCompile Include="wwwroot\lib\googleMaps\googleMaps.d.ts" />
   </ItemGroup>
 

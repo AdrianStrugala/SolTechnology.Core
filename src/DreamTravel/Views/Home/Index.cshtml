@@ -159,25 +159,17 @@
         <div id="listOfCities">
 
             <div class="cityRow" id="cityRow1">
-                <hr class="line" ondrop="drop(event)" ondragover="allowDrop(event)">
-                <textarea class="cityText" id="1" rows="1" onchange="displayCityHandler(this, map)" draggable="true"></textarea>
-                <button type="button" class="btn btn-danger" onclick="removeCityHandler(this)" id="1">X</button>
-                <hr class="line" ondrop="drop(event)" ondragover="allowDrop(event)">
+                <hr class="line" ondrop="drop(event, map)" ondragover="allowDrop(event)" id="0">
+                <textarea class="cityText" id="1" rows="1" onchange="displayCity(this, map)" draggable="true" ondragstart="drag(event)"></textarea>
+                <button type="button" class="btn btn-danger" onclick="removeCity(this)" id="1">X</button>
+                <hr class="line" ondrop="drop(event, map)" ondragover="allowDrop(event)" id="1">
             </div>
             
-            @* temporary *@
-            <div class="cityRow" id="cityRow2">
-                @* <hr class="line" ondrop="drop(event)" ondragover="allowDrop(event)"> *@
-                <textarea class="cityText" id="2" rows="1" onchange="displayCityHandler(this, map)" draggable="true" ondragstart="drag(event)"></textarea>
-                <button type="button" class="btn btn-danger" onclick="removeCityHandler(this)" id="2">X</button>
-                <hr class="line" ondrop="drop(event)" ondragover="allowDrop(event)">
-            </div>
-
         </div>
-        <button type="button" class="btn btn-success" onclick="addCityHandler(map)" id="addCityBtn">+</button>
+        <button type="button" class="btn btn-success" onclick="addCity(map)" id="addCityBtn">+</button>
 
         <footer class="modal-footer">
-            <button type="button" class="btn btn-info" disabled="disabled" onclick="runTSPHandler(map)" id="runTSPBtn">Apply</button>
+            <button type="button" class="btn btn-info" disabled="disabled" onclick="runTSP(map)" id="runTSPBtn">Apply</button>
         </footer>
 
     </div>
@@ -199,7 +191,7 @@
                     <input type="range" min="0" max="100" value="0" class="slider" id="costSlider">
                 </div>
                 <footer class="modal-footer">
-                    <button type="button" class="btn btn-info" id="runLimitBtn" onclick="limitCostHandler(map)" data-dismiss="modal">Apply</button>
+                    <button type="button" class="btn btn-info" id="runLimitBtn" onclick="limitCost(map)" data-dismiss="modal">Apply</button>
                 </footer>
             </div>
         </div>
@@ -232,7 +224,7 @@
                 markers.push(null);
 
                 map.addListener('click', function(e) {
-                    addCityByMapClickHandler(e.latLng, map);
+                    addCityByMapClick(e.latLng, map);
                 });
 
                 $(document).keyup(function (event) {
@@ -242,7 +234,7 @@
                             var el = event.target.value;
                             event.target.value = el.substring(0, el.length - 1);
                         }
-                        addCityHandler(map);
+                        addCity(map);
                     }
                 });
             }
@@ -250,22 +242,6 @@
             $("#costSlider")[0].oninput = function () {
                 $("#limitValue")[0].innerHTML = this.value + " €";
             };
-
-//            temporary
-            //this is ok
-            function allowDrop(ev) {
-                ev.preventDefault();
-            }
-
-            function drag(ev) {
-                ev.dataTransfer.setData("text", ev.source.value);
-            }
-
-            function drop(ev) {
-                ev.preventDefault();
-                var data = ev.dataTransfer.getData("text");
-                ev.target.appendChild(document.getElementById(data));
-            }
         </script>
     }
 </body>

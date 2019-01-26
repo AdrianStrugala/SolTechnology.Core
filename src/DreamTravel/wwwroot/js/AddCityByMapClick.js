@@ -1,4 +1,4 @@
-﻿function addCityByMapClickHandler(position, map) {
+function addCityByMapClick(position, map) {
     displayCityAjaxCalls.push($.ajax({
         type: 'POST',
         dataType: 'html',
@@ -7,38 +7,28 @@
             'Authorization': 'DreamAuthentication U29sVWJlckFsbGVz'
         },
         data: { lat: position.lat(), lng: position.lng(), sessionId: sessionId },
-        success(msg) {
-
+        success: function (msg) {
             var city = JSON.parse(msg);
-
-            if ((<HTMLInputElement>$("#listOfCities").children().eq(0).children()[1]).value !== "") {
-                addCityHandler(map);
+            if ($("#listOfCities").children().eq(0).children()[1].value !== "") {
+                addCity(map);
             }
-
             $("#listOfCities").children().each(function (index) {
                 if ($(this).attr('id') == "cityRow" + noOfCityRows.toString()) {
-
                     if (markers[index] != null) {
                         markers[index].setMap(null);
                     }
-
                     cities[index] = city;
-                    markers[index] = displayMarkerHandler(map,
-                        city.Latitude,
-                        city.Longitude,
-                        "✓");
-
-                    (<HTMLInputElement>$("#listOfCities").children().eq(index).children()[1]).value = city.Name;
-
+                    markers[index] = displayMarker(map, city.Latitude, city.Longitude, "✓");
+                    $("#listOfCities").children().eq(index).children()[1].value = city.Name;
                     map.setCenter(markers[index].getPosition());
                 }
             });
         },
-
-        error(req, status, errorObj) {
+        error: function (req, status, errorObj) {
             displayCityAjaxCalls.pop();
             var alertMessage = JSON.parse(req.responseText);
             alert(alertMessage);
         }
     }));
 }
+//# sourceMappingURL=AddCityByMapClick.js.map
