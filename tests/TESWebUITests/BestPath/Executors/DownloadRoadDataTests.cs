@@ -7,6 +7,8 @@ namespace DreamTravelITests.BestPath.Executors
     using DreamTravel.BestPath.Interfaces;
     using DreamTravel.BestPath.Models;
     using DreamTravel.SharedModels;
+    using Microsoft.Extensions.Logging;
+    using Microsoft.Extensions.Logging.Abstractions;
     using NSubstitute;
     using Xunit;
 
@@ -16,9 +18,9 @@ namespace DreamTravelITests.BestPath.Executors
 
         public DownloadRoadDataTests()
         {
-            IDownloadDurationMatrixByTollRoad downloadDurationMatrixByTollRoad = Substitute.For<DownloadDurationMatrixByTollRoad>();
-            IDownloadDurationMatrixByFreeRoad downloadDurationMatrixByFreeRoad = Substitute.For<DownloadDurationMatrixByFreeRoad>();
-            IDownloadCostBetweenTwoCities downloadCostBetweenTwoCities = Substitute.For<DownloadCostBetweenTwoCities>();
+            IDownloadDurationMatrixByTollRoad downloadDurationMatrixByTollRoad = Substitute.For<DownloadDurationMatrixByTollRoad>(Arg.Any<ILogger>());
+            IDownloadDurationMatrixByFreeRoad downloadDurationMatrixByFreeRoad = Substitute.For<DownloadDurationMatrixByFreeRoad>(Arg.Any<ILogger>());
+            IDownloadCostBetweenTwoCities downloadCostBetweenTwoCities = Substitute.For<DownloadCostBetweenTwoCities>(Arg.Any<ILogger>());
 
             _sut = new DownloadRoadData(downloadDurationMatrixByTollRoad, downloadDurationMatrixByFreeRoad, downloadCostBetweenTwoCities);
         }

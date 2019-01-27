@@ -1,6 +1,7 @@
 ﻿namespace DreamTravel.BestPath.DataAccess
 {
     using Interfaces;
+    using Microsoft.Extensions.Logging;
     using Newtonsoft.Json.Linq;
     using SharedModels;
     using System;
@@ -13,9 +14,11 @@
     public class DownloadDurationMatrixByTollRoad : IDownloadDurationMatrixByTollRoad
     {
         private readonly HttpClient _httpClient;
+        private readonly ILogger<DownloadDurationMatrixByTollRoad> _logger;
 
-        public DownloadDurationMatrixByTollRoad()
+        public DownloadDurationMatrixByTollRoad(ILogger<DownloadDurationMatrixByTollRoad> logger)
         {
+            _logger = logger;
             if (_httpClient == null)
             {
                 _httpClient = new HttpClient();
@@ -53,6 +56,7 @@
 
                 catch (Exception)
                 {
+                    _logger.LogError($"Cannot get data about distance when [{listOfCities[i].Name}] is the origin");
                     throw new InvalidDataException(
                         $"Cannot get data about distance when [{listOfCities[i].Name}] is the origin");
                 }

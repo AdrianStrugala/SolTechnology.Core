@@ -3,11 +3,12 @@
     using DreamTravel.BestPath.DataAccess;
     using DreamTravel.SharedModels;
     using System.IO;
+    using Microsoft.Extensions.Logging.Abstractions;
     using Xunit;
 
     public class DowloadCostBetweenTwoCitiesTests
     {
-        private readonly DownloadCostBetweenTwoCities _sut = new DownloadCostBetweenTwoCities();
+        private readonly DownloadCostBetweenTwoCities _sut = new DownloadCostBetweenTwoCities(NullLogger<DownloadCostBetweenTwoCities>.Instance);
 
 
 

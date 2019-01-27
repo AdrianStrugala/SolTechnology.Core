@@ -9,14 +9,17 @@ using System.Text;
 
 namespace DreamTravel.BestPath.DataAccess
 {
+    using Microsoft.Extensions.Logging;
     using System.Threading.Tasks;
 
     public class DownloadDurationMatrixByFreeRoad : IDownloadDurationMatrixByFreeRoad
     {
         private readonly HttpClient _httpClient;
+        private readonly ILogger<DownloadDurationMatrixByFreeRoad> _logger;
 
-        public DownloadDurationMatrixByFreeRoad()
+        public DownloadDurationMatrixByFreeRoad(ILogger<DownloadDurationMatrixByFreeRoad> logger)
         {
+            _logger = logger;
             if (_httpClient == null)
             {
                 _httpClient = new HttpClient();
@@ -52,6 +55,7 @@ namespace DreamTravel.BestPath.DataAccess
 
                 catch (Exception)
                 {
+                    _logger.LogError($"Cannot get data about distance when [{listOfCities[i].Name}] is the origin");
                     throw new InvalidDataException(
                         $"Cannot get data about distance when [{listOfCities[i].Name}] is the origin");
                 }

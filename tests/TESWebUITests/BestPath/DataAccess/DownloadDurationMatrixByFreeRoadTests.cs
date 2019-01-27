@@ -7,10 +7,11 @@ using Xunit;
 namespace DreamTravelITests.BestPath.DataAccess
 {
     using System.Threading.Tasks;
+    using Microsoft.Extensions.Logging.Abstractions;
 
     public class DownloadDurationMatrixByFreeRoadTests
     {
-        readonly DownloadDurationMatrixByFreeRoad _sut = new DownloadDurationMatrixByFreeRoad();
+        readonly DownloadDurationMatrixByFreeRoad _sut = new DownloadDurationMatrixByFreeRoad(NullLogger<DownloadDurationMatrixByFreeRoad>.Instance);
 
 
         [Fact]

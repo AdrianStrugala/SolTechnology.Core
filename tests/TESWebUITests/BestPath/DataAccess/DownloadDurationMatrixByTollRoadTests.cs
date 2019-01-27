@@ -1,19 +1,20 @@
-﻿using System.Collections.Generic;
-using System.IO;
-using DreamTravel.BestPath.DataAccess;
-using DreamTravel.SharedModels;
-using Xunit;
-
-namespace DreamTravelITests.BestPath.DataAccess
+﻿namespace DreamTravelITests.BestPath.DataAccess
 {
+    using Microsoft.Extensions.Logging.Abstractions;
     using System.Threading.Tasks;
+    using DreamTravel.BestPath.DataAccess;
+    using DreamTravel.SharedModels;
+    using System.Collections.Generic;
+    using System.IO;
+    using Xunit;
+
 
     public class DownloadDurationMatrixByTollRoadTests
     {
-        readonly DownloadDurationMatrixByTollRoad _sut = new DownloadDurationMatrixByTollRoad();
+        readonly DownloadDurationMatrixByTollRoad _sut = new DownloadDurationMatrixByTollRoad(NullLogger<DownloadDurationMatrixByTollRoad>.Instance);
 
         [Fact]
-        public async Task DowloadDurationMatrixByTollRoad_InvokeWithValidCities_ReturnsSomeDuration()
+        public async Task DownloadDurationMatrixByTollRoad_InvokeWithValidCities_ReturnsSomeDuration()
         {
             //Arrange
             City firstCity = new City

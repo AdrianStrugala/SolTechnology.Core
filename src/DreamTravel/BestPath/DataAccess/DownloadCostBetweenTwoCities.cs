@@ -1,6 +1,7 @@
 ﻿namespace DreamTravel.BestPath.DataAccess
 {
     using Interfaces;
+    using Microsoft.Extensions.Logging;
     using SharedModels;
     using System;
     using System.IO;
@@ -10,9 +11,12 @@
     public class DownloadCostBetweenTwoCities : IDownloadCostBetweenTwoCities
     {
         private readonly HttpClient _httpClient;
+        private readonly ILogger<DownloadCostBetweenTwoCities> _logger;
 
-        public DownloadCostBetweenTwoCities()
+        public DownloadCostBetweenTwoCities(ILogger<DownloadCostBetweenTwoCities> logger)
         {
+            _logger = logger;
+
             if (_httpClient == null)
             {
                 _httpClient = new HttpClient();
@@ -43,6 +47,7 @@
             }
             catch (Exception)
             {
+                _logger.LogError($"Cannot get data about cost between [{origin.Name}] and [{destination.Name}]");
                 throw new InvalidDataException(
                     $"Cannot get data about cost between [{origin.Name}] and [{destination.Name}]");
             }
