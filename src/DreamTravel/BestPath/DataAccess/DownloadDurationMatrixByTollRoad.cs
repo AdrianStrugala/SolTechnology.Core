@@ -34,9 +34,9 @@
                 coordinates.AppendFormat($"{city.Latitude},{city.Longitude}|");
             }
 
-            try
+            for (int i = 0; i < listOfCities.Count; i++)
             {
-                for (int i = 0; i < listOfCities.Count; i++)
+                try
                 {
                     string url =
                         $"https://maps.googleapis.com/maps/api/distancematrix/json?units=imperial&origins={listOfCities[i].Latitude},{listOfCities[i].Longitude}&destinations={coordinates}&key=AIzaSyBgCjCJuGQsXlAz6BUXPIL2_RSxgXUaCcM";
@@ -46,16 +46,19 @@
 
                     for (int j = 0; j < listOfCities.Count; j++)
                     {
-                        result[j + i * listOfCities.Count] = json["rows"][0]["elements"][j]["duration"]["value"].Value<int>();
+                        result[j + i * listOfCities.Count] =
+                            json["rows"][0]["elements"][j]["duration"]["value"].Value<int>();
                     }
                 }
-                return result;
+
+                catch (Exception)
+                {
+                    throw new InvalidDataException(
+                        $"Cannot get data about distance when [{listOfCities[i].Name}] is the origin");
+                }
             }
 
-            catch (Exception e)
-            {
-                throw new InvalidDataException(e.Message);
-            }
+            return result;
         }
     }
 }
