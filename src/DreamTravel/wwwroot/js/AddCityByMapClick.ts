@@ -11,6 +11,10 @@
 
             var city = JSON.parse(msg);
 
+            if ($("#listOfCities").children().length == 0) {
+                addCity(map);
+            }
+
             if (getCityNameFromPanel(0) !== "") {
                 addCity(map);
             }
