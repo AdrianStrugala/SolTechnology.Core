@@ -58,12 +58,7 @@
         public async Task CalculateBestPath_ExceptionIsThrown_StatusCodeIs400()
         {
             //Arrange
-            Query query = new Query
-            {
-                Cities = new List<City>(),
-                OptimizePath = true,
-                SessionId = "dupa"
-            };
+            Query query = _fixture.Create<Query>();
 
             _calculateBestPath.Execute(Arg.Any<List<City>>(), Arg.Any<bool>()).Throws(new Exception());
 
