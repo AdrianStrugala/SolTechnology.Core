@@ -1,9 +1,9 @@
-﻿namespace DreamTravel.Bot.Scrap_AzairEu
+﻿namespace DreamTravel.Bot.DiscoverDreamTravelChances.ScrapAzairEu
 {
-    using HtmlAgilityPack;
     using System;
     using System.Collections.Generic;
     using System.Net;
+    using HtmlAgilityPack;
 
     public class ScrapHtmlToChanceModel : IScrapHtmlToChanceModel
     {

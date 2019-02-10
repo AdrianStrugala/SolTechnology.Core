@@ -1,8 +1,8 @@
-﻿namespace DreamTravel.Bot.SendEmail
+﻿namespace DreamTravel.Bot.DiscoverDreamTravelChances.SendEmail
 {
-    using Scrap_AzairEu;
     using System.Collections.Generic;
     using Interfaces;
+    using ScrapAzairEu;
 
     public class ComposeMessage : IComposeMessage
     {

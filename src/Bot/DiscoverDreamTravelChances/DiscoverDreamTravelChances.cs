@@ -1,9 +1,9 @@
-﻿namespace DreamTravel.Bot
+﻿namespace DreamTravel.Bot.DiscoverDreamTravelChances
 {
-    using Scrap_AzairEu;
-    using SendEmail;
-    using SendEmail.Interfaces;
     using System.Collections.Generic;
+    using Interfaces;
+    using ScrapAzairEu;
+    using SendEmail;
 
     public class DiscoverDreamTravelChances : IDiscoverDreamTravelChances
     {

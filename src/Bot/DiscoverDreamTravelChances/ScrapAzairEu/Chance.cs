@@ -1,4 +1,4 @@
-﻿namespace DreamTravel.Bot.Scrap_AzairEu
+﻿namespace DreamTravel.Bot.DiscoverDreamTravelChances.ScrapAzairEu
 {
     public class Chance
     {

@@ -1,10 +1,10 @@
-﻿namespace DreamTravel.Bot.SendEmail
+﻿namespace DreamTravel.Bot.DiscoverDreamTravelChances.SendEmail
 {
+    using System.Collections.Generic;
+    using System.Linq;
     using Configuration;
     using Dapper;
     using Interfaces;
-    using System.Collections.Generic;
-    using System.Linq;
 
     public class ProvideRecipients : IProvideRecipients
     {

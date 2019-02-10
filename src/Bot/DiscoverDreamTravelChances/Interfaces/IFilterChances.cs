@@ -1,7 +1,7 @@
-﻿namespace DreamTravel.Bot.SendEmail
+﻿namespace DreamTravel.Bot.DiscoverDreamTravelChances.Interfaces
 {
-    using Scrap_AzairEu;
     using System.Collections.Generic;
+    using ScrapAzairEu;
 
     public interface IFilterChances
     {

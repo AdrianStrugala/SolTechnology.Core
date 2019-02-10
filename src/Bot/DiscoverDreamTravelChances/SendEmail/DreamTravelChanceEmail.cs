@@ -1,4 +1,4 @@
-﻿namespace DreamTravel.Bot.SendEmail
+﻿namespace DreamTravel.Bot.DiscoverDreamTravelChances.SendEmail
 {
     public class DreamTravelChanceEmail
     {
