@@ -1,4 +1,4 @@
-﻿namespace TravelingSalesmanProblemTests.Benchmark
+﻿namespace DreamTravel.Bot.RunBenchmark.Benchmark
 {
     public class BenchmarkResult
     {

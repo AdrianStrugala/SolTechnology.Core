@@ -1,19 +1,19 @@
-﻿namespace DreamTravel.Bot
+﻿namespace DreamTravel.Bot.DiscoverDreamTravelChances
 {
-    using AzureFunctions.Autofac;
-    using Microsoft.Azure.WebJobs;
-    using Microsoft.Azure.WebJobs.Extensions.Http;
     using System.Net;
     using System.Net.Http;
     using System.Threading.Tasks;
-    using DiscoverDreamTravelChances.Interfaces;
+    using AzureFunctions.Autofac;
+    using Interfaces;
+    using Microsoft.Azure.WebJobs;
+    using Microsoft.Azure.WebJobs.Extensions.Http;
 
     [DependencyInjectionConfig(typeof(Startup))]
     public static class Triggers
     {
-        private const string TimeTriggerFunctionName = "DiscoverDreamTravelChances";
-        private const string HttpTriggerFunctionName = "DiscoverDreamTravelChancesHttp";
-        public const string HttpTriggerFunctionRoute = "DiscoverDreamTravelChances/Now";
+        private const string TimeTriggerFunctionName = nameof(Bot.DiscoverDreamTravelChances) + "Time";
+        private const string HttpTriggerFunctionName = nameof(Bot.DiscoverDreamTravelChances) + "Http";
+        public const string HttpTriggerFunctionRoute = nameof(Bot.DiscoverDreamTravelChances) + "/Now";
 
         [FunctionName(TimeTriggerFunctionName)]
         public static async Task TimerTrigger(

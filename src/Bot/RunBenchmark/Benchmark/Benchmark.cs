@@ -1,15 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using TravelingSalesmanProblem;
-
-namespace TravelingSalesmanProblemTests.Benchmark
+﻿namespace DreamTravel.Bot.RunBenchmark.Benchmark
 {
-    using Newtonsoft.Json;
+    using System;
+    using System.Collections.Generic;
+    using System.Diagnostics;
+    using System.Linq;
     using System.Net.Http;
     using System.Text;
     using System.Threading.Tasks;
+    using Newtonsoft.Json;
+    using TravelingSalesmanProblem;
 
     static class Benchmark
     {

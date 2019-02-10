@@ -9,36 +9,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="Benchmark\TestData\eightCities.txt" />
-    <None Remove="Benchmark\TestData\fourCities.txt" />
-    <None Remove="Benchmark\TestData\sixteenCities.txt" />
-    <None Remove="Benchmark\TestData\twelveCities.txt" />
-    <None Remove="Benchmark\TestData\twentyCities.txt" />
-    <None Remove="Benchmark\TestData\twoCities.txt" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Content Include="Benchmark\TestData\eightCities.txt">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Benchmark\TestData\fourCities.txt">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Benchmark\TestData\twelveCities.txt">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Benchmark\TestData\twentyCities.txt">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Benchmark\TestData\twoCities.txt">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Benchmark\TestData\sixteenCities.txt">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.Logging.Log4Net.AspNetCore" Version="2.2.5" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.6.0" />
     <PackageReference Include="xunit" Version="2.4.0" />
@@ -50,14 +20,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\TravelingSalesmanProblem\TravelingSalesmanProblem.csproj" />
-  </ItemGroup>
-
-
-
-  <ItemGroup>
-    <None Update="Benchmark\configuration.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
   </ItemGroup>
 
 </Project>

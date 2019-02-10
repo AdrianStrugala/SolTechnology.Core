@@ -13,6 +13,12 @@
   <ItemGroup>
     <None Remove="appsettings.json" />
     <None Remove="local.settings.json" />
+    <None Remove="RunBenchmark\Benchmark\TestData\eightCities.txt" />
+    <None Remove="RunBenchmark\Benchmark\TestData\fourCities.txt" />
+    <None Remove="RunBenchmark\Benchmark\TestData\sixteenCities.txt" />
+    <None Remove="RunBenchmark\Benchmark\TestData\twelveCities.txt" />
+    <None Remove="RunBenchmark\Benchmark\TestData\twentyCities.txt" />
+    <None Remove="RunBenchmark\Benchmark\TestData\twoCities.txt" />
   </ItemGroup>
 
   <ItemGroup>
@@ -20,6 +26,24 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="local.settings.json" CopyToOutputDirectory="Always" CopyToPublishDirectory="Never" />
+    <Content Include="RunBenchmark\Benchmark\TestData\eightCities.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="RunBenchmark\Benchmark\TestData\fourCities.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="RunBenchmark\Benchmark\TestData\sixteenCities.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="RunBenchmark\Benchmark\TestData\twelveCities.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="RunBenchmark\Benchmark\TestData\twentyCities.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="RunBenchmark\Benchmark\TestData\twoCities.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
 
   <ItemGroup>
@@ -41,6 +65,10 @@
     <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
     <PackageReference Include="Polly" Version="6.1.0" />
     <PackageReference Include="System.Data.SqlClient" Version="4.4.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\TravelingSalesmanProblem\TravelingSalesmanProblem.csproj" />
   </ItemGroup>
 
   <ItemGroup>
