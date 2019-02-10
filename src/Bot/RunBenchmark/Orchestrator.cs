@@ -11,9 +11,9 @@
         [FunctionName(OrchestratorFunctionName)]
         public static async Task Orchestrate([OrchestrationTrigger] DurableOrchestrationContextBase context, ILogger log)
         {
-            await context.CallActivityAsync(nameof(Activities.AntColonyBenchmarkFunctionName), null);
+            await context.CallActivityAsync(Activities.AntColonyBenchmarkFunctionName, null);
 
-            await context.CallActivityAsync(nameof(Activities.GodBenchmarkFunctionName), null);
+            await context.CallActivityAsync(Activities.GodBenchmarkFunctionName, null);
         }
     }
 }

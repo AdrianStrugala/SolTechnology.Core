@@ -6,7 +6,7 @@
 
     public static class Activities
     {
-        public const string AntColonyBenchmarkFunctionName = "GodBenchmark";
+        public const string AntColonyBenchmarkFunctionName = "AntColonyBenchmark";
         public const string GodBenchmarkFunctionName = "GodBenchmark";
 
         private const int NumberOfExecutions = 100;
@@ -20,12 +20,12 @@
 
         static Activities()
         {
-            TwoCitiesMatrix = JsonConvert.DeserializeObject<double[]>(System.IO.File.ReadAllText(@".\Benchmark\TestData\twoCities.txt"));
-            FourCitiesMatrix = JsonConvert.DeserializeObject<double[]>(System.IO.File.ReadAllText(@".\Benchmark\TestData\fourCities.txt"));
-            EightCitiesMatrix = JsonConvert.DeserializeObject<double[]>(System.IO.File.ReadAllText(@".\Benchmark\TestData\eightCities.txt"));
-            TwelveCitiesMatrix = JsonConvert.DeserializeObject<double[]>(System.IO.File.ReadAllText(@".\Benchmark\TestData\twelveCities.txt"));
-            SixteenCitiesMatrix = JsonConvert.DeserializeObject<double[]>(System.IO.File.ReadAllText(@".\Benchmark\TestData\sixteenCities.txt"));
-            TwentyCitiesMatrix = JsonConvert.DeserializeObject<double[]>(System.IO.File.ReadAllText(@".\Benchmark\TestData\twentyCities.txt"));
+            TwoCitiesMatrix = JsonConvert.DeserializeObject<double[]>(System.IO.File.ReadAllText(@".\RunBenchmark\Benchmark\TestData\twoCities.txt"));
+            FourCitiesMatrix = JsonConvert.DeserializeObject<double[]>(System.IO.File.ReadAllText(@".\RunBenchmark\Benchmark\TestData\fourCities.txt"));
+            EightCitiesMatrix = JsonConvert.DeserializeObject<double[]>(System.IO.File.ReadAllText(@".\RunBenchmark\Benchmark\TestData\eightCities.txt"));
+            TwelveCitiesMatrix = JsonConvert.DeserializeObject<double[]>(System.IO.File.ReadAllText(@".\RunBenchmark\Benchmark\TestData\twelveCities.txt"));
+            SixteenCitiesMatrix = JsonConvert.DeserializeObject<double[]>(System.IO.File.ReadAllText(@".\RunBenchmark\Benchmark\TestData\sixteenCities.txt"));
+            TwentyCitiesMatrix = JsonConvert.DeserializeObject<double[]>(System.IO.File.ReadAllText(@".\RunBenchmark\Benchmark\TestData\twentyCities.txt"));
         }
 
 
