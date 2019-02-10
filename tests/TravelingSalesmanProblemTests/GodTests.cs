@@ -1,9 +1,9 @@
-using DreamTravel.BestPath.Models;
-using System.Linq;
-using Xunit;
-
 namespace TravelingSalesmanProblemTests
 {
+    using System;
+    using System.Linq;
+    using Xunit;
+
     public class GodTests
     {
         readonly TravelingSalesmanProblem.God _sut = new TravelingSalesmanProblem.God();
@@ -12,11 +12,17 @@ namespace TravelingSalesmanProblemTests
         public void SolveTSP_RunWithValidParameters_FirstAndLastCitiesStaysTheSame()
         {
             //Arrange
+            Random random = new Random();
+
             int noOfCities = 4;
-            EvaluationMatrix evaluationMatrix = new EvaluationMatrix(noOfCities);
+            double[] distances = new double[noOfCities * noOfCities];
+            for (int i = 0; i < distances.Length; i++)
+            {
+                distances[i] = random.NextDouble() * 1000;
+            }
 
             //Act
-            var result = _sut.SolveTSP(evaluationMatrix.OptimalDistances.ToList());
+            var result = _sut.SolveTSP(distances.ToList());
 
             //Assert
             Assert.Equal(0, result[0]);
@@ -27,11 +33,18 @@ namespace TravelingSalesmanProblemTests
         public void SolveTSP_RunWithValidParameters_EachCityAppearsOnlyOnce()
         {
             //Arrange
+            Random random = new Random();
+
             int noOfCities = 7;
-            EvaluationMatrix evaluationMatrix = new EvaluationMatrix(noOfCities);
+
+            double[] distances = new double[noOfCities * noOfCities];
+            for (int i = 0; i < distances.Length; i++)
+            {
+                distances[i] = random.NextDouble() * 1000;
+            }
 
             //Act
-            var result = _sut.SolveTSP(evaluationMatrix.OptimalDistances.ToList());
+            var result = _sut.SolveTSP(distances.ToList());
 
             //Assert
             Assert.Equal(1, result.Count(i => i.Equals(0)));

@@ -1,6 +1,5 @@
 using System;
 using System.Linq;
-using DreamTravel.BestPath.Models;
 using TravelingSalesmanProblem;
 using Xunit;
 
@@ -18,19 +17,19 @@ namespace TravelingSalesmanProblemTests
             Random random = new Random();
 
             int noOfCities = 4;
-            EvaluationMatrix evaluationMatrix = new EvaluationMatrix(noOfCities);
 
-            for (int i = 0; i < evaluationMatrix.OptimalDistances.Length; i++)
+            double[] distances = new double[noOfCities * noOfCities];
+            for (int i = 0; i < distances.Length; i++)
             {
-                evaluationMatrix.OptimalDistances[i] = random.NextDouble() * 1000;
+                distances[i] = random.NextDouble() * 1000;
             }
 
             //Act
-            var result = _sut.SolveTSP(evaluationMatrix.OptimalDistances.ToList());
+            var result = _sut.SolveTSP(distances.ToList());
 
             //Assert
             Assert.Equal(0, result[0]);
-            Assert.Equal(noOfCities-1, result.Last());
+            Assert.Equal(noOfCities - 1, result.Last());
         }
 
         [Fact]
@@ -40,15 +39,14 @@ namespace TravelingSalesmanProblemTests
             Random random = new Random();
 
             int noOfCities = 7;
-            EvaluationMatrix evaluationMatrix = new EvaluationMatrix(noOfCities);
-
-            for (int i = 0; i < evaluationMatrix.OptimalDistances.Length; i++)
+            double[] distances = new double[noOfCities * noOfCities];
+            for (int i = 0; i < distances.Length; i++)
             {
-                evaluationMatrix.OptimalDistances[i] = random.NextDouble() * 1000;
+                distances[i] = random.NextDouble() * 1000;
             }
 
             //Act
-            var result = _sut.SolveTSP(evaluationMatrix.OptimalDistances.ToList());
+            var result = _sut.SolveTSP(distances.ToList());
 
             //Assert
             Assert.Equal(1, result.Count(i => i.Equals(0)));

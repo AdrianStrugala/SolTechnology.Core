@@ -1,0 +1,644 @@
+2018-09-11 18:58:28,743 [9] INFO  Microsoft.AspNetCore.Hosting.Internal.WebHost [(null)] - Request starting HTTP/1.1 DEBUG http://localhost:5754/  0
+2018-09-11 18:58:28,743 [8] INFO  Microsoft.AspNetCore.Hosting.Internal.WebHost [(null)] - Request starting HTTP/1.1 GET http://localhost:5754/  
+2018-09-11 18:58:28,839 [9] INFO  Microsoft.AspNetCore.Hosting.Internal.WebHost [(null)] - Request finished in 167.9896ms 200 
+2018-09-11 18:58:28,917 [8] INFO  DreamTravel.Authentication.DreamAuthentication [(null)] - Authentication for request [/ started
+2018-09-11 18:58:28,945 [8] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2018-09-11 18:58:28,975 [8] INFO  DreamTravel.Authentication.DreamAuthentication [(null)] - DreamAuthentication was not authenticated. Failure message: Missing authentication header
+2018-09-11 18:58:29,149 [8] INFO  Microsoft.AspNetCore.Mvc.Internal.ControllerActionInvoker [(null)] - Executing action method DreamTravel.Controllers.HomeController.Index (DreamTravel) with arguments ((null)) - ModelState is Valid
+2018-09-11 18:58:29,192 [8] INFO  Microsoft.AspNetCore.Mvc.ViewFeatures.Internal.ViewResultExecutor [(null)] - Executing ViewResult, running view at path /Views/Home/Index.cshtml.
+2018-09-11 18:58:29,281 [8] INFO  Microsoft.AspNetCore.Mvc.Internal.ControllerActionInvoker [(null)] - Executed action DreamTravel.Controllers.HomeController.Index (DreamTravel) in 161.7236ms
+2018-09-11 18:58:29,299 [8] INFO  Microsoft.AspNetCore.Hosting.Internal.WebHost [(null)] - Request finished in 642.9976ms 200 text/html; charset=utf-8
+2018-09-11 18:58:35,462 [9] INFO  Microsoft.AspNetCore.Hosting.Internal.WebHost [(null)] - Request starting HTTP/1.1 POST http://localhost:5754/TSP/FindCity application/x-www-form-urlencoded; charset=UTF-8 58
+2018-09-11 18:58:35,487 [9] INFO  DreamTravel.Authentication.DreamAuthentication [(null)] - Authentication for request [/TSP/FindCity started
+2018-09-11 18:58:35,493 [9] INFO  DreamTravel.Authentication.DreamAuthentication [(null)] - Decoding incoming authentication key
+2018-09-11 18:58:35,517 [9] INFO  DreamTravel.Authentication.DreamAuthentication [(null)] - Authenticated user: [System.Security.Claims.ClaimsPrincipal]
+2018-09-11 18:58:35,542 [9] INFO  DreamTravel.Authentication.DreamAuthentication [(null)] - AuthenticationScheme: DreamAuthentication was successfully authenticated.
+2018-09-11 18:58:35,579 [9] INFO  Microsoft.AspNetCore.Authorization.DefaultAuthorizationService [(null)] - Authorization was successful for user: DreamAuthentication.
+2018-09-11 18:58:35,627 [9] INFO  Microsoft.AspNetCore.Mvc.Internal.ControllerActionInvoker [(null)] - Executing action method DreamTravel.Controllers.TSPController.FindCity (DreamTravel) with arguments (Krakow, 676cb145-b89d-498a-97b7-4192d72a7940) - ModelState is Valid
+2018-09-11 18:58:35,965 [8] INFO  Microsoft.AspNetCore.Mvc.Internal.ObjectResultExecutor [(null)] - Executing ObjectResult, writing value Microsoft.AspNetCore.Mvc.ControllerContext.
+2018-09-11 18:58:35,969 [8] INFO  Microsoft.AspNetCore.Mvc.Internal.ControllerActionInvoker [(null)] - Executed action DreamTravel.Controllers.TSPController.FindCity (DreamTravel) in 395.0521ms
+2018-09-11 18:58:35,996 [8] INFO  Microsoft.AspNetCore.Hosting.Internal.WebHost [(null)] - Request finished in 533.5484ms 200 text/plain; charset=utf-8
+2018-09-11 18:58:40,696 [10] INFO  Microsoft.AspNetCore.Hosting.Internal.WebHost [(null)] - Request starting HTTP/1.1 POST http://localhost:5754/TSP/FindCity application/x-www-form-urlencoded; charset=UTF-8 59
+2018-09-11 18:58:40,721 [10] INFO  DreamTravel.Authentication.DreamAuthentication [(null)] - Authentication for request [/TSP/FindCity started
+2018-09-11 18:58:40,745 [10] INFO  DreamTravel.Authentication.DreamAuthentication [(null)] - Decoding incoming authentication key
+2018-09-11 18:58:40,769 [10] INFO  DreamTravel.Authentication.DreamAuthentication [(null)] - Authenticated user: [System.Security.Claims.ClaimsPrincipal]
+2018-09-11 18:58:40,793 [10] INFO  DreamTravel.Authentication.DreamAuthentication [(null)] - AuthenticationScheme: DreamAuthentication was successfully authenticated.
+2018-09-11 18:58:40,817 [10] INFO  Microsoft.AspNetCore.Authorization.DefaultAuthorizationService [(null)] - Authorization was successful for user: DreamAuthentication.
+2018-09-11 18:58:40,841 [10] INFO  Microsoft.AspNetCore.Mvc.Internal.ControllerActionInvoker [(null)] - Executing action method DreamTravel.Controllers.TSPController.FindCity (DreamTravel) with arguments (Wroclaw, 676cb145-b89d-498a-97b7-4192d72a7940) - ModelState is Valid
+2018-09-11 18:58:41,172 [8] INFO  Microsoft.AspNetCore.Mvc.Internal.ObjectResultExecutor [(null)] - Executing ObjectResult, writing value Microsoft.AspNetCore.Mvc.ControllerContext.
+2018-09-11 18:58:41,196 [8] INFO  Microsoft.AspNetCore.Mvc.Internal.ControllerActionInvoker [(null)] - Executed action DreamTravel.Controllers.TSPController.FindCity (DreamTravel) in 378.8708ms
+2018-09-11 18:58:41,203 [8] INFO  Microsoft.AspNetCore.Hosting.Internal.WebHost [(null)] - Request finished in 506.3888ms 200 text/plain; charset=utf-8
+2018-09-11 21:42:04,280 [8] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2018-09-11 22:11:36,415 [9] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2018-09-12 18:16:47,538 [8] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2018-09-12 18:28:43,812 [8] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2018-09-12 18:31:37,911 [9] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2018-09-13 17:46:48,310 [8] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2018-09-13 17:47:53,533 [43] WARN  Microsoft.AspNetCore.Server.Kestrel [(null)] - Heartbeat took longer than "00:00:01" at "09/13/2018 15:47:53 +00:00".
+2018-09-13 17:47:53,537 [43] WARN  Microsoft.AspNetCore.Server.Kestrel [(null)] - Heartbeat took longer than "00:00:01" at "09/13/2018 15:47:53 +00:00".
+2018-09-13 17:50:55,096 [8] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2018-09-13 17:53:02,334 [43] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2018-09-13 17:56:05,378 [9] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2018-09-14 23:36:17,026 [9] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2018-09-14 23:40:57,305 [8] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2018-09-15 15:59:07,560 [8] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2018-09-16 17:25:59,565 [8] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2018-09-16 17:39:43,607 [8] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2018-10-03 21:36:40,328 [9] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2018-10-05 17:42:40,389 [9] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2018-10-05 17:46:05,151 [8] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2018-10-05 17:48:10,059 [8] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2018-10-05 17:48:31,796 [10] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2018-10-05 17:49:50,675 [10] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2018-10-05 17:53:22,975 [8] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2018-10-05 17:59:40,444 [12] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2018-10-05 17:59:57,642 [9] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2018-10-05 18:03:54,182 [8] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2018-10-05 18:07:13,336 [8] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2018-10-05 18:08:28,873 [9] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2018-10-05 18:12:20,042 [8] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2018-10-05 18:12:28,870 [10] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2018-10-05 18:14:32,585 [8] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2018-10-05 18:15:30,068 [9] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2018-10-05 18:18:24,102 [9] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2018-10-05 18:18:55,617 [8] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2018-10-05 18:19:02,654 [9] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2018-10-05 18:19:41,398 [8] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2018-10-05 18:20:45,235 [9] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2018-10-05 18:21:12,463 [8] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2018-10-05 18:21:23,054 [10] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2018-10-05 18:22:52,928 [8] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2018-10-05 18:23:14,376 [9] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2018-10-05 18:25:57,453 [9] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2018-10-05 18:27:17,666 [9] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2018-10-05 18:29:52,466 [9] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2018-10-05 18:31:47,847 [9] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2018-10-05 18:33:16,537 [9] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2018-10-05 18:39:57,498 [8] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2018-10-05 18:42:09,550 [9] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2018-10-05 18:58:36,150 [10] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2018-10-05 18:59:08,331 [9] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2018-10-05 19:00:41,679 [8] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2018-10-05 19:01:31,607 [8] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2018-10-05 19:06:20,033 [9] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2018-10-05 19:11:42,428 [9] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2018-10-05 20:28:14,934 [8] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2018-10-30 16:13:43,681 [7] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2018-10-31 20:53:46,388 [8] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2018-11-08 19:10:56,847 [9] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2018-11-08 19:12:55,829 [8] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2018-11-08 19:20:20,390 [8] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2018-11-08 19:21:50,536 [8] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2018-11-08 19:22:36,857 [8] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2018-11-08 19:24:15,045 [8] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2018-11-08 19:26:07,345 [8] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2018-11-08 19:28:33,975 [10] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2018-11-08 19:30:14,788 [8] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2018-11-08 19:32:45,145 [9] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2018-11-08 19:35:11,703 [8] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2018-11-08 19:37:03,555 [10] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2018-11-08 19:39:32,522 [9] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2018-11-08 19:40:37,434 [10] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2018-11-08 19:41:27,865 [9] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2018-11-08 19:41:54,505 [9] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2018-11-08 19:42:30,191 [8] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2018-11-08 19:43:50,510 [9] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2018-11-08 19:44:24,338 [8] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2018-11-08 19:45:43,489 [10] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2018-11-08 19:49:29,345 [8] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2018-11-10 14:49:01,712 [8] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2018-11-10 15:05:33,762 [8] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2018-11-10 15:06:16,010 [10] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2018-11-10 15:07:53,238 [8] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2018-11-10 15:10:43,122 [9] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2018-11-10 15:14:20,102 [9] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2018-11-10 15:28:03,476 [9] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2018-11-10 15:30:45,729 [9] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2018-11-10 15:31:47,193 [9] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2018-11-10 15:32:21,085 [9] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2018-11-10 15:34:44,167 [8] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2018-11-12 08:45:46,556 [8] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2018-11-12 08:48:00,410 [34] ERROR DreamTravel.BestPath.Controller [(null)] - System.AggregateException: One or more errors occurred. (Index was out of range. Must be non-negative and less than the size of the collection.
+Parameter name: index) (Index was out of range. Must be non-negative and less than the size of the collection.
+Parameter name: index) ---> System.IO.InvalidDataException: Index was out of range. Must be non-negative and less than the size of the collection.
+Parameter name: index
+   at DreamTravel.BestPath.DataAccess.DownloadDurationMatrixByTollRoad.Execute(List`1 listOfCities) in E:\workspace\DreamTravel\src\DreamTravel\BestPath\DataAccess\DownloadDurationMatrixByTollRoad.cs:line 65
+   at DreamTravel.ExternalConnection.DownloadRoadData.<>c__DisplayClass4_0.<Execute>b__0() in E:\workspace\DreamTravel\src\DreamTravel\BestPath\DownloadRoadData.cs:line 32
+   at System.Threading.ExecutionContext.Run(ExecutionContext executionContext, ContextCallback callback, Object state)
+   at System.Threading.Tasks.Task.ExecuteWithThreadLocal(Task& currentTaskSlot)
+   --- End of inner exception stack trace ---
+   at System.ThrowHelper.ThrowAggregateException(List`1 exceptions)
+   at System.Threading.Tasks.Task.WaitAll(Task[] tasks, Int32 millisecondsTimeout, CancellationToken cancellationToken)
+   at System.Threading.Tasks.Task.WaitAll(Task[] tasks, Int32 millisecondsTimeout)
+   at System.Threading.Tasks.Task.WaitAll(Task[] tasks)
+   at System.Threading.Tasks.Parallel.Invoke(ParallelOptions parallelOptions, Action[] actions)
+--- End of stack trace from previous location where exception was thrown ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Threading.Tasks.Parallel.ThrowSingleCancellationExceptionOrOtherException(ICollection exceptions, CancellationToken cancelToken, Exception otherException)
+   at System.Threading.Tasks.Parallel.Invoke(ParallelOptions parallelOptions, Action[] actions)
+   at System.Threading.Tasks.Parallel.Invoke(Action[] actions)
+   at DreamTravel.ExternalConnection.DownloadRoadData.Execute(List`1 listOfCities, EvaluationMatrix evaluationMatrix) in E:\workspace\DreamTravel\src\DreamTravel\BestPath\DownloadRoadData.cs:line 30
+   at DreamTravel.BestPath.CalculateBestPath.Execute(List`1 cities, Boolean optimizePath) in E:\workspace\DreamTravel\src\DreamTravel\BestPath\CalculateBestPath.cs:line 30
+   at DreamTravel.BestPath.Controller.CalculateBestPath(List`1 cities, String sessionId, Boolean optimizePath) in E:\workspace\DreamTravel\src\DreamTravel\BestPath\Controller.cs:line 36
+---> (Inner Exception #0) System.IO.InvalidDataException: Index was out of range. Must be non-negative and less than the size of the collection.
+Parameter name: index
+   at DreamTravel.BestPath.DataAccess.DownloadDurationMatrixByTollRoad.Execute(List`1 listOfCities) in E:\workspace\DreamTravel\src\DreamTravel\BestPath\DataAccess\DownloadDurationMatrixByTollRoad.cs:line 65
+   at DreamTravel.ExternalConnection.DownloadRoadData.<>c__DisplayClass4_0.<Execute>b__0() in E:\workspace\DreamTravel\src\DreamTravel\BestPath\DownloadRoadData.cs:line 32
+   at System.Threading.ExecutionContext.Run(ExecutionContext executionContext, ContextCallback callback, Object state)
+   at System.Threading.Tasks.Task.ExecuteWithThreadLocal(Task& currentTaskSlot)<---
+
+---> (Inner Exception #1) System.IO.InvalidDataException: Index was out of range. Must be non-negative and less than the size of the collection.
+Parameter name: index
+   at DreamTravel.BestPath.DataAccess.DownloadDurationMatrixByFreeRoad.Execute(List`1 listOfCities) in E:\workspace\DreamTravel\src\DreamTravel\BestPath\DataAccess\DownloadDurationMatrixByFreeRoad.cs:line 65
+   at DreamTravel.ExternalConnection.DownloadRoadData.<>c__DisplayClass4_0.<Execute>b__1() in E:\workspace\DreamTravel\src\DreamTravel\BestPath\DownloadRoadData.cs:line 33
+   at System.Threading.ExecutionContext.Run(ExecutionContext executionContext, ContextCallback callback, Object state)
+   at System.Threading.Tasks.Task.ExecuteWithThreadLocal(Task& currentTaskSlot)<---
+
+2018-11-12 08:49:10,006 [10] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2018-11-12 08:51:44,689 [9] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2018-11-12 09:04:11,887 [9] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2018-11-12 09:04:41,619 [9] ERROR DreamTravel.BestPath.Controller [(null)] - System.AggregateException: One or more errors occurred. (Index was out of range. Must be non-negative and less than the size of the collection.
+Parameter name: index) (Index was out of range. Must be non-negative and less than the size of the collection.
+Parameter name: index) ---> System.IO.InvalidDataException: Index was out of range. Must be non-negative and less than the size of the collection.
+Parameter name: index
+   at DreamTravel.BestPath.DataAccess.DownloadDurationMatrixByTollRoad.Execute(List`1 listOfCities) in E:\workspace\DreamTravel\src\DreamTravel\BestPath\DataAccess\DownloadDurationMatrixByTollRoad.cs:line 65
+   at DreamTravel.ExternalConnection.DownloadRoadData.<>c__DisplayClass4_0.<Execute>b__0() in E:\workspace\DreamTravel\src\DreamTravel\BestPath\DownloadRoadData.cs:line 32
+   at System.Threading.ExecutionContext.Run(ExecutionContext executionContext, ContextCallback callback, Object state)
+   at System.Threading.Tasks.Task.ExecuteWithThreadLocal(Task& currentTaskSlot)
+   --- End of inner exception stack trace ---
+   at System.ThrowHelper.ThrowAggregateException(List`1 exceptions)
+   at System.Threading.Tasks.Task.WaitAll(Task[] tasks, Int32 millisecondsTimeout, CancellationToken cancellationToken)
+   at System.Threading.Tasks.Task.WaitAll(Task[] tasks, Int32 millisecondsTimeout)
+   at System.Threading.Tasks.Task.WaitAll(Task[] tasks)
+   at System.Threading.Tasks.Parallel.Invoke(ParallelOptions parallelOptions, Action[] actions)
+--- End of stack trace from previous location where exception was thrown ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Threading.Tasks.Parallel.ThrowSingleCancellationExceptionOrOtherException(ICollection exceptions, CancellationToken cancelToken, Exception otherException)
+   at System.Threading.Tasks.Parallel.Invoke(ParallelOptions parallelOptions, Action[] actions)
+   at System.Threading.Tasks.Parallel.Invoke(Action[] actions)
+   at DreamTravel.ExternalConnection.DownloadRoadData.Execute(List`1 listOfCities, EvaluationMatrix evaluationMatrix) in E:\workspace\DreamTravel\src\DreamTravel\BestPath\DownloadRoadData.cs:line 30
+   at DreamTravel.BestPath.CalculateBestPath.Execute(List`1 cities, Boolean optimizePath) in E:\workspace\DreamTravel\src\DreamTravel\BestPath\CalculateBestPath.cs:line 30
+   at DreamTravel.BestPath.Controller.CalculateBestPath(List`1 cities, String sessionId, Boolean optimizePath) in E:\workspace\DreamTravel\src\DreamTravel\BestPath\Controller.cs:line 36
+---> (Inner Exception #0) System.IO.InvalidDataException: Index was out of range. Must be non-negative and less than the size of the collection.
+Parameter name: index
+   at DreamTravel.BestPath.DataAccess.DownloadDurationMatrixByTollRoad.Execute(List`1 listOfCities) in E:\workspace\DreamTravel\src\DreamTravel\BestPath\DataAccess\DownloadDurationMatrixByTollRoad.cs:line 65
+   at DreamTravel.ExternalConnection.DownloadRoadData.<>c__DisplayClass4_0.<Execute>b__0() in E:\workspace\DreamTravel\src\DreamTravel\BestPath\DownloadRoadData.cs:line 32
+   at System.Threading.ExecutionContext.Run(ExecutionContext executionContext, ContextCallback callback, Object state)
+   at System.Threading.Tasks.Task.ExecuteWithThreadLocal(Task& currentTaskSlot)<---
+
+---> (Inner Exception #1) System.IO.InvalidDataException: Index was out of range. Must be non-negative and less than the size of the collection.
+Parameter name: index
+   at DreamTravel.BestPath.DataAccess.DownloadDurationMatrixByFreeRoad.Execute(List`1 listOfCities) in E:\workspace\DreamTravel\src\DreamTravel\BestPath\DataAccess\DownloadDurationMatrixByFreeRoad.cs:line 65
+   at DreamTravel.ExternalConnection.DownloadRoadData.<>c__DisplayClass4_0.<Execute>b__1() in E:\workspace\DreamTravel\src\DreamTravel\BestPath\DownloadRoadData.cs:line 33
+   at System.Threading.ExecutionContext.Run(ExecutionContext executionContext, ContextCallback callback, Object state)
+   at System.Threading.Tasks.Task.ExecuteWithThreadLocal(Task& currentTaskSlot)<---
+
+2018-11-12 09:06:20,002 [9] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2018-11-12 09:06:41,682 [9] ERROR DreamTravel.BestPath.Controller [(null)] - System.AggregateException: One or more errors occurred. (Index was out of range. Must be non-negative and less than the size of the collection.
+Parameter name: index) (Index was out of range. Must be non-negative and less than the size of the collection.
+Parameter name: index) ---> System.IO.InvalidDataException: Index was out of range. Must be non-negative and less than the size of the collection.
+Parameter name: index
+   at DreamTravel.BestPath.DataAccess.DownloadDurationMatrixByTollRoad.Execute(List`1 listOfCities) in E:\workspace\DreamTravel\src\DreamTravel\BestPath\DataAccess\DownloadDurationMatrixByTollRoad.cs:line 65
+   at DreamTravel.ExternalConnection.DownloadRoadData.<>c__DisplayClass4_0.<Execute>b__0() in E:\workspace\DreamTravel\src\DreamTravel\BestPath\DownloadRoadData.cs:line 32
+   at System.Threading.ExecutionContext.Run(ExecutionContext executionContext, ContextCallback callback, Object state)
+   at System.Threading.Tasks.Task.ExecuteWithThreadLocal(Task& currentTaskSlot)
+   --- End of inner exception stack trace ---
+   at System.ThrowHelper.ThrowAggregateException(List`1 exceptions)
+   at System.Threading.Tasks.Task.WaitAll(Task[] tasks, Int32 millisecondsTimeout, CancellationToken cancellationToken)
+   at System.Threading.Tasks.Task.WaitAll(Task[] tasks, Int32 millisecondsTimeout)
+   at System.Threading.Tasks.Task.WaitAll(Task[] tasks)
+   at System.Threading.Tasks.Parallel.Invoke(ParallelOptions parallelOptions, Action[] actions)
+--- End of stack trace from previous location where exception was thrown ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Threading.Tasks.Parallel.ThrowSingleCancellationExceptionOrOtherException(ICollection exceptions, CancellationToken cancelToken, Exception otherException)
+   at System.Threading.Tasks.Parallel.Invoke(ParallelOptions parallelOptions, Action[] actions)
+   at System.Threading.Tasks.Parallel.Invoke(Action[] actions)
+   at DreamTravel.ExternalConnection.DownloadRoadData.Execute(List`1 listOfCities, EvaluationMatrix evaluationMatrix) in E:\workspace\DreamTravel\src\DreamTravel\BestPath\DownloadRoadData.cs:line 30
+   at DreamTravel.BestPath.CalculateBestPath.Execute(List`1 cities, Boolean optimizePath) in E:\workspace\DreamTravel\src\DreamTravel\BestPath\CalculateBestPath.cs:line 30
+   at DreamTravel.BestPath.Controller.CalculateBestPath(List`1 cities, String sessionId, Boolean optimizePath) in E:\workspace\DreamTravel\src\DreamTravel\BestPath\Controller.cs:line 36
+---> (Inner Exception #0) System.IO.InvalidDataException: Index was out of range. Must be non-negative and less than the size of the collection.
+Parameter name: index
+   at DreamTravel.BestPath.DataAccess.DownloadDurationMatrixByTollRoad.Execute(List`1 listOfCities) in E:\workspace\DreamTravel\src\DreamTravel\BestPath\DataAccess\DownloadDurationMatrixByTollRoad.cs:line 65
+   at DreamTravel.ExternalConnection.DownloadRoadData.<>c__DisplayClass4_0.<Execute>b__0() in E:\workspace\DreamTravel\src\DreamTravel\BestPath\DownloadRoadData.cs:line 32
+   at System.Threading.ExecutionContext.Run(ExecutionContext executionContext, ContextCallback callback, Object state)
+   at System.Threading.Tasks.Task.ExecuteWithThreadLocal(Task& currentTaskSlot)<---
+
+---> (Inner Exception #1) System.IO.InvalidDataException: Index was out of range. Must be non-negative and less than the size of the collection.
+Parameter name: index
+   at DreamTravel.BestPath.DataAccess.DownloadDurationMatrixByFreeRoad.Execute(List`1 listOfCities) in E:\workspace\DreamTravel\src\DreamTravel\BestPath\DataAccess\DownloadDurationMatrixByFreeRoad.cs:line 65
+   at DreamTravel.ExternalConnection.DownloadRoadData.<>c__DisplayClass4_0.<Execute>b__1() in E:\workspace\DreamTravel\src\DreamTravel\BestPath\DownloadRoadData.cs:line 33
+   at System.Threading.ExecutionContext.Run(ExecutionContext executionContext, ContextCallback callback, Object state)
+   at System.Threading.Tasks.Task.ExecuteWithThreadLocal(Task& currentTaskSlot)<---
+
+2018-11-12 09:09:35,686 [10] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2018-11-12 09:09:56,270 [9] ERROR DreamTravel.BestPath.Controller [(null)] - System.AggregateException: One or more errors occurred. (Index was out of range. Must be non-negative and less than the size of the collection.
+Parameter name: index) ---> System.IO.InvalidDataException: Index was out of range. Must be non-negative and less than the size of the collection.
+Parameter name: index
+   at DreamTravel.BestPath.DataAccess.DownloadDurationMatrixByFreeRoad.Execute(List`1 listOfCities) in E:\workspace\DreamTravel\src\DreamTravel\BestPath\DataAccess\DownloadDurationMatrixByFreeRoad.cs:line 65
+   at DreamTravel.ExternalConnection.DownloadRoadData.<>c__DisplayClass4_0.<Execute>b__1() in E:\workspace\DreamTravel\src\DreamTravel\BestPath\DownloadRoadData.cs:line 33
+   at System.Threading.ExecutionContext.Run(ExecutionContext executionContext, ContextCallback callback, Object state)
+   at System.Threading.Tasks.Task.ExecuteWithThreadLocal(Task& currentTaskSlot)
+   --- End of inner exception stack trace ---
+   at System.ThrowHelper.ThrowAggregateException(List`1 exceptions)
+   at System.Threading.Tasks.Task.WaitAll(Task[] tasks, Int32 millisecondsTimeout, CancellationToken cancellationToken)
+   at System.Threading.Tasks.Task.WaitAll(Task[] tasks, Int32 millisecondsTimeout)
+   at System.Threading.Tasks.Task.WaitAll(Task[] tasks)
+   at System.Threading.Tasks.Parallel.Invoke(ParallelOptions parallelOptions, Action[] actions)
+--- End of stack trace from previous location where exception was thrown ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Threading.Tasks.Parallel.ThrowSingleCancellationExceptionOrOtherException(ICollection exceptions, CancellationToken cancelToken, Exception otherException)
+   at System.Threading.Tasks.Parallel.Invoke(ParallelOptions parallelOptions, Action[] actions)
+   at System.Threading.Tasks.Parallel.Invoke(Action[] actions)
+   at DreamTravel.ExternalConnection.DownloadRoadData.Execute(List`1 listOfCities, EvaluationMatrix evaluationMatrix) in E:\workspace\DreamTravel\src\DreamTravel\BestPath\DownloadRoadData.cs:line 30
+   at DreamTravel.BestPath.CalculateBestPath.Execute(List`1 cities, Boolean optimizePath) in E:\workspace\DreamTravel\src\DreamTravel\BestPath\CalculateBestPath.cs:line 30
+   at DreamTravel.BestPath.Controller.CalculateBestPath(List`1 cities, String sessionId, Boolean optimizePath) in E:\workspace\DreamTravel\src\DreamTravel\BestPath\Controller.cs:line 36
+---> (Inner Exception #0) System.IO.InvalidDataException: Index was out of range. Must be non-negative and less than the size of the collection.
+Parameter name: index
+   at DreamTravel.BestPath.DataAccess.DownloadDurationMatrixByFreeRoad.Execute(List`1 listOfCities) in E:\workspace\DreamTravel\src\DreamTravel\BestPath\DataAccess\DownloadDurationMatrixByFreeRoad.cs:line 65
+   at DreamTravel.ExternalConnection.DownloadRoadData.<>c__DisplayClass4_0.<Execute>b__1() in E:\workspace\DreamTravel\src\DreamTravel\BestPath\DownloadRoadData.cs:line 33
+   at System.Threading.ExecutionContext.Run(ExecutionContext executionContext, ContextCallback callback, Object state)
+   at System.Threading.Tasks.Task.ExecuteWithThreadLocal(Task& currentTaskSlot)<---
+
+2018-11-12 09:10:12,771 [8] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2018-11-12 09:10:27,703 [8] ERROR DreamTravel.BestPath.Controller [(null)] - System.AggregateException: One or more errors occurred. (Index was out of range. Must be non-negative and less than the size of the collection.
+Parameter name: index) ---> System.IO.InvalidDataException: Index was out of range. Must be non-negative and less than the size of the collection.
+Parameter name: index
+   at DreamTravel.BestPath.DataAccess.DownloadDurationMatrixByFreeRoad.Execute(List`1 listOfCities) in E:\workspace\DreamTravel\src\DreamTravel\BestPath\DataAccess\DownloadDurationMatrixByFreeRoad.cs:line 65
+   at DreamTravel.ExternalConnection.DownloadRoadData.<>c__DisplayClass4_0.<Execute>b__1() in E:\workspace\DreamTravel\src\DreamTravel\BestPath\DownloadRoadData.cs:line 33
+   at System.Threading.ExecutionContext.Run(ExecutionContext executionContext, ContextCallback callback, Object state)
+   at System.Threading.Tasks.Task.ExecuteWithThreadLocal(Task& currentTaskSlot)
+   --- End of inner exception stack trace ---
+   at System.ThrowHelper.ThrowAggregateException(List`1 exceptions)
+   at System.Threading.Tasks.Task.WaitAll(Task[] tasks, Int32 millisecondsTimeout, CancellationToken cancellationToken)
+   at System.Threading.Tasks.Task.WaitAll(Task[] tasks, Int32 millisecondsTimeout)
+   at System.Threading.Tasks.Task.WaitAll(Task[] tasks)
+   at System.Threading.Tasks.Parallel.Invoke(ParallelOptions parallelOptions, Action[] actions)
+--- End of stack trace from previous location where exception was thrown ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Threading.Tasks.Parallel.ThrowSingleCancellationExceptionOrOtherException(ICollection exceptions, CancellationToken cancelToken, Exception otherException)
+   at System.Threading.Tasks.Parallel.Invoke(ParallelOptions parallelOptions, Action[] actions)
+   at System.Threading.Tasks.Parallel.Invoke(Action[] actions)
+   at DreamTravel.ExternalConnection.DownloadRoadData.Execute(List`1 listOfCities, EvaluationMatrix evaluationMatrix) in E:\workspace\DreamTravel\src\DreamTravel\BestPath\DownloadRoadData.cs:line 30
+   at DreamTravel.BestPath.CalculateBestPath.Execute(List`1 cities, Boolean optimizePath) in E:\workspace\DreamTravel\src\DreamTravel\BestPath\CalculateBestPath.cs:line 30
+   at DreamTravel.BestPath.Controller.CalculateBestPath(List`1 cities, String sessionId, Boolean optimizePath) in E:\workspace\DreamTravel\src\DreamTravel\BestPath\Controller.cs:line 36
+---> (Inner Exception #0) System.IO.InvalidDataException: Index was out of range. Must be non-negative and less than the size of the collection.
+Parameter name: index
+   at DreamTravel.BestPath.DataAccess.DownloadDurationMatrixByFreeRoad.Execute(List`1 listOfCities) in E:\workspace\DreamTravel\src\DreamTravel\BestPath\DataAccess\DownloadDurationMatrixByFreeRoad.cs:line 65
+   at DreamTravel.ExternalConnection.DownloadRoadData.<>c__DisplayClass4_0.<Execute>b__1() in E:\workspace\DreamTravel\src\DreamTravel\BestPath\DownloadRoadData.cs:line 33
+   at System.Threading.ExecutionContext.Run(ExecutionContext executionContext, ContextCallback callback, Object state)
+   at System.Threading.Tasks.Task.ExecuteWithThreadLocal(Task& currentTaskSlot)<---
+
+2018-11-12 09:11:50,435 [8] ERROR DreamTravel.BestPath.Controller [(null)] - System.AggregateException: One or more errors occurred. (Index was out of range. Must be non-negative and less than the size of the collection.
+Parameter name: index) ---> System.IO.InvalidDataException: Index was out of range. Must be non-negative and less than the size of the collection.
+Parameter name: index
+   at DreamTravel.BestPath.DataAccess.DownloadDurationMatrixByFreeRoad.Execute(List`1 listOfCities) in E:\workspace\DreamTravel\src\DreamTravel\BestPath\DataAccess\DownloadDurationMatrixByFreeRoad.cs:line 65
+   at DreamTravel.ExternalConnection.DownloadRoadData.<>c__DisplayClass4_0.<Execute>b__1() in E:\workspace\DreamTravel\src\DreamTravel\BestPath\DownloadRoadData.cs:line 33
+   at System.Threading.ExecutionContext.Run(ExecutionContext executionContext, ContextCallback callback, Object state)
+   at System.Threading.Tasks.Task.ExecuteWithThreadLocal(Task& currentTaskSlot)
+   --- End of inner exception stack trace ---
+   at System.ThrowHelper.ThrowAggregateException(List`1 exceptions)
+   at System.Threading.Tasks.Task.WaitAll(Task[] tasks, Int32 millisecondsTimeout, CancellationToken cancellationToken)
+   at System.Threading.Tasks.Task.WaitAll(Task[] tasks, Int32 millisecondsTimeout)
+   at System.Threading.Tasks.Task.WaitAll(Task[] tasks)
+   at System.Threading.Tasks.Parallel.Invoke(ParallelOptions parallelOptions, Action[] actions)
+--- End of stack trace from previous location where exception was thrown ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Threading.Tasks.Parallel.ThrowSingleCancellationExceptionOrOtherException(ICollection exceptions, CancellationToken cancelToken, Exception otherException)
+   at System.Threading.Tasks.Parallel.Invoke(ParallelOptions parallelOptions, Action[] actions)
+   at System.Threading.Tasks.Parallel.Invoke(Action[] actions)
+   at DreamTravel.ExternalConnection.DownloadRoadData.Execute(List`1 listOfCities, EvaluationMatrix evaluationMatrix) in E:\workspace\DreamTravel\src\DreamTravel\BestPath\DownloadRoadData.cs:line 30
+   at DreamTravel.BestPath.CalculateBestPath.Execute(List`1 cities, Boolean optimizePath) in E:\workspace\DreamTravel\src\DreamTravel\BestPath\CalculateBestPath.cs:line 30
+   at DreamTravel.BestPath.Controller.CalculateBestPath(List`1 cities, String sessionId, Boolean optimizePath) in E:\workspace\DreamTravel\src\DreamTravel\BestPath\Controller.cs:line 36
+---> (Inner Exception #0) System.IO.InvalidDataException: Index was out of range. Must be non-negative and less than the size of the collection.
+Parameter name: index
+   at DreamTravel.BestPath.DataAccess.DownloadDurationMatrixByFreeRoad.Execute(List`1 listOfCities) in E:\workspace\DreamTravel\src\DreamTravel\BestPath\DataAccess\DownloadDurationMatrixByFreeRoad.cs:line 65
+   at DreamTravel.ExternalConnection.DownloadRoadData.<>c__DisplayClass4_0.<Execute>b__1() in E:\workspace\DreamTravel\src\DreamTravel\BestPath\DownloadRoadData.cs:line 33
+   at System.Threading.ExecutionContext.Run(ExecutionContext executionContext, ContextCallback callback, Object state)
+   at System.Threading.Tasks.Task.ExecuteWithThreadLocal(Task& currentTaskSlot)<---
+
+2018-11-12 09:15:01,082 [9] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2018-11-12 09:15:03,158 [9] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2018-11-12 09:16:07,747 [56] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2018-11-12 13:36:38,573 [8] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2018-11-12 13:37:10,837 [10] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2018-11-12 13:55:17,217 [9] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2018-11-12 14:03:29,931 [8] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2018-11-12 14:04:27,289 [10] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2018-11-12 14:08:57,051 [8] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2018-11-12 16:14:17,250 [8] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2018-11-12 16:26:34,240 [10] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2018-11-17 13:21:58,933 [9] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2018-11-17 13:24:11,582 [8] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2018-11-18 17:57:01,834 [8] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2018-12-23 21:53:16,907 [8] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2018-12-23 22:20:10,126 [8] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2018-12-26 17:47:40,134 [10] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2018-12-26 17:48:57,809 [10] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2018-12-26 20:38:30,686 [9] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2018-12-26 20:42:32,707 [10] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2018-12-26 20:45:19,175 [9] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2018-12-26 20:47:18,978 [10] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2018-12-26 20:53:07,131 [8] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2018-12-26 20:54:40,645 [8] ERROR DreamTravel.BestPath.Controller [(null)] - System.InvalidOperationException: Collection was modified; enumeration operation may not execute.
+   at System.ThrowHelper.ThrowInvalidOperationException_InvalidOperation_EnumFailedVersion()
+   at System.Collections.Generic.List`1.Enumerator.MoveNextRare()
+   at DreamTravel.BestPath.Executors.CalculateBestPath.Execute(Command command) in E:\workspace\DreamTravel\src\DreamTravel\BestPath\Executors\CalculateBestPath.cs:line 39
+   at DreamTravel.BestPath.Controller.CalculateBestPath(Query query) in E:\workspace\DreamTravel\src\DreamTravel\BestPath\Controller.cs:line 56
+2018-12-26 20:55:11,496 [35] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2018-12-26 20:56:52,179 [9] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2018-12-26 21:04:13,711 [10] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2018-12-26 21:09:00,771 [9] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2018-12-26 21:11:36,193 [10] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2018-12-26 21:13:32,927 [9] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2018-12-27 07:38:47,939 [10] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2018-12-27 07:44:46,994 [9] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2018-12-27 08:04:27,282 [9] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2018-12-27 08:07:17,269 [9] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2018-12-27 08:09:50,932 [9] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2018-12-27 08:13:19,124 [9] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2018-12-27 08:14:58,067 [8] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2018-12-27 08:15:44,713 [12] ERROR DreamTravel.BestPath.Controller [(null)] - System.ArgumentOutOfRangeException: Index was out of range. Must be non-negative and less than the size of the collection.
+Parameter name: index
+   at System.ThrowHelper.ThrowArgumentOutOfRange_IndexException()
+   at System.Collections.Generic.List`1.set_Item(Int32 index, T value)
+   at TravelingSalesmanProblem.AntColony.ClearProbabilityRowsForGivenPoint(Int32 nr, List`1 probabilityMatrix) in E:\workspace\DreamTravel\src\TravelingSalesmanProblem\AntColony.cs:line 195
+   at TravelingSalesmanProblem.AntColony.CalculatePathForSingleAnt() in E:\workspace\DreamTravel\src\TravelingSalesmanProblem\AntColony.cs:line 101
+   at TravelingSalesmanProblem.AntColony.SolveTSP(List`1 distances) in E:\workspace\DreamTravel\src\TravelingSalesmanProblem\AntColony.cs:line 40
+   at DreamTravel.BestPath.Executors.CalculateBestPath.Execute(Command command) in E:\workspace\DreamTravel\src\DreamTravel\BestPath\Executors\CalculateBestPath.cs:line 73
+   at DreamTravel.BestPath.Controller.CalculateBestPath(Query query) in E:\workspace\DreamTravel\src\DreamTravel\BestPath\Controller.cs:line 56
+2018-12-27 08:16:59,838 [8] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2018-12-27 08:22:43,173 [8] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2018-12-27 08:28:57,174 [9] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2018-12-27 08:30:07,180 [10] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2018-12-27 12:05:32,605 [8] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2018-12-27 12:18:51,516 [8] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2018-12-27 12:20:23,281 [8] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2018-12-27 12:25:08,315 [9] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2018-12-27 12:26:04,147 [8] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2018-12-27 12:28:13,291 [8] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2018-12-27 12:34:22,458 [8] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2018-12-27 12:36:49,751 [8] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2018-12-27 13:10:52,069 [8] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2018-12-27 13:22:30,702 [8] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2018-12-27 13:24:47,362 [8] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2018-12-27 13:25:04,626 [8] WARN  Microsoft.AspNetCore.Server.Kestrel [(null)] - Heartbeat took longer than "00:00:01" at "12/27/2018 12:25:02 +00:00".
+2018-12-27 13:27:34,758 [8] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2018-12-27 13:31:31,124 [8] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2018-12-27 13:32:35,698 [9] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2018-12-27 13:36:25,746 [9] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2018-12-27 13:37:42,453 [9] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2018-12-27 13:39:35,175 [9] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2018-12-27 13:40:50,220 [9] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2018-12-27 13:42:40,240 [8] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2018-12-27 13:47:47,958 [8] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2018-12-27 14:26:29,668 [9] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2018-12-27 14:28:15,763 [9] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2018-12-27 19:00:31,736 [8] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-01-04 16:13:10,275 [8] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-01-04 16:13:51,966 [8] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-01-04 16:14:37,156 [10] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-01-04 16:40:44,357 [8] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-01-04 16:48:37,531 [10] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-01-04 16:49:26,973 [8] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-01-04 16:52:45,060 [8] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-01-04 16:53:04,461 [8] ERROR DreamTravel.LocationOfCity.Controller [(null)] - System.IO.InvalidDataException: Cannot find city [asd]
+   at DreamTravel.LocationOfCity.FindLocationOfCity.<Execute>d__2.MoveNext() in E:\workspace\DreamTravel\src\DreamTravel\LocationOfCity\FindLocationOfCity.cs:line 42
+--- End of stack trace from previous location where exception was thrown ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter`1.GetResult()
+   at DreamTravel.LocationOfCity.Controller.<FindLocationOfCity>d__4.MoveNext() in E:\workspace\DreamTravel\src\DreamTravel\LocationOfCity\Controller.cs:line 35
+2019-01-04 16:55:44,359 [9] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-01-04 16:59:56,520 [9] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-01-04 17:01:49,697 [9] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-01-04 17:07:33,770 [9] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-01-04 17:11:39,843 [9] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-01-04 17:12:08,792 [10] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-01-04 17:13:18,885 [9] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-01-04 17:13:18,885 [8] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-01-04 17:14:47,968 [9] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-01-04 17:14:54,208 [8] ERROR DreamTravel.BestPath.Controller [(null)] - System.IndexOutOfRangeException: Index was outside the bounds of the array.
+   at DreamTravel.BestPath.Executors.DownloadRoadData.SetTablesValueAsMax(EvaluationMatrix evaluationMatrix, Int32 iterator) in E:\workspace\DreamTravel\src\DreamTravel\BestPath\Executors\DownloadRoadData.cs:line 60
+   at DreamTravel.BestPath.Executors.DownloadRoadData.<Execute>d__4.MoveNext() in E:\workspace\DreamTravel\src\DreamTravel\BestPath\Executors\DownloadRoadData.cs:line 27
+--- End of stack trace from previous location where exception was thrown ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter`1.GetResult()
+   at DreamTravel.BestPath.Executors.CalculateBestPath.<Execute>d__5.MoveNext() in E:\workspace\DreamTravel\src\DreamTravel\BestPath\Executors\CalculateBestPath.cs:line 28
+--- End of stack trace from previous location where exception was thrown ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter`1.GetResult()
+   at DreamTravel.BestPath.Controller.<CalculateBestPath>d__5.MoveNext() in E:\workspace\DreamTravel\src\DreamTravel\BestPath\Controller.cs:line 42
+2019-01-04 17:15:26,520 [8] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-01-04 17:16:04,377 [11] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-01-04 17:16:48,777 [10] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-01-04 17:19:20,335 [9] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-01-05 11:05:49,222 [9] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-01-05 11:07:26,208 [10] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-01-05 11:12:22,232 [8] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-01-05 11:14:08,758 [9] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-01-05 11:15:08,535 [9] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-01-05 11:15:33,335 [9] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-01-05 11:17:27,712 [10] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-01-05 11:18:10,474 [9] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-01-05 11:19:24,583 [9] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-01-05 11:20:05,226 [8] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-01-05 11:20:38,085 [10] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-01-05 11:21:19,124 [9] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-01-05 11:23:29,381 [9] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-01-05 11:50:05,427 [8] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-01-05 11:53:17,124 [10] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-01-05 11:53:46,662 [10] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-01-05 11:54:32,729 [9] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-01-05 11:55:16,915 [10] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-01-05 11:56:15,205 [10] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-01-05 13:43:24,953 [10] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-01-05 13:44:09,152 [10] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-01-05 13:44:44,249 [10] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-01-05 13:50:00,798 [8] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-01-05 13:51:22,334 [9] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-01-05 13:53:03,044 [9] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-01-05 13:54:50,927 [8] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-01-05 13:57:08,212 [8] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-01-06 21:09:24,779 [9] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-01-06 21:21:54,146 [10] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-01-06 21:24:10,214 [10] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-01-06 21:24:47,946 [8] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-01-06 21:26:33,784 [8] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-01-06 21:30:58,784 [9] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-01-06 21:32:31,876 [8] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-01-06 21:34:41,647 [8] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-01-06 21:36:09,751 [10] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-01-06 21:40:43,475 [8] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-01-06 21:42:05,901 [9] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-01-06 21:43:29,194 [8] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-01-06 21:45:15,987 [8] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-01-06 21:46:18,122 [10] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-01-06 21:47:27,461 [8] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-01-06 21:47:56,809 [8] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-01-06 21:48:42,028 [9] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-01-06 21:48:46,735 [9] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-01-06 21:49:13,167 [8] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-01-06 21:49:17,056 [9] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-01-06 21:49:34,976 [11] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-01-06 21:49:58,912 [8] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-01-06 21:50:19,275 [8] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-01-06 21:51:13,271 [9] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-01-06 21:51:17,158 [9] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-01-06 21:52:32,450 [9] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-01-24 16:50:46,556 [9] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-01-24 17:07:15,372 [9] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-01-24 17:08:54,432 [8] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-01-24 17:14:33,098 [9] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-01-24 17:16:19,801 [10] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-01-24 17:26:23,783 [8] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-01-24 17:28:48,518 [8] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-01-24 17:29:17,829 [8] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-01-24 17:29:57,484 [9] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-01-24 20:02:36,524 [8] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-01-25 17:41:19,436 [8] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-01-25 17:41:24,550 [8] ERROR DreamTravel.NameOfCity.Controller [(null)] - System.IO.InvalidDataException: Cannot find city for coordinates: Lat: [29.3875345266016], [-26.5304694403982]
+   at DreamTravel.NameOfCity.FindNameOfCity.<Execute>d__2.MoveNext() in E:\workspace\DreamTravel\src\DreamTravel\NameOfCity\FindNameOfCity.cs:line 56
+--- End of stack trace from previous location where exception was thrown ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter`1.GetResult()
+   at DreamTravel.NameOfCity.Controller.<FindNameOfCity>d__4.MoveNext() in E:\workspace\DreamTravel\src\DreamTravel\NameOfCity\Controller.cs:line 40
+2019-01-25 17:41:31,704 [9] ERROR DreamTravel.NameOfCity.Controller [(null)] - System.IO.InvalidDataException: Cannot find city for coordinates: Lat: [54.7383650816621], [2.33589076113662]
+   at DreamTravel.NameOfCity.FindNameOfCity.<Execute>d__2.MoveNext() in E:\workspace\DreamTravel\src\DreamTravel\NameOfCity\FindNameOfCity.cs:line 56
+--- End of stack trace from previous location where exception was thrown ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter`1.GetResult()
+   at DreamTravel.NameOfCity.Controller.<FindNameOfCity>d__4.MoveNext() in E:\workspace\DreamTravel\src\DreamTravel\NameOfCity\Controller.cs:line 40
+2019-01-25 17:42:30,992 [8] ERROR DreamTravel.NameOfCity.Controller [(null)] - System.IO.InvalidDataException: Cannot find city for coordinates: Lat: [53.7238005056974], [-3.77250767636338]
+   at DreamTravel.NameOfCity.FindNameOfCity.<Execute>d__2.MoveNext() in E:\workspace\DreamTravel\src\DreamTravel\NameOfCity\FindNameOfCity.cs:line 56
+--- End of stack trace from previous location where exception was thrown ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter`1.GetResult()
+   at DreamTravel.NameOfCity.Controller.<FindNameOfCity>d__4.MoveNext() in E:\workspace\DreamTravel\src\DreamTravel\NameOfCity\Controller.cs:line 40
+2019-01-25 17:42:34,603 [9] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-01-25 17:42:53,973 [9] ERROR DreamTravel.NameOfCity.Controller [(null)] - System.IO.InvalidDataException: Cannot find city for coordinates: Lat: [54.2275929633816], [7.02191219971678]
+   at DreamTravel.NameOfCity.FindNameOfCity.<Execute>d__2.MoveNext() in E:\workspace\DreamTravel\src\DreamTravel\NameOfCity\FindNameOfCity.cs:line 56
+--- End of stack trace from previous location where exception was thrown ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter`1.GetResult()
+   at DreamTravel.NameOfCity.Controller.<FindNameOfCity>d__4.MoveNext() in E:\workspace\DreamTravel\src\DreamTravel\NameOfCity\Controller.cs:line 40
+2019-01-25 17:44:54,355 [9] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-01-25 17:45:55,138 [8] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-01-25 17:46:46,248 [8] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-01-25 17:47:01,376 [9] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-01-25 17:47:38,971 [10] ERROR DreamTravel.NameOfCity.Controller [(null)] - System.IO.InvalidDataException: Cannot find city for coordinates: Lat: [54.4211325616176], [11.7651980147543]
+   at DreamTravel.NameOfCity.FindNameOfCity.<Execute>d__2.MoveNext() in E:\workspace\DreamTravel\src\DreamTravel\NameOfCity\FindNameOfCity.cs:line 56
+--- End of stack trace from previous location where exception was thrown ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter`1.GetResult()
+   at DreamTravel.NameOfCity.Controller.<FindNameOfCity>d__4.MoveNext() in E:\workspace\DreamTravel\src\DreamTravel\NameOfCity\Controller.cs:line 40
+2019-01-25 17:48:12,286 [9] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-01-25 17:48:23,512 [8] ERROR DreamTravel.NameOfCity.Controller [(null)] - System.IO.InvalidDataException: Cannot find city for coordinates: Lat: [55.1801798083392], [16.5526758088413]
+   at DreamTravel.NameOfCity.FindNameOfCity.<Execute>d__2.MoveNext() in E:\workspace\DreamTravel\src\DreamTravel\NameOfCity\FindNameOfCity.cs:line 56
+--- End of stack trace from previous location where exception was thrown ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter`1.GetResult()
+   at DreamTravel.NameOfCity.Controller.<FindNameOfCity>d__4.MoveNext() in E:\workspace\DreamTravel\src\DreamTravel\NameOfCity\Controller.cs:line 40
+2019-01-25 17:50:42,879 [8] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-01-25 17:51:25,409 [11] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-01-25 17:51:57,006 [9] ERROR DreamTravel.NameOfCity.Controller [(null)] - System.IO.InvalidDataException: Cannot find city for coordinates: Lat: [55.5818255565137], [18.5323328976635]
+   at DreamTravel.NameOfCity.FindNameOfCity.<Execute>d__2.MoveNext() in E:\workspace\DreamTravel\src\DreamTravel\NameOfCity\FindNameOfCity.cs:line 56
+--- End of stack trace from previous location where exception was thrown ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter`1.GetResult()
+   at DreamTravel.NameOfCity.Controller.<FindNameOfCity>d__4.MoveNext() in E:\workspace\DreamTravel\src\DreamTravel\NameOfCity\Controller.cs:line 40
+2019-01-25 22:39:08,771 [8] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-01-25 22:41:18,870 [9] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-01-25 22:42:59,763 [9] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-01-25 22:43:19,735 [9] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-01-25 22:45:29,517 [9] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-01-25 22:47:54,298 [9] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-01-25 22:50:36,822 [10] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-01-25 22:54:22,470 [10] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-01-25 22:54:44,745 [9] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-01-25 22:55:24,818 [9] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-01-25 22:55:38,058 [9] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-01-25 22:55:48,890 [9] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-01-25 22:57:15,006 [8] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-01-25 22:59:43,902 [10] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-01-26 15:52:16,284 [8] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-01-26 15:54:22,646 [10] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-01-26 15:55:56,589 [9] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-01-26 15:56:26,667 [8] ERROR DreamTravel.LocationOfCity.Controller [(null)] - System.IO.InvalidDataException: Cannot find city []
+   at DreamTravel.LocationOfCity.FindLocationOfCity.<Execute>d__2.MoveNext() in E:\workspace\DreamTravel\src\DreamTravel\LocationOfCity\FindLocationOfCity.cs:line 42
+--- End of stack trace from previous location where exception was thrown ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter`1.GetResult()
+   at DreamTravel.LocationOfCity.Controller.<FindLocationOfCity>d__4.MoveNext() in E:\workspace\DreamTravel\src\DreamTravel\LocationOfCity\Controller.cs:line 35
+2019-01-26 15:59:44,211 [10] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-01-26 16:01:03,147 [9] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-01-26 16:10:45,480 [8] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-01-26 16:12:25,325 [8] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-01-26 16:16:50,059 [7] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-01-26 16:55:09,511 [8] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-01-26 17:23:45,403 [8] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-01-26 17:26:32,551 [9] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-01-26 17:27:42,113 [10] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-01-26 17:31:40,646 [9] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-01-26 17:35:31,998 [10] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-01-26 17:37:41,552 [9] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-01-26 18:02:27,926 [8] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-01-26 18:05:44,378 [9] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-01-26 18:10:27,487 [8] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-01-26 18:20:18,534 [10] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-01-26 18:23:52,006 [9] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-01-26 18:25:04,106 [36] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-01-26 18:27:07,562 [9] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-01-26 18:31:39,656 [8] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-01-26 18:40:06,880 [8] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-01-26 18:42:47,804 [10] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-01-26 18:45:25,342 [10] ERROR DreamTravel.BestPath.Controller [(null)] - System.IndexOutOfRangeException: Index was outside the bounds of the array.
+   at DreamTravel.BestPath.Executors.DownloadRoadData.SetTablesValueAsMax(EvaluationMatrix evaluationMatrix, Int32 iterator) in E:\workspace\DreamTravel\src\DreamTravel\BestPath\Executors\DownloadRoadData.cs:line 60
+   at DreamTravel.BestPath.Executors.DownloadRoadData.<Execute>d__4.MoveNext() in E:\workspace\DreamTravel\src\DreamTravel\BestPath\Executors\DownloadRoadData.cs:line 27
+--- End of stack trace from previous location where exception was thrown ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter`1.GetResult()
+   at DreamTravel.BestPath.Executors.CalculateBestPath.<Execute>d__5.MoveNext() in E:\workspace\DreamTravel\src\DreamTravel\BestPath\Executors\CalculateBestPath.cs:line 29
+--- End of stack trace from previous location where exception was thrown ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter`1.GetResult()
+   at DreamTravel.BestPath.Controller.<CalculateBestPath>d__5.MoveNext() in E:\workspace\DreamTravel\src\DreamTravel\BestPath\Controller.cs:line 35
+2019-01-26 18:45:46,538 [10] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-01-26 18:47:53,394 [74] ERROR DreamTravel.BestPath.Controller [(null)] - System.IndexOutOfRangeException: Index was outside the bounds of the array.
+   at DreamTravel.BestPath.Executors.DownloadRoadData.SetTablesValueAsMax(EvaluationMatrix evaluationMatrix, Int32 iterator) in E:\workspace\DreamTravel\src\DreamTravel\BestPath\Executors\DownloadRoadData.cs:line 60
+   at DreamTravel.BestPath.Executors.DownloadRoadData.<Execute>d__4.MoveNext() in E:\workspace\DreamTravel\src\DreamTravel\BestPath\Executors\DownloadRoadData.cs:line 27
+--- End of stack trace from previous location where exception was thrown ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter`1.GetResult()
+   at DreamTravel.BestPath.Executors.CalculateBestPath.<Execute>d__5.MoveNext() in E:\workspace\DreamTravel\src\DreamTravel\BestPath\Executors\CalculateBestPath.cs:line 29
+--- End of stack trace from previous location where exception was thrown ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter`1.GetResult()
+   at DreamTravel.BestPath.Controller.<CalculateBestPath>d__5.MoveNext() in E:\workspace\DreamTravel\src\DreamTravel\BestPath\Controller.cs:line 35
+2019-01-26 18:48:10,705 [9] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-01-26 19:08:09,508 [9] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-01-26 22:36:53,609 [8] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-01-26 22:39:32,806 [8] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-01-26 22:48:21,639 [8] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-01-26 22:56:42,722 [9] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-02-09 19:27:10,416 [10] WARN  DreamTravel.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-02-09 19:27:39,473 [8] ERROR DreamTravel.LocationOfCity.Controller [(null)] - System.IO.InvalidDataException: Cannot find city []
+   at DreamTravel.LocationOfCity.FindLocationOfCity.<Execute>d__2.MoveNext() in E:\workspace\DreamTravel\src\DreamTravel\LocationOfCity\FindLocationOfCity.cs:line 42
+--- End of stack trace from previous location where exception was thrown ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter`1.GetResult()
+   at DreamTravel.LocationOfCity.Controller.<FindLocationOfCity>d__4.MoveNext() in E:\workspace\DreamTravel\src\DreamTravel\LocationOfCity\Controller.cs:line 35

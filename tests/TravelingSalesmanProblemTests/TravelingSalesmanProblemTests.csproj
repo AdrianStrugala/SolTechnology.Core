@@ -47,7 +47,6 @@
 
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\DreamTravel\DreamTravel.csproj" />
     <ProjectReference Include="..\..\src\TravelingSalesmanProblem\TravelingSalesmanProblem.csproj" />
   </ItemGroup>
 
