@@ -8,30 +8,6 @@
     <RootNamespace>DreamTravel.WebUI</RootNamespace>
   </PropertyGroup>
 
-  <ItemGroup>
-    <Content Remove="wwwroot\DragAndDropCityHandler.ts" />
-    <Content Remove="wwwroot\js\AddCity.ts" />
-    <Content Remove="wwwroot\js\AddCityByMapClick.ts" />
-    <Content Remove="wwwroot\js\CitiesPanelRepository.ts" />
-    <Content Remove="wwwroot\js\ClearMap.ts" />
-    <Content Remove="wwwroot\js\DisplayCity.ts" />
-    <Content Remove="wwwroot\js\DisplayMarker.ts" />
-    <Content Remove="wwwroot\js\DisplayRoute.ts" />
-    <Content Remove="wwwroot\js\DisplaySummaryInfo.ts" />
-    <Content Remove="wwwroot\js\FindCityName.ts" />
-    <Content Remove="wwwroot\js\GetIndexOfCity.ts" />
-    <Content Remove="wwwroot\js\Instruction.ts" />
-    <Content Remove="wwwroot\js\LimitCost.ts" />
-    <Content Remove="wwwroot\js\MoveCity.ts" />
-    <Content Remove="wwwroot\js\RunTSP.ts" />
-    <Content Remove="wwwroot\js\SaveMap.ts" />
-    <Content Remove="wwwroot\js\UpdateCity.ts" />
-    <Content Remove="wwwroot\js\Utils\Guid.ts" />
-    <Content Remove="wwwroot\js\Utils\Pad2.ts" />
-    <Content Remove="wwwroot\js\Utils\Sleep.ts" />
-    <Content Remove="wwwroot\js\Utils\WritePathInfoHandler.ts" />
-    <Content Remove="wwwroot\lib\googleMaps\googleMaps.d.ts" />
-  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Dapper" Version="1.50.5" />
@@ -56,8 +32,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <TypeScriptCompile Include="wwwroot\js\DragAndDropCity.ts" />
     <TypeScriptCompile Include="wwwroot\js\AddCity.ts" />
+    <TypeScriptCompile Include="wwwroot\js\DragAndDropCity.ts" />
     <TypeScriptCompile Include="wwwroot\js\ClearMap.ts" />
     <TypeScriptCompile Include="wwwroot\js\AddCityByMapClick.ts" />
     <TypeScriptCompile Include="wwwroot\js\DisplayCity.ts" />
@@ -87,7 +63,64 @@
     <Content Update="log4net.config">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Content Update="wwwroot\css\bootstrap.css">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Update="wwwroot\css\instruction.css">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Update="wwwroot\css\limitCostModal.css">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Update="wwwroot\css\listOfCitiesPanel.css">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Update="wwwroot\css\map.css">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Update="wwwroot\css\navbar.css">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Update="wwwroot\css\site.css">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Update="wwwroot\favicon.ico">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Update="wwwroot\images\banner1.svg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Update="wwwroot\images\banner2.svg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Update="wwwroot\images\banner3.svg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Update="wwwroot\images\banner4.svg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Update="wwwroot\images\Instruction1.jpg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Update="wwwroot\images\instruction1_1.jpg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Update="wwwroot\images\Instruction2.jpg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Update="wwwroot\images\Instruction3.jpg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Update="wwwroot\images\Instruction4.jpg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Update="wwwroot\images\Instruction5.jpg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Update="wwwroot\images\Traveling-Eco-Salesman.ico">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Update="wwwroot\lib\html2canvas.js">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
