@@ -59,6 +59,6 @@
     <Folder Include="Properties" />
   </ItemGroup>
   <ItemGroup>
-    <Build Include="Recipients.sql" />
+    <Build Include="User.sql" />
   </ItemGroup>
 </Project>

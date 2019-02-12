@@ -18,6 +18,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebUITests", "..\tests\WebU
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Bot", "Bot\Bot.csproj", "{2AF5C223-ECE4-403B-B222-41417639E7B1}"
 EndProject
+Project("{00D1A9C2-B5F0-4AF3-8072-F6C62B433612}") = "DreamTravelDatabase", "DreamTravelDatabase\DreamTravelDatabase.sqlproj", "{D5CCE04E-179A-4118-9C46-209BFC510CA2}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -44,6 +46,12 @@ Global
 		{2AF5C223-ECE4-403B-B222-41417639E7B1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2AF5C223-ECE4-403B-B222-41417639E7B1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2AF5C223-ECE4-403B-B222-41417639E7B1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D5CCE04E-179A-4118-9C46-209BFC510CA2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D5CCE04E-179A-4118-9C46-209BFC510CA2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D5CCE04E-179A-4118-9C46-209BFC510CA2}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
+		{D5CCE04E-179A-4118-9C46-209BFC510CA2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D5CCE04E-179A-4118-9C46-209BFC510CA2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D5CCE04E-179A-4118-9C46-209BFC510CA2}.Release|Any CPU.Deploy.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
