@@ -41,3 +41,6 @@ src/DreamTravel/wwwroot/js/Utils/Pad2.js
 src/DreamTravel/wwwroot/js/Utils/Sleep.js
 src/DreamTravel/wwwroot/js/WritePathInfoHandler.js
 src/DreamTravel/wwwroot/js/WriteSummaryInfoHandler.js
+src/WebUI/wwwroot/js/Utils/Guid.js
+src/WebUI/wwwroot/js/Utils/Pad2.js
+src/WebUI/wwwroot/js/Utils/Sleep.js

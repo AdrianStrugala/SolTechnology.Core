@@ -24,8 +24,6 @@
 
     public class Startup
     {
-        public static Action<IServiceCollection> _registerServices;
-
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
@@ -74,9 +72,6 @@
                     null);
             services.Configure<DreamAuthenticationOptions>(DreamAuthenticationOptions.AuthenticationScheme, configurationRoot);
             services.AddSingleton<IAuthenticationHandler, DreamAuthentication>();
-
-            _registerServices?.Invoke(services);
-            _registerServices = null;
         }
 
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
