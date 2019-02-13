@@ -1,5 +1,6 @@
 ﻿namespace DreamTravel.Bot.RunBenchmark
 {
+    using Benchmark.TestData;
     using Microsoft.Azure.WebJobs;
     using Newtonsoft.Json;
     using System.Threading.Tasks;
@@ -20,12 +21,12 @@
 
         static Activities()
         {
-            TwoCitiesMatrix = JsonConvert.DeserializeObject<double[]>(System.IO.File.ReadAllText(@".\RunBenchmark\Benchmark\TestData\twoCities.txt"));
-            FourCitiesMatrix = JsonConvert.DeserializeObject<double[]>(System.IO.File.ReadAllText(@".\RunBenchmark\Benchmark\TestData\fourCities.txt"));
-            EightCitiesMatrix = JsonConvert.DeserializeObject<double[]>(System.IO.File.ReadAllText(@".\RunBenchmark\Benchmark\TestData\eightCities.txt"));
-            TwelveCitiesMatrix = JsonConvert.DeserializeObject<double[]>(System.IO.File.ReadAllText(@".\RunBenchmark\Benchmark\TestData\twelveCities.txt"));
-            SixteenCitiesMatrix = JsonConvert.DeserializeObject<double[]>(System.IO.File.ReadAllText(@".\RunBenchmark\Benchmark\TestData\sixteenCities.txt"));
-            TwentyCitiesMatrix = JsonConvert.DeserializeObject<double[]>(System.IO.File.ReadAllText(@".\RunBenchmark\Benchmark\TestData\twentyCities.txt"));
+            TwoCitiesMatrix = JsonConvert.DeserializeObject<double[]>(TestData.twoCities);
+            FourCitiesMatrix = JsonConvert.DeserializeObject<double[]>(TestData.fourCities);
+            EightCitiesMatrix = JsonConvert.DeserializeObject<double[]>(TestData.eightCities);
+            TwelveCitiesMatrix = JsonConvert.DeserializeObject<double[]>(TestData.twelveCities);
+            SixteenCitiesMatrix = JsonConvert.DeserializeObject<double[]>(TestData.sixteenCities);
+            TwentyCitiesMatrix = JsonConvert.DeserializeObject<double[]>(TestData.twentyCities);
         }
 
 

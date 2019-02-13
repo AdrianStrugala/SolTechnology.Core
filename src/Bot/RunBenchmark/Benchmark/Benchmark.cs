@@ -14,7 +14,8 @@
     {
         private static HttpClient _httpClient;
 
-        private const string BenchmarkServiceUrl = "http://dreamtravel-benchmark.azurewebsites.net/PostBenchmarkResult";
+        //private const string BenchmarkServiceUrl = "http://dreamtravel-benchmark.azurewebsites.net/PostBenchmarkResult";
+        private const string BenchmarkServiceUrl = "http://localhost:5000/PostBenchmarkResult";
 
         public static async Task RunTest(int numberOfExecutions, double[] distanceMatrix, ITSP algorithm, string nameOfAlgorithm)
         {
@@ -67,13 +68,13 @@
             //Request to DreamTravel.Benchmark
             var response = await _httpClient.PostAsJson(BenchmarkServiceUrl, benchmarkResult);
 
-            System.IO.File.WriteAllText($@"..\..\..\..\..\docs\{nameOfAlgorithm}_Benchmark_{noOfCities}Cities.txt",
-                $"{nameOfAlgorithm}: {noOfCities} Cities \n" +
-                $"Minimal Distance: {benchmarkResult.MinimalDistance} \n" +
-                $"Average Distance: {benchmarkResult.AverageDistance} \n" +
-                $"Average Time: { benchmarkResult.AverageExecutionTime} ms \n" +
-                $"Recurrence: {benchmarkResult.Recurrence} % \n" +
-                $"Benchmark entry status: {response.StatusCode}");
+//            System.IO.File.WriteAllText($@"..\..\..\..\..\docs\{nameOfAlgorithm}_Benchmark_{noOfCities}Cities.txt",
+//                $"{nameOfAlgorithm}: {noOfCities} Cities \n" +
+//                $"Minimal Distance: {benchmarkResult.MinimalDistance} \n" +
+//                $"Average Distance: {benchmarkResult.AverageDistance} \n" +
+//                $"Average Time: { benchmarkResult.AverageExecutionTime} ms \n" +
+//                $"Recurrence: {benchmarkResult.Recurrence} % \n" +
+//                $"Benchmark entry status: {response.StatusCode}");
 
 
         }
