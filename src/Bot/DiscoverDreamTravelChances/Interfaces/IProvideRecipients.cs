@@ -1,10 +1,10 @@
 ﻿namespace DreamTravel.Bot.DiscoverDreamTravelChances.Interfaces
 {
-    using System.Collections.Generic;
     using SendEmail;
+    using System.Collections.Generic;
 
     public interface IProvideRecipients
     {
-        List<Recipient> Execute();
+        List<User> Execute();
     }
 }

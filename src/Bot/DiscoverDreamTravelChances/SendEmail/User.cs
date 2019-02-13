@@ -1,6 +1,6 @@
 ﻿namespace DreamTravel.Bot.DiscoverDreamTravelChances.SendEmail
 {
-    public class Recipient
+    public class User
     {
         public int Id { get; set; }
         public string Name { get; set; }

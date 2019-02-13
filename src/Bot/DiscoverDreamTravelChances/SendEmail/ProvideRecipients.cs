@@ -14,7 +14,7 @@
 SELECT [Id]
       ,[Name]
       ,[Email]
-  FROM [dbo].[Recipients]
+  FROM [dbo].[User]
 ";
 
         public ProvideRecipients(IDbConnectionFactory dbConnectionFactory)
@@ -22,13 +22,13 @@ SELECT [Id]
             _dbConnectionFactory = dbConnectionFactory;
         }
 
-        public List<Recipient> Execute()
+        public List<User> Execute()
         {
-            var result = new List<Recipient>();
+            var result = new List<User>();
 
             using (var connection = _dbConnectionFactory.CreateConnection())
             {
-                result = connection.Query<Recipient>(sql).ToList();
+                result = connection.Query<User>(sql).ToList();
             }
             
             return result;
