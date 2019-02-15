@@ -155,16 +155,16 @@
 
         <h4 class="modal-title" align="center"> List of cities:</h4>
         <br />
-             
+
         <hr class="line" ondrop="drop(event, map)" ondragover="allowDrop(event)" id="0">
-        
-        <div id="listOfCities">              
+
+        <div id="listOfCities">
             <div class="cityRow" id="cityRow1">
                 <textarea class="cityText" id="1" rows="1" onchange="displayCity(this, map)" draggable="true" ondragstart="drag(event)"></textarea>
                 <button type="button" class="btn btn-danger" onclick="removeCity(this)" id="1">X</button>
                 <hr class="line" ondrop="drop(event, map)" ondragover="allowDrop(event)" id="1">
             </div>
-            
+
         </div>
         <button type="button" class="btn btn-success" onclick="addCity(map)" id="addCityBtn">+</button>
 
@@ -223,7 +223,7 @@
                 cities.push(null);
                 markers.push(null);
 
-                map.addListener('click', function(e) {
+                map.addListener('click', function (e) {
                     addCityByMapClick(e.latLng, map);
                 });
 

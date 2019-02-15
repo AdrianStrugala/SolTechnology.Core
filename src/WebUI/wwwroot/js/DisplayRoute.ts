@@ -39,5 +39,13 @@ function displayRoute(directionsService, map, path) {
             }
         });
 
+    directionsService.onfocus = dupa(map);
+
     paths.push(directionsDisplay);
+}
+
+
+
+function dupa(map) {
+    addCity(map);
 }
