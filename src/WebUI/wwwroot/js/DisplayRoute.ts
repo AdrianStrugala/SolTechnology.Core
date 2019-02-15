@@ -39,13 +39,13 @@ function displayRoute(directionsService, map, path) {
             }
         });
 
-    directionsService.onfocus = dupa(map);
+   // directionsService.route.addListener("onclick", dupa);
 
     paths.push(directionsDisplay);
 }
 
 
 
-function dupa(map) {
-    addCity(map);
+function dupa() {
+    window.alert('dupa');
 }

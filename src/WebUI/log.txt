@@ -643,3 +643,9 @@ Parameter name: index
    at System.Runtime.CompilerServices.TaskAwaiter`1.GetResult()
    at DreamTravel.LocationOfCity.Controller.<FindLocationOfCity>d__4.MoveNext() in E:\workspace\DreamTravel\src\DreamTravel\LocationOfCity\Controller.cs:line 35
 2019-02-15 11:04:09,538 [9] WARN  WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-02-15 11:06:13,021 [8] WARN  WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-02-15 11:12:09,544 [8] WARN  WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-02-15 11:14:47,560 [9] WARN  WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-02-15 11:17:53,590 [8] WARN  WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-02-15 11:19:02,110 [8] WARN  WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-02-15 11:19:47,476 [8] WARN  WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
