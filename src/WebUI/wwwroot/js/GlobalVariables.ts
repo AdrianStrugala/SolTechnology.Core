@@ -6,6 +6,7 @@ var optimalCost;
 var optimalTime;
 var totalCost;
 var pathsToRetry = [];
+var routeLabels = [];
 var noOfCityRows = 1;
 var directionsService;
 var displayCityAjaxCalls = [];

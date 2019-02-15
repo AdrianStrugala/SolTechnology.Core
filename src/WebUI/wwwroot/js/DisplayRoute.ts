@@ -31,16 +31,32 @@ function displayRoute(directionsService, map, path) {
     },
         (response, status) => {
 
-
-
             if (status === 'OK') {
 
-
                 var middleRoad = response.routes[0].overview_path[response.routes[0].overview_path.length / 2];
-                displayMarker(map, middleRoad.lat(), middleRoad.lng(), "DUPA");
+
+                var hours = Math.floor(path.OptimalDistance / 3600);
+                var minutes = Math.floor((path.OptimalDistance - Math.floor(hours) * 3600) / 60);
+                var seconds = (path.OptimalDistance % 60);
+
+                var routeString =
+                    path.StartingCity.Name +
+                    " -> " +
+                    path.EndingCity.Name +
+                    "\ (Cost of fee: " +
+                    path.OptimalCost.toFixed(2) +
+                    " €." +
+                    " Time: " +
+                    Math.floor(hours) +
+                    ":" +
+                    pad2(Math.floor(minutes)) +
+                    ":" +
+                    pad2(Math.floor(seconds)) +
+                    "h)";
+
+                routeLabels.push(displayRouteLabel(map, middleRoad.lat(), middleRoad.lng(), routeString));
 
                 directionsDisplay.setDirections(response);
-
 
             } else if (status === 'OVER_QUERY_LIMIT') {
                 pathsToRetry.push(path);
@@ -49,16 +65,5 @@ function displayRoute(directionsService, map, path) {
             }
         });
 
-
-    //   directionsDisplay.addListener("onclick", dupa);
-
-    // directionsService.route.addListener("onclick", dupa);
-
     paths.push(directionsDisplay);
-}
-
-
-
-function dupa() {
-    window.alert('dupa');
 }

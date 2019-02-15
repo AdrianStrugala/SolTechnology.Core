@@ -33,6 +33,7 @@
 
   <ItemGroup>
     <TypeScriptCompile Include="wwwroot\js\AddCity.ts" />
+    <TypeScriptCompile Include="wwwroot\js\DisplayRouteLabel.ts" />
     <TypeScriptCompile Include="wwwroot\js\DragAndDropCity.ts" />
     <TypeScriptCompile Include="wwwroot\js\ClearMap.ts" />
     <TypeScriptCompile Include="wwwroot\js\AddCityByMapClick.ts" />
