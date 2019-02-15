@@ -30,8 +30,18 @@ function displayRoute(directionsService, map, path) {
         avoidTolls: isToll
     },
         (response, status) => {
+
+
+
             if (status === 'OK') {
+
+
+                var middleRoad = response.routes[0].overview_path[response.routes[0].overview_path.length / 2];
+                displayMarker(map, middleRoad.lat(), middleRoad.lng(), "DUPA");
+
                 directionsDisplay.setDirections(response);
+
+
             } else if (status === 'OVER_QUERY_LIMIT') {
                 pathsToRetry.push(path);
             } else {
@@ -39,7 +49,10 @@ function displayRoute(directionsService, map, path) {
             }
         });
 
-   // directionsService.route.addListener("onclick", dupa);
+
+    //   directionsDisplay.addListener("onclick", dupa);
+
+    // directionsService.route.addListener("onclick", dupa);
 
     paths.push(directionsDisplay);
 }

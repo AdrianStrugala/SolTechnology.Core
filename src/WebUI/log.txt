@@ -649,3 +649,35 @@ Parameter name: index
 2019-02-15 11:17:53,590 [8] WARN  WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
 2019-02-15 11:19:02,110 [8] WARN  WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
 2019-02-15 11:19:47,476 [8] WARN  WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-02-15 17:58:40,551 [9] WARN  WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-02-15 18:19:32,200 [10] WARN  WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-02-15 18:19:38,746 [8] ERROR WebUI.LocationOfCity.Controller [(null)] - System.IO.InvalidDataException: Cannot find city [Krako]
+   at WebUI.LocationOfCity.FindLocationOfCity.<Execute>d__2.MoveNext() in E:\workspace\DreamTravel\src\WebUI\LocationOfCity\FindLocationOfCity.cs:line 42
+--- End of stack trace from previous location where exception was thrown ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter`1.GetResult()
+   at WebUI.LocationOfCity.Controller.<FindLocationOfCity>d__4.MoveNext() in E:\workspace\DreamTravel\src\WebUI\LocationOfCity\Controller.cs:line 35
+2019-02-15 18:20:59,887 [8] WARN  WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-02-15 18:21:07,740 [9] ERROR WebUI.LocationOfCity.Controller [(null)] - System.IO.InvalidDataException: Cannot find city [Kakow]
+   at WebUI.LocationOfCity.FindLocationOfCity.<Execute>d__2.MoveNext() in E:\workspace\DreamTravel\src\WebUI\LocationOfCity\FindLocationOfCity.cs:line 42
+--- End of stack trace from previous location where exception was thrown ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter`1.GetResult()
+   at WebUI.LocationOfCity.Controller.<FindLocationOfCity>d__4.MoveNext() in E:\workspace\DreamTravel\src\WebUI\LocationOfCity\Controller.cs:line 35
+2019-02-15 18:24:23,982 [8] WARN  WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-02-15 18:25:18,651 [8] WARN  WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-02-15 18:25:59,007 [9] WARN  WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-02-15 18:27:11,739 [9] WARN  WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-02-15 18:29:55,370 [9] WARN  WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-02-15 18:31:30,582 [8] WARN  WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-02-15 18:33:15,649 [9] WARN  WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-02-15 18:33:45,152 [8] WARN  WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-02-15 18:34:22,429 [8] WARN  WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-02-15 18:35:01,368 [10] WARN  WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-02-15 18:36:02,291 [9] WARN  WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-02-15 18:36:40,511 [8] WARN  WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-02-15 18:37:41,759 [8] WARN  WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-02-15 18:38:50,303 [9] WARN  WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-02-15 18:42:17,699 [8] WARN  WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
