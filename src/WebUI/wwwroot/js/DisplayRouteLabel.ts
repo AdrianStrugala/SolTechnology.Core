@@ -8,7 +8,7 @@ function displayRouteLabel(map, latitude, longtitude, text) {
         },
         map: map,
         icon: {
-            size: new google.maps.Size(0, 0),
+           // size: new google.maps.Size(1000,,
             url: "../images/labelFrame.jpg"
         },
         label: {
