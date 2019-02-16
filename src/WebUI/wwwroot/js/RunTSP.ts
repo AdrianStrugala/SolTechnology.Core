@@ -31,42 +31,8 @@ function runTSP(map) {
             data: { cities: cities, sessionId: sessionId, optimizePath: optimizeRoadChck },
             success(msg) {
 
-                //Initialize display
-                optimalCost = 0;
-                optimalTime = 0;
-                totalCost = 0;
                 var pathList = JSON.parse(msg);
-                var noOfPaths = pathList.length;
-                var list = $("#projectSelectorDropdown")[0];
-
-                cleanMap(list);
-
-                //Read information
-                for (var i = 0; i < noOfPaths; i++) {
-
-                    optimalCost += pathList[i].OptimalCost;
-                    optimalTime += pathList[i].OptimalDistance;
-                    totalCost += pathList[i].Cost;
-                    displayPathInfo(pathList[i], list);
-                    displayRoute(directionsService, map, pathList[i]);
-
-                    updateCity(i, pathList[i].StartingCity, map);
-                }
-                updateCity(markers.length - 1, pathList[noOfPaths - 1].EndingCity, map);
-
-                //Adjust map bounds
-                var bounds = new google.maps.LatLngBounds();
-                for (var i = 0; i < markers.length; i++) {
-                    bounds.extend(markers[i].position);
-                }
-                map.fitBounds(bounds);
-
-                //Finalize display
-                displaySummaryInfo(optimalTime, optimalCost);
-
-                (<HTMLInputElement>$("#costSlider")[0]).value = optimalCost;
-                (<HTMLInputElement>$("#costSlider")[0]).max = String(Math.ceil(totalCost));
-                $("#limitValue")[0].innerHTML = (<HTMLInputElement>$("#costSlider")[0]).value + " €";
+                displayPage(pathList, map);
 
                 $("#listOfCitiesBtn")[0].style.display = "initial";
                 $("#costLimiBtn")[0].style.display = "initial";

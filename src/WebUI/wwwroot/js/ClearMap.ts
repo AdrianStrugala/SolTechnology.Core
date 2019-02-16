@@ -13,6 +13,4 @@
         }
     }
     routeLabels = [];
-   
-    paths = [];
 }

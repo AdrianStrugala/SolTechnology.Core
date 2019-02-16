@@ -8,6 +8,10 @@
     <RootNamespace>DreamTravel.WebUI</RootNamespace>
   </PropertyGroup>
 
+  <ItemGroup>
+    <Content Remove="wwwroot\js\DisplayPage.ts" />
+  </ItemGroup>
+
 
   <ItemGroup>
     <PackageReference Include="Dapper" Version="1.50.5" />
@@ -33,6 +37,7 @@
 
   <ItemGroup>
     <TypeScriptCompile Include="wwwroot\js\AddCity.ts" />
+    <TypeScriptCompile Include="wwwroot\js\DisplayPage.ts" />
     <TypeScriptCompile Include="wwwroot\js\DisplayRouteLabel.ts" />
     <TypeScriptCompile Include="wwwroot\js\DragAndDropCity.ts" />
     <TypeScriptCompile Include="wwwroot\js\ClearMap.ts" />
