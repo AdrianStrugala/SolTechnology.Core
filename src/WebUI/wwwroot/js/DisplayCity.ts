@@ -1,5 +1,4 @@
-﻿/// <reference path="./GlobalVariables.ts"/>
-/// <reference path="./Repositories/CityRepository.ts"/>
+﻿/// <reference path="./Repositories/CityRepository.ts"/>
 
 function displayCity(item, map) {
 

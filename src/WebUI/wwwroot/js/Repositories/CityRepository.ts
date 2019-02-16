@@ -21,14 +21,20 @@ function addCity(map) {
     textArea.className = "cityText";
     textArea.id = noOfCityRows.toString();
     textArea.rows = 1;
-    textArea.onchange = function () { displayCity(this, map); }
+    textArea.onchange = function() {
+        window.alert("dupa dx");
+        displayCity(this, map);
+    }
     textArea.draggable = true;
     textArea.ondragstart = ev => { drag(ev) }
 
     var button = document.createElement("button");
     button.type = "button";
     button.className = "btn btn-danger";
-    button.onclick = function () { removeCity(this); }
+    button.onclick = function() {
+        removeCity(this); 
+        window.alert("dupa");
+    }
     button.id = noOfCityRows.toString();
     button.innerHTML = "X";
 
