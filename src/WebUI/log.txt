@@ -698,3 +698,19 @@ Parameter name: index
 2019-02-15 21:02:55,972 [10] WARN  WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
 2019-02-15 21:03:53,480 [8] WARN  WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
 2019-02-15 21:04:45,013 [8] WARN  WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-02-16 16:36:56,859 [8] WARN  WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-02-16 16:38:01,758 [11] ERROR WebUI.NameOfCity.Controller [(null)] - System.IO.InvalidDataException: Cannot find city for coordinates: Lat: [55.4105066966556], [15.74544308441]
+   at WebUI.NameOfCity.FindNameOfCity.<Execute>d__2.MoveNext() in E:\workspace\DreamTravel\src\WebUI\NameOfCity\FindNameOfCity.cs:line 56
+--- End of stack trace from previous location where exception was thrown ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter`1.GetResult()
+   at WebUI.NameOfCity.Controller.<FindNameOfCity>d__4.MoveNext() in E:\workspace\DreamTravel\src\WebUI\NameOfCity\Controller.cs:line 40
+2019-02-16 16:43:37,845 [8] WARN  WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-02-16 16:45:34,508 [9] WARN  WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-02-16 16:47:33,539 [8] WARN  WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-02-16 16:48:21,441 [8] WARN  WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-02-16 17:22:22,146 [9] WARN  WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-02-16 17:24:28,036 [10] WARN  WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-02-16 17:25:24,393 [8] WARN  WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-02-16 17:27:53,594 [8] WARN  WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header

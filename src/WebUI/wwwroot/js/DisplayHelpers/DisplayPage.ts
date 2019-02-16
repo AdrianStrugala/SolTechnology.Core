@@ -1,4 +1,4 @@
-﻿/// <reference path="../lib/jquery/jquery.d.ts" />
+﻿/// <reference path="../../lib/jquery/jquery.d.ts" />
 
 function displayPage(pathList, map) {
 
@@ -30,19 +30,20 @@ function displayPage(pathList, map) {
         for (var i = 0; i < pathsToRetry.length; i++) {
             displayRoute(directionsService, map, pathsToRetry[i]);
         }
-        pathsToRetry = [];
-
-        //Adjust map bounds
-        var bounds = new google.maps.LatLngBounds();
-        for (var i = 0; i < markers.length; i++) {
-            bounds.extend(markers[i].position);
-        }
-        map.fitBounds(bounds);
-
-        //Finalize display
-        displaySummaryInfo(optimalTime, optimalCost);
-
-        (<HTMLInputElement>$("#costSlider")[0]).value = optimalCost;
-        (<HTMLInputElement>$("#costSlider")[0]).max = String(Math.ceil(totalCost));
-        $("#limitValue")[0].innerHTML = (<HTMLInputElement>$("#costSlider")[0]).value + " €";
     }
+    pathsToRetry = [];
+
+    //Adjust map bounds
+    var bounds = new google.maps.LatLngBounds();
+    for (var i = 0; i < markers.length; i++) {
+        bounds.extend(markers[i].position);
+    }
+    map.fitBounds(bounds);
+
+    //Finalize display
+    displaySummaryInfo(optimalTime, optimalCost);
+
+    (<HTMLInputElement>$("#costSlider")[0]).value = String(Math.ceil(optimalCost));
+    (<HTMLInputElement>$("#costSlider")[0]).max = String(Math.ceil(totalCost));
+    $("#limitValue")[0].innerHTML = (<HTMLInputElement>$("#costSlider")[0]).value + " €";
+}

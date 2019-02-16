@@ -1,15 +1,13 @@
-﻿/// <reference path="../lib/googleMaps/googleMaps.d.ts" />
+﻿/// <reference path="../../lib/googleMaps/googleMaps.d.ts" />
 
 function displayRoute(directionsService, map, path) {
 
-    //TODO Route Display details after click
+    var isToll = true;
+    var roadColour = "#0080ff";
 
-    var roadColour = "black";
-    var isToll = false;
-
-    if (path.OptimalCost === 0) {
-        isToll = true;
-        roadColour = "#0080ff";
+    if (path.OptimalCost > 0) {
+        roadColour = "black";
+        isToll = false;
     }
 
     var directionsDisplay = new google.maps.DirectionsRenderer({
@@ -33,7 +31,8 @@ function displayRoute(directionsService, map, path) {
 
             if (status === 'OK') {
 
-                var middleRoad = response.routes[0].overview_path[response.routes[0].overview_path.length / 2];
+                var middleRoadIndex = Math.floor(response.routes[0].overview_path.length / 2);
+                var middleRoad = response.routes[0].overview_path[middleRoadIndex];
 
                 var hours = Math.floor(path.OptimalDistance / 3600);
                 var minutes = Math.floor((path.OptimalDistance - Math.floor(hours) * 3600) / 60);

@@ -1,4 +1,4 @@
-﻿/// <reference path="../lib/googleMaps/googleMaps.d.ts" />
+﻿/// <reference path="../../lib/googleMaps/googleMaps.d.ts" />
 
 function displayRouteLabel(map, latitude, longtitude, text) {
     var marker = new google.maps.Marker(({

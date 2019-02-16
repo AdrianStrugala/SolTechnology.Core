@@ -44,3 +44,9 @@ src/DreamTravel/wwwroot/js/WriteSummaryInfoHandler.js
 src/WebUI/wwwroot/js/Utils/Guid.js
 src/WebUI/wwwroot/js/Utils/Pad2.js
 src/WebUI/wwwroot/js/Utils/Sleep.js
+src/WebUI/wwwroot/js/DisplayHelpers/DisplaySummaryInfo.js
+src/WebUI/wwwroot/js/DisplayHelpers/DisplayRouteLabel.js
+src/WebUI/wwwroot/js/DisplayHelpers/DisplayRoute.js
+src/WebUI/wwwroot/js/DisplayHelpers/DisplayPathInfo.js
+src/WebUI/wwwroot/js/DisplayHelpers/DisplayPage.js
+src/WebUI/wwwroot/js/DisplayHelpers/DisplayMarker.js
