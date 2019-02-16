@@ -1,4 +1,4 @@
-﻿/// <reference path="./RemoveCityByIndex.ts"/>
+﻿/// <reference path="./Repositories/CityRepository.ts"/>
 declare const Promise: any;
 
 function runTSP(map) {

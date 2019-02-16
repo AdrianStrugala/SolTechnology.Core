@@ -31,24 +31,21 @@
   </ItemGroup>
 
   <ItemGroup>
-    <TypeScriptCompile Include="wwwroot\js\AddCity.ts" />
+    <TypeScriptCompile Include="wwwroot\js\Repositories\CityRepository.ts" />
     <TypeScriptCompile Include="wwwroot\js\DisplayHelpers\DisplayPage.ts" />
     <TypeScriptCompile Include="wwwroot\js\DisplayHelpers\DisplayRouteLabel.ts" />
     <TypeScriptCompile Include="wwwroot\js\DragAndDropCity.ts" />
     <TypeScriptCompile Include="wwwroot\js\ClearMap.ts" />
     <TypeScriptCompile Include="wwwroot\js\AddCityByMapClick.ts" />
-    <TypeScriptCompile Include="wwwroot\js\DisplayCity.ts" />
+    <TypeScriptCompile Include="wwwroot\js\FindAndDisplayCity.ts" />
     <TypeScriptCompile Include="wwwroot\js\DisplayHelpers\DisplayMarker.ts" />
     <TypeScriptCompile Include="wwwroot\js\DisplayHelpers\DisplayRoute.ts" />
     <TypeScriptCompile Include="wwwroot\js\FindCityName.ts" />
-    <TypeScriptCompile Include="wwwroot\js\CitiesPanelRepository.ts" />
-    <TypeScriptCompile Include="wwwroot\js\GetIndexOfCity.ts" />
+    <TypeScriptCompile Include="wwwroot\js\Repositories\CitiesPanelRepository.ts" />
     <TypeScriptCompile Include="wwwroot\js\Instruction.ts" />
     <TypeScriptCompile Include="wwwroot\js\LimitCost.ts" />
-    <TypeScriptCompile Include="wwwroot\js\MoveCity.ts" />
     <TypeScriptCompile Include="wwwroot\js\RunTSP.ts" />
     <TypeScriptCompile Include="wwwroot\js\SaveMap.ts" />
-    <TypeScriptCompile Include="wwwroot\js\UpdateCity.ts" />
     <TypeScriptCompile Include="wwwroot\js\Utils\Guid.ts" />
     <TypeScriptCompile Include="wwwroot\js\Utils\Pad2.ts" />
     <TypeScriptCompile Include="wwwroot\js\Utils\Sleep.ts" />

@@ -1,7 +1,4 @@
-﻿/// <reference path="./GlobalVariables.ts"/>
-/// <reference path="./Repositories/CityRepository.ts"/>
-
-function displayCity(item, map) {
+﻿function findAndDisplayCity(item, map) {
 
     displayCityAjaxCalls.push($.ajax({
         type: 'POST',
