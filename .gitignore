@@ -51,3 +51,4 @@ src/WebUI/wwwroot/js/DisplayHelpers/DisplayPathInfo.js
 src/WebUI/wwwroot/js/DisplayHelpers/DisplayPage.js
 src/WebUI/wwwroot/js/DisplayHelpers/DisplayMarker.js
 src/WebUI/wwwroot/js/Repositories/CityRepository.js
+src/WebUI/wwwroot/js/Repositories/CitiesPanelRepository.js

@@ -1,7 +1,6 @@
 ﻿/// <reference path="../../lib/jquery/jquery.d.ts" />
 /// <reference path="../GlobalVariables.ts"/>
 /// <reference path="../DragAndDropCity.ts"/>
-/// <reference path="../DisplayCity.ts"/>
 
 function addCity(map) {
 
@@ -22,8 +21,7 @@ function addCity(map) {
     textArea.id = noOfCityRows.toString();
     textArea.rows = 1;
     textArea.onchange = function() {
-        window.alert("dupa dx");
-        displayCity(this, map);
+        findAndDisplayCity(this, map);
     }
     textArea.draggable = true;
     textArea.ondragstart = ev => { drag(ev) }
