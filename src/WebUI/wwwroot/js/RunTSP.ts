@@ -15,7 +15,7 @@ function runTSP(map) {
             }
         }
         for (var i = citiesToRemove.length - 1; i >= 0; i--) {
-            removeCityByIndex(citiesToRemove[i]);
+            removeCity(citiesToRemove[i]);
         }
 
         var optimizeRoadChck = (<HTMLInputElement>$("#optimizeRoad")[0]).checked;

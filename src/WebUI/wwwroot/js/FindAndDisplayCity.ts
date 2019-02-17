@@ -12,16 +12,12 @@
 
             var city = JSON.parse(msg);
 
-            $("#listOfCities").children().each(function (index) {
-                if ($(this).attr('id') == "cityRow" + item.id && index < cities.length) {
-                    
-                    updateCity(index, city, map, "✓");
+            var index = findIndexByCity(item);
+            updateCity(index, city, map, "✓");
 
-                    map.setCenter(markers[index].getPosition());
-                }
-            });
+            map.setCenter(markers[index].getPosition());
+
         },
-
         error(req, status, errorObj) {
             displayCityAjaxCalls.pop();
             var alertMessage = JSON.parse(req.responseText);

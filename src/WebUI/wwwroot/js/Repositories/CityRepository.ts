@@ -4,8 +4,6 @@
 
 function addCity(map) {
 
-    noOfCityRows++;
-
     var div = document.createElement("div");
     div.className = "cityRow";
     div.id = "cityRow" + noOfCityRows.toString();
@@ -20,7 +18,7 @@ function addCity(map) {
     textArea.className = "cityText";
     textArea.id = noOfCityRows.toString();
     textArea.rows = 1;
-    textArea.onchange = function() {
+    textArea.onchange = function () {
         findAndDisplayCity(this, map);
     }
     textArea.draggable = true;
@@ -29,8 +27,9 @@ function addCity(map) {
     var button = document.createElement("button");
     button.type = "button";
     button.className = "btn btn-danger";
-    button.onclick = function() {
-        removeCity(this); 
+    button.onclick = function () {
+        var index = findIndexByCity(this);
+        removeCity(index);
     }
     button.id = noOfCityRows.toString();
     button.innerHTML = "X";
@@ -45,7 +44,9 @@ function addCity(map) {
     cities.push(null);
     markers.push(null);
 
-    if (noOfCityRows >= 2) {
+    noOfCityRows++;
+
+    if (noOfCityRows > 1) {
         (<HTMLInputElement>$("#runTSPBtn")[0]).disabled = false;
     }
 }
@@ -60,28 +61,25 @@ function updateCity(index, city, map, label = index) {
     setCityNameOnPanel(index, city.Name);
 }
 
-function removeCity(city) {
+function findIndexByCity(city): number {
+    var result = -1;
     $("#listOfCities").children().each(function (index) {
         if ($(this).attr('id').toString() == "cityRow" + city.id.toString()) {
-
-            if (markers[index] != null) {
-                markers[index].setMap(null);
-            }
-            markers.splice(index, 1);
-            cities.splice(index, 1);
-            while ($("#listOfCities").children()[index].firstChild) {
-                $("#listOfCities").children()[index].removeChild($("#listOfCities").children()[index].firstChild);
-            }
-            $("#listOfCities").children()[index].remove();
+            result = index;
         }
     });
+    return result;
 }
 
-function removeCityByIndex(index) {
+function removeCity(index) {
+    if (markers[index] != null) {
+        markers[index].setMap(null);
+    }
     markers.splice(index, 1);
     cities.splice(index, 1);
     while ($("#listOfCities").children()[index].firstChild) {
         $("#listOfCities").children()[index].removeChild($("#listOfCities").children()[index].firstChild);
     }
     $("#listOfCities").children()[index].remove();
+
 }
