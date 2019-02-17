@@ -31,7 +31,6 @@ function addCity(map) {
     button.className = "btn btn-danger";
     button.onclick = function() {
         removeCity(this); 
-        window.alert("dupa");
     }
     button.id = noOfCityRows.toString();
     button.innerHTML = "X";
