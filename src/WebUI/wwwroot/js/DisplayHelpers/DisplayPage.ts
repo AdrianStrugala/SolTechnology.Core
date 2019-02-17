@@ -9,7 +9,7 @@ function displayPage(pathList, map) {
     var noOfPaths = pathList.length;
     var list = $("#projectSelectorDropdown")[0];
 
-    cleanMap(list);
+    clearMap(list);
 
     //Read information
     for (var i = 0; i < noOfPaths; i++) {

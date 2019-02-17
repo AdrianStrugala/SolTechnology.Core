@@ -35,7 +35,7 @@
     <TypeScriptCompile Include="wwwroot\js\DisplayHelpers\DisplayPage.ts" />
     <TypeScriptCompile Include="wwwroot\js\DisplayHelpers\DisplayRouteLabel.ts" />
     <TypeScriptCompile Include="wwwroot\js\DragAndDropCity.ts" />
-    <TypeScriptCompile Include="wwwroot\js\ClearMap.ts" />
+    <TypeScriptCompile Include="wwwroot\js\DisplayHelpers\ClearMap.ts" />
     <TypeScriptCompile Include="wwwroot\js\AddCityByMapClick.ts" />
     <TypeScriptCompile Include="wwwroot\js\FindAndDisplayCity.ts" />
     <TypeScriptCompile Include="wwwroot\js\DisplayHelpers\DisplayMarker.ts" />

@@ -1,4 +1,4 @@
-﻿function cleanMap(list) {
+﻿function clearMap(list) {
     for (var i = 0; i < paths.length; i++) {
         paths[i].setMap(null);
     }

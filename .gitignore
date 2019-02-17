@@ -52,3 +52,4 @@ src/WebUI/wwwroot/js/DisplayHelpers/DisplayPage.js
 src/WebUI/wwwroot/js/DisplayHelpers/DisplayMarker.js
 src/WebUI/wwwroot/js/Repositories/CityRepository.js
 src/WebUI/wwwroot/js/Repositories/CitiesPanelRepository.js
+src/WebUI/wwwroot/js/DisplayHelpers/ClearMap.js
