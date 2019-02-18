@@ -757,3 +757,5 @@ Parameter name: index
 2019-02-18 13:01:43,349 [9] WARN  WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
 2019-02-18 15:06:15,943 [9] WARN  WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
 2019-02-18 15:10:26,171 [8] WARN  WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-02-18 15:21:23,815 [9] WARN  WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-02-18 15:21:43,810 [8] WARN  WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
