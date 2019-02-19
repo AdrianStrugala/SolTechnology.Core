@@ -34,7 +34,7 @@ function runTSP(map) {
                 var pathList = JSON.parse(msg);
                 displayPage(pathList, map);
 
-                $("#listOfCitiesBtn")[0].style.display = "initial";
+                $("#pathsSummaryBtn")[0].style.display = "initial";
                 $("#costLimiBtn")[0].style.display = "initial";
                 $("#loader")[0].style.display = "none";
             },

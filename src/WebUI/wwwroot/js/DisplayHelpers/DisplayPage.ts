@@ -7,17 +7,15 @@ function displayPage(pathList, map) {
     optimalTime = 0;
     totalCost = 0;
     var noOfPaths = pathList.length;
-    var list = $("#projectSelectorDropdown")[0];
 
-    clearMap(list);
+    clearMap();
 
     //Read information
     for (var i = 0; i < noOfPaths; i++) {
 
         optimalCost += pathList[i].OptimalCost;
         optimalTime += pathList[i].OptimalDistance;
-        totalCost += pathList[i].Cost;
-        displayPathInfo(pathList[i], list);
+        totalCost += pathList[i].Cost;     
         displayRoute(directionsService, map, pathList[i]);
 
         updateCity(i, pathList[i].StartingCity, map);
@@ -41,6 +39,7 @@ function displayPage(pathList, map) {
     map.fitBounds(bounds);
 
     //Finalize display
+    displayPathsSummary(pathList);
     displaySummaryInfo(optimalTime, optimalCost);
 
     (<HTMLInputElement>$("#costSlider")[0]).value = String(Math.ceil(optimalCost));

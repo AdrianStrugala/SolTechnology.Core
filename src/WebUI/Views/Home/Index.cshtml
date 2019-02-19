@@ -27,10 +27,9 @@
                         <button type="button" class="btn btn-outline-secondary" onclick="saveMap()" id="saveMapBtn" display="none">Save map</button>
                     </li>
 
-                    <!-- Journey list -->
-                    <li class="dropdown nav-item" id="listOfCitiesBtn" display="none">
-                        <a href="#" class="btn btn-outline-secondary dropdown-toggle" data-toggle="dropdown">Your travel</a>
-                        <ul class="dropdown-menu" id="projectSelectorDropdown"></ul>
+                    <!-- Display Paths Summary button -->
+                    <li class="nav-item">
+                        <button type="button" class="btn btn-outline-secondary" data-toggle="modal" data-target="#pathsSummaryModal" id="pathsSummaryBtn" display="none">Paths summary</button>
                     </li>
 
                     <!-- Cost limit button -->
@@ -192,6 +191,21 @@
         </div>
     </div>
 
+    <!-- Paths Summary Modal -->
+    <div id="pathsSummaryModal" class="modal fade" role="dialog">
+        <div class="modal-dialog">
+
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Paths summary:</h4>
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                </div>
+                <div class="modal-body" id="pathsSummaryBody">
+                </div>
+            </div>
+        </div>
+    </div>
 
 
     <div id="loader"></div>
@@ -205,8 +219,8 @@
 
         <script>
             function initMap() {
-                document.getElementById("listOfCitiesBtn").style.display = "none";
-                document.getElementById("costLimiBtn").style.display = "none";
+                $("#pathsSummaryBtn")[0].style.display = "none";
+                $("#costLimiBtn")[0].style.display = "none";
                 sessionId = Guid();
                 directionsService = new window.google.maps.DirectionsService;
                 map = new window.google.maps.Map(document.getElementById('map'),

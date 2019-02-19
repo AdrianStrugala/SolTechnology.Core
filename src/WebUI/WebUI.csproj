@@ -8,6 +8,7 @@
     <RootNamespace>DreamTravel.WebUI</RootNamespace>
   </PropertyGroup>
 
+
   <ItemGroup>
     <PackageReference Include="Dapper" Version="1.50.5" />
     <PackageReference Include="Microsoft.AspNetCore.All" Version="2.0.5" />
@@ -40,6 +41,7 @@
     <TypeScriptCompile Include="wwwroot\js\FindAndDisplayCity.ts" />
     <TypeScriptCompile Include="wwwroot\js\DisplayHelpers\DisplayMarker.ts" />
     <TypeScriptCompile Include="wwwroot\js\DisplayHelpers\DisplayRoute.ts" />
+    <TypeScriptCompile Include="wwwroot\js\DisplayHelpers\DisplaySummaryInfo.ts" />
     <TypeScriptCompile Include="wwwroot\js\FindCityName.ts" />
     <TypeScriptCompile Include="wwwroot\js\Repositories\CitiesPanelRepository.ts" />
     <TypeScriptCompile Include="wwwroot\js\Instruction.ts" />
@@ -49,8 +51,7 @@
     <TypeScriptCompile Include="wwwroot\js\Utils\Guid.ts" />
     <TypeScriptCompile Include="wwwroot\js\Utils\Pad2.ts" />
     <TypeScriptCompile Include="wwwroot\js\Utils\Sleep.ts" />
-    <TypeScriptCompile Include="wwwroot\js\DisplayHelpers\DisplayPathInfo.ts" />
-    <TypeScriptCompile Include="wwwroot\js\DisplayHelpers\DisplaySummaryInfo.ts" />
+    <TypeScriptCompile Include="wwwroot\js\DisplayHelpers\DisplayPathsSummary.ts" />
     <TypeScriptCompile Include="wwwroot\lib\googleMaps\googleMaps.d.ts" />
   </ItemGroup>
 
