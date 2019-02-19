@@ -785,3 +785,11 @@ Parameter name: index
 2019-02-19 12:20:58,275 [9] WARN  DreamTravel.WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
 2019-02-19 12:21:23,474 [10] WARN  DreamTravel.WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
 2019-02-19 12:21:33,936 [10] WARN  DreamTravel.WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-02-19 12:23:32,551 [8] WARN  DreamTravel.WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-02-19 12:24:40,315 [8] WARN  Microsoft.AspNetCore.Server.Kestrel [(null)] - Heartbeat took longer than "00:00:01" at "02/19/2019 11:24:29 +00:00".
+2019-02-19 12:24:57,685 [8] WARN  DreamTravel.WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-02-19 12:25:58,788 [9] WARN  DreamTravel.WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-02-19 12:28:40,425 [8] WARN  DreamTravel.WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-02-19 12:35:05,086 [8] WARN  DreamTravel.WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-02-19 12:35:21,676 [8] WARN  DreamTravel.WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-02-19 12:36:55,292 [8] WARN  DreamTravel.WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
