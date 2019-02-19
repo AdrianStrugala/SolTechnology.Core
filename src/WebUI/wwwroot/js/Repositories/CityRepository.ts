@@ -10,7 +10,7 @@ function addCity(map) {
 
     var hr = document.createElement("hr");
     hr.className = "line";
-    hr.id = noOfCityRows.toString();
+    hr.id = (noOfCityRows +1).toString(); //line is below city
     hr.ondrop = ev => { drop(ev, map) };
     hr.ondragover = ev => { allowDrop(ev) };
 

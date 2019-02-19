@@ -793,3 +793,58 @@ Parameter name: index
 2019-02-19 12:35:05,086 [8] WARN  DreamTravel.WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
 2019-02-19 12:35:21,676 [8] WARN  DreamTravel.WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
 2019-02-19 12:36:55,292 [8] WARN  DreamTravel.WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-02-19 13:37:25,998 [9] WARN  DreamTravel.WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-02-19 13:37:53,840 [8] ERROR DreamTravel.WebUI.BestPath.Controller [(null)] - System.IndexOutOfRangeException: Index was outside the bounds of the array.
+   at DreamTravel.WebUI.BestPath.Executors.DownloadRoadData.SetTablesValueAsMax(EvaluationMatrix evaluationMatrix, Int32 iterator) in C:\workspace\DreamTravel\src\WebUI\BestPath\Executors\DownloadRoadData.cs:line 60
+   at DreamTravel.WebUI.BestPath.Executors.DownloadRoadData.<Execute>d__4.MoveNext() in C:\workspace\DreamTravel\src\WebUI\BestPath\Executors\DownloadRoadData.cs:line 27
+--- End of stack trace from previous location where exception was thrown ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter`1.GetResult()
+   at DreamTravel.WebUI.BestPath.Executors.CalculateBestPath.<Execute>d__5.MoveNext() in C:\workspace\DreamTravel\src\WebUI\BestPath\Executors\CalculateBestPath.cs:line 29
+--- End of stack trace from previous location where exception was thrown ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter`1.GetResult()
+   at DreamTravel.WebUI.BestPath.Controller.<CalculateBestPath>d__5.MoveNext() in C:\workspace\DreamTravel\src\WebUI\BestPath\Controller.cs:line 35
+2019-02-19 13:39:06,238 [8] WARN  DreamTravel.WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-02-19 13:39:17,860 [9] ERROR DreamTravel.WebUI.BestPath.Controller [(null)] - System.IndexOutOfRangeException: Index was outside the bounds of the array.
+   at DreamTravel.WebUI.BestPath.Executors.DownloadRoadData.SetTablesValueAsMax(EvaluationMatrix evaluationMatrix, Int32 iterator) in C:\workspace\DreamTravel\src\WebUI\BestPath\Executors\DownloadRoadData.cs:line 60
+   at DreamTravel.WebUI.BestPath.Executors.DownloadRoadData.<Execute>d__4.MoveNext() in C:\workspace\DreamTravel\src\WebUI\BestPath\Executors\DownloadRoadData.cs:line 27
+--- End of stack trace from previous location where exception was thrown ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter`1.GetResult()
+   at DreamTravel.WebUI.BestPath.Executors.CalculateBestPath.<Execute>d__5.MoveNext() in C:\workspace\DreamTravel\src\WebUI\BestPath\Executors\CalculateBestPath.cs:line 29
+--- End of stack trace from previous location where exception was thrown ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter`1.GetResult()
+   at DreamTravel.WebUI.BestPath.Controller.<CalculateBestPath>d__5.MoveNext() in C:\workspace\DreamTravel\src\WebUI\BestPath\Controller.cs:line 35
+2019-02-19 13:39:21,728 [9] ERROR DreamTravel.WebUI.BestPath.Controller [(null)] - System.IndexOutOfRangeException: Index was outside the bounds of the array.
+   at DreamTravel.WebUI.BestPath.Executors.DownloadRoadData.SetTablesValueAsMax(EvaluationMatrix evaluationMatrix, Int32 iterator) in C:\workspace\DreamTravel\src\WebUI\BestPath\Executors\DownloadRoadData.cs:line 60
+   at DreamTravel.WebUI.BestPath.Executors.DownloadRoadData.<Execute>d__4.MoveNext() in C:\workspace\DreamTravel\src\WebUI\BestPath\Executors\DownloadRoadData.cs:line 27
+--- End of stack trace from previous location where exception was thrown ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter`1.GetResult()
+   at DreamTravel.WebUI.BestPath.Executors.CalculateBestPath.<Execute>d__5.MoveNext() in C:\workspace\DreamTravel\src\WebUI\BestPath\Executors\CalculateBestPath.cs:line 29
+--- End of stack trace from previous location where exception was thrown ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter`1.GetResult()
+   at DreamTravel.WebUI.BestPath.Controller.<CalculateBestPath>d__5.MoveNext() in C:\workspace\DreamTravel\src\WebUI\BestPath\Controller.cs:line 35
+2019-02-19 13:39:24,995 [10] ERROR DreamTravel.WebUI.BestPath.Controller [(null)] - System.IndexOutOfRangeException: Index was outside the bounds of the array.
+   at DreamTravel.WebUI.BestPath.Executors.DownloadRoadData.SetTablesValueAsMax(EvaluationMatrix evaluationMatrix, Int32 iterator) in C:\workspace\DreamTravel\src\WebUI\BestPath\Executors\DownloadRoadData.cs:line 60
+   at DreamTravel.WebUI.BestPath.Executors.DownloadRoadData.<Execute>d__4.MoveNext() in C:\workspace\DreamTravel\src\WebUI\BestPath\Executors\DownloadRoadData.cs:line 27
+--- End of stack trace from previous location where exception was thrown ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter`1.GetResult()
+   at DreamTravel.WebUI.BestPath.Executors.CalculateBestPath.<Execute>d__5.MoveNext() in C:\workspace\DreamTravel\src\WebUI\BestPath\Executors\CalculateBestPath.cs:line 29
+--- End of stack trace from previous location where exception was thrown ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter`1.GetResult()
+   at DreamTravel.WebUI.BestPath.Controller.<CalculateBestPath>d__5.MoveNext() in C:\workspace\DreamTravel\src\WebUI\BestPath\Controller.cs:line 35
+2019-02-19 13:45:18,917 [8] WARN  DreamTravel.WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
