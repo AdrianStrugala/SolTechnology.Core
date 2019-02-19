@@ -1,4 +1,4 @@
-﻿namespace WebUI.BestPath
+﻿namespace DreamTravel.WebUI.BestPath
 {
     using System.Collections.Generic;
     using SharedModels;

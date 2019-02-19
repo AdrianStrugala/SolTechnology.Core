@@ -1,4 +1,4 @@
-﻿namespace WebUI.Authentication
+﻿namespace DreamTravel.WebUI.Authentication
 {
     using Microsoft.AspNetCore.Authentication;
 

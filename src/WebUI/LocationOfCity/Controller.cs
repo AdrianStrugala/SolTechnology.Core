@@ -1,4 +1,4 @@
-﻿namespace WebUI.LocationOfCity
+﻿namespace DreamTravel.WebUI.LocationOfCity
 {
     using System;
     using System.Threading.Tasks;

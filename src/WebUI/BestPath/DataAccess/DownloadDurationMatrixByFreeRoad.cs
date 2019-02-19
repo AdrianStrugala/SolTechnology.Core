@@ -1,4 +1,4 @@
-﻿namespace WebUI.BestPath.DataAccess
+﻿namespace DreamTravel.WebUI.BestPath.DataAccess
 {
     using System;
     using System.Collections.Generic;

@@ -1,4 +1,4 @@
-﻿namespace WebUITests.BestPath.Executors
+﻿namespace DreamTravel.WebUITests.BestPath.Executors
 {
     using System;
     using WebUI.BestPath.Executors;

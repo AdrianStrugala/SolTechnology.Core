@@ -1,9 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading;
-
-namespace TravelingSalesmanProblem
+﻿namespace DreamTravel.TravelingSalesmanProblem
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Threading;
+
     public abstract class TSPAbstract : ITSP
     {
         public abstract List<int> SolveTSP(List<double> distances);

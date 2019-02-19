@@ -1,4 +1,4 @@
-﻿namespace WebUITests.CostLimit
+﻿namespace DreamTravel.WebUITests.CostLimit
 {
     using System.Collections.Generic;
     using WebUI.CostLimit;

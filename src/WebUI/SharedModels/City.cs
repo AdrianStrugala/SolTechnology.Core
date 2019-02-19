@@ -1,4 +1,4 @@
-﻿namespace WebUI.SharedModels
+﻿namespace DreamTravel.WebUI.SharedModels
 {
     public class City
     {

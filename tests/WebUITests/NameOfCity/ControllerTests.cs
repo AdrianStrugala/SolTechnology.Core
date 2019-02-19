@@ -1,4 +1,4 @@
-﻿namespace WebUITests.NameOfCity
+﻿namespace DreamTravel.WebUITests.NameOfCity
 {
     using System.IO;
     using System.Threading.Tasks;

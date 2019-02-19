@@ -1,4 +1,4 @@
-﻿namespace WebUI
+﻿namespace DreamTravel.WebUI
 {
     using Microsoft.AspNetCore;
     using Microsoft.AspNetCore.Hosting;

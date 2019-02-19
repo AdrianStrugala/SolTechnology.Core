@@ -1,4 +1,4 @@
-﻿namespace WebUI
+﻿namespace DreamTravel.WebUI
 {
     using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Mvc;

@@ -1,4 +1,4 @@
-namespace WebUITests.BestPath.Executors
+namespace DreamTravel.WebUITests.BestPath.Executors
 {
     using System.Collections.Generic;
     using WebUI.BestPath.Executors;

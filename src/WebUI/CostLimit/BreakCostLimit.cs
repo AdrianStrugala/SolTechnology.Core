@@ -1,4 +1,4 @@
-﻿namespace WebUI.CostLimit
+﻿namespace DreamTravel.WebUI.CostLimit
 {
     using System.Collections.Generic;
     using System.Linq;

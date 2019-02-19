@@ -1,4 +1,4 @@
-﻿namespace TravelingSalesmanProblem
+﻿namespace DreamTravel.TravelingSalesmanProblem
 {
     using System.Collections.Generic;
 

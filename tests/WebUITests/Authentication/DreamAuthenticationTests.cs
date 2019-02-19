@@ -1,4 +1,4 @@
-﻿namespace WebUITests.Authentication
+﻿namespace DreamTravel.WebUITests.Authentication
 {
     using System.Net;
     using System.Net.Http;

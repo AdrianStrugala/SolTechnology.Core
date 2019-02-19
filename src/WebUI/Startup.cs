@@ -1,6 +1,5 @@
-﻿namespace WebUI
+﻿namespace DreamTravel.WebUI
 {
-    using System;
     using System.Globalization;
     using Authentication;
     using BestPath.DataAccess;

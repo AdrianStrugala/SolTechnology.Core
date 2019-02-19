@@ -1,4 +1,4 @@
-﻿namespace WebUI.BestPath.Models
+﻿namespace DreamTravel.WebUI.BestPath.Models
 {
     using System.Threading.Tasks;
     using Interfaces;

@@ -1,4 +1,4 @@
-﻿namespace WebUI.NameOfCity.Interfaces
+﻿namespace DreamTravel.WebUI.NameOfCity.Interfaces
 {
     using System.Threading.Tasks;
     using SharedModels;

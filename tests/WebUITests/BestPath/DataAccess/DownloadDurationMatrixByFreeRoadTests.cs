@@ -1,4 +1,4 @@
-﻿namespace WebUITests.BestPath.DataAccess
+﻿namespace DreamTravel.WebUITests.BestPath.DataAccess
 {
     using System.Collections.Generic;
     using System.IO;

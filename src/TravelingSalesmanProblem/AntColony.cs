@@ -1,11 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using TravelingSalesmanProblem.Models;
-
-namespace TravelingSalesmanProblem
+﻿namespace DreamTravel.TravelingSalesmanProblem
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Threading.Tasks;
+    using Models;
+
     public class AntColony : TSPAbstract
     {
         // Algorithm parameters

@@ -1,10 +1,9 @@
-﻿using System;
-using System.Collections.Concurrent;
-using System.Threading.Tasks;
-
-namespace TravelingSalesmanProblem
+﻿namespace DreamTravel.TravelingSalesmanProblem
 {
+    using System;
+    using System.Collections.Concurrent;
     using System.Collections.Generic;
+    using System.Threading.Tasks;
 
     public class God : TSPAbstract
     {

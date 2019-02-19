@@ -1,4 +1,4 @@
-﻿namespace WebUI.Authentication
+﻿namespace DreamTravel.WebUI.Authentication
 {
     using System;
     using System.Net.Http.Headers;

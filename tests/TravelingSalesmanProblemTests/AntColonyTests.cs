@@ -1,10 +1,10 @@
-using System;
-using System.Linq;
-using TravelingSalesmanProblem;
-using Xunit;
-
-namespace TravelingSalesmanProblemTests
+namespace DreamTravel.TravelingSalesmanProblemTests
 {
+    using System;
+    using System.Linq;
+    using TravelingSalesmanProblem;
+    using Xunit;
+
     [Collection("Benchmark")]
     public class AntColonyTests
     {

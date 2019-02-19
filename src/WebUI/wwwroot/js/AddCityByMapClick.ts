@@ -11,13 +11,7 @@
 
             var city = JSON.parse(msg);
 
-            if ($("#listOfCities").children().length == 0) {
-                addCity(map);
-            }
-
-            if (getCityNameFromPanel(0) !== "") {
-                addCity(map);
-            }
+            addCity(map);
 
             $("#listOfCities").children().each(function (index) {
                 if ($(this).attr('id') == "cityRow" + noOfCityRows.toString()) {

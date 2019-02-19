@@ -1,4 +1,4 @@
-﻿namespace WebUI.CostLimit.Interfaces
+﻿namespace DreamTravel.WebUI.CostLimit.Interfaces
 {
     using System.Collections.Generic;
     using SharedModels;

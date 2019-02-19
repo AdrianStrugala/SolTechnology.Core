@@ -3,7 +3,7 @@
 //Reference
 //https://github.com/nchaulet/node-geocoder/blob/master/lib/geocoder/googlegeocoder.js
 
-namespace WebUITests.NameOfCity
+namespace DreamTravel.WebUITests.NameOfCity
 {
     using System.IO;
     using System.Threading.Tasks;
