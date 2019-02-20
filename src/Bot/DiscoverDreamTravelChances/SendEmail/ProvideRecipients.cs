@@ -5,6 +5,7 @@
     using Configuration;
     using Dapper;
     using Interfaces;
+    using Models;
 
     public class ProvideRecipients : IProvideRecipients
     {

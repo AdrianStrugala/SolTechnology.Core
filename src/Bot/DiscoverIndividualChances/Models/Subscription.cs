@@ -1,4 +1,4 @@
-﻿namespace DreamTravel.Bot.DiscoverIndividualChances.SendEmail
+﻿namespace DreamTravel.Bot.DiscoverIndividualChances.Models
 {
     public class Subscription
     {

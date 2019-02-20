@@ -2,9 +2,9 @@
 {
     using Infrastructure.Email;
     using Interfaces;
-    using ScrapAzairEu;
     using SendEmail;
     using System.Collections.Generic;
+    using Models;
 
     public class DiscoverDreamTravelChances : IDiscoverDreamTravelChances
     {

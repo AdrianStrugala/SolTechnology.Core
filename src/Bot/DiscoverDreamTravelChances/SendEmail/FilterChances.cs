@@ -3,7 +3,7 @@
     using System.Collections.Generic;
     using System.Linq;
     using Interfaces;
-    using ScrapAzairEu;
+    using Models;
 
     public class FilterChances : IFilterChances
     {
