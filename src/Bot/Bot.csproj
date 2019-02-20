@@ -68,7 +68,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Inftastructure\Infrastructure.csproj" />
+    <ProjectReference Include="..\Infrastructure\Infrastructure.csproj" />
     <ProjectReference Include="..\TravelingSalesmanProblem\TravelingSalesmanProblem.csproj" />
   </ItemGroup>
 
