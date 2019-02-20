@@ -22,7 +22,7 @@
             pad2(Math.floor(minutes)) +
             ":" +
             pad2(Math.floor(seconds)) +
-            "\n";
+            "h\n";
 
         var li = document.createElement("li");
         var text = document.createTextNode(routeString);
