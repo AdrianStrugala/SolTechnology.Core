@@ -1,22 +1,21 @@
 ﻿namespace DreamTravel.Bot.DiscoverDreamTravelChances
 {
-    using System.Collections.Generic;
+    using Infrastructure.Email;
     using Interfaces;
     using ScrapAzairEu;
     using SendEmail;
+    using System.Collections.Generic;
 
     public class DiscoverDreamTravelChances : IDiscoverDreamTravelChances
     {
         private readonly IComposeMessage _composeMessage;
-        private readonly IEmailAgent _emailAgent;
         private readonly IProvideRecipients _provideRecipients;
         private readonly IScrapHtmlToChanceModel _scrapHtmlToChanceModel;
         private readonly IFilterChances _filterChances;
 
-        public DiscoverDreamTravelChances(IComposeMessage composeMessage, IEmailAgent emailAgent, IProvideRecipients provideRecipients, IScrapHtmlToChanceModel scrapHtmlToChanceModel, IFilterChances filterChances)
+        public DiscoverDreamTravelChances(IComposeMessage composeMessage, IProvideRecipients provideRecipients, IScrapHtmlToChanceModel scrapHtmlToChanceModel, IFilterChances filterChances)
         {
             _composeMessage = composeMessage;
-            _emailAgent = emailAgent;
             _provideRecipients = provideRecipients;
             _scrapHtmlToChanceModel = scrapHtmlToChanceModel;
             _filterChances = filterChances;
@@ -32,7 +31,7 @@
 
             foreach (var recipient in _provideRecipients.Execute())
             {
-                _emailAgent.Send(new DreamTravelChanceEmail(message, recipient.Email));
+                EmailAgent.Send(new DreamTravelChanceEmail(message, recipient.Email));
             }
         }
     }

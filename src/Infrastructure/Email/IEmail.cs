@@ -1,4 +1,4 @@
-﻿namespace DreamTravel.Inftastructure.Email
+﻿namespace DreamTravel.Infrastructure.Email
 {
     public interface IEmail
     {

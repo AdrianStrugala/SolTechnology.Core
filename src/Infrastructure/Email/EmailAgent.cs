@@ -1,17 +1,15 @@
-﻿namespace DreamTravel.Bot.DiscoverDreamTravelChances.SendEmail
+﻿namespace DreamTravel.Infrastructure.Email
 {
-    using Inftastructure.Email;
-    using Interfaces;
     using System.Net.Mail;
     using System.Text;
 
-    public class EmailAgent : IEmailAgent
+    public static class EmailAgent
     {
-        private readonly SmtpClient _client;
+        private static readonly SmtpClient Client;
 
-        public EmailAgent()
+        static EmailAgent()
         {
-            _client = new SmtpClient
+            Client = new SmtpClient
             {
                 Port = 587,
                 Host = "smtp.gmail.com",
@@ -23,7 +21,7 @@
             };
         }
 
-        public void Send(IEmail email)
+        public static void Send(IEmail email)
         {
             MailMessage mailMessage = new MailMessage(
                 email.Sender,
@@ -37,7 +35,7 @@
             };
 
 
-            _client.Send(mailMessage);
+            Client.Send(mailMessage);
         }
     }
 }

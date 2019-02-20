@@ -1,6 +1,6 @@
 ﻿namespace DreamTravel.Bot.DiscoverDreamTravelChances.SendEmail
 {
-    public class DreamTravelChanceEmail : Inftastructure.Email.IEmail
+    public class DreamTravelChanceEmail : Infrastructure.Email.IEmail
     {
         public DreamTravelChanceEmail(string message, string recipient)
         {
