@@ -1,8 +1,9 @@
 ﻿namespace DreamTravel.Bot.DiscoverDreamTravelChances.SendEmail
 {
+    using Inftastructure.Email;
+    using Interfaces;
     using System.Net.Mail;
     using System.Text;
-    using Interfaces;
 
     public class EmailAgent : IEmailAgent
     {
@@ -22,7 +23,7 @@
             };
         }
 
-        public void Send(DreamTravelChanceEmail email)
+        public void Send(IEmail email)
         {
             MailMessage mailMessage = new MailMessage(
                 email.Sender,

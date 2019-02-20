@@ -1,9 +1,9 @@
 ﻿namespace DreamTravel.Bot.DiscoverDreamTravelChances.Interfaces
 {
-    using SendEmail;
+    using Inftastructure.Email;
 
     public interface IEmailAgent
     {
-        void Send(DreamTravelChanceEmail email);
+        void Send(IEmail email);
     }
 }
