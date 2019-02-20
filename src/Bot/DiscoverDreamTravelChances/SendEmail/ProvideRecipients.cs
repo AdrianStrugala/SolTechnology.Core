@@ -25,7 +25,7 @@ SELECT [Id]
 
         public List<User> Execute()
         {
-            var result = new List<User>();
+            List<User> result;
 
             using (var connection = _dbConnectionFactory.CreateConnection())
             {
