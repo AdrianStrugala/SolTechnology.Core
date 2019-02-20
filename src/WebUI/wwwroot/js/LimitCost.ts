@@ -16,8 +16,6 @@
             var pathList = JSON.parse(msg);
             displayPage(pathList, map);
 
-
-            $("#listOfCitiesBtn")[0].style.display = "initial";
             $("#loader")[0].style.display = "none";
         },
         error(req, status, errorObj) {
