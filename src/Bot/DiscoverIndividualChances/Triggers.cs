@@ -5,6 +5,7 @@
     using Microsoft.Azure.WebJobs.Extensions.Http;
     using System.Net;
     using System.Net.Http;
+    using Interfaces;
 
     [DependencyInjectionConfig(typeof(Startup))]
     public static class Triggers

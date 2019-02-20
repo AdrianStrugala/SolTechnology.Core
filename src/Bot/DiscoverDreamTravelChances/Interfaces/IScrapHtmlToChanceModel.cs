@@ -1,6 +1,7 @@
-﻿namespace DreamTravel.Bot.DiscoverDreamTravelChances.ScrapAzairEu
+﻿namespace DreamTravel.Bot.DiscoverDreamTravelChances.Interfaces
 {
     using System.Collections.Generic;
+    using Models;
 
     public interface IScrapHtmlToChanceModel
     {

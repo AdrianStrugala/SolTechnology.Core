@@ -1,4 +1,4 @@
-﻿namespace DreamTravel.Bot.DiscoverIndividualChances
+﻿namespace DreamTravel.Bot.DiscoverIndividualChances.Interfaces
 {
     public interface IDiscoverIndividualChances
     {

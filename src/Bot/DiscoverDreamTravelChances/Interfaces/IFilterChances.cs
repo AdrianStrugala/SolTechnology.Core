@@ -1,7 +1,7 @@
 ﻿namespace DreamTravel.Bot.DiscoverDreamTravelChances.Interfaces
 {
     using System.Collections.Generic;
-    using ScrapAzairEu;
+    using Models;
 
     public interface IFilterChances
     {

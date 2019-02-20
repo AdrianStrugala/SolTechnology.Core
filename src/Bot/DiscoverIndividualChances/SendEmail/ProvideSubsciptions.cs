@@ -4,7 +4,7 @@ using System.Text;
 
 namespace DreamTravel.Bot.DiscoverIndividualChances.SendEmail
 {
-    class ProvideSubsciptions
+    class ProvideSubscriptions
     {
     }
 }
