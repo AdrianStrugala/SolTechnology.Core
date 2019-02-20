@@ -1,6 +1,6 @@
 ﻿namespace DreamTravel.Bot.DiscoverDreamTravelChances.SendEmail
 {
-    public class DreamTravelChanceEmail
+    public class DreamTravelChanceEmail : Inftastructure.Email.IEmail
     {
         public DreamTravelChanceEmail(string message, string recipient)
         {
@@ -8,8 +8,10 @@
             Recipient = recipient;
         }
 
-        public string Sender = "dreamtravelwebsite@gmail.com";
-        public string Subject = "Today's Dream Travel Chances!";
+        public string Subject => "Today's Dream Travel Chances!";
+
+        public string Sender => "dreamtravelwebsite@gmail.com";
+
         public string Message { get; set; }
         public string Recipient { get; set; }
     }
