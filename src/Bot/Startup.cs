@@ -31,12 +31,6 @@
                         .Except<ApplicationConfiguration>()
                         .AsImplementedInterfaces();
 
-//                    var assemblies = GetType().Assembly.GetReferencedAssemblies();
-//
-//                    builder.RegisterAssemblyTypes(assemblies)
-//                        .Except<ApplicationConfiguration>()
-//                        .AsImplementedInterfaces();
-
                 },
                 functionName);
         }
