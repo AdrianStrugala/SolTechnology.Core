@@ -7,6 +7,7 @@
     using System.Diagnostics.CodeAnalysis;
     using System.IO;
     using System.Reflection;
+    using Infrastructure;
 
     [ExcludeFromCodeCoverage]
     public class Startup

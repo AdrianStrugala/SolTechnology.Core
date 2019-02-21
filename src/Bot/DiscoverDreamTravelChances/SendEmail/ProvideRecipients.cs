@@ -1,37 +1,30 @@
 ﻿namespace DreamTravel.Bot.DiscoverDreamTravelChances.SendEmail
 {
-    using System.Collections.Generic;
-    using System.Linq;
-    using Configuration;
     using Dapper;
     using Interfaces;
     using Models;
+    using System.Collections.Generic;
+    using System.Linq;
+    using Infrastructure.Database;
 
     public class ProvideRecipients : IProvideRecipients
     {
-        private readonly IDbConnectionFactory _dbConnectionFactory;
-
-        private const string sql = @"
+        private const string Sql = @"
 SELECT [Id]
       ,[Name]
       ,[Email]
   FROM [dbo].[User]
 ";
 
-        public ProvideRecipients(IDbConnectionFactory dbConnectionFactory)
-        {
-            _dbConnectionFactory = dbConnectionFactory;
-        }
-
         public List<User> Execute()
         {
             List<User> result;
 
-            using (var connection = _dbConnectionFactory.CreateConnection())
+            using (var connection = DbConnectionFactory.CreateConnection())
             {
-                result = connection.Query<User>(sql).ToList();
+                result = connection.Query<User>(Sql).ToList();
             }
-            
+
             return result;
         }
     }
