@@ -2,6 +2,7 @@
 {
     using System.Collections.Generic;
     using Models;
+    using SharedModels;
 
     public interface IFilterChances
     {

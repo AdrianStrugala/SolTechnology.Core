@@ -11,7 +11,7 @@
     {
         const string Sql = @"
 SELECT 
-    Name AS UserName
+    User.Name AS UserName
     ,From
     ,To
     ,NoOfMonthsFromNow

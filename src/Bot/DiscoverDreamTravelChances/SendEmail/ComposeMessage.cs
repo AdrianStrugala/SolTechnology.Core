@@ -3,6 +3,7 @@
     using System.Collections.Generic;
     using Interfaces;
     using Models;
+    using SharedModels;
 
     public class ComposeMessage : IComposeMessage
     {

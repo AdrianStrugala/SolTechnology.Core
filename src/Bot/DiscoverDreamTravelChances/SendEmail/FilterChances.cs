@@ -4,6 +4,7 @@
     using System.Linq;
     using Interfaces;
     using Models;
+    using SharedModels;
 
     public class FilterChances : IFilterChances
     {

@@ -6,6 +6,7 @@
     using HtmlAgilityPack;
     using Interfaces;
     using Models;
+    using SharedModels;
 
     public class ScrapHtmlToChanceModel : IScrapHtmlToChanceModel
     {

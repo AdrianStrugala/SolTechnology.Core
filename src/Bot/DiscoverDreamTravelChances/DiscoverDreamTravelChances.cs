@@ -5,6 +5,7 @@
     using SendEmail;
     using System.Collections.Generic;
     using Models;
+    using SharedModels;
 
     public class DiscoverDreamTravelChances : IDiscoverDreamTravelChances
     {
