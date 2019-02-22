@@ -43,7 +43,7 @@
 
 
             string travelRequest =
-                $"http://partners.api.skyscanner.net/apiservices/browseroutes/v1.0/PL-sky/EUR/pl-PL/{fromId}/{toId}/2019-03/2019-03?apiKey={APIKey}&fbclid=IwAR3YcSivV9V769LNrXU6TuVhDFpY3BE4RZHBFUXMQm4sOU5Lfm1MqdCS25Y";
+                $"http://partners.api.skyscanner.net/apiservices/BrowseDates/v1.0/PL-sky/EUR/pl-PL/{fromId}/{toId}/2019-03/2019-03?apiKey={APIKey}&fbclid=IwAR3YcSivV9V769LNrXU6TuVhDFpY3BE4RZHBFUXMQm4sOU5Lfm1MqdCS25Y";
 
             string travelResposne = await _httpClient.GetStringAsync(travelRequest);
             JObject travelJson = JObject.Parse(travelResposne);
