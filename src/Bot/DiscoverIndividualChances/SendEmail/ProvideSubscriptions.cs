@@ -11,12 +11,12 @@
     {
         const string Sql = @"
 SELECT 
-    User.Name AS UserName
-    ,From
-    ,To
+    [User].[Name] AS UserName
+    ,[From]
+    ,[To]
     ,NoOfMonthsFromNow
 FROM Subscription
-JOIN User on User.Id = UserId
+JOIN [User] on [User].Id = UserId
 ";
 
         public List<Subscription> Execute()

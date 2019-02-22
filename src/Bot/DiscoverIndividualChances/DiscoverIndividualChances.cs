@@ -1,10 +1,11 @@
 ﻿namespace DreamTravel.Bot.DiscoverIndividualChances
 {
-    using DataAccess;
     using Interfaces;
     using Models;
-    using SharedModels;
     using System.Collections.Generic;
+    using System.Threading.Tasks;
+    using DataAccess;
+    using SharedModels;
 
     class DiscoverIndividualChances : IDiscoverIndividualChances
     {
@@ -16,13 +17,13 @@
             _provideSubscriptions = provideSubscriptions;
             _getFlightsFromSkyScanner = getFlightsFromSkyScanner;
         }
-        public void Execute()
+        public async Task Execute()
         {
             List<Subscription> subscriptions = _provideSubscriptions.Execute();
 
             foreach (var subscription in subscriptions)
             {
-                Chance chance = _getFlightsFromSkyScanner.Execute(subscription);
+                Chance chance = await _getFlightsFromSkyScanner.Execute(subscription);
             }
         }
     }
