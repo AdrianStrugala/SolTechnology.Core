@@ -4,6 +4,7 @@
     using Models;
     using Newtonsoft.Json.Linq;
     using SharedModels;
+    using System.Linq;
     using System.Net.Http;
     using System.Threading.Tasks;
 
@@ -43,11 +44,25 @@
 
 
             string travelRequest =
-                $"http://partners.api.skyscanner.net/apiservices/BrowseDates/v1.0/PL-sky/EUR/pl-PL/{fromId}/{toId}/2019-03/2019-03?apiKey={APIKey}&fbclid=IwAR3YcSivV9V769LNrXU6TuVhDFpY3BE4RZHBFUXMQm4sOU5Lfm1MqdCS25Y";
+                $"http://partners.api.skyscanner.net/apiservices/browsequotes/v1.0/PL-sky/EUR/pl-PL/{fromId}/{toId}/2019-03/2019-03?apiKey={APIKey}&fbclid=IwAR3YcSivV9V769LNrXU6TuVhDFpY3BE4RZHBFUXMQm4sOU5Lfm1MqdCS25Y";
 
             string travelResposne = await _httpClient.GetStringAsync(travelRequest);
             JObject travelJson = JObject.Parse(travelResposne);
-          //  toId = toLocationJson["Places"][0]["PlaceId"].Value<string>();
+            //  toId = toLocationJson["Places"][0]["PlaceId"].Value<string>();
+
+
+            double minPrice = double.MaxValue;
+            int minIndex = -1;
+
+
+            for (int i = 0; i < travelJson["Quotes"].Count(); i++)
+            {
+                if (travelJson["Quotes"][i]["MinPrice"].Value<double>() < minPrice)
+                {
+                    minPrice = travelJson["Quotes"][i]["MinPrice"].Value<double>();
+                    minIndex = i;
+                }
+            }
 
             return result;
         }
