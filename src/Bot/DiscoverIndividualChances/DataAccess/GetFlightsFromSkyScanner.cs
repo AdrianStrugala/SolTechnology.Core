@@ -3,7 +3,6 @@
     using Interfaces;
     using Models;
     using Newtonsoft.Json.Linq;
-    using SharedModels;
     using System.Linq;
     using System.Net.Http;
     using System.Threading.Tasks;
@@ -30,8 +29,8 @@
                 $"http://partners.api.skyscanner.net/apiservices/autosuggest/v1.0/PL-sky/EUR/pl-PL?query={subscription.From}&apiKey={APIKey}&fbclid=IwAR3YcSivV9V769LNrXU6TuVhDFpY3BE4RZHBFUXMQm4sOU5Lfm1MqdCS25Y";
 
 
-            string fromLocationResposne = await _httpClient.GetStringAsync(fromLocationRequest);
-            JObject fromLocationJson = JObject.Parse(fromLocationResposne);
+            string locationResponse = await _httpClient.GetStringAsync(fromLocationRequest);
+            JObject fromLocationJson = JObject.Parse(locationResponse);
             fromId = fromLocationJson["Places"][0]["PlaceId"].Value<string>();
 
 
@@ -48,21 +47,48 @@
 
             string travelResposne = await _httpClient.GetStringAsync(travelRequest);
             JObject travelJson = JObject.Parse(travelResposne);
-            //  toId = toLocationJson["Places"][0]["PlaceId"].Value<string>();
 
-
-            double minPrice = double.MaxValue;
+            result.Price = double.MaxValue;
             int minIndex = -1;
 
 
             for (int i = 0; i < travelJson["Quotes"].Count(); i++)
             {
-                if (travelJson["Quotes"][i]["MinPrice"].Value<double>() < minPrice)
+                if (travelJson["Quotes"][i]["MinPrice"].Value<double>() < result.Price)
                 {
-                    minPrice = travelJson["Quotes"][i]["MinPrice"].Value<double>();
+                    result.Price = travelJson["Quotes"][i]["MinPrice"].Value<double>();
                     minIndex = i;
                 }
             }
+
+            var bestQuote = travelJson["Quotes"][minIndex];
+
+            
+            result.Origin = subscription.From;
+            result.Destination = subscription.To;
+            result.ActualAt = bestQuote["QuoteDateTime"].Value<string>();
+
+            string thereCarrierId = bestQuote["OutboundLeg"]["CarrierIds"][0].Value<string>();
+            foreach (var carrier in travelJson["Carriers"])
+            {
+                if (carrier["CarrierId"].Value<string>() == thereCarrierId)
+                {
+                    result.ThereCarrier = carrier["Name"].Value<string>();
+                    break;
+                }
+            }
+
+            string backCarrierId = bestQuote["InboundLeg"]["CarrierIds"][0].Value<string>();
+            foreach (var carrier in travelJson["Carriers"])
+            {
+                if (carrier["CarrierId"].Value<string>() == backCarrierId)
+                {
+                    result.BackCarrier = carrier["Name"].Value<string>();
+                }
+            }
+
+            result.ThereDay = bestQuote["OutboundLeg"]["DepartureDate"].Value<string>().Substring(0,10);
+            result.BackDay = bestQuote["InboundLeg"]["DepartureDate"].Value<string>().Substring(0, 10);
 
             return result;
         }

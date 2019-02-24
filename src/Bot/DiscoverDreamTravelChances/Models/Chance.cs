@@ -1,4 +1,4 @@
-﻿namespace DreamTravel.Bot.SharedModels
+﻿namespace DreamTravel.Bot.DiscoverDreamTravelChances.Models
 {
     public class Chance
     {

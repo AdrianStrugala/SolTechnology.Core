@@ -5,7 +5,10 @@
     using System.Collections.Generic;
     using System.Threading.Tasks;
     using DataAccess;
-    using SharedModels;
+    using DiscoverDreamTravelChances.Models;
+    using Infrastructure.Email;
+    using Newtonsoft.Json;
+    using Chance = Models.Chance;
 
     class DiscoverIndividualChances : IDiscoverIndividualChances
     {
@@ -24,6 +27,7 @@
             foreach (var subscription in subscriptions)
             {
                 Chance chance = await _getFlightsFromSkyScanner.Execute(subscription);
+                EmailAgent.Send(new IndividualChanceEmail(JsonConvert.SerializeObject(chance),"adistr94@gmail.com", "New Dream Feature :O"));
             }
         }
     }

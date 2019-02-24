@@ -2,7 +2,6 @@
 {
     using System.Threading.Tasks;
     using Models;
-    using SharedModels;
 
     public interface IGetFlightsFromSkyScanner
     {
