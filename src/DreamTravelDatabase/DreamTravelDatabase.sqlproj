@@ -62,4 +62,7 @@
     <Build Include="User.sql" />
     <Build Include="Subscription.sql" />
   </ItemGroup>
+  <ItemGroup>
+    <RefactorLog Include="DreamTravelDatabase.refactorlog" />
+  </ItemGroup>
 </Project>

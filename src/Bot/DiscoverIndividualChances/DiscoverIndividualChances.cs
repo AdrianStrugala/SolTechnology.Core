@@ -27,7 +27,8 @@
             foreach (var subscription in subscriptions)
             {
                 Chance chance = await _getFlightsFromSkyScanner.Execute(subscription);
-                EmailAgent.Send(new IndividualChanceEmail(JsonConvert.SerializeObject(chance),"adistr94@gmail.com", "New Dream Feature :O"));
+
+                EmailAgent.Send(new IndividualChanceEmail(JsonConvert.SerializeObject(chance),subscription.Email, $"{subscription.UserName} your travel to {subscription.To}!"));
             }
         }
     }

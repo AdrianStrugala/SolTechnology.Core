@@ -14,7 +14,8 @@ SELECT
     [User].[Name] AS UserName
     ,[From]
     ,[To]
-    ,NoOfMonthsFromNow
+    ,LengthOfStay
+    ,[User].Email AS Email
 FROM Subscription
 JOIN [User] on [User].Id = UserId
 ";

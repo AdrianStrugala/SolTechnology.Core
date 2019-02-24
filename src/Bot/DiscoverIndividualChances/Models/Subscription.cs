@@ -5,6 +5,7 @@
         public string UserName { get; set; }
         public string From { get; set; }
         public string To { get; set; }
-        public int NoOfMonthsFromNow { get; set; }
+        public int LengthOfStay { get; set; }
+        public string Email { get; set; }
     }
 }

@@ -4,6 +4,6 @@
 	[UserId] INT NOT NULL, 
 	[From] NVARCHAR(50) NOT NULL, 
 	[To] NVARCHAR(50) NOT NULL, 
-	[NoOfMonthsFromNow] INT NOT NULL,
+	[LengthOfStay] INT NOT NULL,
 	CONSTRAINT [FK_Subscription_User] FOREIGN KEY ([UserId]) REFERENCES [User]([Id])
 )
