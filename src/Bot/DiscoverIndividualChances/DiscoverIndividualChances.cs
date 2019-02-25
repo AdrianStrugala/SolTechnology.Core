@@ -4,8 +4,6 @@
     using Models;
     using System.Collections.Generic;
     using System.Threading.Tasks;
-    using DataAccess;
-    using DiscoverDreamTravelChances.Models;
     using Infrastructure.Email;
     using Newtonsoft.Json;
     using Chance = Models.Chance;
@@ -28,7 +26,10 @@
             {
                 Chance chance = await _getFlightsFromSkyScanner.Execute(subscription);
 
-                EmailAgent.Send(new IndividualChanceEmail(JsonConvert.SerializeObject(chance),subscription.Email, $"{subscription.UserName} your travel to {subscription.To}!"));
+                EmailAgent.Send(new IndividualChanceEmail(
+                    JsonConvert.SerializeObject(chance),
+                    subscription.Email,
+                    $"{subscription.UserName} your travel to {subscription.To} is here!"));
             }
         }
     }
