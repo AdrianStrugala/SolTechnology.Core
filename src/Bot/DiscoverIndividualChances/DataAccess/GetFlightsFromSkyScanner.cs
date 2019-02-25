@@ -3,6 +3,7 @@
     using Interfaces;
     using Models;
     using Newtonsoft.Json.Linq;
+    using System;
     using System.Linq;
     using System.Net.Http;
     using System.Threading.Tasks;
@@ -51,10 +52,17 @@
 
             for (int i = 0; i < travelJson["Quotes"].Count(); i++)
             {
+                //if price lower than current min
                 if (travelJson["Quotes"][i]["MinPrice"].Value<double>() < result.Price)
                 {
-                    result.Price = travelJson["Quotes"][i]["MinPrice"].Value<double>();
-                    minIndex = i;
+                    //if length of stay in range specified by user
+                    if (travelJson["Quotes"][i]["InboundLeg"]["DepartureDate"].Value<DateTime>()
+                            .Subtract(travelJson["Quotes"][i]["OutboundLeg"]["DepartureDate"].Value<DateTime>())
+                        < new TimeSpan(subscription.LengthOfStay, 0, 0, 0))
+                    {
+                        result.Price = travelJson["Quotes"][i]["MinPrice"].Value<double>();
+                        minIndex = i;
+                    }
                 }
             }
 
@@ -67,12 +75,12 @@
             {
                 if (place["PlaceId"].Value<string>() == backPlaceId)
                 {
-                    result.Destination = place["Name"].Value<string>();                
+                    result.Destination = place["Name"].Value<string>();
                 }
 
                 if (place["PlaceId"].Value<string>() == therePlaceId)
                 {
-                    result.Origin = place["Name"].Value<string>();                   
+                    result.Origin = place["Name"].Value<string>();
                 }
             }
 
@@ -88,7 +96,7 @@
 
                 if (carrier["CarrierId"].Value<string>() == thereCarrierId)
                 {
-                    result.ThereCarrier = carrier["Name"].Value<string>();                  
+                    result.ThereCarrier = carrier["Name"].Value<string>();
                 }
             }
 
