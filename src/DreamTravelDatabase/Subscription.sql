@@ -5,5 +5,6 @@
 	[From] NVARCHAR(50) NOT NULL, 
 	[To] NVARCHAR(50) NOT NULL, 
 	[LengthOfStay] INT NOT NULL,
-	CONSTRAINT [FK_Subscription_User] FOREIGN KEY ([UserId]) REFERENCES [User]([Id])
+	[Currency] NVARCHAR(50) NULL, 
+    CONSTRAINT [FK_Subscription_User] FOREIGN KEY ([UserId]) REFERENCES [User]([Id])
 )

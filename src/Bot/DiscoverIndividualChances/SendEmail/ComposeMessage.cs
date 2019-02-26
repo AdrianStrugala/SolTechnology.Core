@@ -14,11 +14,9 @@
 </br>
 <p> Check out the details of your Dream Travel to {subscription.To}: </p></br>
 </br>
-<p>
-Price: {chance.Price} €
-From: {chance.Origin}, By: {chance.ThereCarrier}, At: {chance.ThereDay}
-To: {chance.Destination}, By: {chance.BackCarrier}, At: {chance.BackDay}
-</p>
+<p>Price: {chance.Price} € </p>
+<p>From: {chance.Origin}, By: {chance.ThereCarrier}, At: {chance.ThereDay}</p>
+<p>To: {chance.Destination}, By: {chance.BackCarrier}, At: {chance.BackDay}</p>
 </br>
 </br>
 <p> Looks interesting? Check more details at: http://www.azair.eu/ </p></br>
