@@ -12,11 +12,13 @@
     {
         private readonly IProvideSubscriptions _provideSubscriptions;
         private readonly IGetFlightsFromSkyScanner _getFlightsFromSkyScanner;
+        private readonly IComposeMessage _composeMessage;
 
-        public DiscoverIndividualChances(IProvideSubscriptions provideSubscriptions, IGetFlightsFromSkyScanner getFlightsFromSkyScanner)
+        public DiscoverIndividualChances(IProvideSubscriptions provideSubscriptions, IGetFlightsFromSkyScanner getFlightsFromSkyScanner, IComposeMessage composeMessage)
         {
             _provideSubscriptions = provideSubscriptions;
             _getFlightsFromSkyScanner = getFlightsFromSkyScanner;
+            _composeMessage = composeMessage;
         }
         public async Task Execute()
         {
@@ -27,7 +29,7 @@
                 Chance chance = await _getFlightsFromSkyScanner.Execute(subscription);
 
                 EmailAgent.Send(new IndividualChanceEmail(
-                    JsonConvert.SerializeObject(chance),
+                    _composeMessage.Execute(chance, subscription),
                     subscription.Email,
                     $"{subscription.UserName} your travel to {subscription.To} is here!"));
             }
