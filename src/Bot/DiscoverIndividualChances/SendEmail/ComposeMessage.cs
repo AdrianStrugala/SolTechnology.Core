@@ -14,7 +14,7 @@
 </br>
 <p> Check out the details of your Dream Travel to {subscription.To}: </p></br>
 </br>
-<p>Price: {chance.Price} € </p>
+<p>Price: {chance.Price} {subscription.Currency} </p>
 <p>From: {chance.Origin}, By: {chance.ThereCarrier}, At: {chance.ThereDay}</p>
 <p>To: {chance.Destination}, By: {chance.BackCarrier}, At: {chance.BackDay}</p>
 </br>

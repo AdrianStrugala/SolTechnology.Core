@@ -7,5 +7,6 @@
         public string To { get; set; }
         public int LengthOfStay { get; set; }
         public string Email { get; set; }
+        public string Currency { get; set; }
     }
 }

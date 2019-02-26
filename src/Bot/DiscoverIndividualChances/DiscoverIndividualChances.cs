@@ -10,19 +10,19 @@
 
     class DiscoverIndividualChances : IDiscoverIndividualChances
     {
-        private readonly IProvideSubscriptions _provideSubscriptions;
+        private readonly IGetSubscriptions _getSubscriptions;
         private readonly IGetFlightsFromSkyScanner _getFlightsFromSkyScanner;
         private readonly IComposeMessage _composeMessage;
 
-        public DiscoverIndividualChances(IProvideSubscriptions provideSubscriptions, IGetFlightsFromSkyScanner getFlightsFromSkyScanner, IComposeMessage composeMessage)
+        public DiscoverIndividualChances(IGetSubscriptions getSubscriptions, IGetFlightsFromSkyScanner getFlightsFromSkyScanner, IComposeMessage composeMessage)
         {
-            _provideSubscriptions = provideSubscriptions;
+            _getSubscriptions = getSubscriptions;
             _getFlightsFromSkyScanner = getFlightsFromSkyScanner;
             _composeMessage = composeMessage;
         }
         public async Task Execute()
         {
-            List<Subscription> subscriptions = _provideSubscriptions.Execute();
+            List<Subscription> subscriptions = _getSubscriptions.Execute();
 
             foreach (var subscription in subscriptions)
             {

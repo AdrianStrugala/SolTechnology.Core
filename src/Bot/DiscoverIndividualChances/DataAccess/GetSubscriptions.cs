@@ -1,13 +1,13 @@
-﻿namespace DreamTravel.Bot.DiscoverIndividualChances.SendEmail
+﻿namespace DreamTravel.Bot.DiscoverIndividualChances.DataAccess
 {
-    using Dapper;
-    using Interfaces;
-    using Models;
     using System.Collections.Generic;
     using System.Linq;
+    using Dapper;
     using Infrastructure.Database;
+    using Interfaces;
+    using Models;
 
-    public class ProvideSubscriptions : IProvideSubscriptions
+    public class GetSubscriptions : IGetSubscriptions
     {
         const string Sql = @"
 SELECT 
@@ -16,6 +16,7 @@ SELECT
     ,[To]
     ,LengthOfStay
     ,[User].Email AS Email
+    ,Currency
 FROM Subscription
 JOIN [User] on [User].Id = UserId
 ";

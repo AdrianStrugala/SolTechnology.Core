@@ -1,13 +1,13 @@
-﻿namespace DreamTravel.Bot.DiscoverDreamTravelChances.SendEmail
+﻿namespace DreamTravel.Bot.DiscoverDreamTravelChances.DataAccess
 {
-    using Dapper;
-    using Interfaces;
-    using Models;
     using System.Collections.Generic;
     using System.Linq;
+    using Dapper;
     using Infrastructure.Database;
+    using Interfaces;
+    using Models;
 
-    public class ProvideRecipients : IProvideRecipients
+    public class GetUsers : IGetUsers
     {
         private const string Sql = @"
 SELECT [Id]

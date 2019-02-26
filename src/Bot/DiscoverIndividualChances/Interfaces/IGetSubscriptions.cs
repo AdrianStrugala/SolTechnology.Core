@@ -4,7 +4,7 @@ namespace DreamTravel.Bot.DiscoverIndividualChances.Interfaces
 {
     using Models;
 
-    public interface IProvideSubscriptions
+    public interface IGetSubscriptions
     {
         List<Subscription> Execute();
     }

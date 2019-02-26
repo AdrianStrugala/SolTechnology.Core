@@ -25,7 +25,7 @@
             Chance result = new Chance();
 
             string fromLocationRequest =
-                $"http://partners.api.skyscanner.net/apiservices/autosuggest/v1.0/PL-sky/EUR/pl-PL?query={subscription.From}&apiKey={ApiKey}&fbclid=IwAR3YcSivV9V769LNrXU6TuVhDFpY3BE4RZHBFUXMQm4sOU5Lfm1MqdCS25Y";
+                $"http://partners.api.skyscanner.net/apiservices/autosuggest/v1.0/PL-sky/{subscription.Currency}/pl-PL?query={subscription.From}&apiKey={ApiKey}&fbclid=IwAR3YcSivV9V769LNrXU6TuVhDFpY3BE4RZHBFUXMQm4sOU5Lfm1MqdCS25Y";
 
             string locationResponse = await _httpClient.GetStringAsync(fromLocationRequest);
             JObject fromLocationJson = JObject.Parse(locationResponse);
