@@ -17,7 +17,7 @@
                 Timeout = 10000,
                 DeliveryMethod = SmtpDeliveryMethod.Network,
                 UseDefaultCredentials = false,
-                Credentials = new System.Net.NetworkCredential("dreamtravelwebsite@gmail.com", "P4ssw0rd.")
+                Credentials = new System.Net.NetworkCredential("dreamtravelwebsite@gmail.com", "P4ssw0rd@")
             };
         }
 
