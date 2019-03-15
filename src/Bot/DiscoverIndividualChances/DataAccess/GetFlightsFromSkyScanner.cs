@@ -33,7 +33,7 @@
 
 
             string toLocationRequest =
-                $"http://partners.api.skyscanner.net/apiservices/autosuggest/v1.0/PL-sky/EUR/pl-PL?query={subscription.To}&apiKey={ApiKey}&fbclid=IwAR3YcSivV9V769LNrXU6TuVhDFpY3BE4RZHBFUXMQm4sOU5Lfm1MqdCS25Y";
+                $"http://partners.api.skyscanner.net/apiservices/autosuggest/v1.0/PL-sky/{subscription.Currency}/pl-PL?query={subscription.To}&apiKey={ApiKey}&fbclid=IwAR3YcSivV9V769LNrXU6TuVhDFpY3BE4RZHBFUXMQm4sOU5Lfm1MqdCS25Y";
 
             string toLocationResponse = await _httpClient.GetStringAsync(toLocationRequest);
             JObject toLocationJson = JObject.Parse(toLocationResponse);
@@ -41,7 +41,7 @@
 
 
             string travelRequest =
-                $"http://partners.api.skyscanner.net/apiservices/browsequotes/v1.0/PL-sky/EUR/pl-PL/{fromId}/{toId}/anytime/anytime?apiKey={ApiKey}&fbclid=IwAR3YcSivV9V769LNrXU6TuVhDFpY3BE4RZHBFUXMQm4sOU5Lfm1MqdCS25Y";
+                $"http://partners.api.skyscanner.net/apiservices/browsequotes/v1.0/PL-sky/{subscription.Currency}/pl-PL/{fromId}/{toId}/anytime/anytime?apiKey={ApiKey}&fbclid=IwAR3YcSivV9V769LNrXU6TuVhDFpY3BE4RZHBFUXMQm4sOU5Lfm1MqdCS25Y";
 
             string travelResponse = await _httpClient.GetStringAsync(travelRequest);
             JObject travelJson = JObject.Parse(travelResponse);
