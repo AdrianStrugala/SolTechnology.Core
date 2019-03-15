@@ -1,7 +1,6 @@
 ﻿namespace DreamTravel.WebUI.BestPath.DataAccess
 {
     using System;
-    using System.IO;
     using System.Net.Http;
     using System.Xml;
     using Interfaces;
@@ -48,8 +47,10 @@
             catch (Exception)
             {
                 _logger.LogError($"Cannot get data about cost between [{origin.Name}] and [{destination.Name}]");
-                throw new InvalidDataException(
-                    $"Cannot get data about cost between [{origin.Name}] and [{destination.Name}]");
+
+                return (-1, -1);
+//                throw new InvalidDataException(
+//                    $"Cannot get data about cost between [{origin.Name}] and [{destination.Name}]");
             }
         }
     }

@@ -1,6 +1,5 @@
 ﻿namespace DreamTravel.WebUITests.BestPath.DataAccess
 {
-    using System.IO;
     using Microsoft.Extensions.Logging.Abstractions;
     using WebUI.BestPath.DataAccess;
     using WebUI.SharedModels;
@@ -39,7 +38,7 @@
 
 
         [Fact]
-        public void DowloadCostBetweenTwoCities_InvalidCities_ExceptionIsThrown()
+        public void DowloadCostBetweenTwoCities_InvalidCities_MinusCostIsReturned()
         {
             //Arrange
             City firstCity = new City
@@ -57,10 +56,10 @@
             };
 
             //Act
-            var exception = Record.Exception(() => _sut.Execute(firstCity, secondCity));
+            var result = _sut.Execute(firstCity, secondCity);
 
             //Assert
-            Assert.IsType<InvalidDataException>(exception);
+            Assert.Equal((-1, -1), result);
         }
     }
 }

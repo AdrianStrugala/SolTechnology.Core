@@ -38,12 +38,21 @@ function displayRoute(directionsService, map, path) {
                 var minutes = Math.floor((path.OptimalDistance - Math.floor(hours) * 3600) / 60);
                 var seconds = (path.OptimalDistance % 60);
 
+
                 var routeString =
                     path.StartingCity.Name +
-                    " -> " +
-                    path.EndingCity.Name +
-                    "\ (Cost of fee: " +
-                    path.OptimalCost.toFixed(2) +
+                        " -> " +
+                        path.EndingCity.Name +
+                    "\ (Cost of fee: ";
+
+                if (totalCost < 0) {
+                    routeString += "unknown";
+                }
+                else {
+                    routeString += totalCost.toFixed(2);
+                }
+               
+                routeString +=
                     " €." +
                     " Time: " +
                     Math.floor(hours) +

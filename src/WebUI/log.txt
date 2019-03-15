@@ -861,3 +861,25 @@ Parameter name: index
 2019-02-20 12:02:05,098 [8] WARN  DreamTravel.WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
 2019-02-20 12:06:27,932 [9] WARN  DreamTravel.WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
 2019-02-20 15:15:08,841 [8] WARN  DreamTravel.WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-03-15 13:35:48,347 [9] WARN  DreamTravel.WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-03-15 13:40:14,484 [9] WARN  DreamTravel.WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-03-15 13:40:37,976 [10] ERROR DreamTravel.WebUI.BestPath.DataAccess.DownloadCostBetweenTwoCities [(null)] - Cannot get data about cost between [Lanzhou Shi] and [Xiangyang Shi]
+2019-03-15 13:40:37,976 [12] ERROR DreamTravel.WebUI.BestPath.DataAccess.DownloadCostBetweenTwoCities [(null)] - Cannot get data about cost between [Xiangyang Shi] and [Lanzhou Shi]
+2019-03-15 13:41:24,182 [9] WARN  DreamTravel.WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-03-15 13:41:44,223 [9] ERROR DreamTravel.WebUI.BestPath.DataAccess.DownloadCostBetweenTwoCities [(null)] - Cannot get data about cost between [Tian Ci Jie, Banan Qu, Chongqing Shi, China] and [Chengdu Shi]
+2019-03-15 13:41:44,225 [8] ERROR DreamTravel.WebUI.BestPath.DataAccess.DownloadCostBetweenTwoCities [(null)] - Cannot get data about cost between [Chengdu Shi] and [Tian Ci Jie, Banan Qu, Chongqing Shi, China]
+2019-03-15 13:53:21,069 [8] WARN  DreamTravel.WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-03-15 13:53:41,216 [10] ERROR DreamTravel.WebUI.BestPath.DataAccess.DownloadCostBetweenTwoCities [(null)] - Cannot get data about cost between [Xiang Xi Xi Lu, Nanchuan Qu, Chongqing Shi, China] and [Chengdu Shi]
+2019-03-15 13:53:41,225 [13] ERROR DreamTravel.WebUI.BestPath.DataAccess.DownloadCostBetweenTwoCities [(null)] - Cannot get data about cost between [Chengdu Shi] and [Xiang Xi Xi Lu, Nanchuan Qu, Chongqing Shi, China]
+2019-03-15 13:55:38,214 [10] WARN  DreamTravel.WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-03-15 13:55:53,715 [8] ERROR DreamTravel.WebUI.BestPath.DataAccess.DownloadCostBetweenTwoCities [(null)] - Cannot get data about cost between [Chengdu Shi] and [Unnamed Road, Banan Qu, Chongqing Shi, China]
+2019-03-15 13:55:53,920 [23] ERROR DreamTravel.WebUI.BestPath.DataAccess.DownloadCostBetweenTwoCities [(null)] - Cannot get data about cost between [Unnamed Road, Banan Qu, Chongqing Shi, China] and [Chengdu Shi]
+2019-03-15 14:00:41,128 [9] WARN  DreamTravel.WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-03-15 14:01:16,571 [10] ERROR DreamTravel.WebUI.BestPath.DataAccess.DownloadCostBetweenTwoCities [(null)] - Cannot get data about cost between [776 Xian Dao, Nanchuan Qu, Chongqing Shi, China] and [Xi'an]
+2019-03-15 14:01:16,571 [8] ERROR DreamTravel.WebUI.BestPath.DataAccess.DownloadCostBetweenTwoCities [(null)] - Cannot get data about cost between [Xi'an] and [776 Xian Dao, Nanchuan Qu, Chongqing Shi, China]
+2019-03-15 14:02:03,214 [38] WARN  DreamTravel.WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-03-15 14:02:15,534 [8] ERROR DreamTravel.WebUI.BestPath.DataAccess.DownloadCostBetweenTwoCities [(null)] - Cannot get data about cost between [Chengdu Shi] and [Xianning Shi]
+2019-03-15 14:02:15,568 [10] ERROR DreamTravel.WebUI.BestPath.DataAccess.DownloadCostBetweenTwoCities [(null)] - Cannot get data about cost between [Xianning Shi] and [Chengdu Shi]
+2019-03-15 14:04:37,459 [8] WARN  DreamTravel.WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-03-15 14:05:00,549 [8] ERROR DreamTravel.WebUI.BestPath.DataAccess.DownloadCostBetweenTwoCities [(null)] - Cannot get data about cost between [Yichang Shi] and [Unnamed Road, Banan Qu, Chongqing Shi, China]
+2019-03-15 14:05:00,553 [10] ERROR DreamTravel.WebUI.BestPath.DataAccess.DownloadCostBetweenTwoCities [(null)] - Cannot get data about cost between [Unnamed Road, Banan Qu, Chongqing Shi, China] and [Yichang Shi]

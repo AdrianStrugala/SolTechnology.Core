@@ -10,11 +10,19 @@
 
         var routeString =
             "From " +
-            pathList[i].StartingCity.Name +
-            " to " +
-            pathList[i].EndingCity.Name +
-            ". Cost of toll fee: " +
-            pathList[i].OptimalCost.toFixed(2) +
+                pathList[i].StartingCity.Name +
+                " to " +
+                pathList[i].EndingCity.Name +
+                ". Cost of toll fee: ";
+
+        if (totalCost < 0) {
+            routeString += "unknown";
+        }
+        else {
+            routeString += totalCost.toFixed(2);
+        }
+       
+        routeString +=
             " €." +
             " Time: " +
             Math.floor(hours) +
