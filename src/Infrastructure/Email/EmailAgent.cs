@@ -1,5 +1,6 @@
 ﻿namespace DreamTravel.Infrastructure.Email
 {
+    using System.Net;
     using System.Net.Mail;
     using System.Text;
 
@@ -9,16 +10,15 @@
 
         static EmailAgent()
         {
-            Client = new SmtpClient
-            {
-                Port = 587,
-                Host = "smtp.gmail.com",
-                EnableSsl = true,
-                Timeout = 10000,
-                DeliveryMethod = SmtpDeliveryMethod.Network,
-                TargetName = "STARTTLS/smtp.gmail.com",
-                Credentials = new System.Net.NetworkCredential("dreamtravelwebsite@gmail.com", "P4ssw0rd@")
-            };
+            Client = new SmtpClient();
+
+            Client.Port = 465;
+            Client.Host = "smtp.gmail.com";
+            Client.EnableSsl = true;
+            Client.Timeout = 10000;
+            Client.DeliveryMethod = SmtpDeliveryMethod.Network;
+            Client.UseDefaultCredentials = false;
+            Client.Credentials = new NetworkCredential("dreamtravelwebsite@gmail.com", "P4ssw0rd@");
         }
 
         public static void Send(IEmail email)
