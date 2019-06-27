@@ -18,7 +18,7 @@
             Client.DeliveryMethod = SmtpDeliveryMethod.Network;
             Client.UseDefaultCredentials = false;
             Client.Host = "smtp.gmail.com";
-            Client.Credentials = new NetworkCredential("dreamtravelwebsite@gmail.com", "P4ssw0rd@");
+            Client.Credentials = new NetworkCredential("dreamtravelwebsite@gmail.com", "nixavnjmkefkvxhr");
         }
 
         public static void Send(IEmail email)
