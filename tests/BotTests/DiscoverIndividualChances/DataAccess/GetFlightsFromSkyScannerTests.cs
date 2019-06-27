@@ -14,8 +14,8 @@ namespace DreamTravel.BotTests.DiscoverIndividualChances.DataAccess
             _sut = new GetFlightsFromSkyScanner();
         }
 
-        [Fact]
-        public async Task Execute_StateUnderTest_ExpectedBehavior()
+        [Fact (Skip = "The feature is disabled")]
+        public async Task Execute_ValidSubscription_SomeResultIsReturned()
         {
             // Arrange
             Subscription subscription = new Subscription();

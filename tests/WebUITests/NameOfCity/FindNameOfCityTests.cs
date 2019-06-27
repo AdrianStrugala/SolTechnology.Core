@@ -57,7 +57,7 @@ namespace DreamTravel.WebUITests.NameOfCity
         }
 
         [Fact]
-        public async Task Execute_OceanUnderCoordinates_ExceptionIsThrown()
+        public async Task Execute_SeeUnderCoordinates_NameOfTheSeeIsReturned()
         {
             //Arrange
             City city = new City
@@ -68,11 +68,10 @@ namespace DreamTravel.WebUITests.NameOfCity
             };
 
             //Act
-            // ReSharper disable once PossibleNullReferenceException
-            var exception = await Record.ExceptionAsync(async () => await _sut.Execute(city));
+            var result = await _sut.Execute(city);
 
             //Assert
-            Assert.IsType<InvalidDataException>(exception);
+            Assert.Equal("Baltic Sea", result.Name);
         }
 
     }
