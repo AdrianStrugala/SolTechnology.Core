@@ -12,12 +12,12 @@
         {
             Client = new SmtpClient();
 
-            Client.Port = 587;
-            Client.Host = "smtp.gmail.com";
+            Client.Port = 587;          
             Client.EnableSsl = true;
             Client.Timeout = 10000;
             Client.DeliveryMethod = SmtpDeliveryMethod.Network;
             Client.UseDefaultCredentials = false;
+            Client.Host = "smtp.gmail.com";
             Client.Credentials = new NetworkCredential("dreamtravelwebsite@gmail.com", "P4ssw0rd@");
         }
 
