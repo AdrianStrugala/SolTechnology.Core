@@ -12,7 +12,7 @@
         {
             Client = new SmtpClient();
 
-            Client.Port = 465;
+            Client.Port = 587;
             Client.Host = "smtp.gmail.com";
             Client.EnableSsl = true;
             Client.Timeout = 10000;
