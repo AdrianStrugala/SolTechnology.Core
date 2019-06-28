@@ -60,21 +60,22 @@
             //RESULTS
             benchmarkResult.Algorithm = nameOfAlgorithm;
             benchmarkResult.NoOfCities = noOfCities;
-            benchmarkResult.MinimalDistance = (int) results.Min(result => result);
+            benchmarkResult.MinimalDistance = (int)results.Min(result => result);
             benchmarkResult.Recurrence = (results.Count(result => result.Equals(benchmarkResult.MinimalDistance)) * 100) / numberOfExecutions;
-            benchmarkResult.AverageExecutionTime = (int) (totalTime / numberOfExecutions * 1000);
-            benchmarkResult.AverageDistance = (int) (results.Sum() / numberOfExecutions);
+            benchmarkResult.AverageExecutionTime = (int)(totalTime / numberOfExecutions * 1000);
+            benchmarkResult.AverageDistance = (int)(results.Sum() / numberOfExecutions);
 
             //Request to DreamTravel.Benchmark
-            var response = await _httpClient.PostAsJson(BenchmarkServiceUrl, benchmarkResult);
+            //   var response = await _httpClient.PostAsJson(BenchmarkServiceUrl, benchmarkResult);
 
-//            System.IO.File.WriteAllText($@"..\..\..\..\..\docs\{nameOfAlgorithm}_Benchmark_{noOfCities}Cities.txt",
-//                $"{nameOfAlgorithm}: {noOfCities} Cities \n" +
-//                $"Minimal Distance: {benchmarkResult.MinimalDistance} \n" +
-//                $"Average Distance: {benchmarkResult.AverageDistance} \n" +
-//                $"Average Time: { benchmarkResult.AverageExecutionTime} ms \n" +
-//                $"Recurrence: {benchmarkResult.Recurrence} % \n" +
-//                $"Benchmark entry status: {response.StatusCode}");
+            System.IO.File.WriteAllText($@"..\..\..\..\docs\{nameOfAlgorithm}_Benchmark_{noOfCities}Cities.txt",
+                $"{nameOfAlgorithm}: {noOfCities} Cities \n" +
+                $"Minimal Distance: {benchmarkResult.MinimalDistance} \n" +
+                $"Average Distance: {benchmarkResult.AverageDistance} \n" +
+                $"Average Time: {benchmarkResult.AverageExecutionTime} ms \n" +
+                $"Recurrence: {benchmarkResult.Recurrence} % \n");
+            //+
+            //   $"Benchmark entry status: {response.StatusCode}");
 
 
         }
