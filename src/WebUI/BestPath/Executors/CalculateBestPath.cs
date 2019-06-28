@@ -3,9 +3,9 @@
     using System.Collections.Generic;
     using System.Linq;
     using System.Threading.Tasks;
+    using Contract;
     using Interfaces;
     using Models;
-    using SharedModels;
     using TravelingSalesmanProblem;
 
     public class CalculateBestPath : ICalculateBestPath

@@ -1,7 +1,7 @@
 ﻿namespace DreamTravel.WebUI.CostLimit.Interfaces
 {
     using System.Collections.Generic;
-    using SharedModels;
+    using Contract;
 
     public interface IBreakCostLimit
     {

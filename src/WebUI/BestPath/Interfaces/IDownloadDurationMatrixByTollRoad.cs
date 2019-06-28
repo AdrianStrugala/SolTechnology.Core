@@ -2,7 +2,7 @@
 {
     using System.Collections.Generic;
     using System.Threading.Tasks;
-    using SharedModels;
+    using Contract;
 
     public interface IDownloadDurationMatrixByTollRoad
     {

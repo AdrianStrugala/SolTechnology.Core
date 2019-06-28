@@ -7,8 +7,8 @@
     using Newtonsoft.Json;
     using NSubstitute;
     using NSubstitute.ExceptionExtensions;
+    using WebUI.Contract;
     using WebUI.LocationOfCity.Interfaces;
-    using WebUI.SharedModels;
     using Xunit;
     using Controller = WebUI.LocationOfCity.Controller;
 

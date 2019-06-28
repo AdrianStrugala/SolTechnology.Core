@@ -1,8 +1,8 @@
 ﻿namespace DreamTravel.WebUITests.CostLimit
 {
     using System.Collections.Generic;
+    using WebUI.Contract;
     using WebUI.CostLimit;
-    using WebUI.SharedModels;
     using Xunit;
 
     public class CostLimitBreakerTests

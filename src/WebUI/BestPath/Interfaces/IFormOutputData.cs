@@ -1,7 +1,7 @@
 ﻿namespace DreamTravel.WebUI.BestPath.Interfaces
 {
     using System.Collections.Generic;
-    using SharedModels;
+    using Contract;
 
     public interface IFormOutputData
     {

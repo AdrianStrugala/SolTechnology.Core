@@ -1,7 +1,7 @@
 ﻿namespace DreamTravel.WebUI.LocationOfCity.Interfaces
 {
     using System.Threading.Tasks;
-    using SharedModels;
+    using Contract;
 
     public interface IFindLocationOfCity
     {

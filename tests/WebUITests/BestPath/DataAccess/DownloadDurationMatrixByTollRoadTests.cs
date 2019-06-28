@@ -5,7 +5,7 @@
     using System.Threading.Tasks;
     using Microsoft.Extensions.Logging.Abstractions;
     using WebUI.BestPath.DataAccess;
-    using WebUI.SharedModels;
+    using WebUI.Contract;
     using Xunit;
 
     public class DownloadDurationMatrixByTollRoadTests

@@ -2,9 +2,9 @@
 {
     using System.Collections.Generic;
     using System.Threading.Tasks;
+    using Contract;
     using Interfaces;
     using Models;
-    using SharedModels;
 
     public class DownloadRoadData : IDownloadRoadData
     {

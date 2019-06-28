@@ -2,11 +2,11 @@
 {
     using System;
     using System.Threading.Tasks;
+    using Contract;
     using Interfaces;
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.Extensions.Logging;
     using Newtonsoft.Json;
-    using SharedModels;
 
     [Route(Route)]
     public class Controller : Microsoft.AspNetCore.Mvc.Controller

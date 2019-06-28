@@ -2,8 +2,8 @@
 {
     using System.Collections.Generic;
     using System.Threading.Tasks;
+    using Contract;
     using Models;
-    using SharedModels;
 
     public interface IDownloadRoadData
     {

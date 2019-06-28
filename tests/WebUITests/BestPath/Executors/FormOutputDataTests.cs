@@ -3,7 +3,7 @@ namespace DreamTravel.WebUITests.BestPath.Executors
     using System.Collections.Generic;
     using WebUI.BestPath.Executors;
     using WebUI.BestPath.Models;
-    using WebUI.SharedModels;
+    using WebUI.Contract;
     using Xunit;
 
     public class FormOutputDataTests

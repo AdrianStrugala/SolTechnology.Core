@@ -6,10 +6,10 @@
     using System.Net.Http;
     using System.Text;
     using System.Threading.Tasks;
+    using Contract;
     using Interfaces;
     using Microsoft.Extensions.Logging;
     using Newtonsoft.Json.Linq;
-    using SharedModels;
 
     public class DownloadDurationMatrixByTollRoad : IDownloadDurationMatrixByTollRoad
     {

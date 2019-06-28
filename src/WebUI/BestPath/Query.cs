@@ -1,7 +1,7 @@
 ﻿namespace DreamTravel.WebUI.BestPath
 {
     using System.Collections.Generic;
-    using SharedModels;
+    using Contract;
 
     public class Query
     {

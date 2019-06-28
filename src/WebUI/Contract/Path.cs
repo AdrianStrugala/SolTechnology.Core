@@ -1,4 +1,4 @@
-﻿namespace DreamTravel.WebUI.SharedModels
+﻿namespace DreamTravel.WebUI.Contract
 {
     public sealed class Path
     {

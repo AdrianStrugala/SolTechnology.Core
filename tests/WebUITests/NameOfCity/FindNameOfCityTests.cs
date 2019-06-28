@@ -7,8 +7,8 @@ namespace DreamTravel.WebUITests.NameOfCity
 {
     using System.IO;
     using System.Threading.Tasks;
+    using WebUI.Contract;
     using WebUI.NameOfCity;
-    using WebUI.SharedModels;
     using Xunit;
 
     public class FindNameOfCityTests

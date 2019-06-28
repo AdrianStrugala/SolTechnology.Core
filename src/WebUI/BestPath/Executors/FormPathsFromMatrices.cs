@@ -2,8 +2,8 @@
 {
     using System.Collections.Generic;
     using System.Linq;
+    using Contract;
     using Interfaces;
-    using SharedModels;
 
     public class FormPathsFromMatrices : IFormOutputData
     {

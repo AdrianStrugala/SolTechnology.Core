@@ -1,6 +1,6 @@
 ﻿namespace DreamTravel.WebUI.BestPath.Interfaces
 {
-    using SharedModels;
+    using Contract;
 
     public interface IDownloadCostBetweenTwoCities
     {

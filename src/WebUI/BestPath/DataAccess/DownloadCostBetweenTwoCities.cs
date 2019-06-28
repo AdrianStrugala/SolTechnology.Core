@@ -3,9 +3,9 @@
     using System;
     using System.Net.Http;
     using System.Xml;
+    using Contract;
     using Interfaces;
     using Microsoft.Extensions.Logging;
-    using SharedModels;
 
     public class DownloadCostBetweenTwoCities : IDownloadCostBetweenTwoCities
     {

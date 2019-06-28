@@ -8,7 +8,7 @@ namespace DreamTravel.WebUITests.BestPath.Executors
     using WebUI.BestPath.Executors;
     using WebUI.BestPath.Interfaces;
     using WebUI.BestPath.Models;
-    using WebUI.SharedModels;
+    using WebUI.Contract;
     using Xunit;
 
     public class DownloadRoadDataTests
