@@ -32,10 +32,10 @@ Dream Travel Team
             return message;
         }
 
-        public string ExecuteHtml(List<Chance> chances)
+        public string ExecuteHtml(List<Chance> chances, string userName)
         {
             string message = @"<html> <body> 
-<h4> Welcome Traveler! </h4></br>
+<h4> Welcome " + userName + @"! </h4></br>
 </br>
 <p> Feel welcome to check out the newest flight chances. Prices below contains flying tickets there and back: </p></br>
 <ul>

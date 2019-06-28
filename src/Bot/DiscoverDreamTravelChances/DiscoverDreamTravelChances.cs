@@ -27,11 +27,12 @@
 
             chances = _filterChances.Execute(chances);
 
-            string message = _composeMessage.ExecuteHtml(chances);
+            var users = _getUsers.Execute();
 
-            foreach (var recipient in _getUsers.Execute())
+            foreach (var user in users)
             {
-                EmailAgent.Send(new DreamTravelChanceEmail(message, recipient.Email));
+                string message = _composeMessage.ExecuteHtml(chances, user.Name);
+                EmailAgent.Send(new DreamTravelChanceEmail(message, user.Email));
             }
         }
     }

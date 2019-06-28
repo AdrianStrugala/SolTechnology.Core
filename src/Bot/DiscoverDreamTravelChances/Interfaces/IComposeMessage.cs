@@ -6,6 +6,6 @@
     public interface IComposeMessage
     {
         string Execute(List<Chance> chances);
-        string ExecuteHtml(List<Chance> chances);
+        string ExecuteHtml(List<Chance> chances, string userName);
     }
 }
