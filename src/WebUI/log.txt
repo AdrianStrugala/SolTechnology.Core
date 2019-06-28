@@ -883,3 +883,4 @@ Parameter name: index
 2019-03-15 14:04:37,459 [8] WARN  DreamTravel.WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
 2019-03-15 14:05:00,549 [8] ERROR DreamTravel.WebUI.BestPath.DataAccess.DownloadCostBetweenTwoCities [(null)] - Cannot get data about cost between [Yichang Shi] and [Unnamed Road, Banan Qu, Chongqing Shi, China]
 2019-03-15 14:05:00,553 [10] ERROR DreamTravel.WebUI.BestPath.DataAccess.DownloadCostBetweenTwoCities [(null)] - Cannot get data about cost between [Unnamed Road, Banan Qu, Chongqing Shi, China] and [Yichang Shi]
+2019-06-28 13:55:11,407 [8] WARN  DreamTravel.WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
