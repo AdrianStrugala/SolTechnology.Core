@@ -157,9 +157,42 @@
 
         <hr class="line" ondrop="drop(event, map)" ondragover="allowDrop(event)" id="0">
 
-        <div id="listOfCities">
-        </div>
+        @* <div id="listOfCities">
+            *@
+            @*
+        </div> *@
 
+        <table>
+            <tbody>
+                <tr>
+                    <td>COL0</td>
+                    <td>COL1</td>
+                    <td>COL2</td>
+                </tr>
+                <tr>
+                    <td>c00</td>
+                    <td>c01</td>
+                    <td>c02</td>
+                </tr>
+                <tr>
+                    <td>c10</td>
+                    <td>c11</td>
+                    <td>c12</td>
+                </tr>
+                <tr>
+                    <td>c20</td>
+                    <td>c21</td>
+                    <td>c22</td>
+                </tr>
+            </tbody>
+        </table>
+        <table>
+            <tbody id="listOfCities">
+
+                <tr id="cityRow1"><textarea class="cityText" id="1" rows="1"></textarea><button type="button" class="btn btn-danger" id="1">X</button></tr>
+                <tr id="cityRow3"><textarea class="cityText" id="3" rows="1"></textarea><button type="button" class="btn btn-danger" id="3">X</button></tr>
+            </tbody>
+        </table>
         <button type="button" class="btn btn-success" onclick="addCity(map)" id="addCityBtn">+</button>
 
         <footer class="modal-footer">
@@ -212,44 +245,51 @@
     <div id="map"></div>
 
     @section Scripts
-        {
-        <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyC8ZkBAtPiwp0rk4SRdhH6vufM39eDMmHY&callback=initMap"
-                async defer>
-        </script>
+    {
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyC8ZkBAtPiwp0rk4SRdhH6vufM39eDMmHY&callback=initMap"
+            async defer>
+    </script>
 
-        <script>
-            function initMap() {
-                $("#pathsSummaryBtn")[0].style.display = "none";
-                $("#costLimiBtn")[0].style.display = "none";
-                sessionId = Guid();
-                directionsService = new window.google.maps.DirectionsService;
-                map = new window.google.maps.Map(document.getElementById('map'),
-                    {
-                        zoom: 4,
-                        center: { lat: 0, lng: 0 }
-                    });
-
-                addCity(map);
-
-                map.addListener('click', function (e) {
-                    addCityByMapClick(e.latLng, map);
+    <script>
+        function initMap() {
+            $("#pathsSummaryBtn")[0].style.display = "none";
+            $("#costLimiBtn")[0].style.display = "none";
+            sessionId = Guid();
+            directionsService = new window.google.maps.DirectionsService;
+            map = new window.google.maps.Map(document.getElementById('map'),
+                {
+                    zoom: 4,
+                    center: { lat: 0, lng: 0 }
                 });
 
-                $(document).keyup(function (event) {
-                    if (event.which == 13) { //Enter
-                        if (event.target.type === "textarea") { //removes the enter sign
-                            //event.preventDefault();
-                            var el = event.target.value;
-                            event.target.value = el.substring(0, el.length - 1);
-                        }
-                        addCity(map);
+            addCity(map);
+
+            map.addListener('click', function (e) {
+                addCityByMapClick(e.latLng, map);
+            });
+
+            $(document).keyup(function (event) {
+                if (event.which == 13) { //Enter
+                    if (event.target.type === "textarea") { //removes the enter sign
+                        //event.preventDefault();
+                        var el = event.target.value;
+                        event.target.value = el.substring(0, el.length - 1);
                     }
-                });
-            }
+                    addCity(map);
+                }
+            });
+        }
 
-            $("#costSlider")[0].oninput = function () {
-                $("#limitValue")[0].innerHTML = this.value + " €";
-            };
-        </script>
+        $("tbody").sortable({
+            appendTo: "parent",
+            helper: "clone"
+        });
+
+
+
+        $("#costSlider")[0].oninput = function () {
+            $("#limitValue")[0].innerHTML = this.value + " €";
+        };
+    </script>
     }
 </body>

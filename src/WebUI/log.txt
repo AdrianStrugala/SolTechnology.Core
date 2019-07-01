@@ -884,3 +884,58 @@ Parameter name: index
 2019-03-15 14:05:00,549 [8] ERROR DreamTravel.WebUI.BestPath.DataAccess.DownloadCostBetweenTwoCities [(null)] - Cannot get data about cost between [Yichang Shi] and [Unnamed Road, Banan Qu, Chongqing Shi, China]
 2019-03-15 14:05:00,553 [10] ERROR DreamTravel.WebUI.BestPath.DataAccess.DownloadCostBetweenTwoCities [(null)] - Cannot get data about cost between [Unnamed Road, Banan Qu, Chongqing Shi, China] and [Yichang Shi]
 2019-06-28 13:55:11,407 [8] WARN  DreamTravel.WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-07-01 14:18:31,524 [9] WARN  DreamTravel.WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-07-01 14:21:22,837 [8] WARN  DreamTravel.WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-07-01 14:21:28,208 [8] WARN  DreamTravel.WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-07-01 14:21:51,172 [9] WARN  DreamTravel.WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-07-01 14:31:12,342 [9] WARN  DreamTravel.WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-07-01 14:32:11,263 [9] WARN  DreamTravel.WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-07-01 14:39:12,293 [9] WARN  DreamTravel.WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-07-01 14:39:17,637 [23] WARN  DreamTravel.WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-07-01 14:39:18,215 [11] WARN  DreamTravel.WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-07-01 14:41:54,520 [8] WARN  DreamTravel.WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-07-01 14:42:00,564 [8] WARN  DreamTravel.WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-07-01 14:42:01,445 [11] WARN  DreamTravel.WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-07-01 14:44:20,834 [9] WARN  DreamTravel.WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-07-01 14:44:26,492 [13] WARN  DreamTravel.WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-07-01 14:44:27,348 [12] WARN  DreamTravel.WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-07-01 14:46:12,124 [9] WARN  DreamTravel.WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-07-01 14:46:17,875 [9] WARN  DreamTravel.WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-07-01 14:46:18,627 [8] WARN  DreamTravel.WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-07-01 14:58:50,955 [9] WARN  DreamTravel.WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-07-01 14:58:56,079 [9] WARN  DreamTravel.WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-07-01 14:58:56,804 [12] WARN  DreamTravel.WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-07-01 15:00:19,594 [9] WARN  DreamTravel.WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-07-01 15:00:24,546 [23] WARN  DreamTravel.WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-07-01 15:00:25,295 [10] WARN  DreamTravel.WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-07-01 15:03:31,570 [9] WARN  DreamTravel.WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-07-01 15:03:36,885 [13] WARN  DreamTravel.WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-07-01 15:03:37,446 [22] WARN  DreamTravel.WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-07-01 15:05:13,369 [8] WARN  DreamTravel.WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-07-01 15:05:18,306 [10] WARN  DreamTravel.WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-07-01 15:08:23,477 [9] WARN  DreamTravel.WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-07-01 15:08:29,208 [12] WARN  DreamTravel.WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-07-01 15:08:29,838 [10] WARN  DreamTravel.WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-07-01 15:10:10,862 [8] WARN  DreamTravel.WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-07-01 15:10:15,270 [22] WARN  DreamTravel.WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-07-01 15:10:16,296 [8] WARN  DreamTravel.WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-07-01 15:12:36,613 [9] WARN  DreamTravel.WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-07-01 15:12:42,205 [13] WARN  DreamTravel.WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-07-01 15:12:42,544 [9] WARN  DreamTravel.WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-07-01 15:15:46,607 [8] WARN  DreamTravel.WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-07-01 15:15:51,711 [9] WARN  DreamTravel.WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-07-01 15:18:41,532 [33] ERROR DreamTravel.WebUI.LocationOfCity.Controller [(null)] - System.IO.InvalidDataException: Cannot find city [oznan]
+   at DreamTravel.WebUI.LocationOfCity.FindLocationOfCity.<Execute>d__2.MoveNext() in C:\workspace\DreamTravel\src\WebUI\LocationOfCity\FindLocationOfCity.cs:line 42
+--- End of stack trace from previous location where exception was thrown ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter`1.GetResult()
+   at DreamTravel.WebUI.LocationOfCity.Controller.<FindLocationOfCity>d__4.MoveNext() in C:\workspace\DreamTravel\src\WebUI\LocationOfCity\Controller.cs:line 35
+2019-07-01 15:26:22,431 [8] WARN  DreamTravel.WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-07-01 15:26:27,319 [26] WARN  DreamTravel.WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-07-01 15:28:09,300 [8] WARN  DreamTravel.WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-07-01 15:28:14,322 [22] WARN  DreamTravel.WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-07-01 15:29:12,500 [12] WARN  DreamTravel.WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-07-01 15:29:29,165 [9] WARN  DreamTravel.WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-07-01 15:29:34,624 [9] WARN  DreamTravel.WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-07-01 15:29:35,617 [8] WARN  DreamTravel.WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header

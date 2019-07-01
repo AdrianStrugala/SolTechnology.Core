@@ -4,15 +4,15 @@
 
 function addCity(map) {
 
-    var div = document.createElement("div");
-    div.className = "cityRow";
-    div.id = "cityRow" + noOfCityRows.toString();
+    var tr = document.createElement("tr");
+    tr.className = "ui-sortable-handle";
+    tr.id = "cityRow" + noOfCityRows.toString();
 
-    var hr = document.createElement("hr");
-    hr.className = "line";
-    hr.id = (noOfCityRows +1).toString(); //line is below city
-    hr.ondrop = ev => { drop(ev, map) };
-    hr.ondragover = ev => { allowDrop(ev) };
+//    var hr = document.createElement("hr");
+//    hr.className = "line";
+//    hr.id = (noOfCityRows +1).toString(); //line is below city
+//    hr.ondrop = ev => { drop(ev, map) };
+//    hr.ondragover = ev => { allowDrop(ev) };
 
     var textArea = document.createElement("textarea");
     textArea.className = "cityText";
@@ -21,7 +21,7 @@ function addCity(map) {
     textArea.onchange = function () {
         findAndDisplayCity(this, map);
     }
-    textArea.draggable = true;
+//    textArea.draggable = true;
     textArea.ondragstart = ev => { drag(ev) }
 
     var button = document.createElement("button");
@@ -34,11 +34,11 @@ function addCity(map) {
     button.id = noOfCityRows.toString();
     button.innerHTML = "X";
 
-    div.appendChild(textArea);
-    div.appendChild(button);
-    div.appendChild(hr);
+    tr.appendChild(textArea);
+    tr.appendChild(button);
+//    div.appendChild(hr);
 
-    $("#listOfCities")[0].appendChild(div);
+    $("#listOfCities")[0].appendChild(tr);
     textArea.focus();
 
     cities.push(null);
