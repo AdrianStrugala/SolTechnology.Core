@@ -3,26 +3,28 @@
     var sourceIndex = evt.oldIndex;
     var targetIndex = evt.newIndex;
 
+    if (sourceIndex != targetIndex) {
 
-    //If move up
-    if (sourceIndex > targetIndex) {
-        var temp = cities[sourceIndex];
+        //If move up
+        if (sourceIndex > targetIndex) {
+            var temp = cities[sourceIndex];
 
-        for (var i = sourceIndex; i > targetIndex; i--) {
-            cities[i] = cities[i - 1];
+            for (var i = sourceIndex; i > targetIndex; i--) {
+                cities[i] = cities[i - 1];
+            }
+            cities[targetIndex] = temp;
         }
-        cities[targetIndex] = temp;
-    }
-    //If move down
-    else if (sourceIndex < targetIndex) {
-        var temp = cities[sourceIndex];
+        //If move down
+        else if (sourceIndex < targetIndex) {
+            var temp = cities[sourceIndex];
 
-        for (var i = sourceIndex; i <= targetIndex; i++) {
-            cities[i] = cities[i + 1];
+            for (var i = sourceIndex; i <= targetIndex; i++) {
+                cities[i] = cities[i + 1];
+            }
+            cities[targetIndex] = temp;
         }
-        cities[targetIndex] = temp;
-    }
 
-    (<HTMLInputElement>$("#optimizeRoad")[0]).checked = false;
-    runTSP(map);
+        (<HTMLInputElement>$("#optimizeRoad")[0]).checked = false;
+        runTSP(map);
+    }
 }

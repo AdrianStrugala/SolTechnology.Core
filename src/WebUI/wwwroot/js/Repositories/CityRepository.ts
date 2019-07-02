@@ -8,13 +8,6 @@ function addCity(map) {
     tr.className = "list-group-item cityRow";
     tr.id = "cityRow" + noOfCityRows.toString();
 
-    //    var hr = document.createElement("hr");
-    //    hr.className = "line";
-    //    hr.id = (noOfCityRows +1).toString(); //line is below city
-//    hr.ondrop = ev => { drop(ev, map) };
-//    hr.ondragover = ev => { allowDrop(ev) };
-
-    //    <i class="fas fa-arrows-alt handle" > </i>
     var i = document.createElement("i");
     i.className = "fas fa-arrows-alt handle";
 

@@ -49,7 +49,7 @@ function displayRoute(directionsService, map, path) {
                     routeString += "unknown";
                 }
                 else {
-                    routeString += totalCost.toFixed(2);
+                    routeString += path.OptimalCost.toFixed(2);
                 }
                
                 routeString +=

@@ -53,6 +53,12 @@ label {
     text-align: center;
 }
 
+.btn-success {
+    float: right;
+    margin-right: 0.6rem;
+    margin-top: 0.6rem;
+}
+
 .cityText {
     margin-top: 0.2rem;
     margin-left: 0.5rem;
@@ -68,6 +74,7 @@ label {
     background-image: -webkit-gradient(linear, left top, left bottom, from(#2fa4e7), color-stop(60%, #2fa4e7), to(#2fa4e7));
     background-color: #2FA4E7;
     border-color: #2FA4E7;
+    margin-top: 2.5rem;
 }
 
 .handle {

@@ -19,7 +19,7 @@
             routeString += "unknown";
         }
         else {
-            routeString += totalCost.toFixed(2);
+            routeString += pathList[i].OptimalCost.toFixed(2);
         }
        
         routeString +=
