@@ -155,43 +155,8 @@
         <h4 class="modal-title" align="center"> List of cities:</h4>
         <br />
 
-        <hr class="line" ondrop="drop(event, map)" ondragover="allowDrop(event)" id="0">
-
-        @* <div id="listOfCities">
-            *@
-            @*
-        </div> *@
-
         <table>
-            <tbody>
-                <tr>
-                    <td>COL0</td>
-                    <td>COL1</td>
-                    <td>COL2</td>
-                </tr>
-                <tr>
-                    <td>c00</td>
-                    <td>c01</td>
-                    <td>c02</td>
-                </tr>
-                <tr>
-                    <td>c10</td>
-                    <td>c11</td>
-                    <td>c12</td>
-                </tr>
-                <tr>
-                    <td>c20</td>
-                    <td>c21</td>
-                    <td>c22</td>
-                </tr>
-            </tbody>
-        </table>
-        <table>
-            <tbody id="listOfCities">
-
-                <tr id="cityRow1"><textarea class="cityText" id="1" rows="1"></textarea><button type="button" class="btn btn-danger" id="1">X</button></tr>
-                <tr id="cityRow3"><textarea class="cityText" id="3" rows="1"></textarea><button type="button" class="btn btn-danger" id="3">X</button></tr>
-            </tbody>
+            <tbody id="listOfCities"></tbody>
         </table>
         <button type="button" class="btn btn-success" onclick="addCity(map)" id="addCityBtn">+</button>
 
@@ -264,9 +229,10 @@
 
             addCity(map);
 
-            map.addListener('click', function (e) {
-                addCityByMapClick(e.latLng, map);
-            });
+            map.addListener('click',
+                function (e) {
+                    addCityByMapClick(e.latLng, map);
+                });
 
             $(document).keyup(function (event) {
                 if (event.which == 13) { //Enter
@@ -280,11 +246,14 @@
             });
         }
 
-        $("tbody").sortable({
-            appendTo: "parent",
-            helper: "clone"
+        Sortable.create(document.getElementById('listOfCities'), {
+            handle: '.handle',
+            animation: 150,
+            ghostClass: 'blue-background-class',
+            onEnd: function (evt) {
+                drop(evt, map);
+            }
         });
-
 
 
         $("#costSlider")[0].oninput = function () {
