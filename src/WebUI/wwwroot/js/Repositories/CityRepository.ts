@@ -8,8 +8,8 @@ function addCity(map) {
     tr.className = "list-group-item cityRow";
     tr.id = "cityRow" + noOfCityRows.toString();
 
-    var i = document.createElement("i");
-    i.className = "fas fa-arrows-alt handle";
+    var handler = document.createElement("i");
+    handler.className = "fas fa-arrows-alt handle";
 
     var textArea = document.createElement("textarea");
     textArea.className = "cityText";
@@ -19,19 +19,18 @@ function addCity(map) {
         findAndDisplayCity(this, map);
     }
 
-    var button = document.createElement("button");
-    button.type = "button";
-    button.className = "btn btn-danger";
-    button.onclick = function () {
+    var removeCityBtn = document.createElement("i");
+    removeCityBtn.className = "fas fa-times-circle removeCityBtn";
+    removeCityBtn.onclick = function () {
         var index = findIndexByCity(this);
         removeCity(index);
     }
-    button.id = noOfCityRows.toString();
-    button.innerHTML = "X";
+    removeCityBtn.id = noOfCityRows.toString();
 
-    tr.appendChild(i);
+
+    tr.appendChild(handler);
     tr.appendChild(textArea);
-    tr.appendChild(button);
+    tr.appendChild(removeCityBtn);
 
     $("#listOfCities")[0].appendChild(tr);
     textArea.focus();

@@ -1023,3 +1023,38 @@ Parameter name: index
    at System.Runtime.CompilerServices.TaskAwaiter`1.GetResult()
    at DreamTravel.WebUI.BestPath.Controller.<CalculateBestPath>d__5.MoveNext() in C:\workspace\DreamTravel\src\WebUI\BestPath\Controller.cs:line 35
 2019-07-02 12:21:54,104 [8] WARN  DreamTravel.WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-07-02 14:30:16,529 [8] WARN  DreamTravel.WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-07-02 14:39:57,524 [8] WARN  DreamTravel.WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-07-02 14:47:09,062 [8] WARN  DreamTravel.WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-07-02 14:48:18,562 [8] WARN  DreamTravel.WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-07-02 14:54:26,632 [8] WARN  DreamTravel.WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-07-02 15:08:54,551 [9] WARN  DreamTravel.WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-07-02 15:13:15,323 [8] WARN  DreamTravel.WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-07-02 15:19:34,305 [8] ERROR DreamTravel.WebUI.BestPath.Controller [(null)] - System.ArgumentOutOfRangeException: Index was out of range. Must be non-negative and less than the size of the collection.
+Parameter name: index
+   at System.ThrowHelper.ThrowArgumentOutOfRange_IndexException()
+   at System.Collections.Generic.List`1.set_Item(Int32 index, T value)
+   at DreamTravel.TravelingSalesmanProblem.AntColony.ClearProbabilityRowsForGivenPoint(Int32 nr, List`1 probabilityMatrix) in C:\workspace\DreamTravel\src\TravelingSalesmanProblem\AntColony.cs:line 195
+   at DreamTravel.TravelingSalesmanProblem.AntColony.CalculatePathForSingleAnt() in C:\workspace\DreamTravel\src\TravelingSalesmanProblem\AntColony.cs:line 101
+   at DreamTravel.TravelingSalesmanProblem.AntColony.SolveTSP(List`1 distances) in C:\workspace\DreamTravel\src\TravelingSalesmanProblem\AntColony.cs:line 40
+   at DreamTravel.WebUI.BestPath.Executors.CalculateBestPath.<Execute>d__5.MoveNext() in C:\workspace\DreamTravel\src\WebUI\BestPath\Executors\CalculateBestPath.cs:line 36
+--- End of stack trace from previous location where exception was thrown ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter`1.GetResult()
+   at DreamTravel.WebUI.BestPath.Controller.<CalculateBestPath>d__5.MoveNext() in C:\workspace\DreamTravel\src\WebUI\BestPath\Controller.cs:line 35
+2019-07-02 15:20:07,441 [59] ERROR DreamTravel.WebUI.BestPath.Controller [(null)] - System.ArgumentOutOfRangeException: Index was out of range. Must be non-negative and less than the size of the collection.
+Parameter name: index
+   at System.ThrowHelper.ThrowArgumentOutOfRange_IndexException()
+   at System.Collections.Generic.List`1.set_Item(Int32 index, T value)
+   at DreamTravel.TravelingSalesmanProblem.AntColony.ClearProbabilityRowsForGivenPoint(Int32 nr, List`1 probabilityMatrix) in C:\workspace\DreamTravel\src\TravelingSalesmanProblem\AntColony.cs:line 195
+   at DreamTravel.TravelingSalesmanProblem.AntColony.CalculatePathForSingleAnt() in C:\workspace\DreamTravel\src\TravelingSalesmanProblem\AntColony.cs:line 101
+   at DreamTravel.TravelingSalesmanProblem.AntColony.SolveTSP(List`1 distances) in C:\workspace\DreamTravel\src\TravelingSalesmanProblem\AntColony.cs:line 40
+   at DreamTravel.WebUI.BestPath.Executors.CalculateBestPath.<Execute>d__5.MoveNext() in C:\workspace\DreamTravel\src\WebUI\BestPath\Executors\CalculateBestPath.cs:line 36
+--- End of stack trace from previous location where exception was thrown ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter`1.GetResult()
+   at DreamTravel.WebUI.BestPath.Controller.<CalculateBestPath>d__5.MoveNext() in C:\workspace\DreamTravel\src\WebUI\BestPath\Controller.cs:line 35
+2019-07-02 15:22:09,060 [9] WARN  DreamTravel.WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-07-02 15:24:38,133 [9] WARN  DreamTravel.WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header

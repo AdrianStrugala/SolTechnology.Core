@@ -46,24 +46,31 @@ label {
     position: relative;
 }
 
-.btn-danger {
-    vertical-align: top;
+.removeCityBtn {
+    vertical-align: middle;
     margin: 0;
     resize: none;
     text-align: center;
+    color: #C71C22;
+    cursor: pointer;
+    font-size: larger;
+    margin-right: 0.6rem
 }
 
-.btn-success {
+.addCityBtn {
     float: right;
     margin-right: 0.6rem;
     margin-top: 0.6rem;
+    color: #73A839;
+    cursor: pointer;
+    font-size: larger;
 }
 
 .cityText {
     margin-top: 0.2rem;
     margin-left: 0.5rem;
     margin-right: 0.5rem;
-    width: 10rem;
+    width: 11rem;
     resize: none;
     overflow: hidden;
     height: inherit;
@@ -74,7 +81,7 @@ label {
     background-image: -webkit-gradient(linear, left top, left bottom, from(#2fa4e7), color-stop(60%, #2fa4e7), to(#2fa4e7));
     background-color: #2FA4E7;
     border-color: #2FA4E7;
-    margin-top: 2.5rem;
+    margin-top: 1rem;
 }
 
 .handle {
