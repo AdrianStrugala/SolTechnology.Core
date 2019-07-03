@@ -1,0 +1,21 @@
+﻿<!DOCTYPE html>
+<!-- Limit Cost Modal -->
+<div id="limitCostModal" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Change limit of toll fee:</h4>
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <label id="limitValue"></label>
+                <input type="range" min="0" max="100" value="0" class="slider" id="costSlider">
+            </div>
+            <footer class="modal-footer">
+                <button type="button" class="btn btn-info" id="runLimitBtn" onclick="limitCost(map)" data-dismiss="modal">Apply</button>
+            </footer>
+        </div>
+    </div>
+</div>

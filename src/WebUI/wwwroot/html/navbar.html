@@ -1,0 +1,41 @@
+﻿<!DOCTYPE html>
+<!-- Navbar -->
+<div class="navbar navbar-expand-lg fixed-top navbar-dark bg-primary">
+    <div class="container">
+
+        <!-- Title text -->
+        <a href="" class="navbar-brand">Dream Travel</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarResponsive">
+            <ul class="navbar-nav">
+
+                <!-- Instruction button -->
+                <li class="nav-item">
+                    <button type="button" class="btn btn-outline-secondary" data-toggle="modal" data-target="#instructionModal" id="instructionBtn" display="none">Info</button>
+                </li>
+
+                <!-- Save screenshot button -->
+                <li class="nav-item">
+                    <button type="button" class="btn btn-outline-secondary" onclick="saveMap()" id="saveMapBtn" display="none">Save map</button>
+                </li>
+
+                <!-- Display Paths Summary button -->
+                <li class="nav-item">
+                    <button type="button" class="btn btn-outline-secondary" data-toggle="modal" data-target="#pathsSummaryModal" id="pathsSummaryBtn" display="none">Paths summary</button>
+                </li>
+
+                <!-- Cost limit button -->
+                <li class="nav-item">
+                    <button type="button" class="btn btn-outline-secondary" data-toggle="modal" data-target="#limitCostModal" id="costLimiBtn" display="none">Change cost limit</button>
+                </li>
+
+                <!-- Info text -->
+                <li class="nav-item" id="infoText">
+                </li>
+            </ul>
+
+        </div>
+    </div>
+</div>
