@@ -89,3 +89,8 @@ label {
     vertical-align: sub;
     cursor: grab;
 }
+
+.blue-ghost {
+    background-color: #2fa4e7;
+    opacity: .5;
+}

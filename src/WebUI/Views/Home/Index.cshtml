@@ -62,6 +62,7 @@
         Sortable.create(document.getElementById('listOfCities'), {
             handle: '.handle',
             animation: 150,
+            ghostClass: 'blue-ghost',
             onEnd: function (evt) {
                 drop(evt, map);
             }
