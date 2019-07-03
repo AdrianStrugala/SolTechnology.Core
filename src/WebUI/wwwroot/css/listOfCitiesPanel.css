@@ -53,23 +53,23 @@ label {
     text-align: center;
     color: #C71C22;
     cursor: pointer;
-    font-size: larger;
-    margin-right: 0.5rem
+    font-size: x-large;
+    margin-right: 0.3rem
 }
 
 .addCityBtn {
     float: right;
-    margin-right: 0.6rem;
+    margin-right: 0.4rem;
     margin-top: 0.6rem;
     color: #73A839;
     cursor: pointer;
-    font-size: larger;
+    font-size: x-large;
 }
 
 .cityText {
     margin-top: 0.2rem;
     margin-left: 0.5rem;
-    margin-right: 0.5rem;
+    margin-right: 0.4rem;
     width: 11rem;
     resize: none;
     overflow: hidden;
