@@ -884,3 +884,187 @@ Parameter name: index
 2019-03-15 14:05:00,549 [8] ERROR DreamTravel.WebUI.BestPath.DataAccess.DownloadCostBetweenTwoCities [(null)] - Cannot get data about cost between [Yichang Shi] and [Unnamed Road, Banan Qu, Chongqing Shi, China]
 2019-03-15 14:05:00,553 [10] ERROR DreamTravel.WebUI.BestPath.DataAccess.DownloadCostBetweenTwoCities [(null)] - Cannot get data about cost between [Unnamed Road, Banan Qu, Chongqing Shi, China] and [Yichang Shi]
 2019-06-28 13:55:11,407 [8] WARN  DreamTravel.WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-07-01 14:18:31,524 [9] WARN  DreamTravel.WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-07-01 14:21:22,837 [8] WARN  DreamTravel.WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-07-01 14:21:28,208 [8] WARN  DreamTravel.WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-07-01 14:21:51,172 [9] WARN  DreamTravel.WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-07-01 14:31:12,342 [9] WARN  DreamTravel.WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-07-01 14:32:11,263 [9] WARN  DreamTravel.WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-07-01 14:39:12,293 [9] WARN  DreamTravel.WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-07-01 14:39:17,637 [23] WARN  DreamTravel.WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-07-01 14:39:18,215 [11] WARN  DreamTravel.WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-07-01 14:41:54,520 [8] WARN  DreamTravel.WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-07-01 14:42:00,564 [8] WARN  DreamTravel.WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-07-01 14:42:01,445 [11] WARN  DreamTravel.WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-07-01 14:44:20,834 [9] WARN  DreamTravel.WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-07-01 14:44:26,492 [13] WARN  DreamTravel.WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-07-01 14:44:27,348 [12] WARN  DreamTravel.WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-07-01 14:46:12,124 [9] WARN  DreamTravel.WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-07-01 14:46:17,875 [9] WARN  DreamTravel.WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-07-01 14:46:18,627 [8] WARN  DreamTravel.WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-07-01 14:58:50,955 [9] WARN  DreamTravel.WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-07-01 14:58:56,079 [9] WARN  DreamTravel.WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-07-01 14:58:56,804 [12] WARN  DreamTravel.WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-07-01 15:00:19,594 [9] WARN  DreamTravel.WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-07-01 15:00:24,546 [23] WARN  DreamTravel.WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-07-01 15:00:25,295 [10] WARN  DreamTravel.WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-07-01 15:03:31,570 [9] WARN  DreamTravel.WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-07-01 15:03:36,885 [13] WARN  DreamTravel.WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-07-01 15:03:37,446 [22] WARN  DreamTravel.WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-07-01 15:05:13,369 [8] WARN  DreamTravel.WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-07-01 15:05:18,306 [10] WARN  DreamTravel.WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-07-01 15:08:23,477 [9] WARN  DreamTravel.WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-07-01 15:08:29,208 [12] WARN  DreamTravel.WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-07-01 15:08:29,838 [10] WARN  DreamTravel.WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-07-01 15:10:10,862 [8] WARN  DreamTravel.WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-07-01 15:10:15,270 [22] WARN  DreamTravel.WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-07-01 15:10:16,296 [8] WARN  DreamTravel.WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-07-01 15:12:36,613 [9] WARN  DreamTravel.WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-07-01 15:12:42,205 [13] WARN  DreamTravel.WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-07-01 15:12:42,544 [9] WARN  DreamTravel.WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-07-01 15:15:46,607 [8] WARN  DreamTravel.WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-07-01 15:15:51,711 [9] WARN  DreamTravel.WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-07-01 15:18:41,532 [33] ERROR DreamTravel.WebUI.LocationOfCity.Controller [(null)] - System.IO.InvalidDataException: Cannot find city [oznan]
+   at DreamTravel.WebUI.LocationOfCity.FindLocationOfCity.<Execute>d__2.MoveNext() in C:\workspace\DreamTravel\src\WebUI\LocationOfCity\FindLocationOfCity.cs:line 42
+--- End of stack trace from previous location where exception was thrown ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter`1.GetResult()
+   at DreamTravel.WebUI.LocationOfCity.Controller.<FindLocationOfCity>d__4.MoveNext() in C:\workspace\DreamTravel\src\WebUI\LocationOfCity\Controller.cs:line 35
+2019-07-01 15:26:22,431 [8] WARN  DreamTravel.WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-07-01 15:26:27,319 [26] WARN  DreamTravel.WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-07-01 15:28:09,300 [8] WARN  DreamTravel.WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-07-01 15:28:14,322 [22] WARN  DreamTravel.WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-07-01 15:29:12,500 [12] WARN  DreamTravel.WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-07-01 15:29:29,165 [9] WARN  DreamTravel.WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-07-01 15:29:34,624 [9] WARN  DreamTravel.WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-07-01 15:29:35,617 [8] WARN  DreamTravel.WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-07-02 08:21:08,252 [8] WARN  DreamTravel.WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-07-02 08:21:12,836 [11] WARN  DreamTravel.WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-07-02 08:23:30,110 [8] ERROR DreamTravel.WebUI.LocationOfCity.Controller [(null)] - System.IO.InvalidDataException: Cannot find city []
+   at DreamTravel.WebUI.LocationOfCity.FindLocationOfCity.<Execute>d__2.MoveNext() in C:\workspace\DreamTravel\src\WebUI\LocationOfCity\FindLocationOfCity.cs:line 42
+--- End of stack trace from previous location where exception was thrown ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter`1.GetResult()
+   at DreamTravel.WebUI.LocationOfCity.Controller.<FindLocationOfCity>d__4.MoveNext() in C:\workspace\DreamTravel\src\WebUI\LocationOfCity\Controller.cs:line 35
+2019-07-02 09:02:06,635 [9] WARN  DreamTravel.WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-07-02 09:03:24,285 [31] WARN  DreamTravel.WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-07-02 09:03:39,573 [8] WARN  DreamTravel.WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-07-02 09:07:43,647 [8] WARN  DreamTravel.WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-07-02 09:10:19,891 [9] WARN  DreamTravel.WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-07-02 09:35:01,347 [8] WARN  DreamTravel.WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-07-02 09:36:08,961 [9] WARN  DreamTravel.WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-07-02 09:36:42,952 [8] WARN  DreamTravel.WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-07-02 09:37:41,759 [9] WARN  DreamTravel.WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-07-02 09:38:10,774 [8] WARN  DreamTravel.WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-07-02 09:57:09,904 [10] WARN  DreamTravel.WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-07-02 10:10:30,290 [8] WARN  DreamTravel.WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-07-02 10:13:18,419 [8] WARN  DreamTravel.WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-07-02 10:15:51,093 [8] WARN  DreamTravel.WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-07-02 10:20:22,408 [9] WARN  DreamTravel.WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-07-02 10:22:35,549 [8] WARN  DreamTravel.WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-07-02 10:25:12,932 [10] WARN  DreamTravel.WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-07-02 10:27:54,884 [8] WARN  DreamTravel.WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-07-02 10:28:51,059 [8] WARN  DreamTravel.WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-07-02 10:30:15,284 [8] WARN  DreamTravel.WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-07-02 10:33:07,854 [9] WARN  DreamTravel.WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-07-02 10:33:31,148 [9] WARN  DreamTravel.WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-07-02 10:34:10,490 [10] WARN  DreamTravel.WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-07-02 10:34:41,381 [9] WARN  DreamTravel.WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-07-02 10:35:52,602 [8] WARN  DreamTravel.WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-07-02 10:37:57,257 [9] WARN  DreamTravel.WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-07-02 10:40:11,181 [9] WARN  DreamTravel.WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-07-02 10:41:49,327 [8] WARN  DreamTravel.WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-07-02 10:43:05,293 [9] WARN  DreamTravel.WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-07-02 10:44:43,110 [9] WARN  DreamTravel.WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-07-02 10:51:14,515 [9] WARN  DreamTravel.WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-07-02 10:52:22,112 [8] WARN  DreamTravel.WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-07-02 10:53:41,447 [9] WARN  DreamTravel.WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-07-02 11:00:09,808 [9] WARN  DreamTravel.WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-07-02 11:01:30,650 [8] WARN  DreamTravel.WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-07-02 11:01:51,699 [8] ERROR DreamTravel.WebUI.BestPath.Controller [(null)] - System.IndexOutOfRangeException: Index was outside the bounds of the array.
+   at DreamTravel.WebUI.BestPath.Executors.DownloadRoadData.SetTablesValueAsMax(EvaluationMatrix evaluationMatrix, Int32 iterator) in C:\workspace\DreamTravel\src\WebUI\BestPath\Executors\DownloadRoadData.cs:line 60
+   at DreamTravel.WebUI.BestPath.Executors.DownloadRoadData.<Execute>d__4.MoveNext() in C:\workspace\DreamTravel\src\WebUI\BestPath\Executors\DownloadRoadData.cs:line 27
+--- End of stack trace from previous location where exception was thrown ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter`1.GetResult()
+   at DreamTravel.WebUI.BestPath.Executors.CalculateBestPath.<Execute>d__5.MoveNext() in C:\workspace\DreamTravel\src\WebUI\BestPath\Executors\CalculateBestPath.cs:line 29
+--- End of stack trace from previous location where exception was thrown ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter`1.GetResult()
+   at DreamTravel.WebUI.BestPath.Controller.<CalculateBestPath>d__5.MoveNext() in C:\workspace\DreamTravel\src\WebUI\BestPath\Controller.cs:line 35
+2019-07-02 11:02:28,885 [8] WARN  DreamTravel.WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-07-02 11:05:22,773 [8] WARN  DreamTravel.WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-07-02 11:06:13,249 [9] WARN  DreamTravel.WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-07-02 11:07:31,660 [8] WARN  DreamTravel.WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-07-02 11:09:32,524 [8] WARN  DreamTravel.WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-07-02 11:14:01,535 [8] WARN  DreamTravel.WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-07-02 11:16:48,466 [9] WARN  DreamTravel.WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-07-02 11:20:29,120 [9] WARN  DreamTravel.WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-07-02 11:23:52,474 [9] WARN  DreamTravel.WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-07-02 11:30:27,644 [9] WARN  DreamTravel.WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-07-02 11:42:07,133 [8] WARN  DreamTravel.WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-07-02 12:06:57,784 [10] WARN  DreamTravel.WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-07-02 12:17:46,028 [8] WARN  DreamTravel.WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-07-02 12:21:07,970 [9] ERROR DreamTravel.WebUI.BestPath.Controller [(null)] - System.IndexOutOfRangeException: Index was outside the bounds of the array.
+   at DreamTravel.WebUI.BestPath.Executors.DownloadRoadData.SetTablesValueAsMax(EvaluationMatrix evaluationMatrix, Int32 iterator) in C:\workspace\DreamTravel\src\WebUI\BestPath\Executors\DownloadRoadData.cs:line 60
+   at DreamTravel.WebUI.BestPath.Executors.DownloadRoadData.<Execute>d__4.MoveNext() in C:\workspace\DreamTravel\src\WebUI\BestPath\Executors\DownloadRoadData.cs:line 27
+--- End of stack trace from previous location where exception was thrown ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter`1.GetResult()
+   at DreamTravel.WebUI.BestPath.Executors.CalculateBestPath.<Execute>d__5.MoveNext() in C:\workspace\DreamTravel\src\WebUI\BestPath\Executors\CalculateBestPath.cs:line 29
+--- End of stack trace from previous location where exception was thrown ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter`1.GetResult()
+   at DreamTravel.WebUI.BestPath.Controller.<CalculateBestPath>d__5.MoveNext() in C:\workspace\DreamTravel\src\WebUI\BestPath\Controller.cs:line 35
+2019-07-02 12:21:54,104 [8] WARN  DreamTravel.WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-07-02 14:30:16,529 [8] WARN  DreamTravel.WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-07-02 14:39:57,524 [8] WARN  DreamTravel.WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-07-02 14:47:09,062 [8] WARN  DreamTravel.WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-07-02 14:48:18,562 [8] WARN  DreamTravel.WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-07-02 14:54:26,632 [8] WARN  DreamTravel.WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-07-02 15:08:54,551 [9] WARN  DreamTravel.WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-07-02 15:13:15,323 [8] WARN  DreamTravel.WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-07-02 15:19:34,305 [8] ERROR DreamTravel.WebUI.BestPath.Controller [(null)] - System.ArgumentOutOfRangeException: Index was out of range. Must be non-negative and less than the size of the collection.
+Parameter name: index
+   at System.ThrowHelper.ThrowArgumentOutOfRange_IndexException()
+   at System.Collections.Generic.List`1.set_Item(Int32 index, T value)
+   at DreamTravel.TravelingSalesmanProblem.AntColony.ClearProbabilityRowsForGivenPoint(Int32 nr, List`1 probabilityMatrix) in C:\workspace\DreamTravel\src\TravelingSalesmanProblem\AntColony.cs:line 195
+   at DreamTravel.TravelingSalesmanProblem.AntColony.CalculatePathForSingleAnt() in C:\workspace\DreamTravel\src\TravelingSalesmanProblem\AntColony.cs:line 101
+   at DreamTravel.TravelingSalesmanProblem.AntColony.SolveTSP(List`1 distances) in C:\workspace\DreamTravel\src\TravelingSalesmanProblem\AntColony.cs:line 40
+   at DreamTravel.WebUI.BestPath.Executors.CalculateBestPath.<Execute>d__5.MoveNext() in C:\workspace\DreamTravel\src\WebUI\BestPath\Executors\CalculateBestPath.cs:line 36
+--- End of stack trace from previous location where exception was thrown ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter`1.GetResult()
+   at DreamTravel.WebUI.BestPath.Controller.<CalculateBestPath>d__5.MoveNext() in C:\workspace\DreamTravel\src\WebUI\BestPath\Controller.cs:line 35
+2019-07-02 15:20:07,441 [59] ERROR DreamTravel.WebUI.BestPath.Controller [(null)] - System.ArgumentOutOfRangeException: Index was out of range. Must be non-negative and less than the size of the collection.
+Parameter name: index
+   at System.ThrowHelper.ThrowArgumentOutOfRange_IndexException()
+   at System.Collections.Generic.List`1.set_Item(Int32 index, T value)
+   at DreamTravel.TravelingSalesmanProblem.AntColony.ClearProbabilityRowsForGivenPoint(Int32 nr, List`1 probabilityMatrix) in C:\workspace\DreamTravel\src\TravelingSalesmanProblem\AntColony.cs:line 195
+   at DreamTravel.TravelingSalesmanProblem.AntColony.CalculatePathForSingleAnt() in C:\workspace\DreamTravel\src\TravelingSalesmanProblem\AntColony.cs:line 101
+   at DreamTravel.TravelingSalesmanProblem.AntColony.SolveTSP(List`1 distances) in C:\workspace\DreamTravel\src\TravelingSalesmanProblem\AntColony.cs:line 40
+   at DreamTravel.WebUI.BestPath.Executors.CalculateBestPath.<Execute>d__5.MoveNext() in C:\workspace\DreamTravel\src\WebUI\BestPath\Executors\CalculateBestPath.cs:line 36
+--- End of stack trace from previous location where exception was thrown ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter`1.GetResult()
+   at DreamTravel.WebUI.BestPath.Controller.<CalculateBestPath>d__5.MoveNext() in C:\workspace\DreamTravel\src\WebUI\BestPath\Controller.cs:line 35
+2019-07-02 15:22:09,060 [9] WARN  DreamTravel.WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-07-02 15:24:38,133 [9] WARN  DreamTravel.WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-07-02 19:06:55,367 [9] WARN  DreamTravel.WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-07-02 19:08:02,741 [10] WARN  DreamTravel.WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-07-02 19:16:40,586 [8] WARN  DreamTravel.WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-07-02 19:17:10,274 [8] WARN  DreamTravel.WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-07-03 08:07:38,018 [8] WARN  DreamTravel.WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-07-03 08:10:53,428 [8] WARN  DreamTravel.WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-07-03 08:13:20,832 [9] WARN  DreamTravel.WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-07-03 08:37:44,225 [9] WARN  DreamTravel.WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-07-03 08:38:44,978 [8] WARN  DreamTravel.WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-07-03 08:58:37,194 [8] WARN  DreamTravel.WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header

@@ -4,15 +4,12 @@
 
 function addCity(map) {
 
-    var div = document.createElement("div");
-    div.className = "cityRow";
-    div.id = "cityRow" + noOfCityRows.toString();
+    var tr = document.createElement("tr");
+    tr.className = "list-group-item cityRow";
+    tr.id = "cityRow" + noOfCityRows.toString();
 
-    var hr = document.createElement("hr");
-    hr.className = "line";
-    hr.id = (noOfCityRows +1).toString(); //line is below city
-    hr.ondrop = ev => { drop(ev, map) };
-    hr.ondragover = ev => { allowDrop(ev) };
+    var handler = document.createElement("i");
+    handler.className = "fas fa-arrows-alt handle";
 
     var textArea = document.createElement("textarea");
     textArea.className = "cityText";
@@ -21,24 +18,21 @@ function addCity(map) {
     textArea.onchange = function () {
         findAndDisplayCity(this, map);
     }
-    textArea.draggable = true;
-    textArea.ondragstart = ev => { drag(ev) }
 
-    var button = document.createElement("button");
-    button.type = "button";
-    button.className = "btn btn-danger";
-    button.onclick = function () {
+    var removeCityBtn = document.createElement("i");
+    removeCityBtn.className = "fas fa-times-circle removeCityBtn";
+    removeCityBtn.onclick = function () {
         var index = findIndexByCity(this);
         removeCity(index);
     }
-    button.id = noOfCityRows.toString();
-    button.innerHTML = "X";
+    removeCityBtn.id = noOfCityRows.toString();
 
-    div.appendChild(textArea);
-    div.appendChild(button);
-    div.appendChild(hr);
 
-    $("#listOfCities")[0].appendChild(div);
+    tr.appendChild(handler);
+    tr.appendChild(textArea);
+    tr.appendChild(removeCityBtn);
+
+    $("#listOfCities")[0].appendChild(tr);
     textArea.focus();
 
     cities.push(null);

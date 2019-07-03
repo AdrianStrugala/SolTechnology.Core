@@ -5,251 +5,73 @@
 
 <body style="margin: 0;">
 
-    <!-- Navbar -->
-    <div class="navbar navbar-expand-lg fixed-top navbar-dark bg-primary">
-        <div class="container">
+    @Html.Partial("~/wwwroot/html/navbar.html")
 
-            <!-- Title text -->
-            <a href="" class="navbar-brand">Dream Travel</a>
-            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarResponsive">
-                <ul class="navbar-nav">
-
-                    <!-- Instruction button -->
-                    <li class="nav-item">
-                        <button type="button" class="btn btn-outline-secondary" data-toggle="modal" data-target="#instructionModal" id="instructionBtn" display="none">Info</button>
-                    </li>
-
-                    <!-- Save screenshot button -->
-                    <li class="nav-item">
-                        <button type="button" class="btn btn-outline-secondary" onclick="saveMap()" id="saveMapBtn" display="none">Save map</button>
-                    </li>
-
-                    <!-- Display Paths Summary button -->
-                    <li class="nav-item">
-                        <button type="button" class="btn btn-outline-secondary" data-toggle="modal" data-target="#pathsSummaryModal" id="pathsSummaryBtn" display="none">Paths summary</button>
-                    </li>
-
-                    <!-- Cost limit button -->
-                    <li class="nav-item">
-                        <button type="button" class="btn btn-outline-secondary" data-toggle="modal" data-target="#limitCostModal" id="costLimiBtn" display="none">Change cost limit</button>
-                    </li>
-
-                    <!-- Info text -->
-                    <li class="nav-item" id="infoText">
-                    </li>
-                </ul>
-
-            </div>
-        </div>
-    </div>
-
-
-
-    <!-- Instruction Modal -->
-    <div id="instructionModal" class="modal fade" role="dialog">
-        <div class="modal-dialog">
-
-            <!-- Modal content-->
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h4 class="modal-title">How to use Dream Travel :)</h4>
-                    <button type="button" class="close" data-dismiss="modal">&times;</button>
-                </div>
-                <div class="modal-body">
-
-
-                    <table style="width:100%">
-                        <tr>
-                            <td>
-                                <a class="prev" style="font-size: 30px;" onclick="plusSlides(-1)">&#10094;</a>
-                            </td>
-                            <td>
-                                <!-- Slideshow container -->
-                                <div class="slideshow-container">
-
-                                    <div class="mySlides">
-                                        <div class="numbertext">1 / 7</div>
-                                        <img src="images/Instruction1.jpg" style="width: 100%">
-                                        <div class="text">
-                                            Type in the list of locations you would love to visit.<br>
-                                            They will be displayed on the map.
-                                        </div>
-                                    </div>
-                                    <div class="mySlides">
-                                        <div class="numbertext">2 / 7</div>
-                                        <img src="images/Instruction1_1.jpg" style="width: 100%">
-                                        <div class="text">
-                                            If you enable the 'Optimize Road' option<br>
-                                            order of inserted locations may be changed!<br>
-                                            First and last locations always remains the same.
-                                        </div>
-                                    </div>
-                                    <div class="mySlides">
-                                        <div class="numbertext">3 / 7</div>
-                                        <img src="images/Instruction2.jpg" style="width: 100%">
-                                        <div class="text">
-                                            Press 'Apply' button - Dream Travel will calculate the optimal route.
-                                        </div>
-                                    </div>
-                                    <div class="mySlides">
-                                        <div class="numbertext">4 / 7</div>
-                                        <img src="images/Instruction3.jpg" style="width: 100%">
-                                        <div class="text">
-                                            All the details regarding your travel are displayed on the top of the page.
-                                        </div>
-                                    </div>
-                                    <div class="mySlides">
-                                        <div class="numbertext">5 / 7</div>
-                                        <img src="images/Instruction4.jpg" style="width: 100%">
-                                        <div class="text">
-                                            You can apply changes for your travel. <br>
-                                            Ex: drag and drop markers on the map to change the locations or disable 'Optimize road' option.
-                                        </div>
-                                    </div>
-                                    <div class="mySlides">
-                                        <div class="numbertext">6 / 7</div>
-                                        <img src="images/Instruction5.jpg" style="width: 100%">
-                                        <div class="text">
-                                            You can play with the limit of the toll fee. In general - more money you spent, faster the travel goes.
-                                        </div>
-                                    </div>
-                                    <div class="mySlides">
-                                        <div class="numbertext">7 / 7</div>
-                                        <div class="text">
-                                            <b> Final remarks: </b> <br>
-                                            • Use only english or native names of the locations<br>
-                                            • You can include from 2 to 30 locations in your travel<br>
-                                            • All the cost are displayed in Euro currency<br>
-                                            • Travel time is displayed in HH:mm:ss format<br>
-                                            • Dream Travel supports Google Maps features - street view, satellite map...
-                                        </div>
-                                    </div>
-
-                                </div>
-                            </td>
-                            <td>
-                                <a class="next" style="font-size: 30px;" onclick="plusSlides(1)">&#10095;</a>
-                            </td>
-                        </tr>
-                    </table>
-                </div>
-                <footer class="modal-footer">
-                    <button type="button" class="btn btn-primary" data-dismiss="modal">OK</button>
-                </footer>
-            </div>
-        </div>
-    </div>
-
-
-
-
-    <!-- Cities Panel -->
-    <div id="listOfCitiesPanel">
-
-        <h4 class="modal-title" align="center"> <label for="optimizeRoad">Optimize road    </label><input type="checkbox" id="optimizeRoad" checked="checked"></h4>
-        <hr class="delimeter">
-
-        <h4 class="modal-title" align="center"> List of cities:</h4>
-        <br />
-
-        <hr class="line" ondrop="drop(event, map)" ondragover="allowDrop(event)" id="0">
-
-        <div id="listOfCities">
-        </div>
-
-        <button type="button" class="btn btn-success" onclick="addCity(map)" id="addCityBtn">+</button>
-
-        <footer class="modal-footer">
-            <button type="button" class="btn btn-info" disabled="disabled" onclick="runTSP(map)" id="runTSPBtn">Apply</button>
-        </footer>
-
-    </div>
-
-
-
-    <!-- Limit Modal -->
-    <div id="limitCostModal" class="modal fade" role="dialog">
-        <div class="modal-dialog">
-
-            <!-- Modal content-->
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h4 class="modal-title">Change limit of toll fee:</h4>
-                    <button type="button" class="close" data-dismiss="modal">&times;</button>
-                </div>
-                <div class="modal-body">
-                    <label id="limitValue"></label>
-                    <input type="range" min="0" max="100" value="0" class="slider" id="costSlider">
-                </div>
-                <footer class="modal-footer">
-                    <button type="button" class="btn btn-info" id="runLimitBtn" onclick="limitCost(map)" data-dismiss="modal">Apply</button>
-                </footer>
-            </div>
-        </div>
-    </div>
-
-    <!-- Paths Summary Modal -->
-    <div id="pathsSummaryModal" class="modal fade" role="dialog">
-        <div class="modal-dialog">
-
-            <!-- Modal content-->
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h4 class="modal-title">Paths summary:</h4>
-                    <button type="button" class="close" data-dismiss="modal">&times;</button>
-                </div>
-                <div class="modal-body" id="pathsSummaryBody">
-                </div>
-            </div>
-        </div>
-    </div>
+    @Html.Partial("~/wwwroot/html/instructionModal.html")
+    @Html.Partial("~/wwwroot/html/citiesPanel.html")
+    @Html.Partial("~/wwwroot/html/limitCostModal.html")
+    @Html.Partial("~/wwwroot/html/pathSummaryModal.html")
 
 
     <div id="loader"></div>
     <div id="map"></div>
 
     @section Scripts
-        {
-        <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyC8ZkBAtPiwp0rk4SRdhH6vufM39eDMmHY&callback=initMap"
-                async defer>
-        </script>
+    {
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyC8ZkBAtPiwp0rk4SRdhH6vufM39eDMmHY&callback=initMap"
+            async defer>
+    </script>
 
-        <script>
-            function initMap() {
-                $("#pathsSummaryBtn")[0].style.display = "none";
-                $("#costLimiBtn")[0].style.display = "none";
-                sessionId = Guid();
-                directionsService = new window.google.maps.DirectionsService;
-                map = new window.google.maps.Map(document.getElementById('map'),
-                    {
-                        zoom: 4,
-                        center: { lat: 0, lng: 0 }
-                    });
+    <script>
+        function initMap() {
 
-                addCity(map);
+            //Initialize page components
+            $("#pathsSummaryBtn")[0].style.display = "none";
+            $("#costLimiBtn")[0].style.display = "none";
+            sessionId = Guid();
+            directionsService = new window.google.maps.DirectionsService;
+            map = new window.google.maps.Map(document.getElementById('map'),
+                {
+                    zoom: 4,
+                    center: { lat: 0, lng: 0 }
+                });
 
-                map.addListener('click', function (e) {
+            //Add first city to the panel
+            addCity(map);
+
+            //Add marker by map click
+            map.addListener('click',
+                function (e) {
                     addCityByMapClick(e.latLng, map);
                 });
 
-                $(document).keyup(function (event) {
-                    if (event.which == 13) { //Enter
-                        if (event.target.type === "textarea") { //removes the enter sign
-                            //event.preventDefault();
-                            var el = event.target.value;
-                            event.target.value = el.substring(0, el.length - 1);
-                        }
-                        addCity(map);
+            //Add city by pressing Enter
+            $(document).keyup(function (event) {
+                if (event.which == 13) { //Enter
+                    if (event.target.type === "textarea") { //removes the enter sign
+                        //event.preventDefault();
+                        var el = event.target.value;
+                        event.target.value = el.substring(0, el.length - 1);
                     }
-                });
-            }
+                    addCity(map);
+                }
+            });
+        }
 
-            $("#costSlider")[0].oninput = function () {
-                $("#limitValue")[0].innerHTML = this.value + " €";
-            };
-        </script>
+        //Allow sort of Cities Panel
+        Sortable.create(document.getElementById('listOfCities'), {
+            handle: '.handle',
+            animation: 150,
+            ghostClass: 'blue-background-class',
+            onEnd: function (evt) {
+                drop(evt, map);
+            }
+        });
+
+
+        $("#costSlider")[0].oninput = function () {
+            $("#limitValue")[0].innerHTML = this.value + " €";
+        };
+    </script>
     }
 </body>
