@@ -1068,3 +1068,4 @@ Parameter name: index
 2019-07-03 08:37:44,225 [9] WARN  DreamTravel.WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
 2019-07-03 08:38:44,978 [8] WARN  DreamTravel.WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
 2019-07-03 08:58:37,194 [8] WARN  DreamTravel.WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
+2019-07-03 09:58:14,572 [9] WARN  DreamTravel.WebUI.Authentication.DreamAuthentication [(null)] - Missing authentication header
