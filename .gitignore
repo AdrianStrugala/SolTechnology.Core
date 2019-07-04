@@ -2,6 +2,8 @@ src/**/obj/**/*
 src/**/bin/**/*
 tests/**/bin/*
 tests/**/obj/*
+devOps/**/obj/**/*
+devOps/**/bin/**/*
 *.cache
 src/packages/**/*
 *.ide-shm
@@ -55,3 +57,4 @@ src/WebUI/wwwroot/js/Repositories/CitiesPanelRepository.js
 src/WebUI/wwwroot/js/DisplayHelpers/ClearMap.js
 src/WebUI/wwwroot/js/DisplayHelpers/DisplayTravelSummary.js
 src/WebUI/wwwroot/js/DisplayHelpers/DisplayPathsSummary.js
+src/WebUI/log.txt

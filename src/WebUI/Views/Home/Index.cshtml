@@ -12,66 +12,68 @@
     @Html.Partial("~/wwwroot/html/limitCostModal.html")
     @Html.Partial("~/wwwroot/html/pathSummaryModal.html")
 
+    @Html.Partial("~/wwwroot/html/hideAndShowCitiesPanel.html")
+
 
     <div id="loader"></div>
     <div id="map"></div>
 
     @section Scripts
     {
-    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyC8ZkBAtPiwp0rk4SRdhH6vufM39eDMmHY&callback=initMap"
-            async defer>
-    </script>
+        <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyC8ZkBAtPiwp0rk4SRdhH6vufM39eDMmHY&callback=initMap"
+                async defer>
+        </script>
 
-    <script>
-        function initMap() {
+        <script>
+            function initMap() {
 
-            //Initialize page components
-            $("#pathsSummaryBtn")[0].style.display = "none";
-            $("#costLimiBtn")[0].style.display = "none";
-            sessionId = Guid();
-            directionsService = new window.google.maps.DirectionsService;
-            map = new window.google.maps.Map(document.getElementById('map'),
-                {
-                    zoom: 4,
-                    center: { lat: 0, lng: 0 }
-                });
+                //Initialize page components
+                $("#pathsSummaryBtn")[0].style.display = "none";
+                $("#costLimiBtn")[0].style.display = "none";
+                sessionId = Guid();
+                directionsService = new window.google.maps.DirectionsService;
+                map = new window.google.maps.Map(document.getElementById('map'),
+                    {
+                        zoom: 4,
+                        center: { lat: 0, lng: 0 }
+                    });
 
-            //Add first city to the panel
-            addCity(map);
+                //Add first city to the panel
+                addCity(map);
 
-            //Add marker by map click
-            map.addListener('click',
-                function (e) {
-                    addCityByMapClick(e.latLng, map);
-                });
+                //Add marker by map click
+                map.addListener('click',
+                    function (e) {
+                        addCityByMapClick(e.latLng, map);
+                    });
 
-            //Add city by pressing Enter
-            $(document).keyup(function (event) {
-                if (event.which == 13) { //Enter
-                    if (event.target.type === "textarea") { //removes the enter sign
-                        //event.preventDefault();
-                        var el = event.target.value;
-                        event.target.value = el.substring(0, el.length - 1);
+                //Add city by pressing Enter
+                $(document).keyup(function (event) {
+                    if (event.which == 13) { //Enter
+                        if (event.target.type === "textarea") { //removes the enter sign
+                            //event.preventDefault();
+                            var el = event.target.value;
+                            event.target.value = el.substring(0, el.length - 1);
+                        }
+                        addCity(map);
                     }
-                    addCity(map);
+                });
+            }
+
+            //Allow sort of Cities Panel
+            Sortable.create(document.getElementById('listOfCities'), {
+                handle: '.handle',
+                animation: 150,
+                ghostClass: 'blue-ghost',
+                onEnd: function (evt) {
+                    drop(evt, map);
                 }
             });
-        }
-
-        //Allow sort of Cities Panel
-        Sortable.create(document.getElementById('listOfCities'), {
-            handle: '.handle',
-            animation: 150,
-            ghostClass: 'blue-ghost',
-            onEnd: function (evt) {
-                drop(evt, map);
-            }
-        });
 
 
-        $("#costSlider")[0].oninput = function () {
-            $("#limitValue")[0].innerHTML = this.value + " €";
-        };
-    </script>
+            $("#costSlider")[0].oninput = function () {
+                $("#limitValue")[0].innerHTML = this.value + " €";
+            };
+        </script>
     }
 </body>
