@@ -53,6 +53,7 @@
     <TypeScriptCompile Include="wwwroot\js\Utils\Pad2.ts" />
     <TypeScriptCompile Include="wwwroot\js\Utils\Sleep.ts" />
     <TypeScriptCompile Include="wwwroot\js\DisplayHelpers\DisplayPathsSummary.ts" />
+    <TypeScriptCompile Include="wwwroot\js\HideAndShowCitiesPanel.ts" />
     <TypeScriptCompile Include="wwwroot\lib\googleMaps\googleMaps.d.ts" />
   </ItemGroup>
 
