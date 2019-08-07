@@ -24,6 +24,11 @@
 
         public (double, double) Execute(City origin, City destination)
         {
+            if (origin.Name == destination.Name)
+            {
+                return (double.MaxValue, double.MaxValue);
+            }
+
             try
             {
                 string url =
@@ -49,8 +54,8 @@
                 _logger.LogError($"Cannot get data about cost between [{origin.Name}] and [{destination.Name}]");
 
                 return (-1, -1);
-//                throw new InvalidDataException(
-//                    $"Cannot get data about cost between [{origin.Name}] and [{destination.Name}]");
+                //                throw new InvalidDataException(
+                //                    $"Cannot get data about cost between [{origin.Name}] and [{destination.Name}]");
             }
         }
     }

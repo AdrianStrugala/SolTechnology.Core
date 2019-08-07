@@ -49,8 +49,15 @@
 
                     for (int j = 0; j < listOfCities.Count; j++)
                     {
-                        result[j + i * listOfCities.Count] =
-                            json["rows"][0]["elements"][j]["duration"]["value"].Value<int>();
+                        if (i == j)
+                        {
+                            result[j + i * listOfCities.Count] = double.MaxValue;
+                        }
+                        else
+                        {
+                            result[j + i * listOfCities.Count] = 
+                                json["rows"][0]["elements"][j]["duration"]["value"].Value<int>();
+                        }
                     }
                 }
 

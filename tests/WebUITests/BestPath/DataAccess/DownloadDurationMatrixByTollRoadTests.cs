@@ -37,7 +37,8 @@
 
             //Assert
             Assert.NotEqual(0, result[1]);
-            Assert.Equal(0, result[0]);
+            Assert.NotEqual(double.MaxValue, result[1]);
+            Assert.Equal(double.MaxValue, result[0]);
         }
 
         [Fact]

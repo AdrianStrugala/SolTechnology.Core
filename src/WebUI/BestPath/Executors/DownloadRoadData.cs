@@ -29,30 +29,26 @@
             List<Task> tasks = new List<Task>
             {
                 Task.Run(async () => evaluationMatrix.TollDistances = await _downloadDurationMatrixByTollRoad.Execute(listOfCities)),
-                Task.Run(async () => evaluationMatrix.FreeDistances = await _downloadDurationMatrixByFreeRoad.Execute(listOfCities))
+                Task.Run(async () => evaluationMatrix.FreeDistances = await _downloadDurationMatrixByFreeRoad.Execute(listOfCities)),
+                Task.Run(() => { DownloadCostMatrix(listOfCities, evaluationMatrix); })
             };
             await Task.WhenAll(tasks);
 
+            return evaluationMatrix;
+        }
+
+        private void DownloadCostMatrix(List<City> listOfCities, EvaluationMatrix evaluationMatrix)
+        {
             Parallel.For(0, listOfCities.Count, i =>
-            {
-                for (int j = 0; j < listOfCities.Count; j++)
                 {
-                    int iterator = j + i * listOfCities.Count;
-
-                    if (i == j)
+                    for (int j = 0; j < listOfCities.Count; j++)
                     {
-                        SetTablesValueAsMax(evaluationMatrix, iterator);
-                    }
+                        int iterator = j + i * listOfCities.Count;
 
-                    else
-                    {
                         (evaluationMatrix.Costs[iterator], evaluationMatrix.VinietaCosts[iterator]) =
                             _downloadCostBetweenTwoCities.Execute(listOfCities[i], listOfCities[j]);
                     }
-                }
-            });
-
-            return evaluationMatrix;
+                });
         }
 
         private static void SetTablesValueAsMax(EvaluationMatrix evaluationMatrix, int iterator)

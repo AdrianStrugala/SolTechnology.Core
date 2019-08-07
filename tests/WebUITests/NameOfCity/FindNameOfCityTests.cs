@@ -39,7 +39,7 @@ namespace DreamTravel.WebUITests.NameOfCity
         }
 
         [Fact]
-        public async Task Execute_InvokeWithValidCoordinats_ReturnsActualNameOfCity()
+        public async Task Execute_InvokeWithValidCoordinates_ReturnsActualNameOfCity()
         {
             //Arrange
             City city = new City

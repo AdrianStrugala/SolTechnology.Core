@@ -3,6 +3,7 @@ namespace DreamTravel.WebUITests.BestPath.Executors
     using System.Collections.Generic;
     using System.Threading.Tasks;
     using Microsoft.Extensions.Logging;
+    using Microsoft.Extensions.Logging.Abstractions;
     using NSubstitute;
     using WebUI.BestPath.DataAccess;
     using WebUI.BestPath.Executors;
@@ -17,9 +18,9 @@ namespace DreamTravel.WebUITests.BestPath.Executors
 
         public DownloadRoadDataTests()
         {
-            IDownloadDurationMatrixByTollRoad downloadDurationMatrixByTollRoad = Substitute.For<DownloadDurationMatrixByTollRoad>(Arg.Any<ILogger>());
-            IDownloadDurationMatrixByFreeRoad downloadDurationMatrixByFreeRoad = Substitute.For<DownloadDurationMatrixByFreeRoad>(Arg.Any<ILogger>());
-            IDownloadCostBetweenTwoCities downloadCostBetweenTwoCities = Substitute.For<DownloadCostBetweenTwoCities>(Arg.Any<ILogger>());
+            IDownloadDurationMatrixByTollRoad downloadDurationMatrixByTollRoad = new DownloadDurationMatrixByTollRoad(NullLogger<DownloadDurationMatrixByTollRoad>.Instance);
+            IDownloadDurationMatrixByFreeRoad downloadDurationMatrixByFreeRoad = new DownloadDurationMatrixByFreeRoad(NullLogger<DownloadDurationMatrixByFreeRoad>.Instance);
+            IDownloadCostBetweenTwoCities downloadCostBetweenTwoCities = new DownloadCostBetweenTwoCities(NullLogger<DownloadCostBetweenTwoCities>.Instance);
 
             _sut = new DownloadRoadData(downloadDurationMatrixByTollRoad, downloadDurationMatrixByFreeRoad, downloadCostBetweenTwoCities);
         }
@@ -73,7 +74,7 @@ namespace DreamTravel.WebUITests.BestPath.Executors
             //Arrange
             City city = new City
             {
-                Name = "name",
+                Name = "Wroclaw",
                 Latitude = 51,
                 Longitude = 17
             };
