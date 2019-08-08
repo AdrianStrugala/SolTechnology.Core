@@ -21,11 +21,8 @@
             _downloadCostBetweenTwoCities = downloadCostBetweenTwoCities;
         }
 
-        public async Task<EvaluationMatrix> Execute(List<City> listOfCities,
-            EvaluationMatrix evaluationMatrix)
+        public async Task<EvaluationMatrix> Execute(List<City> listOfCities, EvaluationMatrix evaluationMatrix)
         {
-            SetTablesValueAsMax(evaluationMatrix, 0);
-
             List<Task> tasks = new List<Task>
             {
                 Task.Run(async () => evaluationMatrix.TollDistances = await _downloadDurationMatrixByTollRoad.Execute(listOfCities)),
@@ -49,16 +46,6 @@
                             _downloadCostBetweenTwoCities.Execute(listOfCities[i], listOfCities[j]);
                     }
                 });
-        }
-
-        private static void SetTablesValueAsMax(EvaluationMatrix evaluationMatrix, int iterator)
-        {
-            evaluationMatrix.FreeDistances[iterator] = double.MaxValue;
-            evaluationMatrix.TollDistances[iterator] = double.MaxValue;
-            evaluationMatrix.OptimalDistances[iterator] = double.MaxValue;
-            evaluationMatrix.Goals[iterator] = double.MaxValue;
-            evaluationMatrix.Costs[iterator] = double.MaxValue;
-            evaluationMatrix.OptimalCosts[iterator] = double.MaxValue;
         }
     }
 }
