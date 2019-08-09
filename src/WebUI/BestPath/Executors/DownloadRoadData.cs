@@ -36,7 +36,10 @@
 
         private void DownloadCostMatrix(List<City> listOfCities, EvaluationMatrix evaluationMatrix)
         {
-            Parallel.For(0, listOfCities.Count, i =>
+            Parallel.For(0, listOfCities.Count, new ParallelOptions
+            {
+                MaxDegreeOfParallelism = 10
+            }, i =>
                 {
                     for (int j = 0; j < listOfCities.Count; j++)
                     {
