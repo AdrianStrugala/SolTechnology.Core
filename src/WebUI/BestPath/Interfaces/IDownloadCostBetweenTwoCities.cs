@@ -1,9 +1,10 @@
 ﻿namespace DreamTravel.WebUI.BestPath.Interfaces
 {
+    using System.Threading.Tasks;
     using Contract;
 
     public interface IDownloadCostBetweenTwoCities
     {
-        (double, double) Execute(City origin, City destination);
+        Task<(double, double)> Execute(City origin, City destination);
     }
 }

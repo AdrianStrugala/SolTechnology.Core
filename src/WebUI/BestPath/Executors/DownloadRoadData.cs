@@ -26,29 +26,34 @@
             List<Task> tasks = new List<Task>
             {
                 Task.Run(async () => evaluationMatrix.TollDistances = await _downloadDurationMatrixByTollRoad.Execute(listOfCities)),
-                Task.Run(async () => evaluationMatrix.FreeDistances = await _downloadDurationMatrixByFreeRoad.Execute(listOfCities)),
-                Task.Run(() => { DownloadCostMatrix(listOfCities, evaluationMatrix); })
+                Task.Run(async () => evaluationMatrix.FreeDistances = await _downloadDurationMatrixByFreeRoad.Execute(listOfCities))
             };
+
+            tasks.AddRange(DownloadCostMatrix(listOfCities, evaluationMatrix));
+
             await Task.WhenAll(tasks);
 
             return evaluationMatrix;
         }
 
-        private void DownloadCostMatrix(List<City> listOfCities, EvaluationMatrix evaluationMatrix)
+        private List<Task> DownloadCostMatrix(List<City> listOfCities, EvaluationMatrix evaluationMatrix)
         {
-            Parallel.For(0, listOfCities.Count, new ParallelOptions
-            {
-                MaxDegreeOfParallelism = 10
-            }, i =>
-                {
-                    for (int j = 0; j < listOfCities.Count; j++)
-                    {
-                        int iterator = j + i * listOfCities.Count;
+            List<Task> tasks = new List<Task>();
 
-                        (evaluationMatrix.Costs[iterator], evaluationMatrix.VinietaCosts[iterator]) =
-                            _downloadCostBetweenTwoCities.Execute(listOfCities[i], listOfCities[j]);
-                    }
-                });
+            for (int i = 0; i < listOfCities.Count; i++)
+            {
+                for (int j = 0; j < listOfCities.Count; j++)
+                {
+                    int iterator = j + i * listOfCities.Count;
+
+                    var i1 = i;
+                    var j1 = j;
+                    tasks.Add(Task.Run(async () => (evaluationMatrix.Costs[iterator], evaluationMatrix.VinietaCosts[iterator]) =
+                                                   await _downloadCostBetweenTwoCities.Execute(listOfCities[i1], listOfCities[j1])));
+                }
+            }
+
+            return tasks;
         }
     }
 }

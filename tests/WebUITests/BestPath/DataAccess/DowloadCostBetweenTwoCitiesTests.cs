@@ -1,5 +1,6 @@
 ﻿namespace DreamTravel.WebUITests.BestPath.DataAccess
 {
+    using System.Threading.Tasks;
     using Microsoft.Extensions.Logging.Abstractions;
     using WebUI.BestPath.DataAccess;
     using WebUI.Contract;
@@ -12,7 +13,7 @@
 
 
         [Fact]
-        public void DowloadCostBetweenTwoCities_InvokeWithValidCities_ReturnsSomeCost()
+        public async Task DowloadCostBetweenTwoCities_InvokeWithValidCities_ReturnsSomeCost()
         {
             //Arrange
             City firstCity = new City
@@ -30,7 +31,7 @@
             };
 
             //Act
-            var result = _sut.Execute(firstCity, secondCity);
+            var result = await _sut.Execute(firstCity, secondCity);
 
             //Assert
             Assert.NotEqual((0, 0), result);
@@ -38,7 +39,7 @@
 
 
         [Fact]
-        public void DowloadCostBetweenTwoCities_InvalidCities_MinusCostIsReturned()
+        public async Task DowloadCostBetweenTwoCities_InvalidCities_MinusCostIsReturned()
         {
             //Arrange
             City firstCity = new City
@@ -56,7 +57,7 @@
             };
 
             //Act
-            var result = _sut.Execute(firstCity, secondCity);
+            var result = await _sut.Execute(firstCity, secondCity);
 
             //Assert
             Assert.Equal((-1, -1), result);

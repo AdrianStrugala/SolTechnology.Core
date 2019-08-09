@@ -2,6 +2,7 @@
 {
     using System;
     using System.Net.Http;
+    using System.Threading.Tasks;
     using System.Xml;
     using Contract;
     using Interfaces;
@@ -22,7 +23,7 @@
             }
         }
 
-        public (double, double) Execute(City origin, City destination)
+        public async Task<(double, double)> Execute(City origin, City destination)
         {
             if (origin.Name == destination.Name)
             {
@@ -34,7 +35,7 @@
                 string url =
                     $"http://apir.viamichelin.com/apir/1/route.xml/fra?steps=1:e:{origin.Longitude}:{origin.Latitude};1:e:{destination.Longitude}:{destination.Latitude}&authkey=JSBS20101202150903217741708195";
 
-                var response = _httpClient.GetStringAsync(url).Result;
+                var response = await _httpClient.GetStringAsync(url);
                 XmlDocument doc = new XmlDocument();
                 doc.LoadXml(response);
 
