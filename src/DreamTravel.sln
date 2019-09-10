@@ -26,6 +26,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BotTests", "..\tests\BotTes
 EndProject
 Project("{151D2E53-A2C4-4D7D-83FE-D05416EBD58E}") = "AzureResourceGroup", "..\devOps\AzureResourceGroup\AzureResourceGroup.deployproj", "{2EB94B37-255F-40E7-A807-6A4F2D61DC9E}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DreamFlights", "DreamFlights\DreamFlights.csproj", "{5DE95271-A434-4CE5-BF1C-DB6E1ABE349A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -70,6 +72,10 @@ Global
 		{2EB94B37-255F-40E7-A807-6A4F2D61DC9E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2EB94B37-255F-40E7-A807-6A4F2D61DC9E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2EB94B37-255F-40E7-A807-6A4F2D61DC9E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5DE95271-A434-4CE5-BF1C-DB6E1ABE349A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5DE95271-A434-4CE5-BF1C-DB6E1ABE349A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5DE95271-A434-4CE5-BF1C-DB6E1ABE349A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5DE95271-A434-4CE5-BF1C-DB6E1ABE349A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

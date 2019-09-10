@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.SpaServices.AngularCli;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Aure.SwarmCreator.Monitor
+namespace DreamTravel.DreamFlights
 {
     public class Startup
     {
