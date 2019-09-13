@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using DreamTravel.FlightData.Airports;
 using Xunit;
 
@@ -26,6 +27,42 @@ namespace DreamTravel.FlightDataTests.Airports
             Assert.NotEmpty(result);
 
             Assert.Contains("WRO", result);
+        }
+
+        [Fact]
+        public void GetPlaceToCodesMap_FileContainingMapIsInPlace_MapOfPlacesAndCodesIsReturned()
+        {
+            // Arrange
+            Dictionary<string, List<string>> oneOfResults = new Dictionary<string, List<string>>
+            {
+                {
+                    "Poland", new List<string>
+                    {
+                        "SZY",
+                        "GDN",
+                        "KRK",
+                        "KTW",
+                        "POZ",
+                        "RZE",
+                        "SZZ",
+                        "WAW",
+                        "WRO",
+                        "BZG",
+                        "LCJ",
+                        "WMI",
+                        "LUZ"
+                    }
+                }
+            };
+
+            // Act
+            Dictionary<string, List<string>> result = _sut.GetPlaceToCodesMap();
+
+            // Assert
+            Assert.NotNull(result);
+            Assert.NotEmpty(result);
+
+            Assert.Equal(result[oneOfResults.Keys.First()], oneOfResults.Values.First());
         }
     }
 }

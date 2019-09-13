@@ -1,17 +1,18 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using Newtonsoft.Json;
 
 namespace DreamTravel.FlightData.Airports
 {
     public partial class AirportRepository
     {
-        public Dictionary<string,List<string>> GetPlaceToCodesMap()
+        public Dictionary<string, List<string>> GetPlaceToCodesMap()
         {
             var placeToAirportsDataModels = JsonConvert.DeserializeObject<Dictionary<string, PlaceToAirportsDataModel>>(Place2CodesMap);
 
+            var placeToCodesMap = placeToAirportsDataModels.Values
+                .ToDictionary(k => k.Name, v => v.Ports.Split("_").ToList());
 
-            //TODO Extract the ports
-            Dictionary<string, List<string>> placeToCodesMap = new Dictionary<string, List<string>>();
 
             return placeToCodesMap;
         }
@@ -20,7 +21,7 @@ namespace DreamTravel.FlightData.Airports
         #region place2Codes json
         // 2019-09-10 07:25:01
         private const string Place2CodesMap = @"
-var mcitiesArray = { 
+{ 
   ""LON_ALL"" :  { ""name"" : ""London"",""ports"":""LGW_STN_LTN_LCY_LHR_SEN_BQH""},
   ""STO_ALL"" :  { ""name"" : ""Stockholm"",""ports"":""ARN_BMA_NYO_VST""},
   ""BAR_ALL"" :  { ""name"" : ""Barcelona"",""ports"":""BCN_GRO_REU""},
@@ -70,7 +71,6 @@ var mcitiesArray = {
   ""CAPEVERDE"" :  { ""name"" : ""Cape Verde Islands"",""ports"":""SID_RAI_BVC""},
   ""CORSICA"" :  { ""name"" : ""Corsica"",""ports"":""AJA_BIA_FSC_PRP_CLY""},
   ""GR_CRETE"" :  { ""name"" : ""Greece: Crete"",""ports"":""CHQ_HER_JSH""},
-  ""CYPRUS"" :  { ""name"" : ""Cyprus"",""ports"":""ECN_LCA_PFO""},
   ""SARDINIA"" :  { ""name"" : ""Sardinia"",""ports"":""CAG_AHO_OLB""},
   ""SICILY"" :  { ""name"" : ""Sicily"",""ports"":""CTA_CIY_PMO_PNL_TPS""},
   ""ENGLAND"" :  { ""name"" : ""England"",""ports"":""SEN_NQY_EXT_JER_BRS_GCI_BOH_NWI_NCL_STN_MME_LTN_MAN_LHR_LPL_LGW_LBA_CWL_HUY_EMA_DSA_BLK_BHX_SOU""},
