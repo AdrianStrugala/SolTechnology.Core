@@ -1,4 +1,6 @@
-﻿namespace DreamTravel.Bot.DiscoverDreamTravelChances.SendEmail
+﻿using DreamTravel.Domain.Flights;
+
+namespace DreamTravel.Bot.DiscoverDreamTravelChances.SendEmail
 {
     using System.Collections.Generic;
     using Interfaces;
@@ -6,7 +8,7 @@
 
     public class ComposeMessage : IComposeMessage
     {
-        public string Execute(List<Chance> chances)
+        public string Execute(List<Flight> chances)
         {
             string message = @"
 Welcome Traveler!
@@ -32,7 +34,7 @@ Dream Travel Team
             return message;
         }
 
-        public string ExecuteHtml(List<Chance> chances, string userName)
+        public string ExecuteHtml(List<Flight> chances, string userName)
         {
             string message = @"<html> <body> 
 <h4> Welcome " + userName + @"! </h4></br>

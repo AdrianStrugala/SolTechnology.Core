@@ -10,17 +10,7 @@
     <RootNamespace>DreamTravel.Bot</RootNamespace>
   </PropertyGroup>
 
-  <ItemGroup>
-    <None Remove="appsettings.json" />
-    <None Remove="local.settings.json" />
-    <None Remove="RunBenchmark\Benchmark\TestData\eightCities.txt" />
-    <None Remove="RunBenchmark\Benchmark\TestData\fourCities.txt" />
-    <None Remove="RunBenchmark\Benchmark\TestData\sixteenCities.txt" />
-    <None Remove="RunBenchmark\Benchmark\TestData\twelveCities.txt" />
-    <None Remove="RunBenchmark\Benchmark\TestData\twentyCities.txt" />
-    <None Remove="RunBenchmark\Benchmark\TestData\twoCities.txt" />
-  </ItemGroup>
-
+  
   <ItemGroup>
     <Content Include="appsettings.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
@@ -68,6 +58,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Domain\Domain.csproj" />
     <ProjectReference Include="..\Infrastructure\Infrastructure.csproj" />
     <ProjectReference Include="..\TravelingSalesmanProblem\TravelingSalesmanProblem.csproj" />
   </ItemGroup>

@@ -1,4 +1,6 @@
-﻿namespace DreamTravel.Bot.DiscoverDreamTravelChances
+﻿using DreamTravel.Domain.Flights;
+
+namespace DreamTravel.Bot.DiscoverDreamTravelChances
 {
     using Infrastructure.Email;
     using Interfaces;
@@ -23,7 +25,7 @@
 
         public void Execute()
         {
-            List<Chance> chances = _scrapHtmlToChanceModel.Execute();
+            List<Flight> chances = _scrapHtmlToChanceModel.Execute();
 
             chances = _filterChances.Execute(chances);
 

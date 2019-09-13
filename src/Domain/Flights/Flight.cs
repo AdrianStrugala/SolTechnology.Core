@@ -1,6 +1,6 @@
-﻿namespace DreamTravel.Bot.DiscoverDreamTravelChances.Models
+﻿namespace DreamTravel.Domain.Flights
 {
-    public class Chance
+    public class Flight
     {
         public string ThereDate { get; set; }
         public string ThereDepartureCity { get; set; }

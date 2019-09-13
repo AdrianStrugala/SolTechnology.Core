@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using DreamTravel.Domain.Airports;
 using Newtonsoft.Json;
 
 namespace DreamTravel.FlightData.Airports

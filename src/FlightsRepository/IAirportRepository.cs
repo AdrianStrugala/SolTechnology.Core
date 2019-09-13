@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace DreamTravel.Domain.Airports
+namespace DreamTravel.FlightData
 {
     public interface IAirportRepository
     {

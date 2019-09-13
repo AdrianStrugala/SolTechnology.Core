@@ -1,4 +1,6 @@
-﻿namespace DreamTravel.Bot.DiscoverDreamTravelChances.SendEmail
+﻿using DreamTravel.Domain.Flights;
+
+namespace DreamTravel.Bot.DiscoverDreamTravelChances.SendEmail
 {
     using System.Collections.Generic;
     using System.Linq;
@@ -19,7 +21,7 @@
 
         };
 
-        public List<Chance> Execute(List<Chance> chances)
+        public List<Flight> Execute(List<Flight> chances)
         {
             chances = chances.Where(c => c.Price < 50).ToList();
 

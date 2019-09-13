@@ -1,10 +1,12 @@
-﻿namespace DreamTravel.Bot.DiscoverDreamTravelChances.Interfaces
+﻿using DreamTravel.Domain.Flights;
+
+namespace DreamTravel.Bot.DiscoverDreamTravelChances.Interfaces
 {
     using System.Collections.Generic;
     using Models;
 
     public interface IFilterChances
     {
-        List<Chance> Execute(List<Chance> chances);
+        List<Flight> Execute(List<Flight> chances);
     }
 }
