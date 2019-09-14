@@ -1,0 +1,18 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp2.1</TargetFramework>
+    <RootNamespace>DreamTravel.Features</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Folder Include="CalculateBestPath\" />
+    <Folder Include="FindPathsUnderCostLimit\" />
+    <Folder Include="FindLocationOfCity\" />
+    <Folder Include="FindNameOfCity\" />
+    <Folder Include="RunTSPBenchmark\" />
+    <Folder Include="SendPersonalFlightEmail\" />
+    <Folder Include="SendDreamTravelFlightEmail\" />
+  </ItemGroup>
+
+</Project>
