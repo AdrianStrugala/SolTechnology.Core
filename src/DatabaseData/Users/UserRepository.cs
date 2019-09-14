@@ -1,13 +1,12 @@
-﻿namespace DreamTravel.Bot.DiscoverDreamTravelChances.DataAccess
-{
-    using System.Collections.Generic;
-    using System.Linq;
-    using Dapper;
-    using Infrastructure.Database;
-    using Interfaces;
-    using Models;
+﻿using System.Collections.Generic;
+using System.Linq;
+using Dapper;
+using DreamTravel.Domain.Users;
+using DreamTravel.Infrastructure.Database;
 
-    public class GetUsers : IGetUsers
+namespace DreamTravel.DatabaseData.Users
+{
+    public class UserRepository : IUserRepository
     {
         private const string Sql = @"
 SELECT [Id]
@@ -16,7 +15,7 @@ SELECT [Id]
   FROM [dbo].[User]
 ";
 
-        public List<User> Execute()
+        public List<User> GetUsers()
         {
             List<User> result;
 

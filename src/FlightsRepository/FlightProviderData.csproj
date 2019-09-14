@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp2.1</TargetFramework>
-	<RootNamespace>DreamTravel.FlightData</RootNamespace>
+	<RootNamespace>DreamTravel.FlightProviderData</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>

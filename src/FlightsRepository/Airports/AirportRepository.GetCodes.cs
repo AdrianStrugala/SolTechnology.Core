@@ -2,7 +2,7 @@
 using System.Linq;
 using Newtonsoft.Json;
 
-namespace DreamTravel.FlightData.Airports
+namespace DreamTravel.FlightProviderData.Airports
 {
     public partial class AirportRepository : IAirportRepository
     {

@@ -30,7 +30,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DreamFlights", "DreamFlight
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "DataLayer", "DataLayer", "{B2587745-8654-42FC-A2A2-6D054FDF2173}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FlightData", "FlightsRepository\FlightData.csproj", "{346061C9-B539-4567-B920-EDC4E89D2827}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FlightProviderData", "FlightsRepository\FlightProviderData.csproj", "{346061C9-B539-4567-B920-EDC4E89D2827}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Domain", "Domain\Domain.csproj", "{D1E366DF-35FB-401E-A03D-5BF1B01A2998}"
 EndProject
@@ -39,6 +39,8 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "PresentationLayer", "PresentationLayer", "{671C7D7D-4079-44D1-AEF8-ACCC9A6186B8}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "LogicLayer", "LogicLayer", "{C3AD01F3-75DE-44BB-8FE5-17E1683D7872}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DatabaseData", "DatabaseData\DatabaseData.csproj", "{F58529BA-9ED2-4101-BAA7-7E8142E88F23}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -100,6 +102,10 @@ Global
 		{BABB7CB6-DCC9-48E0-A9ED-5C2097FD581C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BABB7CB6-DCC9-48E0-A9ED-5C2097FD581C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BABB7CB6-DCC9-48E0-A9ED-5C2097FD581C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F58529BA-9ED2-4101-BAA7-7E8142E88F23}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F58529BA-9ED2-4101-BAA7-7E8142E88F23}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F58529BA-9ED2-4101-BAA7-7E8142E88F23}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F58529BA-9ED2-4101-BAA7-7E8142E88F23}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -114,6 +120,7 @@ Global
 		{5DE95271-A434-4CE5-BF1C-DB6E1ABE349A} = {671C7D7D-4079-44D1-AEF8-ACCC9A6186B8}
 		{346061C9-B539-4567-B920-EDC4E89D2827} = {B2587745-8654-42FC-A2A2-6D054FDF2173}
 		{BABB7CB6-DCC9-48E0-A9ED-5C2097FD581C} = {55867FA2-33B1-48B4-AC03-D2F72DD60441}
+		{F58529BA-9ED2-4101-BAA7-7E8142E88F23} = {B2587745-8654-42FC-A2A2-6D054FDF2173}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {00F9DE65-0AAA-464E-9C25-8FC931194B32}

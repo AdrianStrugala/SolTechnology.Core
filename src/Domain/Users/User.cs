@@ -1,4 +1,4 @@
-﻿namespace DreamTravel.Bot.DiscoverDreamTravelChances.Models
+﻿namespace DreamTravel.Domain.Users
 {
     public class User
     {

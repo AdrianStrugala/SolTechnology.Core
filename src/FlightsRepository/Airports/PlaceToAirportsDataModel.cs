@@ -1,4 +1,4 @@
-﻿namespace DreamTravel.FlightData.Airports
+﻿namespace DreamTravel.FlightProviderData.Airports
 {
     class PlaceToAirportsDataModel
     {

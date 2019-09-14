@@ -1,14 +1,18 @@
-﻿namespace DreamTravel.Bot
-{
-    using Autofac;
-    using AzureFunctions.Autofac.Configuration;
-    using Microsoft.Extensions.Configuration;
-    using System;
-    using System.Diagnostics.CodeAnalysis;
-    using System.IO;
-    using System.Reflection;
-    using Infrastructure;
+﻿using DreamTravel.DatabaseData.Users;
+using Autofac;
+using AzureFunctions.Autofac.Configuration;
+using Microsoft.Extensions.Configuration;
+using System;
+using System.Diagnostics.CodeAnalysis;
+using System.IO;
+using System.Reflection;
+using DreamTravel.DatabaseData;
+using DreamTravel.FlightProviderData;
+using DreamTravel.FlightProviderData.Flights.GetFlights;
+using DreamTravel.Infrastructure;
 
+namespace DreamTravel.Bot
+{
     [ExcludeFromCodeCoverage]
     public class Startup
     {
@@ -32,6 +36,8 @@
                         .Except<ApplicationConfiguration>()
                         .AsImplementedInterfaces();
 
+                    builder.RegisterType<FlightRepository>().As<IFlightRepository>();
+                    builder.RegisterType<UserRepository>().As<IUserRepository>();
                 },
                 functionName);
         }

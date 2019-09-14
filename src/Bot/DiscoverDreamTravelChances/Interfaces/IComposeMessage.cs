@@ -1,9 +1,8 @@
 ﻿using DreamTravel.Domain.Flights;
+using System.Collections.Generic;
 
 namespace DreamTravel.Bot.DiscoverDreamTravelChances.Interfaces
 {
-    using System.Collections.Generic;
-    using Models;
 
     public interface IComposeMessage
     {

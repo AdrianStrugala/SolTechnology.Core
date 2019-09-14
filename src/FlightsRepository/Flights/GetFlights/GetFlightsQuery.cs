@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace DreamTravel.FlightData.Flights.GetFlights
+namespace DreamTravel.FlightProviderData.Flights.GetFlights
 {
     public class GetFlightsQuery
     {
-        public Dictionary<string, List<string>> Departures { get; set; }
+        public KeyValuePair<string, List<string>> Departures { get; set; }
 
-        public Dictionary<string, List<string>> Arrivals { get; set; }
+        public KeyValuePair<string, List<string>> Arrivals { get; set; }
 
         public DateTime DepartureDate { get; set; }
 

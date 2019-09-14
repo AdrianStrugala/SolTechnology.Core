@@ -17,7 +17,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\FlightsRepository\FlightData.csproj" />
+    <ProjectReference Include="..\..\src\FlightsRepository\FlightProviderData.csproj" />
   </ItemGroup>
 
 </Project>
