@@ -38,9 +38,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FlightDataTests", "..\tests
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "PresentationLayer", "PresentationLayer", "{671C7D7D-4079-44D1-AEF8-ACCC9A6186B8}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "LogicLayer", "LogicLayer", "{C3AD01F3-75DE-44BB-8FE5-17E1683D7872}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Libraries", "Libraries", "{C3AD01F3-75DE-44BB-8FE5-17E1683D7872}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DatabaseData", "DatabaseData\DatabaseData.csproj", "{F58529BA-9ED2-4101-BAA7-7E8142E88F23}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DatabaseData", "DatabaseData\DatabaseData.csproj", "{F58529BA-9ED2-4101-BAA7-7E8142E88F23}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
