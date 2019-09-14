@@ -12,16 +12,16 @@ namespace DreamTravel.FlightData.Flights.GetFlights
         {
             GetFlightsResult result = new GetFlightsResult();
 
-            DateTime today = DateTime.Today;
-            string todayYear = today.Year.ToString("0000");
-            string todayMonth = today.Month.ToString("00");
-            string todayDay = today.Day.ToString("00");
+            DateTime departureDate = query.DepartureDate > DateTime.UtcNow ? query.DepartureDate : DateTime.UtcNow;
+            string departureYear = departureDate.Year.ToString("0000");
+            string departureMonth = departureDate.Month.ToString("00");
+            string departureDay = departureDate.Day.ToString("00");
 
 
-            DateTime range = DateTime.Today.AddMonths(3);
-            string rangeYear = range.Year.ToString("0000");
-            string rangeMonth = range.Month.ToString("00");
-            string rangeDay = range.Day.ToString("00");
+            DateTime arrivalDate = query.ArrivalDate;
+            string arrivalYear = arrivalDate.Year.ToString("0000");
+            string arrivalMonth = arrivalDate.Month.ToString("00");
+            string arrivalDay = arrivalDate.Day.ToString("00");
 
             string url = $"" +
                          "http://www.azair.eu/azfin.php?searchtype=flexi" +
@@ -37,11 +37,11 @@ namespace DreamTravel.FlightData.Flights.GetFlights
                          "&dstTypedText=any" +
                          "&dstFreeTypedText=" +
                          "&dstMC=" +
-                         $"&depmonth={todayYear + todayMonth}" +
-                         $"&depdate={todayYear + "-" + todayMonth + "-" + todayDay}" +
+                         $"&depmonth={departureYear + departureMonth}" +
+                         $"&depdate={departureYear + "-" + departureMonth + "-" + departureDay}" +
                          "&aid=0" +
-                         $"&arrmonth={rangeYear + rangeMonth}" +
-                         $"&arrdate={rangeYear + "-" + rangeMonth + "-" + rangeDay}" +
+                         $"&arrmonth={arrivalYear + arrivalMonth}" +
+                         $"&arrdate={arrivalYear + "-" + arrivalMonth + "-" + arrivalDay}" +
                          "&minDaysStay=2" +
                          "&maxDaysStay=5" +
                          "&dep0=true" +
