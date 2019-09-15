@@ -1,4 +1,4 @@
-﻿namespace DreamTravel.Bot.RunBenchmark.Benchmark.TestData
+﻿namespace DreamTravel.Features.RunTSPBenchmark.TestData
 {
     public static class TestData
     {

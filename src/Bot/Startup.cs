@@ -7,6 +7,8 @@ using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Reflection;
 using DreamTravel.DatabaseData;
+using DreamTravel.Features.SendDreamTravelFlightEmail;
+using DreamTravel.Features.SendDreamTravelFlightEmail.Interfaces;
 using DreamTravel.FlightProviderData;
 using DreamTravel.FlightProviderData.Flights.GetFlights;
 using DreamTravel.Infrastructure;
@@ -38,6 +40,9 @@ namespace DreamTravel.Bot
 
                     builder.RegisterType<FlightRepository>().As<IFlightRepository>();
                     builder.RegisterType<UserRepository>().As<IUserRepository>();
+                    builder.RegisterType<Features.SendDreamTravelFlightEmail.SendDreamTravelFlightEmail>().As<ISendDreamTravelFlightEmail>();
+                    builder.RegisterType<FilterFlights>().As<IFilterFlights>();
+                    builder.RegisterType<ComposeMessage>().As<IComposeMessage>();
                 },
                 functionName);
         }

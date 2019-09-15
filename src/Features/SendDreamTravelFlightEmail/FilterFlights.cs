@@ -1,13 +1,11 @@
-﻿using DreamTravel.Domain.Flights;
+﻿using System.Collections.Generic;
+using System.Linq;
+using DreamTravel.Domain.Flights;
+using DreamTravel.Features.SendDreamTravelFlightEmail.Interfaces;
 
-namespace DreamTravel.Bot.DiscoverDreamTravelChances.SendEmail
+namespace DreamTravel.Features.SendDreamTravelFlightEmail
 {
-    using System.Collections.Generic;
-    using System.Linq;
-    using Interfaces;
-    using Models;
-
-    public class FilterChances : IFilterChances
+    public class FilterFlights : IFilterFlights
     {
         private readonly Dictionary<string, int> daysOfTheWeek = new Dictionary<string, int>
         {

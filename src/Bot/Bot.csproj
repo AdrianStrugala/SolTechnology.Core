@@ -16,24 +16,6 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="local.settings.json" CopyToOutputDirectory="Always" CopyToPublishDirectory="Never" />
-    <Content Include="RunBenchmark\Benchmark\TestData\eightCities.txt">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="RunBenchmark\Benchmark\TestData\fourCities.txt">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="RunBenchmark\Benchmark\TestData\sixteenCities.txt">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="RunBenchmark\Benchmark\TestData\twelveCities.txt">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="RunBenchmark\Benchmark\TestData\twentyCities.txt">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="RunBenchmark\Benchmark\TestData\twoCities.txt">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
   </ItemGroup>
 
   <ItemGroup>
@@ -56,10 +38,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Domain\Domain.csproj" />
-    <ProjectReference Include="..\FlightsRepository\FlightProviderData.csproj" />
-	 <ProjectReference Include="..\DatabaseData\DatabaseData.csproj" />
-    <ProjectReference Include="..\Infrastructure\Infrastructure.csproj" />
-    <ProjectReference Include="..\TravelingSalesmanProblem\TravelingSalesmanProblem.csproj" />
+    <ProjectReference Include="..\Features\Features.csproj" />
   </ItemGroup>
 
   <ItemGroup>

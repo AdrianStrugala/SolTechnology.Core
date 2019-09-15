@@ -1,8 +1,8 @@
-﻿namespace DreamTravel.Infrastructure.Database
-{
-    using System.Data;
-    using System.Data.SqlClient;
+﻿using System.Data;
+using System.Data.SqlClient;
 
+namespace DreamTravel.Infrastructure.Database
+{
     public static class DbConnectionFactory
     {
         private static readonly string ConnectionString;

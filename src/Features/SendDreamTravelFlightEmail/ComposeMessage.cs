@@ -1,11 +1,9 @@
-﻿using DreamTravel.Domain.Flights;
+﻿using System.Collections.Generic;
+using DreamTravel.Domain.Flights;
+using DreamTravel.Features.SendDreamTravelFlightEmail.Interfaces;
 
-namespace DreamTravel.Bot.DiscoverDreamTravelChances.SendEmail
+namespace DreamTravel.Features.SendDreamTravelFlightEmail
 {
-    using System.Collections.Generic;
-    using Interfaces;
-    using Models;
-
     public class ComposeMessage : IComposeMessage
     {
         public string Execute(List<Flight> chances)

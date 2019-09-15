@@ -1,7 +1,7 @@
-﻿using DreamTravel.Domain.Flights;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using DreamTravel.Domain.Flights;
 
-namespace DreamTravel.Bot.DiscoverDreamTravelChances.Interfaces
+namespace DreamTravel.Features.SendDreamTravelFlightEmail.Interfaces
 {
 
     public interface IComposeMessage

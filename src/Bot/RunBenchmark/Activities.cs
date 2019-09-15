@@ -1,6 +1,8 @@
-﻿namespace DreamTravel.Bot.RunBenchmark
+﻿using DreamTravel.Features.RunTSPBenchmark;
+using DreamTravel.Features.RunTSPBenchmark.TestData;
+
+namespace DreamTravel.Bot.RunBenchmark
 {
-    using Benchmark.TestData;
     using Microsoft.Azure.WebJobs;
     using Newtonsoft.Json;
     using System.Threading.Tasks;
@@ -36,12 +38,12 @@
         {
             var tspEngine = new TravelingSalesmanProblem.AntColony();
 
-            await Benchmark.Benchmark.RunTest(NumberOfExecutions, TwoCitiesMatrix, tspEngine, "AntColony");
-            await Benchmark.Benchmark.RunTest(NumberOfExecutions, FourCitiesMatrix, tspEngine, "AntColony");
-            await Benchmark.Benchmark.RunTest(NumberOfExecutions, EightCitiesMatrix, tspEngine, "AntColony");
-            await Benchmark.Benchmark.RunTest(NumberOfExecutions, TwelveCitiesMatrix, tspEngine, "AntColony");
-            await Benchmark.Benchmark.RunTest(NumberOfExecutions, SixteenCitiesMatrix, tspEngine, "AntColony");
-            await Benchmark.Benchmark.RunTest(NumberOfExecutions, TwentyCitiesMatrix, tspEngine, "AntColony");
+            await Benchmark.RunTest(NumberOfExecutions, TwoCitiesMatrix, tspEngine, "AntColony");
+            await Benchmark.RunTest(NumberOfExecutions, FourCitiesMatrix, tspEngine, "AntColony");
+            await Benchmark.RunTest(NumberOfExecutions, EightCitiesMatrix, tspEngine, "AntColony");
+            await Benchmark.RunTest(NumberOfExecutions, TwelveCitiesMatrix, tspEngine, "AntColony");
+            await Benchmark.RunTest(NumberOfExecutions, SixteenCitiesMatrix, tspEngine, "AntColony");
+            await Benchmark.RunTest(NumberOfExecutions, TwentyCitiesMatrix, tspEngine, "AntColony");
         }
 
 
@@ -51,12 +53,12 @@
         {
             var tspEngine = new TravelingSalesmanProblem.God();
 
-            await Benchmark.Benchmark.RunTest(NumberOfExecutions, TwoCitiesMatrix, tspEngine, "God");
-            await Benchmark.Benchmark.RunTest(NumberOfExecutions, FourCitiesMatrix, tspEngine, "God");
-            await Benchmark.Benchmark.RunTest(NumberOfExecutions, EightCitiesMatrix, tspEngine, "God");
-            await Benchmark.Benchmark.RunTest(NumberOfExecutions, TwelveCitiesMatrix, tspEngine, "God");
-            await Benchmark.Benchmark.RunTest(NumberOfExecutions, SixteenCitiesMatrix, tspEngine, "God");
-            await Benchmark.Benchmark.RunTest(NumberOfExecutions, TwentyCitiesMatrix, tspEngine, "God");
+            await Benchmark.RunTest(NumberOfExecutions, TwoCitiesMatrix, tspEngine, "God");
+            await Benchmark.RunTest(NumberOfExecutions, FourCitiesMatrix, tspEngine, "God");
+            await Benchmark.RunTest(NumberOfExecutions, EightCitiesMatrix, tspEngine, "God");
+            await Benchmark.RunTest(NumberOfExecutions, TwelveCitiesMatrix, tspEngine, "God");
+            await Benchmark.RunTest(NumberOfExecutions, SixteenCitiesMatrix, tspEngine, "God");
+            await Benchmark.RunTest(NumberOfExecutions, TwentyCitiesMatrix, tspEngine, "God");
         }
     }
 }

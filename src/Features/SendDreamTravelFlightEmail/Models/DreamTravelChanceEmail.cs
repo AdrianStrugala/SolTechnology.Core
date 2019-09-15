@@ -1,4 +1,4 @@
-﻿namespace DreamTravel.Bot.DiscoverDreamTravelChances.Models
+﻿namespace DreamTravel.Features.SendDreamTravelFlightEmail.Models
 {
     public class DreamTravelChanceEmail : Infrastructure.Email.IEmail
     {

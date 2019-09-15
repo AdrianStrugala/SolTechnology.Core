@@ -12,7 +12,12 @@
     <Folder Include="FindNameOfCity\" />
     <Folder Include="RunTSPBenchmark\" />
     <Folder Include="SendPersonalFlightEmail\" />
-    <Folder Include="SendDreamTravelFlightEmail\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\DatabaseData\DatabaseData.csproj" />
+    <ProjectReference Include="..\FlightsRepository\FlightProviderData.csproj" />	
+    <ProjectReference Include="..\TravelingSalesmanProblem\TravelingSalesmanProblem.csproj" />
   </ItemGroup>
 
 </Project>

@@ -1,30 +1,28 @@
 ﻿using System;
+using System.Collections.Generic;
 using DreamTravel.DatabaseData;
 using DreamTravel.Domain.Flights;
+using DreamTravel.Features.SendDreamTravelFlightEmail.Interfaces;
+using DreamTravel.Features.SendDreamTravelFlightEmail.Models;
 using DreamTravel.FlightProviderData;
 using DreamTravel.FlightProviderData.Flights.GetFlights;
+using DreamTravel.Infrastructure.Email;
 
-namespace DreamTravel.Bot.DiscoverDreamTravelChances
+namespace DreamTravel.Features.SendDreamTravelFlightEmail
 {
-    using Infrastructure.Email;
-    using Interfaces;
-    using SendEmail;
-    using System.Collections.Generic;
-    using Models;
-
-    public class DiscoverDreamTravelChances : IDiscoverDreamTravelChances
+    public class SendDreamTravelFlightEmail : ISendDreamTravelFlightEmail
     {
         private readonly IComposeMessage _composeMessage;
         private readonly IUserRepository _userRepository;
         private readonly IFlightRepository _flightRepository;
-        private readonly IFilterChances _filterChances;
+        private readonly IFilterFlights _filterFlights;
 
-        public DiscoverDreamTravelChances(IComposeMessage composeMessage, IUserRepository userRepository, IFlightRepository flightRepository, IFilterChances filterChances)
+        public SendDreamTravelFlightEmail(IComposeMessage composeMessage, IUserRepository userRepository, IFlightRepository flightRepository, IFilterFlights filterFlights)
         {
             _composeMessage = composeMessage;
             _userRepository = userRepository;
             _flightRepository = flightRepository;
-            _filterChances = filterChances;
+            _filterFlights = filterFlights;
         }
 
         public void Execute()
@@ -41,7 +39,7 @@ namespace DreamTravel.Bot.DiscoverDreamTravelChances
 
             List<Flight> flights = _flightRepository.GetFlights(getFlightsQuery).Flights;
 
-            flights = _filterChances.Execute(flights);
+            flights = _filterFlights.Execute(flights);
 
             var users = _userRepository.GetUsers();
 
