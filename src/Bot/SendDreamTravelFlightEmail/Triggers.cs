@@ -1,36 +1,39 @@
 ﻿using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
-using AzureFunctions.Autofac;
 using DreamTravel.Features.SendDreamTravelFlightEmail.Interfaces;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
 
 namespace DreamTravel.Bot.SendDreamTravelFlightEmail
 {
-    [DependencyInjectionConfig(typeof(Startup))]
-    public static class Triggers
+    public class Triggers
     {
         private const string TimeTriggerFunctionName = nameof(Bot.SendDreamTravelFlightEmail) + "Time";
         private const string HttpTriggerFunctionName = nameof(Bot.SendDreamTravelFlightEmail) + "Http";
         public const string HttpTriggerFunctionRoute = nameof(Bot.SendDreamTravelFlightEmail) + "/Now";
 
-        [FunctionName(TimeTriggerFunctionName)]
-        public static async Task TimerTrigger(
-            [TimerTrigger("0 0 8 * * *")] TimerInfo timer,
-            [OrchestrationClient] DurableOrchestrationClient orchestrationClient,
-            [Inject] ISendDreamTravelFlightEmail sendDreamTravelFlightEmail)
+        private readonly ISendDreamTravelFlightEmail _sendDreamTravelFlightEmail;
+
+        public Triggers(ISendDreamTravelFlightEmail sendDreamTravelFlightEmail)
         {
-            sendDreamTravelFlightEmail.Execute();
+            _sendDreamTravelFlightEmail = sendDreamTravelFlightEmail;
+        }
+
+        [FunctionName(TimeTriggerFunctionName)]
+        public async Task TimerTrigger(
+            [TimerTrigger("0 0 8 * * *")] TimerInfo timer,
+            [OrchestrationClient] DurableOrchestrationClient orchestrationClient)
+        {
+            _sendDreamTravelFlightEmail.Execute();
         }
 
         [FunctionName(HttpTriggerFunctionName)]
-        public static async Task<HttpResponseMessage> HttpTrigger(
+        public async Task<HttpResponseMessage> HttpTrigger(
             [HttpTrigger(AuthorizationLevel.Function, "get", "post", Route = HttpTriggerFunctionRoute)] HttpRequestMessage req,
-            [OrchestrationClient] DurableOrchestrationClientBase client,
-            [Inject] ISendDreamTravelFlightEmail sendDreamTravelFlightEmail)
+            [OrchestrationClient] DurableOrchestrationClientBase client)
         {
-            sendDreamTravelFlightEmail.Execute();
+            _sendDreamTravelFlightEmail.Execute();
             return req.CreateResponse(HttpStatusCode.OK);
         }
     }

@@ -6,10 +6,13 @@ using DreamTravel.Features.SendDreamTravelFlightEmail;
 using DreamTravel.Infrastructure;
 using DreamTravel.Bot.DiscoverIndividualChances.DataAccess;
 using DreamTravel.Bot.DiscoverIndividualChances.Interfaces;
+using DreamTravel.Features;
 using DreamTravel.FlightProviderData;
 using Microsoft.Azure.Functions.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection;
 using IComposeMessage = DreamTravel.Features.SendDreamTravelFlightEmail.Interfaces.IComposeMessage;
+
+[assembly: FunctionsStartup(typeof(DreamTravel.Bot.Startup))]
 
 namespace DreamTravel.Bot
 {
@@ -36,6 +39,7 @@ namespace DreamTravel.Bot
 
             builder.Services.AddDatabaseData();
             builder.Services.AddFlightProviderData();
+            builder.Services.AddFeatures();
         }
     }
 }
