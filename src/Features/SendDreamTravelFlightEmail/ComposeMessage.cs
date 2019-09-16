@@ -6,32 +6,6 @@ namespace DreamTravel.Features.SendDreamTravelFlightEmail
 {
     public class ComposeMessage : IComposeMessage
     {
-        public string Execute(List<Flight> chances)
-        {
-            string message = @"
-Welcome Traveler!
-
-Feel welcome to check out the newest flight chances. Prices below contains flying tickets there and back:
-";
-
-            foreach (var chance in chances)
-            {
-                message += $"• {chance.ThereDepartureCity} — {chance.ThereArrivalCity}  ({chance.ThereDate}-{chance.BackDate}) — {chance.Price}€ \n";
-            }
-
-            message += @"
-
-Are you interested in? Check more details at: http://www.azair.eu/
-
-Nothing interesting today? Plan your own Dream Travel at: https://dreamtravel.azurewebsites.net/
-
-Stay in touch!
-Dream Travel Team
-";
-
-            return message;
-        }
-
         public string ExecuteHtml(List<Flight> chances, string userName)
         {
             string message = @"<html> <body> 
