@@ -1,5 +1,7 @@
-﻿using DreamTravel.Features.SendDreamTravelFlightEmail;
+﻿using DreamTravel.DatabaseData.Configuration;
+using DreamTravel.Features.SendDreamTravelFlightEmail;
 using DreamTravel.Features.SendDreamTravelFlightEmail.Interfaces;
+using DreamTravel.FlightProviderData;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace DreamTravel.Features
@@ -18,6 +20,9 @@ namespace DreamTravel.Features
             services.AddScoped<IComposeMessage, ComposeMessage>();
             services.AddScoped<IFilterFlights, FilterFlights>();
             services.AddScoped<ISendDreamTravelFlightEmail, SendDreamTravelFlightEmail.SendDreamTravelFlightEmail>();
+
+            services.AddFlightProviderData();
+            services.AddDatabaseData();
         }
     }
 }

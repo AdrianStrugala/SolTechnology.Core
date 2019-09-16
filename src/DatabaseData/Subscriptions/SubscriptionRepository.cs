@@ -8,6 +8,13 @@ namespace DreamTravel.DatabaseData.Subscriptions
 {
     public class SubscriptionRepository : ISubscriptionRepository
     {
+        private readonly IDbConnectionFactory _dbConnectionFactory;
+
+        public SubscriptionRepository(IDbConnectionFactory dbConnectionFactory)
+        {
+            _dbConnectionFactory = dbConnectionFactory;
+        }
+
         const string Sql = @"
 SELECT 
     [User].[Name] AS UserName
@@ -24,7 +31,7 @@ JOIN [User] on [User].Id = UserId
         {
             List<Subscription> result;
 
-            using (var connection = DbConnectionFactory.CreateConnection())
+            using (var connection = _dbConnectionFactory.CreateConnection())
             {
                 result = connection.Query<Subscription>(Sql).ToList();
             }

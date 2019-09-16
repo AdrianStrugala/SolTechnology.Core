@@ -5,31 +5,30 @@ using Polly;
 
 namespace DreamTravel.Infrastructure.Database
 {
-    public static class DbConnectionFactory
+    public class DbConnectionFactory : IDbConnectionFactory
     {
-        private static readonly string ConnectionString;
-        private static readonly Random Random = new Random();
+        private readonly string _connectionString;
+        private readonly Random _random = new Random();
 
-        static DbConnectionFactory()
+        public DbConnectionFactory(string connectionString)
         {
-            var applicationConfiguration = new ApplicationConfiguration();
-            ConnectionString = applicationConfiguration.ConnectionString;
+            _connectionString = connectionString;
         }
 
-            public static IDbConnection CreateConnection()
-            {
-                var connection = new SqlConnection(ConnectionString);
+        public IDbConnection CreateConnection()
+        {
+            var connection = new SqlConnection(_connectionString);
 
-                Policy.Handle<Exception>()
-                            .WaitAndRetry(3, retryAttempt => TimeSpan.FromSeconds(Math.Pow(3, retryAttempt)) // 3,9,27s
-                                                                  + TimeSpan.FromMilliseconds(Random.Next(1000))) //delay up to 1s
-                            .Execute(() =>
-                                          {
-                                              connection.Open();
-                                          });
+            Policy.Handle<Exception>()
+                        .WaitAndRetry(3, retryAttempt => TimeSpan.FromSeconds(Math.Pow(3, retryAttempt)) // 3,9,27s
+                                                              + TimeSpan.FromMilliseconds(_random.Next(1000))) //delay up to 1s
+                        .Execute(() =>
+                                      {
+                                          connection.Open();
+                                      });
 
-                return connection;
-            }
+            return connection;
+        }
 
     }
 }

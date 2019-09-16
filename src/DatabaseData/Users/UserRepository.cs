@@ -8,6 +8,13 @@ namespace DreamTravel.DatabaseData.Users
 {
     public class UserRepository : IUserRepository
     {
+        private readonly IDbConnectionFactory _dbConnectionFactory;
+
+        public UserRepository(IDbConnectionFactory dbConnectionFactory)
+        {
+            _dbConnectionFactory = dbConnectionFactory;
+        }
+
         private const string Sql = @"
 SELECT [Id]
       ,[Name]
@@ -19,7 +26,7 @@ SELECT [Id]
         {
             List<User> result;
 
-            using (var connection = DbConnectionFactory.CreateConnection())
+            using (var connection = _dbConnectionFactory.CreateConnection())
             {
                 result = connection.Query<User>(Sql).ToList();
             }
