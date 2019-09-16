@@ -1,25 +1,21 @@
-﻿using DreamTravel.DatabaseData.Users;
-using Autofac;
-using AzureFunctions.Autofac.Configuration;
-using Microsoft.Extensions.Configuration;
-using System;
-using System.Diagnostics.CodeAnalysis;
+﻿using Microsoft.Extensions.Configuration;
 using System.IO;
 using System.Reflection;
 using DreamTravel.DatabaseData;
 using DreamTravel.Features.SendDreamTravelFlightEmail;
-using DreamTravel.Features.SendDreamTravelFlightEmail.Interfaces;
-using DreamTravel.FlightProviderData;
-using DreamTravel.FlightProviderData.Flights.GetFlights;
 using DreamTravel.Infrastructure;
-using Module = Autofac.Module;
+using DreamTravel.Bot.DiscoverIndividualChances.DataAccess;
+using DreamTravel.Bot.DiscoverIndividualChances.Interfaces;
+using DreamTravel.FlightProviderData;
+using Microsoft.Azure.Functions.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
+using IComposeMessage = DreamTravel.Features.SendDreamTravelFlightEmail.Interfaces.IComposeMessage;
 
 namespace DreamTravel.Bot
 {
-    [ExcludeFromCodeCoverage]
-    public class Startup
+    public class Startup : FunctionsStartup
     {
-        public Startup(string functionName)
+        public override void Configure(IFunctionsHostBuilder builder)
         {
             var applicatonConfiguration = new ApplicationConfiguration();
 
@@ -30,33 +26,16 @@ namespace DreamTravel.Bot
 
             configuration.Bind(applicatonConfiguration);
 
-            DependencyInjection.Initialize(
-                builder =>
-                {
-                    builder.RegisterInstance(applicatonConfiguration).As<ApplicationConfiguration>().AsImplementedInterfaces();
 
-                    builder.RegisterAssemblyTypes(GetType().Assembly)
-                        .Except<ApplicationConfiguration>()
-                        .AsImplementedInterfaces();
+            builder.Services.AddSingleton<ApplicationConfiguration>(applicatonConfiguration);
+            builder.Services.AddTransient<IComposeMessage, ComposeMessage>();
+            builder.Services.AddTransient<IDiscoverIndividualChances, DiscoverIndividualChances.DiscoverIndividualChances>();
+            builder.Services.AddTransient<IGetFlightsFromSkyScanner, GetFlightsFromSkyScanner>();
+            builder.Services.AddTransient<IGetSubscriptions, GetSubscriptions>();
 
 
-                    builder.RegisterType<FlightRepository>().As<IFlightRepository>();
-                    builder.RegisterType<UserRepository>().As<IUserRepository>();
-                    builder.RegisterType<Features.SendDreamTravelFlightEmail.SendDreamTravelFlightEmail>().As<ISendDreamTravelFlightEmail>();
-                    builder.RegisterType<FilterFlights>().As<IFilterFlights>();
-                    builder.RegisterType<ComposeMessage>().As<IComposeMessage>();
-                },
-                functionName);
-        }
-
-        public T ResolveDependency<T>(string functionClassName = null)
-        {
-            return (T)DependencyInjection.Resolve(typeof(T), functionClassName, string.Empty, Guid.Empty);
-        }
-
-        public object ResolveDependency(Type type, string functionClassName = null)
-        {
-            return DependencyInjection.Resolve(type, functionClassName, string.Empty, Guid.Empty);
+            builder.Services.AddDatabaseData();
+            builder.Services.AddFlightProviderData();
         }
     }
 }

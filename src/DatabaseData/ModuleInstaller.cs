@@ -5,7 +5,7 @@ namespace DreamTravel.DatabaseData
 {
     public static class ModuleInstaller
     {
-        public static IServiceCollection AddDatabaseData(this IServiceCollection services, string connectionString)
+        public static IServiceCollection AddDatabaseData(this IServiceCollection services)
         {
             services.AddTransient<IUserRepository, UserRepository>();
 

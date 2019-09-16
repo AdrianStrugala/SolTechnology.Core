@@ -1,12 +1,12 @@
-﻿namespace DreamTravel.Bot.RunBenchmark
-{
-    using AzureFunctions.Autofac;
-    using Microsoft.Azure.WebJobs;
-    using Microsoft.Azure.WebJobs.Extensions.Http;
-    using System.Net;
-    using System.Net.Http;
-    using System.Threading.Tasks;
+﻿using AzureFunctions.Autofac;
+using Microsoft.Azure.WebJobs;
+using Microsoft.Azure.WebJobs.Extensions.Http;
+using System.Net;
+using System.Net.Http;
+using System.Threading.Tasks;
 
+namespace DreamTravel.Bot.RunBenchmark
+{
     [DependencyInjectionConfig(typeof(Startup))]
     public static class Triggers
     {
