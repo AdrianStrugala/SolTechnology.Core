@@ -1,4 +1,5 @@
-﻿using DreamTravel.DatabaseData.Users;
+﻿using DreamTravel.DatabaseData.Subscriptions;
+using DreamTravel.DatabaseData.Users;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace DreamTravel.DatabaseData
@@ -8,6 +9,7 @@ namespace DreamTravel.DatabaseData
         public static IServiceCollection AddDatabaseData(this IServiceCollection services)
         {
             services.AddTransient<IUserRepository, UserRepository>();
+            services.AddTransient<ISubscriptionRepository, SubscriptionRepository>();
 
             return services;
         }

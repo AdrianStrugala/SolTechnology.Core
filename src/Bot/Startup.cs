@@ -6,6 +6,7 @@ using DreamTravel.Features.SendDreamTravelFlightEmail;
 using DreamTravel.Infrastructure;
 using DreamTravel.Bot.DiscoverIndividualChances.DataAccess;
 using DreamTravel.Bot.DiscoverIndividualChances.Interfaces;
+using DreamTravel.DatabaseData.Subscriptions;
 using DreamTravel.Features;
 using DreamTravel.FlightProviderData;
 using Microsoft.Azure.Functions.Extensions.DependencyInjection;
@@ -34,7 +35,6 @@ namespace DreamTravel.Bot
             builder.Services.AddTransient<IComposeMessage, ComposeMessage>();
             builder.Services.AddTransient<IDiscoverIndividualChances, DiscoverIndividualChances.DiscoverIndividualChances>();
             builder.Services.AddTransient<IGetFlightsFromSkyScanner, GetFlightsFromSkyScanner>();
-            builder.Services.AddTransient<IGetSubscriptions, GetSubscriptions>();
 
 
             builder.Services.AddDatabaseData();

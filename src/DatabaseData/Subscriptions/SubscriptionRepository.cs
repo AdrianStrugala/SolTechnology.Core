@@ -1,13 +1,12 @@
-﻿namespace DreamTravel.Bot.DiscoverIndividualChances.DataAccess
-{
-    using System.Collections.Generic;
-    using System.Linq;
-    using Dapper;
-    using Infrastructure.Database;
-    using Interfaces;
-    using Models;
+﻿using System.Collections.Generic;
+using System.Linq;
+using Dapper;
+using DreamTravel.Bot.DiscoverIndividualChances.Models;
+using DreamTravel.Infrastructure.Database;
 
-    public class GetSubscriptions : IGetSubscriptions
+namespace DreamTravel.DatabaseData.Subscriptions
+{
+    public class SubscriptionRepository : ISubscriptionRepository
     {
         const string Sql = @"
 SELECT 
@@ -21,7 +20,7 @@ FROM Subscription
 JOIN [User] on [User].Id = UserId
 ";
 
-        public List<Subscription> Execute()
+        public List<Subscription> GetSubscriptions()
         {
             List<Subscription> result;
 
