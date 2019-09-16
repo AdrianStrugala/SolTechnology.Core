@@ -12,6 +12,7 @@ using DreamTravel.Features.SendDreamTravelFlightEmail.Interfaces;
 using DreamTravel.FlightProviderData;
 using DreamTravel.FlightProviderData.Flights.GetFlights;
 using DreamTravel.Infrastructure;
+using Module = Autofac.Module;
 
 namespace DreamTravel.Bot
 {
@@ -37,6 +38,7 @@ namespace DreamTravel.Bot
                     builder.RegisterAssemblyTypes(GetType().Assembly)
                         .Except<ApplicationConfiguration>()
                         .AsImplementedInterfaces();
+
 
                     builder.RegisterType<FlightRepository>().As<IFlightRepository>();
                     builder.RegisterType<UserRepository>().As<IUserRepository>();
