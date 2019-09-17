@@ -1,6 +1,9 @@
 ﻿CREATE TABLE [dbo].[User]
 (
 	[Id] INT NOT NULL IDENTITY(1,1) PRIMARY KEY, 
-    [Name] NVARCHAR(50) NOT NULL, 
-    [Email] NVARCHAR(50) NOT NULL
+    [Name] NVARCHAR(50) NOT NULL,
+	[Password] NVARCHAR(50) NOT NULL,
+    [Email] NVARCHAR(50) NOT NULL,
+	[IsActive] BIT NULL,
+	[Currency] NVARCHAR(5) NULL DEFAULT 'EUR'
 )

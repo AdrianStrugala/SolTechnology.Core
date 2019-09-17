@@ -64,5 +64,36 @@ namespace DreamTravel.FlightDataTests.Airports
 
             Assert.Equal(result[oneOfResults.Keys.First()], oneOfResults.Values.First());
         }
+
+        [Fact]
+        public void GetCodesByCountry_ValidCountry_ListOfCodesIsReturned()
+        {
+            // Arrange
+            var expected = new List<string>
+                    {
+                        "SZY",
+                        "GDN",
+                        "KRK",
+                        "KTW",
+                        "POZ",
+                        "RZE",
+                        "SZZ",
+                        "WAW",
+                        "WRO",
+                        "BZG",
+                        "LCJ",
+                        "WMI",
+                        "LUZ"
+                    };
+
+            // Act
+            List<string> result = _sut.GetCodesByCountry("Poland");
+
+            // Assert
+            Assert.NotNull(result);
+            Assert.NotEmpty(result);
+
+            Assert.Equal(expected, result);
+        }
     }
 }
