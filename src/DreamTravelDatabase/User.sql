@@ -2,8 +2,8 @@
 (
 	[Id] INT NOT NULL IDENTITY(1,1) PRIMARY KEY, 
     [Name] NVARCHAR(50) NOT NULL,
-	[Password] NVARCHAR(50) NOT NULL,
+	[Password] NVARCHAR(50) NOT NULL DEFAULT 'Password',
     [Email] NVARCHAR(50) NOT NULL,
-	[IsActive] BIT NULL,
+	[IsActive] BIT NOT NULL DEFAULT 0,
 	[Currency] NVARCHAR(5) NULL DEFAULT 'EUR'
 )
