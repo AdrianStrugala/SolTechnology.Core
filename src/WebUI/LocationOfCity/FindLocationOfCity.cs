@@ -25,7 +25,7 @@
             try
             {
                 string url =
-                    $"https://maps.googleapis.com/maps/api/geocode/json?address={cityName}&key=AIzaSyBgCjCJuGQsXlAz6BUXPIL2_RSxgXUaCcM";
+                    $"https://maps.googleapis.com/maps/api/geocode/json?address={cityName}&key=AIzaSyC8ZkBAtPiwp0rk4SRdhH6vufM39eDMmHY";
 
                 City toAdd = new City { Name = cityName };
 

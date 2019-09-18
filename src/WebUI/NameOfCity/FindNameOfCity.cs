@@ -26,7 +26,7 @@
             try
             {
                 string url =
-                    $"https://maps.googleapis.com/maps/api/geocode/json?latlng={city.Latitude},{city.Longitude}&sensor=false&key=AIzaSyBgCjCJuGQsXlAz6BUXPIL2_RSxgXUaCcM";
+                    $"https://maps.googleapis.com/maps/api/geocode/json?latlng={city.Latitude},{city.Longitude}&sensor=false&key=AIzaSyC8ZkBAtPiwp0rk4SRdhH6vufM39eDMmHY";
 
                 string response = await _httpClient.GetStringAsync(url);
                 JObject json = JObject.Parse(response);

@@ -42,7 +42,7 @@
                 try
                 {
                     string url =
-                        $"https://maps.googleapis.com/maps/api/distancematrix/json?units=imperial&origins={listOfCities[i].Latitude},{listOfCities[i].Longitude}&destinations={coordinates}&key=AIzaSyBgCjCJuGQsXlAz6BUXPIL2_RSxgXUaCcM";
+                        $"https://maps.googleapis.com/maps/api/distancematrix/json?units=imperial&origins={listOfCities[i].Latitude},{listOfCities[i].Longitude}&destinations={coordinates}&key=AIzaSyC8ZkBAtPiwp0rk4SRdhH6vufM39eDMmHY";
 
                     var response = await _httpClient.GetStringAsync(url);
                     JObject json = JObject.Parse(response);
