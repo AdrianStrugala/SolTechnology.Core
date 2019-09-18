@@ -16,10 +16,12 @@ namespace DreamTravel.DatabaseData.FlightEmailOrders
 
         public void Insert(FlightEmailOrder flightEmailOrder)
         {
-            using (var connection = _dbConnectionFactory.CreateConnection())
-            {
-               var id = connection.Insert(flightEmailOrder);
-            }
+            throw new System.NotImplementedException();
+
+//            using (var connection = _dbConnectionFactory.CreateConnection())
+//            {
+//               var id = connection.Insert()
+//            }
         }
 
         public List<FlightEmailOrder> GetAll()
