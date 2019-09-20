@@ -149,7 +149,7 @@
       ],
       "resources": [
         {
-          "name": "default",
+          "name": "[concat(parameters('databaseName'), 'backupPolicy')]",
           "type": "backupLongTermRetentionPolicies",
           "apiVersion": "2017-03-01-preview",
           "properties": {
