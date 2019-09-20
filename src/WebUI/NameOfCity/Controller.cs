@@ -1,13 +1,12 @@
-﻿namespace DreamTravel.WebUI.NameOfCity
-{
-    using System;
-    using System.Threading.Tasks;
-    using Contract;
-    using Interfaces;
-    using Microsoft.AspNetCore.Mvc;
-    using Microsoft.Extensions.Logging;
-    using Newtonsoft.Json;
+﻿using DreamTravel.Features.FindNameOfCity.Interfaces;
+using System;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 
+namespace DreamTravel.WebUI.NameOfCity
+{
     [Route(Route)]
     public class Controller : Microsoft.AspNetCore.Mvc.Controller
     {
@@ -31,13 +30,8 @@
             try
             {
                 _logger.LogInformation("Looking for city: " + lat + ";" + lng);
-                City result = new City
-                {
-                    Latitude = lat,
-                    Longitude = lng
-                };
 
-                result = await _findNameOfCity.Execute(result);
+                var result = await _findNameOfCity.Execute(lat, lng);
 
                 string message = JsonConvert.SerializeObject(result);
                 return Ok(message);

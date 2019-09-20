@@ -9,14 +9,14 @@
     <Folder Include="CalculateBestPath\" />
     <Folder Include="FindPathsUnderCostLimit\" />
     <Folder Include="FindLocationOfCity\" />
-    <Folder Include="FindNameOfCity\" />
     <Folder Include="RunTSPBenchmark\" />
     <Folder Include="SendPersonalFlightEmail\" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\DatabaseData\DatabaseData.csproj" />
-    <ProjectReference Include="..\FlightsRepository\FlightProviderData.csproj" />	
+    <ProjectReference Include="..\FlightsRepository\FlightProviderData.csproj" />
+    <ProjectReference Include="..\GeolocationData\GeolocationData.csproj" />	
     <ProjectReference Include="..\TravelingSalesmanProblem\TravelingSalesmanProblem.csproj" />
   </ItemGroup>
 

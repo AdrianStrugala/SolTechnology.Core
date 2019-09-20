@@ -10,7 +10,7 @@ namespace DreamTravel.DatabaseData.Configuration
 {
     public static class ModuleInstaller
     {
-        public static IServiceCollection AddDatabaseData(this IServiceCollection services)
+        public static IServiceCollection InstallDatabaseData(this IServiceCollection services)
         {
             DatabaseDataConfiguration databaseDataConfiguration = JsonConvert.DeserializeObject<DatabaseDataConfiguration>(File.ReadAllText("databaseDataSettings.json"));
             services.AddSingleton<DatabaseDataConfiguration>(databaseDataConfiguration);

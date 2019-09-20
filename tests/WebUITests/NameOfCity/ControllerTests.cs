@@ -1,4 +1,6 @@
-﻿namespace DreamTravel.WebUITests.NameOfCity
+﻿using DreamTravel.Features.FindNameOfCity.Interfaces;
+
+namespace DreamTravel.WebUITests.NameOfCity
 {
     using System.IO;
     using System.Threading.Tasks;
@@ -8,7 +10,6 @@
     using NSubstitute;
     using NSubstitute.ExceptionExtensions;
     using WebUI.Contract;
-    using WebUI.NameOfCity.Interfaces;
     using Xunit;
     using Controller = WebUI.NameOfCity.Controller;
 
@@ -31,12 +32,12 @@
         public async Task FindCityByLocation_SuccesfullCall_ReturnsData()
         {
             // Arrange
-            City city = new City();
+            DreamTravel.Domain.Cities.City city = new DreamTravel.Domain.Cities.City();
             city.Name = "someName";
             city.Latitude = 21;
             city.Longitude = 37;
 
-            _findNameOfCity.Execute(Arg.Any<City>()).Returns(city);
+            _findNameOfCity.Execute(Arg.Any<double>(), Arg.Any<double>()).Returns(city);
 
             // Act
             var result = await _sut.FindNameOfCity(city.Latitude, city.Longitude, "someSessionId");
@@ -57,7 +58,7 @@
         public async Task FindCityByLocation_ExceptionHappend_ReturnsBadRequest()
         {
             // Arrange
-            _findNameOfCity.Execute(Arg.Any<City>()).ThrowsForAnyArgs(new InvalidDataException());
+            _findNameOfCity.Execute(Arg.Any<double>(), Arg.Any<double>()).ThrowsForAnyArgs(new InvalidDataException());
 
             // Act
             var result = await _sut.FindNameOfCity(21, 34, "someSessionId");

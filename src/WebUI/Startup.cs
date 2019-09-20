@@ -17,8 +17,6 @@
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.Logging;
-    using NameOfCity;
-    using NameOfCity.Interfaces;
     using TravelingSalesmanProblem;
 
     public class Startup
@@ -56,7 +54,6 @@
             services.AddTransient<IBreakCostLimit, BreakCostLimit>();
             services.AddTransient<IEvaluationBrain, EvaluationBrain>();
             services.AddTransient<IFindLocationOfCity, FindLocationOfCity>();
-            services.AddTransient<IFindNameOfCity, FindNameOfCity>();
 
             services.AddSession();
 

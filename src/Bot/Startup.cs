@@ -18,7 +18,7 @@ namespace DreamTravel.Bot
             builder.Services.AddTransient<IDiscoverIndividualChances, DiscoverIndividualChances.DiscoverIndividualChances>();
             builder.Services.AddTransient<IGetFlightsFromSkyScanner, GetFlightsFromSkyScanner>();
 
-            builder.Services.AddFeatures();
+            builder.Services.InstallFeatures();
         }
     }
 }

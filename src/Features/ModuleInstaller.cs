@@ -2,27 +2,24 @@
 using DreamTravel.Features.SendDreamTravelFlightEmail;
 using DreamTravel.Features.SendDreamTravelFlightEmail.Interfaces;
 using DreamTravel.FlightProviderData;
+using DreamTravel.GeolocationData.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace DreamTravel.Features
 {
     public static class ModuleInstaller
     {
-        public static IServiceCollection AddFeatures(this IServiceCollection services)
-        {
-            RegisterSendDreamTravelFlightEmail(services);
-
-            return services;
-        }
-
-        private static void RegisterSendDreamTravelFlightEmail(IServiceCollection services)
+        public static IServiceCollection InstallFeatures(this IServiceCollection services)
         {
             services.AddScoped<IComposeMessage, ComposeMessage>();
             services.AddScoped<IFilterFlights, FilterFlights>();
             services.AddScoped<ISendDreamTravelFlightEmail, SendDreamTravelFlightEmail.SendDreamTravelFlightEmail>();
 
-            services.AddFlightProviderData();
-            services.AddDatabaseData();
+            services.InstallFlightProviderData();
+            services.InstallDatabaseData();
+            services.InstallGeolocationData();
+
+            return services;
         }
     }
 }

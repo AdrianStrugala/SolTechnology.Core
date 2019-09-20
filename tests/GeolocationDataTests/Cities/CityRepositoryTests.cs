@@ -1,23 +1,21 @@
-﻿
-
-//Reference
+﻿//Reference
 //https://github.com/nchaulet/node-geocoder/blob/master/lib/geocoder/googlegeocoder.js
 
-namespace DreamTravel.WebUITests.NameOfCity
+
+using System.Threading.Tasks;
+using DreamTravel.Domain.Cities;
+using DreamTravel.GeolocationData.Cities;
+using Xunit;
+
+namespace DreamTravel.GeolocationDataTests.Cities
 {
-    using System.IO;
-    using System.Threading.Tasks;
-    using WebUI.Contract;
-    using WebUI.NameOfCity;
-    using Xunit;
-
-    public class FindNameOfCityTests
+    public class CityRepositoryTests
     {
-        private readonly FindNameOfCity _sut;
+        private readonly CityRepository _sut;
 
-        public FindNameOfCityTests()
+        public CityRepositoryTests()
         {
-            _sut = new FindNameOfCity();
+            _sut = new CityRepository();
         }
 
         [Fact]
@@ -32,7 +30,7 @@ namespace DreamTravel.WebUITests.NameOfCity
             };
 
             //Act
-            var result = await _sut.Execute(city);
+            var result = await _sut.GetName(city);
 
             //Assert
             Assert.Equal("Kufra District, Libya", result.Name);
@@ -50,7 +48,7 @@ namespace DreamTravel.WebUITests.NameOfCity
             };
 
             //Act
-            var result = await _sut.Execute(city);
+            var result = await _sut.GetName(city);
 
             //Assert
             Assert.Equal("Wrocław", result.Name);
@@ -68,7 +66,7 @@ namespace DreamTravel.WebUITests.NameOfCity
             };
 
             //Act
-            var result = await _sut.Execute(city);
+            var result = await _sut.GetName(city);
 
             //Assert
             Assert.Equal("Baltic Sea", result.Name);
