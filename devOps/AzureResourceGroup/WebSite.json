@@ -156,7 +156,7 @@
             "weeklyRetention": "P4W"
           },
           "dependsON": [
-            "[resourceId(parameters('sqlServerName').ResourceGroup.Name, 'Microsoft.Sql/servers/databases', parameters('sqlServerName'), parameters('databaseName'))]"
+            "[resourceId('Microsoft.Sql/servers/databases', parameters('sqlServerName'), parameters('databaseName'))]"
           ]
         }
       ]
