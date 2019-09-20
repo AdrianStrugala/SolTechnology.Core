@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using Dapper;
 using DreamTravel.Bot.DiscoverIndividualChances.Models;
 using DreamTravel.Infrastructure.Database;
@@ -41,7 +42,19 @@ VALUES
 
         public List<FlightEmailOrder> GetAll()
         {
-            throw new System.NotImplementedException();
+            var result = new List<FlightEmailOrder>();
+
+            string sql = @"
+SELECT * 
+FROM FlightEmailOrder
+";
+
+            using (var connection = _dbConnectionFactory.CreateConnection())
+            {
+                result = connection.Query<FlightEmailOrder>(sql).ToList();
+            }
+
+            return result;
         }
     }
 }
