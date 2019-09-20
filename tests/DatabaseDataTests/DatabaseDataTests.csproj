@@ -19,6 +19,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\DatabaseData\DatabaseData.csproj" />
+    <ProjectReference Include="..\..\src\DatabaseData\DatabaseData.csproj" />
   </ItemGroup>
+
 </Project>
