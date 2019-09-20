@@ -16,9 +16,9 @@ namespace DreamTravel.Bot.DiscoverIndividualChances.Models
 
         public DateTime ArrivalDate { get; set; }
 
-        public int MinDaysToStay { get; set; }
+        public int MinDaysOfStay { get; set; }
 
-        public int MaxDaysToStay { get; set; }
+        public int MaxDaysOfStay { get; set; }
 
         public bool OneWay { get; set; }
 

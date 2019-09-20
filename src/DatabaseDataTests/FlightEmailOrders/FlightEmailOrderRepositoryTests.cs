@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Threading;
+using System.Collections.Generic;
 using DreamTravel.Bot.DiscoverIndividualChances.Models;
 using DreamTravel.DatabaseData.FlightEmailOrders;
 using DreamTravel.Infrastructure.Database;
@@ -9,7 +9,7 @@ namespace DreamTravel.DatabaseDataTests.FlightEmailOrders
 {
     public class FlightEmailOrderRepositoryTests
     {
-        private FlightEmailOrderRepository _sut;
+        private readonly FlightEmailOrderRepository _sut;
 
         public FlightEmailOrderRepositoryTests()
         {
@@ -30,14 +30,17 @@ namespace DreamTravel.DatabaseDataTests.FlightEmailOrders
             flightEmailOrder.DepartureDate = DateTime.UtcNow;
             flightEmailOrder.From = "Poland";
             flightEmailOrder.To = "London";
-            flightEmailOrder.MaxDaysToStay = 4;
-            flightEmailOrder.MinDaysToStay = 1;
+            flightEmailOrder.MaxDaysOfStay = 4;
+            flightEmailOrder.MinDaysOfStay = 1;
             flightEmailOrder.OneWay = false;
 
             //Act
             _sut.Insert(flightEmailOrder);
 
             //Assert
+            List<FlightEmailOrder> flightEmailOrders = _sut.GetAll();
+
+            Assert.Contains(flightEmailOrder, flightEmailOrders);
         }
     }
 }
