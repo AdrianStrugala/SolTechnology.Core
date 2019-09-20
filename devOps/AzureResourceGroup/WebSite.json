@@ -132,7 +132,7 @@
       }
     },
     {
-      "name": "[parameters('databaseName')]",
+      "name": "[concat(parameters('sqlServerName'), '/', parameters('databaseName'))]",
       "type": "Microsoft.Sql/servers/databases",
       "location": "[resourceGroup().location]",
       "apiVersion": "2017-10-01-preview",
@@ -156,7 +156,7 @@
             "weeklyRetention": "P4W"
           },
           "dependsON": [
-            "[resourceId(parameters('sqlServerName').ResourceGroup.Name, 'Microsoft.Sql/servers/databases', parameters('sqlServerName').Name, parameters('databaseName'))]"
+            "[resourceId(parameters('sqlServerName').ResourceGroup.Name, 'Microsoft.Sql/servers/databases', parameters('sqlServerName'), parameters('databaseName'))]"
           ]
         }
       ]
