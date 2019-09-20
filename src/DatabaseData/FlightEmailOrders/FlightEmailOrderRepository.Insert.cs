@@ -1,12 +1,10 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using Dapper;
+﻿using Dapper;
 using DreamTravel.Bot.DiscoverIndividualChances.Models;
 using DreamTravel.Infrastructure.Database;
 
 namespace DreamTravel.DatabaseData.FlightEmailOrders
 {
-    public class FlightEmailOrderRepository : IFlightEmailOrderRepository
+    public partial class FlightEmailOrderRepository : IFlightEmailOrderRepository
     {
         private readonly IDbConnectionFactory _dbConnectionFactory;
 
@@ -38,23 +36,6 @@ VALUES
                     OneWay = flightEmailOrder.OneWay
                 });
             }
-        }
-
-        public List<FlightEmailOrder> GetAll()
-        {
-            var result = new List<FlightEmailOrder>();
-
-            string sql = @"
-SELECT * 
-FROM FlightEmailOrder
-";
-
-            using (var connection = _dbConnectionFactory.CreateConnection())
-            {
-                result = connection.Query<FlightEmailOrder>(sql).ToList();
-            }
-
-            return result;
         }
     }
 }
