@@ -2,22 +2,17 @@
 using System.Collections.Generic;
 using DreamTravel.Bot.DiscoverIndividualChances.Models;
 using DreamTravel.DatabaseData.FlightEmailOrders;
-using DreamTravel.Infrastructure.Database;
 using Xunit;
 
 namespace DreamTravel.DatabaseDataTests.FlightEmailOrders
 {
-    public class FlightEmailOrderRepositoryTests
+    public class FlightEmailOrderRepositoryTests : IClassFixture<SqlFixture>
     {
         private readonly FlightEmailOrderRepository _sut;
 
-        public FlightEmailOrderRepositoryTests()
+        public FlightEmailOrderRepositoryTests(SqlFixture sqlFixture)
         {
-            string connectionString =
-                "Server=tcp:dreamtravel.database.windows.net,1433;Initial Catalog=dreamtravel;Persist Security Info=False;User ID=adrian;Password=P4ssw0rd@;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=60;";
-            var dbConnectionFactory = new DbConnectionFactory(connectionString);
-
-            _sut = new FlightEmailOrderRepository(dbConnectionFactory);
+            _sut = new FlightEmailOrderRepository(sqlFixture.DbConnectionFactory);
         }
 
         [Fact]
