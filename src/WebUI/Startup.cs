@@ -7,8 +7,6 @@
     using BestPath.Interfaces;
     using CostLimit;
     using CostLimit.Interfaces;
-    using LocationOfCity;
-    using LocationOfCity.Interfaces;
     using Microsoft.AspNetCore.Authentication;
     using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Builder;
@@ -53,7 +51,6 @@
             services.AddTransient<ICalculateBestPath, CalculateBestPath>();
             services.AddTransient<IBreakCostLimit, BreakCostLimit>();
             services.AddTransient<IEvaluationBrain, EvaluationBrain>();
-            services.AddTransient<IFindLocationOfCity, FindLocationOfCity>();
 
             services.AddSession();
 

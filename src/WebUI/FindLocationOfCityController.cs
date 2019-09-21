@@ -1,24 +1,24 @@
-﻿namespace DreamTravel.WebUI.LocationOfCity
-{
-    using System;
-    using System.Threading.Tasks;
-    using Contract;
-    using Interfaces;
-    using Microsoft.AspNetCore.Mvc;
-    using Microsoft.Extensions.Logging;
-    using Newtonsoft.Json;
+﻿using System;
+using System.Threading.Tasks;
+using DreamTravel.Domain.Cities;
+using DreamTravel.Features.FindLocationOfCity;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 
+namespace DreamTravel.WebUI
+{
     [Route(Route)]
-    public class Controller : Microsoft.AspNetCore.Mvc.Controller
+    public class FindLocationOfCityController : Controller
     {
         public const string Route = "api/FindLocationOfCity";
 
-        private readonly ILogger<Controller> _logger;
+        private readonly ILogger<FindLocationOfCityController> _logger;
         private readonly IFindLocationOfCity _findLocationOfCity;
 
 
-        public Controller(IFindLocationOfCity findLocationOfCity,
-                             ILogger<Controller> logger)
+        public FindLocationOfCityController(IFindLocationOfCity findLocationOfCity,
+                             ILogger<FindLocationOfCityController> logger)
         {
             _findLocationOfCity = findLocationOfCity;
             _logger = logger;

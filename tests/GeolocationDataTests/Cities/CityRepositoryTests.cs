@@ -2,6 +2,7 @@
 //https://github.com/nchaulet/node-geocoder/blob/master/lib/geocoder/googlegeocoder.js
 
 
+using System.IO;
 using System.Threading.Tasks;
 using DreamTravel.Domain.Cities;
 using DreamTravel.GeolocationData.Cities;
@@ -70,6 +71,35 @@ namespace DreamTravel.GeolocationDataTests.Cities
 
             //Assert
             Assert.Equal("Baltic Sea", result.Name);
+        }
+
+        [Fact]
+        public async Task GetCityByName_InvokeWithRealName_ReturnsCityObject()
+        {
+            //Arrange
+            string cityName = "Wroclaw";
+
+            //Act
+            var result = await _sut.GetLocation(cityName);
+
+            //Assert
+            Assert.Equal("Wroclaw", result.Name);
+            Assert.NotEqual(0, result.Latitude);
+            Assert.NotEqual(0, result.Longitude);
+        }
+
+        [Fact]
+        public async Task GetCityByName_NonExistingCity_ExceptionIsThrown()
+        {
+            //Arrange
+            string cityName = "DUPA";
+
+            //Act
+            // ReSharper disable once PossibleNullReferenceException
+            var exception = await Record.ExceptionAsync(async () => await _sut.GetLocation(cityName));
+
+            //Assert
+            Assert.IsType<InvalidDataException>(exception);
         }
 
     }

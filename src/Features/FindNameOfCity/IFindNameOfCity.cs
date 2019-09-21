@@ -1,7 +1,7 @@
 ﻿using System.Threading.Tasks;
 using DreamTravel.Domain.Cities;
 
-namespace DreamTravel.Features.FindNameOfCity.Interfaces
+namespace DreamTravel.Features.FindNameOfCity
 {
     public interface IFindNameOfCity
     {

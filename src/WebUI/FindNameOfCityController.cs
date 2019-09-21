@@ -1,23 +1,23 @@
-﻿using DreamTravel.Features.FindNameOfCity.Interfaces;
-using System;
+﻿using System;
 using System.Threading.Tasks;
+using DreamTravel.Features.FindNameOfCity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 
-namespace DreamTravel.WebUI.NameOfCity
+namespace DreamTravel.WebUI
 {
     [Route(Route)]
-    public class Controller : Microsoft.AspNetCore.Mvc.Controller
+    public class FindNameOfCityController : Controller
     {
         public const string Route = "api/FindNameOfCity";
 
-        private readonly ILogger<Controller> _logger;
+        private readonly ILogger<FindNameOfCityController> _logger;
         private readonly IFindNameOfCity _findNameOfCity;
 
 
-        public Controller(IFindNameOfCity findNameOfCity,
-                          ILogger<Controller> logger)
+        public FindNameOfCityController(IFindNameOfCity findNameOfCity,
+                          ILogger<FindNameOfCityController> logger)
         {
             _findNameOfCity = findNameOfCity;
             _logger = logger;

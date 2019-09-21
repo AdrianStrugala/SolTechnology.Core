@@ -1,6 +1,5 @@
 ﻿using System.Threading.Tasks;
 using DreamTravel.Domain.Cities;
-using DreamTravel.Features.FindNameOfCity.Interfaces;
 using DreamTravel.GeolocationData;
 
 namespace DreamTravel.Features.FindNameOfCity

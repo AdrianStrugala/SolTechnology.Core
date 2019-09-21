@@ -8,7 +8,6 @@
   <ItemGroup>
     <Folder Include="CalculateBestPath\" />
     <Folder Include="FindPathsUnderCostLimit\" />
-    <Folder Include="FindLocationOfCity\" />
     <Folder Include="RunTSPBenchmark\" />
     <Folder Include="SendPersonalFlightEmail\" />
   </ItemGroup>

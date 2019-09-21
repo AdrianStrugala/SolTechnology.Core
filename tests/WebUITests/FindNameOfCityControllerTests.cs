@@ -1,30 +1,29 @@
-﻿using DreamTravel.Features.FindNameOfCity.Interfaces;
+﻿using System.IO;
+using System.Threading.Tasks;
+using DreamTravel.Features.FindNameOfCity;
+using DreamTravel.WebUI;
+using DreamTravel.WebUI.Contract;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
+using NSubstitute;
+using NSubstitute.ExceptionExtensions;
+using Xunit;
 
-namespace DreamTravel.WebUITests.NameOfCity
+namespace DreamTravel.WebUITests
 {
-    using System.IO;
-    using System.Threading.Tasks;
-    using Microsoft.AspNetCore.Mvc;
-    using Microsoft.Extensions.Logging;
-    using Newtonsoft.Json;
-    using NSubstitute;
-    using NSubstitute.ExceptionExtensions;
-    using WebUI.Contract;
-    using Xunit;
-    using Controller = WebUI.NameOfCity.Controller;
-
-    public class ControllerTests
+    public class FindNameOfCityControllerTests
     {
-        private readonly Controller _sut;
+        private readonly FindNameOfCityController _sut;
 
         private readonly IFindNameOfCity _findNameOfCity;
 
-        public ControllerTests()
+        public FindNameOfCityControllerTests()
         {
-            ILogger<Controller> logger = Substitute.For<ILogger<Controller>>();
+            ILogger<FindNameOfCityController> logger = Substitute.For<ILogger<FindNameOfCityController>>();
             _findNameOfCity = Substitute.For<IFindNameOfCity>();
 
-            _sut = new Controller(_findNameOfCity, logger);
+            _sut = new FindNameOfCityController(_findNameOfCity, logger);
         }
 
 
