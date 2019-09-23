@@ -5,8 +5,6 @@
     using BestPath.DataAccess;
     using BestPath.Executors;
     using BestPath.Interfaces;
-    using CostLimit;
-    using CostLimit.Interfaces;
     using Microsoft.AspNetCore.Authentication;
     using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Builder;
@@ -49,7 +47,6 @@
             services.AddTransient<IDownloadRoadData, DownloadRoadData>();
             services.AddTransient<IFormOutputData, FormPathsFromMatrices>();
             services.AddTransient<ICalculateBestPath, CalculateBestPath>();
-            services.AddTransient<IBreakCostLimit, BreakCostLimit>();
             services.AddTransient<IEvaluationBrain, EvaluationBrain>();
 
             services.AddSession();

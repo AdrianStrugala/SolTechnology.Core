@@ -1,16 +1,15 @@
-﻿namespace DreamTravel.WebUITests.CostLimit
-{
-    using System.Collections.Generic;
-    using WebUI.Contract;
-    using WebUI.CostLimit;
-    using Xunit;
+﻿using System.Collections.Generic;
+using DreamTravel.Domain.Paths;
+using Xunit;
 
-    public class CostLimitBreakerTests
+namespace DreamTravel.FeaturesTests.LimitCostOfPaths
+{
+    public class LimitCostOfPathsTests
     {
-        private readonly BreakCostLimit _sut;
-        public CostLimitBreakerTests()
+        private readonly Features.LimitCostOfPaths.LimitCostOfPaths _sut;
+        public LimitCostOfPathsTests()
         {
-            _sut = new BreakCostLimit();
+            _sut = new Features.LimitCostOfPaths.LimitCostOfPaths();
         }
 
         [Fact]

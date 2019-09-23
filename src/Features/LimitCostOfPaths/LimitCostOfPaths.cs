@@ -1,11 +1,10 @@
-﻿namespace DreamTravel.WebUI.CostLimit
-{
-    using System.Collections.Generic;
-    using System.Linq;
-    using Contract;
-    using Interfaces;
+﻿using System.Collections.Generic;
+using System.Linq;
+using DreamTravel.Domain.Paths;
 
-    public class BreakCostLimit : IBreakCostLimit
+namespace DreamTravel.Features.LimitCostOfPaths
+{
+    public class LimitCostOfPaths : ILimitCostOfPaths
     {
         public List<Path> Execute(int costLimit, List<Path> paths)
         {

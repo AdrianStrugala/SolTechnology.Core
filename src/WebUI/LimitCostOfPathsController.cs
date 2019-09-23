@@ -1,23 +1,23 @@
-﻿namespace DreamTravel.WebUI.CostLimit
-{
-    using System;
-    using System.Collections.Generic;
-    using Contract;
-    using Interfaces;
-    using Microsoft.AspNetCore.Http;
-    using Microsoft.AspNetCore.Mvc;
-    using Microsoft.Extensions.Logging;
-    using Newtonsoft.Json;
+﻿using System;
+using System.Collections.Generic;
+using DreamTravel.Domain.Paths;
+using DreamTravel.Features.LimitCostOfPaths;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 
+namespace DreamTravel.WebUI
+{
     [Route(Route)]
-    public class Controller : Microsoft.AspNetCore.Mvc.Controller
+    public class LimitCostOfPathsController : Controller
     {
         public const string Route = "api/LimitCost";
 
-        private readonly IBreakCostLimit _breakCostLimit;
+        private readonly ILimitCostOfPaths _breakCostLimit;
         private readonly ILogger<Controller> _logger;
 
-        public Controller(IBreakCostLimit breakCostLimit,
+        public LimitCostOfPathsController(ILimitCostOfPaths breakCostLimit,
                           ILogger<Controller> logger)
         {
             _breakCostLimit = breakCostLimit;
