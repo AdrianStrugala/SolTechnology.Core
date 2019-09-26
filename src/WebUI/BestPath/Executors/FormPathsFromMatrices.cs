@@ -1,4 +1,6 @@
-﻿namespace DreamTravel.WebUI.BestPath.Executors
+﻿using DreamTravel.WebUI.BestPath.Models;
+
+namespace DreamTravel.WebUI.BestPath.Executors
 {
     using System.Collections.Generic;
     using System.Linq;
@@ -7,7 +9,7 @@
 
     public class FormPathsFromMatrices : IFormOutputData
     {
-        public List<Path> Execute(List<City> listOfCities, IEvaluationMatrix evaluationMatrix, List<int> orderOfCities = null)
+        public List<Path> Execute(List<City> listOfCities, EvaluationMatrix evaluationMatrix, List<int> orderOfCities = null)
         {
             if (orderOfCities == null)
             {
