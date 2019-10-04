@@ -6,10 +6,10 @@ import { RouterModule } from '@angular/router';
 import { FlightEmailOrderComponent } from './flight-email-order/flight-email-order.component'
 import { AppComponent } from './app.component';
 import { HomeComponent } from './home/home.component';
+import { MaterialModule } from './material-module';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
-
-@
-  NgModule({
+@NgModule({
     declarations: [
       AppComponent,
       HomeComponent,
@@ -17,8 +17,10 @@ import { HomeComponent } from './home/home.component';
     ],
     imports: [
       BrowserModule.withServerTransition({ appId: 'ng-cli-universal' }),
+      BrowserAnimationsModule,
       HttpClientModule,
       FormsModule,
+      MaterialModule,
       RouterModule.forRoot([
         { path: '', component: HomeComponent, pathMatch: 'full' }
       ])
