@@ -7,7 +7,7 @@ import { ComponentRef, ComponentFactoryResolver, ViewContainerRef, ViewChild, Co
 export class HomeComponent {
   title = 'Dream Flights';
 
-  @ViewChild('viewContainerRef', { read: ViewContainerRef }) VCR: ViewContainerRef;
+  @ViewChild('viewContainerRef', { read: ViewContainerRef, static: null }) VCR: ViewContainerRef;
 
 
   // to store references of dynamically created components

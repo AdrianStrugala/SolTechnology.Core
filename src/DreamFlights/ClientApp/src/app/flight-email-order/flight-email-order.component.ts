@@ -1,4 +1,5 @@
-import { ComponentRef, ComponentFactoryResolver, ViewContainerRef, ViewChild, Component } from '@angular/core';
+import {Component } from '@angular/core';
+import { MatFormFieldModule } from '@angular/material/form-field';
 
 @Component({
   selector: 'flight-email-order',
@@ -7,6 +8,5 @@ import { ComponentRef, ComponentFactoryResolver, ViewContainerRef, ViewChild, Co
 })
 export class FlightEmailOrderComponent {
 
-  @ViewChild('viewContainerRef', { read: ViewContainerRef }) VCR: ViewContainerRef;
 
 }
