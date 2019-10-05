@@ -2,10 +2,38 @@
   <div>
     <!-- [UserId], [From], [To], [DepartureDate], [ArrivalDate], [MinDaysOfStay], [MaxDaysOfStay], [OneWay] -->
     <mat-form-field>
-      <input matInput placeholder="Input">
+      <input matInput placeholder="From">
     </mat-form-field>
 
+    <br>
+
+    <mat-form-field>
+      <input matInput placeholder="To">
+    </mat-form-field>
+
+    <br>
+
+    <mat-form-field class="example-full-width">
+      <input matInput [matDatepicker]="picker" placeholder="From">
+      <mat-datepicker-toggle matSuffix [for]="picker">
+        <mat-icon matDatepickerToggleIcon>keyboard_arrow_down</mat-icon>
+      </mat-datepicker-toggle>
+      <mat-datepicker #picker></mat-datepicker>
+    </mat-form-field>
+
+    <br>
+
+    <mat-form-field class="example-full-width">
+      <input matInput [matDatepicker]="picker2" placeholder="To">
+      <mat-datepicker-toggle matSuffix [for]="picker2">
+        <mat-icon matDatepickerToggleIcon>keyboard_arrow_down</mat-icon>
+      </mat-datepicker-toggle>
+      <mat-datepicker #picker2></mat-datepicker>
+    </mat-form-field>
+
+    <br>
+
     <mat-slider min="1" max="100" step="1" value="1"></mat-slider>
-DUPA
+
   </div>
 
