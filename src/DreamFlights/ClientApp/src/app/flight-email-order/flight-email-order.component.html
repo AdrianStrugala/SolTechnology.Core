@@ -1,39 +1,67 @@
 
-  <div>
-    <!-- [UserId], [From], [To], [DepartureDate], [ArrivalDate], [MinDaysOfStay], [MaxDaysOfStay], [OneWay] -->
+<!-- <div> -->
+  <!-- [UserId], [From], [To], [DepartureDate], [ArrivalDate], [MinDaysOfStay], [MaxDaysOfStay], [OneWay] -->
+
+  <form [formGroup]="orderForm">
+
     <mat-form-field>
-      <input matInput placeholder="From">
+      <input matInput
+             placeholder="From"
+             formControlName="from">
     </mat-form-field>
 
     <br>
 
     <mat-form-field>
-      <input matInput placeholder="To">
+      <input matInput
+             placeholder="To"
+             formControlName="to">
     </mat-form-field>
 
     <br>
 
     <mat-form-field class="example-full-width">
-      <input matInput [matDatepicker]="picker" placeholder="From">
-      <mat-datepicker-toggle matSuffix [for]="picker">
+      <input matInput [matDatepicker]="DepartureDate" placeholder="DepartureDate">
+      <mat-datepicker-toggle matSuffix [for]="DepartureDate">
         <mat-icon matDatepickerToggleIcon>keyboard_arrow_down</mat-icon>
       </mat-datepicker-toggle>
-      <mat-datepicker #picker></mat-datepicker>
+      <mat-datepicker #DepartureDate></mat-datepicker>
     </mat-form-field>
 
     <br>
 
     <mat-form-field class="example-full-width">
-      <input matInput [matDatepicker]="picker2" placeholder="To">
-      <mat-datepicker-toggle matSuffix [for]="picker2">
+      <input matInput [matDatepicker]="ArrivalDate" placeholder="ArrivalDate">
+      <mat-datepicker-toggle matSuffix [for]="ArrivalDate">
         <mat-icon matDatepickerToggleIcon>keyboard_arrow_down</mat-icon>
       </mat-datepicker-toggle>
-      <mat-datepicker #picker2></mat-datepicker>
+      <mat-datepicker #ArrivalDate></mat-datepicker>
     </mat-form-field>
 
     <br>
 
-    <mat-slider min="1" max="100" step="1" value="1"></mat-slider>
+    <mat-form-field>
+      <input type="number" matInput placeholder="MinDaysOfStay">
+    </mat-form-field>
 
-  </div>
+    <br>
+
+
+    <mat-form-field>
+      <input type="number" matInput placeholder="MaxDaysOfStay">
+    </mat-form-field>
+
+    <br />
+
+    <button mat-stroked-button
+            type="submit"
+            (click)="onSubmit()">
+      Submit
+    </button>
+
+  </form>
+
+  
+
+<!-- </div> -->
 
