@@ -2,6 +2,7 @@
 using DreamTravel.Features.FindLocationOfCity;
 using DreamTravel.Features.FindNameOfCity;
 using DreamTravel.Features.LimitCostOfPaths;
+using DreamTravel.Features.OrderFlightEmail;
 using DreamTravel.Features.SendDreamTravelFlightEmail;
 using DreamTravel.Features.SendDreamTravelFlightEmail.Interfaces;
 using DreamTravel.FlightProviderData;
@@ -27,6 +28,9 @@ namespace DreamTravel.Features
 
             //LimitCostOfPaths
             services.AddScoped<ILimitCostOfPaths, LimitCostOfPaths.LimitCostOfPaths>();
+
+            //OrderFlightEmail
+            services.AddScoped<IOrderFlightEmail, OrderFlightEmail.OrderFlightEmail>();
 
 
             services.InstallFlightProviderData();
