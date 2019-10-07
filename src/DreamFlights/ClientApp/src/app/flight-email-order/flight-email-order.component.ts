@@ -12,6 +12,10 @@ export class FlightEmailOrderComponent implements OnInit {
   orderForm = new FormGroup({
     from: new FormControl(),
     to: new FormControl(),
+    departureDate: new FormControl(),
+    arrivalDate: new FormControl(),
+    minDaysOfStay: new FormControl(),
+    maxDaysOfStay: new FormControl(),
   });
 
   onSubmit(): void {

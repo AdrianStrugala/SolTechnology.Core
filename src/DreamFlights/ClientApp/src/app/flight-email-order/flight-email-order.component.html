@@ -21,7 +21,9 @@
     <br>
 
     <mat-form-field class="example-full-width">
-      <input matInput [matDatepicker]="DepartureDate" placeholder="DepartureDate">
+      <input matInput [matDatepicker]="DepartureDate"
+             placeholder="DepartureDate"
+             formControlName="departureDate">
       <mat-datepicker-toggle matSuffix [for]="DepartureDate">
         <mat-icon matDatepickerToggleIcon>keyboard_arrow_down</mat-icon>
       </mat-datepicker-toggle>
@@ -31,7 +33,9 @@
     <br>
 
     <mat-form-field class="example-full-width">
-      <input matInput [matDatepicker]="ArrivalDate" placeholder="ArrivalDate">
+      <input matInput [matDatepicker]="ArrivalDate"
+             placeholder="ArrivalDate"
+             formControlName="arrivalDate">
       <mat-datepicker-toggle matSuffix [for]="ArrivalDate">
         <mat-icon matDatepickerToggleIcon>keyboard_arrow_down</mat-icon>
       </mat-datepicker-toggle>
@@ -41,14 +45,18 @@
     <br>
 
     <mat-form-field>
-      <input type="number" matInput placeholder="MinDaysOfStay">
+      <input type="number" matInput
+             placeholder="MinDaysOfStay"
+             formControlName="minDaysOfStay">
     </mat-form-field>
 
     <br>
 
 
     <mat-form-field>
-      <input type="number" matInput placeholder="MaxDaysOfStay">
+      <input type="number" matInput
+             placeholder="MaxDaysOfStay"
+             formControlName="maxDaysOfStay">
     </mat-form-field>
 
     <br />
