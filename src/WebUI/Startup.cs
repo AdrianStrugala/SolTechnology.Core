@@ -1,4 +1,6 @@
-﻿namespace DreamTravel.WebUI
+﻿using Microsoft.AspNetCore.Mvc.Cors.Internal;
+
+namespace DreamTravel.WebUI
 {
     using System.Globalization;
     using Authentication;
@@ -27,13 +29,29 @@
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddCors(options =>
+            {
+                options.AddPolicy("AllowAll",
+                    builder =>
+                    {
+                        builder
+                            .WithOrigins("http://localhost:4200")
+                            .AllowAnyMethod()
+                            .AllowAnyHeader()
+                            .AllowCredentials();
+                    });
+            });
+
             var policy = new AuthorizationPolicyBuilder()
                 .RequireAuthenticatedUser()
                 .Build();
 
+
+
             services.AddMvc(opts =>
             {
                 opts.Filters.Add(new AuthorizeFilter(policy));
+                opts.Filters.Add(new CorsAuthorizationFilterFactory("AllowAll"));
             });
 
             services.AddDistributedMemoryCache();
@@ -66,6 +84,8 @@
 
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
         {
+            app.UseCors("AllowAll");
+
             var cultureInfo = new CultureInfo("en-US");
             cultureInfo.NumberFormat.CurrencySymbol = "€";
 
@@ -86,6 +106,8 @@
             app.UseStaticFiles();
             app.UseCookiePolicy();
             app.UseSession();
+
+         
 
             app.UseAuthentication();
             app.UseMvc(routes =>

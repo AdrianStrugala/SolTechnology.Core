@@ -1,12 +1,17 @@
 ﻿using System;
 using DreamTravel.Bot.DiscoverIndividualChances.Models;
 using DreamTravel.Features.OrderFlightEmail;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 
-namespace DreamTravel.WebUI
+namespace DreamTravel.WebUI.Flights
 {
+    [EnableCors("AllowAll")]
+    [AllowAnonymous]
+    
     [Route(Route)]
     public class OrderFlightEmailController : Controller
     {
@@ -29,7 +34,7 @@ namespace DreamTravel.WebUI
         {
             try
             {
-                _logger.LogInformation($"Ordering flight email for user: {flightEmailOrder.UserId}");
+                _logger.LogInformation($"Ordering flight email for user: [{flightEmailOrder.UserId}]");
 
                 _orderFlightEmail.Execute(flightEmailOrder);
 

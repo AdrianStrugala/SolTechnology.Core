@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 
-namespace DreamTravel.WebUI
+namespace DreamTravel.WebUI.Routes
 {
     [Route(Route)]
     public class FindLocationOfCityController : Controller
