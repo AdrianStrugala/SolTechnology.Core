@@ -28,7 +28,7 @@ namespace DreamTravel.DreamFlights
 
 
         [HttpPost]
-        public IActionResult OrderFlightEmail(FlightEmailOrder flightEmailOrder)
+        public IActionResult OrderFlightEmail([FromBody] FlightEmailOrder flightEmailOrder)
         {
             try
             {
