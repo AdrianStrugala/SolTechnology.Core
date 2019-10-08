@@ -2,14 +2,12 @@
 using DreamTravel.Bot.DiscoverIndividualChances.Models;
 using DreamTravel.Features.OrderFlightEmail;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 
-namespace DreamTravel.WebUI.Flights
+namespace DreamTravel.DreamFlights
 {
-    [EnableCors("AllowAll")]
     [AllowAnonymous]
     
     [Route(Route)]

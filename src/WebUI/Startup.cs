@@ -29,19 +29,6 @@ namespace DreamTravel.WebUI
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddCors(options =>
-            {
-                options.AddPolicy("AllowAll",
-                    builder =>
-                    {
-                        builder
-                            .WithOrigins("http://localhost:4200")
-                            .AllowAnyMethod()
-                            .AllowAnyHeader()
-                            .AllowCredentials();
-                    });
-            });
-
             var policy = new AuthorizationPolicyBuilder()
                 .RequireAuthenticatedUser()
                 .Build();
@@ -84,8 +71,6 @@ namespace DreamTravel.WebUI
 
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
         {
-            app.UseCors("AllowAll");
-
             var cultureInfo = new CultureInfo("en-US");
             cultureInfo.NumberFormat.CurrencySymbol = "€";
 
@@ -107,7 +92,6 @@ namespace DreamTravel.WebUI
             app.UseCookiePolicy();
             app.UseSession();
 
-         
 
             app.UseAuthentication();
             app.UseMvc(routes =>

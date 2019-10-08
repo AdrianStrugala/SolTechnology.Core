@@ -1,3 +1,4 @@
+using DreamTravel.Features;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.SpaServices.AngularCli;
@@ -18,6 +19,8 @@ namespace DreamTravel.DreamFlights
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.InstallFeatures();
+
             services.AddMvc();
 
             // Add Angular Monitor App
