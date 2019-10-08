@@ -1,4 +1,5 @@
-﻿using DreamTravel.Features.SendDreamTravelFlightEmail;
+﻿using System.Globalization;
+using DreamTravel.Features.SendDreamTravelFlightEmail;
 using DreamTravel.Bot.DiscoverIndividualChances.DataAccess;
 using DreamTravel.Bot.DiscoverIndividualChances.Interfaces;
 using DreamTravel.Features;
@@ -14,6 +15,12 @@ namespace DreamTravel.Bot
     {
         public override void Configure(IFunctionsHostBuilder builder)
         {
+            var cultureInfo = new CultureInfo("en-US");
+            cultureInfo.NumberFormat.CurrencySymbol = "€";
+
+            CultureInfo.DefaultThreadCurrentCulture = cultureInfo;
+            CultureInfo.DefaultThreadCurrentUICulture = cultureInfo;
+
             builder.Services.AddTransient<IComposeMessage, ComposeMessage>();
             builder.Services.AddTransient<IDiscoverIndividualChances, DiscoverIndividualChances.DiscoverIndividualChances>();
             builder.Services.AddTransient<IGetFlightsFromSkyScanner, GetFlightsFromSkyScanner>();

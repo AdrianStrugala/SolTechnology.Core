@@ -79,7 +79,8 @@ namespace DreamTravel.FlightProviderData.Flights.GetFlights
                     var newChance = new Flight();
 
                     //trim the currency symbol
-                    newChance.Price = double.Parse(priceNode.InnerHtml.Remove(0, 1));
+                    var stringPrice = priceNode.InnerHtml.Remove(0, 1);
+                    newChance.Price = double.Parse(stringPrice);
 
                     flights.Add(newChance);
                 }
