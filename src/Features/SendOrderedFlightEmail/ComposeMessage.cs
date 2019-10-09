@@ -1,8 +1,9 @@
-﻿namespace DreamTravel.Bot.DiscoverIndividualChances.SendEmail
-{
-    using Interfaces;
-    using Models;
+﻿using DreamTravel.Bot.DiscoverIndividualChances.Models;
+using DreamTravel.Features.SendOrderedFlightEmail.Interfaces;
+using DreamTravel.Features.SendOrderedFlightEmail.Models;
 
+namespace DreamTravel.Features.SendOrderedFlightEmail
+{
     public class ComposeMessage : IComposeMessage
     {
         public string Execute(Chance chance, Subscription subscription)

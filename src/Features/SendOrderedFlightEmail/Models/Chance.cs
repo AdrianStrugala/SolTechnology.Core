@@ -1,4 +1,4 @@
-﻿namespace DreamTravel.Bot.DiscoverIndividualChances.Models
+﻿namespace DreamTravel.Features.SendOrderedFlightEmail.Models
 {
     public class Chance
     {

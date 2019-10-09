@@ -1,8 +1,8 @@
 ﻿using System.Globalization;
 using DreamTravel.Features.SendDreamTravelFlightEmail;
 using DreamTravel.Bot.DiscoverIndividualChances.DataAccess;
-using DreamTravel.Bot.DiscoverIndividualChances.Interfaces;
 using DreamTravel.Features;
+using DreamTravel.Features.SendOrderedFlightEmail.Interfaces;
 using Microsoft.Azure.Functions.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection;
 using IComposeMessage = DreamTravel.Features.SendDreamTravelFlightEmail.Interfaces.IComposeMessage;

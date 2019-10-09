@@ -6,5 +6,6 @@ namespace DreamTravel.FlightProviderData
     {
         List<string> GetCodes();
         Dictionary<string, List<string>> GetPlaceToCodesMap();
+        List<string> GetCodesByPlace(string place);
     }
 }

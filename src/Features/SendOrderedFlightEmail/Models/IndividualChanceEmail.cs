@@ -1,7 +1,7 @@
-﻿namespace DreamTravel.Bot.DiscoverIndividualChances.Models
-{
-    using Infrastructure.Email;
+﻿using DreamTravel.Infrastructure.Email;
 
+namespace DreamTravel.Features.SendOrderedFlightEmail.Models
+{
     public class IndividualChanceEmail : IEmail
     {
         public IndividualChanceEmail(string message, string recipient, string subject)
