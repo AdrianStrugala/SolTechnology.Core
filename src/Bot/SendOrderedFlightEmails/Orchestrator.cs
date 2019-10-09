@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using DreamTravel.Bot.DiscoverIndividualChances.Models;
@@ -16,24 +15,18 @@ namespace DreamTravel.Bot.SendOrderedFlightEmails
             [OrchestrationTrigger] DurableOrchestrationContext context)
         {
             List<FlightEmailOrder> flightEmailOrders = await context.CallActivityWithRetryAsync<List<FlightEmailOrder>>(Activities.GetFlightEmailOrdersFunctionName, Retry.Options, null);
-            
-            
-            //Split orders by equal time (in 12h ex)
 
-            //Send mails in foreach
-
-            //End
-
-//            int pollingInterval = GetPollingInterval();
-//            DateTime expiryTime = GetExpiryTime();
+            //Break between sending orders in equal time (in 12h)
+            int twelveHoursInSec = 43200;
+            int pollingInterval = twelveHoursInSec / flightEmailOrders.Count;
 
             foreach (FlightEmailOrder flightEmailOrder in flightEmailOrders)
             {
                 await context.CallActivityWithRetryAsync(Activities.SendOrderedFlightEmailFunctionName, Retry.Options, flightEmailOrder);
 
                 // Orchestration sleeps until this time.
-//                var nextCheck = context.CurrentUtcDateTime.AddSeconds(pollingInterval);
-//                await context.CreateTimer(nextCheck, CancellationToken.None);
+                var nextCheck = context.CurrentUtcDateTime.AddSeconds(pollingInterval);
+                await context.CreateTimer(nextCheck, CancellationToken.None);
             }
         }
     }
