@@ -24,7 +24,7 @@ FlightEmailOrder.[MaxDaysOfStay],
 FlightEmailOrder.[OneWay],
 [User].Name,
 [User].Email,
-[User].Currency,
+[User].Currency
 
 FROM FlightEmailOrder
 JOIN [User] on [User].Id = FlightEmailOrder.[UserId]
