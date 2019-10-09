@@ -1,14 +1,14 @@
 ﻿using System.Collections.Generic;
 using DreamTravel.Bot.DiscoverIndividualChances.Models;
-using DreamTravel.DatabaseData.FlightEmailOrders;
+using DreamTravel.DatabaseData;
 
 namespace DreamTravel.Features.GetFlightEmailOrders
 {
     public class GetFlightEmailOrders : IGetFlightEmailOrders
     {
-        private readonly FlightEmailOrderRepository _flightEmailOrderRepository;
+        private readonly IFlightEmailOrderRepository _flightEmailOrderRepository;
 
-        public GetFlightEmailOrders(FlightEmailOrderRepository flightEmailOrderRepository)
+        public GetFlightEmailOrders(IFlightEmailOrderRepository flightEmailOrderRepository)
         {
             _flightEmailOrderRepository = flightEmailOrderRepository;
         }
