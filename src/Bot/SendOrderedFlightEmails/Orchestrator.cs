@@ -24,16 +24,16 @@ namespace DreamTravel.Bot.SendOrderedFlightEmails
 
             //End
 
-            int pollingInterval = GetPollingInterval();
-            DateTime expiryTime = GetExpiryTime();
+//            int pollingInterval = GetPollingInterval();
+//            DateTime expiryTime = GetExpiryTime();
 
             foreach (FlightEmailOrder flightEmailOrder in flightEmailOrders)
             {
                 await context.CallActivityWithRetryAsync(Activities.SendOrderedFlightEmailFunctionName, Retry.Options, flightEmailOrder);
 
                 // Orchestration sleeps until this time.
-                var nextCheck = context.CurrentUtcDateTime.AddSeconds(pollingInterval);
-                await context.CreateTimer(nextCheck, CancellationToken.None);
+//                var nextCheck = context.CurrentUtcDateTime.AddSeconds(pollingInterval);
+//                await context.CreateTimer(nextCheck, CancellationToken.None);
             }
         }
     }
