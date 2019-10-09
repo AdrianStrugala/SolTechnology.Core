@@ -5,9 +5,11 @@ using DreamTravel.Features.LimitCostOfPaths;
 using DreamTravel.Features.OrderFlightEmail;
 using DreamTravel.Features.SendDreamTravelFlightEmail;
 using DreamTravel.Features.SendDreamTravelFlightEmail.Interfaces;
+using DreamTravel.Features.SendOrderedFlightEmail;
 using DreamTravel.FlightProviderData;
 using DreamTravel.GeolocationData.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using ComposeMessage = DreamTravel.Features.SendDreamTravelFlightEmail.ComposeMessage;
 
 namespace DreamTravel.Features
 {
@@ -32,6 +34,9 @@ namespace DreamTravel.Features
             //OrderFlightEmail
             services.AddScoped<IOrderFlightEmail, OrderFlightEmail.OrderFlightEmail>();
 
+            //SendOrderedFlightEmail
+            services.AddScoped<ISendOrderedFlightEmail, SendOrderedFlightEmail.SendOrderedFlightEmail>();
+            services.AddScoped<SendOrderedFlightEmail.Interfaces.IComposeMessage, SendOrderedFlightEmail.ComposeMessage>();
 
             services.InstallFlightProviderData();
             services.InstallDatabaseData();

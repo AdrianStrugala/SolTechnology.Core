@@ -2,9 +2,9 @@
 
 namespace DreamTravel.Features.SendOrderedFlightEmail.Models
 {
-    public class IndividualChanceEmail : IEmail
+    public class OrderedFlightEmail : IEmail
     {
-        public IndividualChanceEmail(string message, string recipient, string subject)
+        public OrderedFlightEmail(string message, string recipient, string subject)
         {
             Message = message;
             Recipient = recipient;

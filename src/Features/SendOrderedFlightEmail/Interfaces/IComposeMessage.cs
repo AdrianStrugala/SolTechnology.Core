@@ -1,10 +1,11 @@
-﻿using DreamTravel.Bot.DiscoverIndividualChances.Models;
-using DreamTravel.Features.SendOrderedFlightEmail.Models;
+﻿using System.Collections.Generic;
+using DreamTravel.Bot.DiscoverIndividualChances.Models;
+using DreamTravel.Domain.Flights;
 
 namespace DreamTravel.Features.SendOrderedFlightEmail.Interfaces
 {
     public interface IComposeMessage
     {
-        string Execute(Chance chance, Subscription subscription);
+        string Execute(List<Flight> flights, FlightEmailOrder flightEmailOrder);
     }
 }

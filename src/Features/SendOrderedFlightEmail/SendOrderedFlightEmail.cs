@@ -1,8 +1,11 @@
 ﻿using System.Collections.Generic;
 using DreamTravel.Bot.DiscoverIndividualChances.Models;
 using DreamTravel.Domain.Flights;
+using DreamTravel.Features.SendOrderedFlightEmail.Interfaces;
+using DreamTravel.Features.SendOrderedFlightEmail.Models;
 using DreamTravel.FlightProviderData;
 using DreamTravel.FlightProviderData.Flights.GetFlights;
+using DreamTravel.Infrastructure.Email;
 
 namespace DreamTravel.Features.SendOrderedFlightEmail
 {
@@ -10,11 +13,13 @@ namespace DreamTravel.Features.SendOrderedFlightEmail
     {
         private readonly IFlightRepository _flightRepository;
         private readonly IAirportRepository _airportRepository;
+        private readonly IComposeMessage _composeMessage;
 
-        public SendOrderedFlightEmail(IFlightRepository flightRepository, IAirportRepository airportRepository)
+        public SendOrderedFlightEmail(IFlightRepository flightRepository, IAirportRepository airportRepository, IComposeMessage composeMessage)
         {
             _flightRepository = flightRepository;
             _airportRepository = airportRepository;
+            _composeMessage = composeMessage;
         }
 
         public void Execute(FlightEmailOrder flightEmailOrder)
@@ -30,6 +35,11 @@ namespace DreamTravel.Features.SendOrderedFlightEmail
             };
 
             List<Flight> flights = _flightRepository.GetFlights(getFlightsQuery).Flights;
+
+            string message = _composeMessage.Execute(flights, flightEmailOrder);
+            EmailAgent.Send(new OrderedFlightEmail(message,
+                                                   flightEmailOrder.Email,
+                                $"{flightEmailOrder.UserName} choose your flight to {flightEmailOrder.To}!"));
         }
     }
 }
