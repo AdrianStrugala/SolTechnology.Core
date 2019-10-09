@@ -22,7 +22,7 @@ FlightEmailOrder.[ArrivalDate],
 FlightEmailOrder.[MinDaysOfStay], 
 FlightEmailOrder.[MaxDaysOfStay], 
 FlightEmailOrder.[OneWay],
-[User].Name,
+[User].Name AS UserName,
 [User].Email,
 [User].Currency
 

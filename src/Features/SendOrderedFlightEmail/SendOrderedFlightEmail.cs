@@ -28,8 +28,8 @@ namespace DreamTravel.Features.SendOrderedFlightEmail
             {
                 ArrivalDate = flightEmailOrder.ArrivalDate,
                 DepartureDate = flightEmailOrder.DepartureDate,
-                Departures = new KeyValuePair<string, List<string>>(flightEmailOrder.From, _airportRepository.GetCodesByPlace(flightEmailOrder.From)),
-                Arrivals = new KeyValuePair<string, List<string>>(flightEmailOrder.To, _airportRepository.GetCodesByPlace(flightEmailOrder.To)),
+                Departures = new KeyValuePair<string, List<string>>(flightEmailOrder.From, _airportRepository.GetCodesByCountry(flightEmailOrder.From)),
+                Arrivals = new KeyValuePair<string, List<string>>(flightEmailOrder.To, _airportRepository.GetCodesByCountry(flightEmailOrder.To)),
                 MinDaysToStay = flightEmailOrder.MinDaysOfStay,
                 MaxDaysToStay = flightEmailOrder.MaxDaysOfStay
             };

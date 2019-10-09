@@ -87,7 +87,7 @@ namespace DreamTravel.FlightDataTests.Airports
                     };
 
             // Act
-            List<string> result = _sut.GetCodesByPlace("Poland");
+            List<string> result = _sut.GetCodesByCountry("Poland");
 
             // Assert
             Assert.NotNull(result);
