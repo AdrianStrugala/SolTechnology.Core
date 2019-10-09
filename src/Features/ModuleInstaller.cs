@@ -1,6 +1,7 @@
 ﻿using DreamTravel.DatabaseData.Configuration;
 using DreamTravel.Features.FindLocationOfCity;
 using DreamTravel.Features.FindNameOfCity;
+using DreamTravel.Features.GetFlightEmailOrders;
 using DreamTravel.Features.LimitCostOfPaths;
 using DreamTravel.Features.OrderFlightEmail;
 using DreamTravel.Features.SendDreamTravelFlightEmail;
@@ -34,9 +35,13 @@ namespace DreamTravel.Features
             //OrderFlightEmail
             services.AddScoped<IOrderFlightEmail, OrderFlightEmail.OrderFlightEmail>();
 
+            //GetFlightEmailOrders
+            services.AddScoped<IGetFlightEmailOrders, GetFlightEmailOrders.GetFlightEmailOrders>();
+
             //SendOrderedFlightEmail
             services.AddScoped<ISendOrderedFlightEmail, SendOrderedFlightEmail.SendOrderedFlightEmail>();
             services.AddScoped<SendOrderedFlightEmail.Interfaces.IComposeMessage, SendOrderedFlightEmail.ComposeMessage>();
+
 
             services.InstallFlightProviderData();
             services.InstallDatabaseData();
