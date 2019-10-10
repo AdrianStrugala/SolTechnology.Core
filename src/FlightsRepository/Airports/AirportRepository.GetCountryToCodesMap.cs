@@ -6,7 +6,7 @@ namespace DreamTravel.FlightProviderData.Airports
 {
     public partial class AirportRepository
     {
-        public Dictionary<string, List<string>> GetPlaceToCodesMap()
+        public Dictionary<string, List<string>> GetCountryToCodesMap()
         {
             var placeToAirportsDataModels = JsonConvert.DeserializeObject<Dictionary<string, PlaceToAirportsDataModel>>(Place2CodesMap);
 

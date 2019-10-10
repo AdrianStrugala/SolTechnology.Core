@@ -1,18 +1,22 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
-using Newtonsoft.Json;
 
 namespace DreamTravel.FlightProviderData.Airports
 {
     public partial class AirportRepository : IAirportRepository
     {
-        public List<string> GetCodesByCountry(string country)
+        public List<string> GetCodesByPlace(string place)
         {
-            var placeToAirportsDataModels = JsonConvert.DeserializeObject<Dictionary<string, PlaceToAirportsDataModel>>(Place2CodesMap);
+            Dictionary<string, List<string>> countryToCodes = GetCountryToCodesMap();
+            Dictionary<string, string> cityToCodes = GetCityToCodeMap();
 
-            List<string> placeToCodesMap = placeToAirportsDataModels.Values.Single(p => p.Name.Equals(country)).Ports.Split("_").ToList();
+            var combinedResult = countryToCodes;
 
-            return placeToCodesMap;
+            foreach (KeyValuePair<string, string> cityToCode in cityToCodes)
+            {
+                combinedResult.Add(cityToCode.Key, new List<string>{cityToCode.Value});
+            }
+
+            return combinedResult[place];
         }
     }
 }

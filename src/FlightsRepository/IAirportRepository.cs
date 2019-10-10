@@ -4,8 +4,8 @@ namespace DreamTravel.FlightProviderData
 {
     public interface IAirportRepository
     {
-        List<string> GetCodes();
-        Dictionary<string, List<string>> GetPlaceToCodesMap();
-        List<string> GetCodesByCountry(string country);
+        Dictionary<string, string> GetCityToCodeMap();
+        Dictionary<string, List<string>> GetCountryToCodesMap();
+        List<string> GetCodesByPlace(string place);
     }
 }
