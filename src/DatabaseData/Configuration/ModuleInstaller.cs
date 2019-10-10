@@ -1,5 +1,4 @@
 ﻿using DreamTravel.DatabaseData.FlightEmailOrders;
-using DreamTravel.DatabaseData.Subscriptions;
 using DreamTravel.DatabaseData.Users;
 using DreamTravel.Infrastructure.Database;
 using Microsoft.Extensions.DependencyInjection;
@@ -14,7 +13,6 @@ namespace DreamTravel.DatabaseData.Configuration
             services.AddSingleton<IDbConnectionFactory>(new DbConnectionFactory(databaseDataConfiguration.ConnectionString));
 
             services.AddTransient<IUserRepository, UserRepository>();
-            services.AddTransient<ISubscriptionRepository, SubscriptionRepository>();
             services.AddTransient<IFlightEmailOrderRepository, FlightEmailOrderRepository>();
 
             return services;
