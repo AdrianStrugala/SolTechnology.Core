@@ -20,7 +20,7 @@ namespace DreamTravel.Features.SendOrderedFlightEmail
 ";
             foreach (var flight in flights)
             {
-                message += $@"<li> {flight.ThereDepartureCity} — {flight.ThereArrivalCity}  ({flight.ThereDate}:{flight.ThereDepartureHour}-{flight.BackDate}:{flight.BackDepartureHour}) — {flight.Price}€ </li>";
+                message += $@"<li> {flight.ThereDepartureCity} — {flight.ThereArrivalCity}  ({flight.ThereDate}:{flight.ThereDepartureHour} - {flight.BackDate}:{flight.BackDepartureHour}) — {flight.Price}€ </li>";
             }
 
             message += @"</ul>
