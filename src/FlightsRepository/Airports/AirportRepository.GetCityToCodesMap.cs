@@ -16,6 +16,7 @@ namespace DreamTravel.FlightProviderData.Airports
         #region Airports2Countries json
 
         private const string Airports2Countries = @"
+{
 ""POM"" :  ""Port Moresby"",
 ""IFJ"" :  ""Isafjordur"",
 ""KEF"" :  ""Reykjavik (Keflavik)"",
@@ -781,7 +782,8 @@ namespace DreamTravel.FlightProviderData.Airports
 ""SKN"" :  ""Stokmarknes"",
 ""RAI"" :  ""Praia"",
 ""CNJ"" :  ""Cloncurry"",
-""XXX"" : ""Anywhere""";
+""XXX"" : ""Anywhere""
+}";
         #endregion
     }
 }

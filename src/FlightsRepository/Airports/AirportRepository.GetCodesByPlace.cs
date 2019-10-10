@@ -13,7 +13,16 @@ namespace DreamTravel.FlightProviderData.Airports
 
             foreach (KeyValuePair<string, string> cityToCode in cityToCodes)
             {
-                combinedResult.Add(cityToCode.Key, new List<string>{cityToCode.Value});
+                if (!combinedResult.TryAdd(cityToCode.Key, new List<string>
+                {
+                    cityToCode.Value
+                }))
+                {
+                    combinedResult.Add($"{cityToCode.Key} ({cityToCode.Value})", new List<string>
+                    {
+                        cityToCode.Value
+                    });
+                };
             }
 
             return combinedResult[place];
