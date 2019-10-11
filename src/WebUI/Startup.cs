@@ -1,22 +1,17 @@
-﻿using Microsoft.AspNetCore.Mvc.Cors.Internal;
+﻿using DreamTravel.Features;
+using System.Globalization;
+using DreamTravel.WebUI.Authentication;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Mvc.Authorization;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 
 namespace DreamTravel.WebUI
 {
-    using System.Globalization;
-    using Authentication;
-    using BestPath.DataAccess;
-    using BestPath.Executors;
-    using BestPath.Interfaces;
-    using Microsoft.AspNetCore.Authentication;
-    using Microsoft.AspNetCore.Authorization;
-    using Microsoft.AspNetCore.Builder;
-    using Microsoft.AspNetCore.Hosting;
-    using Microsoft.AspNetCore.Mvc.Authorization;
-    using Microsoft.Extensions.Configuration;
-    using Microsoft.Extensions.DependencyInjection;
-    using Microsoft.Extensions.Logging;
-    using TravelingSalesmanProblem;
-
     public class Startup
     {
         public Startup(IConfiguration configuration)
@@ -33,27 +28,12 @@ namespace DreamTravel.WebUI
                 .RequireAuthenticatedUser()
                 .Build();
 
-
-
             services.AddMvc(opts =>
             {
                 opts.Filters.Add(new AuthorizeFilter(policy));
-                opts.Filters.Add(new CorsAuthorizationFilterFactory("AllowAll"));
             });
 
             services.AddDistributedMemoryCache();
-
-            //TSP engine
-            services.AddTransient<ITSP, AntColony>();
-
-            services.AddTransient<IDownloadDurationMatrixByTollRoad, DownloadDurationMatrixByTollRoad>();
-            services.AddTransient<IDownloadDurationMatrixByFreeRoad, DownloadDurationMatrixByFreeRoad>();
-            services.AddTransient<IDownloadCostBetweenTwoCities, DownloadCostBetweenTwoCities>();
-            services.AddTransient<IDownloadRoadData, DownloadRoadData>();
-            services.AddTransient<IFormOutputData, FormPathsFromMatrices>();
-            services.AddTransient<ICalculateBestPath, CalculateBestPath>();
-            services.AddTransient<IEvaluationBrain, EvaluationBrain>();
-
             services.AddSession();
 
             var configurationRoot = new ConfigurationBuilder()
@@ -67,6 +47,8 @@ namespace DreamTravel.WebUI
                     null);
             services.Configure<DreamAuthenticationOptions>(DreamAuthenticationOptions.AuthenticationScheme, configurationRoot);
             services.AddSingleton<IAuthenticationHandler, DreamAuthentication>();
+
+            services.InstallFeatures();
         }
 
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)

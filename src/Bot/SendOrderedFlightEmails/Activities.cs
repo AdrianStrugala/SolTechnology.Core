@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using DreamTravel.Bot.DiscoverIndividualChances.Models;
 using DreamTravel.Features.GetFlightEmailOrders;
 using DreamTravel.Features.SendOrderedFlightEmail;
+using DreamTravel.Features.SendOrderedFlightEmail.Interfaces;
 using Microsoft.Azure.WebJobs;
 
 namespace DreamTravel.Bot.SendOrderedFlightEmails

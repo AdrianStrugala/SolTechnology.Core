@@ -1,4 +1,6 @@
-﻿function addCityByMapClick(position, map) {
+﻿/// <reference path="../lib/jquery/jquery.d.ts" />
+
+function addCityByMapClick(position, map) {
     displayCityAjaxCalls.push($.ajax({
         type: 'POST',
         dataType: 'html',

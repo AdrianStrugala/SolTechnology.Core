@@ -1,4 +1,5 @@
 ﻿using DreamTravel.DatabaseData.Configuration;
+using DreamTravel.Features.CalculateBestPath.Interfaces;
 using DreamTravel.Features.FindLocationOfCity;
 using DreamTravel.Features.FindNameOfCity;
 using DreamTravel.Features.GetFlightEmailOrders;
@@ -7,10 +8,13 @@ using DreamTravel.Features.OrderFlightEmail;
 using DreamTravel.Features.SendDreamTravelFlightEmail;
 using DreamTravel.Features.SendDreamTravelFlightEmail.Interfaces;
 using DreamTravel.Features.SendOrderedFlightEmail;
+using DreamTravel.Features.SendOrderedFlightEmail.Interfaces;
 using DreamTravel.FlightProviderData;
 using DreamTravel.GeolocationData.Configuration;
+using DreamTravel.TravelingSalesmanProblem;
 using Microsoft.Extensions.DependencyInjection;
 using ComposeMessage = DreamTravel.Features.SendDreamTravelFlightEmail.ComposeMessage;
+using IComposeMessage = DreamTravel.Features.SendDreamTravelFlightEmail.Interfaces.IComposeMessage;
 
 namespace DreamTravel.Features
 {
@@ -18,6 +22,14 @@ namespace DreamTravel.Features
     {
         public static IServiceCollection InstallFeatures(this IServiceCollection services)
         {
+            //TSP engine
+            services.AddTransient<ITSP, AntColony>();
+            //CalculateBestPath
+            services.AddScoped<ICalculateBestPath, CalculateBestPath.CalculateBestPath>();
+            services.AddScoped<IDownloadRoadData, CalculateBestPath.DownloadRoadData>();
+            services.AddScoped<IFindProfitablePath, CalculateBestPath.FindProfitablePath>();
+            services.AddScoped<IFormOutputData, CalculateBestPath.FormPathsFromMatrices>();
+
             //SendDreamTravelFlightEmail
             services.AddScoped<IComposeMessage, ComposeMessage>();
             services.AddScoped<IFilterFlights, FilterFlights>();

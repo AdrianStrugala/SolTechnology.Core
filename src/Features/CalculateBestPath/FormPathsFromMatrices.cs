@@ -1,12 +1,12 @@
-﻿using DreamTravel.WebUI.BestPath.Models;
+﻿using System.Collections.Generic;
+using System.Linq;
+using DreamTravel.Domain.Cities;
+using DreamTravel.Domain.Paths;
+using DreamTravel.Features.CalculateBestPath.Interfaces;
+using DreamTravel.Features.CalculateBestPath.Models;
 
-namespace DreamTravel.WebUI.BestPath.Executors
+namespace DreamTravel.Features.CalculateBestPath
 {
-    using System.Collections.Generic;
-    using System.Linq;
-    using Contract;
-    using Interfaces;
-
     public class FormPathsFromMatrices : IFormOutputData
     {
         public List<Path> Execute(List<City> listOfCities, EvaluationMatrix evaluationMatrix, List<int> orderOfCities = null)

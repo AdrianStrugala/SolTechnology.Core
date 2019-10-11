@@ -1,10 +1,10 @@
-﻿namespace DreamTravel.WebUI.BestPath.Executors
-{
-    using System.Threading.Tasks;
-    using Interfaces;
-    using Models;
+﻿using System.Threading.Tasks;
+using DreamTravel.Features.CalculateBestPath.Interfaces;
+using DreamTravel.Features.CalculateBestPath.Models;
 
-    public class EvaluationBrain : IEvaluationBrain
+namespace DreamTravel.Features.CalculateBestPath
+{
+    public class FindProfitablePath : IFindProfitablePath
     {
         private static double FuelPrice { get; } = 1.26;
         private static double RoadVelocity { get; } = 70;

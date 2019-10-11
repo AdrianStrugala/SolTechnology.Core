@@ -1,4 +1,4 @@
-﻿namespace DreamTravel.WebUI.BestPath.Models
+﻿namespace DreamTravel.Features.CalculateBestPath.Models
 {
     public sealed class EvaluationMatrix
     {

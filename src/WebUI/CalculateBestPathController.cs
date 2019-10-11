@@ -1,25 +1,26 @@
-﻿namespace DreamTravel.WebUI.BestPath
-{
-    using System;
-    using System.Threading.Tasks;
-    using Interfaces;
-    using Microsoft.AspNetCore.Http;
-    using Microsoft.AspNetCore.Mvc;
-    using Microsoft.Extensions.Logging;
-    using Newtonsoft.Json;
+﻿using System;
+using System.Threading.Tasks;
+using DreamTravel.Features.CalculateBestPath;
+using DreamTravel.Features.CalculateBestPath.Interfaces;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 
+namespace DreamTravel.WebUI
+{
     [Route(Route)]
-    public class Controller : Microsoft.AspNetCore.Mvc.Controller
+    public class CalculateBestPathController : Controller
     {
         public const string Route = "api/CalculateBestPath";
         private const string PathsKeyName = "_Paths";
 
         private readonly ICalculateBestPath _calculateBestPath;
-        private readonly ILogger<Controller> _logger;
+        private readonly ILogger<CalculateBestPathController> _logger;
 
 
-        public Controller(ICalculateBestPath calculateBestPath,
-                             ILogger<Controller> logger)
+        public CalculateBestPathController(ICalculateBestPath calculateBestPath,
+                             ILogger<CalculateBestPathController> logger)
         {
             _calculateBestPath = calculateBestPath;
             _logger = logger;

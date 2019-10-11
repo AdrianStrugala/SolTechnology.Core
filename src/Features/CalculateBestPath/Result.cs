@@ -1,8 +1,9 @@
-﻿namespace DreamTravel.WebUI.BestPath
-{
-    using System.Collections.Generic;
-    using Contract;
+﻿using System.Collections.Generic;
+using DreamTravel.Domain.Cities;
+using DreamTravel.Domain.Paths;
 
+namespace DreamTravel.Features.CalculateBestPath
+{
     public class Result
     {
         public List<Path> BestPaths { get; set; }

@@ -1,8 +1,8 @@
-﻿namespace DreamTravel.WebUI.BestPath
-{
-    using System.Collections.Generic;
-    using Contract;
+﻿using System.Collections.Generic;
+using DreamTravel.Domain.Cities;
 
+namespace DreamTravel.Features.CalculateBestPath
+{
     public class Query
     {
         public List<City> Cities { get; set; }

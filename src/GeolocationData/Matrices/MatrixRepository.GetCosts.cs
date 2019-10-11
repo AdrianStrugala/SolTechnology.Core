@@ -17,11 +17,11 @@ namespace DreamTravel.GeolocationData.Matrices
 
             List<Task> tasks = new List<Task>();
 
-            for (int i = 0; i < matrixSize; i++)
+            for (int i = 0; i < cities.Count; i++)
             {
-                for (int j = 0; j < matrixSize; j++)
+                for (int j = 0; j < cities.Count; j++)
                 {
-                    int iterator = j + i * matrixSize;
+                    int iterator = j + i * cities.Count;
 
                     var i1 = i;
                     var j1 = j;

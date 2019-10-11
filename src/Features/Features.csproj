@@ -6,10 +6,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="CalculateBestPath\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\DatabaseData\DatabaseData.csproj" />
     <ProjectReference Include="..\FlightsRepository\FlightProviderData.csproj" />
     <ProjectReference Include="..\GeolocationData\GeolocationData.csproj" />	

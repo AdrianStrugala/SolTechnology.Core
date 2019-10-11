@@ -1,33 +1,33 @@
-﻿namespace DreamTravel.WebUI.BestPath.Executors
-{
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Threading.Tasks;
-    using Contract;
-    using Interfaces;
-    using Models;
-    using TravelingSalesmanProblem;
+﻿using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using DreamTravel.Domain.Cities;
+using DreamTravel.Features.CalculateBestPath.Interfaces;
+using DreamTravel.Features.CalculateBestPath.Models;
+using DreamTravel.TravelingSalesmanProblem;
 
+namespace DreamTravel.Features.CalculateBestPath
+{
     public class CalculateBestPath : ICalculateBestPath
     {
         private readonly IDownloadRoadData _downloadRoadData;
         private readonly IFormOutputData _formOutputData;
         private readonly ITSP _tspSolver;
-        private readonly IEvaluationBrain _evaluationBrain;
+        private readonly IFindProfitablePath _findProfitablePath;
 
-        public CalculateBestPath(IDownloadRoadData downloadRoadData, IFormOutputData formOutputData, ITSP tspSolver, IEvaluationBrain evaluationBrain)
+        public CalculateBestPath(IDownloadRoadData downloadRoadData, IFormOutputData formOutputData, ITSP tspSolver, IFindProfitablePath findProfitablePath)
         {
             _downloadRoadData = downloadRoadData;
             _formOutputData = formOutputData;
             _tspSolver = tspSolver;
-            _evaluationBrain = evaluationBrain;
+            _findProfitablePath = findProfitablePath;
         }
 
         public async Task<Result> Execute(List<City> cities, bool optimizePath)
         {
             EvaluationMatrix evaluationMatrix = new EvaluationMatrix(cities.Count);
             evaluationMatrix = await _downloadRoadData.Execute(cities, evaluationMatrix);
-            evaluationMatrix = _evaluationBrain.Execute(evaluationMatrix, cities.Count);
+            evaluationMatrix = _findProfitablePath.Execute(evaluationMatrix, cities.Count);
 
 
             List<int> orderOfCities;
