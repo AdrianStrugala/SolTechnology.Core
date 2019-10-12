@@ -1,17 +1,17 @@
-﻿namespace DreamTravel.WebUITests.BestPath.Executors
+﻿using System;
+using DreamTravel.Features.CalculateBestPath;
+using DreamTravel.Features.CalculateBestPath.Models;
+using Xunit;
+
+namespace DreamTravel.FeaturesTests.CalculateBestPath
 {
-    using System;
-    using WebUI.BestPath.Executors;
-    using WebUI.BestPath.Models;
-    using Xunit;
-
-    public class EvaluationBrainTests
+    public class FindProfitablePathTests
     {
-        private readonly EvaluationBrain _sut;
+        private readonly FindProfitablePath _sut;
 
-        public EvaluationBrainTests()
+        public FindProfitablePathTests()
         {
-            _sut = new EvaluationBrain();
+            _sut = new FindProfitablePath();
         }
 
         [Fact]

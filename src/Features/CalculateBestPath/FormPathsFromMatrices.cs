@@ -7,7 +7,7 @@ using DreamTravel.Features.CalculateBestPath.Models;
 
 namespace DreamTravel.Features.CalculateBestPath
 {
-    public class FormPathsFromMatrices : IFormOutputData
+    public class FormPathsFromMatrices : IFormPathsFromMatrices
     {
         public List<Path> Execute(List<City> listOfCities, EvaluationMatrix evaluationMatrix, List<int> orderOfCities = null)
         {

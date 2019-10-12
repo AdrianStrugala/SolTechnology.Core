@@ -33,30 +33,6 @@
     <ProjectReference Include="..\TravelingSalesmanProblem\TravelingSalesmanProblem.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <TypeScriptCompile Include="wwwroot\js\Repositories\CityRepository.ts" />
-    <TypeScriptCompile Include="wwwroot\js\DisplayHelpers\DisplayPage.ts" />
-    <TypeScriptCompile Include="wwwroot\js\DisplayHelpers\DisplayRouteLabel.ts" />
-    <TypeScriptCompile Include="wwwroot\js\DragAndDropCity.ts" />
-    <TypeScriptCompile Include="wwwroot\js\DisplayHelpers\ClearMap.ts" />
-    <TypeScriptCompile Include="wwwroot\js\AddCityByMapClick.ts" />
-    <TypeScriptCompile Include="wwwroot\js\FindAndDisplayCity.ts" />
-    <TypeScriptCompile Include="wwwroot\js\DisplayHelpers\DisplayMarker.ts" />
-    <TypeScriptCompile Include="wwwroot\js\DisplayHelpers\DisplayRoute.ts" />
-    <TypeScriptCompile Include="wwwroot\js\DisplayHelpers\DisplaySummaryInfo.ts" />
-    <TypeScriptCompile Include="wwwroot\js\FindCityName.ts" />
-    <TypeScriptCompile Include="wwwroot\js\Repositories\CitiesPanelRepository.ts" />
-    <TypeScriptCompile Include="wwwroot\js\Instruction.ts" />
-    <TypeScriptCompile Include="wwwroot\js\LimitCost.ts" />
-    <TypeScriptCompile Include="wwwroot\js\RunTSP.ts" />
-    <TypeScriptCompile Include="wwwroot\js\SaveMap.ts" />
-    <TypeScriptCompile Include="wwwroot\js\Utils\Guid.ts" />
-    <TypeScriptCompile Include="wwwroot\js\Utils\Pad2.ts" />
-    <TypeScriptCompile Include="wwwroot\js\Utils\Sleep.ts" />
-    <TypeScriptCompile Include="wwwroot\js\DisplayHelpers\DisplayPathsSummary.ts" />
-    <TypeScriptCompile Include="wwwroot\js\HideAndShowCitiesPanel.ts" />
-    <TypeScriptCompile Include="wwwroot\lib\googleMaps\googleMaps.d.ts" />
-  </ItemGroup>
 
   <ItemGroup>
     <Content Update="appsettings.json">

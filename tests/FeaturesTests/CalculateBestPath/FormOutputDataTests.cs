@@ -1,12 +1,12 @@
-namespace DreamTravel.WebUITests.BestPath.Executors
-{
-    using System.Collections.Generic;
-    using WebUI.BestPath.Executors;
-    using WebUI.BestPath.Models;
-    using WebUI.Contract;
-    using Xunit;
+using System.Collections.Generic;
+using DreamTravel.Domain.Cities;
+using DreamTravel.Features.CalculateBestPath;
+using DreamTravel.Features.CalculateBestPath.Models;
+using Xunit;
 
-    public class FormOutputDataTests
+namespace DreamTravel.FeaturesTests.CalculateBestPath
+{
+    public class FormPathsFromMatricesTests
     {
         private readonly FormPathsFromMatrices _sut = new FormPathsFromMatrices();
 

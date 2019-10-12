@@ -1,31 +1,31 @@
-namespace DreamTravel.WebUITests.BestPath.Executors
-{
-    using System.Collections.Generic;
-    using System.Threading.Tasks;
-    using NSubstitute;
-    using TravelingSalesmanProblem;
-    using WebUI.BestPath.Executors;
-    using WebUI.BestPath.Interfaces;
-    using WebUI.BestPath.Models;
-    using WebUI.Contract;
-    using Xunit;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using DreamTravel.Domain.Cities;
+using DreamTravel.Features.CalculateBestPath;
+using DreamTravel.Features.CalculateBestPath.Interfaces;
+using DreamTravel.Features.CalculateBestPath.Models;
+using DreamTravel.TravelingSalesmanProblem;
+using NSubstitute;
+using Xunit;
 
+namespace DreamTravel.FeaturesTests.CalculateBestPath
+{
     public class CalculateBestPathTests
     {
         private readonly IDownloadRoadData _downloadRoadData;
         private readonly ITSP _tspSolver;
-        private readonly IEvaluationBrain _evaluationBrain;
+        private readonly IFindProfitablePath _evaluationBrain;
 
-        private readonly CalculateBestPath _sut;
+        private readonly Features.CalculateBestPath.CalculateBestPath _sut;
 
         public CalculateBestPathTests()
         {
             _downloadRoadData = Substitute.For<IDownloadRoadData>();
-            IFormOutputData formOutputData = new FormPathsFromMatrices();
+            IFormPathsFromMatrices formPathsFromMatrices = new FormPathsFromMatrices();
             _tspSolver = Substitute.For<ITSP>();
-            _evaluationBrain = Substitute.For<IEvaluationBrain>();
+            _evaluationBrain = Substitute.For<IFindProfitablePath>();
 
-            _sut = new CalculateBestPath(_downloadRoadData, formOutputData, _tspSolver, _evaluationBrain);
+            _sut = new Features.CalculateBestPath.CalculateBestPath(_downloadRoadData, formPathsFromMatrices, _tspSolver, _evaluationBrain);
         }
 
         [Fact]

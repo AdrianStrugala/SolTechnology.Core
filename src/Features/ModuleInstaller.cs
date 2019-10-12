@@ -28,7 +28,7 @@ namespace DreamTravel.Features
             services.AddScoped<ICalculateBestPath, CalculateBestPath.CalculateBestPath>();
             services.AddScoped<IDownloadRoadData, CalculateBestPath.DownloadRoadData>();
             services.AddScoped<IFindProfitablePath, CalculateBestPath.FindProfitablePath>();
-            services.AddScoped<IFormOutputData, CalculateBestPath.FormPathsFromMatrices>();
+            services.AddScoped<IFormPathsFromMatrices, CalculateBestPath.FormPathsFromMatrices>();
 
             //SendDreamTravelFlightEmail
             services.AddScoped<IComposeMessage, ComposeMessage>();

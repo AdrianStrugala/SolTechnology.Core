@@ -5,7 +5,7 @@ using DreamTravel.Features.CalculateBestPath.Models;
 
 namespace DreamTravel.Features.CalculateBestPath.Interfaces
 {
-    public interface IFormOutputData
+    public interface IFormPathsFromMatrices
     {
         List<Path> Execute(List<City> listOfCities, EvaluationMatrix evaluationMatrix, List<int> orderOfCities = null);
     }

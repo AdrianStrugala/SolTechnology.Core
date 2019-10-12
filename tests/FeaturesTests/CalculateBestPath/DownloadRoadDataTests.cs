@@ -1,32 +1,28 @@
-namespace DreamTravel.WebUITests.BestPath.Executors
-{
-    using System.Collections.Generic;
-    using System.Threading.Tasks;
-    using Microsoft.Extensions.Logging;
-    using Microsoft.Extensions.Logging.Abstractions;
-    using NSubstitute;
-    using WebUI.BestPath.DataAccess;
-    using WebUI.BestPath.Executors;
-    using WebUI.BestPath.Interfaces;
-    using WebUI.BestPath.Models;
-    using WebUI.Contract;
-    using Xunit;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using DreamTravel.Domain.Cities;
+using DreamTravel.Features.CalculateBestPath;
+using DreamTravel.Features.CalculateBestPath.Models;
+using DreamTravel.GeolocationData;
+using DreamTravel.GeolocationData.Matrices;
+using Microsoft.Extensions.Logging.Abstractions;
+using Xunit;
 
+namespace DreamTravel.FeaturesTests.CalculateBestPath
+{
     public class DownloadRoadDataTests
     {
         private readonly DownloadRoadData _sut;
 
         public DownloadRoadDataTests()
         {
-            IDownloadDurationMatrixByTollRoad downloadDurationMatrixByTollRoad = new DownloadDurationMatrixByTollRoad(NullLogger<DownloadDurationMatrixByTollRoad>.Instance);
-            IDownloadDurationMatrixByFreeRoad downloadDurationMatrixByFreeRoad = new DownloadDurationMatrixByFreeRoad(NullLogger<DownloadDurationMatrixByFreeRoad>.Instance);
-            IDownloadCostBetweenTwoCities downloadCostBetweenTwoCities = new DownloadCostBetweenTwoCities(NullLogger<DownloadCostBetweenTwoCities>.Instance);
+            IMatrixRepository matrixRepository = new MatrixRepository(NullLogger<MatrixRepository>.Instance);
 
-            _sut = new DownloadRoadData(downloadDurationMatrixByTollRoad, downloadDurationMatrixByFreeRoad, downloadCostBetweenTwoCities);
+            _sut = new DownloadRoadData(matrixRepository);
         }
 
 
-        [Fact]
+        [Fact (Skip = "Paid test :(")]
         public async Task DownloadExternalData_ValidConditions_MatrixIsPopulated()
         {
             //Arrange
@@ -66,7 +62,7 @@ namespace DreamTravel.WebUITests.BestPath.Executors
         }
 
         //can always download data of at least 30 cities
-        [Fact]
+        [Fact(Skip = "Paid test :(")]
         public async Task Execute_InputHas30Cities_AllTheDataIsDownloaded()
         {
             int noOfCities = 30;

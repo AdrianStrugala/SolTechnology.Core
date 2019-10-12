@@ -1,8 +1,8 @@
 ﻿using System.IO;
 using System.Threading.Tasks;
+using DreamTravel.Domain.Cities;
 using DreamTravel.Features.FindNameOfCity;
 using DreamTravel.WebUI;
-using DreamTravel.WebUI.Contract;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;

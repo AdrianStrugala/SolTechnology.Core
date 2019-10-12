@@ -11,14 +11,14 @@ namespace DreamTravel.Features.CalculateBestPath
     public class CalculateBestPath : ICalculateBestPath
     {
         private readonly IDownloadRoadData _downloadRoadData;
-        private readonly IFormOutputData _formOutputData;
+        private readonly IFormPathsFromMatrices _formPathsFromMatrices;
         private readonly ITSP _tspSolver;
         private readonly IFindProfitablePath _findProfitablePath;
 
-        public CalculateBestPath(IDownloadRoadData downloadRoadData, IFormOutputData formOutputData, ITSP tspSolver, IFindProfitablePath findProfitablePath)
+        public CalculateBestPath(IDownloadRoadData downloadRoadData, IFormPathsFromMatrices formPathsFromMatrices, ITSP tspSolver, IFindProfitablePath findProfitablePath)
         {
             _downloadRoadData = downloadRoadData;
-            _formOutputData = formOutputData;
+            _formPathsFromMatrices = formPathsFromMatrices;
             _tspSolver = tspSolver;
             _findProfitablePath = findProfitablePath;
         }
@@ -47,7 +47,7 @@ namespace DreamTravel.Features.CalculateBestPath
             Result result = new Result
             {
                 Cities = cities,
-                BestPaths = _formOutputData.Execute(cities, evaluationMatrix, orderOfCities)
+                BestPaths = _formPathsFromMatrices.Execute(cities, evaluationMatrix, orderOfCities)
             };
             return result;
         }
