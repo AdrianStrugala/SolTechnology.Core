@@ -9,7 +9,7 @@
     },
     "dreamFlightName": {
       "type": "string",
-      "defaultValue": "dreamflight",
+      "defaultValue": "dreamflights",
       "minLength": 1
     },
     "sqlServerName": {
