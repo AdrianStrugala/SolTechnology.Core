@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using DreamTravel.Bot.DiscoverIndividualChances.Models;
+using DreamTravel.Domain.FlightEmailOrders;
 using Microsoft.Azure.WebJobs;
 
 namespace DreamTravel.Bot.SendOrderedFlightEmails
@@ -14,7 +14,7 @@ namespace DreamTravel.Bot.SendOrderedFlightEmails
         public static async Task Orchestrate(
             [OrchestrationTrigger] DurableOrchestrationContext context)
         {
-            List<FlightEmailOrder> flightEmailOrders = await context.CallActivityWithRetryAsync<List<FlightEmailOrder>>(Activities.GetFlightEmailOrdersFunctionName, Retry.Options, null);
+            List<FlightEmailData> flightEmailOrders = await context.CallActivityWithRetryAsync<List<FlightEmailData>>(Activities.GetFlightEmailOrdersFunctionName, Retry.Options, null);
 
             //Break between sending orders in equal time (in 12h)
             int twelveHoursInSec = 43200;

@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using DreamTravel.Bot.DiscoverIndividualChances.Models;
+using DreamTravel.Domain.FlightEmailOrders;
 
 namespace DreamTravel.DatabaseData
 {
@@ -7,6 +7,6 @@ namespace DreamTravel.DatabaseData
     {
         void Insert(FlightEmailOrder flightEmailOrder);
 
-        List<FlightEmailOrder> GetAll();
+        List<FlightEmailData> GetAll();
     }
 }

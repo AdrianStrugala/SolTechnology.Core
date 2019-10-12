@@ -1,16 +1,15 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using Dapper;
-using DreamTravel.Bot.DiscoverIndividualChances.Models;
+using DreamTravel.Domain.FlightEmailOrders;
 
 namespace DreamTravel.DatabaseData.FlightEmailOrders
 {
     public partial class FlightEmailOrderRepository : IFlightEmailOrderRepository
     {
-
-        public List<FlightEmailOrder> GetAll()
+        public List<FlightEmailData> GetAll()
         {
-            var result = new List<FlightEmailOrder>();
+            var result = new List<FlightEmailData>();
 
             string sql = @"
 SELECT 
@@ -32,7 +31,7 @@ JOIN [User] on [User].Id = FlightEmailOrder.[UserId]
 
             using (var connection = _dbConnectionFactory.CreateConnection())
             {
-                result = connection.Query<FlightEmailOrder>(sql).ToList();
+                result = connection.Query<FlightEmailData>(sql).ToList();
             }
 
             return result;

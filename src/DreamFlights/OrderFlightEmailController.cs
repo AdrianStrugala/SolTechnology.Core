@@ -1,5 +1,5 @@
 ﻿using System;
-using DreamTravel.Bot.DiscoverIndividualChances.Models;
+using DreamTravel.Domain.FlightEmailOrders;
 using DreamTravel.Features.OrderFlightEmail;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;

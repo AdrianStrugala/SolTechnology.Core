@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
-using DreamTravel.Bot.DiscoverIndividualChances.Models;
 using DreamTravel.DatabaseData;
+using DreamTravel.Domain.FlightEmailOrders;
 
 namespace DreamTravel.Features.GetFlightEmailOrders
 {
@@ -13,7 +13,7 @@ namespace DreamTravel.Features.GetFlightEmailOrders
             _flightEmailOrderRepository = flightEmailOrderRepository;
         }
 
-        public List<FlightEmailOrder> Execute()
+        public List<FlightEmailData> Execute()
         {
             return _flightEmailOrderRepository.GetAll();
         }

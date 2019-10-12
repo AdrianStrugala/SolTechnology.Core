@@ -1,5 +1,5 @@
-﻿using DreamTravel.Bot.DiscoverIndividualChances.Models;
-using DreamTravel.DatabaseData;
+﻿using DreamTravel.DatabaseData;
+using DreamTravel.Domain.FlightEmailOrders;
 
 namespace DreamTravel.Features.OrderFlightEmail
 {

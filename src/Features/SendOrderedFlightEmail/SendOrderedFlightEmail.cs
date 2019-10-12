@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using DreamTravel.Bot.DiscoverIndividualChances.Models;
+using DreamTravel.Domain.FlightEmailOrders;
 using DreamTravel.Domain.Flights;
 using DreamTravel.Features.SendOrderedFlightEmail.Interfaces;
 using DreamTravel.Features.SendOrderedFlightEmail.Models;
@@ -22,7 +22,7 @@ namespace DreamTravel.Features.SendOrderedFlightEmail
             _composeMessage = composeMessage;
         }
 
-        public void Execute(FlightEmailOrder flightEmailOrder)
+        public void Execute(FlightEmailData flightEmailOrder)
         {
             GetFlightsQuery getFlightsQuery = new GetFlightsQuery
             {

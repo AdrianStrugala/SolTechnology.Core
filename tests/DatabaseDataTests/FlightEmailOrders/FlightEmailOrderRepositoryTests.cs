@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using DreamTravel.Bot.DiscoverIndividualChances.Models;
+using System.Linq;
 using DreamTravel.DatabaseData.FlightEmailOrders;
+using DreamTravel.Domain.FlightEmailOrders;
 using Xunit;
 
 namespace DreamTravel.DatabaseDataTests.FlightEmailOrders
@@ -33,9 +34,19 @@ namespace DreamTravel.DatabaseDataTests.FlightEmailOrders
             _sut.Insert(flightEmailOrder);
 
             //Assert
-            List<FlightEmailOrder> flightEmailOrders = _sut.GetAll();
+            List<FlightEmailData> flightEmailOrders = _sut.GetAll();
 
-            Assert.Contains(flightEmailOrder, flightEmailOrders);
+            Assert.NotNull(flightEmailOrders);
+            Assert.NotEmpty(flightEmailOrders);
+
+            Assert.Equal(flightEmailOrder.ArrivalDate, flightEmailOrders.First().ArrivalDate);
+            Assert.Equal(flightEmailOrder.DepartureDate, flightEmailOrders.First().DepartureDate);
+            Assert.Equal(flightEmailOrder.From, flightEmailOrders.First().From);
+            Assert.Equal(flightEmailOrder.To, flightEmailOrders.First().To);
+            Assert.Equal(flightEmailOrder.MaxDaysOfStay, flightEmailOrders.First().MaxDaysOfStay);
+            Assert.Equal(flightEmailOrder.MinDaysOfStay, flightEmailOrders.First().MinDaysOfStay);
+            Assert.Equal(flightEmailOrder.OneWay, flightEmailOrders.First().OneWay);
+            Assert.Equal(flightEmailOrder.UserId, flightEmailOrders.First().UserId);
         }
     }
 }

@@ -1,5 +1,5 @@
 ﻿using Dapper;
-using DreamTravel.Bot.DiscoverIndividualChances.Models;
+using DreamTravel.Domain.FlightEmailOrders;
 using DreamTravel.Infrastructure.Database;
 
 namespace DreamTravel.DatabaseData.FlightEmailOrders

@@ -2,9 +2,11 @@
 
 namespace DreamTravel.Domain.FlightEmailOrders
 {
-    public class FlightEmailOrder
+    public class FlightEmailData
     {
         public int UserId { get; set; }
+
+        public string UserName { get; set; }
 
         public string From { get; set; }
 
@@ -19,5 +21,9 @@ namespace DreamTravel.Domain.FlightEmailOrders
         public int MaxDaysOfStay { get; set; }
 
         public bool OneWay { get; set; }
+
+        public string Email { get; set; }
+
+        public string Currency { get; set; }
     }
 }

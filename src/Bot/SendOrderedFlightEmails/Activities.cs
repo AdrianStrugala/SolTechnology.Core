@@ -1,8 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using DreamTravel.Bot.DiscoverIndividualChances.Models;
+using DreamTravel.Domain.FlightEmailOrders;
 using DreamTravel.Features.GetFlightEmailOrders;
-using DreamTravel.Features.SendOrderedFlightEmail;
 using DreamTravel.Features.SendOrderedFlightEmail.Interfaces;
 using Microsoft.Azure.WebJobs;
 
@@ -23,7 +22,7 @@ namespace DreamTravel.Bot.SendOrderedFlightEmails
         }
 
         [FunctionName(GetFlightEmailOrdersFunctionName)]
-        public async Task<List<FlightEmailOrder>> GetFlightEmailOrders(
+        public async Task<List<FlightEmailData>> GetFlightEmailOrders(
             [ActivityTrigger] object input)
         {
             return _getFlightEmailOrders.Execute();
@@ -32,7 +31,7 @@ namespace DreamTravel.Bot.SendOrderedFlightEmails
 
         [FunctionName(SendOrderedFlightEmailFunctionName)]
         public async Task SendOrderedFlightEmail(
-            [ActivityTrigger] FlightEmailOrder input)
+            [ActivityTrigger] FlightEmailData input)
         {
             _sendOrderedFlightEmail.Execute(input);
         }

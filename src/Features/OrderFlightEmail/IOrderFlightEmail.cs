@@ -1,4 +1,4 @@
-﻿using DreamTravel.Bot.DiscoverIndividualChances.Models;
+﻿using DreamTravel.Domain.FlightEmailOrders;
 
 namespace DreamTravel.Features.OrderFlightEmail
 {
