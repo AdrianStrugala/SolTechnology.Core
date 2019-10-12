@@ -7,6 +7,11 @@
       "defaultValue": "dreamtravel",
       "minLength": 1
     },
+    "dreamFlightName": {
+      "type": "string",
+      "defaultValue": "dreamflight",
+      "minLength": 1
+    },
     "sqlServerName": {
       "type": "string",
       "defaultValue": "dreamtravel",
@@ -101,6 +106,50 @@
       ],
       "properties": {
         "name": "[parameters('dreamTravelName')]",
+        "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('hostingPlanName'))]",
+        "httpsOnly": true,
+        "siteConfig": {
+          "appSettings": [
+          ],
+          "http20Enabled": true,
+          "alwaysOn": true,
+          "minTlsVersion": "1.2",
+          "autoHealEnabled": true,
+          "autoHealRules": {
+            "actions": {
+              "actionType": "Recycle"
+            },
+            "triggers": {
+              "statusCodes": [
+                {
+                  "status": 500
+                },
+                {
+                  "status": 502
+                },
+                {
+                  "status": 503
+                }
+              ]
+            }
+          }
+        }
+      }
+    },
+    {
+      "apiVersion": "2015-08-01",
+      "name": "[parameters('dreamFlightName')]",
+      "type": "Microsoft.Web/sites",
+      "location": "[resourceGroup().location]",
+      "tags": {
+        "[concat('hidden-related:', resourceGroup().id, '/providers/Microsoft.Web/serverfarms/', variables('hostingPlanName'))]": "Resource",
+        "displayName": "Dream Flight"
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Web/serverfarms/', variables('hostingPlanName'))]"
+      ],
+      "properties": {
+        "name": "[parameters('dreamFlightName')]",
         "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('hostingPlanName'))]",
         "httpsOnly": true,
         "siteConfig": {
