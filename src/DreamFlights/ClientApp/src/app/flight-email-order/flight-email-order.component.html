@@ -1,8 +1,10 @@
-
 <!-- <div> -->
-  <!-- [UserId], [From], [To], [DepartureDate], [ArrivalDate], [MinDaysOfStay], [MaxDaysOfStay], [OneWay] -->
+<!-- [UserId], [From], [To], [DepartureDate], [ArrivalDate], [MinDaysOfStay], [MaxDaysOfStay], [OneWay] -->
 
+<div class="form">
   <form [formGroup]="orderForm">
+
+    <h5>From:</h5>
 
     <mat-form-field>
       <input matInput
@@ -11,6 +13,9 @@
     </mat-form-field>
 
     <br>
+    <br>
+    <br>
+    <h5>To:</h5>
 
     <mat-form-field>
       <input matInput
@@ -19,10 +24,14 @@
     </mat-form-field>
 
     <br>
+    <br>
+    <br>
+
+    <h5>Date of Departure:</h5>
 
     <mat-form-field class="example-full-width">
       <input matInput [matDatepicker]="DepartureDate"
-             placeholder="DepartureDate"
+             placeholder="Date of Departure"
              formControlName="departureDate">
       <mat-datepicker-toggle matSuffix [for]="DepartureDate">
         <mat-icon matDatepickerToggleIcon>keyboard_arrow_down</mat-icon>
@@ -31,10 +40,14 @@
     </mat-form-field>
 
     <br>
+    <br>
+    <br>
+
+    <h5>Date of Arrival:</h5>
 
     <mat-form-field class="example-full-width">
       <input matInput [matDatepicker]="ArrivalDate"
-             placeholder="ArrivalDate"
+             placeholder="Date of Arrival"
              formControlName="arrivalDate">
       <mat-datepicker-toggle matSuffix [for]="ArrivalDate">
         <mat-icon matDatepickerToggleIcon>keyboard_arrow_down</mat-icon>
@@ -43,23 +56,32 @@
     </mat-form-field>
 
     <br>
+    <br>
+    <br>
+
+    <h5>Number of Minimum days of stay:</h5>
 
     <mat-form-field>
       <input type="number" matInput
-             placeholder="MinDaysOfStay"
+             placeholder="Minimum days of stay"
              formControlName="minDaysOfStay">
     </mat-form-field>
 
     <br>
+    <br>
+    <br>
 
+    <h5>Number of Maximum days of stay:</h5>
 
     <mat-form-field>
       <input type="number" matInput
-             placeholder="MaxDaysOfStay"
+             placeholder="Maximum days of stay"
              formControlName="maxDaysOfStay">
     </mat-form-field>
 
-    <br />
+    <br>
+    <br>
+    <br>
 
     <button mat-stroked-button
             type="submit"
@@ -69,7 +91,5 @@
 
   </form>
 
-  
-
-<!-- </div> -->
+</div>
 

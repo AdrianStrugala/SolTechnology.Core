@@ -9,7 +9,7 @@ using Newtonsoft.Json;
 namespace DreamTravel.DreamFlights
 {
     [AllowAnonymous]
-    
+
     [Route(Route)]
     public class OrderFlightEmailController : Controller
     {
@@ -32,6 +32,9 @@ namespace DreamTravel.DreamFlights
         {
             try
             {
+                flightEmailOrder.ArrivalDate = flightEmailOrder.ArrivalDate.ToUniversalTime();
+                flightEmailOrder.DepartureDate = flightEmailOrder.DepartureDate.ToUniversalTime();
+
                 _logger.LogInformation($"Ordering flight email for user: [{flightEmailOrder.UserId}]");
 
                 _orderFlightEmail.Execute(flightEmailOrder);
