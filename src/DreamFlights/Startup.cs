@@ -26,7 +26,7 @@ namespace DreamTravel.DreamFlights
             // Add Angular Monitor App
             services.AddSpaStaticFiles(configuration =>
             {
-                configuration.RootPath = "ClientApp/dist";
+                configuration.RootPath = "ClientApp/dist/dream-flights";
             });
         }
 
