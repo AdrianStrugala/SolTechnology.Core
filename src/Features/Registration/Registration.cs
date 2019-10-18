@@ -1,4 +1,5 @@
-﻿using DreamTravel.Cryptography;
+﻿using System;
+using DreamTravel.Cryptography;
 using DreamTravel.DatabaseData;
 using DreamTravel.Domain.Users;
 
@@ -13,11 +14,20 @@ namespace DreamTravel.Features.Registration
             _userRepository = userRepository;
         }
 
-        public void Register(User user)
+        public bool Register(User user)
         {
-            user.Password = Encryption.Encrypt(user.Password);
+            try
+            {
+                user.Password = Encryption.Encrypt(user.Password);
 
-            _userRepository.Insert(user);
+                _userRepository.Insert(user);
+
+                return true;
+            }
+            catch (Exception e)
+            {
+                return false;
+            }
         }
     }
 }

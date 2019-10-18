@@ -4,6 +4,6 @@ namespace DreamTravel.Features.Registration
 {
     public interface IRegistration
     {
-        void Register(User user);
+        bool Register(User user);
     }
 }

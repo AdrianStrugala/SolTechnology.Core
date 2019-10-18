@@ -8,5 +8,7 @@ namespace DreamTravel.DatabaseData
         List<User> GetAll();
 
         void Insert(User user);
+
+        User Get(string userEmail);
     }
 }
