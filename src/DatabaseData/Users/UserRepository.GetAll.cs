@@ -6,7 +6,7 @@ using DreamTravel.Infrastructure.Database;
 
 namespace DreamTravel.DatabaseData.Users
 {
-    public class UserRepository : IUserRepository
+    public partial class UserRepository : IUserRepository
     {
         private readonly IDbConnectionFactory _dbConnectionFactory;
 
@@ -22,7 +22,7 @@ SELECT [Id]
   FROM [dbo].[User]
 ";
 
-        public List<User> GetUsers()
+        public List<User> GetAll()
         {
             List<User> result;
 

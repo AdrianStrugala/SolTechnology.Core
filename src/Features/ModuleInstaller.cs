@@ -5,9 +5,9 @@ using DreamTravel.Features.FindNameOfCity;
 using DreamTravel.Features.GetFlightEmailOrders;
 using DreamTravel.Features.LimitCostOfPaths;
 using DreamTravel.Features.OrderFlightEmail;
+using DreamTravel.Features.Registration;
 using DreamTravel.Features.SendDreamTravelFlightEmail;
 using DreamTravel.Features.SendDreamTravelFlightEmail.Interfaces;
-using DreamTravel.Features.SendOrderedFlightEmail;
 using DreamTravel.Features.SendOrderedFlightEmail.Interfaces;
 using DreamTravel.FlightProviderData;
 using DreamTravel.GeolocationData.Configuration;
@@ -54,6 +54,8 @@ namespace DreamTravel.Features
             services.AddScoped<ISendOrderedFlightEmail, SendOrderedFlightEmail.SendOrderedFlightEmail>();
             services.AddScoped<SendOrderedFlightEmail.Interfaces.IComposeMessage, SendOrderedFlightEmail.ComposeMessage>();
 
+            //Register
+            services.AddScoped<IRegistration, Registration.Registration>();
 
             services.InstallFlightProviderData();
             services.InstallDatabaseData();

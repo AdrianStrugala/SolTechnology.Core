@@ -5,6 +5,8 @@ namespace DreamTravel.DatabaseData
 {
     public interface IUserRepository
     {
-        List<User> GetUsers();
+        List<User> GetAll();
+
+        void Insert(User user);
     }
 }
