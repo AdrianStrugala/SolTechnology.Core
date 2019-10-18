@@ -13,8 +13,5 @@
     <ProjectReference Include="..\TravelingSalesmanProblem\TravelingSalesmanProblem.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Login\" />
-  </ItemGroup>
 
 </Project>
