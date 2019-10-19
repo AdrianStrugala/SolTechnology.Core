@@ -25,6 +25,7 @@
     "@angular/platform-browser-dynamic": "8.2.9",
     "@angular/platform-server": "^8.0.0",
     "@angular/router": "8.2.9",
+    "@material/textfield": "^3.2.0",
     "@nguniversal/module-map-ngfactory-loader": "^5.0.0-beta.5",
     "angular-in-memory-web-api": "0.5.4",
     "aspnet-prerendering": "^3.0.1",

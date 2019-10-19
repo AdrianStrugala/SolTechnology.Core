@@ -4,7 +4,7 @@
 <mat-card class="card">
 
   <mat-card-title class="title">
-    Order your Dream Flight email
+    Order your Dream Flight email!
   </mat-card-title>
 
   <br>
@@ -67,31 +67,24 @@
       <br>
       <br>
 
-      <h5>Number of Minimum days of stay:</h5>
+      <h5>How much days do you want to stay?</h5>
 
-      <mat-form-field>
+      <mat-form-field class="number-input">
         <input type="number" matInput
-               placeholder="Minimum days of stay"
+               placeholder="Min"
                formControlName="minDaysOfStay">
       </mat-form-field>
 
-      <br>
-      <br>
-      <br>
+      — 
 
-      <h5>Number of Maximum days of stay:</h5>
-
-      <mat-form-field>
-        <input type="number" matInput
-               placeholder="Maximum days of stay"
+      <mat-form-field class="number-input">
+        <input style="border: 1px solid #ddd" type="number" matInput
+               placeholder="Max"
                formControlName="maxDaysOfStay">
       </mat-form-field>
 
+ 
       <br>
-      <br>
-      <br>
-
-
       <br>
       <br>
       <br>
@@ -108,5 +101,12 @@
 
 
 </mat-card>
+
+
+<div class="mdc-text-field">
+  <input type="text" id="my-text-field" class="mdc-text-field__input">
+  <label class="mdc-floating-label" for="my-text-field">Hint text</label>
+  <div class="mdc-line-ripple"></div>
+</div>
 
 
