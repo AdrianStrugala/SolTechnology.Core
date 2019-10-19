@@ -9,7 +9,6 @@
 
   <br>
   <br>
-  <br>
 
   <form [formGroup]="orderForm">
     <mat-card-content>
@@ -67,25 +66,26 @@
       <br>
       <br>
 
-      <h5>How much days do you want to stay?</h5>
+      <h5>Length of stay:</h5>
 
-      <mat-form-field class="number-input">
+      <mat-form-field appearance="outline" class="number-input">
+        <mat-label>Min days</mat-label>
         <input type="number" matInput
                placeholder="Min"
                formControlName="minDaysOfStay">
       </mat-form-field>
 
-      — 
+      —
 
-      <mat-form-field class="number-input">
-        <input style="border: 1px solid #ddd" type="number" matInput
+      <mat-form-field appearance="outline" class="number-input">
+        <mat-label>Max days</mat-label>
+        <input type="number" matInput
                placeholder="Max"
                formControlName="maxDaysOfStay">
       </mat-form-field>
 
- 
-      <br>
-      <br>
+
+
       <br>
       <br>
     </mat-card-content>
@@ -103,10 +103,6 @@
 </mat-card>
 
 
-<div class="mdc-text-field">
-  <input type="text" id="my-text-field" class="mdc-text-field__input">
-  <label class="mdc-floating-label" for="my-text-field">Hint text</label>
-  <div class="mdc-line-ripple"></div>
-</div>
+
 
 
