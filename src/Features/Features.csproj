@@ -6,10 +6,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Cryptography\Cryptography.csproj" />
     <ProjectReference Include="..\DatabaseData\DatabaseData.csproj" />
     <ProjectReference Include="..\FlightsRepository\FlightProviderData.csproj" />
     <ProjectReference Include="..\GeolocationData\GeolocationData.csproj" />	
     <ProjectReference Include="..\TravelingSalesmanProblem\TravelingSalesmanProblem.csproj" />
   </ItemGroup>
+
 
 </Project>
