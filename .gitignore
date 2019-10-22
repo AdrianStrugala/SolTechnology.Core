@@ -58,3 +58,4 @@ src/WebUI/wwwroot/js/DisplayHelpers/ClearMap.js
 src/WebUI/wwwroot/js/DisplayHelpers/DisplayTravelSummary.js
 src/WebUI/wwwroot/js/DisplayHelpers/DisplayPathsSummary.js
 src/WebUI/log.txt
+**/**/node_modules/*

@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using DreamTravel.Domain.Cities;
-using DreamTravel.Features.CalculateBestPath;
-using DreamTravel.Features.CalculateBestPath.Interfaces;
+using DreamTravel.Features.DreamTrip.CalculateBestPath;
+using DreamTravel.Features.DreamTrip.CalculateBestPath.Interfaces;
 using DreamTravel.GeolocationData;
 using DreamTravel.GeolocationData.Matrices;
 using DreamTravel.TravelingSalesmanProblem;
@@ -13,7 +13,7 @@ namespace DreamTravel.FeaturesTests.CalculateBestPath
 {
     public class PerformanceTests
     {
-        private readonly Features.CalculateBestPath.CalculateBestPath _sut;
+        private readonly Features.DreamTrip.CalculateBestPath.CalculateBestPath _sut;
 
         public PerformanceTests()
         {
@@ -25,7 +25,7 @@ namespace DreamTravel.FeaturesTests.CalculateBestPath
 
             FindProfitablePath evaluationBrain = new FindProfitablePath();
 
-            _sut = new Features.CalculateBestPath.CalculateBestPath(downloadRoadData, formOutputData, tsp, evaluationBrain);
+            _sut = new Features.DreamTrip.CalculateBestPath.CalculateBestPath(downloadRoadData, formOutputData, tsp, evaluationBrain);
         }
 
         [Fact(Skip = "Paid test :(")]

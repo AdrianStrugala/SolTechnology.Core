@@ -1,8 +1,8 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using DreamTravel.Domain.Cities;
-using DreamTravel.Features.CalculateBestPath;
-using DreamTravel.Features.CalculateBestPath.Models;
+using DreamTravel.Features.DreamTrip.CalculateBestPath;
+using DreamTravel.Features.DreamTrip.CalculateBestPath.Models;
 using DreamTravel.GeolocationData;
 using DreamTravel.GeolocationData.Matrices;
 using Microsoft.Extensions.Logging.Abstractions;

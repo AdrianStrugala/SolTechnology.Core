@@ -1,9 +1,9 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using DreamTravel.Domain.Cities;
-using DreamTravel.Features.CalculateBestPath;
-using DreamTravel.Features.CalculateBestPath.Interfaces;
-using DreamTravel.Features.CalculateBestPath.Models;
+using DreamTravel.Features.DreamTrip.CalculateBestPath;
+using DreamTravel.Features.DreamTrip.CalculateBestPath.Interfaces;
+using DreamTravel.Features.DreamTrip.CalculateBestPath.Models;
 using DreamTravel.TravelingSalesmanProblem;
 using NSubstitute;
 using Xunit;
@@ -16,7 +16,7 @@ namespace DreamTravel.FeaturesTests.CalculateBestPath
         private readonly ITSP _tspSolver;
         private readonly IFindProfitablePath _evaluationBrain;
 
-        private readonly Features.CalculateBestPath.CalculateBestPath _sut;
+        private readonly Features.DreamTrip.CalculateBestPath.CalculateBestPath _sut;
 
         public CalculateBestPathTests()
         {
@@ -25,7 +25,7 @@ namespace DreamTravel.FeaturesTests.CalculateBestPath
             _tspSolver = Substitute.For<ITSP>();
             _evaluationBrain = Substitute.For<IFindProfitablePath>();
 
-            _sut = new Features.CalculateBestPath.CalculateBestPath(_downloadRoadData, formPathsFromMatrices, _tspSolver, _evaluationBrain);
+            _sut = new Features.DreamTrip.CalculateBestPath.CalculateBestPath(_downloadRoadData, formPathsFromMatrices, _tspSolver, _evaluationBrain);
         }
 
         [Fact]

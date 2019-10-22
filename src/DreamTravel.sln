@@ -26,7 +26,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BotTests", "..\tests\BotTes
 EndProject
 Project("{151D2E53-A2C4-4D7D-83FE-D05416EBD58E}") = "AzureResourceGroup", "..\devOps\AzureResourceGroup\AzureResourceGroup.deployproj", "{2EB94B37-255F-40E7-A807-6A4F2D61DC9E}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DreamFlights", "DreamFlights\DreamFlights.csproj", "{5DE95271-A434-4CE5-BF1C-DB6E1ABE349A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Frontend", "Frontend\Frontend.csproj", "{5DE95271-A434-4CE5-BF1C-DB6E1ABE349A}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "DataLayer", "DataLayer", "{B2587745-8654-42FC-A2A2-6D054FDF2173}"
 EndProject
@@ -56,11 +56,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GeolocationDataTests", "..\
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FeaturesTests", "..\tests\FeaturesTests\FeaturesTests.csproj", "{5FA4F1EE-322B-425F-A578-C6E6B2AA36B1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cryptography", "Cryptography\Cryptography.csproj", "{9D280751-3A1A-422B-BA5B-D81D053AB36E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cryptography", "Cryptography\Cryptography.csproj", "{9D280751-3A1A-422B-BA5B-D81D053AB36E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CryptographyTests", "CryptographyTests\CryptographyTests.csproj", "{76B0A5FE-2A08-4CF9-93C0-EE678366478A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CryptographyTests", "CryptographyTests\CryptographyTests.csproj", "{76B0A5FE-2A08-4CF9-93C0-EE678366478A}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebAPI", "WebAPI\WebAPI.csproj", "{9698CFDF-5D6C-4297-A68C-1BC6709E69E2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Api", "Api\Api.csproj", "{9698CFDF-5D6C-4297-A68C-1BC6709E69E2}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -182,6 +182,7 @@ Global
 		{5FA4F1EE-322B-425F-A578-C6E6B2AA36B1} = {39216599-39FD-4FC7-8759-48AC896CEFFF}
 		{9D280751-3A1A-422B-BA5B-D81D053AB36E} = {C3AD01F3-75DE-44BB-8FE5-17E1683D7872}
 		{76B0A5FE-2A08-4CF9-93C0-EE678366478A} = {39216599-39FD-4FC7-8759-48AC896CEFFF}
+		{9698CFDF-5D6C-4297-A68C-1BC6709E69E2} = {671C7D7D-4079-44D1-AEF8-ACCC9A6186B8}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {00F9DE65-0AAA-464E-9C25-8FC931194B32}

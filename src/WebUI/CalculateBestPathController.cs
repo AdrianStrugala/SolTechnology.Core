@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
-using DreamTravel.Features.CalculateBestPath;
-using DreamTravel.Features.CalculateBestPath.Interfaces;
+using DreamTravel.Features.DreamTrip.CalculateBestPath;
+using DreamTravel.Features.DreamTrip.CalculateBestPath.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;

@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using DreamTravel.Domain.FlightEmailOrders;
-using DreamTravel.Features.GetFlightEmailOrders;
-using DreamTravel.Features.SendOrderedFlightEmail.Interfaces;
+using DreamTravel.Features.DreamFlight.GetFlightEmailOrders;
+using DreamTravel.Features.DreamFlight.SendOrderedFlightEmail.Interfaces;
 using Microsoft.Azure.WebJobs;
 
 namespace DreamTravel.Bot.SendOrderedFlightEmails
