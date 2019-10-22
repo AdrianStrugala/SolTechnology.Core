@@ -1,95 +1,108 @@
 <!-- <div> -->
 <!-- [UserId], [From], [To], [DepartureDate], [ArrivalDate], [MinDaysOfStay], [MaxDaysOfStay], [OneWay] -->
 
-<div class="form">
+<mat-card class="card">
+
+  <mat-card-title class="title">
+    Order your Dream Flight email!
+  </mat-card-title>
+
+  <br>
+  <br>
+
   <form [formGroup]="orderForm">
+    <mat-card-content>
 
-    <h5>From:</h5>
+      <h5>From:</h5>
 
-    <mat-form-field>
-      <input matInput
-             placeholder="From"
-             formControlName="from">
-    </mat-form-field>
+      <mat-form-field>
+        <input matInput
+               placeholder="From"
+               formControlName="from">
+      </mat-form-field>
 
-    <br>
-    <br>
-    <br>
-    <h5>To:</h5>
+      <br>
+      <br>
+      <br>
+      <h5>To:</h5>
 
-    <mat-form-field>
-      <input matInput
-             placeholder="To"
-             formControlName="to">
-    </mat-form-field>
+      <mat-form-field>
+        <input matInput
+               placeholder="To"
+               formControlName="to">
+      </mat-form-field>
 
-    <br>
-    <br>
-    <br>
+      <br>
+      <br>
+      <br>
 
-    <h5>Date of Departure:</h5>
+      <h5>Date of Departure:</h5>
 
-    <mat-form-field class="example-full-width">
-      <input matInput [matDatepicker]="DepartureDate"
-             placeholder="Date of Departure"
-             formControlName="departureDate">
-      <mat-datepicker-toggle matSuffix [for]="DepartureDate">
-        <mat-icon matDatepickerToggleIcon>keyboard_arrow_down</mat-icon>
-      </mat-datepicker-toggle>
-      <mat-datepicker #DepartureDate></mat-datepicker>
-    </mat-form-field>
+      <mat-form-field class="example-full-width">
+        <input matInput [matDatepicker]="DepartureDate"
+               placeholder="Date of Departure"
+               formControlName="departureDate">
+        <mat-datepicker-toggle matSuffix [for]="DepartureDate">
+        </mat-datepicker-toggle>
+        <mat-datepicker #DepartureDate></mat-datepicker>
+      </mat-form-field>
 
-    <br>
-    <br>
-    <br>
+      <br>
+      <br>
+      <br>
 
-    <h5>Date of Arrival:</h5>
+      <h5>Date of Arrival:</h5>
 
-    <mat-form-field class="example-full-width">
-      <input matInput [matDatepicker]="ArrivalDate"
-             placeholder="Date of Arrival"
-             formControlName="arrivalDate">
-      <mat-datepicker-toggle matSuffix [for]="ArrivalDate">
-        <mat-icon matDatepickerToggleIcon>keyboard_arrow_down</mat-icon>
-      </mat-datepicker-toggle>
-      <mat-datepicker #ArrivalDate></mat-datepicker>
-    </mat-form-field>
+      <mat-form-field class="example-full-width">
+        <input matInput [matDatepicker]="ArrivalDate"
+               placeholder="Date of Arrival"
+               formControlName="arrivalDate">
+        <mat-datepicker-toggle matSuffix [for]="ArrivalDate">
+        </mat-datepicker-toggle>
+        <mat-datepicker #ArrivalDate></mat-datepicker>
+      </mat-form-field>
 
-    <br>
-    <br>
-    <br>
+      <br>
+      <br>
+      <br>
 
-    <h5>Number of Minimum days of stay:</h5>
+      <h5>Length of stay:</h5>
 
-    <mat-form-field>
-      <input type="number" matInput
-             placeholder="Minimum days of stay"
-             formControlName="minDaysOfStay">
-    </mat-form-field>
+      <mat-form-field appearance="outline" class="number-input">
+        <mat-label>Min days</mat-label>
+        <input type="number" matInput
+               placeholder="Min"
+               formControlName="minDaysOfStay">
+      </mat-form-field>
 
-    <br>
-    <br>
-    <br>
+      —
 
-    <h5>Number of Maximum days of stay:</h5>
+      <mat-form-field appearance="outline" class="number-input">
+        <mat-label>Max days</mat-label>
+        <input type="number" matInput
+               placeholder="Max"
+               formControlName="maxDaysOfStay">
+      </mat-form-field>
 
-    <mat-form-field>
-      <input type="number" matInput
-             placeholder="Maximum days of stay"
-             formControlName="maxDaysOfStay">
-    </mat-form-field>
 
-    <br>
-    <br>
-    <br>
 
-    <button mat-stroked-button
-            type="submit"
-            (click)="onSubmit()">
-      Submit
-    </button>
+      <br>
+      <br>
+    </mat-card-content>
+    <mat-card-actions>
+      <button mat-stroked-button
+              type="submit"
+              (click)="onSubmit()">
+        Submit
+      </button>
+    </mat-card-actions>
 
   </form>
 
-</div>
+
+</mat-card>
+
+
+
+
 
