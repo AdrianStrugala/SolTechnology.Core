@@ -1,9 +1,11 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
+using Microsoft.AspNetCore.Cors;
 
 namespace WebAPI.Controllers
 {
     #region snippet
+    [EnableCors]
     [Route("api/[controller]")]
     [ApiController]
     public class ValuesController : ControllerBase

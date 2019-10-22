@@ -12,7 +12,7 @@ namespace WebAPI
 
         public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
             WebHost.CreateDefaultBuilder(args)
-                .UseStartup<StartupTest>();
+                .UseStartup<Startup>();
                 //.UseStartup<StartupTestMultiPolicy>();
     }
 }
