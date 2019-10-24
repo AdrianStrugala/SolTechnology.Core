@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 
-namespace DreamTravel.Api.DreamFlight
+namespace DreamTravel.Api.DreamFlights
 {
     [AllowAnonymous]
 

@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 
-namespace DreamTravel.Api.DreamTrip
+namespace DreamTravel.Api.DreamTrips
 {
     [Route(Route)]
     public class FindNameOfCityController : Controller
