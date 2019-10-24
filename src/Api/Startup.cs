@@ -25,7 +25,9 @@ namespace DreamTravel.Api
                 options.AddPolicy(CorsPolicy,
                 builder =>
                 {
-                    builder.WithOrigins("http://localhost:4200")
+                    builder.WithOrigins("http://localhost:4200",
+                               "https://dreamtravels.azurewebsites.net",
+                               "https://dreamtravels-demo.azurewebsites.net")
                                         .AllowAnyHeader()
                                         .AllowAnyMethod()
                                         .AllowCredentials();
