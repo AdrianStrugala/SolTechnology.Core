@@ -2,14 +2,14 @@
   "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
   "contentVersion": "1.0.0.0",
   "parameters": {
-    "dreamTravelName": {
+    "dreamTravelsName": {
       "type": "string",
-      "defaultValue": "dreamtravel",
+      "defaultValue": "dreamtravels",
       "minLength": 1
     },
-    "dreamFlightName": {
+    "apiName": {
       "type": "string",
-      "defaultValue": "dreamflights",
+      "defaultValue": "dreamtravelsapi",
       "minLength": 1
     },
     "sqlServerName": {
@@ -94,18 +94,18 @@
     },
     {
       "apiVersion": "2015-08-01",
-      "name": "[parameters('dreamTravelName')]",
+      "name": "[parameters('dreamTravelsName')]",
       "type": "Microsoft.Web/sites",
       "location": "[resourceGroup().location]",
       "tags": {
         "[concat('hidden-related:', resourceGroup().id, '/providers/Microsoft.Web/serverfarms/', variables('hostingPlanName'))]": "Resource",
-        "displayName": "Dream Travel"
+        "displayName": "Dream Travels"
       },
       "dependsOn": [
         "[resourceId('Microsoft.Web/serverfarms/', variables('hostingPlanName'))]"
       ],
       "properties": {
-        "name": "[parameters('dreamTravelName')]",
+        "name": "[parameters('dreamTravelsName')]",
         "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('hostingPlanName'))]",
         "httpsOnly": true,
         "siteConfig": {
@@ -138,18 +138,18 @@
     },
     {
       "apiVersion": "2015-08-01",
-      "name": "[parameters('dreamFlightName')]",
+      "name": "[parameters('apiName')]",
       "type": "Microsoft.Web/sites",
       "location": "[resourceGroup().location]",
       "tags": {
         "[concat('hidden-related:', resourceGroup().id, '/providers/Microsoft.Web/serverfarms/', variables('hostingPlanName'))]": "Resource",
-        "displayName": "Dream Flight"
+        "displayName": "Dream Travels Api"
       },
       "dependsOn": [
         "[resourceId('Microsoft.Web/serverfarms/', variables('hostingPlanName'))]"
       ],
       "properties": {
-        "name": "[parameters('dreamFlightName')]",
+        "name": "[parameters('apiName')]",
         "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('hostingPlanName'))]",
         "httpsOnly": true,
         "siteConfig": {
@@ -211,18 +211,18 @@
     },
     {
       "apiVersion": "2014-04-01",
-      "name": "[parameters('dreamTravelName')]",
+      "name": "[parameters('dreamTravelsName')]",
       "type": "Microsoft.Insights/components",
       "location": "[resourceGroup().location]",
       "dependsOn": [
-        "[resourceId('Microsoft.Web/sites/', parameters('dreamTravelName'))]"
+        "[resourceId('Microsoft.Web/sites/', parameters('dreamTravelsName'))]"
       ],
       "tags": {
-        "[concat('hidden-link:', resourceGroup().id, '/providers/Microsoft.Web/sites/', parameters('dreamTravelName'))]": "Resource",
+        "[concat('hidden-link:', resourceGroup().id, '/providers/Microsoft.Web/sites/', parameters('dreamTravelsName'))]": "Resource",
         "displayName": "AppInsights"
       },
       "properties": {
-        "applicationId": "[parameters('dreamTravelName')]"
+        "applicationId": "[parameters('dreamTravelsName')]"
       }
     }
   ]
