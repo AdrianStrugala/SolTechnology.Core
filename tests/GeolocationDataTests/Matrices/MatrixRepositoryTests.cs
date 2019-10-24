@@ -148,7 +148,10 @@ namespace DreamTravel.WebUITests.BestPath.DataAccess
             var result = await _sut.GetCosts(new List<City> { firstCity, secondCity });
 
             //Assert
-            Assert.NotEqual((0, 0), (result.Item1[1], result.Item2[1]));
+            Assert.NotEqual((0), (result.Item1[1]));
+            Assert.NotEqual((0), (result.Item1[2]));
+            Assert.NotEqual((-1), (result.Item1[1]));
+            Assert.NotEqual((-1), (result.Item1[2]));
         }
 
 
@@ -171,7 +174,7 @@ namespace DreamTravel.WebUITests.BestPath.DataAccess
             };
 
             //Act
-            var result = await _sut.GetCosts(new List<City>{firstCity, secondCity});
+            var result = await _sut.GetCosts(new List<City> { firstCity, secondCity });
 
             //Assert
             Assert.NotEqual((-1, -1), (result.Item1[1], result.Item2[1]));
