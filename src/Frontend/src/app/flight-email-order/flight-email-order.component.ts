@@ -28,8 +28,7 @@ export class FlightEmailOrderComponent implements OnInit {
 
     constructor(private http: HttpClient, @Inject('BASE_URL') private baseUrl: string) { }
 
-    //  url = "https://dreamtravel-demo.azurewebsites.net/api/OrderFlightEmail";
-    url = "http://localhost:53725/api/OrderFlightEmail";
+    url = "https://dreamtravelsapi-demo.azurewebsites.net/api/OrderFlightEmail";
 
     orderForm = new FormGroup({
         from: new FormControl(),
