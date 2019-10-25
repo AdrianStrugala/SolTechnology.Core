@@ -40,8 +40,6 @@ export class FlightEmailOrderComponent implements OnInit {
     });
 
     onSubmit(): void {
-        console.log(this.orderForm.value);
-
         this.http.post(
             this.url,
             this.orderForm.value,

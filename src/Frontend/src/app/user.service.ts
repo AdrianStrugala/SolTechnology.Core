@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
 
 @Injectable({
   providedIn: 'root'
@@ -9,10 +10,19 @@ export class UserService {
   public Email: string;
   public Password : string;
 
-  constructor() { }
+  constructor(private http: HttpClient) { }
 
-  login() : string {
+  url = "http://localhost:53725/api/login";
 
-    return 'dupa';
+  login() {
+
+   return this.http.post(
+      this.url,
+      [this.Email, this.Password],
+      {
+          observe: "body"
+      })
+      .subscribe();
+
   } 
 }

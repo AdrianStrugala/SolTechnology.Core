@@ -16,16 +16,19 @@ export class NavbarComponent{
 
     openDialog(): void {
         let dialogRef = this.dialog.open(LoginComponent, {
-            height: '400px',
-            width: '600px',
+            height: '500px',
+            width: '500px',
             data : {Email: this.userService.Email, Password: this.userService.Password}
           });
     
-          
+
         dialogRef.afterClosed().subscribe(result => {
           this.userService.Email = result.email;
           this.userService.Password = result.password;
           console.log(this.userService.Email)
+
+          var xd  = this.userService.login();
+          console.log(xd)
         });
       }
 }
