@@ -16,10 +16,11 @@ export class NavbarComponent{
     constructor(public dialog: MatDialog) { }
 
     openDialog(): void {
-        const dialogRef = this.dialog.open(LoginComponent, {
-          width: '250px',
-          data: {name: this.name, animal: this.animal}
-        });
+        let dialogRef = this.dialog.open(LoginComponent, {
+            height: '400px',
+            width: '600px',
+            data: {name: this.name, animal: this.animal}
+          });
     
         dialogRef.afterClosed().subscribe(result => {
           console.log('The dialog was closed');

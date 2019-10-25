@@ -31,6 +31,7 @@ import { LoginComponent } from './login/login.component';
         ])
     ],
     entryComponents: [
+        LoginComponent
     ],
     bootstrap: [AppComponent]
 })
