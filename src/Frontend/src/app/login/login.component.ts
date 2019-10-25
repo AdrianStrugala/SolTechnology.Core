@@ -1,4 +1,4 @@
-import { Component, OnInit, Inject } from '@angular/core';
+import { Component, Inject } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 
 export interface DialogData {
@@ -12,7 +12,7 @@ export interface DialogData {
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.scss']
 })
-export class LoginComponent implements OnInit {
+export class LoginComponent{
 
   constructor(
     public dialogRef: MatDialogRef<LoginComponent>,
@@ -21,8 +21,4 @@ export class LoginComponent implements OnInit {
   onNoClick(): void {
     this.dialogRef.close();
   }
-
-  ngOnInit() {
-  }
-
 }
