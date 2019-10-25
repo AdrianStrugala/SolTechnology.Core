@@ -1,6 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, Inject } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { LoginComponent } from '../login/login.component';
+import { UserService } from '../user.service';
 
 @Component({
     selector: 'navbar',
@@ -10,21 +11,21 @@ import { LoginComponent } from '../login/login.component';
 
 export class NavbarComponent{
 
-    animal: string;
-    name: string;
 
-    constructor(public dialog: MatDialog) { }
+    constructor(public dialog: MatDialog, private userService: UserService) { }
 
     openDialog(): void {
         let dialogRef = this.dialog.open(LoginComponent, {
             height: '400px',
             width: '600px',
-            data: {name: this.name, animal: this.animal}
+            data : {Email: this.userService.Email, Password: this.userService.Password}
           });
     
+          
         dialogRef.afterClosed().subscribe(result => {
-          console.log('The dialog was closed');
-          this.animal = result;
+          this.userService.Email = result.email;
+          this.userService.Password = result.password;
+          console.log(this.userService.Email)
         });
       }
 }

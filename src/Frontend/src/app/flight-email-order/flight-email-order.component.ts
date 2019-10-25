@@ -46,8 +46,7 @@ export class FlightEmailOrderComponent implements OnInit {
             this.url,
             this.orderForm.value,
             {
-                observe: "body",
-                withCredentials: true
+                observe: "body"
             })
             .subscribe();
     }

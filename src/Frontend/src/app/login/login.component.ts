@@ -1,10 +1,7 @@
 import { Component, Inject } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
-
-export interface DialogData {
-  animal: string;
-  name: string;
-}
+import { UserService } from '../user.service';
+import { FormControl, FormGroup, Validators, FormBuilder } from '@angular/forms';
 
 
 @Component({
@@ -14,9 +11,14 @@ export interface DialogData {
 })
 export class LoginComponent{
 
+  loginForm = new FormGroup({
+    email: new FormControl(),
+    password: new FormControl()
+});
+
   constructor(
     public dialogRef: MatDialogRef<LoginComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: DialogData) {}
+    @Inject(MAT_DIALOG_DATA) public userService: UserService) {}
 
   onNoClick(): void {
     this.dialogRef.close();
