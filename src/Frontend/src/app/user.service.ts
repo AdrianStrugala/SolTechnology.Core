@@ -1,28 +1,34 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { Observable } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
 })
-export class UserService {
+export class UserService{
+  
+  public user : IUser
 
-  public Id : number;
-  public Email: string;
-  public Password : string;
+  constructor(private http: HttpClient) { 
+    this.user = {} as IUser;
+  }
 
-  constructor(private http: HttpClient) { }
+  url = "https://dreamtravelsapi-demo.azurewebsites.net/api/login";
 
-  url = "http://localhost:53725/api/login";
+  login(): Observable<any> {
 
-  login() {
-
-   return this.http.post(
+  return this.http.post(
       this.url,
-      [this.Email, this.Password],
+      this.user,
       {
           observe: "body"
-      })
-      .subscribe();
-
+      });
   } 
+}
+
+interface IUser { 
+  Id: number;
+  Name: string;
+  Password: string;
+  Email: string;
 }

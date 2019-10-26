@@ -17,8 +17,18 @@ export class LoginComponent{
 });
 
   constructor(
-    public dialogRef: MatDialogRef<LoginComponent>,
-    @Inject(MAT_DIALOG_DATA) public userService: UserService) {}
+    public dialogRef: MatDialogRef<LoginComponent>, private userService: UserService) {}
+
+    login(email: string, password: string){
+      this.userService.user.Email = email;
+      this.userService.user.Password = password;
+      console.log(this.userService.user.Email)
+
+      this.userService.login()
+      .subscribe((data : number) => {        
+        this.userService.user.Id = data;
+      });
+    }
 
   onNoClick(): void {
     this.dialogRef.close();

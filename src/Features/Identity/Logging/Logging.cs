@@ -29,6 +29,12 @@ namespace DreamTravel.Features.Identity.Logging
                 return -2;
             }
 
+            //TODO REMOVE THE HACK WHEN REAL USERS WILL ARRIVE
+            if (loggingInUser.Password.Equals("Password") && userFromDb.Password.Equals(loggingInUser.Password))
+            {
+                return userFromDb.Id;
+            }
+
             //Valid logging
             if (Encryption.Decrypt(userFromDb.Password).Equals(loggingInUser.Password))
             {

@@ -1,4 +1,5 @@
-﻿using Dapper;
+﻿using System.Linq;
+using Dapper;
 using DreamTravel.Domain.Users;
 
 namespace DreamTravel.DatabaseData.Users
@@ -21,10 +22,10 @@ SELECT [Id]
             var result = new User();
             using (var connection = _dbConnectionFactory.CreateConnection())
             {
-                result = connection.QuerySingle<User>(GetSql, new
+                result = connection.Query<User>(GetSql, new
                 {
                     Email = userEmail
-                });
+                }).FirstOrDefault();
             }
 
             return result;

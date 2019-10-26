@@ -3,6 +3,7 @@ import { FormControl, FormGroup, Validators, FormBuilder } from '@angular/forms'
 import { HttpClient } from '@angular/common/http';
 import { MAT_MOMENT_DATE_FORMATS, MomentDateAdapter, MAT_MOMENT_DATE_ADAPTER_OPTIONS } from '@angular/material-moment-adapter';
 import { DateAdapter, MAT_DATE_FORMATS, MAT_DATE_LOCALE } from '@angular/material/core';
+import { UserService } from '../user.service';
 
 
 @Component({
@@ -26,7 +27,7 @@ import { DateAdapter, MAT_DATE_FORMATS, MAT_DATE_LOCALE } from '@angular/materia
 
 export class FlightEmailOrderComponent implements OnInit {
 
-    constructor(private http: HttpClient, @Inject('BASE_URL') private baseUrl: string) { }
+    constructor(private http: HttpClient, private userService : UserService) { }
 
     url = "https://dreamtravelsapi-demo.azurewebsites.net/api/OrderFlightEmail";
 
@@ -37,9 +38,13 @@ export class FlightEmailOrderComponent implements OnInit {
         arrivalDate: new FormControl(),
         minDaysOfStay: new FormControl(),
         maxDaysOfStay: new FormControl(),
+        userId : new FormControl
     });
 
     onSubmit(): void {
+
+        this.orderForm.value.userId = this.userService.user.Id
+
         this.http.post(
             this.url,
             this.orderForm.value,
