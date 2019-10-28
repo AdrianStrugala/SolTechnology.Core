@@ -34,6 +34,8 @@ namespace DreamTravel.Api
                 });
             });
 
+            services.AddApplicationInsightsTelemetry();
+
             services.InstallFeatures();
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
