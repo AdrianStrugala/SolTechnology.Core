@@ -27,6 +27,8 @@ export class LoginComponent{
       this.userService.login()
       .subscribe((data : number) => {        
         this.userService.user.Id = data;
+      
+      localStorage.setItem("user", JSON.stringify(this.userService.user))
       });
     }
 

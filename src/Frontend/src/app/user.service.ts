@@ -11,6 +11,10 @@ export class UserService{
 
   constructor(private http: HttpClient) { 
     this.user = {} as IUser;
+
+    if(localStorage.getItem("user") != null){
+      this.user = JSON.parse(localStorage.getItem("user"));
+    }
   }
 
   url = "https://dreamtravelsapi-demo.azurewebsites.net/api/login";
