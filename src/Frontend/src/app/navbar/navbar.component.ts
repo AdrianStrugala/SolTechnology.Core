@@ -13,11 +13,17 @@ export class NavbarComponent{
     constructor(public dialog: MatDialog) { }
 
     openDialog(): void {
-        let dialogRef = this.dialog.open(LoginComponent, {
-            height: '500px',
-            width: '500px'
-          });
-      }
+
+        if(this.dialog.openDialogs.length == 0){
+            this.dialog.open(LoginComponent, {
+                height: '500px',
+                width: '500px'
+              });
+        }
+        else{
+            this.dialog.closeAll();
+        }
     }
+}
   
 
