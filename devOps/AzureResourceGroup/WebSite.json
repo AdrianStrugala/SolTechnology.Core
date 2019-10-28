@@ -102,7 +102,8 @@
         "displayName": "Dream Travels"
       },
       "dependsOn": [
-        "[resourceId('Microsoft.Web/serverfarms/', variables('hostingPlanName'))]"
+        "[resourceId('Microsoft.Web/serverfarms/', variables('hostingPlanName'))]",
+        "[resourceId('microsoft.insights/components/', parameters('dreamTravelsName'))]"
       ],
       "properties": {
         "name": "[parameters('dreamTravelsName')]",
@@ -110,6 +111,10 @@
         "httpsOnly": true,
         "siteConfig": {
           "appSettings": [
+            {
+              "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
+              "value": "[reference(concat('microsoft.insights/components/', parameters('dreamTravelsName'))).InstrumentationKey]"
+            }
           ],
           "http20Enabled": true,
           "alwaysOn": true,
@@ -134,7 +139,18 @@
             }
           }
         }
-      }
+      },
+      "resources": [
+        {
+          "apiVersion": "2016-08-01",
+          "name": "Microsoft.AspNetCore.AzureAppServices.SiteExtension",
+          "type": "siteextensions",
+          "location": "[resourceGroup().location]",
+          "dependsOn": [
+            "[resourceId('Microsoft.Web/Sites', parameters('dreamTravelsName'))]"
+          ]
+        }
+      ]
     },
     {
       "apiVersion": "2015-08-01",
@@ -146,7 +162,8 @@
         "displayName": "Dream Travels Api"
       },
       "dependsOn": [
-        "[resourceId('Microsoft.Web/serverfarms/', variables('hostingPlanName'))]"
+        "[resourceId('Microsoft.Web/serverfarms/', variables('hostingPlanName'))]",
+        "[resourceId('microsoft.insights/components/', parameters('dreamTravelsName'))]"
       ],
       "properties": {
         "name": "[parameters('apiName')]",
@@ -154,6 +171,10 @@
         "httpsOnly": true,
         "siteConfig": {
           "appSettings": [
+            {
+              "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
+              "value": "[reference(concat('microsoft.insights/components/', parameters('dreamTravelsName'))).InstrumentationKey]"
+            }
           ],
           "http20Enabled": true,
           "alwaysOn": true,
@@ -178,7 +199,18 @@
             }
           }
         }
-      }
+      },
+      "resources": [
+        {
+          "apiVersion": "2016-08-01",
+          "name": "Microsoft.AspNetCore.AzureAppServices.SiteExtension",
+          "type": "siteextensions",
+          "location": "[resourceGroup().location]",
+          "dependsOn": [
+            "[resourceId('Microsoft.Web/Sites', parameters('apiName'))]"
+          ]
+        }
+      ]
     },
     {
       "name": "[concat(parameters('sqlServerName'), '/', parameters('databaseName'))]",
