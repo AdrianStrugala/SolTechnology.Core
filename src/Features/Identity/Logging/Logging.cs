@@ -13,11 +13,6 @@ namespace DreamTravel.Features.Identity.Logging
             _userRepository = userRepository;
         }
 
-        // RESPONSES:
-        // 1-9999999 - UserId
-        // -2 - User does not exist
-        // -1 - Invalid password
-
 
         public int LogIn(User loggingInUser)
         {
@@ -26,7 +21,7 @@ namespace DreamTravel.Features.Identity.Logging
             //User does not exist
             if (userFromDb == null)
             {
-                return -2;
+                throw new LoginException("Email not registered");
             }
 
             //TODO REMOVE THE HACK WHEN REAL USERS WILL ARRIVE
@@ -35,14 +30,13 @@ namespace DreamTravel.Features.Identity.Logging
                 return userFromDb.Id;
             }
 
-            //Valid logging
-            if (Encryption.Decrypt(userFromDb.Password).Equals(loggingInUser.Password))
+            if (!Encryption.Decrypt(userFromDb.Password).Equals(loggingInUser.Password))
             {
-                return userFromDb.Id;
+                throw new LoginException("Invalid password");
             }
 
-            //Invalid password
-            return -1;
+            return userFromDb.Id;
+
         }
     }
 }

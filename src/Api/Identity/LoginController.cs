@@ -30,12 +30,13 @@ namespace DreamTravel.Api.Identity
         {
             try
             {
+                _logger.LogInformation($"Attempt to log in with email: [{user.Email}] and password: [{user.Password}]");
                 int id = _logging.LogIn(user);
 
                 return Ok(id);
             }
 
-            catch (Exception ex)
+            catch (LoginException ex)
             {
                 _logger.LogError(ex.ToString());
                 return BadRequest(ex.Message);
