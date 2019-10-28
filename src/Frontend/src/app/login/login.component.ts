@@ -25,10 +25,14 @@ export class LoginComponent{
       console.log(this.userService.user.Email)
 
       this.userService.login()
-      .subscribe((data : number) => {        
+      .subscribe(
+        (data : number) => {        
         this.userService.user.Id = data;
       
       localStorage.setItem("user", JSON.stringify(this.userService.user))
+      },
+      (error) => {
+        console.log(error.error);
       });
     }
 
