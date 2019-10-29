@@ -13,8 +13,10 @@ export class LoginComponent{
 
   loginForm = new FormGroup({
     email: new FormControl(),
-    password: new FormControl()
+    password: new FormControl(),
 });
+
+  error : string;
 
   constructor(
     public dialogRef: MatDialogRef<LoginComponent>, private userService: UserService) {}
@@ -32,7 +34,7 @@ export class LoginComponent{
       localStorage.setItem("user", JSON.stringify(this.userService.user))
       },
       (error) => {
-        console.log(error.error);
+        this.error = error.error
       });
     }
 

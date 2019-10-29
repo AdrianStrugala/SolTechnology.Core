@@ -19,8 +19,15 @@
                        formControlName="password">
               </mat-form-field>
     </form>
+
 </div>
 <div mat-dialog-actions>
   <button mat-button (click)="onNoClick()">No Thanks</button>
-  <button mat-button [mat-dialog-close]="loginForm.value" (click)="login(loginForm.value.email, loginForm.value.password)" cdkFocusInitial>Login</button>
+  <button mat-button (click)="login(loginForm.value.email, loginForm.value.password)" cdkFocusInitial>Login</button>
 </div>
+
+<br>
+<br>
+<mat-error *ngIf="this.error">
+  {{this.error}}
+</mat-error>
