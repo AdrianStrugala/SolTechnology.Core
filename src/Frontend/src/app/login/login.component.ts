@@ -32,6 +32,8 @@ export class LoginComponent{
         this.userService.user.Id = data;
       
       localStorage.setItem("user", JSON.stringify(this.userService.user))
+
+      this.dialogRef.close();
       },
       (error) => {
         this.error = error.error
