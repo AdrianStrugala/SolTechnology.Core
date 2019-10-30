@@ -16,9 +16,7 @@
       <h5>From:</h5>
 
       <mat-form-field>
-        <input matInput
-               placeholder="From"
-               formControlName="from">
+        <input matInput placeholder="From" formControlName="from">
       </mat-form-field>
 
       <br>
@@ -27,9 +25,7 @@
       <h5>To:</h5>
 
       <mat-form-field>
-        <input matInput
-               placeholder="To"
-               formControlName="to">
+        <input matInput placeholder="To" formControlName="to">
       </mat-form-field>
 
       <br>
@@ -39,9 +35,7 @@
       <h5>Date of Departure:</h5>
 
       <mat-form-field class="example-full-width">
-        <input matInput [matDatepicker]="DepartureDate"
-               placeholder="Date of Departure"
-               formControlName="departureDate">
+        <input matInput [matDatepicker]="DepartureDate" placeholder="Date of Departure" formControlName="departureDate">
         <mat-datepicker-toggle matSuffix [for]="DepartureDate">
         </mat-datepicker-toggle>
         <mat-datepicker #DepartureDate></mat-datepicker>
@@ -54,9 +48,7 @@
       <h5>Date of Arrival:</h5>
 
       <mat-form-field class="example-full-width">
-        <input matInput [matDatepicker]="ArrivalDate"
-               placeholder="Date of Arrival"
-               formControlName="arrivalDate">
+        <input matInput [matDatepicker]="ArrivalDate" placeholder="Date of Arrival" formControlName="arrivalDate">
         <mat-datepicker-toggle matSuffix [for]="ArrivalDate">
         </mat-datepicker-toggle>
         <mat-datepicker #ArrivalDate></mat-datepicker>
@@ -70,18 +62,14 @@
 
       <mat-form-field appearance="outline" class="number-input">
         <mat-label>Min days</mat-label>
-        <input type="number" matInput
-               placeholder="Min"
-               formControlName="minDaysOfStay">
+        <input type="number" matInput placeholder="Min" formControlName="minDaysOfStay">
       </mat-form-field>
 
       —
 
       <mat-form-field appearance="outline" class="number-input">
         <mat-label>Max days</mat-label>
-        <input type="number" matInput
-               placeholder="Max"
-               formControlName="maxDaysOfStay">
+        <input type="number" matInput placeholder="Max" formControlName="maxDaysOfStay">
       </mat-form-field>
 
 
@@ -90,9 +78,7 @@
       <br>
     </mat-card-content>
     <mat-card-actions>
-      <button mat-stroked-button
-              type="submit"
-              (click)="onSubmit()">
+      <button class="btn btn-primary" type="submit" (click)="onSubmit()">
         Submit
       </button>
     </mat-card-actions>
@@ -101,8 +87,3 @@
 
 
 </mat-card>
-
-
-
-
-

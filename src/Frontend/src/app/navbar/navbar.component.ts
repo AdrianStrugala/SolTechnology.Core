@@ -16,8 +16,8 @@ export class NavbarComponent{
 
         if(this.dialog.openDialogs.length == 0){
             this.dialog.open(LoginComponent, {
-                height: '500px',
-                width: '500px'
+                height: '35rem',
+                width: '30rem'
               });
         }
         else{

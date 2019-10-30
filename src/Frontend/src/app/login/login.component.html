@@ -1,33 +1,35 @@
-<div mat-dialog-content>
+  <div mat-dialog-content>
     <form [formGroup]="loginForm">
-          <h2 style="text-align: center;"> Login</h2>
+      <h2 style="text-align: center;"> Login</h2>
 
-          <br>
-          <br>
+      <br>
+      <br>
 
-          <h5 >Email:</h5> 
-          <mat-form-field appearance="outline">
-              <input matInput
-                     placeholder="Email"
-                     formControlName="email">
-            </mat-form-field>
-<br>
-            <h5>Password:</h5> 
-            <mat-form-field appearance="outline">
-                <input type="password" matInput
-                       placeholder="Password"
-                       formControlName="password">
-              </mat-form-field>
+      <h5>Email:</h5>
+      <mat-form-field appearance="outline">
+        <input matInput placeholder="Email" formControlName="email">
+      </mat-form-field>
+      <br>
+      <h5>Password:</h5>
+      <mat-form-field appearance="outline">
+        <input type="password" matInput placeholder="Password" formControlName="password">
+      </mat-form-field>
     </form>
 
-</div>
-<div mat-dialog-actions>
-  <button mat-button (click)="onNoClick()">No Thanks</button>
-  <button mat-button (click)="login(loginForm.value.email, loginForm.value.password)" cdkFocusInitial>Login</button>
-</div>
+  </div>
 
-<br>
-<br>
-<mat-error *ngIf="this.error">
-  {{this.error}}
-</mat-error>
+
+  <div mat-dialog-actions>
+    <button type="button" class="btn btn-primary" (click)="login(loginForm.value.email, loginForm.value.password)"
+      cdkFocusInitial>Login</button>
+
+  </div>
+  <br>
+  <br>
+  <mat-error *ngIf="this.error">
+    {{this.error}}
+  </mat-error>
+
+  <br>
+  Not a user yet?
+  <button type="button" class="btn btn-outline-primary" (click)="register()">Register</button>

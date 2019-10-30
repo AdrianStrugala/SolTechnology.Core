@@ -40,7 +40,7 @@ export class LoginComponent{
       });
     }
 
-  onNoClick(): void {
+  register(): void {
     this.dialogRef.close();
   }
 }
