@@ -9,19 +9,10 @@
     <mat-form-field appearance="outline">
       <input matInput placeholder="Email" formControlName="email">
 
-      <mat-error *ngIf="email.hasError('email')">
-          Please enter a valid email address
+      <mat-error *ngIf="loginForm.get('email').hasError('email')">
+          Invalid email
         </mat-error>
     </mat-form-field>
-
-<!-- 
-
-    <div *ngIf="loginForm.errors?.name" class="alert alert-danger">
-      {{loginForm.errors?.name}}
-        <div *ngIf="loginForm.get('name').errors">
-            Email is in wrong format.
-          </div> 
-    </div> -->
 
     <br>
     <h5>Password:</h5>
@@ -35,7 +26,7 @@
 
 <div mat-dialog-actions>
   <button type="button" class="btn btn-primary" (click)="login(loginForm.value.email, loginForm.value.password)"
-    cdkFocusInitial>Login</button>
+    cdkFocusInitial [disabled]="!loginForm.valid">Login</button>
 
 </div>
 <br>
