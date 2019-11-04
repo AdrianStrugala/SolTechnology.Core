@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { LoginComponent } from '../login/login.component';
+import { UserService } from '../user.service';
 
 @Component({
     selector: 'navbar',
@@ -10,7 +11,7 @@ import { LoginComponent } from '../login/login.component';
 
 export class NavbarComponent{
 
-    constructor(public dialog: MatDialog) { }
+    constructor(public dialog: MatDialog, public userService: UserService) { }
 
     openDialog(): void {
 
