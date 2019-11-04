@@ -18,5 +18,18 @@ namespace DreamTravel.CryptographyTests
             //Assert
             Assert.Equal(password, decryptedPassword);
         }
+
+        [Fact]
+        public void Encrypt_PasswordIsShort_NoExceptionIsThrown()
+        {
+            //Arrange
+            string password = "x";
+
+            //Act
+            var encryptedPassword = Encryption.Encrypt(password);
+
+            //Assert
+            //no exception :)
+        }
     }
 }

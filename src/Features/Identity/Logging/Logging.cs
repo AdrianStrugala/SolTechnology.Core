@@ -25,17 +25,23 @@ namespace DreamTravel.Features.Identity.Logging
             }
 
             //TODO REMOVE THE HACK WHEN REAL USERS WILL ARRIVE
-            if (loggingInUser.Password.Equals("Password") && userFromDb.Password.Equals(loggingInUser.Password))
+            if (userFromDb.Password.Equals(loggingInUser.Password))
             {
                 return userFromDb.Id;
             }
 
-            if (!Encryption.Decrypt(userFromDb.Password).Equals(loggingInUser.Password))
+            else
             {
                 throw new LoginException("Invalid password");
             }
 
-            return userFromDb.Id;
+            //TODO BRING IT BACK WHEN REAL USERS ARRIVE
+//            if (!Encryption.Decrypt(userFromDb.Password).Equals(loggingInUser.Password))
+//            {
+//                throw new LoginException("Invalid password");
+//            }
+
+//            return userFromDb.Id;
 
         }
     }
