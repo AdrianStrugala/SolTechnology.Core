@@ -5,11 +5,11 @@ using DreamTravel.Domain.Users;
 
 namespace DreamTravel.Features.Identity.Registration
 {
-    public class Registration : IRegistration
+    public class RegisterUser : IRegisterUser
     {
         private readonly IUserRepository _userRepository;
 
-        public Registration(IUserRepository userRepository)
+        public RegisterUser(IUserRepository userRepository)
         {
             _userRepository = userRepository;
         }

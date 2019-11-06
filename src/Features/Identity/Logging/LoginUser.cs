@@ -3,11 +3,11 @@ using DreamTravel.Domain.Users;
 
 namespace DreamTravel.Features.Identity.Logging
 {
-    public class Logging : ILogging
+    public class LoginUser : ILoginUser
     {
         private readonly IUserRepository _userRepository;
 
-        public Logging(IUserRepository userRepository)
+        public LoginUser(IUserRepository userRepository)
         {
             _userRepository = userRepository;
         }

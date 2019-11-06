@@ -2,7 +2,7 @@
 
 namespace DreamTravel.Features.Identity.Registration
 {
-    public interface IRegistration
+    public interface IRegisterUser
     {
         bool Register(User user);
     }

@@ -15,12 +15,12 @@ namespace DreamTravel.Api.Identity
         public const string Route = "api/login";
 
         private readonly ILogger<LoginController> _logger;
-        private readonly ILogging _logging;
+        private readonly ILoginUser _loginUser;
 
 
-        public LoginController(ILogging logging, ILogger<LoginController> logger)
+        public LoginController(ILoginUser loginUser, ILogger<LoginController> logger)
         {
-            _logging = logging;
+            _loginUser = loginUser;
             _logger = logger;
         }
 
@@ -31,7 +31,7 @@ namespace DreamTravel.Api.Identity
             try
             {
                 _logger.LogInformation($"Attempt to log in with email: [{user.Email}] and password: [{user.Password}]");
-                User result = _logging.Login(user);
+                User result = _loginUser.Login(user);
 
                 return Ok(result);
             }

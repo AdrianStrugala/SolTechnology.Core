@@ -58,10 +58,10 @@ namespace DreamTravel.Features
             services.AddScoped<DreamFlight.SendOrderedFlightEmail.Interfaces.IComposeMessage, DreamFlight.SendOrderedFlightEmail.ComposeMessage>();
 
             //Registration
-            services.AddScoped<IRegistration, Registration>();
+            services.AddScoped<IRegisterUser, RegisterUser>();
 
             //Logging
-            services.AddScoped<ILogging, Logging>();
+            services.AddScoped<ILoginUser, LoginUser>();
 
             services.InstallFlightProviderData();
             services.InstallDatabaseData();

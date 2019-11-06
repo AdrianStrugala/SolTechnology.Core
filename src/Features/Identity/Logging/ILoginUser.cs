@@ -2,7 +2,7 @@
 
 namespace DreamTravel.Features.Identity.Logging
 {
-    public interface ILogging
+    public interface ILoginUser
     {
         User Login(User loggingInUser);
     }
