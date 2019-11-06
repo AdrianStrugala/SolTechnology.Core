@@ -2,6 +2,7 @@ import { Component, Inject } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { UserService } from '../user.service';
 import { FormControl, FormGroup, Validators, FormBuilder } from '@angular/forms';
+import { IUser } from '../user.service'
 
 
 @Component({
@@ -30,8 +31,8 @@ export class LoginComponent{
 
       this.userService.login()
       .subscribe(
-        (data : number) => {        
-        this.userService.user.Id = data;
+        (data : IUser) => {        
+        this.userService.user = data;
       
       localStorage.setItem("user", JSON.stringify(this.userService.user))
 

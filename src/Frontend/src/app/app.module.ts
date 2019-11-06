@@ -11,9 +11,11 @@ import { MaterialModule } from './external-libraries/material-module';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { LoginComponent } from './login/login.component';
 import { RegisterComponent } from './register/register.component';
+import { MyAccountComponent } from './my-account/my-account.component';
 
 const routes: Routes = [
     { path: 'register', component: RegisterComponent },
+    { path: 'my-account', component: MyAccountComponent },
     { path: '', component: HomeComponent, pathMatch: 'full' }
   ];
 
@@ -24,7 +26,8 @@ const routes: Routes = [
         NavbarComponent,
         FlightEmailOrderComponent,
         LoginComponent,
-        RegisterComponent
+        RegisterComponent,
+        MyAccountComponent
     ],
     imports: [
         BrowserModule.withServerTransition({ appId: 'ng-cli-universal' }),

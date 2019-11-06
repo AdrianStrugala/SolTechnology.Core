@@ -6,6 +6,7 @@ import { Observable } from 'rxjs';
   providedIn: 'root'
 })
 export class UserService{
+
   
   public user : IUser
 
@@ -18,7 +19,7 @@ export class UserService{
     }
   }
 
-  url = "https://dreamtravelsapi-demo.azurewebsites.net/api/login";
+  url = "https://dreamtravelsapi.azurewebsites.net/api/login";
 
   login(): Observable<any> {
 
@@ -38,9 +39,14 @@ export class UserService{
       return false;
     }
   }
+
+  logout() {
+    this.user = {} as IUser;
+    this.user.Id = 0;
+  }
 }
 
-interface IUser { 
+export interface IUser { 
   Id: number;
   Name: string;
   Password: string;

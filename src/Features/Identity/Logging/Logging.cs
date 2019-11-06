@@ -1,5 +1,4 @@
-﻿using DreamTravel.Cryptography;
-using DreamTravel.DatabaseData;
+﻿using DreamTravel.DatabaseData;
 using DreamTravel.Domain.Users;
 
 namespace DreamTravel.Features.Identity.Logging
@@ -14,7 +13,7 @@ namespace DreamTravel.Features.Identity.Logging
         }
 
 
-        public int LogIn(User loggingInUser)
+        public User Login(User loggingInUser)
         {
             User userFromDb = _userRepository.Get(loggingInUser.Email);
 
@@ -27,7 +26,7 @@ namespace DreamTravel.Features.Identity.Logging
             //TODO REMOVE THE HACK WHEN REAL USERS WILL ARRIVE
             if (userFromDb.Password.Equals(loggingInUser.Password))
             {
-                return userFromDb.Id;
+                return userFromDb;
             }
 
             else
