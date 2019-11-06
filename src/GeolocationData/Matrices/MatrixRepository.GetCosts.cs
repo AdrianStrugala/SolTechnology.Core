@@ -26,8 +26,8 @@ namespace DreamTravel.GeolocationData.Matrices
                     var i1 = i;
                     var j1 = j;
 
-                    (result.Item1[iterator], result.Item1[iterator]) = await DownloadCostBetweenTwoCities(cities[i1], cities[j1]);
-
+                    
+                    (result.Item1[iterator], result.Item2[iterator]) = await DownloadCostBetweenTwoCities(cities[i1], cities[j1]);
                 }
             }
 
@@ -54,11 +54,11 @@ namespace DreamTravel.GeolocationData.Matrices
 
                 XmlNode node =
                     doc.DocumentElement.SelectSingleNode("/response/iti/header/summaries/summary/tollCost/car");
-                var tollCost = Convert.ToDouble(node.InnerText);
+                var tollCost = Convert.ToDouble(node.InnerText, System.Globalization.CultureInfo.InvariantCulture);
 
                 XmlNode vinietaNode =
                     doc.DocumentElement.SelectSingleNode("/response/iti/header/summaries/summary/CCZCost/car");
-                var vinietaCost = Convert.ToDouble(vinietaNode.InnerText);
+                var vinietaCost = Convert.ToDouble(vinietaNode.InnerText, System.Globalization.CultureInfo.InvariantCulture);
 
 
                 return (tollCost / 100, vinietaCost / 100);

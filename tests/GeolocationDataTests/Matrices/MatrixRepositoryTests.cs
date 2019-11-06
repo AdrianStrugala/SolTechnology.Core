@@ -1,14 +1,13 @@
-﻿using DreamTravel.Domain.Cities;
+﻿using System.Collections.Generic;
+using System.IO;
+using System.Threading.Tasks;
+using DreamTravel.Domain.Cities;
 using DreamTravel.GeolocationData.Matrices;
+using Microsoft.Extensions.Logging.Abstractions;
+using Xunit;
 
-namespace DreamTravel.WebUITests.BestPath.DataAccess
+namespace DreamTravel.GeolocationDataTests.Matrices
 {
-    using System.Collections.Generic;
-    using System.IO;
-    using System.Threading.Tasks;
-    using Microsoft.Extensions.Logging.Abstractions;
-    using Xunit;
-
     public class MatrixRepositoryTests
     {
         readonly MatrixRepository _sut = new MatrixRepository(NullLogger<MatrixRepository>.Instance);
@@ -127,7 +126,7 @@ namespace DreamTravel.WebUITests.BestPath.DataAccess
         }
 
         [Fact]
-        public async Task DowloadCostBetweenTwoCities_InvokeWithValidCities_ReturnsSomeCost()
+        public async Task GetCosts_ValidCities_ReturnsSomeCost()
         {
             //Arrange
             City firstCity = new City
@@ -156,7 +155,7 @@ namespace DreamTravel.WebUITests.BestPath.DataAccess
 
 
         [Fact]
-        public async Task DowloadCostBetweenTwoCities_InvalidCities_MinusCostIsReturned()
+        public async Task GetCosts_InvalidCities_MinusCostIsReturned()
         {
             //Arrange
             City firstCity = new City
@@ -177,7 +176,7 @@ namespace DreamTravel.WebUITests.BestPath.DataAccess
             var result = await _sut.GetCosts(new List<City> { firstCity, secondCity });
 
             //Assert
-            Assert.NotEqual((-1, -1), (result.Item1[1], result.Item2[1]));
+            Assert.Equal((-1, -1), (result.Item1[1], result.Item2[1]));
         }
     }
 }
