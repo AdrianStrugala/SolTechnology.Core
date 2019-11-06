@@ -19,7 +19,7 @@ export class UserService{
     }
   }
 
-  url = "https://dreamtravelsapi.azurewebsites.net/api/login";
+  url = "https://dreamtravelsapi-demo.azurewebsites.net/api/login";
 
   login(): Observable<any> {
 
