@@ -3,7 +3,7 @@ using DreamTravel.Domain.FlightEmailOrders;
 
 namespace DreamTravel.Features.DreamFlight.GetFlightEmailOrders
 {
-    public interface IGetFlightEmailOrders
+    public interface IGetFlightEmailData
     {
         List<FlightEmailData> Execute();
     }

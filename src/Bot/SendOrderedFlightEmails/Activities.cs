@@ -12,12 +12,12 @@ namespace DreamTravel.Bot.SendOrderedFlightEmails
         public const string GetFlightEmailOrdersFunctionName = "GetFlightEmailOrders";
         public const string SendOrderedFlightEmailFunctionName = "SendOrderedFlightEmail";
 
-        private readonly IGetFlightEmailOrders _getFlightEmailOrders;
+        private readonly IGetFlightEmailData _getFlightEmailData;
         private readonly ISendOrderedFlightEmail _sendOrderedFlightEmail;
 
-        public Activities(IGetFlightEmailOrders getFlightEmailOrders, ISendOrderedFlightEmail sendOrderedFlightEmail)
+        public Activities(IGetFlightEmailData getFlightEmailData, ISendOrderedFlightEmail sendOrderedFlightEmail)
         {
-            _getFlightEmailOrders = getFlightEmailOrders;
+            _getFlightEmailData = getFlightEmailData;
             _sendOrderedFlightEmail = sendOrderedFlightEmail;
         }
 
@@ -25,7 +25,7 @@ namespace DreamTravel.Bot.SendOrderedFlightEmails
         public async Task<List<FlightEmailData>> GetFlightEmailOrders(
             [ActivityTrigger] object input)
         {
-            return _getFlightEmailOrders.Execute();
+            return _getFlightEmailData.Execute();
         }
 
 

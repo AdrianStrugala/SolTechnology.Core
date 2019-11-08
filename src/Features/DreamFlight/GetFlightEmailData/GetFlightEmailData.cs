@@ -4,11 +4,11 @@ using DreamTravel.Domain.FlightEmailOrders;
 
 namespace DreamTravel.Features.DreamFlight.GetFlightEmailOrders
 {
-    public class GetFlightEmailOrders : IGetFlightEmailOrders
+    public class GetFlightEmailData : IGetFlightEmailData
     {
         private readonly IFlightEmailOrderRepository _flightEmailOrderRepository;
 
-        public GetFlightEmailOrders(IFlightEmailOrderRepository flightEmailOrderRepository)
+        public GetFlightEmailData(IFlightEmailOrderRepository flightEmailOrderRepository)
         {
             _flightEmailOrderRepository = flightEmailOrderRepository;
         }

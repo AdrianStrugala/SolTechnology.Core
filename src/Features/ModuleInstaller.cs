@@ -51,7 +51,7 @@ namespace DreamTravel.Features
             services.AddScoped<IOrderFlightEmail, OrderFlightEmail>();
 
             //GetFlightEmailOrders
-            services.AddScoped<IGetFlightEmailOrders, GetFlightEmailOrders>();
+            services.AddScoped<IGetFlightEmailData, GetFlightEmailData>();
 
             //SendOrderedFlightEmail
             services.AddScoped<ISendOrderedFlightEmail, SendOrderedFlightEmail>();
