@@ -13,8 +13,9 @@ namespace DreamTravel.Features.DreamFlight.GetFlightEmailOrdersForUser
             _flightEmailOrderRepository = flightEmailOrderRepository;
         }
 
-        public List<FlightEmailOrder> Execute()
+        public List<FlightEmailOrder> Execute(int userId)
         {
+            return _flightEmailOrderRepository.GetByUserId(userId);
         }
     }
 }

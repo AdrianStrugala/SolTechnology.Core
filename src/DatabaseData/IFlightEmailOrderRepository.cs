@@ -8,5 +8,7 @@ namespace DreamTravel.DatabaseData
         void Insert(FlightEmailOrder flightEmailOrder);
 
         List<FlightEmailData> GetAll();
+
+        List<FlightEmailOrder> GetByUserId(int userId);
     }
 }
