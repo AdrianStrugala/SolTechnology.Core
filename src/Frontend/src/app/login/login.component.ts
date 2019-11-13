@@ -25,9 +25,8 @@ export class LoginComponent{
     public dialogRef: MatDialogRef<LoginComponent>, private userService: UserService) {}
 
     login(email: string, password: string){
-      this.userService.user.Email = email;
-      this.userService.user.Password = password;
-      console.log(this.userService.user.Email)
+      this.userService.user.email = email;
+      this.userService.user.password = password;
 
       this.userService.login()
       .subscribe(

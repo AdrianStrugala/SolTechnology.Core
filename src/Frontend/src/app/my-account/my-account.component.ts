@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, AfterViewInit } from '@angular/core';
 import { UserService } from '../user.service';
 import { FlightEmailOrderService, IFlightEmailOrder } from '../flight-email-order.service'
 
@@ -8,20 +8,23 @@ import { FlightEmailOrderService, IFlightEmailOrder } from '../flight-email-orde
   templateUrl: './my-account.component.html',
   styleUrls: ['./my-account.component.scss']
 })
-export class MyAccountComponent implements OnInit {
+export class MyAccountComponent implements AfterViewInit {
 
   public flightEmailOrders: IFlightEmailOrder[];
 
 
-  constructor(public userService: UserService, private flightEmailOrderService: FlightEmailOrderService) { }
+  constructor(private userService: UserService, private flightEmailOrderService: FlightEmailOrderService) { }
 
-  ngOnInit() {
-    this.flightEmailOrderService.GetFlightEmailOrdersForUser(this.userService.user.Id)
+  ngAfterViewInit() {
+
+    console.log(this.userService.user)
+
+    this.flightEmailOrderService.GetFlightEmailOrdersForUser(this.userService.user.id)
       .subscribe(
         (data: IFlightEmailOrder[]) => {
           this.flightEmailOrders = data;
 
-          console.log(data.toString)
+          console.log(data)
         },
         (error) => {
           //ignore

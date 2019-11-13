@@ -12,12 +12,12 @@ export class FlightEmailOrderService{
     
   }
 
-  url = "https://dreamtravelsapi-demo.azurewebsites.net/GetFlightEmailOrders/";
+  url = "https://dreamtravelsapi-demo.azurewebsites.net/api/GetFlightEmailOrders/";
 
   GetFlightEmailOrdersForUser(userId : number): Observable<any> {
 
   return this.http.get(
-      this.url + "userId",
+      this.url + userId,
       {
           observe: "body"
       });

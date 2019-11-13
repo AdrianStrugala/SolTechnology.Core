@@ -43,7 +43,7 @@ export class FlightEmailOrderComponent implements OnInit {
 
     onSubmit(): void {
 
-        this.orderForm.value.userId = this.userService.user.Id
+        this.orderForm.value.userId = this.userService.user.id
 
         this.http.post(
             this.url,

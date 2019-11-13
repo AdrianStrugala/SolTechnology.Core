@@ -1,5 +1,6 @@
 ﻿using DreamTravel.DatabaseData.Configuration;
 using DreamTravel.Features.DreamFlight.GetFlightEmailOrders;
+using DreamTravel.Features.DreamFlight.GetFlightEmailOrdersForUser;
 using DreamTravel.Features.DreamFlight.OrderFlightEmail;
 using DreamTravel.Features.DreamFlight.SendDreamTravelFlightEmail;
 using DreamTravel.Features.DreamFlight.SendDreamTravelFlightEmail.Interfaces;
@@ -50,8 +51,11 @@ namespace DreamTravel.Features
             //OrderFlightEmail
             services.AddScoped<IOrderFlightEmail, OrderFlightEmail>();
 
-            //GetFlightEmailOrders
+            //GetFlightEmailData
             services.AddScoped<IGetFlightEmailData, GetFlightEmailData>();
+
+            //GetFlightEmailOrdersForUser
+            services.AddScoped<IGetFlightEmailOrdersForUser, GetFlightEmailOrdersForUser>();
 
             //SendOrderedFlightEmail
             services.AddScoped<ISendOrderedFlightEmail, SendOrderedFlightEmail>();
