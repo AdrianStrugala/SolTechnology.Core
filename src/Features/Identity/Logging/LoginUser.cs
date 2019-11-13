@@ -1,4 +1,5 @@
-﻿using DreamTravel.DatabaseData;
+﻿using DreamTravel.Cryptography;
+using DreamTravel.DatabaseData;
 using DreamTravel.Domain.Users;
 
 namespace DreamTravel.Features.Identity.Logging
@@ -23,25 +24,13 @@ namespace DreamTravel.Features.Identity.Logging
                 throw new LoginException("Email not registered");
             }
 
-            //TODO REMOVE THE HACK WHEN REAL USERS WILL ARRIVE
-            if (userFromDb.Password.Equals(loggingInUser.Password))
-            {
-                return userFromDb;
-            }
-
-            else
+            //Invalid password
+            if (!Encryption.Decrypt(userFromDb.Password).Equals(loggingInUser.Password))
             {
                 throw new LoginException("Invalid password");
             }
 
-            //TODO BRING IT BACK WHEN REAL USERS ARRIVE
-//            if (!Encryption.Decrypt(userFromDb.Password).Equals(loggingInUser.Password))
-//            {
-//                throw new LoginException("Invalid password");
-//            }
-
-//            return userFromDb.Id;
-
+            return userFromDb;
         }
     }
 }
