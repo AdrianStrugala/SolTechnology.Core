@@ -5,14 +5,11 @@ import { Observable } from 'rxjs';
 @Injectable({
   providedIn: 'root'
 })
-export class FlightEmailOrderService{
+export class FlightOrderListService{
 
-  
-  constructor(private http: HttpClient) { 
-    
-  }
+  constructor(private http: HttpClient) {}
 
-  url = "https://dreamtravelsapi-demo.azurewebsites.net/api/GetFlightEmailOrders/";
+  url = "https://dreamtravelsapi.azurewebsites.net/api/GetFlightEmailOrders/";
 
   GetFlightEmailOrdersForUser(userId : number): Observable<any> {
 
@@ -25,11 +22,11 @@ export class FlightEmailOrderService{
 }
 
 export interface IFlightEmailOrder { 
-  UserId: number;
-  From: string;
-  To: string;
-  DepartureDate: Date;
-  ArrivalDate: Date;
-  MinDaysOfStay : number;
-  MaxDaysOfStay : number;
+  userId: number;
+  from: string;
+  to: string;
+  departureDate: Date;
+  arrivalDate: Date;
+  minDaysOfStay : number;
+  maxDaysOfStay : number;
 }

@@ -3,15 +3,16 @@ import { NgModule } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
 import { Routes, RouterModule } from '@angular/router';
-import { FlightEmailOrderComponent } from './flight-email-order/flight-email-order.component'
+import { FlightEmailOrderComponent } from './dream-flights-page/flight-email-order/flight-email-order.component'
 import { AppComponent } from './app.component';
-import { HomeComponent } from './home/home.component';
-import { NavbarComponent } from './navbar/navbar.component';
+import { HomeComponent } from './main-page/home/home.component';
+import { NavbarComponent } from './main-page/navbar/navbar.component';
 import { MaterialModule } from './external-libraries/material-module';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { LoginComponent } from './login/login.component';
+import { LoginComponent } from './main-page/login/login.component';
 import { RegisterComponent } from './register/register.component';
-import { MyAccountComponent } from './my-account/my-account.component';
+import { MyAccountComponent } from './my-account-page/my-account/my-account.component';
+import { FlightOrderList } from './my-account-page/flight-order-list/flight-order-list.component';
 
 const routes: Routes = [
     { path: 'register', component: RegisterComponent },
@@ -27,7 +28,8 @@ const routes: Routes = [
         FlightEmailOrderComponent,
         LoginComponent,
         RegisterComponent,
-        MyAccountComponent
+        MyAccountComponent,
+        FlightOrderList
     ],
     imports: [
         BrowserModule.withServerTransition({ appId: 'ng-cli-universal' }),

@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { LoginComponent } from '../login/login.component';
-import { UserService } from '../user.service';
+import { UserService } from '../../user.service';
 
 @Component({
     selector: 'navbar',
