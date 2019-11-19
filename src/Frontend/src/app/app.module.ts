@@ -13,10 +13,11 @@ import { LoginComponent } from './main-page/login/login.component';
 import { RegisterComponent } from './register/register.component';
 import { MyAccountComponent } from './my-account-page/my-account/my-account.component';
 import { FlightOrderList } from './my-account-page/flight-order-list/flight-order-list.component';
+import { AuthGuard } from './auth-guard';
 
 const routes: Routes = [
     { path: 'register', component: RegisterComponent },
-    { path: 'my-account', component: MyAccountComponent },
+    { path: 'my-account', component: MyAccountComponent, canActivate: [AuthGuard] },
     { path: '', component: HomeComponent, pathMatch: 'full' }
   ];
 

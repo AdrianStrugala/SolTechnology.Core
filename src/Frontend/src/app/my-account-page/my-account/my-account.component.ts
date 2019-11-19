@@ -1,5 +1,6 @@
-import { Component} from '@angular/core';
+import { Component } from '@angular/core';
 import { UserService } from '../../user.service';
+import { Router } from '@angular/router';
 
 
 @Component({
@@ -7,13 +8,15 @@ import { UserService } from '../../user.service';
   templateUrl: './my-account.component.html',
   styleUrls: ['./my-account.component.scss']
 })
-export class MyAccountComponent{
+export class MyAccountComponent {
 
-  constructor(private userService: UserService) { }
+  constructor(private userService: UserService, private router: Router) { }
 
   logout() {
     this.userService.logout();
 
     localStorage.removeItem("user");
+
+    this.router.navigate([""]);
   }
 }
