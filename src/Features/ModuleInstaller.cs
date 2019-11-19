@@ -28,6 +28,7 @@ namespace DreamTravel.Features
         {
             //TSP engine
             services.AddTransient<ITSP, AntColony>();
+
             //CalculateBestPath
             services.AddScoped<ICalculateBestPath, CalculateBestPath>();
             services.AddScoped<IDownloadRoadData, DownloadRoadData>();

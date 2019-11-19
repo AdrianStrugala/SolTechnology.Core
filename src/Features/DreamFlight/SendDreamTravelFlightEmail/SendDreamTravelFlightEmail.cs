@@ -41,7 +41,7 @@ namespace DreamTravel.Features.DreamFlight.SendDreamTravelFlightEmail
 
             flights = _filterFlights.Execute(flights);
 
-            var users = _userRepository.GetAll();
+            var users = _userRepository.GetPreviewUsers();
 
             foreach (var user in users)
             {
