@@ -35,7 +35,8 @@
       <h5>Date of Departure:</h5>
 
       <mat-form-field class="example-full-width">
-        <input matInput [matDatepicker]="DepartureDate" placeholder="Date of Departure" formControlName="departureDate">
+        <input matInput [matDatepicker]="DepartureDate" [min]="minDepartureDate"
+         placeholder="Date of Departure" formControlName="departureDate">
         <mat-datepicker-toggle matSuffix [for]="DepartureDate">
         </mat-datepicker-toggle>
         <mat-datepicker #DepartureDate></mat-datepicker>
@@ -48,7 +49,7 @@
       <h5>Date of Arrival:</h5>
 
       <mat-form-field class="example-full-width">
-        <input matInput [matDatepicker]="ArrivalDate" placeholder="Date of Arrival" formControlName="arrivalDate">
+        <input matInput [matDatepicker]="ArrivalDate" [min]="minArrivalDate" placeholder="Date of Arrival" formControlName="arrivalDate">
         <mat-datepicker-toggle matSuffix [for]="ArrivalDate">
         </mat-datepicker-toggle>
         <mat-datepicker #ArrivalDate></mat-datepicker>
