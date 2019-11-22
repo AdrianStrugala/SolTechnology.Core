@@ -46,8 +46,8 @@ export class FlightEmailOrderComponent implements OnInit {
             validators: [Validators.required]
         }),
         minDaysOfStay: new FormControl('', {
-            validators: [Validators.required, Validators.min(1)]
-        }),
+            validators: [Validators.required, Validators.min(1), this.minDaysValidator]
+        , updateOn: "blur"}),
         maxDaysOfStay: new FormControl('', {
             validators: [Validators.required, Validators.min(1)]
         }),
@@ -56,6 +56,20 @@ export class FlightEmailOrderComponent implements OnInit {
 
     minDepartureDate = new Date();
     minArrivalDate = this.orderForm.value.departureDate;
+
+    
+    minDaysValidator(control: FormControl) {
+        let minDays = control.value;
+
+
+        console.log( this.orderForm.value.arrivalDate - this.orderForm.value.departureDate);
+        let dateRange = this.orderForm.value.arrivalDate - this.orderForm.value.departureDate;
+
+        if (minDays < dateRange) {
+            return { minDays }
+        }
+        return null;
+    }
 
     onSubmit(): void {
 
