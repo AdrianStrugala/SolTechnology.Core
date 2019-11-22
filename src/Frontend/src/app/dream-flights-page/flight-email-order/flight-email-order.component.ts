@@ -27,18 +27,31 @@ import { UserService } from '../../user.service';
 
 export class FlightEmailOrderComponent implements OnInit {
 
-    constructor(private http: HttpClient, private userService : UserService) { }
+    constructor(private http: HttpClient, private userService: UserService) { }
 
     url = "https://dreamtravelsapi-demo.azurewebsites.net/api/OrderFlightEmail";
 
+
     orderForm = new FormGroup({
-        from: new FormControl(),
-        to: new FormControl(),
-        departureDate: new FormControl(new Date()),
-        arrivalDate: new FormControl(),
-        minDaysOfStay: new FormControl(),
-        maxDaysOfStay: new FormControl(),
-        userId : new FormControl
+        from: new FormControl('', {
+            validators: [Validators.required]
+        }),
+        to: new FormControl('', {
+            validators: [Validators.required]
+        }),
+        departureDate: new FormControl(new Date(), {
+            validators: [Validators.required]
+        }),
+        arrivalDate: new FormControl('', {
+            validators: [Validators.required]
+        }),
+        minDaysOfStay: new FormControl('', {
+            validators: [Validators.required, Validators.min(1)]
+        }),
+        maxDaysOfStay: new FormControl('', {
+            validators: [Validators.required, Validators.min(1)]
+        }),
+        userId: new FormControl
     });
 
     minDepartureDate = new Date();

@@ -17,6 +17,9 @@
 
       <mat-form-field>
         <input matInput placeholder="From" formControlName="from">
+        <mat-error *ngIf="orderForm.get('from').hasError('required')">
+          Field is required
+        </mat-error>
       </mat-form-field>
 
       <br>
@@ -26,6 +29,9 @@
 
       <mat-form-field>
         <input matInput placeholder="To" formControlName="to">
+        <mat-error *ngIf="orderForm.get('to').hasError('required')">
+          Field is required
+        </mat-error>
       </mat-form-field>
 
       <br>
@@ -35,11 +41,14 @@
       <h5>Date of Departure:</h5>
 
       <mat-form-field class="example-full-width">
-        <input matInput [matDatepicker]="DepartureDate" [min]="minDepartureDate"
-         placeholder="Date of Departure" formControlName="departureDate">
+        <input matInput [matDatepicker]="DepartureDate" [min]="minDepartureDate" placeholder="Date of Departure"
+          formControlName="departureDate">
         <mat-datepicker-toggle matSuffix [for]="DepartureDate">
         </mat-datepicker-toggle>
         <mat-datepicker #DepartureDate></mat-datepicker>
+        <mat-error *ngIf="orderForm.get('departureDate').hasError('required')">
+          Field is required
+        </mat-error>
       </mat-form-field>
 
       <br>
@@ -49,10 +58,14 @@
       <h5>Date of Arrival:</h5>
 
       <mat-form-field class="example-full-width">
-        <input matInput [matDatepicker]="ArrivalDate" [min]="minArrivalDate" placeholder="Date of Arrival" formControlName="arrivalDate">
+        <input matInput [matDatepicker]="ArrivalDate" [min]="minArrivalDate" placeholder="Date of Arrival"
+          formControlName="arrivalDate">
         <mat-datepicker-toggle matSuffix [for]="ArrivalDate">
         </mat-datepicker-toggle>
         <mat-datepicker #ArrivalDate></mat-datepicker>
+        <mat-error *ngIf="orderForm.get('arrivalDate').hasError('required')">
+          Field is required
+        </mat-error>
       </mat-form-field>
 
       <br>
@@ -63,14 +76,26 @@
 
       <mat-form-field appearance="outline" class="number-input">
         <mat-label>Min days</mat-label>
-        <input type="number" matInput placeholder="Min" formControlName="minDaysOfStay">
+        <input type="number" matInput placeholder="Min" min="1" formControlName="minDaysOfStay">
+        <mat-error *ngIf="orderForm.get('minDaysOfStay').hasError('required')">
+          Field is required
+        </mat-error>
+        <mat-error *ngIf="orderForm.get('minDaysOfStay').hasError('min')">
+          Minimum value is 1
+        </mat-error>
       </mat-form-field>
 
       —
 
       <mat-form-field appearance="outline" class="number-input">
         <mat-label>Max days</mat-label>
-        <input type="number" matInput placeholder="Max" formControlName="maxDaysOfStay">
+        <input type="number" matInput placeholder="Max" min="1" formControlName="maxDaysOfStay">
+        <mat-error *ngIf="orderForm.get('maxDaysOfStay').hasError('required')">
+          Field is required
+        </mat-error>
+        <mat-error *ngIf="orderForm.get('maxDaysOfStay').hasError('min')">
+          Minimum value is 1
+        </mat-error>
       </mat-form-field>
 
 
@@ -79,7 +104,7 @@
       <br>
     </mat-card-content>
     <mat-card-actions>
-      <button class="btn btn-primary" type="submit" (click)="onSubmit()">
+      <button class="btn btn-primary" type="submit" [disabled]="orderForm.invalid" (click)="onSubmit()">
         Submit
       </button>
     </mat-card-actions>
