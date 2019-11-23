@@ -1,5 +1,4 @@
 <div mat-dialog-content>
-
   <form [formGroup]="loginForm">
     <h2 style="text-align: center;"> Login</h2>
 
@@ -8,7 +7,7 @@
 
     <h5>Email:</h5>
     <mat-form-field appearance="outline">
-      <input cdkFocusInitial matInput placeholder="Email" formControlName="email">
+      <input matInput placeholder="Email" formControlName="email" cdkFocusInitial>
 
       <mat-error *ngIf="loginForm.get('email').hasError('email')">
         Invalid email
@@ -21,26 +20,20 @@
       <input type="password" matInput placeholder="Password" formControlName="password">
     </mat-form-field>
 
-
-
-
-    <!-- <div mat-dialog-actions> -->
-
-      <button class="btn btn-primary" type="submit" [disabled]="orderForm.invalid" (click)="login()"
-        [disabled]="loginForm.invalid">
-        Login
-      </button>
-
-    <!-- </div> -->
-
-
     <br>
-    <br>
-    <mat-error *ngIf="this.error">
-      {{this.error}}
-    </mat-error>
+
+    <button type="button" class="btn btn-primary" type="submit" (click)="login()" [disabled]="loginForm.invalid">
+      Login
+    </button>
   </form>
-  <br>
-  Not a user yet?
-  <button type="button" class="btn btn-outline-primary" routerLink="/register">Register</button>
+
 </div>
+
+<br>
+<mat-error *ngIf="this.error">
+  {{this.error}}
+</mat-error>
+
+<br>
+Not a user yet?
+<button type="button" class="btn btn-outline-primary" routerLink="/register">Register</button>

@@ -26,7 +26,7 @@ export class LoginComponent{
 
     login(){
       this.userService.user.email = this.loginForm.value.email;
-      this.userService.user.password =this.loginForm.value.password;
+      this.userService.user.password = this.loginForm.value.password;
 
       this.userService.login()
       .subscribe(
