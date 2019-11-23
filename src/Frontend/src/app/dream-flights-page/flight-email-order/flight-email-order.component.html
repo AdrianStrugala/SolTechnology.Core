@@ -98,18 +98,27 @@
         </mat-error>
       </mat-form-field>
 
-
-
       <br>
       <br>
+
     </mat-card-content>
+
     <mat-card-actions>
-      <button class="btn btn-primary" type="submit" [disabled]="orderForm.invalid" (click)="onSubmit()">
+      <button class="btn btn-primary" type="submit" [disabled]="orderForm.invalid" (click)="onSubmit()" style="display: inline-block; margin-right: 1rem;">
         Submit
       </button>
+      <div style="display: inline-grid;">
+        <mat-error *ngIf="orderForm.hasError('minDays')">
+          The number of Minimum days of stay is greater than the length of stay
+        </mat-error>
+        <mat-error *ngIf="orderForm.hasError('arrivalDate')">
+          Arrival must happend after Departure
+        </mat-error>
+        <mat-error *ngIf="orderForm.hasError('maxDays')">
+          Number of Max days has to be greater or equal Min days
+        </mat-error>
+      </div>
     </mat-card-actions>
-
   </form>
-
 
 </mat-card>

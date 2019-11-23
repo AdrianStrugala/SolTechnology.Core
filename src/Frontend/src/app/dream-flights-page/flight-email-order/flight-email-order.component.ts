@@ -1,5 +1,5 @@
 import { Component, OnInit, Inject } from '@angular/core';
-import { FormControl, FormGroup, Validators, FormBuilder } from '@angular/forms';
+import { FormControl, FormGroup, Validators, FormBuilder, ValidatorFn } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { MAT_MOMENT_DATE_FORMATS, MomentDateAdapter, MAT_MOMENT_DATE_ADAPTER_OPTIONS } from '@angular/material-moment-adapter';
 import { DateAdapter, MAT_DATE_FORMATS, MAT_DATE_LOCALE } from '@angular/material/core';
@@ -32,6 +32,41 @@ export class FlightEmailOrderComponent implements OnInit {
     url = "https://dreamtravelsapi-demo.azurewebsites.net/api/OrderFlightEmail";
 
 
+
+    minDaysValidator: ValidatorFn = (orderForm: FormGroup) => {
+        let minDays = orderForm.get('minDaysOfStay').value;
+        let arrivalDate = orderForm.get('arrivalDate').value;
+        let departureDate = orderForm.get('departureDate').value;
+
+        let differenceInTime = arrivalDate - departureDate;
+        var differenceInDays = differenceInTime / (1000 * 3600 * 24);
+
+        if (minDays > differenceInDays) {
+            return { minDays }
+        }
+        return null;
+    }
+
+    arrivalDateValidator: ValidatorFn = (orderForm: FormGroup) => {
+        let arrivalDate = orderForm.get('arrivalDate').value;
+        let departureDate = orderForm.get('departureDate').value;
+
+        if (departureDate > arrivalDate) {
+            return { arrivalDate }
+        }
+        return null;
+    }
+
+    maxDaysValidator: ValidatorFn = (orderForm: FormGroup) => {
+        let minDays = orderForm.get('minDaysOfStay').value;
+        let maxDays = orderForm.get('maxDaysOfStay').value;
+
+        if (minDays > maxDays) {
+            return { maxDays }
+        }
+        return null;
+    }
+
     orderForm = new FormGroup({
         from: new FormControl('', {
             validators: [Validators.required]
@@ -46,30 +81,17 @@ export class FlightEmailOrderComponent implements OnInit {
             validators: [Validators.required]
         }),
         minDaysOfStay: new FormControl('', {
-            validators: [Validators.required, Validators.min(1), this.minDaysValidator]
-        , updateOn: "blur"}),
+            validators: [Validators.required, Validators.min(1)]
+            , updateOn: "blur"
+        }),
         maxDaysOfStay: new FormControl('', {
             validators: [Validators.required, Validators.min(1)]
         }),
         userId: new FormControl
-    });
+    }, [this.minDaysValidator, this.arrivalDateValidator, this.maxDaysValidator]);
 
     minDepartureDate = new Date();
     minArrivalDate = this.orderForm.value.departureDate;
-
-    
-    minDaysValidator(control: FormControl) {
-        let minDays = control.value;
-
-
-        console.log( this.orderForm.value.arrivalDate - this.orderForm.value.departureDate);
-        let dateRange = this.orderForm.value.arrivalDate - this.orderForm.value.departureDate;
-
-        if (minDays < dateRange) {
-            return { minDays }
-        }
-        return null;
-    }
 
     onSubmit(): void {
 
