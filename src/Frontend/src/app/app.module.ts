@@ -14,6 +14,7 @@ import { RegisterComponent } from './register/register.component';
 import { MyAccountComponent } from './my-account-page/my-account/my-account.component';
 import { FlightOrderList } from './my-account-page/flight-order-list/flight-order-list.component';
 import { AuthGuard } from './auth-guard';
+import { AngularFontAwesomeModule } from 'angular-font-awesome';
 
 const routes: Routes = [
     { path: 'register', component: RegisterComponent },
@@ -39,6 +40,7 @@ const routes: Routes = [
         FormsModule,
         ReactiveFormsModule,
         MaterialModule,
+        AngularFontAwesomeModule,
         RouterModule.forRoot(routes)
     ],
     exports:[

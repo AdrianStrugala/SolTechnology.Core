@@ -24,9 +24,9 @@ export class LoginComponent{
   constructor(
     public dialogRef: MatDialogRef<LoginComponent>, private userService: UserService) {}
 
-    login(email: string, password: string){
-      this.userService.user.email = email;
-      this.userService.user.password = password;
+    login(){
+      this.userService.user.email = this.loginForm.value.email;
+      this.userService.user.password =this.loginForm.value.password;
 
       this.userService.login()
       .subscribe(
