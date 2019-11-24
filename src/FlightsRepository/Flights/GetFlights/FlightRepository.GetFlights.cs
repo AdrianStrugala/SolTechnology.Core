@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Net;
 using DreamTravel.Domain.Flights;
+using DreamTravel.Domain.Flights.GetFlights;
 using HtmlAgilityPack;
 
 namespace DreamTravel.FlightProviderData.Flights.GetFlights

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Xml;
 using DreamTravel.Domain.Cities;
+using DreamTravel.Domain.Matrices;
 using Microsoft.Extensions.Logging;
 
 namespace DreamTravel.GeolocationData.Matrices

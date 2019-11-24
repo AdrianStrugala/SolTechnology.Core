@@ -1,6 +1,6 @@
-﻿using DreamTravel.FlightProviderData.Flights.GetFlights;
+﻿using DreamTravel.Domain.Flights.GetFlights;
 
-namespace DreamTravel.FlightProviderData
+namespace DreamTravel.Domain.Flights
 {
     public interface IFlightRepository
     {

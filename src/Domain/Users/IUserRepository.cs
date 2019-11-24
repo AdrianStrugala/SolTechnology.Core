@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
-using DreamTravel.Domain.Users;
 
-namespace DreamTravel.DatabaseData
+namespace DreamTravel.Domain.Users
 {
     public interface IUserRepository
     {

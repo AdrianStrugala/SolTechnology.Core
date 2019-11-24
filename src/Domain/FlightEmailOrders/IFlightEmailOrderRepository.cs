@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
-using DreamTravel.Domain.FlightEmailOrders;
 
-namespace DreamTravel.DatabaseData
+namespace DreamTravel.Domain.FlightEmailOrders
 {
     public interface IFlightEmailOrderRepository
     {

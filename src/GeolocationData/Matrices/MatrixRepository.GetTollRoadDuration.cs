@@ -4,6 +4,7 @@ using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 using DreamTravel.Domain.Cities;
+using DreamTravel.Domain.Matrices;
 using DreamTravel.GeolocationData.Configuration;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json.Linq;

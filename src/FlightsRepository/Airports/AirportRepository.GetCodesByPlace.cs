@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using DreamTravel.Domain.Airports;
 
 namespace DreamTravel.FlightProviderData.Airports
 {

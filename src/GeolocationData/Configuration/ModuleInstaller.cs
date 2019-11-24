@@ -1,4 +1,6 @@
-﻿using DreamTravel.GeolocationData.Cities;
+﻿using DreamTravel.Domain.Cities;
+using DreamTravel.Domain.Matrices;
+using DreamTravel.GeolocationData.Cities;
 using DreamTravel.GeolocationData.Matrices;
 using Microsoft.Extensions.DependencyInjection;
 

@@ -2,7 +2,7 @@
 using System.Threading.Tasks;
 using DreamTravel.Domain.Cities;
 
-namespace DreamTravel.GeolocationData
+namespace DreamTravel.Domain.Matrices
 {
     public interface IMatrixRepository
     {

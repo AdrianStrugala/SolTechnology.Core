@@ -1,6 +1,8 @@
 ﻿using System.Collections.Generic;
+using DreamTravel.Domain.Airports;
 using DreamTravel.Domain.FlightEmailOrders;
 using DreamTravel.Domain.Flights;
+using DreamTravel.Domain.Flights.GetFlights;
 using DreamTravel.Features.DreamFlight.SendOrderedFlightEmail.Interfaces;
 using DreamTravel.Features.DreamFlight.SendOrderedFlightEmail.Models;
 using DreamTravel.FlightProviderData;

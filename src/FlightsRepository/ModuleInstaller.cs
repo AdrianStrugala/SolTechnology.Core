@@ -1,4 +1,6 @@
-﻿using DreamTravel.FlightProviderData.Airports;
+﻿using DreamTravel.Domain.Airports;
+using DreamTravel.Domain.Flights;
+using DreamTravel.FlightProviderData.Airports;
 using DreamTravel.FlightProviderData.Flights.GetFlights;
 using Microsoft.Extensions.DependencyInjection;
 

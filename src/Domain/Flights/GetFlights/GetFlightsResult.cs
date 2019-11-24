@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
-using DreamTravel.Domain.Flights;
 
-namespace DreamTravel.FlightProviderData.Flights.GetFlights
+namespace DreamTravel.Domain.Flights.GetFlights
 {
     public class GetFlightsResult
     {
