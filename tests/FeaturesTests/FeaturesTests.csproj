@@ -18,7 +18,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\Features\Features.csproj" />
+    <ProjectReference Include="..\..\src\DreamFlights\DreamFlights.csproj" />
+    <ProjectReference Include="..\..\src\DreamTrips\DreamTrips.csproj" />
+    <ProjectReference Include="..\..\src\Features\Identity.csproj" />
   </ItemGroup>
 
 </Project>

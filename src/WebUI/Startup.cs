@@ -1,5 +1,5 @@
-﻿using DreamTravel.Features;
-using System.Globalization;
+﻿using System.Globalization;
+using DreamTravel.DreamTrips;
 using DreamTravel.WebUI.Authentication;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
@@ -48,7 +48,7 @@ namespace DreamTravel.WebUI
             services.Configure<DreamAuthenticationOptions>(DreamAuthenticationOptions.AuthenticationScheme, configurationRoot);
             services.AddSingleton<IAuthenticationHandler, DreamAuthentication>();
 
-            services.InstallFeatures();
+            services.InstallDreamTrips();
         }
 
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)

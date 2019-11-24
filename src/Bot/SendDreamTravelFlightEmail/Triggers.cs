@@ -1,7 +1,7 @@
 ﻿using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
-using DreamTravel.Features.DreamFlight.SendDreamTravelFlightEmail.Interfaces;
+using DreamTravel.DreamFlights.SendDreamTravelFlightEmail.Interfaces;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
 

@@ -27,7 +27,9 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Domain\Domain.csproj" />
-    <ProjectReference Include="..\Features\Features.csproj" />
+    <ProjectReference Include="..\DreamFlights\DreamFlights.csproj" />
+    <ProjectReference Include="..\DreamTrips\DreamTrips.csproj" />
+    <ProjectReference Include="..\Features\Identity.csproj" />
   </ItemGroup>
 
   <ItemGroup>

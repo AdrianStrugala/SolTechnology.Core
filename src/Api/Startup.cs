@@ -1,4 +1,6 @@
-﻿using DreamTravel.Features;
+﻿using DreamTravel.DreamFlights;
+using DreamTravel.DreamTrips;
+using DreamTravel.Identity;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
@@ -36,7 +38,9 @@ namespace DreamTravel.Api
 
             services.AddApplicationInsightsTelemetry();
 
-            services.InstallFeatures();
+            services.InstallDreamFlights();
+            services.InstallDreamTrips();
+            services.InstallIdentity();
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
         }

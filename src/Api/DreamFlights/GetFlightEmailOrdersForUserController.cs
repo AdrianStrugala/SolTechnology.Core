@@ -1,5 +1,5 @@
 ﻿using System;
-using DreamTravel.Features.DreamFlight.GetFlightEmailOrdersForUser;
+using DreamTravel.DreamFlights.GetFlightEmailOrdersForUser;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 

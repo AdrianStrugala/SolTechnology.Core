@@ -1,6 +1,6 @@
 ﻿using System;
-using DreamTravel.Features.DreamTrip.CalculateBestPath;
-using DreamTravel.Features.DreamTrip.CalculateBestPath.Models;
+using DreamTravel.DreamTrips.CalculateBestPath;
+using DreamTravel.DreamTrips.CalculateBestPath.Models;
 using Xunit;
 
 namespace DreamTravel.FeaturesTests.CalculateBestPath

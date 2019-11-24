@@ -1,6 +1,6 @@
 ﻿using System;
 using DreamTravel.Domain.FlightEmailOrders;
-using DreamTravel.Features.DreamFlight.OrderFlightEmail;
+using DreamTravel.DreamFlights.OrderFlightEmail;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;

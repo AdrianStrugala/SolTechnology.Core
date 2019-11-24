@@ -1,0 +1,13 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp2.2</TargetFramework>
+    <RootNamespace>DreamTravel.Identity</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Cryptography\Cryptography.csproj" />
+    <ProjectReference Include="..\DatabaseData\DatabaseData.csproj" />
+  </ItemGroup>
+
+</Project>

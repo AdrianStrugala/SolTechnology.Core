@@ -1,5 +1,5 @@
-﻿using DreamTravel.Features.DreamTrip.RunTSPBenchmark;
-using DreamTravel.Features.DreamTrip.RunTSPBenchmark.TestData;
+﻿using DreamTravel.DreamTrips.RunTSPBenchmark;
+using DreamTravel.DreamTrips.RunTSPBenchmark.TestData;
 
 namespace DreamTravel.Bot.RunBenchmark
 {

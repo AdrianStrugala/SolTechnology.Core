@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp2.2</TargetFramework>
+    <RootNamespace>DreamTravel.DreamFlights</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\DatabaseData\DatabaseData.csproj" />
+    <ProjectReference Include="..\FlightsRepository\FlightProviderData.csproj" />
+  </ItemGroup>
+
+</Project>

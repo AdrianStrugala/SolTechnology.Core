@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using DreamTravel.Domain.Paths;
-using DreamTravel.Features.DreamTrip.LimitCostOfPaths;
+using DreamTravel.DreamTrips.LimitCostOfPaths;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;

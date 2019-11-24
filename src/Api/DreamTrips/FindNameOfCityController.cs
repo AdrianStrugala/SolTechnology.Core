@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
-using DreamTravel.Features.DreamTrip.FindNameOfCity;
+using DreamTravel.DreamTrips.FindNameOfCity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;

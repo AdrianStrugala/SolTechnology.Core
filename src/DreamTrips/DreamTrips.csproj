@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp2.2</TargetFramework>
+    <RootNamespace>DreamTravel.DreamTrips</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\GeolocationData\GeolocationData.csproj" />
+    <ProjectReference Include="..\TravelingSalesmanProblem\TravelingSalesmanProblem.csproj" />
+  </ItemGroup>
+
+</Project>

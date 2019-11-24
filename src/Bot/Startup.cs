@@ -1,5 +1,6 @@
 ﻿using System.Globalization;
-using DreamTravel.Features;
+using DreamTravel.DreamFlights;
+using DreamTravel.DreamTrips;
 using Microsoft.Azure.Functions.Extensions.DependencyInjection;
 
 [assembly: FunctionsStartup(typeof(DreamTravel.Bot.Startup))]
@@ -16,7 +17,8 @@ namespace DreamTravel.Bot
             CultureInfo.DefaultThreadCurrentCulture = cultureInfo;
             CultureInfo.DefaultThreadCurrentUICulture = cultureInfo;
 
-            builder.Services.InstallFeatures();
+            builder.Services.InstallDreamTrips();
+            builder.Services.InstallDreamFlights();
         }
     }
 }
