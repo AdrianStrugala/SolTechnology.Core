@@ -20,7 +20,7 @@ namespace DreamTravel.FlightDataTests.Airports
             // Arrange
 
             // Act
-            var result = _sut.GetCityToCodeMap();
+            Dictionary<string, string> result = _sut.GetCityToCodeMap();
 
             // Assert
             Assert.NotNull(result);
@@ -34,7 +34,7 @@ namespace DreamTravel.FlightDataTests.Airports
         public void GetPlaceToCodesMap_FileContainingMapIsInPlace_MapOfPlacesAndCodesIsReturned()
         {
             // Arrange
-            Dictionary<string, List<string>> oneOfResults = new Dictionary<string, List<string>>
+            var oneOfResults = new Dictionary<string, List<string>>
             {
                 {
                     "Poland", new List<string>
@@ -71,24 +71,24 @@ namespace DreamTravel.FlightDataTests.Airports
         {
             // Arrange
             var expected = new List<string>
-                    {
-                        "SZY",
-                        "GDN",
-                        "KRK",
-                        "KTW",
-                        "POZ",
-                        "RZE",
-                        "SZZ",
-                        "WAW",
-                        "WRO",
-                        "BZG",
-                        "LCJ",
-                        "WMI",
-                        "LUZ"
-                    };
+            {
+                "SZY",
+                "GDN",
+                "KRK",
+                "KTW",
+                "POZ",
+                "RZE",
+                "SZZ",
+                "WAW",
+                "WRO",
+                "BZG",
+                "LCJ",
+                "WMI",
+                "LUZ"
+            };
 
             // Act
-            List<string> result = _sut.GetCodesByPlace("Poland");
+            List<string> result = _sut.GetByPlace("Poland").Codes;
 
             // Assert
             Assert.NotNull(result);
@@ -107,7 +107,7 @@ namespace DreamTravel.FlightDataTests.Airports
             };
 
             // Act
-            List<string> result = _sut.GetCodesByPlace("Wroclaw");
+            List<string> result = _sut.GetByPlace("Wroclaw").Codes;
 
             // Assert
             Assert.NotNull(result);
