@@ -4,6 +4,9 @@ import { HttpClient } from '@angular/common/http';
 import { MAT_MOMENT_DATE_FORMATS, MomentDateAdapter, MAT_MOMENT_DATE_ADAPTER_OPTIONS } from '@angular/material-moment-adapter';
 import { DateAdapter, MAT_DATE_FORMATS, MAT_DATE_LOCALE } from '@angular/material/core';
 import { UserService } from '../../user.service';
+import { IAirport, AirportsService } from './airports.service';
+import { Observable } from 'rxjs';
+import { map, startWith } from 'rxjs/operators';
 
 
 @Component({
@@ -27,10 +30,14 @@ import { UserService } from '../../user.service';
 
 export class FlightEmailOrderComponent implements OnInit {
 
-    constructor(private http: HttpClient, private userService: UserService) { }
+    constructor(private http: HttpClient, private userService: UserService, private ariportService: AirportsService) { }
 
     url = "https://dreamtravelsapi-demo.azurewebsites.net/api/OrderFlightEmail";
 
+
+    airports: IAirport[];
+    autocomplete: string[];
+    filteredOptions: Observable<string[]>;
 
 
     minDaysValidator: ValidatorFn = (orderForm: FormGroup) => {
@@ -93,6 +100,28 @@ export class FlightEmailOrderComponent implements OnInit {
     minDepartureDate = new Date();
     minArrivalDate = this.orderForm.value.departureDate;
 
+
+    ngOnInit() {
+        this.ariportService.getAirports().subscribe(
+            (data: IAirport[]) => {
+                this.airports = data;
+                this.autocomplete = this.airports.map(a => a.name);
+            
+                //from autocomplete
+                this.filteredOptions = this.orderForm.get('from').valueChanges
+                .pipe(
+                    startWith(''),
+                    map(value => this._filter(value))
+                );
+            }
+        )
+    }
+
+    private _filter(value: string): string[] {
+        const filterValue = value.toLowerCase();
+        return this.autocomplete.filter(option => option.toLowerCase().includes(filterValue));
+    }
+
     onSubmit(): void {
 
         this.orderForm.value.userId = this.userService.user.id
@@ -104,9 +133,6 @@ export class FlightEmailOrderComponent implements OnInit {
                 observe: "body"
             })
             .subscribe();
-    }
-
-    ngOnInit() {
     }
 }
 

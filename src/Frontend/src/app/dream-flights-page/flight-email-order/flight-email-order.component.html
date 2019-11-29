@@ -16,10 +16,25 @@
       <h5>From:</h5>
 
       <mat-form-field>
-        <input matInput placeholder="From" formControlName="from">
+        <input matInput placeholder="From" formControlName="from" [matAutocomplete]="auto">
+        <mat-autocomplete #auto="matAutocomplete">
+          <mat-option *ngFor="let option of filteredOptions | async" [value]="from">
+            {{option}}
+          </mat-option>
+        </mat-autocomplete>
         <mat-error *ngIf="orderForm.get('from').hasError('required')">
           Field is required
         </mat-error>
+      </mat-form-field>
+
+
+      <mat-form-field class="example-full-width">
+        <input type="text" placeholder="Pick one" aria-label="Number" matInput formControlName="from" [matAutocomplete]="auto">
+        <mat-autocomplete #auto="matAutocomplete">
+          <mat-option *ngFor="let option of filteredOptions | async" [value]="option">
+            {{option}}
+          </mat-option>
+        </mat-autocomplete>
       </mat-form-field>
 
       <br>
@@ -104,7 +119,8 @@
     </mat-card-content>
 
     <mat-card-actions>
-      <button class="btn btn-primary" type="submit" [disabled]="orderForm.invalid" (click)="onSubmit()" style="display: inline-block; margin-right: 1rem;">
+      <button class="btn btn-primary" type="submit" [disabled]="orderForm.invalid" (click)="onSubmit()"
+        style="display: inline-block; margin-right: 1rem;">
         Submit
       </button>
       <div style="display: inline-grid;">
