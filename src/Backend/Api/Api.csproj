@@ -18,7 +18,7 @@
     <ProjectReference Include="..\Domain\Domain.csproj" />
     <ProjectReference Include="..\DreamFlights\DreamFlights.csproj" />
     <ProjectReference Include="..\DreamTrips\DreamTrips.csproj" />
-    <ProjectReference Include="..\Features\Identity.csproj" />
+    <ProjectReference Include="..\Identity\Identity.csproj" />
   </ItemGroup>
 
 </Project>

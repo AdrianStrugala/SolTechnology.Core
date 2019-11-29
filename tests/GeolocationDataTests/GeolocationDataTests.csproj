@@ -17,6 +17,8 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\src\Backend\Domain\Domain.csproj" />
+    <ProjectReference Include="..\..\src\Backend\GeolocationData\GeolocationData.csproj" />
     <ProjectReference Include="..\..\src\GeolocationData\GeolocationData.csproj" />
   </ItemGroup>
 

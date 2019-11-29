@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.28729.10
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TravelingSalesmanProblem", "TravelingSalesmanProblem\TravelingSalesmanProblem.csproj", "{890C2C9C-DEA5-439C-A3FF-11D88F2DEAB0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TravelingSalesmanProblem", "Backend\TravelingSalesmanProblem\TravelingSalesmanProblem.csproj", "{890C2C9C-DEA5-439C-A3FF-11D88F2DEAB0}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{55867FA2-33B1-48B4-AC03-D2F72DD60441}"
 EndProject
@@ -12,15 +12,15 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TravelingSalesmanProblemTes
 		{890C2C9C-DEA5-439C-A3FF-11D88F2DEAB0} = {890C2C9C-DEA5-439C-A3FF-11D88F2DEAB0}
 	EndProjectSection
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebUI", "WebUI\WebUI.csproj", "{C606854D-AF53-45EC-92F7-628DFC081BF2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebUI", "Backend\WebUI\WebUI.csproj", "{C606854D-AF53-45EC-92F7-628DFC081BF2}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebUITests", "..\tests\WebUITests\WebUITests.csproj", "{97325D1E-8A37-40C7-831F-77E40F2841B2}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Bot", "Bot\Bot.csproj", "{2AF5C223-ECE4-403B-B222-41417639E7B1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Bot", "Backend\Bot\Bot.csproj", "{2AF5C223-ECE4-403B-B222-41417639E7B1}"
 EndProject
-Project("{00D1A9C2-B5F0-4AF3-8072-F6C62B433612}") = "DreamTravelDatabase", "DreamTravelDatabase\DreamTravelDatabase.sqlproj", "{D5CCE04E-179A-4118-9C46-209BFC510CA2}"
+Project("{00D1A9C2-B5F0-4AF3-8072-F6C62B433612}") = "DreamTravelDatabase", "Backend\DreamTravelDatabase\DreamTravelDatabase.sqlproj", "{D5CCE04E-179A-4118-9C46-209BFC510CA2}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Infrastructure", "Infrastructure\Infrastructure.csproj", "{2186D121-3F00-4FB6-9DC1-BF11094279C8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Infrastructure", "Backend\Infrastructure\Infrastructure.csproj", "{2186D121-3F00-4FB6-9DC1-BF11094279C8}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BotTests", "..\tests\BotTests\BotTests.csproj", "{BBF34C2D-A5CF-468C-A187-555BF0F85EFC}"
 EndProject
@@ -28,9 +28,9 @@ Project("{151D2E53-A2C4-4D7D-83FE-D05416EBD58E}") = "AzureResourceGroup", "..\de
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "DataLayer", "DataLayer", "{B2587745-8654-42FC-A2A2-6D054FDF2173}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FlightProviderData", "FlightsRepository\FlightProviderData.csproj", "{346061C9-B539-4567-B920-EDC4E89D2827}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FlightProviderData", "Backend\FlightsRepository\FlightProviderData.csproj", "{346061C9-B539-4567-B920-EDC4E89D2827}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Domain", "Domain\Domain.csproj", "{D1E366DF-35FB-401E-A03D-5BF1B01A2998}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Domain", "Backend\Domain\Domain.csproj", "{D1E366DF-35FB-401E-A03D-5BF1B01A2998}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FlightDataTests", "..\tests\FlightDataTests\FlightDataTests.csproj", "{BABB7CB6-DCC9-48E0-A9ED-5C2097FD581C}"
 EndProject
@@ -38,7 +38,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "PresentationLayer", "Presen
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "LogicLayer", "LogicLayer", "{C3AD01F3-75DE-44BB-8FE5-17E1683D7872}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Identity", "Features\Identity.csproj", "{7EED07D5-A54C-4A26-952F-D32EB3DC4A84}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Identity", "Backend\Identity\Identity.csproj", "{7EED07D5-A54C-4A26-952F-D32EB3DC4A84}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DatabaseDataTests", "..\tests\DatabaseDataTests\DatabaseDataTests.csproj", "{1F387B59-BE65-434F-87D1-BA648645CED9}"
 EndProject
@@ -46,23 +46,23 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Unit", "Unit", "{39216599-3
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Integration", "Integration", "{6B8A7FAF-6CB2-45BA-87B3-C66F1EED5699}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GeolocationData", "GeolocationData\GeolocationData.csproj", "{CBEE5B73-8F4E-4F2F-A091-73E2A71628B2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GeolocationData", "Backend\GeolocationData\GeolocationData.csproj", "{CBEE5B73-8F4E-4F2F-A091-73E2A71628B2}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DatabaseData", "DatabaseData\DatabaseData.csproj", "{8AE7F261-518E-4E6E-8E85-D05943C1F769}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DatabaseData", "Backend\DatabaseData\DatabaseData.csproj", "{8AE7F261-518E-4E6E-8E85-D05943C1F769}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GeolocationDataTests", "..\tests\GeolocationDataTests\GeolocationDataTests.csproj", "{0342F9AF-83E6-4B16-AD89-3D7C5D6C3231}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FeaturesTests", "..\tests\FeaturesTests\FeaturesTests.csproj", "{5FA4F1EE-322B-425F-A578-C6E6B2AA36B1}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cryptography", "Cryptography\Cryptography.csproj", "{9D280751-3A1A-422B-BA5B-D81D053AB36E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cryptography", "Backend\Cryptography\Cryptography.csproj", "{9D280751-3A1A-422B-BA5B-D81D053AB36E}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CryptographyTests", "CryptographyTests\CryptographyTests.csproj", "{76B0A5FE-2A08-4CF9-93C0-EE678366478A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CryptographyTests", "..\tests\CryptographyTests\CryptographyTests.csproj", "{76B0A5FE-2A08-4CF9-93C0-EE678366478A}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Api", "Api\Api.csproj", "{9698CFDF-5D6C-4297-A68C-1BC6709E69E2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Api", "Backend\Api\Api.csproj", "{9698CFDF-5D6C-4297-A68C-1BC6709E69E2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DreamFlights", "DreamFlights\DreamFlights.csproj", "{AE278CCF-D157-48B9-9C37-EAFE668B13D6}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DreamTrips", "Backend\DreamTrips\DreamTrips.csproj", "{BCD3FB5B-5EF8-48CA-BD1F-722CC73E9E37}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DreamTrips", "DreamTrips\DreamTrips.csproj", "{0AC13472-0FBC-4CDA-A8DA-02FA7A2C9C39}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DreamFlights", "Backend\DreamFlights\DreamFlights.csproj", "{1F3FE57E-8FE3-4691-BA8F-A3B05D51FDCE}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -156,14 +156,14 @@ Global
 		{9698CFDF-5D6C-4297-A68C-1BC6709E69E2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9698CFDF-5D6C-4297-A68C-1BC6709E69E2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9698CFDF-5D6C-4297-A68C-1BC6709E69E2}.Release|Any CPU.Build.0 = Release|Any CPU
-		{AE278CCF-D157-48B9-9C37-EAFE668B13D6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{AE278CCF-D157-48B9-9C37-EAFE668B13D6}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{AE278CCF-D157-48B9-9C37-EAFE668B13D6}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{AE278CCF-D157-48B9-9C37-EAFE668B13D6}.Release|Any CPU.Build.0 = Release|Any CPU
-		{0AC13472-0FBC-4CDA-A8DA-02FA7A2C9C39}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{0AC13472-0FBC-4CDA-A8DA-02FA7A2C9C39}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{0AC13472-0FBC-4CDA-A8DA-02FA7A2C9C39}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{0AC13472-0FBC-4CDA-A8DA-02FA7A2C9C39}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BCD3FB5B-5EF8-48CA-BD1F-722CC73E9E37}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BCD3FB5B-5EF8-48CA-BD1F-722CC73E9E37}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BCD3FB5B-5EF8-48CA-BD1F-722CC73E9E37}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BCD3FB5B-5EF8-48CA-BD1F-722CC73E9E37}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1F3FE57E-8FE3-4691-BA8F-A3B05D51FDCE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1F3FE57E-8FE3-4691-BA8F-A3B05D51FDCE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1F3FE57E-8FE3-4691-BA8F-A3B05D51FDCE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1F3FE57E-8FE3-4691-BA8F-A3B05D51FDCE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -188,8 +188,8 @@ Global
 		{9D280751-3A1A-422B-BA5B-D81D053AB36E} = {C3AD01F3-75DE-44BB-8FE5-17E1683D7872}
 		{76B0A5FE-2A08-4CF9-93C0-EE678366478A} = {39216599-39FD-4FC7-8759-48AC896CEFFF}
 		{9698CFDF-5D6C-4297-A68C-1BC6709E69E2} = {671C7D7D-4079-44D1-AEF8-ACCC9A6186B8}
-		{AE278CCF-D157-48B9-9C37-EAFE668B13D6} = {C3AD01F3-75DE-44BB-8FE5-17E1683D7872}
-		{0AC13472-0FBC-4CDA-A8DA-02FA7A2C9C39} = {C3AD01F3-75DE-44BB-8FE5-17E1683D7872}
+		{BCD3FB5B-5EF8-48CA-BD1F-722CC73E9E37} = {C3AD01F3-75DE-44BB-8FE5-17E1683D7872}
+		{1F3FE57E-8FE3-4691-BA8F-A3B05D51FDCE} = {C3AD01F3-75DE-44BB-8FE5-17E1683D7872}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {00F9DE65-0AAA-464E-9C25-8FC931194B32}

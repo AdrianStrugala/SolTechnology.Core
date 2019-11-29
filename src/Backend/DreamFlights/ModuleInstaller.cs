@@ -1,4 +1,5 @@
 ﻿using DreamTravel.DatabaseData.Configuration;
+using DreamTravel.DreamFlights.GetAirports;
 using DreamTravel.DreamFlights.GetFlightEmailData;
 using DreamTravel.DreamFlights.GetFlightEmailOrdersForUser;
 using DreamTravel.DreamFlights.OrderFlightEmail;
@@ -32,8 +33,10 @@ namespace DreamTravel.DreamFlights
 
             //SendOrderedFlightEmail
             services.AddScoped<ISendOrderedFlightEmail, SendOrderedFlightEmail.SendOrderedFlightEmail>();
-            services.AddScoped<DreamFlights.SendOrderedFlightEmail.Interfaces.IComposeMessage, DreamFlights.SendOrderedFlightEmail.ComposeMessage>();
+            services.AddScoped<SendOrderedFlightEmail.Interfaces.IComposeMessage, SendOrderedFlightEmail.ComposeMessage>();
 
+            //GetAirports
+            services.AddScoped<IGetAirports, GetAirports.GetAirports>();
 
             services.InstallFlightProviderData();
             services.InstallDatabaseData();
