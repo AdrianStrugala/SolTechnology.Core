@@ -1,12 +1,12 @@
 import { Component, OnInit, Inject } from '@angular/core';
-import { FormControl, FormGroup, Validators, FormBuilder, ValidatorFn } from '@angular/forms';
+import { FormControl, FormGroup, Validators, FormBuilder, ValidatorFn, AbstractControl, ValidationErrors } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { MAT_MOMENT_DATE_FORMATS, MomentDateAdapter, MAT_MOMENT_DATE_ADAPTER_OPTIONS } from '@angular/material-moment-adapter';
 import { DateAdapter, MAT_DATE_FORMATS, MAT_DATE_LOCALE } from '@angular/material/core';
 import { UserService } from '../../user.service';
 import { IAirport, AirportsService } from './airports.service';
-import { Observable } from 'rxjs';
-import { map, startWith } from 'rxjs/operators';
+import { Observable, of } from 'rxjs';
+import { map, startWith, filter } from 'rxjs/operators';
 
 
 @Component({
@@ -39,6 +39,36 @@ export class FlightEmailOrderComponent implements OnInit {
     autocomplete: string[];
     filteredOptions: Observable<string[]>;
 
+
+    valueSelected({ value }: AbstractControl): Observable<ValidationErrors | null> {
+
+        console.log(value);
+
+
+        // if (value.untouched) {
+        //     return null;
+        // }
+
+        this.filteredOptions
+            .pipe(
+                map((filtered: String[]) => {
+                    // value => this._filter(value)
+                    let pickedOrNot = filtered.filter(option => option.toLowerCase().includes(value));
+
+                    console.log(pickedOrNot);
+
+                    if (pickedOrNot.length > 0) {
+                        // everything's fine. return no error. therefore it's null.
+                        return of(null);
+
+                    } else {
+                        //there's no matching selectboxvalue selected. so return match error.
+                        return {autocomplete: true};
+                    }
+                })
+            )
+        return of(null);
+    }
 
     minDaysValidator: ValidatorFn = (orderForm: FormGroup) => {
         let minDays = orderForm.get('minDaysOfStay').value;
@@ -75,9 +105,11 @@ export class FlightEmailOrderComponent implements OnInit {
     }
 
     orderForm = new FormGroup({
-        from: new FormControl('', {
-            validators: [Validators.required]
-        }),
+        from: new FormControl(null,
+            {
+                validators: [Validators.required],
+                asyncValidators: [this.valueSelected.bind(this)]
+            }),
         to: new FormControl('', {
             validators: [Validators.required]
         }),
@@ -106,13 +138,13 @@ export class FlightEmailOrderComponent implements OnInit {
             (data: IAirport[]) => {
                 this.airports = data;
                 this.autocomplete = this.airports.map(a => a.name);
-            
+
                 //from autocomplete
                 this.filteredOptions = this.orderForm.get('from').valueChanges
-                .pipe(
-                    startWith(''),
-                    map(value => this._filter(value))
-                );
+                    .pipe(
+                        startWith(''),
+                        map(value => this._filter(value))
+                    );
             }
         )
     }
@@ -136,3 +168,27 @@ export class FlightEmailOrderComponent implements OnInit {
     }
 }
 
+export class FormCustomValidators {
+    static valueSelected(myArray: any[]): ValidatorFn {
+
+        console.log(myArray);
+
+        return (c: AbstractControl): { [key: string]: boolean } | null => {
+
+            if (c.untouched) {
+                return null;
+            }
+
+            let pickedOrNot = myArray.filter(alias => alias.name === c.value);
+
+            if (pickedOrNot.length > 0) {
+                // everything's fine. return no error. therefore it's null.
+                return null;
+
+            } else {
+                //there's no matching selectboxvalue selected. so return match error.
+                return { 'match': true };
+            }
+        }
+    }
+}

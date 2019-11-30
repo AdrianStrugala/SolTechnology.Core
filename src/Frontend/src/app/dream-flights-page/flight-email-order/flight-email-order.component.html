@@ -22,9 +22,19 @@
             {{option}}
           </mat-option>
         </mat-autocomplete>
-        <mat-error *ngIf="orderForm.get('from').hasError('required')">
+        <!-- <mat-error *ngIf="orderForm.get('from').hasError('required')">
           Field is required
+        </mat-error> --> 
+        <mat-error *ngIf="orderForm.get('from').hasError('autocomplete')">
+          Please select a valid project
+      </mat-error>
+      
+        <!-- <ng-container *ngIf="filteredOptions | async; let filteredOption">
+          <mat-error *ngIf="filteredOption.length == 0;">
+            Please select a valid project
         </mat-error>
+        </ng-container> -->
+
       </mat-form-field>
 
 
