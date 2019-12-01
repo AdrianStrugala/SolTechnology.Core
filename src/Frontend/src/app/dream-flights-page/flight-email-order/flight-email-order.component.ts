@@ -1,12 +1,12 @@
 import { Component, OnInit, Inject } from '@angular/core';
-import { FormControl, FormGroup, Validators, FormBuilder, ValidatorFn, AbstractControl, ValidationErrors } from '@angular/forms';
+import { FormControl, FormGroup, Validators, FormBuilder, ValidatorFn, AbstractControl, ValidationErrors, AsyncValidatorFn } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { MAT_MOMENT_DATE_FORMATS, MomentDateAdapter, MAT_MOMENT_DATE_ADAPTER_OPTIONS } from '@angular/material-moment-adapter';
 import { DateAdapter, MAT_DATE_FORMATS, MAT_DATE_LOCALE } from '@angular/material/core';
 import { UserService } from '../../user.service';
 import { IAirport, AirportsService } from './airports.service';
 import { Observable, of } from 'rxjs';
-import { map, startWith, filter } from 'rxjs/operators';
+import { map, startWith, filter, catchError } from 'rxjs/operators';
 
 
 @Component({
@@ -40,34 +40,54 @@ export class FlightEmailOrderComponent implements OnInit {
     filteredOptions: Observable<string[]>;
 
 
-    valueSelected({ value }: AbstractControl): Observable<ValidationErrors | null> {
 
-        console.log(value);
+    validatexd(
+        ctrl: AbstractControl, fromFilter: Observable<string[]>
+    ): Promise<ValidationErrors | null> | Observable<ValidationErrors | null> {
+        return this.filteredOptions
+            .pipe(
+                map((filtered: String[]) => 
+                     (filtered.filter(option => option.toLowerCase().includes(ctrl.value)).length == 0) ? { autocomplete: true } : null),
+                catchError(() => null)
+            );
+
+        // if (pickedOrNot.length > 0) {
+        //     // everything's fine. return no error. therefore it's null.
+        //     return of(null);
+
+        // } else {
+        //     //there's no matching selectboxvalue selected. so return match error.
+        //     return {autocomplete: true};
+        // }
+
+    };
+
+
+    valueSelected(fromFilter: Observable<string[]>): AsyncValidatorFn {
+
+        // console.log(value);
 
 
         // if (value.untouched) {
         //     return null;
         // }
+        return (control: AbstractControl): Promise<ValidationErrors | null> | Observable<ValidationErrors | null> => {
+            return fromFilter
+                .pipe(
+                    map((filtered: String[]) => {
+                        return (filtered.filter(option => option.toLowerCase().includes(control.value)).length == 0) ? { autocomplete: true } : null;
 
-        this.filteredOptions
-            .pipe(
-                map((filtered: String[]) => {
-                    // value => this._filter(value)
-                    let pickedOrNot = filtered.filter(option => option.toLowerCase().includes(value));
+                        // if (pickedOrNot.length > 0) {
+                        //     // everything's fine. return no error. therefore it's null.
+                        //     return of(null);
 
-                    console.log(pickedOrNot);
-
-                    if (pickedOrNot.length > 0) {
-                        // everything's fine. return no error. therefore it's null.
-                        return of(null);
-
-                    } else {
-                        //there's no matching selectboxvalue selected. so return match error.
-                        return {autocomplete: true};
-                    }
-                })
-            )
-        return of(null);
+                        // } else {
+                        //     //there's no matching selectboxvalue selected. so return match error.
+                        //     return {autocomplete: true};
+                        // }
+                    })
+                )
+        }
     }
 
     minDaysValidator: ValidatorFn = (orderForm: FormGroup) => {
@@ -108,7 +128,7 @@ export class FlightEmailOrderComponent implements OnInit {
         from: new FormControl(null,
             {
                 validators: [Validators.required],
-                asyncValidators: [this.valueSelected.bind(this)]
+                asyncValidators: [this.validatexd(this.filteredOptions)]
             }),
         to: new FormControl('', {
             validators: [Validators.required]
@@ -153,6 +173,11 @@ export class FlightEmailOrderComponent implements OnInit {
         const filterValue = value.toLowerCase();
         return this.autocomplete.filter(option => option.toLowerCase().includes(filterValue));
     }
+
+    // private _countInArray(value: string, array: string[]): Observable<number> {
+    //     const filterValue = value.toLowerCase();
+    //     return this.autocomplete.filter(option => option.toLowerCase().includes(filterValue));
+    // }
 
     onSubmit(): void {
 

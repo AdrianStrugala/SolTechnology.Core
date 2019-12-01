@@ -37,16 +37,6 @@
 
       </mat-form-field>
 
-
-      <mat-form-field class="example-full-width">
-        <input type="text" placeholder="Pick one" aria-label="Number" matInput formControlName="from" [matAutocomplete]="auto">
-        <mat-autocomplete #auto="matAutocomplete">
-          <mat-option *ngFor="let option of filteredOptions | async" [value]="option">
-            {{option}}
-          </mat-option>
-        </mat-autocomplete>
-      </mat-form-field>
-
       <br>
       <br>
       <br>
