@@ -39,7 +39,6 @@ export class FlightEmailOrderComponent implements OnInit {
     autocomplete: string[];
     filteredOptions: Observable<string[]>;
 
-
     minDaysValidator: ValidatorFn = (orderForm: FormGroup) => {
         let minDays = orderForm.get('minDaysOfStay').value;
         let arrivalDate = orderForm.get('arrivalDate').value;
