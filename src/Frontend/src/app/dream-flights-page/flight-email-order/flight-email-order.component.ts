@@ -54,6 +54,18 @@ export class FlightEmailOrderComponent implements OnInit {
         return null;
     }
 
+    
+    autocompleteValidator: ValidatorFn = (control: FormControl) => {
+
+        if(control.value == null || control.value == ""){
+            return null;
+        }
+        if (this._filter(control.value).length == 0) {
+            return { autocomplete: true }
+        }
+        return null;
+    }
+
     arrivalDateValidator: ValidatorFn = (orderForm: FormGroup) => {
         let arrivalDate = orderForm.get('arrivalDate').value;
         let departureDate = orderForm.get('departureDate').value;
@@ -76,7 +88,7 @@ export class FlightEmailOrderComponent implements OnInit {
 
     orderForm = new FormGroup({
         from: new FormControl('', {
-            validators: [Validators.required]
+            validators: [Validators.required, this.autocompleteValidator]
         }),
         to: new FormControl('', {
             validators: [Validators.required]
