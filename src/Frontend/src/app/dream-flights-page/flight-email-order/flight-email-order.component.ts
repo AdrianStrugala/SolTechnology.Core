@@ -41,13 +41,15 @@ export class FlightEmailOrderComponent implements OnInit {
 
 
 
-    validatexd(
-        ctrl: AbstractControl, fromFilter: Observable<string[]>
-    ): Promise<ValidationErrors | null> | Observable<ValidationErrors | null> {
-        return this.filteredOptions
+    ageRangeValidator(filteredOptions: Observable<string[]>) { 
+        return (ctrl: AbstractControl): Promise<ValidationErrors | null> | Observable<ValidationErrors | null> => {
+
+        console.log(filteredOptions);
+
+        return filteredOptions
             .pipe(
                 map((filtered: String[]) => 
-                     (filtered.filter(option => option.toLowerCase().includes(ctrl.value)).length == 0) ? { autocomplete: true } : null),
+                     (filtered.length == 0) ? { autocomplete: true } : null),
                 catchError(() => null)
             );
 
@@ -61,34 +63,35 @@ export class FlightEmailOrderComponent implements OnInit {
         // }
 
     };
-
-
-    valueSelected(fromFilter: Observable<string[]>): AsyncValidatorFn {
-
-        // console.log(value);
-
-
-        // if (value.untouched) {
-        //     return null;
-        // }
-        return (control: AbstractControl): Promise<ValidationErrors | null> | Observable<ValidationErrors | null> => {
-            return fromFilter
-                .pipe(
-                    map((filtered: String[]) => {
-                        return (filtered.filter(option => option.toLowerCase().includes(control.value)).length == 0) ? { autocomplete: true } : null;
-
-                        // if (pickedOrNot.length > 0) {
-                        //     // everything's fine. return no error. therefore it's null.
-                        //     return of(null);
-
-                        // } else {
-                        //     //there's no matching selectboxvalue selected. so return match error.
-                        //     return {autocomplete: true};
-                        // }
-                    })
-                )
-        }
     }
+    
+
+    // valueSelected(fromFilter: Observable<string[]>): AsyncValidatorFn {
+
+    //     // console.log(value);
+
+
+    //     // if (value.untouched) {
+    //     //     return null;
+    //     // }
+    //     return (control: AbstractControl): Promise<ValidationErrors | null> | Observable<ValidationErrors | null> => {
+    //         return fromFilter
+    //             .pipe(
+    //                 map((filtered: String[]) => {
+    //                     return (filtered.filter(option => option.toLowerCase().includes(control.value)).length == 0) ? { autocomplete: true } : null;
+
+    //                     // if (pickedOrNot.length > 0) {
+    //                     //     // everything's fine. return no error. therefore it's null.
+    //                     //     return of(null);
+
+    //                     // } else {
+    //                     //     //there's no matching selectboxvalue selected. so return match error.
+    //                     //     return {autocomplete: true};
+    //                     // }
+    //                 })
+    //             )
+    //     }
+    // }
 
     minDaysValidator: ValidatorFn = (orderForm: FormGroup) => {
         let minDays = orderForm.get('minDaysOfStay').value;
@@ -128,7 +131,7 @@ export class FlightEmailOrderComponent implements OnInit {
         from: new FormControl(null,
             {
                 validators: [Validators.required],
-                asyncValidators: [this.validatexd(this.filteredOptions)]
+                asyncValidators: [this.ageRangeValidator(this.filteredOptions)]
             }),
         to: new FormControl('', {
             validators: [Validators.required]
