@@ -16,9 +16,9 @@
       <h5>From:</h5>
 
       <mat-form-field>
-        <input matInput placeholder="From" formControlName="from" [matAutocomplete]="auto">
-        <mat-autocomplete #auto="matAutocomplete">
-          <mat-option *ngFor="let option of filteredOptions | async" [value]="from">
+        <input type="text" matInput placeholder="From" formControlName="from" [matAutocomplete]="autoFrom">
+        <mat-autocomplete #autoFrom="matAutocomplete">
+          <mat-option *ngFor="let option of filteredFrom | async" [value]="option">
             {{option}}
           </mat-option>
         </mat-autocomplete>
@@ -26,18 +26,8 @@
           Field is required
         </mat-error>
         <mat-error *ngIf="orderForm.get('from').hasError('autocomplete')">
-         Errorm msf
+         Select valid location from the list
         </mat-error>
-      </mat-form-field>
-
-
-      <mat-form-field class="example-full-width">
-        <input type="text" placeholder="Pick one" aria-label="Number" matInput formControlName="from" [matAutocomplete]="auto">
-        <mat-autocomplete #auto="matAutocomplete">
-          <mat-option *ngFor="let option of filteredOptions | async" [value]="option">
-            {{option}}
-          </mat-option>
-        </mat-autocomplete>
       </mat-form-field>
 
       <br>
@@ -46,10 +36,18 @@
       <h5>To:</h5>
 
       <mat-form-field>
-        <input matInput placeholder="To" formControlName="to">
+        <input type="text" matInput placeholder="To" formControlName="to" [matAutocomplete]="autoTo">
+        <mat-autocomplete #autoTo="matAutocomplete">
+          <mat-option *ngFor="let option of filteredTo | async" [value]="option">
+            {{option}}
+          </mat-option>
+        </mat-autocomplete>
         <mat-error *ngIf="orderForm.get('to').hasError('required')">
           Field is required
         </mat-error>
+        <mat-error *ngIf="orderForm.get('to').hasError('autocomplete')">
+          Select valid location from the list
+         </mat-error>
       </mat-form-field>
 
       <br>

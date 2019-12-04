@@ -37,7 +37,8 @@ export class FlightEmailOrderComponent implements OnInit {
 
     airports: IAirport[];
     autocomplete: string[];
-    filteredOptions: Observable<string[]>;
+    filteredFrom: Observable<string[]>;
+    filteredTo: Observable<string[]>;
 
     minDaysValidator: ValidatorFn = (orderForm: FormGroup) => {
         let minDays = orderForm.get('minDaysOfStay').value;
@@ -53,10 +54,10 @@ export class FlightEmailOrderComponent implements OnInit {
         return null;
     }
 
-    
+
     autocompleteValidator: ValidatorFn = (control: FormControl) => {
 
-        if(control.value == null || control.value == ""){
+        if (control.value == null || control.value == "") {
             return null;
         }
         if (this._filter(control.value).length == 0) {
@@ -90,7 +91,7 @@ export class FlightEmailOrderComponent implements OnInit {
             validators: [Validators.required, this.autocompleteValidator]
         }),
         to: new FormControl('', {
-            validators: [Validators.required]
+            validators: [Validators.required, this.autocompleteValidator]
         }),
         departureDate: new FormControl(new Date(), {
             validators: [Validators.required]
@@ -117,13 +118,20 @@ export class FlightEmailOrderComponent implements OnInit {
             (data: IAirport[]) => {
                 this.airports = data;
                 this.autocomplete = this.airports.map(a => a.name);
-            
+
                 //from autocomplete
-                this.filteredOptions = this.orderForm.get('from').valueChanges
-                .pipe(
-                    startWith(''),
-                    map(value => this._filter(value))
-                );
+                this.filteredFrom = this.orderForm.get('from').valueChanges
+                    .pipe(
+                        startWith(''),
+                        map(value => this._filter(value))
+                    );
+
+                //to autocomplete
+                this.filteredTo = this.orderForm.get('to').valueChanges
+                    .pipe(
+                        startWith(''),
+                        map(value => this._filter(value))
+                    );
             }
         )
     }
