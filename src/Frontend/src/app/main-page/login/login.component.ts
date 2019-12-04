@@ -3,6 +3,7 @@ import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { UserService } from '../../user.service';
 import { FormControl, FormGroup, Validators, FormBuilder } from '@angular/forms';
 import { IUser } from '../../user.service'
+import { Router } from '@angular/router';
 
 
 @Component({
@@ -22,7 +23,7 @@ export class LoginComponent{
   error : string;
 
   constructor(
-    public dialogRef: MatDialogRef<LoginComponent>, private userService: UserService) {}
+    public dialogRef: MatDialogRef<LoginComponent>, private userService: UserService, private router: Router) {}
 
     login(){
       this.userService.user.email = this.loginForm.value.email;
@@ -43,6 +44,8 @@ export class LoginComponent{
     }
 
   register(): void {
+
+    this.router.navigate(["register"]);
     this.dialogRef.close();
   }
 }

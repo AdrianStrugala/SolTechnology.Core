@@ -1,1 +1,54 @@
-<p>register works!</p>
+<form [formGroup]="registerForm">
+    <h2 style="text-align: center;"> Register</h2>
+
+    <br>
+    <br>
+
+    <h5>Email:</h5>
+    <mat-form-field appearance="outline" style="width: 20rem;">
+      <input matInput placeholder="Email" formControlName="email" cdkFocusInitial>
+
+      <mat-error *ngIf="registerForm.get('email').hasError('required')">
+        Field is required
+      </mat-error>
+      <mat-error *ngIf="registerForm.get('email').hasError('email')">
+        Invalid email
+      </mat-error>
+    </mat-form-field>
+
+    <br>
+    <h5>Name:</h5>
+    <mat-form-field appearance="outline" style="width: 20rem;">
+      <input matInput placeholder="Name" formControlName="name">
+
+      <mat-error *ngIf="registerForm.get('name').hasError('required')">
+        Field is required
+      </mat-error>
+    </mat-form-field>
+
+    <br>
+    <h5>Password:</h5>
+    <mat-form-field appearance="outline" style="width: 20rem;">
+      <input type="password" matInput placeholder="Password" formControlName="password">
+
+      <mat-error *ngIf="registerForm.get('password').hasError('required')">
+        Field is required
+      </mat-error>
+    </mat-form-field>
+
+    <br>
+    <h5>Confirm Password:</h5>
+    <mat-form-field appearance="outline" style="width: 20rem;">
+      <input type="password" matInput placeholder="Confirm Password" formControlName="confirmPassword">
+
+      <mat-error *ngIf="registerForm.get('confirmPassword').hasError('required')">
+        Field is required
+      </mat-error>
+    </mat-form-field>
+
+    <br>
+
+    <button type="button" class="btn btn-primary" type="submit" (click)="register()" [disabled]="registerForm.invalid">
+      Register
+    </button>
+  </form>
