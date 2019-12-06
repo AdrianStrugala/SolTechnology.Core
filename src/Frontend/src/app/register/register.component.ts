@@ -1,12 +1,13 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
+import { UserService, IUser } from '../user.service';
 
 @Component({
   selector: 'app-register',
   templateUrl: './register.component.html',
   styleUrls: ['./register.component.scss']
 })
-export class RegisterComponent implements OnInit {
+export class RegisterComponent{
 
   registerForm = new FormGroup({
     email: new FormControl('', {
@@ -27,9 +28,23 @@ export class RegisterComponent implements OnInit {
     ),
   });
 
-  constructor() { }
+  error : string;
 
-  ngOnInit() {
+  constructor(private userService: UserService) { }
+
+  register(){
+    let user: IUser;
+    user.email = this.registerForm.value.email;
+    user.password = this.registerForm.value.password;
+    user.name = this.registerForm.value.name;
+
+    this.userService.register(user)
+    .subscribe(
+      (data : boolean) => {        
+    
+    },
+    (error) => {
+      this.error = error.error
+    });
   }
-
 }

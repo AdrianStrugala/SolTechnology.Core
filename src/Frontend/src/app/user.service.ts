@@ -19,17 +19,27 @@ export class UserService{
     }
   }
 
-  url = "https://dreamtravelsapi.azurewebsites.net/api/login";
+  url = "https://dreamtravelsapi-demo.azurewebsites.net";
 
   login(): Observable<any> {
 
   return this.http.post(
-      this.url,
+      this.url + "/api/login",
       this.user,
       {
           observe: "body"
       });
   } 
+
+  register(user: IUser): Observable<any> {
+
+    return this.http.post(
+        this.url + "/api/register",
+        user,
+        {
+            observe: "body"
+        });
+    } 
 
   isLoggedIn() : boolean{
     if(this.user.id != 0){

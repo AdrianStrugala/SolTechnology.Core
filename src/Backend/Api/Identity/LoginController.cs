@@ -26,7 +26,7 @@ namespace DreamTravel.Api.Identity
 
 
         [HttpPost]
-        public IActionResult OrderFlightEmail([FromBody] User user)
+        public IActionResult Login([FromBody] User user)
         {
             try
             {
