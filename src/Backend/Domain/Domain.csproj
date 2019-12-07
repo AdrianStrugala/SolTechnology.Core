@@ -5,8 +5,4 @@
     <RootNamespace>DreamTravel.Domain</RootNamespace>
   </PropertyGroup>
 
-  <ItemGroup>
-    <Folder Include="Paths\" />
-  </ItemGroup>
-
 </Project>

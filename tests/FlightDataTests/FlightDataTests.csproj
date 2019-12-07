@@ -19,7 +19,6 @@
   <ItemGroup>
     <ProjectReference Include="..\..\src\Backend\Domain\Domain.csproj" />
     <ProjectReference Include="..\..\src\Backend\FlightsRepository\FlightProviderData.csproj" />
-    <ProjectReference Include="..\..\src\FlightsRepository\FlightProviderData.csproj" />
   </ItemGroup>
 
 </Project>

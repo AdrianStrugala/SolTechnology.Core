@@ -22,7 +22,6 @@
     <ProjectReference Include="..\..\src\Backend\DatabaseData\DatabaseData.csproj" />
     <ProjectReference Include="..\..\src\Backend\Domain\Domain.csproj" />
     <ProjectReference Include="..\..\src\Backend\Infrastructure\Infrastructure.csproj" />
-    <ProjectReference Include="..\..\src\DatabaseData\DatabaseData.csproj" />
   </ItemGroup>
 
 </Project>

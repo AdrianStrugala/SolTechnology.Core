@@ -20,7 +20,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\Backend\TravelingSalesmanProblem\TravelingSalesmanProblem.csproj" />
-    <ProjectReference Include="..\..\src\TravelingSalesmanProblem\TravelingSalesmanProblem.csproj" />
   </ItemGroup>
 
 </Project>

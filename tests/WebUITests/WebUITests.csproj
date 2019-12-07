@@ -23,7 +23,6 @@
     <ProjectReference Include="..\..\src\Backend\Domain\Domain.csproj" />
     <ProjectReference Include="..\..\src\Backend\DreamTrips\DreamTrips.csproj" />
     <ProjectReference Include="..\..\src\Backend\WebUI\WebUI.csproj" />
-    <ProjectReference Include="..\..\src\WebUI\WebUI.csproj" />
   </ItemGroup>
 
 </Project>
