@@ -1,9 +1,10 @@
-﻿using DreamTravel.Domain.Flights.GetFlights;
+﻿using System.Collections.Generic;
+using DreamTravel.Domain.Flights.GetFlights;
 
 namespace DreamTravel.Domain.Flights
 {
     public interface IFlightRepository
     {
-        GetFlightsResult GetFlights(GetFlightsQuery query);
+        List<Flight> GetFlights(GetFlightsOrder order);
     }
 }

@@ -19,7 +19,7 @@ SELECT [Id]
 
         public User Get(string userEmail)
         {
-            var result = new User();
+            User result = null;
             using (var connection = _dbConnectionFactory.CreateConnection())
             {
                 result = connection.Query<User>(GetSql, new

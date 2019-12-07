@@ -22,6 +22,7 @@
     <ProjectReference Include="..\..\src\Backend\DreamFlights\DreamFlights.csproj" />
     <ProjectReference Include="..\..\src\Backend\DreamTrips\DreamTrips.csproj" />
     <ProjectReference Include="..\..\src\Backend\GeolocationData\GeolocationData.csproj" />
+    <ProjectReference Include="..\..\src\Backend\Identity\Identity.csproj" />
     <ProjectReference Include="..\..\src\Backend\TravelingSalesmanProblem\TravelingSalesmanProblem.csproj" />
     <ProjectReference Include="..\..\src\DreamFlights\DreamFlights.csproj" />
     <ProjectReference Include="..\..\src\DreamTrips\DreamTrips.csproj" />

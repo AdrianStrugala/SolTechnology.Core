@@ -24,22 +24,23 @@ namespace DreamTravel.DreamFlights.SendOrderedFlightEmail
 
         public void Execute(FlightEmailData flightEmailOrder)
         {
-            GetFlightsQuery getFlightsQuery = new GetFlightsQuery
-            {
-                ArrivalDate = flightEmailOrder.ArrivalDate,
-                DepartureDate = flightEmailOrder.DepartureDate,
-                Departures = new KeyValuePair<string, List<string>>(flightEmailOrder.From, _airportRepository.GetByPlace(flightEmailOrder.From).Codes),
-                Arrivals = new KeyValuePair<string, List<string>>(flightEmailOrder.To, _airportRepository.GetByPlace(flightEmailOrder.To).Codes),
-                MinDaysToStay = flightEmailOrder.MinDaysOfStay,
-                MaxDaysToStay = flightEmailOrder.MaxDaysOfStay
-            };
+            GetFlightsOrder getFlightsOrder = new GetFlightsOrder
+            (
+                new KeyValuePair<string, List<string>>(flightEmailOrder.From, _airportRepository.GetByPlace(flightEmailOrder.From).Codes),
+                new KeyValuePair<string, List<string>>(flightEmailOrder.To, _airportRepository.GetByPlace(flightEmailOrder.To).Codes),
+                flightEmailOrder.DepartureDate,
+                flightEmailOrder.ArrivalDate,
+                flightEmailOrder.MinDaysOfStay,
+                flightEmailOrder.MaxDaysOfStay
+                );
 
-            List<Flight> flights = _flightRepository.GetFlights(getFlightsQuery).Flights;
+            List<Flight> flights = _flightRepository.GetFlights(getFlightsOrder);
 
             string message = _composeMessage.Execute(flights, flightEmailOrder);
-            EmailAgent.Send(new OrderedFlightEmail(message,
-                                                   flightEmailOrder.Email,
-                                $"{flightEmailOrder.UserName} choose your flight to {flightEmailOrder.To}!"));
+            EmailAgent.Send(new OrderedFlightEmail(
+                message,
+                flightEmailOrder.Email,
+                $"{flightEmailOrder.UserName} choose your flight to {flightEmailOrder.To}!"));
         }
     }
 }

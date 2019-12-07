@@ -26,17 +26,17 @@ namespace DreamTravel.DreamFlights.SendDreamTravelFlightEmail
 
         public void Execute()
         {
-            GetFlightsQuery getFlightsQuery = new GetFlightsQuery
-            {
-                ArrivalDate = DateTime.UtcNow.AddMonths(3),
-                DepartureDate = DateTime.UtcNow,
-                Departures = new KeyValuePair<string, List<string>>("Wroclaw", new List<string> {"WRO"}),
-                Arrivals = new KeyValuePair<string, List<string>>("Anywhere", new List<string> {"XXX"}),
-                MinDaysToStay = 2,
-                MaxDaysToStay = 5
-            };
+            GetFlightsOrder getFlightsOrder = new GetFlightsOrder
+            (
+                new KeyValuePair<string, List<string>>("Wroclaw", new List<string> { "WRO" }),
+                new KeyValuePair<string, List<string>>("Anywhere", new List<string> { "XXX" }),
+                DateTime.UtcNow.AddMonths(3),
+                DateTime.UtcNow,
+                2,
+                5
+            );
 
-            List<Flight> flights = _flightRepository.GetFlights(getFlightsQuery).Flights;
+            List<Flight> flights = _flightRepository.GetFlights(getFlightsOrder);
 
             flights = _filterFlights.Execute(flights);
 

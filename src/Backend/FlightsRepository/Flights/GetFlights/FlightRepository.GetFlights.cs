@@ -9,32 +9,30 @@ namespace DreamTravel.FlightProviderData.Flights.GetFlights
 {
     public class FlightRepository : IFlightRepository
     {
-        public GetFlightsResult GetFlights(GetFlightsQuery query)
+        public List<Flight> GetFlights(GetFlightsOrder order)
         {
-            GetFlightsResult result = new GetFlightsResult();
-
-            DateTime departureDate = query.DepartureDate > DateTime.UtcNow ? query.DepartureDate : DateTime.UtcNow;
+            DateTime departureDate = order.DepartureDate > DateTime.UtcNow ? order.DepartureDate : DateTime.UtcNow;
 
             string url = $"http://www.azair.eu/azfin.php?searchtype=flexi" +
                          $"&tp=0&isOneway=return" +
-                         $"&srcAirport={query.Departures.Key}+{FormattedStringProvider.Airports(query.Departures.Value)}" +
+                         $"&srcAirport={order.Departures.Key}+{FormattedStringProvider.Airports(order.Departures.Value)}" +
                          "&srcap1=POZ" +
                          "&srcFreeAirport=" +
-                         $"&srcTypedText={query.Departures.Key}" +
+                         $"&srcTypedText={order.Departures.Key}" +
                          "&srcFreeTypedText=" +
                          "&srcMC=" +
-                         $"&dstAirport={query.Arrivals.Key}+{FormattedStringProvider.Airports(query.Arrivals.Value)}" +
+                         $"&dstAirport={order.Arrivals.Key}+{FormattedStringProvider.Airports(order.Arrivals.Value)}" +
                          "&dstap10=PMI&dstFreeAirport=" +
-                         $"&dstTypedText={query.Arrivals.Key}" +
+                         $"&dstTypedText={order.Arrivals.Key}" +
                          "&dstFreeTypedText=" +
                          "&dstMC=" +
                          $"&depmonth={FormattedStringProvider.Month(departureDate)}" +
                          $"&depdate={FormattedStringProvider.Date(departureDate)}" +
                          "&aid=0" +
-                         $"&arrmonth={FormattedStringProvider.Month(query.ArrivalDate)}" +
-                         $"&arrdate={FormattedStringProvider.Date(query.ArrivalDate)}" +
-                         $"&minDaysStay={query.MinDaysToStay}" +
-                         $"&maxDaysStay={query.MaxDaysToStay}" +
+                         $"&arrmonth={FormattedStringProvider.Month(order.ArrivalDate)}" +
+                         $"&arrdate={FormattedStringProvider.Date(order.ArrivalDate)}" +
+                         $"&minDaysStay={order.MinDaysToStay}" +
+                         $"&maxDaysStay={order.MaxDaysToStay}" +
                          "&dep0=true" +
                          "&dep1=true" +
                          "&dep2=true" +
@@ -119,9 +117,7 @@ namespace DreamTravel.FlightProviderData.Flights.GetFlights
                 }
             }
 
-            result.Flights = flights;
-
-            return result;
+            return flights;
         }
     }
 }

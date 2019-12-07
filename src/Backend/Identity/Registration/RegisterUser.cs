@@ -1,5 +1,4 @@
-﻿using System;
-using DreamTravel.Cryptography;
+﻿using DreamTravel.Cryptography;
 using DreamTravel.Domain.Users;
 
 namespace DreamTravel.Identity.Registration
@@ -13,20 +12,17 @@ namespace DreamTravel.Identity.Registration
             _userRepository = userRepository;
         }
 
-        public bool Register(User user)
+        public void Register(User user)
         {
-            try
-            {
-                user.Password = Encryption.Encrypt(user.Password);
+            var alreadyExistingUser = _userRepository.Get(user.Email);
 
-                _userRepository.Insert(user);
-
-                return true;
-            }
-            catch (Exception e)
+            if (alreadyExistingUser != null)
             {
-                return false;
+                throw new RegisterException("User with provided email already exists");
             }
+
+            user.Password = Encryption.Encrypt(user.Password);
+            _userRepository.Insert(user);
         }
     }
 }
