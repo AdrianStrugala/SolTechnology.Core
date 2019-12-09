@@ -14,8 +14,13 @@ export class SuccessMessageService {
     this.message = message;
   }
 
-  
   get(){
     return this.message;
   }
+
+reset(){
+  if (this.message != null){
+    this.message = null;
+  }
+}
 }
