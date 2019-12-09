@@ -7,7 +7,7 @@ import { FlightOrderListService, IFlightEmailOrder } from './flight-order-list.s
     templateUrl: './flight-order-list.component.html',
     styleUrls: ['./flight-order-list.component.scss']
   })
-  export class FlightOrderList implements AfterViewInit {
+  export class FlightOrderListComponent implements AfterViewInit {
   
     public flightEmailOrders: IFlightEmailOrder[];
   

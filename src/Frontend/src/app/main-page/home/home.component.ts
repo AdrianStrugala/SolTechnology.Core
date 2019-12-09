@@ -1,5 +1,6 @@
 import { ComponentRef, ComponentFactoryResolver, ViewContainerRef, ViewChild, Component } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
+import { SuccessMessageService } from '../success-message/success-message.service';
 
 @Component({
   selector: 'app-home',
@@ -17,15 +18,7 @@ export class HomeComponent {
 
   page: number;
 
-  constructor(private CFR: ComponentFactoryResolver,private route: ActivatedRoute, private router: Router) {
+  constructor(private CFR: ComponentFactoryResolver, private successMessageService: SuccessMessageService) {
   }
 
-  ngOnInit() {
-   this.route
-      .queryParams
-      .subscribe(params => {
-        // Defaults to 0 if no query param provided.
-        this.success = params['successMessage'];
-      });
-  }
 }

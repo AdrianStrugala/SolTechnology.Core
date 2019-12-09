@@ -12,7 +12,8 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { LoginComponent } from './main-page/login/login.component';
 import { RegisterComponent } from './register/register.component';
 import { MyAccountComponent } from './my-account-page/my-account/my-account.component';
-import { FlightOrderList } from './my-account-page/flight-order-list/flight-order-list.component';
+import { FlightOrderListComponent } from './my-account-page/flight-order-list/flight-order-list.component';
+import { SuccessMessageComponent } from  './main-page/success-message/success-message.component';
 import { AuthGuard } from './auth-guard';
 import { AngularFontAwesomeModule } from 'angular-font-awesome';
 
@@ -31,7 +32,8 @@ const routes: Routes = [
         LoginComponent,
         RegisterComponent,
         MyAccountComponent,
-        FlightOrderList
+        FlightOrderListComponent,
+        SuccessMessageComponent
     ],
     imports: [
         BrowserModule.withServerTransition({ appId: 'ng-cli-universal' }),
