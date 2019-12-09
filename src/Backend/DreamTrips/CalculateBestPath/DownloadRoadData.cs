@@ -18,15 +18,14 @@ namespace DreamTravel.DreamTrips.CalculateBestPath
 
         public async Task<EvaluationMatrix> Execute(List<City> cities, EvaluationMatrix evaluationMatrix)
         {
-            List<Task> tasks = new List<Task>
-            {
-                Task.Run(async () => evaluationMatrix.TollDistances = await _matrixRepository.GetTollRoadDuration(cities)),
-                Task.Run(async () => evaluationMatrix.FreeDistances = await _matrixRepository.GetFreeRoadDuration(cities)),
-                Task.Run(async () => (evaluationMatrix.Costs, evaluationMatrix.VinietaCosts) = await _matrixRepository.GetCosts(cities))
-            };
+            var downloadTollDistanceTask = _matrixRepository.GetTollRoadDuration(cities);
+            var downloadFreeDistanceTask = _matrixRepository.GetFreeRoadDuration(cities);
+            var downloadCostsTask = _matrixRepository.GetCosts(cities);
 
-            await Task.WhenAll(tasks);
-
+            evaluationMatrix.TollDistances = await downloadTollDistanceTask;
+            evaluationMatrix.FreeDistances = await downloadFreeDistanceTask;
+            (evaluationMatrix.Costs, evaluationMatrix.VinietaCosts) = await downloadCostsTask;
+            
             return evaluationMatrix;
         }
     }
