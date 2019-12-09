@@ -118,6 +118,10 @@
       <br>
 
     </mat-card-content>
+    
+    <mat-error *ngIf="this.error">
+      {{this.error}}
+    </mat-error>
 
     <mat-card-actions>
       <button class="btn btn-primary" type="submit" [disabled]="orderForm.invalid" (click)="onSubmit()"

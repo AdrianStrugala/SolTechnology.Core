@@ -7,6 +7,8 @@ import { UserService } from '../../user.service';
 import { IAirport, AirportsService } from './airports.service';
 import { Observable } from 'rxjs';
 import { map, startWith } from 'rxjs/operators';
+import { SuccessMessageService } from '../../main-page/success-message/success-message.service';
+import { Router } from '@angular/router';
 
 
 @Component({
@@ -30,11 +32,17 @@ import { map, startWith } from 'rxjs/operators';
 
 export class FlightEmailOrderComponent implements OnInit {
 
-    constructor(private http: HttpClient, private userService: UserService, private ariportService: AirportsService) { }
+    constructor(
+        private http: HttpClient,
+        private userService: UserService,
+        private ariportService: AirportsService,
+        private successMessageService: SuccessMessageService,
+        private router: Router
+    ) { }
 
     url = "https://dreamtravelsapi-demo.azurewebsites.net/api/OrderFlightEmail";
 
-
+    error: string;
     airports: IAirport[];
     autocomplete: string[];
     filteredFrom: Observable<string[]>;
@@ -143,6 +151,7 @@ export class FlightEmailOrderComponent implements OnInit {
 
     onSubmit(): void {
 
+        this.error = null;
         this.orderForm.value.userId = this.userService.user.id
 
         this.http.post(
@@ -151,7 +160,15 @@ export class FlightEmailOrderComponent implements OnInit {
             {
                 observe: "body"
             })
-            .subscribe();
+            .subscribe(
+                () => {
+                    this.successMessageService.set("Order successfully placed!");
+                    this.router.navigate([""])
+                },
+                error => {
+                    this.error = error.error;
+                }
+            );
     }
 }
 
