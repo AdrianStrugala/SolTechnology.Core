@@ -782,8 +782,7 @@ namespace DreamTravel.FlightProviderData.Airports
 ""SZX"" :  ""Shenzhen"",
 ""SKN"" :  ""Stokmarknes"",
 ""RAI"" :  ""Praia"",
-""CNJ"" :  ""Cloncurry"",
-""XXX"" : ""Anywhere""
+""CNJ"" :  ""Cloncurry""
 }";
         #endregion
     }
