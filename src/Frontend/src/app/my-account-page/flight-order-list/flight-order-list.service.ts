@@ -9,7 +9,7 @@ export class FlightOrderListService{
 
   constructor(private http: HttpClient) {}
 
-  url = "https://dreamtravelsapi.azurewebsites.net/api/GetFlightEmailOrders/";
+  url = "https://dreamtravelsapi-demo.azurewebsites.net/api/GetFlightEmailOrders/";
 
   GetFlightEmailOrdersForUser(userId : number): Observable<any> {
 
