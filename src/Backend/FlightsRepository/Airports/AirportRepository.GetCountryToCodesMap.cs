@@ -88,7 +88,6 @@ namespace DreamTravel.FlightProviderData.Airports
   ""EUMAJOR"" :  { ""name"" : ""Major European airports"",""ports"":""BCN_LGW_DUB_STN_OSL_DUS_PMI_LTN_MAN_AMS_TXL_FCO_ORY_ATH_WAW_CPH_BGY_AGP_MXP_SAW_CGN_EDI_CDG_HAM_BHX_AYT_MAD_MUC_PRG_BUD_STR_SXF_ALC_BRU_GLA_CRL_VIE_BGO_LPA_LYS_ARN_GVA_OTP_FRA_BRQ_BTS""},
   ""TUSCANY"" :  { ""name"" : ""Tuscany"",""ports"":""PSA_FLR""},
   ""NYC_ALL"" :  { ""name"" : ""New York"",""ports"":""JFK_LGA_EWR""},
-  ""XXX"" :  { ""name"" : ""Anywhere"",""ports"":""NULL""},
   ""IT_NORTH"" :  { ""name"" : ""northern Italy"",""ports"":""BLQ_FRL_PMF_RAN_RMI_TSF_VCE_VRN_ALL_GOA_BGY_MXP_LIN_CUF_TRN""},
   ""IT_SOUTH"" :  { ""name"" : ""southern Italy"",""ports"":""BRI_BDS_FOG_CRV_SUF_REG_NAP_QSR""},
   ""IT_CENTRAL"" :  { ""name"" : ""central Italy"",""ports"":""AOI_FLR_PSA_PSR_FCO_CIA_PEG""},
@@ -238,7 +237,7 @@ namespace DreamTravel.FlightProviderData.Airports
   ""XK"" :  { ""name"" : ""Kosovo"",""ports"":""PRN""},
   ""ZA"" :  { ""name"" : ""South Africa"",""ports"":""CPT_JNB""},
   ""ZW"" :  { ""name"" : ""Zimbabwe"",""ports"":""BUQ_VFA_HRE""},
-     ""XXX"" : { ""name"" : ""Anywhere"",""ports"":""XXX""}
+  ""XXX"" : { ""name"" : ""Anywhere"",""ports"":""XXX""}
 }
 ";
 

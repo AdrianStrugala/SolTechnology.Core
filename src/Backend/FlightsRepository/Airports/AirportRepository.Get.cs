@@ -8,31 +8,33 @@ namespace DreamTravel.FlightProviderData.Airports
         public List<Airport> Get()
         {
             List<Airport> result = new List<Airport>();
-            int i = 0;
 
             Dictionary<string, List<string>> countryToCodes = GetCountryToCodesMap();
             Dictionary<string, string> cityToCodes = GetCityToCodeMap();
 
-            foreach (KeyValuePair<string, List<string>> countryToCode in countryToCodes)
-            {
-                result.Add(new Airport
-                {
-                    Id = i,
-                    Name = countryToCode.Key,
-                    Codes = countryToCode.Value
-                });
-                i++;
-            }
 
             foreach (KeyValuePair<string, string> cityToCode in cityToCodes)
             {
                 result.Add(new Airport
                 {
-                    Id = i,
                     Name = cityToCode.Key,
                     Codes = new List<string> { cityToCode.Value }
                 });
-                i++;
+            }
+
+            foreach (KeyValuePair<string, List<string>> countryToCode in countryToCodes)
+            {
+                string name = countryToCode.Key;
+                if (cityToCodes.ContainsKey(name))
+                {
+                    name += " (All Airports)";
+                }
+
+                result.Add(new Airport
+                {
+                    Name = name,
+                    Codes = countryToCode.Value
+                });
             }
 
             return result;
