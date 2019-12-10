@@ -54,10 +54,10 @@
       <br>
       <br>
 
-      <h5>Date of Departure:</h5>
+      <h5>Start travel at soonest:</h5>
 
       <mat-form-field class="example-full-width">
-        <input matInput [matDatepicker]="DepartureDate" [min]="minDepartureDate" placeholder="Date of Departure"
+        <input matInput [matDatepicker]="DepartureDate" [min]="minDepartureDate" placeholder="Soonest start"
           formControlName="departureDate">
         <mat-datepicker-toggle matSuffix [for]="DepartureDate">
         </mat-datepicker-toggle>
@@ -71,10 +71,10 @@
       <br>
       <br>
 
-      <h5>Date of Arrival:</h5>
+      <h5>Return at latest:</h5>
 
       <mat-form-field class="example-full-width">
-        <input matInput [matDatepicker]="ArrivalDate" [min]="minArrivalDate" placeholder="Date of Arrival"
+        <input matInput [matDatepicker]="ArrivalDate" [min]="minArrivalDate" placeholder="Latest return"
           formControlName="arrivalDate">
         <mat-datepicker-toggle matSuffix [for]="ArrivalDate">
         </mat-datepicker-toggle>
@@ -129,7 +129,7 @@
           The number of Minimum days of stay is greater than the length of stay
         </mat-error>
         <mat-error *ngIf="orderForm.hasError('arrivalDate')">
-          Arrival must happend after Departure
+          Return must happend after Start of the travel
         </mat-error>
         <mat-error *ngIf="orderForm.hasError('maxDays')">
           Number of Max days has to be greater or equal Min days
