@@ -30,8 +30,8 @@ namespace DreamTravel.DreamFlights.SendDreamTravelFlightEmail
             (
                 new KeyValuePair<string, List<string>>("Wroclaw", new List<string> { "WRO" }),
                 new KeyValuePair<string, List<string>>("Anywhere", new List<string> { "XXX" }),
-                DateTime.UtcNow.AddMonths(3),
                 DateTime.UtcNow,
+                DateTime.UtcNow.AddMonths(3),
                 2,
                 5
             );
