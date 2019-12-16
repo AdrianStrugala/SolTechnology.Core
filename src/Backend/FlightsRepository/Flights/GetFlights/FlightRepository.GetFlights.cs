@@ -14,15 +14,17 @@ namespace DreamTravel.FlightProviderData.Flights.GetFlights
             DateTime departureDate = order.DepartureDate > DateTime.UtcNow ? order.DepartureDate : DateTime.UtcNow;
 
             string url = $"http://www.azair.eu/azfin.php?searchtype=flexi" +
-                         $"&tp=0&isOneway=return" +
+                         $"&tp=0" + 
+                         $"&isOneway=return" +
                          $"&srcAirport={order.Departures.Key}+{FormattedStringProvider.Airports(order.Departures.Value)}" +
                          "&srcap1=POZ" +
                          "&srcFreeAirport=" +
                          $"&srcTypedText={order.Departures.Key}" +
                          "&srcFreeTypedText=" +
-                         "&srcMC=" +
+                         "&srcMC=" + 
                          $"&dstAirport={order.Arrivals.Key}+{FormattedStringProvider.Airports(order.Arrivals.Value)}" +
-                         "&dstap10=PMI&dstFreeAirport=" +
+                         "&dstap10=PMI" +
+                         "&dstFreeAirport=" +
                          $"&dstTypedText={order.Arrivals.Key}" +
                          "&dstFreeTypedText=" +
                          "&dstMC=" +
@@ -56,7 +58,8 @@ namespace DreamTravel.FlightProviderData.Flights.GetFlights
                          "&minHourInbound=0%3A00" +
                          "&maxHourInbound=24%3A00" +
                          "&autoprice=true" +
-                         "&adults=2&children=0" +
+                         "&adults=2" +
+                         "&children=0" +
                          "&infants=0" +
                          "&maxChng=0" +
                          "&currency=EUR" +
