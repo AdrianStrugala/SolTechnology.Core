@@ -1,18 +1,19 @@
 <mat-list>
     <h4>Your Flight Email Orders:</h4>
-    <mat-list-item *ngFor="let flightEmail of flightEmailOrders">
-        <mat-icon mat-list-icon>airplanemode_on</mat-icon>
-        <h3 mat-line>{{flightEmail.from}} - {{flightEmail.to}}</h3>
-        <br />
-        <p mat-line>
-            {{flightEmail.departureDate|date: "longDate"}} -
-            {{flightEmail.arrivalDate|date: "longDate"}}
-        </p>
-        <br />
-        <p mat-line>
-            {{flightEmail.minDaysOfStay}} to
-            {{flightEmail.maxDaysOfStay}} days.
-        </p>
-    </mat-list-item>
-
+    <div *ngIf="flightEmailOrders$ | async as flightEmailOrders">
+        <mat-list-item *ngFor="let flightEmail of flightEmailOrders">
+            <mat-icon mat-list-icon>airplanemode_on</mat-icon>
+            <h3 mat-line>{{flightEmail.from}} - {{flightEmail.to}}</h3>
+            <br />
+            <p mat-line>
+                {{flightEmail.departureDate|date: "longDate"}} -
+                {{flightEmail.arrivalDate|date: "longDate"}}
+            </p>
+            <br />
+            <p mat-line>
+                {{flightEmail.minDaysOfStay}} to
+                {{flightEmail.maxDaysOfStay}} days.
+            </p>
+        </mat-list-item>
+    </div>
 </mat-list>
