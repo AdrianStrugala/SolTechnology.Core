@@ -1,32 +1,39 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, of } from 'rxjs';
+import { catchError } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root'
 })
-export class FlightOrderListService{
+export class FlightOrderListService {
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
   url = "https://dreamtravelsapi-demo.azurewebsites.net/api/GetFlightEmailOrders/";
 
-  GetFlightEmailOrdersForUser(userId : number): Observable<any> {
+  GetFlightEmailOrdersForUser(userId: number): Observable<IFlightEmailOrder[]> {
 
-  return this.http.get(
+    return this.http.get<IFlightEmailOrder[]>(
       this.url + userId,
       {
-          observe: "body"
-      });
-  } 
+        observe: "body"
+      })
+      .pipe(
+        catchError(err => {
+          console.error(err);
+          return of([] as IFlightEmailOrder[])
+        })
+      );
+  }
 }
 
-export interface IFlightEmailOrder { 
+export interface IFlightEmailOrder {
   userId: number;
   from: string;
   to: string;
   departureDate: Date;
   arrivalDate: Date;
-  minDaysOfStay : number;
-  maxDaysOfStay : number;
+  minDaysOfStay: number;
+  maxDaysOfStay: number;
 }
