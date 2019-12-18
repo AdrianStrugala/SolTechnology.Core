@@ -1,18 +1,14 @@
-<!-- Documentation: https://getbootstrap.com/docs/4.0/components/navbar/ -->
-
-
 <div class="navbar">
-  <nav mat-tab-nav-bar>
-    <a mat-tab-link *ngFor="let link of navLinks" 
-      [routerLink]="link.link" 
-      routerLinkActive #rla="routerLinkActive"
-      [routerLinkActiveOptions]="{exact:true}"
-      [active]="rla.isActive">
-      {{link.label}}
-      {{link.isActive}}
-    </a>
-  </nav>
+    <nav mat-tab-nav-bar>
+      <a mat-tab-link *ngFor="let link of navLinks" [routerLink]="link.link" routerLinkActive #rla="routerLinkActive"
+        [routerLinkActiveOptions]="{exact:true}" [active]="rla.isActive">
+        {{link.label}}
+        {{link.isActive}}
+      </a>
+    </nav>
 
-  <button *ngIf="!userService.isLoggedIn()" type="button" class="btn btn-light" mat-raised-button (click)="openDialog()" >Login</button>
-  <button *ngIf="userService.isLoggedIn()" type="button" class="btn btn-light" mat-raised-button routerLink="/my-account"><i class="fa fa-user fa-lg"></i></button>
+    <button *ngIf="!userService.isLoggedIn()" type="button" class="btn btn-light" mat-raised-button
+      (click)="openDialog()">Login</button>
+    <button *ngIf="userService.isLoggedIn()" type="button" class="btn btn-light" mat-raised-button
+      routerLink="/my-account"><i class="fa fa-user fa-lg"></i></button>
 </div>

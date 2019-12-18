@@ -28,9 +28,6 @@ export class NavbarComponent {
   }
 
   ngOnInit(): void {
-    // this.router.events.subscribe((res) => {
-    //   this.activeLinkIndex = this.navLinks.indexOf(this.navLinks.find(tab => tab.link === '.' + this.router.url));
-    // });
   }
 
   openDialog(): void {
