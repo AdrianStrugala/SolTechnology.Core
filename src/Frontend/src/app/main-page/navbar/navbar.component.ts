@@ -10,32 +10,27 @@ import { Router } from "@angular/router";
   styleUrls: ["./navbar.component.scss"]
 })
 export class NavbarComponent {
-  navLinks: { label: string; link: string; index: number; }[];
-  activeLinkIndex = -1;
+  navLinks: { label: string; link: string;}[];
+
 
 
   constructor(public dialog: MatDialog, public userService: UserService, private router: Router) {
     this.navLinks = [
       {
-          label: 'TabTest1',
-          link: './my-account',
-          index: 0
-      }, {
-          label: 'Tab Test2',
-          link: '',
-          index: 1
-      }, {
-          label: 'Tab Test3',
-          link: './register',
-          index: 2
+        label: 'Dream Flights',
+        link: ''
       },
-  ];
+      {
+        label: 'Register',
+        link: './register'
+      },
+    ];
   }
 
   ngOnInit(): void {
-    this.router.events.subscribe((res) => {
-        this.activeLinkIndex = this.navLinks.indexOf(this.navLinks.find(tab => tab.link === '.' + this.router.url));
-    });
+    // this.router.events.subscribe((res) => {
+    //   this.activeLinkIndex = this.navLinks.indexOf(this.navLinks.find(tab => tab.link === '.' + this.router.url));
+    // });
   }
 
   openDialog(): void {
