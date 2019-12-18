@@ -54,6 +54,7 @@
   </mat-form-field>
 
   <br>
+  <br *ngIf="!this.error && !registerForm.hasError('confirmPassword')">
   <mat-error *ngIf="registerForm.hasError('confirmPassword')">
     Passwords do not match
   </mat-error>
@@ -62,7 +63,11 @@
   </mat-error>
 
   <br>
-  <button type="button" class="btn btn-primary" type="submit" (click)="register()" [disabled]="registerForm.invalid">
+  <div>
+  <button type="button" class="btn btn-primary" type="submit" (click)="register()" [disabled]="registerForm.invalid" *ngIf="!registrationInProgress">
     Register
   </button>
+  <mat-spinner *ngIf="registrationInProgress">
+  </mat-spinner>
+</div>
 </form>

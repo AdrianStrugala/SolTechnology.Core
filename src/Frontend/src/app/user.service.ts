@@ -7,10 +7,9 @@ import { Observable } from 'rxjs';
 })
 export class UserService{
 
-  
   public user : IUser
 
-  constructor(private http: HttpClient) { 
+  constructor(private http: HttpClient) {
     this.user = {} as IUser;
     this.user.id = 0;
 
@@ -29,7 +28,7 @@ export class UserService{
       {
           observe: "body"
       });
-  } 
+  }
 
   register(user: IUser): Observable<any> {
 
@@ -39,7 +38,7 @@ export class UserService{
         {
             observe: "body"
         });
-    } 
+    }
 
   isLoggedIn() : boolean{
     if(this.user.id != 0){
@@ -56,7 +55,7 @@ export class UserService{
   }
 }
 
-export interface IUser { 
+export interface IUser {
   id: number;
   name: string;
   password: string;

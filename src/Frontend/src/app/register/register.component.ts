@@ -1,13 +1,9 @@
 import { Component } from "@angular/core";
-import {
-  FormGroup,
-  FormControl,
-  Validators,
-  ValidatorFn
-} from "@angular/forms";
+import { FormGroup, FormControl, Validators } from "@angular/forms";
 import { UserService, IUser } from "../user.service";
 import { Router } from "@angular/router";
 import { SuccessMessageService } from "../main-page/success-message/success-message.service";
+import { confirmPasswordValidator } from "../shared/validators";
 
 @Component({
   selector: "app-register",
@@ -15,15 +11,6 @@ import { SuccessMessageService } from "../main-page/success-message/success-mess
   styleUrls: ["./register.component.scss"]
 })
 export class RegisterComponent {
-  confirmPasswordValidator: ValidatorFn = (orderForm: FormGroup) => {
-    let password = orderForm.get("password").value;
-    let confirmPassword = orderForm.get("confirmPassword").value;
-
-    if (password != confirmPassword) {
-      return { confirmPassword };
-    }
-    return null;
-  };
 
   registerForm = new FormGroup(
     {
@@ -43,22 +30,25 @@ export class RegisterComponent {
         validators: [Validators.required]
       })
     },
-    [this.confirmPasswordValidator]
+    [confirmPasswordValidator]
   );
 
   error: string;
+  registrationInProgress: boolean;
 
   constructor(
     private userService: UserService,
     private router: Router,
     private successMessageService: SuccessMessageService
-  ) {}
+  ) {
+    this.registrationInProgress = false;
+  }
 
   register() {
+    this.registrationInProgress = true;
     this.error = null;
 
     var user = {} as IUser;
-    console.log(this.registerForm.value);
     user.email = this.registerForm.value.email;
     user.password = this.registerForm.value.password;
     user.name = this.registerForm.value.name;
@@ -69,8 +59,16 @@ export class RegisterComponent {
         this.router.navigate([""]);
       },
       error => {
-        this.error = error.error;
+        console.log(error);
+        if (error.status == 400) {
+          this.error = error.error;
+        } else {
+          this.error =
+            "There was an error during processing your request. Try again later.";
+        }
       }
     );
+
+    this.registrationInProgress = false;
   }
 }
