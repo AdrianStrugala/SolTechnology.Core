@@ -3,3 +3,20 @@ max-width: 1140px !important;
 margin-left: auto;
 margin-right: auto;
 }
+
+.mat-tab-nav-bar{}
+
+.mat-tab-labels, .mat-tab-label, .mat-tab-link {
+    color: white;
+    font-size: 16px;
+
+    background-color:rgb(0, 123, 255);
+    max-width: 1140px !important;
+    margin-left: auto;
+margin-right: auto;
+  }
+  
+//   .mat-tab-group.mat-primary .mat-ink-bar, .mat-tab-nav-bar.mat-primary .mat-ink-bar{
+//     background: white;
+//     height: 5px; 
+//   }
