@@ -1,9 +1,10 @@
-import { Component, Inject } from '@angular/core';
-import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { Component } from '@angular/core';
+import { MatDialogRef } from '@angular/material/dialog';
 import { UserService } from '../../user.service';
-import { FormControl, FormGroup, Validators, FormBuilder } from '@angular/forms';
+import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { IUser } from '../../user.service'
 import { Router } from '@angular/router';
+import { handleError } from '../../shared/error';
 
 
 @Component({
@@ -39,7 +40,7 @@ export class LoginComponent{
       this.dialogRef.close();
       },
       (error) => {
-        this.error = error.error
+        this.error = handleError(error);
       });
     }
 

@@ -21,8 +21,8 @@ export class NavbarComponent {
         link: ''
       },
       {
-        label: 'Register',
-        link: './register'
+        label: 'My Account',
+        link: './my-account'
       },
     ];
   }

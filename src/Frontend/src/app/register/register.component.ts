@@ -4,6 +4,7 @@ import { UserService, IUser } from "../user.service";
 import { Router } from "@angular/router";
 import { SuccessMessageService } from "../main-page/success-message/success-message.service";
 import { confirmPasswordValidator } from "../shared/validators";
+import { handleError } from "../shared/error";
 
 @Component({
   selector: "app-register",
@@ -59,13 +60,7 @@ export class RegisterComponent {
         this.router.navigate([""]);
       },
       error => {
-        console.log(error);
-        if (error.status == 400) {
-          this.error = error.error;
-        } else {
-          this.error =
-            "There was an error during processing your request. Try again later.";
-        }
+        this.error = handleError(error);
       }
     );
 

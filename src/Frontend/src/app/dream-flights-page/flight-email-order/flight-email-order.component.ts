@@ -9,6 +9,7 @@ import { Observable } from 'rxjs';
 import { map, startWith } from 'rxjs/operators';
 import { SuccessMessageService } from '../../main-page/success-message/success-message.service';
 import { Router } from '@angular/router';
+import { handleError } from '../../shared/error';
 
 
 @Component({
@@ -166,7 +167,7 @@ export class FlightEmailOrderComponent implements OnInit {
                     this.router.navigate([""])
                 },
                 error => {
-                    this.error = error.error;
+                    this.error = handleError(error);
                 }
             );
     }
