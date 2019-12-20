@@ -100,18 +100,30 @@ export class FlightEmailOrderComponent implements OnInit {
         return null;
     };
 
-    autocompleteValidator: AsyncValidatorFn = (control: FormControl) => {
+    autocompleteValidatorFrom: AsyncValidatorFn = (control: FormControl) => {
 
         this.orderForm.controls['from'].setErrors(null);
-        
+
         return this.filteredFrom$.pipe(
             map(res => {
-                if(res.length == 0){
-                    this.orderForm.controls['from'].setErrors( {autocomplete: true})
+                if (res.length == 0) {
+                    this.orderForm.controls['from'].setErrors({ autocomplete: true })
                 }
-              }),
-            tap(x => console.log(x)),
-            tap(x => console.log(this.orderForm.controls['from']))
+            }),
+        );
+        return of(null);
+    };
+
+    autocompleteValidatorTo: AsyncValidatorFn = (control: FormControl) => {
+
+        this.orderForm.controls['to'].setErrors(null);
+
+        return this.filteredTo$.pipe(
+            map(res => {
+                if (res.length == 0) {
+                    this.orderForm.controls['to'].setErrors({ autocomplete: true })
+                }
+            }),
         );
         return of(null);
     };
@@ -120,10 +132,11 @@ export class FlightEmailOrderComponent implements OnInit {
         {
             from: new FormControl("", {
                 validators: [Validators.required],
-                 asyncValidators: [this.autocompleteValidator]
+                asyncValidators: [this.autocompleteValidatorFrom]
             }),
             to: new FormControl("", {
-                validators: [Validators.required]
+                validators: [Validators.required],
+                asyncValidators: [this.autocompleteValidatorTo]
             }),
             departureDate: new FormControl(new Date(), {
                 validators: [Validators.required]
