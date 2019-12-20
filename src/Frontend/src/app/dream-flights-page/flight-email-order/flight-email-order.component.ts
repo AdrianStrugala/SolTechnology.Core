@@ -1,29 +1,12 @@
-import { Component, OnInit, Inject } from "@angular/core";
-import {
-    FormControl,
-    FormGroup,
-    Validators,
-    FormBuilder,
-    ValidatorFn,
-    AbstractControl,
-    AsyncValidatorFn,
-    ValidationErrors
-} from "@angular/forms";
+import { Component, OnInit } from "@angular/core";
+import { FormControl, FormGroup, Validators, ValidatorFn, AsyncValidatorFn } from "@angular/forms";
 import { HttpClient } from "@angular/common/http";
-import {
-    MAT_MOMENT_DATE_FORMATS,
-    MomentDateAdapter,
-    MAT_MOMENT_DATE_ADAPTER_OPTIONS
-} from "@angular/material-moment-adapter";
-import {
-    DateAdapter,
-    MAT_DATE_FORMATS,
-    MAT_DATE_LOCALE
-} from "@angular/material/core";
+import { MAT_MOMENT_DATE_FORMATS,MomentDateAdapter,MAT_MOMENT_DATE_ADAPTER_OPTIONS } from "@angular/material-moment-adapter";
+import { DateAdapter,MAT_DATE_FORMATS,MAT_DATE_LOCALE } from "@angular/material/core";
 import { UserService } from "../../user.service";
 import { IAirport, AirportsService } from "./airports.service";
 import { Observable, combineLatest, of } from "rxjs";
-import { map, startWith, switchMap, filter, pluck, tap } from "rxjs/operators";
+import { map, tap } from "rxjs/operators";
 import { SuccessMessageService } from "../../main-page/success-message/success-message.service";
 import { Router } from "@angular/router";
 import { handleError } from "../../shared/error";
