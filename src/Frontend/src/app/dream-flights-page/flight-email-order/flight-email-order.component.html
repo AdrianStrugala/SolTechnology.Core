@@ -14,12 +14,11 @@
     <mat-card-content>
 
       <h5>From:</h5>
-
       <mat-form-field>
         <input type="text" matInput placeholder="From" formControlName="from" [matAutocomplete]="autoFrom">
         <mat-autocomplete #autoFrom="matAutocomplete">
-          <mat-option *ngFor="let option of filteredFrom | async" [value]="option">
-            {{option}}
+          <mat-option *ngFor="let airport of filteredFrom$ | async" [value]="airport.name">
+            {{airport.name}}
           </mat-option>
         </mat-autocomplete>
         <mat-error *ngIf="orderForm.get('from').hasError('required')">
@@ -38,8 +37,8 @@
       <mat-form-field>
         <input type="text" matInput placeholder="To" formControlName="to" [matAutocomplete]="autoTo">
         <mat-autocomplete #autoTo="matAutocomplete">
-          <mat-option *ngFor="let option of filteredTo | async" [value]="option">
-            {{option}}
+          <mat-option *ngFor="let option of filteredTo$ | async" [value]="option.name">
+            {{option.name}}
           </mat-option>
         </mat-autocomplete>
         <mat-error *ngIf="orderForm.get('to').hasError('required')">
