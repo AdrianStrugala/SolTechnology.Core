@@ -100,53 +100,27 @@ export class FlightEmailOrderComponent implements OnInit {
         return null;
     };
 
-    autocompleteValidator2: ValidatorFn = (control: FormControl) => {
-        if (control.value == null || control.value == "") {
-            return null;
-        }
-        this.ariportService.airports$.subscribe(airports => {
+    autocompleteValidator: AsyncValidatorFn = (control: FormControl) => {
 
-            console.log("xd")
-            if (airports.filter(a => a.name.toLowerCase().includes(control.value.toLowerCase())).length == 0) {
-                return { autocomplete: true };
-            }
-            else {
-                return { autocomplete: true };
-            }
-        })
-    };
-
-    autocompleteValidator3: AsyncValidatorFn = (control: FormControl) => {
-        // if (control.value == null || control.value == "") {
-        //     return of(null);
-        // }
-        // return of({ autocomplete: true });
-
-        // this.filteredFrom$.subscribe(
-        //     x => { 
-        //         return of({ autocomplete: true })
-        //     });
-
+        this.orderForm.controls['from'].setErrors(null);
+        
         return this.filteredFrom$.pipe(
-            tap(x => console.log("wow")),
-            // map(x => ( {autocomplete: true} )),
             map(res => {
-                return res.length != 0 ? null : {autocomplete: true}
+                if(res.length == 0){
+                    this.orderForm.controls['from'].setErrors( {autocomplete: true})
+                }
               }),
             tap(x => console.log(x)),
             tap(x => console.log(this.orderForm.controls['from']))
         );
-        // if (this._filter(control.value).length == 0) {
-        //   return { autocomplete: true };
-        // }
         return of(null);
     };
 
     orderForm = new FormGroup(
         {
             from: new FormControl("", {
-                validators: [Validators.required, this.autocompleteValidator2],
-                 asyncValidators: [this.autocompleteValidator3]
+                validators: [Validators.required],
+                 asyncValidators: [this.autocompleteValidator]
             }),
             to: new FormControl("", {
                 validators: [Validators.required]
@@ -177,54 +151,6 @@ export class FlightEmailOrderComponent implements OnInit {
             airports.filter(a => a.name.toLowerCase().includes(from.toLowerCase()))
         )
     );
-
-    usernameValidator(): AsyncValidatorFn {
-        return (control: AbstractControl): Observable<ValidationErrors | null> => {
-            return this.filteredFrom$.pipe(
-                map(airports => {
-                    console.log(airports.length);
-                    if (airports.length == 0) {
-                        return { autocomplete: true };
-                    } else {
-                        return null;
-                    }
-                    // do stuff, and either return error or "of(null)"
-                })
-            );
-        };
-    }
-
-    usernameValidator2(): AsyncValidatorFn {
-        return (control: AbstractControl): Promise<ValidationErrors | null> => {
-            return this.filteredFrom$.toPromise().then(airports => {
-                return airports.length != 0 ? null : { autocomplete: true };
-            });
-        };
-    }
-
-
-
-    UniqueNameValidator(ctrl: AbstractControl) { }
-
-    autocompleteValidator1: ValidatorFn = (control: FormControl) => {
-        if (control.value == null || control.value == "") {
-            return null;
-        }
-        this.filteredFrom$.subscribe(r => {
-            if (r.length == 0) return { autocomplete: true };
-        });
-        // if (this._filter(control.value).length == 0) {
-        //   return { autocomplete: true };
-        // }
-        return null;
-    };
-
-
-
-    //   private _filter(value: string): string[] {
-    //     const filterValue = value.toLowerCase();
-    //     return this.autocomplete.filter(option => option.toLowerCase().includes(filterValue));
-    // }
 
     filteredTo$: Observable<IAirport[]> = combineLatest([
         this.orderForm.get("to").valueChanges,

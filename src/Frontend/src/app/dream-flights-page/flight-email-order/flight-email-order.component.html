@@ -14,17 +14,6 @@
     <mat-card-content>
 
       <h5>From:</h5>
-
-<div *ngIf="orderForm.controls['from'].errors?.autocomplete">
-  dupa
-</div>
-<div *ngIf="orderForm.get('from').errors?.autocomplete">
-  dupa
-</div>
-<div *ngIf="orderForm.get('from').hasError('autocomplete')">
-  dupa
-</div>
-
       <mat-form-field>
         <input type="text" matInput placeholder="From" formControlName="from" [matAutocomplete]="autoFrom">
         <mat-autocomplete #autoFrom="matAutocomplete">
@@ -32,7 +21,6 @@
             {{airport.name}}
           </mat-option>
         </mat-autocomplete>
-        {{orderForm.get('from').hasError('autocomplete')}}
         <mat-error *ngIf="orderForm.get('from').hasError('required')">
           Field is required
         </mat-error>
