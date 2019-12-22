@@ -32,10 +32,8 @@ export class LoginComponent{
 
       this.userService.login()
       .subscribe(
-        (data : IUser) => {        
+        (data : IUser) => {
         this.userService.user = data;
-      
-      localStorage.setItem("user", JSON.stringify(this.userService.user))
 
       this.dialogRef.close();
       },

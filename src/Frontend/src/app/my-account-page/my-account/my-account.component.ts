@@ -10,12 +10,10 @@ import { Router } from '@angular/router';
 })
 export class MyAccountComponent {
 
-  constructor(private userService: UserService, private router: Router) { }
+  constructor(public userService: UserService, private router: Router) { }
 
   logout() {
     this.userService.logout();
-
-    localStorage.removeItem("user");
 
     this.router.navigate([""]);
   }
