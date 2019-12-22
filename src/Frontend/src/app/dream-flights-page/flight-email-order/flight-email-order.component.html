@@ -119,10 +119,13 @@
     </mat-card-content>
 
     <mat-card-actions>
+      <div style="display: inline-block; margin-right: 1rem;">
       <button class="btn btn-primary" type="submit" [disabled]="orderForm.invalid" (click)="onSubmit()"
-        style="display: inline-block; margin-right: 1rem;">
+          *ngIf="!orderInProgress">
         Submit
       </button>
+      <mat-spinner *ngIf="orderInProgress"> </mat-spinner>
+    </div>
       <div style="display: inline-grid;">
         <mat-error *ngIf="orderForm.hasError('minDays')">
           The number of Minimum days of stay is greater than the length of stay
@@ -133,11 +136,15 @@
         <mat-error *ngIf="orderForm.hasError('maxDays')">
           Number of Max days has to be greater or equal Min days
         </mat-error>
+        <mat-error *ngIf="orderForm.hasError('login')">
+          You are not logged in
+        </mat-error>
         <mat-error *ngIf="this.error">
           {{this.error}}
         </mat-error>
       </div>
     </mat-card-actions>
+
   </form>
 
 </mat-card>

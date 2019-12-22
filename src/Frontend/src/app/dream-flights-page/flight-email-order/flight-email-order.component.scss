@@ -10,3 +10,7 @@
 .number-input{
   width: 7em;
 }
+
+:host ::ng-deep .mat-progress-spinner circle, .mat-spinner circle {
+  stroke:  rgb(0, 123, 255);
+}
