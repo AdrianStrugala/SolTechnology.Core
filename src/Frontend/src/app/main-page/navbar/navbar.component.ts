@@ -2,7 +2,6 @@ import { Component } from "@angular/core";
 import { MatDialog } from "@angular/material/dialog";
 import { LoginComponent } from "../login/login.component";
 import { UserService } from "../../user.service";
-import { Router } from "@angular/router";
 
 @Component({
   selector: "navbar",
@@ -10,25 +9,12 @@ import { Router } from "@angular/router";
   styleUrls: ["./navbar.component.scss"]
 })
 export class NavbarComponent {
-  navLinks: { label: string; link: string;}[];
+  constructor(
+    public dialog: MatDialog,
+    public userService: UserService
+  ) {}
 
-
-
-  constructor(public dialog: MatDialog, public userService: UserService, private router: Router) {
-    this.navLinks = [
-      {
-        label: 'Dream Flights',
-        link: ''
-      },
-      {
-        label: 'My Account',
-        link: './my-account'
-      },
-    ];
-  }
-
-  ngOnInit(): void {
-  }
+  ngOnInit(): void {}
 
   openDialog(): void {
     if (this.dialog.openDialogs.length == 0) {

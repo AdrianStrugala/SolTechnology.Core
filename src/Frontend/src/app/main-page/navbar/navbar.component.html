@@ -1,14 +1,57 @@
 <div class="navbar">
-    <nav mat-tab-nav-bar>
-      <a mat-tab-link *ngFor="let link of navLinks" [routerLink]="link.link" routerLinkActive #rla="routerLinkActive"
-        [routerLinkActiveOptions]="{exact:true}" [active]="rla.isActive">
-        {{link.label}}
-        {{link.isActive}}
-      </a>
-    </nav>
+  <nav mat-tab-nav-bar>
+    <a
+      mat-tab-link
+      [routerLink]="''"
+      routerLinkActive
+      #rla="routerLinkActive"
+      [routerLinkActiveOptions]="{ exact: true }"
+      [active]="rla.isActive"
+    >
+      Dream Flights
+    </a>
 
-    <button *ngIf="!userService.isLoggedIn()" type="button" class="btn btn-light" mat-raised-button
-      (click)="openDialog()">Login</button>
-    <button *ngIf="userService.isLoggedIn()" type="button" class="btn btn-light" mat-raised-button
-      routerLink="/my-account"><i class="fa fa-user fa-lg"></i></button>
+    <a
+      mat-tab-link
+      *ngIf="userService.isLoggedIn()"
+      [routerLink]="'my-account'"
+      routerLinkActive
+      #rla="routerLinkActive"
+      [routerLinkActiveOptions]="{ exact: true }"
+      [active]="rla.isActive"
+    >
+      My Account
+    </a>
+
+    <a
+      mat-tab-link
+      *ngIf="!userService.isLoggedIn()"
+      [routerLink]="'register'"
+      routerLinkActive
+      #rla="routerLinkActive"
+      [routerLinkActiveOptions]="{ exact: true }"
+      [active]="rla.isActive"
+    >
+      Register
+    </a>
+  </nav>
+
+  <button
+    *ngIf="!userService.isLoggedIn()"
+    type="button"
+    class="btn btn-light"
+    mat-raised-button
+    (click)="openDialog()"
+  >
+    Login
+  </button>
+  <button
+    *ngIf="userService.isLoggedIn()"
+    type="button"
+    class="btn btn-light"
+    mat-raised-button
+    routerLink="/my-account"
+  >
+    <i class="fa fa-user fa-lg"></i>
+  </button>
 </div>
