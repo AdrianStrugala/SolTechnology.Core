@@ -9,12 +9,7 @@ import { UserService } from "../../user.service";
   styleUrls: ["./navbar.component.scss"]
 })
 export class NavbarComponent {
-  constructor(
-    public dialog: MatDialog,
-    public userService: UserService
-  ) {}
-
-  ngOnInit(): void {}
+  constructor(public dialog: MatDialog, public userService: UserService) {}
 
   openDialog(): void {
     if (this.dialog.openDialogs.length == 0) {

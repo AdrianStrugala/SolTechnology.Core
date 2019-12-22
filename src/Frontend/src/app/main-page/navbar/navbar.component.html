@@ -45,13 +45,14 @@
   >
     Login
   </button>
+
   <button
     *ngIf="userService.isLoggedIn()"
     type="button"
     class="btn btn-light"
     mat-raised-button
-    routerLink="/my-account"
+    (click)="userService.logout()"
   >
-    <i class="fa fa-user fa-lg"></i>
+    Logout
   </button>
 </div>

@@ -57,6 +57,8 @@ export class UserService{
     this.user.id = 0;
 
     localStorage.removeItem("user");
+
+    window.location.reload();
   }
 }
 
