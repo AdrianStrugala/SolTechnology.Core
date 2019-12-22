@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { tap } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root'
@@ -27,7 +28,9 @@ export class UserService{
       this.user,
       {
           observe: "body"
-      });
+      }).pipe(
+        tap(user => localStorage.setItem("user", JSON.stringify(user)))
+      );
   }
 
   register(user: IUser): Observable<any> {
@@ -52,6 +55,8 @@ export class UserService{
   logout() {
     this.user = {} as IUser;
     this.user.id = 0;
+
+    localStorage.removeItem("user");
   }
 }
 
