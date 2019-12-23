@@ -9,5 +9,7 @@ namespace DreamTravel.Domain.FlightEmailOrders
         List<FlightEmailData> GetAll();
 
         List<FlightEmailOrder> GetByUserId(int userId);
+
+        void Delete(int id);
     }
 }

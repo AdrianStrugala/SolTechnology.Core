@@ -1,7 +1,7 @@
 import { Component, ChangeDetectionStrategy } from '@angular/core';
 import { UserService } from '../../user.service';
-import { FlightOrderListService, IFlightEmailOrder } from './flight-order-list.service'
 import { Observable } from 'rxjs';
+import { FlightEmailSubscriptionService, IFlightEmailSubscription } from '../../flight-email-subscription.service';
 
 @Component({
   selector: 'flight-order-list',
@@ -11,8 +11,13 @@ import { Observable } from 'rxjs';
 })
 export class FlightOrderListComponent {
 
-  public flightEmailOrders$: Observable<IFlightEmailOrder[]> = this.flightEmailOrderService.GetFlightEmailOrdersForUser(this.userService.user.id);
+  public flightEmailOrders$: Observable<IFlightEmailSubscription[]> = this.flightEmailSubscriptionService.GetByUserId(this.userService.user.id);
 
-  constructor(private userService: UserService, private flightEmailOrderService: FlightOrderListService) { }
+  constructor(
+    private userService: UserService,
+    private flightEmailSubscriptionService: FlightEmailSubscriptionService) { }
 
+  cancel(id: number){
+    this.flightEmailSubscriptionService.Delete(id);
+  }
 }

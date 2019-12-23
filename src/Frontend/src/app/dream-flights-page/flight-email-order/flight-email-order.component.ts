@@ -1,4 +1,4 @@
-import { Component, OnInit } from "@angular/core";
+import { Component } from "@angular/core";
 import {
   FormControl,
   FormGroup,
@@ -6,7 +6,6 @@ import {
   ValidatorFn,
   AsyncValidatorFn
 } from "@angular/forms";
-import { HttpClient } from "@angular/common/http";
 import {
   MAT_MOMENT_DATE_FORMATS,
   MomentDateAdapter,
@@ -20,10 +19,11 @@ import {
 import { UserService } from "../../user.service";
 import { IAirport, AirportsService } from "./airports.service";
 import { Observable, combineLatest, of } from "rxjs";
-import { map, tap } from "rxjs/operators";
+import { map } from "rxjs/operators";
 import { SuccessMessageService } from "../../main-page/success-message/success-message.service";
 import { Router } from "@angular/router";
 import { handleError } from "../../shared/error";
+import { FlightEmailSubscriptionService } from "../../flight-email-subscription.service";
 
 @Component({
   selector: "flight-email-order",
@@ -47,17 +47,15 @@ import { handleError } from "../../shared/error";
     { provide: MAT_DATE_FORMATS, useValue: MAT_MOMENT_DATE_FORMATS }
   ]
 })
-export class FlightEmailOrderComponent implements OnInit {
+export class FlightEmailOrderComponent {
   airportsSubscription: any;
   constructor(
-    private http: HttpClient,
     private userService: UserService,
     private ariportService: AirportsService,
     private successMessageService: SuccessMessageService,
-    private router: Router
+    private router: Router,
+    private flightEmailSubscriptionService: FlightEmailSubscriptionService
   ) {}
-
-  url = "https://dreamtravelsapi-demo.azurewebsites.net/api/OrderFlightEmail";
 
   orderInProgress = false;
   error: string;
@@ -98,7 +96,7 @@ export class FlightEmailOrderComponent implements OnInit {
     return null;
   };
 
-  loggedInValidator: ValidatorFn = (orderForm: FormGroup) => {
+  loggedInValidator: ValidatorFn = () => {
     if (!this.userService.isLoggedIn()) {
       return { login: true };
     }
@@ -109,7 +107,9 @@ export class FlightEmailOrderComponent implements OnInit {
 
     return this.filteredFrom$.pipe(
       map(res => {
-        let airport = res.filter(a => a.name.toLowerCase() === control.value.toLowerCase())
+        let airport = res.filter(
+          a => a.name.toLowerCase() === control.value.toLowerCase()
+        );
         if (airport.length == 0) {
           this.orderForm.controls["from"].setErrors({ autocomplete: true });
         }
@@ -123,7 +123,9 @@ export class FlightEmailOrderComponent implements OnInit {
 
     return this.filteredTo$.pipe(
       map(res => {
-        let airport = res.filter(a => a.name.toLowerCase() === control.value.toLowerCase())
+        let airport = res.filter(
+          a => a.name.toLowerCase() === control.value.toLowerCase()
+        );
         if (airport.length == 0) {
           this.orderForm.controls["to"].setErrors({ autocomplete: true });
         }
@@ -157,7 +159,12 @@ export class FlightEmailOrderComponent implements OnInit {
       }),
       userId: new FormControl()
     },
-    [this.minDaysValidator, this.arrivalDateValidator, this.maxDaysValidator, this.loggedInValidator]
+    [
+      this.minDaysValidator,
+      this.arrivalDateValidator,
+      this.maxDaysValidator,
+      this.loggedInValidator
+    ]
   );
 
   filteredFrom$: Observable<IAirport[]> = combineLatest([
@@ -175,33 +182,27 @@ export class FlightEmailOrderComponent implements OnInit {
   ]).pipe(
     map(([from, airports]) =>
       airports.filter(a => a.name.toLowerCase().includes(from.toLowerCase()))
-    ),
+    )
   );
 
   minDepartureDate = new Date();
   minArrivalDate = this.orderForm.value.departureDate;
-
-  ngOnInit() {}
 
   onSubmit(): void {
     this.orderInProgress = true;
     this.error = null;
     this.orderForm.value.userId = this.userService.user.id;
 
-    this.http
-      .post(this.url, this.orderForm.value, {
-        observe: "body"
-      })
-      .subscribe(
-        () => {
-          this.successMessageService.set("Order successfully placed!");
-          this.router.navigate([""]);
-        },
-        error => {
-          this.error = handleError(error);
-        }
-      );
+    this.flightEmailSubscriptionService.Insert(this.orderForm.value).subscribe(
+      () => {
+        this.successMessageService.set("Order successfully placed!");
+        this.router.navigate([""]);
+      },
+      error => {
+        this.error = handleError(error);
+      }
+    );
 
-      this.orderInProgress = false;
-    }
+    this.orderInProgress = false;
+  }
 }

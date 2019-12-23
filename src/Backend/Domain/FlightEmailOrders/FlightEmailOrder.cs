@@ -4,6 +4,8 @@ namespace DreamTravel.Domain.FlightEmailOrders
 {
     public class FlightEmailOrder
     {
+        public int Id { get; set; }
+
         public int UserId { get; set; }
 
         public string From { get; set; }
