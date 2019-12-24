@@ -18,6 +18,6 @@ export class FlightOrderListComponent {
     private flightEmailSubscriptionService: FlightEmailSubscriptionService) { }
 
   cancel(id: number){
-    this.flightEmailSubscriptionService.Delete(id);
+    this.flightEmailSubscriptionService.Delete(id).subscribe();
   }
 }

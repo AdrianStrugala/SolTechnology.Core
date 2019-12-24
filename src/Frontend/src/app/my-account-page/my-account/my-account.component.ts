@@ -11,4 +11,8 @@ export class MyAccountComponent {
 
   constructor(public userService: UserService) { }
 
+
+  changePassword(){
+
+  };
 }

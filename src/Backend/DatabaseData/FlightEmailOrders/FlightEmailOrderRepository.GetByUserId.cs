@@ -13,6 +13,7 @@ namespace DreamTravel.DatabaseData.FlightEmailOrders
 
             string sql = @"
 SELECT 
+FlightEmailOrder.[Id],
 FlightEmailOrder.[UserId],
 FlightEmailOrder.[From],
 FlightEmailOrder.[To],
