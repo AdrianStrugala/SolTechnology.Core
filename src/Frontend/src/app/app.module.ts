@@ -18,6 +18,7 @@ import { AuthGuard } from './auth-guard';
 import { AngularFontAwesomeModule } from 'angular-font-awesome';
 
 const routes: Routes = [
+    { path: 'flight-email-subscription', component: FlightEmailOrderComponent },
     { path: 'register', component: RegisterComponent },
     { path: 'my-account', component: MyAccountComponent, canActivate: [AuthGuard] },
     { path: '', component: HomeComponent, pathMatch: 'full' }
