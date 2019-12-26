@@ -1,5 +1,6 @@
 import { Component } from "@angular/core";
 import { CityService, ICity } from "../city.service";
+import { tap } from "rxjs/operators";
 
 @Component({
   selector: "app-cities-panel",
@@ -17,8 +18,24 @@ export class CitiesPanelComponent {
 
     // const xd = [this.someCity];
 
-    // cityService.Cities$.next(xd);
+    // cityService.Cities$.pipe(
+    //   tap(x => x.push(this.someCity))
+    // )
 
     cityService.Cities.push(this.someCity);
+  }
+
+  addCity(){
+    let xd = new ICity();
+    xd.id = 2;
+    xd.name = "Zadupie";
+
+    this.cityService.Cities.push(xd);
+
+    // cityService.Cities$.pipe(
+    //   tap(x => x.push(this.someCity))
+    // )
+
+    console.log("add city")
   }
 }

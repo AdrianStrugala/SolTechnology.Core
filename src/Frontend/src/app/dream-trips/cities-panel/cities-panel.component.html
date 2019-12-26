@@ -13,7 +13,7 @@
     <tbody id="listOfCities" *ngFor = "let city of this.cityService.Cities">
       <tr class="list-group-item cityRow" id={{city.id}}>
         <i class="fa fa-arrows-alt handle" aria-hidden="true"></i>
-        <textarea class="cityText" id= {{city.id}} rows="1"></textarea>
+        <textarea class="cityText" id= {{city.id}} rows="1">{{city.name}}</textarea>
         <i
           class="fa fa-times-circle removeCityBtn"
           id={{city.id}}
@@ -25,7 +25,7 @@
 
   <i
     class="fa fa-plus-circle addCityBtn"
-    onclick="addCity(map)"
+    (click)="addCity()"
     id="addCityBtn"
   ></i>
 
