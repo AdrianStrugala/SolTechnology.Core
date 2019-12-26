@@ -17,6 +17,7 @@ import { SuccessMessageComponent } from  './main-page/success-message/success-me
 import { AuthGuard } from './auth-guard';
 import { AngularFontAwesomeModule } from 'angular-font-awesome';
 import { MapComponent } from './dream-trips/map/map.component';
+import { CitiesPanelComponent } from './dream-trips/cities-panel/cities-panel.component';
 
 const routes: Routes = [
     { path: 'dream-flights', component: FlightEmailOrderComponent },
@@ -37,7 +38,8 @@ const routes: Routes = [
         MyAccountComponent,
         FlightOrderListComponent,
         SuccessMessageComponent,
-        MapComponent
+        MapComponent,
+        CitiesPanelComponent
     ],
     imports: [
         BrowserModule.withServerTransition({ appId: 'ng-cli-universal' }),
