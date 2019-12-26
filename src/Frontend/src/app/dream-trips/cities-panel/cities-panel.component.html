@@ -1,20 +1,43 @@
 <!-- Cities Panel -->
 <div id="listOfCitiesPanel">
+  <h4 class="modal-title" align="center">
+    <label for="optimizeRoad">Optimize road </label
+    ><input type="checkbox" id="optimizeRoad" checked="checked" />
+  </h4>
+  <hr class="delimeter" />
 
-    <h4 class="modal-title" align="center"> <label for="optimizeRoad">Optimize road    </label><input type="checkbox" id="optimizeRoad" checked="checked"></h4>
-    <hr class="delimeter">
+  <h4 class="modal-title" align="center">List of cities:</h4>
+  <br />
 
-    <h4 class="modal-title" align="center"> List of cities:</h4>
-    <br />
+  <table>
+    <tbody id="listOfCities" *ngFor = "let city of this.cityService.Cities">
+      <tr class="list-group-item cityRow" id={{city.id}}>
+        <i class="fa fa-arrows-alt handle" aria-hidden="true"></i>
+        <textarea class="cityText" id= {{city.id}} rows="1"></textarea>
+        <i
+          class="fa fa-times-circle removeCityBtn"
+          id={{city.id}}
+          aria-hidden="true"
+        ></i>
+      </tr>
+    </tbody>
+  </table>
 
-    <table>
-        <tbody id="listOfCities"></tbody>
-    </table>
+  <i
+    class="fa fa-plus-circle addCityBtn"
+    onclick="addCity(map)"
+    id="addCityBtn"
+  ></i>
 
-    <i class="fas fa-plus-circle addCityBtn" onclick="addCity(map)" id="addCityBtn"></i>
-
-    <footer class="modal-footer">
-        <button type="button" class="btn btn-info" disabled="disabled" onclick="runTSP(map)" id="runTSPBtn">Apply</button>
-    </footer>
-
+  <footer class="modal-footer">
+    <button
+      type="button"
+      class="btn btn-info"
+      disabled="disabled"
+      onclick="runTSP(map)"
+      id="runTSPBtn"
+    >
+      Apply
+    </button>
+  </footer>
 </div>

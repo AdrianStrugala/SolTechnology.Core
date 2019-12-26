@@ -3,12 +3,11 @@
   width: 16rem;
   position: fixed;
   z-index: 1;
-  top: 0;
   left: 0;
   background-color: white;
   overflow-x: hidden;
   border-style: solid;
-  border-color: #2FA4E7;
+  border-color: rgba(0, 123, 255, 0.9);
   border-width: 0.3rem;
   border-radius: 0.6rem;
 }
@@ -69,7 +68,7 @@ label {
   margin-top: 0.2rem;
   margin-left: 0.5rem;
   margin-right: 0.4rem;
-  width: 11rem;
+  width: 11.3rem;
   resize: none;
   overflow: hidden;
   height: inherit;

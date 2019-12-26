@@ -1,15 +1,14 @@
-<app-success-message [success]="this.successMessageService.get()"></app-success-message>
+<div class="container">
+  <app-success-message
+    [success]="this.successMessageService.get()"
+  ></app-success-message>
 
-<h2 style="text-align: center;">Welcome Traveller!</h2>
+  <h2 style="text-align: center;">Welcome Traveller!</h2>
 
-Ready for your next journey?
+  Ready for your next journey?
 
-
-<br>
-<button
-type="button"
-mat-raised-button
-routerLink="/dream-flights"
->
-Dream Flights
-</button>
+  <br />
+  <button type="button" mat-raised-button routerLink="/dream-flights">
+    Dream Flights
+  </button>
+</div>

@@ -1,5 +1,4 @@
-import { Component, AfterViewInit, ViewChild, ElementRef } from
-'@angular/core';
+import { Component, AfterViewInit, ViewChild, ElementRef } from '@angular/core';
 
 @Component({
   selector: "app-map",
@@ -9,7 +8,6 @@ import { Component, AfterViewInit, ViewChild, ElementRef } from
 
 
 export class MapComponent implements AfterViewInit {
-
 
   @ViewChild('mapContainer', {static: false}) gmap: ElementRef;
 
