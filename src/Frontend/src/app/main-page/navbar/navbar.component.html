@@ -2,7 +2,18 @@
   <nav mat-tab-nav-bar>
     <a
       mat-tab-link
-      [routerLink]="'flight-email-subscription'"
+      [routerLink]="'dream-trips'"
+      routerLinkActive
+      #rla="routerLinkActive"
+      [routerLinkActiveOptions]="{ exact: true }"
+      [active]="rla.isActive"
+    >
+      Dream Trips
+    </a>
+
+    <a
+      mat-tab-link
+      [routerLink]="'dream-flights'"
       routerLinkActive
       #rla="routerLinkActive"
       [routerLinkActiveOptions]="{ exact: true }"

@@ -26,6 +26,7 @@
     "@angular/platform-server": "^8.2.14",
     "@angular/router": "8.2.9",
     "@nguniversal/module-map-ngfactory-loader": "^5.0.0-beta.5",
+    "@types/googlemaps": "^3.39.0",
     "angular-font-awesome": "^3.1.2",
     "angular-in-memory-web-api": "0.5.4",
     "aspnet-prerendering": "^3.0.1",

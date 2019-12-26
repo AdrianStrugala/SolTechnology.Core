@@ -17,7 +17,7 @@ import {
   MAT_DATE_LOCALE
 } from "@angular/material/core";
 import { UserService } from "../../user.service";
-import { IAirport, AirportsService } from "./airports.service";
+import { IAirport, AirportsService } from "../airports.service";
 import { Observable, combineLatest, of } from "rxjs";
 import { map } from "rxjs/operators";
 import { SuccessMessageService } from "../../main-page/success-message/success-message.service";

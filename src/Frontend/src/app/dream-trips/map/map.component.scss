@@ -1,0 +1,17 @@
+.container {
+  float: left;
+  height: 100vh;
+  margin: 0;
+  padding: 0;
+  background-color: #2FA4E7;
+}
+/* Always set the map height explicitly to define the size of the div
+      * element that contains the map. */
+#map {
+  float: left;
+  vertical-align: top;
+  height: calc(100vh - 4.1rem);
+  width: calc(100vw - 16rem);
+  margin-left: 16rem;
+  padding: 0;
+}

@@ -1,21 +1,29 @@
-<mat-list>
+<div class="container">
+  <mat-list>
     <h4>Your Flight Email Orders:</h4>
     <div *ngIf="flightEmailOrders$ | async as flightEmailOrders">
-        <mat-list-item *ngFor="let flightEmail of flightEmailOrders">
-            <mat-icon mat-list-icon>airplanemode_on</mat-icon>
-            <h3 mat-line>{{flightEmail.from}} - {{flightEmail.to}}</h3>
-            <br />
-            <p mat-line>
-                {{flightEmail.departureDate|date: "longDate"}} -
-                {{flightEmail.arrivalDate|date: "longDate"}}
-            </p>
-            <br />
-            <p mat-line>
-                {{flightEmail.minDaysOfStay}} to
-                {{flightEmail.maxDaysOfStay}} days.
-            </p>
+      <mat-list-item *ngFor="let flightEmail of flightEmailOrders">
+        <mat-icon mat-list-icon>airplanemode_on</mat-icon>
+        <h3 mat-line>{{ flightEmail.from }} - {{ flightEmail.to }}</h3>
+        <br />
+        <p mat-line>
+          {{ flightEmail.departureDate | date: "longDate" }} -
+          {{ flightEmail.arrivalDate | date: "longDate" }}
+        </p>
+        <br />
+        <p mat-line>
+          {{ flightEmail.minDaysOfStay }} to
+          {{ flightEmail.maxDaysOfStay }} days.
+        </p>
 
-            <button type="button" class="btn btn-danger header cancel-btn" (click)="cancel(flightEmail.id)">Cancel</button>
-        </mat-list-item>
+        <button
+          type="button"
+          class="btn btn-danger header cancel-btn"
+          (click)="cancel(flightEmail.id)"
+        >
+          Cancel
+        </button>
+      </mat-list-item>
     </div>
-</mat-list>
+  </mat-list>
+</div>

@@ -16,9 +16,11 @@ import { FlightOrderListComponent } from './my-account-page/flight-order-list/fl
 import { SuccessMessageComponent } from  './main-page/success-message/success-message.component';
 import { AuthGuard } from './auth-guard';
 import { AngularFontAwesomeModule } from 'angular-font-awesome';
+import { MapComponent } from './dream-trips/map/map.component';
 
 const routes: Routes = [
-    { path: 'flight-email-subscription', component: FlightEmailOrderComponent },
+    { path: 'dream-flights', component: FlightEmailOrderComponent },
+    { path: 'dream-trips', component: MapComponent },
     { path: 'register', component: RegisterComponent },
     { path: 'my-account', component: MyAccountComponent, canActivate: [AuthGuard] },
     { path: '', component: HomeComponent, pathMatch: 'full' }
@@ -34,7 +36,8 @@ const routes: Routes = [
         RegisterComponent,
         MyAccountComponent,
         FlightOrderListComponent,
-        SuccessMessageComponent
+        SuccessMessageComponent,
+        MapComponent
     ],
     imports: [
         BrowserModule.withServerTransition({ appId: 'ng-cli-universal' }),
