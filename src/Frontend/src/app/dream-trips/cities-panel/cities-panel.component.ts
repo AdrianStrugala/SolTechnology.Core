@@ -1,6 +1,13 @@
 import { Component } from "@angular/core";
 import { CityService, ICity } from "../city.service";
 import { tap } from "rxjs/operators";
+import { HttpClient, HttpHeaders } from "@angular/common/http";
+import {
+  FormGroup,
+  FormControl,
+  Validators,
+  AbstractControl
+} from "@angular/forms";
 
 @Component({
   selector: "app-cities-panel",
@@ -8,34 +15,39 @@ import { tap } from "rxjs/operators";
   styleUrls: ["./cities-panel.component.scss"]
 })
 export class CitiesPanelComponent {
-  someCity: ICity;
-  dupa: ICity[];
 
-  constructor(public cityService: CityService) {
-    this.someCity = new ICity;
-    this.someCity.id = 0;
-    this.someCity.name = "Wroclaw";
+  citiesForm = new FormGroup({
+    0: new FormControl("")
+  });
 
-    // const xd = [this.someCity];
+  contorls = Object.keys(this.citiesForm.controls);
 
-    // cityService.Cities$.pipe(
-    //   tap(x => x.push(this.someCity))
-    // )
-
-    cityService.Cities.push(this.someCity);
+  constructor(public cityService: CityService, private http: HttpClient) {
   }
 
-  addCity(){
-    let xd = new ICity();
-    xd.id = 2;
-    xd.name = "Zadupie";
+  addCity() {
+    this.citiesForm.addControl(this.cityService.NumberOfCities.toString(), new FormControl());
+    this.contorls = Object.keys(this.citiesForm.controls);
 
-    this.cityService.Cities.push(xd);
+    this.cityService.NumberOfCities++;
+  }
 
-    // cityService.Cities$.pipe(
-    //   tap(x => x.push(this.someCity))
-    // )
+  findAndDisplayCity(index) {
+    let data = {
+      name: this.citiesForm.controls[index].value,
+      sessionId: 123
+    };
 
-    console.log("add city")
+    this.http
+      .post<ICity>("http://localhost:53725/api/FindLocationOfCity", data, {
+        observe: "body"
+      })
+      .subscribe(city => {
+        console.log(city),
+          console.log(this.citiesForm),
+          this.cityService.Cities.push(city),
+          console.log(this.cityService.Cities),
+          this.addCity();
+      });
   }
 }
