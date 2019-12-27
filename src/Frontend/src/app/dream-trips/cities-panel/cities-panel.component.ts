@@ -8,6 +8,7 @@ import {
   Validators,
   AbstractControl
 } from "@angular/forms";
+import { MarkerService, IMarker } from "../marker.service";
 
 @Component({
   selector: "app-cities-panel",
@@ -15,18 +16,23 @@ import {
   styleUrls: ["./cities-panel.component.scss"]
 })
 export class CitiesPanelComponent {
-
   citiesForm = new FormGroup({
     0: new FormControl("")
   });
 
   contorls = Object.keys(this.citiesForm.controls);
 
-  constructor(public cityService: CityService, private http: HttpClient) {
-  }
+  constructor(
+    public cityService: CityService,
+    private http: HttpClient,
+    private markerService: MarkerService
+  ) {}
 
   addCity() {
-    this.citiesForm.addControl(this.cityService.NumberOfCities.toString(), new FormControl());
+    this.citiesForm.addControl(
+      this.cityService.NumberOfCities.toString(),
+      new FormControl()
+    );
     this.contorls = Object.keys(this.citiesForm.controls);
 
     this.cityService.NumberOfCities++;
@@ -48,6 +54,14 @@ export class CitiesPanelComponent {
           this.cityService.Cities.push(city),
           console.log(this.cityService.Cities),
           this.addCity();
+
+        this.markerService.markers.push({
+          label: "✓",
+          latitude: city.Latitude,
+          longitude: city.Longitude
+        } as IMarker);
+
+        this.markerService.updated$.next(true);
       });
   }
 }

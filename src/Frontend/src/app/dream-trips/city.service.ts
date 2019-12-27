@@ -11,8 +11,8 @@ export class CityService {
 }
 
 export class ICity {
-  id: number;
-  name: string;
-  latitude: string;
-  longitude: string;
+  Id: number;
+  Name: string;
+  Latitude: string;
+  Longitude: string;
 }
