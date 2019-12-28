@@ -34,8 +34,7 @@ namespace DreamTravel.Api.DreamTrips
 
                 City city = await _findLocationOfCity.Execute(request.Name);
 
-                string message = JsonConvert.SerializeObject(city);
-                return Ok(message);
+                return Ok(city);
             }
 
             catch (Exception ex)

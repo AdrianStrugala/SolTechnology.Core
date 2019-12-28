@@ -8,6 +8,7 @@ import {
 import { CityService, ICity } from "../city.service";
 import { HttpClient } from "@angular/common/http";
 import { FormGroup, FormControl } from "@angular/forms";
+import { MarkerService } from "../marker.service";
 
 @Component({
   selector: "app-cities-panel",
@@ -23,7 +24,7 @@ export class CitiesPanelComponent implements AfterViewInit {
 
   contorls = Object.keys(this.citiesForm.controls);
 
-  constructor(public cityService: CityService, private http: HttpClient) {}
+  constructor(public cityService: CityService, private http: HttpClient, private markerService: MarkerService) {}
 
   ngAfterViewInit(): void {
     //Focus on the last row in Cities Panel
@@ -69,11 +70,18 @@ export class CitiesPanelComponent implements AfterViewInit {
     };
 
     this.http
-      .post<ICity>("http://localhost:53725/api/CalculateBestPath", data, {
+      .post<any[]>("http://localhost:53725/api/CalculateBestPath", data, {
         observe: "body"
       })
-      .subscribe(x => {
-        console.log(x);
+      .subscribe(pathList => {
+
+        var noOfPaths = pathList.length;
+
+        for (let i = 0; i < noOfPaths; i++) {
+          this.markerService.updateCity(i, pathList[i].startingCity);
+          // this.cityService.Cities[i] = pathList[i].StartingCity
+        }
+        this.markerService.updateCity(noOfPaths, pathList[noOfPaths - 1].endingCity);
       });
 
     // $.ajax({

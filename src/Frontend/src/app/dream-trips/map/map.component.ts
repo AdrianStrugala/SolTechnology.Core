@@ -16,9 +16,9 @@ import { CityService } from "../city.service";
 export class MapComponent implements AfterViewInit, OnInit {
   ngOnInit(): void {
     this.cityService.updated$.subscribe(x => {
-      this.cityService.Cities.forEach(city =>
-        this.markerService.displayMarker(city, "✓")
-      );
+
+        this.markerService.displayMarker(this.cityService.Cities[this.cityService.CityIndex-1], "✓")
+
     });
   }
 

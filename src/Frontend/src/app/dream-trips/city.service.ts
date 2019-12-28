@@ -12,9 +12,9 @@ export class CityService {
   constructor() {}
 }
 
-export class ICity {
-  Id: number;
-  Name: string;
-  Latitude: string;
-  Longitude: string;
+export interface ICity {
+  id: number;
+  name: string;
+  latitude: string;
+  longitude: string;
 }
