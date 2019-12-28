@@ -6,7 +6,7 @@ import { BehaviorSubject } from "rxjs";
 })
 export class CityService {
   public Cities: ICity[] = [];
-  public CityIndex: number = 0;
+  public CityIndex: number = 1;
   updated$ =  new BehaviorSubject<boolean>(false);
 
   constructor() {}

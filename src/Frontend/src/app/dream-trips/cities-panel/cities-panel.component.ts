@@ -1,14 +1,13 @@
-import { Component, ViewChildren, QueryList, ElementRef, ViewChild, AfterViewInit } from "@angular/core";
-import { CityService, ICity } from "../city.service";
-import { tap } from "rxjs/operators";
-import { HttpClient, HttpHeaders } from "@angular/common/http";
 import {
-  FormGroup,
-  FormControl,
-  Validators,
-  AbstractControl
-} from "@angular/forms";
-import { MarkerService } from "../marker.service";
+  Component,
+  ViewChildren,
+  QueryList,
+  ElementRef,
+  AfterViewInit
+} from "@angular/core";
+import { CityService, ICity } from "../city.service";
+import { HttpClient } from "@angular/common/http";
+import { FormGroup, FormControl } from "@angular/forms";
 
 @Component({
   selector: "app-cities-panel",
@@ -16,23 +15,23 @@ import { MarkerService } from "../marker.service";
   styleUrls: ["./cities-panel.component.scss"]
 })
 export class CitiesPanelComponent implements AfterViewInit {
-  ngAfterViewInit(): void {
-    this.addCity();
 
-    console.log(this.cityRows);
-  }
+  @ViewChildren("cityRows") cityRows: QueryList<ElementRef>;
 
-  // @ViewChild('cityRows', {static: false}) cityRows: ElementRef;
-  @ViewChildren('cityRows') cityRows: ElementRef;
-
-  citiesForm = new FormGroup({});
+  citiesForm = new FormGroup({
+    0: new FormControl("")
+  });
 
   contorls = Object.keys(this.citiesForm.controls);
 
-  constructor(
-    public cityService: CityService,
-    private http: HttpClient
-  ) {}
+  constructor(public cityService: CityService, private http: HttpClient) {}
+
+  ngAfterViewInit(): void {
+    //Focus on the last row in Cities Panel
+    this.cityRows.changes.subscribe(() => {
+      this.cityRows.last.nativeElement.children[0].children[1].focus();
+    });
+  }
 
   addCity() {
     this.citiesForm.addControl(
@@ -42,9 +41,6 @@ export class CitiesPanelComponent implements AfterViewInit {
     this.contorls = Object.keys(this.citiesForm.controls);
 
     this.cityService.CityIndex++;
-
-    console.log(this.cityRows);
-    // this.cityRows.last.nativeElement.focus();
   }
 
   findAndDisplayCity(index) {
