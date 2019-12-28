@@ -1,11 +1,13 @@
 import { Injectable } from "@angular/core";
+import { BehaviorSubject } from "rxjs";
 
 @Injectable({
   providedIn: "root"
 })
 export class CityService {
   public Cities: ICity[] = [];
-  public NumberOfCities: number = 0;
+  public CityIndex: number = 0;
+  updated$ =  new BehaviorSubject<boolean>(false);
 
   constructor() {}
 }

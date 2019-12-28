@@ -11,13 +11,14 @@
     <br />
 
     <table>
-      <tbody id="listOfCities" *ngFor="let index of contorls">
+      <tbody id="listOfCities" #cityRows *ngFor="let index of contorls">
         <tr class="list-group-item cityRow">
           <i class="fa fa-arrows-alt handle" aria-hidden="true"></i>
           <input
             type="text"
             class="cityText"
             formControlName="{{ index }}"
+            (keyup.enter)="addCity()"
             (change)="findAndDisplayCity(index)"
           />
           <i class="fa fa-times-circle removeCityBtn" aria-hidden="true"></i>

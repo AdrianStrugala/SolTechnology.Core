@@ -1,4 +1,4 @@
-import { Component } from "@angular/core";
+import { Component, ViewChildren, QueryList, ElementRef, ViewChild, AfterViewInit } from "@angular/core";
 import { CityService, ICity } from "../city.service";
 import { tap } from "rxjs/operators";
 import { HttpClient, HttpHeaders } from "@angular/common/http";
@@ -8,34 +8,43 @@ import {
   Validators,
   AbstractControl
 } from "@angular/forms";
-import { MarkerService, IMarker } from "../marker.service";
+import { MarkerService } from "../marker.service";
 
 @Component({
   selector: "app-cities-panel",
   templateUrl: "./cities-panel.component.html",
   styleUrls: ["./cities-panel.component.scss"]
 })
-export class CitiesPanelComponent {
-  citiesForm = new FormGroup({
-    0: new FormControl("")
-  });
+export class CitiesPanelComponent implements AfterViewInit {
+  ngAfterViewInit(): void {
+    this.addCity();
+
+    console.log(this.cityRows);
+  }
+
+  // @ViewChild('cityRows', {static: false}) cityRows: ElementRef;
+  @ViewChildren('cityRows') cityRows: ElementRef;
+
+  citiesForm = new FormGroup({});
 
   contorls = Object.keys(this.citiesForm.controls);
 
   constructor(
     public cityService: CityService,
-    private http: HttpClient,
-    private markerService: MarkerService
+    private http: HttpClient
   ) {}
 
   addCity() {
     this.citiesForm.addControl(
-      this.cityService.NumberOfCities.toString(),
+      this.cityService.CityIndex.toString(),
       new FormControl()
     );
     this.contorls = Object.keys(this.citiesForm.controls);
 
-    this.cityService.NumberOfCities++;
+    this.cityService.CityIndex++;
+
+    console.log(this.cityRows);
+    // this.cityRows.last.nativeElement.focus();
   }
 
   findAndDisplayCity(index) {
@@ -44,24 +53,17 @@ export class CitiesPanelComponent {
       sessionId: 123
     };
 
+    if (this.contorls.length + 1 <= this.cityService.Cities.length) {
+      this.addCity();
+    }
+
     this.http
       .post<ICity>("http://localhost:53725/api/FindLocationOfCity", data, {
         observe: "body"
       })
       .subscribe(city => {
-        console.log(city),
-          console.log(this.citiesForm),
-          this.cityService.Cities.push(city),
-          console.log(this.cityService.Cities),
-          this.addCity();
-
-        this.markerService.markers.push({
-          label: "✓",
-          latitude: city.Latitude,
-          longitude: city.Longitude
-        } as IMarker);
-
-        this.markerService.updated$.next(true);
+        this.cityService.Cities.push(city),
+          this.cityService.updated$.next(true);
       });
   }
 }

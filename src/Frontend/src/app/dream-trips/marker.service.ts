@@ -8,14 +8,8 @@ import { publishReplay, map, refCount } from "rxjs/operators";
 })
 export class MarkerService {
 
-  markers: IMarker[] = [];
-  updated$ =  new BehaviorSubject<boolean>(false);
+  markers: any[] = [];
 
   constructor() {}
 }
 
-export interface IMarker {
-  label: string;
-  latitude: string;
-  longitude: string;
-}

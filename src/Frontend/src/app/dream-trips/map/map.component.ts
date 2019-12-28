@@ -6,6 +6,7 @@ import {
   OnInit
 } from "@angular/core";
 import { MarkerService } from "../marker.service";
+import { CityService } from "../city.service";
 
 @Component({
   selector: "app-map",
@@ -15,23 +16,24 @@ import { MarkerService } from "../marker.service";
 export class MapComponent implements AfterViewInit, OnInit {
   ngOnInit(): void {
 
-    this.markerService.updated$.subscribe(x => {
-      this.markerService.markers.forEach(marker => {
-        let x = new google.maps.Marker({
+    this.cityService.updated$.subscribe(x => {
+     this.cityService.Cities.forEach(city => {
+        let marker = new google.maps.Marker({
           position: {
-            lat: marker.latitude,
-            lng: marker.longitude
+            lat: city.Latitude,
+            lng: city.Longitude
           },
           map: this.map,
           draggable: true,
           label: {
-            text: marker.label.toString(),
+            text: "✓",
             color: "white",
             fontWeight: "bold"
           }
         } as any);
 
-        this.map.setCenter(x.getPosition());
+        this.markerService.markers.push(marker)
+        this.map.setCenter(marker.getPosition());
       });
     });
   }
@@ -45,7 +47,7 @@ export class MapComponent implements AfterViewInit, OnInit {
     zoom: 4
   };
 
-  constructor(private markerService: MarkerService) {}
+  constructor(private markerService: MarkerService, private cityService: CityService) {}
 
   ngAfterViewInit(): void {
     this.map = new google.maps.Map(this.gmap.nativeElement, this.mapOptions);
