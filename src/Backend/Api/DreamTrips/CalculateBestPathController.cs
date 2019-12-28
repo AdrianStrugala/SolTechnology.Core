@@ -28,18 +28,16 @@ namespace DreamTravel.Api.DreamTrips
 
 
         [HttpPost]
-        public async Task<IActionResult> CalculateBestPath(Query query)
+        public async Task<IActionResult> CalculateBestPath([FromBody]Query query)
         {
             try
             {
                 _logger.LogInformation("TSP Engine: Fire!");
                 Result result = await _calculateBestPath.Execute(query.Cities, query.OptimizePath);
 
+//                HttpContext.Session.SetString(query.SessionId + PathsKeyName, JsonConvert.SerializeObject(result.BestPaths));
 
-                HttpContext.Session.SetString(query.SessionId + PathsKeyName, JsonConvert.SerializeObject(result.BestPaths));
-
-                string message = JsonConvert.SerializeObject(result.BestPaths);
-                return Ok(message);
+                return Ok(result.BestPaths);
             }
 
             catch (Exception ex)

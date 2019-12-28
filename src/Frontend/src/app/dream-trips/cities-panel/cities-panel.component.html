@@ -18,7 +18,7 @@
             type="text"
             class="cityText"
             formControlName="{{ index }}"
-            (keyup.enter)="addCity()"
+            (keyup.enter)="addCityRow()"
             (change)="findAndDisplayCity(index)"
           />
           <i class="fa fa-times-circle removeCityBtn" aria-hidden="true"></i>
@@ -28,7 +28,7 @@
 
     <i
       class="fa fa-plus-circle addCityBtn"
-      (click)="addCity()"
+      (click)="addCityRow()"
       id="addCityBtn"
     ></i>
 
@@ -36,8 +36,7 @@
       <button
         type="button"
         class="btn btn-info"
-        disabled="disabled"
-        onclick="runTSP(map)"
+        (click)="runTSP()"
         id="runTSPBtn"
       >
         Apply

@@ -15,7 +15,6 @@ import { FormGroup, FormControl } from "@angular/forms";
   styleUrls: ["./cities-panel.component.scss"]
 })
 export class CitiesPanelComponent implements AfterViewInit {
-
   @ViewChildren("cityRows") cityRows: QueryList<ElementRef>;
 
   citiesForm = new FormGroup({
@@ -33,7 +32,7 @@ export class CitiesPanelComponent implements AfterViewInit {
     });
   }
 
-  addCity() {
+  addCityRow() {
     this.citiesForm.addControl(
       this.cityService.CityIndex.toString(),
       new FormControl()
@@ -50,7 +49,7 @@ export class CitiesPanelComponent implements AfterViewInit {
     };
 
     if (this.contorls.length + 1 <= this.cityService.Cities.length) {
-      this.addCity();
+      this.addCityRow();
     }
 
     this.http
@@ -61,5 +60,48 @@ export class CitiesPanelComponent implements AfterViewInit {
         this.cityService.Cities.push(city),
           this.cityService.updated$.next(true);
       });
+  }
+
+  runTSP() {
+    let data = {
+      cities: this.cityService.Cities,
+      sessionId: 123
+    };
+
+    this.http
+      .post<ICity>("http://localhost:53725/api/CalculateBestPath", data, {
+        observe: "body"
+      })
+      .subscribe(x => {
+        console.log(x);
+      });
+
+    // $.ajax({
+    //   type: "POST",
+    //   dataType: "html",
+    //   url: window.location + "api/CalculateBestPath",
+    //   headers: {
+    //     Authorization: "DreamAuthentication U29sVWJlckFsbGVz"
+    //   },
+    //   data: {
+    //     cities: cities,
+    //     sessionId: sessionId,
+    //     optimizePath: optimizeRoadChck
+    //   },
+    //   success(msg) {
+    //     var pathList = JSON.parse(msg);
+    //     displayPage(pathList, map);
+
+    //     $("#pathsSummaryBtn")[0].style.display = "initial";
+    //     $("#costLimiBtn")[0].style.display = "initial";
+    //     $("#loader")[0].style.display = "none";
+    //   },
+
+    //   error(req, status, errorObj) {
+    //     $("#loader")[0].style.display = "none";
+    //     var alertMessage = JSON.parse(req.responseText);
+    //     alert(alertMessage);
+    //   }
+    // });
   }
 }

@@ -15,41 +15,29 @@ import { CityService } from "../city.service";
 })
 export class MapComponent implements AfterViewInit, OnInit {
   ngOnInit(): void {
-
     this.cityService.updated$.subscribe(x => {
-     this.cityService.Cities.forEach(city => {
-        let marker = new google.maps.Marker({
-          position: {
-            lat: city.Latitude,
-            lng: city.Longitude
-          },
-          map: this.map,
-          draggable: true,
-          label: {
-            text: "✓",
-            color: "white",
-            fontWeight: "bold"
-          }
-        } as any);
-
-        this.markerService.markers.push(marker)
-        this.map.setCenter(marker.getPosition());
-      });
+      this.cityService.Cities.forEach(city =>
+        this.markerService.displayMarker(city, "✓")
+      );
     });
   }
 
   @ViewChild("mapContainer", { static: false }) gmap: ElementRef;
-
-  map: google.maps.Map;
 
   mapOptions: google.maps.MapOptions = {
     center: { lat: 0, lng: 0 },
     zoom: 4
   };
 
-  constructor(private markerService: MarkerService, private cityService: CityService) {}
+  constructor(
+    private markerService: MarkerService,
+    private cityService: CityService
+  ) {}
 
   ngAfterViewInit(): void {
-    this.map = new google.maps.Map(this.gmap.nativeElement, this.mapOptions);
+    this.markerService.map = new google.maps.Map(
+      this.gmap.nativeElement,
+      this.mapOptions
+    );
   }
 }
