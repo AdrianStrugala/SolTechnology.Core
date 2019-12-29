@@ -5,8 +5,6 @@ import { ICity, CityService } from "./city.service";
   providedIn: "root"
 })
 export class DisplayService {
-
-
   map: google.maps.Map;
 
   constructor() {}
@@ -30,6 +28,4 @@ export class DisplayService {
 
     return marker;
   }
-
-
 }

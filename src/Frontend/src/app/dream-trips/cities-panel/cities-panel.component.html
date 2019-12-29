@@ -21,7 +21,7 @@
             type="text"
             class="cityText"
             formControlName="{{ index }}"
-            (keyup.enter)="addCityRow()"
+            (keyup.enter)="addCity()"
             (change)="findAndDisplayCity(index)"
           />
           <i class="fa fa-times-circle removeCityBtn" aria-hidden="true"></i>
@@ -31,7 +31,7 @@
 
     <i
       class="fa fa-plus-circle addCityBtn"
-      (click)="addCityRow()"
+      (click)="addCity()"
       id="addCityBtn"
     ></i>
 

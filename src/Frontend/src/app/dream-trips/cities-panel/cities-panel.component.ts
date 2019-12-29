@@ -35,12 +35,15 @@ export class CitiesPanelComponent implements AfterViewInit {
     });
   }
 
-  addCityRow() {
+  addCity() {
     this.citiesForm.addControl(
       this.cityService.CityIndex.toString(),
       new FormControl()
     );
     this.contorls = Object.keys(this.citiesForm.controls);
+
+    this.cityService.cities.push(null);
+    this.cityService.markers.push(null);
 
     this.cityService.CityIndex++;
   }
@@ -51,8 +54,8 @@ export class CitiesPanelComponent implements AfterViewInit {
       sessionId: 123
     };
 
-    if (this.contorls.length + 1 <= this.cityService.Cities.length) {
-      this.addCityRow();
+    if (this.contorls.length + 1 <= this.cityService.cities.length) {
+      this.addCity();
     }
 
     this.http
@@ -60,7 +63,7 @@ export class CitiesPanelComponent implements AfterViewInit {
         observe: "body"
       })
       .subscribe(city => {
-        this.cityService.addCity(city);
+        this.cityService.updateCity(index, city, "✓");
       });
   }
 
@@ -68,9 +71,11 @@ export class CitiesPanelComponent implements AfterViewInit {
     this.isLoading = true;
 
     let data = {
-      cities: this.cityService.Cities,
+      cities: this.cityService.cities,
       sessionId: 123
     };
+
+    console.log(this.citiesForm.controls)
 
     this.http
       .post<any[]>("http://localhost:53725/api/CalculateBestPath", data, {
@@ -81,41 +86,19 @@ export class CitiesPanelComponent implements AfterViewInit {
 
         for (let i = 0; i < noOfPaths; i++) {
           this.cityService.updateCity(i, pathList[i].startingCity);
+          this.citiesForm.controls[i].setValue(pathList[i].startingCity.name);
         }
+        //last city
         this.cityService.updateCity(
           noOfPaths,
           pathList[noOfPaths - 1].endingCity
         );
-
+        this.citiesForm.controls[noOfPaths].setValue(
+          pathList[noOfPaths - 1].endingCity.name
+        );
+        console.log( this.citiesForm.controls[noOfPaths - 1])
+        this.contorls = Object.keys(this.citiesForm.controls);
         this.isLoading = false;
       });
-
-    // $.ajax({
-    //   type: "POST",
-    //   dataType: "html",
-    //   url: window.location + "api/CalculateBestPath",
-    //   headers: {
-    //     Authorization: "DreamAuthentication U29sVWJlckFsbGVz"
-    //   },
-    //   data: {
-    //     cities: cities,
-    //     sessionId: sessionId,
-    //     optimizePath: optimizeRoadChck
-    //   },
-    //   success(msg) {
-    //     var pathList = JSON.parse(msg);
-    //     displayPage(pathList, map);
-
-    //     $("#pathsSummaryBtn")[0].style.display = "initial";
-    //     $("#costLimiBtn")[0].style.display = "initial";
-    //     $("#loader")[0].style.display = "none";
-    //   },
-
-    //   error(req, status, errorObj) {
-    //     $("#loader")[0].style.display = "none";
-    //     var alertMessage = JSON.parse(req.responseText);
-    //     alert(alertMessage);
-    //   }
-    // });
   }
 }
