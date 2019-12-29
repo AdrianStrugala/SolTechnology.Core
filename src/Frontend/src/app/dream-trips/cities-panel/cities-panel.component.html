@@ -1,6 +1,6 @@
 <!-- Cities Panel -->
 
-<div id="loader" *ngIf="(isLoading$ | async) == true"></div>
+<div id="loader" *ngIf="isLoading"></div>
 
 <div id="listOfCitiesPanel">
   <form [formGroup]="citiesForm">

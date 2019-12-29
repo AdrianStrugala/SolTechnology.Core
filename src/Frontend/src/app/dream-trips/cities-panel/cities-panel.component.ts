@@ -24,7 +24,7 @@ export class CitiesPanelComponent implements AfterViewInit {
   });
 
   contorls = Object.keys(this.citiesForm.controls);
-  isLoading$: BehaviorSubject<boolean> = new BehaviorSubject(false);
+  isLoading: boolean = false;
 
   constructor(public cityService: CityService, private http: HttpClient) {}
 
@@ -65,7 +65,7 @@ export class CitiesPanelComponent implements AfterViewInit {
   }
 
   runTSP() {
-    this.isLoading$.next(true);
+    this.isLoading = true;
 
     let data = {
       cities: this.cityService.Cities,
@@ -86,9 +86,9 @@ export class CitiesPanelComponent implements AfterViewInit {
           noOfPaths,
           pathList[noOfPaths - 1].endingCity
         );
-      });
 
-    this.isLoading$.next(false);
+        this.isLoading = false;
+      });
 
     // $.ajax({
     //   type: "POST",
