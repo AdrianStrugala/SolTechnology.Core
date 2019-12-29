@@ -1,4 +1,7 @@
 <!-- Cities Panel -->
+
+<div id="loader" *ngIf="(isLoading$ | async) == true"></div>
+
 <div id="listOfCitiesPanel">
   <form [formGroup]="citiesForm">
     <h4 class="modal-title" align="center">

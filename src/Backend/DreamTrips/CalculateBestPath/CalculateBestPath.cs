@@ -23,23 +23,13 @@ namespace DreamTravel.DreamTrips.CalculateBestPath
             _findProfitablePath = findProfitablePath;
         }
 
-        public async Task<Result> Execute(List<City> cities, bool optimizePath)
+        public async Task<Result> Execute(List<City> cities)
         {
             EvaluationMatrix evaluationMatrix = new EvaluationMatrix(cities.Count);
             evaluationMatrix = await _downloadRoadData.Execute(cities, evaluationMatrix);
             evaluationMatrix = _findProfitablePath.Execute(evaluationMatrix, cities.Count);
 
-
-            List<int> orderOfCities;
-            if (optimizePath)
-            {
-                orderOfCities = _tspSolver.SolveTSP(evaluationMatrix.OptimalDistances.ToList());
-            }
-            else
-            {
-                orderOfCities = Enumerable.Range(0, cities.Count).ToList();
-            }
-
+            var orderOfCities = _tspSolver.SolveTSP(evaluationMatrix.OptimalDistances.ToList());
 
             //to have a possiblity to store cities data
             // File.WriteAllText("./xCities.txt", JsonConvert.SerializeObject(evaluationMatrix.OptimalDistances));

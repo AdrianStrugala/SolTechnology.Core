@@ -5,7 +5,7 @@ import {
   ElementRef,
   OnInit
 } from "@angular/core";
-import { MarkerService } from "../marker.service";
+import { DisplayService } from "../display.service";
 import { CityService } from "../city.service";
 
 @Component({
@@ -15,11 +15,6 @@ import { CityService } from "../city.service";
 })
 export class MapComponent implements AfterViewInit, OnInit {
   ngOnInit(): void {
-    this.cityService.updated$.subscribe(x => {
-
-        this.markerService.displayMarker(this.cityService.Cities[this.cityService.CityIndex-1], "✓")
-
-    });
   }
 
   @ViewChild("mapContainer", { static: false }) gmap: ElementRef;
@@ -30,7 +25,7 @@ export class MapComponent implements AfterViewInit, OnInit {
   };
 
   constructor(
-    private markerService: MarkerService,
+    private markerService: DisplayService,
     private cityService: CityService
   ) {}
 

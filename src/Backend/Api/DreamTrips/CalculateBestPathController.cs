@@ -33,7 +33,7 @@ namespace DreamTravel.Api.DreamTrips
             try
             {
                 _logger.LogInformation("TSP Engine: Fire!");
-                Result result = await _calculateBestPath.Execute(query.Cities, query.OptimizePath);
+                Result result = await _calculateBestPath.Execute(query.Cities);
 
 //                HttpContext.Session.SetString(query.SessionId + PathsKeyName, JsonConvert.SerializeObject(result.BestPaths));
 

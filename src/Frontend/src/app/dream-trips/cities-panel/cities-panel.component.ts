@@ -8,7 +8,8 @@ import {
 import { CityService, ICity } from "../city.service";
 import { HttpClient } from "@angular/common/http";
 import { FormGroup, FormControl } from "@angular/forms";
-import { MarkerService } from "../marker.service";
+import { DisplayService } from "../display.service";
+import { BehaviorSubject } from "rxjs";
 
 @Component({
   selector: "app-cities-panel",
@@ -23,8 +24,9 @@ export class CitiesPanelComponent implements AfterViewInit {
   });
 
   contorls = Object.keys(this.citiesForm.controls);
+  isLoading$: BehaviorSubject<boolean> = new BehaviorSubject(false);
 
-  constructor(public cityService: CityService, private http: HttpClient, private markerService: MarkerService) {}
+  constructor(public cityService: CityService, private http: HttpClient) {}
 
   ngAfterViewInit(): void {
     //Focus on the last row in Cities Panel
@@ -58,12 +60,13 @@ export class CitiesPanelComponent implements AfterViewInit {
         observe: "body"
       })
       .subscribe(city => {
-        this.cityService.Cities.push(city),
-          this.cityService.updated$.next(true);
+        this.cityService.addCity(city);
       });
   }
 
   runTSP() {
+    this.isLoading$.next(true);
+
     let data = {
       cities: this.cityService.Cities,
       sessionId: 123
@@ -74,15 +77,18 @@ export class CitiesPanelComponent implements AfterViewInit {
         observe: "body"
       })
       .subscribe(pathList => {
-
         var noOfPaths = pathList.length;
 
         for (let i = 0; i < noOfPaths; i++) {
-          this.markerService.updateCity(i, pathList[i].startingCity);
-          // this.cityService.Cities[i] = pathList[i].StartingCity
+          this.cityService.updateCity(i, pathList[i].startingCity);
         }
-        this.markerService.updateCity(noOfPaths, pathList[noOfPaths - 1].endingCity);
+        this.cityService.updateCity(
+          noOfPaths,
+          pathList[noOfPaths - 1].endingCity
+        );
       });
+
+    this.isLoading$.next(false);
 
     // $.ajax({
     //   type: "POST",

@@ -92,3 +92,27 @@ label {
   background-color: #2fa4e7;
   opacity: .5;
 }
+
+
+#loader {
+  border: 16px solid #f3f3f3;
+  border-radius: 50%;
+  border-top: 16px solid #2FA4E7;
+  width: 30vh;
+  height: 30vh;
+  -webkit-animation: rotation  2s linear infinite; /* Safari */
+  animation: rotation  2s infinite linear ;
+  position: absolute;
+  left: calc(50% - 15vh);
+  top: calc(50% - 15vh);
+  z-index: 1;
+}
+
+@keyframes rotation {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(359deg);
+  }
+}

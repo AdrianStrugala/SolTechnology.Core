@@ -7,7 +7,6 @@ namespace DreamTravel.DreamTrips.CalculateBestPath
     {
         public List<City> Cities { get; set; }
         public string SessionId { get; set; }
-        public bool OptimizePath { get; set; }
 
         public Query()
         {
