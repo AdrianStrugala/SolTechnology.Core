@@ -24,7 +24,7 @@
             (keyup.enter)="addCity()"
             (change)="findAndDisplayCity(index)"
           />
-          <i class="fa fa-times-circle removeCityBtn" aria-hidden="true"></i>
+          <i class="fa fa-times-circle removeCityBtn" (click)="removeCity(index)" aria-hidden="true"></i>
         </tr>
       </tbody>
     </table>
@@ -42,7 +42,7 @@
         (click)="runTSP()"
         id="runTSPBtn"
       >
-        Apply
+        Run
       </button>
     </footer>
   </form>

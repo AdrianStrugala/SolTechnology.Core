@@ -48,6 +48,17 @@ export class CitiesPanelComponent implements AfterViewInit {
     this.cityService.CityIndex++;
   }
 
+  removeCity(index) {
+    if ( this.cityService.markers[index] != null) {
+      this.cityService.markers[index].setMap(null);
+    }
+    this.cityService.markers.splice(index, 1);
+    this.cityService.cities.splice(index, 1);
+
+    this.citiesForm.removeControl(index);
+    this.contorls = Object.keys(this.citiesForm.controls);
+  }
+
   findAndDisplayCity(index) {
     let data = {
       name: this.citiesForm.controls[index].value,
