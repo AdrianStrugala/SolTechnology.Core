@@ -23,6 +23,7 @@ export class CitiesPanelComponent implements AfterViewInit {
 
   contorls = Object.keys(this.citiesForm.controls);
   isLoading: boolean = false;
+  isFetchingData: boolean = false;
 
   constructor(public cityService: CityService, private http: HttpClient) {}
 
@@ -58,6 +59,8 @@ export class CitiesPanelComponent implements AfterViewInit {
   }
 
   findAndDisplayCity(index) {
+    this.isFetchingData = true;
+
     let data = {
       name: this.citiesForm.controls[index].value,
       sessionId: 123
@@ -73,6 +76,7 @@ export class CitiesPanelComponent implements AfterViewInit {
       })
       .subscribe(city => {
         this.cityService.updateCity(index, city, "✓");
+        this.isFetchingData = false;
       });
   }
 
@@ -80,7 +84,7 @@ export class CitiesPanelComponent implements AfterViewInit {
     this.isLoading = true;
 
     this.contorls.forEach(index => {
-      if(this.citiesForm.controls[index].value == null){
+      if (this.citiesForm.controls[index].value == null) {
         this.removeCity(index);
       }
     });

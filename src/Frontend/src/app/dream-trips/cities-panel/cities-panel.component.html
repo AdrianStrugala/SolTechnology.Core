@@ -41,6 +41,7 @@
         class="btn btn-info"
         (click)="runTSP()"
         id="runTSPBtn"
+        [disabled]="isFetchingData"
       >
         Run
       </button>
