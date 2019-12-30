@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
 using DreamTravel.DreamTrips.CalculateBestPath;
 using DreamTravel.DreamTrips.CalculateBestPath.Interfaces;
@@ -32,10 +33,12 @@ namespace DreamTravel.Api.DreamTrips
         {
             try
             {
-                _logger.LogInformation("TSP Engine: Fire!");
-                Result result = await _calculateBestPath.Execute(query.Cities);
+                var sanitizedCities = query.Cities.Where(c => c != null).ToList();
 
-//                HttpContext.Session.SetString(query.SessionId + PathsKeyName, JsonConvert.SerializeObject(result.BestPaths));
+                _logger.LogInformation("TSP Engine: Fire!");
+                Result result = await _calculateBestPath.Execute(sanitizedCities);
+
+                //                HttpContext.Session.SetString(query.SessionId + PathsKeyName, JsonConvert.SerializeObject(result.BestPaths));
 
                 return Ok(result.BestPaths);
             }

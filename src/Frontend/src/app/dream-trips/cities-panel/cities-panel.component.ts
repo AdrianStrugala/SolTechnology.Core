@@ -8,8 +8,6 @@ import {
 import { CityService, ICity } from "../city.service";
 import { HttpClient } from "@angular/common/http";
 import { FormGroup, FormControl } from "@angular/forms";
-import { DisplayService } from "../display.service";
-import { BehaviorSubject } from "rxjs";
 
 @Component({
   selector: "app-cities-panel",
@@ -49,11 +47,11 @@ export class CitiesPanelComponent implements AfterViewInit {
   }
 
   removeCity(index) {
-    if ( this.cityService.markers[index] != null) {
+    if (this.cityService.markers[index] != null) {
       this.cityService.markers[index].setMap(null);
     }
-    this.cityService.markers.splice(index, 1);
-    this.cityService.cities.splice(index, 1);
+    this.cityService.markers[index] = null;
+    this.cityService.cities[index] = null;
 
     this.citiesForm.removeControl(index);
     this.contorls = Object.keys(this.citiesForm.controls);
@@ -81,12 +79,16 @@ export class CitiesPanelComponent implements AfterViewInit {
   runTSP() {
     this.isLoading = true;
 
+    this.contorls.forEach(index => {
+      if(this.citiesForm.controls[index].value == null){
+        this.removeCity(index);
+      }
+    });
+
     let data = {
       cities: this.cityService.cities,
       sessionId: 123
     };
-
-    console.log(this.citiesForm.controls)
 
     this.http
       .post<any[]>("http://localhost:53725/api/CalculateBestPath", data, {
@@ -95,19 +97,25 @@ export class CitiesPanelComponent implements AfterViewInit {
       .subscribe(pathList => {
         var noOfPaths = pathList.length;
 
-        for (let i = 0; i < noOfPaths; i++) {
-          this.cityService.updateCity(i, pathList[i].startingCity);
-          this.citiesForm.controls[i].setValue(pathList[i].startingCity.name);
+        for (let i = 0; i <= noOfPaths; i++) {
+          let city: ICity;
+
+          if (i == noOfPaths) {
+            //last city
+            city = pathList[i - 1].endingCity;
+          } else {
+            city = pathList[i].startingCity;
+          }
+
+          this.cityService.updateCity(
+            Number(this.contorls[i]),
+            city,
+            i.toString()
+          );
+
+          this.citiesForm.controls[this.contorls[i]].setValue(city.name);
         }
-        //last city
-        this.cityService.updateCity(
-          noOfPaths,
-          pathList[noOfPaths - 1].endingCity
-        );
-        this.citiesForm.controls[noOfPaths].setValue(
-          pathList[noOfPaths - 1].endingCity.name
-        );
-        console.log( this.citiesForm.controls[noOfPaths - 1])
+
         this.contorls = Object.keys(this.citiesForm.controls);
         this.isLoading = false;
       });
