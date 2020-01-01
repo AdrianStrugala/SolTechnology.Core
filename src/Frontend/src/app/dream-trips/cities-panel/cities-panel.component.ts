@@ -8,6 +8,7 @@ import {
 import { CityService, ICity } from "../city.service";
 import { HttpClient } from "@angular/common/http";
 import { FormGroup, FormControl } from "@angular/forms";
+import { PathService } from "../path.service";
 
 @Component({
   selector: "app-cities-panel",
@@ -25,7 +26,11 @@ export class CitiesPanelComponent implements AfterViewInit {
   isLoading: boolean = false;
   isFetchingData: boolean = false;
 
-  constructor(public cityService: CityService, private http: HttpClient) {}
+  constructor(
+    public cityService: CityService,
+    private http: HttpClient,
+    public pathService: PathService
+  ) {}
 
   ngAfterViewInit(): void {
     //Focus on the last row in Cities Panel
@@ -101,6 +106,7 @@ export class CitiesPanelComponent implements AfterViewInit {
       .subscribe(pathList => {
         var noOfPaths = pathList.length;
 
+        //Cities
         for (let i = 0; i <= noOfPaths; i++) {
           let city: ICity;
 
@@ -120,7 +126,16 @@ export class CitiesPanelComponent implements AfterViewInit {
           this.citiesForm.controls[this.contorls[i]].setValue(city.name);
         }
 
+        //Paths
+        this.pathService.clearPaths();
+
+        for (let i = 0; i < noOfPaths; i++) {
+          this.pathService.addPath(pathList[i]);
+        }
+
+        this.pathService.adjustBounds();
         this.contorls = Object.keys(this.citiesForm.controls);
+
         this.isLoading = false;
       });
   }
