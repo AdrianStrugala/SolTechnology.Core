@@ -4,9 +4,9 @@
     mat-tab-link
     [routerLink]="'dream-trips'"
     routerLinkActive
-    #rla="routerLinkActive"
+    #rlaTrips="routerLinkActive"
     [routerLinkActiveOptions]="{ exact: true }"
-    [active]="rla.isActive"
+    [active]="rlaTrips.isActive"
     >
       Dream Trips
     </a>
@@ -15,9 +15,9 @@
       mat-tab-link
       [routerLink]="'dream-flights'"
       routerLinkActive
-      #rla="routerLinkActive"
+      #rlaFlights="routerLinkActive"
       [routerLinkActiveOptions]="{ exact: true }"
-      [active]="rla.isActive"
+      [active]="rlaFlights.isActive"
     >
       Dream Flights
     </a>
@@ -27,9 +27,9 @@
       *ngIf="userService.isLoggedIn()"
       [routerLink]="'my-account'"
       routerLinkActive
-      #rla="routerLinkActive"
+      #rlaAcoount="routerLinkActive"
       [routerLinkActiveOptions]="{ exact: true }"
-      [active]="rla.isActive"
+      [active]="rlaAcoount.isActive"
     >
       My Account
     </a>
@@ -39,9 +39,9 @@
       *ngIf="!userService.isLoggedIn()"
       [routerLink]="'register'"
       routerLinkActive
-      #rla="routerLinkActive"
+      #rlaRegister="routerLinkActive"
       [routerLinkActiveOptions]="{ exact: true }"
-      [active]="rla.isActive"
+      [active]="rlaRegister.isActive"
     >
       Register
     </a>
