@@ -76,7 +76,7 @@ export class CitiesPanelComponent implements AfterViewInit {
     }
 
     this.http
-      .post<ICity>("http://localhost:53725/api/FindLocationOfCity", data, {
+      .post<ICity>(APPLICATION_URL + "/api/FindLocationOfCity", data, {
         observe: "body"
       })
       .subscribe(city => {
@@ -100,7 +100,7 @@ export class CitiesPanelComponent implements AfterViewInit {
     };
 
     this.http
-      .post<any[]>("http://localhost:53725/api/CalculateBestPath", data, {
+      .post<any[]>(APPLICATION_URL +  "/api/CalculateBestPath", data, {
         observe: "body"
       })
       .subscribe(pathList => {

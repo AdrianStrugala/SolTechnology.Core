@@ -18,13 +18,10 @@ export class UserService{
       this.user = JSON.parse(localStorage.getItem("user"));
     }
   }
-
-  url = "https://dreamtravelsapi-demo.azurewebsites.net";
-
   login(): Observable<any> {
 
   return this.http.post(
-      this.url + "/api/login",
+      APPLICATION_URL + "/api/login",
       this.user,
       {
           observe: "body"
@@ -36,7 +33,7 @@ export class UserService{
   register(user: IUser): Observable<any> {
 
     return this.http.post(
-        this.url + "/api/register",
+        APPLICATION_URL + "/api/register",
         user,
         {
             observe: "body"

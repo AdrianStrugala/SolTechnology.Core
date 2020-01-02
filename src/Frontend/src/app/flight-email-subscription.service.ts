@@ -9,23 +9,22 @@ import { catchError } from "rxjs/operators";
 export class FlightEmailSubscriptionService {
   constructor(private http: HttpClient) {}
 
-  url = "https://dreamtravelsapi-demo.azurewebsites.net/api/FlightEmailSubscription/";
 
   Delete(id: number): Observable<any> {
     return this.http
-      .delete(this.url + id)
+      .delete(APPLICATION_URL + "/api/FlightEmailSubscription" + id)
   }
 
   Insert(value: any): Observable<any> {
     return this.http
-    .post(this.url, value, {
+    .post(APPLICATION_URL + "/api/FlightEmailSubscription", value, {
       observe: "body"
     })
   }
 
   GetByUserId(userId: number): Observable<IFlightEmailSubscription[]> {
     return this.http.get<IFlightEmailSubscription[]>(
-      this.url + userId,
+      APPLICATION_URL + "/api/FlightEmailSubscription/" + userId,
       {
         observe: "body"
       })

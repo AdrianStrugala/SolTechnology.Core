@@ -11,19 +11,13 @@ export class AirportsService {
 
   airports$: Observable<IAirport[]> = this.http
     .get<IAirport[]>(
-      "https://dreamtravelsapi-demo.azurewebsites.net/api/airports"
+      APPLICATION_URL + "/api/airports"
     )
     .pipe(
       map(val => val || []),
       publishReplay(1),
       refCount()
     );
-
-  getAirports(): Observable<{}> {
-    return this.http.get(
-      "https://dreamtravelsapi-demo.azurewebsites.net/api/airports"
-    );
-  }
 }
 
 export interface IAirport {
