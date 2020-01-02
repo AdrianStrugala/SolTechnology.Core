@@ -1,1 +1,3 @@
-var APPLICATION_URL = "https://dreamtravelsapi-demo.azurewebsites.net"
+export const Configuration = Object.freeze({
+  APPLICATION_URL: 'https://dreamtravelsapi-demo.azurewebsites.net'
+});
