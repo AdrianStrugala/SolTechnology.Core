@@ -2,3 +2,28 @@
 .container{
   margin-top: 5rem;
 }
+
+
+.column {
+  float: left;
+  width: 50%;
+  padding: 0.5rem;
+}
+
+/* Clear floats after the columns */
+.row:after {
+  content: "";
+  display: table;
+  clear: both;
+}
+
+.tile{
+  display: block;
+  margin-top: 3rem;
+  height: 20rem;
+  width: 20rem;
+  margin-left: auto;
+  margin-right: auto;
+  border-style: solid;
+  border-width: 5px;
+}
