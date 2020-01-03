@@ -6,10 +6,10 @@ namespace DreamTravel.FeaturesTests.LimitCostOfPaths
 {
     public class LimitCostOfPathsTests
     {
-        private readonly Features.LimitCostOfPaths.LimitCostOfPaths _sut;
+        private readonly DreamTrips.LimitCostOfPaths.LimitCostOfPaths _sut;
         public LimitCostOfPathsTests()
         {
-            _sut = new Features.LimitCostOfPaths.LimitCostOfPaths();
+            _sut = new DreamTrips.LimitCostOfPaths.LimitCostOfPaths();
         }
 
         [Fact]

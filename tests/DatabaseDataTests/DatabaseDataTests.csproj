@@ -19,7 +19,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\DatabaseData\DatabaseData.csproj" />
+    <ProjectReference Include="..\..\src\Backend\DatabaseData\DatabaseData.csproj" />
+    <ProjectReference Include="..\..\src\Backend\Domain\Domain.csproj" />
+    <ProjectReference Include="..\..\src\Backend\Infrastructure\Infrastructure.csproj" />
   </ItemGroup>
 
 </Project>

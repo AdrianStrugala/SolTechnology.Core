@@ -1,7 +1,7 @@
 ﻿using System.IO;
 using System.Threading.Tasks;
 using DreamTravel.Domain.Cities;
-using DreamTravel.Features.FindLocationOfCity;
+using DreamTravel.DreamTrips.FindLocationOfCity;
 using DreamTravel.WebUI;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;

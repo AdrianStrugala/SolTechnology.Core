@@ -19,7 +19,7 @@
 
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\TravelingSalesmanProblem\TravelingSalesmanProblem.csproj" />
+    <ProjectReference Include="..\..\src\Backend\TravelingSalesmanProblem\TravelingSalesmanProblem.csproj" />
   </ItemGroup>
 
 </Project>

@@ -11,7 +11,7 @@ namespace DreamTravel.DatabaseDataTests.Users
     public class UserRepositoryTests : IClassFixture<SqlFixture>
     {
         private readonly UserRepository _sut;
-        private IDbConnectionFactory _connectionFactory;
+        private readonly IDbConnectionFactory _connectionFactory;
 
         public UserRepositoryTests(SqlFixture sqlFixture)
         {
