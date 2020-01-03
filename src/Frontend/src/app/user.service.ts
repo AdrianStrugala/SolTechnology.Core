@@ -10,7 +10,7 @@ import { Configuration } from "./config";
 export class UserService {
   public user: IUser;
 
-  constructor(private http: HttpClient) {
+  constructor(private http: HttpClient, private config: Configuration) {
     this.user = {} as IUser;
     this.user.id = 0;
 
@@ -20,7 +20,7 @@ export class UserService {
   }
   login(): Observable<any> {
     return this.http
-      .post(Configuration.APPLICATION_URL + "/api/login", this.user, {
+      .post(this.config.APPLICATION_URL + "/api/login", this.user, {
         observe: "body"
       })
       .pipe(tap(user => localStorage.setItem("user", JSON.stringify(user))));
@@ -28,7 +28,7 @@ export class UserService {
 
   register(user: IUser): Observable<any> {
     return this.http.post(
-      Configuration.APPLICATION_URL + "/api/register",
+      this.config.APPLICATION_URL + "/api/register",
       user,
       {
         observe: "body"

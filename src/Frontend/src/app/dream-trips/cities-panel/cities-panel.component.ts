@@ -9,6 +9,7 @@ import { CityService, ICity } from "../city.service";
 import { HttpClient } from "@angular/common/http";
 import { FormGroup, FormControl } from "@angular/forms";
 import { PathService } from "../path.service";
+import { Configuration } from "../../config";
 
 @Component({
   selector: "app-cities-panel",
@@ -29,7 +30,8 @@ export class CitiesPanelComponent implements AfterViewInit {
   constructor(
     public cityService: CityService,
     private http: HttpClient,
-    public pathService: PathService
+    public pathService: PathService,
+    private config: Configuration
   ) {}
 
   ngAfterViewInit(): void {
@@ -76,7 +78,7 @@ export class CitiesPanelComponent implements AfterViewInit {
     }
 
     this.http
-      .post<ICity>(APPLICATION_URL + "/api/FindLocationOfCity", data, {
+      .post<ICity>(this.config.APPLICATION_URL + "/api/FindLocationOfCity", data, {
         observe: "body"
       })
       .subscribe(city => {
@@ -100,7 +102,7 @@ export class CitiesPanelComponent implements AfterViewInit {
     };
 
     this.http
-      .post<any[]>(APPLICATION_URL +  "/api/CalculateBestPath", data, {
+      .post<any[]>(this.config.APPLICATION_URL + "/api/CalculateBestPath", data, {
         observe: "body"
       })
       .subscribe(pathList => {
