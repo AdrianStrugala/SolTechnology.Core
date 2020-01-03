@@ -64,10 +64,7 @@ export class CityService {
       sessionId: 123
     };
 
-    if (
-      this.contorls.length + 1 <=
-      this.cities.length
-    ) {
+    if (this.contorls.length + 1 <= this.cities.length) {
       this.addCity();
     }
 
@@ -82,6 +79,9 @@ export class CityService {
       )
       .subscribe(city => {
         this.updateCity(index, city, "✓");
+        this.displayService.map.setCenter(
+          this.markers[index].getPosition()
+        );
         this.isFetchingData = false;
       });
   }
