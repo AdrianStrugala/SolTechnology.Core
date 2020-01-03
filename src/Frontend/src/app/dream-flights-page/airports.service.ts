@@ -12,7 +12,7 @@ export class AirportsService {
 
   airports$: Observable<IAirport[]> = this.http
     .get<IAirport[]>(
-      this.config.APPLICATION_URL + "/api/airports"
+      "https://dreamtravelsapi-demo.azurewebsites.net" + "/api/airports"
     )
     .pipe(
       map(val => val || []),

@@ -13,19 +13,19 @@ export class FlightEmailSubscriptionService {
 
   Delete(id: number): Observable<any> {
     return this.http
-      .delete(this.config.APPLICATION_URL + "/api/FlightEmailSubscription" + id)
+      .delete("https://dreamtravelsapi-demo.azurewebsites.net" + "/api/FlightEmailSubscription" + id)
   }
 
   Insert(value: any): Observable<any> {
     return this.http
-    .post(this.config.APPLICATION_URL + "/api/FlightEmailSubscription", value, {
+    .post("https://dreamtravelsapi-demo.azurewebsites.net" + "/api/FlightEmailSubscription", value, {
       observe: "body"
     })
   }
 
   GetByUserId(userId: number): Observable<IFlightEmailSubscription[]> {
     return this.http.get<IFlightEmailSubscription[]>(
-      this.config.APPLICATION_URL + "/api/FlightEmailSubscription/" + userId,
+      "https://dreamtravelsapi-demo.azurewebsites.net" + "/api/FlightEmailSubscription/" + userId,
       {
         observe: "body"
       })

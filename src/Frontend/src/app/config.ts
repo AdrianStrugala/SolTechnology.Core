@@ -4,7 +4,7 @@ import { Injectable } from "@angular/core";
   providedIn: "root"
 })
 export class Configuration {
-  public APPLICATION_URL: 'https://dreamtravelsapi-demo.azurewebsites.net';
+  public APPLICATION_URL: "https://dreamtravelsapi-demo.azurewebsites.net";
 
   constructor(
   ) {}

@@ -20,7 +20,7 @@ export class UserService {
   }
   login(): Observable<any> {
     return this.http
-      .post(this.config.APPLICATION_URL + "/api/login", this.user, {
+      .post("https://dreamtravelsapi-demo.azurewebsites.net" + "/api/login", this.user, {
         observe: "body"
       })
       .pipe(tap(user => localStorage.setItem("user", JSON.stringify(user))));
@@ -28,7 +28,7 @@ export class UserService {
 
   register(user: IUser): Observable<any> {
     return this.http.post(
-      this.config.APPLICATION_URL + "/api/register",
+      "https://dreamtravelsapi-demo.azurewebsites.net" + "/api/register",
       user,
       {
         observe: "body"

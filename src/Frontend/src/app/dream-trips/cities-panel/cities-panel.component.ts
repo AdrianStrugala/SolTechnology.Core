@@ -78,7 +78,7 @@ export class CitiesPanelComponent implements AfterViewInit {
     }
 
     this.http
-      .post<ICity>(this.config.APPLICATION_URL + "/api/FindLocationOfCity", data, {
+      .post<ICity>("https://dreamtravelsapi-demo.azurewebsites.net" + "/api/FindLocationOfCity", data, {
         observe: "body"
       })
       .subscribe(city => {
@@ -102,7 +102,7 @@ export class CitiesPanelComponent implements AfterViewInit {
     };
 
     this.http
-      .post<any[]>(this.config.APPLICATION_URL + "/api/CalculateBestPath", data, {
+      .post<any[]>("https://dreamtravelsapi-demo.azurewebsites.net" + "/api/CalculateBestPath", data, {
         observe: "body"
       })
       .subscribe(pathList => {
