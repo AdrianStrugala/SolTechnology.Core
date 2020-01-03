@@ -19,11 +19,7 @@ import { Configuration } from "../../config";
 export class CitiesPanelComponent implements AfterViewInit {
   @ViewChildren("cityRows") cityRows: QueryList<ElementRef>;
 
-  citiesForm = new FormGroup({
-    0: new FormControl("")
-  });
-
-  contorls = Object.keys(this.citiesForm.controls);
+  contorls = Object.keys(this.cityService.citiesForm.controls);
   isLoading: boolean = false;
   isFetchingData: boolean = false;
 
@@ -42,34 +38,20 @@ export class CitiesPanelComponent implements AfterViewInit {
   }
 
   addCity() {
-    this.citiesForm.addControl(
-      this.cityService.CityIndex.toString(),
-      new FormControl()
-    );
-    this.contorls = Object.keys(this.citiesForm.controls);
-
-    this.cityService.cities.push(null);
-    this.cityService.markers.push(null);
-
-    this.cityService.CityIndex++;
+    this.cityService.addCity();
+    this.contorls = Object.keys(this.cityService.citiesForm.controls);
   }
 
   removeCity(index) {
-    if (this.cityService.markers[index] != null) {
-      this.cityService.markers[index].setMap(null);
-    }
-    this.cityService.markers[index] = null;
-    this.cityService.cities[index] = null;
-
-    this.citiesForm.removeControl(index);
-    this.contorls = Object.keys(this.citiesForm.controls);
+    this.cityService.removeCity(index);
+    this.contorls = Object.keys(this.cityService.citiesForm.controls);
   }
 
   findAndDisplayCity(index) {
     this.isFetchingData = true;
 
     let data = {
-      name: this.citiesForm.controls[index].value,
+      name: this.cityService.citiesForm.controls[index].value,
       sessionId: 123
     };
 
@@ -91,7 +73,7 @@ export class CitiesPanelComponent implements AfterViewInit {
     this.isLoading = true;
 
     this.contorls.forEach(index => {
-      if (this.citiesForm.controls[index].value == null) {
+      if (this.cityService.citiesForm.controls[index].value == null) {
         this.removeCity(index);
       }
     });
@@ -125,7 +107,7 @@ export class CitiesPanelComponent implements AfterViewInit {
             i.toString()
           );
 
-          this.citiesForm.controls[this.contorls[i]].setValue(city.name);
+          this.cityService.citiesForm.controls[this.contorls[i]].setValue(city.name);
         }
 
         //Paths
@@ -136,7 +118,7 @@ export class CitiesPanelComponent implements AfterViewInit {
         }
 
         this.pathService.adjustBounds();
-        this.contorls = Object.keys(this.citiesForm.controls);
+        this.contorls = Object.keys(this.cityService.citiesForm.controls);
 
         this.isLoading = false;
       });

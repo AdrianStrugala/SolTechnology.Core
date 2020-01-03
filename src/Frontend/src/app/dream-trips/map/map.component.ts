@@ -6,7 +6,8 @@ import {
   OnInit
 } from "@angular/core";
 import { DisplayService } from "../display.service";
-import { CityService } from "../city.service";
+import { CityService, ICity } from "../city.service";
+import { HttpClient } from "@angular/common/http";
 
 @Component({
   selector: "app-map",
@@ -14,8 +15,7 @@ import { CityService } from "../city.service";
   styleUrls: ["./map.component.scss"]
 })
 export class MapComponent implements AfterViewInit, OnInit {
-  ngOnInit(): void {
-  }
+  ngOnInit(): void {}
 
   @ViewChild("mapContainer", { static: false }) gmap: ElementRef;
 
@@ -26,7 +26,8 @@ export class MapComponent implements AfterViewInit, OnInit {
 
   constructor(
     private markerService: DisplayService,
-    private cityService: CityService
+    private cityService: CityService,
+    private http: HttpClient
   ) {}
 
   ngAfterViewInit(): void {
@@ -34,5 +35,11 @@ export class MapComponent implements AfterViewInit, OnInit {
       this.gmap.nativeElement,
       this.mapOptions
     );
+
+    //Add marker by map click
+    this.markerService.map.addListener("click", (e) => {
+      this.cityService.addCityByMapClick(e.latLng);
+    });
   }
+
 }

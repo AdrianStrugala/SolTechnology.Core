@@ -25,16 +25,15 @@ namespace DreamTravel.Api.DreamTrips
 
 
         [HttpPost]
-        public async Task<IActionResult> FindNameOfCity(double lat, double lng, string sessionId)
+        public async Task<IActionResult> FindNameOfCity([FromBody] Request request)
         {
             try
             {
-                _logger.LogInformation("Looking for city: " + lat + ";" + lng);
+                _logger.LogInformation("Looking for city: " + request.Lat + ";" + request.Lng);
 
-                var result = await _findNameOfCity.Execute(lat, lng);
+                var result = await _findNameOfCity.Execute(request.Lat, request.Lng);
 
-                string message = JsonConvert.SerializeObject(result);
-                return Ok(message);
+                return Ok(result);
             }
 
             catch (Exception ex)
@@ -44,5 +43,13 @@ namespace DreamTravel.Api.DreamTrips
                 return BadRequest(message);
             }
         }
+
+    }
+
+    public class Request
+    {
+        public double Lat { get; set; }
+        public double Lng { get; set; }
+        public string SessionId { get; set; }
     }
 }

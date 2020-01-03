@@ -3,7 +3,7 @@
 <div id="loader" *ngIf="isLoading"></div>
 
 <div id="listOfCitiesPanel">
-  <form [formGroup]="citiesForm">
+  <form [formGroup]="this.cityService.citiesForm">
     <!-- <h4 class="modal-title" align="center">
       <label for="optimizeRoad">Optimize road </label
       ><input type="checkbox" id="optimizeRoad" checked="checked" />
