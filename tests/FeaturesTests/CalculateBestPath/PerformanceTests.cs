@@ -49,7 +49,7 @@ namespace DreamTravel.FeaturesTests.CalculateBestPath
             };
 
             //Act
-            var result = await _sut.Execute(cities, true);
+            var result = await _sut.Execute(cities);
 
 
             //Assert
