@@ -11,9 +11,12 @@ export class CityService {
   public citiesForm = new FormGroup({
     0: new FormControl("")
   });
+  public contorls = Object.keys(this.citiesForm.controls);
 
   public markers: any[] = [];
   public CityIndex: number = 0;
+
+  public isFetchingData: boolean = false;
 
   constructor(
     private displayService: DisplayService,
@@ -27,6 +30,8 @@ export class CityService {
 
     this.cities.push(null);
     this.markers.push(null);
+
+    this.contorls = Object.keys(this.citiesForm.controls);
   }
 
   updateCity(index: number, city: ICity, label: string = index.toString()) {
@@ -47,10 +52,42 @@ export class CityService {
     this.cities[index] = null;
 
     this.citiesForm.removeControl(index);
+
+    this.contorls = Object.keys(this.citiesForm.controls);
+  }
+
+  findAndDisplayCity(index) {
+    this.isFetchingData = true;
+
+    let data = {
+      name: this.citiesForm.controls[index].value,
+      sessionId: 123
+    };
+
+    if (
+      this.contorls.length + 1 <=
+      this.cities.length
+    ) {
+      this.addCity();
+    }
+
+    this.http
+      .post<ICity>(
+        "https://dreamtravelsapi-demo.azurewebsites.net" +
+          "/api/FindLocationOfCity",
+        data,
+        {
+          observe: "body"
+        }
+      )
+      .subscribe(city => {
+        this.updateCity(index, city, "✓");
+        this.isFetchingData = false;
+      });
   }
 
   addCityByMapClick(position) {
-    console.log(position);
+    this.isFetchingData = true;
 
     let data = {
       lat: position.lat(),
@@ -75,6 +112,7 @@ export class CityService {
         this.displayService.map.setCenter(
           this.markers[this.CityIndex].getPosition()
         );
+        this.isFetchingData = false;
       });
   }
 }
