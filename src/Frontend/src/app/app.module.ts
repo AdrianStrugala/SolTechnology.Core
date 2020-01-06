@@ -10,7 +10,7 @@ import { NavbarComponent } from './main-page/navbar/navbar.component';
 import { MaterialModule } from './external-libraries/material-module';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { LoginComponent } from './main-page/login/login.component';
-import { RegisterComponent } from './register/register.component';
+import { RegisterComponent } from './register-page/register.component';
 import { MyAccountComponent } from './my-account-page/my-account/my-account.component';
 import { FlightOrderListComponent } from './my-account-page/flight-order-list/flight-order-list.component';
 import { SuccessMessageComponent } from  './main-page/success-message/success-message.component';
