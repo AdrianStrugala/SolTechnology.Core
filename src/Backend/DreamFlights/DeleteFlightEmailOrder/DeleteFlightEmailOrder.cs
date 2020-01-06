@@ -4,17 +4,17 @@ namespace DreamTravel.DreamFlights.DeleteFlightEmailOrder
 {
     public class DeleteFlightEmailOrder : IDeleteFlightEmailOrder
     {
-        private readonly IFlightEmailOrderRepository _flightEmailOrderRepository;
+        private readonly IFlightEmailSubscriptionRepository _flightEmailSubscriptionRepository;
 
-        public DeleteFlightEmailOrder(IFlightEmailOrderRepository flightEmailOrderRepository)
+        public DeleteFlightEmailOrder(IFlightEmailSubscriptionRepository flightEmailSubscriptionRepository)
         {
-            _flightEmailOrderRepository = flightEmailOrderRepository;
+            _flightEmailSubscriptionRepository = flightEmailSubscriptionRepository;
         }
 
 
         public void Execute(int id)
         {
-            _flightEmailOrderRepository.Delete(id);
+            _flightEmailSubscriptionRepository.Delete(id);
         }
     }
 }

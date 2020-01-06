@@ -3,16 +3,17 @@ using System.Linq;
 using Dapper;
 using DreamTravel.Domain.FlightEmailOrders;
 
-namespace DreamTravel.DatabaseData.FlightEmailOrders
+namespace DreamTravel.DatabaseData.FlightEmailSubscriptions
 {
-    public partial class FlightEmailOrderRepository : IFlightEmailOrderRepository
+    public partial class FlightEmailSubscriptionRepository : IFlightEmailSubscriptionRepository
     {
-        public List<FlightEmailData> GetAll()
+        public List<FlightEmailSubscription> GetByUserId(int userId)
         {
-            var result = new List<FlightEmailData>();
+            List<FlightEmailSubscription> result;
 
             string sql = @"
 SELECT 
+FlightEmailOrder.[Id],
 FlightEmailOrder.[UserId],
 FlightEmailOrder.[From],
 FlightEmailOrder.[To],
@@ -20,18 +21,16 @@ FlightEmailOrder.[DepartureDate],
 FlightEmailOrder.[ArrivalDate],
 FlightEmailOrder.[MinDaysOfStay], 
 FlightEmailOrder.[MaxDaysOfStay], 
-FlightEmailOrder.[OneWay],
-[User].Name AS UserName,
-[User].Email,
-[User].Currency
+FlightEmailOrder.[OneWay]
 
 FROM FlightEmailOrder
-JOIN [User] on [User].Id = FlightEmailOrder.[UserId]
+WHERE
+    [UserId] = @userId
 ";
 
             using (var connection = _dbConnectionFactory.CreateConnection())
             {
-                result = connection.Query<FlightEmailData>(sql).ToList();
+                result = connection.Query<FlightEmailSubscription>(sql, new { userId = userId }).ToList();
             }
 
             return result;

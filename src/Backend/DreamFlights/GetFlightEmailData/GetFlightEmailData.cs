@@ -5,16 +5,16 @@ namespace DreamTravel.DreamFlights.GetFlightEmailData
 {
     public class GetFlightEmailData : IGetFlightEmailData
     {
-        private readonly IFlightEmailOrderRepository _flightEmailOrderRepository;
+        private readonly IFlightEmailSubscriptionRepository _flightEmailSubscriptionRepository;
 
-        public GetFlightEmailData(IFlightEmailOrderRepository flightEmailOrderRepository)
+        public GetFlightEmailData(IFlightEmailSubscriptionRepository flightEmailSubscriptionRepository)
         {
-            _flightEmailOrderRepository = flightEmailOrderRepository;
+            _flightEmailSubscriptionRepository = flightEmailSubscriptionRepository;
         }
 
         public List<FlightEmailData> Execute()
         {
-            return _flightEmailOrderRepository.GetAll();
+            return _flightEmailSubscriptionRepository.GetAll();
         }
     }
 }

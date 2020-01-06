@@ -2,7 +2,7 @@
 
 namespace DreamTravel.Domain.FlightEmailOrders
 {
-    public class FlightEmailOrder
+    public class FlightEmailSubscription
     {
         public int Id { get; set; }
 

@@ -4,6 +4,6 @@ namespace DreamTravel.DreamFlights.OrderFlightEmail
 {
     public interface IOrderFlightEmail
     {
-        void Execute(FlightEmailOrder flightEmailOrder);
+        void Execute(FlightEmailSubscription flightEmailSubscription);
     }
 }

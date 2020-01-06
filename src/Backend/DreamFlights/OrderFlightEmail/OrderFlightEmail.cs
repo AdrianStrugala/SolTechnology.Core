@@ -4,15 +4,15 @@ namespace DreamTravel.DreamFlights.OrderFlightEmail
 {
     public class OrderFlightEmail : IOrderFlightEmail
     {
-        private readonly IFlightEmailOrderRepository _flightEmailOrderRepository;
+        private readonly IFlightEmailSubscriptionRepository _flightEmailSubscriptionRepository;
 
-        public OrderFlightEmail(IFlightEmailOrderRepository flightEmailOrderRepository)
+        public OrderFlightEmail(IFlightEmailSubscriptionRepository flightEmailSubscriptionRepository)
         {
-            _flightEmailOrderRepository = flightEmailOrderRepository;
+            _flightEmailSubscriptionRepository = flightEmailSubscriptionRepository;
         }
-        public void Execute(FlightEmailOrder flightEmailOrder)
+        public void Execute(FlightEmailSubscription flightEmailSubscription)
         {
-            _flightEmailOrderRepository.Insert(flightEmailOrder);
+            _flightEmailSubscriptionRepository.Insert(flightEmailSubscription);
         }
 
     }

@@ -2,13 +2,13 @@
 
 namespace DreamTravel.Domain.FlightEmailOrders
 {
-    public interface IFlightEmailOrderRepository
+    public interface IFlightEmailSubscriptionRepository
     {
-        void Insert(FlightEmailOrder flightEmailOrder);
+        void Insert(FlightEmailSubscription flightEmailSubscription);
 
         List<FlightEmailData> GetAll();
 
-        List<FlightEmailOrder> GetByUserId(int userId);
+        List<FlightEmailSubscription> GetByUserId(int userId);
 
         void Delete(int id);
     }

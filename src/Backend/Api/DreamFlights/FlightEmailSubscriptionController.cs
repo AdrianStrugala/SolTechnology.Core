@@ -79,16 +79,16 @@ namespace DreamTravel.Api.DreamFlights
 
         [HttpPost]
         [Route(InsertRoute)]
-        public IActionResult Insert([FromBody] FlightEmailOrder flightEmailOrder)
+        public IActionResult Insert([FromBody] FlightEmailSubscription flightEmailSubscription)
         {
             try
             {
-                flightEmailOrder.ArrivalDate = flightEmailOrder.ArrivalDate.ToUniversalTime();
-                flightEmailOrder.DepartureDate = flightEmailOrder.DepartureDate.ToUniversalTime();
+                flightEmailSubscription.ArrivalDate = flightEmailSubscription.ArrivalDate.ToUniversalTime();
+                flightEmailSubscription.DepartureDate = flightEmailSubscription.DepartureDate.ToUniversalTime();
 
-                _logger.LogInformation($"Ordering flight email for user: [{flightEmailOrder.UserId}]");
+                _logger.LogInformation($"Ordering flight email for user: [{flightEmailSubscription.UserId}]");
 
-                _orderFlightEmail.Execute(flightEmailOrder);
+                _orderFlightEmail.Execute(flightEmailSubscription);
 
                 return Ok();
             }

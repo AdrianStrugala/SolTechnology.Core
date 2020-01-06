@@ -5,6 +5,6 @@ namespace DreamTravel.DreamFlights.GetFlightEmailOrdersForUser
 {
     public interface IGetFlightEmailOrdersForUser
     {
-        List<FlightEmailOrder> Execute(int userId);
+        List<FlightEmailSubscription> Execute(int userId);
     }
 }

@@ -1,9 +1,9 @@
 ﻿using Dapper;
 using DreamTravel.Domain.FlightEmailOrders;
 
-namespace DreamTravel.DatabaseData.FlightEmailOrders
+namespace DreamTravel.DatabaseData.FlightEmailSubscriptions
 {
-    public partial class FlightEmailOrderRepository : IFlightEmailOrderRepository
+    public partial class FlightEmailSubscriptionRepository : IFlightEmailSubscriptionRepository
     {
         public void Delete(int id)
         {
