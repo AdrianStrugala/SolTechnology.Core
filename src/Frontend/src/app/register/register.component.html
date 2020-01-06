@@ -1,6 +1,8 @@
-<div class="container">
+<mat-card class="card">
   <form [formGroup]="registerForm">
-    <h2 style="text-align: center;">Register</h2>
+    <mat-card-title class="title">
+      Register
+    </mat-card-title>
 
     <br />
     <br />
@@ -94,4 +96,4 @@
       <mat-spinner *ngIf="registrationInProgress"> </mat-spinner>
     </div>
   </form>
-</div>
+</mat-card>
