@@ -29,7 +29,7 @@ namespace DreamTravel.FeaturesTests.CalculateBestPath
             _sut = new DreamTrips.CalculateBestPath.CalculateBestPath(downloadRoadData, formOutputData, tsp, evaluationBrain);
         }
 
-        [Fact(Skip = "Paid test :(")]
+        [Fact(Skip = "Manual test")]
         public async Task Performance_TestFor10Cities_UseWithResharperProfiling_ForFindingOptimizations()
         {
             //Arrange

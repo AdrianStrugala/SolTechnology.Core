@@ -19,7 +19,7 @@ namespace DreamTravel.GeolocationDataTests.Cities
             _sut = new CityRepository();
         }
 
-        [Fact(Skip = "Paid test :(")]
+        [Fact]
         public async Task Execute_WildernessUnderCoordinats_ReturnsFormattedAddress()
         {
             //Arrange
@@ -37,7 +37,7 @@ namespace DreamTravel.GeolocationDataTests.Cities
             Assert.Equal("Kufra District, Libya", result.Name);
         }
 
-        [Fact(Skip = "Paid test :(")]
+        [Fact]
         public async Task Execute_InvokeWithValidCoordinates_ReturnsActualNameOfCity()
         {
             //Arrange
@@ -55,7 +55,7 @@ namespace DreamTravel.GeolocationDataTests.Cities
             Assert.Equal("Wrocław", result.Name);
         }
 
-        [Fact(Skip = "Paid test :(")]
+        [Fact]
         public async Task Execute_SeeUnderCoordinates_NameOfTheSeeIsReturned()
         {
             //Arrange
@@ -73,7 +73,7 @@ namespace DreamTravel.GeolocationDataTests.Cities
             Assert.Equal("Baltic Sea", result.Name);
         }
 
-        [Fact(Skip = "Paid test :(")]
+        [Fact]
         public async Task GetCityByName_InvokeWithRealName_ReturnsCityObject()
         {
             //Arrange
@@ -88,7 +88,7 @@ namespace DreamTravel.GeolocationDataTests.Cities
             Assert.NotEqual(0, result.Longitude);
         }
 
-        [Fact(Skip = "Paid test :(")]
+        [Fact]
         public async Task GetCityByName_NonExistingCity_ExceptionIsThrown()
         {
             //Arrange

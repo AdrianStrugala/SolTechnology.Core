@@ -23,7 +23,7 @@ namespace DreamTravel.FeaturesTests.CalculateBestPath
         }
 
 
-        [Fact (Skip = "Paid test :(")]
+        [Fact]
         public async Task DownloadExternalData_ValidConditions_MatrixIsPopulated()
         {
             //Arrange
@@ -63,7 +63,7 @@ namespace DreamTravel.FeaturesTests.CalculateBestPath
         }
 
         //can always download data of at least 30 cities
-        [Fact(Skip = "Paid test :(")]
+        [Fact]
         public async Task Execute_InputHas30Cities_AllTheDataIsDownloaded()
         {
             int noOfCities = 30;

@@ -12,7 +12,7 @@ namespace DreamTravel.GeolocationDataTests.Matrices
     {
         readonly MatrixRepository _sut = new MatrixRepository(NullLogger<MatrixRepository>.Instance);
 
-        [Fact(Skip = "Paid test :(")]
+        [Fact]
         public async Task DownloadDurationMatrixByTollRoad_InvokeWithValidCities_ReturnsSomeDuration()
         {
             //Arrange
@@ -41,7 +41,7 @@ namespace DreamTravel.GeolocationDataTests.Matrices
             Assert.Equal(double.MaxValue, result[0]);
         }
 
-        [Fact(Skip = "Paid test :(")]
+        [Fact]
         public async Task DowloadDurationMatrixByTollRoad_InvalidCities_ExceptionIsThrown()
         {
             //Arrange
@@ -68,7 +68,7 @@ namespace DreamTravel.GeolocationDataTests.Matrices
             Assert.IsType<InvalidDataException>(exception);
         }
 
-        [Fact(Skip = "Paid test :(")]
+        [Fact]
         public async Task DowloadDurationMatrixByFreeRoad_InvokeWithValidCities_ReturnsSomeDuration()
         {
             //Arrange
@@ -98,7 +98,7 @@ namespace DreamTravel.GeolocationDataTests.Matrices
         }
 
 
-        [Fact(Skip = "Paid test :(")]
+        [Fact]
         public async Task DowloadDurationMatrixByFreeRoad_InvalidCities_ExceptionIsThrown()
         {
             //Arrange
