@@ -11,9 +11,7 @@ export class AirportsService {
   constructor(private http: HttpClient, private config: Configuration) {}
 
   airports$: Observable<IAirport[]> = this.http
-    .get<IAirport[]>(
-      "https://dreamtravelsapi-demo.azurewebsites.net" + "/api/airports"
-    )
+    .get<IAirport[]>(this.config.APPLICATION_URL + "api/airports")
     .pipe(
       map(val => val || []),
       publishReplay(1),

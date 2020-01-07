@@ -1,7 +1,8 @@
 import { Injectable } from "@angular/core";
 import { DisplayService } from "./display.service";
 import { FormGroup, FormControl } from "@angular/forms";
-import { HttpClient } from "@angular/common/http";
+import { HttpClient, HttpHeaders } from "@angular/common/http";
+import { Configuration } from "../config";
 
 @Injectable({
   providedIn: "root"
@@ -20,7 +21,8 @@ export class CityService {
 
   constructor(
     private displayService: DisplayService,
-    private http: HttpClient
+    private http: HttpClient,
+    private config: Configuration
   ) {}
 
   addCity() {
@@ -70,11 +72,14 @@ export class CityService {
 
     this.http
       .post<ICity>(
-        "https://dreamtravelsapi-demo.azurewebsites.net" +
-          "/api/FindLocationOfCity",
+        this.config.APPLICATION_URL +
+          "api/FindLocationOfCity",
         data,
         {
-          observe: "body"
+          observe: "body",
+          headers: new HttpHeaders({
+            'Authorization': 'DreamAuthentication U29sVWJlckFsbGVz'
+          })
         }
       )
       .subscribe(city => {
@@ -97,11 +102,14 @@ export class CityService {
 
     this.http
       .post<ICity>(
-        "https://dreamtravelsapi-demo.azurewebsites.net" +
-          "/api/FindNameOfCity",
+        this.config.APPLICATION_URL +
+          "api/FindNameOfCity",
         data,
         {
-          observe: "body"
+          observe: "body",
+          headers: new HttpHeaders({
+            'Authorization': 'DreamAuthentication U29sVWJlckFsbGVz'
+          })
         }
       )
       .subscribe(city => {

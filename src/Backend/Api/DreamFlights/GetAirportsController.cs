@@ -6,7 +6,6 @@ using Newtonsoft.Json;
 
 namespace DreamTravel.Api.DreamFlights
 {
-    [AllowAnonymous]
 
     [Route(Route)]
     public class GetAirportsController : Controller

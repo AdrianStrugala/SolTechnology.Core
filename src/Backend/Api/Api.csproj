@@ -19,6 +19,7 @@
     <ProjectReference Include="..\DreamFlights\DreamFlights.csproj" />
     <ProjectReference Include="..\DreamTrips\DreamTrips.csproj" />
     <ProjectReference Include="..\Identity\Identity.csproj" />
+    <ProjectReference Include="..\Infrastructure\Infrastructure.csproj" />
   </ItemGroup>
 
 </Project>

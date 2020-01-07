@@ -10,7 +10,6 @@ using Newtonsoft.Json;
 
 namespace DreamTravel.Api.DreamFlights
 {
-    [AllowAnonymous]
     public class FlightEmailSubscriptionController : Controller
     {
         public const string DeleteRoute = "api/FlightEmailSubscription/{id}";

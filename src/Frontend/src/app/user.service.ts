@@ -1,5 +1,5 @@
 import { Injectable } from "@angular/core";
-import { HttpClient } from "@angular/common/http";
+import { HttpClient, HttpHeaders } from "@angular/common/http";
 import { Observable } from "rxjs";
 import { tap } from "rxjs/operators";
 import { Configuration } from "./config";
@@ -20,20 +20,22 @@ export class UserService {
   }
   login(): Observable<any> {
     return this.http
-      .post("https://dreamtravelsapi-demo.azurewebsites.net" + "/api/login", this.user, {
-        observe: "body"
+      .post(this.config.APPLICATION_URL + "api/login", this.user, {
+        observe: "body",
+        headers: new HttpHeaders({
+          Authorization: "DreamAuthentication U29sVWJlckFsbGVz"
+        })
       })
       .pipe(tap(user => localStorage.setItem("user", JSON.stringify(user))));
   }
 
   register(user: IUser): Observable<any> {
-    return this.http.post(
-      "https://dreamtravelsapi-demo.azurewebsites.net" + "/api/register",
-      user,
-      {
-        observe: "body"
-      }
-    );
+    return this.http.post(this.config.APPLICATION_URL + "api/register", user, {
+      observe: "body",
+      headers: new HttpHeaders({
+        Authorization: "DreamAuthentication U29sVWJlckFsbGVz"
+      })
+    });
   }
 
   isLoggedIn(): boolean {

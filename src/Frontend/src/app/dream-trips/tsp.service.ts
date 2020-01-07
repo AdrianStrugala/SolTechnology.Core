@@ -1,8 +1,9 @@
 import { Injectable } from "@angular/core";
 import { CityService, ICity } from "./city.service";
 import { PathService } from "./path.service";
-import { HttpClient } from "@angular/common/http";
+import { HttpClient, HttpHeaders } from "@angular/common/http";
 import { BehaviorSubject } from "rxjs";
+import { Configuration } from "../config";
 
 @Injectable({
   providedIn: "root"
@@ -14,7 +15,8 @@ export class TSPService {
   constructor(
     private pathService: PathService,
     private cityService: CityService,
-    private http: HttpClient
+    private http: HttpClient,
+    private config: Configuration
   ) {}
 
   runTSP() {
@@ -33,11 +35,13 @@ export class TSPService {
 
     this.http
       .post<any[]>(
-        "https://dreamtravelsapi-demo.azurewebsites.net" +
-          "/api/CalculateBestPath",
+        this.config.APPLICATION_URL + "api/CalculateBestPath",
         data,
         {
-          observe: "body"
+          observe: "body",
+          headers: new HttpHeaders({
+            Authorization: "DreamAuthentication U29sVWJlckFsbGVz"
+          })
         }
       )
       .subscribe(pathList => {
@@ -60,9 +64,9 @@ export class TSPService {
             i.toString()
           );
 
-          this.cityService.citiesForm.controls[this.cityService.contorls[i]].setValue(
-            city.name
-          );
+          this.cityService.citiesForm.controls[
+            this.cityService.contorls[i]
+          ].setValue(city.name);
         }
 
         //Paths
@@ -75,7 +79,9 @@ export class TSPService {
         }
 
         this.pathService.adjustBounds();
-        this.cityService.contorls = Object.keys(this.cityService.citiesForm.controls);
+        this.cityService.contorls = Object.keys(
+          this.cityService.citiesForm.controls
+        );
 
         this.updateTimeString(totalTime);
 
@@ -84,20 +90,23 @@ export class TSPService {
   }
   updateTimeString(totalTime: number) {
     var totalHours = Math.floor(totalTime / 3600);
-    var totalMinutes = Math.floor((totalTime - Math.floor(totalHours) * 3600) / 60);
-    var totalSeconds = (totalTime % 60);
+    var totalMinutes = Math.floor(
+      (totalTime - Math.floor(totalHours) * 3600) / 60
+    );
+    var totalSeconds = totalTime % 60;
 
-    let result =  Math.floor(totalHours) +
-    ":" +
-    this.pad2(Math.floor(totalMinutes)) +
-    ":" +
-    this.pad2(Math.floor(totalSeconds)) +
-    ".";
+    let result =
+      Math.floor(totalHours) +
+      ":" +
+      this.pad2(Math.floor(totalMinutes)) +
+      ":" +
+      this.pad2(Math.floor(totalSeconds)) +
+      ".";
 
     this.totalTime$.next(result);
   }
 
   pad2(number) {
-    return (number < 10 ? '0' : '') + number;
-}
+    return (number < 10 ? "0" : "") + number;
+  }
 }
