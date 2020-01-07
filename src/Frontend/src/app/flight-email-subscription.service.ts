@@ -13,7 +13,7 @@ export class FlightEmailSubscriptionService {
 
   Delete(id: number): Observable<any> {
     return this.http
-      .delete("https://dreamtravelsapi-demo.azurewebsites.net" + "/api/FlightEmailSubscription" + id)
+      .delete("https://dreamtravelsapi-demo.azurewebsites.net" + "/api/FlightEmailSubscription/" + id)
   }
 
   Insert(value: any): Observable<any> {
