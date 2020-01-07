@@ -7,8 +7,6 @@ using Microsoft.Extensions.Logging;
 
 namespace DreamTravel.Api.Identity
 {
-    [AllowAnonymous]
-    [EnableCors("dupa")]
     [Route(Route)]
     public class LoginController : Controller
     {
