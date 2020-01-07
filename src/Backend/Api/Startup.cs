@@ -53,7 +53,7 @@ namespace DreamTravel.Api
                     .AddScheme<DreamAuthenticationOptions, DreamAuthentication>(
                         DreamAuthenticationOptions.AuthenticationScheme,
                         null);
-
+            
             services.AddMvc(opts =>
                             {
                                 opts.Filters.Add(new AuthorizeFilter(policy));

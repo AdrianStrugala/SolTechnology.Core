@@ -6,6 +6,6 @@ namespace DreamTravel.Infrastructure.Authentication
     {
         public const string AuthenticationHeaderName = "Authorization";
         public const string AuthenticationScheme = "DreamAuthentication";
-        public string AuthenticationKey { get; set; }
+        public string AuthenticationKey = "SolUberAlles";
     }
 }
