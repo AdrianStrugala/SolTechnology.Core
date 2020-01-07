@@ -1,7 +1,7 @@
 import { Injectable } from "@angular/core";
 import { DisplayService } from "./display.service";
 import { FormGroup, FormControl } from "@angular/forms";
-import { HttpClient } from "@angular/common/http";
+import { HttpClient, HttpHeaders } from "@angular/common/http";
 
 @Injectable({
   providedIn: "root"
