@@ -1,7 +1,5 @@
 ﻿using DreamTravel.Domain.Users;
 using DreamTravel.Identity.Logging;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 

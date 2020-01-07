@@ -1,15 +1,15 @@
-﻿namespace DreamTravel.WebUITests.Authentication
-{
-    using System.Net;
-    using System.Net.Http;
-    using System.Net.Http.Headers;
-    using System.Threading.Tasks;
-    using Microsoft.AspNetCore.Hosting;
-    using Microsoft.AspNetCore.TestHost;
-    using WebUI;
-    using WebUI.Authentication;
-    using Xunit;
+﻿using DreamTravel.Api;
+using System.Net;
+using System.Net.Http;
+using System.Net.Http.Headers;
+using System.Threading.Tasks;
+using DreamTravel.Infrastructure.Authentication;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.TestHost;
+using Xunit;
 
+namespace DreamTravel.ApiTests.Authentication
+{
     public class DreamAuthenticationTests
 
     {
