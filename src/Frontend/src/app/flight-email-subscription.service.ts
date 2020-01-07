@@ -1,5 +1,5 @@
 import { Injectable } from "@angular/core";
-import { HttpClient } from "@angular/common/http";
+import { HttpClient, HttpHeaders } from "@angular/common/http";
 import { Observable, of } from "rxjs";
 import { catchError } from "rxjs/operators";
 import { Configuration } from "./config";
@@ -13,13 +13,20 @@ export class FlightEmailSubscriptionService {
 
   Delete(id: number): Observable<any> {
     return this.http
-      .delete("https://dreamtravelsapi-demo.azurewebsites.net" + "/api/FlightEmailSubscription/" + id)
+      .delete("https://dreamtravelsapi-demo.azurewebsites.net" + "/api/FlightEmailSubscription/" + id, {
+        headers: new HttpHeaders({
+          'Authorization': 'DreamAuthentication U29sVWJlckFsbGVz'
+        })
+      })
   }
 
   Insert(value: any): Observable<any> {
     return this.http
     .post("https://dreamtravelsapi-demo.azurewebsites.net" + "/api/FlightEmailSubscription", value, {
-      observe: "body"
+      observe: "body",
+      headers: new HttpHeaders({
+        'Authorization': 'DreamAuthentication U29sVWJlckFsbGVz'
+      })
     })
   }
 
@@ -27,7 +34,10 @@ export class FlightEmailSubscriptionService {
     return this.http.get<IFlightEmailSubscription[]>(
       "https://dreamtravelsapi-demo.azurewebsites.net" + "/api/FlightEmailSubscription/" + userId,
       {
-        observe: "body"
+        observe: "body",
+        headers: new HttpHeaders({
+          'Authorization': 'DreamAuthentication U29sVWJlckFsbGVz'
+        })
       })
       .pipe(
         catchError(err => {

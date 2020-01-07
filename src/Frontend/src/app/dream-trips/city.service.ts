@@ -74,7 +74,10 @@ export class CityService {
           "/api/FindLocationOfCity",
         data,
         {
-          observe: "body"
+          observe: "body",
+          headers: new HttpHeaders({
+            'Authorization': 'DreamAuthentication U29sVWJlckFsbGVz'
+          })
         }
       )
       .subscribe(city => {
@@ -101,7 +104,10 @@ export class CityService {
           "/api/FindNameOfCity",
         data,
         {
-          observe: "body"
+          observe: "body",
+          headers: new HttpHeaders({
+            'Authorization': 'DreamAuthentication U29sVWJlckFsbGVz'
+          })
         }
       )
       .subscribe(city => {

@@ -1,7 +1,7 @@
 import { Injectable } from "@angular/core";
 import { CityService, ICity } from "./city.service";
 import { PathService } from "./path.service";
-import { HttpClient } from "@angular/common/http";
+import { HttpClient, HttpHeaders } from "@angular/common/http";
 import { BehaviorSubject } from "rxjs";
 
 @Injectable({
@@ -37,7 +37,10 @@ export class TSPService {
           "/api/CalculateBestPath",
         data,
         {
-          observe: "body"
+          observe: "body",
+          headers: new HttpHeaders({
+            'Authorization': 'DreamAuthentication U29sVWJlckFsbGVz'
+          })
         }
       )
       .subscribe(pathList => {
