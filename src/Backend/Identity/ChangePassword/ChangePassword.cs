@@ -1,8 +1,7 @@
 ﻿using DreamTravel.Cryptography;
 using DreamTravel.Domain.Users;
-using DreamTravel.Identity.ChangePassword;
 
-namespace DreamTravel.Identity.Logging
+namespace DreamTravel.Identity.ChangePassword
 {
     public class ChangePassword : IChangePassword
     {
@@ -15,7 +14,19 @@ namespace DreamTravel.Identity.Logging
 
         public void Execute(ChangePasswordCommand command)
         {
-            throw new System.NotImplementedException();
+            var user = _userRepository.Get(command.UserId);
+
+            var newPassword = Encryption.Encrypt(command.NewPassword);
+            var currentPassword = Encryption.Encrypt(command.CurrentPassword);
+
+            if (currentPassword != user.Password)
+            {
+                throw new ChangePasswordException("Current password is invalid");
+            }
+
+            user.Password = newPassword;
+
+            _userRepository.Update(user);
         }
     }
 }

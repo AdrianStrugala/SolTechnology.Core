@@ -9,5 +9,9 @@ namespace DreamTravel.Domain.Users
         void Insert(User user);
 
         User Get(string userEmail);
+
+        User Get(int id);
+
+        void Update(User user);
     }
 }
