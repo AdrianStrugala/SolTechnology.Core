@@ -1,4 +1,5 @@
-﻿using DreamTravel.DreamFlights;
+﻿using System.Globalization;
+using DreamTravel.DreamFlights;
 using DreamTravel.DreamTrips;
 using DreamTravel.Identity;
 using DreamTravel.Infrastructure.Authentication;
@@ -62,6 +63,12 @@ namespace DreamTravel.Api
 
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
+            var cultureInfo = new CultureInfo("en-US");
+            cultureInfo.NumberFormat.CurrencySymbol = "€";
+
+            CultureInfo.DefaultThreadCurrentCulture = cultureInfo;
+            CultureInfo.DefaultThreadCurrentUICulture = cultureInfo;
+
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();

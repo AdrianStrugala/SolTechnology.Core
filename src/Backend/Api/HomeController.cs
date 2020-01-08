@@ -1,18 +1,15 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 
 namespace DreamTravel.Api
 {
     public class HomeController : Controller
     {
-        public HomeController()
-        {
-        }
 
+        [Route("")]
+        [HttpGet]
         public IActionResult Index()
         {
-            return OkObjectResult
-            return OkObjectResult("Dream Travels works!");
+            return Ok("Dream Travels API works!");
         }
     }
 }
