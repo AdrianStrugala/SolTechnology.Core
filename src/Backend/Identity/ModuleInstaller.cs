@@ -1,4 +1,5 @@
 ﻿using DreamTravel.DatabaseData.Configuration;
+using DreamTravel.Identity.ChangePassword;
 using DreamTravel.Identity.Logging;
 using DreamTravel.Identity.Registration;
 using Microsoft.Extensions.DependencyInjection;
@@ -15,6 +16,9 @@ namespace DreamTravel.Identity
 
             //Logging
             services.AddScoped<ILoginUser, LoginUser>();
+
+            //Change Password
+            services.AddScoped<IChangePassword, ChangePassword.ChangePassword>();
 
             services.InstallDatabaseData();
 
