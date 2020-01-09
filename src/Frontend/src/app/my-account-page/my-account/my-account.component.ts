@@ -1,5 +1,7 @@
 import { Component } from '@angular/core';
 import { UserService } from '../../user.service';
+import { MatDialog } from "@angular/material/dialog";
+import { ChangePasswordComponent } from '../change-password/change-password.component';
 
 
 @Component({
@@ -9,10 +11,16 @@ import { UserService } from '../../user.service';
 })
 export class MyAccountComponent {
 
-  constructor(public userService: UserService) { }
+  constructor(public dialog: MatDialog, public userService: UserService) { }
 
-
-  changePassword(){
-
-  };
+  changePassword(): void {
+    if (this.dialog.openDialogs.length == 0) {
+      this.dialog.open(ChangePasswordComponent, {
+        height: "35rem",
+        width: "30rem"
+      });
+    } else {
+      this.dialog.closeAll();
+    }
+  }
 }
