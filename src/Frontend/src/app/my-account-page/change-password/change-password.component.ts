@@ -14,7 +14,7 @@ import { confirmPasswordValidator } from '../../shared/validators';
 export class ChangePasswordComponent {
 
   changePasswordForm = new FormGroup({
-    actualPassword: new FormControl('', {
+    currentPassword: new FormControl('', {
       validators: [Validators.required],
       updateOn: "blur"
     }),
@@ -29,7 +29,7 @@ export class ChangePasswordComponent {
     public dialogRef: MatDialogRef<ChangePasswordComponent>, private userService: UserService) { }
 
   changePassword() {
-    this.userService.changePassword(this.changePasswordForm.value.actualPassword, this.changePasswordForm.value.password)
+    this.userService.changePassword(this.changePasswordForm.value.currentPassword, this.changePasswordForm.value.password)
       .subscribe(
         () => {
 
