@@ -16,7 +16,7 @@ export class MyAccountComponent {
   changePassword(): void {
     if (this.dialog.openDialogs.length == 0) {
       this.dialog.open(ChangePasswordComponent, {
-        height: "35rem",
+        height: "38rem",
         width: "30rem"
       });
     } else {
