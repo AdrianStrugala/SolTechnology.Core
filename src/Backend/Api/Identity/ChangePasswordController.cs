@@ -21,7 +21,7 @@ namespace DreamTravel.Api.Identity
 
 
         [HttpPost]
-        public IActionResult Login([FromBody] ChangePasswordCommand command)
+        public IActionResult ChangePassword([FromBody] ChangePasswordCommand command)
         {
             try
             {

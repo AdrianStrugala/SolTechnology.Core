@@ -42,7 +42,8 @@ export class UserService {
 
     let data = {
       currentPassword: currentPassword,
-      newPassword: password
+      newPassword: password,
+      userId: this.user.id
     };
 
     return this.http
