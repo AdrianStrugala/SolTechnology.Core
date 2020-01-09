@@ -38,6 +38,22 @@ export class UserService {
     });
   }
 
+  changePassword(currentPassword: string, password: string): Observable<any> {
+
+    let data = {
+      currentPassword: currentPassword,
+      newPassword: password
+    };
+
+    return this.http
+      .post(this.config.APPLICATION_URL + "api/changePassword", data, {
+        observe: "body",
+        headers: new HttpHeaders({
+          Authorization: "DreamAuthentication U29sVWJlckFsbGVz"
+        })
+      });
+  }
+
   isLoggedIn(): boolean {
     if (this.user.id != 0) {
       return true;

@@ -2,9 +2,8 @@ import { Component } from '@angular/core';
 import { MatDialogRef } from '@angular/material/dialog';
 import { UserService } from '../../user.service';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
-import { IUser } from '../../user.service'
-import { Router } from '@angular/router';
 import { handleError } from '../../shared/error';
+import { confirmPasswordValidator } from '../../shared/validators';
 
 
 @Component({
@@ -12,39 +11,34 @@ import { handleError } from '../../shared/error';
   templateUrl: './change-password.component.html',
   styleUrls: ['./change-password.component.scss']
 })
-export class ChangePasswordComponent{
+export class ChangePasswordComponent {
 
-  loginForm = new FormGroup({
-    email: new FormControl('', {
-      validators:[Validators.required, Validators.email],
-      updateOn: "blur"}),
-    password: new FormControl(),
-});
+  changePasswordForm = new FormGroup({
+    actualPassword: new FormControl('', {
+      validators: [Validators.required],
+      updateOn: "blur"
+    }),
+    password: new FormControl('', { validators: [Validators.required] }),
+    confirmPassword: new FormControl('', { validators: [Validators.required] }),
+  },
+    [confirmPasswordValidator]);
 
-  error : string;
+  error: string;
 
   constructor(
-    public dialogRef: MatDialogRef<ChangePasswordComponent>, private userService: UserService, private router: Router) {}
+    public dialogRef: MatDialogRef<ChangePasswordComponent>, private userService: UserService) { }
 
-    login(){
-      this.userService.user.email = this.loginForm.value.email;
-      this.userService.user.password = this.loginForm.value.password;
-
-      this.userService.login()
+  changePassword() {
+    this.userService.changePassword(this.changePasswordForm.value.actualPassword, this.changePasswordForm.value.password)
       .subscribe(
-        (data : IUser) => {
-        this.userService.user = data;
+        () => {
 
-      this.dialogRef.close();
-      },
-      (error) => {
-        this.error = handleError(error);
-      });
-    }
+          //TODO some success
 
-  register(): void {
-
-    this.router.navigate(["register"]);
-    this.dialogRef.close();
+          this.dialogRef.close();
+        },
+        (error) => {
+          this.error = handleError(error);
+        });
   }
 }
