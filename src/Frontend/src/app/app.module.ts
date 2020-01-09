@@ -18,6 +18,7 @@ import { AuthGuard } from './auth-guard';
 import { AngularFontAwesomeModule } from 'angular-font-awesome';
 import { MapComponent } from './dream-trips/map/map.component';
 import { CitiesPanelComponent } from './dream-trips/cities-panel/cities-panel.component';
+import { ChangePasswordComponent } from './my-account-page/change-password/change-password.component';
 
 const routes: Routes = [
     { path: 'dream-flights', component: FlightEmailOrderComponent },
@@ -34,6 +35,7 @@ const routes: Routes = [
         NavbarComponent,
         FlightEmailOrderComponent,
         LoginComponent,
+        ChangePasswordComponent,
         RegisterComponent,
         MyAccountComponent,
         FlightOrderListComponent,
@@ -55,7 +57,8 @@ const routes: Routes = [
         RouterModule
     ],
     entryComponents: [
-        LoginComponent
+        LoginComponent,
+        ChangePasswordComponent
     ],
     bootstrap: [AppComponent]
 })
