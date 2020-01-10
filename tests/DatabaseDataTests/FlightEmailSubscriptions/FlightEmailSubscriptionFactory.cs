@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using Dapper;
 using DreamTravel.Domain.FlightEmailSubscriptions;
 using DreamTravel.Infrastructure.Database;
@@ -51,6 +53,37 @@ SELECT SCOPE_IDENTITY()
             }
 
             return flightEmailSubscription;
+        }
+
+
+        public List<FlightEmailData> GetSubscriptionData()
+        {
+            var result = new List<FlightEmailData>();
+
+            string sql = @"
+SELECT 
+FlightEmailSubscription.[UserId],
+FlightEmailSubscription.[From],
+FlightEmailSubscription.[To],
+FlightEmailSubscription.[DepartureDate],
+FlightEmailSubscription.[ArrivalDate],
+FlightEmailSubscription.[MinDaysOfStay], 
+FlightEmailSubscription.[MaxDaysOfStay], 
+FlightEmailSubscription.[OneWay],
+[User].[Name] AS UserName,
+[User].Email,
+[User].Currency
+
+FROM FlightEmailSubscription
+JOIN [User] on [User].Id = FlightEmailSubscription.[UserId]
+";
+
+            using (var connection = _dbConnectionFactory.CreateConnection())
+            {
+                result = connection.Query<FlightEmailData>(sql).ToList();
+            }
+
+            return result;
         }
     }
 }

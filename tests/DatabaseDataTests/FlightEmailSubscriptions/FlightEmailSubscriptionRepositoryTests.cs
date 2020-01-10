@@ -55,7 +55,7 @@ VALUES (@Name, @Email)";
             _sut.Insert(flightEmailSubscription);
 
             //Assert
-            List<FlightEmailData> flightEmailRecords = _sut.GetAll();
+            List<FlightEmailData> flightEmailRecords = _subscriptionFactory.GetSubscriptionData();
 
             Assert.NotNull(flightEmailRecords);
             Assert.NotEmpty(flightEmailRecords);
@@ -138,10 +138,10 @@ VALUES (@Name, @Email)";
             }
 
 
-            var orderUnderTest =  _subscriptionFactory.InsertFlightEmailSubscriptionForUser(user.Id);
+            var orderUnderTest = _subscriptionFactory.InsertFlightEmailSubscriptionForUser(user.Id);
 
             //Assert
-            List<FlightEmailData> flightEmailData = _sut.GetAll();
+            List<FlightEmailData> flightEmailData = _subscriptionFactory.GetSubscriptionData();
 
             Assert.NotNull(flightEmailData);
             Assert.NotEmpty(flightEmailData);
@@ -150,7 +150,7 @@ VALUES (@Name, @Email)";
             _sut.Delete(orderUnderTest.Id);
 
             //Assert 2
-            List<FlightEmailData> afterDelete = _sut.GetAll();
+            List<FlightEmailData> afterDelete = _subscriptionFactory.GetSubscriptionData();
 
             Assert.NotNull(afterDelete);
             Assert.Empty(afterDelete);

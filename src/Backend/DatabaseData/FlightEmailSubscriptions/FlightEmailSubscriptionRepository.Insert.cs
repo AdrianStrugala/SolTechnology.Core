@@ -13,18 +13,21 @@ namespace DreamTravel.DatabaseData.FlightEmailSubscriptions
             _dbConnectionFactory = dbConnectionFactory;
         }
 
-        public void Insert(FlightEmailSubscription flightEmailSubscription)
+        public int Insert(FlightEmailSubscription flightEmailSubscription)
         {
             string sql = @"
 INSERT INTO FlightEmailSubscription
 ([UserId], [From], [To], [DepartureDate], [ArrivalDate], [MinDaysOfStay], [MaxDaysOfStay], [OneWay])
+OUTPUT INSERTED.ID
 VALUES
 (@UserId, @From, @To, @DepartureDate, @ArrivalDate, @MinDaysOfStay, @MaxDaysOfStay, @OneWay)
 ";
 
+            int subscriptionId;
+
             using (var connection = _dbConnectionFactory.CreateConnection())
             {
-                connection.Execute(sql, new
+                subscriptionId = connection.QuerySingle<int>(sql, new
                 {
                     UserId = flightEmailSubscription.UserId,
                     From = flightEmailSubscription.From,
@@ -36,6 +39,8 @@ VALUES
                     OneWay = flightEmailSubscription.OneWay
                 });
             }
+
+            return subscriptionId;
         }
     }
 }

@@ -6,12 +6,12 @@ namespace DreamTravel.DreamFlights.SubscribeForFlightEmail
     {
         public FlightEmailSubscription FlightEmailSubscription { get; }
 
-        public Days Days { get; }
+        public SubscriptionDays SubscriptionDays { get; }
 
-        public SubscribeForFlightEmailsCommand(FlightEmailSubscription flightEmailSubscription, Days days)
+        public SubscribeForFlightEmailsCommand(FlightEmailSubscription flightEmailSubscription, SubscriptionDays subscriptionDays)
         {
             FlightEmailSubscription = flightEmailSubscription;
-            Days = days;
+            SubscriptionDays = subscriptionDays;
         }
     }
 }

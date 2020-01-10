@@ -1,7 +1,8 @@
 ﻿namespace DreamTravel.Domain.FlightEmailSubscriptions
 {
-    public class Days
+    public class SubscriptionDays
     {
+        public long FlightEmailSubscriptionId { get; set; }
         public bool Monday { get; set; }
         public bool Tuesday { get; set; }
         public bool Wednesday { get; set; }

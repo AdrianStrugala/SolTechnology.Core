@@ -7,7 +7,7 @@ namespace DreamTravel.DatabaseData.FlightEmailSubscriptions
 {
     public partial class FlightEmailSubscriptionRepository : IFlightEmailSubscriptionRepository
     {
-        public List<FlightEmailData> GetAll()
+        public List<FlightEmailData> GetByDay(string day)
         {
             var result = new List<FlightEmailData>();
 
@@ -21,16 +21,23 @@ FlightEmailSubscription.[ArrivalDate],
 FlightEmailSubscription.[MinDaysOfStay], 
 FlightEmailSubscription.[MaxDaysOfStay], 
 FlightEmailSubscription.[OneWay],
-[User].Name AS UserName,
+[User].[Name] AS UserName,
 [User].Email,
 [User].Currency
 
 FROM FlightEmailSubscription
 JOIN [User] on [User].Id = FlightEmailSubscription.[UserId]
+JOIN [SubscriptionDays] on [SubscriptionDays].[FlightEmailSubscriptionId] = FlightEmailSubscription.[Id]
+
 ";
 
             using (var connection = _dbConnectionFactory.CreateConnection())
             {
+                sql += $@"
+WHERE 
+    [SubscriptionDays].[{day}] = 1
+";
+
                 result = connection.Query<FlightEmailData>(sql).ToList();
             }
 

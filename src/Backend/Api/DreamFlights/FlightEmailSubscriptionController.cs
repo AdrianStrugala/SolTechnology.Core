@@ -86,7 +86,7 @@ namespace DreamTravel.Api.DreamFlights
 
                 _logger.LogInformation($"Ordering flight email for user: [{flightEmailSubscription.UserId}]");
 
-                _subscribeForFlightEmail.Execute(new SubscribeForFlightEmailsCommand(flightEmailSubscription, new Days()));
+                _subscribeForFlightEmail.Execute(new SubscribeForFlightEmailsCommand(flightEmailSubscription, new SubscriptionDays()));
 
                 return Ok();
             }

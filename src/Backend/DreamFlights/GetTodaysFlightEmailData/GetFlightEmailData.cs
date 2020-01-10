@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using DreamTravel.Domain.FlightEmailSubscriptions;
 
 namespace DreamTravel.DreamFlights.GetFlightEmailData
@@ -14,7 +15,7 @@ namespace DreamTravel.DreamFlights.GetFlightEmailData
 
         public List<FlightEmailData> Execute()
         {
-            return _flightEmailSubscriptionRepository.GetAll();
+            return _flightEmailSubscriptionRepository.GetByDay(DateTime.UtcNow.DayOfWeek.ToString());
         }
     }
 }

@@ -4,9 +4,9 @@ namespace DreamTravel.Domain.FlightEmailSubscriptions
 {
     public interface IFlightEmailSubscriptionRepository
     {
-        void Insert(FlightEmailSubscription flightEmailSubscription);
+        int Insert(FlightEmailSubscription flightEmailSubscription);
 
-        List<FlightEmailData> GetAll();
+        List<FlightEmailData> GetByDay(string day);
 
         List<FlightEmailSubscription> GetByUserId(int userId);
 

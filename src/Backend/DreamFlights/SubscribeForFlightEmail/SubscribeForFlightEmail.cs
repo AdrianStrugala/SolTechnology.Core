@@ -5,14 +5,20 @@ namespace DreamTravel.DreamFlights.SubscribeForFlightEmail
     public class SubscribeForFlightEmail : ISubscribeForFlightEmail
     {
         private readonly IFlightEmailSubscriptionRepository _flightEmailSubscriptionRepository;
+        private readonly ISubscriptionDaysRepository _subscriptionDaysRepository;
 
-        public SubscribeForFlightEmail(IFlightEmailSubscriptionRepository flightEmailSubscriptionRepository)
+        public SubscribeForFlightEmail(
+            IFlightEmailSubscriptionRepository flightEmailSubscriptionRepository,
+            ISubscriptionDaysRepository subscriptionDaysRepository)
         {
             _flightEmailSubscriptionRepository = flightEmailSubscriptionRepository;
+            _subscriptionDaysRepository = subscriptionDaysRepository;
         }
         public void Execute(SubscribeForFlightEmailsCommand command)
         {
-            _flightEmailSubscriptionRepository.Insert(command.FlightEmailSubscription);
+            command.SubscriptionDays.FlightEmailSubscriptionId = _flightEmailSubscriptionRepository.Insert(command.FlightEmailSubscription);
+
+            _subscriptionDaysRepository.Insert(command.SubscriptionDays);
         }
 
     }
