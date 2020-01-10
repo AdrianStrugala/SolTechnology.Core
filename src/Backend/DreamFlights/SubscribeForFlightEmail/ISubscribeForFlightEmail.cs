@@ -4,6 +4,6 @@ namespace DreamTravel.DreamFlights.SubscribeForFlightEmail
 {
     public interface ISubscribeForFlightEmail
     {
-        void Execute(FlightEmailSubscription flightEmailSubscription);
+        void Execute(SubscribeForFlightEmailsCommand command);
     }
 }

@@ -10,9 +10,9 @@ namespace DreamTravel.DreamFlights.SubscribeForFlightEmail
         {
             _flightEmailSubscriptionRepository = flightEmailSubscriptionRepository;
         }
-        public void Execute(FlightEmailSubscription flightEmailSubscription)
+        public void Execute(SubscribeForFlightEmailsCommand command)
         {
-            _flightEmailSubscriptionRepository.Insert(flightEmailSubscription);
+            _flightEmailSubscriptionRepository.Insert(command.FlightEmailSubscription);
         }
 
     }

@@ -3,7 +3,6 @@ using DreamTravel.Domain.FlightEmailSubscriptions;
 using DreamTravel.DreamFlights.DeleteFlightEmailSubscription;
 using DreamTravel.DreamFlights.GetFlightEmailSubscriptionsForUser;
 using DreamTravel.DreamFlights.SubscribeForFlightEmail;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
@@ -87,7 +86,7 @@ namespace DreamTravel.Api.DreamFlights
 
                 _logger.LogInformation($"Ordering flight email for user: [{flightEmailSubscription.UserId}]");
 
-                _subscribeForFlightEmail.Execute(flightEmailSubscription);
+                _subscribeForFlightEmail.Execute(new SubscribeForFlightEmailsCommand(flightEmailSubscription, new Days()));
 
                 return Ok();
             }
