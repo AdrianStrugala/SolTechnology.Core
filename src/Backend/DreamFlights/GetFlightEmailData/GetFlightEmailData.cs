@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using DreamTravel.Domain.FlightEmailOrders;
+using DreamTravel.Domain.FlightEmailSubscriptions;
 
 namespace DreamTravel.DreamFlights.GetFlightEmailData
 {

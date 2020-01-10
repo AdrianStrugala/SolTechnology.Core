@@ -1,12 +1,12 @@
 ﻿using DreamTravel.DatabaseData.Configuration;
-using DreamTravel.DreamFlights.DeleteFlightEmailOrder;
+using DreamTravel.DreamFlights.DeleteFlightEmailSubscription;
 using DreamTravel.DreamFlights.GetAirports;
 using DreamTravel.DreamFlights.GetFlightEmailData;
-using DreamTravel.DreamFlights.GetFlightEmailOrdersForUser;
-using DreamTravel.DreamFlights.OrderFlightEmail;
+using DreamTravel.DreamFlights.GetFlightEmailSubscriptionsForUser;
 using DreamTravel.DreamFlights.SendDreamTravelFlightEmail;
 using DreamTravel.DreamFlights.SendDreamTravelFlightEmail.Interfaces;
 using DreamTravel.DreamFlights.SendOrderedFlightEmail.Interfaces;
+using DreamTravel.DreamFlights.SubscribeForFlightEmail;
 using DreamTravel.FlightProviderData;
 using Microsoft.Extensions.DependencyInjection;
 using ComposeMessage = DreamTravel.DreamFlights.SendDreamTravelFlightEmail.ComposeMessage;
@@ -23,17 +23,17 @@ namespace DreamTravel.DreamFlights
             services.AddScoped<IFilterFlights, FilterFlights>();
             services.AddScoped<ISendDreamTravelFlightEmail, SendDreamTravelFlightEmail.SendDreamTravelFlightEmail>();
 
-            //OrderFlightEmail
-            services.AddScoped<IOrderFlightEmail, OrderFlightEmail.OrderFlightEmail>();
+            //SubscribeForFlightEmail
+            services.AddScoped<ISubscribeForFlightEmail, SubscribeForFlightEmail.SubscribeForFlightEmail>();
 
             //GetFlightEmailData
             services.AddScoped<IGetFlightEmailData, GetFlightEmailData.GetFlightEmailData>();
 
-            //GetFlightEmailOrdersForUser
-            services.AddScoped<IGetFlightEmailOrdersForUser, GetFlightEmailOrdersForUser.GetFlightEmailOrdersForUser>();
+            //GetFlightEmailSubscriptionsForUser
+            services.AddScoped<IGetFlightEmailSubscriptionsForUser, GetFlightEmailSubscriptionsForUser.GetFlightEmailSubscriptionsForUser>();
 
-            //DeleteFlightEmailOrder
-            services.AddScoped<IDeleteFlightEmailOrder, DeleteFlightEmailOrder.DeleteFlightEmailOrder>();
+            //DeleteFlightEmailSubscription
+            services.AddScoped<IDeleteFlightEmailSubscription, DeleteFlightEmailSubscription.DeleteFlightEmailSubscription>();
 
             //SendOrderedFlightEmail
             services.AddScoped<ISendOrderedFlightEmail, SendOrderedFlightEmail.SendOrderedFlightEmail>();

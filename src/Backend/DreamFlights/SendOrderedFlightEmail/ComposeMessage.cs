@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using DreamTravel.Domain.FlightEmailOrders;
+using DreamTravel.Domain.FlightEmailSubscriptions;
 using DreamTravel.Domain.Flights;
 using DreamTravel.DreamFlights.SendOrderedFlightEmail.Interfaces;
 
@@ -7,14 +7,14 @@ namespace DreamTravel.DreamFlights.SendOrderedFlightEmail
 {
     public class ComposeMessage : IComposeMessage
     {
-        public string Execute(List<Flight> flights, FlightEmailData flightEmailOrder)
+        public string Execute(List<Flight> flights, FlightEmailData flightEmailData)
         {
             string message = $@"
 <html> 
 <body> 
-<h4> Hello {flightEmailOrder.UserName}! </h4></br>
+<h4> Hello {flightEmailData.UserName}! </h4></br>
 </br>
-<p> Check out the details of your Dream Travel to {flightEmailOrder.To}: </p></br>
+<p> Check out the details of your Dream Travel to {flightEmailData.To}: </p></br>
 </br>
 <ul>
 ";

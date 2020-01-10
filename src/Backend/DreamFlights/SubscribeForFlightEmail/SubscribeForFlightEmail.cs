@@ -1,12 +1,12 @@
-﻿using DreamTravel.Domain.FlightEmailOrders;
+﻿using DreamTravel.Domain.FlightEmailSubscriptions;
 
-namespace DreamTravel.DreamFlights.OrderFlightEmail
+namespace DreamTravel.DreamFlights.SubscribeForFlightEmail
 {
-    public class OrderFlightEmail : IOrderFlightEmail
+    public class SubscribeForFlightEmail : ISubscribeForFlightEmail
     {
         private readonly IFlightEmailSubscriptionRepository _flightEmailSubscriptionRepository;
 
-        public OrderFlightEmail(IFlightEmailSubscriptionRepository flightEmailSubscriptionRepository)
+        public SubscribeForFlightEmail(IFlightEmailSubscriptionRepository flightEmailSubscriptionRepository)
         {
             _flightEmailSubscriptionRepository = flightEmailSubscriptionRepository;
         }

@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace DreamTravel.Domain.FlightEmailOrders
+namespace DreamTravel.Domain.FlightEmailSubscriptions
 {
     public interface IFlightEmailSubscriptionRepository
     {

@@ -1,12 +1,12 @@
-﻿using DreamTravel.Domain.FlightEmailOrders;
+﻿using DreamTravel.Domain.FlightEmailSubscriptions;
 
-namespace DreamTravel.DreamFlights.DeleteFlightEmailOrder
+namespace DreamTravel.DreamFlights.DeleteFlightEmailSubscription
 {
-    public class DeleteFlightEmailOrder : IDeleteFlightEmailOrder
+    public class DeleteFlightEmailSubscription : IDeleteFlightEmailSubscription
     {
         private readonly IFlightEmailSubscriptionRepository _flightEmailSubscriptionRepository;
 
-        public DeleteFlightEmailOrder(IFlightEmailSubscriptionRepository flightEmailSubscriptionRepository)
+        public DeleteFlightEmailSubscription(IFlightEmailSubscriptionRepository flightEmailSubscriptionRepository)
         {
             _flightEmailSubscriptionRepository = flightEmailSubscriptionRepository;
         }

@@ -1,6 +1,6 @@
 ﻿using System;
 using Dapper;
-using DreamTravel.Domain.FlightEmailOrders;
+using DreamTravel.Domain.FlightEmailSubscriptions;
 using DreamTravel.Infrastructure.Database;
 
 namespace DreamTravel.DatabaseDataTests.FlightEmailSubscriptions
@@ -27,7 +27,7 @@ namespace DreamTravel.DatabaseDataTests.FlightEmailSubscriptions
             flightEmailSubscription.OneWay = false;
 
             string sql = @"
-INSERT INTO FlightEmailOrder
+INSERT INTO FlightEmailSubscription
 ([UserId], [From], [To], [DepartureDate], [ArrivalDate], [MinDaysOfStay], [MaxDaysOfStay], [OneWay])
 VALUES
 (@UserId, @From, @To, @DepartureDate, @ArrivalDate, @MinDaysOfStay, @MaxDaysOfStay, @OneWay)

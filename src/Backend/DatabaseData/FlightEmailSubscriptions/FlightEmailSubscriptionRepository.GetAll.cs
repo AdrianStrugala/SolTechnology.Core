@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using Dapper;
-using DreamTravel.Domain.FlightEmailOrders;
+using DreamTravel.Domain.FlightEmailSubscriptions;
 
 namespace DreamTravel.DatabaseData.FlightEmailSubscriptions
 {
@@ -13,20 +13,20 @@ namespace DreamTravel.DatabaseData.FlightEmailSubscriptions
 
             string sql = @"
 SELECT 
-FlightEmailOrder.[UserId],
-FlightEmailOrder.[From],
-FlightEmailOrder.[To],
-FlightEmailOrder.[DepartureDate],
-FlightEmailOrder.[ArrivalDate],
-FlightEmailOrder.[MinDaysOfStay], 
-FlightEmailOrder.[MaxDaysOfStay], 
-FlightEmailOrder.[OneWay],
+FlightEmailSubscription.[UserId],
+FlightEmailSubscription.[From],
+FlightEmailSubscription.[To],
+FlightEmailSubscription.[DepartureDate],
+FlightEmailSubscription.[ArrivalDate],
+FlightEmailSubscription.[MinDaysOfStay], 
+FlightEmailSubscription.[MaxDaysOfStay], 
+FlightEmailSubscription.[OneWay],
 [User].Name AS UserName,
 [User].Email,
 [User].Currency
 
-FROM FlightEmailOrder
-JOIN [User] on [User].Id = FlightEmailOrder.[UserId]
+FROM FlightEmailSubscription
+JOIN [User] on [User].Id = FlightEmailSubscription.[UserId]
 ";
 
             using (var connection = _dbConnectionFactory.CreateConnection())

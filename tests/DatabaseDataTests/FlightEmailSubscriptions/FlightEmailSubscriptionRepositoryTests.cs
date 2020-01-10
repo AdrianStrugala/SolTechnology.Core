@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Dapper;
 using DreamTravel.DatabaseData.FlightEmailSubscriptions;
-using DreamTravel.Domain.FlightEmailOrders;
+using DreamTravel.Domain.FlightEmailSubscriptions;
 using DreamTravel.Domain.Users;
 using DreamTravel.Infrastructure.Database;
 using Xunit;
@@ -14,13 +14,13 @@ namespace DreamTravel.DatabaseDataTests.FlightEmailSubscriptions
     {
         private readonly FlightEmailSubscriptionRepository _sut;
         private readonly IDbConnectionFactory _dbConnectionFactory;
-        private readonly FlightEmailSubscriptionFactory _orderFactory;
+        private readonly FlightEmailSubscriptionFactory _subscriptionFactory;
 
         public FlightEmailSubscriptionRepositoryTests(SqlFixture sqlFixture)
         {
             _dbConnectionFactory = sqlFixture.DbConnectionFactory;
             _sut = new FlightEmailSubscriptionRepository(_dbConnectionFactory);
-            _orderFactory = new FlightEmailSubscriptionFactory(_dbConnectionFactory);
+            _subscriptionFactory = new FlightEmailSubscriptionFactory(_dbConnectionFactory);
         }
 
         [Fact]
@@ -55,12 +55,12 @@ VALUES (@Name, @Email)";
             _sut.Insert(flightEmailSubscription);
 
             //Assert
-            List<FlightEmailData> flightEmailOrders = _sut.GetAll();
+            List<FlightEmailData> flightEmailRecords = _sut.GetAll();
 
-            Assert.NotNull(flightEmailOrders);
-            Assert.NotEmpty(flightEmailOrders);
+            Assert.NotNull(flightEmailRecords);
+            Assert.NotEmpty(flightEmailRecords);
 
-            var orderUnderTest = flightEmailOrders.Single(o => o.From == "SOME UNIQUE STRING");
+            var orderUnderTest = flightEmailRecords.Single(o => o.From == "SOME UNIQUE STRING");
 
             Assert.Equal(flightEmailSubscription.ArrivalDate.Date, orderUnderTest.ArrivalDate.Date);
             Assert.Equal(flightEmailSubscription.DepartureDate.Date, orderUnderTest.DepartureDate.Date);
@@ -101,11 +101,11 @@ VALUES (@Name, @Email)";
             }
 
 
-            _orderFactory.InsertFlightEmailSubscriptionForUser(user.Id);
-            _orderFactory.InsertFlightEmailSubscriptionForUser(user.Id);
-            _orderFactory.InsertFlightEmailSubscriptionForUser(user.Id);
+            _subscriptionFactory.InsertFlightEmailSubscriptionForUser(user.Id);
+            _subscriptionFactory.InsertFlightEmailSubscriptionForUser(user.Id);
+            _subscriptionFactory.InsertFlightEmailSubscriptionForUser(user.Id);
 
-            _orderFactory.InsertFlightEmailSubscriptionForUser(anotherUser.Id);
+            _subscriptionFactory.InsertFlightEmailSubscriptionForUser(anotherUser.Id);
 
 
             //Act
@@ -138,22 +138,22 @@ VALUES (@Name, @Email)";
             }
 
 
-            var orderUnderTest =  _orderFactory.InsertFlightEmailSubscriptionForUser(user.Id);
+            var orderUnderTest =  _subscriptionFactory.InsertFlightEmailSubscriptionForUser(user.Id);
 
             //Assert
-            List<FlightEmailData> flightEmailOrders = _sut.GetAll();
+            List<FlightEmailData> flightEmailData = _sut.GetAll();
 
-            Assert.NotNull(flightEmailOrders);
-            Assert.NotEmpty(flightEmailOrders);
+            Assert.NotNull(flightEmailData);
+            Assert.NotEmpty(flightEmailData);
 
             //Act
             _sut.Delete(orderUnderTest.Id);
 
             //Assert 2
-            List<FlightEmailData> flightEmailOrdersAfterDelete = _sut.GetAll();
+            List<FlightEmailData> afterDelete = _sut.GetAll();
 
-            Assert.NotNull(flightEmailOrdersAfterDelete);
-            Assert.Empty(flightEmailOrdersAfterDelete);
+            Assert.NotNull(afterDelete);
+            Assert.Empty(afterDelete);
         }
     }
 }

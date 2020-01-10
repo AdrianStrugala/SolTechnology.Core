@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using DreamTravel.Domain.Airports;
-using DreamTravel.Domain.FlightEmailOrders;
+using DreamTravel.Domain.FlightEmailSubscriptions;
 using DreamTravel.Domain.Flights;
 using DreamTravel.Domain.Flights.GetFlights;
 using DreamTravel.DreamFlights.SendOrderedFlightEmail.Interfaces;
@@ -22,25 +22,25 @@ namespace DreamTravel.DreamFlights.SendOrderedFlightEmail
             _composeMessage = composeMessage;
         }
 
-        public void Execute(FlightEmailData flightEmailOrder)
+        public void Execute(FlightEmailData flightEmailData)
         {
             GetFlightsOrder getFlightsOrder = new GetFlightsOrder
             (
-                new KeyValuePair<string, List<string>>(flightEmailOrder.From, _airportRepository.GetByPlace(flightEmailOrder.From).Codes),
-                new KeyValuePair<string, List<string>>(flightEmailOrder.To, _airportRepository.GetByPlace(flightEmailOrder.To).Codes),
-                flightEmailOrder.DepartureDate,
-                flightEmailOrder.ArrivalDate,
-                flightEmailOrder.MinDaysOfStay,
-                flightEmailOrder.MaxDaysOfStay
+                new KeyValuePair<string, List<string>>(flightEmailData.From, _airportRepository.GetByPlace(flightEmailData.From).Codes),
+                new KeyValuePair<string, List<string>>(flightEmailData.To, _airportRepository.GetByPlace(flightEmailData.To).Codes),
+                flightEmailData.DepartureDate,
+                flightEmailData.ArrivalDate,
+                flightEmailData.MinDaysOfStay,
+                flightEmailData.MaxDaysOfStay
                 );
 
             List<Flight> flights = _flightRepository.GetFlights(getFlightsOrder);
 
-            string message = _composeMessage.Execute(flights, flightEmailOrder);
+            string message = _composeMessage.Execute(flights, flightEmailData);
             EmailAgent.Send(new OrderedFlightEmail(
                 message,
-                flightEmailOrder.Email,
-                $"{flightEmailOrder.UserName} choose your flight to {flightEmailOrder.To}!"));
+                flightEmailData.Email,
+                $"{flightEmailData.UserName} choose your flight to {flightEmailData.To}!"));
         }
     }
 }

@@ -1,13 +1,13 @@
 ﻿using System.Collections.Generic;
-using DreamTravel.Domain.FlightEmailOrders;
+using DreamTravel.Domain.FlightEmailSubscriptions;
 
-namespace DreamTravel.DreamFlights.GetFlightEmailOrdersForUser
+namespace DreamTravel.DreamFlights.GetFlightEmailSubscriptionsForUser
 {
-    public class GetFlightEmailOrdersForUser : IGetFlightEmailOrdersForUser
+    public class GetFlightEmailSubscriptionsForUser : IGetFlightEmailSubscriptionsForUser
     {
         private readonly IFlightEmailSubscriptionRepository _flightEmailSubscriptionRepository;
 
-        public GetFlightEmailOrdersForUser(IFlightEmailSubscriptionRepository flightEmailSubscriptionRepository)
+        public GetFlightEmailSubscriptionsForUser(IFlightEmailSubscriptionRepository flightEmailSubscriptionRepository)
         {
             _flightEmailSubscriptionRepository = flightEmailSubscriptionRepository;
         }

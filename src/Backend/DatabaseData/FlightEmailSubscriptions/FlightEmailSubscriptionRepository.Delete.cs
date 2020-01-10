@@ -1,5 +1,5 @@
 ﻿using Dapper;
-using DreamTravel.Domain.FlightEmailOrders;
+using DreamTravel.Domain.FlightEmailSubscriptions;
 
 namespace DreamTravel.DatabaseData.FlightEmailSubscriptions
 {
@@ -10,7 +10,7 @@ namespace DreamTravel.DatabaseData.FlightEmailSubscriptions
 
             string sql = @"
 DELETE 
-    FlightEmailOrder 
+    FlightEmailSubscription 
 WHERE 
     [Id] = @Id
 ";

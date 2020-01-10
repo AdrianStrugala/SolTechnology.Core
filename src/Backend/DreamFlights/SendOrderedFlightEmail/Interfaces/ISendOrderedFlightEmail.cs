@@ -1,9 +1,9 @@
-﻿using DreamTravel.Domain.FlightEmailOrders;
+﻿using DreamTravel.Domain.FlightEmailSubscriptions;
 
 namespace DreamTravel.DreamFlights.SendOrderedFlightEmail.Interfaces
 {
     public interface ISendOrderedFlightEmail
     {
-        void Execute(FlightEmailData flightEmailOrder);
+        void Execute(FlightEmailData flightEmailData);
     }
 }

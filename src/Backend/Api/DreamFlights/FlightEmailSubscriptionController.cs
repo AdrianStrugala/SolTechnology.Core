@@ -1,8 +1,8 @@
 ﻿using System;
-using DreamTravel.Domain.FlightEmailOrders;
-using DreamTravel.DreamFlights.DeleteFlightEmailOrder;
-using DreamTravel.DreamFlights.GetFlightEmailOrdersForUser;
-using DreamTravel.DreamFlights.OrderFlightEmail;
+using DreamTravel.Domain.FlightEmailSubscriptions;
+using DreamTravel.DreamFlights.DeleteFlightEmailSubscription;
+using DreamTravel.DreamFlights.GetFlightEmailSubscriptionsForUser;
+using DreamTravel.DreamFlights.SubscribeForFlightEmail;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -17,20 +17,20 @@ namespace DreamTravel.Api.DreamFlights
         public const string InsertRoute = "api/FlightEmailSubscription";
 
         private readonly ILogger<FlightEmailSubscriptionController> _logger;
-        private readonly IDeleteFlightEmailOrder _deleteFlightEmailOrder;
-        private readonly IGetFlightEmailOrdersForUser _getFlightEmailOrdersForUser;
-        private readonly IOrderFlightEmail _orderFlightEmail;
+        private readonly IDeleteFlightEmailSubscription _deleteFlightEmailSubscription;
+        private readonly IGetFlightEmailSubscriptionsForUser _getFlightEmailSubscriptionsForUser;
+        private readonly ISubscribeForFlightEmail _subscribeForFlightEmail;
 
 
         public FlightEmailSubscriptionController(
-            IDeleteFlightEmailOrder deleteFlightEmailOrder,
-            IGetFlightEmailOrdersForUser getFlightEmailOrdersForUser,
-            IOrderFlightEmail orderFlightEmail,
+            IDeleteFlightEmailSubscription deleteFlightEmailSubscription,
+            IGetFlightEmailSubscriptionsForUser getFlightEmailSubscriptionsForUser,
+            ISubscribeForFlightEmail subscribeForFlightEmail,
             ILogger<FlightEmailSubscriptionController> logger)
         {
-            _deleteFlightEmailOrder = deleteFlightEmailOrder;
-            _getFlightEmailOrdersForUser = getFlightEmailOrdersForUser;
-            _orderFlightEmail = orderFlightEmail;
+            _deleteFlightEmailSubscription = deleteFlightEmailSubscription;
+            _getFlightEmailSubscriptionsForUser = getFlightEmailSubscriptionsForUser;
+            _subscribeForFlightEmail = subscribeForFlightEmail;
             _logger = logger;
         }
 
@@ -43,7 +43,7 @@ namespace DreamTravel.Api.DreamFlights
             
             try
             {
-                _deleteFlightEmailOrder.Execute(id);
+                _deleteFlightEmailSubscription.Execute(id);
 
                 return Ok();
             }
@@ -64,7 +64,7 @@ namespace DreamTravel.Api.DreamFlights
             {
                 _logger.LogInformation($"Getting flight email orders for user: [{userId}]");
 
-                var result = _getFlightEmailOrdersForUser.Execute(userId);
+                var result = _getFlightEmailSubscriptionsForUser.Execute(userId);
 
                 return Ok(result);
             }
@@ -87,7 +87,7 @@ namespace DreamTravel.Api.DreamFlights
 
                 _logger.LogInformation($"Ordering flight email for user: [{flightEmailSubscription.UserId}]");
 
-                _orderFlightEmail.Execute(flightEmailSubscription);
+                _subscribeForFlightEmail.Execute(flightEmailSubscription);
 
                 return Ok();
             }

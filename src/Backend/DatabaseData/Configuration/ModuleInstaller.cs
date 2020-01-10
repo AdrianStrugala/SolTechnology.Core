@@ -1,6 +1,6 @@
 ﻿using DreamTravel.DatabaseData.FlightEmailSubscriptions;
 using DreamTravel.DatabaseData.Users;
-using DreamTravel.Domain.FlightEmailOrders;
+using DreamTravel.Domain.FlightEmailSubscriptions;
 using DreamTravel.Domain.Users;
 using DreamTravel.Infrastructure.Database;
 using Microsoft.Extensions.DependencyInjection;
