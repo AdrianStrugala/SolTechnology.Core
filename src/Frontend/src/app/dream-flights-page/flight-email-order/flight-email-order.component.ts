@@ -134,6 +134,18 @@ export class FlightEmailOrderComponent {
     return of(null);
   };
 
+  emailForm = new FormGroup(
+    {
+      monday: new FormControl(true),
+      tuesday: new FormControl(true),
+      wendesday: new FormControl(true),
+      thursday: new FormControl(true),
+      friday: new FormControl(true),
+      saturday: new FormControl(true),
+      sunday: new FormControl(true)
+    }
+  );
+
   orderForm = new FormGroup(
     {
       from: new FormControl("", {
@@ -187,6 +199,12 @@ export class FlightEmailOrderComponent {
 
   minDepartureDate = new Date();
   minArrivalDate = this.orderForm.value.departureDate;
+
+
+onClick(day: string){
+  this.emailForm.controls[day].setValue(!this.emailForm.controls[day].value)
+}
+
 
   onSubmit(): void {
     this.orderInProgress = true;

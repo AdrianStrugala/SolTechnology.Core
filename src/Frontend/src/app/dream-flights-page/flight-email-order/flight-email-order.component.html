@@ -2,149 +2,238 @@
 <!-- [UserId], [From], [To], [DepartureDate], [ArrivalDate], [MinDaysOfStay], [MaxDaysOfStay], [OneWay] -->
 
 <mat-card class="card">
-
   <mat-card-title class="title">
     Subscribe for your Dream Flight email!
   </mat-card-title>
 
-  <br>
-  <br>
+  <br />
+  <mat-horizontal-stepper [linear]="false" labelPosition="bottom" #stepper>
+    <br />
 
-  <form [formGroup]="orderForm">
-    <mat-card-content>
+    <mat-step [stepControl]="orderForm">
+      <form [formGroup]="orderForm">
+        <ng-template matStepLabel>Provide the flight data</ng-template>
 
-      <h5>From:</h5>
-      <mat-form-field>
-        <input type="text" matInput placeholder="From" formControlName="from" [matAutocomplete]="autoFrom">
-        <mat-autocomplete #autoFrom="matAutocomplete">
-          <mat-option *ngFor="let airport of filteredFrom$ | async" [value]="airport.name">
-            {{airport.name}}
-          </mat-option>
-        </mat-autocomplete>
-        <mat-error *ngIf="orderForm.get('from').hasError('required')">
-          Field is required
-        </mat-error>
-        <mat-error *ngIf="orderForm.get('from').hasError('autocomplete')">
-         Select valid location from the list
-        </mat-error>
-      </mat-form-field>
+        <mat-card-content>
+          <h5>From:</h5>
+          <mat-form-field>
+            <input
+              type="text"
+              matInput
+              placeholder="From"
+              formControlName="from"
+              [matAutocomplete]="autoFrom"
+            />
+            <mat-autocomplete #autoFrom="matAutocomplete">
+              <mat-option
+                *ngFor="let airport of filteredFrom$ | async"
+                [value]="airport.name"
+              >
+                {{ airport.name }}
+              </mat-option>
+            </mat-autocomplete>
+            <mat-error *ngIf="orderForm.get('from').hasError('required')">
+              Field is required
+            </mat-error>
+            <mat-error *ngIf="orderForm.get('from').hasError('autocomplete')">
+              Select valid location from the list
+            </mat-error>
+          </mat-form-field>
 
-      <br>
-      <br>
-      <br>
-      <h5>To:</h5>
+          <br />
+          <br />
+          <br />
+          <h5>To:</h5>
 
-      <mat-form-field>
-        <input type="text" matInput placeholder="To" formControlName="to" [matAutocomplete]="autoTo">
-        <mat-autocomplete #autoTo="matAutocomplete">
-          <mat-option *ngFor="let option of filteredTo$ | async" [value]="option.name">
-            {{option.name}}
-          </mat-option>
-        </mat-autocomplete>
-        <mat-error *ngIf="orderForm.get('to').hasError('required')">
-          Field is required
-        </mat-error>
-        <mat-error *ngIf="orderForm.get('to').hasError('autocomplete')">
-          Select valid location from the list
-         </mat-error>
-      </mat-form-field>
+          <mat-form-field>
+            <input
+              type="text"
+              matInput
+              placeholder="To"
+              formControlName="to"
+              [matAutocomplete]="autoTo"
+            />
+            <mat-autocomplete #autoTo="matAutocomplete">
+              <mat-option
+                *ngFor="let option of filteredTo$ | async"
+                [value]="option.name"
+              >
+                {{ option.name }}
+              </mat-option>
+            </mat-autocomplete>
+            <mat-error *ngIf="orderForm.get('to').hasError('required')">
+              Field is required
+            </mat-error>
+            <mat-error *ngIf="orderForm.get('to').hasError('autocomplete')">
+              Select valid location from the list
+            </mat-error>
+          </mat-form-field>
 
-      <br>
-      <br>
-      <br>
+          <br />
+          <br />
+          <br />
 
-      <h5>Start travel at soonest:</h5>
+          <h5>Start travel at soonest:</h5>
 
-      <mat-form-field class="example-full-width">
-        <input matInput [matDatepicker]="DepartureDate" [min]="minDepartureDate" placeholder="Soonest start"
-          formControlName="departureDate">
-        <mat-datepicker-toggle matSuffix [for]="DepartureDate">
-        </mat-datepicker-toggle>
-        <mat-datepicker #DepartureDate></mat-datepicker>
-        <mat-error *ngIf="orderForm.get('departureDate').hasError('required')">
-          Field is required
-        </mat-error>
-      </mat-form-field>
+          <mat-form-field class="example-full-width">
+            <input
+              matInput
+              [matDatepicker]="DepartureDate"
+              [min]="minDepartureDate"
+              placeholder="Soonest start"
+              formControlName="departureDate"
+            />
+            <mat-datepicker-toggle matSuffix [for]="DepartureDate">
+            </mat-datepicker-toggle>
+            <mat-datepicker #DepartureDate></mat-datepicker>
+            <mat-error
+              *ngIf="orderForm.get('departureDate').hasError('required')"
+            >
+              Field is required
+            </mat-error>
+          </mat-form-field>
 
-      <br>
-      <br>
-      <br>
+          <br />
+          <br />
+          <br />
 
-      <h5>Return at latest:</h5>
+          <h5>Return at latest:</h5>
 
-      <mat-form-field class="example-full-width">
-        <input matInput [matDatepicker]="ArrivalDate" [min]="minArrivalDate" placeholder="Latest return"
-          formControlName="arrivalDate">
-        <mat-datepicker-toggle matSuffix [for]="ArrivalDate">
-        </mat-datepicker-toggle>
-        <mat-datepicker #ArrivalDate></mat-datepicker>
-        <mat-error *ngIf="orderForm.get('arrivalDate').hasError('required')">
-          Field is required
-        </mat-error>
-      </mat-form-field>
+          <mat-form-field class="example-full-width">
+            <input
+              matInput
+              [matDatepicker]="ArrivalDate"
+              [min]="minArrivalDate"
+              placeholder="Latest return"
+              formControlName="arrivalDate"
+            />
+            <mat-datepicker-toggle matSuffix [for]="ArrivalDate">
+            </mat-datepicker-toggle>
+            <mat-datepicker #ArrivalDate></mat-datepicker>
+            <mat-error
+              *ngIf="orderForm.get('arrivalDate').hasError('required')"
+            >
+              Field is required
+            </mat-error>
+          </mat-form-field>
 
-      <br>
-      <br>
-      <br>
+          <br />
+          <br />
+          <br />
 
-      <h5>Length of stay:</h5>
+          <h5>Length of stay:</h5>
 
-      <mat-form-field appearance="outline" class="number-input">
-        <mat-label>Min days</mat-label>
-        <input type="number" matInput placeholder="Min" min="1" formControlName="minDaysOfStay">
-        <mat-error *ngIf="orderForm.get('minDaysOfStay').hasError('required')">
-          Field is required
-        </mat-error>
-        <mat-error *ngIf="orderForm.get('minDaysOfStay').hasError('min')">
-          Minimum value is 1
-        </mat-error>
-      </mat-form-field>
+          <mat-form-field appearance="outline" class="number-input">
+            <mat-label>Min days</mat-label>
+            <input
+              type="number"
+              matInput
+              placeholder="Min"
+              min="1"
+              formControlName="minDaysOfStay"
+            />
+            <mat-error
+              *ngIf="orderForm.get('minDaysOfStay').hasError('required')"
+            >
+              Field is required
+            </mat-error>
+            <mat-error *ngIf="orderForm.get('minDaysOfStay').hasError('min')">
+              Minimum value is 1
+            </mat-error>
+          </mat-form-field>
 
-      —
+          —
 
-      <mat-form-field appearance="outline" class="number-input">
-        <mat-label>Max days</mat-label>
-        <input type="number" matInput placeholder="Max" min="1" formControlName="maxDaysOfStay">
-        <mat-error *ngIf="orderForm.get('maxDaysOfStay').hasError('required')">
-          Field is required
-        </mat-error>
-        <mat-error *ngIf="orderForm.get('maxDaysOfStay').hasError('min')">
-          Minimum value is 1
-        </mat-error>
-      </mat-form-field>
+          <mat-form-field appearance="outline" class="number-input">
+            <mat-label>Max days</mat-label>
+            <input
+              type="number"
+              matInput
+              placeholder="Max"
+              min="1"
+              formControlName="maxDaysOfStay"
+            />
+            <mat-error
+              *ngIf="orderForm.get('maxDaysOfStay').hasError('required')"
+            >
+              Field is required
+            </mat-error>
+            <mat-error *ngIf="orderForm.get('maxDaysOfStay').hasError('min')">
+              Minimum value is 1
+            </mat-error>
+          </mat-form-field>
 
-      <br>
-      <br>
+          <br />
+        </mat-card-content>
 
-    </mat-card-content>
+        <div style="display: inline-grid;">
+          <mat-error *ngIf="orderForm.hasError('minDays')">
+            The number of Minimum days of stay is greater than the length of
+            stay
+          </mat-error>
+          <mat-error *ngIf="orderForm.hasError('arrivalDate')">
+            Return must happen after Start of the travel
+          </mat-error>
+          <mat-error *ngIf="orderForm.hasError('maxDays')">
+            Number of Max days has to be greater or equal Min days
+          </mat-error>
+          <mat-error *ngIf="orderForm.hasError('login')">
+            You are not logged in
+          </mat-error>
+          <mat-error *ngIf="this.error">
+            {{ this.error }}
+          </mat-error>
+        </div>
 
-    <mat-card-actions>
-      <div style="display: inline-block; margin-right: 1rem;">
-      <button class="btn btn-primary" type="submit" [disabled]="orderForm.invalid" (click)="onSubmit()"
-          *ngIf="!orderInProgress">
-        Submit
-      </button>
-      <mat-spinner *ngIf="orderInProgress"> </mat-spinner>
-    </div>
-      <div style="display: inline-grid;">
-        <mat-error *ngIf="orderForm.hasError('minDays')">
-          The number of Minimum days of stay is greater than the length of stay
-        </mat-error>
-        <mat-error *ngIf="orderForm.hasError('arrivalDate')">
-          Return must happend after Start of the travel
-        </mat-error>
-        <mat-error *ngIf="orderForm.hasError('maxDays')">
-          Number of Max days has to be greater or equal Min days
-        </mat-error>
-        <mat-error *ngIf="orderForm.hasError('login')">
-          You are not logged in
-        </mat-error>
-        <mat-error *ngIf="this.error">
-          {{this.error}}
-        </mat-error>
-      </div>
-    </mat-card-actions>
+        <div>
+          <button matStepperNext class="btn btn-primary" style="float: right;">
+            Next
+          </button>
+        </div>
+      </form>
+    </mat-step>
 
-  </form>
+    <mat-step [stepControl]="emailForm">
+      <form [formGroup]="emailForm">
+        <ng-template matStepLabel>Set up the email notification</ng-template>
 
+        <h5>Select the days of receiving the email:</h5>
+
+        <button mat-mini-fab [ngStyle]="emailForm.get('sunday').value==true?{'background-color': 'rgb(0, 123, 255)'}:{'background-color':'gray'}" style="margin-right: 0.5rem;" (click)="onClick('sunday')">S</button>
+        <button mat-mini-fab [ngStyle]="emailForm.get('monday').value==true?{'background-color': 'rgb(0, 123, 255)'}:{'background-color':'gray'}" style="margin-right: 0.5rem;" (click)="onClick('monday')">M</button>
+        <button mat-mini-fab [ngStyle]="emailForm.get('tuesday').value==true?{'background-color': 'rgb(0, 123, 255)'}:{'background-color':'gray'}" style="margin-right: 0.5rem;" (click)="onClick('tuesday')">T</button>
+        <button mat-mini-fab [ngStyle]="emailForm.get('wendesday').value==true?{'background-color': 'rgb(0, 123, 255)'}:{'background-color':'gray'}" style="margin-right: 0.5rem;" (click)="onClick('wendesday')">W</button>
+        <button mat-mini-fab [ngStyle]="emailForm.get('thursday').value==true?{'background-color': 'rgb(0, 123, 255)'}:{'background-color':'gray'}" style="margin-right: 0.5rem;" (click)="onClick('thursday')">T</button>
+        <button mat-mini-fab [ngStyle]="emailForm.get('friday').value==true?{'background-color': 'rgb(0, 123, 255)'}:{'background-color':'gray'}" style="margin-right: 0.5rem;" (click)="onClick('friday')">F</button>
+        <button mat-mini-fab [ngStyle]="emailForm.get('saturday').value==true?{'background-color': 'rgb(0, 123, 255)'}:{'background-color':'gray'}" style="margin-right: 0.5rem;" (click)="onClick('saturday')">S</button>
+
+        <br />
+        <br />
+        <br />
+
+        <div>
+          <button class="btn btn-primary" matStepperPrevious>Back</button>
+          <div style="float: right;">
+            <button
+              class="btn btn-primary"
+              type="submit"
+              [disabled]="orderForm.invalid"
+              (click)="onSubmit()"
+              *ngIf="!orderInProgress"
+            >
+              Submit
+            </button>
+            <mat-spinner *ngIf="orderInProgress"> </mat-spinner>
+
+            <mat-error *ngIf="orderForm.invalid">
+              Finish providing the flight information
+            </mat-error>
+            <mat-error *ngIf="emailForm.invalid">
+              Finish providing the email notification information
+            </mat-error>
+          </div>
+        </div>
+      </form>
+    </mat-step>
+  </mat-horizontal-stepper>
 </mat-card>
