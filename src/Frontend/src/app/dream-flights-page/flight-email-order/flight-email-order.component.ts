@@ -211,7 +211,7 @@ onClick(day: string){
     this.error = null;
     this.orderForm.value.userId = this.userService.user.id;
 
-    this.flightEmailSubscriptionService.Insert(this.orderForm.value).subscribe(
+    this.flightEmailSubscriptionService.Insert(this.orderForm.value, this.emailForm.value).subscribe(
       () => {
         this.successMessageService.set("Order successfully placed!");
         this.router.navigate([""]);

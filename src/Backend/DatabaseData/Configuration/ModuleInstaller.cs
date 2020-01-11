@@ -1,4 +1,5 @@
 ﻿using DreamTravel.DatabaseData.FlightEmailSubscriptions;
+using DreamTravel.DatabaseData.SubscriptionDays;
 using DreamTravel.DatabaseData.Users;
 using DreamTravel.Domain.FlightEmailSubscriptions;
 using DreamTravel.Domain.Users;
@@ -16,6 +17,7 @@ namespace DreamTravel.DatabaseData.Configuration
 
             services.AddTransient<IUserRepository, UserRepository>();
             services.AddTransient<IFlightEmailSubscriptionRepository, FlightEmailSubscriptionRepository>();
+            services.AddTransient<ISubscriptionDaysRepository, SubscriptionDaysRepository>();
 
             return services;
         }

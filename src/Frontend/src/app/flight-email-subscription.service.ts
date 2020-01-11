@@ -21,10 +21,16 @@ export class FlightEmailSubscriptionService {
     );
   }
 
-  Insert(value: any): Observable<any> {
+  Insert(order: any, days:any): Observable<any> {
+
+    let data = {
+      FlightEmailSubscription: order,
+      SubscriptionDays: days
+    };
+
     return this.http.post(
       this.config.APPLICATION_URL + "api/FlightEmailSubscription",
-      value,
+      data,
       {
         observe: "body",
         headers: new HttpHeaders({
