@@ -2,39 +2,38 @@
 using System.Collections.Generic;
 using System.Net;
 using DreamTravel.Domain.Flights;
-using DreamTravel.Domain.Flights.GetFlights;
 using HtmlAgilityPack;
 
-namespace DreamTravel.FlightProviderData.Flights.GetFlights
+namespace DreamTravel.FlightProviderData.Query.GetFlights
 {
-    public class FlightRepository : IFlightRepository
+    public class GetFlights : IGetFlights
     {
-        public List<Flight> GetFlights(GetFlightsOrder order)
+        public List<Flight> Execute(GetFlightsQuery query)
         {
-            DateTime departureDate = order.DepartureDate > DateTime.UtcNow ? order.DepartureDate : DateTime.UtcNow;
+            DateTime departureDate = query.DepartureDate > DateTime.UtcNow ? query.DepartureDate : DateTime.UtcNow;
 
             string url = $"http://www.azair.eu/azfin.php?searchtype=flexi" +
                          $"&tp=0" + 
                          $"&isOneway=return" +
-                         $"&srcAirport={order.Departures.Key}+{FormattedStringProvider.Airports(order.Departures.Value)}" +
+                         $"&srcAirport={query.Departures.Key}+{FormattedStringProvider.Airports(query.Departures.Value)}" +
                          "&srcap1=POZ" +
                          "&srcFreeAirport=" +
-                         $"&srcTypedText={order.Departures.Key}" +
+                         $"&srcTypedText={query.Departures.Key}" +
                          "&srcFreeTypedText=" +
                          "&srcMC=" + 
-                         $"&dstAirport={order.Arrivals.Key}+{FormattedStringProvider.Airports(order.Arrivals.Value)}" +
+                         $"&dstAirport={query.Arrivals.Key}+{FormattedStringProvider.Airports(query.Arrivals.Value)}" +
                          "&dstap10=PMI" +
                          "&dstFreeAirport=" +
-                         $"&dstTypedText={order.Arrivals.Key}" +
+                         $"&dstTypedText={query.Arrivals.Key}" +
                          "&dstFreeTypedText=" +
                          "&dstMC=" +
                          $"&depmonth={FormattedStringProvider.Month(departureDate)}" +
                          $"&depdate={FormattedStringProvider.Date(departureDate)}" +
                          "&aid=0" +
-                         $"&arrmonth={FormattedStringProvider.Month(order.ArrivalDate)}" +
-                         $"&arrdate={FormattedStringProvider.Date(order.ArrivalDate)}" +
-                         $"&minDaysStay={order.MinDaysToStay}" +
-                         $"&maxDaysStay={order.MaxDaysToStay}" +
+                         $"&arrmonth={FormattedStringProvider.Month(query.ArrivalDate)}" +
+                         $"&arrdate={FormattedStringProvider.Date(query.ArrivalDate)}" +
+                         $"&minDaysStay={query.MinDaysToStay}" +
+                         $"&maxDaysStay={query.MaxDaysToStay}" +
                          "&dep0=true" +
                          "&dep1=true" +
                          "&dep2=true" +

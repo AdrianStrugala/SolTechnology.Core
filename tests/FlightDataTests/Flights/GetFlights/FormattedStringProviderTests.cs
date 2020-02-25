@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using DreamTravel.FlightProviderData.Flights.GetFlights;
+using DreamTravel.FlightProviderData.Query.GetFlights;
 using Xunit;
 
 namespace DreamTravel.FlightDataTests.Flights.GetFlights

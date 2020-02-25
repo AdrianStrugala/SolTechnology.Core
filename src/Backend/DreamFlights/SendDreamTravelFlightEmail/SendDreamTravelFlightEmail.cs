@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using DreamTravel.Domain.Flights;
-using DreamTravel.Domain.Flights.GetFlights;
 using DreamTravel.Domain.Users;
 using DreamTravel.DreamFlights.SendDreamTravelFlightEmail.Interfaces;
 using DreamTravel.DreamFlights.SendDreamTravelFlightEmail.Models;
+using DreamTravel.FlightProviderData.Query.GetFlights;
 using DreamTravel.Infrastructure.Email;
 
 namespace DreamTravel.DreamFlights.SendDreamTravelFlightEmail
@@ -13,20 +13,20 @@ namespace DreamTravel.DreamFlights.SendDreamTravelFlightEmail
     {
         private readonly IComposeMessage _composeMessage;
         private readonly IUserRepository _userRepository;
-        private readonly IFlightRepository _flightRepository;
+        private readonly IGetFlights _getFlights;
         private readonly IFilterFlights _filterFlights;
 
-        public SendDreamTravelFlightEmail(IComposeMessage composeMessage, IUserRepository userRepository, IFlightRepository flightRepository, IFilterFlights filterFlights)
+        public SendDreamTravelFlightEmail(IComposeMessage composeMessage, IUserRepository userRepository, IGetFlights getFlights, IFilterFlights filterFlights)
         {
             _composeMessage = composeMessage;
             _userRepository = userRepository;
-            _flightRepository = flightRepository;
+            _getFlights = getFlights;
             _filterFlights = filterFlights;
         }
 
         public void Execute()
         {
-            GetFlightsOrder getFlightsOrder = new GetFlightsOrder
+            GetFlightsQuery getFlightsQuery = new GetFlightsQuery
             (
                 new KeyValuePair<string, List<string>>("Wroclaw", new List<string> { "WRO" }),
                 new KeyValuePair<string, List<string>>("Anywhere", new List<string> { "XXX" }),
@@ -36,7 +36,7 @@ namespace DreamTravel.DreamFlights.SendDreamTravelFlightEmail
                 5
             );
 
-            List<Flight> flights = _flightRepository.GetFlights(getFlightsOrder);
+            List<Flight> flights = _getFlights.Execute(getFlightsQuery);
 
             flights = _filterFlights.Execute(flights);
 

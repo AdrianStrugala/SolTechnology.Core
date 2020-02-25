@@ -1,7 +1,6 @@
 ﻿using DreamTravel.Domain.Airports;
-using DreamTravel.Domain.Flights;
 using DreamTravel.FlightProviderData.Airports;
-using DreamTravel.FlightProviderData.Flights.GetFlights;
+using DreamTravel.FlightProviderData.Query.GetFlights;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace DreamTravel.FlightProviderData
@@ -11,7 +10,7 @@ namespace DreamTravel.FlightProviderData
         public static IServiceCollection InstallFlightProviderData(this IServiceCollection services)
         {
             services.AddTransient<IAirportRepository, AirportRepository>();
-            services.AddTransient<IFlightRepository, FlightRepository>();
+            services.AddTransient<IGetFlights, GetFlights>();
 
             return services;
         }

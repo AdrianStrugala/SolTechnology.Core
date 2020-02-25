@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace DreamTravel.Domain.Flights.GetFlights
+namespace DreamTravel.FlightProviderData.Query.GetFlights
 {
-    public class GetFlightsOrder
+    public class GetFlightsQuery
     {
         public KeyValuePair<string, List<string>> Departures { get; }
 
@@ -20,7 +20,7 @@ namespace DreamTravel.Domain.Flights.GetFlights
         public bool OneWay { get; }
 
 
-        public GetFlightsOrder(KeyValuePair<string, List<string>> departures, KeyValuePair<string, List<string>> arrivals, DateTime departureDate, DateTime arrivalDate, int minDaysToStay, int maxDaysToStay, bool oneWay = false)
+        public GetFlightsQuery(KeyValuePair<string, List<string>> departures, KeyValuePair<string, List<string>> arrivals, DateTime departureDate, DateTime arrivalDate, int minDaysToStay, int maxDaysToStay, bool oneWay = false)
         {
             Departures = departures;
             Arrivals = arrivals;

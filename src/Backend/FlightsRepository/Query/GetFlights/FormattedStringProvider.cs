@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace DreamTravel.FlightProviderData.Flights.GetFlights
+namespace DreamTravel.FlightProviderData.Query.GetFlights
 {
     public static class FormattedStringProvider
     {
