@@ -1,6 +1,6 @@
 ﻿using System.Threading.Tasks;
 using DreamTravel.DreamTrips.CalculateBestPath.Interfaces;
-using DreamTravel.DreamTrips.CalculateBestPath.Models;
+using DreamTravel.GeolocationData.Query.DownloadRoadData;
 
 namespace DreamTravel.DreamTrips.CalculateBestPath
 {

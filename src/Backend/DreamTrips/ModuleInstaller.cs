@@ -18,7 +18,6 @@ namespace DreamTravel.DreamTrips
 
             //CalculateBestPath
             services.AddScoped<ICalculateBestPath, CalculateBestPath.CalculateBestPath>();
-            services.AddScoped<IDownloadRoadData, DownloadRoadData>();
             services.AddScoped<IFindProfitablePath, FindProfitablePath>();
             services.AddScoped<IFormPathsFromMatrices, FormPathsFromMatrices>();
 

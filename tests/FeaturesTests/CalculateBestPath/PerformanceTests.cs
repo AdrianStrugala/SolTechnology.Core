@@ -1,11 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using DreamTravel.Domain.Cities;
-using DreamTravel.Domain.Matrices;
 using DreamTravel.DreamTrips.CalculateBestPath;
 using DreamTravel.DreamTrips.CalculateBestPath.Interfaces;
-using DreamTravel.GeolocationData;
-using DreamTravel.GeolocationData.Matrices;
+using DreamTravel.GeolocationData.Query.DownloadRoadData;
+using DreamTravel.GeolocationData.Query.DownloadRoadData.Clients;
 using DreamTravel.TravelingSalesmanProblem;
 using Microsoft.Extensions.Logging.Abstractions;
 using Xunit;
@@ -18,8 +17,11 @@ namespace DreamTravel.FeaturesTests.CalculateBestPath
 
         public PerformanceTests()
         {
-            IMatrixRepository matrixRepository = new MatrixRepository(NullLogger<MatrixRepository>.Instance);
-            DownloadRoadData downloadRoadData = new DownloadRoadData(matrixRepository);
+            IDownloadDurationMatrixByTollRoad downloadDurationMatrixByTollRoad = new DownloadDurationMatrixByTollRoad(NullLogger<DownloadDurationMatrixByTollRoad>.Instance);
+            IDownloadDurationMatrixByFreeRoad downloadDurationMatrixByFreeRoad = new DownloadDurationMatrixByFreeRoad(NullLogger<DownloadDurationMatrixByFreeRoad>.Instance);
+            IDownloadCostBetweenTwoCities downloadCostBetweenTwoCities = new DownloadCostBetweenTwoCities(NullLogger<DownloadCostBetweenTwoCities>.Instance);
+
+            DownloadRoadData downloadRoadData = new DownloadRoadData(downloadDurationMatrixByTollRoad, downloadDurationMatrixByFreeRoad, downloadCostBetweenTwoCities);
             IFormPathsFromMatrices formOutputData = new FormPathsFromMatrices();
 
             ITSP tsp = new AntColony();

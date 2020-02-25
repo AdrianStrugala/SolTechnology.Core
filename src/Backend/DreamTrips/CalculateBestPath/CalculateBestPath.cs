@@ -3,7 +3,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using DreamTravel.Domain.Cities;
 using DreamTravel.DreamTrips.CalculateBestPath.Interfaces;
-using DreamTravel.DreamTrips.CalculateBestPath.Models;
+using DreamTravel.GeolocationData.Query.DownloadRoadData;
 using DreamTravel.TravelingSalesmanProblem;
 
 namespace DreamTravel.DreamTrips.CalculateBestPath

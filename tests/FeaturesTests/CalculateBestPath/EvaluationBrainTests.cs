@@ -1,6 +1,6 @@
 ﻿using System;
 using DreamTravel.DreamTrips.CalculateBestPath;
-using DreamTravel.DreamTrips.CalculateBestPath.Models;
+using DreamTravel.GeolocationData.Query.DownloadRoadData;
 using Xunit;
 
 namespace DreamTravel.FeaturesTests.CalculateBestPath

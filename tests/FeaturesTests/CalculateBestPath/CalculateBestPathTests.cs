@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using DreamTravel.Domain.Cities;
 using DreamTravel.DreamTrips.CalculateBestPath;
 using DreamTravel.DreamTrips.CalculateBestPath.Interfaces;
-using DreamTravel.DreamTrips.CalculateBestPath.Models;
+using DreamTravel.GeolocationData.Query.DownloadRoadData;
 using DreamTravel.TravelingSalesmanProblem;
 using NSubstitute;
 using Xunit;
@@ -29,7 +29,7 @@ namespace DreamTravel.FeaturesTests.CalculateBestPath
         }
 
         [Fact]
-        void Handle_ValidData_AllCallsAreDone()
+        public void Handle_ValidData_AllCallsAreDone()
         {
             //Arrange
             _downloadRoadData.Execute(Arg.Any<List<City>>(), Arg.Any<EvaluationMatrix>()).Returns(new EvaluationMatrix(1));

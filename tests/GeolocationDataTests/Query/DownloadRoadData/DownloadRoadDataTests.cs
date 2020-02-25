@@ -1,25 +1,24 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using DreamTravel.Domain.Cities;
-using DreamTravel.Domain.Matrices;
-using DreamTravel.DreamTrips.CalculateBestPath;
-using DreamTravel.DreamTrips.CalculateBestPath.Models;
-using DreamTravel.GeolocationData;
-using DreamTravel.GeolocationData.Matrices;
+using DreamTravel.GeolocationData.Query.DownloadRoadData;
+using DreamTravel.GeolocationData.Query.DownloadRoadData.Clients;
 using Microsoft.Extensions.Logging.Abstractions;
 using Xunit;
 
-namespace DreamTravel.FeaturesTests.CalculateBestPath
+namespace DreamTravel.GeolocationDataTests.Query.DownloadRoadData
 {
     public class DownloadRoadDataTests
     {
-        private readonly DownloadRoadData _sut;
+        private readonly GeolocationData.Query.DownloadRoadData.DownloadRoadData _sut;
 
         public DownloadRoadDataTests()
         {
-            IMatrixRepository matrixRepository = new MatrixRepository(NullLogger<MatrixRepository>.Instance);
+            IDownloadDurationMatrixByTollRoad downloadDurationMatrixByTollRoad = new DownloadDurationMatrixByTollRoad(NullLogger<DownloadDurationMatrixByTollRoad>.Instance);
+            IDownloadDurationMatrixByFreeRoad downloadDurationMatrixByFreeRoad = new DownloadDurationMatrixByFreeRoad(NullLogger<DownloadDurationMatrixByFreeRoad>.Instance);
+            IDownloadCostBetweenTwoCities downloadCostBetweenTwoCities = new DownloadCostBetweenTwoCities(NullLogger<DownloadCostBetweenTwoCities>.Instance);
 
-            _sut = new DownloadRoadData(matrixRepository);
+            _sut = new GeolocationData.Query.DownloadRoadData.DownloadRoadData(downloadDurationMatrixByTollRoad, downloadDurationMatrixByFreeRoad, downloadCostBetweenTwoCities);
         }
 
 
