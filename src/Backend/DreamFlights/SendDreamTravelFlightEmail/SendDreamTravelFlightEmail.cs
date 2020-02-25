@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using DreamTravel.DatabaseData.Query.GetPreviewUsers;
 using DreamTravel.Domain.Flights;
-using DreamTravel.Domain.Users;
 using DreamTravel.DreamFlights.SendDreamTravelFlightEmail.Interfaces;
 using DreamTravel.DreamFlights.SendDreamTravelFlightEmail.Models;
 using DreamTravel.FlightProviderData.Query.GetFlights;
@@ -12,14 +12,14 @@ namespace DreamTravel.DreamFlights.SendDreamTravelFlightEmail
     public class SendDreamTravelFlightEmail : ISendDreamTravelFlightEmail
     {
         private readonly IComposeMessage _composeMessage;
-        private readonly IUserRepository _userRepository;
+        private readonly IGetPreviewUsers _getPreviewUsers;
         private readonly IGetFlights _getFlights;
         private readonly IFilterFlights _filterFlights;
 
-        public SendDreamTravelFlightEmail(IComposeMessage composeMessage, IUserRepository userRepository, IGetFlights getFlights, IFilterFlights filterFlights)
+        public SendDreamTravelFlightEmail(IComposeMessage composeMessage, IGetPreviewUsers getPreviewUsers, IGetFlights getFlights, IFilterFlights filterFlights)
         {
             _composeMessage = composeMessage;
-            _userRepository = userRepository;
+            _getPreviewUsers = getPreviewUsers;
             _getFlights = getFlights;
             _filterFlights = filterFlights;
         }
@@ -37,10 +37,9 @@ namespace DreamTravel.DreamFlights.SendDreamTravelFlightEmail
             );
 
             List<Flight> flights = _getFlights.Execute(getFlightsQuery);
-
             flights = _filterFlights.Execute(flights);
 
-            var users = _userRepository.GetPreviewUsers();
+            var users = _getPreviewUsers.Execute();
 
             foreach (var user in users)
             {

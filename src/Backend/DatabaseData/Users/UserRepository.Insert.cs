@@ -1,10 +1,19 @@
 ﻿using Dapper;
 using DreamTravel.Domain.Users;
+using DreamTravel.Infrastructure.Database;
 
 namespace DreamTravel.DatabaseData.Users
 {
     public partial class UserRepository : IUserRepository
     {
+        private readonly IDbConnectionFactory _dbConnectionFactory;
+
+        public UserRepository(IDbConnectionFactory dbConnectionFactory)
+        {
+            _dbConnectionFactory = dbConnectionFactory;
+        }
+
+
         private const string InsertSql = @"
   INSERT INTO [dbo].[User] (
         [Name]

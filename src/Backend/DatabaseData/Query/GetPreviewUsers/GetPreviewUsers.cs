@@ -1,20 +1,11 @@
 ﻿using System.Collections.Generic;
 using DreamTravel.Domain.Users;
-using DreamTravel.Infrastructure.Database;
 
-namespace DreamTravel.DatabaseData.Users
+namespace DreamTravel.DatabaseData.Query.GetPreviewUsers
 {
-    public partial class UserRepository : IUserRepository
+    public class GetPreviewUsers : IGetPreviewUsers
     {
-        private readonly IDbConnectionFactory _dbConnectionFactory;
-
-        public UserRepository(IDbConnectionFactory dbConnectionFactory)
-        {
-            _dbConnectionFactory = dbConnectionFactory;
-        }
-
-
-        public List<User> GetPreviewUsers()
+        public List<User> Execute()
         {
             List<User> result = new List<User>();
 
