@@ -14,7 +14,7 @@ namespace DreamTravel.DreamFlights.GetAirports
 
         public List<Airport> Execute()
         {
-            return _airportRepository.Get();
+            return _airportRepository.GetAll();
         }
     }
 }

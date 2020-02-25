@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 using DreamTravel.Domain.Airports;
 
 namespace DreamTravel.FlightProviderData.Airports
@@ -8,7 +7,7 @@ namespace DreamTravel.FlightProviderData.Airports
     {
         public Airport GetByPlace(string place)
         {
-            var result = Get().FirstOrDefault(a => a.Name == place);
+            var result = AirportDataSource.Get().FirstOrDefault(a => a.Name == place);
 
             return result;
         }

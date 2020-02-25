@@ -4,9 +4,9 @@ using Newtonsoft.Json;
 
 namespace DreamTravel.FlightProviderData.Airports
 {
-    public partial class AirportRepository
+    public partial class AirportDataSource
     {
-        public Dictionary<string, List<string>> GetCountryToCodesMap()
+        public static Dictionary<string, List<string>> GetCountryToCodesMap()
         {
             var placeToAirportsDataModels = JsonConvert.DeserializeObject<Dictionary<string, PlaceToAirportsDataModel>>(Place2CodesMap);
 

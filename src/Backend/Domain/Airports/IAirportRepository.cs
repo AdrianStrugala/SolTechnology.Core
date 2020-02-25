@@ -4,7 +4,7 @@ namespace DreamTravel.Domain.Airports
 {
     public interface IAirportRepository
     {
-        List<Airport> Get();
+        List<Airport> GetAll();
 
         Airport GetByPlace(string place);
     }

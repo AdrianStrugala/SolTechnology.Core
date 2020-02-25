@@ -20,7 +20,7 @@ namespace DreamTravel.FlightDataTests.Airports
             // Arrange
 
             // Act
-            Dictionary<string, string> result = _sut.GetCityToCodeMap();
+            Dictionary<string, string> result = AirportDataSource.GetCityToCodeMap();
 
             // Assert
             Assert.NotNull(result);
@@ -57,7 +57,7 @@ namespace DreamTravel.FlightDataTests.Airports
             };
 
             // Act
-            Dictionary<string, List<string>> result = _sut.GetCountryToCodesMap();
+            Dictionary<string, List<string>> result = AirportDataSource.GetCountryToCodesMap();
 
             // Assert
             Assert.NotNull(result);

@@ -1,13 +1,12 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using DreamTravel.Domain.Airports;
 using Newtonsoft.Json;
 
 namespace DreamTravel.FlightProviderData.Airports
 {
-    public partial class AirportRepository : IAirportRepository
+    public partial class AirportDataSource
     {
-        public Dictionary<string, string> GetCityToCodeMap()
+        public static Dictionary<string, string> GetCityToCodeMap()
         {
             var airportToCityMap = JsonConvert.DeserializeObject<Dictionary<string, string>>(Airports2Countries);
 
