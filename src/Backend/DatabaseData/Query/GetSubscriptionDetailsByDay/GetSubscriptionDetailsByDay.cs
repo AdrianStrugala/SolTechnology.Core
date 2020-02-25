@@ -1,13 +1,20 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using Dapper;
-using DreamTravel.Domain.FlightEmailSubscriptions;
+using DreamTravel.Infrastructure.Database;
 
-namespace DreamTravel.DatabaseData.FlightEmailSubscriptions
+namespace DreamTravel.DatabaseData.Query.GetSubscriptionDetailsByDay
 {
-    public partial class FlightEmailSubscriptionRepository : IFlightEmailSubscriptionRepository
+    public class GetSubscriptionDetailsByDay : IGetSubscriptionDetailsByDay
     {
-        public List<FlightEmailData> GetByDay(string day)
+        private readonly IDbConnectionFactory _dbConnectionFactory;
+
+        public GetSubscriptionDetailsByDay(IDbConnectionFactory dbConnectionFactory)
+        {
+            _dbConnectionFactory = dbConnectionFactory;
+        }
+
+        public List<FlightEmailData> Execute(string day)
         {
             var result = new List<FlightEmailData>();
 
@@ -38,7 +45,7 @@ WHERE
     [SubscriptionDays].[{day}] = 1
 ";
 
-                result = connection.Query<FlightEmailData>(sql).ToList();
+                result = SqlMapper.Query<FlightEmailData>(connection, sql).ToList();
             }
 
             return result;

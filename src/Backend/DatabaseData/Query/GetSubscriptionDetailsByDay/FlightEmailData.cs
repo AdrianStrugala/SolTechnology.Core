@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace DreamTravel.Domain.FlightEmailSubscriptions
+namespace DreamTravel.DatabaseData.Query.GetSubscriptionDetailsByDay
 {
     public class FlightEmailData
     {

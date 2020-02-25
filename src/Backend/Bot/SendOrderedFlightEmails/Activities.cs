@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
+using DreamTravel.DatabaseData.Query.GetSubscriptionDetailsByDay;
 using DreamTravel.Domain.FlightEmailSubscriptions;
 using DreamTravel.DreamFlights.GetFlightEmailData;
 using DreamTravel.DreamFlights.SendOrderedFlightEmail.Interfaces;
@@ -25,7 +26,7 @@ namespace DreamTravel.Bot.SendOrderedFlightEmails
         public async Task<List<FlightEmailData>> GetFlightEmailOrders(
             [ActivityTrigger] object input)
         {
-            return _getFlightEmailData.Execute();
+            return _getFlightEmailData.Handle();
         }
 
 

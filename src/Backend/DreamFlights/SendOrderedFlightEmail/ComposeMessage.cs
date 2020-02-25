@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using DreamTravel.DatabaseData.Query.GetSubscriptionDetailsByDay;
 using DreamTravel.Domain.FlightEmailSubscriptions;
 using DreamTravel.Domain.Flights;
 using DreamTravel.DreamFlights.SendOrderedFlightEmail.Interfaces;

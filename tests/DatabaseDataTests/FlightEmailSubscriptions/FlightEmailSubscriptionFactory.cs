@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Dapper;
+using DreamTravel.DatabaseData.Query.GetSubscriptionDetailsByDay;
 using DreamTravel.Domain.FlightEmailSubscriptions;
 using DreamTravel.Infrastructure.Database;
 

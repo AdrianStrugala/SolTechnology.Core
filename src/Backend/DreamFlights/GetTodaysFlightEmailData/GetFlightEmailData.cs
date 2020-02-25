@@ -1,21 +1,21 @@
 ﻿using System;
 using System.Collections.Generic;
-using DreamTravel.Domain.FlightEmailSubscriptions;
+using DreamTravel.DatabaseData.Query.GetSubscriptionDetailsByDay;
 
 namespace DreamTravel.DreamFlights.GetFlightEmailData
 {
     public class GetFlightEmailData : IGetFlightEmailData
     {
-        private readonly IFlightEmailSubscriptionRepository _flightEmailSubscriptionRepository;
+        private readonly IGetSubscriptionDetailsByDay _getSubscriptionDetailsByDay;
 
-        public GetFlightEmailData(IFlightEmailSubscriptionRepository flightEmailSubscriptionRepository)
+        public GetFlightEmailData(IGetSubscriptionDetailsByDay getSubscriptionDetailsByDay)
         {
-            _flightEmailSubscriptionRepository = flightEmailSubscriptionRepository;
+            _getSubscriptionDetailsByDay = getSubscriptionDetailsByDay;
         }
 
-        public List<FlightEmailData> Execute()
+        public List<FlightEmailData> Handle()
         {
-            return _flightEmailSubscriptionRepository.GetByDay(DateTime.UtcNow.DayOfWeek.ToString());
+            return _getSubscriptionDetailsByDay.Execute(DateTime.UtcNow.DayOfWeek.ToString());
         }
     }
 }

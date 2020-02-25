@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using DreamTravel.DatabaseData.Query.GetSubscriptionDetailsByDay;
 using DreamTravel.Domain.FlightEmailSubscriptions;
 using Microsoft.Azure.WebJobs;
 
