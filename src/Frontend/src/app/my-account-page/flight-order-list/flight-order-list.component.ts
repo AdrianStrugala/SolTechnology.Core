@@ -20,4 +20,8 @@ export class FlightOrderListComponent {
   cancel(id: number){
     this.flightEmailSubscriptionService.Delete(id).subscribe();
   }
+
+  onClick(day: string){
+   // this.emailForm.controls[day].setValue(!this.emailForm.controls[day].value)
+  }
 }

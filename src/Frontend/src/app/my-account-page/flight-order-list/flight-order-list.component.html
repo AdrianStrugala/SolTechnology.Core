@@ -1,6 +1,10 @@
 <div class="container">
   <mat-list>
     <h4>Your Flight Email Orders:</h4>
+    <br>
+    <h5 style="margin-left: 4rem;">Details:</h5>
+    <h5 style="margin-left: 28rem;">Days of email:</h5>
+    <h5 style="margin-left: 18rem;">Actions:</h5>
     <div *ngIf="flightEmailOrders$ | async as flightEmailOrders">
       <mat-list-item *ngFor="let flightEmail of flightEmailOrders">
         <mat-icon mat-list-icon>airplanemode_on</mat-icon>
@@ -15,6 +19,14 @@
           {{ flightEmail.minDaysOfStay }} to
           {{ flightEmail.maxDaysOfStay }} days.
         </p>
+
+        <button mat-mini-fab [ngStyle]="flightEmail.sunday==true?{'background-color': 'rgb(0, 123, 255)'}:{'background-color':'gray'}" style="margin-right: 0.5rem;" (click)="onClick('sunday', flightEmail.id)">S</button>
+        <button mat-mini-fab [ngStyle]="flightEmail.monday==true?{'background-color': 'rgb(0, 123, 255)'}:{'background-color':'gray'}" style="margin-right: 0.5rem;" (click)="onClick('monday', flightEmail.id)">M</button>
+        <button mat-mini-fab [ngStyle]="flightEmail.tuesday==true?{'background-color': 'rgb(0, 123, 255)'}:{'background-color':'gray'}" style="margin-right: 0.5rem;" (click)="onClick('tuesday', flightEmail.id)">T</button>
+        <button mat-mini-fab [ngStyle]="flightEmail.wednesday==true?{'background-color': 'rgb(0, 123, 255)'}:{'background-color':'gray'}" style="margin-right: 0.5rem;" (click)="onClick('wednesday', flightEmail.id)">W</button>
+        <button mat-mini-fab [ngStyle]="flightEmail.thursday==true?{'background-color': 'rgb(0, 123, 255)'}:{'background-color':'gray'}" style="margin-right: 0.5rem;" (click)="onClick('thursday', flightEmail.id)">T</button>
+        <button mat-mini-fab [ngStyle]="flightEmail.friday==true?{'background-color': 'rgb(0, 123, 255)'}:{'background-color':'gray'}" style="margin-right: 0.5rem;" (click)="onClick('friday', flightEmail.id)">F</button>
+        <button mat-mini-fab [ngStyle]="flightEmail.saturday==true?{'background-color': 'rgb(0, 123, 255)'}:{'background-color':'gray'}" style="margin-right: 12rem;" (click)="onClick('saturday', flightEmail.id)">S</button>
 
         <button
           type="button"
