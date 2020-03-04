@@ -12,7 +12,7 @@ namespace DreamTravel.GeolocationDataTests.Query.DownloadRoadData.Clients
     {
         readonly DownloadDurationMatrixByTollRoad _sut = new DownloadDurationMatrixByTollRoad(NullLogger<DownloadDurationMatrixByTollRoad>.Instance);
 
-        [Fact]
+        [Fact(Skip = "Paid test")]
         public async Task DownloadDurationMatrixByTollRoad_InvokeWithValidCities_ReturnsSomeDuration()
         {
             //Arrange
@@ -41,7 +41,7 @@ namespace DreamTravel.GeolocationDataTests.Query.DownloadRoadData.Clients
             Assert.Equal(double.MaxValue, result[0]);
         }
 
-        [Fact]
+        [Fact(Skip = "Paid test")]
         public async Task DownloadDurationMatrixByTollRoad_InvalidCities_ExceptionIsThrown()
         {
             //Arrange

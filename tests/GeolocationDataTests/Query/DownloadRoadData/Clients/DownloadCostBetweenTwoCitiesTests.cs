@@ -12,7 +12,7 @@ namespace DreamTravel.GeolocationDataTests.Query.DownloadRoadData.Clients
 
 
 
-        [Fact]
+        [Fact(Skip = "Paid test")]
         public async Task DownloadCostBetweenTwoCities_InvokeWithValidCities_ReturnsSomeCost()
         {
             //Arrange
@@ -38,7 +38,7 @@ namespace DreamTravel.GeolocationDataTests.Query.DownloadRoadData.Clients
         }
 
 
-        [Fact]
+        [Fact(Skip = "Paid test")]
         public async Task DownloadCostBetweenTwoCities_InvalidCities_MinusCostIsReturned()
         {
             //Arrange
