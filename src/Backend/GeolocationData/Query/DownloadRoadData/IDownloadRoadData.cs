@@ -6,7 +6,6 @@ namespace DreamTravel.GeolocationData.Query.DownloadRoadData
 {
     public interface IDownloadRoadData
     {
-        Task<EvaluationMatrix> Execute(List<City> listOfCities,
-                                       EvaluationMatrix evaluationMatrix);
+        Task<EvaluationMatrix> Execute(List<City> listOfCities);
     }
 }

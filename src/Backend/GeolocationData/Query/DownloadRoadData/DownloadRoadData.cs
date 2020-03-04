@@ -20,8 +20,10 @@ namespace DreamTravel.GeolocationData.Query.DownloadRoadData
             _downloadCostBetweenTwoCities = downloadCostBetweenTwoCities;
         }
 
-        public async Task<EvaluationMatrix> Execute(List<City> listOfCities, EvaluationMatrix evaluationMatrix)
+        public async Task<EvaluationMatrix> Execute(List<City> listOfCities)
         {
+            EvaluationMatrix evaluationMatrix = new EvaluationMatrix(listOfCities.Count);
+
             List<Task> tasks = new List<Task>
             {
                 Task.Run(async () => evaluationMatrix.TollDistances = await _downloadDurationMatrixByTollRoad.Execute(listOfCities)),

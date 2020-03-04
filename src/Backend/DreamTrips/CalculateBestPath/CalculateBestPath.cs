@@ -25,8 +25,7 @@ namespace DreamTravel.DreamTrips.CalculateBestPath
 
         public async Task<Result> Execute(List<City> cities)
         {
-            EvaluationMatrix evaluationMatrix = new EvaluationMatrix(cities.Count);
-            evaluationMatrix = await _downloadRoadData.Execute(cities, evaluationMatrix);
+            EvaluationMatrix evaluationMatrix = await _downloadRoadData.Execute(cities);
             evaluationMatrix = _findProfitablePath.Execute(evaluationMatrix, cities.Count);
 
             var orderOfCities = _tspSolver.SolveTSP(evaluationMatrix.OptimalDistances.ToList());

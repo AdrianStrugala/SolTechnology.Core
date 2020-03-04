@@ -42,11 +42,9 @@ namespace DreamTravel.GeolocationDataTests.Query.DownloadRoadData
 
             List<City> cities = new List<City> { firstCity, secondCity };
 
-            EvaluationMatrix matrix = new EvaluationMatrix(2);
-
 
             //Act
-            matrix = await _sut.Execute(cities, matrix);
+            EvaluationMatrix matrix = await _sut.Execute(cities);
 
 
             //Assert
@@ -81,11 +79,8 @@ namespace DreamTravel.GeolocationDataTests.Query.DownloadRoadData
                 cities.Add(city);
             }
 
-            EvaluationMatrix matrix = new EvaluationMatrix(noOfCities);
-
-
             //Act
-            await _sut.Execute(cities, matrix);
+            await _sut.Execute(cities);
 
 
             //Assert
