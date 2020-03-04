@@ -31,7 +31,7 @@ export class CitiesPanelComponent implements AfterViewInit {
   ngAfterViewInit(): void {
     //Focus on the last row in Cities Panel
     this.cityRows.changes.subscribe(() => {
-      this.cityRows.last.nativeElement.children[0].children[1].focus();
+      this.cityRows.last.nativeElement.children[0].children[0].focus();
     });
   }
 }

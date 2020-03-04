@@ -113,7 +113,7 @@ export class CityService {
         }
       )
       .subscribe(city => {
-        if (this.citiesForm.controls[this.CityIndex].value != null) {
+        if (this.citiesForm.controls[this.CityIndex].value != "") {
           this.addCity();
         }
         this.updateCity(this.CityIndex, city, "✓");
