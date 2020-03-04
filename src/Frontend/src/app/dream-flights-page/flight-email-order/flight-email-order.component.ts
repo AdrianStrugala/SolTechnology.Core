@@ -138,7 +138,7 @@ export class FlightEmailOrderComponent {
     {
       monday: new FormControl(true),
       tuesday: new FormControl(true),
-      wendesday: new FormControl(true),
+      wednesday: new FormControl(true),
       thursday: new FormControl(true),
       friday: new FormControl(true),
       saturday: new FormControl(true),
