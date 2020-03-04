@@ -1,10 +1,9 @@
-﻿using System.Collections.Generic;
-using DreamTravel.Domain.FlightEmailSubscriptions;
+﻿using DreamTravel.DatabaseData.Query.GetSubscriptionsWithDays;
 
 namespace DreamTravel.DreamFlights.GetFlightEmailSubscriptionsForUser
 {
     public interface IGetFlightEmailSubscriptionsForUser
     {
-        List<FlightEmailSubscription> Execute(int userId);
+        GetSubscriptionsWithDaysResult Execute(GetSubscriptionsWithDaysQuery query);
     }
 }

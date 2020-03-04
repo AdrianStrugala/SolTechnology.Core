@@ -69,4 +69,11 @@ export interface IFlightEmailSubscription {
   arrivalDate: Date;
   minDaysOfStay: number;
   maxDaysOfStay: number;
+  monday: boolean;
+  tuesday: boolean;
+  wednesday: boolean;
+  thursday: boolean;
+  friday: boolean;
+  saturday: boolean;
+  sunday: boolean;
 }

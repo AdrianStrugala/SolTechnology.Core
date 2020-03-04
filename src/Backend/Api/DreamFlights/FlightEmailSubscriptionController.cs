@@ -1,4 +1,5 @@
 ﻿using System;
+using DreamTravel.DatabaseData.Query.GetSubscriptionsWithDays;
 using DreamTravel.Domain.FlightEmailSubscriptions;
 using DreamTravel.DreamFlights.DeleteFlightEmailSubscription;
 using DreamTravel.DreamFlights.GetFlightEmailSubscriptionsForUser;
@@ -39,7 +40,7 @@ namespace DreamTravel.Api.DreamFlights
         public IActionResult Delete([FromRoute] int id)
         {
             _logger.LogInformation($"Deleting flight email subscription, [{id}]");
-            
+
             try
             {
                 _deleteFlightEmailSubscription.Execute(id);
@@ -63,9 +64,9 @@ namespace DreamTravel.Api.DreamFlights
             {
                 _logger.LogInformation($"Getting flight email orders for user: [{userId}]");
 
-                var result = _getFlightEmailSubscriptionsForUser.Execute(userId);
+                var result = _getFlightEmailSubscriptionsForUser.Execute(new GetSubscriptionsWithDaysQuery(userId));
 
-                return Ok(result);
+                return Ok(result.SubscriptionsWithDays);
             }
 
             catch (Exception ex)

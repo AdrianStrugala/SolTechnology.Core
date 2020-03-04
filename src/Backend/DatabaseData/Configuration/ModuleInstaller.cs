@@ -1,6 +1,7 @@
 ﻿using DreamTravel.DatabaseData.FlightEmailSubscriptions;
 using DreamTravel.DatabaseData.Query.GetPreviewUsers;
 using DreamTravel.DatabaseData.Query.GetSubscriptionDetailsByDay;
+using DreamTravel.DatabaseData.Query.GetSubscriptionsWithDays;
 using DreamTravel.DatabaseData.SubscriptionDays;
 using DreamTravel.DatabaseData.Users;
 using DreamTravel.Domain.FlightEmailSubscriptions;
@@ -23,6 +24,7 @@ namespace DreamTravel.DatabaseData.Configuration
 
             services.AddTransient<IGetSubscriptionDetailsByDay, GetSubscriptionDetailsByDay>();
             services.AddTransient<IGetPreviewUsers, GetPreviewUsers>();
+            services.AddTransient<IGetSubscriptionsWithDays, GetSubscriptionsWithDaysHandler>();
 
             return services;
         }
