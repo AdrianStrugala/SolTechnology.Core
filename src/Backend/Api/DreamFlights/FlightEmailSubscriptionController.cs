@@ -4,6 +4,7 @@ using DreamTravel.Domain.FlightEmailSubscriptions;
 using DreamTravel.DreamFlights.DeleteFlightEmailSubscription;
 using DreamTravel.DreamFlights.GetFlightEmailSubscriptionsForUser;
 using DreamTravel.DreamFlights.SubscribeForFlightEmail;
+using DreamTravel.DreamFlights.UpdateSubscriptions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
@@ -14,23 +15,27 @@ namespace DreamTravel.Api.DreamFlights
     {
         public const string DeleteRoute = "api/FlightEmailSubscription/{id}";
         public const string GetByUserIdRoute = "api/FlightEmailSubscription/{userId}";
+        public const string UpdateListRoute = "api/FlightEmailSubscription/{userId}";
         public const string InsertRoute = "api/FlightEmailSubscription";
 
         private readonly ILogger<FlightEmailSubscriptionController> _logger;
         private readonly IDeleteFlightEmailSubscription _deleteFlightEmailSubscription;
         private readonly IGetFlightEmailSubscriptionsForUser _getFlightEmailSubscriptionsForUser;
         private readonly ISubscribeForFlightEmail _subscribeForFlightEmail;
+        private readonly IUpdateSubscriptions _updateSubscriptions;
 
 
         public FlightEmailSubscriptionController(
             IDeleteFlightEmailSubscription deleteFlightEmailSubscription,
             IGetFlightEmailSubscriptionsForUser getFlightEmailSubscriptionsForUser,
             ISubscribeForFlightEmail subscribeForFlightEmail,
+            IUpdateSubscriptions updateSubscriptions,
             ILogger<FlightEmailSubscriptionController> logger)
         {
             _deleteFlightEmailSubscription = deleteFlightEmailSubscription;
             _getFlightEmailSubscriptionsForUser = getFlightEmailSubscriptionsForUser;
             _subscribeForFlightEmail = subscribeForFlightEmail;
+            _updateSubscriptions = updateSubscriptions;
             _logger = logger;
         }
 
@@ -67,6 +72,26 @@ namespace DreamTravel.Api.DreamFlights
                 var result = _getFlightEmailSubscriptionsForUser.Execute(new GetSubscriptionsWithDaysQuery(userId));
 
                 return Ok(result.SubscriptionsWithDays);
+            }
+
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.ToString());
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpPost]
+        [Route(UpdateListRoute)]
+        public IActionResult UpdateList([FromBody] UpdateSubscriptionsCommand request)
+        {
+            try
+            {
+                _logger.LogInformation($"Updating subscriptions for user: [{request.UserId}]");
+
+                _updateSubscriptions.Handle(request);
+
+                return Ok();
             }
 
             catch (Exception ex)

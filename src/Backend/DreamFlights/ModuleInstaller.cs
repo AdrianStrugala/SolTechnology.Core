@@ -7,6 +7,7 @@ using DreamTravel.DreamFlights.SendDreamTravelFlightEmail;
 using DreamTravel.DreamFlights.SendDreamTravelFlightEmail.Interfaces;
 using DreamTravel.DreamFlights.SendOrderedFlightEmail.Interfaces;
 using DreamTravel.DreamFlights.SubscribeForFlightEmail;
+using DreamTravel.DreamFlights.UpdateSubscriptions;
 using DreamTravel.FlightProviderData;
 using Microsoft.Extensions.DependencyInjection;
 using ComposeMessage = DreamTravel.DreamFlights.SendDreamTravelFlightEmail.ComposeMessage;
@@ -41,6 +42,9 @@ namespace DreamTravel.DreamFlights
 
             //GetAirports
             services.AddScoped<IGetAirports, GetAirports.GetAirports>();
+
+            //Update Subscriptions
+            services.AddTransient<IUpdateSubscriptions, UpdateSubscriptionsHandler>();
 
             services.InstallFlightProviderData();
             services.InstallDatabaseData();

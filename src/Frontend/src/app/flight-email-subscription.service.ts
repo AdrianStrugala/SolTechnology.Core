@@ -21,8 +21,7 @@ export class FlightEmailSubscriptionService {
     );
   }
 
-  Insert(order: any, days:any): Observable<any> {
-
+  Insert(order: any, days: any): Observable<any> {
     let data = {
       FlightEmailSubscription: order,
       SubscriptionDays: days
@@ -30,6 +29,29 @@ export class FlightEmailSubscriptionService {
 
     return this.http.post(
       this.config.APPLICATION_URL + "api/FlightEmailSubscription",
+      data,
+      {
+        observe: "body",
+        headers: new HttpHeaders({
+          Authorization: "DreamAuthentication U29sVWJlckFsbGVz"
+        })
+      }
+    );
+  }
+
+  UpdateSubscriptionsForUser(
+    dayChangedEvents: DayChangedEvent[],
+    userId: number
+  ) {
+    let data = {
+      events: dayChangedEvents,
+      userId: userId
+    };
+
+    console.log(data)
+
+    return this.http.post(
+      this.config.APPLICATION_URL + "api/FlightEmailSubscription/" + userId,
       data,
       {
         observe: "body",
@@ -76,4 +98,10 @@ export interface IFlightEmailSubscription {
   friday: boolean;
   saturday: boolean;
   sunday: boolean;
+}
+
+export class DayChangedEvent{
+  subscriptionId: number;
+  day: string;
+  value: boolean;
 }

@@ -20,13 +20,13 @@
           {{ flightEmail.maxDaysOfStay }} days.
         </p>
 
-        <button mat-mini-fab [ngStyle]="flightEmail.sunday==true?{'background-color': 'rgb(0, 123, 255)'}:{'background-color':'gray'}" style="margin-right: 0.5rem;" (click)="onClick('sunday', flightEmail.id)">S</button>
-        <button mat-mini-fab [ngStyle]="flightEmail.monday==true?{'background-color': 'rgb(0, 123, 255)'}:{'background-color':'gray'}" style="margin-right: 0.5rem;" (click)="onClick('monday', flightEmail.id)">M</button>
-        <button mat-mini-fab [ngStyle]="flightEmail.tuesday==true?{'background-color': 'rgb(0, 123, 255)'}:{'background-color':'gray'}" style="margin-right: 0.5rem;" (click)="onClick('tuesday', flightEmail.id)">T</button>
-        <button mat-mini-fab [ngStyle]="flightEmail.wednesday==true?{'background-color': 'rgb(0, 123, 255)'}:{'background-color':'gray'}" style="margin-right: 0.5rem;" (click)="onClick('wednesday', flightEmail.id)">W</button>
-        <button mat-mini-fab [ngStyle]="flightEmail.thursday==true?{'background-color': 'rgb(0, 123, 255)'}:{'background-color':'gray'}" style="margin-right: 0.5rem;" (click)="onClick('thursday', flightEmail.id)">T</button>
-        <button mat-mini-fab [ngStyle]="flightEmail.friday==true?{'background-color': 'rgb(0, 123, 255)'}:{'background-color':'gray'}" style="margin-right: 0.5rem;" (click)="onClick('friday', flightEmail.id)">F</button>
-        <button mat-mini-fab [ngStyle]="flightEmail.saturday==true?{'background-color': 'rgb(0, 123, 255)'}:{'background-color':'gray'}" style="margin-right: 12rem;" (click)="onClick('saturday', flightEmail.id)">S</button>
+        <button mat-mini-fab [ngStyle]="flightEmail.sunday==true?{'background-color': 'rgb(0, 123, 255)'}:{'background-color':'gray'}" style="margin-right: 0.5rem;" (click)="flightEmail.sunday = !flightEmail.sunday; onDayChange(flightEmail.id, 'sunday', flightEmail.sunday)">S</button>
+        <button mat-mini-fab [ngStyle]="flightEmail.monday==true?{'background-color': 'rgb(0, 123, 255)'}:{'background-color':'gray'}" style="margin-right: 0.5rem;" (click)="flightEmail.monday = !flightEmail.monday; onDayChange(flightEmail.id, 'monday', flightEmail.monday)">M</button>
+        <button mat-mini-fab [ngStyle]="flightEmail.tuesday==true?{'background-color': 'rgb(0, 123, 255)'}:{'background-color':'gray'}" style="margin-right: 0.5rem;" (click)="flightEmail.tuesday = !flightEmail.tuesday; onDayChange(flightEmail.id, 'tuesday', flightEmail.tuesday)">T</button>
+        <button mat-mini-fab [ngStyle]="flightEmail.wednesday==true?{'background-color': 'rgb(0, 123, 255)'}:{'background-color':'gray'}" style="margin-right: 0.5rem;" (click)="flightEmail.wednesday = !flightEmail.wednesday; onDayChange(flightEmail.id, 'wednesday', flightEmail.wednesday)">W</button>
+        <button mat-mini-fab [ngStyle]="flightEmail.thursday==true?{'background-color': 'rgb(0, 123, 255)'}:{'background-color':'gray'}" style="margin-right: 0.5rem;" (click)="flightEmail.thursday = !flightEmail.thursday; onDayChange(flightEmail.id, 'thursday', flightEmail.thursday)">T</button>
+        <button mat-mini-fab [ngStyle]="flightEmail.friday==true?{'background-color': 'rgb(0, 123, 255)'}:{'background-color':'gray'}" style="margin-right: 0.5rem;" (click)="flightEmail.friday = !flightEmail.friday; onDayChange(flightEmail.id, 'friday', flightEmail.friday)">F</button>
+        <button mat-mini-fab [ngStyle]="flightEmail.saturday==true?{'background-color': 'rgb(0, 123, 255)'}:{'background-color':'gray'}" style="margin-right: 12rem;" (click)="flightEmail.saturday = !flightEmail.saturday; onDayChange(flightEmail.id, 'saturday', flightEmail.saturday)">S</button>
 
         <button
           type="button"
