@@ -8,7 +8,7 @@ import {
   DayChangedEvent
 } from "../../flight-email-subscription.service";
 import { Route } from "@angular/compiler/src/core";
-import { Router } from "@angular/router";
+import { Router, NavigationStart, NavigationEnd, NavigationError } from "@angular/router";
 
 @Component({
   selector: "flight-order-list",
@@ -23,8 +23,30 @@ export class FlightOrderListComponent {
 
   constructor(
     private userService: UserService,
-    private flightEmailSubscriptionService: FlightEmailSubscriptionService)
-     {}
+    private flightEmailSubscriptionService: FlightEmailSubscriptionService,
+    private router: Router)
+     {
+      this.router.events.subscribe((event) => {
+        if (event instanceof NavigationStart) {
+            // Show loading indicator
+        }
+
+        if (event instanceof NavigationEnd) {
+          console.log("xd");
+          this.flightEmailSubscriptionService.UpdateSubscriptionsForUser(
+            this.dayChangedEvents,
+            this.userService.user.id
+          ).subscribe();
+        }
+
+        if (event instanceof NavigationError) {
+            // Hide loading indicator
+
+            // Present error to user
+            console.log(event.error);
+        }
+    });
+     }
 
   cancel(id: number) {
     this.flightEmailSubscriptionService.Delete(id).subscribe();

@@ -1,31 +1,30 @@
 ﻿using Dapper;
 using DreamTravel.Domain.FlightEmailSubscriptions;
-using DreamTravel.Infrastructure.Database;
 
 namespace DreamTravel.DatabaseData.SubscriptionDays
 {
     public partial class SubscriptionDaysRepository : ISubscriptionDaysRepository
     {
-        private readonly IDbConnectionFactory _dbConnectionFactory;
 
-        public SubscriptionDaysRepository(IDbConnectionFactory dbConnectionFactory)
+        public void Update(Domain.FlightEmailSubscriptions.SubscriptionDays days)
         {
-            _dbConnectionFactory = dbConnectionFactory;
-        }
-
-        public void Insert(Domain.FlightEmailSubscriptions.SubscriptionDays days)
-        {
-            string insertSql = @"
-INSERT INTO [SubscriptionDays]
-([FlightEmailSubscriptionId], [Monday], [Tuesday], [Wednesday], [Thursday], [Friday], [Saturday], [Sunday])
-OUTPUT INSERTED.ID
-VALUES
-(@FlightEmailSubscriptionId, @Monday, @Tuesday, @Wednesday, @Thursday, @Friday, @Saturday, @Sunday)
+            string updateSql = @"
+UPDATE [SubscriptionDays]
+SET 
+    [Monday] = @Monday,
+    [Tuesday] = @Tuesday,
+    [Wednesday] = @Wednesday,
+    [Thursday] =  @Thursday,
+    [Friday] = @Friday,
+    [Saturday] =  @Saturday,
+    [Sunday] = @Sunday
+WHERE
+    [FlightEmailSubscriptionId] = @FlightEmailSubscriptionId
 ";
 
             using (var connection = _dbConnectionFactory.CreateConnection())
             {
-                connection.Execute(insertSql, new
+                connection.Execute(updateSql, new
                 {
                     FlightEmailSubscriptionId = days.FlightEmailSubscriptionId,
                     Monday = days.Monday,
