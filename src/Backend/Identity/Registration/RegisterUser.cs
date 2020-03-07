@@ -12,17 +12,21 @@ namespace DreamTravel.Identity.Registration
             _userRepository = userRepository;
         }
 
-        public void Register(User user)
+        public RegisterResult Register(User user)
         {
+            RegisterResult result = new RegisterResult();
             var alreadyExistingUser = _userRepository.Get(user.Email);
 
             if (alreadyExistingUser != null)
             {
-                throw new RegisterException("User with provided email already exists");
+                result.Message = "User with provided email already exists";
+                return result;
             }
 
             user.Password = Encryption.Encrypt(user.Password);
             _userRepository.Insert(user);
+
+            return result;
         }
     }
 }

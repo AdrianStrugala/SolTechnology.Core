@@ -24,19 +24,17 @@ namespace DreamTravel.Api.Identity
         [HttpPost]
         public IActionResult Login([FromBody] User user)
         {
-            try
-            {
-                _logger.LogInformation($"Attempt to log in with email: [{user.Email}] and password: [{user.Password}]");
-                User result = _loginUser.Login(user);
+            _logger.LogInformation($"Attempt to log in with email: [{user.Email}] and password: [{user.Password}]");
+            var result = _loginUser.Login(user);
 
-                return Ok(result);
+            if (result.Message != string.Empty)
+            {
+                _logger.LogError(result.Message);
+                return BadRequest(result.Message);
             }
 
-            catch (LoginException ex)
-            {
-                _logger.LogError(ex.ToString());
-                return BadRequest(ex.Message);
-            }
+            return Ok(result.User);
+
         }
     }
 }

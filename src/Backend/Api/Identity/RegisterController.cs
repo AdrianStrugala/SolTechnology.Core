@@ -26,17 +26,15 @@ namespace DreamTravel.Api.Identity
         {
             _logger.LogInformation($"Attempt to register user with email: [{user.Email}]");
 
-            try
+            var result = _registerUser.Register(user);
+
+            if (result.Message != string.Empty)
             {
-                _registerUser.Register(user);
-                return Ok();
+                _logger.LogError(result.Message);
+                return BadRequest(result.Message);
             }
 
-            catch (RegisterException ex)
-            {
-                _logger.LogError(ex.ToString());
-                return BadRequest(ex.Message);
-            }
+            return Ok();
         }
     }
 }

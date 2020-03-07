@@ -15,7 +15,7 @@ namespace DreamTravel.Identity
             services.AddScoped<IRegisterUser, RegisterUser>();
 
             //Logging
-            services.AddScoped<ILoginUser, LoginUser>();
+            services.AddScoped<ILoginUser, LoginHandler>();
 
             //Change Password
             services.AddScoped<IChangePassword, ChangePassword.ChangePassword>();

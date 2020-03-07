@@ -4,6 +4,6 @@ namespace DreamTravel.Identity.Registration
 {
     public interface IRegisterUser
     {
-        void Register(User user);
+        RegisterResult Register(User user);
     }
 }

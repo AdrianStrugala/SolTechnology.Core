@@ -25,7 +25,7 @@ namespace DreamTravel.FeaturesTests.Registration
             user.Email = "adrian@buziaczek.pl";
             user.Password = "Diariusz Ehwara";
 
-            _userRepository.Get(Arg.Any<string>()).Returns((User) null);
+            _userRepository.Get(Arg.Any<string>()).Returns((User)null);
 
 
             //Act
@@ -47,11 +47,11 @@ namespace DreamTravel.FeaturesTests.Registration
 
 
             //Act
-            var exception = Record.Exception( () => _sut.Register(user));
+            var result = _sut.Register(user);
 
 
             //Assert
-            Assert.IsType<RegisterException>(exception);
+            Assert.NotEmpty(result.Message);
         }
     }
 }

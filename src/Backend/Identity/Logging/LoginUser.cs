@@ -3,33 +3,39 @@ using DreamTravel.Domain.Users;
 
 namespace DreamTravel.Identity.Logging
 {
-    public class LoginUser : ILoginUser
+    public class LoginHandler : ILoginUser
     {
         private readonly IUserRepository _userRepository;
 
-        public LoginUser(IUserRepository userRepository)
+        public LoginHandler(IUserRepository userRepository)
         {
             _userRepository = userRepository;
         }
 
 
-        public User Login(User loggingInUser)
+        public LoginResult Login(User loggingInUser)
         {
+            LoginResult result = new LoginResult();
+
             User userFromDb = _userRepository.Get(loggingInUser.Email);
 
             //User does not exist
             if (userFromDb == null)
             {
-                throw new LoginException("Email not registered");
+                result.Message = "Email not registered";
+                return result;
             }
 
             //Invalid password
             if (!Encryption.Decrypt(userFromDb.Password).Equals(loggingInUser.Password))
             {
-                throw new LoginException("Invalid password");
+                result.Message = "Invalid password";
+                return result;
             }
 
-            return userFromDb;
+            result.User = userFromDb;
+
+            return result;
         }
     }
 }
