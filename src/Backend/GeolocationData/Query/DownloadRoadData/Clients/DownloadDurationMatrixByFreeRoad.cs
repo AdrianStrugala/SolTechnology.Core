@@ -5,6 +5,7 @@ using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using DreamTravel.Domain.Cities;
+using DreamTravel.GeolocationData.Configuration;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json.Linq;
 
@@ -39,7 +40,7 @@ namespace DreamTravel.GeolocationData.Query.DownloadRoadData.Clients
                 try
                 {
                     string url =
-                        $"https://maps.googleapis.com/maps/api/distancematrix/json?units=imperial&origins={listOfCities[i].Latitude},{listOfCities[i].Longitude}&destinations={coordinates}&avoid=tolls&key=AIzaSyBgCjCJuGQsXlAz6BUXPIL2_RSxgXUaCcM";
+                        $"https://maps.googleapis.com/maps/api/distancematrix/json?units=imperial&origins={listOfCities[i].Latitude},{listOfCities[i].Longitude}&destinations={coordinates}&avoid=tolls&key={GeolocationDataConfiguration.ApiKey}";
 
                     string response = await _httpClient.GetStringAsync(url);
                     JObject json = JObject.Parse(response);
