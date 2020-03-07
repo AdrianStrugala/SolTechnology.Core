@@ -25,7 +25,7 @@ namespace DreamTravel.DreamFlights.SendDreamTravelFlightEmail
 </br>
 <p> Are you interested in? Check more details at: http://www.azair.eu/ </p></br>
 </br>
-<p> Nothing interesting today? Plan your own Dream Travel at: https://dreamtravel.azurewebsites.net/ </p></br>
+<p> Nothing interesting today? Plan your own Dream Travel at: https://dreamtravels.azurewebsites.net/ </p></br>
 </br>
 <p> Stay in touch! <br>
 Dream Travel Team </p>
