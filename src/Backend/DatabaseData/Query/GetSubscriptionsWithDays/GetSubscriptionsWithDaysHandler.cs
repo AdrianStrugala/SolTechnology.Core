@@ -1,9 +1,8 @@
 ﻿using System.Linq;
 using Dapper;
-using DreamTravel.DatabaseData.Query.GetSubscriptionsWithDays;
 using DreamTravel.Infrastructure.Database;
 
-namespace DreamTravel.DatabaseData.FlightEmailSubscriptions
+namespace DreamTravel.DatabaseData.Query.GetSubscriptionsWithDays
 {
     public class GetSubscriptionsWithDaysHandler : IGetSubscriptionsWithDays
     {

@@ -6,7 +6,7 @@ using DreamTravel.Domain.Cities;
 using DreamTravel.GeolocationData.Configuration;
 using Newtonsoft.Json.Linq;
 
-namespace DreamTravel.GeolocationData.Cities
+namespace DreamTravel.GeolocationData.Repository.Cities
 {
     public partial class CityRepository : ICityRepository
     {

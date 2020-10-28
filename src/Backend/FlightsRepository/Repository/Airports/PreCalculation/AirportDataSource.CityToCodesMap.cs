@@ -2,7 +2,7 @@
 using System.Linq;
 using Newtonsoft.Json;
 
-namespace DreamTravel.FlightProviderData.Airports
+namespace DreamTravel.FlightProviderData.Repository.Airports.PreCalculation
 {
     public partial class AirportDataSource
     {

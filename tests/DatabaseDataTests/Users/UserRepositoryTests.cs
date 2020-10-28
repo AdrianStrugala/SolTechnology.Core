@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using Dapper;
-using DreamTravel.DatabaseData.Users;
+using DreamTravel.DatabaseData.Repository.Users;
 using DreamTravel.Domain.Users;
 using DreamTravel.Infrastructure.Database;
 using Xunit;

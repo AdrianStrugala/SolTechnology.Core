@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using DreamTravel.Domain.Airports;
 
-namespace DreamTravel.FlightProviderData.Airports
+namespace DreamTravel.FlightProviderData.Repository.Airports.PreCalculation
 {
     public partial class AirportDataSource
     {

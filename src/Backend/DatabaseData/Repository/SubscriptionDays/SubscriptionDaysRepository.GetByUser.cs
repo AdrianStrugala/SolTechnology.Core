@@ -3,7 +3,7 @@ using System.Linq;
 using Dapper;
 using DreamTravel.Domain.FlightEmailSubscriptions;
 
-namespace DreamTravel.DatabaseData.SubscriptionDays
+namespace DreamTravel.DatabaseData.Repository.SubscriptionDays
 {
     public partial class SubscriptionDaysRepository : ISubscriptionDaysRepository
     {

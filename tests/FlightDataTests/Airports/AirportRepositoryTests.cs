@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using DreamTravel.FlightProviderData.Airports;
+using DreamTravel.FlightProviderData.Repository.Airports;
+using DreamTravel.FlightProviderData.Repository.Airports.PreCalculation;
 using Xunit;
 
 namespace DreamTravel.FlightDataTests.Airports

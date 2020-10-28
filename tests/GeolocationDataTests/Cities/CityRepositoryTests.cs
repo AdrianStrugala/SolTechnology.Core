@@ -5,7 +5,7 @@
 using System.IO;
 using System.Threading.Tasks;
 using DreamTravel.Domain.Cities;
-using DreamTravel.GeolocationData.Cities;
+using DreamTravel.GeolocationData.Repository.Cities;
 using Xunit;
 
 namespace DreamTravel.GeolocationDataTests.Cities

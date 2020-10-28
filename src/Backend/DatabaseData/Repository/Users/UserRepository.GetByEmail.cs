@@ -2,7 +2,7 @@
 using Dapper;
 using DreamTravel.Domain.Users;
 
-namespace DreamTravel.DatabaseData.Users
+namespace DreamTravel.DatabaseData.Repository.Users
 {
     public partial class UserRepository : IUserRepository
     {

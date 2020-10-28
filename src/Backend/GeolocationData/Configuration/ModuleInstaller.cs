@@ -1,7 +1,7 @@
 ﻿using DreamTravel.Domain.Cities;
-using DreamTravel.GeolocationData.Cities;
 using DreamTravel.GeolocationData.Query.DownloadRoadData;
 using DreamTravel.GeolocationData.Query.DownloadRoadData.Clients;
+using DreamTravel.GeolocationData.Repository.Cities;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace DreamTravel.GeolocationData.Configuration

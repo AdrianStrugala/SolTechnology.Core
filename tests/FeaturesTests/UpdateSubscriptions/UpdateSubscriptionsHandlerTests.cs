@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using AutoFixture;
-using DreamTravel.DatabaseData.SubscriptionDays;
 using DreamTravel.Domain.FlightEmailSubscriptions;
 using DreamTravel.DreamFlights.UpdateSubscriptions;
 using DreamTravel.Infrastructure.Database;

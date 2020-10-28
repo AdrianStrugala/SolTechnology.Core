@@ -1,9 +1,9 @@
-﻿using DreamTravel.DatabaseData.FlightEmailSubscriptions;
-using DreamTravel.DatabaseData.Query.GetPreviewUsers;
+﻿using DreamTravel.DatabaseData.Query.GetPreviewUsers;
 using DreamTravel.DatabaseData.Query.GetSubscriptionDetailsByDay;
 using DreamTravel.DatabaseData.Query.GetSubscriptionsWithDays;
-using DreamTravel.DatabaseData.SubscriptionDays;
-using DreamTravel.DatabaseData.Users;
+using DreamTravel.DatabaseData.Repository.FlightEmailSubscriptions;
+using DreamTravel.DatabaseData.Repository.SubscriptionDays;
+using DreamTravel.DatabaseData.Repository.Users;
 using DreamTravel.Domain.FlightEmailSubscriptions;
 using DreamTravel.Domain.Users;
 using DreamTravel.Infrastructure.Database;

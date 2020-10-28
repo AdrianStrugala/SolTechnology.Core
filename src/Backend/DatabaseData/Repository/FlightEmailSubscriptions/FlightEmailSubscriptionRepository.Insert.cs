@@ -2,7 +2,7 @@
 using DreamTravel.Domain.FlightEmailSubscriptions;
 using DreamTravel.Infrastructure.Database;
 
-namespace DreamTravel.DatabaseData.FlightEmailSubscriptions
+namespace DreamTravel.DatabaseData.Repository.FlightEmailSubscriptions
 {
     public partial class FlightEmailSubscriptionRepository : IFlightEmailSubscriptionRepository
     {

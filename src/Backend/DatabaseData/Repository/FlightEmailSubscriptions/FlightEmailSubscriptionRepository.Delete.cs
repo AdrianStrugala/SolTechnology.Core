@@ -1,7 +1,7 @@
 ﻿using Dapper;
 using DreamTravel.Domain.FlightEmailSubscriptions;
 
-namespace DreamTravel.DatabaseData.FlightEmailSubscriptions
+namespace DreamTravel.DatabaseData.Repository.FlightEmailSubscriptions
 {
     public partial class FlightEmailSubscriptionRepository : IFlightEmailSubscriptionRepository
     {

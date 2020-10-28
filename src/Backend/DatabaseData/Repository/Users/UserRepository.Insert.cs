@@ -2,7 +2,7 @@
 using DreamTravel.Domain.Users;
 using DreamTravel.Infrastructure.Database;
 
-namespace DreamTravel.DatabaseData.Users
+namespace DreamTravel.DatabaseData.Repository.Users
 {
     public partial class UserRepository : IUserRepository
     {
