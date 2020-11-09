@@ -1,9 +1,10 @@
 ﻿using DreamTravel.Domain.Users;
+using DreamTravel.Infrastructure;
 
 namespace DreamTravel.Identity.Registration
 {
     public interface IRegisterUser
     {
-        RegisterResult Register(User user);
+        CommandResult Register(User user);
     }
 }

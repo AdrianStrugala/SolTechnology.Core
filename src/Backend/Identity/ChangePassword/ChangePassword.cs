@@ -1,5 +1,6 @@
 ﻿using DreamTravel.Cryptography;
 using DreamTravel.Domain.Users;
+using DreamTravel.Infrastructure;
 
 namespace DreamTravel.Identity.ChangePassword
 {
@@ -12,8 +13,9 @@ namespace DreamTravel.Identity.ChangePassword
             _userRepository = userRepository;
         }
 
-        public void Execute(ChangePasswordCommand command)
+        public CommandResult Execute(ChangePasswordCommand command)
         {
+            var result = new CommandResult();
             var user = _userRepository.Get(command.UserId);
 
             var newPassword = Encryption.Encrypt(command.NewPassword);
@@ -21,12 +23,15 @@ namespace DreamTravel.Identity.ChangePassword
 
             if (currentPassword != user.Password)
             {
-                throw new ChangePasswordException("Current password is invalid");
+                result.Message = "Given password does not match user password";
             }
 
             user.Password = newPassword;
 
             _userRepository.Update(user);
+
+            result.Success = true;
+            return result;
         }
     }
 }

@@ -1,7 +1,9 @@
-﻿namespace DreamTravel.Identity.ChangePassword
+﻿using DreamTravel.Infrastructure;
+
+namespace DreamTravel.Identity.ChangePassword
 {
     public interface IChangePassword
     {
-        void Execute(ChangePasswordCommand command);
+        CommandResult Execute(ChangePasswordCommand command);
     }
 }

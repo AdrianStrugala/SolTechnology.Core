@@ -23,19 +23,16 @@ namespace DreamTravel.Api.Identity
         [HttpPost]
         public IActionResult ChangePassword([FromBody] ChangePasswordCommand command)
         {
-            try
-            {
-                _logger.LogInformation($"Changing password for user: [{command.UserId}]");
-                _changePassword.Execute(command);
+            _logger.LogInformation($"Changing password for user: [{command.UserId}]");
+            var result = _changePassword.Execute(command);
 
-                return Ok();
+            if (result.Success == false)
+            {
+                _logger.LogError(result.Message);
+                return BadRequest(result.Message);
             }
 
-            catch (ChangePasswordException ex)
-            {
-                _logger.LogError(ex.ToString());
-                return BadRequest(ex.Message);
-            }
+            return Ok();
         }
     }
 }

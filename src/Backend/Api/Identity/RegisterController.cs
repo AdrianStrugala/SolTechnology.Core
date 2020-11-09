@@ -28,7 +28,7 @@ namespace DreamTravel.Api.Identity
 
             var result = _registerUser.Register(user);
 
-            if (result.Message != string.Empty)
+            if (result.Success == false)
             {
                 _logger.LogError(result.Message);
                 return BadRequest(result.Message);
