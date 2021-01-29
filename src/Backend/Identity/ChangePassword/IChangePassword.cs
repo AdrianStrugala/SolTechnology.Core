@@ -4,6 +4,6 @@ namespace DreamTravel.Identity.ChangePassword
 {
     public interface IChangePassword
     {
-        CommandResult Execute(ChangePasswordCommand command);
+        CommandResult Handle(ChangePasswordCommand command);
     }
 }

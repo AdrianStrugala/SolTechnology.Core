@@ -5,6 +5,6 @@ namespace DreamTravel.DreamTrips.LimitCostOfPaths
 {
     public interface ILimitCostOfPaths
     {
-        List<Path> Execute(int costLimit, List<Path> paths);
+        List<Path> Handle(int costLimit, List<Path> paths);
     }
 }

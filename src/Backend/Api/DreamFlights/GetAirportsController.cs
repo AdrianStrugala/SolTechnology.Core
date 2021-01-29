@@ -25,7 +25,7 @@ namespace DreamTravel.Api.DreamFlights
         {
             try
             {
-                var result = _getAirports.Execute();
+                var result = _getAirports.Handle();
 
                 return Ok(result);
             }

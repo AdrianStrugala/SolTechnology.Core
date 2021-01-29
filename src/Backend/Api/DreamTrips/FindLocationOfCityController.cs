@@ -11,7 +11,7 @@ namespace DreamTravel.Api.DreamTrips
     [Route(Route)]
     public class FindLocationOfCityController : Controller
     {
-        public const string Route = "api/FindLocationOfCity";
+        public const string Route = "api/FindLocationOfCityHandler";
 
         private readonly ILogger<FindLocationOfCityController> _logger;
         private readonly IFindLocationOfCity _findLocationOfCity;
@@ -32,7 +32,7 @@ namespace DreamTravel.Api.DreamTrips
             {
                 _logger.LogInformation("Looking for city: " + request.Name);
 
-                City city = await _findLocationOfCity.Execute(request.Name);
+                City city = await _findLocationOfCity.Handle(request.Name);
 
                 return Ok(city);
             }

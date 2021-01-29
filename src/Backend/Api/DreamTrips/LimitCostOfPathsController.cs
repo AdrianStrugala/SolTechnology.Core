@@ -36,7 +36,7 @@ namespace DreamTravel.Api.DreamTrips
                 _logger.LogInformation("Limit Cost Engine: Fire!");
                 List<Path> paths = JsonConvert.DeserializeObject<List<Path>>(HttpContext.Session.GetString(sessionId + PathsKeyName));
 
-                paths = _breakCostLimit.Execute(costLimit, paths);
+                paths = _breakCostLimit.Handle(costLimit, paths);
 
                 HttpContext.Session.SetString(sessionId + PathsKeyName, JsonConvert.SerializeObject(paths));
 

@@ -7,7 +7,8 @@
 
   <ItemGroup>
     <ProjectReference Include="..\DatabaseData\DatabaseData.csproj" />
-    <ProjectReference Include="..\FlightsRepository\FlightProviderData.csproj" />
+    <ProjectReference Include="..\FlightsRepository\StaticData.csproj" />
+    <ProjectReference Include="..\GeolocationData\Clients.csproj" />
   </ItemGroup>
 
 </Project>

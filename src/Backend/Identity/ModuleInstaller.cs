@@ -12,13 +12,13 @@ namespace DreamTravel.Identity
         {
 
             //Registration
-            services.AddScoped<IRegisterUser, RegisterUser>();
+            services.AddScoped<IRegisterUser, RegisterUserHandler>();
 
             //Logging
             services.AddScoped<ILoginUser, LoginHandler>();
 
             //Change Password
-            services.AddScoped<IChangePassword, ChangePassword.ChangePassword>();
+            services.AddScoped<IChangePassword, ChangePasswordHandler>();
 
             services.InstallDatabaseData();
 

@@ -10,6 +10,7 @@ namespace DreamTravel.GeolocationData.Configuration
         {
             services.AddTransient<IMichelinApiClient, MichelinApiClient>();
             services.AddTransient<IGoogleApiClient, GoogleApiClient>();
+            services.AddTransient<IAzairApiClient, IAzairApiClient>();
 
             return services;
         }

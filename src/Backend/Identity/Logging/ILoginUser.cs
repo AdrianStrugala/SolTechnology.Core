@@ -4,6 +4,6 @@ namespace DreamTravel.Identity.Logging
 {
     public interface ILoginUser
     {
-        LoginResult Login(User loggingInUser);
+        LoginResult Handle(User loggingInUser);
     }
 }

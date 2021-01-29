@@ -25,7 +25,7 @@ namespace DreamTravel.Api.Identity
         public IActionResult Login([FromBody] User user)
         {
             _logger.LogInformation($"Attempt to log in with email: [{user.Email}] and password: [{user.Password}]");
-            var result = _loginUser.Login(user);
+            var result = _loginUser.Handle(user);
 
             if (result.Message != string.Empty)
             {

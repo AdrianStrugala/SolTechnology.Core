@@ -2,7 +2,7 @@
 using System.Threading.Tasks;
 using DreamTravel.DatabaseData.Query.GetSubscriptionDetailsByDay;
 using DreamTravel.Domain.FlightEmailSubscriptions;
-using DreamTravel.DreamFlights.GetFlightEmailData;
+using DreamTravel.DreamFlights.GetTodaysFlightEmailData;
 using DreamTravel.DreamFlights.SendOrderedFlightEmail.Interfaces;
 using Microsoft.Azure.WebJobs;
 
@@ -13,12 +13,12 @@ namespace DreamTravel.Bot.SendOrderedFlightEmails
         public const string GetFlightEmailOrdersFunctionName = "GetFlightEmailOrders";
         public const string SendOrderedFlightEmailFunctionName = "SendOrderedFlightEmail";
 
-        private readonly IGetFlightEmailData _getFlightEmailData;
+        private readonly IGetTodaysFlightEmailData _getTodaysFlightEmailData;
         private readonly ISendOrderedFlightEmail _sendOrderedFlightEmail;
 
-        public Activities(IGetFlightEmailData getFlightEmailData, ISendOrderedFlightEmail sendOrderedFlightEmail)
+        public Activities(IGetTodaysFlightEmailData getTodaysFlightEmailData, ISendOrderedFlightEmail sendOrderedFlightEmail)
         {
-            _getFlightEmailData = getFlightEmailData;
+            _getTodaysFlightEmailData = getTodaysFlightEmailData;
             _sendOrderedFlightEmail = sendOrderedFlightEmail;
         }
 
@@ -26,7 +26,7 @@ namespace DreamTravel.Bot.SendOrderedFlightEmails
         public async Task<List<FlightEmailData>> GetFlightEmailOrders(
             [ActivityTrigger] object input)
         {
-            return _getFlightEmailData.Handle();
+            return _getTodaysFlightEmailData.Handle();
         }
 
 
@@ -34,7 +34,7 @@ namespace DreamTravel.Bot.SendOrderedFlightEmails
         public async Task SendOrderedFlightEmail(
             [ActivityTrigger] FlightEmailData input)
         {
-            _sendOrderedFlightEmail.Execute(input);
+            _sendOrderedFlightEmail.Handle(input);
         }
     }
 }

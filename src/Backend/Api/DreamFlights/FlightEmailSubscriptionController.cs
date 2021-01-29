@@ -48,7 +48,7 @@ namespace DreamTravel.Api.DreamFlights
 
             try
             {
-                _deleteFlightEmailSubscription.Execute(id);
+                _deleteFlightEmailSubscription.Handle(id);
 
                 return Ok();
             }
@@ -69,7 +69,7 @@ namespace DreamTravel.Api.DreamFlights
             {
                 _logger.LogInformation($"Getting flight email orders for user: [{userId}]");
 
-                var result = _getFlightEmailSubscriptionsForUser.Execute(new GetSubscriptionsWithDaysQuery(userId));
+                var result = _getFlightEmailSubscriptionsForUser.Handle(new GetSubscriptionsWithDaysQuery(userId));
 
                 return Ok(result.SubscriptionsWithDays);
             }

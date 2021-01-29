@@ -8,13 +8,13 @@ namespace DreamTravel.FeaturesTests.Registration
     public class RegisterUserTests
     {
         private readonly IUserRepository _userRepository;
-        private readonly RegisterUser _sut;
+        private readonly RegisterUserHandler _sut;
 
         public RegisterUserTests()
         {
             _userRepository = Substitute.For<IUserRepository>();
 
-            _sut = new RegisterUser(_userRepository);
+            _sut = new RegisterUserHandler(_userRepository);
         }
 
         [Fact]
@@ -29,7 +29,7 @@ namespace DreamTravel.FeaturesTests.Registration
 
 
             //Act
-            _sut.Register(user);
+            _sut.Handle(user);
 
 
             //Assert
@@ -47,7 +47,7 @@ namespace DreamTravel.FeaturesTests.Registration
 
 
             //Act
-            var result = _sut.Register(user);
+            var result = _sut.Handle(user);
 
 
             //Assert

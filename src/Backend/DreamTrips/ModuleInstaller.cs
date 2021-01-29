@@ -24,13 +24,13 @@ namespace DreamTravel.DreamTrips
             services.AddTransient<IDownloadRoadData, DownloadRoadData>();
 
             //FindNameOfCIty
-            services.AddScoped<IFindNameOfCity, FindNameOfCity.FindNameOfCity>();
+            services.AddScoped<IFindNameOfCity, FindNameOfCity.FindNameOfCityHandler>();
 
-            //FindLocationOfCity
-            services.AddScoped<IFindLocationOfCity, FindLocationOfCity.FindLocationOfCity>();
+            //FindLocationOfCityHandler
+            services.AddScoped<IFindLocationOfCity, FindLocationOfCity.FindLocationOfCityHandler>();
 
-            //LimitCostOfPaths
-            services.AddScoped<ILimitCostOfPaths, LimitCostOfPaths.LimitCostOfPaths>();
+            //LimitCostOfPathsHandler
+            services.AddScoped<ILimitCostOfPaths, LimitCostOfPaths.LimitCostOfPathsHandler>();
 
             services.InstallGeolocationData();
 

@@ -1,16 +1,17 @@
 ﻿using DreamTravel.DatabaseData.Configuration;
 using DreamTravel.DreamFlights.DeleteFlightEmailSubscription;
 using DreamTravel.DreamFlights.GetAirports;
-using DreamTravel.DreamFlights.GetFlightEmailData;
 using DreamTravel.DreamFlights.GetFlightEmailSubscriptionsForUser;
+using DreamTravel.DreamFlights.GetTodaysFlightEmailData;
 using DreamTravel.DreamFlights.SendDreamTravelFlightEmail;
+using DreamTravel.DreamFlights.SendDreamTravelFlightEmail.Executors;
 using DreamTravel.DreamFlights.SendDreamTravelFlightEmail.Interfaces;
 using DreamTravel.DreamFlights.SendOrderedFlightEmail.Interfaces;
 using DreamTravel.DreamFlights.SubscribeForFlightEmail;
 using DreamTravel.DreamFlights.UpdateSubscriptions;
 using DreamTravel.FlightProviderData;
 using Microsoft.Extensions.DependencyInjection;
-using ComposeMessage = DreamTravel.DreamFlights.SendDreamTravelFlightEmail.ComposeMessage;
+using ComposeMessage = DreamTravel.DreamFlights.SendDreamTravelFlightEmail.Executors.ComposeMessage;
 using IComposeMessage = DreamTravel.DreamFlights.SendDreamTravelFlightEmail.Interfaces.IComposeMessage;
 
 namespace DreamTravel.DreamFlights
@@ -19,29 +20,29 @@ namespace DreamTravel.DreamFlights
     {
         public static IServiceCollection InstallDreamFlights(this IServiceCollection services)
         {
-            //SendDreamTravelFlightEmail
+            //SendDreamTravelFlightEmailHandler
             services.AddScoped<IComposeMessage, ComposeMessage>();
             services.AddScoped<IFilterFlights, FilterFlights>();
-            services.AddScoped<ISendDreamTravelFlightEmail, SendDreamTravelFlightEmail.SendDreamTravelFlightEmail>();
+            services.AddScoped<ISendDreamTravelFlightEmail, SendDreamTravelFlightEmail.SendDreamTravelFlightEmailHandler>();
 
-            //SubscribeForFlightEmail
-            services.AddScoped<ISubscribeForFlightEmail, SubscribeForFlightEmail.SubscribeForFlightEmail>();
+            //SubscribeForFlightEmailHandler
+            services.AddScoped<ISubscribeForFlightEmail, SubscribeForFlightEmail.SubscribeForFlightEmailHandler>();
 
-            //GetFlightEmailData
-            services.AddScoped<IGetFlightEmailData, GetFlightEmailData.GetFlightEmailData>();
+            //GetTodaysTodaysFlightEmailDataHandler
+            services.AddScoped<IGetTodaysFlightEmailData, GetTodaysTodaysFlightEmailDataHandler>();
 
-            //GetFlightEmailSubscriptionsForUser
-            services.AddScoped<IGetFlightEmailSubscriptionsForUser, GetFlightEmailSubscriptionsForUser.GetFlightEmailSubscriptionsForUser>();
+            //GetFlightEmailSubscriptionsForUserHandler
+            services.AddScoped<IGetFlightEmailSubscriptionsForUser, GetFlightEmailSubscriptionsForUser.GetFlightEmailSubscriptionsForUserHandler>();
 
-            //DeleteFlightEmailSubscription
-            services.AddScoped<IDeleteFlightEmailSubscription, DeleteFlightEmailSubscription.DeleteFlightEmailSubscription>();
+            //DeleteFlightEmailSubscriptionHandler
+            services.AddScoped<IDeleteFlightEmailSubscription, DeleteFlightEmailSubscription.DeleteFlightEmailSubscriptionHandler>();
 
             //SendOrderedFlightEmail
             services.AddScoped<ISendOrderedFlightEmail, SendOrderedFlightEmail.SendOrderedFlightEmail>();
             services.AddScoped<SendOrderedFlightEmail.Interfaces.IComposeMessage, SendOrderedFlightEmail.ComposeMessage>();
 
-            //GetAirports
-            services.AddScoped<IGetAirports, GetAirports.GetAirports>();
+            //GetAirportsHandler
+            services.AddScoped<IGetAirports, GetAirports.GetAirportsHandler>();
 
             //Update Subscriptions
             services.AddTransient<IUpdateSubscriptions, UpdateSubscriptionsHandler>();

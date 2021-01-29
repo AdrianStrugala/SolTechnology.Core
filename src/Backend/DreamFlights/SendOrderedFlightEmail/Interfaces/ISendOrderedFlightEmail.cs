@@ -5,6 +5,6 @@ namespace DreamTravel.DreamFlights.SendOrderedFlightEmail.Interfaces
 {
     public interface ISendOrderedFlightEmail
     {
-        void Execute(FlightEmailData flightEmailData);
+        void Handle(FlightEmailData flightEmailData);
     }
 }

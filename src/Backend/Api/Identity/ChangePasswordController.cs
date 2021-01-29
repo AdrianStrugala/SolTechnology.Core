@@ -24,7 +24,7 @@ namespace DreamTravel.Api.Identity
         public IActionResult ChangePassword([FromBody] ChangePasswordCommand command)
         {
             _logger.LogInformation($"Changing password for user: [{command.UserId}]");
-            var result = _changePassword.Execute(command);
+            var result = _changePassword.Handle(command);
 
             if (result.Success == false)
             {

@@ -4,6 +4,6 @@ namespace DreamTravel.DreamFlights.GetFlightEmailSubscriptionsForUser
 {
     public interface IGetFlightEmailSubscriptionsForUser
     {
-        GetSubscriptionsWithDaysResult Execute(GetSubscriptionsWithDaysQuery query);
+        GetSubscriptionsWithDaysResult Handle(GetSubscriptionsWithDaysQuery query);
     }
 }

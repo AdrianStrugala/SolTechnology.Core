@@ -2,6 +2,6 @@
 {
     public interface IDeleteFlightEmailSubscription
     {
-        void Execute(int id);
+        void Handle(int id);
     }
 }

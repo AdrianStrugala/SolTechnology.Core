@@ -25,7 +25,7 @@ namespace DreamTravel.Bot.SendDreamTravelFlightEmail
             [TimerTrigger("0 0 8 * * *")] TimerInfo timer,
             [OrchestrationClient] DurableOrchestrationClient orchestrationClient)
         {
-            _sendDreamTravelFlightEmail.Execute();
+            _sendDreamTravelFlightEmail.Handle();
         }
 
         [FunctionName(HttpTriggerFunctionName)]
@@ -33,7 +33,7 @@ namespace DreamTravel.Bot.SendDreamTravelFlightEmail
             [HttpTrigger(AuthorizationLevel.Function, "get", "post", Route = HttpTriggerFunctionRoute)] HttpRequestMessage req,
             [OrchestrationClient] DurableOrchestrationClientBase client)
         {
-            _sendDreamTravelFlightEmail.Execute();
+            _sendDreamTravelFlightEmail.Handle();
             return req.CreateResponse(HttpStatusCode.OK);
         }
     }

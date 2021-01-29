@@ -2,6 +2,6 @@
 {
     public interface ISendDreamTravelFlightEmail
     {
-        void Execute();
+        void Handle();
     }
 }
