@@ -1,4 +1,5 @@
 ﻿using DreamTravel.DreamTrips.CalculateBestPath;
+using DreamTravel.DreamTrips.CalculateBestPath.Executors;
 using DreamTravel.DreamTrips.CalculateBestPath.Interfaces;
 using DreamTravel.DreamTrips.FindLocationOfCity;
 using DreamTravel.DreamTrips.FindNameOfCity;
@@ -17,9 +18,10 @@ namespace DreamTravel.DreamTrips
             services.AddTransient<ITSP, AntColony>();
 
             //CalculateBestPath
-            services.AddScoped<ICalculateBestPath, CalculateBestPath.CalculateBestPath>();
+            services.AddScoped<ICalculateBestPath, CalculateBestPathHandler>();
             services.AddScoped<IFindProfitablePath, FindProfitablePath>();
             services.AddScoped<IFormPathsFromMatrices, FormPathsFromMatrices>();
+            services.AddTransient<IDownloadRoadData, DownloadRoadData>();
 
             //FindNameOfCIty
             services.AddScoped<IFindNameOfCity, FindNameOfCity.FindNameOfCity>();

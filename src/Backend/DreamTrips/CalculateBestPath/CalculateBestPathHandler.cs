@@ -3,19 +3,18 @@ using System.Linq;
 using System.Threading.Tasks;
 using DreamTravel.Domain.Cities;
 using DreamTravel.DreamTrips.CalculateBestPath.Interfaces;
-using DreamTravel.GeolocationData.Query.DownloadRoadData;
 using DreamTravel.TravelingSalesmanProblem;
 
 namespace DreamTravel.DreamTrips.CalculateBestPath
 {
-    public class CalculateBestPath : ICalculateBestPath
+    public class CalculateBestPathHandler : ICalculateBestPath
     {
         private readonly IDownloadRoadData _downloadRoadData;
         private readonly IFormPathsFromMatrices _formPathsFromMatrices;
         private readonly ITSP _tspSolver;
         private readonly IFindProfitablePath _findProfitablePath;
 
-        public CalculateBestPath(IDownloadRoadData downloadRoadData, IFormPathsFromMatrices formPathsFromMatrices, ITSP tspSolver, IFindProfitablePath findProfitablePath)
+        public CalculateBestPathHandler(IDownloadRoadData downloadRoadData, IFormPathsFromMatrices formPathsFromMatrices, ITSP tspSolver, IFindProfitablePath findProfitablePath)
         {
             _downloadRoadData = downloadRoadData;
             _formPathsFromMatrices = formPathsFromMatrices;
@@ -23,7 +22,7 @@ namespace DreamTravel.DreamTrips.CalculateBestPath
             _findProfitablePath = findProfitablePath;
         }
 
-        public async Task<Result> Execute(List<City> cities)
+        public async Task<CalculateBestPathResult> Execute(List<City> cities)
         {
             EvaluationMatrix evaluationMatrix = await _downloadRoadData.Execute(cities);
             evaluationMatrix = _findProfitablePath.Execute(evaluationMatrix, cities.Count);
@@ -33,12 +32,12 @@ namespace DreamTravel.DreamTrips.CalculateBestPath
             //to have a possiblity to store cities data
             // File.WriteAllText("./xCities.txt", JsonConvert.SerializeObject(evaluationMatrix.OptimalDistances));
 
-            Result result = new Result
+            CalculateBestPathResult calculateBestPathResult = new CalculateBestPathResult
             {
                 Cities = cities,
                 BestPaths = _formPathsFromMatrices.Execute(cities, evaluationMatrix, orderOfCities)
             };
-            return result;
+            return calculateBestPathResult;
         }
 
     }

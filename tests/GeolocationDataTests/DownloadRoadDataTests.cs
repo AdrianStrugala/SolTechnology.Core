@@ -1,24 +1,24 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using DreamTravel.Domain.Cities;
-using DreamTravel.GeolocationData.Query.DownloadRoadData;
-using DreamTravel.GeolocationData.Query.DownloadRoadData.Clients;
+using DreamTravel.GeolocationData;
+using DreamTravel.GeolocationData.GoogleApi;
+using DreamTravel.GeolocationData.MichelinApi;
 using Microsoft.Extensions.Logging.Abstractions;
 using Xunit;
 
-namespace DreamTravel.GeolocationDataTests.Query.DownloadRoadData
+namespace DreamTravel.GeolocationDataTests
 {
     public class DownloadRoadDataTests
     {
-        private readonly GeolocationData.Query.DownloadRoadData.DownloadRoadData _sut;
+        private readonly DreamTrips.CalculateBestPath.Executors.DownloadRoadData _sut;
 
         public DownloadRoadDataTests()
         {
-            IDownloadDurationMatrixByTollRoad downloadDurationMatrixByTollRoad = new DownloadDurationMatrixByTollRoad(NullLogger<DownloadDurationMatrixByTollRoad>.Instance);
-            IDownloadDurationMatrixByFreeRoad downloadDurationMatrixByFreeRoad = new DownloadDurationMatrixByFreeRoad(NullLogger<DownloadDurationMatrixByFreeRoad>.Instance);
-            IDownloadCostBetweenTwoCities downloadCostBetweenTwoCities = new DownloadCostBetweenTwoCities(NullLogger<DownloadCostBetweenTwoCities>.Instance);
+            IGoogleApiClient googleApiClient = new GoogleApiClient(NullLogger<GoogleApiClient>.Instance);
+            IMichelinApiClient michelinApiClient = new MichelinApiClient(NullLogger<MichelinApiClient>.Instance);
 
-            _sut = new GeolocationData.Query.DownloadRoadData.DownloadRoadData(downloadDurationMatrixByTollRoad, downloadDurationMatrixByFreeRoad, downloadCostBetweenTwoCities);
+            _sut = new DreamTrips.CalculateBestPath.Executors.DownloadRoadData(googleApiClient, michelinApiClient);
         }
 
 

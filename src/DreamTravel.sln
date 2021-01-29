@@ -42,7 +42,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Unit", "Unit", "{39216599-3
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Integration", "Integration", "{6B8A7FAF-6CB2-45BA-87B3-C66F1EED5699}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GeolocationData", "Backend\GeolocationData\GeolocationData.csproj", "{CBEE5B73-8F4E-4F2F-A091-73E2A71628B2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Clients", "Backend\GeolocationData\Clients.csproj", "{CBEE5B73-8F4E-4F2F-A091-73E2A71628B2}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DatabaseData", "Backend\DatabaseData\DatabaseData.csproj", "{8AE7F261-518E-4E6E-8E85-D05943C1F769}"
 EndProject

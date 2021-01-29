@@ -4,12 +4,12 @@ using DreamTravel.Domain.Paths;
 
 namespace DreamTravel.DreamTrips.CalculateBestPath
 {
-    public class Result
+    public class CalculateBestPathResult
     {
         public List<Path> BestPaths { get; set; }
         public List<City> Cities { get; set; }
 
-        public Result()
+        public CalculateBestPathResult()
         {
             BestPaths = new List<Path>();
             Cities = new List<City>();

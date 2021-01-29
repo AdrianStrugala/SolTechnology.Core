@@ -1,4 +1,4 @@
-﻿using DreamTravel.GeolocationData.Query.DownloadRoadData;
+﻿using DreamTravel.Domain.Cities;
 
 namespace DreamTravel.DreamTrips.CalculateBestPath.Interfaces
 {

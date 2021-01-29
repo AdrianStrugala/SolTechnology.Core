@@ -3,9 +3,8 @@ using System.Linq;
 using DreamTravel.Domain.Cities;
 using DreamTravel.Domain.Paths;
 using DreamTravel.DreamTrips.CalculateBestPath.Interfaces;
-using DreamTravel.GeolocationData.Query.DownloadRoadData;
 
-namespace DreamTravel.DreamTrips.CalculateBestPath
+namespace DreamTravel.DreamTrips.CalculateBestPath.Executors
 {
     public class FormPathsFromMatrices : IFormPathsFromMatrices
     {

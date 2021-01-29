@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using DreamTravel.Domain.Cities;
@@ -9,23 +8,11 @@ using DreamTravel.GeolocationData.Configuration;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json.Linq;
 
-namespace DreamTravel.GeolocationData.Query.DownloadRoadData.Clients
+namespace DreamTravel.GeolocationData.GoogleApi
 {
-    public class DownloadDurationMatrixByFreeRoad : IDownloadDurationMatrixByFreeRoad
+    public partial class GoogleApiClient : IGoogleApiClient
     {
-        private readonly HttpClient _httpClient;
-        private readonly ILogger<DownloadDurationMatrixByFreeRoad> _logger;
-
-        public DownloadDurationMatrixByFreeRoad(ILogger<DownloadDurationMatrixByFreeRoad> logger)
-        {
-            _logger = logger;
-            if (_httpClient == null)
-            {
-                _httpClient = new HttpClient();
-            }
-        }
-
-        public async Task<double[]> Execute(List<City> listOfCities)
+        public async Task<double[]> GetDurationMatrixByTollRoad(List<City> listOfCities)
         {
             double[] result = new double[listOfCities.Count * listOfCities.Count];
 
@@ -40,9 +27,9 @@ namespace DreamTravel.GeolocationData.Query.DownloadRoadData.Clients
                 try
                 {
                     string url =
-                        $"https://maps.googleapis.com/maps/api/distancematrix/json?units=imperial&origins={listOfCities[i].Latitude},{listOfCities[i].Longitude}&destinations={coordinates}&avoid=tolls&key={GeolocationDataConfiguration.ApiKey}";
+                        $"https://maps.googleapis.com/maps/api/distancematrix/json?units=imperial&origins={listOfCities[i].Latitude},{listOfCities[i].Longitude}&destinations={coordinates}&key={GeolocationDataConfiguration.ApiKey}";
 
-                    string response = await _httpClient.GetStringAsync(url);
+                    var response = await _httpClient.GetStringAsync(url);
                     JObject json = JObject.Parse(response);
 
                     for (int j = 0; j < listOfCities.Count; j++)
@@ -56,7 +43,6 @@ namespace DreamTravel.GeolocationData.Query.DownloadRoadData.Clients
                             result[j + i * listOfCities.Count] =
                                 json["rows"][0]["elements"][j]["duration"]["value"].Value<int>();
                         }
-
                     }
                 }
 

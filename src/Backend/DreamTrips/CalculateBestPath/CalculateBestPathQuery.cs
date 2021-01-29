@@ -3,12 +3,11 @@ using DreamTravel.Domain.Cities;
 
 namespace DreamTravel.DreamTrips.CalculateBestPath
 {
-    public class Query
+    public class CalculateBestPathQuery
     {
         public List<City> Cities { get; set; }
-        public string SessionId { get; set; }
 
-        public Query()
+        public CalculateBestPathQuery()
         {
             Cities = new List<City>();
         }

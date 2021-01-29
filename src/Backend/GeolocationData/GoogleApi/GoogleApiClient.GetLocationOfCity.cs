@@ -4,23 +4,26 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using DreamTravel.Domain.Cities;
 using DreamTravel.GeolocationData.Configuration;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json.Linq;
 
-namespace DreamTravel.GeolocationData.Repository.Cities
+namespace DreamTravel.GeolocationData.GoogleApi
 {
-    public partial class CityRepository : ICityRepository
+    public partial class GoogleApiClient : IGoogleApiClient
     {
+        private readonly ILogger<GoogleApiClient> _logger;
         private readonly HttpClient _httpClient;
 
-        public CityRepository()
+        public GoogleApiClient(ILogger<GoogleApiClient> logger)
         {
+            _logger = logger;
             if (_httpClient == null)
             {
                 _httpClient = new HttpClient();
             }
         }
 
-        public async Task<City> GetLocation(string cityName)
+        public async Task<City> GetLocationOfCity(string cityName)
         {
             try
             {

@@ -1,4 +1,4 @@
-﻿namespace DreamTravel.GeolocationData.Query.DownloadRoadData
+﻿namespace DreamTravel.Domain.Cities
 {
     public sealed class EvaluationMatrix
     {

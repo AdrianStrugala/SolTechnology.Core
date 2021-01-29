@@ -2,7 +2,7 @@
 using System.Threading.Tasks;
 using DreamTravel.Domain.Cities;
 
-namespace DreamTravel.GeolocationData.Query.DownloadRoadData
+namespace DreamTravel.DreamTrips.CalculateBestPath.Interfaces
 {
     public interface IDownloadRoadData
     {

@@ -24,6 +24,7 @@ namespace DreamTravel.Identity.ChangePassword
             if (currentPassword != user.Password)
             {
                 result.Message = "Given password does not match user password";
+                return result;
             }
 
             user.Password = newPassword;

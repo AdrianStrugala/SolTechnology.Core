@@ -1,16 +1,16 @@
 ﻿using System.Threading.Tasks;
 using DreamTravel.Domain.Cities;
+using DreamTravel.GeolocationData;
 
 namespace DreamTravel.DreamTrips.FindNameOfCity
 {
     public class FindNameOfCity : IFindNameOfCity
     {
-        private readonly ICityRepository _cityRepository;
+        private readonly IGoogleApiClient _googleApiClient;
 
-        public FindNameOfCity(ICityRepository cityRepository)
+        public FindNameOfCity(IGoogleApiClient googleApiClient)
         {
-            _cityRepository = cityRepository;
-
+            _googleApiClient = googleApiClient;
         }
 
         public async Task<City> Execute(double lat, double lng)
@@ -21,7 +21,7 @@ namespace DreamTravel.DreamTrips.FindNameOfCity
                 Longitude = lng
             };
 
-            result = await _cityRepository.GetName(result);
+            result = await _googleApiClient.GetNameOfCity(result);
 
             return result;
         }

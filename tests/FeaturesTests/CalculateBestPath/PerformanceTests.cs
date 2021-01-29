@@ -1,10 +1,11 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using DreamTravel.Domain.Cities;
-using DreamTravel.DreamTrips.CalculateBestPath;
+using DreamTravel.DreamTrips.CalculateBestPath.Executors;
 using DreamTravel.DreamTrips.CalculateBestPath.Interfaces;
-using DreamTravel.GeolocationData.Query.DownloadRoadData;
-using DreamTravel.GeolocationData.Query.DownloadRoadData.Clients;
+using DreamTravel.GeolocationData;
+using DreamTravel.GeolocationData.GoogleApi;
+using DreamTravel.GeolocationData.MichelinApi;
 using DreamTravel.TravelingSalesmanProblem;
 using Microsoft.Extensions.Logging.Abstractions;
 using Xunit;
@@ -13,22 +14,21 @@ namespace DreamTravel.FeaturesTests.CalculateBestPath
 {
     public class PerformanceTests
     {
-        private readonly DreamTrips.CalculateBestPath.CalculateBestPath _sut;
+        private readonly DreamTrips.CalculateBestPath.CalculateBestPathHandler _sut;
 
         public PerformanceTests()
         {
-            IDownloadDurationMatrixByTollRoad downloadDurationMatrixByTollRoad = new DownloadDurationMatrixByTollRoad(NullLogger<DownloadDurationMatrixByTollRoad>.Instance);
-            IDownloadDurationMatrixByFreeRoad downloadDurationMatrixByFreeRoad = new DownloadDurationMatrixByFreeRoad(NullLogger<DownloadDurationMatrixByFreeRoad>.Instance);
-            IDownloadCostBetweenTwoCities downloadCostBetweenTwoCities = new DownloadCostBetweenTwoCities(NullLogger<DownloadCostBetweenTwoCities>.Instance);
+            IGoogleApiClient googleApiClient = new GoogleApiClient(NullLogger<GoogleApiClient>.Instance);
+            IMichelinApiClient michelinApiClient = new MichelinApiClient(NullLogger<MichelinApiClient>.Instance);
 
-            DownloadRoadData downloadRoadData = new DownloadRoadData(downloadDurationMatrixByTollRoad, downloadDurationMatrixByFreeRoad, downloadCostBetweenTwoCities);
+            DownloadRoadData downloadRoadData = new DownloadRoadData(googleApiClient, michelinApiClient);
             IFormPathsFromMatrices formOutputData = new FormPathsFromMatrices();
 
             ITSP tsp = new AntColony();
 
             FindProfitablePath evaluationBrain = new FindProfitablePath();
 
-            _sut = new DreamTrips.CalculateBestPath.CalculateBestPath(downloadRoadData, formOutputData, tsp, evaluationBrain);
+            _sut = new DreamTrips.CalculateBestPath.CalculateBestPathHandler(downloadRoadData, formOutputData, tsp, evaluationBrain);
         }
 
         [Fact(Skip = "Manual test")]

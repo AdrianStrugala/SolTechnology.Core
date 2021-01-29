@@ -5,14 +5,14 @@ using System.Xml;
 using DreamTravel.Domain.Cities;
 using Microsoft.Extensions.Logging;
 
-namespace DreamTravel.GeolocationData.Query.DownloadRoadData.Clients
+namespace DreamTravel.GeolocationData.MichelinApi
 {
-    public class DownloadCostBetweenTwoCities : IDownloadCostBetweenTwoCities
+    public class MichelinApiClient : IMichelinApiClient
     {
         private readonly HttpClient _httpClient;
-        private readonly ILogger<DownloadCostBetweenTwoCities> _logger;
+        private readonly ILogger<MichelinApiClient> _logger;
 
-        public DownloadCostBetweenTwoCities(ILogger<DownloadCostBetweenTwoCities> logger)
+        public MichelinApiClient(ILogger<MichelinApiClient> logger)
         {
             _logger = logger;
 
@@ -22,7 +22,7 @@ namespace DreamTravel.GeolocationData.Query.DownloadRoadData.Clients
             }
         }
 
-        public async Task<(double, double)> Execute(City origin, City destination)
+        public async Task<(double, double)> DownloadCostBetweenTwoCities(City origin, City destination)
         {
             if (origin.Name == destination.Name)
             {

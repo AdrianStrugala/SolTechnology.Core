@@ -1,8 +1,8 @@
 ﻿using System.Threading.Tasks;
+using DreamTravel.Domain.Cities;
 using DreamTravel.DreamTrips.CalculateBestPath.Interfaces;
-using DreamTravel.GeolocationData.Query.DownloadRoadData;
 
-namespace DreamTravel.DreamTrips.CalculateBestPath
+namespace DreamTravel.DreamTrips.CalculateBestPath.Executors
 {
     public class FindProfitablePath : IFindProfitablePath
     {

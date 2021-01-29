@@ -6,6 +6,6 @@ namespace DreamTravel.DreamTrips.CalculateBestPath.Interfaces
 {
     public interface ICalculateBestPath
     {
-        Task<Result> Execute(List<City> cities);
+        Task<CalculateBestPathResult> Execute(List<City> cities);
     }
 }

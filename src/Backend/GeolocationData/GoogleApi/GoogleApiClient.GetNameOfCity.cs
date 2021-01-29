@@ -6,11 +6,11 @@ using DreamTravel.Domain.Cities;
 using DreamTravel.GeolocationData.Configuration;
 using Newtonsoft.Json.Linq;
 
-namespace DreamTravel.GeolocationData.Repository.Cities
+namespace DreamTravel.GeolocationData.GoogleApi
 {
-    public partial class CityRepository : ICityRepository
+    public partial class GoogleApiClient : IGoogleApiClient
     {
-        public async Task<City> GetName(City city)
+        public async Task<City> GetNameOfCity(City city)
         {
             try
             {

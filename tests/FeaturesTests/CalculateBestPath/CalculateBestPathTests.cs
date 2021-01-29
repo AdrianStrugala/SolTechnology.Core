@@ -1,8 +1,8 @@
 using System.Collections.Generic;
 using DreamTravel.Domain.Cities;
 using DreamTravel.DreamTrips.CalculateBestPath;
+using DreamTravel.DreamTrips.CalculateBestPath.Executors;
 using DreamTravel.DreamTrips.CalculateBestPath.Interfaces;
-using DreamTravel.GeolocationData.Query.DownloadRoadData;
 using DreamTravel.TravelingSalesmanProblem;
 using NSubstitute;
 using Xunit;
@@ -15,7 +15,7 @@ namespace DreamTravel.FeaturesTests.CalculateBestPath
         private readonly ITSP _tspSolver;
         private readonly IFindProfitablePath _evaluationBrain;
 
-        private readonly DreamTrips.CalculateBestPath.CalculateBestPath _sut;
+        private readonly CalculateBestPathHandler _sut;
 
         public CalculateBestPathTests()
         {
@@ -24,7 +24,7 @@ namespace DreamTravel.FeaturesTests.CalculateBestPath
             _tspSolver = Substitute.For<ITSP>();
             _evaluationBrain = Substitute.For<IFindProfitablePath>();
 
-            _sut = new DreamTrips.CalculateBestPath.CalculateBestPath(_downloadRoadData, formPathsFromMatrices, _tspSolver, _evaluationBrain);
+            _sut = new DreamTrips.CalculateBestPath.CalculateBestPathHandler(_downloadRoadData, formPathsFromMatrices, _tspSolver, _evaluationBrain);
         }
 
         [Fact]
@@ -53,8 +53,8 @@ namespace DreamTravel.FeaturesTests.CalculateBestPath
         //        async Task Handle_DoNotOptimizePath_ResultOrderIsTheSameAsInput()
         //        {
         //            //Arrange
-        //            _downloadRoadData.Execute(Arg.Any<List<City>>(), Arg.Any<EvaluationMatrix>()).Returns(new EvaluationMatrix(3));
-        //            _evaluationBrain.Execute(Arg.Any<EvaluationMatrix>(), Arg.Any<int>()).Returns(new EvaluationMatrix(3));
+        //            _downloadRoadData.DownloadCostBetweenTwoCities(Arg.Any<List<City>>(), Arg.Any<EvaluationMatrix>()).Returns(new EvaluationMatrix(3));
+        //            _evaluationBrain.DownloadCostBetweenTwoCities(Arg.Any<EvaluationMatrix>(), Arg.Any<int>()).Returns(new EvaluationMatrix(3));
         //            List<int> order = new List<int> { 0, 2, 1 };
         //            _tspSolver.SolveTSP(Arg.Any<List<double>>()).Returns(order);
         //
@@ -66,7 +66,7 @@ namespace DreamTravel.FeaturesTests.CalculateBestPath
         //            };
         //            
         //            //Act
-        //            var result = await _sut.Execute(cities, false);
+        //            var result = await _sut.DownloadCostBetweenTwoCities(cities, false);
         //            var bestPaths = result.BestPaths;
         //
         //

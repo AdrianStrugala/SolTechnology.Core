@@ -5,18 +5,19 @@
 using System.IO;
 using System.Threading.Tasks;
 using DreamTravel.Domain.Cities;
-using DreamTravel.GeolocationData.Repository.Cities;
+using DreamTravel.GeolocationData.GoogleApi;
+using Microsoft.Extensions.Logging.Abstractions;
 using Xunit;
 
-namespace DreamTravel.GeolocationDataTests.Cities
+namespace DreamTravel.GeolocationDataTests.GoogleApi
 {
-    public class CityRepositoryTests
+    public class CitiesTests
     {
-        private readonly CityRepository _sut;
+        private readonly GoogleApiClient _sut;
 
-        public CityRepositoryTests()
+        public CitiesTests()
         {
-            _sut = new CityRepository();
+            _sut = new GoogleApiClient(NullLogger<GoogleApiClient>.Instance);
         }
 
         [Fact (Skip = "Paid test")]
@@ -31,7 +32,7 @@ namespace DreamTravel.GeolocationDataTests.Cities
             };
 
             //Act
-            var result = await _sut.GetName(city);
+            var result = await _sut.GetNameOfCity(city);
 
             //Assert
             Assert.Equal("Kufra District, Libya", result.Name);
@@ -49,7 +50,7 @@ namespace DreamTravel.GeolocationDataTests.Cities
             };
 
             //Act
-            var result = await _sut.GetName(city);
+            var result = await _sut.GetNameOfCity(city);
 
             //Assert
             Assert.Equal("Wrocław", result.Name);
@@ -67,7 +68,7 @@ namespace DreamTravel.GeolocationDataTests.Cities
             };
 
             //Act
-            var result = await _sut.GetName(city);
+            var result = await _sut.GetNameOfCity(city);
 
             //Assert
             Assert.Equal("Baltic Sea", result.Name);
@@ -80,7 +81,7 @@ namespace DreamTravel.GeolocationDataTests.Cities
             string cityName = "Wroclaw";
 
             //Act
-            var result = await _sut.GetLocation(cityName);
+            var result = await _sut.GetLocationOfCity(cityName);
 
             //Assert
             Assert.Equal("Wroclaw", result.Name);
@@ -96,7 +97,7 @@ namespace DreamTravel.GeolocationDataTests.Cities
 
             //Act
             // ReSharper disable once PossibleNullReferenceException
-            var exception = await Record.ExceptionAsync(async () => await _sut.GetLocation(cityName));
+            var exception = await Record.ExceptionAsync(async () => await _sut.GetLocationOfCity(cityName));
 
             //Assert
             Assert.IsType<InvalidDataException>(exception);

@@ -1,14 +1,14 @@
 ﻿using System.Threading.Tasks;
 using DreamTravel.Domain.Cities;
-using DreamTravel.GeolocationData.Query.DownloadRoadData.Clients;
+using DreamTravel.GeolocationData.MichelinApi;
 using Microsoft.Extensions.Logging.Abstractions;
 using Xunit;
 
-namespace DreamTravel.GeolocationDataTests.Query.DownloadRoadData.Clients
+namespace DreamTravel.GeolocationDataTests.MichelinApi
 {
     public class DownloadCostBetweenTwoCitiesTests
     {
-        private readonly DownloadCostBetweenTwoCities _sut = new DownloadCostBetweenTwoCities(NullLogger<DownloadCostBetweenTwoCities>.Instance);
+        private readonly MichelinApiClient _sut = new MichelinApiClient(NullLogger<MichelinApiClient>.Instance);
 
 
 
@@ -31,7 +31,7 @@ namespace DreamTravel.GeolocationDataTests.Query.DownloadRoadData.Clients
             };
 
             //Act
-            var result = await _sut.Execute(firstCity, secondCity);
+            var result = await _sut.DownloadCostBetweenTwoCities(firstCity, secondCity);
 
             //Assert
             Assert.NotEqual((0, 0), result);
@@ -57,7 +57,7 @@ namespace DreamTravel.GeolocationDataTests.Query.DownloadRoadData.Clients
             };
 
             //Act
-            var result = await _sut.Execute(firstCity, secondCity);
+            var result = await _sut.DownloadCostBetweenTwoCities(firstCity, secondCity);
 
             //Assert
             Assert.Equal((-1, -1), result);
