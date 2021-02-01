@@ -13,12 +13,12 @@ namespace DreamTravel.DreamTrips.FindNameOfCity
             _googleApiClient = googleApiClient;
         }
 
-        public async Task<City> Handle(double lat, double lng)
+        public async Task<City> Handle(FindNameOfCityQuery query)
         {
             City result = new City
             {
-                Latitude = lat,
-                Longitude = lng
+                Latitude = query.Lat,
+                Longitude = query.Lng
             };
 
             result = await _googleApiClient.GetNameOfCity(result);

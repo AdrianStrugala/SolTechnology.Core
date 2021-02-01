@@ -10,7 +10,7 @@ namespace DreamTravel.Api.DreamTrips
     [Route(Route)]
     public class FindNameOfCityController : Controller
     {
-        public const string Route = "api/FindNameOfCityHandler";
+        public const string Route = "api/FindNameOfCity";
 
         private readonly ILogger<FindNameOfCityController> _logger;
         private readonly IFindNameOfCity _findNameOfCity;
@@ -25,13 +25,13 @@ namespace DreamTravel.Api.DreamTrips
 
 
         [HttpPost]
-        public async Task<IActionResult> FindNameOfCity([FromBody] Request request)
+        public async Task<IActionResult> FindNameOfCity([FromBody] FindNameOfCityQuery request)
         {
             try
             {
                 _logger.LogInformation("Looking for city: " + request.Lat + ";" + request.Lng);
 
-                var result = await _findNameOfCity.Handle(request.Lat, request.Lng);
+                var result = await _findNameOfCity.Handle(request);
 
                 return Ok(result);
             }
@@ -43,13 +43,5 @@ namespace DreamTravel.Api.DreamTrips
                 return BadRequest(message);
             }
         }
-
-    }
-
-    public class Request
-    {
-        public double Lat { get; set; }
-        public double Lng { get; set; }
-        public string SessionId { get; set; }
     }
 }

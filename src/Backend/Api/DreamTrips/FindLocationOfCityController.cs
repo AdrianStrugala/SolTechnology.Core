@@ -11,7 +11,7 @@ namespace DreamTravel.Api.DreamTrips
     [Route(Route)]
     public class FindLocationOfCityController : Controller
     {
-        public const string Route = "api/FindLocationOfCityHandler";
+        public const string Route = "api/FindLocationOfCity";
 
         private readonly ILogger<FindLocationOfCityController> _logger;
         private readonly IFindLocationOfCity _findLocationOfCity;
@@ -26,13 +26,13 @@ namespace DreamTravel.Api.DreamTrips
 
 
         [HttpPost]
-        public async Task<IActionResult> FindLocationOfCity([FromBody]FindLocationOfCityRequest request)
+        public async Task<IActionResult> FindLocationOfCity([FromBody]FindLocationOfCityQuery query)
         {
             try
             {
-                _logger.LogInformation("Looking for city: " + request.Name);
+                _logger.LogInformation("Looking for city: " + query.Name);
 
-                City city = await _findLocationOfCity.Handle(request.Name);
+                City city = await _findLocationOfCity.Handle(query);
 
                 return Ok(city);
             }
@@ -44,11 +44,5 @@ namespace DreamTravel.Api.DreamTrips
                 return BadRequest(message);
             }
         }
-    }
-
-    public class FindLocationOfCityRequest
-    {
-        public string Name { get; set; }
-        public string SessionId { get; set; }
     }
 }

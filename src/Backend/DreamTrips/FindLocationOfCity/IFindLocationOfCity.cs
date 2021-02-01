@@ -5,6 +5,6 @@ namespace DreamTravel.DreamTrips.FindLocationOfCity
 {
     public interface IFindLocationOfCity
     {
-        Task<City> Handle(string cityName);
+        Task<City> Handle(FindLocationOfCityQuery query);
     }
 }

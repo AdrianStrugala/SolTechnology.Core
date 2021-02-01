@@ -13,7 +13,7 @@ namespace DreamTravel.Api.DreamTrips
     [Route(Route)]
     public class CalculateBestPathController : Controller
     {
-        public const string Route = "api/CalculateBestPathHandler";
+        public const string Route = "api/CalculateBestPath";
         private const string PathsKeyName = "_Paths";
 
         private readonly ICalculateBestPath _calculateBestPath;

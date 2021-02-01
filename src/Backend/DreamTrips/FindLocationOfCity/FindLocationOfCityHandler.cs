@@ -13,9 +13,9 @@ namespace DreamTravel.DreamTrips.FindLocationOfCity
             _googleApiClient = googleApiClient;
         }
 
-        public async Task<City> Handle(string cityName)
+        public async Task<City> Handle(FindLocationOfCityQuery query)
         {
-            var result = await _googleApiClient.GetLocationOfCity(cityName);
+            var result = await _googleApiClient.GetLocationOfCity(query.Name);
 
             return result;
         }
