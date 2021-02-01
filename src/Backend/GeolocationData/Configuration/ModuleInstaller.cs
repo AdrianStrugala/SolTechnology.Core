@@ -1,4 +1,5 @@
-﻿using DreamTravel.GeolocationData.GoogleApi;
+﻿using DreamTravel.GeolocationData.AzairApi;
+using DreamTravel.GeolocationData.GoogleApi;
 using DreamTravel.GeolocationData.MichelinApi;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -10,7 +11,7 @@ namespace DreamTravel.GeolocationData.Configuration
         {
             services.AddTransient<IMichelinApiClient, MichelinApiClient>();
             services.AddTransient<IGoogleApiClient, GoogleApiClient>();
-            services.AddTransient<IAzairApiClient, IAzairApiClient>();
+            services.AddTransient<IAzairApiClient, AzairApiClient>();
 
             return services;
         }

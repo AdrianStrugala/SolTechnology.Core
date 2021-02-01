@@ -26,7 +26,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StaticData", "Backend\Fligh
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Domain", "Backend\Domain\Domain.csproj", "{D1E366DF-35FB-401E-A03D-5BF1B01A2998}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FlightDataTests", "..\tests\FlightDataTests\FlightDataTests.csproj", "{BABB7CB6-DCC9-48E0-A9ED-5C2097FD581C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StaticDataTests", "..\tests\FlightDataTests\StaticDataTests.csproj", "{BABB7CB6-DCC9-48E0-A9ED-5C2097FD581C}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "PresentationLayer", "PresentationLayer", "{671C7D7D-4079-44D1-AEF8-ACCC9A6186B8}"
 EndProject
@@ -44,7 +44,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Clients", "Backend\Geolocat
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DatabaseData", "Backend\DatabaseData\DatabaseData.csproj", "{8AE7F261-518E-4E6E-8E85-D05943C1F769}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GeolocationDataTests", "..\tests\GeolocationDataTests\GeolocationDataTests.csproj", "{0342F9AF-83E6-4B16-AD89-3D7C5D6C3231}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ClientsTests", "..\tests\GeolocationDataTests\ClientsTests.csproj", "{0342F9AF-83E6-4B16-AD89-3D7C5D6C3231}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FeaturesTests", "..\tests\FeaturesTests\FeaturesTests.csproj", "{5FA4F1EE-322B-425F-A578-C6E6B2AA36B1}"
 EndProject

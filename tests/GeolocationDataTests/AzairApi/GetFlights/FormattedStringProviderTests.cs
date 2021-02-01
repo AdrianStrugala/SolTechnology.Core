@@ -1,9 +1,8 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
-using DreamTravel.FlightProviderData.Query.GetFlights;
+using DreamTravel.GeolocationData.AzairApi.GetFlights;
 using Xunit;
 
-namespace DreamTravel.FlightDataTests.Flights.GetFlights
+namespace DreamTravel.GeolocationDataTests.AzairApi.GetFlights
 {
     public class FormattedStringProviderTests
     {
