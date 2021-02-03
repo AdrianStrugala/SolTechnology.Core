@@ -7,14 +7,14 @@ EXPOSE 443
 
 FROM mcr.microsoft.com/dotnet/core/sdk:3.1-buster AS build
 WORKDIR /src
-COPY ["DockerApi/DockerApi.csproj", "DockerApi/"]
+COPY ["Backend/DockerApi/DockerApi.csproj", "Backend/DockerApi/"]
 COPY ["Backend/DreamTrips/DreamTrips.csproj", "Backend/DreamTrips/"]
 COPY ["Backend/TravelingSalesmanProblem/TravelingSalesmanProblem.csproj", "Backend/TravelingSalesmanProblem/"]
 COPY ["Backend/GeolocationData/Clients.csproj", "Backend/GeolocationData/"]
 COPY ["Backend/Domain/Domain.csproj", "Backend/Domain/"]
-RUN dotnet restore "DockerApi/DockerApi.csproj"
+RUN dotnet restore "Backend/DockerApi/DockerApi.csproj"
 COPY . .
-WORKDIR "/src/DockerApi"
+WORKDIR "/src/Backend/DockerApi"
 RUN dotnet build "DockerApi.csproj" -c Release -o /app/build
 
 FROM build AS publish
