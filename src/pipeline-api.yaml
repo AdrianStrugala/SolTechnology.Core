@@ -16,7 +16,7 @@ resources:
 
 variables:
   # Container registry service connection established during pipeline creation
-  dockerRegistryServiceConnection: '86a9c183-a3b0-48e6-931a-4358122f8d06'
+  dockerRegistryServiceConnection: 'dreamtravels-container-registry'
   imageRepository: 'dreamtravels-api'
   containerRegistry: 'dreamtravels.azurecr.io'
   dockerfilePath: 'src/Backend/DockerApi/Dockerfile'
@@ -61,6 +61,8 @@ stages:
     - script: |
         sudo docker tag $(imageRepository):$(tag) $(containerRegistry)/$(imageRepository):$(tag)
       displayName: 'Tag container image before push'
+
+
     - task: Docker@2
       displayName: Push the image to container registry
       inputs:
