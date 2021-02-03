@@ -42,7 +42,7 @@ stages:
         command: build
         repository: $(imageRepository)
         dockerfile: $(dockerfilePath)
-        buildContext: $(Build.SourcesDirectory)/DreamTravels
+        buildContext: $(Build.SourcesDirectory)/src
         tags: |
           $(tag)
     - script: |
@@ -70,7 +70,7 @@ stages:
         repository: $(imageRepository)
         dockerfile: $(dockerfilePath)
         containerRegistry: $(dockerRegistryServiceConnection)
-        buildContext: $(Build.SourcesDirectory)/DreamTravels
+        buildContext: $(Build.SourcesDirectory)/src
         tags: |
           $(tag)
     
