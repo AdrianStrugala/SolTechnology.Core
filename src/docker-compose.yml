@@ -1,0 +1,8 @@
+version: '3.4'
+
+services:
+  dockerapi:
+    image: ${DOCKER_REGISTRY-}dockerapi
+    build:
+      context: .
+      dockerfile: DockerApi/Dockerfile
