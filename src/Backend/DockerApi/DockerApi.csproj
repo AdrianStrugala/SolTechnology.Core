@@ -12,7 +12,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Backend\DreamTrips\DreamTrips.csproj" />
+    <ProjectReference Include="..\DreamTrips\DreamTrips.csproj" />
   </ItemGroup>
 
 

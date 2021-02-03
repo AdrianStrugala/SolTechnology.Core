@@ -60,7 +60,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DreamFlights", "Backend\Dre
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ApiTests", "..\tests\ApiTests\ApiTests.csproj", "{128A9A73-31B5-4C52-A6E1-5710BD8DB4A7}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DockerApi", "DockerApi\DockerApi.csproj", "{8C92A019-4F92-435B-B1A0-62E51EEC475C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DockerApi", "Backend\DockerApi\DockerApi.csproj", "{8C92A019-4F92-435B-B1A0-62E51EEC475C}"
 EndProject
 Project("{E53339B2-1760-4266-BCC7-CA923CBCF16C}") = "docker-compose", "docker-compose.dcproj", "{481D3230-356A-481B-98F5-06192CB326C9}"
 EndProject
