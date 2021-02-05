@@ -9,7 +9,7 @@ trigger:
   paths:
     include:
     - src/Backend/DockerApi/*
-    - aks-api.yaml
+    - src/aks-api.yaml
 
 resources:
 - repo: self
@@ -71,7 +71,7 @@ stages:
     steps:
     - task: replacetokens@3
       inputs:
-        rootDirectory: '$(Build.SourcesDirectory)/DreamTravels'
+        rootDirectory: '$(Build.SourcesDirectory)/src'
         targetFiles: '$(deploymentFile)'
         encoding: 'auto'
         writeBOM: true
@@ -91,7 +91,7 @@ stages:
         namespace: 'default'
         command: 'apply'
         useConfigurationFile: true
-        configuration: '$(Build.SourcesDirectory)/DreamTravels/$(deploymentFile)'
+        configuration: '$(Build.SourcesDirectory)/src/$(deploymentFile)'
         secretType: 'dockerRegistry'
         containerRegistryType: 'Azure Container Registry'
         azureContainerRegistry: '$(containerRegistry)'
