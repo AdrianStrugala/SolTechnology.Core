@@ -4,6 +4,7 @@ using System.Linq;
 using Dapper;
 using DreamTravel.DatabaseData.Query.GetSubscriptionDetailsByDay;
 using DreamTravel.DatabaseData.Repository.FlightEmailSubscriptions;
+using DreamTravel.DatabaseDataTests.TestsConfiguration;
 using DreamTravel.Domain.FlightEmailSubscriptions;
 using DreamTravel.Domain.Users;
 using DreamTravel.Infrastructure.Database;
@@ -11,15 +12,18 @@ using Xunit;
 
 namespace DreamTravel.DatabaseDataTests.FlightEmailSubscriptions
 {
-    public class FlightEmailSubscriptionRepositoryTests : IClassFixture<SqlFixture>
+    [Collection(nameof(TestsCollections.SqlTestsCollection))]
+    public class FlightEmailSubscriptionRepositoryTests
     {
         private readonly FlightEmailSubscriptionRepository _sut;
         private readonly IDbConnectionFactory _dbConnectionFactory;
         private readonly FlightEmailSubscriptionFactory _subscriptionFactory;
+        private readonly DreamTravelsDbContext _dbContext;
 
         public FlightEmailSubscriptionRepositoryTests(SqlFixture sqlFixture)
         {
             _dbConnectionFactory = sqlFixture.DbConnectionFactory;
+            _dbContext = sqlFixture.DbContext;
             _sut = new FlightEmailSubscriptionRepository(_dbConnectionFactory);
             _subscriptionFactory = new FlightEmailSubscriptionFactory(_dbConnectionFactory);
         }
@@ -34,18 +38,10 @@ namespace DreamTravel.DatabaseDataTests.FlightEmailSubscriptions
                 email: "xd@Insert.pl"
             );
 
-            string insertSql = @"
-INSERT INTO [User] ([Name], Email)
-OUTPUT INSERTED.ID
-VALUES (@Name, @Email)";
-
-            using (var connection = _dbConnectionFactory.CreateConnection())
-            {
-                user.Id = connection.QuerySingle<int>(insertSql, new { Name = user.Name, Email = user.Email });
-            }
+            _dbContext.Users.Add(user);
 
             FlightEmailSubscription flightEmailSubscription = new FlightEmailSubscription();
-            flightEmailSubscription.UserId = user.Id;
+            flightEmailSubscription.UserId = user.UserId;
             flightEmailSubscription.ArrivalDate = DateTime.UtcNow.AddDays(3);
             flightEmailSubscription.DepartureDate = DateTime.UtcNow;
             flightEmailSubscription.From = "SOME UNIQUE STRING";
@@ -81,38 +77,32 @@ VALUES (@Name, @Email)";
         {
             //Arrange
             User user = new User
-            {
-                Name = "GetByUserId",
-                Email = "validUser@GetByUserId"
-            };
+            (
+                name: "GetByUserId",
+                password: "password",
+                email: "validUser@GetByUserId"
+            );
 
             User anotherUser = new User
-            {
-                Name = "GetByUserIdNotGood",
-                Email = "anotherUser@@GetByUserId"
-            };
+            (
+                name: "GetByUserIdNotGood",
+                password: "password",
+                email: "anotherUser@GetByUserId"
+            );
 
-            string insertSql = @"
-INSERT INTO [User] ([Name], Email)
-OUTPUT INSERTED.ID
-VALUES (@Name, @Email)";
-
-            using (var connection = _dbConnectionFactory.CreateConnection())
-            {
-                user.Id = connection.QuerySingle<int>(insertSql, new { Name = user.Name, Email = user.Email });
-                anotherUser.Id = connection.QuerySingle<int>(insertSql, new { Name = anotherUser.Name, Email = anotherUser.Email });
-            }
+            _dbContext.Users.Add(user);
+            _dbContext.Users.Add(anotherUser);
 
 
-            _subscriptionFactory.InsertFlightEmailSubscriptionForUser(user.Id);
-            _subscriptionFactory.InsertFlightEmailSubscriptionForUser(user.Id);
-            _subscriptionFactory.InsertFlightEmailSubscriptionForUser(user.Id);
+            _subscriptionFactory.InsertFlightEmailSubscriptionForUser(user.UserId);
+            _subscriptionFactory.InsertFlightEmailSubscriptionForUser(user.UserId);
+            _subscriptionFactory.InsertFlightEmailSubscriptionForUser(user.UserId);
 
-            _subscriptionFactory.InsertFlightEmailSubscriptionForUser(anotherUser.Id);
+            _subscriptionFactory.InsertFlightEmailSubscriptionForUser(anotherUser.UserId);
 
 
             //Act
-            var result = _sut.GetByUserId(user.Id);
+            var result = _sut.GetByUserId(user.UserId);
 
 
             //Assert
@@ -126,22 +116,17 @@ VALUES (@Name, @Email)";
         public void Delete_ValidOrder_ItemWasDeletedFromDB()
         {
             //Arrange
-            User user = new User();
-            user.Name = "test";
-            user.Email = "xd@delete.pl";
+            User user = new User
+            (
+                name: "test",
+                password: "password",
+                email: "xd@delete.pl"
+            );
 
-            string insertSql = @"
-INSERT INTO [User] ([Name], Email)
-OUTPUT INSERTED.ID
-VALUES (@Name, @Email)";
+            _dbContext.Users.Add(user);
 
-            using (var connection = _dbConnectionFactory.CreateConnection())
-            {
-                user.Id = connection.QuerySingle<int>(insertSql, new { Name = user.Name, Email = user.Email });
-            }
+            var orderUnderTest = _subscriptionFactory.InsertFlightEmailSubscriptionForUser(user.UserId);
 
-
-            var orderUnderTest = _subscriptionFactory.InsertFlightEmailSubscriptionForUser(user.Id);
 
             //Assert
             List<FlightEmailData> flightEmailData = _subscriptionFactory.GetSubscriptionData();
@@ -149,8 +134,10 @@ VALUES (@Name, @Email)";
             Assert.NotNull(flightEmailData);
             Assert.NotEmpty(flightEmailData);
 
+
             //Act
             _sut.Delete(orderUnderTest.Id);
+
 
             //Assert 2
             List<FlightEmailData> afterDelete = _subscriptionFactory.GetSubscriptionData();

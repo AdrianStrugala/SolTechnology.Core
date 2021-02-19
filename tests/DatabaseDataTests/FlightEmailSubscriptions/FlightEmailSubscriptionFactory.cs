@@ -17,7 +17,7 @@ namespace DreamTravel.DatabaseDataTests.FlightEmailSubscriptions
             _dbConnectionFactory = dbConnectionFactory;
         }
 
-        public FlightEmailSubscription InsertFlightEmailSubscriptionForUser(int userId)
+        public FlightEmailSubscription InsertFlightEmailSubscriptionForUser(Guid userId)
         {
             FlightEmailSubscription flightEmailSubscription = new FlightEmailSubscription();
             flightEmailSubscription.UserId = userId;

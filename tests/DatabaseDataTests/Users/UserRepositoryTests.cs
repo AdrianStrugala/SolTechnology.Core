@@ -2,6 +2,7 @@
 using System.Linq;
 using Dapper;
 using DreamTravel.DatabaseData.Repository.Users;
+using DreamTravel.DatabaseDataTests.TestsConfiguration;
 using DreamTravel.Domain.Users;
 using DreamTravel.Infrastructure.Database;
 using Xunit;

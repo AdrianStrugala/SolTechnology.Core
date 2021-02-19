@@ -23,26 +23,26 @@ namespace DreamTravel.DreamFlights
             //SendDreamTravelFlightEmailHandler
             services.AddScoped<IComposeMessage, ComposeMessage>();
             services.AddScoped<IFilterFlights, FilterFlights>();
-            services.AddScoped<ISendDreamTravelFlightEmail, SendDreamTravelFlightEmail.SendDreamTravelFlightEmailHandler>();
+            services.AddScoped<ISendDreamTravelFlightEmail, SendDreamTravelFlightEmailHandler>();
 
             //SubscribeForFlightEmailHandler
-            services.AddScoped<ISubscribeForFlightEmail, SubscribeForFlightEmail.SubscribeForFlightEmailHandler>();
+            services.AddScoped<ISubscribeForFlightEmail, SubscribeForFlightEmailHandler>();
 
             //GetTodaysTodaysFlightEmailDataHandler
             services.AddScoped<IGetTodaysFlightEmailData, GetTodaysTodaysFlightEmailDataHandler>();
 
             //GetFlightEmailSubscriptionsForUserHandler
-            services.AddScoped<IGetFlightEmailSubscriptionsForUser, GetFlightEmailSubscriptionsForUser.GetFlightEmailSubscriptionsForUserHandler>();
+            services.AddScoped<IGetFlightEmailSubscriptionsForUser, GetFlightEmailSubscriptionsForUserHandler>();
 
             //DeleteFlightEmailSubscriptionHandler
-            services.AddScoped<IDeleteFlightEmailSubscription, DeleteFlightEmailSubscription.DeleteFlightEmailSubscriptionHandler>();
+            services.AddScoped<IDeleteFlightEmailSubscription, DeleteFlightEmailSubscriptionHandler>();
 
             //SendOrderedFlightEmail
             services.AddScoped<ISendOrderedFlightEmail, SendOrderedFlightEmail.SendOrderedFlightEmail>();
             services.AddScoped<SendOrderedFlightEmail.Interfaces.IComposeMessage, SendOrderedFlightEmail.ComposeMessage>();
 
             //GetAirportsHandler
-            services.AddScoped<IGetAirports, GetAirports.GetAirportsHandler>();
+            services.AddScoped<IGetAirports, GetAirportsHandler>();
 
             //Update Subscriptions
             services.AddTransient<IUpdateSubscriptions, UpdateSubscriptionsHandler>();

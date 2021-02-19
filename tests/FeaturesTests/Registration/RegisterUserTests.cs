@@ -21,9 +21,11 @@ namespace DreamTravel.FeaturesTests.Registration
         public void Register_NewUser_IsRegistered()
         {
             //Arrange
-            User user = new User();
-            user.Email = "adrian@buziaczek.pl";
-            user.Password = "Diariusz Ehwara";
+            User user = new User(
+            email: "adrian@buziaczek.pl",
+            password: "Diariusz Ehwara",
+            name: "Ehwar jest wielki!"
+            );
 
             _userRepository.Get(Arg.Any<string>()).Returns((User)null);
 
@@ -40,8 +42,11 @@ namespace DreamTravel.FeaturesTests.Registration
         public void Register_EmailAlreadyExists_RegisterExceptionIsThrown()
         {
             //Arrange
-            User user = new User();
-            user.Email = "adrian@buziaczek.pl";
+            User user = new User(
+                email: "adrian@buziaczek.pl",
+                password: "Diariusz Ehwara",
+                name: "Ehwar jest wielki!"
+            );
 
             _userRepository.Get(Arg.Any<string>()).Returns(user);
 

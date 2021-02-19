@@ -1,15 +1,16 @@
 ﻿using DreamTravel.DatabaseData.Configuration;
+using DreamTravel.Infrastructure.Database;
 using Xunit;
 
 namespace DreamTravel.DatabaseDataTests.Configuration
 {
     public class DatabaseDataConfigurationTests
     {
-        private readonly DatabaseDataConfiguration _sut;
+        private readonly SqlDatabaseConfiguration _sut;
 
         public DatabaseDataConfigurationTests()
         {
-            _sut = new DatabaseDataConfiguration();
+            _sut = new SqlDatabaseConfiguration();
         }
 
         [Fact]

@@ -5,89 +5,83 @@ namespace DreamTravel.DatabaseData.Query.GetPreviewUsers
 {
     public class GetPreviewUsers : IGetPreviewUsers
     {
-        public List<User> Execute()
+        public List<PreviewUser> Execute()
         {
-            List<User> result = new List<User>();
+            List<PreviewUser> result = new List<PreviewUser>();
 
-            result.Add(new User
+            result.Add(new PreviewUser
             {
                 Email = "adistr94@gmail.com",
                 Name = "Adi"
             });
 
-            result.Add(new User
+            result.Add(new PreviewUser
             {
                 Email = "alek-pawul@wp.pl",
                 Name = "Alek"
             });
 
-            result.Add(new User
+            result.Add(new PreviewUser
             {
                 Email = "czechowski.priv@gmail.com",
                 Name = "Andrzej"
             });
 
-            result.Add(new User
+            result.Add(new PreviewUser
             {
                 Email = "k.tobolski94@gmail.com",
                 Name = "Krzysiu"
             });
 
-            result.Add(new User
+            result.Add(new PreviewUser
             {
                 Email = "karolina.brenzak@gmail.com",
                 Name = "Karolina"
             });
 
-            result.Add(new User
-            {
-                Email = "katada9707@wp.pl",
-                Name = "Kasiek"
-            });
-
-            result.Add(new User
+            result.Add(new PreviewUser
             {
                 Email = "lukasz.kamil.wojtczak@gmail.com",
                 Name = "Łukasz"
             });
 
-            result.Add(new User
+            result.Add(new PreviewUser
             {
                 Email = "maria.chorazy94@gmail.com",
                 Name = "Serduszko"
             });
 
-            result.Add(new User
+            result.Add(new PreviewUser
             {
                 Email = "mkmac231@gmail.com",
                 Name = "Mac"
             });
 
-            result.Add(new User
+            result.Add(new PreviewUser
             {
                 Email = "struanna@o2.pl",
                 Name = "Ania"
             });
 
-            result.Add(new User
+            result.Add(new PreviewUser
             {
                 Email = "szelus255@gmail.com",
                 Name = "Szela"
             });
 
-            result.Add(new User
+            result.Add(new PreviewUser
             {
                 Email = "tomasz.a.zmuda@gmail.com",
                 Name = "Tomek"
             });
 
-            result.Add(new User
+            result.Add(new PreviewUser
             {
                 Email = "zofia.natanek@gmail.com",
                 Name = "Zosia"
             });
 
-            result.Add(new User
+            result.Add(new PreviewUser
             {
                 Email = "tomasz.walicki.1994@gmail.com",
                 Name = "Walik"
