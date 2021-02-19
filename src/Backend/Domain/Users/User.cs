@@ -1,10 +1,33 @@
-﻿namespace DreamTravel.Domain.Users
+﻿using System;
+using Guards;
+
+namespace DreamTravel.Domain.Users
 {
-    public class User
+    public record User : AbstractEntity
     {
-        public int Id { get; set; }
-        public string Name { get; set; }
-        public string Password { get; set; }
-        public string Email { get; set; }
+        public Guid UserId { get; }
+        public string Name { get; init; }
+        public string Password { get; private set; }
+        public string Email { get; init; }
+
+
+        public User(string name, string password, string email)
+        {
+            Guard.ArgumentNotNullOrEmpty(name, nameof(name));
+            Guard.ArgumentNotNullOrEmpty(password, nameof(password));
+            Guard.ArgumentNotNullOrEmpty(email, nameof(email));
+
+            Name = name;
+            Password = password;
+            Email = email;
+
+            UserId = Guid.NewGuid();
+        }
+
+        public void UpdatePassword(string password)
+        {
+            Guard.ArgumentNotNullOrEmpty(password, nameof(password));
+            Password = password;
+        }
     }
 }

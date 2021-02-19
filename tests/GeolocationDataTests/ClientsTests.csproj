@@ -1,8 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 <PropertyGroup>
-    <TargetFramework>netcoreapp2.2</TargetFramework>
-    <RootNamespace>DreamTravel.GeolocationDataTests</RootNamespace>
+  <TargetFramework>net5.0</TargetFramework>
+    <RootNamespace>DreamTravel.ClientsTests</RootNamespace>
     <IsPackable>false</IsPackable>
 
   </PropertyGroup>

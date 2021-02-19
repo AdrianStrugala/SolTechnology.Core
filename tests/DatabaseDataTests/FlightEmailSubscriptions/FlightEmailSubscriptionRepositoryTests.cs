@@ -28,9 +28,11 @@ namespace DreamTravel.DatabaseDataTests.FlightEmailSubscriptions
         public void Insert_ValidOrderIncoming_ItIsSavedInDB()
         {
             //Arrange
-            User user = new User();
-            user.Name = "test";
-            user.Email = "xd@Insert.pl";
+            User user = new User(
+                name: "test",
+                password: "password",
+                email: "xd@Insert.pl"
+            );
 
             string insertSql = @"
 INSERT INTO [User] ([Name], Email)

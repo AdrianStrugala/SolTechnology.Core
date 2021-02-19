@@ -23,10 +23,12 @@ namespace DreamTravel.DatabaseDataTests.Users
         public void Insert_ValidUser_ItIsSavedInDB()
         {
             //Arrange
-            User user = new User();
-            user.Name = "Adrian";
-            user.Password = "Admin123";
-            user.Email = "dreamtravel@gmail.com";
+            User user = new User
+            (
+                name: "Adrian",
+                password: "Admin123",
+                email: "dreamtravel@gmail.com"
+            );
 
             //Act
             _sut.Insert(user);

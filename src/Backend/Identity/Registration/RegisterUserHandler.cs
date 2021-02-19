@@ -25,7 +25,7 @@ namespace DreamTravel.Identity.Registration
                 return result;
             }
 
-            user.Password = Encryption.Encrypt(user.Password);
+            user.UpdatePassword(Encryption.Encrypt(user.Password));
             _userRepository.Insert(user);
 
             result.Success = true;

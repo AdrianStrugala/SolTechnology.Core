@@ -27,7 +27,7 @@ namespace DreamTravel.Identity.ChangePassword
                 return result;
             }
 
-            user.Password = newPassword;
+            user.UpdatePassword(newPassword);
 
             _userRepository.Update(user);
 
