@@ -12,7 +12,7 @@ namespace DreamTravel.Infrastructure.Database.ContextConfigurations
         {
             builder.ToTable(typeof(T).Name);
 
-            builder.Property<long>(nameof(AbstractEntity.Id))
+            builder.Property<int>(nameof(AbstractEntity.Id))
                 .UseIdentityColumn(1);
 
             builder.HasKey(nameof(AbstractEntity.Id));

@@ -4,7 +4,7 @@ namespace DreamTravel.Domain
 {
     public abstract record AbstractEntity
     {
-        public long Id { get; }
+        public int Id { get; }
 
         public DateTime CreatedAt { get; }
 

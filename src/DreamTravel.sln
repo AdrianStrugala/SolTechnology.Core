@@ -14,8 +14,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TravelingSalesmanProblemTes
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Bot", "Backend\Bot\Bot.csproj", "{2AF5C223-ECE4-403B-B222-41417639E7B1}"
 EndProject
-Project("{00D1A9C2-B5F0-4AF3-8072-F6C62B433612}") = "DreamTravelDatabase", "Backend\DreamTravelDatabase\DreamTravelDatabase.sqlproj", "{D5CCE04E-179A-4118-9C46-209BFC510CA2}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Infrastructure", "Backend\Infrastructure\Infrastructure.csproj", "{2186D121-3F00-4FB6-9DC1-BF11094279C8}"
 EndProject
 Project("{151D2E53-A2C4-4D7D-83FE-D05416EBD58E}") = "AzureResourceGroup", "..\devOps\AzureResourceGroup\AzureResourceGroup.deployproj", "{2EB94B37-255F-40E7-A807-6A4F2D61DC9E}"
@@ -62,7 +60,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ApiTests", "..\tests\ApiTes
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "DevOps", "DevOps", "{83A22BC6-B2D9-49A9-A618-DEA0763A7CE3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DomainTests", "..\tests\DomainTests\DomainTests.csproj", "{FD8D3159-CC22-447C-B414-BE4101C2C949}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DomainTests", "..\tests\DomainTests\DomainTests.csproj", "{FD8D3159-CC22-447C-B414-BE4101C2C949}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DreamTravelDatabase", "Backend\DreamTravelDatabase\DreamTravelDatabase.csproj", "{23CAA043-2582-4C6B-82AE-612F0FDCDFAE}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -82,12 +82,6 @@ Global
 		{2AF5C223-ECE4-403B-B222-41417639E7B1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2AF5C223-ECE4-403B-B222-41417639E7B1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2AF5C223-ECE4-403B-B222-41417639E7B1}.Release|Any CPU.Build.0 = Release|Any CPU
-		{D5CCE04E-179A-4118-9C46-209BFC510CA2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{D5CCE04E-179A-4118-9C46-209BFC510CA2}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{D5CCE04E-179A-4118-9C46-209BFC510CA2}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
-		{D5CCE04E-179A-4118-9C46-209BFC510CA2}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{D5CCE04E-179A-4118-9C46-209BFC510CA2}.Release|Any CPU.Build.0 = Release|Any CPU
-		{D5CCE04E-179A-4118-9C46-209BFC510CA2}.Release|Any CPU.Deploy.0 = Release|Any CPU
 		{2186D121-3F00-4FB6-9DC1-BF11094279C8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{2186D121-3F00-4FB6-9DC1-BF11094279C8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2186D121-3F00-4FB6-9DC1-BF11094279C8}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -160,6 +154,10 @@ Global
 		{FD8D3159-CC22-447C-B414-BE4101C2C949}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FD8D3159-CC22-447C-B414-BE4101C2C949}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FD8D3159-CC22-447C-B414-BE4101C2C949}.Release|Any CPU.Build.0 = Release|Any CPU
+		{23CAA043-2582-4C6B-82AE-612F0FDCDFAE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{23CAA043-2582-4C6B-82AE-612F0FDCDFAE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{23CAA043-2582-4C6B-82AE-612F0FDCDFAE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{23CAA043-2582-4C6B-82AE-612F0FDCDFAE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

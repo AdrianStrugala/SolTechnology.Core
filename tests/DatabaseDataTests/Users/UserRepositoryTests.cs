@@ -1,7 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using Dapper;
-using DreamTravel.DatabaseData.Repository.Users;
+﻿using DreamTravel.DatabaseData.Repository.Users;
 using DreamTravel.DatabaseDataTests.TestsConfiguration;
 using DreamTravel.Domain.Users;
 using DreamTravel.Infrastructure.Database;
@@ -35,19 +32,14 @@ namespace DreamTravel.DatabaseDataTests.Users
             _sut.Insert(user);
 
             //Assert
-            List<User> users = new List<User>();
 
-            using (var connection = _connectionFactory.CreateConnection())
-            {
-                users = connection.Query<User>("SELECT * FROM [User]").ToList();
-            }
+            User resultUser = _sut.Get(user.UserId);
 
-            Assert.NotNull(users);
-            Assert.NotEmpty(users);
+            Assert.NotNull(resultUser);
 
-            Assert.Equal(user.Email, users.First().Email);
-            Assert.Equal(user.Name, users.First().Name);
-            Assert.Equal(user.Password, users.First().Password);
+            Assert.Equal(user.Email, resultUser.Email);
+            Assert.Equal(user.Name, resultUser.Name);
+            Assert.Equal(user.Password, resultUser.Password);
         }
     }
 }

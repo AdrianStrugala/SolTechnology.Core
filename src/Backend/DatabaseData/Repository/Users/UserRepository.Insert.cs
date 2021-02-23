@@ -16,11 +16,12 @@ namespace DreamTravel.DatabaseData.Repository.Users
 
         private const string InsertSql = @"
   INSERT INTO [dbo].[User] (
-        [Name]
-      ,[Password]
-      ,[Email]
-      ,[IsActive])
-VALUES (@Name, @Password, @Email, @IsActive)
+    [Name]
+    ,[UserId]
+    ,[Password]
+    ,[Email]
+    ,[IsActive])
+VALUES (@Name, @UserId, @Password, @Email, @IsActive)
 ";
 
         public void Insert(User user)
@@ -30,6 +31,7 @@ VALUES (@Name, @Password, @Email, @IsActive)
                 connection.Execute(InsertSql, new
                 {
                     Name = user.Name,
+                    UserId = user.UserId,
                     Password = user.Password,
                     Email = user.Email,
                     IsActive = true

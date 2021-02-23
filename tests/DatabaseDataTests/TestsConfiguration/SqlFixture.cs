@@ -16,21 +16,26 @@ namespace DreamTravel.DatabaseDataTests.TestsConfiguration
         public async Task InitializeAsync()
         {
             _connectionString =
-                "Server=tcp:dreamtravel.database.windows.net,1433;Initial Catalog=dreamtravel-demo;Persist Security Info=False;User ID=adrian;Password=P4ssw0rd@;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=60;";
+                "Data Source=localhost,1433;Database=DreamTravelDatabase;User ID=SA;Password=password_xxddd_2137;Persist Security Info=False;MultipleActiveResultSets=False;Connect Timeout=60;Encrypt=False;TrustServerCertificate=True";
             DbConnectionFactory = new DbConnectionFactory(_connectionString);
 
             SqlConnection?.Dispose();
             SqlConnection = new SqlConnection(_connectionString);
             SqlConnection.Open();
 
+            InitializeDbContext();
+
+            await new Respawn.Checkpoint().Reset(_connectionString);
+        }
+
+        public void InitializeDbContext()
+        {
             var dbContextOptions = new DbContextOptionsBuilder<DreamTravelsDbContext>();
             dbContextOptions
                 .UseSqlServer(SqlConnection)
                 .EnableSensitiveDataLogging(true)
                 .EnableDetailedErrors(true);
             DbContext = new DreamTravelsDbContext(dbContextOptions.Options);
-
-            await new Respawn.Checkpoint().Reset(_connectionString);
         }
 
         public async Task DisposeAsync()

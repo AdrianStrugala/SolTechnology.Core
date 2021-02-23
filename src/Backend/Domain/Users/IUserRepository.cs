@@ -1,4 +1,6 @@
-﻿namespace DreamTravel.Domain.Users
+﻿using System;
+
+namespace DreamTravel.Domain.Users
 {
     public interface IUserRepository
     {
@@ -6,7 +8,7 @@
 
         User Get(string userEmail);
 
-        User Get(int id);
+        User Get(Guid id);
 
         void Update(User user);
     }
