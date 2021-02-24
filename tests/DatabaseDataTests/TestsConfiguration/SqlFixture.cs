@@ -9,7 +9,6 @@ namespace DreamTravel.DatabaseDataTests.TestsConfiguration
     public class SqlFixture : IAsyncLifetime
     {
         public IDbConnectionFactory DbConnectionFactory;
-        public DreamTravelsDbContext DbContext;
         public SqlConnection SqlConnection { get; private set; }
         private string _connectionString;
 
@@ -23,19 +22,7 @@ namespace DreamTravel.DatabaseDataTests.TestsConfiguration
             SqlConnection = new SqlConnection(_connectionString);
             SqlConnection.Open();
 
-            InitializeDbContext();
-
             await new Respawn.Checkpoint().Reset(_connectionString);
-        }
-
-        public void InitializeDbContext()
-        {
-            var dbContextOptions = new DbContextOptionsBuilder<DreamTravelsDbContext>();
-            dbContextOptions
-                .UseSqlServer(SqlConnection)
-                .EnableSensitiveDataLogging(true)
-                .EnableDetailedErrors(true);
-            DbContext = new DreamTravelsDbContext(dbContextOptions.Options);
         }
 
         public async Task DisposeAsync()

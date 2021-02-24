@@ -1,13 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Dapper;
 using DreamTravel.DatabaseData.Query.GetSubscriptionDetailsByDay;
 using DreamTravel.DatabaseData.Repository.FlightEmailSubscriptions;
+using DreamTravel.DatabaseData.Repository.Users;
 using DreamTravel.DatabaseDataTests.TestsConfiguration;
 using DreamTravel.Domain.FlightEmailSubscriptions;
 using DreamTravel.Domain.Users;
-using DreamTravel.Infrastructure.Database;
 using Xunit;
 
 namespace DreamTravel.DatabaseDataTests.FlightEmailSubscriptions
@@ -16,16 +15,16 @@ namespace DreamTravel.DatabaseDataTests.FlightEmailSubscriptions
     public class FlightEmailSubscriptionRepositoryTests
     {
         private readonly FlightEmailSubscriptionRepository _sut;
-        private readonly IDbConnectionFactory _dbConnectionFactory;
         private readonly FlightEmailSubscriptionFactory _subscriptionFactory;
-        private readonly DreamTravelsDbContext _dbContext;
+        private readonly UserRepository _users;
 
         public FlightEmailSubscriptionRepositoryTests(SqlFixture sqlFixture)
         {
-            _dbConnectionFactory = sqlFixture.DbConnectionFactory;
-            _dbContext = sqlFixture.DbContext;
-            _sut = new FlightEmailSubscriptionRepository(_dbConnectionFactory);
-            _subscriptionFactory = new FlightEmailSubscriptionFactory(_dbConnectionFactory);
+            var dbConnectionFactory = sqlFixture.DbConnectionFactory;
+            _sut = new FlightEmailSubscriptionRepository(dbConnectionFactory);
+            _subscriptionFactory = new FlightEmailSubscriptionFactory(dbConnectionFactory);
+
+            _users = new UserRepository(dbConnectionFactory);
         }
 
         [Fact]
@@ -38,7 +37,7 @@ namespace DreamTravel.DatabaseDataTests.FlightEmailSubscriptions
                 email: "xd@Insert.pl"
             );
 
-            _dbContext.Users.Add(user);
+            _users.Insert(user);
 
             FlightEmailSubscription flightEmailSubscription = new FlightEmailSubscription();
             flightEmailSubscription.UserId = user.UserId;
@@ -90,8 +89,8 @@ namespace DreamTravel.DatabaseDataTests.FlightEmailSubscriptions
                 email: "anotherUser@GetByUserId"
             );
 
-            _dbContext.Users.Add(user);
-            _dbContext.Users.Add(anotherUser);
+            _users.Insert(user);
+            _users.Insert(anotherUser);
 
 
             _subscriptionFactory.InsertFlightEmailSubscriptionForUser(user.UserId);
@@ -123,7 +122,7 @@ namespace DreamTravel.DatabaseDataTests.FlightEmailSubscriptions
                 email: "xd@delete.pl"
             );
 
-            _dbContext.Users.Add(user);
+            _users.Insert(user);
 
             var orderUnderTest = _subscriptionFactory.InsertFlightEmailSubscriptionForUser(user.UserId);
 

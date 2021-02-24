@@ -1,8 +1,10 @@
-﻿namespace DreamTravel.Identity.ChangePassword
+﻿using System;
+
+namespace DreamTravel.Identity.ChangePassword
 {
    public class ChangePasswordCommand
     {
-        public int UserId { get; set; }
+        public Guid UserId { get; set; }
 
         public string CurrentPassword { get; set; }
 

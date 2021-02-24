@@ -11,6 +11,11 @@ namespace DreamTravel.Domain.Users
         public string Email { get; init; }
 
 
+        private User()
+        {
+            
+        }
+
         public User(string name, string password, string email)
         {
             Guard.ArgumentNotNullOrEmpty(name, nameof(name));
