@@ -26,23 +26,23 @@ namespace DreamTravel.Api
 
         public void ConfigureServices(IServiceCollection services)
         {
-            var policy = new AuthorizationPolicyBuilder()
-                         .RequireAuthenticatedUser()
-                         .Build();
-
-            services.AddCors(options =>
-            {
-                options.AddPolicy(CorsPolicy,
-                builder =>
-                {
-                    builder.WithOrigins("http://localhost:4200",
-                               "https://dreamtravels.azurewebsites.net",
-                               "https://dreamtravels-demo.azurewebsites.net")
-                                        .AllowAnyHeader()
-                                        .AllowAnyMethod()
-                                        .AllowCredentials();
-                });
-            });
+            // var policy = new AuthorizationPolicyBuilder()
+            //              .RequireAuthenticatedUser()
+            //              .Build();
+            //
+            // services.AddCors(options =>
+            // {
+            //     options.AddPolicy(CorsPolicy,
+            //     builder =>
+            //     {
+            //         builder.WithOrigins("http://localhost:4200",
+            //                    "https://dreamtravels.azurewebsites.net",
+            //                    "https://dreamtravels-demo.azurewebsites.net")
+            //                             .AllowAnyHeader()
+            //                             .AllowAnyMethod()
+            //                             .AllowCredentials();
+            //     });
+            // });
 
             services.AddApplicationInsightsTelemetry();
 
@@ -50,15 +50,17 @@ namespace DreamTravel.Api
             services.InstallDreamTrips();
             services.InstallIdentity();
 
-            services.AddAuthentication(DreamAuthenticationOptions.AuthenticationScheme)
-                    .AddScheme<DreamAuthenticationOptions, DreamAuthentication>(
-                        DreamAuthenticationOptions.AuthenticationScheme,
-                        null);
-            
+            // services.AddAuthentication(DreamAuthenticationOptions.AuthenticationScheme)
+            //         .AddScheme<DreamAuthenticationOptions, DreamAuthentication>(
+            //             DreamAuthenticationOptions.AuthenticationScheme,
+            //             null);
+            //
             services.AddMvc(opts =>
                             {
-                                opts.Filters.Add(new AuthorizeFilter(policy));
+                                // opts.Filters.Add(new AuthorizeFilter(policy));
                             }).SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
+
+            
         }
 
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
@@ -87,11 +89,10 @@ namespace DreamTravel.Api
                 app.UseHsts();
             }
 
-            app.UseCors(CorsPolicy);
+            // app.UseCors(CorsPolicy);
 
             app.UseHttpsRedirection();
-            app.UseAuthentication();
-            app.UseMvc();
+            // app.UseAuthentication();
         }
     }
 }
