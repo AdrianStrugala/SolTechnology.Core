@@ -14,6 +14,9 @@ using System.Threading.Tasks;
 using DreamTravel.DreamFlights;
 using DreamTravel.DreamTrips;
 using DreamTravel.Identity;
+using DreamTravel.Infrastructure.Authentication;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc.Authorization;
 
 namespace WebApi
 {
@@ -29,16 +32,46 @@ namespace WebApi
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-
             services.InstallDreamFlights();
             services.InstallDreamTrips();
             services.InstallIdentity();
 
             services.AddControllers();
 
+            services.AddAuthentication(DreamAuthenticationOptions.AuthenticationScheme)
+                    .AddScheme<DreamAuthenticationOptions, DreamAuthentication>(
+                        DreamAuthenticationOptions.AuthenticationScheme,
+                        null);
+
+
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "WebApi", Version = "v1" });
+                c.AddSecurityDefinition("ApiKey", new OpenApiSecurityScheme
+                {
+                    Type = SecuritySchemeType.ApiKey,
+                    In = ParameterLocation.Header,
+                    Name = DreamAuthenticationOptions.AuthenticationHeaderName,
+                    Description = "Authentication: Api Key for using Dream Travels"
+                });
+                c.AddSecurityRequirement(new OpenApiSecurityRequirement
+                {
+                    {
+                        new OpenApiSecurityScheme
+                        {
+                            Reference = new OpenApiReference { Type = ReferenceType.SecurityScheme, Id = "ApiKey" }
+                        },
+                        new string[] { }
+                    }
+                });
+            });
+
+            var policy = new AuthorizationPolicyBuilder()
+                         .RequireAuthenticatedUser()
+                         .Build();
+            services.AddMvc(opts =>
+            {
+                opts.Filters.Add(new AuthorizeFilter(policy));
             });
         }
 
@@ -57,6 +90,7 @@ namespace WebApi
             app.UseRouting();
 
             app.UseAuthorization();
+            app.UseAuthentication();
 
             app.UseEndpoints(endpoints =>
             {
