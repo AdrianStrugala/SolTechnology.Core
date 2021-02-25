@@ -11,6 +11,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Backend\Domain\Domain.csproj" />
     <ProjectReference Include="..\Backend\DreamFlights\DreamFlights.csproj" />
     <ProjectReference Include="..\Backend\DreamTrips\DreamTrips.csproj" />
     <ProjectReference Include="..\Backend\Identity\Identity.csproj" />
