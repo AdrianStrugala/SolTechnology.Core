@@ -1,13 +1,7 @@
-src/**/obj/**/*
-src/**/bin/**/*
-backend/src/**/bin/**/*
-backend/src/**/obj/**/*
-backend/tests/**/bin/**/*
-backend/tests/**/obj/**/*
-tests/**/bin/*
-tests/**/obj/*
-devOps/**/obj/**/*
-devOps/**/bin/**/*
+**/**/bin/**/*
+**/**/bin/*
+**/**/obj/*
+**/**/obj/**/*
 *.cache
 src/packages/**/*
 *.ide-shm
