@@ -1,9 +1,7 @@
-src/**/obj/**/*
-src/**/bin/**/*
-tests/**/bin/*
-tests/**/obj/*
-devOps/**/obj/**/*
-devOps/**/bin/**/*
+**/**/bin/**/*
+**/**/bin/*
+**/**/obj/*
+**/**/obj/**/*
 *.cache
 src/packages/**/*
 *.ide-shm

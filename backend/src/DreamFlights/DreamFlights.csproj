@@ -1,0 +1,14 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net5.0</TargetFramework>
+    <RootNamespace>DreamTravel.DreamFlights</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\DatabaseData\DatabaseData.csproj" />
+    <ProjectReference Include="..\FlightsRepository\StaticData.csproj" />
+    <ProjectReference Include="..\GeolocationData\Clients.csproj" />
+  </ItemGroup>
+
+</Project>
