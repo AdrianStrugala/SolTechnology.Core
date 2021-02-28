@@ -1,0 +1,7 @@
+E:\workspace\DreamTravel\src\DreamFlights\obj\Debug\netcoreapp2.2\Frontend.csprojAssemblyReference.cache
+E:\workspace\DreamTravel\src\DreamFlights\obj\Debug\netcoreapp2.2\Frontend.RazorAssemblyInfo.cache
+E:\workspace\DreamTravel\src\DreamFlights\obj\Debug\netcoreapp2.2\Frontend.RazorAssemblyInfo.cs
+E:\workspace\DreamTravel\src\DreamFlights\obj\Debug\netcoreapp2.2\Frontend.AssemblyInfoInputs.cache
+E:\workspace\DreamTravel\src\DreamFlights\obj\Debug\netcoreapp2.2\Frontend.AssemblyInfo.cs
+E:\workspace\DreamTravel\src\DreamFlights\obj\Debug\netcoreapp2.2\DreamTravel.DreamFlights.dll
+E:\workspace\DreamTravel\src\DreamFlights\obj\Debug\netcoreapp2.2\DreamTravel.DreamFlights.pdb
