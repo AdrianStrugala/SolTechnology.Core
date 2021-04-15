@@ -1,9 +1,7 @@
 ﻿using System;
-using System.Linq;
 using System.Threading.Tasks;
 using DreamTravel.DreamTrips.CalculateBestPath;
-using DreamTravel.DreamTrips.CalculateBestPath.Interfaces;
-using Microsoft.AspNetCore.Http;
+using DreamTravel.Infrastructure;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
@@ -14,13 +12,12 @@ namespace DreamTravel.Api.DreamTrips
     public class CalculateBestPathController : Controller
     {
         public const string Route = "api/CalculateBestPath";
-        private const string PathsKeyName = "_Paths";
 
-        private readonly ICalculateBestPath _calculateBestPath;
+        private readonly IQueryHandler<CalculateBestPathQuery, CalculateBestPathResult> _calculateBestPath;
         private readonly ILogger<CalculateBestPathController> _logger;
 
 
-        public CalculateBestPathController(ICalculateBestPath calculateBestPath,
+        public CalculateBestPathController(IQueryHandler<CalculateBestPathQuery, CalculateBestPathResult> calculateBestPath,
                              ILogger<CalculateBestPathController> logger)
         {
             _calculateBestPath = calculateBestPath;
@@ -29,16 +26,12 @@ namespace DreamTravel.Api.DreamTrips
 
 
         [HttpPost]
-        public async Task<IActionResult> CalculateBestPath([FromBody]CalculateBestPathQuery calculateBestPathQuery)
+        public async Task<IActionResult> CalculateBestPath([FromBody] CalculateBestPathQuery calculateBestPathQuery)
         {
             try
             {
-                var sanitizedCities = calculateBestPathQuery.Cities.Where(c => c != null).ToList();
-
                 _logger.LogInformation("TSP Engine: Fire!");
-                CalculateBestPathResult calculateBestPathResult = await _calculateBestPath.Execute(sanitizedCities);
-
-                //                HttpContext.Session.SetString(calculateBestPathQuery.SessionId + PathsKeyName, JsonConvert.SerializeObject(calculateBestPathResult.BestPaths));
+                CalculateBestPathResult calculateBestPathResult = await _calculateBestPath.Handle(calculateBestPathQuery);
 
                 return Ok(calculateBestPathResult.BestPaths);
             }

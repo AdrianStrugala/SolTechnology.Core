@@ -4,11 +4,11 @@ using DreamTravel.DatabaseData.Query.GetSubscriptionDetailsByDay;
 
 namespace DreamTravel.DreamFlights.GetTodaysFlightEmailData
 {
-    public class GetTodaysTodaysFlightEmailDataHandler : IGetTodaysFlightEmailData
+    public class GetTodaysFlightEmailDataHandler : IGetTodaysFlightEmailData
     {
         private readonly IGetSubscriptionDetailsByDay _getSubscriptionDetailsByDay;
 
-        public GetTodaysTodaysFlightEmailDataHandler(IGetSubscriptionDetailsByDay getSubscriptionDetailsByDay)
+        public GetTodaysFlightEmailDataHandler(IGetSubscriptionDetailsByDay getSubscriptionDetailsByDay)
         {
             _getSubscriptionDetailsByDay = getSubscriptionDetailsByDay;
         }

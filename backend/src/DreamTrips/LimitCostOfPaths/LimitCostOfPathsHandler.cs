@@ -1,13 +1,16 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using DreamTravel.Domain.Paths;
+using DreamTravel.Infrastructure;
 
 namespace DreamTravel.DreamTrips.LimitCostOfPaths
 {
-    public class LimitCostOfPathsHandler : ILimitCostOfPaths
+    public class LimitCostOfPathsHandler : IQueryHandler<LimitCostsOfPathsQuery, List<Path>>
     {
-        public List<Path> Handle(int costLimit, List<Path> paths)
+        public Task<List<Path>> Handle(LimitCostsOfPathsQuery query)
         {
+            var paths = query.Paths;
             List<double> consideredVinietas = new List<double>();
 
             paths.Sort((x, y) => 1 * x.Goal.CompareTo(y.Goal));
@@ -18,7 +21,7 @@ namespace DreamTravel.DreamTrips.LimitCostOfPaths
                 if (path.VinietaCost > 0)
                 {
                     if (consideredVinietas.Contains(path.VinietaCost)) continue;
-                    if (overallCost + path.VinietaCost > costLimit)
+                    if (overallCost + path.VinietaCost > query.CostLimit)
                     {
                         paths.Where(x => x.VinietaCost.Equals(path.VinietaCost)).ToList()
                             .ForEach(y =>
@@ -42,7 +45,7 @@ namespace DreamTravel.DreamTrips.LimitCostOfPaths
                 }
                 else
                 {
-                    if (overallCost + path.Cost <= costLimit)
+                    if (overallCost + path.Cost <= query.CostLimit)
                     {
                         overallCost += path.Cost;
                         path.OptimalCost = path.Cost;
@@ -58,7 +61,7 @@ namespace DreamTravel.DreamTrips.LimitCostOfPaths
 
             paths.Sort((x, y) => 1 * x.Index.CompareTo(y.Index));
 
-            return paths;
+            return Task.FromResult(paths);
         }
     }
 }

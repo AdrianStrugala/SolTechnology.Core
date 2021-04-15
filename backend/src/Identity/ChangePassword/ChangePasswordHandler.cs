@@ -4,7 +4,7 @@ using DreamTravel.Infrastructure;
 
 namespace DreamTravel.Identity.ChangePassword
 {
-    public class ChangePasswordHandler : IChangePassword
+    public class ChangePasswordHandler : ICommandHandler<ChangePasswordCommand>
     {
         private readonly IUserRepository _userRepository;
 

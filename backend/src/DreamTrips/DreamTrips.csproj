@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net5.0</TargetFramework>
@@ -7,6 +7,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\GeolocationData\Clients.csproj" />
+    <ProjectReference Include="..\Infrastructure\Infrastructure.csproj" />
     <ProjectReference Include="..\TravelingSalesmanProblem\TravelingSalesmanProblem.csproj" />
   </ItemGroup>
 

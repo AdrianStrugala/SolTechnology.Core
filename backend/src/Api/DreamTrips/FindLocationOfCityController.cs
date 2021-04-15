@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using DreamTravel.Domain.Cities;
 using DreamTravel.DreamTrips.FindLocationOfCity;
+using DreamTravel.Infrastructure;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
@@ -14,11 +15,12 @@ namespace DreamTravel.Api.DreamTrips
         public const string Route = "api/FindLocationOfCity";
 
         private readonly ILogger<FindLocationOfCityController> _logger;
-        private readonly IFindLocationOfCity _findLocationOfCity;
+        private readonly IQueryHandler<FindLocationOfCityQuery, City> _findLocationOfCity;
 
 
-        public FindLocationOfCityController(IFindLocationOfCity findLocationOfCity,
-                             ILogger<FindLocationOfCityController> logger)
+        public FindLocationOfCityController(
+            IQueryHandler<FindLocationOfCityQuery, City> findLocationOfCity,
+            ILogger<FindLocationOfCityController> logger)
         {
             _findLocationOfCity = findLocationOfCity;
             _logger = logger;
@@ -26,7 +28,7 @@ namespace DreamTravel.Api.DreamTrips
 
 
         [HttpPost]
-        public async Task<IActionResult> FindLocationOfCity([FromBody]FindLocationOfCityQuery query)
+        public async Task<IActionResult> FindLocationOfCity([FromBody] FindLocationOfCityQuery query)
         {
             try
             {

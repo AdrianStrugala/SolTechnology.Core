@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Threading.Tasks;
+using DreamTravel.Domain.Cities;
 using DreamTravel.DreamTrips.FindNameOfCity;
+using DreamTravel.Infrastructure;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
@@ -13,11 +15,12 @@ namespace DreamTravel.Api.DreamTrips
         public const string Route = "api/FindNameOfCity";
 
         private readonly ILogger<FindNameOfCityController> _logger;
-        private readonly IFindNameOfCity _findNameOfCity;
+        private readonly IQueryHandler<FindNameOfCityQuery, City> _findNameOfCity;
 
 
-        public FindNameOfCityController(IFindNameOfCity findNameOfCity,
-                          ILogger<FindNameOfCityController> logger)
+        public FindNameOfCityController(
+            IQueryHandler<FindNameOfCityQuery, City> findNameOfCity,
+            ILogger<FindNameOfCityController> logger)
         {
             _findNameOfCity = findNameOfCity;
             _logger = logger;

@@ -28,8 +28,8 @@ namespace DreamTravel.DreamFlights
             //SubscribeForFlightEmailHandler
             services.AddScoped<ISubscribeForFlightEmail, SubscribeForFlightEmailHandler>();
 
-            //GetTodaysTodaysFlightEmailDataHandler
-            services.AddScoped<IGetTodaysFlightEmailData, GetTodaysTodaysFlightEmailDataHandler>();
+            //GetTodaysFlightEmailDataHandler
+            services.AddScoped<IGetTodaysFlightEmailData, GetTodaysFlightEmailDataHandler>();
 
             //GetFlightEmailSubscriptionsForUserHandler
             services.AddScoped<IGetFlightEmailSubscriptionsForUser, GetFlightEmailSubscriptionsForUserHandler>();
@@ -45,9 +45,9 @@ namespace DreamTravel.DreamFlights
             services.AddScoped<IGetAirports, GetAirportsHandler>();
 
             //Update Subscriptions
-            services.AddTransient<IUpdateSubscriptions, UpdateSubscriptionsHandler>();
+            services.AddScoped<IUpdateSubscriptions, UpdateSubscriptionsHandler>();
 
-            services.InstallFlightProviderData();
+            services.InstallStaticData();
             services.InstallDatabaseData();
 
             return services;

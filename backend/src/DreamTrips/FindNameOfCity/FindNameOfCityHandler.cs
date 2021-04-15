@@ -1,10 +1,11 @@
 ﻿using System.Threading.Tasks;
 using DreamTravel.Domain.Cities;
 using DreamTravel.GeolocationData;
+using DreamTravel.Infrastructure;
 
 namespace DreamTravel.DreamTrips.FindNameOfCity
 {
-    public class FindNameOfCityHandler : IFindNameOfCity
+    public class FindNameOfCityHandler : IQueryHandler<FindNameOfCityQuery, City>
     {
         private readonly IGoogleApiClient _googleApiClient;
 

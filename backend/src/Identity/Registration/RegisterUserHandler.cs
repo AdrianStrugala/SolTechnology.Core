@@ -4,7 +4,7 @@ using DreamTravel.Infrastructure;
 
 namespace DreamTravel.Identity.Registration
 {
-    public class RegisterUserHandler : IRegisterUser
+    public class RegisterUserHandler : ICommandHandler<RegisterUserCommand>
     {
         private readonly IUserRepository _userRepository;
 
@@ -13,10 +13,10 @@ namespace DreamTravel.Identity.Registration
             _userRepository = userRepository;
         }
 
-        public CommandResult Handle(User user)
+        public CommandResult Handle(RegisterUserCommand command)
         {
             CommandResult result = new CommandResult();
-            var alreadyExistingUser = _userRepository.Get(user.Email);
+            var alreadyExistingUser = _userRepository.Get(command.User.Email);
 
             if (alreadyExistingUser != null)
             {
@@ -25,8 +25,8 @@ namespace DreamTravel.Identity.Registration
                 return result;
             }
 
-            user.UpdatePassword(Encryption.Encrypt(user.Password));
-            _userRepository.Insert(user);
+            command.User.UpdatePassword(Encryption.Encrypt(command.User.Password));
+            _userRepository.Insert(command.User);
 
             result.Success = true;
             return result;

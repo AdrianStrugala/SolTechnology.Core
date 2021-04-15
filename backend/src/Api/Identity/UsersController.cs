@@ -1,8 +1,9 @@
-﻿using DreamTravel.Identity.ChangePassword;
-using DreamTravel.Identity.Logging;
+﻿using System.Threading.Tasks;
+using DreamTravel.Identity.ChangePassword;
 using DreamTravel.Identity.Registration;
 using DreamTravel.Domain.Users;
-using Microsoft.ApplicationInsights;
+using DreamTravel.Identity.Login;
+using DreamTravel.Infrastructure;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 
@@ -11,17 +12,22 @@ namespace DreamTravel.Api.Identity
     public class Users : Controller
     {
         private readonly ILogger<Users> _logger;
-        private readonly ILoginUser _loginUser;
-        private readonly IRegisterUser _registerUser;
-        private readonly IChangePassword _changePassword;
+        private readonly IQueryHandler<LoginQuery, LoginResult> _loginUser;
+        private readonly ICommandHandler<RegisterUserCommand> _registerUserHandler;
+        private readonly ICommandHandler<ChangePasswordCommand> _changePassword;
 
 
-        public Users(IChangePassword changePassword, ILogger<Users> logger, ILoginUser loginUser, IRegisterUser registerUser)
+        public Users(
+            ICommandHandler<ChangePasswordCommand> changePassword,
+            IQueryHandler<LoginQuery, LoginResult> loginUser,
+            ICommandHandler<RegisterUserCommand> registerUserHandler,
+            ILogger<Users> logger
+            )
         {
             _changePassword = changePassword;
             _logger = logger;
             _loginUser = loginUser;
-            _registerUser = registerUser;
+            _registerUserHandler = registerUserHandler;
         }
 
 
@@ -43,10 +49,10 @@ namespace DreamTravel.Api.Identity
 
         [HttpPost]
         [Route("api/users/login")]
-        public IActionResult Login([FromBody] User user)
+        public async Task<IActionResult> Login([FromBody] User user)
         {
             _logger.LogInformation($"Attempt to log in with email: [{user.Email}] and password: [{user.Password}]");
-            var result = _loginUser.Handle(user);
+            var result = await _loginUser.Handle(new LoginQuery { User = user });
 
             if (result.Message != string.Empty)
             {
@@ -63,7 +69,7 @@ namespace DreamTravel.Api.Identity
         {
             _logger.LogInformation($"Attempt to register user with email: [{user.Email}]");
 
-            var result = _registerUser.Handle(user);
+            var result = _registerUserHandler.Handle(new RegisterUserCommand { User = user });
 
             if (result.Success == false)
             {

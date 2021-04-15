@@ -1,5 +1,7 @@
 ﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using DreamTravel.Domain.Paths;
+using DreamTravel.DreamTrips.LimitCostOfPaths;
 using Xunit;
 
 namespace DreamTravel.FeaturesTests.LimitCostOfPaths
@@ -13,7 +15,7 @@ namespace DreamTravel.FeaturesTests.LimitCostOfPaths
         }
 
         [Fact]
-        void Handle_ValidInput_ListOfCitiesIsSortedByIndex()
+        async Task Handle_ValidInput_ListOfCitiesIsSortedByIndex()
         {
             //Arrange
             int costLimit = 40;
@@ -48,7 +50,11 @@ namespace DreamTravel.FeaturesTests.LimitCostOfPaths
 
 
             //Act
-            var result = _sut.Handle(costLimit, paths);
+            var result = await _sut.Handle(new LimitCostsOfPathsQuery
+            {
+                CostLimit = costLimit,
+                Paths = paths
+            });
 
             //Assert
             Assert.Equal(0, result[0].Index);
@@ -66,7 +72,7 @@ namespace DreamTravel.FeaturesTests.LimitCostOfPaths
         }
 
         [Fact]
-        void Handle_PathWithVinietaCostAndLimitDecreases_FreePathIsReturned()
+        async Task Handle_PathWithVinietaCostAndLimitDecreases_FreePathIsReturned()
         {
             //Arrange
             int costLimit = 0;
@@ -82,7 +88,11 @@ namespace DreamTravel.FeaturesTests.LimitCostOfPaths
 
 
             //Act
-            var result = _sut.Handle(costLimit, paths);
+            var result = await _sut.Handle(new LimitCostsOfPathsQuery
+            {
+                CostLimit = costLimit,
+                Paths = paths
+            });
 
 
             //Assert
@@ -91,7 +101,7 @@ namespace DreamTravel.FeaturesTests.LimitCostOfPaths
 
 
         [Fact]
-        void Handle_2PathsUsingTheSameVinieta_ResultContainsOptimalCostForThem()
+        async Task Handle_2PathsUsingTheSameVinieta_ResultContainsOptimalCostForThem()
         {
             //Arrange
             int costLimit = 11;
@@ -116,7 +126,11 @@ namespace DreamTravel.FeaturesTests.LimitCostOfPaths
 
 
             //Act
-            var result = _sut.Handle(costLimit, paths);
+            var result = await _sut.Handle(new LimitCostsOfPathsQuery
+            {
+                CostLimit = costLimit,
+                Paths = paths
+            });
 
 
             //Assert

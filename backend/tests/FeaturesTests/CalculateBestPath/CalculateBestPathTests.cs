@@ -38,7 +38,7 @@ namespace DreamTravel.FeaturesTests.CalculateBestPath
             List<City> cities = new List<City> { new City { Name = "Wroclaw", Latitude = 21, Longitude = 37 } };
 
             //Act
-            var result = _sut.Execute(cities);
+            var result = _sut.Handle(new CalculateBestPathQuery { Cities = cities });
 
 
             //Assert

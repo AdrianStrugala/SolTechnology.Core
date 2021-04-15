@@ -1,4 +1,4 @@
-﻿namespace DreamTravel.Infrastructure.Database
+﻿namespace DreamTravel.DatabaseData.Configuration
 {
     public class SqlDatabaseConfiguration
     {

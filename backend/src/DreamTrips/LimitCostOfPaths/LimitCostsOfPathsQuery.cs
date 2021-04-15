@@ -3,8 +3,9 @@ using DreamTravel.Domain.Paths;
 
 namespace DreamTravel.DreamTrips.LimitCostOfPaths
 {
-    public interface ILimitCostOfPaths
+    public class LimitCostsOfPathsQuery
     {
-        List<Path> Handle(int costLimit, List<Path> paths);
+        public int CostLimit { get; set; }
+        public List<Path> Paths { get; set; }
     }
 }

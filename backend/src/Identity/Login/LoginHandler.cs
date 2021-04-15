@@ -1,9 +1,11 @@
-﻿using DreamTravel.Cryptography;
+﻿using System.Threading.Tasks;
+using DreamTravel.Cryptography;
 using DreamTravel.Domain.Users;
+using DreamTravel.Infrastructure;
 
-namespace DreamTravel.Identity.Logging
+namespace DreamTravel.Identity.Login
 {
-    public class LoginHandler : ILoginUser
+    public class LoginHandler : IQueryHandler<LoginQuery, LoginResult>
     {
         private readonly IUserRepository _userRepository;
 
@@ -13,29 +15,29 @@ namespace DreamTravel.Identity.Logging
         }
 
 
-        public LoginResult Handle(User loggingInUser)
+        public Task<LoginResult> Handle(LoginQuery query)
         {
             LoginResult result = new LoginResult();
 
-            User userFromDb = _userRepository.Get(loggingInUser.Email);
+            User userFromDb = _userRepository.Get(query.User.Email);
 
             //User does not exist
             if (userFromDb == null)
             {
                 result.Message = "Email not registered";
-                return result;
+                return Task.FromResult(result);
             }
 
             //Invalid password
-            if (!Encryption.Decrypt(userFromDb.Password).Equals(loggingInUser.Password))
+            if (!Encryption.Decrypt(userFromDb.Password).Equals(query.User.Password))
             {
                 result.Message = "Invalid password";
-                return result;
+                return Task.FromResult(result);
             }
 
             result.User = userFromDb;
 
-            return result;
+            return Task.FromResult(result);
         }
     }
 }

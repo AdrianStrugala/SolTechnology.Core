@@ -1,7 +1,5 @@
 ﻿using DreamTravel.DatabaseData.Configuration;
-using DreamTravel.Identity.ChangePassword;
-using DreamTravel.Identity.Logging;
-using DreamTravel.Identity.Registration;
+using DreamTravel.Infrastructure;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace DreamTravel.Identity
@@ -10,15 +8,8 @@ namespace DreamTravel.Identity
     {
         public static IServiceCollection InstallIdentity(this IServiceCollection services)
         {
-
-            //Registration
-            services.AddScoped<IRegisterUser, RegisterUserHandler>();
-
-            //Logging
-            services.AddScoped<ILoginUser, LoginHandler>();
-
-            //Change Password
-            services.AddScoped<IChangePassword, ChangePasswordHandler>();
+            services.RegisterAllImplementations(typeof(ICommandHandler<>));
+            services.RegisterAllImplementations(typeof(IQueryHandler<,>));
 
             services.InstallDatabaseData();
 

@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using DreamTravel.Domain.Cities;
+using DreamTravel.DreamTrips.CalculateBestPath;
 using DreamTravel.DreamTrips.CalculateBestPath.Executors;
 using DreamTravel.DreamTrips.CalculateBestPath.Interfaces;
 using DreamTravel.GeolocationData;
@@ -51,7 +52,7 @@ namespace DreamTravel.FeaturesTests.CalculateBestPath
             };
 
             //Act
-            var result = await _sut.Execute(cities);
+            var result = await _sut.Handle(new CalculateBestPathQuery{Cities = cities});
 
 
             //Assert

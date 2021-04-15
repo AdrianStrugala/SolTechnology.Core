@@ -1,6 +1,6 @@
 ﻿using DreamTravel.Domain.Users;
 
-namespace DreamTravel.Identity.Logging
+namespace DreamTravel.Identity.Login
 {
     public class LoginResult
     {

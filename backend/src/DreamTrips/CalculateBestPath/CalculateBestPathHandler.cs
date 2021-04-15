@@ -1,13 +1,13 @@
-﻿using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 using System.Threading.Tasks;
 using DreamTravel.Domain.Cities;
 using DreamTravel.DreamTrips.CalculateBestPath.Interfaces;
+using DreamTravel.Infrastructure;
 using DreamTravel.TravelingSalesmanProblem;
 
 namespace DreamTravel.DreamTrips.CalculateBestPath
 {
-    public class CalculateBestPathHandler : ICalculateBestPath
+    public class CalculateBestPathHandler : IQueryHandler<CalculateBestPathQuery, CalculateBestPathResult>
     {
         private readonly IDownloadRoadData _downloadRoadData;
         private readonly IFormPathsFromMatrices _formPathsFromMatrices;
@@ -22,8 +22,10 @@ namespace DreamTravel.DreamTrips.CalculateBestPath
             _findProfitablePath = findProfitablePath;
         }
 
-        public async Task<CalculateBestPathResult> Execute(List<City> cities)
+        public async Task<CalculateBestPathResult> Handle(CalculateBestPathQuery query)
         {
+            var cities = query.Cities.Where(c => c != null).ToList();
+
             EvaluationMatrix evaluationMatrix = await _downloadRoadData.Execute(cities);
             evaluationMatrix = _findProfitablePath.Execute(evaluationMatrix, cities.Count);
 
@@ -39,6 +41,5 @@ namespace DreamTravel.DreamTrips.CalculateBestPath
             };
             return calculateBestPathResult;
         }
-
     }
 }

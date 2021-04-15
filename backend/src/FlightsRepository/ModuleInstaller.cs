@@ -6,7 +6,7 @@ namespace DreamTravel.FlightProviderData
 {
     public static class ModuleInstaller
     {
-        public static IServiceCollection InstallFlightProviderData(this IServiceCollection services)
+        public static IServiceCollection InstallStaticData(this IServiceCollection services)
         {
             services.AddTransient<IAirportRepository, AirportRepository>();
 
