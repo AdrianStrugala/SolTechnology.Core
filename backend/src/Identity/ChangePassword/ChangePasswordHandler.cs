@@ -15,7 +15,6 @@ namespace DreamTravel.Identity.ChangePassword
 
         public CommandResult Handle(ChangePasswordCommand command)
         {
-            var result = new CommandResult();
             var user = _userRepository.Get(command.UserId);
 
             var newPassword = Encryption.Encrypt(command.NewPassword);
@@ -23,16 +22,14 @@ namespace DreamTravel.Identity.ChangePassword
 
             if (currentPassword != user.Password)
             {
-                result.Message = "Given password does not match user password";
-                return result;
+                return CommandResult.Failed("Given password does not match user password");
             }
 
             user.UpdatePassword(newPassword);
 
             _userRepository.Update(user);
 
-            result.Success = true;
-            return result;
+            return CommandResult.Succeeded();
         }
     }
 }

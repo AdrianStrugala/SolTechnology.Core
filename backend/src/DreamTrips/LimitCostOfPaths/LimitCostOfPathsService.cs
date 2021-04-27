@@ -6,11 +6,11 @@ using DreamTravel.Infrastructure;
 
 namespace DreamTravel.DreamTrips.LimitCostOfPaths
 {
-    public class LimitCostOfPathsHandler : IQueryHandler<LimitCostsOfPathsQuery, List<Path>>
+    public class LimitCostOfPathsService : IService<LimitCostOfPathsInput, List<Path>>
     {
-        public Task<List<Path>> Handle(LimitCostsOfPathsQuery query)
+        public Task<List<Path>> Execute(LimitCostOfPathsInput input)
         {
-            var paths = query.Paths;
+            var paths = input.Paths;
             List<double> consideredVinietas = new List<double>();
 
             paths.Sort((x, y) => 1 * x.Goal.CompareTo(y.Goal));
@@ -21,7 +21,7 @@ namespace DreamTravel.DreamTrips.LimitCostOfPaths
                 if (path.VinietaCost > 0)
                 {
                     if (consideredVinietas.Contains(path.VinietaCost)) continue;
-                    if (overallCost + path.VinietaCost > query.CostLimit)
+                    if (overallCost + path.VinietaCost > input.CostLimit)
                     {
                         paths.Where(x => x.VinietaCost.Equals(path.VinietaCost)).ToList()
                             .ForEach(y =>
@@ -45,7 +45,7 @@ namespace DreamTravel.DreamTrips.LimitCostOfPaths
                 }
                 else
                 {
-                    if (overallCost + path.Cost <= query.CostLimit)
+                    if (overallCost + path.Cost <= input.CostLimit)
                     {
                         overallCost += path.Cost;
                         path.OptimalCost = path.Cost;

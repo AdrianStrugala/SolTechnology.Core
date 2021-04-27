@@ -15,7 +15,7 @@ namespace DreamTravel.DatabaseDataTests.TestsConfiguration
         public async Task InitializeAsync()
         {
             _connectionString =
-                "Data Source=localhost,1433;Database=DreamTravelDatabase;User ID=SA;Password=password_xxddd_2137;Persist Security Info=False;MultipleActiveResultSets=False;Connect Timeout=60;Encrypt=False;TrustServerCertificate=True";
+                "Data Source=localhost,1401;Database=DreamTravelDatabase;User ID=SA;Password=password_xxddd_2137;Persist Security Info=False;MultipleActiveResultSets=False;Connect Timeout=60;Encrypt=False;TrustServerCertificate=True";
             DbConnectionFactory = new DbConnectionFactory(_connectionString);
 
             SqlConnection?.Dispose();

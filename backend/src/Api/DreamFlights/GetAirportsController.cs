@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
+using DreamTravel.Domain.Airports;
 using DreamTravel.DreamFlights.GetAirports;
-using Microsoft.AspNetCore.Authorization;
+using DreamTravel.Infrastructure;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 
@@ -12,9 +14,9 @@ namespace DreamTravel.Api.DreamFlights
     {
         public const string Route = "api/airports";
 
-        private readonly IGetAirports _getAirports;
+        private readonly IQueryHandler<GetAirportsQuery, List<Airport>> _getAirports;
 
-        public GetAirportsController(IGetAirports getAirports)
+        public GetAirportsController(IQueryHandler<GetAirportsQuery, List<Airport>> getAirports)
         {
             _getAirports = getAirports;
         }
@@ -25,7 +27,7 @@ namespace DreamTravel.Api.DreamFlights
         {
             try
             {
-                var result = _getAirports.Handle();
+                var result = _getAirports.Handle(new GetAirportsQuery());
 
                 return Ok(result);
             }

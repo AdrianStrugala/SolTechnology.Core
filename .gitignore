@@ -58,3 +58,5 @@ src/WebUI/wwwroot/js/DisplayHelpers/DisplayPathsSummary.js
 src/WebUI/log.txt
 **/**/node_modules/*
 backend/UpgradeLog.htm
+*.v2
+backend/.vs/DreamTravel/v16/.suo

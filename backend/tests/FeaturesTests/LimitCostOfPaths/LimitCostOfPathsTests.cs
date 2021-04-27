@@ -8,10 +8,10 @@ namespace DreamTravel.FeaturesTests.LimitCostOfPaths
 {
     public class LimitCostOfPathsTests
     {
-        private readonly DreamTrips.LimitCostOfPaths.LimitCostOfPathsHandler _sut;
+        private readonly LimitCostOfPathsService _sut;
         public LimitCostOfPathsTests()
         {
-            _sut = new DreamTrips.LimitCostOfPaths.LimitCostOfPathsHandler();
+            _sut = new LimitCostOfPathsService();
         }
 
         [Fact]
@@ -50,7 +50,7 @@ namespace DreamTravel.FeaturesTests.LimitCostOfPaths
 
 
             //Act
-            var result = await _sut.Handle(new LimitCostsOfPathsQuery
+            var result = await _sut.Execute(new LimitCostOfPathsInput
             {
                 CostLimit = costLimit,
                 Paths = paths
@@ -88,7 +88,7 @@ namespace DreamTravel.FeaturesTests.LimitCostOfPaths
 
 
             //Act
-            var result = await _sut.Handle(new LimitCostsOfPathsQuery
+            var result = await _sut.Execute(new LimitCostOfPathsInput
             {
                 CostLimit = costLimit,
                 Paths = paths
@@ -126,7 +126,7 @@ namespace DreamTravel.FeaturesTests.LimitCostOfPaths
 
 
             //Act
-            var result = await _sut.Handle(new LimitCostsOfPathsQuery
+            var result = await _sut.Execute(new LimitCostOfPathsInput
             {
                 CostLimit = costLimit,
                 Paths = paths

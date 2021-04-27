@@ -1,9 +1,11 @@
 ﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using DreamTravel.Domain.Airports;
+using DreamTravel.Infrastructure;
 
 namespace DreamTravel.DreamFlights.GetAirports
 {
-    public class GetAirportsHandler : IGetAirports
+    public class GetAirportsHandler : IQueryHandler<GetAirportsQuery, List<Airport>>
     {
         private readonly IAirportRepository _airportRepository;
 
@@ -12,9 +14,9 @@ namespace DreamTravel.DreamFlights.GetAirports
             _airportRepository = airportRepository;
         }
 
-        public List<Airport> Handle()
+        public Task<List<Airport>> Handle(GetAirportsQuery query)
         {
-            return _airportRepository.GetAll();
+            return Task.FromResult(_airportRepository.GetAll());
         }
     }
 }

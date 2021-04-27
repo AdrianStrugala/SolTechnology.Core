@@ -12,6 +12,7 @@ namespace DreamTravel.DreamTrips
         public static IServiceCollection InstallDreamTrips(this IServiceCollection services)
         {
             services.RegisterAllImplementations(typeof(IQueryHandler<,>));
+            services.RegisterAllImplementations(typeof(IService<,>));
 
             //TSP engine
             services.AddScoped<ITSP, AntColony>();

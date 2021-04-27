@@ -1,8 +1,9 @@
 ﻿using DreamTravel.Domain.FlightEmailSubscriptions;
+using DreamTravel.Infrastructure;
 
 namespace DreamTravel.DreamFlights.SubscribeForFlightEmail
 {
-    public class SubscribeForFlightEmailHandler : ISubscribeForFlightEmail
+    public class SubscribeForFlightEmailHandler : ICommandHandler<SubscribeForFlightEmailsCommand>
     {
         private readonly IFlightEmailSubscriptionRepository _flightEmailSubscriptionRepository;
         private readonly ISubscriptionDaysRepository _subscriptionDaysRepository;
@@ -14,11 +15,13 @@ namespace DreamTravel.DreamFlights.SubscribeForFlightEmail
             _flightEmailSubscriptionRepository = flightEmailSubscriptionRepository;
             _subscriptionDaysRepository = subscriptionDaysRepository;
         }
-        public void Execute(SubscribeForFlightEmailsCommand command)
+        public CommandResult Handle(SubscribeForFlightEmailsCommand command)
         {
             command.SubscriptionDays.FlightEmailSubscriptionId = _flightEmailSubscriptionRepository.Insert(command.FlightEmailSubscription);
 
             _subscriptionDaysRepository.Insert(command.SubscriptionDays);
+
+            return CommandResult.Succeeded();
         }
 
     }

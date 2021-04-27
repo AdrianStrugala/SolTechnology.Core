@@ -1,9 +1,10 @@
 ﻿using System.Reflection;
 using DreamTravel.Domain.FlightEmailSubscriptions;
+using DreamTravel.Infrastructure;
 
 namespace DreamTravel.DreamFlights.UpdateSubscriptions
 {
-    public class UpdateSubscriptionsHandler : IUpdateSubscriptions
+    public class UpdateSubscriptionsHandler : ICommandHandler<UpdateSubscriptionsCommand>
     {
         private readonly ISubscriptionDaysRepository _subscriptionDaysRepository;
 
@@ -12,11 +13,11 @@ namespace DreamTravel.DreamFlights.UpdateSubscriptions
             _subscriptionDaysRepository = subscriptionDaysRepository;
         }
 
-        public void Handle(UpdateSubscriptionsCommand command)
+        public CommandResult Handle(UpdateSubscriptionsCommand command)
         {
             if (command.Events.Count == 0)
             {
-                return;
+                return CommandResult.Succeeded();
             }
 
             var subscriptionsDictionary = _subscriptionDaysRepository.GetByUser(command.UserId);
@@ -40,6 +41,8 @@ namespace DreamTravel.DreamFlights.UpdateSubscriptions
             {
                 _subscriptionDaysRepository.Update(subscriptionDays);
             }
+
+            return CommandResult.Succeeded();
         }
     }
 }

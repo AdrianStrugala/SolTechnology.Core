@@ -1,24 +1,22 @@
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
-using Microsoft.OpenApi.Models;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using DreamTravel.DatabaseData.Configuration;
 using DreamTravel.DreamFlights;
+using DreamTravel.DreamFlights.SendDreamTravelFlightEmail.Interfaces;
 using DreamTravel.DreamTrips;
 using DreamTravel.Identity;
 using DreamTravel.Infrastructure.Authentication;
+using Hangfire;
+using Hangfire.SqlServer;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Authorization;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using Microsoft.OpenApi.Models;
 
-namespace WebApi
+namespace DreamTravel.Api
 {
     public class Startup
     {
@@ -38,12 +36,31 @@ namespace WebApi
 
             services.AddControllers();
 
+            //AUTHENTICATION
             services.AddAuthentication(DreamAuthenticationOptions.AuthenticationScheme)
                     .AddScheme<DreamAuthenticationOptions, DreamAuthentication>(
                         DreamAuthenticationOptions.AuthenticationScheme,
                         null);
 
 
+            //HANGFIRE
+            SqlDatabaseConfiguration databaseDataConfiguration = new SqlDatabaseConfiguration();
+            services.AddHangfire(configuration => configuration
+                .SetDataCompatibilityLevel(CompatibilityLevel.Version_170)
+                .UseSimpleAssemblyNameTypeSerializer()
+                .UseRecommendedSerializerSettings()
+                .UseSqlServerStorage(databaseDataConfiguration.ConnectionString, new SqlServerStorageOptions
+                {
+                    CommandBatchMaxTimeout = TimeSpan.FromMinutes(5),
+                    SlidingInvisibilityTimeout = TimeSpan.FromMinutes(5),
+                    QueuePollInterval = TimeSpan.Zero,
+                    UseRecommendedIsolationLevel = true,
+                    DisableGlobalLocks = true
+                }));
+
+            services.AddHangfireServer();
+
+            //SWAGGER
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "WebApi", Version = "v1" });
@@ -66,6 +83,7 @@ namespace WebApi
                 });
             });
 
+            //MVC
             var policy = new AuthorizationPolicyBuilder()
                          .RequireAuthenticatedUser()
                          .Build();
@@ -76,7 +94,7 @@ namespace WebApi
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder app, IBackgroundJobClient backgroundJobs, IWebHostEnvironment env)
         {
             if (env.IsDevelopment())
             {
@@ -84,6 +102,8 @@ namespace WebApi
                 app.UseSwagger();
                 app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "WebApi v1"));
             }
+
+            AddHangfire(app, backgroundJobs);
 
             app.UseHttpsRedirection();
 
@@ -95,7 +115,17 @@ namespace WebApi
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
+                endpoints.MapHangfireDashboard();
             });
+        }
+
+
+        private static void AddHangfire(IApplicationBuilder app, IBackgroundJobClient backgroundJobs)
+        {
+            app.UseHangfireDashboard(); //https://localhost:44330/hangfire
+            backgroundJobs.Enqueue(() => Console.WriteLine("Hello world from Hangfire!"));
+
+            RecurringJob.AddOrUpdate<ISendDreamTravelFlightEmail>(a => a.Handle(), "0 0 8 * * *");
         }
     }
 }

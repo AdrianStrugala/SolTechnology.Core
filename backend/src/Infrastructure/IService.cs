@@ -1,7 +1,9 @@
-﻿namespace DreamTravel.Infrastructure
+﻿using System.Threading.Tasks;
+
+namespace DreamTravel.Infrastructure
 {
-    public interface IService<in TInput, out TOutput>
+    public interface IService<in TInput, TOutput>
     {
-        public TOutput Execute(TInput command);
+        public Task<TOutput> Execute(TInput command);
     }
 }

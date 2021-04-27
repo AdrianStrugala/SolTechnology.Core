@@ -16,10 +16,10 @@ namespace DreamTravel.Api.DreamTrips
     {
         public const string Route = "api/LimitCost";
 
-        private readonly IQueryHandler<LimitCostsOfPathsQuery, List<Path>> _limitCostsOfPathsHandler;
+        private readonly IQueryHandler<LimitCostOfPathsInput, List<Path>> _limitCostsOfPathsHandler;
         private readonly ILogger<Controller> _logger;
 
-        public LimitCostOfPathsController(IQueryHandler<LimitCostsOfPathsQuery, List<Path>> _limitCostsOfPathsHandler,
+        public LimitCostOfPathsController(IQueryHandler<LimitCostOfPathsInput, List<Path>> _limitCostsOfPathsHandler,
                           ILogger<Controller> logger)
         {
             this._limitCostsOfPathsHandler = _limitCostsOfPathsHandler;
@@ -38,7 +38,7 @@ namespace DreamTravel.Api.DreamTrips
                 _logger.LogInformation("Limit Cost Engine: Fire!");
                 List<Path> paths = JsonConvert.DeserializeObject<List<Path>>(HttpContext.Session.GetString(sessionId + PathsKeyName));
 
-                paths = await _limitCostsOfPathsHandler.Handle(new LimitCostsOfPathsQuery
+                paths = await _limitCostsOfPathsHandler.Handle(new LimitCostOfPathsInput
                 {
                     CostLimit = costLimit,
                     Paths = paths
