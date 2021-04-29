@@ -16,7 +16,7 @@ namespace DreamTravel.DatabaseDataTests.TestsConfiguration
             var config = new SqlDatabaseConfiguration
             {
                 ConnectionString =
-                    "Data Source=localhost,1433;Database=DreamTravelDatabase; User ID=SA;Password=password_xxddd_2137;Persist Security Info=False;MultipleActiveResultSets=False;Connect Timeout=60;Encrypt=False;TrustServerCertificate=True"
+                    "Data Source=localhost,1401;Database=DreamTravelDatabase; User ID=SA;Password=password_xxddd_2137;Persist Security Info=False;MultipleActiveResultSets=False;Connect Timeout=60;Encrypt=False;TrustServerCertificate=True"
             };
             _connectionString = config.ConnectionString;
 
