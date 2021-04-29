@@ -1,6 +1,4 @@
-﻿using DreamTravel.DatabaseData.Configuration;
-using DreamTravel.Infrastructure.Database;
-using Microsoft.Extensions.Options;
+﻿using DreamTravel.Infrastructure.Database;
 
 namespace DreamTravel.Api.Configuration
 {
@@ -8,7 +6,7 @@ namespace DreamTravel.Api.Configuration
     {
         public static ApplicationConfiguration GetConfiguration(string environmentName)
         {
-            if (environmentName.ToLower() == "demo")
+            if (environmentName?.ToLower() == "demo")
             {
                 return GetDemoConfiguration();
             }
