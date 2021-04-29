@@ -3,8 +3,8 @@
 # Add steps that publish symbols, save build artifacts, deploy, and more:
 # https://docs.microsoft.com/azure/devops/pipelines/apps/aspnet/build-aspnet-4
 
-trigger:
-- master
+# trigger:
+# - master
   
 variables:
   BuildConfiguration: 'Release'
@@ -24,4 +24,17 @@ stages:
       - template: devOps/pipelines/buildAndPublishTests.yml
         parameters:
           BuildConfiguration: ${{ variables.buildConfiguration }}
-    - stage: BuildDemo
+  - stage: BuildDemo
+    displayName: BuildDemo
+    jobs:
+    - job: Backend
+      steps:
+        - task: DotNetCoreCLI@2
+          env:
+            environment: demo
+          inputs:
+            command: 'build'
+            projects: 'backend/DreamTravel.sln'
+            arguments: '-o $(Build.ArtifactStagingDirectory)/Binaries'
+
+
