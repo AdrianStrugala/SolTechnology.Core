@@ -10,7 +10,6 @@ pool: Azure Pipelines
   
 variables:
   BuildConfiguration: 'Release'
-  ASFProjFolderName: 'src\Pyra.Csp.LicenseAssignments'
 
 stages:
   - stage: BuildAndTest
@@ -18,12 +17,12 @@ stages:
     jobs:
     - job: Database
       steps:
-      - template: pipelines/buildAndPublishDatabase.yml
+      - template: devOps/pipelines/buildAndPublishDatabase.yml
         parameters:
           BuildConfiguration: ${{ variables.buildConfiguration }}
           Artifact: database
     - job: Tests
       steps:
-      - template: pipelines/buildAndPublishTests.yml
+      - template: devOps/pipelines/buildAndPublishTests.yml
         parameters:
           BuildConfiguration: ${{ variables.buildConfiguration }}
