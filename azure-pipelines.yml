@@ -6,7 +6,7 @@
 trigger:
 - master
 
-pool: Standard-Linux
+pool: Azure Pipelines
   
 variables:
   BuildConfiguration: 'Release'
