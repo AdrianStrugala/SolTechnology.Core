@@ -1,4 +1,5 @@
 ﻿using System.Data.SqlClient;
+using System.Threading;
 using System.Threading.Tasks;
 using DreamTravel.Infrastructure.Database;
 using Microsoft.EntityFrameworkCore;
@@ -15,11 +16,19 @@ namespace DreamTravel.DatabaseDataTests.TestsConfiguration
         public async Task InitializeAsync()
         {
             _connectionString =
-                "Data Source=localhost,1433;Database=DreamTravelDatabase;User ID=SA;Password=password_xxddd_2137;Persist Security Info=False;MultipleActiveResultSets=False;Connect Timeout=60;Encrypt=False;TrustServerCertificate=True";
+                "Data Source=localhost,5433;Database=DreamTravelDatabase;User ID=SA;Password=password_xxddd_2137;Persist Security Info=False;MultipleActiveResultSets=False;Connect Timeout=60;Encrypt=False;TrustServerCertificate=True";
             DbConnectionFactory = new DbConnectionFactory(_connectionString);
 
             SqlConnection?.Dispose();
             SqlConnection = new SqlConnection(_connectionString);
+            try
+            {
+                SqlConnection.Open();
+            }
+            catch (SqlException)
+            {
+                Thread.Sleep(5000);
+            }
             SqlConnection.Open();
 
             await new Respawn.Checkpoint().Reset(_connectionString);
