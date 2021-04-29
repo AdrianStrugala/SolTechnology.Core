@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 using DreamTravel.Infrastructure.Authentication;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.TestHost;
-using WebApi;
 using Xunit;
 
 namespace DreamTravel.ApiTests.Authentication
