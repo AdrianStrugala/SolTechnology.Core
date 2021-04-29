@@ -34,7 +34,7 @@ stages:
             environment: demo
           inputs:
             command: 'build'
-            projects: '**\*.sln'
+            projects: 'backend/DreamTravel.sln'
             arguments: '-o $(Build.ArtifactStagingDirectory)/Binaries'
 
 
