@@ -24,4 +24,17 @@ stages:
       - template: devOps/pipelines/buildAndPublishTests.yml
         parameters:
           BuildConfiguration: ${{ variables.buildConfiguration }}
-    - stage: BuildDemo
+  - stage: BuildDemo
+    displayName: BuildDemo
+    jobs:
+    - job: Backend
+      steps:
+        - task: DotNetCoreCLI@2
+          env:
+            environment: demo
+          inputs:
+            command: 'build'
+            projects: '**\*.sln'
+            arguments: '-o $(Build.ArtifactStagingDirectory)/Binaries'
+
+
