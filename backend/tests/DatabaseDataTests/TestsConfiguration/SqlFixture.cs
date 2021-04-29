@@ -21,14 +21,6 @@ namespace DreamTravel.DatabaseDataTests.TestsConfiguration
 
             SqlConnection?.Dispose();
             SqlConnection = new SqlConnection(_connectionString);
-            try
-            {
-                SqlConnection.Open();
-            }
-            catch (SqlException)
-            {
-                Thread.Sleep(5000);
-            }
             SqlConnection.Open();
 
             await new Respawn.Checkpoint().Reset(_connectionString);
