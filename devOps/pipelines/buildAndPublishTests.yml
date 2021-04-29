@@ -19,7 +19,7 @@ steps:
   inputs:
     targetType: 'inline'
     script: |
-      docker run -e 'ACCEPT_EULA=Y' -e 'SA_PASSWORD=password_xxddd_2137' -p 1433:1433 --name DB -d mcr.microsoft.com/mssql/server:2019-latest
+      docker run -e 'ACCEPT_EULA=Y' -e 'SA_PASSWORD=password_xxddd_2137' -p 1401:1433 --name DB -d mcr.microsoft.com/mssql/server:2019-latest
 
 - task: PowerShell@2
   displayName: Publish DB
@@ -27,7 +27,7 @@ steps:
     targetType: 'inline'
     workingDirectory: 'backend/src/DreamTravelDatabase'
     script: |
-      dotnet publish /p:TargetServerName=localhost /p:TargetPort=1433 /p:TargetUser=sa /p:TargetPassword=password_xxddd_2137 /p:TargetDatabaseName=DreamTravelDatabase
+      dotnet publish /p:TargetServerName=localhost /p:TargetPort=1401 /p:TargetUser=sa /p:TargetPassword=password_xxddd_2137 /p:TargetDatabaseName=DreamTravelDatabase
 
 - task: DotNetCoreCLI@2
   displayName: 'Run the tests'
