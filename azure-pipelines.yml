@@ -10,8 +10,8 @@ variables:
   BuildConfiguration: 'Release'
 
 stages:
-  - stage: BuildAndTest
-    displayName: Build and test and publish
+  - stage: RunTests
+    displayName: RunTests
     jobs:
     - job: Database
       steps:
@@ -24,3 +24,4 @@ stages:
       - template: devOps/pipelines/buildAndPublishTests.yml
         parameters:
           BuildConfiguration: ${{ variables.buildConfiguration }}
+    - stage: BuildDemo

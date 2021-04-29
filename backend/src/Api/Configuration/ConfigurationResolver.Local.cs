@@ -8,10 +8,10 @@ namespace DreamTravel.Api.Configuration
     {
         public static ApplicationConfiguration GetConfiguration(string environmentName)
         {
-            // if (_applicationConfiguration.Environment == "Local" || _applicationConfiguration.Environment == "")
-            // {
-            //     return GetLocalConfiguration();
-            // }
+            if (environmentName.ToLower() == "demo")
+            {
+                return GetDemoConfiguration();
+            }
 
             return GetLocalConfiguration();
         }
