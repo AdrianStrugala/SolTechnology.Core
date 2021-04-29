@@ -1,10 +1,11 @@
 using System;
-using DreamTravel.DatabaseData.Configuration;
+using DreamTravel.Api.Configuration;
 using DreamTravel.DreamFlights;
 using DreamTravel.DreamFlights.SendDreamTravelFlightEmail.Interfaces;
 using DreamTravel.DreamTrips;
 using DreamTravel.Identity;
 using DreamTravel.Infrastructure.Authentication;
+using DreamTravel.Infrastructure.Database;
 using Hangfire;
 using Hangfire.SqlServer;
 using Microsoft.AspNetCore.Authorization;
@@ -30,6 +31,16 @@ namespace DreamTravel.Api
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            IConfiguration configuration = new ConfigurationBuilder()
+                .AddJsonFile("appsettings.json", true, true)
+                .AddEnvironmentVariables()
+                .Build();
+
+            var environmentName = configuration.GetValue<string>("environment");
+            var appConfig = ConfigurationResolver.GetConfiguration(environmentName);
+
+            services.AddSingleton<ISqlDatabaseConfiguration>(appConfig.SqlDatabaseConfiguration);
+
             services.InstallDreamFlights();
             services.InstallDreamTrips();
             services.InstallIdentity();
@@ -44,12 +55,11 @@ namespace DreamTravel.Api
 
 
             //HANGFIRE
-            SqlDatabaseConfiguration databaseDataConfiguration = new SqlDatabaseConfiguration();
             services.AddHangfire(configuration => configuration
                 .SetDataCompatibilityLevel(CompatibilityLevel.Version_170)
                 .UseSimpleAssemblyNameTypeSerializer()
                 .UseRecommendedSerializerSettings()
-                .UseSqlServerStorage(databaseDataConfiguration.ConnectionString, new SqlServerStorageOptions
+                .UseSqlServerStorage(appConfig.SqlDatabaseConfiguration.ConnectionString, new SqlServerStorageOptions
                 {
                     CommandBatchMaxTimeout = TimeSpan.FromMinutes(5),
                     SlidingInvisibilityTimeout = TimeSpan.FromMinutes(5),

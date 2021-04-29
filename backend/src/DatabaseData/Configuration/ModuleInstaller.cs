@@ -6,7 +6,6 @@ using DreamTravel.DatabaseData.Repository.SubscriptionDays;
 using DreamTravel.DatabaseData.Repository.Users;
 using DreamTravel.Domain.FlightEmailSubscriptions;
 using DreamTravel.Domain.Users;
-using DreamTravel.Infrastructure;
 using DreamTravel.Infrastructure.Database;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -16,8 +15,7 @@ namespace DreamTravel.DatabaseData.Configuration
     {
         public static IServiceCollection InstallDatabaseData(this IServiceCollection services)
         {
-            SqlDatabaseConfiguration databaseDataConfiguration = new SqlDatabaseConfiguration();
-            services.AddSingleton<IDbConnectionFactory>(new DbConnectionFactory(databaseDataConfiguration.ConnectionString));
+            services.AddSingleton<IDbConnectionFactory, DbConnectionFactory>();
 
             services.AddTransient<IUserRepository, UserRepository>();
             services.AddTransient<IFlightEmailSubscriptionRepository, FlightEmailSubscriptionRepository>();

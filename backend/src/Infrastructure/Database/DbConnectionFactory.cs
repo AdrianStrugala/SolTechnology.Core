@@ -10,9 +10,9 @@ namespace DreamTravel.Infrastructure.Database
         private readonly string _connectionString;
         private readonly Random _random = new Random();
 
-        public DbConnectionFactory(string connectionString)
+        public DbConnectionFactory(ISqlDatabaseConfiguration sqlDatabaseConfiguration)
         {
-            _connectionString = connectionString;
+            _connectionString = sqlDatabaseConfiguration.ConnectionString;
         }
 
         public IDbConnection CreateConnection()
