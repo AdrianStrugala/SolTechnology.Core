@@ -29,6 +29,14 @@ stages:
     jobs:
     - job: Backend
       steps:
+        - task: CopyFiles@2
+          displayName: 'Publish AzureResourceGroup'
+          inputs:
+            SourceFolder: devOps/AzureResourceGroup
+            Contents: WebSite.json
+            TargetFolder: '$(Build.ArtifactStagingDirectory)/Binaries/AzureResourceGroup'
+            OverWrite: true
+
         - task: DotNetCoreCLI@2
           displayName: 'Publish Api'
           inputs:
