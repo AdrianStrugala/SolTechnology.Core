@@ -48,7 +48,7 @@ stages:
           displayName: 'Publish Artifact'
           inputs:
             PathtoPublish: '$(Build.ArtifactStagingDirectory)/Binaries'
-            ArtifactName: 'drop'
+            ArtifactName: 'backend'
 
 
 
