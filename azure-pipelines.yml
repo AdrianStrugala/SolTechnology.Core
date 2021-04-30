@@ -39,6 +39,8 @@ stages:
 
         - task: DotNetCoreCLI@2
           displayName: 'Publish Api'
+          env:
+            environment: demo
           inputs:
             command: publish
             publishWebProjects: false
