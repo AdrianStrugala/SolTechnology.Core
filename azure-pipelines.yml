@@ -30,11 +30,17 @@ stages:
     - job: Backend
       steps:
         - task: DotNetCoreCLI@2
-          env:
-            environment: demo
+          displayName: 'Publish Api'
           inputs:
-            command: 'build'
-            projects: 'backend/DreamTravel.sln'
+            command: publish
+            publishWebProjects: false
+            projects: '**/Api.csproj'
             arguments: '-o $(Build.ArtifactStagingDirectory)/Binaries'
+        - task: PublishBuildArtifacts@1
+          displayName: 'Publish Artifact'
+          inputs:
+            PathtoPublish: '$(Build.ArtifactStagingDirectory)/Binaries'
+            ArtifactName: 'drop'
+
 
 
