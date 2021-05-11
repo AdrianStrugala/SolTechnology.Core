@@ -6,6 +6,7 @@ using DreamTravel.DreamTrips;
 using DreamTravel.Identity;
 using DreamTravel.Infrastructure.Authentication;
 using DreamTravel.Infrastructure.Database;
+using DreamTravel.Infrastructure.Email;
 using Hangfire;
 using Hangfire.SqlServer;
 using Microsoft.AspNetCore.Authorization;
@@ -40,6 +41,7 @@ namespace DreamTravel.Api
             var appConfig = ConfigurationResolver.GetConfiguration(environmentName);
 
             services.AddSingleton<ISqlDatabaseConfiguration>(appConfig.SqlDatabaseConfiguration);
+            services.AddSingleton<IDreamFlightsConfiguration>(appConfig.DreamFlightsConfiguration);
 
             services.InstallDreamFlights();
             services.InstallDreamTrips();
