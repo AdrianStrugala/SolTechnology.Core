@@ -19,7 +19,7 @@ task Start-SQLServer{
 
 	if((docker container ls -a -f name=$dockerContainerName).Count -le 1){
 		Write-Host "Running SQL Server container"
-		docker run -e 'ACCEPT_EULA=Y' -e 'SA_PASSWORD=password_xxddd_2137' -p 1433:1433 --name $dockerContainerName -d mcr.microsoft.com/mssql/server:2019-latest
+		docker run -e 'ACCEPT_EULA=Y' -e 'SA_PASSWORD=password_xxddd_2137' -p 1401:1433 --name $dockerContainerName -d mcr.microsoft.com/mssql/server:2019-latest
 	}
 	else{
 		if((docker container ls -f name=$dockerContainerName).Count -le 1){
@@ -39,7 +39,7 @@ task Create-Database{
 
 	Write-Host $databaseName
 
-	dotnet publish $projectPath /p:TargetServerName=localhost /p:TargetPort=1433 /p:TargetUser=sa /p:TargetPassword=password_xxddd_2137 /p:TargetDatabaseName=$databaseName
+	dotnet publish $projectPath /p:TargetServerName=localhost /p:TargetPort=1401 /p:TargetUser=sa /p:TargetPassword=password_xxddd_2137 /p:TargetDatabaseName=$databaseName
 
 	Write-Host "Database [$databaseName] successfully published"
 
