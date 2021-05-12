@@ -1,7 +1,5 @@
 ﻿using DreamTravel.DreamFlights;
-using DreamTravel.Infrastructure.Configuration;
 using DreamTravel.Infrastructure.Database;
-using DreamTravel.Infrastructure.Email;
 
 namespace DreamTravel.Api.Configuration
 {
@@ -28,10 +26,6 @@ namespace DreamTravel.Api.Configuration
                 DreamFlightsConfiguration = new DreamFlightsConfiguration
                 {
                     SendEmails = false
-                },
-                ApiConfiguration = new ApiConfiguration
-                {
-                    ApiName = "dreamTravels-local"
                 }
             };
 
