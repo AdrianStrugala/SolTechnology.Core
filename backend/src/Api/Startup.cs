@@ -36,7 +36,7 @@ namespace DreamTravel.Api
                 .AddEnvironmentVariables()
                 .Build();
 
-            var environmentName = configuration.GetValue<string>("environment");
+            var environmentName = configuration.GetValue<string>("ASPNETCORE_ENVIRONMENT");
             var appConfig = ConfigurationResolver.GetConfiguration(environmentName);
 
             services.AddSingleton<ISqlDatabaseConfiguration>(appConfig.SqlDatabaseConfiguration);
