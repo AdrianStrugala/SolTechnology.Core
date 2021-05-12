@@ -5,10 +5,13 @@ using DreamTravel.DreamFlights.SendDreamTravelFlightEmail.Interfaces;
 using DreamTravel.DreamTrips;
 using DreamTravel.Identity;
 using DreamTravel.Infrastructure.Authentication;
+using DreamTravel.Infrastructure.Configuration;
 using DreamTravel.Infrastructure.Database;
 using DreamTravel.Infrastructure.Email;
+using DreamTravel.Infrastructure.Logging;
 using Hangfire;
 using Hangfire.SqlServer;
+using Microsoft.ApplicationInsights.Extensibility;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -42,6 +45,10 @@ namespace DreamTravel.Api
 
             services.AddSingleton<ISqlDatabaseConfiguration>(appConfig.SqlDatabaseConfiguration);
             services.AddSingleton<IDreamFlightsConfiguration>(appConfig.DreamFlightsConfiguration);
+            services.AddSingleton<IApiConfiguration>(appConfig.ApiConfiguration);
+
+            services.AddSingleton<ITelemetryInitializer, CloudRoleNameTelemetryInitializer>();
+
 
             services.InstallDreamFlights();
             services.InstallDreamTrips();

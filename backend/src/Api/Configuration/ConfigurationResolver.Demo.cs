@@ -16,6 +16,10 @@ namespace DreamTravel.Api.Configuration
                 DreamFlightsConfiguration = new DreamFlightsConfiguration
                 {
                     SendEmails = false
+                },
+                ApiConfiguration = new ApiConfiguration
+                {
+                    ApiName = "dreamTravels-demo"
                 }
             };
 
