@@ -1,4 +1,5 @@
 ﻿using DreamTravel.DreamFlights;
+using DreamTravel.Infrastructure.Configuration;
 using DreamTravel.Infrastructure.Database;
 using DreamTravel.Infrastructure.Email;
 
