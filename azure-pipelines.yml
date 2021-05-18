@@ -61,24 +61,9 @@ stages:
             workingDir: ./frontend
             verbose: false
             customCommand: ci
-            
+
         - powershell: 'npm install -g @angular/cli'
           displayName: 'Install Angular CLI'
-
-        - powershell: |
-              cd './frontend'
-              ng build
-              displayName: 'Build Frontend'
-        - task: CopyFiles@2
-          displayName: 'Copy Frontend'
-          inputs:
-            SourceFolder: './frontend/dist/dream-flights'
-            TargetFolder: '$(Build.ArtifactStagingDirectory)/Binaries/Frontend'
-        - task: PublishBuildArtifacts@1
-          displayName: 'Publish Artifact'
-          inputs:
-            PathtoPublish: '$(Build.ArtifactStagingDirectory)/Binaries/Frontend'
-            ArtifactName: 'frontend'
 
 
 
