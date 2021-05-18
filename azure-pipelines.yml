@@ -58,17 +58,17 @@ stages:
           displayName: 'npm install'
           inputs:
             command: custom
-            workingDir: ./src/frontend
+            workingDir: ./frontend
             verbose: false
             customCommand: ci
         - powershell: |
-              cd './src/frontend'
+              cd './frontend'
               ng build
               displayName: 'Build Frontend'
         - task: CopyFiles@2
           displayName: 'Copy Frontend'
           inputs:
-            SourceFolder: './src/frontend/dist/dream-flights'
+            SourceFolder: './frontend/dist/dream-flights'
             TargetFolder: '$(Build.ArtifactStagingDirectory)/Binaries/Frontend'
         - task: PublishBuildArtifacts@1
           displayName: 'Publish Artifact'
