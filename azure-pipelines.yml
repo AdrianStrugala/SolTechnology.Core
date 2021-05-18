@@ -61,6 +61,10 @@ stages:
             workingDir: ./frontend
             verbose: false
             customCommand: ci
+            
+        - powershell: 'npm install -g @angular/cli'
+          displayName: 'Install Angular CLI'
+
         - powershell: |
               cd './frontend'
               ng build
