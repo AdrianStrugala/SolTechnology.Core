@@ -51,6 +51,31 @@ stages:
           inputs:
             PathtoPublish: '$(Build.ArtifactStagingDirectory)/Binaries'
             ArtifactName: 'backend'
+    
+    - job: Frontend
+      steps:
+        - task: Npm@1
+          displayName: 'npm install'
+          inputs:
+            command: custom
+            workingDir: ./src/Frontend
+            verbose: false
+            customCommand: ci
+        - powershell: |
+              cd './src/Frontend'
+              ng build
+              displayName: 'Build Frontend'
+        - task: CopyFiles@2
+          displayName: 'Copy Frontend'
+          inputs:
+            SourceFolder: './src/Frontend/dist/dream-flights'
+            TargetFolder: '$(Build.ArtifactStagingDirectory)/Binaries/Frontend'
+        - task: PublishBuildArtifacts@1
+          displayName: 'Publish Artifact'
+          inputs:
+            PathtoPublish: '$(Build.ArtifactStagingDirectory)/Binaries/Frontend'
+            ArtifactName: 'frontend'
+
 
 
 
