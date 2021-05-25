@@ -5,23 +5,21 @@ namespace DreamTravel.Api.Configuration
 {
     public static partial class ConfigurationResolver
     {
-        private static ApplicationConfiguration GetLocalConfiguration()
+        private static ApplicationConfiguration GetProdConfiguration()
         {
             var config = new ApplicationConfiguration
             {
                 SqlDatabaseConfiguration = new SqlDatabaseConfiguration
                 {
-                    ConnectionString = "Data Source=localhost,1401;Database=DreamTravelDatabase; User ID=SA;Password=password_xxddd_2137;Persist Security Info=False;MultipleActiveResultSets=False;Connect Timeout=60;Encrypt=False;TrustServerCertificate=True"
+                    ConnectionString = "Server=tcp:dreamtravel.database.windows.net,1433;Initial Catalog=dreamtravel;Persist Security Info=False;User ID=adrian;Password=P4ssw0rd@;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=60;"
                 },
                 DreamFlightsConfiguration = new DreamFlightsConfiguration
                 {
-                    SendEmails = false
+                    SendEmails = true
                 }
             };
 
             return config;
         }
     }
-
-
 }
