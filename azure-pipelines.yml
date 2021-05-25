@@ -51,19 +51,6 @@ stages:
           inputs:
             PathtoPublish: '$(Build.ArtifactStagingDirectory)/Binaries'
             ArtifactName: 'backend'
-    
-    - job: Frontend
-      steps:
-        - task: Npm@1
-          displayName: 'npm install'
-          inputs:
-            command: custom
-            workingDir: ./frontend
-            verbose: false
-            customCommand: ci
-
-        - powershell: 'npm install -g @angular/cli'
-          displayName: 'Install Angular CLI'
 
 
 
