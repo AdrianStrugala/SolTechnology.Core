@@ -10,6 +10,7 @@ using Hangfire;
 using Hangfire.SqlServer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Cors.Infrastructure;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.Extensions.Configuration;
@@ -27,6 +28,7 @@ namespace DreamTravel.Api
         }
 
         public IConfiguration Configuration { get; }
+        readonly string CorsPolicy = "dupa";
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
@@ -42,6 +44,24 @@ namespace DreamTravel.Api
             services.AddSingleton<ISqlDatabaseConfiguration>(appConfig.SqlDatabaseConfiguration);
             services.AddSingleton<IDreamFlightsConfiguration>(appConfig.DreamFlightsConfiguration);
 
+            //CORS
+            var policy = new AuthorizationPolicyBuilder()
+                         .RequireAuthenticatedUser()
+                         .Build();
+
+            services.AddCors(options =>
+            {
+                options.AddPolicy(CorsPolicy,
+                builder =>
+                {
+                    builder.WithOrigins("http://localhost:4200",
+                               "https://dreamtravels.azurewebsites.net",
+                               "https://dreamtravels-demo.azurewebsites.net")
+                                        .AllowAnyHeader()
+                                        .AllowAnyMethod()
+                                        .AllowCredentials();
+                });
+            });
 
             services.InstallDreamFlights();
             services.InstallDreamTrips();
@@ -96,9 +116,6 @@ namespace DreamTravel.Api
             });
 
             //MVC
-            var policy = new AuthorizationPolicyBuilder()
-                         .RequireAuthenticatedUser()
-                         .Build();
             services.AddMvc(opts =>
             {
                 opts.Filters.Add(new AuthorizeFilter(policy));
