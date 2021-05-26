@@ -134,6 +134,7 @@ namespace DreamTravel.Api
 
             AddHangfire(app, backgroundJobs);
 
+            app.UseCors(CorsPolicy);
             app.UseHttpsRedirection();
 
             app.UseRouting();

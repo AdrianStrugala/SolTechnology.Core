@@ -22,6 +22,4 @@ namespace DreamTravel.Api.Configuration
             return config;
         }
     }
-
-
 }
