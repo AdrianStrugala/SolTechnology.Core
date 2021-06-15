@@ -19,7 +19,7 @@ namespace DreamTravel.Identity.Login
         {
             LoginResult result = new LoginResult();
 
-            User userFromDb = _userRepository.Get(query.User.Email);
+            User userFromDb = _userRepository.Get(query.Email);
 
             //User does not exist
             if (userFromDb == null)
@@ -29,7 +29,7 @@ namespace DreamTravel.Identity.Login
             }
 
             //Invalid password
-            if (!Encryption.Decrypt(userFromDb.Password).Equals(query.User.Password))
+            if (!Encryption.Decrypt(userFromDb.Password).Equals(query.Password))
             {
                 result.Message = "Invalid password";
                 return Task.FromResult(result);

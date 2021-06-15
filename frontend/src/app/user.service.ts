@@ -20,7 +20,7 @@ export class UserService {
   }
   login(): Observable<any> {
     return this.http
-      .post(this.config.APPLICATION_URL + "api/login", this.user, {
+      .post(this.config.APPLICATION_URL + "api/users/login", this.user, {
         observe: "body",
         headers: new HttpHeaders({
           Authorization: "DreamAuthentication U29sVWJlckFsbGVz"
@@ -30,7 +30,7 @@ export class UserService {
   }
 
   register(user: IUser): Observable<any> {
-    return this.http.post(this.config.APPLICATION_URL + "api/register", user, {
+    return this.http.post(this.config.APPLICATION_URL + "api/users/register", user, {
       observe: "body",
       headers: new HttpHeaders({
         Authorization: "DreamAuthentication U29sVWJlckFsbGVz"
@@ -47,7 +47,7 @@ export class UserService {
     };
 
     return this.http
-      .post(this.config.APPLICATION_URL + "api/changePassword", data, {
+      .post(this.config.APPLICATION_URL + "api/users/changePassword", data, {
         observe: "body",
         headers: new HttpHeaders({
           Authorization: "DreamAuthentication U29sVWJlckFsbGVz"

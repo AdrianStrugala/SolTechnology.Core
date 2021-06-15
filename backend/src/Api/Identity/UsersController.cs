@@ -49,10 +49,10 @@ namespace DreamTravel.Api.Identity
 
         [HttpPost]
         [Route("api/users/login")]
-        public async Task<IActionResult> Login([FromBody] User user)
+        public async Task<IActionResult> Login([FromBody] LoginQuery query)
         {
-            _logger.LogInformation($"Attempt to log in with email: [{user.Email}] and password: [{user.Password}]");
-            var result = await _loginUser.Handle(new LoginQuery { User = user });
+            _logger.LogInformation($"Attempt to log in with email: [{query.Email}] and password: [{query.Password}]");
+            var result = await _loginUser.Handle(query);
 
             if (result.Message != string.Empty)
             {

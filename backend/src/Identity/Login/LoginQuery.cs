@@ -1,9 +1,8 @@
-﻿using DreamTravel.Domain.Users;
-
-namespace DreamTravel.Identity.Login
+﻿namespace DreamTravel.Identity.Login
 {
     public class LoginQuery
     {
-        public User User { get; set; }
+        public string Password { get; set; }
+        public string Email { get; set; }
     }
 }
