@@ -12,7 +12,7 @@ export class UserService {
 
   constructor(private http: HttpClient, private config: Configuration) {
     this.user = {} as IUser;
-    this.user.id = 0;
+    this.user.id = '';
 
     if (localStorage.getItem("user") != null) {
       this.user = JSON.parse(localStorage.getItem("user"));
@@ -56,7 +56,7 @@ export class UserService {
   }
 
   isLoggedIn(): boolean {
-    if (this.user.id != 0) {
+    if (this.user.id != '') {
       return true;
     } else {
       return false;
@@ -65,7 +65,7 @@ export class UserService {
 
   logout() {
     this.user = {} as IUser;
-    this.user.id = 0;
+    this.user.id = '';
 
     localStorage.removeItem("user");
 
@@ -74,7 +74,7 @@ export class UserService {
 }
 
 export interface IUser {
-  id: number;
+  id: string;
   name: string;
   password: string;
   email: string;
