@@ -1,10 +1,12 @@
-﻿namespace DreamTravel.DatabaseData.Query.GetSubscriptionsWithDays
+﻿using System;
+
+namespace DreamTravel.DatabaseData.Query.GetSubscriptionsWithDays
 {
     public class GetSubscriptionsWithDaysQuery
     {
-        public int UserId { get; }
+        public Guid UserId { get; }
 
-        public GetSubscriptionsWithDaysQuery(int userId)
+        public GetSubscriptionsWithDaysQuery(Guid userId)
         {
             UserId = userId;
         }

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace DreamTravel.DreamFlights.UpdateSubscriptions
 {
@@ -6,7 +7,7 @@ namespace DreamTravel.DreamFlights.UpdateSubscriptions
     {
         public List<DayChangedEvent> Events { get; set; }
 
-        public int UserId { get; set; }
+        public Guid UserId { get; set; }
     }
 
     public class DayChangedEvent

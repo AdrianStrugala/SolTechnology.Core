@@ -41,7 +41,7 @@ export class FlightEmailSubscriptionService {
 
   UpdateSubscriptionsForUser(
     dayChangedEvents: DayChangedEvent[],
-    userId: number
+    userId: string
   ) {
     let data = {
       events: dayChangedEvents,
@@ -62,7 +62,7 @@ export class FlightEmailSubscriptionService {
     );
   }
 
-  GetByUserId(userId: number): Observable<IFlightEmailSubscription[]> {
+  GetByUserId(userId: string): Observable<IFlightEmailSubscription[]> {
     return this.http
       .get<IFlightEmailSubscription[]>(
         this.config.APPLICATION_URL + "api/FlightEmailSubscription/" + userId,

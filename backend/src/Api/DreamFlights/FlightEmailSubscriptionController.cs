@@ -65,7 +65,7 @@ namespace DreamTravel.Api.DreamFlights
 
         [HttpGet]
         [Route(GetByUserIdRoute)]
-        public IActionResult GetByUser([FromRoute] int userId)
+        public IActionResult GetByUser([FromRoute] Guid userId)
         {
             try
             {

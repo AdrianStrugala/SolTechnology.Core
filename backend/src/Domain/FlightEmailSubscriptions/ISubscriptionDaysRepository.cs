@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace DreamTravel.Domain.FlightEmailSubscriptions
 {
@@ -6,7 +7,7 @@ namespace DreamTravel.Domain.FlightEmailSubscriptions
     {
         void Insert(SubscriptionDays subscriptionDays);
 
-        Dictionary<long, SubscriptionDays> GetByUser(int userId);
+        Dictionary<long, SubscriptionDays> GetByUser(Guid userId);
 
         void Update(SubscriptionDays subscriptionDays);
     }

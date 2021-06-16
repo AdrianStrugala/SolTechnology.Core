@@ -1,9 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using AutoFixture;
 using DreamTravel.Domain.FlightEmailSubscriptions;
 using DreamTravel.DreamFlights.UpdateSubscriptions;
-using DreamTravel.Infrastructure.Database;
 using NSubstitute;
 using Xunit;
 
@@ -37,7 +37,7 @@ namespace DreamTravel.FeaturesTests.UpdateSubscriptions
 
 
             //Assert
-            _repository.Received(0).GetByUser(Arg.Any<int>());
+            _repository.Received(0).GetByUser(Arg.Any<Guid>());
             _repository.Received(0).Update(Arg.Any<SubscriptionDays>());
         }
 
@@ -49,7 +49,7 @@ namespace DreamTravel.FeaturesTests.UpdateSubscriptions
             Dictionary<long, SubscriptionDays> subscriptions = new Dictionary<long, SubscriptionDays>();
             subscriptions.Add(1, new SubscriptionDays());
 
-            _repository.GetByUser(Arg.Any<int>()).Returns(subscriptions);
+            _repository.GetByUser(Arg.Any<Guid>()).Returns(subscriptions);
 
             UpdateSubscriptionsCommand command = new UpdateSubscriptionsCommand();
             command.Events = _fixture.CreateMany<DayChangedEvent>(4).ToList();
@@ -64,7 +64,7 @@ namespace DreamTravel.FeaturesTests.UpdateSubscriptions
 
 
             //Assert
-            _repository.Received(1).GetByUser(Arg.Any<int>());
+            _repository.Received(1).GetByUser(Arg.Any<Guid>());
             _repository.Received(1).Update(Arg.Any<SubscriptionDays>());
         }
 
@@ -75,7 +75,7 @@ namespace DreamTravel.FeaturesTests.UpdateSubscriptions
             Dictionary<long, SubscriptionDays> subscriptions = new Dictionary<long, SubscriptionDays>();
             subscriptions.Add(1, new SubscriptionDays());
 
-            _repository.GetByUser(Arg.Any<int>()).Returns(subscriptions);
+            _repository.GetByUser(Arg.Any<Guid>()).Returns(subscriptions);
 
             UpdateSubscriptionsCommand command = new UpdateSubscriptionsCommand();
             command.Events = _fixture.CreateMany<DayChangedEvent>(4).ToList();
@@ -91,7 +91,7 @@ namespace DreamTravel.FeaturesTests.UpdateSubscriptions
 
 
             //Assert
-            _repository.Received(1).GetByUser(Arg.Any<int>());
+            _repository.Received(1).GetByUser(Arg.Any<Guid>());
             _repository.Received(1).Update(Arg.Is<SubscriptionDays>(s =>
                s.Monday == false &&
                s.Tuesday == false &&
@@ -110,7 +110,7 @@ namespace DreamTravel.FeaturesTests.UpdateSubscriptions
             Dictionary<long, SubscriptionDays> subscriptions = new Dictionary<long, SubscriptionDays>();
             subscriptions.Add(1, new SubscriptionDays());
 
-            _repository.GetByUser(Arg.Any<int>()).Returns(subscriptions);
+            _repository.GetByUser(Arg.Any<Guid>()).Returns(subscriptions);
 
             UpdateSubscriptionsCommand command = new UpdateSubscriptionsCommand();
             command.Events = new List<DayChangedEvent>
@@ -135,7 +135,7 @@ namespace DreamTravel.FeaturesTests.UpdateSubscriptions
 
 
             //Assert
-            _repository.Received(1).GetByUser(Arg.Any<int>());
+            _repository.Received(1).GetByUser(Arg.Any<Guid>());
             _repository.Received(1).Update(Arg.Is<SubscriptionDays>(s => s.Monday == true && s.Friday == true));
         }
     }

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Dapper;
 using DreamTravel.Domain.FlightEmailSubscriptions;
@@ -25,7 +26,7 @@ JOIN [SubscriptionDays] on [SubscriptionDays].FlightEmailSubscriptionId = Flight
 ";
 
 
-        public Dictionary<long, Domain.FlightEmailSubscriptions.SubscriptionDays> GetByUser(int userId)
+        public Dictionary<long, Domain.FlightEmailSubscriptions.SubscriptionDays> GetByUser(Guid userId)
         {
             Dictionary<long, Domain.FlightEmailSubscriptions.SubscriptionDays> result;
 
