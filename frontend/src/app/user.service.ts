@@ -12,7 +12,7 @@ export class UserService {
 
   constructor(private http: HttpClient, private config: Configuration) {
     this.user = {} as IUser;
-    this.user.id = '';
+    this.user.userId = '';
 
     if (localStorage.getItem("user") != null) {
       this.user = JSON.parse(localStorage.getItem("user"));
@@ -43,7 +43,7 @@ export class UserService {
     let data = {
       currentPassword: currentPassword,
       newPassword: password,
-      userId: this.user.id
+      userId: this.user.userId
     };
 
     return this.http
@@ -56,7 +56,7 @@ export class UserService {
   }
 
   isLoggedIn(): boolean {
-    if (this.user.id != '') {
+    if (this.user.userId != '') {
       return true;
     } else {
       return false;
@@ -65,7 +65,7 @@ export class UserService {
 
   logout() {
     this.user = {} as IUser;
-    this.user.id = '';
+    this.user.userId = '';
 
     localStorage.removeItem("user");
 
@@ -74,7 +74,7 @@ export class UserService {
 }
 
 export interface IUser {
-  id: string;
+  userId: string;
   name: string;
   password: string;
   email: string;

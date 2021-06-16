@@ -17,7 +17,7 @@ import { Router, NavigationStart, NavigationEnd, NavigationError } from "@angula
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class FlightOrderListComponent {
-  public flightEmailOrders$: Observable<IFlightEmailSubscription[]> = this.flightEmailSubscriptionService.GetByUserId(this.userService.user.id);
+  public flightEmailOrders$: Observable<IFlightEmailSubscription[]> = this.flightEmailSubscriptionService.GetByUserId(this.userService.user.userId);
 
   private dayChangedEvents: DayChangedEvent[] = [];
 
@@ -35,7 +35,7 @@ export class FlightOrderListComponent {
           console.log("xd");
           this.flightEmailSubscriptionService.UpdateSubscriptionsForUser(
             this.dayChangedEvents,
-            this.userService.user.id
+            this.userService.user.userId
           ).subscribe();
         }
 
@@ -67,7 +67,7 @@ onDayChange(id, day, value){
     console.log("xd");
       this.flightEmailSubscriptionService.UpdateSubscriptionsForUser(
         this.dayChangedEvents,
-        this.userService.user.id
+        this.userService.user.userId
       ).subscribe();
   }
 }

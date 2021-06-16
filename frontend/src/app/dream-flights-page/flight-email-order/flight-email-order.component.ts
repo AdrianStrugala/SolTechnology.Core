@@ -209,7 +209,7 @@ onClick(day: string){
   onSubmit(): void {
     this.orderInProgress = true;
     this.error = null;
-    this.orderForm.value.userId = this.userService.user.id;
+    this.orderForm.value.userId = this.userService.user.userId;
 
     this.flightEmailSubscriptionService.Insert(this.orderForm.value, this.emailForm.value).subscribe(
       () => {
