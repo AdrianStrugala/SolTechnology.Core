@@ -13,7 +13,7 @@ namespace DreamTravel.DatabaseData.Repository.Users
       ,[Email] = @Email
       ,[IsActive] = @IsActive
 WHERE
-    [Id] = @Id
+    [UserId] = @UserId
 ";
 
         public void Update(User user)
@@ -26,7 +26,7 @@ WHERE
                     Password = user.Password,
                     Email = user.Email,
                     IsActive = true,
-                    Id = user.Id
+                    UserId = user.UserId
                 });
             }
         }

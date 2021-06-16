@@ -40,6 +40,7 @@ namespace DreamTravel.DatabaseDataTests.Users
             Assert.Equal(user.Email, resultUser.Email);
             Assert.Equal(user.Name, resultUser.Name);
             Assert.Equal(user.Password, resultUser.Password);
+            Assert.Equal(user.UserId, resultUser.UserId);
         }
     }
 }

@@ -7,7 +7,7 @@ namespace DreamTravel.DatabaseData.Repository.Users
     public partial class UserRepository : IUserRepository
     {
         private const string GetSql = @"
-SELECT [Id]
+SELECT [UserId]
       ,[Name]
       ,[Password]
       ,[Email]
