@@ -24,8 +24,8 @@ stages:
       - template: devOps/pipelines/buildAndPublishTests.yml
         parameters:
           BuildConfiguration: ${{ variables.buildConfiguration }}
-  - stage: BuildDemo
-    displayName: BuildDemo
+  - stage: BuildBackend
+    displayName: BuildBackend
     jobs:
     - job: Backend
       steps:
