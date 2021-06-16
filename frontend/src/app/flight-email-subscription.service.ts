@@ -84,7 +84,7 @@ export class FlightEmailSubscriptionService {
 
 export interface IFlightEmailSubscription {
   id: number;
-  userId: number;
+  userId: string;
   from: string;
   to: string;
   departureDate: Date;
