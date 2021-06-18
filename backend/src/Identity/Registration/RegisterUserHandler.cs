@@ -15,15 +15,17 @@ namespace DreamTravel.Identity.Registration
 
         public CommandResult Handle(RegisterUserCommand command)
         {
-            var alreadyExistingUser = _userRepository.Get(command.User.Email);
+            var alreadyExistingUser = _userRepository.Get(command.Email);
 
             if (alreadyExistingUser != null)
             {
                 return CommandResult.Failed("User with provided email already exists");
             }
 
-            command.User.UpdatePassword(Encryption.Encrypt(command.User.Password));
-            _userRepository.Insert(command.User);
+            var user = new User(command.Name, command.Password, command.Email);
+
+            user.UpdatePassword(Encryption.Encrypt(user.Password));
+            _userRepository.Insert(user);
 
             return CommandResult.Succeeded();
         }

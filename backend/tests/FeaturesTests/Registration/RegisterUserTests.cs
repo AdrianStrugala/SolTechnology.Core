@@ -31,7 +31,7 @@ namespace DreamTravel.FeaturesTests.Registration
 
 
             //Act
-            _sut.Handle(new RegisterUserCommand { User = user });
+            _sut.Handle(new RegisterUserCommand(user.Name, user.Password, user.Email));
 
 
             //Assert
@@ -52,7 +52,7 @@ namespace DreamTravel.FeaturesTests.Registration
 
 
             //Act
-            var result = _sut.Handle(new RegisterUserCommand { User = user });
+            var result = _sut.Handle(new RegisterUserCommand(user.Name, user.Password, user.Email));
 
 
             //Assert

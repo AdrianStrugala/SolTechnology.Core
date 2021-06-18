@@ -1,26 +1,20 @@
-﻿using DreamTravel.Api;
-using System.Net;
+﻿using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
+using DreamTravel.ApiTests.TestsConfiguration;
 using DreamTravel.Infrastructure.Authentication;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.TestHost;
 using Xunit;
 
 namespace DreamTravel.ApiTests.Authentication
 {
-    public class DreamAuthenticationTests
-
+    public class DreamAuthenticationTests : IClassFixture<HttpClientFixture>
     {
         private readonly HttpClient _httpServer;
         private const string TestUrl = "";
-        public DreamAuthenticationTests()
+        public DreamAuthenticationTests(HttpClientFixture fixture)
         {
-            var webHostBuilder = new WebHostBuilder()
-                .UseStartup<Startup>();
-            var testServer = new TestServer(webHostBuilder);
-            _httpServer = testServer.CreateClient();
+            _httpServer = fixture.ServerClient;
         }
 
         [Fact]

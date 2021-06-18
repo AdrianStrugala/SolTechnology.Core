@@ -65,11 +65,11 @@ namespace DreamTravel.Api.Identity
 
         [HttpPost]
         [Route("api/users/register")]
-        public IActionResult Register([FromBody] User user)
+        public IActionResult Register([FromBody] RegisterUserCommand command)
         {
-            _logger.LogInformation($"Attempt to register user with email: [{user.Email}]");
+            _logger.LogInformation($"Attempt to register user with email: [{command.Email}]");
 
-            var result = _registerUserHandler.Handle(new RegisterUserCommand { User = user });
+            var result = _registerUserHandler.Handle(command);
 
             if (result.Success == false)
             {
