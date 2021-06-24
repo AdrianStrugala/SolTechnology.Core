@@ -1,4 +1,5 @@
 using System;
+using DreamTravel.Api.BackgroundTasks;
 using DreamTravel.Api.Configuration;
 using DreamTravel.DreamFlights;
 using DreamTravel.DreamFlights.SendDreamTravelFlightEmail.Interfaces;
@@ -67,6 +68,8 @@ namespace DreamTravel.Api
             services.InstallDreamTrips();
             services.InstallIdentity();
 
+            services.AddScoped<IScheduleOrderedFlightEmails, ScheduleOrderedFlightEmails>();
+
             services.AddControllers();
 
             //AUTHENTICATION
@@ -122,7 +125,6 @@ namespace DreamTravel.Api
             });
         }
 
-        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IBackgroundJobClient backgroundJobs, IWebHostEnvironment env)
         {
             if (env.IsDevelopment())
@@ -153,9 +155,10 @@ namespace DreamTravel.Api
         private static void AddHangfire(IApplicationBuilder app, IBackgroundJobClient backgroundJobs)
         {
             app.UseHangfireDashboard(); //https://localhost:44330/hangfire
-            backgroundJobs.Enqueue(() => Console.WriteLine("Hello world from Hangfire!"));
+            backgroundJobs.Enqueue(() => Console.WriteLine("DREAM TRAVELS CAN INTO HANGFIRE!!!"));
 
             RecurringJob.AddOrUpdate<ISendDreamTravelFlightEmail>(a => a.Handle(), "0 0 8 * * *");
+            RecurringJob.AddOrUpdate<IScheduleOrderedFlightEmails>(a => a.Schedule(), "0 0 8 * * *");
         }
     }
 }
