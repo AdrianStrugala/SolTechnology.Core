@@ -33,7 +33,7 @@ FlightEmailSubscription.[OneWay],
 [User].Currency
 
 FROM FlightEmailSubscription
-JOIN [User] on [User].Id = FlightEmailSubscription.[UserId]
+JOIN [User] on [User].[UserId] = FlightEmailSubscription.[UserId]
 JOIN [SubscriptionDays] on [SubscriptionDays].[FlightEmailSubscriptionId] = FlightEmailSubscription.[Id]
 
 ";
