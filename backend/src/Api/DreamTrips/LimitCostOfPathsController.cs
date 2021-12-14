@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Net;
+using System.Net.Mime;
 using System.Threading.Tasks;
 using DreamTravel.Domain.Paths;
 using DreamTravel.DreamTrips.LimitCostOfPaths;
@@ -19,8 +21,9 @@ namespace DreamTravel.Api.DreamTrips
         private readonly IQueryHandler<LimitCostOfPathsInput, List<Path>> _limitCostsOfPathsHandler;
         private readonly ILogger<Controller> _logger;
 
-        public LimitCostOfPathsController(IQueryHandler<LimitCostOfPathsInput, List<Path>> _limitCostsOfPathsHandler,
-                          ILogger<Controller> logger)
+        public LimitCostOfPathsController(
+            IQueryHandler<LimitCostOfPathsInput, List<Path>> _limitCostsOfPathsHandler,
+            ILogger<Controller> logger)
         {
             this._limitCostsOfPathsHandler = _limitCostsOfPathsHandler;
             _logger = logger;
@@ -31,6 +34,9 @@ namespace DreamTravel.Api.DreamTrips
 
 
         [HttpPost]
+        [Produces(MediaTypeNames.Application.Json)]
+        [ProducesResponseType(typeof(List<Path>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(string), (int)HttpStatusCode.BadRequest)]
         public async Task<IActionResult> LimitCost(int costLimit, string sessionId)
         {
             try

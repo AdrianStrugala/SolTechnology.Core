@@ -5,21 +5,21 @@ using DreamTravel.Infrastructure;
 
 namespace DreamTravel.DreamTrips.FindNameOfCity
 {
-    public class FindNameOfCityHandler : IQueryHandler<FindNameOfCityQuery, City>
+    public class FindCityByCoordinatesHandler : IQueryHandler<FindCityByCoordinatesQuery, City>
     {
         private readonly IGoogleApiClient _googleApiClient;
 
-        public FindNameOfCityHandler(IGoogleApiClient googleApiClient)
+        public FindCityByCoordinatesHandler(IGoogleApiClient googleApiClient)
         {
             _googleApiClient = googleApiClient;
         }
 
-        public async Task<City> Handle(FindNameOfCityQuery query)
+        public async Task<City> Handle(FindCityByCoordinatesQuery byCoordinatesQuery)
         {
             City result = new City
             {
-                Latitude = query.Lat,
-                Longitude = query.Lng
+                Latitude = byCoordinatesQuery.Lat,
+                Longitude = byCoordinatesQuery.Lng
             };
 
             result = await _googleApiClient.GetNameOfCity(result);

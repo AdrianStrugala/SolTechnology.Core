@@ -1,5 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Net;
+using System.Net.Mime;
 using System.Threading.Tasks;
+using DreamTravel.Domain.Paths;
 using DreamTravel.DreamTrips.CalculateBestPath;
 using DreamTravel.Infrastructure;
 using Microsoft.AspNetCore.Mvc;
@@ -17,8 +21,9 @@ namespace DreamTravel.Api.DreamTrips
         private readonly ILogger<CalculateBestPathController> _logger;
 
 
-        public CalculateBestPathController(IQueryHandler<CalculateBestPathQuery, CalculateBestPathResult> calculateBestPath,
-                             ILogger<CalculateBestPathController> logger)
+        public CalculateBestPathController(
+            IQueryHandler<CalculateBestPathQuery, CalculateBestPathResult> calculateBestPath,
+            ILogger<CalculateBestPathController> logger)
         {
             _calculateBestPath = calculateBestPath;
             _logger = logger;
@@ -26,6 +31,9 @@ namespace DreamTravel.Api.DreamTrips
 
 
         [HttpPost]
+        [Produces(MediaTypeNames.Application.Json)]
+        [ProducesResponseType(typeof(List<Path>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(string), (int)HttpStatusCode.BadRequest)]
         public async Task<IActionResult> CalculateBestPath([FromBody] CalculateBestPathQuery calculateBestPathQuery)
         {
             try
