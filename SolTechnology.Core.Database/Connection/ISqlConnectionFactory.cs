@@ -2,7 +2,7 @@
 
 namespace SolTechnology.Database.Connection
 {
-    public interface IDbConnectionFactory
+    public interface ISqlConnectionFactory
     {
         IDbConnection CreateConnection();
     }
