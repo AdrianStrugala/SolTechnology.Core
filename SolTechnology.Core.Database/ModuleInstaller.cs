@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using SolTechnology.Database.Connection;
 
 namespace SolTechnology.Core.Database
 {
@@ -25,6 +26,9 @@ namespace SolTechnology.Core.Database
 
                config.ConnectionString = sqlConfiguration.ConnectionString;
            });
+
+
+            services.AddSingleton<ISqlConnectionFactory, SqlConnectionFactory>();
 
             return services;
         }
