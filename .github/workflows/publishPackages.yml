@@ -24,8 +24,8 @@ jobs:
     - name: Test
       run: dotnet test --no-build --verbosity normal
       
-    - name: Publish SolTechnology.Core.Database
+    - name: Publish SolTechnology.Core.Sql
       uses: brandedoutcast/publish-nuget@v2.5.5
       with:
-          PROJECT_FILE_PATH: src/SolTechnology.Core.Database/SolTechnology.Core.Database.csproj
+          PROJECT_FILE_PATH: src/SolTechnology.Core.Sql/SolTechnology.Core.Sql.csproj
           NUGET_KEY: ${{secrets.NUGET_API_KEY}}
