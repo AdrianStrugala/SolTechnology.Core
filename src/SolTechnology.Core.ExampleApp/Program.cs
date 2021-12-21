@@ -1,5 +1,5 @@
 using Microsoft.Extensions.Options;
-using SolTechnology.Core.Database;
+using SolTechnology.Core.Sql;
 
 var builder = WebApplication.CreateBuilder(args);
 

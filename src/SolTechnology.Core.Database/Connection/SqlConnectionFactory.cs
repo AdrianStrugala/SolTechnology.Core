@@ -2,9 +2,8 @@
 using System.Data.SqlClient;
 using Microsoft.Extensions.Options;
 using Polly;
-using SolTechnology.Core.Database;
 
-namespace SolTechnology.Database.Connection
+namespace SolTechnology.Core.Sql.Connection
 {
     public class SqlConnectionFactory : ISqlConnectionFactory
     {

@@ -1,8 +1,8 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using SolTechnology.Database.Connection;
+using SolTechnology.Core.Sql.Connection;
 
-namespace SolTechnology.Core.Database
+namespace SolTechnology.Core.Sql
 {
     public static class ModuleInstaller
     {
