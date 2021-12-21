@@ -18,7 +18,7 @@ jobs:
       with:
         dotnet-version: 6.0.x
     - name: Restore dependencies
-      run: dotnet restore
+      run: dotnet restore src/SolTechnology.Core.sln
     - name: Build
       run: dotnet build src/SolTechnology.Core.sln --no-restore
     - name: Test
