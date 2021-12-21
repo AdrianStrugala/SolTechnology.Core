@@ -18,11 +18,11 @@ jobs:
       with:
         dotnet-version: 6.0.x
     - name: Restore dependencies
-      run: dotnet restore
+      run: dotnet restore src/SolTechnology.Core.sln
     - name: Build
-      run: dotnet build --no-restore
+      run: dotnet build src/SolTechnology.Core.sln --no-restore
     - name: Test
-      run: dotnet test --no-build --verbosity normal
+      run: dotnet test src/SolTechnology.Core.sln --no-build --verbosity normal
       
     - name: Publish SolTechnology.Core.Sql
       uses: brandedoutcast/publish-nuget@v2.5.5
