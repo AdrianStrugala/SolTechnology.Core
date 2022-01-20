@@ -1,4 +1,5 @@
 using Microsoft.Extensions.Options;
+using SolTechnology.Core.BlobStorage;
 using SolTechnology.Core.Sql;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -14,10 +15,14 @@ builder.Services.AddSwaggerGen();
 //Custom services
 
 builder.Services.AddSql();
-
+builder.Services.AddBlobStorage();
 
 
 var app = builder.Build();
+
+
+//USE TO CHECK CONFIGURATION EXTENSION METHODS
+// var x = app.Services.GetService<IOptions<BlobStorageConfiguration>>();
 
 
 // Configure the HTTP request pipeline.

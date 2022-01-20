@@ -11,6 +11,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\SolTechnology.Core.BlobStorage\SolTechnology.Core.BlobStorage.csproj" />
     <ProjectReference Include="..\SolTechnology.Core.Sql\SolTechnology.Core.Sql.csproj" />
   </ItemGroup>
 
