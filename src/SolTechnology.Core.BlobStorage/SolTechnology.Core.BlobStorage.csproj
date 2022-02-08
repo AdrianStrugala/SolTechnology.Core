@@ -16,7 +16,7 @@
 		<AssemblyName>SolTechnology.Core.BlobStorage</AssemblyName>
 		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
 
-		<PackageIconUrl>https://raw.githubusercontent.com/AdrianStrugala/AvroConvert/master/docs/mini-logo.png</PackageIconUrl>
+		<PackageIcon>docs\mini-logo.png</PackageIcon>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -25,6 +25,10 @@
 	  <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="6.0.0" />
 	  <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="6.0.0" />
 	  <PackageReference Include="Microsoft.Extensions.Options" Version="6.0.0" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<None Include="..\..\docs\mini-logo.png" Pack="true" Visible="false" PackagePath="docs\mini-logo.png" />
 	</ItemGroup>
 
 </Project>

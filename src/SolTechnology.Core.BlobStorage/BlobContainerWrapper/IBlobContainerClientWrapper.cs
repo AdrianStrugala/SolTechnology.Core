@@ -1,6 +1,6 @@
 ﻿using Azure.Storage.Blobs;
 
-namespace SolTechnology.Core.BlobStorage;
+namespace SolTechnology.Core.BlobStorage.BlobContainerWrapper;
 
 public interface IBlobContainerClientWrapper
 {

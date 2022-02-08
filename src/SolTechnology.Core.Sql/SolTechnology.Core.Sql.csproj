@@ -16,7 +16,7 @@
 		<AssemblyName>SolTechnology.Core.Sql</AssemblyName>
 		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
 
-		<PackageIconUrl>https://raw.githubusercontent.com/AdrianStrugala/AvroConvert/master/docs/mini-logo.png</PackageIconUrl>
+		<PackageIcon>docs\mini-logo.png</PackageIcon>
 	</PropertyGroup>
 
 
@@ -26,6 +26,10 @@
 		<PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="6.0.0" />
 		<PackageReference Include="Polly" Version="7.2.*" />
 		<PackageReference Include="System.Data.SqlClient" Version="4.8.*" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<None Include="..\..\docs\mini-logo.png" Pack="true" Visible="false" PackagePath="docs\mini-logo.png" />
 	</ItemGroup>
 
 </Project>

@@ -2,7 +2,7 @@
 using Microsoft.Extensions.Options;
 using SolTechnology.Avro;
 
-namespace SolTechnology.Core.BlobStorage
+namespace SolTechnology.Core.BlobStorage.BlobContainerWrapper
 {
     public class BlobContainerClientWrapper : IBlobContainerClientWrapper
     {
