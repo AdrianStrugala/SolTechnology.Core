@@ -16,7 +16,6 @@
 		<AssemblyName>SolTechnology.Core.BlobStorage</AssemblyName>
 		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
 
-		<PackageIcon>docs\mini-logo.png</PackageIcon>
 		<PackageIconUrl>https://raw.githubusercontent.com/AdrianStrugala/AvroConvert/master/docs/mini-logo.png</PackageIconUrl>
 	</PropertyGroup>
 

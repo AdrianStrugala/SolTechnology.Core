@@ -10,3 +10,7 @@ ISqlConnectionFactory
 For Blob:
 IBlobConnectionFactory
 IBlobContainerClientWrapper (read and write operation)
+
+
+For HttpClient:
+IApiClientFactory

@@ -1,4 +1,5 @@
 using Microsoft.Extensions.Options;
+using SolTechnology.Core.ApiClient;
 using SolTechnology.Core.BlobStorage;
 using SolTechnology.Core.Sql;
 
@@ -16,13 +17,14 @@ builder.Services.AddSwaggerGen();
 
 builder.Services.AddSql();
 builder.Services.AddBlobStorage();
+builder.Services.AddApiClients();
 
 
 var app = builder.Build();
 
 
 //USE TO CHECK CONFIGURATION EXTENSION METHODS
-// var x = app.Services.GetService<IOptions<BlobStorageConfiguration>>();
+var x = app.Services.GetService<IOptions<ApiClientConfiguration>>();
 
 
 // Configure the HTTP request pipeline.

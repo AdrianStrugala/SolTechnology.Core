@@ -8,24 +8,21 @@
 		<Authors>Adrian Strugala</Authors>
 		<Version>0.1.0</Version>
 		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-		<Description>SolTechnology Core Sql library</Description>
-		<PackageTags>sol technology core sql</PackageTags>
-		<Product>SolTechnology.Core.Sql</Product>
-		<PackageId>SolTechnology.Core.Sql</PackageId>
+		<Description>SolTechnology Core API client library</Description>
+		<PackageTags>sol technology core azure api client</PackageTags>
+		<Product>SolTechnology.Core.ApiClient</Product>
+		<PackageId>SolTechnology.Core.ApiClient</PackageId>
 		<RepositoryUrl>https://github.com/AdrianStrugala/SolTechnology.Core</RepositoryUrl>
-		<AssemblyName>SolTechnology.Core.Sql</AssemblyName>
+		<AssemblyName>SolTechnology.Core.ApiClient</AssemblyName>
 		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
 
 		<PackageIconUrl>https://raw.githubusercontent.com/AdrianStrugala/AvroConvert/master/docs/mini-logo.png</PackageIconUrl>
 	</PropertyGroup>
 
-
 	<ItemGroup>
+		<PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="6.0.0" />
 		<PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="6.0.0" />
-		<PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="6.0.0" />
-		<PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="6.0.0" />
-		<PackageReference Include="Polly" Version="7.2.*" />
-		<PackageReference Include="System.Data.SqlClient" Version="4.8.*" />
+		<PackageReference Include="Microsoft.Extensions.Options" Version="6.0.0" />
 	</ItemGroup>
 
 </Project>

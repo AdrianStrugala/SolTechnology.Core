@@ -35,3 +35,9 @@ jobs:
       with:
           PROJECT_FILE_PATH: src/SolTechnology.Core.BlobStorage/SolTechnology.Core.BlobStorage.csproj
           NUGET_KEY: ${{secrets.NUGET_API_KEY}}
+
+    - name: Publish SolTechnology.Core.ApiClient
+      uses: brandedoutcast/publish-nuget@v2.5.5
+      with:
+          PROJECT_FILE_PATH: src/SolTechnology.Core.ApiClient/SolTechnology.Core.ApiClient.csproj
+          NUGET_KEY: ${{secrets.NUGET_API_KEY}}
