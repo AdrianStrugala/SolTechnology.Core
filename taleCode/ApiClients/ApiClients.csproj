@@ -8,7 +8,6 @@
 
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
-    <PackageReference Include="SolTechnology.Core.ApiClient" Version="0.1.0" />
   </ItemGroup>
 
   <ItemGroup>
