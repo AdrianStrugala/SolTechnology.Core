@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
+using SolTechnology.TaleCode.PlayerRegistry.Commands.SynchronizePlayerMatches;
 
-namespace SolTechnology.Core.ExampleApp.Controllers
+namespace SolTechnology.TaleCode.Controllers
 {
     [ApiController]
     [Route("[controller]")]
@@ -12,15 +13,20 @@ namespace SolTechnology.Core.ExampleApp.Controllers
     };
 
         private readonly ILogger<WeatherForecastController> _logger;
+        private readonly ICommandHandler<SynchronizePlayerMatchesCommand> _handler;
 
-        public WeatherForecastController(ILogger<WeatherForecastController> logger)
+        public WeatherForecastController(ILogger<WeatherForecastController> logger, ICommandHandler<SynchronizePlayerMatchesCommand> handler)
         {
             _logger = logger;
+            _handler = handler;
         }
 
         [HttpGet(Name = "GetWeatherForecast")]
-        public IEnumerable<WeatherForecast> Get()
+        public IEnumerable<WeatherForecast> GetAsync()
         {
+            _handler.Handle(new SynchronizePlayerMatchesCommand(44));
+
+
             return Enumerable.Range(1, 5).Select(index => new WeatherForecast
             {
                 Date = DateTime.Now.AddDays(index),

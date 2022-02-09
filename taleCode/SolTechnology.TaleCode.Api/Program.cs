@@ -1,7 +1,7 @@
-using Microsoft.Extensions.Options;
+using ApiClients;
 using SolTechnology.Core.ApiClient;
-using SolTechnology.Core.BlobStorage;
-using SolTechnology.Core.Sql;
+using SolTechnology.TaleCode;
+using SolTechnology.TaleCode.PlayerRegistry.Commands.SynchronizePlayerMatches;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,19 +12,21 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-
-//Custom services
-
-builder.Services.AddSql();
-builder.Services.AddBlobStorage();
 builder.Services.AddApiClients();
+
+
+builder.Services.AddScoped<ICommandHandler<SynchronizePlayerMatchesCommand>, SynchronizePlayerMatchesHandler>();
+builder.Services.AddScoped<IFootballDataApiClient, FootballDataApiClient>();
+
 
 
 var app = builder.Build();
 
 
+
 //USE TO CHECK CONFIGURATION EXTENSION METHODS
 var x = app.Services.GetService<IOptions<ApiClientConfiguration>>();
+
 
 
 // Configure the HTTP request pipeline.

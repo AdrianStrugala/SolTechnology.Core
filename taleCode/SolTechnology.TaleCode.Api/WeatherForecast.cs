@@ -1,4 +1,4 @@
-namespace SolTechnology.Core.ExampleApp
+namespace SolTechnology.TaleCode
 {
     public class WeatherForecast
     {
