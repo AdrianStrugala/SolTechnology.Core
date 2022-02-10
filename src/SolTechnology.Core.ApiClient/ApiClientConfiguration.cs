@@ -18,8 +18,8 @@
 
     public enum DataType
     {
-        json = 0,
-        avro = 1
+        Json = 0,
+        Avro = 1
     }
 
     public class Header
