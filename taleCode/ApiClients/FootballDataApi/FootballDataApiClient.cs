@@ -19,13 +19,9 @@ namespace ApiClients
         {
             var httpClient = _apiClientFactory.GetClient(ApiName);
 
-            HttpResponseMessage result = await httpClient.GetAsync($"v2/players/{id}/matches");
+            var result = await httpClient.GetAsync<PlayersMatchesModel>($"v2/players/{id}/matches");
 
-            var x = await result.Content.ReadAsStringAsync();
-
-            var res = JsonConvert.DeserializeObject<PlayersMatchesModel>(x);
-
-            return res?.Player;
+            return result?.Player;
         }
     }
 
