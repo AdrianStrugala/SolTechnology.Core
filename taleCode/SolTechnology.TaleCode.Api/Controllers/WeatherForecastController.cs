@@ -24,7 +24,7 @@ namespace SolTechnology.TaleCode.Controllers
         [HttpGet(Name = "GetWeatherForecast")]
         public IEnumerable<WeatherForecast> GetAsync()
         {
-            _handler.Handle(new SynchronizePlayerMatchesCommand(44));
+            _handler.Handle(new SynchronizePlayerMatchesCommand(78));
 
 
             return Enumerable.Range(1, 5).Select(index => new WeatherForecast
