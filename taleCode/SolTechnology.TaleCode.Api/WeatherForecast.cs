@@ -1,4 +1,4 @@
-namespace SolTechnology.TaleCode
+namespace SolTechnology.TaleCode.Api
 {
     public class WeatherForecast
     {

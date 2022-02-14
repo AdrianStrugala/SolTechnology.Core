@@ -3,8 +3,11 @@
 	<PropertyGroup>
 		<TargetFramework>net6.0</TargetFramework>
 		<ImplicitUsings>enable</ImplicitUsings>
-		<Nullable>enable</Nullable>
 		<RootNamespace>SolTechnology.TaleCode.Domain</RootNamespace>
 	</PropertyGroup>
+
+	<ItemGroup>
+	  <ProjectReference Include="..\..\src\Soltechnology.Core.Guards\SolTechnology.Core.Guards.csproj" />
+	</ItemGroup>
 
 </Project>

@@ -1,7 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
+using SolTechnology.TaleCode.Infrastructure;
 using SolTechnology.TaleCode.PlayerRegistry.Commands.SynchronizePlayerMatches;
 
-namespace SolTechnology.TaleCode.Controllers
+namespace SolTechnology.TaleCode.Api.Controllers
 {
     [ApiController]
     [Route("[controller]")]

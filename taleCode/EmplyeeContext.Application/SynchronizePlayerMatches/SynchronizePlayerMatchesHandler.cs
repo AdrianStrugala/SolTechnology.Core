@@ -1,4 +1,7 @@
 ﻿using ApiClients;
+using ApiClients.FootballDataApi;
+using SolTechnology.TaleCode.Infrastructure;
+using Player = SolTechnology.TaleCode.Domain.Player;
 
 namespace SolTechnology.TaleCode.PlayerRegistry.Commands.SynchronizePlayerMatches
 {
@@ -13,9 +16,16 @@ namespace SolTechnology.TaleCode.PlayerRegistry.Commands.SynchronizePlayerMatche
 
         public async Task Handle(SynchronizePlayerMatchesCommand command)
         {
-            var player = await _footballDataApiClient.GetPlayerById(command.PlayerId);
+            Player player = await _footballDataApiClient.GetPlayerById(command.PlayerId);
 
-            var x = 1;
+            // repository.StorePlayer();
+
+            // look which matches are not synced
+
+            // get matches competition winners
+
+            // save matches
+
         }
     }
 }

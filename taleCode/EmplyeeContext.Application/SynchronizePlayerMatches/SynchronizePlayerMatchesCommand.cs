@@ -1,4 +1,6 @@
-﻿namespace SolTechnology.TaleCode.PlayerRegistry.Commands.SynchronizePlayerMatches
+﻿using SolTechnology.TaleCode.Infrastructure;
+
+namespace SolTechnology.TaleCode.PlayerRegistry.Commands.SynchronizePlayerMatches
 {
     public class SynchronizePlayerMatchesCommand : ICommand
     {

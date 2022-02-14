@@ -1,10 +1,8 @@
-﻿using SolTechnology.TaleCode.Domain;
-
-namespace ApiClients
+﻿namespace ApiClients.FootballDataApi
 {
     public interface IFootballDataApiClient
     {
-        public  Task<Player> GetPlayerById(int id);
+        public Task<SolTechnology.TaleCode.Domain.Player> GetPlayerById(int id);
     }
 
 }

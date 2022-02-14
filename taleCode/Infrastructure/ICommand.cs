@@ -1,4 +1,4 @@
-﻿namespace SolTechnology.TaleCode
+﻿namespace SolTechnology.TaleCode.Infrastructure
 {
     public interface ICommand
     {

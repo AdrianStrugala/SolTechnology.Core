@@ -44,6 +44,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "DataLayer", "DataLayer", "{
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "LogicLayer", "LogicLayer", "{7BF4DB8D-9C8C-44E9-9D73-CBC102D8FEB3}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SolTechnology.Core.Guards", "Soltechnology.Core.Guards\SolTechnology.Core.Guards.csproj", "{B170194E-E13E-4A5C-965B-1D1E5085A24D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -102,6 +104,10 @@ Global
 		{FD781473-32FC-4F65-95D5-7D269B8631FA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FD781473-32FC-4F65-95D5-7D269B8631FA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FD781473-32FC-4F65-95D5-7D269B8631FA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B170194E-E13E-4A5C-965B-1D1E5085A24D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B170194E-E13E-4A5C-965B-1D1E5085A24D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B170194E-E13E-4A5C-965B-1D1E5085A24D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B170194E-E13E-4A5C-965B-1D1E5085A24D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

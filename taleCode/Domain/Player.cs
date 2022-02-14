@@ -1,20 +1,27 @@
-﻿namespace SolTechnology.TaleCode.Domain
+﻿using SolTechnology.Core.Guards;
+
+namespace SolTechnology.TaleCode.Domain
 {
     public record Player
     {
-        public int PlayerId { get; set; }
+        public int ApiId { get; set; }
         public string Name { get; set; }
         public string DateOfBirth { get; set; }
         public string Nationality { get; set; }
         public string Position { get; set; }
+        public List<Match> Matches { get; set; }
 
-        public Player(int playerId, string name, string dateOfBirth, string nationality, string position)
+        public Player(int apiId, string name, string dateOfBirth, string nationality, string position, List<Match> matches)
         {
-            PlayerId = playerId;
+            Guards.StringNotNullNorEmpty(name, nameof(name));
+            Guards.IntNotZero(apiId, nameof(apiId));
+
+            ApiId = apiId;
             Name = name;
             DateOfBirth = dateOfBirth;
             Nationality = nationality;
             Position = position;
+            Matches = matches;
         }
     }
 }

@@ -1,23 +1,40 @@
-﻿namespace SolTechnology.TaleCode.Domain
+﻿using SolTechnology.Core.Guards;
+
+namespace SolTechnology.TaleCode.Domain
 {
     public record Match
     {
-        public int id { get; set; }
-        public Competition Competition { get; set; }
-        public DateTime UtcDate { get; set; }
-        public string status { get; set; }
-        public int matchday { get; set; }
-        public string stage { get; set; }
-        public string group { get; set; }
-        public DateTime lastUpdated { get; set; }
-        public Score score { get; set; }
-        public Team homeTeam { get; set; }
-        public Team awayTeam { get; set; }
-    }
+        public int ApiId { get; set; }
+        public int PlayerApiId { get; set; }
+        public DateTime Date { get; set; }
+        public string HomeTeam { get; set; }
+        public string AwayTeam { get; set; }
+        public int HomeTeamScore { get; set; }
+        public int AwayTeamScore { get; set; }
+        public string Winner { get; set; }
+        public string CompetitionWinner { get; set; }
 
-    public class Competition
-    {
-        public int id { get; set; }
-        public string name { get; set; }
+        public Match(int apiId, int playerApiId, DateTime date, string homeTeam, string awayTeam, int homeTeamScore, int awayTeamScore, string winner)
+        {
+            Guards.StringNotNullNorEmpty(winner, nameof(winner));
+            Guards.IntNotZero(apiId, nameof(apiId));
+            Guards.IntNotZero(playerApiId, nameof(playerApiId));
+
+            ApiId = apiId;
+            PlayerApiId = playerApiId;
+            Date = date;
+            HomeTeam = homeTeam;
+            AwayTeam = awayTeam;
+            HomeTeamScore = homeTeamScore;
+            AwayTeamScore = awayTeamScore;
+            Winner = winner;
+        }
+
+        public void AssignCompetitionWinner(string competitionWinner)
+        {
+            Guards.StringNotNullNorEmpty(competitionWinner, nameof(competitionWinner));
+
+            CompetitionWinner = competitionWinner;
+        }
     }
 }

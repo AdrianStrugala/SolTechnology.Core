@@ -1,7 +1,9 @@
 using ApiClients;
+using ApiClients.FootballDataApi;
 using Microsoft.Extensions.Options;
 using SolTechnology.Core.ApiClient;
 using SolTechnology.TaleCode;
+using SolTechnology.TaleCode.Infrastructure;
 using SolTechnology.TaleCode.PlayerRegistry.Commands.SynchronizePlayerMatches;
 
 var builder = WebApplication.CreateBuilder(args);
