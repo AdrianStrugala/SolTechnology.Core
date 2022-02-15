@@ -1,0 +1,18 @@
+<Project Sdk="MSBuild.Sdk.SqlProj/2.0.0">
+	<PropertyGroup>
+		<Name>TaleCodeDatabase</Name>
+		<TargetFramework>netstandard2.0</TargetFramework>
+		<AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+		<DSP>Microsoft.Data.Tools.Schema.Sql.SqlAzureV12DatabaseSchemaProvider</DSP>
+		<SqlServerVersion>SqlAzure</SqlServerVersion>
+		
+	</PropertyGroup>
+
+
+	<ItemGroup>
+		<None Update="_Deployment\default.publish.xml">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
+	</ItemGroup>
+
+</Project>

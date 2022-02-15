@@ -2,8 +2,10 @@ using ApiClients;
 using ApiClients.FootballDataApi;
 using Microsoft.Extensions.Options;
 using SolTechnology.Core.ApiClient;
+using SolTechnology.Core.Sql;
 using SolTechnology.TaleCode;
 using SolTechnology.TaleCode.Infrastructure;
+using SolTechnology.TaleCode.PlayerRegistry.Commands;
 using SolTechnology.TaleCode.PlayerRegistry.Commands.SynchronizePlayerMatches;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -15,11 +17,11 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+
 builder.Services.AddApiClients();
+builder.Services.AddSql();
 
-
-builder.Services.AddScoped<ICommandHandler<SynchronizePlayerMatchesCommand>, SynchronizePlayerMatchesHandler>();
-builder.Services.AddScoped<IFootballDataApiClient, FootballDataApiClient>();
+builder.Services.AddCommands();
 
 
 

@@ -2,7 +2,7 @@
 {
     public interface IFootballDataApiClient
     {
-        public Task<SolTechnology.TaleCode.Domain.Player> GetPlayerById(int id);
+        public Task<SolTechnology.TaleCode.Domain.Player.Player> GetPlayerById(int id);
     }
 
 }

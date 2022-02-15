@@ -1,6 +1,6 @@
 ﻿using SolTechnology.Core.Guards;
 
-namespace SolTechnology.TaleCode.Domain
+namespace SolTechnology.TaleCode.Domain.Player
 {
     public record Player
     {

@@ -44,7 +44,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "DataLayer", "DataLayer", "{
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "LogicLayer", "LogicLayer", "{7BF4DB8D-9C8C-44E9-9D73-CBC102D8FEB3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SolTechnology.Core.Guards", "Soltechnology.Core.Guards\SolTechnology.Core.Guards.csproj", "{B170194E-E13E-4A5C-965B-1D1E5085A24D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SolTechnology.Core.Guards", "Soltechnology.Core.Guards\SolTechnology.Core.Guards.csproj", "{B170194E-E13E-4A5C-965B-1D1E5085A24D}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TaleCodeDatabase", "..\taleCode\TaleCodeDatabase\TaleCodeDatabase.csproj", "{8231F2DF-9BB3-4624-B9CB-8F66826E8272}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -108,6 +110,10 @@ Global
 		{B170194E-E13E-4A5C-965B-1D1E5085A24D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B170194E-E13E-4A5C-965B-1D1E5085A24D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B170194E-E13E-4A5C-965B-1D1E5085A24D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8231F2DF-9BB3-4624-B9CB-8F66826E8272}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8231F2DF-9BB3-4624-B9CB-8F66826E8272}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8231F2DF-9BB3-4624-B9CB-8F66826E8272}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8231F2DF-9BB3-4624-B9CB-8F66826E8272}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -126,6 +132,7 @@ Global
 		{53156430-F3F1-432F-A13F-6F8B486F811F} = {15E8DC7F-F76A-4151-B0FA-5A3F5D4DCAE6}
 		{34FBF818-929B-408B-B6BF-FE6355A94DB0} = {15E8DC7F-F76A-4151-B0FA-5A3F5D4DCAE6}
 		{7BF4DB8D-9C8C-44E9-9D73-CBC102D8FEB3} = {15E8DC7F-F76A-4151-B0FA-5A3F5D4DCAE6}
+		{8231F2DF-9BB3-4624-B9CB-8F66826E8272} = {15E8DC7F-F76A-4151-B0FA-5A3F5D4DCAE6}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {56BC2B7E-7B9F-4B05-951A-C0E3CF0D1287}

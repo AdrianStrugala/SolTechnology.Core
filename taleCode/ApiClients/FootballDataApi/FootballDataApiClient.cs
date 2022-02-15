@@ -12,13 +12,13 @@ namespace ApiClients.FootballDataApi
             _apiClientFactory = apiClientFactory;
         }
 
-        public async Task<SolTechnology.TaleCode.Domain.Player> GetPlayerById(int id)
+        public async Task<SolTechnology.TaleCode.Domain.Player.Player> GetPlayerById(int id)
         {
             var httpClient = _apiClientFactory.GetClient(ApiName);
 
             var result = await httpClient.GetAsync<PlayerModel>($"v2/players/{id}/matches");
 
-            var domainResult = new SolTechnology.TaleCode.Domain.Player(
+            var domainResult = new SolTechnology.TaleCode.Domain.Player.Player(
                 result.Player.Id,
                 result.Player.Name,
                 result.Player.DateOfBirth,

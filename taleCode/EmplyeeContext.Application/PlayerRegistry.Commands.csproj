@@ -9,6 +9,7 @@
 	<ItemGroup>
 	  <ProjectReference Include="..\ApiClients\ApiClients.csproj" />
 	  <ProjectReference Include="..\Infrastructure\Infrastructure.csproj" />
+	  <ProjectReference Include="..\SqlData\SqlData.csproj" />
 	</ItemGroup>
 
 </Project>
