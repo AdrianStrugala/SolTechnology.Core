@@ -1,7 +1,7 @@
 ﻿using ApiClients.FootballDataApi;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace SolTechnology.TaleCode.SqlData
+namespace ApiClients
 {
     public static class ModuleInstaller
     {

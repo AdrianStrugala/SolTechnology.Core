@@ -24,7 +24,7 @@ namespace ApiClients.FootballDataApi
                 result.Player.DateOfBirth,
                 result.Player.Nationality,
                 result.Player.Position,
-                result.Matches.Select(m => new SolTechnology.TaleCode.Domain.Match(
+                result.Matches.Select(m => new SolTechnology.TaleCode.Domain.Match.Match(
                         m.Id,
                         result.Player.Id,
                         m.UtcDate,

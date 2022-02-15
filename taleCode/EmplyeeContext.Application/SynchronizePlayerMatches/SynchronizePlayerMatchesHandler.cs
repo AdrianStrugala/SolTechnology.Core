@@ -1,5 +1,6 @@
 ﻿using ApiClients;
 using ApiClients.FootballDataApi;
+using SolTechnology.TaleCode.Domain.Match;
 using SolTechnology.TaleCode.Domain.Player;
 using SolTechnology.TaleCode.Infrastructure;
 using Player = SolTechnology.TaleCode.Domain.Player.Player;
@@ -8,13 +9,20 @@ namespace SolTechnology.TaleCode.PlayerRegistry.Commands.SynchronizePlayerMatche
 {
     public class SynchronizePlayerMatchesHandler : ICommandHandler<SynchronizePlayerMatchesCommand>
     {
+        private const int SyncCallsLimit = 9;
+
         private readonly IFootballDataApiClient _footballDataApiClient;
         private readonly IPlayerRepository _playerRepository;
+        private readonly IMatchRepository _matchRepository;
 
-        public SynchronizePlayerMatchesHandler(IFootballDataApiClient footballDataApiClient, IPlayerRepository playerRepository)
+        public SynchronizePlayerMatchesHandler(
+            IFootballDataApiClient footballDataApiClient,
+            IPlayerRepository playerRepository,
+            IMatchRepository matchRepository)
         {
             _footballDataApiClient = footballDataApiClient;
             _playerRepository = playerRepository;
+            _matchRepository = matchRepository;
         }
 
         public async Task Handle(SynchronizePlayerMatchesCommand command)
@@ -23,12 +31,12 @@ namespace SolTechnology.TaleCode.PlayerRegistry.Commands.SynchronizePlayerMatche
 
             _playerRepository.Insert(player);
 
-            // look which matches are not synced
+            var syncedMatches = _matchRepository.GetByPlayerId(player.ApiId);
+            var syncedMatchesIds = syncedMatches.Select(m => m.ApiId);
 
-            // get matches competition winners
+            var matchesToSync = player.Matches.Where(m => !syncedMatchesIds.Contains(m.ApiId)).Take(SyncCallsLimit);
 
-            // save matches
-
+            // sync Match
         }
     }
 }

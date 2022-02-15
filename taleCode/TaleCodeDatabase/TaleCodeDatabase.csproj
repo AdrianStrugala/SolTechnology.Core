@@ -5,8 +5,8 @@
 		<AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
 		<DSP>Microsoft.Data.Tools.Schema.Sql.SqlAzureV12DatabaseSchemaProvider</DSP>
 		<SqlServerVersion>SqlAzure</SqlServerVersion>
-		
 	</PropertyGroup>
+
 
 
 	<ItemGroup>

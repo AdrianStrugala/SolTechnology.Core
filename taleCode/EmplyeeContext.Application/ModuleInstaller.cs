@@ -1,4 +1,5 @@
-﻿using ApiClients.FootballDataApi;
+﻿using ApiClients;
+using ApiClients.FootballDataApi;
 using Microsoft.Extensions.DependencyInjection;
 using SolTechnology.TaleCode.Infrastructure;
 using SolTechnology.TaleCode.PlayerRegistry.Commands.SynchronizePlayerMatches;

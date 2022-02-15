@@ -2,7 +2,7 @@
 using SolTechnology.Core.Sql.Connection;
 using SolTechnology.TaleCode.Domain.Player;
 
-namespace SolTechnology.TaleCode.SqlData.Repository
+namespace SolTechnology.TaleCode.SqlData.Repository.Player
 {
     public partial class PlayerRepository : IPlayerRepository
     {
@@ -24,7 +24,7 @@ namespace SolTechnology.TaleCode.SqlData.Repository
 VALUES (@ApiId, @Name, @DateOfBirth, @Nationality, @Position)
 ";
 
-        public void Insert(Player player)
+        public void Insert(Domain.Player.Player player)
         {
             using (var connection = _sqlConnectionFactory.CreateConnection())
             {
