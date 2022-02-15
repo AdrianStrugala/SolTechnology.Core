@@ -44,7 +44,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "DataLayer", "DataLayer", "{
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "LogicLayer", "LogicLayer", "{7BF4DB8D-9C8C-44E9-9D73-CBC102D8FEB3}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SolTechnology.Core.Guards", "Soltechnology.Core.Guards\SolTechnology.Core.Guards.csproj", "{B170194E-E13E-4A5C-965B-1D1E5085A24D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SolTechnology.Core.Guards", "SolTechnology.Core.Guards\SolTechnology.Core.Guards.csproj", "{B170194E-E13E-4A5C-965B-1D1E5085A24D}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TaleCodeDatabase", "..\taleCode\TaleCodeDatabase\TaleCodeDatabase.csproj", "{8231F2DF-9BB3-4624-B9CB-8F66826E8272}"
 EndProject
