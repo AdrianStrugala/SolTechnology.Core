@@ -1,7 +1,7 @@
 ﻿using Dapper;
-using SolTechnology.TaleCode.Domain.Match;
+using SolTechnology.TaleCode.Domain;
 
-namespace SolTechnology.TaleCode.SqlData.Repository.Match
+namespace SolTechnology.TaleCode.SqlData.Repository.MatchRepository
 {
     public partial class MatchRepository : IMatchRepository
     {
@@ -21,13 +21,13 @@ FROM [dbo].[Match]
 WHERE [PlayerApiId] = @PlayerApiId
 ";
 
-        public List<Domain.Match.Match> GetByPlayerId(int playerApiId)
+        public List<Match> GetByPlayerId(int playerApiId)
         {
-            List<Domain.Match.Match> result = null;
+            List<Match> result = null;
 
             using (var connection = _sqlConnectionFactory.CreateConnection())
             {
-                result = connection.Query<Domain.Match.Match>(GetByPlayerIdSql, new
+                result = connection.Query<Match>(GetByPlayerIdSql, new
                 {
                     PlayerApiId = playerApiId,
                 }).ToList();

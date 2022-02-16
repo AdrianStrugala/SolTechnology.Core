@@ -1,6 +1,6 @@
 ﻿using SolTechnology.Core.Guards;
 
-namespace SolTechnology.TaleCode.Domain.Player
+namespace SolTechnology.TaleCode.Domain
 {
     public record Player
     {
@@ -9,9 +9,9 @@ namespace SolTechnology.TaleCode.Domain.Player
         public string DateOfBirth { get; set; }
         public string Nationality { get; set; }
         public string Position { get; set; }
-        public List<Match.Match> Matches { get; set; }
+        public List<Match> Matches { get; set; }
 
-        public Player(int apiId, string name, string dateOfBirth, string nationality, string position, List<Match.Match> matches)
+        public Player(int apiId, string name, string dateOfBirth, string nationality, string position, List<Match> matches)
         {
             Guards.StringNotNullNorEmpty(name, nameof(name));
             Guards.IntNotZero(apiId, nameof(apiId));

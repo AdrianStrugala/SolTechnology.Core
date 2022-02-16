@@ -1,8 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using SolTechnology.TaleCode.Domain.Match;
-using SolTechnology.TaleCode.Domain.Player;
-using SolTechnology.TaleCode.SqlData.Repository.Match;
-using SolTechnology.TaleCode.SqlData.Repository.Player;
+using SolTechnology.TaleCode.SqlData.Repository.MatchRepository;
+using SolTechnology.TaleCode.SqlData.Repository.PlayerRepository;
 
 namespace SolTechnology.TaleCode.SqlData
 {

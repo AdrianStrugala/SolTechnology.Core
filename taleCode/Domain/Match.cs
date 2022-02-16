@@ -1,6 +1,6 @@
 ﻿using SolTechnology.Core.Guards;
 
-namespace SolTechnology.TaleCode.Domain.Match
+namespace SolTechnology.TaleCode.Domain
 {
     public record Match
     {
@@ -33,7 +33,6 @@ namespace SolTechnology.TaleCode.Domain.Match
         public void AssignCompetitionWinner(string competitionWinner)
         {
             Guards.StringNotNullNorEmpty(competitionWinner, nameof(competitionWinner));
-
             CompetitionWinner = competitionWinner;
         }
     }

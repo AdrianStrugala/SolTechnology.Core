@@ -1,9 +1,10 @@
 ﻿using ApiClients;
 using ApiClients.FootballDataApi;
-using SolTechnology.TaleCode.Domain.Match;
-using SolTechnology.TaleCode.Domain.Player;
+using SolTechnology.TaleCode.Domain;
 using SolTechnology.TaleCode.Infrastructure;
-using Player = SolTechnology.TaleCode.Domain.Player.Player;
+using SolTechnology.TaleCode.PlayerRegistry.Commands.SynchronizePlayerMatches.Interfaces;
+using SolTechnology.TaleCode.SqlData.Repository.MatchRepository;
+using SolTechnology.TaleCode.SqlData.Repository.PlayerRepository;
 
 namespace SolTechnology.TaleCode.PlayerRegistry.Commands.SynchronizePlayerMatches
 {
@@ -13,28 +14,36 @@ namespace SolTechnology.TaleCode.PlayerRegistry.Commands.SynchronizePlayerMatche
 
         private readonly IFootballDataApiClient _footballDataApiClient;
         private readonly IPlayerRepository _playerRepository;
+        private readonly ISyncPlayer _syncPlayer;
         private readonly IMatchRepository _matchRepository;
 
         public SynchronizePlayerMatchesHandler(
-            IFootballDataApiClient footballDataApiClient,
+            ISyncPlayer syncPlayer,
             IPlayerRepository playerRepository,
             IMatchRepository matchRepository)
         {
-            _footballDataApiClient = footballDataApiClient;
-            _playerRepository = playerRepository;
+            _syncPlayer = syncPlayer;
             _matchRepository = matchRepository;
         }
 
         public async Task Handle(SynchronizePlayerMatchesCommand command)
         {
-            Player player = await _footballDataApiClient.GetPlayerById(command.PlayerId);
+            var context = new SynchronizePlayerMatchesContext
+            {
+                Command = command
+            };
 
-            _playerRepository.Insert(player);
+            await _syncPlayer.Execute(context);
+            //   _playerRepository.AddOrUpdate(context.Player);
 
-            var syncedMatches = _matchRepository.GetByPlayerId(player.ApiId);
+
+            var syncedMatches = _matchRepository.GetByPlayerId(command.PlayerId);
             var syncedMatchesIds = syncedMatches.Select(m => m.ApiId);
 
-            var matchesToSync = player.Matches.Where(m => !syncedMatchesIds.Contains(m.ApiId)).Take(SyncCallsLimit);
+            var matchesToSync = context.Player.Matches
+                                      .Where(m => !syncedMatchesIds.Contains(m.ApiId))
+                                      .OrderBy(m => m.Date)
+                                      .Take(SyncCallsLimit);
 
             // sync Match
         }

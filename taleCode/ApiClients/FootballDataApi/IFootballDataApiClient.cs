@@ -1,8 +1,12 @@
-﻿namespace ApiClients.FootballDataApi
+﻿
+using ApiClients.FootballDataApi.Models;
+
+namespace ApiClients.FootballDataApi
 {
     public interface IFootballDataApiClient
     {
-        public Task<SolTechnology.TaleCode.Domain.Player.Player> GetPlayerById(int id);
+        public Task<FootballDataPlayer> GetPlayerById(int id);
+        public Task<FootballDataMatch> GetMatchById(int matchApiId);
     }
 
 }

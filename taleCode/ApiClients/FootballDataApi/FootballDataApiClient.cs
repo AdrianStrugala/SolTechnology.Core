@@ -1,4 +1,5 @@
-﻿using SolTechnology.Core.ApiClient.Connection;
+﻿using ApiClients.FootballDataApi.Models;
+using SolTechnology.Core.ApiClient.Connection;
 
 namespace ApiClients.FootballDataApi
 {
@@ -12,30 +13,53 @@ namespace ApiClients.FootballDataApi
             _apiClientFactory = apiClientFactory;
         }
 
-        public async Task<SolTechnology.TaleCode.Domain.Player.Player> GetPlayerById(int id)
+        public async Task<FootballDataPlayer> GetPlayerById(int id)
         {
             var httpClient = _apiClientFactory.GetClient(ApiName);
 
-            var result = await httpClient.GetAsync<PlayerModel>($"v2/players/{id}/matches");
+            var apiResult = await httpClient.GetAsync<PlayerModel>($"v2/players/{id}/matches");
 
-            var domainResult = new SolTechnology.TaleCode.Domain.Player.Player(
-                result.Player.Id,
-                result.Player.Name,
-                result.Player.DateOfBirth,
-                result.Player.Nationality,
-                result.Player.Position,
-                result.Matches.Select(m => new SolTechnology.TaleCode.Domain.Match.Match(
-                        m.Id,
-                        result.Player.Id,
-                        m.UtcDate,
-                        m.HomeTeam.Name,
-                        m.AwayTeam.Name,
-                        m.Score.FullTime.HomeTeam,
-                        m.Score.FullTime.AwayTeam,
-                        m.Score.Winner))
-                    .ToList());
+            var result = new FootballDataPlayer
+            {
+                Id = apiResult.Player.Id,
+                Name = apiResult.Player.Name,
+                DateOfBirth = apiResult.Player.DateOfBirth,
+                Nationality = apiResult.Player.Nationality,
+                Position = apiResult.Player.Position,
+                Matches = apiResult.Matches.Select(m => new FootballDataMatch
+                {
+                    Id = m.Id,
+                    Date = m.UtcDate,
+                    HomeTeam = m.HomeTeam.Name,
+                    AwayTeam = m.AwayTeam.Name,
+                    HomeTeamScore = m.Score.FullTime.HomeTeam,
+                    AwayTeamScore = m.Score.FullTime.AwayTeam,
+                    Winner = m.Score.Winner
+                }).ToList()
+            };
 
-            return domainResult;
+            return result;
+        }
+
+        public async Task<FootballDataMatch> GetMatchById(int matchApiId)
+        {
+            var httpClient = _apiClientFactory.GetClient(ApiName);
+
+            var apiResult = await httpClient.GetAsync<MatchModel>($"v2/matches/{matchApiId}");
+
+            var result = new FootballDataMatch
+            {
+                Id = apiResult.Match.Id,
+                Date = apiResult.Match.UtcDate,
+                HomeTeam = apiResult.Match.HomeTeam.Name,
+                AwayTeam = apiResult.Match.AwayTeam.Name,
+                HomeTeamScore = apiResult.Match.Score.FullTime.HomeTeam,
+                AwayTeamScore = apiResult.Match.Score.FullTime.AwayTeam,
+                Winner = apiResult.Match.Score.Winner,
+                CompetitionWinner = apiResult.Match.Season.Winner.Name
+            };
+
+            return result;
         }
     }
 

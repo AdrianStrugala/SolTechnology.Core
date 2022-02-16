@@ -1,4 +1,6 @@
-﻿namespace SolTechnology.TaleCode.Domain.Match;
+﻿using SolTechnology.TaleCode.Domain;
+
+namespace SolTechnology.TaleCode.SqlData.Repository.MatchRepository;
 
 public interface IMatchRepository
 {

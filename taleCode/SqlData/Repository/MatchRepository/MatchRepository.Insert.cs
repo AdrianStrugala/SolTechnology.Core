@@ -1,8 +1,8 @@
 ﻿using Dapper;
 using SolTechnology.Core.Sql.Connection;
-using SolTechnology.TaleCode.Domain.Player;
+using SolTechnology.TaleCode.Domain;
 
-namespace SolTechnology.TaleCode.SqlData.Repository.Match
+namespace SolTechnology.TaleCode.SqlData.Repository.MatchRepository
 {
     public partial class MatchRepository
     {
@@ -28,7 +28,7 @@ namespace SolTechnology.TaleCode.SqlData.Repository.Match
 VALUES (@ApiId, @PlayerApiId, @Date, @HomeTeam, @AwayTeam, @HomeTeamScore, @AwayTeamScore, @Winner, @CompetitionWinner)
 ";
 
-        public void Insert(Domain.Match.Match match)
+        public void Insert(Match match)
         {
             using (var connection = _sqlConnectionFactory.CreateConnection())
             {

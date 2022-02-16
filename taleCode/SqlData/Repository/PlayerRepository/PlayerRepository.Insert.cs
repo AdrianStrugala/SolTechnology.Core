@@ -1,8 +1,8 @@
 ﻿using Dapper;
 using SolTechnology.Core.Sql.Connection;
-using SolTechnology.TaleCode.Domain.Player;
+using SolTechnology.TaleCode.Domain;
 
-namespace SolTechnology.TaleCode.SqlData.Repository.Player
+namespace SolTechnology.TaleCode.SqlData.Repository.PlayerRepository
 {
     public partial class PlayerRepository : IPlayerRepository
     {
@@ -24,7 +24,7 @@ namespace SolTechnology.TaleCode.SqlData.Repository.Player
 VALUES (@ApiId, @Name, @DateOfBirth, @Nationality, @Position)
 ";
 
-        public void Insert(Domain.Player.Player player)
+        public void Insert(Player player)
         {
             using (var connection = _sqlConnectionFactory.CreateConnection())
             {

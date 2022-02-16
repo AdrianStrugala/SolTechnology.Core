@@ -3,6 +3,8 @@ using ApiClients.FootballDataApi;
 using Microsoft.Extensions.DependencyInjection;
 using SolTechnology.TaleCode.Infrastructure;
 using SolTechnology.TaleCode.PlayerRegistry.Commands.SynchronizePlayerMatches;
+using SolTechnology.TaleCode.PlayerRegistry.Commands.SynchronizePlayerMatches.Executors;
+using SolTechnology.TaleCode.PlayerRegistry.Commands.SynchronizePlayerMatches.Interfaces;
 using SolTechnology.TaleCode.SqlData;
 
 namespace SolTechnology.TaleCode.PlayerRegistry.Commands
@@ -15,6 +17,7 @@ namespace SolTechnology.TaleCode.PlayerRegistry.Commands
             services.AddApiClients();
 
             services.AddScoped<ICommandHandler<SynchronizePlayerMatchesCommand>, SynchronizePlayerMatchesHandler>();
+            services.AddScoped<ISyncPlayer, SyncPlayer>();
 
             return services;
         }
