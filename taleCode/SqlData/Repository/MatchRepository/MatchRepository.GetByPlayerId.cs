@@ -7,7 +7,7 @@ namespace SolTechnology.TaleCode.SqlData.Repository.MatchRepository
     {
 
         private const string GetByPlayerIdSql = @"
-  SELECT (
+  SELECT
     [ApiId],
     [PlayerApiId],
     [Date],
@@ -16,7 +16,7 @@ namespace SolTechnology.TaleCode.SqlData.Repository.MatchRepository
     [HomeTeamScore],
     [AwayTeamScore],
     [Winner],
-	[CompetitionWinner])
+	[CompetitionWinner]
 FROM [dbo].[Match]
 WHERE [PlayerApiId] = @PlayerApiId
 ";

@@ -14,10 +14,14 @@ namespace SolTechnology.TaleCode.Domain
         public string Winner { get; set; }
         public string CompetitionWinner { get; set; }
 
-        public Match(int apiId, int playerApiId, DateTime date, string homeTeam, string awayTeam, int homeTeamScore, int awayTeamScore, string winner, string competitionWinner)
+        private Match()
+        {
+            //required by ORM
+        }
+
+        public Match(int apiId, int playerApiId, DateTime date, string homeTeam, string awayTeam, int homeTeamScore, int awayTeamScore, string winner)
         {
             Guards.StringNotNullNorEmpty(winner, nameof(winner));
-            Guards.StringNotNullNorEmpty(competitionWinner, nameof(competitionWinner));
             Guards.IntNotZero(apiId, nameof(apiId));
             Guards.IntNotZero(playerApiId, nameof(playerApiId));
 
@@ -29,6 +33,11 @@ namespace SolTechnology.TaleCode.Domain
             HomeTeamScore = homeTeamScore;
             AwayTeamScore = awayTeamScore;
             Winner = winner;
+        }
+
+        public void AssignCompetitionWinner(string competitionWinner)
+        {
+            Guards.StringNotNullNorEmpty(competitionWinner, nameof(competitionWinner));
             CompetitionWinner = competitionWinner;
         }
     }

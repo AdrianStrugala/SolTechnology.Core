@@ -2,7 +2,7 @@
 
 namespace SolTechnology.TaleCode.PlayerRegistry.Commands.SynchronizePlayerMatches.Interfaces;
 
-public interface IBuildMatch
+public interface IAssignWinner
 {
-    Task<Match> Execute(int playerId, int matchId);
+    Task Execute(Match match);
 }

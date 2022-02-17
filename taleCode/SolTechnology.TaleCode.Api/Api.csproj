@@ -2,7 +2,6 @@
 
 	<PropertyGroup>
 		<TargetFramework>net6.0</TargetFramework>
-		<Nullable>enable</Nullable>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<RootNamespace>SolTechnology.TaleCode.Api</RootNamespace>
 		<UserSecretsId>ce941014-e580-4425-bdae-f9707225b0e5</UserSecretsId>

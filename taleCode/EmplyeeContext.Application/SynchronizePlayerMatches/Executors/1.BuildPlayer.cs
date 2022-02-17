@@ -25,7 +25,16 @@ namespace SolTechnology.TaleCode.PlayerRegistry.Commands.SynchronizePlayerMatche
                 clientPlayer.DateOfBirth,
                 clientPlayer.Nationality,
                 clientPlayer.Position,
-                new List<Match>());
+                clientPlayer.Matches.Select(m => new Match(
+                    m.Id,
+                    playerId,
+                    m.Date,
+                    m.HomeTeam,
+                    m.AwayTeam,
+                    m.HomeTeamScore,
+                    m.AwayTeamScore,
+                    m.Winner))
+                    .ToList());
 
             return player;
         }

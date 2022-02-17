@@ -17,7 +17,7 @@ namespace SolTechnology.TaleCode.PlayerRegistry.Commands
 
             services.AddTransient<ICommandHandler<SynchronizePlayerMatchesCommand>, SynchronizePlayerMatchesHandler>();
             services.AddTransient<IBuildPlayer, BuildPlayer>();
-            services.AddTransient<IBuildMatch, BuildMatch>();
+            services.AddTransient<IAssignWinner, AssignWinner>();
 
             return services;
         }

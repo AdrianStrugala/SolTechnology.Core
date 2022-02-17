@@ -1,5 +1,4 @@
 ﻿using ApiClients.FootballDataApi.Models;
-using SolTechnology.Core.ApiClient.Connection;
 
 namespace ApiClients.FootballDataApi
 {
@@ -24,7 +23,7 @@ namespace ApiClients.FootballDataApi
                 DateOfBirth = apiResult.Player.DateOfBirth,
                 Nationality = apiResult.Player.Nationality,
                 Position = apiResult.Player.Position,
-                Matches = apiResult.Matches.Select(m => new FootballDataMatch
+                Matches = apiResult.Matches.OrderBy(m => m.UtcDate).Select(m => new FootballDataMatch
                 {
                     Id = m.Id,
                     Date = m.UtcDate,

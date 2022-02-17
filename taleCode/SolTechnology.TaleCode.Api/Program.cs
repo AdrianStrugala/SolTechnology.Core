@@ -1,12 +1,7 @@
-using ApiClients;
-using ApiClients.FootballDataApi;
 using Microsoft.Extensions.Options;
 using SolTechnology.Core.ApiClient;
 using SolTechnology.Core.Sql;
-using SolTechnology.TaleCode;
-using SolTechnology.TaleCode.Infrastructure;
 using SolTechnology.TaleCode.PlayerRegistry.Commands;
-using SolTechnology.TaleCode.PlayerRegistry.Commands.SynchronizePlayerMatches;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -39,6 +34,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+app.UseExceptionHandler("/error");
 
 app.UseHttpsRedirection();
 

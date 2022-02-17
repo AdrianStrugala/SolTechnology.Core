@@ -1,7 +1,4 @@
-﻿using ApiClients;
-using ApiClients.FootballDataApi;
-using SolTechnology.TaleCode.Domain;
-using SolTechnology.TaleCode.Infrastructure;
+﻿using SolTechnology.TaleCode.Infrastructure;
 using SolTechnology.TaleCode.PlayerRegistry.Commands.SynchronizePlayerMatches.Interfaces;
 using SolTechnology.TaleCode.SqlData.Repository.MatchRepository;
 using SolTechnology.TaleCode.SqlData.Repository.PlayerRepository;
@@ -12,26 +9,24 @@ namespace SolTechnology.TaleCode.PlayerRegistry.Commands.SynchronizePlayerMatche
     {
         private const int SyncCallsLimit = 9;
 
-        private readonly IFootballDataApiClient _footballDataApiClient;
         private readonly IPlayerRepository _playerRepository;
         private readonly IBuildPlayer _buildPlayer;
         private readonly IMatchRepository _matchRepository;
-        private readonly IBuildMatch _buildMatch;
+        private readonly IAssignWinner _assignWinner;
 
         public SynchronizePlayerMatchesHandler(
             IBuildPlayer buildPlayer,
             IPlayerRepository playerRepository,
             IMatchRepository matchRepository,
-            IBuildMatch buildMatch)
+            IAssignWinner assignWinner)
         {
             _buildPlayer = buildPlayer;
             _matchRepository = matchRepository;
-            _buildMatch = buildMatch;
+            _assignWinner = assignWinner;
         }
 
         public async Task Handle(SynchronizePlayerMatchesCommand command)
         {
-
             var player = await _buildPlayer.Execute(command.PlayerId);
             //   _playerRepository.AddOrUpdate(context.Player);
 
@@ -46,7 +41,7 @@ namespace SolTechnology.TaleCode.PlayerRegistry.Commands.SynchronizePlayerMatche
 
             foreach (var match in matchesToSync)
             {
-                await _buildMatch.Execute(player.ApiId, match.ApiId);
+                await _assignWinner.Execute(match);
             }
 
             //    _matchRepository.BulkInsert(context.Matches);

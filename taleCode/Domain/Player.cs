@@ -11,6 +11,11 @@ namespace SolTechnology.TaleCode.Domain
         public string Position { get; set; }
         public List<Match> Matches { get; set; }
 
+        private Player()
+        {
+            //required by ORM
+        }
+
         public Player(int apiId, string name, string dateOfBirth, string nationality, string position, List<Match> matches)
         {
             Guards.StringNotNullNorEmpty(name, nameof(name));
