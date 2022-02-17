@@ -4,18 +4,18 @@ using SolTechnology.TaleCode.PlayerRegistry.Commands.SynchronizePlayerMatches.In
 
 namespace SolTechnology.TaleCode.PlayerRegistry.Commands.SynchronizePlayerMatches.Executors
 {
-    public class SyncPlayer : ISyncPlayer
+    public class BuildPlayer : IBuildPlayer
     {
         private readonly IFootballDataApiClient _footballDataApiClient;
 
-        public SyncPlayer(IFootballDataApiClient footballDataApiClient)
+        public BuildPlayer(IFootballDataApiClient footballDataApiClient)
         {
             _footballDataApiClient = footballDataApiClient;
         }
 
-        public async Task Execute(SynchronizePlayerMatchesContext context)
+        public async Task<Player> Execute(int playerId)
         {
-            var clientPlayer = await _footballDataApiClient.GetPlayerById(context.Command.PlayerId);
+            var clientPlayer = await _footballDataApiClient.GetPlayerById(playerId);
 
             //add player teams (web scrap?)
 
@@ -27,7 +27,7 @@ namespace SolTechnology.TaleCode.PlayerRegistry.Commands.SynchronizePlayerMatche
                 clientPlayer.Position,
                 new List<Match>());
 
-            context.Player = player;
+            return player;
         }
     }
 }

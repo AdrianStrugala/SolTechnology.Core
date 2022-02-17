@@ -1,5 +1,4 @@
 ﻿using ApiClients;
-using ApiClients.FootballDataApi;
 using Microsoft.Extensions.DependencyInjection;
 using SolTechnology.TaleCode.Infrastructure;
 using SolTechnology.TaleCode.PlayerRegistry.Commands.SynchronizePlayerMatches;
@@ -16,8 +15,9 @@ namespace SolTechnology.TaleCode.PlayerRegistry.Commands
             services.AddSqlData();
             services.AddApiClients();
 
-            services.AddScoped<ICommandHandler<SynchronizePlayerMatchesCommand>, SynchronizePlayerMatchesHandler>();
-            services.AddScoped<ISyncPlayer, SyncPlayer>();
+            services.AddTransient<ICommandHandler<SynchronizePlayerMatchesCommand>, SynchronizePlayerMatchesHandler>();
+            services.AddTransient<IBuildPlayer, BuildPlayer>();
+            services.AddTransient<IBuildMatch, BuildMatch>();
 
             return services;
         }

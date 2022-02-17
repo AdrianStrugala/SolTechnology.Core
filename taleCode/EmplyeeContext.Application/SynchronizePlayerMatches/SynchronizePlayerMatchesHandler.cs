@@ -14,38 +14,42 @@ namespace SolTechnology.TaleCode.PlayerRegistry.Commands.SynchronizePlayerMatche
 
         private readonly IFootballDataApiClient _footballDataApiClient;
         private readonly IPlayerRepository _playerRepository;
-        private readonly ISyncPlayer _syncPlayer;
+        private readonly IBuildPlayer _buildPlayer;
         private readonly IMatchRepository _matchRepository;
+        private readonly IBuildMatch _buildMatch;
 
         public SynchronizePlayerMatchesHandler(
-            ISyncPlayer syncPlayer,
+            IBuildPlayer buildPlayer,
             IPlayerRepository playerRepository,
-            IMatchRepository matchRepository)
+            IMatchRepository matchRepository,
+            IBuildMatch buildMatch)
         {
-            _syncPlayer = syncPlayer;
+            _buildPlayer = buildPlayer;
             _matchRepository = matchRepository;
+            _buildMatch = buildMatch;
         }
 
         public async Task Handle(SynchronizePlayerMatchesCommand command)
         {
-            var context = new SynchronizePlayerMatchesContext
-            {
-                Command = command
-            };
 
-            await _syncPlayer.Execute(context);
+            var player = await _buildPlayer.Execute(command.PlayerId);
             //   _playerRepository.AddOrUpdate(context.Player);
 
 
             var syncedMatches = _matchRepository.GetByPlayerId(command.PlayerId);
             var syncedMatchesIds = syncedMatches.Select(m => m.ApiId);
 
-            var matchesToSync = context.Player.Matches
+            var matchesToSync = player.Matches
                                       .Where(m => !syncedMatchesIds.Contains(m.ApiId))
                                       .OrderBy(m => m.Date)
                                       .Take(SyncCallsLimit);
 
-            // sync Match
+            foreach (var match in matchesToSync)
+            {
+                await _buildMatch.Execute(player.ApiId, match.ApiId);
+            }
+
+            //    _matchRepository.BulkInsert(context.Matches);
         }
     }
 }

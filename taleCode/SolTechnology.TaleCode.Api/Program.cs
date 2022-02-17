@@ -18,7 +18,6 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 
-builder.Services.AddApiClients();
 builder.Services.AddSql();
 
 builder.Services.AddCommands();

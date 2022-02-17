@@ -5,19 +5,17 @@ namespace ApiClients.FootballDataApi
 {
     public class FootballDataApiClient : IFootballDataApiClient
     {
-        private const string ApiName = "football-data"; //has to match configuration name
-        private readonly IApiClientFactory _apiClientFactory;
+        private readonly HttpClient _httpClient;
+        private const string ApiName = "football-data";
 
-        public FootballDataApiClient(IApiClientFactory apiClientFactory)
+        public FootballDataApiClient(HttpClient httpClient)
         {
-            _apiClientFactory = apiClientFactory;
+            _httpClient = httpClient;
         }
 
         public async Task<FootballDataPlayer> GetPlayerById(int id)
         {
-            var httpClient = _apiClientFactory.GetClient(ApiName);
-
-            var apiResult = await httpClient.GetAsync<PlayerModel>($"v2/players/{id}/matches");
+            var apiResult = await _httpClient.GetAsync<PlayerModel>($"v2/players/{id}/matches");
 
             var result = new FootballDataPlayer
             {
@@ -43,9 +41,7 @@ namespace ApiClients.FootballDataApi
 
         public async Task<FootballDataMatch> GetMatchById(int matchApiId)
         {
-            var httpClient = _apiClientFactory.GetClient(ApiName);
-
-            var apiResult = await httpClient.GetAsync<MatchModel>($"v2/matches/{matchApiId}");
+            var apiResult = await _httpClient.GetAsync<MatchModel>($"v2/matches/{matchApiId}");
 
             var result = new FootballDataMatch
             {

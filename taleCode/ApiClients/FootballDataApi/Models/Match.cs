@@ -8,7 +8,7 @@ public class Match
     public DateTime UtcDate { get; set; }
     public string Status { get; set; }
     public string Venue { get; set; }
-    public int Matchday { get; set; }
+    public int? Matchday { get; set; }
     public string Stage { get; set; }
     public object Group { get; set; }
     public DateTime LastUpdated { get; set; }
