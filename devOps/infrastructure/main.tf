@@ -15,7 +15,7 @@ provider "azurerm" {
 # Create the resource group
 resource "azurerm_resource_group" "rg" {
   name     = "TaleCode"
-  location = "westeu"
+  location = "westeurope"
 }
 # Create the Linux App Service Plan
 resource "azurerm_app_service_plan" "appserviceplan" {
