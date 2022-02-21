@@ -23,12 +23,22 @@ namespace SolTechnology.TaleCode.PlayerRegistry.Commands.SynchronizePlayerMatche
             _buildPlayer = buildPlayer;
             _matchRepository = matchRepository;
             _assignWinner = assignWinner;
+            _playerRepository = playerRepository;
         }
 
         public async Task Handle(SynchronizePlayerMatchesCommand command)
         {
             var player = await _buildPlayer.Execute(command.PlayerId);
-            //   _playerRepository.AddOrUpdate(context.Player);
+
+            var dbPlayer = _playerRepository.GetById(player.ApiId);
+            if (dbPlayer == null)
+            {
+                _playerRepository.Insert(player);
+            }
+            else
+            {
+                _playerRepository.Update(player);
+            }
 
 
             var syncedMatches = _matchRepository.GetByPlayerId(command.PlayerId);
@@ -38,6 +48,7 @@ namespace SolTechnology.TaleCode.PlayerRegistry.Commands.SynchronizePlayerMatche
                                       .Where(m => !syncedMatchesIds.Contains(m.ApiId))
                                       .OrderBy(m => m.Date)
                                       .Take(SyncCallsLimit);
+
 
             foreach (var match in matchesToSync)
             {

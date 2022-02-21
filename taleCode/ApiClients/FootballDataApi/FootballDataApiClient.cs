@@ -5,7 +5,6 @@ namespace ApiClients.FootballDataApi
     public class FootballDataApiClient : IFootballDataApiClient
     {
         private readonly HttpClient _httpClient;
-        private const string ApiName = "football-data";
 
         public FootballDataApiClient(HttpClient httpClient)
         {
@@ -31,7 +30,7 @@ namespace ApiClients.FootballDataApi
                     AwayTeam = m.AwayTeam.Name,
                     HomeTeamScore = m.Score.FullTime.HomeTeam,
                     AwayTeamScore = m.Score.FullTime.AwayTeam,
-                    Winner = m.Score.Winner
+                    Winner = m.Score.Winner.Contains("HOME") ? m.HomeTeam.Name : m.AwayTeam.Name
                 }).ToList()
             };
 

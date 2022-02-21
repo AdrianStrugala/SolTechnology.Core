@@ -1,18 +1,3 @@
-# Configure the Azure provider
-terraform {
-  required_providers {
-    azurerm = {
-      source  = "hashicorp/azurerm"
-      version = "~> 2.65"
-    }
-  }
-  required_version = ">= 0.14.9"
-}
-provider "azurerm" {
-  features {}
-}
-
-
 # Create the Linux App Service Plan
 resource "azurerm_app_service_plan" "appserviceplan" {
   name                = "TaleCodePlan"
