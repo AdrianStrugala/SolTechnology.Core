@@ -3,7 +3,7 @@ resource "azurerm_sql_server" "sqlserver" {
   resource_group_name          = azurerm_resource_group.rg.name
   location                     = azurerm_resource_group.rg.location
   version                      = "12.0"
-  administrator_login          = "sa"
+  administrator_login          = "adrian"
   administrator_login_password = "password_xxddd_2137"
 
 }
