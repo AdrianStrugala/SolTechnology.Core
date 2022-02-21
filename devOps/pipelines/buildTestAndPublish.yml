@@ -1,6 +1,3 @@
-parameters:
-    BuildConfiguration: ''
-
 steps:
 - task: NuGetToolInstaller@1
   displayName: 'Install NuGet'
