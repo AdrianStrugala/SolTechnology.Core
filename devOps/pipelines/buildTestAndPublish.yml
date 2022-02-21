@@ -19,7 +19,7 @@ steps:
       docker run -e 'ACCEPT_EULA=Y' -e 'SA_PASSWORD=password_xxddd_2137' -p 1401:1433 --name DB -d mcr.microsoft.com/mssql/server:2019-latest
 
 - task: PowerShell@2
-  displayName: Deploy DB
+  displayName: Deploy DB locally
   inputs:
     targetType: 'inline'
     workingDirectory: 'taleCode/TaleCodeDatabase'
@@ -27,10 +27,19 @@ steps:
       dotnet publish /p:TargetServerName=localhost /p:TargetPort=1401 /p:TargetUser=sa /p:TargetPassword=password_xxddd_2137 /p:TargetDatabaseName=TaleCodeDatabase
 
 - task: DotNetCoreCLI@2
-  displayName: 'Run the tests'
+  displayName: 'Run unit tests'
   inputs:
     command: 'test'
     projects: '**/*Tests.csproj'
     custom: 'msbuild'
     arguments: '-p:Configuration=$(BuildConfiguration)'
     publishTestResults: true
+
+- task: DotNetCoreCLI@2
+  displayName: 'Publish Database'
+  inputs:
+    projects: '**/TaleCodeDatabase.csproj'
+    arguments: '-c $(BuildConfiguration) -o $(Build.ArtifactStagingDirectory)/Databases'
+    
+- publish: '$(Build.ArtifactStagingDirectory)'
+  artifact: ${{ parameters.Artifact }}
