@@ -38,7 +38,8 @@ steps:
 - task: CopyFiles@2
   displayName: 'Publish Infrastructure'
   inputs:
-    contents: 'devOps/infrastructure/**'
+    sourceFolder: 'devOps/infrastructure'
+    contents: '*'
     targetFolder: $(Build.ArtifactStagingDirectory)/Infrastructure
 
 - task: DotNetCoreCLI@2
