@@ -35,7 +35,6 @@ steps:
     arguments: '-p:Configuration=$(BuildConfiguration)'
     publishTestResults: true
 
-steps:
 - task: CopyFiles@2
   displayName: 'Publish Infrastructure'
   inputs:
