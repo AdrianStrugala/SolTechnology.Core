@@ -35,11 +35,18 @@ steps:
     arguments: '-p:Configuration=$(BuildConfiguration)'
     publishTestResults: true
 
+steps:
+- task: CopyFiles@2
+  displayName: 'Publish Infrastructure'
+  inputs:
+    contents: 'devOps/infrastructure/**'
+    targetFolder: $(Build.ArtifactStagingDirectory)/Infrastructure
+
 - task: DotNetCoreCLI@2
   displayName: 'Publish Database'
   inputs:
     projects: '**/TaleCodeDatabase.csproj'
-    arguments: '-c $(BuildConfiguration) -o $(Build.ArtifactStagingDirectory)/Databases'
+    arguments: '-o $(Build.ArtifactStagingDirectory)/Database'
     
 - task: PublishBuildArtifacts@1
   inputs:
