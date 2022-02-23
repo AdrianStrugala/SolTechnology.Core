@@ -1,21 +1,24 @@
 ﻿using ApiClients.FootballDataApi;
 using SolTechnology.TaleCode.Domain;
 using SolTechnology.TaleCode.PlayerRegistry.Commands.SynchronizePlayerMatches.Interfaces;
+using SolTechnology.TaleCode.SqlData.Repository.PlayerRepository;
 
 namespace SolTechnology.TaleCode.PlayerRegistry.Commands.SynchronizePlayerMatches.Executors
 {
-    public class BuildPlayer : IBuildPlayer
+    public class SyncPlayer : ISyncPlayer
     {
         private readonly IFootballDataApiClient _footballDataApiClient;
+        private readonly IPlayerRepository _playerRepository;
 
-        public BuildPlayer(IFootballDataApiClient footballDataApiClient)
+        public SyncPlayer(IFootballDataApiClient footballDataApiClient, IPlayerRepository playerRepository)
         {
             _footballDataApiClient = footballDataApiClient;
+            _playerRepository = playerRepository;
         }
 
-        public async Task<Player> Execute(int playerId)
+        public async Task Execute(SynchronizePlayerMatchesContext context)
         {
-            var clientPlayer = await _footballDataApiClient.GetPlayerById(playerId);
+            var clientPlayer = await _footballDataApiClient.GetPlayerById(context.PlayerId);
 
             //add player teams (web scrap?)
 
@@ -27,7 +30,7 @@ namespace SolTechnology.TaleCode.PlayerRegistry.Commands.SynchronizePlayerMatche
                 clientPlayer.Position,
                 clientPlayer.Matches.Select(m => new Match(
                     m.Id,
-                    playerId,
+                    context.PlayerId,
                     m.Date,
                     m.HomeTeam,
                     m.AwayTeam,
@@ -36,7 +39,17 @@ namespace SolTechnology.TaleCode.PlayerRegistry.Commands.SynchronizePlayerMatche
                     m.Winner))
                     .ToList());
 
-            return player;
+            var dbPlayer = _playerRepository.GetById(player.ApiId);
+            if (dbPlayer == null)
+            {
+                _playerRepository.Insert(player);
+            }
+            else
+            {
+                // _playerRepository.Update(player);
+            }
+
+            context.Player = player;
         }
     }
 }

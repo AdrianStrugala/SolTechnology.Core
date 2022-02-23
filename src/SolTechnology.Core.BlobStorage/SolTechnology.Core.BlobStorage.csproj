@@ -6,7 +6,7 @@
 		<Nullable>enable</Nullable>
 
 		<Authors>Adrian Strugala</Authors>
-		<Version>0.1.0</Version>
+		<Version>0.1.1</Version>
 		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
 		<Description>SolTechnology Core Azure blob storage library</Description>
 		<PackageTags>sol technology core azure blob storage</PackageTags>

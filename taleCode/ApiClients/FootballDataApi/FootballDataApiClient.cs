@@ -30,7 +30,7 @@ namespace ApiClients.FootballDataApi
                     AwayTeam = m.AwayTeam.Name,
                     HomeTeamScore = m.Score.FullTime.HomeTeam,
                     AwayTeamScore = m.Score.FullTime.AwayTeam,
-                    Winner = m.Score.Winner.Contains("HOME") ? m.HomeTeam.Name : m.AwayTeam.Name
+                    Winner = GetWinner(m)
                 }).ToList()
             };
 
@@ -49,11 +49,16 @@ namespace ApiClients.FootballDataApi
                 AwayTeam = apiResult.Match.AwayTeam.Name,
                 HomeTeamScore = apiResult.Match.Score.FullTime.HomeTeam,
                 AwayTeamScore = apiResult.Match.Score.FullTime.AwayTeam,
-                Winner = apiResult.Match.Score.Winner,
-                CompetitionWinner = apiResult.Match.Season.Winner.Name
+                Winner = GetWinner(apiResult.Match),
+                CompetitionWinner = apiResult.Match.Season.Winner?.Name
             };
 
             return result;
+        }
+
+        private string GetWinner(Match m)
+        {
+            return m.Score.Winner.Contains("HOME") ? m.HomeTeam.Name : m.AwayTeam.Name;
         }
     }
 
