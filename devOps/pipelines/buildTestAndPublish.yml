@@ -36,6 +36,7 @@ stages:
             dotnet publish /p:TargetServerName=localhost /p:TargetPort=1401 /p:TargetUser=sa /p:TargetPassword=password_xxddd_2137 /p:TargetDatabaseName=TaleCodeDatabase
 
     - job: RunTests
+      dependsOn: PrepareEnvironment
       steps:
       - task: DotNetCoreCLI@2
         displayName: 'Run unit tests'
