@@ -81,4 +81,28 @@ stages:
             artifactName: 'drop' 
 
 
+  - stage: DeployProd
+    displayName: Deploy to Production
+
+    variables:
+      azureServiceConnection: 'azureSWO'
+      resourceGroupName: 'TaleCode'
+      location: 'westeurope'
+      templateFile: 'main.bicep'
+
+    jobs:
+
+    - job: Backend
+      steps:
+        - task: AzureCLI@2
+          inputs:
+            azureSubscription: $(azureServiceConnection)
+            scriptType: bash
+            scriptLocation: inlineScript
+            inlineScript: |
+              az --version
+              az group create --name $(resourceGroupName) --location $(location)
+              az deployment group create --resource-group $(resourceGroupName) --template-file $(templateFile)
+
+
 
