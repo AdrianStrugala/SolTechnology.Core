@@ -103,7 +103,7 @@ stages:
             inlineScript: |
               az --version
               az group create --name $(resourceGroupName) --location $(location)
-              az deployment group create --resource-group $(resourceGroupName) --template-file '$(Pipeline.Workspace)\drop\$(templateFile)'
+              az deployment group create --resource-group $(resourceGroupName) --template-file '$(Pipeline.Workspace)\drop\Infrastructure\$(templateFile)'
 
 
 
