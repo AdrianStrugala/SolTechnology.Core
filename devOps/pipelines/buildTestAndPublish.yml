@@ -1,5 +1,10 @@
 variables:
   BuildConfiguration: 'Release'
+     
+  azureServiceConnection: 'azureSWO'
+  resourceGroupName: 'TaleCode'
+  location: 'westeurope'
+  templateFile: 'main.bicep'
 
 stages:
   - stage: TestApplication
@@ -83,12 +88,6 @@ stages:
 
   - stage: DeployProd
     displayName: Deploy to Production
-
-    variables:
-      azureServiceConnection: 'azureSWO'
-      resourceGroupName: 'TaleCode'
-      location: 'westeurope'
-      templateFile: 'main.bicep'
 
     jobs:
 
