@@ -93,6 +93,8 @@ stages:
 
     - job: Backend
       steps:
+        - task: DownloadPipelineArtifact@2
+
         - task: AzureCLI@2
           inputs:
             azureSubscription: $(azureServiceConnection)
@@ -101,7 +103,7 @@ stages:
             inlineScript: |
               az --version
               az group create --name $(resourceGroupName) --location $(location)
-              az deployment group create --resource-group $(resourceGroupName) --template-file $(templateFile)
+              az deployment group create --resource-group $(resourceGroupName) --template-file '$(Pipeline.Workspace)\drop\$(templateFile)
 
 
 
