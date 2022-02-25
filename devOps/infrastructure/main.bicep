@@ -30,7 +30,7 @@ param environmentName string = 'prod'
   'P4'
 ])
 @minLength(1)
-param skuName string = 'S0'
+param sqlSkuName string = 'S0'
 
 @description('Describes plan\'s pricing tier and capacity. Check details at https://azure.microsoft.com/en-us/pricing/details/app-service/')
 @allowed([
@@ -44,34 +44,25 @@ param skuName string = 'S0'
   'Dynamic'
 ])
 @minLength(1)
-param skuTier string = 'Standard'
+param sqlSkuTier string = 'Standard'
+
+param apiSkuName string = 'F1'
 
 
 
 
-
-
-
-
-
-
-
-
-resource hostingPlanName 'Microsoft.Web/serverfarms@2015-08-01' = {
+resource appServicePlan 'Microsoft.Web/serverfarms@2020-06-01' = {
   name: '${baseName}plan'
   location: resourceGroup().location
-  tags: {
-    displayName: 'HostingPlan'
+  properties: {
+    reserved: true
   }
   sku: {
-    name: skuName
-    tier: skuTier
+    name: apiSkuName
   }
-  properties: {
-    name: '${baseName}plan'
-    maximumNumberOfWorkers: 1
-  }
+  kind: 'linux'
 }
+
 
 resource api 'Microsoft.Web/sites@2015-08-01' = {
   name: apiName
@@ -82,7 +73,7 @@ resource api 'Microsoft.Web/sites@2015-08-01' = {
   }
   properties: {
     name: apiName
-    serverFarmId: hostingPlanName.id
+    serverFarmId: appServicePlan.id
     httpsOnly: true
     siteConfig: {
       appSettings: [
@@ -153,8 +144,8 @@ resource database 'Microsoft.Sql/servers/databases@2017-10-01-preview' = {
     displayName: 'Tale Code Database'
   }
   sku: {
-    name: skuName
-    tier: skuTier
+    name: sqlSkuName
+    tier: sqlSkuTier
   }
   properties: {}
   dependsOn: []
