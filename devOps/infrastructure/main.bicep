@@ -47,6 +47,16 @@ param skuName string = 'S0'
 param skuTier string = 'Standard'
 
 
+
+
+
+
+
+
+
+
+
+
 resource hostingPlanName 'Microsoft.Web/serverfarms@2015-08-01' = {
   name: '${baseName}plan'
   location: resourceGroup().location
@@ -59,7 +69,7 @@ resource hostingPlanName 'Microsoft.Web/serverfarms@2015-08-01' = {
   }
   properties: {
     name: '${baseName}plan'
-    numberOfWorkers: 1
+    maximumNumberOfWorkers: 1
   }
 }
 
@@ -119,6 +129,18 @@ resource appsettings 'Microsoft.Web/sites/config@2015-08-01' = {
   }
   properties: {
     ASPNETCORE_ENVIRONMENT: environmentName
+  }
+}
+
+resource sqlserver 'Microsoft.Sql/servers@2021-08-01-preview' = {
+  name: sqlServerName
+  location: resourceGroup().location
+  identity: {
+    type: 'None'
+    userAssignedIdentities: {}
+  }
+  properties: {
+    minimalTlsVersion: '1.2'
   }
 }
 

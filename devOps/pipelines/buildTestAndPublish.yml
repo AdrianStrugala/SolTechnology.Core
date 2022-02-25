@@ -112,7 +112,7 @@ stages:
             ServerName: talecode.database.windows.net
             DatabaseName: talecode
             SqlUsername: adrian
-            SqlPassword: 'P4ssw0rd@'
+            SqlPassword: 'password_xxddd_2137'
             DacpacFile: '$(Pipeline.Workspace)\drop\Database\TaleCodeDatabase.dacpac'
 
 
