@@ -140,6 +140,8 @@ resource sqlserver 'Microsoft.Sql/servers@2021-08-01-preview' = {
     userAssignedIdentities: {}
   }
   properties: {
+    administratorLogin: 'adrian'
+    administratorLoginPassword: 'password_xxddd_2137'
     minimalTlsVersion: '1.2'
   }
 }
