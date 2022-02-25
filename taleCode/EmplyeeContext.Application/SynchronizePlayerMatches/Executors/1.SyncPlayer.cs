@@ -50,6 +50,9 @@ namespace SolTechnology.TaleCode.PlayerRegistry.Commands.SynchronizePlayerMatche
             }
 
             context.Player = player;
+
+
+            Console.WriteLine($"Sync player [{player.ApiId}] - SUCCESS");
         }
     }
 }

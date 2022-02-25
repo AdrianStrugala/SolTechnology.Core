@@ -13,7 +13,7 @@ IBlobContainerClientWrapper (read and write operation)
 
 
 For HttpClient:
-IApiClientFactory
+     services.AddApiClient<IFootballDataApiClient, FootballDataApiClient>("football-data");  //has to match the name from configuration
 
 Guards:
  * provides series of extension methods protecting arguments from invalid value (code contract pattern)

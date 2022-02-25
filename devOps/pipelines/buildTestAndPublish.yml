@@ -89,6 +89,8 @@ stages:
     jobs: 
 
     - job: DeployProd
+      pool:
+        vmImage: 'windows-latest'
       steps:
         - task: DownloadPipelineArtifact@2
 
