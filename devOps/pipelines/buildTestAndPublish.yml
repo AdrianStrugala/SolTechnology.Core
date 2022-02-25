@@ -57,7 +57,7 @@ stages:
     displayName: Publish Artifacts
     jobs:
 
-    - job: Backend
+    - job: PublishArtifacts
       steps:
         - task: CopyFiles@2
           displayName: 'Publish Infrastructure'
@@ -89,9 +89,9 @@ stages:
   - stage: DeployProd
     displayName: Deploy to Production
 
-    jobs:
+    jobs: 
 
-    - job: Backend
+    - job: DeployProd
       steps:
         - task: DownloadPipelineArtifact@2
 
@@ -104,6 +104,16 @@ stages:
               az --version
               az group create --name $(resourceGroupName) --location $(location)
               az deployment group create --resource-group $(resourceGroupName) --template-file '$(Pipeline.Workspace)\drop\Infrastructure\$(templateFile)'
+
+        - task: SqlAzureDacpacDeployment@1
+          displayName: 'Deploy Database'
+          inputs:
+            azureSubscription: $(azureServiceConnection)
+            ServerName: talecode.database.windows.net
+            DatabaseName: talecode
+            SqlUsername: adrian
+            SqlPassword: 'P4ssw0rd@'
+            DacpacFile: '$(Pipeline.Workspace)\drop\Database\TaleCodeDatabase.dacpac'
 
 
 
