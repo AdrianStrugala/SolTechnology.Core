@@ -49,7 +49,7 @@ param sqlSkuTier string = 'Standard'
 param apiSkuName string = 'F1'
 
 
-
+//API-----------------------------------------------------------------------------------------------------------------
 
 resource appServicePlan 'Microsoft.Web/serverfarms@2020-06-01' = {
   name: '${baseName}plan'
@@ -83,7 +83,6 @@ resource api 'Microsoft.Web/sites@2015-08-01' = {
         }
       ]
       http20Enabled: true
-      alwaysOn: true
       minTlsVersion: '1.2'
       autoHealEnabled: true
       autoHealRules: {
@@ -122,6 +121,11 @@ resource appsettings 'Microsoft.Web/sites/config@2015-08-01' = {
     ASPNETCORE_ENVIRONMENT: environmentName
   }
 }
+
+
+
+//SQL-----------------------------------------------------------------------------------------------------------------
+
 
 resource sqlserver 'Microsoft.Sql/servers@2021-08-01-preview' = {
   name: sqlServerName
