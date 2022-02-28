@@ -108,7 +108,7 @@ stages:
           displayName: 'Deploy Database'
           inputs:
             azureSubscription: $(azureServiceConnection)
-            ServerName: talecode.database.windows.net
+            ServerName: talecodesqlserver.database.windows.net
             DatabaseName: talecode
             SqlUsername: adrian
             SqlPassword: 'password_xxddd_2137'
