@@ -119,6 +119,7 @@ resource appsettings 'Microsoft.Web/sites/config@2015-08-01' = {
   }
   properties: {
     ASPNETCORE_ENVIRONMENT: environmentName
+    Configuration__Sql__ConnectionString: 'Server=tcp:talecodesqlserver.database.windows.net,1433;Initial Catalog=talecode;Persist Security Info=False;User ID=adrian;Password=password_xxddd_2137;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;'
   }
 }
 
