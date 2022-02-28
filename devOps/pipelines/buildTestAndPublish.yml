@@ -114,5 +114,13 @@ stages:
             SqlPassword: 'password_xxddd_2137'
             DacpacFile: '$(Pipeline.Workspace)\drop\Database\TaleCodeDatabase.dacpac'
 
+        - task: AzureRmWebAppDeployment@4
+          displayName: 'Deploy Api'
+          inputs:
+            azureSubscription: $(azureServiceConnection)
+            WebAppName: 'talecodeapi'
+            packageForLinux: '$(Pipeline.Workspace)\drop\Api\SolTechnology.TaleCode.Api.zip'
+
+
 
 
