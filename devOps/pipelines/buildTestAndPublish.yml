@@ -1,4 +1,5 @@
 variables:
+ - group: talecode
   BuildConfiguration: 'Release'
      
   azureServiceConnection: 'azureSWO'
