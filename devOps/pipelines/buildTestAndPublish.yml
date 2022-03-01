@@ -55,7 +55,7 @@ stages:
     jobs:
 
     - job: PublishArtifacts
-    displayName: 'Publish Infrastructure'
+      displayName: 'Publish Artifacts'
       steps:
         - task: CopyFiles@2
           displayName: 'Publish Infrastructure'
