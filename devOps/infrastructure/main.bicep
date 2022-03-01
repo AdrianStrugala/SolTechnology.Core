@@ -46,7 +46,7 @@ param sqlSkuName string = 'S0'
 @minLength(1)
 param sqlSkuTier string = 'Standard'
 
-param apiSkuName string = 'S1'
+param apiSkuName string = 'B1'
 
 
 //API-----------------------------------------------------------------------------------------------------------------
@@ -60,7 +60,7 @@ resource appServicePlan 'Microsoft.Web/serverfarms@2020-06-01' = {
   sku: {
     name: apiSkuName
   }
-  kind: 'linux'
+  kind: 'windows'
 }
 
 
