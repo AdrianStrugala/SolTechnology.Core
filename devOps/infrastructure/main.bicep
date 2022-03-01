@@ -46,7 +46,7 @@ param sqlSkuName string = 'S0'
 @minLength(1)
 param sqlSkuTier string = 'Standard'
 
-param apiSkuName string = 'F1'
+param apiSkuName string = 'S1'
 
 
 //API-----------------------------------------------------------------------------------------------------------------
