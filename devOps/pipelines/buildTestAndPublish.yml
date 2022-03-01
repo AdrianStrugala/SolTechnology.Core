@@ -75,7 +75,7 @@ stages:
           inputs:
             command: publish
             projects: '**/Api.csproj'
-            arguments: '--configuration 'Release' -o $(Build.ArtifactStagingDirectory)/Api'
+            arguments: '--configuration Release --output $(Build.ArtifactStagingDirectory)/Api'
 
         - task: PublishBuildArtifacts@1
           inputs:
@@ -114,12 +114,13 @@ stages:
             SqlPassword: 'password_xxddd_2137'
             DacpacFile: '$(Pipeline.Workspace)\drop\Database\TaleCodeDatabase.dacpac'
 
-        - task: AzureRmWebAppDeployment@4
+        - task: AzureWebApp@1
           displayName: 'Deploy Api'
           inputs:
+            appType: webAppLinux
             azureSubscription: $(azureServiceConnection)
-            WebAppName: 'talecodeapi'
-            packageForLinux: '$(Pipeline.Workspace)\drop\Api\SolTechnology.TaleCode.Api.zip'
+            appName: 'talecodeapi'
+            package: '$(Pipeline.Workspace)\drop\Api\SolTechnology.TaleCode.Api.zip'
 
 
 

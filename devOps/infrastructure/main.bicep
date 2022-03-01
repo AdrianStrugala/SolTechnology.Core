@@ -64,7 +64,7 @@ resource appServicePlan 'Microsoft.Web/serverfarms@2020-06-01' = {
 }
 
 
-resource api 'Microsoft.Web/sites@2015-08-01' = {
+resource api 'Microsoft.Web/sites@2021-02-01' = {
   name: apiName
   location: resourceGroup().location
   tags: {
@@ -72,7 +72,6 @@ resource api 'Microsoft.Web/sites@2015-08-01' = {
     displayName: 'Tale Code'
   }
   properties: {
-    name: apiName
     serverFarmId: appServicePlan.id
     httpsOnly: true
     siteConfig: {
@@ -82,6 +81,8 @@ resource api 'Microsoft.Web/sites@2015-08-01' = {
           value: app_insights.properties.InstrumentationKey
         }
       ]
+      ftpsState: 'Disabled'
+      netFrameworkVersion: 'v6.0'
       http20Enabled: true
       minTlsVersion: '1.2'
       autoHealEnabled: true
