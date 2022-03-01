@@ -1,11 +1,16 @@
 variables:
  - group: talecode
-  BuildConfiguration: 'Release'
-     
-  azureServiceConnection: 'azureSWO'
-  resourceGroupName: 'TaleCode'
-  location: 'westeurope'
-  templateFile: 'main.bicep'
+
+ - name: BuildConfiguration
+   value: 'Release'
+ - name: azureServiceConnection
+   value: 'azureSWO'
+ - name: resourceGroupName
+   value: 'TaleCode'
+ - name: location
+   value: 'westeurope'
+ - name: templateFile
+   value: 'main.bicep'
 
 stages:
   - stage: TestApplication
