@@ -85,7 +85,7 @@ stages:
 
         - task: FileTransform@1
           inputs:
-            folderPath: '$(System.DefaultWorkingDirectory)/**/*.zip'
+            folderPath: '$(Build.ArtifactStagingDirectory)/**/*.zip'
             fileType: 'json'
             targetFiles: '**/appsettings.json'
 
