@@ -55,6 +55,7 @@ stages:
     jobs:
 
     - job: PublishArtifacts
+    displayName: 'Publish Infrastructure'
       steps:
         - task: CopyFiles@2
           displayName: 'Publish Infrastructure'
@@ -73,9 +74,8 @@ stages:
           displayName: 'Publish Api'
           inputs:
             command: publish
-            publishWebProjects: false
             projects: '**/Api.csproj'
-            arguments: '-o $(Build.ArtifactStagingDirectory)/Api'
+            arguments: '--configuration 'Release' -o $(Build.ArtifactStagingDirectory)/Api'
 
         - task: PublishBuildArtifacts@1
           inputs:
