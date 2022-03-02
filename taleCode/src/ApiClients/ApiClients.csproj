@@ -10,7 +10,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\SolTechnology.Core.ApiClient\SolTechnology.Core.ApiClient.csproj" />
+    <ProjectReference Include="..\..\..\src\SolTechnology.Core.ApiClient\SolTechnology.Core.ApiClient.csproj" />
   </ItemGroup>
 
 </Project>

@@ -18,25 +18,25 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SolTechnology.Core.ApiClien
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "TaleCode", "TaleCode", "{15E8DC7F-F76A-4151-B0FA-5A3F5D4DCAE6}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ApiClients", "..\taleCode\ApiClients\ApiClients.csproj", "{9E260D54-6C20-4ADA-87B8-6635E4964748}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ApiClients", "..\taleCode\src\ApiClients\ApiClients.csproj", "{9E260D54-6C20-4ADA-87B8-6635E4964748}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BackgroundWorker", "..\taleCode\BackgroundWorker\BackgroundWorker.csproj", "{2289395C-FF89-4BF3-806C-4B1FD93A16E5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BackgroundWorker", "..\taleCode\src\BackgroundWorker\BackgroundWorker.csproj", "{2289395C-FF89-4BF3-806C-4B1FD93A16E5}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BlobData", "..\taleCode\BlobData\BlobData.csproj", "{D95FCD69-EB99-45B9-955D-34D61F7BB8B3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BlobData", "..\taleCode\src\BlobData\BlobData.csproj", "{D95FCD69-EB99-45B9-955D-34D61F7BB8B3}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Domain", "..\taleCode\Domain\Domain.csproj", "{DA0EB4EE-0317-4250-A7DB-1011DBB9CBB4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Domain", "..\taleCode\src\Domain\Domain.csproj", "{DA0EB4EE-0317-4250-A7DB-1011DBB9CBB4}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PlayerRegistry.Queries", "..\taleCode\EmployeeManager.Queries\PlayerRegistry.Queries.csproj", "{B99AD9EA-157B-4148-9951-1D41EF4FE75A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PlayerRegistry.Queries", "..\taleCode\src\EmployeeManager.Queries\PlayerRegistry.Queries.csproj", "{B99AD9EA-157B-4148-9951-1D41EF4FE75A}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PlayerRegistry.Commands", "..\taleCode\EmplyeeContext.Application\PlayerRegistry.Commands.csproj", "{348B5788-58E6-4289-83C2-1AC2BF504ED4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PlayerRegistry.Commands", "..\taleCode\src\EmplyeeContext.Application\PlayerRegistry.Commands.csproj", "{348B5788-58E6-4289-83C2-1AC2BF504ED4}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EventListener", "..\taleCode\EventListener\EventListener.csproj", "{09E8060B-03E2-4C64-BD46-2BD88999646F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EventListener", "..\taleCode\src\EventListener\EventListener.csproj", "{09E8060B-03E2-4C64-BD46-2BD88999646F}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Infrastructure", "..\taleCode\Infrastructure\Infrastructure.csproj", "{2D037884-D5CF-4364-947A-F41BA46D1DB7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Infrastructure", "..\taleCode\src\Infrastructure\Infrastructure.csproj", "{2D037884-D5CF-4364-947A-F41BA46D1DB7}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Api", "..\taleCode\SolTechnology.TaleCode.Api\Api.csproj", "{F04206F8-8F71-4B16-9686-7A7D15FBB1E0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Api", "..\taleCode\src\SolTechnology.TaleCode.Api\Api.csproj", "{F04206F8-8F71-4B16-9686-7A7D15FBB1E0}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SqlData", "..\taleCode\SqlData\SqlData.csproj", "{FD781473-32FC-4F65-95D5-7D269B8631FA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SqlData", "..\taleCode\src\SqlData\SqlData.csproj", "{FD781473-32FC-4F65-95D5-7D269B8631FA}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "PresentationLayer", "PresentationLayer", "{53156430-F3F1-432F-A13F-6F8B486F811F}"
 EndProject
@@ -44,11 +44,21 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "DataLayer", "DataLayer", "{
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "LogicLayer", "LogicLayer", "{7BF4DB8D-9C8C-44E9-9D73-CBC102D8FEB3}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TaleCodeDatabase", "..\taleCode\TaleCodeDatabase\TaleCodeDatabase.csproj", "{8231F2DF-9BB3-4624-B9CB-8F66826E8272}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TaleCodeDatabase", "..\taleCode\src\TaleCodeDatabase\TaleCodeDatabase.csproj", "{8231F2DF-9BB3-4624-B9CB-8F66826E8272}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SolTechnology.Core.Guards", "SolTechnology.Core.Guards\SolTechnology.Core.Guards.csproj", "{F1246CF6-259E-43FF-8FAB-C632921E13AC}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{7EF7950D-4549-43F6-A47C-FDF15CD6D98F}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{B490A69B-B247-42A5-A437-DBC78A026CA2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TaleCode.UnitTests", "..\taleCode\tests\TaleCode.UnitTests\TaleCode.UnitTests.csproj", "{30E24C35-CB21-48E4-8008-DC021D337DD1}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TaleCode.IntegrationTests", "..\taleCode\tests\TaleCode.IntegrationTests\TaleCode.IntegrationTests.csproj", "{9026BB1F-AB80-4592-A6D4-85247DBA86DF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TaleCode.FunctionalTests", "..\taleCode\tests\TaleCode.FunctionalTests\TaleCode.FunctionalTests.csproj", "{D72660DF-0766-4325-AE19-74D27890CD17}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SolTechnology.Core.Sql.Tests", "..\tests\SolTechnology.Core.Sql.Tests\SolTechnology.Core.Sql.Tests.csproj", "{A176409E-DC28-4557-8416-A11C6EE61555}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -116,6 +126,22 @@ Global
 		{F1246CF6-259E-43FF-8FAB-C632921E13AC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F1246CF6-259E-43FF-8FAB-C632921E13AC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F1246CF6-259E-43FF-8FAB-C632921E13AC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{30E24C35-CB21-48E4-8008-DC021D337DD1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{30E24C35-CB21-48E4-8008-DC021D337DD1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{30E24C35-CB21-48E4-8008-DC021D337DD1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{30E24C35-CB21-48E4-8008-DC021D337DD1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9026BB1F-AB80-4592-A6D4-85247DBA86DF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9026BB1F-AB80-4592-A6D4-85247DBA86DF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9026BB1F-AB80-4592-A6D4-85247DBA86DF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9026BB1F-AB80-4592-A6D4-85247DBA86DF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D72660DF-0766-4325-AE19-74D27890CD17}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D72660DF-0766-4325-AE19-74D27890CD17}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D72660DF-0766-4325-AE19-74D27890CD17}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D72660DF-0766-4325-AE19-74D27890CD17}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A176409E-DC28-4557-8416-A11C6EE61555}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A176409E-DC28-4557-8416-A11C6EE61555}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A176409E-DC28-4557-8416-A11C6EE61555}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A176409E-DC28-4557-8416-A11C6EE61555}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -135,6 +161,11 @@ Global
 		{34FBF818-929B-408B-B6BF-FE6355A94DB0} = {15E8DC7F-F76A-4151-B0FA-5A3F5D4DCAE6}
 		{7BF4DB8D-9C8C-44E9-9D73-CBC102D8FEB3} = {15E8DC7F-F76A-4151-B0FA-5A3F5D4DCAE6}
 		{8231F2DF-9BB3-4624-B9CB-8F66826E8272} = {15E8DC7F-F76A-4151-B0FA-5A3F5D4DCAE6}
+		{B490A69B-B247-42A5-A437-DBC78A026CA2} = {15E8DC7F-F76A-4151-B0FA-5A3F5D4DCAE6}
+		{30E24C35-CB21-48E4-8008-DC021D337DD1} = {B490A69B-B247-42A5-A437-DBC78A026CA2}
+		{9026BB1F-AB80-4592-A6D4-85247DBA86DF} = {B490A69B-B247-42A5-A437-DBC78A026CA2}
+		{D72660DF-0766-4325-AE19-74D27890CD17} = {B490A69B-B247-42A5-A437-DBC78A026CA2}
+		{A176409E-DC28-4557-8416-A11C6EE61555} = {7EF7950D-4549-43F6-A47C-FDF15CD6D98F}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {56BC2B7E-7B9F-4B05-951A-C0E3CF0D1287}
