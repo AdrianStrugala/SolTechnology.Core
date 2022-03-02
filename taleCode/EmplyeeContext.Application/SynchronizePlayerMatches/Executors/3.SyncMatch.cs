@@ -1,4 +1,5 @@
 ﻿using ApiClients.FootballDataApi;
+using Microsoft.Extensions.Logging;
 using SolTechnology.TaleCode.PlayerRegistry.Commands.SynchronizePlayerMatches.Interfaces;
 using SolTechnology.TaleCode.SqlData.Repository.ExecutionErrorRepository;
 using SolTechnology.TaleCode.SqlData.Repository.MatchRepository;
@@ -11,12 +12,18 @@ namespace SolTechnology.TaleCode.PlayerRegistry.Commands.SynchronizePlayerMatche
         private readonly IFootballDataApiClient _footballDataApiClient;
         private readonly IMatchRepository _matchRepository;
         private readonly IExecutionErrorRepository _executionErrorRepository;
+        private readonly ILogger<SyncMatch> _logger;
 
-        public SyncMatch(IFootballDataApiClient footballDataApiClient, IMatchRepository matchRepository, IExecutionErrorRepository executionErrorRepository)
+        public SyncMatch(
+            IFootballDataApiClient footballDataApiClient,
+            IMatchRepository matchRepository,
+            IExecutionErrorRepository executionErrorRepository,
+            ILogger<SyncMatch> logger)
         {
             _footballDataApiClient = footballDataApiClient;
             _matchRepository = matchRepository;
             _executionErrorRepository = executionErrorRepository;
+            _logger = logger;
         }
 
         public async Task Execute(SynchronizePlayerMatchesContext context, int matchId)
@@ -39,11 +46,11 @@ namespace SolTechnology.TaleCode.PlayerRegistry.Commands.SynchronizePlayerMatche
 
                 _matchRepository.Insert(match);
 
-                Console.WriteLine($"Sync match [{match.ApiId}] - SUCCESS");
+                _logger.LogInformation($"Sync match [{match.ApiId}] - SUCCESS");
             }
             catch (Exception e)
             {
-                Console.WriteLine(e);
+                _logger.LogError(e.Message);
 
                 _executionErrorRepository.Insert(new ExecutionError(ReferenceType.Match, clientMatch.Id, e.Message));
             }
