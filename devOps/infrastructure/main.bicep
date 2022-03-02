@@ -75,12 +75,6 @@ resource api 'Microsoft.Web/sites@2021-02-01' = {
     serverFarmId: appServicePlan.id
     httpsOnly: true
     siteConfig: {
-      appSettings: [
-        {
-          name: 'APPINSIGHTS_INSTRUMENTATIONKEY'
-          value: app_insights.properties.InstrumentationKey
-        }
-      ]
       ftpsState: 'Disabled'
       netFrameworkVersion: 'v6.0'
       http20Enabled: true
@@ -120,6 +114,7 @@ resource appsettings 'Microsoft.Web/sites/config@2015-08-01' = {
   }
   properties: {
     ASPNETCORE_ENVIRONMENT: environmentName
+    APPINSIGHTS_INSTRUMENTATIONKEY: app_insights.properties.InstrumentationKey
   }
 }
 
