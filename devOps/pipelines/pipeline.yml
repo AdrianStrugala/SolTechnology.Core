@@ -107,6 +107,7 @@ stages:
         - task: DownloadPipelineArtifact@2
 
         - task: AzureCLI@2
+          displayName: 'Deploy Infrastructure'
           inputs:
             azureSubscription: $(azureServiceConnection)
             scriptType: bash
@@ -117,16 +118,16 @@ stages:
               az deployment group create \
               --resource-group $(resourceGroupName) \
               --template-file '$(Pipeline.Workspace)\drop\Infrastructure\$(templateFile)' \
-              --parameters testParam='$(testParam)' baseName='taleCode'
+              --parameters testParam='$(testParam)' baseName='taleCode' sqlAdminUserName='$(sqlAdminUserName)' sqlAdminPassword='$(sqlAdminPassword)' sqlServerName='$(sqlServerName)' databaseName='$(databaseName)' apiName='$(apiName)'
 
         - task: SqlAzureDacpacDeployment@1
           displayName: 'Deploy Database'
           inputs:
             azureSubscription: $(azureServiceConnection)
-            ServerName: talecodesqlserver.database.windows.net
-            DatabaseName: talecode
-            SqlUsername: adrian
-            SqlPassword: 'password_xxddd_2137'
+            ServerName: '$(sqlServerName).database.windows.net'
+            DatabaseName: $(databaseName)
+            SqlUsername: $(sqlAdminUserName)
+            SqlPassword: $(sqlAdminPassword)
             DacpacFile: '$(Pipeline.Workspace)\drop\Database\TaleCodeDatabase.dacpac'
 
         - task: AzureWebApp@1
@@ -134,7 +135,7 @@ stages:
           inputs:
             appType: webAppLinux
             azureSubscription: $(azureServiceConnection)
-            appName: 'talecodeapi'
+            appName: $(apiName)
             package: '$(Pipeline.Workspace)\drop\Api\SolTechnology.TaleCode.Api.zip'
 
 

@@ -1,23 +1,22 @@
-@minLength(1)
+
+//BASE PARAMS
 param baseName string = 'talecode'
-
-@minLength(1)
-param apiName string = '${baseName}api'
-
-@minLength(1)
-param sqlServerName string = '${baseName}sqlserver'
-
-@minLength(1)
-param databaseName string = baseName
-
-@minLength(1)
 param environmentName string = 'prod'
-
+param location string = resourceGroup().location
 param testParam string
 
-param appServicePlanName string = '${baseName}plan'
 
-param location string = resourceGroup().location
+//API PARAMS
+param appServicePlanName string = '${baseName}plan'
+param apiName string
+param apiSkuName string = 'B1'
+
+
+//SQL PARAMS
+param sqlServerName string
+param databaseName string
+param sqlAdminUserName string
+param sqlAdminPassword string
 
 @description('Describes plan\'s pricing tier and capacity. Check details at https://azure.microsoft.com/en-us/pricing/details/app-service/')
 @allowed([
@@ -52,7 +51,7 @@ param sqlSkuName string = 'S0'
 @minLength(1)
 param sqlSkuTier string = 'Standard'
 
-param apiSkuName string = 'B1'
+
 
 
 //API-----------------------------------------------------------------------------------------------------------------
@@ -138,8 +137,8 @@ resource sqlserver 'Microsoft.Sql/servers@2021-08-01-preview' = {
     userAssignedIdentities: {}
   }
   properties: {
-    administratorLogin: 'adrian'
-    administratorLoginPassword: 'password_xxddd_2137'
+    administratorLogin: sqlAdminUserName
+    administratorLoginPassword: sqlAdminPassword
     minimalTlsVersion: '1.2'
   }
 }
