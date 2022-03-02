@@ -13,6 +13,12 @@ param databaseName string = baseName
 @minLength(1)
 param environmentName string = 'prod'
 
+param testParam string
+
+param appServicePlanName string = '${baseName}plan'
+
+param location string = resourceGroup().location
+
 @description('Describes plan\'s pricing tier and capacity. Check details at https://azure.microsoft.com/en-us/pricing/details/app-service/')
 @allowed([
   'F1'
@@ -52,21 +58,21 @@ param apiSkuName string = 'B1'
 //API-----------------------------------------------------------------------------------------------------------------
 
 resource appServicePlan 'Microsoft.Web/serverfarms@2020-06-01' = {
-  name: '${baseName}plan'
-  location: resourceGroup().location
+  name: appServicePlanName
+  location: location
   properties: {
     reserved: true
   }
   sku: {
     name: apiSkuName
   }
-  kind: 'windows'
+  kind: 'linux'
 }
 
 
 resource api 'Microsoft.Web/sites@2021-02-01' = {
   name: apiName
-  location: resourceGroup().location
+  location: location
   tags: {
     'hidden-related:${resourceGroup().id}/providers/Microsoft.Web/serverfarms/${apiName}': 'Resource'
     displayName: 'Tale Code'
@@ -107,13 +113,14 @@ resource api 'Microsoft.Web/sites@2021-02-01' = {
 
 resource appsettings 'Microsoft.Web/sites/config@2015-08-01' = {
   parent: api
-  location: resourceGroup().location
+  location: location
   name: 'appsettings'
   tags: {
     displayName: 'appsettings'
   }
   properties: {
     ASPNETCORE_ENVIRONMENT: environmentName
+    TEST_PARAM: testParam
     APPINSIGHTS_INSTRUMENTATIONKEY: app_insights.properties.InstrumentationKey
   }
 }
@@ -125,7 +132,7 @@ resource appsettings 'Microsoft.Web/sites/config@2015-08-01' = {
 
 resource sqlserver 'Microsoft.Sql/servers@2021-08-01-preview' = {
   name: sqlServerName
-  location: resourceGroup().location
+  location: location
   identity: {
     type: 'None'
     userAssignedIdentities: {}
@@ -139,7 +146,7 @@ resource sqlserver 'Microsoft.Sql/servers@2021-08-01-preview' = {
 
 resource database 'Microsoft.Sql/servers/databases@2017-10-01-preview' = {
   name: '${sqlServerName}/${databaseName}'
-  location: resourceGroup().location
+  location: location
   tags: {
     displayName: 'Tale Code Database'
   }
@@ -161,7 +168,7 @@ resource database_retention 'Microsoft.Sql/servers/databases/backupLongTermReten
 
 resource app_insights 'Microsoft.Insights/components@2014-04-01' = {
   name: baseName
-  location: resourceGroup().location
+  location: location
   tags: {
     'hidden-link:${resourceGroup().id}/providers/Microsoft.Web/sites/${baseName}': 'Resource'
     displayName: 'AppInsights'

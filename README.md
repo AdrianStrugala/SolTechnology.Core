@@ -35,3 +35,8 @@ https://api.football-data.org/v2/matches/327130
 4) calculate how many matches of player led to team victory
 
 
+
+Deployment:
+
+Infrastrucutre comes from Bicep (ARM Template overlay)
+Deployed by yaml pipeline in 3 steps: Test, Build&Publish, Deploy
