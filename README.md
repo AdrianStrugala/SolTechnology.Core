@@ -1,42 +1,59 @@
 # SolTechnology.Core
 
 
+
 I will fill this one day
+
+
+Table of Contents
+
+I. SolTechnology Core Libraries:
+
+- SQL
 
 For SQL DB use:
 ISqlConnectionFactory
 
 
-For Blob:
+ - Blob:
 IBlobConnectionFactory
 IBlobContainerClientWrapper (read and write operation)
 
 
-For HttpClient:
+- HttpClient:
      services.AddApiClient<IFootballDataApiClient, FootballDataApiClient>("football-data");  //has to match the name from configuration
 
-Guards:
+- Guards:
  * provides series of extension methods protecting arguments from invalid value (code contract pattern)
 Guards.Method()
 
 
 
 
-For TaleCode:
+II. TaleCode:
 
-1) get matches of player by player id
+1) App idea
+
+a) get matches of player by player id
 http://api.football-data.org/v2/players/44/matches?limit=1
 
-2) get match details by match id
+b) get match details by match id
 https://api.football-data.org/v2/matches/327130
 
-3) store match result
+c) store match result
 
-4) calculate how many matches of player led to team victory
+d) calculate how many matches of player led to team victory
 
 
+2) Architecture
 
-Deployment:
+3) Infrastructure and Deployment
 
 Infrastrucutre comes from Bicep (ARM Template overlay)
 Deployed by yaml pipeline in 3 steps: Test, Build&Publish, Deploy
+
+
+4) Tale Code Approach
+
+
+

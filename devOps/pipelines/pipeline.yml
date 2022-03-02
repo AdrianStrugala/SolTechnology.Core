@@ -117,7 +117,7 @@ stages:
               az deployment group create \
               --resource-group $(resourceGroupName) \
               --template-file '$(Pipeline.Workspace)\drop\Infrastructure\$(templateFile)' \
-              --parameters testParam='$(testParam)' myParam2='myValue2'
+              --parameters testParam='$(testParam)' baseName='taleCode'
 
         - task: SqlAzureDacpacDeployment@1
           displayName: 'Deploy Database'
