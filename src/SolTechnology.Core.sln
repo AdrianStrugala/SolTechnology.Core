@@ -48,6 +48,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TaleCodeDatabase", "..\tale
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SolTechnology.Core.Guards", "SolTechnology.Core.Guards\SolTechnology.Core.Guards.csproj", "{F1246CF6-259E-43FF-8FAB-C632921E13AC}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{7EF7950D-4549-43F6-A47C-FDF15CD6D98F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU

@@ -44,13 +44,14 @@ c) store match result
 
 d) calculate how many matches of player led to team victory
 
-
 2) Architecture
 
 3) Infrastructure and Deployment
 
 Infrastrucutre comes from Bicep (ARM Template overlay)
 Deployed by yaml pipeline in 3 steps: Test, Build&Publish, Deploy
+
+Configuration is tokenized. Values come from Pipelines->Library->VariableGroup
 
 
 4) Tale Code Approach

@@ -42,7 +42,7 @@ stages:
         displayName: Deploy DB locally
         inputs:
           targetType: 'inline'
-          workingDirectory: 'taleCode/TaleCodeDatabase'
+          workingDirectory: 'taleCode/src/TaleCodeDatabase'
           script: |
             dotnet publish /p:TargetServerName=localhost /p:TargetPort=1401 /p:TargetUser=sa /p:TargetPassword=password_xxddd_2137 /p:TargetDatabaseName=TaleCodeDatabase
 
@@ -50,7 +50,7 @@ stages:
         displayName: 'Run unit tests'
         inputs:
           command: 'test'
-          projects: '**/*Tests.csproj'
+          projects: 'taleCode/**/*Tests.csproj'
           custom: 'msbuild'
           arguments: '-p:Configuration=$(BuildConfiguration)'
           publishTestResults: true
@@ -66,21 +66,21 @@ stages:
         - task: CopyFiles@2
           displayName: 'Publish Infrastructure'
           inputs:
-            sourceFolder: 'devOps/infrastructure'
+            sourceFolder: 'taleCode/devOps/infrastructure'
             contents: '*'
             targetFolder: $(Build.ArtifactStagingDirectory)/Infrastructure
 
         - task: DotNetCoreCLI@2
           displayName: 'Publish Database'
           inputs:
-            projects: '**/TaleCodeDatabase.csproj'
+            projects: 'taleCode/**/TaleCodeDatabase.csproj'
             arguments: '-o $(Build.ArtifactStagingDirectory)/Database'
           
         - task: DotNetCoreCLI@2
           displayName: 'Publish Api'
           inputs:
             command: publish
-            projects: '**/Api.csproj'
+            projects: 'taleCode/**/Api.csproj'
             arguments: '--configuration Release --output $(Build.ArtifactStagingDirectory)/Api'
 
         - task: FileTransform@1
