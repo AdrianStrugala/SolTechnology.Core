@@ -30,5 +30,9 @@ namespace SolTechnology.Core.Sql.Connection
             return connection;
         }
 
+        public string GetConnectionString()
+        {
+            return _connectionString;
+        }
     }
 }

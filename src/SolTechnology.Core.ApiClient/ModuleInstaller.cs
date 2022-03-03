@@ -28,7 +28,7 @@ namespace SolTechnology.Core.ApiClient
 
             var options = services.BuildServiceProvider().GetRequiredService<IOptions<ApiClientConfiguration>>().Value;
 
-            var httpClientConfiguration = options.HttpClients.FirstOrDefault(h => h.Name == httpClientName);
+            var httpClientConfiguration = options.HttpClients.FirstOrDefault(h => h.Name.Equals(httpClientName, StringComparison.InvariantCultureIgnoreCase));
             if (httpClientConfiguration == null)
             {
                 throw new ArgumentException($"The Http Client configuration for client: [{httpClientName}] is missing. Provide it by parameter or configuration section");

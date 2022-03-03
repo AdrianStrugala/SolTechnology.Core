@@ -2,9 +2,8 @@
 
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
-    <Nullable>enable</Nullable>
 
-    <IsPackable>false</IsPackable>
+	  <IsPackable>false</IsPackable>
   </PropertyGroup>
 
   <ItemGroup>
@@ -21,7 +20,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\SolTechnology.Core.Sql\SolTechnology.Core.Sql.csproj" />
+    <ProjectReference Include="..\..\src\SolTechnology.Core.ApiClient\SolTechnology.Core.ApiClient.csproj" />
   </ItemGroup>
 
 </Project>
