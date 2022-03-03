@@ -9,7 +9,7 @@ param testParam string
 //API PARAMS
 param appServicePlanName string = '${baseName}plan'
 param apiName string
-param apiSkuName string = 'B1'
+param apiSkuName string = 'F1'
 
 
 //SQL PARAMS
