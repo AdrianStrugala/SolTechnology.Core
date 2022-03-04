@@ -141,7 +141,7 @@ namespace SolTechnology.Core.Guards.Tests
 
             //Act
             var exception = Record.Exception(() => Guards.Int(underTest, nameof(underTest))
-                .Equal(underTest));
+                .Equal(50));
 
 
             //Assert
@@ -156,7 +156,7 @@ namespace SolTechnology.Core.Guards.Tests
 
             //Act
             var exception = Record.Exception(() => Guards.Int(underTest, nameof(underTest))
-                .Equal(345));
+                .NotEqual(underTest));
 
 
             //Assert
