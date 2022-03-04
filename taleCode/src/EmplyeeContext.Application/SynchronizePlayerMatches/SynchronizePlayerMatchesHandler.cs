@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
+using SolTechnology.Core.Logging;
 using SolTechnology.TaleCode.Infrastructure;
 using SolTechnology.TaleCode.PlayerRegistry.Commands.SynchronizePlayerMatches.Executors;
 using SolTechnology.TaleCode.PlayerRegistry.Commands.SynchronizePlayerMatches.Interfaces;
@@ -26,22 +27,25 @@ namespace SolTechnology.TaleCode.PlayerRegistry.Commands.SynchronizePlayerMatche
 
         public async Task Handle(SynchronizePlayerMatchesCommand command)
         {
-            _logger.LogInformation("Sync for playerId: [{command.PlayerId}] started");
-
-            var context = new SynchronizePlayerMatchesContext
+            using (_logger.OperationStarted(nameof(SynchronizePlayerMatches), new { command.PlayerId }))
             {
-                PlayerId = command.PlayerId
-            };
+                var context = new SynchronizePlayerMatchesContext
+                {
+                    PlayerId = command.PlayerId
+                };
 
 
-            await _syncPlayer.Execute(context);
+                await _syncPlayer.Execute(context);
 
-            _determineMatchesToSync.Execute(context);
+                _determineMatchesToSync.Execute(context);
 
 
-            foreach (var matchId in context.MatchesToSync)
-            {
-                await _syncMatch.Execute(context, matchId);
+                foreach (var matchId in context.MatchesToSync)
+                {
+                    await _syncMatch.Execute(context, matchId);
+                }
+
+                _logger.OperationSucceeded();
             }
         }
     }

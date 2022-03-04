@@ -1,5 +1,6 @@
 ﻿using ApiClients.FootballDataApi;
 using Microsoft.Extensions.Logging;
+using SolTechnology.Core.Logging;
 using SolTechnology.TaleCode.PlayerRegistry.Commands.SynchronizePlayerMatches.Interfaces;
 using SolTechnology.TaleCode.SqlData.Repository.ExecutionErrorRepository;
 using SolTechnology.TaleCode.SqlData.Repository.MatchRepository;
@@ -28,31 +29,35 @@ namespace SolTechnology.TaleCode.PlayerRegistry.Commands.SynchronizePlayerMatche
 
         public async Task Execute(SynchronizePlayerMatchesContext context, int matchId)
         {
-            var clientMatch = await _footballDataApiClient.GetMatchById(matchId);
-
-            try
+            using (_logger.OperationStarted(nameof(SyncMatch), new { matchId }))
             {
-                Match match = new Match(
-                    clientMatch.Id,
-                    context.PlayerId,
-                    clientMatch.Date,
-                    clientMatch.HomeTeam,
-                    clientMatch.AwayTeam,
-                    clientMatch.HomeTeamScore,
-                    clientMatch.AwayTeamScore,
-                    clientMatch.Winner);
+                var clientMatch = await _footballDataApiClient.GetMatchById(matchId);
 
-                match.AssignCompetitionWinner(clientMatch.CompetitionWinner);
+                try
+                {
+                    Match match = new Match(
+                        clientMatch.Id,
+                        context.PlayerId,
+                        clientMatch.Date,
+                        clientMatch.HomeTeam,
+                        clientMatch.AwayTeam,
+                        clientMatch.HomeTeamScore,
+                        clientMatch.AwayTeamScore,
+                        clientMatch.Winner);
 
-                _matchRepository.Insert(match);
+                    match.AssignCompetitionWinner(clientMatch.CompetitionWinner);
 
-                _logger.LogInformation($"Sync match [{match.ApiId}] - SUCCESS");
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e.Message);
+                    _matchRepository.Insert(match);
 
-                _executionErrorRepository.Insert(new ExecutionError(ReferenceType.Match, clientMatch.Id, e.Message));
+                    _logger.OperationSucceeded();
+                }
+                catch (Exception e)
+                {
+                    _logger.OperationFailed(e);
+
+                    _executionErrorRepository.Insert(new ExecutionError(ReferenceType.Match, clientMatch.Id,
+                        e.Message));
+                }
             }
         }
     }

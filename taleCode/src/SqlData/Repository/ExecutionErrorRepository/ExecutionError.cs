@@ -11,12 +11,12 @@ namespace SolTechnology.TaleCode.SqlData.Repository.ExecutionErrorRepository
 
         private ExecutionError()
         {
-
+            //required by ORM
         }
 
         public ExecutionError(ReferenceType referenceType, int referenceId, string message)
         {
-            Guards.IntNotZero(referenceId, nameof(referenceId));
+            Guards.Int(referenceId, nameof(referenceId)).NotZero();
 
             ReferenceType = referenceType;
             ReferenceId = referenceId;

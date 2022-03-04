@@ -7,9 +7,10 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-	  <ProjectReference Include="..\ApiClients\ApiClients.csproj" />
-	  <ProjectReference Include="..\Infrastructure\Infrastructure.csproj" />
-	  <ProjectReference Include="..\SqlData\SqlData.csproj" />
+		<ProjectReference Include="..\..\..\src\SolTechnology.Core.Logging\SolTechnology.Core.Logging.csproj" />
+		<ProjectReference Include="..\ApiClients\ApiClients.csproj" />
+		<ProjectReference Include="..\Infrastructure\Infrastructure.csproj" />
+		<ProjectReference Include="..\SqlData\SqlData.csproj" />
 	</ItemGroup>
 
 </Project>

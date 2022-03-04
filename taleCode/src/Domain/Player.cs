@@ -18,8 +18,8 @@ namespace SolTechnology.TaleCode.Domain
 
         public Player(int apiId, string name, string dateOfBirth, string nationality, string position, List<Match> matches)
         {
-            Guards.StringNotNullNorEmpty(name, nameof(name));
-            Guards.IntNotZero(apiId, nameof(apiId));
+            Guards.String(name, nameof(name)).NotNull().NotEmpty(); ;
+            Guards.Int(apiId, nameof(apiId)).NotZero();
 
             ApiId = apiId;
             Name = name;
