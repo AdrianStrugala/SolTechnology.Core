@@ -12,7 +12,7 @@
 		<Product>SolTechnology.Core.Logging</Product>
 		<PackageId>SolTechnology.Core.Logging</PackageId>
 		<RepositoryUrl>https://github.com/AdrianStrugala/SolTechnology.Core</RepositoryUrl>
-		<AssemblyName>SolTechnology.Core.Guards</AssemblyName>
+		<AssemblyName>SolTechnology.Core.Logging</AssemblyName>
 		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
 
 		<PackageIcon>docs\mini-logo.png</PackageIcon>
