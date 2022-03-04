@@ -80,7 +80,7 @@ stages:
           displayName: 'Publish Api'
           inputs:
             command: publish
-            projects: 'taleCode/src**/Api.csproj'
+            projects: 'taleCode/src/SolTechnology.TaleCode.Api/Api.csproj'
             arguments: '--configuration Release --output $(Build.ArtifactStagingDirectory)/Api'
 
         - task: FileTransform@1
