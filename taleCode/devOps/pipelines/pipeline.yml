@@ -93,6 +93,7 @@ stages:
           inputs:
             pathToPublish: '$(Build.ArtifactStagingDirectory)' 
             artifactName: 'drop' 
+          condition: always()
 
 
   - stage: Deploy
