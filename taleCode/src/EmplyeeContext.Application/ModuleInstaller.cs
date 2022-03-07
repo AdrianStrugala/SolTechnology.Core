@@ -1,10 +1,11 @@
-﻿using ApiClients;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
+using SolTechnology.TaleCode.ApiClients;
 using SolTechnology.TaleCode.Infrastructure;
 using SolTechnology.TaleCode.PlayerRegistry.Commands.SynchronizePlayerMatches;
 using SolTechnology.TaleCode.PlayerRegistry.Commands.SynchronizePlayerMatches.Executors;
 using SolTechnology.TaleCode.PlayerRegistry.Commands.SynchronizePlayerMatches.Interfaces;
 using SolTechnology.TaleCode.SqlData;
+using SolTechnology.TaleCode.StaticData;
 
 namespace SolTechnology.TaleCode.PlayerRegistry.Commands
 {
@@ -14,6 +15,7 @@ namespace SolTechnology.TaleCode.PlayerRegistry.Commands
         {
             services.AddSqlData();
             services.AddApiClients();
+            services.AddStaticData();
 
             services.AddTransient<ICommandHandler<SynchronizePlayerMatchesCommand>, SynchronizePlayerMatchesHandler>();
             services.AddTransient<ISyncPlayer, SyncPlayer>();

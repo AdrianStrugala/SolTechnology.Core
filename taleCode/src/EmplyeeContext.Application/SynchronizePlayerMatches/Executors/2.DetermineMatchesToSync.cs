@@ -18,7 +18,7 @@ namespace SolTechnology.TaleCode.PlayerRegistry.Commands.SynchronizePlayerMatche
 
         public void Execute(SynchronizePlayerMatchesContext context)
         {
-            var syncedMatches = _matchRepository.GetByPlayerId(context.PlayerId);
+            var syncedMatches = _matchRepository.GetByPlayerId(context.PlayerIdMap.FootballDataId);
             var syncedMatchesIds = syncedMatches.Select(m => m.ApiId);
 
             var failedMatches = _executionErrorRepository.GetByReferenceType(ReferenceType.Match);

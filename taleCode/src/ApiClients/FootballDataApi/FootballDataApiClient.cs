@@ -1,6 +1,6 @@
-﻿using ApiClients.FootballDataApi.Models;
+﻿using SolTechnology.TaleCode.ApiClients.FootballDataApi.Models;
 
-namespace ApiClients.FootballDataApi
+namespace SolTechnology.TaleCode.ApiClients.FootballDataApi
 {
     public class FootballDataApiClient : IFootballDataApiClient
     {

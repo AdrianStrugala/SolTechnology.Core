@@ -4,11 +4,11 @@ namespace SolTechnology.TaleCode.PlayerRegistry.Commands.SynchronizePlayerMatche
 {
     public class SynchronizePlayerMatchesCommand : ICommand
     {
-        public int PlayerId { get; set; }
+        public string PlayerName { get; set; }
 
-        public SynchronizePlayerMatchesCommand(int playerId)
+        public SynchronizePlayerMatchesCommand(string playerName)
         {
-            PlayerId = playerId;
+            PlayerName = playerName;
         }
     }
 }

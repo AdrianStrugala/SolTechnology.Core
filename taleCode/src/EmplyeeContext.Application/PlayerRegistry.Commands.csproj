@@ -11,6 +11,7 @@
 		<ProjectReference Include="..\ApiClients\ApiClients.csproj" />
 		<ProjectReference Include="..\Infrastructure\Infrastructure.csproj" />
 		<ProjectReference Include="..\SqlData\SqlData.csproj" />
+		<ProjectReference Include="..\StaticData\StaticData.csproj" />
 	</ItemGroup>
 
 </Project>

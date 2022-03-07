@@ -1,4 +1,4 @@
-﻿namespace ApiClients.FootballDataApi.Models;
+﻿namespace SolTechnology.TaleCode.ApiClients.FootballDataApi.Models;
 
 public class Penalties
 {

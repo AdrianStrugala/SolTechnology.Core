@@ -1,6 +1,6 @@
-﻿using ApiClients.FootballDataApi;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using SolTechnology.Core.Logging;
+using SolTechnology.TaleCode.ApiClients.FootballDataApi;
 using SolTechnology.TaleCode.PlayerRegistry.Commands.SynchronizePlayerMatches.Interfaces;
 using SolTechnology.TaleCode.SqlData.Repository.ExecutionErrorRepository;
 using SolTechnology.TaleCode.SqlData.Repository.MatchRepository;
@@ -37,7 +37,7 @@ namespace SolTechnology.TaleCode.PlayerRegistry.Commands.SynchronizePlayerMatche
                 {
                     Match match = new Match(
                         clientMatch.Id,
-                        context.PlayerId,
+                        context.PlayerIdMap.FootballDataId,
                         clientMatch.Date,
                         clientMatch.HomeTeam,
                         clientMatch.AwayTeam,

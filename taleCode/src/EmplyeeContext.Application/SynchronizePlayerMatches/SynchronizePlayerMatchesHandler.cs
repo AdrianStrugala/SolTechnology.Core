@@ -3,6 +3,7 @@ using SolTechnology.Core.Logging;
 using SolTechnology.TaleCode.Infrastructure;
 using SolTechnology.TaleCode.PlayerRegistry.Commands.SynchronizePlayerMatches.Executors;
 using SolTechnology.TaleCode.PlayerRegistry.Commands.SynchronizePlayerMatches.Interfaces;
+using SolTechnology.TaleCode.StaticData;
 
 namespace SolTechnology.TaleCode.PlayerRegistry.Commands.SynchronizePlayerMatches
 {
@@ -11,41 +12,55 @@ namespace SolTechnology.TaleCode.PlayerRegistry.Commands.SynchronizePlayerMatche
         private readonly ISyncPlayer _syncPlayer;
         private readonly IDetermineMatchesToSync _determineMatchesToSync;
         private readonly ISyncMatch _syncMatch;
+        private readonly IPlayerIdProvider _playerIdProvider;
         private readonly ILogger<SynchronizePlayerMatchesHandler> _logger;
 
         public SynchronizePlayerMatchesHandler(
             ISyncPlayer syncPlayer,
             IDetermineMatchesToSync determineMatchesToSync,
             ISyncMatch syncMatch,
+            IPlayerIdProvider playerIdProvider,
             ILogger<SynchronizePlayerMatchesHandler> logger)
         {
             _syncPlayer = syncPlayer;
             _determineMatchesToSync = determineMatchesToSync;
             _syncMatch = syncMatch;
+            _playerIdProvider = playerIdProvider;
             _logger = logger;
         }
 
         public async Task Handle(SynchronizePlayerMatchesCommand command)
         {
-            using (_logger.OperationStarted(nameof(SynchronizePlayerMatches), new { command.PlayerId }))
+            using (_logger.OperationStarted(nameof(SynchronizePlayerMatches), new { PlayerId = command.PlayerName }))
             {
-                var context = new SynchronizePlayerMatchesContext
+                try
                 {
-                    PlayerId = command.PlayerId
-                };
+                    var playerIdMap = _playerIdProvider.GetPlayerId(command.PlayerName);
+                    var context = new SynchronizePlayerMatchesContext
+                    {
+                        PlayerName = command.PlayerName,
+                        PlayerIdMap = playerIdMap
+                    };
 
 
-                await _syncPlayer.Execute(context);
+                    await _syncPlayer.Execute(context);
 
-                _determineMatchesToSync.Execute(context);
+                    _determineMatchesToSync.Execute(context);
 
 
-                foreach (var matchId in context.MatchesToSync)
+                    foreach (var matchId in context.MatchesToSync)
+                    {
+                        await _syncMatch.Execute(context, matchId);
+                    }
+
+                    _logger.OperationSucceeded(nameof(SynchronizePlayerMatches));
+                }
+                catch (Exception e)
                 {
-                    await _syncMatch.Execute(context, matchId);
+                    _logger.OperationFailed(nameof(SyncMatch), e);
+                    throw;
                 }
 
-                _logger.OperationSucceeded(nameof(SynchronizePlayerMatches));
             }
         }
     }

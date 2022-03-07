@@ -1,11 +1,14 @@
 ﻿using SolTechnology.TaleCode.Domain;
 using SolTechnology.TaleCode.Infrastructure;
+using SolTechnology.TaleCode.StaticData;
 
 namespace SolTechnology.TaleCode.PlayerRegistry.Commands.SynchronizePlayerMatches
 {
     public class SynchronizePlayerMatchesContext : ICommand
     {
-        public int PlayerId { get; set; }
+        public string PlayerName { get; set; }
+
+        public PlayerIdMap PlayerIdMap { get; set; }
 
         public Player Player { get; set; }
 
