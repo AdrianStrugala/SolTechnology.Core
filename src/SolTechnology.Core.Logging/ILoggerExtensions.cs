@@ -6,67 +6,49 @@ namespace SolTechnology.Core.Logging
     // ReSharper disable once InconsistentNaming
     public static class ILoggerExtensions
     {
-        private static string OperationName { get; set; }
-        private static Dictionary<string, object> OperationIdentifiers { get; set; } = new Dictionary<string, object>();
-
-
         public static IDisposable OperationStarted(this ILogger logger, string operationName, object operationIdentifiers = null)
         {
-            OperationName = operationName;
-
-            OperationIdentifiers = TypeDescriptor.GetProperties(operationIdentifiers)
+            var operationNameDictionary = TypeDescriptor.GetProperties(operationIdentifiers)
                 .OfType<PropertyDescriptor>()
                 .ToDictionary(
                     prop => prop.Name,
                     prop => prop.GetValue(operationIdentifiers)
                 );
 
-            LogOperation(logger, "START");
+            LogOperation(logger, operationName, "START");
 
-            return logger.BeginScope(OperationIdentifiers);
+            return logger.BeginScope(operationNameDictionary);
         }
 
-        public static void OperationFailed(this ILogger logger, Exception exception = null, string message = null)
+        public static void OperationFailed(this ILogger logger, string operationName, Exception exception = null, string message = null)
         {
             if (exception != null)
             {
                 logger.LogError(exception, message ?? exception.Message);
             }
 
-            LogOperation(logger, "FAILURE");
+            LogOperation(logger, operationName, "FAILURE");
 
             return;
         }
 
-        public static void OperationSucceeded(this ILogger logger, string message = null)
+        public static void OperationSucceeded(this ILogger logger, string operationName, string message = null)
         {
             if (message != null)
             {
                 logger.LogInformation(message);
             }
 
-            LogOperation(logger, "SUCCESS");
+            LogOperation(logger, operationName, "SUCCESS");
 
             return;
         }
 
-        private static void LogOperation(this ILogger logger, string status)
+        private static void LogOperation(this ILogger logger, string operationName, string status)
         {
-            string message = OperationName;
+            string message = $"Operation: [{operationName}]. Status: [{status}]";
 
-            var tempIdentifiers = OperationIdentifiers;
-            tempIdentifiers.Add("STATUS", status);
-
-
-            message += " Custom dimensions:";
-            foreach (var keyValuePair in tempIdentifiers)
-            {
-
-                message += " {" + keyValuePair.Key + "}";
-            }
-
-
-            logger.LogInformation(2137, message, tempIdentifiers.Values.ToArray());
+            logger.LogInformation(2137, message, operationName, status);
         }
 
     }

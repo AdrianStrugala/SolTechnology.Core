@@ -45,7 +45,7 @@ namespace SolTechnology.TaleCode.PlayerRegistry.Commands.SynchronizePlayerMatche
                     await _syncMatch.Execute(context, matchId);
                 }
 
-                _logger.OperationSucceeded();
+                _logger.OperationSucceeded(nameof(SynchronizePlayerMatches));
             }
         }
     }

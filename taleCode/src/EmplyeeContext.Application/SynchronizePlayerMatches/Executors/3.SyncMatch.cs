@@ -49,11 +49,11 @@ namespace SolTechnology.TaleCode.PlayerRegistry.Commands.SynchronizePlayerMatche
 
                     _matchRepository.Insert(match);
 
-                    _logger.OperationSucceeded();
+                    _logger.OperationSucceeded(nameof(SyncMatch));
                 }
                 catch (Exception e)
                 {
-                    _logger.OperationFailed(e);
+                    _logger.OperationFailed(nameof(SyncMatch), e);
 
                     _executionErrorRepository.Insert(new ExecutionError(ReferenceType.Match, clientMatch.Id,
                         e.Message));
