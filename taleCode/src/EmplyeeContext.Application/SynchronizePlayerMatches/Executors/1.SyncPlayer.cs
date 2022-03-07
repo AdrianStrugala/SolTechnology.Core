@@ -21,12 +21,9 @@ namespace SolTechnology.TaleCode.PlayerRegistry.Commands.SynchronizePlayerMatche
 
         public async Task Execute(SynchronizePlayerMatchesContext context)
         {
-
-            // var TEST = await _apiFootballApiClient.GetPlayerTeams(context.PlayerIdMap.ApiFootballId);
-
             var clientPlayer = await _footballDataApiClient.GetPlayerById(context.PlayerIdMap.FootballDataId);
 
-            //add player teams (web scrap?)
+            var teams = await _apiFootballApiClient.GetPlayerTeams(context.PlayerIdMap.ApiFootballId);
 
             Player player = new Player(
                 clientPlayer.Id,
@@ -43,6 +40,12 @@ namespace SolTechnology.TaleCode.PlayerRegistry.Commands.SynchronizePlayerMatche
                     m.HomeTeamScore,
                     m.AwayTeamScore,
                     m.Winner))
+                    .ToList(),
+                teams.Select(t => new Team(
+                    context.PlayerIdMap.FootballDataId,
+                    t.TimeFrom,
+                    t.TimeTo,
+                    t.Name))
                     .ToList());
 
             var dbPlayer = _playerRepository.GetById(player.ApiId);
@@ -56,9 +59,6 @@ namespace SolTechnology.TaleCode.PlayerRegistry.Commands.SynchronizePlayerMatche
             }
 
             context.Player = player;
-
-
-            Console.WriteLine($"Sync player [{player.ApiId}] - SUCCESS");
         }
     }
 }

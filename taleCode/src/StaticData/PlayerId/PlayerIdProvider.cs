@@ -1,4 +1,4 @@
-﻿namespace SolTechnology.TaleCode.StaticData
+﻿namespace SolTechnology.TaleCode.StaticData.PlayerId
 {
     public class PlayerIdProvider : IPlayerIdProvider
     {

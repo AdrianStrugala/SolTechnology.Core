@@ -1,6 +1,8 @@
-﻿namespace SolTechnology.TaleCode.ApiClients.ApiFootballApi;
+﻿using SolTechnology.TaleCode.ApiClients.ApiFootballApi.Models;
+
+namespace SolTechnology.TaleCode.ApiClients.ApiFootballApi;
 
 public interface IApiFootballApiClient
 {
-    Task<List<string>> GetPlayerTeams(int apiId);
+    Task<List<Team>> GetPlayerTeams(int apiId);
 }

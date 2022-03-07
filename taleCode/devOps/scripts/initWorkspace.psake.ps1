@@ -6,7 +6,7 @@ properties{
 	
 	#configuration of database preparations
 	
-	$projectPath = "$srcPath\..\taleCode\TaleCodeDatabase\TaleCodeDatabase.csproj"
+	$projectPath = "$srcPath\..\src\TaleCodeDatabase\TaleCodeDatabase.csproj"
 	$profilePathRelativeToOutput = "_Deployment\default.publish.xml"
 	$projectName = [io.path]::GetFileNameWithoutExtension($projectPath)
 	$databaseName = "$projectName"

@@ -1,4 +1,4 @@
-﻿namespace SolTechnology.TaleCode.PlayerRegistry.Commands.SynchronizePlayerMatches.Executors;
+﻿namespace SolTechnology.TaleCode.PlayerRegistry.Commands.SynchronizePlayerMatches.Interfaces;
 
 public interface IDetermineMatchesToSync
 {

@@ -7,8 +7,6 @@
 		<SqlServerVersion>SqlAzure</SqlServerVersion>
 	</PropertyGroup>
 
-
-
 	<ItemGroup>
 		<None Update="_Deployment\default.publish.xml">
 			<CopyToOutputDirectory>Always</CopyToOutputDirectory>

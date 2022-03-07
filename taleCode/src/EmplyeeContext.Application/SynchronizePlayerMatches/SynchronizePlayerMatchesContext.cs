@@ -1,6 +1,7 @@
 ﻿using SolTechnology.TaleCode.Domain;
 using SolTechnology.TaleCode.Infrastructure;
 using SolTechnology.TaleCode.StaticData;
+using SolTechnology.TaleCode.StaticData.PlayerId;
 
 namespace SolTechnology.TaleCode.PlayerRegistry.Commands.SynchronizePlayerMatches
 {

@@ -1,4 +1,5 @@
 ﻿using Dapper;
+using DapperExtensions;
 using SolTechnology.Core.Sql.Connection;
 using SolTechnology.TaleCode.Domain;
 
@@ -28,6 +29,8 @@ VALUES (@ApiId, @Name, @DateOfBirth, @Nationality, @Position)
         {
             using (var connection = _sqlConnectionFactory.CreateConnection())
             {
+                var transaction = connection.BeginTransaction();
+
                 connection.Execute(InsertSql, new
                 {
                     ApiId = player.ApiId,
@@ -35,8 +38,14 @@ VALUES (@ApiId, @Name, @DateOfBirth, @Nationality, @Position)
                     DateOfBirth = player.DateOfBirth,
                     Nationality = player.Nationality,
                     Position = player.Position
-                });
+                }, transaction);
+
+
+                connection.Insert<Team>(player.Teams, transaction);
+
+                transaction.Commit();
             }
+
         }
     }
 }

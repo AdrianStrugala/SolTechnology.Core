@@ -10,13 +10,14 @@ namespace SolTechnology.TaleCode.Domain
         public string Nationality { get; set; }
         public string Position { get; set; }
         public List<Match> Matches { get; set; }
+        public List<Team> Teams { get; set; }
 
         private Player()
         {
             //required by ORM
         }
 
-        public Player(int apiId, string name, string dateOfBirth, string nationality, string position, List<Match> matches)
+        public Player(int apiId, string name, string dateOfBirth, string nationality, string position, List<Match> matches, List<Team> teams)
         {
             Guards.String(name, nameof(name)).NotNull().NotEmpty(); ;
             Guards.Int(apiId, nameof(apiId)).NotZero();
@@ -27,6 +28,7 @@ namespace SolTechnology.TaleCode.Domain
             Nationality = nationality;
             Position = position;
             Matches = matches;
+            Teams = teams;
         }
     }
 }

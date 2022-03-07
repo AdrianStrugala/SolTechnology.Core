@@ -6,7 +6,7 @@ namespace SolTechnology.Core.Logging
     // ReSharper disable once InconsistentNaming
     public static class ILoggerExtensions
     {
-        public static IDisposable OperationStarted(this ILogger logger, string operationName, object operationIdentifiers = null)
+        public static IDisposable OperationStarted(this ILogger logger, string operationName, object operationIdentifiers)
         {
             var operationNameDictionary = TypeDescriptor.GetProperties(operationIdentifiers)
                 .OfType<PropertyDescriptor>()
@@ -15,9 +15,11 @@ namespace SolTechnology.Core.Logging
                     prop => prop.GetValue(operationIdentifiers)
                 );
 
-            LogOperation(logger, operationName, "START");
-
-            return logger.BeginScope(operationNameDictionary);
+            using var beginScope = logger.BeginScope(operationNameDictionary);
+            {
+                LogOperation(logger, operationName, "START");
+                return beginScope;
+            }
         }
 
         public static void OperationFailed(this ILogger logger, string operationName, Exception exception = null, string message = null)
@@ -46,7 +48,7 @@ namespace SolTechnology.Core.Logging
 
         private static void LogOperation(this ILogger logger, string operationName, string status)
         {
-            string message = $"Operation: [{operationName}]. Status: [{status}]";
+            string message = "Operation: [{operationName}]. Status: [{status}]";
 
             logger.LogInformation(2137, message, operationName, status);
         }

@@ -10,7 +10,7 @@ namespace SolTechnology.TaleCode.ApiClients.ApiFootballApi
         {
             _httpClient = httpClient;
         }
-        public async Task<List<string>> GetPlayerTeams(int apiId)
+        public async Task<List<Team>> GetPlayerTeams(int apiId)
         {
             List<Team> result = new List<Team>();
 
@@ -29,8 +29,8 @@ namespace SolTechnology.TaleCode.ApiClients.ApiFootballApi
                         result.Add(new Team
                         {
                             Name = transfer.Teams.Out.Name,
-                            TimeFrom = DateOnly.MinValue,
-                            TimeTo = DateOnly.Parse(transfer.Date)
+                            TimeFrom = DateTime.Parse("1920-05-18"),
+                            TimeTo = DateTime.Parse(transfer.Date)
                         });
                     }
 
@@ -38,33 +38,24 @@ namespace SolTechnology.TaleCode.ApiClients.ApiFootballApi
                     {
                         result.Add(new Team
                         {
-                            Name = transfer.Teams.Out.Name,
-                            TimeFrom = DateOnly.Parse(transfer.Date),
-                            TimeTo = DateOnly.Parse(transfers[i + 1].Date)
+                            Name = transfer.Teams.In.Name,
+                            TimeFrom = DateTime.Parse(transfer.Date),
+                            TimeTo = DateTime.Parse(transfers[i + 1].Date)
                         });
                     }
                     else
                     {
                         result.Add(new Team
                         {
-                            Name = transfer.Teams.Out.Name,
-                            TimeFrom = DateOnly.Parse(transfer.Date),
-                            TimeTo = DateOnly.FromDateTime(DateTime.Now)
+                            Name = transfer.Teams.In.Name,
+                            TimeFrom = DateTime.Parse(transfer.Date),
+                            TimeTo = DateTime.Now
                         });
                     }
                 }
             }
 
-            var y = result;
-
-            return new List<string>();
+            return result;
         }
-    }
-
-    public class Team
-    {
-        public string Name { get; set; }
-        public DateOnly TimeFrom { get; set; }
-        public DateOnly TimeTo { get; set; }
     }
 }
