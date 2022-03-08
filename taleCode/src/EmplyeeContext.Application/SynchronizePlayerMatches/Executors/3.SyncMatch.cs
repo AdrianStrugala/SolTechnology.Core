@@ -29,8 +29,10 @@ namespace SolTechnology.TaleCode.PlayerRegistry.Commands.SynchronizePlayerMatche
 
         public async Task Execute(SynchronizePlayerMatchesContext context, int matchId)
         {
-            using (_logger.OperationStarted(nameof(SyncMatch), new { matchId }))
+            using (_logger.BeginOperationScope(new { MatchId = matchId }))
             {
+                _logger.OperationStarted(nameof(SyncMatch));
+
                 var clientMatch = await _footballDataApiClient.GetMatchById(matchId);
 
                 try

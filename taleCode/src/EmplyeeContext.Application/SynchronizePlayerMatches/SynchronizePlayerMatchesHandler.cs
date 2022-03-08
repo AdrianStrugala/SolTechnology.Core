@@ -3,7 +3,6 @@ using SolTechnology.Core.Logging;
 using SolTechnology.TaleCode.Infrastructure;
 using SolTechnology.TaleCode.PlayerRegistry.Commands.SynchronizePlayerMatches.Executors;
 using SolTechnology.TaleCode.PlayerRegistry.Commands.SynchronizePlayerMatches.Interfaces;
-using SolTechnology.TaleCode.StaticData;
 using SolTechnology.TaleCode.StaticData.PlayerId;
 
 namespace SolTechnology.TaleCode.PlayerRegistry.Commands.SynchronizePlayerMatches
@@ -32,8 +31,10 @@ namespace SolTechnology.TaleCode.PlayerRegistry.Commands.SynchronizePlayerMatche
 
         public async Task Handle(SynchronizePlayerMatchesCommand command)
         {
-            using (_logger.OperationStarted(nameof(SynchronizePlayerMatches), new { PlayerId = command.PlayerName }))
+            using (_logger.BeginOperationScope(new { PlayerName = command.PlayerName }))
             {
+                _logger.OperationStarted(nameof(SynchronizePlayerMatches));
+
                 try
                 {
                     var playerIdMap = _playerIdProvider.GetPlayerId(command.PlayerName);
