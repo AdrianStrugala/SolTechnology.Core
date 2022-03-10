@@ -28,6 +28,18 @@ IBlobContainerClientWrapper (read and write operation)
 Guards.Method()
 
 
+Authentication
+
+IMPORTANT:
+Requires authentication Key in config, invoking installation AND ADDING FILTER TO (MVC) OPTOONS 
+
+var authenticationFiler = builder.Services.AddAuthenticationAndBuildFilter();
+builder.Services.AddControllers(opts => opts.Filters.Add(authenticationFiler));
+
+
+i jeszcze
+
+  app.UseAuthentication();
 
 
 II. TaleCode:

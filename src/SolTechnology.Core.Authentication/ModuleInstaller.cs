@@ -1,4 +1,6 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc.Authorization;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 
@@ -6,13 +8,10 @@ namespace SolTechnology.Core.Authentication
 {
     public static class ModuleInstaller
     {
-        public static IServiceCollection AddAuthentication(
+        public static AuthorizeFilter AddAuthenticationAndBuildFilter(
             this IServiceCollection services,
             AuthenticationConfiguration authenticationConfiguration = null)
         {
-
-
-            //it is run only, if the options are not build (once per multiple registrations)
             services
             .AddOptions<AuthenticationConfiguration>()
             .Configure<IConfiguration>((config, configuration) =>
@@ -36,7 +35,13 @@ namespace SolTechnology.Core.Authentication
                 .AddScheme<SolTechnologyAuthenticationOptions, SolTechnologyAuthentication>(
                     SolTechnologyAuthenticationOptions.AuthenticationScheme, c => c.AuthenticationKey = options.Key);
 
-            return services;
+            var policy = new AuthorizationPolicyBuilder()
+                .RequireAuthenticatedUser()
+                .Build();
+
+            var filter = new AuthorizeFilter(policy);
+
+            return filter;
         }
     }
 }

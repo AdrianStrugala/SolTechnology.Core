@@ -9,8 +9,6 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
-builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddLogging(c =>
         c.AddConsole()
@@ -18,12 +16,11 @@ builder.Services.AddLogging(c =>
 builder.Services.AddApplicationInsightsTelemetry();
 
 
-// builder.Services.AddSql();
-SolTechnology.Core.Authentication.ModuleInstaller.AddAuthentication(builder.Services);
 builder.Services.AddCommands();
 
 
-
+var authenticationFiler = builder.Services.AddAuthenticationAndBuildFilter();
+builder.Services.AddControllers(opts => opts.Filters.Add(authenticationFiler));
 
 
 //SWAGGER
