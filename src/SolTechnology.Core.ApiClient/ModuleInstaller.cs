@@ -6,24 +6,28 @@ namespace SolTechnology.Core.ApiClient
 {
     public static class ModuleInstaller
     {
-        public static IServiceCollection AddApiClient<TIClient, TClient>(this IServiceCollection services, string httpClientName, ApiClientConfiguration apiClientConfigurations = null) where TIClient : class where TClient : class, TIClient
+        public static IServiceCollection AddApiClient<TIClient, TClient>(
+            this IServiceCollection services,
+            string httpClientName, 
+            ApiClientConfiguration apiClientConfiguration = null) 
+            where TIClient : class where TClient : class, TIClient
         {
             //it is run only, if the options are not build (once per multiple registrations)
             services
             .AddOptions<ApiClientConfiguration>()
             .Configure<IConfiguration>((config, configuration) =>
             {
-                if (apiClientConfigurations == null)
+                if (apiClientConfiguration == null)
                 {
-                    apiClientConfigurations = configuration.GetSection("Configuration:ApiClients").Get<ApiClientConfiguration>();
+                    apiClientConfiguration = configuration.GetSection("Configuration:ApiClients").Get<ApiClientConfiguration>();
                 }
 
-                if (apiClientConfigurations == null)
+                if (apiClientConfiguration == null)
                 {
                     throw new ArgumentException($"The [{nameof(ApiClientConfiguration)}] is missing. Provide it by parameter or configuration section");
                 }
 
-                config.HttpClients = apiClientConfigurations.HttpClients;
+                config.HttpClients = apiClientConfiguration.HttpClients;
             });
 
             var options = services.BuildServiceProvider().GetRequiredService<IOptions<ApiClientConfiguration>>().Value;
