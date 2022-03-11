@@ -15,8 +15,8 @@ namespace SolTechnology.TaleCode.Api.Controllers
         }
 
         [HttpGet]
-        [Route("SynchronizePlayerMatches/{playerId}")]
-        public void SynchronizePlayerMatches(int playerId)
+        [Route("SynchronizePlayerMatches")]
+        public void SynchronizePlayerMatches()
         {
             try
             {

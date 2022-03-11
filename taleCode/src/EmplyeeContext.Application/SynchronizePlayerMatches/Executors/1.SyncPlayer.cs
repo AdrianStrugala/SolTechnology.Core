@@ -19,12 +19,11 @@ namespace SolTechnology.TaleCode.PlayerRegistry.Commands.SynchronizePlayerMatche
             _apiFootballApiClient = apiFootballApiClient;
         }
 
-        public async Task   Execute(SynchronizePlayerMatchesContext context)
+        public async Task Execute(SynchronizePlayerMatchesContext context)
         {
             var clientPlayer = await _footballDataApiClient.GetPlayerById(context.PlayerIdMap.FootballDataId);
 
-            // var teams = await _apiFootballApiClient.GetPlayerTeams(context.PlayerIdMap.ApiFootballId);
-            var teams = new List<ApiClients.ApiFootballApi.Models.Team>();
+            var teams = await _apiFootballApiClient.GetPlayerTeams(context.PlayerIdMap.ApiFootballId);
 
             Player player = new Player(
                 clientPlayer.Id,
@@ -56,7 +55,7 @@ namespace SolTechnology.TaleCode.PlayerRegistry.Commands.SynchronizePlayerMatche
             }
             else
             {
-                // _playerRepository.Update(player);
+                _playerRepository.Update(player);
             }
 
             context.Player = player;

@@ -55,6 +55,9 @@ namespace SolTechnology.TaleCode.PlayerRegistry.Commands.SynchronizePlayerMatche
                         await _syncMatch.Execute(context, matchId);
                     }
 
+
+                    //TODO: Calculate Player STATISTICS BITCH
+
                     _logger.OperationSucceeded(nameof(SynchronizePlayerMatches));
                 }
                 catch (Exception e)
