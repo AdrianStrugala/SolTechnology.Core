@@ -11,13 +11,12 @@
 		<PackageTags>sol technology core azure logging logs log</PackageTags>
 		<Product>SolTechnology.Core.Logging</Product>
 		<PackageId>SolTechnology.Core.Logging</PackageId>
-		<RepositoryUrl>https://github.com/AdrianStrugala/SolTechnology.Core</RepositoryUrl>
 		<AssemblyName>SolTechnology.Core.Logging</AssemblyName>
+		<RepositoryUrl>https://github.com/AdrianStrugala/SolTechnology.Core</RepositoryUrl>
 		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
 
 		<PackageIcon>docs\mini-logo.png</PackageIcon>
 	</PropertyGroup>
-
 	<ItemGroup>
 		<None Include="..\..\docs\mini-logo.png" Pack="true" Visible="false" PackagePath="docs\mini-logo.png" />
 	</ItemGroup>

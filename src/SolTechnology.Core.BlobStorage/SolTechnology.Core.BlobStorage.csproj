@@ -11,12 +11,15 @@
 		<PackageTags>sol technology core azure blob storage</PackageTags>
 		<Product>SolTechnology.Core.BlobStorage</Product>
 		<PackageId>SolTechnology.Core.BlobStorage</PackageId>
-		<RepositoryUrl>https://github.com/AdrianStrugala/SolTechnology.Core</RepositoryUrl>
 		<AssemblyName>SolTechnology.Core.BlobStorage</AssemblyName>
+		<RepositoryUrl>https://github.com/AdrianStrugala/SolTechnology.Core</RepositoryUrl>
 		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
 
 		<PackageIcon>docs\mini-logo.png</PackageIcon>
 	</PropertyGroup>
+	<ItemGroup>
+		<None Include="..\..\docs\mini-logo.png" Pack="true" Visible="false" PackagePath="docs\mini-logo.png" />
+	</ItemGroup>
 
 	<ItemGroup>
 	  <PackageReference Include="AvroConvert" Version="3.2.3" />
@@ -24,10 +27,6 @@
 	  <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="6.0.0" />
 	  <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="6.0.0" />
 	  <PackageReference Include="Microsoft.Extensions.Options" Version="6.0.0" />
-	</ItemGroup>
-
-	<ItemGroup>
-		<None Include="..\..\docs\mini-logo.png" Pack="true" Visible="false" PackagePath="docs\mini-logo.png" />
 	</ItemGroup>
 
 </Project>

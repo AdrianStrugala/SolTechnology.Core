@@ -11,13 +11,12 @@
 		<PackageTags>sol technology core azure guards</PackageTags>
 		<Product>SolTechnology.Core.Guards</Product>
 		<PackageId>SolTechnology.Core.Guards</PackageId>
-		<RepositoryUrl>https://github.com/AdrianStrugala/SolTechnology.Core</RepositoryUrl>
 		<AssemblyName>SolTechnology.Core.Guards</AssemblyName>
+		<RepositoryUrl>https://github.com/AdrianStrugala/SolTechnology.Core</RepositoryUrl>
 		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
 
 		<PackageIcon>docs\mini-logo.png</PackageIcon>
 	</PropertyGroup>
-
 	<ItemGroup>
 		<None Include="..\..\docs\mini-logo.png" Pack="true" Visible="false" PackagePath="docs\mini-logo.png" />
 	</ItemGroup>

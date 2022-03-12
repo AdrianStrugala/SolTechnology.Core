@@ -11,12 +11,15 @@
 		<PackageTags>sol technology core azure api client</PackageTags>
 		<Product>SolTechnology.Core.ApiClient</Product>
 		<PackageId>SolTechnology.Core.ApiClient</PackageId>
-		<RepositoryUrl>https://github.com/AdrianStrugala/SolTechnology.Core</RepositoryUrl>
 		<AssemblyName>SolTechnology.Core.ApiClient</AssemblyName>
+		<RepositoryUrl>https://github.com/AdrianStrugala/SolTechnology.Core</RepositoryUrl>
 		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
 
 		<PackageIcon>docs\mini-logo.png</PackageIcon>
 	</PropertyGroup>
+	<ItemGroup>
+		<None Include="..\..\docs\mini-logo.png" Pack="true" Visible="false" PackagePath="docs\mini-logo.png" />
+	</ItemGroup>
 
 	<ItemGroup>
 		<PackageReference Include="AvroConvert" Version="3.2.3" />
@@ -27,8 +30,6 @@
 		<PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
 	</ItemGroup>
 
-	<ItemGroup>
-		<None Include="..\..\docs\mini-logo.png" Pack="true" Visible="false" PackagePath="docs\mini-logo.png" />
-	</ItemGroup>
+
 
 </Project>
