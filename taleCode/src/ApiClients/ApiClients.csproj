@@ -12,6 +12,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\..\src\SolTechnology.Core.ApiClient\SolTechnology.Core.ApiClient.csproj" />
+    <ProjectReference Include="..\StaticData\StaticData.csproj" />
   </ItemGroup>
 
 </Project>

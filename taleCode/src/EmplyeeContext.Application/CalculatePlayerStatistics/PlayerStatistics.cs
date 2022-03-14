@@ -4,7 +4,7 @@
     {
         public string Name { get; set; }
         public int NumberOfMatches { get; set; }
-        public List<StatisticsByTeam> StatisticsByTeams { get; set; }
+        public List<StatisticsByTeam> StatisticsByTeams { get; set; } = new();
 
     }
 

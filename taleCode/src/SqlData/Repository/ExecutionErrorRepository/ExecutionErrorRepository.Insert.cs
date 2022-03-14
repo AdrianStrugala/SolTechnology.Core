@@ -18,7 +18,7 @@ namespace SolTechnology.TaleCode.SqlData.Repository.ExecutionErrorRepository
     [ReferenceType],
     [ReferenceId],
 	[Message],
-    [Valid],
+    [Valid])
 VALUES (@ReferenceType, @ReferenceId, @Message, @Valid)
 ";
 

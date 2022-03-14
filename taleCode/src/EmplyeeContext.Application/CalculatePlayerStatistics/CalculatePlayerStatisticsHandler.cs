@@ -1,17 +1,81 @@
-﻿namespace SolTechnology.TaleCode.PlayerRegistry.Commands.CalculatePlayerStatistics
+﻿using SolTechnology.TaleCode.Domain;
+using SolTechnology.TaleCode.Infrastructure;
+using SolTechnology.TaleCode.SqlData.Repository.MatchRepository;
+using SolTechnology.TaleCode.SqlData.Repository.PlayerRepository;
+using SolTechnology.TaleCode.StaticData;
+using SolTechnology.TaleCode.StaticData.PlayerId;
+
+namespace SolTechnology.TaleCode.PlayerRegistry.Commands.CalculatePlayerStatistics
 {
-    public class CalculatePlayerStatisticsHandler
+    public class CalculatePlayerStatisticsHandler : ICommandHandler<CalculatePlayerStatisticsCommand>
     {
-        public PlayerStatistics Handle(CalculatePlayerStatisticsCommand command)
+        private readonly IPlayerIdProvider _playerIdProvider;
+        private readonly IMatchRepository _matchRepository;
+        private readonly IPlayerRepository _playerRepository;
+
+        public CalculatePlayerStatisticsHandler(IPlayerIdProvider playerIdProvider, IMatchRepository matchRepository, IPlayerRepository playerRepository)
         {
-            var result = new PlayerStatistics();
-
-            return result;
+            _playerIdProvider = playerIdProvider;
+            _matchRepository = matchRepository;
+            _playerRepository = playerRepository;
         }
-    }
 
-    public class CalculatePlayerStatisticsCommand
-    {
-        public string PlayerName { get; set; }
+        public Task Handle(CalculatePlayerStatisticsCommand command)
+        {
+            var playerIdMap = _playerIdProvider.GetPlayerId(command.PlayerName);
+
+            var result = new PlayerStatistics
+            {
+                Name = command.PlayerName
+            };
+
+            var player = _playerRepository.GetById(playerIdMap.FootballDataId);
+            var matches = _matchRepository.GetByPlayerId(playerIdMap.FootballDataId);
+
+            result.NumberOfMatches = matches.Count;
+
+            var nationalTeamMatches = matches.Where(m => m.AwayTeam == player.Nationality || m.HomeTeam == player.Nationality).ToList();
+            var clubMatches = matches.Except(nationalTeamMatches).ToList();
+
+            result.StatisticsByTeams.Add(
+                CalculateSingleTeamStatistics(
+                nationalTeamMatches,
+                new Team(playerIdMap.ApiFootballId, DateProvider.DateMin(), DateProvider.DateMax(), player.Name)));
+
+            foreach (var team in player.Teams)
+            {
+                var teamMatches = clubMatches
+                    .Where(m => m.Date > team.DateFrom && m.Date < team.DateTo)
+                    .ToList();
+
+                result.StatisticsByTeams.Add(CalculateSingleTeamStatistics(teamMatches, team));
+            }
+
+            return Task.CompletedTask;
+        }
+
+        private StatisticsByTeam CalculateSingleTeamStatistics(List<Match> teamMatches, Team team)
+        {
+            var statistic = new StatisticsByTeam
+            {
+                TeamName = team.Name,
+                DateFrom = DateOnly.FromDateTime(team.DateFrom),
+                DateTo = DateOnly.FromDateTime(team.DateTo),
+                NumberOfMatches = teamMatches.Count
+            };
+
+            var numberOfMatchesResultingCompetitionVictory = teamMatches.Count(m => m.CompetitionWinner == team.Name);
+            if (statistic.NumberOfMatches == 0)
+            {
+                statistic.PercentageOfMatchesResultingCompetitionVictory = 0;
+            }
+            else
+            {
+                statistic.PercentageOfMatchesResultingCompetitionVictory =
+                    (numberOfMatchesResultingCompetitionVictory / statistic.NumberOfMatches) * 100;
+            }
+
+            return statistic;
+        }
     }
 }

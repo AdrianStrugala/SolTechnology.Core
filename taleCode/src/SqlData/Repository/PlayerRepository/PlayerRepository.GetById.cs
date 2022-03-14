@@ -15,19 +15,27 @@ namespace SolTechnology.TaleCode.SqlData.Repository.PlayerRepository
 	[Position]
 FROM [dbo].[Player]
 WHERE [ApiId] = @PlayerApiId
+
+SELECT 
+       [PlayerApiId]
+      ,[DateFrom]
+      ,[DateTo]
+      ,[Name]
+  FROM [TaleCodeDatabase].[dbo].[Team]
+  WHERE PlayerApiId = @PlayerApiId
 ";
 
         public Player GetById(int apiId)
         {
             Player result = null;
 
-            using (var connection = _sqlConnectionFactory.CreateConnection())
+            using var connection = _sqlConnectionFactory.CreateConnection();
+            using var multi = connection.QueryMultiple(GetByIdSql, new
             {
-                result = connection.QuerySingleOrDefault<Player>(GetByIdSql, new
-                {
-                    PlayerApiId = apiId,
-                });
-            }
+                PlayerApiId = apiId,
+            });
+            result = multi.ReadSingleOrDefault<Player>();
+            result.Teams = multi.Read<Team>().ToList();
 
             return result;
         }

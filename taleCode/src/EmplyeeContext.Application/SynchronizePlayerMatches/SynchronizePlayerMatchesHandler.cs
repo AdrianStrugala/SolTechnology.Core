@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
 using SolTechnology.Core.Logging;
 using SolTechnology.TaleCode.Infrastructure;
+using SolTechnology.TaleCode.PlayerRegistry.Commands.CalculatePlayerStatistics;
 using SolTechnology.TaleCode.PlayerRegistry.Commands.SynchronizePlayerMatches.Executors;
 using SolTechnology.TaleCode.PlayerRegistry.Commands.SynchronizePlayerMatches.Interfaces;
 using SolTechnology.TaleCode.StaticData.PlayerId;
@@ -14,19 +15,25 @@ namespace SolTechnology.TaleCode.PlayerRegistry.Commands.SynchronizePlayerMatche
         private readonly ISyncMatch _syncMatch;
         private readonly IPlayerIdProvider _playerIdProvider;
         private readonly ILogger<SynchronizePlayerMatchesHandler> _logger;
+        private readonly ICommandHandler<CalculatePlayerStatisticsCommand> _calculatePlayerStatsHandler;
 
         public SynchronizePlayerMatchesHandler(
             ISyncPlayer syncPlayer,
             IDetermineMatchesToSync determineMatchesToSync,
             ISyncMatch syncMatch,
             IPlayerIdProvider playerIdProvider,
-            ILogger<SynchronizePlayerMatchesHandler> logger)
+            ILogger<SynchronizePlayerMatchesHandler> logger,
+
+
+            //TEMPORARY:
+            ICommandHandler<CalculatePlayerStatisticsCommand> calculatePlayerStatsHandler)
         {
             _syncPlayer = syncPlayer;
             _determineMatchesToSync = determineMatchesToSync;
             _syncMatch = syncMatch;
             _playerIdProvider = playerIdProvider;
             _logger = logger;
+            _calculatePlayerStatsHandler = calculatePlayerStatsHandler;
         }
 
         public async Task Handle(SynchronizePlayerMatchesCommand command)
@@ -56,7 +63,10 @@ namespace SolTechnology.TaleCode.PlayerRegistry.Commands.SynchronizePlayerMatche
                     }
 
 
-                    //TODO: Calculate Player STATISTICS BITCH
+                    //TODO: Calculate Player STATISTICS
+                    await _calculatePlayerStatsHandler.Handle(new CalculatePlayerStatisticsCommand
+                    { PlayerName = command.PlayerName });
+
 
                     _logger.OperationSucceeded(nameof(SynchronizePlayerMatches));
                 }
