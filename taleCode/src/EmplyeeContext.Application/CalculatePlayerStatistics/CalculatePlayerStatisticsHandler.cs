@@ -1,4 +1,6 @@
-﻿using SolTechnology.TaleCode.Domain;
+﻿using SolTechnology.TaleCode.BlobData;
+using SolTechnology.TaleCode.BlobData.PlayerStatisticsRepository;
+using SolTechnology.TaleCode.Domain;
 using SolTechnology.TaleCode.Infrastructure;
 using SolTechnology.TaleCode.SqlData.Repository.MatchRepository;
 using SolTechnology.TaleCode.SqlData.Repository.PlayerRepository;
@@ -12,20 +14,27 @@ namespace SolTechnology.TaleCode.PlayerRegistry.Commands.CalculatePlayerStatisti
         private readonly IPlayerIdProvider _playerIdProvider;
         private readonly IMatchRepository _matchRepository;
         private readonly IPlayerRepository _playerRepository;
+        private readonly IPlayerStatisticsRepository _playerStatisticsRepository;
 
-        public CalculatePlayerStatisticsHandler(IPlayerIdProvider playerIdProvider, IMatchRepository matchRepository, IPlayerRepository playerRepository)
+        public CalculatePlayerStatisticsHandler(
+            IPlayerIdProvider playerIdProvider,
+            IMatchRepository matchRepository,
+            IPlayerRepository playerRepository,
+            IPlayerStatisticsRepository playerStatisticsRepository)
         {
             _playerIdProvider = playerIdProvider;
             _matchRepository = matchRepository;
             _playerRepository = playerRepository;
+            _playerStatisticsRepository = playerStatisticsRepository;
         }
 
-        public Task Handle(CalculatePlayerStatisticsCommand command)
+        public async Task Handle(CalculatePlayerStatisticsCommand command)
         {
             var playerIdMap = _playerIdProvider.GetPlayerId(command.PlayerName);
 
             var result = new PlayerStatistics
             {
+                Id = playerIdMap.FootballDataId,
                 Name = command.PlayerName
             };
 
@@ -40,7 +49,7 @@ namespace SolTechnology.TaleCode.PlayerRegistry.Commands.CalculatePlayerStatisti
             result.StatisticsByTeams.Add(
                 CalculateSingleTeamStatistics(
                 nationalTeamMatches,
-                new Team(playerIdMap.ApiFootballId, DateProvider.DateMin(), DateProvider.DateMax(), player.Name)));
+                new Team(playerIdMap.FootballDataId, DateProvider.DateMin(), DateProvider.DateMax(), player.Name)));
 
             foreach (var team in player.Teams)
             {
@@ -51,7 +60,9 @@ namespace SolTechnology.TaleCode.PlayerRegistry.Commands.CalculatePlayerStatisti
                 result.StatisticsByTeams.Add(CalculateSingleTeamStatistics(teamMatches, team));
             }
 
-            return Task.CompletedTask;
+            // await _playerStatisticsRepository.Add(result);
+
+            // var x = await _playerStatisticsRepository.Get(result.Id);
         }
 
         private StatisticsByTeam CalculateSingleTeamStatistics(List<Match> teamMatches, Team team)
@@ -59,8 +70,8 @@ namespace SolTechnology.TaleCode.PlayerRegistry.Commands.CalculatePlayerStatisti
             var statistic = new StatisticsByTeam
             {
                 TeamName = team.Name,
-                DateFrom = DateOnly.FromDateTime(team.DateFrom),
-                DateTo = DateOnly.FromDateTime(team.DateTo),
+                DateFrom = team.DateFrom,
+                DateTo = team.DateTo,
                 NumberOfMatches = teamMatches.Count
             };
 

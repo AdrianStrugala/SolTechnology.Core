@@ -12,9 +12,9 @@ namespace SolTechnology.TaleCode.SqlData
         {
             services.AddSql();
 
-            services.AddTransient<IPlayerRepository, PlayerRepository>();
-            services.AddTransient<IMatchRepository, MatchRepository>();
-            services.AddTransient<IExecutionErrorRepository, ExecutionErrorRepository>();
+            services.AddScoped<IPlayerRepository, PlayerRepository>();
+            services.AddScoped<IMatchRepository, MatchRepository>();
+            services.AddScoped<IExecutionErrorRepository, ExecutionErrorRepository>();
 
             return services;
         }

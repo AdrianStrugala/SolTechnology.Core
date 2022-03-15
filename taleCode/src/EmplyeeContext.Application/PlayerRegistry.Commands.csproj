@@ -9,6 +9,7 @@
 	<ItemGroup>
 		<ProjectReference Include="..\..\..\src\SolTechnology.Core.Logging\SolTechnology.Core.Logging.csproj" />
 		<ProjectReference Include="..\ApiClients\ApiClients.csproj" />
+		<ProjectReference Include="..\BlobData\BlobData.csproj" />
 		<ProjectReference Include="..\Infrastructure\Infrastructure.csproj" />
 		<ProjectReference Include="..\SqlData\SqlData.csproj" />
 		<ProjectReference Include="..\StaticData\StaticData.csproj" />

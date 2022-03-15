@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using SolTechnology.TaleCode.ApiClients;
+using SolTechnology.TaleCode.BlobData;
 using SolTechnology.TaleCode.Infrastructure;
 using SolTechnology.TaleCode.PlayerRegistry.Commands.CalculatePlayerStatistics;
 using SolTechnology.TaleCode.PlayerRegistry.Commands.SynchronizePlayerMatches;
@@ -17,13 +18,14 @@ namespace SolTechnology.TaleCode.PlayerRegistry.Commands
             services.AddSqlData();
             services.AddApiClients();
             services.AddStaticData();
+            services.AddBlobData();
 
-            services.AddTransient<ICommandHandler<SynchronizePlayerMatchesCommand>, SynchronizePlayerMatchesHandler>();
-            services.AddTransient<ISyncPlayer, SyncPlayer>();
-            services.AddTransient<IDetermineMatchesToSync, DetermineMatchesToSync>();
-            services.AddTransient<ISyncMatch, SyncMatch>();
+            services.AddScoped<ICommandHandler<SynchronizePlayerMatchesCommand>, SynchronizePlayerMatchesHandler>();
+            services.AddScoped<ISyncPlayer, SyncPlayer>();
+            services.AddScoped<IDetermineMatchesToSync, DetermineMatchesToSync>();
+            services.AddScoped<ISyncMatch, SyncMatch>();
 
-            services.AddTransient<ICommandHandler<CalculatePlayerStatisticsCommand>, CalculatePlayerStatisticsHandler>();
+            services.AddScoped<ICommandHandler<CalculatePlayerStatisticsCommand>, CalculatePlayerStatisticsHandler>();
 
             return services;
         }

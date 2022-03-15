@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
 		<TargetFramework>net6.0</TargetFramework>
@@ -6,5 +6,10 @@
 		<Nullable>enable</Nullable>
 		<RootNamespace>SolTechnology.TaleCode.BlobData</RootNamespace>
 	</PropertyGroup>
+
+	<ItemGroup>
+	  <ProjectReference Include="..\..\..\src\SolTechnology.Core.BlobStorage\SolTechnology.Core.BlobStorage.csproj" />
+	  <ProjectReference Include="..\Domain\Domain.csproj" />
+	</ItemGroup>
 
 </Project>

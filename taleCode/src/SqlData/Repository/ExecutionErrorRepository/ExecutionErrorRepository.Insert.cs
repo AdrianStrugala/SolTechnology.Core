@@ -31,7 +31,7 @@ VALUES (@ReferenceType, @ReferenceId, @Message, @Valid)
                     ReferenceType = executionError.ReferenceType.ToString(),
                     ReferenceId = executionError.ReferenceId,
                     Message = executionError.Message,
-                    Active = executionError.Valid
+                    Valid = executionError.Valid
                 });
             }
         }

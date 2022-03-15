@@ -1,7 +1,8 @@
-﻿namespace SolTechnology.TaleCode.PlayerRegistry.Commands.CalculatePlayerStatistics
+﻿namespace SolTechnology.TaleCode.Domain
 {
     public class PlayerStatistics
     {
+        public int Id { get; set; }
         public string Name { get; set; }
         public int NumberOfMatches { get; set; }
         public List<StatisticsByTeam> StatisticsByTeams { get; set; } = new();
@@ -11,8 +12,8 @@
     public class StatisticsByTeam
     {
         public string TeamName { get; set; }
-        public DateOnly DateFrom { get; set; }
-        public DateOnly DateTo { get; set; }
+        public DateTime DateFrom { get; set; }
+        public DateTime DateTo { get; set; }
         public int NumberOfMatches { get; set; }
         public decimal PercentageOfMatchesResultingCompetitionVictory { get; set; }
     }

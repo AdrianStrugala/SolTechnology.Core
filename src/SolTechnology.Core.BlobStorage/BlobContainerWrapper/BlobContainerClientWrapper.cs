@@ -1,4 +1,5 @@
 ﻿using Azure.Storage.Blobs;
+using Azure.Storage.Blobs.Models;
 using Microsoft.Extensions.Options;
 using SolTechnology.Avro;
 
@@ -37,15 +38,19 @@ namespace SolTechnology.Core.BlobStorage.BlobContainerWrapper
         {
             var blob = client.GetBlobClient(blobName);
 
+            byte[] serializedContent;
+
             if (_useCompression)
             {
-                var serializedContent = AvroConvert.Serialize(content);
-                await blob.UploadAsync(new BinaryData(serializedContent));
+                serializedContent = AvroConvert.Serialize(content);
+
             }
             else
             {
-                await blob.UploadAsync(BinaryData.FromObjectAsJson(content));
+                serializedContent = BinaryData.FromObjectAsJson(content).ToArray();
             }
+
+            await blob.UploadAsync(new MemoryStream(serializedContent), true, CancellationToken.None);
         }
     }
 }

@@ -66,11 +66,11 @@ namespace System.Net.Http
 
             if (response.IsSuccessStatusCode == false)
             {
-                HandleErrors();
+                HandleErrors(response);
             }
 
             var responseContent = await response.Content.ReadAsStringAsync();
-           
+
 
             return JsonConvert.DeserializeObject<TResponse>(responseContent);
         }
@@ -95,18 +95,18 @@ namespace System.Net.Http
 
             if (response.IsSuccessStatusCode == false)
             {
-                HandleErrors();
+                HandleErrors(response);
             }
 
             var responseContent = await response.Content.ReadAsByteArrayAsync();
-           
+
 
             return AvroConvert.Deserialize<TResponse>(responseContent);
         }
 
-        private static void HandleErrors()
+        private static void HandleErrors(HttpResponseMessage httpResponseMessage)
         {
-            throw new NotImplementedException();
+            throw new Exception(httpResponseMessage.ReasonPhrase);
         }
     }
 }
