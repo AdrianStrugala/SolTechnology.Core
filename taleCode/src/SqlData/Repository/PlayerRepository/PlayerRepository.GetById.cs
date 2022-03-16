@@ -21,7 +21,7 @@ SELECT
       ,[DateFrom]
       ,[DateTo]
       ,[Name]
-  FROM [TaleCodeDatabase].[dbo].[Team]
+  FROM [dbo].[Team]
   WHERE PlayerApiId = @PlayerApiId
 ";
 
