@@ -60,9 +60,7 @@ namespace SolTechnology.TaleCode.PlayerRegistry.Commands.CalculatePlayerStatisti
                 result.StatisticsByTeams.Add(CalculateSingleTeamStatistics(teamMatches, team));
             }
 
-            // await _playerStatisticsRepository.Add(result);
-
-            // var x = await _playerStatisticsRepository.Get(result.Id);
+            await _playerStatisticsRepository.Add(result);
         }
 
         private StatisticsByTeam CalculateSingleTeamStatistics(List<Match> teamMatches, Team team)

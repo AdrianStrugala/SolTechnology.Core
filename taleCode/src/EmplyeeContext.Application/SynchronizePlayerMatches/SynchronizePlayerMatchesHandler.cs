@@ -38,6 +38,7 @@ namespace SolTechnology.TaleCode.PlayerRegistry.Commands.SynchronizePlayerMatche
 
         public async Task Handle(SynchronizePlayerMatchesCommand command)
         {
+            //TODO: ADD LOGGER DECORATOR
             using (_logger.BeginOperationScope(new { PlayerName = command.PlayerName }))
             {
                 _logger.OperationStarted(nameof(SynchronizePlayerMatches));
@@ -63,7 +64,7 @@ namespace SolTechnology.TaleCode.PlayerRegistry.Commands.SynchronizePlayerMatche
                     }
 
 
-                    //TODO: Calculate Player STATISTICS
+                    //TODO: TEMP Calculate Player STATISTICS
                     await _calculatePlayerStatsHandler.Handle(new CalculatePlayerStatisticsCommand
                     { PlayerName = command.PlayerName });
 
