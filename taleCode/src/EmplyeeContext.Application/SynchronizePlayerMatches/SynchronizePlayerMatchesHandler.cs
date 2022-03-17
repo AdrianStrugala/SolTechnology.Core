@@ -38,46 +38,29 @@ namespace SolTechnology.TaleCode.PlayerRegistry.Commands.SynchronizePlayerMatche
 
         public async Task Handle(SynchronizePlayerMatchesCommand command)
         {
-            //TODO: ADD LOGGER DECORATOR
-            using (_logger.BeginOperationScope(new { PlayerName = command.PlayerName }))
+            var playerIdMap = _playerIdProvider.GetPlayerId(command.PlayerName);
+            var context = new SynchronizePlayerMatchesContext
             {
-                _logger.OperationStarted(nameof(SynchronizePlayerMatches));
-
-                try
-                {
-                    var playerIdMap = _playerIdProvider.GetPlayerId(command.PlayerName);
-                    var context = new SynchronizePlayerMatchesContext
-                    {
-                        PlayerName = command.PlayerName,
-                        PlayerIdMap = playerIdMap
-                    };
+                PlayerName = command.PlayerName,
+                PlayerIdMap = playerIdMap
+            };
 
 
-                    await _syncPlayer.Execute(context);
+            await _syncPlayer.Execute(context);
 
-                    _determineMatchesToSync.Execute(context);
-
-
-                    foreach (var matchId in context.MatchesToSync)
-                    {
-                        await _syncMatch.Execute(context, matchId);
-                    }
+            _determineMatchesToSync.Execute(context);
 
 
-                    //TODO: TEMP Calculate Player STATISTICS
-                    await _calculatePlayerStatsHandler.Handle(new CalculatePlayerStatisticsCommand
-                    { PlayerName = command.PlayerName });
-
-
-                    _logger.OperationSucceeded(nameof(SynchronizePlayerMatches));
-                }
-                catch (Exception e)
-                {
-                    _logger.OperationFailed(nameof(SyncMatch), e);
-                    throw;
-                }
-
+            foreach (var matchId in context.MatchesToSync)
+            {
+                await _syncMatch.Execute(context, matchId);
             }
+
+
+            //TODO: TEMP Calculate Player STATISTICS
+            await _calculatePlayerStatsHandler.Handle(new CalculatePlayerStatisticsCommand
+            { PlayerName = command.PlayerName });
+
         }
     }
 }

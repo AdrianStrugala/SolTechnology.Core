@@ -3,7 +3,7 @@
 	[Id] INT NOT NULL IDENTITY(1,1) PRIMARY KEY,
 	[ReferenceType] NVARCHAR(50) NOT NULL,
 	[ReferenceId] INT NOT NULL,
-	[Message] NVARCHAR(50) NULL,
+	[Message] NVARCHAR(MAX) NULL,
 	[Valid] BIT NOT NULL,
 
 	[CreatedAt] datetime2 NOT NULL DEFAULT GETUTCDATE(),

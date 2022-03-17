@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using SolTechnology.TaleCode.ApiClients;
 using SolTechnology.TaleCode.BlobData;
 using SolTechnology.TaleCode.Infrastructure;
@@ -20,12 +21,28 @@ namespace SolTechnology.TaleCode.PlayerRegistry.Commands
             services.AddStaticData();
             services.AddBlobData();
 
-            services.AddScoped<ICommandHandler<SynchronizePlayerMatchesCommand>, SynchronizePlayerMatchesHandler>();
+
             services.AddScoped<ISyncPlayer, SyncPlayer>();
             services.AddScoped<IDetermineMatchesToSync, DetermineMatchesToSync>();
             services.AddScoped<ISyncMatch, SyncMatch>();
 
-            services.AddScoped<ICommandHandler<CalculatePlayerStatisticsCommand>, CalculatePlayerStatisticsHandler>();
+            services.AddScoped<CalculatePlayerStatisticsHandler>();
+
+            services.AddScoped<ICommandHandler<CalculatePlayerStatisticsCommand>>(x =>
+                new CommandHandlerLoggingDecorator<CalculatePlayerStatisticsCommand>(
+                    x.GetService<CalculatePlayerStatisticsHandler>(),
+                    x.GetService<ILogger<ICommandHandler<CalculatePlayerStatisticsCommand>>>()));
+
+
+            services.AddScoped<SynchronizePlayerMatchesHandler>();
+
+            services.AddScoped<ICommandHandler<SynchronizePlayerMatchesCommand>>(x =>
+                new CommandHandlerLoggingDecorator<SynchronizePlayerMatchesCommand>(
+                    x.GetService<SynchronizePlayerMatchesHandler>(),
+                    x.GetService<ILogger<ICommandHandler<SynchronizePlayerMatchesCommand>>>()));
+
+
+            // services.AddScoped<ICommandHandler<SynchronizePlayerMatchesCommand>, SynchronizePlayerMatchesHandler>();
 
             return services;
         }

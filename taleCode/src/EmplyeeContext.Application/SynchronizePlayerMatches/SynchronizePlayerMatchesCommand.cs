@@ -10,5 +10,8 @@ namespace SolTechnology.TaleCode.PlayerRegistry.Commands.SynchronizePlayerMatche
         {
             PlayerName = playerName;
         }
+
+        string ICommand.CommandId => PlayerName;
+        string ICommand.CommandName => nameof(SynchronizePlayerMatches);
     }
 }

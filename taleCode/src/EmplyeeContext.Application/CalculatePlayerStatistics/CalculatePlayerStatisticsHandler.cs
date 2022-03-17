@@ -1,4 +1,6 @@
-﻿using SolTechnology.TaleCode.BlobData;
+﻿using Microsoft.Extensions.Logging;
+using SolTechnology.Core.Logging;
+using SolTechnology.TaleCode.BlobData;
 using SolTechnology.TaleCode.BlobData.PlayerStatisticsRepository;
 using SolTechnology.TaleCode.Domain;
 using SolTechnology.TaleCode.Infrastructure;
@@ -15,17 +17,20 @@ namespace SolTechnology.TaleCode.PlayerRegistry.Commands.CalculatePlayerStatisti
         private readonly IMatchRepository _matchRepository;
         private readonly IPlayerRepository _playerRepository;
         private readonly IPlayerStatisticsRepository _playerStatisticsRepository;
+        private readonly ILogger<CalculatePlayerStatisticsHandler> _logger;
 
         public CalculatePlayerStatisticsHandler(
             IPlayerIdProvider playerIdProvider,
             IMatchRepository matchRepository,
             IPlayerRepository playerRepository,
-            IPlayerStatisticsRepository playerStatisticsRepository)
+            IPlayerStatisticsRepository playerStatisticsRepository,
+            ILogger<CalculatePlayerStatisticsHandler> logger)
         {
             _playerIdProvider = playerIdProvider;
             _matchRepository = matchRepository;
             _playerRepository = playerRepository;
             _playerStatisticsRepository = playerStatisticsRepository;
+            _logger = logger;
         }
 
         public async Task Handle(CalculatePlayerStatisticsCommand command)
@@ -43,13 +48,15 @@ namespace SolTechnology.TaleCode.PlayerRegistry.Commands.CalculatePlayerStatisti
 
             result.NumberOfMatches = matches.Count;
 
-            var nationalTeamMatches = matches.Where(m => m.AwayTeam == player.Nationality || m.HomeTeam == player.Nationality).ToList();
+            var nationalTeamMatches = matches
+                .Where(m => m.AwayTeam == player.Nationality || m.HomeTeam == player.Nationality).ToList();
             var clubMatches = matches.Except(nationalTeamMatches).ToList();
 
             result.StatisticsByTeams.Add(
                 CalculateSingleTeamStatistics(
-                nationalTeamMatches,
-                new Team(playerIdMap.FootballDataId, DateProvider.DateMin(), DateProvider.DateMax(), player.Name)));
+                    nationalTeamMatches,
+                    new Team(playerIdMap.FootballDataId, DateProvider.DateMin(), DateProvider.DateMax(),
+                        player.Name)));
 
             foreach (var team in player.Teams)
             {
