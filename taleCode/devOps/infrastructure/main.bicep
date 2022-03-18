@@ -18,7 +18,9 @@ param databaseName string
 param sqlAdminUserName string
 param sqlAdminPassword string
 
+//STORAGE PARAMS
 param storageAccountName string
+param serviceBusName string
 
 @description('Describes plan\'s pricing tier and capacity. Check details at https://azure.microsoft.com/en-us/pricing/details/app-service/')
 @allowed([
@@ -220,4 +222,16 @@ resource storageAccount 'Microsoft.Storage/storageAccounts@2020-08-01-preview' =
     }
     accessTier: 'Hot'
   }
+}
+
+
+//SERVICE BUS----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+resource service_bus 'Microsoft.ServiceBus/namespaces@2021-01-01-preview' = {
+  name: serviceBusName
+  location:location
+  sku: {
+    name: 'Standard'
+    tier: 'Standard'
+  }
+  properties: {}
 }

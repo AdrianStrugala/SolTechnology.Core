@@ -34,6 +34,7 @@ namespace SolTechnology.TaleCode.PlayerRegistry.Commands
                     x.GetService<ILogger<ICommandHandler<CalculatePlayerStatisticsCommand>>>()));
 
 
+            //TODO: Add Decoration to separate library
             services.AddScoped<SynchronizePlayerMatchesHandler>();
 
             services.AddScoped<ICommandHandler<SynchronizePlayerMatchesCommand>>(x =>
