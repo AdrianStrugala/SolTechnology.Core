@@ -23,7 +23,7 @@ namespace SolTechnology.TaleCode.PlayerRegistry.Commands
             services.AddBlobData();
             services.AddMessageBus()
                     .WithPublisher<PlayerMatchesSynchronizedEvent>("synchronizeplayermatches");
-                     
+
 
             services.AddScoped<ISyncPlayer, SyncPlayer>();
             services.AddScoped<IDetermineMatchesToSync, DetermineMatchesToSync>();
@@ -37,7 +37,7 @@ namespace SolTechnology.TaleCode.PlayerRegistry.Commands
                     x.GetService<ILogger<ICommandHandler<CalculatePlayerStatisticsCommand>>>()));
 
 
-            //TODO: Add Decoration to separate library
+            //TODO: Add Decoration to separate library (preferably Logger)
             services.AddScoped<SynchronizePlayerMatchesHandler>();
 
             services.AddScoped<ICommandHandler<SynchronizePlayerMatchesCommand>>(x =>

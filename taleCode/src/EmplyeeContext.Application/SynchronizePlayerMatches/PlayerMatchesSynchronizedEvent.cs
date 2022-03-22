@@ -4,8 +4,6 @@ namespace SolTechnology.TaleCode.PlayerRegistry.Commands.SynchronizePlayerMatche
 {
     public class PlayerMatchesSynchronizedEvent : IMessage
     {
-        public string MessageType => "PlayerMatchesSynchronizedEvent";
-
         public string PlayerName { get; set; }
 
         public PlayerMatchesSynchronizedEvent(string playerName)

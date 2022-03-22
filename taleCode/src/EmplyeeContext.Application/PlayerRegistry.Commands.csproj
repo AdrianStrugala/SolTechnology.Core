@@ -8,7 +8,7 @@
 
 	<ItemGroup>
 		<ProjectReference Include="..\..\..\src\SolTechnology.Core.Logging\SolTechnology.Core.Logging.csproj" />
-		<ProjectReference Include="..\..\..\src\SolTechnology.Core.ServiceBus\SolTechnology.Core.MessageBus.csproj" />
+		<ProjectReference Include="..\..\..\src\SolTechnology.Core.MessageBus\SolTechnology.Core.MessageBus.csproj" />
 		<ProjectReference Include="..\ApiClients\ApiClients.csproj" />
 		<ProjectReference Include="..\BlobData\BlobData.csproj" />
 		<ProjectReference Include="..\Infrastructure\Infrastructure.csproj" />

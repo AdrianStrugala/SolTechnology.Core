@@ -1,8 +1,9 @@
-﻿using SolTechnology.TaleCode.Infrastructure;
+﻿using SolTechnology.Core.Logging;
+using SolTechnology.TaleCode.Infrastructure;
 
 namespace SolTechnology.TaleCode.PlayerRegistry.Commands.SynchronizePlayerMatches
 {
-    public class SynchronizePlayerMatchesCommand : ICommand
+    public class SynchronizePlayerMatchesCommand : ICommand, ILoggedOperation
     {
         public string PlayerName { get; set; }
 
@@ -11,7 +12,11 @@ namespace SolTechnology.TaleCode.PlayerRegistry.Commands.SynchronizePlayerMatche
             PlayerName = playerName;
         }
 
-        string ICommand.CommandId => PlayerName;
-        string ICommand.CommandName => nameof(SynchronizePlayerMatches);
+        LogScope ILoggedOperation.LogScope => new LogScope
+        {
+            OperationId = PlayerName,
+            OperationIdName = nameof(PlayerName),
+            OperationName = nameof(SynchronizePlayerMatches)
+        };
     }
 }

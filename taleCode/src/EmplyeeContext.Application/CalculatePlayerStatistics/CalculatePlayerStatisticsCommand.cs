@@ -1,11 +1,16 @@
-﻿using SolTechnology.TaleCode.Infrastructure;
+﻿using SolTechnology.Core.Logging;
+using SolTechnology.TaleCode.Infrastructure;
 
 namespace SolTechnology.TaleCode.PlayerRegistry.Commands.CalculatePlayerStatistics;
 
-public class CalculatePlayerStatisticsCommand : ICommand
+public class CalculatePlayerStatisticsCommand : ICommand, ILoggedOperation
 {
     public string PlayerName { get; set; }
 
-    string ICommand.CommandId => PlayerName;
-    string ICommand.CommandName => nameof(CalculatePlayerStatistics);
+    LogScope ILoggedOperation.LogScope => new LogScope
+    {
+        OperationId = PlayerName,
+        OperationIdName = nameof(PlayerName),
+        OperationName = nameof(CalculatePlayerStatistics)
+    };
 }

@@ -3,8 +3,14 @@ using SolTechnology.Core.Logging;
 
 namespace SolTechnology.TaleCode.Infrastructure
 {
-    public class CommandHandlerLoggingDecorator<TCommand> : ICommandHandler<TCommand> where TCommand : ICommand
+    public class CommandHandlerLoggingDecorator<TCommand> : ICommandHandler<TCommand> where TCommand : ILoggedOperation, ICommand
     {
+
+        //TODO: Extract decorator to Logging
+        //TODO: Remove ICommand dependency
+
+
+
         private readonly ICommandHandler<TCommand> _handler;
         private readonly ILogger<ICommandHandler<TCommand>> _logger;
 
@@ -17,9 +23,9 @@ namespace SolTechnology.TaleCode.Infrastructure
 
         public async Task Handle(TCommand command)
         {
-            using (_logger.BeginOperationScope(new { command.CommandId }))
+            using (_logger.BeginOperationScope(new KeyValuePair<string, object>(command.LogScope.OperationIdName, command.LogScope.OperationId)))
             {
-                _logger.OperationStarted(command.CommandName);
+                _logger.OperationStarted(command.LogScope.OperationName);
 
                 try
                 {
@@ -27,7 +33,7 @@ namespace SolTechnology.TaleCode.Infrastructure
                 }
                 catch (Exception e)
                 {
-                    _logger.OperationFailed(command.CommandName, e);
+                    _logger.OperationFailed(command.LogScope.OperationName, e);
                     throw;
                 }
             }

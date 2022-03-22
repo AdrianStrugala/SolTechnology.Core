@@ -26,6 +26,8 @@ namespace SolTechnology.Core.MessageBus
             _managementClient = new ManagementClient(connectionString);
         }
 
+        //TODO: Add here topic options (message time to live, retry count and so on)
+
         public void RegisterMessagePublisher(string messageType, string topicName)
         {
             var topicSender = _serviceBusClient.CreateSender(topicName);

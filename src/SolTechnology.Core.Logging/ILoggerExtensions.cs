@@ -18,6 +18,16 @@ namespace SolTechnology.Core.Logging
             return logger.BeginScope(operationIdentifiersDictionary);
         }
 
+        public static IDisposable BeginOperationScope(this ILogger logger, KeyValuePair<string, object> operationIdentifier)
+        {
+            return logger.BeginScope(operationIdentifier);
+        }
+
+        public static IDisposable BeginOperationScope(this ILogger logger, Dictionary<string, object> operationIdentifiers)
+        {
+            return logger.BeginScope(operationIdentifiers);
+        }
+
         public static void OperationStarted(this ILogger logger, string operationName, string message = null)
         {
             if (message != null)
