@@ -68,7 +68,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SolTechnology.Core.Logging"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StaticData", "..\taleCode\src\StaticData\StaticData.csproj", "{170F17D8-5E6F-4473-AFB6-1E438CCE01FF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SolTechnology.Core.Authentication", "SolTechnology.Core.Authentication\SolTechnology.Core.Authentication.csproj", "{585097CE-2CE9-4C8C-9414-EA3BF332B4EF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SolTechnology.Core.Authentication", "SolTechnology.Core.Authentication\SolTechnology.Core.Authentication.csproj", "{585097CE-2CE9-4C8C-9414-EA3BF332B4EF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SolTechnology.Core.MessageBus", "SolTechnology.Core.ServiceBus\SolTechnology.Core.MessageBus.csproj", "{1D000387-BC2D-4F1B-8609-B315112C0013}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -172,6 +174,10 @@ Global
 		{585097CE-2CE9-4C8C-9414-EA3BF332B4EF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{585097CE-2CE9-4C8C-9414-EA3BF332B4EF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{585097CE-2CE9-4C8C-9414-EA3BF332B4EF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1D000387-BC2D-4F1B-8609-B315112C0013}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1D000387-BC2D-4F1B-8609-B315112C0013}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1D000387-BC2D-4F1B-8609-B315112C0013}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1D000387-BC2D-4F1B-8609-B315112C0013}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 using SolTechnology.Core.Logging;
+using SolTechnology.Core.MessageBus;
 using SolTechnology.TaleCode.Infrastructure;
 using SolTechnology.TaleCode.PlayerRegistry.Commands.CalculatePlayerStatistics;
 using SolTechnology.TaleCode.PlayerRegistry.Commands.SynchronizePlayerMatches.Executors;
@@ -14,6 +15,7 @@ namespace SolTechnology.TaleCode.PlayerRegistry.Commands.SynchronizePlayerMatche
         private readonly IDetermineMatchesToSync _determineMatchesToSync;
         private readonly ISyncMatch _syncMatch;
         private readonly IPlayerIdProvider _playerIdProvider;
+        private readonly IMessagePublisher _messagePublisher;
         private readonly ILogger<SynchronizePlayerMatchesHandler> _logger;
         private readonly ICommandHandler<CalculatePlayerStatisticsCommand> _calculatePlayerStatsHandler;
 
@@ -22,6 +24,7 @@ namespace SolTechnology.TaleCode.PlayerRegistry.Commands.SynchronizePlayerMatche
             IDetermineMatchesToSync determineMatchesToSync,
             ISyncMatch syncMatch,
             IPlayerIdProvider playerIdProvider,
+            IMessagePublisher messagePublisher,
             ILogger<SynchronizePlayerMatchesHandler> logger,
 
 
@@ -32,12 +35,14 @@ namespace SolTechnology.TaleCode.PlayerRegistry.Commands.SynchronizePlayerMatche
             _determineMatchesToSync = determineMatchesToSync;
             _syncMatch = syncMatch;
             _playerIdProvider = playerIdProvider;
+            _messagePublisher = messagePublisher;
             _logger = logger;
             _calculatePlayerStatsHandler = calculatePlayerStatsHandler;
         }
 
         public async Task Handle(SynchronizePlayerMatchesCommand command)
         {
+
             var playerIdMap = _playerIdProvider.GetPlayerId(command.PlayerName);
             var context = new SynchronizePlayerMatchesContext
             {
@@ -57,9 +62,17 @@ namespace SolTechnology.TaleCode.PlayerRegistry.Commands.SynchronizePlayerMatche
             }
 
 
-            //TODO: TEMP Calculate Player STATISTICS
+
+
+
+
+            // TODO: TEMP Calculate Player STATISTICS
             await _calculatePlayerStatsHandler.Handle(new CalculatePlayerStatisticsCommand
             { PlayerName = command.PlayerName });
+
+
+            var message = new PlayerMatchesSynchronizedEvent(command.PlayerName);
+            await _messagePublisher.Publish(message);
 
         }
     }

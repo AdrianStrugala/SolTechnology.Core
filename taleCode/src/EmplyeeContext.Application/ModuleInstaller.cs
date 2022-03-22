@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using SolTechnology.Core.MessageBus;
 using SolTechnology.TaleCode.ApiClients;
 using SolTechnology.TaleCode.BlobData;
 using SolTechnology.TaleCode.Infrastructure;
@@ -20,7 +21,9 @@ namespace SolTechnology.TaleCode.PlayerRegistry.Commands
             services.AddApiClients();
             services.AddStaticData();
             services.AddBlobData();
-
+            services.AddMessageBus()
+                    .WithPublisher<PlayerMatchesSynchronizedEvent>("synchronizeplayermatches");
+                     
 
             services.AddScoped<ISyncPlayer, SyncPlayer>();
             services.AddScoped<IDetermineMatchesToSync, DetermineMatchesToSync>();

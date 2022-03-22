@@ -5,6 +5,10 @@ using SolTechnology.Avro;
 
 namespace SolTechnology.Core.BlobStorage.BlobContainerWrapper
 {
+    //TODO  - Refactor this to extensions methods
+    //      - Add content type as optional parameter to write
+    //      - save content type in metadata
+
     public class BlobContainerClientWrapper : IBlobContainerClientWrapper
     {
         private readonly bool _useCompression;
