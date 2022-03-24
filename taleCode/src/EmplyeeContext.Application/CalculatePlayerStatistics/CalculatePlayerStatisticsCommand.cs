@@ -5,12 +5,18 @@ namespace SolTechnology.TaleCode.PlayerRegistry.Commands.CalculatePlayerStatisti
 
 public class CalculatePlayerStatisticsCommand : ICommand, ILoggedOperation
 {
-    public string PlayerName { get; set; }
+    public int PlayerId { get; set; }
+
+    public CalculatePlayerStatisticsCommand(int playerId)
+    {
+        PlayerId = playerId;
+    }
+
 
     LogScope ILoggedOperation.LogScope => new LogScope
     {
-        OperationId = PlayerName,
-        OperationIdName = nameof(PlayerName),
+        OperationId = PlayerId,
+        OperationIdName = nameof(PlayerId),
         OperationName = nameof(CalculatePlayerStatistics)
     };
 }

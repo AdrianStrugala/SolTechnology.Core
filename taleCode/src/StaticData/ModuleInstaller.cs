@@ -7,7 +7,7 @@ namespace SolTechnology.TaleCode.StaticData
     {
         public static IServiceCollection AddStaticData(this IServiceCollection services)
         {
-            services.AddTransient<IPlayerIdProvider, PlayerIdProvider>();
+            services.AddTransient<IPlayerExternalIdsProvider, PlayerExternalIdsProvider>();
 
             return services;
         }

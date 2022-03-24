@@ -15,7 +15,7 @@
         public List<Header> Headers { get; set; } = new List<Header>();
     }
 
-
+    //TODO: not sure if data type makes sense here
     public enum DataType
     {
         Json = 0,

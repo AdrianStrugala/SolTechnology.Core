@@ -30,6 +30,7 @@ namespace SolTechnology.TaleCode.Infrastructure
                 try
                 {
                     await _handler.Handle(command);
+                    _logger.OperationSucceeded(command.LogScope.OperationName);
                 }
                 catch (Exception e)
                 {

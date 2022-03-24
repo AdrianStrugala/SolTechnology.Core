@@ -1,9 +1,8 @@
-﻿using System.Reflection;
-using System.Security.Cryptography.X509Certificates;
-using Azure.Messaging.ServiceBus;
-using Microsoft.Extensions.Configuration;
+﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Options;
+using SolTechnology.Core.MessageBus.Configuration;
+using SolTechnology.Core.MessageBus.Publish;
+using SolTechnology.Core.MessageBus.Receive;
 
 namespace SolTechnology.Core.MessageBus
 {
@@ -32,7 +31,7 @@ namespace SolTechnology.Core.MessageBus
             });
 
             services.AddSingleton<IMessagePublisher, MessagePublisher>();
-            services.AddSingleton<IMessagePublisherConfigurationProvider, MessagePublisherConfigurationProvider>();
+            services.AddSingleton<IMessageBusConfigurationProvider, MessageBusConfigurationProvider>();
 
             return services;
         }
@@ -41,11 +40,31 @@ namespace SolTechnology.Core.MessageBus
             this IServiceCollection services,
             string topicName) where T : IMessage
         {
-            var publisher = services.BuildServiceProvider().GetRequiredService<IMessagePublisherConfigurationProvider>();
+            var configurationProvider = services.BuildServiceProvider().GetRequiredService<IMessageBusConfigurationProvider>();
 
             string messageType = typeof(T).Name;
 
-            publisher.RegisterMessagePublisher(messageType, topicName);
+            configurationProvider.RegisterMessagePublisher(messageType, topicName);
+
+            return services;
+        }
+
+        public static IServiceCollection WithReceiver<TMessage, THandler>(
+            this IServiceCollection services,
+            string topicName,
+            string subscriptionName)
+            where TMessage : IMessage where THandler : class, IMessageHandler<TMessage>
+        {
+            var configurationProvider = services.BuildServiceProvider()
+                .GetRequiredService<IMessageBusConfigurationProvider>();
+
+            services.AddHostedService<MessageBusReceiver<TMessage>>();
+            services.AddScoped<THandler>();
+            services.AddScoped(typeof(MessageBusReceiver<TMessage>), (serviceProvider) => serviceProvider.GetRequiredService<THandler>());
+
+            string messageType = typeof(TMessage).Name;
+
+            configurationProvider.RegisterMessageReceiver(messageType, topicName, subscriptionName);
 
             return services;
         }

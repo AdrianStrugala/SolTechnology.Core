@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
 using SolTechnology.Core.Logging;
 using SolTechnology.Core.MessageBus;
+using SolTechnology.Core.MessageBus.Publish;
 using SolTechnology.TaleCode.Infrastructure;
 using SolTechnology.TaleCode.PlayerRegistry.Commands.CalculatePlayerStatistics;
 using SolTechnology.TaleCode.PlayerRegistry.Commands.SynchronizePlayerMatches.Executors;
@@ -14,7 +15,7 @@ namespace SolTechnology.TaleCode.PlayerRegistry.Commands.SynchronizePlayerMatche
         private readonly ISyncPlayer _syncPlayer;
         private readonly IDetermineMatchesToSync _determineMatchesToSync;
         private readonly ISyncMatch _syncMatch;
-        private readonly IPlayerIdProvider _playerIdProvider;
+        private readonly IPlayerExternalIdsProvider _playerExternalIdsProvider;
         private readonly IMessagePublisher _messagePublisher;
         private readonly ILogger<SynchronizePlayerMatchesHandler> _logger;
         private readonly ICommandHandler<CalculatePlayerStatisticsCommand> _calculatePlayerStatsHandler;
@@ -23,7 +24,7 @@ namespace SolTechnology.TaleCode.PlayerRegistry.Commands.SynchronizePlayerMatche
             ISyncPlayer syncPlayer,
             IDetermineMatchesToSync determineMatchesToSync,
             ISyncMatch syncMatch,
-            IPlayerIdProvider playerIdProvider,
+            IPlayerExternalIdsProvider playerExternalIdsProvider,
             IMessagePublisher messagePublisher,
             ILogger<SynchronizePlayerMatchesHandler> logger,
 
@@ -34,7 +35,7 @@ namespace SolTechnology.TaleCode.PlayerRegistry.Commands.SynchronizePlayerMatche
             _syncPlayer = syncPlayer;
             _determineMatchesToSync = determineMatchesToSync;
             _syncMatch = syncMatch;
-            _playerIdProvider = playerIdProvider;
+            _playerExternalIdsProvider = playerExternalIdsProvider;
             _messagePublisher = messagePublisher;
             _logger = logger;
             _calculatePlayerStatsHandler = calculatePlayerStatsHandler;
@@ -43,10 +44,13 @@ namespace SolTechnology.TaleCode.PlayerRegistry.Commands.SynchronizePlayerMatche
         public async Task Handle(SynchronizePlayerMatchesCommand command)
         {
 
-            var playerIdMap = _playerIdProvider.GetPlayerId(command.PlayerName);
+            //TODO: for testing
+            var message = new PlayerMatchesSynchronizedEvent(command.PlayerId);
+            await _messagePublisher.Publish(message);
+
+            var playerIdMap = _playerExternalIdsProvider.GetExternalPlayerId(command.PlayerId);
             var context = new SynchronizePlayerMatchesContext
             {
-                PlayerName = command.PlayerName,
                 PlayerIdMap = playerIdMap
             };
 
@@ -67,11 +71,11 @@ namespace SolTechnology.TaleCode.PlayerRegistry.Commands.SynchronizePlayerMatche
 
 
             // TODO: TEMP Calculate Player STATISTICS
-            await _calculatePlayerStatsHandler.Handle(new CalculatePlayerStatisticsCommand
-            { PlayerName = command.PlayerName });
+            // await _calculatePlayerStatsHandler.Handle(new CalculatePlayerStatisticsCommand
+            // { PlayerId = command.PlayerId });
 
 
-            var message = new PlayerMatchesSynchronizedEvent(command.PlayerName);
+            // var message = new PlayerMatchesSynchronizedEvent(command.PlayerId);
             await _messagePublisher.Publish(message);
 
         }

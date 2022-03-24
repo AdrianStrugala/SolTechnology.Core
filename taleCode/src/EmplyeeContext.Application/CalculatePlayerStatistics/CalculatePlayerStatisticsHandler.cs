@@ -13,20 +13,20 @@ namespace SolTechnology.TaleCode.PlayerRegistry.Commands.CalculatePlayerStatisti
 {
     public class CalculatePlayerStatisticsHandler : ICommandHandler<CalculatePlayerStatisticsCommand>
     {
-        private readonly IPlayerIdProvider _playerIdProvider;
+        private readonly IPlayerExternalIdsProvider _playerExternalIdsProvider;
         private readonly IMatchRepository _matchRepository;
         private readonly IPlayerRepository _playerRepository;
         private readonly IPlayerStatisticsRepository _playerStatisticsRepository;
         private readonly ILogger<CalculatePlayerStatisticsHandler> _logger;
 
         public CalculatePlayerStatisticsHandler(
-            IPlayerIdProvider playerIdProvider,
+            IPlayerExternalIdsProvider playerExternalIdsProvider,
             IMatchRepository matchRepository,
             IPlayerRepository playerRepository,
             IPlayerStatisticsRepository playerStatisticsRepository,
             ILogger<CalculatePlayerStatisticsHandler> logger)
         {
-            _playerIdProvider = playerIdProvider;
+            _playerExternalIdsProvider = playerExternalIdsProvider;
             _matchRepository = matchRepository;
             _playerRepository = playerRepository;
             _playerStatisticsRepository = playerStatisticsRepository;
@@ -35,17 +35,17 @@ namespace SolTechnology.TaleCode.PlayerRegistry.Commands.CalculatePlayerStatisti
 
         public async Task Handle(CalculatePlayerStatisticsCommand command)
         {
-            var playerIdMap = _playerIdProvider.GetPlayerId(command.PlayerName);
+            var playerIdMap = _playerExternalIdsProvider.GetExternalPlayerId(command.PlayerId);
 
             var result = new PlayerStatistics
             {
-                Id = playerIdMap.FootballDataId,
-                Name = command.PlayerName
+                Id = command.PlayerId
             };
 
             var player = _playerRepository.GetById(playerIdMap.FootballDataId);
             var matches = _matchRepository.GetByPlayerId(playerIdMap.FootballDataId);
 
+            result.Name = player.Name;
             result.NumberOfMatches = matches.Count;
 
             var nationalTeamMatches = matches

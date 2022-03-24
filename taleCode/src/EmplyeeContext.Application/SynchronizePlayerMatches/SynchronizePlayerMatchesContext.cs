@@ -5,8 +5,6 @@ namespace SolTechnology.TaleCode.PlayerRegistry.Commands.SynchronizePlayerMatche
 {
     public class SynchronizePlayerMatchesContext
     {
-        public string PlayerName { get; set; }
-
         public PlayerIdMap PlayerIdMap { get; set; }
 
         public Player Player { get; set; }

@@ -1,5 +1,5 @@
 ﻿
-namespace SolTechnology.Core.MessageBus
+namespace SolTechnology.Core.MessageBus.Configuration
 {
     public class MessageBusConfiguration
     {

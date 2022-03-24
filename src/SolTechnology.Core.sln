@@ -70,7 +70,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StaticData", "..\taleCode\s
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SolTechnology.Core.Authentication", "SolTechnology.Core.Authentication\SolTechnology.Core.Authentication.csproj", "{585097CE-2CE9-4C8C-9414-EA3BF332B4EF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SolTechnology.Core.MessageBus", "SolTechnology.Core.MessageBus\SolTechnology.Core.MessageBus.csproj", "{1D000387-BC2D-4F1B-8609-B315112C0013}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SolTechnology.Core.MessageBus", "SolTechnology.Core.MessageBus\SolTechnology.Core.MessageBus.csproj", "{1D000387-BC2D-4F1B-8609-B315112C0013}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

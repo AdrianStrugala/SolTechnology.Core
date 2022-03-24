@@ -20,7 +20,7 @@ namespace SolTechnology.TaleCode.Api.Controllers
         {
             try
             {
-                _handler.Handle(new SynchronizePlayerMatchesCommand("Cristiano Ronaldo"));
+                _handler.Handle(new SynchronizePlayerMatchesCommand(44));
             }
             catch (Exception e)
             {

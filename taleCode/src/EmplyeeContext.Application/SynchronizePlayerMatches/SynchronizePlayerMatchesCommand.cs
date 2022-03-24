@@ -5,17 +5,17 @@ namespace SolTechnology.TaleCode.PlayerRegistry.Commands.SynchronizePlayerMatche
 {
     public class SynchronizePlayerMatchesCommand : ICommand, ILoggedOperation
     {
-        public string PlayerName { get; set; }
+        public int PlayerId { get; set; }
 
-        public SynchronizePlayerMatchesCommand(string playerName)
+        public SynchronizePlayerMatchesCommand(int playerId)
         {
-            PlayerName = playerName;
+            PlayerId = playerId;
         }
 
         LogScope ILoggedOperation.LogScope => new LogScope
         {
-            OperationId = PlayerName,
-            OperationIdName = nameof(PlayerName),
+            OperationId = PlayerId,
+            OperationIdName = nameof(PlayerId),
             OperationName = nameof(SynchronizePlayerMatches)
         };
     }
