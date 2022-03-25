@@ -12,7 +12,7 @@ namespace SolTechnology.TaleCode.PlayerRegistry.Commands.SynchronizePlayerMatche
             PlayerId = playerId;
         }
 
-        LogScope ILoggedOperation.LogScope => new LogScope
+        LogScope ILoggedOperation.LogScope => new()
         {
             OperationId = PlayerId,
             OperationIdName = nameof(PlayerId),
