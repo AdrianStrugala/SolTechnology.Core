@@ -162,7 +162,7 @@ stages:
             appType: webAppLinux
             azureSubscription: $(azureServiceConnection)
             appName: $(eventListenerName)
-            package: '$(Pipeline.Workspace)\drop\EventListener\SolTechnology.TaleCode.EventListener.zip'
+            package: '$(Pipeline.Workspace)\drop\EventListener\EventListener.zip'
 
 
 
