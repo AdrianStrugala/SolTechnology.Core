@@ -1,6 +1,4 @@
 ﻿using Microsoft.Extensions.Logging;
-using SolTechnology.Core.Logging;
-using SolTechnology.TaleCode.BlobData;
 using SolTechnology.TaleCode.BlobData.PlayerStatisticsRepository;
 using SolTechnology.TaleCode.Domain;
 using SolTechnology.TaleCode.Infrastructure;

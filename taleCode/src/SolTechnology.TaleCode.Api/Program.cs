@@ -2,7 +2,6 @@ using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
 using SolTechnology.Core.ApiClient;
 using SolTechnology.Core.Authentication;
-using SolTechnology.Core.Sql;
 using SolTechnology.TaleCode.PlayerRegistry.Commands;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -10,6 +9,9 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 
 builder.Services.AddEndpointsApiExplorer();
+
+
+//TODO: Messagebus can be refactored to have internal api like here in AddLogging
 builder.Services.AddLogging(c =>
         c.AddConsole()
         .AddApplicationInsights());

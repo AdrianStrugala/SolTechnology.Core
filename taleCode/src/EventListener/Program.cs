@@ -8,12 +8,12 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddLogging(c =>
             c.AddConsole()
                 .AddApplicationInsights());
-// services.AddApplicationInsightsTelemetry();
+builder.Services.AddApplicationInsightsTelemetry();
 
 builder.Services.AddCommands();
 
 builder.Services.AddMessageBus()
-           .WithReceiver<PlayerMatchesSynchronizedEvent, CalculatePlayerStatistics>("synchronizeplayermatches", "calculatestatistics");
+                .WithReceiver<PlayerMatchesSynchronizedEvent, CalculatePlayerStatistics>("synchronizeplayermatches", "calculatestatistics");
 
 builder.Services.AddControllers();
 

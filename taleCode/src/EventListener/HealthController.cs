@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 
-namespace SolTechnology.TaleCode.Api.Controllers
+namespace SolTechnology.TaleCode.EventListener
 {
     [ApiController]
     [Route("")]
@@ -17,7 +17,7 @@ namespace SolTechnology.TaleCode.Api.Controllers
         public string GetAsync()
         {
             _logger.LogWarning("Run");
-            return "I'm Alive!";
+            return $"My name is {nameof(EventListener)}. I'll become the king of Message Bus!";
         }
     }
 }
