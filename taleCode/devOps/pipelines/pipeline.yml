@@ -136,7 +136,7 @@ stages:
               az deployment group create \
               --resource-group $(resourceGroupName) \
               --template-file '$(Pipeline.Workspace)\drop\Infrastructure\$(templateFile)' \
-              --parameters testParam='$(testParam)' baseName='taleCode' sqlAdminUserName='$(sqlAdminUserName)' sqlAdminPassword='$(sqlAdminPassword)' sqlServerName='$(sqlServerName)' databaseName='$(databaseName)' apiName='$(apiName)' storageAccountName='$(storageAccountName)' serviceBusName='$(serviceBusName)'
+              --parameters testParam='$(testParam)' baseName='taleCode' sqlAdminUserName='$(sqlAdminUserName)' sqlAdminPassword='$(sqlAdminPassword)' sqlServerName='$(sqlServerName)' databaseName='$(databaseName)' apiName='$(apiName)' storageAccountName='$(storageAccountName)' serviceBusName='$(serviceBusName)' eventListenerName='$(eventListenerName)'
 
         - task: SqlAzureDacpacDeployment@1
           displayName: 'Deploy Database'
