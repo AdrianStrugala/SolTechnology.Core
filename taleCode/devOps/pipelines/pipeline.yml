@@ -93,8 +93,16 @@ stages:
             arguments: '--configuration Release --output $(Build.ArtifactStagingDirectory)/EventListener'
 
         - task: FileTransform@1
+          displayName: 'Apply Production App settings for Api'
           inputs:
-            folderPath: '$(Build.ArtifactStagingDirectory)/**/*.zip'
+            folderPath: '$(Build.ArtifactStagingDirectory)/**/*Api.zip'
+            fileType: 'json'
+            targetFiles: '**/appsettings.json'
+
+        - task: FileTransform@1
+          displayName: 'Apply Production App settings for EventListener'
+          inputs:
+            folderPath: '$(Build.ArtifactStagingDirectory)/**/*EventListener.zip'
             fileType: 'json'
             targetFiles: '**/appsettings.json'
 
