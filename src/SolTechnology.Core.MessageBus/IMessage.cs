@@ -1,4 +1,4 @@
-﻿namespace SolTechnology.Core.MessageBus.Publish;
+﻿namespace SolTechnology.Core.MessageBus;
 
 public interface IMessage
 {

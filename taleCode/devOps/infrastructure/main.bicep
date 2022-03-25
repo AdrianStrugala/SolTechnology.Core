@@ -6,10 +6,11 @@ param location string = resourceGroup().location
 param testParam string
 
 
-//API PARAMS
+//APPS PARAMS
 param appServicePlanName string = '${baseName}plan'
 param apiName string
 param apiSkuName string = 'F1'
+param eventListenerName string
 
 
 //SQL PARAMS
@@ -21,6 +22,9 @@ param sqlAdminPassword string
 //STORAGE PARAMS
 param storageAccountName string
 param serviceBusName string
+
+
+
 
 @description('Describes plan\'s pricing tier and capacity. Check details at https://azure.microsoft.com/en-us/pricing/details/app-service/')
 @allowed([
@@ -78,7 +82,45 @@ resource api 'Microsoft.Web/sites@2021-02-01' = {
   location: location
   tags: {
     'hidden-related:${resourceGroup().id}/providers/Microsoft.Web/serverfarms/${apiName}': 'Resource'
-    displayName: 'Tale Code'
+    displayName: 'Tale Code API'
+  }
+  properties: {
+    serverFarmId: appServicePlan.id
+    httpsOnly: true
+    siteConfig: {
+      ftpsState: 'Disabled'
+      netFrameworkVersion: 'v6.0'
+      http20Enabled: true
+      minTlsVersion: '1.2'
+      autoHealEnabled: true
+      autoHealRules: {
+        actions: {
+          actionType: 'Recycle'
+        }
+        triggers: {
+          statusCodes: [
+            {
+              status: 500
+            }
+            {
+              status: 502
+            }
+            {
+              status: 503
+            }
+          ]
+        }
+      }
+    }
+  }
+}
+
+resource eventListener 'Microsoft.Web/sites@2021-02-01' = {
+  name: eventListenerName
+  location: location
+  tags: {
+    'hidden-related:${resourceGroup().id}/providers/Microsoft.Web/serverfarms/${apiName}': 'Resource'
+    displayName: 'Tale Code Event Listener'
   }
   properties: {
     serverFarmId: appServicePlan.id

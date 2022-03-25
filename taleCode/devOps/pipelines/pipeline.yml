@@ -84,6 +84,14 @@ stages:
             publishWebProjects: False
             arguments: '--configuration Release --output $(Build.ArtifactStagingDirectory)/Api'
 
+        - task: DotNetCoreCLI@2
+          displayName: 'Publish Event Listener'
+          inputs:
+            command: publish
+            projects: 'taleCode/src/**/EventListener.csproj'
+            publishWebProjects: False
+            arguments: '--configuration Release --output $(Build.ArtifactStagingDirectory)/EventListener'
+
         - task: FileTransform@1
           inputs:
             folderPath: '$(Build.ArtifactStagingDirectory)/**/*.zip'
@@ -139,6 +147,14 @@ stages:
             azureSubscription: $(azureServiceConnection)
             appName: $(apiName)
             package: '$(Pipeline.Workspace)\drop\Api\SolTechnology.TaleCode.Api.zip'
+        
+        - task: AzureWebApp@1
+          displayName: 'Deploy EventListener'
+          inputs:
+            appType: webAppLinux
+            azureSubscription: $(azureServiceConnection)
+            appName: $(eventListenerName)
+            package: '$(Pipeline.Workspace)\drop\EventListener\SolTechnology.TaleCode.EventListener.zip'
 
 
 

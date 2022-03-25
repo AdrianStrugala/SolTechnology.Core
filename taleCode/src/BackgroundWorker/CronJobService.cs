@@ -1,5 +1,7 @@
 ﻿using Cronos;
 
+namespace BackgroundWorker;
+
 public class CronJobService : IHostedService, IDisposable
 {
     private System.Timers.Timer _timer;

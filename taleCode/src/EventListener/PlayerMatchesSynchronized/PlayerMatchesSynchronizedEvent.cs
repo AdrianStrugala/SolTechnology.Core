@@ -1,4 +1,5 @@
-﻿using SolTechnology.Core.MessageBus.Publish;
+﻿using SolTechnology.Core.MessageBus;
+using SolTechnology.Core.MessageBus.Publish;
 
 namespace SolTechnology.TaleCode.EventListener.PlayerMatchesSynchronized
 {
