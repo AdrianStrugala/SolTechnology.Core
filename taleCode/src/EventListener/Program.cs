@@ -1,35 +1,30 @@
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using SolTechnology.Core.MessageBus;
 using SolTechnology.TaleCode.EventListener.PlayerMatchesSynchronized;
 using SolTechnology.TaleCode.PlayerRegistry.Commands;
 
-var builder = Host.CreateDefaultBuilder(args)
-    .ConfigureServices((hostContext, services) =>
-    {
-        services.AddLogging(c =>
+var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddLogging(c =>
             c.AddConsole()
                 .AddApplicationInsights());
-        // services.AddApplicationInsightsTelemetry();
+// services.AddApplicationInsightsTelemetry();
 
-        services.AddCommands();
+builder.Services.AddCommands();
 
-        services.AddMessageBus()
+builder.Services.AddMessageBus()
            .WithReceiver<PlayerMatchesSynchronizedEvent, CalculatePlayerStatistics>("synchronizeplayermatches", "calculatestatistics");
-    });
-// var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-
-
-
-
-
+builder.Services.AddControllers();
 
 
 var app = builder.Build();
-await app.RunAsync();
 
 
-// app.Run("http://localhost:2137");
+app.MapControllers();
+if (app.Environment.IsDevelopment())
+{
+    app.Run("http://localhost:2137");
+}
+app.Run();
+

@@ -165,7 +165,19 @@ resource appsettings 'Microsoft.Web/sites/config@2015-08-01' = {
   }
   properties: {
     ASPNETCORE_ENVIRONMENT: environmentName
-    TEST_PARAM: testParam
+    APPINSIGHTS_INSTRUMENTATIONKEY: app_insights.properties.InstrumentationKey
+  }
+}
+
+resource appsettingsEventListener 'Microsoft.Web/sites/config@2015-08-01' = {
+  parent: eventListener
+  location: location
+  name: 'appsettings'
+  tags: {
+    displayName: 'appsettings'
+  }
+  properties: {
+    ASPNETCORE_ENVIRONMENT: environmentName
     APPINSIGHTS_INSTRUMENTATIONKEY: app_insights.properties.InstrumentationKey
   }
 }
