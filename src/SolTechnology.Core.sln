@@ -72,6 +72,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SolTechnology.Core.Authenti
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SolTechnology.Core.MessageBus", "SolTechnology.Core.MessageBus\SolTechnology.Core.MessageBus.csproj", "{1D000387-BC2D-4F1B-8609-B315112C0013}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Docs", "Docs", "{7513E3F2-A3A4-45C8-8165-E3B836713466}"
+	ProjectSection(SolutionItems) = preProject
+		..\docs\Sql.md = ..\docs\Sql.md
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
