@@ -3,6 +3,7 @@ using Microsoft.OpenApi.Models;
 using SolTechnology.Core.ApiClient;
 using SolTechnology.Core.Authentication;
 using SolTechnology.TaleCode.PlayerRegistry.Commands;
+using SolTechnology.TaleCode.PlayerRegistry.Queries;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -19,6 +20,7 @@ builder.Services.AddApplicationInsightsTelemetry();
 
 
 builder.Services.AddCommands();
+builder.Services.AddQueries();
 
 
 var authenticationFiler = builder.Services.AddAuthenticationAndBuildFilter();

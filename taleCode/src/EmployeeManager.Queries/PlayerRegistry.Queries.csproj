@@ -7,4 +7,9 @@
 		<RootNamespace>SolTechnology.TaleCode.PlayerRegistry.Queries</RootNamespace>
 	</PropertyGroup>
 
+	<ItemGroup>
+	  <ProjectReference Include="..\BlobData\BlobData.csproj" />
+	  <ProjectReference Include="..\Infrastructure\Infrastructure.csproj" />
+	</ItemGroup>
+
 </Project>

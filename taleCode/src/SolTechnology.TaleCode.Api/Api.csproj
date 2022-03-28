@@ -14,6 +14,7 @@
 
 	<ItemGroup>
 	  <ProjectReference Include="..\..\..\src\SolTechnology.Core.Authentication\SolTechnology.Core.Authentication.csproj" />
+	  <ProjectReference Include="..\EmployeeManager.Queries\PlayerRegistry.Queries.csproj" />
 	  <ProjectReference Include="..\EmplyeeContext.Application\PlayerRegistry.Commands.csproj" />
 	  <ProjectReference Include="..\Infrastructure\Infrastructure.csproj" />
 	</ItemGroup>

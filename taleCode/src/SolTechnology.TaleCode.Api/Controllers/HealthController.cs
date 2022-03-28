@@ -17,7 +17,7 @@ namespace SolTechnology.TaleCode.Api.Controllers
         public string GetAsync()
         {
             _logger.LogWarning("Run");
-            return "I'm Alive!";
+            return "I'm the Tale COde Api!";
         }
     }
 }
