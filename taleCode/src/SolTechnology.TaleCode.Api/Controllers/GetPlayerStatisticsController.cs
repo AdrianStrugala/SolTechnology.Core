@@ -1,15 +1,16 @@
 using Microsoft.AspNetCore.Mvc;
 using SolTechnology.TaleCode.Infrastructure;
 using SolTechnology.TaleCode.PlayerRegistry.Commands.SynchronizePlayerMatches;
+using SolTechnology.TaleCode.PlayerRegistry.Queries.GetPlayerStatistics;
 
 namespace SolTechnology.TaleCode.Api.Controllers
 {
     [ApiController]
     public class GetPlayerStatisticsController : ControllerBase
     {
-        private readonly ICommandHandler<SynchronizePlayerMatchesCommand> _handler;
+        private readonly IQueryHandler<GetPlayerStatisticsQuery, GetPlayerStatisticsResult> _handler;
 
-        public GetPlayerStatisticsController(ICommandHandler<SynchronizePlayerMatchesCommand> handler)
+        public GetPlayerStatisticsController(IQueryHandler<GetPlayerStatisticsQuery, GetPlayerStatisticsResult> handler)
         {
             _handler = handler;
         }
@@ -20,7 +21,7 @@ namespace SolTechnology.TaleCode.Api.Controllers
         {
             try
             {
-                _handler.Handle(new SynchronizePlayerMatchesCommand(44));
+                _handler.Handle(new GetPlayerStatisticsQuery(playerId));
             }
             catch (Exception e)
             {

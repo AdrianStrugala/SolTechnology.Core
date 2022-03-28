@@ -11,7 +11,7 @@ namespace SolTechnology.TaleCode.PlayerRegistry.Queries
         {
             services.AddBlobData();
 
-            services.AddScoped<IQueryHandler<GetPlayerStatisticsQuery, GetPlayerStatisticsResult>>();
+            services.AddScoped<IQueryHandler<GetPlayerStatisticsQuery, GetPlayerStatisticsResult>, GetPlayerStatisticsHandler>();
 
             return services;
         }
