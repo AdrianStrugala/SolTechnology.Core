@@ -17,11 +17,11 @@ namespace SolTechnology.TaleCode.Api.Controllers
 
         [HttpGet]
         [Route("GetPlayerStatistics/{playerId}")]
-        public void GetPlayerStatistics(int playerId)
+        public async Task<GetPlayerStatisticsResult> GetPlayerStatistics(int playerId)
         {
             try
             {
-                _handler.Handle(new GetPlayerStatisticsQuery(playerId));
+                return await _handler.Handle(new GetPlayerStatisticsQuery(playerId));
             }
             catch (Exception e)
             {
