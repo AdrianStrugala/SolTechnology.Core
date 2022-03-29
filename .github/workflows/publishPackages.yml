@@ -22,7 +22,7 @@ jobs:
     - name: Build
       run: dotnet build src/SolTechnology.Core.sln --no-restore
     - name: Test
-      run: dotnet test src/SolTechnology.Core.sln --no-build --verbosity normal
+      run: dotnet test tests/**/*Tests.csproj --no-build --verbosity normal
    
     - name: Pack SolTechnology.Core.Sql
       run: dotnet pack -c Release -o . ./src/SolTechnology.Core.Sql/SolTechnology.Core.Sql.csproj

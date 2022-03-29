@@ -1,4 +1,6 @@
+### Overview
 
+The SolTechnology.Core.Sql library provides minimum functionality needed for SQL db connection. It handles needed services registration and configuration and a result provides IDbConnection.
 
 ### Registration
 
@@ -32,3 +34,20 @@ services.AddSql(sqlConfiguration);
 
 
 ### Usage
+
+1) Inject ISqlConnectionFactory
+
+```csharp
+     public MatchRepository(ISqlConnectionFactory sqlConnectionFactory)
+        {
+            _sqlConnectionFactory = sqlConnectionFactory;
+        }
+```
+
+2) Create IDbConnection
+
+```csharp
+  using (var connection = _sqlConnectionFactory.CreateConnection())
+```
+
+3) Works well with raw SQL and Dapper ORM.
