@@ -1,4 +1,4 @@
-name: build test and publish nuget packages
+name: Build, test and publish
 
 on:
   push:
@@ -23,45 +23,27 @@ jobs:
       run: dotnet build src/SolTechnology.Core.sln --no-restore
     - name: Test
       run: dotnet test src/SolTechnology.Core.sln --no-build --verbosity normal
-      
-    - name: Publish SolTechnology.Core.Sql
-      uses: brandedoutcast/publish-nuget@v2.5.5
-      with:
-          PROJECT_FILE_PATH: src/SolTechnology.Core.Sql/SolTechnology.Core.Sql.csproj
-          NUGET_KEY: ${{secrets.NUGET_API_KEY}}
+   
+    - name: Pack SolTechnology.Core.Sql
+      run: dotnet pack -c Release -o . src/SolTechnology.Core.Sql/SolTechnology.Core.Sql.csproj
 
-    - name: Publish SolTechnology.Core.BlobStorage
-      uses: brandedoutcast/publish-nuget@v2.5.5
-      with:
-          PROJECT_FILE_PATH: src/SolTechnology.Core.BlobStorage/SolTechnology.Core.BlobStorage.csproj
-          NUGET_KEY: ${{secrets.NUGET_API_KEY}}
+    - name: Pack SolTechnology.Core.BlobStorage
+      run: dotnet pack -c Release -o . src/SolTechnology.Core.BlobStorage/SolTechnology.Core.BlobStorage.csproj
 
-    - name: Publish SolTechnology.Core.ApiClient
-      uses: brandedoutcast/publish-nuget@v2.5.5
-      with:
-          PROJECT_FILE_PATH: src/SolTechnology.Core.ApiClient/SolTechnology.Core.ApiClient.csproj
-          NUGET_KEY: ${{secrets.NUGET_API_KEY}}
+    - name: Pack SolTechnology.Core.ApiClient
+      run: dotnet pack -c Release -o . src/SolTechnology.Core.ApiClient/SolTechnology.Core.ApiClient.csproj
 
-    - name: Publish SolTechnology.Core.Guards
-      uses: brandedoutcast/publish-nuget@v2.5.5
-      with:
-          PROJECT_FILE_PATH: src/SolTechnology.Core.Guards/SolTechnology.Core.Guards.csproj
-          NUGET_KEY: ${{secrets.NUGET_API_KEY}}
+    - name: Pack SolTechnology.Core.Guards
+      run: dotnet pack -c Release -o . src/SolTechnology.Core.Guards/SolTechnology.Core.Guards.csproj
 
-    - name: Publish SolTechnology.Core.Logging
-      uses: brandedoutcast/publish-nuget@v2.5.5
-      with:
-          PROJECT_FILE_PATH: src/SolTechnology.Core.Logging/SolTechnology.Core.Logging.csproj
-          NUGET_KEY: ${{secrets.NUGET_API_KEY}}
+    - name: Pack SolTechnology.Core.Logging
+      run: dotnet pack -c Release -o . src/SolTechnology.Core.Logging/SolTechnology.Core.Logging.csproj
 
-    - name: Publish SolTechnology.Core.Authentication
-      uses: brandedoutcast/publish-nuget@v2.5.5
-      with:
-          PROJECT_FILE_PATH: src/SolTechnology.Core.Authentication/SolTechnology.Core.Authentication.csproj
-          NUGET_KEY: ${{secrets.NUGET_API_KEY}}
+    - name: Pack SolTechnology.Core.Authentication
+      run: dotnet pack -c Release -o . src/SolTechnology.Core.Authentication/SolTechnology.Core.Authentication.csproj
 
-    - name: Publish SolTechnology.Core.MessageBus
-      uses: brandedoutcast/publish-nuget@v2.5.5
-      with:
-          PROJECT_FILE_PATH: src/SolTechnology.Core.MessageBus/SolTechnology.Core.MessageBus.csproj
-          NUGET_KEY: ${{secrets.NUGET_API_KEY}}
+    - name: Pack SolTechnology.Core.MessageBus
+      run: dotnet pack -c Release -o . src/SolTechnology.Core.MessageBus/SolTechnology.Core.MessageBus.csproj
+
+    - name: Publish all nuget packages
+      run: dotnet nuget push *.nupkg -k ${{ secrets.NUGET_KEY }} -s https://api.nuget.org/v3/index.json
