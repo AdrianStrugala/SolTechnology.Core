@@ -25,25 +25,25 @@ jobs:
       run: dotnet test src/SolTechnology.Core.sln --no-build --verbosity normal
    
     - name: Pack SolTechnology.Core.Sql
-      run: dotnet pack -c Release -o . src/SolTechnology.Core.Sql/SolTechnology.Core.Sql.csproj
+      run: dotnet pack -c Release -o . ./src/SolTechnology.Core.Sql/SolTechnology.Core.Sql.csproj
 
     - name: Pack SolTechnology.Core.BlobStorage
-      run: dotnet pack -c Release -o . src/SolTechnology.Core.BlobStorage/SolTechnology.Core.BlobStorage.csproj
+      run: dotnet pack -c Release -o . ./src/SolTechnology.Core.BlobStorage/SolTechnology.Core.BlobStorage.csproj
 
     - name: Pack SolTechnology.Core.ApiClient
-      run: dotnet pack -c Release -o . src/SolTechnology.Core.ApiClient/SolTechnology.Core.ApiClient.csproj
+      run: dotnet pack -c Release -o . ./src/SolTechnology.Core.ApiClient/SolTechnology.Core.ApiClient.csproj
 
     - name: Pack SolTechnology.Core.Guards
-      run: dotnet pack -c Release -o . src/SolTechnology.Core.Guards/SolTechnology.Core.Guards.csproj
+      run: dotnet pack -c Release -o . ./src/SolTechnology.Core.Guards/SolTechnology.Core.Guards.csproj
 
     - name: Pack SolTechnology.Core.Logging
-      run: dotnet pack -c Release -o . src/SolTechnology.Core.Logging/SolTechnology.Core.Logging.csproj
+      run: dotnet pack -c Release -o . ./src/SolTechnology.Core.Logging/SolTechnology.Core.Logging.csproj
 
     - name: Pack SolTechnology.Core.Authentication
-      run: dotnet pack -c Release -o . src/SolTechnology.Core.Authentication/SolTechnology.Core.Authentication.csproj
+      run: dotnet pack -c Release -o . ./src/SolTechnology.Core.Authentication/SolTechnology.Core.Authentication.csproj
 
     - name: Pack SolTechnology.Core.MessageBus
-      run: dotnet pack -c Release -o . src/SolTechnology.Core.MessageBus/SolTechnology.Core.MessageBus.csproj
+      run: dotnet pack -c Release -o . ./src/SolTechnology.Core.MessageBus/SolTechnology.Core.MessageBus.csproj
 
     - name: Publish all nuget packages
       run: dotnet nuget push *.nupkg -k ${{ secrets.NUGET_KEY }} -s https://api.nuget.org/v3/index.json
