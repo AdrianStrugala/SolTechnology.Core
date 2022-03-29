@@ -5,7 +5,7 @@
 		<ImplicitUsings>enable</ImplicitUsings>
 
 		<Authors>Adrian Strugala</Authors>
-		<Version>0.1.1</Version>
+		<Version>0.2.0</Version>
 		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
 		<Description>SolTechnology Core Azure blob storage library</Description>
 		<PackageTags>sol technology core azure blob storage</PackageTags>

@@ -15,31 +15,27 @@ namespace SolTechnology.TaleCode.PlayerRegistry.Commands.CalculatePlayerStatisti
         private readonly IMatchRepository _matchRepository;
         private readonly IPlayerRepository _playerRepository;
         private readonly IPlayerStatisticsRepository _playerStatisticsRepository;
-        private readonly ILogger<CalculatePlayerStatisticsHandler> _logger;
 
         public CalculatePlayerStatisticsHandler(
             IPlayerExternalIdsProvider playerExternalIdsProvider,
             IMatchRepository matchRepository,
             IPlayerRepository playerRepository,
-            IPlayerStatisticsRepository playerStatisticsRepository,
-            ILogger<CalculatePlayerStatisticsHandler> logger)
+            IPlayerStatisticsRepository playerStatisticsRepository)
         {
             _playerExternalIdsProvider = playerExternalIdsProvider;
             _matchRepository = matchRepository;
             _playerRepository = playerRepository;
             _playerStatisticsRepository = playerStatisticsRepository;
-            _logger = logger;
         }
 
         public async Task Handle(CalculatePlayerStatisticsCommand command)
         {
-            var playerIdMap = _playerExternalIdsProvider.GetExternalPlayerId(command.PlayerId);
-
             var result = new PlayerStatistics
             {
                 Id = command.PlayerId
             };
 
+            var playerIdMap = _playerExternalIdsProvider.GetExternalPlayerId(command.PlayerId);
             var player = _playerRepository.GetById(playerIdMap.FootballDataId);
             var matches = _matchRepository.GetByPlayerId(playerIdMap.FootballDataId);
 
@@ -53,8 +49,9 @@ namespace SolTechnology.TaleCode.PlayerRegistry.Commands.CalculatePlayerStatisti
             result.StatisticsByTeams.Add(
                 CalculateSingleTeamStatistics(
                     nationalTeamMatches,
-                    new Team(playerIdMap.FootballDataId, DateProvider.DateMin(), DateProvider.DateMax(),
-                        player.Name)));
+                    new Team(
+                        playerIdMap.FootballDataId, DateProvider.DateMin(), DateProvider.DateMax(), player.Nationality)
+                    ));
 
             foreach (var team in player.Teams)
             {
