@@ -6,7 +6,6 @@
 
 		<Authors>Adrian Strugala</Authors>
 		<Version>0.2.0</Version>
-		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
 		<Description>SolTechnology Core Azure logging library</Description>
 		<PackageTags>sol technology core azure logging logs log</PackageTags>
 		<Product>SolTechnology.Core.Logging</Product>

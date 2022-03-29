@@ -6,7 +6,6 @@
 
 		<Authors>Adrian Strugala</Authors>
 		<Version>0.2.0</Version>
-		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
 		<Description>SolTechnology Core Azure guards library</Description>
 		<PackageTags>sol technology core azure guards</PackageTags>
 		<Product>SolTechnology.Core.Guards</Product>

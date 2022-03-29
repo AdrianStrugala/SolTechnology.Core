@@ -6,7 +6,6 @@
 
 		<Authors>Adrian Strugala</Authors>
 		<Version>0.2.0</Version>
-		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
 		<Description>SolTechnology Core Sql library</Description>
 		<PackageTags>sol technology core sql</PackageTags>
 		<Product>SolTechnology.Core.Sql</Product>
