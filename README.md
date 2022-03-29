@@ -15,7 +15,7 @@
 <p align="center">
  <a href="https://www.nuget.org/packages?q=SolTechnology"><img src="https://img.shields.io/badge/Nuget-v0.2-blue?logo=nuget"></a>
  <a href="https://github.com/AdrianStrugala/SolTechnology.Core"><img src="https://img.shields.io/badge/Downloads-500-blue?logo=github"></a>
-//build or coverage
+ <a href="https://github.com/AdrianStrugala/SolTechnology.Core"><img src="https://github.com/AdrianStrugala/SolTechnology.Core/actions/workflows/publishPackages.yml/badge.svg"></a>
 
 </p>
 
