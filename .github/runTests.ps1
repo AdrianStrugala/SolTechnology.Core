@@ -1,1 +1,1 @@
-dotnet vstest (Get-ChildItem tests | % { Join-Path $_.FullName -ChildPath ("bin/Release/net6.0/$($_.Name).dll") })
+ForEach ($folder in (Get-ChildItem -Path tests -Directory)) { dotnet test --no-build $folder.FullName }
