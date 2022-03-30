@@ -57,9 +57,16 @@ namespace SolTechnology.Core.BlobStorage.BlobContainerClientExtensions
                     break;
             }
 
-            var properties = await blob.GetPropertiesAsync();
-
-            var metadata = properties.Value.Metadata ?? new Dictionary<string, string>();
+            Dictionary<string, string> metadata;
+            if (await blob.ExistsAsync())
+            {
+                var properties = await blob.GetPropertiesAsync();
+                metadata = new Dictionary<string, string>(properties.Value.Metadata);
+            }
+            else
+            {
+                metadata = new Dictionary<string, string>();
+            }
             metadata[SerializationFormatKey] = $"{serializationFormat.ToString().ToLowerInvariant()}";
 
             await blob.UploadAsync(new MemoryStream(serializedContent), true, CancellationToken.None);
