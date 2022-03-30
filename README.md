@@ -14,8 +14,8 @@
 
 <p align="center">
  <a href="https://www.nuget.org/packages?q=SolTechnology"><img src="https://img.shields.io/badge/Nuget-v0.2-blue?logo=nuget"></a>
- <a href="https://github.com/AdrianStrugala/SolTechnology.Core"><img src="https://img.shields.io/badge/Downloads-500-blue?logo=github"></a>
- <a href="https://github.com/AdrianStrugala/SolTechnology.Core"><img src="https://github.com/AdrianStrugala/SolTechnology.Core/actions/workflows/publishPackages.yml/badge.svg"></a>
+ <a href="https://github.com/AdrianStrugala/SolTechnology.Core/actions"><img src="https://github.com/AdrianStrugala/SolTechnology.Core/actions/workflows/publishPackages.yml/badge.svg"></a>
+ <a href="https://github.com/AdrianStrugala/SolTechnology.Core"><img src="https://badgen.net/badge/%E2%AD%90Stars/%E2%98%852%E2%98%85/yellow"></a>
 
 </p>
 
@@ -26,15 +26,15 @@
 **The SolTechnology.Core repository contains a set of shared libraries. This is a foundation for CQRS driven applications using basic Azure technologies. The libraries support a modern coding approach presented in the example application called "Tale Code".**
 
 
-- [Sql Database](https://github.com/AdrianStrugala/SolTechnology.Core/tree/master/docs/Sql.md)
-- [Blob Storage](https://github.com/AdrianStrugala/SolTechnology.Core/tree/master/docs/Blob.md)
-- [HttpClients](https://github.com/AdrianStrugala/SolTechnology.Core/tree/master/docs/Clients.md)
-- [Message Bus](https://github.com/AdrianStrugala/SolTechnology.Core/tree/master/docs/Bus.md)
-- [Guards](https://github.com/AdrianStrugala/SolTechnology.Core/tree/master/docs/Guards.md)
-- [Authentication](https://github.com/AdrianStrugala/SolTechnology.Core/tree/master/docs/Auth.md)
-- [Logging](https://github.com/AdrianStrugala/SolTechnology.Core/tree/master/docs/Log.md)
-- [Pipelines and resource templates](https://github.com/AdrianStrugala/SolTechnology.Core/tree/master/docs/CICD.md)
-- [TaleCode](https://github.com/AdrianStrugala/SolTechnology.Core/tree/master/docs/Tale.md)
+| Documentation  | Nuget  |   |
+|---|---|---|
+|[Sql Database](https://github.com/AdrianStrugala/SolTechnology.Core/tree/master/docs/Sql.md)      |  <a href="https://www.nuget.org/packages/SolTechnology.Core.Sql/"><img src="https://img.shields.io/badge/Downloads-150-blue?logo=github"></a>  |   |
+|[Blob Storage](https://github.com/AdrianStrugala/SolTechnology.Core/tree/master/docs/Blob.md)     |  <a href="https://www.nuget.org/packages/SolTechnology.Core.BlobStorage/"><img src="https://img.shields.io/badge/Downloads-100-blue?logo=github"></a>  |   |
+|[HttpClients](https://github.com/AdrianStrugala/SolTechnology.Core/tree/master/docs/Clients.md)   |  <a href="https://www.nuget.org/packages/SolTechnology.Core.ApiClient/"><img src="https://img.shields.io/badge/Downloads-150-blue?logo=github"></a>  |   |
+|[Message Bus](https://github.com/AdrianStrugala/SolTechnology.Core/tree/master/docs/Bus.md)       |  <a href="https://www.nuget.org/packages/SolTechnology.Core.MessageBus/"><img src="https://img.shields.io/badge/Downloads-50-blue?logo=github"></a>  |   |
+|[Guards](https://github.com/AdrianStrugala/SolTechnology.Core/tree/master/docs/Guards.md)         |  <a href="https://www.nuget.org/packages/SolTechnology.Core.Guards/"><img src="https://img.shields.io/badge/Downloads-100-blue?logo=github"></a>  |   |
+|[Authentication](https://github.com/AdrianStrugala/SolTechnology.Core/tree/master/docs/Auth.md)   |  <a href="https://www.nuget.org/packages/SolTechnology.Core.Authentication/"><img src="https://img.shields.io/badge/Downloads-50-blue?logo=github"></a>  |   |
+|[Logging](https://github.com/AdrianStrugala/SolTechnology.Core/tree/master/docs/Log.md)           |  <a href="https://www.nuget.org/packages/SolTechnology.Core.Logging/"><img src="https://img.shields.io/badge/Downloads-50-blue?logo=github"></a>  |   |
 
 
 
