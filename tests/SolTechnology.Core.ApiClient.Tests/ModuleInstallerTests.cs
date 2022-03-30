@@ -23,14 +23,10 @@ namespace SolTechnology.Core.ApiClient.Tests
             //Arrange 
             ApiClientConfiguration configuration = new ApiClientConfiguration
             {
-                HttpClients = new List<HttpClient>
-                {
-                    new HttpClient
-                    {
-                        BaseAddress = "http://localhost:8080/",
-                        Name = "Sample",
-                        TimeoutSeconds = 21,
-                        Headers = new List<Header>
+                BaseAddress = "http://localhost:8080/",
+                Name = "Sample",
+                TimeoutSeconds = 21,
+                Headers = new List<Header>
                         {
                             new Header
                             {
@@ -38,8 +34,6 @@ namespace SolTechnology.Core.ApiClient.Tests
                                 Value = "HeaderValue"
                             }
                         }
-                    }
-                }
             };
 
 
@@ -52,33 +46,11 @@ namespace SolTechnology.Core.ApiClient.Tests
 
             var sampleClient = app.Services.GetService<ISampleApiClient>();
             Assert.NotNull(sampleClient);
-            Assert.Equal(new Uri(configuration.HttpClients.First().BaseAddress), sampleClient.HttpClient.BaseAddress);
-            Assert.Equal(TimeSpan.FromSeconds(configuration.HttpClients.First().TimeoutSeconds.Value), sampleClient.HttpClient.Timeout);
+            Assert.Equal(new Uri(configuration.BaseAddress), sampleClient.HttpClient.BaseAddress);
+            Assert.Equal(TimeSpan.FromSeconds(configuration.TimeoutSeconds.Value), sampleClient.HttpClient.Timeout);
             var header = sampleClient.HttpClient.DefaultRequestHeaders.FirstOrDefault(h =>
-                h.Key == configuration.HttpClients.First().Headers.First().Name);
-            Assert.Equal(configuration.HttpClients.First().Headers.First().Value, header.Value.First());
+                h.Key == configuration.Headers.First().Name);
+            Assert.Equal(configuration.Headers.First().Value, header.Value.First());
         }
-    }
-
-    interface ISampleApiClient
-    {
-        string DownloadSth();
-
-        System.Net.Http.HttpClient HttpClient { get; set; }
-    }
-
-    class SampleApiClient : ISampleApiClient
-    {
-        public System.Net.Http.HttpClient HttpClient { get; set; }
-
-        public SampleApiClient(System.Net.Http.HttpClient httpClient)
-        {
-            HttpClient = httpClient;
-        }
-        public string DownloadSth()
-        {
-            return "it";
-        }
-
     }
 }

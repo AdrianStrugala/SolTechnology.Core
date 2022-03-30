@@ -13,7 +13,7 @@
 </p>
 
 <p align="center">
- <a href="https://www.nuget.org/packages?q=SolTechnology"><img src="https://img.shields.io/badge/Nuget-v0.2-blue?logo=nuget"></a>
+ <a href="https://www.nuget.org/packages?q=SolTechnology"><img src="https://img.shields.io/badge/Version-v0.2-blue?logo=nuget"></a>
  <a href="https://github.com/AdrianStrugala/SolTechnology.Core/actions"><img src="https://github.com/AdrianStrugala/SolTechnology.Core/actions/workflows/publishPackages.yml/badge.svg"></a>
  <a href="https://github.com/AdrianStrugala/SolTechnology.Core"><img src="https://badgen.net/badge/%E2%AD%90Stars/%E2%98%852%E2%98%85/yellow"></a>
 
@@ -42,21 +42,6 @@
 
 I will fill this one day
 
-
-
-
-I. SolTechnology Core Libraries:
-
-
-
-
- - Blob:
-IBlobConnectionFactory
-IBlobContainerClientWrapper (read and write operation)
-
-
-- HttpClient:
-     services.AddApiClient<IFootballDataApiClient, FootballDataApiClient>("football-data");  //has to match the name from configuration
 
 - Guards:
  * provides series of extension methods protecting arguments from invalid value (code contract pattern)

@@ -4,6 +4,7 @@
 		<TargetFramework>net6.0</TargetFramework>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<RootNamespace>SolTechnology.TaleCode.EventListener</RootNamespace>
+		<UserSecretsId>88b9d6e7-7de5-45a0-abc8-38f684f65764</UserSecretsId>
 	</PropertyGroup>
 
 	<ItemGroup>

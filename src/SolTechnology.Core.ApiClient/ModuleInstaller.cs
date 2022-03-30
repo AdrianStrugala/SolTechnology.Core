@@ -8,18 +8,17 @@ namespace SolTechnology.Core.ApiClient
     {
         public static IServiceCollection AddApiClient<TIClient, TClient>(
             this IServiceCollection services,
-            string httpClientName, 
+            string httpClientName,
             ApiClientConfiguration apiClientConfiguration = null) 
             where TIClient : class where TClient : class, TIClient
         {
-            //it is run only, if the options are not build (once per multiple registrations)
             services
-            .AddOptions<ApiClientConfiguration>()
+            .AddOptions<List<ApiClientConfiguration>>()
             .Configure<IConfiguration>((config, configuration) =>
             {
                 if (apiClientConfiguration == null)
                 {
-                    apiClientConfiguration = configuration.GetSection("Configuration:ApiClients").Get<ApiClientConfiguration>();
+                    apiClientConfiguration = configuration.GetSection("Configuration:ApiClients").Get<List<ApiClientConfiguration>>().FirstOrDefault(a => a.Name.Equals(httpClientName, StringComparison.InvariantCultureIgnoreCase));
                 }
 
                 if (apiClientConfiguration == null)
@@ -27,12 +26,12 @@ namespace SolTechnology.Core.ApiClient
                     throw new ArgumentException($"The [{nameof(ApiClientConfiguration)}] is missing. Provide it by parameter or configuration section");
                 }
 
-                config.HttpClients = apiClientConfiguration.HttpClients;
+                config.Add(apiClientConfiguration);
             });
 
-            var options = services.BuildServiceProvider().GetRequiredService<IOptions<ApiClientConfiguration>>().Value;
+            var options = services.BuildServiceProvider().GetRequiredService<IOptions<List<ApiClientConfiguration>>>().Value;
 
-            var httpClientConfiguration = options.HttpClients.FirstOrDefault(h => h.Name.Equals(httpClientName, StringComparison.InvariantCultureIgnoreCase));
+            var httpClientConfiguration = options.FirstOrDefault(h => h.Name.Equals(httpClientName, StringComparison.InvariantCultureIgnoreCase));
             if (httpClientConfiguration == null)
             {
                 throw new ArgumentException($"The Http Client configuration for client: [{httpClientName}] is missing. Provide it by parameter or configuration section");
