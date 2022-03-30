@@ -24,7 +24,7 @@ jobs:
     - name: Test
       shell: pwsh
       run: |
-      'dotnet vstest (Get-ChildItem tests | % { Join-Path $_.FullName -ChildPath ("bin/Release/net6.0/$($_.Name).dll") })'
+           .\.github\runTests.ps1
    
     - name: Pack SolTechnology.Core.Sql
       run: dotnet pack -c Release -o . ./src/SolTechnology.Core.Sql/SolTechnology.Core.Sql.csproj
