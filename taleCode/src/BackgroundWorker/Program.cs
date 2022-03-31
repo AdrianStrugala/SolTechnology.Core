@@ -1,26 +1,30 @@
-using SolTechnology.Core.MessageBus;
+using BackgroundWorker.Jobs;
+using SolTechnology.Core.Scheduler;
+using SolTechnology.Core.Scheduler.ScheduleConfig;
+using SolTechnology.TaleCode.PlayerRegistry.Commands;
 
-var builder = Host.CreateDefaultBuilder(args)
-    .ConfigureServices((hostContext, services) =>
-    {
-        services.AddEndpointsApiExplorer();
-        services.AddLogging(c =>
-            c.AddConsole()
-                .AddApplicationInsights());
-        services.AddApplicationInsightsTelemetry();
-    });
-// var builder = WebApplication.CreateBuilder(args);
+var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddLogging(c =>
+    c.AddConsole()
+        .AddApplicationInsights());
+builder.Services.AddApplicationInsightsTelemetry();
 
+builder.Services.AddCommands();
+
+builder.Services.AddScheduledJob<SynchornizeCristianoRonaldoMatches>(new ScheduleConfig("0 0 * * *")); //every day at midnight
 
 
-
-
+builder.Services.AddControllers();
 
 
 var app = builder.Build();
-await app.StartAsync();
 
 
-// app.Run("http://localhost:2137");
+app.MapControllers();
+if (app.Environment.IsDevelopment())
+{
+    app.Run("http://localhost:0204");
+}
+app.Run();
