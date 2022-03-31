@@ -174,7 +174,7 @@ resource backgroundWorker 'Microsoft.Web/sites@2021-02-01' = {
       ftpsState: 'Disabled'
       linuxFxVersion: 'DOTNETCORE|6.0'
       netFrameworkVersion: 'v6.0'
-      appCommandLine: 'dotnet EventListener.dll'
+      appCommandLine: 'dotnet BackgroundWorker.dll'
       http20Enabled: true
       minTlsVersion: '1.2'
       autoHealEnabled: true

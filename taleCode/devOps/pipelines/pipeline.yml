@@ -92,6 +92,14 @@ stages:
             publishWebProjects: False
             arguments: '--configuration Release --output $(Build.ArtifactStagingDirectory)/EventListener'
 
+        - task: DotNetCoreCLI@2
+          displayName: 'Publish BackgroundWorker'
+          inputs:
+            command: publish
+            projects: 'taleCode/src/**/BackgroundWorker.csproj'
+            publishWebProjects: False
+            arguments: '--configuration Release --output $(Build.ArtifactStagingDirectory)/BackgroundWorker'
+
         - task: FileTransform@1
           displayName: 'Apply Production App settings for Api'
           inputs:
@@ -103,6 +111,13 @@ stages:
           displayName: 'Apply Production App settings for EventListener'
           inputs:
             folderPath: '$(Build.ArtifactStagingDirectory)/**/*EventListener.zip'
+            fileType: 'json'
+            targetFiles: '**/appsettings.json'
+
+        - task: FileTransform@1
+          displayName: 'Apply Production App settings for BackgroundWorker'
+          inputs:
+            folderPath: '$(Build.ArtifactStagingDirectory)/**/*BackgroundWorker.zip'
             fileType: 'json'
             targetFiles: '**/appsettings.json'
 
@@ -163,6 +178,14 @@ stages:
             azureSubscription: $(azureServiceConnection)
             appName: $(eventListenerName)
             package: '$(Pipeline.Workspace)\drop\EventListener\EventListener.zip'
+
+        - task: AzureWebApp@1
+          displayName: 'Deploy BackgroundWorker'
+          inputs:
+            appType: webAppLinux
+            azureSubscription: $(azureServiceConnection)
+            appName: $(eventListenerName)
+            package: '$(Pipeline.Workspace)\drop\BackgroundWorker\BackgroundWorker.zip'
 
 
 
