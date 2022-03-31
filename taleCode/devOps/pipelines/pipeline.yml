@@ -184,7 +184,7 @@ stages:
           inputs:
             appType: webAppLinux
             azureSubscription: $(azureServiceConnection)
-            appName: $(eventListenerName)
+            appName: $(backgroundWorkerName)
             package: '$(Pipeline.Workspace)\drop\BackgroundWorker\BackgroundWorker.zip'
 
 
