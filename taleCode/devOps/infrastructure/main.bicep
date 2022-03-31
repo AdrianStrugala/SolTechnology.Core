@@ -9,7 +9,7 @@ param testParam string
 //APPS PARAMS
 param appServicePlanName string = '${baseName}plan'
 param apiName string
-param apiSkuName string = 'F1'
+param apiSkuName string = 'B1'
 param eventListenerName string
 
 
@@ -89,10 +89,13 @@ resource api 'Microsoft.Web/sites@2021-02-01' = {
     httpsOnly: true
     siteConfig: {
       ftpsState: 'Disabled'
+      linuxFxVersion: 'DOTNETCORE|6.0'
       netFrameworkVersion: 'v6.0'
+      appCommandLine: 'dotnet Api.dll'
       http20Enabled: true
       minTlsVersion: '1.2'
       autoHealEnabled: true
+      alwaysOn: true
       autoHealRules: {
         actions: {
           actionType: 'Recycle'
@@ -127,10 +130,13 @@ resource eventListener 'Microsoft.Web/sites@2021-02-01' = {
     httpsOnly: true
     siteConfig: {
       ftpsState: 'Disabled'
+      linuxFxVersion: 'DOTNETCORE|6.0'
       netFrameworkVersion: 'v6.0'
+      appCommandLine: 'dotnet EventListener.dll'
       http20Enabled: true
       minTlsVersion: '1.2'
       autoHealEnabled: true
+      alwaysOn: true
       autoHealRules: {
         actions: {
           actionType: 'Recycle'
