@@ -72,6 +72,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SolTechnology.Core.MessageB
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Docs", "Docs", "{7513E3F2-A3A4-45C8-8165-E3B836713466}"
 	ProjectSection(SolutionItems) = preProject
+		..\docs\Auth.md = ..\docs\Auth.md
 		..\docs\Blob.md = ..\docs\Blob.md
 		..\docs\Clients.md = ..\docs\Clients.md
 		..\docs\Sql.md = ..\docs\Sql.md

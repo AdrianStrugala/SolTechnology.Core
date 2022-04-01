@@ -35,7 +35,7 @@
 |[Guards](https://github.com/AdrianStrugala/SolTechnology.Core/tree/master/docs/Guards.md)         |  <a href="https://www.nuget.org/packages/SolTechnology.Core.Guards/"><img src="https://badgen.net/badge/Downloads/100/?icon=nuget"></a>  |   |
 |[Authentication](https://github.com/AdrianStrugala/SolTechnology.Core/tree/master/docs/Auth.md)   |  <a href="https://www.nuget.org/packages/SolTechnology.Core.Authentication/"><img src="https://badgen.net/badge/Downloads/50/?icon=nuget"></a>  |   |
 |[Logging](https://github.com/AdrianStrugala/SolTechnology.Core/tree/master/docs/Log.md)           |  <a href="https://www.nuget.org/packages/SolTechnology.Core.Logging/"><img src="https://badgen.net/badge/Downloads/50/?icon=nuget"></a>  |   |
-|[Logging](https://github.com/AdrianStrugala/SolTechnology.Core/tree/master/docs/Cron.md)           |  <a href="https://www.nuget.org/packages/SolTechnology.Core.Scheduler/"><img src="https://badgen.net/badge/Downloads/0/?icon=nuget"></a>  |   |
+|[Scheduler](https://github.com/AdrianStrugala/SolTechnology.Core/tree/master/docs/Cron.md)        |  <a href="https://www.nuget.org/packages/SolTechnology.Core.Scheduler/"><img src="https://badgen.net/badge/Downloads/0/?icon=nuget"></a>  |   |
 
 
 
@@ -48,19 +48,6 @@ I will fill this one day
  * provides series of extension methods protecting arguments from invalid value (code contract pattern)
 Guards.Method()
 
-
-Authentication
-
-IMPORTANT:
-Requires authentication Key in config, invoking installation AND ADDING FILTER TO (MVC) OPTOONS 
-
-var authenticationFiler = builder.Services.AddAuthenticationAndBuildFilter();
-builder.Services.AddControllers(opts => opts.Filters.Add(authenticationFiler));
-
-
-i jeszcze
-
-  app.UseAuthentication();
 
 
 II. TaleCode:

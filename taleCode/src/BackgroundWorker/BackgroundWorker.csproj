@@ -3,7 +3,7 @@
 	<PropertyGroup>
 		<TargetFramework>net6.0</TargetFramework>
 		<ImplicitUsings>enable</ImplicitUsings>
-		<Namespace>SolTechnology.TaleCode.BackgroundWorker</Namespace>
+		<RootNamespace>SolTechnology.TaleCode.BackgroundWorker</RootNamespace>
 		<UserSecretsId>4604ec22-32e0-4019-b0a9-b67154068548</UserSecretsId>
 	</PropertyGroup>
 

@@ -39,8 +39,8 @@ namespace SolTechnology.Core.Authentication
 
             if (!SolTechnologyAuthenticationOptions.AuthenticationScheme.Equals(headerValue.Scheme, StringComparison.OrdinalIgnoreCase))
             {
-                _logger.LogWarning($"Not DreamAuthentication schema");
-                return AuthenticateResult.Fail("Not DreamAuthentication schema");
+                _logger.LogWarning($"Not SolTechnologyAuthentication schema");
+                return AuthenticateResult.Fail("Not SolTechnologyAuthentication schema");
             }
 
             _logger.LogDebug($"Decoding incoming authentication key");

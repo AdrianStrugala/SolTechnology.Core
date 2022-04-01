@@ -1,6 +1,6 @@
-using BackgroundWorker.Jobs;
 using SolTechnology.Core.Scheduler;
 using SolTechnology.Core.Scheduler.ScheduleConfig;
+using SolTechnology.TaleCode.BackgroundWorker.Jobs;
 using SolTechnology.TaleCode.PlayerRegistry.Commands;
 
 var builder = WebApplication.CreateBuilder(args);

@@ -3,7 +3,7 @@ using SolTechnology.Core.Scheduler.ScheduleConfig;
 using SolTechnology.TaleCode.Infrastructure;
 using SolTechnology.TaleCode.PlayerRegistry.Commands.SynchronizePlayerMatches;
 
-namespace BackgroundWorker.Jobs
+namespace SolTechnology.TaleCode.BackgroundWorker.Jobs
 {
     public class SynchornizeCristianoRonaldoMatches : ScheduledJob
     {
