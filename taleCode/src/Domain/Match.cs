@@ -37,7 +37,7 @@ namespace SolTechnology.TaleCode.Domain
 
         public void AssignCompetitionWinner(string competitionWinner)
         {
-            Guards.String(competitionWinner, nameof(competitionWinner)).NotNull().NotEmpty(); ;
+            Guards.String(competitionWinner, nameof(competitionWinner)).NotNull().NotEmpty();
             CompetitionWinner = competitionWinner;
         }
     }

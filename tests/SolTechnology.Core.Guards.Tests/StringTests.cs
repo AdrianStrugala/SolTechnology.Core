@@ -4,7 +4,7 @@ using Xunit;
 
 namespace SolTechnology.Core.Guards.Tests
 {
-    public class String
+    public class StringTests
     {
         [Fact]
         public void NotNull_Null_Throws()

@@ -4,7 +4,7 @@ using Xunit;
 
 namespace SolTechnology.Core.Guards.Tests
 {
-    public class Int
+    public class IntTests
     {
         [Fact]
         public void NotZero_Zero_Throws()
@@ -161,6 +161,75 @@ namespace SolTechnology.Core.Guards.Tests
 
             //Assert
             exception.Should().BeOfType<ArgumentException>();
+        }
+
+        [Theory]
+        [InlineData(5)]
+        [InlineData(10)]
+        public void GreaterThan_NotGreater_Throws(int toCompare)
+        {
+            //Arrange
+            int underTest = 5;
+
+            //Act
+            var exception = Record.Exception(() => Guards.Int(underTest, nameof(underTest))
+                .GreaterThan(toCompare));
+
+
+            //Assert
+            exception.Should().BeOfType<ArgumentException>();
+        }
+
+        [Theory]
+        [InlineData(5)]
+        [InlineData(int.MinValue)]
+        public void GreaterEqual_GreaterOrEqual_Success(int toCompare)
+        {
+            //Arrange
+            int underTest = 5;
+
+            //Act
+            var exception = Record.Exception(() => Guards.Int(underTest, nameof(underTest))
+                .GreaterEqual(toCompare));
+
+
+            //Assert
+            exception.Should().BeNull();
+        }
+
+
+        [Theory]
+        [InlineData(5)]
+        [InlineData(-10)]
+        public void LessThan_NotLess_Throws(int toCompare)
+        {
+            //Arrange
+            int underTest = 5;
+
+            //Act
+            var exception = Record.Exception(() => Guards.Int(underTest, nameof(underTest))
+                .LessThan(toCompare));
+
+
+            //Assert
+            exception.Should().BeOfType<ArgumentException>();
+        }
+
+        [Theory]
+        [InlineData(5)]
+        [InlineData(int.MaxValue)]
+        public void LessEqual_LessOrEqual_Success(int toCompare)
+        {
+            //Arrange
+            int underTest = 5;
+
+            //Act
+            var exception = Record.Exception(() => Guards.Int(underTest, nameof(underTest))
+                .LessEqual(toCompare));
+
+
+            //Assert
+            exception.Should().BeNull();
         }
     }
 }

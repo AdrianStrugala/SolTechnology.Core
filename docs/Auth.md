@@ -50,9 +50,9 @@ app.UseAuthentication();
 
 3) From now on, you have to add your authentication key to header of every request send to the application
 
--Header name: "X-Auth"
--Schema name: "SolTechnologyAuthentication"
--Base64 encoded key: (equivalent of "SecureKey" is "U2VjdXJlS2V5") 
+- Header name: "X-Auth"
+- Schema name: "SolTechnologyAuthentication"
+- Base64 encoded key: (equivalent of "SecureKey" is "U2VjdXJlS2V5") 
 
 For example:
 ```csharp
