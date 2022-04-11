@@ -35,13 +35,13 @@ namespace SolTechnology.Core.MessageBus
             return services;
         }
 
-        public static IServiceCollection WithPublisher<T>(
+        public static IServiceCollection WithPublisher<TMessage>(
             this IServiceCollection services,
-            string topicName) where T : IMessage
+            string topicName) where TMessage : IMessage
         {
             var configurationProvider = services.BuildServiceProvider().GetRequiredService<IMessageBusConfigurationProvider>();
 
-            string messageType = typeof(T).Name;
+            string messageType = typeof(TMessage).Name;
 
             configurationProvider.RegisterMessagePublisher(messageType, topicName);
 
