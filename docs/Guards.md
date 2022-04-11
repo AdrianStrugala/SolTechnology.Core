@@ -24,11 +24,9 @@ Invokes NotNull() and NotEmpty() checks on the "competitionWinner" string. If an
 
 2) Supported types
 
-```csharp
-decimal
-double
-float
-int
-long
-string
-```
+- decimal
+- double
+- float
+- int
+- long
+- string
