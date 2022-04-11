@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 
-namespace SolTechnology.TaleCode.Api.Controllers
+namespace SolTechnology.TaleCode.Api.Controllers.Api
 {
     [ApiController]
     [Route("")]

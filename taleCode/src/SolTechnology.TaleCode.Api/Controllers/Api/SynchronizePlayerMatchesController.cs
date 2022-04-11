@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using SolTechnology.TaleCode.Infrastructure;
 using SolTechnology.TaleCode.PlayerRegistry.Commands.SynchronizePlayerMatches;
 
-namespace SolTechnology.TaleCode.Api.Controllers
+namespace SolTechnology.TaleCode.Api.Controllers.Api
 {
     [ApiController]
     public class SynchronizePlayerMatchesController : ControllerBase
@@ -15,12 +15,12 @@ namespace SolTechnology.TaleCode.Api.Controllers
         }
 
         [HttpGet]
-        [Route("SynchronizePlayerMatches")]
-        public void SynchronizePlayerMatches()
+        [Route("api/SynchronizePlayerMatches/{playerId}")]
+        public void SynchronizePlayerMatches(int playerId)
         {
             try
             {
-                _handler.Handle(new SynchronizePlayerMatchesCommand(44));
+                _handler.Handle(new SynchronizePlayerMatchesCommand(playerId));
             }
             catch (Exception e)
             {

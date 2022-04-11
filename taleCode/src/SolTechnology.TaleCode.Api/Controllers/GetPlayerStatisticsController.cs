@@ -1,6 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
 using SolTechnology.TaleCode.Infrastructure;
-using SolTechnology.TaleCode.PlayerRegistry.Commands.SynchronizePlayerMatches;
 using SolTechnology.TaleCode.PlayerRegistry.Queries.GetPlayerStatistics;
 
 namespace SolTechnology.TaleCode.Api.Controllers

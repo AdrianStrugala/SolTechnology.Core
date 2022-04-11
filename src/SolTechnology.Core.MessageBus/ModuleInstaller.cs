@@ -27,7 +27,6 @@ namespace SolTechnology.Core.MessageBus
                 }
 
                 config.ConnectionString = messageBusConfiguration.ConnectionString;
-                config.Publishers = messageBusConfiguration.Publishers;
             });
 
             services.AddSingleton<IMessagePublisher, MessagePublisher>();

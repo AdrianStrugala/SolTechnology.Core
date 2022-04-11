@@ -1,4 +1,5 @@
-﻿using SolTechnology.TaleCode.Infrastructure;
+﻿using SolTechnology.Core.Guards;
+using SolTechnology.TaleCode.Infrastructure;
 
 namespace SolTechnology.TaleCode.PlayerRegistry.Queries.GetPlayerStatistics
 {
@@ -8,6 +9,8 @@ namespace SolTechnology.TaleCode.PlayerRegistry.Queries.GetPlayerStatistics
 
         public GetPlayerStatisticsQuery(int playerId)
         {
+            Guards.Int(playerId, nameof(playerId)).NotNegative();
+
             PlayerId = playerId;
         }
     }

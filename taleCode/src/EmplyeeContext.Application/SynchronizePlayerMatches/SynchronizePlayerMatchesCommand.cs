@@ -1,4 +1,5 @@
-﻿using SolTechnology.Core.Logging;
+﻿using SolTechnology.Core.Guards;
+using SolTechnology.Core.Logging;
 using SolTechnology.TaleCode.Infrastructure;
 
 namespace SolTechnology.TaleCode.PlayerRegistry.Commands.SynchronizePlayerMatches
@@ -9,6 +10,8 @@ namespace SolTechnology.TaleCode.PlayerRegistry.Commands.SynchronizePlayerMatche
 
         public SynchronizePlayerMatchesCommand(int playerId)
         {
+            Guards.Int(playerId, nameof(playerId)).NotNegative();
+
             PlayerId = playerId;
         }
 

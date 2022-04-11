@@ -9,25 +9,25 @@ namespace SolTechnology.Core.MessageBus.Configuration
         private readonly ServiceBusClient _serviceBusClient;
         private readonly ManagementClient _managementClient;
 
-        private static readonly List<(string, ServiceBusSender)> _messageToSenderMap = new();
-        private static readonly List<(string, ServiceBusProcessor)> _messageToProcessorMap = new();
+        private static readonly List<(string, ServiceBusSender)> MessageToSenderMap = new();
+        private static readonly List<(string, ServiceBusProcessor)> MessageToProcessorMap = new();
 
-        //TODO add logs here
 
+        //Service bus client options can be added here
         public MessageBusConfigurationProvider(IOptions<MessageBusConfiguration> options)
         {
             var connectionString = options.Value.ConnectionString;
 
             _serviceBusClient = new ServiceBusClient(connectionString);
             _managementClient = new ManagementClient(connectionString);
+
         }
 
-        //TODO: Add here topic options (message time to live, retry count and so on)
-
+        //Topic descriptions can be added here
         public void RegisterMessagePublisher(string messageType, string topicName)
         {
             var topicSender = _serviceBusClient.CreateSender(topicName);
-            _messageToSenderMap.Add((messageType, topicSender));
+            MessageToSenderMap.Add((messageType, topicSender));
 
             if (!_managementClient.TopicExistsAsync(topicName).GetAwaiter().GetResult())
             {
@@ -37,7 +37,7 @@ namespace SolTechnology.Core.MessageBus.Configuration
 
         public List<ServiceBusSender> ResolveMessagePublisher(string messageType)
         {
-            var senders = _messageToSenderMap
+            var senders = MessageToSenderMap
                 .Where(m => m.Item1.Equals(messageType, StringComparison.CurrentCultureIgnoreCase)).Select(x => x.Item2)
                 .ToList();
 
@@ -49,6 +49,7 @@ namespace SolTechnology.Core.MessageBus.Configuration
             return senders;
         }
 
+        //Subscription Options can be added here (MaxAutoLockRenewalDuration, MaxConcurrentCalls)
         public void RegisterMessageReceiver(string messageType, string topicName, string subscriptionName)
         {
             var serviceBusProcessorOptions = new ServiceBusProcessorOptions
@@ -57,34 +58,18 @@ namespace SolTechnology.Core.MessageBus.Configuration
                 ReceiveMode = ServiceBusReceiveMode.PeekLock
             };
 
-
             ServiceBusProcessor serviceBusProcessor = _serviceBusClient.CreateProcessor(topicName, subscriptionName, serviceBusProcessorOptions);
-            _messageToProcessorMap.Add((messageType, serviceBusProcessor));
-
-
-            //TODO: add subscriptionOptions
-            // if (messageBusSubscription.MaxAutoLockRenewalDuration.HasValue)
-            // {
-            //     serviceBusProcessorOptions.MaxAutoLockRenewalDuration =
-            //         TimeSpan.FromMinutes(messageBusSubscription.MaxAutoLockRenewalDuration.Value);
-            // }
-            //
-            // if (messageBusSubscription.MaxConcurrentCalls.HasValue)
-            // {
-            //     serviceBusProcessorOptions.MaxConcurrentCalls = messageBusSubscription.MaxConcurrentCalls.Value;
-            // }
+            MessageToProcessorMap.Add((messageType, serviceBusProcessor));
 
             if (!_managementClient.SubscriptionExistsAsync(topicName, subscriptionName).GetAwaiter().GetResult())
             {
                 _managementClient.CreateSubscriptionAsync(topicName, subscriptionName).GetAwaiter().GetResult();
             }
-
-
         }
 
         public List<ServiceBusProcessor> ResolveMessageReceiver(string messageType)
         {
-            var processors = _messageToProcessorMap
+            var processors = MessageToProcessorMap
                 .Where(m => m.Item1.Equals(messageType, StringComparison.CurrentCultureIgnoreCase)).Select(x => x.Item2)
                 .ToList();
 
