@@ -1,5 +1,5 @@
 ﻿using SolTechnology.Core.Scheduler;
-using SolTechnology.Core.Scheduler.ScheduleConfig;
+using SolTechnology.Core.Scheduler.Configuration;
 using SolTechnology.TaleCode.Infrastructure;
 using SolTechnology.TaleCode.PlayerRegistry.Commands.SynchronizePlayerMatches;
 
@@ -10,16 +10,17 @@ namespace SolTechnology.TaleCode.BackgroundWorker.Jobs
         private readonly ICommandHandler<SynchronizePlayerMatchesCommand> _handler;
 
         public SynchornizeCristianoRonaldoMatches(
-            IScheduleConfig<SynchornizeCristianoRonaldoMatches> config,
-            IServiceScopeFactory scopeFactory)
-            : base(config.CronExpression, config.TimeZoneInfo)
+            ISchedulerConfigurationProvider schedulerConfigurationProvider,
+            IServiceScopeFactory serviceScopeFactory,
+            ILogger<ScheduledJob> logger)
+            : base(schedulerConfigurationProvider, serviceScopeFactory, logger)
         {
-            var scope = scopeFactory.CreateScope();
+            var scope = serviceScopeFactory.CreateScope();
             var handler = scope.ServiceProvider.GetRequiredService<ICommandHandler<SynchronizePlayerMatchesCommand>>();
             _handler = handler;
         }
 
-        public override async Task Execute(CancellationToken cancellationToken)
+        public override async Task Execute()
         {
             await _handler.Handle(new SynchronizePlayerMatchesCommand(44));
         }

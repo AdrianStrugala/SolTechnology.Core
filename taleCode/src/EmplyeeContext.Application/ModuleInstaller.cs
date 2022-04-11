@@ -33,8 +33,8 @@ namespace SolTechnology.TaleCode.PlayerRegistry.Commands
 
             services.AddScoped<ICommandHandler<CalculatePlayerStatisticsCommand>>(x =>
                 new CommandHandlerLoggingDecorator<CalculatePlayerStatisticsCommand>(
-                    x.GetService<CalculatePlayerStatisticsHandler>(),
-                    x.GetService<ILogger<ICommandHandler<CalculatePlayerStatisticsCommand>>>()));
+                    x.GetService<CalculatePlayerStatisticsHandler>()!,
+                    x.GetService<ILogger<ICommandHandler<CalculatePlayerStatisticsCommand>>>()!));
 
 
             //TODO: Add Decoration to separate library (preferably Logger)
@@ -42,8 +42,8 @@ namespace SolTechnology.TaleCode.PlayerRegistry.Commands
 
             services.AddScoped<ICommandHandler<SynchronizePlayerMatchesCommand>>(x =>
                 new CommandHandlerLoggingDecorator<SynchronizePlayerMatchesCommand>(
-                    x.GetService<SynchronizePlayerMatchesHandler>(),
-                    x.GetService<ILogger<ICommandHandler<SynchronizePlayerMatchesCommand>>>()));
+                    x.GetService<SynchronizePlayerMatchesHandler>()!,
+                    x.GetService<ILogger<ICommandHandler<SynchronizePlayerMatchesCommand>>>()!));
 
 
             // services.AddScoped<ICommandHandler<SynchronizePlayerMatchesCommand>, SynchronizePlayerMatchesHandler>();

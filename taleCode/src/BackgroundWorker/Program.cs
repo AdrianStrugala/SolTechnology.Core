@@ -1,5 +1,5 @@
 using SolTechnology.Core.Scheduler;
-using SolTechnology.Core.Scheduler.ScheduleConfig;
+using SolTechnology.Core.Scheduler.Configuration;
 using SolTechnology.TaleCode.BackgroundWorker.Jobs;
 using SolTechnology.TaleCode.PlayerRegistry.Commands;
 
@@ -13,8 +13,7 @@ builder.Services.AddApplicationInsightsTelemetry();
 
 builder.Services.AddCommands();
 
-builder.Services.AddScheduledJob<SynchornizeCristianoRonaldoMatches>(new ScheduleConfig("0 0 * * *")); //every day at midnight
-
+builder.Services.AddScheduledJob<SynchornizeCristianoRonaldoMatches>(new ScheduledJobConfiguration("0 0 * * *")); //every day at midnight
 
 builder.Services.AddControllers();
 

@@ -75,6 +75,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Docs", "Docs", "{7513E3F2-A
 		..\docs\Auth.md = ..\docs\Auth.md
 		..\docs\Blob.md = ..\docs\Blob.md
 		..\docs\Clients.md = ..\docs\Clients.md
+		..\docs\Cron.md = ..\docs\Cron.md
 		..\docs\Guards.md = ..\docs\Guards.md
 		..\docs\Sql.md = ..\docs\Sql.md
 	EndProjectSection

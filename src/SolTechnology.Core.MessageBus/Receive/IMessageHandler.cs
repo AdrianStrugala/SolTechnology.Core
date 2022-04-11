@@ -1,6 +1,4 @@
-﻿using SolTechnology.Core.MessageBus.Publish;
-
-namespace SolTechnology.Core.MessageBus.Receive
+﻿namespace SolTechnology.Core.MessageBus.Receive
 {
     public interface IMessageHandler<in TMessage> where TMessage : IMessage
     {

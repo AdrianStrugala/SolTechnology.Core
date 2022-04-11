@@ -4,7 +4,6 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using SolTechnology.Core.MessageBus.Configuration;
-using SolTechnology.Core.MessageBus.Publish;
 
 namespace SolTechnology.Core.MessageBus.Receive
 {

@@ -9,7 +9,7 @@ namespace SolTechnology.Core.ApiClient
         public static IServiceCollection AddApiClient<TIClient, TClient>(
             this IServiceCollection services,
             string httpClientName,
-            ApiClientConfiguration apiClientConfiguration = null) 
+            ApiClientConfiguration apiClientConfiguration = null)
             where TIClient : class where TClient : class, TIClient
         {
             services
@@ -23,7 +23,7 @@ namespace SolTechnology.Core.ApiClient
 
                 if (apiClientConfiguration == null)
                 {
-                    throw new ArgumentException($"The [{nameof(ApiClientConfiguration)}] is missing. Provide it by parameter or configuration section");
+                    throw new ArgumentException($"The [{nameof(ApiClientConfiguration)}] for client: [{httpClientName}] is missing. Provide it by parameter or configuration section");
                 }
 
                 config.Add(apiClientConfiguration);
@@ -31,22 +31,18 @@ namespace SolTechnology.Core.ApiClient
 
             var options = services.BuildServiceProvider().GetRequiredService<IOptions<List<ApiClientConfiguration>>>().Value;
 
-            var httpClientConfiguration = options.FirstOrDefault(h => h.Name.Equals(httpClientName, StringComparison.InvariantCultureIgnoreCase));
-            if (httpClientConfiguration == null)
-            {
-                throw new ArgumentException($"The Http Client configuration for client: [{httpClientName}] is missing. Provide it by parameter or configuration section");
-            }
+            apiClientConfiguration = options.First(h => h.Name.Equals(httpClientName, StringComparison.InvariantCultureIgnoreCase));
 
             services.AddHttpClient<TIClient, TClient>(httpClientName,
                 httpClient =>
                 {
-                    httpClient.BaseAddress = new Uri(httpClientConfiguration.BaseAddress);
-                    if (httpClientConfiguration.TimeoutSeconds.HasValue)
+                    httpClient.BaseAddress = new Uri(apiClientConfiguration.BaseAddress);
+                    if (apiClientConfiguration.TimeoutSeconds.HasValue)
                     {
-                        httpClient.Timeout = TimeSpan.FromSeconds(httpClientConfiguration.TimeoutSeconds.Value);
+                        httpClient.Timeout = TimeSpan.FromSeconds(apiClientConfiguration.TimeoutSeconds.Value);
                     }
 
-                    foreach (var header in httpClientConfiguration.Headers)
+                    foreach (var header in apiClientConfiguration.Headers)
                     {
                         httpClient.DefaultRequestHeaders.Add(header.Name, header.Value);
                     }
