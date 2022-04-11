@@ -20,7 +20,7 @@
 </p>
 
 
-## I Libraries
+## Core Libraries
 
 
 **The SolTechnology.Core repository contains a set of shared libraries. This is a foundation for CQRS driven applications using basic Azure technologies. The libraries support a modern coding approach presented in the example application called "Tale Code".**
@@ -39,7 +39,7 @@
 
 
 
-## II Tale Code
+## Tale Code
 
 
 1) App idea

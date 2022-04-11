@@ -35,7 +35,7 @@ services.AddMessageBus(messageBusConfiguration);
 
 ### Usage
 
-#### I. Message publishing
+#### II. Message publishing
 1) Register message publisher
 
 ```csharp
