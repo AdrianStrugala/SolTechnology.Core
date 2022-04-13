@@ -25,7 +25,7 @@
 "Clean code is simple and direct. Clean code reads like well-written prose. Clean code never obscures the designer's intent but rather is full of crisp abstractions and straightforward lines of control."
 </p>
 <p align="right">
-*~Grady Booch author of Object Oriented Analysis and Design with Applications*
+~Grady Booch author of Object Oriented Analysis and Design with Applications
 </p>
 </i>
 
@@ -70,9 +70,9 @@ Enjoy your reading!
 
 
 
-[1) The Design](https://github.com/AdrianStrugala/SolTechnology.Core/tree/master/taleCode/docs/theDesign.md) \
-[2) The Automatization](https://github.com/AdrianStrugala/SolTechnology.Core/tree/master/taleCode/docs/theAutomatization.md) \
-[2) The Quality](https://github.com/AdrianStrugala/SolTechnology.Core/tree/master/taleCode/docs/theQuality.md)
+[1. The Design](https://github.com/AdrianStrugala/SolTechnology.Core/tree/master/taleCode/docs/theDesign.md) \
+[2. The Automatization](https://github.com/AdrianStrugala/SolTechnology.Core/tree/master/taleCode/docs/theAutomatization.md) \
+[3. The Quality](https://github.com/AdrianStrugala/SolTechnology.Core/tree/master/taleCode/docs/theQuality.md)
 
 *Some ending words*
 
