@@ -20,6 +20,16 @@
 </p>
 
 
+<i>
+<center>
+"Clean code is simple and direct. Clean code reads like well-written prose. Clean code never obscures the designer's intent but rather is full of crisp abstractions and straightforward lines of control."
+
+*~Grady Booch author of Object Oriented Analysis and Design with Applications*
+</center>
+</i>
+</b>
+
+
 ## Core Libraries
 
 
@@ -42,30 +52,31 @@
 ## Tale Code
 
 
-1) App idea
-
-a) get matches of player by player id
-http://api.football-data.org/v2/players/44/matches?limit=1
-
-b) get match details by match id
-https://api.football-data.org/v2/matches/327130
-
-c) store match result
-
-d) calculate how many matches of player led to team victory
-
-2) Architecture
-
-3) Infrastructure and Deployment
-
-Infrastrucutre comes from Bicep (ARM Template overlay)
-Deployed by yaml pipeline in 3 steps: Test, Build&Publish, Deploy
-
-Configuration is tokenized. Values come from Pipelines->Library->VariableGroup
 
 
-4) Tale Code Approach
+The idea of clean and readable code stays with me from the very beginning of my career. As for book lover and amateur writer, this is the most natural part of programming.\
+In the Tale Code approach, I am trying to summarize all the information about coding, design, automation and configuration that I have learned over the years.
+The Tale Code rule is simple:
+
+</br>
+<center>
+<b> "Make your code pleasure to read like a tale."
+</b>
+</center>
+</br>
+
+The TaleCode application is the most common case that came to my mind. Every night *some* data is fetched. Then it is validated and stored. Users have the possibility to query the data. The queries are expensive and require additional data manipulation.\
+To solve the application flow the CQRS approach is implemented. It is interesting from a technological perspective. Uses SQL, no-SQL databases, Azure Service Bus, Scheduled Tasks, Authentication, and Application Insights logging.
+I have summarized the knowledge and decisions into three chapters. \
+Enjoy your reading! 
 
 
 
-5) Testing Piramide
+[1) The Design](https://github.com/AdrianStrugala/SolTechnology.Core/tree/master/taleCode/docs/theDesign.md) \
+[2) The Automatization](https://github.com/AdrianStrugala/SolTechnology.Core/tree/master/taleCode/docs/theAutomatization.md) \
+[2) The Quality](https://github.com/AdrianStrugala/SolTechnology.Core/tree/master/taleCode/docs/theQuality.md)
+
+*Some ending words*
+
+
+
