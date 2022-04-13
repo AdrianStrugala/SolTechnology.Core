@@ -21,13 +21,12 @@
 
 
 <i>
-<center>
+<p align="center">
 "Clean code is simple and direct. Clean code reads like well-written prose. Clean code never obscures the designer's intent but rather is full of crisp abstractions and straightforward lines of control."
 
 *~Grady Booch author of Object Oriented Analysis and Design with Applications*
-</center>
+</p>
 </i>
-</b>
 
 
 ## Core Libraries
@@ -58,12 +57,10 @@ The idea of clean and readable code stays with me from the very beginning of my 
 In the Tale Code approach, I am trying to summarize all the information about coding, design, automation and configuration that I have learned over the years.
 The Tale Code rule is simple:
 
-</br>
-<center>
+<p align="center">
 <b> "Make your code pleasure to read like a tale."
 </b>
-</center>
-</br>
+</p>
 
 The TaleCode application is the most common case that came to my mind. Every night *some* data is fetched. Then it is validated and stored. Users have the possibility to query the data. The queries are expensive and require additional data manipulation.\
 To solve the application flow the CQRS approach is implemented. It is interesting from a technological perspective. Uses SQL, no-SQL databases, Azure Service Bus, Scheduled Tasks, Authentication, and Application Insights logging.
