@@ -23,7 +23,8 @@
 <i>
 <p align="center">
 "Clean code is simple and direct. Clean code reads like well-written prose. Clean code never obscures the designer's intent but rather is full of crisp abstractions and straightforward lines of control."
-
+</p>
+<p align="right">
 *~Grady Booch author of Object Oriented Analysis and Design with Applications*
 </p>
 </i>
@@ -32,7 +33,7 @@
 ## Core Libraries
 
 
-**The SolTechnology.Core repository contains a set of shared libraries. This is a foundation for CQRS driven applications using basic Azure technologies. The libraries support a modern coding approach presented in the example application called "Tale Code".**
+The SolTechnology.Core repository contains a set of shared libraries. This is a foundation for CQRS driven applications using basic Azure technologies. The libraries support a modern coding approach presented in the example application called "Tale Code".
 
 
 | Documentation  | Nuget  |   |
