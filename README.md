@@ -65,13 +65,51 @@ The Tale Code rule is simple:
 
 The TaleCode application is the most common case that came to my mind. Every night *some* data is fetched. Then it is validated and stored. Users have the possibility to query the data. The queries are expensive and require additional data manipulation.\
 To solve the application flow the CQRS approach is implemented. It is interesting from a technological perspective. Uses SQL, no-SQL databases, Azure Service Bus, Scheduled Tasks, Authentication, and Application Insights logging.
-I have summarized the knowledge and decisions into three chapters. \
-Enjoy your reading! 
+<p>
+<b>The Code Design is the main goal</b> of TaleCode application. The Code is organized in the most redable way I was able to think of.
+Take a look at example Command Handler:
 
+```csharp
+    public async Task Handle(SynchronizePlayerMatchesCommand command)
+    {
+        var playerIdMap = _playerExternalIdsProvider.GetExternalPlayerId(command.PlayerId);
+        var context = new SynchronizePlayerMatchesContext
+        {
+            PlayerIdMap = playerIdMap
+        };
+
+
+        await _syncPlayer.Execute(context);
+
+        _determineMatchesToSync.Execute(context);
+
+
+        foreach (var matchId in context.MatchesToSync)
+        {
+            await _syncMatch.Execute(context, matchId);
+        }
+
+        var message = new PlayerMatchesSynchronizedEvent(command.PlayerId);
+        await _messagePublisher.Publish(message);
+    }
+```
+
+My intention was to read the code in following way:
+<p>
+<i>
+The Synchronize Player Matches command is given. To synchronize the matches I need to get at first the external Id for a player. Having this, I am sharing it using the operation context. As the next step, I need to synchronize the player itself. Then, I am determining the matches to sync. For each of the chosen matches, I am running the sync. At the end, I am sending a notification, that the Player Matches are synchronized.
+</i>
+</p>
+
+If you read the code is simiar way, Tale Code succeeded. How was it achieved?
+
+I have summarized the knowledge and decisions into three chapters.\
+Enjoy your reading! 
+</p>
 
 
 [1. The Design](https://github.com/AdrianStrugala/SolTechnology.Core/tree/master/taleCode/docs/theDesign.md) \
-[2. The Automatization](https://github.com/AdrianStrugala/SolTechnology.Core/tree/master/taleCode/docs/theAutomatization.md) \
+[2. The Automation](https://github.com/AdrianStrugala/SolTechnology.Core/tree/master/taleCode/docs/theAutomatization.md) \
 [3. The Quality](https://github.com/AdrianStrugala/SolTechnology.Core/tree/master/taleCode/docs/theQuality.md)
 
 *Some ending words*

@@ -1,5 +1,4 @@
 ﻿using Azure.Storage.Blobs;
-using SolTechnology.Core.BlobStorage;
 using SolTechnology.Core.BlobStorage.BlobContainerClientExtensions;
 using SolTechnology.Core.BlobStorage.Connection;
 using SolTechnology.TaleCode.Domain;
@@ -20,9 +19,6 @@ namespace SolTechnology.TaleCode.BlobData.PlayerStatisticsRepository
         public async Task Add(PlayerStatistics playerStatistics)
         {
             await _client.WriteToBlob(playerStatistics.Id.ToString(), playerStatistics);
-
-            //TODO: TEMPORARY
-            await _client.WriteToBlob("test", playerStatistics, SerializationFormat.Avro);
         }
 
         public async Task<PlayerStatistics> Get(int playerId)
