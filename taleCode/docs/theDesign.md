@@ -1,7 +1,7 @@
 
 ## Architecture
 
-<img alt="design" src="./taleCodeArchitecture.jpg">
+<img alt="design" src="./taleCodeArchitecture.JPG">
 
 
 Tale Code application is build of following components:
@@ -52,7 +52,7 @@ Extending the Readme example:
 
 The repository is structurized in this way:
 
-<img alt="design" src="./commandHandlerStructure.jpg">
+<img alt="design" src="./commandHandlerStructure.JPG">
 
 Where:
 
@@ -345,7 +345,7 @@ VALUES (@ApiId, @Name, @DateOfBirth, @Nationality, @Position)
 
 What is worth to mention here. in purpose of keeping classes small and readabe, the adventage of partial classes can be used:
 
-<img alt="design" src="./partialClasses.jpg">
+<img alt="design" src="./partialClasses.JPG">
 
 
 #### BlobData

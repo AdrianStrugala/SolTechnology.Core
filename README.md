@@ -97,7 +97,7 @@ Take a look at example Command Handler:
 My intention was to read the code in following way:
 <p>
 <i>
-The Synchronize Player Matches command is given. To synchronize the matches I need to get at first the external Id for a player. Having this, I am sharing it using the operation context. As the next step, I need to synchronize the player itself. Then, I am determining the matches to sync. For each of the chosen matches, I am running the sync. At the end, I am sending a notification, that the Player Matches are synchronized.
+The Synchronize Player Matches command is given. To synchronize the matches I need to get at first the external Id for a player. Having this, I am sharing it using the operation context. As the next step, I need to synchronize the player itself. Then, I am determining the matches to sync. For each of the chosen matches, I am running the sync process. At the end, I am sending a notification, that the Player Matches are synchronized.
 </i>
 </p>
 
@@ -109,7 +109,7 @@ Enjoy your reading!
 
 
 [1. The Design](https://github.com/AdrianStrugala/SolTechnology.Core/tree/master/taleCode/docs/theDesign.md) \
-[2. The Automation](https://github.com/AdrianStrugala/SolTechnology.Core/tree/master/taleCode/docs/theAutomatization.md) \
+[2. The Automation](https://github.com/AdrianStrugala/SolTechnology.Core/tree/master/taleCode/docs/theAutomation.md) \
 [3. The Quality](https://github.com/AdrianStrugala/SolTechnology.Core/tree/master/taleCode/docs/theQuality.md)
 
 *Some ending words*
