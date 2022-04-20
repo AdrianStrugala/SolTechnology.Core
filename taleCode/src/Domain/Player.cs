@@ -6,7 +6,7 @@ namespace SolTechnology.TaleCode.Domain
     {
         public int ApiId { get; set; }
         public string Name { get; set; }
-        public string DateOfBirth { get; set; }
+        public DateTime DateOfBirth { get; set; }
         public string Nationality { get; set; }
         public string Position { get; set; }
         public List<Match> Matches { get; set; }
@@ -17,7 +17,7 @@ namespace SolTechnology.TaleCode.Domain
             //required by ORM
         }
 
-        public Player(int apiId, string name, string dateOfBirth, string nationality, string position, List<Match> matches, List<Team> teams)
+        public Player(int apiId, string name, DateTime dateOfBirth, string nationality, string position, List<Match> matches, List<Team> teams)
         {
             Guards.String(name, nameof(name)).NotNull().NotEmpty(); ;
             Guards.Int(apiId, nameof(apiId)).NotZero();

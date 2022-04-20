@@ -19,7 +19,7 @@ namespace SolTechnology.TaleCode.ApiClients.FootballDataApi
             {
                 Id = apiResult.Player.Id,
                 Name = apiResult.Player.Name,
-                DateOfBirth = apiResult.Player.DateOfBirth,
+                DateOfBirth = DateTime.Parse(apiResult.Player.DateOfBirth),
                 Nationality = apiResult.Player.Nationality,
                 Position = apiResult.Player.Position,
                 Matches = apiResult.Matches.OrderBy(m => m.UtcDate).Select(m => new FootballDataMatch

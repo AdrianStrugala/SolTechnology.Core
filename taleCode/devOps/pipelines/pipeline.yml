@@ -53,7 +53,16 @@ stages:
         displayName: 'Run unit tests'
         inputs:
           command: 'test'
-          projects: 'taleCode/**/*Tests.csproj'
+          projects: 'taleCode/**/*UnitTests.csproj'
+          custom: 'msbuild'
+          arguments: '-p:Configuration=$(BuildConfiguration)'
+          publishTestResults: true
+
+      - task: DotNetCoreCLI@2
+        displayName: 'Run integration tests'
+        inputs:
+          command: 'test'
+          projects: 'taleCode/**/*IntegrationTests.csproj'
           custom: 'msbuild'
           arguments: '-p:Configuration=$(BuildConfiguration)'
           publishTestResults: true
