@@ -13,7 +13,7 @@ builder.Services.AddApplicationInsightsTelemetry();
 builder.Services.AddCommands();
 
 builder.Services.AddMessageBus()
-                .WithReceiver<PlayerMatchesSynchronizedEvent, CalculatePlayerStatistics>("synchronizeplayermatches", "calculatestatistics");
+                .WithQueueReceiver<PlayerMatchesSynchronizedEvent, CalculatePlayerStatistics>("calculatestatistics");
 
 builder.Services.AddControllers();
 

@@ -4,7 +4,7 @@ using Microsoft.Extensions.Options;
 
 namespace SolTechnology.Core.MessageBus.Configuration
 {
-    public class MessageBusConfigurationProvider : IMessageBusConfigurationProvider
+    public class MessageBusConfigurationProvider : IMessageBusConfigurationProvider, IDisposable
     {
         private readonly ServiceBusClient _serviceBusClient;
         private readonly ManagementClient _managementClient;
@@ -24,7 +24,7 @@ namespace SolTechnology.Core.MessageBus.Configuration
         }
 
         //Topic descriptions can be added here
-        public void RegisterMessagePublisher(string messageType, string topicName)
+        public void RegisterTopicPublisher(string messageType, string topicName)
         {
             var topicSender = _serviceBusClient.CreateSender(topicName);
             MessageToSenderMap.Add((messageType, topicSender));
@@ -43,14 +43,14 @@ namespace SolTechnology.Core.MessageBus.Configuration
 
             if (!senders.Any())
             {
-                throw new ArgumentException($"Message bus topic for Topic: [{messageType}] is not configured.");
+                throw new ArgumentException($"No message bus Publisher for Message: [{messageType}] is configured.");
             }
 
             return senders;
         }
 
         //Subscription Options can be added here (MaxAutoLockRenewalDuration, MaxConcurrentCalls)
-        public void RegisterMessageReceiver(string messageType, string topicName, string subscriptionName)
+        public void RegisterTopicReceiver(string messageType, string topicName, string subscriptionName)
         {
             var serviceBusProcessorOptions = new ServiceBusProcessorOptions
             {
@@ -75,10 +75,44 @@ namespace SolTechnology.Core.MessageBus.Configuration
 
             if (!processors.Any())
             {
-                throw new ArgumentException($"Message bus topic for Topic: [{messageType}] is not configured.");
+                throw new ArgumentException($"No message bus Receiver for Message: [{messageType}] is configured.");
             }
 
             return processors;
+        }
+
+        public void RegisterQueuePublisher(string messageType, string queueName)
+        {
+            var queueSender = _serviceBusClient.CreateSender(queueName);
+            MessageToSenderMap.Add((messageType, queueSender));
+
+            if (!_managementClient.QueueExistsAsync(queueName).GetAwaiter().GetResult())
+            {
+                _managementClient.CreateQueueAsync(queueName).GetAwaiter().GetResult();
+            }
+        }
+
+        public void RegisterQueueReceiver(string messageType, string queueName)
+        {
+            var serviceBusProcessorOptions = new ServiceBusProcessorOptions
+            {
+                AutoCompleteMessages = true,
+                ReceiveMode = ServiceBusReceiveMode.PeekLock
+            };
+
+            ServiceBusProcessor serviceBusProcessor = _serviceBusClient.CreateProcessor(queueName, serviceBusProcessorOptions);
+            MessageToProcessorMap.Add((messageType, serviceBusProcessor));
+
+            //   if (!_managementClient.SubscriptionExistsAsync(topicName, subscriptionName).GetAwaiter().GetResult())
+            //   {
+            //       _managementClient.CreateSubscriptionAsync(topicName, subscriptionName).GetAwaiter().GetResult();
+            //   }
+        }
+
+
+        public void Dispose()
+        {
+           _serviceBusClient.DisposeAsync().GetAwaiter().GetResult();
         }
     }
 }

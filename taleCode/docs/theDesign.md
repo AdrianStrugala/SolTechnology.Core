@@ -387,7 +387,7 @@ Contains data not changing in time.
 ## Command & Query Flow
 
 
-<img alt="design" src="./taleCodeFlow.JPG">
+<img alt="design" src="./taleCodeFlow.jpg">
 
 
 Synchronize player steps:

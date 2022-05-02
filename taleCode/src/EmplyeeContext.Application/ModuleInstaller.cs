@@ -22,7 +22,7 @@ namespace SolTechnology.TaleCode.PlayerRegistry.Commands
             services.AddStaticData();
             services.AddBlobData();
             services.AddMessageBus()
-                    .WithPublisher<PlayerMatchesSynchronizedEvent>("synchronizeplayermatches");
+                    .WithQueuePublisher<PlayerMatchesSynchronizedEvent>("calculatestatistics");
 
 
             services.AddScoped<ISyncPlayer, SyncPlayer>();

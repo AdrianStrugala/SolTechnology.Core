@@ -4,8 +4,11 @@ namespace SolTechnology.Core.MessageBus.Configuration;
 
 public interface IMessageBusConfigurationProvider
 {
-    void RegisterMessagePublisher(string messageType, string topicName);
+    void RegisterTopicPublisher(string messageType, string topicName);
     List<ServiceBusSender> ResolveMessagePublisher(string messageType);
-    void RegisterMessageReceiver(string messageType, string topicName, string subscriptionName);
+    void RegisterTopicReceiver(string messageType, string topicName, string subscriptionName);
     List<ServiceBusProcessor> ResolveMessageReceiver(string messageType);
+
+    void RegisterQueuePublisher(string messageType, string queueName);
+    void RegisterQueueReceiver(string messageType, string queueName);
 }

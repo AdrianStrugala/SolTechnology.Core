@@ -34,7 +34,7 @@ namespace SolTechnology.Core.MessageBus.Receive
 
             foreach (ServiceBusProcessor processor in _processors)
             {
-                _logger.LogInformation($"Starting message bus processor for topic: [{processor.EntityPath}]");
+                _logger.LogInformation($"Starting message bus processor for: [{processor.EntityPath}]");
                 processor.ProcessMessageAsync += HandleMessageAsync;
                 processor.ProcessErrorAsync += HandleError;
 

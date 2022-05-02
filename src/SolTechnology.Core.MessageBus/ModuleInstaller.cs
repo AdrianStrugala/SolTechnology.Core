@@ -35,7 +35,8 @@ namespace SolTechnology.Core.MessageBus
             return services;
         }
 
-        public static IServiceCollection WithPublisher<TMessage>(
+        //TOPIC
+        public static IServiceCollection WithTopicPublisher<TMessage>(
             this IServiceCollection services,
             string topicName) where TMessage : IMessage
         {
@@ -43,12 +44,12 @@ namespace SolTechnology.Core.MessageBus
 
             string messageType = typeof(TMessage).Name;
 
-            configurationProvider.RegisterMessagePublisher(messageType, topicName);
+            configurationProvider.RegisterTopicPublisher(messageType, topicName);
 
             return services;
         }
 
-        public static IServiceCollection WithReceiver<TMessage, THandler>(
+        public static IServiceCollection WithTopicReceiver<TMessage, THandler>(
             this IServiceCollection services,
             string topicName,
             string subscriptionName)
@@ -63,7 +64,40 @@ namespace SolTechnology.Core.MessageBus
 
             string messageType = typeof(TMessage).Name;
 
-            configurationProvider.RegisterMessageReceiver(messageType, topicName, subscriptionName);
+            configurationProvider.RegisterTopicReceiver(messageType, topicName, subscriptionName);
+
+            return services;
+        }
+
+        //QUEUE
+        public static IServiceCollection WithQueuePublisher<TMessage>(
+            this IServiceCollection services,
+            string queueName) where TMessage : IMessage
+        {
+            var configurationProvider = services.BuildServiceProvider().GetRequiredService<IMessageBusConfigurationProvider>();
+
+            string messageType = typeof(TMessage).Name;
+
+            configurationProvider.RegisterQueuePublisher(messageType, queueName);
+
+            return services;
+        }
+
+        public static IServiceCollection WithQueueReceiver<TMessage, THandler>(
+            this IServiceCollection services,
+            string topicName)
+            where TMessage : IMessage where THandler : class, IMessageHandler<TMessage>
+        {
+            var configurationProvider = services.BuildServiceProvider()
+                .GetRequiredService<IMessageBusConfigurationProvider>();
+
+            services.AddHostedService<MessageBusReceiver<TMessage>>();
+            services.AddScoped<THandler>();
+            services.AddScoped(typeof(MessageBusReceiver<TMessage>), (serviceProvider) => serviceProvider.GetRequiredService<THandler>());
+
+            string messageType = typeof(TMessage).Name;
+
+            configurationProvider.RegisterQueueReceiver(messageType, topicName);
 
             return services;
         }
