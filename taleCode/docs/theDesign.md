@@ -386,12 +386,31 @@ Contains data not changing in time.
 
 ## Command & Query Flow
 
-a) get matches of player by player id
-http://api.football-data.org/v2/players/44/matches?limit=1
 
-b) get match details by match id
+<img alt="design" src="./taleCodeFlow.JPG">
+
+
+Synchronize player steps:
+
+a) get playerIds from static map
+
+b) get matches of player by player id
+http://api.football-data.org/v2/players/44/matches?limit=999
+
+c) get player teams
+https://api-football-v1.p.rapidapi.com/v3/transfers?player={apiId}
+
+d) insert or update player
+
+e) determine matches to sync (exclude already imported or failed)
+
+f) get match details by match id
 https://api.football-data.org/v2/matches/327130
 
-c) store match result
+g) assign competition winner
 
-d) calculate how many matches of player led to team victory
+h) store match result
+
+i) in case of not assigned winner - store execution error with match Id
+
+j) publish PlayerMatchesSynchronizedEvent
