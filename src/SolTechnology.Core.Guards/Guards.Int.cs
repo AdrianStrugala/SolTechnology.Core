@@ -1,102 +1,139 @@
-﻿namespace SolTechnology.Core.Guards
+﻿using SolTechnology.Core.Guards.Context;
+
+namespace SolTechnology.Core.Guards
 {
     public partial class Guards
     {
-        public static GuardsContext<int> Int(int parameter, string parameterName)
+        public static IntContext Int(int parameter, string parameterName)
         {
-            return new GuardsContext<int>(parameter, parameterName);
+            return new IntContext(parameter, parameterName);
         }
 
-        public static GuardsContext<int> NotZero(this GuardsContext<int> guardsContext)
+        public  static GuardsContext2 Int(int property, string propertyName, Action<IntContext> validate)
+        {
+            GuardsContext.Int(property, propertyName, validate);
+
+            return GuardsContext;
+        }
+
+        public static GuardsContext2 Int(this GuardsContext2 context, int property, string propertyName, Action<IntContext> validate)
+        {
+            IntContext stringContext = new IntContext(property, propertyName);
+            validate(stringContext);
+
+            return context;
+        }
+
+
+        public static IntContext NotZero(this IntContext guardsContext)
         {
             if (guardsContext.Value == 0)
             {
-                throw new ArgumentException($"Int [{guardsContext.Value}] of name [{guardsContext.Name}] cannot be zero!");
+                GuardsContext.Errors.Add($"Int [{guardsContext.Value}] of name [{guardsContext.Name}] cannot be zero!");
             }
 
             return guardsContext;
         }
 
-        public static GuardsContext<int> NotNegative(this GuardsContext<int> guardsContext)
+        public static IntContext NotNegative(this IntContext guardsContext)
         {
             if (guardsContext.Value < 0)
             {
-                throw new ArgumentException($"Int [{guardsContext.Value}] of name [{guardsContext.Name}] cannot be negative!");
+                GuardsContext.Errors.Add($"Int [{guardsContext.Value}] of name [{guardsContext.Name}] cannot be negative!");
             }
 
             return guardsContext;
         }
 
-        public static GuardsContext<int> NotPositive(this GuardsContext<int> guardsContext)
+        public static IntContext NotPositive(this IntContext guardsContext)
         {
             if (guardsContext.Value > 0)
             {
-                throw new ArgumentException($"Int [{guardsContext.Value}] of name [{guardsContext.Name}] cannot be positive!");
+                GuardsContext.Errors.Add($"Int [{guardsContext.Value}] of name [{guardsContext.Name}] cannot be positive!");
             }
 
             return guardsContext;
         }
 
-        public static GuardsContext<int> GreaterThan(this GuardsContext<int> guardsContext, int toCompare)
+        public static IntContext GreaterThan(this IntContext guardsContext, int toCompare)
         {
-            if (guardsContext.Value > toCompare) return guardsContext;
-            throw new ArgumentException($"Int [{guardsContext.Value}] of name [{guardsContext.Name}] has to be greater than [{toCompare}]!");
+            if (!(guardsContext.Value > toCompare))
+            {
+                GuardsContext.Errors.Add(
+                    $"Int [{guardsContext.Value}] of name [{guardsContext.Name}] has to be greater than [{toCompare}]!");
+            }
 
+            return guardsContext;
         }
 
-        public static GuardsContext<int> GreaterEqual(this GuardsContext<int> guardsContext, int toCompare)
+        public static IntContext GreaterEqual(this IntContext guardsContext, int toCompare)
         {
-            if (guardsContext.Value >= toCompare) return guardsContext;
-            throw new ArgumentException($"Int [{guardsContext.Value}] of name [{guardsContext.Name}] has to be greater or equal [{toCompare}]!");
+            if (!(guardsContext.Value >= toCompare))
+            {
+                GuardsContext.Errors.Add(
+                    $"Int [{guardsContext.Value}] of name [{guardsContext.Name}] has to be greater or equal [{toCompare}]!");
+            }
 
+            return guardsContext;
         }
 
-        public static GuardsContext<int> LessThan(this GuardsContext<int> guardsContext, int toCompare)
+        public static IntContext LessThan(this IntContext guardsContext, int toCompare)
         {
-            if (guardsContext.Value < toCompare) return guardsContext;
-            throw new ArgumentException($"Int [{guardsContext.Value}] of name [{guardsContext.Name}] has to be lesser than [{toCompare}]!");
+            if (!(guardsContext.Value < toCompare))
+            {
+                GuardsContext.Errors.Add(
+                    $"Int [{guardsContext.Value}] of name [{guardsContext.Name}] has to be lesser than [{toCompare}]!");
+            }
 
+            return guardsContext;
         }
 
-        public static GuardsContext<int> LessEqual(this GuardsContext<int> guardsContext, int toCompare)
+        public static IntContext LessEqual(this IntContext guardsContext, int toCompare)
         {
-            if (guardsContext.Value <= toCompare) return guardsContext;
-            throw new ArgumentException($"Int [{guardsContext.Value}] of name [{guardsContext.Name}] has to be lesser or equal [{toCompare}]!");
+            if (!(guardsContext.Value <= toCompare))
+            {
+                GuardsContext.Errors.Add(
+                    $"Int [{guardsContext.Value}] of name [{guardsContext.Name}] has to be lesser or equal [{toCompare}]!");
+            }
 
+            return guardsContext;
         }
 
-        public static GuardsContext<int> Equal(this GuardsContext<int> guardsContext, int toCompare)
+        public static IntContext Equal(this IntContext guardsContext, int toCompare)
         {
-            if (guardsContext.Value == toCompare) return guardsContext;
-            throw new ArgumentException($"Int [{guardsContext.Value}] of name [{guardsContext.Name}] has to be equal [{toCompare}]!");
+            if (guardsContext.Value != toCompare)
+            {
+                GuardsContext.Errors.Add($"Int [{guardsContext.Value}] of name [{guardsContext.Name}] has to be equal [{toCompare}]!");
+            }
 
+            return guardsContext;
         }
 
-        public static GuardsContext<int> NotEqual(this GuardsContext<int> guardsContext, int toCompare)
+        public static IntContext NotEqual(this IntContext guardsContext, int toCompare)
         {
             if (guardsContext.Value == toCompare)
             {
-                throw new ArgumentException($"Int [{guardsContext.Value}] of name [{guardsContext.Name}] cannot be equal [{toCompare}]!");
+                GuardsContext.Errors.Add($"Int [{guardsContext.Value}] of name [{guardsContext.Name}] cannot be equal [{toCompare}]!");
             }
 
             return guardsContext;
         }
 
-        public static GuardsContext<int> InRange(this GuardsContext<int> guardsContext, int min, int max)
+        public static IntContext InRange(this IntContext guardsContext, int min, int max)
         {
             if (guardsContext.Value < min || guardsContext.Value > max)
             {
-                throw new ArgumentException($"Int [{guardsContext.Value}] of name [{guardsContext.Name}] has to be in range: [{min}] to [{max}]!");
+                GuardsContext.Errors.Add($"Int [{guardsContext.Value}] of name [{guardsContext.Name}] has to be in range: [{min}] to [{max}]!");
             }
 
             return guardsContext;
         }
 
-        public static GuardsContext<int> NotInRange(this GuardsContext<int> guardsContext, int min, int max)
+        public static IntContext NotInRange(this IntContext guardsContext, int min, int max)
         {
             if (guardsContext.Value >= min && guardsContext.Value <= max)
             {
-                throw new ArgumentException($"Int [{guardsContext.Value}] of name [{guardsContext.Name}] cannot be in range: [{min}] to [{max}]!");
+                GuardsContext.Errors.Add($"Int [{guardsContext.Value}] of name [{guardsContext.Name}] cannot be in range: [{min}] to [{max}]!");
             }
 
             return guardsContext;

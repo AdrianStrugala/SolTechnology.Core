@@ -7,68 +7,63 @@ namespace SolTechnology.Core.Guards.Tests
     public class StringTests
     {
         [Fact]
-        public void NotNull_Null_Throws()
+        public void Null_String_Produces_Error()
         {
             //Arrange
             string underTest = null;
 
 
             //Act
-            var exception = Record.Exception(() => Guards.String(underTest, nameof(underTest))
-                .NotNull());
+            var result = Guards.String(underTest, nameof(underTest), x => x.NotNull());
 
 
             //Assert
-            exception.Should().BeOfType<ArgumentException>();
+            result.Errors.Should().HaveCount(1);
         }
 
         [Fact]
-        public void NotEmpty_Empty_Throws()
+        public void Empty_String_Produces_Error()
         {
             //Arrange
             string underTest = "";
 
 
             //Act
-            var exception = Record.Exception(() => Guards.String(underTest, nameof(underTest))
-                .NotEmpty());
+            var result = Guards.String(underTest, nameof(underTest), x => x.NotEmpty());
 
 
             //Assert
-            exception.Should().BeOfType<ArgumentException>();
+            result.Errors.Should().HaveCount(1);
         }
 
         [Fact]
-        public void NotEquals_Equals_Throws()
+        public void String_Equal_To_Given_Produces_Error()
         {
             //Arrange
             string underTest = "EqualString";
 
 
             //Act
-            var exception = Record.Exception(() => Guards.String(underTest, nameof(underTest))
-                .NotEqual(underTest));
+            var result = Guards.String(underTest, nameof(underTest), x => x.NotEqual(underTest));
 
 
             //Assert
-            exception.Should().BeOfType<ArgumentException>();
+            result.Errors.Should().HaveCount(1);
         }
 
         [Fact]
-        public void Equals_NotEquals_Throws()
+        public void String_Not_Equal_To_Given_Produces_Error()
         {
             //Arrange
             string underTest = "NotEqualString";
 
 
             //Act
-            var exception = Record.Exception(() => Guards.String(underTest, nameof(underTest))
-                .Equal("AnotherString"));
+            var result = Guards.String(underTest, nameof(underTest), x => x.Equal("AnotherString"));
 
 
             //Assert
-
-            exception.Should().BeOfType<ArgumentException>();
+            result.Errors.Should().HaveCount(1);
         }
     }
 }

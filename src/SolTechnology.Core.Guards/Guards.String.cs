@@ -1,59 +1,74 @@
-﻿namespace SolTechnology.Core.Guards
+﻿using SolTechnology.Core.Guards.Context;
+
+namespace SolTechnology.Core.Guards
 {
     public static partial class Guards
     {
-        public static GuardsContext<string> String(string parameter, string parameterName)
+        public static GuardsContext2 String(string property, string propertyName, Action<StringContext> validate)
         {
-            return new GuardsContext<string>(parameter, parameterName);
+            StringContext stringContext = new StringContext(property, propertyName);
+            validate(stringContext);
+
+            return GuardsContext;
         }
 
-        public static GuardsContext<string> NotNull(this GuardsContext<string> guardsContext)
+        // public static GuardsContext2 String(this GuardsContext2 context, string property, string propertyName, Action<StringContext> validate)
+        // {
+        //     StringContext stringContext = new StringContext(property, propertyName);
+        //     validate(stringContext);
+        //
+        //     return GuardsContext;
+        // }
+
+
+        public static StringContext NotNull(this StringContext context)
         {
-            if (guardsContext.Value == null)
+            if (context.Value == null)
             {
-                throw new ArgumentException($"String [{guardsContext.Name}] cannot be null!");
+                GuardsContext.Errors.Add($"String [{context.Name}] cannot be null!");
             }
 
-            return guardsContext;
+            return context;
         }
 
-        public static GuardsContext<string> NotEmpty(this GuardsContext<string> guardsContext)
+
+        public static StringContext NotEmpty(this StringContext guardsContext)
         {
             if (guardsContext.Value == string.Empty)
             {
-                throw new ArgumentException($"String [{guardsContext.Name}] cannot be empty!");
+                GuardsContext.Errors.Add($"String [{guardsContext.Name}] cannot be empty!");
             }
-
+        
             return guardsContext;
         }
-
-        public static GuardsContext<string> NotWhitespace(this GuardsContext<string> guardsContext)
+        
+        public static StringContext NotWhitespace(this StringContext guardsContext)
         {
             if (guardsContext.Value != null && string.IsNullOrWhiteSpace(guardsContext.Value))
             {
-                throw new ArgumentException($"String [{guardsContext.Name}] cannot be whitespace!");
+                GuardsContext.Errors.Add($"String [{guardsContext.Name}] cannot be whitespace!");
             }
-
+        
             return guardsContext;
         }
-
-        public static GuardsContext<string> Equal(this GuardsContext<string> guardsContext, string toCompare)
+        
+        public static StringContext Equal(this StringContext guardsContext, string toCompare)
         {
             if (guardsContext.Value != toCompare)
             {
-                throw new ArgumentException($"String [{guardsContext.Value}] of name [{guardsContext.Name}] has to be equal [{toCompare}]!");
+                GuardsContext.Errors.Add($"String [{guardsContext.Value}] of name [{guardsContext.Name}] has to be equal [{toCompare}]!");
             }
-
+        
             return guardsContext;
         }
-
-        public static GuardsContext<string> NotEqual(this GuardsContext<string> guardsContext, string toCompare)
+        
+        public static StringContext NotEqual(this StringContext guardsContext, string toCompare)
         {
             if (guardsContext.Value == toCompare)
             {
-                throw new ArgumentException($"String [{guardsContext.Value}] of name [{guardsContext.Name}] cannot be equal [{toCompare}]!");
+                GuardsContext.Errors.Add($"String [{guardsContext.Value}] of name [{guardsContext.Name}] cannot be equal [{toCompare}]!");
             }
-
+        
             return guardsContext;
         }
     }

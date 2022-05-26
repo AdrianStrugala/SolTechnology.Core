@@ -21,9 +21,12 @@ namespace SolTechnology.TaleCode.Domain
 
         public Match(int apiId, int playerApiId, DateTime date, string homeTeam, string awayTeam, int homeTeamScore, int awayTeamScore, string winner)
         {
-            Guards.String(winner, nameof(winner)).NotNull().NotEmpty();
-            Guards.Int(apiId, nameof(apiId)).NotZero();
-            Guards.Int(playerApiId, nameof(playerApiId)).NotZero();
+            Guards.String(winner, nameof(winner), x => x.NotNull().NotEmpty())
+                  .Int(apiId, nameof(apiId), x => x.NotZero())
+                  .Int(playerApiId, nameof(playerApiId), x => x.NotZero())
+                  .ThrowOnErrors();
+
+
 
             ApiId = apiId;
             PlayerApiId = playerApiId;
