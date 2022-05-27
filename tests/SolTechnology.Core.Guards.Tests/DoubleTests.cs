@@ -17,7 +17,7 @@ namespace SolTechnology.Core.Guards.Tests
         public void NotZero_Zero_Throws()
         {
             //Arrange
-            int underTest = 0;
+            double underTest = 0;
 
 
             //Act
@@ -30,9 +30,9 @@ namespace SolTechnology.Core.Guards.Tests
         }
 
         [Theory]
-        [InlineData(int.MinValue)]
+        [InlineData(double.MinValue)]
         [InlineData(-1)]
-        public void NotNegative_Negative_Throws(int underTest)
+        public void NotNegative_Negative_Throws(double underTest)
         {
             //Arrange
 
@@ -48,9 +48,9 @@ namespace SolTechnology.Core.Guards.Tests
 
 
         [Theory]
-        [InlineData(int.MaxValue)]
+        [InlineData(double.MaxValue)]
         [InlineData(1)]
-        public void NotPositive_Positive_Throws(int underTest)
+        public void NotPositive_Positive_Throws(double underTest)
         {
             //Arrange
 
@@ -65,11 +65,11 @@ namespace SolTechnology.Core.Guards.Tests
         }
 
         [Theory]
-        [InlineData(int.MaxValue)]
-        [InlineData(int.MinValue)]
+        [InlineData(double.MaxValue)]
+        [InlineData(double.MinValue)]
         [InlineData(-6)]
         [InlineData(11)]
-        public void InRange_NotInRange_Throws(int underTest)
+        public void InRange_NotInRange_Throws(double underTest)
         {
             //Arrange
 
@@ -87,7 +87,7 @@ namespace SolTechnology.Core.Guards.Tests
         [InlineData(-5)]
         [InlineData(10)]
         [InlineData(0)]
-        public void InRange_InRange_NoException(int underTest)
+        public void InRange_InRange_NoException(double underTest)
         {
             //Arrange
 
@@ -103,11 +103,11 @@ namespace SolTechnology.Core.Guards.Tests
 
 
         [Theory]
-        [InlineData(int.MaxValue)]
-        [InlineData(int.MinValue)]
+        [InlineData(double.MaxValue)]
+        [InlineData(double.MinValue)]
         [InlineData(-6)]
         [InlineData(11)]
-        public void NotInRange_NotInRange_NoException(int underTest)
+        public void NotInRange_NotInRange_NoException(double underTest)
         {
             //Arrange
 
@@ -125,7 +125,7 @@ namespace SolTechnology.Core.Guards.Tests
         [InlineData(-5)]
         [InlineData(10)]
         [InlineData(0)]
-        public void NotInRange_InRange_Throws(int underTest)
+        public void NotInRange_InRange_Throws(double underTest)
         {
             //Arrange
 
@@ -144,7 +144,7 @@ namespace SolTechnology.Core.Guards.Tests
         public void Equal_NotEqual_Throws()
         {
             //Arrange
-            int underTest = 5;
+            double underTest = 5;
 
             //Act
             var result = _guards.Double(underTest, nameof(underTest), x => x
@@ -159,7 +159,7 @@ namespace SolTechnology.Core.Guards.Tests
         public void NotEqual_Equal_Throws()
         {
             //Arrange
-            int underTest = 5;
+            double underTest = 5;
 
             //Act
             var result = _guards.Double(underTest, nameof(underTest), x => x
@@ -173,10 +173,10 @@ namespace SolTechnology.Core.Guards.Tests
         [Theory]
         [InlineData(5)]
         [InlineData(10)]
-        public void GreaterThan_NotGreater_Throws(int toCompare)
+        public void GreaterThan_NotGreater_Throws(double toCompare)
         {
             //Arrange
-            int underTest = 5;
+            double underTest = 5;
 
             //Act
             var result = _guards.Double(underTest, nameof(underTest), x => x
@@ -189,11 +189,11 @@ namespace SolTechnology.Core.Guards.Tests
 
         [Theory]
         [InlineData(5)]
-        [InlineData(int.MinValue)]
-        public void GreaterEqual_GreaterOrEqual_Success(int toCompare)
+        [InlineData(double.MinValue)]
+        public void GreaterEqual_GreaterOrEqual_Success(double toCompare)
         {
             //Arrange
-            int underTest = 5;
+            double underTest = 5;
 
             //Act
             var result = _guards.Double(underTest, nameof(underTest), x => x
@@ -208,10 +208,10 @@ namespace SolTechnology.Core.Guards.Tests
         [Theory]
         [InlineData(5)]
         [InlineData(-10)]
-        public void LessThan_NotLess_Throws(int toCompare)
+        public void LessThan_NotLess_Throws(double toCompare)
         {
             //Arrange
-            int underTest = 5;
+            double underTest = 5;
 
             //Act
             var result = _guards.Double(underTest, nameof(underTest), x => x
@@ -224,11 +224,11 @@ namespace SolTechnology.Core.Guards.Tests
 
         [Theory]
         [InlineData(5)]
-        [InlineData(int.MaxValue)]
-        public void LessEqual_LessOrEqual_Success(int toCompare)
+        [InlineData(double.MaxValue)]
+        public void LessEqual_LessOrEqual_Success(double toCompare)
         {
             //Arrange
-            int underTest = 5;
+            double underTest = 5;
 
             //Act
             var result = _guards.Double(underTest, nameof(underTest), x => x
