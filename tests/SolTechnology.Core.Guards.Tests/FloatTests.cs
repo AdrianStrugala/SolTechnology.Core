@@ -6,130 +6,137 @@ namespace SolTechnology.Core.Guards.Tests
 {
     public class FloatTests
     {
+        private readonly Guards _guards;
+
+        public FloatTests()
+        {
+            _guards = new Guards();
+        }
+
         [Fact]
         public void NotZero_Zero_Throws()
         {
             //Arrange
-            float underTest = 0;
+            int underTest = 0;
 
 
             //Act
-            var exception = Record.Exception(() => Guards.Float(underTest, nameof(underTest))
+            var result = _guards.Float(underTest, nameof(underTest), x => x
                 .NotZero());
 
 
             //Assert
-            exception.Should().BeOfType<ArgumentException>();
+            result.Errors.Should().HaveCount(1);
         }
 
         [Theory]
-        [InlineData(float.MinValue)]
+        [InlineData(int.MinValue)]
         [InlineData(-1)]
-        public void NotNegative_Negative_Throws(float underTest)
+        public void NotNegative_Negative_Throws(int underTest)
         {
             //Arrange
 
 
             //Act
-            var exception = Record.Exception(() => Guards.Float(underTest, nameof(underTest))
+            var result = _guards.Float(underTest, nameof(underTest), x => x
                 .NotNegative());
 
 
             //Assert
-            exception.Should().BeOfType<ArgumentException>();
+            result.Errors.Should().HaveCount(1);
         }
 
 
         [Theory]
-        [InlineData(float.MaxValue)]
+        [InlineData(int.MaxValue)]
         [InlineData(1)]
-        public void NotPositive_Positive_Throws(float underTest)
+        public void NotPositive_Positive_Throws(int underTest)
         {
             //Arrange
 
 
             //Act
-            var exception = Record.Exception(() => Guards.Float(underTest, nameof(underTest))
+            var result = _guards.Float(underTest, nameof(underTest), x => x
                 .NotPositive());
 
 
             //Assert
-            exception.Should().BeOfType<ArgumentException>();
+            result.Errors.Should().HaveCount(1);
         }
 
         [Theory]
-        [InlineData(float.MaxValue)]
-        [InlineData(float.MinValue)]
+        [InlineData(int.MaxValue)]
+        [InlineData(int.MinValue)]
         [InlineData(-6)]
         [InlineData(11)]
-        public void InRange_NotInRange_Throws(float underTest)
+        public void InRange_NotInRange_Throws(int underTest)
         {
             //Arrange
 
 
             //Act
-            var exception = Record.Exception(() => Guards.Float(underTest, nameof(underTest))
+            var result = _guards.Float(underTest, nameof(underTest), x => x
                 .InRange(-5, 10));
 
 
             //Assert
-            exception.Should().BeOfType<ArgumentException>();
+            result.Errors.Should().HaveCount(1);
         }
 
         [Theory]
         [InlineData(-5)]
         [InlineData(10)]
         [InlineData(0)]
-        public void InRange_InRange_NoException(float underTest)
+        public void InRange_InRange_NoException(int underTest)
         {
             //Arrange
 
 
             //Act
-            var exception = Record.Exception(() => Guards.Float(underTest, nameof(underTest))
+            var result = _guards.Float(underTest, nameof(underTest), x => x
                 .InRange(-5, 10));
 
 
             //Assert
-            exception.Should().BeNull();
+            result.Errors.Should().HaveCount(0);
         }
 
 
         [Theory]
-        [InlineData(float.MaxValue)]
-        [InlineData(float.MinValue)]
+        [InlineData(int.MaxValue)]
+        [InlineData(int.MinValue)]
         [InlineData(-6)]
         [InlineData(11)]
-        public void NotInRange_NotInRange_NoException(float underTest)
+        public void NotInRange_NotInRange_NoException(int underTest)
         {
             //Arrange
 
 
             //Act
-            var exception = Record.Exception(() => Guards.Float(underTest, nameof(underTest))
+            var result = _guards.Float(underTest, nameof(underTest), x => x
                 .NotInRange(-5, 10));
 
 
             //Assert
-            exception.Should().BeNull();
+            result.Errors.Should().HaveCount(0);
         }
 
         [Theory]
         [InlineData(-5)]
         [InlineData(10)]
         [InlineData(0)]
-        public void NotInRange_InRange_Throws(float underTest)
+        public void NotInRange_InRange_Throws(int underTest)
         {
             //Arrange
 
 
             //Act
-            var exception = Record.Exception(() => Guards.Float(underTest, nameof(underTest))
+            var result = _guards.Float(underTest, nameof(underTest), x => x
                 .NotInRange(-5, 10));
 
 
             //Assert
-            exception.Should().BeOfType<ArgumentException>();
+            result.Errors.Should().HaveCount(1);
         }
 
 
@@ -137,99 +144,99 @@ namespace SolTechnology.Core.Guards.Tests
         public void Equal_NotEqual_Throws()
         {
             //Arrange
-            float underTest = 5;
+            int underTest = 5;
 
             //Act
-            var exception = Record.Exception(() => Guards.Float(underTest, nameof(underTest))
+            var result = _guards.Float(underTest, nameof(underTest), x => x
                 .Equal(50));
 
 
             //Assert
-            exception.Should().BeOfType<ArgumentException>();
+            result.Errors.Should().HaveCount(1);
         }
 
         [Fact]
         public void NotEqual_Equal_Throws()
         {
             //Arrange
-            float underTest = 5;
+            int underTest = 5;
 
             //Act
-            var exception = Record.Exception(() => Guards.Float(underTest, nameof(underTest))
+            var result = _guards.Float(underTest, nameof(underTest), x => x
                 .NotEqual(underTest));
 
 
             //Assert
-            exception.Should().BeOfType<ArgumentException>();
+            result.Errors.Should().HaveCount(1);
         }
 
         [Theory]
         [InlineData(5)]
         [InlineData(10)]
-        public void GreaterThan_NotGreater_Throws(float toCompare)
+        public void GreaterThan_NotGreater_Throws(int toCompare)
         {
             //Arrange
-            float underTest = 5;
+            int underTest = 5;
 
             //Act
-            var exception = Record.Exception(() => Guards.Float(underTest, nameof(underTest))
+            var result = _guards.Float(underTest, nameof(underTest), x => x
                 .GreaterThan(toCompare));
 
 
             //Assert
-            exception.Should().BeOfType<ArgumentException>();
+            result.Errors.Should().HaveCount(1);
         }
 
         [Theory]
         [InlineData(5)]
-        [InlineData(float.MinValue)]
-        public void GreaterEqual_GreaterOrEqual_Success(float toCompare)
+        [InlineData(int.MinValue)]
+        public void GreaterEqual_GreaterOrEqual_Success(int toCompare)
         {
             //Arrange
-            float underTest = 5;
+            int underTest = 5;
 
             //Act
-            var exception = Record.Exception(() => Guards.Float(underTest, nameof(underTest))
+            var result = _guards.Float(underTest, nameof(underTest), x => x
                 .GreaterEqual(toCompare));
 
 
             //Assert
-            exception.Should().BeNull();
+            result.Errors.Should().HaveCount(0);
         }
 
 
         [Theory]
         [InlineData(5)]
         [InlineData(-10)]
-        public void LessThan_NotLess_Throws(float toCompare)
+        public void LessThan_NotLess_Throws(int toCompare)
         {
             //Arrange
-            float underTest = 5;
+            int underTest = 5;
 
             //Act
-            var exception = Record.Exception(() => Guards.Float(underTest, nameof(underTest))
+            var result = _guards.Float(underTest, nameof(underTest), x => x
                 .LessThan(toCompare));
 
 
             //Assert
-            exception.Should().BeOfType<ArgumentException>();
+            result.Errors.Should().HaveCount(1);
         }
 
         [Theory]
         [InlineData(5)]
-        [InlineData(float.MaxValue)]
-        public void LessEqual_LessOrEqual_Success(float toCompare)
+        [InlineData(int.MaxValue)]
+        public void LessEqual_LessOrEqual_Success(int toCompare)
         {
             //Arrange
-            float underTest = 5;
+            int underTest = 5;
 
             //Act
-            var exception = Record.Exception(() => Guards.Float(underTest, nameof(underTest))
+            var result = _guards.Float(underTest, nameof(underTest), x => x
                 .LessEqual(toCompare));
 
 
             //Assert
-            exception.Should().BeNull();
+            result.Errors.Should().HaveCount(0);
         }
     }
 }

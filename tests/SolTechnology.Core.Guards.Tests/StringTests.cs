@@ -6,6 +6,13 @@ namespace SolTechnology.Core.Guards.Tests
 {
     public class StringTests
     {
+        private readonly Guards _guards;
+
+        public StringTests()
+        {
+            _guards = new Guards();
+        }
+
         [Fact]
         public void Null_String_Produces_Error()
         {
@@ -14,7 +21,7 @@ namespace SolTechnology.Core.Guards.Tests
 
 
             //Act
-            var result = Guards.String(underTest, nameof(underTest), x => x.NotNull());
+            var result = _guards.String(underTest, nameof(underTest), x => x.NotNull());
 
 
             //Assert
@@ -29,7 +36,7 @@ namespace SolTechnology.Core.Guards.Tests
 
 
             //Act
-            var result = Guards.String(underTest, nameof(underTest), x => x.NotEmpty());
+            var result = _guards.String(underTest, nameof(underTest), x => x.NotEmpty());
 
 
             //Assert
@@ -44,7 +51,7 @@ namespace SolTechnology.Core.Guards.Tests
 
 
             //Act
-            var result = Guards.String(underTest, nameof(underTest), x => x.NotEqual(underTest));
+            var result = _guards.String(underTest, nameof(underTest), x => x.NotEqual(underTest));
 
 
             //Assert
@@ -59,7 +66,7 @@ namespace SolTechnology.Core.Guards.Tests
 
 
             //Act
-            var result = Guards.String(underTest, nameof(underTest), x => x.Equal("AnotherString"));
+            var result = _guards.String(underTest, nameof(underTest), x => x.Equal("AnotherString"));
 
 
             //Assert

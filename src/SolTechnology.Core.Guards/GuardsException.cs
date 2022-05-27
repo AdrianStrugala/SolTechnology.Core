@@ -1,4 +1,4 @@
-﻿namespace SolTechnology.Core.Guards.Context;
+﻿namespace SolTechnology.Core.Guards;
 
 public class GuardsException : AggregateException
 {

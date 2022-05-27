@@ -6,6 +6,13 @@ namespace SolTechnology.Core.Guards.Tests
 {
     public class IntTests
     {
+        private readonly Guards _guards;
+
+        public IntTests()
+        {
+            _guards = new Guards();
+        }
+
         [Fact]
         public void NotZero_Zero_Throws()
         {
@@ -14,12 +21,12 @@ namespace SolTechnology.Core.Guards.Tests
 
 
             //Act
-            var exception = Record.Exception(() => Guards.Int(underTest, nameof(underTest))
+            var result = _guards.Int(underTest, nameof(underTest), x => x
                 .NotZero());
 
 
             //Assert
-            exception.Should().BeOfType<ArgumentException>();
+            result.Errors.Should().HaveCount(1);
         }
 
         [Theory]
@@ -31,12 +38,12 @@ namespace SolTechnology.Core.Guards.Tests
 
 
             //Act
-            var exception = Record.Exception(() => Guards.Int(underTest, nameof(underTest))
+            var result = _guards.Int(underTest, nameof(underTest), x => x
                 .NotNegative());
 
 
             //Assert
-            exception.Should().BeOfType<ArgumentException>();
+            result.Errors.Should().HaveCount(1);
         }
 
 
@@ -49,12 +56,12 @@ namespace SolTechnology.Core.Guards.Tests
 
 
             //Act
-            var exception = Record.Exception(() => Guards.Int(underTest, nameof(underTest))
+            var result = _guards.Int(underTest, nameof(underTest), x => x
                 .NotPositive());
 
 
             //Assert
-            exception.Should().BeOfType<ArgumentException>();
+            result.Errors.Should().HaveCount(1);
         }
 
         [Theory]
@@ -68,12 +75,12 @@ namespace SolTechnology.Core.Guards.Tests
 
 
             //Act
-            var exception = Record.Exception(() => Guards.Int(underTest, nameof(underTest))
+            var result = _guards.Int(underTest, nameof(underTest), x => x
                 .InRange(-5, 10));
 
 
             //Assert
-            exception.Should().BeOfType<ArgumentException>();
+            result.Errors.Should().HaveCount(1);
         }
 
         [Theory]
@@ -86,12 +93,12 @@ namespace SolTechnology.Core.Guards.Tests
 
 
             //Act
-            var exception = Record.Exception(() => Guards.Int(underTest, nameof(underTest))
+            var result = _guards.Int(underTest, nameof(underTest), x => x
                 .InRange(-5, 10));
 
 
             //Assert
-            exception.Should().BeNull();
+            result.Errors.Should().HaveCount(0);
         }
 
 
@@ -106,12 +113,12 @@ namespace SolTechnology.Core.Guards.Tests
 
 
             //Act
-            var exception = Record.Exception(() => Guards.Int(underTest, nameof(underTest))
+            var result = _guards.Int(underTest, nameof(underTest), x => x
                 .NotInRange(-5, 10));
 
 
             //Assert
-            exception.Should().BeNull();
+            result.Errors.Should().HaveCount(0);
         }
 
         [Theory]
@@ -124,12 +131,12 @@ namespace SolTechnology.Core.Guards.Tests
 
 
             //Act
-            var exception = Record.Exception(() => Guards.Int(underTest, nameof(underTest))
+            var result = _guards.Int(underTest, nameof(underTest), x => x
                 .NotInRange(-5, 10));
 
 
             //Assert
-            exception.Should().BeOfType<ArgumentException>();
+            result.Errors.Should().HaveCount(1);
         }
 
 
@@ -140,12 +147,12 @@ namespace SolTechnology.Core.Guards.Tests
             int underTest = 5;
 
             //Act
-            var exception = Record.Exception(() => Guards.Int(underTest, nameof(underTest))
+            var result = _guards.Int(underTest, nameof(underTest), x => x
                 .Equal(50));
 
 
             //Assert
-            exception.Should().BeOfType<ArgumentException>();
+            result.Errors.Should().HaveCount(1);
         }
 
         [Fact]
@@ -155,12 +162,12 @@ namespace SolTechnology.Core.Guards.Tests
             int underTest = 5;
 
             //Act
-            var exception = Record.Exception(() => Guards.Int(underTest, nameof(underTest))
+            var result = _guards.Int(underTest, nameof(underTest), x => x
                 .NotEqual(underTest));
 
 
             //Assert
-            exception.Should().BeOfType<ArgumentException>();
+            result.Errors.Should().HaveCount(1);
         }
 
         [Theory]
@@ -172,12 +179,12 @@ namespace SolTechnology.Core.Guards.Tests
             int underTest = 5;
 
             //Act
-            var exception = Record.Exception(() => Guards.Int(underTest, nameof(underTest))
+            var result = _guards.Int(underTest, nameof(underTest), x => x
                 .GreaterThan(toCompare));
 
 
             //Assert
-            exception.Should().BeOfType<ArgumentException>();
+            result.Errors.Should().HaveCount(1);
         }
 
         [Theory]
@@ -189,12 +196,12 @@ namespace SolTechnology.Core.Guards.Tests
             int underTest = 5;
 
             //Act
-            var exception = Record.Exception(() => Guards.Int(underTest, nameof(underTest))
+            var result = _guards.Int(underTest, nameof(underTest), x => x
                 .GreaterEqual(toCompare));
 
 
             //Assert
-            exception.Should().BeNull();
+            result.Errors.Should().HaveCount(0);
         }
 
 
@@ -207,12 +214,12 @@ namespace SolTechnology.Core.Guards.Tests
             int underTest = 5;
 
             //Act
-            var exception = Record.Exception(() => Guards.Int(underTest, nameof(underTest))
+            var result = _guards.Int(underTest, nameof(underTest), x => x
                 .LessThan(toCompare));
 
 
             //Assert
-            exception.Should().BeOfType<ArgumentException>();
+            result.Errors.Should().HaveCount(1);
         }
 
         [Theory]
@@ -224,12 +231,12 @@ namespace SolTechnology.Core.Guards.Tests
             int underTest = 5;
 
             //Act
-            var exception = Record.Exception(() => Guards.Int(underTest, nameof(underTest))
+            var result = _guards.Int(underTest, nameof(underTest), x => x
                 .LessEqual(toCompare));
 
 
             //Assert
-            exception.Should().BeNull();
+            result.Errors.Should().HaveCount(0);
         }
     }
 }
