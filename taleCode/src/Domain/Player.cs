@@ -22,7 +22,7 @@ namespace SolTechnology.TaleCode.Domain
             var guards = new Guards();
             guards.String(name, nameof(name), x=> x.NotNull().NotEmpty())
                   .Int(apiId, nameof(apiId), x => x.NotZero())
-                  .ThrowOnErrors();
+                  .ThrowOnError();
 
             ApiId = apiId;
             Name = name;

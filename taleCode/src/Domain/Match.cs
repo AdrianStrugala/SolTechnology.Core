@@ -25,7 +25,7 @@ namespace SolTechnology.TaleCode.Domain
             guards.String(winner, nameof(winner), x => x.NotNull().NotEmpty())
                   .Int(apiId, nameof(apiId), x => x.NotZero())
                   .Int(playerApiId, nameof(playerApiId), x => x.NotZero())
-                  .ThrowOnErrors();
+                  .ThrowOnError();
 
 
 
@@ -42,7 +42,7 @@ namespace SolTechnology.TaleCode.Domain
         public void AssignCompetitionWinner(string competitionWinner)
         {
             var guards = new Guards();
-            guards.String(competitionWinner, nameof(competitionWinner), x => x.NotNull().NotEmpty()).ThrowOnErrors();
+            guards.String(competitionWinner, nameof(competitionWinner), x => x.NotNull().NotEmpty()).ThrowOnError();
             CompetitionWinner = competitionWinner;
         }
     }

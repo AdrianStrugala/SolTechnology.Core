@@ -16,10 +16,13 @@ No configuration is needed.
 1) Example
 
 ```csharp
-string competitionWinner = "";
-Guards.String(competitionWinner, nameof(competitionWinner)).NotNull().NotEmpty();
+var guards = new Guards();
+guards.Int(playerApiId, nameof(playerApiId), x=> x.NotZero())
+      .String(name, nameof(name), x=> x.NotNull().NotEmpty())
+      .ThrowOnError();
+
 ```
-Invokes NotNull() and NotEmpty() checks on the "competitionWinner" string. If any of those conditions are not met, the ArgumentException is thrown.
+Invokes chain of checks on the given parameters. If one or more conditions are not met, the exception is thrown.
 
 
 2) Supported types
@@ -30,3 +33,4 @@ Invokes NotNull() and NotEmpty() checks on the "competitionWinner" string. If an
 - int
 - long
 - string
+- object

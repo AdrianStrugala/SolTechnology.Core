@@ -10,7 +10,8 @@ namespace SolTechnology.TaleCode.PlayerRegistry.Commands.SynchronizePlayerMatche
 
         public SynchronizePlayerMatchesCommand(int playerId)
         {
-            Guards.Int(playerId, nameof(playerId)).NotNegative();
+            var guards = new Guards();
+            guards.Int(playerId, nameof(playerId), x => x.NotNegative().NotZero()).ThrowOnError();
 
             PlayerId = playerId;
         }

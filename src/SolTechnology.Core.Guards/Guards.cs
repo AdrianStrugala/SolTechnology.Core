@@ -10,7 +10,7 @@
         public readonly List<string> Errors;
 
 
-        public void ThrowOnErrors()
+        public void ThrowOnError()
         {
             if (Errors.Any())
             {

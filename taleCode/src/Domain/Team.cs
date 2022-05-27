@@ -17,8 +17,10 @@ namespace SolTechnology.TaleCode.Domain
 
         public Team(int playerApiId, DateTime dateFrom, DateTime dateTo, string name)
         {
-            Guards.Int(playerApiId, nameof(playerApiId)).NotZero();
-            Guards.String(name, nameof(name)).NotNull().NotEmpty();
+            var guards = new Guards();
+            guards.Int(playerApiId, nameof(playerApiId), x=> x.NotZero())
+                  .String(name, nameof(name), x=> x.NotNull().NotEmpty())
+                  .ThrowOnError();
 
             PlayerApiId = playerApiId;
             DateFrom = dateFrom;
