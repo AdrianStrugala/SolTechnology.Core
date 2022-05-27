@@ -16,7 +16,8 @@ namespace SolTechnology.TaleCode.SqlData.Repository.ExecutionErrorRepository
 
         public ExecutionError(ReferenceType referenceType, int referenceId, string message)
         {
-            Guards.Int(referenceId, nameof(referenceId)).NotZero();
+            var guards = new Guards();
+            guards.Int(referenceId, nameof(referenceId), x => x.NotNegative().NotZero()).ThrowOnError();
 
             ReferenceType = referenceType;
             ReferenceId = referenceId;

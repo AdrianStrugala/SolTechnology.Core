@@ -1,7 +1,9 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace SolTechnology.TaleCode.Api.Controllers.Api
 {
+    [AllowAnonymous]
     [ApiController]
     [Route("")]
     public class HealthController : ControllerBase

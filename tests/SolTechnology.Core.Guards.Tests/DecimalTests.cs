@@ -6,6 +6,13 @@ namespace SolTechnology.Core.Guards.Tests
 {
     public class DecimalTests
     {
+        private readonly Guards _guards;
+
+        public DecimalTests()
+        {
+            _guards = new Guards();
+        }
+
         [Fact]
         public void NotZero_Zero_Throws()
         {
@@ -14,12 +21,12 @@ namespace SolTechnology.Core.Guards.Tests
 
 
             //Act
-            var exception = Record.Exception(() => Guards.Decimal(underTest, nameof(underTest))
+            var result = _guards.Decimal(underTest, nameof(underTest), x => x
                 .NotZero());
 
 
             //Assert
-            exception.Should().BeOfType<ArgumentException>();
+            result.Errors.Should().HaveCount(1);
         }
 
         [Theory]
@@ -31,17 +38,17 @@ namespace SolTechnology.Core.Guards.Tests
 
 
             //Act
-            var exception = Record.Exception(() => Guards.Decimal(underTest, nameof(underTest))
+            var result = _guards.Decimal(underTest, nameof(underTest), x => x
                 .NotNegative());
 
 
             //Assert
-            exception.Should().BeOfType<ArgumentException>();
+            result.Errors.Should().HaveCount(1);
         }
 
 
         [Theory]
-        [InlineData(7922816251423375335)]
+        [InlineData(79228162514264335)]
         [InlineData(1)]
         public void NotPositive_Positive_Throws(decimal underTest)
         {
@@ -49,17 +56,17 @@ namespace SolTechnology.Core.Guards.Tests
 
 
             //Act
-            var exception = Record.Exception(() => Guards.Decimal(underTest, nameof(underTest))
+            var result = _guards.Decimal(underTest, nameof(underTest), x => x
                 .NotPositive());
 
 
             //Assert
-            exception.Should().BeOfType<ArgumentException>();
+            result.Errors.Should().HaveCount(1);
         }
 
         [Theory]
-        [InlineData(7922816259343950335)]
-        [InlineData(-7922816251543950335)]
+        [InlineData(79228162514264335)]
+        [InlineData(-79228162514264335)]
         [InlineData(-6)]
         [InlineData(11)]
         public void InRange_NotInRange_Throws(decimal underTest)
@@ -68,12 +75,12 @@ namespace SolTechnology.Core.Guards.Tests
 
 
             //Act
-            var exception = Record.Exception(() => Guards.Decimal(underTest, nameof(underTest))
+            var result = _guards.Decimal(underTest, nameof(underTest), x => x
                 .InRange(-5, 10));
 
 
             //Assert
-            exception.Should().BeOfType<ArgumentException>();
+            result.Errors.Should().HaveCount(1);
         }
 
         [Theory]
@@ -86,18 +93,18 @@ namespace SolTechnology.Core.Guards.Tests
 
 
             //Act
-            var exception = Record.Exception(() => Guards.Decimal(underTest, nameof(underTest))
+            var result = _guards.Decimal(underTest, nameof(underTest), x => x
                 .InRange(-5, 10));
 
 
             //Assert
-            exception.Should().BeNull();
+            result.Errors.Should().HaveCount(0);
         }
 
 
         [Theory]
-        [InlineData(7922816251426430335)]
-        [InlineData(-7922816251543950335)]
+        [InlineData(79228162514264335)]
+        [InlineData(-79228162514264335)]
         [InlineData(-6)]
         [InlineData(11)]
         public void NotInRange_NotInRange_NoException(decimal underTest)
@@ -106,12 +113,12 @@ namespace SolTechnology.Core.Guards.Tests
 
 
             //Act
-            var exception = Record.Exception(() => Guards.Decimal(underTest, nameof(underTest))
+            var result = _guards.Decimal(underTest, nameof(underTest), x => x
                 .NotInRange(-5, 10));
 
 
             //Assert
-            exception.Should().BeNull();
+            result.Errors.Should().HaveCount(0);
         }
 
         [Theory]
@@ -124,12 +131,12 @@ namespace SolTechnology.Core.Guards.Tests
 
 
             //Act
-            var exception = Record.Exception(() => Guards.Decimal(underTest, nameof(underTest))
+            var result = _guards.Decimal(underTest, nameof(underTest), x => x
                 .NotInRange(-5, 10));
 
 
             //Assert
-            exception.Should().BeOfType<ArgumentException>();
+            result.Errors.Should().HaveCount(1);
         }
 
 
@@ -140,12 +147,12 @@ namespace SolTechnology.Core.Guards.Tests
             decimal underTest = 5;
 
             //Act
-            var exception = Record.Exception(() => Guards.Decimal(underTest, nameof(underTest))
+            var result = _guards.Decimal(underTest, nameof(underTest), x => x
                 .Equal(50));
 
 
             //Assert
-            exception.Should().BeOfType<ArgumentException>();
+            result.Errors.Should().HaveCount(1);
         }
 
         [Fact]
@@ -155,12 +162,12 @@ namespace SolTechnology.Core.Guards.Tests
             decimal underTest = 5;
 
             //Act
-            var exception = Record.Exception(() => Guards.Decimal(underTest, nameof(underTest))
+            var result = _guards.Decimal(underTest, nameof(underTest), x => x
                 .NotEqual(underTest));
 
 
             //Assert
-            exception.Should().BeOfType<ArgumentException>();
+            result.Errors.Should().HaveCount(1);
         }
 
         [Theory]
@@ -172,29 +179,29 @@ namespace SolTechnology.Core.Guards.Tests
             decimal underTest = 5;
 
             //Act
-            var exception = Record.Exception(() => Guards.Decimal(underTest, nameof(underTest))
+            var result = _guards.Decimal(underTest, nameof(underTest), x => x
                 .GreaterThan(toCompare));
 
 
             //Assert
-            exception.Should().BeOfType<ArgumentException>();
+            result.Errors.Should().HaveCount(1);
         }
 
         [Theory]
         [InlineData(5)]
-        [InlineData(-7922816)]
+        [InlineData(-79228162514264335)]
         public void GreaterEqual_GreaterOrEqual_Success(decimal toCompare)
         {
             //Arrange
-            Decimal underTest = 5;
+            decimal underTest = 5;
 
             //Act
-            var exception = Record.Exception(() => Guards.Decimal(underTest, nameof(underTest))
+            var result = _guards.Decimal(underTest, nameof(underTest), x => x
                 .GreaterEqual(toCompare));
 
 
             //Assert
-            exception.Should().BeNull();
+            result.Errors.Should().HaveCount(0);
         }
 
 
@@ -207,29 +214,29 @@ namespace SolTechnology.Core.Guards.Tests
             decimal underTest = 5;
 
             //Act
-            var exception = Record.Exception(() => Guards.Decimal(underTest, nameof(underTest))
+            var result = _guards.Decimal(underTest, nameof(underTest), x => x
                 .LessThan(toCompare));
 
 
             //Assert
-            exception.Should().BeOfType<ArgumentException>();
+            result.Errors.Should().HaveCount(1);
         }
 
         [Theory]
         [InlineData(5)]
-        [InlineData(7922816251426433)]
+        [InlineData(79228162514264335)]
         public void LessEqual_LessOrEqual_Success(decimal toCompare)
         {
             //Arrange
-            Decimal underTest = 5;
+            decimal underTest = 5;
 
             //Act
-            var exception = Record.Exception(() => Guards.Decimal(underTest, nameof(underTest))
+            var result = _guards.Decimal(underTest, nameof(underTest), x => x
                 .LessEqual(toCompare));
 
 
             //Assert
-            exception.Should().BeNull();
+            result.Errors.Should().HaveCount(0);
         }
     }
 }

@@ -1,6 +1,5 @@
 ﻿using Azure.Storage.Blobs;
 using SolTechnology.Avro;
-
 namespace SolTechnology.Core.BlobStorage.BlobContainerClientExtensions
 {
     public static class BlobContainerClientExtensions
