@@ -345,8 +345,8 @@ resource service_bus 'Microsoft.ServiceBus/namespaces@2021-01-01-preview' = {
   name: serviceBusName
   location:location
   sku: {
-    name: 'Standard'
-    tier: 'Standard'
+    name: 'Basic'
+    tier: 'Basic'
   }
   properties: {}
 }
