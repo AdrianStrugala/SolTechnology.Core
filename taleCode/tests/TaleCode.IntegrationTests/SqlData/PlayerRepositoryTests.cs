@@ -21,7 +21,7 @@ namespace TaleCode.IntegrationTests.SqlData
         }
 
         [Fact]
-        public void Insert_ValidPlayer_ItIsSavedInDB()
+        public void Inserting_Valid_Player_Saves_It_To_Database()
         {
             //Arrange
 
@@ -56,6 +56,21 @@ namespace TaleCode.IntegrationTests.SqlData
                 config: options => options
                     .Excluding(a => a.Id)
                     .Using<DateTime>(ctx => ctx.Subject.Should().BeCloseTo(ctx.Expectation, TimeSpan.FromSeconds(1))).WhenTypeIs<DateTime>());
+        }
+
+
+        [Fact]
+        public void Getting_Not_Existing_Player_Returns_Null()
+        {
+            //Arrange
+
+
+            //Act
+            var result = _sut.GetById(420);
+
+
+            //Assert
+            result.Should().BeNull();
         }
     }
 }

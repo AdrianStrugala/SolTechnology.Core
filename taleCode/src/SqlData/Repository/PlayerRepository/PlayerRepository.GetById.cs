@@ -35,7 +35,10 @@ SELECT
                 PlayerApiId = apiId,
             });
             result = multi.ReadSingleOrDefault<Player>();
-            result.Teams = multi.Read<Team>().ToList();
+            if (result != null)
+            {
+                result.Teams = multi.Read<Team>().ToList();
+            }
 
             return result;
         }
