@@ -22,7 +22,7 @@ AND [Valid] = 0
 
             using (var connection = _sqlConnectionFactory.CreateConnection())
             {
-                result = SqlMapper.Query<ExecutionError>(connection, GetByTypeSql, new
+                result = connection.Query<ExecutionError>(GetByTypeSql, new
                 {
                     ReferenceType = referenceType.ToString(),
                 }).ToList();

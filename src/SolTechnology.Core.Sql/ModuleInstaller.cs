@@ -28,7 +28,7 @@ namespace SolTechnology.Core.Sql
            });
 
 
-            services.AddSingleton<ISqlConnectionFactory, SqlConnectionFactory>();
+            services.AddTransient<ISqlConnectionFactory, SqlConnectionFactory>();
 
             return services;
         }

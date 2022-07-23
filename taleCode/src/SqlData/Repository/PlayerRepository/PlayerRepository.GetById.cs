@@ -29,17 +29,32 @@ SELECT
         {
             Player result = null;
 
-            using var connection = _sqlConnectionFactory.CreateConnection();
-            using var multi = connection.QueryMultiple(GetByIdSql, new
+            var parameters = new
             {
                 PlayerApiId = apiId,
-            });
-            result = multi.ReadSingleOrDefault<Player>();
-            if (result != null)
-            {
-                result.Teams = multi.Read<Team>().ToList();
-            }
+            };
 
+            if (_sqlConnectionFactory.HasOpenTransaction)
+            {
+                var transaction = _sqlConnectionFactory.GetTransaction();
+                using var multi = transaction.Connection.QueryMultiple(GetByIdSql, parameters, transaction);
+                result = multi.ReadSingleOrDefault<Player>();
+                if (result != null)
+                {
+                    result.Teams = multi.Read<Team>().ToList();
+                }
+            }
+            else
+            {
+                using var connection = _sqlConnectionFactory.CreateConnection();
+
+                using var multi = connection.QueryMultiple(GetByIdSql, parameters);
+                result = multi.ReadSingleOrDefault<Player>();
+                if (result != null)
+                {
+                    result.Teams = multi.Read<Team>().ToList();
+                }
+            }
             return result;
         }
     }
