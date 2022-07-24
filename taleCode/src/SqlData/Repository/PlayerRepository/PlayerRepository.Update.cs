@@ -25,16 +25,8 @@ namespace SolTechnology.TaleCode.SqlData.Repository.PlayerRepository
 
         public void Update(Player player)
         {
-            if (_sqlConnectionFactory.HasOpenTransaction)
-            {
-                var transaction = _sqlConnectionFactory.GetTransaction();
-                transaction.Connection.Execute(MergeTeamsSql, player.Teams, transaction);
-            }
-            else
-            {
-                using var connection = _sqlConnectionFactory.CreateConnection();
-                connection.Execute(MergeTeamsSql, player.Teams);
-            }
+            using var connection = _sqlConnectionFactory.CreateConnection();
+            connection.Execute(MergeTeamsSql, player.Teams);
         }
     }
 }

@@ -27,34 +27,25 @@ VALUES (@ApiId, @Name, @DateOfBirth, @Nationality, @Position)
 
         public void Insert(Player player)
         {
-            var parameters = new
+            using (var connection = _sqlConnectionFactory.CreateConnection())
             {
-                ApiId = player.ApiId,
-                Name = player.Name,
-                DateOfBirth = player.DateOfBirth,
-                Nationality = player.Nationality,
-                Position = player.Position
-            };
+                var transaction = connection.BeginTransaction();
 
-            if (_sqlConnectionFactory.HasOpenTransaction)
-            {
-                var transaction = _sqlConnectionFactory.GetTransaction();
-                transaction.Connection.Execute(InsertSql, parameters, transaction);
-                transaction.Connection.Insert<Team>(player.Teams, transaction);
-            }
-            else
-            {
-                using (var connection = _sqlConnectionFactory.CreateConnection())
+                connection.Execute(InsertSql, new
                 {
-                    using (var transaction = connection.BeginTransaction())
-                    {
-                        connection.Execute(InsertSql, parameters, transaction);
-                        connection.Insert<Team>(player.Teams, transaction);
+                    ApiId = player.ApiId,
+                    Name = player.Name,
+                    DateOfBirth = player.DateOfBirth,
+                    Nationality = player.Nationality,
+                    Position = player.Position
+                }, transaction);
 
-                        transaction.Commit();
-                    }
-                }
+
+                connection.Insert<Team>(player.Teams, transaction);
+
+                transaction.Commit();
             }
+
         }
     }
 }
