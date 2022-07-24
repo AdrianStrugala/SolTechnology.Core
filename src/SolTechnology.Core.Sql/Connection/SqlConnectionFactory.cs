@@ -8,7 +8,7 @@ namespace SolTechnology.Core.Sql.Connection
     public class SqlConnectionFactory : ISqlConnectionFactory
     {
         private readonly string _connectionString;
-        private readonly Random _random = new Random();
+        private static readonly Random Random = new Random();
 
         public SqlConnectionFactory(IOptions<SqlConfiguration> sqlConfiguration)
         {
@@ -21,7 +21,7 @@ namespace SolTechnology.Core.Sql.Connection
 
             Policy.Handle<Exception>()
                 .WaitAndRetry(3, retryAttempt => TimeSpan.FromSeconds(Math.Pow(3, retryAttempt)) // 3,9,27s
-                               + TimeSpan.FromMilliseconds(_random.Next(1000))) //delay up to 1s
+                               + TimeSpan.FromMilliseconds(Random.Next(1000))) //delay up to 1s
                 .Execute(() =>
                   {
                       connection.Open();
