@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using SolTechnology.Core.Sql.Connection;
+using SolTechnology.Core.Sql.Transactions;
 
 namespace SolTechnology.Core.Sql
 {
@@ -29,6 +30,7 @@ namespace SolTechnology.Core.Sql
 
 
             services.AddTransient<ISqlConnectionFactory, SqlConnectionFactory>();
+            services.AddTransient<IUnitOfWork, UnitOfWork>();
 
             return services;
         }
