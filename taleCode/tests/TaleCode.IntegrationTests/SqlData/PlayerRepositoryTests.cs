@@ -75,7 +75,7 @@ namespace TaleCode.IntegrationTests.SqlData
         }
 
         [Fact]
-        public void Not_Completed_Transaction_Is_Not_Modyfying_Database()
+        public void Not_Completed_Transaction_Is_Not_Modyfing_Database()
         {
             //Arrange
 
