@@ -6,6 +6,7 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+		<PackageReference Include="AvroConvert" Version="3.2.9" />
 		<PackageReference Include="Hangfire.Core" Version="1.7.*" />
 		<PackageReference Include="Hangfire.SqlServer" Version="1.7.*" />
 		<PackageReference Include="Hangfire.AspNetCore" Version="1.7.*" />
