@@ -57,7 +57,9 @@ namespace DreamTravel.Api
                 {
                     builder.WithOrigins("http://localhost:4200",
                                "https://dreamtravels.azurewebsites.net",
-                               "https://dreamtravels-demo.azurewebsites.net")
+                               "https://dreamtravels-demo.azurewebsites.net",
+                               "http://localhost:55855",
+                               "https://avroconvertonline.azurewebsites.net")
                                         .AllowAnyHeader()
                                         .AllowAnyMethod()
                                         .AllowCredentials();
