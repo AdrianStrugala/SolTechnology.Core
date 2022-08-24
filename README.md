@@ -108,9 +108,9 @@ Enjoy your reading!
 </p>
 
 
-[1. The Design](https://github.com/AdrianStrugala/SolTechnology.Core/tree/master/taleCode/docs/theDesign.md) \
-[2. The Automation](https://github.com/AdrianStrugala/SolTechnology.Core/tree/master/taleCode/docs/theAutomation.md) \
-[3. The Quality](https://github.com/AdrianStrugala/SolTechnology.Core/tree/master/taleCode/docs/theQuality.md)
+[1. The Design](https://github.com/AdrianStrugala/SolTechnology.Core/tree/master/docs/theDesign.md) \
+[2. The Automation](https://github.com/AdrianStrugala/SolTechnology.Core/tree/master/docs/theAutomation.md) \
+[3. The Quality](https://github.com/AdrianStrugala/SolTechnology.Core/tree/master/docs/theQuality.md)
 
 *Some ending words*
 

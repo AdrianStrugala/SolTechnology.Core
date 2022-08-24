@@ -80,6 +80,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Docs", "Docs", "{7513E3F2-A
 		..\docs\Guards.md = ..\docs\Guards.md
 		..\docs\Log.md = ..\docs\Log.md
 		..\docs\Sql.md = ..\docs\Sql.md
+		..\docs\theAutomation.md = ..\docs\theAutomation.md
+		..\docs\theDesign.md = ..\docs\theDesign.md
+		..\docs\theQuality.md = ..\docs\theQuality.md
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SolTechnology.Core.Scheduler", "SolTechnology.Core.Scheduler\SolTechnology.Core.Scheduler.csproj", "{DAD13F76-B679-4752-930A-500AEA68AE79}"

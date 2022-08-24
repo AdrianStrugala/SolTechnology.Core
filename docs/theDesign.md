@@ -1,6 +1,26 @@
 
 ## Architecture
 
+<img alt="design" src="./Architecture.PNG">
+
+Tale Code application is using Clean Architecture approach as on above picture. Projects are ogranized into layers with clear responsibilities and dependencies from top to bottom.
+
+#### 1) Domain
+The domain is heart of the application. Identyfies the area, bounded context and common language between business and developers. The information is gathered into models understanable by every team member of the project.
+
+#### 2) Data Layer
+This layer is responsible for communication with storages. The most simple use case would be Repository build on SQL or no-SQL databse. May contain multiple projects dedicated to different types of storages. 
+
+#### 3) Logic Layer
+The part for which stakeholders are paying for. Contains only the pieces of codes that brings business value. It does not care from where the data comes from or where it ends. It's responsibility is to run all of the operations, calculations, commands and queries required to achieve success. \
+Might be using CQRS or Domain Services or Application approaches. Whatever is the most extensible, natural and understandable for the development team.
+
+#### 4) Presentation Layer
+The entry point or points for the applciation. API, triggers, scheduled tasks, event handlers - every way of making the application to do something is considered as Presentation.
+
+#### 5) Infrastructure
+Everything else. Drivers, extensions and rest of techincal details needed to write good piece of code.
+
 <img alt="design" src="./taleCodeArchitecture.JPG">
 
 
