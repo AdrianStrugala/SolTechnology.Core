@@ -1,16 +1,17 @@
-﻿using System;
+﻿using DreamTravel.AvroConvertOnline.GenerateModel;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using SolTechnology.Avro;
 
 namespace DreamTravel.Api.AvroConvertOnline
 {
     public class AvroConvertOnlineController : Controller
     {
+        private readonly IGenerateModelHandler _generateModelHandler;
         private readonly ILogger<AvroConvertOnlineController> _logger;
 
-        public AvroConvertOnlineController(ILogger<AvroConvertOnlineController> logger)
+        public AvroConvertOnlineController(IGenerateModelHandler generateModelHandler, ILogger<AvroConvertOnlineController> logger)
         {
+            _generateModelHandler = generateModelHandler;
             _logger = logger;
         }
 
@@ -18,16 +19,15 @@ namespace DreamTravel.Api.AvroConvertOnline
         [Route("api/avro/generateModel")]
         public IActionResult PostSchema(GenerateModelRequest request)
         {
-            try
+            var response = _generateModelHandler.Handle(request);
+
+            if (response.IsFailure)
             {
-                var result = AvroConvert.GenerateModel(request.Schema);
-                return new OkObjectResult(result);
+                _logger.LogError(response.Error, $"Exception from schema: {request.Schema}");
+                return new BadRequestObjectResult(response.Error.Message);
             }
-            catch (Exception e)
-            {
-                _logger.LogError(e, $"Exception from schema: {request.Schema}");
-                return BadRequest(e.Message);
-            }
+
+            return new OkObjectResult(response.Value);
         }
     }
 }

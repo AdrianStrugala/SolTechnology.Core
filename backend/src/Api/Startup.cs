@@ -1,17 +1,11 @@
-using System;
-using DreamTravel.Api.BackgroundTasks;
 using DreamTravel.Api.Configuration;
 using DreamTravel.DreamFlights;
-using DreamTravel.DreamFlights.SendDreamTravelFlightEmail.Interfaces;
 using DreamTravel.DreamTrips;
 using DreamTravel.Identity;
 using DreamTravel.Infrastructure.Authentication;
 using DreamTravel.Infrastructure.Database;
-using Hangfire;
-using Hangfire.SqlServer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Cors.Infrastructure;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.Extensions.Configuration;
@@ -70,8 +64,6 @@ namespace DreamTravel.Api
             services.InstallDreamTrips();
             services.InstallIdentity();
 
-            services.AddScoped<IScheduleOrderedFlightEmails, ScheduleOrderedFlightEmails>();
-
             services.AddControllers();
 
             //AUTHENTICATION
@@ -80,22 +72,6 @@ namespace DreamTravel.Api
                         DreamAuthenticationOptions.AuthenticationScheme,
                         null);
 
-
-            //HANGFIRE
-            services.AddHangfire(configuration => configuration
-                .SetDataCompatibilityLevel(CompatibilityLevel.Version_170)
-                .UseSimpleAssemblyNameTypeSerializer()
-                .UseRecommendedSerializerSettings()
-                .UseSqlServerStorage(appConfig.SqlDatabaseConfiguration.ConnectionString, new SqlServerStorageOptions
-                {
-                    CommandBatchMaxTimeout = TimeSpan.FromMinutes(5),
-                    SlidingInvisibilityTimeout = TimeSpan.FromMinutes(5),
-                    QueuePollInterval = TimeSpan.Zero,
-                    UseRecommendedIsolationLevel = true,
-                    DisableGlobalLocks = true
-                }));
-
-            services.AddHangfireServer();
 
             //SWAGGER
             services.AddSwaggerGen(c =>
@@ -127,7 +103,7 @@ namespace DreamTravel.Api
             });
         }
 
-        public void Configure(IApplicationBuilder app, IBackgroundJobClient backgroundJobs, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             if (env.IsDevelopment())
             {
@@ -136,7 +112,6 @@ namespace DreamTravel.Api
                 app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "WebApi v1"));
             }
 
-            AddHangfire(app, backgroundJobs);
 
             app.UseCors(CorsPolicy);
             app.UseHttpsRedirection();
@@ -149,18 +124,7 @@ namespace DreamTravel.Api
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
-                endpoints.MapHangfireDashboard();
             });
-        }
-
-
-        private static void AddHangfire(IApplicationBuilder app, IBackgroundJobClient backgroundJobs)
-        {
-            app.UseHangfireDashboard(); //https://localhost:44330/hangfire
-            backgroundJobs.Enqueue(() => Console.WriteLine("DREAM TRAVELS CAN INTO HANGFIRE!!!"));
-
-            RecurringJob.AddOrUpdate<ISendDreamTravelFlightEmail>(a => a.Handle(), "0 0 8 * * *");
-            RecurringJob.AddOrUpdate<IScheduleOrderedFlightEmails>(a => a.Schedule(), "0 0 8 * * *");
         }
     }
 }

@@ -1,4 +1,4 @@
-﻿namespace DreamTravel.Api.AvroConvertOnline
+﻿namespace DreamTravel.AvroConvertOnline.GenerateModel
 {
     public class GenerateModelRequest
     {
