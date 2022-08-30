@@ -6,7 +6,7 @@ namespace DreamTravel.AvroConvertOnline
 {
     public static class ModuleInstaller
     {
-        public static IServiceCollection InstallDreamFlights(this IServiceCollection services)
+        public static IServiceCollection InstallAvroConvertOnline(this IServiceCollection services)
         {
             services.AddScoped<IGenerateModelHandler, GenerateModelHandler>();
 

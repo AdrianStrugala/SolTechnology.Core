@@ -17,7 +17,7 @@ namespace DreamTravel.Api.AvroConvertOnline
 
         [HttpPost]
         [Route("api/avro/generateModel")]
-        public IActionResult PostSchema(GenerateModelRequest request)
+        public IActionResult PostSchema([FromBody] GenerateModelRequest request)
         {
             var response = _generateModelHandler.Handle(request);
 

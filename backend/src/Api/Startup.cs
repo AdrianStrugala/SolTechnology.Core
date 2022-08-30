@@ -1,4 +1,5 @@
 using DreamTravel.Api.Configuration;
+using DreamTravel.AvroConvertOnline;
 using DreamTravel.DreamFlights;
 using DreamTravel.DreamTrips;
 using DreamTravel.Identity;
@@ -63,6 +64,7 @@ namespace DreamTravel.Api
             services.InstallDreamFlights();
             services.InstallDreamTrips();
             services.InstallIdentity();
+            services.InstallAvroConvertOnline();
 
             services.AddControllers();
 
