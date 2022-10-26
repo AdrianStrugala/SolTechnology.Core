@@ -1,0 +1,23 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+	  <TargetFramework>net6.0</TargetFramework>
+	  <ImplicitUsings>enable</ImplicitUsings>
+
+	  <Authors>Adrian Strugala</Authors>
+	  <Version>0.2.0</Version>
+	  <Description>SolTechnology Core CQRS library</Description>
+	  <PackageTags>sol technology cqrs command query chain</PackageTags>
+	  <Product>SolTechnology.Core.CQRS</Product>
+	  <PackageId>SolTechnology.Core.CQRS</PackageId>
+	  <AssemblyName>SolTechnology.Core.CQRS</AssemblyName>
+	  <RepositoryUrl>https://github.com/AdrianStrugala/SolTechnology.Core</RepositoryUrl>
+	  <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+
+	  <PackageIcon>docs\mini-logo.png</PackageIcon>
+  </PropertyGroup>
+	<ItemGroup>
+		<None Include="..\..\docs\mini-logo.png" Pack="true" Visible="false" PackagePath="docs\mini-logo.png" />
+	</ItemGroup>
+
+</Project>
