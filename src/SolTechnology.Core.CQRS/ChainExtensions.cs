@@ -56,5 +56,30 @@
             action(chain.Value);
             return chain;
         }
+
+        public static async Task EndCommand<TIn>(
+            this Task<Chain<TIn>> asyncChain)
+        {
+            await asyncChain;
+        }
+
+        public static Task EndCommand<TIn>(
+            this Chain<TIn> chain)
+        {
+            return Task.FromResult(chain);
+        }
+
+        public static async Task<TIn> EndQuery<TIn>(
+            this Task<Chain<TIn>> asyncChain)
+        {
+            var chain = await asyncChain;
+            return chain.Value;
+        }
+
+        public static Task EndQuery<TIn>(
+            this Chain<TIn> chain)
+        {
+            return Task.FromResult(chain.Value);
+        }
     }
 }
