@@ -27,7 +27,7 @@ namespace SolTechnology.TaleCode.PlayerRegistry.Commands.SynchronizePlayerMatche
             _logger = logger;
         }
 
-        public async Task Execute(SynchronizePlayerMatchesContext context, int matchId)
+        public async Task Execute(int playerId, int matchId)
         {
             using (_logger.BeginOperationScope(new { MatchId = matchId }))
             {
@@ -39,7 +39,7 @@ namespace SolTechnology.TaleCode.PlayerRegistry.Commands.SynchronizePlayerMatche
                 {
                     Match match = new Match(
                         clientMatch.Id,
-                        context.PlayerIdMap.FootballDataId,
+                        playerId,
                         clientMatch.Date,
                         clientMatch.HomeTeam,
                         clientMatch.AwayTeam,

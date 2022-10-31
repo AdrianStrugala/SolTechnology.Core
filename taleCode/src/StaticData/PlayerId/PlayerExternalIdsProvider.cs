@@ -7,7 +7,7 @@
             { 44, new PlayerIdMap {FootballDataId = 44, ApiFootballId = 874} }
         };
 
-        public PlayerIdMap GetExternalPlayerId(int applicationId)
+        public PlayerIdMap Get(int applicationId)
         {
             PlayerIdMap.TryGetValue(applicationId, out var result);
 

@@ -1,4 +1,5 @@
-﻿using SolTechnology.TaleCode.PlayerRegistry.Commands.SynchronizePlayerMatches.Interfaces;
+﻿using SolTechnology.TaleCode.Domain;
+using SolTechnology.TaleCode.PlayerRegistry.Commands.SynchronizePlayerMatches.Interfaces;
 using SolTechnology.TaleCode.SqlData.Repository.ExecutionErrorRepository;
 using SolTechnology.TaleCode.SqlData.Repository.MatchRepository;
 
@@ -17,15 +18,15 @@ namespace SolTechnology.TaleCode.PlayerRegistry.Commands.SynchronizePlayerMatche
             _executionErrorRepository = executionErrorRepository;
         }
 
-        public void Execute(SynchronizePlayerMatchesContext context)
+        public List<int> Execute(Player player)
         {
-            var syncedMatches = _matchRepository.GetByPlayerId(context.PlayerIdMap.FootballDataId);
+            var syncedMatches = _matchRepository.GetByPlayerId(player.ApiId);
             var syncedMatchesIds = syncedMatches.Select(m => m.ApiId);
 
             var failedMatches = _executionErrorRepository.GetByReferenceType(ReferenceType.Match);
             var failedMatchesIds = failedMatches.Select(e => e.ReferenceId);
 
-            var matchesToSync = context.Player.Matches
+            var matchesToSync = player.Matches
                 .Where(m => !syncedMatchesIds.Contains(m.ApiId))
                 .Where(m => !failedMatchesIds.Contains(m.ApiId))
                 .OrderBy(m => m.Date)
@@ -43,7 +44,7 @@ namespace SolTechnology.TaleCode.PlayerRegistry.Commands.SynchronizePlayerMatche
                     .ToList();
             }
 
-            context.MatchesToSync = matchesToSync;
+            return matchesToSync;
         }
     }
 }

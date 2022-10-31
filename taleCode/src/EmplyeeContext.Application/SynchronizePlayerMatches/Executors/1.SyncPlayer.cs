@@ -1,8 +1,9 @@
-﻿using SolTechnology.TaleCode.ApiClients.FootballDataApi;
+﻿using SolTechnology.TaleCode.ApiClients.ApiFootballApi;
+using SolTechnology.TaleCode.ApiClients.FootballDataApi;
 using SolTechnology.TaleCode.Domain;
 using SolTechnology.TaleCode.PlayerRegistry.Commands.SynchronizePlayerMatches.Interfaces;
 using SolTechnology.TaleCode.SqlData.Repository.PlayerRepository;
-using SolTechnology.TaleCode.ApiClients.ApiFootballApi;
+using SolTechnology.TaleCode.StaticData.PlayerId;
 
 namespace SolTechnology.TaleCode.PlayerRegistry.Commands.SynchronizePlayerMatches.Executors
 {
@@ -19,11 +20,11 @@ namespace SolTechnology.TaleCode.PlayerRegistry.Commands.SynchronizePlayerMatche
             _apiFootballApiClient = apiFootballApiClient;
         }
 
-        public async Task Execute(SynchronizePlayerMatchesContext context)
+        public async Task<Player> Execute(PlayerIdMap playerIdMap)
         {
-            var clientPlayer = await _footballDataApiClient.GetPlayerById(context.PlayerIdMap.FootballDataId);
+            var clientPlayer = await _footballDataApiClient.GetPlayerById(playerIdMap.FootballDataId);
 
-            var teams = await _apiFootballApiClient.GetPlayerTeams(context.PlayerIdMap.ApiFootballId);
+            var teams = await _apiFootballApiClient.GetPlayerTeams(playerIdMap.ApiFootballId);
 
             Player player = new Player(
                 clientPlayer.Id,
@@ -33,7 +34,7 @@ namespace SolTechnology.TaleCode.PlayerRegistry.Commands.SynchronizePlayerMatche
                 clientPlayer.Position,
                 clientPlayer.Matches.Select(m => new Match(
                     m.Id,
-                    context.PlayerIdMap.FootballDataId,
+                    playerIdMap.FootballDataId,
                     m.Date,
                     m.HomeTeam,
                     m.AwayTeam,
@@ -42,7 +43,7 @@ namespace SolTechnology.TaleCode.PlayerRegistry.Commands.SynchronizePlayerMatche
                     m.Winner))
                     .ToList(),
                 teams.Select(t => new Team(
-                    context.PlayerIdMap.FootballDataId,
+                        playerIdMap.FootballDataId,
                     t.TimeFrom,
                     t.TimeTo,
                     t.Name))
@@ -58,7 +59,7 @@ namespace SolTechnology.TaleCode.PlayerRegistry.Commands.SynchronizePlayerMatche
                 _playerRepository.Update(player);
             }
 
-            context.Player = player;
+            return player;
         }
     }
 }

@@ -35,7 +35,7 @@ namespace SolTechnology.TaleCode.PlayerRegistry.Commands.CalculatePlayerStatisti
                 Id = command.PlayerId
             };
 
-            var playerIdMap = _playerExternalIdsProvider.GetExternalPlayerId(command.PlayerId);
+            var playerIdMap = _playerExternalIdsProvider.Get(command.PlayerId);
             var player = _playerRepository.GetById(playerIdMap.FootballDataId);
             var matches = _matchRepository.GetByPlayerId(playerIdMap.FootballDataId);
 

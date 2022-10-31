@@ -2,5 +2,5 @@
 
 public interface ISyncMatch
 {
-    Task Execute(SynchronizePlayerMatchesContext context, int matchId);
+    Task Execute(int playerId, int matchId);
 }

@@ -70,34 +70,21 @@ To solve the application flow the CQRS approach is implemented. It is interestin
 Take a look at example Command Handler:
 
 ```csharp
-    public async Task Handle(SynchronizePlayerMatchesCommand command)
-    {
-        var playerIdMap = _playerExternalIdsProvider.GetExternalPlayerId(command.PlayerId);
-        var context = new SynchronizePlayerMatchesContext
-        {
-            PlayerIdMap = playerIdMap
-        };
-
-
-        await _syncPlayer.Execute(context);
-
-        _determineMatchesToSync.Execute(context);
-
-
-        foreach (var matchId in context.MatchesToSync)
-        {
-            await _syncMatch.Execute(context, matchId);
-        }
-
-        var message = new PlayerMatchesSynchronizedEvent(command.PlayerId);
-        await _messagePublisher.Publish(message);
-    }
+        await Chain
+            .Start(() => GetPlayerId(command.PlayerId))
+            .Then(SynchronizePlayer)
+            .Then(CalculateMatchesToSync)
+            .Then(match => match.ForEach(id =>
+                SynchronizeMatch(id, command.PlayerId)))
+            .Then(_ => new PlayerMatchesSynchronizedEvent(command.PlayerId))
+            .Then(PublishMessage)
+            .EndCommand();
 ```
 
 My intention was to read the code in following way:
 <p>
 <i>
-The Synchronize Player Matches command is given. To synchronize the matches I need to get at first the external Id for a player. Having this, I am sharing it using the operation context. As the next step, I need to synchronize the player itself. Then, I am determining the matches to sync. For each of the chosen matches, I am running the sync process. At the end, I am sending a notification, that the Player Matches are synchronized.
+To synchronize the matches I need to get at first the external Id for a player. As the next step, I synchronize the player itself. Then, I am calculating the matches to sync. For each of the chosen matches, I am running the sync process. At the end, I am sending a notification, that the Player Matches are synchronized.
 </i>
 </p>
 

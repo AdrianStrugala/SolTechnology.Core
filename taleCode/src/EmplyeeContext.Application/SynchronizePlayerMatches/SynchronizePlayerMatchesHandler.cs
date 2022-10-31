@@ -1,17 +1,19 @@
-﻿using SolTechnology.Core.MessageBus.Publish;
-using SolTechnology.TaleCode.Infrastructure;
+﻿using SolTechnology.Core.CQRS;
+using SolTechnology.Core.MessageBus;
+using SolTechnology.Core.MessageBus.Publish;
+using SolTechnology.TaleCode.Domain;
 using SolTechnology.TaleCode.PlayerRegistry.Commands.SynchronizePlayerMatches.Interfaces;
 using SolTechnology.TaleCode.StaticData.PlayerId;
 
 namespace SolTechnology.TaleCode.PlayerRegistry.Commands.SynchronizePlayerMatches
 {
-    public class SynchronizePlayerMatchesHandler : ICommandHandler<SynchronizePlayerMatchesCommand>
+    public class SynchronizePlayerMatchesHandler : Infrastructure.ICommandHandler<SynchronizePlayerMatchesCommand>
     {
-        private readonly ISyncPlayer _syncPlayer;
-        private readonly IDetermineMatchesToSync _determineMatchesToSync;
-        private readonly ISyncMatch _syncMatch;
-        private readonly IPlayerExternalIdsProvider _playerExternalIdsProvider;
-        private readonly IMessagePublisher _messagePublisher;
+        private Func<int, PlayerIdMap> GetPlayerId { get; }
+        private Func<IMessage, Task> PublishMessage { get; }
+        private Func<int, int, Task> SynchronizeMatch { get; }
+        private Func<Player, List<int>> CalculateMatchesToSync { get; }
+        private Func<PlayerIdMap, Task<Player>> SynchronizePlayer { get; }
 
         public SynchronizePlayerMatchesHandler(
             ISyncPlayer syncPlayer,
@@ -20,34 +22,24 @@ namespace SolTechnology.TaleCode.PlayerRegistry.Commands.SynchronizePlayerMatche
             IPlayerExternalIdsProvider playerExternalIdsProvider,
             IMessagePublisher messagePublisher)
         {
-            _syncPlayer = syncPlayer;
-            _determineMatchesToSync = determineMatchesToSync;
-            _syncMatch = syncMatch;
-            _playerExternalIdsProvider = playerExternalIdsProvider;
-            _messagePublisher = messagePublisher;
+            GetPlayerId = playerExternalIdsProvider.Get;
+            SynchronizePlayer = syncPlayer.Execute;
+            CalculateMatchesToSync = determineMatchesToSync.Execute;
+            SynchronizeMatch = syncMatch.Execute;
+            PublishMessage = messagePublisher.Publish;
         }
 
         public async Task Handle(SynchronizePlayerMatchesCommand command)
         {
-            var playerIdMap = _playerExternalIdsProvider.GetExternalPlayerId(command.PlayerId);
-            var context = new SynchronizePlayerMatchesContext
-            {
-                PlayerIdMap = playerIdMap
-            };
-
-
-            await _syncPlayer.Execute(context);
-
-            _determineMatchesToSync.Execute(context);
-
-
-            foreach (var matchId in context.MatchesToSync)
-            {
-                await _syncMatch.Execute(context, matchId);
-            }
-
-            var message = new PlayerMatchesSynchronizedEvent(command.PlayerId);
-            await _messagePublisher.Publish(message);
+            await Chain
+                .Start(() => GetPlayerId(command.PlayerId))
+                .Then(SynchronizePlayer)
+                .Then(CalculateMatchesToSync)
+                .Then(match => match.ForEach(id =>
+                    SynchronizeMatch(id, command.PlayerId)))
+                .Then(_ => new PlayerMatchesSynchronizedEvent(command.PlayerId))
+                .Then(PublishMessage)
+                .EndCommand();
         }
     }
 }
