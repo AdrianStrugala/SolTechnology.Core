@@ -5,7 +5,7 @@
 	  <ImplicitUsings>enable</ImplicitUsings>
 
 	  <Authors>Adrian Strugala</Authors>
-	  <Version>0.2.1</Version>
+	  <Version>0.2.2</Version>
 	  <Description>SolTechnology Core CQRS library</Description>
 	  <PackageTags>sol technology cqrs command query chain</PackageTags>
 	  <Product>SolTechnology.Core.CQRS</Product>

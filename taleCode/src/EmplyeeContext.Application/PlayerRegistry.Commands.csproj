@@ -7,6 +7,7 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+		<ProjectReference Include="..\..\..\src\SolTechnology.Core.CQRS\SolTechnology.Core.CQRS.csproj" />
 		<ProjectReference Include="..\..\..\src\SolTechnology.Core.Logging\SolTechnology.Core.Logging.csproj" />
 		<ProjectReference Include="..\..\..\src\SolTechnology.Core.MessageBus\SolTechnology.Core.MessageBus.csproj" />
 		<ProjectReference Include="..\ApiClients\ApiClients.csproj" />

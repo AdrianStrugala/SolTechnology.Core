@@ -1,30 +1,26 @@
 ﻿namespace SolTechnology.Core.CQRS
 {
-    public class Chain<T>
+
+    public class Chain
     {
-        public readonly T Value;
-
-        public Chain()
-        {
-        }
-
-        public Chain(T value)
-        {
-
-            Value = value;
-        }
-    }
-
-    public class ChainBuilders
-    {
-        public Chain<T> Chain<T>(Func<T> func)
+        public static Chain<T> Start<T>(Func<T> func)
         {
             return new Chain<T>(func());
         }
 
-        public async Task<Chain<T>> Chain<T>(Func<Task<T>> func)
+        public static async Task<Chain<T>> Start<T>(Func<Task<T>> func)
         {
             return new Chain<T>(await func());
+        }
+    }
+
+    public class Chain<T>
+    {
+        public readonly T Value;
+
+        public Chain(T value)
+        {
+            Value = value;
         }
     }
 }
