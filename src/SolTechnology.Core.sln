@@ -89,7 +89,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SolTechnology.Core.Schedule
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BackgroundWorker", "..\taleCode\src\BackgroundWorker\BackgroundWorker.csproj", "{205B7CAF-0F08-45FE-A90A-FD0F71F89173}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SolTechnology.Core.CQRS", "SolTechnology.Core.CQRS\SolTechnology.Core.CQRS.csproj", "{1B034CBE-92B6-4133-8563-CEBD7C642473}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SolTechnology.Core.CQRS", "SolTechnology.Core.CQRS\SolTechnology.Core.CQRS.csproj", "{1B034CBE-92B6-4133-8563-CEBD7C642473}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SolTechnology.Core.Api", "SolTechnology.Core.Api\SolTechnology.Core.Api.csproj", "{A6351DF0-8A79-4513-AD2E-DBDCCF6DE568}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -205,6 +207,10 @@ Global
 		{1B034CBE-92B6-4133-8563-CEBD7C642473}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1B034CBE-92B6-4133-8563-CEBD7C642473}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1B034CBE-92B6-4133-8563-CEBD7C642473}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A6351DF0-8A79-4513-AD2E-DBDCCF6DE568}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A6351DF0-8A79-4513-AD2E-DBDCCF6DE568}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A6351DF0-8A79-4513-AD2E-DBDCCF6DE568}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A6351DF0-8A79-4513-AD2E-DBDCCF6DE568}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

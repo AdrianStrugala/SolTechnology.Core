@@ -53,5 +53,8 @@ jobs:
     - name: Pack SolTechnology.Core.CQRS
       run: dotnet pack -c Release -o . ./src/SolTechnology.Core.CQRS/SolTechnology.Core.CQRS.csproj
 
+    - name: Pack SolTechnology.Core.Api
+      run: dotnet pack -c Release -o . ./src/SolTechnology.Core.Api/SolTechnology.Core.Api.csproj
+
     - name: Publish all nuget packages
       run: dotnet nuget push *.nupkg -k ${{secrets.NUGET_API_KEY}} -s https://api.nuget.org/v3/index.json --skip-duplicate

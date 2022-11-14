@@ -1,0 +1,28 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>net6.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+
+		<Authors>Adrian Strugala</Authors>
+		<Version>0.2.0</Version>
+		<Description>SolTechnology Core API library</Description>
+		<PackageTags>sol technology core azure api base controller</PackageTags>
+		<Product>SolTechnology.Core.Api</Product>
+		<PackageId>SolTechnology.Core.Api</PackageId>
+		<AssemblyName>SolTechnology.Core.Api</AssemblyName>
+		<RepositoryUrl>https://github.com/AdrianStrugala/SolTechnology.Core</RepositoryUrl>
+		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
+
+		<PackageIcon>docs\mini-logo.png</PackageIcon>
+	</PropertyGroup>
+	<ItemGroup>
+		<None Include="..\..\docs\mini-logo.png" Pack="true" Visible="false" PackagePath="docs\mini-logo.png" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Microsoft.AspNetCore.Mvc.Abstractions" Version="2.2.0" />
+		<PackageReference Include="Microsoft.AspNetCore.Mvc.Core" Version="2.2.5" />
+	</ItemGroup>
+
+</Project>

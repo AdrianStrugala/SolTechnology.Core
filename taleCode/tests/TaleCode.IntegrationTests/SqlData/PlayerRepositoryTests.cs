@@ -26,7 +26,7 @@ namespace TaleCode.IntegrationTests.SqlData
         {
             //Arrange
 
-            var playerId = 123;
+            var playerId = _fixture.Create<int>();
 
             var teams = _fixture.Build<Team>()
                 .With(t => t.PlayerApiId, playerId)
@@ -67,7 +67,7 @@ namespace TaleCode.IntegrationTests.SqlData
 
 
             //Act
-            var result = _sut.GetById(420);
+            var result = _sut.GetById(_fixture.Create<int>());
 
 
             //Assert
@@ -79,7 +79,7 @@ namespace TaleCode.IntegrationTests.SqlData
         {
             //Arrange
 
-            var playerId = 123;
+            var playerId = _fixture.Create<int>();
 
             var teams = _fixture.Build<Team>()
                 .With(t => t.PlayerApiId, playerId)

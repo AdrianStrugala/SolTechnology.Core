@@ -1,32 +1,22 @@
 using Microsoft.AspNetCore.Mvc;
+using SolTechnology.Core.Api;
 using SolTechnology.TaleCode.Infrastructure;
 using SolTechnology.TaleCode.PlayerRegistry.Commands.SynchronizePlayerMatches;
 
-namespace SolTechnology.TaleCode.Api.Controllers.Api
+namespace SolTechnology.TaleCode.Api.Controllers.Api;
+
+[ApiController]
+public class SynchronizePlayerMatchesController : BaseController
 {
-    [ApiController]
-    public class SynchronizePlayerMatchesController : ControllerBase
+    private readonly ICommandHandler<SynchronizePlayerMatchesCommand> _handler;
+
+    public SynchronizePlayerMatchesController(ICommandHandler<SynchronizePlayerMatchesCommand> handler)
     {
-        private readonly ICommandHandler<SynchronizePlayerMatchesCommand> _handler;
-
-        public SynchronizePlayerMatchesController(ICommandHandler<SynchronizePlayerMatchesCommand> handler)
-        {
-            _handler = handler;
-        }
-
-        [HttpGet]
-        [Route("api/SynchronizePlayerMatches/{playerId}")]
-        public void SynchronizePlayerMatches(int playerId)
-        {
-            try
-            {
-                _handler.Handle(new SynchronizePlayerMatchesCommand(playerId));
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e);
-                throw;
-            }
-        }
+        _handler = handler;
     }
+
+    [HttpGet]
+    [Route("api/SynchronizePlayerMatches/{playerId}")]
+    public async void SynchronizePlayerMatches(int playerId) =>
+        await Invoke(_handler.Handle(new SynchronizePlayerMatchesCommand(playerId)));
 }
