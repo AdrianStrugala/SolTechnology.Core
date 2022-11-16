@@ -7,7 +7,7 @@ namespace SolTechnology.Core.Api
         public bool IsSuccess { get; set; }
 
         [JsonIgnore(Condition = JsonIgnoreCondition.Never)]
-        public T Result { get; set; }
+        public T Data { get; set; }
 
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public string Error { get; set; }

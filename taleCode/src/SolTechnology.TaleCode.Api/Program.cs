@@ -4,6 +4,7 @@ using SolTechnology.Core.ApiClient;
 using SolTechnology.Core.Authentication;
 using SolTechnology.TaleCode.PlayerRegistry.Commands;
 using SolTechnology.TaleCode.PlayerRegistry.Queries;
+using Swashbuckle.AspNetCore.Filters;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -28,9 +29,11 @@ builder.Services.AddControllers(opts => opts.Filters.Add(authenticationFiler));
 
 
 //SWAGGER
+builder.Services.AddSwaggerExamplesFromAssemblyOf<Program>();
 builder.Services.AddSwaggerGen(c =>
 {
-    c.SwaggerDoc("v1", new OpenApiInfo { Title = "WebApi", Version = "v1" });
+    c.SwaggerDoc("v1", new OpenApiInfo { Title = "TaleCode API", Version = "v1" });
+    c.ExampleFilters();
     c.AddSecurityDefinition("ApiKey", new OpenApiSecurityScheme
     {
         Type = SecuritySchemeType.ApiKey,

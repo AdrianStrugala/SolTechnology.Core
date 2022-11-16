@@ -4,12 +4,13 @@ namespace SolTechnology.Core.Api;
 
 public abstract class BaseController : ControllerBase
 {
+    [NonAction]
     public async Task<IActionResult> Return<T>(Task<T> handle)
     {
         var response = new Response<T>();
         try
         {
-            response.Result = await handle;
+            response.Data = await handle;
             response.IsSuccess = true;
 
             return new OkObjectResult(response);
@@ -23,6 +24,7 @@ public abstract class BaseController : ControllerBase
         }
     }
 
+    [NonAction]
     public async Task<IActionResult> Invoke(Task handle)
     {
         var response = new Response();
