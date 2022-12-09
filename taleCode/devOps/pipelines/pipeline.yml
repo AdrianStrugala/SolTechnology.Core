@@ -97,14 +97,6 @@ stages:
             arguments: '--configuration Release --output $(Build.ArtifactStagingDirectory)/Api'
 
         - task: DotNetCoreCLI@2
-          displayName: 'Publish Event Listener'
-          inputs:
-            command: publish
-            projects: 'taleCode/src/**/EventListener.csproj'
-            publishWebProjects: False
-            arguments: '--configuration Release --output $(Build.ArtifactStagingDirectory)/EventListener'
-
-        - task: DotNetCoreCLI@2
           displayName: 'Publish BackgroundWorker'
           inputs:
             command: publish
@@ -119,12 +111,6 @@ stages:
             fileType: 'json'
             targetFiles: '**/appsettings.json'
 
-        - task: FileTransform@1
-          displayName: 'Apply Production App settings for EventListener'
-          inputs:
-            folderPath: '$(Build.ArtifactStagingDirectory)/**/*EventListener.zip'
-            fileType: 'json'
-            targetFiles: '**/appsettings.json'
 
         - task: FileTransform@1
           displayName: 'Apply Production App settings for BackgroundWorker'
@@ -163,7 +149,7 @@ stages:
               az deployment group create \
               --resource-group $(resourceGroupName) \
               --template-file '$(Pipeline.Workspace)\drop\Infrastructure\$(templateFile)' \
-              --parameters testParam='$(testParam)' baseName='taleCode' sqlAdminUserName='$(sqlAdminUserName)' sqlAdminPassword='$(sqlAdminPassword)' sqlServerName='$(sqlServerName)' databaseName='$(databaseName)' apiName='$(apiName)' storageAccountName='$(storageAccountName)' serviceBusName='$(serviceBusName)' eventListenerName='$(eventListenerName)' backgroundWorkerName='$(backgroundWorkerName)'
+              --parameters testParam='$(testParam)' baseName='taleCode' sqlAdminUserName='$(sqlAdminUserName)' sqlAdminPassword='$(sqlAdminPassword)' sqlServerName='$(sqlServerName)' databaseName='$(databaseName)' apiName='$(apiName)' storageAccountName='$(storageAccountName)' serviceBusName='$(serviceBusName)'  backgroundWorkerName='$(backgroundWorkerName)'
 
         - task: SqlAzureDacpacDeployment@1
           displayName: 'Deploy Database'
@@ -182,14 +168,6 @@ stages:
             azureSubscription: $(azureServiceConnection)
             appName: $(apiName)
             package: '$(Pipeline.Workspace)\drop\Api\SolTechnology.TaleCode.Api.zip'
-        
-        - task: AzureWebApp@1
-          displayName: 'Deploy EventListener'
-          inputs:
-            appType: webAppLinux
-            azureSubscription: $(azureServiceConnection)
-            appName: $(eventListenerName)
-            package: '$(Pipeline.Workspace)\drop\EventListener\EventListener.zip'
 
         - task: AzureWebApp@1
           displayName: 'Deploy BackgroundWorker'

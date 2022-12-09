@@ -10,7 +10,6 @@ param testParam string
 param appServicePlanName string = '${baseName}plan'
 param apiName string
 param apiSkuName string = 'B1'
-param eventListenerName string
 param backgroundWorkerName string
 
 
@@ -119,46 +118,6 @@ resource api 'Microsoft.Web/sites@2021-02-01' = {
   }
 }
 
-resource eventListener 'Microsoft.Web/sites@2021-02-01' = {
-  name: eventListenerName
-  location: location
-  tags: {
-    'hidden-related:${resourceGroup().id}/providers/Microsoft.Web/serverfarms/${eventListenerName}': 'Resource'
-    displayName: 'Tale Code Event Listener'
-  }
-  properties: {
-    serverFarmId: appServicePlan.id
-    httpsOnly: true
-    siteConfig: {
-      ftpsState: 'Disabled'
-      linuxFxVersion: 'DOTNETCORE|6.0'
-      netFrameworkVersion: 'v6.0'
-      appCommandLine: 'dotnet EventListener.dll'
-      http20Enabled: true
-      minTlsVersion: '1.2'
-      autoHealEnabled: true
-      alwaysOn: true
-      autoHealRules: {
-        actions: {
-          actionType: 'Recycle'
-        }
-        triggers: {
-          statusCodes: [
-            {
-              status: 500
-            }
-            {
-              status: 502
-            }
-            {
-              status: 503
-            }
-          ]
-        }
-      }
-    }
-  }
-}
 
 resource backgroundWorker 'Microsoft.Web/sites@2021-02-01' = {
   name: backgroundWorkerName
@@ -217,18 +176,6 @@ resource appsettings 'Microsoft.Web/sites/config@2015-08-01' = {
   }
 }
 
-resource appsettingsEventListener 'Microsoft.Web/sites/config@2015-08-01' = {
-  parent: eventListener
-  location: location
-  name: 'appsettings'
-  tags: {
-    displayName: 'appsettings'
-  }
-  properties: {
-    ASPNETCORE_ENVIRONMENT: environmentName
-    APPINSIGHTS_INSTRUMENTATIONKEY: app_insights.properties.InstrumentationKey
-  }
-}
 
 resource appsettingsBackgroundWorker 'Microsoft.Web/sites/config@2015-08-01' = {
   parent: backgroundWorker
