@@ -1,7 +1,6 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using SolTechnology.Core.CQRS;
 using SolTechnology.TaleCode.BlobData.PlayerStatisticsRepository;
 using SolTechnology.TaleCode.Domain;
-using SolTechnology.TaleCode.Infrastructure;
 using SolTechnology.TaleCode.SqlData.Repository.MatchRepository;
 using SolTechnology.TaleCode.SqlData.Repository.PlayerRepository;
 using SolTechnology.TaleCode.StaticData;
@@ -9,12 +8,12 @@ using SolTechnology.TaleCode.StaticData.PlayerId;
 
 namespace SolTechnology.TaleCode.PlayerRegistry.Commands.CalculatePlayerStatistics
 {
-    public class CalculatePlayerStatisticsHandler : ICommandHandler<CalculatePlayerStatisticsCommand>
+    public class CalculatePlayerStatisticsHandler : Infrastructure.ICommandHandler<CalculatePlayerStatisticsCommand>
     {
-        private readonly IPlayerExternalIdsProvider _playerExternalIdsProvider;
-        private readonly IMatchRepository _matchRepository;
-        private readonly IPlayerRepository _playerRepository;
-        private readonly IPlayerStatisticsRepository _playerStatisticsRepository;
+        private Func<PlayerStatistics, Task> StoreResult { get; }
+        private Func<int, List<Match>> GetMatches { get; }
+        private Func<int, Player> GetPlayer { get; }
+        private Func<int, PlayerIdMap> GetPlayerId { get; }
 
         public CalculatePlayerStatisticsHandler(
             IPlayerExternalIdsProvider playerExternalIdsProvider,
@@ -22,37 +21,61 @@ namespace SolTechnology.TaleCode.PlayerRegistry.Commands.CalculatePlayerStatisti
             IPlayerRepository playerRepository,
             IPlayerStatisticsRepository playerStatisticsRepository)
         {
-            _playerExternalIdsProvider = playerExternalIdsProvider;
-            _matchRepository = matchRepository;
-            _playerRepository = playerRepository;
-            _playerStatisticsRepository = playerStatisticsRepository;
+            GetPlayerId = playerExternalIdsProvider.Get;
+            GetMatches = matchRepository.GetByPlayerId;
+            GetPlayer = playerRepository.GetById;
+            StoreResult = playerStatisticsRepository.Add;
         }
 
         public async Task Handle(CalculatePlayerStatisticsCommand command)
         {
-            var result = new PlayerStatistics
-            {
-                Id = command.PlayerId
-            };
+            var result = new PlayerStatistics { Id = command.PlayerId };
+            PlayerIdMap playerIdMap = null;
+            Player player = null;
+            List<Match> matches = null;
 
-            var playerIdMap = _playerExternalIdsProvider.Get(command.PlayerId);
-            var player = _playerRepository.GetById(playerIdMap.FootballDataId);
-            var matches = _matchRepository.GetByPlayerId(playerIdMap.FootballDataId);
+            await Chain
+                .Start(() => playerIdMap = GetPlayerId(command.PlayerId))
+                .Then(_ => player = GetPlayer(playerIdMap.FootballDataId))
+                .Then(_ => matches = GetMatches(playerIdMap.FootballDataId))
+                .Then(x => ExtractNationalTeamMatches(x, player))
+                .Then(x => AssignNationalTeamMatches(result, x, player))
+                .Then(x => ExtractClubMatches(x, matches))
+                .Then(x => AssignClubMatches(result, x, player))
+                .Then(_ => ApplyPlayerMetadata(result, player, matches))
+                .Then(_ => StoreResult(result))
+                .EndCommand();
+        }
 
-            result.Name = player.Name;
-            result.NumberOfMatches = matches.Count;
 
-            var nationalTeamMatches = matches
-                .Where(m => m.AwayTeam == player.Nationality || m.HomeTeam == player.Nationality).ToList();
-            var clubMatches = matches.Except(nationalTeamMatches).ToList();
 
+        private List<Match> ExtractNationalTeamMatches(List<Match> allMatches, Player player)
+        {
+            return allMatches
+                .Where(m => m.AwayTeam == player.Nationality ||
+                            m.HomeTeam == player.Nationality)
+                .ToList();
+        }
+
+        private List<Match> AssignNationalTeamMatches(PlayerStatistics result, List<Match> nationalTeamMatches, Player player)
+        {
             result.StatisticsByTeams.Add(
                 CalculateSingleTeamStatistics(
                     nationalTeamMatches,
                     new Team(
-                        playerIdMap.FootballDataId, DateProvider.DateMin(), DateProvider.DateMax(), player.Nationality)
-                    ));
+                        player.ApiId, DateProvider.DateMin(), DateProvider.DateMax(), player.Nationality)
+                ));
 
+            return nationalTeamMatches;
+        }
+
+        private List<Match> ExtractClubMatches(List<Match> nationalTeamMatches, List<Match> matches)
+        {
+            return matches.Except(nationalTeamMatches).ToList();
+        }
+
+        private void AssignClubMatches(PlayerStatistics result, List<Match> clubMatches, Player player)
+        {
             foreach (var team in player.Teams)
             {
                 var teamMatches = clubMatches
@@ -61,9 +84,14 @@ namespace SolTechnology.TaleCode.PlayerRegistry.Commands.CalculatePlayerStatisti
 
                 result.StatisticsByTeams.Add(CalculateSingleTeamStatistics(teamMatches, team));
             }
-
-            await _playerStatisticsRepository.Add(result);
         }
+
+        private void ApplyPlayerMetadata(PlayerStatistics result, Player player, List<Match> matches)
+        {
+            result.Name = player.Name;
+            result.NumberOfMatches = matches.Count;
+        }
+
 
         private StatisticsByTeam CalculateSingleTeamStatistics(List<Match> teamMatches, Team team)
         {
