@@ -22,7 +22,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\..\src\SqlData\SqlData.csproj" />
+	  <ProjectReference Include="..\..\src\DataLayer\SolTechnology.TaleCode.Sql\SolTechnology.TaleCode.Sql.csproj" />
 	</ItemGroup>
 
 </Project>

@@ -28,8 +28,7 @@ Tale Code application is build of following components:
 
 | Component  | Purpose  |   
 |---|---|
-| Background Worker  | Runs Commands on time trigger  |   
-| Event Listener     | Runs Commands on message triggers  |   
+| Background Worker  | Runs Commands on internal triggers time|event|api  |     
 | API                | Provides Queries for users  |   
 | SQL Database       | Stores data in relational model  |   
 | Blob Storage       | Stores read models for Queries  |   
@@ -44,28 +43,15 @@ Tale Code application is build of following components:
 Extending the Readme example:
 
 ```csharp
-    public async Task Handle(SynchronizePlayerMatchesCommand command)
-    {
-        var playerIdMap = _playerExternalIdsProvider.GetExternalPlayerId(command.PlayerId);
-        var context = new SynchronizePlayerMatchesContext
-        {
-            PlayerIdMap = playerIdMap
-        };
-
-
-        await _syncPlayer.Execute(context);
-
-        _determineMatchesToSync.Execute(context);
-
-
-        foreach (var matchId in context.MatchesToSync)
-        {
-            await _syncMatch.Execute(context, matchId);
-        }
-
-        var message = new PlayerMatchesSynchronizedEvent(command.PlayerId);
-        await _messagePublisher.Publish(message);
-    }
+        await Chain
+            .Start(() => GetPlayerId(command.PlayerId))
+            .Then(SynchronizePlayer)
+            .Then(CalculateMatchesToSync)
+            .Then(match => match.ForEach(id =>
+                SynchronizeMatch(id, command.PlayerId)))
+            .Then(_ => new PlayerMatchesSynchronizedEvent(command.PlayerId))
+            .Then(PublishMessage)
+            .EndCommand();
 ```
 
 ### Command Handler Structure
@@ -118,8 +104,6 @@ Runs scheduled jobs:
     }
 ```
 
-#### EventListener
-
 Subscribes to messages and invokes operations based on them:
 
 ```csharp
@@ -142,7 +126,7 @@ Subscribes to messages and invokes operations based on them:
 
 #### Api
 
-Provides an interface for queries:
+Provides a public interface for queries:
 
 ```csharp
     public class GetPlayerStatisticsController : ControllerBase
