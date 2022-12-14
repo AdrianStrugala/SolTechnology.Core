@@ -93,9 +93,11 @@ namespace TaleCode.IntegrationTests.SqlData
                 .With(p => p.Teams, teams)
                 .Create();
 
+            var uow = new UnitOfWork();
+
 
             //Act
-            using (var uow = new UnitOfWork())
+            using (uow.Begin())
             {
                 _sut.Insert(player);
 

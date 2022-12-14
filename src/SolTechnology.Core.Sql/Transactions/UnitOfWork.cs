@@ -4,18 +4,24 @@ namespace SolTechnology.Core.Sql.Transactions
 {
     public class UnitOfWork : IDisposable, IUnitOfWork
     {
-        private readonly TransactionScope _scope;
+        private TransactionScope _scope;
 
-        public UnitOfWork(IsolationLevel isolationLevel = IsolationLevel.ReadCommitted)
+        public UnitOfWork Begin(IsolationLevel isolationLevel = IsolationLevel.ReadCommitted)
         {
             _scope = new TransactionScope(
                 TransactionScopeOption.Required,
                 new TransactionOptions { IsolationLevel = isolationLevel },
                 TransactionScopeAsyncFlowOption.Enabled);
+            return this;
         }
 
         public void Complete()
         {
+            if (_scope == null)
+            {
+                throw new InvalidOperationException("The transaction scope was not initialized. Call Begin() at first");
+            }
+
             _scope.Complete();
             Dispose();
         }
