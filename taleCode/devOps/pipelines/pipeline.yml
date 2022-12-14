@@ -182,7 +182,7 @@ stages:
             appType: webAppLinux
             azureSubscription: $(azureServiceConnection)
             appName: $(backgroundWorkerName)
-            package: '$(Pipeline.Workspace)\drop\BackgroundWorker\BackgroundWorker.zip'
+            package: '$(Pipeline.Workspace)\drop\BackgroundWorker\SolTechnology.TaleCode.BackgroundWorker.zip'
 
 
 
