@@ -161,16 +161,23 @@ Contains all of the business knowledge and operations. Commands and Queries are 
 
 #### Commands
 
-Commands are operations that fetches external data, manipulate it, and modifies. The most important is data consistency. The same example as above:
+Commands are operations focused on data consistency. They are composed from few steps:
+1) Trigger - usually coming from outside of the application (time trigger, event handler, queue message, API call)
+2) Get the external data
+3) Validate!
+4) Adjust to a specific application or domain - map, modify, combine
+5) Store in persistent storage
+6) Ensure that no item is lost - data consistency and quality checks
+7) Pre-generate read models for crucial queries (SQL Materialized View, Temporary Storage (ex. No-Sql database)
 
 ```csharp
     public class SynchronizePlayerMatchesHandler : ICommandHandler<SynchronizePlayerMatchesCommand>
     {
-        private readonly ISyncPlayer _syncPlayer;
-        private readonly IDetermineMatchesToSync _determineMatchesToSync;
-        private readonly ISyncMatch _syncMatch;
-        private readonly IPlayerExternalIdsProvider _playerExternalIdsProvider;
-        private readonly IMessagePublisher _messagePublisher;
+        private Func<int, PlayerIdMap> GetPlayerId { get; }
+        private Func<IMessage, Task> PublishMessage { get; }
+        private Func<int, int, Task> SynchronizeMatch { get; }
+        private Func<Player, List<int>> CalculateMatchesToSync { get; }
+        private Func<PlayerIdMap, Task<Player>> SynchronizePlayer { get; }
 
         public SynchronizePlayerMatchesHandler(
             ISyncPlayer syncPlayer,
@@ -179,41 +186,38 @@ Commands are operations that fetches external data, manipulate it, and modifies.
             IPlayerExternalIdsProvider playerExternalIdsProvider,
             IMessagePublisher messagePublisher)
         {
-            _syncPlayer = syncPlayer;
-            _determineMatchesToSync = determineMatchesToSync;
-            _syncMatch = syncMatch;
-            _playerExternalIdsProvider = playerExternalIdsProvider;
-            _messagePublisher = messagePublisher;
+            GetPlayerId = playerExternalIdsProvider.Get;
+            SynchronizePlayer = syncPlayer.Execute;
+            CalculateMatchesToSync = determineMatchesToSync.Execute;
+            SynchronizeMatch = syncMatch.Execute;
+            PublishMessage = messagePublisher.Publish;
         }
 
         public async Task Handle(SynchronizePlayerMatchesCommand command)
         {
-            var playerIdMap = _playerExternalIdsProvider.GetExternalPlayerId(command.PlayerId);
-            var context = new SynchronizePlayerMatchesContext
-            {
-                PlayerIdMap = playerIdMap
-            };
-
-
-            await _syncPlayer.Execute(context);
-
-            _determineMatchesToSync.Execute(context);
-
-
-            foreach (var matchId in context.MatchesToSync)
-            {
-                await _syncMatch.Execute(context, matchId);
-            }
-
-            var message = new PlayerMatchesSynchronizedEvent(command.PlayerId);
-            await _messagePublisher.Publish(message);
+            await Chain
+                .Start(() => GetPlayerId(command.PlayerId))
+                .Then(SynchronizePlayer)
+                .Then(CalculateMatchesToSync)
+                .Then(match => match.ForEach(id =>
+                    SynchronizeMatch(id, command.PlayerId)))
+                .Then(_ => new PlayerMatchesSynchronizedEvent(command.PlayerId))
+                .Then(PublishMessage)
+                .EndCommand();
         }
     }
 ```
 
 #### Queries
 
-Runs operations returning data to the users from data storage. Crucial factor here is the response time.
+Queries are fundamentally different from commands. Crucial factor is the response time.
+1) Be quick
+2) No not rely on external services if possible
+3) Use pre-generated read models
+4) Be fast
+5) Cache responses
+6) Handle errors - fallbacks
+7) Respond rapidly
 
 
 ```csharp

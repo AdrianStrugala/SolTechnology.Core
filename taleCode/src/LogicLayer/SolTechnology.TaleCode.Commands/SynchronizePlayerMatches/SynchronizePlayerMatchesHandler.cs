@@ -7,7 +7,7 @@ using SolTechnology.TaleCode.StaticData.PlayerId;
 
 namespace SolTechnology.TaleCode.PlayerRegistry.Commands.SynchronizePlayerMatches
 {
-    public class SynchronizePlayerMatchesHandler : Infrastructure.ICommandHandler<SynchronizePlayerMatchesCommand>
+    public class SynchronizePlayerMatchesHandler : ICommandHandler<SynchronizePlayerMatchesCommand>
     {
         private Func<int, PlayerIdMap> GetPlayerId { get; }
         private Func<IMessage, Task> PublishMessage { get; }

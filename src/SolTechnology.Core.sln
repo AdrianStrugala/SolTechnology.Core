@@ -36,7 +36,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TaleCode.UnitTests", "..\ta
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TaleCode.IntegrationTests", "..\taleCode\tests\TaleCode.IntegrationTests\TaleCode.IntegrationTests.csproj", "{9026BB1F-AB80-4592-A6D4-85247DBA86DF}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TaleCode.FunctionalTests", "..\taleCode\tests\TaleCode.FunctionalTests\TaleCode.FunctionalTests.csproj", "{D72660DF-0766-4325-AE19-74D27890CD17}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TaleCode.ComponentTests", "..\taleCode\tests\TaleCode.FunctionalTests\TaleCode.ComponentTests.csproj", "{D72660DF-0766-4325-AE19-74D27890CD17}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SolTechnology.Core.Sql.Tests", "..\tests\SolTechnology.Core.Sql.Tests\SolTechnology.Core.Sql.Tests.csproj", "{A176409E-DC28-4557-8416-A11C6EE61555}"
 EndProject
@@ -90,6 +90,8 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SolTechnology.TaleCode.Api", "..\taleCode\src\PresentationLayer\SolTechnology.TaleCode.Api\SolTechnology.TaleCode.Api.csproj", "{38F82C88-4DED-4ADD-BA4C-74165B9712FC}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SolTechnology.TaleCode.Commands", "..\taleCode\src\LogicLayer\SolTechnology.TaleCode.Commands\SolTechnology.TaleCode.Commands.csproj", "{14675484-B241-4E56-B036-B1848A0AA93F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SolTechnology.Core.Cache", "SolTechnology.Core.Cache\SolTechnology.Core.Cache.csproj", "{E117AC91-AC0B-4D33-AD6E-A013D858F65F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -205,6 +207,10 @@ Global
 		{14675484-B241-4E56-B036-B1848A0AA93F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{14675484-B241-4E56-B036-B1848A0AA93F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{14675484-B241-4E56-B036-B1848A0AA93F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E117AC91-AC0B-4D33-AD6E-A013D858F65F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E117AC91-AC0B-4D33-AD6E-A013D858F65F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E117AC91-AC0B-4D33-AD6E-A013D858F65F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E117AC91-AC0B-4D33-AD6E-A013D858F65F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -129,6 +129,6 @@ And example test itself:
 
 
 
-## Functional Tests
+## Component Tests
 
 ## App Insights Logs

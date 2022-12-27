@@ -1,6 +1,8 @@
-﻿using Azure.Storage.Blobs;
-using SolTechnology.Avro;
-namespace SolTechnology.Core.BlobStorage.BlobContainerClientExtensions
+﻿using SolTechnology.Avro;
+using SolTechnology.Core.BlobStorage;
+
+// ReSharper disable once CheckNamespace
+namespace Azure.Storage.Blobs
 {
     public static class BlobContainerClientExtensions
     {

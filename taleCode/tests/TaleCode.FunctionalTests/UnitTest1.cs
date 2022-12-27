@@ -1,6 +1,6 @@
 using Xunit;
 
-namespace TaleCode.FunctionalTests
+namespace TaleCode.ComponentTests
 {
     public class UnitTest1
     {

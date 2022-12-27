@@ -14,8 +14,7 @@ In the TaleCode app case, the Bicep (ARM Template overlay) was used: [Link](http
 
 It contains following sections:
 * appServicePlan (service farm)
-  - api 
-  - eventListener
+  - api
   - backgroundWorker 
   - appSettings for each
 * sql server
@@ -37,6 +36,7 @@ Is build of following steps:
   - Deploy Database to local server
   - Run Unit Tests
   - Run Integration Tests
+  - Run Component Tests
 - Build
   - Publish Infra
   - Publish Database (dacpac)

@@ -1,0 +1,30 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>net6.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+
+		<Authors>Adrian Strugala</Authors>
+		<Version>0.2.0</Version>
+		<Description>SolTechnology Core Cache library</Description>
+		<PackageTags>sol technology core cache memory lazy task</PackageTags>
+		<Product>SolTechnology.Core.Cache</Product>
+		<PackageId>SolTechnology.Core.Cache</PackageId>
+		<AssemblyName>SolTechnology.Core.Cache</AssemblyName>
+		<RepositoryUrl>https://github.com/AdrianStrugala/SolTechnology.Core</RepositoryUrl>
+		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
+
+		<PackageIcon>docs\mini-logo.png</PackageIcon>
+	</PropertyGroup>
+	<ItemGroup>
+		<None Include="..\..\docs\mini-logo.png" Pack="true" Visible="false" PackagePath="docs\mini-logo.png" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Microsoft.Extensions.Caching.Abstractions" Version="7.0.0" />
+		<PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="6.0.0" />
+		<PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="6.0.0" />
+		<PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="6.0.0" />
+		<PackageReference Include="Microsoft.Extensions.Options" Version="6.0.0" />
+	</ItemGroup>
+</Project>

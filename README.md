@@ -46,6 +46,9 @@ The SolTechnology.Core repository contains a set of shared libraries. This is a 
 |[Authentication](https://github.com/AdrianStrugala/SolTechnology.Core/tree/master/docs/Auth.md)   |  <a href="https://www.nuget.org/packages/SolTechnology.Core.Authentication/"><img src="https://badgen.net/badge/Downloads/350/?icon=nuget"></a>  |   |
 |[Logging](https://github.com/AdrianStrugala/SolTechnology.Core/tree/master/docs/Log.md)           |  <a href="https://www.nuget.org/packages/SolTechnology.Core.Logging/"><img src="https://badgen.net/badge/Downloads/300/?icon=nuget"></a>  |   |
 |[Scheduler](https://github.com/AdrianStrugala/SolTechnology.Core/tree/master/docs/Cron.md)        |  <a href="https://www.nuget.org/packages/SolTechnology.Core.Scheduler/"><img src="https://badgen.net/badge/Downloads/100/?icon=nuget"></a>  |   |
+|CQRS        |  <a href="https://www.nuget.org/packages/SolTechnology.Core.CQRS/"><img src="https://badgen.net/badge/Downloads/100/?icon=nuget"></a>  |   |
+|Api        |  <a href="https://www.nuget.org/packages/SolTechnology.Core.Api/"><img src="https://badgen.net/badge/Downloads/100/?icon=nuget"></a>  |   |
+|Cache        |  <a href="https://www.nuget.org/packages/SolTechnology.Core.Cache/"><img src="https://badgen.net/badge/Downloads/100/?icon=nuget"></a>  |   |
 
 
 
