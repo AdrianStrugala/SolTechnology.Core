@@ -2,7 +2,7 @@
 
 namespace SolTechnology.TaleCode.PlayerRegistry.Queries.GetPlayerStatistics
 {
-    public class GetPlayerStatisticsResult : IResult
+    public class GetPlayerStatisticsResult
     {
         public int Id { get; set; }
         public string Name { get; set; }

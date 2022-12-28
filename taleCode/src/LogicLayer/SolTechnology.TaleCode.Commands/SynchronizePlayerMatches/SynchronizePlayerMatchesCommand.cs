@@ -1,10 +1,9 @@
 ﻿using SolTechnology.Core.Guards;
 using SolTechnology.Core.Logging;
-using SolTechnology.TaleCode.Infrastructure;
 
 namespace SolTechnology.TaleCode.PlayerRegistry.Commands.SynchronizePlayerMatches
 {
-    public class SynchronizePlayerMatchesCommand : ICommand, ILoggedOperation
+    public class SynchronizePlayerMatchesCommand : ILoggedOperation
     {
         public int PlayerId { get; set; }
 

@@ -1,4 +1,5 @@
-﻿using SolTechnology.Core.MessageBus.Receive;
+﻿using SolTechnology.Core.CQRS;
+using SolTechnology.Core.MessageBus.Receive;
 using SolTechnology.TaleCode.Infrastructure;
 using SolTechnology.TaleCode.PlayerRegistry.Commands.CalculatePlayerStatistics;
 

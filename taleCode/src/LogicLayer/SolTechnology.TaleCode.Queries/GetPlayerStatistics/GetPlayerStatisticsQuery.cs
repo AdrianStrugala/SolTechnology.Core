@@ -1,9 +1,8 @@
 ﻿using SolTechnology.Core.Guards;
-using SolTechnology.TaleCode.Infrastructure;
 
 namespace SolTechnology.TaleCode.PlayerRegistry.Queries.GetPlayerStatistics
 {
-    public class GetPlayerStatisticsQuery : IQuery
+    public class GetPlayerStatisticsQuery
     {
         public int PlayerId { get; set; }
 

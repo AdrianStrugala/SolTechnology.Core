@@ -1,4 +1,5 @@
-﻿using SolTechnology.TaleCode.BlobData.PlayerStatisticsRepository;
+﻿using SolTechnology.Core.CQRS;
+using SolTechnology.TaleCode.BlobData.PlayerStatisticsRepository;
 using SolTechnology.TaleCode.Infrastructure;
 
 namespace SolTechnology.TaleCode.PlayerRegistry.Queries.GetPlayerStatistics

@@ -1,5 +1,4 @@
 ﻿using Azure.Storage.Blobs;
-using SolTechnology.Core.BlobStorage.BlobContainerClientExtensions;
 using SolTechnology.Core.BlobStorage.Connection;
 using SolTechnology.TaleCode.Domain;
 

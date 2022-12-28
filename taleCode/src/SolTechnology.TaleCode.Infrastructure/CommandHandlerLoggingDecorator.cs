@@ -1,14 +1,14 @@
 ﻿using Microsoft.Extensions.Logging;
+using SolTechnology.Core.CQRS;
 using SolTechnology.Core.Logging;
 
 namespace SolTechnology.TaleCode.Infrastructure
 {
-    public class CommandHandlerLoggingDecorator<TCommand> : ICommandHandler<TCommand> where TCommand : ILoggedOperation, ICommand
+    public class CommandHandlerLoggingDecorator<TCommand> : ICommandHandler<TCommand> where TCommand : ILoggedOperation
     {
 
         //TODO: Extract decorator to Logging
         //TODO: Remove ICommand dependency
-
 
 
         private readonly ICommandHandler<TCommand> _handler;

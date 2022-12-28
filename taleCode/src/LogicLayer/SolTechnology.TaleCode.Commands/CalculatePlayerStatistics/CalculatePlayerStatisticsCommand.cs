@@ -1,9 +1,10 @@
-﻿using SolTechnology.Core.Logging;
+﻿using System.Windows.Input;
+using SolTechnology.Core.Logging;
 using SolTechnology.TaleCode.Infrastructure;
 
 namespace SolTechnology.TaleCode.PlayerRegistry.Commands.CalculatePlayerStatistics;
 
-public class CalculatePlayerStatisticsCommand : ICommand, ILoggedOperation
+public class CalculatePlayerStatisticsCommand : ILoggedOperation
 {
     public int PlayerId { get; set; }
 

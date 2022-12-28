@@ -8,7 +8,7 @@ using SolTechnology.TaleCode.StaticData.PlayerId;
 
 namespace SolTechnology.TaleCode.PlayerRegistry.Commands.CalculatePlayerStatistics
 {
-    public class CalculatePlayerStatisticsHandler : Infrastructure.ICommandHandler<CalculatePlayerStatisticsCommand>
+    public class CalculatePlayerStatisticsHandler : ICommandHandler<CalculatePlayerStatisticsCommand>
     {
         private Func<PlayerStatistics, Task> StoreResult { get; }
         private Func<int, List<Match>> GetMatches { get; }

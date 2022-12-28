@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using SolTechnology.Core.CQRS;
 using SolTechnology.TaleCode.BlobData;
 using SolTechnology.TaleCode.Infrastructure;
 using SolTechnology.TaleCode.PlayerRegistry.Queries.GetPlayerStatistics;
