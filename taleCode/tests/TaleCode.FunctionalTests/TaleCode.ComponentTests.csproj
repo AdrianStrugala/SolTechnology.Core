@@ -27,4 +27,10 @@
 		<ProjectReference Include="..\TaleCode.IntegrationTests\TaleCode.IntegrationTests.csproj" />
 	</ItemGroup>
 
+	<ItemGroup>
+	  <None Update="appsettings.component.tests.json">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </None>
+	</ItemGroup>
+
 </Project>

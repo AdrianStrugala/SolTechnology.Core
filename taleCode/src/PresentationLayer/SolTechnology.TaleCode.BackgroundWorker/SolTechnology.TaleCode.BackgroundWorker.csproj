@@ -4,7 +4,6 @@
 		<TargetFramework>net6.0</TargetFramework>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<RootNamespace>SolTechnology.TaleCode.BackgroundWorker</RootNamespace>
-		<UserSecretsId>4604ec22-32e0-4019-b0a9-b67154068548</UserSecretsId>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -23,12 +22,6 @@
 	  <Content Update="appsettings.json">
 	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 	  </Content>
-	</ItemGroup>
-
-	<ItemGroup>
-		<None Update="appsettings.json">
-			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
-		</None>
 	</ItemGroup>
 
 	<ItemGroup>
