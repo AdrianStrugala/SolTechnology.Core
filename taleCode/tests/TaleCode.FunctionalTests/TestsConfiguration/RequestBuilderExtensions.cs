@@ -3,7 +3,7 @@ using System.Net.Http.Json;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.TestHost;
 
-namespace TaleCode.ComponentTests.TestsConfiguration
+namespace TaleCode.FunctionalTests.TestsConfiguration
 {
     public static class RequestBuilderExtensions
     {

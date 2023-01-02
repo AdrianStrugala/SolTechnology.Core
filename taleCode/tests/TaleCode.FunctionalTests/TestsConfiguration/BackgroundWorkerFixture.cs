@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.Configuration;
 using SolTechnology.TaleCode.BackgroundWorker;
 
-namespace TaleCode.ComponentTests.TestsConfiguration
+namespace TaleCode.FunctionalTests.TestsConfiguration
 {
     public class BackgroundWorkerFixture : IDisposable
     {
@@ -20,7 +20,7 @@ namespace TaleCode.ComponentTests.TestsConfiguration
             var webAppFactory = new WebApplicationFactory<Program>()
                 .WithWebHostBuilder(builder =>
                     builder
-                        .ConfigureAppConfiguration((_, config) => config.AddJsonFile(Path.Combine(Directory.GetCurrentDirectory(), "appsettings.component.tests.json")))
+                        .ConfigureAppConfiguration((_, config) => config.AddJsonFile(Path.Combine(Directory.GetCurrentDirectory(), "appsettings.functional.tests.json")))
                         .ConfigureServices(_ =>
                         {
                             // set up custom services

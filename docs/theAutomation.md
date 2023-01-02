@@ -36,7 +36,7 @@ Is build of following steps:
   - Deploy Database to local server
   - Run Unit Tests
   - Run Integration Tests
-  - Run Component Tests
+  - Run Functional Tests
 - Build
   - Publish Infra
   - Publish Database (dacpac)

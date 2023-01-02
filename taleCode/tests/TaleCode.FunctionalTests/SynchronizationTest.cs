@@ -1,22 +1,21 @@
-using System.Net.Http;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.TestHost;
-using TaleCode.ComponentTests.TestsConfiguration;
+using TaleCode.FunctionalTests.TestsConfiguration;
 using TaleCode.IntegrationTests.SqlData;
 using Xunit;
 
-namespace TaleCode.ComponentTests
+namespace TaleCode.FunctionalTests
 {
-    [Collection(nameof(TaleCodeComponentTests))]
+    [Collection(nameof(TaleCodeFunctionalTestsCollection))]
     public class SynchronizationTest
     {
         private readonly SqlFixture _sqlFixture;
         private readonly TestServer _backgroundWorker;
 
-        public SynchronizationTest(ComponentTestsFixture componentTestsFixture)
+        public SynchronizationTest(FunctionalTestsFixture functionalTestsFixture)
         {
-            _backgroundWorker = componentTestsFixture.BackgroundWorkerFixture.TestServer;
-            _sqlFixture = componentTestsFixture.SqlFixture;
+            _backgroundWorker = functionalTestsFixture.BackgroundWorkerFixture.TestServer;
+            _sqlFixture = functionalTestsFixture.SqlFixture;
         }
 
         [Fact]

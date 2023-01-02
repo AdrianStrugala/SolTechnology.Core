@@ -36,7 +36,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TaleCode.UnitTests", "..\ta
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TaleCode.IntegrationTests", "..\taleCode\tests\TaleCode.IntegrationTests\TaleCode.IntegrationTests.csproj", "{9026BB1F-AB80-4592-A6D4-85247DBA86DF}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TaleCode.ComponentTests", "..\taleCode\tests\TaleCode.FunctionalTests\TaleCode.ComponentTests.csproj", "{D72660DF-0766-4325-AE19-74D27890CD17}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TaleCode.FunctionalTests", "..\taleCode\tests\TaleCode.FunctionalTests\TaleCode.FunctionalTests.csproj", "{D72660DF-0766-4325-AE19-74D27890CD17}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SolTechnology.Core.Sql.Tests", "..\tests\SolTechnology.Core.Sql.Tests\SolTechnology.Core.Sql.Tests.csproj", "{A176409E-DC28-4557-8416-A11C6EE61555}"
 EndProject
@@ -93,7 +93,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SolTechnology.TaleCode.Comm
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SolTechnology.Core.Cache", "SolTechnology.Core.Cache\SolTechnology.Core.Cache.csproj", "{E117AC91-AC0B-4D33-AD6E-A013D858F65F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TaleCode.Faker", "..\taleCode\tests\TaleCode.Faker\TaleCode.Faker.csproj", "{AC93AFDE-57E7-4A41-8D7D-B1BA5925D743}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TaleCode.Faker", "..\taleCode\tests\TaleCode.Faker\TaleCode.Faker.csproj", "{AC93AFDE-57E7-4A41-8D7D-B1BA5925D743}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

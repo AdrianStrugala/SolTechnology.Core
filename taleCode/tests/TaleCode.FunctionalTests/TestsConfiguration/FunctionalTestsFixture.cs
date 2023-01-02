@@ -1,14 +1,14 @@
 ﻿using TaleCode.IntegrationTests.SqlData;
 using Xunit;
 
-namespace TaleCode.ComponentTests.TestsConfiguration
+namespace TaleCode.FunctionalTests.TestsConfiguration
 {
-    public class ComponentTestsFixture
+    public class FunctionalTestsFixture
     {
         public BackgroundWorkerFixture BackgroundWorkerFixture { get; set; }
         public SqlFixture SqlFixture { get; set; }
 
-        public ComponentTestsFixture()
+        public FunctionalTestsFixture()
         {
             BackgroundWorkerFixture ??= new BackgroundWorkerFixture();
             SqlFixture ??= new SqlFixture();
@@ -17,8 +17,8 @@ namespace TaleCode.ComponentTests.TestsConfiguration
         }
     }
 
-    [CollectionDefinition(nameof(TaleCodeComponentTests))]
-    public class TaleCodeComponentTests : ICollectionFixture<ComponentTestsFixture>
+    [CollectionDefinition(nameof(TaleCodeFunctionalTestsCollection))]
+    public class TaleCodeFunctionalTestsCollection : ICollectionFixture<FunctionalTestsFixture>
     {
     }
 
