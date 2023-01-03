@@ -1,7 +1,9 @@
-﻿namespace SolTechnology.Core.CQRS
+﻿using SolTechnology.Core.CQRS.ResultPattern;
+
+namespace SolTechnology.Core.CQRS
 {
     public interface IQueryHandler<in TQuery, TResult>
     {
-        public Task<TResult> Handle(TQuery query);
+        public Task<Result<TResult>> Handle(TQuery query);
     }
 }

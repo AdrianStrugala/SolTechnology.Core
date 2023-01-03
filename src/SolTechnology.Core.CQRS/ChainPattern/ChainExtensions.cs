@@ -1,4 +1,6 @@
-﻿namespace SolTechnology.Core.CQRS
+﻿using SolTechnology.Core.CQRS.ResultPattern;
+
+namespace SolTechnology.Core.CQRS.ChainPattern
 {
     public static class ChainExtensions
     {
@@ -22,7 +24,7 @@
             Func<TIn, TOut> func)
         {
             var chain = await asyncChain;
-            return Then(chain, func);
+            return chain.Then(func);
         }
 
         public static async Task<Chain<Task>> Then<TIn>(
@@ -30,7 +32,7 @@
             Func<TIn, Task> func)
         {
             var chain = await asyncChain;
-            return Then(chain, func);
+            return chain.Then(func);
         }
 
         public static async Task<Chain<TOut>> Then<TIn, TOut>(
@@ -38,7 +40,7 @@
             Func<TIn, Task<TOut>> asyncFunc)
         {
             var chain = await asyncChain;
-            return await Then(chain, asyncFunc);
+            return await chain.Then(asyncFunc);
         }
 
         public static async Task<Chain<T>> Then<T>(
@@ -46,7 +48,7 @@
                 Action<T> action)
         {
             var chain = await asyncChain;
-            return chain.Then<T>(action);
+            return chain.Then(action);
         }
 
         public static Chain<T> Then<T>(
@@ -57,29 +59,30 @@
             return chain;
         }
 
-        public static async Task EndCommand<TIn>(
-            this Task<Chain<TIn>> asyncChain)
+        public static async Task<Result<Vacuum>> EndCommand<T>(
+            this Task<Chain<T>> asyncChain)
         {
             await asyncChain;
+            return Result<Vacuum>.Success();
         }
 
-        public static Task EndCommand<TIn>(
-            this Chain<TIn> chain)
+        public static Task<Result<Vacuum>> EndCommand<T>(
+            this Chain<T> chain)
         {
-            return Task.FromResult(chain);
+            return Task.FromResult(Result<Vacuum>.Success());
         }
 
-        public static async Task<TIn> EndQuery<TIn>(
-            this Task<Chain<TIn>> asyncChain)
+        public static async Task<Result<T>> EndQuery<T>(
+            this Task<Chain<T>> asyncChain)
         {
             var chain = await asyncChain;
-            return chain.Value;
+            return Result<T>.Success(chain.Value);
         }
 
-        public static Task EndQuery<TIn>(
-            this Chain<TIn> chain)
+        public static Task<Result<T>> EndQuery<T>(
+            this Chain<T> chain)
         {
-            return Task.FromResult(chain.Value);
+            return Task.FromResult(Result<T>.Success(chain.Value));
         }
     }
 }

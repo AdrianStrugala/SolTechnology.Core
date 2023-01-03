@@ -1,4 +1,6 @@
 ﻿using SolTechnology.Core.CQRS;
+using SolTechnology.Core.CQRS.ChainPattern;
+using SolTechnology.Core.CQRS.ResultPattern;
 using SolTechnology.Core.MessageBus;
 using SolTechnology.Core.MessageBus.Publish;
 using SolTechnology.TaleCode.Domain;
@@ -29,9 +31,9 @@ namespace SolTechnology.TaleCode.PlayerRegistry.Commands.SynchronizePlayerMatche
             PublishMessage = messagePublisher.Publish;
         }
 
-        public async Task Handle(SynchronizePlayerMatchesCommand command)
+        public async Task<Result<Vacuum>> Handle(SynchronizePlayerMatchesCommand command)
         {
-            await Chain
+            return await Chain
                 .Start(() => GetPlayerId(command.PlayerId))
                 .Then(SynchronizePlayer)
                 .Then(CalculateMatchesToSync)

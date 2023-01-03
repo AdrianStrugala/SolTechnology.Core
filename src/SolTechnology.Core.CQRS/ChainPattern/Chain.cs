@@ -1,4 +1,4 @@
-﻿namespace SolTechnology.Core.CQRS
+﻿namespace SolTechnology.Core.CQRS.ChainPattern
 {
 
     public class Chain

@@ -1,4 +1,6 @@
 ﻿using SolTechnology.Core.CQRS;
+using SolTechnology.Core.CQRS.ChainPattern;
+using SolTechnology.Core.CQRS.ResultPattern;
 using SolTechnology.TaleCode.BlobData.PlayerStatisticsRepository;
 using SolTechnology.TaleCode.Domain;
 using SolTechnology.TaleCode.SqlData.Repository.MatchRepository;
@@ -27,14 +29,14 @@ namespace SolTechnology.TaleCode.PlayerRegistry.Commands.CalculatePlayerStatisti
             StoreResult = playerStatisticsRepository.Add;
         }
 
-        public async Task Handle(CalculatePlayerStatisticsCommand command)
+        public async Task<Result<Vacuum>> Handle(CalculatePlayerStatisticsCommand command)
         {
             var result = new PlayerStatistics { Id = command.PlayerId };
             PlayerIdMap playerIdMap = null;
             Player player = null;
             List<Match> matches = null;
 
-            await Chain
+            return await Chain
                 .Start(() => playerIdMap = GetPlayerId(command.PlayerId))
                 .Then(_ => player = GetPlayer(playerIdMap.FootballDataId))
                 .Then(_ => matches = GetMatches(playerIdMap.FootballDataId))

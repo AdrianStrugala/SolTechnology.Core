@@ -1,6 +1,6 @@
 ﻿using SolTechnology.Core.CQRS;
+using SolTechnology.Core.CQRS.ResultPattern;
 using SolTechnology.TaleCode.BlobData.PlayerStatisticsRepository;
-using SolTechnology.TaleCode.Infrastructure;
 
 namespace SolTechnology.TaleCode.PlayerRegistry.Queries.GetPlayerStatistics
 {
@@ -13,7 +13,7 @@ namespace SolTechnology.TaleCode.PlayerRegistry.Queries.GetPlayerStatistics
             _playerStatisticsRepository = playerStatisticsRepository;
         }
 
-        public async Task<GetPlayerStatisticsResult> Handle(GetPlayerStatisticsQuery query)
+        public async Task<Result<GetPlayerStatisticsResult>> Handle(GetPlayerStatisticsQuery query)
         {
             var data = await _playerStatisticsRepository.Get(query.PlayerId);
 
@@ -32,7 +32,7 @@ namespace SolTechnology.TaleCode.PlayerRegistry.Queries.GetPlayerStatistics
                 }).ToList()
             };
 
-            return result;
+            return Result<GetPlayerStatisticsResult>.Success(result);
         }
     }
 }

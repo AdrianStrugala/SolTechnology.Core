@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 using SolTechnology.Core.CQRS;
+using SolTechnology.Core.CQRS.ResultPattern;
 using SolTechnology.Core.Logging;
 
 namespace SolTechnology.TaleCode.Infrastructure
@@ -21,7 +22,7 @@ namespace SolTechnology.TaleCode.Infrastructure
             _logger = logger;
         }
 
-        public async Task Handle(TCommand command)
+        public async Task<Result<Vacuum>> Handle(TCommand command)
         {
             using (_logger.BeginOperationScope(new KeyValuePair<string, object>(command.LogScope.OperationIdName, command.LogScope.OperationId)))
             {
@@ -31,6 +32,7 @@ namespace SolTechnology.TaleCode.Infrastructure
                 {
                     await _handler.Handle(command);
                     _logger.OperationSucceeded(command.LogScope.OperationName);
+                    return Result<Vacuum>.Success();
                 }
                 catch (Exception e)
                 {
