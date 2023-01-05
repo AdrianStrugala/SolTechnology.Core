@@ -7,8 +7,6 @@ trigger:
       - master
 
 variables:
- - group: talecode
-
  - name: BuildConfiguration
    value: 'Release'
  - name: azureServiceConnection
@@ -23,6 +21,8 @@ variables:
 stages:
   - stage: Test
     displayName: Test
+    variables:
+       - group: talecode-test
     jobs:
 
     - job: RunTests
@@ -95,6 +95,8 @@ stages:
 
     - job: PublishArtifacts
       displayName: 'Publish Artifacts'
+      variables:
+       - group: talecode-prod
       steps:
         - task: UseDotNet@2
           displayName: 'Set .NET Core to 6.0'
