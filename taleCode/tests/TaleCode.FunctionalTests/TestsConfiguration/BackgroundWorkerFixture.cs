@@ -27,6 +27,7 @@ namespace TaleCode.FunctionalTests.TestsConfiguration
                         }));
 
             TestServer = webAppFactory.Server;
+            TestServer.PreserveExecutionContext = true;
 
             ServerClient = TestServer.CreateClient();
         }

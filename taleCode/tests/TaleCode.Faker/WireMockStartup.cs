@@ -7,7 +7,7 @@ namespace TaleCode.Faker
 {
     public class WireMockStartup
     {
-        private WireMockServer _wireMockServer = null!;
+        public WireMockServer WireMockServer = null!;
         private readonly List<IFakeApi> _fakeServices = new();
 
         public void Run(int port = 0, bool runAsServer = false)
@@ -15,13 +15,13 @@ namespace TaleCode.Faker
             var settings = new WireMockServerSettings
             {
                 AllowPartialMapping = true,
-                StartAdminInterface = runAsServer,
+                StartAdminInterface = true,
                 ReadStaticMappings = false,
                 Port = port
             };
 
-            _wireMockServer = StartServer(runAsServer, settings);
-            RegisterFakeServices(_wireMockServer);
+            WireMockServer = StartServer(runAsServer, settings);
+            RegisterFakeServices(WireMockServer);
         }
 
         private static WireMockServer StartServer(bool runAsServer, WireMockServerSettings settings)

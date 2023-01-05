@@ -22,5 +22,12 @@ public class SynchronizePlayerMatchesController : BaseController
     [ProducesResponseType((int)HttpStatusCode.OK)]
     [ProducesResponseType((int)HttpStatusCode.BadRequest)]
     public async void SynchronizePlayerMatches(int playerId) =>
-        await Invoke(_handler.Handle(new SynchronizePlayerMatchesCommand(playerId)));
+         await Invoke(_handler.Handle(new SynchronizePlayerMatchesCommand(playerId)));
+
+    [HttpGet]
+    [Route("api/failingTest/{playerId}")]
+    [ProducesResponseType((int)HttpStatusCode.OK)]
+    [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+    public async void FailingTest(int playerId) =>
+        await _handler.Handle(new SynchronizePlayerMatchesCommand(playerId));
 }
