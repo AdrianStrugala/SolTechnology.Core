@@ -71,6 +71,15 @@ stages:
           custom: 'msbuild'
           arguments: '-p:Configuration=$(BuildConfiguration)'
           publishTestResults: true
+         
+      - task: DotNetCoreCLI@2
+        displayName: 'Run functional tests'
+        inputs:
+          command: 'test'
+          projects: 'taleCode/**/*FunctionalTests.csproj'
+          custom: 'msbuild'
+          arguments: '-p:Configuration=$(BuildConfiguration)'
+          publishTestResults: true
 
 
   - stage: BuildAndPublish
