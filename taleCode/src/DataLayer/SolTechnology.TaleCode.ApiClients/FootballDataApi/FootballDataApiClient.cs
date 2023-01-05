@@ -13,16 +13,7 @@ namespace SolTechnology.TaleCode.ApiClients.FootballDataApi
 
         public async Task<FootballDataPlayer> GetPlayerById(int id)
         {
-            PlayerModel apiResult;
-            try
-            {
-                apiResult = await _httpClient.GetAsync<PlayerModel>($"v2/players/{id}/matches?limit=999");
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e);
-                throw;
-            }
+            var apiResult = await _httpClient.GetAsync<PlayerModel>($"v2/players/{id}/matches?limit=999");
 
             var result = new FootballDataPlayer
             {

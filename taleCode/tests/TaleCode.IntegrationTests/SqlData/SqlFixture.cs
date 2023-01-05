@@ -18,7 +18,7 @@ namespace TaleCode.IntegrationTests.SqlData
             var config = Options.Create(new SqlConfiguration
             {
                 ConnectionString =
-                    "Server=.;Database=TaleCodeDatabase;Trusted_Connection=True;Encrypt=False;"
+                    "Data Source=localhost,1401;Database=TaleCodeDatabase; User ID=SA;Password=password_xxddd_2137;Persist Security Info=True;MultipleActiveResultSets=True;Trusted_Connection=False;Connect Timeout=60;Encrypt=False;TrustServerCertificate=True"
             });
 
             _connectionString = config.Value.ConnectionString;
