@@ -73,9 +73,9 @@ stages:
           publishTestResults: true
         
       - task: FileTransform@1
-        displayName: 'Apply test appsettings.json'
+        displayName: 'Apply test variables to appsettings.json'
         inputs:
-          folderPath: 'talecode/tests/TaleCode.FunctionalTests'
+          folderPath: 'taleCode/tests/TaleCode.FunctionalTests'
           targetFiles: '**/appsettings.functional.tests.json'
           fileType: json
 
