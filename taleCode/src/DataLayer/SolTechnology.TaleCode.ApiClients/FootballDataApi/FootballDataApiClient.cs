@@ -5,15 +5,30 @@ namespace SolTechnology.TaleCode.ApiClients.FootballDataApi
     public class FootballDataApiClient : IFootballDataApiClient
     {
         private readonly HttpClient _httpClient;
+        private readonly IFootballDataRefitClient _client;
 
-        public FootballDataApiClient(HttpClient httpClient)
+        public FootballDataApiClient(HttpClient httpClient, IFootballDataRefitClient client)
         {
             _httpClient = httpClient;
+            _client = client;
         }
 
         public async Task<FootballDataPlayer> GetPlayerById(int id)
         {
-            var apiResult = await _httpClient.GetAsync<PlayerModel>($"v2/players/{id}/matches?limit=999");
+
+            PlayerModel apiResult;
+            try
+            {
+                // apiResult = await _httpClient.GetAsync<PlayerModel>($"v2/players/{id}/matches?limit=999");
+                apiResult = _client.GetPlayerById(id).GetAwaiter().GetResult();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                throw;
+            }
+           
+      
 
             var result = new FootballDataPlayer
             {

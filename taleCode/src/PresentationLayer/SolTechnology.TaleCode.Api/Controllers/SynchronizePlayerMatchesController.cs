@@ -1,4 +1,5 @@
 using System.Net;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SolTechnology.Core.Api;
 using SolTechnology.Core.CQRS;
@@ -18,6 +19,7 @@ public class SynchronizePlayerMatchesController : BaseController
     }
 
     [HttpGet]
+    [AllowAnonymous]
     [Route("api/SynchronizePlayerMatches/{playerId}")]
     [ProducesResponseType((int)HttpStatusCode.OK)]
     [ProducesResponseType((int)HttpStatusCode.BadRequest)]

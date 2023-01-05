@@ -2,6 +2,7 @@ using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
 using SolTechnology.Core.ApiClient;
 using SolTechnology.Core.Authentication;
+using SolTechnology.TaleCode.PlayerRegistry.Commands;
 using SolTechnology.TaleCode.PlayerRegistry.Queries;
 using Swashbuckle.AspNetCore.Filters;
 
@@ -20,6 +21,7 @@ builder.Services.AddApplicationInsightsTelemetry();
 
 
 builder.Services.InstallQueries();
+builder.Services.InstallCommands();
 
 
 var authenticationFiler = builder.Services.AddAuthenticationAndBuildFilter();
@@ -71,8 +73,8 @@ app.UseAuthorization();
 app.UseAuthentication();
 
 app.MapControllers();
-if (app.Environment.IsDevelopment())
-{
-    app.Run("http://localhost:2137");
-}
+// if (app.Environment.IsDevelopment())
+// {
+//     app.Run("http://localhost:7321");
+// }
 app.Run();

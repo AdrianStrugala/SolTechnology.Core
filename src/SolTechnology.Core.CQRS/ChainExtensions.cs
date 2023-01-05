@@ -13,7 +13,7 @@
             this Chain<TIn> chain,
             Func<TIn, Task<TOut>> asyncFunc)
         {
-            var result = await asyncFunc(chain.Value).ConfigureAwait(true);
+            var result = await asyncFunc(chain.Value);
             return new Chain<TOut>(result);
         }
 

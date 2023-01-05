@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using Refit;
 using SolTechnology.Core.ApiClient;
 using SolTechnology.TaleCode.ApiClients.ApiFootballApi;
 using SolTechnology.TaleCode.ApiClients.FootballDataApi;
@@ -11,6 +12,11 @@ namespace SolTechnology.TaleCode.ApiClients
         {
             services.AddApiClient<IFootballDataApiClient, FootballDataApiClient>("football-data");  //has to match the name from configuration
             services.AddApiClient<IApiFootballApiClient, ApiFootballApiClient>("api-football");  //has to match the name from configuration
+
+
+            services
+                .AddRefitClient<IFootballDataRefitClient>()
+                .ConfigureHttpClient(c => c.BaseAddress = new Uri("http://localhost:2137/football-data"));
 
             return services;
         }
