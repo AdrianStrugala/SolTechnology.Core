@@ -38,6 +38,11 @@ namespace SolTechnology.TaleCode.BackgroundWorker
 
         public void Configure(IApplicationBuilder app)
         {
+            app.Use(async (context, next) =>
+            {
+                context.Request.EnableBuffering();
+                await next();
+            });
             app.UseSerilogRequestLogging(options =>
             {
                 options.EnrichDiagnosticContext = LogEnrichmentHelper.EnrichLogs;

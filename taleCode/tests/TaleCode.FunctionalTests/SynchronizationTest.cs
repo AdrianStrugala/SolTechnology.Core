@@ -5,6 +5,7 @@ using FluentAssertions;
 using Microsoft.AspNetCore.TestHost;
 using SolTechnology.TaleCode.ApiClients.FootballDataApi;
 using SolTechnology.TaleCode.ApiClients.FootballDataApi.Models;
+using SolTechnology.TaleCode.BackgroundWorker.InternalApi;
 using TaleCode.FunctionalTests.TestsConfiguration;
 using TaleCode.IntegrationTests.SqlData;
 using Xunit;
@@ -27,20 +28,18 @@ namespace TaleCode.FunctionalTests
             _wireMockFixture = functionalTestsFixture.WireMockFixture;
         }
 
-        [Fact]
-        public async Task After_Synchronization_Data_Can_Be_Accessed_By_Api()
+        [Theory, AutoFixtureData]
+        [EndpointReference(nameof(SynchronizePlayerMatchesController), nameof(SynchronizePlayerMatchesController.SynchronizePlayerMatches))]
+        public async Task After_Synchronization_Data_Can_Be_Accessed_By_Api(PlayerModel footballDataResponse)
         {
-            PlayerModel footballDataResponse = new PlayerModel();
-
             //Arrange
             _wireMockFixture.Fake<IFootballDataApiClient>()
                 .WithRequest(x => x.GetPlayerById, 1)
                 .WithResponse(x => x.WithSuccess().WithBodyAsJson(footballDataResponse));
 
-
             //Act
             var synchronizationResponse = await _backgroundWorker
-                .CreateRequest("api/failingTest/44")
+                .CreateRequest("api/SynchronizePlayerMatches/44")
                 .GetAsync();
 
             synchronizationResponse.StatusCode.Should().Be(HttpStatusCode.InternalServerError);

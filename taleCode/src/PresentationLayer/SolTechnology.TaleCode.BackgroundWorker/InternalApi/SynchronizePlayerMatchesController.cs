@@ -2,7 +2,6 @@ using System.Net;
 using Microsoft.AspNetCore.Mvc;
 using SolTechnology.Core.Api;
 using SolTechnology.Core.CQRS;
-using SolTechnology.TaleCode.Infrastructure;
 using SolTechnology.TaleCode.PlayerRegistry.Commands.SynchronizePlayerMatches;
 
 namespace SolTechnology.TaleCode.BackgroundWorker.InternalApi;
@@ -21,13 +20,6 @@ public class SynchronizePlayerMatchesController : BaseController
     [Route("api/SynchronizePlayerMatches/{playerId}")]
     [ProducesResponseType((int)HttpStatusCode.OK)]
     [ProducesResponseType((int)HttpStatusCode.BadRequest)]
-    public async void SynchronizePlayerMatches(int playerId) =>
+    public async Task<IActionResult> SynchronizePlayerMatches(int playerId) =>
          await Invoke(_handler.Handle(new SynchronizePlayerMatchesCommand(playerId)));
-
-    [HttpGet]
-    [Route("api/failingTest/{playerId}")]
-    [ProducesResponseType((int)HttpStatusCode.OK)]
-    [ProducesResponseType((int)HttpStatusCode.BadRequest)]
-    public async void FailingTest(int playerId) =>
-        await _handler.Handle(new SynchronizePlayerMatchesCommand(playerId));
 }
