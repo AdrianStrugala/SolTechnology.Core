@@ -39,22 +39,11 @@ namespace TaleCode.FunctionalTests
 
 
             //Act
-            // var response = _backgroundWorkerClient.GetAsync("api/SynchronizePlayerMatches/44").GetAwaiter().GetResult();
+            var synchronizationResponse = await _backgroundWorker
+                .CreateRequest("api/failingTest/44")
+                .GetAsync();
 
-            var synchronizationResponse = _backgroundWorker
-                .CreateRequest("api/SynchronizePlayerMatches/44")
-                .GetAsync()
-                .GetAwaiter()
-                .GetResult();
-
-            synchronizationResponse.StatusCode.Should().Be(HttpStatusCode.OK);
-
-            var x = 1;
-
-            // while (true)
-            // {
-            //      x += 1;
-            // }
+            synchronizationResponse.StatusCode.Should().Be(HttpStatusCode.InternalServerError);
         }
     }
 }

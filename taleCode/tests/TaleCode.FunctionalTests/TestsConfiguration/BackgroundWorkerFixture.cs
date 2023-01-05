@@ -1,10 +1,10 @@
 ﻿using System;
 using System.IO;
 using System.Net.Http;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.Configuration;
+using SolTechnology.TaleCode.BackgroundWorker;
 
 namespace TaleCode.FunctionalTests.TestsConfiguration
 {
@@ -25,21 +25,6 @@ namespace TaleCode.FunctionalTests.TestsConfiguration
                         {
                             // set up custom services
                         }));
-
-            // var webHostBuilder = new WebHostBuilder()
-            //     .UseStartup<Startup>()
-            //     .ConfigureAppConfiguration((_, config) => config.AddJsonFile(Path.Combine(Directory.GetCurrentDirectory(), "appsettings.json")))
-            //     .ConfigureAppConfiguration((_, config) => config.AddJsonFile(Path.Combine(Directory.GetCurrentDirectory(), "appsettings.functional.tests.json")))
-            //     .ConfigureServices(_ =>
-            //     {
-            //         // set up custom services
-            //     });
-            //
-            // TestServer = new TestServer(webHostBuilder)
-            // {
-            //     PreserveExecutionContext = true
-            // };
-            // ServerClient = TestServer.CreateClient();
 
             TestServer = webAppFactory.Server;
             TestServer.PreserveExecutionContext = true;

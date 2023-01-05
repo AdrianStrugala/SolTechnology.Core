@@ -6,12 +6,7 @@
 	  <RootNamespace>SolTechnology.TaleCode.ApiClients</RootNamespace>
   </PropertyGroup>
 
-  <ItemGroup>
-    <PackageReference Include="Refit" Version="6.3.2" />
-    <PackageReference Include="Refit.HttpClientFactory" Version="6.3.2" />
-  </ItemGroup>
-
-  <ItemGroup>
+	<ItemGroup>
     <ProjectReference Include="..\..\..\..\src\SolTechnology.Core.ApiClient\SolTechnology.Core.ApiClient.csproj" />
     <ProjectReference Include="..\SolTechnology.TaleCode.StaticData\SolTechnology.TaleCode.StaticData.csproj" />
   </ItemGroup>

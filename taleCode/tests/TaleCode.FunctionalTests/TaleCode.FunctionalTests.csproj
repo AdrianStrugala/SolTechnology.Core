@@ -24,7 +24,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\..\src\PresentationLayer\SolTechnology.TaleCode.Api\SolTechnology.TaleCode.Api.csproj" />
+		<ProjectReference Include="..\..\src\PresentationLayer\SolTechnology.TaleCode.BackgroundWorker\SolTechnology.TaleCode.BackgroundWorker.csproj" />
 		<ProjectReference Include="..\TaleCode.Faker\TaleCode.Faker.csproj" />
 		<ProjectReference Include="..\TaleCode.IntegrationTests\TaleCode.IntegrationTests.csproj" />
 	</ItemGroup>
@@ -33,9 +33,6 @@
 	  <None Update="appsettings.functional.tests.json">
 	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 	  </None>
-	</ItemGroup>
-	<ItemGroup>
-		<Content Include="xunit.runner.json" CopyToOutputDirectory="PreserveNewest" />
 	</ItemGroup>
 
 </Project>

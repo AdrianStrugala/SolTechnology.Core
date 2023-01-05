@@ -38,12 +38,12 @@ namespace SolTechnology.TaleCode.BackgroundWorker
 
         public void Configure(IApplicationBuilder app)
         {
-            // app.UseSerilogRequestLogging(options =>
-            // {
-            //     options.EnrichDiagnosticContext = LogEnrichmentHelper.EnrichLogs;
-            //     options.MessageTemplate =
-            //         "HTTP {RequestMethod} {RequestPath} with headers {Headers} and body {Body} responded {StatusCode} in {Elapsed:0.0000} ms";
-            // });
+            app.UseSerilogRequestLogging(options =>
+            {
+                options.EnrichDiagnosticContext = LogEnrichmentHelper.EnrichLogs;
+                options.MessageTemplate =
+                    "HTTP {RequestMethod} {RequestPath} with headers {Headers} and body {Body} responded {StatusCode} in {Elapsed:0.0000} ms";
+            });
 
             app.UseRouting();
             app.UseEndpoints(endpoints =>

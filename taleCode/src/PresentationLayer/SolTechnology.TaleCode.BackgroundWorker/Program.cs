@@ -23,14 +23,13 @@ namespace SolTechnology.TaleCode.BackgroundWorker
                                 .AddFilter<Microsoft.Extensions.Logging.ApplicationInsights.
                                         ApplicationInsightsLoggerProvider>
                                     ("", LogLevel.Information));
-                });
-        // .UseSerilog((context, services, config) =>
-        //     config
-        //         .ReadFrom.Configuration(context.Configuration)
-        //         .ReadFrom.Services(services)
-        //         .Enrich.WithTraceIdentifier()
-        //         .Enrich.FromLogContext()
-        //         .WriteTo.Console(),
-        //         writeToProviders: true);
+                }).UseSerilog((context, services, config) =>
+                config
+                    .ReadFrom.Configuration(context.Configuration)
+                    .ReadFrom.Services(services)
+                    .Enrich.WithTraceIdentifier()
+                    .Enrich.FromLogContext()
+                    .WriteTo.Console(),
+                    writeToProviders: true);
     }
 }

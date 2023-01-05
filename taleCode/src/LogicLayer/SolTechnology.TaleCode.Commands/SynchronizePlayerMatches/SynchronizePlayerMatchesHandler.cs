@@ -9,7 +9,6 @@ namespace SolTechnology.TaleCode.PlayerRegistry.Commands.SynchronizePlayerMatche
 {
     public class SynchronizePlayerMatchesHandler : ICommandHandler<SynchronizePlayerMatchesCommand>
     {
-        private readonly ISyncPlayer _syncPlayer;
         private Func<int, PlayerIdMap> GetPlayerId { get; }
         private Func<IMessage, Task> PublishMessage { get; }
         private Func<int, int, Task> SynchronizeMatch { get; }
@@ -25,7 +24,6 @@ namespace SolTechnology.TaleCode.PlayerRegistry.Commands.SynchronizePlayerMatche
         {
             GetPlayerId = playerExternalIdsProvider.Get;
             SynchronizePlayer = syncPlayer.Execute;
-            _syncPlayer = syncPlayer;
             CalculateMatchesToSync = determineMatchesToSync.Execute;
             SynchronizeMatch = syncMatch.Execute;
             PublishMessage = messagePublisher.Publish;
@@ -33,35 +31,15 @@ namespace SolTechnology.TaleCode.PlayerRegistry.Commands.SynchronizePlayerMatche
 
         public async Task Handle(SynchronizePlayerMatchesCommand command)
         {
-            try
-            {
-                var map = GetPlayerId(command.PlayerId);
-                var xd = await _syncPlayer.Execute(map);
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e);
-                throw;
-            }
-         
-
-            // try
-            // {
-            //     await Chain
-            //         .Start(() => GetPlayerId(command.PlayerId))
-            //         .Then(SynchronizePlayer)
-            //         .Then(CalculateMatchesToSync)
-            //         .Then(match => match.ForEach(id =>
-            //             SynchronizeMatch(id, command.PlayerId)))
-            //         .Then(_ => new PlayerMatchesSynchronizedEvent(command.PlayerId))
-            //         .Then(PublishMessage)
-            //         .EndCommand();
-            // }
-            // catch (Exception e)
-            // {
-            //     var x = e;
-            //     throw;
-            // }
+            await Chain
+                .Start(() => GetPlayerId(command.PlayerId))
+                .Then(SynchronizePlayer)
+                .Then(CalculateMatchesToSync)
+                .Then(match => match.ForEach(id =>
+                    SynchronizeMatch(id, command.PlayerId)))
+                .Then(_ => new PlayerMatchesSynchronizedEvent(command.PlayerId))
+                .Then(PublishMessage)
+                .EndCommand();
         }
     }
 }
