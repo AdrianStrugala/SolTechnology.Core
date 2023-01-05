@@ -71,7 +71,14 @@ stages:
           custom: 'msbuild'
           arguments: '-p:Configuration=$(BuildConfiguration)'
           publishTestResults: true
-         
+        
+      - task: FileTransform@1
+        displayName: 'Apply test appsettings.json'
+        inputs:
+          folderPath: 'talecode/tests/TaleCode.FunctionalTests'
+          targetFiles: '**/appsettings.functional.tests.json'
+          fileType: json
+
       - task: DotNetCoreCLI@2
         displayName: 'Run functional tests'
         inputs:
