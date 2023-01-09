@@ -1,8 +1,11 @@
+using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using FluentAssertions;
 using Microsoft.AspNetCore.TestHost;
+using SolTechnology.TaleCode.ApiClients.ApiFootballApi;
+using SolTechnology.TaleCode.ApiClients.ApiFootballApi.Models;
 using SolTechnology.TaleCode.ApiClients.FootballDataApi;
 using SolTechnology.TaleCode.ApiClients.FootballDataApi.Models;
 using SolTechnology.TaleCode.BackgroundWorker.InternalApi;
@@ -30,12 +33,18 @@ namespace TaleCode.FunctionalTests
 
         [Theory, AutoFixtureData]
         [EndpointReference(nameof(SynchronizePlayerMatchesController), nameof(SynchronizePlayerMatchesController.SynchronizePlayerMatches))]
-        public async Task After_Synchronization_Data_Can_Be_Accessed_By_Api(PlayerModel footballDataResponse)
+        public async Task After_Synchronization_Data_Can_Be_Accessed_By_Api(
+            PlayerModel footballDataResponse,
+            List<Transfer> transfers)
         {
             //Arrange
             _wireMockFixture.Fake<IFootballDataApiClient>()
                 .WithRequest(x => x.GetPlayerById, 1)
                 .WithResponse(x => x.WithSuccess().WithBodyAsJson(footballDataResponse));
+
+            _wireMockFixture.Fake<IApiFootballApiClient>()
+                .WithRequest(x => x.GetPlayerTeams, 1)
+                .WithResponse(x => x.WithSuccess().WithBodyAsJson(transfers));
 
             //Act
             var synchronizationResponse = await _backgroundWorker
