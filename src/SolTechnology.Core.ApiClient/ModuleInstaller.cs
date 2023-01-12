@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
 namespace SolTechnology.Core.ApiClient
@@ -9,7 +10,8 @@ namespace SolTechnology.Core.ApiClient
         public static IServiceCollection AddApiClient<TIClient, TClient>(
             this IServiceCollection services,
             string httpClientName,
-            ApiClientConfiguration apiClientConfiguration = null)
+            ApiClientConfiguration apiClientConfiguration = null,
+            HttpPolicyConfiguration httpPolicyConfiguration = null)
             where TIClient : class where TClient : class, TIClient
         {
             services
@@ -29,9 +31,40 @@ namespace SolTechnology.Core.ApiClient
                 config.Add(apiClientConfiguration);
             });
 
-            var options = services.BuildServiceProvider().GetRequiredService<IOptions<List<ApiClientConfiguration>>>().Value;
+            services
+                .AddOptions<HttpPolicyConfiguration>()
+                .Configure<IConfiguration>((config, configuration) =>
+                {
+                    if (httpPolicyConfiguration == null)
+                    {
+                        httpPolicyConfiguration = configuration.GetSection("Configuration:HttpPolicy").Get<HttpPolicyConfiguration>();
+                    }
 
-            apiClientConfiguration = options.First(h => h.Name.Equals(httpClientName, StringComparison.InvariantCultureIgnoreCase));
+                    if (httpPolicyConfiguration == null)
+                    {
+                        httpPolicyConfiguration = new HttpPolicyConfiguration();
+                    }
+
+                    config.CircuitBreakerDelayDuration = httpPolicyConfiguration.CircuitBreakerDelayDuration;
+                    config.CircuitBreakerFailureThreshold = httpPolicyConfiguration.CircuitBreakerFailureThreshold;
+                    config.CircuitBreakerMinimumThroughput = httpPolicyConfiguration.CircuitBreakerMinimumThroughput;
+                    config.CircuitBreakerSamplingDuration = httpPolicyConfiguration.CircuitBreakerSamplingDuration;
+                    config.MaxRequestRetries = httpPolicyConfiguration.MaxRequestRetries;
+                    config.RequestTimeout = httpPolicyConfiguration.RequestTimeout;
+                    config.RetryInitialDelay = httpPolicyConfiguration.RetryInitialDelay;
+                    config.RetryTimeout = httpPolicyConfiguration.RetryTimeout;
+                    config.UsePolly = httpPolicyConfiguration.UsePolly;
+                });
+
+            var serviceProvider = services.BuildServiceProvider();
+
+            var logger = serviceProvider.GetRequiredService<ILogger<HttpPolicyFactory>>();
+            var policyFactory = new HttpPolicyFactory(logger);
+
+            var apiClientConfigurations = serviceProvider.GetRequiredService<IOptions<List<ApiClientConfiguration>>>().Value;
+            apiClientConfiguration = apiClientConfigurations.First(h => h.Name.Equals(httpClientName, StringComparison.InvariantCultureIgnoreCase));
+
+            httpPolicyConfiguration = serviceProvider.GetRequiredService<IOptions<HttpPolicyConfiguration>>().Value;
 
             services.AddHttpClient<TIClient, TClient>(httpClientName,
                 httpClient =>
@@ -46,7 +79,8 @@ namespace SolTechnology.Core.ApiClient
                     {
                         httpClient.DefaultRequestHeaders.Add(header.Name, header.Value);
                     }
-                });
+                })
+                .AddPolicyHandler(policyFactory.Create(httpPolicyConfiguration));
 
 
             return services;

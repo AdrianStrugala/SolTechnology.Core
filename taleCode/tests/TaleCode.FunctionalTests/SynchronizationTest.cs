@@ -51,7 +51,7 @@ namespace TaleCode.FunctionalTests
                 .CreateRequest("api/SynchronizePlayerMatches/44")
                 .GetAsync();
 
-            synchronizationResponse.StatusCode.Should().Be(HttpStatusCode.InternalServerError);
+            synchronizationResponse.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         }
     }
 }
