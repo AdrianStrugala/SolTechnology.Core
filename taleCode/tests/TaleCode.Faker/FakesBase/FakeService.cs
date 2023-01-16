@@ -23,12 +23,12 @@ public abstract class FakeService<TApiClient> :
                               throw new InvalidOperationException($"{nameof(Configure)} should never return null");
 
     public IFakeServiceBuilderWithResponse WithRequest(Expression<Func<TApiClient, Delegate>> selector,
-        int priority = 10, Action<IRequestBuilder>? configure = null)
+        Dictionary<string, string>? parameters = null, int priority = 10, Action<IRequestBuilder>? configure = null)
     {
         var method = GetMethodInfo(selector)!.Name;
         var requestInfo = (RequestInfo)GetType().GetMethod(method)!.Invoke(this, new object[] { })!;
 
-        _provider = _buildConfiguration!.BuildRequest(requestInfo, configure).AtPriority(priority);
+        _provider = _buildConfiguration!.BuildRequest(requestInfo, parameters, configure).AtPriority(priority);
         return this;
     }
 

@@ -36,7 +36,7 @@ namespace SolTechnology.TaleCode.PlayerRegistry.Commands.SynchronizePlayerMatche
                 .Then(SynchronizePlayer)
                 .Then(CalculateMatchesToSync)
                 .Then(match => match.ForEach(id =>
-                    SynchronizeMatch(id, command.PlayerId)))
+                    SynchronizeMatch(command.PlayerId, id)))
                 .Then(_ => new PlayerMatchesSynchronizedEvent(command.PlayerId))
                 .Then(PublishMessage)
                 .EndCommand();

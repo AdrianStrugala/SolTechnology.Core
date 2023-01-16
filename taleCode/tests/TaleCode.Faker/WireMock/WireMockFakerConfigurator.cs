@@ -25,10 +25,18 @@ public class WireMockFakerConfigurator<TClient> : IWireMockFakerConfigurator<TCl
         return this;
     }
 
-    public IRespondWithAProvider BuildRequest(RequestInfo requestInfo, Action<IRequestBuilder>? configure = null)
+    public IRespondWithAProvider BuildRequest(RequestInfo requestInfo, Dictionary<string, string>? parameters, Action<IRequestBuilder>? configure = null)
     {
         var path = requestInfo.Path;
         var httpMethod = requestInfo.HttpMethod;
+
+        if (parameters != null)
+        {
+            foreach (var parameter in parameters)
+            {
+                path = path.Replace($"{{{parameter.Key}}}", parameter.Value);
+            }
+        }
 
         var request = Request
             .Create()

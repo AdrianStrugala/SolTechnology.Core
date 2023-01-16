@@ -33,25 +33,41 @@ namespace TaleCode.FunctionalTests
 
         [Theory, AutoFixtureData]
         [EndpointReference(nameof(SynchronizePlayerMatchesController), nameof(SynchronizePlayerMatchesController.SynchronizePlayerMatches))]
-        public async Task After_Synchronization_Data_Can_Be_Accessed_By_Api(
-            PlayerModel footballDataResponse,
-            List<Transfer> transfers)
+        public async Task After_Synchronization_Player_Data_Can_Be_Accessed_By_Api(
+            PlayerModel playerResponse,
+            List<Transfer> transfersResponse,
+            List<MatchModel> matchesResponse)
+
         {
             //Arrange
+            int playerId = 44;
+            playerResponse.Player.Id = playerId;
+
             _wireMockFixture.Fake<IFootballDataApiClient>()
-                .WithRequest(x => x.GetPlayerById, 1)
-                .WithResponse(x => x.WithSuccess().WithBodyAsJson(footballDataResponse));
+                .WithRequest(x => x.GetPlayerById, priority: 1)
+                .WithResponse(x => x.WithSuccess().WithBodyAsJson(playerResponse));
+
+            for (int i = 0; i < playerResponse.Matches.Count; i++)
+            {
+                matchesResponse[i].Match = playerResponse.Matches[i];
+
+                _wireMockFixture.Fake<IFootballDataApiClient>()
+                    .WithRequest(x => x.GetMatchById, new Dictionary<string, string> { { "matchId", matchesResponse[i].Match.Id.ToString() } })
+                    .WithResponse(x => x.WithSuccess().WithBodyAsJson(matchesResponse[i]));
+            }
+
 
             _wireMockFixture.Fake<IApiFootballApiClient>()
-                .WithRequest(x => x.GetPlayerTeams, 1)
-                .WithResponse(x => x.WithSuccess().WithBodyAsJson(transfers));
+                .WithRequest(x => x.GetPlayerTeams, priority: 2)
+                .WithResponse(x => x.WithSuccess().WithBodyAsJson(transfersResponse));
+
 
             //Act
             var synchronizationResponse = await _backgroundWorker
-                .CreateRequest("api/SynchronizePlayerMatches/44")
+                .CreateRequest($"api/SynchronizePlayerMatches/{playerId}")
                 .GetAsync();
 
-            synchronizationResponse.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+            synchronizationResponse.StatusCode.Should().Be(HttpStatusCode.OK);
         }
     }
 }

@@ -8,5 +8,5 @@ public interface IWireMockFakerConfigurator<TClient> where TClient : class
 {
     IWireMockFakerConfigurator<TClient> WithBaseUrl(string url);
 
-    public IRespondWithAProvider BuildRequest(RequestInfo requestInfo, Action<IRequestBuilder>? configure = null);
+    public IRespondWithAProvider BuildRequest(RequestInfo requestInfo, Dictionary<string, string>? parameters, Action<IRequestBuilder>? configure = null);
 }
