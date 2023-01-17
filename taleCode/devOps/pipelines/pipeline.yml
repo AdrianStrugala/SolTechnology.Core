@@ -95,8 +95,7 @@ stages:
 
     - job: PublishArtifacts
       displayName: 'Publish Artifacts'
-      variables:
-       - group: talecode-prod
+      
       steps:
         - task: UseDotNet@2
           displayName: 'Set .NET Core to 6.0'
@@ -134,21 +133,6 @@ stages:
             publishWebProjects: False
             arguments: '--configuration Release --output $(Build.ArtifactStagingDirectory)/BackgroundWorker'
 
-        - task: FileTransform@1
-          displayName: 'Apply Production App settings for Api'
-          inputs:
-            folderPath: '$(Build.ArtifactStagingDirectory)/**/*Api.zip'
-            fileType: 'json'
-            targetFiles: '**/appsettings.json'
-
-
-        - task: FileTransform@1
-          displayName: 'Apply Production App settings for BackgroundWorker'
-          inputs:
-            folderPath: '$(Build.ArtifactStagingDirectory)/**/*BackgroundWorker.zip'
-            fileType: 'json'
-            targetFiles: '**/appsettings.json'
-
         - task: PublishBuildArtifacts@1
           inputs:
             pathToPublish: '$(Build.ArtifactStagingDirectory)' 
@@ -158,7 +142,8 @@ stages:
 
   - stage: Deploy
     displayName: Deploy
-
+    variables:
+      - group: talecode-prod
     jobs: 
 
     - job: DeployProd
@@ -190,6 +175,21 @@ stages:
             SqlUsername: $(sqlAdminUserName)
             SqlPassword: $(sqlAdminPassword)
             DacpacFile: '$(Pipeline.Workspace)\drop\Database\TaleCodeDatabase.dacpac'
+
+        - task: FileTransform@1
+          displayName: 'Apply Production App settings for Api'
+          inputs:
+            folderPath: '$(Pipeline.Workspace)\drop\Api\SolTechnology.TaleCode.Api.zip'
+            fileType: 'json'
+            targetFiles: '**/appsettings.json'
+
+
+        - task: FileTransform@1
+          displayName: 'Apply Production App settings for BackgroundWorker'
+          inputs:
+            folderPath: '$(Pipeline.Workspace)\drop\BackgroundWorker\SolTechnology.TaleCode.BackgroundWorker.zip'
+            fileType: 'json'
+            targetFiles: '**/appsettings.json'
 
         - task: AzureWebApp@1
           displayName: 'Deploy Api'
