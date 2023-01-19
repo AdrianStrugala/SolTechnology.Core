@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Mvc;
 using SolTechnology.Core.Api;
 using SolTechnology.Core.CQRS;
 using SolTechnology.TaleCode.Api.Examples;
-using SolTechnology.TaleCode.Infrastructure;
 using SolTechnology.TaleCode.PlayerRegistry.Queries.GetPlayerStatistics;
 using Swashbuckle.AspNetCore.Filters;
 

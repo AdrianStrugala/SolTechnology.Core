@@ -56,7 +56,6 @@ namespace TaleCode.FunctionalTests
                     .WithResponse(x => x.WithSuccess().WithBodyAsJson(matchesResponse[i]));
             }
 
-
             _wireMockFixture.Fake<IApiFootballApiClient>()
                 .WithRequest(x => x.GetPlayerTeams, priority: 2)
                 .WithResponse(x => x.WithSuccess().WithBodyAsJson(transfersResponse));
