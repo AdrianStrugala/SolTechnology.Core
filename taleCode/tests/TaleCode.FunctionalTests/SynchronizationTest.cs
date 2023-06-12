@@ -66,6 +66,8 @@ namespace TaleCode.FunctionalTests
                 .CreateRequest($"api/SynchronizePlayerMatches/{playerId}")
                 .GetAsync();
 
+            await Task.Delay(60000);
+
             synchronizationResponse.StatusCode.Should().Be(HttpStatusCode.OK);
         }
     }

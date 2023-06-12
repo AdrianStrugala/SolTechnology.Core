@@ -7,7 +7,7 @@ namespace SolTechnology.Core.MessageBus.Configuration
     public class MessageBusConfigurationProvider : IMessageBusConfigurationProvider, IDisposable
     {
         private readonly ServiceBusClient _serviceBusClient;
-        private readonly ManagementClient _managementClient;
+        // private readonly ManagementClient _managementClient;
 
         private static readonly List<(string, ServiceBusSender)> MessageToSenderMap = new();
         private static readonly List<(string, ServiceBusProcessor)> MessageToProcessorMap = new();
@@ -18,8 +18,13 @@ namespace SolTechnology.Core.MessageBus.Configuration
         {
             var connectionString = options.Value.ConnectionString;
 
-            _serviceBusClient = new ServiceBusClient(connectionString);
-            _managementClient = new ManagementClient(connectionString);
+            var clientOptions = new ServiceBusClientOptions
+            {
+                TransportType = ServiceBusTransportType.AmqpTcp
+            };
+
+            _serviceBusClient = new ServiceBusClient(connectionString, clientOptions);
+            // _managementClient = new ManagementClient(connectionString);
 
         }
 
@@ -29,10 +34,10 @@ namespace SolTechnology.Core.MessageBus.Configuration
             var topicSender = _serviceBusClient.CreateSender(topicName);
             MessageToSenderMap.Add((messageType, topicSender));
 
-            if (!_managementClient.TopicExistsAsync(topicName).GetAwaiter().GetResult())
-            {
-                _managementClient.CreateTopicAsync(topicName).GetAwaiter().GetResult();
-            }
+            // if (!_managementClient.TopicExistsAsync(topicName).GetAwaiter().GetResult())
+            // {
+            //     _managementClient.CreateTopicAsync(topicName).GetAwaiter().GetResult();
+            // }
         }
 
         public List<ServiceBusSender> ResolveMessagePublisher(string messageType)
@@ -61,10 +66,10 @@ namespace SolTechnology.Core.MessageBus.Configuration
             ServiceBusProcessor serviceBusProcessor = _serviceBusClient.CreateProcessor(topicName, subscriptionName, serviceBusProcessorOptions);
             MessageToProcessorMap.Add((messageType, serviceBusProcessor));
 
-            if (!_managementClient.SubscriptionExistsAsync(topicName, subscriptionName).GetAwaiter().GetResult())
-            {
-                _managementClient.CreateSubscriptionAsync(topicName, subscriptionName).GetAwaiter().GetResult();
-            }
+            // if (!_managementClient.SubscriptionExistsAsync(topicName, subscriptionName).GetAwaiter().GetResult())
+            // {
+            //     _managementClient.CreateSubscriptionAsync(topicName, subscriptionName).GetAwaiter().GetResult();
+            // }
         }
 
         public List<ServiceBusProcessor> ResolveMessageReceiver(string messageType)
@@ -86,10 +91,10 @@ namespace SolTechnology.Core.MessageBus.Configuration
             var queueSender = _serviceBusClient.CreateSender(queueName);
             MessageToSenderMap.Add((messageType, queueSender));
 
-            if (!_managementClient.QueueExistsAsync(queueName).GetAwaiter().GetResult())
-            {
-                _managementClient.CreateQueueAsync(queueName).GetAwaiter().GetResult();
-            }
+            // if (!_managementClient.QueueExistsAsync(queueName).GetAwaiter().GetResult())
+            // {
+            //     _managementClient.CreateQueueAsync(queueName).GetAwaiter().GetResult();
+            // }
         }
 
         public void RegisterQueueReceiver(string messageType, string queueName)
@@ -112,7 +117,7 @@ namespace SolTechnology.Core.MessageBus.Configuration
 
         public void Dispose()
         {
-           _serviceBusClient.DisposeAsync().GetAwaiter().GetResult();
+            _serviceBusClient.DisposeAsync().GetAwaiter().GetResult();
         }
     }
 }

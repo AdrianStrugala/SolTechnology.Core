@@ -25,4 +25,9 @@
 	  <ProjectReference Include="..\..\src\DataLayer\SolTechnology.TaleCode.Sql\SolTechnology.TaleCode.Sql.csproj" />
 	</ItemGroup>
 
+	<ItemGroup>
+		<Content Include="..\TaleCode.FunctionalTests\appsettings.functional.tests.json" Link="appsettings.functional.tests.json">
+		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</Content>
+	</ItemGroup>
 </Project>

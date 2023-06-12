@@ -1,4 +1,6 @@
-﻿using System.Threading.Tasks;
+﻿using System.IO;
+using System.Text.Json;
+using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
 using SolTechnology.Core.Sql;
 using SolTechnology.Core.Sql.Connection;
@@ -15,13 +17,18 @@ namespace TaleCode.IntegrationTests.SqlData
 
         public async Task InitializeAsync()
         {
+            var settingsFile = File.ReadAllText("appsettings.functional.tests.json");
+            _connectionString = JsonDocument.Parse(settingsFile)
+                .RootElement
+                .GetProperty("Configuration")
+                .GetProperty("Sql")
+                .GetProperty("ConnectionString")
+                .GetString()!;
+
             var config = Options.Create(new SqlConfiguration
             {
-                ConnectionString =
-                    "Data Source=localhost,1401;Database=TaleCodeDatabase; User ID=SA;Password=password_xxddd_2137;Persist Security Info=True;MultipleActiveResultSets=True;Trusted_Connection=False;Connect Timeout=60;Encrypt=False;TrustServerCertificate=True"
+                ConnectionString = _connectionString
             });
-
-            _connectionString = config.Value.ConnectionString;
 
             SqlConnectionFactory = new SqlConnectionFactory(config);
 

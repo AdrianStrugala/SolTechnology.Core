@@ -120,8 +120,8 @@ namespace SolTechnology.Core.MessageBus
                 .GetRequiredService<IMessageBusConfigurationProvider>();
 
             services.AddHostedService<MessageBusReceiver<TMessage>>();
-            services.AddScoped<THandler>();
-            services.AddScoped(typeof(MessageBusReceiver<TMessage>), (serviceProvider) => serviceProvider.GetRequiredService<THandler>());
+            services.AddScoped<IMessageHandler<TMessage>,THandler>();
+            // services.AddScoped(typeof(MessageBusReceiver<TMessage>), (serviceProvider) => serviceProvider.GetRequiredService<THandler>());
 
 
 
