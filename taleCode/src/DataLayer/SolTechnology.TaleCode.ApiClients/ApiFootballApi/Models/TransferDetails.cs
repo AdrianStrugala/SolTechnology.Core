@@ -9,6 +9,4 @@
         public Paging Paging { get; set; }
         public List<Response> Response { get; set; }
     }
-
-
 }

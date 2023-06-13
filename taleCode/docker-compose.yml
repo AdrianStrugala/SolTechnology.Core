@@ -9,15 +9,18 @@ services:
         ports:  
           - "1433:1433"
           
-    azure-storage:
-        container_name: azure-storage
+    azurite:
+        container_name: azurite
         image: mcr.microsoft.com/azure-storage/azurite
         hostname: azurite
         restart: always
-        command: "azurite --loose --blobHost 0.0.0.0 --blobPort 10000 --queueHost 0.0.0.0 --queuePort 10001"
+        command: "azurite --loose --blobHost 0.0.0.0 --blobPort 10000 --queueHost 0.0.0.0 --queuePort 10001 --location /workspace --debug /workspace/debug.log"
         ports:
-          - "10000:10000"
-          - "10001:10001"
+          - 10000:10000
+          - 10001:10001
+          - 10002:10002
+        volumes:
+          - ./azurite:/workspace
           
     rabbit:
         container_name: rabbitmq

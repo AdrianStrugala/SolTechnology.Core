@@ -41,7 +41,7 @@ public class WireMockFakerConfigurator<TClient> : IWireMockFakerConfigurator<TCl
         var request = Request
             .Create()
             .UsingMethod(httpMethod.Method)
-            .WithPath(new WildcardMatcher($"/{_baseUrl}/{_parameterRegex.Replace(path, "*").Trim('/')}"));
+            .WithPath(new SimMetricsMatcher($"/{_baseUrl}/{_parameterRegex.Replace(path, "*").Trim('/')}"));
         configure?.Invoke(request);
         return _server.Given(request);
     }

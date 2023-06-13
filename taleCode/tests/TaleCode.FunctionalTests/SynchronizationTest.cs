@@ -35,7 +35,7 @@ namespace TaleCode.FunctionalTests
         [EndpointReference(nameof(SynchronizePlayerMatchesController), nameof(SynchronizePlayerMatchesController.SynchronizePlayerMatches))]
         public async Task After_Synchronization_Player_Data_Can_Be_Accessed_By_Api(
             PlayerModel playerResponse,
-            List<Transfer> transfersResponse,
+            TransferDetails transfersResponse,
             List<MatchModel> matchesResponse)
 
         {
@@ -44,7 +44,7 @@ namespace TaleCode.FunctionalTests
             playerResponse.Player.Id = playerId;
 
             _wireMockFixture.Fake<IFootballDataApiClient>()
-                .WithRequest(x => x.GetPlayerById, priority: 1)
+                .WithRequest(x => x.GetPlayerById, new Dictionary<string, string> { { "id", playerId.ToString() } }, priority: 1)
                 .WithResponse(x => x.WithSuccess().WithBodyAsJson(playerResponse));
 
             for (int i = 0; i < playerResponse.Matches.Count; i++)
