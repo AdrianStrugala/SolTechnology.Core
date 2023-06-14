@@ -5,7 +5,7 @@ wireMock.Run(2137, true);
 
 wireMock
     .GetFakeApi<IFootballDataApiClient>()
-    .WithRequest(x => x.GetPlayerById, new Dictionary<string, string> { { "id", "44" } }, priority: 1)
+    .WithRequest(x => x.GetPlayerById, new Dictionary<string, string> { { "id", "44" } })
     .WithResponse(x => x.WithSuccess().WithBody("Just test body"));
 
 wireMock

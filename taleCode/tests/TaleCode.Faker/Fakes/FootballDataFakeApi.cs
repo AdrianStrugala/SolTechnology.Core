@@ -9,13 +9,16 @@ namespace TaleCode.Faker.Fakes
     {
         protected override IWireMockFakerConfigurator<IFootballDataApiClient> Configure(WireMockServer mockServer) =>
             mockServer
-                .CreateFor<IFootballDataApiClient>()  //not sure if needed
+                .CreateFor<IFootballDataApiClient>()
                 .WithBaseUrl("football-data");
 
 
         public RequestInfo GetPlayerById()
         {
-            return new RequestInfo(HttpMethod.Get, "v2/players/{id}/matches?limit=999");
+            return new RequestInfo(
+                HttpMethod.Get,
+                "v2/players/{id}/matches",
+                new Dictionary<string, string> { { "limit", "999" } });
         }
 
         public RequestInfo GetMatchById()

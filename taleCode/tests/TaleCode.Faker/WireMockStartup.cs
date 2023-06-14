@@ -1,4 +1,5 @@
 ﻿using TaleCode.Faker.FakesBase;
+using WireMock.Logging;
 using WireMock.Net.StandAlone;
 using WireMock.Server;
 using WireMock.Settings;
@@ -14,9 +15,10 @@ namespace TaleCode.Faker
         {
             var settings = new WireMockServerSettings
             {
-                AllowPartialMapping = true,
+                AllowPartialMapping = false,
                 StartAdminInterface = true,
                 ReadStaticMappings = false,
+                Logger = new WireMockConsoleLogger(),
                 Port = port
             };
 

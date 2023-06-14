@@ -22,13 +22,20 @@ public abstract class FakeService<TApiClient> :
         _buildConfiguration = Configure(mockServer) ??
                               throw new InvalidOperationException($"{nameof(Configure)} should never return null");
 
-    public IFakeServiceBuilderWithResponse WithRequest(Expression<Func<TApiClient, Delegate>> selector,
-        Dictionary<string, string>? parameters = null, int priority = 10, Action<IRequestBuilder>? configure = null)
+    public IFakeServiceBuilderWithResponse WithRequest(
+        Expression<Func<TApiClient, Delegate>> selector,
+        Dictionary<string, string>? pathParameters = null,
+        Dictionary<string, string>? queryParameters = null,
+       Action<IRequestBuilder>? configure = null)
     {
         var method = GetMethodInfo(selector)!.Name;
         var requestInfo = (RequestInfo)GetType().GetMethod(method)!.Invoke(this, new object[] { })!;
 
-        _provider = _buildConfiguration!.BuildRequest(requestInfo, parameters, configure).AtPriority(priority);
+        _provider = _buildConfiguration!.BuildRequest(
+            requestInfo,
+            pathParameters ?? new Dictionary<string, string>(),
+            queryParameters ?? new Dictionary<string, string>(),
+            configure);
         return this;
     }
 

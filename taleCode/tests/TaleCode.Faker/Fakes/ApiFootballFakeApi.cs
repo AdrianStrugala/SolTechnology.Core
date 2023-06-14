@@ -22,7 +22,7 @@ namespace TaleCode.Faker.Fakes
 
         public RequestInfo GetPlayerTeams()
         {
-            return new RequestInfo(HttpMethod.Get, "v3/transfers?player={apiId}");
+            return new RequestInfo(HttpMethod.Get, "v3/transfers");
         }
     }
 }

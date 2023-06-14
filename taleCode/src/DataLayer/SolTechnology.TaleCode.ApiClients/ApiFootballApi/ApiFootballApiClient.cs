@@ -31,7 +31,7 @@ namespace SolTechnology.TaleCode.ApiClients.ApiFootballApi
                         {
                             Name = transfer.Teams.Out.Name,
                             TimeFrom = DateProvider.DateMin(),
-                            TimeTo = DateTime.Parse(transfer.Date)
+                            TimeTo = transfer.Date
                         });
                     }
 
@@ -40,8 +40,8 @@ namespace SolTechnology.TaleCode.ApiClients.ApiFootballApi
                         result.Add(new Team
                         {
                             Name = transfer.Teams.In.Name,
-                            TimeFrom = DateTime.Parse(transfer.Date),
-                            TimeTo = DateTime.Parse(transfers[i + 1].Date)
+                            TimeFrom = transfer.Date,
+                            TimeTo = transfers[i + 1].Date
                         });
                     }
                     else
@@ -49,7 +49,7 @@ namespace SolTechnology.TaleCode.ApiClients.ApiFootballApi
                         result.Add(new Team
                         {
                             Name = transfer.Teams.In.Name,
-                            TimeFrom = DateTime.Parse(transfer.Date),
+                            TimeFrom = transfer.Date,
                             TimeTo = DateProvider.DateMax()
                         });
                     }

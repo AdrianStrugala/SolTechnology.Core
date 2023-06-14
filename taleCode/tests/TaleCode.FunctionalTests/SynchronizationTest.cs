@@ -41,10 +41,11 @@ namespace TaleCode.FunctionalTests
         {
             //Arrange
             int playerId = 44;
+            int apiFootballPlayerId = 874;
             playerResponse.Player.Id = playerId;
 
             _wireMockFixture.Fake<IFootballDataApiClient>()
-                .WithRequest(x => x.GetPlayerById, new Dictionary<string, string> { { "id", playerId.ToString() } }, priority: 1)
+                .WithRequest(x => x.GetPlayerById, new Dictionary<string, string> { { "id", playerId.ToString() } })
                 .WithResponse(x => x.WithSuccess().WithBodyAsJson(playerResponse));
 
             for (int i = 0; i < playerResponse.Matches.Count; i++)
@@ -57,7 +58,7 @@ namespace TaleCode.FunctionalTests
             }
 
             _wireMockFixture.Fake<IApiFootballApiClient>()
-                .WithRequest(x => x.GetPlayerTeams, priority: 2)
+                .WithRequest(x => x.GetPlayerTeams, null, new Dictionary<string, string> { { "player", apiFootballPlayerId.ToString() } })
                 .WithResponse(x => x.WithSuccess().WithBodyAsJson(transfersResponse));
 
 
