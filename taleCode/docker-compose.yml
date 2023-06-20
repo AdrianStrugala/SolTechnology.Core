@@ -14,13 +14,11 @@ services:
         image: mcr.microsoft.com/azure-storage/azurite
         hostname: azurite
         restart: always
-        command: "azurite --loose --blobHost 0.0.0.0 --blobPort 10000 --queueHost 0.0.0.0 --queuePort 10001 --location /workspace --debug /workspace/debug.log"
+        command: "azurite --loose --blobHost 0.0.0.0 --blobPort 10000 --queueHost 0.0.0.0 --queuePort 10001"
         ports:
           - 10000:10000
           - 10001:10001
           - 10002:10002
-        volumes:
-          - ./azurite:/workspace
           
     rabbit:
         container_name: rabbitmq
@@ -50,7 +48,6 @@ services:
             - "devopsifyme/sbemu:${TAGMAJORMINOR:-0.0}"
             - "devopsifyme/sbemu:${TAGMAJORMINORPATCH:-0.0.1}"
           context: .
-          dockerfile: ./src/ServiceBusEmulator.Host/Dockerfile
         environment:
           - EMULATOR__RABBITMQ__HOST=rabbit
           - EMULATOR__RABBITMQ__USERNAME=guest
