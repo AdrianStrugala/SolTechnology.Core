@@ -1,5 +1,6 @@
 ﻿using System;
-using TaleCode.IntegrationTests.SqlData;
+using TaleCode.IntegrationTests.Blob;
+using TaleCode.IntegrationTests.Sql.Configuration;
 using Xunit;
 
 namespace TaleCode.FunctionalTests.TestsConfiguration
@@ -8,6 +9,7 @@ namespace TaleCode.FunctionalTests.TestsConfiguration
     {
         public BackgroundWorkerFixture BackgroundWorkerFixture { get; set; }
         public SqlFixture SqlFixture { get; set; }
+        public BlobFixture BlobFixture { get; set; }
         public WireMockFixture WireMockFixture { get; set; }
 
         public FunctionalTestsFixture()
@@ -15,6 +17,7 @@ namespace TaleCode.FunctionalTests.TestsConfiguration
             BackgroundWorkerFixture ??= new BackgroundWorkerFixture();
             SqlFixture ??= new SqlFixture();
             WireMockFixture ??= new WireMockFixture();
+            BlobFixture ??= new BlobFixture();
 
             SqlFixture.InitializeAsync().GetAwaiter().GetResult();
             WireMockFixture.Initialize();

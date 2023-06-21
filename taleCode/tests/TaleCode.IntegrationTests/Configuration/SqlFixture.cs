@@ -7,7 +7,7 @@ using SolTechnology.Core.Sql.Connection;
 using Xunit;
 using SqlConnection = System.Data.SqlClient.SqlConnection;
 
-namespace TaleCode.IntegrationTests.SqlData
+namespace TaleCode.IntegrationTests.Sql.Configuration
 {
     public class SqlFixture : IAsyncLifetime
     {

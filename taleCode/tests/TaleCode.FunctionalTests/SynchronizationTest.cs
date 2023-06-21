@@ -1,16 +1,22 @@
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Net;
 using System.Net.Http;
+using System.Threading;
 using System.Threading.Tasks;
+using Azure.Storage.Blobs;
 using FluentAssertions;
 using Microsoft.AspNetCore.TestHost;
+using SolTechnology.Core.BlobStorage.Connection;
 using SolTechnology.TaleCode.ApiClients.ApiFootballApi;
 using SolTechnology.TaleCode.ApiClients.ApiFootballApi.Models;
 using SolTechnology.TaleCode.ApiClients.FootballDataApi;
 using SolTechnology.TaleCode.ApiClients.FootballDataApi.Models;
 using SolTechnology.TaleCode.BackgroundWorker.InternalApi;
+using SolTechnology.TaleCode.Domain;
 using TaleCode.FunctionalTests.TestsConfiguration;
-using TaleCode.IntegrationTests.SqlData;
+using TaleCode.IntegrationTests.Blob;
+using TaleCode.IntegrationTests.Sql.Configuration;
 using Xunit;
 
 namespace TaleCode.FunctionalTests
@@ -22,12 +28,14 @@ namespace TaleCode.FunctionalTests
         private readonly HttpClient _backgroundWorkerClient;
         private readonly WireMockFixture _wireMockFixture;
         private readonly TestServer _backgroundWorker;
+        private readonly BlobConnectionFactory _blobConnectionFactory;
 
         public SynchronizationTest(FunctionalTestsFixture functionalTestsFixture)
         {
             _backgroundWorkerClient = functionalTestsFixture.BackgroundWorkerFixture.ServerClient;
             _backgroundWorker = functionalTestsFixture.BackgroundWorkerFixture.TestServer;
             _sqlFixture = functionalTestsFixture.SqlFixture;
+            _blobConnectionFactory = functionalTestsFixture.BlobFixture.BlobConnectionFactory;
             _wireMockFixture = functionalTestsFixture.WireMockFixture;
         }
 
@@ -42,6 +50,7 @@ namespace TaleCode.FunctionalTests
             //Arrange
             int playerId = 44;
             int apiFootballPlayerId = 874;
+            var resultContainerName = "playerstatistics";
             playerResponse.Player.Id = playerId;
 
             _wireMockFixture.Fake<IFootballDataApiClient>()
@@ -61,15 +70,31 @@ namespace TaleCode.FunctionalTests
                 .WithRequest(x => x.GetPlayerTeams, null, new Dictionary<string, string> { { "player", apiFootballPlayerId.ToString() } })
                 .WithResponse(x => x.WithSuccess().WithBodyAsJson(transfersResponse));
 
+            var containerClient = _blobConnectionFactory.GetConnection(resultContainerName);
+            var blobClient = containerClient.GetBlobClient(playerId.ToString());
+            await blobClient.DeleteIfExistsAsync();
 
             //Act
             var synchronizationResponse = await _backgroundWorker
                 .CreateRequest($"api/SynchronizePlayerMatches/{playerId}")
                 .GetAsync();
 
-            await Task.Delay(60000);
-
             synchronizationResponse.StatusCode.Should().Be(HttpStatusCode.OK);
+
+
+            //Assert
+            var stopwatch = Stopwatch.StartNew();
+            if (!await blobClient.ExistsAsync() && stopwatch.Elapsed.TotalSeconds < 20)
+            {
+                Thread.Sleep(1000);
+            }
+            stopwatch.Stop();
+
+            var playerStatisticsResult = await containerClient.ReadFromBlob<PlayerStatistics>(playerId.ToString());
+
+            Assert.NotNull(playerStatisticsResult);
+
+            //That's the place for more sophisticated assert, but would require data arrange. You know :D
         }
     }
 }

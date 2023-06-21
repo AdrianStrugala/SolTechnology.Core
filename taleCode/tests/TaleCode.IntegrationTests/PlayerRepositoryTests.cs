@@ -5,9 +5,10 @@ using FluentAssertions;
 using SolTechnology.Core.Sql.Transactions;
 using SolTechnology.TaleCode.Domain;
 using SolTechnology.TaleCode.SqlData.Repository.PlayerRepository;
+using TaleCode.IntegrationTests.Sql.Configuration;
 using Xunit;
 
-namespace TaleCode.IntegrationTests.SqlData
+namespace TaleCode.IntegrationTests.Sql
 {
     [Collection(nameof(TestsCollections.SqlTestsCollection))]
     public class PlayerRepositoryTests

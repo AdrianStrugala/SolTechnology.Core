@@ -4,6 +4,6 @@ namespace SolTechnology.Core.BlobStorage.Connection
 {
     public interface IBlobConnectionFactory
     {
-        BlobContainerClient CreateConnection(string containerName);
+        BlobContainerClient GetConnection(string containerName);
     }
 }
