@@ -57,19 +57,12 @@ namespace SolTechnology.Core.MessageBus.Receive
             try
             {
                 using IServiceScope scope = _serviceProvider.CreateScope();
-                try
-                {
-                    var type = GetType();
-                    var service = scope.ServiceProvider.GetRequiredService<IMessageHandler<TMessage>>();
-                    var handler = (IMessageHandler<TMessage>)service;
-                    var message = JsonConvert.DeserializeObject<TMessage>(args.Message?.Body.ToString());
-                    await handler.Handle(message, args.CancellationToken);
-                }
-                catch (Exception ex)
-                {
-                    var x = ex;
-                }
-        
+
+                var type = GetType();
+                var service = scope.ServiceProvider.GetRequiredService<IMessageHandler<TMessage>>();
+                var handler = (IMessageHandler<TMessage>)service;
+                var message = JsonConvert.DeserializeObject<TMessage>(args.Message?.Body.ToString());
+                await handler.Handle(message, args.CancellationToken);
             }
 
             catch (Exception ex)

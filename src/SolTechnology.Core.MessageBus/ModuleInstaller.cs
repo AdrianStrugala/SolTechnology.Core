@@ -87,7 +87,7 @@ namespace SolTechnology.Core.MessageBus
 
             if (queueName == null)
             {
-                throw new ArgumentException($"The [{nameof(queueName)}] is missing. Provide it by parameter or appsettings configuration section");
+                throw new ArgumentException($"The [{nameof(queueName)}] for message type: [{messageType}]is missing. Provide it by parameter or appsettings configuration section");
             }
 
             var configurationProvider = services.BuildServiceProvider().GetRequiredService<IMessageBusConfigurationProvider>();
@@ -113,7 +113,7 @@ namespace SolTechnology.Core.MessageBus
 
             if (queueName == null)
             {
-                throw new ArgumentException($"The [{nameof(queueName)}] is missing. Provide it by parameter or appsettings configuration section");
+                throw new ArgumentException($"The [{nameof(queueName)}] is missing for message type: [{messageType}] is missing. Provide it by parameter or appsettings configuration section");
             }
 
             var configurationProvider = services.BuildServiceProvider()

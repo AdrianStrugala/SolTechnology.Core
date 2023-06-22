@@ -39,10 +39,6 @@ namespace SolTechnology.TaleCode.ApiClients.FootballDataApi
 
         public async Task<FootballDataMatch> GetMatchById(int matchApiId)
         {
-            try
-            {
-
-      
             var apiResult = await _httpClient.GetAsync<MatchModel>($"v2/matches/{matchApiId}");
 
             var result = new FootballDataMatch
@@ -58,12 +54,6 @@ namespace SolTechnology.TaleCode.ApiClients.FootballDataApi
             };
 
             return result;
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e);
-                throw;
-            }
         }
 
         private string GetWinner(Match m)
