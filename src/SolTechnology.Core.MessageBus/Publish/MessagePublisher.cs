@@ -1,22 +1,22 @@
 ﻿using System.Text;
 using Azure.Messaging.ServiceBus;
 using Newtonsoft.Json;
-using SolTechnology.Core.MessageBus.Configuration;
+using SolTechnology.Core.MessageBus.Broker;
 
 namespace SolTechnology.Core.MessageBus.Publish
 {
     public class MessagePublisher : IMessagePublisher
     {
-        private readonly IMessageBusConfigurationProvider _messageBusConfigurationProvider;
+        private readonly IMessageBusBroker _messageBusBroker;
 
-        public MessagePublisher(IMessageBusConfigurationProvider messageBusConfigurationProvider)
+        public MessagePublisher(IMessageBusBroker messageBusBroker)
         {
-            _messageBusConfigurationProvider = messageBusConfigurationProvider;
+            _messageBusBroker = messageBusBroker;
         }
 
         public async Task Publish(IMessage message)
         {
-            var senders = _messageBusConfigurationProvider.ResolveMessagePublisher(message.GetType().Name);
+            var senders = _messageBusBroker.ResolveMessagePublisher(message.GetType().Name);
 
             var serviceBusMessage = BuildMessage(message);
 

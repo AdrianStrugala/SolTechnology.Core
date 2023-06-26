@@ -3,26 +3,26 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
-using SolTechnology.Core.MessageBus.Configuration;
+using SolTechnology.Core.MessageBus.Broker;
 
 namespace SolTechnology.Core.MessageBus.Receive
 {
 
-    public class MessageBusReceiver<TMessage> : IHostedService, IAsyncDisposable where TMessage : IMessage
+    public class MessageBusReceiver : IHostedService, IAsyncDisposable
     {
         private readonly IServiceProvider _serviceProvider;
-        private readonly ILogger<MessageBusReceiver<TMessage>> _logger;
+        private readonly ILogger<MessageBusReceiver> _logger;
 
-        private readonly IMessageBusConfigurationProvider _messageBusConfigurationProvider;
+        private readonly IMessageBusBroker _messageBusBroker;
         private List<ServiceBusProcessor> _processors;
 
 
         public MessageBusReceiver(
-           IMessageBusConfigurationProvider messageBusConfigurationProvider,
+           IMessageBusBroker messageBusBroker,
            IServiceProvider serviceProvider,
-           ILogger<MessageBusReceiver<TMessage>> logger)
+           ILogger<MessageBusReceiver> logger)
         {
-            _messageBusConfigurationProvider = messageBusConfigurationProvider;
+            _messageBusBroker = messageBusBroker;
             _serviceProvider = serviceProvider;
             _logger = logger;
         }
@@ -30,18 +30,21 @@ namespace SolTechnology.Core.MessageBus.Receive
 
         public async Task StartAsync(CancellationToken cancellationToken)
         {
-            _processors = _messageBusConfigurationProvider.ResolveMessageReceiver(typeof(TMessage).Name);
+            var typeProcessorMap = _messageBusBroker.ResolveMessageReceivers();
+            _processors = typeProcessorMap.Select(x => x.Item2).ToList();
 
-            foreach (ServiceBusProcessor processor in _processors)
+            foreach (var (messageType, processor) in typeProcessorMap)
             {
                 _logger.LogInformation($"Starting message bus processor for: [{processor.EntityPath}]");
-                processor.ProcessMessageAsync += HandleMessageAsync;
                 processor.ProcessErrorAsync += HandleError;
+                processor.ProcessMessageAsync += async args =>
+                {
+                    await HandleMessageAsync(args, messageType);
+                };
 
                 await processor.StartProcessingAsync(cancellationToken).ConfigureAwait(false);
             }
         }
-
 
         public async Task StopAsync(CancellationToken cancellationToken)
         {
@@ -51,27 +54,28 @@ namespace SolTechnology.Core.MessageBus.Receive
             }
         }
 
-
-        protected virtual async Task HandleMessageAsync(ProcessMessageEventArgs args)
+        private async Task HandleMessageAsync(ProcessMessageEventArgs args, Type messageType)
         {
-            try
-            {
-                using IServiceScope scope = _serviceProvider.CreateScope();
+            using IServiceScope scope = _serviceProvider.CreateScope();
 
-                var type = GetType();
-                var service = scope.ServiceProvider.GetRequiredService<IMessageHandler<TMessage>>();
-                var handler = (IMessageHandler<TMessage>)service;
-                var message = JsonConvert.DeserializeObject<TMessage>(args.Message?.Body.ToString());
-                await handler.Handle(message, args.CancellationToken);
-            }
 
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, ex.Message);
-                await args.DeadLetterMessageAsync(args.Message);
-                throw;
-            }
+            var x = Type.MakeGenericSignatureType(typeof(IMessageHandler<>), messageType);
+            var handlerType = typeof(IMessageHandler<>).MakeGenericType(messageType);
+
+            dynamic handler = scope.ServiceProvider.GetRequiredService(handlerType);
+            dynamic message = JsonConvert.DeserializeObject(args.Message?.Body.ToString(), messageType);
+            await handler.Handle(message, args.CancellationToken);
         }
+
+        // protected virtual async Task HandleMessageAsync(ProcessMessageEventArgs args)
+        // {
+        //     using IServiceScope scope = _serviceProvider.CreateScope();
+        //
+        //     var HandleMessageAsync = scope.ServiceProvider.GetRequiredService<IMessageHandler<TMessage>>();
+        //     var message = JsonConvert.DeserializeObject<TMessage>(args.Message?.Body.ToString());
+        //     await HandleMessageAsync.Handle(message, args.CancellationToken);
+        // }
+
 
         protected virtual Task HandleError(ProcessErrorEventArgs args)
         {
@@ -83,10 +87,12 @@ namespace SolTechnology.Core.MessageBus.Receive
         public async ValueTask DisposeAsync()
         {
             if (_processors != null)
+            {
                 foreach (ServiceBusProcessor processor in _processors)
                 {
                     await processor.DisposeAsync().ConfigureAwait(false);
                 }
+            }
         }
     }
 }

@@ -1,22 +1,23 @@
 ﻿using Azure.Messaging.ServiceBus;
 using Microsoft.Azure.ServiceBus.Management;
 using Microsoft.Extensions.Options;
+using SolTechnology.Core.MessageBus.Configuration;
 
-namespace SolTechnology.Core.MessageBus.Configuration
+namespace SolTechnology.Core.MessageBus.Broker
 {
-    public class MessageBusConfigurationProvider : IMessageBusConfigurationProvider, IDisposable
+    public class MessageBusBroker : IMessageBusBroker, IDisposable
     {
         private readonly ServiceBusClient _serviceBusClient;
         private readonly bool _createResources;
         private readonly ManagementClient _managementClient;
 
         private static readonly List<(string, ServiceBusSender)> MessageToSenderMap = new();
-        private static readonly List<(string, ServiceBusProcessor)> MessageToProcessorMap = new();
+        private static readonly List<(Type, ServiceBusProcessor)> MessageToProcessorMap = new();
 
 
 
         //Service bus client options can be added here
-        public MessageBusConfigurationProvider(IOptions<MessageBusConfiguration> options)
+        public MessageBusBroker(IOptions<MessageBusConfiguration> options)
         {
             var connectionString = options.Value.ConnectionString;
             _createResources = options.Value.CreateResources;
@@ -64,7 +65,7 @@ namespace SolTechnology.Core.MessageBus.Configuration
         }
 
         //Subscription Options can be added here (MaxAutoLockRenewalDuration, MaxConcurrentCalls)
-        public void RegisterTopicReceiver(string messageType, string topicName, string subscriptionName)
+        public void RegisterTopicReceiver(Type messageType, string topicName, string subscriptionName)
         {
             var serviceBusProcessorOptions = new ServiceBusProcessorOptions
             {
@@ -84,10 +85,15 @@ namespace SolTechnology.Core.MessageBus.Configuration
             }
         }
 
+        public List<(Type, ServiceBusProcessor)> ResolveMessageReceivers()
+        {
+            return MessageToProcessorMap;
+        }
+
         public List<ServiceBusProcessor> ResolveMessageReceiver(string messageType)
         {
             var processors = MessageToProcessorMap
-                .Where(m => m.Item1.Equals(messageType, StringComparison.CurrentCultureIgnoreCase)).Select(x => x.Item2)
+                .Where(m => m.Item1.Name.Equals(messageType, StringComparison.CurrentCultureIgnoreCase)).Select(x => x.Item2)
                 .ToList();
 
             if (!processors.Any())
@@ -112,7 +118,7 @@ namespace SolTechnology.Core.MessageBus.Configuration
             }
         }
 
-        public void RegisterQueueReceiver(string messageType, string queueName)
+        public void RegisterQueueReceiver(Type messageType, string queueName)
         {
             var serviceBusProcessorOptions = new ServiceBusProcessorOptions
             {

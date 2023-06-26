@@ -25,9 +25,9 @@
 
 	<ItemGroup>
 		<ProjectReference Include="..\..\src\PresentationLayer\SolTechnology.TaleCode.BackgroundWorker\SolTechnology.TaleCode.BackgroundWorker.csproj" />
-		<ProjectReference Include="..\TaleCode.Blob.IntegrationTests\TaleCode.IntegrationTests.Blob.csproj" />
 		<ProjectReference Include="..\TaleCode.Faker\TaleCode.Faker.csproj" />
-		<ProjectReference Include="..\TaleCode.IntegrationTests\TaleCode.IntegrationTests.Sql.csproj" />
+		<ProjectReference Include="..\TaleCode.IntegrationTests.Blob\TaleCode.IntegrationTests.Blob.csproj" />
+		<ProjectReference Include="..\TaleCode.IntegrationTests.Sql\TaleCode.IntegrationTests.Sql.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>
