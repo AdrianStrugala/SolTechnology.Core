@@ -1,5 +1,5 @@
 ﻿using Dapper;
-using SolTechnology.Core.Sql.Connection;
+using SolTechnology.Core.Sql.Connections;
 
 namespace SolTechnology.TaleCode.SqlData.Repository.ExecutionErrorRepository
 {

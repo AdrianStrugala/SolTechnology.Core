@@ -1,6 +1,6 @@
 ﻿using Dapper;
 using DapperExtensions;
-using SolTechnology.Core.Sql.Connection;
+using SolTechnology.Core.Sql.Connections;
 using SolTechnology.TaleCode.Domain;
 
 namespace SolTechnology.TaleCode.SqlData.Repository.PlayerRepository

@@ -1,5 +1,5 @@
 ﻿using Dapper;
-using SolTechnology.Core.Sql.Connection;
+using SolTechnology.Core.Sql.Connections;
 using SolTechnology.TaleCode.Domain;
 
 namespace SolTechnology.TaleCode.SqlData.Repository.MatchRepository

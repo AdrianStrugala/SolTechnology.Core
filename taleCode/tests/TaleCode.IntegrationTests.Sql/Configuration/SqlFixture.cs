@@ -3,7 +3,7 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
 using SolTechnology.Core.Sql;
-using SolTechnology.Core.Sql.Connection;
+using SolTechnology.Core.Sql.Connections;
 using Xunit;
 using SqlConnection = System.Data.SqlClient.SqlConnection;
 

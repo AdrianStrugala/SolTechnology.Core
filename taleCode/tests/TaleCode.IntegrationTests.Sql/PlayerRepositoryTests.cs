@@ -76,7 +76,7 @@ namespace TaleCode.IntegrationTests.Sql
         }
 
         [Fact]
-        public void Not_Completed_Transaction_Is_Not_Modyfing_Database()
+        public void Not_Completed_Transaction_Is_Not_Modifying_Database()
         {
             //Arrange
 
@@ -110,6 +110,53 @@ namespace TaleCode.IntegrationTests.Sql
             var result = _sut.GetById(playerId);
 
             Assert.Null(result);
+        }
+
+        [Fact]
+        public void Completed_Transaction_Is_Modifying_Database()
+        {
+            //Arrange
+
+            var playerId = _fixture.Create<int>();
+
+            var teams = _fixture.Build<Team>()
+                .With(t => t.PlayerApiId, playerId)
+                .CreateMany()
+                .ToList();
+
+            Player player = _fixture
+                .Build<Player>()
+                .With(p => p.ApiId, playerId)
+                .With(p => p.DateOfBirth, DateTime.UtcNow.Date)
+                .With(p => p.Teams, teams)
+                .Create();
+
+            var uow = new UnitOfWork();
+
+
+            //Act
+            using (uow.Begin())
+            {
+                _sut.Insert(player);
+
+                uow.Complete();
+            }
+
+
+            //Assert
+            var result = _sut.GetById(playerId);
+
+            Assert.NotNull(result);
+            Assert.NotEmpty(result.Teams);
+
+            result.DateOfBirth.Should().Be(player.DateOfBirth);
+            result.Name.Should().Be(player.Name);
+            result.Nationality.Should().Be(player.Nationality);
+            result.Position.Should().Be(player.Position);
+            result.Teams.Should().BeEquivalentTo(player.Teams,
+                config: options => options
+                    .Excluding(a => a.Id)
+                    .Using<DateTime>(ctx => ctx.Subject.Should().BeCloseTo(ctx.Expectation, TimeSpan.FromSeconds(1))).WhenTypeIs<DateTime>());
         }
     }
 }
