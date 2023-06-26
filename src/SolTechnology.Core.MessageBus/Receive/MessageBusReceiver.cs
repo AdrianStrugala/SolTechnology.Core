@@ -54,6 +54,7 @@ namespace SolTechnology.Core.MessageBus.Receive
             }
         }
 
+
         private async Task HandleMessageAsync(ProcessMessageEventArgs args, Type messageType)
         {
             using IServiceScope scope = _serviceProvider.CreateScope();
@@ -66,16 +67,6 @@ namespace SolTechnology.Core.MessageBus.Receive
             dynamic message = JsonConvert.DeserializeObject(args.Message?.Body.ToString(), messageType);
             await handler.Handle(message, args.CancellationToken);
         }
-
-        // protected virtual async Task HandleMessageAsync(ProcessMessageEventArgs args)
-        // {
-        //     using IServiceScope scope = _serviceProvider.CreateScope();
-        //
-        //     var HandleMessageAsync = scope.ServiceProvider.GetRequiredService<IMessageHandler<TMessage>>();
-        //     var message = JsonConvert.DeserializeObject<TMessage>(args.Message?.Body.ToString());
-        //     await HandleMessageAsync.Handle(message, args.CancellationToken);
-        // }
-
 
         protected virtual Task HandleError(ProcessErrorEventArgs args)
         {
