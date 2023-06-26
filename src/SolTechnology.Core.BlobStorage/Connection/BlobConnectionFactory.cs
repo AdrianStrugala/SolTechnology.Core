@@ -7,18 +7,18 @@ namespace SolTechnology.Core.BlobStorage.Connection
     {
         private readonly string _connectionString;
 
-        private readonly Dictionary<string, BlobContainerClient> _blobContainerCache = new Dictionary<string, BlobContainerClient>();
+        private readonly Dictionary<string, BlobContainerClient> _blobContainerCache = new();
 
         public BlobConnectionFactory(IOptions<BlobStorageConfiguration> blobConfiguration)
         {
             _connectionString = blobConfiguration.Value.ConnectionString;
         }
 
-        public BlobContainerClient CreateConnection(string containerName)
+        public BlobContainerClient GetConnection(string containerName)
         {
-            if (_blobContainerCache.ContainsKey(containerName))
+            if (_blobContainerCache.TryGetValue(containerName, out var connection))
             {
-                return _blobContainerCache[containerName];
+                return connection;
             }
 
             var blobContainerClient = new BlobContainerClient(_connectionString, containerName);

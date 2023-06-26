@@ -12,7 +12,7 @@ namespace SolTechnology.TaleCode.BlobData.PlayerStatisticsRepository
 
         public PlayerStatisticsRepository(IBlobConnectionFactory blobConnectionFactory)
         {
-            _client = blobConnectionFactory.CreateConnection(ContainerName);
+            _client = blobConnectionFactory.GetConnection(ContainerName);
         }
 
         public async Task Add(PlayerStatistics playerStatistics)

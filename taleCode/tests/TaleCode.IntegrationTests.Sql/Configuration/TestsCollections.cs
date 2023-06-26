@@ -1,6 +1,6 @@
 ﻿using Xunit;
 
-namespace TaleCode.IntegrationTests.SqlData
+namespace TaleCode.IntegrationTests.Sql.Configuration
 {
     public class TestsCollections
     {

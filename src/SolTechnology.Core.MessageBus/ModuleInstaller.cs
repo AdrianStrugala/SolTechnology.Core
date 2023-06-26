@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
+using SolTechnology.Core.MessageBus.Broker;
 using SolTechnology.Core.MessageBus.Configuration;
 using SolTechnology.Core.MessageBus.Publish;
 using SolTechnology.Core.MessageBus.Receive;
@@ -29,10 +30,13 @@ namespace SolTechnology.Core.MessageBus
 
                 config.ConnectionString = messageBusConfiguration.ConnectionString;
                 config.Queues = messageBusConfiguration.Queues;
+                config.CreateResources = messageBusConfiguration.CreateResources;
             });
 
             services.AddSingleton<IMessagePublisher, MessagePublisher>();
-            services.AddSingleton<IMessageBusConfigurationProvider, MessageBusConfigurationProvider>();
+            services.AddSingleton<IMessageBusBroker, MessageBusBroker>();
+
+            services.AddHostedService<MessageBusReceiver>();
 
             return services;
         }
@@ -43,7 +47,7 @@ namespace SolTechnology.Core.MessageBus
             this IServiceCollection services,
             string topicName) where TMessage : IMessage
         {
-            var configurationProvider = services.BuildServiceProvider().GetRequiredService<IMessageBusConfigurationProvider>();
+            var configurationProvider = services.BuildServiceProvider().GetRequiredService<IMessageBusBroker>();
 
             string messageType = typeof(TMessage).Name;
 
@@ -59,15 +63,13 @@ namespace SolTechnology.Core.MessageBus
             where TMessage : IMessage where THandler : class, IMessageHandler<TMessage>
         {
             var configurationProvider = services.BuildServiceProvider()
-                .GetRequiredService<IMessageBusConfigurationProvider>();
+                .GetRequiredService<IMessageBusBroker>();
 
-            services.AddHostedService<MessageBusReceiver<TMessage>>();
-            services.AddScoped<THandler>();
-            services.AddScoped(typeof(MessageBusReceiver<TMessage>), (serviceProvider) => serviceProvider.GetRequiredService<THandler>());
+            services.AddScoped<IMessageHandler<TMessage>, THandler>();
 
             string messageType = typeof(TMessage).Name;
 
-            configurationProvider.RegisterTopicReceiver(messageType, topicName, subscriptionName);
+            configurationProvider.RegisterTopicReceiver(typeof(TMessage), topicName, subscriptionName);
 
             return services;
         }
@@ -87,10 +89,10 @@ namespace SolTechnology.Core.MessageBus
 
             if (queueName == null)
             {
-                throw new ArgumentException($"The [{nameof(queueName)}] is missing. Provide it by parameter or appsettings configuration section");
+                throw new ArgumentException($"The [{nameof(queueName)}] for message type: [{messageType}]is missing. Provide it by parameter or appsettings configuration section");
             }
 
-            var configurationProvider = services.BuildServiceProvider().GetRequiredService<IMessageBusConfigurationProvider>();
+            var configurationProvider = services.BuildServiceProvider().GetRequiredService<IMessageBusBroker>();
 
 
             configurationProvider.RegisterQueuePublisher(messageType, queueName);
@@ -113,19 +115,15 @@ namespace SolTechnology.Core.MessageBus
 
             if (queueName == null)
             {
-                throw new ArgumentException($"The [{nameof(queueName)}] is missing. Provide it by parameter or appsettings configuration section");
+                throw new ArgumentException($"The [{nameof(queueName)}] is missing for message type: [{messageType}] is missing. Provide it by parameter or appsettings configuration section");
             }
 
             var configurationProvider = services.BuildServiceProvider()
-                .GetRequiredService<IMessageBusConfigurationProvider>();
+                .GetRequiredService<IMessageBusBroker>();
 
-            services.AddHostedService<MessageBusReceiver<TMessage>>();
-            services.AddScoped<THandler>();
-            services.AddScoped(typeof(MessageBusReceiver<TMessage>), (serviceProvider) => serviceProvider.GetRequiredService<THandler>());
+            services.AddScoped<IMessageHandler<TMessage>, THandler>();
 
-
-
-            configurationProvider.RegisterQueueReceiver(messageType, queueName);
+            configurationProvider.RegisterQueueReceiver(typeof(TMessage), queueName);
 
             return services;
         }

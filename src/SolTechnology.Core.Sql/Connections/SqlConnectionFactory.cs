@@ -3,7 +3,7 @@ using System.Data.SqlClient;
 using Microsoft.Extensions.Options;
 using Polly;
 
-namespace SolTechnology.Core.Sql.Connection
+namespace SolTechnology.Core.Sql.Connections
 {
     public class SqlConnectionFactory : ISqlConnectionFactory
     {

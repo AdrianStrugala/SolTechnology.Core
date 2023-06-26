@@ -1,6 +1,6 @@
 ﻿using System.Data;
 
-namespace SolTechnology.Core.Sql.Connection
+namespace SolTechnology.Core.Sql.Connections
 {
     public interface ISqlConnectionFactory
     {

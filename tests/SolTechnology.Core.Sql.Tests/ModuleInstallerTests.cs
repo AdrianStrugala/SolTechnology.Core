@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
-using SolTechnology.Core.Sql.Connection;
+using SolTechnology.Core.Sql.Connections;
 using Xunit;
 
 namespace SolTechnology.Core.Sql.Tests
@@ -15,7 +15,7 @@ namespace SolTechnology.Core.Sql.Tests
         }
 
         [Fact]
-        public void AddSql_ConfigurationProvidedAsParameter_SqlServivesAreAddedToServiceCollection()
+        public void AddSql_ConfigurationProvidedAsParameter_SqlServicesAreAddedToServiceCollection()
         {
 
             //Arrange 
