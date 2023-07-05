@@ -1,4 +1,5 @@
-﻿using SolTechnology.TaleCode.ApiClients.ApiFootballApi;
+﻿using SolTechnology.Core.Cache;
+using SolTechnology.TaleCode.ApiClients.ApiFootballApi;
 using SolTechnology.TaleCode.ApiClients.FootballDataApi;
 using SolTechnology.TaleCode.Domain;
 using SolTechnology.TaleCode.PlayerRegistry.Commands.SynchronizePlayerMatches.Interfaces;
@@ -12,17 +13,23 @@ namespace SolTechnology.TaleCode.PlayerRegistry.Commands.SynchronizePlayerMatche
         private readonly IFootballDataApiClient _footballDataApiClient;
         private readonly IPlayerRepository _playerRepository;
         private readonly IApiFootballApiClient _apiFootballApiClient;
+        private readonly ILazyTaskCache _lazyTaskCache;
 
-        public SyncPlayer(IFootballDataApiClient footballDataApiClient, IPlayerRepository playerRepository, IApiFootballApiClient apiFootballApiClient)
+        public SyncPlayer(
+            IFootballDataApiClient footballDataApiClient,
+            IPlayerRepository playerRepository,
+            IApiFootballApiClient apiFootballApiClient,
+            ILazyTaskCache lazyTaskCache)
         {
             _footballDataApiClient = footballDataApiClient;
             _playerRepository = playerRepository;
             _apiFootballApiClient = apiFootballApiClient;
+            _lazyTaskCache = lazyTaskCache;
         }
 
         public async Task<Player> Execute(PlayerIdMap playerIdMap)
         {
-            var clientPlayer = await _footballDataApiClient.GetPlayerById(playerIdMap.FootballDataId);
+            var clientPlayer = await _lazyTaskCache.GetOrAdd(playerIdMap.FootballDataId, _footballDataApiClient.GetPlayerById);
 
             var teams = await _apiFootballApiClient.GetPlayerTeams(playerIdMap.ApiFootballId);
 

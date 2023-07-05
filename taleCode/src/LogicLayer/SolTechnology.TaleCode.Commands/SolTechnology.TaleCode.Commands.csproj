@@ -11,6 +11,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <ProjectReference Include="..\..\..\..\src\SolTechnology.Core.Cache\SolTechnology.Core.Cache.csproj" />
 	  <ProjectReference Include="..\..\..\..\src\SolTechnology.Core.CQRS\SolTechnology.Core.CQRS.csproj" />
 	  <ProjectReference Include="..\..\..\..\src\SolTechnology.Core.MessageBus\SolTechnology.Core.MessageBus.csproj" />
 	  <ProjectReference Include="..\..\DataLayer\SolTechnology.TaleCode.ApiClients\SolTechnology.TaleCode.ApiClients.csproj" />
