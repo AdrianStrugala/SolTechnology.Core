@@ -7,7 +7,7 @@ public abstract class BaseController : ControllerBase
     [NonAction]
     public async Task<IActionResult> Return<T>(Task<T> handle)
     {
-        var response = new Response<T>();
+        var response = new ResponseEnvelope<T>();
         try
         {
             response.Data = await handle;
@@ -27,7 +27,7 @@ public abstract class BaseController : ControllerBase
     [NonAction]
     public async Task<IActionResult> Invoke(Task handle)
     {
-        var response = new Response();
+        var response = new ResponseEnvelope();
         try
         {
             await handle;

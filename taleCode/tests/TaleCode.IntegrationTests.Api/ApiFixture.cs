@@ -1,22 +1,19 @@
-﻿using System;
-using System.IO;
-using System.Net.Http;
-using Microsoft.AspNetCore.Mvc.Testing;
+﻿using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.Configuration;
 
-namespace TaleCode.FunctionalTests.TestsConfiguration
+namespace TaleCode.IntegrationTests.Api
 {
-    public class BackgroundWorkerFixture : IDisposable
+    public class ApiFixture : IDisposable
     {
         public TestServer TestServer { get; }
 
         public HttpClient ServerClient { get; }
 
 
-        public BackgroundWorkerFixture()
+        public ApiFixture()
         {
-            var webAppFactory = new WebApplicationFactory<SolTechnology.TaleCode.BackgroundWorker.Program>()
+            var webAppFactory = new WebApplicationFactory<Program>()
                 .WithWebHostBuilder(builder =>
                     builder
                         .ConfigureAppConfiguration((_, config) => config.AddJsonFile(Path.Combine(Directory.GetCurrentDirectory(), "appsettings.functional.tests.json")))

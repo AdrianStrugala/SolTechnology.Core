@@ -95,7 +95,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SolTechnology.Core.Cache", 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TaleCode.Faker", "..\taleCode\tests\TaleCode.Faker\TaleCode.Faker.csproj", "{AC93AFDE-57E7-4A41-8D7D-B1BA5925D743}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TaleCode.IntegrationTests.Blob", "..\taleCode\tests\TaleCode.IntegrationTests.Blob\TaleCode.IntegrationTests.Blob.csproj", "{5110106D-C54D-4FD7-9454-2243223C98BA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TaleCode.IntegrationTests.Blob", "..\taleCode\tests\TaleCode.IntegrationTests.Blob\TaleCode.IntegrationTests.Blob.csproj", "{5110106D-C54D-4FD7-9454-2243223C98BA}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TaleCode.IntegrationTests.Api", "..\taleCode\tests\TaleCode.IntegrationTests.Api\TaleCode.IntegrationTests.Api.csproj", "{5B412845-10F9-4210-98A2-7774E7041B7E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -223,6 +225,10 @@ Global
 		{5110106D-C54D-4FD7-9454-2243223C98BA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5110106D-C54D-4FD7-9454-2243223C98BA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5110106D-C54D-4FD7-9454-2243223C98BA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5B412845-10F9-4210-98A2-7774E7041B7E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5B412845-10F9-4210-98A2-7774E7041B7E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5B412845-10F9-4210-98A2-7774E7041B7E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5B412845-10F9-4210-98A2-7774E7041B7E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -251,6 +257,7 @@ Global
 		{14675484-B241-4E56-B036-B1848A0AA93F} = {7BF4DB8D-9C8C-44E9-9D73-CBC102D8FEB3}
 		{AC93AFDE-57E7-4A41-8D7D-B1BA5925D743} = {B490A69B-B247-42A5-A437-DBC78A026CA2}
 		{5110106D-C54D-4FD7-9454-2243223C98BA} = {B490A69B-B247-42A5-A437-DBC78A026CA2}
+		{5B412845-10F9-4210-98A2-7774E7041B7E} = {B490A69B-B247-42A5-A437-DBC78A026CA2}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {56BC2B7E-7B9F-4B05-951A-C0E3CF0D1287}

@@ -2,7 +2,7 @@
 
 namespace SolTechnology.Core.Api
 {
-    public class Response<T>
+    public class ResponseEnvelope<T>
     {
         public bool IsSuccess { get; set; }
 
@@ -13,7 +13,7 @@ namespace SolTechnology.Core.Api
         public string Error { get; set; }
     }
 
-    public class Response
+    public class ResponseEnvelope
     {
         public bool IsSuccess { get; set; }
 

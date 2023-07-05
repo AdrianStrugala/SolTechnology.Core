@@ -4,11 +4,11 @@ using Swashbuckle.AspNetCore.Filters;
 
 namespace SolTechnology.TaleCode.Api.Examples;
 
-public class GetPlayerStatisticsExample : IExamplesProvider<Response<GetPlayerStatisticsResult>>
+public class GetPlayerStatisticsExample : IExamplesProvider<ResponseEnvelope<GetPlayerStatisticsResult>>
 {
-    public Response<GetPlayerStatisticsResult> GetExamples()
+    public ResponseEnvelope<GetPlayerStatisticsResult> GetExamples()
     {
-        return new Response<GetPlayerStatisticsResult>
+        return new ResponseEnvelope<GetPlayerStatisticsResult>
         {
             IsSuccess = true,
             Data = new GetPlayerStatisticsResult

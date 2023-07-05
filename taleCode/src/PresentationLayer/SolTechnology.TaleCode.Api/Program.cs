@@ -71,8 +71,8 @@ app.UseAuthorization();
 app.UseAuthentication();
 
 app.MapControllers();
-if (app.Environment.IsDevelopment())
-{
-    app.Run("http://localhost:2137");
-}
 app.Run();
+
+
+// Make the implicit Program class public so test projects can access it
+public partial class Program { }
