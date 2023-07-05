@@ -38,16 +38,16 @@ The SolTechnology.Core repository contains a set of shared libraries. This is a 
 
 | Documentation  | Nuget  |   |
 |---|---|---|
-|[Sql Database](https://github.com/AdrianStrugala/SolTechnology.Core/tree/master/docs/Sql.md)      |  <a href="https://www.nuget.org/packages/SolTechnology.Core.Sql/"><img src="https://badgen.net/badge/Downloads/500/?icon=nuget"></a>  |   |
-|[Blob Storage](https://github.com/AdrianStrugala/SolTechnology.Core/tree/master/docs/Blob.md)     |  <a href="https://www.nuget.org/packages/SolTechnology.Core.BlobStorage/"><img src="https://badgen.net/badge/Downloads/500/?icon=nuget"></a>  |   |
-|[HttpClients](https://github.com/AdrianStrugala/SolTechnology.Core/tree/master/docs/Clients.md)   |  <a href="https://www.nuget.org/packages/SolTechnology.Core.ApiClient/"><img src="https://badgen.net/badge/Downloads/700/?icon=nuget"></a>  |   |
-|[Message Bus](https://github.com/AdrianStrugala/SolTechnology.Core/tree/master/docs/Bus.md)       |  <a href="https://www.nuget.org/packages/SolTechnology.Core.MessageBus/"><img src="https://badgen.net/badge/Downloads/600/?icon=nuget"></a>  |   |
-|[Guards](https://github.com/AdrianStrugala/SolTechnology.Core/tree/master/docs/Guards.md)         |  <a href="https://www.nuget.org/packages/SolTechnology.Core.Guards/"><img src="https://badgen.net/badge/Downloads/500/?icon=nuget"></a>  |   |
-|[Authentication](https://github.com/AdrianStrugala/SolTechnology.Core/tree/master/docs/Auth.md)   |  <a href="https://www.nuget.org/packages/SolTechnology.Core.Authentication/"><img src="https://badgen.net/badge/Downloads/350/?icon=nuget"></a>  |   |
-|[Logging](https://github.com/AdrianStrugala/SolTechnology.Core/tree/master/docs/Log.md)           |  <a href="https://www.nuget.org/packages/SolTechnology.Core.Logging/"><img src="https://badgen.net/badge/Downloads/300/?icon=nuget"></a>  |   |
+|[Sql Database](https://github.com/AdrianStrugala/SolTechnology.Core/tree/master/docs/Sql.md)      |  <a href="https://www.nuget.org/packages/SolTechnology.Core.Sql/"><img src="https://badgen.net/badge/Downloads/1100/?icon=nuget"></a>  |   |
+|[Blob Storage](https://github.com/AdrianStrugala/SolTechnology.Core/tree/master/docs/Blob.md)     |  <a href="https://www.nuget.org/packages/SolTechnology.Core.BlobStorage/"><img src="https://badgen.net/badge/Downloads/1000/?icon=nuget"></a>  |   |
+|[HttpClients](https://github.com/AdrianStrugala/SolTechnology.Core/tree/master/docs/Clients.md)   |  <a href="https://www.nuget.org/packages/SolTechnology.Core.ApiClient/"><img src="https://badgen.net/badge/Downloads/1400/?icon=nuget"></a>  |   |
+|[Message Bus](https://github.com/AdrianStrugala/SolTechnology.Core/tree/master/docs/Bus.md)       |  <a href="https://www.nuget.org/packages/SolTechnology.Core.MessageBus/"><img src="https://badgen.net/badge/Downloads/1000/?icon=nuget"></a>  |   |
+|[Guards](https://github.com/AdrianStrugala/SolTechnology.Core/tree/master/docs/Guards.md)         |  <a href="https://www.nuget.org/packages/SolTechnology.Core.Guards/"><img src="https://badgen.net/badge/Downloads/1000/?icon=nuget"></a>  |   |
+|[Authentication](https://github.com/AdrianStrugala/SolTechnology.Core/tree/master/docs/Auth.md)   |  <a href="https://www.nuget.org/packages/SolTechnology.Core.Authentication/"><img src="https://badgen.net/badge/Downloads/700/?icon=nuget"></a>  |   |
+|[Logging](https://github.com/AdrianStrugala/SolTechnology.Core/tree/master/docs/Log.md)           |  <a href="https://www.nuget.org/packages/SolTechnology.Core.Logging/"><img src="https://badgen.net/badge/Downloads/700/?icon=nuget"></a>  |   |
 |[Scheduler](https://github.com/AdrianStrugala/SolTechnology.Core/tree/master/docs/Cron.md)        |  <a href="https://www.nuget.org/packages/SolTechnology.Core.Scheduler/"><img src="https://badgen.net/badge/Downloads/100/?icon=nuget"></a>  |   |
-|CQRS        |  <a href="https://www.nuget.org/packages/SolTechnology.Core.CQRS/"><img src="https://badgen.net/badge/Downloads/100/?icon=nuget"></a>  |   |
-|Api        |  <a href="https://www.nuget.org/packages/SolTechnology.Core.Api/"><img src="https://badgen.net/badge/Downloads/100/?icon=nuget"></a>  |   |
+|CQRS        |  <a href="https://www.nuget.org/packages/SolTechnology.Core.CQRS/"><img src="https://badgen.net/badge/Downloads/800/?icon=nuget"></a>  |   |
+|Api        |  <a href="https://www.nuget.org/packages/SolTechnology.Core.Api/"><img src="https://badgen.net/badge/Downloads/500/?icon=nuget"></a>  |   |
 |Cache        |  <a href="https://www.nuget.org/packages/SolTechnology.Core.Cache/"><img src="https://badgen.net/badge/Downloads/100/?icon=nuget"></a>  |   |
 
 
