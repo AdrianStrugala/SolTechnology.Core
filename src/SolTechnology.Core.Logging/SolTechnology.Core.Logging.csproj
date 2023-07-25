@@ -15,6 +15,7 @@
 		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
 
 		<PackageIcon>docs\mini-logo.png</PackageIcon>
+		<PackageReadmeFile>docs\readme.md</PackageReadmeFile>
 	</PropertyGroup>
 	<ItemGroup>
 		<None Include="..\..\docs\mini-logo.png" Pack="true" Visible="false" PackagePath="docs\mini-logo.png" />
