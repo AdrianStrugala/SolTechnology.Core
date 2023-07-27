@@ -5,7 +5,7 @@ using SolTechnology.Core.MessageBus.Configuration;
 
 namespace SolTechnology.Core.MessageBus.Broker
 {
-    public class MessageBusBroker : IMessageBusBroker, IDisposable
+    public class MessageBusBroker : IMessageBusBroker, IAsyncDisposable
     {
         private readonly ServiceBusClient _serviceBusClient;
         private readonly bool _createResources;
@@ -139,9 +139,11 @@ namespace SolTechnology.Core.MessageBus.Broker
         }
 
 
-        public void Dispose()
+        public async ValueTask DisposeAsync()
         {
-            _serviceBusClient.DisposeAsync().GetAwaiter().GetResult();
+            await Task.WhenAll(MessageToSenderMap.Select(p => p.Item2.CloseAsync()));
+            await Task.WhenAll(MessageToProcessorMap.Select(p => p.Item2.CloseAsync()));
+            await _serviceBusClient.DisposeAsync();
         }
     }
 }
