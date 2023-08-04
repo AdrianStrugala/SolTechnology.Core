@@ -19,6 +19,7 @@
 	</PropertyGroup>
 	<ItemGroup>
 		<None Include="..\..\docs\mini-logo.png" Pack="true" Visible="false" PackagePath="docs\mini-logo.png" />
+	<None Include="..\..\docs\Guards.md" Pack="true" Visible="false" PackagePath="docs\readme.md" />
 	</ItemGroup>
 
 
