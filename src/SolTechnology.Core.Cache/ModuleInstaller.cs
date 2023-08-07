@@ -31,7 +31,7 @@ namespace SolTechnology.Core.Cache
                     config.ExpirationSeconds = cacheConfiguration.ExpirationSeconds;
                 });
 
-
+            services.AddMemoryCache();
             services.AddSingleton<ILazyTaskCache, LazyTaskCache>();
 
             return services;
