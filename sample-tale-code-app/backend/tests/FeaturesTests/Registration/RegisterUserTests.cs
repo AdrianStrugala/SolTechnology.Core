@@ -1,5 +1,5 @@
 ﻿using DreamTravel.Domain.Users;
-using DreamTravel.Identity.Registration;
+using DreamTravel.Identity.Register;
 using NSubstitute;
 using Xunit;
 

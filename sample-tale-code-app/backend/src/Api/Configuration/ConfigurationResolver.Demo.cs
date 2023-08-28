@@ -1,5 +1,4 @@
-﻿using DreamTravel.DreamFlights;
-using DreamTravel.Infrastructure.Database;
+﻿using DreamTravel.Infrastructure.Database;
 
 namespace DreamTravel.Api.Configuration
 {
@@ -12,11 +11,8 @@ namespace DreamTravel.Api.Configuration
                 SqlDatabaseConfiguration = new SqlDatabaseConfiguration
                 {
                     ConnectionString = "Server=tcp:dreamtravel.database.windows.net,1433;Initial Catalog=dreamtravel-demo;Persist Security Info=False;User ID=adrian;Password=P4ssw0rd@;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=60;"
-                },
-                DreamFlightsConfiguration = new DreamFlightsConfiguration
-                {
-                    SendEmails = false
                 }
+                
             };
 
             return config;

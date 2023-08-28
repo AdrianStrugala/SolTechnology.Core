@@ -1,10 +1,10 @@
-﻿<Project Sdk="MSBuild.Sdk.SqlProj/2.0.0">
+﻿<Project Sdk="MSBuild.Sdk.SqlProj/2.5.0">
 	<PropertyGroup>
 		<Name>DreamTravelDatabase</Name>
 		<TargetFramework>netstandard2.1</TargetFramework>
+		<SqlServerVersion>SqlAzure</SqlServerVersion>
 		<AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
 		<DSP>Microsoft.Data.Tools.Schema.Sql.SqlAzureV12DatabaseSchemaProvider</DSP>
-		<SqlServerVersion>SqlAzure</SqlServerVersion>
 	</PropertyGroup>
 
 	<ItemGroup>

@@ -1,6 +1,4 @@
 using DreamTravel.Api.Configuration;
-using DreamTravel.AvroConvertOnline;
-using DreamTravel.DreamFlights;
 using DreamTravel.DreamTrips;
 using DreamTravel.Identity;
 using DreamTravel.Infrastructure.Authentication;
@@ -38,7 +36,6 @@ namespace DreamTravel.Api
             var appConfig = ConfigurationResolver.GetConfiguration(environmentName);
 
             services.AddSingleton<ISqlDatabaseConfiguration>(appConfig.SqlDatabaseConfiguration);
-            services.AddSingleton<IDreamFlightsConfiguration>(appConfig.DreamFlightsConfiguration);
 
             //CORS
             var policy = new AuthorizationPolicyBuilder()
@@ -61,10 +58,8 @@ namespace DreamTravel.Api
                 });
             });
 
-            services.InstallDreamFlights();
             services.InstallDreamTrips();
             services.InstallIdentity();
-            services.InstallAvroConvertOnline();
 
             services.AddControllers();
 

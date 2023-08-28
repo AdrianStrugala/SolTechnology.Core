@@ -20,7 +20,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\Domain\Domain.csproj" />
-    <ProjectReference Include="..\..\src\DreamFlights\DreamFlights.csproj" />
     <ProjectReference Include="..\..\src\DreamTrips\DreamTrips.csproj" />
     <ProjectReference Include="..\..\src\GeolocationData\Clients.csproj" />
     <ProjectReference Include="..\..\src\Identity\Identity.csproj" />

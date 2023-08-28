@@ -12,11 +12,9 @@
 
 	<ItemGroup>
 		<ProjectReference Include="..\Domain\Domain.csproj" />
-		<ProjectReference Include="..\DreamFlights\DreamFlights.csproj" />
 		<ProjectReference Include="..\DreamTrips\DreamTrips.csproj" />
 		<ProjectReference Include="..\Identity\Identity.csproj" />
 		<ProjectReference Include="..\Infrastructure\Infrastructure.csproj" />
-		<ProjectReference Include="..\LogicLayer\AvroConvertOnline\AvroConvertOnline.csproj" />
 	</ItemGroup>
 
 </Project>

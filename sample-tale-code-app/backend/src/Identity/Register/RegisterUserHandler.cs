@@ -2,7 +2,7 @@
 using DreamTravel.Domain.Users;
 using DreamTravel.Infrastructure;
 
-namespace DreamTravel.Identity.Registration
+namespace DreamTravel.Identity.Register
 {
     public class RegisterUserHandler : ICommandHandler<RegisterUserCommand>
     {

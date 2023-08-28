@@ -1,8 +1,8 @@
 ﻿using System.Threading.Tasks;
 using DreamTravel.Identity.ChangePassword;
-using DreamTravel.Identity.Registration;
 using DreamTravel.Domain.Users;
 using DreamTravel.Identity.Login;
+using DreamTravel.Identity.Register;
 using DreamTravel.Infrastructure;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
