@@ -1,0 +1,6 @@
+AntColony: 8 Cities 
+Minimal Distance: 53164 
+Average Distance: 53164 
+Average Time: 124 ms 
+Recurrence: 100 % 
+Benchmark entry status: OK

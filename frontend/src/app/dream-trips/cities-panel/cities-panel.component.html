@@ -1,0 +1,52 @@
+<!-- Cities Panel -->
+
+<div id="loader" *ngIf="this.TSPService.isLoading"></div>
+
+<div id="listOfCitiesPanel">
+  <form [formGroup]="this.cityService.citiesForm">
+    <!-- <h4 class="modal-title" align="center">
+      <label for="optimizeRoad">Optimize road </label
+      ><input type="checkbox" id="optimizeRoad" checked="checked" />
+    </h4>
+    <hr class="delimeter" /> -->
+
+    <h4 class="modal-title" align="center">List of cities:</h4>
+    <br />
+
+    <table>
+      <tbody id="listOfCities" #cityRows *ngFor="let index of this.cityService.contorls">
+        <tr class="list-group-item cityRow">
+          <!-- <i class="fa fa-arrows-alt handle" aria-hidden="true"></i> -->
+          <input
+            type="text"
+            class="cityText"
+            formControlName="{{ index }}"
+            (keyup.enter)="this.cityService.addCity()"
+            (change)="this.cityService.findAndDisplayCity(index)"
+          />
+          <i class="fa fa-times-circle removeCityBtn" (click)="this.cityService.removeCity(index)" aria-hidden="true"></i>
+        </tr>
+      </tbody>
+    </table>
+
+    <i
+      class="fa fa-plus-circle addCityBtn"
+      (click)="this.cityService.addCity()"
+      id="addCityBtn"
+    ></i>
+
+    <footer class="modal-footer">
+      <button
+        type="button"
+        class="btn btn-info"
+        (click)="this.TSPService.runTSP()"
+        id="runTSPBtn"
+        [disabled]="this.cityService.isFetchingData"
+      >
+        Run
+      </button>
+    </footer>
+  </form>
+  <hr class="delimeter" />
+      Total travel time: {{this.TSPService.totalTime$ | async}}
+</div>

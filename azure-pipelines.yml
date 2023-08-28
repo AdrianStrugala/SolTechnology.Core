@@ -1,0 +1,57 @@
+# ASP.NET
+# Build and test ASP.NET projects.
+# Add steps that publish symbols, save build artifacts, deploy, and more:
+# https://docs.microsoft.com/azure/devops/pipelines/apps/aspnet/build-aspnet-4
+
+# trigger:
+# - master
+  
+variables:
+  BuildConfiguration: 'Release'
+
+stages:
+  - stage: RunTests
+    displayName: RunTests
+    jobs:
+    - job: Database
+      steps:
+      - template: devOps/pipelines/buildAndPublishDatabase.yml
+        parameters:
+          BuildConfiguration: ${{ variables.buildConfiguration }}
+          Artifact: database
+    - job: Tests
+      steps:
+      - template: devOps/pipelines/buildAndPublishTests.yml
+        parameters:
+          BuildConfiguration: ${{ variables.buildConfiguration }}
+  - stage: BuildBackend
+    displayName: BuildBackend
+    jobs:
+    - job: Backend
+      steps:
+        - task: CopyFiles@2
+          displayName: 'Publish AzureResourceGroup'
+          inputs:
+            SourceFolder: devOps/AzureResourceGroup
+            Contents: WebSite.json
+            TargetFolder: '$(Build.ArtifactStagingDirectory)/Binaries/AzureResourceGroup'
+            OverWrite: true
+
+        - task: DotNetCoreCLI@2
+          displayName: 'Publish Api'
+          env:
+            environment: demo
+          inputs:
+            command: publish
+            publishWebProjects: false
+            projects: '**/Api.csproj'
+            arguments: '-o $(Build.ArtifactStagingDirectory)/Binaries'
+        - task: PublishBuildArtifacts@1
+          displayName: 'Publish Artifact'
+          inputs:
+            PathtoPublish: '$(Build.ArtifactStagingDirectory)/Binaries'
+            ArtifactName: 'backend'
+
+
+
+

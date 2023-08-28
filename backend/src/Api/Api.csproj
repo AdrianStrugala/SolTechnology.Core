@@ -1,0 +1,22 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+	<PropertyGroup>
+		<TargetFramework>net6.0</TargetFramework>
+		<RootNamespace>DreamTravel.Api</RootNamespace>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Swashbuckle.AspNetCore" Version="5.6.3" />
+		<PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.8.0" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\Domain\Domain.csproj" />
+		<ProjectReference Include="..\DreamFlights\DreamFlights.csproj" />
+		<ProjectReference Include="..\DreamTrips\DreamTrips.csproj" />
+		<ProjectReference Include="..\Identity\Identity.csproj" />
+		<ProjectReference Include="..\Infrastructure\Infrastructure.csproj" />
+		<ProjectReference Include="..\LogicLayer\AvroConvertOnline\AvroConvertOnline.csproj" />
+	</ItemGroup>
+
+</Project>

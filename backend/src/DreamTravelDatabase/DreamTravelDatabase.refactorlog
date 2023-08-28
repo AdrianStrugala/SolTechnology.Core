@@ -1,0 +1,10 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Operations Version="1.0" xmlns="http://schemas.microsoft.com/sqlserver/dac/Serialization/2012/02">
+  <Operation Name="Rename Refactor" Key="f0c60564-b143-4729-b8cb-dece34b03cc2" ChangeDateTime="02/24/2019 20:56:53">
+    <Property Name="ElementName" Value="[dbo].[Subscription].[NoOfMonthsFromNow]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[Subscription]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="LengthOfStay" />
+  </Operation>
+</Operations>

@@ -1,0 +1,39 @@
+parameters:
+    BuildConfiguration: ''
+
+steps:
+- task: NuGetToolInstaller@1
+  displayName: 'Install NuGet'
+  inputs:
+    versionSpec: '5.x'
+
+- task: UseDotNet@2
+  displayName: 'Set .NET Core to 5.0'
+  inputs:
+    packageType: sdk
+    version: 5.0.x
+    installationPath: $(Agent.ToolsDirectory)/dotnet
+
+- task: PowerShell@2
+  displayName: Run SQL Server
+  inputs:
+    targetType: 'inline'
+    script: |
+      docker run -e 'ACCEPT_EULA=Y' -e 'SA_PASSWORD=password_xxddd_2137' -p 1401:1433 --name DB -d mcr.microsoft.com/mssql/server:2019-latest
+
+- task: PowerShell@2
+  displayName: Publish DB
+  inputs:
+    targetType: 'inline'
+    workingDirectory: 'backend/src/DreamTravelDatabase'
+    script: |
+      dotnet publish /p:TargetServerName=localhost /p:TargetPort=1401 /p:TargetUser=sa /p:TargetPassword=password_xxddd_2137 /p:TargetDatabaseName=DreamTravelDatabase
+
+- task: DotNetCoreCLI@2
+  displayName: 'Run the tests'
+  inputs:
+    command: 'test'
+    projects: '**/*Tests.csproj'
+    custom: 'msbuild'
+    arguments: '-p:Configuration=$(BuildConfiguration)'
+    publishTestResults: true
