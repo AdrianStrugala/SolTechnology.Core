@@ -1,15 +1,9 @@
-﻿using DreamTravel.DatabaseData.Query.GetPreviewUsers;
-using DreamTravel.DatabaseData.Query.GetSubscriptionDetailsByDay;
-using DreamTravel.DatabaseData.Query.GetSubscriptionsWithDays;
-using DreamTravel.DatabaseData.Repository.FlightEmailSubscriptions;
-using DreamTravel.DatabaseData.Repository.SubscriptionDays;
-using DreamTravel.DatabaseData.Repository.Users;
-using DreamTravel.Domain.FlightEmailSubscriptions;
-using DreamTravel.Domain.Users;
+﻿using DreamTravel.Domain.Users;
+using DreamTravel.Identity.DatabaseData.Repository.Users;
 using DreamTravel.Infrastructure.Database;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace DreamTravel.DatabaseData.Configuration
+namespace DreamTravel.Identity.DatabaseData.Configuration
 {
     public static class ModuleInstaller
     {
@@ -18,12 +12,6 @@ namespace DreamTravel.DatabaseData.Configuration
             services.AddSingleton<IDbConnectionFactory, DbConnectionFactory>();
 
             services.AddTransient<IUserRepository, UserRepository>();
-            services.AddTransient<IFlightEmailSubscriptionRepository, FlightEmailSubscriptionRepository>();
-            services.AddTransient<ISubscriptionDaysRepository, SubscriptionDaysRepository>();
-
-            services.AddTransient<IGetSubscriptionDetailsByDay, GetSubscriptionDetailsByDay>();
-            services.AddTransient<IGetPreviewUsers, GetPreviewUsers>();
-            services.AddTransient<IGetSubscriptionsWithDays, GetSubscriptionsWithDaysHandler>();
 
             return services;
         }

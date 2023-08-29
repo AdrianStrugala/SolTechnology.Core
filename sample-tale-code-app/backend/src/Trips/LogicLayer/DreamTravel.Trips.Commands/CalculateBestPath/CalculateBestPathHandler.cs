@@ -1,9 +1,9 @@
 ﻿using System.Linq;
 using System.Threading.Tasks;
-using DreamTravel.Domain.Cities;
 using DreamTravel.DreamTrips.CalculateBestPath.Interfaces;
 using DreamTravel.Infrastructure;
 using DreamTravel.TravelingSalesmanProblem;
+using DreamTravel.Trips.Domain.Cities;
 
 namespace DreamTravel.DreamTrips.CalculateBestPath
 {

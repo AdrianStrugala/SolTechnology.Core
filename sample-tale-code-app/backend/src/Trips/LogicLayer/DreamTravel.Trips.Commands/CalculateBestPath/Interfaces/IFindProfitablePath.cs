@@ -1,4 +1,4 @@
-﻿using DreamTravel.Domain.Cities;
+﻿using DreamTravel.Trips.Domain.Cities;
 
 namespace DreamTravel.DreamTrips.CalculateBestPath.Interfaces
 {

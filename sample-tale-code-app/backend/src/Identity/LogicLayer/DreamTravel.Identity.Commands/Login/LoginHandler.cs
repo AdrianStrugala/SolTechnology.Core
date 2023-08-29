@@ -1,9 +1,9 @@
 ﻿using System.Threading.Tasks;
-using DreamTravel.Cryptography;
 using DreamTravel.Domain.Users;
+using DreamTravel.Identity.Cryptography;
 using DreamTravel.Infrastructure;
 
-namespace DreamTravel.Identity.Login
+namespace DreamTravel.Identity.Commands.Login
 {
     public class LoginHandler : IQueryHandler<LoginQuery, LoginResult>
     {

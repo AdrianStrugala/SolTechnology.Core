@@ -3,7 +3,7 @@ using System.IO;
 using System.Security.Cryptography;
 using System.Text;
 
-namespace DreamTravel.Cryptography
+namespace DreamTravel.Identity.Cryptography
 {
     public static class Encryption
     {

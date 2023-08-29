@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using DreamTravel.Domain.Cities;
+using DreamTravel.Trips.Domain.Cities;
 
 namespace DreamTravel.DreamTrips.CalculateBestPath
 {

@@ -1,5 +1,5 @@
 ﻿using System.Threading.Tasks;
-using DreamTravel.Domain.Cities;
+using DreamTravel.Trips.Domain.Cities;
 
 namespace DreamTravel.GeolocationData
 {

@@ -1,10 +1,10 @@
-﻿using DreamTravel.DatabaseData.Repository.Users;
-using DreamTravel.DatabaseDataTests.TestsConfiguration;
-using DreamTravel.Domain.Users;
+﻿using DreamTravel.Domain.Users;
+using DreamTravel.Identity.DatabaseData.IntegrationTests.TestsConfiguration;
+using DreamTravel.Identity.DatabaseData.Repository.Users;
 using DreamTravel.Infrastructure.Database;
 using Xunit;
 
-namespace DreamTravel.DatabaseDataTests.Users
+namespace DreamTravel.Identity.DatabaseData.IntegrationTests.Users
 {
     public class UserRepositoryTests : IClassFixture<SqlFixture>
     {

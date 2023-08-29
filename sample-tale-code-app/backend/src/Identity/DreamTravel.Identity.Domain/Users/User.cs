@@ -1,7 +1,7 @@
 ﻿using System;
 using Guards;
 
-namespace DreamTravel.Domain.Users
+namespace DreamTravel.Identity.Domain.Users
 {
     public record User : AbstractEntity
     {

@@ -61,7 +61,13 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DreamTravelDatabase", "src\
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DreamTravel.Identity.Cryptography.UnitTests", "src\Identity\Tests\DreamTravel.Identity.Cryptography.UnitTests\DreamTravel.Identity.Cryptography.UnitTests.csproj", "{818CEB54-7F26-4BA4-8BB1-84AC388C81C3}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ApiTests", "src\ApiTests\ApiTests.csproj", "{6335A740-B0C2-4D56-A741-D3E11101082C}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DreamTravel.Trips.Domain", "src\Trips\DreamTravel.Trips.Domain\DreamTravel.Trips.Domain.csproj", "{7C69F220-4F3C-4902-AD68-E4A50C527007}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DreamTravel.Trips.Domain.UnitTests", "src\Trips\Tests\DreamTravel.Trips.Domain.UnitTests\DreamTravel.Trips.Domain.UnitTests.csproj", "{B21807F9-8BC7-45CC-AD2D-EAC8F7DC5EFB}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "TestFixtures", "TestFixtures", "{4B5E71B6-91EE-44E5-BAC7-EB1A416CB311}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DreamTravel.TestFixture.Api", "src\Infrastructure\TestFixtures\DreamTravel.TestFixture.Api\DreamTravel.TestFixture.Api.csproj", "{5403A65C-8123-4D30-8184-BC9B549605CF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -141,10 +147,18 @@ Global
 		{818CEB54-7F26-4BA4-8BB1-84AC388C81C3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{818CEB54-7F26-4BA4-8BB1-84AC388C81C3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{818CEB54-7F26-4BA4-8BB1-84AC388C81C3}.Release|Any CPU.Build.0 = Release|Any CPU
-		{6335A740-B0C2-4D56-A741-D3E11101082C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{6335A740-B0C2-4D56-A741-D3E11101082C}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{6335A740-B0C2-4D56-A741-D3E11101082C}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{6335A740-B0C2-4D56-A741-D3E11101082C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7C69F220-4F3C-4902-AD68-E4A50C527007}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7C69F220-4F3C-4902-AD68-E4A50C527007}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7C69F220-4F3C-4902-AD68-E4A50C527007}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7C69F220-4F3C-4902-AD68-E4A50C527007}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B21807F9-8BC7-45CC-AD2D-EAC8F7DC5EFB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B21807F9-8BC7-45CC-AD2D-EAC8F7DC5EFB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B21807F9-8BC7-45CC-AD2D-EAC8F7DC5EFB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B21807F9-8BC7-45CC-AD2D-EAC8F7DC5EFB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5403A65C-8123-4D30-8184-BC9B549605CF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5403A65C-8123-4D30-8184-BC9B549605CF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5403A65C-8123-4D30-8184-BC9B549605CF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5403A65C-8123-4D30-8184-BC9B549605CF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -173,6 +187,10 @@ Global
 		{CF9F9975-D6E8-42AA-9FDB-C939559DB80B} = {AA021B4E-7738-4B8B-856D-D5DEBC992D9F}
 		{9EFD66EB-23EC-4A26-B9BC-59E277555CA6} = {AA021B4E-7738-4B8B-856D-D5DEBC992D9F}
 		{818CEB54-7F26-4BA4-8BB1-84AC388C81C3} = {7941F357-9380-4675-A5F4-0AA950DEBA48}
+		{7C69F220-4F3C-4902-AD68-E4A50C527007} = {572E779B-BBF5-479A-BCF8-4F42D87B96A6}
+		{B21807F9-8BC7-45CC-AD2D-EAC8F7DC5EFB} = {35A72CE7-B87F-4068-BCD8-32667B36F536}
+		{4B5E71B6-91EE-44E5-BAC7-EB1A416CB311} = {AA021B4E-7738-4B8B-856D-D5DEBC992D9F}
+		{5403A65C-8123-4D30-8184-BC9B549605CF} = {4B5E71B6-91EE-44E5-BAC7-EB1A416CB311}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {00F9DE65-0AAA-464E-9C25-8FC931194B32}

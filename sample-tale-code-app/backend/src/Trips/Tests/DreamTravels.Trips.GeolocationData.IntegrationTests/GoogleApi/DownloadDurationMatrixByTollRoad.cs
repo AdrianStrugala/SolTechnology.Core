@@ -1,12 +1,12 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
-using DreamTravel.Domain.Cities;
 using DreamTravel.GeolocationData.GoogleApi;
+using DreamTravel.Trips.Domain.Cities;
 using Microsoft.Extensions.Logging.Abstractions;
 using Xunit;
 
-namespace DreamTravel.GeolocationDataTests.GoogleApi
+namespace DreamTravel.Trips.GeolocationDataClients.IntegrationTests.GoogleApi
 {
     public class DownloadDurationMatrixByTollRoadTests
     {

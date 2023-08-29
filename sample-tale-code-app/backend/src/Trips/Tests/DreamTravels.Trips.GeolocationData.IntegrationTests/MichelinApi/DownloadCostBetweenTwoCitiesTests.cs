@@ -1,10 +1,10 @@
 ﻿using System.Threading.Tasks;
-using DreamTravel.Domain.Cities;
 using DreamTravel.GeolocationData.MichelinApi;
+using DreamTravel.Trips.Domain.Cities;
 using Microsoft.Extensions.Logging.Abstractions;
 using Xunit;
 
-namespace DreamTravel.GeolocationDataTests.MichelinApi
+namespace DreamTravel.Trips.GeolocationDataClients.IntegrationTests.MichelinApi
 {
     public class DownloadCostBetweenTwoCitiesTests
     {

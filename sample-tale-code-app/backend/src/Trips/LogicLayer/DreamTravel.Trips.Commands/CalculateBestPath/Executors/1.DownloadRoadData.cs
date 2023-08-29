@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using DreamTravel.Domain.Cities;
 using DreamTravel.DreamTrips.CalculateBestPath.Interfaces;
 using DreamTravel.GeolocationData;
+using DreamTravel.Trips.Domain.Cities;
 
 namespace DreamTravel.DreamTrips.CalculateBestPath.Executors
 {

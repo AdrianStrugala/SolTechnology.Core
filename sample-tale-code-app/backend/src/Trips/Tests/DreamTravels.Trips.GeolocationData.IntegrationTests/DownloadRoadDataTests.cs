@@ -1,14 +1,14 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using DreamTravel.Domain.Cities;
 using DreamTravel.DreamTrips.CalculateBestPath.Executors;
 using DreamTravel.GeolocationData;
 using DreamTravel.GeolocationData.GoogleApi;
 using DreamTravel.GeolocationData.MichelinApi;
+using DreamTravel.Trips.Domain.Cities;
 using Microsoft.Extensions.Logging.Abstractions;
 using Xunit;
 
-namespace DreamTravel.GeolocationDataTests
+namespace DreamTravel.Trips.GeolocationDataClients.IntegrationTests
 {
     public class DownloadRoadDataTests
     {

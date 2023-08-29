@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using DreamTravel.Domain.Cities;
 using DreamTravel.DreamTrips.CalculateBestPath;
 using DreamTravel.DreamTrips.CalculateBestPath.Executors;
 using DreamTravel.DreamTrips.CalculateBestPath.Interfaces;
@@ -8,10 +7,11 @@ using DreamTravel.GeolocationData;
 using DreamTravel.GeolocationData.GoogleApi;
 using DreamTravel.GeolocationData.MichelinApi;
 using DreamTravel.TravelingSalesmanProblem;
+using DreamTravel.Trips.Domain.Cities;
 using Microsoft.Extensions.Logging.Abstractions;
 using Xunit;
 
-namespace DreamTravel.FeaturesTests.CalculateBestPath
+namespace DreamTravel.Trips.Commands.UnitTests.CalculateBestPath
 {
     public class PerformanceTests
     {

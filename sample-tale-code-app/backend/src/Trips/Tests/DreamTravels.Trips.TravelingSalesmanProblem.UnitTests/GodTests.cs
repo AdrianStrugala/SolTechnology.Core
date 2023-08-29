@@ -1,12 +1,12 @@
-namespace DreamTravel.TravelingSalesmanProblemTests
-{
-    using System;
-    using System.Linq;
-    using Xunit;
+using System;
+using System.Linq;
+using Xunit;
 
+namespace DreamTravel.Trips.TravelingSalesmanProblem.UnitTests
+{
     public class GodTests
     {
-        readonly TravelingSalesmanProblem.God _sut = new TravelingSalesmanProblem.God();
+        readonly DreamTravel.TravelingSalesmanProblem.God _sut = new DreamTravel.TravelingSalesmanProblem.God();
 
         [Fact]
         public void SolveTSP_RunWithValidParameters_FirstAndLastCitiesStaysTheSame()

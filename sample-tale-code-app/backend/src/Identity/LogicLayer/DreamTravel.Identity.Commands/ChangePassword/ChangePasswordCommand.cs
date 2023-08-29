@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace DreamTravel.Identity.ChangePassword
+namespace DreamTravel.Identity.Commands.ChangePassword
 {
    public class ChangePasswordCommand
     {

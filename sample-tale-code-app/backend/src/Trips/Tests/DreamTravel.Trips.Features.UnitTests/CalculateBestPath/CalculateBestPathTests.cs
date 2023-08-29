@@ -1,13 +1,13 @@
 using System.Collections.Generic;
-using DreamTravel.Domain.Cities;
 using DreamTravel.DreamTrips.CalculateBestPath;
 using DreamTravel.DreamTrips.CalculateBestPath.Executors;
 using DreamTravel.DreamTrips.CalculateBestPath.Interfaces;
 using DreamTravel.TravelingSalesmanProblem;
+using DreamTravel.Trips.Domain.Cities;
 using NSubstitute;
 using Xunit;
 
-namespace DreamTravel.FeaturesTests.CalculateBestPath
+namespace DreamTravel.Trips.Commands.UnitTests.CalculateBestPath
 {
     public class CalculateBestPathTests
     {

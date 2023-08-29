@@ -1,8 +1,8 @@
-﻿using DreamTravel.DatabaseData.Configuration;
+﻿using DreamTravel.Identity.DatabaseData.Configuration;
 using DreamTravel.Infrastructure;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace DreamTravel.Identity
+namespace DreamTravel.Identity.Commands
 {
     public static class ModuleInstaller
     {

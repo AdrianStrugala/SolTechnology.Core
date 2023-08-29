@@ -1,7 +1,6 @@
-﻿using DreamTravel.Cryptography;
-using Xunit;
+﻿using Xunit;
 
-namespace DreamTravel.CryptographyTests
+namespace DreamTravel.Identity.Cryptography.UnitTests
 {
     public class EncryptionTests
     {

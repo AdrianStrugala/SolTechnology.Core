@@ -1,4 +1,4 @@
-﻿namespace DreamTravel.Domain.Cities
+﻿namespace DreamTravel.Trips.Domain.Cities
 {
     public sealed class EvaluationMatrix
     {

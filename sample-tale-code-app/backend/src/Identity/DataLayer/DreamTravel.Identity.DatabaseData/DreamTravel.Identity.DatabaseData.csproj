@@ -2,7 +2,6 @@
 
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
-    <RootNamespace>DreamTravel.DatabaseData</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>
@@ -14,6 +13,10 @@
   <ItemGroup>
     <ProjectReference Include="..\..\..\Infrastructure\DreamTravel.Infrastructure\DreamTravel.Infrastructure.csproj" />
     <ProjectReference Include="..\..\DreamTravel.Identity.Domain\DreamTravel.Identity.Domain.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Query\" />
   </ItemGroup>
   
 </Project>

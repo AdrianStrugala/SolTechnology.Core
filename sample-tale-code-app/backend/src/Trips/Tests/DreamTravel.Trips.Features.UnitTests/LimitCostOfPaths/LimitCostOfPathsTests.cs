@@ -1,10 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using DreamTravel.Domain.Paths;
 using DreamTravel.DreamTrips.LimitCostOfPaths;
+using DreamTravel.Trips.Domain.Paths;
 using Xunit;
 
-namespace DreamTravel.FeaturesTests.LimitCostOfPaths
+namespace DreamTravel.Trips.Commands.UnitTests.LimitCostOfPaths
 {
     public class LimitCostOfPathsTests
     {

@@ -3,7 +3,7 @@ using System.Linq;
 using Dapper;
 using DreamTravel.Domain.Users;
 
-namespace DreamTravel.DatabaseData.Repository.Users
+namespace DreamTravel.Identity.DatabaseData.Repository.Users
 {
     public partial class UserRepository : IUserRepository
     {

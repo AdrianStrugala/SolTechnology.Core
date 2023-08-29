@@ -1,6 +1,6 @@
-﻿using DreamTravel.Domain.Cities;
+﻿using DreamTravel.Trips.Domain.Cities;
 
-namespace DreamTravel.Domain.Paths
+namespace DreamTravel.Trips.Domain.Paths
 {
     public class Path
     {

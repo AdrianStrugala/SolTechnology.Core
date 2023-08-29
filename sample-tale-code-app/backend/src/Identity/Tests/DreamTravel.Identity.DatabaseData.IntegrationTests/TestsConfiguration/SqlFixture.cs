@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using DreamTravel.Infrastructure.Database;
 using Xunit;
 
-namespace DreamTravel.DatabaseDataTests.TestsConfiguration
+namespace DreamTravel.Identity.DatabaseData.IntegrationTests.TestsConfiguration
 {
     public class SqlFixture : IAsyncLifetime
     {

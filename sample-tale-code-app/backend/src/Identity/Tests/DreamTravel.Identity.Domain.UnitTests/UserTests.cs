@@ -2,7 +2,7 @@ using System;
 using DreamTravel.Domain.Users;
 using Xunit;
 
-namespace DreamTravel.DomainTests
+namespace DreamTravel.Identity.Domain.UnitTests
 {
     public class UserTests
     {

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace DreamTravel.Domain
+namespace DreamTravel.Identity.Domain
 {
     public abstract record AbstractEntity
     {

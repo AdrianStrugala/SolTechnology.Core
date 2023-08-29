@@ -1,8 +1,8 @@
-﻿using DreamTravel.Cryptography;
-using DreamTravel.Domain.Users;
+﻿using DreamTravel.Domain.Users;
+using DreamTravel.Identity.Cryptography;
 using DreamTravel.Infrastructure;
 
-namespace DreamTravel.Identity.ChangePassword
+namespace DreamTravel.Identity.Commands.ChangePassword
 {
     public class ChangePasswordHandler : ICommandHandler<ChangePasswordCommand>
     {

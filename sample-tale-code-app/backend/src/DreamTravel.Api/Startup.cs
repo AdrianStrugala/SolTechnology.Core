@@ -1,6 +1,7 @@
 using DreamTravel.Api.Configuration;
 using DreamTravel.DreamTrips;
 using DreamTravel.Identity;
+using DreamTravel.Identity.Commands;
 using DreamTravel.Infrastructure.Authentication;
 using DreamTravel.Infrastructure.Database;
 using Microsoft.AspNetCore.Authorization;

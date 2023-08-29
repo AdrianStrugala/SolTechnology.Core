@@ -2,7 +2,7 @@
 using System.Net.Http;
 using System.Threading.Tasks;
 using System.Xml;
-using DreamTravel.Domain.Cities;
+using DreamTravel.Trips.Domain.Cities;
 using Microsoft.Extensions.Logging;
 
 namespace DreamTravel.GeolocationData.MichelinApi

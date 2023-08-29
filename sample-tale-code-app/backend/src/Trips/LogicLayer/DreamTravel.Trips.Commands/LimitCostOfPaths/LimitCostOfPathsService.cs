@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using DreamTravel.Domain.Paths;
 using DreamTravel.Infrastructure;
+using DreamTravel.Trips.Domain.Paths;
 
 namespace DreamTravel.DreamTrips.LimitCostOfPaths
 {

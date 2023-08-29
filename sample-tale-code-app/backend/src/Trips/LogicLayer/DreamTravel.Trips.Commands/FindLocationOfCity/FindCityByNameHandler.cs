@@ -1,7 +1,7 @@
 ﻿using System.Threading.Tasks;
-using DreamTravel.Domain.Cities;
 using DreamTravel.GeolocationData;
 using DreamTravel.Infrastructure;
+using DreamTravel.Trips.Domain.Cities;
 
 namespace DreamTravel.DreamTrips.FindLocationOfCity
 {

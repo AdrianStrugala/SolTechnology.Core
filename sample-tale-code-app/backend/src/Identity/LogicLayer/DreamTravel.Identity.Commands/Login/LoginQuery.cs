@@ -1,4 +1,4 @@
-﻿namespace DreamTravel.Identity.Login
+﻿namespace DreamTravel.Identity.Commands.Login
 {
     public class LoginQuery
     {

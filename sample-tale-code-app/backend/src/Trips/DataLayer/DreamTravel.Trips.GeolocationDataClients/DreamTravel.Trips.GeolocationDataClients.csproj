@@ -13,7 +13,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\Identity\DreamTravel.Identity.Domain\DreamTravel.Identity.Domain.csproj" />
+    <ProjectReference Include="..\..\DreamTravel.Trips.Domain\DreamTravel.Trips.Domain.csproj" />
   </ItemGroup>
 
 </Project>

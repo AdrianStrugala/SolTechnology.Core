@@ -1,10 +1,10 @@
-namespace DreamTravel.TravelingSalesmanProblemTests
-{
-    using System;
-    using System.Linq;
-    using TravelingSalesmanProblem;
-    using Xunit;
+using System;
+using System.Linq;
+using DreamTravel.TravelingSalesmanProblem;
+using Xunit;
 
+namespace DreamTravel.Trips.TravelingSalesmanProblem.UnitTests
+{
     [Collection("Benchmark")]
     public class AntColonyTests
     {

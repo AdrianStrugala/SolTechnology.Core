@@ -1,10 +1,9 @@
 ﻿using System;
-using DreamTravel.Domain.Cities;
-using DreamTravel.DreamTrips.CalculateBestPath;
 using DreamTravel.DreamTrips.CalculateBestPath.Executors;
+using DreamTravel.Trips.Domain.Cities;
 using Xunit;
 
-namespace DreamTravel.FeaturesTests.CalculateBestPath
+namespace DreamTravel.Trips.Commands.UnitTests.CalculateBestPath
 {
     public class FindProfitablePathTests
     {
