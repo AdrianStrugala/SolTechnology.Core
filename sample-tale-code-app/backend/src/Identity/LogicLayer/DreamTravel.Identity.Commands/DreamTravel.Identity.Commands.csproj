@@ -1,0 +1,13 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net5.0</TargetFramework>
+    <RootNamespace>DreamTravel.Identity</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\DataLayer\DreamTravel.Identity.DatabaseData\DreamTravel.Identity.DatabaseData.csproj" />
+    <ProjectReference Include="..\DreamTravel.Identity.Cryptography\DreamTravel.Identity.Cryptography.csproj" />
+  </ItemGroup>
+
+</Project>
