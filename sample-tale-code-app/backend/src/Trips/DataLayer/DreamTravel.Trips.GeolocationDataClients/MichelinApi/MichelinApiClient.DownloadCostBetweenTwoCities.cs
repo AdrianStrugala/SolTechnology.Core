@@ -32,7 +32,7 @@ namespace DreamTravel.GeolocationData.MichelinApi
             try
             {
                 string url =
-                    $"http://apir.viamichelin.com/apir/1/route.xml/fra?steps=1:e:{origin.Longitude}:{origin.Latitude};1:e:{destination.Longitude}:{destination.Latitude}&authkey=JSBS20101202150903217741708195";
+                    $"http://apir.viamichelin.com/apir/1/route.xml/fra?steps=1:e:{origin.Longitude}:{origin.Latitude};1:e:{destination.Longitude}:{destination.Latitude}&authkey=";
 
                 var response = await _httpClient.GetStringAsync(url);
                 XmlDocument doc = new XmlDocument();
