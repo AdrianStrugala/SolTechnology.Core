@@ -4,6 +4,6 @@ namespace DreamTravel.Trips.Queries.CalculateBestPath.Interfaces
 {
     public interface IFindProfitablePath
     {
-        EvaluationMatrix Execute(EvaluationMatrix evaluationMatrix, int noOfCities);
+        void Execute(CalculateBestPathContext calculateBestPathContext, int noOfCities);
     }
 }

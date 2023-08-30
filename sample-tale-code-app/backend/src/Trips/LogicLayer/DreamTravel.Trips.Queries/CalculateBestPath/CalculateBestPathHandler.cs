@@ -23,19 +23,20 @@ namespace DreamTravel.Trips.Queries.CalculateBestPath
         public async Task<CalculateBestPathResult> Handle(CalculateBestPathQuery query)
         {
             var cities = query.Cities.Where(c => c != null).ToList();
+            var context = new CalculateBestPathContext(cities.Count);
 
-            EvaluationMatrix evaluationMatrix = await _downloadRoadData.Execute(cities);
-            evaluationMatrix = _findProfitablePath.Execute(evaluationMatrix, cities.Count);
+            await _downloadRoadData.Execute(cities!, context);
+            _findProfitablePath.Execute(context, cities.Count);
 
-            var orderOfCities = _tspSolver.SolveTSP(evaluationMatrix.OptimalDistances.ToList());
+            var orderOfCities = _tspSolver.SolveTSP(context.OptimalDistances.ToList());
 
             //to have a possiblity to store cities data
-            // File.WriteAllText("./xCities.txt", JsonConvert.SerializeObject(evaluationMatrix.OptimalDistances));
+            // File.WriteAllText("./xCities.txt", JsonConvert.SerializeObject(calculateBestPathContext.OptimalDistances));
 
             CalculateBestPathResult calculateBestPathResult = new CalculateBestPathResult
             {
-                Cities = cities,
-                BestPaths = _formPathsFromMatrices.Execute(cities, evaluationMatrix, orderOfCities)
+                Cities = cities!,
+                BestPaths = _formPathsFromMatrices.Execute(cities!, context, orderOfCities)
             };
             return calculateBestPathResult;
         }

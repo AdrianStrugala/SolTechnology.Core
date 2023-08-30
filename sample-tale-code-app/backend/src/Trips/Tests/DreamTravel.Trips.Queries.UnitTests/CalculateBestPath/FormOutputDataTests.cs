@@ -1,4 +1,5 @@
 using DreamTravel.Trips.Domain.Cities;
+using DreamTravel.Trips.Queries.CalculateBestPath;
 using DreamTravel.Trips.Queries.CalculateBestPath.Executors;
 
 namespace DreamTravel.Trips.Queries.UnitTests.CalculateBestPath
@@ -37,10 +38,10 @@ namespace DreamTravel.Trips.Queries.UnitTests.CalculateBestPath
 
             List<int> orderOfCities = new List<int>(noOfCities) { 0, 2, 1 };
 
-            EvaluationMatrix evaluationMatrix = new EvaluationMatrix(noOfCities);
+            CalculateBestPathContext calculateBestPathContext = new CalculateBestPathContext(noOfCities);
 
             //Act
-            var result = _sut.Execute(listOfCities, evaluationMatrix, orderOfCities);
+            var result = _sut.Execute(listOfCities, calculateBestPathContext, orderOfCities);
 
             //Assert
             Assert.Equal(noOfCities - 1, result.Count);

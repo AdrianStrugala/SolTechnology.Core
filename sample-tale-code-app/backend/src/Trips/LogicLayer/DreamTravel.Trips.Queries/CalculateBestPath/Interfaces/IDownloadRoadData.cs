@@ -4,6 +4,6 @@ namespace DreamTravel.Trips.Queries.CalculateBestPath.Interfaces
 {
     public interface IDownloadRoadData
     {
-        Task<EvaluationMatrix> Execute(List<City> listOfCities);
+        Task Execute(List<City> listOfCities, CalculateBestPathContext calculateBestPathContext);
     }
 }

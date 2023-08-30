@@ -4,6 +4,7 @@ using DreamTravel.GeolocationData;
 using DreamTravel.GeolocationData.GoogleApi;
 using DreamTravel.GeolocationData.MichelinApi;
 using DreamTravel.Trips.Domain.Cities;
+using DreamTravel.Trips.Queries.CalculateBestPath;
 using DreamTravel.Trips.Queries.CalculateBestPath.Executors;
 using Microsoft.Extensions.Logging.Abstractions;
 using Xunit;
@@ -43,21 +44,22 @@ namespace DreamTravel.Trips.GeolocationDataClients.IntegrationTests
 
             List<City> cities = new List<City> { firstCity, secondCity };
 
+            var context = new CalculateBestPathContext(cities.Count);
 
             //Act
-            EvaluationMatrix matrix = await _sut.Execute(cities);
+            await _sut.Execute(cities, context);
 
 
             //Assert
-            Assert.Equal(4, matrix.Costs.Length);
-            Assert.Equal(4, matrix.FreeDistances.Length);
-            Assert.Equal(4, matrix.TollDistances.Length);
+            Assert.Equal(4, context.Costs.Length);
+            Assert.Equal(4, context.FreeDistances.Length);
+            Assert.Equal(4, context.TollDistances.Length);
 
             //valid values
-            Assert.Equal(double.MaxValue, matrix.FreeDistances[0]);
-            Assert.Equal(double.MaxValue, matrix.FreeDistances[3]);
-            Assert.NotEqual(double.MaxValue, matrix.FreeDistances[1]);
-            Assert.NotEqual(double.MaxValue, matrix.FreeDistances[2]);
+            Assert.Equal(double.MaxValue, context.FreeDistances[0]);
+            Assert.Equal(double.MaxValue, context.FreeDistances[3]);
+            Assert.NotEqual(double.MaxValue, context.FreeDistances[1]);
+            Assert.NotEqual(double.MaxValue, context.FreeDistances[2]);
         }
 
         //can always download data of at least 30 cities
@@ -80,8 +82,11 @@ namespace DreamTravel.Trips.GeolocationDataClients.IntegrationTests
                 cities.Add(city);
             }
 
+            var context = new CalculateBestPathContext(cities.Count);
+
+
             //Act
-            await _sut.Execute(cities);
+            await _sut.Execute(cities, context);
 
 
             //Assert

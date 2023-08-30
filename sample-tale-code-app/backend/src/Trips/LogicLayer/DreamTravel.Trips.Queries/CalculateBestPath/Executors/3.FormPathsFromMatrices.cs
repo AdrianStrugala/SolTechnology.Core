@@ -6,7 +6,7 @@ namespace DreamTravel.Trips.Queries.CalculateBestPath.Executors
 {
     public class FormPathsFromMatrices : IFormPathsFromMatrices
     {
-        public List<Path> Execute(List<City> listOfCities, EvaluationMatrix evaluationMatrix, List<int> orderOfCities = null)
+        public List<Path> Execute(List<City> listOfCities, CalculateBestPathContext calculateBestPathContext, List<int> orderOfCities = null)
         {
             if (orderOfCities == null)
             {
@@ -25,13 +25,13 @@ namespace DreamTravel.Trips.Queries.CalculateBestPath.Executors
                     Index = i,
                     StartingCity = listOfCities[orderOfCities[i]],
                     EndingCity = listOfCities[orderOfCities[i + 1]],
-                    OptimalCost = evaluationMatrix.OptimalCosts[orderOfCities[i + 1] + orderOfCities[i] * noOfCities],
-                    VinietaCost = evaluationMatrix.VinietaCosts[orderOfCities[i + 1] + orderOfCities[i] * noOfCities],
-                    OptimalDistance = evaluationMatrix.OptimalDistances[orderOfCities[i + 1] + orderOfCities[i] * noOfCities],
-                    Goal = evaluationMatrix.Goals[orderOfCities[i + 1] + orderOfCities[i] * noOfCities],
-                    Cost = evaluationMatrix.Costs[orderOfCities[i + 1] + orderOfCities[i] * noOfCities],
-                    FreeDistance = evaluationMatrix.FreeDistances[orderOfCities[i + 1] + orderOfCities[i] * noOfCities],
-                    TollDistance = evaluationMatrix.TollDistances[orderOfCities[i + 1] + orderOfCities[i] * noOfCities]
+                    OptimalCost = calculateBestPathContext.OptimalCosts[orderOfCities[i + 1] + orderOfCities[i] * noOfCities],
+                    VinietaCost = calculateBestPathContext.VinietaCosts[orderOfCities[i + 1] + orderOfCities[i] * noOfCities],
+                    OptimalDistance = calculateBestPathContext.OptimalDistances[orderOfCities[i + 1] + orderOfCities[i] * noOfCities],
+                    Goal = calculateBestPathContext.Goals[orderOfCities[i + 1] + orderOfCities[i] * noOfCities],
+                    Cost = calculateBestPathContext.Costs[orderOfCities[i + 1] + orderOfCities[i] * noOfCities],
+                    FreeDistance = calculateBestPathContext.FreeDistances[orderOfCities[i + 1] + orderOfCities[i] * noOfCities],
+                    TollDistance = calculateBestPathContext.TollDistances[orderOfCities[i + 1] + orderOfCities[i] * noOfCities]
                 };
                 paths.Add(currentPath);
             }

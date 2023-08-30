@@ -10,7 +10,7 @@ namespace DreamTravel.Trips.Queries.CalculateBestPath.Executors
         private static double HighwayVelocity { get; } = 120;
         private static double RoadCombustion { get; } = 0.06; //per km
 
-        public EvaluationMatrix Execute(EvaluationMatrix evaluationMatrix, int noOfCities)
+        public void Execute(CalculateBestPathContext calculateBestPathContext, int noOfCities)
         {
             Parallel.For(0, noOfCities, i =>
             {
@@ -21,57 +21,55 @@ namespace DreamTravel.Trips.Queries.CalculateBestPath.Executors
                         int iterator = j + i * noOfCities;
 
                         //if toll takes more time than regular -> pretend it does not exist
-                        if (evaluationMatrix.TollDistances[iterator] > evaluationMatrix.FreeDistances[iterator])
+                        if (calculateBestPathContext.TollDistances[iterator] > calculateBestPathContext.FreeDistances[iterator])
                         {
-                            evaluationMatrix.TollDistances[iterator] = evaluationMatrix.FreeDistances[iterator];
-                            evaluationMatrix.Costs[iterator] = 0;
+                            calculateBestPathContext.TollDistances[iterator] = calculateBestPathContext.FreeDistances[iterator];
+                            calculateBestPathContext.Costs[iterator] = 0;
                         }
 
-                        if (IsTollRoadProfitable(evaluationMatrix, iterator))
+                        if (IsTollRoadProfitable(calculateBestPathContext, iterator))
                         {
-                            evaluationMatrix.OptimalDistances[iterator] = evaluationMatrix.TollDistances[iterator];
-                            evaluationMatrix.OptimalCosts[iterator] = evaluationMatrix.Costs[iterator];
+                            calculateBestPathContext.OptimalDistances[iterator] = calculateBestPathContext.TollDistances[iterator];
+                            calculateBestPathContext.OptimalCosts[iterator] = calculateBestPathContext.Costs[iterator];
                         }
                         else
                         {
-                            evaluationMatrix.OptimalDistances[iterator] = evaluationMatrix.FreeDistances[iterator];
-                            evaluationMatrix.OptimalCosts[iterator] = 0;
+                            calculateBestPathContext.OptimalDistances[iterator] = calculateBestPathContext.FreeDistances[iterator];
+                            calculateBestPathContext.OptimalCosts[iterator] = 0;
                         }
                     }
                 });
             });
-
-            return evaluationMatrix;
         }
 
 
-        private static bool IsTollRoadProfitable(EvaluationMatrix evaluationMatrix, int iterator)
+        private static bool IsTollRoadProfitable(CalculateBestPathContext calculateBestPathContext, int iterator)
         {
             //roads using vinieta are never profitable
-            if (evaluationMatrix.VinietaCosts[iterator] != 0)
+            if (calculateBestPathContext.VinietaCosts[iterator] != 0)
             {
                 return false;
             }
 
             // C_G=s×combustion×fuel price [€] = v x t x combustion x fuel 
             double gasolineCostFree =
-                evaluationMatrix.FreeDistances[iterator] /
+                calculateBestPathContext.FreeDistances[iterator] /
                 3600.0 * RoadVelocity * RoadCombustion * FuelPrice;
 
             double gasolineCostToll =
-                evaluationMatrix.TollDistances[iterator] /
+                calculateBestPathContext.TollDistances[iterator] /
                 3600.0 * HighwayVelocity * RoadCombustion * 1.25 * FuelPrice;
 
             //toll goal = (cost of gasoline + cost of toll fee) * time of toll
-            double cost = (gasolineCostToll + evaluationMatrix.Costs[iterator]);
-            double time = (evaluationMatrix.TollDistances[iterator] / 3600.0);
-            double importance = (evaluationMatrix.TollDistances[iterator] * 1.0 /
-                                 evaluationMatrix.FreeDistances[iterator] * 1.0);
+            double cost = (gasolineCostToll + calculateBestPathContext.Costs[iterator]);
+            double time = (calculateBestPathContext.TollDistances[iterator] / 3600.0);
+            double importance = (calculateBestPathContext.TollDistances[iterator] * 1.0 /
+                                 calculateBestPathContext.FreeDistances[iterator] * 1.0);
             var tollGoal = cost * time * importance;
-            var freeGoal = gasolineCostFree * (evaluationMatrix.FreeDistances[iterator] / 3600.0);
+            var freeGoal = gasolineCostFree * (calculateBestPathContext.FreeDistances[iterator] / 3600.0);
 
 
-            evaluationMatrix.Goals[iterator] = tollGoal;
+            calculateBestPathContext.Goals[iterator] = tollGoal;
 
             return freeGoal > tollGoal;
         }

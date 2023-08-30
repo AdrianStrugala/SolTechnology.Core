@@ -1,4 +1,5 @@
 ﻿using DreamTravel.Trips.Domain.Cities;
+using DreamTravel.Trips.Queries.CalculateBestPath;
 using DreamTravel.Trips.Queries.CalculateBestPath.Executors;
 
 namespace DreamTravel.Trips.Queries.UnitTests.CalculateBestPath
@@ -17,7 +18,7 @@ namespace DreamTravel.Trips.Queries.UnitTests.CalculateBestPath
         {
             //Arrange
             int noOfCities = 3;
-            EvaluationMatrix matrix = new EvaluationMatrix(noOfCities);
+            CalculateBestPathContext matrix = new CalculateBestPathContext(noOfCities);
             matrix.Costs = new[]
             {
                 Double.MaxValue, 10, 19,
@@ -41,27 +42,27 @@ namespace DreamTravel.Trips.Queries.UnitTests.CalculateBestPath
 
 
             //Act 
-            var result = _sut.Execute(matrix, noOfCities);
+            _sut.Execute(matrix, noOfCities);
 
 
             //Assert
             //1) takes profitable road
-            Assert.Equal(20, result.OptimalDistances[2]);
-            Assert.Equal(19, result.OptimalCosts[2]);
-            Assert.Equal(20, result.OptimalDistances[6]);
-            Assert.Equal(19, result.OptimalCosts[6]);
+            Assert.Equal(20, matrix.OptimalDistances[2]);
+            Assert.Equal(19, matrix.OptimalCosts[2]);
+            Assert.Equal(20, matrix.OptimalDistances[6]);
+            Assert.Equal(19, matrix.OptimalCosts[6]);
 
             //2) Rejects non-profitable road
-            Assert.Equal(100, result.OptimalDistances[1]);
-            Assert.Equal(0, result.OptimalCosts[1]);
-            Assert.Equal(100, result.OptimalDistances[3]);
-            Assert.Equal(0, result.OptimalCosts[3]);
+            Assert.Equal(100, matrix.OptimalDistances[1]);
+            Assert.Equal(0, matrix.OptimalCosts[1]);
+            Assert.Equal(100, matrix.OptimalDistances[3]);
+            Assert.Equal(0, matrix.OptimalCosts[3]);
 
             //3) Rejects toll road longer than free
-            Assert.Equal(300, result.OptimalDistances[5]);
-            Assert.Equal(0, result.OptimalCosts[5]);
-            Assert.Equal(300, result.OptimalDistances[7]);
-            Assert.Equal(0, result.OptimalCosts[7]);
+            Assert.Equal(300, matrix.OptimalDistances[5]);
+            Assert.Equal(0, matrix.OptimalCosts[5]);
+            Assert.Equal(300, matrix.OptimalDistances[7]);
+            Assert.Equal(0, matrix.OptimalCosts[7]);
         }
     }
 }

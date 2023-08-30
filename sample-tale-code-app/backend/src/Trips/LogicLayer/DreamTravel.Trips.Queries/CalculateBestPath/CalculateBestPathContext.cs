@@ -1,6 +1,6 @@
-﻿namespace DreamTravel.Trips.Domain.Cities
+﻿namespace DreamTravel.Trips.Queries.CalculateBestPath
 {
-    public sealed class EvaluationMatrix
+    public sealed class CalculateBestPathContext
     {
         public double[] FreeDistances { get; set; }
         public double[] TollDistances { get; set; }
@@ -11,7 +11,7 @@
         public double[] VinietaCosts { get; set; }
 
 
-        public EvaluationMatrix(int noOfCities)
+        public CalculateBestPathContext(int noOfCities)
         {
             int matrixSize = noOfCities * noOfCities;
 

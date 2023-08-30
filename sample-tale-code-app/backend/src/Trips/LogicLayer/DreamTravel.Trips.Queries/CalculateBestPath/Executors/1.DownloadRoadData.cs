@@ -15,24 +15,20 @@ namespace DreamTravel.Trips.Queries.CalculateBestPath.Executors
             _michelinApiClient = michelinApiClient;
         }
 
-        public async Task<EvaluationMatrix> Execute(List<City> listOfCities)
+        public async Task Execute(List<City> listOfCities, CalculateBestPathContext calculateBestPathContext)
         {
-            EvaluationMatrix evaluationMatrix = new EvaluationMatrix(listOfCities.Count);
-
             List<Task> tasks = new List<Task>
             {
-                Task.Run(async () => evaluationMatrix.TollDistances = await _googleApiClient.GetDurationMatrixByTollRoad(listOfCities)),
-                Task.Run(async () => evaluationMatrix.FreeDistances = await _googleApiClient.GetDurationMatrixByFreeRoad(listOfCities))
+                Task.Run(async () => calculateBestPathContext.TollDistances = await _googleApiClient.GetDurationMatrixByTollRoad(listOfCities)),
+                Task.Run(async () => calculateBestPathContext.FreeDistances = await _googleApiClient.GetDurationMatrixByFreeRoad(listOfCities))
             };
 
-            tasks.AddRange(DownloadCostMatrix(listOfCities, evaluationMatrix));
+            tasks.AddRange(DownloadCostMatrix(listOfCities, calculateBestPathContext));
 
             await Task.WhenAll(tasks);
-
-            return evaluationMatrix;
         }
 
-        private List<Task> DownloadCostMatrix(List<City> listOfCities, EvaluationMatrix evaluationMatrix)
+        private List<Task> DownloadCostMatrix(List<City> listOfCities, CalculateBestPathContext calculateBestPathContext)
         {
             List<Task> tasks = new List<Task>();
 
@@ -44,7 +40,7 @@ namespace DreamTravel.Trips.Queries.CalculateBestPath.Executors
 
                     var i1 = i;
                     var j1 = j;
-                    tasks.Add(Task.Run(async () => (evaluationMatrix.Costs[iterator], evaluationMatrix.VinietaCosts[iterator]) =
+                    tasks.Add(Task.Run(async () => (calculateBestPathContext.Costs[iterator], calculateBestPathContext.VinietaCosts[iterator]) =
                                                    await _michelinApiClient.DownloadCostBetweenTwoCities(listOfCities[i1], listOfCities[j1])));
                 }
             }

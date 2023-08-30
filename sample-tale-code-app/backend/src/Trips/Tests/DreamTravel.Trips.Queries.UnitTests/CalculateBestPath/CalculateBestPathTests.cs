@@ -29,8 +29,6 @@ namespace DreamTravel.Trips.Queries.UnitTests.CalculateBestPath
         public void Handle_ValidData_AllCallsAreDone()
         {
             //Arrange
-            _downloadRoadData.Execute(Arg.Any<List<City>>()).Returns(new EvaluationMatrix(1));
-            _evaluationBrain.Execute(Arg.Any<EvaluationMatrix>(), Arg.Any<int>()).Returns(new EvaluationMatrix(1));
             _tspSolver.SolveTSP(Arg.Any<List<double>>()).Returns(new List<int> { 1 });
 
             List<City> cities = new List<City> { new City { Name = "Wroclaw", Latitude = 21, Longitude = 37 } };
@@ -42,8 +40,8 @@ namespace DreamTravel.Trips.Queries.UnitTests.CalculateBestPath
             //Assert
             Assert.NotNull(result);
 
-            _downloadRoadData.Received(1).Execute(Arg.Any<List<City>>());
-            _evaluationBrain.Received(1).Execute(Arg.Any<EvaluationMatrix>(), Arg.Any<int>());
+            _downloadRoadData.Received(1).Execute(Arg.Any<List<City>>(), Arg.Any<CalculateBestPathContext>());
+            _evaluationBrain.Received(1).Execute(Arg.Any<CalculateBestPathContext>(), Arg.Any<int>());
             _tspSolver.Received(1).SolveTSP(Arg.Any<List<double>>());
         }
 
@@ -51,8 +49,8 @@ namespace DreamTravel.Trips.Queries.UnitTests.CalculateBestPath
         //        async Task Handle_DoNotOptimizePath_ResultOrderIsTheSameAsInput()
         //        {
         //            //Arrange
-        //            _downloadRoadData.DownloadCostBetweenTwoCities(Arg.Any<List<City>>(), Arg.Any<EvaluationMatrix>()).Returns(new EvaluationMatrix(3));
-        //            _evaluationBrain.DownloadCostBetweenTwoCities(Arg.Any<EvaluationMatrix>(), Arg.Any<int>()).Returns(new EvaluationMatrix(3));
+        //            _downloadRoadData.DownloadCostBetweenTwoCities(Arg.Any<List<City>>(), Arg.Any<CalculateBestPathContext>()).Returns(new CalculateBestPathContext(3));
+        //            _evaluationBrain.DownloadCostBetweenTwoCities(Arg.Any<CalculateBestPathContext>(), Arg.Any<int>()).Returns(new CalculateBestPathContext(3));
         //            List<int> order = new List<int> { 0, 2, 1 };
         //            _tspSolver.SolveTSP(Arg.Any<List<double>>()).Returns(order);
         //

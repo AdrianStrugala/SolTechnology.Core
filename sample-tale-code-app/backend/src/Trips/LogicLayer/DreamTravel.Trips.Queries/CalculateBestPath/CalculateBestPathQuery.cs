@@ -4,11 +4,11 @@ namespace DreamTravel.Trips.Queries.CalculateBestPath
 {
     public class CalculateBestPathQuery
     {
-        public List<City> Cities { get; set; }
+        public List<City?> Cities { get; set; }
 
         public CalculateBestPathQuery()
         {
-            Cities = new List<City>();
+            Cities = new List<City?>();
         }
     }
 }
