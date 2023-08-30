@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Linq;
 using Dapper;
-using DreamTravel.Domain.Users;
+using DreamTravel.Identity.Domain.Users;
 
 namespace DreamTravel.Identity.DatabaseData.Repository.Users
 {

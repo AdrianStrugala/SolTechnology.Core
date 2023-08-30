@@ -1,14 +1,14 @@
 ﻿using Dapper;
-using DreamTravel.Domain.Users;
-using DreamTravel.Infrastructure.Database;
+using DreamTravel.Identity.Domain.Users;
+using SolTechnology.Core.Sql.Connections;
 
 namespace DreamTravel.Identity.DatabaseData.Repository.Users
 {
     public partial class UserRepository : IUserRepository
     {
-        private readonly IDbConnectionFactory _dbConnectionFactory;
+        private readonly ISqlConnectionFactory _dbConnectionFactory;
 
-        public UserRepository(IDbConnectionFactory dbConnectionFactory)
+        public UserRepository(ISqlConnectionFactory dbConnectionFactory)
         {
             _dbConnectionFactory = dbConnectionFactory;
         }

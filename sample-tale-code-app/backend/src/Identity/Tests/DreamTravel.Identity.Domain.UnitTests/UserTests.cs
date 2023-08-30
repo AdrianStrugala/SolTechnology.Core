@@ -1,5 +1,5 @@
 using System;
-using DreamTravel.Domain.Users;
+using DreamTravel.Identity.Domain.Users;
 using Xunit;
 
 namespace DreamTravel.Identity.Domain.UnitTests

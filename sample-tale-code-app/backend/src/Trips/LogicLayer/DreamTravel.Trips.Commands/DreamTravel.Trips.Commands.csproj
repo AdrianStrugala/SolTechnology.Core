@@ -7,7 +7,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\..\Infrastructure\DreamTravel.Infrastructure\DreamTravel.Infrastructure.csproj" />
-    <ProjectReference Include="..\..\DataLayer\DreamTravel.Trips.GeolocationDataClients\DreamTravel.Trips.GeolocationDataClients.csproj" />
     <ProjectReference Include="..\DreamTravel.Trips.TravelingSalesmanProblem\DreamTravel.Trips.TravelingSalesmanProblem.csproj" />
   </ItemGroup>
 

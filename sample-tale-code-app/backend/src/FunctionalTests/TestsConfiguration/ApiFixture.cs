@@ -1,5 +1,5 @@
 ﻿using DreamTravel.ApiTests.TestsConfiguration;
-using DreamTravel.Identity.DatabaseData.IntegrationTests.TestsConfiguration;
+using DreamTravel.TestFixture.Sql;
 using Xunit;
 
 namespace DreamTravel.FunctionalTests.TestsConfiguration

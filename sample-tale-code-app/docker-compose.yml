@@ -1,0 +1,10 @@
+version: '3.7'
+ 
+services:
+    sql-server:
+        container_name: sql-server
+        build: 
+          context: .
+          dockerfile: backend/src/Infrastructure/DreamTravelDatabase/Dockerfile
+        ports:  
+          - "1403:1433"

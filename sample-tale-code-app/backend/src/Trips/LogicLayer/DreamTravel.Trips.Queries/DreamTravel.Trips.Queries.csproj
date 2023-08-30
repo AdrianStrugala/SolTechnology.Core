@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\Infrastructure\DreamTravel.Infrastructure\DreamTravel.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\DataLayer\DreamTravel.Trips.GeolocationDataClients\DreamTravel.Trips.GeolocationDataClients.csproj" />
+    <ProjectReference Include="..\DreamTravel.Trips.TravelingSalesmanProblem\DreamTravel.Trips.TravelingSalesmanProblem.csproj" />
+  </ItemGroup>
+
+</Project>

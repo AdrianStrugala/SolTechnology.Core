@@ -1,6 +1,6 @@
 ﻿using System.Threading.Tasks;
-using DreamTravel.Domain.Users;
 using DreamTravel.Identity.Cryptography;
+using DreamTravel.Identity.Domain.Users;
 using DreamTravel.Infrastructure;
 
 namespace DreamTravel.Identity.Commands.Login

@@ -5,6 +5,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\..\Infrastructure\DreamTravel.Infrastructure\DreamTravel.Infrastructure.csproj" />
     <ProjectReference Include="..\..\DataLayer\DreamTravel.Identity.DatabaseData\DreamTravel.Identity.DatabaseData.csproj" />
     <ProjectReference Include="..\DreamTravel.Identity.Cryptography\DreamTravel.Identity.Cryptography.csproj" />
   </ItemGroup>

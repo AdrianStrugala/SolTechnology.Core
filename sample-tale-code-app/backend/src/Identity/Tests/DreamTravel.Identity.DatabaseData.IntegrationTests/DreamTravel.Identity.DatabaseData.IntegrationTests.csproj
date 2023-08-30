@@ -1,21 +1,27 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
-	  <IsPackable>false</IsPackable>
-  </PropertyGroup>
+	<PropertyGroup>
+		<TargetFramework>net6.0</TargetFramework>
+		<IsPackable>false</IsPackable>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <PackageReference Include="NSubstitute" Version="4.0.0" />
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.6.0" />
-    <PackageReference Include="xunit" Version="2.4.1" />
-    <PackageReference Include="xunit.runner.visualstudio" Version="2.4.0" />
-    <DotNetCliToolReference Include="dotnet-xunit" Version="2.3.1" />
-	<PackageReference Include="Respawn" Version="3.2.0" />
-  </ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="NSubstitute" Version="4.0.0" />
+		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.6.0" />
+		<PackageReference Include="xunit" Version="2.4.2" />
+		<PackageReference Include="xunit.runner.visualstudio" Version="2.4.2" />
+		<DotNetCliToolReference Include="dotnet-xunit" Version="2.3.1" />
+	</ItemGroup>
 
-  <ItemGroup>
-	  <ProjectReference Include="..\..\DataLayer\DreamTravel.Identity.DatabaseData\DreamTravel.Identity.DatabaseData.csproj" />
-  </ItemGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\..\..\..\DreamTravel.TestFixture.Sql\DreamTravel.TestFixture.Sql.csproj" />
+		<ProjectReference Include="..\..\DataLayer\DreamTravel.Identity.DatabaseData\DreamTravel.Identity.DatabaseData.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<Content Include="..\..\..\FunctionalTests\appsettings.functional.tests.json" Link="appsettings.functional.tests.json">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</Content>
+	</ItemGroup>
 
 </Project>

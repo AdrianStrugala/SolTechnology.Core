@@ -1,9 +1,8 @@
-using DreamTravel.Api.Configuration;
 using DreamTravel.DreamTrips;
 using DreamTravel.Identity;
 using DreamTravel.Identity.Commands;
 using DreamTravel.Infrastructure.Authentication;
-using DreamTravel.Infrastructure.Database;
+using DreamTravel.Trips.Queries;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -34,9 +33,6 @@ namespace DreamTravel.Api
                 .Build();
 
             var environmentName = configuration.GetValue<string>("ASPNETCORE_ENVIRONMENT");
-            var appConfig = ConfigurationResolver.GetConfiguration(environmentName);
-
-            services.AddSingleton<ISqlDatabaseConfiguration>(appConfig.SqlDatabaseConfiguration);
 
             //CORS
             var policy = new AuthorizationPolicyBuilder()
@@ -59,8 +55,9 @@ namespace DreamTravel.Api
                 });
             });
 
-            services.InstallDreamTrips();
-            services.InstallIdentity();
+            services.InstallDreamTripsCommands();
+            services.InstallDreamTripsQueries();
+            services.InstallIdentityCommands();
 
             services.AddControllers();
 

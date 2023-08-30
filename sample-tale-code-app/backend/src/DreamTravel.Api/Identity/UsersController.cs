@@ -1,5 +1,4 @@
 ﻿using System.Threading.Tasks;
-using DreamTravel.Domain.Users;
 using DreamTravel.Identity.Commands.ChangePassword;
 using DreamTravel.Identity.Commands.Login;
 using DreamTravel.Identity.Commands.Register;
