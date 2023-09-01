@@ -3,6 +3,7 @@ using Microsoft.Azure.WebJobs.Extensions.Http;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
+using Microsoft.Azure.WebJobs.Extensions.DurableTask;
 
 namespace DreamTravel.Bot.RunBenchmark
 {
@@ -15,7 +16,7 @@ namespace DreamTravel.Bot.RunBenchmark
         [FunctionName(HttpTriggerFunctionName)]
         public static async Task<HttpResponseMessage> HttpTrigger(
             [HttpTrigger(AuthorizationLevel.Function, "get", "post", Route = HttpTriggerFunctionRoute)] HttpRequestMessage req,
-            [OrchestrationClient] DurableOrchestrationClientBase client)
+            [DurableClient] IDurableOrchestrationClient client)
         {
             await client.StartNewAsync(Orchestrator.OrchestratorFunctionName, null);
             return req.CreateResponse(HttpStatusCode.OK);

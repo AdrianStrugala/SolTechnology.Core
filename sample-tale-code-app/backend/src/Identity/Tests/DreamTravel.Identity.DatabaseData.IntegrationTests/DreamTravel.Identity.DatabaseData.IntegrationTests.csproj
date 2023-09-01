@@ -14,7 +14,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\..\..\..\DreamTravel.TestFixture.Sql\DreamTravel.TestFixture.Sql.csproj" />
+		<ProjectReference Include="..\..\..\Infrastructure\TestFixtures\DreamTravel.TestFixture.Sql\DreamTravel.TestFixture.Sql.csproj" />
 		<ProjectReference Include="..\..\DataLayer\DreamTravel.Identity.DatabaseData\DreamTravel.Identity.DatabaseData.csproj" />
 	</ItemGroup>
 

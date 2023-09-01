@@ -18,8 +18,8 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <ProjectReference Include="..\Identity\Tests\DreamTravel.Identity.DatabaseData.IntegrationTests\DreamTravel.Identity.DatabaseData.IntegrationTests.csproj" />
 	  <ProjectReference Include="..\Infrastructure\TestFixtures\DreamTravel.TestFixture.Api\DreamTravel.TestFixture.Api.csproj" />
+	  <ProjectReference Include="..\Infrastructure\TestFixtures\DreamTravel.TestFixture.Sql\DreamTravel.TestFixture.Sql.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>

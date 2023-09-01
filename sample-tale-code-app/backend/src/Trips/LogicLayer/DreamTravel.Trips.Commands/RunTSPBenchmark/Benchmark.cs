@@ -66,7 +66,7 @@ namespace DreamTravel.DreamTrips.RunTSPBenchmark
             //Request to DreamTravel.Benchmark
             //   var response = await _httpClient.PostAsJson(BenchmarkServiceUrl, benchmarkResult);
 
-            System.IO.File.WriteAllText($@"..\..\..\..\docs\{nameOfAlgorithm}_Benchmark_{noOfCities}Cities.txt",
+            System.IO.File.WriteAllText($@"..\..\..\..\..\..\docs\{nameOfAlgorithm}_Benchmark_{noOfCities}Cities.txt",
                 $"{nameOfAlgorithm}: {noOfCities} Cities \n" +
                 $"Minimal Distance: {benchmarkResult.MinimalDistance} \n" +
                 $"Average Distance: {benchmarkResult.AverageDistance} \n" +

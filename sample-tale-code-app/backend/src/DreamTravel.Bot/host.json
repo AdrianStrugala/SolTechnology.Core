@@ -1,17 +1,11 @@
-﻿{
-  "version": "2.0",
-  "functionTimeout": "00:10:00",
-  "durableTask": {
-    "MaxConcurrentActivityFunctions": 1
-  },
-  "logger": {
-    "categoryFilter": {
-      "defaultLevel": "Debug",
-      "categoryLevels": {
-        "Host.Results": "Information",
-        "Function": "Trace",
-        "Host.Aggregator": "Information"
-      }
+{
+    "version": "2.0",
+    "logging": {
+        "applicationInsights": {
+            "samplingSettings": {
+                "isEnabled": true,
+                "excludedTypes": "Request"
+            }
+        }
     }
-  }
 }

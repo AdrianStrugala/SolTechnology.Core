@@ -29,3 +29,8 @@
     }
 
 }
+
+// add mediatr? Keep commandResult and commandResult<T> 
+// something similar for executors? they should get context, not sure about operation result -> Cool check on result (if failed, then rewrite failed message)
+
+

@@ -3,4 +3,3 @@ Minimal Distance: 103983
 Average Distance: 103983 
 Average Time: 0 ms 
 Recurrence: 100 % 
-Benchmark entry status: OK

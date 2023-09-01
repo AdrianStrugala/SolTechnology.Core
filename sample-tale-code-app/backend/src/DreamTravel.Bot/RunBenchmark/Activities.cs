@@ -1,5 +1,6 @@
 ﻿using DreamTravel.DreamTrips.RunTSPBenchmark;
 using DreamTravel.DreamTrips.RunTSPBenchmark.TestData;
+using Microsoft.Azure.WebJobs.Extensions.DurableTask;
 
 namespace DreamTravel.Bot.RunBenchmark
 {
@@ -11,8 +12,10 @@ namespace DreamTravel.Bot.RunBenchmark
     {
         public const string AntColonyBenchmarkFunctionName = "AntColonyBenchmark";
         public const string GodBenchmarkFunctionName = "GodBenchmark";
+        public const string GoogleBingHeldKarpFunctionName = "GoogleBingHeldKarp";
+        public const string ChatGPTNearestNeighbourFunctionName = "ChatGPTNearestNeighbour";
 
-        private const int NumberOfExecutions = 100;
+        private const int NumberOfExecutions = 10;
 
         private static readonly double[] TwoCitiesMatrix;
         private static readonly double[] FourCitiesMatrix;
@@ -42,8 +45,8 @@ namespace DreamTravel.Bot.RunBenchmark
             await Benchmark.RunTest(NumberOfExecutions, FourCitiesMatrix, tspEngine, "AntColony");
             await Benchmark.RunTest(NumberOfExecutions, EightCitiesMatrix, tspEngine, "AntColony");
             await Benchmark.RunTest(NumberOfExecutions, TwelveCitiesMatrix, tspEngine, "AntColony");
-            await Benchmark.RunTest(NumberOfExecutions, SixteenCitiesMatrix, tspEngine, "AntColony");
-            await Benchmark.RunTest(NumberOfExecutions, TwentyCitiesMatrix, tspEngine, "AntColony");
+            // await Benchmark.RunTest(NumberOfExecutions, SixteenCitiesMatrix, tspEngine, "AntColony");
+            // await Benchmark.RunTest(NumberOfExecutions, TwentyCitiesMatrix, tspEngine, "AntColony");
         }
 
 
@@ -57,8 +60,36 @@ namespace DreamTravel.Bot.RunBenchmark
             await Benchmark.RunTest(NumberOfExecutions, FourCitiesMatrix, tspEngine, "God");
             await Benchmark.RunTest(NumberOfExecutions, EightCitiesMatrix, tspEngine, "God");
             await Benchmark.RunTest(NumberOfExecutions, TwelveCitiesMatrix, tspEngine, "God");
-            await Benchmark.RunTest(NumberOfExecutions, SixteenCitiesMatrix, tspEngine, "God");
-            await Benchmark.RunTest(NumberOfExecutions, TwentyCitiesMatrix, tspEngine, "God");
+            // await Benchmark.RunTest(NumberOfExecutions, SixteenCitiesMatrix, tspEngine, "God");
+            // await Benchmark.RunTest(NumberOfExecutions, TwentyCitiesMatrix, tspEngine, "God");
+        }
+
+        [FunctionName(GoogleBingHeldKarpFunctionName)]
+        public static async Task GoogleBingHeldKarp(
+            [ActivityTrigger] object input)
+        {
+            var tspEngine = new TravelingSalesmanProblem.GoogleBingHeldKarp();
+
+            // await Benchmark.RunTest(NumberOfExecutions, TwoCitiesMatrix, tspEngine, "GoogleBingHeldKarp");
+            await Benchmark.RunTest(NumberOfExecutions, FourCitiesMatrix, tspEngine, "GoogleBingHeldKarp");
+            await Benchmark.RunTest(NumberOfExecutions, EightCitiesMatrix, tspEngine, "GoogleBingHeldKarp");
+            await Benchmark.RunTest(NumberOfExecutions, TwelveCitiesMatrix, tspEngine, "GoogleBingHeldKarp");
+            // await Benchmark.RunTest(NumberOfExecutions, SixteenCitiesMatrix, tspEngine, "GoogleBingHeldKarp");
+            // await Benchmark.RunTest(NumberOfExecutions, TwentyCitiesMatrix, tspEngine, "GoogleBingHeldKarp");
+        }
+
+        [FunctionName(ChatGPTNearestNeighbourFunctionName)]
+        public static async Task ChatGPT(
+            [ActivityTrigger] object input)
+        {
+            var tspEngine = new TravelingSalesmanProblem.ChatGPTNearestNeighbour();
+
+            // await Benchmark.RunTest(NumberOfExecutions, TwoCitiesMatrix, tspEngine, "ChatGPTNearestNeighbour");
+            await Benchmark.RunTest(NumberOfExecutions, FourCitiesMatrix, tspEngine, "ChatGPTNearestNeighbour");
+            await Benchmark.RunTest(NumberOfExecutions, EightCitiesMatrix, tspEngine, "ChatGPTNearestNeighbour");
+            await Benchmark.RunTest(NumberOfExecutions, TwelveCitiesMatrix, tspEngine, "ChatGPTNearestNeighbour");
+            // await Benchmark.RunTest(NumberOfExecutions, SixteenCitiesMatrix, tspEngine, "ChatGPTNearestNeighbour");
+            // await Benchmark.RunTest(NumberOfExecutions, TwentyCitiesMatrix, tspEngine, "ChatGPTNearestNeighbour");
         }
     }
 }

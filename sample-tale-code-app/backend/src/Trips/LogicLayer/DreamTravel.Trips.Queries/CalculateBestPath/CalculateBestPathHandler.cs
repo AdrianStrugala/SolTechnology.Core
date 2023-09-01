@@ -30,9 +30,6 @@ namespace DreamTravel.Trips.Queries.CalculateBestPath
 
             var orderOfCities = _tspSolver.SolveTSP(context.OptimalDistances.ToList());
 
-            //to have a possiblity to store cities data
-            // File.WriteAllText("./xCities.txt", JsonConvert.SerializeObject(calculateBestPathContext.OptimalDistances));
-
             CalculateBestPathResult calculateBestPathResult = new CalculateBestPathResult
             {
                 Cities = cities!,
