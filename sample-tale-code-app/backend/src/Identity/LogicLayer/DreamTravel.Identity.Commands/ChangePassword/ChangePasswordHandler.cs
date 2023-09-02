@@ -1,10 +1,11 @@
-﻿using DreamTravel.Identity.Cryptography;
+﻿using System.Threading.Tasks;
+using DreamTravel.Identity.Cryptography;
 using DreamTravel.Identity.Domain.Users;
-using DreamTravel.Infrastructure;
+using SolTechnology.Core.CQRS;
 
 namespace DreamTravel.Identity.Commands.ChangePassword
 {
-    public class ChangePasswordHandler : ICommandHandler<ChangePasswordCommand>
+    public class ChangePasswordHandler : ICommandHandler<ChangePasswordCommand, Result>
     {
         private readonly IUserRepository _userRepository;
 
@@ -13,7 +14,7 @@ namespace DreamTravel.Identity.Commands.ChangePassword
             _userRepository = userRepository;
         }
 
-        public CommandResult Handle(ChangePasswordCommand command)
+        public Task<Result> Handle(ChangePasswordCommand command)
         {
             var user = _userRepository.Get(command.UserId);
 
@@ -22,14 +23,14 @@ namespace DreamTravel.Identity.Commands.ChangePassword
 
             if (currentPassword != user.Password)
             {
-                return CommandResult.Failed("Given password does not match user password");
+                return Result.FailedTask("Given password does not match user password");
             }
 
             user.UpdatePassword(newPassword);
 
             _userRepository.Update(user);
 
-            return CommandResult.Succeeded();
+            return Result.SucceededTask();
         }
     }
 }

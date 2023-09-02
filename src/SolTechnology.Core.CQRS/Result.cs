@@ -2,24 +2,42 @@
 {
     public class Result
     {
-        public bool Success { get; set; }
-        public string Message { get; set; }
-
-        public static Result Failed(string message)
-        {
-            return new Result
-            {
-                Message = message,
-                Success = false
-            };
-        }
+        public bool IsSuccess { get; init; }
+        public bool IsFailure => !IsSuccess;
+        public string ErrorMessage { get; init; }
 
         public static Result Succeeded()
         {
             return new Result
             {
-                Success = true
+                IsSuccess = true
             };
+        }
+
+        public static Task<Result> SucceededTask()
+        {
+            return Task.FromResult(new Result
+            {
+                IsSuccess = true
+            });
+        }
+
+        public static Result Failed(string message)
+        {
+            return new Result
+            {
+                ErrorMessage = message,
+                IsSuccess = false
+            };
+        }
+
+        public static Task<Result> FailedTask(string message)
+        {
+            return Task.FromResult(new Result
+            {
+                ErrorMessage = message,
+                IsSuccess = false
+            });
         }
     }
 
@@ -32,18 +50,36 @@
         {
             return new Result<T>
             {
-                Success = true,
+                IsSuccess = true,
                 Data = data
             };
         }
 
-        public static Result<T> Failed(string message)
+        public new static Result<T> Failed(string message)
         {
             return new Result<T>
             {
-                Message = message,
-                Success = false
+                ErrorMessage = message,
+                IsSuccess = false
             };
+        }
+
+        public new static Task<Result<T>> FailedTask(string message)
+        {
+            return Task.FromResult(new Result<T>
+            {
+                ErrorMessage = message,
+                IsSuccess = false
+            });
+        }
+
+        public static Task<Result<T>> SucceededTask(T data)
+        {
+            return Task.FromResult(new Result<T>
+            {
+                IsSuccess = true,
+                Data = data
+            });
         }
     }
 }

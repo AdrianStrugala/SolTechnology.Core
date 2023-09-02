@@ -1,4 +1,5 @@
-﻿namespace DreamTravel.Identity.Commands.Register
+﻿
+namespace DreamTravel.Identity.Commands.Register
 {
     public class RegisterUserCommand
     {

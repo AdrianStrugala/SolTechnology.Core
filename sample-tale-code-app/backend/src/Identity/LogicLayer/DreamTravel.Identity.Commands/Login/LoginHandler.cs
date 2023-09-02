@@ -1,11 +1,11 @@
 ﻿using System.Threading.Tasks;
 using DreamTravel.Identity.Cryptography;
 using DreamTravel.Identity.Domain.Users;
-using DreamTravel.Infrastructure;
+using SolTechnology.Core.CQRS;
 
 namespace DreamTravel.Identity.Commands.Login
 {
-    public class LoginHandler : IQueryHandler<LoginQuery, LoginResult>
+    public class LoginHandler : ICommandHandler<LoginQuery, Result<LoginResult>>
     {
         private readonly IUserRepository _userRepository;
 
@@ -15,7 +15,7 @@ namespace DreamTravel.Identity.Commands.Login
         }
 
 
-        public Task<LoginResult> Handle(LoginQuery query)
+        public Task<Result<LoginResult>> Handle(LoginQuery query)
         {
             LoginResult result = new LoginResult();
 
@@ -24,20 +24,18 @@ namespace DreamTravel.Identity.Commands.Login
             //User does not exist
             if (userFromDb == null)
             {
-                result.Message = "Email not registered";
-                return Task.FromResult(result);
+                return Result<LoginResult>.FailedTask("Email not registered");
             }
 
             //Invalid password
             if (!Encryption.Decrypt(userFromDb.Password).Equals(query.Password))
             {
-                result.Message = "Invalid password";
-                return Task.FromResult(result);
+                return Result<LoginResult>.FailedTask("Invalid password");
             }
 
             result.User = userFromDb;
 
-            return Task.FromResult(result);
+            return Result<LoginResult>.SucceededTask(result);
         }
     }
 }

@@ -1,32 +1,30 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using Dapper;
 using DreamTravel.Identity.Domain.Users;
 
-namespace DreamTravel.Identity.DatabaseData.Repository.Users
+namespace DreamTravel.Identity.DatabaseData.Repositories.Users
 {
     public partial class UserRepository : IUserRepository
     {
-        private const string GetByIdSql = @"
-SELECT
-      [UserId]
+        private const string GetSql = @"
+SELECT [UserId]
       ,[Name]
       ,[Password]
       ,[Email]
       ,[IsActive]
       ,[Currency]
   FROM [dbo].[User]
-  WHERE [UserId] = @Id
+  WHERE [Email] = @Email
 ";
 
-        public User Get(Guid  id)
+        public User Get(string userEmail)
         {
             User result = null;
             using (var connection = _dbConnectionFactory.CreateConnection())
             {
-                result = connection.Query<User>(GetByIdSql, new
+                result = connection.Query<User>(GetSql, new
                 {
-                    Id = id
+                    Email = userEmail
                 }).FirstOrDefault();
             }
 

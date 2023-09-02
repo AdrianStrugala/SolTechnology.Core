@@ -1,4 +1,4 @@
-﻿using DreamTravel.Identity.DatabaseData.Repository.Users;
+﻿using DreamTravel.Identity.DatabaseData.Repositories.Users;
 using DreamTravel.Identity.Domain.Users;
 using Microsoft.Extensions.DependencyInjection;
 using SolTechnology.Core.Sql;

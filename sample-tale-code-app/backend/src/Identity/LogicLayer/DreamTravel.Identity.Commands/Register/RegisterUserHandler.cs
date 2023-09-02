@@ -1,10 +1,11 @@
-﻿using DreamTravel.Identity.Cryptography;
+﻿using System.Threading.Tasks;
+using DreamTravel.Identity.Cryptography;
 using DreamTravel.Identity.Domain.Users;
-using DreamTravel.Infrastructure;
+using SolTechnology.Core.CQRS;
 
 namespace DreamTravel.Identity.Commands.Register
 {
-    public class RegisterUserHandler : ICommandHandler<RegisterUserCommand>
+    public class RegisterUserHandler : ICommandHandler<RegisterUserCommand, Result>
     {
         private readonly IUserRepository _userRepository;
 
@@ -13,13 +14,13 @@ namespace DreamTravel.Identity.Commands.Register
             _userRepository = userRepository;
         }
 
-        public CommandResult Handle(RegisterUserCommand command)
+        public Task<Result> Handle(RegisterUserCommand command)
         {
             var alreadyExistingUser = _userRepository.Get(command.Email);
 
             if (alreadyExistingUser != null)
             {
-                return CommandResult.Failed("User with provided email already exists");
+                return Result.FailedTask("User with provided email already exists");
             }
 
             var user = new User(command.Name, command.Password, command.Email);
@@ -27,7 +28,7 @@ namespace DreamTravel.Identity.Commands.Register
             user.UpdatePassword(Encryption.Encrypt(user.Password));
             _userRepository.Insert(user);
 
-            return CommandResult.Succeeded();
+            return Result.SucceededTask();
         }
     }
 }
