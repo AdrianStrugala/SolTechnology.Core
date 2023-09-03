@@ -1,11 +1,8 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
-namespace DreamTravel.ApiTests.TestsConfiguration
+namespace DreamTravel.TestFixture.Api.TestsConfiguration
 {
     public class ApiResponse<T>
     {

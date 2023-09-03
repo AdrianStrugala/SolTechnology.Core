@@ -1,4 +1,4 @@
-﻿namespace DreamTravel.DreamTrips.RunTSPBenchmark.TestData
+﻿namespace DreamTravel.Trips.Commands.RunTSPBenchmark.TestData
 {
     public static class TestData
     {

@@ -5,7 +5,7 @@ using SolTechnology.Core.CQRS;
 
 namespace DreamTravel.Identity.Commands.Register
 {
-    public class RegisterUserHandler : ICommandHandler<RegisterUserCommand, Result>
+    public class RegisterUserHandler : ICommandHandler<RegisterUserCommand>
     {
         private readonly IUserRepository _userRepository;
 
@@ -14,13 +14,13 @@ namespace DreamTravel.Identity.Commands.Register
             _userRepository = userRepository;
         }
 
-        public Task<Result> Handle(RegisterUserCommand command)
+        public Task<CommandResult> Handle(RegisterUserCommand command)
         {
             var alreadyExistingUser = _userRepository.Get(command.Email);
 
             if (alreadyExistingUser != null)
             {
-                return Result.FailedTask("User with provided email already exists");
+                return CommandResult.FailedTask("User with provided email already exists");
             }
 
             var user = new User(command.Name, command.Password, command.Email);
@@ -28,7 +28,7 @@ namespace DreamTravel.Identity.Commands.Register
             user.UpdatePassword(Encryption.Encrypt(user.Password));
             _userRepository.Insert(user);
 
-            return Result.SucceededTask();
+            return CommandResult.SucceededTask();
         }
     }
 }

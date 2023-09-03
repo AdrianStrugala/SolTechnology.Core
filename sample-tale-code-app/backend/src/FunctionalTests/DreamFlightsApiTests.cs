@@ -3,9 +3,9 @@ using System.Net;
 using Xbehave;
 using Xunit;
 using AutoFixture;
-using DreamTravel.ApiTests.TestsConfiguration;
 using DreamTravel.FunctionalTests.Models;
 using DreamTravel.FunctionalTests.TestsConfiguration;
+using DreamTravel.TestFixture.Api.TestsConfiguration;
 
 namespace DreamTravel.FunctionalTests
 {

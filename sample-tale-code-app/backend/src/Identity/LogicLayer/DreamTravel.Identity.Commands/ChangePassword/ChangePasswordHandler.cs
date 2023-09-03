@@ -5,7 +5,7 @@ using SolTechnology.Core.CQRS;
 
 namespace DreamTravel.Identity.Commands.ChangePassword
 {
-    public class ChangePasswordHandler : ICommandHandler<ChangePasswordCommand, Result>
+    public class ChangePasswordHandler : ICommandHandler<ChangePasswordCommand>
     {
         private readonly IUserRepository _userRepository;
 
@@ -14,7 +14,7 @@ namespace DreamTravel.Identity.Commands.ChangePassword
             _userRepository = userRepository;
         }
 
-        public Task<Result> Handle(ChangePasswordCommand command)
+        public Task<CommandResult> Handle(ChangePasswordCommand command)
         {
             var user = _userRepository.Get(command.UserId);
 
@@ -23,14 +23,14 @@ namespace DreamTravel.Identity.Commands.ChangePassword
 
             if (currentPassword != user.Password)
             {
-                return Result.FailedTask("Given password does not match user password");
+                return CommandResult.FailedTask("Given password does not match user password");
             }
 
             user.UpdatePassword(newPassword);
 
             _userRepository.Update(user);
 
-            return Result.SucceededTask();
+            return CommandResult.SucceededTask();
         }
     }
 }

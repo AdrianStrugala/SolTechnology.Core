@@ -1,5 +1,5 @@
-﻿using DreamTravel.DreamTrips.RunTSPBenchmark;
-using DreamTravel.DreamTrips.RunTSPBenchmark.TestData;
+﻿using DreamTravel.Trips.Commands.RunTSPBenchmark;
+using DreamTravel.Trips.Commands.RunTSPBenchmark.TestData;
 using Microsoft.Azure.WebJobs.Extensions.DurableTask;
 
 namespace DreamTravel.Bot.RunBenchmark

@@ -1,15 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.Http;
-using System.Net.Http.Headers;
-using System.Threading.Tasks;
+﻿using System.Net.Http.Headers;
 using DreamTravel.Api;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.TestHost;
 using Newtonsoft.Json;
 
-namespace DreamTravel.ApiTests.TestsConfiguration
+namespace DreamTravel.TestFixture.Api.TestsConfiguration
 {
     public class HttpClientFixture : IDisposable
     {

@@ -5,7 +5,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\Infrastructure\DreamTravel.Infrastructure\DreamTravel.Infrastructure.csproj" />
     <ProjectReference Include="..\DreamTravel.Trips.TravelingSalesmanProblem\DreamTravel.Trips.TravelingSalesmanProblem.csproj" />
   </ItemGroup>
 

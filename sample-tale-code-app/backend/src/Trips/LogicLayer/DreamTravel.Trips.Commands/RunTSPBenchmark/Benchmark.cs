@@ -6,7 +6,7 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using DreamTravel.TravelingSalesmanProblem;
 
-namespace DreamTravel.DreamTrips.RunTSPBenchmark
+namespace DreamTravel.Trips.Commands.RunTSPBenchmark
 {
     public static class Benchmark
     {

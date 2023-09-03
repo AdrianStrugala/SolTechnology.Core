@@ -2,11 +2,11 @@
 {
     public interface ICommandHandler<in TCommand>
     {
-        public Task Handle(TCommand command);
+        public Task<CommandResult> Handle(TCommand command);
     }
 
     public interface ICommandHandler<in TCommand, TResult>
     {
-        public Task<TResult> Handle(TCommand command);
+        public Task<CommandResult<TResult>> Handle(TCommand command);
     }
 }

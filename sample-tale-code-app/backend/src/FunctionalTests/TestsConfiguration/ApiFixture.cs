@@ -1,4 +1,4 @@
-﻿using DreamTravel.ApiTests.TestsConfiguration;
+﻿using DreamTravel.TestFixture.Api.TestsConfiguration;
 using DreamTravel.TestFixture.Sql;
 using Xunit;
 

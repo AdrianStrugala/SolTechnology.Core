@@ -3,7 +3,7 @@ using Guards;
 
 namespace DreamTravel.Identity.Domain.Users
 {
-    public record User : AbstractEntity
+    public record User : BaseEntity
     {
         public Guid UserId { get; }
         public string Name { get; init; }

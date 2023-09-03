@@ -2,7 +2,7 @@
 
 namespace DreamTravel.Identity.Domain
 {
-    public abstract record AbstractEntity
+    public abstract record BaseEntity
     {
         public int Id { get; }
 

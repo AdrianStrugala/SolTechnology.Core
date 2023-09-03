@@ -1,6 +1,4 @@
-using System.Collections.Generic;
-
-namespace DreamTravel.ApiTests.TestsConfiguration
+namespace DreamTravel.TestFixture.Api.TestsConfiguration
 {
     public class ApiRequest<T>
     {

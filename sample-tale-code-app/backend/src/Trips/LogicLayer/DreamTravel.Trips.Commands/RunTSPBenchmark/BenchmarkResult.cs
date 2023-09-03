@@ -1,4 +1,4 @@
-﻿namespace DreamTravel.DreamTrips.RunTSPBenchmark
+﻿namespace DreamTravel.Trips.Commands.RunTSPBenchmark
 {
     public class BenchmarkResult
     {
