@@ -1,5 +1,4 @@
-﻿using DreamTravel.GeolocationData;
-using DreamTravel.GeolocationData.GoogleApi;
+﻿using DreamTravel.GeolocationData.GoogleApi;
 using DreamTravel.GeolocationData.MichelinApi;
 using DreamTravel.TravelingSalesmanProblem;
 using DreamTravel.Trips.Domain.Cities;

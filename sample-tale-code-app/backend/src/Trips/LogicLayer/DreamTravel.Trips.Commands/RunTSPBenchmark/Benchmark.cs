@@ -38,7 +38,7 @@ namespace DreamTravel.Trips.Commands.RunTSPBenchmark
                 tspResults.Add(algorithm.SolveTSP(distanceMatrix.ToList()));
             }
 
-            var totalTime = stopwatch.Elapsed.TotalSeconds;
+            var totalTime = stopwatch.Elapsed.TotalMilliseconds;
             stopwatch.Stop();
 
 
@@ -60,7 +60,7 @@ namespace DreamTravel.Trips.Commands.RunTSPBenchmark
             benchmarkResult.NoOfCities = noOfCities;
             benchmarkResult.MinimalDistance = (int)results.Min(result => result);
             benchmarkResult.Recurrence = (results.Count(result => result.Equals(benchmarkResult.MinimalDistance)) * 100) / numberOfExecutions;
-            benchmarkResult.AverageExecutionTime = (int)(totalTime / numberOfExecutions * 1000);
+            benchmarkResult.AverageExecutionTime = (int)(totalTime / numberOfExecutions);
             benchmarkResult.AverageDistance = (int)(results.Sum() / numberOfExecutions);
 
             //Request to DreamTravel.Benchmark

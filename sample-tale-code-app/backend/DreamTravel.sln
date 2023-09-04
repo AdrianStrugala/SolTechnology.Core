@@ -5,8 +5,6 @@ VisualStudioVersion = 17.2.32630.192
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DreamTravel.Api", "src\DreamTravel.Api\DreamTravel.Api.csproj", "{B6E9DD4E-1DEA-4597-9933-7B4EE6803DE1}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DreamTravel.Bot", "src\DreamTravel.Bot\DreamTravel.Bot.csproj", "{85B38EC0-B773-4666-83BF-F53E2D231C1A}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FunctionalTests", "src\FunctionalTests\FunctionalTests.csproj", "{F131404D-1BDE-4442-B7E1-0B8412B65FFE}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Trips", "Trips", "{572E779B-BBF5-479A-BCF8-4F42D87B96A6}"
@@ -101,6 +99,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SolTechnology.Core.Sql", ".
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DreamTravel.TestFixture.Sql", "src\Infrastructure\TestFixtures\DreamTravel.TestFixture.Sql\DreamTravel.TestFixture.Sql.csproj", "{20CA7D19-E759-4630-9703-FAED9DDCC8C9}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DreamTravel.Bot", "src\DreamTravel.Bot\DreamTravel.Bot.csproj", "{390B8123-3B63-49FE-B8D3-E4D3BC40C53D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -111,10 +111,6 @@ Global
 		{B6E9DD4E-1DEA-4597-9933-7B4EE6803DE1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B6E9DD4E-1DEA-4597-9933-7B4EE6803DE1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B6E9DD4E-1DEA-4597-9933-7B4EE6803DE1}.Release|Any CPU.Build.0 = Release|Any CPU
-		{85B38EC0-B773-4666-83BF-F53E2D231C1A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{85B38EC0-B773-4666-83BF-F53E2D231C1A}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{85B38EC0-B773-4666-83BF-F53E2D231C1A}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{85B38EC0-B773-4666-83BF-F53E2D231C1A}.Release|Any CPU.Build.0 = Release|Any CPU
 		{F131404D-1BDE-4442-B7E1-0B8412B65FFE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{F131404D-1BDE-4442-B7E1-0B8412B65FFE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F131404D-1BDE-4442-B7E1-0B8412B65FFE}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -251,6 +247,10 @@ Global
 		{20CA7D19-E759-4630-9703-FAED9DDCC8C9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{20CA7D19-E759-4630-9703-FAED9DDCC8C9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{20CA7D19-E759-4630-9703-FAED9DDCC8C9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{390B8123-3B63-49FE-B8D3-E4D3BC40C53D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{390B8123-3B63-49FE-B8D3-E4D3BC40C53D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{390B8123-3B63-49FE-B8D3-E4D3BC40C53D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{390B8123-3B63-49FE-B8D3-E4D3BC40C53D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

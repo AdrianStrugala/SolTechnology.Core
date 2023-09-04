@@ -5,7 +5,7 @@ namespace SolTechnology.Core.CQRS
 {
     public static class ModuleInstaller
     {
-        public static IServiceCollection AddCommands(this IServiceCollection services)
+        public static IServiceCollection RegisterCommands(this IServiceCollection services)
         {
             services.RegisterAllImplementations(typeof(ICommandHandler<>));
             services.RegisterAllImplementations(typeof(ICommandHandler<,>));
@@ -13,7 +13,7 @@ namespace SolTechnology.Core.CQRS
             return services;
         }
 
-        public static IServiceCollection AddQueries(this IServiceCollection services)
+        public static IServiceCollection RegisterQueries(this IServiceCollection services)
         {
             services.RegisterAllImplementations(typeof(IQueryHandler<,>));
 

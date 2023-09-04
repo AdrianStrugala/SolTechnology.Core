@@ -1,8 +1,8 @@
 {
   "profiles": {
-    "xD": {
+    "DreamTravel.Bot": {
       "commandName": "Project",
-      "commandLineArgs": "--port 7195",
+      "commandLineArgs": "--port 7298",
       "launchBrowser": false
     }
   }

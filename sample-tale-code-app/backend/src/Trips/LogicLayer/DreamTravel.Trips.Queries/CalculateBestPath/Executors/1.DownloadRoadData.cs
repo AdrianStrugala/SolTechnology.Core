@@ -1,4 +1,5 @@
-﻿using DreamTravel.GeolocationData;
+﻿using DreamTravel.GeolocationData.GoogleApi;
+using DreamTravel.GeolocationData.MichelinApi;
 using DreamTravel.Trips.Domain.Cities;
 using DreamTravel.Trips.Queries.CalculateBestPath.Interfaces;
 

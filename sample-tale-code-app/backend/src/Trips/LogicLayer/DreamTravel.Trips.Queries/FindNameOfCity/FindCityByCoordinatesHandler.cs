@@ -1,4 +1,4 @@
-﻿using DreamTravel.GeolocationData;
+﻿using DreamTravel.GeolocationData.GoogleApi;
 using DreamTravel.Infrastructure;
 using DreamTravel.Trips.Domain.Cities;
 

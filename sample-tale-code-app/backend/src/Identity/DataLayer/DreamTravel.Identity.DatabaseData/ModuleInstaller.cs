@@ -1,5 +1,4 @@
 ﻿using DreamTravel.Identity.DatabaseData.Repositories.Users;
-using DreamTravel.Identity.Domain.Users;
 using Microsoft.Extensions.DependencyInjection;
 using SolTechnology.Core.Sql;
 
@@ -11,7 +10,7 @@ namespace DreamTravel.Identity.DatabaseData
         {
             services.AddSql();
 
-            services.AddScoped<IUserRepository, UserRepository>();
+            services.AddTransient<IUserRepository, UserRepository>();
 
             return services;
         }

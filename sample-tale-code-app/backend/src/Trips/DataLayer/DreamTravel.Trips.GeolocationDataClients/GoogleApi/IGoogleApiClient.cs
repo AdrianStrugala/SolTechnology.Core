@@ -2,7 +2,7 @@
 using System.Threading.Tasks;
 using DreamTravel.Trips.Domain.Cities;
 
-namespace DreamTravel.GeolocationData
+namespace DreamTravel.GeolocationData.GoogleApi
 {
     public interface IGoogleApiClient
     {

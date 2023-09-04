@@ -1,6 +1,7 @@
 ﻿using System;
+using DreamTravel.Identity.Domain.Users;
 
-namespace DreamTravel.Identity.Domain.Users
+namespace DreamTravel.Identity.DatabaseData.Repositories.Users
 {
     public interface IUserRepository
     {

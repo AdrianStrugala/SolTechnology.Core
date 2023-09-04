@@ -9,6 +9,9 @@ using Newtonsoft.Json.Linq;
 
 namespace DreamTravel.GeolocationData.GoogleApi
 {
+
+    //TODO: use the httpConnectionFactory for the Clients
+
     public partial class GoogleApiClient : IGoogleApiClient
     {
         private readonly ILogger<GoogleApiClient> _logger;

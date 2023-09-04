@@ -1,5 +1,6 @@
 ﻿using System.Threading.Tasks;
 using DreamTravel.Identity.Cryptography;
+using DreamTravel.Identity.DatabaseData.Repositories.Users;
 using DreamTravel.Identity.Domain.Users;
 using SolTechnology.Core.CQRS;
 

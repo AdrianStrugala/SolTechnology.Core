@@ -1,7 +1,6 @@
 ﻿using DreamTravel.Identity.DatabaseData.Repositories.Users;
 using DreamTravel.Identity.Domain.Users;
 using DreamTravel.TestFixture.Sql;
-using SolTechnology.Core.Sql.Connections;
 using Xunit;
 
 namespace DreamTravel.Identity.DatabaseData.IntegrationTests.Users
@@ -9,12 +8,11 @@ namespace DreamTravel.Identity.DatabaseData.IntegrationTests.Users
     public class UserRepositoryTests : IClassFixture<SqlFixture>
     {
         private readonly UserRepository _sut;
-        private readonly ISqlConnectionFactory _connectionFactory;
 
         public UserRepositoryTests(SqlFixture sqlFixture)
         {
-            _connectionFactory = sqlFixture.SqlConnectionFactory;
-            _sut = new UserRepository(_connectionFactory);
+            var connectionFactory = sqlFixture.SqlConnectionFactory;
+            _sut = new UserRepository(connectionFactory);
         }
 
         [Fact]

@@ -1,5 +1,7 @@
 ﻿using DreamTravel.Identity.Commands.Register;
+using DreamTravel.Identity.DatabaseData.Repositories.Users;
 using DreamTravel.Identity.Domain.Users;
+using FluentAssertions;
 using NSubstitute;
 
 namespace DreamTravel.Identity.Commands.UnitTests.Registration
@@ -17,7 +19,7 @@ namespace DreamTravel.Identity.Commands.UnitTests.Registration
         }
 
         [Fact]
-        public void Register_NewUser_IsRegistered()
+        public async Task Register_NewUser_IsRegistered()
         {
             //Arrange
             User user = new User(
@@ -30,15 +32,15 @@ namespace DreamTravel.Identity.Commands.UnitTests.Registration
 
 
             //Act
-            _sut.Handle(new RegisterUserCommand(user.Name, user.Password, user.Email));
+            var result = await _sut.Handle(new RegisterUserCommand(user.Name, user.Password, user.Email));
 
 
             //Assert
-            //no exception :)
+            result.IsSuccess.Should().BeTrue();
         }
 
         [Fact]
-        public void Register_EmailAlreadyExists_RegisterExceptionIsThrown()
+        public async Task Register_EmailAlreadyExists_RegisterExceptionIsThrown()
         {
             //Arrange
             User user = new User(
@@ -51,11 +53,12 @@ namespace DreamTravel.Identity.Commands.UnitTests.Registration
 
 
             //Act
-            var result = _sut.Handle(new RegisterUserCommand(user.Name, user.Password, user.Email));
+            var result = await _sut.Handle(new RegisterUserCommand(user.Name, user.Password, user.Email));
 
 
             //Assert
-            Assert.NotEmpty(result.Message);
+            result.IsSuccess.Should().BeFalse();
+            result.ErrorMessage.Should().NotBeNullOrEmpty();
         }
     }
 }

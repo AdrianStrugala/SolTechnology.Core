@@ -9,7 +9,7 @@ namespace DreamTravel.Identity.Commands
         public static IServiceCollection
             InstallIdentityCommands(this IServiceCollection services)
         {
-            services.AddCommands();
+            services.RegisterCommands();
 
             services.InstallDatabaseData();
 
