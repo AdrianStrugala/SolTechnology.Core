@@ -3,13 +3,13 @@ using System.Collections.Generic;
 using System.Net;
 using System.Net.Mime;
 using System.Threading.Tasks;
-using DreamTravel.Infrastructure;
 using DreamTravel.Trips.Domain.Paths;
 using DreamTravel.Trips.Queries.LimitCostOfPaths;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+using SolTechnology.Core.CQRS;
 
 namespace DreamTravel.Api.DreamTrips
 {
@@ -18,11 +18,11 @@ namespace DreamTravel.Api.DreamTrips
     {
         public const string Route = "api/LimitCost";
 
-        private readonly IQueryHandler<LimitCostOfPathsInput, List<Path>> _limitCostsOfPathsHandler;
+        private readonly IQueryHandler<LimitCostOfPathsQuery, List<Path>> _limitCostsOfPathsHandler;
         private readonly ILogger<Controller> _logger;
 
         public LimitCostOfPathsController(
-            IQueryHandler<LimitCostOfPathsInput, List<Path>> _limitCostsOfPathsHandler,
+            IQueryHandler<LimitCostOfPathsQuery, List<Path>> _limitCostsOfPathsHandler,
             ILogger<Controller> logger)
         {
             this._limitCostsOfPathsHandler = _limitCostsOfPathsHandler;
@@ -44,7 +44,7 @@ namespace DreamTravel.Api.DreamTrips
                 _logger.LogInformation("Limit Cost Engine: Fire!");
                 List<Path> paths = JsonConvert.DeserializeObject<List<Path>>(HttpContext.Session.GetString(sessionId + PathsKeyName));
 
-                paths = await _limitCostsOfPathsHandler.Handle(new LimitCostOfPathsInput
+                paths = await _limitCostsOfPathsHandler.Handle(new LimitCostOfPathsQuery
                 {
                     CostLimit = costLimit,
                     Paths = paths

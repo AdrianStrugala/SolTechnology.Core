@@ -1,7 +1,6 @@
-﻿using DreamTravel.Infrastructure;
-using DreamTravel.TravelingSalesmanProblem;
-using DreamTravel.Trips.Domain.Cities;
-using DreamTravel.Trips.Queries.CalculateBestPath.Interfaces;
+﻿using DreamTravel.TravelingSalesmanProblem;
+using DreamTravel.Trips.Queries.CalculateBestPath.Executors;
+using SolTechnology.Core.CQRS;
 
 namespace DreamTravel.Trips.Queries.CalculateBestPath
 {

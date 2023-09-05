@@ -2,7 +2,7 @@
 
 namespace DreamTravel.Trips.Queries.LimitCostOfPaths
 {
-    public class LimitCostOfPathsInput
+    public class LimitCostOfPathsQuery
     {
         public int CostLimit { get; set; }
         public List<Path> Paths { get; set; }

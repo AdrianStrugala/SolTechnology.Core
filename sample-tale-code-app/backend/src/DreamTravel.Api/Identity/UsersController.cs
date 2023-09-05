@@ -2,9 +2,9 @@
 using DreamTravel.Identity.Commands.ChangePassword;
 using DreamTravel.Identity.Commands.Login;
 using DreamTravel.Identity.Commands.Register;
-using DreamTravel.Infrastructure;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using SolTechnology.Core.CQRS;
 
 namespace DreamTravel.Api.Identity
 {
@@ -32,15 +32,15 @@ namespace DreamTravel.Api.Identity
 
         [HttpPost]
         [Route("api/users/changePassword")]
-        public IActionResult ChangePassword([FromBody] ChangePasswordCommand command)
+        public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordCommand command)
         {
             _logger.LogInformation($"Changing password for user: [{command.UserId}]");
-            var result = _changePassword.Handle(command);
+            var result = await _changePassword.Handle(command);
 
-            if (result.Success == false)
+            if (result.IsSuccess == false)
             {
-                _logger.LogError(result.Message);
-                return BadRequest(result.Message);
+                _logger.LogError(result.ErrorMessage);
+                return BadRequest(result.ErrorMessage);
             }
 
             return Ok();
@@ -64,16 +64,16 @@ namespace DreamTravel.Api.Identity
 
         [HttpPost]
         [Route("api/users/register")]
-        public IActionResult Register([FromBody] RegisterUserCommand command)
+        public async Task<IActionResult> Register([FromBody] RegisterUserCommand command)
         {
             _logger.LogInformation($"Attempt to register user with email: [{command.Email}]");
 
-            var result = _registerUserHandler.Handle(command);
+            var result = await _registerUserHandler.Handle(command);
 
-            if (result.Success == false)
+            if (result.IsSuccess == false)
             {
-                _logger.LogError(result.Message);
-                return BadRequest(result.Message);
+                _logger.LogError(result.ErrorMessage);
+                return BadRequest(result.ErrorMessage);
             }
 
             return Ok();

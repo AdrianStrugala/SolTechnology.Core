@@ -5,13 +5,13 @@ using System.Linq;
 using System.Net;
 using System.Net.Mime;
 using System.Threading.Tasks;
-using DreamTravel.Infrastructure;
 using DreamTravel.Trips.Domain.Cities;
 using DreamTravel.Trips.Queries.FindLocationOfCity;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+using SolTechnology.Core.CQRS;
 
 namespace DreamTravel.Api.DreamTrips
 {

@@ -3,12 +3,12 @@ using System.Collections.Generic;
 using System.Net;
 using System.Net.Mime;
 using System.Threading.Tasks;
-using DreamTravel.Infrastructure;
 using DreamTravel.Trips.Domain.Paths;
 using DreamTravel.Trips.Queries.CalculateBestPath;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+using SolTechnology.Core.CQRS;
 
 namespace DreamTravel.Api.DreamTrips
 {

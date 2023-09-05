@@ -1,8 +1,10 @@
-﻿using DreamTravel.Trips.Domain.Cities;
-using DreamTravel.Trips.Queries.CalculateBestPath.Interfaces;
-
-namespace DreamTravel.Trips.Queries.CalculateBestPath.Executors
+﻿namespace DreamTravel.Trips.Queries.CalculateBestPath.Executors
 {
+    public interface IFindProfitablePath
+    {
+        void Execute(CalculateBestPathContext calculateBestPathContext, int noOfCities);
+    }
+
     public class FindProfitablePath : IFindProfitablePath
     {
         private static double FuelPrice { get; } = 1.26;

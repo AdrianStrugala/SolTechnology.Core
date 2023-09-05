@@ -4,7 +4,6 @@ using DreamTravel.TravelingSalesmanProblem;
 using DreamTravel.Trips.Domain.Cities;
 using DreamTravel.Trips.Queries.CalculateBestPath;
 using DreamTravel.Trips.Queries.CalculateBestPath.Executors;
-using DreamTravel.Trips.Queries.CalculateBestPath.Interfaces;
 using Microsoft.Extensions.Logging.Abstractions;
 
 namespace DreamTravel.Trips.Queries.UnitTests.CalculateBestPath

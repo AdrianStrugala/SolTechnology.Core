@@ -1,9 +1,8 @@
 ﻿using DreamTravel.GeolocationData;
-using DreamTravel.Infrastructure;
 using DreamTravel.TravelingSalesmanProblem;
 using DreamTravel.Trips.Queries.CalculateBestPath.Executors;
-using DreamTravel.Trips.Queries.CalculateBestPath.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
+using SolTechnology.Core.CQRS;
 
 namespace DreamTravel.Trips.Queries
 {
@@ -11,8 +10,7 @@ namespace DreamTravel.Trips.Queries
     {
         public static IServiceCollection InstallDreamTripsQueries(this IServiceCollection services)
         {
-            services.RegisterAllImplementations(typeof(IQueryHandler<,>));
-            services.RegisterAllImplementations(typeof(IService<,>));
+            services.RegisterQueries();
 
             //TSP engine
             services.AddScoped<ITSP, AntColony>();

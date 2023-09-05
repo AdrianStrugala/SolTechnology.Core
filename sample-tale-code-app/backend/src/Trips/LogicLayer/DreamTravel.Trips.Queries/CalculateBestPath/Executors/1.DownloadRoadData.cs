@@ -1,10 +1,14 @@
 ﻿using DreamTravel.GeolocationData.GoogleApi;
 using DreamTravel.GeolocationData.MichelinApi;
 using DreamTravel.Trips.Domain.Cities;
-using DreamTravel.Trips.Queries.CalculateBestPath.Interfaces;
 
 namespace DreamTravel.Trips.Queries.CalculateBestPath.Executors
 {
+    public interface IDownloadRoadData
+    {
+        Task Execute(List<City> listOfCities, CalculateBestPathContext calculateBestPathContext);
+    }
+
     public class DownloadRoadData : IDownloadRoadData
     {
         private readonly IGoogleApiClient _googleApiClient;

@@ -1,13 +1,13 @@
-﻿using DreamTravel.Infrastructure;
+﻿using SolTechnology.Core.CQRS;
 using Path = DreamTravel.Trips.Domain.Paths.Path;
 
 namespace DreamTravel.Trips.Queries.LimitCostOfPaths
 {
-    public class LimitCostOfPathsService : IService<LimitCostOfPathsInput, List<Path>>
+    public class LimitCostOfPathsService : IQueryHandler<LimitCostOfPathsQuery, List<Path>>
     {
-        public Task<List<Path>> Execute(LimitCostOfPathsInput input)
+        public Task<List<Path>> Handle(LimitCostOfPathsQuery query)
         {
-            var paths = input.Paths;
+            var paths = query.Paths;
             List<double> consideredVinietas = new List<double>();
 
             paths.Sort((x, y) => 1 * x.Goal.CompareTo(y.Goal));
@@ -18,7 +18,7 @@ namespace DreamTravel.Trips.Queries.LimitCostOfPaths
                 if (path.VinietaCost > 0)
                 {
                     if (consideredVinietas.Contains(path.VinietaCost)) continue;
-                    if (overallCost + path.VinietaCost > input.CostLimit)
+                    if (overallCost + path.VinietaCost > query.CostLimit)
                     {
                         paths.Where(x => x.VinietaCost.Equals(path.VinietaCost)).ToList()
                             .ForEach(y =>
@@ -42,7 +42,7 @@ namespace DreamTravel.Trips.Queries.LimitCostOfPaths
                 }
                 else
                 {
-                    if (overallCost + path.Cost <= input.CostLimit)
+                    if (overallCost + path.Cost <= query.CostLimit)
                     {
                         overallCost += path.Cost;
                         path.OptimalCost = path.Cost;

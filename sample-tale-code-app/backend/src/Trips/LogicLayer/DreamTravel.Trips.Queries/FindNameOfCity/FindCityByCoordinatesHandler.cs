@@ -1,6 +1,6 @@
 ﻿using DreamTravel.GeolocationData.GoogleApi;
-using DreamTravel.Infrastructure;
 using DreamTravel.Trips.Domain.Cities;
+using SolTechnology.Core.CQRS;
 
 namespace DreamTravel.Trips.Queries.FindNameOfCity
 {

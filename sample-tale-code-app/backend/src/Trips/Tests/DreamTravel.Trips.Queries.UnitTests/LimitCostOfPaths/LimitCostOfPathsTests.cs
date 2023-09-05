@@ -47,7 +47,7 @@ namespace DreamTravel.Trips.Queries.UnitTests.LimitCostOfPaths
 
 
             //Act
-            var result = await _sut.Execute(new LimitCostOfPathsInput
+            var result = await _sut.Handle(new LimitCostOfPathsQuery
             {
                 CostLimit = costLimit,
                 Paths = paths
@@ -85,7 +85,7 @@ namespace DreamTravel.Trips.Queries.UnitTests.LimitCostOfPaths
 
 
             //Act
-            var result = await _sut.Execute(new LimitCostOfPathsInput
+            var result = await _sut.Handle(new LimitCostOfPathsQuery
             {
                 CostLimit = costLimit,
                 Paths = paths
@@ -123,7 +123,7 @@ namespace DreamTravel.Trips.Queries.UnitTests.LimitCostOfPaths
 
 
             //Act
-            var result = await _sut.Execute(new LimitCostOfPathsInput
+            var result = await _sut.Handle(new LimitCostOfPathsQuery
             {
                 CostLimit = costLimit,
                 Paths = paths
