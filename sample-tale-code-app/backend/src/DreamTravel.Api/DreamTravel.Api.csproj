@@ -17,4 +17,10 @@
 	  <ProjectReference Include="..\Trips\LogicLayer\DreamTravel.Trips.Queries\DreamTravel.Trips.Queries.csproj" />
 	</ItemGroup>
 
+	<ItemGroup>
+	  <Content Update="appsettings.json">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </Content>
+	</ItemGroup>
+
 </Project>
