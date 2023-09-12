@@ -98,7 +98,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TaleCode.Faker", "..\taleCo
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TaleCode.IntegrationTests.Blob", "..\taleCode\tests\TaleCode.IntegrationTests.Blob\TaleCode.IntegrationTests.Blob.csproj", "{5110106D-C54D-4FD7-9454-2243223C98BA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TaleCode.IntegrationTests.Api", "..\taleCode\tests\TaleCode.IntegrationTests.Api\TaleCode.IntegrationTests.Api.csproj", "{5B412845-10F9-4210-98A2-7774E7041B7E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TaleCode.IntegrationTests.Api", "..\taleCode\tests\TaleCode.IntegrationTests.Api\TaleCode.IntegrationTests.Api.csproj", "{5B412845-10F9-4210-98A2-7774E7041B7E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

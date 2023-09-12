@@ -21,22 +21,25 @@ namespace SolTechnology.TaleCode.Infrastructure
             _logger = logger;
         }
 
-        public async Task Handle(TCommand command)
+        public async Task<CommandResult> Handle(TCommand command)
         {
-            using (_logger.BeginOperationScope(new KeyValuePair<string, object>(command.LogScope.OperationIdName, command.LogScope.OperationId)))
+            using (_logger.BeginOperationScope(new KeyValuePair<string, object>(command.LogScope.OperationIdName,
+                       command.LogScope.OperationId)))
             {
                 _logger.OperationStarted(command.LogScope.OperationName);
 
-                try
+                var result = await _handler.Handle(command);
+
+                if (result.IsSuccess)
                 {
-                    await _handler.Handle(command);
                     _logger.OperationSucceeded(command.LogScope.OperationName);
                 }
-                catch (Exception e)
+                else
                 {
-                    _logger.OperationFailed(command.LogScope.OperationName, e);
-                    throw;
+                    _logger.OperationFailed(command.LogScope.OperationName, message: result.ErrorMessage);
                 }
+
+                return result;
             }
         }
     }
