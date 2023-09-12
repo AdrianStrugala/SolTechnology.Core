@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using System.Xml;
 using DreamTravel.Trips.Domain.Cities;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
 namespace DreamTravel.GeolocationData.MichelinApi
 {
@@ -11,15 +12,13 @@ namespace DreamTravel.GeolocationData.MichelinApi
     {
         private readonly HttpClient _httpClient;
         private readonly ILogger<MichelinApiClient> _logger;
+        private readonly MichelinApiOptions _options;
 
-        public MichelinApiClient(ILogger<MichelinApiClient> logger)
+        public MichelinApiClient(IOptions<MichelinApiOptions> options, HttpClient httpClient, ILogger<MichelinApiClient> logger)
         {
             _logger = logger;
-
-            if (_httpClient == null)
-            {
-                _httpClient = new HttpClient();
-            }
+            _options = options.Value;
+            _httpClient = httpClient;
         }
 
         public async Task<(double, double)> DownloadCostBetweenTwoCities(City origin, City destination)
@@ -32,7 +31,7 @@ namespace DreamTravel.GeolocationData.MichelinApi
             try
             {
                 string url =
-                    $"http://apir.viamichelin.com/apir/1/route.xml/fra?steps=1:e:{origin.Longitude}:{origin.Latitude};1:e:{destination.Longitude}:{destination.Latitude}&authkey=";
+                    $"http://apir.viamichelin.com/apir/1/route.xml/fra?steps=1:e:{origin.Longitude}:{origin.Latitude};1:e:{destination.Longitude}:{destination.Latitude}&authkey={_options.Key}";
 
                 var response = await _httpClient.GetStringAsync(url);
                 XmlDocument doc = new XmlDocument();

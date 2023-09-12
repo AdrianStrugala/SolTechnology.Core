@@ -10,12 +10,12 @@ using DreamTravel.TestFixture.Api.TestsConfiguration;
 namespace DreamTravel.FunctionalTests
 {
     [Collection(nameof(ApiFunctionalTests))]
-    public class DreamFlightsApiFeatureTest
+    public class DreamTripsApiFeatureTest
     {
         private readonly ApiFixture _apiFixture;
         private readonly Fixture _fixture;
 
-        public DreamFlightsApiFeatureTest(ApiFixture apiFixture)
+        public DreamTripsApiFeatureTest(ApiFixture apiFixture)
         {
             _apiFixture = apiFixture;
             _fixture = new Fixture();

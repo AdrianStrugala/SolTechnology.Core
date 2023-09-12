@@ -11,6 +11,7 @@ import { Configuration } from "../config";
 export class TSPService {
   public isLoading: boolean = false;
   public totalTime$ = new BehaviorSubject<string>("");
+  public totalCost$ = new BehaviorSubject<number>(0);
 
   constructor(
     private pathService: PathService,
@@ -71,10 +72,12 @@ export class TSPService {
 
         //Paths
         let totalTime = 0;
+        let totalCost = 0;
         this.pathService.clearPaths();
 
         for (let i = 0; i < noOfPaths; i++) {
           totalTime += pathList[i].optimalDistance;
+          totalCost += pathList[i].optimalCost;
           this.pathService.addPath(pathList[i]);
         }
 
@@ -84,6 +87,7 @@ export class TSPService {
         );
 
         this.updateTimeString(totalTime);
+        this.totalCost$.next(totalCost *7.46);
 
         this.isLoading = false;
       });

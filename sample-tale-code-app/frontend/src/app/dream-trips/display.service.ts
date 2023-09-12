@@ -30,13 +30,14 @@ export class DisplayService {
     return marker;
   }
 
-  displayPath(path) {
-    var isToll = true;
+  displayPath(path : any) {
+    console.log(path)
+    var avoidToll = true;
     var roadColour = "#0080ff";
 
-    if (path.OptimalCost > 0) {
+    if (path.optimalCost > 0) {
       roadColour = "black";
-      isToll = false;
+      avoidToll = false;
     }
 
     var directionsDisplay = new google.maps.DirectionsRenderer({
@@ -61,9 +62,10 @@ export class DisplayService {
           path.endingCity.longitude
         ),
         travelMode: google.maps.TravelMode.DRIVING,
-        avoidTolls: isToll
+        avoidTolls: avoidToll,
+        avoidFerries: true
       },
-      (response, status) => {
+      (response : any, status) => {
         if (status === "OK") {
           directionsDisplay.setDirections(response);
         } else if (status === "OVER_QUERY_LIMIT") {

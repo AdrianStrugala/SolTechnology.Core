@@ -7,7 +7,6 @@ import {
   IFlightEmailSubscription,
   DayChangedEvent
 } from "../../flight-email-subscription.service";
-import { Route } from "@angular/compiler/src/core";
 import { Router, NavigationStart, NavigationEnd, NavigationError } from "@angular/router";
 
 @Component({

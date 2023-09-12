@@ -102,37 +102,36 @@ export class FlightEmailOrderComponent {
     }
     return null;
   };
-  autocompleteValidatorFrom: AsyncValidatorFn = (control: FormControl) => {
-    this.orderForm.controls["from"].setErrors(null);
+  // autocompleteValidatorFrom: AsyncValidatorFn = (control: FormControl) =>  {
+  //   this.orderForm.controls["from"].setErrors(null);
 
-    return this.filteredFrom$.pipe(
-      map(res => {
-        let airport = res.filter(
-          a => a.name.toLowerCase() === control.value.toLowerCase()
-        );
-        if (airport.length == 0) {
-          this.orderForm.controls["from"].setErrors({ autocomplete: true });
-        }
-      })
-    );
-    return of(null);
-  };
+  //   return this.filteredFrom$.pipe(
+  //     map(res => {
+  //       let airport = res.filter(
+  //         a => a.name.toLowerCase() === control.value.toLowerCase()
+  //       );
+  //       if (airport.length == 0) {
+  //         this.orderForm.controls["from"].setErrors({ autocomplete: true });
+  //       }
+  //     })
+  //   ) as unknown as AsyncValidatorFn
+  // };
 
-  autocompleteValidatorTo: AsyncValidatorFn = (control: FormControl) => {
-    this.orderForm.controls["to"].setErrors(null);
+  // autocompleteValidatorTo: AsyncValidatorFn = (control: FormControl) => {
+  //   this.orderForm.controls["to"].setErrors(null);
 
-    return this.filteredTo$.pipe(
-      map(res => {
-        let airport = res.filter(
-          a => a.name.toLowerCase() === control.value.toLowerCase()
-        );
-        if (airport.length == 0) {
-          this.orderForm.controls["to"].setErrors({ autocomplete: true });
-        }
-      })
-    );
-    return of(null);
-  };
+  //   return this.filteredTo$.pipe(
+  //     map(res => {
+  //       let airport = res.filter(
+  //         a => a.name.toLowerCase() === control.value.toLowerCase()
+  //       );
+  //       if (airport.length == 0) {
+  //         this.orderForm.controls["to"].setErrors({ autocomplete: true });
+  //       }
+  //     })
+  //   );
+  //   return of(null);
+  // };
 
   emailForm = new FormGroup(
     {
@@ -150,11 +149,11 @@ export class FlightEmailOrderComponent {
     {
       from: new FormControl("", {
         validators: [Validators.required],
-        asyncValidators: [this.autocompleteValidatorFrom]
+        // asyncValidators: [this.autocompleteValidatorFrom]
       }),
       to: new FormControl("", {
         validators: [Validators.required],
-        asyncValidators: [this.autocompleteValidatorTo]
+        // asyncValidators: [this.autocompleteValidatorTo]
       }),
       departureDate: new FormControl(new Date(), {
         validators: [Validators.required]

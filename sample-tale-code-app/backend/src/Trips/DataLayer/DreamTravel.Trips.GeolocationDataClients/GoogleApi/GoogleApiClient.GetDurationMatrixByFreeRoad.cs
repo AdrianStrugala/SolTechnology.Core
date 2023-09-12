@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
-using DreamTravel.GeolocationData.Configuration;
 using DreamTravel.Trips.Domain.Cities;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json.Linq;
@@ -28,7 +27,7 @@ namespace DreamTravel.GeolocationData.GoogleApi
                 try
                 {
                     string url =
-                        $"https://maps.googleapis.com/maps/api/distancematrix/json?units=imperial&origins={listOfCities[i].Latitude},{listOfCities[i].Longitude}&destinations={coordinates}&avoid=tolls&key={GeolocationDataConfiguration.ApiKey}";
+                        $"https://maps.googleapis.com/maps/api/distancematrix/json?units=imperial&origins={listOfCities[i].Latitude},{listOfCities[i].Longitude}&destinations={coordinates}&avoid=tolls&key={_options.Key}";
 
                     string response = await _httpClient.GetStringAsync(url);
                     JObject json = JObject.Parse(response);

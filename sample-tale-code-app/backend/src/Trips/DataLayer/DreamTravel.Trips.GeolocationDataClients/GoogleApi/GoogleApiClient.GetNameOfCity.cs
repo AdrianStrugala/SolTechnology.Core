@@ -2,7 +2,6 @@
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using DreamTravel.GeolocationData.Configuration;
 using DreamTravel.Trips.Domain.Cities;
 using Newtonsoft.Json.Linq;
 
@@ -15,7 +14,7 @@ namespace DreamTravel.GeolocationData.GoogleApi
             try
             {
                 string url =
-                    $"https://maps.googleapis.com/maps/api/geocode/json?latlng={city.Latitude},{city.Longitude}&sensor=false&key={GeolocationDataConfiguration.ApiKey}";
+                    $"https://maps.googleapis.com/maps/api/geocode/json?latlng={city.Latitude},{city.Longitude}&sensor=false&key={_options.Key}";
 
                 string response = await _httpClient.GetStringAsync(url);
                 JObject json = JObject.Parse(response);

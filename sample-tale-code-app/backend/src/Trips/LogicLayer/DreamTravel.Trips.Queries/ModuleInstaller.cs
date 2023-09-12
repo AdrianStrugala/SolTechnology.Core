@@ -13,12 +13,12 @@ namespace DreamTravel.Trips.Queries
             services.RegisterQueries();
 
             //TSP engine
-            services.AddScoped<ITSP, AntColony>();
+            services.AddTransient<ITSP, AntColony>();
 
             //CalculateBestPath
-            services.AddScoped<IFindProfitablePath, FindProfitablePath>();
-            services.AddScoped<IFormPathsFromMatrices, FormPathsFromMatrices>();
-            services.AddScoped<IDownloadRoadData, DownloadRoadData>();
+            services.AddTransient<IFindProfitablePath, FindProfitablePath>();
+            services.AddTransient<IFormPathsFromMatrices, FormPathsFromMatrices>();
+            services.AddTransient<IDownloadRoadData, DownloadRoadData>();
 
 
             services.InstallGeolocationDataClients();

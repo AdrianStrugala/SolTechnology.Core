@@ -71,6 +71,32 @@ export class UserService {
 
     window.location.reload();
   }
+
+  pay(amount : number): any {
+
+
+console.log("dupa");
+
+    let data = {
+      userId: "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+      amount: amount,
+      currency: "DKK"
+    };
+
+console.log(data);
+
+    this.http
+      .post<IPayResponse>(this.config.APPLICATION_URL + "api/users/pay", data, {
+        observe: "body",
+        headers: new HttpHeaders({
+          Authorization: "DreamAuthentication U29sVWJlckFsbGVz"
+        })
+      })  
+      .subscribe(data => {
+        console.log(data.authorizationUrl);
+        window.location.href = data.authorizationUrl;
+      });
+  }
 }
 
 export interface IUser {
@@ -78,4 +104,9 @@ export interface IUser {
   name: string;
   password: string;
   email: string;
+}
+
+export interface IPayResponse {
+  authorizationUrl: string;
+  paymentId: string;
 }

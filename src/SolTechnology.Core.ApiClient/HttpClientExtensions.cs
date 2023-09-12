@@ -12,9 +12,9 @@ namespace System.Net.Http
         {
             return await SendAsync<string, TResponse>(httpClient, url, HttpMethod.Get);
         }
-        public static async Task<TResponse> PostAsync<TContent, TResponse>(this HttpClient httpClient, string url, TContent request, DataType dataType = DataType.Json) where TContent : class
+        public static async Task<TResponse> PostAsync<TContent, TResponse>(this HttpClient httpClient, string url, TContent request, Dictionary<string, string> headers = null, DataType dataType = DataType.Json) where TContent : class
         {
-            return await SendAsync<TContent, TResponse>(httpClient, url, HttpMethod.Post, request);
+            return await SendAsync<TContent, TResponse>(httpClient, url, HttpMethod.Post, request, headers);
         }
 
         public static async Task<TResponse> DeleteAsync<TContent, TResponse>(this HttpClient httpClient, string url, TContent request, DataType dataType = DataType.Json) where TContent : class
@@ -33,12 +33,14 @@ namespace System.Net.Http
             string url,
             HttpMethod httpMethod,
             TContent content = null,
-            DataType dataType = DataType.Json) where TContent : class
+            Dictionary<string, string> headers = null,
+            DataType dataType = DataType.Json) 
+            where TContent : class
         {
             switch (dataType)
             {
                 case DataType.Json:
-                    return await SendJsonAsync<TContent, TResponse>(httpClient, url, httpMethod, content);
+                    return await SendJsonAsync<TContent, TResponse>(httpClient, url, httpMethod, content, headers);
                 case DataType.Avro:
                     return await SendAvroAsync<TContent, TResponse>(httpClient, url, httpMethod, content);
             }
@@ -47,7 +49,13 @@ namespace System.Net.Http
         }
 
 
-        private static async Task<TResponse> SendJsonAsync<TContent, TResponse>(this HttpClient httpClient, string url, HttpMethod httpMethod, TContent content = null) where TContent : class
+        private static async Task<TResponse> SendJsonAsync<TContent, TResponse>(
+            this HttpClient httpClient, 
+            string url,
+            HttpMethod httpMethod, 
+            TContent content = null,
+            Dictionary<string, string> headers = null) 
+            where TContent : class
         {
             HttpRequestMessage httpRequest = new HttpRequestMessage(httpMethod, url);
 
@@ -60,6 +68,14 @@ namespace System.Net.Http
                 httpContent.Headers.ContentType = new MediaTypeHeaderValue("application/json");
 
                 httpRequest.Content = httpContent;
+            }
+
+            if (headers != null)
+            {
+                foreach (var (key, value) in headers)
+                {
+                    httpRequest.Headers.Add(key, value);
+                }
             }
 
             var response = await httpClient.SendAsync(httpRequest);

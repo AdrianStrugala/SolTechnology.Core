@@ -8,9 +8,8 @@ import { Configuration } from "../config";
   providedIn: "root"
 })
 export class CityService {
-  public cities: ICity[] = [];
+  public cities: ICity[]= [];
   public citiesForm = new FormGroup({
-    0: new FormControl("")
   });
   public contorls = Object.keys(this.citiesForm.controls);
 
@@ -27,6 +26,7 @@ export class CityService {
 
   addCity() {
     this.CityIndex++;
+
 
     this.citiesForm.addControl(this.CityIndex.toString(), new FormControl());
 
@@ -46,7 +46,7 @@ export class CityService {
     this.cities[index] = city;
   }
 
-  removeCity(index) {
+  removeCity(index : any) {
     if (this.markers[index] != null) {
       this.markers[index].setMap(null);
     }
@@ -58,7 +58,7 @@ export class CityService {
     this.contorls = Object.keys(this.citiesForm.controls);
   }
 
-  findAndDisplayCity(index) {
+  findAndDisplayCity(index : any) {
     this.isFetchingData = true;
 
     let data = {

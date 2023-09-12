@@ -8,9 +8,9 @@ import { SuccessMessageService } from '../success-message/success-message.servic
   styleUrls: ["./home.component.scss"]
 })
 export class HomeComponent {
-  title = 'Dream Flights';
+  title = 'Dream Travel';
 
-  @ViewChild('viewContainerRef', { read: ViewContainerRef, static: null }) VCR: ViewContainerRef;
+  @ViewChild('viewContainerRef', { read: ViewContainerRef, static: false }) VCR: ViewContainerRef;
 
   success: string;
   // to store references of dynamically created components
@@ -18,7 +18,7 @@ export class HomeComponent {
 
   page: number;
 
-  constructor(private CFR: ComponentFactoryResolver, private successMessageService: SuccessMessageService) {
+  constructor(private CFR: ComponentFactoryResolver, public successMessageService: SuccessMessageService) {
   }
 
 }

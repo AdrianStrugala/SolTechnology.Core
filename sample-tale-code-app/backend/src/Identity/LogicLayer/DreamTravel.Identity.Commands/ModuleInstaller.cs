@@ -1,4 +1,5 @@
 ﻿using DreamTravel.Identity.DatabaseData;
+using DreamTravel.Identity.HttpClients;
 using Microsoft.Extensions.DependencyInjection;
 using SolTechnology.Core.CQRS;
 
@@ -12,6 +13,8 @@ namespace DreamTravel.Identity.Commands
             services.RegisterCommands();
 
             services.InstallDatabaseData();
+            services.InstallHttpClients();
+
 
             return services;
         }

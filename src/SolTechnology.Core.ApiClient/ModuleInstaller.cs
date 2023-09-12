@@ -14,30 +14,56 @@ namespace SolTechnology.Core.ApiClient
             HttpPolicyConfiguration httpPolicyConfiguration = null)
             where TIClient : class where TClient : class, TIClient
         {
+            AddApiClientInternal<TIClient, TClient>(services, httpClientName, apiClientConfiguration, httpPolicyConfiguration);
+            return services;
+        }
+
+        public static IServiceCollection AddApiClient<TIClient, TClient, TOptions>(
+            this IServiceCollection services,
+            string httpClientName,
+            ApiClientConfiguration apiClientConfiguration = null,
+            HttpPolicyConfiguration httpPolicyConfiguration = null)
+            where TIClient : class where TClient : class, TIClient where TOptions : class
+        {
+            AddApiClientInternal<TIClient, TClient>(services, httpClientName, apiClientConfiguration, httpPolicyConfiguration);
+            
             services
-            .AddOptions<List<ApiClientConfiguration>>()
-            .Configure<IConfiguration>((config, configuration) =>
+                .AddOptions<TOptions>()
+                .Configure<IConfiguration>((options, configuration) =>
             {
-                if (apiClientConfiguration == null)
-                {
-                    apiClientConfiguration = configuration.GetSection("Configuration:ApiClients").Get<List<ApiClientConfiguration>>().FirstOrDefault(a => a.Name.Equals(httpClientName, StringComparison.InvariantCultureIgnoreCase));
-                }
-
-                if (apiClientConfiguration == null)
-                {
-                    throw new ArgumentException($"The [{nameof(ApiClientConfiguration)}] for client: [{httpClientName}] is missing. Provide it by parameter or configuration section");
-                }
-
-                config.Add(apiClientConfiguration);
+                configuration = configuration.GetSection($"Configuration:ApiClients:{httpClientName}:Options");
+                configuration.Bind(options);
             });
+
+            return services;
+        }
+
+        private static IConfigurationSection AddApiClientInternal<TIClient, TClient>(IServiceCollection services,
+            string httpClientName, ApiClientConfiguration apiClientConfiguration,
+            HttpPolicyConfiguration httpPolicyConfiguration) where TIClient : class where TClient : class, TIClient
+        {
+            IConfigurationSection configurationSection = null;
 
             services
                 .AddOptions<HttpPolicyConfiguration>()
                 .Configure<IConfiguration>((config, configuration) =>
                 {
+                    configurationSection = configuration.GetSection($"Configuration:ApiClients:{httpClientName}");
+                    if (apiClientConfiguration == null)
+                    {
+                        apiClientConfiguration = configurationSection.Get<ApiClientConfiguration>();
+                    }
+
+                    if (apiClientConfiguration == null)
+                    {
+                        throw new ArgumentException(
+                            $"The [{nameof(ApiClientConfiguration)}] for client: [{httpClientName}] is missing. Provide it by parameter or configuration section");
+                    }
+
                     if (httpPolicyConfiguration == null)
                     {
-                        httpPolicyConfiguration = configuration.GetSection("Configuration:HttpPolicy").Get<HttpPolicyConfiguration>();
+                        httpPolicyConfiguration =
+                            configuration.GetSection("Configuration:HttpPolicy").Get<HttpPolicyConfiguration>();
                     }
 
                     if (httpPolicyConfiguration == null)
@@ -60,30 +86,26 @@ namespace SolTechnology.Core.ApiClient
 
             var logger = serviceProvider.GetRequiredService<ILogger<HttpPolicyFactory>>();
             var policyFactory = new HttpPolicyFactory(logger);
-
-            var apiClientConfigurations = serviceProvider.GetRequiredService<IOptions<List<ApiClientConfiguration>>>().Value;
-            apiClientConfiguration = apiClientConfigurations.First(h => h.Name.Equals(httpClientName, StringComparison.InvariantCultureIgnoreCase));
-
             httpPolicyConfiguration = serviceProvider.GetRequiredService<IOptions<HttpPolicyConfiguration>>().Value;
 
             services.AddHttpClient<TIClient, TClient>(httpClientName,
-                httpClient =>
-                {
-                    httpClient.BaseAddress = new Uri(apiClientConfiguration.BaseAddress);
-                    if (apiClientConfiguration.TimeoutSeconds.HasValue)
+                    httpClient =>
                     {
-                        httpClient.Timeout = TimeSpan.FromSeconds(apiClientConfiguration.TimeoutSeconds.Value);
-                    }
+                        httpClient.BaseAddress = new Uri(apiClientConfiguration.BaseAddress);
+                        if (apiClientConfiguration.TimeoutSeconds.HasValue)
+                        {
+                            httpClient.Timeout = TimeSpan.FromSeconds(apiClientConfiguration.TimeoutSeconds.Value);
+                        }
 
-                    foreach (var header in apiClientConfiguration.Headers)
-                    {
-                        httpClient.DefaultRequestHeaders.Add(header.Name, header.Value);
-                    }
-                })
+                        foreach (var header in apiClientConfiguration.Headers)
+                        {
+                            httpClient.DefaultRequestHeaders.Add(header.Name, header.Value);
+                        }
+                    })
                 .AddPolicyHandler(policyFactory.Create(httpPolicyConfiguration));
 
 
-            return services;
+            return configurationSection;
         }
     }
 }

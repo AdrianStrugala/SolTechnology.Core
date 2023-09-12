@@ -2,28 +2,24 @@
 using System.IO;
 using System.Net.Http;
 using System.Threading.Tasks;
-using DreamTravel.GeolocationData.Configuration;
 using DreamTravel.Trips.Domain.Cities;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Newtonsoft.Json.Linq;
 
 namespace DreamTravel.GeolocationData.GoogleApi
 {
-
-    //TODO: use the httpConnectionFactory for the Clients
-
     public partial class GoogleApiClient : IGoogleApiClient
     {
+        private readonly GoogleApiOptions _options;
         private readonly ILogger<GoogleApiClient> _logger;
         private readonly HttpClient _httpClient;
 
-        public GoogleApiClient(ILogger<GoogleApiClient> logger)
+        public GoogleApiClient(IOptions<GoogleApiOptions> options, HttpClient httpClient, ILogger<GoogleApiClient> logger)
         {
+            _options = options.Value;
+            _httpClient = httpClient;
             _logger = logger;
-            if (_httpClient == null)
-            {
-                _httpClient = new HttpClient();
-            }
         }
 
         public async Task<City> GetLocationOfCity(string cityName)
@@ -31,7 +27,7 @@ namespace DreamTravel.GeolocationData.GoogleApi
             try
             {
                 string url =
-                    $"https://maps.googleapis.com/maps/api/geocode/json?address={cityName}&key={GeolocationDataConfiguration.ApiKey}";
+                    $"https://maps.googleapis.com/maps/api/geocode/json?address={cityName}&key={_options.Key}";
 
                 City toAdd = new City { Name = cityName };
 

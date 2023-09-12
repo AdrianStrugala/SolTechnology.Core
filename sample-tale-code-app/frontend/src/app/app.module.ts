@@ -15,10 +15,11 @@ import { MyAccountComponent } from './my-account-page/my-account/my-account.comp
 import { FlightOrderListComponent } from './my-account-page/flight-order-list/flight-order-list.component';
 import { SuccessMessageComponent } from  './main-page/success-message/success-message.component';
 import { AuthGuard } from './auth-guard';
-import { AngularFontAwesomeModule } from 'angular-font-awesome';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { MapComponent } from './dream-trips/map/map.component';
 import { CitiesPanelComponent } from './dream-trips/cities-panel/cities-panel.component';
 import { ChangePasswordComponent } from './my-account-page/change-password/change-password.component';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
 const routes: Routes = [
     { path: 'dream-flights', component: FlightEmailOrderComponent },
@@ -50,15 +51,12 @@ const routes: Routes = [
         FormsModule,
         ReactiveFormsModule,
         MaterialModule,
-        AngularFontAwesomeModule,
-        RouterModule.forRoot(routes)
+        RouterModule.forRoot(routes),
+        MatProgressSpinnerModule,
+        FontAwesomeModule
     ],
     exports:[
         RouterModule
-    ],
-    entryComponents: [
-        LoginComponent,
-        ChangePasswordComponent
     ],
     bootstrap: [AppComponent]
 })

@@ -13,7 +13,6 @@ namespace DreamTravel.Identity.Domain.Users
 
         private User()
         {
-            
         }
 
         public User(string name, string password, string email)

@@ -1,4 +1,3 @@
-using DreamTravel.Identity;
 using DreamTravel.Identity.Commands;
 using DreamTravel.Infrastructure.Authentication;
 using DreamTravel.Trips.Commands;
@@ -6,11 +5,12 @@ using DreamTravel.Trips.Queries;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
+using System.Globalization;
+using Microsoft.AspNetCore.Mvc.Authorization;
 
 namespace DreamTravel.Api
 {
@@ -33,6 +33,13 @@ namespace DreamTravel.Api
                 .Build();
 
             var environmentName = configuration.GetValue<string>("ASPNETCORE_ENVIRONMENT");
+
+            var cultureInfo = new CultureInfo("en-US");
+            cultureInfo.NumberFormat.CurrencySymbol = "€";
+
+            CultureInfo.DefaultThreadCurrentCulture = cultureInfo;
+            CultureInfo.DefaultThreadCurrentUICulture = cultureInfo;
+
 
             //CORS
             var policy = new AuthorizationPolicyBuilder()

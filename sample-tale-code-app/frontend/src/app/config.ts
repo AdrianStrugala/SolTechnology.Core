@@ -5,7 +5,7 @@ import { Injectable } from "@angular/core";
 })
 
 export class Configuration {
-  public readonly APPLICATION_URL = "https://dreamtravelsapi-demo.azurewebsites.net/";
+  public readonly APPLICATION_URL = "https://localhost:44330/";
 
   constructor(
     ) {}

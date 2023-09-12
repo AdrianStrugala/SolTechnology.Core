@@ -11,6 +11,7 @@ import { FormGroup, FormControl } from "@angular/forms";
 import { PathService } from "../path.service";
 import { Configuration } from "../../config";
 import { TSPService } from "../tsp.service";
+import { UserService } from "../../user.service";
 
 @Component({
   selector: "app-cities-panel",
@@ -25,7 +26,8 @@ export class CitiesPanelComponent implements AfterViewInit {
     private http: HttpClient,
     public pathService: PathService,
     private config: Configuration,
-    public TSPService: TSPService
+    public TSPService: TSPService,
+    public UserService: UserService
   ) {}
 
   ngAfterViewInit(): void {
