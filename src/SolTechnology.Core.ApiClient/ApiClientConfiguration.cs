@@ -2,7 +2,6 @@
 {
     public class ApiClientConfiguration
     {
-        public string Name { get; set; }
         public string BaseAddress { get; set; }
         public int? TimeoutSeconds { get; set; }
         public List<Header> Headers { get; set; } = new List<Header>();

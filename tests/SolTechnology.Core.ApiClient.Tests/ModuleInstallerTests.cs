@@ -24,7 +24,6 @@ namespace SolTechnology.Core.ApiClient.Tests
             ApiClientConfiguration configuration = new ApiClientConfiguration
             {
                 BaseAddress = "http://localhost:8080/",
-                Name = "Sample",
                 TimeoutSeconds = 21,
                 Headers = new List<Header>
                         {
