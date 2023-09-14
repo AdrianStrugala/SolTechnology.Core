@@ -16,32 +16,30 @@ services.AddApiClient<IFootballDataApiClient, FootballDataApiClient>("football-d
 
 ```csharp
   "Configuration": {
-      "ApiClients": [
-        {
-          "Name": "football-data",
-          "BaseAddress": "http://api.football-data.org",
-          "Headers": [
-            {
-              "Name": "X-Auth-Token",
-              "Value": ""
-            }
-          ]
-        },
-        {
-          "Name": "api-football",
-          "BaseAddress": "https://api-football-v1.p.rapidapi.com",
-          "Headers": [
-            {
-              "Name": "x-rapidapi-host",
-              "Value": ""
-            },
-            {
-              "Name": "x-rapidapi-key",
-              "Value": ""
-            }
-          ]
-        }
-      ]
+    "ApiClients": {
+      "football-data": {
+        "BaseAddress": "http://api.football-data.org",
+        "Headers": [
+          {
+            "Name": "X-Auth-Token",
+            "Value": ""
+          }
+        ]
+      },
+      "api-football": {
+        "BaseAddress": "https://api-football-v1.p.rapidapi.com",
+        "Headers": [
+          {
+            "Name": "x-rapidapi-host",
+            "Value": ""
+          },
+          {
+            "Name": "x-rapidapi-key",
+            "Value": ""
+          }
+        ]
+      }
+    }
   }
 ```
 

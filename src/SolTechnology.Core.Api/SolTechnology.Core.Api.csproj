@@ -5,7 +5,7 @@
 		<ImplicitUsings>enable</ImplicitUsings>
 
 		<Authors>Adrian Strugala</Authors>
-		<Version>0.2.1</Version>
+		<Version>0.2.2</Version>
 		<Description>SolTechnology Core API library</Description>
 		<PackageTags>sol technology core azure api base controller</PackageTags>
 		<Product>SolTechnology.Core.Api</Product>
@@ -23,6 +23,10 @@
 	<ItemGroup>
 		<PackageReference Include="Microsoft.AspNetCore.Mvc.Abstractions" Version="2.2.0" />
 		<PackageReference Include="Microsoft.AspNetCore.Mvc.Core" Version="2.2.5" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <ProjectReference Include="..\SolTechnology.Core.CQRS\SolTechnology.Core.CQRS.csproj" />
 	</ItemGroup>
 
 </Project>
