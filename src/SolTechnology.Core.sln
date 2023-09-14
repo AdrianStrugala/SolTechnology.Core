@@ -60,8 +60,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SampleApps", "SampleApps", 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DreamTravel.Api", "..\sample-tale-code-apps\DreamTravel\backend\src\DreamTravel.Api\DreamTravel.Api.csproj", "{7F7D6165-43D9-4A82-84F3-13AB2341FF75}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DreamTravel.Bot", "..\sample-tale-code-apps\DreamTravel\backend\src\DreamTravel.Bot\DreamTravel.Bot.csproj", "{3409C38C-7AF3-4E9B-88C1-3DB04806F38F}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DreamTravel.Identity.Commands", "..\sample-tale-code-apps\DreamTravel\backend\src\Identity\LogicLayer\DreamTravel.Identity.Commands\DreamTravel.Identity.Commands.csproj", "{F225054F-F4C4-431E-8428-9E1BA7064AA1}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DreamTravel.Identity.Commands.UnitTests", "..\sample-tale-code-apps\DreamTravel\backend\src\Identity\Tests\DreamTravel.Identity.Commands.UnitTests\DreamTravel.Identity.Commands.UnitTests.csproj", "{9D21DE36-9C71-4B7C-945E-6B1AA55586EA}"
@@ -248,10 +246,6 @@ Global
 		{7F7D6165-43D9-4A82-84F3-13AB2341FF75}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7F7D6165-43D9-4A82-84F3-13AB2341FF75}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7F7D6165-43D9-4A82-84F3-13AB2341FF75}.Release|Any CPU.Build.0 = Release|Any CPU
-		{3409C38C-7AF3-4E9B-88C1-3DB04806F38F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{3409C38C-7AF3-4E9B-88C1-3DB04806F38F}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{3409C38C-7AF3-4E9B-88C1-3DB04806F38F}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{3409C38C-7AF3-4E9B-88C1-3DB04806F38F}.Release|Any CPU.Build.0 = Release|Any CPU
 		{F225054F-F4C4-431E-8428-9E1BA7064AA1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{F225054F-F4C4-431E-8428-9E1BA7064AA1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F225054F-F4C4-431E-8428-9E1BA7064AA1}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -425,7 +419,6 @@ Global
 		{9DC0D803-5CCE-41CC-92BE-D5CD1E027CD2} = {7EF7950D-4549-43F6-A47C-FDF15CD6D98F}
 		{86FA2E60-9AED-4FD4-B53D-722CBE8CC2A8} = {7EF7950D-4549-43F6-A47C-FDF15CD6D98F}
 		{7F7D6165-43D9-4A82-84F3-13AB2341FF75} = {D9E61986-EACB-4DFD-949F-ED2F27DB1F75}
-		{3409C38C-7AF3-4E9B-88C1-3DB04806F38F} = {D9E61986-EACB-4DFD-949F-ED2F27DB1F75}
 		{F225054F-F4C4-431E-8428-9E1BA7064AA1} = {43778229-C527-47E6-B6C0-CDE422218DA8}
 		{9D21DE36-9C71-4B7C-945E-6B1AA55586EA} = {43778229-C527-47E6-B6C0-CDE422218DA8}
 		{F417E89D-5B94-4472-900D-BEF179A32C44} = {43778229-C527-47E6-B6C0-CDE422218DA8}
