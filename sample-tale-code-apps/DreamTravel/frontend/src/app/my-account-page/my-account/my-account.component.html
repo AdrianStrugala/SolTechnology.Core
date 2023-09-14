@@ -1,0 +1,18 @@
+<div class="container">
+  <h3 class="header">{{ userService.user.name }}</h3>
+
+  <button
+    type="button"
+    class="btn btn-primary header change-pass-btn"
+    (click)="changePassword()"
+  >
+    Change password
+  </button>
+
+  <br />
+  <br />
+  <mat-divider></mat-divider>
+  <br />
+
+  <flight-order-list></flight-order-list>
+</div>

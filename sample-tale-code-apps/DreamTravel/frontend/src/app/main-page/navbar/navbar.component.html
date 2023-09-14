@@ -1,0 +1,73 @@
+<div class="navbar">
+
+  <input type="image" src="assets/DreamTravels_horizontal.ico" [routerLink]="''" style="height: 3rem;"/>
+
+  <nav mat-tab-nav-bar>
+
+    <a
+    mat-tab-link
+    [routerLink]="'dream-trips'"
+    routerLinkActive
+    #rlaTrips="routerLinkActive"
+    [routerLinkActiveOptions]="{ exact: true }"
+    [active]="rlaTrips.isActive"
+    >
+      Dream Trips
+    </a>
+
+    <a
+      mat-tab-link
+      [routerLink]="'dream-flights'"
+      routerLinkActive
+      #rlaFlights="routerLinkActive"
+      [routerLinkActiveOptions]="{ exact: true }"
+      [active]="rlaFlights.isActive"
+    >
+      Dream Flights
+    </a>
+
+    <a
+      mat-tab-link
+      *ngIf="userService.isLoggedIn()"
+      [routerLink]="'my-account'"
+      routerLinkActive
+      #rlaAcoount="routerLinkActive"
+      [routerLinkActiveOptions]="{ exact: true }"
+      [active]="rlaAcoount.isActive"
+    >
+      My Account
+    </a>
+
+    <a
+      mat-tab-link
+      *ngIf="!userService.isLoggedIn()"
+      [routerLink]="'register'"
+      routerLinkActive
+      #rlaRegister="routerLinkActive"
+      [routerLinkActiveOptions]="{ exact: true }"
+      [active]="rlaRegister.isActive"
+    >
+      Register
+    </a>
+  </nav>
+
+  <button
+    *ngIf="!userService.isLoggedIn()"
+    type="button"
+    class="btn btn-light"
+    mat-raised-button
+    (click)="openDialog()"
+  >
+    Login
+  </button>
+
+  <button
+    *ngIf="userService.isLoggedIn()"
+    type="button"
+    class="btn btn-light"
+    mat-raised-button
+    (click)="userService.logout()"
+  >
+    Logout
+  </button>
+</div>

@@ -1,0 +1,5 @@
+ChatGPTNearestNeighbour: 12 Cities 
+Minimal Distance: 195596 
+Average Distance: 195596 
+Average Time: 0 ms 
+Recurrence: 100 % 

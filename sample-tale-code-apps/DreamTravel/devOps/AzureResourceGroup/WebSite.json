@@ -1,0 +1,279 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "dreamTravelsName": {
+      "type": "string",
+      "defaultValue": "dreamtravels",
+      "minLength": 1
+    },
+    "apiName": {
+      "type": "string",
+      "defaultValue": "dreamtravelsapi",
+      "minLength": 1
+    },
+    "sqlServerName": {
+      "type": "string",
+      "defaultValue": "dreamtravel",
+      "minLength": 1
+    },
+    "databaseName": {
+      "type": "string",
+      "defaultValue": "dreamtravel",
+      "minLength": 1
+    },
+	"environmentName": {
+      "type": "string",
+      "defaultValue": "prod",
+      "minLength": 1
+    },
+    "DbSkuName": {
+      "type": "string",
+      "defaultValue": "S0",
+      "minLength": 1
+    },
+    "DbSkuTier": {
+      "type": "string",
+      "defaultValue": "Standard",
+      "minLength": 1
+    },
+    "skuName": {
+      "type": "string",
+      "defaultValue": "S1",
+      "allowedValues": [
+        "F1",
+        "D1",
+        "B1",
+        "B2",
+        "B3",
+        "S1",
+        "S2",
+        "S3",
+        "P1",
+        "P2",
+        "P3",
+        "P4"
+      ],
+      "metadata": {
+        "description": "Describes plan's pricing tier and capacity. Check details at https://azure.microsoft.com/en-us/pricing/details/app-service/"
+      }
+    },
+    "skuTier": {
+      "type": "string",
+      "defaultValue": "Standard",
+      "allowedValues": [
+        "Basic",
+        "Shared",
+        "Free",
+        "Standard",
+        "Premium",
+        "PremiumV2",
+        "Isolated",
+        "Dynamic"
+      ],
+      "metadata": {
+        "description": "Describes plan's pricing tier and capacity. Check details at https://azure.microsoft.com/en-us/pricing/details/app-service/"
+      }
+    }
+  },
+  "variables": {
+    "hostingPlanName": "DreamTravel"
+  },
+  "resources": [
+    {
+      "apiVersion": "2015-08-01",
+      "name": "[variables('hostingPlanName')]",
+      "type": "Microsoft.Web/serverfarms",
+      "location": "[resourceGroup().location]",
+      "tags": {
+        "displayName": "HostingPlan"
+      },
+      "sku": {
+        "name": "[parameters('skuName')]",
+        "tier": "[parameters('skuTier')]"
+      },
+      "properties": {
+        "name": "[variables('hostingPlanName')]",
+        "numberOfWorkers": 1
+      }
+    },
+    {
+      "apiVersion": "2015-08-01",
+      "name": "[parameters('dreamTravelsName')]",
+      "type": "Microsoft.Web/sites",
+      "location": "[resourceGroup().location]",
+      "tags": {
+        "[concat('hidden-related:', resourceGroup().id, '/providers/Microsoft.Web/serverfarms/', variables('hostingPlanName'))]": "Resource",
+        "displayName": "Dream Travels"
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Web/serverfarms/', variables('hostingPlanName'))]",
+        "[resourceId('microsoft.insights/components/', parameters('dreamTravelsName'))]"
+      ],
+      "properties": {
+        "name": "[parameters('dreamTravelsName')]",
+        "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('hostingPlanName'))]",
+        "httpsOnly": true,
+        "siteConfig": {
+          "appSettings": [
+            {
+              "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
+              "value": "[reference(concat('microsoft.insights/components/', parameters('dreamTravelsName'))).InstrumentationKey]"
+            }
+          ],
+          "http20Enabled": true,
+          "alwaysOn": true,
+          "minTlsVersion": "1.2",
+          "autoHealEnabled": true,
+          "autoHealRules": {
+            "actions": {
+              "actionType": "Recycle"
+            },
+            "triggers": {
+              "statusCodes": [
+                {
+                  "status": 500
+                },
+                {
+                  "status": 502
+                },
+                {
+                  "status": 503
+                }
+              ]
+            }
+          }
+        }
+      },
+      "resources": [
+        {
+          "apiVersion": "2016-08-01",
+          "name": "Microsoft.AspNetCore.AzureAppServices.SiteExtension",
+          "type": "siteextensions",
+          "location": "[resourceGroup().location]",
+          "dependsOn": [
+            "[resourceId('Microsoft.Web/Sites', parameters('dreamTravelsName'))]"
+          ]
+        }
+      ]
+    },
+    {
+      "apiVersion": "2015-08-01",
+      "name": "[parameters('apiName')]",
+      "type": "Microsoft.Web/sites",
+      "location": "[resourceGroup().location]",
+      "tags": {
+        "[concat('hidden-related:', resourceGroup().id, '/providers/Microsoft.Web/serverfarms/', variables('hostingPlanName'))]": "Resource",
+        "displayName": "Dream Travels Api"
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Web/serverfarms/', variables('hostingPlanName'))]",
+        "[resourceId('microsoft.insights/components/', parameters('dreamTravelsName'))]"
+      ],
+      "properties": {
+        "name": "[parameters('apiName')]",
+        "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('hostingPlanName'))]",
+        "httpsOnly": true,
+        "siteConfig": {
+          "appSettings": [
+            {
+              "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
+              "value": "[reference(concat('microsoft.insights/components/', parameters('dreamTravelsName'))).InstrumentationKey]"
+            }
+          ],
+          "http20Enabled": true,
+          "alwaysOn": true,
+          "minTlsVersion": "1.2",
+          "autoHealEnabled": true,
+          "autoHealRules": {
+            "actions": {
+              "actionType": "Recycle"
+            },
+            "triggers": {
+              "statusCodes": [
+                {
+                  "status": 500
+                },
+                {
+                  "status": 502
+                },
+                {
+                  "status": 503
+                }
+              ]
+            }
+          }
+        }
+      },
+      "resources": [
+        {
+          "apiVersion": "2016-08-01",
+          "name": "Microsoft.AspNetCore.AzureAppServices.SiteExtension",
+          "type": "siteextensions",
+          "location": "[resourceGroup().location]",
+          "dependsOn": [
+            "[resourceId('Microsoft.Web/Sites', parameters('apiName'))]"
+          ]
+        },
+		{
+          "name": "appsettings",
+          "type": "config",
+          "apiVersion": "2015-08-01",
+          "dependsOn": [
+            "[resourceId('Microsoft.Web/Sites', parameters('apiName'))]"
+          ],
+          "tags": {
+            "displayName": "appsettings"
+          },
+          "properties": {
+			"ASPNETCORE_ENVIRONMENT": "[parameters('environmentName')]"
+          }
+		}
+      ]
+    },
+    {
+      "name": "[concat(parameters('sqlServerName'), '/', parameters('databaseName'))]",
+      "type": "Microsoft.Sql/servers/databases",
+      "location": "[resourceGroup().location]",
+      "apiVersion": "2017-10-01-preview",
+      "tags": {
+        "displayName": "Dream Travel Database"
+      },
+      "sku": {
+        "name": "[parameters('DbSkuName')]",
+        "tier": "[parameters('DbSkuTier')]"
+      },
+      "properties": {},
+      "dependsOn": [
+      ],
+      "resources": [
+        {
+          "name": "default",
+          "type": "backupLongTermRetentionPolicies",
+          "apiVersion": "2017-03-01-preview",
+          "properties": {
+            "weeklyRetention": "P4W"
+          },
+          "dependsON": [
+            "[resourceId('Microsoft.Sql/servers/databases', parameters('sqlServerName'), parameters('databaseName'))]"
+          ]
+        }
+      ]
+    },
+    {
+      "apiVersion": "2014-04-01",
+      "name": "[parameters('dreamTravelsName')]",
+      "type": "Microsoft.Insights/components",
+      "location": "[resourceGroup().location]",
+      "dependsOn": [
+      ],
+      "tags": {
+        "[concat('hidden-link:', resourceGroup().id, '/providers/Microsoft.Web/sites/', parameters('dreamTravelsName'))]": "Resource",
+        "displayName": "AppInsights"
+      },
+      "properties": {
+        "applicationId": "[parameters('dreamTravelsName')]"
+      }
+    }
+  ]
+}
