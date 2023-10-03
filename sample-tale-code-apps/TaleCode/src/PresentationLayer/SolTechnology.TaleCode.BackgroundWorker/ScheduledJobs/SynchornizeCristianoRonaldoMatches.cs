@@ -1,7 +1,6 @@
 ﻿using SolTechnology.Core.CQRS;
 using SolTechnology.Core.Scheduler;
 using SolTechnology.Core.Scheduler.Configuration;
-using SolTechnology.TaleCode.Infrastructure;
 using SolTechnology.TaleCode.PlayerRegistry.Commands.SynchronizePlayerMatches;
 
 namespace SolTechnology.TaleCode.BackgroundWorker.ScheduledJobs

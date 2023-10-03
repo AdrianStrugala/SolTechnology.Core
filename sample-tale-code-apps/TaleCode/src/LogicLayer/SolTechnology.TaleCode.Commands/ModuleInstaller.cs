@@ -1,12 +1,9 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 using SolTechnology.Core.Cache;
 using SolTechnology.Core.CQRS;
 using SolTechnology.Core.MessageBus;
 using SolTechnology.TaleCode.ApiClients;
 using SolTechnology.TaleCode.BlobData;
-using SolTechnology.TaleCode.Infrastructure;
-using SolTechnology.TaleCode.PlayerRegistry.Commands.CalculatePlayerStatistics;
 using SolTechnology.TaleCode.PlayerRegistry.Commands.SynchronizePlayerMatches;
 using SolTechnology.TaleCode.PlayerRegistry.Commands.SynchronizePlayerMatches.Executors;
 using SolTechnology.TaleCode.PlayerRegistry.Commands.SynchronizePlayerMatches.Interfaces;
@@ -19,6 +16,8 @@ namespace SolTechnology.TaleCode.PlayerRegistry.Commands
     {
         public static IServiceCollection InstallCommands(this IServiceCollection services)
         {
+            services.RegisterCommands();
+
             services.InstallSql();
             services.InstallApiClients();
             services.InstallStaticData();
@@ -32,24 +31,6 @@ namespace SolTechnology.TaleCode.PlayerRegistry.Commands
             services.AddScoped<IDetermineMatchesToSync, DetermineMatchesToSync>();
             services.AddScoped<ISyncMatch, SyncMatch>();
 
-            services.AddScoped<CalculatePlayerStatisticsHandler>();
-
-            services.AddScoped<ICommandHandler<CalculatePlayerStatisticsCommand>>(x =>
-                new CommandHandlerLoggingDecorator<CalculatePlayerStatisticsCommand>(
-                    x.GetService<CalculatePlayerStatisticsHandler>()!,
-                    x.GetService<ILogger<ICommandHandler<CalculatePlayerStatisticsCommand>>>()!));
-
-
-            //TODO: Add Decoration to separate library (preferably Logger)
-            services.AddScoped<SynchronizePlayerMatchesHandler>();
-
-            services.AddScoped<ICommandHandler<SynchronizePlayerMatchesCommand>>(x =>
-                new CommandHandlerLoggingDecorator<SynchronizePlayerMatchesCommand>(
-                    x.GetService<SynchronizePlayerMatchesHandler>()!,
-                    x.GetService<ILogger<ICommandHandler<SynchronizePlayerMatchesCommand>>>()!));
-
-
-            // services.AddScoped<ICommandHandler<SynchronizePlayerMatchesCommand>, SynchronizePlayerMatchesHandler>();
 
             return services;
         }

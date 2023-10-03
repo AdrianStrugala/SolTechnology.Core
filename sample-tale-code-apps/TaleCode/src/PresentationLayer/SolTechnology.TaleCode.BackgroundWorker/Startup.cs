@@ -32,7 +32,7 @@ namespace SolTechnology.TaleCode.BackgroundWorker
             services.AddControllers();
 
             services.AddMessageBus()
-                .WithQueueReceiver<PlayerMatchesSynchronizedEvent, CalculatePlayerStatistics>();
+                    .WithQueueReceiver<PlayerMatchesSynchronizedEvent, CalculatePlayerStatistics>();
 
         }
 

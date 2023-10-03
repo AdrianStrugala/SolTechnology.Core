@@ -1,6 +1,4 @@
-﻿using SolTechnology.TaleCode.Infrastructure;
-
-namespace SolTechnology.TaleCode.PlayerRegistry.Queries.GetPlayerStatistics
+﻿namespace SolTechnology.TaleCode.PlayerRegistry.Queries.GetPlayerStatistics
 {
     public class GetPlayerStatisticsResult
     {

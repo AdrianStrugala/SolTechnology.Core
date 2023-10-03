@@ -1,6 +1,5 @@
 ﻿using System.Windows.Input;
 using SolTechnology.Core.Logging;
-using SolTechnology.TaleCode.Infrastructure;
 
 namespace SolTechnology.TaleCode.PlayerRegistry.Commands.CalculatePlayerStatistics;
 

@@ -19,7 +19,6 @@
 	  <ProjectReference Include="..\..\DataLayer\SolTechnology.TaleCode.BlobStorage\SolTechnology.TaleCode.BlobStorage.csproj" />
 	  <ProjectReference Include="..\..\DataLayer\SolTechnology.TaleCode.Sql\SolTechnology.TaleCode.Sql.csproj" />
 	  <ProjectReference Include="..\..\DataLayer\SolTechnology.TaleCode.StaticData\SolTechnology.TaleCode.StaticData.csproj" />
-	  <ProjectReference Include="..\..\SolTechnology.TaleCode.Infrastructure\SolTechnology.TaleCode.Infrastructure.csproj" />
 	</ItemGroup>
 
 </Project>

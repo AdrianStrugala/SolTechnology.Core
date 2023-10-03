@@ -1,6 +1,5 @@
 ﻿using SolTechnology.Core.CQRS;
 using SolTechnology.Core.MessageBus.Receive;
-using SolTechnology.TaleCode.Infrastructure;
 using SolTechnology.TaleCode.PlayerRegistry.Commands.CalculatePlayerStatistics;
 
 namespace SolTechnology.TaleCode.BackgroundWorker.EventHandlers.OnPlayerMatchesSynchronized
