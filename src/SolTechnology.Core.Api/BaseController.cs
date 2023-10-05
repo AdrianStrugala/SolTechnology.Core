@@ -46,6 +46,35 @@ public abstract class BaseController : ControllerBase
     }
 
     [NonAction]
+    public async Task<IActionResult> Invoke(Task<CommandResult> handle)
+    {
+        var response = new ResponseEnvelope();
+        try
+        {
+            var result = await handle;
+            response.IsSuccess = result.IsSuccess;
+
+            if (response.IsSuccess)
+            {
+                return new OkObjectResult(response);
+            }
+            else
+            {
+                response.Error = result.ErrorMessage;
+                return new BadRequestObjectResult(response);
+            }
+
+        }
+        catch (Exception e)
+        {
+            response.IsSuccess = false;
+            response.Error = e.Message;
+
+            return new BadRequestObjectResult(response);
+        }
+    }
+
+    [NonAction]
     public async Task<IActionResult> Invoke<T>(Task<CommandResult<T>> handle)
     {
         var response = new ResponseEnvelope<T>();

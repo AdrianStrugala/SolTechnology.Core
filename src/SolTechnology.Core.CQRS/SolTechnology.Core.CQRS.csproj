@@ -1,11 +1,11 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
 	  <TargetFramework>net6.0</TargetFramework>
 	  <ImplicitUsings>enable</ImplicitUsings>
 
 	  <Authors>Adrian Strugala</Authors>
-	  <Version>0.2.2</Version>
+	  <Version>0.2.3</Version>
 	  <Description>SolTechnology Core CQRS library</Description>
 	  <PackageTags>sol technology cqrs command query chain</PackageTags>
 	  <Product>SolTechnology.Core.CQRS</Product>
@@ -22,6 +22,7 @@
 
 	<ItemGroup>
 		<PackageReference Include="FluentValidation" Version="11.7.1" />
+		<PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="11.7.1" />
 		<PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="6.0.0" />
 		<PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="6.0.0" />
 		<PackageReference Include="Scrutor" Version="4.2.2" />

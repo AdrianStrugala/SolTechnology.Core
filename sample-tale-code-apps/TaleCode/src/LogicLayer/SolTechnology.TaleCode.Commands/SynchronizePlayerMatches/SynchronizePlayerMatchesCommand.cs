@@ -1,25 +1,35 @@
-﻿using SolTechnology.Core.Guards;
+﻿using FluentValidation;
+using SolTechnology.Core.Guards;
 using SolTechnology.Core.Logging;
 
-namespace SolTechnology.TaleCode.PlayerRegistry.Commands.SynchronizePlayerMatches
+namespace SolTechnology.TaleCode.PlayerRegistry.Commands.SynchronizePlayerMatches;
+
+public class SynchronizePlayerMatchesCommand : ILoggedOperation
 {
-    public class SynchronizePlayerMatchesCommand : ILoggedOperation
+    public int PlayerId { get; set; }
+
+    public SynchronizePlayerMatchesCommand(int playerId)
     {
-        public int PlayerId { get; set; }
+        var guards = new Guards();
+        guards.Int(playerId, nameof(playerId), x => x.NotNegative().NotZero()).ThrowOnError();
 
-        public SynchronizePlayerMatchesCommand(int playerId)
-        {
-            var guards = new Guards();
-            guards.Int(playerId, nameof(playerId), x => x.NotNegative().NotZero()).ThrowOnError();
+        PlayerId = playerId;
+    }
 
-            PlayerId = playerId;
-        }
+    LogScope ILoggedOperation.LogScope => new()
+    {
+        OperationId = PlayerId,
+        OperationIdName = nameof(PlayerId),
+        OperationName = nameof(SynchronizePlayerMatches)
+    };
+}
 
-        LogScope ILoggedOperation.LogScope => new()
-        {
-            OperationId = PlayerId,
-            OperationIdName = nameof(PlayerId),
-            OperationName = nameof(SynchronizePlayerMatches)
-        };
+public class SynchronizePlayerMatchesCommandValidator : AbstractValidator<SynchronizePlayerMatchesCommand>
+{
+    public SynchronizePlayerMatchesCommandValidator()
+    {
+        RuleFor(x => x.PlayerId)
+            .Equal(44)
+            .WithMessage("Only Cristiano Ronaldo (Id 44) sync allowed. Noob");
     }
 }

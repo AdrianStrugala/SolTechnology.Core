@@ -1,5 +1,7 @@
 ﻿using System.Reflection;
+using FluentValidation;
 using Microsoft.Extensions.DependencyInjection;
+using Scrutor;
 using SolTechnology.Core.CQRS.Decorators.Logging;
 using SolTechnology.Core.CQRS.Decorators.Validation;
 
@@ -9,20 +11,41 @@ public static class ModuleInstaller
 {
     public static IServiceCollection RegisterCommands(this IServiceCollection services)
     {
-        services.RegisterAllImplementations(typeof(ICommandHandler<>), Assembly.GetCallingAssembly());
-        services.Decorate(typeof(ICommandHandler<>), typeof(CommandHandlerValidationDecorator<>));
-        services.Decorate(typeof(ICommandHandler<>), typeof(CommandHandlerLoggingDecorator<>));
+        var callingAssembly = Assembly.GetCallingAssembly();
+        services.AddValidatorsFromAssembly(callingAssembly);
 
-        services.RegisterAllImplementations(typeof(ICommandHandler<,>), Assembly.GetCallingAssembly());
-        services.Decorate(typeof(ICommandHandler<,>), typeof(CommandHandlerValidationDecorator<,>));
-        services.Decorate(typeof(ICommandHandler<,>), typeof(CommandWithResultHandlerLoggingDecorator<,>));
+        services.RegisterAllImplementations(typeof(ICommandHandler<>), callingAssembly);
+        try
+        {
+            services.Decorate(typeof(ICommandHandler<>), typeof(CommandHandlerValidationDecorator<>));
+            services.Decorate(typeof(ICommandHandler<>), typeof(CommandHandlerLoggingDecorator<>));
+        }
+        catch (DecorationException)
+        {
+            //could happen if no service of the type is registered
+        }
+
+        services.RegisterAllImplementations(typeof(ICommandHandler<,>), callingAssembly);
+        try
+        {
+            services.Decorate(typeof(ICommandHandler<,>), typeof(CommandHandlerValidationDecorator<,>));
+            services.Decorate(typeof(ICommandHandler<,>), typeof(CommandWithResultHandlerLoggingDecorator<,>));
+        }
+        catch (DecorationException)
+        {
+            //could happen if no service of the type is registered
+        }
+
 
         return services;
     }
 
     public static IServiceCollection RegisterQueries(this IServiceCollection services)
     {
-        services.RegisterAllImplementations(typeof(IQueryHandler<,>), Assembly.GetCallingAssembly());
+        var callingAssembly = Assembly.GetCallingAssembly();
+        services.AddValidatorsFromAssembly(callingAssembly);
+
+        services.RegisterAllImplementations(typeof(IQueryHandler<,>), callingAssembly);
         services.Decorate(typeof(IQueryHandler<,>), typeof(QueryHandlerValidationDecorator<,>));
 
         return services;
