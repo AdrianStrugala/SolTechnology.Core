@@ -11,6 +11,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <ProjectReference Include="..\..\..\..\..\src\SolTechnology.Core.Api\SolTechnology.Core.Api.csproj" />
 	  <ProjectReference Include="..\Identity\LogicLayer\DreamTravel.Identity.Commands\DreamTravel.Identity.Commands.csproj" />
 	  <ProjectReference Include="..\Infrastructure\DreamTravel.Infrastructure\DreamTravel.Infrastructure.csproj" />
 	  <ProjectReference Include="..\Trips\LogicLayer\DreamTravel.Trips.Commands\DreamTravel.Trips.Commands.csproj" />

@@ -51,7 +51,7 @@ namespace SolTechnology.Core.Logging
                 logger.LogError(exception, message ?? exception.Message);
             }
 
-            LogOperation(logger, operationName, "FAILURE");
+            LogOperation(logger, operationName, "FAILED");
 
             return;
         }
@@ -63,7 +63,7 @@ namespace SolTechnology.Core.Logging
                 logger.LogInformation(message);
             }
 
-            LogOperation(logger, operationName, "SUCCESS");
+            LogOperation(logger, operationName, "SUCCEEDED");
 
             return;
         }

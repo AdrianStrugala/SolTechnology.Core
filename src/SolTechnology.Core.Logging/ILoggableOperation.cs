@@ -1,6 +1,6 @@
 ﻿namespace SolTechnology.Core.Logging
 {
-    public interface ILoggedOperation
+    public interface ILoggableOperation
     {
         public LogScope LogScope { get; }
     }

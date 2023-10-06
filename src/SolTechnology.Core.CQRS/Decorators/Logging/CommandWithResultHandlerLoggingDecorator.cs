@@ -18,7 +18,7 @@ namespace SolTechnology.Core.CQRS.Decorators.Logging
 
         public async Task<CommandResult<TResult>> Handle(TCommand command)
         {
-            if (command is ILoggedOperation loggedOperation)
+            if (command is ILoggableOperation loggedOperation)
             {
                 using (_logger.BeginOperationScope(new KeyValuePair<string, object>(loggedOperation.LogScope.OperationIdName,
                            loggedOperation.LogScope.OperationId)))

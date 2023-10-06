@@ -1,22 +1,19 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
 using System.Net;
 using System.Net.Mime;
 using System.Threading.Tasks;
 using DreamTravel.Trips.Domain.Cities;
 using DreamTravel.Trips.Queries.FindLocationOfCity;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
+using SolTechnology.Core.Api;
 using SolTechnology.Core.CQRS;
 
 namespace DreamTravel.Api.DreamTrips
 {
     [Route(Route)]
-    public class FindLocationOfCityController : Controller
+    public class FindLocationOfCityController : BaseController
     {
         public const string Route = "api/FindLocationOfCity";
 
@@ -39,27 +36,8 @@ namespace DreamTravel.Api.DreamTrips
         [ProducesResponseType(typeof(List<ValidationResult>), (int)HttpStatusCode.BadRequest)]
         public async Task<IActionResult> FindLocationOfCity([FromBody] FindCityByNameQuery query)
         {
-            var validationResult = query.Validate(new ValidationContext(query));
-            if (validationResult.Any())
-            {
-                return BadRequest(validationResult);
-            }
-
-            try
-            {
-                _logger.LogInformation("Looking for city: " + query.Name);
-
-                City city = await _findLocationOfCity.Handle(query);
-
-                return Ok(city);
-            }
-
-            catch (Exception ex)
-            {
-                _logger.LogError(ex.ToString());
-                string message = JsonConvert.SerializeObject(ex.Message);
-                return BadRequest(message);
-            }
+            _logger.LogInformation("Looking for city: " + query.Name);
+            return await Return(_findLocationOfCity.Handle(query));
         }
     }
 }

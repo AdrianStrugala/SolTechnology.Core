@@ -1,28 +1,21 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using FluentValidation;
 
-namespace DreamTravel.Trips.Queries.FindNameOfCity
+namespace DreamTravel.Trips.Queries.FindNameOfCity;
+
+public class FindCityByCoordinatesQuery
 {
-    public class FindCityByCoordinatesQuery : IValidatableObject
+    public double Lat { get; set; }
+    public double Lng { get; set; }
+}
+
+public class FindCityByCoordinatesQueryValidator : AbstractValidator<FindCityByCoordinatesQuery>
+{
+    public FindCityByCoordinatesQueryValidator()
     {
-        public double Lat { get; set; }
-        public double Lng { get; set; }
+        RuleFor(x => x.Lat)
+            .InclusiveBetween(-90, 90);
 
-
-        public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
-        {
-            List<ValidationResult> validationResult = new List<ValidationResult>();
-
-            if (Lat > 90 || Lat < -90)
-            {
-                validationResult.Add(new ValidationResult($"Invalid value of [{nameof(Lat)}]: [{Lat}]. Must be between -90 and 90", new[] { nameof(Lat) }));
-            }
-
-            if (Lng > 180 || Lng < -180)
-            {
-                validationResult.Add(new ValidationResult($"Invalid value of [{nameof(Lng)}]: [{Lng}]. Must be between -180 and 180", new[] { nameof(Lng) }));
-            }
-
-            return validationResult;
-        }
+        RuleFor(x => x.Lng)
+            .InclusiveBetween(-180, 180);
     }
 }

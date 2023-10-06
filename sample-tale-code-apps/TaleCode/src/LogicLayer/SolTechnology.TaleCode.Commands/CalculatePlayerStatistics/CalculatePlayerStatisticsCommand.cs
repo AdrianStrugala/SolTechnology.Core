@@ -1,9 +1,10 @@
-﻿using System.Windows.Input;
+﻿using FluentValidation;
 using SolTechnology.Core.Logging;
+using SolTechnology.TaleCode.PlayerRegistry.Commands.SynchronizePlayerMatches;
 
 namespace SolTechnology.TaleCode.PlayerRegistry.Commands.CalculatePlayerStatistics;
 
-public class CalculatePlayerStatisticsCommand : ILoggedOperation
+public class CalculatePlayerStatisticsCommand : ILoggableOperation
 {
     public int PlayerId { get; set; }
 
@@ -13,10 +14,21 @@ public class CalculatePlayerStatisticsCommand : ILoggedOperation
     }
 
 
-    LogScope ILoggedOperation.LogScope => new LogScope
+    LogScope ILoggableOperation.LogScope => new()
     {
         OperationId = PlayerId,
         OperationIdName = nameof(PlayerId),
         OperationName = nameof(CalculatePlayerStatistics)
     };
+}
+
+public class CalculatePlayerStatisticsCommandValidator : AbstractValidator<CalculatePlayerStatisticsCommand>
+{
+    public CalculatePlayerStatisticsCommandValidator()
+    {
+        RuleFor(x => x.PlayerId)
+            .NotNull()
+            .NotEmpty()
+            .GreaterThan(0);
+    }
 }

@@ -1,17 +1,24 @@
-﻿using SolTechnology.Core.Guards;
+﻿using FluentValidation;
 
-namespace SolTechnology.TaleCode.PlayerRegistry.Queries.GetPlayerStatistics
+namespace SolTechnology.TaleCode.PlayerRegistry.Queries.GetPlayerStatistics;
+
+public class GetPlayerStatisticsQuery
 {
-    public class GetPlayerStatisticsQuery
+    public int PlayerId { get; set; }
+
+    public GetPlayerStatisticsQuery(int playerId)
     {
-        public int PlayerId { get; set; }
+        PlayerId = playerId;
+    }
+}
 
-        public GetPlayerStatisticsQuery(int playerId)
-        {
-            var guards = new Guards();
-            guards.Int(playerId, nameof(playerId), x => x.NotNegative().NotZero()).ThrowOnError();
-
-            PlayerId = playerId;
-        }
+public class GetPlayerStatisticsQueryValidator : AbstractValidator<GetPlayerStatisticsQuery>
+{
+    public GetPlayerStatisticsQueryValidator()
+    {
+        RuleFor(x => x.PlayerId)
+            .NotNull()
+            .NotEmpty()
+            .GreaterThan(0);
     }
 }

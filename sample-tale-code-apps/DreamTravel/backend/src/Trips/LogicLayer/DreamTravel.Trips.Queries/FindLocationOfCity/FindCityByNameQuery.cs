@@ -1,22 +1,18 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using FluentValidation;
 
-namespace DreamTravel.Trips.Queries.FindLocationOfCity
+namespace DreamTravel.Trips.Queries.FindLocationOfCity;
+
+public class FindCityByNameQuery
 {
-    public class FindCityByNameQuery : IValidatableObject
+    public string Name { get; set; } = null!;
+}
+
+public class FindCityByNameQueryValidator : AbstractValidator<FindCityByNameQuery>
+{
+    public FindCityByNameQueryValidator()
     {
-        public string Name { get; set; }
-
-
-        public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
-        {
-            List<ValidationResult> validationResult = new List<ValidationResult>();
-
-            if (string.IsNullOrEmpty(Name))
-            {
-                validationResult.Add(new ValidationResult($"[{nameof(Name)}] cannot be null or empty", new[] { nameof(Name) }));
-            }
-
-            return validationResult;
-        }
+        RuleFor(x => x.Name)
+            .NotNull()
+            .NotEmpty();
     }
 }

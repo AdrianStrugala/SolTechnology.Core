@@ -4,7 +4,7 @@ using SolTechnology.Core.Logging;
 
 namespace SolTechnology.TaleCode.PlayerRegistry.Commands.SynchronizePlayerMatches;
 
-public class SynchronizePlayerMatchesCommand : ILoggedOperation
+public class SynchronizePlayerMatchesCommand : ILoggableOperation
 {
     public int PlayerId { get; set; }
 
@@ -16,7 +16,7 @@ public class SynchronizePlayerMatchesCommand : ILoggedOperation
         PlayerId = playerId;
     }
 
-    LogScope ILoggedOperation.LogScope => new()
+    LogScope ILoggableOperation.LogScope => new()
     {
         OperationId = PlayerId,
         OperationIdName = nameof(PlayerId),

@@ -14,6 +14,7 @@ using SolTechnology.Core.CQRS;
 namespace DreamTravel.Api.DreamTrips
 {
     [Route(Route)]
+    [Obsolete]
     public class LimitCostOfPathsController : Controller
     {
         public const string Route = "api/LimitCost";
