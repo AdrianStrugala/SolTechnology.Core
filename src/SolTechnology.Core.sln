@@ -142,7 +142,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TaleCodeDatabase", "..\samp
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "DreamTravel", "DreamTravel", "{D9E61986-EACB-4DFD-949F-ED2F27DB1F75}"
 	ProjectSection(SolutionItems) = preProject
-		README.md = README.md
+		..\sample-tale-code-apps\DreamTravel\README.md = ..\sample-tale-code-apps\DreamTravel\README.md
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Trips", "Trips", "{420E5B4D-02EA-463D-B929-B3FDA2FA8046}"
