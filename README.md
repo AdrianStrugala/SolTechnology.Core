@@ -74,7 +74,30 @@ The TaleCode application is the most common case that came to my mind. Every nig
 To solve the application flow the CQRS approach is implemented. It is interesting from a technological perspective. Uses SQL, no-SQL databases, Azure Service Bus, Scheduled Tasks, Authentication, and Application Insights logging.
 <p>
 <b>The Code Design is the main goal</b> of TaleCode application. The Code is organized in the most redable way I was able to think of.
-Take a look at example Command Handler:
+Take a look at example Query Handler:
+
+```csharp
+    public async Task<CalculateBestPathResult> Handle(CalculateBestPathQuery query)
+    {
+        var cities = query.Cities.Where(c => c != null).ToList();
+        var context = new CalculateBestPathContext(cities.Count);
+
+        await _downloadRoadData(cities!, context);
+        _findProfitablePath(context, cities.Count);
+
+        var orderOfCities = _solveTSP(context.OptimalDistances.ToList());
+
+        CalculateBestPathResult calculateBestPathResult = new CalculateBestPathResult
+        {
+            Cities = cities!,
+            BestPaths = _formPathsFromMatrices(cities!, context, orderOfCities)
+        };
+        return calculateBestPathResult;
+    }
+```
+
+Compact and clean. \
+Sample Command Handler using funcional-like notation:
 
 ```csharp
         await Chain
@@ -88,14 +111,6 @@ Take a look at example Command Handler:
             .EndCommand();
 ```
 
-My intention was to read the code in following way:
-<p>
-<i>
-To synchronize the matches I need to get at first the external Id for a player. As the next step, I synchronize the player itself. Then, I am calculating the matches to sync. For each of the chosen matches, I am running the sync process. At the end, I am sending a notification, that the Player Matches are synchronized.
-</i>
-</p>
-
-If you read the code is simiar way, Tale Code succeeded. How was it achieved?
 
 I have summarized the knowledge and decisions into three chapters.\
 Enjoy your reading! 

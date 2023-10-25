@@ -2,7 +2,6 @@ version: '3.7'
  
 services:
     sql-server:
-        container_name: sql-server
         build: 
           context: .
           dockerfile: src/TaleCodeDatabase/Dockerfile
@@ -10,7 +9,6 @@ services:
           - "1403:1433"
           
     azurite:
-        container_name: azurite
         image: mcr.microsoft.com/azure-storage/azurite
         hostname: azurite
         restart: always
@@ -21,7 +19,6 @@ services:
           - 10002:10002
           
     rabbit:
-        container_name: rabbitmq
         image: rabbitmq:3-management
         user: rabbitmq
         ports:
@@ -34,7 +31,6 @@ services:
           retries: 60
 
     sbemulator:
-        container_name: sbemulator
         image: devopsifyme/sbemu:latest
         build:
           x-bake:
