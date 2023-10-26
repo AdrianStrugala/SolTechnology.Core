@@ -73,3 +73,153 @@ classDiagram
       Provides SQL queries and repositories
     }
 ```
+
+
+Going into more details. The complete example of a [QueryHandler](https://github.com/AdrianStrugala/SolTechnology.Core/tree/master/sample-tale-code-apps/DreamTravel/backend/src/Trips/LogicLayer/DreamTravel.Trips.Queries/CalculateBestPath):
+
+1) Controller - it is meant be simple:
+
+```csharp
+    [HttpPost]
+    [Produces(MediaTypeNames.Application.Json)]
+    [ProducesResponseType(typeof(List<Path>), (int)HttpStatusCode.OK)]
+    [ProducesResponseType(typeof(string), (int)HttpStatusCode.BadRequest)]
+    public async Task<IActionResult> CalculateBestPath([FromBody] CalculateBestPathQuery calculateBestPathQuery)
+    {
+        _logger.LogInformation("TSP Engine: Fire!");
+        return await Return(_calculateBestPath.Handle(calculateBestPathQuery));
+    }
+```
+
+
+2) Query Handler - is build of a few components:
+
+a) Query - model and **validation**
+
+```csharp
+    public class CalculateBestPathQuery
+    {
+        public List<City?> Cities { get; set; } = new();
+    }
+
+    public class CalculateBestPathQueryValidator : AbstractValidator<CalculateBestPathQuery>
+    {
+        public CalculateBestPathQueryValidator()
+        {
+            RuleFor(x => x.Cities)
+                .NotNull();
+        }
+    }
+```
+
+This is a little bit artificial example, but shows the rule. Validation is build into the CQRS pipeline, and whenever Query/Command validator is registered, it would be invoked and the result handled.
+
+b) Context - intermediate model for internal handler operations. This one might be controvesial, but greatly increses performance of the solution. What is worth to remember, that this model lives only in the scope of Query.
+
+```csharp
+    public sealed class CalculateBestPathContext
+    {
+        public double[] FreeDistances { get; set; }
+        public double[] TollDistances { get; set; }
+        public double[] OptimalDistances { get; set; }
+        public double[] Goals { get; set; }
+        public double[] Costs { get; set; }
+        public double[] OptimalCosts { get; set; }
+        public double[] VinietaCosts { get; set; }
+
+
+        public CalculateBestPathContext(int noOfCities)
+        {
+            int matrixSize = noOfCities * noOfCities;
+
+            FreeDistances = new double[matrixSize];
+            TollDistances = new double[matrixSize];
+            OptimalDistances = new double[matrixSize];
+            Goals = new double[matrixSize];
+            Costs = new double[matrixSize];
+            OptimalCosts = new double[matrixSize];
+            VinietaCosts = new double[matrixSize];
+        }
+    }
+```
+
+c) Handler - the logic part. Contains the operations itself or orchestrates executors:
+
+```csharp
+    public async Task<CalculateBestPathResult> Handle(CalculateBestPathQuery query)
+    {
+        var cities = query.Cities.Where(c => c != null).ToList();
+        var context = new CalculateBestPathContext(cities.Count);
+
+        await _downloadRoadData(cities!, context);
+        _findProfitablePath(context, cities.Count);
+
+        var orderOfCities = _solveTSP(context.OptimalDistances.ToList());
+
+        CalculateBestPathResult calculateBestPathResult = new CalculateBestPathResult
+        {
+            Cities = cities!,
+            BestPaths = _formPathsFromMatrices(cities!, context, orderOfCities)
+        };
+        return calculateBestPathResult;
+    }
+```
+
+d) Executors - the dirty part of the code has to be written somewhere. Those classes are modyfing context for the best performance:
+
+```csharp
+    public DownloadRoadData(IGoogleApiClient googleApiClient, IMichelinApiClient michelinApiClient)
+    {
+        _googleApiClient = googleApiClient;
+        _michelinApiClient = michelinApiClient;
+    }
+
+    public async Task Execute(List<City> listOfCities, CalculateBestPathContext calculateBestPathContext)
+    {
+        List<Task> tasks = new List<Task>
+        {
+            Task.Run(async () => calculateBestPathContext.TollDistances = await _googleApiClient.GetDurationMatrixByTollRoad(listOfCities)),
+            Task.Run(async () => calculateBestPathContext.FreeDistances = await _googleApiClient.GetDurationMatrixByFreeRoad(listOfCities))
+        };
+
+        tasks.AddRange(DownloadCostMatrix(listOfCities, calculateBestPathContext));
+
+        await Task.WhenAll(tasks);
+    }
+
+    private List<Task> DownloadCostMatrix(List<City> listOfCities, CalculateBestPathContext calculateBestPathContext)
+    {
+        List<Task> tasks = new List<Task>();
+
+        for (int i = 0; i < listOfCities.Count; i++)
+        {
+            for (int j = 0; j < listOfCities.Count; j++)
+            {
+                int iterator = j + i * listOfCities.Count;
+
+                var i1 = i;
+                var j1 = j;
+                tasks.Add(Task.Run(async () => (calculateBestPathContext.Costs[iterator], calculateBestPathContext.VinietaCosts[iterator]) =
+                    await _michelinApiClient.DownloadCostBetweenTwoCities(listOfCities[i1], listOfCities[j1])));
+            }
+        }
+
+        return tasks;
+    }
+```
+
+e) And finally the Result:
+
+```csharp
+public class CalculateBestPathResult
+{
+    public List<Path> BestPaths { get; set; }
+    public List<City> Cities { get; set; }
+
+    public CalculateBestPathResult()
+    {
+        BestPaths = new List<Path>();
+        Cities = new List<City>();
+    }
+}
+```
