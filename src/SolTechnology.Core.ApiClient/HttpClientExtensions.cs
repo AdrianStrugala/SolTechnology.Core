@@ -17,6 +17,11 @@ namespace System.Net.Http
             return await SendAsync<TContent, TResponse>(httpClient, url, HttpMethod.Post, request, headers);
         }
 
+        public static async Task<TResponse> PostAsync<TResponse>(this HttpClient httpClient, string url, object request, Dictionary<string, string> headers = null, DataType dataType = DataType.Json)
+        {
+            return await SendAsync<object, TResponse>(httpClient, url, HttpMethod.Post, request, headers);
+        }
+
         public static async Task<TResponse> DeleteAsync<TContent, TResponse>(this HttpClient httpClient, string url, TContent request, DataType dataType = DataType.Json) where TContent : class
         {
             return await SendAsync<TContent, TResponse>(httpClient, url, HttpMethod.Delete, request);

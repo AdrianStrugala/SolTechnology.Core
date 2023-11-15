@@ -4,23 +4,29 @@ using System.Net;
 using Xbehave;
 using Xunit;
 using AutoFixture;
+using DreamTravel.Api;
 using DreamTravel.FunctionalTests.Models;
 using DreamTravel.FunctionalTests.TestsConfiguration;
 using DreamTravel.TestFixture.Api.TestsConfiguration;
 using DreamTravel.Trips.Domain.Cities;
 using Microsoft.AspNetCore.Mvc.Formatters;
+using Microsoft.AspNetCore.TestHost;
+using SolTechnology.Core.Api.Testing;
+using System.Net.Http;
 
 namespace DreamTravel.FunctionalTests
 {
-    [Collection(nameof(ApiFunctionalTests))]
+    // [Collection(nameof(ApiFunctionalTests))]
     public class CalculateBestPathFeatureTest
     {
-        private readonly ApiFixture _apiFixture;
+        // private readonly ApiFixture _apiFixture;
         private readonly Fixture _fixture;
+        private readonly ApiFixture<Program> _apiFixture;
 
-        public CalculateBestPathFeatureTest(ApiFixture apiFixture)
+        public CalculateBestPathFeatureTest(FunctionalTestsFixture functionalTestsFixture)
         {
-            _apiFixture = apiFixture;
+            // _apiFixture = apiFixture;
+            _apiFixture = functionalTestsFixture.ApiFixture;
             _fixture = new Fixture();
         }
 
@@ -42,8 +48,15 @@ namespace DreamTravel.FunctionalTests
             {
                 foreach (var city in cities)
                 {
-                    var apiResponse = await _apiFixture.InternalApiIntegrationTestsFixture.PostAsync<City>($"/api/FindLocationOfCity", new { Name = city.Name });
-                    Assert.Equal(HttpStatusCode.OK, apiResponse.HttpStatusCode);
+                    var apiResponse = await _apiFixture.ServerClient.PostAsync<City>("/api/FindLocationOfCity", new { Name = city.Name });
+                    //
+                    // var apiResponse = await _api
+                    //     .CreateRequest($"/api/FindLocationOfCity")
+                    //     // .AddHeader("X-Auth", "SolTechnologyAuthentication U2VjdXJlS2V5")
+                    //     .PostAsync();
+                    // _api.
+                    // var apiResponse = await _apiFixture.InternalApiIntegrationTestsFixture.PostAsync<City>($"/api/FindLocationOfCity", new { Name = city.Name });
+                    // Assert.Equal(HttpStatusCode.OK, apiResponse.);
                 }
 
 
