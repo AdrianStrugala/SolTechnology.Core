@@ -15,7 +15,9 @@ namespace SolTechnology.TaleCode.ApiClients.ApiFootballApi
         {
             List<Team> result = new List<Team>();
 
-            var apiResult = await _httpClient.GetAsync<TransferDetails>($"v3/transfers?player={apiId}");
+            var apiResult = await _httpClient
+                .CreateRequest($"v3/transfers?player={apiId}")
+                .GetAsync<TransferDetails>();
 
             if (apiResult.Response != null)
             {

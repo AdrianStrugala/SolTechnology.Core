@@ -13,20 +13,23 @@ using Microsoft.AspNetCore.Mvc.Formatters;
 using Microsoft.AspNetCore.TestHost;
 using SolTechnology.Core.Api.Testing;
 using System.Net.Http;
+using SolTechnology.Core.Api;
 
 namespace DreamTravel.FunctionalTests
 {
-    // [Collection(nameof(ApiFunctionalTests))]
+    [Collection(nameof(DreamTravelFunctionalTestsCollection))]
     public class CalculateBestPathFeatureTest
     {
         // private readonly ApiFixture _apiFixture;
         private readonly Fixture _fixture;
         private readonly ApiFixture<Program> _apiFixture;
+        private readonly HttpClient _apiClient;
 
         public CalculateBestPathFeatureTest(FunctionalTestsFixture functionalTestsFixture)
         {
             // _apiFixture = apiFixture;
             _apiFixture = functionalTestsFixture.ApiFixture;
+            _apiClient = functionalTestsFixture.ApiFixture.ServerClient;
             _fixture = new Fixture();
         }
 
@@ -48,15 +51,15 @@ namespace DreamTravel.FunctionalTests
             {
                 foreach (var city in cities)
                 {
-                    var apiResponse = await _apiFixture.ServerClient.PostAsync<City>("/api/FindLocationOfCity", new { Name = city.Name });
-                    //
-                    // var apiResponse = await _api
-                    //     .CreateRequest($"/api/FindLocationOfCity")
-                    //     // .AddHeader("X-Auth", "SolTechnologyAuthentication U2VjdXJlS2V5")
-                    //     .PostAsync();
-                    // _api.
-                    // var apiResponse = await _apiFixture.InternalApiIntegrationTestsFixture.PostAsync<City>($"/api/FindLocationOfCity", new { Name = city.Name });
-                    // Assert.Equal(HttpStatusCode.OK, apiResponse.);
+                    var apiResponse = await _apiClient
+                        .CreateRequest("/api/FindLocationOfCity")
+                        .WithHeader("Authorization", "DreamAuthentication U29sVWJlckFsbGVz")
+                        .WithBody(new { Name = city.Name })
+                        .PostAsync<ResponseEnvelope<City>>();
+
+                    Assert.True(apiResponse.IsSuccess);
+
+                    //Assert data (add wiremock)
                 }
 
 

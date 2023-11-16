@@ -13,7 +13,9 @@ namespace SolTechnology.TaleCode.ApiClients.FootballDataApi
 
         public async Task<FootballDataPlayer> GetPlayerById(int id)
         {
-            var apiResult = await _httpClient.GetAsync<PlayerModel>($"v2/players/{id}/matches?limit=999");
+            var apiResult = await _httpClient
+                .CreateRequest($"v2/players/{id}/matches?limit=999")
+                .GetAsync<PlayerModel>();
 
             var result = new FootballDataPlayer
             {
@@ -39,7 +41,9 @@ namespace SolTechnology.TaleCode.ApiClients.FootballDataApi
 
         public async Task<FootballDataMatch> GetMatchById(int matchApiId)
         {
-            var apiResult = await _httpClient.GetAsync<MatchModel>($"v2/matches/{matchApiId}");
+            var apiResult = await _httpClient
+                .CreateRequest($"v2/matches/{matchApiId}")
+                .GetAsync<MatchModel>();
 
             var result = new FootballDataMatch
             {

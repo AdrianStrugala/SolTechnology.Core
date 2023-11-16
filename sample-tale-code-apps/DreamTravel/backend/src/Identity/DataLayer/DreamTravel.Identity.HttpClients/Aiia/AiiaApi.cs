@@ -11,8 +11,10 @@ public class AiiaApi : IAiiaApi
 
     public async Task<CreatePaymentResponse> CreateAcceptPayment(CreateAcceptPaymentRequest paymentRequest)
     {
-        return await _aiiaHttpClient.PostAsync<CreateAcceptPaymentRequest, CreatePaymentResponse>(
-            $"v2/payments/accept",
-            paymentRequest);
+        var apiResponse = await _aiiaHttpClient
+            .CreateRequest("v2/payments/accept")
+            .WithBody(paymentRequest)
+            .PostAsync<CreatePaymentResponse>();
+        return apiResponse;
     }
 }
