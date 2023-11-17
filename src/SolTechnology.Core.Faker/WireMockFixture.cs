@@ -1,9 +1,6 @@
-﻿using System;
-using TaleCode.Faker;
-using TaleCode.Faker.FakesBase;
-using TaleCode.FunctionalTests.FakeApis;
+﻿using SolTechnology.Core.Faker.FakesBase;
 
-namespace TaleCode.FunctionalTests.TestsConfiguration
+namespace SolTechnology.Core.Faker
 {
     public class WireMockFixture : IDisposable
     {
@@ -13,11 +10,11 @@ namespace TaleCode.FunctionalTests.TestsConfiguration
         {
             _wireMockStartup = new WireMockStartup();
             _wireMockStartup.Run(port);
-            _wireMockStartup.RegisterFakeApi(new ApiFootballFakeApi());
-            _wireMockStartup.RegisterFakeApi(new FootballDataFakeApi());
 
             return _wireMockStartup;
         }
+
+        public void RegisterFakeApi(IFakeApi fakeApi) => _wireMockStartup.RegisterFakeApi(fakeApi);
 
         public IFakeServiceBuilderWithRequest<T> Fake<T>() where T : class =>
             _wireMockStartup.GetFakeApi<T>();

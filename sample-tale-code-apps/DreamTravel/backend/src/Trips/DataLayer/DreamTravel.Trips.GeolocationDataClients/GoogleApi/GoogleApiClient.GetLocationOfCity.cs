@@ -26,17 +26,21 @@ namespace DreamTravel.GeolocationData.GoogleApi
         {
             try
             {
-                string url =
-                    $"https://maps.googleapis.com/maps/api/geocode/json?address={cityName}&key={_options.Key}";
+                City result = new City { Name = cityName };
 
-                City toAdd = new City { Name = cityName };
+                var response = await _httpClient
+                    .CreateRequest($"maps/api/geocode/json?address={cityName}&key={_options.Key}")
+                    .GetAsync<string>();
 
-                string response = await _httpClient.GetStringAsync(url);
+                // string url =
+                //     $"https://maps.googleapis.com/maps/api/geocode/json?address={cityName}&key={_options.Key}";
+
+                // string response = await _httpClient.GetStringAsync(url);
                 JObject json = JObject.Parse(response);
 
-                toAdd.Latitude = json["results"][0]["geometry"]["location"]["lat"].Value<double>();
-                toAdd.Longitude = json["results"][0]["geometry"]["location"]["lng"].Value<double>();
-                return toAdd;
+                result.Latitude = json["results"][0]["geometry"]["location"]["lat"].Value<double>();
+                result.Longitude = json["results"][0]["geometry"]["location"]["lng"].Value<double>();
+                return result;
             }
 
             catch (Exception)

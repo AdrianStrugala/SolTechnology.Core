@@ -1,10 +1,10 @@
-﻿using TaleCode.Faker.FakesBase;
+﻿using SolTechnology.Core.Faker.FakesBase;
 using WireMock.Logging;
 using WireMock.Net.StandAlone;
 using WireMock.Server;
 using WireMock.Settings;
 
-namespace TaleCode.Faker
+namespace SolTechnology.Core.Faker
 {
     public class WireMockStartup
     {
@@ -23,7 +23,6 @@ namespace TaleCode.Faker
             };
 
             WireMockServer = StartServer(runAsServer, settings);
-            // RegisterFakeServices(WireMockServer);
         }
 
         private static WireMockServer StartServer(bool runAsServer, WireMockServerSettings settings)
@@ -52,22 +51,5 @@ namespace TaleCode.Faker
             fakeApi.Register(WireMockServer);
             _fakeServices.Add(fakeApi);
         }
-
-        // private void RegisterFakeServices(WireMockServer mockServer)
-        // {
-        //     var fakeApis = typeof(WireMockStartup).Assembly.DefinedTypes
-        //         .Where(x =>
-        //             !x.IsAbstract &&
-        //             x.IsClass &&
-        //             x.ImplementedInterfaces.Contains(typeof(IFakeApi)))
-        //         .ToArray();
-        //
-        //     foreach (var fakeApi in fakeApis)
-        //     {
-        //         var fakeService = (IFakeApi)Activator.CreateInstance(fakeApi)!;
-        //         fakeService.Register(mockServer);
-        //         _fakeServices.Add(fakeService);
-        //     }
-        // }
     }
 }

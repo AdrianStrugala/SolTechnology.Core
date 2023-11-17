@@ -1,11 +1,11 @@
 using System.Text.RegularExpressions;
-using TaleCode.Faker.FakesBase;
+using SolTechnology.Core.Faker.FakesBase;
 using WireMock.Matchers;
 using WireMock.RequestBuilders;
 using WireMock.Server;
 using IRequestBuilder = WireMock.RequestBuilders.IRequestBuilder;
 
-namespace TaleCode.Faker.WireMock;
+namespace SolTechnology.Core.Faker.WireMock;
 
 public class WireMockFakerConfigurator<TClient> : IWireMockFakerConfigurator<TClient>
     where TClient : class

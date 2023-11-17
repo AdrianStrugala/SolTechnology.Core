@@ -1,19 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Net;
+﻿using System.Collections.Generic;
 using Xbehave;
 using Xunit;
 using AutoFixture;
 using DreamTravel.Api;
-using DreamTravel.FunctionalTests.Models;
 using DreamTravel.FunctionalTests.TestsConfiguration;
-using DreamTravel.TestFixture.Api.TestsConfiguration;
 using DreamTravel.Trips.Domain.Cities;
-using Microsoft.AspNetCore.Mvc.Formatters;
-using Microsoft.AspNetCore.TestHost;
 using SolTechnology.Core.Api.Testing;
 using System.Net.Http;
+using DreamTravel.GeolocationData.GoogleApi;
+using FluentAssertions;
 using SolTechnology.Core.Api;
+using SolTechnology.Core.Faker;
 
 namespace DreamTravel.FunctionalTests
 {
@@ -22,14 +19,13 @@ namespace DreamTravel.FunctionalTests
     {
         // private readonly ApiFixture _apiFixture;
         private readonly Fixture _fixture;
-        private readonly ApiFixture<Program> _apiFixture;
         private readonly HttpClient _apiClient;
+        private readonly WireMockFixture _wireMockFixture;
 
         public CalculateBestPathFeatureTest(FunctionalTestsFixture functionalTestsFixture)
         {
-            // _apiFixture = apiFixture;
-            _apiFixture = functionalTestsFixture.ApiFixture;
             _apiClient = functionalTestsFixture.ApiFixture.ServerClient;
+            _wireMockFixture = functionalTestsFixture.WireMockFixture;
             _fixture = new Fixture();
         }
 
@@ -41,11 +37,32 @@ namespace DreamTravel.FunctionalTests
             {
                 cities = new List<City>
                 {
-                    new() { Name = "Wroclaw" },
-                    new() { Name = "Vienna" },
-                    new() { Name = "Barcelona" }
+                    new() { Name = "Wroclaw", Latitude =  51.107883, Longitude = 17.038538},
+                    new() { Name = "Firenze", Latitude =  43.769562, Longitude = 11.255814},
+                    new() { Name = "Vienna", Latitude = 48.210033, Longitude =  16.363449},
+                    new() { Name = "Barcelona",  Latitude =  41.390205, Longitude = 2.154007}
                 };
             });
+
+            "Given is fake google API".x(() =>
+            {
+                foreach (var city in cities)
+                {
+                    _wireMockFixture.Fake<IGoogleApiClient>()
+                        .WithRequest(x => x.GetLocationOfCity,
+                            new Dictionary<string, string> { { "cityName", city.Name }, { "key", "googleKey" } })
+                        .WithResponse(x => x.WithSuccess().WithBodyAsJson("xx"));
+                }
+
+                cities = new List<City>
+                {
+                    new() { Name = "Wroclaw", Latitude =  51.107883, Longitude = 17.038538},
+                    new() { Name = "Firenze", Latitude =  43.769562, Longitude = 11.255814},
+                    new() { Name = "Vienna", Latitude = 48.210033, Longitude =  16.363449},
+                    new() { Name = "Barcelona",  Latitude =  41.390205, Longitude = 2.154007}
+                };
+            });
+
 
             "When User searches for location of each of them".x(async () =>
             {
@@ -57,9 +74,8 @@ namespace DreamTravel.FunctionalTests
                         .WithBody(new { Name = city.Name })
                         .PostAsync<ResponseEnvelope<City>>();
 
-                    Assert.True(apiResponse.IsSuccess);
-
-                    //Assert data (add wiremock)
+                    apiResponse.IsSuccess.Should().BeTrue();
+                    apiResponse.Data.Should().BeEquivalentTo(city);
                 }
 
 

@@ -16,4 +16,8 @@
 	  <ProjectReference Include="..\..\src\DataLayer\SolTechnology.TaleCode.ApiClients\SolTechnology.TaleCode.ApiClients.csproj" />
 	</ItemGroup>
 
+	<ItemGroup>
+	  <Folder Include="Fakes\" />
+	</ItemGroup>
+
 </Project>

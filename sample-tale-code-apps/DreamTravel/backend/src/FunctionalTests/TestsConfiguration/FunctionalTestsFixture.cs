@@ -1,7 +1,9 @@
 ﻿using System;
 using DreamTravel.Api;
+using DreamTravel.FunctionalTests.FakeApis;
 using DreamTravel.TestFixture.Sql;
 using SolTechnology.Core.Api.Testing;
+using SolTechnology.Core.Faker;
 using Xunit;
 
 namespace DreamTravel.FunctionalTests.TestsConfiguration
@@ -12,18 +14,19 @@ namespace DreamTravel.FunctionalTests.TestsConfiguration
         public ApiFixture<Program> ApiFixture { get; set; }
         // public SqlFixture SqlFixture { get; set; }
         // public BlobFixture BlobFixture { get; set; }
-        // public WireMockFixture WireMockFixture { get; set; }
+        public WireMockFixture WireMockFixture { get; set; }
 
         public FunctionalTestsFixture()
         {
             // BackgroundWorkerFixture ??= new BackgroundWorkerFixture();
             ApiFixture = new ApiFixture<Program>();
             // SqlFixture = new SqlFixture();
-            // WireMockFixture ??= new WireMockFixture();
+            WireMockFixture = new WireMockFixture();
             // BlobFixture ??= new BlobFixture();
 
             // SqlFixture.InitializeAsync().GetAwaiter().GetResult();
-            // WireMockFixture.Initialize();
+            WireMockFixture.Initialize();
+            WireMockFixture.RegisterFakeApi(new GoogleFakeApi());
         }
 
         public void Dispose()

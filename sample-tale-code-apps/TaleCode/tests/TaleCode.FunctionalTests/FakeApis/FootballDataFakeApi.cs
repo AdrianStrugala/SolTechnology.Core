@@ -1,9 +1,11 @@
-﻿using SolTechnology.TaleCode.ApiClients.FootballDataApi;
+﻿using System.Collections.Generic;
+using System.Net.Http;
+using SolTechnology.TaleCode.ApiClients.FootballDataApi;
 using TaleCode.Faker.FakesBase;
 using TaleCode.Faker.WireMock;
 using WireMock.Server;
 
-namespace TaleCode.Faker.Fakes
+namespace TaleCode.FunctionalTests.FakeApis
 {
     public class FootballDataFakeApi : FakeService<IFootballDataApiClient>, IFakeApi
     {
