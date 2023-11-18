@@ -1,5 +1,6 @@
 ﻿using System.Linq.Expressions;
 using System.Reflection;
+using Microsoft.AspNetCore.Hosting.Server;
 using SolTechnology.Core.Faker.WireMock;
 using WireMock.RequestBuilders;
 using WireMock.ResponseBuilders;
@@ -13,29 +14,23 @@ public abstract class FakeService<TApiClient> :
     where TApiClient : class
 
 {
-    private IWireMockFakerConfigurator<TApiClient>? _buildConfiguration;
-    private IRespondWithAProvider _provider = null!;
+    protected IRespondWithAProvider Provider = null!;
+    private WireMockServer _mockServer = null!;
 
-    protected abstract IWireMockFakerConfigurator<TApiClient> Configure(WireMockServer mockServer);
+    protected abstract string BaseUrl { get; }
 
-    public void Register(WireMockServer mockServer) =>
-        _buildConfiguration = Configure(mockServer) ??
-                              throw new InvalidOperationException($"{nameof(Configure)} should never return null");
+    public void Register(WireMockServer mockServer)
+    {
+        _mockServer = mockServer;
+    }
 
     public IFakeServiceBuilderWithResponse WithRequest(
         Expression<Func<TApiClient, Delegate>> selector,
-        Dictionary<string, string>? pathParameters = null,
-        Dictionary<string, string>? queryParameters = null,
-       Action<IRequestBuilder>? configure = null)
+        object?[]? parameters = null)
     {
+        parameters ??= new object[] { };
         var method = GetMethodInfo(selector)!.Name;
-        var requestInfo = (RequestInfo)GetType().GetMethod(method)!.Invoke(this, new object[] { })!;
-
-        _provider = _buildConfiguration!.BuildRequest(
-            requestInfo,
-            pathParameters ?? new Dictionary<string, string>(),
-            queryParameters ?? new Dictionary<string, string>(),
-            configure);
+        GetType().GetMethod(method)!.Invoke(this, parameters);
         return this;
     }
 
@@ -46,7 +41,12 @@ public abstract class FakeService<TApiClient> :
         ArgumentNullException.ThrowIfNull(configure);
         var builder = Response.Create();
         asJson.Invoke(builder);
-        _provider.RespondWith(builder);
+        Provider.RespondWith(builder);
+    }
+
+    protected IRespondWithAProvider BuildRequest(IRequestBuilder request)
+    {
+        return _mockServer.Given(request);
     }
 
     private static MethodInfo? GetMethodInfo<T>(Expression<Func<T, Delegate>> expression)

@@ -49,8 +49,7 @@ namespace DreamTravel.FunctionalTests
                 foreach (var city in cities)
                 {
                     _wireMockFixture.Fake<IGoogleApiClient>()
-                        .WithRequest(x => x.GetLocationOfCity,
-                            new Dictionary<string, string> { { "cityName", city.Name }, { "key", "googleKey" } })
+                        .WithRequest( x => x.GetLocationOfCity, city.Name)
                         .WithResponse(x => x.WithSuccess().WithBodyAsJson("xx"));
                 }
 

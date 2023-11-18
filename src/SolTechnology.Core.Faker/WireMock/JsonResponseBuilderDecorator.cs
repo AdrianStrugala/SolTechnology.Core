@@ -116,7 +116,7 @@ public class JsonResponseBuilderDecorator : IResponseBuilder
     public IResponseBuilder WithBodyAsJson(object body, Encoding? encoding = null, bool? indented = null)
     {
         var json = JsonSerializer.Serialize(body,
-            new JsonSerializerOptions {WriteIndented = indented.GetValueOrDefault()});
+            new JsonSerializerOptions { WriteIndented = indented.GetValueOrDefault() });
         _originalBuilder.WithBody(json);
         return this;
     }

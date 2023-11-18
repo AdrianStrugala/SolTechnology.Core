@@ -1,5 +1,4 @@
 ﻿using System.Linq.Expressions;
-using WireMock.RequestBuilders;
 
 namespace SolTechnology.Core.Faker.FakesBase
 {
@@ -7,8 +6,6 @@ namespace SolTechnology.Core.Faker.FakesBase
     {
         public IFakeServiceBuilderWithResponse WithRequest(
             Expression<Func<TApiClient, Delegate>> selector,
-            Dictionary<string, string>? pathParameters = null, 
-            Dictionary<string, string>? queryParameters = null, 
-            Action<IRequestBuilder>? configure = null);
+            params object?[]? parameters);
     }
 }
