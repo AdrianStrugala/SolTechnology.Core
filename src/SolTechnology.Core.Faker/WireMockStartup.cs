@@ -1,6 +1,4 @@
-﻿using DreamTravel.FunctionalTests.FakeApis;
-using DreamTravel.GeolocationData.GoogleApi;
-using SolTechnology.Core.Faker.FakesBase;
+﻿using SolTechnology.Core.Faker.FakesBase;
 using WireMock.Logging;
 using WireMock.Net.StandAlone;
 using WireMock.Server;
@@ -25,11 +23,6 @@ namespace SolTechnology.Core.Faker
             };
 
             WireMockServer = StartServer(runAsServer, settings);
-
-            RegisterFakeApi(new GoogleFakeApi());
-            GetFakeApi<IGoogleApiClient>()
-                .WithRequest(x => x.GetLocationOfCity, "Wroclaw")
-                .WithResponse(x => x.WithSuccess().WithBodyAsJson("xx"));
         }
 
         private static WireMockServer StartServer(bool runAsServer, WireMockServerSettings settings)

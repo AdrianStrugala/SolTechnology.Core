@@ -30,11 +30,13 @@ namespace DreamTravel.FunctionalTests.FakeApis
             var request = Request
                 .Create()
                 .UsingGet()
-                .WithPath(new WildcardMatcher($"/{BaseUrl}/maps/api/geocode/json?address={cityName}&key=googleKey"));
+                .WithPath(new WildcardMatcher($"/{BaseUrl}/maps/api/geocode/json"))
+                .WithParam("address", $"{cityName}")
+                .WithParam("key", "googleKey");
 
             Provider = BuildRequest(request);
 
-            return null;
+            return null!;
         }
 
         public Task<double[]> GetDurationMatrixByTollRoad(List<City> listOfCities)
