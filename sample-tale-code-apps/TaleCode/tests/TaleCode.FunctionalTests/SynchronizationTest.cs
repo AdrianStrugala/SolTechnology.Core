@@ -8,6 +8,7 @@ using FluentAssertions;
 using Microsoft.AspNetCore.TestHost;
 using SolTechnology.Core.Api;
 using SolTechnology.Core.BlobStorage.Connection;
+using SolTechnology.Core.Sql.Testing;
 using SolTechnology.TaleCode.ApiClients.ApiFootballApi;
 using SolTechnology.TaleCode.ApiClients.ApiFootballApi.Models;
 using SolTechnology.TaleCode.ApiClients.FootballDataApi;
@@ -15,7 +16,6 @@ using SolTechnology.TaleCode.ApiClients.FootballDataApi.Models;
 using SolTechnology.TaleCode.BackgroundWorker.InternalApi;
 using SolTechnology.TaleCode.PlayerRegistry.Queries.GetPlayerStatistics;
 using TaleCode.FunctionalTests.TestsConfiguration;
-using TaleCode.IntegrationTests.Sql.Configuration;
 using Xunit;
 
 namespace TaleCode.FunctionalTests

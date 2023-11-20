@@ -14,12 +14,11 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\..\..\Infrastructure\TestFixtures\DreamTravel.TestFixture.Sql\DreamTravel.TestFixture.Sql.csproj" />
 		<ProjectReference Include="..\..\DataLayer\DreamTravel.Identity.DatabaseData\DreamTravel.Identity.DatabaseData.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>
-		<Content Include="..\..\..\FunctionalTests\appsettings.functional.tests.json" Link="appsettings.functional.tests.json">
+		<Content Include="..\..\..\DreamTravel.Api\appsettings.local.json" Link="appsettings.local.json">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</Content>
 	</ItemGroup>

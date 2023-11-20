@@ -1,7 +1,6 @@
 ﻿using System;
 using DreamTravel.Api;
 using DreamTravel.FunctionalTests.FakeApis;
-using DreamTravel.TestFixture.Sql;
 using SolTechnology.Core.Api.Testing;
 using SolTechnology.Core.Faker;
 using Xunit;

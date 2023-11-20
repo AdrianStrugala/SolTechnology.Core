@@ -28,10 +28,11 @@ namespace DreamTravel.GeolocationData.GoogleApi
             {
                 City result = new City { Name = cityName };
 
-                var response = await _httpClient
+                var request = await _httpClient
                     .CreateRequest($"maps/api/geocode/json?address={cityName}&key={_options.Key}")
-                    .GetAsync<string>();
+                    .GetAsync();
 
+                var response = await request.Content.ReadAsStringAsync();
                 // string url =
                 //     $"https://maps.googleapis.com/maps/api/geocode/json?address={cityName}&key={_options.Key}";
 

@@ -13,18 +13,6 @@ namespace DreamTravel.FunctionalTests.FakeApis
         protected override string BaseUrl => "google";
 
 
-        // /// <summary>
-        // /// The convention for Fake API methods:
-        // /// 1. Use the same name as for Client methods
-        // /// 2. Return RequestInfo model containing http method and path used in the call
-        // /// 3. The methods here have no reference, because are called dynamically
-        // /// </summary>
-        //
-        // public RequestInfo GetLocationOfCity()
-        // {
-        //     return new RequestInfo(HttpMethod.Get, "maps/api/geocode/json?address={cityName}&key={key}");
-        // }
-
         public Task<City> GetLocationOfCity(string cityName)
         {
             var request = Request

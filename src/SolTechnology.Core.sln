@@ -80,8 +80,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DreamTravel.Identity.HttpCl
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DreamTravel.Infrastructure", "..\sample-tale-code-apps\DreamTravel\backend\src\Infrastructure\DreamTravel.Infrastructure\DreamTravel.Infrastructure.csproj", "{4A8E3915-04CF-4B1D-9DFF-88CD890629EA}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DreamTravel.TestFixture.Sql", "..\sample-tale-code-apps\DreamTravel\backend\src\Infrastructure\TestFixtures\DreamTravel.TestFixture.Sql\DreamTravel.TestFixture.Sql.csproj", "{CF6ACC50-E67F-488C-84A3-4FA3C7EB3ACB}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DreamTravel.Trips.Commands", "..\sample-tale-code-apps\DreamTravel\backend\src\Trips\LogicLayer\DreamTravel.Trips.Commands\DreamTravel.Trips.Commands.csproj", "{A64CFE55-0FDA-4EB1-A705-2960AEB9B217}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DreamTravel.Trips.Commands.UnitTests", "..\sample-tale-code-apps\DreamTravel\backend\src\Trips\Tests\DreamTravel.Trips.Features.UnitTests\DreamTravel.Trips.Commands.UnitTests.csproj", "{404B05F9-4672-4BF8-87D4-510A84D68450}"
@@ -104,7 +102,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DreamTravel.Trips.Traveling
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DreamTravelDatabase", "..\sample-tale-code-apps\DreamTravel\backend\src\Infrastructure\DreamTravelDatabase\DreamTravelDatabase.csproj", "{98426C33-10DC-42C0-A305-865125AF5A41}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FunctionalTests", "..\sample-tale-code-apps\DreamTravel\backend\src\FunctionalTests\FunctionalTests.csproj", "{59B97430-ADBB-4E1E-AA4D-128761D9A90C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DreamTravel.FunctionalTests", "..\sample-tale-code-apps\DreamTravel\backend\src\FunctionalTests\DreamTravel.FunctionalTests.csproj", "{59B97430-ADBB-4E1E-AA4D-128761D9A90C}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SolTechnology.TaleCode.Api", "..\sample-tale-code-apps\TaleCode\src\PresentationLayer\SolTechnology.TaleCode.Api\SolTechnology.TaleCode.Api.csproj", "{44F4656A-1664-414C-953F-C6B8D34CD5C4}"
 EndProject
@@ -179,7 +177,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{473ABBD6
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{BE9DF68B-3FD1-45D1-A1A8-86F41273FBA5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SolTechnology.Core.Faker", "SolTechnology.Core.Faker\SolTechnology.Core.Faker.csproj", "{862CF9FB-0A3D-4E7F-8F20-8D6C2243174A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SolTechnology.Core.Faker", "SolTechnology.Core.Faker\SolTechnology.Core.Faker.csproj", "{862CF9FB-0A3D-4E7F-8F20-8D6C2243174A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -287,10 +285,6 @@ Global
 		{4A8E3915-04CF-4B1D-9DFF-88CD890629EA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4A8E3915-04CF-4B1D-9DFF-88CD890629EA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4A8E3915-04CF-4B1D-9DFF-88CD890629EA}.Release|Any CPU.Build.0 = Release|Any CPU
-		{CF6ACC50-E67F-488C-84A3-4FA3C7EB3ACB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{CF6ACC50-E67F-488C-84A3-4FA3C7EB3ACB}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{CF6ACC50-E67F-488C-84A3-4FA3C7EB3ACB}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{CF6ACC50-E67F-488C-84A3-4FA3C7EB3ACB}.Release|Any CPU.Build.0 = Release|Any CPU
 		{A64CFE55-0FDA-4EB1-A705-2960AEB9B217}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{A64CFE55-0FDA-4EB1-A705-2960AEB9B217}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A64CFE55-0FDA-4EB1-A705-2960AEB9B217}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -426,7 +420,6 @@ Global
 		{DC13B6C0-67BD-45FD-8858-AF89A83BF187} = {F55BA14C-499E-480A-A722-0C5B73C14CA4}
 		{080B998E-9174-4373-BA9E-0DB87E93D9DF} = {8C45A60F-7098-4D3B-A0FD-2BD85845A2E6}
 		{4A8E3915-04CF-4B1D-9DFF-88CD890629EA} = {6541B884-6E1F-492F-B5CB-1117C78760FE}
-		{CF6ACC50-E67F-488C-84A3-4FA3C7EB3ACB} = {6541B884-6E1F-492F-B5CB-1117C78760FE}
 		{A64CFE55-0FDA-4EB1-A705-2960AEB9B217} = {4C7789AA-2CA6-45C2-85B4-398653826B23}
 		{404B05F9-4672-4BF8-87D4-510A84D68450} = {4F1D67DA-D15E-4EFC-93C7-6C15CE89B209}
 		{73AFABF8-EE14-412C-82D6-C27E20EBF7F4} = {420E5B4D-02EA-463D-B929-B3FDA2FA8046}

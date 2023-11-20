@@ -1,7 +1,7 @@
 ﻿using SolTechnology.Core.Api.Testing;
 using System;
+using SolTechnology.Core.Sql.Testing;
 using TaleCode.IntegrationTests.Blob;
-using TaleCode.IntegrationTests.Sql.Configuration;
 using Xunit;
 
 namespace TaleCode.FunctionalTests.TestsConfiguration

@@ -17,16 +17,8 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <ProjectReference Include="..\..\..\..\..\src\SolTechnology.Core.Api\SolTechnology.Core.Api.csproj" />
 	  <ProjectReference Include="..\..\..\..\..\src\SolTechnology.Core.Faker\SolTechnology.Core.Faker.csproj" />
 	  <ProjectReference Include="..\DreamTravel.Api\DreamTravel.Api.csproj" />
-	  <ProjectReference Include="..\Infrastructure\TestFixtures\DreamTravel.TestFixture.Sql\DreamTravel.TestFixture.Sql.csproj" />
-	</ItemGroup>
-
-	<ItemGroup>
-		<None Update="appsettings.functional.tests.json">
-			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
-		</None>
 	</ItemGroup>
 
 </Project>

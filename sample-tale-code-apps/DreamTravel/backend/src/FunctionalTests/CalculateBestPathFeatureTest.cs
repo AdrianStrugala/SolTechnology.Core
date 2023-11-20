@@ -1,13 +1,12 @@
 ﻿using System.Collections.Generic;
 using Xbehave;
 using Xunit;
-using AutoFixture;
-using DreamTravel.Api;
 using DreamTravel.FunctionalTests.TestsConfiguration;
 using DreamTravel.Trips.Domain.Cities;
-using SolTechnology.Core.Api.Testing;
 using System.Net.Http;
+using System.Threading.Tasks;
 using DreamTravel.GeolocationData.GoogleApi;
+using DreamTravel.Trips.Domain.Paths;
 using FluentAssertions;
 using SolTechnology.Core.Api;
 using SolTechnology.Core.Faker;
@@ -17,8 +16,6 @@ namespace DreamTravel.FunctionalTests
     [Collection(nameof(DreamTravelFunctionalTestsCollection))]
     public class CalculateBestPathFeatureTest
     {
-        // private readonly ApiFixture _apiFixture;
-        private readonly Fixture _fixture;
         private readonly HttpClient _apiClient;
         private readonly WireMockFixture _wireMockFixture;
 
@@ -26,13 +23,14 @@ namespace DreamTravel.FunctionalTests
         {
             _apiClient = functionalTestsFixture.ApiFixture.ServerClient;
             _wireMockFixture = functionalTestsFixture.WireMockFixture;
-            _fixture = new Fixture();
         }
 
 
-        [Scenario(DisplayName = "Search for 3 cities and calculate best path")]
+        [Scenario(DisplayName = "Search for 4 cities and calculate best path")]
         public void Register_Login_CreateOrder_GetOrder(List<City> cities)
         {
+            List<Path> paths = null;
+
             "Given is list of cities".x(() =>
             {
                 cities = new List<City>
@@ -44,26 +42,87 @@ namespace DreamTravel.FunctionalTests
                 };
             });
 
-            "Given is fake google API".x(() =>
+            "Given is fake google city API".x(() =>
             {
                 foreach (var city in cities)
                 {
                     _wireMockFixture.Fake<IGoogleApiClient>()
-                        .WithRequest( x => x.GetLocationOfCity, city.Name)
-                        .WithResponse(x => x.WithSuccess().WithBodyAsJson("xx"));
+                        .WithRequest(x => x.GetLocationOfCity, city.Name)
+                        .WithResponse(x => x.WithSuccess().WithBody(
+                        $@"{{
+                           ""results"" : 
+                           [
+                              {{
+                                 ""geometry"" : 
+                                 {{
+                                    ""location"" : 
+                                    {{
+                                       ""lat"" : {city.Latitude},
+                                       ""lng"" : {city.Longitude}
+                                    }}
+                                 }}
+                              }}
+                           ],
+                           ""status"" : ""OK""
+                        }}"));
                 }
+            });
 
-                cities = new List<City>
-                {
-                    new() { Name = "Wroclaw", Latitude =  51.107883, Longitude = 17.038538},
-                    new() { Name = "Firenze", Latitude =  43.769562, Longitude = 11.255814},
-                    new() { Name = "Vienna", Latitude = 48.210033, Longitude =  16.363449},
-                    new() { Name = "Barcelona",  Latitude =  41.390205, Longitude = 2.154007}
-                };
+            "Given is fake google distance API".x(() =>
+            {
+                // _wireMockFixture.Fake<IGoogleApiClient>()
+                //         .WithRequest(x => x.GetDurationMatrixByFreeRoad, city.Name)
+                //         .WithResponse(x => x.WithSuccess().WithBody(
+                //             $@"{{
+                //            ""results"" : 
+                //            [
+                //               {{
+                //                  ""geometry"" : 
+                //                  {{
+                //                     ""location"" : 
+                //                     {{
+                //                        ""lat"" : {city.Latitude},
+                //                        ""lng"" : {city.Longitude}
+                //                     }}
+                //                  }}
+                //               }}
+                //            ],
+                //            ""status"" : ""OK""
+                //         }}"));
+                //
+                // _wireMockFixture.Fake<IGoogleApiClient>()
+                //     .WithRequest(x => x.GetDurationMatrixByTollRoad, city.Name)
+                //     .WithResponse(x => x.WithSuccess().WithBody(
+                //         $@"{{
+                //            ""results"" : 
+                //            [
+                //               {{
+                //                  ""geometry"" : 
+                //                  {{
+                //                     ""location"" : 
+                //                     {{
+                //                        ""lat"" : {city.Latitude},
+                //                        ""lng"" : {city.Longitude}
+                //                     }}
+                //                  }}
+                //               }}
+                //            ],
+                //            ""status"" : ""OK""
+                //         }}"));
+            });
+
+            "Given is fake michelin cost API".x(() =>
+            {
+                // foreach (var city in cities)
+                // {
+                //     _wireMockFixture.Fake<IGoogleApiClient>()
+                //         .WithRequest(x => x.GetLocationOfCity, city.Name)
+                //         .WithResponse(x => x.WithSuccess().WithBodyAsJson("xx"));
+                // }
             });
 
 
-            "When User searches for location of each of them".x(async () =>
+            "When user searches for location of each of the cities".x(async () =>
             {
                 foreach (var city in cities)
                 {
@@ -76,20 +135,34 @@ namespace DreamTravel.FunctionalTests
                     apiResponse.IsSuccess.Should().BeTrue();
                     apiResponse.Data.Should().BeEquivalentTo(city);
                 }
-
-
-
             });
 
-            "When User is Logged In".x(async () =>
+            "When user searches for the best path".x(async () =>
             {
-                // var loginResponse = await _apiFixture.InternalApiIntegrationTestsFixture.PostAsync<User>($"/api/users/login", user);
+                var apiResponse = await _apiClient
+                    .CreateRequest("/api/CalculateBestPath")
+                    .WithHeader("Authorization", "DreamAuthentication U29sVWJlckFsbGVz")
+                    .WithBody(new { Cities = cities })
+                    .PostAsync<ResponseEnvelope<List<Path>>>();
 
-                // user = loginResponse.GetBody();
-                // Assert.Equal(HttpStatusCode.OK, loginResponse.HttpStatusCode);
-                // Assert.NotEqual(Guid.Empty, user.UserId);
+                apiResponse.IsSuccess.Should().BeTrue();
+                paths = apiResponse.Data;
             });
 
+
+            "Then returned path is optimal".x(() =>
+            {
+                paths[0].StartingCity.Should().Be("Wroclaw");
+                paths[0].EndingCity.Should().Be("Vienna");
+
+                paths[1].StartingCity.Should().Be("Vienna");
+                paths[1].EndingCity.Should().Be("Firenze");
+
+                paths[2].StartingCity.Should().Be("Firenze");
+                paths[2].EndingCity.Should().Be("Barcelona");
+
+                return Task.CompletedTask;
+            });
         }
     }
 }

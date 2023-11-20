@@ -1,6 +1,6 @@
 ﻿using DreamTravel.Identity.DatabaseData.Repositories.Users;
 using DreamTravel.Identity.Domain.Users;
-using DreamTravel.TestFixture.Sql;
+using SolTechnology.Core.Sql.Testing;
 using Xunit;
 
 namespace DreamTravel.Identity.DatabaseData.IntegrationTests.Users

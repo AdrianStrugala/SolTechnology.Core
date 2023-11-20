@@ -1,4 +1,5 @@
-﻿using Xunit;
+﻿using SolTechnology.Core.Sql.Testing;
+using Xunit;
 
 namespace DreamTravel.TestFixture.Sql
 {
