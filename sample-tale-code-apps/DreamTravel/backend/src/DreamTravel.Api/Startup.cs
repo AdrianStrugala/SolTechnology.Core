@@ -114,7 +114,6 @@ namespace DreamTravel.Api
                 app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "WebApi v1"));
             }
 
-
             app.UseCors(CorsPolicy);
             app.UseHttpsRedirection();
 

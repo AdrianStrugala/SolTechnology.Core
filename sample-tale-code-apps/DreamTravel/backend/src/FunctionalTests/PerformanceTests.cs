@@ -1,14 +1,11 @@
-﻿using DreamTravel.GeolocationData.GoogleApi;
-using DreamTravel.GeolocationData.MichelinApi;
-using DreamTravel.TravelingSalesmanProblem;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using DreamTravel.Trips.Domain.Cities;
 using DreamTravel.Trips.Queries.CalculateBestPath;
-using DreamTravel.Trips.Queries.CalculateBestPath.Executors;
-using Microsoft.Extensions.Logging.Abstractions;
-using Microsoft.Extensions.Options;
-using NSubstitute;
+using Xunit;
+// using NSubstitute;
 
-namespace DreamTravel.Trips.Queries.UnitTests.CalculateBestPath
+namespace DreamTravel.FunctionalTests
 {
     public class PerformanceTests
     {
@@ -16,17 +13,17 @@ namespace DreamTravel.Trips.Queries.UnitTests.CalculateBestPath
 
         public PerformanceTests()
         {
-            IGoogleApiClient googleApiClient = new GoogleApiClient(Options.Create(new GoogleApiOptions()), Substitute.For<HttpClient>(), NullLogger<GoogleApiClient>.Instance);
-            IMichelinApiClient michelinApiClient = new MichelinApiClient(Options.Create(new MichelinApiOptions()), Substitute.For<HttpClient>(), NullLogger<MichelinApiClient>.Instance);
-
-            DownloadRoadData downloadRoadData = new DownloadRoadData(googleApiClient, michelinApiClient);
-            IFormPathsFromMatrices formOutputData = new FormPathsFromMatrices();
-
-            ITSP tsp = new AntColony();
-
-            FindProfitablePath evaluationBrain = new FindProfitablePath();
-
-            _sut = new CalculateBestPathHandler(downloadRoadData, formOutputData, tsp, evaluationBrain);
+            // IGoogleApiClient googleApiClient = new GoogleApiClient(Options.Create(new GoogleApiOptions()), Substitute.For<HttpClient>(), NullLogger<GoogleApiClient>.Instance);
+            // IMichelinApiClient michelinApiClient = new MichelinApiClient(Options.Create(new MichelinApiOptions()), Substitute.For<HttpClient>(), NullLogger<MichelinApiClient>.Instance);
+            //
+            // DownloadRoadData downloadRoadData = new DownloadRoadData(googleApiClient, michelinApiClient);
+            // IFormPathsFromMatrices formOutputData = new FormPathsFromMatrices();
+            //
+            // ITSP tsp = new AntColony();
+            //
+            // FindProfitablePath evaluationBrain = new FindProfitablePath();
+            //
+            // _sut = new CalculateBestPathHandler(downloadRoadData, formOutputData, tsp, evaluationBrain);
         }
 
         [Fact(Skip = "Manual test")]
