@@ -5,6 +5,7 @@ using DreamTravel.FunctionalTests.TestsConfiguration;
 using DreamTravel.Trips.Domain.Cities;
 using System.Net.Http;
 using System.Threading.Tasks;
+using DreamTravel.FunctionalTests.FakeApis;
 using DreamTravel.GeolocationData.GoogleApi;
 using DreamTravel.Trips.Domain.Paths;
 using FluentAssertions;
@@ -90,25 +91,9 @@ namespace DreamTravel.FunctionalTests
                 //            ""status"" : ""OK""
                 //         }}"));
                 //
-                // _wireMockFixture.Fake<IGoogleApiClient>()
-                //     .WithRequest(x => x.GetDurationMatrixByTollRoad, city.Name)
-                //     .WithResponse(x => x.WithSuccess().WithBody(
-                //         $@"{{
-                //            ""results"" : 
-                //            [
-                //               {{
-                //                  ""geometry"" : 
-                //                  {{
-                //                     ""location"" : 
-                //                     {{
-                //                        ""lat"" : {city.Latitude},
-                //                        ""lng"" : {city.Longitude}
-                //                     }}
-                //                  }}
-                //               }}
-                //            ],
-                //            ""status"" : ""OK""
-                //         }}"));
+                _wireMockFixture.Fake<IGoogleApiClient>()
+                    .WithRequest(x => x.GetDurationMatrixByTollRoad, cities)
+                    .WithResponse(x => x.WithSuccess().WithBody(GoogleFakeApi.TollDistanceMatrix));
             });
 
             "Given is fake michelin cost API".x(() =>
