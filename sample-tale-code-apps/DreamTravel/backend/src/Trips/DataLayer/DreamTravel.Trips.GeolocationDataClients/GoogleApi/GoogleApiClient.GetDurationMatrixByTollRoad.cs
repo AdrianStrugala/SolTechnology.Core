@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using DreamTravel.Trips.Domain.Cities;
@@ -21,17 +22,17 @@ namespace DreamTravel.GeolocationData.GoogleApi
                 coordinates.AppendFormat($"{city.Latitude},{city.Longitude}|");
             }
 
-            string url =
-                $"https://maps.googleapis.com/maps/api/distancematrix/json?units=imperial&origins={coordinates}&destinations={coordinates}&key={_options.Key}";
-
             try
             {
-                var response = await _httpClient.GetStringAsync(url);
+                var request = await _httpClient
+                    .CreateRequest($"maps/api/distancematrix/json?units=imperial&origins={coordinates}&destinations={coordinates}&key={_options.Key}")
+                    .GetAsync();
+
+                var response = await request.Content.ReadAsStringAsync();
                 JObject json = JObject.Parse(response);
 
                 for (int i = 0; i < listOfCities.Count; i++)
                 {
-
                     for (int j = 0; j < listOfCities.Count; j++)
                     {
                         if (i == j)

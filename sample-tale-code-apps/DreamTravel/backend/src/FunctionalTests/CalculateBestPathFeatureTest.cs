@@ -4,13 +4,13 @@ using Xunit;
 using DreamTravel.FunctionalTests.TestsConfiguration;
 using DreamTravel.Trips.Domain.Cities;
 using System.Net.Http;
-using System.Threading.Tasks;
 using DreamTravel.FunctionalTests.FakeApis;
 using DreamTravel.GeolocationData.GoogleApi;
 using DreamTravel.Trips.Domain.Paths;
 using FluentAssertions;
 using SolTechnology.Core.Api;
 using SolTechnology.Core.Faker;
+using DreamTravel.Trips.Queries.CalculateBestPath;
 
 namespace DreamTravel.FunctionalTests
 {
@@ -71,39 +71,13 @@ namespace DreamTravel.FunctionalTests
 
             "Given is fake google distance API".x(() =>
             {
-                // _wireMockFixture.Fake<IGoogleApiClient>()
-                //         .WithRequest(x => x.GetDurationMatrixByFreeRoad, city.Name)
-                //         .WithResponse(x => x.WithSuccess().WithBody(
-                //             $@"{{
-                //            ""results"" : 
-                //            [
-                //               {{
-                //                  ""geometry"" : 
-                //                  {{
-                //                     ""location"" : 
-                //                     {{
-                //                        ""lat"" : {city.Latitude},
-                //                        ""lng"" : {city.Longitude}
-                //                     }}
-                //                  }}
-                //               }}
-                //            ],
-                //            ""status"" : ""OK""
-                //         }}"));
-                //
+                _wireMockFixture.Fake<IGoogleApiClient>()
+                    .WithRequest(x => x.GetDurationMatrixByFreeRoad, cities)
+                    .WithResponse(x => x.WithSuccess().WithBody(GoogleFakeApi.FreeDistanceMatrix));
+
                 _wireMockFixture.Fake<IGoogleApiClient>()
                     .WithRequest(x => x.GetDurationMatrixByTollRoad, cities)
                     .WithResponse(x => x.WithSuccess().WithBody(GoogleFakeApi.TollDistanceMatrix));
-            });
-
-            "Given is fake michelin cost API".x(() =>
-            {
-                // foreach (var city in cities)
-                // {
-                //     _wireMockFixture.Fake<IGoogleApiClient>()
-                //         .WithRequest(x => x.GetLocationOfCity, city.Name)
-                //         .WithResponse(x => x.WithSuccess().WithBodyAsJson("xx"));
-                // }
             });
 
 
@@ -122,31 +96,29 @@ namespace DreamTravel.FunctionalTests
                 }
             });
 
-            "When user searches for the best path".x(async () =>
+            "And when user searches for the best path".x(async () =>
             {
                 var apiResponse = await _apiClient
                     .CreateRequest("/api/CalculateBestPath")
                     .WithHeader("Authorization", "DreamAuthentication U29sVWJlckFsbGVz")
                     .WithBody(new { Cities = cities })
-                    .PostAsync<ResponseEnvelope<List<Path>>>();
+                    .PostAsync<ResponseEnvelope<CalculateBestPathResult>>();
 
                 apiResponse.IsSuccess.Should().BeTrue();
-                paths = apiResponse.Data;
+                paths = apiResponse.Data.BestPaths;
             });
 
 
             "Then returned path is optimal".x(() =>
             {
-                paths[0].StartingCity.Should().Be("Wroclaw");
-                paths[0].EndingCity.Should().Be("Vienna");
+                paths[0].StartingCity.Name.Should().Be("Wroclaw");
+                paths[0].EndingCity.Name.Should().Be("Vienna");
 
-                paths[1].StartingCity.Should().Be("Vienna");
-                paths[1].EndingCity.Should().Be("Firenze");
+                paths[1].StartingCity.Name.Should().Be("Vienna");
+                paths[1].EndingCity.Name.Should().Be("Firenze");
 
-                paths[2].StartingCity.Should().Be("Firenze");
-                paths[2].EndingCity.Should().Be("Barcelona");
-
-                return Task.CompletedTask;
+                paths[2].StartingCity.Name.Should().Be("Firenze");
+                paths[2].EndingCity.Name.Should().Be("Barcelona");
             });
         }
     }

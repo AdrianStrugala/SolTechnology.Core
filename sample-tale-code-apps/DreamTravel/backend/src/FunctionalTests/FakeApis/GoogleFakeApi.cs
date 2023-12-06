@@ -1,10 +1,13 @@
 ﻿using System.Collections.Generic;
+using System.Text;
 using System.Threading.Tasks;
 using DreamTravel.GeolocationData.GoogleApi;
 using DreamTravel.Trips.Domain.Cities;
 using SolTechnology.Core.Faker.FakesBase;
+using SolTechnology.Core.Faker.WireMock;
 using WireMock.Matchers;
 using WireMock.RequestBuilders;
+using WireMock.ResponseBuilders;
 
 namespace DreamTravel.FunctionalTests.FakeApis
 {
@@ -24,17 +27,52 @@ namespace DreamTravel.FunctionalTests.FakeApis
 
             Provider = BuildRequest(request);
 
-            return null!;
+            return default;
         }
 
         public Task<double[]> GetDurationMatrixByTollRoad(List<City> listOfCities)
         {
-            throw new System.NotImplementedException();
+            StringBuilder coordinates = new StringBuilder();
+            foreach (City city in listOfCities)
+            {
+                coordinates.AppendFormat($"{city.Latitude},{city.Longitude}|");
+            }
+
+            var request = Request
+                .Create()
+                .UsingGet()
+                .WithPath(new WildcardMatcher($"/{BaseUrl}/maps/api/distancematrix/json"))
+                .WithParam("units", "imperial")
+                .WithParam("origins", $"{coordinates}")
+                .WithParam("destinations", $"{coordinates}")
+                .WithParam("key", "googleKey");
+
+            Provider = BuildRequest(request);
+
+            return default;
         }
 
         public Task<double[]> GetDurationMatrixByFreeRoad(List<City> listOfCities)
         {
-            throw new System.NotImplementedException();
+            StringBuilder coordinates = new StringBuilder();
+            foreach (City city in listOfCities)
+            {
+                coordinates.AppendFormat($"{city.Latitude},{city.Longitude}|");
+            }
+
+            var request = Request
+                .Create()
+                .UsingGet()
+                .WithPath(new WildcardMatcher($"/{BaseUrl}/maps/api/distancematrix/json"))
+                .WithParam("units", "imperial")
+                .WithParam("origins", $"{coordinates}")
+                .WithParam("destinations", $"{coordinates}")
+                .WithParam("avoid", "tolls")
+                .WithParam("key", "googleKey");
+
+            Provider = BuildRequest(request);
+
+            return default;
         }
 
 
@@ -292,5 +330,257 @@ namespace DreamTravel.FunctionalTests.FakeApis
    ],
    ""status"" : ""OK""
 }";
+
+
+        internal static string FreeDistanceMatrix = @"
+{
+   ""destination_addresses"" : 
+   [
+      ""Droga bez nazwy, 50-438 Wrocław, Poland"",
+      ""P.za della Signoria, 16, 50122 Firenze FI, Italy"",
+      ""Minoritenplatz 5, 1010 Wien, Austria"",
+      ""C/ de Muntaner, 139, 08036 Barcelona, Spain""
+   ],
+   ""origin_addresses"" : 
+   [
+      ""Droga bez nazwy, 50-438 Wrocław, Poland"",
+      ""P.za della Signoria, 16, 50122 Firenze FI, Italy"",
+      ""Minoritenplatz 5, 1010 Wien, Austria"",
+      ""C/ de Muntaner, 139, 08036 Barcelona, Spain""
+   ],
+   ""rows"" : 
+   [
+      {
+         ""elements"" : 
+         [
+            {
+               ""distance"" : 
+               {
+                  ""text"" : ""1 ft"",
+                  ""value"" : 0
+               },
+               ""duration"" : 
+               {
+                  ""text"" : ""1 min"",
+                  ""value"" : 0
+               },
+               ""status"" : ""OK""
+            },
+            {
+               ""distance"" : 
+               {
+                  ""text"" : ""866 mi"",
+                  ""value"" : 1394314
+               },
+               ""duration"" : 
+               {
+                  ""text"" : ""18 hours 28 mins"",
+                  ""value"" : 66480
+               },
+               ""status"" : ""OK""
+            },
+            {
+               ""distance"" : 
+               {
+                  ""text"" : ""242 mi"",
+                  ""value"" : 388914
+               },
+               ""duration"" : 
+               {
+                  ""text"" : ""6 hours 46 mins"",
+                  ""value"" : 24381
+               },
+               ""status"" : ""OK""
+            },
+            {
+               ""distance"" : 
+               {
+                  ""text"" : ""1,309 mi"",
+                  ""value"" : 2107316
+               },
+               ""duration"" : 
+               {
+                  ""text"" : ""23 hours 49 mins"",
+                  ""value"" : 85713
+               },
+               ""status"" : ""OK""
+            }
+         ]
+      },
+      {
+         ""elements"" : 
+         [
+            {
+               ""distance"" : 
+               {
+                  ""text"" : ""864 mi"",
+                  ""value"" : 1391229
+               },
+               ""duration"" : 
+               {
+                  ""text"" : ""18 hours 32 mins"",
+                  ""value"" : 66739
+               },
+               ""status"" : ""OK""
+            },
+            {
+               ""distance"" : 
+               {
+                  ""text"" : ""1 ft"",
+                  ""value"" : 0
+               },
+               ""duration"" : 
+               {
+                  ""text"" : ""1 min"",
+                  ""value"" : 0
+               },
+               ""status"" : ""OK""
+            },
+            {
+               ""distance"" : 
+               {
+                  ""text"" : ""509 mi"",
+                  ""value"" : 818437
+               },
+               ""duration"" : 
+               {
+                  ""text"" : ""14 hours 48 mins"",
+                  ""value"" : 53279
+               },
+               ""status"" : ""OK""
+            },
+            {
+               ""distance"" : 
+               {
+                  ""text"" : ""766 mi"",
+                  ""value"" : 1232538
+               },
+               ""duration"" : 
+               {
+                  ""text"" : ""20 hours 29 mins"",
+                  ""value"" : 73765
+               },
+               ""status"" : ""OK""
+            }
+         ]
+      },
+      {
+         ""elements"" : 
+         [
+            {
+               ""distance"" : 
+               {
+                  ""text"" : ""242 mi"",
+                  ""value"" : 390156
+               },
+               ""duration"" : 
+               {
+                  ""text"" : ""6 hours 45 mins"",
+                  ""value"" : 24319
+               },
+               ""status"" : ""OK""
+            },
+            {
+               ""distance"" : 
+               {
+                  ""text"" : ""516 mi"",
+                  ""value"" : 830266
+               },
+               ""duration"" : 
+               {
+                  ""text"" : ""14 hours 39 mins"",
+                  ""value"" : 52732
+               },
+               ""status"" : ""OK""
+            },
+            {
+               ""distance"" : 
+               {
+                  ""text"" : ""1 ft"",
+                  ""value"" : 0
+               },
+               ""duration"" : 
+               {
+                  ""text"" : ""1 min"",
+                  ""value"" : 0
+               },
+               ""status"" : ""OK""
+            },
+            {
+               ""distance"" : 
+               {
+                  ""text"" : ""1,270 mi"",
+                  ""value"" : 2043640
+               },
+               ""duration"" : 
+               {
+                  ""text"" : ""1 day 1 hour"",
+                  ""value"" : 88235
+               },
+               ""status"" : ""OK""
+            }
+         ]
+      },
+      {
+         ""elements"" : 
+         [
+            {
+               ""distance"" : 
+               {
+                  ""text"" : ""1,310 mi"",
+                  ""value"" : 2109014
+               },
+               ""duration"" : 
+               {
+                  ""text"" : ""23 hours 45 mins"",
+                  ""value"" : 85522
+               },
+               ""status"" : ""OK""
+            },
+            {
+               ""distance"" : 
+               {
+                  ""text"" : ""763 mi"",
+                  ""value"" : 1227477
+               },
+               ""duration"" : 
+               {
+                  ""text"" : ""20 hours 27 mins"",
+                  ""value"" : 73632
+               },
+               ""status"" : ""OK""
+            },
+            {
+               ""distance"" : 
+               {
+                  ""text"" : ""1,267 mi"",
+                  ""value"" : 2039683
+               },
+               ""duration"" : 
+               {
+                  ""text"" : ""1 day 0 hours"",
+                  ""value"" : 88050
+               },
+               ""status"" : ""OK""
+            },
+            {
+               ""distance"" : 
+               {
+                  ""text"" : ""1 ft"",
+                  ""value"" : 0
+               },
+               ""duration"" : 
+               {
+                  ""text"" : ""1 min"",
+                  ""value"" : 0
+               },
+               ""status"" : ""OK""
+            }
+         ]
+      }
+   ],
+   ""status"" : ""OK""
+}";
+
     }
 }

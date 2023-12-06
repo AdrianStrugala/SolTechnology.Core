@@ -33,10 +33,6 @@ namespace DreamTravel.GeolocationData.GoogleApi
                     .GetAsync();
 
                 var response = await request.Content.ReadAsStringAsync();
-                // string url =
-                //     $"https://maps.googleapis.com/maps/api/geocode/json?address={cityName}&key={_options.Key}";
-
-                // string response = await _httpClient.GetStringAsync(url);
                 JObject json = JObject.Parse(response);
 
                 result.Latitude = json["results"][0]["geometry"]["location"]["lat"].Value<double>();

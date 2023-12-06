@@ -15,7 +15,7 @@ namespace SolTechnology.Core.Faker
         {
             var settings = new WireMockServerSettings
             {
-                AllowPartialMapping = false,
+                AllowPartialMapping = true,
                 StartAdminInterface = true,
                 ReadStaticMappings = false,
                 Logger = new WireMockConsoleLogger(),

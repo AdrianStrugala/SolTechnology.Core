@@ -11,6 +11,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
 using System.Globalization;
 using Microsoft.AspNetCore.Mvc.Authorization;
+using System;
 
 namespace DreamTravel.Api
 {
@@ -31,8 +32,6 @@ namespace DreamTravel.Api
                 .AddJsonFile("appsettings.json", true, true)
                 .AddEnvironmentVariables()
                 .Build();
-
-            var environmentName = configuration.GetValue<string>("ASPNETCORE_ENVIRONMENT");
 
             var cultureInfo = new CultureInfo("en-US");
             cultureInfo.NumberFormat.CurrencySymbol = "€";
