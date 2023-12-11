@@ -1,6 +1,6 @@
 ﻿using System;
-using TaleCode.Faker;
-using TaleCode.Faker.FakesBase;
+using SolTechnology.Core.Faker;
+using SolTechnology.Core.Faker.FakesBase;
 using TaleCode.FunctionalTests.FakeApis;
 
 namespace TaleCode.FunctionalTests.TestsConfiguration

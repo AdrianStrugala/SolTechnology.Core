@@ -1,31 +1,39 @@
-﻿using System.Collections.Generic;
-using System.Net.Http;
+﻿using System.Threading.Tasks;
+using SolTechnology.Core.Faker.FakesBase;
 using SolTechnology.TaleCode.ApiClients.FootballDataApi;
-using TaleCode.Faker.FakesBase;
-using TaleCode.Faker.WireMock;
-using WireMock.Server;
+using SolTechnology.TaleCode.ApiClients.FootballDataApi.Models;
+using WireMock.Matchers;
+using WireMock.RequestBuilders;
 
 namespace TaleCode.FunctionalTests.FakeApis
 {
-    public class FootballDataFakeApi : FakeService<IFootballDataApiClient>, IFakeApi
+    public class FootballDataFakeApi : FakeService<IFootballDataApiClient>, IFakeApi, IFootballDataApiClient
     {
-        protected override IWireMockFakerConfigurator<IFootballDataApiClient> Configure(WireMockServer mockServer) =>
-            mockServer
-                .CreateFor<IFootballDataApiClient>()
-                .WithBaseUrl("football-data");
+        protected override string BaseUrl => "football-data";
 
-
-        public RequestInfo GetPlayerById()
+        public Task<FootballDataPlayer> GetPlayerById(int id)
         {
-            return new RequestInfo(
-                HttpMethod.Get,
-                "v2/players/{id}/matches",
-                new Dictionary<string, string> { { "limit", "999" } });
+            var request = Request
+                .Create()
+                .UsingGet()
+                .WithPath(new WildcardMatcher($"/{BaseUrl}/v2/players/{id}/matches"))
+                .WithParam("limit", "999");
+
+            Provider = BuildRequest(request);
+
+            return default;
         }
 
-        public RequestInfo GetMatchById()
+        public Task<FootballDataMatch> GetMatchById(int matchApiId)
         {
-            return new RequestInfo(HttpMethod.Get, "v2/matches/{matchId}");
+            var request = Request
+                .Create()
+                .UsingGet()
+                .WithPath(new WildcardMatcher($"/{BaseUrl}/v2/matches/{matchApiId}"));
+
+            Provider = BuildRequest(request);
+
+            return default;
         }
     }
 }

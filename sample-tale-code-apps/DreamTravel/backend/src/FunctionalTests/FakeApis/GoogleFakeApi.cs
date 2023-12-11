@@ -4,10 +4,8 @@ using System.Threading.Tasks;
 using DreamTravel.GeolocationData.GoogleApi;
 using DreamTravel.Trips.Domain.Cities;
 using SolTechnology.Core.Faker.FakesBase;
-using SolTechnology.Core.Faker.WireMock;
 using WireMock.Matchers;
 using WireMock.RequestBuilders;
-using WireMock.ResponseBuilders;
 
 namespace DreamTravel.FunctionalTests.FakeApis
 {

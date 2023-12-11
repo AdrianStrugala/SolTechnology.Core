@@ -55,7 +55,7 @@ namespace TaleCode.FunctionalTests
             playerResponse.Player.Id = playerId;
 
             _wireMockFixture.Fake<IFootballDataApiClient>()
-                .WithRequest(x => x.GetPlayerById, new Dictionary<string, string> { { "id", playerId.ToString() } })
+                .WithRequest(x => x.GetPlayerById, playerId)
                 .WithResponse(x => x.WithSuccess().WithBodyAsJson(playerResponse));
 
             for (int i = 0; i < playerResponse.Matches.Count; i++)
@@ -63,12 +63,12 @@ namespace TaleCode.FunctionalTests
                 matchesResponse[i].Match = playerResponse.Matches[i];
 
                 _wireMockFixture.Fake<IFootballDataApiClient>()
-                    .WithRequest(x => x.GetMatchById, new Dictionary<string, string> { { "matchId", matchesResponse[i].Match.Id.ToString() } })
+                    .WithRequest(x => x.GetMatchById,  matchesResponse[i].Match.Id)
                     .WithResponse(x => x.WithSuccess().WithBodyAsJson(matchesResponse[i]));
             }
 
             _wireMockFixture.Fake<IApiFootballApiClient>()
-                .WithRequest(x => x.GetPlayerTeams, null, new Dictionary<string, string> { { "player", apiFootballPlayerId.ToString() } })
+                .WithRequest(x => x.GetPlayerTeams, apiFootballPlayerId)
                 .WithResponse(x => x.WithSuccess().WithBodyAsJson(transfersResponse));
 
             var containerClient = _blobConnectionFactory.GetConnection(resultContainerName);
