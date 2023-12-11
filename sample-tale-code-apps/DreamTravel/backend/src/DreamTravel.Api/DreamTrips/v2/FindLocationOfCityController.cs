@@ -10,12 +10,12 @@ using Microsoft.Extensions.Logging;
 using SolTechnology.Core.Api;
 using SolTechnology.Core.CQRS;
 
-namespace DreamTravel.Api.DreamTrips
+namespace DreamTravel.Api.DreamTrips.v2
 {
     [Route(Route)]
     public class FindLocationOfCityController : BaseController
     {
-        public const string Route = "api/FindLocationOfCity";
+        public const string Route = "api/v2/FindLocationOfCity";
 
         private readonly ILogger<FindLocationOfCityController> _logger;
         private readonly IQueryHandler<FindCityByNameQuery, City> _findLocationOfCity;

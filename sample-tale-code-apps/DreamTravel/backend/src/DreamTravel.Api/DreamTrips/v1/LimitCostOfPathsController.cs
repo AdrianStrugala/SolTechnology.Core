@@ -11,7 +11,7 @@ using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using SolTechnology.Core.CQRS;
 
-namespace DreamTravel.Api.DreamTrips
+namespace DreamTravel.Api.DreamTrips.v1
 {
     [Route(Route)]
     [Obsolete]

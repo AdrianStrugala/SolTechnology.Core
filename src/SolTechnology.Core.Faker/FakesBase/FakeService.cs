@@ -1,6 +1,5 @@
 ﻿using System.Linq.Expressions;
 using System.Reflection;
-using Microsoft.AspNetCore.Hosting.Server;
 using SolTechnology.Core.Faker.WireMock;
 using WireMock.RequestBuilders;
 using WireMock.ResponseBuilders;

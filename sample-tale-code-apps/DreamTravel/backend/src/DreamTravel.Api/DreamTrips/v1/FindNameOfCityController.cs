@@ -5,7 +5,6 @@ using System.Net;
 using System.Net.Mime;
 using System.Threading.Tasks;
 using DreamTravel.Trips.Domain.Cities;
-using DreamTravel.Trips.Queries.CalculateBestPath;
 using DreamTravel.Trips.Queries.FindNameOfCity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -13,10 +12,10 @@ using Newtonsoft.Json;
 using SolTechnology.Core.Api;
 using SolTechnology.Core.CQRS;
 
-namespace DreamTravel.Api.DreamTrips
+namespace DreamTravel.Api.DreamTrips.v1
 {
     [Route(Route)]
-    public class FindNameOfCityController : BaseController
+    public class FindNameOfCityController : Controller
     {
         public const string Route = "api/FindNameOfCity";
 
@@ -39,8 +38,21 @@ namespace DreamTravel.Api.DreamTrips
         [ProducesResponseType(typeof(List<ValidationResult>), (int)HttpStatusCode.BadRequest)]
         public async Task<IActionResult> FindNameOfCity([FromBody] FindCityByCoordinatesQuery query)
         {
-            _logger.LogInformation("TSP Engine: Fire!");
-            return await Return(_findNameOfCity.Handle(query));
+            try
+            {
+                _logger.LogInformation("Looking for city: " + query.Lat + ";" + query.Lng);
+
+                var result = await _findNameOfCity.Handle(query);
+
+                return Ok(result);
+            }
+
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.ToString());
+                string message = JsonConvert.SerializeObject(ex.Message);
+                return BadRequest(message);
+            }
         }
     }
 }

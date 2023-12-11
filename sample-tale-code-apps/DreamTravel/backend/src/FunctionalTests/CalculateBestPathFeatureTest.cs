@@ -86,7 +86,7 @@ namespace DreamTravel.FunctionalTests
                 foreach (var city in cities)
                 {
                     var apiResponse = await _apiClient
-                        .CreateRequest("/api/FindLocationOfCity")
+                        .CreateRequest("/api/v2/FindLocationOfCity")
                         .WithHeader("Authorization", "DreamAuthentication U29sVWJlckFsbGVz")
                         .WithBody(new { Name = city.Name })
                         .PostAsync<ResponseEnvelope<City>>();
@@ -99,7 +99,7 @@ namespace DreamTravel.FunctionalTests
             "And when user searches for the best path".x(async () =>
             {
                 var apiResponse = await _apiClient
-                    .CreateRequest("/api/CalculateBestPath")
+                    .CreateRequest("/api/v2/CalculateBestPath")
                     .WithHeader("Authorization", "DreamAuthentication U29sVWJlckFsbGVz")
                     .WithBody(new { Cities = cities })
                     .PostAsync<ResponseEnvelope<CalculateBestPathResult>>();
