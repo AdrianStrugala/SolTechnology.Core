@@ -5,7 +5,7 @@ using System.Net;
 using System.Net.Mime;
 using System.Threading.Tasks;
 using DreamTravel.Trips.Domain.Cities;
-using DreamTravel.Trips.Queries.FindNameOfCity;
+using DreamTravel.Trips.Queries.FindCityByCoordinates;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;

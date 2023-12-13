@@ -2,7 +2,7 @@
 using DreamTravel.Trips.Domain.Cities;
 using SolTechnology.Core.CQRS;
 
-namespace DreamTravel.Trips.Queries.FindLocationOfCity
+namespace DreamTravel.Trips.Queries.FindCityByName
 {
     public class FindCityByNameHandler : IQueryHandler<FindCityByNameQuery, City>
     {

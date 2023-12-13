@@ -2,7 +2,7 @@
 using DreamTravel.Trips.Domain.Cities;
 using SolTechnology.Core.CQRS;
 
-namespace DreamTravel.Trips.Queries.FindNameOfCity
+namespace DreamTravel.Trips.Queries.FindCityByCoordinates
 {
     public class FindCityByCoordinatesHandler : IQueryHandler<FindCityByCoordinatesQuery, City>
     {
@@ -13,12 +13,12 @@ namespace DreamTravel.Trips.Queries.FindNameOfCity
             _googleApiClient = googleApiClient;
         }
 
-        public async Task<City> Handle(FindCityByCoordinatesQuery byCoordinatesQuery)
+        public async Task<City> Handle(FindCityByCoordinatesQuery query)
         {
             City result = new City
             {
-                Latitude = byCoordinatesQuery.Lat,
-                Longitude = byCoordinatesQuery.Lng
+                Latitude = query.Lat,
+                Longitude = query.Lng
             };
 
             result = await _googleApiClient.GetNameOfCity(result);

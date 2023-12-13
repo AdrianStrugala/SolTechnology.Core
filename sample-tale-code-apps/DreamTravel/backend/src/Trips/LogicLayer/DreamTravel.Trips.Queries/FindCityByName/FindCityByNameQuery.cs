@@ -1,6 +1,6 @@
 ﻿using FluentValidation;
 
-namespace DreamTravel.Trips.Queries.FindLocationOfCity;
+namespace DreamTravel.Trips.Queries.FindCityByName;
 
 public class FindCityByNameQuery
 {

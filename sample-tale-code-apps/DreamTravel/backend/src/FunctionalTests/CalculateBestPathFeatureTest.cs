@@ -86,7 +86,7 @@ namespace DreamTravel.FunctionalTests
                 foreach (var city in cities)
                 {
                     var apiResponse = await _apiClient
-                        .CreateRequest("/api/v2/FindLocationOfCity")
+                        .CreateRequest("/api/v2/FindCityByName")
                         .WithHeader("Authorization", "DreamAuthentication U29sVWJlckFsbGVz")
                         .WithBody(new { Name = city.Name })
                         .PostAsync<ResponseEnvelope<City>>();

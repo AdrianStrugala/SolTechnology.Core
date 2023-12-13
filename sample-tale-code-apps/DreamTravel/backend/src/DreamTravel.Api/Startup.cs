@@ -12,6 +12,7 @@ using Microsoft.OpenApi.Models;
 using System.Globalization;
 using Microsoft.AspNetCore.Mvc.Authorization;
 using System;
+using MicroElements.Swashbuckle.FluentValidation.AspNetCore;
 
 namespace DreamTravel.Api
 {
@@ -83,7 +84,7 @@ namespace DreamTravel.Api
                     Type = SecuritySchemeType.ApiKey,
                     In = ParameterLocation.Header,
                     Name = DreamAuthenticationOptions.AuthenticationHeaderName,
-                    Description = "Authentication: Api Key for using Dream Travels"
+                    Description = "Authentication: Api Key for using Dream Travel"
                 });
                 c.AddSecurityRequirement(new OpenApiSecurityRequirement
                 {
@@ -96,6 +97,8 @@ namespace DreamTravel.Api
                     }
                 });
             });
+            services.AddFluentValidationRulesToSwagger();
+
 
             //MVC
             services.AddMvc(opts =>
@@ -110,7 +113,7 @@ namespace DreamTravel.Api
             {
                 app.UseDeveloperExceptionPage();
                 app.UseSwagger();
-                app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "WebApi v1"));
+                app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "Dream Travel"));
             }
 
             app.UseCors(CorsPolicy);
