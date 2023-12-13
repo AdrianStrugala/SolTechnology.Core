@@ -47,6 +47,7 @@ public static class ModuleInstaller
 
         services.RegisterAllImplementations(typeof(IQueryHandler<,>), callingAssembly);
         services.Decorate(typeof(IQueryHandler<,>), typeof(QueryHandlerValidationDecorator<,>));
+        services.Decorate(typeof(IQueryHandler<,>), typeof(QueryHandlerLoggingDecorator<,>));
 
         return services;
     }

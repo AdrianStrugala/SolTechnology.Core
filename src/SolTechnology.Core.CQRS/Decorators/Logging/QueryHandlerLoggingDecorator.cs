@@ -4,24 +4,24 @@ using System.Diagnostics;
 
 namespace SolTechnology.Core.CQRS.Decorators.Logging
 {
-    public class CommandHandlerLoggingDecorator<TCommand> : ICommandHandler<TCommand>
+    public class QueryHandlerLoggingDecorator<TQuery, TResult> : IQueryHandler<TQuery, TResult>
     {
-        private readonly ICommandHandler<TCommand> _handler;
-        private readonly ILogger<ICommandHandler<TCommand>> _logger;
+        private readonly IQueryHandler<TQuery, TResult> _handler;
+        private readonly ILogger<ICommandHandler<TQuery, TResult>> _logger;
 
-        public CommandHandlerLoggingDecorator(
-            ICommandHandler<TCommand> handler,
-            ILogger<ICommandHandler<TCommand>> logger)
+        public QueryHandlerLoggingDecorator(
+            IQueryHandler<TQuery, TResult> handler,
+            ILogger<ICommandHandler<TQuery, TResult>> logger)
         {
             _handler = handler;
             _logger = logger;
         }
 
-        public async Task<CommandResult> Handle(TCommand command)
+        public async Task<TResult> Handle(TQuery query)
         {
             string operationName;
 
-            if (command is ILoggableOperation loggedOperation)
+            if (query is ILoggableOperation loggedOperation)
             {
                 using var scope = _logger.BeginOperationScope(new KeyValuePair<string, object>(
                     loggedOperation.LogScope.OperationIdName,
@@ -31,7 +31,7 @@ namespace SolTechnology.Core.CQRS.Decorators.Logging
             }
             else
             {
-                operationName = typeof(TCommand).FullName;
+                operationName = typeof(TQuery).FullName;
             }
 
             var sw = Stopwatch.StartNew();
@@ -39,16 +39,8 @@ namespace SolTechnology.Core.CQRS.Decorators.Logging
 
             try
             {
-                var result = await _handler.Handle(command);
-
-                if (result.IsSuccess)
-                {
-                    _logger.OperationSucceeded(operationName, sw.ElapsedMilliseconds);
-                }
-                else
-                {
-                    _logger.OperationFailed(operationName, sw.ElapsedMilliseconds, message: result.ErrorMessage);
-                }
+                var result = await _handler.Handle(query);
+                _logger.OperationSucceeded(operationName, sw.ElapsedMilliseconds);
 
                 return result;
             }

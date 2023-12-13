@@ -9,7 +9,7 @@
     }
   },
   "profiles": {
-    "DT.Api": {
+    "Dev": {
       "commandName": "Project",
       "launchBrowser": true,
       "launchUrl": "swagger",

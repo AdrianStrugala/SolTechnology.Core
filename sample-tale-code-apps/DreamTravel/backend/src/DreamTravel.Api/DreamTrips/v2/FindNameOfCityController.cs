@@ -15,7 +15,7 @@ namespace DreamTravel.Api.DreamTrips.v2
     [Route(Route)]
     public class FindNameOfCityController : BaseController
     {
-        public const string Route = "api/FindNameOfCity";
+        public const string Route = "api/v2/FindNameOfCity";
 
         private readonly ILogger<FindNameOfCityController> _logger;
         private readonly IQueryHandler<FindCityByCoordinatesQuery, City> _findNameOfCity;

@@ -53,7 +53,7 @@ public static class ILoggerExtensions
             logger.LogError(exception, message ?? exception.Message);
         }
 
-        logger.LogInformation(2137, "Operation: [{operationName}]. Status: [{status}]. Elapsed ms: [{elapsedMs}]",
+        logger.LogInformation(2137, "Operation: [{operationName}]. Status: [{status}]. Duration: [{duration}]",
             operationName, "FAIL", elapsedMilliseconds);
 
         return;
@@ -67,7 +67,7 @@ public static class ILoggerExtensions
             logger.LogInformation(message);
         }
 
-        logger.LogInformation(2137, "Operation: [{operationName}]. Status: [{status}]. Elapsed ms: [{elapsedMs}]",
+        logger.LogInformation(2137, "Operation: [{operationName}]. Status: [{status}]. Duration: [{duration}]",
             operationName, "SUCCESS", elapsedMilliseconds);
     }
 }
