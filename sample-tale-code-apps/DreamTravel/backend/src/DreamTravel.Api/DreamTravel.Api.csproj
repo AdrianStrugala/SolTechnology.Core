@@ -25,7 +25,7 @@
 	  </Content>
 	</ItemGroup>
 	<ItemGroup>
-		<None Include="appsettings.local.json">
+		<None Include="appsettings.development.json">
 			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
 	</ItemGroup>

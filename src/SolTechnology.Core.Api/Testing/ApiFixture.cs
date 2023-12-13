@@ -19,10 +19,10 @@ namespace SolTechnology.Core.Api.Testing
             var webAppFactory = new WebApplicationFactory<TEntryPoint>()
                 .WithWebHostBuilder(builder =>
                     builder
-                        .ConfigureAppConfiguration((_, config) => config
-                            .AddJsonFile(Path.Combine(Directory.GetCurrentDirectory(), "appsettings.local.json"), true)
+                        .ConfigureAppConfiguration((context, config) => config
                             .AddJsonFile(Path.Combine(Directory.GetCurrentDirectory(), "appsettings.functional.tests.json"), true)
-                        ).ConfigureServices(configureServices ?? (_ => { })));
+                            .AddJsonFile(Path.Combine(Directory.GetCurrentDirectory(), $"appsettings.{context.HostingEnvironment.EnvironmentName}.json"), true))
+                        .ConfigureServices(configureServices ?? (_ => { })));
 
             TestServer = webAppFactory.Server;
             TestServer.PreserveExecutionContext = true;
