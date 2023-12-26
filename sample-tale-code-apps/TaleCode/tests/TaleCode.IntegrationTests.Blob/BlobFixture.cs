@@ -1,4 +1,4 @@
-﻿using System.Text.Json;
+﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 using SolTechnology.Core.BlobStorage;
 using SolTechnology.Core.BlobStorage.Connection;
@@ -8,24 +8,19 @@ namespace TaleCode.IntegrationTests.Blob
     public class BlobFixture
     {
         public BlobConnectionFactory BlobConnectionFactory;
-        private string _connectionString;
 
         public BlobFixture()
         {
-            var settingsFile = File.ReadAllText("appsettings.functional.tests.json");
-            _connectionString = JsonDocument.Parse(settingsFile)
-                .RootElement
-                .GetProperty("Configuration")
-                .GetProperty("BlobStorage")
-                .GetProperty("ConnectionString")
-                .GetString()!;
+            IConfiguration configuration = new ConfigurationBuilder()
+                .AddJsonFile("appsettings.json", true, true)
+                .AddJsonFile("appsettings.development.json", true, true)
+                .AddJsonFile("appsettings.tests.json", true, true)
+                .Build();
 
-            var config = Options.Create(new BlobStorageConfiguration
-            {
-                ConnectionString = _connectionString
-            });
+            var blobConfiguration = configuration.GetRequiredSection("Configuration:BlobStorage").Get<BlobStorageConfiguration>()!;
+            var options = Options.Create(blobConfiguration);
 
-            BlobConnectionFactory = new BlobConnectionFactory(config);
+            BlobConnectionFactory = new BlobConnectionFactory(options);
         }
     }
 }

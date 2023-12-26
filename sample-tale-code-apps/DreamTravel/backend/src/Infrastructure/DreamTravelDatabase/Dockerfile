@@ -4,7 +4,7 @@
 
 # First, the dotnet build of the DACPAC. The csproj referenced here should be
 # one that uses this SDK: https://github.com/rr-wfm/MSBuild.Sdk.SqlProj/
-FROM mcr.microsoft.com/dotnet/core/sdk:3.1-buster AS build
+FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build
 WORKDIR .
 COPY ["/backend/src/Infrastructure/DreamTravelDatabase/DreamTravelDatabase.csproj", "DreamTravelDatabase/"]
 RUN dotnet restore "DreamTravelDatabase/DreamTravelDatabase.csproj"

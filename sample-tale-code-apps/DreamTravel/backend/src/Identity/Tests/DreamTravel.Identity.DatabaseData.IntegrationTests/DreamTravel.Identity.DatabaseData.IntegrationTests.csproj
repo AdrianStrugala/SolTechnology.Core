@@ -18,7 +18,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<Content Include="..\..\..\DreamTravel.Api\appsettings.local.json" Link="appsettings.local.json">
+		<Content Include="..\..\..\DreamTravel.Api\appsettings.json" Link="appsettings.json">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</Content>
 	</ItemGroup>

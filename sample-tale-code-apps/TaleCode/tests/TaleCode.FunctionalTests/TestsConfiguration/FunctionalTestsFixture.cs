@@ -1,8 +1,10 @@
 ﻿using SolTechnology.Core.Api.Testing;
 using System;
+using SolTechnology.Core.Faker;
 using SolTechnology.Core.Sql.Testing;
 using TaleCode.IntegrationTests.Blob;
 using Xunit;
+using TaleCode.FunctionalTests.FakeApis;
 
 namespace TaleCode.FunctionalTests.TestsConfiguration
 {
@@ -24,6 +26,8 @@ namespace TaleCode.FunctionalTests.TestsConfiguration
 
             SqlFixture.InitializeAsync().GetAwaiter().GetResult();
             WireMockFixture.Initialize();
+            WireMockFixture.RegisterFakeApi(new ApiFootballFakeApi());
+            WireMockFixture.RegisterFakeApi(new FootballDataFakeApi());
         }
 
         public void Dispose()

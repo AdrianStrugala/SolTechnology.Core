@@ -50,13 +50,9 @@ namespace SolTechnology.TaleCode.PlayerRegistry.Commands.SynchronizePlayerMatche
                     match.AssignCompetitionWinner(clientMatch.CompetitionWinner);
 
                     _matchRepository.Insert(match);
-
-                    _logger.OperationSucceeded(nameof(SyncMatch));
                 }
                 catch (Exception e)
                 {
-                    _logger.OperationFailed(nameof(SyncMatch), e);
-
                     _executionErrorRepository.Insert(new ExecutionError(ReferenceType.Match, clientMatch.Id,
                         e.Message));
                 }

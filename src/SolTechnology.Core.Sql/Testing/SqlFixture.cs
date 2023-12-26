@@ -16,8 +16,8 @@ namespace SolTechnology.Core.Sql.Testing
         {
             IConfiguration configuration = new ConfigurationBuilder()
                 .AddJsonFile("appsettings.json", true, true)
-                .AddJsonFile("appsettings.local.json", true, true)
-                .AddJsonFile("appsettings.functional.tests.json", true, true)
+                .AddJsonFile("appsettings.development.json", true, true)
+                .AddJsonFile("appsettings.tests.json", true, true)
                 .Build();
 
             var sqlConfiguration = configuration.GetRequiredSection("Configuration:Sql").Get<SqlConfiguration>();

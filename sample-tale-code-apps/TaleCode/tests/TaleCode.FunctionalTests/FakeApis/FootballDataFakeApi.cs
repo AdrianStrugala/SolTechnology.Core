@@ -21,7 +21,7 @@ namespace TaleCode.FunctionalTests.FakeApis
 
             Provider = BuildRequest(request);
 
-            return default;
+            return default!;
         }
 
         public Task<FootballDataMatch> GetMatchById(int matchApiId)
@@ -33,7 +33,7 @@ namespace TaleCode.FunctionalTests.FakeApis
 
             Provider = BuildRequest(request);
 
-            return default;
+            return default!;
         }
     }
 }
