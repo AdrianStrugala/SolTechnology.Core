@@ -2,7 +2,7 @@
 
 public interface IFindProfitablePath
 {
-    void Execute(CalculateBestPathContext calculateBestPathContext, int noOfCities);
+    void Execute(CalculateBestPathContext calculateBestPathContext);
 }
 
 public class FindProfitablePath : IFindProfitablePath
@@ -12,32 +12,32 @@ public class FindProfitablePath : IFindProfitablePath
     private static double HighwayVelocity { get; } = 120;
     private static double RoadCombustion { get; } = 0.06; //per km
 
-    public void Execute(CalculateBestPathContext calculateBestPathContext, int noOfCities)
+    public void Execute(CalculateBestPathContext context)
     {
-        Parallel.For(0, noOfCities, i =>
+        Parallel.For(0, context.NoOfCities, i =>
         {
-            Parallel.For(0, noOfCities, j =>
+            Parallel.For(0, context.NoOfCities, j =>
             {
                 if (i != j)
                 {
-                    int iterator = j + i * noOfCities;
+                    int iterator = j + i * context.NoOfCities;
 
                     //if toll takes more time than regular -> pretend it does not exist
-                    if (calculateBestPathContext.TollDistances[iterator] > calculateBestPathContext.FreeDistances[iterator])
+                    if (context.TollDistances[iterator] > context.FreeDistances[iterator])
                     {
-                        calculateBestPathContext.TollDistances[iterator] = calculateBestPathContext.FreeDistances[iterator];
-                        calculateBestPathContext.Costs[iterator] = 0;
+                        context.TollDistances[iterator] = context.FreeDistances[iterator];
+                        context.Costs[iterator] = 0;
                     }
 
-                    if (IsTollRoadProfitable(calculateBestPathContext, iterator))
+                    if (IsTollRoadProfitable(context, iterator))
                     {
-                        calculateBestPathContext.OptimalDistances[iterator] = calculateBestPathContext.TollDistances[iterator];
-                        calculateBestPathContext.OptimalCosts[iterator] = calculateBestPathContext.Costs[iterator];
+                        context.OptimalDistances[iterator] = context.TollDistances[iterator];
+                        context.OptimalCosts[iterator] = context.Costs[iterator];
                     }
                     else
                     {
-                        calculateBestPathContext.OptimalDistances[iterator] = calculateBestPathContext.FreeDistances[iterator];
-                        calculateBestPathContext.OptimalCosts[iterator] = 0;
+                        context.OptimalDistances[iterator] = context.FreeDistances[iterator];
+                        context.OptimalCosts[iterator] = 0;
                     }
                 }
             });

@@ -6,7 +6,7 @@ namespace DreamTravel.Trips.Queries.CalculateBestPath.Executors;
 
 public interface IDownloadRoadData
 {
-    Task Execute(List<City> listOfCities, CalculateBestPathContext calculateBestPathContext);
+    Task Execute(CalculateBestPathContext calculateBestPathContext);
 }
 
 public class DownloadRoadData : IDownloadRoadData
@@ -20,8 +20,9 @@ public class DownloadRoadData : IDownloadRoadData
         _michelinApiClient = michelinApiClient;
     }
 
-    public async Task Execute(List<City> listOfCities, CalculateBestPathContext calculateBestPathContext)
+    public async Task Execute(CalculateBestPathContext calculateBestPathContext)
     {
+        var listOfCities = calculateBestPathContext.Cities;
         List<Task> tasks = new List<Task>
         {
             Task.Run(async () => calculateBestPathContext.TollDistances = await _googleApiClient.GetDurationMatrixByTollRoad(listOfCities)),
