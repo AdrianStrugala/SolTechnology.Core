@@ -26,7 +26,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<Content Include="..\TaleCode.FunctionalTests\appsettings.functional.tests.json" Link="appsettings.functional.tests.json">
+		<Content Include="..\TaleCode.FunctionalTests\appsettings.tests.json" Link="appsettings.tests.json">
 		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</Content>
 	</ItemGroup>

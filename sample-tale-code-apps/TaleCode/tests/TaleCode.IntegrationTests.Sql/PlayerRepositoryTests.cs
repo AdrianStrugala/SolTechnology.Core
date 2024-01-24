@@ -2,16 +2,15 @@
 using System.Linq;
 using AutoFixture;
 using FluentAssertions;
+using SolTechnology.Core.Sql.Testing;
 using SolTechnology.Core.Sql.Transactions;
 using SolTechnology.TaleCode.Domain;
 using SolTechnology.TaleCode.SqlData.Repository.PlayerRepository;
-using TaleCode.IntegrationTests.Sql.Configuration;
 using Xunit;
 
 namespace TaleCode.IntegrationTests.Sql
 {
-    [Collection(nameof(TestsCollections.SqlTestsCollection))]
-    public class PlayerRepositoryTests
+    public class PlayerRepositoryTests : IClassFixture<SqlFixture>
     {
         private readonly PlayerRepository _sut;
         private readonly Fixture _fixture;

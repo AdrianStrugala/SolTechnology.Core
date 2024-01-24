@@ -38,12 +38,12 @@ namespace DreamTravel.GeolocationData.MichelinApi
                 doc.LoadXml(response);
 
                 XmlNode node =
-                    doc.DocumentElement.SelectSingleNode("/response/iti/header/summaries/summary/tollCost/car");
-                var tollCost = Convert.ToDouble(node.InnerText);
+                    doc.DocumentElement?.SelectSingleNode("/response/iti/header/summaries/summary/tollCost/car");
+                var tollCost = Convert.ToDouble(node?.InnerText);
 
                 XmlNode vinietaNode =
-                    doc.DocumentElement.SelectSingleNode("/response/iti/header/summaries/summary/CCZCost/car");
-                var vinietaCost = Convert.ToDouble(vinietaNode.InnerText);
+                    doc.DocumentElement?.SelectSingleNode("/response/iti/header/summaries/summary/CCZCost/car");
+                var vinietaCost = Convert.ToDouble(vinietaNode?.InnerText);
 
 
                 return (tollCost / 100, vinietaCost / 100);

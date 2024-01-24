@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using DreamTravel.Trips.Domain.Cities;
@@ -21,16 +22,17 @@ namespace DreamTravel.GeolocationData.GoogleApi
                 coordinates.AppendFormat($"{city.Latitude},{city.Longitude}|");
             }
 
-            for (int i = 0; i < listOfCities.Count; i++)
+            try
             {
-                try
+                var request = await _httpClient
+                    .CreateRequest($"maps/api/distancematrix/json?units=imperial&origins={coordinates}&destinations={coordinates}&key={_options.Key}")
+                    .GetAsync();
+
+                var response = await request.Content.ReadAsStringAsync();
+                JObject json = JObject.Parse(response);
+
+                for (int i = 0; i < listOfCities.Count; i++)
                 {
-                    string url =
-                        $"https://maps.googleapis.com/maps/api/distancematrix/json?units=imperial&origins={listOfCities[i].Latitude},{listOfCities[i].Longitude}&destinations={coordinates}&key={_options.Key}";
-
-                    var response = await _httpClient.GetStringAsync(url);
-                    JObject json = JObject.Parse(response);
-
                     for (int j = 0; j < listOfCities.Count; j++)
                     {
                         if (i == j)
@@ -40,17 +42,16 @@ namespace DreamTravel.GeolocationData.GoogleApi
                         else
                         {
                             result[j + i * listOfCities.Count] =
-                                json["rows"][0]["elements"][j]["duration"]["value"].Value<int>();
+                                json["rows"][i]["elements"][j]["duration"]["value"].Value<int>();
                         }
                     }
                 }
-
-                catch (Exception)
-                {
-                    _logger.LogError($"Cannot get data about distance when [{listOfCities[i].Name}] is the origin");
-                    throw new InvalidDataException(
-                        $"Cannot get data about distance when [{listOfCities[i].Name}] is the origin");
-                }
+            }
+            catch (Exception)
+            {
+                _logger.LogError($"Cannot get Toll Distance Matrix data");
+                throw new InvalidDataException(
+                    "Cannot get Toll Distance Matrix data");
             }
 
             return result;

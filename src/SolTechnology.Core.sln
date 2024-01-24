@@ -80,10 +80,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DreamTravel.Identity.HttpCl
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DreamTravel.Infrastructure", "..\sample-tale-code-apps\DreamTravel\backend\src\Infrastructure\DreamTravel.Infrastructure\DreamTravel.Infrastructure.csproj", "{4A8E3915-04CF-4B1D-9DFF-88CD890629EA}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DreamTravel.TestFixture.Api", "..\sample-tale-code-apps\DreamTravel\backend\src\Infrastructure\TestFixtures\DreamTravel.TestFixture.Api\DreamTravel.TestFixture.Api.csproj", "{4E6F57EE-845E-4274-A1C7-6B9C32C38BB2}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DreamTravel.TestFixture.Sql", "..\sample-tale-code-apps\DreamTravel\backend\src\Infrastructure\TestFixtures\DreamTravel.TestFixture.Sql\DreamTravel.TestFixture.Sql.csproj", "{CF6ACC50-E67F-488C-84A3-4FA3C7EB3ACB}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DreamTravel.Trips.Commands", "..\sample-tale-code-apps\DreamTravel\backend\src\Trips\LogicLayer\DreamTravel.Trips.Commands\DreamTravel.Trips.Commands.csproj", "{A64CFE55-0FDA-4EB1-A705-2960AEB9B217}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DreamTravel.Trips.Commands.UnitTests", "..\sample-tale-code-apps\DreamTravel\backend\src\Trips\Tests\DreamTravel.Trips.Features.UnitTests\DreamTravel.Trips.Commands.UnitTests.csproj", "{404B05F9-4672-4BF8-87D4-510A84D68450}"
@@ -106,7 +102,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DreamTravel.Trips.Traveling
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DreamTravelDatabase", "..\sample-tale-code-apps\DreamTravel\backend\src\Infrastructure\DreamTravelDatabase\DreamTravelDatabase.csproj", "{98426C33-10DC-42C0-A305-865125AF5A41}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FunctionalTests", "..\sample-tale-code-apps\DreamTravel\backend\src\FunctionalTests\FunctionalTests.csproj", "{59B97430-ADBB-4E1E-AA4D-128761D9A90C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DreamTravel.FunctionalTests", "..\sample-tale-code-apps\DreamTravel\backend\src\FunctionalTests\DreamTravel.FunctionalTests.csproj", "{59B97430-ADBB-4E1E-AA4D-128761D9A90C}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SolTechnology.TaleCode.Api", "..\sample-tale-code-apps\TaleCode\src\PresentationLayer\SolTechnology.TaleCode.Api\SolTechnology.TaleCode.Api.csproj", "{44F4656A-1664-414C-953F-C6B8D34CD5C4}"
 EndProject
@@ -125,8 +121,6 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SolTechnology.TaleCode.Sql", "..\sample-tale-code-apps\TaleCode\src\DataLayer\SolTechnology.TaleCode.Sql\SolTechnology.TaleCode.Sql.csproj", "{385698FA-0BAF-4A90-80FE-89DD3881E0B8}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SolTechnology.TaleCode.StaticData", "..\sample-tale-code-apps\TaleCode\src\DataLayer\SolTechnology.TaleCode.StaticData\SolTechnology.TaleCode.StaticData.csproj", "{3148925D-FF22-416F-9F19-B4A4D83D955A}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TaleCode.Faker", "..\sample-tale-code-apps\TaleCode\tests\TaleCode.Faker\TaleCode.Faker.csproj", "{000FCA24-06E1-4FA3-8921-899FC0A073C0}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TaleCode.FunctionalTests", "..\sample-tale-code-apps\TaleCode\tests\TaleCode.FunctionalTests\TaleCode.FunctionalTests.csproj", "{06939D68-B282-4C50-866F-BD2A8CAE41B8}"
 EndProject
@@ -180,6 +174,8 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{473ABBD6-4AD0-48D1-BE20-4CC07165CE59}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{BE9DF68B-3FD1-45D1-A1A8-86F41273FBA5}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SolTechnology.Core.Faker", "SolTechnology.Core.Faker\SolTechnology.Core.Faker.csproj", "{862CF9FB-0A3D-4E7F-8F20-8D6C2243174A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -287,14 +283,6 @@ Global
 		{4A8E3915-04CF-4B1D-9DFF-88CD890629EA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4A8E3915-04CF-4B1D-9DFF-88CD890629EA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4A8E3915-04CF-4B1D-9DFF-88CD890629EA}.Release|Any CPU.Build.0 = Release|Any CPU
-		{4E6F57EE-845E-4274-A1C7-6B9C32C38BB2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{4E6F57EE-845E-4274-A1C7-6B9C32C38BB2}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{4E6F57EE-845E-4274-A1C7-6B9C32C38BB2}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{4E6F57EE-845E-4274-A1C7-6B9C32C38BB2}.Release|Any CPU.Build.0 = Release|Any CPU
-		{CF6ACC50-E67F-488C-84A3-4FA3C7EB3ACB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{CF6ACC50-E67F-488C-84A3-4FA3C7EB3ACB}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{CF6ACC50-E67F-488C-84A3-4FA3C7EB3ACB}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{CF6ACC50-E67F-488C-84A3-4FA3C7EB3ACB}.Release|Any CPU.Build.0 = Release|Any CPU
 		{A64CFE55-0FDA-4EB1-A705-2960AEB9B217}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{A64CFE55-0FDA-4EB1-A705-2960AEB9B217}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A64CFE55-0FDA-4EB1-A705-2960AEB9B217}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -379,10 +367,6 @@ Global
 		{3148925D-FF22-416F-9F19-B4A4D83D955A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3148925D-FF22-416F-9F19-B4A4D83D955A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3148925D-FF22-416F-9F19-B4A4D83D955A}.Release|Any CPU.Build.0 = Release|Any CPU
-		{000FCA24-06E1-4FA3-8921-899FC0A073C0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{000FCA24-06E1-4FA3-8921-899FC0A073C0}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{000FCA24-06E1-4FA3-8921-899FC0A073C0}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{000FCA24-06E1-4FA3-8921-899FC0A073C0}.Release|Any CPU.Build.0 = Release|Any CPU
 		{06939D68-B282-4C50-866F-BD2A8CAE41B8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{06939D68-B282-4C50-866F-BD2A8CAE41B8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{06939D68-B282-4C50-866F-BD2A8CAE41B8}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -407,6 +391,10 @@ Global
 		{18EC819A-7663-4CD5-A949-178C7E0F5E4B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{18EC819A-7663-4CD5-A949-178C7E0F5E4B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{18EC819A-7663-4CD5-A949-178C7E0F5E4B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{862CF9FB-0A3D-4E7F-8F20-8D6C2243174A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{862CF9FB-0A3D-4E7F-8F20-8D6C2243174A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{862CF9FB-0A3D-4E7F-8F20-8D6C2243174A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{862CF9FB-0A3D-4E7F-8F20-8D6C2243174A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -426,8 +414,6 @@ Global
 		{DC13B6C0-67BD-45FD-8858-AF89A83BF187} = {F55BA14C-499E-480A-A722-0C5B73C14CA4}
 		{080B998E-9174-4373-BA9E-0DB87E93D9DF} = {8C45A60F-7098-4D3B-A0FD-2BD85845A2E6}
 		{4A8E3915-04CF-4B1D-9DFF-88CD890629EA} = {6541B884-6E1F-492F-B5CB-1117C78760FE}
-		{4E6F57EE-845E-4274-A1C7-6B9C32C38BB2} = {6541B884-6E1F-492F-B5CB-1117C78760FE}
-		{CF6ACC50-E67F-488C-84A3-4FA3C7EB3ACB} = {6541B884-6E1F-492F-B5CB-1117C78760FE}
 		{A64CFE55-0FDA-4EB1-A705-2960AEB9B217} = {4C7789AA-2CA6-45C2-85B4-398653826B23}
 		{404B05F9-4672-4BF8-87D4-510A84D68450} = {4F1D67DA-D15E-4EFC-93C7-6C15CE89B209}
 		{73AFABF8-EE14-412C-82D6-C27E20EBF7F4} = {420E5B4D-02EA-463D-B929-B3FDA2FA8046}
@@ -449,7 +435,6 @@ Global
 		{6350D7F8-C825-4AC0-AFB8-39B1CBEA7C51} = {21966B4D-E0CB-444A-A872-B79A80774F52}
 		{385698FA-0BAF-4A90-80FE-89DD3881E0B8} = {604EB996-7D4A-4E23-A85B-6F84FC6436B1}
 		{3148925D-FF22-416F-9F19-B4A4D83D955A} = {604EB996-7D4A-4E23-A85B-6F84FC6436B1}
-		{000FCA24-06E1-4FA3-8921-899FC0A073C0} = {D345B814-8F22-4CB2-B542-871AB32A0074}
 		{06939D68-B282-4C50-866F-BD2A8CAE41B8} = {FE26A40A-2CA7-4D3D-858E-7DCEB404CF42}
 		{F4A2C9F8-AEC7-4FE2-8AB4-A6F4B18D042D} = {057C9A36-9CD3-481D-84A5-070D5B456337}
 		{3456261C-9EE4-4929-AE15-BF98392459F8} = {057C9A36-9CD3-481D-84A5-070D5B456337}

@@ -12,7 +12,7 @@ namespace SolTechnology.Core.Sql
 
             services
                 .AddOptions<SqlConfiguration>()
-                .Configure<IConfiguration>((config, configuration) =>
+                .Configure<IConfiguration>((options, configuration) =>
            {
 
                if (sqlConfiguration == null)
@@ -25,7 +25,7 @@ namespace SolTechnology.Core.Sql
                    throw new ArgumentException($"The [{nameof(SqlConfiguration)}] is missing. Provide it by parameter or configuration section");
                }
 
-               config.ConnectionString = sqlConfiguration.ConnectionString;
+               options.ConnectionString = sqlConfiguration.ConnectionString;
            });
 
 
