@@ -2,22 +2,22 @@
 using Microsoft.Azure.ServiceBus.Management;
 using Microsoft.Extensions.Options;
 using SolTechnology.Core.MessageBus.Configuration;
+using SolTechnology.Core.MessageBus.Publish;
 
 namespace SolTechnology.Core.MessageBus.Broker
 {
-    public class MessageBusBroker : IMessageBusBroker, IAsyncDisposable
+    public class AzureMessageBusBroker : IMessageBusBroker, IAsyncDisposable
     {
         private readonly ServiceBusClient _serviceBusClient;
         private readonly bool _createResources;
         private readonly ManagementClient _managementClient;
 
-        private static readonly List<(string, ServiceBusSender)> MessageToSenderMap = new();
+        private static readonly List<(string, ISender)> MessageToSenderMap = new();
         private static readonly List<(Type, ServiceBusProcessor)> MessageToProcessorMap = new();
 
 
-
         //Service bus client options can be added here
-        public MessageBusBroker(IOptions<MessageBusConfiguration> options)
+        public AzureMessageBusBroker(IOptions<MessageBusConfiguration> options, IServiceProvider serviceProvider)
         {
             var connectionString = options.Value.ConnectionString;
             _createResources = options.Value.CreateResources;
@@ -39,7 +39,7 @@ namespace SolTechnology.Core.MessageBus.Broker
         public void RegisterTopicPublisher(string messageType, string topicName)
         {
             var topicSender = _serviceBusClient.CreateSender(topicName);
-            MessageToSenderMap.Add((messageType, topicSender));
+            MessageToSenderMap.Add((messageType, new AzureSender(topicSender)));
 
             if (_createResources)
             {
@@ -50,7 +50,7 @@ namespace SolTechnology.Core.MessageBus.Broker
             }
         }
 
-        public List<ServiceBusSender> ResolveMessagePublisher(string messageType)
+        public List<ISender> ResolveMessagePublisher(string messageType)
         {
             var senders = MessageToSenderMap
                 .Where(m => m.Item1.Equals(messageType, StringComparison.CurrentCultureIgnoreCase)).Select(x => x.Item2)
@@ -107,7 +107,7 @@ namespace SolTechnology.Core.MessageBus.Broker
         public void RegisterQueuePublisher(string messageType, string queueName)
         {
             var queueSender = _serviceBusClient.CreateSender(queueName);
-            MessageToSenderMap.Add((messageType, queueSender));
+            MessageToSenderMap.Add((messageType, new AzureSender(queueSender)));
 
             if (_createResources)
             {
@@ -141,7 +141,7 @@ namespace SolTechnology.Core.MessageBus.Broker
 
         public async ValueTask DisposeAsync()
         {
-            await Task.WhenAll(MessageToSenderMap.Select(p => p.Item2.CloseAsync()));
+            await Task.WhenAll(MessageToSenderMap.Select(p => p.Item2.Close()));
             await Task.WhenAll(MessageToProcessorMap.Select(p => p.Item2.CloseAsync()));
             await _serviceBusClient.DisposeAsync();
         }

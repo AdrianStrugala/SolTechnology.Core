@@ -2,6 +2,7 @@
 using SolTechnology.Core.Cache;
 using SolTechnology.Core.CQRS;
 using SolTechnology.Core.MessageBus;
+using SolTechnology.Core.MessageBus.Configuration;
 using SolTechnology.TaleCode.ApiClients;
 using SolTechnology.TaleCode.BlobData;
 using SolTechnology.TaleCode.PlayerRegistry.Commands.SynchronizePlayerMatches;
@@ -22,7 +23,7 @@ namespace SolTechnology.TaleCode.PlayerRegistry.Commands
             services.InstallApiClients();
             services.InstallStaticData();
             services.InstallBlobStorage();
-            services.AddMessageBus()
+            services.AddMessageBus(MessageBusProvider.InMemory)
                     .WithQueuePublisher<PlayerMatchesSynchronizedEvent>();
             services.AddCache();
 

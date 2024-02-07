@@ -12,6 +12,7 @@ namespace SolTechnology.Core.MessageBus
     {
         public static IServiceCollection AddMessageBus(
             this IServiceCollection services,
+            MessageBusProvider provider = MessageBusProvider.Azure,
             MessageBusConfiguration messageBusConfiguration = null)
         {
             services
@@ -34,10 +35,20 @@ namespace SolTechnology.Core.MessageBus
             });
 
             services.AddSingleton<IMessagePublisher, MessagePublisher>();
-            services.AddSingleton<IMessageBusBroker, MessageBusBroker>();
-
-            services.AddHostedService<MessageBusReceiver>();
-
+            switch (provider)
+            {
+                case MessageBusProvider.Azure:
+                    {
+                        services.AddSingleton<IMessageBusBroker, AzureMessageBusBroker>();
+                        services.AddHostedService<AzureMessageBusReceiver>();
+                        break;
+                    }
+                case MessageBusProvider.InMemory:
+                    {
+                        services.AddSingleton<IMessageBusBroker, InMemoryMessageBusBroker>();
+                        break;
+                    }
+            }
             return services;
         }
 

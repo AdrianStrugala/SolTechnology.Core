@@ -8,19 +8,19 @@ using SolTechnology.Core.MessageBus.Broker;
 namespace SolTechnology.Core.MessageBus.Receive
 {
 
-    public class MessageBusReceiver : IHostedService, IAsyncDisposable
+    public class AzureMessageBusReceiver : IHostedService, IAsyncDisposable
     {
         private readonly IServiceProvider _serviceProvider;
-        private readonly ILogger<MessageBusReceiver> _logger;
+        private readonly ILogger<AzureMessageBusReceiver> _logger;
 
         private readonly IMessageBusBroker _messageBusBroker;
         private List<ServiceBusProcessor> _processors;
 
 
-        public MessageBusReceiver(
+        public AzureMessageBusReceiver(
            IMessageBusBroker messageBusBroker,
            IServiceProvider serviceProvider,
-           ILogger<MessageBusReceiver> logger)
+           ILogger<AzureMessageBusReceiver> logger)
         {
             _messageBusBroker = messageBusBroker;
             _serviceProvider = serviceProvider;

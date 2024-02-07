@@ -1,5 +1,6 @@
 ﻿using Serilog;
 using SolTechnology.Core.MessageBus;
+using SolTechnology.Core.MessageBus.Configuration;
 using SolTechnology.Core.Scheduler;
 using SolTechnology.Core.Scheduler.Configuration;
 using SolTechnology.TaleCode.BackgroundWorker.EventHandlers.OnPlayerMatchesSynchronized;
@@ -31,7 +32,7 @@ namespace SolTechnology.TaleCode.BackgroundWorker
 
             services.AddControllers();
 
-            services.AddMessageBus()
+            services.AddMessageBus(MessageBusProvider.InMemory)
                     .WithQueueReceiver<PlayerMatchesSynchronizedEvent, CalculatePlayerStatistics>();
 
         }
