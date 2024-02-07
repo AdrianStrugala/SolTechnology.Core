@@ -3,6 +3,7 @@ using Microsoft.Azure.ServiceBus.Management;
 using Microsoft.Extensions.Options;
 using SolTechnology.Core.MessageBus.Configuration;
 using SolTechnology.Core.MessageBus.Publish;
+using SolTechnology.Core.MessageBus.Receive;
 
 namespace SolTechnology.Core.MessageBus.Broker
 {
@@ -13,7 +14,7 @@ namespace SolTechnology.Core.MessageBus.Broker
         private readonly ManagementClient _managementClient;
 
         private static readonly List<(string, ISender)> MessageToSenderMap = new();
-        private static readonly List<(Type, ServiceBusProcessor)> MessageToProcessorMap = new();
+        private static readonly List<(Type, IReceiver)> MessageToProcessorMap = new();
 
 
         //Service bus client options can be added here
@@ -74,7 +75,7 @@ namespace SolTechnology.Core.MessageBus.Broker
             };
 
             ServiceBusProcessor serviceBusProcessor = _serviceBusClient.CreateProcessor(topicName, subscriptionName, serviceBusProcessorOptions);
-            MessageToProcessorMap.Add((messageType, serviceBusProcessor));
+            MessageToProcessorMap.Add((messageType, new AzureReceiver(serviceBusProcessor)));
 
             if (_createResources)
             {
@@ -85,7 +86,7 @@ namespace SolTechnology.Core.MessageBus.Broker
             }
         }
 
-        public List<(Type, ServiceBusProcessor)> ResolveMessageReceivers()
+        public List<(Type, IReceiver)> ResolveMessageReceivers()
         {
             return MessageToProcessorMap;
         }
@@ -127,7 +128,7 @@ namespace SolTechnology.Core.MessageBus.Broker
             };
 
             ServiceBusProcessor serviceBusProcessor = _serviceBusClient.CreateProcessor(queueName, serviceBusProcessorOptions);
-            MessageToProcessorMap.Add((messageType, serviceBusProcessor));
+            MessageToProcessorMap.Add((messageType, new AzureReceiver(serviceBusProcessor)));
 
             if (_createResources)
             {

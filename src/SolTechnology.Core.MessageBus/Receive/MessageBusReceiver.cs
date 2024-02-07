@@ -1,5 +1,4 @@
-﻿using Azure.Messaging.ServiceBus;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
@@ -8,19 +7,19 @@ using SolTechnology.Core.MessageBus.Broker;
 namespace SolTechnology.Core.MessageBus.Receive
 {
 
-    public class AzureMessageBusReceiver : IHostedService, IAsyncDisposable
+    public class MessageBusReceiver : IHostedService, IAsyncDisposable
     {
         private readonly IServiceProvider _serviceProvider;
-        private readonly ILogger<AzureMessageBusReceiver> _logger;
+        private readonly ILogger<MessageBusReceiver> _logger;
 
         private readonly IMessageBusBroker _messageBusBroker;
-        private List<ServiceBusProcessor> _processors;
+        private List<IReceiver> _processors;
 
 
-        public AzureMessageBusReceiver(
+        public MessageBusReceiver(
            IMessageBusBroker messageBusBroker,
            IServiceProvider serviceProvider,
-           ILogger<AzureMessageBusReceiver> logger)
+           ILogger<MessageBusReceiver> logger)
         {
             _messageBusBroker = messageBusBroker;
             _serviceProvider = serviceProvider;
@@ -33,29 +32,27 @@ namespace SolTechnology.Core.MessageBus.Receive
             var typeProcessorMap = _messageBusBroker.ResolveMessageReceivers();
             _processors = typeProcessorMap.Select(x => x.Item2).ToList();
 
-            foreach (var (messageType, processor) in typeProcessorMap)
+            foreach (var (messageType, receiver) in typeProcessorMap)
             {
-                _logger.LogInformation($"Starting message bus processor for: [{processor.EntityPath}]");
-                processor.ProcessErrorAsync += HandleError;
-                processor.ProcessMessageAsync += async args =>
-                {
-                    await HandleMessageAsync(args, messageType);
-                };
+                _logger.LogInformation($"Starting message bus processor for: [{messageType.ToString()}]");
 
-                await processor.StartProcessingAsync(cancellationToken).ConfigureAwait(false);
+                receiver.AssignErrorHandler(HandleError);
+                receiver.AssignMessageHandler(HandleMessageAsync, messageType);
+
+                await receiver.StartProcessingAsync(cancellationToken).ConfigureAwait(false);
             }
         }
 
         public async Task StopAsync(CancellationToken cancellationToken)
         {
-            foreach (ServiceBusProcessor processor in _processors)
+            foreach (IReceiver processor in _processors)
             {
                 await processor.StopProcessingAsync(cancellationToken).ConfigureAwait(false);
             }
         }
 
 
-        private async Task HandleMessageAsync(ProcessMessageEventArgs args, Type messageType)
+        private async Task HandleMessageAsync(IMessage message, CancellationToken token, Type messageType)
         {
             using IServiceScope scope = _serviceProvider.CreateScope();
 
@@ -64,13 +61,12 @@ namespace SolTechnology.Core.MessageBus.Receive
             var handlerType = typeof(IMessageHandler<>).MakeGenericType(messageType);
 
             dynamic handler = scope.ServiceProvider.GetRequiredService(handlerType);
-            dynamic message = JsonConvert.DeserializeObject(args.Message?.Body.ToString(), messageType);
-            await handler.Handle(message, args.CancellationToken);
+            await handler.Handle(message, token);
         }
 
-        protected virtual Task HandleError(ProcessErrorEventArgs args)
+        protected virtual Task HandleError(Exception exception)
         {
-            _logger.LogError(args.Exception, args.Exception.Message);
+            _logger.LogError(exception, exception.Message);
             return Task.CompletedTask;
         }
 
@@ -79,7 +75,7 @@ namespace SolTechnology.Core.MessageBus.Receive
         {
             if (_processors != null)
             {
-                foreach (ServiceBusProcessor processor in _processors)
+                foreach (var processor in _processors)
                 {
                     await processor.DisposeAsync().ConfigureAwait(false);
                 }

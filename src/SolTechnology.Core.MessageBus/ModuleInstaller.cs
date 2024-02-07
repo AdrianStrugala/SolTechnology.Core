@@ -35,12 +35,12 @@ namespace SolTechnology.Core.MessageBus
             });
 
             services.AddSingleton<IMessagePublisher, MessagePublisher>();
+            services.AddHostedService<MessageBusReceiver>();
             switch (provider)
             {
                 case MessageBusProvider.Azure:
                     {
                         services.AddSingleton<IMessageBusBroker, AzureMessageBusBroker>();
-                        services.AddHostedService<AzureMessageBusReceiver>();
                         break;
                     }
                 case MessageBusProvider.InMemory:

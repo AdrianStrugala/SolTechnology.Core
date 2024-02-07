@@ -1,16 +1,15 @@
-﻿using Azure.Messaging.ServiceBus;
-
-namespace SolTechnology.Core.MessageBus.Receive
+﻿namespace SolTechnology.Core.MessageBus.Receive
 {
-    public interface IReceiver
+    public interface IReceiver : IAsyncDisposable
     {
-        public void AssignMessageHandler(Func<ProcessMessageEventArgs, Task> func);
+        public void AssignMessageHandler(Func<IMessage, CancellationToken, Type, Task> func, Type type);
 
-        public void AssignErrorHandler(Func<ProcessErrorEventArgs, Task> func);
+        public void AssignErrorHandler(Func<Exception, Task> func);
 
         public Task StartProcessingAsync(CancellationToken cancellationToken = default);
 
         public Task StopProcessingAsync(CancellationToken cancellationToken = default);
 
+        Task CloseAsync();
     }
 }

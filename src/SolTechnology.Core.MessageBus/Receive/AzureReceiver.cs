@@ -1,10 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Azure.Messaging.ServiceBus;
+﻿using Azure.Messaging.ServiceBus;
+using Newtonsoft.Json;
 
 namespace SolTechnology.Core.MessageBus.Receive
 {
@@ -17,24 +12,37 @@ namespace SolTechnology.Core.MessageBus.Receive
             _processor = processor;
         }
 
-        public void AssignMessageHandler(Func<ProcessMessageEventArgs, Task> func)
+        public void AssignMessageHandler(Func<IMessage, CancellationToken, Type, Task> func, Type type)
         {
-            _processor.ProcessMessageAsync += func;
+            Task HandleMessage(ProcessMessageEventArgs args) => func((IMessage)JsonConvert.DeserializeObject(args.Message?.Body.ToString(),type), args.CancellationToken, type);
+            _processor.ProcessMessageAsync += HandleMessage;
         }
 
-        public void AssignErrorHandler(Func<ProcessErrorEventArgs, Task> func)
+        public void AssignErrorHandler(Func<Exception, Task> func)
         {
-            _processor.ProcessErrorAsync += func;
+            Task HandleError(ProcessErrorEventArgs args) => func(args.Exception);
+
+            _processor.ProcessErrorAsync += HandleError;
         }
 
-        public Task StartProcessingAsync(CancellationToken cancellationToken = default)
+        public async Task StartProcessingAsync(CancellationToken cancellationToken = default)
         {
-            return _processor.StartProcessingAsync(cancellationToken);
+            await _processor.StartProcessingAsync(cancellationToken);
         }
 
-        public Task StopProcessingAsync(CancellationToken cancellationToken = default)
+        public async Task StopProcessingAsync(CancellationToken cancellationToken = default)
         {
-            return _processor.StartProcessingAsync(cancellationToken);
+            await _processor.StopProcessingAsync(cancellationToken).ConfigureAwait(false);
+        }
+
+        public async Task CloseAsync()
+        {
+            await _processor.CloseAsync();
+        }
+
+        public async ValueTask DisposeAsync()
+        {
+            if (_processor != null) await _processor.DisposeAsync();
         }
     }
 }

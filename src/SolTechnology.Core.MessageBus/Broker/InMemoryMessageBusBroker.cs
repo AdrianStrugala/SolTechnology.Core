@@ -1,5 +1,6 @@
 ﻿using Azure.Messaging.ServiceBus;
 using SolTechnology.Core.MessageBus.Publish;
+using SolTechnology.Core.MessageBus.Receive;
 
 namespace SolTechnology.Core.MessageBus.Broker
 {
@@ -37,7 +38,7 @@ namespace SolTechnology.Core.MessageBus.Broker
             throw new NotImplementedException();
         }
 
-        public List<(Type, ServiceBusProcessor)> ResolveMessageReceivers()
+        public List<(Type, IReceiver)> ResolveMessageReceivers()
         {
             throw new NotImplementedException();
         }
