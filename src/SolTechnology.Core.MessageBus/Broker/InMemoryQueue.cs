@@ -9,7 +9,7 @@ public class InMemoryQueue : ISender, IReceiver
     private readonly Channel<IMessage> _channel;
     private Func<IMessage, CancellationToken, Type, Task> _messageHandler;
     private Func<Exception, Task> _errorHandler;
-    private bool _shouldBeProcessing = true;
+    private CancellationTokenSource _cancellationTokenSource;
 
     public string QueueName { get; }
 
@@ -31,7 +31,7 @@ public class InMemoryQueue : ISender, IReceiver
 
     public ValueTask DisposeAsync()
     {
-     
+
         return ValueTask.CompletedTask;
     }
 
@@ -45,18 +45,35 @@ public class InMemoryQueue : ISender, IReceiver
         _errorHandler = func;
     }
 
-    public async Task StartProcessingAsync(CancellationToken cancellationToken = default)
+    public Task StartProcessingAsync(CancellationToken cancellationToken = default)
     {
-        while (_shouldBeProcessing)
+        _cancellationTokenSource = new CancellationTokenSource();
+        cancellationToken = _cancellationTokenSource.Token;
+
+        Task longRunningTask = Task.Run(async () =>
         {
             var message = await _channel.Reader.ReadAsync(cancellationToken);
-            await _messageHandler(message, cancellationToken, message.GetType());
-        }
+
+            try
+            {
+                await _messageHandler(message, cancellationToken, message.GetType());
+            }
+            catch (Exception e)
+            {
+                await _errorHandler(e);
+            }
+        }, cancellationToken);
+        return Task.CompletedTask;
     }
 
     public Task StopProcessingAsync(CancellationToken cancellationToken = default)
     {
-        _shouldBeProcessing = false;
+        _cancellationTokenSource.Cancel();
         return Task.CompletedTask;
+    }
+
+    public async Task CloseAsync()
+    {
+        await StopProcessingAsync();
     }
 }

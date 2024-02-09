@@ -87,18 +87,18 @@ namespace TaleCode.FunctionalTests
 
             //Assert
             //TODO: change way of service bus emulation
-            // var stopwatch = Stopwatch.StartNew();
-            // GetPlayerStatisticsResult? playerStatistics = null;
-            // do
-            // {
-            //     Thread.Sleep(1000);
-            //     playerStatistics = await GetPlayerStatistics(playerId);
-            //
-            // } while (playerStatistics == null && stopwatch.Elapsed.TotalSeconds < 20);
-            // stopwatch.Stop();
-            //
-            //
-            // Assert.NotNull(playerStatistics);
+            var stopwatch = Stopwatch.StartNew();
+            GetPlayerStatisticsResult? playerStatistics = null;
+            do
+            {
+                Thread.Sleep(1000);
+                playerStatistics = await GetPlayerStatistics(playerId);
+            
+            } while (playerStatistics == null && stopwatch.Elapsed.TotalSeconds < 20);
+            stopwatch.Stop();
+            
+            
+            Assert.NotNull(playerStatistics);
             //That's the place for more sophisticated assert, but would require data arrange. You know :D
         }
 

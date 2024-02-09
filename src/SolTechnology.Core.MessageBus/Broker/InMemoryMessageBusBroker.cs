@@ -1,5 +1,4 @@
-﻿using Azure.Messaging.ServiceBus;
-using SolTechnology.Core.MessageBus.Publish;
+﻿using SolTechnology.Core.MessageBus.Publish;
 using SolTechnology.Core.MessageBus.Receive;
 
 namespace SolTechnology.Core.MessageBus.Broker
@@ -7,6 +6,7 @@ namespace SolTechnology.Core.MessageBus.Broker
     public class InMemoryMessageBusBroker : IMessageBusBroker
     {
         private static readonly List<(string, InMemoryQueue)> MessageToQueueMap = new();
+        private static readonly List<(Type, IReceiver)> MessageToReceiverMap = new();
 
         public void RegisterTopicPublisher(string messageType, string topicName)
         {
@@ -33,14 +33,14 @@ namespace SolTechnology.Core.MessageBus.Broker
             throw new NotImplementedException();
         }
 
-        public List<ServiceBusProcessor> ResolveMessageReceiver(string messageType)
+        public List<IReceiver> ResolveMessageReceiver(string messageType)
         {
             throw new NotImplementedException();
         }
 
         public List<(Type, IReceiver)> ResolveMessageReceivers()
         {
-            throw new NotImplementedException();
+            return MessageToReceiverMap;
         }
 
         public void RegisterQueuePublisher(string messageType, string queueName)
@@ -57,14 +57,8 @@ namespace SolTechnology.Core.MessageBus.Broker
 
         public void RegisterQueueReceiver(Type messageType, string queueName)
         {
-            var existingQueue = MessageToQueueMap.FirstOrDefault(x =>
-                x.Item1 == messageType.ToString() && x.Item2.QueueName == queueName);
-
-            if (existingQueue.Item1 == null)
-            {
-                var queue = new InMemoryQueue(queueName);
-                MessageToQueueMap.Add((messageType.ToString(), queue));
-            }
+            var queue = new InMemoryQueue(queueName);
+            MessageToReceiverMap.Add((messageType, queue));
         }
     }
 }

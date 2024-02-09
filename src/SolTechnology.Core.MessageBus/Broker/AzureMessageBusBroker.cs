@@ -91,7 +91,7 @@ namespace SolTechnology.Core.MessageBus.Broker
             return MessageToProcessorMap;
         }
 
-        public List<ServiceBusProcessor> ResolveMessageReceiver(string messageType)
+        public List<IReceiver> ResolveMessageReceiver(string messageType)
         {
             var processors = MessageToProcessorMap
                 .Where(m => m.Item1.Name.Equals(messageType, StringComparison.CurrentCultureIgnoreCase)).Select(x => x.Item2)
