@@ -9,14 +9,14 @@ public class CalculateBestPathHandler : IQueryHandler<CalculateBestPathQuery, Ca
     private readonly Func<CalculateBestPathContext, Task<OperationResult>> _downloadRoadData;
     private readonly Func<CalculateBestPathContext, Task<OperationResult>> _findProfitablePath;
     private readonly Func<CalculateBestPathContext, Task<OperationResult>> _solveTSP;
-    private readonly Func<CalculateBestPathContext, CalculateBestPathResult> _formPathsFromMatrices;
+    private readonly Func<CalculateBestPathContext, CalculateBestPathResult> _formResult;
 
     public CalculateBestPathHandler(
         IDownloadRoadData downloadRoadData,
         IFormCalculateBestPathResult formCalculateBestPathResult, ISolveTsp solveTsp, IFindProfitablePath findProfitablePath)
     {
         _downloadRoadData = downloadRoadData.Execute;
-        _formPathsFromMatrices = formCalculateBestPathResult.Execute;
+        _formResult = formCalculateBestPathResult.Execute;
         _solveTSP = solveTsp.Execute;
         _findProfitablePath = findProfitablePath.Execute;
     }
@@ -32,7 +32,7 @@ public class CalculateBestPathHandler : IQueryHandler<CalculateBestPathQuery, Ca
              .Then(_downloadRoadData)
              .Then(_findProfitablePath)
              .Then(_solveTSP)
-             .End(_formPathsFromMatrices);
+             .End(_formResult);
 
         return result;
     }
