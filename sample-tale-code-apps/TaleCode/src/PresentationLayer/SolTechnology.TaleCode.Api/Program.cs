@@ -1,4 +1,5 @@
 using Microsoft.OpenApi.Models;
+using SolTechnology.Core.Api;
 using SolTechnology.Core.Authentication;
 using SolTechnology.TaleCode.PlayerRegistry.Queries;
 using Swashbuckle.AspNetCore.Filters;
@@ -15,7 +16,7 @@ builder.Services.AddLogging(c =>
         c.AddConsole()
         .AddApplicationInsights());
 builder.Services.AddApplicationInsightsTelemetry();
-
+builder.Services.AddApiMiddlewares();
 
 builder.Services.InstallQueries();
 
@@ -56,8 +57,9 @@ var app = builder.Build();
 app.UseSwagger();
 app.UseSwaggerUI();
 
-
 app.UseExceptionHandler("/error");
+app.UseApiMiddlewares();
+
 
 app.UseHttpsRedirection();
 

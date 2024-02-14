@@ -1,39 +1,39 @@
 ﻿namespace SolTechnology.Core.CQRS
 {
-    public class CommandResult
+    public class ResultBase
     {
         public bool IsSuccess { get; init; }
         public bool IsFailure => !IsSuccess;
         public string ErrorMessage { get; init; }
 
-        public static CommandResult Succeeded()
+        public static ResultBase Succeeded()
         {
-            return new CommandResult
+            return new ResultBase
             {
                 IsSuccess = true
             };
         }
 
-        public static Task<CommandResult> SucceededTask()
+        public static Task<ResultBase> SucceededTask()
         {
-            return Task.FromResult(new CommandResult
+            return Task.FromResult(new ResultBase
             {
                 IsSuccess = true
             });
         }
 
-        public static CommandResult Failed(string message)
+        public static ResultBase Failed(string message)
         {
-            return new CommandResult
+            return new ResultBase
             {
                 ErrorMessage = message,
                 IsSuccess = false
             };
         }
 
-        public static Task<CommandResult> FailedTask(string message)
+        public static Task<ResultBase> FailedTask(string message)
         {
-            return Task.FromResult(new CommandResult
+            return Task.FromResult(new ResultBase
             {
                 ErrorMessage = message,
                 IsSuccess = false
@@ -41,41 +41,41 @@
         }
     }
 
-    public class CommandResult<T> : CommandResult
+    public class ResultBase<T> : ResultBase
     {
         public T Data { get; set; }
 
 
-        public static CommandResult<T> Succeeded(T data)
+        public static ResultBase<T> Succeeded(T data)
         {
-            return new CommandResult<T>
+            return new ResultBase<T>
             {
                 IsSuccess = true,
                 Data = data
             };
         }
 
-        public new static CommandResult<T> Failed(string message)
+        public new static ResultBase<T> Failed(string message)
         {
-            return new CommandResult<T>
+            return new ResultBase<T>
             {
                 ErrorMessage = message,
                 IsSuccess = false
             };
         }
 
-        public new static Task<CommandResult<T>> FailedTask(string message)
+        public new static Task<ResultBase<T>> FailedTask(string message)
         {
-            return Task.FromResult(new CommandResult<T>
+            return Task.FromResult(new ResultBase<T>
             {
                 ErrorMessage = message,
                 IsSuccess = false
             });
         }
 
-        public static Task<CommandResult<T>> SucceededTask(T data)
+        public static Task<ResultBase<T>> SucceededTask(T data)
         {
-            return Task.FromResult(new CommandResult<T>
+            return Task.FromResult(new ResultBase<T>
             {
                 IsSuccess = true,
                 Data = data

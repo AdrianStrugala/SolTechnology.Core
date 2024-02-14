@@ -16,7 +16,7 @@ public class CommandHandlerValidationDecorator<TCommand, TResult> : ICommandHand
         _validators = validators;
     }
 
-    public async Task<CommandResult<TResult>> Handle(TCommand command)
+    public async Task<ResultBase<TResult>> Handle(TCommand command)
     {
         var errors = new List<ValidationFailure>();
 
@@ -28,7 +28,7 @@ public class CommandHandlerValidationDecorator<TCommand, TResult> : ICommandHand
         if (errors.Any())
         {
             var errorMessage = BuildErrorMessage(errors);
-            return CommandResult<TResult>.Failed(errorMessage);
+            return ResultBase<TResult>.Failed(errorMessage);
         }
         else
         {

@@ -1,10 +1,11 @@
 ﻿using DreamTravel.TravelingSalesmanProblem;
+using SolTechnology.Core.CQRS.Operations;
 
 namespace DreamTravel.Trips.Queries.CalculateBestPath.Executors
 {
     public interface ISolveTsp
     {
-        void Execute(CalculateBestPathContext calculateBestPathContext);
+        Task<OperationResult> Execute(CalculateBestPathContext calculateBestPathContext);
     }
 
     public class SolveTsp : ISolveTsp
@@ -16,9 +17,10 @@ namespace DreamTravel.Trips.Queries.CalculateBestPath.Executors
             _tsp = tsp;
         }
 
-        public void Execute(CalculateBestPathContext calculateBestPathContext)
+        public Task<OperationResult> Execute(CalculateBestPathContext calculateBestPathContext)
         {
             calculateBestPathContext.OrderOfCities = _tsp.SolveTSP(calculateBestPathContext.OptimalDistances.ToList());
+            return OperationResult.SucceededTask();
         }
     }
 }

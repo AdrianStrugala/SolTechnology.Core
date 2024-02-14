@@ -1,115 +1,112 @@
-﻿using DreamTravel.TravelingSalesmanProblem;
-using DreamTravel.Trips.Domain.Cities;
-using DreamTravel.Trips.Queries.CalculateBestPath.Executors;
-using Polly;
+﻿using DreamTravel.Trips.Queries.CalculateBestPath.Executors;
 using SolTechnology.Core.CQRS;
 using SolTechnology.Core.CQRS.Operations;
-using Path = DreamTravel.Trips.Domain.Paths.Path;
 
 namespace DreamTravel.Trips.Queries.CalculateBestPath;
 
-public class CalculateBestPathHandler : OperationQueryHandlerBase<CalculateBestPathQuery, CalculateBestPathResult, CalculateBestPathContext>
+public class CalculateBestPathHandler : IQueryHandler<CalculateBestPathQuery, CalculateBestPathResult>
 {
     private readonly Func<CalculateBestPathContext, Task<OperationResult>> _downloadRoadData;
-    private readonly Func<List<City>, CalculateBestPathContext, List<int>, List<Path>> _formPathsFromMatrices;
-    private readonly Action<CalculateBestPathContext> _findProfitablePath;
-    private readonly Action<CalculateBestPathContext> _solveTSP;
+    private readonly Func<CalculateBestPathContext, Task<OperationResult>> _findProfitablePath;
+    private readonly Func<CalculateBestPathContext, Task<OperationResult>> _solveTSP;
+    private readonly Func<CalculateBestPathContext, CalculateBestPathResult> _formPathsFromMatrices;
 
     public CalculateBestPathHandler(
         IDownloadRoadData downloadRoadData,
-        IFormPathsFromMatrices formPathsFromMatrices, ISolveTsp solveTsp, IFindProfitablePath findProfitablePath)
+        IFormCalculateBestPathResult formCalculateBestPathResult, ISolveTsp solveTsp, IFindProfitablePath findProfitablePath)
     {
         _downloadRoadData = downloadRoadData.Execute;
-        _formPathsFromMatrices = formPathsFromMatrices.Execute;
+        _formPathsFromMatrices = formCalculateBestPathResult.Execute;
         _solveTSP = solveTsp.Execute;
         _findProfitablePath = findProfitablePath.Execute;
     }
 
-    public override void Start(CalculateBestPathQuery query)
+
+    public async Task<CalculateBestPathResult> Handle(CalculateBestPathQuery query, CancellationToken cancellationToken = default)
     {
         var cities = query.Cities.Where(c => c != null).ToList();
-        Context = new CalculateBestPathContext(cities!);
-    }
+        var context = new CalculateBestPathContext(cities!);
 
-    public override IEnumerable<IOperation<CalculateBestPathContext>> OperationsOrder()
-    {
-        throw new NotImplementedException();
-    }
+        var result = await Chain2
+             .Start(context, cancellationToken)
+             .Then(_downloadRoadData)
+             .Then(_findProfitablePath)
+             .Then(_solveTSP)
+             .End(_formPathsFromMatrices);
 
-    public override Task<CalculateBestPathResult> End()
-    {
-        throw new NotImplementedException();
-    }
-
-    public async Task<CalculateBestPathResult> Handle(CalculateBestPathQuery query)
-    {
-
-
-
-        await Chain2
-            .Start(context)
-            .Next(_downloadRoadData)
-            .Next(_findProfitablePath)
-            .Next(_solveTSP);
-
-        CalculateBestPathResult calculateBestPathResult = new CalculateBestPathResult
-        {
-            Cities = cities!,
-            BestPaths = _formPathsFromMatrices(cities!, context, context.OrderOfCities)
-        };
-        return calculateBestPathResult;
+        return result;
     }
 }
 
 public static class Chain2
 {
-    public static Chain2<TContext> Start<TContext>(TContext context)
+    public static Chain2<TContext> Start<TContext>(TContext context, CancellationToken cancellationToken)
     {
-        return new Chain2<TContext>(context);
+        return new Chain2<TContext>(context, cancellationToken);
     }
 }
 
 
 public class Chain2<TContext>
 {
-    private TContext Context { get; }
+    private readonly CancellationToken _cancellationToken;
+    private readonly List<Exception> _exceptions = new();
+    internal TContext Context { get; }
 
 
 
-    public Chain2(TContext context)
+    public Chain2(TContext context, CancellationToken cancellationToken)
     {
+        _cancellationToken = cancellationToken;
         Context = context;
     }
 
-    // public Chain2<TContext> Next(Action<TContext> action)
-    // {
-    //     action.Invoke(Context);
-    //     return this;
-    // }
-
-    public async Task<Chain2<TContext>> Next(Func<TContext, Task<OperationResult>> func)
+    public async Task<Chain2<TContext>> Then(Func<TContext, Task<OperationResult>> func)
     {
-        var operationResult = new OperationResult();
+        _cancellationToken.ThrowIfCancellationRequested();
 
+        if (_exceptions.Any())
+        {
+            return this;
+        }
+
+        var operationResult = new OperationResult();
         try
         {
             operationResult = await func.Invoke(Context);
         }
         catch (Exception e)
         {
-            operationResult = OperationResult.Failed(e.Message);
+            _exceptions.Add(e);
+        }
+        if (operationResult.IsFailed)
+        {
+            _exceptions.Add(new Exception(operationResult.ErrorMessage));
         }
         return this;
+    }
+
+    public TResult End<TResult>(Func<TContext, TResult> func)
+    {
+        return func.Invoke(Context);
     }
 }
 
 public static class Chain2Extensions
 {
-    public static async Task<Chain2<TContext>> Next<TContext>(
+    public static async Task<Chain2<TContext>> Then<TContext>(
         this Task<Chain2<TContext>> asyncChain,
-        Action<TContext> action)
+        Func<TContext, Task<OperationResult>> action)
     {
         var chain = await asyncChain;
-        return chain.Next(action);
+        return await chain.Then(action);
+    }
+
+    public static async Task<TResult> End<TContext, TResult>(
+        this Task<Chain2<TContext>> asyncChain,
+        Func<TContext, TResult> action)
+    {
+        var chain = await asyncChain;
+        return chain.End(action);
     }
 }

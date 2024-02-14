@@ -17,11 +17,11 @@ namespace DreamTravel.Trips.Queries.UnitTests.CalculateBestPath
         public CalculateBestPathTests()
         {
             _downloadRoadData = Substitute.For<IDownloadRoadData>();
-            IFormPathsFromMatrices formPathsFromMatrices = new FormPathsFromMatrices();
+            IFormCalculateBestPathResult formCalculateBestPathResult = new FormPathsFromMatrices();
             _tspSolver = Substitute.For<ITSP>();
             _evaluationBrain = Substitute.For<IFindProfitablePath>();
 
-            _sut = new CalculateBestPathHandler(_downloadRoadData, formPathsFromMatrices, _tspSolver, _evaluationBrain);
+            _sut = new CalculateBestPathHandler(_downloadRoadData, formCalculateBestPathResult, _tspSolver, _evaluationBrain);
         }
 
         [Fact]

@@ -14,6 +14,11 @@ namespace SolTechnology.TaleCode.PlayerRegistry.Queries.GetPlayerStatistics
 
         public async Task<GetPlayerStatisticsResult> Handle(GetPlayerStatisticsQuery query)
         {
+            return new GetPlayerStatisticsResult
+            {
+                Id = 2137
+            };
+
             var data = await _playerStatisticsRepository.Get(query.PlayerId);
 
             var result = new GetPlayerStatisticsResult

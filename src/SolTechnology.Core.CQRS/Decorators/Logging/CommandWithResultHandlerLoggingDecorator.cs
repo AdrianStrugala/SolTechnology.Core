@@ -17,7 +17,7 @@ namespace SolTechnology.Core.CQRS.Decorators.Logging
             _logger = logger;
         }
 
-        public async Task<CommandResult<TResult>> Handle(TCommand command)
+        public async Task<ResultBase<TResult>> Handle(TCommand command)
         {
             string operationName;
 
