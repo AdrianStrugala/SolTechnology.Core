@@ -16,13 +16,13 @@ public class QueryHandlerValidationDecorator<TQuery, TResult> : IQueryHandler<TQ
         _validators = validators;
     }
 
-    public async Task<TResult> Handle(TQuery command)
+    public async Task<OperationResult<TResult>> Handle(TQuery command, CancellationToken cancellationToken)
     {
         var errors = new List<ValidationFailure>();
 
         foreach (var validator in _validators)
         {
-            errors.AddRange((await validator.ValidateAsync(command)).Errors);
+            errors.AddRange((await validator.ValidateAsync(command, cancellationToken)).Errors);
         }
 
         if (errors.Any())
@@ -33,7 +33,7 @@ public class QueryHandlerValidationDecorator<TQuery, TResult> : IQueryHandler<TQ
         else
         {
 
-            return await _handler.Handle(command);
+            return await _handler.Handle(command, cancellationToken);
         }
     }
 

@@ -29,7 +29,7 @@ namespace SolTechnology.TaleCode.PlayerRegistry.Commands.SynchronizePlayerMatche
             PublishMessage = messagePublisher.Publish;
         }
 
-        public async Task<CommandResult> Handle(SynchronizePlayerMatchesCommand command)
+        public async Task<OperationResult> Handle(SynchronizePlayerMatchesCommand command)
         {
             await Chain
                 .Start(() => GetPlayerId(command.PlayerId))
@@ -41,7 +41,7 @@ namespace SolTechnology.TaleCode.PlayerRegistry.Commands.SynchronizePlayerMatche
                 .Then(PublishMessage)
                 .EndCommand();
 
-            return CommandResult.Succeeded();
+            return OperationResult.Succeeded();
         }
     }
 }

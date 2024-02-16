@@ -1,39 +1,39 @@
 ﻿namespace SolTechnology.Core.CQRS
 {
-    public class ResultBase
+    public record OperationResult
     {
         public bool IsSuccess { get; init; }
         public bool IsFailure => !IsSuccess;
         public string ErrorMessage { get; init; }
 
-        public static ResultBase Succeeded()
+        public static OperationResult Succeeded()
         {
-            return new ResultBase
+            return new OperationResult
             {
                 IsSuccess = true
             };
         }
 
-        public static Task<ResultBase> SucceededTask()
+        public static Task<OperationResult> SucceededTask()
         {
-            return Task.FromResult(new ResultBase
+            return Task.FromResult(new OperationResult
             {
                 IsSuccess = true
             });
         }
 
-        public static ResultBase Failed(string message)
+        public static OperationResult Failed(string message)
         {
-            return new ResultBase
+            return new OperationResult
             {
                 ErrorMessage = message,
                 IsSuccess = false
             };
         }
 
-        public static Task<ResultBase> FailedTask(string message)
+        public static Task<OperationResult> FailedTask(string message)
         {
-            return Task.FromResult(new ResultBase
+            return Task.FromResult(new OperationResult
             {
                 ErrorMessage = message,
                 IsSuccess = false
@@ -41,41 +41,41 @@
         }
     }
 
-    public class ResultBase<T> : ResultBase
+    public record OperationResult<T> : OperationResult
     {
         public T Data { get; set; }
 
 
-        public static ResultBase<T> Succeeded(T data)
+        public static OperationResult<T> Succeeded(T data)
         {
-            return new ResultBase<T>
+            return new OperationResult<T>
             {
                 IsSuccess = true,
                 Data = data
             };
         }
 
-        public new static ResultBase<T> Failed(string message)
+        public new static OperationResult<T> Failed(string message)
         {
-            return new ResultBase<T>
+            return new OperationResult<T>
             {
                 ErrorMessage = message,
                 IsSuccess = false
             };
         }
 
-        public new static Task<ResultBase<T>> FailedTask(string message)
+        public new static Task<OperationResult<T>> FailedTask(string message)
         {
-            return Task.FromResult(new ResultBase<T>
+            return Task.FromResult(new OperationResult<T>
             {
                 ErrorMessage = message,
                 IsSuccess = false
             });
         }
 
-        public static Task<ResultBase<T>> SucceededTask(T data)
+        public static Task<OperationResult<T>> SucceededTask(T data)
         {
-            return Task.FromResult(new ResultBase<T>
+            return Task.FromResult(new OperationResult<T>
             {
                 IsSuccess = true,
                 Data = data

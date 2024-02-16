@@ -40,9 +40,9 @@ namespace DreamTravel.Api.DreamTrips.v1
             try
             {
                 _logger.LogInformation("TSP Engine: Fire!");
-                CalculateBestPathResult calculateBestPathResult = await _calculateBestPath.Handle(calculateBestPathQuery);
+                var calculateBestPathResult = await _calculateBestPath.Handle(calculateBestPathQuery);
 
-                return Ok(calculateBestPathResult.BestPaths);
+                return Ok(calculateBestPathResult.Data.BestPaths);
             }
 
             catch (Exception ex)

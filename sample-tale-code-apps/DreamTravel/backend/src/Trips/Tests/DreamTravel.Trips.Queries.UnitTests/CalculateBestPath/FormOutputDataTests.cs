@@ -6,7 +6,7 @@ namespace DreamTravel.Trips.Queries.UnitTests.CalculateBestPath
 {
     public class FormPathsFromMatricesTests
     {
-        private readonly FormPathsFromMatrices _sut = new FormPathsFromMatrices();
+        private readonly FormCalculateBestPathResult _sut = new FormCalculateBestPathResult();
 
         [Fact]
         public void GetDurationBetweenTwoCitiesByTollRoad_InvokeWithValidCities_ReturnsSomeDuration()
@@ -38,10 +38,11 @@ namespace DreamTravel.Trips.Queries.UnitTests.CalculateBestPath
 
             List<int> orderOfCities = new List<int>(noOfCities) { 0, 2, 1 };
 
-            CalculateBestPathContext calculateBestPathContext = new CalculateBestPathContext(noOfCities);
+            CalculateBestPathContext calculateBestPathContext = new CalculateBestPathContext(listOfCities);
+            calculateBestPathContext.OrderOfCities = orderOfCities;
 
             //Act
-            var result = _sut.Execute(listOfCities, calculateBestPathContext, orderOfCities);
+            var result = (_sut.Execute(calculateBestPathContext)).BestPaths;
 
             //Assert
             Assert.Equal(noOfCities - 1, result.Count);

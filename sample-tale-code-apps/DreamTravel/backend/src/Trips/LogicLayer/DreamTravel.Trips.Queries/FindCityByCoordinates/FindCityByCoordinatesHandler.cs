@@ -13,7 +13,7 @@ namespace DreamTravel.Trips.Queries.FindCityByCoordinates
             _googleApiClient = googleApiClient;
         }
 
-        public async Task<City> Handle(FindCityByCoordinatesQuery query)
+        public async Task<OperationResult<City>> Handle(FindCityByCoordinatesQuery query, CancellationToken cancellationToken)
         {
             City result = new City
             {
@@ -23,7 +23,7 @@ namespace DreamTravel.Trips.Queries.FindCityByCoordinates
 
             result = await _googleApiClient.GetNameOfCity(result);
 
-            return result;
+            return OperationResult<City>.Succeeded(result);
         }
     }
 }

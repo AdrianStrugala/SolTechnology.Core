@@ -1,4 +1,4 @@
-﻿using SolTechnology.Core.CQRS.Operations;
+﻿using SolTechnology.Core.CQRS;
 
 namespace DreamTravel.Trips.Queries.CalculateBestPath.Executors;
 

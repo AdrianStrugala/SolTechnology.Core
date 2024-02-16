@@ -1,6 +1,5 @@
 ﻿using DreamTravel.Trips.Queries.CalculateBestPath.Executors;
 using SolTechnology.Core.CQRS;
-using SolTechnology.Core.CQRS.Operations;
 
 namespace DreamTravel.Trips.Queries.CalculateBestPath;
 
@@ -22,7 +21,7 @@ public class CalculateBestPathHandler : IQueryHandler<CalculateBestPathQuery, Ca
     }
 
 
-    public async Task<CalculateBestPathResult> Handle(CalculateBestPathQuery query, CancellationToken cancellationToken = default)
+    public async Task<OperationResult<CalculateBestPathResult>> Handle(CalculateBestPathQuery query, CancellationToken cancellationToken = default)
     {
         var cities = query.Cities.Where(c => c != null).ToList();
         var context = new CalculateBestPathContext(cities!);
@@ -34,7 +33,7 @@ public class CalculateBestPathHandler : IQueryHandler<CalculateBestPathQuery, Ca
              .Then(_solveTSP)
              .End(_formResult);
 
-        return result;
+        return OperationResult<CalculateBestPathResult>.Succeeded(result);
     }
 }
 
@@ -79,7 +78,7 @@ public class Chain2<TContext>
         {
             _exceptions.Add(e);
         }
-        if (operationResult.IsFailed)
+        if (operationResult.IsFailure)
         {
             _exceptions.Add(new Exception(operationResult.ErrorMessage));
         }

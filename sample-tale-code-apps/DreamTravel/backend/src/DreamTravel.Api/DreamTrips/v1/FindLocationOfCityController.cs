@@ -41,9 +41,9 @@ namespace DreamTravel.Api.DreamTrips.v1
             {
                 _logger.LogInformation("Looking for city: " + query.Name);
 
-                City city = await _findLocationOfCity.Handle(query);
+                var city = await _findLocationOfCity.Handle(query);
 
-                return Ok(city);
+                return Ok(city.Data);
             }
 
             catch (Exception ex)

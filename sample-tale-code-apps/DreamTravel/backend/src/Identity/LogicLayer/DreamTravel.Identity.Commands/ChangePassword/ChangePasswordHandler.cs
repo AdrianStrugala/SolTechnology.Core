@@ -15,7 +15,7 @@ namespace DreamTravel.Identity.Commands.ChangePassword
             _userRepository = userRepository;
         }
 
-        public Task<ResultBase> Handle(ChangePasswordCommand command)
+        public Task<OperationResult> Handle(ChangePasswordCommand command)
         {
             var user = _userRepository.Get(command.UserId);
 
@@ -24,14 +24,14 @@ namespace DreamTravel.Identity.Commands.ChangePassword
 
             if (currentPassword != user.Password)
             {
-                return ResultBase.FailedTask("Given password does not match user password");
+                return OperationResult.FailedTask("Given password does not match user password");
             }
 
             user.UpdatePassword(newPassword);
 
             _userRepository.Update(user);
 
-            return ResultBase.SucceededTask();
+            return OperationResult.SucceededTask();
         }
     }
 }

@@ -6,19 +6,14 @@ namespace DreamTravel.Trips.Queries.UnitTests.CalculateBestPath
 {
     public class FindProfitablePathTests
     {
-        private readonly FindProfitablePath _sut;
-
-        public FindProfitablePathTests()
-        {
-            _sut = new FindProfitablePath();
-        }
+        private readonly FindProfitablePath _sut = new();
 
         [Fact]
         public void EvaluateCost_ValidData_IntelligentResults()
         {
             //Arrange
             int noOfCities = 3;
-            CalculateBestPathContext matrix = new CalculateBestPathContext(noOfCities);
+            CalculateBestPathContext matrix = new CalculateBestPathContext(new List<City> { new(), new(), new() });
             matrix.Costs = new[]
             {
                 Double.MaxValue, 10, 19,
@@ -42,7 +37,7 @@ namespace DreamTravel.Trips.Queries.UnitTests.CalculateBestPath
 
 
             //Act 
-            _sut.Execute(matrix, noOfCities);
+            _sut.Execute(matrix);
 
 
             //Assert

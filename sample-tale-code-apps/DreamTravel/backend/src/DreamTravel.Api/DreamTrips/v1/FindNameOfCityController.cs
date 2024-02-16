@@ -9,7 +9,6 @@ using DreamTravel.Trips.Queries.FindCityByCoordinates;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
-using SolTechnology.Core.Api;
 using SolTechnology.Core.CQRS;
 
 namespace DreamTravel.Api.DreamTrips.v1
@@ -44,7 +43,7 @@ namespace DreamTravel.Api.DreamTrips.v1
 
                 var result = await _findNameOfCity.Handle(query);
 
-                return Ok(result);
+                return Ok(result.Data);
             }
 
             catch (Exception ex)

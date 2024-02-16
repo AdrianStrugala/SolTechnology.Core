@@ -27,7 +27,7 @@ namespace SolTechnology.TaleCode.PlayerRegistry.Commands.CalculatePlayerStatisti
             StoreResult = playerStatisticsRepository.Add;
         }
 
-        public async Task<ResultBase> Handle(CalculatePlayerStatisticsCommand command)
+        public async Task<OperationResult> Handle(CalculatePlayerStatisticsCommand command)
         {
             var result = new PlayerStatistics { Id = command.PlayerId };
             PlayerIdMap playerIdMap = null;
@@ -46,7 +46,7 @@ namespace SolTechnology.TaleCode.PlayerRegistry.Commands.CalculatePlayerStatisti
                 .Then(_ => StoreResult(result))
                 .EndCommand();
 
-            return ResultBase.Succeeded();
+            return OperationResult.Succeeded();
         }
 
 

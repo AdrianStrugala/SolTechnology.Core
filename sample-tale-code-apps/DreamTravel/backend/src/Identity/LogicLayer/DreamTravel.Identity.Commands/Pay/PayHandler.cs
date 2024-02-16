@@ -16,7 +16,7 @@ namespace DreamTravel.Identity.Commands.Pay
             _api = aiiaApi;
         }
 
-        public async Task<ResultBase<CreatePaymentResponse>> Handle(PayCommand command)
+        public async Task<OperationResult<CreatePaymentResponse>> Handle(PayCommand command)
         {
             var paymentRequest = new CreateAcceptPaymentRequest
             {
@@ -31,7 +31,7 @@ namespace DreamTravel.Identity.Commands.Pay
 
             var result = await _api.CreateAcceptPayment(paymentRequest);
 
-            return ResultBase<CreatePaymentResponse>.Succeeded(result);
+            return OperationResult<CreatePaymentResponse>.Succeeded(result);
         }
     }
 }
