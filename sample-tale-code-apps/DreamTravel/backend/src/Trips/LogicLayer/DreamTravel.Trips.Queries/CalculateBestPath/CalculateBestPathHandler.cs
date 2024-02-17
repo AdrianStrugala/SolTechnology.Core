@@ -33,7 +33,7 @@ public class CalculateBestPathHandler : IQueryHandler<CalculateBestPathQuery, Ca
              .Then(_solveTSP)
              .End(_formResult);
 
-        return OperationResult<CalculateBestPathResult>.Succeeded(result);
+        return result;
     }
 }
 
@@ -85,9 +85,13 @@ public class Chain2<TContext>
         return this;
     }
 
-    public TResult End<TResult>(Func<TContext, TResult> func)
+    public OperationResult<TResult> End<TResult>(Func<TContext, TResult> func)
     {
-        return func.Invoke(Context);
+        if (_exceptions.Any())
+        {
+            return OperationResult<TResult>.Failed(new AggregateException(_exceptions).Message);
+        }
+        return OperationResult<TResult>.Succeeded(func.Invoke(Context));
     }
 }
 
@@ -101,7 +105,7 @@ public static class Chain2Extensions
         return await chain.Then(action);
     }
 
-    public static async Task<TResult> End<TContext, TResult>(
+    public static async Task<OperationResult<TResult>> End<TContext, TResult>(
         this Task<Chain2<TContext>> asyncChain,
         Func<TContext, TResult> action)
     {
