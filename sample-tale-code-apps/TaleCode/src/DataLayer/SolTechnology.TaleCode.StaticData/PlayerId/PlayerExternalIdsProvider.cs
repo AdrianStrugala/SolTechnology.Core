@@ -7,13 +7,13 @@
             { 44, new PlayerIdMap {FootballDataId = 44, ApiFootballId = 874} }
         };
 
-        public PlayerIdMap Get(int applicationId)
+        public PlayerIdMap Get(int playerId)
         {
-            PlayerIdMap.TryGetValue(applicationId, out var result);
+            PlayerIdMap.TryGetValue(playerId, out var result);
 
             if (result == null)
             {
-                throw new ArgumentException($"Player [{applicationId}] was not found. Please provide his Id's to StaticData Mapping");
+                throw new ArgumentException($"Player [{playerId}] was not found. Please provide his Id's to StaticData Mapping");
             }
 
             return result;
