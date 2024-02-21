@@ -1,34 +1,43 @@
 ﻿using SolTechnology.Core.Cache;
+using SolTechnology.Core.CQRS;
 using SolTechnology.TaleCode.ApiClients.ApiFootballApi;
 using SolTechnology.TaleCode.ApiClients.FootballDataApi;
 using SolTechnology.TaleCode.Domain;
-using SolTechnology.TaleCode.PlayerRegistry.Commands.SynchronizePlayerMatches.Interfaces;
 using SolTechnology.TaleCode.SqlData.Repository.PlayerRepository;
 using SolTechnology.TaleCode.StaticData.PlayerId;
 
 namespace SolTechnology.TaleCode.PlayerRegistry.Commands.SynchronizePlayerMatches.Executors
 {
+    public interface ISyncPlayer
+    {
+        Task<OperationResult> Execute(SynchronizePlayerMatchesContext context);
+    }
+
     public class SyncPlayer : ISyncPlayer
     {
+        private readonly IPlayerExternalIdsProvider _externalIdsProvider;
         private readonly IFootballDataApiClient _footballDataApiClient;
         private readonly IPlayerRepository _playerRepository;
         private readonly IApiFootballApiClient _apiFootballApiClient;
         private readonly ILazyTaskCache _lazyTaskCache;
 
         public SyncPlayer(
+            IPlayerExternalIdsProvider externalIdsProvider,
             IFootballDataApiClient footballDataApiClient,
             IPlayerRepository playerRepository,
             IApiFootballApiClient apiFootballApiClient,
             ILazyTaskCache lazyTaskCache)
         {
+            _externalIdsProvider = externalIdsProvider;
             _footballDataApiClient = footballDataApiClient;
             _playerRepository = playerRepository;
             _apiFootballApiClient = apiFootballApiClient;
             _lazyTaskCache = lazyTaskCache;
         }
 
-        public async Task<Player> Execute(PlayerIdMap playerIdMap)
+        public async Task<OperationResult> Execute(SynchronizePlayerMatchesContext context)
         {
+            var playerIdMap = _externalIdsProvider.Get(context.PlayerId);
             var clientPlayer = await _lazyTaskCache.GetOrAdd(playerIdMap.FootballDataId, _footballDataApiClient.GetPlayerById);
 
             var teams = await _apiFootballApiClient.GetPlayerTeams(playerIdMap.ApiFootballId);
@@ -66,7 +75,8 @@ namespace SolTechnology.TaleCode.PlayerRegistry.Commands.SynchronizePlayerMatche
                 _playerRepository.Update(player);
             }
 
-            return player;
+            context.Player = player;
+            return OperationResult.Succeeded();
         }
     }
 }
