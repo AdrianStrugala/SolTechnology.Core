@@ -29,24 +29,54 @@ namespace SolTechnology.TaleCode.PlayerRegistry.Commands.CalculatePlayerStatisti
 
         public async Task<OperationResult> Handle(CalculatePlayerStatisticsCommand command, CancellationToken cancellationToken)
         {
-            var result = new PlayerStatistics { Id = command.PlayerId };
-            PlayerIdMap playerIdMap = null;
-            Player player = null;
-            List<Match> matches = null;
+            var context = new CalculatePlayerStatisticsContext
+            {
+                Result = new PlayerStatistics { Id = command.PlayerId }
+            };
 
-            await Chain
-                .Start(() => playerIdMap = GetPlayerId(command.PlayerId))
-                .Then(_ => player = GetPlayer(playerIdMap.FootballDataId))
-                .Then(_ => matches = GetMatches(playerIdMap.FootballDataId))
-                .Then(x => ExtractNationalTeamMatches(x, player))
-                .Then(x => AssignNationalTeamMatches(result, x, player))
-                .Then(x => ExtractClubMatches(x, matches))
-                .Then(x => AssignClubMatches(result, x, player))
-                .Then(_ => ApplyPlayerMetadata(result, player, matches))
-                .Then(_ => StoreResult(result))
-                .EndCommand();
-
-            return OperationResult.Succeeded();
+            return await Chain2.Start(context, cancellationToken)
+                .Then(ctx =>
+                {
+                    ctx.PlayerIdMap = GetPlayerId(command.PlayerId);
+                    return OperationResult.SucceededTask();
+                })
+                .Then(ctx =>
+                {
+                    ctx.Player = GetPlayer(ctx.PlayerIdMap.FootballDataId);
+                    return OperationResult.SucceededTask();
+                })
+                .Then(ctx =>
+                {
+                    ctx.Matches = GetMatches(ctx.PlayerIdMap.FootballDataId);
+                    return OperationResult.SucceededTask();
+                })
+                .Then(ctx =>
+                {
+                    ctx.NationalTeamMatches = ExtractNationalTeamMatches(ctx.Matches, ctx.Player);
+                    return OperationResult.SucceededTask();
+                })
+                .Then(ctx =>
+                {
+                    AssignNationalTeamMatches(ctx.Result, ctx.NationalTeamMatches, ctx.Player);
+                    return OperationResult.SucceededTask();
+                })
+                .Then(ctx =>
+                {
+                    ctx.ClubMatches = ExtractClubMatches(ctx.NationalTeamMatches, ctx.Matches);
+                    return OperationResult.SucceededTask();
+                })
+                .Then(ctx =>
+                {
+                    AssignClubMatches(ctx.Result, ctx.ClubMatches, ctx.Player);
+                    return OperationResult.SucceededTask();
+                })
+                .Then(async ctx =>
+                {
+                    ApplyPlayerMetadata(ctx.Result, ctx.Player, ctx.Matches);
+                    await StoreResult(ctx.Result);
+                    return OperationResult.Succeeded();
+                })
+                .End(ctx => ctx.Result);
         }
 
 
