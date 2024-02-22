@@ -102,7 +102,9 @@
         {
             if (_exceptions.Any())
             {
-                return OperationResult<TResult>.Failed(new AggregateException(_exceptions).Message);
+                var errorMessage = string.Join(string.Empty, _exceptions.Select(x =>
+                    $"{Environment.NewLine} -- {x.Message}"));
+                return OperationResult<TResult>.Failed(errorMessage);
             }
             return OperationResult<TResult>.Succeeded(func.Invoke(Context));
         }

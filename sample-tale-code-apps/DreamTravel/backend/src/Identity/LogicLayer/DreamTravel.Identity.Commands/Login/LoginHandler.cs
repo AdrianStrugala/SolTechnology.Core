@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Threading;
+using System.Threading.Tasks;
 using DreamTravel.Identity.Cryptography;
 using DreamTravel.Identity.DatabaseData.Repositories.Users;
 using DreamTravel.Identity.Domain.Users;
@@ -16,7 +17,7 @@ namespace DreamTravel.Identity.Commands.Login
         }
 
 
-        public Task<OperationResult<LoginResult>> Handle(LoginQuery query)
+        public Task<OperationResult<LoginResult>> Handle(LoginQuery query, CancellationToken cancellationToken)
         {
             LoginResult result = new LoginResult();
 

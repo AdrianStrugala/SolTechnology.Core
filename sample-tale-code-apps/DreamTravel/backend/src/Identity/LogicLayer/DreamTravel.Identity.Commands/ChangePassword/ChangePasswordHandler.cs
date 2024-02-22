@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Threading;
+using System.Threading.Tasks;
 using DreamTravel.Identity.Cryptography;
 using DreamTravel.Identity.DatabaseData.Repositories.Users;
 using DreamTravel.Identity.Domain.Users;
@@ -15,7 +16,7 @@ namespace DreamTravel.Identity.Commands.ChangePassword
             _userRepository = userRepository;
         }
 
-        public Task<OperationResult> Handle(ChangePasswordCommand command)
+        public Task<OperationResult> Handle(ChangePasswordCommand command, CancellationToken cancellationToken)
         {
             var user = _userRepository.Get(command.UserId);
 

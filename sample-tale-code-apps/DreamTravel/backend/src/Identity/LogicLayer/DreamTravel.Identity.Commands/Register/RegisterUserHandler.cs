@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Threading;
+using System.Threading.Tasks;
 using DreamTravel.Identity.Cryptography;
 using DreamTravel.Identity.DatabaseData.Repositories.Users;
 using DreamTravel.Identity.Domain.Users;
@@ -15,7 +16,7 @@ namespace DreamTravel.Identity.Commands.Register
             _userRepository = userRepository;
         }
 
-        public Task<OperationResult> Handle(RegisterUserCommand command)
+        public Task<OperationResult> Handle(RegisterUserCommand command, CancellationToken cancellationToken)
         {
             var alreadyExistingUser = _userRepository.Get(command.Email);
 

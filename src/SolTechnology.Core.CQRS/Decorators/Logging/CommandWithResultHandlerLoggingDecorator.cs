@@ -17,7 +17,7 @@ namespace SolTechnology.Core.CQRS.Decorators.Logging
             _logger = logger;
         }
 
-        public async Task<OperationResult<TResult>> Handle(TCommand command)
+        public async Task<OperationResult<TResult>> Handle(TCommand command, CancellationToken cancellationToken = default)
         {
             string operationName;
 
@@ -39,7 +39,7 @@ namespace SolTechnology.Core.CQRS.Decorators.Logging
 
             try
             {
-                var result = await _handler.Handle(command);
+                var result = await _handler.Handle(command, cancellationToken);
 
                 if (result.IsSuccess)
                 {
