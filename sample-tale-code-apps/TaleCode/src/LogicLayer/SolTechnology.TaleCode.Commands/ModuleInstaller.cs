@@ -6,7 +6,6 @@ using SolTechnology.TaleCode.ApiClients;
 using SolTechnology.TaleCode.BlobData;
 using SolTechnology.TaleCode.PlayerRegistry.Commands.SynchronizePlayerMatches;
 using SolTechnology.TaleCode.PlayerRegistry.Commands.SynchronizePlayerMatches.Executors;
-using SolTechnology.TaleCode.PlayerRegistry.Commands.SynchronizePlayerMatches.Interfaces;
 using SolTechnology.TaleCode.SqlData;
 using SolTechnology.TaleCode.StaticData;
 
@@ -29,7 +28,7 @@ namespace SolTechnology.TaleCode.PlayerRegistry.Commands
 
             services.AddScoped<ISyncPlayer, SyncPlayer>();
             services.AddScoped<IDetermineMatchesToSync, DetermineMatchesToSync>();
-            services.AddScoped<ISyncMatch, SyncMatch>();
+            services.AddScoped<ISyncMatches, SyncMatches>();
 
 
             return services;

@@ -12,8 +12,13 @@ namespace SolTechnology.TaleCode.PlayerRegistry.Queries.GetPlayerStatistics
             _playerStatisticsRepository = playerStatisticsRepository;
         }
 
-        public async Task<GetPlayerStatisticsResult> Handle(GetPlayerStatisticsQuery query)
+        public async Task<OperationResult<GetPlayerStatisticsResult>> Handle(GetPlayerStatisticsQuery query, CancellationToken cancellationToken)
         {
+            return OperationResult<GetPlayerStatisticsResult>.Succeeded(new GetPlayerStatisticsResult
+            {
+                Id = 2137
+            });
+
             var data = await _playerStatisticsRepository.Get(query.PlayerId);
 
             var result = new GetPlayerStatisticsResult
@@ -31,7 +36,7 @@ namespace SolTechnology.TaleCode.PlayerRegistry.Queries.GetPlayerStatistics
                 }).ToList()
             };
 
-            return result;
+            return OperationResult<GetPlayerStatisticsResult>.Succeeded(result);
         }
     }
 }

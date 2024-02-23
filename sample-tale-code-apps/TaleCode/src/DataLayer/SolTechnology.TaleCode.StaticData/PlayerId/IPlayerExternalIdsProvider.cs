@@ -2,5 +2,5 @@
 
 public interface IPlayerExternalIdsProvider
 {
-    PlayerIdMap Get(int applicationId);
+    PlayerIdMap Get(int playerId);
 }

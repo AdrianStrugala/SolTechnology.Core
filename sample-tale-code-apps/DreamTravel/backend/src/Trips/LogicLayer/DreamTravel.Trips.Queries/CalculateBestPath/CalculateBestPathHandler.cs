@@ -1,41 +1,38 @@
-﻿using DreamTravel.TravelingSalesmanProblem;
-using DreamTravel.Trips.Domain.Cities;
-using DreamTravel.Trips.Queries.CalculateBestPath.Executors;
+﻿using DreamTravel.Trips.Queries.CalculateBestPath.Executors;
 using SolTechnology.Core.CQRS;
-using Path = DreamTravel.Trips.Domain.Paths.Path;
 
 namespace DreamTravel.Trips.Queries.CalculateBestPath;
 
 public class CalculateBestPathHandler : IQueryHandler<CalculateBestPathQuery, CalculateBestPathResult>
 {
-    private readonly Func<List<City>, CalculateBestPathContext, Task> _downloadRoadData;
-    private readonly Func<List<City>, CalculateBestPathContext, List<int>, List<Path>> _formPathsFromMatrices;
-    private readonly Func<List<double>, List<int>> _solveTSP;
-    private readonly Action<CalculateBestPathContext, int> _findProfitablePath;
+    private readonly Func<CalculateBestPathContext, Task<OperationResult>> _downloadRoadData;
+    private readonly Func<CalculateBestPathContext, Task<OperationResult>> _findProfitablePath;
+    private readonly Func<CalculateBestPathContext, Task<OperationResult>> _solveTSP;
+    private readonly Func<CalculateBestPathContext, CalculateBestPathResult> _formResult;
 
-    public CalculateBestPathHandler(IDownloadRoadData downloadRoadData, IFormPathsFromMatrices formPathsFromMatrices, ITSP solveTsp, IFindProfitablePath findProfitablePath)
+    public CalculateBestPathHandler(
+        IDownloadRoadData downloadRoadData,
+        IFormCalculateBestPathResult formCalculateBestPathResult, ISolveTsp solveTsp, IFindProfitablePath findProfitablePath)
     {
         _downloadRoadData = downloadRoadData.Execute;
-        _formPathsFromMatrices = formPathsFromMatrices.Execute;
-        _solveTSP = solveTsp.SolveTSP;
+        _formResult = formCalculateBestPathResult.Execute;
+        _solveTSP = solveTsp.Execute;
         _findProfitablePath = findProfitablePath.Execute;
     }
 
-    public async Task<CalculateBestPathResult> Handle(CalculateBestPathQuery query)
+
+    public async Task<OperationResult<CalculateBestPathResult>> Handle(CalculateBestPathQuery query, CancellationToken cancellationToken = default)
     {
         var cities = query.Cities.Where(c => c != null).ToList();
-        var context = new CalculateBestPathContext(cities.Count);
+        var context = new CalculateBestPathContext(cities!);
 
-        await _downloadRoadData(cities!, context);
-        _findProfitablePath(context, cities.Count);
+        var result = await Chain2
+             .Start(context, cancellationToken)
+             .Then(_downloadRoadData)
+             .Then(_findProfitablePath)
+             .Then(_solveTSP)
+             .End(_formResult);
 
-        var orderOfCities = _solveTSP(context.OptimalDistances.ToList());
-
-        CalculateBestPathResult calculateBestPathResult = new CalculateBestPathResult
-        {
-            Cities = cities!,
-            BestPaths = _formPathsFromMatrices(cities!, context, orderOfCities)
-        };
-        return calculateBestPathResult;
+        return result;
     }
 }

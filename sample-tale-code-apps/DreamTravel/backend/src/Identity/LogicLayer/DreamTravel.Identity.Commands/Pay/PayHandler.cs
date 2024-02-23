@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Threading;
+using System.Threading.Tasks;
 using DreamTravel.Identity.DatabaseData.Repositories.Users;
 using DreamTravel.Identity.HttpClients.Aiia;
 using SolTechnology.Core.CQRS;
@@ -16,7 +17,7 @@ namespace DreamTravel.Identity.Commands.Pay
             _api = aiiaApi;
         }
 
-        public async Task<CommandResult<CreatePaymentResponse>> Handle(PayCommand command)
+        public async Task<OperationResult<CreatePaymentResponse>> Handle(PayCommand command, CancellationToken cancellationToken)
         {
             var paymentRequest = new CreateAcceptPaymentRequest
             {
@@ -31,7 +32,7 @@ namespace DreamTravel.Identity.Commands.Pay
 
             var result = await _api.CreateAcceptPayment(paymentRequest);
 
-            return CommandResult<CreatePaymentResponse>.Succeeded(result);
+            return OperationResult<CreatePaymentResponse>.Succeeded(result);
         }
     }
 }

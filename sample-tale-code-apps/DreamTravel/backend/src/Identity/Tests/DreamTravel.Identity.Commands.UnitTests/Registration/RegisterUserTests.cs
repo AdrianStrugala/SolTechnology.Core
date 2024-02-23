@@ -32,7 +32,7 @@ namespace DreamTravel.Identity.Commands.UnitTests.Registration
 
 
             //Act
-            var result = await _sut.Handle(new RegisterUserCommand(user.Name, user.Password, user.Email));
+            var result = await _sut.Handle(new RegisterUserCommand(user.Name, user.Password, user.Email), CancellationToken.None);
 
 
             //Assert
@@ -53,7 +53,7 @@ namespace DreamTravel.Identity.Commands.UnitTests.Registration
 
 
             //Act
-            var result = await _sut.Handle(new RegisterUserCommand(user.Name, user.Password, user.Email));
+            var result = await _sut.Handle(new RegisterUserCommand(user.Name, user.Password, user.Email), CancellationToken.None);
 
 
             //Assert

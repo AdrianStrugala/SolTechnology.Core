@@ -1,12 +1,13 @@
 ﻿using DreamTravel.GeolocationData.GoogleApi;
 using DreamTravel.GeolocationData.MichelinApi;
 using DreamTravel.Trips.Domain.Cities;
+using SolTechnology.Core.CQRS;
 
 namespace DreamTravel.Trips.Queries.CalculateBestPath.Executors;
 
 public interface IDownloadRoadData
 {
-    Task Execute(List<City> listOfCities, CalculateBestPathContext calculateBestPathContext);
+    Task<OperationResult> Execute(CalculateBestPathContext calculateBestPathContext);
 }
 
 public class DownloadRoadData : IDownloadRoadData
@@ -20,8 +21,9 @@ public class DownloadRoadData : IDownloadRoadData
         _michelinApiClient = michelinApiClient;
     }
 
-    public async Task Execute(List<City> listOfCities, CalculateBestPathContext calculateBestPathContext)
+    public async Task<OperationResult> Execute(CalculateBestPathContext calculateBestPathContext)
     {
+        var listOfCities = calculateBestPathContext.Cities;
         List<Task> tasks = new List<Task>
         {
             Task.Run(async () => calculateBestPathContext.TollDistances = await _googleApiClient.GetDurationMatrixByTollRoad(listOfCities)),
@@ -31,6 +33,8 @@ public class DownloadRoadData : IDownloadRoadData
         tasks.AddRange(DownloadCostMatrix(listOfCities, calculateBestPathContext));
 
         await Task.WhenAll(tasks);
+
+        return OperationResult.Succeeded();
     }
 
     private List<Task> DownloadCostMatrix(List<City> listOfCities, CalculateBestPathContext calculateBestPathContext)

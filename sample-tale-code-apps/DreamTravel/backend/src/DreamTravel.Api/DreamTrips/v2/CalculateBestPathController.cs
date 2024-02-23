@@ -6,13 +6,12 @@ using DreamTravel.Trips.Domain.Paths;
 using DreamTravel.Trips.Queries.CalculateBestPath;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using SolTechnology.Core.Api;
 using SolTechnology.Core.CQRS;
 
 namespace DreamTravel.Api.DreamTrips.v2
 {
     [Route(Route)]
-    public class CalculateBestPathController : BaseController
+    public class CalculateBestPathController : ControllerBase
     {
         public const string Route = "api/v2/CalculateBestPath";
 
@@ -36,7 +35,7 @@ namespace DreamTravel.Api.DreamTrips.v2
         public async Task<IActionResult> CalculateBestPath([FromBody] CalculateBestPathQuery calculateBestPathQuery)
         {
             _logger.LogInformation("TSP Engine: Fire!");
-            return await Return(_calculateBestPath.Handle(calculateBestPathQuery));
+            return Ok(await _calculateBestPath.Handle(calculateBestPathQuery));
         }
     }
 }

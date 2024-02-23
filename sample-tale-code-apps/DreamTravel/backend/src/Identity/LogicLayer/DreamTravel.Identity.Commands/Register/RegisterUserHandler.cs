@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Threading;
+using System.Threading.Tasks;
 using DreamTravel.Identity.Cryptography;
 using DreamTravel.Identity.DatabaseData.Repositories.Users;
 using DreamTravel.Identity.Domain.Users;
@@ -15,13 +16,13 @@ namespace DreamTravel.Identity.Commands.Register
             _userRepository = userRepository;
         }
 
-        public Task<CommandResult> Handle(RegisterUserCommand command)
+        public Task<OperationResult> Handle(RegisterUserCommand command, CancellationToken cancellationToken)
         {
             var alreadyExistingUser = _userRepository.Get(command.Email);
 
             if (alreadyExistingUser != null)
             {
-                return CommandResult.FailedTask("User with provided email already exists");
+                return OperationResult.FailedTask("User with provided email already exists");
             }
 
             var user = new User(command.Name, command.Password, command.Email);
@@ -29,7 +30,7 @@ namespace DreamTravel.Identity.Commands.Register
             user.UpdatePassword(Encryption.Encrypt(user.Password));
             _userRepository.Insert(user);
 
-            return CommandResult.SucceededTask();
+            return OperationResult.SucceededTask();
         }
     }
 }

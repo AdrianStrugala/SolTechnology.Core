@@ -5,12 +5,6 @@ namespace DreamTravel.Trips.Queries.CalculateBestPath;
 
 public class CalculateBestPathResult
 {
-    public List<Path> BestPaths { get; set; }
-    public List<City> Cities { get; set; }
-
-    public CalculateBestPathResult()
-    {
-        BestPaths = new List<Path>();
-        Cities = new List<City>();
-    }
+    public List<Path> BestPaths { get; set; } = new();
+    public List<City> Cities { get; set; } = new();
 }

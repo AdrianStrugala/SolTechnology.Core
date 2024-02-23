@@ -5,11 +5,7 @@ namespace DreamTravel.Trips.Queries.UnitTests.LimitCostOfPaths
 {
     public class LimitCostOfPathsTests
     {
-        private readonly LimitCostOfPathsService _sut;
-        public LimitCostOfPathsTests()
-        {
-            _sut = new LimitCostOfPathsService();
-        }
+        private readonly LimitCostOfPathsService _sut = new();
 
         [Fact]
         async Task Handle_ValidInput_ListOfCitiesIsSortedByIndex()
@@ -47,11 +43,11 @@ namespace DreamTravel.Trips.Queries.UnitTests.LimitCostOfPaths
 
 
             //Act
-            var result = await _sut.Handle(new LimitCostOfPathsQuery
+            var result = (await _sut.Handle(new LimitCostOfPathsQuery
             {
                 CostLimit = costLimit,
                 Paths = paths
-            });
+            }, CancellationToken.None)).Data;
 
             //Assert
             Assert.Equal(0, result[0].Index);
@@ -85,11 +81,11 @@ namespace DreamTravel.Trips.Queries.UnitTests.LimitCostOfPaths
 
 
             //Act
-            var result = await _sut.Handle(new LimitCostOfPathsQuery
+            var result = (await _sut.Handle(new LimitCostOfPathsQuery
             {
                 CostLimit = costLimit,
                 Paths = paths
-            });
+            }, CancellationToken.None)).Data;
 
 
             //Assert
@@ -123,11 +119,11 @@ namespace DreamTravel.Trips.Queries.UnitTests.LimitCostOfPaths
 
 
             //Act
-            var result = await _sut.Handle(new LimitCostOfPathsQuery
+            var result = (await _sut.Handle(new LimitCostOfPathsQuery
             {
                 CostLimit = costLimit,
                 Paths = paths
-            });
+            }, CancellationToken.None)).Data;
 
 
             //Assert

@@ -3,14 +3,25 @@ using Path = DreamTravel.Trips.Domain.Paths.Path;
 
 namespace DreamTravel.Trips.Queries.CalculateBestPath.Executors;
 
-public interface IFormPathsFromMatrices
+public interface IFormCalculateBestPathResult
 {
-    List<Path> Execute(List<City> listOfCities, CalculateBestPathContext calculateBestPathContext, List<int> orderOfCities = null);
+    CalculateBestPathResult Execute(CalculateBestPathContext context);
 }
 
-public class FormPathsFromMatrices : IFormPathsFromMatrices
+public class FormCalculateBestPathResult : IFormCalculateBestPathResult
 {
-    public List<Path> Execute(List<City> listOfCities, CalculateBestPathContext calculateBestPathContext, List<int> orderOfCities = null)
+    public CalculateBestPathResult Execute(CalculateBestPathContext context)
+    {
+        CalculateBestPathResult calculateBestPathResult = new CalculateBestPathResult
+        {
+            Cities = context.Cities,
+            BestPaths = FormPathsFromMatrices(context.Cities, context, context.OrderOfCities)
+        };
+
+        return calculateBestPathResult;
+    }
+
+    private List<Path> FormPathsFromMatrices(List<City> listOfCities, CalculateBestPathContext calculateBestPathContext, List<int> orderOfCities = null)
     {
         if (orderOfCities == null)
         {

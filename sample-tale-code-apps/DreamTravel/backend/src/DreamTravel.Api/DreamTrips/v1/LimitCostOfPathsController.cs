@@ -45,11 +45,11 @@ namespace DreamTravel.Api.DreamTrips.v1
                 _logger.LogInformation("Limit Cost Engine: Fire!");
                 List<Path> paths = JsonConvert.DeserializeObject<List<Path>>(HttpContext.Session.GetString(sessionId + PathsKeyName));
 
-                paths = await _limitCostsOfPathsHandler.Handle(new LimitCostOfPathsQuery
+                paths = (await _limitCostsOfPathsHandler.Handle(new LimitCostOfPathsQuery
                 {
                     CostLimit = costLimit,
                     Paths = paths
-                });
+                })).Data;
 
                 HttpContext.Session.SetString(sessionId + PathsKeyName, JsonConvert.SerializeObject(paths));
 

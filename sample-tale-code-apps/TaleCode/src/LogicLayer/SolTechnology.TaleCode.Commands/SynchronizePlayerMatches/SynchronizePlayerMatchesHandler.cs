@@ -1,47 +1,42 @@
 ﻿using SolTechnology.Core.CQRS;
 using SolTechnology.Core.MessageBus;
 using SolTechnology.Core.MessageBus.Publish;
-using SolTechnology.TaleCode.Domain;
-using SolTechnology.TaleCode.PlayerRegistry.Commands.SynchronizePlayerMatches.Interfaces;
-using SolTechnology.TaleCode.StaticData.PlayerId;
+using SolTechnology.TaleCode.PlayerRegistry.Commands.SynchronizePlayerMatches.Executors;
 
 namespace SolTechnology.TaleCode.PlayerRegistry.Commands.SynchronizePlayerMatches
 {
     public class SynchronizePlayerMatchesHandler : ICommandHandler<SynchronizePlayerMatchesCommand>
     {
-        private Func<int, PlayerIdMap> GetPlayerId { get; }
-        private Func<IMessage, Task> PublishMessage { get; }
-        private Func<int, int, Task> SynchronizeMatch { get; }
-        private Func<Player, List<int>> CalculateMatchesToSync { get; }
-        private Func<PlayerIdMap, Task<Player>> SynchronizePlayer { get; }
+        private readonly Func<SynchronizePlayerMatchesContext, Task<OperationResult>> _synchronizePlayer;
+        private readonly Func<SynchronizePlayerMatchesContext, Task<OperationResult>> _calculateMatchesToSync;
+        private readonly Func<SynchronizePlayerMatchesContext, Task<OperationResult>> _synchronizeMatch;
+        private readonly Func<IMessage, Task> _publishMessage;
 
         public SynchronizePlayerMatchesHandler(
             ISyncPlayer syncPlayer,
             IDetermineMatchesToSync determineMatchesToSync,
-            ISyncMatch syncMatch,
-            IPlayerExternalIdsProvider playerExternalIdsProvider,
+            ISyncMatches syncMatches,
             IMessagePublisher messagePublisher)
         {
-            GetPlayerId = playerExternalIdsProvider.Get;
-            SynchronizePlayer = syncPlayer.Execute;
-            CalculateMatchesToSync = determineMatchesToSync.Execute;
-            SynchronizeMatch = syncMatch.Execute;
-            PublishMessage = messagePublisher.Publish;
+            _synchronizePlayer = syncPlayer.Execute;
+            _calculateMatchesToSync = determineMatchesToSync.Execute;
+            _synchronizeMatch = syncMatches.Execute;
+            _publishMessage = messagePublisher.Publish;
         }
 
-        public async Task<CommandResult> Handle(SynchronizePlayerMatchesCommand command)
+        public async Task<OperationResult> Handle(SynchronizePlayerMatchesCommand command, CancellationToken cancellationToken = default)
         {
-            await Chain
-                .Start(() => GetPlayerId(command.PlayerId))
-                .Then(SynchronizePlayer)
-                .Then(CalculateMatchesToSync)
-                .Then(match => match.ForEach(id =>
-                    SynchronizeMatch(command.PlayerId, id)))
-                .Then(_ => new PlayerMatchesSynchronizedEvent(command.PlayerId))
-                .Then(PublishMessage)
-                .EndCommand();
+            var context = new SynchronizePlayerMatchesContext(command.PlayerId);
 
-            return CommandResult.Succeeded();
+            var result = await Chain2
+                .Start(context, cancellationToken)
+                .Then(_synchronizePlayer)
+                .Then(_calculateMatchesToSync)
+                .Then(_synchronizeMatch)
+                .Then(_ => _publishMessage(new PlayerMatchesSynchronizedEvent(context.PlayerId)))
+                .End(_ => OperationResult.Succeeded());
+
+            return result;
         }
     }
 }

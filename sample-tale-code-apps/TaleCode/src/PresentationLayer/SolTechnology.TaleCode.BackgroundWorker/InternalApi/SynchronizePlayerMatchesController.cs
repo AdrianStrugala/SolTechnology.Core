@@ -1,13 +1,12 @@
 using System.Net;
 using Microsoft.AspNetCore.Mvc;
-using SolTechnology.Core.Api;
 using SolTechnology.Core.CQRS;
 using SolTechnology.TaleCode.PlayerRegistry.Commands.SynchronizePlayerMatches;
 
 namespace SolTechnology.TaleCode.BackgroundWorker.InternalApi;
 
 [ApiController]
-public class SynchronizePlayerMatchesController : BaseController
+public class SynchronizePlayerMatchesController : ControllerBase
 {
     private readonly ICommandHandler<SynchronizePlayerMatchesCommand> _handler;
 
@@ -21,5 +20,5 @@ public class SynchronizePlayerMatchesController : BaseController
     [ProducesResponseType((int)HttpStatusCode.OK)]
     [ProducesResponseType((int)HttpStatusCode.BadRequest)]
     public async Task<IActionResult> SynchronizePlayerMatches(int playerId) =>
-         await Invoke(_handler.Handle(new SynchronizePlayerMatchesCommand(playerId)));
+        Ok(await _handler.Handle(new SynchronizePlayerMatchesCommand(playerId)));
 }

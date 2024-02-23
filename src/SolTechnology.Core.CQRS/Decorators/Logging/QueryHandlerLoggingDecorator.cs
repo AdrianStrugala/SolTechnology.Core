@@ -17,7 +17,7 @@ namespace SolTechnology.Core.CQRS.Decorators.Logging
             _logger = logger;
         }
 
-        public async Task<TResult> Handle(TQuery query)
+        public async Task<OperationResult<TResult>> Handle(TQuery query, CancellationToken cancellationToken)
         {
             string operationName;
 
@@ -39,7 +39,7 @@ namespace SolTechnology.Core.CQRS.Decorators.Logging
 
             try
             {
-                var result = await _handler.Handle(query);
+                var result = await _handler.Handle(query, cancellationToken);
                 _logger.OperationSucceeded(operationName, sw.ElapsedMilliseconds);
 
                 return result;

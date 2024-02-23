@@ -13,11 +13,11 @@ namespace DreamTravel.Trips.Queries.FindCityByName
             _googleApiClient = googleApiClient;
         }
 
-        public async Task<City> Handle(FindCityByNameQuery byNameQuery)
+        public async Task<OperationResult<City>> Handle(FindCityByNameQuery byNameQuery, CancellationToken cancellationToken)
         {
             var result = await _googleApiClient.GetLocationOfCity(byNameQuery.Name);
 
-            return result;
+            return OperationResult<City>.Succeeded(result);
         }
     }
 }

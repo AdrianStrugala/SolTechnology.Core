@@ -13,6 +13,7 @@ using System.Globalization;
 using Microsoft.AspNetCore.Mvc.Authorization;
 using System;
 using MicroElements.Swashbuckle.FluentValidation.AspNetCore;
+using SolTechnology.Core.Api;
 
 namespace DreamTravel.Api
 {
@@ -45,7 +46,7 @@ namespace DreamTravel.Api
             var policy = new AuthorizationPolicyBuilder()
                          .RequireAuthenticatedUser()
                          .Build();
-
+            services.AddApiMiddlewares();
             services.AddCors(options =>
             {
                 options.AddPolicy(CorsPolicy,
@@ -123,6 +124,8 @@ namespace DreamTravel.Api
 
             app.UseAuthorization();
             app.UseAuthentication();
+
+            app.UseApiMiddlewares();
 
             app.UseEndpoints(endpoints =>
             {

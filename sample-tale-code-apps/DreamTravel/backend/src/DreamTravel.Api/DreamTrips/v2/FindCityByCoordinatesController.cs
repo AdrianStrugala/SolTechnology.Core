@@ -13,7 +13,7 @@ using SolTechnology.Core.CQRS;
 namespace DreamTravel.Api.DreamTrips.v2
 {
     [Route(Route)]
-    public class FindCityByCoordinatesController : BaseController
+    public class FindCityByCoordinatesController : ControllerBase
     {
         public const string Route = "api/v2/FindCityByCoordinates";
 
@@ -37,7 +37,7 @@ namespace DreamTravel.Api.DreamTrips.v2
         public async Task<IActionResult> FindCityByCoordinates([FromBody] FindCityByCoordinatesQuery query)
         {
             _logger.LogInformation("Looking for city: " + query.Lat + ";" + query.Lng);
-            return await Return(_findNameOfCity.Handle(query));
+            return Ok(await _findNameOfCity.Handle(query));
         }
     }
 }

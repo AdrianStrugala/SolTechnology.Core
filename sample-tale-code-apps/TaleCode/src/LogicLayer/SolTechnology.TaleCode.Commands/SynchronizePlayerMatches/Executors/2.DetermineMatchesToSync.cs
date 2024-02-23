@@ -1,10 +1,15 @@
-﻿using SolTechnology.TaleCode.Domain;
-using SolTechnology.TaleCode.PlayerRegistry.Commands.SynchronizePlayerMatches.Interfaces;
+﻿using SolTechnology.Core.CQRS;
+using SolTechnology.TaleCode.Domain;
 using SolTechnology.TaleCode.SqlData.Repository.ExecutionErrorRepository;
 using SolTechnology.TaleCode.SqlData.Repository.MatchRepository;
 
 namespace SolTechnology.TaleCode.PlayerRegistry.Commands.SynchronizePlayerMatches.Executors
 {
+    public interface IDetermineMatchesToSync
+    {
+        Task<OperationResult> Execute(SynchronizePlayerMatchesContext context);
+    }
+
     public class DetermineMatchesToSync : IDetermineMatchesToSync
     {
         private const int SyncCallsLimit = 9;
@@ -18,8 +23,9 @@ namespace SolTechnology.TaleCode.PlayerRegistry.Commands.SynchronizePlayerMatche
             _executionErrorRepository = executionErrorRepository;
         }
 
-        public List<int> Execute(Player player)
+        public Task<OperationResult> Execute(SynchronizePlayerMatchesContext context)
         {
+            var player = context.Player;
             var syncedMatches = _matchRepository.GetByPlayerId(player.ApiId);
             var syncedMatchesIds = syncedMatches.Select(m => m.ApiId);
 
@@ -44,7 +50,8 @@ namespace SolTechnology.TaleCode.PlayerRegistry.Commands.SynchronizePlayerMatche
                     .ToList();
             }
 
-            return matchesToSync;
+            context.MatchesToSync = matchesToSync;
+            return OperationResult.SucceededTask();
         }
     }
 }

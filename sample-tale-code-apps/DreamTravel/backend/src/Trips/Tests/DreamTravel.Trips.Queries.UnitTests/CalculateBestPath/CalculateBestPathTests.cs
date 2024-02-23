@@ -1,4 +1,3 @@
-using DreamTravel.TravelingSalesmanProblem;
 using DreamTravel.Trips.Domain.Cities;
 using DreamTravel.Trips.Queries.CalculateBestPath;
 using DreamTravel.Trips.Queries.CalculateBestPath.Executors;
@@ -9,7 +8,7 @@ namespace DreamTravel.Trips.Queries.UnitTests.CalculateBestPath
     public class CalculateBestPathTests
     {
         private readonly IDownloadRoadData _downloadRoadData;
-        private readonly ITSP _tspSolver;
+        private readonly ISolveTsp _tspSolver;
         private readonly IFindProfitablePath _evaluationBrain;
 
         private readonly CalculateBestPathHandler _sut;
@@ -17,20 +16,21 @@ namespace DreamTravel.Trips.Queries.UnitTests.CalculateBestPath
         public CalculateBestPathTests()
         {
             _downloadRoadData = Substitute.For<IDownloadRoadData>();
-            IFormPathsFromMatrices formPathsFromMatrices = new FormPathsFromMatrices();
-            _tspSolver = Substitute.For<ITSP>();
+            IFormCalculateBestPathResult formCalculateBestPathResult = new FormCalculateBestPathResult();
+            _tspSolver = Substitute.For<ISolveTsp>();
             _evaluationBrain = Substitute.For<IFindProfitablePath>();
 
-            _sut = new CalculateBestPathHandler(_downloadRoadData, formPathsFromMatrices, _tspSolver, _evaluationBrain);
+            _sut = new CalculateBestPathHandler(_downloadRoadData, formCalculateBestPathResult, _tspSolver, _evaluationBrain);
         }
 
         [Fact]
         public void Handle_ValidData_AllCallsAreDone()
         {
             //Arrange
-            _tspSolver.SolveTSP(Arg.Any<List<double>>()).Returns(new List<int> { 1 });
-
             List<City> cities = new List<City> { new City { Name = "Wroclaw", Latitude = 21, Longitude = 37 } };
+            CalculateBestPathContext calculateBestPathContext = new CalculateBestPathContext(cities);
+
+
 
             //Act
             var result = _sut.Handle(new CalculateBestPathQuery { Cities = cities });
@@ -39,9 +39,9 @@ namespace DreamTravel.Trips.Queries.UnitTests.CalculateBestPath
             //Assert
             Assert.NotNull(result);
 
-            _downloadRoadData.Received(1).Execute(Arg.Any<List<City>>(), Arg.Any<CalculateBestPathContext>());
-            _evaluationBrain.Received(1).Execute(Arg.Any<CalculateBestPathContext>(), Arg.Any<int>());
-            _tspSolver.Received(1).SolveTSP(Arg.Any<List<double>>());
+            _downloadRoadData.Received(1).Execute(Arg.Any<CalculateBestPathContext>());
+            _evaluationBrain.Received(1).Execute(Arg.Any<CalculateBestPathContext>());
+            _tspSolver.Received(1).Execute(Arg.Any<CalculateBestPathContext>());
         }
 
         //        [Fact]

@@ -46,10 +46,10 @@ namespace DreamTravel.Trips.GeolocationDataClients.IntegrationTests
 
             List<City> cities = new List<City> { firstCity, secondCity };
 
-            var context = new CalculateBestPathContext(cities.Count);
+            var context = new CalculateBestPathContext(cities);
 
             //Act
-            await _sut.Execute(cities, context);
+            await _sut.Execute(context);
 
 
             //Assert
@@ -84,11 +84,11 @@ namespace DreamTravel.Trips.GeolocationDataClients.IntegrationTests
                 cities.Add(city);
             }
 
-            var context = new CalculateBestPathContext(cities.Count);
+            var context = new CalculateBestPathContext(cities);
 
 
             //Act
-            await _sut.Execute(cities, context);
+            await _sut.Execute(context);
 
 
             //Assert

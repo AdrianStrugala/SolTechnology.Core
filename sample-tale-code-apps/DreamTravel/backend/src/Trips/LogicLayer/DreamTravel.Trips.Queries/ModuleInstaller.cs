@@ -17,7 +17,8 @@ namespace DreamTravel.Trips.Queries
 
             //CalculateBestPath
             services.AddTransient<IFindProfitablePath, FindProfitablePath>();
-            services.AddTransient<IFormPathsFromMatrices, FormPathsFromMatrices>();
+            services.AddTransient<IFormCalculateBestPathResult, FormCalculateBestPathResult>();
+            services.AddTransient<ISolveTsp, SolveTsp>();
             services.AddTransient<IDownloadRoadData, DownloadRoadData>();
 
 

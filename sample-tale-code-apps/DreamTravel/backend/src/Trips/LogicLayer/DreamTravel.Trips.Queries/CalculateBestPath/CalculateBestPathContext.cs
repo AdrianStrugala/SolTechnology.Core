@@ -1,7 +1,13 @@
-﻿namespace DreamTravel.Trips.Queries.CalculateBestPath;
+﻿using DreamTravel.Trips.Domain.Cities;
+
+namespace DreamTravel.Trips.Queries.CalculateBestPath;
 
 public sealed class CalculateBestPathContext
 {
+    public List<City> Cities { get; }
+    public int NoOfCities { get; }
+    public List<int> OrderOfCities { get; set; }
+
     public double[] FreeDistances { get; set; }
     public double[] TollDistances { get; set; }
     public double[] OptimalDistances { get; set; }
@@ -11,9 +17,11 @@ public sealed class CalculateBestPathContext
     public double[] VinietaCosts { get; set; }
 
 
-    public CalculateBestPathContext(int noOfCities)
+    public CalculateBestPathContext(List<City> cities)
     {
-        int matrixSize = noOfCities * noOfCities;
+        Cities = cities;
+        NoOfCities = cities.Count;
+        int matrixSize = NoOfCities * NoOfCities;
 
         FreeDistances = new double[matrixSize];
         TollDistances = new double[matrixSize];
@@ -23,4 +31,6 @@ public sealed class CalculateBestPathContext
         OptimalCosts = new double[matrixSize];
         VinietaCosts = new double[matrixSize];
     }
+
+ 
 }

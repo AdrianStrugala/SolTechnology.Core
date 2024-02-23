@@ -51,7 +51,7 @@ namespace DreamTravel.Api.Identity
         public async Task<IActionResult> Login([FromBody] LoginQuery query)
         {
             _logger.LogInformation($"Attempt to log in with email: [{query.Email}] and password: [{query.Password}]");
-            var result = await _loginUser.Handle(query);
+            var result = (await _loginUser.Handle(query)).Data;
 
             if (result.Message != string.Empty)
             {

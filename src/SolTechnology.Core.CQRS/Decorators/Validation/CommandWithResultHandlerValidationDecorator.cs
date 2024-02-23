@@ -16,24 +16,24 @@ public class CommandHandlerValidationDecorator<TCommand, TResult> : ICommandHand
         _validators = validators;
     }
 
-    public async Task<CommandResult<TResult>> Handle(TCommand command)
+    public async Task<OperationResult<TResult>> Handle(TCommand command, CancellationToken cancellationToken = default)
     {
         var errors = new List<ValidationFailure>();
 
         foreach (var validator in _validators)
         {
-            errors.AddRange((await validator.ValidateAsync(command)).Errors);
+            errors.AddRange((await validator.ValidateAsync(command, cancellationToken)).Errors);
         }
 
         if (errors.Any())
         {
             var errorMessage = BuildErrorMessage(errors);
-            return CommandResult<TResult>.Failed(errorMessage);
+            return OperationResult<TResult>.Failed(errorMessage);
         }
         else
         {
 
-            return await _handler.Handle(command);
+            return await _handler.Handle(command, cancellationToken);
         }
     }
 

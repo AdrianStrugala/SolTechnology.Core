@@ -9,7 +9,7 @@ using Swashbuckle.AspNetCore.Filters;
 namespace SolTechnology.TaleCode.Api.Controllers;
 
 [ApiController]
-public class GetPlayerStatisticsController : BaseController
+public class GetPlayerStatisticsController : ControllerBase
 {
     private readonly IQueryHandler<GetPlayerStatisticsQuery, GetPlayerStatisticsResult> _handler;
 
@@ -25,5 +25,5 @@ public class GetPlayerStatisticsController : BaseController
     [ProducesResponseType(typeof(ResponseEnvelope<GetPlayerStatisticsResult>), (int)HttpStatusCode.BadRequest),
      SwaggerResponseExample((int)HttpStatusCode.BadRequest, typeof(ErrorExample))]
     public async Task<IActionResult> GetPlayerStatistics(int playerId) =>
-        await Return(_handler.Handle(new GetPlayerStatisticsQuery(playerId)));
+        Ok(await _handler.Handle(new GetPlayerStatisticsQuery(playerId)));
 }

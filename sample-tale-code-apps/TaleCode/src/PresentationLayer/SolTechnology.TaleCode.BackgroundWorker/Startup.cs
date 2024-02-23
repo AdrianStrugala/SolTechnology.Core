@@ -1,4 +1,5 @@
 ﻿using Serilog;
+using SolTechnology.Core.Api;
 using SolTechnology.Core.MessageBus;
 using SolTechnology.Core.Scheduler;
 using SolTechnology.Core.Scheduler.Configuration;
@@ -24,6 +25,7 @@ namespace SolTechnology.TaleCode.BackgroundWorker
                 c.AddConsole()
                     .AddApplicationInsights());
             services.AddApplicationInsightsTelemetry();
+            services.AddApiMiddlewares();
 
             services.InstallCommands();
 
@@ -49,7 +51,7 @@ namespace SolTechnology.TaleCode.BackgroundWorker
                 options.MessageTemplate =
                     "HTTP {RequestMethod} {RequestPath} with headers {Headers} and body {Body} responded {StatusCode} in {Elapsed:0.0000} ms";
             });
-
+            app.UseApiMiddlewares();
             app.UseRouting();
             app.UseEndpoints(endpoints =>
             {

@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Threading;
+using System.Threading.Tasks;
 using DreamTravel.Identity.Cryptography;
 using DreamTravel.Identity.DatabaseData.Repositories.Users;
 using DreamTravel.Identity.Domain.Users;
@@ -16,7 +17,7 @@ namespace DreamTravel.Identity.Commands.Login
         }
 
 
-        public Task<CommandResult<LoginResult>> Handle(LoginQuery query)
+        public Task<OperationResult<LoginResult>> Handle(LoginQuery query, CancellationToken cancellationToken)
         {
             LoginResult result = new LoginResult();
 
@@ -25,18 +26,18 @@ namespace DreamTravel.Identity.Commands.Login
             //User does not exist
             if (userFromDb == null)
             {
-                return CommandResult<LoginResult>.FailedTask("Email not registered");
+                return OperationResult<LoginResult>.FailedTask("Email not registered");
             }
 
             //Invalid password
             if (!Encryption.Decrypt(userFromDb.Password).Equals(query.Password))
             {
-                return CommandResult<LoginResult>.FailedTask("Invalid password");
+                return OperationResult<LoginResult>.FailedTask("Invalid password");
             }
 
             result.User = userFromDb;
 
-            return CommandResult<LoginResult>.SucceededTask(result);
+            return OperationResult<LoginResult>.SucceededTask(result);
         }
     }
 }
