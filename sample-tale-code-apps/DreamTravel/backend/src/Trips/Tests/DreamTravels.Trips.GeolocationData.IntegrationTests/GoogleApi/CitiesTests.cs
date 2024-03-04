@@ -24,7 +24,7 @@ namespace DreamTravel.Trips.GeolocationDataClients.IntegrationTests.GoogleApi
         }
 
         [Fact (Skip = "Paid test")]
-        public async Task Execute_WildernessUnderCoordinats_ReturnsFormattedAddress()
+        public async Task Execute_WildernessUnderCoordinates_ReturnsFormattedAddress()
         {
             //Arrange
             City city = new City

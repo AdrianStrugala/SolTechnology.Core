@@ -1,7 +1,10 @@
+using AutoFixture;
+using AutoFixture.AutoNSubstitute;
 using DreamTravel.Trips.Domain.Cities;
 using DreamTravel.Trips.Queries.CalculateBestPath;
 using DreamTravel.Trips.Queries.CalculateBestPath.Executors;
 using NSubstitute;
+using SolTechnology.Core.CQRS;
 
 namespace DreamTravel.Trips.Queries.UnitTests.CalculateBestPath
 {
@@ -12,36 +15,43 @@ namespace DreamTravel.Trips.Queries.UnitTests.CalculateBestPath
         private readonly IFindProfitablePath _evaluationBrain;
 
         private readonly CalculateBestPathHandler _sut;
+        private readonly IFormCalculateBestPathResult _formCalculateBestPathResult;
 
         public CalculateBestPathTests()
         {
-            _downloadRoadData = Substitute.For<IDownloadRoadData>();
-            IFormCalculateBestPathResult formCalculateBestPathResult = new FormCalculateBestPathResult();
-            _tspSolver = Substitute.For<ISolveTsp>();
-            _evaluationBrain = Substitute.For<IFindProfitablePath>();
+            var fixture = new Fixture().Customize(
+                new AutoNSubstituteCustomization { ConfigureMembers = true });
 
-            _sut = new CalculateBestPathHandler(_downloadRoadData, formCalculateBestPathResult, _tspSolver, _evaluationBrain);
+            _downloadRoadData = fixture.Freeze<IDownloadRoadData>();
+            _formCalculateBestPathResult = fixture.Freeze<IFormCalculateBestPathResult>();
+            _tspSolver = fixture.Freeze<ISolveTsp>();
+            _evaluationBrain = fixture.Freeze<IFindProfitablePath>();
+
+            _sut = fixture.Create<CalculateBestPathHandler>();
         }
 
         [Fact]
-        public void Handle_ValidData_AllCallsAreDone()
+        public async Task Handle_ValidData_AllCallsAreDone()
         {
             //Arrange
-            List<City> cities = new List<City> { new City { Name = "Wroclaw", Latitude = 21, Longitude = 37 } };
-            CalculateBestPathContext calculateBestPathContext = new CalculateBestPathContext(cities);
+            List<City> cities = new() { new() { Name = "Wroclaw", Latitude = 21, Longitude = 37 } };
 
+            _downloadRoadData.Execute(Arg.Any<CalculateBestPathContext>()).ReturnsForAnyArgs(OperationResult.SucceededTask());
+            _tspSolver.Execute(Arg.Any<CalculateBestPathContext>()).ReturnsForAnyArgs(OperationResult.SucceededTask());
+            _evaluationBrain.Execute(Arg.Any<CalculateBestPathContext>()).ReturnsForAnyArgs(OperationResult.SucceededTask());
 
 
             //Act
-            var result = _sut.Handle(new CalculateBestPathQuery { Cities = cities });
+            var result = await _sut.Handle(new CalculateBestPathQuery { Cities = cities! });
 
 
             //Assert
-            Assert.NotNull(result);
+            Assert.True(result.IsSuccess);
 
-            _downloadRoadData.Received(1).Execute(Arg.Any<CalculateBestPathContext>());
-            _evaluationBrain.Received(1).Execute(Arg.Any<CalculateBestPathContext>());
-            _tspSolver.Received(1).Execute(Arg.Any<CalculateBestPathContext>());
+            await _downloadRoadData.Received(1).Execute(Arg.Any<CalculateBestPathContext>());
+            await _evaluationBrain.Received(1).Execute(Arg.Any<CalculateBestPathContext>());
+            await _tspSolver.Received(1).Execute(Arg.Any<CalculateBestPathContext>());
+            _formCalculateBestPathResult.Received(1).Execute(Arg.Any<CalculateBestPathContext>());
         }
 
         //        [Fact]
