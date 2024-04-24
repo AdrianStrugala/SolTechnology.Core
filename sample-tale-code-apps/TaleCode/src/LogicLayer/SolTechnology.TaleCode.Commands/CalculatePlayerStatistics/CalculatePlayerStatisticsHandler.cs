@@ -27,6 +27,7 @@ namespace SolTechnology.TaleCode.PlayerRegistry.Commands.CalculatePlayerStatisti
             StoreResult = playerStatisticsRepository.Add;
         }
 
+        //Example of ugly implementation even when the standard is in place
         public async Task<OperationResult> Handle(CalculatePlayerStatisticsCommand command, CancellationToken cancellationToken)
         {
             var context = new CalculatePlayerStatisticsContext

@@ -7,7 +7,6 @@ namespace SolTechnology.Core.Cache
     {
         public static IServiceCollection AddCache(this IServiceCollection services, CacheConfiguration cacheConfiguration = null)
         {
-
             services
                 .AddOptions<CacheConfiguration>()
                 .Configure<IConfiguration>((config, configuration) =>
@@ -19,11 +18,11 @@ namespace SolTechnology.Core.Cache
 
                     if (cacheConfiguration == null)
                     {
-                        //Apply default values
+                        //Default values: absolute expiration, 20 minutes
                         cacheConfiguration = new CacheConfiguration
                         {
-                            ExpirationMode = ExpirationMode.Sliding,
-                            ExpirationSeconds = 300
+                            ExpirationMode = ExpirationMode.Absolute,
+                            ExpirationSeconds = 20 * 60
                         };
                     }
 
@@ -32,7 +31,8 @@ namespace SolTechnology.Core.Cache
                 });
 
             services.AddMemoryCache();
-            services.AddSingleton<ILazyTaskCache, LazyTaskCache>();
+            services.AddSingleton<ISingletonCache, SingletonCache>();
+            services.AddScoped(typeof(IScopedCache<,>), typeof(ScopedCache<,>));
 
             return services;
         }

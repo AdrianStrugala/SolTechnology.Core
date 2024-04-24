@@ -5,8 +5,13 @@
     <RootNamespace>DreamTravel.GeolocationData</RootNamespace>
   </PropertyGroup>
 
+  <ItemGroup>
+    <PackageReference Include="Scrutor" Version="4.2.2" />
+  </ItemGroup>
+
 	<ItemGroup>
     <ProjectReference Include="..\..\..\..\..\..\..\src\SolTechnology.Core.ApiClient\SolTechnology.Core.ApiClient.csproj" />
+    <ProjectReference Include="..\..\..\..\..\..\..\src\SolTechnology.Core.Cache\SolTechnology.Core.Cache.csproj" />
     <ProjectReference Include="..\..\DreamTravel.Trips.Domain\DreamTravel.Trips.Domain.csproj" />
   </ItemGroup>
 

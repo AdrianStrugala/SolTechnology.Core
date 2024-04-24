@@ -3,6 +3,7 @@
 	<PropertyGroup>
 		<TargetFramework>net6.0</TargetFramework>
 		<RootNamespace>DreamTravel.Api</RootNamespace>
+		<UserSecretsId>b739bf21-d11c-4fd2-8180-f30bd9409a36</UserSecretsId>
 	</PropertyGroup>
 
 	<ItemGroup>

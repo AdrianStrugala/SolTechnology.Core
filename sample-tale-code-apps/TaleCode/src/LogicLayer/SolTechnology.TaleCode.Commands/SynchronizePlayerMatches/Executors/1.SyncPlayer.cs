@@ -19,26 +19,26 @@ namespace SolTechnology.TaleCode.PlayerRegistry.Commands.SynchronizePlayerMatche
         private readonly IFootballDataApiClient _footballDataApiClient;
         private readonly IPlayerRepository _playerRepository;
         private readonly IApiFootballApiClient _apiFootballApiClient;
-        private readonly ILazyTaskCache _lazyTaskCache;
+        private readonly ISingletonCache _singletonCache;
 
         public SyncPlayer(
             IPlayerExternalIdsProvider externalIdsProvider,
             IFootballDataApiClient footballDataApiClient,
             IPlayerRepository playerRepository,
             IApiFootballApiClient apiFootballApiClient,
-            ILazyTaskCache lazyTaskCache)
+            ISingletonCache singletonCache)
         {
             _externalIdsProvider = externalIdsProvider;
             _footballDataApiClient = footballDataApiClient;
             _playerRepository = playerRepository;
             _apiFootballApiClient = apiFootballApiClient;
-            _lazyTaskCache = lazyTaskCache;
+            _singletonCache = singletonCache;
         }
 
         public async Task<OperationResult> Execute(SynchronizePlayerMatchesContext context)
         {
             var playerIdMap = _externalIdsProvider.Get(context.PlayerId);
-            var clientPlayer = await _lazyTaskCache.GetOrAdd(playerIdMap.FootballDataId, _footballDataApiClient.GetPlayerById);
+            var clientPlayer = await _singletonCache.GetOrAdd(playerIdMap.FootballDataId, _footballDataApiClient.GetPlayerById);
 
             var teams = await _apiFootballApiClient.GetPlayerTeams(playerIdMap.ApiFootballId);
 
