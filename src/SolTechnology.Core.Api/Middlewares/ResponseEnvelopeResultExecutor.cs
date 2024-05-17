@@ -19,15 +19,15 @@ namespace SolTechnology.Core.Api.Middlewares
             var resultValue = result.Value;
             var resultValueType = result.Value?.GetType();
 
-            if (resultValueType is { IsGenericType: true } && resultValueType.GetGenericTypeDefinition() == typeof(OperationResult<>))
+            if (resultValueType is { IsGenericType: true } && resultValueType.GetGenericTypeDefinition() == typeof(Result<>))
             {
                 response = new ResponseEnvelope<object>
                 {
-                    IsSuccess = (bool)resultValueType.GetProperty(nameof(OperationResult<object>.IsSuccess))?.GetValue(resultValue)!,
-                    Data = resultValueType.GetProperty(nameof(OperationResult<object>.Data))?.GetValue(resultValue)
+                    IsSuccess = (bool)resultValueType.GetProperty(nameof(Result<object>.IsSuccess))?.GetValue(resultValue)!,
+                    Data = resultValueType.GetProperty(nameof(Result<object>.Data))?.GetValue(resultValue)
                 };
             }
-            else if (resultValue is OperationResult resultAsBase)
+            else if (resultValue is Result resultAsBase)
             {
                 response = new ResponseEnvelope<object>
                 {
