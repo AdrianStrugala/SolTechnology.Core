@@ -10,7 +10,7 @@ namespace SolTechnology.TaleCode.PlayerRegistry.Commands.SynchronizePlayerMatche
 {
     public interface ISyncMatches
     {
-        Task<OperationResult> Execute(SynchronizePlayerMatchesContext context);
+        Task<Result> Execute(SynchronizePlayerMatchesContext context);
     }
 
     public class SyncMatches : ISyncMatches
@@ -32,13 +32,13 @@ namespace SolTechnology.TaleCode.PlayerRegistry.Commands.SynchronizePlayerMatche
             _logger = logger;
         }
 
-        public async Task<OperationResult> Execute(SynchronizePlayerMatchesContext context)
+        public async Task<Result> Execute(SynchronizePlayerMatchesContext context)
         {
             List<Task> tasks = new List<Task>();
             context.MatchesToSync.ForEach(matchId => tasks.Add(SyncMatch(context.PlayerId, matchId)));
             await Task.WhenAll(tasks);
 
-            return OperationResult.Succeeded();
+            return Result.Success();
         }
 
         private async Task SyncMatch(int playerId, int matchId)

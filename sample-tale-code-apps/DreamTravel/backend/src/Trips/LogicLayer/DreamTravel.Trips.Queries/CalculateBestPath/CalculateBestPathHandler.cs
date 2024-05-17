@@ -5,9 +5,9 @@ namespace DreamTravel.Trips.Queries.CalculateBestPath;
 
 public class CalculateBestPathHandler : IQueryHandler<CalculateBestPathQuery, CalculateBestPathResult>
 {
-    private readonly Func<CalculateBestPathContext, Task<OperationResult>> _downloadRoadData;
-    private readonly Func<CalculateBestPathContext, Task<OperationResult>> _findProfitablePath;
-    private readonly Func<CalculateBestPathContext, Task<OperationResult>> _solveTSP;
+    private readonly Func<CalculateBestPathContext, Task<Result>> _downloadRoadData;
+    private readonly Func<CalculateBestPathContext, Task<Result>> _findProfitablePath;
+    private readonly Func<CalculateBestPathContext, Task<Result>> _solveTSP;
     private readonly Func<CalculateBestPathContext, CalculateBestPathResult> _formResult;
 
     public CalculateBestPathHandler(
@@ -21,12 +21,12 @@ public class CalculateBestPathHandler : IQueryHandler<CalculateBestPathQuery, Ca
     }
 
 
-    public async Task<OperationResult<CalculateBestPathResult>> Handle(CalculateBestPathQuery query, CancellationToken cancellationToken = default)
+    public async Task<Result<CalculateBestPathResult>> Handle(CalculateBestPathQuery query, CancellationToken cancellationToken = default)
     {
         var cities = query.Cities.Where(c => c != null).ToList();
         var context = new CalculateBestPathContext(cities!);
 
-        var result = await Chain2
+        var result = await Chain
              .Start(context, cancellationToken)
              .Then(_downloadRoadData)
              .Then(_findProfitablePath)

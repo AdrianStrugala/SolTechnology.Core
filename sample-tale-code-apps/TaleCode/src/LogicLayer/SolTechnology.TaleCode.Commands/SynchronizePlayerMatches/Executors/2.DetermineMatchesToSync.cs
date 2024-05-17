@@ -7,7 +7,7 @@ namespace SolTechnology.TaleCode.PlayerRegistry.Commands.SynchronizePlayerMatche
 {
     public interface IDetermineMatchesToSync
     {
-        Task<OperationResult> Execute(SynchronizePlayerMatchesContext context);
+        Task<Result> Execute(SynchronizePlayerMatchesContext context);
     }
 
     public class DetermineMatchesToSync : IDetermineMatchesToSync
@@ -23,7 +23,7 @@ namespace SolTechnology.TaleCode.PlayerRegistry.Commands.SynchronizePlayerMatche
             _executionErrorRepository = executionErrorRepository;
         }
 
-        public Task<OperationResult> Execute(SynchronizePlayerMatchesContext context)
+        public Task<Result> Execute(SynchronizePlayerMatchesContext context)
         {
             var player = context.Player;
             var syncedMatches = _matchRepository.GetByPlayerId(player.ApiId);
@@ -51,7 +51,7 @@ namespace SolTechnology.TaleCode.PlayerRegistry.Commands.SynchronizePlayerMatche
             }
 
             context.MatchesToSync = matchesToSync;
-            return OperationResult.SucceededTask();
+            return Result.SuccessAsTask();
         }
     }
 }

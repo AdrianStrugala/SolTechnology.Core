@@ -1,39 +1,40 @@
 ﻿namespace SolTechnology.Core.CQRS
 {
-    public record OperationResult
+    public record Result
     {
         public bool IsSuccess { get; init; }
         public bool IsFailure => !IsSuccess;
         public string ErrorMessage { get; init; }
 
-        public static OperationResult Succeeded()
+
+        public static Result Success()
         {
-            return new OperationResult
+            return new Result
             {
                 IsSuccess = true
             };
         }
 
-        public static Task<OperationResult> SucceededTask()
+        public static Task<Result> SuccessAsTask()
         {
-            return Task.FromResult(new OperationResult
+            return Task.FromResult(new Result
             {
                 IsSuccess = true
             });
         }
 
-        public static OperationResult Failed(string message)
+        public static Result Fail(string message)
         {
-            return new OperationResult
+            return new Result
             {
                 ErrorMessage = message,
                 IsSuccess = false
             };
         }
 
-        public static Task<OperationResult> FailedTask(string message)
+        public static Task<Result> FailAsTask(string message)
         {
-            return Task.FromResult(new OperationResult
+            return Task.FromResult(new Result
             {
                 ErrorMessage = message,
                 IsSuccess = false
@@ -41,41 +42,50 @@
         }
     }
 
-    public record OperationResult<T> : OperationResult
+    public record Result<T> : Result
     {
         public T Data { get; set; }
 
-
-        public static OperationResult<T> Succeeded(T data)
+        public static implicit operator Result<T>(T value)
         {
-            return new OperationResult<T>
+            return Success(value);
+        }
+
+        public static implicit operator Result<T>(Exception e)
+        {
+            return Fail(e.Message);
+        }
+
+        public static Result<T> Success(T data)
+        {
+            return new Result<T>
             {
                 IsSuccess = true,
                 Data = data
             };
         }
 
-        public new static OperationResult<T> Failed(string message)
+        public new static Result<T> Fail(string message)
         {
-            return new OperationResult<T>
+            return new Result<T>
             {
                 ErrorMessage = message,
                 IsSuccess = false
             };
         }
 
-        public new static Task<OperationResult<T>> FailedTask(string message)
+        public new static Task<Result<T>> FailAsTask(string message)
         {
-            return Task.FromResult(new OperationResult<T>
+            return Task.FromResult(new Result<T>
             {
                 ErrorMessage = message,
                 IsSuccess = false
             });
         }
 
-        public static Task<OperationResult<T>> SucceededTask(T data)
+        public static Task<Result<T>> SuccessAsTask(T data)
         {
-            return Task.FromResult(new OperationResult<T>
+            return Task.FromResult(new Result<T>
             {
                 IsSuccess = true,
                 Data = data

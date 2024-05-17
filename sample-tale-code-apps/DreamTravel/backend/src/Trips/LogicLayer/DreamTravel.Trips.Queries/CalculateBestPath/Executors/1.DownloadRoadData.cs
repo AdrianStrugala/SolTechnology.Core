@@ -7,7 +7,7 @@ namespace DreamTravel.Trips.Queries.CalculateBestPath.Executors;
 
 public interface IDownloadRoadData
 {
-    Task<OperationResult> Execute(CalculateBestPathContext calculateBestPathContext);
+    Task<Result> Execute(CalculateBestPathContext calculateBestPathContext);
 }
 
 public class DownloadRoadData : IDownloadRoadData
@@ -21,7 +21,7 @@ public class DownloadRoadData : IDownloadRoadData
         _michelinApiClient = michelinApiClient;
     }
 
-    public async Task<OperationResult> Execute(CalculateBestPathContext calculateBestPathContext)
+    public async Task<Result> Execute(CalculateBestPathContext calculateBestPathContext)
     {
         var listOfCities = calculateBestPathContext.Cities;
         List<Task> tasks = new List<Task>
@@ -34,7 +34,7 @@ public class DownloadRoadData : IDownloadRoadData
 
         await Task.WhenAll(tasks);
 
-        return OperationResult.Succeeded();
+        return Result.Success();
     }
 
     private List<Task> DownloadCostMatrix(List<City> listOfCities, CalculateBestPathContext calculateBestPathContext)

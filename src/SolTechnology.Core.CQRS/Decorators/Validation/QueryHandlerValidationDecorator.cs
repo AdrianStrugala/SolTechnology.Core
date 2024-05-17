@@ -16,7 +16,7 @@ public class QueryHandlerValidationDecorator<TQuery, TResult> : IQueryHandler<TQ
         _validators = validators;
     }
 
-    public async Task<OperationResult<TResult>> Handle(TQuery command, CancellationToken cancellationToken)
+    public async Task<Result<TResult>> Handle(TQuery command, CancellationToken cancellationToken)
     {
         var errors = new List<ValidationFailure>();
 

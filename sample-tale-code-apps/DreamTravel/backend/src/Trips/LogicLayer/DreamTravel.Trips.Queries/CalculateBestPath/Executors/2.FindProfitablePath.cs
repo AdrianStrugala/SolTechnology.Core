@@ -4,7 +4,7 @@ namespace DreamTravel.Trips.Queries.CalculateBestPath.Executors;
 
 public interface IFindProfitablePath
 {
-    Task<OperationResult> Execute(CalculateBestPathContext calculateBestPathContext);
+    Task<Result> Execute(CalculateBestPathContext calculateBestPathContext);
 }
 
 public class FindProfitablePath : IFindProfitablePath
@@ -14,7 +14,7 @@ public class FindProfitablePath : IFindProfitablePath
     private static double HighwayVelocity { get; } = 120;
     private static double RoadCombustion { get; } = 0.06; //per km
 
-    public Task<OperationResult> Execute(CalculateBestPathContext context)
+    public Task<Result> Execute(CalculateBestPathContext context)
     {
         Parallel.For(0, context.NoOfCities, i =>
         {
@@ -45,7 +45,7 @@ public class FindProfitablePath : IFindProfitablePath
             });
         });
 
-        return OperationResult.SucceededTask();
+        return Result.SuccessAsTask();
     }
 
 

@@ -36,9 +36,9 @@ namespace DreamTravel.Trips.Queries.UnitTests.CalculateBestPath
             //Arrange
             List<City> cities = new() { new() { Name = "Wroclaw", Latitude = 21, Longitude = 37 } };
 
-            _downloadRoadData.Execute(Arg.Any<CalculateBestPathContext>()).ReturnsForAnyArgs(OperationResult.SucceededTask());
-            _tspSolver.Execute(Arg.Any<CalculateBestPathContext>()).ReturnsForAnyArgs(OperationResult.SucceededTask());
-            _evaluationBrain.Execute(Arg.Any<CalculateBestPathContext>()).ReturnsForAnyArgs(OperationResult.SucceededTask());
+            _downloadRoadData.Execute(Arg.Any<CalculateBestPathContext>()).ReturnsForAnyArgs(Result.SucceededTask());
+            _tspSolver.Execute(Arg.Any<CalculateBestPathContext>()).ReturnsForAnyArgs(Result.SucceededTask());
+            _evaluationBrain.Execute(Arg.Any<CalculateBestPathContext>()).ReturnsForAnyArgs(Result.SucceededTask());
 
 
             //Act

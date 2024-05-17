@@ -5,7 +5,7 @@ namespace DreamTravel.Trips.Queries.LimitCostOfPaths
 {
     public class LimitCostOfPathsService : IQueryHandler<LimitCostOfPathsQuery, List<Path>>
     {
-        public Task<OperationResult<List<Path>>> Handle(LimitCostOfPathsQuery query, CancellationToken cancellationToken)
+        public Task<Result<List<Path>>> Handle(LimitCostOfPathsQuery query, CancellationToken cancellationToken)
         {
             var paths = query.Paths;
             List<double> consideredVinietas = new List<double>();
@@ -58,7 +58,7 @@ namespace DreamTravel.Trips.Queries.LimitCostOfPaths
 
             paths.Sort((x, y) => 1 * x.Index.CompareTo(y.Index));
 
-            return OperationResult<List<Path>>.SucceededTask(paths);
+            return Result<List<Path>>.SuccessAsTask(paths);
         }
     }
 }

@@ -17,7 +17,7 @@ namespace SolTechnology.Core.CQRS.Decorators.Logging
             _logger = logger;
         }
 
-        public async Task<OperationResult<TResult>> Handle(TQuery query, CancellationToken cancellationToken)
+        public async Task<Result<TResult>> Handle(TQuery query, CancellationToken cancellationToken)
         {
             string operationName;
 

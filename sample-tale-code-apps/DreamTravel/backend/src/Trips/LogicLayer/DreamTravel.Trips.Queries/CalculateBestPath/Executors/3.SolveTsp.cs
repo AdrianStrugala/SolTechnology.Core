@@ -5,7 +5,7 @@ namespace DreamTravel.Trips.Queries.CalculateBestPath.Executors
 {
     public interface ISolveTsp
     {
-        Task<OperationResult> Execute(CalculateBestPathContext calculateBestPathContext);
+        Task<Result> Execute(CalculateBestPathContext calculateBestPathContext);
     }
 
     public class SolveTsp : ISolveTsp
@@ -17,10 +17,10 @@ namespace DreamTravel.Trips.Queries.CalculateBestPath.Executors
             _tsp = tsp;
         }
 
-        public Task<OperationResult> Execute(CalculateBestPathContext calculateBestPathContext)
+        public Task<Result> Execute(CalculateBestPathContext calculateBestPathContext)
         {
             calculateBestPathContext.OrderOfCities = _tsp.SolveTSP(calculateBestPathContext.OptimalDistances.ToList());
-            return OperationResult.SucceededTask();
+            return Result.SuccessAsTask();
         }
     }
 }

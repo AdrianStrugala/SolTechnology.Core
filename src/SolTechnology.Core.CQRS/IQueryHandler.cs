@@ -2,6 +2,6 @@
 {
     public interface IQueryHandler<in TQuery, TResult>
     {
-        public Task<OperationResult<TResult>> Handle(TQuery query, CancellationToken cancellationToken = default);
+        public Task<Result<TResult>> Handle(TQuery query, CancellationToken cancellationToken = default);
     }
 }

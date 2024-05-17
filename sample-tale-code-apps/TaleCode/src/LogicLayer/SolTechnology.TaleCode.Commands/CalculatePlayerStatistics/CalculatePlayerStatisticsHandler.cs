@@ -28,55 +28,23 @@ namespace SolTechnology.TaleCode.PlayerRegistry.Commands.CalculatePlayerStatisti
         }
 
         //Example of ugly implementation even when the standard is in place
-        public async Task<OperationResult> Handle(CalculatePlayerStatisticsCommand command, CancellationToken cancellationToken)
+        public async Task<Result> Handle(CalculatePlayerStatisticsCommand command, CancellationToken cancellationToken)
         {
             var context = new CalculatePlayerStatisticsContext
             {
                 Result = new PlayerStatistics { Id = command.PlayerId }
             };
 
-            return await Chain2.Start(context, cancellationToken)
-                .Then(ctx =>
-                {
-                    ctx.PlayerIdMap = GetPlayerId(command.PlayerId);
-                    return OperationResult.SucceededTask();
-                })
-                .Then(ctx =>
-                {
-                    ctx.Player = GetPlayer(ctx.PlayerIdMap.FootballDataId);
-                    return OperationResult.SucceededTask();
-                })
-                .Then(ctx =>
-                {
-                    ctx.Matches = GetMatches(ctx.PlayerIdMap.FootballDataId);
-                    return OperationResult.SucceededTask();
-                })
-                .Then(ctx =>
-                {
-                    ctx.NationalTeamMatches = ExtractNationalTeamMatches(ctx.Matches, ctx.Player);
-                    return OperationResult.SucceededTask();
-                })
-                .Then(ctx =>
-                {
-                    AssignNationalTeamMatches(ctx.Result, ctx.NationalTeamMatches, ctx.Player);
-                    return OperationResult.SucceededTask();
-                })
-                .Then(ctx =>
-                {
-                    ctx.ClubMatches = ExtractClubMatches(ctx.NationalTeamMatches, ctx.Matches);
-                    return OperationResult.SucceededTask();
-                })
-                .Then(ctx =>
-                {
-                    AssignClubMatches(ctx.Result, ctx.ClubMatches, ctx.Player);
-                    return OperationResult.SucceededTask();
-                })
-                .Then(async ctx =>
-                {
-                    ApplyPlayerMetadata(ctx.Result, ctx.Player, ctx.Matches);
-                    await StoreResult(ctx.Result);
-                    return OperationResult.Succeeded();
-                })
+            return await Chain.Start(context, cancellationToken)
+                .Then(ctx => ctx.PlayerIdMap = GetPlayerId(command.PlayerId))
+                .Then(ctx => ctx.Player = GetPlayer(ctx.PlayerIdMap.FootballDataId))
+                .Then(ctx => ctx.Matches = GetMatches(ctx.PlayerIdMap.FootballDataId))
+                .Then(ctx => ctx.NationalTeamMatches = ExtractNationalTeamMatches(ctx.Matches, ctx.Player))
+                .Then(ctx => AssignNationalTeamMatches(ctx.Result, ctx.NationalTeamMatches, ctx.Player))
+                .Then(ctx => ctx.ClubMatches = ExtractClubMatches(ctx.NationalTeamMatches, ctx.Matches))
+                .Then(ctx => AssignClubMatches(ctx.Result, ctx.ClubMatches, ctx.Player))
+                .Then(ctx => ApplyPlayerMetadata(ctx.Result, ctx.Player, ctx.Matches))
+                .Then(async ctx => await StoreResult(ctx.Result))
                 .End(ctx => ctx.Result);
         }
 

@@ -16,13 +16,13 @@ namespace DreamTravel.Identity.Commands.Register
             _userRepository = userRepository;
         }
 
-        public Task<OperationResult> Handle(RegisterUserCommand command, CancellationToken cancellationToken)
+        public Task<Result> Handle(RegisterUserCommand command, CancellationToken cancellationToken)
         {
             var alreadyExistingUser = _userRepository.Get(command.Email);
 
             if (alreadyExistingUser != null)
             {
-                return OperationResult.FailedTask("User with provided email already exists");
+                return Result.FailAsTask("User with provided email already exists");
             }
 
             var user = new User(command.Name, command.Password, command.Email);
@@ -30,7 +30,7 @@ namespace DreamTravel.Identity.Commands.Register
             user.UpdatePassword(Encryption.Encrypt(user.Password));
             _userRepository.Insert(user);
 
-            return OperationResult.SucceededTask();
+            return Result.SuccessAsTask();
         }
     }
 }

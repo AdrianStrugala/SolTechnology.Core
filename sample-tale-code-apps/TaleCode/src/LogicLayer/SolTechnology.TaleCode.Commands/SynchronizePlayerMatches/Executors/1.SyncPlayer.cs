@@ -10,7 +10,7 @@ namespace SolTechnology.TaleCode.PlayerRegistry.Commands.SynchronizePlayerMatche
 {
     public interface ISyncPlayer
     {
-        Task<OperationResult> Execute(SynchronizePlayerMatchesContext context);
+        Task<Result> Execute(SynchronizePlayerMatchesContext context);
     }
 
     public class SyncPlayer : ISyncPlayer
@@ -35,7 +35,7 @@ namespace SolTechnology.TaleCode.PlayerRegistry.Commands.SynchronizePlayerMatche
             _singletonCache = singletonCache;
         }
 
-        public async Task<OperationResult> Execute(SynchronizePlayerMatchesContext context)
+        public async Task<Result> Execute(SynchronizePlayerMatchesContext context)
         {
             var playerIdMap = _externalIdsProvider.Get(context.PlayerId);
             var clientPlayer = await _singletonCache.GetOrAdd(playerIdMap.FootballDataId, _footballDataApiClient.GetPlayerById);
@@ -76,7 +76,7 @@ namespace SolTechnology.TaleCode.PlayerRegistry.Commands.SynchronizePlayerMatche
             }
 
             context.Player = player;
-            return OperationResult.Succeeded();
+            return Result.Success();
         }
     }
 }

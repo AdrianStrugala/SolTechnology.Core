@@ -1,16 +1,18 @@
-﻿namespace SolTechnology.Core.CQRS
+﻿using System;
+
+namespace SolTechnology.Core.CQRS
 {
 
-    public static class Chain2
+    public static class Chain
     {
-        public static Chain2<TContext> Start<TContext>(TContext context, CancellationToken cancellationToken)
+        public static Chain<TContext> Start<TContext>(TContext context, CancellationToken cancellationToken)
         {
-            return new Chain2<TContext>(context, cancellationToken);
+            return new Chain<TContext>(context, cancellationToken);
         }
     }
 
 
-    public class Chain2<TContext>
+    public class Chain<TContext>
     {
         private readonly CancellationToken _cancellationToken;
         private readonly List<Exception> _exceptions = new();
@@ -18,13 +20,13 @@
 
 
 
-        public Chain2(TContext context, CancellationToken cancellationToken)
+        public Chain(TContext context, CancellationToken cancellationToken)
         {
             _cancellationToken = cancellationToken;
             Context = context;
         }
 
-        public async Task<Chain2<TContext>> Then(Func<TContext, Task<OperationResult>> func)
+        public async Task<Chain<TContext>> Then(Func<TContext, Task<Result>> func)
         {
             _cancellationToken.ThrowIfCancellationRequested();
 
@@ -33,7 +35,7 @@
                 return this;
             }
 
-            var operationResult = new OperationResult();
+            var operationResult = new Result();
             try
             {
                 operationResult = await func.Invoke(Context);
@@ -49,7 +51,7 @@
             return this;
         }
 
-        public async Task<Chain2<TContext>> Then(Func<TContext, Task> func)
+        public async Task<Chain<TContext>> Then(Func<TContext, Task> func)
         {
             _cancellationToken.ThrowIfCancellationRequested();
 
@@ -58,7 +60,7 @@
                 return this;
             }
 
-            var operationResult = new OperationResult();
+            var operationResult = new Result();
             try
             {
                 await func.Invoke(Context);
@@ -74,42 +76,87 @@
             return this;
         }
 
-        public OperationResult<TResult> End<TResult>(Func<TContext, TResult> func)
+        public Task<Chain<TContext>> Then(Action<TContext> func)
+        {
+            _cancellationToken.ThrowIfCancellationRequested();
+
+            if (_exceptions.Any())
+            {
+                return Task.FromResult(this);
+            }
+
+            var operationResult = new Result();
+            try
+            {
+                func.Invoke(Context);
+            }
+            catch (Exception e)
+            {
+                _exceptions.Add(e);
+            }
+            if (operationResult.IsFailure)
+            {
+                _exceptions.Add(new Exception(operationResult.ErrorMessage));
+            }
+            return Task.FromResult(this);
+        }
+
+        public Result<TResult> End<TResult>(Func<TContext, TResult> func)
         {
             if (_exceptions.Any())
             {
                 var errorMessage = string.Join(string.Empty, _exceptions.Select(x =>
                     $"{Environment.NewLine} -- {x.Message}"));
-                return OperationResult<TResult>.Failed(errorMessage);
+                return Result<TResult>.Fail(errorMessage);
             }
-            return OperationResult<TResult>.Succeeded(func.Invoke(Context));
+            return func.Invoke(Context);
+        }
+
+        public Result End()
+        {
+            return Result.Success();
         }
     }
 
-    public static class Chain2Extensions
+    public static class ChainExtensions
     {
-        public static async Task<Chain2<TContext>> Then<TContext>(
-            this Task<Chain2<TContext>> asyncChain,
-            Func<TContext, Task<OperationResult>> action)
+        public static async Task<Chain<TContext>> Then<TContext>(
+            this Task<Chain<TContext>> asyncChain,
+            Func<TContext, Task<Result>> action)
         {
             var chain = await asyncChain;
             return await chain.Then(action);
         }
 
-        public static async Task<Chain2<TContext>> Then<TContext>(
-            this Task<Chain2<TContext>> asyncChain,
+        public static async Task<Chain<TContext>> Then<TContext>(
+            this Task<Chain<TContext>> asyncChain,
             Func<TContext, Task> action)
         {
             var chain = await asyncChain;
             return await chain.Then(action);
         }
 
-        public static async Task<OperationResult<TResult>> End<TContext, TResult>(
-            this Task<Chain2<TContext>> asyncChain,
+        public static async Task<Chain<TContext>> Then<TContext>(
+            this Task<Chain<TContext>> asyncChain,
+            Action<TContext> action)
+        {
+            var chain = await asyncChain;
+            return await chain.Then(action);
+        }
+
+        public static async Task<Result<TResult>> End<TContext, TResult>(
+            this Task<Chain<TContext>> asyncChain,
             Func<TContext, TResult> action)
         {
             var chain = await asyncChain;
             return chain.End(action);
+        }
+
+        public static async Task<Result> End<TContext>(
+            this Task<Chain<TContext>> asyncChain)
+        {
+            var chain = await asyncChain;
+            return chain.End();
         }
     }
 }

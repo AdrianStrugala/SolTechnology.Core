@@ -7,9 +7,9 @@ namespace SolTechnology.TaleCode.PlayerRegistry.Commands.SynchronizePlayerMatche
 {
     public class SynchronizePlayerMatchesHandler : ICommandHandler<SynchronizePlayerMatchesCommand>
     {
-        private readonly Func<SynchronizePlayerMatchesContext, Task<OperationResult>> _synchronizePlayer;
-        private readonly Func<SynchronizePlayerMatchesContext, Task<OperationResult>> _calculateMatchesToSync;
-        private readonly Func<SynchronizePlayerMatchesContext, Task<OperationResult>> _synchronizeMatch;
+        private readonly Func<SynchronizePlayerMatchesContext, Task<Result>> _synchronizePlayer;
+        private readonly Func<SynchronizePlayerMatchesContext, Task<Result>> _calculateMatchesToSync;
+        private readonly Func<SynchronizePlayerMatchesContext, Task<Result>> _synchronizeMatch;
         private readonly Func<IMessage, Task> _publishMessage;
 
         public SynchronizePlayerMatchesHandler(
@@ -24,17 +24,17 @@ namespace SolTechnology.TaleCode.PlayerRegistry.Commands.SynchronizePlayerMatche
             _publishMessage = messagePublisher.Publish;
         }
 
-        public async Task<OperationResult> Handle(SynchronizePlayerMatchesCommand command, CancellationToken cancellationToken = default)
+        public async Task<Result> Handle(SynchronizePlayerMatchesCommand command, CancellationToken cancellationToken = default)
         {
             var context = new SynchronizePlayerMatchesContext(command.PlayerId);
 
-            var result = await Chain2
+            var result = await Chain
                 .Start(context, cancellationToken)
                 .Then(_synchronizePlayer)
                 .Then(_calculateMatchesToSync)
                 .Then(_synchronizeMatch)
                 .Then(_ => _publishMessage(new PlayerMatchesSynchronizedEvent(context.PlayerId)))
-                .End(_ => OperationResult.Succeeded());
+                .End();
 
             return result;
         }

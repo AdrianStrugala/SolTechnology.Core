@@ -17,7 +17,7 @@ namespace DreamTravel.Trips.Queries.FindCityByName
             _logger = logger;
         }
 
-        public async Task<OperationResult<City>> Handle(FindCityByNameQuery byNameQuery, CancellationToken cancellationToken)
+        public async Task<Result<City>> Handle(FindCityByNameQuery byNameQuery, CancellationToken cancellationToken)
         {
             var stopwatch = new Stopwatch();
             stopwatch.Start();
@@ -31,7 +31,7 @@ namespace DreamTravel.Trips.Queries.FindCityByName
             _logger.LogInformation($"FindCityByName. Cache hit took: [{stopwatch.ElapsedMilliseconds}]ms");
             stopwatch.Stop();
 
-            return OperationResult<City>.Succeeded(result);
+            return result;
         }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using System.Net;
+using Microsoft.Extensions.Logging;
 
 namespace SolTechnology.Core.Api.Middlewares
 {
@@ -12,7 +13,7 @@ namespace SolTechnology.Core.Api.Middlewares
             _next = next;
         }
 
-        public async Task Invoke(HttpContext context)
+        public async Task Invoke(HttpContext context, ILogger<ExceptionHandlerMiddleware> logger)
         {
             try
             {
@@ -28,6 +29,9 @@ namespace SolTechnology.Core.Api.Middlewares
                     Error = exception.Message,
                     IsSuccess = false
                 };
+
+                logger.LogError(exception.Message);
+
                 await response.WriteAsJsonAsync(responseEnvelope);
             }
         }
