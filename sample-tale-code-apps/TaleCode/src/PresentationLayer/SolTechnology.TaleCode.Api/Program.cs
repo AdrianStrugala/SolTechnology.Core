@@ -11,7 +11,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddEndpointsApiExplorer();
 
 
-//TODO: Messagebus can be refactored to have internal api like here in AddLogging
+//TODO: Message bus can be refactored to have internal fluent api like here in AddLogging
 builder.Services.AddLogging(c =>
         c.AddConsole()
         .AddApplicationInsights());
