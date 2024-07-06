@@ -4,4 +4,10 @@
     {
         public LogScope LogScope { get; }
     }
+
+    public class LoggableOperation : ILoggableOperation
+
+    {
+    public LogScope LogScope { get; }
+    }
 }

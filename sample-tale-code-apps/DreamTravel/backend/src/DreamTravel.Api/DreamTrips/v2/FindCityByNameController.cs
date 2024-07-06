@@ -8,11 +8,15 @@ using DreamTravel.Trips.Queries.FindCityByName;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using SolTechnology.Core.Api;
+using SolTechnology.Core.Api.Filters;
 using SolTechnology.Core.CQRS;
 
 namespace DreamTravel.Api.DreamTrips.v2
 {
     [Route(Route)]
+    [ServiceFilter(typeof(LoggingFilter))]
+    [ServiceFilter(typeof(ExceptionFilter))]
+    [ServiceFilter(typeof(ResponseEnvelopeFilter))]
     public class FindCityByNameController : ControllerBase
     {
         public const string Route = "api/v2/FindCityByName";

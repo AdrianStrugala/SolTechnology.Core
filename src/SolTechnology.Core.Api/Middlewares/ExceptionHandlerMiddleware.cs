@@ -41,7 +41,6 @@ namespace SolTechnology.Core.Api.Middlewares
             int code;
             switch (exception)
             {
-
                 case TaskCanceledException:
                     code = 499;
                     break;
