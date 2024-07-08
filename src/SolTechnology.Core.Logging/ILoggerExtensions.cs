@@ -18,14 +18,19 @@ public static class ILoggerExtensions
         return logger.BeginScope(operationIdentifiersDictionary);
     }
 
-    public static IDisposable BeginOperationScope(this ILogger logger, KeyValuePair<string, object> operationIdentifier)
+    public static IDisposable AddToScope(this ILogger logger, string key, object value)
     {
         var scopeDictionary = new Dictionary<string, object>
         {
-            { operationIdentifier.Key, operationIdentifier.Value }
+            { key, value }
         };
 
         return logger.BeginScope(scopeDictionary);
+    }
+
+    public static IDisposable BeginOperationScope(this ILogger logger, KeyValuePair<string, object> operationIdentifier)
+    {
+        return logger.AddToScope(operationIdentifier.Key, operationIdentifier.Value);
     }
 
     public static IDisposable BeginOperationScope(this ILogger logger, Dictionary<string, object> operationIdentifiers)
