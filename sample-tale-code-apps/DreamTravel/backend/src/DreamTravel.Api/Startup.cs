@@ -104,7 +104,6 @@ namespace DreamTravel.Api
             services.AddFluentValidationRulesToSwagger();
 
 
-            services.AddScoped<LoggingFilter>();
             services.AddScoped<ExceptionFilter>();
             services.AddScoped<ResponseEnvelopeFilter>();
 

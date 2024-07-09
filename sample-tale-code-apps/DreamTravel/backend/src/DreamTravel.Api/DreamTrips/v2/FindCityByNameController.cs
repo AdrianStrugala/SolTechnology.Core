@@ -14,7 +14,6 @@ using SolTechnology.Core.CQRS;
 namespace DreamTravel.Api.DreamTrips.v2
 {
     [Route(Route)]
-    // [ServiceFilter(typeof(LoggingFilter))]
     [ServiceFilter(typeof(ExceptionFilter))]
     [ServiceFilter(typeof(ResponseEnvelopeFilter))]
     public class FindCityByNameController : ControllerBase

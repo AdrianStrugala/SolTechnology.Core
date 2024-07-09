@@ -21,7 +21,7 @@ public class LoggingMiddleware
         _logger = logger;
         var asyncStopwatch = new AsyncStopwatch();
 
-        using (AddRequestIdsToScope(context))
+        using (await AddRequestIdsToScope(context))
         {
             _logger.LogInformation("Started request: [{RequestMethod} {RequestPath}]",
                 context.Request.Method, context.Request.Path);
@@ -40,21 +40,21 @@ public class LoggingMiddleware
 
     }
 
-    private IDisposable AddRequestIdsToScope(HttpContext context)
+    private async Task<IDisposable> AddRequestIdsToScope(HttpContext context)
     {
         //To show how can some id's be extracted from query
         context.Request.Query.TryGetValue("userId", out var userId);
 
         //To show how can some id's be extracted from body
         context.Request.EnableBuffering();
-        var body = ReadRequestBody(context.Request);
+        var body = await ReadRequestBody(context.Request);
 
-        string? requestId = null;
+        string? name = null;
         if (body is not null)
         {
-            if ((bool)body?.TryGetProperty("requestId", out var property))
+            if (body.RootElement.TryGetProperty("name", out var nameElement))
             {
-                requestId = property?.ToString();
+                name = nameElement.ToString();
             }
         }
 
@@ -64,23 +64,22 @@ public class LoggingMiddleware
             _logger.AddToScope("environment", Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT")),
             _logger.AddToScope("correlationId", Guid.NewGuid().ToString()),
             _logger.AddToScope("userId", userId.ToString() ?? "unknown"),
-            _logger.AddToScope("requestId", requestId ?? "unknown"),
+            _logger.AddToScope("name", name ?? "unknown"),
         };
 
         return disposable;
     }
 
-    private JsonElement? ReadRequestBody(HttpRequest request)
+    private async Task<JsonDocument?> ReadRequestBody(HttpRequest request)
     {
         request.Body.Position = 0;
 
         try
         {
             using var reader = new StreamReader(request.Body, Encoding.UTF8, leaveOpen: true);
-            var bodyAsText = reader.ReadToEnd();
-            using var document = JsonDocument.Parse(bodyAsText);
-            var root = document.RootElement;
-            return root;
+            var bodyAsText = await reader.ReadToEndAsync();
+            var document = JsonDocument.Parse(bodyAsText);
+            return document;
         }
         catch (Exception)
         {
