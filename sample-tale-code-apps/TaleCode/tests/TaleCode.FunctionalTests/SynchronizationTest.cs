@@ -8,6 +8,7 @@ using FluentAssertions;
 using Microsoft.AspNetCore.TestHost;
 using SolTechnology.Core.Api;
 using SolTechnology.Core.BlobStorage.Connection;
+using SolTechnology.Core.CQRS;
 using SolTechnology.Core.Faker;
 using SolTechnology.Core.Sql.Testing;
 using SolTechnology.TaleCode.ApiClients.ApiFootballApi;
@@ -107,7 +108,7 @@ namespace TaleCode.FunctionalTests
             var apiResponse = await _api
                 .CreateRequest($"GetPlayerStatistics/{playerId}")
                 .WithHeader("X-Auth", "SolTechnologyAuthentication U2VjdXJlS2V5")
-                .GetAsync<ResponseEnvelope<GetPlayerStatisticsResult>>();
+                .GetAsync<Result<GetPlayerStatisticsResult>>();
 
 
             return !apiResponse.IsSuccess ? null : apiResponse.Data;

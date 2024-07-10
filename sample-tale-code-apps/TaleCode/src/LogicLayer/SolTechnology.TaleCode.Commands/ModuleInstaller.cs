@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using FluentValidation;
+using Microsoft.Extensions.DependencyInjection;
 using SolTechnology.Core.Cache;
 using SolTechnology.Core.CQRS;
 using SolTechnology.Core.MessageBus;
@@ -15,7 +16,7 @@ namespace SolTechnology.TaleCode.PlayerRegistry.Commands
     {
         public static IServiceCollection InstallCommands(this IServiceCollection services)
         {
-            services.RegisterCommands();
+            var thisAssembly = typeof(ModuleInstaller).Assembly;
 
             services.InstallSql();
             services.InstallApiClients();
@@ -24,6 +25,9 @@ namespace SolTechnology.TaleCode.PlayerRegistry.Commands
             services.AddMessageBus()
                     .WithQueuePublisher<PlayerMatchesSynchronizedEvent>();
             services.AddCache();
+
+            services.AddMediatR(config => config.RegisterServicesFromAssembly(thisAssembly));
+            services.AddValidatorsFromAssembly(thisAssembly);
 
 
             services.AddScoped<ISyncPlayer, SyncPlayer>();

@@ -58,7 +58,7 @@ namespace DreamTravel.Identity.Commands.UnitTests.Registration
 
             //Assert
             result.IsSuccess.Should().BeFalse();
-            result.ErrorMessage.Should().NotBeNullOrEmpty();
+            result.Error.Message.Should().NotBeNullOrEmpty();
         }
     }
 }

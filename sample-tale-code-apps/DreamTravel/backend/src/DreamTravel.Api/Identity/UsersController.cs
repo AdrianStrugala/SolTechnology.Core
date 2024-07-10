@@ -39,8 +39,8 @@ namespace DreamTravel.Api.Identity
 
             if (result.IsSuccess == false)
             {
-                _logger.LogError(result.ErrorMessage);
-                return BadRequest(result.ErrorMessage);
+                _logger.LogError(result.Error.Message);
+                return BadRequest(result.Error.Message);
             }
 
             return Ok();
@@ -72,8 +72,8 @@ namespace DreamTravel.Api.Identity
 
             if (result.IsSuccess == false)
             {
-                _logger.LogError(result.ErrorMessage);
-                return BadRequest(result.ErrorMessage);
+                _logger.LogError(result.Error.Message);
+                return BadRequest(result.Error.Message);
             }
 
             return Ok();

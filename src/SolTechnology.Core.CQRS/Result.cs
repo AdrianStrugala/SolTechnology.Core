@@ -1,10 +1,17 @@
-﻿namespace SolTechnology.Core.CQRS
+﻿#nullable enable
+using System.Text.Json.Serialization;
+
+namespace SolTechnology.Core.CQRS
 {
     public record Result
     {
         public bool IsSuccess { get; init; }
+
+        [JsonIgnore]
         public bool IsFailure => !IsSuccess;
-        public string ErrorMessage { get; init; }
+
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public Error? Error { get; init; }
 
 
         public static Result Success()
@@ -27,7 +34,19 @@
         {
             return new Result
             {
-                ErrorMessage = message,
+                Error = new Error
+                {
+                    Message = message
+                },
+                IsSuccess = false
+            };
+        }
+
+        public static Result Fail(Error error)
+        {
+            return new Result
+            {
+                Error = error,
                 IsSuccess = false
             };
         }
@@ -36,7 +55,19 @@
         {
             return Task.FromResult(new Result
             {
-                ErrorMessage = message,
+                Error = new Error
+                {
+                    Message = message
+                },
+                IsSuccess = false
+            });
+        }
+
+        public static Task<Result> FailAsTask(Error error)
+        {
+            return Task.FromResult(new Result
+            {
+                Error = error,
                 IsSuccess = false
             });
         }
@@ -44,6 +75,7 @@
 
     public record Result<T> : Result
     {
+        [JsonIgnore(Condition = JsonIgnoreCondition.Never)]
         public T Data { get; set; }
 
         public static implicit operator Result<T>(T value)
@@ -54,6 +86,11 @@
         public static implicit operator Result<T>(Exception e)
         {
             return Fail(e.Message);
+        }
+
+        public static implicit operator Result<T>(Error e)
+        {
+            return Fail(e);
         }
 
         public static Result<T> Success(T data)
@@ -69,7 +106,19 @@
         {
             return new Result<T>
             {
-                ErrorMessage = message,
+                Error = new Error
+                {
+                    Message = message
+                },
+                IsSuccess = false
+            };
+        }
+
+        public new static Result<T> Fail(Error error)
+        {
+            return new Result<T>
+            {
+                Error = error,
                 IsSuccess = false
             };
         }
@@ -78,7 +127,10 @@
         {
             return Task.FromResult(new Result<T>
             {
-                ErrorMessage = message,
+                Error = new Error
+                {
+                    Message = message
+                },
                 IsSuccess = false
             });
         }

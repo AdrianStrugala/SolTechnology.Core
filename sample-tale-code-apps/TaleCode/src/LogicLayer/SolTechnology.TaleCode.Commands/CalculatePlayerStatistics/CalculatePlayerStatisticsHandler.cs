@@ -1,4 +1,5 @@
-﻿using SolTechnology.Core.CQRS;
+﻿using MediatR;
+using SolTechnology.Core.CQRS;
 using SolTechnology.TaleCode.BlobData.PlayerStatisticsRepository;
 using SolTechnology.TaleCode.Domain;
 using SolTechnology.TaleCode.SqlData.Repository.MatchRepository;
@@ -8,7 +9,7 @@ using SolTechnology.TaleCode.StaticData.PlayerId;
 
 namespace SolTechnology.TaleCode.PlayerRegistry.Commands.CalculatePlayerStatistics
 {
-    public class CalculatePlayerStatisticsHandler : ICommandHandler<CalculatePlayerStatisticsCommand>
+    public class CalculatePlayerStatisticsHandler : ICommandHandler<CalculatePlayerStatisticsCommand>, IRequestHandler<CalculatePlayerStatisticsCommand, Result>
     {
         private Func<PlayerStatistics, Task> StoreResult { get; }
         private Func<int, List<Match>> GetMatches { get; }

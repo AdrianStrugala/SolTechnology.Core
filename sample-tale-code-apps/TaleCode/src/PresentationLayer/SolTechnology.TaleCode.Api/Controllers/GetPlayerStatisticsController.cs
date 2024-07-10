@@ -20,9 +20,9 @@ public class GetPlayerStatisticsController : ControllerBase
 
     [HttpGet]
     [Route("GetPlayerStatistics/{playerId}")]
-    [ProducesResponseType(typeof(ResponseEnvelope<GetPlayerStatisticsResult>), (int)HttpStatusCode.OK),
+    [ProducesResponseType(typeof(Result<GetPlayerStatisticsResult>), (int)HttpStatusCode.OK),
      SwaggerResponseExample((int)HttpStatusCode.OK, typeof(GetPlayerStatisticsExample))]
-    [ProducesResponseType(typeof(ResponseEnvelope<GetPlayerStatisticsResult>), (int)HttpStatusCode.BadRequest),
+    [ProducesResponseType(typeof(Result<GetPlayerStatisticsResult>), (int)HttpStatusCode.BadRequest),
      SwaggerResponseExample((int)HttpStatusCode.BadRequest, typeof(ErrorExample))]
     public async Task<IActionResult> GetPlayerStatistics(int playerId) =>
         Ok(await _handler.Handle(new GetPlayerStatisticsQuery(playerId)));

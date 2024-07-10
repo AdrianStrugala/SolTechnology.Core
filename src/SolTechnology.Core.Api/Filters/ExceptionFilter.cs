@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System.Net;
+using SolTechnology.Core.CQRS;
 
 namespace SolTechnology.Core.Api.Filters;
 
@@ -17,9 +18,9 @@ public class ExceptionFilter : IExceptionFilter
     public void OnException(ExceptionContext context)
     {
         _logger.LogError(context.Exception.Message);
-        context.Result = new ObjectResult(new ResponseEnvelope
+        context.Result = new ObjectResult(new Result()
         {
-            Error = context.Exception.Message,
+            Error = Error.From(context.Exception),
             IsSuccess = false
         })
         {

@@ -46,7 +46,7 @@ namespace SolTechnology.Core.CQRS
             }
             if (operationResult.IsFailure)
             {
-                _exceptions.Add(new Exception(operationResult.ErrorMessage));
+                _exceptions.Add(new Exception(operationResult.Error.Message));
             }
             return this;
         }
@@ -71,7 +71,7 @@ namespace SolTechnology.Core.CQRS
             }
             if (operationResult.IsFailure)
             {
-                _exceptions.Add(new Exception(operationResult.ErrorMessage));
+                _exceptions.Add(new Exception(operationResult.Error.Message));
             }
             return this;
         }
@@ -96,7 +96,7 @@ namespace SolTechnology.Core.CQRS
             }
             if (operationResult.IsFailure)
             {
-                _exceptions.Add(new Exception(operationResult.ErrorMessage));
+                _exceptions.Add(new Exception(operationResult.Error.Message));
             }
             return Task.FromResult(this);
         }

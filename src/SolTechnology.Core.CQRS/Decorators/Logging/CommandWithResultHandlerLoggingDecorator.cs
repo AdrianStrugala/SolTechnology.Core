@@ -47,7 +47,7 @@ namespace SolTechnology.Core.CQRS.Decorators.Logging
                 }
                 else
                 {
-                    _logger.OperationFailed(operationName, sw.ElapsedMilliseconds, message: result.ErrorMessage);
+                    _logger.OperationFailed(operationName, sw.ElapsedMilliseconds, message: result.Error.Message);
                 }
 
                 return result;

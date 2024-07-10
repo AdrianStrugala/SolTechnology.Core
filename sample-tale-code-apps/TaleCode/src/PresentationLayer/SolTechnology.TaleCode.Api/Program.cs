@@ -1,5 +1,8 @@
+using Microsoft.AspNetCore.Mvc.Infrastructure;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.OpenApi.Models;
-using SolTechnology.Core.Api;
+using SolTechnology.Core.Api.Filters;
+using SolTechnology.Core.Api.Middlewares;
 using SolTechnology.Core.Authentication;
 using SolTechnology.TaleCode.PlayerRegistry.Queries;
 using Swashbuckle.AspNetCore.Filters;
@@ -16,13 +19,18 @@ builder.Services.AddLogging(c =>
         c.AddConsole()
         .AddApplicationInsights());
 builder.Services.AddApplicationInsightsTelemetry();
-builder.Services.AddApiMiddlewares();
+builder.Services.AddSingleton<IActionResultExecutor<ObjectResult>, ResponseEnvelopeResultExecutor>();
 
 builder.Services.InstallQueries();
 
 
 var authenticationFiler = builder.Services.AddAuthenticationAndBuildFilter();
-builder.Services.AddControllers(opts => opts.Filters.Add(authenticationFiler));
+builder.Services.AddControllers(opts =>
+{
+    opts.Filters.Add(authenticationFiler);
+    opts.Filters.Add<ExceptionFilter>();
+    opts.Filters.Add<ResponseEnvelopeFilter>();
+});
 
 
 //SWAGGER
@@ -58,7 +66,7 @@ app.UseSwagger();
 app.UseSwaggerUI();
 
 app.UseExceptionHandler("/error");
-app.UseApiMiddlewares();
+app.UseMiddleware<LoggingMiddleware>();
 
 
 app.UseHttpsRedirection();

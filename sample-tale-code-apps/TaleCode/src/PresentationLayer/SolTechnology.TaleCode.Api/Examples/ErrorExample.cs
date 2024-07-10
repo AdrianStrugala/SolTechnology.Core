@@ -1,17 +1,21 @@
 using SolTechnology.Core.Api;
+using SolTechnology.Core.CQRS;
 using SolTechnology.TaleCode.PlayerRegistry.Queries.GetPlayerStatistics;
 using Swashbuckle.AspNetCore.Filters;
 
 namespace SolTechnology.TaleCode.Api.Examples;
 
-public class ErrorExample : IExamplesProvider<ResponseEnvelope<GetPlayerStatisticsResult>>
+public class ErrorExample : IExamplesProvider<Result<GetPlayerStatisticsResult>>
 {
-    public ResponseEnvelope<GetPlayerStatisticsResult> GetExamples()
+    public Result<GetPlayerStatisticsResult> GetExamples()
     {
-        return new ResponseEnvelope<GetPlayerStatisticsResult>
+        return new Result<GetPlayerStatisticsResult>
         {
             IsSuccess = false,
-            Error = "A bug appeared. Might be caterpie :O"
+            Error = new Error
+            {
+                Message = "A bug appeared. Might be caterpie :O"
+            }
         };
     }
 }

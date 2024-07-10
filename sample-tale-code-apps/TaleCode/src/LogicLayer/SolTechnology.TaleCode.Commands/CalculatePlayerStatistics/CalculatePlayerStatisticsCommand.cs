@@ -1,10 +1,11 @@
 ﻿using FluentValidation;
+using MediatR;
+using SolTechnology.Core.CQRS;
 using SolTechnology.Core.Logging;
-using SolTechnology.TaleCode.PlayerRegistry.Commands.SynchronizePlayerMatches;
 
 namespace SolTechnology.TaleCode.PlayerRegistry.Commands.CalculatePlayerStatistics;
 
-public class CalculatePlayerStatisticsCommand : ILoggableOperation
+public class CalculatePlayerStatisticsCommand : ILoggableOperation, IRequest<Result>
 {
     public int PlayerId { get; set; }
 

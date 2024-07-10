@@ -1,11 +1,12 @@
-﻿using SolTechnology.Core.CQRS;
+﻿using MediatR;
+using SolTechnology.Core.CQRS;
 using SolTechnology.Core.MessageBus;
 using SolTechnology.Core.MessageBus.Publish;
 using SolTechnology.TaleCode.PlayerRegistry.Commands.SynchronizePlayerMatches.Executors;
 
 namespace SolTechnology.TaleCode.PlayerRegistry.Commands.SynchronizePlayerMatches
 {
-    public class SynchronizePlayerMatchesHandler : ICommandHandler<SynchronizePlayerMatchesCommand>
+    public class SynchronizePlayerMatchesHandler : ICommandHandler<SynchronizePlayerMatchesCommand>, IRequestHandler<SynchronizePlayerMatchesCommand, Result>
     {
         private readonly Func<SynchronizePlayerMatchesContext, Task<Result>> _synchronizePlayer;
         private readonly Func<SynchronizePlayerMatchesContext, Task<Result>> _calculateMatchesToSync;

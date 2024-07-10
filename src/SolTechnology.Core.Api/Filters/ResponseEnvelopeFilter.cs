@@ -13,40 +13,21 @@ public class ResponseEnvelopeFilter : IResultFilter
             var resultValue = objectResult.Value;
             var resultValueType = resultValue?.GetType();
 
-            ResponseEnvelope<object> response;
             if (resultValueType is { IsGenericType: true } && resultValueType.GetGenericTypeDefinition() == typeof(Result<>))
             {
-                response = new ResponseEnvelope<object>
-                {
-                    IsSuccess = (bool)resultValueType.GetProperty(nameof(Result<object>.IsSuccess))?.GetValue(resultValue)!,
-                    Data = resultValueType.GetProperty(nameof(Result<object>.Data))?.GetValue(resultValue)
-                };
-            }
-            else if (resultValue is Result resultAsBase)
-            {
-                response = new ResponseEnvelope<object>
-                {
-                    IsSuccess = resultAsBase.IsSuccess,
-                    Error = resultAsBase.ErrorMessage
-                };
-            }
-            else
-            {
-                response = new ResponseEnvelope<object>
-                {
-                    Data = resultValue,
-                    IsSuccess = true
-                };
+                return;
             }
 
+            if (resultValue is Result)
+            {
+                return;
+            }
 
-            //TODO: that's not so stupid as well:
-            // var envelope = new
-            // {
-            //     Success = objectResult.StatusCode >= 200 && objectResult.StatusCode < 300,
-            //     Data = objectResult.Value
-            // };
-            context.Result = new ObjectResult(response)
+            context.Result = new ObjectResult(new Result<object>
+            {
+                Data = resultValue,
+                IsSuccess = true
+            })
             {
                 StatusCode = objectResult.StatusCode
             };

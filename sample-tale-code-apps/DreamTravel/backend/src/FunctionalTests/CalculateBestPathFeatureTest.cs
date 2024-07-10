@@ -11,6 +11,7 @@ using FluentAssertions;
 using SolTechnology.Core.Api;
 using SolTechnology.Core.Faker;
 using DreamTravel.Trips.Queries.CalculateBestPath;
+using SolTechnology.Core.CQRS;
 
 namespace DreamTravel.FunctionalTests
 {
@@ -89,7 +90,7 @@ namespace DreamTravel.FunctionalTests
                         .CreateRequest("/api/v2/FindCityByName")
                         .WithHeader("Authorization", "DreamAuthentication U29sVWJlckFsbGVz")
                         .WithBody(new { Name = city.Name })
-                        .PostAsync<ResponseEnvelope<City>>();
+                        .PostAsync<Result<City>>();
 
                     apiResponse.IsSuccess.Should().BeTrue();
                     apiResponse.Data.Should().BeEquivalentTo(city);
@@ -102,7 +103,7 @@ namespace DreamTravel.FunctionalTests
                     .CreateRequest("/api/v2/CalculateBestPath")
                     .WithHeader("Authorization", "DreamAuthentication U29sVWJlckFsbGVz")
                     .WithBody(new { Cities = cities })
-                    .PostAsync<ResponseEnvelope<CalculateBestPathResult>>();
+                    .PostAsync<Result<CalculateBestPathResult>>();
 
                 apiResponse.IsSuccess.Should().BeTrue();
                 paths = apiResponse.Data.BestPaths;

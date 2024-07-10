@@ -1,10 +1,12 @@
 ﻿using FluentValidation;
+using MediatR;
+using SolTechnology.Core.CQRS;
 using SolTechnology.Core.Guards;
 using SolTechnology.Core.Logging;
 
 namespace SolTechnology.TaleCode.PlayerRegistry.Commands.SynchronizePlayerMatches;
 
-public class SynchronizePlayerMatchesCommand : ILoggableOperation
+public class SynchronizePlayerMatchesCommand : ILoggableOperation, IRequest<Result>
 {
     public int PlayerId { get; set; }
 

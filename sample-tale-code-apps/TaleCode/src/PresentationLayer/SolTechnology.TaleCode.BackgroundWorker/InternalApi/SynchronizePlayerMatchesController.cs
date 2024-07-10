@@ -1,6 +1,6 @@
 using System.Net;
+using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using SolTechnology.Core.CQRS;
 using SolTechnology.TaleCode.PlayerRegistry.Commands.SynchronizePlayerMatches;
 
 namespace SolTechnology.TaleCode.BackgroundWorker.InternalApi;
@@ -8,11 +8,11 @@ namespace SolTechnology.TaleCode.BackgroundWorker.InternalApi;
 [ApiController]
 public class SynchronizePlayerMatchesController : ControllerBase
 {
-    private readonly ICommandHandler<SynchronizePlayerMatchesCommand> _handler;
+    private readonly IMediator _mediator;
 
-    public SynchronizePlayerMatchesController(ICommandHandler<SynchronizePlayerMatchesCommand> handler)
+    public SynchronizePlayerMatchesController(IMediator mediator)
     {
-        _handler = handler;
+        _mediator = mediator;
     }
 
     [HttpGet]
@@ -20,5 +20,5 @@ public class SynchronizePlayerMatchesController : ControllerBase
     [ProducesResponseType((int)HttpStatusCode.OK)]
     [ProducesResponseType((int)HttpStatusCode.BadRequest)]
     public async Task<IActionResult> SynchronizePlayerMatches(int playerId) =>
-        Ok(await _handler.Handle(new SynchronizePlayerMatchesCommand(playerId)));
+        Ok(await _mediator.Send(new SynchronizePlayerMatchesCommand(playerId)));
 }

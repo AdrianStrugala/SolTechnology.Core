@@ -1,54 +1,55 @@
 ﻿using Microsoft.AspNetCore.Http;
 using System.Net;
 using Microsoft.Extensions.Logging;
+using SolTechnology.Core.CQRS;
 
-namespace SolTechnology.Core.Api.Middlewares
+namespace SolTechnology.Core.Api.Middlewares;
+
+//FILTER is preferred
+public class ExceptionHandlerMiddleware
 {
-    public class ExceptionHandlerMiddleware
+    private readonly RequestDelegate _next;
+
+    public ExceptionHandlerMiddleware(RequestDelegate next)
     {
-        private readonly RequestDelegate _next;
+        _next = next;
+    }
 
-        public ExceptionHandlerMiddleware(RequestDelegate next)
+    public async Task Invoke(HttpContext context, ILogger<ExceptionHandlerMiddleware> logger)
+    {
+        try
         {
-            _next = next;
+            await _next(context);
         }
-
-        public async Task Invoke(HttpContext context, ILogger<ExceptionHandlerMiddleware> logger)
+        catch (Exception exception)
         {
-            try
+            var response = context.Response;
+            response.StatusCode = GetStatusCode(exception);
+
+            var responseEnvelope = new Result
             {
-                await _next(context);
-            }
-            catch (Exception exception)
-            {
-                var response = context.Response;
-                response.StatusCode = GetStatusCode(exception);
+                Error = Error.From(exception),
+                IsSuccess = false
+            };
 
-                var responseEnvelope = new ResponseEnvelope
-                {
-                    Error = exception.Message,
-                    IsSuccess = false
-                };
+            logger.LogError(exception.Message);
 
-                logger.LogError(exception.Message);
-
-                await response.WriteAsJsonAsync(responseEnvelope);
-            }
+            await response.WriteAsJsonAsync(responseEnvelope);
         }
+    }
 
-        public int GetStatusCode(Exception exception)
+    public int GetStatusCode(Exception exception)
+    {
+        int code;
+        switch (exception)
         {
-            int code;
-            switch (exception)
-            {
-                case TaskCanceledException:
-                    code = 499;
-                    break;
-                default:
-                    code = (int)HttpStatusCode.BadRequest;
-                    break;
-            }
-            return code;
+            case TaskCanceledException:
+                code = 499;
+                break;
+            default:
+                code = (int)HttpStatusCode.BadRequest;
+                break;
         }
+        return code;
     }
 }
