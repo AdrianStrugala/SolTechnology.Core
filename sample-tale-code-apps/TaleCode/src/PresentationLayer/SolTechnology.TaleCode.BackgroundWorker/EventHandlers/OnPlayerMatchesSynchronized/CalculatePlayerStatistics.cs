@@ -1,4 +1,4 @@
-﻿using SolTechnology.Core.CQRS;
+﻿using MediatR;
 using SolTechnology.Core.MessageBus.Receive;
 using SolTechnology.TaleCode.PlayerRegistry.Commands.CalculatePlayerStatistics;
 
@@ -6,17 +6,17 @@ namespace SolTechnology.TaleCode.BackgroundWorker.EventHandlers.OnPlayerMatchesS
 {
     public class CalculatePlayerStatistics : IMessageHandler<PlayerMatchesSynchronizedEvent>
     {
-        private readonly ICommandHandler<CalculatePlayerStatisticsCommand> _handler;
+        private readonly IMediator _mediator;
 
-        public CalculatePlayerStatistics(ICommandHandler<CalculatePlayerStatisticsCommand> handler)
+        public CalculatePlayerStatistics(IMediator mediator)
         {
-            _handler = handler;
+            _mediator = mediator;
         }
 
         public async Task Handle(PlayerMatchesSynchronizedEvent message, CancellationToken cancellationToken)
         {
             var command = new CalculatePlayerStatisticsCommand(message.PlayerId);
-            await _handler.Handle(command);
+            await _mediator.Send(command, cancellationToken);
         }
 
     }

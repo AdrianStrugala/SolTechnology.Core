@@ -35,7 +35,7 @@ namespace SolTechnology.Core.CQRS
                 return this;
             }
 
-            var operationResult = new Result();
+            Result operationResult;
             try
             {
                 operationResult = await func.Invoke(Context);
@@ -43,10 +43,11 @@ namespace SolTechnology.Core.CQRS
             catch (Exception e)
             {
                 _exceptions.Add(e);
+                return this;
             }
             if (operationResult.IsFailure)
             {
-                _exceptions.Add(new Exception(operationResult.Error.Message));
+                _exceptions.Add(new Exception(operationResult.Error?.Message));
             }
             return this;
         }
@@ -60,7 +61,6 @@ namespace SolTechnology.Core.CQRS
                 return this;
             }
 
-            var operationResult = new Result();
             try
             {
                 await func.Invoke(Context);
@@ -68,11 +68,9 @@ namespace SolTechnology.Core.CQRS
             catch (Exception e)
             {
                 _exceptions.Add(e);
+                return this;
             }
-            if (operationResult.IsFailure)
-            {
-                _exceptions.Add(new Exception(operationResult.Error.Message));
-            }
+
             return this;
         }
 

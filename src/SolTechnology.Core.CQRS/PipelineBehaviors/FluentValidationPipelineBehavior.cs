@@ -6,7 +6,7 @@ using Microsoft.Extensions.Logging;
 
 namespace SolTechnology.Core.CQRS.PipelineBehaviors;
 
-public class FluentValidationPipelineBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>
+public class FluentValidationPipelineBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse> where TResponse : class
 {
     private readonly IEnumerable<IValidator<TRequest>> _validators;
     private readonly ILogger<FluentValidationPipelineBehavior<TRequest, TResponse>> _logger;
@@ -39,12 +39,12 @@ public class FluentValidationPipelineBehavior<TRequest, TResponse> : IPipelineBe
 
             if (typeof(TResponse) == typeof(Result))
             {
-
-                return Result.Fail(new Error
+                var result = Result.Fail(new Error
                 {
                     Message = "Validation failed",
                     Description = errorMessage
                 });
+                return result as TResponse;
             }
         }
 

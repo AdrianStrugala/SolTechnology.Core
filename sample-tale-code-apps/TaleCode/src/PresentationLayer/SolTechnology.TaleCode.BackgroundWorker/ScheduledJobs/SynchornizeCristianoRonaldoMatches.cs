@@ -1,4 +1,5 @@
-﻿using SolTechnology.Core.CQRS;
+﻿using MediatR;
+using SolTechnology.Core.CQRS;
 using SolTechnology.Core.Scheduler;
 using SolTechnology.Core.Scheduler.Configuration;
 using SolTechnology.TaleCode.PlayerRegistry.Commands.SynchronizePlayerMatches;
@@ -7,7 +8,7 @@ namespace SolTechnology.TaleCode.BackgroundWorker.ScheduledJobs
 {
     public class SynchornizeCristianoRonaldoMatches : ScheduledJob
     {
-        private readonly ICommandHandler<SynchronizePlayerMatchesCommand> _handler;
+        private readonly IMediator _mediator;
 
         public SynchornizeCristianoRonaldoMatches(
             ISchedulerConfigurationProvider schedulerConfigurationProvider,
@@ -16,13 +17,13 @@ namespace SolTechnology.TaleCode.BackgroundWorker.ScheduledJobs
             : base(schedulerConfigurationProvider, serviceScopeFactory, logger)
         {
             var scope = serviceScopeFactory.CreateScope();
-            var handler = scope.ServiceProvider.GetRequiredService<ICommandHandler<SynchronizePlayerMatchesCommand>>();
-            _handler = handler;
+            var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
+            _mediator = mediator;
         }
 
         public override async Task Execute()
         {
-            await _handler.Handle(new SynchronizePlayerMatchesCommand(44));
+            await _mediator.Send(new SynchronizePlayerMatchesCommand(44));
         }
     }
 }
