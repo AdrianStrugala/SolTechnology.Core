@@ -1,4 +1,5 @@
 using System.Net;
+using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using SolTechnology.Core.Api;
 using SolTechnology.Core.CQRS;
@@ -11,11 +12,11 @@ namespace SolTechnology.TaleCode.Api.Controllers;
 [ApiController]
 public class GetPlayerStatisticsController : ControllerBase
 {
-    private readonly IQueryHandler<GetPlayerStatisticsQuery, GetPlayerStatisticsResult> _handler;
+    private readonly IMediator _mediator;
 
-    public GetPlayerStatisticsController(IQueryHandler<GetPlayerStatisticsQuery, GetPlayerStatisticsResult> handler)
+    public GetPlayerStatisticsController(IMediator mediator)
     {
-        _handler = handler;
+        _mediator = mediator;
     }
 
     [HttpGet]
@@ -25,5 +26,5 @@ public class GetPlayerStatisticsController : ControllerBase
     [ProducesResponseType(typeof(Result<GetPlayerStatisticsResult>), (int)HttpStatusCode.BadRequest),
      SwaggerResponseExample((int)HttpStatusCode.BadRequest, typeof(ErrorExample))]
     public async Task<IActionResult> GetPlayerStatistics(int playerId) =>
-        Ok(await _handler.Handle(new GetPlayerStatisticsQuery(playerId)));
+        Ok(await _mediator.Send(new GetPlayerStatisticsQuery(playerId)));
 }

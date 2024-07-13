@@ -1,7 +1,7 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using SolTechnology.Core.CQRS;
+﻿using FluentValidation;
+using Microsoft.Extensions.DependencyInjection;
+using SolTechnology.Core.CQRS.PipelineBehaviors;
 using SolTechnology.TaleCode.BlobData;
-using SolTechnology.TaleCode.PlayerRegistry.Queries.GetPlayerStatistics;
 
 namespace SolTechnology.TaleCode.PlayerRegistry.Queries
 {
@@ -9,9 +9,17 @@ namespace SolTechnology.TaleCode.PlayerRegistry.Queries
     {
         public static IServiceCollection InstallQueries(this IServiceCollection services)
         {
+            var thisAssembly = typeof(ModuleInstaller).Assembly;
+
             services.InstallBlobStorage();
 
-            services.AddScoped<IQueryHandler<GetPlayerStatisticsQuery, GetPlayerStatisticsResult>, GetPlayerStatisticsHandler>();
+            services.AddMediatR(
+                config =>
+                {
+                    config.RegisterServicesFromAssembly(thisAssembly);
+                    config.AddOpenBehavior(typeof(FluentValidationPipelineBehavior<,>));
+                });
+            services.AddValidatorsFromAssembly(thisAssembly);
 
             return services;
         }

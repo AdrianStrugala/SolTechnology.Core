@@ -37,7 +37,8 @@ public class FluentValidationPipelineBehavior<TRequest, TResponse> : IPipelineBe
             var errorMessage = BuildErrorMessage(validationFailures);
             _logger.LogWarning(errorMessage);
 
-            if (typeof(TResponse) == typeof(Result))
+            var responseType = typeof(TResponse);
+            if (responseType == typeof(Result) || (responseType.IsGenericType && responseType.GetGenericTypeDefinition() == typeof(Result<>)))
             {
                 var result = Result.Fail(new Error
                 {

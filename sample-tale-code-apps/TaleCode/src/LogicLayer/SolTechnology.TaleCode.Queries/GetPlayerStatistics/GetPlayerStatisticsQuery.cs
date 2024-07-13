@@ -1,8 +1,10 @@
 ﻿using FluentValidation;
+using MediatR;
+using SolTechnology.Core.CQRS;
 
 namespace SolTechnology.TaleCode.PlayerRegistry.Queries.GetPlayerStatistics;
 
-public class GetPlayerStatisticsQuery
+public class GetPlayerStatisticsQuery : IRequest<Result<GetPlayerStatisticsResult>>
 {
     public int PlayerId { get; set; }
 
