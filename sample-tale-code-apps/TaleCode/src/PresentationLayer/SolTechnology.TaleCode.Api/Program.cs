@@ -1,3 +1,5 @@
+using System.Text.Encodings.Web;
+using System.Text.Unicode;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.OpenApi.Models;
@@ -19,7 +21,6 @@ builder.Services.AddLogging(c =>
         c.AddConsole()
         .AddApplicationInsights());
 builder.Services.AddApplicationInsightsTelemetry();
-builder.Services.AddSingleton<IActionResultExecutor<ObjectResult>, ResponseEnvelopeResultExecutor>();
 
 builder.Services.InstallQueries();
 
@@ -30,7 +31,12 @@ builder.Services.AddControllers(opts =>
     opts.Filters.Add(authenticationFiler);
     opts.Filters.Add<ExceptionFilter>();
     opts.Filters.Add<ResponseEnvelopeFilter>();
-});
+})
+.AddJsonOptions(options =>
+{
+    options.JsonSerializerOptions.Encoder = JavaScriptEncoder.Create(UnicodeRanges.All);
+    options.JsonSerializerOptions.WriteIndented = true;
+}); 
 
 
 //SWAGGER

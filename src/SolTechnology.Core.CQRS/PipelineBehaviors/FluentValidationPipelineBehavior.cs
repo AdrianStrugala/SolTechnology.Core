@@ -1,4 +1,6 @@
-﻿using System.Text.Json;
+﻿using System.Reflection;
+using System.Text.Encodings.Web;
+using System.Text.Json;
 using FluentValidation;
 using FluentValidation.Results;
 using MediatR;
@@ -40,12 +42,20 @@ public class FluentValidationPipelineBehavior<TRequest, TResponse> : IPipelineBe
             var responseType = typeof(TResponse);
             if (responseType == typeof(Result) || (responseType.IsGenericType && responseType.GetGenericTypeDefinition() == typeof(Result<>)))
             {
-                var result = Result.Fail(new Error
+                Type genericType = responseType.GetGenericArguments()[0];
+                Type closedGenericType = typeof(Result<>).MakeGenericType(genericType);
+                MethodInfo failMethod = closedGenericType.GetMethod(nameof(Result.Fail), BindingFlags.Public | BindingFlags.Static, null, new Type[] { typeof(Error) }, null);
+
+                var error = new Error
                 {
                     Message = "Validation failed",
                     Description = errorMessage
-                });
-                return result as TResponse;
+                };
+
+                object instance = failMethod.Invoke(null, new object[] { error });
+
+
+                return instance as TResponse;
             }
         }
 
@@ -65,6 +75,7 @@ public class FluentValidationPipelineBehavior<TRequest, TResponse> : IPipelineBe
         var options = new JsonSerializerOptions
         {
             WriteIndented = true,
+            Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping // Ensures special characters are not escaped
         };
 
         return JsonSerializer.Serialize(new { errors = groupedErrors }, options);

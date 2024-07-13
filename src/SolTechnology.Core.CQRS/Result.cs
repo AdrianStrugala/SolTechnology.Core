@@ -123,6 +123,7 @@ namespace SolTechnology.Core.CQRS
             };
         }
 
+
         public new static Task<Result<T>> FailAsTask(string message)
         {
             return Task.FromResult(new Result<T>
