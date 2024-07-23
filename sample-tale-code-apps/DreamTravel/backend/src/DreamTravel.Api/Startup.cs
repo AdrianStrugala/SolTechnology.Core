@@ -15,6 +15,7 @@ using MicroElements.Swashbuckle.FluentValidation.AspNetCore;
 using SolTechnology.Core.Api.Filters;
 using Microsoft.AspNetCore.Http;
 using SolTechnology.Core.Api.Middlewares;
+using SolTechnology.Core.Logging.Middleware;
 
 namespace DreamTravel.Api
 {

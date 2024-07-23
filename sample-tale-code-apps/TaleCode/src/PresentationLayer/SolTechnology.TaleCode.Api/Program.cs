@@ -6,6 +6,7 @@ using Microsoft.OpenApi.Models;
 using SolTechnology.Core.Api.Filters;
 using SolTechnology.Core.Api.Middlewares;
 using SolTechnology.Core.Authentication;
+using SolTechnology.Core.Logging.Middleware;
 using SolTechnology.TaleCode.PlayerRegistry.Queries;
 using Swashbuckle.AspNetCore.Filters;
 

@@ -1,6 +1,6 @@
 ﻿using System.Collections;
 
-namespace SolTechnology.Core.Api.Middlewares;
+namespace SolTechnology.Core.Logging.Middleware;
 
 public class DisposableCollection : ICollection<IDisposable>, IDisposable
 {

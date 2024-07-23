@@ -1,10 +1,9 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Logging;
-using SolTechnology.Core.Logging;
-using System.Text;
+﻿using System.Text;
 using System.Text.Json;
+using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Logging;
 
-namespace SolTechnology.Core.Api.Middlewares;
+namespace SolTechnology.Core.Logging.Middleware;
 
 public class LoggingMiddleware
 {
@@ -35,15 +34,16 @@ public class LoggingMiddleware
                 _logger.LogInformation("Finished request in [{ElapsedMilliseconds}] ms with status code [{StatusCode}]",
                     asyncStopwatch.Elapsed.TotalMilliseconds, context.Response.StatusCode);
             }
-
         }
-
     }
 
     private async Task<IDisposable> AddRequestIdsToScope(HttpContext context)
     {
         //To show how can some id's be extracted from query
         context.Request.Query.TryGetValue("userId", out var userId);
+
+        //To show how can some id's be extracted from route
+        context.Request.RouteValues.TryGetValue("category", out var category);
 
         //To show how can some id's be extracted from body
         context.Request.EnableBuffering();
@@ -64,6 +64,7 @@ public class LoggingMiddleware
             _logger.AddToScope("environment", Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT")),
             _logger.AddToScope("correlationId", Guid.NewGuid().ToString()),
             _logger.AddToScope("userId", userId.ToString() ?? "unknown"),
+            _logger.AddToScope("category", category?.ToString() ?? "unknown"),
             _logger.AddToScope("name", name ?? "unknown"),
         };
 
