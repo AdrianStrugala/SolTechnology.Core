@@ -1,12 +1,10 @@
 using System.Text.Encodings.Web;
 using System.Text.Unicode;
-using Microsoft.AspNetCore.Mvc.Infrastructure;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.OpenApi.Models;
 using SolTechnology.Core.Api.Filters;
-using SolTechnology.Core.Api.Middlewares;
 using SolTechnology.Core.Authentication;
 using SolTechnology.Core.Logging.Middleware;
+using SolTechnology.TaleCode.PlayerRegistry.Commands;
 using SolTechnology.TaleCode.PlayerRegistry.Queries;
 using Swashbuckle.AspNetCore.Filters;
 
@@ -24,6 +22,7 @@ builder.Services.AddLogging(c =>
 builder.Services.AddApplicationInsightsTelemetry();
 
 builder.Services.InstallQueries();
+builder.Services.InstallCommands();
 
 
 var authenticationFiler = builder.Services.AddAuthenticationAndBuildFilter();

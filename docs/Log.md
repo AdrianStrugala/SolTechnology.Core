@@ -51,32 +51,35 @@ appsettings:
  ```
 
 
-#### Usage
+#### Operation scope:
 
-1) Operation scope:
-a. Begin operation scope (creates a custom dimension - key useful for App Insights tracking)
+1) Begin operation scope (creates a custom dimension - key useful for App Insights tracking)
 ```csharp
    using (_logger.BeginOperationScope(new KeyValuePair<string, object>(command.LogScope.OperationIdName, command.LogScope.OperationId)))
 ```
 
-b. Log operation (action, method, execution) started status
+2) Log operation (action, method, execution) started status
 ```csharp
   _logger.OperationStarted(command.LogScope.OperationName);
 ```
 
-c. Log operation succeeded or failed status
+3) Log operation succeeded or failed status
 ```csharp
    _logger.OperationSucceeded(command.LogScope.OperationName);
    _logger.OperationFailed(command.LogScope.OperationName, e);
 ```
 
-2) Middleware:
-a. Reference middleware
+#### Middleware:
+
+1) Reference middleware
 ```csharp
    app.UseMiddleware<LoggingMiddleware>();
 ```
 
-b. Reference middleware
+2) Expand log scope with whatever data is helpful from request body, path or query
+```csharp
+    _logger.AddToScope("userId", userId.ToString() ?? "unknown"),
+```
  
 
 

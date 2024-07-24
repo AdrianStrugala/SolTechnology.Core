@@ -14,8 +14,6 @@ using Microsoft.AspNetCore.Mvc.Authorization;
 using MicroElements.Swashbuckle.FluentValidation.AspNetCore;
 using SolTechnology.Core.Api.Filters;
 using Microsoft.AspNetCore.Http;
-using SolTechnology.Core.Api.Middlewares;
-using SolTechnology.Core.Logging.Middleware;
 
 namespace DreamTravel.Api
 {
@@ -129,8 +127,6 @@ namespace DreamTravel.Api
 
             app.UseAuthorization();
             app.UseAuthentication();
-
-            app.UseMiddleware<LoggingMiddleware>();
 
             app.Use(async (context, next) =>
             {

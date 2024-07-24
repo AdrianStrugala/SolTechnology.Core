@@ -34,8 +34,6 @@ namespace SolTechnology.TaleCode.BackgroundWorker
 
             services.AddScheduledJob<SynchornizeCristianoRonaldoMatches>(new ScheduledJobConfiguration("0 0 * * *")); //every day at midnight
 
-            services.AddControllers();
-
             services.AddMessageBus()
                     .WithQueueReceiver<PlayerMatchesSynchronizedEvent, CalculatePlayerStatistics>();
 

@@ -3,7 +3,7 @@ using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using SolTechnology.TaleCode.PlayerRegistry.Commands.SynchronizePlayerMatches;
 
-namespace SolTechnology.TaleCode.BackgroundWorker.InternalApi;
+namespace SolTechnology.TaleCode.Api.Controllers;
 
 [ApiController]
 public class SynchronizePlayerMatchesController : ControllerBase
