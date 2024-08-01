@@ -88,6 +88,72 @@ stages:
           arguments: '-p:Configuration=$(BuildConfiguration)'
           publishTestResults: true
 
+      - script: |
+          # fetch swagger.json from appliaction test instance
+        displayName: 'Fetch latest release Swagger specs'
+        condition: eq(variables['Build.Reason'], 'PullRequest')
+
+      - script: |
+          mv nuget.config nuget.temp
+          dotnet tool install --version 6.6.2 Swashbuckle.AspNetCore.Cli --global --ignore-failed-sources
+          swagger tofile --output swagger-build.json taleCode/src/PresentationLayer/SolTechnology.TaleCode.Api/bin/Release/net6.0/SolTechnology.TaleCode.Api.dll v1
+          mv nuget.temp nuget.config
+        displayName: 'Generating build Swagger specs'
+        condition: eq(variables['Build.Reason'], 'PullRequest')
+
+      - script: |
+          if [ -f "swagger.json" ]; then
+            diff -u swagger.json swagger-build.json > swagger.diff
+            if [ -s swagger.diff ]; then
+              echo "Differences found between swagger.json and swagger-build.json"
+              echo swagger.diff
+            else
+              echo "No differences found between swagger.json and swagger-build.json"
+            fi
+          else
+            echo "swagger.json not found!"
+            exit 1
+          fi
+        displayName: 'Run Contract tests'
+        condition: eq(variables['Build.Reason'], 'PullRequest')
+
+      - script: |
+          if [ -s $(Build.SourcesDirectory)/swagger.diff ]; then
+            prId=$(System.PullRequest.PullRequestId)
+            orgUrl=$(System.CollectionUri)
+            project=$(System.TeamProject)
+            repo=$(Build.Repository.Name)
+            token=$(System.AccessToken)
+            
+            diffContent=$(cat $(Build.SourcesDirectory)/swagger.diff)
+            diffContentEscaped=$(echo "$diffContent" | sed 's/\\/\\\\/g' | sed 's/"/\\"/g' | sed 's/\n/\\n/g' | sed 's/\r//g')
+            markdownContent="Review changes done to the API specs:\n\\\diff\\n$diffContentEscaped\\n\\\"
+
+            body='{
+                    "status": "active",
+                    "comments": [
+                      {
+                        "parentCommentId": 0,
+                        "content": "'$markdownContent'",
+                        "commentType": 1
+                      }
+                    ]
+                  }'
+
+            echo "jsonBody: $body"
+
+            curl -X POST "$orgUrl$project/_apis/git/repositories/$repo/pullRequests/$prId/threads?api-version=6.0" \
+                -H "Content-Type: application/json" \
+                -H "Authorization: Bearer $token" \
+                -d "$body"
+          else
+            echo "No differences found, not posting to PR."
+          fi
+        displayName: 'Publish Contract tests result to PR'
+        env:
+          SYSTEM_ACCESSTOKEN: $(System.AccessToken)
+        condition: eq(variables['Build.Reason'], 'PullRequest')
+
 
   - stage: BuildAndPublish
     displayName: Build&Publish

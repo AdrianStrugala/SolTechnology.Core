@@ -4,6 +4,7 @@
 		<TargetFramework>net6.0</TargetFramework>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<RootNamespace>SolTechnology.TaleCode.Api</RootNamespace>
+		<UserSecretsId>44e379e1-3402-4d96-90a1-a7376cc3eb31</UserSecretsId>
 	</PropertyGroup>
 
 	<ItemGroup>
