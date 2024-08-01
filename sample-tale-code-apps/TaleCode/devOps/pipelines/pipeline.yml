@@ -89,7 +89,7 @@ stages:
           publishTestResults: true
 
       - script: |
-          # fetch swagger.json from mts-settlment-services test instance
+          # fetch swagger.json from appliaction test instance
         displayName: 'Fetch latest release Swagger specs'
         condition: eq(variables['Build.Reason'], 'PullRequest')
 
