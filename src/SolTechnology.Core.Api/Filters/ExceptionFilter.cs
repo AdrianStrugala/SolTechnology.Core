@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System.Net;
+using FluentValidation;
 using SolTechnology.Core.CQRS;
 
 namespace SolTechnology.Core.Api.Filters;
@@ -18,31 +19,39 @@ public class ExceptionFilter : IExceptionFilter
     public void OnException(ExceptionContext context)
     {
         _logger.LogError(context.Exception.Message);
+
+        var (code, error) = HandleException(context.Exception);
+
         context.Result = new ObjectResult(new Result()
         {
-            Error = Error.From(context.Exception),
+            Error = error,
             IsSuccess = false
         })
         {
-            StatusCode = GetStatusCode(context.Exception)
+            StatusCode = code
 
         };
         context.ExceptionHandled = true;
     }
 
-    public int GetStatusCode(Exception exception)
+    public (int, Error) HandleException(Exception exception)
     {
-        int code;
+        var error = Error.From(exception);
+        int code = (int)HttpStatusCode.BadRequest;
         switch (exception)
         {
-
             case TaskCanceledException:
                 code = 499;
                 break;
-            default:
-                code = (int)HttpStatusCode.BadRequest;
+
+            case ValidationException:
+                error = new Error
+                {
+                    Message = "Validation failed",
+                    Description = exception.Message
+                };
                 break;
         }
-        return code;
+        return (code, error);
     }
 }

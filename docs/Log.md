@@ -12,8 +12,6 @@ No extra configuration is needed.
 
 ### Usage
 
-1) Add app insights logging
-
 ```csharp
 builder.Services.AddLogging(c =>
         c.AddConsole()
@@ -52,26 +50,40 @@ appsettings:
   }
  ```
 
-2) Begin operation scope (creates a custom dimension - key useful for App Insights tracking)
 
+#### Operation scope:
+
+1) Begin operation scope (creates a custom dimension - key useful for App Insights tracking)
 ```csharp
    using (_logger.BeginOperationScope(new KeyValuePair<string, object>(command.LogScope.OperationIdName, command.LogScope.OperationId)))
 ```
 
 2) Log operation (action, method, execution) started status
-
 ```csharp
   _logger.OperationStarted(command.LogScope.OperationName);
 ```
 
 3) Log operation succeeded or failed status
-
 ```csharp
    _logger.OperationSucceeded(command.LogScope.OperationName);
    _logger.OperationFailed(command.LogScope.OperationName, e);
 ```
 
-4) Example result
+#### Middleware:
+
+1) Reference middleware
+```csharp
+   app.UseMiddleware<LoggingMiddleware>();
+```
+
+2) Expand log scope with whatever data is helpful from request body, path or query
+```csharp
+    _logger.AddToScope("userId", userId.ToString() ?? "unknown"),
+```
+ 
+
+
+### Usage Example result
 
 | Timestamp  | Message  | CustomDimensions.PlayerId  |
 |-----------------------------|------------------------------------------------------------|-----|

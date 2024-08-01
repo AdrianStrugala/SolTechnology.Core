@@ -15,6 +15,7 @@
 	<ItemGroup>
 	  <ProjectReference Include="..\..\..\..\..\src\SolTechnology.Core.Api\SolTechnology.Core.Api.csproj" />
 	  <ProjectReference Include="..\..\..\..\..\src\SolTechnology.Core.Authentication\SolTechnology.Core.Authentication.csproj" />
+	  <ProjectReference Include="..\..\LogicLayer\SolTechnology.TaleCode.Commands\SolTechnology.TaleCode.Commands.csproj" />
 	  <ProjectReference Include="..\..\LogicLayer\SolTechnology.TaleCode.Queries\SolTechnology.TaleCode.Queries.csproj" />
 	</ItemGroup>
 
