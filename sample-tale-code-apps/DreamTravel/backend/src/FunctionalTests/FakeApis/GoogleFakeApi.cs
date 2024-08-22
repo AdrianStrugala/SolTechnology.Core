@@ -9,7 +9,7 @@ using WireMock.RequestBuilders;
 
 namespace DreamTravel.FunctionalTests.FakeApis
 {
-    public class GoogleFakeApi : FakeService<IGoogleApiClient>, IFakeApi, IGoogleApiClient
+    public class GoogleFakeApi : FakeApiBase<IGoogleApiClient>, IGoogleApiClient
     {
         protected override string BaseUrl => "google";
 

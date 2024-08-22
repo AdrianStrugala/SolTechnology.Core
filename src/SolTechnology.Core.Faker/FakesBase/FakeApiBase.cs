@@ -7,9 +7,10 @@ using WireMock.Server;
 
 namespace SolTechnology.Core.Faker.FakesBase;
 
-public abstract class FakeService<TApiClient> :
-    IFakeServiceBuilderWithRequest<TApiClient>,
-    IFakeServiceBuilderWithResponse
+public abstract class FakeApiBase<TApiClient> :
+    IFakeApiBuilderWithRequest<TApiClient>,
+    IFakeApiBuilderWithResponse,
+    IFakeApi
     where TApiClient : class
 
 {
@@ -23,7 +24,7 @@ public abstract class FakeService<TApiClient> :
         _mockServer = mockServer;
     }
 
-    public IFakeServiceBuilderWithResponse WithRequest(
+    public IFakeApiBuilderWithResponse WithRequest(
         Expression<Func<TApiClient, Delegate>> selector,
         object?[]? parameters = null)
     {
@@ -36,7 +37,6 @@ public abstract class FakeService<TApiClient> :
     public void WithResponse(Action<IResponseBuilder> configure)
     {
         var asJson = (IResponseBuilder builder) => configure(new JsonResponseBuilderDecorator(builder));
-
         ArgumentNullException.ThrowIfNull(configure);
         var builder = Response.Create();
         asJson.Invoke(builder);

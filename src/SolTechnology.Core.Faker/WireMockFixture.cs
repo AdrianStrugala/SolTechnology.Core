@@ -17,7 +17,7 @@ namespace SolTechnology.Core.Faker
         public void RegisterFakeApi(IFakeApi fakeApi) => 
             _wireMockStartup.RegisterFakeApi(fakeApi);
 
-        public IFakeServiceBuilderWithRequest<T> Fake<T>() where T : class =>
+        public IFakeApiBuilderWithRequest<T> Fake<T>() where T : class =>
             _wireMockStartup.GetFakeApi<T>();
 
         public void Dispose()

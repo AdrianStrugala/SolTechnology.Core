@@ -2,7 +2,7 @@
 
 namespace SolTechnology.Core.Faker.FakesBase
 {
-    public interface IFakeServiceBuilderWithResponse
+    public interface IFakeApiBuilderWithResponse
     {
         public void WithResponse(Action<IResponseBuilder> configure);
     }

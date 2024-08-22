@@ -37,13 +37,13 @@ namespace SolTechnology.Core.Faker
             return standaloneServer;
         }
 
-        public IFakeServiceBuilderWithRequest<TApiClient> GetFakeApi<TApiClient>() where TApiClient : class
+        public IFakeApiBuilderWithRequest<TApiClient> GetFakeApi<TApiClient>() where TApiClient : class
         {
             var fakeApi = _fakeServices.First(f =>
                 f.GetType().BaseType != null &&
                 f.GetType().BaseType!.GenericTypeArguments.Contains(typeof(TApiClient)));
 
-            return (IFakeServiceBuilderWithRequest<TApiClient>)fakeApi;
+            return (IFakeApiBuilderWithRequest<TApiClient>)fakeApi;
         }
 
         public void RegisterFakeApi(IFakeApi fakeApi)

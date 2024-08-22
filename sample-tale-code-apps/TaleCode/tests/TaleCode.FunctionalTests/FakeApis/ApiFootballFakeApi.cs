@@ -8,7 +8,7 @@ using WireMock.RequestBuilders;
 
 namespace TaleCode.FunctionalTests.FakeApis
 {
-    public class ApiFootballFakeApi : FakeService<IApiFootballApiClient>, IFakeApi, IApiFootballApiClient
+    public class ApiFootballFakeApi : FakeApiBase<IApiFootballApiClient>, IApiFootballApiClient
     {
         protected override string BaseUrl => "api-football";
 
