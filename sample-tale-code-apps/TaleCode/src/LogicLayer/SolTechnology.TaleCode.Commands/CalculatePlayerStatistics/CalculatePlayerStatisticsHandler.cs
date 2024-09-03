@@ -1,4 +1,5 @@
 ﻿using MediatR;
+using Quartz;
 using SolTechnology.Core.CQRS;
 using SolTechnology.TaleCode.BlobData.PlayerStatisticsRepository;
 using SolTechnology.TaleCode.Domain;
@@ -9,7 +10,7 @@ using SolTechnology.TaleCode.StaticData.PlayerId;
 
 namespace SolTechnology.TaleCode.PlayerRegistry.Commands.CalculatePlayerStatistics
 {
-    public class CalculatePlayerStatisticsHandler : ICommandHandler<CalculatePlayerStatisticsCommand>, IRequestHandler<CalculatePlayerStatisticsCommand, Result>
+    public class CalculatePlayerStatisticsHandler : ICommandHandler<CalculatePlayerStatisticsCommand>, IRequestHandler<CalculatePlayerStatisticsCommand, Result>, IJob
     {
         private Func<PlayerStatistics, Task> StoreResult { get; }
         private Func<int, List<Match>> GetMatches { get; }
@@ -116,6 +117,13 @@ namespace SolTechnology.TaleCode.PlayerRegistry.Commands.CalculatePlayerStatisti
             }
 
             return statistic;
+        }
+
+        public async Task Execute(IJobExecutionContext context)
+        {
+           var playerId = context.MergedJobDataMap.GetIntValue("PlayerId");
+
+           await Handle(new CalculatePlayerStatisticsCommand(playerId), CancellationToken.None);
         }
     }
 }

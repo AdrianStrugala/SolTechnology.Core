@@ -1,10 +1,15 @@
 using System.Text.Encodings.Web;
 using System.Text.Unicode;
 using Microsoft.OpenApi.Models;
+using Quartz;
+using Quartz.Simpl;
+using Quartz.Spi;
 using SolTechnology.Core.Api.Filters;
 using SolTechnology.Core.Authentication;
 using SolTechnology.Core.Logging.Middleware;
+using SolTechnology.TaleCode.Api;
 using SolTechnology.TaleCode.PlayerRegistry.Commands;
+using SolTechnology.TaleCode.PlayerRegistry.Commands.CalculatePlayerStatistics;
 using SolTechnology.TaleCode.PlayerRegistry.Queries;
 using Swashbuckle.AspNetCore.Filters;
 
@@ -36,7 +41,31 @@ builder.Services.AddControllers(opts =>
 {
     options.JsonSerializerOptions.Encoder = JavaScriptEncoder.Create(UnicodeRanges.All);
     options.JsonSerializerOptions.WriteIndented = true;
-}); 
+});
+
+
+builder.Services.AddQuartz(q =>
+{
+    q.SchedulerName = "Scheduler-Core";
+
+// these are the defaults
+    q.UseSimpleTypeLoader();
+    q.UseInMemoryStore();
+    q.UseDefaultThreadPool(tp => { tp.MaxConcurrency = 10; });
+
+
+    q.AddJob<CalculatePlayerStatisticsHandler>(j => j
+        .WithIdentity("name", "group") // name "myJob", group "group1"
+        .StoreDurably() // we need to store durably if no trigger is associated
+        .WithDescription("my awesome job")
+    );
+
+});
+
+builder.Services.AddQuartzHostedService(options =>
+{
+    options.WaitForJobsToComplete = true;
+});
 
 
 //SWAGGER
@@ -66,7 +95,6 @@ builder.Services.AddSwaggerGen(c =>
 
 
 var app = builder.Build();
-
 
 app.UseSwagger();
 app.UseSwaggerUI();

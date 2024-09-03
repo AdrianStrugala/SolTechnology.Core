@@ -19,6 +19,9 @@ public class SynchronizePlayerMatchesController : ControllerBase
     [Route("api/SynchronizePlayerMatches/{playerId}")]
     [ProducesResponseType((int)HttpStatusCode.OK)]
     [ProducesResponseType((int)HttpStatusCode.BadRequest)]
-    public async Task<IActionResult> SynchronizePlayerMatches(int playerId) =>
-        Ok(await _mediator.Send(new SynchronizePlayerMatchesCommand(playerId)));
+    public async Task<IActionResult> SynchronizePlayerMatches(int playerId)
+    {
+        var result = await _mediator.Send(new SynchronizePlayerMatchesCommand(playerId));
+        return Ok(result);
+    }
 }
