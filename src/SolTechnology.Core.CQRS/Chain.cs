@@ -83,7 +83,6 @@ namespace SolTechnology.Core.CQRS
                 return Task.FromResult(this);
             }
 
-            var operationResult = new Result();
             try
             {
                 func.Invoke(Context);
@@ -92,10 +91,7 @@ namespace SolTechnology.Core.CQRS
             {
                 _exceptions.Add(e);
             }
-            if (operationResult.IsFailure)
-            {
-                _exceptions.Add(new Exception(operationResult.Error.Message));
-            }
+           
             return Task.FromResult(this);
         }
 
