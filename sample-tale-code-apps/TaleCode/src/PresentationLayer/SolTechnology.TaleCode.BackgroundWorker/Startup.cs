@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc.Infrastructure;
+﻿using Hangfire;
+using Hangfire.MemoryStorage;
+using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.AspNetCore.Mvc;
 using Serilog;
 using SolTechnology.Core.Api;
@@ -37,6 +39,15 @@ namespace SolTechnology.TaleCode.BackgroundWorker
             services.AddMessageBus()
                     .WithQueueReceiver<PlayerMatchesSynchronizedEvent, CalculatePlayerStatistics>();
 
+            //HANGFIRE
+            services.AddHangfire(configuration => configuration
+                .SetDataCompatibilityLevel(CompatibilityLevel.Version_180)
+                .UseSimpleAssemblyNameTypeSerializer()
+                .UseRecommendedSerializerSettings()
+                .UseMemoryStorage());
+
+            services.AddHangfireServer();
+
         }
 
         public void Configure(IApplicationBuilder app)
@@ -57,6 +68,7 @@ namespace SolTechnology.TaleCode.BackgroundWorker
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
+                endpoints.MapHangfireDashboard();
             });
         }
     }
