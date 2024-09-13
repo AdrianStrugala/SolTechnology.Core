@@ -177,6 +177,14 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{BE9DF68B
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SolTechnology.Core.Faker", "SolTechnology.Core.Faker\SolTechnology.Core.Faker.csproj", "{862CF9FB-0A3D-4E7F-8F20-8D6C2243174A}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SolTechnology.TaleCode.Aspire", "..\sample-tale-code-apps\TaleCode\src\SolTechnology.TaleCode.Aspire.AppHost\SolTechnology.TaleCode.Aspire.csproj", "{7863708A-B612-45BB-9BDE-C34D78AF3E30}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SolTechnology.TaleCode.Aspire.ServiceDefaults", "..\sample-tale-code-apps\TaleCode\src\SolTechnology.TaleCode.Aspire.ServiceDefaults\SolTechnology.TaleCode.Aspire.ServiceDefaults.csproj", "{C83A4E1B-3F1E-43F0-9AA3-DDB5A223D47F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SolTechnology.TaleCode.Aspire.ApiService", "..\sample-tale-code-apps\TaleCode\src\SolTechnology.TaleCode.Aspire.ApiService\SolTechnology.TaleCode.Aspire.ApiService.csproj", "{25FBCE52-9FE4-4CE4-9ED3-FE3606C74AC1}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SolTechnology.TaleCode.Aspire.Web", "..\sample-tale-code-apps\TaleCode\src\SolTechnology.TaleCode.Aspire.Web\SolTechnology.TaleCode.Aspire.Web.csproj", "{7E990FA5-3D35-4188-BF1E-78E7C950D087}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -395,6 +403,22 @@ Global
 		{862CF9FB-0A3D-4E7F-8F20-8D6C2243174A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{862CF9FB-0A3D-4E7F-8F20-8D6C2243174A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{862CF9FB-0A3D-4E7F-8F20-8D6C2243174A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7863708A-B612-45BB-9BDE-C34D78AF3E30}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7863708A-B612-45BB-9BDE-C34D78AF3E30}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7863708A-B612-45BB-9BDE-C34D78AF3E30}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7863708A-B612-45BB-9BDE-C34D78AF3E30}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C83A4E1B-3F1E-43F0-9AA3-DDB5A223D47F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C83A4E1B-3F1E-43F0-9AA3-DDB5A223D47F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C83A4E1B-3F1E-43F0-9AA3-DDB5A223D47F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C83A4E1B-3F1E-43F0-9AA3-DDB5A223D47F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{25FBCE52-9FE4-4CE4-9ED3-FE3606C74AC1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{25FBCE52-9FE4-4CE4-9ED3-FE3606C74AC1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{25FBCE52-9FE4-4CE4-9ED3-FE3606C74AC1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{25FBCE52-9FE4-4CE4-9ED3-FE3606C74AC1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7E990FA5-3D35-4188-BF1E-78E7C950D087}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7E990FA5-3D35-4188-BF1E-78E7C950D087}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7E990FA5-3D35-4188-BF1E-78E7C950D087}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7E990FA5-3D35-4188-BF1E-78E7C950D087}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -460,6 +484,10 @@ Global
 		{43778229-C527-47E6-B6C0-CDE422218DA8} = {F55BA14C-499E-480A-A722-0C5B73C14CA4}
 		{473ABBD6-4AD0-48D1-BE20-4CC07165CE59} = {8C45A60F-7098-4D3B-A0FD-2BD85845A2E6}
 		{BE9DF68B-3FD1-45D1-A1A8-86F41273FBA5} = {43778229-C527-47E6-B6C0-CDE422218DA8}
+		{7863708A-B612-45BB-9BDE-C34D78AF3E30} = {03E3CC45-A420-4392-9EBC-AF33E4CB901C}
+		{C83A4E1B-3F1E-43F0-9AA3-DDB5A223D47F} = {FE26A40A-2CA7-4D3D-858E-7DCEB404CF42}
+		{25FBCE52-9FE4-4CE4-9ED3-FE3606C74AC1} = {FE26A40A-2CA7-4D3D-858E-7DCEB404CF42}
+		{7E990FA5-3D35-4188-BF1E-78E7C950D087} = {FE26A40A-2CA7-4D3D-858E-7DCEB404CF42}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {56BC2B7E-7B9F-4B05-951A-C0E3CF0D1287}

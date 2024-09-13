@@ -1,4 +1,4 @@
-﻿<Project Sdk="MSBuild.Sdk.SqlProj/2.6.1">
+﻿<Project Sdk="MSBuild.Sdk.SqlProj/2.8.1">
 	<PropertyGroup>
 		<Name>DreamTravelDatabase</Name>
 		<TargetFramework>netstandard2.1</TargetFramework>

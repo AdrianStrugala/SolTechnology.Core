@@ -18,6 +18,11 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddEndpointsApiExplorer();
 
+// Add service defaults & Aspire components.
+builder.AddServiceDefaults();
+
+// Add services to the container.
+builder.Services.AddProblemDetails();
 
 //TODO: Message bus can be refactored to have internal fluent api like here in AddLogging
 builder.Services.AddLogging(c =>
@@ -79,6 +84,8 @@ builder.Services.AddHangfire(configuration => configuration
 // builder.Services.AddHangfireServer();
 
 var app = builder.Build();
+
+app.MapDefaultEndpoints();
 
 
 app.UseSwagger();
