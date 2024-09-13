@@ -1,10 +1,9 @@
 ﻿using MediatR;
-using SolTechnology.Core.CQRS;
 using SolTechnology.Core.Scheduler;
 using SolTechnology.Core.Scheduler.Configuration;
 using SolTechnology.TaleCode.PlayerRegistry.Commands.SynchronizePlayerMatches;
 
-namespace SolTechnology.TaleCode.BackgroundWorker.ScheduledJobs
+namespace SolTechnology.TaleCode.Worker.ScheduledJobs
 {
     public class SynchornizeCristianoRonaldoMatches : ScheduledJob
     {

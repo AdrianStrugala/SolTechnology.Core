@@ -1,12 +1,9 @@
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Net;
 using System.Net.Http;
-using System.Threading;
 using System.Threading.Tasks;
 using FluentAssertions;
 using Microsoft.AspNetCore.TestHost;
-using SolTechnology.Core.Api;
 using SolTechnology.Core.BlobStorage.Connection;
 using SolTechnology.Core.CQRS;
 using SolTechnology.Core.Faker;
@@ -17,10 +14,10 @@ using SolTechnology.TaleCode.ApiClients.ApiFootballApi.Models;
 using SolTechnology.TaleCode.ApiClients.FootballDataApi;
 using SolTechnology.TaleCode.ApiClients.FootballDataApi.Models;
 using SolTechnology.TaleCode.PlayerRegistry.Queries.GetPlayerStatistics;
-using TaleCode.FunctionalTests.TestsConfiguration;
+using TaleCode.IntegrationTests.TestsConfiguration;
 using Xunit;
 
-namespace TaleCode.FunctionalTests
+namespace TaleCode.IntegrationTests
 {
     [Collection(nameof(TaleCodeFunctionalTestsCollection))]
     public class SynchronizationTest

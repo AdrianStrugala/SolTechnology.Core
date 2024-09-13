@@ -9,4 +9,6 @@ builder.AddProject<Projects.SolTechnology_TaleCode_Aspire_Web>("webfrontend")
 
 builder.AddProject<Projects.SolTechnology_TaleCode_Api>("soltechnology-talecode-api");
 
+builder.AddProject<Projects.SolTechnology_TaleCode_Worker>("soltechnology-talecode-worker");
+
 builder.Build().Run();

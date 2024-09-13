@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 
-namespace SolTechnology.TaleCode.BackgroundWorker
+namespace SolTechnology.TaleCode.Worker
 {
     [ApiController]
     [Route("")]
@@ -17,7 +17,7 @@ namespace SolTechnology.TaleCode.BackgroundWorker
         public string GetAsync()
         {
             _logger.LogWarning("Run");
-            return $"My name is {nameof(BackgroundWorker)}. I am working 1";
+            return $"My name is {nameof(Worker)}. I am working 1";
         }
     }
 }

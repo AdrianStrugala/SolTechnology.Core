@@ -1,6 +1,6 @@
 using System;
 
-namespace TaleCode.FunctionalTests.TestsConfiguration;
+namespace TaleCode.IntegrationTests.TestsConfiguration;
 
 [AttributeUsage(AttributeTargets.Method)]
 public class EndpointReferenceAttribute : Attribute

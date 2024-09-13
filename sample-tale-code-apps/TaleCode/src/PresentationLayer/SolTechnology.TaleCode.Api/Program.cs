@@ -1,27 +1,23 @@
 using System.Text.Encodings.Web;
 using System.Text.Unicode;
 using Hangfire;
-using Hangfire.MemoryStorage;
 using Microsoft.OpenApi.Models;
-using Slapper;
 using SolTechnology.Core.Api.Filters;
 using SolTechnology.Core.Authentication;
 using SolTechnology.Core.Logging.Middleware;
 using SolTechnology.Core.Sql;
+using SolTechnology.TaleCode.Api;
 using SolTechnology.TaleCode.PlayerRegistry.Commands;
 using SolTechnology.TaleCode.PlayerRegistry.Queries;
 using Swashbuckle.AspNetCore.Filters;
 
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-
-builder.Services.AddEndpointsApiExplorer();
-
 // Add service defaults & Aspire components.
+builder.Services.AddEndpointsApiExplorer();
 builder.AddServiceDefaults();
-
-// Add services to the container.
 builder.Services.AddProblemDetails();
 
 //TODO: Message bus can be refactored to have internal fluent api like here in AddLogging
@@ -81,8 +77,6 @@ builder.Services.AddHangfire(configuration => configuration
     .UseRecommendedSerializerSettings()
     .UseSqlServerStorage(sqlConnectionString));
 
-// builder.Services.AddHangfireServer();
-
 var app = builder.Build();
 
 app.MapDefaultEndpoints();
@@ -101,10 +95,7 @@ app.UseAuthorization();
 app.UseAuthentication();
 
 app.MapControllers();
-// app.MapHangfireDashboard();
 
 app.Run();
 
-
-// Make the implicit Program class public so test projects can access it
 public partial class Program { }

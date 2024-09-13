@@ -3,7 +3,7 @@ using System.Diagnostics.CodeAnalysis;
 using AutoFixture;
 using AutoFixture.Xunit2;
 
-namespace TaleCode.FunctionalTests.TestsConfiguration;
+namespace TaleCode.IntegrationTests.TestsConfiguration;
 
 [ExcludeFromCodeCoverage]
 public class AutoFixtureDataAttribute : AutoDataAttribute

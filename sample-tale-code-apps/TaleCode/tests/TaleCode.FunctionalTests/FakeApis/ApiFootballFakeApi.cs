@@ -6,7 +6,7 @@ using SolTechnology.TaleCode.ApiClients.ApiFootballApi.Models;
 using WireMock.Matchers;
 using WireMock.RequestBuilders;
 
-namespace TaleCode.FunctionalTests.FakeApis
+namespace TaleCode.IntegrationTests.FakeApis
 {
     public class ApiFootballFakeApi : FakeApiBase<IApiFootballApiClient>, IApiFootballApiClient
     {

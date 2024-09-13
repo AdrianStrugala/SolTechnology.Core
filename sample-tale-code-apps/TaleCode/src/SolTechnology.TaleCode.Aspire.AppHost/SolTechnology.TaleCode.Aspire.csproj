@@ -11,8 +11,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\PresentationLayer\SolTechnology.TaleCode.Api\SolTechnology.TaleCode.Api.csproj" />
-    <ProjectReference Include="..\SolTechnology.TaleCode.Aspire.ApiService\SolTechnology.TaleCode.Aspire.ApiService.csproj" />
-    <ProjectReference Include="..\SolTechnology.TaleCode.Aspire.Web\SolTechnology.TaleCode.Aspire.Web.csproj" />
+    <ProjectReference Include="..\PresentationLayer\SolTechnology.TaleCode.Worker\SolTechnology.TaleCode.Worker.csproj" />
   </ItemGroup>
 
   <ItemGroup>

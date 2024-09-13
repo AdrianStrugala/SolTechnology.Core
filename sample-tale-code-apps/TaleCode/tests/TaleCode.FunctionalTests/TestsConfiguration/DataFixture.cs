@@ -2,7 +2,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using AutoFixture;
 
-namespace TaleCode.FunctionalTests.TestsConfiguration;
+namespace TaleCode.IntegrationTests.TestsConfiguration;
 
 [ExcludeFromCodeCoverage]
 public class DataFixture : Fixture

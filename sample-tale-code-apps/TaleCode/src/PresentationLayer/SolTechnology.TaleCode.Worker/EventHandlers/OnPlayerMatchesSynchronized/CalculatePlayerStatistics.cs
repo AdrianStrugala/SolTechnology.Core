@@ -2,7 +2,7 @@
 using SolTechnology.Core.MessageBus.Receive;
 using SolTechnology.TaleCode.PlayerRegistry.Commands.CalculatePlayerStatistics;
 
-namespace SolTechnology.TaleCode.BackgroundWorker.EventHandlers.OnPlayerMatchesSynchronized
+namespace SolTechnology.TaleCode.Worker.EventHandlers.OnPlayerMatchesSynchronized
 {
     public class CalculatePlayerStatistics : IMessageHandler<PlayerMatchesSynchronizedEvent>
     {
