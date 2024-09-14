@@ -40,7 +40,6 @@ namespace TaleCode.IntegrationTests
         }
 
         [Theory, AutoFixtureData]
-        [EndpointReference(nameof(SynchronizePlayerMatchesController), nameof(SynchronizePlayerMatchesController.SynchronizePlayerMatches))]
         public async Task After_Synchronization_Player_Data_Can_Be_Accessed_By_Api(
             PlayerModel playerResponse,
             TransferDetails transfersResponse,
@@ -76,6 +75,9 @@ namespace TaleCode.IntegrationTests
 
 
             //Act
+
+            //TODO: change this to trigger worker hangfire job
+
             var synchronizationResponse = await _backgroundWorker
                 .CreateRequest($"api/SynchronizePlayerMatches/{playerId}")
                 .GetAsync();

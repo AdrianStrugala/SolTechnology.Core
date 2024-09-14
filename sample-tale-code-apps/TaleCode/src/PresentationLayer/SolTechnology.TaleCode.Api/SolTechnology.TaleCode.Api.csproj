@@ -8,6 +8,7 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+		<PackageReference Include="Hangfire" Version="1.8.14" />
 		<PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.20.0" />
 		<PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
 		<PackageReference Include="Swashbuckle.AspNetCore.Filters" Version="7.0.6" />
@@ -16,7 +17,7 @@
 	<ItemGroup>
 	  <ProjectReference Include="..\..\..\..\..\src\SolTechnology.Core.Api\SolTechnology.Core.Api.csproj" />
 	  <ProjectReference Include="..\..\..\..\..\src\SolTechnology.Core.Authentication\SolTechnology.Core.Authentication.csproj" />
-	  <ProjectReference Include="..\..\LogicLayer\SolTechnology.TaleCode.Commands\SolTechnology.TaleCode.Commands.csproj" />
+	  <ProjectReference Include="..\..\DataLayer\SolTechnology.TaleCode.Sql\SolTechnology.TaleCode.Sql.csproj" />
 	  <ProjectReference Include="..\..\LogicLayer\SolTechnology.TaleCode.Queries\SolTechnology.TaleCode.Queries.csproj" />
 	  <ProjectReference Include="..\..\SolTechnology.TaleCode.Aspire.ServiceDefaults\SolTechnology.TaleCode.Aspire.ServiceDefaults.csproj" />
 	</ItemGroup>

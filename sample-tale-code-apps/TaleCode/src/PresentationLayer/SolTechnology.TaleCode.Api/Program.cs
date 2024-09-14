@@ -6,7 +6,6 @@ using SolTechnology.Core.Api.Filters;
 using SolTechnology.Core.Authentication;
 using SolTechnology.Core.Logging.Middleware;
 using SolTechnology.Core.Sql;
-using SolTechnology.TaleCode.PlayerRegistry.Commands;
 using SolTechnology.TaleCode.PlayerRegistry.Queries;
 using Swashbuckle.AspNetCore.Filters;
 
@@ -24,14 +23,12 @@ public class Program
         builder.AddServiceDefaults();
         builder.Services.AddProblemDetails();
 
-        //TODO: Message bus can be refactored to have internal fluent api like here in AddLogging
         builder.Services.AddLogging(c =>
-            c.AddConsole()
+                c.AddConsole()
                 .AddApplicationInsights());
         builder.Services.AddApplicationInsightsTelemetry();
 
         builder.Services.InstallQueries();
-        builder.Services.InstallCommands();
 
 
         var authenticationFiler = builder.Services.AddAuthenticationAndBuildFilter();

@@ -3,6 +3,7 @@ using SolTechnology.Core.Api.Middlewares;
 using SolTechnology.Core.Logging.Middleware;
 using SolTechnology.Core.Sql;
 using SolTechnology.TaleCode.PlayerRegistry.Commands;
+using SolTechnology.TaleCode.Worker.ScheduledJobs;
 
 namespace SolTechnology.TaleCode.Worker;
 
@@ -23,12 +24,7 @@ public class Program
 
         builder.Services.InstallCommands();
 
-// builder.Services.AddScheduledJob<SynchornizeCristianoRonaldoMatches>(new ScheduledJobConfiguration("0 0 * * *")); //every day at midnight
-//
-// builder.Services.AddMessageBus()
-//     .WithQueueReceiver<PlayerMatchesSynchronizedEvent, CalculatePlayerStatistics>();
-
-//HANGFIRE
+        //HANGFIRE
         var sqlConnectionString = builder.Configuration.GetSection("Configuration:Sql").Get<SqlConfiguration>().ConnectionString;
         builder.Services.AddHangfire(configuration => configuration
             .SetDataCompatibilityLevel(CompatibilityLevel.Version_180)
@@ -41,9 +37,15 @@ public class Program
 
         var app = builder.Build();
 
+
+        var recurringJobManager = app.Services.GetRequiredService<IRecurringJobManager>();
+        recurringJobManager.AddOrUpdate<SynchornizeCristianoRonaldoMatches>(
+            nameof(SynchornizeCristianoRonaldoMatches),
+            x => x.Execute(),
+            Cron.Daily);
+
+
         app.MapDefaultEndpoints();
-
-
 
         app.UseExceptionHandler("/error");
         app.UseMiddleware<LoggingMiddleware>();
@@ -52,7 +54,6 @@ public class Program
 
         app.UseHttpsRedirection();
         app.MapHangfireDashboard();
-
 
         app.Run();
     }
