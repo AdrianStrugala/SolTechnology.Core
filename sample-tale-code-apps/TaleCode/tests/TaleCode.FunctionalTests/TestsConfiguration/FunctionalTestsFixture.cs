@@ -19,7 +19,7 @@ namespace TaleCode.IntegrationTests.TestsConfiguration
         public FunctionalTestsFixture()
         {
             BackgroundWorkerFixture ??= new ApiFixture<SolTechnology.TaleCode.Worker.Program>();
-            ApiFixture ??= new ApiFixture<Program>();
+            ApiFixture ??= new ApiFixture<SolTechnology.TaleCode.Api.Program>();
             SqlFixture ??= new SqlFixture();
             WireMockFixture ??= new WireMockFixture();
             BlobFixture ??= new BlobFixture();
