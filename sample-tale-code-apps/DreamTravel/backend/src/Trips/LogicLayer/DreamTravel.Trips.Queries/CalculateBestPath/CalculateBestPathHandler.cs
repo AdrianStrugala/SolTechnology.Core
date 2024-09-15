@@ -19,6 +19,7 @@ public class CalculateBestPathHandler : IQueryHandler<CalculateBestPathQuery, Ca
         _solveTSP = solveTsp.Execute;
         _findProfitablePath = findProfitablePath.Execute;
     }
+    
 
 
     public async Task<Result<CalculateBestPathResult>> Handle(CalculateBestPathQuery query, CancellationToken cancellationToken = default)
