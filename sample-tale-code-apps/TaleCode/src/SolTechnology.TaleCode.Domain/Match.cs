@@ -2,7 +2,7 @@
 
 namespace SolTechnology.TaleCode.Domain
 {
-    public record Match
+    public record Match : EntityBase
     {
         public int ApiId { get; set; }
         public int PlayerApiId { get; set; }
@@ -13,6 +13,8 @@ namespace SolTechnology.TaleCode.Domain
         public int AwayTeamScore { get; set; }
         public string Winner { get; set; }
         public string CompetitionWinner { get; set; }
+        
+        public virtual Player Player { get; set; }
 
         private Match()
         {

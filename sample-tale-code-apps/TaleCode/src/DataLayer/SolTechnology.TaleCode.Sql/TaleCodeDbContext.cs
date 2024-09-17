@@ -1,9 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata;
+﻿using Microsoft.EntityFrameworkCore;
+using SolTechnology.TaleCode.Domain;
+using SolTechnology.TaleCode.SqlData.Repository.ExecutionErrorRepository;
 
-namespace SolTechnology.TaleCode.SqlData.Models
+namespace SolTechnology.TaleCode.SqlData
 {
 
     /// <summary>
@@ -52,15 +51,13 @@ namespace SolTechnology.TaleCode.SqlData.Models
                     .IsRequired()
                     .HasMaxLength(50);
 
-                entity.Property(e => e.CreatedAt).HasDefaultValueSql("(getutcdate())");
-
                 entity.Property(e => e.HomeTeam).HasMaxLength(50);
 
                 entity.Property(e => e.Winner)
                     .IsRequired()
                     .HasMaxLength(50);
 
-                entity.HasOne(d => d.PlayerApi)
+                entity.HasOne(d => d.Player)
                     .WithMany(p => p.Matches)
                     .HasPrincipalKey(p => p.ApiId)
                     .HasForeignKey(d => d.PlayerApiId)
@@ -75,8 +72,6 @@ namespace SolTechnology.TaleCode.SqlData.Models
                 entity.HasIndex(e => e.ApiId, "UX_Player_ApiId")
                     .IsUnique();
 
-                entity.Property(e => e.CreatedAt).HasDefaultValueSql("(getutcdate())");
-
                 entity.Property(e => e.Name).HasMaxLength(50);
 
                 entity.Property(e => e.Nationality).HasMaxLength(50);
@@ -88,13 +83,11 @@ namespace SolTechnology.TaleCode.SqlData.Models
             {
                 entity.ToTable("Team");
 
-                entity.Property(e => e.CreatedAt).HasDefaultValueSql("(getutcdate())");
-
                 entity.Property(e => e.Name)
                     .IsRequired()
                     .HasMaxLength(50);
 
-                entity.HasOne(d => d.PlayerApi)
+                entity.HasOne(d => d.Player)
                     .WithMany(p => p.Teams)
                     .HasPrincipalKey(p => p.ApiId)
                     .HasForeignKey(d => d.PlayerApiId)
@@ -106,5 +99,34 @@ namespace SolTechnology.TaleCode.SqlData.Models
         }
 
         partial void OnModelCreatingPartial(ModelBuilder modelBuilder);
+        
+        public override int SaveChanges()
+        {
+            UpdateTimestamps();
+            return base.SaveChanges();
+        }
+
+        public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+        {
+            UpdateTimestamps();
+            return base.SaveChangesAsync(cancellationToken);
+        }
+
+        private void UpdateTimestamps()
+        {
+            var entries = ChangeTracker.Entries()
+                .Where(e => e is { Entity: EntityBase, State: EntityState.Added or EntityState.Modified })
+                .ToList();
+            foreach (var entry in entries)
+            {
+                var entity = (EntityBase)entry.Entity;
+                entity.ModifiedAt = DateTime.UtcNow;
+
+                if (entry.State == EntityState.Added)
+                {
+                    entity.CreatedAt = DateTime.UtcNow;
+                }
+            }
+        }
     }
 }

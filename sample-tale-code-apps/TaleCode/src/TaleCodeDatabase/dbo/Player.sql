@@ -8,7 +8,7 @@
 	[Position] NVARCHAR(50) NULL,
 
 	[CreatedAt] datetime2 NOT NULL DEFAULT GETUTCDATE(),
-	[ModifiedAt] datetime2 NULL
+	[UpdatedAt] datetime2 NULL
 )
 GO
 
@@ -26,7 +26,7 @@ BEGIN
 	UPDATE
 		dbo.[Player]
 	SET
-		ModifiedAt = GETUTCDATE()
+        UpdatedAt = GETUTCDATE()
 	FROM
 		dbo.[Player]
 		JOIN inserted ON inserted.Id = [Player].Id

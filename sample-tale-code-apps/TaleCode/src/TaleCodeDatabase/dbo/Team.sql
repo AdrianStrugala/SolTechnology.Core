@@ -7,7 +7,7 @@
 	[Name] NVARCHAR(50) NOT NULL, 
 
 	[CreatedAt] datetime2 NOT NULL DEFAULT GETUTCDATE(),
-	[ModifiedAt] datetime2 NULL
+	[UpdatedAt] datetime2 NULL
 
     CONSTRAINT [FK_Team_Player] FOREIGN KEY ([PlayerApiId]) REFERENCES [Player]([ApiId])
 )
@@ -23,7 +23,7 @@ BEGIN
 	UPDATE
 		dbo.[Team]
 	SET
-		ModifiedAt = GETUTCDATE()
+        UpdatedAt = GETUTCDATE()
 	FROM
 		dbo.[Team]
 		JOIN inserted ON inserted.Id = [Team].Id

@@ -22,7 +22,7 @@ public class Program
                 .AddApplicationInsights());
         builder.Services.AddApplicationInsightsTelemetry();
 
-        builder.Services.InstallCommands();
+        builder.Services.InstallCommands(builder.Configuration);
 
         //HANGFIRE
         var sqlConnectionString = builder.Configuration.GetSection("Configuration:Sql").Get<SqlConfiguration>().ConnectionString;

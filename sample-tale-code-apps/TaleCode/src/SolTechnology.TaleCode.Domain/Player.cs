@@ -2,7 +2,7 @@
 
 namespace SolTechnology.TaleCode.Domain
 {
-    public record Player
+    public record Player : EntityBase
     {
         public int ApiId { get; set; }
         public string Name { get; set; }

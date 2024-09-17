@@ -2,13 +2,14 @@
 
 namespace SolTechnology.TaleCode.Domain
 {
-    public record Team
+    public record Team : EntityBase
     {
-        public long Id { get; set; }
         public int PlayerApiId { get; set; }
         public DateTime DateFrom { get; set; }
         public DateTime DateTo { get; set; }
         public string Name { get; set; }
+        
+        public virtual Player Player { get; set; }
 
         private Team()
         {

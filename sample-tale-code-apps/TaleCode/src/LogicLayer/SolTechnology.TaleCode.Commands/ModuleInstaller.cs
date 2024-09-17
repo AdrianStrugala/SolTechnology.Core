@@ -1,4 +1,5 @@
 ﻿using FluentValidation;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using SolTechnology.Core.Cache;
 using SolTechnology.Core.CQRS;
@@ -14,11 +15,11 @@ namespace SolTechnology.TaleCode.PlayerRegistry.Commands
 {
     public static class ModuleInstaller
     {
-        public static IServiceCollection InstallCommands(this IServiceCollection services)
+        public static IServiceCollection InstallCommands(this IServiceCollection services, IConfiguration configuration)
         {
             var thisAssembly = typeof(ModuleInstaller).Assembly;
-
-            services.InstallSql();
+            
+            services.InstallSql(configuration);
             services.InstallApiClients();
             services.InstallStaticData();
             services.InstallBlobStorage();

@@ -7,7 +7,7 @@
 	[Valid] BIT NOT NULL,
 
 	[CreatedAt] datetime2 NOT NULL DEFAULT GETUTCDATE(),
-	[ModifiedAt] datetime2 NULL
+	[UpdatedAt] datetime2 NULL
 )
 GO
 
@@ -22,7 +22,7 @@ BEGIN
 	UPDATE
 		dbo.[ExecutionError]
 	SET
-		ModifiedAt = GETUTCDATE()
+        UpdatedAt = GETUTCDATE()
 	FROM
 		dbo.[ExecutionError]
 		JOIN inserted ON inserted.Id = [ExecutionError].Id
