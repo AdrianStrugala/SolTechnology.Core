@@ -62,19 +62,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DreamTravel.Api", "..\sampl
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DreamTravel.Identity.Commands", "..\sample-tale-code-apps\DreamTravel\backend\src\Identity\LogicLayer\DreamTravel.Identity.Commands\DreamTravel.Identity.Commands.csproj", "{F225054F-F4C4-431E-8428-9E1BA7064AA1}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DreamTravel.Identity.Commands.UnitTests", "..\sample-tale-code-apps\DreamTravel\backend\src\Identity\Tests\DreamTravel.Identity.Commands.UnitTests\DreamTravel.Identity.Commands.UnitTests.csproj", "{9D21DE36-9C71-4B7C-945E-6B1AA55586EA}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DreamTravel.Identity.Cryptography", "..\sample-tale-code-apps\DreamTravel\backend\src\Identity\LogicLayer\DreamTravel.Identity.Cryptography\DreamTravel.Identity.Cryptography.csproj", "{F417E89D-5B94-4472-900D-BEF179A32C44}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DreamTravel.Identity.Cryptography.UnitTests", "..\sample-tale-code-apps\DreamTravel\backend\src\Identity\Tests\DreamTravel.Identity.Cryptography.UnitTests\DreamTravel.Identity.Cryptography.UnitTests.csproj", "{34A547A5-E5EE-4E13-8441-4E01FB05E28D}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DreamTravel.Identity.DatabaseData", "..\sample-tale-code-apps\DreamTravel\backend\src\Identity\DataLayer\DreamTravel.Identity.DatabaseData\DreamTravel.Identity.DatabaseData.csproj", "{AED79B0C-FD08-40AD-A182-53EB50800610}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DreamTravel.Identity.DatabaseData.IntegrationTests", "..\sample-tale-code-apps\DreamTravel\backend\src\Identity\Tests\DreamTravel.Identity.DatabaseData.IntegrationTests\DreamTravel.Identity.DatabaseData.IntegrationTests.csproj", "{8FCE9C8A-774A-409D-BF05-A99DF08D6BBE}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DreamTravel.Identity.Domain", "..\sample-tale-code-apps\DreamTravel\backend\src\Identity\DreamTravel.Identity.Domain\DreamTravel.Identity.Domain.csproj", "{4934C4F7-4FC6-4FC6-AF19-462DA89A4DE9}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DreamTravel.Identity.Domain.UnitTests", "..\sample-tale-code-apps\DreamTravel\backend\src\Identity\Tests\DreamTravel.Identity.Domain.UnitTests\DreamTravel.Identity.Domain.UnitTests.csproj", "{DC13B6C0-67BD-45FD-8858-AF89A83BF187}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DreamTravel.Identity.HttpClients", "..\sample-tale-code-apps\DreamTravel\backend\src\Identity\DataLayer\DreamTravel.Identity.HttpClients\DreamTravel.Identity.HttpClients.csproj", "{080B998E-9174-4373-BA9E-0DB87E93D9DF}"
 EndProject
@@ -82,27 +74,15 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DreamTravel.Infrastructure"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DreamTravel.Trips.Commands", "..\sample-tale-code-apps\DreamTravel\backend\src\Trips\LogicLayer\DreamTravel.Trips.Commands\DreamTravel.Trips.Commands.csproj", "{A64CFE55-0FDA-4EB1-A705-2960AEB9B217}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DreamTravel.Trips.Commands.UnitTests", "..\sample-tale-code-apps\DreamTravel\backend\src\Trips\Tests\DreamTravel.Trips.Features.UnitTests\DreamTravel.Trips.Commands.UnitTests.csproj", "{404B05F9-4672-4BF8-87D4-510A84D68450}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DreamTravel.Trips.Domain", "..\sample-tale-code-apps\DreamTravel\backend\src\Trips\DreamTravel.Trips.Domain\DreamTravel.Trips.Domain.csproj", "{73AFABF8-EE14-412C-82D6-C27E20EBF7F4}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DreamTravel.Trips.Domain.UnitTests", "..\sample-tale-code-apps\DreamTravel\backend\src\Trips\Tests\DreamTravel.Trips.Domain.UnitTests\DreamTravel.Trips.Domain.UnitTests.csproj", "{CD392F22-5E63-4AE4-9CAA-E9511F6B9798}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DreamTravel.Trips.GeolocationDataClients", "..\sample-tale-code-apps\DreamTravel\backend\src\Trips\DataLayer\DreamTravel.Trips.GeolocationDataClients\DreamTravel.Trips.GeolocationDataClients.csproj", "{6F09FE2D-0F70-4AAF-9B3F-F21715695E6E}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DreamTravel.Trips.GeolocationDataClients.IntegrationTests", "..\sample-tale-code-apps\DreamTravel\backend\src\Trips\Tests\DreamTravels.Trips.GeolocationData.IntegrationTests\DreamTravel.Trips.GeolocationDataClients.IntegrationTests.csproj", "{FAB5073E-E9F5-4A86-8C58-019527A9FBBA}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DreamTravel.Trips.Queries", "..\sample-tale-code-apps\DreamTravel\backend\src\Trips\LogicLayer\DreamTravel.Trips.Queries\DreamTravel.Trips.Queries.csproj", "{D38B62DE-23E9-4322-92F5-DB9120566DFB}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DreamTravel.Trips.Queries.UnitTests", "..\sample-tale-code-apps\DreamTravel\backend\src\Trips\Tests\DreamTravel.Trips.Queries.UnitTests\DreamTravel.Trips.Queries.UnitTests.csproj", "{78382950-8315-4245-A17A-4B04B7566F1E}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DreamTravel.Trips.TravelingSalesmanProblem", "..\sample-tale-code-apps\DreamTravel\backend\src\Trips\LogicLayer\DreamTravel.Trips.TravelingSalesmanProblem\DreamTravel.Trips.TravelingSalesmanProblem.csproj", "{7A57B0B2-7C01-44A9-9354-8C20CA1E13F7}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DreamTravel.Trips.TravelingSalesmanProblem.UnitTests", "..\sample-tale-code-apps\DreamTravel\backend\src\Trips\Tests\DreamTravels.Trips.TravelingSalesmanProblem.UnitTests\DreamTravel.Trips.TravelingSalesmanProblem.UnitTests.csproj", "{1E26874D-7E0C-4AAE-A03B-87356649B756}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DreamTravelDatabase", "..\sample-tale-code-apps\DreamTravel\backend\src\Infrastructure\DreamTravelDatabase\DreamTravelDatabase.csproj", "{98426C33-10DC-42C0-A305-865125AF5A41}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DreamTravel.FunctionalTests", "..\sample-tale-code-apps\DreamTravel\backend\src\FunctionalTests\DreamTravel.FunctionalTests.csproj", "{59B97430-ADBB-4E1E-AA4D-128761D9A90C}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SolTechnology.TaleCode.Api", "..\sample-tale-code-apps\TaleCode\src\PresentationLayer\SolTechnology.TaleCode.Api\SolTechnology.TaleCode.Api.csproj", "{44F4656A-1664-414C-953F-C6B8D34CD5C4}"
 EndProject
@@ -151,17 +131,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "DataLayer", "DataLayer", "{
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "LogicLayer", "LogicLayer", "{4C7789AA-2CA6-45C2-85B4-398653826B23}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{4F1D67DA-D15E-4EFC-93C7-6C15CE89B209}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{9ED3389A-D1F9-4008-8184-E3F8D7497C52}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "DataLayer", "DataLayer", "{8C45A60F-7098-4D3B-A0FD-2BD85845A2E6}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "LogicLayer", "LogicLayer", "{43778229-C527-47E6-B6C0-CDE422218DA8}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{473ABBD6-4AD0-48D1-BE20-4CC07165CE59}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{BE9DF68B-3FD1-45D1-A1A8-86F41273FBA5}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SolTechnology.Core.Faker", "SolTechnology.Core.Faker\SolTechnology.Core.Faker.csproj", "{862CF9FB-0A3D-4E7F-8F20-8D6C2243174A}"
 EndProject
@@ -170,6 +142,32 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SolTechnology.TaleCode.Aspire.ServiceDefaults", "..\sample-tale-code-apps\TaleCode\src\SolTechnology.TaleCode.Aspire.ServiceDefaults\SolTechnology.TaleCode.Aspire.ServiceDefaults.csproj", "{7D2BF5F5-A11D-4397-924F-804297A5E44D}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SolTechnology.TaleCode.Aspire", "..\sample-tale-code-apps\TaleCode\src\SolTechnology.TaleCode.Aspire.AppHost\SolTechnology.TaleCode.Aspire.csproj", "{31D2E7C6-CFD8-409B-BE94-0CD9DB4CC6AB}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{404A6071-A9F5-4782-A3FB-462DF09FC68A}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Identity", "Identity", "{3929478D-680F-4B96-8F47-13BC19EA4428}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Trips", "Trips", "{FF7E1260-A139-4D69-A1E8-21B66426523A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DreamTravel.Identity.Commands.UnitTests", "..\sample-tale-code-apps\DreamTravel\backend\tests\Identity\DreamTravel.Identity.Commands.UnitTests\DreamTravel.Identity.Commands.UnitTests.csproj", "{548757C9-6E19-473C-8C75-4BCE72AF8BC6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DreamTravel.Identity.Cryptography.UnitTests", "..\sample-tale-code-apps\DreamTravel\backend\tests\Identity\DreamTravel.Identity.Cryptography.UnitTests\DreamTravel.Identity.Cryptography.UnitTests.csproj", "{CC798089-F3B3-4B1D-AB2C-E15F72E1F0CD}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DreamTravel.Identity.DatabaseData.IntegrationTests", "..\sample-tale-code-apps\DreamTravel\backend\tests\Identity\DreamTravel.Identity.DatabaseData.IntegrationTests\DreamTravel.Identity.DatabaseData.IntegrationTests.csproj", "{F5F2E93C-69D7-4DC1-B933-E4F1D91F6405}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DreamTravel.Identity.Domain.UnitTests", "..\sample-tale-code-apps\DreamTravel\backend\tests\Identity\DreamTravel.Identity.Domain.UnitTests\DreamTravel.Identity.Domain.UnitTests.csproj", "{0DA7336F-AD2F-4531-8F73-2DF472D073DA}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DreamTravel.FunctionalTests", "..\sample-tale-code-apps\DreamTravel\backend\tests\FunctionalTests\DreamTravel.FunctionalTests.csproj", "{F2D35B6E-86E1-4569-A8AF-C998FE0650E8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DreamTravel.Trips.Commands.UnitTests", "..\sample-tale-code-apps\DreamTravel\backend\tests\Trips\DreamTravel.Trips.Commands.UnitTests\DreamTravel.Trips.Commands.UnitTests.csproj", "{CFD5B079-8E41-4838-93A0-CEC9F592323A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DreamTravel.Trips.Domain.UnitTests", "..\sample-tale-code-apps\DreamTravel\backend\tests\Trips\DreamTravel.Trips.Domain.UnitTests\DreamTravel.Trips.Domain.UnitTests.csproj", "{25F8EE76-EED5-4747-9893-FD5B38B24E76}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DreamTravel.Trips.Queries.UnitTests", "..\sample-tale-code-apps\DreamTravel\backend\tests\Trips\DreamTravel.Trips.Queries.UnitTests\DreamTravel.Trips.Queries.UnitTests.csproj", "{CC6CBE26-8A2A-46A8-84C6-6C9DF22403F9}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DreamTravel.Trips.GeolocationDataClients.IntegrationTests", "..\sample-tale-code-apps\DreamTravel\backend\tests\Trips\DreamTravels.Trips.GeolocationData.IntegrationTests\DreamTravel.Trips.GeolocationDataClients.IntegrationTests.csproj", "{4B4A1C30-7BB4-4908-BC31-948F06939B81}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DreamTravel.Trips.TravelingSalesmanProblem.UnitTests", "..\sample-tale-code-apps\DreamTravel\backend\tests\Trips\DreamTravels.Trips.TravelingSalesmanProblem.UnitTests\DreamTravel.Trips.TravelingSalesmanProblem.UnitTests.csproj", "{4B52CC8C-6D8E-4187-A46D-79FADD0D8377}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -241,34 +239,18 @@ Global
 		{F225054F-F4C4-431E-8428-9E1BA7064AA1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F225054F-F4C4-431E-8428-9E1BA7064AA1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F225054F-F4C4-431E-8428-9E1BA7064AA1}.Release|Any CPU.Build.0 = Release|Any CPU
-		{9D21DE36-9C71-4B7C-945E-6B1AA55586EA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{9D21DE36-9C71-4B7C-945E-6B1AA55586EA}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{9D21DE36-9C71-4B7C-945E-6B1AA55586EA}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{9D21DE36-9C71-4B7C-945E-6B1AA55586EA}.Release|Any CPU.Build.0 = Release|Any CPU
 		{F417E89D-5B94-4472-900D-BEF179A32C44}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{F417E89D-5B94-4472-900D-BEF179A32C44}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F417E89D-5B94-4472-900D-BEF179A32C44}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F417E89D-5B94-4472-900D-BEF179A32C44}.Release|Any CPU.Build.0 = Release|Any CPU
-		{34A547A5-E5EE-4E13-8441-4E01FB05E28D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{34A547A5-E5EE-4E13-8441-4E01FB05E28D}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{34A547A5-E5EE-4E13-8441-4E01FB05E28D}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{34A547A5-E5EE-4E13-8441-4E01FB05E28D}.Release|Any CPU.Build.0 = Release|Any CPU
 		{AED79B0C-FD08-40AD-A182-53EB50800610}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{AED79B0C-FD08-40AD-A182-53EB50800610}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AED79B0C-FD08-40AD-A182-53EB50800610}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AED79B0C-FD08-40AD-A182-53EB50800610}.Release|Any CPU.Build.0 = Release|Any CPU
-		{8FCE9C8A-774A-409D-BF05-A99DF08D6BBE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{8FCE9C8A-774A-409D-BF05-A99DF08D6BBE}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{8FCE9C8A-774A-409D-BF05-A99DF08D6BBE}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{8FCE9C8A-774A-409D-BF05-A99DF08D6BBE}.Release|Any CPU.Build.0 = Release|Any CPU
 		{4934C4F7-4FC6-4FC6-AF19-462DA89A4DE9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{4934C4F7-4FC6-4FC6-AF19-462DA89A4DE9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4934C4F7-4FC6-4FC6-AF19-462DA89A4DE9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4934C4F7-4FC6-4FC6-AF19-462DA89A4DE9}.Release|Any CPU.Build.0 = Release|Any CPU
-		{DC13B6C0-67BD-45FD-8858-AF89A83BF187}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{DC13B6C0-67BD-45FD-8858-AF89A83BF187}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{DC13B6C0-67BD-45FD-8858-AF89A83BF187}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{DC13B6C0-67BD-45FD-8858-AF89A83BF187}.Release|Any CPU.Build.0 = Release|Any CPU
 		{080B998E-9174-4373-BA9E-0DB87E93D9DF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{080B998E-9174-4373-BA9E-0DB87E93D9DF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{080B998E-9174-4373-BA9E-0DB87E93D9DF}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -281,50 +263,26 @@ Global
 		{A64CFE55-0FDA-4EB1-A705-2960AEB9B217}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A64CFE55-0FDA-4EB1-A705-2960AEB9B217}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A64CFE55-0FDA-4EB1-A705-2960AEB9B217}.Release|Any CPU.Build.0 = Release|Any CPU
-		{404B05F9-4672-4BF8-87D4-510A84D68450}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{404B05F9-4672-4BF8-87D4-510A84D68450}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{404B05F9-4672-4BF8-87D4-510A84D68450}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{404B05F9-4672-4BF8-87D4-510A84D68450}.Release|Any CPU.Build.0 = Release|Any CPU
 		{73AFABF8-EE14-412C-82D6-C27E20EBF7F4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{73AFABF8-EE14-412C-82D6-C27E20EBF7F4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{73AFABF8-EE14-412C-82D6-C27E20EBF7F4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{73AFABF8-EE14-412C-82D6-C27E20EBF7F4}.Release|Any CPU.Build.0 = Release|Any CPU
-		{CD392F22-5E63-4AE4-9CAA-E9511F6B9798}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{CD392F22-5E63-4AE4-9CAA-E9511F6B9798}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{CD392F22-5E63-4AE4-9CAA-E9511F6B9798}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{CD392F22-5E63-4AE4-9CAA-E9511F6B9798}.Release|Any CPU.Build.0 = Release|Any CPU
 		{6F09FE2D-0F70-4AAF-9B3F-F21715695E6E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{6F09FE2D-0F70-4AAF-9B3F-F21715695E6E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6F09FE2D-0F70-4AAF-9B3F-F21715695E6E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6F09FE2D-0F70-4AAF-9B3F-F21715695E6E}.Release|Any CPU.Build.0 = Release|Any CPU
-		{FAB5073E-E9F5-4A86-8C58-019527A9FBBA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{FAB5073E-E9F5-4A86-8C58-019527A9FBBA}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{FAB5073E-E9F5-4A86-8C58-019527A9FBBA}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{FAB5073E-E9F5-4A86-8C58-019527A9FBBA}.Release|Any CPU.Build.0 = Release|Any CPU
 		{D38B62DE-23E9-4322-92F5-DB9120566DFB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{D38B62DE-23E9-4322-92F5-DB9120566DFB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D38B62DE-23E9-4322-92F5-DB9120566DFB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D38B62DE-23E9-4322-92F5-DB9120566DFB}.Release|Any CPU.Build.0 = Release|Any CPU
-		{78382950-8315-4245-A17A-4B04B7566F1E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{78382950-8315-4245-A17A-4B04B7566F1E}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{78382950-8315-4245-A17A-4B04B7566F1E}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{78382950-8315-4245-A17A-4B04B7566F1E}.Release|Any CPU.Build.0 = Release|Any CPU
 		{7A57B0B2-7C01-44A9-9354-8C20CA1E13F7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{7A57B0B2-7C01-44A9-9354-8C20CA1E13F7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7A57B0B2-7C01-44A9-9354-8C20CA1E13F7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7A57B0B2-7C01-44A9-9354-8C20CA1E13F7}.Release|Any CPU.Build.0 = Release|Any CPU
-		{1E26874D-7E0C-4AAE-A03B-87356649B756}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{1E26874D-7E0C-4AAE-A03B-87356649B756}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{1E26874D-7E0C-4AAE-A03B-87356649B756}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{1E26874D-7E0C-4AAE-A03B-87356649B756}.Release|Any CPU.Build.0 = Release|Any CPU
 		{98426C33-10DC-42C0-A305-865125AF5A41}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{98426C33-10DC-42C0-A305-865125AF5A41}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{98426C33-10DC-42C0-A305-865125AF5A41}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{98426C33-10DC-42C0-A305-865125AF5A41}.Release|Any CPU.Build.0 = Release|Any CPU
-		{59B97430-ADBB-4E1E-AA4D-128761D9A90C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{59B97430-ADBB-4E1E-AA4D-128761D9A90C}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{59B97430-ADBB-4E1E-AA4D-128761D9A90C}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{59B97430-ADBB-4E1E-AA4D-128761D9A90C}.Release|Any CPU.Build.0 = Release|Any CPU
 		{44F4656A-1664-414C-953F-C6B8D34CD5C4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{44F4656A-1664-414C-953F-C6B8D34CD5C4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{44F4656A-1664-414C-953F-C6B8D34CD5C4}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -381,6 +339,46 @@ Global
 		{31D2E7C6-CFD8-409B-BE94-0CD9DB4CC6AB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{31D2E7C6-CFD8-409B-BE94-0CD9DB4CC6AB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{31D2E7C6-CFD8-409B-BE94-0CD9DB4CC6AB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{548757C9-6E19-473C-8C75-4BCE72AF8BC6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{548757C9-6E19-473C-8C75-4BCE72AF8BC6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{548757C9-6E19-473C-8C75-4BCE72AF8BC6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{548757C9-6E19-473C-8C75-4BCE72AF8BC6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CC798089-F3B3-4B1D-AB2C-E15F72E1F0CD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CC798089-F3B3-4B1D-AB2C-E15F72E1F0CD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CC798089-F3B3-4B1D-AB2C-E15F72E1F0CD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CC798089-F3B3-4B1D-AB2C-E15F72E1F0CD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F5F2E93C-69D7-4DC1-B933-E4F1D91F6405}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F5F2E93C-69D7-4DC1-B933-E4F1D91F6405}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F5F2E93C-69D7-4DC1-B933-E4F1D91F6405}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F5F2E93C-69D7-4DC1-B933-E4F1D91F6405}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0DA7336F-AD2F-4531-8F73-2DF472D073DA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0DA7336F-AD2F-4531-8F73-2DF472D073DA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0DA7336F-AD2F-4531-8F73-2DF472D073DA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0DA7336F-AD2F-4531-8F73-2DF472D073DA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F2D35B6E-86E1-4569-A8AF-C998FE0650E8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F2D35B6E-86E1-4569-A8AF-C998FE0650E8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F2D35B6E-86E1-4569-A8AF-C998FE0650E8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F2D35B6E-86E1-4569-A8AF-C998FE0650E8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CFD5B079-8E41-4838-93A0-CEC9F592323A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CFD5B079-8E41-4838-93A0-CEC9F592323A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CFD5B079-8E41-4838-93A0-CEC9F592323A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CFD5B079-8E41-4838-93A0-CEC9F592323A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{25F8EE76-EED5-4747-9893-FD5B38B24E76}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{25F8EE76-EED5-4747-9893-FD5B38B24E76}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{25F8EE76-EED5-4747-9893-FD5B38B24E76}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{25F8EE76-EED5-4747-9893-FD5B38B24E76}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CC6CBE26-8A2A-46A8-84C6-6C9DF22403F9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CC6CBE26-8A2A-46A8-84C6-6C9DF22403F9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CC6CBE26-8A2A-46A8-84C6-6C9DF22403F9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CC6CBE26-8A2A-46A8-84C6-6C9DF22403F9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4B4A1C30-7BB4-4908-BC31-948F06939B81}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4B4A1C30-7BB4-4908-BC31-948F06939B81}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4B4A1C30-7BB4-4908-BC31-948F06939B81}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4B4A1C30-7BB4-4908-BC31-948F06939B81}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4B52CC8C-6D8E-4187-A46D-79FADD0D8377}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4B52CC8C-6D8E-4187-A46D-79FADD0D8377}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4B52CC8C-6D8E-4187-A46D-79FADD0D8377}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4B52CC8C-6D8E-4187-A46D-79FADD0D8377}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -391,27 +389,17 @@ Global
 		{86FA2E60-9AED-4FD4-B53D-722CBE8CC2A8} = {7EF7950D-4549-43F6-A47C-FDF15CD6D98F}
 		{7F7D6165-43D9-4A82-84F3-13AB2341FF75} = {D9E61986-EACB-4DFD-949F-ED2F27DB1F75}
 		{F225054F-F4C4-431E-8428-9E1BA7064AA1} = {43778229-C527-47E6-B6C0-CDE422218DA8}
-		{9D21DE36-9C71-4B7C-945E-6B1AA55586EA} = {BE9DF68B-3FD1-45D1-A1A8-86F41273FBA5}
 		{F417E89D-5B94-4472-900D-BEF179A32C44} = {43778229-C527-47E6-B6C0-CDE422218DA8}
-		{34A547A5-E5EE-4E13-8441-4E01FB05E28D} = {BE9DF68B-3FD1-45D1-A1A8-86F41273FBA5}
 		{AED79B0C-FD08-40AD-A182-53EB50800610} = {8C45A60F-7098-4D3B-A0FD-2BD85845A2E6}
-		{8FCE9C8A-774A-409D-BF05-A99DF08D6BBE} = {473ABBD6-4AD0-48D1-BE20-4CC07165CE59}
 		{4934C4F7-4FC6-4FC6-AF19-462DA89A4DE9} = {F55BA14C-499E-480A-A722-0C5B73C14CA4}
-		{DC13B6C0-67BD-45FD-8858-AF89A83BF187} = {F55BA14C-499E-480A-A722-0C5B73C14CA4}
 		{080B998E-9174-4373-BA9E-0DB87E93D9DF} = {8C45A60F-7098-4D3B-A0FD-2BD85845A2E6}
 		{4A8E3915-04CF-4B1D-9DFF-88CD890629EA} = {6541B884-6E1F-492F-B5CB-1117C78760FE}
 		{A64CFE55-0FDA-4EB1-A705-2960AEB9B217} = {4C7789AA-2CA6-45C2-85B4-398653826B23}
-		{404B05F9-4672-4BF8-87D4-510A84D68450} = {4F1D67DA-D15E-4EFC-93C7-6C15CE89B209}
 		{73AFABF8-EE14-412C-82D6-C27E20EBF7F4} = {420E5B4D-02EA-463D-B929-B3FDA2FA8046}
-		{CD392F22-5E63-4AE4-9CAA-E9511F6B9798} = {420E5B4D-02EA-463D-B929-B3FDA2FA8046}
 		{6F09FE2D-0F70-4AAF-9B3F-F21715695E6E} = {F88D9F2D-E763-4B94-88DC-0EFD21AD8138}
-		{FAB5073E-E9F5-4A86-8C58-019527A9FBBA} = {9ED3389A-D1F9-4008-8184-E3F8D7497C52}
 		{D38B62DE-23E9-4322-92F5-DB9120566DFB} = {4C7789AA-2CA6-45C2-85B4-398653826B23}
-		{78382950-8315-4245-A17A-4B04B7566F1E} = {4F1D67DA-D15E-4EFC-93C7-6C15CE89B209}
 		{7A57B0B2-7C01-44A9-9354-8C20CA1E13F7} = {4C7789AA-2CA6-45C2-85B4-398653826B23}
-		{1E26874D-7E0C-4AAE-A03B-87356649B756} = {4F1D67DA-D15E-4EFC-93C7-6C15CE89B209}
 		{98426C33-10DC-42C0-A305-865125AF5A41} = {6541B884-6E1F-492F-B5CB-1117C78760FE}
-		{59B97430-ADBB-4E1E-AA4D-128761D9A90C} = {D9E61986-EACB-4DFD-949F-ED2F27DB1F75}
 		{44F4656A-1664-414C-953F-C6B8D34CD5C4} = {FE26A40A-2CA7-4D3D-858E-7DCEB404CF42}
 		{B107F553-01B6-4E8A-91F1-B8C37EEF2512} = {604EB996-7D4A-4E23-A85B-6F84FC6436B1}
 		{F25D9A60-A501-4323-AC02-AB2AFE078E6B} = {FE26A40A-2CA7-4D3D-858E-7DCEB404CF42}
@@ -434,15 +422,24 @@ Global
 		{604EB996-7D4A-4E23-A85B-6F84FC6436B1} = {03E3CC45-A420-4392-9EBC-AF33E4CB901C}
 		{F88D9F2D-E763-4B94-88DC-0EFD21AD8138} = {420E5B4D-02EA-463D-B929-B3FDA2FA8046}
 		{4C7789AA-2CA6-45C2-85B4-398653826B23} = {420E5B4D-02EA-463D-B929-B3FDA2FA8046}
-		{4F1D67DA-D15E-4EFC-93C7-6C15CE89B209} = {4C7789AA-2CA6-45C2-85B4-398653826B23}
-		{9ED3389A-D1F9-4008-8184-E3F8D7497C52} = {F88D9F2D-E763-4B94-88DC-0EFD21AD8138}
 		{8C45A60F-7098-4D3B-A0FD-2BD85845A2E6} = {F55BA14C-499E-480A-A722-0C5B73C14CA4}
 		{43778229-C527-47E6-B6C0-CDE422218DA8} = {F55BA14C-499E-480A-A722-0C5B73C14CA4}
-		{473ABBD6-4AD0-48D1-BE20-4CC07165CE59} = {8C45A60F-7098-4D3B-A0FD-2BD85845A2E6}
-		{BE9DF68B-3FD1-45D1-A1A8-86F41273FBA5} = {43778229-C527-47E6-B6C0-CDE422218DA8}
 		{C410F1D0-0F69-4424-AF3E-2DD7363EE14D} = {03E3CC45-A420-4392-9EBC-AF33E4CB901C}
 		{7D2BF5F5-A11D-4397-924F-804297A5E44D} = {FE26A40A-2CA7-4D3D-858E-7DCEB404CF42}
 		{31D2E7C6-CFD8-409B-BE94-0CD9DB4CC6AB} = {03E3CC45-A420-4392-9EBC-AF33E4CB901C}
+		{404A6071-A9F5-4782-A3FB-462DF09FC68A} = {D9E61986-EACB-4DFD-949F-ED2F27DB1F75}
+		{3929478D-680F-4B96-8F47-13BC19EA4428} = {404A6071-A9F5-4782-A3FB-462DF09FC68A}
+		{FF7E1260-A139-4D69-A1E8-21B66426523A} = {404A6071-A9F5-4782-A3FB-462DF09FC68A}
+		{548757C9-6E19-473C-8C75-4BCE72AF8BC6} = {3929478D-680F-4B96-8F47-13BC19EA4428}
+		{CC798089-F3B3-4B1D-AB2C-E15F72E1F0CD} = {3929478D-680F-4B96-8F47-13BC19EA4428}
+		{F5F2E93C-69D7-4DC1-B933-E4F1D91F6405} = {3929478D-680F-4B96-8F47-13BC19EA4428}
+		{0DA7336F-AD2F-4531-8F73-2DF472D073DA} = {3929478D-680F-4B96-8F47-13BC19EA4428}
+		{F2D35B6E-86E1-4569-A8AF-C998FE0650E8} = {404A6071-A9F5-4782-A3FB-462DF09FC68A}
+		{CFD5B079-8E41-4838-93A0-CEC9F592323A} = {FF7E1260-A139-4D69-A1E8-21B66426523A}
+		{25F8EE76-EED5-4747-9893-FD5B38B24E76} = {FF7E1260-A139-4D69-A1E8-21B66426523A}
+		{CC6CBE26-8A2A-46A8-84C6-6C9DF22403F9} = {FF7E1260-A139-4D69-A1E8-21B66426523A}
+		{4B4A1C30-7BB4-4908-BC31-948F06939B81} = {FF7E1260-A139-4D69-A1E8-21B66426523A}
+		{4B52CC8C-6D8E-4187-A46D-79FADD0D8377} = {FF7E1260-A139-4D69-A1E8-21B66426523A}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {56BC2B7E-7B9F-4B05-951A-C0E3CF0D1287}
