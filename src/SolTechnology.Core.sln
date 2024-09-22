@@ -169,6 +169,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DreamTravel.Trips.Geolocati
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DreamTravel.Trips.TravelingSalesmanProblem.UnitTests", "..\sample-tale-code-apps\DreamTravel\backend\tests\Trips\DreamTravels.Trips.TravelingSalesmanProblem.UnitTests\DreamTravel.Trips.TravelingSalesmanProblem.UnitTests.csproj", "{4B52CC8C-6D8E-4187-A46D-79FADD0D8377}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DreamTravel.Worker", "..\sample-tale-code-apps\DreamTravel\backend\src\DreamTravel.Worker\DreamTravel.Worker.csproj", "{B7D1C49C-CB87-4DE6-9599-CDDE2957DD07}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DreamTravel.Trips.Sql", "..\sample-tale-code-apps\DreamTravel\backend\src\Trips\DataLayer\DreamTravel.Trips.Sql\DreamTravel.Trips.Sql.csproj", "{1449FA96-0E63-4EEC-B073-6ED09193B7CE}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -379,6 +383,14 @@ Global
 		{4B52CC8C-6D8E-4187-A46D-79FADD0D8377}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4B52CC8C-6D8E-4187-A46D-79FADD0D8377}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4B52CC8C-6D8E-4187-A46D-79FADD0D8377}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B7D1C49C-CB87-4DE6-9599-CDDE2957DD07}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B7D1C49C-CB87-4DE6-9599-CDDE2957DD07}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B7D1C49C-CB87-4DE6-9599-CDDE2957DD07}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B7D1C49C-CB87-4DE6-9599-CDDE2957DD07}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1449FA96-0E63-4EEC-B073-6ED09193B7CE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1449FA96-0E63-4EEC-B073-6ED09193B7CE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1449FA96-0E63-4EEC-B073-6ED09193B7CE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1449FA96-0E63-4EEC-B073-6ED09193B7CE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -440,6 +452,8 @@ Global
 		{CC6CBE26-8A2A-46A8-84C6-6C9DF22403F9} = {FF7E1260-A139-4D69-A1E8-21B66426523A}
 		{4B4A1C30-7BB4-4908-BC31-948F06939B81} = {FF7E1260-A139-4D69-A1E8-21B66426523A}
 		{4B52CC8C-6D8E-4187-A46D-79FADD0D8377} = {FF7E1260-A139-4D69-A1E8-21B66426523A}
+		{B7D1C49C-CB87-4DE6-9599-CDDE2957DD07} = {D9E61986-EACB-4DFD-949F-ED2F27DB1F75}
+		{1449FA96-0E63-4EEC-B073-6ED09193B7CE} = {F88D9F2D-E763-4B94-88DC-0EFD21AD8138}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {56BC2B7E-7B9F-4B05-951A-C0E3CF0D1287}
