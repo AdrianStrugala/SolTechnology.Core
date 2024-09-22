@@ -155,13 +155,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DreamTravel.Identity.Crypto
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DreamTravel.Identity.DatabaseData.IntegrationTests", "..\sample-tale-code-apps\DreamTravel\backend\tests\Identity\DreamTravel.Identity.DatabaseData.IntegrationTests\DreamTravel.Identity.DatabaseData.IntegrationTests.csproj", "{F5F2E93C-69D7-4DC1-B933-E4F1D91F6405}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DreamTravel.Identity.Domain.UnitTests", "..\sample-tale-code-apps\DreamTravel\backend\tests\Identity\DreamTravel.Identity.Domain.UnitTests\DreamTravel.Identity.Domain.UnitTests.csproj", "{0DA7336F-AD2F-4531-8F73-2DF472D073DA}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DreamTravel.FunctionalTests", "..\sample-tale-code-apps\DreamTravel\backend\tests\FunctionalTests\DreamTravel.FunctionalTests.csproj", "{F2D35B6E-86E1-4569-A8AF-C998FE0650E8}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DreamTravel.Trips.Commands.UnitTests", "..\sample-tale-code-apps\DreamTravel\backend\tests\Trips\DreamTravel.Trips.Commands.UnitTests\DreamTravel.Trips.Commands.UnitTests.csproj", "{CFD5B079-8E41-4838-93A0-CEC9F592323A}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DreamTravel.Trips.Domain.UnitTests", "..\sample-tale-code-apps\DreamTravel\backend\tests\Trips\DreamTravel.Trips.Domain.UnitTests\DreamTravel.Trips.Domain.UnitTests.csproj", "{25F8EE76-EED5-4747-9893-FD5B38B24E76}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DreamTravel.Trips.Queries.UnitTests", "..\sample-tale-code-apps\DreamTravel\backend\tests\Trips\DreamTravel.Trips.Queries.UnitTests\DreamTravel.Trips.Queries.UnitTests.csproj", "{CC6CBE26-8A2A-46A8-84C6-6C9DF22403F9}"
 EndProject
@@ -172,6 +166,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DreamTravel.Worker", "..\sample-tale-code-apps\DreamTravel\backend\src\DreamTravel.Worker\DreamTravel.Worker.csproj", "{B7D1C49C-CB87-4DE6-9599-CDDE2957DD07}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DreamTravel.Trips.Sql", "..\sample-tale-code-apps\DreamTravel\backend\src\Trips\DataLayer\DreamTravel.Trips.Sql\DreamTravel.Trips.Sql.csproj", "{1449FA96-0E63-4EEC-B073-6ED09193B7CE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DreamTravel.Trips.Commands.UnitTests", "..\sample-tale-code-apps\DreamTravel\backend\tests\Trips\DreamTravel.Trips.Commands.UnitTests\DreamTravel.Trips.Commands.UnitTests.csproj", "{B2B2DBF9-2EF6-4C9E-A970-84E16AD4CF40}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -355,22 +351,10 @@ Global
 		{F5F2E93C-69D7-4DC1-B933-E4F1D91F6405}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F5F2E93C-69D7-4DC1-B933-E4F1D91F6405}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F5F2E93C-69D7-4DC1-B933-E4F1D91F6405}.Release|Any CPU.Build.0 = Release|Any CPU
-		{0DA7336F-AD2F-4531-8F73-2DF472D073DA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{0DA7336F-AD2F-4531-8F73-2DF472D073DA}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{0DA7336F-AD2F-4531-8F73-2DF472D073DA}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{0DA7336F-AD2F-4531-8F73-2DF472D073DA}.Release|Any CPU.Build.0 = Release|Any CPU
 		{F2D35B6E-86E1-4569-A8AF-C998FE0650E8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{F2D35B6E-86E1-4569-A8AF-C998FE0650E8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F2D35B6E-86E1-4569-A8AF-C998FE0650E8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F2D35B6E-86E1-4569-A8AF-C998FE0650E8}.Release|Any CPU.Build.0 = Release|Any CPU
-		{CFD5B079-8E41-4838-93A0-CEC9F592323A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{CFD5B079-8E41-4838-93A0-CEC9F592323A}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{CFD5B079-8E41-4838-93A0-CEC9F592323A}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{CFD5B079-8E41-4838-93A0-CEC9F592323A}.Release|Any CPU.Build.0 = Release|Any CPU
-		{25F8EE76-EED5-4747-9893-FD5B38B24E76}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{25F8EE76-EED5-4747-9893-FD5B38B24E76}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{25F8EE76-EED5-4747-9893-FD5B38B24E76}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{25F8EE76-EED5-4747-9893-FD5B38B24E76}.Release|Any CPU.Build.0 = Release|Any CPU
 		{CC6CBE26-8A2A-46A8-84C6-6C9DF22403F9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{CC6CBE26-8A2A-46A8-84C6-6C9DF22403F9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CC6CBE26-8A2A-46A8-84C6-6C9DF22403F9}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -391,6 +375,10 @@ Global
 		{1449FA96-0E63-4EEC-B073-6ED09193B7CE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1449FA96-0E63-4EEC-B073-6ED09193B7CE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1449FA96-0E63-4EEC-B073-6ED09193B7CE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B2B2DBF9-2EF6-4C9E-A970-84E16AD4CF40}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B2B2DBF9-2EF6-4C9E-A970-84E16AD4CF40}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B2B2DBF9-2EF6-4C9E-A970-84E16AD4CF40}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B2B2DBF9-2EF6-4C9E-A970-84E16AD4CF40}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -445,15 +433,13 @@ Global
 		{548757C9-6E19-473C-8C75-4BCE72AF8BC6} = {3929478D-680F-4B96-8F47-13BC19EA4428}
 		{CC798089-F3B3-4B1D-AB2C-E15F72E1F0CD} = {3929478D-680F-4B96-8F47-13BC19EA4428}
 		{F5F2E93C-69D7-4DC1-B933-E4F1D91F6405} = {3929478D-680F-4B96-8F47-13BC19EA4428}
-		{0DA7336F-AD2F-4531-8F73-2DF472D073DA} = {3929478D-680F-4B96-8F47-13BC19EA4428}
 		{F2D35B6E-86E1-4569-A8AF-C998FE0650E8} = {404A6071-A9F5-4782-A3FB-462DF09FC68A}
-		{CFD5B079-8E41-4838-93A0-CEC9F592323A} = {FF7E1260-A139-4D69-A1E8-21B66426523A}
-		{25F8EE76-EED5-4747-9893-FD5B38B24E76} = {FF7E1260-A139-4D69-A1E8-21B66426523A}
 		{CC6CBE26-8A2A-46A8-84C6-6C9DF22403F9} = {FF7E1260-A139-4D69-A1E8-21B66426523A}
 		{4B4A1C30-7BB4-4908-BC31-948F06939B81} = {FF7E1260-A139-4D69-A1E8-21B66426523A}
 		{4B52CC8C-6D8E-4187-A46D-79FADD0D8377} = {FF7E1260-A139-4D69-A1E8-21B66426523A}
 		{B7D1C49C-CB87-4DE6-9599-CDDE2957DD07} = {D9E61986-EACB-4DFD-949F-ED2F27DB1F75}
 		{1449FA96-0E63-4EEC-B073-6ED09193B7CE} = {F88D9F2D-E763-4B94-88DC-0EFD21AD8138}
+		{B2B2DBF9-2EF6-4C9E-A970-84E16AD4CF40} = {FF7E1260-A139-4D69-A1E8-21B66426523A}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {56BC2B7E-7B9F-4B05-951A-C0E3CF0D1287}

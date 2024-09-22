@@ -38,8 +38,6 @@ public class Program
         //     Cron.Daily);
 
 
-        app.MapDefaultEndpoints();
-        app.UseHttpsRedirection();
         app.MapHangfireDashboard();
 
         app.Run();

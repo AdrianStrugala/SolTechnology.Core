@@ -11,7 +11,7 @@ using Microsoft.Extensions.Options;
 using NSubstitute;
 using Xunit;
 
-namespace DreamTravel.Trips.GeolocationDataClients.IntegrationTests
+namespace DreamTravel.FunctionalTests
 {
     public class DownloadRoadDataTests
     {

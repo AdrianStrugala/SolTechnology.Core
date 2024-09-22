@@ -14,7 +14,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\LogicLayer\DreamTravel.Identity.Cryptography\DreamTravel.Identity.Cryptography.csproj" />
+    <ProjectReference Include="..\..\..\src\Identity\LogicLayer\DreamTravel.Identity.Cryptography\DreamTravel.Identity.Cryptography.csproj" />
   </ItemGroup>
 
 </Project>

@@ -13,9 +13,6 @@
 )
 GO
 
-CREATE UNIQUE INDEX [UX_City_UserId] ON [dbo].[City] ([CityId])
-GO
-
 
 CREATE TRIGGER [OnUpdateCity_SetUpdatedAtToCurrentTime]
 ON dbo.[City]

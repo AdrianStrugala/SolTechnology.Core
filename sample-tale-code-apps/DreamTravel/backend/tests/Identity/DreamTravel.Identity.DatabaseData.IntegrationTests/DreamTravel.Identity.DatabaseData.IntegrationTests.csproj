@@ -14,13 +14,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\..\DataLayer\DreamTravel.Identity.DatabaseData\DreamTravel.Identity.DatabaseData.csproj" />
-	</ItemGroup>
-
-	<ItemGroup>
-		<Content Include="..\..\..\DreamTravel.Api\appsettings.json" Link="appsettings.json">
-			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-		</Content>
+	  <ProjectReference Include="..\..\..\src\Identity\DataLayer\DreamTravel.Identity.DatabaseData\DreamTravel.Identity.DatabaseData.csproj" />
 	</ItemGroup>
 
 </Project>
