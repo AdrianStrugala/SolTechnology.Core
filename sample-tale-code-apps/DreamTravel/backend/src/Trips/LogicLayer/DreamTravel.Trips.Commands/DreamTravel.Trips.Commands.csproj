@@ -8,9 +8,11 @@
 
 	<ItemGroup>
 	  <PackageReference Include="Hangfire.Core" Version="1.8.14" />
+	  <PackageReference Include="MediatR" Version="12.4.1" />
 	</ItemGroup>
 
 	<ItemGroup>
+		<ProjectReference Include="..\..\DreamTravel.Trips.Domain\DreamTravel.Trips.Domain.csproj" />
 		<ProjectReference Include="..\DreamTravel.Trips.TravelingSalesmanProblem\DreamTravel.Trips.TravelingSalesmanProblem.csproj" />
 	</ItemGroup>
 

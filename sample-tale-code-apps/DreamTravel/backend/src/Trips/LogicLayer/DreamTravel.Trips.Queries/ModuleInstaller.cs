@@ -21,7 +21,6 @@ namespace DreamTravel.Trips.Queries
             services.AddTransient<ISolveTsp, SolveTsp>();
             services.AddTransient<IDownloadRoadData, DownloadRoadData>();
 
-
             services.InstallGeolocationDataClients();
 
             return services;

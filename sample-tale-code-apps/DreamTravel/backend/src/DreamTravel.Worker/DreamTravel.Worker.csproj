@@ -8,6 +8,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\..\..\..\src\SolTechnology.Core.Sql\SolTechnology.Core.Sql.csproj" />
+    <ProjectReference Include="..\Trips\DreamTravel.Trips.Domain\DreamTravel.Trips.Domain.csproj" />
     <ProjectReference Include="..\Trips\LogicLayer\DreamTravel.Trips.Commands\DreamTravel.Trips.Commands.csproj" />
   </ItemGroup>
 

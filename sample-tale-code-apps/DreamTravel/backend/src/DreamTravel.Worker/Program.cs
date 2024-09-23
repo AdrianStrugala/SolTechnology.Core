@@ -26,6 +26,12 @@ public class Program
             .UseSqlServerStorage(sqlConnectionString));
 
         builder.Services.AddHangfireServer();
+        
+        var thisAssembly = typeof(Program).Assembly;
+        builder.Services.AddMediatR(cfg =>
+        {
+            cfg.RegisterServicesFromAssemblies(thisAssembly);
+        });
 
 
         var app = builder.Build();

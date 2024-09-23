@@ -10,10 +10,12 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
 using System.Globalization;
+using DreamTravel.Infrastructure.Events;
 using Microsoft.AspNetCore.Mvc.Authorization;
 using MicroElements.Swashbuckle.FluentValidation.AspNetCore;
 using SolTechnology.Core.Api.Filters;
 using Microsoft.AspNetCore.Http;
+using SolTechnology.Core.Logging.Middleware;
 
 namespace DreamTravel.Api
 {
@@ -36,7 +38,7 @@ namespace DreamTravel.Api
                 .Build();
 
             var cultureInfo = new CultureInfo("en-US");
-            cultureInfo.NumberFormat.CurrencySymbol = "€";
+            cultureInfo.NumberFormat.CurrencySymbol = "ï¿½";
 
             CultureInfo.DefaultThreadCurrentCulture = cultureInfo;
             CultureInfo.DefaultThreadCurrentUICulture = cultureInfo;
@@ -69,6 +71,13 @@ namespace DreamTravel.Api
 
             services.AddControllers();
 
+            var thisAssembly = typeof(Startup).Assembly;
+            services.AddMediatR(cfg =>
+            {
+                cfg.RegisterServicesFromAssemblies(thisAssembly);
+                cfg.NotificationPublisher = new HangfireNotificationPublisher();
+            });
+            
             //AUTHENTICATION
             services.AddAuthentication(DreamAuthenticationOptions.AuthenticationScheme)
                     .AddScheme<DreamAuthenticationOptions, DreamAuthentication>(
@@ -127,6 +136,7 @@ namespace DreamTravel.Api
 
             app.UseAuthorization();
             app.UseAuthentication();
+            app.UseMiddleware<LoggingMiddleware>();
 
             app.Use(async (context, next) =>
             {
