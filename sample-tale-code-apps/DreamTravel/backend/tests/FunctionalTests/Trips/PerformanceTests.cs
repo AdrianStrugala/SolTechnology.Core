@@ -2,10 +2,12 @@
 using System.Threading.Tasks;
 using DreamTravel.Trips.Domain.Cities;
 using DreamTravel.Trips.Queries.CalculateBestPath;
+using FluentAssertions;
+using NUnit.Framework;
 using Xunit;
 // using NSubstitute;
 
-namespace DreamTravel.FunctionalTests
+namespace DreamTravel.FunctionalTests.Trips
 {
     public class PerformanceTests
     {
@@ -46,11 +48,11 @@ namespace DreamTravel.FunctionalTests
             };
 
             //Act
-            var result = await _sut.Handle(new CalculateBestPathQuery{Cities = cities});
+            var result = await _sut.Handle(new CalculateBestPathQuery { Cities = cities });
 
 
             //Assert
-            Assert.NotNull(result);
+            result.Should().NotBeNull();
         }
     }
 }
