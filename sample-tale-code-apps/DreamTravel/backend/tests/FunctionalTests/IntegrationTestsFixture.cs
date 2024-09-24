@@ -4,11 +4,11 @@ using DreamTravel.FunctionalTests.FakeApis;
 using NUnit.Framework;
 using SolTechnology.Core.Api.Testing;
 using SolTechnology.Core.Faker;
-using Xunit;
 
 namespace DreamTravel.FunctionalTests
 {
     [SetUpFixture]
+    [SetCulture("en-US")]
     public static class IntegrationTestsFixture
     {
         public static ApiFixture<Program> ApiFixture { get; set; }

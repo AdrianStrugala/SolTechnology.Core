@@ -15,11 +15,18 @@ namespace DreamTravel.FunctionalTests.Trips
 {
     public class CalculateBestPathFeatureTest
     {
-        private readonly HttpClient _apiClient = IntegrationTestsFixture.ApiFixture.ServerClient;
-        private readonly WireMockFixture _wireMockFixture = IntegrationTestsFixture.WireMockFixture;
+        private HttpClient _apiClient;
+        private WireMockFixture _wireMockFixture;
+
+        [SetUp]
+        public void Setup()
+        {
+            _apiClient = IntegrationTestsFixture.ApiFixture.ServerClient;
+            _wireMockFixture = IntegrationTestsFixture.WireMockFixture;
+        }
 
         [Test]
-        public async Task Register_Login_CreateOrder_GetOrder()
+        public async Task FindsOptimalPath()
         {
             // "Given is list of cities".x(() =>
             var cities = new List<City>
