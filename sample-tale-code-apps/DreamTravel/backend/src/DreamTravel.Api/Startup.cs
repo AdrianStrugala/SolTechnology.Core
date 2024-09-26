@@ -1,6 +1,5 @@
 using DreamTravel.Identity.Commands;
 using DreamTravel.Infrastructure.Authentication;
-using DreamTravel.Trips.Commands;
 using DreamTravel.Trips.Queries;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
@@ -65,7 +64,6 @@ namespace DreamTravel.Api
                 });
             });
 
-            services.InstallDreamTripsCommands();
             services.InstallDreamTripsQueries();
             services.InstallIdentityCommands();
 

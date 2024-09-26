@@ -25,6 +25,7 @@
 	<ItemGroup>
 	  <ProjectReference Include="..\..\..\..\..\src\SolTechnology.Core.Faker\SolTechnology.Core.Faker.csproj" />
 	  <ProjectReference Include="..\..\src\DreamTravel.Api\DreamTravel.Api.csproj" />
+	  <ProjectReference Include="..\..\src\DreamTravel.Worker\DreamTravel.Worker.csproj" />
 	</ItemGroup>
 
 </Project>

@@ -15,7 +15,7 @@ public class Program
         builder.Services.AddLogging(c =>
             c.AddConsole());
 
-        builder.Services.InstallDreamTripsCommands();
+        builder.Services.InstallDreamTripsCommands(builder.Configuration);
 
         //HANGFIRE
         var sqlConnectionString = builder.Configuration.GetSection("Configuration:Sql").Get<SqlConfiguration>().ConnectionString;

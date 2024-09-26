@@ -1,15 +1,25 @@
-﻿using MediatR;
+﻿using DreamTravel.Trips.Domain.Cities;
+using DreamTravel.Trips.Sql.Repositories;
+using MediatR;
 
 namespace DreamTravel.Trips.Commands.FetchCity
 {
     public class FetchCityDetailsCommandHandler : IRequestHandler<FetchCityDetailsCommand>
     {
-        public Task Handle(FetchCityDetailsCommand request, CancellationToken cancellationToken)
+        private readonly ICityRepository _cityRepository;
+
+        public FetchCityDetailsCommandHandler(ICityRepository cityRepository)
         {
+            _cityRepository = cityRepository;
+        }
+
+        public async Task Handle(FetchCityDetailsCommand request, CancellationToken cancellationToken)
+        {
+            CityDetails cityDetails = new CityDetails();
             // get city from api
             //store it in db
-            
-            return Task.CompletedTask;
+
+            await _cityRepository.Add(cityDetails);
         }
     }
 }

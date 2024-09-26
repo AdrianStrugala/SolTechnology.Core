@@ -12,6 +12,7 @@ namespace DreamTravel.FunctionalTests
     public static class IntegrationTestsFixture
     {
         public static ApiFixture<Program> ApiFixture { get; set; }
+        public static ApiFixture<Worker.Program> WorkerFixture { get; set; }
         public static WireMockFixture WireMockFixture { get; set; }
 
         [OneTimeSetUp]
@@ -20,16 +21,19 @@ namespace DreamTravel.FunctionalTests
             Environment.SetEnvironmentVariable("ASPNETCORE_ENVIRONMENT", "development");
 
             ApiFixture = new ApiFixture<Program>();
+            WorkerFixture = new ApiFixture<DreamTravel.Worker.Program>();
             WireMockFixture = new WireMockFixture();
 
             WireMockFixture.Initialize();
             WireMockFixture.RegisterFakeApi(new GoogleFakeApi());
         }
 
+
         [OneTimeTearDown]
         public static void TearDown()
         {
             ApiFixture.Dispose();
+            WorkerFixture.Dispose();
             WireMockFixture.Dispose();
         }
     }
