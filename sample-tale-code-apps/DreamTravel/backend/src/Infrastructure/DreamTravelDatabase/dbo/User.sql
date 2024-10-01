@@ -9,7 +9,7 @@
 	[Currency] NVARCHAR(5) NULL DEFAULT 'EUR',
 
 	[CreatedAt] datetime2 NOT NULL DEFAULT GETUTCDATE(),
-	[ModifiedAt] datetime2 NULL
+	[UpdatedAt] datetime2 NULL
 )
 GO
 
@@ -17,7 +17,7 @@ CREATE UNIQUE INDEX [UX_User_UserId] ON [dbo].[User] ([UserId])
 GO
 
 
-CREATE TRIGGER [OnUpdateUser_SetModifiedAtToCurrentTime]
+CREATE TRIGGER [OnUpdateUser_SetUpdatedAtToCurrentTime]
 ON dbo.[User]
 AFTER UPDATE
 AS
@@ -27,7 +27,7 @@ BEGIN
 	UPDATE
 		dbo.[User]
 	SET
-		ModifiedAt = GETUTCDATE()
+		UpdatedAt = GETUTCDATE()
 	FROM
 		dbo.[User]
 		JOIN inserted ON inserted.Id = [User].Id

@@ -66,7 +66,7 @@ namespace DreamTravel.Trips.Sql
             foreach (var entry in entries)
             {
                 var entity = (EntityBase)entry.Entity;
-                entity.ModifiedAt = DateTime.UtcNow;
+                entity.UpdatedAt = DateTime.UtcNow;
 
                 if (entry.State == EntityState.Added)
                 {
