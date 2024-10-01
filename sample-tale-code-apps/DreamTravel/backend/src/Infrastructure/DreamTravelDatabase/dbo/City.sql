@@ -12,3 +12,21 @@
 	[UpdatedAt] datetime2 NULL
 )
 GO
+
+
+CREATE TRIGGER [OnUpdateCity_SetUpdatedAtToCurrentTime]
+ON dbo.[City]
+AFTER UPDATE
+AS
+BEGIN
+	SET NOCOUNT ON
+
+	UPDATE
+		dbo.[City]
+	SET
+        UpdatedAt = GETUTCDATE()
+	FROM
+		dbo.[City]
+		JOIN inserted ON inserted.Id = [City].Id
+
+END

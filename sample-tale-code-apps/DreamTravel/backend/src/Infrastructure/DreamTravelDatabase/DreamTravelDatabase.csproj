@@ -6,9 +6,6 @@
 		<AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
 		<DSP>Microsoft.Data.Tools.Schema.Sql.SqlAzureV12DatabaseSchemaProvider</DSP>
 	</PropertyGroup>
-	<ItemGroup>
-	  <None Remove="dbo\City.sql" />
-	</ItemGroup>
 
 	<ItemGroup>
 		<None Update="_Deployment\default.publish.xml">
