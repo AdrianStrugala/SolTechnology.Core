@@ -1,4 +1,5 @@
 ﻿using DreamTravel.Trips.Sql.Repositories;
+using Hangfire;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -13,10 +14,16 @@ namespace DreamTravel.Trips.Sql
             services.AddSql();
 
             var sqlConfiguration =
-                configuration.GetSection("Configuration:Sql").Get<SqlConfiguration>();
+                configuration.GetSection("Configuration:Sql").Get<SqlConfiguration>()!;
             services.AddDbContext<DreamTripsDbContext>(options =>
                 options.UseSqlServer(sqlConfiguration.ConnectionString));
-            
+
+            services.AddHangfire(configuration => configuration
+                .SetDataCompatibilityLevel(CompatibilityLevel.Version_180)
+                .UseSimpleAssemblyNameTypeSerializer()
+                .UseRecommendedSerializerSettings()
+                .UseSqlServerStorage(sqlConfiguration.ConnectionString));
+
             services.AddScoped<ICityRepository, CityRepository>();
 
             return services;

@@ -1,4 +1,5 @@
-﻿using DreamTravel.GeolocationData.GoogleApi;
+﻿using DreamTravel.GeolocationData.GeoDb;
+using DreamTravel.GeolocationData.GoogleApi;
 using DreamTravel.GeolocationData.MichelinApi;
 using Microsoft.Extensions.DependencyInjection;
 using SolTechnology.Core.ApiClient;
@@ -16,6 +17,7 @@ namespace DreamTravel.GeolocationData
             services.Decorate(typeof(IGoogleApiClient), typeof(GoogleApiClientCachingDecorator));
 
             services.AddApiClient<IMichelinApiClient, MichelinApiClient, MichelinApiOptions>("Michelin");
+            services.AddApiClient<IGeoDbApiClient, GeoDbApiClient>("GeoDb");
 
             return services;
         }

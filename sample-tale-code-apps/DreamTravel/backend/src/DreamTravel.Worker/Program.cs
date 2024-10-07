@@ -1,4 +1,5 @@
 using DreamTravel.Trips.Commands;
+using DreamTravel.Worker.EventHandlers.OnCitySearched;
 using Hangfire;
 using SolTechnology.Core.Sql;
 
@@ -18,13 +19,6 @@ public class Program
         builder.Services.InstallDreamTripsCommands(builder.Configuration);
 
         //HANGFIRE
-        var sqlConnectionString = builder.Configuration.GetSection("Configuration:Sql").Get<SqlConfiguration>().ConnectionString;
-        builder.Services.AddHangfire(configuration => configuration
-            .SetDataCompatibilityLevel(CompatibilityLevel.Version_180)
-            .UseSimpleAssemblyNameTypeSerializer()
-            .UseRecommendedSerializerSettings()
-            .UseSqlServerStorage(sqlConnectionString));
-
         builder.Services.AddHangfireServer();
         
         var thisAssembly = typeof(Program).Assembly;
@@ -36,13 +30,8 @@ public class Program
 
         var app = builder.Build();
 
-
-        // var recurringJobManager = app.Services.GetRequiredService<IRecurringJobManager>();
-        // recurringJobManager.AddOrUpdate<SynchornizeCristianoRonaldoMatches>(
-        //     nameof(SynchornizeCristianoRonaldoMatches),
-        //     x => x.Execute(),
-        //     Cron.Daily);
-
+        var recurringJobManager = app.Services.GetRequiredService<IRecurringJobManager>();
+        recurringJobManager.AddOrUpdate("LogFromJob", () => Console.WriteLine("Hello from Job"), Cron.Daily);
 
         app.MapHangfireDashboard();
 

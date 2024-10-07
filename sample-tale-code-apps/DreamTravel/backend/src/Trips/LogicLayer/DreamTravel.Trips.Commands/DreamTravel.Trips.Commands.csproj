@@ -12,6 +12,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<ProjectReference Include="..\..\DataLayer\DreamTravel.Trips.GeolocationDataClients\DreamTravel.Trips.GeolocationDataClients.csproj" />
 		<ProjectReference Include="..\..\DataLayer\DreamTravel.Trips.Sql\DreamTravel.Trips.Sql.csproj" />
 		<ProjectReference Include="..\..\DreamTravel.Trips.Domain\DreamTravel.Trips.Domain.csproj" />
 		<ProjectReference Include="..\DreamTravel.Trips.TravelingSalesmanProblem\DreamTravel.Trips.TravelingSalesmanProblem.csproj" />
