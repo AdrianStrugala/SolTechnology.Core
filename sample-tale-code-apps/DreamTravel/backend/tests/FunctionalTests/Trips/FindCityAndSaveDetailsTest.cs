@@ -27,7 +27,7 @@ namespace DreamTravel.FunctionalTests.Trips
             _apiClient = IntegrationTestsFixture.ApiFixture.ServerClient;
             _wireMockFixture = IntegrationTestsFixture.WireMockFixture;
 
-            var scope = IntegrationTestsFixture.WorkerFixture.TestServer.Services.CreateScope();
+            var scope = IntegrationTestsFixture.ApiFixture.TestServer.Services.CreateScope();
             _dbContext = scope.ServiceProvider.GetService<DreamTripsDbContext>();
         }
 
@@ -83,7 +83,7 @@ namespace DreamTravel.FunctionalTests.Trips
             do
             {
                 storedCity = _dbContext.Cities.FirstOrDefault(c => c.Name == city.Name);
-            } while (storedCity == null && stopwatch.Elapsed.TotalSeconds < 100);
+            } while (storedCity == null && stopwatch.Elapsed.TotalSeconds < 10);
 
             storedCity.Should().NotBeNull();
             //chekc details

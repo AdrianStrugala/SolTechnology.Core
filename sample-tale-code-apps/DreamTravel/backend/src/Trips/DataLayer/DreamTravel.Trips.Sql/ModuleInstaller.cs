@@ -16,7 +16,7 @@ namespace DreamTravel.Trips.Sql
             var sqlConfiguration =
                 configuration.GetSection("Configuration:Sql").Get<SqlConfiguration>()!;
             services.AddDbContext<DreamTripsDbContext>(options =>
-                options.UseSqlServer(sqlConfiguration.ConnectionString), ServiceLifetime.Transient);
+                options.UseSqlServer(sqlConfiguration.ConnectionString));
 
             services.AddHangfire(configuration => configuration
                 .SetDataCompatibilityLevel(CompatibilityLevel.Version_180)
