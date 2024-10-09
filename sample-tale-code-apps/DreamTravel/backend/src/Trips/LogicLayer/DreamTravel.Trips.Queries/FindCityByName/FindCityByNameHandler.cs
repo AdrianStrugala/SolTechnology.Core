@@ -13,16 +13,16 @@ namespace DreamTravel.Trips.Queries.FindCityByName
     public class FindCityByNameHandler : IQueryHandler<FindCityByNameQuery, City>
     {
         private readonly IGoogleApiClient _googleApiClient;
-        private readonly IMediator _mediator;
+        private readonly IHangfireNotificationPublisher _hangfireNotificationPublisher;
         private readonly ILogger<FindCityByNameHandler> _logger;
 
         public FindCityByNameHandler(
             IGoogleApiClient googleApiClient,
-            IMediator mediator,
+            IHangfireNotificationPublisher hangfireNotificationPublisher,
             ILogger<FindCityByNameHandler> logger)
         {
             _googleApiClient = googleApiClient;
-            _mediator = mediator;
+            _hangfireNotificationPublisher = hangfireNotificationPublisher;
             _logger = logger;
         }
 
@@ -39,7 +39,7 @@ namespace DreamTravel.Trips.Queries.FindCityByName
             result = await _googleApiClient.GetLocationOfCity(query.Name);
             _logger.LogInformation($"FindCityByName. Cache hit took: [{stopwatch.ElapsedMilliseconds}]ms");
 
-            await _mediator.Publish(new CitySearched { Name = result.Name }, cancellationToken);
+            _hangfireNotificationPublisher.Publish(new CitySearched { Name = result.Name });
             
             stopwatch.Stop();
 

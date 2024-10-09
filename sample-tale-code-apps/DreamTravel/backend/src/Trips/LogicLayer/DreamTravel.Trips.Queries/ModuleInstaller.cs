@@ -1,4 +1,6 @@
 ﻿using DreamTravel.GeolocationData;
+using DreamTravel.Infrastructure;
+using DreamTravel.Infrastructure.Events;
 using DreamTravel.TravelingSalesmanProblem;
 using DreamTravel.Trips.Queries.CalculateBestPath.Executors;
 using Microsoft.Extensions.DependencyInjection;
@@ -22,6 +24,7 @@ namespace DreamTravel.Trips.Queries
             services.AddTransient<IDownloadRoadData, DownloadRoadData>();
 
             services.InstallGeolocationDataClients();
+            services.InstallInfrastructure();
 
             return services;
         }

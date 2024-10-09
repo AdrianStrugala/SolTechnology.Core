@@ -1,29 +1,34 @@
-using System;
-using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
 using Hangfire;
 using MediatR;
 
 namespace DreamTravel.Infrastructure.Events;
 
-public class HangfireNotificationPublisher : INotificationPublisher
+public interface IHangfireNotificationPublisher
 {
-    public Task Publish(IEnumerable<NotificationHandlerExecutor> handlerExecutors, INotification notification, CancellationToken cancellationToken)
-    {
-        foreach (var handler in handlerExecutors)
-        {
-            // Enqueue each handler as a Hangfire job
-            BackgroundJob.Enqueue(() => ExecuteHandler(handler, notification));
-        }
+    void Publish(INotification notification);
+    void DispatchEvent(INotification notification);
+}
 
-        return Task.CompletedTask;
-    }
-  
-    
-    private static Task ExecuteHandler(NotificationHandlerExecutor handler, INotification notification)
+public class HangfireNotificationPublisher : IHangfireNotificationPublisher
+{
+    private readonly IMediator _mediator;
+    private readonly IBackgroundJobClient _backgroundJobClient;
+
+    public HangfireNotificationPublisher(IMediator mediator, IBackgroundJobClient backgroundJobClient)
     {
-        // Execute the handler
-        return handler.HandlerCallback(notification, CancellationToken.None);
+        _mediator = mediator;
+        _backgroundJobClient = backgroundJobClient;
     }
+
+    public void Publish(INotification notification)
+    {
+        _backgroundJobClient.Enqueue(() => DispatchEvent(notification));
+    }
+
+
+    public void DispatchEvent(INotification notification)
+    {
+        _mediator.Publish(notification);
+    }
+
 }

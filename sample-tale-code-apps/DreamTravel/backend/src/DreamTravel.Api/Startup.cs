@@ -10,6 +10,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
 using System.Globalization;
 using DreamTravel.Infrastructure.Events;
+using DreamTravel.Trips.Sql;
 using Microsoft.AspNetCore.Mvc.Authorization;
 using MicroElements.Swashbuckle.FluentValidation.AspNetCore;
 using SolTechnology.Core.Api.Filters;
@@ -66,6 +67,7 @@ namespace DreamTravel.Api
 
             services.InstallDreamTripsQueries();
             services.InstallIdentityCommands();
+            services.InstallSql(configuration);
 
             services.AddControllers();
 
@@ -73,7 +75,6 @@ namespace DreamTravel.Api
             services.AddMediatR(cfg =>
             {
                 cfg.RegisterServicesFromAssemblies(thisAssembly);
-                cfg.NotificationPublisher = new HangfireNotificationPublisher();
             });
             
             //AUTHENTICATION
