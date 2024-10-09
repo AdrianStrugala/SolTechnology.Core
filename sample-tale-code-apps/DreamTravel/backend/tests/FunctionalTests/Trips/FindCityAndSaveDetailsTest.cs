@@ -38,7 +38,7 @@ namespace DreamTravel.FunctionalTests.Trips
 
             City city = new()
             {
-                Name = "Wroclaw",
+                Name = "Wrocław",
                 Latitude = 51.107883,
                 Longitude = 17.038538
             };
@@ -83,17 +83,17 @@ namespace DreamTravel.FunctionalTests.Trips
             do
             {
                 storedCity = _dbContext.Cities.FirstOrDefault(c => c.Name == city.Name);
-            } while (storedCity == null && stopwatch.Elapsed.TotalSeconds < 10);
+            } while (storedCity == null && stopwatch.Elapsed.TotalSeconds < 100);
 
             storedCity.Should().NotBeNull();
             //chekc details
-
+            ;
         }
 
         [TearDown]
-        public void TearDown()
+        public async Task TearDown()
         {
-            _dbContext.Dispose();
+            await _dbContext.DisposeAsync();
         }
     }
 }

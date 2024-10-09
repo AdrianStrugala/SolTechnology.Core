@@ -21,7 +21,7 @@ namespace DreamTravel.FunctionalTests
             Environment.SetEnvironmentVariable("ASPNETCORE_ENVIRONMENT", "development");
 
             ApiFixture = new ApiFixture<Program>();
-            WorkerFixture = new ApiFixture<DreamTravel.Worker.Program>();
+            WorkerFixture = new ApiFixture<Worker.Program>();
             WireMockFixture = new WireMockFixture();
 
             WireMockFixture.Initialize();

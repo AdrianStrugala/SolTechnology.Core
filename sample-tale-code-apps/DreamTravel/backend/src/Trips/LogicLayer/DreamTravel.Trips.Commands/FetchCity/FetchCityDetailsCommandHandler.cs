@@ -21,6 +21,10 @@ namespace DreamTravel.Trips.Commands.FetchCity
 
         public async Task Handle(FetchCityDetailsCommand request, CancellationToken cancellationToken)
         {
+            try
+            {
+
+          
             var geoDbResponse = await _geoDbApiClient.GetCityDetails(request.Name);
             if (geoDbResponse == null)
             {
@@ -38,6 +42,12 @@ namespace DreamTravel.Trips.Commands.FetchCity
             };
 
             await _cityRepository.Add(cityDetails);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                throw;
+            }
         }
     }
 }
