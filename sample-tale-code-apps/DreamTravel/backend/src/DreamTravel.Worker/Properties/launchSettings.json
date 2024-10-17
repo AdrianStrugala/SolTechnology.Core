@@ -13,7 +13,7 @@
       "commandName": "Project",
       "dotnetRunMessages": true,
       "launchBrowser": true,
-      "launchUrl": "hangfire",
+      "launchUrl": "ui/voyager",
       "applicationUrl": "http://localhost:2025",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
@@ -22,7 +22,7 @@
     "IIS Express": {
       "commandName": "IISExpress",
       "launchBrowser": true,
-      "launchUrl": "hangfire",
+      "launchUrl": "ui/voyager",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       }

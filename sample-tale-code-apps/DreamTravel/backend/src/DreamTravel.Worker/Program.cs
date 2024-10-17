@@ -1,7 +1,7 @@
 using DreamTravel.Trips.Commands;
-using DreamTravel.Worker.EventHandlers.OnCitySearched;
+using DreamTravel.Trips.Sql;
+using EntityGraphQL.AspNet;
 using Hangfire;
-using SolTechnology.Core.Sql;
 
 namespace DreamTravel.Worker;
 
@@ -33,7 +33,10 @@ public class Program
         var recurringJobManager = app.Services.GetRequiredService<IRecurringJobManager>();
         recurringJobManager.AddOrUpdate("LogFromJob", () => Console.WriteLine("Hello from Job"), Cron.Daily);
 
-        app.MapHangfireDashboard();
+        app.MapHangfireDashboard("/ui/hangfire");
+        app.MapGraphQL<DreamTripsDbContext>(); // default url: /graphql
+        app.MapGraphQLVoyager("ui/voyager");
+        app.UseGraphQLPlayground("/ui/graphql");
 
         app.Run();
     }

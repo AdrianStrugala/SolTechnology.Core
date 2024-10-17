@@ -1,4 +1,5 @@
 ﻿using DreamTravel.Trips.Sql.Repositories;
+using EntityGraphQL.AspNet;
 using Hangfire;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -16,13 +17,17 @@ namespace DreamTravel.Trips.Sql
             var sqlConfiguration =
                 configuration.GetSection("Configuration:Sql").Get<SqlConfiguration>()!;
             services.AddDbContext<DreamTripsDbContext>(options =>
-                options.UseSqlServer(sqlConfiguration.ConnectionString));
+                // options.UseSqlServer(sqlConfiguration.ConnectionString));services.AddDbContext<DreamTripsDbContext>(options =>
+                options.UseInMemoryDatabase("DreamTravelDatabase"));
 
             services.AddHangfire(configuration => configuration
                 .SetDataCompatibilityLevel(CompatibilityLevel.Version_180)
                 .UseSimpleAssemblyNameTypeSerializer()
                 .UseRecommendedSerializerSettings()
-                .UseSqlServerStorage(sqlConfiguration.ConnectionString));
+                // .UseSqlServerStorage(sqlConfiguration.ConnectionString));
+                .UseInMemoryStorage());
+                
+            services.AddGraphQLSchema<DreamTripsDbContext>();
 
             services.AddScoped<ICityRepository, CityRepository>();
 
