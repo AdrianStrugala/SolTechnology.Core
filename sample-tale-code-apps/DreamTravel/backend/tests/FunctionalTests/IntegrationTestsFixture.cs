@@ -22,8 +22,8 @@ namespace DreamTravel.FunctionalTests
 
             ApiFixture = new ApiFixture<Program>();
             WorkerFixture = new ApiFixture<Worker.Program>();
-            WireMockFixture = new WireMockFixture();
 
+            WireMockFixture = new WireMockFixture();
             WireMockFixture.Initialize();
             WireMockFixture.RegisterFakeApi(new GoogleFakeApi());
         }

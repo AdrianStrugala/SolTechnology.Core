@@ -8,6 +8,7 @@ using DreamTravel.GeolocationData.GoogleApi;
 using DreamTravel.Trips.Domain.Paths;
 using DreamTravel.Trips.Sql;
 using FluentAssertions;
+using Microsoft.EntityFrameworkCore;
 using SolTechnology.Core.Faker;
 using SolTechnology.Core.CQRS;
 using NUnit.Framework;
@@ -27,7 +28,7 @@ namespace DreamTravel.FunctionalTests.Trips
             _apiClient = IntegrationTestsFixture.ApiFixture.ServerClient;
             _wireMockFixture = IntegrationTestsFixture.WireMockFixture;
 
-            var scope = IntegrationTestsFixture.ApiFixture.TestServer.Services.CreateScope();
+            var scope = IntegrationTestsFixture.WorkerFixture.TestServer.Services.CreateScope();
             _dbContext = scope.ServiceProvider.GetService<DreamTripsDbContext>();
         }
 
@@ -78,22 +79,24 @@ namespace DreamTravel.FunctionalTests.Trips
 
             Stopwatch stopwatch = new Stopwatch();
             stopwatch.Start();
-            CityDetails storedCity = null;
+            CityDetails storedCity;
 
             do
             {
-                storedCity = _dbContext.Cities.FirstOrDefault(c => c.Name == city.Name);
+                storedCity = await _dbContext.Cities.FirstOrDefaultAsync(c => c.Name == city.Name);
             } while (storedCity == null && stopwatch.Elapsed.TotalSeconds < 10);
 
             storedCity.Should().NotBeNull();
-            //chekc details
+            storedCity!.Name.Should().Be(city.Name);
+            storedCity.Country.Should().Be("Poland");
+            storedCity.Population.Should().BeGreaterThan(600000);
             ;
         }
 
         [TearDown]
-        public async Task TearDown()
+        public void TearDown()
         {
-            await _dbContext.DisposeAsync();
+            _dbContext.Dispose();
         }
     }
 }

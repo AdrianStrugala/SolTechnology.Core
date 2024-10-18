@@ -143,7 +143,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SolTechnology.TaleCode.Aspi
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SolTechnology.TaleCode.Aspire", "..\sample-tale-code-apps\TaleCode\src\SolTechnology.TaleCode.Aspire.AppHost\SolTechnology.TaleCode.Aspire.csproj", "{31D2E7C6-CFD8-409B-BE94-0CD9DB4CC6AB}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ZTests", "ZTests", "{404A6071-A9F5-4782-A3FB-462DF09FC68A}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "xTests", "xTests", "{404A6071-A9F5-4782-A3FB-462DF09FC68A}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Identity", "Identity", "{3929478D-680F-4B96-8F47-13BC19EA4428}"
 EndProject

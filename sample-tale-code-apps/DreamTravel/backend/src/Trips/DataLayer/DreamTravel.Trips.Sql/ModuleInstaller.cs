@@ -17,15 +17,15 @@ namespace DreamTravel.Trips.Sql
             var sqlConfiguration =
                 configuration.GetSection("Configuration:Sql").Get<SqlConfiguration>()!;
             services.AddDbContext<DreamTripsDbContext>(options =>
-                // options.UseSqlServer(sqlConfiguration.ConnectionString));services.AddDbContext<DreamTripsDbContext>(options =>
-                options.UseInMemoryDatabase("DreamTravelDatabase"));
+                options.UseSqlServer(sqlConfiguration.ConnectionString));
+                // options.UseInMemoryDatabase("DreamTravelDatabase"));
 
             services.AddHangfire(configuration => configuration
                 .SetDataCompatibilityLevel(CompatibilityLevel.Version_180)
                 .UseSimpleAssemblyNameTypeSerializer()
                 .UseRecommendedSerializerSettings()
-                // .UseSqlServerStorage(sqlConfiguration.ConnectionString));
-                .UseInMemoryStorage());
+                .UseSqlServerStorage(sqlConfiguration.ConnectionString));
+                // .UseInMemoryStorage());
                 
             services.AddGraphQLSchema<DreamTripsDbContext>();
 

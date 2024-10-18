@@ -1,5 +1,6 @@
 using Hangfire;
 using MediatR;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace DreamTravel.Infrastructure.Events;
 
@@ -11,12 +12,12 @@ public interface IHangfireNotificationPublisher
 
 public class HangfireNotificationPublisher : IHangfireNotificationPublisher
 {
-    private readonly IMediator _mediator;
+    private readonly IServiceScopeFactory _serviceScopeFactory;
     private readonly IBackgroundJobClient _backgroundJobClient;
 
-    public HangfireNotificationPublisher(IMediator mediator, IBackgroundJobClient backgroundJobClient)
+    public HangfireNotificationPublisher(IServiceScopeFactory serviceScopeFactory, IBackgroundJobClient backgroundJobClient)
     {
-        _mediator = mediator;
+        _serviceScopeFactory = serviceScopeFactory;
         _backgroundJobClient = backgroundJobClient;
     }
 
@@ -26,9 +27,12 @@ public class HangfireNotificationPublisher : IHangfireNotificationPublisher
     }
 
 
+    [Hangfire.AutomaticRetry(Attempts = 0)] // Optional: prevent retries if not needed
     public void DispatchEvent(INotification notification)
     {
-        _mediator.Publish(notification);
+        using var scope = _serviceScopeFactory.CreateScope();
+        var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
+        mediator.Publish(notification).GetAwaiter().GetResult();
     }
 
 }

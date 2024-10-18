@@ -7,7 +7,7 @@ namespace DreamTravel.Infrastructure
     {
         public static IServiceCollection InstallInfrastructure(this IServiceCollection services)
         {
-            services.AddScoped<IHangfireNotificationPublisher, HangfireNotificationPublisher>();
+            services.AddTransient<IHangfireNotificationPublisher, HangfireNotificationPublisher>();
 
             return services;
         }
