@@ -48,7 +48,7 @@ namespace DreamTravel.Api
             var policy = new AuthorizationPolicyBuilder()
                          .RequireAuthenticatedUser()
                          .Build();
-           
+
             services.AddCors(options =>
             {
                 options.AddPolicy(CorsPolicy,
@@ -76,7 +76,7 @@ namespace DreamTravel.Api
             {
                 cfg.RegisterServicesFromAssemblies(thisAssembly);
             });
-            
+
             //AUTHENTICATION
             services.AddAuthentication(DreamAuthenticationOptions.AuthenticationScheme)
                     .AddScheme<DreamAuthenticationOptions, DreamAuthentication>(
@@ -121,12 +121,10 @@ namespace DreamTravel.Api
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-            if (env.IsDevelopment())
-            {
-                app.UseDeveloperExceptionPage();
-                app.UseSwagger();
-                app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "Dream Travel"));
-            }
+
+            app.UseDeveloperExceptionPage();
+            app.UseSwagger();
+            app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "Dream Travel"));
 
             app.UseCors(CorsPolicy);
             app.UseHttpsRedirection();

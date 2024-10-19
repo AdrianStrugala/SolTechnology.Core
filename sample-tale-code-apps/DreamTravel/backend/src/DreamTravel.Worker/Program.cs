@@ -18,15 +18,13 @@ public class Program
 
         builder.Services.InstallDreamTripsCommands(builder.Configuration);
 
-        //HANGFIRE
-        builder.Services.AddHangfireServer();
-        
         var thisAssembly = typeof(Program).Assembly;
         builder.Services.AddMediatR(cfg =>
         {
             cfg.RegisterServicesFromAssemblies(thisAssembly);
         });
 
+        builder.Services.AddHangfireServer();
 
         var app = builder.Build();
 
