@@ -14,8 +14,4 @@
     <DotNetCliToolReference Include="dotnet-xunit" Version="2.3.1" />
   </ItemGroup>
 
-  <ItemGroup>
-	  <ProjectReference Include="..\..\LogicLayer\DreamTravel.Trips.Commands\DreamTravel.Trips.Commands.csproj" />
-  </ItemGroup>
-
 </Project>

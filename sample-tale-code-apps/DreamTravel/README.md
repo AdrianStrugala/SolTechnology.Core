@@ -112,7 +112,7 @@ a) Query - model and **validation**
     }
 ```
 
-This is a little bit artificial example, but shows the rule. Validation is build into the CQRS pipeline, and whenever Query/Command validator is registered, it would be invoked and the result handled.
+Validation is build into the CQRS pipeline, and whenever Query/Command validator is registered, it would be invoked and the result handled.
 
 b) Context - intermediate model for internal handler operations. This one might be controvesial, but greatly increses performance of the solution. What is worth to remember, that this model lives only in the scope of Query.
 

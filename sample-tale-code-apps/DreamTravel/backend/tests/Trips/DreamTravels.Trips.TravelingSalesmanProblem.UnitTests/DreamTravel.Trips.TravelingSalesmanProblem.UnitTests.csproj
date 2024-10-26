@@ -14,7 +14,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\LogicLayer\DreamTravel.Trips.TravelingSalesmanProblem\DreamTravel.Trips.TravelingSalesmanProblem.csproj" />
+    <ProjectReference Include="..\..\..\src\Trips\LogicLayer\DreamTravel.Trips.TravelingSalesmanProblem\DreamTravel.Trips.TravelingSalesmanProblem.csproj" />
   </ItemGroup>
 
 </Project>

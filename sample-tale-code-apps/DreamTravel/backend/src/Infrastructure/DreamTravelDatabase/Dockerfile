@@ -7,13 +7,13 @@
 FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build
 WORKDIR .
 COPY ["/backend/src/Infrastructure/DreamTravelDatabase/DreamTravelDatabase.csproj", "DreamTravelDatabase/"]
-RUN dotnet restore "DreamTravelDatabase/DreamTravelDatabase.csproj"
+RUN dotnet restore -v diag "DreamTravelDatabase/DreamTravelDatabase.csproj"
 COPY . .
 WORKDIR "/backend/src/Infrastructure/DreamTravelDatabase"
-RUN dotnet build "DreamTravelDatabase.csproj" -c Release -o /app/build
+RUN dotnet build "DreamTravelDatabase.csproj" -c Release -o /app/build -v diag
 
 # Then we create the final image using instructions adapted from https://www.wintellect.com/devops-sql-server-dacpac-docker/
-FROM mcr.microsoft.com/mssql/server:2019-latest AS final
+FROM mcr.microsoft.com/azure-sql-edge:latest AS final
 
 USER root
 

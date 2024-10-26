@@ -14,9 +14,7 @@
   </ItemGroup>
 
   <ItemGroup>
-	  <ProjectReference Include="..\..\DataLayer\DreamTravel.Trips.GeolocationDataClients\DreamTravel.Trips.GeolocationDataClients.csproj" />
-	  <ProjectReference Include="..\..\LogicLayer\DreamTravel.Trips.Commands\DreamTravel.Trips.Commands.csproj" />
-	  <ProjectReference Include="..\..\LogicLayer\DreamTravel.Trips.Queries\DreamTravel.Trips.Queries.csproj" />
+    <ProjectReference Include="..\..\..\src\Trips\DataLayer\DreamTravel.Trips.GeolocationDataClients\DreamTravel.Trips.GeolocationDataClients.csproj" />
   </ItemGroup>
 
 </Project>

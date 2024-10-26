@@ -1,8 +1,8 @@
 ﻿namespace DreamTravel.Trips.Domain.Cities
 {
-    public class City
+    public record City : EntityBase
     {
-        public string Name { get; set; }
+        public string Name { get; set; } = null!;
         public double Latitude { get; set; }
         public double Longitude { get; set; }
     }

@@ -25,7 +25,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\LogicLayer\DreamTravel.Trips.Queries\DreamTravel.Trips.Queries.csproj" />
+    <ProjectReference Include="..\..\..\src\Trips\LogicLayer\DreamTravel.Trips.Queries\DreamTravel.Trips.Queries.csproj" />
   </ItemGroup>
 
 </Project>

@@ -2,6 +2,7 @@ version: '3.7'
  
 services:
     sql-server:
+        platform: linux/amd64
         build: 
           context: .
           dockerfile: backend/src/Infrastructure/DreamTravelDatabase/Dockerfile

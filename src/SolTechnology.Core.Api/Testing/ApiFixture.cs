@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 
 namespace SolTechnology.Core.Api.Testing
 {
@@ -14,7 +15,7 @@ namespace SolTechnology.Core.Api.Testing
         public HttpClient ServerClient { get; }
 
 
-        public ApiFixture(Action<IServiceCollection> configureServices = null)
+        public ApiFixture()
         {
             var webAppFactory = new WebApplicationFactory<TEntryPoint>()
                 .WithWebHostBuilder(builder =>
@@ -23,7 +24,8 @@ namespace SolTechnology.Core.Api.Testing
                             .AddJsonFile(Path.Combine(Directory.GetCurrentDirectory(), $"appsettings.json"), true)
                             .AddJsonFile(Path.Combine(Directory.GetCurrentDirectory(), $"appsettings.development.json"), true)
                             .AddJsonFile(Path.Combine(Directory.GetCurrentDirectory(), $"appsettings.tests.json"), true))
-                        .ConfigureServices(configureServices ?? (_ => { })));
+                        .ConfigureServices((context, services) => 
+                            services.AddLogging(l => l.AddConsole())));
 
             TestServer = webAppFactory.Server;
             TestServer.PreserveExecutionContext = true;

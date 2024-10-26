@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
 	<PropertyGroup>
-		<TargetFramework>net6.0</TargetFramework>
+		<TargetFramework>net8.0</TargetFramework>
 		<RootNamespace>DreamTravel.Api</RootNamespace>
 		<UserSecretsId>b739bf21-d11c-4fd2-8180-f30bd9409a36</UserSecretsId>
 		<AssemblyVersion>2.2.*</AssemblyVersion>
@@ -18,7 +18,7 @@
 	  <ProjectReference Include="..\..\..\..\..\src\SolTechnology.Core.Api\SolTechnology.Core.Api.csproj" />
 	  <ProjectReference Include="..\Identity\LogicLayer\DreamTravel.Identity.Commands\DreamTravel.Identity.Commands.csproj" />
 	  <ProjectReference Include="..\Infrastructure\DreamTravel.Infrastructure\DreamTravel.Infrastructure.csproj" />
-	  <ProjectReference Include="..\Trips\LogicLayer\DreamTravel.Trips.Commands\DreamTravel.Trips.Commands.csproj" />
+	  <ProjectReference Include="..\Trips\DataLayer\DreamTravel.Trips.Sql\DreamTravel.Trips.Sql.csproj" />
 	  <ProjectReference Include="..\Trips\LogicLayer\DreamTravel.Trips.Queries\DreamTravel.Trips.Queries.csproj" />
 	</ItemGroup>
 

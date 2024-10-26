@@ -9,9 +9,10 @@ using DreamTravel.Trips.Queries.CalculateBestPath.Executors;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
 using NSubstitute;
+using NUnit.Framework;
 using Xunit;
 
-namespace DreamTravel.Trips.GeolocationDataClients.IntegrationTests
+namespace DreamTravel.FunctionalTests.Trips
 {
     public class DownloadRoadDataTests
     {
@@ -53,15 +54,15 @@ namespace DreamTravel.Trips.GeolocationDataClients.IntegrationTests
 
 
             //Assert
-            Assert.Equal(4, context.Costs.Length);
-            Assert.Equal(4, context.FreeDistances.Length);
-            Assert.Equal(4, context.TollDistances.Length);
+            Assert.Equals(4, context.Costs.Length);
+            Assert.Equals(4, context.FreeDistances.Length);
+            Assert.Equals(4, context.TollDistances.Length);
 
             //valid values
-            Assert.Equal(double.MaxValue, context.FreeDistances[0]);
-            Assert.Equal(double.MaxValue, context.FreeDistances[3]);
-            Assert.NotEqual(double.MaxValue, context.FreeDistances[1]);
-            Assert.NotEqual(double.MaxValue, context.FreeDistances[2]);
+            Assert.Equals(double.MaxValue, context.FreeDistances[0]);
+            Assert.Equals(double.MaxValue, context.FreeDistances[3]);
+            Assert.Equals(double.MaxValue, context.FreeDistances[1]);
+            Assert.Equals(double.MaxValue, context.FreeDistances[2]);
         }
 
         //can always download data of at least 30 cities

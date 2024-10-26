@@ -1,6 +1,5 @@
 using DreamTravel.Identity.Commands;
 using DreamTravel.Infrastructure.Authentication;
-using DreamTravel.Trips.Commands;
 using DreamTravel.Trips.Queries;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
@@ -10,10 +9,13 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
 using System.Globalization;
+using DreamTravel.Infrastructure.Events;
+using DreamTravel.Trips.Sql;
 using Microsoft.AspNetCore.Mvc.Authorization;
 using MicroElements.Swashbuckle.FluentValidation.AspNetCore;
 using SolTechnology.Core.Api.Filters;
 using Microsoft.AspNetCore.Http;
+using SolTechnology.Core.Logging.Middleware;
 
 namespace DreamTravel.Api
 {
@@ -36,7 +38,7 @@ namespace DreamTravel.Api
                 .Build();
 
             var cultureInfo = new CultureInfo("en-US");
-            cultureInfo.NumberFormat.CurrencySymbol = "€";
+            cultureInfo.NumberFormat.CurrencySymbol = "ï¿½";
 
             CultureInfo.DefaultThreadCurrentCulture = cultureInfo;
             CultureInfo.DefaultThreadCurrentUICulture = cultureInfo;
@@ -46,7 +48,7 @@ namespace DreamTravel.Api
             var policy = new AuthorizationPolicyBuilder()
                          .RequireAuthenticatedUser()
                          .Build();
-           
+
             services.AddCors(options =>
             {
                 options.AddPolicy(CorsPolicy,
@@ -63,11 +65,17 @@ namespace DreamTravel.Api
                 });
             });
 
-            services.InstallDreamTripsCommands();
             services.InstallDreamTripsQueries();
             services.InstallIdentityCommands();
+            services.InstallSql(configuration);
 
             services.AddControllers();
+
+            var thisAssembly = typeof(Startup).Assembly;
+            services.AddMediatR(cfg =>
+            {
+                cfg.RegisterServicesFromAssemblies(thisAssembly);
+            });
 
             //AUTHENTICATION
             services.AddAuthentication(DreamAuthenticationOptions.AuthenticationScheme)
@@ -101,24 +109,21 @@ namespace DreamTravel.Api
             services.AddFluentValidationRulesToSwagger();
 
 
-            services.AddScoped<ExceptionFilter>();
-            services.AddScoped<ResponseEnvelopeFilter>();
-
             //MVC
             services.AddMvc(opts =>
             {
                 opts.Filters.Add(new AuthorizeFilter(policy));
+                opts.Filters.Add<ExceptionFilter>();
+                opts.Filters.Add<ResponseEnvelopeFilter>();
             });
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-            if (env.IsDevelopment())
-            {
-                app.UseDeveloperExceptionPage();
-                app.UseSwagger();
-                app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "Dream Travel"));
-            }
+
+            app.UseDeveloperExceptionPage();
+            app.UseSwagger();
+            app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "Dream Travel"));
 
             app.UseCors(CorsPolicy);
             app.UseHttpsRedirection();
@@ -127,6 +132,7 @@ namespace DreamTravel.Api
 
             app.UseAuthorization();
             app.UseAuthentication();
+            app.UseMiddleware<LoggingMiddleware>();
 
             app.Use(async (context, next) =>
             {

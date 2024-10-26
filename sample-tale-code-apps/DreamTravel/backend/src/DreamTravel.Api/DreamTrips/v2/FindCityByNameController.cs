@@ -35,8 +35,8 @@ namespace DreamTravel.Api.DreamTrips.v2
 
         [HttpPost]
         [Produces(MediaTypeNames.Application.Json)]
-        [ProducesResponseType(typeof(City), (int)HttpStatusCode.OK)]
-        [ProducesResponseType(typeof(List<ValidationResult>), (int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType(typeof(Result<City>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(Result), (int)HttpStatusCode.BadRequest)]
         public async Task<IActionResult> FindCityByName([FromBody] FindCityByNameQuery query)
         {
             _logger.LogInformation("Looking for city: " + query.Name);

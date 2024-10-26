@@ -1,0 +1,24 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UserSecretsId>d7b42b3b-775d-4bf9-b7ab-77a1e90a98d4</UserSecretsId>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\..\..\src\SolTechnology.Core.Sql\SolTechnology.Core.Sql.csproj" />
+    <ProjectReference Include="..\Trips\DreamTravel.Trips.Domain\DreamTravel.Trips.Domain.csproj" />
+    <ProjectReference Include="..\Trips\LogicLayer\DreamTravel.Trips.Commands\DreamTravel.Trips.Commands.csproj" />
+  </ItemGroup>
+
+
+  <ItemGroup>
+    <PackageReference Include="GraphQL.Server.Ui.Playground" Version="8.0.3" />
+    <PackageReference Include="Hangfire.AspNetCore" Version="1.8.14" />
+    <PackageReference Include="Hangfire.SqlServer" Version="1.8.14" />
+    <PackageReference Include="GraphQL.Server.Ui.Voyager" Version="8.0.3" />
+  </ItemGroup>
+
+</Project>
