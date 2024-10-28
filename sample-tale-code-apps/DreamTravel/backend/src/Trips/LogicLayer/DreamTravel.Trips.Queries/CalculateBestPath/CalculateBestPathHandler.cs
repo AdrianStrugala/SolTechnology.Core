@@ -1,4 +1,5 @@
 ﻿using DreamTravel.Trips.Queries.CalculateBestPath.Executors;
+using MediatR;
 using SolTechnology.Core.CQRS;
 
 namespace DreamTravel.Trips.Queries.CalculateBestPath;

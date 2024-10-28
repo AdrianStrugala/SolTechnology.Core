@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Net;
 using System.Net.Mime;
+using System.Threading;
 using System.Threading.Tasks;
 using DreamTravel.Trips.Domain.Paths;
 using DreamTravel.Trips.Queries.CalculateBestPath;
@@ -34,7 +35,7 @@ namespace DreamTravel.Api.DreamTrips.v2
         public async Task<IActionResult> CalculateBestPath([FromBody] CalculateBestPathQuery calculateBestPathQuery)
         {
             _logger.LogInformation("TSP Engine: Fire!");
-            return Ok(await _calculateBestPath.Handle(calculateBestPathQuery));
+            return Ok(await _calculateBestPath.Handle(calculateBestPathQuery, CancellationToken.None));
         }
     }
 }

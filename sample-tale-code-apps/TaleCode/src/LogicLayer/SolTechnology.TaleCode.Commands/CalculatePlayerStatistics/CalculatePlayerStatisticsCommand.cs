@@ -5,7 +5,7 @@ using SolTechnology.Core.Logging;
 
 namespace SolTechnology.TaleCode.PlayerRegistry.Commands.CalculatePlayerStatistics;
 
-public class CalculatePlayerStatisticsCommand : ILoggableOperation, IRequest<Result>
+public class CalculatePlayerStatisticsCommand : ILoggableOperation, IRequest<Result>, IRequest
 {
     public int PlayerId { get; set; }
 

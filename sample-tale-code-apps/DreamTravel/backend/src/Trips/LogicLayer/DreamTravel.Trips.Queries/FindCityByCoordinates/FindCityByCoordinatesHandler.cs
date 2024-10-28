@@ -1,5 +1,6 @@
 ﻿using DreamTravel.GeolocationData.GoogleApi;
 using DreamTravel.Trips.Domain.Cities;
+using MediatR;
 using SolTechnology.Core.CQRS;
 
 namespace DreamTravel.Trips.Queries.FindCityByCoordinates

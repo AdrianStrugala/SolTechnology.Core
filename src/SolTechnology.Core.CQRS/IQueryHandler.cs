@@ -1,7 +1,8 @@
-﻿namespace SolTechnology.Core.CQRS
+﻿using MediatR;
+
+namespace SolTechnology.Core.CQRS
 {
-    public interface IQueryHandler<in TQuery, TResult>
+    public interface IQueryHandler<in TQuery, TResult> : IRequestHandler<TQuery, Result<TResult>> where TQuery : IRequest<Result<TResult>>
     {
-        public Task<Result<TResult>> Handle(TQuery query, CancellationToken cancellationToken = default);
     }
 }

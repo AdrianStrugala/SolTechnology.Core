@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Mime;
+using System.Threading;
 using System.Threading.Tasks;
 using DreamTravel.Trips.Domain.Paths;
 using DreamTravel.Trips.Queries.LimitCostOfPaths;
@@ -49,7 +50,7 @@ namespace DreamTravel.Api.DreamTrips.v1
                 {
                     CostLimit = costLimit,
                     Paths = paths
-                })).Data;
+                }, CancellationToken.None)).Data;
 
                 HttpContext.Session.SetString(sessionId + PathsKeyName, JsonConvert.SerializeObject(paths));
 

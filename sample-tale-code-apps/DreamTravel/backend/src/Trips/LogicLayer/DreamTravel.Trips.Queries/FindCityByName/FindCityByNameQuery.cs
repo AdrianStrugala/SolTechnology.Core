@@ -1,9 +1,12 @@
-﻿using FluentValidation;
+﻿using DreamTravel.Trips.Domain.Cities;
+using FluentValidation;
+using MediatR;
+using SolTechnology.Core.CQRS;
 using SolTechnology.Core.Logging;
 
 namespace DreamTravel.Trips.Queries.FindCityByName;
 
-public class FindCityByNameQuery : ILoggableOperation
+public class FindCityByNameQuery : ILoggableOperation, IRequest<Result<City>>
 {
     public string Name { get; set; } = null!;
 

@@ -1,9 +1,10 @@
 ﻿using FluentValidation;
 using FluentValidation.Results;
+using MediatR;
 
 namespace SolTechnology.Core.CQRS.Decorators.Validation;
 
-public class CommandHandlerValidationDecorator<TCommand> : ICommandHandler<TCommand>
+public class CommandHandlerValidationDecorator<TCommand> : ICommandHandler<TCommand> where TCommand : IRequest, IRequest<Result>
 {
     private readonly ICommandHandler<TCommand> _handler;
     private readonly IEnumerable<IValidator<TCommand>> _validators;

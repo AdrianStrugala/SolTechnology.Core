@@ -18,6 +18,7 @@ namespace SolTechnology.TaleCode.PlayerRegistry.Queries
                 {
                     config.RegisterServicesFromAssembly(thisAssembly);
                     config.AddOpenBehavior(typeof(FluentValidationPipelineBehavior<,>));
+                    config.AddOpenBehavior(typeof(LoggingPipelineBehavior<,>));
                 });
             services.AddValidatorsFromAssembly(thisAssembly);
 

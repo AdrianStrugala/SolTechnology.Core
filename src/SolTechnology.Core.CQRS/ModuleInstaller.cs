@@ -46,8 +46,8 @@ public static class ModuleInstaller
         services.AddValidatorsFromAssembly(callingAssembly);
 
         services.RegisterAllImplementations(typeof(IQueryHandler<,>), callingAssembly);
-        services.Decorate(typeof(IQueryHandler<,>), typeof(QueryHandlerValidationDecorator<,>));
-        services.Decorate(typeof(IQueryHandler<,>), typeof(QueryHandlerLoggingDecorator<,>));
+        // services.Decorate(typeof(IQueryHandler<,>), typeof(QueryHandlerValidationDecorator<,>));
+        // services.Decorate(typeof(IQueryHandler<,>), typeof(QueryHandlerLoggingDecorator<,>));
 
         return services;
     }

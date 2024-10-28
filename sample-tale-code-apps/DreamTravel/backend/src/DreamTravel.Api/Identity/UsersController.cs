@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Threading;
+using System.Threading.Tasks;
 using DreamTravel.Identity.Commands.ChangePassword;
 using DreamTravel.Identity.Commands.Login;
 using DreamTravel.Identity.Commands.Register;
@@ -35,7 +36,7 @@ namespace DreamTravel.Api.Identity
         public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordCommand command)
         {
             _logger.LogInformation($"Changing password for user: [{command.UserId}]");
-            var result = await _changePassword.Handle(command);
+            var result = await _changePassword.Handle(command, CancellationToken.None);
 
             if (result.IsSuccess == false)
             {
@@ -51,7 +52,7 @@ namespace DreamTravel.Api.Identity
         public async Task<IActionResult> Login([FromBody] LoginQuery query)
         {
             _logger.LogInformation($"Attempt to log in with email: [{query.Email}] and password: [{query.Password}]");
-            var result = (await _loginUser.Handle(query)).Data;
+            var result = (await _loginUser.Handle(query, CancellationToken.None)).Data;
 
             if (result.Message != string.Empty)
             {
@@ -68,7 +69,7 @@ namespace DreamTravel.Api.Identity
         {
             _logger.LogInformation($"Attempt to register user with email: [{command.Email}]");
 
-            var result = await _registerUserHandler.Handle(command);
+            var result = await _registerUserHandler.Handle(command, CancellationToken.None);
 
             if (result.IsSuccess == false)
             {

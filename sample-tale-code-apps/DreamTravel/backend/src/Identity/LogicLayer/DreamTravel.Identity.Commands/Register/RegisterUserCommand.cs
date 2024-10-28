@@ -1,7 +1,10 @@
 ﻿
+using MediatR;
+using SolTechnology.Core.CQRS;
+
 namespace DreamTravel.Identity.Commands.Register
 {
-    public class RegisterUserCommand
+    public class RegisterUserCommand : IRequest, IRequest<Result>
     {
         public string Name { get; init; }
         public string Password { get; init; }

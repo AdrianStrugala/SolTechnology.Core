@@ -1,9 +1,10 @@
 ﻿using FluentValidation;
 using FluentValidation.Results;
+using MediatR;
 
 namespace SolTechnology.Core.CQRS.Decorators.Validation;
 
-public class QueryHandlerValidationDecorator<TQuery, TResult> : IQueryHandler<TQuery, TResult>
+public class QueryHandlerValidationDecorator<TQuery, TResult> : IQueryHandler<TQuery, TResult> where TQuery : IRequest<Result<TResult>>
 {
     private readonly IEnumerable<IValidator<TQuery>> _validators;
     private readonly IQueryHandler<TQuery, TResult> _handler;

@@ -108,6 +108,8 @@ namespace DreamTravel.Api
             });
             services.AddFluentValidationRulesToSwagger();
 
+            services.AddScoped<ExceptionFilter>();
+            services.AddScoped<ResponseEnvelopeFilter>();
 
             //MVC
             services.AddMvc(opts =>

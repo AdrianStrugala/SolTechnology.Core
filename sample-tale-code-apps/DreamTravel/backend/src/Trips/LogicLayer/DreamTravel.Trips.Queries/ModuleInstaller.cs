@@ -22,6 +22,7 @@ namespace DreamTravel.Trips.Queries
                 {
                     config.RegisterServicesFromAssembly(thisAssembly);
                     config.AddOpenBehavior(typeof(FluentValidationPipelineBehavior<,>));
+                    config.AddOpenBehavior(typeof(LoggingPipelineBehavior<,>));
                 });
             services.AddValidatorsFromAssembly(thisAssembly);
 

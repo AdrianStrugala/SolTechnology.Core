@@ -1,10 +1,11 @@
 ﻿using Microsoft.Extensions.Logging;
 using SolTechnology.Core.Logging;
 using System.Diagnostics;
+using MediatR;
 
 namespace SolTechnology.Core.CQRS.Decorators.Logging
 {
-    public class CommandHandlerLoggingDecorator<TCommand> : ICommandHandler<TCommand>
+    public class CommandHandlerLoggingDecorator<TCommand> : ICommandHandler<TCommand> where TCommand : IRequest, IRequest<Result>
     {
         private readonly ICommandHandler<TCommand> _handler;
         private readonly ILogger<ICommandHandler<TCommand>> _logger;

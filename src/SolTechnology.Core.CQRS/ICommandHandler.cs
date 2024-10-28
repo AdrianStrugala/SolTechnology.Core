@@ -1,12 +1,12 @@
-﻿namespace SolTechnology.Core.CQRS
+﻿using MediatR;
+
+namespace SolTechnology.Core.CQRS
 {
-    public interface ICommandHandler<in TCommand>
+    public interface ICommandHandler<in TCommand> : IRequestHandler<TCommand, Result> where TCommand : IRequest<Result>
     {
-        public Task<Result> Handle(TCommand command, CancellationToken cancellationToken = default);
     }
 
-    public interface ICommandHandler<in TCommand, TResult>
+    public interface ICommandHandler<in TCommand, TResult> : IRequestHandler<TCommand, Result<TResult>> where TCommand : IRequest<Result<TResult>>
     {
-        public Task<Result<TResult>> Handle(TCommand command, CancellationToken cancellationToken = default);
     }
 }

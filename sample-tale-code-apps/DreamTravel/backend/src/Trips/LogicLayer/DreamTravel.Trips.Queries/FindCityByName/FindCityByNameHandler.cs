@@ -3,8 +3,6 @@ using DreamTravel.GeolocationData.GoogleApi;
 using DreamTravel.Infrastructure.Events;
 using DreamTravel.Trips.Domain.Cities;
 using DreamTravel.Trips.Domain.Events;
-using Hangfire;
-using MediatR;
 using Microsoft.Extensions.Logging;
 using SolTechnology.Core.CQRS;
 

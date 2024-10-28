@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Net;
 using System.Net.Mime;
+using System.Threading;
 using System.Threading.Tasks;
 using DreamTravel.Trips.Domain.Cities;
 using DreamTravel.Trips.Queries.FindCityByCoordinates;
@@ -41,7 +42,7 @@ namespace DreamTravel.Api.DreamTrips.v1
             {
                 _logger.LogInformation("Looking for city: " + query.Lat + ";" + query.Lng);
 
-                var result = await _findNameOfCity.Handle(query);
+                var result = await _findNameOfCity.Handle(query, CancellationToken.None);
 
                 return Ok(result.Data);
             }

@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Threading;
+using System.Threading.Tasks;
 using DreamTravel.Identity.Commands.Pay;
 using DreamTravel.Identity.HttpClients.Aiia;
 using Microsoft.AspNetCore.Mvc;
@@ -20,7 +21,7 @@ namespace DreamTravel.Api.Identity
         [Route("api/users/pay")]
         public async Task<IActionResult> Pay([FromBody] PayCommand query)
         {
-            var result = await _payHandler.Handle(query);
+            var result = await _payHandler.Handle(query, CancellationToken.None);
 
             return Ok(result.Data);
         }
