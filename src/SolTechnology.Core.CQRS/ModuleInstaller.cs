@@ -1,9 +1,7 @@
 ﻿using System.Reflection;
 using FluentValidation;
 using Microsoft.Extensions.DependencyInjection;
-using Scrutor;
-using SolTechnology.Core.CQRS.Decorators.Logging;
-using SolTechnology.Core.CQRS.Decorators.Validation;
+using SolTechnology.Core.CQRS.PipelineBehaviors;
 
 namespace SolTechnology.Core.CQRS;
 
@@ -12,30 +10,19 @@ public static class ModuleInstaller
     public static IServiceCollection RegisterCommands(this IServiceCollection services)
     {
         var callingAssembly = Assembly.GetCallingAssembly();
-        services.AddValidatorsFromAssembly(callingAssembly);
 
         services.RegisterAllImplementations(typeof(ICommandHandler<>), callingAssembly);
-        try
-        {
-            services.Decorate(typeof(ICommandHandler<>), typeof(CommandHandlerValidationDecorator<>));
-            services.Decorate(typeof(ICommandHandler<>), typeof(CommandHandlerLoggingDecorator<>));
-        }
-        catch (DecorationException)
-        {
-            //could happen if no service of the type is registered
-        }
-
         services.RegisterAllImplementations(typeof(ICommandHandler<,>), callingAssembly);
-        try
-        {
-            services.Decorate(typeof(ICommandHandler<,>), typeof(CommandHandlerValidationDecorator<,>));
-            services.Decorate(typeof(ICommandHandler<,>), typeof(CommandWithResultHandlerLoggingDecorator<,>));
-        }
-        catch (DecorationException)
-        {
-            //could happen if no service of the type is registered
-        }
 
+        services.AddValidatorsFromAssembly(callingAssembly);
+
+        services.AddMediatR(
+            config =>
+            {
+                config.RegisterServicesFromAssembly(callingAssembly);
+                config.AddOpenBehavior(typeof(FluentValidationPipelineBehavior<,>));
+                config.AddOpenBehavior(typeof(LoggingPipelineBehavior<,>));
+            });
 
         return services;
     }
@@ -43,11 +30,17 @@ public static class ModuleInstaller
     public static IServiceCollection RegisterQueries(this IServiceCollection services)
     {
         var callingAssembly = Assembly.GetCallingAssembly();
+        services.RegisterAllImplementations(typeof(IQueryHandler<,>), callingAssembly);
+
         services.AddValidatorsFromAssembly(callingAssembly);
 
-        services.RegisterAllImplementations(typeof(IQueryHandler<,>), callingAssembly);
-        // services.Decorate(typeof(IQueryHandler<,>), typeof(QueryHandlerValidationDecorator<,>));
-        // services.Decorate(typeof(IQueryHandler<,>), typeof(QueryHandlerLoggingDecorator<,>));
+        services.AddMediatR(
+            config =>
+            {
+                config.RegisterServicesFromAssembly(callingAssembly);
+                config.AddOpenBehavior(typeof(FluentValidationPipelineBehavior<,>));
+                config.AddOpenBehavior(typeof(LoggingPipelineBehavior<,>));
+            });
 
         return services;
     }

@@ -49,7 +49,5 @@ public class LoggingPipelineBehavior<TRequest, TResponse> : IPipelineBehavior<TR
             _logger.OperationFailed(operationName, sw.ElapsedMilliseconds, e);
             throw;
         }
-
     }
-
 }
