@@ -10,6 +10,7 @@ public class Program
     public static void Main(string[] args)
     {
         var builder = WebApplication.CreateBuilder(args);
+        builder.AddServiceDefaults();
 
      
         builder.Services.AddEndpointsApiExplorer();
@@ -27,6 +28,8 @@ public class Program
         builder.Services.AddHangfireServer();
 
         var app = builder.Build();
+
+        app.MapDefaultEndpoints();
 
         var recurringJobManager = app.Services.GetRequiredService<IRecurringJobManager>();
         recurringJobManager.AddOrUpdate("LogFromJob", () => Console.WriteLine("Hello from Job"), Cron.Daily);

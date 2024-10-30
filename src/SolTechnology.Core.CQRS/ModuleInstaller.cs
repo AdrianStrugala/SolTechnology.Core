@@ -20,8 +20,8 @@ public static class ModuleInstaller
             config =>
             {
                 config.RegisterServicesFromAssembly(callingAssembly);
-                config.AddOpenBehavior(typeof(FluentValidationPipelineBehavior<,>));
                 config.AddOpenBehavior(typeof(LoggingPipelineBehavior<,>));
+                config.AddOpenBehavior(typeof(FluentValidationPipelineBehavior<,>));
             });
 
         return services;
@@ -38,8 +38,8 @@ public static class ModuleInstaller
             config =>
             {
                 config.RegisterServicesFromAssembly(callingAssembly);
-                config.AddOpenBehavior(typeof(FluentValidationPipelineBehavior<,>));
                 config.AddOpenBehavior(typeof(LoggingPipelineBehavior<,>));
+                config.AddOpenBehavior(typeof(FluentValidationPipelineBehavior<,>));
             });
 
         return services;

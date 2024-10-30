@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace SolTechnology.Core.CQRS
+﻿namespace SolTechnology.Core.CQRS
 {
 
     public static class Chain

@@ -23,7 +23,7 @@ public class LoggingPipelineBehavior<TRequest, TResponse> : IPipelineBehavior<TR
 
         if (request is ILoggableOperation loggedOperation)
         {
-            using var scope = _logger.BeginOperationScope(new KeyValuePair<string, object>(
+            _logger.BeginOperationScope(new KeyValuePair<string, object>(
                 loggedOperation.LogScope.OperationIdName,
                 loggedOperation.LogScope.OperationId));
 

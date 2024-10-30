@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using SolTechnology.Core.CQRS;
+using Path = DreamTravel.Trips.Domain.Paths.Path;
 
 namespace DreamTravel.Api.DreamTrips.v1
 {

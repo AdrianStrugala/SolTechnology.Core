@@ -20,7 +20,6 @@ public class Program
         // Add services to the container.
         // Add service defaults & Aspire components.
         builder.Services.AddEndpointsApiExplorer();
-        builder.AddServiceDefaults();
         builder.Services.AddProblemDetails();
 
         builder.Services.AddLogging(c =>
@@ -79,8 +78,6 @@ public class Program
             .UseSqlServerStorage(sqlConnectionString));
 
         var app = builder.Build();
-
-        app.MapDefaultEndpoints();
 
 
         app.UseSwagger();

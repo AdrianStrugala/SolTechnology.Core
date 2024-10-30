@@ -13,9 +13,6 @@ public class Program
     {
         var builder = WebApplication.CreateBuilder(args);
 
-        builder.AddServiceDefaults();
-
-
         builder.Services.AddEndpointsApiExplorer();
         builder.Services.AddLogging(c =>
             c.AddConsole()
@@ -44,8 +41,6 @@ public class Program
             x => x.Execute(),
             Cron.Daily);
 
-
-        app.MapDefaultEndpoints();
 
         app.UseExceptionHandler("/error");
         app.UseMiddleware<LoggingMiddleware>();
