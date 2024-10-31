@@ -1,0 +1,278 @@
+pool:
+  vmImage: ubuntu-latest
+
+trigger:
+  branches:
+    include:
+      - master
+
+variables:
+ - name: BuildConfiguration
+   value: 'Release'
+ - name: azureServiceConnection
+   value: 'azureSWO'
+ - name: resourceGroupName
+   value: 'TaleCode'
+ - name: location
+   value: 'westeurope'
+ - name: templateFile
+   value: 'main.bicep'
+
+stages:
+  - stage: Test
+    displayName: Test
+    variables:
+       - group: talecode-test
+    jobs:
+
+    - job: RunTests
+      steps:
+      - task: NuGetToolInstaller@1
+        displayName: 'Install NuGet'
+        inputs:
+          versionSpec: '5.x'
+
+      - task: UseDotNet@2
+        displayName: 'Set .NET Core to 6.0'
+        inputs:
+          packageType: sdk
+          version: 6.0.x
+          installationPath: $(Agent.ToolsDirectory)/dotnet
+
+      - task: PowerShell@2
+        displayName: Run SQL Server
+        inputs:
+          targetType: 'inline'
+          script: |
+            docker run -e 'ACCEPT_EULA=Y' -e 'SA_PASSWORD=password_xxddd_2137' -p 1401:1433 --name DB -d mcr.microsoft.com/mssql/server:2019-latest
+
+      - task: PowerShell@2
+        displayName: Deploy DB locally
+        inputs:
+          targetType: 'inline'
+          workingDirectory: 'taleCode/src/TaleCodeDatabase'
+          script: |
+            dotnet publish /p:TargetServerName=localhost /p:TargetPort=1401 /p:TargetUser=sa /p:TargetPassword=password_xxddd_2137 /p:TargetDatabaseName=TaleCodeDatabase
+
+      - task: DotNetCoreCLI@2
+        displayName: 'Run unit tests'
+        inputs:
+          command: 'test'
+          projects: 'taleCode/**/*UnitTests.csproj'
+          custom: 'msbuild'
+          arguments: '-p:Configuration=$(BuildConfiguration)'
+          publishTestResults: true
+
+      - task: DotNetCoreCLI@2
+        displayName: 'Run integration tests'
+        inputs:
+          command: 'test'
+          projects: 'taleCode/**/*IntegrationTests.csproj'
+          custom: 'msbuild'
+          arguments: '-p:Configuration=$(BuildConfiguration)'
+          publishTestResults: true
+        
+      - task: FileTransform@1
+        displayName: 'Apply test variables to appsettings.json'
+        inputs:
+          folderPath: 'taleCode/tests/TaleCode.FunctionalTests'
+          targetFiles: '**/appsettings.functional.tests.json'
+          fileType: json
+
+      - task: DotNetCoreCLI@2
+        displayName: 'Run functional tests'
+        inputs:
+          command: 'test'
+          projects: 'taleCode/**/*FunctionalTests.csproj'
+          custom: 'msbuild'
+          arguments: '-p:Configuration=$(BuildConfiguration)'
+          publishTestResults: true
+
+      - script: |
+          # fetch swagger.json from appliaction test instance
+        displayName: 'Fetch latest release Swagger specs'
+        condition: eq(variables['Build.Reason'], 'PullRequest')
+
+      - script: |
+          mv nuget.config nuget.temp
+          dotnet tool install --version 6.6.2 Swashbuckle.AspNetCore.Cli --global --ignore-failed-sources
+          swagger tofile --output swagger-build.json taleCode/src/PresentationLayer/SolTechnology.TaleCode.Api/bin/Release/net6.0/SolTechnology.TaleCode.Api.dll v1
+          mv nuget.temp nuget.config
+        displayName: 'Generating build Swagger specs'
+        condition: eq(variables['Build.Reason'], 'PullRequest')
+
+      - script: |
+          if [ -f "swagger.json" ]; then
+            diff -u swagger.json swagger-build.json > swagger.diff
+            if [ -s swagger.diff ]; then
+              echo "Differences found between swagger.json and swagger-build.json"
+              echo swagger.diff
+            else
+              echo "No differences found between swagger.json and swagger-build.json"
+            fi
+          else
+            echo "swagger.json not found!"
+            exit 1
+          fi
+        displayName: 'Run Contract tests'
+        condition: eq(variables['Build.Reason'], 'PullRequest')
+
+      - script: |
+          if [ -s $(Build.SourcesDirectory)/swagger.diff ]; then
+            prId=$(System.PullRequest.PullRequestId)
+            orgUrl=$(System.CollectionUri)
+            project=$(System.TeamProject)
+            repo=$(Build.Repository.Name)
+            token=$(System.AccessToken)
+            
+            diffContent=$(cat $(Build.SourcesDirectory)/swagger.diff)
+            diffContentEscaped=$(echo "$diffContent" | sed 's/\\/\\\\/g' | sed 's/"/\\"/g' | sed 's/\n/\\n/g' | sed 's/\r//g')
+            markdownContent="Review changes done to the API specs:\n\\\diff\\n$diffContentEscaped\\n\\\"
+
+            body='{
+                    "status": "active",
+                    "comments": [
+                      {
+                        "parentCommentId": 0,
+                        "content": "'$markdownContent'",
+                        "commentType": 1
+                      }
+                    ]
+                  }'
+
+            echo "jsonBody: $body"
+
+            curl -X POST "$orgUrl$project/_apis/git/repositories/$repo/pullRequests/$prId/threads?api-version=6.0" \
+                -H "Content-Type: application/json" \
+                -H "Authorization: Bearer $token" \
+                -d "$body"
+          else
+            echo "No differences found, not posting to PR."
+          fi
+        displayName: 'Publish Contract tests result to PR'
+        env:
+          SYSTEM_ACCESSTOKEN: $(System.AccessToken)
+        condition: eq(variables['Build.Reason'], 'PullRequest')
+
+
+  - stage: BuildAndPublish
+    displayName: Build&Publish
+    jobs:
+
+    - job: PublishArtifacts
+      displayName: 'Publish Artifacts'
+      
+      steps:
+        - task: UseDotNet@2
+          displayName: 'Set .NET Core to 6.0'
+          inputs:
+            packageType: sdk
+            version: 6.0.x
+            installationPath: $(Agent.ToolsDirectory)/dotnet
+          
+        - task: CopyFiles@2
+          displayName: 'Publish Infrastructure'
+          inputs:
+            sourceFolder: 'taleCode/devOps/infrastructure'
+            contents: '*'
+            targetFolder: $(Build.ArtifactStagingDirectory)/Infrastructure
+
+        - task: DotNetCoreCLI@2
+          displayName: 'Publish Database'
+          inputs:
+            projects: 'taleCode/**/TaleCodeDatabase.csproj'
+            arguments: '-o $(Build.ArtifactStagingDirectory)/Database'
+          
+        - task: DotNetCoreCLI@2
+          displayName: 'Publish Api'
+          inputs:
+            command: publish
+            projects: 'taleCode/src/**/SolTechnology.TaleCode.Api.csproj'
+            publishWebProjects: False
+            arguments: '--configuration Release --output $(Build.ArtifactStagingDirectory)/Api'
+
+        - task: DotNetCoreCLI@2
+          displayName: 'Publish BackgroundWorker'
+          inputs:
+            command: publish
+            projects: 'taleCode/src/**/SolTechnology.TaleCode.BackgroundWorker.csproj'
+            publishWebProjects: False
+            arguments: '--configuration Release --output $(Build.ArtifactStagingDirectory)/BackgroundWorker'
+
+        - task: PublishBuildArtifacts@1
+          inputs:
+            pathToPublish: '$(Build.ArtifactStagingDirectory)' 
+            artifactName: 'drop' 
+          condition: always()
+
+
+  - stage: Deploy
+    displayName: Deploy
+    variables:
+      - group: talecode-prod
+    jobs: 
+
+    - job: DeployProd
+      pool:
+        vmImage: 'windows-latest'
+      steps:
+        - task: DownloadPipelineArtifact@2
+
+        - task: AzureCLI@2
+          displayName: 'Deploy Infrastructure'
+          inputs:
+            azureSubscription: $(azureServiceConnection)
+            scriptType: bash
+            scriptLocation: inlineScript
+            inlineScript: |
+              az --version
+              az group create --name $(resourceGroupName) --location $(location)
+              az deployment group create \
+              --resource-group $(resourceGroupName) \
+              --template-file '$(Pipeline.Workspace)\drop\Infrastructure\$(templateFile)' \
+              --parameters testParam='$(testParam)' baseName='taleCode' sqlAdminUserName='$(sqlAdminUserName)' sqlAdminPassword='$(sqlAdminPassword)' sqlServerName='$(sqlServerName)' databaseName='$(databaseName)' apiName='$(apiName)' storageAccountName='$(storageAccountName)' serviceBusName='$(serviceBusName)'  backgroundWorkerName='$(backgroundWorkerName)'
+
+        - task: SqlAzureDacpacDeployment@1
+          displayName: 'Deploy Database'
+          inputs:
+            azureSubscription: $(azureServiceConnection)
+            ServerName: '$(sqlServerName).database.windows.net'
+            DatabaseName: $(databaseName)
+            SqlUsername: $(sqlAdminUserName)
+            SqlPassword: $(sqlAdminPassword)
+            DacpacFile: '$(Pipeline.Workspace)\drop\Database\TaleCodeDatabase.dacpac'
+
+        - task: FileTransform@1
+          displayName: 'Apply Production App settings for Api'
+          inputs:
+            folderPath: '$(Pipeline.Workspace)\drop\Api\SolTechnology.TaleCode.Api.zip'
+            fileType: 'json'
+            targetFiles: '**/appsettings.json'
+
+
+        - task: FileTransform@1
+          displayName: 'Apply Production App settings for BackgroundWorker'
+          inputs:
+            folderPath: '$(Pipeline.Workspace)\drop\BackgroundWorker\SolTechnology.TaleCode.BackgroundWorker.zip'
+            fileType: 'json'
+            targetFiles: '**/appsettings.json'
+
+        - task: AzureWebApp@1
+          displayName: 'Deploy Api'
+          inputs:
+            appType: webAppLinux
+            azureSubscription: $(azureServiceConnection)
+            appName: $(apiName)
+            package: '$(Pipeline.Workspace)\drop\Api\SolTechnology.TaleCode.Api.zip'
+
+        - task: AzureWebApp@1
+          displayName: 'Deploy BackgroundWorker'
+          inputs:
+            appType: webAppLinux
+            azureSubscription: $(azureServiceConnection)
+            appName: $(backgroundWorkerName)
+            package: '$(Pipeline.Workspace)\drop\BackgroundWorker\SolTechnology.TaleCode.BackgroundWorker.zip'
+
+
+
+
