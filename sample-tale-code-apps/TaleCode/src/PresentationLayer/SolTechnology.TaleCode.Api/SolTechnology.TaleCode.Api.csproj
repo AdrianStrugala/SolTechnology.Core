@@ -19,7 +19,6 @@
 	  <ProjectReference Include="..\..\..\..\..\src\SolTechnology.Core.Authentication\SolTechnology.Core.Authentication.csproj" />
 	  <ProjectReference Include="..\..\DataLayer\SolTechnology.TaleCode.Sql\SolTechnology.TaleCode.Sql.csproj" />
 	  <ProjectReference Include="..\..\LogicLayer\SolTechnology.TaleCode.Queries\SolTechnology.TaleCode.Queries.csproj" />
-	  <ProjectReference Include="..\..\SolTechnology.TaleCode.Aspire.ServiceDefaults\SolTechnology.TaleCode.Aspire.ServiceDefaults.csproj" />
 	</ItemGroup>
 
 </Project>

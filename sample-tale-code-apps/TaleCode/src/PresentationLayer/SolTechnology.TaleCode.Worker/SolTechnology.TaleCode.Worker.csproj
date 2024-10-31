@@ -20,7 +20,6 @@
 	  <ProjectReference Include="..\..\..\..\..\src\SolTechnology.Core.Api\SolTechnology.Core.Api.csproj" />
 	  <ProjectReference Include="..\..\..\..\..\src\SolTechnology.Core.Scheduler\SolTechnology.Core.Scheduler.csproj" />
 	  <ProjectReference Include="..\..\LogicLayer\SolTechnology.TaleCode.Commands\SolTechnology.TaleCode.Commands.csproj" />
-	  <ProjectReference Include="..\..\SolTechnology.TaleCode.Aspire.ServiceDefaults\SolTechnology.TaleCode.Aspire.ServiceDefaults.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>
