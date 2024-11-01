@@ -49,12 +49,10 @@ stages:
             dotnet publish /p:TargetServerName=localhost /p:TargetPort=1401 /p:TargetUser=sa /p:TargetPassword=password_xxddd_2137 /p:TargetDatabaseName=DreamTravelDatabase
 
       - task: DotNetCoreCLI@2
-        displayName: 'Run unit tests'
         inputs:
           command: 'test'
           projects: '$(workingDirectory)/tests/**/*UnitTests.csproj'
-          custom: 'msbuild'
-          arguments: '-p:Configuration=$(BuildConfiguration)'
+          arguments: 'Configuration=$(BuildConfiguration)'
           publishTestResults: true
 
       - task: DotNetCoreCLI@2
