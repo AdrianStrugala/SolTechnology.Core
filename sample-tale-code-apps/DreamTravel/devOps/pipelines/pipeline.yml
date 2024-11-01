@@ -9,6 +9,8 @@ trigger:
 variables:
  - name: BuildConfiguration
    value: 'Release'
+ - name: workingDirectory
+   value: 'sample-tale-code-apps/DreamTravel/backend'
 
 stages:
   - stage: Test
@@ -19,8 +21,6 @@ stages:
 
     - job: RunTests
       steps:
-      - checkout: self
-        path: sample-tale-code-apps/DreamTravel/backend
       - task: NuGetToolInstaller@1
         displayName: 'Install NuGet'
         inputs:
@@ -44,7 +44,7 @@ stages:
         displayName: Deploy DB locally
         inputs:
           targetType: 'inline'
-          workingDirectory: 'src/Infrastructure/DreamTravelDatabase'
+          workingDirectory: '$(workingDirectory)/src/Infrastructure/DreamTravelDatabase'
           script: |
             dotnet publish /p:TargetServerName=localhost /p:TargetPort=1401 /p:TargetUser=sa /p:TargetPassword=password_xxddd_2137 /p:TargetDatabaseName=DreamTravelDatabase
 
@@ -52,7 +52,7 @@ stages:
         displayName: 'Run unit tests'
         inputs:
           command: 'test'
-          projects: 'tests/**/*UnitTests.csproj'
+          projects: '$(workingDirectory)/tests/**/*UnitTests.csproj'
           custom: 'msbuild'
           arguments: '-p:Configuration=$(BuildConfiguration)'
           publishTestResults: true
@@ -61,17 +61,10 @@ stages:
         displayName: 'Run integration tests'
         inputs:
           command: 'test'
-          projects: 'tests/**/*IntegrationTests.csproj'
+          projects: '$(workingDirectory)/tests/**/*IntegrationTests.csproj'
           custom: 'msbuild'
           arguments: '-p:Configuration=$(BuildConfiguration)'
           publishTestResults: true
-        
-      - task: FileTransform@1
-        displayName: 'Apply test variables to appsettings.json'
-        inputs:
-          folderPath: 'taleCode/tests/TaleCode.FunctionalTests'
-          targetFiles: '**/appsettings.functional.tests.json'
-          fileType: json
 
       - task: DotNetCoreCLI@2
         displayName: 'Run functional tests'
