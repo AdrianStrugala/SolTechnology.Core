@@ -19,6 +19,8 @@ stages:
 
     - job: RunTests
       steps:
+      - checkout: self
+        path: sample-tale-code-apps/DreamTravel
       - task: NuGetToolInstaller@1
         displayName: 'Install NuGet'
         inputs:
@@ -42,15 +44,15 @@ stages:
         displayName: Deploy DB locally
         inputs:
           targetType: 'inline'
-          workingDirectory: 'taleCode/src/TaleCodeDatabase'
+          workingDirectory: 'src/Infrastructure/DreamTravelDatabase'
           script: |
-            dotnet publish /p:TargetServerName=localhost /p:TargetPort=1401 /p:TargetUser=sa /p:TargetPassword=password_xxddd_2137 /p:TargetDatabaseName=TaleCodeDatabase
+            dotnet publish /p:TargetServerName=localhost /p:TargetPort=1401 /p:TargetUser=sa /p:TargetPassword=password_xxddd_2137 /p:TargetDatabaseName=DreamTravelDatabase
 
       - task: DotNetCoreCLI@2
         displayName: 'Run unit tests'
         inputs:
           command: 'test'
-          projects: 'taleCode/**/*UnitTests.csproj'
+          projects: 'tests/**/*UnitTests.csproj'
           custom: 'msbuild'
           arguments: '-p:Configuration=$(BuildConfiguration)'
           publishTestResults: true
@@ -59,7 +61,7 @@ stages:
         displayName: 'Run integration tests'
         inputs:
           command: 'test'
-          projects: 'taleCode/**/*IntegrationTests.csproj'
+          projects: 'tests/**/*IntegrationTests.csproj'
           custom: 'msbuild'
           arguments: '-p:Configuration=$(BuildConfiguration)'
           publishTestResults: true
