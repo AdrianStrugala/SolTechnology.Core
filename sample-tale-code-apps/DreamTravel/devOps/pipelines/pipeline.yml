@@ -164,7 +164,7 @@ stages:
         - task: CopyFiles@2
           displayName: 'Publish Infrastructure'
           inputs:
-            sourceFolder: '$(workingDirectory)/devOps/infrastructure'
+            sourceFolder: '$(workingDirectory)/../devOps/infrastructure'
             contents: '*'
             targetFolder: $(Build.ArtifactStagingDirectory)/Infrastructure
 
@@ -186,7 +186,7 @@ stages:
           displayName: 'Publish Worker'
           inputs:
             command: publish
-            projects: 'taleCode/src/**/DreamTravel.Worker.csproj'
+            projects: '(workingDirectory)/**/DreamTravel.Worker.csproj'
             publishWebProjects: False
             arguments: '--configuration Release --output $(Build.ArtifactStagingDirectory)/Worker'
 
