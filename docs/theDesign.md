@@ -21,7 +21,7 @@ The entry point or points for the applciation. API, triggers, scheduled tasks, e
 #### 5) Infrastructure
 Everything else. Drivers, extensions and rest of techincal details needed to write good piece of code.
 
-![design](./taleCodeArchitecture.svg)
+![design](./taleCodeArchitecture.png)
 
 
 Tale Code application is build of following components:
