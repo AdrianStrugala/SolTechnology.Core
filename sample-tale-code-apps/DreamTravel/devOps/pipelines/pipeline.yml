@@ -20,7 +20,7 @@ stages:
     - job: RunTests
       steps:
       - checkout: self
-        path: sample-tale-code-apps/DreamTravel
+        path: sample-tale-code-apps/DreamTravel/backend
       - task: NuGetToolInstaller@1
         displayName: 'Install NuGet'
         inputs:
