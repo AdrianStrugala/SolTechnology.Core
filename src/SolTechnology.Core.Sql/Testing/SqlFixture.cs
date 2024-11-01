@@ -1,7 +1,4 @@
 ﻿using System.Diagnostics;
-using DotNet.Testcontainers.Builders;
-using DotNet.Testcontainers.Configurations;
-using DotNet.Testcontainers.Containers;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 using SolTechnology.Core.Sql.Connections;
@@ -81,6 +78,8 @@ namespace SolTechnology.Core.Sql.Testing
 
         private MsSqlContainer CreateSqlContainer(Dictionary<string, string> parsedConnectionString)
         {
+            //TODO: this is throwing with respawn. To check
+
             var mssqlContainer = new MsSqlBuilder()
                 .WithPassword(parsedConnectionString["Password"])
                 .WithPortBinding(int.Parse(parsedConnectionString["Port"]), 1433)
