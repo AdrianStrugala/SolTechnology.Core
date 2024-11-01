@@ -33,8 +33,7 @@
 ## Core Libraries
 
 
-The SolTechnology.Core repository contains a set of shared libraries. This is a foundation for CQRS driven applications using basic Azure technologies. The libraries support a modern coding approach presented in the example application called "Tale Code".
-
+The SolTechnology.Core repository contains a set of shared libraries. This is a foundation for CQRS driven applications using basic Azure technologies. The libraries support a modern coding approach presented in the example applications.
 
 | Documentation  | Nuget  |   |
 |---|---|---|
@@ -66,49 +65,24 @@ The Tale Code rule is simple:
 "Make your code pleasure to read like a tale."
 </p>
 <p align="right">
-~Adrian Strugala
+~Adrian Strugała
 </p>
 </i>
 
-The TaleCode application is the most common case that came to my mind. Every night *some* data is fetched. Then it is validated and stored. Users have the possibility to query the data. The queries are expensive and require additional data manipulation.\
-To solve the application flow the CQRS approach is implemented. It is interesting from a technological perspective. Uses SQL, no-SQL databases, Azure Service Bus, Scheduled Tasks, Authentication, and Application Insights logging.
+The sample application is the most common case that came to my mind. It's build of user facing API, background Worker responsible for fetching data and feeding SQL database. The communication between those two is asynchronious and based on messages. As on the picture:
+![design](./docs/taleCodeArchitecture.png)
 <p>
-<b>The Code Design is the main goal</b> of TaleCode application. The Code is organized in the most redable way I was able to think of.
-Take a look at example Query Handler:
+<b>The Code Design is the main goal</b> of Tale Code. Logical flow and code structure is described in details. And it even follows more human friendly funcional-like notation:
 
 ```csharp
-    public async Task<CalculateBestPathResult> Handle(CalculateBestPathQuery query)
-    {
-        var cities = query.Cities.Where(c => c != null).ToList();
-        var context = new CalculateBestPathContext(cities.Count);
+        var context = new CalculateBestPathContext(cities!);
 
-        await _downloadRoadData(cities!, context);
-        _findProfitablePath(context, cities.Count);
-
-        var orderOfCities = _solveTSP(context.OptimalDistances.ToList());
-
-        CalculateBestPathResult calculateBestPathResult = new CalculateBestPathResult
-        {
-            Cities = cities!,
-            BestPaths = _formPathsFromMatrices(cities!, context, orderOfCities)
-        };
-        return calculateBestPathResult;
-    }
-```
-
-Compact and clean. \
-Sample Command Handler using funcional-like notation:
-
-```csharp
-        await Chain
-            .Start(() => GetPlayerId(command.PlayerId))
-            .Then(SynchronizePlayer)
-            .Then(CalculateMatchesToSync)
-            .Then(match => match.ForEach(id =>
-                SynchronizeMatch(id, command.PlayerId)))
-            .Then(_ => new PlayerMatchesSynchronizedEvent(command.PlayerId))
-            .Then(PublishMessage)
-            .EndCommand();
+        var result = await Chain
+             .Start(context, cancellationToken)
+             .Then(_downloadRoadData)
+             .Then(_findProfitablePath)
+             .Then(_solveTSP)
+             .End(_formResult);
 ```
 
 
