@@ -177,17 +177,13 @@ stages:
         - task: DotNetCoreCLI@2
           displayName: 'Publish Api'
           inputs:
-            command: publish
             projects: '(workingDirectory)/**/DreamTravel.Api.csproj'
-            publishWebProjects: False
             arguments: '--configuration Release --output $(Build.ArtifactStagingDirectory)/Api'
 
         - task: DotNetCoreCLI@2
           displayName: 'Publish Worker'
           inputs:
-            command: publish
             projects: '(workingDirectory)/**/DreamTravel.Worker.csproj'
-            publishWebProjects: False
             arguments: '--configuration Release --output $(Build.ArtifactStagingDirectory)/Worker'
 
         - task: PublishBuildArtifacts@1
