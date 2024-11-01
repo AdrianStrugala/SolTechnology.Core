@@ -1,0 +1,71 @@
+variables:
+ - name: BuildConfiguration
+   value: 'Release'
+ - name: azureServiceConnection
+   value: 'azureSWO'
+ - name: resourceGroupName
+   value: 'TaleCode'
+ - name: location
+   value: 'westeurope'
+ - name: templateFile
+   value: 'main.bicep'
+
+stages:
+  - stage: Deploy
+    displayName: Deploy
+    variables:
+      - group: talecode-prod
+    jobs: 
+    - job: DeployProd
+      pool:
+        vmImage: 'windows-latest'
+      steps:
+        - task: DownloadPipelineArtifact@2
+        - task: AzureCLI@2
+          displayName: 'Deploy Infrastructure'
+          inputs:
+            azureSubscription: $(azureServiceConnection)
+            scriptType: bash
+            scriptLocation: inlineScript
+            inlineScript: |
+              az --version
+              az group create --name $(resourceGroupName) --location $(location)
+              az deployment group create \
+              --resource-group $(resourceGroupName) \
+              --template-file '$(Pipeline.Workspace)\drop\Infrastructure\$(templateFile)' \
+              --parameters testParam='$(testParam)' baseName='taleCode' sqlAdminUserName='$(sqlAdminUserName)' sqlAdminPassword='$(sqlAdminPassword)' sqlServerName='$(sqlServerName)' databaseName='$(databaseName)' apiName='$(apiName)' storageAccountName='$(storageAccountName)' serviceBusName='$(serviceBusName)'  backgroundWorkerName='$(backgroundWorkerName)'
+        - task: SqlAzureDacpacDeployment@1
+          displayName: 'Deploy Database'
+          inputs:
+            azureSubscription: $(azureServiceConnection)
+            ServerName: '$(sqlServerName).database.windows.net'
+            DatabaseName: $(databaseName)
+            SqlUsername: $(sqlAdminUserName)
+            SqlPassword: $(sqlAdminPassword)
+            DacpacFile: '$(Pipeline.Workspace)\drop\Database\TaleCodeDatabase.dacpac'
+        - task: FileTransform@1
+          displayName: 'Apply Production App settings for Api'
+          inputs:
+            folderPath: '$(Pipeline.Workspace)\drop\Api\SolTechnology.TaleCode.Api.zip'
+            fileType: 'json'
+            targetFiles: '**/appsettings.json'
+        - task: FileTransform@1
+          displayName: 'Apply Production App settings for BackgroundWorker'
+          inputs:
+            folderPath: '$(Pipeline.Workspace)\drop\BackgroundWorker\SolTechnology.TaleCode.BackgroundWorker.zip'
+            fileType: 'json'
+            targetFiles: '**/appsettings.json'
+        - task: AzureWebApp@1
+          displayName: 'Deploy Api'
+          inputs:
+            appType: webAppLinux
+            azureSubscription: $(azureServiceConnection)
+            appName: $(apiName)
+            package: '$(Pipeline.Workspace)\drop\Api\SolTechnology.TaleCode.Api.zip'
+        - task: AzureWebApp@1
+          displayName: 'Deploy BackgroundWorker'
+          inputs:
+            appType: webAppLinux
+            azureSubscription: $(azureServiceConnection)
+            appName: $(backgroundWorkerName)
+            package: '$(Pipeline.Workspace)\drop\BackgroundWorker\SolTechnology.TaleCode.BackgroundWorker.zip'
