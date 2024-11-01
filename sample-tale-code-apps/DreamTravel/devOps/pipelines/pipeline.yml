@@ -45,7 +45,7 @@ stages:
         inputs:
           targetType: 'inline'
           script: |
-            docker run -e 'ACCEPT_EULA=Y' -e 'SA_PASSWORD=password_xxddd_2137' -p 1401:1433 --name DB -d mcr.microsoft.com/mssql/server:2019-latest
+            docker run -e 'ACCEPT_EULA=Y' -e 'SA_PASSWORD=password_xxddd_2137' -p 1404:1433 --name DB -d mcr.microsoft.com/mssql/server:2019-latest
 
       - task: PowerShell@2
         displayName: Deploy DB locally
@@ -53,9 +53,10 @@ stages:
           targetType: 'inline'
           workingDirectory: '$(workingDirectory)/src/Infrastructure/DreamTravelDatabase'
           script: |
-            dotnet publish /p:TargetServerName=localhost /p:TargetPort=1401 /p:TargetUser=sa /p:TargetPassword=password_xxddd_2137 /p:TargetDatabaseName=DreamTravelDatabase
+            dotnet publish /p:TargetServerName=localhost /p:TargetPort=1404 /p:TargetUser=sa /p:TargetPassword=password_xxddd_2137 /p:TargetDatabaseName=DreamTravelDatabase
 
       - task: DotNetCoreCLI@2
+        displayName: 'Run unit tests'
         inputs:
           command: 'test'
           projects: '$(workingDirectory)/tests/**/*UnitTests.csproj'
@@ -67,17 +68,15 @@ stages:
         inputs:
           command: 'test'
           projects: '$(workingDirectory)/tests/**/*IntegrationTests.csproj'
-          custom: 'msbuild'
-          arguments: '-p:Configuration=$(BuildConfiguration)'
+          arguments: '--configuration $(BuildConfiguration)'
           publishTestResults: true
 
       - task: DotNetCoreCLI@2
         displayName: 'Run functional tests'
         inputs:
           command: 'test'
-          projects: 'taleCode/**/*FunctionalTests.csproj'
-          custom: 'msbuild'
-          arguments: '-p:Configuration=$(BuildConfiguration)'
+          projects: '$(workingDirectory)/tests/**/*FunctionalTests.csproj'
+          arguments: '--configuration $(BuildConfiguration)'
           publishTestResults: true
 
       - script: |
