@@ -155,40 +155,40 @@ stages:
       
       steps:
         - task: UseDotNet@2
-          displayName: 'Set .NET Core to 6.0'
+          displayName: 'Install .NET 8.0'
           inputs:
             packageType: sdk
-            version: 6.0.x
+            version: 8.0.x
             installationPath: $(Agent.ToolsDirectory)/dotnet
           
         - task: CopyFiles@2
           displayName: 'Publish Infrastructure'
           inputs:
-            sourceFolder: 'taleCode/devOps/infrastructure'
+            sourceFolder: '$(workingDirectory)/devOps/infrastructure'
             contents: '*'
             targetFolder: $(Build.ArtifactStagingDirectory)/Infrastructure
 
         - task: DotNetCoreCLI@2
           displayName: 'Publish Database'
           inputs:
-            projects: 'taleCode/**/TaleCodeDatabase.csproj'
+            projects: '$(workingDirectory)/**/DreamTravelDatabase.csproj'
             arguments: '-o $(Build.ArtifactStagingDirectory)/Database'
           
         - task: DotNetCoreCLI@2
           displayName: 'Publish Api'
           inputs:
             command: publish
-            projects: 'taleCode/src/**/SolTechnology.TaleCode.Api.csproj'
+            projects: '(workingDirectory)/**/DreamTravel.Api.csproj'
             publishWebProjects: False
             arguments: '--configuration Release --output $(Build.ArtifactStagingDirectory)/Api'
 
         - task: DotNetCoreCLI@2
-          displayName: 'Publish BackgroundWorker'
+          displayName: 'Publish Worker'
           inputs:
             command: publish
-            projects: 'taleCode/src/**/SolTechnology.TaleCode.BackgroundWorker.csproj'
+            projects: 'taleCode/src/**/DreamTravel.Worker.csproj'
             publishWebProjects: False
-            arguments: '--configuration Release --output $(Build.ArtifactStagingDirectory)/BackgroundWorker'
+            arguments: '--configuration Release --output $(Build.ArtifactStagingDirectory)/Worker'
 
         - task: PublishBuildArtifacts@1
           inputs:
