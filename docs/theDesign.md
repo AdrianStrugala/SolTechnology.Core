@@ -51,40 +51,45 @@ var result = await Chain
      .End(_formResult);
 ```
 
-### Command Handler Structure
-
-PAGE TO GENERATE TREE:
-https://ascii-tree-generator.com/
-
-```
-my-app/
-├─ robots.txt
-├─ node_modules/
-│  ├─ favicon.ico
-├─ public/
-├─ src/
-│  ├─ index.html
-│  ├─ index.css
-│  ├─ index.js
-├─ .gitignore
-├─ package.json
-├─ README.md
-```
-
+### Handlers Structure
 
 The repository is structurized in this way:
 
-<img alt="design" src="./commandHandlerStructure.JPG">
+```
+src/
+├─ Presentation/
+│  ├─ API
+├─ Logic/
+│  ├─ Commands/
+│  │  ├─ X/
+│  │  │  ├─ CommandX.cs
+│  │  │  ├─ CommandXHandler.cs
+│  │  │  ├─ CommandXContext.cs
+│  │  │  ├─ CommandXResult.cs
+│  │  │  ├─ Executors/
+│  │  │  │  ├─ Action1.cs
+│  │  │  │  ├─ Action2.cs
+│  │  │  │  ├─ ...
+│  ├─ Queries/
+│  │  ├─ .../
+├─ Data/
+│  ├─ SQL/
+│  ├─ .../
+```
+
 
 Where:
 
 - Handler is already known to you - this is the business logic part
 - Command is an input anemic model
-- Event is an output of the operation (in this case)
+- Result is an output of the operation (in this case)
 - Context holds the data needed for the whole operation. It is shared between Handler and Executors
 - Executors are steps needed for fulfilling the business logic. They have a single and clear purpose
 
 For maximum readability Handler behaves like an orchestrator. It calls the executors in needed order and produces the final result. The code is clear from the solution view and from the editor itself.
+
+
+<img alt="design" src="./handlerStructure.JPG">
 
 
 ### Presentation Layer
