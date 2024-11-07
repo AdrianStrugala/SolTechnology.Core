@@ -1,9 +1,22 @@
 
 ## Architecture
 
-<img alt="design" src="./Architecture.PNG">
 
-Tale Code application is using Clean Architecture approach as on above picture. Projects are ogranized into layers with clear responsibilities and dependencies from top to bottom.
+![design](./taleCodeArchitecture.png)
+
+
+| Component  | Purpose  |   
+|---|---|
+| Background Worker  | Runs Commands on time/event/api trigger |     
+| API                | Provides Queries for users  |   
+| SQL Database       | Stores data in relational model  |   
+| Service Bus        | Message Broker  |   
+| External API       | Provides data needed by the Application  |   
+| Application Insights  | Collects logs from all sources  |   
+
+
+
+Application written in Tale Code uses Clean Architecture approach. Projects are ogranized into layers with clear responsibilities and dependencies from top to bottom.
 
 #### 1) Domain
 The domain is heart of the application. Identyfies the area, bounded context and common language between business and developers. The information is gathered into models understanable by every team member of the project.
@@ -21,40 +34,43 @@ The entry point or points for the applciation. API, triggers, scheduled tasks, e
 #### 5) Infrastructure
 Everything else. Drivers, extensions and rest of techincal details needed to write good piece of code.
 
-![design](./taleCodeArchitecture.png)
-
-
-Tale Code application is build of following components:
-
-| Component  | Purpose  |   
-|---|---|
-| Background Worker  | Runs Commands on internal triggers time|event|api  |     
-| API                | Provides Queries for users  |   
-| SQL Database       | Stores data in relational model  |   
-| Blob Storage       | Stores read models for Queries  |   
-| Service Bus        | Message Broker  |   
-| External API       | Provides data needed by the Application  |   
-| Application Insights  | Collects logs from all sources  |   
-
-
+![design](./Architecture.PNG)
 
 ## Code Design
 
 Extending the Readme example:
 
 ```csharp
-        await Chain
-            .Start(() => GetPlayerId(command.PlayerId))
-            .Then(SynchronizePlayer)
-            .Then(CalculateMatchesToSync)
-            .Then(match => match.ForEach(id =>
-                SynchronizeMatch(id, command.PlayerId)))
-            .Then(_ => new PlayerMatchesSynchronizedEvent(command.PlayerId))
-            .Then(PublishMessage)
-            .EndCommand();
+var context = new CalculateBestPathContext(cities!);
+
+var result = await Chain
+     .Start(context, cancellationToken)
+     .Then(_downloadRoadData)
+     .Then(_findProfitablePath)
+     .Then(_solveTSP)
+     .End(_formResult);
 ```
 
 ### Command Handler Structure
+
+PAGE TO GENERATE TREE:
+https://ascii-tree-generator.com/
+
+```
+my-app/
+├─ robots.txt
+├─ node_modules/
+│  ├─ favicon.ico
+├─ public/
+├─ src/
+│  ├─ index.html
+│  ├─ index.css
+│  ├─ index.js
+├─ .gitignore
+├─ package.json
+├─ README.md
+```
+
 
 The repository is structurized in this way:
 
