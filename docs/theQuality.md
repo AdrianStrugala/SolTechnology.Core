@@ -1,5 +1,8 @@
 
 ## Testing Piramide
+
+//TODO describe flow and use cases
+
 ## Unit tests
 
 
