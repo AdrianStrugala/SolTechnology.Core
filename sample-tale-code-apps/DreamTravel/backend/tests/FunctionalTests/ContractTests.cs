@@ -19,9 +19,9 @@ public class ContractTests
     }
     
     /// <summary>
-    /// This test requires https://plugins.jetbrains.com/plugin/17240-verify-support plugin
+    /// This test requires https://plugins.jetbrains.com/plugin/17240-verify-support
     /// It will fail when a change to the API is introduced
-    /// Then you need to right click the test, review the changes and accept them eventually
+    /// Then you need to right click the test, review changes and accept them eventually
     /// A short video on the plugin page
     /// </summary>
     
