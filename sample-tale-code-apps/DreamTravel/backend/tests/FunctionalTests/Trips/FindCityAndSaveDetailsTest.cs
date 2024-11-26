@@ -13,6 +13,7 @@ using SolTechnology.Core.Faker;
 using SolTechnology.Core.CQRS;
 using NUnit.Framework;
 using Microsoft.Extensions.DependencyInjection;
+using Path = DreamTravel.Trips.Domain.Paths.Path;
 
 namespace DreamTravel.FunctionalTests.Trips
 {
