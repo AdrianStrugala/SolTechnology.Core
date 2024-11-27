@@ -1,19 +1,12 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFramework>net6.0</TargetFramework>
-		<ImplicitUsings>enable</ImplicitUsings>
-
-		<Authors>Adrian Strugala</Authors>
 		<Version>0.4.0</Version>
 		<Description>SolTechnology Core API client library</Description>
 		<PackageTags>sol technology core azure api client</PackageTags>
 		<Product>SolTechnology.Core.ApiClient</Product>
 		<PackageId>SolTechnology.Core.ApiClient</PackageId>
 		<AssemblyName>SolTechnology.Core.ApiClient</AssemblyName>
-		<RepositoryUrl>https://github.com/AdrianStrugala/SolTechnology.Core</RepositoryUrl>
-		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
-
 		<PackageIcon>docs\mini-logo.png</PackageIcon>
 		<PackageReadmeFile>docs\readme.md</PackageReadmeFile>
 	</PropertyGroup>

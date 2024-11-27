@@ -12,7 +12,7 @@
 		<PackageId>SolTechnology.Core.BlobStorage</PackageId>
 		<AssemblyName>SolTechnology.Core.BlobStorage</AssemblyName>
 		<RepositoryUrl>https://github.com/AdrianStrugala/SolTechnology.Core</RepositoryUrl>
-		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
+		
 
 		<PackageIcon>docs\mini-logo.png</PackageIcon>
 		<PackageReadmeFile>docs\readme.md</PackageReadmeFile>

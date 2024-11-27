@@ -1,13 +1,5 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <OutputType>Library</OutputType>
-    <TargetFramework>net6.0</TargetFramework>
-    <RootNamespace>DreamTravel.Infrastructure</RootNamespace>
-    <ApplicationIcon />
-    <StartupObject />
-  </PropertyGroup>
-
   <ItemGroup>
     <PackageReference Include="Hangfire.Core" Version="1.8.14" />
     <PackageReference Include="MediatR" Version="12.3.0" />

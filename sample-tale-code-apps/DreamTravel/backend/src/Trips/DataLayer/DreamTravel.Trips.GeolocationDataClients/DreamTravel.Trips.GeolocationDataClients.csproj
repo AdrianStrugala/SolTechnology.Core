@@ -1,10 +1,5 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-
-  <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
-    <RootNamespace>DreamTravel.GeolocationData</RootNamespace>
-  </PropertyGroup>
-
+  
   <ItemGroup>
     <PackageReference Include="Scrutor" Version="4.2.2" />
   </ItemGroup>

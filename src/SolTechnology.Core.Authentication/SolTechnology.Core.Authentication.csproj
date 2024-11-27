@@ -1,19 +1,12 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-	  <TargetFramework>net6.0</TargetFramework>
-	  <ImplicitUsings>enable</ImplicitUsings>
-
-	  <Authors>Adrian Strugala</Authors>
 	  <Version>0.2.0</Version>
 	  <Description>SolTechnology Core Authentication library</Description>
 	  <PackageTags>sol technology core azure api authentication</PackageTags>
 	  <Product>SolTechnology.Core.Authentication</Product>
 	  <PackageId>SolTechnology.Core.Authentication</PackageId>
 	  <AssemblyName>SolTechnology.Core.Authentication</AssemblyName>
-	  <RepositoryUrl>https://github.com/AdrianStrugala/SolTechnology.Core</RepositoryUrl>
-	  <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-
 	  <PackageIcon>docs\mini-logo.png</PackageIcon>
 	  <PackageReadmeFile>docs\readme.md</PackageReadmeFile>
   </PropertyGroup>
