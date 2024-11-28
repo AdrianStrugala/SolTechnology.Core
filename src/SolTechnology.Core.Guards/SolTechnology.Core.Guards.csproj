@@ -1,18 +1,12 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFramework>net6.0</TargetFramework>
-		<ImplicitUsings>enable</ImplicitUsings>
-
-		<Authors>Adrian Strugala</Authors>
 		<Version>0.3.0</Version>
 		<Description>SolTechnology Core Azure guards library</Description>
 		<PackageTags>sol technology core azure guards</PackageTags>
 		<Product>SolTechnology.Core.Guards</Product>
 		<PackageId>SolTechnology.Core.Guards</PackageId>
 		<AssemblyName>SolTechnology.Core.Guards</AssemblyName>
-		<RepositoryUrl>https://github.com/AdrianStrugala/SolTechnology.Core</RepositoryUrl>
-		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
 
 		<PackageIcon>docs\mini-logo.png</PackageIcon>
 		<PackageReadmeFile>docs\readme.md</PackageReadmeFile>

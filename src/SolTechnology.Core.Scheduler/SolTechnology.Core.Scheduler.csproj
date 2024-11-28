@@ -1,18 +1,12 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFramework>net6.0</TargetFramework>
-		<ImplicitUsings>enable</ImplicitUsings>
-
-		<Authors>Adrian Strugala</Authors>
 		<Version>0.2.0</Version>
 		<Description>SolTechnology Core Azure scheduler library</Description>
 		<PackageTags>sol technology core azure background jobs cronos scheduler</PackageTags>
 		<Product>SolTechnology.Core.Scheduler</Product>
 		<PackageId>SolTechnology.Core.Scheduler</PackageId>
 		<AssemblyName>SolTechnology.Core.Scheduler</AssemblyName>
-		<RepositoryUrl>https://github.com/AdrianStrugala/SolTechnology.Core</RepositoryUrl>
-		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
 
 		<PackageIcon>docs\mini-logo.png</PackageIcon>
 		<PackageReadmeFile>docs\readme.md</PackageReadmeFile>
@@ -24,11 +18,6 @@
 	
 	<ItemGroup>
 	  <PackageReference Include="Cronos" Version="0.7.1" />
-	  <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="2.2.0" />
-	  <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="6.0.0" />
-	  <PackageReference Include="Microsoft.Extensions.Options" Version="7.0.0" />
-	  <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="7.0.0" />
-	  <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="7.0.2" />
 	</ItemGroup>
 
 </Project>

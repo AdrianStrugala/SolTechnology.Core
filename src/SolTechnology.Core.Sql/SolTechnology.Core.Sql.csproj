@@ -1,22 +1,16 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFramework>net6.0</TargetFramework>
-		<ImplicitUsings>enable</ImplicitUsings>
 
-		<Authors>Adrian Strugala</Authors>
 		<Version>0.2.1</Version>
 		<Description>SolTechnology Core Sql library</Description>
 		<PackageTags>sol technology core sql</PackageTags>
 		<Product>SolTechnology.Core.Sql</Product>
 		<PackageId>SolTechnology.Core.Sql</PackageId>
 		<AssemblyName>SolTechnology.Core.Sql</AssemblyName>
-		<RepositoryUrl>https://github.com/AdrianStrugala/SolTechnology.Core</RepositoryUrl>
-		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
 
 		<PackageIcon>docs\mini-logo.png</PackageIcon>
 		<PackageReadmeFile>docs\readme.md</PackageReadmeFile>
-		<Nullable>enable</Nullable>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -26,11 +20,6 @@
 
 	<ItemGroup>
 		<PackageReference Include="DotNet.Testcontainers" Version="1.6.0" />
-		<PackageReference Include="Microsoft.Extensions.Configuration" Version="6.0.0" />
-		<PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="7.0.2" />
-		<PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="6.0.0" />
-		<PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="6.0.0" />
-		<PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="6.0.0" />
 		<PackageReference Include="Polly" Version="7.2.*" />
 		<PackageReference Include="Respawn" Version="5.0.1" />
 		<PackageReference Include="System.Data.SqlClient" Version="4.8.*" />

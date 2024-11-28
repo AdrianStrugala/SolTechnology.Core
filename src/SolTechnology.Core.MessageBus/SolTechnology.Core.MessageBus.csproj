@@ -1,18 +1,12 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFramework>net6.0</TargetFramework>
-		<ImplicitUsings>enable</ImplicitUsings>
-
-		<Authors>Adrian Strugala</Authors>
 		<Version>0.3.0</Version>
 		<Description>SolTechnology Core Message Bus library</Description>
 		<PackageTags>sol technology core azure service message bus</PackageTags>
 		<Product>SolTechnology.Core.MessageBus</Product>
 		<PackageId>SolTechnology.Core.MessageBus</PackageId>
 		<AssemblyName>SolTechnology.Core.MessageBus</AssemblyName>
-		<RepositoryUrl>https://github.com/AdrianStrugala/SolTechnology.Core</RepositoryUrl>
-		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
 
 		<PackageIcon>docs\mini-logo.png</PackageIcon>
 		<PackageReadmeFile>docs\readme.md</PackageReadmeFile>
@@ -26,11 +20,6 @@
 	<ItemGroup>
 	  <PackageReference Include="Azure.Messaging.ServiceBus" Version="7.11.1" />
 	  <PackageReference Include="Microsoft.Azure.ServiceBus" Version="5.2.0" />
-	  <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="7.0.0" />
-	  <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="7.0.2" />
-	  <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="2.2.0" />
-	  <PackageReference Include="Microsoft.Extensions.Options" Version="7.0.0" />
-	  <PackageReference Include="Microsoft.Extensions.Http" Version="7.0.0" />
 	</ItemGroup>
 
 </Project>

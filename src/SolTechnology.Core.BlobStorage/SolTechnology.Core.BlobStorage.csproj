@@ -1,10 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFramework>net6.0</TargetFramework>
-		<ImplicitUsings>enable</ImplicitUsings>
-
-		<Authors>Adrian Strugala</Authors>
 		<Version>0.2.0</Version>
 		<Description>SolTechnology Core Azure blob storage library</Description>
 		<PackageTags>sol technology core azure blob storage</PackageTags>
@@ -25,11 +21,6 @@
 	<ItemGroup>
 	  <PackageReference Include="AvroConvert" Version="3.3.0" />
 	  <PackageReference Include="Azure.Storage.Blobs" Version="12.14.1" />
-	  <PackageReference Include="Microsoft.Extensions.Configuration" Version="6.0.0" />
-	  <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="7.0.2" />
-	  <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="6.0.0" />
-	  <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="7.0.0" />
-	  <PackageReference Include="Microsoft.Extensions.Options" Version="7.0.0" />
 	</ItemGroup>
 
 </Project>

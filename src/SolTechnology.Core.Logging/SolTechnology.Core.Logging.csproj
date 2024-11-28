@@ -1,18 +1,12 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFramework>net6.0</TargetFramework>
-		<ImplicitUsings>enable</ImplicitUsings>
-
-		<Authors>Adrian Strugala</Authors>
 		<Version>0.2.2</Version>
 		<Description>SolTechnology Core Azure logging library</Description>
 		<PackageTags>sol technology core azure logging logs log</PackageTags>
 		<Product>SolTechnology.Core.Logging</Product>
 		<PackageId>SolTechnology.Core.Logging</PackageId>
 		<AssemblyName>SolTechnology.Core.Logging</AssemblyName>
-		<RepositoryUrl>https://github.com/AdrianStrugala/SolTechnology.Core</RepositoryUrl>
-		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
 
 		<PackageIcon>docs\mini-logo.png</PackageIcon>
 		<PackageReadmeFile>docs\readme.md</PackageReadmeFile>
@@ -22,8 +16,6 @@
 		<None Include="..\..\docs\Log.md" Pack="true" Visible="false" PackagePath="docs\readme.md" />
 	</ItemGroup>
 
-	<ItemGroup>
-		<FrameworkReference Include="Microsoft.AspNetCore.App" />
-	</ItemGroup>
+
 
 </Project>
