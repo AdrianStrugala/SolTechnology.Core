@@ -1,4 +1,5 @@
 using System.Net;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Text.Json;
 using JsonConverter.Abstractions;
@@ -62,7 +63,7 @@ public class JsonResponseBuilderDecorator : IResponseBuilder
     }
 
     public IResponseBuilder WithTransformer(TransformerType transformerType = TransformerType.Handlebars,
-        bool transformContentFromBodyAsFile = false, ReplaceNodeOptions options = ReplaceNodeOptions.None)
+        bool transformContentFromBodyAsFile = false, ReplaceNodeOptions options = ReplaceNodeOptions.EvaluateAndTryToConvert)
     {
         _originalBuilder.WithTransformer(transformerType, transformContentFromBodyAsFile, options);
         return this;
@@ -113,6 +114,24 @@ public class JsonResponseBuilderDecorator : IResponseBuilder
         return this;
     }
 
+    public IResponseBuilder WithBodyAsProtoBuf(string protoDefinition, string messageType, object value,
+        IJsonConverter? jsonConverter = null, JsonConverterOptions? options = null)
+    {
+        throw new NotImplementedException();
+    }
+
+    public IResponseBuilder WithBodyAsProtoBuf(IReadOnlyList<string> protoDefinitions, string messageType, object value,
+        IJsonConverter? jsonConverter = null, JsonConverterOptions? options = null)
+    {
+        throw new NotImplementedException();
+    }
+
+    public IResponseBuilder WithBodyAsProtoBuf(string messageType, object value, IJsonConverter? jsonConverter = null,
+        JsonConverterOptions? options = null)
+    {
+        throw new NotImplementedException();
+    }
+
     public IResponseBuilder WithBodyAsJson(object body, Encoding? encoding = null, bool? indented = null)
     {
         var json = JsonSerializer.Serialize(body,
@@ -125,6 +144,16 @@ public class JsonResponseBuilderDecorator : IResponseBuilder
     {
         WithBodyAsJson(body, null, indented);
         return this;
+    }
+
+    public IResponseBuilder WithBodyAsJson(Func<IRequestMessage, object> bodyFactory, Encoding? encoding = null)
+    {
+        throw new NotImplementedException();
+    }
+
+    public IResponseBuilder WithBodyAsJson(Func<IRequestMessage, Task<object>> bodyFactory, Encoding? encoding = null)
+    {
+        throw new NotImplementedException();
     }
 
     public IResponseBuilder WithBodyFromFile(string filename, bool cache = true)
@@ -155,6 +184,26 @@ public class JsonResponseBuilderDecorator : IResponseBuilder
     {
         _originalBuilder.WithHeaders(headers);
         return this;
+    }
+
+    public IResponseBuilder WithTrailingHeader(string name, params string[] values)
+    {
+        throw new NotImplementedException();
+    }
+
+    public IResponseBuilder WithTrailingHeaders(IDictionary<string, string> headers)
+    {
+        throw new NotImplementedException();
+    }
+
+    public IResponseBuilder WithTrailingHeaders(IDictionary<string, string[]> headers)
+    {
+        throw new NotImplementedException();
+    }
+
+    public IResponseBuilder WithTrailingHeaders(IDictionary<string, WireMockList<string>> headers)
+    {
+        throw new NotImplementedException();
     }
 
     public IResponseBuilder WithStatusCode(int code)
@@ -197,5 +246,10 @@ public class JsonResponseBuilderDecorator : IResponseBuilder
     {
         _originalBuilder.WithProxy(settings);
         return this;
+    }
+
+    public IResponseBuilder WithProxy(string proxyUrl, X509Certificate2 certificate)
+    {
+        throw new NotImplementedException();
     }
 }

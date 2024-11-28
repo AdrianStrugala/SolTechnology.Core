@@ -19,8 +19,8 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <PackageReference Include="AvroConvert" Version="3.3.0" />
-	  <PackageReference Include="Azure.Storage.Blobs" Version="12.14.1" />
+	  <PackageReference Include="AvroConvert" Version="3.4.10" />
+	  <PackageReference Include="Azure.Storage.Blobs" Version="12.23.0" />
 	</ItemGroup>
 
 </Project>
