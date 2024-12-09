@@ -22,7 +22,7 @@ paths:
               $ref: '#/components/schemas/CalculateBestPathQuery'
       responses:
         '200':
-          description: Success
+          description: OK
           content:
             application/json:
               schema:
@@ -44,7 +44,7 @@ paths:
               $ref: '#/components/schemas/CalculateBestPathQuery'
       responses:
         '200':
-          description: Success
+          description: OK
           content:
             application/json:
               schema:
@@ -74,7 +74,7 @@ paths:
               $ref: '#/components/schemas/FindCityByCoordinatesQuery'
       responses:
         '200':
-          description: Success
+          description: OK
           content:
             application/json:
               schema:
@@ -102,7 +102,7 @@ paths:
               $ref: '#/components/schemas/FindCityByNameQuery'
       responses:
         '200':
-          description: Success
+          description: OK
           content:
             application/json:
               schema:
@@ -130,7 +130,7 @@ paths:
               $ref: '#/components/schemas/FindCityByNameQuery'
       responses:
         '200':
-          description: Success
+          description: OK
           content:
             application/json:
               schema:
@@ -160,7 +160,7 @@ paths:
               $ref: '#/components/schemas/FindCityByCoordinatesQuery'
       responses:
         '200':
-          description: Success
+          description: OK
           content:
             application/json:
               schema:
@@ -179,7 +179,7 @@ paths:
         - Home
       responses:
         '200':
-          description: Success
+          description: OK
   /api/LimitCost:
     post:
       tags:
@@ -196,7 +196,7 @@ paths:
             type: string
       responses:
         '200':
-          description: Success
+          description: OK
           content:
             application/json:
               schema:
@@ -227,7 +227,7 @@ paths:
               $ref: '#/components/schemas/PayCommand'
       responses:
         '200':
-          description: Success
+          description: OK
   /api/users/changePassword:
     post:
       tags:
@@ -245,7 +245,7 @@ paths:
               $ref: '#/components/schemas/ChangePasswordCommand'
       responses:
         '200':
-          description: Success
+          description: OK
   /api/users/login:
     post:
       tags:
@@ -263,7 +263,7 @@ paths:
               $ref: '#/components/schemas/LoginQuery'
       responses:
         '200':
-          description: Success
+          description: OK
   /api/users/register:
     post:
       tags:
@@ -281,7 +281,7 @@ paths:
               $ref: '#/components/schemas/RegisterUserCommand'
       responses:
         '200':
-          description: Success
+          description: OK
 components:
   schemas:
     CalculateBestPathQuery:
