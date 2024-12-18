@@ -13,7 +13,7 @@ namespace SolTechnology.Core.Cache
                 {
                     if (cacheConfiguration == null)
                     {
-                        cacheConfiguration = configuration.GetSection("Configuration:Cache").Get<CacheConfiguration>();
+                        cacheConfiguration = configuration.GetSection("SolTechnology:Cache").Get<CacheConfiguration>();
                     }
 
                     if (cacheConfiguration == null)

@@ -25,6 +25,9 @@
 	  <Content Update="appsettings.json">
 	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 	  </Content>
+	  <Content Update="appsettings.prod.json">
+	    <DependentUpon>appsettings.json</DependentUpon>
+	  </Content>
 	</ItemGroup>
 	<ItemGroup>
 		<None Include="appsettings.prod.json">

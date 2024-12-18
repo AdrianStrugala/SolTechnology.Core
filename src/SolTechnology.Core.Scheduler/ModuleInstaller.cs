@@ -25,7 +25,7 @@ namespace SolTechnology.Core.Scheduler
                     }
                     if (scheduledJobConfiguration == null)
                     {
-                        var appSettingsscheduledJobConfiguration = configuration.GetSection("Configuration:ScheduledJobs").Get<List<AppSettingsScheduledJobConfiguration>>().FirstOrDefault(a => a.JobName.Equals(jobName, StringComparison.InvariantCultureIgnoreCase));
+                        var appSettingsscheduledJobConfiguration = configuration.GetSection("SolTechnology:ScheduledJobs").Get<List<AppSettingsScheduledJobConfiguration>>().FirstOrDefault(a => a.JobName.Equals(jobName, StringComparison.InvariantCultureIgnoreCase));
 
                         if (appSettingsscheduledJobConfiguration == null)
                         {

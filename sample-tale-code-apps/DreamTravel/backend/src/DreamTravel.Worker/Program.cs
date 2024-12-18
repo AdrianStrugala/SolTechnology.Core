@@ -34,10 +34,10 @@ public class Program
         var recurringJobManager = app.Services.GetRequiredService<IRecurringJobManager>();
         recurringJobManager.AddOrUpdate("LogFromJob", () => Console.WriteLine("Hello from Job"), Cron.Daily);
 
-        app.MapHangfireDashboard("/ui/hangfire");
+        app.MapHangfireDashboard("/hangfire/ui");
         app.MapGraphQL<DreamTripsDbContext>(); // default url: /graphql
-        app.MapGraphQLVoyager("ui/voyager");
-        app.UseGraphQLPlayground("/ui/graphql");
+        app.MapGraphQLVoyager("voyager/ui");
+        app.UseGraphQLPlayground("/graphql/ui");
 
         app.Run();
     }
