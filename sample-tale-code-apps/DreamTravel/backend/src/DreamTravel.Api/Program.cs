@@ -1,20 +1,17 @@
 using DreamTravel.Identity.Commands;
-using DreamTravel.Infrastructure.Authentication;
 using DreamTravel.Trips.Queries;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.OpenApi.Models;
 using System.Globalization;
 using DreamTravel.Trips.Sql;
-using Microsoft.AspNetCore.Mvc.Authorization;
 using MicroElements.Swashbuckle.FluentValidation.AspNetCore;
 using SolTechnology.Core.Api.Filters;
+using SolTechnology.Core.Authentication;
 using SolTechnology.Core.Logging.Middleware;
 
 namespace DreamTravel.Api;
 
 public class Program
 {
-    public IConfiguration Configuration { get; }
     static readonly string CorsPolicy = "dupa";
 
     // This method gets called by the runtime. Use this method to add services to the container.
@@ -32,10 +29,6 @@ public class Program
 
 
         //CORS
-        var policy = new AuthorizationPolicyBuilder()
-            .RequireAuthenticatedUser()
-            .Build();
-
         builder.Services.AddCors(options =>
         {
             options.AddPolicy(CorsPolicy,
@@ -61,32 +54,28 @@ public class Program
         var thisAssembly = typeof(Program).Assembly;
         builder.Services.AddMediatR(cfg => { cfg.RegisterServicesFromAssemblies(thisAssembly); });
 
-        //AUTHENTICATION
-        builder.Services.AddAuthentication(DreamAuthenticationOptions.AuthenticationScheme)
-            .AddScheme<DreamAuthenticationOptions, DreamAuthentication>(
-                DreamAuthenticationOptions.AuthenticationScheme,
-                null);
+        var authFilter = builder.Services.AddAuthenticationAndBuildFilter();
 
 
         //SWAGGER
         builder.Services.AddSwaggerGen(c =>
         {
             c.SwaggerDoc("v1", new OpenApiInfo { Title = "DreamTravel", Version = "v1" });
-            c.AddSecurityDefinition("ApiKey", new OpenApiSecurityScheme
+            c.AddSecurityDefinition(ApiKeyAuthenticationSchemeOptions.AuthenticationScheme, new OpenApiSecurityScheme
             {
                 Type = SecuritySchemeType.ApiKey,
                 In = ParameterLocation.Header,
-                Name = DreamAuthenticationOptions.AuthenticationHeaderName,
+                Name = ApiKeyAuthenticationSchemeOptions.AuthenticationHeaderName,
                 Description = "Authentication: Api Key for using Dream Travel"
             });
             c.AddSecurityRequirement(new OpenApiSecurityRequirement
             {
                 {
-                    new OpenApiSecurityScheme
+                    new OpenApiSecurityScheme 
                     {
-                        Reference = new OpenApiReference { Type = ReferenceType.SecurityScheme, Id = "ApiKey" }
+                        Reference = new OpenApiReference { Type = ReferenceType.SecurityScheme, Id = ApiKeyAuthenticationSchemeOptions.AuthenticationScheme }
                     },
-                    new string[] { }
+                    []
                 }
             });
         });
@@ -98,7 +87,7 @@ public class Program
         //MVC
         builder.Services.AddMvc(opts =>
         {
-            opts.Filters.Add(new AuthorizeFilter(policy));
+            opts.Filters.Add(authFilter);
             opts.Filters.Add<ExceptionFilter>();
             opts.Filters.Add<ResponseEnvelopeFilter>();
         });
