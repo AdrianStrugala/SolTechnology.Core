@@ -76,7 +76,7 @@ namespace DreamTravel.FunctionalTests.Trips
             {
                 var findCityByNameResponse = await _apiClient
                     .CreateRequest("/api/v2/FindCityByName")
-                    .WithHeader("Authorization", "DreamAuthentication U29sVWJlckFsbGVz")
+                    .WithHeader("Authorization", "<SECRET>")
                     .WithBody(new { city.Name })
                     .PostAsync<Result<City>>();
 
@@ -87,7 +87,7 @@ namespace DreamTravel.FunctionalTests.Trips
             // "And when user searches for the best path".x(async () =>
             var apiResponse = await _apiClient
                 .CreateRequest("/api/v2/CalculateBestPath")
-                .WithHeader("Authorization", "DreamAuthentication U29sVWJlckFsbGVz")
+                .WithHeader("Authorization", "<SECRET>")
                 .WithBody(new { Cities = cities })
                 .PostAsync<Result<CalculateBestPathResult>>();
 
