@@ -20,7 +20,7 @@ namespace SolTechnology.Core.MessageBus
             {
                 if (messageBusConfiguration == null)
                 {
-                    messageBusConfiguration = configuration.GetSection("SolTechnology:MessageBus").Get<MessageBusConfiguration>();
+                    messageBusConfiguration = configuration.GetSection("MessageBus").Get<MessageBusConfiguration>();
                 }
 
                 if (messageBusConfiguration == null)

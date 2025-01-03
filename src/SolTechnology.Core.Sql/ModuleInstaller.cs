@@ -17,7 +17,7 @@ namespace SolTechnology.Core.Sql
 
                if (sqlConfiguration == null)
                {
-                   sqlConfiguration = configuration.GetSection("SolTechnology:Sql").Get<SqlConfiguration>();
+                   sqlConfiguration = configuration.GetSection("Sql").Get<SqlConfiguration>();
                }
 
                if (sqlConfiguration == null)

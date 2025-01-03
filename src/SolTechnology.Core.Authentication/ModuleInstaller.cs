@@ -18,7 +18,7 @@ namespace SolTechnology.Core.Authentication
             {
                 if (string.IsNullOrEmpty(authenticationConfiguration?.ApiKey))
                 {
-                    authenticationConfiguration = configuration.GetSection("SolTechnology:Authentication").Get<AuthenticationConfiguration>();
+                    authenticationConfiguration = configuration.GetSection("Authentication").Get<AuthenticationConfiguration>();
                 }
 
                 if (string.IsNullOrEmpty(authenticationConfiguration?.ApiKey))

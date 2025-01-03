@@ -12,7 +12,7 @@ namespace SolTechnology.Core.Sql.Testing
         public SqlConnection? SqlConnection { get; private set; }
         private string _connectionString = null!;
 
-        public async Task Start(SqlConfiguration sqlConfiguration)
+        public async Task Connect(SqlConfiguration sqlConfiguration)
         {
             var options = Options.Create(sqlConfiguration);
             _connectionString = sqlConfiguration!.ConnectionString;

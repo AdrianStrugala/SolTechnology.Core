@@ -16,7 +16,7 @@ namespace SolTechnology.Core.BlobStorage
 
                if (blobStorageConfiguration == null)
                {
-                   blobStorageConfiguration = configuration.GetSection("SolTechnology:BlobStorage").Get<BlobStorageConfiguration>();
+                   blobStorageConfiguration = configuration.GetSection("BlobStorage").Get<BlobStorageConfiguration>();
                }
 
                if (blobStorageConfiguration == null)

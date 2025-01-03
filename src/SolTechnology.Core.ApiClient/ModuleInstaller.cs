@@ -31,7 +31,7 @@ namespace SolTechnology.Core.ApiClient
                 .AddOptions<TOptions>()
                 .Configure<IConfiguration>((options, configuration) =>
             {
-                configuration = configuration.GetSection($"SolTechnology:ApiClients:{httpClientName}:Options");
+                configuration = configuration.GetSection($"ApiClients:{httpClientName}:Options");
                 configuration.Bind(options);
             });
 
@@ -48,7 +48,7 @@ namespace SolTechnology.Core.ApiClient
                 .AddOptions<HttpPolicyConfiguration>()
                 .Configure<IConfiguration>((config, configuration) =>
                 {
-                    configurationSection = configuration.GetSection($"SolTechnology:ApiClients:{httpClientName}");
+                    configurationSection = configuration.GetSection($"ApiClients:{httpClientName}");
                     if (apiClientConfiguration == null)
                     {
                         apiClientConfiguration = configurationSection.Get<ApiClientConfiguration>();
@@ -63,7 +63,7 @@ namespace SolTechnology.Core.ApiClient
                     if (httpPolicyConfiguration == null)
                     {
                         httpPolicyConfiguration =
-                            configuration.GetSection("SolTechnology:HttpPolicy").Get<HttpPolicyConfiguration>();
+                            configuration.GetSection("HttpPolicy").Get<HttpPolicyConfiguration>();
                     }
 
                     if (httpPolicyConfiguration == null)

@@ -21,10 +21,10 @@ namespace DreamTravel.Identity.DatabaseData.IntegrationTests
                 .AddJsonFile("appsettings.tests.json", true, true)
                 .Build();
 
-            var sqlConfiguration = configuration.GetRequiredSection("SolTechnology:Sql").Get<SqlConfiguration>()!;
+            var sqlConfiguration = configuration.GetRequiredSection("Sql").Get<SqlConfiguration>()!;
             
             SqlFixture = new SqlFixture();
-            await SqlFixture.Start(sqlConfiguration);
+            await SqlFixture.Connect(sqlConfiguration);
         }
 
 

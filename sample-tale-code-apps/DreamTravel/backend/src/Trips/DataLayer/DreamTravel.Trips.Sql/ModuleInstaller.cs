@@ -14,8 +14,7 @@ namespace DreamTravel.Trips.Sql
         {
             services.AddSql();
 
-            var sqlConfiguration =
-                configuration.GetSection("Configuration:Sql").Get<SqlConfiguration>()!;
+            var sqlConfiguration = configuration.GetSection("Sql").Get<SqlConfiguration>()!;
             services.AddDbContext<DreamTripsDbContext>(options =>
                 options.UseSqlServer(sqlConfiguration.ConnectionString));
                 // options.UseInMemoryDatabase("DreamTravelDatabase"));
