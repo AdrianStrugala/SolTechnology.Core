@@ -1,21 +1,29 @@
 ﻿using DreamTravel.Identity.DatabaseData.Repositories.Users;
 using DreamTravel.Identity.Domain.Users;
+using FluentAssertions;
+using NUnit.Framework;
 using SolTechnology.Core.Sql.Testing;
-using Xunit;
 
 namespace DreamTravel.Identity.DatabaseData.IntegrationTests.Users
 {
-    public class UserRepositoryTests : IClassFixture<SqlFixture>
+    public class UserRepositoryTests
     {
-        private readonly UserRepository _sut;
+        private UserRepository _sut;
 
-        public UserRepositoryTests(SqlFixture sqlFixture)
+        [OneTimeSetUp]
+        public void OneTimeSetUp()
         {
-            var connectionFactory = sqlFixture.SqlConnectionFactory;
+            var connectionFactory = IntegrationTestsFixture.SqlFixture.SqlConnectionFactory;
             _sut = new UserRepository(connectionFactory);
         }
+        
+        [SetUp]
+        public async Task SetUp()
+        {
+            await IntegrationTestsFixture.SqlFixture.Reset();
+        }
 
-        [Fact]
+        [Test]
         public void Insert_ValidUser_ItIsSavedInDB()
         {
             //Arrange
@@ -33,12 +41,11 @@ namespace DreamTravel.Identity.DatabaseData.IntegrationTests.Users
 
             User resultUser = _sut.Get(user.UserId);
 
-            Assert.NotNull(resultUser);
-
-            Assert.Equal(user.Email, resultUser.Email);
-            Assert.Equal(user.Name, resultUser.Name);
-            Assert.Equal(user.Password, resultUser.Password);
-            Assert.Equal(user.UserId, resultUser.UserId);
+            resultUser.Should().NotBeNull();
+            resultUser.Email.Should().Be(user.Email);
+            resultUser.Name.Should().Be(user.Name);
+            resultUser.Password.Should().Be(user.Password);
+            resultUser.UserId.Should().Be(user.UserId);
         }
     }
 }

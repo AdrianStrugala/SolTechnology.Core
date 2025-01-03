@@ -10,7 +10,6 @@ using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
 using NSubstitute;
 using NUnit.Framework;
-using Xunit;
 
 namespace DreamTravel.FunctionalTests.Trips
 {
@@ -27,7 +26,7 @@ namespace DreamTravel.FunctionalTests.Trips
         }
 
 
-        [Fact(Skip = "Paid test")]
+        // [Fact(Skip = "Paid test")]
         public async Task DownloadExternalData_ValidConditions_MatrixIsPopulated()
         {
             //Arrange
@@ -66,7 +65,7 @@ namespace DreamTravel.FunctionalTests.Trips
         }
 
         //can always download data of at least 30 cities
-        [Fact(Skip = "Paid test")]
+        // [Fact(Skip = "Paid test")]
         public async Task Execute_InputHas30Cities_AllTheDataIsDownloaded()
         {
             int noOfCities = 30;

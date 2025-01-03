@@ -1,14 +1,9 @@
-﻿using System.Collections.Generic;
-using DreamTravel.Trips.Domain.Cities;
-using System.Net.Http;
-using System.Threading.Tasks;
+﻿using DreamTravel.Trips.Domain.Cities;
 using DreamTravel.FunctionalTests.FakeApis;
 using DreamTravel.GeolocationData.GoogleApi;
-using DreamTravel.Trips.Domain.Paths;
 using FluentAssertions;
 using SolTechnology.Core.Faker;
 using DreamTravel.Trips.Queries.CalculateBestPath;
-using NUnit.Framework;
 using SolTechnology.Core.CQRS;
 
 namespace DreamTravel.FunctionalTests.Trips
@@ -76,7 +71,7 @@ namespace DreamTravel.FunctionalTests.Trips
             {
                 var findCityByNameResponse = await _apiClient
                     .CreateRequest("/api/v2/FindCityByName")
-                    .WithHeader("Authorization", "<SECRET>")
+                    .WithHeader("X-API-KEY", "<SECRET>")
                     .WithBody(new { city.Name })
                     .PostAsync<Result<City>>();
 
@@ -87,7 +82,7 @@ namespace DreamTravel.FunctionalTests.Trips
             // "And when user searches for the best path".x(async () =>
             var apiResponse = await _apiClient
                 .CreateRequest("/api/v2/CalculateBestPath")
-                .WithHeader("Authorization", "<SECRET>")
+                .WithHeader("X-API-KEY", "<SECRET>")
                 .WithBody(new { Cities = cities })
                 .PostAsync<Result<CalculateBestPathResult>>();
 

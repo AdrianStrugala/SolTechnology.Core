@@ -1,28 +1,19 @@
 ﻿using System.Diagnostics;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 using SolTechnology.Core.Sql.Connections;
 using Testcontainers.MsSql;
-using Xunit;
 using SqlConnection = System.Data.SqlClient.SqlConnection;
 
 namespace SolTechnology.Core.Sql.Testing
 {
-    public class SqlFixture : IAsyncLifetime
+    public class SqlFixture : IDisposable
     {
         public ISqlConnectionFactory SqlConnectionFactory = null!;
         public SqlConnection? SqlConnection { get; private set; }
         private string _connectionString = null!;
 
-        public async Task InitializeAsync()
+        public async Task Start(SqlConfiguration sqlConfiguration)
         {
-            IConfiguration configuration = new ConfigurationBuilder()
-                .AddJsonFile("appsettings.json", true, true)
-                .AddJsonFile("appsettings.development.json", true, true)
-                .AddJsonFile("appsettings.tests.json", true, true)
-                .Build();
-
-            var sqlConfiguration = configuration.GetRequiredSection("Configuration:Sql").Get<SqlConfiguration>();
             var options = Options.Create(sqlConfiguration);
             _connectionString = sqlConfiguration!.ConnectionString;
 
@@ -43,17 +34,17 @@ namespace SolTechnology.Core.Sql.Testing
                     throw new Exception($"Unable to connect to Sql Server. Connection string is: {_connectionString}");
                 }
             }
-
-
             SqlConnectionFactory = new SqlConnectionFactory(options!);
-
+        }
+        
+        public async Task Reset()
+        {
             await new Respawn.Checkpoint().Reset(_connectionString);
         }
 
-        public async Task DisposeAsync()
+        public void Dispose()
         {
             SqlConnection?.Dispose();
-            await new Respawn.Checkpoint().Reset(_connectionString);
         }
 
 

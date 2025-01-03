@@ -23,7 +23,7 @@ public class ResponseEnvelopeFilter : IResultFilter
                 return;
             }
 
-            context.Result = new ObjectResult(new Result<object>
+            context.Result = new ObjectResult(new Result<object?>
             {
                 Data = resultValue,
                 IsSuccess = true

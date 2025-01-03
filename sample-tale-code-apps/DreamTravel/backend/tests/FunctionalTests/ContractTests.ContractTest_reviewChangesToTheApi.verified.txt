@@ -506,7 +506,7 @@ components:
     ApiKey:
       type: apiKey
       description: 'Authentication: Api Key for using Dream Travel'
-      name: Authorization
+      name: X-API-KEY
       in: header
 security:
   - ApiKey: [ ]

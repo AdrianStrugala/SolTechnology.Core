@@ -67,7 +67,7 @@ namespace DreamTravel.FunctionalTests.Trips
 
             var apiResponse = await _apiClient
                 .CreateRequest("/api/v2/FindCityByName")
-                .WithHeader("Authorization", "<SECRET>")
+                .WithHeader("X-API-KEY", "<SECRET>")
                 .WithBody(new { city.Name })
                 .PostAsync<Result<City>>();
 

@@ -4,7 +4,6 @@ using DreamTravel.Trips.Domain.Cities;
 using DreamTravel.Trips.Queries.CalculateBestPath;
 using FluentAssertions;
 using NUnit.Framework;
-using Xunit;
 // using NSubstitute;
 
 namespace DreamTravel.FunctionalTests.Trips
@@ -28,7 +27,7 @@ namespace DreamTravel.FunctionalTests.Trips
             // _sut = new CalculateBestPathHandler(downloadRoadData, formOutputData, tsp, evaluationBrain);
         }
 
-        [Fact(Skip = "Manual test")]
+        // [Fact(Skip = "Manual test")]
         public async Task Performance_TestFor10Cities_UseWithResharperProfiling_ForFindingOptimizations()
         {
             //Arrange
