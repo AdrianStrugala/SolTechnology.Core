@@ -134,4 +134,131 @@ And example test itself:
 
 ## Functional Tests
 
+Functional tests are designed to test the entire feature in an isolated environment, ensuring that all components work together as expected. These tests simulate real-world scenarios and validate the system's behavior from the user's perspective.  
+
+### Initialize the Environment:  
+The IntegrationTestsFixture class is responsible for setting up the testing environment. It initializes the necessary components and dependencies, such as the API server and mock services.
+
+```csharp
+    [SetUpFixture]
+    [SetCulture("en-US")]
+    public static class IntegrationTestsFixture
+    {
+    public static ApiFixture<Program> ApiFixture { get; set; }
+    public static ApiFixture<Worker.Program> WorkerFixture { get; set; }
+    public static WireMockFixture WireMockFixture { get; set; }
+    
+        [OneTimeSetUp]
+        public static void SetUp()
+        {
+            Environment.SetEnvironmentVariable("ASPNETCORE_ENVIRONMENT", "development");
+    
+            ApiFixture = new ApiFixture<Program>();
+            WorkerFixture = new ApiFixture<Worker.Program>();
+    
+            WireMockFixture = new WireMockFixture();
+            WireMockFixture.Initialize();
+            WireMockFixture.RegisterFakeApi(new GoogleFakeApi());
+        }
+    
+        [OneTimeTearDown]
+        public static void TearDown()
+        {
+            ApiFixture.Dispose();
+            WorkerFixture.Dispose();
+            WireMockFixture.Dispose();
+        }
+    }
+```
+### Define Test Scenarios:
+Use WireMockFixture to set up fake APIs that simulate the behavior of external services. This ensures that the tests run in an isolated environment without relying on actual external services.
+Write test methods that cover various scenarios. For example, the FindsOptimalPath test verifies that the CalculateBestPath feature correctly finds the optimal path between a list of cities by interacting with the fake Google APIs.
+
+```csharp
+    [Test]
+    public async Task FindsOptimalPath()
+    {
+        // Given a list of cities
+        var cities = new List<City>
+        {
+            new() { Name = "Wroclaw", Latitude =  51.107883, Longitude = 17.038538},
+            new() { Name = "Firenze", Latitude =  43.769562, Longitude = 11.255814},
+            new() { Name = "Vienna", Latitude = 48.210033, Longitude =  16.363449},
+            new() { Name = "Barcelona",  Latitude =  41.390205, Longitude = 2.154007}
+        };
+    
+        // Given a fake Google city API
+        foreach (var city in cities)
+        {
+            _wireMockFixture.Fake<IGoogleApiClient>()
+                .WithRequest(x => x.GetLocationOfCity, city.Name)
+                .WithResponse(x => x.WithSuccess().WithBody(
+                $@"{{
+                       ""results"" :
+                       [
+                          {{
+                             ""geometry"" :
+                             {{
+                                ""location"" :
+                                {{
+                                   ""lat"" : {city.Latitude},
+                                   ""lng"" : {city.Longitude}
+                                }}
+                             }}
+                          }}
+                       ],
+                       ""status"" : ""OK""
+                    }}"));
+        }
+    
+        // Given a fake Google distance API
+        _wireMockFixture.Fake<IGoogleApiClient>()
+            .WithRequest(x => x.GetDurationMatrixByFreeRoad, cities)
+            .WithResponse(x => x.WithSuccess().WithBody(GoogleFakeApi.FreeDistanceMatrix));
+    
+        _wireMockFixture.Fake<IGoogleApiClient>()
+            .WithRequest(x => x.GetDurationMatrixByTollRoad, cities)
+            .WithResponse(x => x.WithSuccess().WithBody(GoogleFakeApi.TollDistanceMatrix));
+    
+        // When user searches for the location of each city
+        foreach (var city in cities)
+        {
+            var findCityByNameResponse = await _apiClient
+                .CreateRequest("/api/v2/FindCityByName")
+                .WithHeader("X-API-KEY", "<SECRET>")
+                .WithBody(new { city.Name })
+                .PostAsync<Result<City>>();
+    
+            findCityByNameResponse.IsSuccess.Should().BeTrue();
+            findCityByNameResponse.Data.Should().BeEquivalentTo(city);
+        }
+    
+        // And when user searches for the best path
+        var apiResponse = await _apiClient
+            .CreateRequest("/api/v2/CalculateBestPath")
+            .WithHeader("X-API-KEY", "<SECRET>")
+            .WithBody(new { Cities = cities })
+            .PostAsync<Result<CalculateBestPathResult>>();
+    }
+```
+
+### Assert expected results:
+
+```csharp
+    apiResponse.IsSuccess.Should().BeTrue();
+    var paths = apiResponse.Data.BestPaths;
+    
+    // Then the returned path is optimal
+    paths[0].StartingCity.Name.Should().Be("Wroclaw");
+    paths[0].EndingCity.Name.Should().Be("Vienna");
+    
+    paths[1].StartingCity.Name.Should().Be("Vienna");
+    paths[1].EndingCity.Name.Should().Be("Firenze");
+    
+    paths[2].StartingCity.Name.Should().Be("Firenze");
+    paths[2].EndingCity.Name.Should().Be("Barcelona");
+```
+
+This test verifies that the CalculateBestPath feature correctly finds the optimal path between a list of cities by interacting with the fake Google APIs. The test ensures that the entire feature works as expected in an isolated environment, providing confidence in the system's behavior.
+
 ## App Insights Logs
