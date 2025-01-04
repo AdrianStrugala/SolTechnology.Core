@@ -1,4 +1,3 @@
-
 ## Architecture
 
 
@@ -16,27 +15,106 @@
 
 
 
-Application written in Tale Code uses Clean Architecture approach. Projects are ogranized into layers with clear responsibilities and dependencies from top to bottom.
+Application written in Tale Code uses the Clean Architecture approach. Projects are organized into layers with clear responsibilities and dependencies from top to bottom.
 
 #### 1) Domain
-The domain is heart of the application. Identyfies the area, bounded context and common language between business and developers. The information is gathered into models understanable by every team member of the project.
+The domain is the heart of the application. It identifies the area, bounded context, and common language between business and developers. The information is gathered into models understandable by every team member of the project.
 
 #### 2) Data Layer
-This layer is responsible for communication with storages. The most simple use case would be Repository build on SQL or no-SQL databse. May contain multiple projects dedicated to different types of storages. 
+This layer is responsible for communication with data sources. The simplest use case would be a repository built on an SQL database or HTTP client. It may contain multiple projects dedicated to different types of sources.
 
 #### 3) Logic Layer
-The part for which stakeholders are paying for. Contains only the pieces of codes that brings business value. It does not care from where the data comes from or where it ends. It's responsibility is to run all of the operations, calculations, commands and queries required to achieve success. \
-Might be using CQRS or Domain Services or Application approaches. Whatever is the most extensible, natural and understandable for the development team.
+The part for which stakeholders are paying. It contains only the pieces of code that bring business value. It does not care where the data comes from or where it ends. Its responsibility is to run all of the operations, calculations, commands, and queries required to achieve success. It might use CQRS, Domain Services, or Application approaches, whichever is the most extensible, natural, and understandable for the development team.
 
 #### 4) Presentation Layer
-The entry point or points for the applciation. API, triggers, scheduled tasks, event handlers - every way of making the application to do something is considered as Presentation.
+The entry point or points for the application. API, triggers, scheduled tasks, event handlers - every way of making the application do something is considered as Presentation.
 
 #### 5) Infrastructure
-Everything else. Drivers, extensions and rest of techincal details needed to write good piece of code.
+Everything else. Drivers, extensions, and the rest of the technical details needed to write a good piece of code.
 
 ![design](./Architecture.PNG)
 
+
+
 ## Code Design
+
+### Presentation Layer
+
+Starting from the top, Tale Code is organized in well-known and old-fashioned layers. The first and initial layer is the Presentation Layer.
+
+This layer is responsible for communication with the outside world. It contains a minimum of code. Presentation is only a wrapper for the logic, containing all presentation-specific aspects (like authentication). In the sample app, it's built of 2 components:
+
+#### BackgroundWorker
+
+Subscribes to messages and invokes operations based on them. In this scenario, on CitySearched event invokes FetchCityDetails command:
+
+```csharp
+    public class FetchCityDetailsJob(IMediator mediator) : INotificationHandler<CitySearched>
+    {
+        public async Task Handle(CitySearched notification, CancellationToken cancellationToken)
+        {
+            await mediator.Send(new FetchCityDetailsCommand {Name = notification.Name}, cancellationToken);
+        }
+    }
+```
+
+#### Api
+
+Provides a public interface for queries:
+
+```csharp
+    [Route(Route)]
+    [ServiceFilter(typeof(ExceptionFilter))]
+    [ServiceFilter(typeof(ResponseEnvelopeFilter))]
+    public class FindCityByNameController(
+        IMediator mediator,
+        ILogger<FindCityByNameController> logger)
+        : ControllerBase
+    {
+        public const string Route = "api/v2/FindCityByName";
+
+
+        [HttpPost]
+        [Produces(MediaTypeNames.Application.Json)]
+        [ProducesResponseType(typeof(Result<City>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(Result), (int)HttpStatusCode.BadRequest)]
+        public async Task<IActionResult> FindCityByName([FromBody] FindCityByNameQuery query)
+        {
+            logger.LogInformation("Looking for city: " + query.Name);
+            return Ok(await mediator.Send(query));
+        }
+    }
+```
+
+
+
+### Logic Layer
+
+Contains all of the business knowledge and operations. Commands and Queries are separated from each other. They have totally different purposes, there is no reason to mix them. They can vary on everything, even on the technology used.
+
+#### Commands
+
+Commands are operations focused on data consistency. Execution time is not a crucial factor for commands, rather reliability. That's why I suggest following couple of simple rules:
+1) Validate command input!
+2) Ensure command could be retried
+3) Ensure that no information is lost - data consistency and quality checks
+4) Work on smart error handling - distinct between expected failure scenarios and exceptions
+5) Log a lot, and have log scope
+
+
+#### Queries
+
+Queries are fundamentally different from commands. Crucial factor is the response time.
+1) Be quick
+2) No not rely on external services if possible
+3) Use pre-generated read models
+4) Be fast
+5) Cache responses
+6) Handle errors - fallbacks
+7) Respond rapidly
+
+
+#### Handlers Structure
 
 Extending the Readme example:
 
@@ -51,7 +129,6 @@ var result = await Chain
      .End(_formResult);
 ```
 
-### Handlers Structure
 
 The repository is structurized in this way:
 
@@ -82,7 +159,7 @@ Where:
 
 - Handler is already known to you - this is the business logic part
 - Command is an input anemic model
-- Result is an output of the operation (in this case)
+- Result is an output of the operation
 - Context holds the data needed for the whole operation. It is shared between Handler and Executors
 - Executors are steps needed for fulfilling the business logic. They have a single and clear purpose
 
@@ -92,188 +169,6 @@ For maximum readability Handler behaves like an orchestrator. It calls the execu
 <img alt="design" src="./handlerStructure.JPG">
 
 
-### Presentation Layer
-
-From detail, to the general. Tale Code is organized in well-known and old-fashioned layers. The first and initial is a Presentation Layer.
-
-This Layer is responsible for communication with the outside world. It conains minumum of the code. Presentation is only a wrapper for the logic, conataining all presentation-specific aspecs (like authenticaion) though. It is build of 3 components:
-
-#### BackgroundWorker
-
-Runs scheduled jobs:
-
-```csharp
-    public class SynchornizeCristianoRonaldoMatches : ScheduledJob
-    {
-        private readonly ICommandHandler<SynchronizePlayerMatchesCommand> _handler;
-
-        public SynchornizeCristianoRonaldoMatches(
-            ISchedulerConfigurationProvider schedulerConfigurationProvider,
-            IServiceScopeFactory serviceScopeFactory,
-            ILogger<ScheduledJob> logger)
-            : base(schedulerConfigurationProvider, serviceScopeFactory, logger)
-        {
-            var scope = serviceScopeFactory.CreateScope();
-            var handler = scope.ServiceProvider.GetRequiredService<ICommandHandler<SynchronizePlayerMatchesCommand>>();
-            _handler = handler;
-        }
-
-        public override async Task Execute()
-        {
-            await _handler.Handle(new SynchronizePlayerMatchesCommand(44));
-        }
-    }
-```
-
-Subscribes to messages and invokes operations based on them:
-
-```csharp
-    public class CalculatePlayerStatistics : IMessageHandler<PlayerMatchesSynchronizedEvent>
-    {
-        private readonly ICommandHandler<CalculatePlayerStatisticsCommand> _handler;
-
-        public CalculatePlayerStatistics(ICommandHandler<CalculatePlayerStatisticsCommand> handler)
-        {
-            _handler = handler;
-        }
-
-        public async Task Handle(PlayerMatchesSynchronizedEvent message, CancellationToken cancellationToken)
-        {
-            var command = new CalculatePlayerStatisticsCommand(message.PlayerId);
-            await _handler.Handle(command);
-        }
-    }
-```
-
-#### Api
-
-Provides a public interface for queries:
-
-```csharp
-    public class GetPlayerStatisticsController : ControllerBase
-    {
-        private readonly IQueryHandler<GetPlayerStatisticsQuery, GetPlayerStatisticsResult> _handler;
-
-        public GetPlayerStatisticsController(IQueryHandler<GetPlayerStatisticsQuery, GetPlayerStatisticsResult> handler)
-        {
-            _handler = handler;
-        }
-
-        [HttpGet]
-        [Route("GetPlayerStatistics/{playerId}")]
-        public async Task<GetPlayerStatisticsResult> GetPlayerStatistics(int playerId)
-        {
-            try
-            {
-                return await _handler.Handle(new GetPlayerStatisticsQuery(playerId));
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e);
-                throw;
-            }
-        }
-    }
-```
-
-### Logic Layer
-
-Contains all of the business knowledge and operations. Commands and Queries are separated from each other. They have totally different purposes, there is no reason to mix them. They can vary on everything, even on the technology used.
-
-#### Commands
-
-Commands are operations focused on data consistency. They are composed from few steps:
-1) Trigger - usually coming from outside of the application (time trigger, event handler, queue message, API call)
-2) Get the external data
-3) Validate!
-4) Adjust to a specific application or domain - map, modify, combine
-5) Store in persistent storage
-6) Ensure that no item is lost - data consistency and quality checks
-7) Pre-generate read models for crucial queries (SQL Materialized View, Temporary Storage (ex. No-Sql database)
-
-```csharp
-    public class SynchronizePlayerMatchesHandler : ICommandHandler<SynchronizePlayerMatchesCommand>
-    {
-        private Func<int, PlayerIdMap> GetPlayerId { get; }
-        private Func<IMessage, Task> PublishMessage { get; }
-        private Func<int, int, Task> SynchronizeMatch { get; }
-        private Func<Player, List<int>> CalculateMatchesToSync { get; }
-        private Func<PlayerIdMap, Task<Player>> SynchronizePlayer { get; }
-
-        public SynchronizePlayerMatchesHandler(
-            ISyncPlayer syncPlayer,
-            IDetermineMatchesToSync determineMatchesToSync,
-            ISyncMatch syncMatch,
-            IPlayerExternalIdsProvider playerExternalIdsProvider,
-            IMessagePublisher messagePublisher)
-        {
-            GetPlayerId = playerExternalIdsProvider.Get;
-            SynchronizePlayer = syncPlayer.Execute;
-            CalculateMatchesToSync = determineMatchesToSync.Execute;
-            SynchronizeMatch = syncMatch.Execute;
-            PublishMessage = messagePublisher.Publish;
-        }
-
-        public async Task Handle(SynchronizePlayerMatchesCommand command)
-        {
-            await Chain
-                .Start(() => GetPlayerId(command.PlayerId))
-                .Then(SynchronizePlayer)
-                .Then(CalculateMatchesToSync)
-                .Then(match => match.ForEach(id =>
-                    SynchronizeMatch(id, command.PlayerId)))
-                .Then(_ => new PlayerMatchesSynchronizedEvent(command.PlayerId))
-                .Then(PublishMessage)
-                .EndCommand();
-        }
-    }
-```
-
-#### Queries
-
-Queries are fundamentally different from commands. Crucial factor is the response time.
-1) Be quick
-2) No not rely on external services if possible
-3) Use pre-generated read models
-4) Be fast
-5) Cache responses
-6) Handle errors - fallbacks
-7) Respond rapidly
-
-
-```csharp
-    public class GetPlayerStatisticsHandler : IQueryHandler<GetPlayerStatisticsQuery, GetPlayerStatisticsResult>
-    {
-        private readonly IPlayerStatisticsRepository _playerStatisticsRepository;
-
-        public GetPlayerStatisticsHandler(IPlayerStatisticsRepository playerStatisticsRepository)
-        {
-            _playerStatisticsRepository = playerStatisticsRepository;
-        }
-
-        public async Task<GetPlayerStatisticsResult> Handle(GetPlayerStatisticsQuery query)
-        {
-            var data = await _playerStatisticsRepository.Get(query.PlayerId);
-
-            var result = new GetPlayerStatisticsResult
-            {
-                Id = data.Id,
-                Name = data.Name,
-                NumberOfMatches = data.NumberOfMatches,
-                StatisticsByTeams = data.StatisticsByTeams.Select(s => new StatisticsByTeam
-                {
-                    DateFrom = s.DateFrom,
-                    DateTo = s.DateTo,
-                    NumberOfMatches = s.NumberOfMatches,
-                    PercentageOfMatchesResultingCompetitionVictory = s.PercentageOfMatchesResultingCompetitionVictory,
-                    TeamName = s.TeamName
-                }).ToList()
-            };
-
-            return result;
-        }
-    }
-```
 
 ### Data Layer
 
@@ -284,39 +179,41 @@ Encapsulates all of the code needed for external components or services integrat
 External API clients:
 
 ```csharp
-   public class FootballDataApiClient : IFootballDataApiClient
+    public partial class GoogleApiClient : IGoogleApiClient
     {
+        private readonly GoogleApiOptions _options;
+        private readonly ILogger<GoogleApiClient> _logger;
         private readonly HttpClient _httpClient;
 
-        public FootballDataApiClient(HttpClient httpClient)
+        public GoogleApiClient(IOptions<GoogleApiOptions> options, HttpClient httpClient, ILogger<GoogleApiClient> logger)
         {
+            _options = options.Value;
             _httpClient = httpClient;
+            _logger = logger;
         }
 
-        public async Task<FootballDataPlayer> GetPlayerById(int id)
+        public async Task<City> GetLocationOfCity(string cityName)
         {
-            var apiResult = await _httpClient.GetAsync<PlayerModel>($"v2/players/{id}/matches?limit=999");
-
-            var result = new FootballDataPlayer
+            try
             {
-                Id = apiResult.Player.Id,
-                Name = apiResult.Player.Name,
-                DateOfBirth = apiResult.Player.DateOfBirth,
-                Nationality = apiResult.Player.Nationality,
-                Position = apiResult.Player.Position,
-                Matches = apiResult.Matches.OrderBy(m => m.UtcDate).Select(m => new FootballDataMatch
-                {
-                    Id = m.Id,
-                    Date = m.UtcDate,
-                    HomeTeam = m.HomeTeam.Name,
-                    AwayTeam = m.AwayTeam.Name,
-                    HomeTeamScore = m.Score.FullTime.HomeTeam,
-                    AwayTeamScore = m.Score.FullTime.AwayTeam,
-                    Winner = GetWinner(m)
-                }).ToList()
-            };
+                City result = new City { Name = cityName };
 
-            return result;
+                var request = await _httpClient
+                    .CreateRequest($"maps/api/geocode/json?address={cityName}&key={_options.Key}")
+                    .GetAsync();
+
+                var response = await request.Content.ReadAsStringAsync();
+                JObject json = JObject.Parse(response);
+
+                result.Latitude = json["results"][0]["geometry"]["location"]["lat"].Value<double>();
+                result.Longitude = json["results"][0]["geometry"]["location"]["lng"].Value<double>();
+                return result;
+            }
+
+            catch (Exception)
+            {
+                throw new InvalidDataException($"Cannot find city [{cityName}]");
+            }
         }
     }
 ```
