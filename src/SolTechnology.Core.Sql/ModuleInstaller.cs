@@ -7,27 +7,19 @@ namespace SolTechnology.Core.Sql
 {
     public static class ModuleInstaller
     {
-        public static IServiceCollection AddSql(this IServiceCollection services, SqlConfiguration? sqlConfiguration = null)
+        public static IServiceCollection AddSql(this IServiceCollection services, SqlConfiguration sqlConfiguration)
         {
+            if (sqlConfiguration == null)
+            {
+                throw new ArgumentException($"The [{nameof(SqlConfiguration)}] is missing. Provide it by parameter.");
+            }
 
             services
                 .AddOptions<SqlConfiguration>()
-                .Configure<IConfiguration>((options, configuration) =>
-           {
-
-               if (sqlConfiguration == null)
-               {
-                   sqlConfiguration = configuration.GetSection("Sql").Get<SqlConfiguration>();
-               }
-
-               if (sqlConfiguration == null)
-               {
-                   throw new ArgumentException($"The [{nameof(SqlConfiguration)}] is missing. Provide it by parameter or configuration section");
-               }
-
-               options.ConnectionString = sqlConfiguration.ConnectionString;
-           });
-
+                .Configure(options =>
+                {
+                    options.ConnectionString = sqlConfiguration.ConnectionString;
+                });
 
             services.AddTransient<ISqlConnectionFactory, SqlConnectionFactory>();
             services.AddTransient<IUnitOfWork, UnitOfWork>();

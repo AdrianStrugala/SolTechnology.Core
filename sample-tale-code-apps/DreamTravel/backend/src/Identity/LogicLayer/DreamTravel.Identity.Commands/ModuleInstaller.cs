@@ -7,13 +7,11 @@ namespace DreamTravel.Identity.Commands
 {
     public static class ModuleInstaller
     {
-        public static IServiceCollection
-            InstallIdentityCommands(this IServiceCollection services)
+        public static IServiceCollection InstallIdentityCommands(this IServiceCollection services)
         {
             services.RegisterCommands();
 
-            services.InstallDatabaseData();
-            services.InstallHttpClients();
+
 
 
             return services;

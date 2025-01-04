@@ -5,27 +5,22 @@ namespace SolTechnology.Core.Cache
 {
     public static class ModuleInstaller
     {
-        public static IServiceCollection AddCache(this IServiceCollection services, CacheConfiguration cacheConfiguration = null)
+        public static IServiceCollection AddCache(this IServiceCollection services, CacheConfiguration? cacheConfiguration = null)
         {
+            if (cacheConfiguration == null)
+            {
+                // Default values: absolute expiration, 20 minutes
+                cacheConfiguration = new CacheConfiguration
+                {
+                    ExpirationMode = ExpirationMode.Absolute,
+                    ExpirationSeconds = 20 * 60
+                };
+            }
+
             services
                 .AddOptions<CacheConfiguration>()
-                .Configure<IConfiguration>((config, configuration) =>
+                .Configure(config =>
                 {
-                    if (cacheConfiguration == null)
-                    {
-                        cacheConfiguration = configuration.GetSection("Cache").Get<CacheConfiguration>();
-                    }
-
-                    if (cacheConfiguration == null)
-                    {
-                        //Default values: absolute expiration, 20 minutes
-                        cacheConfiguration = new CacheConfiguration
-                        {
-                            ExpirationMode = ExpirationMode.Absolute,
-                            ExpirationSeconds = 20 * 60
-                        };
-                    }
-
                     config.ExpirationMode = cacheConfiguration.ExpirationMode;
                     config.ExpirationSeconds = cacheConfiguration.ExpirationSeconds;
                 });

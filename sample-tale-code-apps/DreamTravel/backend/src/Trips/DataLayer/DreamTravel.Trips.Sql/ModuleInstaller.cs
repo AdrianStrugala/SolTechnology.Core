@@ -10,11 +10,10 @@ namespace DreamTravel.Trips.Sql
 {
     public static class ModuleInstaller
     {
-        public static IServiceCollection InstallSql(this IServiceCollection services, IConfiguration configuration)
+        public static IServiceCollection InstallTripsSql(this IServiceCollection services, SqlConfiguration sqlConfiguration)
         {
-            services.AddSql();
-
-            var sqlConfiguration = configuration.GetSection("Sql").Get<SqlConfiguration>()!;
+            services.AddSql(sqlConfiguration);
+            
             services.AddDbContext<DreamTripsDbContext>(options =>
                 options.UseSqlServer(sqlConfiguration.ConnectionString));
                 // options.UseInMemoryDatabase("DreamTravelDatabase"));

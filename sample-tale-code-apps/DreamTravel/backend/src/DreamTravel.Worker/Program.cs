@@ -1,7 +1,12 @@
+using DreamTravel.GeolocationData;
+using DreamTravel.Infrastructure;
 using DreamTravel.Trips.Commands;
+using DreamTravel.Trips.GeolocationDataClients;
 using DreamTravel.Trips.Sql;
 using EntityGraphQL.AspNet;
 using Hangfire;
+using SolTechnology.Core.Cache;
+using SolTechnology.Core.Sql;
 
 namespace DreamTravel.Worker;
 
@@ -11,13 +16,21 @@ public class Program
     {
         var builder = WebApplication.CreateBuilder(args);
         builder.AddServiceDefaults();
-
-     
+        
         builder.Services.AddEndpointsApiExplorer();
         builder.Services.AddLogging(c =>
             c.AddConsole());
 
-        builder.Services.InstallDreamTripsCommands(builder.Configuration);
+        
+        var sqlConfiguration = builder.Configuration.GetSection("Sql").Get<SqlConfiguration>()!;
+        
+        builder.Services.InstallTripsSql(sqlConfiguration);
+        builder.Services.InstallGeolocationDataClients();
+        builder.Services.InstallInfrastructure();
+        builder.Services.InstallDreamTripsCommands();
+        
+        var cacheConfiguration = builder.Configuration.GetSection("Cache").Get<CacheConfiguration>()!;
+        builder.Services.AddCache(cacheConfiguration);
 
         var thisAssembly = typeof(Program).Assembly;
         builder.Services.AddMediatR(cfg =>

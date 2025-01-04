@@ -10,22 +10,17 @@ namespace SolTechnology.Core.Authentication
     {
         public static AuthorizeFilter AddAuthenticationAndBuildFilter(
             this IServiceCollection services,
-            AuthenticationConfiguration? authenticationConfiguration = null)
+            AuthenticationConfiguration authenticationConfiguration)
         {
+            if (string.IsNullOrEmpty(authenticationConfiguration?.ApiKey))
+            {
+                throw new ArgumentException($"The [{nameof(AuthenticationConfiguration)}{nameof(authenticationConfiguration.ApiKey)}] is missing. Provide it by parameter.");
+            }
+
             services
             .AddOptions<AuthenticationConfiguration>()
-            .Configure<IConfiguration>((config, configuration) =>
+            .Configure(config =>
             {
-                if (string.IsNullOrEmpty(authenticationConfiguration?.ApiKey))
-                {
-                    authenticationConfiguration = configuration.GetSection("Authentication").Get<AuthenticationConfiguration>();
-                }
-
-                if (string.IsNullOrEmpty(authenticationConfiguration?.ApiKey))
-                {
-                    throw new ArgumentException($"The [{nameof(AuthenticationConfiguration)}{nameof(authenticationConfiguration.ApiKey)}] is missing. Provide it by parameter or configuration section");
-                }
-
                 config.ApiKey = authenticationConfiguration.ApiKey;
             });
 

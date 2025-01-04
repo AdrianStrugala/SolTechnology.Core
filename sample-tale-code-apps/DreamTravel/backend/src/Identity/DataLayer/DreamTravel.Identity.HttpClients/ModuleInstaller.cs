@@ -6,7 +6,7 @@ namespace DreamTravel.Identity.HttpClients
 {
     public static class ModuleInstaller
     {
-        public static IServiceCollection InstallHttpClients(this IServiceCollection services)
+        public static IServiceCollection InstallIdentityHttpClients(this IServiceCollection services)
         {
             services.AddApiClient<IAiiaApi, AiiaApi>("Aiia");  //has to match the name from configuration
 

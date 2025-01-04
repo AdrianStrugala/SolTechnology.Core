@@ -9,10 +9,9 @@ namespace DreamTravel.Trips.Queries
 {
     public static class ModuleInstaller
     {
-        public static IServiceCollection InstallDreamTripsQueries(this IServiceCollection services)
+        public static IServiceCollection InstallTripsQueries(this IServiceCollection services)
         {
-            services.InstallGeolocationDataClients();
-            services.InstallInfrastructure();
+
 
             services.RegisterQueries();
 

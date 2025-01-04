@@ -1,18 +1,25 @@
-using DreamTravel.Identity.Commands;
-using DreamTravel.Trips.Queries;
-using Microsoft.OpenApi.Models;
 using System.Globalization;
+using DreamTravel.GeolocationData;
+using DreamTravel.Identity.Commands;
+using DreamTravel.Identity.DatabaseData;
+using DreamTravel.Identity.HttpClients;
+using DreamTravel.Infrastructure;
+using DreamTravel.Trips.GeolocationDataClients;
+using DreamTravel.Trips.Queries;
 using DreamTravel.Trips.Sql;
 using MicroElements.Swashbuckle.FluentValidation.AspNetCore;
+using Microsoft.OpenApi.Models;
 using SolTechnology.Core.Api.Filters;
 using SolTechnology.Core.Authentication;
+using SolTechnology.Core.Cache;
 using SolTechnology.Core.Logging.Middleware;
+using SolTechnology.Core.Sql;
 
 namespace DreamTravel.Api;
 
 public class Program
 {
-    static readonly string CorsPolicy = "dupa";
+    private static readonly string CorsPolicy = "dupa";
 
     // This method gets called by the runtime. Use this method to add services to the container.
     public static void Main(string[] args)
@@ -45,17 +52,29 @@ public class Program
                 });
         });
 
-        builder.Services.InstallDreamTripsQueries();
-        builder.Services.InstallIdentityCommands();
-        builder.Services.InstallSql(builder.Configuration);
+        var sqlConfiguration = builder.Configuration.GetSection("Sql").Get<SqlConfiguration>()!;
 
-        builder.Services.AddControllers();
+        //Identity
+        builder.Services.InstallIdentityDatabaseData(sqlConfiguration);
+        builder.Services.InstallIdentityHttpClients();
+        builder.Services.InstallIdentityCommands();
+
+        //Trips
+        builder.Services.InstallTripsSql(sqlConfiguration);
+        builder.Services.InstallGeolocationDataClients();
+        builder.Services.InstallInfrastructure();
+        builder.Services.InstallTripsQueries();
+        
+        builder.Services.AddCache();
+        
 
         var thisAssembly = typeof(Program).Assembly;
         builder.Services.AddMediatR(cfg => { cfg.RegisterServicesFromAssemblies(thisAssembly); });
 
-        var authFilter = builder.Services.AddAuthenticationAndBuildFilter();
+        var authenticationConfiguration = builder.Configuration.GetRequiredSection("Authentication").Get<AuthenticationConfiguration>()!;
+        var authFilter = builder.Services.AddAuthenticationAndBuildFilter(authenticationConfiguration);
 
+        builder.Services.AddControllers();
 
         //SWAGGER
         builder.Services.AddSwaggerGen(c =>
@@ -71,9 +90,13 @@ public class Program
             c.AddSecurityRequirement(new OpenApiSecurityRequirement
             {
                 {
-                    new OpenApiSecurityScheme 
+                    new OpenApiSecurityScheme
                     {
-                        Reference = new OpenApiReference { Type = ReferenceType.SecurityScheme, Id = ApiKeyAuthenticationSchemeOptions.AuthenticationScheme }
+                        Reference = new OpenApiReference
+                        {
+                            Type = ReferenceType.SecurityScheme,
+                            Id = ApiKeyAuthenticationSchemeOptions.AuthenticationScheme
+                        }
                     },
                     []
                 }

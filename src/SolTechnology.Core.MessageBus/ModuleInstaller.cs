@@ -12,22 +12,17 @@ namespace SolTechnology.Core.MessageBus
     {
         public static IServiceCollection AddMessageBus(
             this IServiceCollection services,
-            MessageBusConfiguration messageBusConfiguration = null)
+            MessageBusConfiguration messageBusConfiguration)
         {
+            if (messageBusConfiguration == null)
+            {
+                throw new ArgumentException($"The [{nameof(MessageBusConfiguration)}] is missing. Provide it by parameter.");
+            }
+
             services
             .AddOptions<MessageBusConfiguration>()
-            .Configure<IConfiguration>((config, configuration) =>
+            .Configure(config =>
             {
-                if (messageBusConfiguration == null)
-                {
-                    messageBusConfiguration = configuration.GetSection("MessageBus").Get<MessageBusConfiguration>();
-                }
-
-                if (messageBusConfiguration == null)
-                {
-                    throw new ArgumentException($"The [{nameof(MessageBusConfiguration)}] is missing. Provide it by parameter or appsettings configuration section");
-                }
-
                 config.ConnectionString = messageBusConfiguration.ConnectionString;
                 config.Queues = messageBusConfiguration.Queues;
                 config.CreateResources = messageBusConfiguration.CreateResources;
@@ -40,7 +35,6 @@ namespace SolTechnology.Core.MessageBus
 
             return services;
         }
-
 
         //TOPIC
         public static IServiceCollection WithTopicPublisher<TMessage>(

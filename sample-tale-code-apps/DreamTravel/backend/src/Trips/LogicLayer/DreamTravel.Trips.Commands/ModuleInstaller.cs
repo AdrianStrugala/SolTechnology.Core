@@ -10,12 +10,8 @@ namespace DreamTravel.Trips.Commands
 {
     public static class ModuleInstaller
     {
-        public static IServiceCollection InstallDreamTripsCommands(this IServiceCollection services, IConfiguration configuration)
+        public static IServiceCollection InstallDreamTripsCommands(this IServiceCollection services)
         {
-            services.InstallSql(configuration);
-            services.InstallGeolocationDataClients();
-            services.InstallInfrastructure();
-
             services.RegisterCommands();
 
             //TSP engine
