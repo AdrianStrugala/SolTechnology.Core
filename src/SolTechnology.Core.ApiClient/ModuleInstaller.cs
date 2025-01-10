@@ -38,7 +38,7 @@ namespace SolTechnology.Core.ApiClient
             return services;
         }
 
-        private static IConfigurationSection AddApiClientInternal<TIClient, TClient>(
+        private static void AddApiClientInternal<TIClient, TClient>(
             IServiceCollection services,
             string httpClientName,
             ApiClientConfiguration? apiClientConfiguration,
@@ -94,7 +94,7 @@ namespace SolTechnology.Core.ApiClient
             services.AddHttpClient<TIClient, TClient>(httpClientName,
                     httpClient =>
                     {
-                        httpClient.BaseAddress = new Uri(apiClientConfiguration?.BaseAddress);
+                        httpClient.BaseAddress = new Uri(apiClientConfiguration!.BaseAddress);
                         if (apiClientConfiguration.TimeoutSeconds.HasValue)
                         {
                             httpClient.Timeout = TimeSpan.FromSeconds(apiClientConfiguration.TimeoutSeconds.Value);
@@ -106,9 +106,6 @@ namespace SolTechnology.Core.ApiClient
                         }
                     })
                 .AddPolicyHandler(policyFactory.Create(httpPolicyConfiguration));
-
-
-            return configurationSection;
         }
     }
 }

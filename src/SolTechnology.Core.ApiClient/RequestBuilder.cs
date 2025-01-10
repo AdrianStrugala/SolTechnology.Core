@@ -143,14 +143,14 @@ public class RequestBuilder
         {
             case DataType.Json:
                 var responseJsonContent = await response.Content.ReadAsStringAsync();
-                return JsonConvert.DeserializeObject<TResponse>(responseJsonContent);
+                return JsonConvert.DeserializeObject<TResponse>(responseJsonContent)!;
 
             case DataType.Avro:
                 var responseAvroContent = await response.Content.ReadAsByteArrayAsync();
                 return AvroConvert.Deserialize<TResponse>(responseAvroContent);
-
+            
             default:
-                return default;
+                throw new ArgumentOutOfRangeException();
         }
     }
 

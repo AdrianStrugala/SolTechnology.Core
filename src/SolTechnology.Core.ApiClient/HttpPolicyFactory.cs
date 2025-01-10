@@ -14,6 +14,8 @@ public class HttpPolicyFactory
 
     public IAsyncPolicy<HttpResponseMessage> Create(HttpPolicyConfiguration? configuration)
     {
+        configuration ??= new();
+        
         if (!configuration.UsePolly)
         {
             return Policy.NoOpAsync<HttpResponseMessage>();
