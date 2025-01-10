@@ -10,8 +10,8 @@ namespace SolTechnology.Core.ApiClient
         public static IServiceCollection AddApiClient<TIClient, TClient>(
             this IServiceCollection services,
             string httpClientName,
-            ApiClientConfiguration apiClientConfiguration = null,
-            HttpPolicyConfiguration httpPolicyConfiguration = null)
+            ApiClientConfiguration? apiClientConfiguration = null,
+            HttpPolicyConfiguration? httpPolicyConfiguration = null)
             where TIClient : class where TClient : class, TIClient
         {
             AddApiClientInternal<TIClient, TClient>(services, httpClientName, apiClientConfiguration, httpPolicyConfiguration);
@@ -21,8 +21,8 @@ namespace SolTechnology.Core.ApiClient
         public static IServiceCollection AddApiClient<TIClient, TClient, TOptions>(
             this IServiceCollection services,
             string httpClientName,
-            ApiClientConfiguration apiClientConfiguration = null,
-            HttpPolicyConfiguration httpPolicyConfiguration = null)
+            ApiClientConfiguration? apiClientConfiguration = null,
+            HttpPolicyConfiguration? httpPolicyConfiguration = null)
             where TIClient : class where TClient : class, TIClient where TOptions : class
         {
             AddApiClientInternal<TIClient, TClient>(services, httpClientName, apiClientConfiguration, httpPolicyConfiguration);
@@ -38,11 +38,14 @@ namespace SolTechnology.Core.ApiClient
             return services;
         }
 
-        private static IConfigurationSection AddApiClientInternal<TIClient, TClient>(IServiceCollection services,
-            string httpClientName, ApiClientConfiguration apiClientConfiguration,
-            HttpPolicyConfiguration httpPolicyConfiguration) where TIClient : class where TClient : class, TIClient
+        private static IConfigurationSection AddApiClientInternal<TIClient, TClient>(
+            IServiceCollection services,
+            string httpClientName,
+            ApiClientConfiguration? apiClientConfiguration,
+            HttpPolicyConfiguration? httpPolicyConfiguration) 
+            where TIClient : class where TClient : class, TIClient
         {
-            IConfigurationSection configurationSection = null;
+            IConfigurationSection? configurationSection = null;
 
             services
                 .AddOptions<HttpPolicyConfiguration>()
@@ -91,7 +94,7 @@ namespace SolTechnology.Core.ApiClient
             services.AddHttpClient<TIClient, TClient>(httpClientName,
                     httpClient =>
                     {
-                        httpClient.BaseAddress = new Uri(apiClientConfiguration.BaseAddress);
+                        httpClient.BaseAddress = new Uri(apiClientConfiguration?.BaseAddress);
                         if (apiClientConfiguration.TimeoutSeconds.HasValue)
                         {
                             httpClient.Timeout = TimeSpan.FromSeconds(apiClientConfiguration.TimeoutSeconds.Value);
