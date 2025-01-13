@@ -8,7 +8,7 @@ namespace SolTechnology.Core.Logging.Middleware;
 public class LoggingMiddleware
 {
     private readonly RequestDelegate _next;
-    private ILogger<LoggingMiddleware> _logger;
+    private ILogger<LoggingMiddleware> _logger = null!;
 
     public LoggingMiddleware(RequestDelegate next)
     {

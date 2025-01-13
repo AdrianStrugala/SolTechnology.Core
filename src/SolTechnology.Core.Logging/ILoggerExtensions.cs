@@ -15,7 +15,7 @@ public static class ILoggerExtensions
                 prop => prop.GetValue(operationIdentifiers)
             );
 
-        return logger.BeginScope(operationIdentifiersDictionary);
+        return logger.BeginScope(operationIdentifiersDictionary)!;
     }
 
     public static IDisposable AddToScope(this ILogger logger, string key, object value)
@@ -25,7 +25,7 @@ public static class ILoggerExtensions
             { key, value }
         };
 
-        return logger.BeginScope(scopeDictionary);
+        return logger.BeginScope(scopeDictionary)!;
     }
 
     public static IDisposable BeginOperationScope(this ILogger logger, KeyValuePair<string, object> operationIdentifier)
@@ -35,10 +35,10 @@ public static class ILoggerExtensions
 
     public static IDisposable BeginOperationScope(this ILogger logger, Dictionary<string, object> operationIdentifiers)
     {
-        return logger.BeginScope(operationIdentifiers);
+        return logger.BeginScope(operationIdentifiers)!;
     }
 
-    public static void OperationStarted(this ILogger logger, string operationName, string message = null)
+    public static void OperationStarted(this ILogger logger, string operationName, string? message = null)
     {
         if (message != null)
         {
@@ -51,7 +51,7 @@ public static class ILoggerExtensions
     }
 
     public static void OperationFailed(this ILogger logger, string operationName, long elapsedMilliseconds,
-        Exception exception = null, string message = null)
+        Exception? exception = null, string? message = null)
     {
         if (exception != null)
         {
@@ -65,7 +65,7 @@ public static class ILoggerExtensions
     }
 
     public static void OperationSucceeded(this ILogger logger, string operationName, long elapsedMilliseconds,
-        string message = null)
+        string? message = null)
     {
         if (message != null)
         {

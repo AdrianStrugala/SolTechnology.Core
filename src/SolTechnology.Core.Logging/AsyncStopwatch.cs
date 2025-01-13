@@ -15,6 +15,6 @@ namespace SolTechnology.Core.Logging
         {
             InternalStopwatch.Value = Stopwatch.StartNew();
         }
-        public TimeSpan Elapsed => InternalStopwatch.Value.Elapsed;
+        public TimeSpan Elapsed => InternalStopwatch.Value!.Elapsed;
     }
 }

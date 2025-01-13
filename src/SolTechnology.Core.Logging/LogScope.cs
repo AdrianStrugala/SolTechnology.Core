@@ -2,7 +2,7 @@
 
 public class LogScope
 {
-    public object OperationId { get; set; }
-    public string OperationIdName { get; set; }
-    public string OperationName { get; set; }
+    public required object OperationId { get; set; }
+    public required string OperationIdName { get; set; }
+    public required string OperationName { get; set; }
 }
