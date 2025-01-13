@@ -66,7 +66,7 @@ public static class ModuleInstaller
 
         foreach (var type in types)
         {
-            services.AddTransient(type.Service, type.Implementation);
+            services.AddTransient(type.Service!, type.Implementation);
         }
 
         return services;

@@ -5,7 +5,7 @@ using SolTechnology.Core.Logging;
 
 namespace SolTechnology.Core.CQRS.PipelineBehaviors;
 
-public class LoggingPipelineBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse> where TResponse : class
+public class LoggingPipelineBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse> where TResponse : class where TRequest : notnull
 {
     private readonly ILogger<LoggingPipelineBehavior<TRequest, TResponse>> _logger;
 
@@ -31,7 +31,7 @@ public class LoggingPipelineBehavior<TRequest, TResponse> : IPipelineBehavior<TR
         }
         else
         {
-            operationName = typeof(TRequest).FullName;
+            operationName = typeof(TRequest).FullName!;
         }
 
         var sw = Stopwatch.StartNew();

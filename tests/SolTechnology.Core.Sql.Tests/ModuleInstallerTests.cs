@@ -19,8 +19,10 @@ namespace SolTechnology.Core.Sql.Tests
         {
 
             //Arrange 
-            SqlConfiguration sqlConfiguration = new SqlConfiguration();
-            sqlConfiguration.ConnectionString = "ExampleConnectionString";
+            SqlConfiguration sqlConfiguration = new SqlConfiguration
+            {
+                ConnectionString = "ExampleConnectionString"
+            };
 
 
             //Act

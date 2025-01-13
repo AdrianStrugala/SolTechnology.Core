@@ -7,5 +7,5 @@ public interface ILoggableOperation
 
 public class LoggableOperation : ILoggableOperation
 {
-    public required LogScope LogScope { get; }
+    public required LogScope LogScope { get; init; }
 }
