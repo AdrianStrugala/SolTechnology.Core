@@ -365,6 +365,8 @@ components:
           $ref: '#/components/schemas/City'
       additionalProperties: false
     Error:
+      required:
+        - message
       type: object
       properties:
         message:
@@ -398,20 +400,6 @@ components:
         name:
           minLength: 1
           type: string
-        logScope:
-          $ref: '#/components/schemas/LogScope'
-      additionalProperties: false
-    LogScope:
-      type: object
-      properties:
-        operationId:
-          nullable: true
-        operationIdName:
-          type: string
-          nullable: true
-        operationName:
-          type: string
-          nullable: true
       additionalProperties: false
     LoginQuery:
       type: object

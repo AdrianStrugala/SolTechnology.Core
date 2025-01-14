@@ -26,7 +26,7 @@ namespace Azure.Storage.Blobs
 
                 case "json":
                 default:
-                    return content.Value.Content.ToObjectFromJson<T>();
+                    return content.Value.Content.ToObjectFromJson<T>()!;
             }
         }
 

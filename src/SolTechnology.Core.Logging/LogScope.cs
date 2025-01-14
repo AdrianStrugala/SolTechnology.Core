@@ -1,8 +1,15 @@
-﻿namespace SolTechnology.Core.Logging;
+﻿using System.Text.Json.Serialization;
+
+namespace SolTechnology.Core.Logging;
 
 public class LogScope
 {
-    public object OperationId { get; set; }
-    public string OperationIdName { get; set; }
-    public string OperationName { get; set; }
+    [JsonIgnore]
+    public required object OperationId { get; init; }
+
+    [JsonIgnore]
+    public required string OperationIdName { get; init; }
+
+    [JsonIgnore]
+    public required string OperationName { get; init; }
 }

@@ -12,8 +12,10 @@ public class HttpPolicyFactory
 
     public HttpPolicyFactory(ILogger<HttpPolicyFactory> logger) => _logger = logger;
 
-    public IAsyncPolicy<HttpResponseMessage> Create(HttpPolicyConfiguration configuration)
+    public IAsyncPolicy<HttpResponseMessage> Create(HttpPolicyConfiguration? configuration)
     {
+        configuration ??= new();
+        
         if (!configuration.UsePolly)
         {
             return Policy.NoOpAsync<HttpResponseMessage>();

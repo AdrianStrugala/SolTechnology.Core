@@ -5,7 +5,7 @@ namespace SolTechnology.Core.Cache
 {
     public interface ISingletonCache
     {
-        Task<TItem> GetOrAdd<TKey, TItem>(TKey key, Func<TKey, Task<TItem>> factory, MemoryCacheEntryOptions memoryCacheEntryOptions = null);
+        Task<TItem> GetOrAdd<TKey, TItem>(TKey key, Func<TKey, Task<TItem>> factory, MemoryCacheEntryOptions? memoryCacheEntryOptions = null);
     }
 
     public class SingletonCache : ISingletonCache
@@ -20,7 +20,7 @@ namespace SolTechnology.Core.Cache
         }
 
         public Task<TItem> GetOrAdd<TKey, TItem>(TKey key, Func<TKey, Task<TItem>> factory,
-            MemoryCacheEntryOptions memoryCacheEntryOptions = null)
+            MemoryCacheEntryOptions? memoryCacheEntryOptions = null)
         {
             var keyString = System.Text.Json.JsonSerializer.Serialize(key);
             if (string.IsNullOrWhiteSpace(keyString))
@@ -53,7 +53,7 @@ namespace SolTechnology.Core.Cache
                 _memoryCache.Set(keyString, result, entryOptions);
             }
 
-            return result?.Value;
+            return result!.Value;
         }
     }
 }

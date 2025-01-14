@@ -1,4 +1,5 @@
-﻿using DreamTravel.Trips.Domain.Cities;
+﻿using System.Text.Json.Serialization;
+using DreamTravel.Trips.Domain.Cities;
 using FluentValidation;
 using MediatR;
 using SolTechnology.Core.CQRS;
@@ -10,6 +11,7 @@ public class FindCityByNameQuery : ILoggableOperation, IRequest<Result<City>>
 {
     public string Name { get; set; } = null!;
 
+    [JsonIgnore]
     public LogScope LogScope => new()
     {
         OperationName = nameof(FindCityByNameQuery),

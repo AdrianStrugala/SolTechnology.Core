@@ -2,6 +2,7 @@
 
 	<PropertyGroup>
 		<Version>0.2.0</Version>
+		<TreatWarningsAsErrors>false</TreatWarningsAsErrors>
 		<Description>SolTechnology Core Azure scheduler library</Description>
 		<PackageTags>sol technology core azure background jobs cronos scheduler</PackageTags>
 		<Product>SolTechnology.Core.Scheduler</Product>

@@ -4,7 +4,7 @@ namespace SolTechnology.Core.Sql.Transactions
 {
     public class UnitOfWork : IDisposable, IUnitOfWork
     {
-        private TransactionScope _scope;
+        private TransactionScope _scope = null!;
 
         public UnitOfWork Begin(IsolationLevel isolationLevel = IsolationLevel.ReadCommitted)
         {

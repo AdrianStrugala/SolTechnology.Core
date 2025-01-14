@@ -1,8 +1,8 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-
 		<Version>0.2.1</Version>
+		<TreatWarningsAsErrors>false</TreatWarningsAsErrors>
 		<Description>SolTechnology Core Sql library</Description>
 		<PackageTags>sol technology core sql</PackageTags>
 		<Product>SolTechnology.Core.Sql</Product>

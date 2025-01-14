@@ -76,7 +76,7 @@ namespace SolTechnology.Core.CQRS
     public record Result<T> : Result
     {
         [JsonIgnore(Condition = JsonIgnoreCondition.Never)]
-        public T Data { get; set; }
+        public T? Data { get; set; }
 
         public static implicit operator Result<T>(T value)
         {

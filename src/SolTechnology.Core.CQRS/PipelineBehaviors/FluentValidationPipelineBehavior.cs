@@ -6,7 +6,7 @@ using MediatR;
 
 namespace SolTechnology.Core.CQRS.PipelineBehaviors;
 
-public class FluentValidationPipelineBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse> where TResponse : class
+public class FluentValidationPipelineBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse> where TResponse : class where TRequest : notnull
 {
     private readonly IEnumerable<IValidator<TRequest>> _validators;
 
