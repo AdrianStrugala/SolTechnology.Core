@@ -85,10 +85,8 @@ stages:
         condition: eq(variables['Build.Reason'], 'PullRequest')
 
       - script: |
-          mv nuget.config nuget.temp
           dotnet tool install --version 6.6.2 Swashbuckle.AspNetCore.Cli --global --ignore-failed-sources
-          swagger tofile --output swagger-build.json taleCode/src/PresentationLayer/SolTechnology.TaleCode.Api/bin/Release/net6.0/SolTechnology.TaleCode.Api.dll v1
-          mv nuget.temp nuget.config
+          swagger tofile --output swagger-build.json '$(workingDirectory)/src/DreamTravel.Api/bin/Release/net8.0/DreamTravel.Api.dll v1
         displayName: 'Generating build Swagger specs'
         condition: eq(variables['Build.Reason'], 'PullRequest')
 
