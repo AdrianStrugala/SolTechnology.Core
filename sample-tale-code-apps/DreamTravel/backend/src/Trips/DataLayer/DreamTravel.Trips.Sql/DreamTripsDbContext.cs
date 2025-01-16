@@ -1,5 +1,6 @@
 ﻿using DreamTravel.Trips.Domain;
 using DreamTravel.Trips.Domain.Cities;
+using DreamTravel.Trips.Domain.SearchStatistics;
 using Microsoft.EntityFrameworkCore;
 
 namespace DreamTravel.Trips.Sql
@@ -23,6 +24,8 @@ namespace DreamTravel.Trips.Sql
         }
 
         public virtual DbSet<CityDetails> Cities { get; set; }
+        public virtual DbSet<CityStatistics> CitiesStatistics { get; set; }
+        public virtual DbSet<CountryStatistics> CountriesStatistics { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -38,6 +41,12 @@ namespace DreamTravel.Trips.Sql
             modelBuilder.Entity<CityDetails>(entity =>
             {
                 entity.ToTable("City");
+            });
+            
+            modelBuilder.Entity<CountryStatistics>(entity =>
+            {
+                entity.ToView("CountryStatisticsView");   // view name in db
+                entity.HasNoKey();                        // keyless, because it's view
             });
 
 
