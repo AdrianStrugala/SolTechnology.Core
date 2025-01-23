@@ -1,8 +1,11 @@
-﻿namespace DreamTravel.Trips.Domain.SearchStatistics;
+﻿using System.Text.Json.Serialization;
+
+namespace DreamTravel.Trips.Domain.SearchStatistics;
 
 public class CityStatistics
 {
-    public long Id { get; set; }
-    public long CityId { get; set; }
+    public required string CityName { get; set; }
     public int SearchCount { get; set; }
+    [JsonIgnore]
+    public required string Country { get; set; }
 }

@@ -1,9 +1,8 @@
-﻿using System.Threading.Tasks;
-using DreamTravel.GeolocationData.GeoDb.Models;
+﻿using DreamTravel.GeolocationData.GeoDb.Models;
 
-namespace DreamTravel.GeolocationData.GeoDb;
+namespace DreamTravel.Trips.GeolocationDataClients.GeoDb;
 
 public interface IGeoDbApiClient
 {
-    Task<CityDetails> GetCityDetails(string cityName);
+    Task<CityDetails?> GetCityDetails(string cityName);
 }

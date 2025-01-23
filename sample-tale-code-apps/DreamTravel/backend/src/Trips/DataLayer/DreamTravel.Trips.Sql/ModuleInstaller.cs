@@ -27,7 +27,9 @@ namespace DreamTravel.Trips.Sql
                 
             services.AddGraphQLSchema<DreamTripsDbContext>();
 
-            services.AddScoped<ICityRepository, CityRepository>();
+            services.AddTransient<ICityRepository, CityRepository>();
+            services.AddTransient<ICityStatisticsRepository, CityStatisticsRepository>();
+            services.AddTransient<ICountryStatisticsRepository, CountryStatisticsRepository>();
 
             return services;
         }

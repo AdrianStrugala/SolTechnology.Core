@@ -2,6 +2,7 @@
 
 public class CountryStatistics
 {
-    public string Country { get; set; }
-    public int TotalCitySearches { get; set; }
+    public required string Country { get; set; }
+    public int TotalSearchCount { get; set; }
+    public List<CityStatistics> CityStatistics { get; set; } = new();
 }

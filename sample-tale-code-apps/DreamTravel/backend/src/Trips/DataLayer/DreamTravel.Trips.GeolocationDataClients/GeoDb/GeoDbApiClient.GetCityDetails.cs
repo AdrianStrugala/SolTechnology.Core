@@ -1,9 +1,7 @@
-﻿using System.Linq;
-using System.Net.Http;
-using System.Threading.Tasks;
+﻿using DreamTravel.GeolocationData.GeoDb;
 using DreamTravel.GeolocationData.GeoDb.Models;
 
-namespace DreamTravel.GeolocationData.GeoDb
+namespace DreamTravel.Trips.GeolocationDataClients.GeoDb
 {
     public class GeoDbApiClient : IGeoDbApiClient
     {
@@ -14,7 +12,7 @@ namespace DreamTravel.GeolocationData.GeoDb
             _httpClient = httpClient;
         }
 
-        public async Task<CityDetails> GetCityDetails(string cityName)
+        public async Task<CityDetails?> GetCityDetails(string cityName)
         {
             var response = await _httpClient
                 .CreateRequest($"v1/geo/places?namePrefix={cityName}&types=CITY&hateoasMode=false&limit=5&offset=0")

@@ -1,6 +1,4 @@
-﻿using DreamTravel.GeolocationData;
-using DreamTravel.Infrastructure;
-using DreamTravel.TravelingSalesmanProblem;
+﻿using DreamTravel.TravelingSalesmanProblem;
 using DreamTravel.Trips.Queries.CalculateBestPath.Executors;
 using Microsoft.Extensions.DependencyInjection;
 using SolTechnology.Core.CQRS;
@@ -11,8 +9,6 @@ namespace DreamTravel.Trips.Queries
     {
         public static IServiceCollection InstallTripsQueries(this IServiceCollection services)
         {
-
-
             services.RegisterQueries();
 
             //TSP engine

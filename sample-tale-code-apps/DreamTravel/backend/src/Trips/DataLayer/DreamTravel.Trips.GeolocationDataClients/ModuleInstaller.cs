@@ -1,6 +1,7 @@
 ﻿using DreamTravel.GeolocationData.GeoDb;
 using DreamTravel.GeolocationData.GoogleApi;
 using DreamTravel.GeolocationData.MichelinApi;
+using DreamTravel.Trips.GeolocationDataClients.GeoDb;
 using Microsoft.Extensions.DependencyInjection;
 using SolTechnology.Core.ApiClient;
 
