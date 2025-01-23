@@ -40,8 +40,9 @@ namespace DreamTravel.GeolocationData.GoogleApi
                 return result;
             }
 
-            catch (Exception)
+            catch (Exception e)
             {
+                _logger.LogError(e, $"Cannot find city [{cityName}]");
                 throw new InvalidDataException($"Cannot find city [{cityName}]");
             }
         }

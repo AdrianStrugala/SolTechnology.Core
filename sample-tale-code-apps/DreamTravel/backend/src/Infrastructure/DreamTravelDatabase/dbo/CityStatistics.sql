@@ -6,7 +6,7 @@
 
     [CreatedAt] datetime2 NOT NULL DEFAULT GETUTCDATE(),
     [UpdatedAt] datetime2 NULL
-    );
+)
 GO
 
 ALTER TABLE [dbo].[CityStatistics]

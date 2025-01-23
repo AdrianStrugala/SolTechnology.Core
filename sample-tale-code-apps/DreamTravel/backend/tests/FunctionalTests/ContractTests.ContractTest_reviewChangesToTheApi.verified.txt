@@ -228,6 +228,34 @@ paths:
       responses:
         '200':
           description: OK
+  /api/v2/statistics/countries:
+    post:
+      tags:
+        - Statistics
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GetSearchStatisticsQuery'
+          text/json:
+            schema:
+              $ref: '#/components/schemas/GetSearchStatisticsQuery'
+          application/*+json:
+            schema:
+              $ref: '#/components/schemas/GetSearchStatisticsQuery'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetSearchStatisticsResultResult'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Result'
   /api/users/changePassword:
     post:
       tags:
@@ -364,6 +392,35 @@ components:
         data:
           $ref: '#/components/schemas/City'
       additionalProperties: false
+    CityStatistics:
+      required:
+        - cityName
+      type: object
+      properties:
+        cityName:
+          type: string
+          nullable: true
+        searchCount:
+          type: integer
+          format: int32
+      additionalProperties: false
+    CountryStatistics:
+      required:
+        - country
+      type: object
+      properties:
+        country:
+          type: string
+          nullable: true
+        totalSearchCount:
+          type: integer
+          format: int32
+        cityStatistics:
+          type: array
+          items:
+            $ref: '#/components/schemas/CityStatistics'
+          nullable: true
+      additionalProperties: false
     Error:
       required:
         - message
@@ -400,6 +457,28 @@ components:
         name:
           minLength: 1
           type: string
+      additionalProperties: false
+    GetSearchStatisticsQuery:
+      type: object
+      additionalProperties: false
+    GetSearchStatisticsResult:
+      type: object
+      properties:
+        countryStatistics:
+          type: array
+          items:
+            $ref: '#/components/schemas/CountryStatistics'
+          nullable: true
+      additionalProperties: false
+    GetSearchStatisticsResultResult:
+      type: object
+      properties:
+        isSuccess:
+          type: boolean
+        error:
+          $ref: '#/components/schemas/Error'
+        data:
+          $ref: '#/components/schemas/GetSearchStatisticsResult'
       additionalProperties: false
     LoginQuery:
       type: object
