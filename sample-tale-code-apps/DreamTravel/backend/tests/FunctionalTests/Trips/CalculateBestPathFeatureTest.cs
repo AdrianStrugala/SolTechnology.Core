@@ -1,6 +1,6 @@
 ﻿using DreamTravel.Trips.Domain.Cities;
 using DreamTravel.FunctionalTests.FakeApis;
-using DreamTravel.GeolocationData.GoogleApi;
+using DreamTravel.Trips.GeolocationDataClients.GoogleApi;
 using FluentAssertions;
 using SolTechnology.Core.Faker;
 using DreamTravel.Trips.Queries.CalculateBestPath;

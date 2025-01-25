@@ -1,7 +1,6 @@
-﻿using DreamTravel.GeolocationData.GeoDb;
-using DreamTravel.GeolocationData.GoogleApi;
-using DreamTravel.GeolocationData.MichelinApi;
-using DreamTravel.Trips.GeolocationDataClients.GeoDb;
+﻿using DreamTravel.Trips.GeolocationDataClients.GeoDb;
+using DreamTravel.Trips.GeolocationDataClients.GoogleApi;
+using DreamTravel.Trips.GeolocationDataClients.MichelinApi;
 using Microsoft.Extensions.DependencyInjection;
 using SolTechnology.Core.ApiClient;
 
@@ -11,7 +10,6 @@ namespace DreamTravel.Trips.GeolocationDataClients
     {
         public static IServiceCollection InstallGeolocationDataClients(this IServiceCollection services)
         {
-  
             services.AddApiClient<IGoogleApiClient, GoogleApiClient, GoogleApiOptions>("Google");
             services.Decorate(typeof(IGoogleApiClient), typeof(GoogleApiClientCachingDecorator));
 

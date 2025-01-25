@@ -1,7 +1,7 @@
 ﻿using System.Net.Http;
 using System.Threading.Tasks;
-using DreamTravel.GeolocationData.MichelinApi;
 using DreamTravel.Trips.Domain.Cities;
+using DreamTravel.Trips.GeolocationDataClients.MichelinApi;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
 using NSubstitute;

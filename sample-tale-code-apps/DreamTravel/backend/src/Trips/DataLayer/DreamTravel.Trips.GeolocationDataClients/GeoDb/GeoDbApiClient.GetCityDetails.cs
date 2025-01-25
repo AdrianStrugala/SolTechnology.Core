@@ -1,5 +1,4 @@
-﻿using DreamTravel.GeolocationData.GeoDb;
-using DreamTravel.GeolocationData.GeoDb.Models;
+﻿using DreamTravel.Trips.GeolocationDataClients.GeoDb.Models;
 
 namespace DreamTravel.Trips.GeolocationDataClients.GeoDb
 {

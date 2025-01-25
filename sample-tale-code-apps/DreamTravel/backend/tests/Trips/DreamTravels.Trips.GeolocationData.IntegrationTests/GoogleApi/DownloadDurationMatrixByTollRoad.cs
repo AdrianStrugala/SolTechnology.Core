@@ -2,8 +2,8 @@
 using System.IO;
 using System.Net.Http;
 using System.Threading.Tasks;
-using DreamTravel.GeolocationData.GoogleApi;
 using DreamTravel.Trips.Domain.Cities;
+using DreamTravel.Trips.GeolocationDataClients.GoogleApi;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
 using NSubstitute;

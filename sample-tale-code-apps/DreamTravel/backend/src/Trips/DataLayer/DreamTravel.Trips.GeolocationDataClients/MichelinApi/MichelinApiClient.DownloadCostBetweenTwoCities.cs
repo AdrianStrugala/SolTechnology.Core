@@ -1,12 +1,9 @@
-﻿using System;
-using System.Net.Http;
-using System.Threading.Tasks;
-using System.Xml;
+﻿using System.Xml;
 using DreamTravel.Trips.Domain.Cities;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
-namespace DreamTravel.GeolocationData.MichelinApi
+namespace DreamTravel.Trips.GeolocationDataClients.MichelinApi
 {
     public class MichelinApiClient : IMichelinApiClient
     {

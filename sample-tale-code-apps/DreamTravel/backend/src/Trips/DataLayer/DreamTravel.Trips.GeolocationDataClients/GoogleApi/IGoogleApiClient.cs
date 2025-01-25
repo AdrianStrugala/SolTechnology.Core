@@ -1,8 +1,6 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
-using DreamTravel.Trips.Domain.Cities;
+﻿using DreamTravel.Trips.Domain.Cities;
 
-namespace DreamTravel.GeolocationData.GoogleApi
+namespace DreamTravel.Trips.GeolocationDataClients.GoogleApi
 {
     public interface IGoogleApiClient
     {

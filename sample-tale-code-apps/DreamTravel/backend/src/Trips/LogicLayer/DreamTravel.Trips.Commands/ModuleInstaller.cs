@@ -1,8 +1,4 @@
-﻿using DreamTravel.GeolocationData;
-using DreamTravel.Infrastructure;
-using DreamTravel.TravelingSalesmanProblem;
-using DreamTravel.Trips.Sql;
-using Microsoft.Extensions.Configuration;
+﻿using DreamTravel.TravelingSalesmanProblem;
 using Microsoft.Extensions.DependencyInjection;
 using SolTechnology.Core.CQRS;
 

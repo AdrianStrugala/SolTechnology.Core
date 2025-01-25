@@ -1,9 +1,9 @@
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading.Tasks;
-using DreamTravel.GeolocationData.GoogleApi;
-using DreamTravel.GeolocationData.MichelinApi;
 using DreamTravel.Trips.Domain.Cities;
+using DreamTravel.Trips.GeolocationDataClients.GoogleApi;
+using DreamTravel.Trips.GeolocationDataClients.MichelinApi;
 using DreamTravel.Trips.Queries.CalculateBestPath;
 using DreamTravel.Trips.Queries.CalculateBestPath.Executors;
 using Microsoft.Extensions.Logging.Abstractions;

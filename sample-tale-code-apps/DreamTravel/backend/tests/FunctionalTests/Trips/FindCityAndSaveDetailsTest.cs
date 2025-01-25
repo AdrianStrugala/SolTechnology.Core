@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics;
-using DreamTravel.GeolocationData.GoogleApi;
 using DreamTravel.Trips.Domain.Cities;
+using DreamTravel.Trips.GeolocationDataClients.GoogleApi;
 using DreamTravel.Trips.Sql;
 using FluentAssertions;
 using Microsoft.EntityFrameworkCore;

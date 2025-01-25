@@ -1,6 +1,6 @@
-﻿using DreamTravel.GeolocationData.GoogleApi;
-using DreamTravel.GeolocationData.MichelinApi;
-using DreamTravel.Trips.Domain.Cities;
+﻿using DreamTravel.Trips.Domain.Cities;
+using DreamTravel.Trips.GeolocationDataClients.GoogleApi;
+using DreamTravel.Trips.GeolocationDataClients.MichelinApi;
 using SolTechnology.Core.CQRS;
 
 namespace DreamTravel.Trips.Queries.CalculateBestPath.Executors;

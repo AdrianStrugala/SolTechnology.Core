@@ -1,4 +1,4 @@
-﻿namespace DreamTravel.GeolocationData.MichelinApi
+﻿namespace DreamTravel.Trips.GeolocationDataClients.MichelinApi
 {
     public class MichelinApiOptions
     {

@@ -1,4 +1,3 @@
-using DreamTravel.GeolocationData;
 using DreamTravel.Infrastructure;
 using DreamTravel.Trips.Commands;
 using DreamTravel.Trips.GeolocationDataClients;
@@ -29,9 +28,11 @@ public class Program
         builder.Services.InstallInfrastructure();
         builder.Services.InstallDreamTripsCommands();
         
+        //CACHE
         var cacheConfiguration = builder.Configuration.GetSection("Cache").Get<CacheConfiguration>()!;
         builder.Services.AddCache(cacheConfiguration);
 
+        //MEDIATR
         var thisAssembly = typeof(Program).Assembly;
         builder.Services.AddMediatR(cfg =>
         {
@@ -40,6 +41,7 @@ public class Program
 
         builder.Services.AddHangfireServer();
 
+        //APP
         var app = builder.Build();
 
         app.MapDefaultEndpoints();

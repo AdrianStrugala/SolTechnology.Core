@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace DreamTravel.GeolocationData.GeoDb.Models
+﻿namespace DreamTravel.Trips.GeolocationDataClients.GeoDb.Models
 {
     public class GetCityResponse
     {

@@ -1,5 +1,4 @@
 using System.Globalization;
-using DreamTravel.GeolocationData;
 using DreamTravel.Identity.Commands;
 using DreamTravel.Identity.DatabaseData;
 using DreamTravel.Identity.HttpClients;
@@ -52,10 +51,12 @@ public class Program
                 });
         });
 
+        //SQL
         var sqlConfiguration = builder.Configuration.GetSection("Sql").Get<SqlConfiguration>()!;
+        builder.Services.AddSql(sqlConfiguration);
 
         //Identity
-        builder.Services.InstallIdentityDatabaseData(sqlConfiguration);
+        builder.Services.InstallIdentityDatabaseData();
         builder.Services.InstallIdentityHttpClients();
         builder.Services.InstallIdentityCommands();
 

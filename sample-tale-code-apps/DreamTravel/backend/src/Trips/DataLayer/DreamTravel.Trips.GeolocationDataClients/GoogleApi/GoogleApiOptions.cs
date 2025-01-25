@@ -1,4 +1,4 @@
-﻿namespace DreamTravel.GeolocationData.GoogleApi
+﻿namespace DreamTravel.Trips.GeolocationDataClients.GoogleApi
 {
     public class GoogleApiOptions
     {

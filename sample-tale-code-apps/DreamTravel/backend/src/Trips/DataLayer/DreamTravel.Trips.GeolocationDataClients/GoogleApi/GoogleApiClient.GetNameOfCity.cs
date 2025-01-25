@@ -1,11 +1,7 @@
-﻿using System;
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
-using DreamTravel.Trips.Domain.Cities;
+﻿using DreamTravel.Trips.Domain.Cities;
 using Newtonsoft.Json.Linq;
 
-namespace DreamTravel.GeolocationData.GoogleApi
+namespace DreamTravel.Trips.GeolocationDataClients.GoogleApi
 {
     public partial class GoogleApiClient : IGoogleApiClient
     {

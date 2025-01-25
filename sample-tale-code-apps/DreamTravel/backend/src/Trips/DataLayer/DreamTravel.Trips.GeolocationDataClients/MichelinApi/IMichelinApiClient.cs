@@ -1,7 +1,6 @@
-﻿using System.Threading.Tasks;
-using DreamTravel.Trips.Domain.Cities;
+﻿using DreamTravel.Trips.Domain.Cities;
 
-namespace DreamTravel.GeolocationData.MichelinApi
+namespace DreamTravel.Trips.GeolocationDataClients.MichelinApi
 {
     public interface IMichelinApiClient
     {

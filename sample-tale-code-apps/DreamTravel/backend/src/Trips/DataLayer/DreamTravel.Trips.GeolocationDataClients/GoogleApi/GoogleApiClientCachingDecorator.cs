@@ -1,12 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using DreamTravel.Trips.Domain.Cities;
+﻿using DreamTravel.Trips.Domain.Cities;
 using SolTechnology.Core.Cache;
 
-namespace DreamTravel.GeolocationData.GoogleApi
+namespace DreamTravel.Trips.GeolocationDataClients.GoogleApi
 {
     public class GoogleApiClientCachingDecorator : IGoogleApiClient
     {

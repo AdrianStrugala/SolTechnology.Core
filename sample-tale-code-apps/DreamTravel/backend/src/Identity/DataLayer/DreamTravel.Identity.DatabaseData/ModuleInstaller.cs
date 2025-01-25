@@ -7,10 +7,8 @@ namespace DreamTravel.Identity.DatabaseData
 {
     public static class ModuleInstaller
     {
-        public static IServiceCollection InstallIdentityDatabaseData(this IServiceCollection services, SqlConfiguration sqlConfiguration)
+        public static IServiceCollection InstallIdentityDatabaseData(this IServiceCollection services)
         {
-            services.AddSql(sqlConfiguration);
-
             services.AddTransient<IUserRepository, UserRepository>();
 
             return services;
