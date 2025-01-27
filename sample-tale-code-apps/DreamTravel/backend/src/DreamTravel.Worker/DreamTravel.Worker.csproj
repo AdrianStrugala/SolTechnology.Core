@@ -18,4 +18,13 @@
     <PackageReference Include="GraphQL.Server.Ui.Voyager" Version="8.1.0" />
   </ItemGroup>
 
+
+  <ItemGroup>
+    <Content Include="..\..\tests\FunctionalTests\appsettings.integration.tests.json">
+      <Link>appsettings.integration.tests.json</Link>
+      <DependentUpon>appsettings.json</DependentUpon>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
 </Project>

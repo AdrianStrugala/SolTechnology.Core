@@ -29,6 +29,11 @@
 	  <Content Update="appsettings.prod.json">
 	    <DependentUpon>appsettings.json</DependentUpon>
 	  </Content>
+	  <Content Include="..\..\tests\FunctionalTests\appsettings.integration.tests.json">
+	    <Link>appsettings.integration.tests.json</Link>
+	    <DependentUpon>appsettings.json</DependentUpon>
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </Content>
 	</ItemGroup>
 	<ItemGroup>
 		<None Include="appsettings.prod.json">

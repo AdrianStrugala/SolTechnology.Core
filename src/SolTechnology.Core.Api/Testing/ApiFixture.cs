@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc.Testing;
+﻿using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -15,17 +16,21 @@ namespace SolTechnology.Core.Api.Testing
         public HttpClient ServerClient { get; }
 
 
-        public ApiFixture()
+        public ApiFixture(IConfiguration? configuration = null)
         {
             var webAppFactory = new WebApplicationFactory<TEntryPoint>()
                 .WithWebHostBuilder(builder =>
-                    builder
-                        .ConfigureAppConfiguration((_, config) => config
-                            .AddJsonFile(Path.Combine(Directory.GetCurrentDirectory(), $"appsettings.json"), true)
-                            .AddJsonFile(Path.Combine(Directory.GetCurrentDirectory(), $"appsettings.development.json"), true)
-                            .AddJsonFile(Path.Combine(Directory.GetCurrentDirectory(), $"appsettings.tests.json"), true))
-                        .ConfigureServices((context, services) => 
-                            services.AddLogging(l => l.AddConsole())));
+                    {
+                        if(configuration != null)
+                        {
+                            builder
+                                .UseConfiguration(configuration);
+                        }
+
+                        builder
+                            .ConfigureServices((context, services) =>
+                                services.AddLogging(l => l.AddConsole()));
+                    });
 
             TestServer = webAppFactory.Server;
             TestServer.PreserveExecutionContext = true;

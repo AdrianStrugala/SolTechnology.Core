@@ -30,4 +30,12 @@
 	  <ProjectReference Include="..\..\src\DreamTravel.Worker\DreamTravel.Worker.csproj" />
 	</ItemGroup>
 
+	<ItemGroup>
+	  <Content Update="appsettings.integration.tests.json">
+	    <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	    <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+	  </Content>
+	</ItemGroup>
+
 </Project>
