@@ -18,6 +18,6 @@ jobs:
         displayName: Test
         inputs:
           command: test
-           projects: '$(workingDirectory)/tests/**/*E2E.Tests.csproj'
+          projects: '$(workingDirectory)/tests/**/*E2E.Tests.csproj'
           arguments: "--configuration $(BuildConfiguration)"
           publishTestResults: true
