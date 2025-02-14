@@ -141,6 +141,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Applications", "Application
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DreamTravel.ServiceDefaults", "..\sample-tale-code-apps\DreamTravel\backend\src\Presentation\DreamTravel.ServiceDefaults\DreamTravel.ServiceDefaults.csproj", "{D9B2122D-ADDD-46F8-A8DB-29E46B5B1DB3}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DreamTravel.E2E.Tests", "..\sample-tale-code-apps\DreamTravel\backend\tests\DreamTravel.E2E.Tests\DreamTravel.E2E.Tests.csproj", "{0A374336-0BD6-4792-A413-3CFC373B172B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -307,6 +309,10 @@ Global
 		{D9B2122D-ADDD-46F8-A8DB-29E46B5B1DB3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D9B2122D-ADDD-46F8-A8DB-29E46B5B1DB3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D9B2122D-ADDD-46F8-A8DB-29E46B5B1DB3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0A374336-0BD6-4792-A413-3CFC373B172B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0A374336-0BD6-4792-A413-3CFC373B172B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0A374336-0BD6-4792-A413-3CFC373B172B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0A374336-0BD6-4792-A413-3CFC373B172B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -353,6 +359,7 @@ Global
 		{23026ABA-8995-4B3C-ADDC-0F6D5497518C} = {D9E61986-EACB-4DFD-949F-ED2F27DB1F75}
 		{C934A214-EA46-4FB6-BA5A-F351D2747054} = {D9E61986-EACB-4DFD-949F-ED2F27DB1F75}
 		{D9B2122D-ADDD-46F8-A8DB-29E46B5B1DB3} = {23026ABA-8995-4B3C-ADDC-0F6D5497518C}
+		{0A374336-0BD6-4792-A413-3CFC373B172B} = {404A6071-A9F5-4782-A3FB-462DF09FC68A}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {56BC2B7E-7B9F-4B05-951A-C0E3CF0D1287}

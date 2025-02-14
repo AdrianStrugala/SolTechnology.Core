@@ -1,0 +1,23 @@
+variables:
+ - name: BuildConfiguration
+   value: 'Release'
+ - name: workingDirectory
+   value: 'sample-tale-code-apps/DreamTravel/backend'
+
+
+jobs:
+  - job: RunE2ETests
+    displayName: "Run E2E tests"
+    steps:
+      - task: UseDotNet@2
+        inputs:
+          packageType: "sdk"
+          version: 8.0.x
+
+      - task: DotNetCoreCLI@2
+        displayName: Test
+        inputs:
+          command: test
+           projects: '$(workingDirectory)/tests/**/*E2E.Tests.csproj'
+          arguments: "--configuration $(BuildConfiguration)"
+          publishTestResults: true
