@@ -59,7 +59,7 @@ steps:
     # Display provided template parameters
     foreach ($key in $templateParams.PSObject.Properties.Name) {
         $value = $templateParams.$key
-        Write-Output "Template parameter - $key: $value"
+        Write-Output "Key: $key, Value: $value"
     }
     
     # Prepare request body
@@ -233,7 +233,7 @@ steps:
         Write-Error "Pipeline failed. Final status: $status"
         exit 1
     }
-  displayName: Trigger pipeline and download artifacts
+  displayName: Trigger pipeline '$pipelineName'
   condition: always()
   env:
     SYSTEM_ACCESSTOKEN: $(System.AccessToken)
