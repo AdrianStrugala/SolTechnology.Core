@@ -1,0 +1,239 @@
+parameters:
+  - name: organizationId
+    type: string
+  - name: projectName
+    type: string
+  - name: definitionId
+    type: string
+  - name: apiVersion
+    type: string
+  - name: pipelineName
+    type: string
+  - name: branch
+    type: string
+  - name: parentRunId
+    type: string
+  - name: waitingTimeBeforePolling
+    type: number
+    default: 60
+  - name: timeoutBetweenPollingCalls
+    type: number
+    default: 100
+  - name: timeoutForPipelineRunning
+    type: number
+    default: 30
+  - name: token
+    type: string
+    default: ''
+  - name: maxTriggerRetries
+    type: number
+    default: 2
+  - name: templateParameters
+    type: string
+    default: '{}'
+  - name: variables
+    type: string
+    default: '{}'
+
+steps:
+- pwsh: |
+    # PARAMETERS AND CONFIGURATION
+    $orgId           = "${{ parameters.organizationId }}"
+    $project         = "${{ parameters.projectName }}"
+    $definitionId    = "${{ parameters.definitionId }}"
+    $apiVersion      = "${{ parameters.apiVersion }}"
+    $pipelineName    = "${{ parameters.pipelineName }}"
+    $branch          = "${{ parameters.branch }}"
+    $parentRunId     = "${{ parameters.parentRunId }}"
+    $waitBeforePoll  = ${{ parameters.waitingTimeBeforePolling }}
+    $pollInterval    = ${{ parameters.timeoutBetweenPollingCalls }}
+    $pipelineTimeout = ${{ parameters.timeoutForPipelineRunning }}
+    $maxRetries      = ${{ parameters.maxTriggerRetries }}
+    
+    # Additional parameters
+    $templateParams = ConvertFrom-Json -InputObject '${{ parameters.templateParameters }}'
+    $variables      = ConvertFrom-Json -InputObject '${{ parameters.variables }}'
+    
+    $authToken = [Convert]::ToBase64String([Text.Encoding]::ASCII.GetBytes("${{ parameters.token }}" + ":"))
+    
+    # Display provided template parameters
+    foreach ($key in $templateParams.PSObject.Properties.Name) {
+        $value = $templateParams.$key
+        Write-Output "Template parameter - $key: $value"
+    }
+    
+    # Prepare request body
+    $triggerUri = "https://dev.azure.com/$orgId/$project/_apis/pipelines/$definitionId/runs?api-version=$apiVersion"
+    $requestBody = @{
+        resources = @{
+            repositories = @{
+                self = @{
+                    refName = "refs/heads/$branch"
+                }
+            }
+        }
+        templateParameters = $templateParams
+        variables          = $variables
+    } | ConvertTo-Json -Depth 4
+    
+    Write-Host "Trigger URI: $triggerUri"
+    Write-Host "Request body: $requestBody"
+    
+    try {
+        $triggerResponse = Invoke-RestMethod -Uri $triggerUri -Method Post -ContentType "application/json" `
+                           -Headers @{ Authorization = ("Basic {0}" -f $authToken) } -Body $requestBody
+        Write-Host "Pipeline triggered. Response: $triggerResponse"
+    } catch {
+        Write-Error "Failed to trigger the pipeline."
+        exit 1
+    }
+    $runId = $triggerResponse.id
+    Write-Output "Triggered pipeline '$pipelineName' with Run ID: $runId"
+    
+    # Initial wait before starting to monitor the pipeline status
+    Write-Host "Waiting $waitBeforePoll seconds before starting to monitor the status..."
+    Start-Sleep -Seconds $waitBeforePoll
+    
+    # Retrieve initial status
+    $statusUri = "https://dev.azure.com/$orgId/$project/_apis/build/builds/$runId"
+    try {
+        $statusResponse = Invoke-RestMethod -Uri $statusUri -Method Get -ContentType "application/json" `
+                          -Headers @{ Authorization = ("Basic {0}" -f $authToken) }
+    } catch {
+        Write-Error "Error retrieving the pipeline status."
+        exit 1
+    }
+    $status = $statusResponse.status
+    $result = $statusResponse.result
+    Write-Output "Initial status: $status"
+    Write-Output "Initial result: $result"
+    
+    # Retry logic for the pipeline start
+    $retryCount = 0
+    while ($status -eq "notStarted" -and $retryCount -lt $maxRetries) {
+        Write-Output "Build has not started yet. Attempt: $($retryCount + 1) of $maxRetries."
+        $retryCount++
+    
+        # Check parent pipeline status
+        $parentUri = "https://dev.azure.com/$orgId/$project/_apis/build/builds/$parentRunId?api-version=$apiVersion"
+        try {
+            $parentResponse = Invoke-RestMethod -Uri $parentUri -Method Get -ContentType "application/json" `
+                              -Headers @{ Authorization = ("Basic {0}" -f $authToken) }
+            $parentStatus = $parentResponse.status
+            Write-Host "Parent pipeline status: $parentStatus"
+            $parentCanceled = ($parentStatus -eq "stopped")
+        } catch {
+            Write-Error "Error checking the parent pipeline status."
+            exit 1
+        }
+        if ($parentCanceled) {
+            Write-Output "Parent pipeline was canceled. Stopping the triggered pipeline..."
+            $stopUri = "https://dev.azure.com/$orgId/$project/_apis/build/builds/$runId?api-version=$apiVersion"
+            Write-Host "Stopping pipeline at: $stopUri"
+            try {
+                Invoke-RestMethod -Uri $stopUri -Method Patch -ContentType "application/json" `
+                     -Headers @{ Authorization = ("Basic {0}" -f $authToken) } -Body '{"status":"stopped"}'
+                Write-Host "Pipeline with Run ID $runId has been stopped."
+            } catch {
+                Write-Error "Failed to stop the pipeline with Run ID $runId"
+            }
+            exit 1
+        }
+    
+        try {
+            $retriggerResponse = Invoke-RestMethod -Uri $triggerUri -Method Post -ContentType "application/json" `
+                                  -Headers @{ Authorization = ("Basic {0}" -f $authToken) } -Body $requestBody
+            Write-Host "Pipeline re-triggered. Response: $retriggerResponse"
+            $runId = $retriggerResponse.id
+            $statusUri = "https://dev.azure.com/$orgId/$project/_apis/build/builds/$runId"
+        } catch {
+            Write-Error "Error re-triggering the pipeline."
+            exit 1
+        }
+        Start-Sleep -Seconds $pollInterval
+        try {
+            $statusResponse = Invoke-RestMethod -Uri $statusUri -Method Get -ContentType "application/json" `
+                              -Headers @{ Authorization = ("Basic {0}" -f $authToken) }
+        } catch {
+            Write-Error "Error retrieving the pipeline status."
+            exit 1
+        }
+        $status = $statusResponse.status
+        $result = $statusResponse.result
+        Write-Output "Status after retry: $status"
+        Write-Output "Result after retry: $result"
+    }
+    
+    if ($status -eq "notStarted") {
+        Write-Error "Pipeline did not start after $maxRetries attempts."
+        exit 1
+    }
+    
+    # Monitor the pipeline status
+    $timeoutEnd = (Get-Date).AddSeconds($pipelineTimeout)
+    Write-Host "Pipeline monitoring timeout set to: $timeoutEnd"
+    while ($status -eq "inProgress") {
+        if ([datetime]::Now -gt $timeoutEnd) {
+            Write-Error "Pipeline monitoring timed out."
+            exit 1
+        }
+        # Check if the parent pipeline was canceled
+        $parentUri = "https://dev.azure.com/$orgId/$project/_apis/build/builds/$parentRunId?api-version=$apiVersion"
+        try {
+            $parentResponse = Invoke-RestMethod -Uri $parentUri -Method Get -ContentType "application/json" `
+                              -Headers @{ Authorization = ("Basic {0}" -f $authToken) }
+            $parentStatus = $parentResponse.status
+            Write-Host "Parent pipeline status: $parentStatus"
+            $parentCanceled = ($parentStatus -eq "stopped")
+        } catch {
+            Write-Error "Error checking the parent pipeline status."
+            exit 1
+        }
+        if ($parentCanceled) {
+            Write-Output "Parent pipeline was canceled. Stopping the triggered pipeline..."
+            $stopUri = "https://dev.azure.com/$orgId/$project/_apis/build/builds/$runId?api-version=$apiVersion"
+            Write-Host "Stopping pipeline at: $stopUri"
+            try {
+                Invoke-RestMethod -Uri $stopUri -Method Patch -ContentType "application/json" `
+                     -Headers @{ Authorization = ("Basic {0}" -f $authToken) } -Body '{"status":"stopped"}'
+                Write-Host "Pipeline with Run ID $runId has been stopped."
+            } catch {
+                Write-Error "Failed to stop the pipeline with Run ID $runId"
+            }
+            exit 1
+        }
+        Write-Output "Pipeline in progress, waiting $pollInterval seconds..."
+        Start-Sleep -Seconds $pollInterval
+        try {
+            $statusResponse = Invoke-RestMethod -Uri $statusUri -Method Get -ContentType "application/json" `
+                              -Headers @{ Authorization = ("Basic {0}" -f $authToken) }
+        } catch {
+            Write-Error "Error retrieving the pipeline status."
+            exit 1
+        }
+        $status = $statusResponse.status
+        $result = $statusResponse.result
+        Write-Output "Current status: $status"
+        Write-Output "Current result: $result"
+    }
+    
+    if ($status -eq "completed") {
+        Write-Output "Pipeline '$pipelineName' completed. Status: $status, Result: $result"
+    
+        if ($result -eq "succeeded") {
+            Write-Output "Pipeline succeeded."
+        } elseif ($result -eq "cancelling" -or $result -eq "cancelled") {
+            Write-Output "Pipeline was canceled."
+            exit 1
+        } else {
+            Write-Error "Pipeline failed. Result: $result"
+            exit 1
+        }
+    } else {
+        Write-Error "Pipeline failed. Final status: $status"
+        exit 1
+    }
+  displayName: Trigger pipeline and download artifacts
+  condition: always()
+  env:
+    SYSTEM_ACCESSTOKEN: $(System.AccessToken)
