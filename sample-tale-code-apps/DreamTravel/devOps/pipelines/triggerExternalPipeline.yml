@@ -177,31 +177,6 @@ steps:
             Write-Error "Pipeline monitoring timed out."
             exit 1
         }
-        # Check if the parent pipeline was canceled
-        $parentUri = "https://dev.azure.com/$orgId/$project/_apis/build/builds/$parentRunId?api-version=$apiVersion"
-        try {
-            $parentResponse = Invoke-RestMethod -Uri $parentUri -Method Get -ContentType "application/json" `
-                              -Headers @{ Authorization = ("Basic {0}" -f $authToken) }
-            $parentStatus = $parentResponse.status
-            Write-Host "Parent pipeline status: $parentStatus"
-            $parentCanceled = ($parentStatus -eq "stopped")
-        } catch {
-            Write-Error "Error checking the parent pipeline status."
-            exit 1
-        }
-        if ($parentCanceled) {
-            Write-Output "Parent pipeline was canceled. Stopping the triggered pipeline..."
-            $stopUri = "https://dev.azure.com/$orgId/$project/_apis/build/builds/$runId?api-version=$apiVersion"
-            Write-Host "Stopping pipeline at: $stopUri"
-            try {
-                Invoke-RestMethod -Uri $stopUri -Method Patch -ContentType "application/json" `
-                     -Headers @{ Authorization = ("Basic {0}" -f $authToken) } -Body '{"status":"stopped"}'
-                Write-Host "Pipeline with Run ID $runId has been stopped."
-            } catch {
-                Write-Error "Failed to stop the pipeline with Run ID $runId"
-            }
-            exit 1
-        }
         Write-Output "Pipeline in progress, waiting $pollInterval seconds..."
         Start-Sleep -Seconds $pollInterval
         try {
@@ -233,7 +208,7 @@ steps:
         Write-Error "Pipeline failed. Final status: $status"
         exit 1
     }
-  displayName: Trigger pipeline '$pipelineName'
+  displayName: "Trigger pipeline ${{ parameters.pipelineName }}"
   condition: always()
   env:
     SYSTEM_ACCESSTOKEN: $(System.AccessToken)
