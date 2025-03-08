@@ -32,5 +32,7 @@ public sealed class CalculateBestPathContext : PipelineContext<CalculateBestPath
         VinietaCosts = new double[matrixSize];
     }
 
- 
+    public CalculateBestPathContext()
+    {
+    }
 }

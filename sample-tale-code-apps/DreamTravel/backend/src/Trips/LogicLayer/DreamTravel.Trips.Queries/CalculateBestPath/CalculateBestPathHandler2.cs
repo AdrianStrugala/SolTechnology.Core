@@ -2,7 +2,7 @@
 
 namespace DreamTravel.Trips.Queries.CalculateBestPath;
 
-public class CalculateBestPathHandler : PipelineHandler<CalculateBestPathQuery, CalculateBestPathResult>
+public class CalculateBestPathHandler : PipelineHandler<CalculateBestPathQuery, CalculateBestPathContext, CalculateBestPathResult>
 {
     public CalculateBestPathHandler(IServiceProvider serviceProvider) : base(serviceProvider) { }
     

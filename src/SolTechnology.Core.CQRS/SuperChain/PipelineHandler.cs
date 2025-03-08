@@ -1,36 +1,18 @@
 ﻿using MediatR;
 using SolTechnology.Core.CQRS;
 
-public abstract class PipelineHandler<TInput, TOutput> : IQueryHandler<TInput, TOutput> where TInput : IRequest<Result<TOutput>>
+public abstract class PipelineHandler<TInput, TContext, TOutput>(IServiceProvider serviceProvider)
+    : IQueryHandler<TInput, TOutput>
+    where TInput : IRequest<Result<TOutput>>
+    where TContext : PipelineContext<TInput, TOutput>, new()
 {
-    private readonly IServiceProvider _serviceProvider;
-    protected internal PipelineContext<TInput, TOutput> Context { get; set; } = null!;
+    protected internal TContext Context { get; set; } = null!;
     private readonly List<Type> _steps = new();
-
-    protected PipelineHandler(IServiceProvider serviceProvider)
-    {
-        _serviceProvider = serviceProvider;
-    }
 
     // Register a step in the pipeline.
     // TStep must implement IAsyncStep<PipelineContext<TInput, TOutput>>
-    protected void Step<TStep>()
+    protected void Step<TStep>() where TStep : IAsyncStep<TContext>
     {
-        var stepType = typeof(TStep);
-        var valid = stepType.GetInterfaces()
-            .Where(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IAsyncStep<>))
-            .Any(i =>
-            {
-                var arg = i.GetGenericArguments()[0];
-                return typeof(PipelineContext<TInput, TOutput>).IsAssignableFrom(arg);
-            });
-        
-        if (!valid)
-        {
-            throw new InvalidOperationException(
-                $"{stepType.Name} must implement IAsyncStep<PipelineContext<TInput, TOutput>> (or a derived context)");
-        }
-        
         _steps.Add(typeof(TStep));
     }
 
@@ -40,8 +22,7 @@ public abstract class PipelineHandler<TInput, TOutput> : IQueryHandler<TInput, T
         foreach (var stepType in _steps)
         {
             // Resolve the step using the DI container.
-            var stepInstance = _serviceProvider.GetService(stepType) as IAsyncStep<PipelineContext<TInput, TOutput>>;
-            if (stepInstance == null)
+            if (serviceProvider.GetService(stepType) is not IAsyncStep<TContext> stepInstance)
             {
                 throw new InvalidOperationException($"Could not resolve service for type {stepType.Name}");
             }
@@ -55,7 +36,7 @@ public abstract class PipelineHandler<TInput, TOutput> : IQueryHandler<TInput, T
     // Public entry point: registers steps, executes the pipeline, and returns the Output.
     public async Task<Result<TOutput>> Handle(TInput input, CancellationToken cancellationToken = default)
     {
-        Context = new PipelineContext<TInput, TOutput> { Input = input };
+        Context = new TContext { Input = input };
         RegisterSteps();
         await ExecutePipelineAsync();
         return Context.Output;
