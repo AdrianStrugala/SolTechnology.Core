@@ -1,6 +1,7 @@
 using DreamTravel.Trips.Domain.Cities;
 using DreamTravel.Trips.Queries.CalculateBestPath;
 using DreamTravel.Trips.Queries.CalculateBestPath.Executors;
+using SolTechnology.Core.CQRS;
 
 namespace DreamTravel.Trips.Queries.UnitTests.CalculateBestPath
 {
@@ -9,7 +10,7 @@ namespace DreamTravel.Trips.Queries.UnitTests.CalculateBestPath
         private readonly FormCalculateBestPathResult _sut = new FormCalculateBestPathResult();
 
         [Fact]
-        public void GetDurationBetweenTwoCitiesByTollRoad_InvokeWithValidCities_ReturnsSomeDuration()
+        public async Task GetDurationBetweenTwoCitiesByTollRoad_InvokeWithValidCities_ReturnsSomeDuration()
         {
             //Arrange
             int noOfCities = 3;
@@ -42,13 +43,15 @@ namespace DreamTravel.Trips.Queries.UnitTests.CalculateBestPath
             calculateBestPathContext.OrderOfCities = orderOfCities;
 
             //Act
-            var result = (_sut.Execute(calculateBestPathContext)).BestPaths;
+            Result result = await _sut.Execute(calculateBestPathContext);
 
             //Assert
-            Assert.Equal(noOfCities - 1, result.Count);
-            Assert.Equal("first", result[0].StartingCity.Name);
-            Assert.Equal("third", result[1].StartingCity.Name);
-            Assert.Equal("second", result[1].EndingCity.Name);
+            Assert.True(result.IsSuccess);
+            var bestPaths = calculateBestPathContext.Output.BestPaths;
+            Assert.Equal(noOfCities - 1, bestPaths.Count);
+            Assert.Equal("first", bestPaths[0].StartingCity.Name);
+            Assert.Equal("third", bestPaths[1].StartingCity.Name);
+            Assert.Equal("second", bestPaths[1].EndingCity.Name);
         }
     }
 }

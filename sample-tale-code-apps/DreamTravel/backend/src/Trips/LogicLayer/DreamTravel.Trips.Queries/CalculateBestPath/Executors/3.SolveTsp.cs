@@ -8,7 +8,7 @@ namespace DreamTravel.Trips.Queries.CalculateBestPath.Executors
         Task<Result> Execute(CalculateBestPathContext calculateBestPathContext);
     }
 
-    public class SolveTsp : ISolveTsp
+    public class SolveTsp : IAsyncStep<CalculateBestPathContext>
     {
         private readonly ITSP _tsp;
 

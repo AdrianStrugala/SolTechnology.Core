@@ -7,7 +7,7 @@ public interface IFindProfitablePath
     Task<Result> Execute(CalculateBestPathContext calculateBestPathContext);
 }
 
-public class FindProfitablePath : IFindProfitablePath
+public class FindProfitablePath: IAsyncStep<CalculateBestPathContext>
 {
     private static double FuelPrice { get; } = 1.26;
     private static double RoadVelocity { get; } = 70;

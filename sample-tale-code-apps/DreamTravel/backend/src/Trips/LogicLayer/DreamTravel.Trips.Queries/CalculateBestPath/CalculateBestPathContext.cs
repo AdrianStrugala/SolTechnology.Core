@@ -2,7 +2,7 @@
 
 namespace DreamTravel.Trips.Queries.CalculateBestPath;
 
-public sealed class CalculateBestPathContext
+public sealed class CalculateBestPathContext : PipelineContext<CalculateBestPathQuery, CalculateBestPathResult>
 {
     public List<City> Cities { get; }
     public int NoOfCities { get; }

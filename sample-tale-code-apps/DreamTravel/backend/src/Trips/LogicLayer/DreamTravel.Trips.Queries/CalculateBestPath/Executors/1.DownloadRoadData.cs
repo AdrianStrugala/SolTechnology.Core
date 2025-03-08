@@ -10,7 +10,7 @@ public interface IDownloadRoadData
     Task<Result> Execute(CalculateBestPathContext calculateBestPathContext);
 }
 
-public class DownloadRoadData : IDownloadRoadData
+public class DownloadRoadData : IAsyncStep<PipelineContext<CalculateBestPathQuery, CalculateBestPathResult>>
 {
     private readonly IGoogleApiClient _googleApiClient;
     private readonly IMichelinApiClient _michelinApiClient;

@@ -1,4 +1,5 @@
 ﻿using DreamTravel.TravelingSalesmanProblem;
+using DreamTravel.Trips.Queries.CalculateBestPath;
 using DreamTravel.Trips.Queries.CalculateBestPath.Executors;
 using Microsoft.Extensions.DependencyInjection;
 using SolTechnology.Core.CQRS;
@@ -15,10 +16,10 @@ namespace DreamTravel.Trips.Queries
             services.AddTransient<ITSP, AntColony>();
 
             //CalculateBestPath
-            services.AddTransient<IFindProfitablePath, FindProfitablePath>();
-            services.AddTransient<IFormCalculateBestPathResult, FormCalculateBestPathResult>();
-            services.AddTransient<ISolveTsp, SolveTsp>();
-            services.AddTransient<IDownloadRoadData, DownloadRoadData>();
+            services.AddTransient<IAsyncStep<PipelineContext<CalculateBestPathQuery, CalculateBestPathResult>>, DownloadRoadData>();
+            services.AddTransient<FindProfitablePath>();
+            services.AddTransient<SolveTsp>();
+            services.AddTransient<FormCalculateBestPathResult>();
 
             return services;
         }
