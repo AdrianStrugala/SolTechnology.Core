@@ -8,6 +8,7 @@ public class CalculateBestPathHandler : PipelineHandler<CalculateBestPathQuery, 
     
     protected override void RegisterSteps()
     {
+        Step<InitiateContext>();
         Step<DownloadRoadData>();
         Step<FindProfitablePath>();
         Step<SolveTsp>();

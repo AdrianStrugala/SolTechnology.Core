@@ -16,6 +16,7 @@ namespace DreamTravel.Trips.Queries
             services.AddTransient<ITSP, AntColony>();
 
             //CalculateBestPath
+            services.AddTransient<InitiateContext>();
             services.AddTransient<DownloadRoadData>();
             services.AddTransient<FindProfitablePath>();
             services.AddTransient<SolveTsp>();

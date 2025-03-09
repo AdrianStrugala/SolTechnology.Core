@@ -26,7 +26,7 @@ public abstract class PipelineHandler<TInput, TContext, TOutput>(IServiceProvide
             {
                 throw new InvalidOperationException($"Could not resolve service for type {stepType.Name}");
             }
-            await stepInstance.Execute(Context);
+            var result = await stepInstance.Execute(Context);
         }
     }
 

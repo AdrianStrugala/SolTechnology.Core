@@ -4,8 +4,8 @@ namespace DreamTravel.Trips.Queries.CalculateBestPath;
 
 public sealed class CalculateBestPathContext : PipelineContext<CalculateBestPathQuery, CalculateBestPathResult>
 {
-    public List<City> Cities { get; }
-    public int NoOfCities { get; }
+    public List<City> Cities { get; set; }
+    public int NoOfCities { get; set; }
     public List<int> OrderOfCities { get; set; }
 
     public double[] FreeDistances { get; set; }
