@@ -1,9 +1,10 @@
 ﻿using SolTechnology.Core.CQRS;
+using SolTechnology.Core.CQRS.SuperChain;
 
 namespace DreamTravel.Trips.Queries.CalculateBestPath.Executors;
 
 
-public class InitiateContext : IAsyncStep<CalculateBestPathContext>
+public class InitiateContext : IChainStep<CalculateBestPathContext>
 {
     public Task<Result> Execute(CalculateBestPathContext context)
     {

@@ -1,8 +1,9 @@
 ﻿using DreamTravel.Trips.Domain.Cities;
+using SolTechnology.Core.CQRS.SuperChain;
 
 namespace DreamTravel.Trips.Queries.CalculateBestPath;
 
-public sealed class CalculateBestPathContext : PipelineContext<CalculateBestPathQuery, CalculateBestPathResult>
+public sealed class CalculateBestPathContext : ChainContext<CalculateBestPathQuery, CalculateBestPathResult>
 {
     public List<City> Cities { get; set; }
     public int NoOfCities { get; set; }

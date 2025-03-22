@@ -1,17 +1,17 @@
 ﻿using DreamTravel.Trips.Queries.CalculateBestPath.Executors;
+using SolTechnology.Core.CQRS.SuperChain;
 
 namespace DreamTravel.Trips.Queries.CalculateBestPath;
 
-public class CalculateBestPathHandler : PipelineHandler<CalculateBestPathQuery, CalculateBestPathContext, CalculateBestPathResult>
+public class CalculateBestPathHandler(IServiceProvider serviceProvider)
+    : ChainHandler<CalculateBestPathQuery, CalculateBestPathContext, CalculateBestPathResult>(serviceProvider)
 {
-    public CalculateBestPathHandler(IServiceProvider serviceProvider) : base(serviceProvider) { }
-    
-    protected override void RegisterSteps()
+    protected override async Task HandleChain()
     {
-        Step<InitiateContext>();
-        Step<DownloadRoadData>();
-        Step<FindProfitablePath>();
-        Step<SolveTsp>();
-        Step<FormCalculateBestPathResult>();
+        await Invoke<InitiateContext>();
+        await Invoke<DownloadRoadData>();
+        await Invoke<FindProfitablePath>();
+        await Invoke<SolveTsp>();
+        await Invoke<FormCalculateBestPathResult>();
     }
 }

@@ -1,5 +1,6 @@
 ﻿using DreamTravel.TravelingSalesmanProblem;
 using SolTechnology.Core.CQRS;
+using SolTechnology.Core.CQRS.SuperChain;
 
 namespace DreamTravel.Trips.Queries.CalculateBestPath.Executors
 {
@@ -8,7 +9,7 @@ namespace DreamTravel.Trips.Queries.CalculateBestPath.Executors
         Task<Result> Execute(CalculateBestPathContext calculateBestPathContext);
     }
 
-    public class SolveTsp : IAsyncStep<CalculateBestPathContext>
+    public class SolveTsp : IChainStep<CalculateBestPathContext>
     {
         private readonly ITSP _tsp;
 
