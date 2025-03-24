@@ -11,16 +11,10 @@ namespace DreamTravel.Trips.Queries
         public static IServiceCollection InstallTripsQueries(this IServiceCollection services)
         {
             services.RegisterQueries();
+            services.RegisterChain();
 
             //TSP engine
             services.AddTransient<ITSP, AntColony>();
-
-            //CalculateBestPath
-            services.AddTransient<InitiateContext>();
-            services.AddTransient<DownloadRoadData>();
-            services.AddTransient<FindProfitablePath>();
-            services.AddTransient<SolveTsp>();
-            services.AddTransient<FormCalculateBestPathResult>();
 
             return services;
         }

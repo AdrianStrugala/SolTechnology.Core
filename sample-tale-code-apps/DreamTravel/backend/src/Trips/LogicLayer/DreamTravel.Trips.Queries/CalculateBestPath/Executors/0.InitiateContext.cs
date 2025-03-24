@@ -3,15 +3,13 @@ using SolTechnology.Core.CQRS.SuperChain;
 
 namespace DreamTravel.Trips.Queries.CalculateBestPath.Executors;
 
-
 public class InitiateContext : IChainStep<CalculateBestPathContext>
 {
     public Task<Result> Execute(CalculateBestPathContext context)
     {
          var cities = context.Input.Cities.Where(c => c != null).ToList();
-         // context = new CalculateBestPathContext(cities!);
          
-         context.Cities = cities;
+         context.Cities = cities!;
          context.NoOfCities = cities.Count;
          int matrixSize = cities.Count * cities.Count;
 

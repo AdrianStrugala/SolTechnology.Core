@@ -23,28 +23,27 @@ namespace DreamTravel.Trips.Queries.UnitTests.CalculateBestPath
             var matrix = new CalculateBestPathContext
             {
                 Cities = cities,
-                Costs = new double[expectedLength],
-                VinietaCosts = new double[expectedLength]
-            };
-            matrix.Costs = new[]
-            {
-                Double.MaxValue, 10, 19,
-                10, Double.MaxValue, 30,
-                19, 30,  Double.MaxValue
-            };
-
-            matrix.FreeDistances = new[]
-            {
-                Double.MaxValue, 100, 200,
-                100, Double.MaxValue, 300,
-                200, 300,  Double.MaxValue
-            };
-
-            matrix.TollDistances = new[]
-            {
-                Double.MaxValue, 90, 20,
-                90, Double.MaxValue, 350,
-                20, 350,  Double.MaxValue
+                VinietaCosts = new double[expectedLength],
+                OptimalDistances = new double[expectedLength],
+                OptimalCosts = new double[expectedLength],
+                Costs =
+                [
+                    Double.MaxValue, 10, 19,
+                    10, Double.MaxValue, 30,
+                    19, 30,  Double.MaxValue
+                ],
+                FreeDistances =
+                [
+                    Double.MaxValue, 100, 200,
+                    100, Double.MaxValue, 300,
+                    200, 300,  Double.MaxValue
+                ],
+                TollDistances =
+                [
+                    Double.MaxValue, 90, 20,
+                    90, Double.MaxValue, 350,
+                    20, 350,  Double.MaxValue
+                ]
             };
 
 

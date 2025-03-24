@@ -3,12 +3,7 @@ using SolTechnology.Core.CQRS.SuperChain;
 
 namespace DreamTravel.Trips.Queries.CalculateBestPath.Executors;
 
-public interface IFindProfitablePath
-{
-    Task<Result> Execute(CalculateBestPathContext calculateBestPathContext);
-}
-
-public class FindProfitablePath: IChainStep<CalculateBestPathContext>
+public class FindProfitablePath : IChainStep<CalculateBestPathContext>
 {
     private static double FuelPrice { get; } = 1.26;
     private static double RoadVelocity { get; } = 70;

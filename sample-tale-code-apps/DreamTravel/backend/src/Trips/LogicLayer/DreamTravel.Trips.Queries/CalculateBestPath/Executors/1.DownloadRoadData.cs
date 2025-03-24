@@ -6,11 +6,6 @@ using SolTechnology.Core.CQRS.SuperChain;
 
 namespace DreamTravel.Trips.Queries.CalculateBestPath.Executors;
 
-public interface IDownloadRoadData
-{
-    Task<Result> Execute(CalculateBestPathContext calculateBestPathContext);
-}
-
 public class DownloadRoadData : IChainStep<CalculateBestPathContext>
 {
     private readonly IGoogleApiClient _googleApiClient;

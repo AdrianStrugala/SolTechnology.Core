@@ -2,26 +2,20 @@
 using SolTechnology.Core.CQRS;
 using SolTechnology.Core.CQRS.SuperChain;
 
-namespace DreamTravel.Trips.Queries.CalculateBestPath.Executors
+namespace DreamTravel.Trips.Queries.CalculateBestPath.Executors;
+
+public class SolveTsp : IChainStep<CalculateBestPathContext>
 {
-    public interface ISolveTsp
+    private readonly ITSP _tsp;
+
+    public SolveTsp(ITSP tsp)
     {
-        Task<Result> Execute(CalculateBestPathContext calculateBestPathContext);
+        _tsp = tsp;
     }
 
-    public class SolveTsp : IChainStep<CalculateBestPathContext>
+    public Task<Result> Execute(CalculateBestPathContext calculateBestPathContext)
     {
-        private readonly ITSP _tsp;
-
-        public SolveTsp(ITSP tsp)
-        {
-            _tsp = tsp;
-        }
-
-        public Task<Result> Execute(CalculateBestPathContext calculateBestPathContext)
-        {
-            calculateBestPathContext.OrderOfCities = _tsp.SolveTSP(calculateBestPathContext.OptimalDistances.ToList());
-            return Result.SuccessAsTask();
-        }
+        calculateBestPathContext.OrderOfCities = _tsp.SolveTSP(calculateBestPathContext.OptimalDistances.ToList());
+        return Result.SuccessAsTask();
     }
 }

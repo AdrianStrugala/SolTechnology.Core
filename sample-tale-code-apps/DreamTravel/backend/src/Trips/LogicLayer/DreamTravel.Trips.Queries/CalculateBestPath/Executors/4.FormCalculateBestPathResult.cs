@@ -5,11 +5,6 @@ using Path = DreamTravel.Trips.Domain.Paths.Path;
 
 namespace DreamTravel.Trips.Queries.CalculateBestPath.Executors;
 
-public interface IFormCalculateBestPathResult
-{
-    CalculateBestPathResult Execute(CalculateBestPathContext context);
-}
-
 public class FormCalculateBestPathResult : IChainStep<CalculateBestPathContext>
 {
     public Task<Result> Execute(CalculateBestPathContext context)

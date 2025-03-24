@@ -43,7 +43,12 @@ namespace DreamTravel.Trips.Queries.UnitTests.CalculateBestPath
             {
                 Cities = listOfCities,
                 Costs = new double[noOfCities*noOfCities],
+                Goals = new double[noOfCities*noOfCities],
                 VinietaCosts = new double[noOfCities*noOfCities],
+                OptimalCosts = new double[noOfCities*noOfCities],
+                OptimalDistances = new double[noOfCities*noOfCities],
+                FreeDistances = new double[noOfCities*noOfCities],
+                TollDistances = new double[noOfCities*noOfCities],
                 OrderOfCities = orderOfCities
             };
 
