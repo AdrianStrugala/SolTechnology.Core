@@ -39,8 +39,13 @@ namespace DreamTravel.Trips.Queries.UnitTests.CalculateBestPath
 
             List<int> orderOfCities = new List<int>(noOfCities) { 0, 2, 1 };
 
-            CalculateBestPathContext calculateBestPathContext = new CalculateBestPathContext(listOfCities);
-            calculateBestPathContext.OrderOfCities = orderOfCities;
+            var calculateBestPathContext = new CalculateBestPathContext
+            {
+                Cities = listOfCities,
+                Costs = new double[noOfCities*noOfCities],
+                VinietaCosts = new double[noOfCities*noOfCities],
+                OrderOfCities = orderOfCities
+            };
 
             //Act
             Result result = await _sut.Execute(calculateBestPathContext);

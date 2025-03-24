@@ -16,24 +16,4 @@ public sealed class CalculateBestPathContext : ChainContext<CalculateBestPathQue
     public double[] Costs { get; set; }
     public double[] OptimalCosts { get; set; }
     public double[] VinietaCosts { get; set; }
-
-
-    public CalculateBestPathContext(List<City> cities)
-    {
-        Cities = cities;
-        NoOfCities = cities.Count;
-        int matrixSize = NoOfCities * NoOfCities;
-
-        FreeDistances = new double[matrixSize];
-        TollDistances = new double[matrixSize];
-        OptimalDistances = new double[matrixSize];
-        Goals = new double[matrixSize];
-        Costs = new double[matrixSize];
-        OptimalCosts = new double[matrixSize];
-        VinietaCosts = new double[matrixSize];
-    }
-
-    public CalculateBestPathContext()
-    {
-    }
 }

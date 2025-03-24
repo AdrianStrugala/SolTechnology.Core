@@ -5,9 +5,8 @@ using DreamTravel.Trips.GeolocationDataClients.GoogleApi;
 using DreamTravel.Trips.GeolocationDataClients.MichelinApi;
 using DreamTravel.Trips.Queries.CalculateBestPath;
 using DreamTravel.Trips.Queries.CalculateBestPath.Executors;
+using FluentAssertions;
 using NSubstitute;
-using SolTechnology.Core.CQRS;
-using SolTechnology.Core.CQRS.SuperChain;
 
 namespace DreamTravel.Trips.Queries.UnitTests.CalculateBestPath
 {
@@ -16,8 +15,7 @@ namespace DreamTravel.Trips.Queries.UnitTests.CalculateBestPath
         private readonly DownloadRoadData _sut;
         private readonly IGoogleApiClient _googleApiClient;
         private readonly IMichelinApiClient _michelinApiClient;
-
-
+        
         public DownloadRoadDataTests()
         {
             var fixture = new Fixture().Customize(
@@ -78,6 +76,6 @@ namespace DreamTravel.Trips.Queries.UnitTests.CalculateBestPath
             await _googleApiClient.Received(1).GetDurationMatrixByTollRoad(cities);
             await _googleApiClient.Received(1).GetDurationMatrixByFreeRoad(cities);
             // Verify that the Michelin API was called for every city pair (9 calls).
-            _michelinApiClient.Received(expectedLength).DownloadCostBetweenTwoCities(Arg.Any<City>(), Arg.Any<City>());}
+            await _michelinApiClient.Received(expectedLength).DownloadCostBetweenTwoCities(Arg.Any<City>(), Arg.Any<City>());}
     }
 }

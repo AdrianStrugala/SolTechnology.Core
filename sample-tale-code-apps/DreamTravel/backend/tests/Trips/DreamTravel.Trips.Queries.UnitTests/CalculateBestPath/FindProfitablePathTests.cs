@@ -12,8 +12,20 @@ namespace DreamTravel.Trips.Queries.UnitTests.CalculateBestPath
         public void EvaluateCost_ValidData_IntelligentResults()
         {
             //Arrange
-            int noOfCities = 3;
-            CalculateBestPathContext matrix = new CalculateBestPathContext(new List<City> { new(), new(), new() });
+            var cities = new List<City>
+            {
+                new City { Name = "CityA" },
+                new City { Name = "CityB" },
+                new City { Name = "CityC" }
+            };
+
+            int expectedLength = cities.Count * cities.Count; // 3 x 3 = 9
+            var matrix = new CalculateBestPathContext
+            {
+                Cities = cities,
+                Costs = new double[expectedLength],
+                VinietaCosts = new double[expectedLength]
+            };
             matrix.Costs = new[]
             {
                 Double.MaxValue, 10, 19,
