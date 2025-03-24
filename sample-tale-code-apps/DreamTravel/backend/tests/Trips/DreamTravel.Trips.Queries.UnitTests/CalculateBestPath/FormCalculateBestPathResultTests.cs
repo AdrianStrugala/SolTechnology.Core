@@ -5,7 +5,7 @@ using SolTechnology.Core.CQRS;
 
 namespace DreamTravel.Trips.Queries.UnitTests.CalculateBestPath
 {
-    public class FormPathsFromMatricesTests
+    public class FormCalculateBestPathResultTests
     {
         private readonly FormCalculateBestPathResult _sut = new FormCalculateBestPathResult();
 
