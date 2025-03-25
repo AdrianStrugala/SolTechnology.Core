@@ -9,7 +9,7 @@ namespace DreamTravel.Trips.Queries.UnitTests.CalculateBestPath
         private readonly FindProfitablePath _sut = new();
 
         [Fact]
-        public void EvaluateCost_ValidData_IntelligentResults()
+        public async Task EvaluateCost_ValidData_IntelligentResults()
         {
             //Arrange
             var cities = new List<City>
@@ -23,9 +23,11 @@ namespace DreamTravel.Trips.Queries.UnitTests.CalculateBestPath
             var matrix = new CalculateBestPathContext
             {
                 Cities = cities,
+                NoOfCities = cities.Count,
                 VinietaCosts = new double[expectedLength],
                 OptimalDistances = new double[expectedLength],
                 OptimalCosts = new double[expectedLength],
+                Goals = new double[expectedLength],
                 Costs =
                 [
                     Double.MaxValue, 10, 19,
@@ -48,7 +50,7 @@ namespace DreamTravel.Trips.Queries.UnitTests.CalculateBestPath
 
 
             //Act 
-            _sut.Execute(matrix);
+            await _sut.Execute(matrix);
 
 
             //Assert
