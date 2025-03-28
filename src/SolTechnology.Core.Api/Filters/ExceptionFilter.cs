@@ -4,6 +4,7 @@ using Microsoft.Extensions.Logging;
 using System.Net;
 using FluentValidation;
 using SolTechnology.Core.CQRS;
+using SolTechnology.Core.CQRS.Errors;
 
 namespace SolTechnology.Core.Api.Filters;
 

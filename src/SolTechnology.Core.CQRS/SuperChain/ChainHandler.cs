@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using MediatR;
+using SolTechnology.Core.CQRS.Errors;
 
 namespace SolTechnology.Core.CQRS.SuperChain;
 
@@ -19,6 +20,8 @@ public abstract class ChainHandler<TInput, TContext, TOutput>(IServiceProvider s
     /// </summary>
     [SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
     protected internal TContext Context { get; set; } = null!;
+    private CancellationToken _cancellationToken;
+    private readonly List<Error> _errors = new();
 
     /// <summary>
     /// Invokes the specified chain step immediately.
@@ -27,12 +30,26 @@ public abstract class ChainHandler<TInput, TContext, TOutput>(IServiceProvider s
     /// <exception cref="InvalidOperationException">Thrown if the chain step cannot be resolved via the service provider.</exception>
     protected async Task Invoke<TStep>() where TStep : IChainStep<TContext>
     {
+        _cancellationToken.ThrowIfCancellationRequested();
+        
         if (serviceProvider.GetService(typeof(TStep)) is not IChainStep<TContext> stepInstance)
         {
             throw new InvalidOperationException($"Could not resolve service for type {typeof(TStep).Name}");
         }
 
-        await stepInstance.Execute(Context);
+        Result stepResult = null!;
+        try
+        {
+            stepResult = await stepInstance.Execute(Context);
+        }
+        catch(Exception e)
+        {
+            _errors.Add(Error.From(e));
+        }
+        if (stepResult.IsFailure)
+        {
+            _errors.Add(stepResult.Error!);
+        }
     }
 
     /// <summary>
@@ -49,8 +66,15 @@ public abstract class ChainHandler<TInput, TContext, TOutput>(IServiceProvider s
     /// <returns>A task representing the asynchronous operation, containing the handler's output wrapped in a Result&lt;TOutput&gt;.</returns>
     public async Task<Result<TOutput>> Handle(TInput input, CancellationToken cancellationToken = default)
     {
+        _cancellationToken = cancellationToken;
         Context = new TContext { Input = input };
         await HandleChain();
+        
+        if (_errors.Any())
+        {
+            return new AggregateError(_errors);
+        }
+        
         return Context.Output;
     }
 }

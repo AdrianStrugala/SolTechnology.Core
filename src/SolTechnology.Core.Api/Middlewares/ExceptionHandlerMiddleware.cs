@@ -2,6 +2,7 @@
 using System.Net;
 using Microsoft.Extensions.Logging;
 using SolTechnology.Core.CQRS;
+using SolTechnology.Core.CQRS.Errors;
 
 namespace SolTechnology.Core.Api.Middlewares;
 

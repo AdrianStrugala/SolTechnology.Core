@@ -1,5 +1,6 @@
 ﻿#nullable enable
 using System.Text.Json.Serialization;
+using SolTechnology.Core.CQRS.Errors;
 
 namespace SolTechnology.Core.CQRS
 {
