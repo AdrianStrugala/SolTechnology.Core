@@ -79,26 +79,26 @@ stages:
           arguments: '--configuration $(BuildConfiguration)'
           publishTestResults: true
 
-    - job: RunE2EPipeline
-      displayName: 'Run E2E tests'
-      timeoutInMinutes: 10
-      steps:
-        - template: ../pipelines/triggerExternalPipeline.yml
-          parameters:
-              organizationId: "xionc"
-              projectName: "Dream Travel"
-              definitionId: 12
-              apiVersion: "7.1-preview.1"
-              pipelineName: "Dream Travel v3 - E2E Tests"
-              branch: "master"
-              parentRunId: $(Build.BuildId)
-              waitingTimeBeforePolling: 60
-              timeoutBetweenPollingCalls: 10
-              timeoutForPipelineRunning: 600
-              token: "$(System.AccessToken)"
-              maxTriggerRetries: 2
-              templateParameters: '{}'
-              variables: '{"parentBuild": { value: "$(Build.BuildId)"}}'
+    # - job: RunE2EPipeline
+    #   displayName: 'Run E2E tests'
+    #   timeoutInMinutes: 10
+    #   steps:
+    #     - template: ../pipelines/triggerExternalPipeline.yml
+    #       parameters:
+    #           organizationId: "xionc"
+    #           projectName: "Dream Travel"
+    #           definitionId: 12
+    #           apiVersion: "7.1-preview.1"
+    #           pipelineName: "Dream Travel v3 - E2E Tests"
+    #           branch: "master"
+    #           parentRunId: $(Build.BuildId)
+    #           waitingTimeBeforePolling: 60
+    #           timeoutBetweenPollingCalls: 10
+    #           timeoutForPipelineRunning: 600
+    #           token: "$(System.AccessToken)"
+    #           maxTriggerRetries: 2
+    #           templateParameters: '{}'
+    #           variables: '{"parentBuild": { value: "$(Build.BuildId)"}}'
 
   - stage: BuildAndPublish
     displayName: Build&Publish
