@@ -2,15 +2,11 @@
 using DreamTravel.Trips.GeolocationDataClients.GoogleApi;
 using DreamTravel.Trips.GeolocationDataClients.MichelinApi;
 using SolTechnology.Core.CQRS;
+using SolTechnology.Core.CQRS.SuperChain;
 
 namespace DreamTravel.Trips.Queries.CalculateBestPath.Executors;
 
-public interface IDownloadRoadData
-{
-    Task<Result> Execute(CalculateBestPathContext calculateBestPathContext);
-}
-
-public class DownloadRoadData : IDownloadRoadData
+public class DownloadRoadData : IChainStep<CalculateBestPathContext>
 {
     private readonly IGoogleApiClient _googleApiClient;
     private readonly IMichelinApiClient _michelinApiClient;

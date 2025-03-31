@@ -1,16 +1,13 @@
 ﻿using DreamTravel.Trips.Domain.Cities;
+using SolTechnology.Core.CQRS;
+using SolTechnology.Core.CQRS.SuperChain;
 using Path = DreamTravel.Trips.Domain.Paths.Path;
 
 namespace DreamTravel.Trips.Queries.CalculateBestPath.Executors;
 
-public interface IFormCalculateBestPathResult
+public class FormCalculateBestPathResult : IChainStep<CalculateBestPathContext>
 {
-    CalculateBestPathResult Execute(CalculateBestPathContext context);
-}
-
-public class FormCalculateBestPathResult : IFormCalculateBestPathResult
-{
-    public CalculateBestPathResult Execute(CalculateBestPathContext context)
+    public Task<Result> Execute(CalculateBestPathContext context)
     {
         CalculateBestPathResult calculateBestPathResult = new CalculateBestPathResult
         {
@@ -18,7 +15,9 @@ public class FormCalculateBestPathResult : IFormCalculateBestPathResult
             BestPaths = FormPathsFromMatrices(context.Cities, context, context.OrderOfCities)
         };
 
-        return calculateBestPathResult;
+        context.Output = calculateBestPathResult;
+        
+        return Result.SuccessAsTask();
     }
 
     private List<Path> FormPathsFromMatrices(List<City> listOfCities, CalculateBestPathContext calculateBestPathContext, List<int> orderOfCities = null)

@@ -1,11 +1,12 @@
 ﻿using DreamTravel.Trips.Domain.Cities;
+using SolTechnology.Core.CQRS.SuperChain;
 
 namespace DreamTravel.Trips.Queries.CalculateBestPath;
 
-public sealed class CalculateBestPathContext
+public sealed class CalculateBestPathContext : ChainContext<CalculateBestPathQuery, CalculateBestPathResult>
 {
-    public List<City> Cities { get; }
-    public int NoOfCities { get; }
+    public List<City> Cities { get; set; }
+    public int NoOfCities { get; set; }
     public List<int> OrderOfCities { get; set; }
 
     public double[] FreeDistances { get; set; }
@@ -15,22 +16,4 @@ public sealed class CalculateBestPathContext
     public double[] Costs { get; set; }
     public double[] OptimalCosts { get; set; }
     public double[] VinietaCosts { get; set; }
-
-
-    public CalculateBestPathContext(List<City> cities)
-    {
-        Cities = cities;
-        NoOfCities = cities.Count;
-        int matrixSize = NoOfCities * NoOfCities;
-
-        FreeDistances = new double[matrixSize];
-        TollDistances = new double[matrixSize];
-        OptimalDistances = new double[matrixSize];
-        Goals = new double[matrixSize];
-        Costs = new double[matrixSize];
-        OptimalCosts = new double[matrixSize];
-        VinietaCosts = new double[matrixSize];
-    }
-
- 
 }
