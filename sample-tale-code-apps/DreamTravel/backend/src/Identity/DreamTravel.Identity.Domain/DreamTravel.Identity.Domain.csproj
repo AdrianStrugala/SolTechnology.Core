@@ -1,7 +1,0 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
-  
-  <ItemGroup>
-    <PackageReference Include="Guards" Version="2.1.19292.12" />
-  </ItemGroup>
-
-</Project>

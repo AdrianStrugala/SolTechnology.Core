@@ -1,8 +1,6 @@
-﻿using System.Threading.Tasks;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OpenApi.Extensions;
 using Microsoft.OpenApi.Models;
-using NUnit.Framework;
 using Swashbuckle.AspNetCore.Swagger;
 
 namespace DreamTravel.FunctionalTests;

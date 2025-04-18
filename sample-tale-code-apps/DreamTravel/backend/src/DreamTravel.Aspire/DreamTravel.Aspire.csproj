@@ -11,8 +11,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\DreamTravel.Api\DreamTravel.Api.csproj" />
-    <ProjectReference Include="..\DreamTravel.Worker\DreamTravel.Worker.csproj" />
+    <ProjectReference Include="..\Presentation\DreamTravel.Api\DreamTravel.Api.csproj" />
+    <ProjectReference Include="..\Presentation\DreamTravel.Worker\DreamTravel.Worker.csproj" />
   </ItemGroup>
 
 </Project>
