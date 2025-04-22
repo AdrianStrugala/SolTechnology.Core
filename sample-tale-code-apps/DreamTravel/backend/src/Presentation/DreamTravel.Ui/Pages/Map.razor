@@ -1,0 +1,45 @@
+﻿@page "/map"
+@using DreamTravel.Trips.Domain.StreetGraph
+@using DreamTravel.Ui.Services
+@inject GraphService GraphService
+@inject IJSRuntime JS
+
+<MudText Typo="Typo.h5">Mapa projektu</MudText>
+
+<div id="map" style="height:600px; width:100%; margin-top:1rem; background:#eee"></div>
+
+@code {
+    private bool _mapInitialized;
+    private List<Intersection> _nodes = new();
+    private List<Street>       _streets = new();
+    private Dictionary<string,Intersection> _nodeDict = new();
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            // 1) Inicjalizujemy mapę od razu:
+            await JS.InvokeVoidAsync("mapInterop.initMap", 51.1079, 17.0385, 13);
+            _mapInitialized = true;
+
+            // 2) Pobieramy dane:
+            _nodes   = await GraphService.GetNodesAsync();
+            _streets = await GraphService.GetStreetsAsync();
+            _nodeDict = _nodes.ToDictionary(n => n.Id);
+
+            // 3) Rysujemy znaczniki i linie:
+            foreach (var node in _nodes)
+            {
+                await JS.InvokeVoidAsync("mapInterop.drawIntersection",
+                    node.Lat, node.Lng, node.Id);
+            }
+            foreach (var street in _streets)
+            {
+                var from = _nodeDict[street.FromId];
+                var to   = _nodeDict[street.ToId];
+                await JS.InvokeVoidAsync("mapInterop.drawStreet",
+                    from.Lat, from.Lng, to.Lat, to.Lng, "#FF0000");
+            }
+        }
+    }
+}

@@ -1,6 +1,6 @@
 ﻿namespace DreamTravel.Trips.Domain.StreetGraph;
 
-public class RoadSegment
+public class Street
 {
     public string Id       { get; set; } = default!;  // RelationshipId
     public string FromId   { get; set; } = default!;

@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
@@ -12,6 +12,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Presentation\DreamTravel.Api\DreamTravel.Api.csproj" />
+    <ProjectReference Include="..\Presentation\DreamTravel.Ui\DreamTravel.Ui.csproj" />
     <ProjectReference Include="..\Presentation\DreamTravel.Worker\DreamTravel.Worker.csproj" />
   </ItemGroup>
 

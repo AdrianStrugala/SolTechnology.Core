@@ -42,6 +42,7 @@ public class Program
                             "https://dreamtravels.azurewebsites.net",
                             "https://dreamtravels-demo.azurewebsites.net",
                             "http://localhost:55855",
+                            "https://localhost:7024",
                             "https://avroconvertonline.azurewebsites.net")
                         .AllowAnyHeader()
                         .AllowAnyMethod()
