@@ -8,7 +8,7 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-	  <Content Include="..\..\..\tests\FunctionalTests\appsettings.integration.tests.json" Link="appsettings.integration.tests.json" />
+	  <Content Include="..\..\..\tests\FunctionalTests\appsettings.tests.json" Link="appsettings.tests.json" />
 	</ItemGroup>
 
 	<ItemGroup>
