@@ -20,18 +20,49 @@ public class StreetRepository(IDriverProvider provider) : IStreetRepository, IAs
     {
         await using var session = _driver.AsyncSession();
         var result = await session.RunAsync(@"
-                MATCH (a)-[r:RELATED]->(b)
-                WHERE a.id IS NOT NULL AND b.id IS NOT NULL
-                RETURN id(r) AS id,
-                       a.id AS fromId,
-                       b.id AS toId
-            ");
+        MATCH (a)-[r:RELATED]->(b)
+        WHERE a.id IS NOT NULL AND b.id IS NOT NULL
+        RETURN 
+          id(r)          AS id,
+          a.id           AS fromId,
+          b.id           AS toId,
+          r.name         AS name,
+          toFloat(r.length)   AS length,
+          toInteger(r.lanes)  AS lanes,
+          r.`turn:lanes` AS turnLanes, 
+          r.oneway       AS oneway,
+          r.bridge       AS bridge,
+          r.tunnel       AS tunnel,
+          r.highway      AS highway,
+          r.service      AS service,
+          r.junction     AS junction,
+          r.ref          AS ref,
+          r.access       AS access,
+          r.surface      AS surface,
+          toFloat(r.width)   AS width,
+          r.lit          AS lit
+    ");
         var list = new List<Street>();
         await result.ForEachAsync(rec => list.Add(new Street
         {
             Id = rec["id"].As<string>(),
             FromId = rec["fromId"].As<string>(),
-            ToId = rec["toId"].As<string>()
+            ToId = rec["toId"].As<string>(),
+            Name = rec["name"].As<string?>(),
+            Length = rec["length"].As<double?>(),
+            Lanes = rec["lanes"].As<int?>(),
+            TurnLanes = rec["turnLanes"].As<string?>(),
+            Oneway = rec["oneway"].As<string?>(),
+            Bridge = rec["bridge"].As<string?>(),
+            Tunnel = rec["tunnel"].As<string?>(),
+            Highway = rec["highway"].As<string?>(),
+            Service = rec["service"].As<string?>(),
+            Junction = rec["junction"].As<string?>(),
+            Ref = rec["ref"].As<string?>(),
+            Access = rec["access"].As<string?>(),
+            Surface = rec["surface"].As<string?>(),
+            Width = rec["width"].As<double?>(),
+            Lit = rec["lit"].As<string?>()
         }));
         return list;
     }
