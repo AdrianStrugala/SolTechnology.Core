@@ -3,131 +3,153 @@
 @using DreamTravel.Ui.Services
 @using MudBlazor
 @inject GraphService GraphService
-@inject IJSRuntime JS
+@inject IJSRuntime    JS
 
 <MudGrid GutterSize="1" Class="px-2 mt-4 pt-4">
-    <MudItem xs="12" md="3">
-        <MudPaper Class="pa-4" Elevation="1">
-            <MudText Typo="Typo.h6">Opcje</MudText>
-            <MudDivider Class="my-2" />
+  <!-- OPTIONS PANEL -->
+  <MudItem xs="12" md="3">
+    <MudPaper Class="pa-4" Elevation="1">
+      <MudText Typo="Typo.h6">Options</MudText>
+      <MudDivider Class="my-2" />
 
-            @* Spinner aż do załadowania *@
-            @if (isLoading)
-            {
-                <MudProgressCircular Indeterminate="true"
-                                     Size="Size.Large"
-                                     Class="my-4 mx-auto" />
-            }
-            else
-            {
-                @* Toggle skrzyżowań *@
-                <MudSwitch T="bool"
-                           Value="showMarkers"
-                           ValueChanged="OnMarkersToggled"
-                           Label="Pokaż skrzyżowania"
-                           Color="Color.Primary"
-                           Class="mb-2" />
+      @if (isLoading)
+      {
+        <MudProgressCircular Indeterminate="true" Size="Size.Large" Class="my-4 mx-auto" />
+      }
+      else
+      {
+        <MudSwitch T="bool"
+                   Value="showMarkers"
+                   ValueChanged="OnMarkersToggled"
+                   Label="Show markers"
+                   Color="Color.Primary"
+                   Class="mb-2" />
 
-                @* Toggle ulic *@
-                <MudSwitch T="bool"
-                           Value="showStreets"
-                           ValueChanged="OnStreetsToggled"
-                           Label="Pokaż ulice"
-                           Color="Color.Primary"
-                           Class="mb-4" />
-            }
-        </MudPaper>
-    </MudItem>
+        <MudSwitch T="bool"
+                   Value="showStreets"
+                   ValueChanged="OnStreetsToggled"
+                   Label="Show streets"
+                   Color="Color.Primary"
+                   Class="mb-4" />
 
-    <MudItem xs="12" md="9">
-        <MudText Typo="Typo.h5" Class="pa-2">Mapa projektu</MudText>
-        <div id="map"
-             style="height:calc(100vh - 64px - 48px); width:100%; background:#eee">
-        </div>
-    </MudItem>
+        <MudText Typo="Typo.subtitle2" Class="mt-4 mb-1">Legend:</MudText>
+        <MudStack Spacing="1">
+          <MudText>
+            <span style="display:inline-block;width:16px;height:4px;background:#28a745;margin-right:8px;"></span>
+            Fast (above 10 m/s)
+          </MudText>
+          <MudText>
+            <span style="display:inline-block;width:16px;height:4px;background:#ffc107;margin-right:8px;"></span>
+            Medium (5–10 m/s)
+          </MudText>
+          <MudText>
+            <span style="display:inline-block;width:16px;height:4px;background:#dc3545;margin-right:8px;"></span>
+            Slow (below 5 m/s)
+          </MudText>
+        </MudStack>
+      }
+    </MudPaper>
+  </MudItem>
+
+  <!-- MAP CONTAINER -->
+  <MudItem xs="12" md="9">
+    <MudText Typo="Typo.h5" Class="pa-2">Project Map</MudText>
+    <div id="map"
+         style="height:calc(100vh - 64px - 48px); width:100%; background:#eee">
+    </div>
+  </MudItem>
 </MudGrid>
 
 @code {
-    private bool isLoading = true;
-    private bool showMarkers = false;
-    private bool showStreets = true;
+  private bool isLoading = true;
+  private bool showMarkers = false;
+  private bool showStreets = true;
 
-    private List<Intersection> _nodes = new();
-    private List<Street> _streets = new();
-    private Dictionary<string, Intersection> _dict = new();
+  private List<Intersection> _nodes = new();
+  private List<Street> _streets = new();
+  private Dictionary<string, Intersection> _dict = new();
 
-    protected override async Task OnAfterRenderAsync(bool firstRender)
+  protected override async Task OnAfterRenderAsync(bool firstRender)
+  {
+    if (!firstRender) return;
+    await LoadMapAsync();
+  }
+
+  private async Task LoadMapAsync()
+  {
+    isLoading = true;
+    StateHasChanged();
+
+    // initialize map
+    await JS.InvokeVoidAsync("mapInterop.initMap", 51.1079, 17.0385, 13);
+
+    // load data
+    _nodes = (await GraphService.GetNodesAsync()).ToList();
+    _streets = (await GraphService.GetStreetsAsync()).ToList();
+    _dict = _nodes.ToDictionary(n => n.Id);
+
+    // draw layers
+    if (showMarkers) await DrawMarkersAsync();
+    if (showStreets)  await DrawStreetsAsync();
+
+    isLoading = false;
+    StateHasChanged();
+  }
+
+  private async Task OnMarkersToggled(bool visible)
+  {
+    showMarkers = visible;
+    await JS.InvokeVoidAsync("mapInterop.clearMarkers");
+    if (visible) await DrawMarkersAsync();
+  }
+
+  private async Task OnStreetsToggled(bool visible)
+  {
+    showStreets = visible;
+    await JS.InvokeVoidAsync("mapInterop.clearStreets");
+    if (visible)
     {
-        if (!firstRender) return;
-        await LoadMapAsync();
+      await DrawStreetsAsync();
+      await JS.InvokeVoidAsync("mapInterop.updateColors");
     }
+  }
 
-    private async Task LoadMapAsync()
+  private async Task DrawMarkersAsync()
+  {
+    foreach (var n in _nodes)
+      await JS.InvokeVoidAsync("mapInterop.drawIntersection", n.Lat, n.Lng, n.Id);
+  }
+
+  private async Task DrawStreetsAsync()
+  {
+    foreach (var s in _streets)
     {
-        isLoading = true;
-        StateHasChanged();
+      if (_dict.TryGetValue(s.FromId, out var a) &&
+          _dict.TryGetValue(s.ToId,   out var b))
+      {
+          double? speed = s.TrafficRegularSpeed;
+          double? speedArg = speed.HasValue && !double.IsInfinity(speed.Value) && !double.IsNaN(speed.Value)
+              ? speed.Value
+              : null;
 
-        // (Re)inicjalizacja mapy
-        await JS.InvokeVoidAsync("mapInterop.initMap", 51.1079, 17.0385, 13);
-
-        // Załaduj dane
-        _nodes = await GraphService.GetNodesAsync();
-        _streets = await GraphService.GetStreetsAsync();
-        _dict = _nodes.ToDictionary(n => n.Id);
-
-        // Narysuj tylko to, co aktualnie ma być widoczne
-        if (showMarkers) await DrawMarkersAsync();
-        if (showStreets) await DrawStreetsAsync();
-
-        isLoading = false;
-        StateHasChanged();
+          await JS.InvokeVoidAsync("mapInterop.drawStreet",
+              a.Lat, a.Lng,
+              b.Lat, b.Lng,
+              new {
+                  id        = s.Id,
+                  name      = s.Name,
+                  length    = s.Length,
+                  lanes     = s.Lanes,
+                  oneway    = s.Oneway,
+                  bridge    = s.Bridge,
+                  tunnel    = s.Tunnel,
+                  highway   = s.Highway,
+                  service   = s.Service,
+                  junction  = s.Junction,
+                  @ref      = s.Ref
+              },
+              speedArg);
+      }
     }
-
-    private async Task OnMarkersToggled(bool visible)
-    {
-        showMarkers = visible;
-        await JS.InvokeVoidAsync("mapInterop.clearMarkers");
-        if (visible) await DrawMarkersAsync();
-    }
-
-    private async Task OnStreetsToggled(bool visible)
-    {
-        showStreets = visible;
-        await JS.InvokeVoidAsync("mapInterop.clearStreets");
-        if (visible) await DrawStreetsAsync();
-    }
-
-    private async Task DrawMarkersAsync()
-    {
-        foreach (var n in _nodes)
-            await JS.InvokeVoidAsync("mapInterop.drawIntersection", n.Lat, n.Lng, n.Id);
-    }
-
-    private async Task DrawStreetsAsync()
-    {
-        foreach (var s in _streets)
-        {
-            if (_dict.TryGetValue(s.FromId, out var a) &&
-                _dict.TryGetValue(s.ToId,   out var b))
-            {
-                await JS.InvokeVoidAsync("mapInterop.drawStreet",
-                    a.Lat, a.Lng,
-                    b.Lat, b.Lng,
-                    "#007bff",
-                    new {
-                        id        = s.Id,
-                        name      = s.Name,
-                        length    = s.Length,
-                        lanes     = s.Lanes,
-                        oneway    = s.Oneway,
-                        bridge    = s.Bridge,
-                        tunnel    = s.Tunnel,
-                        highway   = s.Highway,
-                        service   = s.Service,
-                        junction  = s.Junction,
-                        @ref      = s.Ref,
-                    });
-            }
-        }
-    }
+  }
 }

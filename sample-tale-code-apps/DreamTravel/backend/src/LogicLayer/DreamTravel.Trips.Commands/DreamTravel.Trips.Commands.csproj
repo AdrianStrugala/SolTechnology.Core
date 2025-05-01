@@ -7,6 +7,7 @@
 
 	<ItemGroup>
 		<ProjectReference Include="..\..\..\..\..\..\src\SolTechnology.Core.CQRS\SolTechnology.Core.CQRS.csproj" />
+		<ProjectReference Include="..\..\DataLayer\DreamTravel.GraphDatabase\DreamTravel.GraphDatabase.csproj" />
 		<ProjectReference Include="..\..\DataLayer\DreamTravel.Trips.GeolocationDataClients\DreamTravel.Trips.GeolocationDataClients.csproj" />
 		<ProjectReference Include="..\..\DataLayer\DreamTravel.Trips.Sql\DreamTravel.Trips.Sql.csproj" />
 		<ProjectReference Include="..\..\DreamTravel.Trips.Domain\DreamTravel.Trips.Domain.csproj" />

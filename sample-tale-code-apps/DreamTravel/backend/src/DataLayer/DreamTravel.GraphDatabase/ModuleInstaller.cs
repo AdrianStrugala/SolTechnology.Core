@@ -7,9 +7,9 @@ public static class ModuleInstaller
 {
     public static IServiceCollection InstallGraphDatabase(this IServiceCollection services)
     {
-        services.AddSingleton<IDriverProvider, Neo4jDriverProvider>();
-        services.AddSingleton<IStreetRepository, StreetRepository>();
-        services.AddSingleton<IIntersectionRepository, IntersectionRepository>();
+        services.AddScoped<IDriverProvider, Neo4jDriverProvider>();
+        services.AddScoped<IStreetRepository, StreetRepository>();
+        services.AddScoped<IIntersectionRepository, IntersectionRepository>();
 
         return services;
     }

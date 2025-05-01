@@ -26,6 +26,11 @@ namespace DreamTravel.Trips.GeolocationDataClients.GoogleApi
             return _innerClient.GetDurationMatrixByFreeRoad(listOfCities);
         }
 
+        public Task<TrafficMatrixResponse> GetSegmentDurationMatrixByTraffic(TrafficMatrixRequest request)
+        {
+            return _innerClient.GetSegmentDurationMatrixByTraffic(request);
+        }
+
         public Task<City> GetLocationOfCity(string cityName)
         {
             return _scopedCache.GetOrAdd(cityName, key => _innerClient.GetLocationOfCity(key));

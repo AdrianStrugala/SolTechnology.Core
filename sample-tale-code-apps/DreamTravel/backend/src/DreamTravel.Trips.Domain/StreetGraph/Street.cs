@@ -20,4 +20,7 @@
     public string? Lit { get; init; } // r.lit
 
     public string? TurnLanes { get; init; }
+    
+    public double? TrafficRegularTime { get; set; }
+    public double? TrafficRegularSpeed { get; set; }
 }

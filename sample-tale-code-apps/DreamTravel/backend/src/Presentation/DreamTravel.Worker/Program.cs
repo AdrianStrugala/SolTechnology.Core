@@ -1,11 +1,14 @@
+using DreamTravel.GraphDatabase;
 using DreamTravel.Infrastructure;
 using DreamTravel.Trips.Commands;
 using DreamTravel.Trips.GeolocationDataClients;
 using DreamTravel.Trips.Sql;
+using DreamTravel.Worker.BackgroundJobs;
 using EntityGraphQL.AspNet;
 using Hangfire;
 using SolTechnology.Core.Cache;
 using SolTechnology.Core.Sql;
+using System.Globalization;
 
 namespace DreamTravel.Worker;
 
@@ -14,6 +17,10 @@ public class Program
     public static void Main(string[] args)
     {
         var builder = WebApplication.CreateBuilder(args);
+
+        CultureInfo.DefaultThreadCurrentCulture = CultureInfo.InvariantCulture;
+        CultureInfo.DefaultThreadCurrentUICulture = CultureInfo.InvariantCulture;
+
         builder.AddServiceDefaults();
         
         builder.Services.AddEndpointsApiExplorer();
@@ -21,9 +28,15 @@ public class Program
             c.AddConsole());
 
         
+        //SQL
         var sqlConfiguration = builder.Configuration.GetSection("Sql").Get<SqlConfiguration>()!;
-        
         builder.Services.InstallTripsSql(sqlConfiguration);
+        
+        //Graph
+        builder.Services.Configure<Neo4jSettings>(
+            builder.Configuration.GetSection("Neo4j"));
+        builder.Services.InstallGraphDatabase();
+        
         builder.Services.InstallGeolocationDataClients();
         builder.Services.InstallInfrastructure();
         builder.Services.InstallDreamTripsCommands();
@@ -49,6 +62,9 @@ public class Program
         var recurringJobManager = app.Services.GetRequiredService<IRecurringJobManager>();
         recurringJobManager.AddOrUpdate("LogFromJob", () => Console.WriteLine("Hello from Job"), Cron.Daily);
 
+
+        FetchTrafficJob.Register();
+
         app.MapHangfireDashboard("/hangfire/ui");
         app.MapGraphQL<DreamTripsDbContext>(); // default url: /graphql
         app.MapGraphQLVoyager("voyager/ui");
@@ -56,4 +72,6 @@ public class Program
 
         app.Run();
     }
+
+
 }

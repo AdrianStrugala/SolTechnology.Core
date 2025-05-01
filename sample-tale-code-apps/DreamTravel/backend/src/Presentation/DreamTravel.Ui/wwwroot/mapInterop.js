@@ -1,6 +1,5 @@
 ﻿window.mapInterop = {
     initMap: (lat, lng, zoom) => {
-        // inicjalizacja mapy i warstw
         window._map = new google.maps.Map(
             document.getElementById('map'),
             { center: { lat, lng }, zoom }
@@ -20,8 +19,15 @@
         window._markers.push(m);
     },
 
-    drawStreet: (fromLat, fromLng, toLat, toLng, color, data) => {
-        // polyline dla ulicy
+    drawStreet: (fromLat, fromLng, toLat, toLng, data, trafficValue) => {
+        // compute strokeColor based on speed (m/s)
+        let color = '#007bff'; // default
+        if (trafficValue != null && !isNaN(trafficValue)) {
+            if (trafficValue >= 10) color = '#28a745'; // ≥10 m/s → green
+            else if (trafficValue >= 5) color = '#ffc107'; // 5–10 m/s → yellow
+            else color = '#dc3545'; // <5 m/s → red
+        }
+
         const line = new google.maps.Polyline({
             map: window._map,
             path: [
@@ -33,11 +39,12 @@
             strokeWeight: 2
         });
 
-        // zachowaj dane w linii
-        line._streetData = data;
+        // store metadata
+        line._streetData = data;          // your existing data object
+        line._trafficValue = trafficValue; // numeric traffic metric
 
-        // hover → pokaż InfoWindow
-        line.addListener('mouseover', (e) => {
+        // hover InfoWindow 
+        line.addListener('mouseover', e => {
             const d = line._streetData;
             const content = `
         <div style="min-width:200px; font-size:14px;">
@@ -50,16 +57,13 @@
           <b>Tunnel:</b> ${d.tunnel ?? '—'}<br/>
           <b>Highway:</b> ${d.highway || '—'}<br/>
           <b>Ref:</b> ${d.ref || '—'}<br/>
+          <b>Speed:</b> ${line._trafficValue != null ? (line._trafficValue * 3.6).toFixed(1) + ' km/h' : 'n/a'}
         </div>`;
             window._infoWindow.setContent(content);
             window._infoWindow.setPosition(e.latLng);
             window._infoWindow.open(window._map);
         });
-
-        // mouseout → schowaj okno
-        line.addListener('mouseout', () => {
-            window._infoWindow.close();
-        });
+        line.addListener('mouseout', () => window._infoWindow.close());
 
         window._polylines.push(line);
     },
@@ -71,8 +75,7 @@
     },
 
     clearStreets: () => {
-        // usuń wszystkie linie
         window._polylines.forEach(l => l.setMap(null));
         window._polylines = [];
-    }
+    },
 };

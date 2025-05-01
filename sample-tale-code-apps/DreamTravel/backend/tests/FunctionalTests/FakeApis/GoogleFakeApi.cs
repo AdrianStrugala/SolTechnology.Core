@@ -14,6 +14,11 @@ namespace DreamTravel.FunctionalTests.FakeApis
         protected override string BaseUrl => "google";
 
 
+        public Task<TrafficMatrixResponse> GetSegmentDurationMatrixByTraffic(TrafficMatrixRequest request)
+        {
+            throw new NotImplementedException();
+        }
+
         public Task<City> GetLocationOfCity(string cityName)
         {
             var request = Request
