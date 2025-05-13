@@ -20,12 +20,14 @@
     },
 
     drawStreet: (fromLat, fromLng, toLat, toLng, data, trafficValue) => {
-        // compute strokeColor based on speed (m/s)
-        let color = '#007bff'; // default
+        // convert m/s to km/h
+        let color = '#007bff'; // BLUE = no data
         if (trafficValue != null && !isNaN(trafficValue)) {
-            if (trafficValue >= 10) color = '#28a745'; // ≥10 m/s → green
-            else if (trafficValue >= 5) color = '#ffc107'; // 5–10 m/s → yellow
-            else color = '#dc3545'; // <5 m/s → red
+            const kmh = trafficValue * 3.6;
+            if (kmh > 50) color = '#28a745'; // GREEN
+            else if (kmh >= 30) color = '#ffc107'; // YELLOW
+            else if (kmh >= 10) color = '#dc3545'; // RED
+            else color = '#000000'; // BLACK
         }
 
         const line = new google.maps.Polyline({

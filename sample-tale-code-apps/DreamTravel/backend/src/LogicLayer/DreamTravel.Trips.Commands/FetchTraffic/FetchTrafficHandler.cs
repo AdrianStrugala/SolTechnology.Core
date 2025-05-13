@@ -70,13 +70,15 @@ namespace DreamTravel.Trips.Commands.FetchTraffic
 
             // 2) load all streets
             var streets = await streetRepo.GetAllAsync();
+            logger.LogInformation("Streets total: " + streets.Count);
 
             // 3) build segment list
             var segments = new List<TrafficSegment>(streets.Count());
             foreach (var s in streets)
             {
-                if (s.TrafficRegularTime.HasValue && s.TrafficRegularTime != 0)
+                if (s.TrafficRegularSpeed.HasValue && s.TrafficRegularSpeed != 0)
                 {
+                    logger.LogInformation("Skipped " + s.Name);
                     continue;
                 }
                 
@@ -94,9 +96,11 @@ namespace DreamTravel.Trips.Commands.FetchTraffic
                 }
                 else
                 {
-                    logger.LogInformation("Skipped" + s.Name);
+                    logger.LogInformation("Skipped " + s.Name);
                 }
             }
+
+            logger.LogInformation("Streets to update: " + segments.Count);
 
             return segments;
         }
