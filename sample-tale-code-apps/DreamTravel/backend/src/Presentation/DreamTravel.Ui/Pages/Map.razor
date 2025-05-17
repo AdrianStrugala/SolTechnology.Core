@@ -9,7 +9,7 @@
   <!-- OPTIONS PANEL -->
   <MudItem xs="12" md="3">
     <MudPaper Class="pa-4" Elevation="1">
-      <MudText Typo="Typo.h6">Options</MudText>
+      <MudText Typo="Typo.h6">Opcje</MudText>
       <MudDivider Class="my-2" />
 
       @if (isLoading)
@@ -21,22 +21,57 @@
         <MudSwitch T="bool"
                    Value="showMarkers"
                    ValueChanged="OnMarkersToggled"
-                   Label="Show markers"
+                   Label="Pokaż markery"
                    Color="Color.Primary"
                    Class="mb-2" />
 
         <MudSwitch T="bool"
                    Value="showStreets"
                    ValueChanged="OnStreetsToggled"
-                   Label="Show streets"
+                   Label="Pokaż ulice"
                    Color="Color.Primary"
-                   Class="mb-4" />
+                   Class="mb-2" />
+                   
+        <MudDivider Class="my-2" />
+        
+        <MudText Typo="Typo.subtitle2" Class="mt-2 mb-1">Dodawanie nowych ulic:</MudText>
+        
+        <MudSwitch T="bool"
+                   Value="addStreetMode"
+                   ValueChanged="OnAddStreetModeToggled"
+                   Label="Tryb dodawania"
+                   Color="Color.Secondary"
+                   Class="mb-2" />
+                   
+        @if (addStreetMode)
+        {
+            <MudText Typo="Typo.caption" Class="mt-1 mb-3" Color="Color.Secondary">
+                Kliknij dwa różne skrzyżowania, aby utworzyć nową ulicę
+            </MudText>
+            
+            <MudButton 
+                Variant="Variant.Outlined" 
+                Color="Color.Error" 
+                Size="Size.Small"
+                OnClick="ClearNewStreets"
+                Class="mb-3"
+                FullWidth="true">
+                Wyczyść nowe ulice
+            </MudButton>
+            
+            <MudText>
+                <span style="display:inline-block;width:16px;height:4px;background:#9c27b0;margin-right:8px;"></span>
+                Nowe ulice
+            </MudText>
+        }
 
-        <MudText Typo="Typo.subtitle2" Class="mt-4 mb-1">Legend:</MudText>
+        <MudDivider Class="my-3" />
+        
+        <MudText Typo="Typo.subtitle2" Class="mt-2 mb-1">Legenda:</MudText>
         <MudStack Spacing="1">
             <MudText>
                 <span style="display:inline-block;width:16px;height:4px;background:#007bff;margin-right:8px;"></span>
-                No data
+                Brak danych
             </MudText>
             <MudText>
                 <span style="display:inline-block;width:16px;height:4px;background:#28a745;margin-right:8px;"></span>
@@ -61,7 +96,7 @@
 
   <!-- MAP CONTAINER -->
   <MudItem xs="12" md="9">
-    <MudText Typo="Typo.h5" Class="pa-2">Project Map</MudText>
+    <MudText Typo="Typo.h5" Class="pa-2">Mapa projektu</MudText>
     <div id="map"
          style="height:calc(100vh - 64px - 48px); width:100%; background:#eee">
     </div>
@@ -72,6 +107,7 @@
   private bool isLoading = true;
   private bool showMarkers = false;
   private bool showStreets = true;
+  private bool addStreetMode = false;
 
   private List<Intersection> _nodes = new();
   private List<Street> _streets = new();
@@ -118,8 +154,22 @@
     if (visible)
     {
       await DrawStreetsAsync();
-      await JS.InvokeVoidAsync("mapInterop.updateColors");
+      if (JS.InvokeAsync<bool>("typeof", "mapInterop.updateColors").IsFaulted == false)
+      {
+        await JS.InvokeVoidAsync("mapInterop.updateColors");  
+      }
     }
+  }
+  
+  private async Task OnAddStreetModeToggled(bool enabled)
+  {
+    addStreetMode = enabled;
+    await JS.InvokeVoidAsync("mapInterop.setAddStreetMode", enabled);
+  }
+  
+  private async Task ClearNewStreets()
+  {
+    await JS.InvokeVoidAsync("mapInterop.clearNewStreets");
   }
 
   private async Task DrawMarkersAsync()
