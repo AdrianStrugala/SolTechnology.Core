@@ -1,0 +1,73 @@
+﻿  private async Task RecalculateTraffic()
+  {
+    try
+    {
+      isRecalculating = true;
+      StateHasChanged();
+      
+      // Get new streets created in the UI but not yet saved
+      var newStreets = await JS.InvokeAsync<List<Street>>("mapInterop.getNewStreets");
+      
+      // Combine existing streets with new ones
+      var allStreets = _streets.ToList();
+      if (newStreets != null && newStreets.Any())
+      {
+        foreach (var newStreet in newStreets)
+        {
+          // Set default values for new streets
+          newStreet.TrafficRegularSpeed = null; // Mark as new
+          // Generate a temporary ID if needed
+          if (string.IsNullOrEmpty(newStreet.Id))
+          {
+            newStreet.Id = $"new_{Guid.NewGuid():N}";
+          }
+          allStreets.Add(newStreet);
+        }
+      }
+      
+      // Call the traffic recalculation with all streets and intersections
+      var result = await GraphService.RecalculateTrafficAsync(allStreets, _nodes);
+      
+      if (result.Success)
+      {
+        Snackbar.Add(result.Message, Severity.Success);
+        
+        // Update local street data with recalculated traffic values
+        if (result.UpdatedSegments != null)
+        {
+          foreach (var segment in result.UpdatedSegments)
+          {
+            var street = allStreets.FirstOrDefault(s => s.Id == segment.StreetId);
+            if (street != null)
+            {
+              street.TrafficRegularSpeed = segment.TrafficRegularSpeed;
+            }
+          }
+        }
+        
+        // Update _streets collection with the updated data
+        _streets = allStreets;
+        
+        // Redraw streets with new traffic data
+        if (showStreets)
+        {
+          await JS.InvokeVoidAsync("mapInterop.clearStreets");
+          await DrawStreetsAsync();
+          await JS.InvokeVoidAsync("mapInterop.updateTrafficColors");
+        }
+      }
+      else
+      {
+        Snackbar.Add(result.Message, Severity.Error);
+      }
+    }
+    catch (Exception ex)
+    {
+      Snackbar.Add($"Error: {ex.Message}", Severity.Error);
+    }
+    finally
+    {
+      isRecalculating = false;
+      StateHasChanged();
+    }
+  }
