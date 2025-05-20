@@ -4,17 +4,10 @@ using System.Net.Http.Headers;
 
 namespace SolTechnology.Core.ApiClient;
 
-public class RequestBuilder
+public class RequestBuilder(HttpClient httpClient, string path)
 {
-    private readonly HttpClient _httpClient;
-    private readonly HttpRequestMessage _request;
+    private readonly HttpRequestMessage _request = new(HttpMethod.Get, path);
     private DataType _responseType;
-
-    public RequestBuilder(HttpClient httpClient, string path)
-    {
-        _httpClient = httpClient;
-        _request = new HttpRequestMessage(HttpMethod.Get, path);
-    }
 
 
     public RequestBuilder WithHeader(string name, string value)
@@ -73,31 +66,31 @@ public class RequestBuilder
     public Task<HttpResponseMessage> GetAsync()
     {
         _request.Method = HttpMethod.Get;
-        return _httpClient.SendAsync(_request);
+        return httpClient.SendAsync(_request);
     }
 
     public Task<HttpResponseMessage> PostAsync()
     {
         _request.Method = HttpMethod.Post;
-        return _httpClient.SendAsync(_request);
+        return httpClient.SendAsync(_request);
     }
 
     public Task<HttpResponseMessage> PutAsync()
     {
         _request.Method = HttpMethod.Put;
-        return _httpClient.SendAsync(_request);
+        return httpClient.SendAsync(_request);
     }
 
     public Task<HttpResponseMessage> PatchAsync()
     {
         _request.Method = HttpMethod.Patch;
-        return _httpClient.SendAsync(_request);
+        return httpClient.SendAsync(_request);
     }
 
     public Task<HttpResponseMessage> DeleteAsync()
     {
         _request.Method = HttpMethod.Delete;
-        return _httpClient.SendAsync(_request);
+        return httpClient.SendAsync(_request);
     }
 
     public Task<TResponse> GetAsync<TResponse>()
@@ -132,7 +125,7 @@ public class RequestBuilder
 
     private async Task<TResponse> Send<TResponse>()
     {
-        var response = await _httpClient.SendAsync(_request);
+        var response = await httpClient.SendAsync(_request);
 
         if (response.IsSuccessStatusCode == false)
         {

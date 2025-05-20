@@ -10,33 +10,20 @@ using System.Threading.Tasks;
 
 namespace DreamTravel.Trips.Commands.RecalculateTraffic;
 
-public class RecalculateTrafficCommandHandler : ICommandHandler<RecalculateTrafficCommand, RecalculateTrafficResult>
+public class RecalculateTrafficCommandHandler(ILogger<RecalculateTrafficCommandHandler> logger)
+    : ICommandHandler<RecalculateTrafficCommand, Result<List<TrafficSegment>>>
 {
-    private readonly ILogger<RecalculateTrafficCommandHandler> _logger;
-
-    public RecalculateTrafficCommandHandler(ILogger<RecalculateTrafficCommandHandler> logger)
+    public async Task<Result<List<TrafficSegment>>> Handle(RecalculateTrafficCommand request, CancellationToken cancellationToken)
     {
-        _logger = logger;
-    }
-
-    public async Task<RecalculateTrafficResult> Handle(RecalculateTrafficCommand request, CancellationToken cancellationToken)
-    {
-        try
-        {
-            _logger.LogInformation("Starting traffic recalculation with {StreetCount} streets and {IntersectionCount} intersections", 
+            logger.LogInformation("Starting traffic recalculation with {StreetCount} streets and {IntersectionCount} intersections", 
                 request.Streets.Count, request.Intersections.Count);
-            
-            if (!request.Streets.Any() || !request.Intersections.Any())
-            {
-                return new RecalculateTrafficResult(false, "No streets or intersections provided");
-            }
-
+       
             // Identify new streets (those with null or 0 TrafficRegularSpeed)
             var newStreets = request.Streets
                 .Where(s => s.TrafficRegularSpeed == null || s.TrafficRegularSpeed == 0)
                 .ToList();
             
-            _logger.LogInformation("Found {NewStreetCount} new streets to process", newStreets.Count);
+            logger.LogInformation("Found {NewStreetCount} new streets to process", newStreets.Count);
 
             // Build graph with all streets (existing and new)
             var graph = BuildGraph(request.Streets, request.Intersections);
@@ -62,19 +49,10 @@ public class RecalculateTrafficCommandHandler : ICommandHandler<RecalculateTraff
                 })
                 .ToList());
             
-            _logger.LogInformation("Traffic recalculation completed. Average speed before: {BeforeSpeed}, after: {AfterSpeed}", 
+            logger.LogInformation("Traffic recalculation completed. Average speed before: {BeforeSpeed}, after: {AfterSpeed}", 
                 beforeMetrics.AverageSpeed, afterMetrics.AverageSpeed);
             
-            return new RecalculateTrafficResult(
-                true, 
-                $"Successfully recalculated traffic. Network improvement: {afterMetrics.AverageSpeed - beforeMetrics.AverageSpeed:F2} km/h average increase", 
-                updatedSegments);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error during traffic recalculation");
-            return new RecalculateTrafficResult(false, $"Error during traffic recalculation: {ex.Message}");
-        }
+            return updatedSegments;
     }
 
     private Dictionary<string, List<(string DestinationId, Street Street)>> BuildGraph(List<Street> streets, List<Intersection> intersections)
@@ -99,10 +77,10 @@ public class RecalculateTrafficCommandHandler : ICommandHandler<RecalculateTraff
             // Add bidirectional edges for two-way streets and single edge for one-way streets
             graph[street.FromId].Add((street.ToId, street));
             
-            if (!street.Oneway)
-            {
+            // if (!street.Oneway)
+            // {
                 graph[street.ToId].Add((street.FromId, street));
-            }
+            // }
         }
         
         return graph;
@@ -118,8 +96,8 @@ public class RecalculateTrafficCommandHandler : ICommandHandler<RecalculateTraff
         {
             if (street.TrafficRegularSpeed.HasValue && street.TrafficRegularSpeed > 0)
             {
-                totalLength += street.Length;
-                totalTravelTime += (street.Length / street.TrafficRegularSpeed) * 60; // in minutes
+                totalLength += street.Length ?? 0;
+                totalTravelTime += ((street.Length ?? 0) / street.TrafficRegularSpeed.Value) * 60; // in minutes
                 countedStreets++;
             }
         }
@@ -143,7 +121,7 @@ public class RecalculateTrafficCommandHandler : ICommandHandler<RecalculateTraff
         {
             var baseSpeed = CalculateBaseSpeed(street);
             var trafficTime = street.Length / baseSpeed * 60; // minutes
-            result.Add(new TrafficSegment(street.Id, trafficTime, baseSpeed));
+            result.Add(new TrafficSegment(street.Id, trafficTime!.Value, baseSpeed));
         }
         
         // Create a residual graph (for max flow calculation)
@@ -219,7 +197,7 @@ public class RecalculateTrafficCommandHandler : ICommandHandler<RecalculateTraff
         // Apply the calculated factors to all streets not yet in the result list
         foreach (var street in allStreets.Where(s => s.TrafficRegularSpeed.HasValue && s.TrafficRegularSpeed > 0))
         {
-            if (result.Any(r => r.StreetId == street.Id))
+            if (result.Any(r => r.SegmentId == street.Id))
                 continue;
                 
             var factor = trafficFlowFactors.GetValueOrDefault(street.Id, 1.0);
@@ -231,7 +209,7 @@ public class RecalculateTrafficCommandHandler : ICommandHandler<RecalculateTraff
             // Calculate new traffic time
             var newTime = street.Length / newSpeed * 60; // minutes
             
-            result.Add(new TrafficSegment(street.Id, newTime, newSpeed));
+            result.Add(new TrafficSegment(street.Id, newTime.GetValueOrDefault(), newSpeed));
         }
         
         // Return the updated traffic segments
@@ -256,15 +234,15 @@ public class RecalculateTrafficCommandHandler : ICommandHandler<RecalculateTraff
                 continue;
                 
             // Capacity is proportional to the number of lanes and inversely proportional to length
-            var capacity = street.Lanes * 100.0 / Math.Max(0.1, street.Length);
+            var capacity = (street.Lanes * 100.0 / Math.Max(0.1, street.Length.GetValueOrDefault())).GetValueOrDefault();
             
             // Add bidirectional edges for two-way streets, single edge for one-way
             residualGraph[street.FromId][street.ToId] = capacity;
             
-            if (!street.Oneway)
-            {
-                residualGraph[street.ToId][street.FromId] = capacity;
-            }
+            // if (!street.Oneway)
+            // {
+            residualGraph[street.ToId][street.FromId] = capacity;
+            // }
         }
         
         return residualGraph;

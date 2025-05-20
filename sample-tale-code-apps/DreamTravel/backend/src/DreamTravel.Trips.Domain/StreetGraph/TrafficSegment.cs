@@ -10,4 +10,5 @@ public record TrafficSegment(
 {
     public double DurationInSeconds { get; set; }
     public double DistanceInMeters { get; set; }
+    public double? TrafficRegularSpeed { get; set; }
 }

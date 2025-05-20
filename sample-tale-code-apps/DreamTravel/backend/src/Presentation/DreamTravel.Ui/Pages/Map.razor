@@ -3,7 +3,9 @@
 @using DreamTravel.Ui.Services
 @using MudBlazor
 @inject GraphService GraphService
-@inject IJSRuntime    JS
+@inject IJSRuntime JS
+@inject ISnackbar Snackbar
+
 
 <MudGrid GutterSize="1" Class="px-2 mt-4 pt-4">
   <!-- OPTIONS PANEL -->
@@ -108,6 +110,7 @@
   private bool showMarkers = false;
   private bool showStreets = true;
   private bool addStreetMode = false;
+  private bool isRecalculating = false;
 
   private List<Intersection> _nodes = new();
   private List<Street> _streets = new();
@@ -241,16 +244,17 @@
       // Call the traffic recalculation with all streets and intersections
       var result = await GraphService.RecalculateTrafficAsync(allStreets, _nodes);
       
-      if (result.Success)
+      if (result.IsSuccess)
       {
-        Snackbar.Add(result.Message, Severity.Success);
+        Snackbar.Add("Recalculated traffic", Severity.Success);
         
         // Update local street data with recalculated traffic values
-        if (result.UpdatedSegments != null)
+        var updatedSegments = result.Data ?? new List<TrafficSegment>();
+        if (updatedSegments.Any())
         {
-          foreach (var segment in result.UpdatedSegments)
+          foreach (var segment in updatedSegments)
           {
-            var street = allStreets.FirstOrDefault(s => s.Id == segment.StreetId);
+            var street = allStreets.FirstOrDefault(s => s.Id == segment.SegmentId);
             if (street != null)
             {
               street.TrafficRegularSpeed = segment.TrafficRegularSpeed;

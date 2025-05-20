@@ -1,6 +1,6 @@
 ﻿public record Street
 {
-    public string Id { get; init; }          // = id(r)
+    public string Id { get; set; }          // = id(r)
     public string FromId { get; init; }      // = a.id
     public string ToId { get; init; }        // = b.id
 

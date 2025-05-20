@@ -18,7 +18,10 @@
 	</ItemGroup>
 	
 	<ItemGroup>
-	  <PackageReference Include="Cronos" Version="0.8.4" />
+		<PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="8.0.1" />
+		<PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="8.0.2" />
+		<PackageReference Include="Microsoft.Extensions.Options" Version="8.0.2" />
+		<PackageReference Include="Cronos" Version="0.8.4" />
 	</ItemGroup>
 
 </Project>
