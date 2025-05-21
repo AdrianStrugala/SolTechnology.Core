@@ -7,5 +7,6 @@ namespace DreamTravel.Trips.Commands.RecalculateTraffic;
 
 public record RecalculateTrafficCommand(
     List<Street> Streets,
+    List<Street> NewStreets,
     List<Intersection> Intersections) 
-    : IRequest<Result<List<TrafficSegment>>>;
+    : IRequest<Result<List<Street>>>;

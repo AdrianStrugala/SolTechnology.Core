@@ -275,7 +275,7 @@
       }
       else
       {
-        Snackbar.Add(result.Message, Severity.Error);
+        Snackbar.Add(result.Error?.Message ?? "Error during calling RecalculateTraffic", Severity.Error);
       }
     }
     catch (Exception ex)
@@ -288,5 +288,4 @@
       StateHasChanged();
     }
   }
-
 }
