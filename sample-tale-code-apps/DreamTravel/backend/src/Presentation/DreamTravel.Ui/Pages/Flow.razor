@@ -1,0 +1,52 @@
+﻿@page "/Flow"
+@using MudBlazor
+
+
+<MudCard Style="max-width: 350px; margin: 2rem auto; height: 500px;" Elevation="10">
+    <!-- Header with logo, subtitle, and close button -->
+    <MudCardHeader Class="px-4 pt-4 pb-2">
+        <CardHeaderContent>
+            <!-- Logo and brand name -->
+            <MudStack>
+                <!-- Horizontal stack for logo + text -->
+                <MudStack Row="true" AlignItems="AlignItems.Center">
+                    <MudIcon Icon="@Icons.Material.Filled.Payment" Size="Size.Large" />
+                </MudStack>
+                <!-- Subtitle tagline -->
+                <MudText Typo="Typo.caption" Class="mud-text-secondary mt-1">
+                    Stealing your money
+                </MudText>
+            </MudStack>
+        </CardHeaderContent>
+        <CardHeaderActions>
+            <MudIconButton Icon="@Icons.Material.Filled.Close" />
+        </CardHeaderActions>
+    </MudCardHeader>
+
+    <MudDivider Style="max-height: 10px"/>
+
+    <!-- Main content: title, description, input fields, help link -->
+    <MudCardContent Class="pa-4 pt-1">
+        <MudText Typo="Typo.h5" Class="mb-2">Log in</MudText>
+     
+        <MudTextField Label="Identity" @bind-Value="_identity" Variant="Variant.Outlined" />
+        <MudTextField Label="Password" @bind-Value="_password" Variant="Variant.Outlined" 
+                      InputType="InputType.Password" Class="mt-3" />
+        
+        <MudText Typo="Typo.caption" Class="mud-text-secondary mt-2" Style="cursor:pointer;">
+            Are you having trouble logging in? Fuck off
+        </MudText>
+        
+    </MudCardContent>
+
+    <!-- Footer with Continue button -->
+    <MudCardActions Class="d-flex justify-center pb-4">
+        <MudButton Variant="Variant.Filled" Color="Color.Primary">Continue</MudButton>
+    </MudCardActions>
+</MudCard>
+
+
+@code {
+    private string _identity = string.Empty;
+    private string _password = string.Empty;
+}
