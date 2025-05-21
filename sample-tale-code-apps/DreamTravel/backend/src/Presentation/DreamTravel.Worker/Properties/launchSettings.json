@@ -13,7 +13,7 @@
       "commandName": "Project",
       "dotnetRunMessages": true,
       "launchBrowser": true,
-      "launchUrl": "/hangfire/ui",
+      "launchUrl": "hangfire/ui",
       "applicationUrl": "http://localhost:2025",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"

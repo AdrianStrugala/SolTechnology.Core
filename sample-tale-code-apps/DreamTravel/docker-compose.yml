@@ -8,3 +8,21 @@ services:
           dockerfile: backend/src/Infrastructure/DreamTravelDatabase/Dockerfile
         ports:  
           - "1404:1433"
+          
+    neo4j:
+        image: neo4j:5.10-community
+        container_name: neo4j-wroclaw
+        ports:
+            - "7474:7474"   # HTTP
+            - "7687:7687"   # Bolt
+        volumes:
+            - ./import:/var/lib/neo4j/import
+            - neo4j_data:/data
+        environment:
+            NEO4J_AUTH: "neo4j/neo4jpass"
+            NEO4J_dbms_directories_import: /var/lib/neo4j/import
+            NEO4J_dbms_security_procedures_unrestricted: apoc.*
+            NEO4JLABS_PLUGINS: '["apoc"]'
+            NEO4J_apoc_import_file_enabled: "true"
+volumes:
+    neo4j_data:

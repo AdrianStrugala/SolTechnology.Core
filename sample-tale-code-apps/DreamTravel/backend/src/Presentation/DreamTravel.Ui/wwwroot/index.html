@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>RoadPlanner</title>
+    <base href="/" />
+    <link href="css/app.css" rel="stylesheet" />
+    <link href="_content/MudBlazor/MudBlazor.min.css" rel="stylesheet" />
+
+    <script src="https://maps.googleapis.com/maps/api/js?key="
+            async defer>
+    </script>
+    <script src="mapInterop.js"></script>
+
+    <script>
+        window.initMap = function () {
+            // inicjalizacja mapy w elemencie #map
+            window._baseMap = new google.maps.Map(
+                document.getElementById('map'),
+                {
+                    center: { lat: 51.1079, lng: 17.0385 },
+                    zoom: 13
+                }
+            );
+        };
+    </script>
+</head>
+<body>
+    <div id="app">Loading...</div>
+
+    <div id="blazor-error-ui">
+        An unhandled error has occurred.
+        <a href="" class="reload">Reload</a>
+        <a class="dismiss">🗙</a>
+    </div>
+    <script src="_framework/blazor.webassembly.js"></script>
+    <script src="_content/MudBlazor/MudBlazor.min.js"></script>
+</body>
+</html>

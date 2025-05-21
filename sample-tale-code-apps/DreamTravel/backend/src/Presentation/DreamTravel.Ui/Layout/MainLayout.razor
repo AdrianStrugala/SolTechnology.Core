@@ -1,0 +1,27 @@
+﻿@inherits LayoutComponentBase
+@using MudBlazor
+
+<MudThemeProvider />
+<MudDialogProvider />
+<MudSnackbarProvider />
+
+<MudLayout>
+    <MudAppBar Color="Color.Primary" Elevation="1">
+        <MudText Typo="Typo.h6">RoadPlanner</MudText>
+        <MudSpacer />
+    </MudAppBar>
+    
+    <MudDrawer Open="true" ClipMode="DrawerClipMode.Always" Elevation="1">
+        <NavMenu />
+    </MudDrawer>
+    
+    <MudMainContent>
+        <MudContainer MaxWidth="MaxWidth.Large" Class="my-4 pt-4">
+            @Body
+        </MudContainer>
+    </MudMainContent>
+    
+    <MudFooter>
+        <MudText Typo="Typo.body2" Class="mx-4">SolTechnology© 2025</MudText>
+    </MudFooter>
+</MudLayout>

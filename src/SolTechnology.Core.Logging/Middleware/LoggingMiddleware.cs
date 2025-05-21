@@ -44,7 +44,7 @@ public class LoggingMiddleware
         context.Request.Query.TryGetValue("userId", out var userId);
 
         //To show how can some id's be extracted from route
-        context.Request.RouteValues.TryGetValue("category", out var category);
+        // context.Request.RouteValues.TryGetValue("category", out var category);
 
         //To show how can some id's be extracted from body
         var body = ReadRequestBody(context.Request);
@@ -64,7 +64,7 @@ public class LoggingMiddleware
             _logger.AddToScope("environment", Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "unknown"),
             _logger.AddToScope("correlationId", Guid.NewGuid().ToString()),
             _logger.AddToScope("userId", userId.ToString() ?? "unknown"),
-            _logger.AddToScope("category", category?.ToString() ?? "unknown"),
+            // _logger.AddToScope("category", category?.ToString() ?? "unknown"),
             _logger.AddToScope("name", name ?? "unknown"),
         };
 

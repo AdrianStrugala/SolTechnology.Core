@@ -14,5 +14,9 @@
 		<None Include="..\..\docs\mini-logo.png" Pack="true" Visible="false" PackagePath="docs\mini-logo.png" />
 		<None Include="..\..\docs\Auth.md" Pack="true" Visible="false" PackagePath="docs\readme.md" />
 	</ItemGroup>
+	<ItemGroup>
+	  <PackageReference Include="Microsoft.AspNetCore.Authentication" Version="2.2.0" /><PackageReference Include="Microsoft.AspNetCore.App" Version="2.2.8" />
+	  <PackageReference Include="Microsoft.AspNetCore.Metadata" Version="8.0.13" />
+	</ItemGroup>
 	
 </Project>

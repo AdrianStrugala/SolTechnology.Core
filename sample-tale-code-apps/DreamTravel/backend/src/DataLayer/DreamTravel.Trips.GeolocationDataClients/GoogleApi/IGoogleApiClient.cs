@@ -8,8 +8,11 @@ namespace DreamTravel.Trips.GeolocationDataClients.GoogleApi
 
         Task<double[]> GetDurationMatrixByFreeRoad(List<City> listOfCities);
 
+        Task<TrafficMatrixResponse> GetSegmentDurationMatrixByTraffic(TrafficMatrixRequest request);
+
         Task<City> GetLocationOfCity(string cityName);
 
         Task<City> GetNameOfCity(City city);
+
     }
 }

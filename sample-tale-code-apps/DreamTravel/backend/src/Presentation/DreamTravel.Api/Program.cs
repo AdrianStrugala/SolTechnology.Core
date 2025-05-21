@@ -1,4 +1,5 @@
 using System.Globalization;
+using DreamTravel.GraphDatabase;
 using DreamTravel.Infrastructure;
 using DreamTravel.Trips.GeolocationDataClients;
 using DreamTravel.Trips.Queries;
@@ -41,6 +42,7 @@ public class Program
                             "https://dreamtravels.azurewebsites.net",
                             "https://dreamtravels-demo.azurewebsites.net",
                             "http://localhost:55855",
+                            "https://localhost:7024",
                             "https://avroconvertonline.azurewebsites.net")
                         .AllowAnyHeader()
                         .AllowAnyMethod()
@@ -59,8 +61,15 @@ public class Program
         builder.Services.InstallInfrastructure();
         builder.Services.InstallTripsQueries();
         
-        builder.Services.AddCache();
         
+        //Graph
+        builder.Services.Configure<Neo4jSettings>(
+            builder.Configuration.GetSection("Neo4j"));
+        builder.Services.InstallGraphDatabase();
+        
+        
+        //The rest
+        builder.Services.AddCache();
 
         var thisAssembly = typeof(Program).Assembly;
         builder.Services.AddMediatR(cfg => { cfg.RegisterServicesFromAssemblies(thisAssembly); });

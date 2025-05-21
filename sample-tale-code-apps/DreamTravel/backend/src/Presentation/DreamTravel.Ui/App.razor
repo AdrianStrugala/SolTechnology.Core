@@ -1,0 +1,29 @@
+﻿<Router AppAssembly="@typeof(App).Assembly">
+    <Found Context="routeData">
+        <ErrorBoundary>
+            <ChildContent>
+                <RouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)" />
+                <FocusOnNavigate RouteData="@routeData" Selector="h1" />
+            </ChildContent>
+            <ErrorContent>
+                <MudContainer Class="mt-4">
+                    <MudAlert Severity="Severity.Error" Variant="Variant.Filled">
+                        An error has occurred: @context.Message
+                    </MudAlert>
+                    <MudDivider Class="my-4" />
+                    <MudText Typo="Typo.body2">@context.StackTrace</MudText>
+                </MudContainer>
+            </ErrorContent>
+        </ErrorBoundary>
+    </Found>
+    <NotFound>
+        <PageTitle>Not found</PageTitle>
+        <LayoutView Layout="@typeof(MainLayout)">
+            <MudContainer Class="mt-4">
+                <MudAlert Severity="Severity.Warning" Variant="Variant.Filled">
+                    Sorry, there's nothing at this address.
+                </MudAlert>
+            </MudContainer>
+        </LayoutView>
+    </NotFound>
+</Router>
