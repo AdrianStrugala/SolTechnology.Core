@@ -13,12 +13,14 @@ namespace SolTechnology.Core.Api.Controllers
 {
     [ApiController]
     [Route("api/journeys")]
-    public class JourneysController : ControllerBase
+    public class JourneysController(
+        JourneyManager journeyManager,
+        ILogger<JourneysController> logger,
+        IServiceProvider serviceProvider,
+        IJourneyInstanceRepository journeyRepository)
+        : ControllerBase
     {
-        private readonly JourneyManager _journeyManager;
-        private readonly ILogger<JourneysController> _logger;
-        private readonly IServiceProvider _serviceProvider; 
-        private readonly IJourneyInstanceRepository _journeyRepository; 
+        private readonly IServiceProvider _serviceProvider = serviceProvider;
 
         // Simplified handler registration
         private static readonly Dictionary<string, Type> _registeredHandlers = new Dictionary<string, Type>(StringComparer.OrdinalIgnoreCase)
@@ -27,22 +29,10 @@ namespace SolTechnology.Core.Api.Controllers
             // Add other handlers here as they are created
         };
 
-        public JourneysController(
-            JourneyManager journeyManager,
-            ILogger<JourneysController> logger,
-            IServiceProvider serviceProvider,
-            IJourneyInstanceRepository journeyRepository) 
-        {
-            _journeyManager = journeyManager;
-            _logger = logger;
-            _serviceProvider = serviceProvider;
-            _journeyRepository = journeyRepository; 
-        }
-
         [HttpPost("{journeyHandlerName}/start")]
         public async Task<IActionResult> StartJourney(string journeyHandlerName, [FromBody] JsonElement initialInputJson)
         {
-            _logger.LogInformation("Attempting to start journey with handler: {JourneyHandlerName}", journeyHandlerName);
+            logger.LogInformation("Attempting to start journey with handler: {JourneyHandlerName}", journeyHandlerName);
 
             if (!_registeredHandlers.TryGetValue(journeyHandlerName, out Type? handlerType))
             {
@@ -69,7 +59,7 @@ namespace SolTechnology.Core.Api.Controllers
                 
                 if (startMethod == null) return StatusCode(500, "Could not make generic StartJourneyAsync method.");
 
-                var task = (Task?)startMethod.Invoke(_journeyManager, new[] { typedInitialInput });
+                var task = (Task?)startMethod.Invoke(journeyManager, new[] { typedInitialInput });
                 if (task == null) return StatusCode(500, "Could not invoke StartJourneyAsync.");
                 
                 await task;
@@ -81,7 +71,7 @@ namespace SolTechnology.Core.Api.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error starting journey {JourneyHandlerName}.", journeyHandlerName);
+                logger.LogError(ex, "Error starting journey {JourneyHandlerName}.", journeyHandlerName);
                 return StatusCode(500, $"An error occurred: {ex.Message}");
             }
         }
@@ -89,24 +79,24 @@ namespace SolTechnology.Core.Api.Controllers
         [HttpPost("{journeyId}/resume")]
         public async Task<IActionResult> ResumeJourney(string journeyId, [FromBody] JsonElement? userInputJson) 
         {
-            _logger.LogInformation("Attempting to resume journey: {JourneyId}", journeyId);
+            logger.LogInformation("Attempting to resume journey: {JourneyId}", journeyId);
             
             try
             {
                 object? userInput = userInputJson?.ValueKind == JsonValueKind.Undefined || userInputJson == null ? null : userInputJson;
 
-                var tempInstance = await _journeyRepository.GetByIdAsync(journeyId); 
+                var tempInstance = await journeyRepository.GetByIdAsync(journeyId); 
                 if (tempInstance == null) return NotFound($"Journey {journeyId} not found.");
                 
                 if (string.IsNullOrEmpty(tempInstance.FlowHandlerName))
                 {
-                    _logger.LogError("FlowHandlerName is null or empty for Journey {JourneyId}.", journeyId);
+                    logger.LogError("FlowHandlerName is null or empty for Journey {JourneyId}.", journeyId);
                     return StatusCode(500, $"FlowHandlerName is missing for journey {journeyId}.");
                 }
                 Type? handlerType = Type.GetType(tempInstance.FlowHandlerName);
 
                 if (handlerType == null || !_registeredHandlers.ContainsValue(handlerType)) {
-                     _logger.LogError("Handler type {HandlerName} for journey {JourneyId} is not registered or cannot be resolved.", tempInstance.FlowHandlerName, journeyId);
+                     logger.LogError("Handler type {HandlerName} for journey {JourneyId} is not registered or cannot be resolved.", tempInstance.FlowHandlerName, journeyId);
                      return StatusCode(500, $"Handler type {tempInstance.FlowHandlerName} for journey {journeyId} is not registered or cannot be resolved.");
                 }
 
@@ -130,7 +120,7 @@ namespace SolTechnology.Core.Api.Controllers
                 
                 MethodInfo genericResumeMethod = resumeMethod.MakeGenericMethod(handlerType, baseHandlerType.GetGenericArguments()[0], baseHandlerType.GetGenericArguments()[1], baseHandlerType.GetGenericArguments()[2]);
 
-                var task = (Task?)genericResumeMethod.Invoke(_journeyManager, new[] { journeyId, userInput, null /*targetStepId*/ });
+                var task = (Task?)genericResumeMethod.Invoke(journeyManager, new[] { journeyId, userInput, null /*targetStepId*/ });
                 if (task == null) return StatusCode(500, "Could not invoke ResumeJourneyAsync.");
                 await task;
 
@@ -149,7 +139,7 @@ namespace SolTechnology.Core.Api.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error resuming journey {JourneyId}.", journeyId);
+                logger.LogError(ex, "Error resuming journey {JourneyId}.", journeyId);
                 return StatusCode(500, $"An error occurred: {ex.Message}");
             }
         }
@@ -157,12 +147,12 @@ namespace SolTechnology.Core.Api.Controllers
         [HttpGet("{journeyId}")]
         public async Task<IActionResult> GetJourneyStatus(string journeyId)
         {
-            _logger.LogInformation("Attempting to get status for journey: {JourneyId}", journeyId);
+            logger.LogInformation("Attempting to get status for journey: {JourneyId}", journeyId);
             if (string.IsNullOrEmpty(journeyId))
             {
                 return BadRequest("Journey ID must be provided.");
             }
-            var journeyInstance = await _journeyRepository.GetByIdAsync(journeyId); 
+            var journeyInstance = await journeyRepository.GetByIdAsync(journeyId); 
             return BuildJourneyResponse(journeyInstance);
         }
 
@@ -196,7 +186,7 @@ namespace SolTechnology.Core.Api.Controllers
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogError(ex, "Error trying to interpret ContextData for Journey {JourneyId}.", journeyInstance.JourneyId);
+                    logger.LogError(ex, "Error trying to interpret ContextData for Journey {JourneyId}.", journeyInstance.JourneyId);
                     genericContext = new ChainContext<object, object> { Status = journeyInstance.CurrentStatus, ErrorMessage = "Error interpreting context." };
                 }
             }
