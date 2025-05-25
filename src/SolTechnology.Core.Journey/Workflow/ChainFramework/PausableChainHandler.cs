@@ -211,7 +211,7 @@ namespace SolTechnology.Core.Journey.Workflow.ChainFramework
                 // Store pause details in history entry's OutputData
                 if (stepHistory.OutputData == null)
                 {
-                    stepHistory.OutputData = new Dictionary<string, object>();
+                    stepHistory.OutputData = new Dictionary<string, object?>();
                 }
                 stepHistory.OutputData["PausedReason"] = stepResult.PausedReason;
                 if (stepResult.RequiredInputSchemaForPause != null) // Avoid storing null

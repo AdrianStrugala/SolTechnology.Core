@@ -6,7 +6,8 @@ using System.Collections.Generic; // For KeyNotFoundException
 using System.Threading.Tasks;
 using System.Text.Json; // Added for JsonElement and JsonSerializer
 using System.Reflection; // Added for MethodInfo etc.
-using System.Linq; // Added for Linq FirstOrDefault
+using System.Linq;
+using SolTechnology.Core.Journey.Workflow.Persistence; // Added for Linq FirstOrDefault
 
 namespace SolTechnology.Core.Journey.Workflow.ChainFramework
 {
@@ -39,7 +40,7 @@ namespace SolTechnology.Core.Journey.Workflow.ChainFramework
             var context = new TContext { Input = input, Status = FlowStatus.NotStarted };
             var journeyId = Guid.NewGuid().ToString();
             
-            var journeyInstance = new JourneyInstance(journeyId, typeof(THandler).AssemblyQualifiedName, context) 
+            var journeyInstance = new JourneyInstance(journeyId, typeof(THandler).AssemblyQualifiedName!, context) 
             { 
                 CurrentStatus = context.Status // Initial status from context
             };
@@ -47,6 +48,12 @@ namespace SolTechnology.Core.Journey.Workflow.ChainFramework
             await _repository.SaveAsync(journeyInstance);
             _logger.LogInformation("Journey {JourneyId} instance created and saved. Initial status: {Status}", journeyId, context.Status);
 
+            
+            
+            //TODO:
+            // The Start should return an instance. Do not call steps (rather initiate?)
+
+            
             Result executionResult = await handler.ExecuteHandler(context);
 
             journeyInstance.ContextData = context;

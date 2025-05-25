@@ -1,6 +1,6 @@
-using System.Threading.Tasks;
+using SolTechnology.Core.Journey.Workflow.ChainFramework;
 
-namespace SolTechnology.Core.Journey.Workflow.ChainFramework
+namespace SolTechnology.Core.Journey.Workflow.Persistence
 {
     public interface IJourneyInstanceRepository
     {

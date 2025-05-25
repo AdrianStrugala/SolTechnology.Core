@@ -1,21 +1,23 @@
+using System.Reflection;
+using System.Text.Json;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using SolTechnology.Core.Journey.Workflow; 
-using SolTechnology.Core.Journey.Workflow.ChainFramework; 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using System.Text.Json; // For JsonElement
-using System.Reflection; // For MethodInfo
+using SolTechnology.Core.Journey.Workflow;
+using SolTechnology.Core.Journey.Workflow.ChainFramework;
+using SolTechnology.Core.Journey.Workflow.Handlers;
+using SolTechnology.Core.Journey.Workflow.Persistence;
 
-namespace SolTechnology.Core.Api.Controllers
+// For JsonElement
+
+// For MethodInfo
+
+namespace SolTechnology.Core.Journey.Controllers
 {
     [ApiController]
-    [Route("api/journeys")]
-    public class JourneysController(
+    [Route("api/journey")]
+    public abstract class JourneyController(
         JourneyManager journeyManager,
-        ILogger<JourneysController> logger,
+        ILogger<JourneyController> logger,
         IServiceProvider serviceProvider,
         IJourneyInstanceRepository journeyRepository)
         : ControllerBase
@@ -25,18 +27,19 @@ namespace SolTechnology.Core.Api.Controllers
         // Simplified handler registration
         private static readonly Dictionary<string, Type> _registeredHandlers = new Dictionary<string, Type>(StringComparer.OrdinalIgnoreCase)
         {
-            { "SampleOrderWorkflow", typeof(SolTechnology.Core.Journey.Workflow.Handlers.SampleOrderWorkflowHandler) }
+            //TODO: take it from DI
+            { "SampleOrderWorkflow", typeof(SampleOrderWorkflowHandler) }
             // Add other handlers here as they are created
         };
 
-        [HttpPost("{journeyHandlerName}/start")]
-        public async Task<IActionResult> StartJourney(string journeyHandlerName, [FromBody] JsonElement initialInputJson)
+        [HttpPost("{journeyName}/start")]
+        public async Task<IActionResult> StartJourney(string journeyName, [FromBody] JsonElement initialInputJson)
         {
-            logger.LogInformation("Attempting to start journey with handler: {JourneyHandlerName}", journeyHandlerName);
+            logger.LogInformation("Attempting to start journey with handler: {JourneyHandlerName}", journeyName);
 
-            if (!_registeredHandlers.TryGetValue(journeyHandlerName, out Type? handlerType))
+            if (!_registeredHandlers.TryGetValue(journeyName, out Type? handlerType))
             {
-                return NotFound($"Handler '{journeyHandlerName}' not registered.");
+                return NotFound($"Handler '{journeyName}' not registered.");
             }
 
             try
@@ -44,14 +47,25 @@ namespace SolTechnology.Core.Api.Controllers
                 var baseHandlerType = handlerType.BaseType;
                 if (baseHandlerType == null || !baseHandlerType.IsGenericType || baseHandlerType.GetGenericTypeDefinition() != typeof(PausableChainHandler<,,>))
                 {
-                    return StatusCode(500, $"Handler '{journeyHandlerName}' is not a valid PausableChainHandler.");
+                    return StatusCode(500, $"Handler '{journeyName}' is not a valid PausableChainHandler.");
                 }
                 Type inputType = baseHandlerType.GetGenericArguments()[0]; 
 
-                object? typedInitialInput = initialInputJson.Deserialize(inputType, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+                object? typedInitialInput;
+                try
+                {
+                    typedInitialInput = initialInputJson.Deserialize(inputType,
+                        new JsonSerializerOptions { PropertyNameCaseInsensitive = true }
+                    );
+                }
+                catch (JsonException jsonEx)
+                {
+                    //TODO: bad request should not be success xd
+                    return BadRequest($"Could not deserialize input for handler '{journeyName}' to type {inputType.Name}. {jsonEx.Message}");
+                }
                 if (typedInitialInput == null)
                 {
-                    return BadRequest($"Could not deserialize input for handler '{journeyHandlerName}' to type {inputType.Name}.");
+                    return BadRequest($"Could not deserialize input for handler '{journeyName}' to type {inputType.Name}.");
                 }
 
                 MethodInfo? startMethod = typeof(JourneyManager).GetMethod("StartJourneyAsync")?
@@ -71,12 +85,12 @@ namespace SolTechnology.Core.Api.Controllers
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error starting journey {JourneyHandlerName}.", journeyHandlerName);
+                logger.LogError(ex, "Error starting journey {JourneyHandlerName}.", journeyName);
                 return StatusCode(500, $"An error occurred: {ex.Message}");
             }
         }
 
-        [HttpPost("{journeyId}/resume")]
+        [HttpPost("{journeyId}")]
         public async Task<IActionResult> ResumeJourney(string journeyId, [FromBody] JsonElement? userInputJson) 
         {
             logger.LogInformation("Attempting to resume journey: {JourneyId}", journeyId);

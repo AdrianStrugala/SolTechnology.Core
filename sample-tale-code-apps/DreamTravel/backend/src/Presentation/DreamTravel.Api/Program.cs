@@ -9,6 +9,7 @@ using Microsoft.OpenApi.Models;
 using SolTechnology.Core.Api.Filters;
 using SolTechnology.Core.Authentication;
 using SolTechnology.Core.Cache;
+using SolTechnology.Core.Journey.Workflow;
 using SolTechnology.Core.Logging.Middleware;
 using SolTechnology.Core.Sql;
 
@@ -67,6 +68,8 @@ public class Program
             builder.Configuration.GetSection("Neo4j"));
         builder.Services.InstallGraphDatabase();
         
+        //Journey
+        builder.Services.AddJourneyFramework();
         
         //The rest
         builder.Services.AddCache();

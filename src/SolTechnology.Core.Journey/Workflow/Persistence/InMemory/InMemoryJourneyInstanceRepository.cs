@@ -1,9 +1,9 @@
-using SolTechnology.Core.Journey.Workflow.ChainFramework; // For JourneyInstance, IJourneyInstanceRepository
-using System.Collections.Concurrent; // For thread-safe dictionary
-using System.Linq;
-using System.Threading.Tasks;
+using System.Collections.Concurrent;
+using SolTechnology.Core.Journey.Workflow.ChainFramework;
+// For JourneyInstance, IJourneyInstanceRepository
+// For thread-safe dictionary
 
-namespace SolTechnology.Core.Journey.Workflow.ChainFramework.Persistence.InMemory
+namespace SolTechnology.Core.Journey.Workflow.Persistence.InMemory
 {
     public class InMemoryJourneyInstanceRepository : IJourneyInstanceRepository
     {

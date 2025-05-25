@@ -20,7 +20,6 @@
 
 	<ItemGroup>
 	  <ProjectReference Include="..\SolTechnology.Core.CQRS\SolTechnology.Core.CQRS.csproj" />
-	  <ProjectReference Include="..\SolTechnology.Core.Journey\SolTechnology.Core.Journey.csproj" />
 	</ItemGroup>
 
 </Project>

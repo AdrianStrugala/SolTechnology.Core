@@ -5,9 +5,9 @@ namespace SolTechnology.Core.Journey.Workflow.ChainFramework
 {
     public class JourneyInstance
     {
-        public string JourneyId { get; set; }
-        public string FlowHandlerName { get; set; }
-        public object ContextData { get; set; }
+        public string JourneyId { get; set; } = null!;
+        public string FlowHandlerName { get; set; } = null!;
+        public object ContextData { get; set; } = null!;
         public DateTime CreatedAt { get; set; }
         public DateTime LastUpdatedAt { get; set; }
         public FlowStatus CurrentStatus { get; set; }
@@ -45,8 +45,8 @@ namespace SolTechnology.Core.Journey.Workflow.ChainFramework
 
     // Hypothetical interface to make status extraction cleaner from ChainContext
     // This would require ChainContext to implement it.
-    // public interface IStatusProvider
-    // {
-    //     FlowStatus Status { get; }
-    // }
+    public interface IStatusProvider
+    {
+        FlowStatus Status { get; }
+    }
 }
