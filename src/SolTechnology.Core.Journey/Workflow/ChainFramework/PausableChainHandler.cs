@@ -7,7 +7,9 @@ using System.Threading.Tasks;
 
 namespace SolTechnology.Core.Journey.Workflow.ChainFramework
 {
-    public abstract class PausableChainHandler<TInput, TContext, TOutput>
+    public interface IJourneyHandler;
+
+    public abstract class PausableChainHandler<TInput, TContext, TOutput> : IJourneyHandler
         where TInput : new()
         where TOutput : new()
         where TContext : ChainContext<TInput, TOutput>, new()

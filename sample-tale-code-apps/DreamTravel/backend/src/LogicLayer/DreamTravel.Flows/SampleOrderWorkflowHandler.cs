@@ -1,10 +1,10 @@
 using Microsoft.Extensions.Logging;
 using SolTechnology.Core.Journey.Workflow.ChainFramework;
-using SolTechnology.Core.Journey.Workflow.Steps; // For example steps
-using System;
-using System.Threading.Tasks;
+using SolTechnology.Core.Journey.Workflow.Handlers;
+using SolTechnology.Core.Journey.Workflow.Steps;
+// For example steps
 
-namespace SolTechnology.Core.Journey.Workflow.Handlers
+namespace DreamTravel.Flows
 {
     public class SampleOrderWorkflowHandler : PausableChainHandler<SampleOrderInput, SampleOrderContext, SampleOrderResult>
     {

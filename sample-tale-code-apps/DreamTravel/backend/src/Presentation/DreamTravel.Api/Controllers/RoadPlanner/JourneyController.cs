@@ -5,6 +5,7 @@ namespace DreamTravel.Api.Controllers.RoadPlanner;
 
 public class JourneyController(
     JourneyManager journeyManager, 
-    ILogger<SolTechnology.Core.Journey.Controllers.JourneyController> logger, 
-    IServiceProvider serviceProvider, IJourneyInstanceRepository journeyRepository) 
-    : SolTechnology.Core.Journey.Controllers.JourneyController(journeyManager, logger, serviceProvider, journeyRepository);
+    ILogger<SolTechnology.Core.Journey.Controllers.JourneyController> logger,
+    IJourneyInstanceRepository journeyRepository,
+    IEnumerable<IJourneyHandler> journeyHandlers) 
+    : SolTechnology.Core.Journey.Controllers.JourneyController(journeyManager, logger, journeyRepository, journeyHandlers);

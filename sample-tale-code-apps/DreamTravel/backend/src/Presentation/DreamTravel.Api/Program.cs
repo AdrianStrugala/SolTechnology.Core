@@ -1,4 +1,5 @@
 using System.Globalization;
+using DreamTravel.Flows;
 using DreamTravel.GraphDatabase;
 using DreamTravel.Infrastructure;
 using DreamTravel.Trips.GeolocationDataClients;
@@ -69,6 +70,7 @@ public class Program
         builder.Services.InstallGraphDatabase();
         
         //Journey
+        builder.Services.AddFlows();
         builder.Services.AddJourneyFramework();
         
         //The rest

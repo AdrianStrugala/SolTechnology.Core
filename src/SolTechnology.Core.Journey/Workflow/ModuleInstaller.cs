@@ -6,14 +6,13 @@ using SolTechnology.Core.Journey.Workflow.Persistence.InMemory;
 
 namespace SolTechnology.Core.Journey.Workflow;
 
-public static class DependencyInstaller
+public static class ModuleInstaller
 {
         public static IServiceCollection AddJourneyFramework(
             this IServiceCollection services)
         {
             services.AddScoped<IJourneyInstanceRepository, InMemoryJourneyInstanceRepository>();
             services.AddScoped<JourneyManager>();
-            services.AddScoped<SampleOrderWorkflowHandler>();
 
             return services;
         }

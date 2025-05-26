@@ -36,6 +36,7 @@
 	  <ProjectReference Include="..\..\..\..\..\..\src\SolTechnology.Core.CQRS\SolTechnology.Core.CQRS.csproj" />
 	  <ProjectReference Include="..\..\..\..\..\..\src\SolTechnology.Core.Journey\SolTechnology.Core.Journey.csproj" />
 	  <ProjectReference Include="..\..\DataLayer\DreamTravel.GraphDatabase\DreamTravel.GraphDatabase.csproj" />
+	  <ProjectReference Include="..\..\LogicLayer\DreamTravel.Flows\DreamTravel.Flows.csproj" />
 	  <ProjectReference Include="..\..\LogicLayer\DreamTravel.Trips.Commands\DreamTravel.Trips.Commands.csproj" />
 	  <ProjectReference Include="..\..\LogicLayer\DreamTravel.Trips.Queries\DreamTravel.Trips.Queries.csproj" />
 	  <ProjectReference Include="..\DreamTravel.ServiceDefaults\DreamTravel.ServiceDefaults.csproj" />

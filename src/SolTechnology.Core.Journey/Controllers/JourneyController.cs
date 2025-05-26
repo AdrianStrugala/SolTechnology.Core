@@ -18,28 +18,22 @@ namespace SolTechnology.Core.Journey.Controllers
     public abstract class JourneyController(
         JourneyManager journeyManager,
         ILogger<JourneyController> logger,
-        IServiceProvider serviceProvider,
-        IJourneyInstanceRepository journeyRepository)
+        IJourneyInstanceRepository journeyRepository,
+        IEnumerable<IJourneyHandler> journeyHandlers)
         : ControllerBase
     {
-        private readonly IServiceProvider _serviceProvider = serviceProvider;
 
-        // Simplified handler registration
-        private static readonly Dictionary<string, Type> _registeredHandlers = new Dictionary<string, Type>(StringComparer.OrdinalIgnoreCase)
+        private readonly Dictionary<string, Type> _registeredHandlers = journeyHandlers.ToDictionary(
+                x => x.GetType().Name, y => y.GetType());
+
+        [HttpPost("{flowName}/start")]
+        public async Task<IActionResult> StartJourney(string flowName, [FromBody] JsonElement initialInputJson)
         {
-            //TODO: take it from DI
-            { "SampleOrderWorkflow", typeof(SampleOrderWorkflowHandler) }
-            // Add other handlers here as they are created
-        };
+            logger.LogInformation("Attempting to start journey with handler: {JourneyHandlerName}", flowName);
 
-        [HttpPost("{journeyName}/start")]
-        public async Task<IActionResult> StartJourney(string journeyName, [FromBody] JsonElement initialInputJson)
-        {
-            logger.LogInformation("Attempting to start journey with handler: {JourneyHandlerName}", journeyName);
-
-            if (!_registeredHandlers.TryGetValue(journeyName, out Type? handlerType))
+            if (!_registeredHandlers.TryGetValue(flowName, out Type? handlerType))
             {
-                return NotFound($"Handler '{journeyName}' not registered.");
+                return NotFound($"Flow '{flowName}' not registered.");
             }
 
             try
@@ -47,7 +41,7 @@ namespace SolTechnology.Core.Journey.Controllers
                 var baseHandlerType = handlerType.BaseType;
                 if (baseHandlerType == null || !baseHandlerType.IsGenericType || baseHandlerType.GetGenericTypeDefinition() != typeof(PausableChainHandler<,,>))
                 {
-                    return StatusCode(500, $"Handler '{journeyName}' is not a valid PausableChainHandler.");
+                    return StatusCode(400, $"Flow '{flowName}' is not a valid PausableChainHandler.");
                 }
                 Type inputType = baseHandlerType.GetGenericArguments()[0]; 
 
@@ -61,17 +55,20 @@ namespace SolTechnology.Core.Journey.Controllers
                 catch (JsonException jsonEx)
                 {
                     //TODO: bad request should not be success xd
-                    return BadRequest($"Could not deserialize input for handler '{journeyName}' to type {inputType.Name}. {jsonEx.Message}");
+                    return BadRequest($"Could not deserialize input for flow '{flowName}' to type {inputType.Name}. {jsonEx.Message}");
                 }
                 if (typedInitialInput == null)
                 {
-                    return BadRequest($"Could not deserialize input for handler '{journeyName}' to type {inputType.Name}.");
+                    return BadRequest($"Could not deserialize input for flow '{flowName}' to type {inputType.Name}.");
                 }
 
-                MethodInfo? startMethod = typeof(JourneyManager).GetMethod("StartJourneyAsync")?
+                MethodInfo? startMethod = typeof(JourneyManager).GetMethod(nameof(JourneyManager.StartJourneyAsync))?
                     .MakeGenericMethod(handlerType, inputType, baseHandlerType.GetGenericArguments()[1], baseHandlerType.GetGenericArguments()[2]);
-                
-                if (startMethod == null) return StatusCode(500, "Could not make generic StartJourneyAsync method.");
+
+                if (startMethod == null)
+                {
+                    return StatusCode(400, "Could not make generic StartJourneyAsync method.");
+                }
 
                 var task = (Task?)startMethod.Invoke(journeyManager, new[] { typedInitialInput });
                 if (task == null) return StatusCode(500, "Could not invoke StartJourneyAsync.");
@@ -85,7 +82,7 @@ namespace SolTechnology.Core.Journey.Controllers
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error starting journey {JourneyHandlerName}.", journeyName);
+                logger.LogError(ex, "Error starting journey {JourneyHandlerName}.", flowName);
                 return StatusCode(500, $"An error occurred: {ex.Message}");
             }
         }
