@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using System.Text.Json; // Added for JsonElement and JsonSerializer
 using System.Reflection; // Added for MethodInfo etc.
 using System.Linq;
+using SolTechnology.Core.Journey.Models;
 using SolTechnology.Core.Journey.Workflow.Persistence; // Added for Linq FirstOrDefault
 
 namespace SolTechnology.Core.Journey.Workflow.ChainFramework

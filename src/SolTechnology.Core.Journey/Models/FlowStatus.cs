@@ -1,11 +1,10 @@
-namespace SolTechnology.Core.Journey.Workflow
+namespace SolTechnology.Core.Journey.Models
 {
     public enum FlowStatus
     {
         NotStarted,
         Running,
         WaitingForInput,
-        Suspended,
         Completed,
         Failed,
         Cancelled

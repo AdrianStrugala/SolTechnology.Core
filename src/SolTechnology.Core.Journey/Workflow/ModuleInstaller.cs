@@ -1,6 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using SolTechnology.Core.Journey.Workflow.ChainFramework;
-using SolTechnology.Core.Journey.Workflow.Handlers;
 using SolTechnology.Core.Journey.Workflow.Persistence;
 using SolTechnology.Core.Journey.Workflow.Persistence.InMemory;
 

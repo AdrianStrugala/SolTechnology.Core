@@ -4,6 +4,7 @@ using SolTechnology.Core.Journey.Workflow; // For FlowStatus and ExecutedStepInf
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using SolTechnology.Core.Journey.Models;
 
 namespace SolTechnology.Core.Journey.Workflow.ChainFramework
 {
@@ -167,7 +168,7 @@ namespace SolTechnology.Core.Journey.Workflow.ChainFramework
                 stepHistory.Status = FlowStatus.Running;
                 stepHistory.FinishedAt = null;
                 stepHistory.ErrorMessage = null;
-                stepHistory.OutputData.Clear(); // Clear previous output if any
+                stepHistory.ProvidedData.Clear(); // Clear previous output if any
             }
 
 
@@ -211,14 +212,14 @@ namespace SolTechnology.Core.Journey.Workflow.ChainFramework
                 context.CurrentStepId = stepResult.NextStepIdOverride ?? context.CurrentStepId; // Use current step AQN if override is null
 
                 // Store pause details in history entry's OutputData
-                if (stepHistory.OutputData == null)
+                if (stepHistory.ProvidedData == null)
                 {
-                    stepHistory.OutputData = new Dictionary<string, object?>();
+                    stepHistory.ProvidedData = new Dictionary<string, object?>();
                 }
-                stepHistory.OutputData["PausedReason"] = stepResult.PausedReason;
+                stepHistory.ProvidedData["PausedReason"] = stepResult.PausedReason;
                 if (stepResult.RequiredInputSchemaForPause != null) // Avoid storing null
                 {
-                    stepHistory.OutputData["RequiredInputSchemaForPause"] = stepResult.RequiredInputSchemaForPause;
+                    stepHistory.ProvidedData["RequiredInputSchemaForPause"] = stepResult.RequiredInputSchemaForPause;
                 }
                 
                 return stepResult;

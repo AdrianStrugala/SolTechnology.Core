@@ -1,4 +1,5 @@
 using System;
+using SolTechnology.Core.Journey.Models;
 using SolTechnology.Core.Journey.Workflow; // For FlowStatus
 
 namespace SolTechnology.Core.Journey.Workflow.ChainFramework

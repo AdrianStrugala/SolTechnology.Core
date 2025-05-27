@@ -123,7 +123,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SolTechnology.Core.Journey"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ElsaServer", "..\sample-tale-code-apps\DreamTravel\backend\src\Presentation\ElsaServer\ElsaServer.csproj", "{834A8949-742A-42AA-9C3B-FE70EBB0E6E8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DreamTravel.Flows", "..\sample-tale-code-apps\DreamTravel\backend\src\LogicLayer\DreamTravel.Flows\DreamTravel.Flows.csproj", "{FAA6AFD6-C83F-4D15-9331-1DB2FD8609A2}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DreamTravel.Flows", "..\sample-tale-code-apps\DreamTravel\backend\src\LogicLayer\DreamTravel.Flows\DreamTravel.Flows.csproj", "{B8FFF3C8-43D7-4C65-8CC0-5D6C71EECC85}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -279,10 +279,10 @@ Global
 		{834A8949-742A-42AA-9C3B-FE70EBB0E6E8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{834A8949-742A-42AA-9C3B-FE70EBB0E6E8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{834A8949-742A-42AA-9C3B-FE70EBB0E6E8}.Release|Any CPU.Build.0 = Release|Any CPU
-		{FAA6AFD6-C83F-4D15-9331-1DB2FD8609A2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{FAA6AFD6-C83F-4D15-9331-1DB2FD8609A2}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{FAA6AFD6-C83F-4D15-9331-1DB2FD8609A2}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{FAA6AFD6-C83F-4D15-9331-1DB2FD8609A2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B8FFF3C8-43D7-4C65-8CC0-5D6C71EECC85}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B8FFF3C8-43D7-4C65-8CC0-5D6C71EECC85}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B8FFF3C8-43D7-4C65-8CC0-5D6C71EECC85}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B8FFF3C8-43D7-4C65-8CC0-5D6C71EECC85}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -319,7 +319,7 @@ Global
 		{E04EFEC5-2777-491B-90EC-0BE41642189B} = {F88D9F2D-E763-4B94-88DC-0EFD21AD8138}
 		{F0114AC7-F75F-3673-353D-C6EC03DCFD77} = {23026ABA-8995-4B3C-ADDC-0F6D5497518C}
 		{834A8949-742A-42AA-9C3B-FE70EBB0E6E8} = {23026ABA-8995-4B3C-ADDC-0F6D5497518C}
-		{FAA6AFD6-C83F-4D15-9331-1DB2FD8609A2} = {4C7789AA-2CA6-45C2-85B4-398653826B23}
+		{B8FFF3C8-43D7-4C65-8CC0-5D6C71EECC85} = {4C7789AA-2CA6-45C2-85B4-398653826B23}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {56BC2B7E-7B9F-4B05-951A-C0E3CF0D1287}
