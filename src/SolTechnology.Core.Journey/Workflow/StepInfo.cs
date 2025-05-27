@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace SolTechnology.Core.Journey.Workflow
 {
-    public class ExecutedStepInfo
+    public class StepInfo
     {
         public string? StepId { get; set; }
         public DateTime StartedAt { get; set; }

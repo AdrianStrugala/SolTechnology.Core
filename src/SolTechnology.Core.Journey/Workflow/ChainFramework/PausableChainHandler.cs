@@ -132,7 +132,7 @@ namespace SolTechnology.Core.Journey.Workflow.ChainFramework
                 context.ErrorMessage = $"Critical error: Failed to resolve step {stepId}.";
                 context.CurrentStepId = stepId; // Mark this as the failing step
                 // Add history for resolution failure
-                context.History.Add(new ExecutedStepInfo { StepId = stepId, StartedAt = DateTime.UtcNow, FinishedAt = DateTime.UtcNow, Status = FlowStatus.Failed, ErrorMessage = context.ErrorMessage });
+                context.History.Add(new StepInfo { StepId = stepId, StartedAt = DateTime.UtcNow, FinishedAt = DateTime.UtcNow, Status = FlowStatus.Failed, ErrorMessage = context.ErrorMessage });
                 return Result.Failure(context.ErrorMessage);
             }
 
@@ -142,7 +142,7 @@ namespace SolTechnology.Core.Journey.Workflow.ChainFramework
                 context.Status = FlowStatus.Failed;
                 context.ErrorMessage = $"Critical error: Step {stepId} resolved to null.";
                 context.CurrentStepId = stepId;
-                context.History.Add(new ExecutedStepInfo { StepId = stepId, StartedAt = DateTime.UtcNow, FinishedAt = DateTime.UtcNow, Status = FlowStatus.Failed, ErrorMessage = context.ErrorMessage });
+                context.History.Add(new StepInfo { StepId = stepId, StartedAt = DateTime.UtcNow, FinishedAt = DateTime.UtcNow, Status = FlowStatus.Failed, ErrorMessage = context.ErrorMessage });
                 return Result.Failure(context.ErrorMessage);
             }
 
@@ -154,10 +154,10 @@ namespace SolTechnology.Core.Journey.Workflow.ChainFramework
                  context.Status = FlowStatus.Running;
             }
 
-            ExecutedStepInfo? stepHistory = context.History.LastOrDefault(h => h.StepId == context.CurrentStepId && h.Status == FlowStatus.Running);
+            StepInfo? stepHistory = context.History.LastOrDefault(h => h.StepId == context.CurrentStepId && h.Status == FlowStatus.Running);
             if (stepHistory == null || (isContinuation && context.Status == FlowStatus.WaitingForInput) ) // If resuming or first time
             {
-                stepHistory = new ExecutedStepInfo { StepId = context.CurrentStepId, StartedAt = DateTime.UtcNow, Status = FlowStatus.Running };
+                stepHistory = new StepInfo { StepId = context.CurrentStepId, StartedAt = DateTime.UtcNow, Status = FlowStatus.Running };
                 context.History.Add(stepHistory);
             }
             else // It's a re-run of a step that wasn't Running (e.g. previous failure but chain continues)

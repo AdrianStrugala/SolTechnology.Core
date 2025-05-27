@@ -16,29 +16,25 @@ namespace SolTechnology.Core.Journey.Workflow.ChainFramework
         IJourneyInstanceRepository repository,
         ILogger<JourneyManager> logger)
     {
-        public async Task<JourneyInstance> StartJourneyAsync<THandler, TInput, TContext, TOutput>(TInput input)
+        public async Task<JourneyInstance> StartFlow<THandler, TInput, TContext, TOutput>(TInput input)
             where THandler : PausableChainHandler<TInput, TContext, TOutput>
             where TInput : new()
             where TOutput : new()
             where TContext : ChainContext<TInput, TOutput>, new()
         {
-            logger.LogInformation("Starting new flow with handler {HandlerName}.", typeof(THandler).Name);
+            var flowName = typeof(THandler).AssemblyQualifiedName!;
+            logger.LogInformation("Starting new flow [{HandlerName}].", flowName);
 
-            var context = new TContext { Input = input, Status = FlowStatus.NotStarted };
             var flowId = Guid.NewGuid().ToString();
+            var flowInstance = new JourneyInstance(flowId, flowName, input);
+
+            await repository.SaveAsync(flowInstance);
             
-            var journeyInstance = new JourneyInstance(flowId, typeof(THandler).AssemblyQualifiedName!, context) 
-            { 
-                CurrentStatus = context.Status,
-                ContextData = context,
-                LastUpdatedAt = DateTime.UtcNow
-            };
-
-            await repository.SaveAsync(journeyInstance);
-            logger.LogInformation("Flow {JourneyId} instance created and saved. Initial status: {Status}", flowId, context.Status);
+            logger.LogInformation("Flow {FlowId} instance created and saved. Initial status: {Status}",
+                flowId, flowInstance.Status);
 
 
-            return journeyInstance;
+            return flowInstance;
         }
 
         // Updated ResumeJourneyAsync to be non-generic in signature, but handle types internally
@@ -163,7 +159,7 @@ namespace SolTechnology.Core.Journey.Workflow.ChainFramework
                             
                             journeyInstance.ContextData = context;
                             journeyInstance.LastUpdatedAt = DateTime.UtcNow;
-                            journeyInstance.CurrentStatus = (FlowStatus)(statusProperty?.GetValue(context) ?? FlowStatus.WaitingForInput); 
+                            journeyInstance.Status = (FlowStatus)(statusProperty?.GetValue(context) ?? FlowStatus.WaitingForInput); 
                             await repository.SaveAsync(journeyInstance);
                             return journeyInstance; 
                         }
@@ -186,7 +182,7 @@ namespace SolTechnology.Core.Journey.Workflow.ChainFramework
             
             journeyInstance.ContextData = context;
             journeyInstance.LastUpdatedAt = DateTime.UtcNow;
-            journeyInstance.CurrentStatus = (FlowStatus)(statusProperty?.GetValue(context) ?? FlowStatus.Failed); 
+            journeyInstance.Status = (FlowStatus)(statusProperty?.GetValue(context) ?? FlowStatus.Failed); 
             await repository.SaveAsync(journeyInstance);
 
             logger.LogInformation(

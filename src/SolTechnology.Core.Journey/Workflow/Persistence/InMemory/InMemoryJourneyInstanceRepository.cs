@@ -56,7 +56,7 @@ namespace SolTechnology.Core.Journey.Workflow.Persistence.InMemory
                 ContextData = original.ContextData, // Reference copy for ContextData
                 CreatedAt = original.CreatedAt,
                 LastUpdatedAt = original.LastUpdatedAt, // Will be updated in SaveAsync for the stored version
-                CurrentStatus = original.CurrentStatus
+                Status = original.Status
             };
             return clone;
         }

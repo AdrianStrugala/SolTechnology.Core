@@ -39,7 +39,7 @@ namespace SolTechnology.Core.Journey.Controllers
             try
             {
                 var baseHandlerType = handlerType.BaseType;
-                if (baseHandlerType == null || !baseHandlerType.IsGenericType || baseHandlerType.GetGenericTypeDefinition() != typeof(PausableChainHandler<,,>))
+                if (baseHandlerType is not { IsGenericType: true } || baseHandlerType.GetGenericTypeDefinition() != typeof(PausableChainHandler<,,>))
                 {
                     return StatusCode(400, $"Flow '{flowName}' is not a valid PausableChainHandler.");
                 }
@@ -62,16 +62,16 @@ namespace SolTechnology.Core.Journey.Controllers
                     return BadRequest($"Could not deserialize input for flow '{flowName}' to type {inputType.Name}.");
                 }
 
-                MethodInfo? startMethod = typeof(JourneyManager).GetMethod(nameof(JourneyManager.StartJourneyAsync))?
+                MethodInfo? startMethod = typeof(JourneyManager).GetMethod(nameof(JourneyManager.StartFlow))?
                     .MakeGenericMethod(handlerType, inputType, baseHandlerType.GetGenericArguments()[1], baseHandlerType.GetGenericArguments()[2]);
 
                 if (startMethod == null)
                 {
-                    return StatusCode(400, "Could not make generic StartJourneyAsync method.");
+                    return StatusCode(400, "Could not make generic StartFlow method.");
                 }
 
-                var task = (Task?)startMethod.Invoke(journeyManager, new[] { typedInitialInput });
-                if (task == null) return StatusCode(500, "Could not invoke StartJourneyAsync.");
+                var task = (Task?)startMethod.Invoke(journeyManager, [typedInitialInput]);
+                if (task == null) return StatusCode(400, "Could not invoke StartFlow.");
                 
                 await task;
 
@@ -183,22 +183,22 @@ namespace SolTechnology.Core.Journey.Controllers
                     var statusProp = contextType.GetProperty("Status")?.GetValue(journeyInstance.ContextData);
                     var currentStepIdProp = contextType.GetProperty("CurrentStepId")?.GetValue(journeyInstance.ContextData)?.ToString();
                     var errorMsgProp = contextType.GetProperty("ErrorMessage")?.GetValue(journeyInstance.ContextData)?.ToString();
-                    var historyProp = contextType.GetProperty("History")?.GetValue(journeyInstance.ContextData) as List<ExecutedStepInfo>;
+                    var historyProp = contextType.GetProperty("History")?.GetValue(journeyInstance.ContextData) as List<StepInfo>;
                     var outputProp = contextType.GetProperty("Output")?.GetValue(journeyInstance.ContextData);
 
                     genericContext = new ChainContext<object, object> 
                     {
-                        Status = statusProp is FlowStatus fs ? fs : journeyInstance.CurrentStatus, 
+                        Status = statusProp is FlowStatus fs ? fs : journeyInstance.Status, 
                         CurrentStepId = currentStepIdProp ?? string.Empty,
                         ErrorMessage = errorMsgProp,
-                        History = historyProp ?? new List<ExecutedStepInfo>(),
+                        History = historyProp ?? new List<StepInfo>(),
                         Output = outputProp ?? new object() 
                     };
                 }
                 catch (Exception ex)
                 {
                     logger.LogError(ex, "Error trying to interpret ContextData for Journey {JourneyId}.", journeyInstance.JourneyId);
-                    genericContext = new ChainContext<object, object> { Status = journeyInstance.CurrentStatus, ErrorMessage = "Error interpreting context." };
+                    genericContext = new ChainContext<object, object> { Status = journeyInstance.Status, ErrorMessage = "Error interpreting context." };
                 }
             }
 
@@ -240,7 +240,7 @@ namespace SolTechnology.Core.Journey.Controllers
                 {
                     journeyInstance.JourneyId,
                     currentStepId = genericContext.CurrentStepId, 
-                    status = journeyInstance.CurrentStatus.ToString(), 
+                    status = journeyInstance.Status.ToString(), 
                     errorMessage = genericContext.ErrorMessage,
                     lastUpdatedAt = journeyInstance.LastUpdatedAt,
                     output = genericContext.Output 
@@ -251,7 +251,7 @@ namespace SolTechnology.Core.Journey.Controllers
             {
                 journeyInstance.JourneyId,
                 currentStepId = genericContext?.CurrentStepId, 
-                status = journeyInstance.CurrentStatus.ToString(), 
+                status = journeyInstance.Status.ToString(), 
                 errorMessage = genericContext?.ErrorMessage,
                 lastUpdatedAt = journeyInstance.LastUpdatedAt
             });
