@@ -17,7 +17,7 @@ namespace SolTechnology.Core.Journey.Workflow.ChainFramework
         
         public string? CurrentStep { get; set; }
         public List<StepInfo> History { get; set; } = new List<StepInfo>();
-        public string? ErrorMessage { get; set; }
+        public string? Error { get; set; }
 
         public JourneyInstance()
         {

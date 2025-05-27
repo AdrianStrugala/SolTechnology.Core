@@ -1,17 +1,20 @@
 using System.Collections;
 using System.Reflection;
 using System.Text.Json;
+using SolTechnology.Core.CQRS.Errors;
 
 namespace SolTechnology.Core.Journey.Models;
 
 public class StepInfo
 {
-    public string? StepId { get; set; }
-    public DateTime StartedAt { get; set; }
+    public required string StepId { get; set; }
+    public string StepType { get; set; } = "Backend";
+    public required DateTime StartedAt { get; set; }
     public DateTime? FinishedAt { get; set; }
     public FlowStatus Status { get; set; }
     public List<DataField> RequiredData { get; set; } = new();
     public JsonElement? ProvidedData { get; set; }
+    public Error? Error { get; set; }
 }
 
    public static class SchemaBuilder
@@ -19,7 +22,7 @@ public class StepInfo
         /// <summary>
         /// Recursively builds a list of DataField descriptors for all public properties of the given type.
         /// </summary>
-        public static List<DataField> GetSchema(Type type)
+        public static List<DataField> ToDataFields(this Type type)
         {
             return type
                 .GetProperties(BindingFlags.Public | BindingFlags.Instance)
@@ -27,7 +30,7 @@ public class StepInfo
                 .ToList();
         }
 
-        private static DataField BuildField(Type propertyType, string propertyName)
+        public static DataField BuildField(this Type propertyType, string propertyName)
         {
             var isSimple = IsSimpleType(propertyType);
             var field = new DataField
@@ -44,12 +47,12 @@ public class StepInfo
                 {
                     var elementType = propertyType.GetGenericArguments().First();
                     // Represent children as the element's schema
-                    field.Children = GetSchema(elementType);
+                    field.Children = ToDataFields(elementType);
                 }
                 else
                 {
                     // Complex object: drill into its properties
-                    field.Children = GetSchema(propertyType);
+                    field.Children = ToDataFields(propertyType);
                 }
             }
 

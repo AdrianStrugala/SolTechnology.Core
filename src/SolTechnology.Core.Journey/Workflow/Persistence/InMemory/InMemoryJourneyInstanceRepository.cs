@@ -9,7 +9,7 @@ namespace SolTechnology.Core.Journey.Workflow.Persistence.InMemory
     {
         private readonly ConcurrentDictionary<string, JourneyInstance> _journeys = new ConcurrentDictionary<string, JourneyInstance>();
 
-        public Task<JourneyInstance?> GetByIdAsync(string journeyId)
+        public Task<JourneyInstance?> FindById(string journeyId)
         {
             _journeys.TryGetValue(journeyId, out var journeyInstance);
             // Return a clone to simulate behavior of a real repository (preventing direct modification of stored instance)

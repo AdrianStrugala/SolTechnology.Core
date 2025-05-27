@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using System.Text.Json; // Added for JsonElement and JsonSerializer
 using System.Reflection; // Added for MethodInfo etc.
 using System.Linq;
+using SolTechnology.Core.CQRS;
 using SolTechnology.Core.Journey.Models;
 using SolTechnology.Core.Journey.Workflow.Persistence; // Added for Linq FirstOrDefault
 
@@ -39,14 +40,15 @@ namespace SolTechnology.Core.Journey.Workflow.ChainFramework
         }
 
         // Updated ResumeJourneyAsync to be non-generic in signature, but handle types internally
-        public async Task<JourneyInstance> ResumeJourneyAsync(
-            string journeyId, 
-            object? userInput = null, // Accept userInput as object
-            string? targetStepId = null) // targetStepId is useful if resuming at a specific point
+        public async Task<JourneyInstance> ResumeFlow(string journeyId,
+            JourneyInstance tempInstance,
+            object? userInput = null, 
+            string? targetStepId = null // targetStepId is used when resuming at a specific point
+        ) 
         {
-            logger.LogInformation("Resuming journey {JourneyId}. TargetStepId: {TargetStepId}", journeyId, targetStepId);
+            logger.LogInformation("Resuming flow {JourneyId}. TargetStepId: {TargetStepId}", journeyId, targetStepId);
 
-            var journeyInstance = await repository.GetByIdAsync(journeyId);
+            var journeyInstance = await repository.FindById(journeyId);
 
             if (journeyInstance == null)
             {

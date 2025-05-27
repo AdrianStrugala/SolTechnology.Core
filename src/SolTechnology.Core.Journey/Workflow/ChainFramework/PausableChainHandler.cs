@@ -3,69 +3,48 @@ using Microsoft.Extensions.Logging;
 using SolTechnology.Core.Journey.Workflow; // For FlowStatus and ExecutedStepInfo
 using System;
 using System.Linq;
+using System.Runtime.InteropServices.JavaScript;
 using System.Threading.Tasks;
+using SolTechnology.Core.CQRS;
+using SolTechnology.Core.CQRS.Errors;
 using SolTechnology.Core.Journey.Models;
 
 namespace SolTechnology.Core.Journey.Workflow.ChainFramework
 {
     public interface IJourneyHandler;
 
-    public abstract class PausableChainHandler<TInput, TContext, TOutput> : IJourneyHandler
+    public abstract class PausableChainHandler<TInput, TContext, TOutput>(
+        IServiceProvider serviceProvider,
+        ILogger<PausableChainHandler<TInput, TContext, TOutput>> logger)
+        : IJourneyHandler
         where TInput : new()
         where TOutput : new()
         where TContext : ChainContext<TInput, TOutput>, new()
     {
-        protected readonly IServiceProvider _serviceProvider;
-        protected readonly ILogger<PausableChainHandler<TInput, TContext, TOutput>> _logger;
-
-        protected PausableChainHandler(IServiceProvider serviceProvider, ILogger<PausableChainHandler<TInput, TContext, TOutput>> logger)
-        {
-            _serviceProvider = serviceProvider;
-            _logger = logger;
-        }
-
+        private Error? _error;
+        private List<StepInfo> _stepHistory = new List<StepInfo>();
+        private CancellationToken _cancellationToken;
         protected abstract Task HandleChainDefinition(TContext context);
 
-        public async Task<Result> ExecuteHandler(TContext context, string? requestedStepId = null)
+        public async Task<StepInfo> ExecuteHandler(
+            TContext context,
+            CancellationToken cancellationToken,
+            string? requestedStepId = null)
         {
-            _logger.LogInformation(
-                "Executing handler for context {ContextType}, current status: {Status}, current context step: {ContextCurrentStep}, requested step: {RequestedStepId}",
+            _cancellationToken = cancellationToken;
+            
+            logger.LogInformation(
+                "Executing handler for context {ContextType}, requested step: {RequestedStepId}",
                 typeof(TContext).Name,
-                context.Status,
-                context.CurrentStepId,
                 requestedStepId);
-
-            if (context.Status == FlowStatus.Failed || context.Status == FlowStatus.Completed)
-            {
-                if (string.IsNullOrEmpty(requestedStepId) || requestedStepId == context.CurrentStepId) // only return terminal if not trying to re-enter a specific step
-                {
-                    _logger.LogWarning("Handler execution attempted on a terminal context (Status: {Status}) without specific step request. ContextCurrentStep: {ContextCurrentStep}", context.Status, context.CurrentStepId);
-                    return Result.Failure($"Context is already in a terminal state: {context.Status}");
-                }
-            }
-
-            // If a specific step is requested, it implies we are resuming or jumping.
-            // If context is WaitingForInput, and the requestedStepId matches CurrentStepId, it's a direct resume.
-            if (!string.IsNullOrEmpty(requestedStepId))
-            {
-                context.CurrentStepId = requestedStepId; // Set the current step to the requested one for resumption
-                if(context.Status != FlowStatus.WaitingForInput) // If not explicitly waiting, assume it's running
-                {
-                     context.Status = FlowStatus.Running;
-                }
-            }
-            else if (context.Status == FlowStatus.NotStarted || string.IsNullOrEmpty(context.CurrentStepId))
-            {
-                context.Status = FlowStatus.Running; // Fresh start
-            }
-            // If context.Status is WaitingForInput and no requestedStepId, it means it's still waiting.
-            // HandleChainDefinition will manage skipping or executing based on context.CurrentStepId.
-
+            
             await HandleChainDefinition(context);
 
-            _logger.LogInformation("Handler execution finished for context {ContextType}. Final status: {Status}, CurrentStepId: {CurrentStepId}, ErrorMessage: {ErrorMessage}",
+            logger.LogInformation("Handler execution finished for context {ContextType}. Final status: {Status}, CurrentStepId: {CurrentStepId}, ErrorMessage: {ErrorMessage}",
                 typeof(TContext).Name, context.Status, context.CurrentStepId, context.ErrorMessage);
 
+            
+            
             if (context.Status == FlowStatus.Completed) return Result.Success();
             if (context.Status == FlowStatus.Failed) return Result.Failure(context.ErrorMessage ?? "Flow failed due to an unspecified error during chain execution.");
             if (context.Status == FlowStatus.WaitingForInput)
@@ -89,10 +68,48 @@ namespace SolTechnology.Core.Journey.Workflow.ChainFramework
             }
 
             // Fallback for any other unhandled state, though ideally steps should drive context to a clear state.
-            _logger.LogWarning("Handler for context {ContextType} ended with an unexpected status: {Status}", typeof(TContext).Name, context.Status);
+            logger.LogWarning("Handler for context {ContextType} ended with an unexpected status: {Status}", typeof(TContext).Name, context.Status);
             return Result.Failure($"Flow ended with an unexpected status: {context.Status}. Error: {context.ErrorMessage}");
         }
 
+        protected async Task Invoke<TStep>() where TStep : IChainStep<TContext>
+        {
+            _cancellationToken.ThrowIfCancellationRequested();
+        
+            if (serviceProvider.GetService(typeof(TStep)) is not IChainStep<TContext> stepInstance)
+            {
+                throw new InvalidOperationException($"Could not resolve service for type {typeof(TStep).Name}");
+            }
+
+            StepInfo stepInfo = new StepInfo
+            {
+                StartedAt = DateTime.UtcNow,
+                Status = FlowStatus.Running,
+                StepId = "stepInstance." //TODO
+            };
+
+            Result stepResult = null!;
+            
+            //TODO here somehow discover if step needs input
+            
+            try
+            {
+                stepResult = await stepInstance.Execute(Context);
+            }
+            catch(Exception e)
+            {
+                stepInfo.Error = Error.From(e);
+                stepInfo.Status = FlowStatus.Failed;
+            }
+            if (stepResult.IsFailure)
+            {
+                stepInfo.Error = stepResult.Error!;
+                stepInfo.Status = FlowStatus.Failed;
+            }
+            
+            _stepHistory.Add(stepInfo);
+        }
+        
         protected async Task<Result> InvokeNextAsync<TStep>(TContext context, bool isContinuation = false)
             where TStep : class, IChainStep<TContext>
         {
