@@ -81,7 +81,7 @@ namespace SolTechnology.Core.Journey.Controllers
                 await task;
 
                 var resultProperty = task.GetType().GetProperty("Result");
-                var journeyInstance = resultProperty?.GetValue(task) as JourneyInstance;
+                var journeyInstance = resultProperty?.GetValue(task) as FlowInstance;
 
                 return Ok(journeyInstance);
             }
@@ -100,7 +100,7 @@ namespace SolTechnology.Core.Journey.Controllers
         {
             logger.LogInformation("Attempting to resume flow: {flowId}", flowId);
 
-                object? userInput = userInputJson?.ValueKind == JsonValueKind.Undefined || userInputJson == null
+            JsonElement? userInput = userInputJson?.ValueKind == JsonValueKind.Undefined || userInputJson == null
                     ? null
                     : userInputJson;
 
@@ -129,7 +129,10 @@ namespace SolTechnology.Core.Journey.Controllers
                         $"Handler '{flowInstance.FlowHandlerName}' is not a valid PausableChainHandler.");
                 }
 
-                flowInstance = await journeyManager.ResumeFlow(flowId, flowInstance, userInput, stepId);
+                flowInstance = await journeyManager.RunFlow(
+                    flowId,
+                    stepId ?? flowInstance.CurrentStep?.StepId,
+                    userInput);
 
                 return Ok(flowInstance);
         }

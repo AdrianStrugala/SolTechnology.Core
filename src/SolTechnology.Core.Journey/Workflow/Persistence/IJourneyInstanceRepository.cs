@@ -4,8 +4,8 @@ namespace SolTechnology.Core.Journey.Workflow.Persistence
 {
     public interface IJourneyInstanceRepository
     {
-        Task<JourneyInstance?> FindById(string journeyId);
-        Task SaveAsync(JourneyInstance journeyInstance); // For create or update (upsert)
+        Task<FlowInstance?> FindById(string journeyId);
+        Task SaveAsync(FlowInstance flowInstance); // For create or update (upsert)
         Task DeleteAsync(string journeyId); // Optional for now, but good for completeness
     }
 }

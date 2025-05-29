@@ -7,29 +7,29 @@ namespace SolTechnology.Core.Journey.Workflow.Persistence.InMemory
 {
     public class InMemoryJourneyInstanceRepository : IJourneyInstanceRepository
     {
-        private readonly ConcurrentDictionary<string, JourneyInstance> _journeys = new ConcurrentDictionary<string, JourneyInstance>();
+        private readonly ConcurrentDictionary<string, FlowInstance> _journeys = new ConcurrentDictionary<string, FlowInstance>();
 
-        public Task<JourneyInstance?> FindById(string journeyId)
+        public Task<FlowInstance?> FindById(string journeyId)
         {
             _journeys.TryGetValue(journeyId, out var journeyInstance);
             // Return a clone to simulate behavior of a real repository (preventing direct modification of stored instance)
-            return Task.FromResult<JourneyInstance?>(Clone(journeyInstance)); 
+            return Task.FromResult<FlowInstance?>(Clone(journeyInstance)); 
         }
 
-        public Task SaveAsync(JourneyInstance journeyInstance)
+        public Task SaveAsync(FlowInstance flowInstance)
         {
-            if (journeyInstance == null)
+            if (flowInstance == null)
             {
                 // Or throw new ArgumentNullException(nameof(journeyInstance));
                 return Task.CompletedTask; 
             }
 
             // Store a clone to prevent external modifications to the instance in the dictionary
-            var instanceToStore = Clone(journeyInstance);
+            var instanceToStore = Clone(flowInstance);
             if(instanceToStore != null) // Clone method could return null
             {
                 instanceToStore.LastUpdatedAt = System.DateTime.UtcNow; // Ensure LastUpdatedAt is fresh on save
-                _journeys[journeyInstance.JourneyId] = instanceToStore;
+                _journeys[flowInstance.FlowId] = instanceToStore;
             }
             return Task.CompletedTask;
         }
@@ -41,7 +41,7 @@ namespace SolTechnology.Core.Journey.Workflow.Persistence.InMemory
         }
 
         // Simplified cloning method.
-        private JourneyInstance? Clone(JourneyInstance? original)
+        private FlowInstance? Clone(FlowInstance? original)
         {
             if (original == null) return null;
 
@@ -49,11 +49,11 @@ namespace SolTechnology.Core.Journey.Workflow.Persistence.InMemory
             // For a true in-memory DB behavior preventing cross-test contamination or unintended modifications,
             // ContextData would also need to be deep cloned (e.g., via serialization/deserialization).
             // This is a known simplification for this in-memory repository.
-            var clone = new JourneyInstance
+            var clone = new FlowInstance
             {
-                JourneyId = original.JourneyId,
+                FlowId = original.FlowId,
                 FlowHandlerName = original.FlowHandlerName,
-                ContextData = original.ContextData, // Reference copy for ContextData
+                Context = original.Context, // Reference copy for ContextData
                 CreatedAt = original.CreatedAt,
                 LastUpdatedAt = original.LastUpdatedAt, // Will be updated in SaveAsync for the stored version
                 Status = original.Status

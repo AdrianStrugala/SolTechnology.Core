@@ -1,3 +1,5 @@
+using SolTechnology.Core.CQRS;
+
 namespace SolTechnology.Core.Journey.Workflow.ChainFramework
 {
     /// <summary>
@@ -6,7 +8,7 @@ namespace SolTechnology.Core.Journey.Workflow.ChainFramework
     /// Their Execute method performs the action and returns Success or Failure.
     /// </summary>
     /// <typeparam name="TContext">The context type shared by steps in the chain.</typeparam>
-    public interface IAutomatedChainStep<TContext> : IChainStep<TContext>
+    public abstract class AutomatedFlowStep<TContext> : IFlowStep<TContext>
         where TContext : class
     {
         // This interface currently has no additional members. 
@@ -14,5 +16,6 @@ namespace SolTechnology.Core.Journey.Workflow.ChainFramework
         // if needed for type checking, DI registration, or specific handling in the chain orchestrator.
         // If IChainStep<TContext> is sufficient as the universal base and IUserInteractionChainStep 
         // provides the necessary specialization, this marker might be optional depending on the framework's evolution.
+        public abstract Task<Result> Execute(TContext context);
     }
 }

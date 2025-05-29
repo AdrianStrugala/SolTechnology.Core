@@ -1,20 +1,18 @@
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
+using SolTechnology.Core.CQRS;
+using SolTechnology.Core.Journey.Models;
 
 namespace SolTechnology.Core.Journey.Workflow.ChainFramework
 {
-    public interface IUserInteractionChainStep<TContext, TStepInput, TStepOutput> : IChainStep<TContext>
+    public abstract class InteractiveFlowStep<TContext, TStepInput> : IFlowStep<TContext>
         where TContext : class
         where TStepInput : class, new()  // Input DTO for the step
-        where TStepOutput : class, new() // Output DTO for the step
     {
         /// <summary>
         /// Returns a dictionary describing the expected TStepInput properties and their types.
         /// This helps in generating the API response for UI steps or validating input.
         /// </summary>
         /// <returns>A dictionary where keys are property names and values are their types.</returns>
-        Dictionary<string, Type> GetRequiredInputSchema();
+        public List<DataField> GetRequiredInputSchema() => typeof(TStepInput).ToDataFields();
 
         /// <summary>
         /// Processes the provided user input.
@@ -24,7 +22,7 @@ namespace SolTechnology.Core.Journey.Workflow.ChainFramework
         /// <param name="context">The current workflow context.</param>
         /// <param name="userInput">The user-provided input for this step.</param>
         /// <returns>A Result indicating the outcome of processing the user input.</returns>
-        Task<Result> HandleUserInputAsync(TContext context, TStepInput userInput);
+        public abstract Task<Result> ExecuteWithUserInput(TContext context, TStepInput userInput);
 
         // Note on Execute(TContext context) from IChainStep<TContext>:
         // For an IUserInteractionChainStep, the Execute method would typically:
@@ -41,5 +39,9 @@ namespace SolTechnology.Core.Journey.Workflow.ChainFramework
         //    Update TContext with TStepOutput.
         //    Return Result.Success(); 
         //    Or, if further processing leads to an issue, Result.Failure("...");
+        public Task<Result> Execute(TContext context)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

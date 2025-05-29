@@ -1,15 +1,8 @@
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using SolTechnology.Core.Journey.Workflow; // For FlowStatus
-using System;
-using System.Collections.Generic; // For KeyNotFoundException
-using System.Threading.Tasks;
-using System.Text.Json; // Added for JsonElement and JsonSerializer
-using System.Reflection; // Added for MethodInfo etc.
-using System.Linq;
-using SolTechnology.Core.CQRS;
+using System.Text.Json; 
+using System.Reflection; 
 using SolTechnology.Core.Journey.Models;
-using SolTechnology.Core.Journey.Workflow.Persistence; // Added for Linq FirstOrDefault
+using SolTechnology.Core.Journey.Workflow.Persistence; 
 
 namespace SolTechnology.Core.Journey.Workflow.ChainFramework
 {
@@ -18,17 +11,22 @@ namespace SolTechnology.Core.Journey.Workflow.ChainFramework
         IJourneyInstanceRepository repository,
         ILogger<JourneyManager> logger)
     {
-        public async Task<JourneyInstance> StartFlow<THandler, TInput, TContext, TOutput>(TInput input)
+        public async Task<FlowInstance> StartFlow<THandler, TInput, TContext, TOutput>(TInput input)
             where THandler : PausableChainHandler<TInput, TContext, TOutput>
             where TInput : new()
             where TOutput : new()
-            where TContext : ChainContext<TInput, TOutput>, new()
+            where TContext : FlowContext<TInput, TOutput>, new()
         {
             var flowName = typeof(THandler).AssemblyQualifiedName!;
             logger.LogInformation("Starting new flow [{HandlerName}].", flowName);
-
+            
             var flowId = Guid.NewGuid().ToString();
-            var flowInstance = new JourneyInstance(flowId, flowName, input);
+            var context = new TContext
+            {
+                Input = input
+            };
+            
+            var flowInstance = new FlowInstance(flowId, flowName, context);
 
             await repository.SaveAsync(flowInstance);
             
@@ -40,11 +38,11 @@ namespace SolTechnology.Core.Journey.Workflow.ChainFramework
         }
 
         // Updated ResumeJourneyAsync to be non-generic in signature, but handle types internally
-        public async Task<JourneyInstance> ResumeFlow(string journeyId,
-            JourneyInstance tempInstance,
-            object? userInput = null, 
-            string? targetStepId = null // targetStepId is used when resuming at a specific point
-        ) 
+        public async Task<FlowInstance> RunFlow(
+            string journeyId,
+            string? targetStepId,
+            JsonElement? userInput = null
+            ) 
         {
             logger.LogInformation("Resuming flow {JourneyId}. TargetStepId: {TargetStepId}", journeyId, targetStepId);
 
@@ -56,7 +54,7 @@ namespace SolTechnology.Core.Journey.Workflow.ChainFramework
                 throw new KeyNotFoundException($"Journey {journeyId} not found.");
             }
 
-            if (journeyInstance.ContextData == null)
+            if (journeyInstance.Context == null)
             {
                 logger.LogError("ContextData for Journey {JourneyId} is null.", journeyId);
                 throw new InvalidOperationException($"ContextData for Journey {journeyId} is null.");
@@ -82,13 +80,13 @@ namespace SolTechnology.Core.Journey.Workflow.ChainFramework
             }
 
             Type contextType = baseHandlerType.GetGenericArguments()[1]; // TContext type
-            if (!contextType.IsAssignableFrom(journeyInstance.ContextData.GetType()))
+            if (!contextType.IsInstanceOfType(journeyInstance.Context))
             {
                  logger.LogError("ContextData type mismatch for Journey {JourneyId}. Expected assignable from {ExpectedBase}, got {ActualType}", 
-                    journeyId, contextType.FullName, journeyInstance.ContextData.GetType().FullName);
+                    journeyId, contextType.FullName, journeyInstance.Context.GetType().FullName);
                 throw new InvalidOperationException("ContextData type mismatch.");
             }
-            var context = journeyInstance.ContextData; 
+            var context = journeyInstance.Context; 
 
             var statusProperty = contextType.GetProperty("Status");
             var currentStatus = (FlowStatus)(statusProperty?.GetValue(context) ?? FlowStatus.Failed);
@@ -108,89 +106,19 @@ namespace SolTechnology.Core.Journey.Workflow.ChainFramework
             
             var currentStepIdProperty = contextType.GetProperty("CurrentStepId");
             string? currentStepId = currentStepIdProperty?.GetValue(context) as string;
-
-            if (userInput != null && !string.IsNullOrEmpty(currentStepId))
-            {
-                logger.LogInformation("Processing user input for journey {JourneyId}, step {StepId}", journeyId, currentStepId);
-                
-                Type? currentStepType = Type.GetType(currentStepId); // Relies on CurrentStepId being AssemblyQualifiedName
-                
-                if (currentStepType != null && serviceProvider.GetService(currentStepType) is var stepInstance && stepInstance != null)
-                {
-                    var userInteractionStepInterface = stepInstance.GetType().GetInterfaces().FirstOrDefault(i => 
-                        i.IsGenericType && 
-                        i.GetGenericTypeDefinition() == typeof(IUserInteractionChainStep<,,>));
-
-                    if (userInteractionStepInterface != null)
-                    {
-                        Type stepInputType = userInteractionStepInterface.GetGenericArguments()[1]; 
-
-                        object? typedUserInput;
-                        if (userInput.GetType() == stepInputType) {
-                            typedUserInput = userInput;
-                        } else if (userInput is JsonElement jsonElement) { 
-                            typedUserInput = jsonElement.Deserialize(stepInputType, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
-                        }
-                        else if (userInput is Dictionary<string, object> dict) { // Should be less common if controller sends JsonElement
-                            var tempJson = JsonSerializer.Serialize(dict);
-                            typedUserInput = JsonSerializer.Deserialize(tempJson, stepInputType, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
-                        }
-                         else {
-                            logger.LogError("User input type mismatch for step {StepId}. Expected {ExpectedType}, got {ActualType}", currentStepId, stepInputType.FullName, userInput.GetType().FullName);
-                            throw new ArgumentException($"User input type mismatch for step {currentStepId}. Expected {stepInputType.FullName} but got {userInput.GetType().FullName}.");
-                        }
-                        
-                        if (typedUserInput == null)
-                        {
-                            logger.LogError("User input for step {StepId} deserialized to null.", currentStepId);
-                            throw new ArgumentException($"User input for step {currentStepId} could not be processed.");
-                        }
-
-                        MethodInfo? handleMethod = userInteractionStepInterface.GetMethod("HandleUserInputAsync");
-                        if (handleMethod == null) throw new InvalidOperationException("HandleUserInputAsync method not found on step.");
-
-                        var taskResult = (Task<Result>?)handleMethod.Invoke(stepInstance, new[] { context, typedUserInput });
-                        if (taskResult == null) throw new InvalidOperationException("Invoking HandleUserInputAsync returned null task.");
-                        
-                        Result inputHandlingResult = await taskResult;
-
-                        if (!inputHandlingResult.IsSuccess)
-                        {
-                            logger.LogWarning("Handling user input failed for journey {JourneyId}, step {StepId}. Error: {Error}", journeyId, currentStepId, inputHandlingResult.Error);
-                            var errorProperty = contextType.GetProperty("ErrorMessage");
-                            errorProperty?.SetValue(context, inputHandlingResult.Error);
-                            
-                            journeyInstance.ContextData = context;
-                            journeyInstance.LastUpdatedAt = DateTime.UtcNow;
-                            journeyInstance.Status = (FlowStatus)(statusProperty?.GetValue(context) ?? FlowStatus.WaitingForInput); 
-                            await repository.SaveAsync(journeyInstance);
-                            return journeyInstance; 
-                        }
-                         logger.LogInformation("User input handled successfully for step {StepId}", currentStepId);
-                    }
-                } else {
-                     logger.LogWarning("User input provided for journey {JourneyId}, but current step {StepId} (Type: {CurrentStepTypeString}) could not be resolved or is not an interaction step.", 
-                        journeyId, currentStepId, currentStepType?.FullName ?? "Not Resolved");
-                }
-            }
             
             // Dynamically invoke ExecuteHandler on the resolved handlerInstance
             MethodInfo? executeHandlerMethod = handlerType.GetMethod("ExecuteHandler");
             if (executeHandlerMethod == null) throw new InvalidOperationException("ExecuteHandler method not found on handler.");
 
-            var executionTask = (Task<Result>?)executeHandlerMethod.Invoke(handlerInstance, new object?[] { context, targetStepId ?? currentStepId });
+            var executionTask = (Task?)executeHandlerMethod.Invoke(handlerInstance, new object?[] { context, targetStepId ?? currentStepId });
             if (executionTask == null) throw new InvalidOperationException("Invoking ExecuteHandler returned null task.");
             
-            Result executionResult = await executionTask;
+            await executionTask;
             
-            journeyInstance.ContextData = context;
             journeyInstance.LastUpdatedAt = DateTime.UtcNow;
-            journeyInstance.Status = (FlowStatus)(statusProperty?.GetValue(context) ?? FlowStatus.Failed); 
             await repository.SaveAsync(journeyInstance);
-
-            logger.LogInformation(
-                    "Journey {JourneyId} resumed. Execution result: IsSuccess={IsSuccess}, IsPaused={IsPaused}, Error={Error}", 
-                journeyId, executionResult.IsSuccess, executionResult.IsPaused, executionResult.Error);
+            
             return journeyInstance;
         }
     }

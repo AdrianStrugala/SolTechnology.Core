@@ -1,36 +1,29 @@
+using DreamTravel.Flows.SampleOrderWorkflow.Steps;
 using Microsoft.Extensions.Logging;
 using SolTechnology.Core.Journey.Workflow.ChainFramework;
 using SolTechnology.Core.Journey.Workflow.Handlers;
 using SolTechnology.Core.Journey.Workflow.Steps;
-// For example steps
 
-namespace DreamTravel.Flows
+namespace DreamTravel.Flows.SampleOrderWorkflow
 {
-    public class SampleOrderWorkflowHandler : PausableChainHandler<SampleOrderInput, SampleOrderContext, SampleOrderResult>
+    public class SampleOrderWorkflowHandler(
+        IServiceProvider serviceProvider,
+        ILogger<SampleOrderWorkflowHandler> logger)
+        : PausableChainHandler<SampleOrderInput, SampleOrderContext, SampleOrderResult>(serviceProvider, logger)
     {
-        public SampleOrderWorkflowHandler(
-            IServiceProvider serviceProvider,
-            ILogger<SampleOrderWorkflowHandler> logger)
-            : base(serviceProvider, logger)
-        {
-        }
-
         protected override async Task HandleChainDefinition(SampleOrderContext context)
         {
             // The PausableChainHandler's ExecuteHandler will manage continuing or stopping based on these results.
-            // InvokeNextAsync should internally handle the "don't proceed if prior step failed/paused" logic.
+            // Invoke should internally handle the "don't proceed if prior step failed/paused" logic.
 
             // Step 1: Request User Input for Customer Details
-            await InvokeNextAsync<RequestUserInputStep>(context);
-            // if (!stepResult.IsSuccess || stepResult.IsPaused) return; // Stop if failed or paused
+            await Invoke<RequestUserInputStep>();
 
             // Step 2: Process Payment (Automated)
-            await InvokeNextAsync<BackendProcessingStep>(context);
-            // if (!stepResult.IsSuccess || stepResult.IsPaused) return; // Stop if failed (paused not expected for automated)
+            await Invoke<BackendProcessingStep>();
 
             // Step 3: Fetch Shipping Estimate (Automated)
-            await InvokeNextAsync<FetchExternalDataStep>(context);
-            // if (!stepResult.IsSuccess || stepResult.IsPaused) return; // Stop if failed
+            await Invoke<FetchExternalDataStep>();
 
             // If all steps complete successfully:
             context.Output.OrderId = context.Input.OrderId;
