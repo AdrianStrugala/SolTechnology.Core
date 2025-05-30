@@ -1,3 +1,4 @@
+using System.Text.Json.Serialization;
 using SolTechnology.Core.Journey.Models;
 
 namespace SolTechnology.Core.Journey.Workflow.ChainFramework
@@ -14,7 +15,8 @@ namespace SolTechnology.Core.Journey.Workflow.ChainFramework
         public FlowStatus Status { get; set; }
         public DateTime CreatedAt { get; set; }
         public DateTime LastUpdatedAt { get; set; }
-        
+
+        [JsonIgnore]
         public object? Context { get; set; }
         
 

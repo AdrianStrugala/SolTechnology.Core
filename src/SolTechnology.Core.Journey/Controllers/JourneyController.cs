@@ -27,7 +27,7 @@ namespace SolTechnology.Core.Journey.Controllers
             x => x.GetType().Name, y => y.GetType());
 
         [HttpPost("{flowName}/start")]
-        public async Task<IActionResult> StartJourney(string flowName, [FromBody] JsonElement initialInputJson)
+        public async Task<IActionResult> StartFlow(string flowName, [FromBody] JsonElement initialInputJson)
         {
             logger.LogInformation("Attempting to start journey with handler: {JourneyHandlerName}", flowName);
 
@@ -92,8 +92,8 @@ namespace SolTechnology.Core.Journey.Controllers
             }
         }
 
-        [HttpPost("{journeyId}")]
-        public async Task<IActionResult> ResumeFlow(
+        [HttpPost("{flowId}")]
+        public async Task<IActionResult> RunFlow(
             string flowId,
             [FromBody] JsonElement? userInputJson,
             [FromQuery] string? stepId)

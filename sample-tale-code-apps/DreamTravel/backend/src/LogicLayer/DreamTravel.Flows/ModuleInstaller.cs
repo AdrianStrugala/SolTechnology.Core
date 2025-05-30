@@ -1,4 +1,5 @@
 ﻿using DreamTravel.Flows.SampleOrderWorkflow;
+using DreamTravel.Flows.SampleOrderWorkflow.Steps;
 using Microsoft.Extensions.DependencyInjection;
 using SolTechnology.Core.Journey.Workflow.ChainFramework;
 
@@ -11,6 +12,10 @@ public static class ModuleInstaller
         {
             services.AddScoped<IJourneyHandler, SampleOrderWorkflowHandler>();
             services.AddScoped<SampleOrderWorkflowHandler>();
+            
+            services.AddScoped<RequestUserInputStep>();
+            services.AddScoped<FetchExternalDataStep>();
+            services.AddScoped<BackendProcessingStep>();
 
             return services;
         }

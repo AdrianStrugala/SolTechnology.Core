@@ -24,6 +24,7 @@ namespace SolTechnology.Core.Journey.Workflow.ChainFramework
         private StepInfo? _currentStep;
 
         private bool _flowFailed;
+        private bool _flowPaused;
 
 
         protected abstract Task HandleChainDefinition(TContext context);
@@ -43,14 +44,14 @@ namespace SolTechnology.Core.Journey.Workflow.ChainFramework
                 requestedStepId);
 
             _context = context;
+            _requestedStep = requestedStepId;
+            _stepInput = requestedStepInput;
 
-            if (requestedStepId != null)
+            if (_requestedStep != null)
             {
                 logger.LogInformation(
                     "Resuming from step {CurrentStep}",
                     requestedStepId);
-                _requestedStep = requestedStepId;
-                _stepInput = requestedStepInput;
             }
 
             await HandleChainDefinition(context);
@@ -101,7 +102,7 @@ namespace SolTechnology.Core.Journey.Workflow.ChainFramework
                 return;
             }
 
-            if (_requestedStep != null && stepInstance.StepId != _requestedStep)
+            if (_requestedStep != null && stepInstance.StepId != _requestedStep || _flowPaused)
             {
                 logger.LogInformation($"Skipping step: [{stepInstance.StepId}]");
                 return;
@@ -116,15 +117,7 @@ namespace SolTechnology.Core.Journey.Workflow.ChainFramework
 
             Result stepResult = null!;
 
-
-            //check if step is interactive
-            var interactiveStepType = stepType
-                .GetInterfaces()
-                .FirstOrDefault(i =>
-                    i.IsGenericType
-                    && i.GetGenericTypeDefinition() == typeof(InteractiveFlowStep<,>)
-                );
-
+            var interactiveStepType = GetInteractiveStepBaseType(stepType);
             if (interactiveStepType != null)
             {
                 _currentStep.StepType = "Interactive";
@@ -137,6 +130,7 @@ namespace SolTechnology.Core.Journey.Workflow.ChainFramework
                 object? stepInput = TryDeserializeInput(interactiveStepType);
                 if (stepInput == null)
                 {
+                    _flowPaused = true;
                     _currentStep.Status = FlowStatus.WaitingForInput;
                     return;
                 }
@@ -199,6 +193,21 @@ namespace SolTechnology.Core.Journey.Workflow.ChainFramework
             _currentStep = null;
         }
 
+        private Type? GetInteractiveStepBaseType(Type? stepType)
+        {
+            while (stepType != null && stepType != typeof(object))
+            {
+                if (stepType.IsGenericType &&
+                    stepType.GetGenericTypeDefinition() == typeof(InteractiveFlowStep<,>))
+                {
+                    return stepType;
+                }
+
+                stepType = stepType.BaseType;
+            }
+
+            return null;
+        }
 
         private object? TryDeserializeInput(Type interactiveStepType)
         {

@@ -10,7 +10,7 @@ public static class ModuleInstaller
         public static IServiceCollection AddJourneyFramework(
             this IServiceCollection services)
         {
-            services.AddScoped<IJourneyInstanceRepository, InMemoryJourneyInstanceRepository>();
+            services.AddSingleton<IJourneyInstanceRepository, InMemoryJourneyInstanceRepository>();
             services.AddScoped<JourneyManager>();
 
             return services;

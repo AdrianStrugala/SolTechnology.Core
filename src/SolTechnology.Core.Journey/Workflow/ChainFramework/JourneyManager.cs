@@ -86,12 +86,10 @@ namespace SolTechnology.Core.Journey.Workflow.ChainFramework
                     journeyId, contextType.FullName, journeyInstance.Context.GetType().FullName);
                 throw new InvalidOperationException("ContextData type mismatch.");
             }
-            var context = journeyInstance.Context; 
+            var context = journeyInstance.Context;
+            var currentStatus = journeyInstance.Status;
 
-            var statusProperty = contextType.GetProperty("Status");
-            var currentStatus = (FlowStatus)(statusProperty?.GetValue(context) ?? FlowStatus.Failed);
-
-            if (currentStatus == FlowStatus.Completed || currentStatus == FlowStatus.Failed)
+            if (currentStatus is FlowStatus.Completed or FlowStatus.Failed)
             {
                 logger.LogWarning("Attempt to resume journey {JourneyId} that is already in terminal state: {Status}", journeyId, currentStatus);
                 return journeyInstance;
@@ -103,15 +101,14 @@ namespace SolTechnology.Core.Journey.Workflow.ChainFramework
                 logger.LogError("Could not resolve handler instance for type {HandlerType}", handlerType.FullName);
                 throw new InvalidOperationException($"Could not resolve handler instance for type {handlerType.FullName}");
             }
-            
-            var currentStepIdProperty = contextType.GetProperty("CurrentStepId");
-            string? currentStepId = currentStepIdProperty?.GetValue(context) as string;
+
+            string? currentStepId = targetStepId ?? journeyInstance.CurrentStep?.StepId;
             
             // Dynamically invoke ExecuteHandler on the resolved handlerInstance
             MethodInfo? executeHandlerMethod = handlerType.GetMethod("ExecuteHandler");
             if (executeHandlerMethod == null) throw new InvalidOperationException("ExecuteHandler method not found on handler.");
 
-            var executionTask = (Task?)executeHandlerMethod.Invoke(handlerInstance, new object?[] { context, targetStepId ?? currentStepId });
+            var executionTask = (Task?)executeHandlerMethod.Invoke(handlerInstance, [journeyInstance, context, currentStepId, userInput, CancellationToken.None]);
             if (executionTask == null) throw new InvalidOperationException("Invoking ExecuteHandler returned null task.");
             
             await executionTask;
