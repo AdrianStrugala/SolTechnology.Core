@@ -6,8 +6,14 @@ namespace DreamTravel.Flows.SampleOrderWorkflow
     public class SampleOrderContext : FlowContext<SampleOrderInput, SampleOrderResult>
     {
         // Custom properties for this specific workflow context
-        public string CustomerDetails { get; set; } = null!;
+        public CustomerDetails CustomerDetails { get; set; } = null!;
         public double ProcessedPaymentAmount { get; set; }
         public bool IsInventoryChecked { get; set; }
+    }
+
+    public class CustomerDetails
+    {
+        public string Name { get; set; } = null!; 
+        public string Address { get; set; } = null!;
     }
 }

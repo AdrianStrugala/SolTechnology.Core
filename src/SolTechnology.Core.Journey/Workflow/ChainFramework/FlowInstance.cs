@@ -10,6 +10,7 @@ namespace SolTechnology.Core.Journey.Workflow.ChainFramework
         
         public StepInfo? CurrentStep { get; set; }
         
+        // ReSharper disable once CollectionNeverQueried.Global
         public List<StepInfo> History { get; set; } = new();
                 
         public FlowStatus Status { get; set; }
@@ -17,7 +18,7 @@ namespace SolTechnology.Core.Journey.Workflow.ChainFramework
         public DateTime LastUpdatedAt { get; set; }
 
         [JsonIgnore]
-        public object? Context { get; set; }
+        public dynamic? Context { get; set; }
         
 
         public FlowInstance(string flowId, string flowHandlerName, object context)
@@ -26,7 +27,7 @@ namespace SolTechnology.Core.Journey.Workflow.ChainFramework
             FlowHandlerName = flowHandlerName;
             CreatedAt = DateTime.UtcNow;
             LastUpdatedAt = DateTime.UtcNow;
-            Status = FlowStatus.NotStarted;
+            Status = FlowStatus.Created;
             Context = context;
         }
 

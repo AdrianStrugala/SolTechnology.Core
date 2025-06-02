@@ -28,6 +28,7 @@ namespace DreamTravel.Flows.SampleOrderWorkflow
             // If all steps complete successfully:
             context.Output.OrderId = context.Input.OrderId;
             context.Output.IsSuccessfullyProcessed = true;
+            context.Output.Name = context.CustomerDetails.Name;
             if (string.IsNullOrEmpty(context.Output.FinalMessage)) // Ensure FinalMessage has a value
             {
                 context.Output.FinalMessage = "Order processed and shipping estimate obtained.";

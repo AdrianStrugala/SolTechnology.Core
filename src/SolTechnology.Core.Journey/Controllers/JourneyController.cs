@@ -7,9 +7,6 @@ using SolTechnology.Core.Journey.Workflow;
 using SolTechnology.Core.Journey.Workflow.ChainFramework;
 using SolTechnology.Core.Journey.Workflow.Persistence;
 
-// For JsonElement
-
-// For MethodInfo
 
 namespace SolTechnology.Core.Journey.Controllers
 {
@@ -138,7 +135,7 @@ namespace SolTechnology.Core.Journey.Controllers
         }
 
         [HttpGet("{journeyId}")]
-        public async Task<IActionResult> GetJourneyStatus(string journeyId)
+        public async Task<IActionResult> GetJourneyState(string journeyId)
         {
             logger.LogInformation("Attempting to get status for journey: {JourneyId}", journeyId);
             if (string.IsNullOrEmpty(journeyId))
@@ -148,6 +145,19 @@ namespace SolTechnology.Core.Journey.Controllers
 
             var journeyInstance = await journeyRepository.FindById(journeyId);
             return Ok(journeyInstance);
+        }
+        
+        [HttpGet("{journeyId}/result")]
+        public async Task<IActionResult> GetJourneyResult(string journeyId)
+        {
+            logger.LogInformation("Attempting to get result for journey: {JourneyId}", journeyId);
+            if (string.IsNullOrEmpty(journeyId))
+            {
+                return BadRequest("Journey ID must be provided.");
+            }
+
+            var journeyInstance = await journeyRepository.FindById(journeyId);
+            return Ok(journeyInstance!.Context!.Output);
         }
     }
 }

@@ -2,7 +2,7 @@ namespace SolTechnology.Core.Journey.Models
 {
     public enum FlowStatus
     {
-        NotStarted,
+        Created,
         Running,
         WaitingForInput,
         Completed,

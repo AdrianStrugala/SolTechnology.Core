@@ -82,7 +82,7 @@ namespace SolTechnology.Core.Journey.Workflow.ChainFramework
             Type contextType = baseHandlerType.GetGenericArguments()[1]; // TContext type
             if (!contextType.IsInstanceOfType(journeyInstance.Context))
             {
-                 logger.LogError("ContextData type mismatch for Journey {JourneyId}. Expected assignable from {ExpectedBase}, got {ActualType}", 
+                 LoggerExtensions.LogError(logger, "ContextData type mismatch for Journey {JourneyId}. Expected assignable from {ExpectedBase}, got {ActualType}", 
                     journeyId, contextType.FullName, journeyInstance.Context.GetType().FullName);
                 throw new InvalidOperationException("ContextData type mismatch.");
             }

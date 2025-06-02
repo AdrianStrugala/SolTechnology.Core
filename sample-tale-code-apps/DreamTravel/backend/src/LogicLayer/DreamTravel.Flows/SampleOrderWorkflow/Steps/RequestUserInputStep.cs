@@ -14,7 +14,11 @@ public class RequestUserInputStep : InteractiveFlowStep<SampleOrderContext, Cust
             return Task.FromResult(Result.Fail("Name and Address cannot be empty."));
         }
 
-        context.CustomerDetails = $"Name: {userInput.Name}, Address: {userInput.Address}";
+        context.CustomerDetails = new CustomerDetails
+        {
+            Address = userInput.Address,
+            Name = userInput.Name
+        };
         // Optionally, produce some output for TStepOutput if this step had one.
         // For this example, the main output (CustomerDetails) is written to the shared context.
         // Let's assume CustomerDetailsOutput is not strictly needed for this example's TStepOutput.
