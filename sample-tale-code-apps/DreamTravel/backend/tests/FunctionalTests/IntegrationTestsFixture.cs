@@ -22,7 +22,7 @@ namespace DreamTravel.FunctionalTests
             Environment.SetEnvironmentVariable("ASPNETCORE_ENVIRONMENT", "development");
 
             var configuration = new ConfigurationBuilder()
-                .AddJsonFile("appsettings.integration.tests.json")
+                .AddJsonFile("appsettings.tests.json")
                 .Build();
             
             ApiFixture = new ApiFixture<Program>(configuration);

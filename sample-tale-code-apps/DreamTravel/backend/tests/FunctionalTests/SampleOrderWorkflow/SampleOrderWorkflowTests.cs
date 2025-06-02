@@ -32,9 +32,9 @@ public class SampleOrderWorkflowTests
             
         createFlowResponse.IsSuccess.Should().BeTrue();
         createFlowResponse.Data.Should().NotBeNull();
-        createFlowResponse.Data!.FlowHandlerName.Should().Be("SampleOrderWorkflowHandler");
+        createFlowResponse.Data!.FlowHandlerName.Should().Contain("DreamTravel.Flows.SampleOrderWorkflow.SampleOrderWorkflowHandler");
         createFlowResponse.Data!.Status.Should().Be(FlowStatus.Created);
-        createFlowResponse.Data!.CreatedAt.Should().Be(default);
+        createFlowResponse.Data!.CreatedAt.Should().NotBe(default);
         createFlowResponse.Data.History.Should().BeEmpty();
 
         var flowId = createFlowResponse.Data.FlowId;
@@ -69,8 +69,8 @@ public class SampleOrderWorkflowTests
         progressFlow.IsSuccess.Should().BeTrue();
         progressFlow.Data.Should().NotBeNull();
         progressFlow.Data!.CurrentStep.Should().BeNull();
-        createFlowResponse.Data.History.Should().HaveCount(3);
-        createFlowResponse.Data!.Status.Should().Be(FlowStatus.Completed);
+        progressFlow.Data.History.Should().HaveCount(3);
+        progressFlow.Data!.Status.Should().Be(FlowStatus.Completed);
             
             
         // "When calling get flow result".x(() =>

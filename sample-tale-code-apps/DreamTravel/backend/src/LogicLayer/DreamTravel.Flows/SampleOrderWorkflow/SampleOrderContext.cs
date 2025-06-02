@@ -13,7 +13,7 @@ namespace DreamTravel.Flows.SampleOrderWorkflow
 
     public class CustomerDetails
     {
-        public string Name { get; set; } = null!; 
-        public string Address { get; set; } = null!;
+        public string? Name { get; set; } = null!; 
+        public string? Address { get; set; } = null!;
     }
 }
