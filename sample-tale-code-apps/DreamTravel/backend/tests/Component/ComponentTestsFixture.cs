@@ -1,8 +1,6 @@
-﻿using System;
-using DreamTravel.Api;
+﻿using DreamTravel.Api;
 using DreamTravel.FunctionalTests.FakeApis;
 using Microsoft.Extensions.Configuration;
-using NUnit.Framework;
 using SolTechnology.Core.Api.Testing;
 using SolTechnology.Core.Faker;
 
@@ -10,7 +8,7 @@ namespace DreamTravel.FunctionalTests
 {
     [SetUpFixture]
     [SetCulture("en-US")]
-    public static class IntegrationTestsFixture
+    public static class ComponentTestsFixture
     {
         public static ApiFixture<Program> ApiFixture { get; set; } = null!;
         public static ApiFixture<Worker.Program> WorkerFixture { get; set; } = null!;

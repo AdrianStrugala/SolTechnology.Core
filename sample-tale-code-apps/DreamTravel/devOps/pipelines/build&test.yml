@@ -72,13 +72,14 @@ stages:
           publishTestResults: true
 
       - task: DotNetCoreCLI@2
-        displayName: 'Run functional tests'
+        displayName: 'Run component tests'
         inputs:
           command: 'test'
-          projects: '$(workingDirectory)/tests/**/*FunctionalTests.csproj'
+          projects: '$(workingDirectory)/tests/**/*ComponentTests.csproj'
           arguments: '--configuration $(BuildConfiguration)'
           publishTestResults: true
 
+    # Does not work with single agent xd
     # - job: RunE2EPipeline
     #   displayName: 'Run E2E tests'
     #   timeoutInMinutes: 10

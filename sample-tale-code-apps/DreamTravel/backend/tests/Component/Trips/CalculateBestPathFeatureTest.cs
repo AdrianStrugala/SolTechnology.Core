@@ -16,8 +16,8 @@ namespace DreamTravel.FunctionalTests.Trips
         [SetUp]
         public void Setup()
         {
-            _apiClient = IntegrationTestsFixture.ApiFixture.ServerClient;
-            _wireMockFixture = IntegrationTestsFixture.WireMockFixture;
+            _apiClient = ComponentTestsFixture.ApiFixture.ServerClient;
+            _wireMockFixture = ComponentTestsFixture.WireMockFixture;
         }
 
         [Test]

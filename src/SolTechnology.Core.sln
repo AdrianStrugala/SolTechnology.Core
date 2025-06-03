@@ -70,6 +70,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "DreamTravel", "DreamTravel"
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Infrastructure", "Infrastructure", "{6541B884-6E1F-492F-B5CB-1117C78760FE}"
+	ProjectSection(SolutionItems) = preProject
+		..\sample-tale-code-apps\DreamTravel\devOps\pipelines\build&test.yml = ..\sample-tale-code-apps\DreamTravel\devOps\pipelines\build&test.yml
+	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "DataLayer", "DataLayer", "{F88D9F2D-E763-4B94-88DC-0EFD21AD8138}"
 EndProject
@@ -81,7 +84,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "zTests", "zTests", "{404A60
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Unit", "Unit", "{FF7E1260-A139-4D69-A1E8-21B66426523A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DreamTravel.Component.Tests", "..\sample-tale-code-apps\DreamTravel\backend\tests\FunctionalTests\DreamTravel.Component.Tests.csproj", "{F2D35B6E-86E1-4569-A8AF-C998FE0650E8}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DreamTravel.Component.Tests", "..\sample-tale-code-apps\DreamTravel\backend\tests\Component\DreamTravel.Component.Tests.csproj", "{F2D35B6E-86E1-4569-A8AF-C998FE0650E8}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DreamTravel.Aspire", "..\sample-tale-code-apps\DreamTravel\backend\src\DreamTravel.Aspire\DreamTravel.Aspire.csproj", "{F73014B6-2083-4D6D-8553-937611B44E8B}"
 EndProject
@@ -89,7 +92,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Presentation", "Presentatio
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DreamTravel.ServiceDefaults", "..\sample-tale-code-apps\DreamTravel\backend\src\Presentation\DreamTravel.ServiceDefaults\DreamTravel.ServiceDefaults.csproj", "{D9B2122D-ADDD-46F8-A8DB-29E46B5B1DB3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DreamTravel.E2E.Tests", "..\sample-tale-code-apps\DreamTravel\backend\tests\DreamTravel.E2E.Tests\DreamTravel.E2E.Tests.csproj", "{0A374336-0BD6-4792-A413-3CFC373B172B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DreamTravel.E2E.Tests", "..\sample-tale-code-apps\DreamTravel\backend\tests\EndToEnd\DreamTravel.E2E.Tests.csproj", "{0A374336-0BD6-4792-A413-3CFC373B172B}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DreamTravel.Trips.GeolocationDataClients", "..\sample-tale-code-apps\DreamTravel\backend\src\DataLayer\DreamTravel.Trips.GeolocationDataClients\DreamTravel.Trips.GeolocationDataClients.csproj", "{E175E3E0-BF27-22F1-B8E8-CF0D591EE2A0}"
 EndProject
@@ -122,6 +125,12 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SolTechnology.Core.Flow", "SolTechnology.Core.Flow\SolTechnology.Core.Flow.csproj", "{64D916D6-B2DC-4CCD-8D04-D992C2F58236}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DreamTravel.Flows", "..\sample-tale-code-apps\DreamTravel\backend\src\LogicLayer\DreamTravel.Flows\DreamTravel.Flows.csproj", "{B8FFF3C8-43D7-4C65-8CC0-5D6C71EECC85}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "pipelines", "pipelines", "{1CF91859-41F0-4391-908D-CF38BAC8E9E3}"
+	ProjectSection(SolutionItems) = preProject
+		..\sample-tale-code-apps\DreamTravel\devOps\pipelines\e2etests.yml = ..\sample-tale-code-apps\DreamTravel\devOps\pipelines\e2etests.yml
+		..\sample-tale-code-apps\DreamTravel\devOps\pipelines\deploy.yml = ..\sample-tale-code-apps\DreamTravel\devOps\pipelines\deploy.yml
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -313,6 +322,7 @@ Global
 		{E04EFEC5-2777-491B-90EC-0BE41642189B} = {F88D9F2D-E763-4B94-88DC-0EFD21AD8138}
 		{F0114AC7-F75F-3673-353D-C6EC03DCFD77} = {23026ABA-8995-4B3C-ADDC-0F6D5497518C}
 		{B8FFF3C8-43D7-4C65-8CC0-5D6C71EECC85} = {4C7789AA-2CA6-45C2-85B4-398653826B23}
+		{1CF91859-41F0-4391-908D-CF38BAC8E9E3} = {6541B884-6E1F-492F-B5CB-1117C78760FE}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {56BC2B7E-7B9F-4B05-951A-C0E3CF0D1287}

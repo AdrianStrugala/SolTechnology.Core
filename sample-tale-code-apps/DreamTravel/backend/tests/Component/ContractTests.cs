@@ -12,7 +12,7 @@ public class ContractTests
     [SetUp]
     public void Setup()
     {
-        var scope = IntegrationTestsFixture.ApiFixture.TestServer.Services.CreateScope();
+        var scope = ComponentTestsFixture.ApiFixture.TestServer.Services.CreateScope();
         _swaggerProvider = scope.ServiceProvider.GetRequiredService<ISwaggerProvider>();
     }
     

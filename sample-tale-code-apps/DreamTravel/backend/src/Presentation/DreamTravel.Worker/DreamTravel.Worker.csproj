@@ -4,10 +4,6 @@
     <UserSecretsId>d7b42b3b-775d-4bf9-b7ab-77a1e90a98d4</UserSecretsId>
   </PropertyGroup>
 
-  <ItemGroup>
-    <Content Include="..\..\..\tests\FunctionalTests\appsettings.integration.tests.json" Link="appsettings.integration.tests.json" />
-  </ItemGroup>
-
 
   <ItemGroup>
     <PackageReference Include="GraphQL.Server.Ui.Playground" Version="8.1.0" />
@@ -20,6 +16,10 @@
     <ProjectReference Include="..\..\DreamTravel.Trips.Domain\DreamTravel.Trips.Domain.csproj" />
     <ProjectReference Include="..\..\LogicLayer\DreamTravel.Trips.Commands\DreamTravel.Trips.Commands.csproj" />
     <ProjectReference Include="..\DreamTravel.ServiceDefaults\DreamTravel.ServiceDefaults.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="..\..\..\tests\Component\appsettings.tests.json" Link="appsettings.tests.json" />
   </ItemGroup>
 
 </Project>

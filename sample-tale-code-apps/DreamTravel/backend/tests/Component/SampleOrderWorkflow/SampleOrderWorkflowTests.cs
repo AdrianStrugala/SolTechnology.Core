@@ -13,7 +13,7 @@ public class SampleOrderWorkflowTests
     [SetUp]
     public void Setup()
     {
-        _apiClient = IntegrationTestsFixture.ApiFixture.ServerClient;
+        _apiClient = ComponentTestsFixture.ApiFixture.ServerClient;
     }
 
     [Test]
