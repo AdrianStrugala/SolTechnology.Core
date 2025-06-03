@@ -1,7 +1,7 @@
 using System.Text.Json.Serialization;
-using SolTechnology.Core.Journey.Models;
+using SolTechnology.Core.Flow.Models;
 
-namespace SolTechnology.Core.Journey.Workflow.ChainFramework
+namespace SolTechnology.Core.Flow.Workflow.ChainFramework
 {
     public class FlowInstance
     {

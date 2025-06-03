@@ -1,7 +1,7 @@
 using SolTechnology.Core.CQRS;
-using SolTechnology.Core.Journey.Models;
+using SolTechnology.Core.Flow.Models;
 
-namespace SolTechnology.Core.Journey.Workflow.ChainFramework
+namespace SolTechnology.Core.Flow.Workflow.ChainFramework
 {
     public abstract class InteractiveFlowStep<TContext, TStepInput> : IFlowStep<TContext>
         where TContext : class

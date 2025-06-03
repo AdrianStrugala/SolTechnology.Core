@@ -1,4 +1,4 @@
-namespace SolTechnology.Core.Journey.Models
+namespace SolTechnology.Core.Flow.Models
 {
     public enum FlowStatus
     {

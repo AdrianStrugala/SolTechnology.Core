@@ -1,6 +1,6 @@
 using SolTechnology.Core.CQRS;
 
-namespace SolTechnology.Core.Journey.Workflow.ChainFramework
+namespace SolTechnology.Core.Flow.Workflow.ChainFramework
 {
     /// <summary>
     /// Marker interface for automated steps in a chain.

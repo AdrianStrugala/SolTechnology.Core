@@ -1,26 +1,26 @@
 using System.Collections.Concurrent;
-using SolTechnology.Core.Journey.Workflow.ChainFramework;
-// For JourneyInstance, IJourneyInstanceRepository
+using SolTechnology.Core.Flow.Workflow.ChainFramework;
+// For FlowInstance, IFlowInstanceRepository
 // For thread-safe dictionary
 
-namespace SolTechnology.Core.Journey.Workflow.Persistence.InMemory
+namespace SolTechnology.Core.Flow.Workflow.Persistence.InMemory
 {
-    public class InMemoryJourneyInstanceRepository : IJourneyInstanceRepository
+    public class InMemoryFlowInstanceRepository : IFlowInstanceRepository
     {
-        private readonly ConcurrentDictionary<string, FlowInstance> _journeys = new ConcurrentDictionary<string, FlowInstance>();
+        private readonly ConcurrentDictionary<string, FlowInstance> _flows = new ConcurrentDictionary<string, FlowInstance>();
 
-        public Task<FlowInstance?> FindById(string journeyId)
+        public Task<FlowInstance?> FindById(string flowId)
         {
-            _journeys.TryGetValue(journeyId, out var journeyInstance);
+            _flows.TryGetValue(flowId, out var flowInstance);
             // Return a clone to simulate behavior of a real repository (preventing direct modification of stored instance)
-            return Task.FromResult<FlowInstance?>(Clone(journeyInstance)); 
+            return Task.FromResult<FlowInstance?>(Clone(flowInstance));
         }
 
         public Task SaveAsync(FlowInstance flowInstance)
         {
             if (flowInstance == null)
             {
-                // Or throw new ArgumentNullException(nameof(journeyInstance));
+                // Or throw new ArgumentNullException(nameof(flowInstance));
                 return Task.CompletedTask; 
             }
 
@@ -29,14 +29,14 @@ namespace SolTechnology.Core.Journey.Workflow.Persistence.InMemory
             if(instanceToStore != null) // Clone method could return null
             {
                 instanceToStore.LastUpdatedAt = System.DateTime.UtcNow; // Ensure LastUpdatedAt is fresh on save
-                _journeys[flowInstance.FlowId] = instanceToStore;
+                _flows[flowInstance.FlowId] = instanceToStore;
             }
             return Task.CompletedTask;
         }
 
-        public Task DeleteAsync(string journeyId)
+        public Task DeleteAsync(string flowId)
         {
-            _journeys.TryRemove(journeyId, out _);
+            _flows.TryRemove(flowId, out _);
             return Task.CompletedTask;
         }
 

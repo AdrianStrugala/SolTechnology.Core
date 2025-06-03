@@ -1,6 +1,6 @@
 // For FlowStatus and ExecutedStepInfo
 
-namespace SolTechnology.Core.Journey.Workflow.ChainFramework;
+namespace SolTechnology.Core.Flow.Workflow.ChainFramework;
 
 public abstract class FlowContext<TInput, TOutput>
     where TInput : new()

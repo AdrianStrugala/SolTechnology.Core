@@ -119,7 +119,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DreamTravel.GraphDatabase",
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DreamTravel.Ui", "..\sample-tale-code-apps\DreamTravel\backend\src\Presentation\DreamTravel.Ui\DreamTravel.Ui.csproj", "{F0114AC7-F75F-3673-353D-C6EC03DCFD77}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SolTechnology.Core.Journey", "SolTechnology.Core.Journey\SolTechnology.Core.Journey.csproj", "{64D916D6-B2DC-4CCD-8D04-D992C2F58236}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SolTechnology.Core.Flow", "SolTechnology.Core.Flow\SolTechnology.Core.Flow.csproj", "{64D916D6-B2DC-4CCD-8D04-D992C2F58236}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DreamTravel.Flows", "..\sample-tale-code-apps\DreamTravel\backend\src\LogicLayer\DreamTravel.Flows\DreamTravel.Flows.csproj", "{B8FFF3C8-43D7-4C65-8CC0-5D6C71EECC85}"
 EndProject

@@ -3,7 +3,7 @@ using System.Reflection;
 using System.Text.Json;
 using SolTechnology.Core.CQRS.Errors;
 
-namespace SolTechnology.Core.Journey.Models;
+namespace SolTechnology.Core.Flow.Models;
 
 public class StepInfo
 {

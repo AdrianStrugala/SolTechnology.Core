@@ -2,31 +2,32 @@ using System.Reflection;
 using System.Text.Json;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using SolTechnology.Core.Journey.Models;
-using SolTechnology.Core.Journey.Workflow;
-using SolTechnology.Core.Journey.Workflow.ChainFramework;
-using SolTechnology.Core.Journey.Workflow.Persistence;
+using SolTechnology.Core.Flow.Models;
+using SolTechnology.Core.Flow.Workflow;
+using SolTechnology.Core.Flow.Workflow.ChainFramework;
+using SolTechnology.Core.Flow.Workflow.Persistence;
 
 
-namespace SolTechnology.Core.Journey.Controllers
+namespace SolTechnology.Core.Flow.Controllers
 {
     [ApiController]
-    [Route("api/journey")]
-    public abstract class JourneyController(
-        JourneyManager journeyManager,
-        ILogger<JourneyController> logger,
-        IJourneyInstanceRepository journeyRepository,
-        IEnumerable<IJourneyHandler> journeyHandlers)
+    [Route("api/flow")]
+    public abstract class FlowController(
+        FlowManager flowManager,
+        ILogger<FlowController> logger,
+        IFlowInstanceRepository flowRepository,
+        IEnumerable<IFlowHandler> flowHandlers)
         : ControllerBase
     {
 
-        private readonly Dictionary<string, Type> _registeredHandlers = journeyHandlers.ToDictionary(
+        private readonly Dictionary<string, Type> _registeredHandlers = flowHandlers.ToDictionary(
             x => x.GetType().Name, y => y.GetType());
 
         [HttpPost("{flowName}/start")]
         public async Task<IActionResult> StartFlow(string flowName, [FromBody] JsonElement initialInputJson)
         {
-            logger.LogInformation("Attempting to start journey with handler: {JourneyHandlerName}", flowName);
+            logger.LogInformation("Attempting to start flow with handler: {FlowHandlerName}", flowName);
+            logger.LogInformation("Attempting to start flow with handler: {FlowHandlerName}", flowName);
 
             if (!_registeredHandlers.TryGetValue(flowName, out Type? handlerType))
             {
@@ -63,7 +64,7 @@ namespace SolTechnology.Core.Journey.Controllers
                     return BadRequest($"Could not deserialize input for flow '{flowName}' to type {inputType.Name}.");
                 }
 
-                MethodInfo? startMethod = typeof(JourneyManager).GetMethod(nameof(JourneyManager.StartFlow))?
+                MethodInfo? startMethod = typeof(FlowManager).GetMethod(nameof(FlowManager.StartFlow))?
                     .MakeGenericMethod(handlerType, inputType, baseHandlerType.GetGenericArguments()[1],
                         baseHandlerType.GetGenericArguments()[2]);
 
@@ -72,19 +73,19 @@ namespace SolTechnology.Core.Journey.Controllers
                     return StatusCode(400, "Could not make generic StartFlow method.");
                 }
 
-                var task = (Task?)startMethod.Invoke(journeyManager, [typedInitialInput]);
+                var task = (Task?)startMethod.Invoke(flowManager, [typedInitialInput]);
                 if (task == null) return StatusCode(400, "Could not invoke StartFlow.");
 
                 await task;
 
                 var resultProperty = task.GetType().GetProperty("Result");
-                var journeyInstance = resultProperty?.GetValue(task) as FlowInstance;
+                var flowInstance = resultProperty?.GetValue(task) as FlowInstance;
 
-                return Ok(journeyInstance);
+                return Ok(flowInstance);
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error starting journey {JourneyHandlerName}.", flowName);
+                logger.LogError(ex, "Error starting flow {FlowHandlerName}.", flowName);
                 return StatusCode(500, $"An error occurred: {ex.Message}");
             }
         }
@@ -101,7 +102,7 @@ namespace SolTechnology.Core.Journey.Controllers
                     ? null
                     : userInputJson;
 
-                var flowInstance = await journeyRepository.FindById(flowId);
+                var flowInstance = await flowRepository.FindById(flowId);
                 if (flowInstance == null)
                 {
                     return BadRequest($"Flow {flowId} not found.");
@@ -126,7 +127,7 @@ namespace SolTechnology.Core.Journey.Controllers
                         $"Handler '{flowInstance.FlowHandlerName}' is not a valid PausableChainHandler.");
                 }
 
-                flowInstance = await journeyManager.RunFlow(
+                flowInstance = await flowManager.RunFlow(
                     flowId,
                     stepId ?? flowInstance.CurrentStep?.StepId,
                     userInput);
@@ -134,30 +135,30 @@ namespace SolTechnology.Core.Journey.Controllers
                 return Ok(flowInstance);
         }
 
-        [HttpGet("{journeyId}")]
-        public async Task<IActionResult> GetJourneyState(string journeyId)
+        [HttpGet("{flowId}")]
+        public async Task<IActionResult> GetFlowState(string flowId)
         {
-            logger.LogInformation("Attempting to get status for journey: {JourneyId}", journeyId);
-            if (string.IsNullOrEmpty(journeyId))
+            logger.LogInformation("Attempting to get status for flow: {FlowId}", flowId);
+            if (string.IsNullOrEmpty(flowId))
             {
-                return BadRequest("Journey ID must be provided.");
+                return BadRequest("Flow ID must be provided.");
             }
 
-            var journeyInstance = await journeyRepository.FindById(journeyId);
-            return Ok(journeyInstance);
+            var flowInstance = await flowRepository.FindById(flowId);
+            return Ok(flowInstance);
         }
         
-        [HttpGet("{journeyId}/result")]
-        public async Task<IActionResult> GetJourneyResult(string journeyId)
+        [HttpGet("{flowId}/result")]
+        public async Task<IActionResult> GetFlowResult(string flowId)
         {
-            logger.LogInformation("Attempting to get result for journey: {JourneyId}", journeyId);
-            if (string.IsNullOrEmpty(journeyId))
+            logger.LogInformation("Attempting to get result for flow: {FlowId}", flowId);
+            if (string.IsNullOrEmpty(flowId))
             {
-                return BadRequest("Journey ID must be provided.");
+                return BadRequest("Flow ID must be provided.");
             }
 
-            var journeyInstance = await journeyRepository.FindById(journeyId);
-            return Ok(journeyInstance!.Context!.Output);
+            var flowInstance = await flowRepository.FindById(flowId);
+            return Ok(flowInstance!.Context!.Output);
         }
     }
 }

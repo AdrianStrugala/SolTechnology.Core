@@ -2,16 +2,16 @@ using System.Text.Json;
 using Microsoft.Extensions.Logging;
 using SolTechnology.Core.CQRS;
 using SolTechnology.Core.CQRS.Errors;
-using SolTechnology.Core.Journey.Models;
+using SolTechnology.Core.Flow.Models;
 
-namespace SolTechnology.Core.Journey.Workflow.ChainFramework
+namespace SolTechnology.Core.Flow.Workflow.ChainFramework
 {
-    public interface IJourneyHandler;
+    public interface IFlowHandler;
 
     public abstract class PausableChainHandler<TInput, TContext, TOutput>(
         IServiceProvider serviceProvider,
         ILogger<PausableChainHandler<TInput, TContext, TOutput>> logger)
-        : IJourneyHandler
+        : IFlowHandler
         where TInput : new()
         where TOutput : new()
         where TContext : FlowContext<TInput, TOutput>, new()
