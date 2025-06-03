@@ -1,5 +1,5 @@
 using SolTechnology.Core.CQRS;
-using SolTechnology.Core.Journey.Workflow.ChainFramework;
+using SolTechnology.Core.Flow.Workflow.ChainFramework;
 using SolTechnology.Core.Journey.Workflow.Steps.Dtos;
 namespace DreamTravel.Flows.SampleOrderWorkflow.Steps;
 

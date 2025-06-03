@@ -1,8 +1,8 @@
 ﻿using DreamTravel.Flows.SampleOrderWorkflow;
 using FluentAssertions;
 using SolTechnology.Core.CQRS;
-using SolTechnology.Core.Journey.Models;
-using SolTechnology.Core.Journey.Workflow.ChainFramework;
+using SolTechnology.Core.Flow.Models;
+using SolTechnology.Core.Flow.Workflow.ChainFramework;
 
 namespace DreamTravel.FunctionalTests.SampleOrderWorkflow;
 
