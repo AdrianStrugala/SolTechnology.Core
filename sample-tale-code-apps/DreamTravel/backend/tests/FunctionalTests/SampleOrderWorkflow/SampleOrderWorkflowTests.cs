@@ -21,7 +21,7 @@ public class SampleOrderWorkflowTests
     {
         // "Given is initiate flow request".x(() =>
         var createFlowResponse = await _apiClient
-            .CreateRequest("/api/journey/SampleOrderWorkflowHandler/start")
+            .CreateRequest("/api/flow/SampleOrderWorkflowHandler/start")
             .WithHeader("X-API-KEY", "<SECRET>")
             .WithBody(new
             {
@@ -41,7 +41,7 @@ public class SampleOrderWorkflowTests
             
         // "When calling post flow with empty body".x(() =>
         var progressFlow = await _apiClient
-            .CreateRequest($"/api/journey/{flowId}")
+            .CreateRequest($"/api/flow/{flowId}")
             .WithHeader("X-API-KEY", "<SECRET>")
             .PostAsync<Result<FlowInstance>>();
             
@@ -56,7 +56,7 @@ public class SampleOrderWorkflowTests
             
         // "When calling post flow with expected body".x(() =>
         progressFlow = await _apiClient
-            .CreateRequest($"/api/journey/{flowId}")
+            .CreateRequest($"/api/flow/{flowId}")
             .WithHeader("X-API-KEY", "<SECRET>")
             .WithBody(new
             {
@@ -75,7 +75,7 @@ public class SampleOrderWorkflowTests
             
         // "When calling get flow result".x(() =>
         var flowResult = await _apiClient
-            .CreateRequest($"/api/journey/{flowId}")
+            .CreateRequest($"/api/flow/{flowId}")
             .WithHeader("X-API-KEY", "<SECRET>")
             .GetAsync<Result<SampleOrderResult>>();
             
