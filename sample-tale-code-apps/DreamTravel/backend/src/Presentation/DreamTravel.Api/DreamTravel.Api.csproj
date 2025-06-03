@@ -34,7 +34,9 @@
 	  <ProjectReference Include="..\..\..\..\..\..\src\SolTechnology.Core.Api\SolTechnology.Core.Api.csproj" />
 	  <ProjectReference Include="..\..\..\..\..\..\src\SolTechnology.Core.Authentication\SolTechnology.Core.Authentication.csproj" />
 	  <ProjectReference Include="..\..\..\..\..\..\src\SolTechnology.Core.CQRS\SolTechnology.Core.CQRS.csproj" />
+	  <ProjectReference Include="..\..\..\..\..\..\src\SolTechnology.Core.Flow\SolTechnology.Core.Flow.csproj" />
 	  <ProjectReference Include="..\..\DataLayer\DreamTravel.GraphDatabase\DreamTravel.GraphDatabase.csproj" />
+	  <ProjectReference Include="..\..\LogicLayer\DreamTravel.Flows\DreamTravel.Flows.csproj" />
 	  <ProjectReference Include="..\..\LogicLayer\DreamTravel.Trips.Commands\DreamTravel.Trips.Commands.csproj" />
 	  <ProjectReference Include="..\..\LogicLayer\DreamTravel.Trips.Queries\DreamTravel.Trips.Queries.csproj" />
 	  <ProjectReference Include="..\DreamTravel.ServiceDefaults\DreamTravel.ServiceDefaults.csproj" />

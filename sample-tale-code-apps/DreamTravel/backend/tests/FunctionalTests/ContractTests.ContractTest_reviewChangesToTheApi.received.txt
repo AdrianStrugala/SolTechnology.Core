@@ -1,0 +1,702 @@
+﻿openapi: 3.0.1
+info:
+  title: DreamTravel
+  version: v1
+servers:
+  - url: /
+paths:
+  /api/v2/CalculateBestPath:
+    post:
+      tags:
+        - CalculateBestPath
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CalculateBestPathQuery'
+          text/json:
+            schema:
+              $ref: '#/components/schemas/CalculateBestPathQuery'
+          application/*+json:
+            schema:
+              $ref: '#/components/schemas/CalculateBestPathQuery'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CalculateBestPathResultResult'
+  /api/CalculateBestPath:
+    post:
+      tags:
+        - CalculateBestPath
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CalculateBestPathQuery'
+          text/json:
+            schema:
+              $ref: '#/components/schemas/CalculateBestPathQuery'
+          application/*+json:
+            schema:
+              $ref: '#/components/schemas/CalculateBestPathQuery'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Path'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                type: string
+  /api/v2/FindCityByCoordinates:
+    post:
+      tags:
+        - FindCityByCoordinates
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FindCityByCoordinatesQuery'
+          text/json:
+            schema:
+              $ref: '#/components/schemas/FindCityByCoordinatesQuery'
+          application/*+json:
+            schema:
+              $ref: '#/components/schemas/FindCityByCoordinatesQuery'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CityResult'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Result'
+  /api/v2/FindCityByName:
+    post:
+      tags:
+        - FindCityByName
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FindCityByNameQuery'
+          text/json:
+            schema:
+              $ref: '#/components/schemas/FindCityByNameQuery'
+          application/*+json:
+            schema:
+              $ref: '#/components/schemas/FindCityByNameQuery'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CityResult'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Result'
+  /api/FindLocationOfCity:
+    post:
+      tags:
+        - FindLocationOfCity
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FindCityByNameQuery'
+          text/json:
+            schema:
+              $ref: '#/components/schemas/FindCityByNameQuery'
+          application/*+json:
+            schema:
+              $ref: '#/components/schemas/FindCityByNameQuery'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/City'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ValidationResult'
+  /api/FindNameOfCity:
+    post:
+      tags:
+        - FindNameOfCity
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FindCityByCoordinatesQuery'
+          text/json:
+            schema:
+              $ref: '#/components/schemas/FindCityByCoordinatesQuery'
+          application/*+json:
+            schema:
+              $ref: '#/components/schemas/FindCityByCoordinatesQuery'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/City'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ValidationResult'
+  '/api/flow/{flowName}/start':
+    post:
+      tags:
+        - Flow
+      parameters:
+        - name: flowName
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema: { }
+          text/json:
+            schema: { }
+          application/*+json:
+            schema: { }
+      responses:
+        '200':
+          description: OK
+  '/api/flow/{flowId}':
+    post:
+      tags:
+        - Flow
+      parameters:
+        - name: flowId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: stepId
+          in: query
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema: { }
+          text/json:
+            schema: { }
+          application/*+json:
+            schema: { }
+      responses:
+        '200':
+          description: OK
+    get:
+      tags:
+        - Flow
+      parameters:
+        - name: flowId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+  '/api/flow/{flowId}/result':
+    get:
+      tags:
+        - Flow
+      parameters:
+        - name: flowId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+  /:
+    get:
+      tags:
+        - Home
+      responses:
+        '200':
+          description: OK
+  /api/LimitCost:
+    post:
+      tags:
+        - LimitCostOfPaths
+      parameters:
+        - name: costLimit
+          in: query
+          schema:
+            type: integer
+            format: int32
+        - name: sessionId
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Path'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                type: string
+      deprecated: true
+  /api/projects/nodes:
+    get:
+      tags:
+        - Projects
+      responses:
+        '200':
+          description: OK
+          content:
+            text/plain:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Intersection'
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Intersection'
+            text/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Intersection'
+  /api/projects/streets:
+    get:
+      tags:
+        - Projects
+      responses:
+        '200':
+          description: OK
+          content:
+            text/plain:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Street'
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Street'
+            text/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Street'
+  /api/v2/statistics/countries:
+    post:
+      tags:
+        - Statistics
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GetSearchStatisticsQuery'
+          text/json:
+            schema:
+              $ref: '#/components/schemas/GetSearchStatisticsQuery'
+          application/*+json:
+            schema:
+              $ref: '#/components/schemas/GetSearchStatisticsQuery'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetSearchStatisticsResultResult'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Result'
+  /api/Traffic/recalculate:
+    post:
+      tags:
+        - Traffic
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RecalculateTrafficCommand'
+          text/json:
+            schema:
+              $ref: '#/components/schemas/RecalculateTrafficCommand'
+          application/*+json:
+            schema:
+              $ref: '#/components/schemas/RecalculateTrafficCommand'
+      responses:
+        '200':
+          description: OK
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/RecalculateTrafficCommand'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RecalculateTrafficCommand'
+            text/json:
+              schema:
+                $ref: '#/components/schemas/RecalculateTrafficCommand'
+components:
+  schemas:
+    CalculateBestPathQuery:
+      required:
+        - cities
+      type: object
+      properties:
+        cities:
+          type: array
+          items:
+            $ref: '#/components/schemas/City'
+      additionalProperties: false
+    CalculateBestPathResult:
+      type: object
+      properties:
+        bestPaths:
+          type: array
+          items:
+            $ref: '#/components/schemas/Path'
+          nullable: true
+        cities:
+          type: array
+          items:
+            $ref: '#/components/schemas/City'
+          nullable: true
+      additionalProperties: false
+    CalculateBestPathResultResult:
+      type: object
+      properties:
+        isSuccess:
+          type: boolean
+        error:
+          $ref: '#/components/schemas/Error'
+        data:
+          $ref: '#/components/schemas/CalculateBestPathResult'
+      additionalProperties: false
+    City:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+          nullable: true
+        name:
+          type: string
+          nullable: true
+        latitude:
+          type: number
+          format: double
+        longitude:
+          type: number
+          format: double
+      additionalProperties: false
+    CityResult:
+      type: object
+      properties:
+        isSuccess:
+          type: boolean
+        error:
+          $ref: '#/components/schemas/Error'
+        data:
+          $ref: '#/components/schemas/City'
+      additionalProperties: false
+    CityStatistics:
+      required:
+        - cityName
+      type: object
+      properties:
+        cityName:
+          type: string
+          nullable: true
+        searchCount:
+          type: integer
+          format: int32
+      additionalProperties: false
+    CountryStatistics:
+      required:
+        - country
+      type: object
+      properties:
+        country:
+          type: string
+          nullable: true
+        totalSearchCount:
+          type: integer
+          format: int32
+        cityStatistics:
+          type: array
+          items:
+            $ref: '#/components/schemas/CityStatistics'
+          nullable: true
+      additionalProperties: false
+    Error:
+      type: object
+      properties:
+        message:
+          type: string
+          nullable: true
+        description:
+          type: string
+          nullable: true
+        recoverable:
+          type: boolean
+      additionalProperties: false
+    FindCityByCoordinatesQuery:
+      type: object
+      properties:
+        lat:
+          maximum: 90
+          minimum: -90
+          type: number
+          format: double
+        lng:
+          maximum: 180
+          minimum: -180
+          type: number
+          format: double
+      additionalProperties: false
+    FindCityByNameQuery:
+      required:
+        - name
+      type: object
+      properties:
+        name:
+          minLength: 1
+          type: string
+      additionalProperties: false
+    GetSearchStatisticsQuery:
+      type: object
+      additionalProperties: false
+    GetSearchStatisticsResult:
+      type: object
+      properties:
+        countryStatistics:
+          type: array
+          items:
+            $ref: '#/components/schemas/CountryStatistics'
+          nullable: true
+      additionalProperties: false
+    GetSearchStatisticsResultResult:
+      type: object
+      properties:
+        isSuccess:
+          type: boolean
+        error:
+          $ref: '#/components/schemas/Error'
+        data:
+          $ref: '#/components/schemas/GetSearchStatisticsResult'
+      additionalProperties: false
+    Intersection:
+      type: object
+      properties:
+        id:
+          type: string
+          nullable: true
+        lat:
+          type: number
+          format: double
+        lng:
+          type: number
+          format: double
+      additionalProperties: false
+    Path:
+      type: object
+      properties:
+        index:
+          type: integer
+          format: int32
+        startingCity:
+          $ref: '#/components/schemas/City'
+        endingCity:
+          $ref: '#/components/schemas/City'
+        optimalDistance:
+          type: number
+          format: double
+        optimalCost:
+          type: number
+          format: double
+        vinietaCost:
+          type: number
+          format: double
+        goal:
+          type: number
+          format: double
+        cost:
+          type: number
+          format: double
+        freeDistance:
+          type: number
+          format: double
+        tollDistance:
+          type: number
+          format: double
+      additionalProperties: false
+    RecalculateTrafficCommand:
+      type: object
+      properties:
+        streets:
+          type: array
+          items:
+            $ref: '#/components/schemas/Street'
+          nullable: true
+        newStreets:
+          type: array
+          items:
+            $ref: '#/components/schemas/Street'
+          nullable: true
+        intersections:
+          type: array
+          items:
+            $ref: '#/components/schemas/Intersection'
+          nullable: true
+      additionalProperties: false
+    Result:
+      type: object
+      properties:
+        isSuccess:
+          type: boolean
+        error:
+          $ref: '#/components/schemas/Error'
+      additionalProperties: false
+    Street:
+      type: object
+      properties:
+        id:
+          type: string
+          nullable: true
+        fromId:
+          type: string
+          nullable: true
+        toId:
+          type: string
+          nullable: true
+        name:
+          type: string
+          nullable: true
+        length:
+          type: number
+          format: double
+          nullable: true
+        lanes:
+          type: integer
+          format: int32
+          nullable: true
+        oneway:
+          type: string
+          nullable: true
+        bridge:
+          type: string
+          nullable: true
+        tunnel:
+          type: string
+          nullable: true
+        highway:
+          type: string
+          nullable: true
+        service:
+          type: string
+          nullable: true
+        junction:
+          type: string
+          nullable: true
+        ref:
+          type: string
+          nullable: true
+        access:
+          type: string
+          nullable: true
+        surface:
+          type: string
+          nullable: true
+        width:
+          type: number
+          format: double
+          nullable: true
+        lit:
+          type: string
+          nullable: true
+        turnLanes:
+          type: string
+          nullable: true
+        trafficRegularTime:
+          type: number
+          format: double
+          nullable: true
+        trafficRegularSpeed:
+          type: number
+          format: double
+          nullable: true
+      additionalProperties: false
+    ValidationResult:
+      type: object
+      properties:
+        memberNames:
+          type: array
+          items:
+            type: string
+          nullable: true
+          readOnly: true
+        errorMessage:
+          type: string
+          nullable: true
+      additionalProperties: false
+  securitySchemes:
+    ApiKey:
+      type: apiKey
+      description: 'Authentication: Api Key for using Dream Travel'
+      name: X-API-KEY
+      in: header
+security:
+  - ApiKey: [ ]

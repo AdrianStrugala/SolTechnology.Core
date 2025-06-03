@@ -119,6 +119,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DreamTravel.GraphDatabase",
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DreamTravel.Ui", "..\sample-tale-code-apps\DreamTravel\backend\src\Presentation\DreamTravel.Ui\DreamTravel.Ui.csproj", "{F0114AC7-F75F-3673-353D-C6EC03DCFD77}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SolTechnology.Core.Flow", "SolTechnology.Core.Flow\SolTechnology.Core.Flow.csproj", "{64D916D6-B2DC-4CCD-8D04-D992C2F58236}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DreamTravel.Flows", "..\sample-tale-code-apps\DreamTravel\backend\src\LogicLayer\DreamTravel.Flows\DreamTravel.Flows.csproj", "{B8FFF3C8-43D7-4C65-8CC0-5D6C71EECC85}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -265,6 +269,14 @@ Global
 		{F0114AC7-F75F-3673-353D-C6EC03DCFD77}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F0114AC7-F75F-3673-353D-C6EC03DCFD77}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F0114AC7-F75F-3673-353D-C6EC03DCFD77}.Release|Any CPU.Build.0 = Release|Any CPU
+		{64D916D6-B2DC-4CCD-8D04-D992C2F58236}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{64D916D6-B2DC-4CCD-8D04-D992C2F58236}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{64D916D6-B2DC-4CCD-8D04-D992C2F58236}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{64D916D6-B2DC-4CCD-8D04-D992C2F58236}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B8FFF3C8-43D7-4C65-8CC0-5D6C71EECC85}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B8FFF3C8-43D7-4C65-8CC0-5D6C71EECC85}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B8FFF3C8-43D7-4C65-8CC0-5D6C71EECC85}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B8FFF3C8-43D7-4C65-8CC0-5D6C71EECC85}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -300,6 +312,7 @@ Global
 		{34984A0C-9695-DED6-2A8C-AA254F2566BC} = {FF7E1260-A139-4D69-A1E8-21B66426523A}
 		{E04EFEC5-2777-491B-90EC-0BE41642189B} = {F88D9F2D-E763-4B94-88DC-0EFD21AD8138}
 		{F0114AC7-F75F-3673-353D-C6EC03DCFD77} = {23026ABA-8995-4B3C-ADDC-0F6D5497518C}
+		{B8FFF3C8-43D7-4C65-8CC0-5D6C71EECC85} = {4C7789AA-2CA6-45C2-85B4-398653826B23}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {56BC2B7E-7B9F-4B05-951A-C0E3CF0D1287}
