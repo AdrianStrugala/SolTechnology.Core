@@ -103,8 +103,8 @@ stages:
 
   - stage: BuildAndPublish
     displayName: Build&Publish
+    condition: ne(variables['Build.Reason'], 'PullRequest')
     jobs:
-
     - job: PublishArtifacts
       displayName: 'Publish Artifacts'
       
