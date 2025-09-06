@@ -18,12 +18,12 @@
 
 ## Testing Levels Comparison
 
-| Level | Execution | Environment | Volume | Data | Scope | Frequency  | Use Cases |
-|-------|---------------------|--------|------|-------|-----------|------------|-----------|
-| Production | Manual | Real Production | Few | Real data | Whole product | Rarely | Deployment validation, Performance monitoring, A/B testing, Chaos testing, User analytics |
+| Level | Execution | Environment | Volume            | Data | Scope | Frequency  | Use Cases |
+|-------|---------------------|--------|-------------------|-------|-----------|------------|-----------|
+| Production | Manual | Real Production | A Few             | Real data | Whole product | Rarely | Deployment validation, Performance monitoring, A/B testing, Chaos testing, User analytics |
 | End to End | Automated in CD | Test & Sandbox | A few per feature | Defined scenarios | Whole product | After each merge | Critical user paths,  Authentication flows, Browser compatibility, Multi-step validations |
-| Component | Automated in Build & CI | Local with mocked external dependencies | Many | Mocked data | Single application | On each build | Service integration, Database operations, API contracts, Message handling, Configuration |
-| Unit | Automated in Build & CI | No environment needed | Millions | Mocked data | Single class/method | On each build | Business logic, Algorithms, Data transformations, Validation rules, Utility functions |
+| Component | Automated in Build & CI | Local with mocked external dependencies | Many              | Mocked data | Single application | On each build | Service integration, Database operations, API contracts, Message handling, Configuration |
+| Unit | Automated in Build & CI | No environment needed | Millions          | Mocked data | Single class/method | On each build | Business logic, Algorithms, Data transformations, Validation rules, Utility functions |
 
 ## 1. Production Testing
 
@@ -36,8 +36,10 @@ Production testing involves verifying that the application works correctly in th
 - **Continuous Monitoring**: Implement health checks and synthetic monitoring
 - **Quick Feedback**: Rapid detection of production issues
 
-### Geo Rollout & Market Readiness
-Monitoring
+### Manual testing campaign
+
+
+### Monitoring
 //TODO
 
 ## 2. End-to-End Testing
@@ -53,17 +55,17 @@ End-to-End tests verify complete user workflows through the entire application s
 
 ### Tools
 The key prerequisite is deep understanding of application flows and functionalities.
-- **Testing framework**: NUnit
-- **Frontend interactions**: Playwright
-- **Pipeline linking**: example
+- **Testing framework**: [NUnit](https://github.com/nunit/nunit)
+- **Frontend interactions**: [Playwright](https://github.com/microsoft/playwright)
+- **Pipeline linking**: [example](https://github.com/AdrianStrugala/SolTechnology.Core/blob/bca831703c7fd251775ef95f9c568dc31025c6da/sample-tale-code-apps/DreamTravel/devOps/pipelines/build%26test.yml#L83)
 
 ### Example Repositories
-- EPP Smoke Tests: https://dev.azure.com/spiir/Delivery/_git/payments-platform-smoke-tests
+- Dream Travel E2E Tests: https://github.com/AdrianStrugala/SolTechnology.Core/tree/master/sample-tale-code-apps/DreamTravel/backend/tests/EndToEnd
 
 ## 3. Component Testing
 
 ### Overview
-Component tests (also known as Integration and Functional tests) verify that different parts of your application work correctly together. They test the integration between multiple units while still mocking external dependencies like APIs. These tests cover integration with APIs, external resources, storages, and specifically SQL databases.
+Component tests (could be called also Integration or Functional) are designed to test the entire feature in an isolated environment. Verify that different parts of your application work together as expected. They test the integration between multiple units while still mocking external dependencies like APIs. These tests cover integration with APIs, external resources, storages, and specifically SQL databases.
 
 ### Key Principles
 - **Single Functionality Scope**: Test interaction from the API to the data source and back
@@ -72,9 +74,7 @@ Component tests (also known as Integration and Functional tests) verify that dif
 - **Golden Mean**: Provides appropriate level of confidence while being reasonably costly in creation and maintenance
 - **SQL Logic Coverage**: SQL queries and commands often contain specific logic and mapping that should be properly tested
 
-### Integration Tests
-
-Integration tests cover integration with APIs, external resources, storages and specifically SQL databases. **SQL tests are covering business logic and this is why it's important to have them run in the build pipeline**.
+### Setup
 
 #### Database Configuration
 
@@ -94,16 +94,9 @@ dotnet publish /p:TargetServerName=localhost /p:TargetPort=1401 /p:TargetUser=sa
 ```
 
 As you can see, the two prerequisites are needed in this configuration:
-- docker installed on the build machine
-- SQL proj containing database schema, which creates .dacpac file on build
+- docker
+- SQL proj containing database schema or Entity Framework migrations
 
-Alternatively, the SQL Server itself could be installed on the build machine - it may require app settings change before running integration tests.
-
-#### Test Configuration
-
-When the SQL Server is up and running, the tests itself has to be configured as well:
-- run on clean database
-- run sequentially
 
 The SqlFixture is introduced to fulfill these needs:
 
@@ -141,64 +134,9 @@ public class SqlFixture : IAsyncLifetime
     }
 }
 ```
-
-#### Example Integration Test
-
-```csharp
-private readonly PlayerRepository _sut;
-private readonly Fixture _fixture;
-
-public PlayerRepositoryTests(SqlFixture sqlFixture)
-{
-    _fixture = new Fixture();
-    _sut = new PlayerRepository(sqlFixture.SqlConnectionFactory);
-}
-
-[Fact]
-public void Insert_ValidPlayer_ItIsSavedInDB()
-{
-    //Arrange
-    var playerId = 123;
-
-    var teams = _fixture.Build<Team>()
-        .With(t => t.PlayerApiId, playerId)
-        .CreateMany()
-        .ToList();
-
-    Player player = _fixture
-        .Build<Player>()
-        .With(p => p.ApiId, playerId)
-        .With(p => p.DateOfBirth, DateTime.UtcNow.Date)
-        .With(p => p.Teams, teams)
-        .Create();
-
-    //Act
-    _sut.Insert(player);
-
-    //Assert
-    var result = _sut.GetById(playerId);
-
-    Assert.NotNull(result);
-    Assert.NotEmpty(result.Teams);
-
-    result.DateOfBirth.Should().Be(player.DateOfBirth);
-    result.Name.Should().Be(player.Name);
-    result.Nationality.Should().Be(player.Nationality);
-    result.Position.Should().Be(player.Position);
-    result.Teams.Should().BeEquivalentTo(player.Teams, 
-        config: options => options
-            .Excluding(a => a.Id)
-            .Using<DateTime>(ctx => ctx.Subject.Should().BeCloseTo(ctx.Expectation, TimeSpan.FromSeconds(1))).WhenTypeIs<DateTime>());
-}
-```
-
-### Functional Tests
-
-Functional tests are designed to test the entire feature in an isolated environment, ensuring that all components work together as expected. These tests simulate real-world scenarios and validate the system's behavior from the user's perspective.
-
 #### Initialize the Environment
 
-The IntegrationTestsFixture class is responsible for setting up the testing environment. It initializes the necessary components and dependencies, such as the API server and mock services.
+The TestsFixture class is responsible for setting up the testing environment. It initializes the necessary components and dependencies, such as the API server and mock services.
 
 ```csharp
 [SetUpFixture]
@@ -329,11 +267,8 @@ This test verifies that the CalculateBestPath feature correctly finds the optima
 - **Preferred testing framework**: NUnit
 
 ### Example Repositories
-- Aiia Storage: https://dev.azure.com/spiir/Delivery/_git/aiia-storage?path=/src/Aiia.Storage.Payments.Tests/ApiTests
-- MTS Settlement Services: https://dev.azure.com/spiir/Delivery/_git/mts-settlement-services?path=/tests/Mts.SettlementServices.Integration.Tests
-- KYC: https://dev.azure.com/spiir/Delivery/_git/aiia-kyc-api?path=/tests/AiiaKyc.Api.Integration.Tests
-- Participant Service: https://dev.azure.com/spiir/Delivery/_git/participant-service?path=/tests/ParticipantService.E2E.Tests
-
+- Dream Travel Component Tests: https://github.com/AdrianStrugala/SolTechnology.Core/tree/master/sample-tale-code-apps/DreamTravel/backend/tests/Component
+- 
 ## 4. Unit Testing
 
 ### Overview
@@ -347,9 +282,6 @@ Unit tests form the foundation of the testing pyramid. They are the most numerou
 - **Readable**: AAA (Arrange, Act, Assert) pattern, one assertion per test (when possible)
 
 ### Tools & Frameworks
-//TODO
-
-## App Insights Logs
 //TODO
 
 ## Additional Resources
