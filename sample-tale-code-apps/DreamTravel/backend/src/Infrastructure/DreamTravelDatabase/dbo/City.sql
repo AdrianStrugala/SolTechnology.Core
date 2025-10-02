@@ -3,7 +3,7 @@
 	[Id] BIGINT NOT NULL IDENTITY(1,1) PRIMARY KEY,
     [Name] NVARCHAR(50) NOT NULL,
     [Country] NVARCHAR(50) NOT NULL,
-    [Region] NVARCHAR(50) NOT NULL,
+    [Region] NVARCHAR(50) NULL,
 	[Population] INT NULL,
 	[Latitude] FLOAT NOT NULL,
 	[Longitude] FLOAT NOT NULL,

@@ -5,21 +5,20 @@ using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using SolTechnology.Core.CQRS;
 
-namespace DreamTravel.Api.Controllers.v2
+namespace DreamTravel.Api.Controllers.Trips.v2
 {
     [Route(Route)]
     public class StatisticsController(IMediator mediator) : ControllerBase
     {
         public const string Route = "api/v2/statistics";
-
-
-        [HttpPost ("countries")]
+        
+        [HttpGet ("countries")]
         [Produces(MediaTypeNames.Application.Json)]
         [ProducesResponseType(typeof(Result<GetSearchStatisticsResult>), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(Result), (int)HttpStatusCode.BadRequest)]
-        public async Task<IActionResult> GetSearchStatistics([FromBody] GetSearchStatisticsQuery query)
+        public async Task<IActionResult> GetSearchStatistics()
         {
-            return Ok(await mediator.Send(query));
+            return Ok(await mediator.Send(new GetSearchStatisticsQuery()));
         }
     }
 }
