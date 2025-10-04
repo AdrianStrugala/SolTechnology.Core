@@ -1,15 +1,15 @@
-﻿using DreamTravel.Trips.Domain.Cities;
+﻿using DreamTravel.Trips.Commands.DomainServices;
+using DreamTravel.Trips.Domain.Cities;
 using DreamTravel.Trips.GeolocationDataClients.GeoDb;
-using DreamTravel.Trips.Sql.Repositories;
 using Microsoft.Extensions.Logging;
 using SolTechnology.Core.CQRS;
 
 namespace DreamTravel.Trips.Commands.FetchCity
 {
     public class FetchCityDetailsCommandHandler(
-        ICityRepository cityRepository,
+        ICityDomainService cityDomainService,
         IGeoDbApiClient geoDbApiClient,
-        ICityStatisticsRepository cityStatisticsRepository,
+        ICityStatisticsDomainService cityStatisticsDomainService,
         ILogger<FetchCityDetailsCommandHandler> logger)
         : ICommandHandler<FetchCityDetailsCommand>
     {
@@ -35,7 +35,7 @@ namespace DreamTravel.Trips.Commands.FetchCity
                     Region = geoDbResponse.Region
                 };
 
-                await cityRepository.Add(cityDetails);
+                await cityDomainService.Add(cityDetails);
                 
                 
             }
@@ -52,7 +52,7 @@ namespace DreamTravel.Trips.Commands.FetchCity
 
         private async Task BumpSearchStatistics(long cityDetailsId)
         {
-            var cityStatistics = await cityStatisticsRepository.GetOrAdd(cityDetailsId);
+            var cityStatistics = await cityStatisticsDomainService.GetOrAdd(cityDetailsId);
             cityStatistics.SearchCount++;
         }
     }

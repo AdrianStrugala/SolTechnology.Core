@@ -28,18 +28,18 @@ public class Program
             c.AddConsole());
 
         
-        //SQL
+        //INSTALL MODULES
         var sqlConfiguration = builder.Configuration.GetSection("Sql").Get<SqlConfiguration>()!;
         builder.Services.InstallTripsSql(sqlConfiguration);
+        builder.Services.InstallGeolocationDataClients();
+        builder.Services.InstallInfrastructure();
+        
+        builder.Services.InstallDreamTripsCommands();
         
         //Graph
         builder.Services.Configure<Neo4jSettings>(
             builder.Configuration.GetSection("Neo4j"));
         builder.Services.InstallGraphDatabase();
-        
-        builder.Services.InstallGeolocationDataClients();
-        builder.Services.InstallInfrastructure();
-        builder.Services.InstallDreamTripsCommands();
         
         //CACHE
         var cacheConfiguration = builder.Configuration.GetSection("Cache").Get<CacheConfiguration>()!;

@@ -31,7 +31,6 @@ public class StatisticsTests
         {
             new()
             {
-                Id = 1,
                 Name = "Warszawa",
                 Latitude = 52.2297,
                 Longitude = 21.0122,
@@ -41,7 +40,6 @@ public class StatisticsTests
             },
             new CityDetails
             {
-                Id = 2,
                 Name = "Kraków",
                 Latitude = 50.0647,
                 Longitude = 19.9450,
@@ -51,7 +49,6 @@ public class StatisticsTests
             },
             new CityDetails
             {
-                Id = 3,
                 Name = "Gdańsk",
                 Latitude = 54.3520,
                 Longitude = 18.6466,
@@ -65,19 +62,16 @@ public class StatisticsTests
         {
             new()
             {
-                Id = 1,
                 CityId = 1,
                 SearchCount = 3
             },
             new()
             {
-                Id = 2,
                 CityId = 2,
                 SearchCount = 2
             },
             new()
             {
-                Id = 3,
                 CityId = 3,
                 SearchCount = 2
             }
@@ -91,7 +85,7 @@ public class StatisticsTests
         var apiResponse = await _apiClient
             .CreateRequest("/api/v2/statistics/countries")
             .WithHeader("X-API-KEY", "<SECRET>")
-            .PostAsync<Result<GetSearchStatisticsResult>>();
+            .GetAsync<Result<GetSearchStatisticsResult>>();
         
         
         // "Then the statistics matches expected result"
