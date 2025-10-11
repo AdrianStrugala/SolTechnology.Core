@@ -124,6 +124,7 @@ public class Program
             opts.Filters.Add<ResponseEnvelopeFilter>();
         });
 
+        
 
         var app = builder.Build();
 
@@ -149,7 +150,28 @@ public class Program
         });
 
         app.MapControllers();
+        LogAvailableEndpoints(app.Services);
 
         app.Run();
+    }
+
+    private static void LogAvailableEndpoints(IServiceProvider services)
+    {
+        var endpointDataSource = services.GetRequiredService<EndpointDataSource>();
+        var loggerFactory = services.GetRequiredService<ILoggerFactory>();
+        var logger = loggerFactory.CreateLogger("Startup");
+
+        var availableEndpoints = endpointDataSource.Endpoints
+            .OfType<RouteEndpoint>()
+            .Select(e => new {
+                Methods = e.Metadata.OfType<HttpMethodMetadata>().FirstOrDefault()?.HttpMethods ?? ["UNKNOWN"],
+                Route = e.RoutePattern.RawText
+            })
+            .SelectMany(e => e.Methods.Select(m => $"{m} {e.Route}"))
+            .Distinct()
+            .OrderBy(x => x)
+            .ToList();
+
+        logger.LogInformation("AvailableEndpoints: {Endpoints}", availableEndpoints);
     }
 }

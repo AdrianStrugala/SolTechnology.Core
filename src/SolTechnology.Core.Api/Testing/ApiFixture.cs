@@ -21,10 +21,9 @@ namespace SolTechnology.Core.Api.Testing
             var webAppFactory = new WebApplicationFactory<TEntryPoint>()
                 .WithWebHostBuilder(builder =>
                     {
-                        if(configuration != null)
+                        if (configuration != null)
                         {
-                            builder
-                                .UseConfiguration(configuration);
+                            builder.UseConfiguration(configuration);
                         }
 
                         builder
