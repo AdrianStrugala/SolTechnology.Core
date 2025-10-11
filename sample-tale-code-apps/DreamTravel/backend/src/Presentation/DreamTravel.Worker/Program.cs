@@ -9,6 +9,7 @@ using Hangfire;
 using SolTechnology.Core.Cache;
 using SolTechnology.Core.Sql;
 using System.Globalization;
+using DreamTravel.ServiceDefaults;
 
 namespace DreamTravel.Worker;
 
@@ -46,11 +47,8 @@ public class Program
         builder.Services.AddCache(cacheConfiguration);
 
         //MEDIATR
-        var thisAssembly = typeof(Program).Assembly;
         builder.Services.AddMediatR(cfg =>
-        {
-            cfg.RegisterServicesFromAssemblies(thisAssembly);
-        });
+            cfg.RegisterServicesFromAssemblyContaining<Program>());
 
         builder.Services.AddHangfireServer();
 

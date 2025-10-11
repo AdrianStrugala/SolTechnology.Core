@@ -2,6 +2,7 @@ using System.Globalization;
 using DreamTravel.Flows;
 using DreamTravel.GraphDatabase;
 using DreamTravel.Infrastructure;
+using DreamTravel.ServiceDefaults;
 using DreamTravel.Trips.GeolocationDataClients;
 using DreamTravel.Trips.Queries;
 using DreamTravel.Trips.Sql;
@@ -11,7 +12,6 @@ using SolTechnology.Core.Api.Filters;
 using SolTechnology.Core.Authentication;
 using SolTechnology.Core.Cache;
 using SolTechnology.Core.Flow.Workflow;
-using SolTechnology.Core.Journey.Workflow;
 using SolTechnology.Core.Logging.Middleware;
 using SolTechnology.Core.Sql;
 
@@ -39,9 +39,9 @@ public class Program
         builder.Services.AddCors(options =>
         {
             options.AddPolicy(CorsPolicy,
-                builder =>
+                policyBuilder =>
                 {
-                    builder.WithOrigins("http://localhost:4200",
+                    policyBuilder.WithOrigins("http://localhost:4200",
                             "https://dreamtravels.azurewebsites.net",
                             "https://dreamtravels-demo.azurewebsites.net",
                             "http://localhost:55855",

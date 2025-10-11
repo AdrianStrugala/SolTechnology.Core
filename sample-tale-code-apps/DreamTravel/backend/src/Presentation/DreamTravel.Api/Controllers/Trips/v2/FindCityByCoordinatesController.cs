@@ -6,7 +6,7 @@ using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using SolTechnology.Core.CQRS;
 
-namespace DreamTravel.Api.Controllers.v2
+namespace DreamTravel.Api.Controllers.Trips.v2
 {
     [Route(Route)]
     public class FindCityByCoordinatesController(

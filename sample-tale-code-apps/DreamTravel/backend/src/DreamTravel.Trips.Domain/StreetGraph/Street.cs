@@ -1,8 +1,10 @@
-﻿public record Street
+﻿namespace DreamTravel.Trips.Domain.StreetGraph;
+
+public record Street
 {
-    public string Id { get; set; }          // = id(r)
-    public string FromId { get; init; }      // = a.id
-    public string ToId { get; init; }        // = b.id
+    public required string Id { get; set; }          // = id(r)
+    public required string FromId { get; init; }      // = a.id
+    public required string ToId { get; init; }        // = b.id
 
     public string? Name { get; init; } // r.name
     public double? Length { get; init; } // r.length

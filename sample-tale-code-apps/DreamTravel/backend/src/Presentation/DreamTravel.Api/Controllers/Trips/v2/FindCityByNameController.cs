@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using SolTechnology.Core.Api.Filters;
 using SolTechnology.Core.CQRS;
 
-namespace DreamTravel.Api.Controllers.v2
+namespace DreamTravel.Api.Controllers.Trips.v2
 {
     [Route(Route)]
     [ServiceFilter(typeof(ExceptionFilter))]
