@@ -23,18 +23,18 @@ namespace SolTechnology.Core.Api.Testing
             var webAppFactory = new WebApplicationFactory<TEntryPoint>()
                 .WithWebHostBuilder(builder =>
                     {
-                        if(configuration != null)
+                        builder.ConfigureAppConfiguration((context, config) =>
                         {
-                            builder
-                                .UseConfiguration(configuration);
-                        }
-                        if(inMemoryConfiguration != null)
-                        {
-                            builder.ConfigureAppConfiguration((context, config) =>
+                            if (configuration != null)
                             {
-                                config.AddInMemoryCollection(inMemoryConfiguration!);
-                            });
-                        }
+                                config.AddConfiguration(configuration);
+                            }
+                            
+                            if (inMemoryConfiguration != null)
+                            {
+                                config.AddInMemoryCollection(inMemoryConfiguration);
+                            }
+                        });
 
                         builder
                             .ConfigureServices((context, services) =>

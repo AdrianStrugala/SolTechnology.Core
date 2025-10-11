@@ -26,11 +26,6 @@ namespace DreamTravel.Trips.Sql
                 // .UseInMemoryStorage());
                 
             services.AddGraphQLSchema<DreamTripsDbContext>();
-
-            services.AddTransient<ICityRepository, CityRepository>();
-            services.AddTransient<ICityStatisticsRepository, CityStatisticsRepository>();
-            services.AddTransient<ICountryStatisticsRepository, CountryStatisticsRepository>();
-
             return services;
         }
     }
