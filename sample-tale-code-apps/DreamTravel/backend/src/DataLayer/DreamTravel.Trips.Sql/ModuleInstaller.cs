@@ -1,5 +1,4 @@
-﻿using DreamTravel.Trips.Sql.Repositories;
-using EntityGraphQL.AspNet;
+﻿using EntityGraphQL.AspNet;
 using Hangfire;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;

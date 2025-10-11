@@ -1,19 +1,15 @@
 ﻿using System.Data;
 using System.Data.SqlClient;
+using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Options;
 using Polly;
 
 namespace SolTechnology.Core.Sql.Connections
 {
-    public class SqlConnectionFactory : ISqlConnectionFactory
+    public class SqlConnectionFactory(IOptions<SqlConfiguration> sqlConfiguration) : ISqlConnectionFactory
     {
-        private readonly string _connectionString;
+        private readonly string _connectionString = sqlConfiguration.Value.ConnectionString;
         private static readonly Random Random = new Random();
-
-        public SqlConnectionFactory(IOptions<SqlConfiguration> sqlConfiguration)
-        {
-            _connectionString = sqlConfiguration.Value.ConnectionString;
-        }
 
         public IDbConnection CreateConnection()
         {

@@ -149,6 +149,7 @@ public class RequestBuilder(HttpClient httpClient, string path)
 
     private static void HandleErrors(HttpResponseMessage httpResponseMessage)
     {
-        throw new Exception(httpResponseMessage.ReasonPhrase);
+        var errorContent = httpResponseMessage.Content.ReadAsStringAsync().Result;
+        throw new Exception(errorContent ?? httpResponseMessage.ReasonPhrase);
     }
 }

@@ -16,25 +16,15 @@ namespace SolTechnology.Core.Api.Testing
         public HttpClient ServerClient { get; }
 
 
-        public ApiFixture(
-            IConfiguration? configuration = null,
-            Dictionary<string, string?>? inMemoryConfiguration = null)
+        public ApiFixture(IConfiguration? configuration = null)
         {
             var webAppFactory = new WebApplicationFactory<TEntryPoint>()
                 .WithWebHostBuilder(builder =>
                     {
-                        builder.ConfigureAppConfiguration((context, config) =>
+                        if (configuration != null)
                         {
-                            if (configuration != null)
-                            {
-                                config.AddConfiguration(configuration);
-                            }
-                            
-                            if (inMemoryConfiguration != null)
-                            {
-                                config.AddInMemoryCollection(inMemoryConfiguration);
-                            }
-                        });
+                            builder.UseConfiguration(configuration);
+                        }
 
                         builder
                             .ConfigureServices((context, services) =>

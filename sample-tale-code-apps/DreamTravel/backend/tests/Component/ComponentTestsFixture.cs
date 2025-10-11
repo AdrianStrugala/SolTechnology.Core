@@ -1,5 +1,7 @@
 ﻿using DreamTravel.Api;
 using DreamTravel.FunctionalTests.FakeApis;
+using DreamTravel.Trips.Sql;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using SolTechnology.Core.Api.Testing;
 using SolTechnology.Core.Faker;
@@ -21,22 +23,20 @@ namespace DreamTravel.FunctionalTests
         {
             Environment.SetEnvironmentVariable("ASPNETCORE_ENVIRONMENT", "development");
 
-            var configuration = new ConfigurationBuilder()
-                .AddJsonFile("appsettings.tests.json")
-                .Build();
-            
             SqlFixture = new SqlFixture("DreamTravelDatabase")
-                .WithSqlFolder("SqlScripts");
+                .WithSqlProject(Path.GetFullPath("../../../../../src/Infrastructure/DreamTravelDatabase/DreamTravelDatabase.csproj"));
             await SqlFixture.InitializeAsync();
             
+            var configuration = new ConfigurationBuilder()
+                .AddJsonFile("appsettings.tests.json")
+                .AddInMemoryCollection(new Dictionary<string, string?>
+                {
+                    {"Sql:ConnectionString", SqlFixture.DatabaseConnectionString}
+                })
+                .Build();
             
-            var inMemoryConfig = new Dictionary<string, string?>
-            {
-                {"Sql:ConnectionString", SqlFixture.ConnectionString}
-            };
-            
-            ApiFixture = new ApiFixture<Program>(configuration, inMemoryConfig);
-            WorkerFixture = new ApiFixture<Worker.Program>(configuration, inMemoryConfig);
+            ApiFixture = new ApiFixture<Program>(configuration);
+            WorkerFixture = new ApiFixture<Worker.Program>(configuration);
             
             WireMockFixture = new WireMockFixture();
             WireMockFixture.Initialize();
