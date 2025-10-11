@@ -44,13 +44,4 @@
 	  </None>
 	</ItemGroup>
 
-	<Target Name="CopyDatabaseScripts" AfterTargets="Build">
-		<ItemGroup>
-			<DatabaseScripts Include="$(MSBuildProjectDirectory)\..\..\src\Infrastructure\DreamTravelDatabase\**\*.sql" />
-		</ItemGroup>
-		<Copy SourceFiles="@(DatabaseScripts)"
-			  DestinationFolder="$(OutputPath)\SqlScripts"
-			  SkipUnchangedFiles="true" />
-	</Target>
-
 </Project>
