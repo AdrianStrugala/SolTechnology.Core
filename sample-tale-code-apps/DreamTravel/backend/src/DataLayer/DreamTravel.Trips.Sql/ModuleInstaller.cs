@@ -1,6 +1,7 @@
 ﻿using EntityGraphQL.AspNet;
 using Hangfire;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using SolTechnology.Core.Sql;
 
@@ -24,7 +25,6 @@ namespace DreamTravel.Trips.Sql
                 // .UseInMemoryStorage());
                 
             services.AddGraphQLSchema<DreamTripsDbContext>();
-
             return services;
         }
     }
