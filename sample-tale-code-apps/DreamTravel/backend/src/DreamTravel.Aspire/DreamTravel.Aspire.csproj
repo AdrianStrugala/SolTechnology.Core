@@ -1,16 +1,19 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
+  <Sdk Name="Aspire.AppHost.Sdk" Version="9.5.0" />
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <IsAspireHost>true</IsAspireHost>
+    <TargetFramework>net8.0</TargetFramework>
     <UserSecretsId>e6d85edf-8ba1-4c22-a8b9-586712c5f311</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Aspire.Hosting.AppHost" Version="8.2.2" />
+    <PackageReference Include="Aspire.Hosting.AppHost" Version="9.5.0" />
+    <PackageReference Include="Aspire.Hosting.SqlServer" Version="9.5.0" />
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\..\..\..\src\SolTechnology.Core.Sql\SolTechnology.Core.Sql.csproj" />
     <ProjectReference Include="..\Presentation\DreamTravel.Api\DreamTravel.Api.csproj" />
     <ProjectReference Include="..\Presentation\DreamTravel.Ui\DreamTravel.Ui.csproj" />
     <ProjectReference Include="..\Presentation\DreamTravel.Worker\DreamTravel.Worker.csproj" />
