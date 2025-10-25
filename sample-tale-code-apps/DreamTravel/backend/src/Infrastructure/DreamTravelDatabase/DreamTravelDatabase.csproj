@@ -13,4 +13,22 @@
 		</None>
 	</ItemGroup>
 
+	<!-- Skopiuj dacpac do wspólnej lokalizacji po zbudowaniu -->
+	<Target Name="CopyDacpacToSharedLocation" AfterTargets="Build">
+		<PropertyGroup>
+			<BackendRoot>$(MSBuildProjectDirectory)\..\..\..</BackendRoot>
+			<SharedDacpacDir>$(BackendRoot)\artifacts\dacpac\</SharedDacpacDir>
+			<SharedDacpacPath>$(SharedDacpacDir)$(MSBuildProjectName).dacpac</SharedDacpacPath>
+		</PropertyGroup>
+
+		<MakeDir Directories="$(SharedDacpacDir)" />
+
+		<Copy
+				SourceFiles="$(TargetDir)$(MSBuildProjectName).dacpac"
+				DestinationFiles="$(SharedDacpacPath)"
+				SkipUnchangedFiles="true" />
+
+		<Message Text="✅ Dacpac copied to: $(SharedDacpacPath)" Importance="high" />
+	</Target>
+
 </Project>

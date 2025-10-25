@@ -1,3 +1,4 @@
+using Microsoft.Data.SqlClient;
 using SolTechnology.Core.Sql.SqlProject;
 
 var builder = DistributedApplication.CreateBuilder(args);
@@ -10,27 +11,40 @@ var sql = builder
 
 var dreamTravelDb = sql.AddDatabase("DreamTravelDatabase");
 
-dreamTravelDb.OnResourceReady(async (resource, @event, ct) =>
+var dbDeployment = dreamTravelDb.OnResourceReady(async (resource, @event, ct) =>
 {
     var connectionString = await resource.ConnectionStringExpression.GetValueAsync(ct);
-    var sqlProjPath = Path.Combine(
-        builder.AppHostDirectory, 
-        "..", "..", "db", "DreamTravelDatabase", "DreamTravelDatabase.sqlproj"
+    Console.WriteLine($"🔧 Db ConnectionString: {connectionString}");
+    
+    var dacpacPath = Path.Combine(
+        builder.AppHostDirectory,      // .../backend/src/DreamTravel.Aspire
+        "..", "..",                    // -> backend/
+        "artifacts", "dacpac", "DreamTravelDatabase.dacpac"
     );
 
-    await SqlProjectDeployer.DeployAsync(
-        sqlProjPath, 
-        connectionString, 
-        "DreamTravelDatabase", 
-        ct
-    );
+    dacpacPath = Path.GetFullPath(dacpacPath);
+
+    if (!File.Exists(dacpacPath))
+    {
+        throw new FileNotFoundException(
+            $"Dacpac not found at {dacpacPath}. Build the database project first: " +
+            "dotnet build Infrastructure/DreamTravelDatabase/DreamTravelDatabase.csproj");
+    }
+
+    Console.WriteLine($"🔧 Deploying dacpac: {dacpacPath}");
+    
+    await SqlProjectDeployer.DeployDacpacAsync(dacpacPath, connectionString, "DreamTravelDatabase", ct);
+    
+    Console.WriteLine("✅ Database is ready for connections!");
 });
 
-builder.AddProject<Projects.DreamTravel_Api>("dreamtravel-api");
+var api = builder.AddProject<Projects.DreamTravel_Api>("dreamtravel-api")
+    .WaitFor(dbDeployment);
 
 builder.AddProject<Projects.DreamTravel_Worker>("dreamtravel-worker")
-    .WaitFor(sql);
+    .WaitFor(dbDeployment);
 
-builder.AddProject<Projects.DreamTravel_Ui>("dreamtravel-ui");
+builder.AddProject<Projects.DreamTravel_Ui>("dreamtravel-ui")
+    .WaitFor(api);
 
 builder.Build().Run();
