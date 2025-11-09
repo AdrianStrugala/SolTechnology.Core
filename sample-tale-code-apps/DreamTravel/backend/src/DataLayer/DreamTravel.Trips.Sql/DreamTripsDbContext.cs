@@ -21,13 +21,13 @@ public partial class DreamTripsDbContext : DbContext
     {
     }
 
-    public virtual DbSet<CityDetails> Cities { get; set; }
+    public virtual DbSet<CityDbModel> Cities { get; set; }
     public virtual DbSet<CityStatisticsDbModel> CityStatistics { get; set; }
     public virtual DbSet<CountryStatisticsDbModel> CountryStatistics { get; set; }
     
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.Entity<CityDetails>(entity =>
+        modelBuilder.Entity<CityDbModel>(entity =>
         {
             entity.ToTable("City");
         });

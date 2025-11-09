@@ -1,6 +1,7 @@
 ﻿using DreamTravel.Trips.Commands.DomainServices;
 using DreamTravel.Trips.Domain.Cities;
 using DreamTravel.Trips.GeolocationDataClients.GeoDb;
+using DreamTravel.Trips.GeolocationDataClients.GeoDb.Models;
 using Microsoft.Extensions.Logging;
 using SolTechnology.Core.CQRS;
 
@@ -22,7 +23,7 @@ namespace DreamTravel.Trips.Commands.FetchCity
                 if (geoDbResponse == null)
                 {
                     logger.LogWarning($"Failed to fetch data about city: [{request.Name}]");
-                    return Result.Fail("Failed to fetch data about city: [{request.Name}]");
+                    return Result.Fail($"Failed to fetch data about city: [{request.Name}]");
                 }
 
                 cityDetails = new CityDetails

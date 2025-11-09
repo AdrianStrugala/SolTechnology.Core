@@ -1,6 +1,6 @@
 ﻿namespace DreamTravel.Trips.Domain.Cities;
 
-public record City : EntityBase
+public record City
 {
     public string Name { get; set; } = null!;
     public double Latitude { get; set; }
