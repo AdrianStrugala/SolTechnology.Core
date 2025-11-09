@@ -11,4 +11,6 @@ public record CityDbModel : EntityBase
     public required string Country { get; set; }
     public string? Region { get; set; }
     public int? Population { get; set; }
+
+    public List<string> AlternativeNames { get; set; } = [];
 }

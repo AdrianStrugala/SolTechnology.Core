@@ -11,5 +11,7 @@ public class FetchCityDetailsJob(IMediator mediator) : INotificationHandler<City
     public async Task Handle(CitySearched notification, CancellationToken cancellationToken)
     {
         await mediator.Send(new FetchCityDetailsCommand { Name = notification.Name }, cancellationToken);
+        
+        //TODO add separate handler to bump search statistics
     }
 }

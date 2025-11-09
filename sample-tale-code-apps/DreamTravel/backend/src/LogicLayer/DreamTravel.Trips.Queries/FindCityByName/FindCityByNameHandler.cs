@@ -29,6 +29,8 @@ namespace DreamTravel.Trips.Queries.FindCityByName
             var stopwatch = new Stopwatch();
             stopwatch.Start();
 
+            //TODO: try get from database, fallback to google api
+            
             var result = await _googleApiClient.GetLocationOfCity(query.Name);
             _logger.LogInformation($"FindCityByName. Http request took: [{stopwatch.ElapsedMilliseconds}]ms");
             stopwatch.Restart();
@@ -37,6 +39,7 @@ namespace DreamTravel.Trips.Queries.FindCityByName
             result = await _googleApiClient.GetLocationOfCity(query.Name);
             _logger.LogInformation($"FindCityByName. Cache hit took: [{stopwatch.ElapsedMilliseconds}]ms");
 
+            //TODO: pass isInDb flag to notification
             _hangfireNotificationPublisher.Publish(new CitySearched { Name = result.Name });
             
             stopwatch.Stop();
