@@ -1,16 +1,17 @@
 ﻿using DreamTravel.Trips.Commands.DomainServices;
-using DreamTravel.Trips.Domain.Cities;
+using DreamTravel.Trips.Commands.DomainServices.CityDomain;
 using DreamTravel.Trips.GeolocationDataClients.GeoDb;
 using DreamTravel.Trips.GeolocationDataClients.GeoDb.Models;
 using Microsoft.Extensions.Logging;
 using SolTechnology.Core.CQRS;
 
-namespace DreamTravel.Trips.Commands.FetchCity
+namespace DreamTravel.Trips.Commands.FetchCityDetails
 {
     public class FetchCityDetailsCommandHandler(
         ICityDomainService cityDomainService,
         IGeoDbApiClient geoDbApiClient,
         ICityStatisticsDomainService cityStatisticsDomainService,
+        ICityExtendedBuilder cityExtendedBuilder,
         ILogger<FetchCityDetailsCommandHandler> logger)
         : ICommandHandler<FetchCityDetailsCommand>
     {
@@ -35,6 +36,8 @@ namespace DreamTravel.Trips.Commands.FetchCity
                     Population = geoDbResponse.Population,
                     Region = geoDbResponse.Region
                 };
+                
+                var city = 
 
                 await cityDomainService.Add(cityDetails);
                 

@@ -2,7 +2,7 @@
 
 namespace DreamTravel.Trips.Sql.DbModels;
 
-public record CityStatisticsDbModel : EntityBase
+public record CityStatisticsEntity : EntityBase
 {
     public long CityId { get; set; }
     public int SearchCount { get; set; }

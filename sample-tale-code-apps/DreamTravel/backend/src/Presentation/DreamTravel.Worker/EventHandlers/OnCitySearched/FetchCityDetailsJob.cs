@@ -1,4 +1,4 @@
-using DreamTravel.Trips.Commands.FetchCity;
+using DreamTravel.Trips.Commands.FetchCityDetails;
 using DreamTravel.Trips.Domain.Events;
 using Hangfire.Annotations;
 using MediatR;

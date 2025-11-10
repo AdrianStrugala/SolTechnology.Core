@@ -21,18 +21,29 @@ public partial class DreamTripsDbContext : DbContext
     {
     }
 
-    public virtual DbSet<CityDbModel> Cities { get; set; }
-    public virtual DbSet<CityStatisticsDbModel> CityStatistics { get; set; }
-    public virtual DbSet<CountryStatisticsDbModel> CountryStatistics { get; set; }
+    public virtual DbSet<CityEntity> Cities { get; set; }
+    public virtual DbSet<CityStatisticsEntity> CityStatistics { get; set; }
+    public virtual DbSet<CountryStatisticsEntity> CountryStatistics { get; set; }
+    public virtual DbSet<AlternativeNameEntity> CityAlternativeNames { get; set; }
     
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.Entity<CityDbModel>(entity =>
+        modelBuilder.Entity<CityEntity>(entity =>
         {
             entity.ToTable("City");
+        
+            // Konfiguracja relacji
+            entity.HasMany(c => c.AlternativeNames)
+                .WithOne()
+                .HasForeignKey(a => a.CityId)
+                .OnDelete(DeleteBehavior.Cascade);
         });
-            
-        modelBuilder.Entity<CountryStatisticsDbModel>(entity =>
+    
+        modelBuilder.Entity<AlternativeNameEntity>(entity =>
+        {
+            entity.ToTable("CityAlternativeName");
+        });
+        modelBuilder.Entity<CountryStatisticsEntity>(entity =>
         {
             entity.ToView("CountryStatisticsView");   // view name in db
             entity.HasNoKey();                        // keyless, because it's view

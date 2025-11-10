@@ -6,19 +6,19 @@ namespace DreamTravel.Trips.Commands.DomainServices;
 
 public interface ICityStatisticsDomainService
 {
-    Task<CityStatisticsDbModel> GetOrAdd(long cityId);
+    Task<CityStatisticsEntity> GetOrAdd(long cityId);
 }
 
 public class CityStatisticsDomainService(DreamTripsDbContext dbContext) : ICityStatisticsDomainService
 {
-    public async Task<CityStatisticsDbModel> GetOrAdd(long cityId)
+    public async Task<CityStatisticsEntity> GetOrAdd(long cityId)
     {
         var stats = await dbContext.CityStatistics
             .SingleOrDefaultAsync(x => x.CityId == cityId);
 
         if (stats == null)
         {
-            stats = new CityStatisticsDbModel
+            stats = new CityStatisticsEntity
             {
                 CityId = cityId,
                 SearchCount = 0

@@ -58,7 +58,7 @@ public class StatisticsTests
             }
         };
         
-        var statistics = new List<CityStatisticsDbModel>
+        var statistics = new List<CityStatisticsEntity>
         {
             new()
             {

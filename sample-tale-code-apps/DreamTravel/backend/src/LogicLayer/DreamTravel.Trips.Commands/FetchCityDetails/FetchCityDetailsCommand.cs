@@ -1,7 +1,7 @@
 ﻿using MediatR;
 using SolTechnology.Core.CQRS;
 
-namespace DreamTravel.Trips.Commands.FetchCity
+namespace DreamTravel.Trips.Commands.FetchCityDetails
 {
     public class FetchCityDetailsCommand : IRequest<Result>
     {
