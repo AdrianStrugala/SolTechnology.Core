@@ -1,9 +1,10 @@
-﻿using DreamTravel.Trips.Domain;
+﻿namespace DreamTravel.Trips.Sql.DbModels;
 
-namespace DreamTravel.Trips.Sql.DbModels;
-
-public record CityStatisticsEntity : EntityBase
+public record CityStatisticsEntity : BaseEntity
 {
     public long CityId { get; set; }
     public int SearchCount { get; set; }
+    public DateOnly Date { get; set; }
+    
+    public CityEntity City { get; set; } = null!;
 }

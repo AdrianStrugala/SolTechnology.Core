@@ -1,41 +1,35 @@
-﻿using DreamTravel.Trips.Sql.DbModels;
+﻿using DreamTravel.Trips.Domain.Cities;
+using DreamTravel.Trips.Sql.DbModels;
 
 namespace DreamTravel.Trips.Commands.DomainServices.CityDomain;
 
 public interface ICityMapper
 {
-    Domain.Cities.City ToDomain(CityEntity entity);
-    void ApplyUpdate(CityEntity? entity, Domain.Cities.City city);
+    City ToDomain(CityEntity baseEntity, string name);
+    void ApplyUpdate(CityEntity? entity, City city);
 }
 
-public class CityMapper(ICityExtendedBuilder extendedBuilder) : ICityMapper
+public class CityMapper() : ICityMapper
 {
-    public Domain.Cities.City ToDomain(CityEntity entity)
+    public City ToDomain(CityEntity baseEntity, string name)
     {
-        return new Domain.Cities.City
+        return new City
         {
-            Name = entity.Name,
-            Latitude = entity.Latitude,
-            Longitude = entity.Longitude
+            Name =  name,
+            Latitude = baseEntity.Latitude,
+            Longitude = baseEntity.Longitude
         };
     }
     
-    public void ApplyUpdate(CityEntity? entity, Domain.Cities.City city)
+    public void ApplyUpdate(CityEntity? entity, City city)
     {
         entity ??= new CityEntity
         {
-            Name = city.Name,
             Latitude = city.Latitude,
             Longitude = city.Longitude
         };
         
-        entity.Name = city.Name;
         entity.Latitude = city.Latitude;
         entity.Longitude = city.Longitude;
-        
-        foreach (var change in extendedBuilder.GetChanges())
-        {
-            change.Apply(entity);
-        }
     }
 }

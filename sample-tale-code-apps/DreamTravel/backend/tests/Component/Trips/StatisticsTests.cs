@@ -1,5 +1,4 @@
 using DreamTravel.Trips.Domain.Cities;
-using DreamTravel.Trips.Domain.SearchStatistics;
 using DreamTravel.Trips.Queries.GetSearchStatistics;
 using DreamTravel.Trips.Sql;
 using DreamTravel.Trips.Sql.DbModels;

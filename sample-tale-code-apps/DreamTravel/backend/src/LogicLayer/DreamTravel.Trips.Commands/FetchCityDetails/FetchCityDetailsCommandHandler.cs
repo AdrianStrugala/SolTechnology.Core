@@ -1,5 +1,6 @@
 ﻿using DreamTravel.Trips.Commands.DomainServices;
 using DreamTravel.Trips.Commands.DomainServices.CityDomain;
+using DreamTravel.Trips.Commands.DomainServices.CityStatistics;
 using DreamTravel.Trips.GeolocationDataClients.GeoDb;
 using DreamTravel.Trips.GeolocationDataClients.GeoDb.Models;
 using Microsoft.Extensions.Logging;

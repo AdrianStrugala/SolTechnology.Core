@@ -1,10 +1,9 @@
-﻿using DreamTravel.Trips.Domain;
+﻿namespace DreamTravel.Trips.Sql.DbModels;
 
-namespace DreamTravel.Trips.Sql.DbModels;
-
-public record CityEntity : EntityBase
+public record CityEntity : BaseEntity
 {
-    public required string Name { get; set; }
+    public Guid CityId { get; set; }          // biznesowe Id (unikalne)
+    
     public required double Latitude { get; set; }
     public required double Longitude { get; set; }
     public string? Country { get; set; } 
@@ -12,4 +11,5 @@ public record CityEntity : EntityBase
     public int? Population { get; set; }
 
     public List<AlternativeNameEntity> AlternativeNames { get; set; } = [];
+    public List<CityStatisticsEntity> CityStatistics { get; set; } = [];
 }

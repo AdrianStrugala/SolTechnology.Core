@@ -1,15 +1,8 @@
-﻿using DreamTravel.Trips.Domain;
-using DreamTravel.Trips.Domain.Cities;
-using DreamTravel.Trips.Sql.DbModels;
+﻿using DreamTravel.Trips.Sql.DbModels;
 using Microsoft.EntityFrameworkCore;
 
 namespace DreamTravel.Trips.Sql;
 
-/// <summary>
-/// Scaffolded using:
-/// dotnet-ef dbcontext scaffold "Data Source=localhost,1403;Database=TaleCodeDatabase; User ID=SA;Password=password_xxddd_2137;Persist Security Info=True;MultipleActiveResultSets=True;Trusted_Connection=False;Connect Timeout=60;Encrypt=False;TrustServerCertificate=True" Microsoft.EntityFrameworkCore.SqlServer --output-dir Models --context DreamTripsDbContext --force
-/// from SolTechnology.TaleCode.Sql directory
-/// </summary>
 public partial class DreamTripsDbContext : DbContext
 {
     public DreamTripsDbContext()
@@ -31,24 +24,51 @@ public partial class DreamTripsDbContext : DbContext
         modelBuilder.Entity<CityEntity>(entity =>
         {
             entity.ToTable("City");
+            entity.HasKey(e => e.Id);
         
-            // Konfiguracja relacji
+            entity.Property(e => e.Latitude).IsRequired();
+            entity.Property(e => e.Longitude).IsRequired();
+            entity.Property(e => e.Country).HasMaxLength(100);
+            entity.Property(e => e.Region).HasMaxLength(100);
+    
             entity.HasMany(c => c.AlternativeNames)
-                .WithOne()
+                .WithOne(a => a.City)
                 .HasForeignKey(a => a.CityId)
                 .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasMany<CityStatisticsEntity>()
+                .WithOne(s => s.City)
+                .HasForeignKey(s => s.CityId)
+                .OnDelete(DeleteBehavior.Cascade);
         });
-    
+
         modelBuilder.Entity<AlternativeNameEntity>(entity =>
         {
             entity.ToTable("CityAlternativeName");
+            entity.HasKey(e => e.Id);
+        
+            entity.Property(e => e.AlternativeName)
+                .IsRequired()
+                .HasMaxLength(200);
+        
+            entity.HasIndex(e => e.AlternativeName); // Index dla szybszego wyszukiwania
+            entity.HasIndex(e => e.CityId);
         });
-        modelBuilder.Entity<CountryStatisticsEntity>(entity =>
+    
+        modelBuilder.Entity<CityStatisticsEntity>(entity =>
         {
-            entity.ToView("CountryStatisticsView");   // view name in db
-            entity.HasNoKey();                        // keyless, because it's view
+            entity.ToTable("CityStatistics");
+            entity.HasKey(e => e.Id);
+        
+            // Możesz dodać composite unique index na CityId + Date
+            entity.HasIndex(e => new { e.CityId, e.Date }).IsUnique();
         });
 
+        modelBuilder.Entity<CountryStatisticsEntity>(entity =>
+        {
+            entity.ToView("CountryStatisticsView");
+            entity.HasNoKey(); // keyless, because it's view
+        });
 
         OnModelCreatingPartial(modelBuilder);
     }
@@ -70,11 +90,11 @@ public partial class DreamTripsDbContext : DbContext
     private void UpdateTimestamps()
     {
         var entries = ChangeTracker.Entries()
-            .Where(e => e is { Entity: EntityBase, State: EntityState.Added or EntityState.Modified })
+            .Where(e => e is { Entity: BaseEntity, State: EntityState.Added or EntityState.Modified })
             .ToList();
         foreach (var entry in entries)
         {
-            var entity = (EntityBase)entry.Entity;
+            var entity = (BaseEntity)entry.Entity;
             entity.UpdatedAt = DateTime.UtcNow;
 
             if (entry.State == EntityState.Added)

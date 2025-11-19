@@ -1,56 +1,81 @@
-﻿using DreamTravel.Trips.Domain.Cities;
+﻿using DreamTravel.Trips.Commands.DomainServices.CityDomain.SaveSteps;
+using DreamTravel.Trips.Domain.Cities;
 using DreamTravel.Trips.Sql;
 using DreamTravel.Trips.Sql.DbModels;
 using Microsoft.EntityFrameworkCore;
 
-namespace DreamTravel.Trips.Commands.DomainServices.CityDomain
+namespace DreamTravel.Trips.Commands.DomainServices.CityDomain;
+
+public interface ICityDomainService
 {
-    public interface ICityDomainService
+    Task<City?> Get(string name);
+    Task Save(City city);
+}
+
+
+public class CityDomainService(
+    ICityMapper cityMapper,
+    IAssignAlternativeNameStep assignAlternativeNameStep,
+    IIncrementSearchCountStep incrementSearchCountStep,
+    DreamTripsDbContext dbContext) : ICityDomainService
+{
+    public async Task<City?> Get(string name)
     {
-        Task Add(City city);
+        var cityEntity = await dbContext.Cities
+            .Include(c => c.AlternativeNames)
+            .FirstOrDefaultAsync(c =>
+                c.AlternativeNames.Any(an =>
+                    an.AlternativeName.Equals(name, StringComparison.OrdinalIgnoreCase)));
+
+        if (cityEntity == null) return null;
+
+        return cityMapper.ToDomain(cityEntity, name);
     }
 
-    public class CityDomainService(
-        ICityMapper cityMapper,
-        DreamTripsDbContext dbContext) : ICityDomainService
+    public async Task Save(City city)
     {
-        //TODO: add CityExtendedBuilder for CityDetails
-        
-        //The domain service is meant to be the single point of domain entity modification
-        //This is to ensure, that the Add/Update/Delete behavior remains consistent across the application
-        //It could perform additional validation and trigger side effects like sending notifications, creating change tracking
-        
-        public async Task Add(City city)
+        var today = DateOnly.FromDateTime(DateTime.UtcNow);
+
+        var cityEntity = await GetOrCreateCityAsync(city);
+
+        assignAlternativeNameStep.Invoke(cityEntity, city.Name);
+        incrementSearchCountStep.Invoke(cityEntity, today);
+
+        //this is the only place where Save is called - to ensure no partial updates
+        await dbContext.SaveChangesAsync();
+    }
+
+    /// <summary>
+    /// 1) Pobierz city z bazy danych po koordynatach (podobne miasto),
+    ///    albo utwórz nowe i dodaj do DbContextu (bez SaveChanges).
+    /// </summary>
+    private async Task<CityEntity> GetOrCreateCityAsync(City city)
+    {
+        var cityEntity = await dbContext.Cities
+            .Include(c => c.AlternativeNames)
+            .FirstOrDefaultAsync(c =>
+                Math.Abs(c.Latitude - city.Latitude) < 0.001 &&  // ~100m
+                Math.Abs(c.Longitude - city.Longitude) < 0.001);
+
+        if (cityEntity != null)
+            return cityEntity;
+
+        // Tworzymy nowe miasto
+        cityEntity = new CityEntity
         {
-            // Check if city with same coordinates already exists
-            var cityEntity = await dbContext.Cities
-                .Include(c => c.AlternativeNames)
-                .FirstOrDefaultAsync(c => 
-                    Math.Abs(c.Latitude - city.Latitude) < 0.001 && //100m approximation
-                    Math.Abs(c.Longitude - city.Longitude) < 0.001);
-    
-            if (cityEntity != null)
-            {
-                // City already exists - add the new name as an alternative if not already present
-                if (!cityEntity.AlternativeNames.Any(an => 
-                        an.AlternativeName.Equals(city.Name, StringComparison.OrdinalIgnoreCase)))
-                {
-                    cityEntity.AlternativeNames.Add(new AlternativeNameEntity
-                    {
-                        CityId = cityEntity.Id,
-                        AlternativeName = city.Name
-                    });
-                }
-        
-                return;
-            }
-            else
-            {
-                cityMapper.ApplyUpdate(cityEntity, city);;
-                await dbContext.Cities.AddAsync(cityEntity!);
-            }
-    
-            await dbContext.SaveChangesAsync();
-        }
+            CityId = Guid.NewGuid(),             // biznesowe Id
+            Latitude = city.Latitude,
+            Longitude = city.Longitude,
+            Country = null,
+            Region = null,
+            Population = null
+        };
+
+        // jeśli chcesz użyć mappera:
+        // cityMapper.ApplyUpdate(cityEntity, city);
+
+        await dbContext.Cities.AddAsync(cityEntity);
+
+        return cityEntity;
     }
 }

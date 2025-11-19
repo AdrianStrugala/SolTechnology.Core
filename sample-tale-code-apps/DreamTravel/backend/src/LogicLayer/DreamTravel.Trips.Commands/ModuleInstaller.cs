@@ -1,6 +1,7 @@
 ﻿using DreamTravel.TravelingSalesmanProblem;
 using DreamTravel.Trips.Commands.DomainServices;
 using DreamTravel.Trips.Commands.DomainServices.CityDomain;
+using DreamTravel.Trips.Commands.DomainServices.CityStatistics;
 using Microsoft.Extensions.DependencyInjection;
 using SolTechnology.Core.CQRS;
 

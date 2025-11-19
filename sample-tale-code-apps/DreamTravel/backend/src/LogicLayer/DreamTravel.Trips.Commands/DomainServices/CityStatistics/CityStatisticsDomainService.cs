@@ -2,7 +2,7 @@ using DreamTravel.Trips.Sql;
 using DreamTravel.Trips.Sql.DbModels;
 using Microsoft.EntityFrameworkCore;
 
-namespace DreamTravel.Trips.Commands.DomainServices;
+namespace DreamTravel.Trips.Commands.DomainServices.CityStatistics;
 
 public interface ICityStatisticsDomainService
 {
