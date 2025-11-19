@@ -2,13 +2,15 @@
 using DreamTravel.Trips.Domain.Cities;
 using DreamTravel.Trips.Sql;
 using DreamTravel.Trips.Sql.DbModels;
+using DreamTravel.Trips.Sql.QueryBuilders;
 using Microsoft.EntityFrameworkCore;
 
 namespace DreamTravel.Trips.Commands.DomainServices.CityDomain;
 
 public interface ICityDomainService
 {
-    Task<City?> Get(string name);
+    Task<City?> Find(string name, CityReadOptions? options = null);
+    Task<City?> Find(double latitude, double longitude, CityReadOptions? options = null);
     Task Save(City city);
 }
 
@@ -19,63 +21,51 @@ public class CityDomainService(
     IIncrementSearchCountStep incrementSearchCountStep,
     DreamTripsDbContext dbContext) : ICityDomainService
 {
-    public async Task<City?> Get(string name)
+    public async Task<City?> Find(string name, CityReadOptions? options = null)
     {
         var cityEntity = await dbContext.Cities
+            .ApplyReadOptions(options)
             .Include(c => c.AlternativeNames)
-            .FirstOrDefaultAsync(c =>
-                c.AlternativeNames.Any(an =>
-                    an.AlternativeName.Equals(name, StringComparison.OrdinalIgnoreCase)));
+            .WhereName(name)
+            .FirstOrDefaultAsync();
 
         if (cityEntity == null) return null;
 
         return cityMapper.ToDomain(cityEntity, name);
     }
+    
+    public async Task<City?> Find(double latitude, double longitude, CityReadOptions? options = null)
+    {
+        var cityEntity = await dbContext.Cities
+            .ApplyReadOptions(options)
+            .Include(c => c.AlternativeNames)
+            .WhereCoordinates(latitude, longitude)
+            .FirstOrDefaultAsync();
+
+        if (cityEntity == null) return null;
+
+        return cityMapper.ToDomain(cityEntity, "name");
+    }
 
     public async Task Save(City city)
     {
         var today = DateOnly.FromDateTime(DateTime.UtcNow);
+        city.ReadOptions = city.ReadOptions.WithStatistics();
 
-        var cityEntity = await GetOrCreateCityAsync(city);
+        var cityEntity = await dbContext.Cities
+            .ApplyReadOptions(city.ReadOptions)
+            .Include(c => c.AlternativeNames)
+            .WhereCoordinates(city.Latitude, city.Longitude)
+            .FirstOrDefaultAsync();
+        
+        cityMapper.ApplyUpdate(cityEntity, city);
 
         assignAlternativeNameStep.Invoke(cityEntity, city.Name);
         incrementSearchCountStep.Invoke(cityEntity, today);
 
+        await dbContext.Cities.AddAsync(cityEntity!);
+        
         //this is the only place where Save is called - to ensure no partial updates
         await dbContext.SaveChangesAsync();
-    }
-
-    /// <summary>
-    /// 1) Pobierz city z bazy danych po koordynatach (podobne miasto),
-    ///    albo utwórz nowe i dodaj do DbContextu (bez SaveChanges).
-    /// </summary>
-    private async Task<CityEntity> GetOrCreateCityAsync(City city)
-    {
-        var cityEntity = await dbContext.Cities
-            .Include(c => c.AlternativeNames)
-            .FirstOrDefaultAsync(c =>
-                Math.Abs(c.Latitude - city.Latitude) < 0.001 &&  // ~100m
-                Math.Abs(c.Longitude - city.Longitude) < 0.001);
-
-        if (cityEntity != null)
-            return cityEntity;
-
-        // Tworzymy nowe miasto
-        cityEntity = new CityEntity
-        {
-            CityId = Guid.NewGuid(),             // biznesowe Id
-            Latitude = city.Latitude,
-            Longitude = city.Longitude,
-            Country = null,
-            Region = null,
-            Population = null
-        };
-
-        // jeśli chcesz użyć mappera:
-        // cityMapper.ApplyUpdate(cityEntity, city);
-
-        await dbContext.Cities.AddAsync(cityEntity);
-
-        return cityEntity;
     }
 }

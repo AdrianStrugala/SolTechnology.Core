@@ -6,5 +6,8 @@ public record City
     public double Latitude { get; set; }
     public double Longitude { get; set; }
 
-    private List<CitySearchStatistics> SearchStatistics { get; set; } = new();
+    public IReadOnlyList<CitySearchStatistics> SearchStatistics { get; set; } = null!;
+    
+    // helper property
+    public CityReadOptions ReadOptions { get; set; } = CityReadOptions.Default;
 }

@@ -11,5 +11,5 @@ public record CityEntity : BaseEntity
     public int? Population { get; set; }
 
     public List<AlternativeNameEntity> AlternativeNames { get; set; } = [];
-    public List<CityStatisticsEntity> CityStatistics { get; set; } = [];
+    public List<CityStatisticsEntity> Statistics { get; set; } = [];
 }

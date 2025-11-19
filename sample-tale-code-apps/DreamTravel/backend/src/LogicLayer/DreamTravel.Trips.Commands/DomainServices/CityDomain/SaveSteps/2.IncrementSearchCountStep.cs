@@ -15,7 +15,7 @@ public class IncrementSearchCountStep : IIncrementSearchCountStep
     /// </summary>
     public void Invoke(CityEntity cityEntity, DateOnly date)
     {
-        var statistics = cityEntity.CityStatistics
+        var statistics = cityEntity.Statistics
             .FirstOrDefault(s => s.CityId == cityEntity.Id && s.Date == date);
 
         if (statistics != null)
@@ -24,7 +24,7 @@ public class IncrementSearchCountStep : IIncrementSearchCountStep
             return;
         }
 
-        cityEntity.CityStatistics.Add(new CityStatisticsEntity
+        cityEntity.Statistics.Add(new CityStatisticsEntity
         {
             CityId = cityEntity.Id,
             Date = date,
