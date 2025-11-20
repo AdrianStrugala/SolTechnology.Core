@@ -1,4 +1,5 @@
 using System.Globalization;
+using DreamTravel.DomainServices;
 using DreamTravel.Flows;
 using DreamTravel.GraphDatabase;
 using DreamTravel.Infrastructure;
@@ -62,6 +63,7 @@ public class Program
         builder.Services.InstallTripsSql(sqlConfiguration);
         builder.Services.InstallGeolocationDataClients();
         builder.Services.InstallInfrastructure();
+        builder.Services.InstallDomainServices();
         builder.Services.InstallTripsQueries();
         
         

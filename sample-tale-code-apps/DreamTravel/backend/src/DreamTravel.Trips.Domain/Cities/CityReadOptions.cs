@@ -9,9 +9,6 @@ public class CityReadOptions
     // public AttractionsOptions? Attractions { get; private set; }
 
     public static CityReadOptions Default => new();
-    
-    public static CityReadOptions Full => new CityReadOptions()
-        .WithStatistics();
 
     /// <summary>
     /// Include all statistics

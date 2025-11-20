@@ -9,6 +9,7 @@ using Hangfire;
 using SolTechnology.Core.Cache;
 using SolTechnology.Core.Sql;
 using System.Globalization;
+using DreamTravel.DomainServices;
 using DreamTravel.ServiceDefaults;
 
 namespace DreamTravel.Worker;
@@ -34,7 +35,7 @@ public class Program
         builder.Services.InstallTripsSql(sqlConfiguration);
         builder.Services.InstallGeolocationDataClients();
         builder.Services.InstallInfrastructure();
-        
+        builder.Services.InstallDomainServices();
         builder.Services.InstallDreamTripsCommands();
         
         //Graph

@@ -1,12 +1,12 @@
 ﻿using DreamTravel.Trips.Domain.Cities;
 using DreamTravel.Trips.Sql.DbModels;
 
-namespace DreamTravel.Trips.Commands.DomainServices.CityDomain;
+namespace DreamTravel.DomainServices.CityDomain;
 
 public interface ICityMapper
 {
     City ToDomain(CityEntity entity, string name);
-    void ApplyUpdate(CityEntity? entity, City city);
+    CityEntity ApplyUpdate(CityEntity? entity, City city);
 }
 
 public class CityMapper() : ICityMapper
@@ -45,7 +45,7 @@ public class CityMapper() : ICityMapper
         return city;
     }
     
-    public void ApplyUpdate(CityEntity? entity, City city)
+    public CityEntity ApplyUpdate(CityEntity? entity, City city)
     {
         entity ??= new CityEntity
         {
@@ -58,5 +58,7 @@ public class CityMapper() : ICityMapper
         entity.Latitude = city.Latitude;
         entity.Longitude = city.Longitude;
         entity.Country = city.Country;
+        
+        return entity;
     }
 }

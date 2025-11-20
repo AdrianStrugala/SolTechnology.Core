@@ -132,6 +132,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "pipelines", "pipelines", "{
 		..\sample-tale-code-apps\DreamTravel\devOps\pipelines\deploy.yml = ..\sample-tale-code-apps\DreamTravel\devOps\pipelines\deploy.yml
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DreamTravel.DomainServices", "..\sample-tale-code-apps\DreamTravel\backend\src\LogicLayer\DreamTravel.DomainServices\DreamTravel.DomainServices.csproj", "{61BDD8D2-2442-4938-8747-C468B9BE00BE}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -286,6 +288,10 @@ Global
 		{B8FFF3C8-43D7-4C65-8CC0-5D6C71EECC85}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B8FFF3C8-43D7-4C65-8CC0-5D6C71EECC85}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B8FFF3C8-43D7-4C65-8CC0-5D6C71EECC85}.Release|Any CPU.Build.0 = Release|Any CPU
+		{61BDD8D2-2442-4938-8747-C468B9BE00BE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{61BDD8D2-2442-4938-8747-C468B9BE00BE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{61BDD8D2-2442-4938-8747-C468B9BE00BE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{61BDD8D2-2442-4938-8747-C468B9BE00BE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -323,6 +329,7 @@ Global
 		{F0114AC7-F75F-3673-353D-C6EC03DCFD77} = {23026ABA-8995-4B3C-ADDC-0F6D5497518C}
 		{B8FFF3C8-43D7-4C65-8CC0-5D6C71EECC85} = {4C7789AA-2CA6-45C2-85B4-398653826B23}
 		{1CF91859-41F0-4391-908D-CF38BAC8E9E3} = {6541B884-6E1F-492F-B5CB-1117C78760FE}
+		{61BDD8D2-2442-4938-8747-C468B9BE00BE} = {4C7789AA-2CA6-45C2-85B4-398653826B23}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {56BC2B7E-7B9F-4B05-951A-C0E3CF0D1287}
