@@ -51,10 +51,12 @@ public class CityMapper() : ICityMapper
         {
             CityId = Guid.NewGuid(), 
             Latitude = city.Latitude,
-            Longitude = city.Longitude
+            Longitude = city.Longitude,
+            Country = city.Country
         };
         
         entity.Latitude = city.Latitude;
         entity.Longitude = city.Longitude;
+        entity.Country = city.Country;
     }
 }

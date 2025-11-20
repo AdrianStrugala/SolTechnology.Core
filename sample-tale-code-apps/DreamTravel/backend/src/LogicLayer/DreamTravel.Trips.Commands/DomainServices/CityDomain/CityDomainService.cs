@@ -9,8 +9,8 @@ namespace DreamTravel.Trips.Commands.DomainServices.CityDomain;
 
 public interface ICityDomainService
 {
-    Task<City?> Find(string name, CityReadOptions? options = null);
-    Task<City?> Find(double latitude, double longitude, CityReadOptions? options = null);
+    Task<City> Get(string name, CityReadOptions? options = null);
+    Task<City> Get(double latitude, double longitude, CityReadOptions? options = null);
     Task Save(City city);
 }
 
@@ -21,7 +21,7 @@ public class CityDomainService(
     IIncrementSearchCountStep incrementSearchCountStep,
     DreamTripsDbContext dbContext) : ICityDomainService
 {
-    public async Task<City?> Find(string name, CityReadOptions? options = null)
+    public async Task<City> Get(string name, CityReadOptions? options = null)
     {
         var cityEntity = await dbContext.Cities
             .ApplyReadOptions(options)
@@ -34,7 +34,7 @@ public class CityDomainService(
         return cityMapper.ToDomain(cityEntity, name);
     }
     
-    public async Task<City?> Find(double latitude, double longitude, CityReadOptions? options = null)
+    public async Task<City> Get(double latitude, double longitude, CityReadOptions? options = null)
     {
         var cityEntity = await dbContext.Cities
             .ApplyReadOptions(options)
@@ -60,8 +60,8 @@ public class CityDomainService(
         
         cityMapper.ApplyUpdate(cityEntity, city);
 
-        assignAlternativeNameStep.Invoke(cityEntity, city.Name);
-        incrementSearchCountStep.Invoke(cityEntity, today);
+        assignAlternativeNameStep.Invoke(cityEntity!, city.Name);
+        incrementSearchCountStep.Invoke(cityEntity!, today);
 
         await dbContext.Cities.AddAsync(cityEntity!);
         

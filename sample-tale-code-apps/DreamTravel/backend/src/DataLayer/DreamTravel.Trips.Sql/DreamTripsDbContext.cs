@@ -29,7 +29,6 @@ public partial class DreamTripsDbContext : DbContext
             entity.Property(e => e.Latitude).IsRequired();
             entity.Property(e => e.Longitude).IsRequired();
             entity.Property(e => e.Country).HasMaxLength(100);
-            entity.Property(e => e.Region).HasMaxLength(100);
     
             entity.HasMany(c => c.AlternativeNames)
                 .WithOne(a => a.City)
