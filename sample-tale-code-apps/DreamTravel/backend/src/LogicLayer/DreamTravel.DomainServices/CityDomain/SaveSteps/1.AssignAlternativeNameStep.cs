@@ -1,6 +1,6 @@
 using DreamTravel.Trips.Sql.DbModels;
 
-namespace DreamTravel.Trips.Commands.DomainServices.CityDomain.SaveSteps;
+namespace DreamTravel.DomainServices.CityDomain.SaveSteps;
 
 public interface IAssignAlternativeNameStep
 {

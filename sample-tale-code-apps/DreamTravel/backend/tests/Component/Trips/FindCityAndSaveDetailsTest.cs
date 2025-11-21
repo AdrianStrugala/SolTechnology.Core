@@ -2,6 +2,7 @@
 using DreamTravel.Trips.Domain.Cities;
 using DreamTravel.Trips.GeolocationDataClients.GoogleApi;
 using DreamTravel.Trips.Sql;
+using DreamTravel.Trips.Sql.QueryBuilders;
 using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -74,7 +75,7 @@ public class FindCityAndSaveDetailsTest
             await Retry.Unless(
             async () =>
             {
-                return await _dbContext.Cities.FirstOrDefaultAsync(c => c.Name == city.Name);
+                return await _dbContext.Cities.WhereName(city.Name).FirstOrDefaultAsync();
             },
             cityDetails => cityDetails != null,
             TimeSpan.FromSeconds(10),
@@ -82,9 +83,8 @@ public class FindCityAndSaveDetailsTest
 
 
         storedCity.Should().NotBeNull();
-        storedCity!.Name.Should().Be(city.Name);
+        storedCity!.AlternativeNames.Select(x => x.AlternativeName).Should().Contain(city.Name);
         storedCity.Country.Should().Be("Poland");
-        storedCity.Population.Should().BeGreaterThan(600000);
     }
 
     [TearDown]

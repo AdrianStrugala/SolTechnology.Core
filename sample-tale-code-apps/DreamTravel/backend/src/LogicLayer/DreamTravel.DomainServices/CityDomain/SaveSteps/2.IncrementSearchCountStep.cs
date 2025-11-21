@@ -1,6 +1,6 @@
 using DreamTravel.Trips.Sql.DbModels;
 
-namespace DreamTravel.Trips.Commands.DomainServices.CityDomain.SaveSteps;
+namespace DreamTravel.DomainServices.CityDomain.SaveSteps;
 
 public interface IIncrementSearchCountStep
 {
@@ -16,7 +16,7 @@ public class IncrementSearchCountStep : IIncrementSearchCountStep
     public void Invoke(CityEntity cityEntity, DateOnly date)
     {
         var statistics = cityEntity.Statistics
-            .FirstOrDefault(s => s.CityId == cityEntity.Id && s.Date == date);
+            .FirstOrDefault(s => s.City.Id == cityEntity.Id && s.Date == date);
 
         if (statistics != null)
         {
@@ -26,7 +26,6 @@ public class IncrementSearchCountStep : IIncrementSearchCountStep
 
         cityEntity.Statistics.Add(new CityStatisticsEntity
         {
-            CityId = cityEntity.Id,
             Date = date,
             SearchCount = 1
         });

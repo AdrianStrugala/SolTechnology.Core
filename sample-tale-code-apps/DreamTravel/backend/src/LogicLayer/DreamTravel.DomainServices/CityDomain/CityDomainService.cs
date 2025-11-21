@@ -1,5 +1,4 @@
-﻿using DreamTravel.Trips.Commands.DomainServices.CityDomain;
-using DreamTravel.Trips.Commands.DomainServices.CityDomain.SaveSteps;
+﻿using DreamTravel.DomainServices.CityDomain.SaveSteps;
 using DreamTravel.Trips.Domain.Cities;
 using DreamTravel.Trips.GeolocationDataClients.GoogleApi;
 using DreamTravel.Trips.Sql;

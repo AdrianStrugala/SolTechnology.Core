@@ -1,5 +1,4 @@
 using DreamTravel.DomainServices.CityDomain;
-using DreamTravel.Trips.Commands.DomainServices.CityDomain;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace DreamTravel.DomainServices
