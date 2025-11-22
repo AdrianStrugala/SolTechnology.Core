@@ -37,7 +37,7 @@ public class CityDomainService(
 
         if (cityEntity != null)
         {
-            result = cityMapper.ToDomain(cityEntity, name);
+            result = cityMapper.ToDomain(cityEntity, options, name);
         }
         else
         {
@@ -64,7 +64,7 @@ public class CityDomainService(
 
         if (cityEntity != null)
         {
-            result = cityMapper.ToDomain(cityEntity, "name");
+            result = cityMapper.ToDomain(cityEntity, options);
         }
         else
         {

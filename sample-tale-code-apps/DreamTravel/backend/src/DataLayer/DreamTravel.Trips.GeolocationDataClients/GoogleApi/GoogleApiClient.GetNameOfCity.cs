@@ -12,7 +12,7 @@ namespace DreamTravel.Trips.GeolocationDataClients.GoogleApi
                 string url =
                     $"https://maps.googleapis.com/maps/api/geocode/json?latlng={city.Latitude},{city.Longitude}&sensor=false&key={_options.Key}";
 
-                string response = await _httpClient.GetStringAsync(url);
+                string response = await httpClient.GetStringAsync(url);
                 JObject json = JObject.Parse(response);
 
                 for (int i = 0; i < json["results"][0]["address_components"].Count(); i++)

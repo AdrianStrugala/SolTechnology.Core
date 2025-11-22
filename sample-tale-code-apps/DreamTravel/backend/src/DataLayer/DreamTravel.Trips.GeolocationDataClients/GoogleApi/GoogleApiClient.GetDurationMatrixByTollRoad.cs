@@ -19,7 +19,7 @@ namespace DreamTravel.Trips.GeolocationDataClients.GoogleApi
 
             try
             {
-                var request = await _httpClient
+                var request = await httpClient
                     .CreateRequest($"maps/api/distancematrix/json?units=imperial&origins={coordinates}&destinations={coordinates}&key={_options.Key}")
                     .GetAsync();
 
@@ -44,7 +44,7 @@ namespace DreamTravel.Trips.GeolocationDataClients.GoogleApi
             }
             catch (Exception)
             {
-                _logger.LogError($"Cannot get Toll Distance Matrix data");
+                logger.LogError($"Cannot get Toll Distance Matrix data");
                 throw new InvalidDataException(
                     "Cannot get Toll Distance Matrix data");
             }

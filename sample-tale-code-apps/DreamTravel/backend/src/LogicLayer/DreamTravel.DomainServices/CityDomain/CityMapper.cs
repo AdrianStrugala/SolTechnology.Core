@@ -5,35 +5,29 @@ namespace DreamTravel.DomainServices.CityDomain;
 
 public interface ICityMapper
 {
-    City ToDomain(CityEntity entity, string name);
+    City ToDomain(CityEntity entity, CityReadOptions options, string? name = null);
     CityEntity ApplyUpdate(CityEntity? entity, City city);
 }
 
-public class CityMapper() : ICityMapper
+public class CityMapper : ICityMapper
 {
-    public City ToDomain(CityEntity entity, string name)
+    public City ToDomain(CityEntity entity, CityReadOptions options, string? name = null)
     {
+        var cityName = name ?? entity.AlternativeNames.FirstOrDefault()?.AlternativeName 
+            ?? throw new InvalidOperationException("City has no alternative names and name was not provided");
+        
         var city = new City
         {
-            Name =  name,
+            Name =  cityName,
             Latitude = entity.Latitude,
-            Longitude = entity.Longitude
+            Longitude = entity.Longitude,
+            Country = entity.Country
         };
         
         // Map statistics only if options include them
-        var options = city.ReadOptions;
-        if (options.Statistics != null)
+        if (entity.Statistics.Any())
         {
-            var statistics = entity.Statistics.AsQueryable();
-
-            // Apply filtering (already done in EF query, but double-check)
-            if (options.Statistics.From.HasValue)
-                statistics = statistics.Where(s => s.Date >= options.Statistics.From.Value);
-
-            if (options.Statistics.To.HasValue)
-                statistics = statistics.Where(s => s.Date <= options.Statistics.To.Value);
-
-            city.SearchStatistics = statistics
+            city.SearchStatistics = entity.Statistics
                 .Select(s => new CitySearchStatistics
                 {
                     Date = s.Date,
