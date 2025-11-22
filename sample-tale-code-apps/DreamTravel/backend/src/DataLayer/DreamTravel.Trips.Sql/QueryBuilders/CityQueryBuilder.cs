@@ -15,39 +15,38 @@ public static class CityQueryBuilder
         this IQueryable<CityEntity> query,
         CityReadOptions? options)
     {
-        if(options == null) return query;
-        
+        if (options == null) return query;
+
         if (options.Statistics != null)
         {
+            // Wyciągamy wartości do zmiennych lokalnych, aby EF mógł użyć ich jako parametrów SQL
+            var fromDate = options.Statistics.From;
+            var toDate = options.Statistics.To;
+
             query = query.Include(c => c.Statistics
-                .Where(s => ApplyStatisticsFilter(s, options.Statistics)));
+                .Where(s =>
+                    // Logika musi być bezpośrednio w wyrażeniu lambda
+                    (!fromDate.HasValue || s.Date >= fromDate.Value) &&
+                    (!toDate.HasValue || s.Date <= toDate.Value)
+                ));
         }
 
         return query;
     }
-
-    private static bool ApplyStatisticsFilter(CityStatisticsEntity s, StatisticsOptions options)
-    {
-        if (options.From.HasValue && s.Date < options.From.Value)
-            return false;
-
-        if (options.To.HasValue && s.Date > options.To.Value)
-            return false;
-
-        return true;
-    }
+    
 
     /// <summary>
     /// Filter cities by alternative name (case-insensitive)
     /// </summary>
     public static IQueryable<CityEntity> WhereName(
         this IQueryable<CityEntity> query,
-        string name,
-        StringComparison comparison = StringComparison.OrdinalIgnoreCase)
+        string name)
     {
+        var lowerName = name.ToLower();
+
         return query.Where(c =>
             c.AlternativeNames.Any(an =>
-                an.AlternativeName.Equals(name, comparison)));
+                an.AlternativeName.ToLower() == lowerName));
     }
 
     /// <summary>

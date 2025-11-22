@@ -4,6 +4,9 @@
     [CityId] BIGINT NOT NULL,
     [AlternativeName] NVARCHAR(100) NOT NULL,
 
+    [CreatedAt] datetime2 NOT NULL DEFAULT GETUTCDATE(),
+    [UpdatedAt] datetime2 NULL
+    
     CONSTRAINT FK_CityAlternativeName_City
     FOREIGN KEY ([CityId]) REFERENCES [dbo].[City]([Id])
     ON DELETE CASCADE,
