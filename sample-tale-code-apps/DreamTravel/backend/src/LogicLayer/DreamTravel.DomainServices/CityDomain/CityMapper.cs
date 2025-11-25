@@ -11,14 +11,17 @@ public interface ICityMapper
 
 public class CityMapper : ICityMapper
 {
-    public City ToDomain(CityEntity entity, CityReadOptions options, string? name = null)
+    public City ToDomain(CityEntity entity, CityReadOptions options, string? requestedName = null)
     {
-        var cityName = name ?? entity.AlternativeNames.FirstOrDefault()?.AlternativeName 
-            ?? throw new InvalidOperationException("City has no alternative names and name was not provided");
+        // Jeśli user szukał po nazwie - zwróć tę nazwę
+        // Jeśli szukał po lokalizacji - zwróć pierwsze name
+        var cityName = requestedName 
+                       ?? entity.AlternativeNames.FirstOrDefault()?.AlternativeName
+                       ?? throw new InvalidOperationException("City has no name");
         
         var city = new City
         {
-            Name =  cityName,
+            Name = cityName,
             Latitude = entity.Latitude,
             Longitude = entity.Longitude,
             Country = entity.Country
@@ -41,13 +44,16 @@ public class CityMapper : ICityMapper
     
     public CityEntity ApplyUpdate(CityEntity? entity, City city)
     {
-        entity ??= new CityEntity
+        if (entity == null)
         {
-            CityId = Guid.NewGuid(), 
-            Latitude = city.Latitude,
-            Longitude = city.Longitude,
-            Country = city.Country
-        };
+            return new CityEntity
+            {
+                CityId = Guid.NewGuid(),
+                Latitude = city.Latitude,
+                Longitude = city.Longitude,
+                Country = city.Country
+            };
+        }
         
         entity.Latitude = city.Latitude;
         entity.Longitude = city.Longitude;

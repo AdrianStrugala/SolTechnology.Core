@@ -59,7 +59,10 @@ public class FindCityAndSaveDetailsTest
         // "Then background job is triggered, city details fetched and stored".x(() =>
         var storedCity =
             await Retry.Unless(
-                async () => await _dbContext.Cities.WhereName(city.Name).FirstOrDefaultAsync(),
+                async () => await _dbContext.Cities
+                    .Include(c => c.AlternativeNames)
+                    .WhereName(city.Name)
+                    .FirstOrDefaultAsync(),
                 cityDetails => cityDetails != null,
                 TimeSpan.FromSeconds(10),
                 TimeSpan.FromSeconds(1));
