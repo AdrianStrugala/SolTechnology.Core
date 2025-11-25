@@ -585,5 +585,85 @@ namespace DreamTravel.FunctionalTests.FakeApis
    ""status"" : ""OK""
 }";
 
+        public static string BuildGeocodingResponse(City city)
+        {
+            var countryCode = GetCountryCode(city.Country);
+
+            return $@"{{
+            ""results"": [
+                {{
+                    ""address_components"": [
+                        {{
+                            ""long_name"": ""{city.Name}"",
+                            ""short_name"": ""{city.Name}"",
+                            ""types"": [
+                                ""locality"",
+                                ""political""
+                            ]
+                        }},
+                        {{
+                            ""long_name"": ""{city.Country}"",
+                            ""short_name"": ""{countryCode}"",
+                            ""types"": [
+                                ""country"",
+                                ""political""
+                            ]
+                        }}
+                    ],
+                    ""formatted_address"": ""{city.Name}, {city.Country}"",
+                    ""geometry"": {{
+                        ""location"": {{
+                            ""lat"": {city.Latitude},
+                            ""lng"": {city.Longitude}
+                        }},
+                        ""location_type"": ""APPROXIMATE"",
+                        ""viewport"": {{
+                            ""northeast"": {{
+                                ""lat"": {city.Latitude + 0.1},
+                                ""lng"": {city.Longitude + 0.1}
+                            }},
+                            ""southwest"": {{
+                                ""lat"": {city.Latitude - 0.1},
+                                ""lng"": {city.Longitude - 0.1}
+                            }}
+                        }}
+                    }},
+                    ""place_id"": ""ChIJ{city.Name.GetHashCode():X}"",
+                    ""types"": [
+                        ""locality"",
+                        ""political""
+                    ]
+                }}
+            ],
+            ""status"": ""OK""
+        }}";
+        }
+
+        private static string GetCountryCode(string? country)
+        {
+            if (string.IsNullOrEmpty(country))
+                return "XX";
+
+            return country switch
+            {
+                "Poland" => "PL",
+                "Italy" => "IT",
+                "Austria" => "AT",
+                "Spain" => "ES",
+                "Germany" => "DE",
+                "France" => "FR",
+                "United States" => "US",
+                "United Kingdom" => "GB",
+                "Czech Republic" => "CZ",
+                "Netherlands" => "NL",
+                "Belgium" => "BE",
+                "Switzerland" => "CH",
+                "Portugal" => "PT",
+                "Greece" => "GR",
+                "Hungary" => "HU",
+                "Slovakia" => "SK",
+                _ => country.Length >= 2 ? country[..2].ToUpper() : "XX"
+            };
+        }
     }
 }

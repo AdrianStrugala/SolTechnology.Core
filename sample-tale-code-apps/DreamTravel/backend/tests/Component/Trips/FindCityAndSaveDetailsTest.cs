@@ -3,6 +3,7 @@ using DreamTravel.Trips.Domain.Cities;
 using DreamTravel.Trips.GeolocationDataClients.GoogleApi;
 using DreamTravel.Trips.Sql;
 using DreamTravel.Trips.Sql.QueryBuilders;
+using DreamTravel.FunctionalTests.FakeApis;
 using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -31,34 +32,19 @@ public class FindCityAndSaveDetailsTest
     [Test]
     public async Task Search_and_store_details()
     {
-        List<Path> paths = null;
-
         City city = new()
         {
             Name = "Wrocław",
             Latitude = 51.107883,
-            Longitude = 17.038538
+            Longitude = 17.038538,
+            Country = "Poland"
         };
 
         _wireMockFixture.Fake<IGoogleApiClient>()
             .WithRequest(x => x.GetLocationOfCity, city.Name)
-            .WithResponse(x => x.WithSuccess().WithBody(
-                $@"{{
-                           ""results"" : 
-                           [
-                              {{
-                                 ""geometry"" : 
-                                 {{
-                                    ""location"" : 
-                                    {{
-                                       ""lat"" : {city.Latitude},
-                                       ""lng"" : {city.Longitude}
-                                    }}
-                                 }}
-                              }}
-                           ],
-                           ""status"" : ""OK""
-                        }}"));
+            .WithResponse(x => x
+                .WithSuccess()
+                .WithBody(GoogleFakeApi.BuildGeocodingResponse(city)));
 
         var apiResponse = await _apiClient
             .CreateRequest("/api/v2/FindCityByName")
@@ -69,18 +55,14 @@ public class FindCityAndSaveDetailsTest
         apiResponse.IsSuccess.Should().BeTrue();
         apiResponse.Data.Should().BeEquivalentTo(city);
 
-
+        
         // "Then background job is triggered, city details fetched and stored".x(() =>
         var storedCity =
             await Retry.Unless(
-            async () =>
-            {
-                return await _dbContext.Cities.WhereName(city.Name).FirstOrDefaultAsync();
-            },
-            cityDetails => cityDetails != null,
-            TimeSpan.FromSeconds(10),
-            TimeSpan.FromSeconds(1));
-
+                async () => await _dbContext.Cities.WhereName(city.Name).FirstOrDefaultAsync(),
+                cityDetails => cityDetails != null,
+                TimeSpan.FromSeconds(10),
+                TimeSpan.FromSeconds(1));
 
         storedCity.Should().NotBeNull();
         storedCity!.AlternativeNames.Select(x => x.AlternativeName).Should().Contain(city.Name);
