@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <Version>0.2.0</Version>
+        <Description>SolTechnology Core AUID library</Description>
+        <PackageTags>sol technology guid uuid auid id identifier unique</PackageTags>
+        <Product>SolTechnology.Core.AUID</Product>
+        <PackageId>SolTechnology.Core.AUID</PackageId>
+        <AssemblyName>SolTechnology.Core.AUID</AssemblyName>
+
+        <PackageIcon>docs\mini-logo.png</PackageIcon>
+    </PropertyGroup>
+    <ItemGroup>
+        <None Include="..\..\docs\mini-logo.png" Pack="true" Visible="false" PackagePath="docs\mini-logo.png" />
+    </ItemGroup>
+
+</Project>
