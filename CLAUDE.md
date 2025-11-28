@@ -168,6 +168,10 @@ Validators are automatically discovered and executed when registered via `Regist
 3. **Target Framework**: .NET 8.0
 4. **Nullable Reference Types**: Enabled across all projects
 5. **Implicit Usings**: Enabled
+6. **Testing Framework**:
+   - Use NUnit for all tests
+   - For integration tests, use WebApplicationFactory and Testcontainers
+7. **Validation Framework**: Use FluentValidation for all input validation
 
 ## Important Implementation Notes
 
