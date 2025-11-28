@@ -1,186 +1,348 @@
-﻿using System;
-using System.Diagnostics;
-using System.Linq;
+﻿using System.ComponentModel;
 using System.Runtime.CompilerServices;
-using System.Text;
+using System.Runtime.InteropServices;
 
-public readonly struct Auid : IComparable<Auid>, IEquatable<Auid>
+/// <summary>
+/// A unique 64-bit identifier (AUID) designed for high-performance scenarios.
+/// Structure: [Code: 15 bits] [Timestamp: 32 bits] [Random: 17 bits].
+/// Total: 64 bits used.
+/// </summary>
+[StructLayout(LayoutKind.Auto)]
+[TypeConverter(typeof(AuidTypeConverter))]
+public readonly struct Auid : IComparable<Auid>, IEquatable<Auid>, IParsable<Auid>
 {
-    /*
-     * Struktura 64-bitowego AUID:
-     *
-     * Bity 63-49 (15 bitów): 3-znakowy kod (AAA-ZZZ) = 17,576 kombinacji
-     * Bity 48-17 (32 bity):  Timestamp w sekundach od 2001-01-01 (do 2137)
-     * Bity 16-0  (17 bitów): Losowa liczba (0-131,071)
-     */
+    // --- Configuration ---
+    // Total 64 bits:
+    // Code:   15 bits (17,576 combinations) -> Bits 63-49
+    // Time:   32 bits (Seconds since 2001)  -> Bits 48-17
+    // Random: 17 bits (131,072 combinations)-> Bits 16-0
     
-    // Fizyczna wartość (8 bajtów)
+    private const int BitsRandom = 17;
+    private const int BitsTime = 32;
+    // BitsCode = 15 (Calculated implicitly)
+
+    private const long MaskRandom = (1L << BitsRandom) - 1;     // 0x1FFFF
+    private const long MaskTime = (1L << BitsTime) - 1;         // 0xFFFFFFFF
+    
+    // Epoch: 2001-01-01 UTC
+    private static readonly long EpochTicks = new DateTime(2001, 1, 1, 0, 0, 0, DateTimeKind.Utc).Ticks;
+    
+    // Defaults
+    private const string DefaultCode = "XXX";
+    private const char Separator = '_';
+
+    /// <summary>
+    /// The raw 64-bit integer value. Can be negative due to full 64-bit usage.
+    /// </summary>
     public long Value { get; }
 
+    public static readonly Auid Empty = new Auid(0);
 
-    // Epoch: 1 Stycznia 2020
-    private static readonly DateTime Epoch = new(2001, 1, 1, 0, 0, 0, DateTimeKind.Utc);
-    private static readonly Random Rng = Random.Shared;
-    private static readonly string DefaultCodeIfEmpty = "XXX";
-
-    // === KONFIGURACJA (63 bity) ===
-    private const int BitsCode = 15;   // 3 litery
-    private const int BitsTime = 32;   // ~136 lat
-    private const int BitsRandom = 16; // 65k ID/sek
-
-    
-    // Prywatny konstruktor - jedyny sposób to użycie metod New()
     private Auid(long value) => Value = value;
 
-    
+    // --- Factory Methods ---
 
     /// <summary>
-    /// Tworzy AUID automatycznie wykrywając nazwę klasy wywołującej.
-    /// UWAGA: Wolniejsze przez StackFrame. Zaleca się używanie New<T>().
+    /// Creates a new AUID based on the type name (e.g., Order -> ORD).
+    /// Zero allocation.
     /// </summary>
-    [MethodImpl(MethodImplOptions.NoInlining)]
-    public static Auid New()
-    {
-        var frame = new StackFrame(1, false);
-        var type = frame.GetMethod()?.DeclaringType;
-        string name = type != null ? type.Name : DefaultCodeIfEmpty;
-        
-        // Tutaj generujemy kod z nazwy (więc nie rzuci wyjątku o długość)
-        return CreateInternal(GenerateCodeFromName(name));
-    }
-
-    /// <summary>
-    /// Tworzy AUID dla konkretnego typu (Najszybsza metoda).
-    /// Np. Auid.New<Order>() wygeneruje kod "ORD"
-    /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Auid New<T>()
     {
-        string name = typeof(T).Name;
-        return CreateInternal(GenerateCodeFromName(name));
+        return CreateInternal(typeof(T).Name.AsSpan(), generateCode: true);
     }
 
     /// <summary>
-    /// Tworzy AUID ręcznie podając kod 3-literowy.
-    /// Rzuca wyjątek, jeśli kod nie ma dokładnie 3 znaków.
+    /// Creates a new AUID.
+    /// If code is provided, uses that 3-letter code (must be exactly 3 uppercase letters A-Z).
+    /// If code is null, infers the code from the source file name using [CallerFilePath].
     /// </summary>
-    public static Auid New(string code)
+    /// <param name="code">Optional 3-letter code (must be uppercase A-Z). If null, uses caller file name.</param>
+    /// <param name="callerFilePath">Automatically populated by compiler. Do not pass manually.</param>
+    [MethodImpl(MethodImplOptions.NoInlining)]
+    public static Auid New(string? code = null, [CallerFilePath] string callerFilePath = "")
     {
-        if (code == null || code.Length != 3)
-            throw new ArgumentException("Kod identyfikatora musi mieć dokładnie 3 znaki.", nameof(code));
-
-        // Sprawdzamy czy to same litery (opcjonalnie)
-        if (!code.All(char.IsLetter))
-             throw new ArgumentException("Kod może zawierać tylko litery.", nameof(code));
-
-        return CreateInternal(code);
-    }
-
-    // Wewnętrzna metoda tworząca strukturę
-    private static Auid CreateInternal(string code3Chars)
-    {
-        long codeVal = EncodeCode(code3Chars);
-        long timeVal = (long)(DateTime.UtcNow - Epoch).TotalSeconds;
-
-        // Zabezpieczenie zakresu czasu (32 bity)
-        long maxTime = (1L << BitsTime) - 1;
-        if (timeVal > maxTime) timeVal = maxTime;
-
-        int randomVal = Rng.Next(0, 1 << BitsRandom);
-
-        // Bit shifting: [KOD] [CZAS] [LOS]
-        long finalId = (codeVal << (BitsTime + BitsRandom))
-                     | (timeVal << BitsRandom)
-                     | (uint)randomVal;
-
-        return new Auid(finalId);
-    }
-
-    /// <summary>
-    /// Twój algorytm: 1 litera startowa + reszta bez samogłosek + padding X.
-    /// Zawsze zwraca 3 znaki.
-    /// </summary>
-    private static string GenerateCodeFromName(string name)
-    {
-        if (string.IsNullOrEmpty(name)) return DefaultCodeIfEmpty;
-        
-        name = name.ToUpper();
-        char[] vowels = { 'A', 'E', 'I', 'O', 'U', 'Y' };
-        var sb = new StringBuilder();
-
-        // 1. Zawsze bierzemy pierwszą literę
-        sb.Append(name[0]);
-
-        // 2. Iterujemy od drugiej litery i pomijamy samogłoski
-        for (int i = 1; i < name.Length; i++)
+        if (code != null)
         {
-            char c = name[i];
-            if (char.IsLetter(c) && !vowels.Contains(c))
+            // Explicit code provided - use it directly without processing
+            if (code.Length != 3)
+                throw new ArgumentException("Code must be exactly 3 characters.", nameof(code));
+
+            // Validate uppercase letters A-Z
+            for (int i = 0; i < 3; i++)
             {
-                sb.Append(c);
+                if (code[i] < 'A' || code[i] > 'Z')
+                    throw new ArgumentException("Code must contain only uppercase letters A-Z.", nameof(code));
             }
-            // Jeśli już mamy 3 znaki, przerywamy
-            if (sb.Length >= 3) break;
-        }
 
-        // 3. Dopełnianie 'X'
-        while (sb.Length < 3)
+            return CreateInternal(code.AsSpan(), generateCode: false);
+        }
+        else
         {
-            sb.Append('X');
+            // Infer from caller file path
+            ReadOnlySpan<char> span = callerFilePath.AsSpan();
+            if (span.IsEmpty) return CreateInternal(DefaultCode.AsSpan(), generateCode: false);
+
+            // Manual "GetFileNameWithoutExtension" on Span to avoid allocation
+            int lastSeparator = span.LastIndexOfAny('/', '\\');
+            int lastDot = span.LastIndexOf('.');
+
+            int start = lastSeparator + 1;
+            int length = (lastDot > start) ? (lastDot - start) : (span.Length - start);
+
+            return CreateInternal(span.Slice(start, length), generateCode: true);
+        }
+    }
+
+    /// <summary>
+    /// Creates a new AUID from a specific 3-letter code (must be exactly 3 uppercase letters A-Z).
+    /// Zero allocation version using ReadOnlySpan.
+    /// </summary>
+    public static Auid New(ReadOnlySpan<char> code)
+    {
+        if (code.Length != 3)
+            throw new ArgumentException("Code must be exactly 3 characters.");
+
+        // Validate uppercase letters A-Z
+        for (int i = 0; i < 3; i++)
+        {
+            if (code[i] < 'A' || code[i] > 'Z')
+                throw new ArgumentException("Code must contain only uppercase letters A-Z.");
         }
 
-        return sb.ToString();
+        return CreateInternal(code, generateCode: false);
     }
 
-    private static long EncodeCode(string code)
+    // --- Core Logic (Zero Alloc) ---
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private static Auid CreateInternal(ReadOnlySpan<char> input, bool generateCode)
     {
-        code = code.ToUpper();
-        return ((code[0] - 'A') * 676) +
-               ((code[1] - 'A') * 26) +
-               (code[2] - 'A');
+        // 1. Encode Code (15 bits)
+        long codeEncoded;
+
+        if (generateCode)
+        {
+            // Generate code from input name (e.g., "Order" -> "ORD")
+            Span<char> codeBuffer = stackalloc char[3];
+            GenerateCode3(input, codeBuffer);
+            codeEncoded = Encode3Chars(codeBuffer);
+        }
+        else
+        {
+            // Use input directly as 3-letter code (already validated)
+            codeEncoded = Encode3Chars(input);
+        }
+
+        // 2. Encode Time (32 bits)
+        long seconds = (DateTime.UtcNow.Ticks - EpochTicks) / TimeSpan.TicksPerSecond;
+        long timeEncoded = seconds & MaskTime;
+
+        // 3. Encode Random (17 bits)
+        long randomEncoded = Random.Shared.Next() & MaskRandom;
+
+        // Combine: [CODE 15] [TIME 32] [RND 17]
+        long finalValue = (codeEncoded << (BitsTime + BitsRandom))
+                        | (timeEncoded << BitsRandom)
+                        | randomEncoded;
+
+        return new Auid(finalValue);
     }
 
-    private static string DecodeCode(long value)
+    /// <summary>
+    /// Generates "ORD" from "Order", "USR" from "User" without allocations.
+    /// </summary>
+    private static void GenerateCode3(ReadOnlySpan<char> input, Span<char> output)
     {
-        if (value == 0) return DefaultCodeIfEmpty; // Obsługa Empty
+        if (input.IsEmpty)
+        {
+            DefaultCode.AsSpan().CopyTo(output);
+            return;
+        }
 
-        long codeVal = value >> (BitsTime + BitsRandom);
-        
-        char c1 = (char)('A' + (codeVal / 676));
-        char c2 = (char)('A' + ((codeVal % 676) / 26));
-        char c3 = (char)('A' + (codeVal % 26));
-        
-        return $"{c1}{c2}{c3}";
+        int outIdx = 0;
+
+        // 1. First char (always taken)
+        char first = input[0];
+        // Fast ToUpper
+        if (first >= 'a' && first <= 'z') first = (char)(first - 32);
+        if (first < 'A' || first > 'Z') first = 'X';
+        output[outIdx++] = first;
+
+        // 2. Next consonants
+        for (int i = 1; i < input.Length && outIdx < 3; i++)
+        {
+            char c = input[i];
+            // Fast ToUpper
+            if (c >= 'a' && c <= 'z') c = (char)(c - 32);
+
+            // IsLetter check (A-Z only)
+            if (c >= 'A' && c <= 'Z')
+            {
+                // IsVowel check
+                if (!(c == 'A' || c == 'E' || c == 'I' || c == 'O' || c == 'U' || c == 'Y'))
+                {
+                    output[outIdx++] = c;
+                }
+            }
+        }
+
+        // 3. Padding
+        while (outIdx < 3)
+        {
+            output[outIdx++] = 'X';
+        }
     }
-    
-    // Wartość "Pusta" (same zera)
-    public static readonly Auid Empty = new Auid(0);
-    
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private static long Encode3Chars(ReadOnlySpan<char> code)
+    {
+        // A=0, B=1...
+        return ((long)(code[0] - 'A') * 676) +
+               ((long)(code[1] - 'A') * 26) +
+               ((long)(code[2] - 'A'));
+    }
+
+    // --- Formatting & Parsing ---
+
+    /// <summary>
+    /// Format: CODE_TIMESTAMP_HEX_RANDOM_HEX
+    /// Length: 3 + 1 + 8 + 1 + 5 = 18 chars (approx)
+    /// Random is 17 bits, so it needs 5 hex chars (max 1FFFF).
+    /// Example: ORD_2B1A3F12_1A2B3
+    /// </summary>
     public override string ToString()
     {
-        if (Value == 0) return $"{DefaultCodeIfEmpty}_00000000_0000";
+        if (Value == 0) return $"{DefaultCode}{Separator}00000000{Separator}00000";
 
-        string code = DecodeCode(Value);
-        
-        long timeMask = (1L << BitsTime) - 1;
-        long timeVal = (Value >> BitsRandom) & timeMask;
-        DateTime date = Epoch.AddSeconds(timeVal);
+        return string.Create(18, Value, (span, val) =>
+        {
+            // Decode
+            long codePart = val >>> (BitsTime + BitsRandom); // Use ulong shift to handle sign bit correctly
+            long timePart = (val >> BitsRandom) & MaskTime;
+            long randPart = val & MaskRandom;
 
-        long randomMask = (1L << BitsRandom) - 1;
-        long randomVal = Value & randomMask;
+            // Write Code
+            span[0] = (char)('A' + (codePart / 676));
+            span[1] = (char)('A' + ((codePart % 676) / 26));
+            span[2] = (char)('A' + (codePart % 26));
+            
+            span[3] = Separator;
 
-        // Format: KOD_DATA_HEX
-        return $"{code}_{date:yyyyMMdd}_{randomVal:X4}";
+            // Write Time (Hex 8)
+            timePart.TryFormat(span.Slice(4, 8), out _, "X8");
+
+            span[12] = Separator;
+
+            // Write Random (Hex 5 - needed for 17 bits)
+            randPart.TryFormat(span.Slice(13, 5), out _, "X5");
+        });
     }
 
-    // Konwersje
-    public static implicit operator long(Auid auid) => auid.Value;
-    public static implicit operator Auid(long value) => new Auid(value);
+    public static Auid Parse(string s, IFormatProvider? provider = null)
+    {
+        if (!TryParse(s, provider, out var result))
+            throw new FormatException($"Invalid Auid format: {s}");
+        return result;
+    }
 
-    // Porównania
-    public int CompareTo(Auid other) => Value.CompareTo(other.Value);
-    public bool Equals(Auid other) => Value == other.Value;
+    public static bool TryParse(string? s, IFormatProvider? provider, out Auid result)
+    {
+        result = Empty;
+        if (string.IsNullOrEmpty(s)) return false;
+
+        ReadOnlySpan<char> span = s.AsSpan();
+        // Format: AAA_HHHHHHHH_HHHHH (18 chars)
+        if (span.Length != 18) return false;
+        if (span[3] != Separator || span[12] != Separator) return false;
+
+        // 1. Parse Code
+        var c0 = span[0]; var c1 = span[1]; var c2 = span[2];
+        // Simplified manual check to avoid LINQ/Calls
+        if (c0 < 'A' || c0 > 'Z' || c1 < 'A' || c1 > 'Z' || c2 < 'A' || c2 > 'Z') return false;
+
+        long codeEncoded = ((long)(c0 - 'A') * 676) +
+                           ((long)(c1 - 'A') * 26) +
+                           ((long)(c2 - 'A'));
+
+        // 2. Parse Time (Hex)
+        if (!long.TryParse(span.Slice(4, 8), System.Globalization.NumberStyles.HexNumber, null, out long timeVal))
+            return false;
+
+        // 3. Parse Random (Hex)
+        if (!long.TryParse(span.Slice(13, 5), System.Globalization.NumberStyles.HexNumber, null, out long randVal))
+            return false;
+
+        // Reconstruct
+        long finalValue = (codeEncoded << (BitsTime + BitsRandom))
+                        | (timeVal << BitsRandom)
+                        | randVal;
+
+        result = new Auid(finalValue);
+        return true;
+    }
+
+    /// <summary>
+    /// Parses a long value into an AUID.
+    /// Validates that the code part (first 15 bits) represents a valid 3-letter code (AAA-ZZZ).
+    /// </summary>
+    public static Auid Parse(long value)
+    {
+        if (!TryParse(value, out var result))
+            throw new FormatException($"Invalid Auid value: {value}. The code part exceeds valid range for 3-letter codes (AAA-ZZZ).");
+        return result;
+    }
+
+    /// <summary>
+    /// Tries to parse a long value into an AUID.
+    /// Returns false if the code part (first 15 bits) doesn't represent a valid 3-letter code (AAA-ZZZ).
+    /// </summary>
+    public static bool TryParse(long value, out Auid result)
+    {
+        result = Empty;
+
+        // Extract code part (top 15 bits)
+        long codePart = value >>> (BitsTime + BitsRandom);
+
+        // Valid 3-letter codes (A-Z): 0 to 26^3 - 1 = 17575
+        const long MaxValidCode = 26 * 26 * 26 - 1; // 17575
+
+        if (codePart < 0 || codePart > MaxValidCode)
+            return false;
+
+        result = new Auid(value);
+        return true;
+    }
+
+    // --- Standard Boilerplate ---
+
     public override bool Equals(object? obj) => obj is Auid other && Equals(other);
-    public override int GetHashCode() => Value.GetHashCode();
-    public static bool operator ==(Auid left, Auid right) => left.Equals(right);
-    public static bool operator !=(Auid left, Auid right) => !left.Equals(right);
+    public bool Equals(Auid other) => Value == other.Value;
+    public override int GetHashCode() => Value.GetHashCode(); // long hash code is good enough
+    public int CompareTo(Auid other) => Value.CompareTo(other.Value);
+
+    public static bool operator ==(Auid left, Auid right) => left.Value == right.Value;
+    public static bool operator !=(Auid left, Auid right) => left.Value != right.Value;
+    
+    public static implicit operator long(Auid a) => a.Value;
+    public static explicit operator Auid(long v) => new Auid(v);
+}
+
+// Helper for TypeConverter (e.g. used by JSON serializers automatically if registered)
+public class AuidTypeConverter : TypeConverter
+{
+    public override bool CanConvertFrom(ITypeDescriptorContext? context, Type sourceType) 
+        => sourceType == typeof(string) || base.CanConvertFrom(context, sourceType);
+
+    public override object? ConvertFrom(ITypeDescriptorContext? context, System.Globalization.CultureInfo? culture, object value)
+    {
+        if (value is string str) return Auid.Parse(str);
+        return base.ConvertFrom(context, culture, value);
+    }
+
+    public override object? ConvertTo(ITypeDescriptorContext? context, System.Globalization.CultureInfo? culture, object? value, Type destinationType)
+    {
+        if (destinationType == typeof(string) && value is Auid auid) return auid.ToString();
+        return base.ConvertTo(context, culture, value, destinationType);
+    }
 }
