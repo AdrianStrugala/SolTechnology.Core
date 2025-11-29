@@ -36,6 +36,9 @@ public readonly struct Auid : IComparable<Auid>, IEquatable<Auid>, IParsable<Aui
     /// </summary>
     public long Value { get; }
 
+    /// <summary>
+    /// Represents an empty AUID with value 0.
+    /// </summary>
     public static readonly Auid Empty = new Auid(0);
 
     private Auid(long value) => Value = value;
@@ -46,6 +49,15 @@ public readonly struct Auid : IComparable<Auid>, IEquatable<Auid>, IParsable<Aui
     /// Creates a new AUID based on the type name (e.g., Order -> ORD).
     /// Zero allocation.
     /// </summary>
+    /// <typeparam name="T">The type to derive the 3-letter code from.</typeparam>
+    /// <returns>A new AUID with code derived from type name.</returns>
+    /// <example>
+    /// <code>
+    /// var orderId = Auid.New&lt;Order&gt;();
+    /// Console.WriteLine(orderId); // Output: ORD_2B1A3F12_1A2B3
+    /// </code>
+    /// </example>
+    /// <exception cref="InvalidOperationException">Thrown when current date exceeds year 2137 (timestamp overflow).</exception>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Auid New<T>()
     {
@@ -59,6 +71,18 @@ public readonly struct Auid : IComparable<Auid>, IEquatable<Auid>, IParsable<Aui
     /// </summary>
     /// <param name="code">Optional 3-letter code (must be uppercase A-Z). If null, uses caller file name.</param>
     /// <param name="callerFilePath">Automatically populated by compiler. Do not pass manually.</param>
+    /// <returns>A new AUID with specified or inferred code.</returns>
+    /// <example>
+    /// <code>
+    /// // Explicit code
+    /// var userId = Auid.New("USR");
+    ///
+    /// // Inferred from file name (e.g., OrderService.cs -> ORS)
+    /// var id = Auid.New();
+    /// </code>
+    /// </example>
+    /// <exception cref="ArgumentException">Thrown when code is not exactly 3 characters or contains non-uppercase letters.</exception>
+    /// <exception cref="InvalidOperationException">Thrown when current date exceeds year 2137 (timestamp overflow).</exception>
     [MethodImpl(MethodImplOptions.NoInlining)]
     public static Auid New(string? code = null, [CallerFilePath] string callerFilePath = "")
     {
@@ -98,6 +122,16 @@ public readonly struct Auid : IComparable<Auid>, IEquatable<Auid>, IParsable<Aui
     /// Creates a new AUID from a specific 3-letter code (must be exactly 3 uppercase letters A-Z).
     /// Zero allocation version using ReadOnlySpan.
     /// </summary>
+    /// <param name="code">3-letter code span (must be uppercase A-Z).</param>
+    /// <returns>A new AUID with the specified code.</returns>
+    /// <example>
+    /// <code>
+    /// ReadOnlySpan&lt;char&gt; code = "PRD".AsSpan();
+    /// var productId = Auid.New(code);
+    /// </code>
+    /// </example>
+    /// <exception cref="ArgumentException">Thrown when code is not exactly 3 characters or contains non-uppercase letters.</exception>
+    /// <exception cref="InvalidOperationException">Thrown when current date exceeds year 2137 (timestamp overflow).</exception>
     public static Auid New(ReadOnlySpan<char> code)
     {
         if (code.Length != 3)
@@ -247,6 +281,14 @@ public readonly struct Auid : IComparable<Auid>, IEquatable<Auid>, IParsable<Aui
         });
     }
 
+    /// <summary>
+    /// Parses a string representation of an AUID.
+    /// Expected format: CODE_TIMESTAMP_RANDOM (e.g., ORD_2B1A3F12_1A2B3).
+    /// </summary>
+    /// <param name="s">The string to parse.</param>
+    /// <param name="provider">Format provider (not used, included for IParsable compliance).</param>
+    /// <returns>The parsed AUID.</returns>
+    /// <exception cref="FormatException">Thrown when string format is invalid.</exception>
     public static Auid Parse(string s, IFormatProvider? provider = null)
     {
         if (!TryParse(s, provider, out var result))
@@ -254,6 +296,14 @@ public readonly struct Auid : IComparable<Auid>, IEquatable<Auid>, IParsable<Aui
         return result;
     }
 
+    /// <summary>
+    /// Tries to parse a string representation of an AUID.
+    /// Expected format: CODE_TIMESTAMP_RANDOM (e.g., ORD_2B1A3F12_1A2B3).
+    /// </summary>
+    /// <param name="s">The string to parse.</param>
+    /// <param name="provider">Format provider (not used, included for IParsable compliance).</param>
+    /// <param name="result">The parsed AUID if successful; otherwise, Empty.</param>
+    /// <returns>True if parsing succeeded; otherwise, false.</returns>
     public static bool TryParse(string? s, IFormatProvider? provider, out Auid result)
     {
         result = Empty;
@@ -336,18 +386,24 @@ public readonly struct Auid : IComparable<Auid>, IEquatable<Auid>, IParsable<Aui
     public static explicit operator Auid(long v) => new Auid(v);
 }
 
-// Helper for TypeConverter (e.g. used by JSON serializers automatically if registered)
+/// <summary>
+/// Type converter for AUID, enabling automatic conversion in JSON serializers and other frameworks.
+/// Converts between AUID and string representations.
+/// </summary>
 public class AuidTypeConverter : TypeConverter
 {
-    public override bool CanConvertFrom(ITypeDescriptorContext? context, Type sourceType) 
+    /// <inheritdoc />
+    public override bool CanConvertFrom(ITypeDescriptorContext? context, Type sourceType)
         => sourceType == typeof(string) || base.CanConvertFrom(context, sourceType);
 
+    /// <inheritdoc />
     public override object? ConvertFrom(ITypeDescriptorContext? context, System.Globalization.CultureInfo? culture, object value)
     {
         if (value is string str) return Auid.Parse(str);
         return base.ConvertFrom(context, culture, value);
     }
 
+    /// <inheritdoc />
     public override object? ConvertTo(ITypeDescriptorContext? context, System.Globalization.CultureInfo? culture, object? value, Type destinationType)
     {
         if (destinationType == typeof(string) && value is Auid auid) return auid.ToString();
