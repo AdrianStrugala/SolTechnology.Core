@@ -74,8 +74,5 @@ jobs:
     - name: Pack SolTechnology.Core.Faker
       run: dotnet pack -c Release -o . ./src/SolTechnology.Core.Faker/SolTechnology.Core.Faker.csproj
 
-    - name: Pack SolTechnology.Core.Journey
-      run: dotnet pack -c Release -o . ./src/SolTechnology.Core.Journey/SolTechnology.Core.Journey.csproj
-
     - name: Publish all nuget packages
       run: dotnet nuget push *.nupkg -k ${{secrets.NUGET_API_KEY}} -s https://api.nuget.org/v3/index.json --skip-duplicate
