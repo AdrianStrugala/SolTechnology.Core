@@ -65,5 +65,17 @@ jobs:
     - name: Pack SolTechnology.Core.Cache
       run: dotnet pack -c Release -o . ./src/SolTechnology.Core.Cache/SolTechnology.Core.Cache.csproj
 
+    - name: Pack SolTechnology.Core.Flow
+      run: dotnet pack -c Release -o . ./src/SolTechnology.Core.Flow/SolTechnology.Core.Flow.csproj
+
+    - name: Pack SolTechnology.Core.AUID
+      run: dotnet pack -c Release -o . ./src/SolTechnology.Core.AUID/SolTechnology.Core.AUID.csproj
+
+    - name: Pack SolTechnology.Core.Faker
+      run: dotnet pack -c Release -o . ./src/SolTechnology.Core.Faker/SolTechnology.Core.Faker.csproj
+
+    - name: Pack SolTechnology.Core.Journey
+      run: dotnet pack -c Release -o . ./src/SolTechnology.Core.Journey/SolTechnology.Core.Journey.csproj
+
     - name: Publish all nuget packages
       run: dotnet nuget push *.nupkg -k ${{secrets.NUGET_API_KEY}} -s https://api.nuget.org/v3/index.json --skip-duplicate
