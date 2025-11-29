@@ -17,7 +17,7 @@ public class AuidToStringTests
         string result = auid.ToString();
 
         // Assert
-        result.Should().HaveLength(18);
+        result.Should().HaveLength(25);
     }
 
     [Test]
@@ -44,7 +44,7 @@ public class AuidToStringTests
 
         // Assert
         result[3].Should().Be('_');
-        result[12].Should().Be('_');
+        result[18].Should().Be('_');
     }
 
     [Test]
@@ -57,8 +57,8 @@ public class AuidToStringTests
         string result = auid.ToString();
 
         // Assert
-        // Format: XXX_HHHHHHHH_HHHHH
-        result.Should().MatchRegex(@"^[A-Z]{3}_[0-9A-F]{8}_[0-9A-F]{5}$");
+        // Format: XXX_YYYYMMDDHHmmss_RRRRRR
+        result.Should().MatchRegex(@"^[A-Z]{3}_\d{14}_\d{6}$");
     }
 
     [Test]
@@ -68,7 +68,7 @@ public class AuidToStringTests
         string result = Auid.Empty.ToString();
 
         // Assert
-        result.Should().Be("XXX_00000000_00000");
+        result.Should().Be("XXX_00010101000000_000000");
     }
 
     [Test]
@@ -113,7 +113,7 @@ public class AuidToStringTests
 
         // Assert
         result.Should().StartWith("AAA_");
-        result.Should().HaveLength(18);
+        result.Should().HaveLength(25);
     }
 
     [Test]
@@ -127,48 +127,55 @@ public class AuidToStringTests
 
         // Assert
         result.Should().StartWith("ZZZ_");
-        result.Should().HaveLength(18);
+        result.Should().HaveLength(25);
     }
 
     [Test]
-    public void ToString_TimestampPart_ShouldBe8HexCharacters()
+    public void ToString_TimestampPart_ShouldBe14DateTimeCharacters()
     {
         // Arrange
         var auid = Auid.New("TST");
 
         // Act
         string result = auid.ToString();
-        string timestampPart = result.Substring(4, 8);
+        string timestampPart = result.Substring(4, 14);
 
         // Assert
-        timestampPart.Should().MatchRegex("^[0-9A-F]{8}$");
+        timestampPart.Should().MatchRegex(@"^\d{14}$");
+        // Validate it's a valid date/time
+        DateTime.TryParseExact(timestampPart, "yyyyMMddHHmmss",
+            System.Globalization.CultureInfo.InvariantCulture,
+            System.Globalization.DateTimeStyles.None, out _).Should().BeTrue();
     }
 
     [Test]
-    public void ToString_RandomPart_ShouldBe5HexCharacters()
+    public void ToString_RandomPart_ShouldBe6DecimalDigits()
     {
         // Arrange
         var auid = Auid.New("TST");
 
         // Act
         string result = auid.ToString();
-        string randomPart = result.Substring(13, 5);
+        string randomPart = result.Substring(19, 6);
 
         // Assert
-        randomPart.Should().MatchRegex("^[0-9A-F]{5}$");
+        randomPart.Should().MatchRegex(@"^\d{6}$");
+        int randomValue = int.Parse(randomPart);
+        randomValue.Should().BeInRange(0, 131071); // 2^17 - 1
     }
 
     [Test]
-    public void ToString_ShouldBeUppercase()
+    public void ToString_CodePart_ShouldBeUppercase()
     {
         // Arrange
         var auid = Auid.New("TST");
 
         // Act
         string result = auid.ToString();
+        string codePart = result.Substring(0, 3);
 
         // Assert
-        result.Should().MatchRegex("^[A-Z0-9_]+$");
+        codePart.Should().MatchRegex("^[A-Z]{3}$");
     }
 
     [Test]
@@ -181,14 +188,14 @@ public class AuidToStringTests
         string result1 = auid1.ToString();
         string result2 = auid2.ToString();
 
-        // Extract timestamp parts
-        string timestamp1 = result1.Substring(4, 8);
-        string timestamp2 = result2.Substring(4, 8);
+        // Extract timestamp parts (YYYYMMDDHHmmss)
+        string timestamp1 = result1.Substring(4, 14);
+        string timestamp2 = result2.Substring(4, 14);
 
         // Assert - timestamps should be the same or very close (might differ by 1 second)
-        var time1 = Convert.ToInt64(timestamp1, 16);
-        var time2 = Convert.ToInt64(timestamp2, 16);
-        Math.Abs(time1 - time2).Should().BeLessThan(2);
+        var time1 = DateTime.ParseExact(timestamp1, "yyyyMMddHHmmss", System.Globalization.CultureInfo.InvariantCulture);
+        var time2 = DateTime.ParseExact(timestamp2, "yyyyMMddHHmmss", System.Globalization.CultureInfo.InvariantCulture);
+        Math.Abs((time1 - time2).TotalSeconds).Should().BeLessThan(2);
     }
 
     [Test]

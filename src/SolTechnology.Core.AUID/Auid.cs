@@ -248,16 +248,17 @@ public readonly struct Auid : IComparable<Auid>, IEquatable<Auid>, IParsable<Aui
     // --- Formatting & Parsing ---
 
     /// <summary>
-    /// Format: CODE_TIMESTAMP_HEX_RANDOM_HEX
-    /// Length: 3 + 1 + 8 + 1 + 5 = 18 chars (approx)
-    /// Random is 17 bits, so it needs 5 hex chars (max 1FFFF).
-    /// Example: ORD_2B1A3F12_1A2B3
+    /// Format: COD_YYYYMMDDHHmmss_RANDOM
+    /// Length: 3 + 1 + 14 + 1 + 6 = 25 chars
+    /// Timestamp: YYYYMMDDHHmmss (readable date/time)
+    /// Random: 6 decimal digits (17 bits = 0-131071)
+    /// Example: CTY_20241205123456_012345
     /// </summary>
     public override string ToString()
     {
-        if (Value == 0) return $"{DefaultCode}{Separator}00000000{Separator}00000";
+        if (Value == 0) return $"{DefaultCode}{Separator}00010101000000{Separator}000000";
 
-        return string.Create(18, Value, (span, val) =>
+        return string.Create(25, Value, (span, val) =>
         {
             // Decode
             long codePart = val >>> (BitsTime + BitsRandom); // Use ulong shift to handle sign bit correctly
@@ -268,22 +269,24 @@ public readonly struct Auid : IComparable<Auid>, IEquatable<Auid>, IParsable<Aui
             span[0] = (char)('A' + (codePart / 676));
             span[1] = (char)('A' + ((codePart % 676) / 26));
             span[2] = (char)('A' + (codePart % 26));
-            
+
             span[3] = Separator;
 
-            // Write Time (Hex 8)
-            timePart.TryFormat(span.Slice(4, 8), out _, "X8");
+            // Write Time (YYYYMMDDHHmmss - 14 chars)
+            // Convert seconds since epoch to DateTime
+            var dateTime = new DateTime(EpochTicks + (timePart * TimeSpan.TicksPerSecond), DateTimeKind.Utc);
+            dateTime.TryFormat(span.Slice(4, 14), out _, "yyyyMMddHHmmss");
 
-            span[12] = Separator;
+            span[18] = Separator;
 
-            // Write Random (Hex 5 - needed for 17 bits)
-            randPart.TryFormat(span.Slice(13, 5), out _, "X5");
+            // Write Random (6 decimal digits, padded with zeros)
+            randPart.TryFormat(span.Slice(19, 6), out _, "D6");
         });
     }
 
     /// <summary>
     /// Parses a string representation of an AUID.
-    /// Expected format: CODE_TIMESTAMP_RANDOM (e.g., ORD_2B1A3F12_1A2B3).
+    /// Expected format: COD_YYYYMMDDHHmmss_RANDOM (e.g., ORD_20241205123456_012345).
     /// </summary>
     /// <param name="s">The string to parse.</param>
     /// <param name="provider">Format provider (not used, included for IParsable compliance).</param>
@@ -298,7 +301,7 @@ public readonly struct Auid : IComparable<Auid>, IEquatable<Auid>, IParsable<Aui
 
     /// <summary>
     /// Tries to parse a string representation of an AUID.
-    /// Expected format: CODE_TIMESTAMP_RANDOM (e.g., ORD_2B1A3F12_1A2B3).
+    /// Expected format: COD_YYYYMMDDHHmmss_RANDOM (e.g., CTY_20241205123456_012345).
     /// </summary>
     /// <param name="s">The string to parse.</param>
     /// <param name="provider">Format provider (not used, included for IParsable compliance).</param>
@@ -310,9 +313,9 @@ public readonly struct Auid : IComparable<Auid>, IEquatable<Auid>, IParsable<Aui
         if (string.IsNullOrEmpty(s)) return false;
 
         ReadOnlySpan<char> span = s.AsSpan();
-        // Format: AAA_HHHHHHHH_HHHHH (18 chars)
-        if (span.Length != 18) return false;
-        if (span[3] != Separator || span[12] != Separator) return false;
+        // Format: AAA_YYYYMMDDHHmmss_RRRRRR (25 chars)
+        if (span.Length != 25) return false;
+        if (span[3] != Separator || span[18] != Separator) return false;
 
         // 1. Parse Code
         var c0 = span[0]; var c1 = span[1]; var c2 = span[2];
@@ -323,12 +326,22 @@ public readonly struct Auid : IComparable<Auid>, IEquatable<Auid>, IParsable<Aui
                            ((long)(c1 - 'A') * 26) +
                            ((long)(c2 - 'A'));
 
-        // 2. Parse Time (Hex)
-        if (!long.TryParse(span.Slice(4, 8), System.Globalization.NumberStyles.HexNumber, null, out long timeVal))
+        // 2. Parse Time (YYYYMMDDHHmmss - 14 chars)
+        if (!DateTime.TryParseExact(span.Slice(4, 14), "yyyyMMddHHmmss",
+            System.Globalization.CultureInfo.InvariantCulture,
+            System.Globalization.DateTimeStyles.AssumeUniversal | System.Globalization.DateTimeStyles.AdjustToUniversal,
+            out DateTime dateTime))
             return false;
 
-        // 3. Parse Random (Hex)
-        if (!long.TryParse(span.Slice(13, 5), System.Globalization.NumberStyles.HexNumber, null, out long randVal))
+        // Convert DateTime to seconds since epoch
+        long timeVal = (dateTime.Ticks - EpochTicks) / TimeSpan.TicksPerSecond;
+
+        // 3. Parse Random (6 decimal digits)
+        if (!long.TryParse(span.Slice(19, 6), System.Globalization.NumberStyles.None, null, out long randVal))
+            return false;
+
+        // Validate random is within 17-bit range
+        if (randVal > MaskRandom)
             return false;
 
         // Reconstruct

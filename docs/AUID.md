@@ -6,13 +6,13 @@ AUID structure: **[Code: 15 bits] [Timestamp: 32 bits] [Random: 17 bits]** = 64 
 
 - **Code (15 bits)**: 3-letter identifier (AAA-ZZZ) for entity type
 - **Timestamp (32 bits)**: Seconds since 2001-01-01 UTC (valid until year 2137)
-- **Random (17 bits)**: Collision prevention within same second
+- **Random (17 bits)**: Collision prevention within same second (0-131071)
 
 ### Features
 
 - Zero-allocation design using `Span<T>` and `stackalloc`
 - Type-safe with automatic code generation from type names
-- Human-readable string format: `CODE_TIMESTAMP_RANDOM` (e.g., `ORD_2B1A3F12_1A2B3`)
+- Human-readable string format: `COD_YYYYMMDDHHmmss_RANDOM` (e.g., `ORD_20241205123456_012345`)
 - Sortable by creation time
 - Compact 64-bit storage (vs 128-bit GUID)
 - Built-in type converter for JSON serialization
@@ -30,7 +30,7 @@ dotnet add package SolTechnology.Core.AUID
 ```csharp
 var orderId = Auid.New<Order>();
 // Creates AUID with code "ORD" derived from type name
-// Example output: ORD_2B1A3F12_1A2B3
+// Example output: ORD_20241205123456_012345
 ```
 
 #### 2. Generate with explicit code
@@ -38,7 +38,7 @@ var orderId = Auid.New<Order>();
 ```csharp
 var userId = Auid.New("USR");
 // Creates AUID with code "USR"
-// Example output: USR_2B1A3F14_3C4D5
+// Example output: USR_20241205123458_012346
 ```
 
 #### 3. Generate with caller file inference
@@ -52,8 +52,8 @@ var id = Auid.New();
 #### 4. Parse from string
 
 ```csharp
-var auid = Auid.Parse("ORD_2B1A3F12_1A2B3");
-if (Auid.TryParse("ORD_2B1A3F12_1A2B3", null, out var result))
+var auid = Auid.Parse("ORD_20241205123456_012345");
+if (Auid.TryParse("ORD_20241205123456_012345", null, out var result))
 {
     Console.WriteLine(result.Value); // Access raw 64-bit value
 }
@@ -77,7 +77,7 @@ When using `Auid.New<T>()` or `Auid.New()`, the library generates a 3-letter cod
 Examples:
 - `Order` -> `ORD`
 - `User` -> `USR`
-- `City` -> `CTY`
+- `City` -> `CTX`
 - `AI` -> `AXX` (padded)
 
 ### Validation
@@ -94,13 +94,16 @@ Examples:
 
 ### String Format
 
-Format: `CODE_TIMESTAMP_RANDOM`
-- Code: 3 uppercase letters
-- Timestamp: 8 hex digits
-- Random: 5 hex digits
-- Total length: 18 characters
+Format: `COD_YYYYMMDDHHmmss_RANDOM`
+- Code: 3 uppercase letters (AAA-ZZZ)
+- Timestamp: 14 digits representing date/time (YYYYMMDDHHmmss in UTC)
+- Random: 6 decimal digits (000000-131071, zero-padded)
+- Total length: 25 characters
 
-Example: `ORD_2B1A3F12_1A2B3`
+Example: `ORD_20241205123456_012345`
+- `ORD` = Order entity type
+- `20241205123456` = December 5, 2024 at 12:34:56 UTC
+- `012345` = Random collision prevention number
 
 ### Use Cases
 

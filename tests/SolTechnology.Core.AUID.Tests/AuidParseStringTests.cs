@@ -103,7 +103,7 @@ public class AuidParseStringTests
     public void Parse_WithWrongSeparator_ShouldThrowFormatException()
     {
         // Arrange - Using hyphen instead of underscore
-        string invalid = "ABC-12345678-12345";
+        string invalid = "ABC-20241205123456-012345";
 
         // Act
         Action act = () => Auid.Parse(invalid);
@@ -116,7 +116,7 @@ public class AuidParseStringTests
     public void TryParse_WithWrongSeparator_ShouldReturnFalse()
     {
         // Arrange
-        string invalid = "ABC-12345678-12345";
+        string invalid = "ABC-20241205123456-012345";
 
         // Act
         var success = Auid.TryParse(invalid, null, out var result);
@@ -129,7 +129,7 @@ public class AuidParseStringTests
     public void Parse_WithLowercaseCode_ShouldThrowFormatException()
     {
         // Arrange
-        string invalid = "abc_12345678_12345";
+        string invalid = "abc_20241205123456_012345";
 
         // Act
         Action act = () => Auid.Parse(invalid);
@@ -142,7 +142,7 @@ public class AuidParseStringTests
     public void TryParse_WithLowercaseCode_ShouldReturnFalse()
     {
         // Arrange
-        string invalid = "abc_12345678_12345";
+        string invalid = "abc_20241205123456_012345";
 
         // Act
         var success = Auid.TryParse(invalid, null, out var result);
@@ -152,10 +152,10 @@ public class AuidParseStringTests
     }
 
     [Test]
-    public void Parse_WithNonHexTimestamp_ShouldThrowFormatException()
+    public void Parse_WithInvalidTimestamp_ShouldThrowFormatException()
     {
-        // Arrange
-        string invalid = "ABC_GGGGGGGG_12345";
+        // Arrange - Invalid date (month 13)
+        string invalid = "ABC_20241305123456_012345";
 
         // Act
         Action act = () => Auid.Parse(invalid);
@@ -165,10 +165,10 @@ public class AuidParseStringTests
     }
 
     [Test]
-    public void TryParse_WithNonHexTimestamp_ShouldReturnFalse()
+    public void TryParse_WithInvalidTimestamp_ShouldReturnFalse()
     {
-        // Arrange
-        string invalid = "ABC_GGGGGGGG_12345";
+        // Arrange - Invalid date (month 13)
+        string invalid = "ABC_20241305123456_012345";
 
         // Act
         var success = Auid.TryParse(invalid, null, out var result);
@@ -178,10 +178,10 @@ public class AuidParseStringTests
     }
 
     [Test]
-    public void Parse_WithNonHexRandom_ShouldThrowFormatException()
+    public void Parse_WithNonNumericRandom_ShouldThrowFormatException()
     {
         // Arrange
-        string invalid = "ABC_12345678_GGGGG";
+        string invalid = "ABC_20241205123456_ABCDEF";
 
         // Act
         Action act = () => Auid.Parse(invalid);
@@ -191,10 +191,10 @@ public class AuidParseStringTests
     }
 
     [Test]
-    public void TryParse_WithNonHexRandom_ShouldReturnFalse()
+    public void TryParse_WithNonNumericRandom_ShouldReturnFalse()
     {
         // Arrange
-        string invalid = "ABC_12345678_GGGGG";
+        string invalid = "ABC_20241205123456_ABCDEF";
 
         // Act
         var success = Auid.TryParse(invalid, null, out var result);
@@ -238,8 +238,8 @@ public class AuidParseStringTests
     [Test]
     public void Parse_WithValidFormat_AAA_ShouldWork()
     {
-        // Arrange
-        string valid = "AAA_00000001_00001";
+        // Arrange - January 1, 2001 at 00:00:01
+        string valid = "AAA_20010101000001_000001";
 
         // Act
         var parsed = Auid.Parse(valid);
@@ -252,8 +252,8 @@ public class AuidParseStringTests
     [Test]
     public void Parse_WithValidFormat_ZZZ_ShouldWork()
     {
-        // Arrange
-        string valid = "ZZZ_FFFFFFFF_1FFFF";
+        // Arrange - December 31, 2136 at 23:59:59 (close to max date)
+        string valid = "ZZZ_21361231235959_131071";
 
         // Act
         var parsed = Auid.Parse(valid);
@@ -267,7 +267,7 @@ public class AuidParseStringTests
     public void Parse_WithNonLetterInCode_ShouldThrowFormatException()
     {
         // Arrange
-        string invalid = "A1C_12345678_12345";
+        string invalid = "A1C_20241205123456_012345";
 
         // Act
         Action act = () => Auid.Parse(invalid);
@@ -280,7 +280,7 @@ public class AuidParseStringTests
     public void TryParse_EmptyAuidString_ShouldParseCorrectly()
     {
         // Arrange
-        string emptyString = Auid.Empty.ToString(); // "XXX_00000000_00000"
+        string emptyString = Auid.Empty.ToString(); // "XXX_00010101000000_000000"
 
         // Act
         var success = Auid.TryParse(emptyString, null, out var parsed);
