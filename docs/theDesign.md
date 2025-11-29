@@ -508,42 +508,161 @@ Files are numbered (`1.`, `2.`) to make the execution order obvious. Each step h
 
 Here's a visual representation of how a typical query flows through the system:
 
-```
-Controller (Presentation)
-    ↓ (sends query via MediatR)
-QueryHandler (LogicLayer)
-    ↓ (delegates to)
-DomainService (LogicLayer)
-    ↓ (checks database)
-DbContext (DataLayer)
-    ↓ (if not found, fallback to)
-ExternalApiClient (DataLayer)
-    ↓ (maps result via)
-Mapper (LogicLayer)
-    ↓ (executes)
-SaveSteps (LogicLayer)
-    ↓ (persists via)
-DbContext (DataLayer)
-    ↓ (returns)
-Result<City> → Controller → User
+##### Simple Query Flow
+
+```mermaid
+graph TB
+    User([User])
+    Controller[Controller<br/><b>Presentation Layer</b>]
+    QueryHandler[Query Handler<br/><b>Logic Layer</b>]
+    DomainService[Domain Service<br/><b>Logic Layer</b>]
+    DbContext[DbContext<br/><b>Data Layer</b>]
+    ApiClient[External API Client<br/><b>Data Layer</b>]
+    Mapper[Mapper<br/><b>Logic Layer</b>]
+    SaveSteps[Save Steps<br/><b>Logic Layer</b>]
+
+    User -->|HTTP Request| Controller
+    Controller -->|MediatR Send| QueryHandler
+    QueryHandler -->|Delegates to| DomainService
+    DomainService -->|Query Database| DbContext
+    DbContext -.->|Not Found| ApiClient
+    ApiClient -.->|Maps Response| Mapper
+    Mapper -.->|Executes| SaveSteps
+    SaveSteps -.->|Persists| DbContext
+    DbContext -->|Returns Entity| DomainService
+    DomainService -->|Maps to Domain| Mapper
+    Mapper -->|Result&lt;City&gt;| QueryHandler
+    QueryHandler -->|Result&lt;City&gt;| Controller
+    Controller -->|HTTP Response| User
+
+    style Controller fill:#e1f5ff
+    style QueryHandler fill:#fff4e1
+    style DomainService fill:#fff4e1
+    style Mapper fill:#fff4e1
+    style SaveSteps fill:#fff4e1
+    style DbContext fill:#e8f5e9
+    style ApiClient fill:#e8f5e9
+    style User fill:#f3e5f5
 ```
 
-**For Complex Queries with ChainHandler:**
+##### Complex Query Flow (ChainHandler)
 
-```
-Controller
-    ↓
-ChainHandler
-    ├─→ Executor 1 (InitiateContext)
-    ├─→ Executor 2 (DownloadRoadData) → External APIs
-    ├─→ Executor 3 (FindProfitablePath) → Business Calculations
-    ├─→ Executor 4 (SolveTsp) → Algorithm
-    └─→ Executor 5 (FormResult)
-    ↓
-Result<T> → Controller → User
+```mermaid
+graph TB
+    User([User])
+    Controller[Controller<br/><b>Presentation Layer</b>]
+    ChainHandler[Chain Handler<br/><b>Logic Layer</b>]
+    Context[(Shared Context)]
+
+    Exec1[Step 1: InitiateContext<br/><b>Logic Layer</b>]
+    Exec2[Step 2: DownloadRoadData<br/><b>Logic Layer</b>]
+    Exec3[Step 3: FindProfitablePath<br/><b>Logic Layer</b>]
+    Exec4[Step 4: SolveTsp<br/><b>Logic Layer</b>]
+    Exec5[Step 5: FormResult<br/><b>Logic Layer</b>]
+
+    ExternalAPI[External APIs<br/><b>Data Layer</b>]
+
+    User -->|HTTP Request| Controller
+    Controller -->|MediatR Send| ChainHandler
+
+    ChainHandler -->|Invoke| Exec1
+    Exec1 -->|Mutates| Context
+    Context -->|Passes to| Exec2
+    Exec2 -->|Calls| ExternalAPI
+    ExternalAPI -->|Returns Data| Exec2
+    Exec2 -->|Mutates| Context
+    Context -->|Passes to| Exec3
+    Exec3 -->|Business Logic| Context
+    Context -->|Passes to| Exec4
+    Exec4 -->|Algorithm| Context
+    Context -->|Passes to| Exec5
+    Exec5 -->|Builds Result| ChainHandler
+
+    ChainHandler -->|Result&lt;T&gt;| Controller
+    Controller -->|HTTP Response| User
+
+    style Controller fill:#e1f5ff
+    style ChainHandler fill:#fff4e1
+    style Exec1 fill:#fff4e1
+    style Exec2 fill:#fff4e1
+    style Exec3 fill:#fff4e1
+    style Exec4 fill:#fff4e1
+    style Exec5 fill:#fff4e1
+    style Context fill:#fce4ec
+    style ExternalAPI fill:#e8f5e9
+    style User fill:#f3e5f5
 ```
 
-Each executor receives a `Context` object, mutates it, and returns `Result.Success()` or `Result.Fail()`. The handler stops on first failure.
+##### Layer Dependencies Overview
+
+```mermaid
+graph TB
+    subgraph Presentation["<b>Presentation Layer</b><br/>(API, Worker, UI)"]
+        API[API Controllers]
+        Worker[Background Workers]
+    end
+
+    subgraph Logic["<b>Logic Layer</b><br/>(Commands, Queries, Domain Services, Flows)"]
+        Handlers[Handlers]
+        DomainServices[Domain Services]
+        ChainSteps[Chain Steps / Executors]
+        Mappers[Mappers]
+        Validators[Validators]
+    end
+
+    subgraph Data["<b>Data Layer</b><br/>(SQL, HTTP, Blob)"]
+        EF[Entity Framework<br/>DbContext]
+        HttpClients[HTTP Clients<br/>External APIs]
+        BlobStorage[Blob Storage]
+    end
+
+    subgraph Domain["<b>Domain Layer</b><br/>(Models, Interfaces)"]
+        Models[Domain Models]
+        Interfaces[Domain Interfaces]
+    end
+
+    subgraph Infrastructure["<b>Infrastructure</b><br/>(Extensions, Drivers, Tech Details)"]
+        Extensions[Extensions]
+        Config[Configuration]
+    end
+
+    API -->|MediatR| Handlers
+    Worker -->|MediatR| Handlers
+    Handlers -->|Uses| DomainServices
+    Handlers -->|Uses| ChainSteps
+    DomainServices -->|Uses| Mappers
+    DomainServices -->|Uses| EF
+    DomainServices -->|Uses| HttpClients
+    ChainSteps -->|Uses| EF
+    ChainSteps -->|Uses| HttpClients
+    ChainSteps -->|Uses| BlobStorage
+    Handlers -->|Validates via| Validators
+
+    Handlers -.->|References| Models
+    DomainServices -.->|Implements| Interfaces
+    EF -.->|Maps to| Models
+    HttpClients -.->|Returns| Models
+
+    Presentation -.->|Configured by| Infrastructure
+    Logic -.->|Configured by| Infrastructure
+    Data -.->|Configured by| Infrastructure
+
+    style Presentation fill:#e1f5ff
+    style Logic fill:#fff4e1
+    style Data fill:#e8f5e9
+    style Domain fill:#fce4ec
+    style Infrastructure fill:#f5f5f5
+```
+
+**Flow Principles:**
+
+Each executor/step receives a `Context` object, mutates it, and returns `Result.Success()` or `Result.Fail()`. The handler stops on first failure.
+
+**Dependency Rules:**
+- Dependencies flow **downward only**: Presentation → Logic → Data → Infrastructure
+- Domain has **no dependencies** on other layers
+- Each layer can only reference layers below it
+- Never reference higher layers from lower layers
 
 #### Pattern Decision Matrix
 

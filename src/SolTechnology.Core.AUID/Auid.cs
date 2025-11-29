@@ -344,6 +344,9 @@ public readonly struct Auid : IComparable<Auid>, IEquatable<Auid>, IParsable<Aui
     /// Parses a long value into an AUID.
     /// Validates that the code part (first 15 bits) represents a valid 3-letter code (AAA-ZZZ).
     /// </summary>
+    /// <param name="value">The long value to parse.</param>
+    /// <returns>The parsed AUID.</returns>
+    /// <exception cref="FormatException">Thrown when the code part exceeds valid range for 3-letter codes.</exception>
     public static Auid Parse(long value)
     {
         if (!TryParse(value, out var result))
@@ -355,6 +358,9 @@ public readonly struct Auid : IComparable<Auid>, IEquatable<Auid>, IParsable<Aui
     /// Tries to parse a long value into an AUID.
     /// Returns false if the code part (first 15 bits) doesn't represent a valid 3-letter code (AAA-ZZZ).
     /// </summary>
+    /// <param name="value">The long value to parse.</param>
+    /// <param name="result">The parsed AUID if successful; otherwise, Empty.</param>
+    /// <returns>True if parsing succeeded; otherwise, false.</returns>
     public static bool TryParse(long value, out Auid result)
     {
         result = Empty;
@@ -374,15 +380,36 @@ public readonly struct Auid : IComparable<Auid>, IEquatable<Auid>, IParsable<Aui
 
     // --- Standard Boilerplate ---
 
+    /// <inheritdoc />
     public override bool Equals(object? obj) => obj is Auid other && Equals(other);
+
+    /// <inheritdoc />
     public bool Equals(Auid other) => Value == other.Value;
-    public override int GetHashCode() => Value.GetHashCode(); // long hash code is good enough
+
+    /// <inheritdoc />
+    public override int GetHashCode() => Value.GetHashCode();
+
+    /// <inheritdoc />
     public int CompareTo(Auid other) => Value.CompareTo(other.Value);
 
+    /// <summary>
+    /// Determines whether two AUID instances are equal.
+    /// </summary>
     public static bool operator ==(Auid left, Auid right) => left.Value == right.Value;
+
+    /// <summary>
+    /// Determines whether two AUID instances are not equal.
+    /// </summary>
     public static bool operator !=(Auid left, Auid right) => left.Value != right.Value;
-    
+
+    /// <summary>
+    /// Implicitly converts an AUID to its raw 64-bit long value.
+    /// </summary>
     public static implicit operator long(Auid a) => a.Value;
+
+    /// <summary>
+    /// Explicitly converts a 64-bit long value to an AUID.
+    /// </summary>
     public static explicit operator Auid(long v) => new Auid(v);
 }
 
