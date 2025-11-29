@@ -79,6 +79,40 @@ dotnet test SolTechnology.Core.Guards.Tests --no-build
 dotnet pack -c Release -o . ./src/SolTechnology.Core.CQRS/SolTechnology.Core.CQRS.csproj
 ```
 
+## Claude Code Workflow
+
+**IMPORTANT**: When working on tasks, always verify changes by building the solution after completing each task.
+
+### After Every Task:
+
+1. **Build the solution** to catch compilation errors early:
+   ```bash
+   cd src
+   dotnet build SolTechnology.Core.sln
+   ```
+
+2. **For DreamTravel changes**, build the sample app:
+   ```bash
+   cd sample-tale-code-apps/DreamTravel/backend
+   dotnet build
+   ```
+
+3. **Run relevant tests** if the change affects testable logic:
+   ```bash
+   # Core library tests
+   .\.github\runTests.ps1
+
+   # Specific project tests
+   cd tests
+   dotnet test SolTechnology.Core.AUID.Tests
+   ```
+
+**Why**: Building after each task ensures:
+- No compilation errors introduced
+- Type mismatches caught immediately
+- Dependencies are correct
+- Changes are compatible with existing code
+
 ## Architecture Patterns
 
 ### CQRS Pattern

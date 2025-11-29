@@ -74,7 +74,7 @@ public class CityMapper : ICityMapper
 
     /// <summary>
     /// Applies updates from a domain model to a city entity.
-    /// If the entity is null, creates a new city entity with a new GUID.
+    /// If the entity is null, creates a new city entity with a new AUID.
     /// Otherwise, updates the existing entity's properties.
     /// </summary>
     /// <param name="entity">The existing entity to update, or null to create a new one.</param>
@@ -86,7 +86,7 @@ public class CityMapper : ICityMapper
         {
             return new CityEntity
             {
-                CityId = Guid.NewGuid(),
+                CityId = Auid.New("CTY"),
                 Latitude = city.Latitude,
                 Longitude = city.Longitude,
                 Country = city.Country

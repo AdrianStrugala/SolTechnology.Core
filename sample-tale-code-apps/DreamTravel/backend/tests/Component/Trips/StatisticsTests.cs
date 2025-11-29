@@ -29,38 +29,38 @@ public class StatisticsTests
         {
             new()
             {
-                CityId = Guid.NewGuid(),
+                CityId = Auid.New("CTY"),
                 Latitude = 52.2297,
                 Longitude = 21.0122,
                 Country = "Polska",
-                AlternativeNames = new() 
-                { 
+                AlternativeNames = new()
+                {
                     new() { AlternativeName = "Warszawa" }
                 },
-                Statistics = new() 
-                { 
+                Statistics = new()
+                {
                     new() { SearchCount = 3 }
                 }
             },
             new()
             {
-                CityId = Guid.NewGuid(),
+                CityId = Auid.New("CTY"),
                 Latitude = 50.0647,
                 Longitude = 19.9450,
                 Country = "Polska",
-                Statistics = new() 
-                { 
+                Statistics = new()
+                {
                     new() { SearchCount = 2 }
                 }
             },
             new()
             {
-                CityId = Guid.NewGuid(),
+                CityId = Auid.New("CTY"),
                 Latitude = 54.3520,
                 Longitude = 18.6466,
                 Country = "Germany",
-                Statistics = new() 
-                { 
+                Statistics = new()
+                {
                     new() { SearchCount = 2 }
                 }
             }
