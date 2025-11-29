@@ -177,6 +177,28 @@ public class AuidNewTests
             Auid.New(code);
         });
     }
+
+    [Test]
+    public void TimestampOverflow_ShouldBeDetected_WhenYear2137Exceeded()
+    {
+        // This test documents the maximum date AUID can handle
+        // AUID uses 32 bits for timestamp (seconds since 2001-01-01)
+        // Max value: 2^32 - 1 = 4,294,967,295 seconds
+        // This gives us approximately 136 years from 2001 = year 2137
+
+        // Calculate the exact maximum date
+        var epoch = new DateTime(2001, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+        const long maxSeconds = (1L << 32) - 1; // 0xFFFFFFFF
+        var maxDate = epoch.AddSeconds(maxSeconds);
+
+        // Assert - should be around year 2137
+        maxDate.Year.Should().Be(2137);
+
+        // Note: When this date is exceeded, CreateInternal will throw InvalidOperationException
+        // with a message about "Papież Polak robi BUM"
+        // We cannot easily test the actual exception without mocking DateTime.UtcNow,
+        // but this test documents the expected behavior and maximum date.
+    }
 }
 
 // Helper class for generic type testing

@@ -136,6 +136,14 @@ public readonly struct Auid : IComparable<Auid>, IEquatable<Auid>, IParsable<Aui
 
         // 2. Encode Time (32 bits)
         long seconds = (DateTime.UtcNow.Ticks - EpochTicks) / TimeSpan.TicksPerSecond;
+
+        // Validate timestamp doesn't exceed 32-bit limit
+        if (seconds > MaskTime)
+        {
+            throw new InvalidOperationException(
+                "AUID timestamp overflow: Przekroczono rok 2137! Papież Polak robi BUM i AUID już nie działa. Czas na nową epokę, albo niech ktoś w końcu przepisze ten system na 64-bitowy timestamp!");
+        }
+
         long timeEncoded = seconds & MaskTime;
 
         // 3. Encode Random (17 bits)
