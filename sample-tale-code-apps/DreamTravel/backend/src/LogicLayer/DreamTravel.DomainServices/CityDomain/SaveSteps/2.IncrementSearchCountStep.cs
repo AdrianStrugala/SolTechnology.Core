@@ -2,17 +2,31 @@ using DreamTravel.Trips.Sql.DbModels;
 
 namespace DreamTravel.DomainServices.CityDomain.SaveSteps;
 
+/// <summary>
+/// Step responsible for incrementing search count statistics for a city.
+/// </summary>
 public interface IIncrementSearchCountStep
 {
+    /// <summary>
+    /// Increments the search count for a city on a specific date.
+    /// </summary>
+    /// <param name="cityEntity">The city entity to update statistics for.</param>
+    /// <param name="date">The date of the search.</param>
     public void Invoke(CityEntity cityEntity, DateOnly date);
 }
 
+/// <summary>
+/// Implements the logic for incrementing city search count statistics.
+/// Creates a new statistics record if one doesn't exist for the given date.
+/// </summary>
 public class IncrementSearchCountStep : IIncrementSearchCountStep
 {
     /// <summary>
-    /// 2) Zwiększ liczbę wyszukiwań dla miasta (CityId, Date).
-    /// Jeśli nie ma rekordu, utwórz z SearchCount = 1.
+    /// Increments the search count for the specified city and date.
+    /// If no record exists for the given date, creates a new one with SearchCount = 1.
     /// </summary>
+    /// <param name="cityEntity">The city entity to update statistics for.</param>
+    /// <param name="date">The date of the search.</param>
     public void Invoke(CityEntity cityEntity, DateOnly date)
     {
         var statistics = cityEntity.Statistics
