@@ -75,7 +75,7 @@ stages:
         displayName: 'Run component tests'
         inputs:
           command: 'test'
-          projects: '$(workingDirectory)/tests/**/*ComponentTests.csproj'
+          projects: '$(workingDirectory)/tests/**/*Component.Tests.csproj'
           arguments: '--configuration $(BuildConfiguration)'
           publishTestResults: true
 
