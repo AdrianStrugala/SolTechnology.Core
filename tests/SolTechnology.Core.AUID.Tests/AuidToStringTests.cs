@@ -68,7 +68,7 @@ public class AuidToStringTests
         string result = Auid.Empty.ToString();
 
         // Assert
-        result.Should().Be("XXX_00010101000000_000000");
+        result.Should().Be("AAA_20010101000000_000000");
     }
 
     [Test]

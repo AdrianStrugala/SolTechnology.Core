@@ -256,7 +256,7 @@ public readonly struct Auid : IComparable<Auid>, IEquatable<Auid>, IParsable<Aui
     /// </summary>
     public override string ToString()
     {
-        if (Value == 0) return $"{DefaultCode}{Separator}00010101000000{Separator}000000";
+        if (Value == 0) return $"AAA{Separator}20010101000000{Separator}000000";
 
         return string.Create(25, Value, (span, val) =>
         {

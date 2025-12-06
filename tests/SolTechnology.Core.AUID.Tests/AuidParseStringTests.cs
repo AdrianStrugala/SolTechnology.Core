@@ -280,15 +280,15 @@ public class AuidParseStringTests
     public void TryParse_EmptyAuidString_ShouldParseCorrectly()
     {
         // Arrange
-        string emptyString = Auid.Empty.ToString(); // "XXX_00010101000000_000000"
+        string emptyString = Auid.Empty.ToString(); // "AAA_20010101000000_000000"
 
         // Act
         var success = Auid.TryParse(emptyString, null, out var parsed);
 
-        // Assert - Empty.ToString() produces "XXX_..." which when parsed creates a non-zero Auid
+        // Assert - Empty.ToString() produces "AAA_20010101000000_000000" which round-trips correctly
         success.Should().BeTrue();
         parsed.ToString().Should().Be(emptyString);
-        // Note: parsed.Value won't be 0 because "XXX" encodes to 16169, not 0
+        parsed.Value.Should().Be(0); // Now it properly round-trips to 0
     }
 
     [Test]
