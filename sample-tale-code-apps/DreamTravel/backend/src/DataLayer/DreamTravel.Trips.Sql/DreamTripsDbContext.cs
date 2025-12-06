@@ -1,15 +1,9 @@
-﻿using DreamTravel.Trips.Domain;
-using DreamTravel.Trips.Domain.Cities;
-using DreamTravel.Trips.Sql.DbModels;
+﻿using DreamTravel.Trips.Sql.DbModels;
 using Microsoft.EntityFrameworkCore;
+using System.Reflection;
 
 namespace DreamTravel.Trips.Sql;
 
-/// <summary>
-/// Scaffolded using:
-/// dotnet-ef dbcontext scaffold "Data Source=localhost,1403;Database=TaleCodeDatabase; User ID=SA;Password=password_xxddd_2137;Persist Security Info=True;MultipleActiveResultSets=True;Trusted_Connection=False;Connect Timeout=60;Encrypt=False;TrustServerCertificate=True" Microsoft.EntityFrameworkCore.SqlServer --output-dir Models --context DreamTripsDbContext --force
-/// from SolTechnology.TaleCode.Sql directory
-/// </summary>
 public partial class DreamTripsDbContext : DbContext
 {
     public DreamTripsDbContext()
@@ -21,28 +15,15 @@ public partial class DreamTripsDbContext : DbContext
     {
     }
 
-    public virtual DbSet<CityDetails> Cities { get; set; }
-    public virtual DbSet<CityStatisticsDbModel> CityStatistics { get; set; }
-    public virtual DbSet<CountryStatisticsDbModel> CountryStatistics { get; set; }
+    public virtual DbSet<CityEntity> Cities { get; set; }
+    public virtual DbSet<CityStatisticsEntity> CityStatistics { get; set; }
+    public virtual DbSet<CountryStatisticsEntity> CountryStatistics { get; set; }
+    public virtual DbSet<AlternativeNameEntity> CityAlternativeNames { get; set; }
     
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.Entity<CityDetails>(entity =>
-        {
-            entity.ToTable("City");
-        });
-            
-        modelBuilder.Entity<CountryStatisticsDbModel>(entity =>
-        {
-            entity.ToView("CountryStatisticsView");   // view name in db
-            entity.HasNoKey();                        // keyless, because it's view
-        });
-
-
-        OnModelCreatingPartial(modelBuilder);
+        modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
     }
-
-    partial void OnModelCreatingPartial(ModelBuilder modelBuilder);
 
     public override int SaveChanges()
     {
@@ -59,11 +40,12 @@ public partial class DreamTripsDbContext : DbContext
     private void UpdateTimestamps()
     {
         var entries = ChangeTracker.Entries()
-            .Where(e => e is { Entity: EntityBase, State: EntityState.Added or EntityState.Modified })
+            .Where(e => e is { Entity: BaseEntity, State: EntityState.Added or EntityState.Modified })
             .ToList();
+            
         foreach (var entry in entries)
         {
-            var entity = (EntityBase)entry.Entity;
+            var entity = (BaseEntity)entry.Entity;
             entity.UpdatedAt = DateTime.UtcNow;
 
             if (entry.State == EntityState.Added)

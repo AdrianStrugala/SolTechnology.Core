@@ -1,4 +1,3 @@
-using DreamTravel.Trips.Domain.SearchStatistics;
 using DreamTravel.Trips.Sql;
 using Microsoft.EntityFrameworkCore;
 using SolTechnology.Core.CQRS;

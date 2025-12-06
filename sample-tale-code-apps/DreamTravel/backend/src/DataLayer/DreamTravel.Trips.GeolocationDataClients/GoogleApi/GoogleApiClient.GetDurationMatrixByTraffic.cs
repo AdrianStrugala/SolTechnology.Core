@@ -45,7 +45,7 @@ public partial class GoogleApiClient : IGoogleApiClient
                   $"&departure_time={departureTs}" +
                   $"&key={_options.Key}";
 
-        var resp = await _httpClient.GetAsync(url);
+        var resp = await httpClient.GetAsync(url);
         resp.EnsureSuccessStatusCode();
 
         var json = JObject.Parse(await resp.Content.ReadAsStringAsync());

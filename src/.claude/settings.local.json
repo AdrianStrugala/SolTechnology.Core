@@ -1,0 +1,16 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(dir:*)",
+      "Bash(if exist .githubworkflows dir .githubworkflows)",
+      "Bash(cat:*)",
+      "Bash(dotnet build:*)",
+      "Bash(dotnet restore:*)",
+      "Bash(dotnet test:*)",
+      "Bash(find:*)",
+      "Bash(dotnet:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

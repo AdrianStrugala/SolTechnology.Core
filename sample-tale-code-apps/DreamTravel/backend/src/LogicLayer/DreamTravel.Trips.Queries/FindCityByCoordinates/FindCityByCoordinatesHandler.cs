@@ -1,28 +1,22 @@
-﻿using DreamTravel.Trips.Domain.Cities;
-using DreamTravel.Trips.GeolocationDataClients.GoogleApi;
+﻿using DreamTravel.DomainServices.CityDomain;
+using DreamTravel.Infrastructure.Events;
+using DreamTravel.Trips.Domain.Cities;
+using DreamTravel.Trips.Domain.Events;
 using SolTechnology.Core.CQRS;
 
 namespace DreamTravel.Trips.Queries.FindCityByCoordinates
 {
-    public class FindCityByCoordinatesHandler : IQueryHandler<FindCityByCoordinatesQuery, City>
+    public class FindCityByCoordinatesHandler(
+        ICityDomainService cityDomainService,
+        IHangfireNotificationPublisher notificationPublisher)
+        : IQueryHandler<FindCityByCoordinatesQuery, City>
     {
-        private readonly IGoogleApiClient _googleApiClient;
-
-        public FindCityByCoordinatesHandler(IGoogleApiClient googleApiClient)
-        {
-            _googleApiClient = googleApiClient;
-        }
-
         public async Task<Result<City>> Handle(FindCityByCoordinatesQuery query, CancellationToken cancellationToken)
         {
-            City result = new City
-            {
-                Latitude = query.Lat,
-                Longitude = query.Lng
-            };
+            var result = await cityDomainService.Get(query.Lat, query.Lng);
 
-            result = await _googleApiClient.GetNameOfCity(result);
-
+            notificationPublisher.Publish(new CitySearched{ City = result });
+            
             return result;
         }
     }

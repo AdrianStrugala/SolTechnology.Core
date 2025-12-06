@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <Version>0.2.0</Version>
+        <Description>High-performance 64-bit unique identifier (AUID) for distributed systems. Zero-allocation, sortable, human-readable alternative to GUIDs.</Description>
+        <PackageTags>sol technology guid uuid auid id identifier unique distributed performance zero-allocation</PackageTags>
+        <Product>SolTechnology.Core.AUID</Product>
+        <PackageId>SolTechnology.Core.AUID</PackageId>
+        <AssemblyName>SolTechnology.Core.AUID</AssemblyName>
+
+        <PackageIcon>docs\mini-logo.png</PackageIcon>
+        <PackageReadmeFile>docs\AUID.md</PackageReadmeFile>
+        <GenerateDocumentationFile>true</GenerateDocumentationFile>
+        <PackageProjectUrl>https://github.com/AdrianStrugala/SolTechnology.Core</PackageProjectUrl>
+        <RepositoryType>git</RepositoryType>
+    </PropertyGroup>
+    <ItemGroup>
+        <None Include="..\..\docs\mini-logo.png" Pack="true" Visible="false" PackagePath="docs\mini-logo.png" />
+        <None Include="..\..\docs\AUID.md" Pack="true" Visible="false" PackagePath="docs\AUID.md" />
+    </ItemGroup>
+
+</Project>
