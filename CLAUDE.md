@@ -54,9 +54,8 @@ Located in `sample-tale-code-apps/DreamTravel/backend/src/`, organized by layers
 
 ```bash
 # From repository root
-cd src
-dotnet restore SolTechnology.Core.sln
-dotnet build SolTechnology.Core.sln
+dotnet restore SolTechnology.Core.slnx
+dotnet build SolTechnology.Core.slnx
 ```
 
 ### Testing
@@ -87,8 +86,7 @@ dotnet pack -c Release -o . ./src/SolTechnology.Core.CQRS/SolTechnology.Core.CQR
 
 1. **Build the solution** to catch compilation errors early:
    ```bash
-   cd src
-   dotnet build SolTechnology.Core.sln
+   dotnet build SolTechnology.Core.slnx
    ```
 
 2. **For DreamTravel changes**, build the sample app:
@@ -271,3 +269,41 @@ Key entry points:
 3. **Chain Steps**: Must be registered with `RegisterChain()` before use
 4. **Result Implicit Conversion**: You can return domain objects directly - they'll auto-convert to `Result<T>`
 5. **Workload Restore**: Required before build - see GitHub workflow for reference
+
+## Solution Format and .NET Version
+
+### Current Configuration
+
+- **Solution Format**: `.slnx` (XML-based solution file introduced in .NET 10)
+- **Solution Location**: Repository root (`SolTechnology.Core.slnx`)
+- **Target Framework**: .NET 10.0
+- **SDK Version**: 10.0.100+ (specified in `global.json` at repository root)
+- **IDE Requirements**: JetBrains Rider 2024.3+ for full .slnx support
+
+### Migration History
+
+This repository was migrated from .NET 8.0 to .NET 10.0 and from traditional `.sln` to modern `.slnx` format. Key changes:
+
+1. **Solution moved from** `src/SolTechnology.Core.sln` **to** `SolTechnology.Core.slnx` (at root)
+2. **All projects upgraded** from `net8.0` to `net10.0` target framework
+3. **Directory.Build.props hierarchy**: Root → src/ → projects (for shared build properties)
+4. **global.json moved** to repository root for SDK version control
+5. **Organized solution folders**: src/, tests/, docs/, sample-tale-code-apps/, .github/
+
+### Building with .slnx
+
+The `.slnx` format is functionally equivalent to `.sln` but uses XML structure for better readability and VCS friendliness:
+
+```bash
+# All standard dotnet commands work with .slnx
+dotnet restore SolTechnology.Core.slnx
+dotnet build SolTechnology.Core.slnx
+dotnet test SolTechnology.Core.slnx
+dotnet pack SolTechnology.Core.slnx
+```
+
+### Requirements
+
+- **.NET SDK**: 10.0.100 or later (auto-enforced by `global.json`)
+- **IDE**: JetBrains Rider 2024.3+ or Visual Studio 2022 17.13+ for .slnx editing
+- **CLI**: .NET CLI 10.0+ fully supports .slnx format
