@@ -9,16 +9,15 @@
 	  <AssemblyName>SolTechnology.Core.Authentication</AssemblyName>
 	  <PackageIcon>docs\mini-logo.png</PackageIcon>
 	  <PackageReadmeFile>docs\readme.md</PackageReadmeFile>
-	  <NoWarn>NU1510</NoWarn>
+	  <!-- NU1510: Packages from Directory.Build.props are already included in FrameworkReference -->
+	  <NoWarn>$(NoWarn);NU1510</NoWarn>
   </PropertyGroup>
 	<ItemGroup>
 		<None Include="..\..\docs\mini-logo.png" Pack="true" Visible="false" PackagePath="docs\mini-logo.png" />
 		<None Include="..\..\docs\Auth.md" Pack="true" Visible="false" PackagePath="docs\readme.md" />
 	</ItemGroup>
 	<ItemGroup>
-	  <PackageReference Include="Microsoft.AspNetCore.Authentication" Version="2.2.0" />
-      <PackageReference Include="Microsoft.AspNetCore.App" Version="2.2.8" />
-	  <PackageReference Include="Microsoft.AspNetCore.Metadata" Version="8.0.13" />
+	  <FrameworkReference Include="Microsoft.AspNetCore.App" />
 	</ItemGroup>
 	
 </Project>

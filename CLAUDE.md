@@ -197,13 +197,14 @@ Validators are automatically discovered and executed when registered via `Regist
 
 1. **Tale Code Philosophy**: Code should read like prose - prioritize clarity and readability
 2. **Warnings as Errors**: `TreatWarningsAsErrors` is enabled in `Directory.Build.props`
-3. **Target Framework**: .NET 8.0
-4. **Nullable Reference Types**: Enabled across all projects
-5. **Implicit Usings**: Enabled
-6. **Testing Framework**:
+3. **Target Framework**: .NET 10.0
+4. **Solution Format**: `.slnx` (XML-based solution file format)
+5. **Nullable Reference Types**: Enabled across all projects
+6. **Implicit Usings**: Enabled
+7. **Testing Framework**:
    - Use NUnit for all tests
    - For integration tests, use WebApplicationFactory and Testcontainers
-7. **Validation Framework**: Use FluentValidation for all input validation
+8. **Validation Framework**: Use FluentValidation for all input validation
 
 ## Important Implementation Notes
 
@@ -270,40 +271,24 @@ Key entry points:
 4. **Result Implicit Conversion**: You can return domain objects directly - they'll auto-convert to `Result<T>`
 5. **Workload Restore**: Required before build - see GitHub workflow for reference
 
-## Solution Format and .NET Version
+## Technical Requirements
 
-### Current Configuration
+### SDK and Runtime
 
-- **Solution Format**: `.slnx` (XML-based solution file introduced in .NET 10)
-- **Solution Location**: Repository root (`SolTechnology.Core.slnx`)
-- **Target Framework**: .NET 10.0
-- **SDK Version**: 10.0.100+ (specified in `global.json` at repository root)
-- **IDE Requirements**: JetBrains Rider 2024.3+ for full .slnx support
+- **.NET SDK**: 10.0.100 or later (enforced by `global.json` at repository root)
+- **Target Framework**: .NET 10.0 (`net10.0`)
+- **CLI**: All standard `dotnet` commands work with `.slnx` solution files
 
-### Migration History
+### IDE Support
 
-This repository was migrated from .NET 8.0 to .NET 10.0 and from traditional `.sln` to modern `.slnx` format. Key changes:
+- **JetBrains Rider**: 2024.3+ (full `.slnx` support)
+- **Visual Studio**: 2022 17.13+ (for `.slnx` editing)
+- **VS Code**: Works with `dotnet` CLI for building/testing
 
-1. **Solution moved from** `src/SolTechnology.Core.sln` **to** `SolTechnology.Core.slnx` (at root)
-2. **All projects upgraded** from `net8.0` to `net10.0` target framework
-3. **Directory.Build.props hierarchy**: Root → src/ → projects (for shared build properties)
-4. **global.json moved** to repository root for SDK version control
-5. **Organized solution folders**: src/, tests/, docs/, sample-tale-code-apps/, .github/
+### Solution Structure
 
-### Building with .slnx
+- **Solution File**: `SolTechnology.Core.slnx` (XML-based format, located at repository root)
+- **Build Configuration**: 3-tier `Directory.Build.props` hierarchy (root → src/ → projects)
+- **Solution Folders**: src/, tests/, docs/, sample-tale-code-apps/, .github/
 
-The `.slnx` format is functionally equivalent to `.sln` but uses XML structure for better readability and VCS friendliness:
-
-```bash
-# All standard dotnet commands work with .slnx
-dotnet restore SolTechnology.Core.slnx
-dotnet build SolTechnology.Core.slnx
-dotnet test SolTechnology.Core.slnx
-dotnet pack SolTechnology.Core.slnx
-```
-
-### Requirements
-
-- **.NET SDK**: 10.0.100 or later (auto-enforced by `global.json`)
-- **IDE**: JetBrains Rider 2024.3+ or Visual Studio 2022 17.13+ for .slnx editing
-- **CLI**: .NET CLI 10.0+ fully supports .slnx format
+The `.slnx` format is functionally equivalent to traditional `.sln` but uses XML structure for better readability and version control friendliness. All standard `dotnet` CLI commands work seamlessly with `.slnx` files.

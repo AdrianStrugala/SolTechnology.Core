@@ -13,10 +13,9 @@
 </p>
 
 <p align="center">
- <a href="https://dotnet.microsoft.com/download/dotnet/10.0"><img src="https://img.shields.io/badge/.NET-10.0-512BD4?logo=dotnet"></a>
- <a href="https://www.nuget.org/packages?q=SolTechnology"><img src="https://img.shields.io/badge/Version-v0.2-blue?logo=nuget"></a>
- <a href="https://github.com/AdrianStrugala/SolTechnology.Core/actions"><img src="https://github.com/AdrianStrugala/SolTechnology.Core/actions/workflows/publishPackages.yml/badge.svg"></a>
- <a href="https://github.com/AdrianStrugala/SolTechnology.Core"><img src="https://badgen.net/badge/%E2%AD%90Stars/%E2%98%855%E2%98%85/yellow"></a>
+ <a href="https://dotnet.microsoft.com/download/dotnet/10.0"><img src="https://img.shields.io/badge/%7F-10.0-512BD4?logo=dotnet"></a>
+ <a href="https://github.com/AdrianStrugala/SolTechnology.Core/actions"><img src="https://img.shields.io/github/actions/workflow/status/AdrianStrugala/SolTechnology.Core/publishPackages.yml?branch=master&logo=github&label=build%26tests"></a> 
+ <a href="https://www.nuget.org/packages?q=SolTechnology"><img src="https://badgen.net/badge/%E2%AD%90Stars/%E2%98%855%E2%98%85/yellow"></a>
 </p>
 
 <i>
@@ -27,22 +26,6 @@
 ~Grady Booch, author of *Object-Oriented Analysis and Design with Applications*
 </p>
 </i>
-
-## Requirements
-
-- **.NET SDK**: 10.0.100 or later ([Download](https://dotnet.microsoft.com/download/dotnet/10.0))
-- **IDE**: JetBrains Rider 2024.3+ or Visual Studio 2022 17.13+ (for .slnx solution format support)
-- **Solution Format**: .slnx (XML-based solution file introduced in .NET 10)
-
-### Building the Solution
-
-```bash
-# From repository root
-dotnet restore SolTechnology.Core.slnx
-dotnet build SolTechnology.Core.slnx
-```
-
-See [CLAUDE.md](CLAUDE.md) for detailed development workflow and architecture patterns.
 
 ## Core Libraries
 
