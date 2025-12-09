@@ -1,16 +1,20 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<Version>0.2.2</Version>
-		<Description>SolTechnology Core API library</Description>
-		<PackageTags>sol technology core azure api base controller</PackageTags>
+		<Version>0.5.0</Version>
+		<Description>ASP.NET Core API utilities including exception handling middleware, response envelope filters, and integration testing fixtures. Provides a foundation for building clean, testable APIs with consistent error handling and response formatting.</Description>
+		<PackageTags>sol technology core api aspnetcore middleware filters exception-handling testing webapi rest controllers</PackageTags>
 		<Product>SolTechnology.Core.Api</Product>
 		<PackageId>SolTechnology.Core.Api</PackageId>
 		<AssemblyName>SolTechnology.Core.Api</AssemblyName>
+
 		<PackageIcon>docs\mini-logo.png</PackageIcon>
+		<PackageReadmeFile>docs\readme.md</PackageReadmeFile>
+		<RepositoryUrl>https://github.com/AdrianStrugala/SolTechnology.Core</RepositoryUrl>
 	</PropertyGroup>
 	<ItemGroup>
 		<None Include="..\..\docs\mini-logo.png" Pack="true" Visible="false" PackagePath="docs\mini-logo.png" />
+		<None Include="..\..\docs\Api.md" Pack="true" Visible="false" PackagePath="docs\readme.md" />
 	</ItemGroup>
 	
 	<ItemGroup>

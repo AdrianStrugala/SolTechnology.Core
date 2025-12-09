@@ -1,17 +1,16 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<Version>0.2.0</Version>
-		<Description>SolTechnology Core Azure blob storage library</Description>
-		<PackageTags>sol technology core azure blob storage</PackageTags>
+		<Version>0.5.0</Version>
+		<Description>Azure Blob Storage wrapper with Avro serialization support. Simplifies blob operations with strongly-typed models, automatic serialization/deserialization, and streamlined configuration for cloud-native applications.</Description>
+		<PackageTags>sol technology core azure blob storage cloud avro serialization nosql dotnet file-storage</PackageTags>
 		<Product>SolTechnology.Core.BlobStorage</Product>
 		<PackageId>SolTechnology.Core.BlobStorage</PackageId>
 		<AssemblyName>SolTechnology.Core.BlobStorage</AssemblyName>
-		<RepositoryUrl>https://github.com/AdrianStrugala/SolTechnology.Core</RepositoryUrl>
-		
 
 		<PackageIcon>docs\mini-logo.png</PackageIcon>
 		<PackageReadmeFile>docs\readme.md</PackageReadmeFile>
+		<RepositoryUrl>https://github.com/AdrianStrugala/SolTechnology.Core</RepositoryUrl>
 	</PropertyGroup>
 	<ItemGroup>
 		<None Include="..\..\docs\mini-logo.png" Pack="true" Visible="false" PackagePath="docs\mini-logo.png" />

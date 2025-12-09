@@ -1,16 +1,17 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<Version>0.2.0</Version>
+		<Version>0.5.0</Version>
 		<TreatWarningsAsErrors>false</TreatWarningsAsErrors>
-		<Description>SolTechnology Core Azure scheduler library</Description>
-		<PackageTags>sol technology core azure background jobs cronos scheduler</PackageTags>
+		<Description>Cron-based task scheduler using Cronos for .NET applications. Enables background job scheduling with flexible cron expressions, configurable execution intervals, and integration with hosted services for automated recurring tasks.</Description>
+		<PackageTags>sol technology core scheduler cron cronos background-jobs task-scheduling recurring-tasks dotnet automation timer</PackageTags>
 		<Product>SolTechnology.Core.Scheduler</Product>
 		<PackageId>SolTechnology.Core.Scheduler</PackageId>
 		<AssemblyName>SolTechnology.Core.Scheduler</AssemblyName>
 
 		<PackageIcon>docs\mini-logo.png</PackageIcon>
 		<PackageReadmeFile>docs\readme.md</PackageReadmeFile>
+		<RepositoryUrl>https://github.com/AdrianStrugala/SolTechnology.Core</RepositoryUrl>
 	</PropertyGroup>
 	<ItemGroup>
 		<None Include="..\..\docs\mini-logo.png" Pack="true" Visible="false" PackagePath="docs\mini-logo.png" />

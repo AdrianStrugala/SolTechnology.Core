@@ -1,17 +1,18 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<Version>0.3.0</Version>
+		<Version>0.5.0</Version>
 		<TreatWarningsAsErrors>false</TreatWarningsAsErrors>
-		
-		<Description>SolTechnology Core Message Bus library</Description>
-		<PackageTags>sol technology core azure service message bus</PackageTags>
+
+		<Description>Azure Service Bus wrapper for building event-driven architectures with message queues and topics. Supports publish/subscribe patterns, automatic queue management, background message processing, and reliable asynchronous communication between services.</Description>
+		<PackageTags>sol technology core azure servicebus messaging queue topic pubsub async event-driven microservices dotnet cloud</PackageTags>
 		<Product>SolTechnology.Core.MessageBus</Product>
 		<PackageId>SolTechnology.Core.MessageBus</PackageId>
 		<AssemblyName>SolTechnology.Core.MessageBus</AssemblyName>
 
 		<PackageIcon>docs\mini-logo.png</PackageIcon>
 		<PackageReadmeFile>docs\readme.md</PackageReadmeFile>
+		<RepositoryUrl>https://github.com/AdrianStrugala/SolTechnology.Core</RepositoryUrl>
 	</PropertyGroup>
 
 	<ItemGroup>

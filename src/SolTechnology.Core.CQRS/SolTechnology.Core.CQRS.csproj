@@ -1,17 +1,20 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-	  <Version>0.2.4</Version>
-	  <Description>SolTechnology Core CQRS library</Description>
-	  <PackageTags>sol technology cqrs command query chain</PackageTags>
+	  <Version>0.5.0</Version>
+	  <Description>Complete CQRS implementation built on MediatR with Result pattern, SuperChain for complex workflows, automatic FluentValidation, and logging pipeline behaviors. Enforces clean separation between reads and writes with explicit success/failure handling.</Description>
+	  <PackageTags>sol technology cqrs mediatr command query result-pattern chain fluentvalidation architecture clean-code dotnet design-patterns</PackageTags>
 	  <Product>SolTechnology.Core.CQRS</Product>
 	  <PackageId>SolTechnology.Core.CQRS</PackageId>
 	  <AssemblyName>SolTechnology.Core.CQRS</AssemblyName>
 
 	  <PackageIcon>docs\mini-logo.png</PackageIcon>
+	  <PackageReadmeFile>docs\readme.md</PackageReadmeFile>
+	  <RepositoryUrl>https://github.com/AdrianStrugala/SolTechnology.Core</RepositoryUrl>
   </PropertyGroup>
 	<ItemGroup>
 		<None Include="..\..\docs\mini-logo.png" Pack="true" Visible="false" PackagePath="docs\mini-logo.png" />
+		<None Include="..\..\docs\CQRS.md" Pack="true" Visible="false" PackagePath="docs\readme.md" />
 	</ItemGroup>
 
 	<ItemGroup>

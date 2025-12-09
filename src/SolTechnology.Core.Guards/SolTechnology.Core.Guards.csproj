@@ -1,15 +1,16 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<Version>0.3.0</Version>
-		<Description>SolTechnology Core Azure guards library</Description>
-		<PackageTags>sol technology core azure guards</PackageTags>
+		<Version>0.5.0</Version>
+		<Description>Fluent API for code contract validation supporting multiple data types (int, long, double, decimal, float, string, object). Provides chainable guards with readable syntax for enforcing preconditions and business rules with clear error messages.</Description>
+		<PackageTags>sol technology core guards validation contracts fluent-api preconditions defensive-programming dotnet code-quality</PackageTags>
 		<Product>SolTechnology.Core.Guards</Product>
 		<PackageId>SolTechnology.Core.Guards</PackageId>
 		<AssemblyName>SolTechnology.Core.Guards</AssemblyName>
 
 		<PackageIcon>docs\mini-logo.png</PackageIcon>
 		<PackageReadmeFile>docs\readme.md</PackageReadmeFile>
+		<RepositoryUrl>https://github.com/AdrianStrugala/SolTechnology.Core</RepositoryUrl>
 	</PropertyGroup>
 	<ItemGroup>
 		<None Include="..\..\docs\mini-logo.png" Pack="true" Visible="false" PackagePath="docs\mini-logo.png" />

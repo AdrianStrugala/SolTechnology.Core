@@ -1,9 +1,22 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
+        <Version>0.5.0</Version>
+        <Description>Workflow and chain framework with pausable flows that can be resumed after user interaction. Features state persistence (SQLite/in-memory), interactive and automated steps, and support for complex multi-step business processes with human-in-the-loop scenarios.</Description>
+        <PackageTags>sol technology core workflow flow chain pausable state-machine saga orchestration sqlite async dotnet business-process</PackageTags>
+        <Product>SolTechnology.Core.Flow</Product>
+        <PackageId>SolTechnology.Core.Flow</PackageId>
         <AssemblyName>SolTechnology.Core.Flow</AssemblyName>
         <RootNamespace>SolTechnology.Core.Flow</RootNamespace>
+
+        <PackageIcon>docs\mini-logo.png</PackageIcon>
+        <PackageReadmeFile>docs\readme.md</PackageReadmeFile>
+        <RepositoryUrl>https://github.com/AdrianStrugala/SolTechnology.Core</RepositoryUrl>
     </PropertyGroup>
+    <ItemGroup>
+        <None Include="..\..\docs\mini-logo.png" Pack="true" Visible="false" PackagePath="docs\mini-logo.png" />
+        <None Include="..\..\docs\Flow.md" Pack="true" Visible="false" PackagePath="docs\readme.md" />
+    </ItemGroup>
 
     <ItemGroup>
       <PackageReference Include="Microsoft.AspNetCore.Mvc.Core" Version="2.2.5" />
