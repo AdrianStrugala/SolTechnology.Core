@@ -13,6 +13,7 @@
 
 	<ItemGroup>
 		<PackageReference Include="MicroElements.Swashbuckle.FluentValidation" Version="6.1.0" />
+		<PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="10.0.0" />
 		<PackageReference Include="Swashbuckle.AspNetCore" Version="7.1.0" />
 	</ItemGroup>
 

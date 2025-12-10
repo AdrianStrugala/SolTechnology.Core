@@ -18,7 +18,9 @@
       "Bash(./.github/runTests.ps1)",
       "Bash(git rm:*)",
       "Bash(pwsh:*)",
-      "Bash(git add:*)"
+      "Bash(git add:*)",
+      "Bash(winget search:*)",
+      "Bash(dotnet add:*)"
     ],
     "deny": [],
     "ask": []
