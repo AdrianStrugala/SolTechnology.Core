@@ -1,15 +1,16 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<Version>0.2.2</Version>
-		<Description>SolTechnology Core Azure logging library</Description>
-		<PackageTags>sol technology core azure logging logs log</PackageTags>
+		<Version>0.5.0</Version>
+		<Description>Structured logging abstractions with HTTP context enrichment for ASP.NET Core applications. Provides consistent logging patterns, correlation IDs, and request/response tracing for better observability in distributed systems.</Description>
+		<PackageTags>sol technology core logging aspnetcore structured-logging tracing diagnostics observability correlation-id dotnet monitoring</PackageTags>
 		<Product>SolTechnology.Core.Logging</Product>
 		<PackageId>SolTechnology.Core.Logging</PackageId>
 		<AssemblyName>SolTechnology.Core.Logging</AssemblyName>
 
 		<PackageIcon>docs\mini-logo.png</PackageIcon>
 		<PackageReadmeFile>docs\readme.md</PackageReadmeFile>
+		<RepositoryUrl>https://github.com/AdrianStrugala/SolTechnology.Core</RepositoryUrl>
 	</PropertyGroup>
 	<ItemGroup>
 		<None Include="..\..\docs\mini-logo.png" Pack="true" Visible="false" PackagePath="docs\mini-logo.png" />

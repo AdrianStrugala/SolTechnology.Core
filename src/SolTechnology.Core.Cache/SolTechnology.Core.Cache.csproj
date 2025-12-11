@@ -1,15 +1,16 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<Version>0.2.1</Version>
-		<Description>SolTechnology Core Cache library</Description>
-		<PackageTags>sol technology core cache memory lazy task</PackageTags>
+		<Version>0.5.0</Version>
+		<Description>In-memory caching abstraction with lazy task caching support for async operations. Features configurable expiration modes (sliding/absolute), thread-safe operations, and optimized for caching expensive computations and external API calls.</Description>
+		<PackageTags>sol technology core cache memory performance lazy-loading async task caching dotnet optimization</PackageTags>
 		<Product>SolTechnology.Core.Cache</Product>
 		<PackageId>SolTechnology.Core.Cache</PackageId>
 		<AssemblyName>SolTechnology.Core.Cache</AssemblyName>
 
 		<PackageIcon>docs\mini-logo.png</PackageIcon>
 		<PackageReadmeFile>docs\readme.md</PackageReadmeFile>
+		<RepositoryUrl>https://github.com/AdrianStrugala/SolTechnology.Core</RepositoryUrl>
 	</PropertyGroup>
 	<ItemGroup>
 		<None Include="..\..\docs\mini-logo.png" Pack="true" Visible="false" PackagePath="docs\mini-logo.png" />

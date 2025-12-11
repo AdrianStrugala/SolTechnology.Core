@@ -54,9 +54,8 @@ Located in `sample-tale-code-apps/DreamTravel/backend/src/`, organized by layers
 
 ```bash
 # From repository root
-cd src
-dotnet restore SolTechnology.Core.sln
-dotnet build SolTechnology.Core.sln
+dotnet restore SolTechnology.Core.slnx
+dotnet build SolTechnology.Core.slnx
 ```
 
 ### Testing
@@ -87,8 +86,7 @@ dotnet pack -c Release -o . ./src/SolTechnology.Core.CQRS/SolTechnology.Core.CQR
 
 1. **Build the solution** to catch compilation errors early:
    ```bash
-   cd src
-   dotnet build SolTechnology.Core.sln
+   dotnet build SolTechnology.Core.slnx
    ```
 
 2. **For DreamTravel changes**, build the sample app:
@@ -199,13 +197,14 @@ Validators are automatically discovered and executed when registered via `Regist
 
 1. **Tale Code Philosophy**: Code should read like prose - prioritize clarity and readability
 2. **Warnings as Errors**: `TreatWarningsAsErrors` is enabled in `Directory.Build.props`
-3. **Target Framework**: .NET 8.0
-4. **Nullable Reference Types**: Enabled across all projects
-5. **Implicit Usings**: Enabled
-6. **Testing Framework**:
+3. **Target Framework**: .NET 10.0
+4. **Solution Format**: `.slnx` (XML-based solution file format)
+5. **Nullable Reference Types**: Enabled across all projects
+6. **Implicit Usings**: Enabled
+7. **Testing Framework**:
    - Use NUnit for all tests
    - For integration tests, use WebApplicationFactory and Testcontainers
-7. **Validation Framework**: Use FluentValidation for all input validation
+8. **Validation Framework**: Use FluentValidation for all input validation
 
 ## Important Implementation Notes
 
@@ -239,16 +238,121 @@ Both are registered automatically when using `RegisterCommands()` or `RegisterQu
 - Exceptions are caught in chain steps and converted to `Error`
 - Use `AggregateError` for multiple errors in chain operations
 
-## CI/CD
+## CI/CD Pipelines
 
-GitHub Actions workflow: `.github/workflows/publishPackages.yml`
+This repository uses both GitHub Actions and Azure DevOps for CI/CD.
 
-Triggers on push/PR to master:
-1. Restore workload and dependencies
-2. Build solution
-3. Run all tests via PowerShell script
-4. Pack each library
-5. Publish to NuGet (on master branch only)
+### GitHub Actions (Core Libraries)
+
+**Location**: `.github/workflows/publishPackages.yml`
+
+**Scope**: Core NuGet packages (`src/SolTechnology.Core.*`)
+
+**Triggers**: Push/PR to `master` branch
+
+**Steps**:
+1. Setup .NET 10.0.x SDK
+2. Restore workload: `dotnet workload restore SolTechnology.Core.slnx`
+3. Restore dependencies: `dotnet restore SolTechnology.Core.slnx`
+4. Build: `dotnet build SolTechnology.Core.slnx --no-restore`
+5. Test: Run `.github/runTests.ps1` (tests all projects in `tests/` directory)
+6. Pack all core libraries (SolTechnology.Core.*)
+7. Publish to NuGet.org (master branch only, requires `NUGET_API_KEY` secret)
+
+**Test Script**: `.github/runTests.ps1`
+```powershell
+ForEach ($folder in (Get-ChildItem -Path tests -Directory)) {
+    dotnet test --no-build $folder.FullName
+}
+```
+Tests covered:
+- `tests/SolTechnology.Core.AUID.Tests`
+- `tests/SolTechnology.Core.ApiClient.Tests`
+- `tests/SolTechnology.Core.Guards.Tests`
+- `tests/SolTechnology.Core.Sql.Tests`
+
+### Azure DevOps (DreamTravel Sample)
+
+**Location**: `sample-tale-code-apps/DreamTravel/devOps/pipelines/`
+
+#### 1. Build & Test Pipeline
+**File**: `build&test.yml`
+
+**Scope**: DreamTravel sample application
+
+**Triggers**: Push to `master` branch
+
+**Stages**:
+
+**Stage 1: Test**
+- Setup .NET 10.0.x SDK
+- Start SQL Server container (Docker)
+- Deploy database locally using DreamTravelDatabase project
+- Run unit tests: `tests/**/*UnitTests.csproj`
+- Run integration tests: `tests/**/*IntegrationTests.csproj`
+- Run component tests: `tests/**/*Component.Tests.csproj`
+
+Tests covered:
+- `DreamTravel.Trips.Commands.UnitTests`
+- `DreamTravel.Trips.Queries.UnitTests`
+- `DreamTravel.Trips.TravelingSalesmanProblem.UnitTests`
+- `DreamTravel.Trips.GeolocationDataClients.IntegrationTests`
+- `DreamTravel.Component.Tests`
+
+**Stage 2: BuildAndPublish** (only on non-PR builds)
+- Publish infrastructure templates
+- Publish Database project
+- Publish DreamTravel.Api
+- Publish DreamTravel.Worker
+- Upload artifacts
+
+**Variables required**:
+- Variable group: `dream-travel-test` (for Test stage)
+
+#### 2. E2E Tests Pipeline
+**File**: `e2etests.yml`
+
+**Scope**: End-to-end tests for DreamTravel
+
+**Triggers**: Manual or called from other pipelines
+
+**Steps**:
+- Setup .NET 10.0.x SDK
+- Run E2E tests: `tests/**/*E2E.Tests.csproj`
+
+Tests covered:
+- `DreamTravel.E2E.Tests`
+
+**Note**: E2E pipeline is separate and can be triggered independently or as part of a larger workflow.
+
+#### 3. Deploy Pipeline
+**File**: `deploy.yml`
+
+**Scope**: Azure deployment for DreamTravel
+
+#### 4. Trigger External Pipeline
+**File**: `triggerExternalPipeline.yml`
+
+**Scope**: Template for triggering and monitoring external pipelines
+
+### Important Notes
+
+1. **SDK Version Consistency**: All pipelines must use .NET 10.0.x to match the `TargetFramework` in `Directory.Build.props`
+
+2. **Test Separation**:
+   - GitHub Actions: Tests core libraries only (`tests/` directory at root)
+   - Azure DevOps: Tests DreamTravel sample app (`sample-tale-code-apps/DreamTravel/backend/tests/`)
+
+3. **When Updating SDK Version**: Update in ALL pipeline files:
+   - `.github/workflows/publishPackages.yml` (line 19)
+   - `sample-tale-code-apps/DreamTravel/devOps/pipelines/build&test.yml` (lines 33, 109)
+   - `sample-tale-code-apps/DreamTravel/devOps/pipelines/e2etests.yml` (line 16)
+
+4. **Docker Requirements**: Build & Test pipeline requires Docker for SQL Server container
+
+5. **Secrets Required**:
+   - GitHub: `NUGET_API_KEY` for publishing packages
+   - Azure DevOps: `dream-travel-test` variable group with connection strings and API keys
 
 ## Working with DreamTravel Sample
 
@@ -271,3 +375,25 @@ Key entry points:
 3. **Chain Steps**: Must be registered with `RegisterChain()` before use
 4. **Result Implicit Conversion**: You can return domain objects directly - they'll auto-convert to `Result<T>`
 5. **Workload Restore**: Required before build - see GitHub workflow for reference
+
+## Technical Requirements
+
+### SDK and Runtime
+
+- **.NET SDK**: 10.0.100 or later (enforced by `global.json` at repository root)
+- **Target Framework**: .NET 10.0 (`net10.0`)
+- **CLI**: All standard `dotnet` commands work with `.slnx` solution files
+
+### IDE Support
+
+- **JetBrains Rider**: 2024.3+ (full `.slnx` support)
+- **Visual Studio**: 2022 17.13+ (for `.slnx` editing)
+- **VS Code**: Works with `dotnet` CLI for building/testing
+
+### Solution Structure
+
+- **Solution File**: `SolTechnology.Core.slnx` (XML-based format, located at repository root)
+- **Build Configuration**: 3-tier `Directory.Build.props` hierarchy (root → src/ → projects)
+- **Solution Folders**: src/, tests/, docs/, sample-tale-code-apps/, .github/
+
+The `.slnx` format is functionally equivalent to traditional `.sln` but uses XML structure for better readability and version control friendliness. All standard `dotnet` CLI commands work seamlessly with `.slnx` files.

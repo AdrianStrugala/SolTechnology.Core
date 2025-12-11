@@ -8,7 +8,19 @@
       "Bash(dotnet restore:*)",
       "Bash(dotnet test:*)",
       "Bash(find:*)",
-      "Bash(dotnet:*)"
+      "Bash(dotnet:*)",
+      "WebSearch",
+      "Bash(winget install:*)",
+      "Bash(echo:*)",
+      "Bash(Select-String -Pattern \"Build succeeded|Build FAILED\" -Context 0,5)",
+      "Bash(git checkout:*)",
+      "Bash(copy:*)",
+      "Bash(./.github/runTests.ps1)",
+      "Bash(git rm:*)",
+      "Bash(pwsh:*)",
+      "Bash(git add:*)",
+      "Bash(winget search:*)",
+      "Bash(dotnet add:*)"
     ],
     "deny": [],
     "ask": []

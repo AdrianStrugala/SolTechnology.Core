@@ -1,23 +1,25 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-	  <Version>0.2.0</Version>
-	  <Description>SolTechnology Core Authentication library</Description>
-	  <PackageTags>sol technology core azure api authentication</PackageTags>
+	  <Version>0.5.0</Version>
+	  <Description>Lightweight ASP.NET Core authentication library with API key and basic authentication support. Provides simple, configurable filters for securing APIs without the complexity of full OAuth/OIDC implementations.</Description>
+	  <PackageTags>sol technology core authentication apikey security aspnetcore middleware authorization filters basic-auth</PackageTags>
 	  <Product>SolTechnology.Core.Authentication</Product>
 	  <PackageId>SolTechnology.Core.Authentication</PackageId>
 	  <AssemblyName>SolTechnology.Core.Authentication</AssemblyName>
+
 	  <PackageIcon>docs\mini-logo.png</PackageIcon>
 	  <PackageReadmeFile>docs\readme.md</PackageReadmeFile>
+	  <RepositoryUrl>https://github.com/AdrianStrugala/SolTechnology.Core</RepositoryUrl>
+	  <!-- NU1510: Packages from Directory.Build.props are already included in FrameworkReference -->
+	  <NoWarn>$(NoWarn);NU1510</NoWarn>
   </PropertyGroup>
 	<ItemGroup>
 		<None Include="..\..\docs\mini-logo.png" Pack="true" Visible="false" PackagePath="docs\mini-logo.png" />
 		<None Include="..\..\docs\Auth.md" Pack="true" Visible="false" PackagePath="docs\readme.md" />
 	</ItemGroup>
 	<ItemGroup>
-	  <PackageReference Include="Microsoft.AspNetCore.Authentication" Version="2.2.0" />
-      <PackageReference Include="Microsoft.AspNetCore.App" Version="2.2.8" />
-	  <PackageReference Include="Microsoft.AspNetCore.Metadata" Version="8.0.13" />
+	  <FrameworkReference Include="Microsoft.AspNetCore.App" />
 	</ItemGroup>
 	
 </Project>

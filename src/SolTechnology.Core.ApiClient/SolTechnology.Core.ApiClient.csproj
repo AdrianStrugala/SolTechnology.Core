@@ -1,14 +1,16 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<Version>0.4.0</Version>
-		<Description>SolTechnology Core API client library</Description>
-		<PackageTags>sol technology core azure api client</PackageTags>
+		<Version>0.5.0</Version>
+		<Description>Resilient HTTP client wrapper with built-in Polly retry policies, exponential backoff, circuit breaker patterns, and Avro serialization support. Simplifies external API integration with production-ready resilience patterns.</Description>
+		<PackageTags>sol technology core httpclient rest api polly retry resilience circuit-breaker avro http dotnet</PackageTags>
 		<Product>SolTechnology.Core.ApiClient</Product>
 		<PackageId>SolTechnology.Core.ApiClient</PackageId>
 		<AssemblyName>SolTechnology.Core.ApiClient</AssemblyName>
+
 		<PackageIcon>docs\mini-logo.png</PackageIcon>
 		<PackageReadmeFile>docs\readme.md</PackageReadmeFile>
+		<RepositoryUrl>https://github.com/AdrianStrugala/SolTechnology.Core</RepositoryUrl>
 	</PropertyGroup>
 	<ItemGroup>
 		<None Include="..\..\docs\mini-logo.png" Pack="true" Visible="false" PackagePath="docs\mini-logo.png" />

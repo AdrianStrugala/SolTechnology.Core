@@ -23,11 +23,16 @@ public class ResponseEnvelopeFilter : IResultFilter
                 return;
             }
 
-            context.Result = new ObjectResult(new Result<object?>
-            {
-                Data = resultValue,
-                IsSuccess = true
-            })
+            var statusCode = objectResult.StatusCode ?? 200;
+            var isSuccess = statusCode >= 200 && statusCode < 400;
+
+            context.Result = new ObjectResult(isSuccess
+                ? new Result<object?>
+                {
+                    Data = resultValue,
+                    IsSuccess = true
+                }
+                : Result<object?>.Fail(resultValue?.ToString() ?? "An error occurred"))
             {
                 StatusCode = objectResult.StatusCode
             };

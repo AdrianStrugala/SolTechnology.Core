@@ -1,0 +1,96 @@
+<Solution>
+  <Folder Name="/Docs/">
+    <File Path="docs/AUID.md" />
+    <File Path="docs/Auth.md" />
+    <File Path="docs/Blob.md" />
+    <File Path="docs/Bus.md" />
+    <File Path="docs/Cache.md" />
+    <File Path="docs/Clients.md" />
+    <File Path="docs/Cron.md" />
+    <File Path="docs/Guards.md" />
+    <File Path="docs/Log.md" />
+    <File Path="docs/Sql.md" />
+    <File Path="docs/theAutomation.md" />
+    <File Path="docs/theDesign.md" />
+    <File Path="docs/theQuality.md" />
+  </Folder>
+  <Folder Name="/SampleApps/" />
+  <Folder Name="/SampleApps/DreamTravel/">
+    <File Path="sample-tale-code-apps/DreamTravel/README.md" />
+    <File Path="sample-tale-code-apps/DreamTravel/backend/Directory.Build.props" />
+    <Project Path="sample-tale-code-apps/DreamTravel/backend/src/DreamTravel.Aspire/DreamTravel.Aspire.csproj" />
+    <Project Path="sample-tale-code-apps/DreamTravel/backend/src/DreamTravel.Trips.Domain/DreamTravel.Trips.Domain.csproj" />
+  </Folder>
+  <Folder Name="/SampleApps/DreamTravel/DataLayer/">
+    <Project Path="sample-tale-code-apps/DreamTravel/backend/src/DataLayer/DreamTravel.GraphDatabase/DreamTravel.GraphDatabase.csproj" />
+    <Project Path="sample-tale-code-apps/DreamTravel/backend/src/DataLayer/DreamTravel.Trips.GeolocationDataClients/DreamTravel.Trips.GeolocationDataClients.csproj" />
+    <Project Path="sample-tale-code-apps/DreamTravel/backend/src/DataLayer/DreamTravel.Trips.Sql/DreamTravel.Trips.Sql.csproj" />
+  </Folder>
+  <Folder Name="/SampleApps/DreamTravel/Infrastructure/">
+    <File Path="sample-tale-code-apps/DreamTravel/devOps/pipelines/build&amp;test.yml" />
+    <Project Path="sample-tale-code-apps/DreamTravel/backend/src/Infrastructure/DreamTravel.Infrastructure/DreamTravel.Infrastructure.csproj" />
+    <Project Path="sample-tale-code-apps/DreamTravel/backend/src/Infrastructure/DreamTravelDatabase/DreamTravelDatabase.csproj" />
+  </Folder>
+  <Folder Name="/SampleApps/DreamTravel/Infrastructure/pipelines/">
+    <File Path="sample-tale-code-apps/DreamTravel/devOps/pipelines/deploy.yml" />
+    <File Path="sample-tale-code-apps/DreamTravel/devOps/pipelines/e2etests.yml" />
+  </Folder>
+  <Folder Name="/SampleApps/DreamTravel/LogicLayer/">
+    <Project Path="sample-tale-code-apps/DreamTravel/backend/src/LogicLayer/DreamTravel.DomainServices/DreamTravel.DomainServices.csproj" />
+    <Project Path="sample-tale-code-apps/DreamTravel/backend/src/LogicLayer/DreamTravel.Flows/DreamTravel.Flows.csproj" />
+    <Project Path="sample-tale-code-apps/DreamTravel/backend/src/LogicLayer/DreamTravel.Trips.Commands/DreamTravel.Trips.Commands.csproj" />
+    <Project Path="sample-tale-code-apps/DreamTravel/backend/src/LogicLayer/DreamTravel.Trips.Queries/DreamTravel.Trips.Queries.csproj" />
+    <Project Path="sample-tale-code-apps/DreamTravel/backend/src/LogicLayer/DreamTravel.Trips.TravelingSalesmanProblem/DreamTravel.Trips.TravelingSalesmanProblem.csproj" />
+  </Folder>
+  <Folder Name="/SampleApps/DreamTravel/Presentation/">
+    <Project Path="sample-tale-code-apps/DreamTravel/backend/src/Presentation/DreamTravel.Api/DreamTravel.Api.csproj" />
+    <Project Path="sample-tale-code-apps/DreamTravel/backend/src/Presentation/DreamTravel.ServiceDefaults/DreamTravel.ServiceDefaults.csproj" />
+    <Project Path="sample-tale-code-apps/DreamTravel/backend/src/Presentation/DreamTravel.Ui/DreamTravel.Ui.csproj" />
+    <Project Path="sample-tale-code-apps/DreamTravel/backend/src/Presentation/DreamTravel.Worker/DreamTravel.Worker.csproj" />
+  </Folder>
+  <Folder Name="/SampleApps/DreamTravel/zTests/">
+    <Project Path="sample-tale-code-apps/DreamTravel/backend/tests/Component/DreamTravel.Component.Tests.csproj" />
+    <Project Path="sample-tale-code-apps/DreamTravel/backend/tests/EndToEnd/DreamTravel.E2E.Tests.csproj" />
+  </Folder>
+  <Folder Name="/SampleApps/DreamTravel/zTests/Unit/">
+    <Project Path="sample-tale-code-apps/DreamTravel/backend/tests/Unit/DreamTravel.Trips.Commands.UnitTests/DreamTravel.Trips.Commands.UnitTests.csproj" />
+    <Project Path="sample-tale-code-apps/DreamTravel/backend/tests/Unit/DreamTravel.Trips.Queries.UnitTests/DreamTravel.Trips.Queries.UnitTests.csproj" />
+    <Project Path="sample-tale-code-apps/DreamTravel/backend/tests/Unit/DreamTravels.Trips.GeolocationData.IntegrationTests/DreamTravel.Trips.GeolocationDataClients.IntegrationTests.csproj" />
+    <Project Path="sample-tale-code-apps/DreamTravel/backend/tests/Unit/DreamTravels.Trips.TravelingSalesmanProblem.UnitTests/DreamTravel.Trips.TravelingSalesmanProblem.UnitTests.csproj" />
+  </Folder>
+  <Folder Name="/Solution Items/">
+    <File Path="README.md" />
+    <File Path="CLAUDE.md" />
+    <File Path="global.json" />
+    <File Path=".gitignore" />
+  </Folder>
+  <Folder Name="/.github/">
+    <File Path=".github/runTests.ps1" />
+    <Folder Name="/workflows/">
+      <File Path=".github/workflows/publishPackages.yml" />
+    </Folder>
+  </Folder>
+  <Folder Name="/Tests/">
+    <Project Path="tests/SolTechnology.Core.ApiClient.Tests/SolTechnology.Core.ApiClient.Tests.csproj" />
+    <Project Path="tests/SolTechnology.Core.AUID.Tests/SolTechnology.Core.AUID.Tests.csproj" />
+    <Project Path="tests/SolTechnology.Core.Guards.Tests/SolTechnology.Core.Guards.Tests.csproj" />
+    <Project Path="tests/SolTechnology.Core.Sql.Tests/SolTechnology.Core.Sql.Tests.csproj" />
+  </Folder>
+  <Folder Name="/src/">
+    <File Path="src/Directory.Build.props" />
+    <Project Path="src/SolTechnology.Core.Api/SolTechnology.Core.Api.csproj" />
+    <Project Path="src/SolTechnology.Core.ApiClient/SolTechnology.Core.ApiClient.csproj" />
+    <Project Path="src/SolTechnology.Core.AUID/SolTechnology.Core.AUID.csproj" />
+    <Project Path="src/SolTechnology.Core.Authentication/SolTechnology.Core.Authentication.csproj" />
+    <Project Path="src/SolTechnology.Core.BlobStorage/SolTechnology.Core.BlobStorage.csproj" />
+    <Project Path="src/SolTechnology.Core.Cache/SolTechnology.Core.Cache.csproj" />
+    <Project Path="src/SolTechnology.Core.CQRS/SolTechnology.Core.CQRS.csproj" />
+    <Project Path="src/SolTechnology.Core.Faker/SolTechnology.Core.Faker.csproj" />
+    <Project Path="src/SolTechnology.Core.Flow/SolTechnology.Core.Flow.csproj" />
+    <Project Path="src/SolTechnology.Core.Guards/SolTechnology.Core.Guards.csproj" />
+    <Project Path="src/SolTechnology.Core.Logging/SolTechnology.Core.Logging.csproj" />
+    <Project Path="src/SolTechnology.Core.MessageBus/SolTechnology.Core.MessageBus.csproj" />
+    <Project Path="src/SolTechnology.Core.Scheduler/SolTechnology.Core.Scheduler.csproj" />
+    <Project Path="src/SolTechnology.Core.Sql/SolTechnology.Core.Sql.csproj" />
+  </Folder>
+</Solution>

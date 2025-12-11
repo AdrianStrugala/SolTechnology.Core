@@ -1,16 +1,17 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<Version>0.2.1</Version>
+		<Version>0.5.0</Version>
 		<TreatWarningsAsErrors>false</TreatWarningsAsErrors>
-		<Description>SolTechnology Core Sql library</Description>
-		<PackageTags>sol technology core sql</PackageTags>
+		<Description>SQL Server database access layer with Dapper, Entity Framework support, Testcontainers integration for testing, and Polly resilience policies. Includes DacFx for database deployment and schema management in CI/CD pipelines.</Description>
+		<PackageTags>sol technology core sql database dapper entity-framework testcontainers polly resilience dacpac sqlserver dotnet orm testing</PackageTags>
 		<Product>SolTechnology.Core.Sql</Product>
 		<PackageId>SolTechnology.Core.Sql</PackageId>
 		<AssemblyName>SolTechnology.Core.Sql</AssemblyName>
 
 		<PackageIcon>docs\mini-logo.png</PackageIcon>
 		<PackageReadmeFile>docs\readme.md</PackageReadmeFile>
+		<RepositoryUrl>https://github.com/AdrianStrugala/SolTechnology.Core</RepositoryUrl>
 	</PropertyGroup>
 
 	<ItemGroup>

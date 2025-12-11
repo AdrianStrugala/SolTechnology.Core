@@ -1,12 +1,12 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-	  <OutputType>Exe</OutputType>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="WireMock.Net" Version="1.6.8" />
     <PackageReference Include="WireMock.Net.StandAlone" Version="1.6.8" />
+    <PackageReference Include="System.Linq.Dynamic.Core" Version="1.6.0" />
   </ItemGroup>
 
 </Project>
