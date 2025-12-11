@@ -11,9 +11,6 @@ paths:
         - CalculateBestPath
       requestBody:
         content:
-          application/json-patch+json:
-            schema:
-              $ref: '#/components/schemas/CalculateBestPathQuery'
           application/json:
             schema:
               $ref: '#/components/schemas/CalculateBestPathQuery'
@@ -36,9 +33,6 @@ paths:
         - CalculateBestPath
       requestBody:
         content:
-          application/json-patch+json:
-            schema:
-              $ref: '#/components/schemas/CalculateBestPathQuery'
           application/json:
             schema:
               $ref: '#/components/schemas/CalculateBestPathQuery'
@@ -69,9 +63,6 @@ paths:
         - FindCityByCoordinates
       requestBody:
         content:
-          application/json-patch+json:
-            schema:
-              $ref: '#/components/schemas/FindCityByCoordinatesQuery'
           application/json:
             schema:
               $ref: '#/components/schemas/FindCityByCoordinatesQuery'
@@ -100,9 +91,6 @@ paths:
         - FindCityByName
       requestBody:
         content:
-          application/json-patch+json:
-            schema:
-              $ref: '#/components/schemas/FindCityByNameQuery'
           application/json:
             schema:
               $ref: '#/components/schemas/FindCityByNameQuery'
@@ -131,9 +119,6 @@ paths:
         - FindLocationOfCity
       requestBody:
         content:
-          application/json-patch+json:
-            schema:
-              $ref: '#/components/schemas/FindCityByNameQuery'
           application/json:
             schema:
               $ref: '#/components/schemas/FindCityByNameQuery'
@@ -164,9 +149,6 @@ paths:
         - FindNameOfCity
       requestBody:
         content:
-          application/json-patch+json:
-            schema:
-              $ref: '#/components/schemas/FindCityByCoordinatesQuery'
           application/json:
             schema:
               $ref: '#/components/schemas/FindCityByCoordinatesQuery'
@@ -203,8 +185,6 @@ paths:
             type: string
       requestBody:
         content:
-          application/json-patch+json:
-            schema: { }
           application/json:
             schema: { }
           text/json:
@@ -230,8 +210,6 @@ paths:
             type: string
       requestBody:
         content:
-          application/json-patch+json:
-            schema: { }
           application/json:
             schema: { }
           text/json:
@@ -372,9 +350,6 @@ paths:
         - Traffic
       requestBody:
         content:
-          application/json-patch+json:
-            schema:
-              $ref: '#/components/schemas/RecalculateTrafficCommand'
           application/json:
             schema:
               $ref: '#/components/schemas/RecalculateTrafficCommand'

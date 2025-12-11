@@ -85,11 +85,7 @@ public class Program
         var authenticationConfiguration = builder.Configuration.GetRequiredSection("Authentication").Get<AuthenticationConfiguration>()!;
         var authFilter = builder.Services.AddAuthenticationAndBuildFilter(authenticationConfiguration);
 
-        // Workaround for .NET 10 PipeWriter.UnflushedBytes bug
-        // https://github.com/dotnet/runtime/issues/108075
-        // Use Newtonsoft.Json instead of System.Text.Json to avoid the issue
-        builder.Services.AddControllers()
-            .AddNewtonsoftJson();
+        builder.Services.AddControllers();
 
         //SWAGGER
         builder.Services.AddSwaggerGen(c =>

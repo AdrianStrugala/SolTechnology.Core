@@ -36,56 +36,128 @@ namespace SolTechnology.Core.Flow.Controllers
 
             try
             {
+                logger.LogInformation("Step 1: Validating handler type for {FlowName}", flowName);
                 var baseHandlerType = handlerType.BaseType;
                 if (baseHandlerType is not { IsGenericType: true } ||
                     baseHandlerType.GetGenericTypeDefinition() != typeof(PausableChainHandler<,,>))
                 {
+                    logger.LogError("Handler {FlowName} is not a valid PausableChainHandler", flowName);
                     return StatusCode(400, $"Flow '{flowName}' is not a valid PausableChainHandler.");
                 }
 
+                logger.LogInformation("Step 2: Getting input type");
                 Type inputType = baseHandlerType.GetGenericArguments()[0];
+                logger.LogInformation("Input type: {InputType}", inputType.FullName);
 
                 object? typedInitialInput;
                 try
                 {
+                    logger.LogInformation("Step 3: Deserializing input JSON");
                     typedInitialInput = initialInputJson.Deserialize(inputType,
                         new JsonSerializerOptions { PropertyNameCaseInsensitive = true }
                     );
+                    logger.LogInformation("Input deserialized successfully");
                 }
                 catch (JsonException jsonEx)
                 {
-                    //TODO: bad request should not be success xd
+                    logger.LogError(jsonEx, "Failed to deserialize input");
                     return BadRequest(
                         $"Could not deserialize input for flow '{flowName}' to type {inputType.Name}. {jsonEx.Message}");
                 }
 
                 if (typedInitialInput == null)
                 {
+                    logger.LogError("Deserialized input is null");
                     return BadRequest($"Could not deserialize input for flow '{flowName}' to type {inputType.Name}.");
                 }
 
+                logger.LogInformation("Step 4: Creating generic StartFlow method");
                 MethodInfo? startMethod = typeof(FlowManager).GetMethod(nameof(FlowManager.StartFlow))?
                     .MakeGenericMethod(handlerType, inputType, baseHandlerType.GetGenericArguments()[1],
                         baseHandlerType.GetGenericArguments()[2]);
 
                 if (startMethod == null)
                 {
+                    logger.LogError("Could not create generic StartFlow method");
                     return StatusCode(400, "Could not make generic StartFlow method.");
                 }
+                logger.LogInformation("Generic method created successfully");
 
-                var task = (Task?)startMethod.Invoke(flowManager, [typedInitialInput]);
-                if (task == null) return StatusCode(400, "Could not invoke StartFlow.");
+                logger.LogInformation("Step 5: Invoking StartFlow method");
+                Task? task;
+                try
+                {
+                    task = (Task?)startMethod.Invoke(flowManager, [typedInitialInput]);
+                    logger.LogInformation("StartFlow invoked, task type: {TaskType}", task?.GetType().FullName ?? "null");
+                }
+                catch (Exception invokeEx)
+                {
+                    logger.LogError(invokeEx, "Failed to invoke StartFlow");
+                    return StatusCode(500, $"Failed to invoke StartFlow: {invokeEx.Message}");
+                }
 
-                await task;
+                if (task == null)
+                {
+                    logger.LogError("StartFlow returned null task");
+                    return StatusCode(400, "Could not invoke StartFlow.");
+                }
 
-                var resultProperty = task.GetType().GetProperty("Result");
-                var flowInstance = resultProperty?.GetValue(task) as FlowInstance;
+                logger.LogInformation("Step 6: Awaiting task");
+                try
+                {
+                    await task;
+                    logger.LogInformation("Task completed successfully");
+                }
+                catch (Exception taskEx)
+                {
+                    logger.LogError(taskEx, "Task failed during StartFlow execution for {FlowHandlerName}.", flowName);
+                    return StatusCode(500, $"An error occurred during flow execution: {taskEx.Message}");
+                }
 
+                logger.LogInformation("Step 7: Extracting result from task");
+                var taskType = task.GetType();
+                logger.LogInformation("Task type: {TaskType}, IsGenericType: {IsGeneric}", taskType.FullName, taskType.IsGenericType);
+
+                if (!taskType.IsGenericType)
+                {
+                    logger.LogError("Task is not generic");
+                    return StatusCode(500, "StartFlow did not return a generic Task<T>.");
+                }
+
+                var resultProperty = taskType.GetProperty("Result");
+                if (resultProperty == null)
+                {
+                    logger.LogError("Could not find Result property on task");
+                    return StatusCode(500, "Could not find Result property on Task.");
+                }
+
+                logger.LogInformation("Step 8: Getting Result value");
+                object? resultValue;
+                try
+                {
+                    resultValue = resultProperty.GetValue(task);
+                    logger.LogInformation("Result value type: {ResultType}", resultValue?.GetType().FullName ?? "null");
+                }
+                catch (Exception resultEx)
+                {
+                    logger.LogError(resultEx, "Failed to get Result value");
+                    return StatusCode(500, $"Failed to get result: {resultEx.Message}");
+                }
+
+                var flowInstance = resultValue as FlowInstance;
+                if (flowInstance == null)
+                {
+                    logger.LogError("Result is not a FlowInstance, actual type: {ActualType}", resultValue?.GetType().FullName ?? "null");
+                    return StatusCode(500, "Result was not a FlowInstance.");
+                }
+
+                logger.LogInformation("Step 9: Returning flow instance");
                 return Ok(flowInstance);
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error starting flow {FlowHandlerName}.", flowName);
+                logger.LogError(ex, "Error starting flow {FlowHandlerName}. Exception type: {ExceptionType}, StackTrace: {StackTrace}",
+                    flowName, ex.GetType().FullName, ex.StackTrace);
                 return StatusCode(500, $"An error occurred: {ex.Message}");
             }
         }
