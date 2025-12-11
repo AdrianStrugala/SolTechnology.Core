@@ -15,7 +15,13 @@ var dbDeployment = dreamTravelDb.OnResourceReady(async (resource, @event, ct) =>
 {
     var connectionString = await resource.ConnectionStringExpression.GetValueAsync(ct);
     Console.WriteLine($"🔧 Db ConnectionString: {connectionString}");
-    
+
+    var connBuilder = new SqlConnectionStringBuilder(connectionString)
+    {
+        TrustServerCertificate = true
+    };
+    connectionString = connBuilder.ToString();
+
     var dacpacPath = Path.Combine(
         builder.AppHostDirectory,      // .../backend/src/DreamTravel.Aspire
         "..", "..",                    // -> backend/
@@ -32,16 +38,18 @@ var dbDeployment = dreamTravelDb.OnResourceReady(async (resource, @event, ct) =>
     }
 
     Console.WriteLine($"🔧 Deploying dacpac: {dacpacPath}");
-    
+
     await SqlProjectDeployer.DeployDacpacAsync(dacpacPath, connectionString, "DreamTravelDatabase", ct);
-    
+
     Console.WriteLine("✅ Database is ready for connections!");
 });
 
 var api = builder.AddProject<Projects.DreamTravel_Api>("dreamtravel-api")
+    .WithReference(dreamTravelDb)
     .WaitFor(dbDeployment);
 
 builder.AddProject<Projects.DreamTravel_Worker>("dreamtravel-worker")
+    .WithReference(dreamTravelDb)
     .WaitFor(dbDeployment);
 
 builder.AddProject<Projects.DreamTravel_Ui>("dreamtravel-ui")
