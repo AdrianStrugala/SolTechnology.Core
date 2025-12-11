@@ -46,6 +46,7 @@ var dbDeployment = dreamTravelDb.OnResourceReady(async (resource, @event, ct) =>
 
 var api = builder.AddProject<Projects.DreamTravel_Api>("dreamtravel-api")
     .WithReference(dreamTravelDb)
+    .WithExternalHttpEndpoints()
     .WaitFor(dbDeployment);
 
 builder.AddProject<Projects.DreamTravel_Worker>("dreamtravel-worker")
@@ -53,6 +54,7 @@ builder.AddProject<Projects.DreamTravel_Worker>("dreamtravel-worker")
     .WaitFor(dbDeployment);
 
 builder.AddProject<Projects.DreamTravel_Ui>("dreamtravel-ui")
+    .WithExternalHttpEndpoints()
     .WaitFor(api);
 
 builder.Build().Run();
