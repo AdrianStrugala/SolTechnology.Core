@@ -10,7 +10,12 @@
       "WebFetch(domain:github.com)",
       "WebSearch",
       "Bash(dotnet remove:*)",
-      "Bash(dotnet list:*)"
+      "Bash(dotnet list:*)",
+      "Bash(cat:*)",
+      "Bash(dotnet --list-sdks:*)",
+      "Bash(dotnet --version:*)",
+      "Bash(dotnet workload:*)",
+      "Bash(dotnet dev-certs:*)"
     ],
     "deny": [],
     "ask": []

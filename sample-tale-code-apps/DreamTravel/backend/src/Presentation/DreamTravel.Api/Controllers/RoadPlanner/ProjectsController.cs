@@ -1,6 +1,7 @@
 ﻿using DreamTravel.GraphDatabase.Repositories;
 using DreamTravel.Trips.Domain.StreetGraph;
 using Microsoft.AspNetCore.Mvc;
+using SolTechnology.Core.CQRS;
 
 namespace DreamTravel.Api.Controllers.RoadPlanner;
 
@@ -11,19 +12,19 @@ public class ProjectsController(
     IStreetRepository roads)
     : ControllerBase
 {
-    // GET api/projects/{projectId}/nodes
+    // GET api/projects/nodes
     [HttpGet("nodes")]
-    public async Task<ActionResult<IEnumerable<Intersection>>> GetNodes()
+    public async Task<ActionResult<Result<List<Intersection>>>> GetNodes()
     {
         var nodes = await intersections.GetAllAsync();
-        return Ok(nodes);
+        return Ok(Result<List<Intersection>>.Success(nodes.ToList()));
     }
 
-    // GET api/projects/{projectId}/streets
+    // GET api/projects/streets
     [HttpGet("streets")]
-    public async Task<ActionResult<IEnumerable<Street>>> GetRoads()
+    public async Task<ActionResult<Result<List<Street>>>> GetRoads()
     {
         var roads1 = await roads.GetAllAsync();
-        return Ok(roads1);
+        return Ok(Result<List<Street>>.Success(roads1.ToList()));
     }
 }

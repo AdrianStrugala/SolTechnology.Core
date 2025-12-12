@@ -1,4 +1,21 @@
 ﻿window.mapInterop = {
+    loadGoogleMapsScript: async (apiKey) => {
+        // Check if Google Maps is already loaded
+        if (window.google && window.google.maps) {
+            return Promise.resolve();
+        }
+
+        return new Promise((resolve, reject) => {
+            const script = document.createElement('script');
+            script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}`;
+            script.async = true;
+            script.defer = true;
+            script.onload = () => resolve();
+            script.onerror = () => reject(new Error('Failed to load Google Maps script'));
+            document.head.appendChild(script);
+        });
+    },
+
     initMap: (lat, lng, zoom) => {
         window._map = new google.maps.Map(
             document.getElementById('map'),

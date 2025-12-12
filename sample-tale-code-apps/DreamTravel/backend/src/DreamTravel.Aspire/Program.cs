@@ -54,6 +54,7 @@ builder.AddProject<Projects.DreamTravel_Worker>("dreamtravel-worker")
     .WaitFor(dbDeployment);
 
 builder.AddProject<Projects.DreamTravel_Ui>("dreamtravel-ui")
+    .WithReference(api)
     .WithExternalHttpEndpoints()
     .WaitFor(api);
 

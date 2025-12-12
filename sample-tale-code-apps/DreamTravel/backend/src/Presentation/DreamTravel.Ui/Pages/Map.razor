@@ -1,8 +1,10 @@
 ﻿@page "/map"
 @using DreamTravel.Trips.Domain.StreetGraph
 @using DreamTravel.Ui.Services
+@using DreamTravel.Ui.Configuration
 @using MudBlazor
 @inject GraphService GraphService
+@inject GoogleMapsConfiguration GoogleMapsConfig
 @inject IJSRuntime JS
 @inject ISnackbar Snackbar
 
@@ -126,6 +128,9 @@
   {
     isLoading = true;
     StateHasChanged();
+
+    // Load Google Maps script dynamically with API key
+    await JS.InvokeVoidAsync("mapInterop.loadGoogleMapsScript", GoogleMapsConfig.ApiKey);
 
     // initialize map
     await JS.InvokeVoidAsync("mapInterop.initMap", 51.1079, 17.0385, 13);

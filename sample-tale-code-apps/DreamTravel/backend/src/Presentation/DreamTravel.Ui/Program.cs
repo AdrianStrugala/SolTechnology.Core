@@ -1,27 +1,17 @@
 ﻿using DreamTravel.Ui;
-using DreamTravel.Ui.Services;
+using DreamTravel.Ui.Configuration;
+using DreamTravel.Ui.DependencyInjection;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
-using MudBlazor.Services;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
+
 builder.RootComponents.Add<App>("#app");
 builder.RootComponents.Add<HeadOutlet>("head::after");
 
-builder.Services.AddMudServices();
+var apiConfig = builder.GetApiConfiguration();
+var googleMapsConfig = builder.GetGoogleMapsConfiguration();
 
-var apiUrl = builder.Configuration["ApiBaseUrl"];
-var apiKey = builder.Configuration["Authentication:ApiKey"];
-if (string.IsNullOrEmpty(apiUrl) || string.IsNullOrEmpty(apiKey))
-    throw new InvalidOperationException("Brakuje ApiBaseUrl lub Authentication:ApiKey w konfiguracji.");
-
-builder.Services.AddScoped(sp =>
-{
-    var client = new HttpClient { BaseAddress = new Uri(apiUrl) };
-    client.DefaultRequestHeaders.Add("X-Api-Key", apiKey);
-    return client;
-});
-
-builder.Services.AddScoped<GraphService>();
+builder.Services.AddDreamTravelServices(apiConfig, googleMapsConfig);
 
 await builder.Build().RunAsync();
