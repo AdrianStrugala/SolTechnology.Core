@@ -1,109 +1,150 @@
-using System.Diagnostics;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.FileProviders;
+using Microsoft.Extensions.Hosting;
 
 namespace DreamTravel.FunctionalTests;
 
 /// <summary>
-/// Fixture for running Blazor WebAssembly application during tests.
-/// Starts the UI dev server and manages its lifecycle.
+/// Blazor WASM fixture - similar to ApiFixture but for static WASM apps.
+/// Uses Kestrel with real port (not TestServer) because Playwright needs real URLs.
+///
+/// Performance optimizations:
+/// 1. Publishes WASM once (smart caching - only if source changed)
+/// 2. Serves via lightweight Kestrel server (~2s startup vs ~15s for 'dotnet run')
+/// 3. HTTP instead of HTTPS (no certificate overhead)
 /// </summary>
 public class BlazorWasmFixture : IAsyncDisposable
 {
-    private Process? _process;
+    private IHost? _host;
+    private readonly string _publishPath;
     private readonly string _projectPath;
-    private readonly string _baseUrl;
     private readonly int _port;
 
-    public string BaseUrl => _baseUrl;
+    public string BaseUrl { get; private set; }
 
     public BlazorWasmFixture(string projectPath, int port = 7024)
     {
         _projectPath = projectPath;
         _port = port;
-        _baseUrl = $"https://localhost:{port}";
+        _publishPath = Path.Combine(_projectPath, "bin", "Debug", "net10.0", "publish", "wwwroot");
+        BaseUrl = $"http://localhost:{port}"; // HTTP for faster startup (no cert issues)
     }
 
     public async Task StartAsync()
     {
-        // Start dotnet run for the Blazor WASM project
-        // Note: Builds the project if needed (no --no-build flag)
-        var startInfo = new ProcessStartInfo
+        // Step 1: Publish Blazor WASM (only if outdated)
+        await PublishBlazorWasmAsync();
+
+        // Step 2: Start lightweight Kestrel server for static files
+        var builder = Host.CreateDefaultBuilder()
+            .ConfigureWebHost(webBuilder =>
+            {
+                webBuilder
+                    .UseKestrel(options =>
+                    {
+                        options.ListenLocalhost(_port); // Real HTTP server with port
+                    })
+                    .Configure(app =>
+                    {
+                        var fileProvider = new PhysicalFileProvider(_publishPath);
+
+                        app.UseDefaultFiles(new DefaultFilesOptions
+                        {
+                            FileProvider = fileProvider
+                        });
+
+                        app.UseStaticFiles(new StaticFileOptions
+                        {
+                            FileProvider = fileProvider,
+                            ServeUnknownFileTypes = true, // .wasm, .dat, .json
+                            OnPrepareResponse = ctx =>
+                            {
+                                // CORS headers for WASM
+                                ctx.Context.Response.Headers["Cross-Origin-Embedder-Policy"] = "require-corp";
+                                ctx.Context.Response.Headers["Cross-Origin-Opener-Policy"] = "same-origin";
+                            }
+                        });
+
+                        // SPA fallback routing - serve index.html for all non-file requests
+                        app.UseRouting();
+                        app.UseEndpoints(endpoints =>
+                        {
+                            endpoints.MapFallbackToFile("index.html", new StaticFileOptions
+                            {
+                                FileProvider = fileProvider
+                            });
+                        });
+                    });
+            });
+
+        _host = await builder.StartAsync();
+
+        // Wait for server readiness (Kestrel is usually instant, but be safe)
+        await Task.Delay(500);
+    }
+
+    private async Task PublishBlazorWasmAsync()
+    {
+        // Smart caching: only publish if source files changed
+        var indexPath = Path.Combine(_publishPath, "index.html");
+        if (File.Exists(indexPath))
+        {
+            var publishTime = File.GetLastWriteTimeUtc(indexPath);
+            var csprojPath = Directory.GetFiles(_projectPath, "*.csproj").FirstOrDefault();
+
+            if (csprojPath != null)
+            {
+                var csprojTime = File.GetLastWriteTimeUtc(csprojPath);
+                var pagesTime = Directory.Exists(Path.Combine(_projectPath, "Pages"))
+                    ? Directory.GetLastWriteTimeUtc(Path.Combine(_projectPath, "Pages"))
+                    : DateTime.MinValue;
+                var componentsTime = Directory.Exists(Path.Combine(_projectPath, "Components"))
+                    ? Directory.GetLastWriteTimeUtc(Path.Combine(_projectPath, "Components"))
+                    : DateTime.MinValue;
+
+                var latestSourceChange = new[] { csprojTime, pagesTime, componentsTime }.Max();
+
+                if (publishTime > latestSourceChange)
+                {
+                    return; // Cache hit - already published and up-to-date
+                }
+            }
+        }
+
+        // Publish WASM
+        var startInfo = new System.Diagnostics.ProcessStartInfo
         {
             FileName = "dotnet",
-            Arguments = "run",
+            Arguments = "publish -c Debug --nologo",
             WorkingDirectory = _projectPath,
             RedirectStandardOutput = true,
             RedirectStandardError = true,
             UseShellExecute = false,
-            CreateNoWindow = true,
-            Environment =
-            {
-                ["ASPNETCORE_URLS"] = _baseUrl,
-                ["ASPNETCORE_ENVIRONMENT"] = "Development"
-            }
+            CreateNoWindow = true
         };
 
-        _process = Process.Start(startInfo);
-
-        if (_process == null)
+        var publishProcess = System.Diagnostics.Process.Start(startInfo);
+        if (publishProcess == null)
         {
-            throw new InvalidOperationException("Failed to start Blazor WASM dev server");
+            throw new InvalidOperationException("Failed to start dotnet publish");
         }
 
-        // Wait for the application to be ready
-        await WaitForApplicationStartupAsync();
-    }
+        await publishProcess.WaitForExitAsync();
 
-    private async Task WaitForApplicationStartupAsync()
-    {
-        using var httpClient = new HttpClient(new HttpClientHandler
+        if (publishProcess.ExitCode != 0)
         {
-            ServerCertificateCustomValidationCallback = (_, _, _, _) => true // Accept self-signed cert
-        });
-
-        var maxAttempts = 60; // 60 seconds timeout
-        var attempt = 0;
-
-        while (attempt < maxAttempts)
-        {
-            try
-            {
-                var response = await httpClient.GetAsync(_baseUrl);
-                if (response.IsSuccessStatusCode)
-                {
-                    // Give it a bit more time to fully initialize
-                    await Task.Delay(2000);
-                    return;
-                }
-            }
-            catch
-            {
-                // Application not ready yet
-            }
-
-            await Task.Delay(1000);
-            attempt++;
+            var error = await publishProcess.StandardError.ReadToEndAsync();
+            throw new InvalidOperationException($"Blazor WASM publish failed: {error}");
         }
-
-        throw new TimeoutException($"Blazor WASM application did not start within {maxAttempts} seconds at {_baseUrl}");
     }
 
     public async ValueTask DisposeAsync()
     {
-        if (_process != null && !_process.HasExited)
+        if (_host != null)
         {
-            try
-            {
-                // Try graceful shutdown first
-                _process.Kill(entireProcessTree: true);
-                await _process.WaitForExitAsync();
-            }
-            catch
-            {
-                // Process might have already exited
-            }
-
-            _process.Dispose();
-            _process = null;
+            await _host.StopAsync();
+            _host.Dispose();
         }
     }
 }
