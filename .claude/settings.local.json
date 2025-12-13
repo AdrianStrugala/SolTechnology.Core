@@ -18,7 +18,11 @@
       "Bash(dotnet dev-certs:*)",
       "Bash(git checkout:*)",
       "Bash(git add:*)",
-      "Bash(git commit:*)"
+      "Bash(git commit:*)",
+      "Bash(find:*)",
+      "Bash(dotnet add:*)",
+      "Bash(Select-String -Pattern \"error|Kompilacja\")",
+      "Bash(Select-Object -Last 5)"
     ],
     "deny": [],
     "ask": []
