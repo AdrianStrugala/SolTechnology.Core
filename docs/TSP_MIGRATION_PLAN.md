@@ -261,19 +261,121 @@ public class CityEntry {
 
 ---
 
-## Pliki do Utworzenia (7 nowych)
+## Pliki do Utworzenia (8 nowych)
 
 1. ✅ `Models/CityEntry.cs`
-2. ✅ `Services/TspService.cs`
-3. `Components/Shared/GoogleMap.razor`
-4. `Components/TspMap/CitiesPanel.razor`
-5. `Pages/TspMap.razor`
+2. ✅ `Models/TspDtos.cs`
+3. ✅ `Services/TspService.cs`
+4. ✅ `Components/Shared/GoogleMap.razor`
+5. ✅ `Components/TspMap/CitiesPanel.razor`
+6. ✅ `Pages/TspMap.razor`
+7. 🔄 `tests/Component/Trips/TspUiIntegrationTest.cs` (w trakcie)
 
 ## Pliki do Zmodyfikowania (3 istniejące)
 
-1. `wwwroot/mapInterop.js` - dodać funkcje TSP
-2. `Layout/NavMenu.razor` - dodać link do TSP
+1. ✅ `wwwroot/mapInterop.js` - dodać funkcje TSP
+2. ✅ `Layout/NavMenu.razor` - dodać link do TSP
 3. ✅ `DependencyInjection/ServiceCollectionExtensions.cs` - zarejestrować TspService
+
+---
+
+## Testowanie Integracyjne
+
+### Infrastruktura (Component Tests)
+
+**Framework**: NUnit + Playwright + WireMock + TestContainers
+
+**Fixtures** (SetUpFixture pattern):
+- **ApiFixture<Program>** - In-memory test server dla DreamTravel.Api (WebApplicationFactory)
+- **SqlFixture** - Docker SQL Server z DACPAC deployment
+- **WireMockFixture** - HTTP mocking na porcie 2137
+
+### Wzorzec Testu TSP UI
+
+**Lokalizacja**: `tests/Component/Trips/TspUiIntegrationTest.cs`
+
+**Scope**: Test end-to-end całego flow TSP z UI Blazor
+
+**Pattern**:
+```csharp
+[SetUp]
+public void Setup()
+{
+    _apiClient = ComponentTestsFixture.ApiFixture.ServerClient;
+    _wireMockFixture = ComponentTestsFixture.WireMockFixture;
+    _playwright = await Playwright.CreateAsync();
+    _browser = await _playwright.Chromium.LaunchAsync(new() { Headless = true });
+}
+
+[Test]
+public async Task TspFlow_AddCitiesAndCalculate_DisplaysResults()
+{
+    // Arrange - Mock Google API responses
+    _wireMockFixture.Fake<IGoogleApiClient>()
+        .WithRequest(x => x.GetLocationOfCity, "Warsaw")
+        .WithResponse(x => x.WithSuccess().WithBody(
+            GoogleFakeApi.BuildGeocodingResponse(new City {
+                Name = "Warsaw",
+                Latitude = 52.2297,
+                Longitude = 21.0122
+            })
+        ));
+
+    _wireMockFixture.Fake<IGoogleApiClient>()
+        .WithRequest(x => x.GetDistanceMatrix, ...)
+        .WithResponse(x => x.WithSuccess().WithBody(...));
+
+    // Act - Playwright UI automation
+    var page = await _browser.NewPageAsync();
+    await page.GotoAsync("http://localhost:5000/tsp-map");
+
+    // Add first city by name
+    await page.FillAsync("input[label='City Name']", "Warsaw");
+    await page.Keyboard.PressAsync("Enter");
+
+    // Add second city by map click (mock geocoding)
+    await page.ClickAsync("#tsp-map", new() { Position = new() { X = 300, Y = 200 } });
+
+    // Run TSP
+    await page.ClickAsync("button:has-text('Run TSP')");
+    await page.WaitForSelectorAsync("text=Total Time:");
+
+    // Assert - Verify results displayed
+    var totalTime = await page.TextContentAsync("text=Total time:");
+    totalTime.Should().NotBeNullOrEmpty();
+
+    var totalCost = await page.TextContentAsync("text=Total cost:");
+    totalCost.Should().Contain("DKK");
+}
+```
+
+**Google API Mocking** (wykorzystanie istniejącego GoogleFakeApi.cs):
+- Geocoding: `BuildGeocodingResponse(city)` - konwersja nazwy/współrzędnych na City
+- Distance Matrix: `BuildDistanceMatrixResponse(...)` - dystanse między miastami dla TSP
+
+**Test Cases**:
+1. Dodanie miast po nazwie (mocked geocoding)
+2. Dodanie miast kliknięciem (mocked reverse geocoding)
+3. Obliczenie TSP (mocked distance matrix)
+4. Wyświetlenie rezultatów (total time, cost, colored paths)
+5. Walidacja błędów (brak miast, API error)
+
+### Konfiguracja
+
+**appsettings.tests.json** (już skonfigurowane):
+```json
+{
+  "GoogleApi": {
+    "BaseUrl": "http://localhost:2137/google/",
+    "ApiKey": "test-key"
+  }
+}
+```
+
+**Referencje**:
+- Test pattern: `CalculateBestPathFeatureTest.cs`
+- WireMock API: `GoogleFakeApi.cs`
+- Fixture setup: `ComponentTestsFixture.cs`
 
 ---
 
