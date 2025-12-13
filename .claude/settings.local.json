@@ -17,7 +17,8 @@
       "Bash(dotnet workload:*)",
       "Bash(dotnet dev-certs:*)",
       "Bash(git checkout:*)",
-      "Bash(git add:*)"
+      "Bash(git add:*)",
+      "Bash(git commit:*)"
     ],
     "deny": [],
     "ask": []

@@ -1,0 +1,104 @@
+@using DreamTravel.Ui.Models
+
+<MudPaper Class="pa-4" Elevation="2" Style="height: calc(100vh - 64px); overflow-y: auto;">
+    <MudText Typo="Typo.h6" Class="mb-4">List of Cities</MudText>
+
+    @foreach (var city in Cities)
+    {
+        <MudStack Row="true" AlignItems="AlignItems.Center" Class="mb-2">
+            <MudTextField @bind-Value="city.Name"
+                          Label="City Name"
+                          Variant="Variant.Outlined"
+                          Immediate="true"
+                          OnBlur="@(() => OnCityChanged.InvokeAsync(city))"
+                          OnKeyUp="@(e => HandleKeyUp(e, city))"
+                          Style="flex: 1;" />
+
+            <MudIconButton Icon="@Icons.Material.Filled.Close"
+                           Color="Color.Error"
+                           Size="Size.Small"
+                           OnClick="@(() => OnCityRemoved.InvokeAsync(city.Index))" />
+        </MudStack>
+    }
+
+    <MudButton StartIcon="@Icons.Material.Filled.Add"
+               Color="Color.Success"
+               Variant="Variant.Outlined"
+               OnClick="@(() => OnCityAdded.InvokeAsync())"
+               FullWidth="true"
+               Class="mt-2">
+        Add City
+    </MudButton>
+
+    <MudDivider Class="my-4" />
+
+    <MudButton Variant="Variant.Filled"
+               Color="Color.Primary"
+               OnClick="@(() => OnRunTsp.InvokeAsync())"
+               Disabled="@(IsLoading || Cities.Count(c => c.City != null) < 2)"
+               FullWidth="true">
+        @if (IsLoading)
+        {
+            <MudProgressCircular Size="Size.Small" Indeterminate="true" Class="mr-2" />
+            <span>Calculating...</span>
+        }
+        else
+        {
+            <span>Run TSP</span>
+        }
+    </MudButton>
+
+    @if (!string.IsNullOrEmpty(TotalTime))
+    {
+        <MudDivider Class="my-4" />
+
+        <MudPaper Class="pa-3" Elevation="1">
+            <MudText Typo="Typo.h6" Class="mb-2">Results</MudText>
+
+            <MudStack Spacing="2">
+                <MudText>
+                    <MudIcon Icon="@Icons.Material.Filled.Timer" Size="Size.Small" Class="mr-1" />
+                    Total Time: <strong>@TotalTime</strong>
+                </MudText>
+
+                <MudText>
+                    <MudIcon Icon="@Icons.Material.Filled.AttachMoney" Size="Size.Small" Class="mr-1" />
+                    Total Cost: <strong>@TotalCost.ToString("F2") DKK</strong>
+                </MudText>
+            </MudStack>
+
+            @* TODO: Payment integration - endpoint /api/users/pay does not exist yet *@
+            @*
+            @if (TotalCost > 0)
+            {
+                <MudButton Variant="Variant.Filled"
+                           Color="Color.Secondary"
+                           Disabled="true"
+                           FullWidth="true"
+                           Class="mt-3">
+                    Pay with AIIA (Coming Soon)
+                </MudButton>
+            }
+            *@
+        </MudPaper>
+    }
+</MudPaper>
+
+@code {
+    [Parameter] public List<CityEntry> Cities { get; set; } = new();
+    [Parameter] public bool IsLoading { get; set; }
+    [Parameter] public string TotalTime { get; set; } = "";
+    [Parameter] public double TotalCost { get; set; }
+    [Parameter] public EventCallback OnCityAdded { get; set; }
+    [Parameter] public EventCallback<int> OnCityRemoved { get; set; }
+    [Parameter] public EventCallback<CityEntry> OnCityChanged { get; set; }
+    [Parameter] public EventCallback OnRunTsp { get; set; }
+
+    private async Task HandleKeyUp(KeyboardEventArgs e, CityEntry city)
+    {
+        if (e.Key == "Enter")
+        {
+            await OnCityChanged.InvokeAsync(city);
+        }
+    }
+}

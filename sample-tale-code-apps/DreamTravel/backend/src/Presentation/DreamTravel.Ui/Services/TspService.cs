@@ -1,6 +1,6 @@
 using System.Net.Http.Json;
 using DreamTravel.Trips.Domain.Cities;
-using DreamTravel.Trips.Queries.CalculateBestPath;
+using DreamTravel.Ui.Models;
 using SolTechnology.Core.CQRS;
 
 namespace DreamTravel.Ui.Services;
