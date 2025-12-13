@@ -353,3 +353,6 @@ src/.idea/
 
 # Windows null device file (accidentally created)
 nul
+
+# Blazor WebAssembly development settings with secrets
+**/wwwroot/appsettings.Development.json

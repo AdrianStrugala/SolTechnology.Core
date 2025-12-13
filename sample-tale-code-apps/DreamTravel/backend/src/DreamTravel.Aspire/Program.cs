@@ -11,6 +11,16 @@ var sql = builder
 
 var dreamTravelDb = sql.AddDatabase("DreamTravelDatabase");
 
+var neo4j = builder.AddContainer("neo4j", "neo4j", "5.10-community")
+    .WithEnvironment("NEO4J_AUTH", "neo4j/neo4jpass")
+    .WithEnvironment("NEO4J_dbms_directories_import", "/var/lib/neo4j/import")
+    .WithEnvironment("NEO4J_dbms_security_procedures_unrestricted", "apoc.*")
+    .WithEnvironment("NEO4JLABS_PLUGINS", "[\"apoc\"]")
+    .WithEnvironment("NEO4J_apoc_import_file_enabled", "true")
+    .WithHttpEndpoint(port: 7474, targetPort: 7474, name: "http")
+    .WithEndpoint(port: 7687, targetPort: 7687, name: "bolt")
+    .WithLifetime(ContainerLifetime.Persistent);
+
 var dbDeployment = dreamTravelDb.OnResourceReady(async (resource, @event, ct) =>
 {
     var connectionString = await resource.ConnectionStringExpression.GetValueAsync(ct);
@@ -47,7 +57,8 @@ var dbDeployment = dreamTravelDb.OnResourceReady(async (resource, @event, ct) =>
 var api = builder.AddProject<Projects.DreamTravel_Api>("dreamtravel-api")
     .WithReference(dreamTravelDb)
     .WithExternalHttpEndpoints()
-    .WaitFor(dbDeployment);
+    .WaitFor(dbDeployment)
+    .WaitFor(neo4j);
 
 builder.AddProject<Projects.DreamTravel_Worker>("dreamtravel-worker")
     .WithReference(dreamTravelDb)

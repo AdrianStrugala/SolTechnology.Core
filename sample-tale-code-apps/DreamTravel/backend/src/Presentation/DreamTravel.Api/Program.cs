@@ -42,12 +42,27 @@ public class Program
             options.AddPolicy(CorsPolicy,
                 policyBuilder =>
                 {
-                    policyBuilder.WithOrigins("http://localhost:4200",
-                            "https://dreamtravels.azurewebsites.net",
-                            "https://dreamtravels-demo.azurewebsites.net",
-                            "http://localhost:55855",
-                            "https://localhost:7024",
-                            "https://avroconvertonline.azurewebsites.net")
+                    policyBuilder.SetIsOriginAllowed(origin =>
+                        {
+                            if (string.IsNullOrWhiteSpace(origin)) return false;
+
+                            // Allow all localhost origins (for development)
+                            if (origin.StartsWith("http://localhost:", StringComparison.OrdinalIgnoreCase) ||
+                                origin.StartsWith("https://localhost:", StringComparison.OrdinalIgnoreCase))
+                            {
+                                return true;
+                            }
+
+                            // Allow specific production origins
+                            var allowedOrigins = new[]
+                            {
+                                "https://dreamtravels.azurewebsites.net",
+                                "https://dreamtravels-demo.azurewebsites.net",
+                                "https://avroconvertonline.azurewebsites.net"
+                            };
+
+                            return allowedOrigins.Contains(origin, StringComparer.OrdinalIgnoreCase);
+                        })
                         .AllowAnyHeader()
                         .AllowAnyMethod()
                         .AllowCredentials();
