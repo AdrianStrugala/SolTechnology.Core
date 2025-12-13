@@ -17,6 +17,7 @@ namespace DreamTravel.FunctionalTests
         public static ApiFixture<Worker.Program> WorkerFixture { get; set; } = null!;
         public static SqlFixture SqlFixture { get; set; } = null!;
         public static WireMockFixture WireMockFixture { get; set; } = null!;
+        public static BlazorWasmFixture UiFixture { get; set; } = null!;
 
         [OneTimeSetUp]
         public static async Task SetUp()
@@ -37,10 +38,15 @@ namespace DreamTravel.FunctionalTests
             
             ApiFixture = new ApiFixture<Program>(configuration);
             WorkerFixture = new ApiFixture<Worker.Program>(configuration);
-            
+
             WireMockFixture = new WireMockFixture();
             WireMockFixture.Initialize();
             WireMockFixture.RegisterFakeApi(new GoogleFakeApi());
+
+            // Start Blazor WASM UI for integration tests
+            var uiProjectPath = Path.GetFullPath("../../../../../src/Presentation/DreamTravel.UI");
+            UiFixture = new BlazorWasmFixture(uiProjectPath, port: 7024);
+            await UiFixture.StartAsync();
         }
 
 
@@ -51,6 +57,7 @@ namespace DreamTravel.FunctionalTests
             ApiFixture.Dispose();
             WorkerFixture.Dispose();
             WireMockFixture.Dispose();
+            await UiFixture.DisposeAsync();
         }
     }
 }

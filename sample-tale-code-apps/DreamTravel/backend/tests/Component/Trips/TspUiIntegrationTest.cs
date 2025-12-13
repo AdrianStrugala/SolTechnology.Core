@@ -12,13 +12,15 @@ namespace DreamTravel.FunctionalTests.Trips;
 public class TspUiIntegrationTest : PageTest
 {
     private WireMockFixture _wireMockFixture = null!;
-    private const string UiBaseUrl = "https://localhost:7024";
-    private const string TspPageUrl = $"{UiBaseUrl}/tsp-map";
+    private string _uiBaseUrl = null!;
+    private string _tspPageUrl = null!;
 
     [SetUp]
     public void Setup()
     {
         _wireMockFixture = ComponentTestsFixture.WireMockFixture;
+        _uiBaseUrl = ComponentTestsFixture.UiFixture.BaseUrl;
+        _tspPageUrl = $"{_uiBaseUrl}/tsp-map";
     }
 
     [Test]
@@ -66,7 +68,7 @@ public class TspUiIntegrationTest : PageTest
             .WithResponse(x => x.WithSuccess().WithBody(GoogleFakeApi.TollDistanceMatrix));
 
         // Act - Navigate to TSP page
-        await Page.GotoAsync(TspPageUrl);
+        await Page.GotoAsync(_tspPageUrl);
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
         // Add first city (Warsaw)
@@ -126,7 +128,7 @@ public class TspUiIntegrationTest : PageTest
                 .WithBody(GoogleFakeApi.BuildGeocodingResponse(wroclaw)));
 
         // Act - Navigate to TSP page
-        await Page.GotoAsync(TspPageUrl);
+        await Page.GotoAsync(_tspPageUrl);
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
         // Click on map (simulating click near Wroclaw coordinates)
@@ -147,7 +149,7 @@ public class TspUiIntegrationTest : PageTest
     public async Task TspFlow_RunWithLessThanTwoCities_DisablesRunButton()
     {
         // Act - Navigate to TSP page
-        await Page.GotoAsync(TspPageUrl);
+        await Page.GotoAsync(_tspPageUrl);
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
         // Assert - Run TSP button should be disabled (less than 2 cities)
