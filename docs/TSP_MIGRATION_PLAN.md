@@ -289,6 +289,7 @@ public class CityEntry {
 - **ApiFixture<Program>** - In-memory test server dla DreamTravel.Api (WebApplicationFactory)
 - **SqlFixture** - Docker SQL Server z DACPAC deployment
 - **WireMockFixture** - HTTP mocking na porcie 2137
+- **BlazorWasmFixture** - Automatyczne uruchamianie Blazor UI (`dotnet run` w tle, health check, graceful shutdown)
 
 ### Wzorzec Testu TSP UI
 
@@ -296,15 +297,16 @@ public class CityEntry {
 
 **Scope**: Test end-to-end całego flow TSP z UI Blazor
 
+**Automatyzacja**: Test jest w pełni automatyczny - BlazorWasmFixture uruchamia UI przed testami i zatrzymuje po zakończeniu. Nie wymaga manualnego startu aplikacji.
+
 **Pattern**:
 ```csharp
 [SetUp]
 public void Setup()
 {
-    _apiClient = ComponentTestsFixture.ApiFixture.ServerClient;
     _wireMockFixture = ComponentTestsFixture.WireMockFixture;
-    _playwright = await Playwright.CreateAsync();
-    _browser = await _playwright.Chromium.LaunchAsync(new() { Headless = true });
+    _uiBaseUrl = ComponentTestsFixture.UiFixture.BaseUrl; // Dynamic URL from fixture
+    _tspPageUrl = $"{_uiBaseUrl}/tsp-map";
 }
 
 [Test]
@@ -322,30 +324,34 @@ public async Task TspFlow_AddCitiesAndCalculate_DisplaysResults()
         ));
 
     _wireMockFixture.Fake<IGoogleApiClient>()
-        .WithRequest(x => x.GetDistanceMatrix, ...)
-        .WithResponse(x => x.WithSuccess().WithBody(...));
+        .WithRequest(x => x.GetDurationMatrixByFreeRoad, cities)
+        .WithResponse(x => x.WithSuccess().WithBody(GoogleFakeApi.FreeDistanceMatrix));
 
-    // Act - Playwright UI automation
-    var page = await _browser.NewPageAsync();
-    await page.GotoAsync("http://localhost:5000/tsp-map");
+    // Act - Playwright UI automation (inherits from PageTest - Page is auto-created)
+    await Page.GotoAsync(_tspPageUrl); // UI automatically started by fixture
 
     // Add first city by name
-    await page.FillAsync("input[label='City Name']", "Warsaw");
-    await page.Keyboard.PressAsync("Enter");
+    var firstCityInput = Page.Locator("input").First;
+    await firstCityInput.FillAsync("Warsaw");
+    await firstCityInput.PressAsync("Enter");
 
-    // Add second city by map click (mock geocoding)
-    await page.ClickAsync("#tsp-map", new() { Position = new() { X = 300, Y = 200 } });
+    // Add second city
+    await Page.Locator("button:has-text('Add City')").ClickAsync();
+    var secondCityInput = Page.Locator("input").Nth(1);
+    await secondCityInput.FillAsync("Berlin");
+    await secondCityInput.PressAsync("Enter");
 
     // Run TSP
-    await page.ClickAsync("button:has-text('Run TSP')");
-    await page.WaitForSelectorAsync("text=Total Time:");
+    await Page.Locator("button:has-text('Run TSP')").ClickAsync();
+    await Page.WaitForSelectorAsync("text=/Total [Tt]ime:/");
 
     // Assert - Verify results displayed
-    var totalTime = await page.TextContentAsync("text=Total time:");
-    totalTime.Should().NotBeNullOrEmpty();
+    var resultsSection = Page.Locator("text=/Total [Tt]ime:/").First;
+    await Expect(resultsSection).ToBeVisibleAsync();
 
-    var totalCost = await page.TextContentAsync("text=Total cost:");
-    totalCost.Should().Contain("DKK");
+    var costSection = Page.Locator("text=/Total [Cc]ost:/").First;
+    var costText = await costSection.TextContentAsync();
+    costText.Should().Contain("DKK");
 }
 ```
 
