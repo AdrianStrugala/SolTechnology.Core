@@ -15,7 +15,9 @@
       "Bash(dotnet --list-sdks:*)",
       "Bash(dotnet --version:*)",
       "Bash(dotnet workload:*)",
-      "Bash(dotnet dev-certs:*)"
+      "Bash(dotnet dev-certs:*)",
+      "Bash(git checkout:*)",
+      "Bash(git add:*)"
     ],
     "deny": [],
     "ask": []
