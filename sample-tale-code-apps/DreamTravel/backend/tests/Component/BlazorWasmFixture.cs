@@ -1,5 +1,8 @@
+using System.Text.Json;
+using System.Text.Json.Nodes;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Hosting;
 
@@ -20,14 +23,16 @@ public class BlazorWasmFixture : IAsyncDisposable
     private readonly string _publishPath;
     private readonly string _projectPath;
     private readonly int _port;
+    private readonly string? _apiBaseUrlOverride;
 
     public string BaseUrl { get; private set; }
 
-    public BlazorWasmFixture(string projectPath, int port = 7024)
+    public BlazorWasmFixture(string projectPath, int port = 7024, string? apiBaseUrlOverride = null)
     {
         _projectPath = projectPath;
         _port = port;
         _publishPath = Path.Combine(_projectPath, "bin", "Debug", "net10.0", "publish", "wwwroot");
+        _apiBaseUrlOverride = apiBaseUrlOverride;
         BaseUrl = $"http://localhost:{port}"; // HTTP for faster startup (no cert issues)
     }
 
@@ -35,6 +40,12 @@ public class BlazorWasmFixture : IAsyncDisposable
     {
         // Step 1: Publish Blazor WASM (only if outdated)
         await PublishBlazorWasmAsync();
+
+        // Step 1.5: Override appsettings.json for test environment
+        if (_apiBaseUrlOverride != null)
+        {
+            OverrideAppSettings();
+        }
 
         // Step 2: Start lightweight Kestrel server for static files
         var builder = Host.CreateDefaultBuilder()
@@ -44,6 +55,10 @@ public class BlazorWasmFixture : IAsyncDisposable
                     .UseKestrel(options =>
                     {
                         options.ListenLocalhost(_port); // Real HTTP server with port
+                    })
+                    .ConfigureServices(services =>
+                    {
+                        services.AddRouting(); // Required for UseRouting/UseEndpoints
                     })
                     .Configure(app =>
                     {
@@ -130,13 +145,46 @@ public class BlazorWasmFixture : IAsyncDisposable
             throw new InvalidOperationException("Failed to start dotnet publish");
         }
 
+        // CRITICAL: Read output asynchronously to prevent deadlock
+        // If we don't consume stdout/stderr, buffers fill up and process hangs
+        var outputTask = publishProcess.StandardOutput.ReadToEndAsync();
+        var errorTask = publishProcess.StandardError.ReadToEndAsync();
+
         await publishProcess.WaitForExitAsync();
+
+        var output = await outputTask;
+        var error = await errorTask;
 
         if (publishProcess.ExitCode != 0)
         {
-            var error = await publishProcess.StandardError.ReadToEndAsync();
-            throw new InvalidOperationException($"Blazor WASM publish failed: {error}");
+            throw new InvalidOperationException($"Blazor WASM publish failed:\n{error}\n{output}");
         }
+    }
+
+    private void OverrideAppSettings()
+    {
+        // Override appsettings.json in publish folder to point to WireMock
+        var appSettingsPath = Path.Combine(_publishPath, "appsettings.json");
+
+        if (!File.Exists(appSettingsPath))
+        {
+            throw new InvalidOperationException($"appsettings.json not found at {appSettingsPath}");
+        }
+
+        var json = File.ReadAllText(appSettingsPath);
+        var jsonNode = JsonNode.Parse(json);
+
+        if (jsonNode == null)
+        {
+            throw new InvalidOperationException("Failed to parse appsettings.json");
+        }
+
+        // Override ApiBaseUrl to point to WireMock
+        jsonNode["ApiBaseUrl"] = _apiBaseUrlOverride!;
+
+        var options = new JsonSerializerOptions { WriteIndented = true };
+        var updatedJson = jsonNode.ToJsonString(options);
+        File.WriteAllText(appSettingsPath, updatedJson);
     }
 
     public async ValueTask DisposeAsync()

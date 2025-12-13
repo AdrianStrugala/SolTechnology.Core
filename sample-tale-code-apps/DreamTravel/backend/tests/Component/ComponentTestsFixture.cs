@@ -45,7 +45,7 @@ namespace DreamTravel.FunctionalTests
 
             // Start Blazor WASM UI for integration tests
             var uiProjectPath = Path.GetFullPath("../../../../../src/Presentation/DreamTravel.UI");
-            UiFixture = new BlazorWasmFixture(uiProjectPath, port: 7024);
+            UiFixture = new BlazorWasmFixture(uiProjectPath, port: 7024, apiBaseUrlOverride: "http://localhost:2137");
             await UiFixture.StartAsync();
         }
 
