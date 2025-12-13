@@ -269,7 +269,7 @@ public class CityEntry {
 4. ✅ `Components/Shared/GoogleMap.razor`
 5. ✅ `Components/TspMap/CitiesPanel.razor`
 6. ✅ `Pages/TspMap.razor`
-7. 🔄 `tests/Component/Trips/TspUiIntegrationTest.cs` (w trakcie)
+7. ✅ `tests/Component/Trips/TspUiIntegrationTest.cs`
 
 ## Pliki do Zmodyfikowania (3 istniejące)
 
