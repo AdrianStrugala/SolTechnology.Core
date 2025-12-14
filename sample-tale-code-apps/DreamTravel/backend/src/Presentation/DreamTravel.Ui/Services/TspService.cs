@@ -5,7 +5,7 @@ using SolTechnology.Core.CQRS;
 
 namespace DreamTravel.Ui.Services;
 
-public class TspService
+public class TspService : ITspService
 {
     private readonly HttpClient _http;
     private const string FindCityByNameUrl = "/api/v2/FindCityByName";

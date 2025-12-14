@@ -31,7 +31,21 @@
       "Bash(dotnet tool install:*)",
       "Bash(powershell.exe -Command \".\\bin\\Debug\\net10.0\\playwright.ps1 install chromium\")",
       "Bash(pwsh:*)",
-      "Bash(Remove-Item:*)"
+      "Bash(Remove-Item:*)",
+      "Bash(Select-String -Pattern \"tsp|blazor|migration|ui\" -Context 0)",
+      "Bash(ls:*)",
+      "Bash(timeout 180 dotnet test:*)",
+      "Bash(curl:*)",
+      "Bash(netstat:*)",
+      "Bash(Select-String -Pattern \"5000|7024|2137\")",
+      "Bash(powershell.exe -Command \"netstat -ano | Select-String -Pattern ''5000|7024|2137''\")",
+      "Bash(timeout 60 dotnet test:*)",
+      "Bash(powershell.exe:*)",
+      "Bash(Select-String -Pattern \"error|failed|passed\" -Context 2)",
+      "Bash(git rm:*)",
+      "Bash(rm:*)",
+      "Bash(dotnet new:*)",
+      "Bash(dotnet sln:*)"
     ],
     "deny": [],
     "ask": []

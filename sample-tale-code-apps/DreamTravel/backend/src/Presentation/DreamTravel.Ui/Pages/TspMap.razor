@@ -5,7 +5,7 @@
 @using DreamTravel.Ui.Components.Shared
 @using DreamTravel.Trips.Domain.Cities
 @using DreamTravel.Trips.Domain.Paths
-@inject TspService TspService
+@inject ITspService TspService
 @inject IJSRuntime JS
 @inject ISnackbar Snackbar
 
@@ -275,7 +275,7 @@
         _paths = resultPaths;
 
         var totalSeconds = resultPaths.Sum(p => p.OptimalDistance);
-        _totalTime = TspService.FormatTimeFromSeconds(totalSeconds);
+        _totalTime = DreamTravel.Ui.Services.TspService.FormatTimeFromSeconds(totalSeconds);
 
         // DKK conversion (7.46 multiplier from Angular app)
         _totalCost = resultPaths.Sum(p => p.OptimalCost) * 7.46;

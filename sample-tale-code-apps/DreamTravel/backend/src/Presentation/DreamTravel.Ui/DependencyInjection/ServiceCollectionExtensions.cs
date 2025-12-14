@@ -21,7 +21,7 @@ public static class ServiceCollectionExtensions
         });
 
         services.AddScoped<GraphService>();
-        services.AddScoped<TspService>();
+        services.AddScoped<ITspService, TspService>();
 
         services.AddSingleton(googleMapsConfig);
 
