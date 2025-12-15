@@ -46,7 +46,9 @@
       "Bash(rm:*)",
       "Bash(dotnet new:*)",
       "Bash(dotnet sln:*)",
-      "Bash(dotnet user-secrets:*)"
+      "Bash(dotnet user-secrets:*)",
+      "Bash(tree:*)",
+      "Bash(zip:*)"
     ],
     "deny": [],
     "ask": []
