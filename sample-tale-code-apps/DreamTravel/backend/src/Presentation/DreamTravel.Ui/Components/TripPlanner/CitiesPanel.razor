@@ -170,7 +170,7 @@
 
     private async Task HandleKeyUp(KeyboardEventArgs e, CityEntry city)
     {
-        // Ctrl/Cmd + Enter: Run TSP
+        // Ctrl/Cmd + Enter: Calculate route
         if ((e.CtrlKey || e.MetaKey) && e.Key == "Enter")
         {
             if (!IsLoading && Cities.Count(c => c.City != null) >= 2)

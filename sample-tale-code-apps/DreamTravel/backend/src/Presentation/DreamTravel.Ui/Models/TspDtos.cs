@@ -3,7 +3,7 @@ using Path = DreamTravel.Trips.Domain.Paths.Path;
 
 namespace DreamTravel.Ui.Models;
 
-// DTOs for TSP API communication
+// DTOs for Trip Planner API communication
 // These mirror the server-side query/result models but are client-safe
 
 public class CalculateBestPathQuery

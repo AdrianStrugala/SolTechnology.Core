@@ -220,7 +220,7 @@
     },
 
     // ========================================
-    // TSP-SPECIFIC FUNCTIONS (Multi-instance support)
+    // TRIP PLANNER FUNCTIONS (Multi-instance support)
     // ========================================
 
     _maps: {}, // Store multiple map instances by ID

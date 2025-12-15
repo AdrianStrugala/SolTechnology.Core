@@ -3,9 +3,71 @@
 
 <PageTitle>Home</PageTitle>
 
-<MudContainer>
-    <MudText Typo="Typo.h3" Class="mb-4">Welcome to DreamTravel UI!</MudText>
-    <MudText Typo="Typo.body1">
-        Go to the <MudLink Href="/map">map</MudLink> to view the street grid.
+<MudContainer Class="mt-8">
+    <MudText Typo="Typo.h3" Class="mb-2">Welcome to DreamTravel!</MudText>
+    <MudText Typo="Typo.body1" Color="Color.Secondary" Class="mb-6">
+        Explore our interactive tools for trip planning and city navigation
     </MudText>
+
+    <MudGrid>
+        <!-- City Architect Card -->
+        <MudItem xs="12" md="6">
+            <MudCard Elevation="2" Class="pa-4" Style="height: 100%;">
+                <MudCardContent>
+                    <MudStack Spacing="2">
+                        <MudIcon Icon="@Icons.Material.Filled.Map" Size="Size.Large" Color="Color.Primary" />
+                        <MudText Typo="Typo.h5">City Architect</MudText>
+                        <MudText Typo="Typo.body2" Color="Color.Secondary">
+                            Visualize and manage street networks. View traffic data, add new streets, and explore city infrastructure with interactive maps.
+                        </MudText>
+                    </MudStack>
+                </MudCardContent>
+                <MudCardActions>
+                    <MudButton Variant="Variant.Filled" Color="Color.Primary" Href="/map" StartIcon="@Icons.Material.Filled.ArrowForward">
+                        Open City Architect
+                    </MudButton>
+                </MudCardActions>
+            </MudCard>
+        </MudItem>
+
+        <!-- Trip Planner Card -->
+        <MudItem xs="12" md="6">
+            <MudCard Elevation="2" Class="pa-4" Style="height: 100%;">
+                <MudCardContent>
+                    <MudStack Spacing="2">
+                        <MudIcon Icon="@Icons.Material.Filled.Route" Size="Size.Large" Color="Color.Primary" />
+                        <MudText Typo="Typo.h5">Trip Planner</MudText>
+                        <MudText Typo="Typo.body2" Color="Color.Secondary">
+                            Plan optimal routes between multiple cities. Calculate travel times, costs, and find the most efficient paths for your journey.
+                        </MudText>
+                    </MudStack>
+                </MudCardContent>
+                <MudCardActions>
+                    <MudButton Variant="Variant.Filled" Color="Color.Primary" Href="/tsp-map" StartIcon="@Icons.Material.Filled.ArrowForward">
+                        Open Trip Planner
+                    </MudButton>
+                </MudCardActions>
+            </MudCard>
+        </MudItem>
+
+        <!-- Flow Card -->
+        <MudItem xs="12" md="6">
+            <MudCard Elevation="2" Class="pa-4" Style="height: 100%;">
+                <MudCardContent>
+                    <MudStack Spacing="2">
+                        <MudIcon Icon="@Icons.Material.Filled.Money" Size="Size.Large" Color="Color.Primary" />
+                        <MudText Typo="Typo.h5">Flow</MudText>
+                        <MudText Typo="Typo.body2" Color="Color.Secondary">
+                            Manage and visualize workflow processes. Track operations, monitor progress, and analyze flow efficiency.
+                        </MudText>
+                    </MudStack>
+                </MudCardContent>
+                <MudCardActions>
+                    <MudButton Variant="Variant.Filled" Color="Color.Primary" Href="/flow" StartIcon="@Icons.Material.Filled.ArrowForward">
+                        Open Flow
+                    </MudButton>
+                </MudCardActions>
+            </MudCard>
+        </MudItem>
+    </MudGrid>
 </MudContainer>

@@ -46,7 +46,7 @@ public class TspMapTests
         _testContext.ComponentFactories.AddStub<MudSnackbarProvider>();
 
         // Stub child components (we're testing TspMap logic, not rendering)
-        _testContext.ComponentFactories.AddStub<DreamTravel.Ui.Components.TspMap.CitiesPanel>();
+        _testContext.ComponentFactories.AddStub<DreamTravel.Ui.Components.TripPlanner.CitiesPanel>();
         _testContext.ComponentFactories.AddStub<DreamTravel.Ui.Components.Shared.GoogleMap>();
     }
 

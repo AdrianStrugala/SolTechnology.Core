@@ -2,12 +2,14 @@
 @using DreamTravel.Trips.Domain.StreetGraph
 @using DreamTravel.Ui.Services
 @using DreamTravel.Ui.Configuration
+@using DreamTravel.Ui.Components.Shared
 @using MudBlazor
 @inject GraphService GraphService
 @inject GoogleMapsConfiguration GoogleMapsConfig
 @inject IJSRuntime JS
 @inject ISnackbar Snackbar
 
+<PageTitle>City Architect</PageTitle>
 
 <MudGrid GutterSize="1" Class="px-2 mt-4 pt-4">
   <!-- OPTIONS PANEL -->
@@ -35,34 +37,34 @@
                    Label="Pokaż ulice"
                    Color="Color.Primary"
                    Class="mb-2" />
-                   
+
         <MudDivider Class="my-2" />
-        
+
         <MudText Typo="Typo.subtitle2" Class="mt-2 mb-1">Dodawanie nowych ulic:</MudText>
-        
+
         <MudSwitch T="bool"
                    Value="addStreetMode"
                    ValueChanged="OnAddStreetModeToggled"
                    Label="Tryb dodawania"
                    Color="Color.Secondary"
                    Class="mb-2" />
-                   
+
         @if (addStreetMode)
         {
             <MudText Typo="Typo.caption" Class="mt-1 mb-3" Color="Color.Secondary">
                 Kliknij dwa różne skrzyżowania, aby utworzyć nową ulicę
             </MudText>
-            
-            <MudButton 
-                Variant="Variant.Outlined" 
-                Color="Color.Error" 
+
+            <MudButton
+                Variant="Variant.Outlined"
+                Color="Color.Error"
                 Size="Size.Small"
                 OnClick="ClearNewStreets"
                 Class="mb-3"
                 FullWidth="true">
                 Wyczyść nowe ulice
             </MudButton>
-            
+
             <MudText>
                 <span style="display:inline-block;width:16px;height:4px;background:#9c27b0;margin-right:8px;"></span>
                 Nowe ulice
@@ -70,7 +72,7 @@
         }
 
         <MudDivider Class="my-3" />
-        
+
         <MudText Typo="Typo.subtitle2" Class="mt-2 mb-1">Legenda:</MudText>
         <MudStack Spacing="1">
             <MudText>
@@ -100,10 +102,12 @@
 
   <!-- MAP CONTAINER -->
   <MudItem xs="12" md="9">
-    <MudText Typo="Typo.h5" Class="pa-2">Mapa projektu</MudText>
-    <div id="map"
-         style="height:calc(100vh - 64px - 48px); width:100%; background:#eee">
-    </div>
+    <MudText Typo="Typo.h5" Class="pa-2">City Architect</MudText>
+    <GoogleMap MapId="map"
+               InitialLat="51.1079"
+               InitialLng="17.0385"
+               InitialZoom="13"
+               AdditionalStyles="height: calc(100vh - 64px - 48px); background: #eee;" />
   </MudItem>
 </MudGrid>
 
@@ -121,28 +125,22 @@
   protected override async Task OnAfterRenderAsync(bool firstRender)
   {
     if (!firstRender) return;
-    await LoadMapAsync();
+    await LoadDataAsync();
   }
 
-  private async Task LoadMapAsync()
+  private async Task LoadDataAsync()
   {
     isLoading = true;
     StateHasChanged();
 
-    // Load Google Maps script dynamically with API key
-    await JS.InvokeVoidAsync("mapInterop.loadGoogleMapsScript", GoogleMapsConfig.ApiKey);
-
-    // initialize map
-    await JS.InvokeVoidAsync("mapInterop.initMap", 51.1079, 17.0385, 13);
-
-    // load data
+    // Load data from GraphService
     _nodes = (await GraphService.GetNodesAsync()).ToList();
     _streets = (await GraphService.GetStreetsAsync()).ToList();
     _dict = _nodes.ToDictionary(n => n.Id);
 
-    // draw layers
+    // Draw layers (map is already initialized by GoogleMap component)
     if (showMarkers) await DrawMarkersAsync();
-    if (showStreets)  await DrawStreetsAsync();
+    if (showStreets) await DrawStreetsAsync();
 
     isLoading = false;
     StateHasChanged();
