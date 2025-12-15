@@ -11,8 +11,8 @@
 
 <PageTitle>Dream Trips - TSP Solver</PageTitle>
 
-<MudGrid Class="pa-0 ma-0">
-    <MudItem xs="12" md="3" Class="pa-0">
+<MudGrid Class="pa-0 ma-0" Style="height: calc(100vh - 64px);">
+    <MudItem xs="12" md="4" Class="pa-0" Style="height: 100%;">
         <CitiesPanel Cities="@_cities"
                      IsLoading="@_isCalculating"
                      TotalTime="@_totalTime"
@@ -23,13 +23,13 @@
                      OnRunTsp="HandleRunTsp" />
     </MudItem>
 
-    <MudItem xs="12" md="9" Class="pa-0">
+    <MudItem xs="12" md="8" Class="pa-0" Style="height: 100%;">
         <GoogleMap MapId="tsp-map"
                    EnableGeolocation="true"
                    EnableClickToAdd="true"
                    OnMapClick="HandleMapClick"
                    InitialZoom="5"
-                   AdditionalStyles="height: calc(100vh - 64px);" />
+                   AdditionalStyles="height: 100%;" />
     </MudItem>
 </MudGrid>
 
@@ -48,8 +48,26 @@
 
     private async Task HandleCityAdded()
     {
-        _cities.Add(new CityEntry { Index = _cities.Count });
+        var newIndex = _cities.Count;
+        _cities.Add(new CityEntry { Index = newIndex });
         StateHasChanged();
+
+        // Auto-scroll to new field only if needed
+        await Task.Delay(150);
+        await JS.InvokeVoidAsync("eval", $@"
+            var container = document.getElementById('cities-scroll-container');
+            var newField = document.getElementById('city-input-{newIndex}');
+            if (container && newField) {{
+                // Only scroll if the field is not visible
+                var containerRect = container.getBoundingClientRect();
+                var fieldRect = newField.getBoundingClientRect();
+
+                if (fieldRect.bottom > containerRect.bottom || fieldRect.top < containerRect.top) {{
+                    newField.scrollIntoView({{ behavior: 'smooth', block: 'nearest' }});
+                }}
+                newField.focus();
+            }}
+        ");
     }
 
     private async Task HandleCityRemoved(int index)
@@ -79,7 +97,7 @@
     {
         if (string.IsNullOrWhiteSpace(entry.Name)) return;
 
-        _isCalculating = true;
+        entry.IsSearching = true;
         StateHasChanged();
 
         try
@@ -90,6 +108,12 @@
             {
                 entry.City = result.Data;
                 await AddCityToMap(result.Data, entry.Index);
+
+                // If this was the last field, add a new empty one
+                if (entry.Index == _cities.Count - 1)
+                {
+                    _cities.Add(new CityEntry { Index = _cities.Count });
+                }
             }
             else
             {
@@ -103,7 +127,7 @@
         }
         finally
         {
-            _isCalculating = false;
+            entry.IsSearching = false;
             StateHasChanged();
         }
     }
@@ -119,14 +143,28 @@
 
             if (result.IsSuccess)
             {
-                var entry = new CityEntry
+                // Check if there's an empty field to fill
+                var emptyEntry = _cities.FirstOrDefault(c => c.City == null);
+
+                if (emptyEntry != null)
                 {
-                    Index = _cities.Count,
-                    City = result.Data,
-                    Name = result.Data.Name
-                };
-                _cities.Add(entry);
-                await AddCityToMap(result.Data, entry.Index);
+                    // Fill existing empty field
+                    emptyEntry.City = result.Data;
+                    emptyEntry.Name = result.Data.Name;
+                    await AddCityToMap(result.Data, emptyEntry.Index);
+                }
+                else
+                {
+                    // Add new field if no empty ones exist
+                    var entry = new CityEntry
+                    {
+                        Index = _cities.Count,
+                        City = result.Data,
+                        Name = result.Data.Name
+                    };
+                    _cities.Add(entry);
+                    await AddCityToMap(result.Data, entry.Index);
+                }
             }
             else
             {

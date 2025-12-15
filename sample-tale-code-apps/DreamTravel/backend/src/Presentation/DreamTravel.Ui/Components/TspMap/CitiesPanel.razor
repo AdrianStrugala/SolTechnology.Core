@@ -1,90 +1,138 @@
 @using DreamTravel.Ui.Models
 
-<MudPaper Class="pa-4" Elevation="2" Style="height: calc(100vh - 64px); overflow-y: auto;">
-    <MudText Typo="Typo.h6" Class="mb-4">List of Cities</MudText>
+<MudPaper Class="pa-0" Elevation="2" Style="height: 100%; display: flex; flex-direction: column;">
 
-    @foreach (var city in Cities)
-    {
-        <MudStack Row="true" AlignItems="AlignItems.Center" Class="mb-2">
-            <MudTextField @bind-Value="city.Name"
-                          Label="City Name"
-                          Variant="Variant.Outlined"
-                          Immediate="true"
-                          OnBlur="@(() => OnCityChanged.InvokeAsync(city))"
-                          OnKeyUp="@(e => HandleKeyUp(e, city))"
-                          Style="flex: 1;" />
+    <!-- Header -->
+    <MudPaper Class="pa-3 pb-2" Elevation="0" Square="true">
+        <MudText Typo="Typo.h6" Class="mb-1">
+            <MudIcon Icon="@Icons.Material.Filled.Route" Size="Size.Small" Class="mr-1" />
+            Trip Planner
+        </MudText>
+        <MudText Typo="Typo.caption" Color="Color.Secondary">
+            Click on map or type city names
+        </MudText>
+    </MudPaper>
 
-            <MudIconButton Icon="@Icons.Material.Filled.Close"
-                           Color="Color.Error"
-                           Size="Size.Small"
-                           OnClick="@(() => OnCityRemoved.InvokeAsync(city.Index))" />
+    <MudDivider />
+
+    <!-- Scrollable Cities List - MAXIMUM SPACE -->
+    <div style="flex: 1 1 auto; min-height: 0; overflow-y: auto; overflow-x: hidden; padding: 10px; scroll-behavior: smooth;" id="cities-scroll-container">
+        @foreach (var city in Cities)
+        {
+            <div class="city-item @(city.IsSearching ? "city-searching" : "") @(IsLoading ? "city-loading" : "")"
+                 style="@GetCityItemStyle(city)">
+                <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="2">
+                    <!-- City Number Badge -->
+                    <div style="@($"min-width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; border-radius: 16px; font-weight: 600; font-size: 14px; background: var(--mud-palette-primary); color: white;")">
+                        @(city.Index + 1)
+                    </div>
+
+                    <!-- City Input -->
+                    <MudTextField @bind-Value="city.Name"
+                                  Label="@($"City {city.Index + 1}")"
+                                  Variant="Variant.Outlined"
+                                  Immediate="true"
+                                  Disabled="@IsLoading"
+                                  OnBlur="@(() => OnCityChanged.InvokeAsync(city))"
+                                  OnKeyUp="@(e => HandleKeyUp(e, city))"
+                                  Style="flex: 1;"
+                                  id="@($"city-input-{city.Index}")" />
+
+                    <!-- Remove Button -->
+                    <MudIconButton Icon="@Icons.Material.Filled.Close"
+                                   Color="Color.Error"
+                                   Size="Size.Small"
+                                   Disabled="@IsLoading"
+                                   OnClick="@(() => OnCityRemoved.InvokeAsync(city.Index))" />
+                </MudStack>
+            </div>
+        }
+    </div>
+
+    <MudDivider />
+
+    <!-- Compact Action Buttons -->
+    <div style="padding: 10px; background: var(--mud-palette-background);">
+        <!-- Results Section (if available) - Inline -->
+        @if (!string.IsNullOrEmpty(TotalTime))
+        {
+            <div style="padding: 10px 12px; margin-bottom: 8px; border-radius: 6px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; font-size: 15px; font-weight: 500; display: flex; justify-content: space-between; align-items: center;">
+                <span style="display: flex; align-items: center; gap: 4px;">
+                    <MudIcon Icon="@Icons.Material.Filled.Timer" Size="Size.Medium" />
+                    @TotalTime
+                </span>
+                <span style="display: flex; align-items: center; gap: 4px;">
+                    <MudIcon Icon="@Icons.Material.Filled.AttachMoney" Size="Size.Medium" />
+                    @TotalCost.ToString("F2") DKK
+                </span>
+            </div>
+        }
+
+        <MudStack Spacing="2">
+            <MudButton StartIcon="@Icons.Material.Filled.Add"
+                       Color="Color.Success"
+                       Variant="Variant.Outlined"
+                       OnClick="@(() => OnCityAdded.InvokeAsync())"
+                       Disabled="@IsLoading"
+                       FullWidth="true"
+                       Size="Size.Medium">
+                Add City
+            </MudButton>
+
+            <MudButton Variant="Variant.Filled"
+                       Color="Color.Primary"
+                       StartIcon="@Icons.Material.Filled.Calculate"
+                       OnClick="@(() => OnRunTsp.InvokeAsync())"
+                       Disabled="@(IsLoading || Cities.Count(c => c.City != null) < 2)"
+                       FullWidth="true"
+                       Size="Size.Medium"
+                       data-action="run-tsp">
+                @if (IsLoading)
+                {
+                    <MudProgressCircular Size="Size.Small" Indeterminate="true" Class="mr-2" />
+                    <span>Calculating...</span>
+                }
+                else
+                {
+                    <span>Calculate Route</span>
+                }
+            </MudButton>
+
+            <MudText Typo="Typo.caption" Align="Align.Center" Color="Color.Secondary">
+                Ctrl+Enter to calculate
+            </MudText>
         </MudStack>
-    }
-
-    <MudButton StartIcon="@Icons.Material.Filled.Add"
-               Color="Color.Success"
-               Variant="Variant.Outlined"
-               OnClick="@(() => OnCityAdded.InvokeAsync())"
-               FullWidth="true"
-               Class="mt-2">
-        Add City
-    </MudButton>
-
-    <MudDivider Class="my-4" />
-
-    <MudButton Variant="Variant.Filled"
-               Color="Color.Primary"
-               OnClick="@(() => OnRunTsp.InvokeAsync())"
-               Disabled="@(IsLoading || Cities.Count(c => c.City != null) < 2)"
-               FullWidth="true">
-        @if (IsLoading)
-        {
-            <MudProgressCircular Size="Size.Small" Indeterminate="true" Class="mr-2" />
-            <span>Calculating...</span>
-        }
-        else
-        {
-            <span>Run TSP</span>
-        }
-    </MudButton>
-
-    @if (!string.IsNullOrEmpty(TotalTime))
-    {
-        <MudDivider Class="my-4" />
-
-        <MudPaper Class="pa-3" Elevation="1">
-            <MudText Typo="Typo.h6" Class="mb-2">Results</MudText>
-
-            <MudStack Spacing="2">
-                <MudText>
-                    <MudIcon Icon="@Icons.Material.Filled.Timer" Size="Size.Small" Class="mr-1" />
-                    Total Time: <strong>@TotalTime</strong>
-                </MudText>
-
-                <MudText>
-                    <MudIcon Icon="@Icons.Material.Filled.AttachMoney" Size="Size.Small" Class="mr-1" />
-                    Total Cost: <strong>@TotalCost.ToString("F2") DKK</strong>
-                </MudText>
-            </MudStack>
-
-            @* TODO: Payment integration - endpoint /api/users/pay does not exist yet *@
-            @*
-            @if (TotalCost > 0)
-            {
-                <MudButton Variant="Variant.Filled"
-                           Color="Color.Secondary"
-                           Disabled="true"
-                           FullWidth="true"
-                           Class="mt-3">
-                    Pay with AIIA (Coming Soon)
-                </MudButton>
-            }
-            *@
-        </MudPaper>
-    }
+    </div>
 </MudPaper>
 
+<style>
+    .city-item {
+        margin-bottom: 8px;
+        padding: 6px;
+    }
+
+    .city-loading {
+        opacity: 0.6;
+        pointer-events: none;
+    }
+
+    @@keyframes pulse {
+        0%, 100% {
+            box-shadow: 0 0 0 0 rgba(103, 58, 183, 0.4);
+        }
+        50% {
+            box-shadow: 0 0 0 8px rgba(103, 58, 183, 0);
+        }
+    }
+
+    .city-searching {
+        animation: pulse 1.5s infinite;
+    }
+</style>
+
 @code {
+    [Inject] private IJSRuntime JS { get; set; } = default!;
+
     [Parameter] public List<CityEntry> Cities { get; set; } = new();
     [Parameter] public bool IsLoading { get; set; }
     [Parameter] public string TotalTime { get; set; } = "";
@@ -94,11 +142,73 @@
     [Parameter] public EventCallback<CityEntry> OnCityChanged { get; set; }
     [Parameter] public EventCallback OnRunTsp { get; set; }
 
+    private string GetCityItemStyle(CityEntry city)
+    {
+        return "";
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            // Ensure cities list starts from top
+            await JS.InvokeVoidAsync("eval", @"
+                var container = document.getElementById('cities-scroll-container');
+                if (container) {
+                    container.scrollTop = 0;
+                }
+
+                document.addEventListener('keydown', function(e) {
+                    if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+                        e.preventDefault();
+                        document.querySelector('[data-action=""run-tsp""]')?.click();
+                    }
+                });
+            ");
+        }
+    }
+
     private async Task HandleKeyUp(KeyboardEventArgs e, CityEntry city)
     {
+        // Ctrl/Cmd + Enter: Run TSP
+        if ((e.CtrlKey || e.MetaKey) && e.Key == "Enter")
+        {
+            if (!IsLoading && Cities.Count(c => c.City != null) >= 2)
+            {
+                await OnRunTsp.InvokeAsync();
+            }
+            return;
+        }
+
+        // Escape: Clear input
+        if (e.Key == "Escape")
+        {
+            city.Name = string.Empty;
+            city.City = null;
+            StateHasChanged();
+            return;
+        }
+
+        // Enter: Search and move to next
         if (e.Key == "Enter")
         {
             await OnCityChanged.InvokeAsync(city);
+
+            // Wait for state update
+            await Task.Delay(150);
+
+            // Focus next field
+            var nextIndex = city.Index + 1;
+            var nextFieldId = $"city-input-{nextIndex}";
+
+            try
+            {
+                await JS.InvokeVoidAsync("eval", $"document.getElementById('{nextFieldId}')?.focus()");
+            }
+            catch
+            {
+                // Ignore if field doesn't exist or focus fails
+            }
         }
     }
 }

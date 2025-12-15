@@ -7,6 +7,7 @@ public class CityEntry
     public int Index { get; set; }
     public string Name { get; set; } = string.Empty;
     public City? City { get; set; }
+    public bool IsSearching { get; set; }
 }
 
 public class MapClickEventArgs

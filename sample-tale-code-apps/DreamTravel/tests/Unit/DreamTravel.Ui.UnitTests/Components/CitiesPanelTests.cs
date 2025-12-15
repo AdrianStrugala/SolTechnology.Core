@@ -38,7 +38,7 @@ public class CitiesPanelTests : Bunit.TestContext
 
         // Assert
         var runButton = cut.FindAll("button")
-            .FirstOrDefault(b => b.TextContent.Contains("Run TSP"));
+            .FirstOrDefault(b => b.TextContent.Contains("Calculate Route"));
 
         runButton.Should().NotBeNull();
         runButton!.HasAttribute("disabled").Should().BeTrue();
@@ -67,7 +67,7 @@ public class CitiesPanelTests : Bunit.TestContext
 
         // Assert
         var runButton = cut.FindAll("button")
-            .FirstOrDefault(b => b.TextContent.Contains("Run TSP"));
+            .FirstOrDefault(b => b.TextContent.Contains("Calculate Route"));
 
         runButton.Should().NotBeNull();
         runButton!.HasAttribute("disabled").Should().BeTrue();
@@ -102,7 +102,7 @@ public class CitiesPanelTests : Bunit.TestContext
 
         // Assert
         var runButton = cut.FindAll("button")
-            .FirstOrDefault(b => b.TextContent.Contains("Run TSP"));
+            .FirstOrDefault(b => b.TextContent.Contains("Calculate Route"));
 
         runButton.Should().NotBeNull();
         runButton!.HasAttribute("disabled").Should().BeFalse();
@@ -137,7 +137,7 @@ public class CitiesPanelTests : Bunit.TestContext
 
         // Assert
         var runButton = cut.FindAll("button")
-            .FirstOrDefault(b => b.TextContent.Contains("Calculating") || b.TextContent.Contains("Run TSP"));
+            .FirstOrDefault(b => b.TextContent.Contains("Calculating") || b.TextContent.Contains("Calculate Route"));
 
         runButton.Should().NotBeNull();
         runButton!.HasAttribute("disabled").Should().BeTrue();
@@ -260,7 +260,7 @@ public class CitiesPanelTests : Bunit.TestContext
             .Add(p => p.OnRunTsp, EventCallback.Factory.Create(this, () => callbackInvoked = true)));
 
         var runButton = cut.FindAll("button")
-            .FirstOrDefault(b => b.TextContent.Contains("Run TSP"));
+            .FirstOrDefault(b => b.TextContent.Contains("Calculate Route"));
 
         runButton.Should().NotBeNull();
         runButton!.Click();
@@ -282,9 +282,8 @@ public class CitiesPanelTests : Bunit.TestContext
             .Add(p => p.TotalTime, "")
             .Add(p => p.TotalCost, 0));
 
-        // Assert
-        cut.Markup.Should().NotContain("Total Time:");
-        cut.Markup.Should().NotContain("Total Cost:");
+        // Assert - results section shouldn't be rendered at all when TotalTime is empty
+        cut.Markup.Should().NotContain("DKK");
     }
 
     [Test]
@@ -314,10 +313,10 @@ public class CitiesPanelTests : Bunit.TestContext
             .Add(p => p.TotalTime, "2:30:00")
             .Add(p => p.TotalCost, 111.9));
 
-        // Assert
-        cut.Markup.Should().Contain("Total Time:");
+        // Assert - verify time and cost are displayed (no labels anymore, just values with icons)
         cut.Markup.Should().Contain("2:30:00");
-        cut.Markup.Should().Contain("Total Cost:");
-        cut.Markup.Should().Contain("DKK"); // Accept any locale formatting (111.90 or 111,90)
+        cut.Markup.Should().Contain("DKK");
+        // Accept either locale format: 111.90 or 111,90
+        cut.Markup.Should().Match(m => m.Contains("111.90") || m.Contains("111,90"));
     }
 }
