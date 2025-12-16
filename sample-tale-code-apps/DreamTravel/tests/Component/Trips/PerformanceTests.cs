@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using DreamTravel.Trips.Domain.Cities;
-using DreamTravel.Trips.Queries.CalculateBestPath;
+using DreamTravel.Domain.Cities;
+using DreamTravel.Queries.CalculateBestPath;
 using FluentAssertions;
 using NUnit.Framework;
 // using NSubstitute;

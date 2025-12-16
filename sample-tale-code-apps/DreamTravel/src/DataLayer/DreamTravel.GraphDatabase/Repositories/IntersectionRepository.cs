@@ -1,4 +1,4 @@
-﻿using DreamTravel.Trips.Domain.StreetGraph;
+﻿using DreamTravel.Domain.StreetGraph;
 using Neo4j.Driver;
 
 namespace DreamTravel.GraphDatabase.Repositories;

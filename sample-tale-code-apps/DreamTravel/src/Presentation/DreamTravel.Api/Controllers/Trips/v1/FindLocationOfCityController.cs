@@ -1,8 +1,8 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.Net;
 using System.Net.Mime;
-using DreamTravel.Trips.Domain.Cities;
-using DreamTravel.Trips.Queries.FindCityByName;
+using DreamTravel.Domain.Cities;
+using DreamTravel.Queries.FindCityByName;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using SolTechnology.Core.CQRS;

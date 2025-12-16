@@ -1,5 +1,5 @@
 ﻿using DreamTravel.GraphDatabase.Repositories;
-using DreamTravel.Trips.Domain.StreetGraph;
+using DreamTravel.Domain.StreetGraph;
 using Microsoft.AspNetCore.Mvc;
 using SolTechnology.Core.CQRS;
 

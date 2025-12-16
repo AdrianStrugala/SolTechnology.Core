@@ -1,5 +1,5 @@
-﻿using DreamTravel.Trips.Domain.Cities;
-using DreamTravel.Trips.Sql.DbModels;
+﻿using DreamTravel.Domain.Cities;
+using DreamTravel.Sql.DbModels;
 
 namespace DreamTravel.DomainServices.CityDomain;
 

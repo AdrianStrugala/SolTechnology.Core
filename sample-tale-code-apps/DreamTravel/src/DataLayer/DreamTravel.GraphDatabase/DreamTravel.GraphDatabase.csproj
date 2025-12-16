@@ -6,7 +6,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\..\DreamTravel.Trips.Domain\DreamTravel.Trips.Domain.csproj" />
+      <ProjectReference Include="..\..\DreamTravel.Domain\DreamTravel.Domain.csproj" />
     </ItemGroup>
 
 </Project>

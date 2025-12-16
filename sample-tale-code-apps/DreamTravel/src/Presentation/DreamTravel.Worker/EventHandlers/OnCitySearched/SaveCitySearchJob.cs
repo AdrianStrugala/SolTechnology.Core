@@ -1,5 +1,5 @@
 using DreamTravel.DomainServices.CityDomain;
-using DreamTravel.Trips.Domain.Events;
+using DreamTravel.Domain.Events;
 using Hangfire.Annotations;
 using MediatR;
 

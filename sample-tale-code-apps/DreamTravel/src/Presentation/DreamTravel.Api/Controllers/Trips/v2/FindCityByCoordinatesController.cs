@@ -1,7 +1,7 @@
 ﻿using System.Net;
 using System.Net.Mime;
-using DreamTravel.Trips.Domain.Cities;
-using DreamTravel.Trips.Queries.FindCityByCoordinates;
+using DreamTravel.Domain.Cities;
+using DreamTravel.Queries.FindCityByCoordinates;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using SolTechnology.Core.CQRS;

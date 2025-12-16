@@ -1,15 +1,15 @@
 ﻿using System.Diagnostics;
-using DreamTravel.Trips.Domain.Cities;
-using DreamTravel.Trips.GeolocationDataClients.GoogleApi;
-using DreamTravel.Trips.Sql;
-using DreamTravel.Trips.Sql.QueryBuilders;
+using DreamTravel.Domain.Cities;
+using DreamTravel.GeolocationDataClients.GoogleApi;
+using DreamTravel.Sql;
+using DreamTravel.Sql.QueryBuilders;
 using DreamTravel.FunctionalTests.FakeApis;
 using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using SolTechnology.Core.CQRS;
 using SolTechnology.Core.Faker;
-using Path = DreamTravel.Trips.Domain.Paths.Path;
+using Path = DreamTravel.Domain.Paths.Path;
 
 namespace DreamTravel.FunctionalTests.Trips;
 

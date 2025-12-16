@@ -1,6 +1,6 @@
 ﻿using DreamTravel.Api;
 using DreamTravel.FunctionalTests.FakeApis;
-using DreamTravel.Trips.Sql;
+using DreamTravel.Sql;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using SolTechnology.Core.Api.Testing;

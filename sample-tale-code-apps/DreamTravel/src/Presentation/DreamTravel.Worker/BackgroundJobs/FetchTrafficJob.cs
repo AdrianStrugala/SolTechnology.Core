@@ -1,4 +1,4 @@
-using DreamTravel.Trips.Commands.FetchTraffic;
+using DreamTravel.Commands.FetchTraffic;
 using Hangfire;
 
 namespace DreamTravel.Worker.BackgroundJobs;

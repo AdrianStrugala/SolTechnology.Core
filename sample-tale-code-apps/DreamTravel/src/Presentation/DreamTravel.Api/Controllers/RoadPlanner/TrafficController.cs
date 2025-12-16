@@ -1,4 +1,4 @@
-﻿using DreamTravel.Trips.Commands.RecalculateTraffic;
+﻿using DreamTravel.Commands.RecalculateTraffic;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 

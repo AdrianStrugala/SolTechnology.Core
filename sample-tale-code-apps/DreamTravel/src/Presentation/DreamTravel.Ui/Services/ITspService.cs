@@ -1,4 +1,4 @@
-using DreamTravel.Trips.Domain.Cities;
+using DreamTravel.Domain.Cities;
 using DreamTravel.Ui.Models;
 using SolTechnology.Core.CQRS;
 

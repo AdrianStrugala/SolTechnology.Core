@@ -1,6 +1,6 @@
-using DreamTravel.Trips.Queries.GetSearchStatistics;
-using DreamTravel.Trips.Sql;
-using DreamTravel.Trips.Sql.DbModels;
+using DreamTravel.Queries.GetSearchStatistics;
+using DreamTravel.Sql;
+using DreamTravel.Sql.DbModels;
 using FluentAssertions;
 using Microsoft.Extensions.DependencyInjection;
 using SolTechnology.Core.CQRS;

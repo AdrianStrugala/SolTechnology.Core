@@ -1,6 +1,6 @@
 ﻿using System.Net;
 using System.Net.Mime;
-using DreamTravel.Trips.Queries.CalculateBestPath;
+using DreamTravel.Queries.CalculateBestPath;
 using Microsoft.AspNetCore.Mvc;
 using SolTechnology.Core.CQRS;
 

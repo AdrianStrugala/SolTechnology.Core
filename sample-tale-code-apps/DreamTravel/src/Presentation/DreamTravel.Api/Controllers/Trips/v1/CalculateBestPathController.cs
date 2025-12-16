@@ -1,10 +1,10 @@
 ﻿using System.Net;
 using System.Net.Mime;
-using DreamTravel.Trips.Queries.CalculateBestPath;
+using DreamTravel.Queries.CalculateBestPath;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using SolTechnology.Core.CQRS;
-using Path = DreamTravel.Trips.Domain.Paths.Path;
+using Path = DreamTravel.Domain.Paths.Path;
 
 namespace DreamTravel.Api.Controllers.v1
 {

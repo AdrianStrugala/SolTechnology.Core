@@ -1,4 +1,4 @@
-using DreamTravel.Trips.Domain.Cities;
+using DreamTravel.Domain.Cities;
 
 namespace DreamTravel.Ui.Models;
 

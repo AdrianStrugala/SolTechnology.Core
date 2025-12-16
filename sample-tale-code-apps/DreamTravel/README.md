@@ -112,9 +112,9 @@ Comprehensive test coverage across multiple levels:
 - **DreamTravel.Ui.UnitTests** - Blazor component tests (bUnit)
   - 17 tests for CitiesPanel, TspMap components
   - FluentAssertions for readable assertions
-- **DreamTravel.Trips.Commands.UnitTests** - Business logic
-- **DreamTravel.Trips.Queries.UnitTests** - Query handlers
-- **DreamTravel.Trips.TravelingSalesmanProblem.UnitTests** - TSP algorithms
+- **DreamTravel.Commands.UnitTests** - Business logic
+- **DreamTravel.Queries.UnitTests** - Query handlers
+- **DreamTravel.TravelingSalesmanProblem.UnitTests** - TSP algorithms
 
 **Framework:** NUnit + FluentAssertions
 
@@ -240,7 +240,7 @@ classDiagram
 ```
 
 
-Going into more details. The complete example of a [QueryHandler](https://github.com/AdrianStrugala/SolTechnology.Core/tree/master/sample-tale-code-apps/DreamTravel/src/LogicLayer/DreamTravel.Trips.Queries/CalculateBestPath):
+Going into more details. The complete example of a [QueryHandler](https://github.com/AdrianStrugala/SolTechnology.Core/tree/master/sample-tale-code-apps/DreamTravel/src/LogicLayer/DreamTravel.Queries/CalculateBestPath):
 
 1) Controller - it is meant be simple:
 

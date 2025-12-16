@@ -1,4 +1,4 @@
-using DreamTravel.Trips.Sql.DbModels;
+using DreamTravel.Sql.DbModels;
 
 namespace DreamTravel.DomainServices.CityDomain.SaveSteps;
 

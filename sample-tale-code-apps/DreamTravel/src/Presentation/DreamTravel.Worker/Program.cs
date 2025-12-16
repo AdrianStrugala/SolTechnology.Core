@@ -1,8 +1,8 @@
 using DreamTravel.GraphDatabase;
 using DreamTravel.Infrastructure;
-using DreamTravel.Trips.Commands;
-using DreamTravel.Trips.GeolocationDataClients;
-using DreamTravel.Trips.Sql;
+using DreamTravel.Commands;
+using DreamTravel.GeolocationDataClients;
+using DreamTravel.Sql;
 using DreamTravel.Worker.BackgroundJobs;
 using EntityGraphQL.AspNet;
 using Hangfire;

@@ -1,6 +1,6 @@
 ﻿using System.Net;
 using System.Net.Mime;
-using DreamTravel.Trips.Queries.GetSearchStatistics;
+using DreamTravel.Queries.GetSearchStatistics;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using SolTechnology.Core.CQRS;

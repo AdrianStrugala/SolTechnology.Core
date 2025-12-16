@@ -1,7 +1,7 @@
 ﻿using System.Net;
 using System.Net.Mime;
-using DreamTravel.Trips.Domain.Cities;
-using DreamTravel.Trips.Queries.FindCityByName;
+using DreamTravel.Domain.Cities;
+using DreamTravel.Queries.FindCityByName;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using SolTechnology.Core.Api.Filters;

@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
-using DreamTravel.Trips.Domain.Cities;
-using DreamTravel.Trips.GeolocationDataClients.GoogleApi;
+using DreamTravel.Domain.Cities;
+using DreamTravel.GeolocationDataClients.GoogleApi;
 using SolTechnology.Core.Faker.FakesBase;
 using WireMock.Matchers;
 using WireMock.RequestBuilders;

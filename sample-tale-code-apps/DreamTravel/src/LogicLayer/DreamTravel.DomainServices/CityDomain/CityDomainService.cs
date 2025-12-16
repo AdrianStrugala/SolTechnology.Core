@@ -1,8 +1,8 @@
 ﻿using DreamTravel.DomainServices.CityDomain.SaveSteps;
-using DreamTravel.Trips.Domain.Cities;
-using DreamTravel.Trips.GeolocationDataClients.GoogleApi;
-using DreamTravel.Trips.Sql;
-using DreamTravel.Trips.Sql.QueryBuilders;
+using DreamTravel.Domain.Cities;
+using DreamTravel.GeolocationDataClients.GoogleApi;
+using DreamTravel.Sql;
+using DreamTravel.Sql.QueryBuilders;
 using Microsoft.EntityFrameworkCore;
 
 namespace DreamTravel.DomainServices.CityDomain;

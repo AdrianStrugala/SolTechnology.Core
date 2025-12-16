@@ -26,12 +26,12 @@
   </Folder>
   <Folder Name="/SampleApps/DreamTravel/src/">
     <Project Path="sample-tale-code-apps/DreamTravel/src/DreamTravel.Aspire/DreamTravel.Aspire.csproj" />
-    <Project Path="sample-tale-code-apps/DreamTravel/src/DreamTravel.Trips.Domain/DreamTravel.Trips.Domain.csproj" />
+    <Project Path="sample-tale-code-apps/DreamTravel/src/DreamTravel.Domain/DreamTravel.Domain.csproj" />
   </Folder>
   <Folder Name="/SampleApps/DreamTravel/src/DataLayer/">
     <Project Path="sample-tale-code-apps/DreamTravel/src/DataLayer/DreamTravel.GraphDatabase/DreamTravel.GraphDatabase.csproj" />
-    <Project Path="sample-tale-code-apps/DreamTravel/src/DataLayer/DreamTravel.Trips.GeolocationDataClients/DreamTravel.Trips.GeolocationDataClients.csproj" />
-    <Project Path="sample-tale-code-apps/DreamTravel/src/DataLayer/DreamTravel.Trips.Sql/DreamTravel.Trips.Sql.csproj" />
+    <Project Path="sample-tale-code-apps/DreamTravel/src/DataLayer/DreamTravel.GeolocationDataClients/DreamTravel.GeolocationDataClients.csproj" />
+    <Project Path="sample-tale-code-apps/DreamTravel/src/DataLayer/DreamTravel.Sql/DreamTravel.Sql.csproj" />
   </Folder>
   <Folder Name="/SampleApps/DreamTravel/src/Infrastructure/">
     <Project Path="sample-tale-code-apps/DreamTravel/src/Infrastructure/DreamTravel.Infrastructure/DreamTravel.Infrastructure.csproj" />
@@ -40,9 +40,9 @@
   <Folder Name="/SampleApps/DreamTravel/src/LogicLayer/">
     <Project Path="sample-tale-code-apps/DreamTravel/src/LogicLayer/DreamTravel.DomainServices/DreamTravel.DomainServices.csproj" />
     <Project Path="sample-tale-code-apps/DreamTravel/src/LogicLayer/DreamTravel.Flows/DreamTravel.Flows.csproj" />
-    <Project Path="sample-tale-code-apps/DreamTravel/src/LogicLayer/DreamTravel.Trips.Commands/DreamTravel.Trips.Commands.csproj" />
-    <Project Path="sample-tale-code-apps/DreamTravel/src/LogicLayer/DreamTravel.Trips.Queries/DreamTravel.Trips.Queries.csproj" />
-    <Project Path="sample-tale-code-apps/DreamTravel/src/LogicLayer/DreamTravel.Trips.TravelingSalesmanProblem/DreamTravel.Trips.TravelingSalesmanProblem.csproj" />
+    <Project Path="sample-tale-code-apps/DreamTravel/src/LogicLayer/DreamTravel.Commands/DreamTravel.Commands.csproj" />
+    <Project Path="sample-tale-code-apps/DreamTravel/src/LogicLayer/DreamTravel.Queries/DreamTravel.Queries.csproj" />
+    <Project Path="sample-tale-code-apps/DreamTravel/src/LogicLayer/DreamTravel.TravelingSalesmanProblem/DreamTravel.TravelingSalesmanProblem.csproj" />
   </Folder>
   <Folder Name="/SampleApps/DreamTravel/src/Presentation/">
     <Project Path="sample-tale-code-apps/DreamTravel/src/Presentation/DreamTravel.Api/DreamTravel.Api.csproj" />
@@ -55,10 +55,10 @@
     <Project Path="sample-tale-code-apps/DreamTravel/tests/EndToEnd/DreamTravel.E2E.Tests.csproj" />
   </Folder>
   <Folder Name="/SampleApps/DreamTravel/tests/Unit/">
-    <Project Path="sample-tale-code-apps/DreamTravel/tests/Unit/DreamTravel.Trips.Commands.UnitTests/DreamTravel.Trips.Commands.UnitTests.csproj" />
-    <Project Path="sample-tale-code-apps/DreamTravel/tests/Unit/DreamTravel.Trips.Queries.UnitTests/DreamTravel.Trips.Queries.UnitTests.csproj" />
-    <Project Path="sample-tale-code-apps/DreamTravel/tests/Unit/DreamTravels.Trips.GeolocationData.IntegrationTests/DreamTravel.Trips.GeolocationDataClients.IntegrationTests.csproj" />
-    <Project Path="sample-tale-code-apps/DreamTravel/tests/Unit/DreamTravels.Trips.TravelingSalesmanProblem.UnitTests/DreamTravel.Trips.TravelingSalesmanProblem.UnitTests.csproj" />
+    <Project Path="sample-tale-code-apps/DreamTravel/tests/Unit/DreamTravel.Commands.UnitTests/DreamTravel.Commands.UnitTests.csproj" />
+    <Project Path="sample-tale-code-apps/DreamTravel/tests/Unit/DreamTravel.Queries.UnitTests/DreamTravel.Queries.UnitTests.csproj" />
+    <Project Path="sample-tale-code-apps/DreamTravel/tests/Unit/DreamTravel.GeolocationDataClients.IntegrationTests/DreamTravel.GeolocationDataClients.IntegrationTests.csproj" />
+    <Project Path="sample-tale-code-apps/DreamTravel/tests/Unit/DreamTravel.TravelingSalesmanProblem.UnitTests/DreamTravel.TravelingSalesmanProblem.UnitTests.csproj" />
     <Project Path="sample-tale-code-apps/DreamTravel/tests/Unit/DreamTravel.Ui.UnitTests/DreamTravel.Ui.UnitTests.csproj" />
   </Folder>
   <Folder Name="/Solution Items/">

@@ -1,5 +1,5 @@
-using DreamTravel.Trips.Domain.Cities;
-using Path = DreamTravel.Trips.Domain.Paths.Path;
+using DreamTravel.Domain.Cities;
+using Path = DreamTravel.Domain.Paths.Path;
 
 namespace DreamTravel.Ui.Models;
 

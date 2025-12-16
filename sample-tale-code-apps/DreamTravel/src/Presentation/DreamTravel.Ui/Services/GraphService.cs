@@ -1,6 +1,6 @@
 ﻿
 using System.Net.Http.Json;
-using DreamTravel.Trips.Domain.StreetGraph;
+using DreamTravel.Domain.StreetGraph;
 using SolTechnology.Core.CQRS;
 
 namespace DreamTravel.Ui.Services;
