@@ -217,5 +217,206 @@
         window._markers.forEach(marker => {
             marker.setIcon(null);
         });
+    },
+
+    // ========================================
+    // TRIP PLANNER FUNCTIONS (Multi-instance support)
+    // ========================================
+
+    _maps: {}, // Store multiple map instances by ID
+
+    initMapById: (mapId, lat, lng, zoom) => {
+        const mapElement = document.getElementById(mapId);
+        if (!mapElement) {
+            console.error(`Map element with id '${mapId}' not found`);
+            return;
+        }
+
+        const map = new google.maps.Map(mapElement, {
+            center: { lat, lng },
+            zoom
+        });
+
+        window.mapInterop._maps[mapId] = {
+            map: map,
+            markers: [],
+            directionsRenderers: [],
+            infoWindow: new google.maps.InfoWindow()
+        };
+
+        return mapId;
+    },
+
+    addTspMarker: (mapId, lat, lng, label, color = '#FF0000', cityData = null) => {
+        const mapData = window.mapInterop._maps[mapId];
+        if (!mapData) {
+            console.error(`Map with id '${mapId}' not initialized`);
+            return;
+        }
+
+        const marker = new google.maps.Marker({
+            position: { lat, lng },
+            map: mapData.map,
+            label: {
+                text: label,
+                color: 'white',
+                fontWeight: 'bold',
+                fontSize: '14px'
+            },
+            icon: {
+                path: google.maps.SymbolPath.CIRCLE,
+                scale: 10,
+                fillColor: color,
+                fillOpacity: 1,
+                strokeWeight: 2,
+                strokeColor: 'white'
+            }
+        });
+
+        // Add hover info window with city statistics
+        if (cityData) {
+            marker.addListener('mouseover', () => {
+                let infoContent = `
+                    <div style="min-width: 200px; font-size: 14px;">
+                        <b>${cityData.name || 'Unknown'}</b><br/>
+                        <b>Country:</b> ${cityData.country || 'N/A'}<br/>
+                        <b>Coordinates:</b> ${lat.toFixed(4)}, ${lng.toFixed(4)}<br/>`;
+
+                if (cityData.searchStatistics && cityData.searchStatistics.length > 0) {
+                    const latestStat = cityData.searchStatistics[0];
+                    infoContent += `<b>Search Count:</b> ${latestStat.searchCount}<br/>`;
+                }
+
+                infoContent += `</div>`;
+
+                mapData.infoWindow.setContent(infoContent);
+                mapData.infoWindow.open(mapData.map, marker);
+            });
+
+            marker.addListener('mouseout', () => {
+                mapData.infoWindow.close();
+            });
+        }
+
+        mapData.markers.push(marker);
+        return marker;
+    },
+
+    drawDirectionsPath: async (mapId, startLat, startLng, endLat, endLng, options = {}) => {
+        const mapData = window.mapInterop._maps[mapId];
+        if (!mapData) {
+            console.error(`Map with id '${mapId}' not initialized`);
+            return Promise.reject(new Error('Map not initialized'));
+        }
+
+        const directionsService = new google.maps.DirectionsService();
+        const directionsRenderer = new google.maps.DirectionsRenderer({
+            suppressMarkers: true,
+            preserveViewport: true,
+            polylineOptions: {
+                strokeColor: options.color || '#0080ff',
+                strokeWeight: 6,
+                strokeOpacity: 0.6
+            }
+        });
+
+        directionsRenderer.setMap(mapData.map);
+
+        return new Promise((resolve, reject) => {
+            const makeRequest = () => {
+                directionsService.route({
+                    origin: { lat: startLat, lng: startLng },
+                    destination: { lat: endLat, lng: endLng },
+                    travelMode: google.maps.TravelMode.DRIVING,
+                    avoidTolls: options.avoidTolls || false,
+                    avoidFerries: true
+                }, (response, status) => {
+                    if (status === 'OK') {
+                        directionsRenderer.setDirections(response);
+                        mapData.directionsRenderers.push(directionsRenderer);
+                        resolve(true);
+                    } else if (status === 'OVER_QUERY_LIMIT') {
+                        // Retry after 1 second
+                        console.warn('Google Maps API rate limit hit, retrying in 1s...');
+                        setTimeout(makeRequest, 1000);
+                    } else {
+                        console.error(`Directions request failed: ${status}`);
+                        reject(new Error(`Directions request failed: ${status}`));
+                    }
+                });
+            };
+
+            makeRequest();
+        });
+    },
+
+    clearTspMarkers: (mapId) => {
+        const mapData = window.mapInterop._maps[mapId];
+        if (!mapData) return;
+
+        mapData.markers.forEach(marker => marker.setMap(null));
+        mapData.markers = [];
+    },
+
+    clearDirections: (mapId) => {
+        const mapData = window.mapInterop._maps[mapId];
+        if (!mapData) return;
+
+        mapData.directionsRenderers.forEach(renderer => renderer.setMap(null));
+        mapData.directionsRenderers = [];
+    },
+
+    fitBoundsToMarkers: (mapId) => {
+        const mapData = window.mapInterop._maps[mapId];
+        if (!mapData || mapData.markers.length === 0) return;
+
+        const bounds = new google.maps.LatLngBounds();
+        mapData.markers.forEach(marker => {
+            bounds.extend(marker.getPosition());
+        });
+
+        mapData.map.fitBounds(bounds);
+    },
+
+    requestGeolocation: (mapId) => {
+        if (!navigator.geolocation) {
+            return Promise.reject(new Error('Geolocation not supported'));
+        }
+
+        return new Promise((resolve, reject) => {
+            navigator.geolocation.getCurrentPosition(
+                (position) => {
+                    const result = {
+                        lat: position.coords.latitude,
+                        lng: position.coords.longitude
+                    };
+                    resolve(result);
+                },
+                (error) => {
+                    reject(new Error(`Geolocation error: ${error.message}`));
+                }
+            );
+        });
+    },
+
+    setMapCenter: (mapId, lat, lng) => {
+        const mapData = window.mapInterop._maps[mapId];
+        if (!mapData) return;
+
+        mapData.map.setCenter({ lat, lng });
+    },
+
+    attachMapClickListener: (mapId, dotnetHelper, callbackMethodName) => {
+        const mapData = window.mapInterop._maps[mapId];
+        if (!mapData) {
+            console.error(`Map with id '${mapId}' not initialized`);
+            return;
+        }
+
+        mapData.map.addListener('click', (event) => {
+            const lat = event.latLng.lat();
+            const lng = event.latLng.lng();
+            dotnetHelper.invokeMethodAsync(callbackMethodName, lat, lng);
+        });
     }
 };

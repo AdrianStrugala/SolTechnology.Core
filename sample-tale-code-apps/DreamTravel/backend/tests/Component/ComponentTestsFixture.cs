@@ -13,8 +13,11 @@ namespace DreamTravel.FunctionalTests
     [SetCulture("en-US")]
     public static class ComponentTestsFixture
     {
+        // In-memory fixtures (for API integration tests)
         public static ApiFixture<Program> ApiFixture { get; set; } = null!;
         public static ApiFixture<Worker.Program> WorkerFixture { get; set; } = null!;
+
+        // Shared fixtures
         public static SqlFixture SqlFixture { get; set; } = null!;
         public static WireMockFixture WireMockFixture { get; set; } = null!;
 
@@ -23,10 +26,16 @@ namespace DreamTravel.FunctionalTests
         {
             Environment.SetEnvironmentVariable("ASPNETCORE_ENVIRONMENT", "development");
 
+            // 1. Start SQL Server (Docker container)
             SqlFixture = new SqlFixture("DreamTravelDatabase")
                 .WithSqlProject(Path.GetFullPath("../../../../../src/Infrastructure/DreamTravelDatabase/DreamTravelDatabase.csproj"));
             await SqlFixture.InitializeAsync();
-            
+
+            // 2. Start WireMock (mocks Google API) on port 2137
+            WireMockFixture = new WireMockFixture();
+            WireMockFixture.Initialize();
+            WireMockFixture.RegisterFakeApi(new GoogleFakeApi());
+
             var configuration = new ConfigurationBuilder()
                 .AddJsonFile("appsettings.tests.json")
                 .AddInMemoryCollection(new Dictionary<string, string?>
@@ -34,13 +43,10 @@ namespace DreamTravel.FunctionalTests
                     {"Sql:ConnectionString", SqlFixture.DatabaseConnectionString}
                 })
                 .Build();
-            
+
+            // 3. Start in-memory API fixtures (for API integration tests)
             ApiFixture = new ApiFixture<Program>(configuration);
             WorkerFixture = new ApiFixture<Worker.Program>(configuration);
-            
-            WireMockFixture = new WireMockFixture();
-            WireMockFixture.Initialize();
-            WireMockFixture.RegisterFakeApi(new GoogleFakeApi());
         }
 
 

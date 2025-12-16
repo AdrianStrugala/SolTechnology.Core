@@ -291,19 +291,13 @@ paths:
           content:
             text/plain:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Intersection'
+                $ref: '#/components/schemas/IntersectionListResult'
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Intersection'
+                $ref: '#/components/schemas/IntersectionListResult'
             text/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Intersection'
+                $ref: '#/components/schemas/IntersectionListResult'
   /api/projects/streets:
     get:
       tags:
@@ -314,19 +308,13 @@ paths:
           content:
             text/plain:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Street'
+                $ref: '#/components/schemas/StreetListResult'
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Street'
+                $ref: '#/components/schemas/StreetListResult'
             text/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Street'
+                $ref: '#/components/schemas/StreetListResult'
   /api/v2/statistics/countries:
     get:
       tags:
@@ -536,6 +524,19 @@ components:
           type: number
           format: double
       additionalProperties: false
+    IntersectionListResult:
+      type: object
+      properties:
+        isSuccess:
+          type: boolean
+        error:
+          $ref: '#/components/schemas/Error'
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Intersection'
+          nullable: true
+      additionalProperties: false
     Path:
       type: object
       properties:
@@ -678,6 +679,19 @@ components:
         trafficRegularSpeed:
           type: number
           format: double
+          nullable: true
+      additionalProperties: false
+    StreetListResult:
+      type: object
+      properties:
+        isSuccess:
+          type: boolean
+        error:
+          $ref: '#/components/schemas/Error'
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Street'
           nullable: true
       additionalProperties: false
     ValidationResult:

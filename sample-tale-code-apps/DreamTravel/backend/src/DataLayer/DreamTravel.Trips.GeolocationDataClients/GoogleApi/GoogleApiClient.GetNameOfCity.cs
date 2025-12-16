@@ -7,18 +7,32 @@ namespace DreamTravel.Trips.GeolocationDataClients.GoogleApi
     {
         public async Task<City> GetNameOfCity(City city)
         {
+            string url = $"https://maps.googleapis.com/maps/api/geocode/json?latlng={city.Latitude},{city.Longitude}&sensor=false&key={_options.Key}";
+
             try
             {
-                string url =
-                    $"https://maps.googleapis.com/maps/api/geocode/json?latlng={city.Latitude},{city.Longitude}&sensor=false&key={_options.Key}";
-
                 string response = await httpClient.GetStringAsync(url);
                 JObject json = JObject.Parse(response);
 
-                for (int i = 0; i < json["results"][0]["address_components"].Count(); i++)
+                var status = json["status"]?.Value<string>();
+                if (status != "OK")
                 {
-                    var component = json["results"][0]["address_components"][i];
+                    var errorMessage = json["error_message"]?.Value<string>() ?? "Unknown error";
+                    throw new InvalidDataException(
+                        $"Google Maps API returned status '{status}': {errorMessage}. " +
+                        $"URL: {url.Replace(_options.Key, "<REDACTED>")}");
+                }
 
+                var results = json["results"];
+                if (results == null || !results.Any())
+                {
+                    throw new InvalidDataException(
+                        $"No results found for coordinates: Lat: {city.Latitude}, Lng: {city.Longitude}");
+                }
+
+                for (int i = 0; i < results[0]["address_components"].Count(); i++)
+                {
+                    var component = results[0]["address_components"][i];
                     var types = component["types"].Select(t => t.Value<string>()).ToList();
 
                     if (types.Contains("locality") || types.Contains("postal_town"))
@@ -31,17 +45,29 @@ namespace DreamTravel.Trips.GeolocationDataClients.GoogleApi
                         city.Country = component["long_name"].Value<string>();
                     }
                 }
-                
+
                 if (city.Name == null || city.Name.Equals(string.Empty))
                 {
-                    city.Name = json["results"][0]["formatted_address"].Value<string>();
+                    city.Name = results[0]["formatted_address"].Value<string>();
                 }
 
                 return city;
             }
-            catch (Exception)
+            catch (HttpRequestException ex)
             {
-                throw new InvalidDataException($"Cannot find city for coordinates: Lat: [{city.Latitude}], [{city.Longitude}]");
+                throw new InvalidDataException(
+                    $"Failed to call Google Maps API for coordinates: Lat: {city.Latitude}, Lng: {city.Longitude}. " +
+                    $"HTTP error: {ex.Message}", ex);
+            }
+            catch (InvalidDataException)
+            {
+                throw;
+            }
+            catch (Exception ex)
+            {
+                throw new InvalidDataException(
+                    $"Unexpected error while getting city name for coordinates: Lat: {city.Latitude}, Lng: {city.Longitude}. " +
+                    $"Error: {ex.Message}", ex);
             }
         }
     }

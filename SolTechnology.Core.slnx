@@ -57,6 +57,7 @@
     <Project Path="sample-tale-code-apps/DreamTravel/backend/tests/Unit/DreamTravel.Trips.Queries.UnitTests/DreamTravel.Trips.Queries.UnitTests.csproj" />
     <Project Path="sample-tale-code-apps/DreamTravel/backend/tests/Unit/DreamTravels.Trips.GeolocationData.IntegrationTests/DreamTravel.Trips.GeolocationDataClients.IntegrationTests.csproj" />
     <Project Path="sample-tale-code-apps/DreamTravel/backend/tests/Unit/DreamTravels.Trips.TravelingSalesmanProblem.UnitTests/DreamTravel.Trips.TravelingSalesmanProblem.UnitTests.csproj" />
+    <Project Path="sample-tale-code-apps/DreamTravel/tests/Unit/DreamTravel.Ui.UnitTests/DreamTravel.Ui.UnitTests.csproj" />
   </Folder>
   <Folder Name="/Solution Items/">
     <File Path="README.md" />

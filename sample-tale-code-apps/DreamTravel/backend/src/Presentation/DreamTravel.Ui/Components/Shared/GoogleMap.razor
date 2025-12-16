@@ -1,0 +1,92 @@
+@using DreamTravel.Ui.Configuration
+@using DreamTravel.Ui.Models
+@inject IJSRuntime JS
+@inject GoogleMapsConfiguration GoogleMapsConfig
+@inject ISnackbar Snackbar
+@implements IAsyncDisposable
+
+<div id="@MapId" style="@($"height: 100%; width: 100%; {AdditionalStyles}")"></div>
+
+@code {
+    [Parameter] public string MapId { get; set; } = "map";
+    [Parameter] public double InitialLat { get; set; } = 51.1079;
+    [Parameter] public double InitialLng { get; set; } = 17.0385;
+    [Parameter] public int InitialZoom { get; set; } = 5;
+    [Parameter] public bool EnableGeolocation { get; set; } = false;
+    [Parameter] public bool EnableClickToAdd { get; set; } = false;
+    [Parameter] public EventCallback<MapClickEventArgs> OnMapClick { get; set; }
+    [Parameter] public string AdditionalStyles { get; set; } = "";
+
+    private bool _isMapInitialized = false;
+    private DotNetObjectReference<GoogleMap>? _dotNetHelper;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender || _isMapInitialized) return;
+
+        try
+        {
+            // Load Google Maps script
+            await JS.InvokeVoidAsync("mapInterop.loadGoogleMapsScript", GoogleMapsConfig.ApiKey);
+
+            // Initialize map
+            await JS.InvokeVoidAsync("mapInterop.initMapById", MapId, InitialLat, InitialLng, InitialZoom);
+
+            _isMapInitialized = true;
+
+            // Handle geolocation
+            if (EnableGeolocation)
+            {
+                await TrySetGeolocation();
+            }
+
+            // Attach click listener
+            if (EnableClickToAdd && OnMapClick.HasDelegate)
+            {
+                _dotNetHelper = DotNetObjectReference.Create(this);
+                await JS.InvokeVoidAsync("mapInterop.attachMapClickListener", MapId, _dotNetHelper, nameof(HandleMapClickFromJS));
+            }
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Failed to initialize map: {ex.Message}", Severity.Error);
+        }
+    }
+
+    private async Task TrySetGeolocation()
+    {
+        try
+        {
+            var position = await JS.InvokeAsync<GeolocationResult>("mapInterop.requestGeolocation", MapId);
+            await JS.InvokeVoidAsync("mapInterop.setMapCenter", MapId, position.Lat, position.Lng);
+        }
+        catch (JSException)
+        {
+            Snackbar.Add("Geolocation denied. Using default location.", Severity.Info);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Geolocation error: {ex.Message}");
+        }
+    }
+
+    [JSInvokable]
+    public async Task HandleMapClickFromJS(double lat, double lng)
+    {
+        if (OnMapClick.HasDelegate)
+        {
+            await OnMapClick.InvokeAsync(new MapClickEventArgs { Lat = lat, Lng = lng });
+        }
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        _dotNetHelper?.Dispose();
+    }
+
+    private class GeolocationResult
+    {
+        public double Lat { get; set; }
+        public double Lng { get; set; }
+    }
+}
