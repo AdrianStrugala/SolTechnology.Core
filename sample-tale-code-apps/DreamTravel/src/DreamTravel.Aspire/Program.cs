@@ -33,8 +33,8 @@ var dbDeployment = dreamTravelDb.OnResourceReady(async (resource, @event, ct) =>
     connectionString = connBuilder.ToString();
 
     var dacpacPath = Path.Combine(
-        builder.AppHostDirectory,      // .../backend/src/DreamTravel.Aspire
-        "..", "..",                    // -> backend/
+        builder.AppHostDirectory,      // .../src/DreamTravel.Aspire
+        "..", "..",                    // -> DreamTravel/
         "artifacts", "dacpac", "DreamTravelDatabase.dacpac"
     );
 

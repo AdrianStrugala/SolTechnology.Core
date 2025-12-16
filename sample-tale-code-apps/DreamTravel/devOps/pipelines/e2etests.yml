@@ -2,7 +2,7 @@ variables:
  - name: BuildConfiguration
    value: 'Release'
  - name: workingDirectory
-   value: 'sample-tale-code-apps/DreamTravel/backend'
+   value: 'sample-tale-code-apps/DreamTravel'
 
 
 jobs:

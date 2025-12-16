@@ -15,8 +15,8 @@
 	<!-- Skopiuj dacpac do wspólnej lokalizacji po zbudowaniu -->
 	<Target Name="CopyDacpacToSharedLocation" AfterTargets="Build">
 		<PropertyGroup>
-			<BackendRoot>$(MSBuildProjectDirectory)\..\..\..</BackendRoot>
-			<SharedDacpacDir>$(BackendRoot)\artifacts\dacpac\</SharedDacpacDir>
+			<DreamTravelRoot>$(MSBuildProjectDirectory)\..\..\..</DreamTravelRoot>
+			<SharedDacpacDir>$(DreamTravelRoot)\artifacts\dacpac\</SharedDacpacDir>
 			<SharedDacpacPath>$(SharedDacpacDir)$(MSBuildProjectName).dacpac</SharedDacpacPath>
 		</PropertyGroup>
 

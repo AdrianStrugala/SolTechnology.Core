@@ -6,10 +6,10 @@
 # one that uses this SDK: https://github.com/rr-wfm/MSBuild.Sdk.SqlProj/
 FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build
 WORKDIR .
-COPY ["/backend/src/Infrastructure/DreamTravelDatabase/DreamTravelDatabase.csproj", "DreamTravelDatabase/"]
+COPY ["/src/Infrastructure/DreamTravelDatabase/DreamTravelDatabase.csproj", "DreamTravelDatabase/"]
 RUN dotnet restore -v diag "DreamTravelDatabase/DreamTravelDatabase.csproj"
 COPY . .
-WORKDIR "/backend/src/Infrastructure/DreamTravelDatabase"
+WORKDIR "/src/Infrastructure/DreamTravelDatabase"
 RUN dotnet build "DreamTravelDatabase.csproj" -c Release -o /app/build -v diag
 
 # Then we create the final image using instructions adapted from https://www.wintellect.com/devops-sql-server-dacpac-docker/
