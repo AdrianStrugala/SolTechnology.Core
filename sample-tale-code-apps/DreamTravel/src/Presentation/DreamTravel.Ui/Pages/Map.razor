@@ -1,0 +1,294 @@
+﻿@page "/map"
+@using DreamTravel.Domain.StreetGraph
+@using DreamTravel.Ui.Services
+@using DreamTravel.Ui.Configuration
+@using DreamTravel.Ui.Components.Shared
+@using MudBlazor
+@inject GraphService GraphService
+@inject GoogleMapsConfiguration GoogleMapsConfig
+@inject IJSRuntime JS
+@inject ISnackbar Snackbar
+
+<PageTitle>City Architect</PageTitle>
+
+<MudGrid GutterSize="1" Class="px-2 mt-4 pt-4">
+  <!-- OPTIONS PANEL -->
+  <MudItem xs="12" md="3">
+    <MudPaper Class="pa-4" Elevation="1">
+      <MudText Typo="Typo.h6">Opcje</MudText>
+      <MudDivider Class="my-2" />
+
+      @if (isLoading)
+      {
+        <MudProgressCircular Indeterminate="true" Size="Size.Large" Class="my-4 mx-auto" />
+      }
+      else
+      {
+        <MudSwitch T="bool"
+                   Value="showMarkers"
+                   ValueChanged="OnMarkersToggled"
+                   Label="Pokaż markery"
+                   Color="Color.Primary"
+                   Class="mb-2" />
+
+        <MudSwitch T="bool"
+                   Value="showStreets"
+                   ValueChanged="OnStreetsToggled"
+                   Label="Pokaż ulice"
+                   Color="Color.Primary"
+                   Class="mb-2" />
+
+        <MudDivider Class="my-2" />
+
+        <MudText Typo="Typo.subtitle2" Class="mt-2 mb-1">Dodawanie nowych ulic:</MudText>
+
+        <MudSwitch T="bool"
+                   Value="addStreetMode"
+                   ValueChanged="OnAddStreetModeToggled"
+                   Label="Tryb dodawania"
+                   Color="Color.Secondary"
+                   Class="mb-2" />
+
+        @if (addStreetMode)
+        {
+            <MudText Typo="Typo.caption" Class="mt-1 mb-3" Color="Color.Secondary">
+                Kliknij dwa różne skrzyżowania, aby utworzyć nową ulicę
+            </MudText>
+
+            <MudButton
+                Variant="Variant.Outlined"
+                Color="Color.Error"
+                Size="Size.Small"
+                OnClick="ClearNewStreets"
+                Class="mb-3"
+                FullWidth="true">
+                Wyczyść nowe ulice
+            </MudButton>
+
+            <MudText>
+                <span style="display:inline-block;width:16px;height:4px;background:#9c27b0;margin-right:8px;"></span>
+                Nowe ulice
+            </MudText>
+        }
+
+        <MudDivider Class="my-3" />
+
+        <MudText Typo="Typo.subtitle2" Class="mt-2 mb-1">Legenda:</MudText>
+        <MudStack Spacing="1">
+            <MudText>
+                <span style="display:inline-block;width:16px;height:4px;background:#007bff;margin-right:8px;"></span>
+                Brak danych
+            </MudText>
+            <MudText>
+                <span style="display:inline-block;width:16px;height:4px;background:#28a745;margin-right:8px;"></span>
+                &gt; 50 km/h
+            </MudText>
+            <MudText>
+                <span style="display:inline-block;width:16px;height:4px;background:#ffc107;margin-right:8px;"></span>
+                        30–50 km/h
+            </MudText>
+            <MudText>
+                <span style="display:inline-block;width:16px;height:4px;background:#dc3545;margin-right:8px;"></span>
+                        10–30 km/h
+            </MudText>
+            <MudText>
+                <span style="display:inline-block;width:16px;height:4px;background:#000000;margin-right:8px;"></span>
+                        &lt; 10 km/h
+            </MudText>
+        </MudStack>
+      }
+    </MudPaper>
+  </MudItem>
+
+  <!-- MAP CONTAINER -->
+  <MudItem xs="12" md="9">
+    <MudText Typo="Typo.h5" Class="pa-2">City Architect</MudText>
+    <GoogleMap MapId="map"
+               InitialLat="51.1079"
+               InitialLng="17.0385"
+               InitialZoom="13"
+               AdditionalStyles="height: calc(100vh - 64px - 48px); background: #eee;" />
+  </MudItem>
+</MudGrid>
+
+@code {
+  private bool isLoading = true;
+  private bool showMarkers = false;
+  private bool showStreets = true;
+  private bool addStreetMode = false;
+  private bool isRecalculating = false;
+
+  private List<Intersection> _nodes = new();
+  private List<Street> _streets = new();
+  private Dictionary<string, Intersection> _dict = new();
+
+  protected override async Task OnAfterRenderAsync(bool firstRender)
+  {
+    if (!firstRender) return;
+    await LoadDataAsync();
+  }
+
+  private async Task LoadDataAsync()
+  {
+    isLoading = true;
+    StateHasChanged();
+
+    // Load data from GraphService
+    _nodes = (await GraphService.GetNodesAsync()).ToList();
+    _streets = (await GraphService.GetStreetsAsync()).ToList();
+    _dict = _nodes.ToDictionary(n => n.Id);
+
+    // Draw layers (map is already initialized by GoogleMap component)
+    if (showMarkers) await DrawMarkersAsync();
+    if (showStreets) await DrawStreetsAsync();
+
+    isLoading = false;
+    StateHasChanged();
+  }
+
+  private async Task OnMarkersToggled(bool visible)
+  {
+    showMarkers = visible;
+    await JS.InvokeVoidAsync("mapInterop.clearMarkers");
+    if (visible) await DrawMarkersAsync();
+  }
+
+  private async Task OnStreetsToggled(bool visible)
+  {
+    showStreets = visible;
+    await JS.InvokeVoidAsync("mapInterop.clearStreets");
+    if (visible)
+    {
+      await DrawStreetsAsync();
+      if (JS.InvokeAsync<bool>("typeof", "mapInterop.updateColors").IsFaulted == false)
+      {
+        await JS.InvokeVoidAsync("mapInterop.updateColors");  
+      }
+    }
+  }
+  
+  private async Task OnAddStreetModeToggled(bool enabled)
+  {
+    addStreetMode = enabled;
+    await JS.InvokeVoidAsync("mapInterop.setAddStreetMode", enabled);
+  }
+  
+  private async Task ClearNewStreets()
+  {
+    await JS.InvokeVoidAsync("mapInterop.clearNewStreets");
+  }
+
+  private async Task DrawMarkersAsync()
+  {
+    foreach (var n in _nodes)
+      await JS.InvokeVoidAsync("mapInterop.drawIntersection", n.Lat, n.Lng, n.Id);
+  }
+
+  private async Task DrawStreetsAsync()
+  {
+    foreach (var s in _streets)
+    {
+      if (_dict.TryGetValue(s.FromId, out var a) &&
+          _dict.TryGetValue(s.ToId,   out var b))
+      {
+          double? speed = s.TrafficRegularSpeed;
+          double? speedArg = speed.HasValue && !double.IsInfinity(speed.Value) && !double.IsNaN(speed.Value)
+              ? speed.Value
+              : null;
+
+          await JS.InvokeVoidAsync("mapInterop.drawStreet",
+              a.Lat, a.Lng,
+              b.Lat, b.Lng,
+              new {
+                  id        = s.Id,
+                  name      = s.Name,
+                  length    = s.Length,
+                  lanes     = s.Lanes,
+                  oneway    = s.Oneway,
+                  bridge    = s.Bridge,
+                  tunnel    = s.Tunnel,
+                  highway   = s.Highway,
+                  service   = s.Service,
+                  junction  = s.Junction,
+                  @ref      = s.Ref
+              },
+              speedArg);
+      }
+    }
+  }
+  
+    private async Task RecalculateTraffic()
+  {
+    try
+    {
+      isRecalculating = true;
+      StateHasChanged();
+      
+      // Get new streets created in the UI but not yet saved
+      var newStreets = await JS.InvokeAsync<List<Street>>("mapInterop.getNewStreets");
+      
+      // Combine existing streets with new ones
+      var allStreets = _streets.ToList();
+      if (newStreets != null && newStreets.Any())
+      {
+        foreach (var newStreet in newStreets)
+        {
+          // Set default values for new streets
+          newStreet.TrafficRegularSpeed = null; // Mark as new
+          // Generate a temporary ID if needed
+          if (string.IsNullOrEmpty(newStreet.Id))
+          {
+            newStreet.Id = $"new_{Guid.NewGuid():N}";
+          }
+          allStreets.Add(newStreet);
+        }
+      }
+      
+      // Call the traffic recalculation with all streets and intersections
+      var result = await GraphService.RecalculateTrafficAsync(allStreets, _nodes);
+      
+      if (result.IsSuccess)
+      {
+        Snackbar.Add("Recalculated traffic", Severity.Success);
+        
+        // Update local street data with recalculated traffic values
+        var updatedSegments = result.Data ?? new List<TrafficSegment>();
+        if (updatedSegments.Any())
+        {
+          foreach (var segment in updatedSegments)
+          {
+            var street = allStreets.FirstOrDefault(s => s.Id == segment.SegmentId);
+            if (street != null)
+            {
+              street.TrafficRegularSpeed = segment.TrafficRegularSpeed;
+            }
+          }
+        }
+        
+        // Update _streets collection with the updated data
+        _streets = allStreets;
+        
+        // Redraw streets with new traffic data
+        if (showStreets)
+        {
+          await JS.InvokeVoidAsync("mapInterop.clearStreets");
+          await DrawStreetsAsync();
+          await JS.InvokeVoidAsync("mapInterop.updateTrafficColors");
+        }
+      }
+      else
+      {
+        Snackbar.Add(result.Error?.Message ?? "Error during calling RecalculateTraffic", Severity.Error);
+      }
+    }
+    catch (Exception ex)
+    {
+      Snackbar.Add($"Error: {ex.Message}", Severity.Error);
+    }
+    finally
+    {
+      isRecalculating = false;
+      StateHasChanged();
+    }
+  }
+}

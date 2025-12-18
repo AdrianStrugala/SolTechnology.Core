@@ -24,7 +24,7 @@ DreamTravel is a comprehensive full-stack application demonstrating modern .NET 
 ### Application Components
 
 #### 1. **DreamTravel.Ui** - Blazor WebAssembly Frontend
-Located: `backend/src/Presentation/DreamTravel.Ui`
+Located: `src/Presentation/DreamTravel.Ui`
 
 **Framework:** Blazor WASM + MudBlazor UI components
 
@@ -51,7 +51,7 @@ Located: `backend/src/Presentation/DreamTravel.Ui`
 - Clean Architecture with shared components
 
 #### 2. **DreamTravel.Api** - REST API Backend
-Located: `backend/src/Presentation/DreamTravel.Api`
+Located: `src/Presentation/DreamTravel.Api`
 
 **Endpoints:**
 ```
@@ -74,7 +74,7 @@ GET  /api/v2/statistics/countries    - Search statistics aggregation
 - GeoDB API (city search)
 
 #### 3. **DreamTravel.Worker** - Background Processing
-Located: `backend/src/Presentation/DreamTravel.Worker`
+Located: `src/Presentation/DreamTravel.Worker`
 
 **Responsibilities:**
 - Azure Service Bus message processing
@@ -88,7 +88,7 @@ Located: `backend/src/Presentation/DreamTravel.Worker`
 - Quartz.NET scheduler
 
 #### 4. **DreamTravel.Aspire** - Orchestration & Service Discovery
-Located: `backend/src/DreamTravel.Aspire`
+Located: `src/DreamTravel.Aspire`
 
 **.NET Aspire** provides:
 - Service orchestration (API, Worker, UI)
@@ -112,9 +112,9 @@ Comprehensive test coverage across multiple levels:
 - **DreamTravel.Ui.UnitTests** - Blazor component tests (bUnit)
   - 17 tests for CitiesPanel, TspMap components
   - FluentAssertions for readable assertions
-- **DreamTravel.Trips.Commands.UnitTests** - Business logic
-- **DreamTravel.Trips.Queries.UnitTests** - Query handlers
-- **DreamTravel.Trips.TravelingSalesmanProblem.UnitTests** - TSP algorithms
+- **DreamTravel.Commands.UnitTests** - Business logic
+- **DreamTravel.Queries.UnitTests** - Query handlers
+- **DreamTravel.TravelingSalesmanProblem.UnitTests** - TSP algorithms
 
 **Framework:** NUnit + FluentAssertions
 
@@ -240,7 +240,7 @@ classDiagram
 ```
 
 
-Going into more details. The complete example of a [QueryHandler](https://github.com/AdrianStrugala/SolTechnology.Core/tree/master/sample-tale-code-apps/DreamTravel/backend/src/Trips/LogicLayer/DreamTravel.Trips.Queries/CalculateBestPath):
+Going into more details. The complete example of a [QueryHandler](https://github.com/AdrianStrugala/SolTechnology.Core/tree/master/sample-tale-code-apps/DreamTravel/src/LogicLayer/DreamTravel.Queries/CalculateBestPath):
 
 1) Controller - it is meant be simple:
 

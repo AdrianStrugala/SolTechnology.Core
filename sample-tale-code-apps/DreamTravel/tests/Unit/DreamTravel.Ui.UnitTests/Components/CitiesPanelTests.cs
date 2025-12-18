@@ -1,5 +1,5 @@
 using Bunit;
-using DreamTravel.Trips.Domain.Cities;
+using DreamTravel.Domain.Cities;
 using DreamTravel.Ui.Components.TripPlanner;
 using DreamTravel.Ui.Models;
 using FluentAssertions;

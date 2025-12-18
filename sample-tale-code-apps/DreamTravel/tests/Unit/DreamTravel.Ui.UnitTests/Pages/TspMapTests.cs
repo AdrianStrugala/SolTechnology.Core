@@ -1,6 +1,6 @@
 using Bunit;
-using DreamTravel.Trips.Domain.Cities;
-using DreamTravel.Trips.Domain.Paths;
+using DreamTravel.Domain.Cities;
+using DreamTravel.Domain.Paths;
 using DreamTravel.Ui.Models;
 using DreamTravel.Ui.Pages;
 using DreamTravel.Ui.Services;
@@ -11,7 +11,7 @@ using MudBlazor;
 using MudBlazor.Services;
 using NSubstitute;
 using SolTechnology.Core.CQRS;
-using Path = DreamTravel.Trips.Domain.Paths.Path;
+using Path = DreamTravel.Domain.Paths.Path;
 
 namespace DreamTravel.Ui.UnitTests.Pages;
 

@@ -1,9 +1,0 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
-    
-    <ItemGroup>
-      <ProjectReference Include="..\..\..\..\..\..\src\SolTechnology.Core.Sql\SolTechnology.Core.Sql.csproj" />
-      <ProjectReference Include="..\..\DataLayer\DreamTravel.Trips.GeolocationDataClients\DreamTravel.Trips.GeolocationDataClients.csproj" />
-      <ProjectReference Include="..\..\DataLayer\DreamTravel.Trips.Sql\DreamTravel.Trips.Sql.csproj" />
-    </ItemGroup>
-
-</Project>

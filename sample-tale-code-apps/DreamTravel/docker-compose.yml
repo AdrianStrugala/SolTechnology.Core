@@ -3,9 +3,9 @@ version: '3.7'
 services:
     sql-server:
         platform: linux/amd64
-        build: 
+        build:
           context: .
-          dockerfile: backend/src/Infrastructure/DreamTravelDatabase/Dockerfile
+          dockerfile: src/Infrastructure/DreamTravelDatabase/Dockerfile
         ports:  
           - "1404:1433"
           

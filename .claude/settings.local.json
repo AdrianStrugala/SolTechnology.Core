@@ -48,7 +48,11 @@
       "Bash(dotnet sln:*)",
       "Bash(dotnet user-secrets:*)",
       "Bash(tree:*)",
-      "Bash(zip:*)"
+      "Bash(zip:*)",
+      "Bash(mv:*)",
+      "Bash(dotnet nuget list:*)",
+      "Bash(git mv:*)",
+      "Bash(export LC_ALL=C)"
     ],
     "deny": [],
     "ask": []

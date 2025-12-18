@@ -31,7 +31,7 @@ Each library is a separate NuGet package with its own `ModuleInstaller.cs` for d
 
 ### Sample Application (DreamTravel)
 
-Located in `sample-tale-code-apps/DreamTravel/backend/src/`, organized by layers:
+Located in `sample-tale-code-apps/DreamTravel/src/`, organized by layers:
 
 - **Presentation/** - Entry points (API, Worker, UI)
 - **LogicLayer/** - Business logic (Commands, Queries, Domain Services, Flows)
@@ -43,8 +43,8 @@ Located in `sample-tale-code-apps/DreamTravel/backend/src/`, organized by layers
 ### Tests
 
 - Core library tests: `tests/SolTechnology.Core.*.Tests`
-- DreamTravel tests: `sample-tale-code-apps/DreamTravel/backend/tests/`
-  - `Unit/` - Unit tests for individual components
+- DreamTravel tests: `sample-tale-code-apps/DreamTravel/tests/`
+  - `Unit/` - Unit tests for individual components (backend and UI)
   - `Component/` - Component integration tests
   - `EndToEnd/` - E2E tests
 
@@ -91,7 +91,7 @@ dotnet pack -c Release -o . ./src/SolTechnology.Core.CQRS/SolTechnology.Core.CQR
 
 2. **For DreamTravel changes**, build the sample app:
    ```bash
-   cd sample-tale-code-apps/DreamTravel/backend
+   cd sample-tale-code-apps/DreamTravel
    dotnet build
    ```
 
@@ -341,7 +341,7 @@ Tests covered:
 
 2. **Test Separation**:
    - GitHub Actions: Tests core libraries only (`tests/` directory at root)
-   - Azure DevOps: Tests DreamTravel sample app (`sample-tale-code-apps/DreamTravel/backend/tests/`)
+   - Azure DevOps: Tests DreamTravel sample app (`sample-tale-code-apps/DreamTravel/tests/`)
 
 3. **When Updating SDK Version**: Update in ALL pipeline files:
    - `.github/workflows/publishPackages.yml` (line 19)

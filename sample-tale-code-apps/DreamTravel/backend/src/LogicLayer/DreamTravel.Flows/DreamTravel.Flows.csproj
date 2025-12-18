@@ -1,8 +1,0 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
-
-  <ItemGroup>
-    <ProjectReference Include="..\..\..\..\..\..\src\SolTechnology.Core.CQRS\SolTechnology.Core.CQRS.csproj" />
-    <ProjectReference Include="..\..\..\..\..\..\src\SolTechnology.Core.Flow\SolTechnology.Core.Flow.csproj" />
-  </ItemGroup>
-
-</Project>

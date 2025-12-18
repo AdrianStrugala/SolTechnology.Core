@@ -25,7 +25,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\backend\src\Presentation\DreamTravel.Ui\DreamTravel.Ui.csproj" />
+    <ProjectReference Include="..\..\..\src\Presentation\DreamTravel.Ui\DreamTravel.Ui.csproj" />
   </ItemGroup>
 
 </Project>
