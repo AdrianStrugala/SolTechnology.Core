@@ -52,7 +52,11 @@
       "Bash(mv:*)",
       "Bash(dotnet nuget list:*)",
       "Bash(git mv:*)",
-      "Bash(export LC_ALL=C)"
+      "Bash(export LC_ALL=C)",
+      "Bash(dotnet run:*)",
+      "Bash(lsof:*)",
+      "Bash(kill:*)",
+      "Bash(pkill:*)"
     ],
     "deny": [],
     "ask": []

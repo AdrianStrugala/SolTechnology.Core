@@ -244,6 +244,15 @@
             infoWindow: new google.maps.InfoWindow()
         };
 
+        // Initialize global variables for backward compatibility with old API
+        window._map = map;
+        window._markers = [];
+        window._polylines = [];
+        window._newStreets = [];
+        window._infoWindow = new google.maps.InfoWindow();
+        window._selectedIntersections = [];
+        window._addStreetMode = false;
+
         return mapId;
     },
 
