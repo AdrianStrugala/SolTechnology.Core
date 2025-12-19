@@ -50,11 +50,39 @@ public partial class GoogleApiClient : IGoogleApiClient
 
         var json = JObject.Parse(await resp.Content.ReadAsStringAsync());
 
+        // Check if response has rows array
+        var rows = json["rows"] as JArray;
+        if (rows == null)
+        {
+            // No rows in response, set all segments to NaN
+            foreach (var segment in batch)
+            {
+                segment.DurationInSeconds = double.NaN;
+                segment.DistanceInMeters = double.NaN;
+            }
+            return new TrafficMatrixResponse(batch);
+        }
+
         // For each segment i in this batch, take the [i][i] element
         for (int i = 0; i < n; i++)
         {
-            var cell = json["rows"]?[i]?["elements"]?[i];
-            double time = double.NaN;
+            // Check if row exists and has elements
+            if (i >= rows.Count)
+            {
+                batch[i].DurationInSeconds = double.NaN;
+                batch[i].DistanceInMeters = double.NaN;
+                continue;
+            }
+
+            var elements = rows[i]?["elements"] as JArray;
+            if (elements == null || i >= elements.Count)
+            {
+                batch[i].DurationInSeconds = double.NaN;
+                batch[i].DistanceInMeters = double.NaN;
+                continue;
+            }
+
+            var cell = elements[i];
             if (cell?["status"]?.Value<string>() == "OK")
             {
                 batch[i].DurationInSeconds =
