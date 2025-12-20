@@ -3,6 +3,7 @@ using Microsoft.Extensions.Logging;
 using SolTechnology.Core.CQRS;
 using DreamTravel.GraphDatabase.Repositories;
 using DreamTravel.Domain.StreetGraph;
+using Hangfire;
 
 namespace DreamTravel.Commands.FetchTraffic
 {
@@ -15,6 +16,7 @@ namespace DreamTravel.Commands.FetchTraffic
     {
         private const int BatchSize = 10;
 
+        [AutomaticRetry(Attempts = 0)]
         public async Task<Result> Handle(FetchTrafficCommand request, CancellationToken cancellationToken)
         {
             var departureTime = request.DepartureTime;
