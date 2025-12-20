@@ -45,25 +45,9 @@ namespace DreamTravel.Commands.FetchTraffic
                     var trafficRequest = new TrafficMatrixRequest(batch, departureTime);
                     var response = await googleClient.GetSegmentDurationMatrixByTraffic(trafficRequest);
 
-                    // Filter out segments with invalid data (NaN) before updating database
-                    var validResults = response.Results
-                        .Where(r => !double.IsNaN(r.DurationInSeconds) &&
-                                    !double.IsNaN(r.DistanceInMeters) &&
-                                    r.DurationInSeconds > 0 &&
-                                    r.DistanceInMeters > 0)
-                        .ToList();
+                    await streetRepo.UpdateTrafficRegularTime(response.Results);
 
-                    if (validResults.Count > 0)
-                    {
-                        await streetRepo.UpdateTrafficRegularTime(validResults);
-                        logger.LogInformation("Batch processed: {Valid} valid results out of {Total} segments",
-                            validResults.Count, batch.Count);
-                    }
-                    else
-                    {
-                        logger.LogWarning("Batch skipped: no valid results from Google API for {Count} segments",
-                            batch.Count);
-                    }
+                    logger.LogInformation("Batch of {Count} segments updated successfully", batch.Count);
                 }
                 catch (Exception ex)
                 {
