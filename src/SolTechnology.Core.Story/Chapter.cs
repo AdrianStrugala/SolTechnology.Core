@@ -3,14 +3,14 @@ using SolTechnology.Core.CQRS;
 namespace SolTechnology.Core.Story;
 
 /// <summary>
-/// Base class for automated story chapters that execute without user input.
-/// These chapters run to completion automatically during story execution.
-/// Use this for business logic that doesn't require external interaction.
+/// Base class for story chapters.
+/// Chapters are the building blocks of your story - each represents a focused step in your business logic.
+/// For chapters that need user input, use InteractiveChapter instead.
 /// </summary>
 /// <typeparam name="TNarration">The narration type that flows through this chapter</typeparam>
 /// <example>
 /// <code>
-/// public class CalculateTotal : AutomatedChapter&lt;OrderNarration&gt;
+/// public class CalculateTotal : Chapter&lt;OrderNarration&gt;
 /// {
 ///     public override Task&lt;Result&gt; Read(OrderNarration narration)
 ///     {
@@ -20,7 +20,7 @@ namespace SolTechnology.Core.Story;
 /// }
 /// </code>
 /// </example>
-public abstract class AutomatedChapter<TNarration> : IChapter<TNarration>
+public abstract class Chapter<TNarration> : IChapter<TNarration>
     where TNarration : class
 {
     /// <summary>
@@ -30,7 +30,7 @@ public abstract class AutomatedChapter<TNarration> : IChapter<TNarration>
     public virtual string ChapterId => GetType().Name;
 
     /// <summary>
-    /// Execute this chapter's automated logic.
+    /// Execute this chapter's logic.
     /// Read from narration, perform your business logic, then update narration with results.
     /// Return Result.Success() if successful, or Result.Fail("message") if something goes wrong.
     /// </summary>

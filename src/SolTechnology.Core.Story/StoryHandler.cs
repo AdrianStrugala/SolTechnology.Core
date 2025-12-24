@@ -127,7 +127,7 @@ public abstract class StoryHandler<TInput, TNarration, TOutput>
             Narration = new TNarration { Input = input };
 
             // Initialize the engine
-            _engine.Initialize(Narration, cancellationToken);
+            await _engine.Initialize(Narration, cancellationToken);
 
             // Execute the story (calls TellStory() which calls Chapter<T>() methods)
             await TellStory();

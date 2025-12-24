@@ -22,9 +22,7 @@ internal class StoryEngine
     private CancellationToken _cancellationToken;
     private object _narration = null!;
     private string? _resumeFromChapterId;
-#pragma warning disable CS0649 // Field is never assigned - will be used for resume functionality in Week 2
     private JsonElement? _chapterInput;
-#pragma warning restore CS0649
     private bool _isPaused;
     private bool _hasFailed;
     private readonly List<ChapterInfo> _chapterHistory = new();
@@ -44,7 +42,7 @@ internal class StoryEngine
     /// Initialize the engine with narration and cancellation token.
     /// Must be called before executing any chapters.
     /// </summary>
-    public void Initialize<TInput, TOutput>(
+    public async Task Initialize<TInput, TOutput>(
         Narration<TInput, TOutput> narration,
         CancellationToken cancellationToken)
         where TInput : class
@@ -58,9 +56,26 @@ internal class StoryEngine
         // we might be resuming - load any previous state
         if (_options.EnablePersistence && !string.IsNullOrEmpty(narration.StoryInstanceId))
         {
-            // TODO: Load state from repository in Week 2
+            await LoadStoryState(narration.StoryInstanceId);
             _logger.LogInformation("Story {StoryId} resuming from saved state", narration.StoryInstanceId);
         }
+        else if (_options.EnablePersistence)
+        {
+            // Generate new story ID for first execution
+            var baseNarration = narration as dynamic;
+            baseNarration.StoryInstanceId = Guid.NewGuid().ToString();
+            _logger.LogInformation("Story started with ID {StoryId}", baseNarration.StoryInstanceId);
+        }
+    }
+
+    /// <summary>
+    /// Set user input for an interactive chapter when resuming.
+    /// Must be called before executing the story if resuming an interactive chapter.
+    /// </summary>
+    public void SetChapterInput(JsonElement? input)
+    {
+        _chapterInput = input;
+        _logger.LogDebug("Chapter input set for resume");
     }
 
     /// <summary>
@@ -168,11 +183,10 @@ internal class StoryEngine
 
         _chapterHistory.Add(chapterInfo);
 
-        // Persist state if enabled (Week 2 implementation)
+        // Persist state if enabled
         if (_options.EnablePersistence)
         {
-            // TODO: Save state to repository
-            _logger.LogDebug("Story state would be persisted here (Week 2)");
+            await SaveStoryState();
         }
     }
 
@@ -286,5 +300,83 @@ internal class StoryEngine
         }
 
         return Result<TOutput>.Fail("Failed to extract output from narration");
+    }
+
+    /// <summary>
+    /// Save current story state to the repository.
+    /// </summary>
+    private async Task SaveStoryState()
+    {
+        if (_options.Repository == null)
+        {
+            _logger.LogWarning("Persistence enabled but no repository configured");
+            return;
+        }
+
+        var narrationBase = _narration as dynamic;
+        string? storyId = narrationBase?.StoryInstanceId;
+
+        if (string.IsNullOrEmpty(storyId))
+        {
+            _logger.LogWarning("Cannot save story state - no StoryInstanceId");
+            return;
+        }
+
+        var storyInstance = new StoryInstance
+        {
+            StoryId = storyId,
+            HandlerTypeName = _narration.GetType().Name,
+            Status = _isPaused ? StoryStatus.WaitingForInput :
+                     _hasFailed ? StoryStatus.Failed :
+                     StoryStatus.Running,
+            CreatedAt = DateTime.UtcNow,
+            LastUpdatedAt = DateTime.UtcNow,
+            History = new List<ChapterInfo>(_chapterHistory),
+            CurrentChapter = _isPaused ? _chapterHistory.LastOrDefault() : null,
+            Context = JsonSerializer.Serialize(_narration)
+        };
+
+        await _options.Repository.SaveAsync(storyInstance);
+        _logger.LogDebug("Story state saved for {StoryId}", storyId);
+    }
+
+    /// <summary>
+    /// Load story state from the repository and restore engine state.
+    /// </summary>
+    private async Task LoadStoryState(string storyId)
+    {
+        if (_options.Repository == null)
+        {
+            _logger.LogWarning("Persistence enabled but no repository configured");
+            return;
+        }
+
+        var storyInstance = await _options.Repository.FindById(storyId);
+        if (storyInstance == null)
+        {
+            _logger.LogWarning("Story {StoryId} not found in repository", storyId);
+            return;
+        }
+
+        // Restore chapter history
+        _chapterHistory.Clear();
+        _chapterHistory.AddRange(storyInstance.History);
+
+        // Restore state flags
+        _isPaused = storyInstance.Status == StoryStatus.WaitingForInput;
+        _hasFailed = storyInstance.Status == StoryStatus.Failed;
+
+        // If we're paused at an interactive chapter, set up for resume
+        if (_isPaused && storyInstance.CurrentChapter != null)
+        {
+            _resumeFromChapterId = storyInstance.CurrentChapter.ChapterId;
+            _logger.LogInformation(
+                "Story will resume at interactive chapter {ChapterId}",
+                _resumeFromChapterId);
+        }
+
+        // Note: Narration context restoration happens in StoryManager/StoryHandler
+        // since the engine doesn't know the concrete narration type
+        _logger.LogDebug("Story state loaded for {StoryId}", storyId);
     }
 }

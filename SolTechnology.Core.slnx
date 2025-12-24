@@ -78,6 +78,7 @@
     <Project Path="tests/SolTechnology.Core.AUID.Tests/SolTechnology.Core.AUID.Tests.csproj" />
     <Project Path="tests/SolTechnology.Core.Guards.Tests/SolTechnology.Core.Guards.Tests.csproj" />
     <Project Path="tests/SolTechnology.Core.Sql.Tests/SolTechnology.Core.Sql.Tests.csproj" />
+    <Project Path="tests/SolTechnology.Core.Story.Tests/SolTechnology.Core.Story.Tests.csproj" />
   </Folder>
   <Folder Name="/src/">
     <File Path="src/Directory.Build.props" />

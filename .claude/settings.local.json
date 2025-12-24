@@ -59,7 +59,10 @@
       "Bash(pkill:*)",
       "Bash(git push:*)",
       "Bash(time dotnet build:*)",
-      "Bash(Select-String -Pattern \"Build|Warning|Error\")"
+      "Bash(Select-String -Pattern \"Build|Warning|Error\")",
+      "Bash(timeout 120 dotnet build:*)",
+      "Bash(Select-String -Pattern \"error|Build|succeeded|failed|warning\")",
+      "Bash(Select-Object -Last 20)"
     ],
     "deny": [],
     "ask": []
