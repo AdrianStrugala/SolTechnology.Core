@@ -56,7 +56,10 @@
       "Bash(dotnet run:*)",
       "Bash(lsof:*)",
       "Bash(kill:*)",
-      "Bash(pkill:*)"
+      "Bash(pkill:*)",
+      "Bash(git push:*)",
+      "Bash(time dotnet build:*)",
+      "Bash(Select-String -Pattern \"Build|Warning|Error\")"
     ],
     "deny": [],
     "ask": []

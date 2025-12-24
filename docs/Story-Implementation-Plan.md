@@ -1,7 +1,8 @@
 # Plan Implementacji: Story Framework
 
-> **Status:** 🟡 In Planning
-> **Start Date:** 2025-12-23
+> **Status:** 🟢 In Progress - Week 1
+> **Start Date:** 2024-12-23
+> **Last Updated:** 2024-12-24
 > **Target Completion:** 2026-01-20 (4 tygodnie)
 
 ## 🎯 Cel
@@ -73,25 +74,40 @@ src/SolTechnology.Core.Story/           # NOWY PROJEKT (ex-Flow)
 
 ### Week 1: Core Framework (Priorytet 1)
 
-- [ ] **Setup Projektu**
-  - [ ] Utworzenie `src/SolTechnology.Core.Story/SolTechnology.Core.Story.csproj`
-  - [ ] Dodanie referencji do `SolTechnology.Core.CQRS` (Result, Error)
-  - [ ] Dodanie zależności: Microsoft.Data.Sqlite, Microsoft.AspNetCore.Mvc.Core
-  - [ ] Aktualizacja `SolTechnology.Core.slnx` (usunąć Flow, dodać Story)
+- [x] **Setup Projektu** ✅
+  - [x] Utworzenie `src/SolTechnology.Core.Story/SolTechnology.Core.Story.csproj`
+  - [x] Dodanie referencji do `SolTechnology.Core.CQRS` (Result, Error)
+  - [x] Dodanie zależności: Microsoft.Data.Sqlite, Microsoft.AspNetCore.Mvc.Core
+  - [x] Aktualizacja `SolTechnology.Core.slnx` (usunąć Flow, dodać Story)
 
-- [ ] **Core Abstractions**
-  - [ ] `StoryHandler<TInput, TNarration, TOutput>` - bazowy handler
-  - [ ] `Narration<TInput, TOutput>` - bazowy kontekst
-  - [ ] `IChapter<TNarration>` - interfejs rozdziału
-  - [ ] `AutomatedChapter<TNarration>` - bazowa klasa automatycznych rozdziałów
-  - [ ] `InteractiveChapter<TNarration, TChapterInput>` - bazowa klasa interaktywnych rozdziałów
-  - [ ] `StoryOptions` - konfiguracja (Default, WithInMemoryPersistence, WithSqlitePersistence)
+- [x] **Core Abstractions** ✅ (partial)
+  - [ ] `StoryHandler<TInput, TNarration, TOutput>` - bazowy handler 🚧
+  - [x] `Narration<TInput, TOutput>` - bazowy kontekst
+  - [x] `IChapter<TNarration>` - interfejs rozdziału
+  - [x] `AutomatedChapter<TNarration>` - bazowa klasa automatycznych rozdziałów
+  - [x] `InteractiveChapter<TNarration, TChapterInput>` - bazowa klasa interaktywnych rozdziałów
+  - [x] `StoryOptions` - konfiguracja (Default, WithInMemoryPersistence, WithSqlitePersistence)
 
-- [ ] **Registration**
-  - [ ] `ModuleInstaller.cs` - `RegisterStories()` z auto-discovery
-  - [ ] Testy rejestracji
+- [x] **Models** ✅
+  - [x] `StoryInstance` - persisted story state
+  - [x] `ChapterInfo` - chapter execution tracking
+  - [x] `StoryStatus` - enum
+  - [x] `DataField + SchemaBuilder` - input schema introspection
 
-- [ ] **Basic Tests**
+- [x] **Persistence Stubs** ✅
+  - [x] `IStoryRepository` - interface
+  - [x] `InMemoryStoryRepository` - complete implementation
+  - [x] `SqliteStoryRepository` - stub (Week 3)
+
+- [x] **Engine & Handler** ✅
+  - [x] `StoryEngine` - internal orchestration
+  - [x] `StoryHandler<TInput, TNarration, TOutput>` - bazowy handler
+
+- [x] **Registration** ✅
+  - [x] `ModuleInstaller.cs` - `RegisterStories()` z auto-discovery
+  - [ ] Testy rejestracji (Week 1 Part 2)
+
+- [ ] **Basic Tests** (Week 1 Part 2)
   - [ ] `tests/SolTechnology.Core.Story.Tests/StoryHandlerTests.cs` - podstawowa funkcjonalność
   - [ ] `tests/SolTechnology.Core.Story.Tests/AutomatedChapterTests.cs` - wykonanie rozdziałów
   - [ ] Proste 3-chapter story end-to-end
