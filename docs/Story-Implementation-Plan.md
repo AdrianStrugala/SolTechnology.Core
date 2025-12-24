@@ -149,11 +149,14 @@ src/SolTechnology.Core.Story/           # NOWY PROJEKT (ex-Flow)
 
 ### Week 3: Advanced & Migration (Priorytet 3)
 
-- [ ] **SQLite Persistence**
-  - [ ] `Persistence/SqliteStoryRepository.cs`
-  - [ ] Database schema + migrations
-  - [ ] Serializacja/deserializacja context
-  - [ ] `SqliteRepositoryTests.cs`
+**Status:** 🟡 In Progress (SQLite done, DreamTravel migration pending)
+**Progress:** 2/4 major tasks completed
+
+- [x] **SQLite Persistence** ✅ Completed (2025-12-24)
+  - [x] `Persistence/SqliteStoryRepository.cs` - Full CRUD implementation
+  - [x] Database schema + indices for performance
+  - [x] JSON serialization for context, history, and current chapter
+  - [x] `SqliteRepositoryTests.cs` - 11 tests (implementation complete, execution issues being debugged)
 
 - [x] **Orchestration** ✅ Completed (2025-12-24)
   - [x] `Orchestration/StoryManager.cs`
