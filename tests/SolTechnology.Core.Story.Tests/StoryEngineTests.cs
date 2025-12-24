@@ -28,9 +28,25 @@ public class StoryEngineTests
         services.AddTransient<EngineTestChapter2>();
         services.AddTransient<EngineTestChapter3>();
         services.AddTransient<EngineTestFailingChapter>();
+        services.AddTransient<EngineTestFailingChapter2>();
+        services.AddTransient<EngineTestFailingChapter3>();
+        services.AddTransient<EngineTestSingleErrorChapter>();
         services.AddTransient<EngineTestThrowingChapter>();
 
         _serviceProvider = services.BuildServiceProvider();
+    }
+
+    [TearDown]
+    public void TearDown()
+    {
+        if (_serviceProvider is IAsyncDisposable asyncDisposable)
+        {
+            asyncDisposable.DisposeAsync().GetAwaiter().GetResult();
+        }
+        else if (_serviceProvider is IDisposable disposable)
+        {
+            disposable.Dispose();
+        }
     }
 
     [Test]
@@ -52,7 +68,8 @@ public class StoryEngineTests
     public async Task StoryEngine_ShouldAggregateErrors_WhenMultipleChaptersFail()
     {
         // Arrange
-        var handler = new MultipleErrorsStory(_serviceProvider, GetLogger<MultipleErrorsStory>());
+        var options = new StoryOptions { StopOnFirstError = false };
+        var handler = new MultipleErrorsStory(_serviceProvider, GetLogger<MultipleErrorsStory>(), options);
         var input = new EngineTestInput { Value = 1 };
 
         // Act
@@ -63,10 +80,10 @@ public class StoryEngineTests
         result.Error.Should().BeOfType<AggregateError>();
 
         var aggregateError = result.Error as AggregateError;
-        aggregateError!.Errors.Should().HaveCount(3);
-        aggregateError.Errors.Select(e => e.Message).Should().Contain("Error from Chapter 1");
-        aggregateError.Errors.Select(e => e.Message).Should().Contain("Error from Chapter 2");
-        aggregateError.Errors.Select(e => e.Message).Should().Contain("Error from Chapter 3");
+        aggregateError!.InnerErrors.Should().HaveCount(3);
+        aggregateError.InnerErrors.Select(e => e.Message).Should().Contain("Error from Chapter 1");
+        aggregateError.InnerErrors.Select(e => e.Message).Should().Contain("Error from Chapter 2");
+        aggregateError.InnerErrors.Select(e => e.Message).Should().Contain("Error from Chapter 3");
     }
 
     [Test]

@@ -26,10 +26,25 @@ public class ErrorHandlingTests
         // Register test chapters
         services.AddTransient<ErrorTestSuccessChapter>();
         services.AddTransient<ErrorTestFailureChapter>();
+        services.AddTransient<ErrorTestFirstFailureChapter>();
+        services.AddTransient<ErrorTestSecondFailureChapter>();
         services.AddTransient<ErrorTestExceptionChapter>();
         services.AddTransient<ErrorTestCustomErrorChapter>();
 
         _serviceProvider = services.BuildServiceProvider();
+    }
+
+    [TearDown]
+    public void TearDown()
+    {
+        if (_serviceProvider is IAsyncDisposable asyncDisposable)
+        {
+            asyncDisposable.DisposeAsync().GetAwaiter().GetResult();
+        }
+        else if (_serviceProvider is IDisposable disposable)
+        {
+            disposable.Dispose();
+        }
     }
 
     [Test]
@@ -46,7 +61,7 @@ public class ErrorHandlingTests
         result.IsSuccess.Should().BeTrue();
         result.IsFailure.Should().BeFalse();
         result.Error.Should().BeNull();
-        result.Value.Should().NotBeNull();
+        result.Data.Should().NotBeNull();
     }
 
     [Test]
@@ -83,8 +98,8 @@ public class ErrorHandlingTests
         result.Error.Should().BeOfType<AggregateError>();
 
         var aggregateError = result.Error as AggregateError;
-        aggregateError!.Errors.Should().HaveCount(2);
-        aggregateError.Message.Should().Contain("Multiple errors occurred");
+        aggregateError!.InnerErrors.Should().HaveCount(2);
+        aggregateError.Message.Should().Contain("One or more errors occurred");
     }
 
     [Test]
@@ -100,7 +115,7 @@ public class ErrorHandlingTests
 
         // Assert
         var aggregateError = result.Error as AggregateError;
-        var errorMessages = aggregateError!.Errors.Select(e => e.Message).ToList();
+        var errorMessages = aggregateError!.InnerErrors.Select(e => e.Message).ToList();
 
         errorMessages.Should().Contain("First failure");
         errorMessages.Should().Contain("Second failure");
@@ -335,8 +350,7 @@ public class ErrorTestCustomErrorChapter : Chapter<ErrorTestNarration>
         var customError = new Error
         {
             Message = "Custom error message",
-            Description = "Detailed description of the error",
-            Code = "ERR_CUSTOM_001"
+            Description = "Detailed description of the error"
         };
 
         return Result.FailAsTask(customError);

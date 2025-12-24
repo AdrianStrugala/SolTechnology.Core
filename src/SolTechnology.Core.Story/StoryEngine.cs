@@ -9,6 +9,19 @@ using SolTechnology.Core.Story.Models;
 namespace SolTechnology.Core.Story;
 
 /// <summary>
+/// Shared JSON serializer options for story context persistence.
+/// </summary>
+internal static class StoryJsonOptions
+{
+    public static JsonSerializerOptions Default => new()
+    {
+        IncludeFields = true,
+        PropertyNameCaseInsensitive = true,
+        WriteIndented = false
+    };
+}
+
+/// <summary>
 /// Internal orchestration engine for story execution.
 /// Handles chapter execution, error aggregation, pause/resume, and persistence.
 /// Not exposed to users - accessed through StoryHandler.
@@ -62,9 +75,10 @@ internal class StoryEngine
         else if (_options.EnablePersistence)
         {
             // Generate new story ID for first execution
+            var storyId = Guid.NewGuid().ToString();
             var baseNarration = narration as dynamic;
-            baseNarration.StoryInstanceId = Guid.NewGuid().ToString();
-            _logger.LogInformation("Story started with ID {StoryId}", baseNarration.StoryInstanceId);
+            baseNarration.StoryInstanceId = storyId;
+            _logger.LogInformation("Story started with ID {StoryId}", storyId);
         }
     }
 
@@ -333,7 +347,7 @@ internal class StoryEngine
             LastUpdatedAt = DateTime.UtcNow,
             History = new List<ChapterInfo>(_chapterHistory),
             CurrentChapter = _isPaused ? _chapterHistory.LastOrDefault() : null,
-            Context = JsonSerializer.Serialize(_narration)
+            Context = JsonSerializer.Serialize(_narration, StoryJsonOptions.Default)
         };
 
         await _options.Repository.SaveAsync(storyInstance);

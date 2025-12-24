@@ -38,7 +38,7 @@ public abstract class StoryHandler<TInput, TNarration, TOutput>
     /// The narration (context) flowing through this story.
     /// Access this in your TellStory() method if you need to set output directly.
     /// </summary>
-    protected internal TNarration Narration { get; set; } = null!;
+    public TNarration Narration { get; set; } = null!;
 
     private readonly StoryEngine _engine;
     private readonly ILogger _logger;

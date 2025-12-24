@@ -34,6 +34,19 @@ public class StoryHandlerTests
         _serviceProvider = services.BuildServiceProvider();
     }
 
+    [TearDown]
+    public void TearDown()
+    {
+        if (_serviceProvider is IAsyncDisposable asyncDisposable)
+        {
+            asyncDisposable.DisposeAsync().GetAwaiter().GetResult();
+        }
+        else if (_serviceProvider is IDisposable disposable)
+        {
+            disposable.Dispose();
+        }
+    }
+
     [Test]
     public async Task StoryHandler_ShouldExecuteAllChapters_InSequence()
     {
@@ -46,8 +59,8 @@ public class StoryHandlerTests
 
         // Assert
         result.IsSuccess.Should().BeTrue();
-        result.Value.Should().NotBeNull();
-        result.Value!.Result.Should().Be("Result: 30"); // (10 + 10) * 1.5 = 30, formatted
+        result.Data.Should().NotBeNull();
+        result.Data!.Result.Should().Be("Result: 30"); // (10 + 10) * 1.5 = 30, formatted
     }
 
     [Test]
@@ -77,12 +90,11 @@ public class StoryHandlerTests
 
         // Assert
         result.IsSuccess.Should().BeTrue();
-        result.Value.Should().NotBeNull();
-        result.Value!.Result.Should().Be("Result: 60"); // (20 + 10) * 1.5 = 45... wait let me recalculate
+        result.Data.Should().NotBeNull();
+        result.Data!.Result.Should().Be("Result: 45"); // (20 + 10) * 1.5 = 45
         // Step 1: 20 + 10 = 30
         // Step 2: validate (pass)
         // Step 3: 30 * 1.5 = 45, formatted as "Result: 45"
-        // Actually, I need to check the chapter implementations...
     }
 
     [Test]
@@ -112,7 +124,7 @@ public class StoryHandlerTests
         await handler.Handle(input);
 
         // Assert - the third chapter should not have been executed
-        handler.Narration.ChapterExecutionLog.Should().Contain("ValidateChapter");
+        handler.Narration.ChapterExecutionLog.Should().Contain("FailingChapter");
         handler.Narration.ChapterExecutionLog.Should().NotContain("FormatResultChapter");
     }
 
@@ -128,7 +140,7 @@ public class StoryHandlerTests
 
         // Assert
         result.IsSuccess.Should().BeTrue();
-        result.Value!.Result.Should().Be("Direct output: 42");
+        result.Data!.Result.Should().Be("Direct output: 42");
     }
 
     [Test]

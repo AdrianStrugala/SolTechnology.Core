@@ -47,6 +47,19 @@ public class PauseResumeIntegrationTests
         _serviceProvider = services.BuildServiceProvider();
     }
 
+    [TearDown]
+    public void TearDown()
+    {
+        if (_serviceProvider is IAsyncDisposable asyncDisposable)
+        {
+            asyncDisposable.DisposeAsync().GetAwaiter().GetResult();
+        }
+        else if (_serviceProvider is IDisposable disposable)
+        {
+            disposable.Dispose();
+        }
+    }
+
     [Test]
     public async Task Story_ShouldPause_AtInteractiveChapter()
     {
@@ -59,7 +72,7 @@ public class PauseResumeIntegrationTests
 
         // Assert - Should pause at interactive chapter
         result.IsSuccess.Should().BeTrue();
-        var storyInstance = result.Value!;
+        var storyInstance = result.Data!;
 
         storyInstance.Status.Should().Be(StoryStatus.WaitingForInput);
         storyInstance.CurrentChapter.Should().NotBeNull();
@@ -76,7 +89,7 @@ public class PauseResumeIntegrationTests
 
         // Act - Start the story (should pause)
         var startResult = await manager.StartStory<OrderProcessingStory, OrderInput, OrderNarration, OrderOutput>(input);
-        var storyId = startResult.Value!.StoryId;
+        var storyId = startResult.Data!.StoryId;
 
         // Prepare user input
         var customerDetails = new CustomerDetails
@@ -94,7 +107,7 @@ public class PauseResumeIntegrationTests
 
         // Assert - Should complete successfully
         resumeResult.IsSuccess.Should().BeTrue();
-        resumeResult.Value!.Status.Should().Be(StoryStatus.Completed);
+        resumeResult.Data!.Status.Should().Be(StoryStatus.Completed);
     }
 
     [Test]
@@ -106,7 +119,7 @@ public class PauseResumeIntegrationTests
 
         // Act - Start story
         var startResult = await manager.StartStory<OrderProcessingStory, OrderInput, OrderNarration, OrderOutput>(input);
-        var storyId = startResult.Value!.StoryId;
+        var storyId = startResult.Data!.StoryId;
 
         // Load story state
         var storyInstance = await _repository.FindById(storyId);
@@ -128,7 +141,8 @@ public class PauseResumeIntegrationTests
 
         // Act - Start and pause
         var startResult = await manager.StartStory<OrderProcessingStory, OrderInput, OrderNarration, OrderOutput>(input);
-        var storyId = startResult.Value!.StoryId;
+        startResult.IsSuccess.Should().BeTrue();
+        var storyId = startResult.Data!.StoryId;
 
         // Resume with input
         var customerDetails = new CustomerDetails
@@ -143,8 +157,12 @@ public class PauseResumeIntegrationTests
             storyId,
             userInput);
 
-        // Assert - All chapters should have executed
+        // Assert
+        resumeResult.IsSuccess.Should().BeTrue();
+
+        // All chapters should have executed
         var finalState = await _repository.FindById(storyId);
+        finalState.Should().NotBeNull();
         finalState!.History.Should().HaveCount(4); // All 4 chapters
         finalState.History.Select(h => h.ChapterId).Should().ContainInOrder(
             "OrderValidationChapter",
@@ -163,7 +181,7 @@ public class PauseResumeIntegrationTests
 
         // Act - Start story
         var startResult = await manager.StartStory<OrderProcessingStory, OrderInput, OrderNarration, OrderOutput>(input);
-        var storyId = startResult.Value!.StoryId;
+        var storyId = startResult.Data!.StoryId;
 
         // Resume with invalid input (empty name)
         var invalidDetails = new CustomerDetails
@@ -206,15 +224,15 @@ public class PauseResumeIntegrationTests
 
         // Act - Start story
         var startResult = await manager.StartStory<OrderProcessingStory, OrderInput, OrderNarration, OrderOutput>(input);
-        var storyId = startResult.Value!.StoryId;
+        var storyId = startResult.Data!.StoryId;
 
         // Get story state
         var stateResult = await manager.GetStoryState(storyId);
 
         // Assert
         stateResult.IsSuccess.Should().BeTrue();
-        stateResult.Value!.StoryId.Should().Be(storyId);
-        stateResult.Value.Status.Should().Be(StoryStatus.WaitingForInput);
+        stateResult.Data!.StoryId.Should().Be(storyId);
+        stateResult.Data.Status.Should().Be(StoryStatus.WaitingForInput);
     }
 }
 

@@ -38,8 +38,9 @@ public class StoryOptions
     /// Stop story execution on the first chapter error (true) or collect all errors (false).
     /// When false, all chapters execute and errors are aggregated into AggregateError.
     /// When true, execution stops at the first failure.
+    /// Default is true for intuitive fail-fast behavior.
     /// </summary>
-    public bool StopOnFirstError { get; init; } = false;
+    public bool StopOnFirstError { get; init; } = true;
 
     /// <summary>
     /// Factory method for persistence-enabled stories with in-memory repository.

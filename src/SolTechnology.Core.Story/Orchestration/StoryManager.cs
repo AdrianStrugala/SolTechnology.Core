@@ -42,8 +42,19 @@ public class StoryManager
 
         try
         {
-            // Resolve the handler from DI
-            var handler = _serviceProvider.GetRequiredService<THandler>();
+            // Create handler with persistence options
+            var logger = _serviceProvider.GetRequiredService<ILogger<THandler>>();
+            var options = new StoryOptions
+            {
+                EnablePersistence = true,
+                Repository = _repository
+            };
+
+            var handler = (THandler)Activator.CreateInstance(
+                typeof(THandler),
+                _serviceProvider,
+                logger,
+                options)!;
 
             // Execute the story
             var result = await handler.Handle(input);
@@ -112,8 +123,8 @@ public class StoryManager
                 return Result<StoryInstance>.Fail($"Story {storyId} not found");
             }
 
-            // Deserialize the narration context
-            var narration = JsonSerializer.Deserialize<TNarration>(storyInstance.Context);
+            // Deserialize the narration context with consistent JSON options
+            var narration = JsonSerializer.Deserialize<TNarration>(storyInstance.Context, StoryJsonOptions.Default);
             if (narration == null)
             {
                 return Result<StoryInstance>.Fail("Failed to deserialize story context");
