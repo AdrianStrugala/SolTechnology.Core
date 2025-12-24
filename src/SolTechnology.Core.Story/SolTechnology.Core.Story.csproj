@@ -1,0 +1,33 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <Version>0.6.0</Version>
+        <Description>Story Framework - Unified workflow orchestration for multi-step business processes. Supports both simple automated chains and pausable workflows with persistence. Features Tale Code philosophy with StoryHandler, Chapters, and Narration for readable, maintainable business logic.</Description>
+        <PackageTags>sol technology core story workflow chain pausable state-machine saga orchestration sqlite async dotnet business-process tale-code</PackageTags>
+        <Product>SolTechnology.Core.Story</Product>
+        <PackageId>SolTechnology.Core.Story</PackageId>
+        <AssemblyName>SolTechnology.Core.Story</AssemblyName>
+        <RootNamespace>SolTechnology.Core.Story</RootNamespace>
+
+        <PackageIcon>docs\mini-logo.png</PackageIcon>
+        <PackageReadmeFile>docs\readme.md</PackageReadmeFile>
+        <RepositoryUrl>https://github.com/AdrianStrugala/SolTechnology.Core</RepositoryUrl>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <None Include="..\..\docs\mini-logo.png" Pack="true" Visible="false" PackagePath="docs\mini-logo.png" />
+        <None Include="..\..\docs\Story-Framework.md" Pack="true" Visible="false" PackagePath="docs\readme.md" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="Microsoft.AspNetCore.Mvc.Core" Version="2.2.5" />
+      <PackageReference Include="Microsoft.Data.Sqlite.Core" Version="9.0.5" />
+      <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+      <PackageReference Include="SQLitePCLRaw.bundle_green" Version="2.1.11" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\SolTechnology.Core.CQRS\SolTechnology.Core.CQRS.csproj" />
+    </ItemGroup>
+
+</Project>

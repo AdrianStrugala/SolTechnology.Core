@@ -1,0 +1,272 @@
+# Plan Implementacji: Story Framework
+
+> **Status:** 🟡 In Planning
+> **Start Date:** 2025-12-23
+> **Target Completion:** 2026-01-20 (4 tygodnie)
+
+## 🎯 Cel
+
+Utworzenie zunifikowanego frameworka "Story" łączącego obecne wzorce Chain (CQRS) i Flow w jeden, prosty i czytelny system orkiestracji wieloetapowych procesów biznesowych.
+
+## 📖 Nomenklatura (Tale Code Philosophy)
+
+- **Story** (framework) - opowiedziana sekwencja kroków biznesowych
+- **Chapter** (krok) - pojedynczy rozdział historii
+- **Narration** (kontekst) - narracja przepływająca przez rozdziały
+- **TellStory()** - metoda definiująca sekwencję rozdziałów
+
+```csharp
+public class SaveCityStory : StoryHandler<SaveCityInput, SaveCityNarration, SaveCityResult>
+{
+    protected override async Task TellStory()
+    {
+        await Chapter<LoadExistingCity>();
+        await Chapter<AssignAlternativeName>();
+        await Chapter<IncrementSearchCount>();
+        await Chapter<SaveToDatabase>();
+    }
+}
+```
+
+## 🏗️ Architektura
+
+### Decyzja: Osobny Projekt (SolTechnology.Core.Story)
+
+**SolTechnology.Core.Flow** zostanie zastąpiony przez **SolTechnology.Core.Story**.
+
+**Uzasadnienie:**
+- Flow już ma infrastrukturę (persistence, API, controller)
+- Zachowujemy osobny pakiet dla workflow orchestration
+- Chain w CQRS pozostaje jako lightweight option (bez dodatkowej zależności)
+- Separacja odpowiedzialności: CQRS (patterns) vs Story (orchestration)
+- Łatwiejsza adopcja - użytkownicy wybierają co potrzebują
+
+### Struktura Projektu
+
+```
+src/SolTechnology.Core.Story/           # NOWY PROJEKT (ex-Flow)
+├── SolTechnology.Core.Story.csproj
+├── StoryHandler.cs
+├── Narration.cs
+├── IChapter.cs
+├── AutomatedChapter.cs
+├── InteractiveChapter.cs
+├── StoryOptions.cs
+├── StoryEngine.cs
+├── ModuleInstaller.cs
+├── Persistence/
+│   ├── IStoryRepository.cs
+│   ├── InMemoryStoryRepository.cs
+│   └── SqliteStoryRepository.cs
+├── Models/
+│   ├── StoryInstance.cs
+│   ├── ChapterInfo.cs
+│   ├── StoryStatus.cs
+│   └── DataField.cs
+├── Orchestration/
+│   └── StoryManager.cs
+└── Api/
+    └── StoryController.cs
+```
+
+## 📝 Checklist Implementacji
+
+### Week 1: Core Framework (Priorytet 1)
+
+- [ ] **Setup Projektu**
+  - [ ] Utworzenie `src/SolTechnology.Core.Story/SolTechnology.Core.Story.csproj`
+  - [ ] Dodanie referencji do `SolTechnology.Core.CQRS` (Result, Error)
+  - [ ] Dodanie zależności: Microsoft.Data.Sqlite, Microsoft.AspNetCore.Mvc.Core
+  - [ ] Aktualizacja `SolTechnology.Core.slnx` (usunąć Flow, dodać Story)
+
+- [ ] **Core Abstractions**
+  - [ ] `StoryHandler<TInput, TNarration, TOutput>` - bazowy handler
+  - [ ] `Narration<TInput, TOutput>` - bazowy kontekst
+  - [ ] `IChapter<TNarration>` - interfejs rozdziału
+  - [ ] `AutomatedChapter<TNarration>` - bazowa klasa automatycznych rozdziałów
+  - [ ] `InteractiveChapter<TNarration, TChapterInput>` - bazowa klasa interaktywnych rozdziałów
+  - [ ] `StoryOptions` - konfiguracja (Default, WithInMemoryPersistence, WithSqlitePersistence)
+
+- [ ] **Registration**
+  - [ ] `ModuleInstaller.cs` - `RegisterStories()` z auto-discovery
+  - [ ] Testy rejestracji
+
+- [ ] **Basic Tests**
+  - [ ] `tests/SolTechnology.Core.Story.Tests/StoryHandlerTests.cs` - podstawowa funkcjonalność
+  - [ ] `tests/SolTechnology.Core.Story.Tests/AutomatedChapterTests.cs` - wykonanie rozdziałów
+  - [ ] Proste 3-chapter story end-to-end
+
+### Week 2: Persistence & Engine (Priorytet 2)
+
+- [ ] **Models**
+  - [ ] `Models/StoryInstance.cs`
+  - [ ] `Models/ChapterInfo.cs`
+  - [ ] `Models/StoryStatus.cs` (enum)
+  - [ ] `Models/DataField.cs` + SchemaBuilder
+
+- [ ] **StoryEngine** (internal)
+  - [ ] Podstawowa orkiestracja kroków
+  - [ ] Agregacja błędów (AggregateError)
+  - [ ] Obsługa InteractiveChapter (pause/resume)
+  - [ ] Pomijanie kroków podczas wznawiania
+  - [ ] CancellationToken support
+
+- [ ] **Persistence**
+  - [ ] `Persistence/IStoryRepository.cs`
+  - [ ] `Persistence/InMemoryStoryRepository.cs`
+  - [ ] Integracja z StoryEngine (save/load state)
+
+- [ ] **Tests**
+  - [ ] `InteractiveChapterTests.cs` - schemat inputu, wykonanie z inputem
+  - [ ] `StoryEngineTests.cs` - orkiestracja, agregacja błędów
+  - [ ] `ErrorHandlingTests.cs` - Result, AggregateError
+  - [ ] `InMemoryRepositoryTests.cs` - CRUD, thread-safety
+
+### Week 3: Advanced & Migration (Priorytet 3)
+
+- [ ] **SQLite Persistence**
+  - [ ] `Persistence/SqliteStoryRepository.cs`
+  - [ ] Database schema + migrations
+  - [ ] Serializacja/deserializacja context
+  - [ ] `SqliteRepositoryTests.cs`
+
+- [ ] **Orchestration**
+  - [ ] `Orchestration/StoryManager.cs`
+  - [ ] StartStory, ResumeStory, GetStoryState
+  - [ ] `StoryManagerTests.cs`
+
+- [ ] **Migracja DreamTravel**
+  - [ ] CalculateBestPath: Handler + 5 chapters (InitiateContext, DownloadRoadData, FindProfitablePath, SolveTsp, FormResult)
+  - [ ] SampleOrderWorkflow: Handler + 3 chapters (RequestUserInput, ProcessPayment, FetchShippingEstimate)
+  - [ ] SaveCityStory: Nowa implementacja + 4 chapters (LoadExistingCity, AssignAlternativeName, IncrementSearchCount, SaveToDatabase)
+  - [ ] Aktualizacja ModuleInstaller w DreamTravel (RegisterStories)
+
+- [ ] **Integration Tests**
+  - [ ] Migracja CalculateBestPath (weryfikacja wyników)
+  - [ ] Migracja SampleOrderWorkflow (pause/resume)
+  - [ ] SaveCityStory end-to-end (z Testcontainers)
+
+### Week 4: API, Docs & Cleanup (Priorytet 4)
+
+- [ ] **REST API**
+  - [ ] `Api/StoryController.cs` (abstract)
+  - [ ] Endpoints: start, resume, get state, get result
+  - [ ] Integration test dla API
+
+- [ ] **Deprecation**
+  - [ ] `[Obsolete]` na `ChainHandler`, `ChainContext`, `IChainStep` (CQRS)
+  - [ ] `[Obsolete]` na `RegisterChain()` w CQRS
+  - [ ] Usunięcie `src/SolTechnology.Core.Flow/` (cały katalog)
+
+- [ ] **Documentation**
+  - [ ] `docs/Story-Framework.md` - kompletny przewodnik użytkownika
+  - [ ] `docs/Migration-To-Story.md` - przewodnik migracji
+  - [ ] `CLAUDE.md` - aktualizacja Architecture Patterns
+  - [ ] XML comments na wszystkich publicznych API
+  - [ ] README update
+
+- [ ] **Performance & Cleanup**
+  - [ ] Performance benchmarks (vs ChainHandler)
+  - [ ] Code review + cleanup
+  - [ ] CI/CD pipelines (GitHub Actions + Azure DevOps)
+
+## 🧪 Strategia Testowania
+
+### Testy Jednostkowe (>90% coverage)
+- StoryHandlerTests - podstawowa funkcjonalność
+- AutomatedChapterTests - wykonanie rozdziałów automatycznych
+- InteractiveChapterTests - rozdziały z user input
+- StoryEngineTests - orkiestracja i flow control
+- ErrorHandlingTests - Result, AggregateError, stop-on-error
+- InMemoryRepositoryTests - CRUD, thread-safety
+- SqliteRepositoryTests - persistence, serialization
+- StoryManagerTests - high-level orchestration
+
+### Testy Integracyjne
+- CalculateBestPath migration (same results as Chain)
+- SampleOrderWorkflow migration (pause/resume)
+- SaveCityStory end-to-end (Testcontainers SQL)
+- REST API endpoints
+
+### Performance Benchmarks
+- 5-step story vs old ChainHandler (<5% overhead)
+- Story with persistence (InMemory vs SQLite)
+- Large story (50+ chapters)
+
+## 📚 Dokumentacja
+
+### docs/Story-Framework.md
+- Wprowadzenie (Tale Code philosophy)
+- Quick Start (5-minute example)
+- Core Concepts (StoryHandler, Narration, Chapter)
+- Automated vs Interactive Chapters
+- Error Handling
+- Persistence (InMemory vs SQLite)
+- REST API
+- Best Practices & Anti-patterns
+
+### docs/Migration-To-Story.md
+- Overview (why migrate)
+- Migration from ChainHandler (step-by-step)
+- Migration from PausableChainHandler (step-by-step)
+- Search & Replace Guide
+- Common Issues & FAQ
+- Breaking Changes
+- Deprecation Timeline
+
+### CLAUDE.md Update
+- Replace Chain/Flow sections with Story Pattern
+- Usage examples
+- Registration patterns
+
+## ✅ Kryteria Akceptacji
+
+### Funkcjonalne
+- [ ] Prosty 3-chapter story działa bez opcji
+- [ ] Złożony 5+ chapter story działa
+- [ ] Interactive chapter pauzuje i wznawia
+- [ ] InMemory persistence zapisuje/wczytuje state
+- [ ] SQLite persistence działa z bazy
+- [ ] StoryManager pozwala start/resume
+- [ ] Błędy agregowane w AggregateError
+- [ ] Wszystkie 3 use cases zmigrowane i działają identycznie
+
+### Niefunkcjonalne
+- [ ] Performance: <5% overhead vs ChainHandler (bez persistence)
+- [ ] Code coverage: >90%
+- [ ] Dokumentacja kompletna
+- [ ] Migration guide jasny i testowany
+- [ ] Zero breaking changes dla istniejącego kodu (marked Obsolete)
+- [ ] CI/CD pipelines przechodzą
+
+## 📊 Postęp
+
+### Week 1: Core Framework
+- Status: 🔴 Not Started
+- Progress: 0/10 tasks
+
+### Week 2: Persistence & Engine
+- Status: 🔴 Not Started
+- Progress: 0/8 tasks
+
+### Week 3: Advanced & Migration
+- Status: 🔴 Not Started
+- Progress: 0/7 tasks
+
+### Week 4: API, Docs & Cleanup
+- Status: 🔴 Not Started
+- Progress: 0/6 tasks
+
+**Overall Progress: 0/31 (0%)**
+
+## 🚀 Następne Kroki
+
+1. ✅ Plan zatwierdzony
+2. ⏭️ Utworzenie projektu `SolTechnology.Core.Story`
+3. ⏭️ Implementacja core abstractions
+4. ⏭️ Podstawowe testy
+
+---
+
+**Last Updated:** 2025-12-23
+**Updated By:** Claude Sonnet 4.5
