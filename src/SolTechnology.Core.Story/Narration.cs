@@ -27,11 +27,11 @@ public abstract class Narration<TInput, TOutput>
     /// Internal identifier for the story instance.
     /// Used by the framework for persistence - you don't need to access this.
     /// </summary>
-    internal string? StoryInstanceId { get; set; }
+    public string? StoryInstanceId { get; internal set; }
 
     /// <summary>
     /// Internal identifier for the current chapter being executed.
     /// Used by the framework for pause/resume - you don't need to access this.
     /// </summary>
-    internal string? CurrentChapterId { get; set; }
+    public string? CurrentChapterId { get; internal set; }
 }

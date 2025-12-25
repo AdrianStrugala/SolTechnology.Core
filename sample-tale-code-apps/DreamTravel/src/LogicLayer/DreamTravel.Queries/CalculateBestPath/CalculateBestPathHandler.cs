@@ -1,5 +1,6 @@
 ﻿using DreamTravel.Queries.CalculateBestPath.Chapters;
 using Microsoft.Extensions.Logging;
+using SolTechnology.Core.CQRS;
 using SolTechnology.Core.Story;
 
 namespace DreamTravel.Queries.CalculateBestPath;
@@ -7,7 +8,8 @@ namespace DreamTravel.Queries.CalculateBestPath;
 public class CalculateBestPathHandler(
     IServiceProvider serviceProvider,
     ILogger<CalculateBestPathHandler> logger)
-    : StoryHandler<CalculateBestPathQuery, CalculateBestPathNarration, CalculateBestPathResult>(serviceProvider, logger)
+    : StoryHandler<CalculateBestPathQuery, CalculateBestPathNarration, CalculateBestPathResult>(serviceProvider, logger),
+      IQueryHandler<CalculateBestPathQuery, CalculateBestPathResult>
 {
     protected override async Task TellStory()
     {
@@ -17,4 +19,5 @@ public class CalculateBestPathHandler(
         await ReadChapter<SolveTsp>();
         await ReadChapter<FormCalculateBestPathResult>();
     }
+
 }

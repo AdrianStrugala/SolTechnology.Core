@@ -123,8 +123,11 @@ public abstract class StoryHandler<TInput, TNarration, TOutput>
 
         try
         {
-            // Create fresh narration with the input
-            Narration = new TNarration { Input = input };
+            // Create narration if not already set (for resume scenarios)
+            if (Narration == null || Narration.StoryInstanceId == null)
+            {
+                Narration = new TNarration { Input = input };
+            }
 
             // Initialize the engine
             await _engine.Initialize(Narration, cancellationToken);

@@ -105,10 +105,11 @@ internal class StoryEngine
             throw new InvalidOperationException("StoryEngine must be initialized before executing chapters");
         }
 
-        // Skip if already paused or failed (and stop-on-error is enabled)
-        if (_isPaused || (_hasFailed && _options.StopOnFirstError))
+        // Skip if failed (and stop-on-error is enabled)
+        // Note: Don't skip if paused but we have chapter input (resume scenario)
+        if ((_isPaused && _chapterInput == null) || (_hasFailed && _options.StopOnFirstError))
         {
-            _logger.LogDebug("Skipping chapter execution - story is paused or failed");
+            _logger.LogDebug("Skipping chapter execution - story is paused (no input) or failed");
             return;
         }
 
@@ -195,7 +196,19 @@ internal class StoryEngine
             HandleChapterFailure(chapterInfo, Error.From(ex));
         }
 
-        _chapterHistory.Add(chapterInfo);
+        // Update existing chapter in history or add new one
+        var existingIndex = _chapterHistory.FindIndex(h => h.ChapterId == chapterId);
+        if (existingIndex >= 0)
+        {
+            // Update existing entry (for resume scenarios where chapter is re-executed)
+            _chapterHistory[existingIndex] = chapterInfo;
+            _logger.LogDebug("Updated chapter {ChapterId} in history", chapterId);
+        }
+        else
+        {
+            // Add new entry
+            _chapterHistory.Add(chapterInfo);
+        }
 
         // Persist state if enabled
         if (_options.EnablePersistence)
@@ -256,6 +269,13 @@ internal class StoryEngine
         var task = executeMethod!.Invoke(chapter, new[] { narration, deserializedInput }) as Task<Result>;
         var result = await task!;
 
+        // Clear pause flag and chapter input after successful execution
+        if (result.IsSuccess)
+        {
+            _isPaused = false;
+            _chapterInput = null;
+        }
+
         chapterInfo.FinishedAt = DateTime.UtcNow;
         return result;
     }
@@ -284,16 +304,8 @@ internal class StoryEngine
     /// </summary>
     public Result<TOutput> GetResult<TOutput>() where TOutput : class, new()
     {
-        if (_isPaused)
-        {
-            var narrationBase = _narration as Narration<object, object>;
-            return Result<TOutput>.Fail(new Error
-            {
-                Message = "Story paused waiting for user input",
-                Description = $"Current chapter: {narrationBase?.CurrentChapterId}"
-            });
-        }
-
+        // Check for errors first (including validation failures from interactive chapters)
+        // This ensures that validation errors take precedence over pause status
         if (_errors.Any())
         {
             if (_errors.Count == 1)
@@ -302,6 +314,17 @@ internal class StoryEngine
             }
 
             return Result<TOutput>.Fail(new AggregateError(_errors));
+        }
+
+        // Then check for pause (only if no errors occurred)
+        if (_isPaused)
+        {
+            var narrationBase = _narration as Narration<object, object>;
+            return Result<TOutput>.Fail(new Error
+            {
+                Message = "Story paused waiting for user input",
+                Description = $"Current chapter: {narrationBase?.CurrentChapterId}"
+            });
         }
 
         // Extract output from narration

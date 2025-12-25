@@ -179,14 +179,18 @@ public class StoryManager
                 }
             }
 
-            // Story completed
+            // Story completed - get the latest version from repository
             if (result.IsSuccess)
             {
-                storyInstance.Status = StoryStatus.Completed;
-                storyInstance.LastUpdatedAt = DateTime.UtcNow;
-                await _repository.SaveAsync(storyInstance);
+                var updatedInstance = await _repository.FindById(storyId);
+                if (updatedInstance != null)
+                {
+                    updatedInstance.Status = StoryStatus.Completed;
+                    updatedInstance.LastUpdatedAt = DateTime.UtcNow;
+                    await _repository.SaveAsync(updatedInstance);
 
-                return Result<StoryInstance>.Success(storyInstance);
+                    return Result<StoryInstance>.Success(updatedInstance);
+                }
             }
 
             return Result<StoryInstance>.Fail(result.Error!);

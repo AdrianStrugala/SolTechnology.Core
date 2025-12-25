@@ -48,14 +48,14 @@ public class StoryInstance
 
     /// <summary>
     /// The complete narration (context) for this story.
-    /// Stored as dynamic to support any narration type.
+    /// Stored as JSON string to support any narration type.
     /// </summary>
-    public dynamic? Context { get; set; }
+    public string Context { get; set; } = string.Empty;
 
     /// <summary>
     /// Constructor for creating a new story instance.
     /// </summary>
-    public StoryInstance(string storyId, string handlerTypeName, dynamic context)
+    public StoryInstance(string storyId, string handlerTypeName, string context)
     {
         StoryId = storyId;
         HandlerTypeName = handlerTypeName;

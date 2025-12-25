@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Text.Json;
 using Microsoft.Data.Sqlite;
 using SolTechnology.Core.Story.Models;
@@ -92,8 +93,8 @@ public class SqliteStoryRepository : IStoryRepository
             HandlerTypeName = reader.GetString(1),
             Status = (StoryStatus)reader.GetInt32(2),
             Context = reader.GetString(3),
-            CreatedAt = DateTime.Parse(reader.GetString(4)),
-            LastUpdatedAt = DateTime.Parse(reader.GetString(5)),
+            CreatedAt = DateTime.Parse(reader.GetString(4), null, DateTimeStyles.RoundtripKind),
+            LastUpdatedAt = DateTime.Parse(reader.GetString(5), null, DateTimeStyles.RoundtripKind),
             History = reader.IsDBNull(6)
                 ? new List<ChapterInfo>()
                 : JsonSerializer.Deserialize<List<ChapterInfo>>(reader.GetString(6)) ?? new List<ChapterInfo>(),

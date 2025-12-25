@@ -265,7 +265,8 @@ public class SqliteRepositoryTests
         // Act - Concurrent writes
         for (int i = 0; i < storyCount; i++)
         {
-            var storyId = $"concurrent-{i}";
+            var index = i; // Create local copy to avoid closure bug
+            var storyId = $"concurrent-{index}";
             var task = Task.Run(async () =>
             {
                 var instance = new StoryInstance
@@ -273,7 +274,7 @@ public class SqliteRepositoryTests
                     StoryId = storyId,
                     HandlerTypeName = "ConcurrentHandler",
                     Status = StoryStatus.Running,
-                    Context = $"{{\"index\":{i}}}",
+                    Context = $"{{\"index\":{index}}}",
                     CreatedAt = DateTime.UtcNow,
                     LastUpdatedAt = DateTime.UtcNow
                 };
