@@ -1,9 +1,13 @@
 ﻿using DreamTravel.DomainServices.CityDomain.SaveSteps;
+using DreamTravel.DomainServices.CityDomain.SaveCityStory;
+using DreamTravel.DomainServices.CityDomain.SaveCityStory.Chapters;
 using DreamTravel.Domain.Cities;
 using DreamTravel.GeolocationDataClients.GoogleApi;
 using DreamTravel.Sql;
 using DreamTravel.Sql.QueryBuilders;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
+using SolTechnology.Core.Story;
 
 namespace DreamTravel.DomainServices.CityDomain;
 
@@ -52,11 +56,11 @@ public interface ICityDomainService
 /// </summary>
 public class CityDomainService(
     ICityMapper cityMapper,
-    IAssignAlternativeNameStep assignAlternativeNameStep,
-    IIncrementSearchCountStep incrementSearchCountStep,
     DreamTripsDbContext dbContext,
-    IGoogleApiClient googleApiClient)
-    : ICityDomainService
+    IGoogleApiClient googleApiClient,
+    IServiceProvider serviceProvider,
+    ILogger<CityDomainService> logger)
+    : StoryHandler<SaveCityInput, SaveCityNarration, SaveCityResult>(serviceProvider, logger), ICityDomainService
 {
     public async Task<City> Get(string name, Action<CityReadOptions>? configureOptions = null)
     {
@@ -118,31 +122,59 @@ public class CityDomainService(
 
     public async Task Save(City city)
     {
-        var today = DateOnly.FromDateTime(DateTime.UtcNow);
+        var input = new SaveCityInput { City = city };
+        var result = await Handle(input);
+
+        if (!result.IsSuccess)
+        {
+            throw new InvalidOperationException($"Failed to save city: {result.Error?.Message}");
+        }
+    }
+
+    /// <summary>
+    /// Story for saving a city to the database.
+    /// Orchestrates loading existing city, assigning alternative name,
+    /// incrementing search count, and saving to database.
+    /// </summary>
+    protected override async Task TellStory()
+    {
+        var city = Narration.Input.City;
+        Narration.Today = DateOnly.FromDateTime(DateTime.UtcNow);
+
+        // Ensure city has statistics enabled
         city.ReadOptions = city.ReadOptions.WithStatistics();
 
+        // Load existing city from database or create new one
         var existingEntity = await dbContext.Cities
             .ApplyReadOptions(city.ReadOptions)
             .Include(c => c.AlternativeNames)
             .WhereCoordinates(city.Latitude, city.Longitude)
             .FirstOrDefaultAsync();
-    
-        bool isNew = existingEntity == null;
 
-        var entityToSave = cityMapper.ApplyUpdate(existingEntity, city);
-        
-        assignAlternativeNameStep.Invoke(entityToSave, city.Name);
-        incrementSearchCountStep.Invoke(entityToSave, today);
+        Narration.IsNew = existingEntity == null;
 
-        if (isNew)
+        // Apply update to existing entity or create new one
+        Narration.CityEntity = cityMapper.ApplyUpdate(existingEntity, city);
+
+        // Chapter: Assign alternative name to the city
+        await ReadChapter<AssignAlternativeNameChapter>();
+
+        // Chapter: Increment search count statistics
+        await ReadChapter<IncrementSearchCountChapter>();
+
+        // Save the city entity to database
+        if (Narration.IsNew)
         {
-            await dbContext.Cities.AddAsync(entityToSave);
+            await dbContext.Cities.AddAsync(Narration.CityEntity);
         }
         else
         {
-            dbContext.Update(entityToSave);
+            dbContext.Update(Narration.CityEntity);
         }
-        
+
         await dbContext.SaveChangesAsync();
+
+        // Set the final result
+        Narration.Output.IsNew = Narration.IsNew;
     }
 }

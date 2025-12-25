@@ -1,6 +1,6 @@
 ﻿using DreamTravel.Domain.Cities;
 using DreamTravel.Queries.CalculateBestPath;
-using DreamTravel.Queries.CalculateBestPath.Executors;
+using DreamTravel.Queries.CalculateBestPath.Chapters;
 
 namespace DreamTravel.Queries.UnitTests.CalculateBestPath
 {
@@ -20,7 +20,7 @@ namespace DreamTravel.Queries.UnitTests.CalculateBestPath
             };
 
             int expectedLength = cities.Count * cities.Count; // 3 x 3 = 9
-            var matrix = new CalculateBestPathContext
+            var matrix = new CalculateBestPathNarration
             {
                 Cities = cities,
                 NoOfCities = cities.Count,
@@ -50,7 +50,7 @@ namespace DreamTravel.Queries.UnitTests.CalculateBestPath
 
 
             //Act 
-            await _sut.Execute(matrix);
+            await _sut.Read(matrix);
 
 
             //Assert

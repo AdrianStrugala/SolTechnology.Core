@@ -1,6 +1,6 @@
 using DreamTravel.Domain.Cities;
 using DreamTravel.Queries.CalculateBestPath;
-using DreamTravel.Queries.CalculateBestPath.Executors;
+using DreamTravel.Queries.CalculateBestPath.Chapters;
 using SolTechnology.Core.CQRS;
 
 namespace DreamTravel.Queries.UnitTests.CalculateBestPath
@@ -39,7 +39,7 @@ namespace DreamTravel.Queries.UnitTests.CalculateBestPath
 
             List<int> orderOfCities = new List<int>(noOfCities) { 0, 2, 1 };
 
-            var calculateBestPathContext = new CalculateBestPathContext
+            var calculateBestPathContext = new CalculateBestPathNarration
             {
                 Cities = listOfCities,
                 Costs = new double[noOfCities*noOfCities],
@@ -53,7 +53,7 @@ namespace DreamTravel.Queries.UnitTests.CalculateBestPath
             };
 
             //Act
-            Result result = await _sut.Execute(calculateBestPathContext);
+            Result result = await _sut.Read(calculateBestPathContext);
 
             //Assert
             Assert.True(result.IsSuccess);

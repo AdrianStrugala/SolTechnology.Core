@@ -1,16 +1,16 @@
 ﻿using SolTechnology.Core.CQRS;
-using SolTechnology.Core.CQRS.SuperChain;
+using SolTechnology.Core.Story;
 
-namespace DreamTravel.Queries.CalculateBestPath.Executors;
+namespace DreamTravel.Queries.CalculateBestPath.Chapters;
 
-public class FindProfitablePath : IChainStep<CalculateBestPathContext>
+public class FindProfitablePath : Chapter<CalculateBestPathNarration>
 {
     private static double FuelPrice { get; } = 1.26;
     private static double RoadVelocity { get; } = 70;
     private static double HighwayVelocity { get; } = 120;
     private static double RoadCombustion { get; } = 0.06; //per km
 
-    public Task<Result> Execute(CalculateBestPathContext context)
+    public override Task<Result> Read(CalculateBestPathNarration context)
     {
         Parallel.For(0, context.NoOfCities, i =>
         {
@@ -45,7 +45,7 @@ public class FindProfitablePath : IChainStep<CalculateBestPathContext>
     }
 
 
-    private static bool IsTollRoadProfitable(CalculateBestPathContext calculateBestPathContext, int iterator)
+    private static bool IsTollRoadProfitable(CalculateBestPathNarration calculateBestPathContext, int iterator)
     {
         //roads using vinieta are never profitable
         if (calculateBestPathContext.VinietaCosts[iterator] != 0)

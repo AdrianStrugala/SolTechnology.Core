@@ -1,17 +1,20 @@
-﻿using DreamTravel.Queries.CalculateBestPath.Executors;
-using SolTechnology.Core.CQRS.SuperChain;
+﻿using DreamTravel.Queries.CalculateBestPath.Chapters;
+using Microsoft.Extensions.Logging;
+using SolTechnology.Core.Story;
 
 namespace DreamTravel.Queries.CalculateBestPath;
 
-public class CalculateBestPathHandler(IServiceProvider serviceProvider)
-    : ChainHandler<CalculateBestPathQuery, CalculateBestPathContext, CalculateBestPathResult>(serviceProvider)
+public class CalculateBestPathHandler(
+    IServiceProvider serviceProvider,
+    ILogger<CalculateBestPathHandler> logger)
+    : StoryHandler<CalculateBestPathQuery, CalculateBestPathNarration, CalculateBestPathResult>(serviceProvider, logger)
 {
-    protected override async Task HandleChain()
+    protected override async Task TellStory()
     {
-        await Invoke<InitiateContext>();
-        await Invoke<DownloadRoadData>();
-        await Invoke<FindProfitablePath>();
-        await Invoke<SolveTsp>();
-        await Invoke<FormCalculateBestPathResult>();
+        await ReadChapter<InitiateContext>();
+        await ReadChapter<DownloadRoadData>();
+        await ReadChapter<FindProfitablePath>();
+        await ReadChapter<SolveTsp>();
+        await ReadChapter<FormCalculateBestPathResult>();
     }
 }

@@ -1,9 +1,9 @@
-using SolTechnology.Core.Flow.Workflow.ChainFramework;
+using SolTechnology.Core.Story;
 using SolTechnology.Core.Journey.Workflow.Handlers;
 
 namespace DreamTravel.Flows.SampleOrderWorkflow
 {
-    public class SampleOrderContext : FlowContext<SampleOrderInput, SampleOrderResult>
+    public class SampleOrderNarration : Narration<SampleOrderInput, SampleOrderResult>
     {
         // Custom properties for this specific workflow context
         public CustomerDetails CustomerDetails { get; set; } = null!;
@@ -13,7 +13,7 @@ namespace DreamTravel.Flows.SampleOrderWorkflow
 
     public class CustomerDetails
     {
-        public string? Name { get; set; } = null!; 
+        public string? Name { get; set; } = null!;
         public string? Address { get; set; } = null!;
     }
 }

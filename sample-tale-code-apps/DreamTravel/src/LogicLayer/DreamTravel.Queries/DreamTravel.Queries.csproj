@@ -5,6 +5,7 @@
     <ProjectReference Include="..\..\Infrastructure\DreamTravel.Infrastructure\DreamTravel.Infrastructure.csproj" />
     <ProjectReference Include="..\DreamTravel.DomainServices\DreamTravel.DomainServices.csproj" />
     <ProjectReference Include="..\DreamTravel.TravelingSalesmanProblem\DreamTravel.TravelingSalesmanProblem.csproj" />
+    <ProjectReference Include="..\..\..\..\..\src\SolTechnology.Core.Story\SolTechnology.Core.Story.csproj" />
   </ItemGroup>
 
 </Project>

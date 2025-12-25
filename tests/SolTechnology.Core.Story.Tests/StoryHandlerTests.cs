@@ -180,9 +180,9 @@ public class SimpleCalculationStory : StoryHandler<CalculationInput, Calculation
 
     protected override async Task TellStory()
     {
-        await Chapter<CalculateChapter>();
-        await Chapter<ValidateChapter>();
-        await Chapter<FormatResultChapter>();
+        await ReadChapter<CalculateChapter>();
+        await ReadChapter<ValidateChapter>();
+        await ReadChapter<FormatResultChapter>();
     }
 }
 
@@ -198,9 +198,9 @@ public class FailingStory : StoryHandler<CalculationInput, CalculationNarration,
 
     protected override async Task TellStory()
     {
-        await Chapter<CalculateChapter>();
-        await Chapter<FailingChapter>();
-        await Chapter<FormatResultChapter>(); // Should not be executed
+        await ReadChapter<CalculateChapter>();
+        await ReadChapter<FailingChapter>();
+        await ReadChapter<FormatResultChapter>(); // Should not be executed
     }
 }
 
@@ -216,7 +216,7 @@ public class DirectOutputStory : StoryHandler<CalculationInput, CalculationNarra
 
     protected override async Task TellStory()
     {
-        await Chapter<ModifyOutputChapter>();
+        await ReadChapter<ModifyOutputChapter>();
         Narration.Output.Result = $"Direct output: {Narration.Input.Number}";
     }
 }

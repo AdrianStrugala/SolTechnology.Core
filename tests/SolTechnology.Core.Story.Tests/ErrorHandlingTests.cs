@@ -232,7 +232,7 @@ public class SuccessfulStory : StoryHandler<ErrorTestInput, ErrorTestNarration, 
 
     protected override async Task TellStory()
     {
-        await Chapter<ErrorTestSuccessChapter>();
+        await ReadChapter<ErrorTestSuccessChapter>();
         Narration.Output.Result = "Success";
     }
 }
@@ -246,9 +246,9 @@ public class SingleFailureStory : StoryHandler<ErrorTestInput, ErrorTestNarratio
 
     protected override async Task TellStory()
     {
-        await Chapter<ErrorTestSuccessChapter>();
-        await Chapter<ErrorTestFailureChapter>();
-        await Chapter<ErrorTestSuccessChapter>();
+        await ReadChapter<ErrorTestSuccessChapter>();
+        await ReadChapter<ErrorTestFailureChapter>();
+        await ReadChapter<ErrorTestSuccessChapter>();
     }
 }
 
@@ -264,8 +264,8 @@ public class MultipleFailuresStory : StoryHandler<ErrorTestInput, ErrorTestNarra
 
     protected override async Task TellStory()
     {
-        await Chapter<ErrorTestFirstFailureChapter>();
-        await Chapter<ErrorTestSecondFailureChapter>();
+        await ReadChapter<ErrorTestFirstFailureChapter>();
+        await ReadChapter<ErrorTestSecondFailureChapter>();
     }
 }
 
@@ -278,7 +278,7 @@ public class ExceptionStory : StoryHandler<ErrorTestInput, ErrorTestNarration, E
 
     protected override async Task TellStory()
     {
-        await Chapter<ErrorTestExceptionChapter>();
+        await ReadChapter<ErrorTestExceptionChapter>();
     }
 }
 
@@ -291,7 +291,7 @@ public class CustomErrorStory : StoryHandler<ErrorTestInput, ErrorTestNarration,
 
     protected override async Task TellStory()
     {
-        await Chapter<ErrorTestCustomErrorChapter>();
+        await ReadChapter<ErrorTestCustomErrorChapter>();
     }
 }
 

@@ -1,28 +1,29 @@
 using SolTechnology.Core.CQRS;
-using SolTechnology.Core.Flow.Workflow.ChainFramework;
+using SolTechnology.Core.Story;
 
-namespace DreamTravel.Flows.SampleOrderWorkflow.Steps;
+namespace DreamTravel.Flows.SampleOrderWorkflow.Chapters;
 
-public class BackendProcessingStep : AutomatedFlowStep<SampleOrderContext>
+public class BackendProcessingChapter : Chapter<SampleOrderNarration>
 {
-    public string StepId => "ProcessOrderPayment";
-    
-    public override Task<Result> Execute(SampleOrderContext context)
+    public override string ChapterId => "ProcessOrderPayment";
+
+    public override Task<Result> Read(SampleOrderNarration narration)
     {
         // Example condition for forced test failure
-        if (context.Input.Quantity < 0) { 
+        if (narration.Input.Quantity < 0)
+        {
             var errorMessage = "Invalid quantity for processing.";
             return Task.FromResult(Result.Fail(errorMessage));
         }
 
         // Simulate payment processing
-        context.ProcessedPaymentAmount = context.Input.Quantity * 10.5; // Example calculation
-        context.IsInventoryChecked = true; // Simulate another part of backend work
+        narration.ProcessedPaymentAmount = narration.Input.Quantity * 10.5; // Example calculation
+        narration.IsInventoryChecked = true; // Simulate another part of backend work
 
         // Simulate a potential failure scenario based on OrderId (can be kept or removed if covered by above)
-        if (context.Input.OrderId.Contains("FAIL_PAYMENT"))
+        if (narration.Input.OrderId.Contains("FAIL_PAYMENT"))
         {
-            var errorMessage  = "Simulated payment failure for OrderID: " + context.Input.OrderId;
+            var errorMessage = "Simulated payment failure for OrderID: " + narration.Input.OrderId;
             return Task.FromResult(Result.Fail(errorMessage));
         }
 

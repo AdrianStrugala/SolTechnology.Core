@@ -250,10 +250,10 @@ public class OrderProcessingStory : StoryHandler<OrderInput, OrderNarration, Ord
 
     protected override async Task TellStory()
     {
-        await Chapter<OrderValidationChapter>();
-        await Chapter<RequestCustomerDetailsChapter>(); // Interactive - will pause here
-        await Chapter<ProcessPaymentChapter>();
-        await Chapter<SendConfirmationChapter>();
+        await ReadChapter<OrderValidationChapter>();
+        await ReadChapter<RequestCustomerDetailsChapter>(); // Interactive - will pause here
+        await ReadChapter<ProcessPaymentChapter>();
+        await ReadChapter<SendConfirmationChapter>();
     }
 }
 

@@ -21,10 +21,10 @@ namespace SolTechnology.Core.Story;
 ///
 ///     protected override async Task TellStory()
 ///     {
-///         await Chapter&lt;LoadExistingCity&gt;();
-///         await Chapter&lt;AssignAlternativeName&gt;();
-///         await Chapter&lt;IncrementSearchCount&gt;();
-///         await Chapter&lt;SaveToDatabase&gt;();
+///         await ReadChapter&lt;LoadExistingCity&gt;();
+///         await ReadChapter&lt;AssignAlternativeName&gt;();
+///         await ReadChapter&lt;IncrementSearchCount&gt;();
+///         await ReadChapter&lt;SaveToDatabase&gt;();
 ///     }
 /// }
 /// </code>
@@ -72,16 +72,16 @@ public abstract class StoryHandler<TInput, TNarration, TOutput>
 
     /// <summary>
     /// Define the sequence of chapters in your story.
-    /// Call Chapter&lt;TChapter&gt;() for each chapter in order.
+    /// Call ReadChapter&lt;TChapter&gt;() for each chapter in order.
     /// This method reads like a table of contents for your story.
     /// </summary>
     /// <example>
     /// <code>
     /// protected override async Task TellStory()
     /// {
-    ///     await Chapter&lt;ValidateInput&gt;();
-    ///     await Chapter&lt;ProcessData&gt;();
-    ///     await Chapter&lt;SaveResults&gt;();
+    ///     await ReadChapter&lt;ValidateInput&gt;();
+    ///     await ReadChapter&lt;ProcessData&gt;();
+    ///     await ReadChapter&lt;SaveResults&gt;();
     /// }
     /// </code>
     /// </example>
@@ -94,7 +94,7 @@ public abstract class StoryHandler<TInput, TNarration, TOutput>
     /// For pausable workflows: resumes from the correct chapter based on saved state.
     /// </summary>
     /// <typeparam name="TChapter">The chapter type to execute</typeparam>
-    protected async Task Chapter<TChapter>() where TChapter : IChapter<TNarration>
+    protected async Task ReadChapter<TChapter>() where TChapter : IChapter<TNarration>
     {
         await _engine.ExecuteChapter<TChapter, TNarration>(Narration);
     }

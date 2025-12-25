@@ -1,25 +1,25 @@
 ﻿using SolTechnology.Core.CQRS;
-using SolTechnology.Core.CQRS.SuperChain;
+using SolTechnology.Core.Story;
 
-namespace DreamTravel.Queries.CalculateBestPath.Executors;
+namespace DreamTravel.Queries.CalculateBestPath.Chapters;
 
-public class InitiateContext : IChainStep<CalculateBestPathContext>
+public class InitiateContext : Chapter<CalculateBestPathNarration>
 {
-    public Task<Result> Execute(CalculateBestPathContext context)
+    public override Task<Result> Read(CalculateBestPathNarration narration)
     {
-         var cities = context.Input.Cities.Where(c => c != null).ToList();
-         
-         context.Cities = cities!;
-         context.NoOfCities = cities.Count;
+         var cities = narration.Input.Cities.Where(c => c != null).ToList();
+
+         narration.Cities = cities!;
+         narration.NoOfCities = cities.Count;
          int matrixSize = cities.Count * cities.Count;
 
-         context.FreeDistances = new double[matrixSize];
-         context.TollDistances = new double[matrixSize];
-         context.OptimalDistances = new double[matrixSize];
-         context.Goals = new double[matrixSize];
-         context.Costs = new double[matrixSize];
-         context.OptimalCosts = new double[matrixSize];
-         context.VinietaCosts = new double[matrixSize];
+         narration.FreeDistances = new double[matrixSize];
+         narration.TollDistances = new double[matrixSize];
+         narration.OptimalDistances = new double[matrixSize];
+         narration.Goals = new double[matrixSize];
+         narration.Costs = new double[matrixSize];
+         narration.OptimalCosts = new double[matrixSize];
+         narration.VinietaCosts = new double[matrixSize];
 
         return Result.SuccessAsTask();
     }

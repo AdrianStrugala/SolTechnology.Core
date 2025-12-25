@@ -211,9 +211,9 @@ public class EngineTestStory : StoryHandler<EngineTestInput, EngineTestNarration
 
     protected override async Task TellStory()
     {
-        await Chapter<EngineTestChapter1>();
-        await Chapter<EngineTestChapter2>();
-        await Chapter<EngineTestChapter3>();
+        await ReadChapter<EngineTestChapter1>();
+        await ReadChapter<EngineTestChapter2>();
+        await ReadChapter<EngineTestChapter3>();
     }
 }
 
@@ -229,9 +229,9 @@ public class MultipleErrorsStory : StoryHandler<EngineTestInput, EngineTestNarra
 
     protected override async Task TellStory()
     {
-        await Chapter<EngineTestFailingChapter>();
-        await Chapter<EngineTestFailingChapter2>();
-        await Chapter<EngineTestFailingChapter3>();
+        await ReadChapter<EngineTestFailingChapter>();
+        await ReadChapter<EngineTestFailingChapter2>();
+        await ReadChapter<EngineTestFailingChapter3>();
     }
 }
 
@@ -244,9 +244,9 @@ public class SingleErrorStory : StoryHandler<EngineTestInput, EngineTestNarratio
 
     protected override async Task TellStory()
     {
-        await Chapter<EngineTestChapter1>();
-        await Chapter<EngineTestSingleErrorChapter>();
-        await Chapter<EngineTestChapter3>();
+        await ReadChapter<EngineTestChapter1>();
+        await ReadChapter<EngineTestSingleErrorChapter>();
+        await ReadChapter<EngineTestChapter3>();
     }
 }
 
@@ -259,7 +259,7 @@ public class ThrowingStory : StoryHandler<EngineTestInput, EngineTestNarration, 
 
     protected override async Task TellStory()
     {
-        await Chapter<EngineTestThrowingChapter>();
+        await ReadChapter<EngineTestThrowingChapter>();
     }
 }
 
@@ -272,7 +272,7 @@ public class LongRunningStory : StoryHandler<EngineTestInput, EngineTestNarratio
 
     protected override async Task TellStory()
     {
-        await Chapter<EngineTestChapter1>();
+        await ReadChapter<EngineTestChapter1>();
     }
 }
 
@@ -285,7 +285,7 @@ public class UnregisteredChapterStory : StoryHandler<EngineTestInput, EngineTest
 
     protected override async Task TellStory()
     {
-        await Chapter<UnregisteredChapter>();
+        await ReadChapter<UnregisteredChapter>();
     }
 }
 

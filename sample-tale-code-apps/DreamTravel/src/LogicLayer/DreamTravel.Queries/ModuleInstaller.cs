@@ -1,6 +1,7 @@
 ﻿using DreamTravel.TravelingSalesmanProblem;
 using Microsoft.Extensions.DependencyInjection;
 using SolTechnology.Core.CQRS;
+using SolTechnology.Core.Story;
 
 namespace DreamTravel.Queries
 {
@@ -9,7 +10,7 @@ namespace DreamTravel.Queries
         public static IServiceCollection InstallTripsQueries(this IServiceCollection services)
         {
             services.RegisterQueries();
-            services.RegisterChain();
+            services.RegisterStories();
 
             //TSP engine
             services.AddTransient<ITSP, AntColony>();
