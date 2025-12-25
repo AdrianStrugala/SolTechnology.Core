@@ -77,9 +77,7 @@ public static class ModuleInstaller
             }
 
             services.AddSingleton(options.Repository);
-
-            // TODO: Register StoryManager in Week 2
-            // services.AddScoped<StoryManager>();
+            services.AddScoped<Orchestration.StoryManager>();
         }
 
         return services;
@@ -96,6 +94,39 @@ public static class ModuleInstaller
         this IServiceCollection services,
         StoryOptions options)
     {
-        return RegisterStories(services, opts => opts = options);
+        // Register options as singleton
+        services.AddSingleton(options);
+
+        // Auto-discover all chapters in the calling assembly
+        var callingAssembly = Assembly.GetCallingAssembly();
+        var chapterInterfaceType = typeof(IChapter<>);
+
+        var chapterTypes = callingAssembly.GetExportedTypes()
+            .Where(t => t is { IsClass: true, IsAbstract: false } &&
+                        t.GetInterfaces().Any(i =>
+                            i.IsGenericType &&
+                            i.GetGenericTypeDefinition() == chapterInterfaceType));
+
+        foreach (var chapterType in chapterTypes)
+        {
+            services.AddTransient(chapterType);
+        }
+
+        // Register persistence infrastructure if enabled
+        if (options.EnablePersistence)
+        {
+            if (options.Repository == null)
+            {
+                throw new InvalidOperationException(
+                    "EnablePersistence is true but Repository is null. " +
+                    "Use StoryOptions.WithInMemoryPersistence() or StoryOptions.WithSqlitePersistence(), " +
+                    "or manually set options.Repository.");
+            }
+
+            services.AddSingleton(options.Repository);
+            services.AddScoped<Orchestration.StoryManager>();
+        }
+
+        return services;
     }
 }

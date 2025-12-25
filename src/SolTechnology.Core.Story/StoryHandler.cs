@@ -124,13 +124,13 @@ public abstract class StoryHandler<TInput, TNarration, TOutput>
         try
         {
             // Create narration if not already set (for resume scenarios)
-            if (Narration == null || Narration.StoryInstanceId == null)
+            if (Narration == null || Narration.StoryInstanceId == Auid.Empty)
             {
                 Narration = new TNarration { Input = input };
             }
 
             // Initialize the engine
-            await _engine.Initialize(Narration, cancellationToken);
+            await _engine.Initialize(Narration, GetType().Name, cancellationToken);
 
             // Execute the story (calls TellStory() which calls Chapter<T>() methods)
             await TellStory();

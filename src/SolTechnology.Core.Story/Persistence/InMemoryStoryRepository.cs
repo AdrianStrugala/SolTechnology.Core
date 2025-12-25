@@ -11,13 +11,13 @@ namespace SolTechnology.Core.Story.Persistence;
 /// </summary>
 public class InMemoryStoryRepository : IStoryRepository
 {
-    private readonly ConcurrentDictionary<string, StoryInstance> _stories = new();
+    private readonly ConcurrentDictionary<Auid, StoryInstance> _stories = new();
 
     /// <summary>
     /// Find a story instance by ID.
     /// Returns a clone to simulate immutability and prevent external modifications.
     /// </summary>
-    public Task<StoryInstance?> FindById(string storyId)
+    public Task<StoryInstance?> FindById(Auid storyId)
     {
         if (_stories.TryGetValue(storyId, out var story))
         {
@@ -47,7 +47,7 @@ public class InMemoryStoryRepository : IStoryRepository
     /// Delete a story instance.
     /// No-op if the story doesn't exist.
     /// </summary>
-    public Task DeleteAsync(string storyId)
+    public Task DeleteAsync(Auid storyId)
     {
         _stories.TryRemove(storyId, out _);
         return Task.CompletedTask;

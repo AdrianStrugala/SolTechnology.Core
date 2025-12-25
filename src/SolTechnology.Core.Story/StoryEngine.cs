@@ -40,6 +40,7 @@ internal class StoryEngine
     private bool _hasFailed;
     private readonly List<ChapterInfo> _chapterHistory = new();
     private bool _isInitialized;
+    private string _handlerTypeName = string.Empty;
 
     public StoryEngine(
         IServiceProvider serviceProvider,
@@ -57,17 +58,19 @@ internal class StoryEngine
     /// </summary>
     public async Task Initialize<TInput, TOutput>(
         Narration<TInput, TOutput> narration,
+        string handlerTypeName,
         CancellationToken cancellationToken)
         where TInput : class
         where TOutput : class, new()
     {
         _narration = narration;
+        _handlerTypeName = handlerTypeName;
         _cancellationToken = cancellationToken;
         _isInitialized = true;
 
         // If persistence is enabled and this narration has a StoryInstanceId,
         // we might be resuming - load any previous state
-        if (_options.EnablePersistence && !string.IsNullOrEmpty(narration.StoryInstanceId))
+        if (_options.EnablePersistence && narration.StoryInstanceId != Auid.Empty)
         {
             await LoadStoryState(narration.StoryInstanceId);
             _logger.LogInformation("Story {StoryId} resuming from saved state", narration.StoryInstanceId);
@@ -75,7 +78,7 @@ internal class StoryEngine
         else if (_options.EnablePersistence)
         {
             // Generate new story ID for first execution
-            var storyId = Guid.NewGuid().ToString();
+            var storyId = Auid.New("STR");
             var baseNarration = narration as dynamic;
             baseNarration.StoryInstanceId = storyId;
             _logger.LogInformation("Story started with ID {StoryId}", storyId);
@@ -176,8 +179,9 @@ internal class StoryEngine
             {
                 HandleChapterFailure(chapterInfo, result.Error!);
             }
-            else
+            else if (chapterInfo.Status != StoryStatus.WaitingForInput)
             {
+                // Only mark as completed if not waiting for input
                 chapterInfo.Status = StoryStatus.Completed;
                 chapterInfo.FinishedAt = DateTime.UtcNow;
                 _logger.LogInformation("Chapter {ChapterId} completed successfully", chapterId);
@@ -351,9 +355,9 @@ internal class StoryEngine
         }
 
         var narrationBase = _narration as dynamic;
-        string? storyId = narrationBase?.StoryInstanceId;
+        Auid storyId = narrationBase?.StoryInstanceId ?? Auid.Empty;
 
-        if (string.IsNullOrEmpty(storyId))
+        if (storyId == Auid.Empty)
         {
             _logger.LogWarning("Cannot save story state - no StoryInstanceId");
             return;
@@ -362,7 +366,7 @@ internal class StoryEngine
         var storyInstance = new StoryInstance
         {
             StoryId = storyId,
-            HandlerTypeName = _narration.GetType().Name,
+            HandlerTypeName = _handlerTypeName,
             Status = _isPaused ? StoryStatus.WaitingForInput :
                      _hasFailed ? StoryStatus.Failed :
                      StoryStatus.Running,
@@ -380,7 +384,7 @@ internal class StoryEngine
     /// <summary>
     /// Load story state from the repository and restore engine state.
     /// </summary>
-    private async Task LoadStoryState(string storyId)
+    private async Task LoadStoryState(Auid storyId)
     {
         if (_options.Repository == null)
         {

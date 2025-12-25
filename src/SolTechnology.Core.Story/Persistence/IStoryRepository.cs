@@ -14,7 +14,7 @@ public interface IStoryRepository
     /// </summary>
     /// <param name="storyId">The unique identifier of the story</param>
     /// <returns>The story instance if found, null otherwise</returns>
-    Task<StoryInstance?> FindById(string storyId);
+    Task<StoryInstance?> FindById(Auid storyId);
 
     /// <summary>
     /// Save or update a story instance.
@@ -28,5 +28,5 @@ public interface IStoryRepository
     /// Delete a story instance permanently.
     /// </summary>
     /// <param name="storyId">The unique identifier of the story to delete</param>
-    Task DeleteAsync(string storyId);
+    Task DeleteAsync(Auid storyId);
 }

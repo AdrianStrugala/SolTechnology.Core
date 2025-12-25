@@ -27,7 +27,7 @@ public abstract class Narration<TInput, TOutput>
     /// Internal identifier for the story instance.
     /// Used by the framework for persistence - you don't need to access this.
     /// </summary>
-    public string? StoryInstanceId { get; internal set; }
+    public Auid StoryInstanceId { get; internal set; } = Auid.Empty;
 
     /// <summary>
     /// Internal identifier for the current chapter being executed.

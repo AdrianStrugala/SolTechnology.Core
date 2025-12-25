@@ -62,7 +62,15 @@
       "Bash(Select-String -Pattern \"Build|Warning|Error\")",
       "Bash(timeout 120 dotnet build:*)",
       "Bash(Select-String -Pattern \"error|Build|succeeded|failed|warning\")",
-      "Bash(Select-Object -Last 20)"
+      "Bash(Select-Object -Last 20)",
+      "Bash(Select-Object -Last 10)",
+      "Bash(tee:*)",
+      "Bash(Select-String -Pattern \"MSB9008|Build|Error|succeeded|failed\")",
+      "Bash(git reset:*)",
+      "Bash(timeout 300 dotnet test:*)",
+      "Bash(Select-String -Pattern \"Niepowodzenie|Failed|Error\" -Context 5)",
+      "Bash(wc:*)",
+      "Bash(Select-Object -Last 30)"
     ],
     "deny": [],
     "ask": []

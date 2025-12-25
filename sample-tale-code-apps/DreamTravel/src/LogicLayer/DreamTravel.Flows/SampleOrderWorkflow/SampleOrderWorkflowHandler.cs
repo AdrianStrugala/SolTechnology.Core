@@ -5,11 +5,24 @@ using SolTechnology.Core.Journey.Workflow.Handlers;
 
 namespace DreamTravel.Flows.SampleOrderWorkflow
 {
-    public class SampleOrderWorkflowHandler(
-        IServiceProvider serviceProvider,
-        ILogger<SampleOrderWorkflowHandler> logger)
-        : StoryHandler<SampleOrderInput, SampleOrderNarration, SampleOrderResult>(serviceProvider, logger)
+    public class SampleOrderWorkflowHandler : StoryHandler<SampleOrderInput, SampleOrderNarration, SampleOrderResult>
     {
+        // Constructor for simple stories without persistence
+        public SampleOrderWorkflowHandler(
+            IServiceProvider serviceProvider,
+            ILogger<SampleOrderWorkflowHandler> logger)
+            : base(serviceProvider, logger)
+        {
+        }
+
+        // Constructor for stories with persistence (used by StoryManager)
+        public SampleOrderWorkflowHandler(
+            IServiceProvider serviceProvider,
+            ILogger<SampleOrderWorkflowHandler> logger,
+            StoryOptions options)
+            : base(serviceProvider, logger, options)
+        {
+        }
         protected override async Task TellStory()
         {
             // Chapter 1: Request User Input for Customer Details

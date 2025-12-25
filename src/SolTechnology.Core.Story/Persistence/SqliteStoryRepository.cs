@@ -68,7 +68,7 @@ public class SqliteStoryRepository : IStoryRepository
         }
     }
 
-    public async Task<StoryInstance?> FindById(string storyId)
+    public async Task<StoryInstance?> FindById(Auid storyId)
     {
         using var connection = new SqliteConnection(_connectionString);
         await connection.OpenAsync();
@@ -79,7 +79,7 @@ public class SqliteStoryRepository : IStoryRepository
             FROM StoryInstances
             WHERE StoryId = @StoryId
         ";
-        command.Parameters.AddWithValue("@StoryId", storyId);
+        command.Parameters.AddWithValue("@StoryId", storyId.ToString());
 
         using var reader = await command.ExecuteReaderAsync();
         if (!await reader.ReadAsync())
@@ -89,7 +89,7 @@ public class SqliteStoryRepository : IStoryRepository
 
         var storyInstance = new StoryInstance
         {
-            StoryId = reader.GetString(0),
+            StoryId = Auid.Parse(reader.GetString(0)),
             HandlerTypeName = reader.GetString(1),
             Status = (StoryStatus)reader.GetInt32(2),
             Context = reader.GetString(3),
@@ -123,7 +123,7 @@ public class SqliteStoryRepository : IStoryRepository
                 CurrentChapter = @CurrentChapter
         ";
 
-        command.Parameters.AddWithValue("@StoryId", storyInstance.StoryId);
+        command.Parameters.AddWithValue("@StoryId", storyInstance.StoryId.ToString());
         command.Parameters.AddWithValue("@HandlerTypeName", storyInstance.HandlerTypeName);
         command.Parameters.AddWithValue("@Status", (int)storyInstance.Status);
         command.Parameters.AddWithValue("@Context", storyInstance.Context);
@@ -141,14 +141,14 @@ public class SqliteStoryRepository : IStoryRepository
         await command.ExecuteNonQueryAsync();
     }
 
-    public async Task DeleteAsync(string storyId)
+    public async Task DeleteAsync(Auid storyId)
     {
         using var connection = new SqliteConnection(_connectionString);
         await connection.OpenAsync();
 
         var command = connection.CreateCommand();
         command.CommandText = "DELETE FROM StoryInstances WHERE StoryId = @StoryId";
-        command.Parameters.AddWithValue("@StoryId", storyId);
+        command.Parameters.AddWithValue("@StoryId", storyId.ToString());
 
         await command.ExecuteNonQueryAsync();
     }

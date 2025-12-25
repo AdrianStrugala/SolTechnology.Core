@@ -14,6 +14,7 @@ using SolTechnology.Core.Authentication;
 using SolTechnology.Core.Cache;
 using SolTechnology.Core.Logging.Middleware;
 using SolTechnology.Core.Sql;
+using SolTechnology.Core.Story;
 
 namespace DreamTravel.Api;
 
@@ -88,6 +89,14 @@ public class Program
         
         //Journey (migrated to Story framework)
         builder.Services.AddFlows();
+
+        //Story Framework with persistence
+        builder.Services.RegisterStories(SolTechnology.Core.Story.StoryOptions.WithInMemoryPersistence());
+
+        // Manually register chapters from DreamTravel.Flows assembly
+        builder.Services.AddTransient<DreamTravel.Flows.SampleOrderWorkflow.Chapters.RequestUserInputChapter>();
+        builder.Services.AddTransient<DreamTravel.Flows.SampleOrderWorkflow.Chapters.BackendProcessingChapter>();
+        builder.Services.AddTransient<DreamTravel.Flows.SampleOrderWorkflow.Chapters.FetchExternalDataChapter>();
         
         //The rest
         builder.Services.AddCache();

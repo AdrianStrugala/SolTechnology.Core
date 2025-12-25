@@ -63,7 +63,7 @@ public class StoryManager
             if (result.IsFailure && result.Error?.Message.Contains("paused") == true)
             {
                 var storyId = handler.Narration.StoryInstanceId;
-                if (!string.IsNullOrEmpty(storyId))
+                if (storyId != Auid.Empty)
                 {
                     var storyInstance = await _repository.FindById(storyId);
                     if (storyInstance != null)
@@ -81,7 +81,9 @@ public class StoryManager
                 // Create a completed story instance
                 var completedInstance = new StoryInstance
                 {
-                    StoryId = handler.Narration.StoryInstanceId ?? Guid.NewGuid().ToString(),
+                    StoryId = handler.Narration.StoryInstanceId != Auid.Empty
+                        ? handler.Narration.StoryInstanceId
+                        : Auid.New("STR"),
                     HandlerTypeName = typeof(THandler).Name,
                     Status = StoryStatus.Completed,
                     CreatedAt = DateTime.UtcNow,
@@ -105,7 +107,7 @@ public class StoryManager
     /// Resume a paused story with user input for the interactive chapter.
     /// </summary>
     public async Task<Result<StoryInstance>> ResumeStory<THandler, TInput, TNarration, TOutput>(
-        string storyId,
+        Auid storyId,
         JsonElement? userInput = null)
         where THandler : StoryHandler<TInput, TNarration, TOutput>
         where TInput : class
@@ -205,7 +207,7 @@ public class StoryManager
     /// <summary>
     /// Get the current state of a story.
     /// </summary>
-    public async Task<Result<StoryInstance>> GetStoryState(string storyId)
+    public async Task<Result<StoryInstance>> GetStoryState(Auid storyId)
     {
         var storyInstance = await _repository.FindById(storyId);
         if (storyInstance == null)

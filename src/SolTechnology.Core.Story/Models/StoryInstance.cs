@@ -11,7 +11,7 @@ public class StoryInstance
     /// <summary>
     /// Unique identifier for this story instance.
     /// </summary>
-    public string StoryId { get; init; } = default!;
+    public Auid StoryId { get; init; } = default!;
 
     /// <summary>
     /// Assembly-qualified type name of the StoryHandler.
@@ -55,7 +55,7 @@ public class StoryInstance
     /// <summary>
     /// Constructor for creating a new story instance.
     /// </summary>
-    public StoryInstance(string storyId, string handlerTypeName, string context)
+    public StoryInstance(Auid storyId, string handlerTypeName, string context)
     {
         StoryId = storyId;
         HandlerTypeName = handlerTypeName;
