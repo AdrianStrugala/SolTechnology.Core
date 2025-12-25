@@ -48,9 +48,10 @@ public class SqliteRepositoryTests
     public async Task SaveAsync_ShouldPersistStoryInstance()
     {
         // Arrange
+        var storyId = Auid.New("TST");
         var storyInstance = new StoryInstance
         {
-            StoryId = "test-story-1",
+            StoryId = storyId,
             HandlerTypeName = "TestHandler",
             Status = StoryStatus.Running,
             Context = "{\"value\":42}",
@@ -66,9 +67,9 @@ public class SqliteRepositoryTests
         await _repository.SaveAsync(storyInstance);
 
         // Assert
-        var retrieved = await _repository.FindById("test-story-1");
+        var retrieved = await _repository.FindById(storyId);
         Assert.That(retrieved, Is.Not.Null);
-        Assert.That(retrieved!.StoryId, Is.EqualTo("test-story-1"));
+        Assert.That(retrieved!.StoryId, Is.EqualTo(storyId));
         Assert.That(retrieved.HandlerTypeName, Is.EqualTo("TestHandler"));
         Assert.That(retrieved.Status, Is.EqualTo(StoryStatus.Running));
         Assert.That(retrieved.Context, Is.EqualTo("{\"value\":42}"));
@@ -80,7 +81,7 @@ public class SqliteRepositoryTests
     public async Task FindById_ShouldReturnNull_WhenStoryDoesNotExist()
     {
         // Act
-        var result = await _repository.FindById("non-existent-id");
+        var result = await _repository.FindById(Auid.New("TST"));
 
         // Assert
         result.Should().BeNull();
@@ -90,9 +91,10 @@ public class SqliteRepositoryTests
     public async Task SaveAsync_ShouldUpdateExistingStory()
     {
         // Arrange
+        var storyId = Auid.New("TST");
         var storyInstance = new StoryInstance
         {
-            StoryId = "update-test",
+            StoryId = storyId,
             HandlerTypeName = "TestHandler",
             Status = StoryStatus.Running,
             Context = "{\"value\":1}",
@@ -110,7 +112,7 @@ public class SqliteRepositoryTests
         await _repository.SaveAsync(storyInstance);
 
         // Assert
-        var retrieved = await _repository.FindById("update-test");
+        var retrieved = await _repository.FindById(storyId);
         retrieved.Should().NotBeNull();
         retrieved!.Status.Should().Be(StoryStatus.Completed);
         retrieved.Context.Should().Be("{\"value\":2}");
@@ -121,9 +123,10 @@ public class SqliteRepositoryTests
     public async Task DeleteAsync_ShouldRemoveStory()
     {
         // Arrange
+        var storyId = Auid.New("TST");
         var storyInstance = new StoryInstance
         {
-            StoryId = "delete-test",
+            StoryId = storyId,
             HandlerTypeName = "TestHandler",
             Status = StoryStatus.Running,
             Context = "{}",
@@ -134,10 +137,10 @@ public class SqliteRepositoryTests
         await _repository.SaveAsync(storyInstance);
 
         // Act
-        await _repository.DeleteAsync("delete-test");
+        await _repository.DeleteAsync(storyId);
 
         // Assert
-        var result = await _repository.FindById("delete-test");
+        var result = await _repository.FindById(storyId);
         result.Should().BeNull();
     }
 
@@ -145,9 +148,10 @@ public class SqliteRepositoryTests
     public async Task SaveAsync_ShouldHandleNullHistory()
     {
         // Arrange
+        var storyId = Auid.New("TST");
         var storyInstance = new StoryInstance
         {
-            StoryId = "null-history-test",
+            StoryId = storyId,
             HandlerTypeName = "TestHandler",
             Status = StoryStatus.Running,
             Context = "{}",
@@ -160,7 +164,7 @@ public class SqliteRepositoryTests
         await _repository.SaveAsync(storyInstance);
 
         // Assert
-        var retrieved = await _repository.FindById("null-history-test");
+        var retrieved = await _repository.FindById(storyId);
         retrieved.Should().NotBeNull();
         retrieved!.History.Should().NotBeNull();
         retrieved.History.Should().BeEmpty();
@@ -170,9 +174,10 @@ public class SqliteRepositoryTests
     public async Task SaveAsync_ShouldHandleEmptyHistory()
     {
         // Arrange
+        var storyId = Auid.New("TST");
         var storyInstance = new StoryInstance
         {
-            StoryId = "empty-history-test",
+            StoryId = storyId,
             HandlerTypeName = "TestHandler",
             Status = StoryStatus.Running,
             Context = "{}",
@@ -185,7 +190,7 @@ public class SqliteRepositoryTests
         await _repository.SaveAsync(storyInstance);
 
         // Assert
-        var retrieved = await _repository.FindById("empty-history-test");
+        var retrieved = await _repository.FindById(storyId);
         retrieved.Should().NotBeNull();
         retrieved!.History.Should().NotBeNull();
         retrieved.History.Should().BeEmpty();
@@ -195,6 +200,7 @@ public class SqliteRepositoryTests
     public async Task SaveAsync_ShouldHandleCurrentChapter()
     {
         // Arrange
+        var storyId = Auid.New("TST");
         var currentChapter = new ChapterInfo
         {
             ChapterId = "CurrentChapter",
@@ -204,7 +210,7 @@ public class SqliteRepositoryTests
 
         var storyInstance = new StoryInstance
         {
-            StoryId = "current-chapter-test",
+            StoryId = storyId,
             HandlerTypeName = "TestHandler",
             Status = StoryStatus.WaitingForInput,
             Context = "{}",
@@ -217,7 +223,7 @@ public class SqliteRepositoryTests
         await _repository.SaveAsync(storyInstance);
 
         // Assert
-        var retrieved = await _repository.FindById("current-chapter-test");
+        var retrieved = await _repository.FindById(storyId);
         retrieved.Should().NotBeNull();
         retrieved!.CurrentChapter.Should().NotBeNull();
         retrieved.CurrentChapter!.ChapterId.Should().Be("CurrentChapter");
@@ -229,9 +235,10 @@ public class SqliteRepositoryTests
     public async Task SaveAsync_ShouldHandleMultipleHistoryEntries()
     {
         // Arrange
+        var storyId = Auid.New("TST");
         var storyInstance = new StoryInstance
         {
-            StoryId = "multi-history-test",
+            StoryId = storyId,
             HandlerTypeName = "TestHandler",
             Status = StoryStatus.Running,
             Context = "{}",
@@ -249,7 +256,7 @@ public class SqliteRepositoryTests
         await _repository.SaveAsync(storyInstance);
 
         // Assert
-        var retrieved = await _repository.FindById("multi-history-test");
+        var retrieved = await _repository.FindById(storyId);
         retrieved.Should().NotBeNull();
         retrieved!.History.Should().HaveCount(3);
         retrieved.History.Select(h => h.ChapterId).Should().Equal("Chapter1", "Chapter2", "Chapter3");
@@ -260,13 +267,20 @@ public class SqliteRepositoryTests
     {
         // Arrange
         var tasks = new List<Task>();
+        var storyIds = new List<Auid>();
         var storyCount = 50;
+
+        // Generate all story IDs upfront
+        for (int i = 0; i < storyCount; i++)
+        {
+            storyIds.Add(Auid.New("TST"));
+        }
 
         // Act - Concurrent writes
         for (int i = 0; i < storyCount; i++)
         {
             var index = i; // Create local copy to avoid closure bug
-            var storyId = $"concurrent-{index}";
+            var storyId = storyIds[index];
             var task = Task.Run(async () =>
             {
                 var instance = new StoryInstance
@@ -288,7 +302,7 @@ public class SqliteRepositoryTests
         // Assert - All stories should be persisted
         for (int i = 0; i < storyCount; i++)
         {
-            var retrieved = await _repository.FindById($"concurrent-{i}");
+            var retrieved = await _repository.FindById(storyIds[i]);
             retrieved.Should().NotBeNull();
             retrieved!.Context.Should().Contain($"\"index\":{i}");
         }
@@ -298,9 +312,10 @@ public class SqliteRepositoryTests
     public async Task DeleteAsync_ShouldBeIdempotent()
     {
         // Arrange
+        var storyId = Auid.New("TST");
         var storyInstance = new StoryInstance
         {
-            StoryId = "idempotent-delete-test",
+            StoryId = storyId,
             HandlerTypeName = "TestHandler",
             Status = StoryStatus.Running,
             Context = "{}",
@@ -311,11 +326,11 @@ public class SqliteRepositoryTests
         await _repository.SaveAsync(storyInstance);
 
         // Act - Delete twice
-        await _repository.DeleteAsync("idempotent-delete-test");
-        await _repository.DeleteAsync("idempotent-delete-test"); // Should not throw
+        await _repository.DeleteAsync(storyId);
+        await _repository.DeleteAsync(storyId); // Should not throw
 
         // Assert
-        var result = await _repository.FindById("idempotent-delete-test");
+        var result = await _repository.FindById(storyId);
         result.Should().BeNull();
     }
 
@@ -323,9 +338,10 @@ public class SqliteRepositoryTests
     public async Task Repository_ShouldPersistAcrossInstances()
     {
         // Arrange
+        var storyId = Auid.New("TST");
         var storyInstance = new StoryInstance
         {
-            StoryId = "persistence-test",
+            StoryId = storyId,
             HandlerTypeName = "TestHandler",
             Status = StoryStatus.Running,
             Context = "{\"persisted\":true}",
@@ -337,7 +353,7 @@ public class SqliteRepositoryTests
 
         // Act - Create new repository instance pointing to same database
         var newRepository = new SqliteStoryRepository(_testDbPath);
-        var retrieved = await newRepository.FindById("persistence-test");
+        var retrieved = await newRepository.FindById(storyId);
 
         // Assert
         retrieved.Should().NotBeNull();

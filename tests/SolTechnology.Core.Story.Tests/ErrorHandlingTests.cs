@@ -85,9 +85,15 @@ public class ErrorHandlingTests
     [Test]
     public async Task ErrorHandling_ShouldReturnAggregateError_WhenMultipleChaptersFail()
     {
-        // Arrange
-        var options = new StoryOptions { StopOnFirstError = false };
-        var handler = new MultipleFailuresStory(_serviceProvider, GetLogger<MultipleFailuresStory>(), options);
+        // Arrange - create service provider with StopOnFirstError = false
+        var services = new ServiceCollection();
+        services.AddLogging(builder => builder.AddConsole());
+        services.AddSingleton(new StoryOptions { StopOnFirstError = false });
+        services.AddTransient<ErrorTestFirstFailureChapter>();
+        services.AddTransient<ErrorTestSecondFailureChapter>();
+        var sp = services.BuildServiceProvider();
+
+        var handler = new MultipleFailuresStory(sp, sp.GetRequiredService<ILogger<MultipleFailuresStory>>());
         var input = new ErrorTestInput { Value = 10 };
 
         // Act
@@ -105,9 +111,15 @@ public class ErrorHandlingTests
     [Test]
     public async Task ErrorHandling_AggregateError_ShouldContainAllErrors()
     {
-        // Arrange
-        var options = new StoryOptions { StopOnFirstError = false };
-        var handler = new MultipleFailuresStory(_serviceProvider, GetLogger<MultipleFailuresStory>(), options);
+        // Arrange - create service provider with StopOnFirstError = false
+        var services = new ServiceCollection();
+        services.AddLogging(builder => builder.AddConsole());
+        services.AddSingleton(new StoryOptions { StopOnFirstError = false });
+        services.AddTransient<ErrorTestFirstFailureChapter>();
+        services.AddTransient<ErrorTestSecondFailureChapter>();
+        var sp = services.BuildServiceProvider();
+
+        var handler = new MultipleFailuresStory(sp, sp.GetRequiredService<ILogger<MultipleFailuresStory>>());
         var input = new ErrorTestInput { Value = 10 };
 
         // Act
@@ -157,9 +169,15 @@ public class ErrorHandlingTests
     [Test]
     public async Task ErrorHandling_ShouldNotExecuteRemainingChapters_WhenStopOnFirstError()
     {
-        // Arrange
-        var options = new StoryOptions { StopOnFirstError = true };
-        var handler = new MultipleFailuresStory(_serviceProvider, GetLogger<MultipleFailuresStory>(), options);
+        // Arrange - create service provider with StopOnFirstError = true
+        var services = new ServiceCollection();
+        services.AddLogging(builder => builder.AddConsole());
+        services.AddSingleton(new StoryOptions { StopOnFirstError = true });
+        services.AddTransient<ErrorTestFirstFailureChapter>();
+        services.AddTransient<ErrorTestSecondFailureChapter>();
+        var sp = services.BuildServiceProvider();
+
+        var handler = new MultipleFailuresStory(sp, sp.GetRequiredService<ILogger<MultipleFailuresStory>>());
         var input = new ErrorTestInput { Value = 10 };
 
         // Act
@@ -177,9 +195,15 @@ public class ErrorHandlingTests
     [Test]
     public async Task ErrorHandling_ShouldExecuteAllChapters_WhenStopOnFirstErrorIsFalse()
     {
-        // Arrange
-        var options = new StoryOptions { StopOnFirstError = false };
-        var handler = new MultipleFailuresStory(_serviceProvider, GetLogger<MultipleFailuresStory>(), options);
+        // Arrange - create service provider with StopOnFirstError = false
+        var services = new ServiceCollection();
+        services.AddLogging(builder => builder.AddConsole());
+        services.AddSingleton(new StoryOptions { StopOnFirstError = false });
+        services.AddTransient<ErrorTestFirstFailureChapter>();
+        services.AddTransient<ErrorTestSecondFailureChapter>();
+        var sp = services.BuildServiceProvider();
+
+        var handler = new MultipleFailuresStory(sp, sp.GetRequiredService<ILogger<MultipleFailuresStory>>());
         var input = new ErrorTestInput { Value = 10 };
 
         // Act
@@ -256,9 +280,8 @@ public class MultipleFailuresStory : StoryHandler<ErrorTestInput, ErrorTestNarra
 {
     public MultipleFailuresStory(
         IServiceProvider sp,
-        ILogger<MultipleFailuresStory> logger,
-        StoryOptions? options = null)
-        : base(sp, logger, options)
+        ILogger<MultipleFailuresStory> logger)
+        : base(sp, logger)
     {
     }
 

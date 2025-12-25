@@ -7,20 +7,10 @@ namespace DreamTravel.Flows.SampleOrderWorkflow
 {
     public class SampleOrderWorkflowHandler : StoryHandler<SampleOrderInput, SampleOrderNarration, SampleOrderResult>
     {
-        // Constructor for simple stories without persistence
         public SampleOrderWorkflowHandler(
             IServiceProvider serviceProvider,
             ILogger<SampleOrderWorkflowHandler> logger)
             : base(serviceProvider, logger)
-        {
-        }
-
-        // Constructor for stories with persistence (used by StoryManager)
-        public SampleOrderWorkflowHandler(
-            IServiceProvider serviceProvider,
-            ILogger<SampleOrderWorkflowHandler> logger,
-            StoryOptions options)
-            : base(serviceProvider, logger, options)
         {
         }
         protected override async Task TellStory()

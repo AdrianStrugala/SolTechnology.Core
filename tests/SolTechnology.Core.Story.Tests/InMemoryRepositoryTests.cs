@@ -24,22 +24,23 @@ public class InMemoryRepositoryTests
     public async Task Repository_ShouldSaveStoryInstance()
     {
         // Arrange
-        var storyInstance = CreateTestStoryInstance("story-001");
+        var storyId = Auid.New("TST");
+        var storyInstance = CreateTestStoryInstance(storyId);
 
         // Act
         await _repository.SaveAsync(storyInstance);
 
         // Assert
-        var retrieved = await _repository.FindById("story-001");
+        var retrieved = await _repository.FindById(storyId);
         retrieved.Should().NotBeNull();
-        retrieved!.StoryId.Should().Be("story-001");
+        retrieved!.StoryId.Should().Be(storyId);
     }
 
     [Test]
     public async Task Repository_ShouldReturnNull_WhenStoryNotFound()
     {
         // Act
-        var result = await _repository.FindById("non-existent");
+        var result = await _repository.FindById(Auid.New("TST"));
 
         // Assert
         result.Should().BeNull();
@@ -49,7 +50,8 @@ public class InMemoryRepositoryTests
     public async Task Repository_ShouldUpdateExistingStory()
     {
         // Arrange
-        var storyInstance = CreateTestStoryInstance("story-002");
+        var storyId = Auid.New("TST");
+        var storyInstance = CreateTestStoryInstance(storyId);
         await _repository.SaveAsync(storyInstance);
 
         // Act - Update the story
@@ -57,7 +59,7 @@ public class InMemoryRepositoryTests
         await _repository.SaveAsync(storyInstance);
 
         // Assert
-        var retrieved = await _repository.FindById("story-002");
+        var retrieved = await _repository.FindById(storyId);
         retrieved!.Status.Should().Be(StoryStatus.Completed);
     }
 
@@ -65,14 +67,15 @@ public class InMemoryRepositoryTests
     public async Task Repository_ShouldDeleteStory()
     {
         // Arrange
-        var storyInstance = CreateTestStoryInstance("story-003");
+        var storyId = Auid.New("TST");
+        var storyInstance = CreateTestStoryInstance(storyId);
         await _repository.SaveAsync(storyInstance);
 
         // Act
-        await _repository.DeleteAsync("story-003");
+        await _repository.DeleteAsync(storyId);
 
         // Assert
-        var retrieved = await _repository.FindById("story-003");
+        var retrieved = await _repository.FindById(storyId);
         retrieved.Should().BeNull();
     }
 
@@ -80,7 +83,7 @@ public class InMemoryRepositoryTests
     public async Task Repository_Delete_ShouldNotThrow_WhenStoryDoesNotExist()
     {
         // Act & Assert
-        var act = async () => await _repository.DeleteAsync("non-existent");
+        var act = async () => await _repository.DeleteAsync(Auid.New("TST"));
         await act.Should().NotThrowAsync();
     }
 
@@ -88,12 +91,13 @@ public class InMemoryRepositoryTests
     public async Task Repository_ShouldReturnClonedInstance_ToPreventMutation()
     {
         // Arrange
-        var storyInstance = CreateTestStoryInstance("story-004");
+        var storyId = Auid.New("TST");
+        var storyInstance = CreateTestStoryInstance(storyId);
         await _repository.SaveAsync(storyInstance);
 
         // Act
-        var retrieved1 = await _repository.FindById("story-004");
-        var retrieved2 = await _repository.FindById("story-004");
+        var retrieved1 = await _repository.FindById(storyId);
+        var retrieved2 = await _repository.FindById(storyId);
 
         // Assert - Should be different instances
         retrieved1.Should().NotBeSameAs(retrieved2);
@@ -103,16 +107,17 @@ public class InMemoryRepositoryTests
     public async Task Repository_ShouldNotAffectStoredData_WhenModifyingRetrievedInstance()
     {
         // Arrange
-        var storyInstance = CreateTestStoryInstance("story-005");
+        var storyId = Auid.New("TST");
+        var storyInstance = CreateTestStoryInstance(storyId);
         storyInstance.Status = StoryStatus.Running;
         await _repository.SaveAsync(storyInstance);
 
         // Act - Modify the retrieved instance
-        var retrieved = await _repository.FindById("story-005");
+        var retrieved = await _repository.FindById(storyId);
         retrieved!.Status = StoryStatus.Completed;
 
         // Assert - Original should remain unchanged
-        var original = await _repository.FindById("story-005");
+        var original = await _repository.FindById(storyId);
         original!.Status.Should().Be(StoryStatus.Running);
     }
 
@@ -120,20 +125,22 @@ public class InMemoryRepositoryTests
     public async Task Repository_ShouldHandleConcurrentWrites()
     {
         // Arrange
-        var tasks = new List<Task>();
-        var storyIds = Enumerable.Range(1, 100).Select(i => $"story-{i:D3}").ToList();
+        var tasks = new List<Task<Auid>>();
+        var count = 100;
 
         // Act - Write 100 stories concurrently
-        foreach (var storyId in storyIds)
+        for (int i = 0; i < count; i++)
         {
             tasks.Add(Task.Run(async () =>
             {
+                var storyId = Auid.New("TST");
                 var story = CreateTestStoryInstance(storyId);
                 await _repository.SaveAsync(story);
+                return storyId;
             }));
         }
 
-        await Task.WhenAll(tasks);
+        var storyIds = await Task.WhenAll(tasks);
 
         // Assert - All stories should be saved
         foreach (var storyId in storyIds)
@@ -148,12 +155,13 @@ public class InMemoryRepositoryTests
     public async Task Repository_ShouldHandleConcurrentReads()
     {
         // Arrange
-        var storyInstance = CreateTestStoryInstance("story-concurrent");
+        var storyId = Auid.New("TST");
+        var storyInstance = CreateTestStoryInstance(storyId);
         await _repository.SaveAsync(storyInstance);
 
         // Act - Read the same story 100 times concurrently
         var tasks = Enumerable.Range(1, 100).Select(_ =>
-            Task.Run(async () => await _repository.FindById("story-concurrent"))
+            Task.Run(async () => await _repository.FindById(storyId))
         ).ToList();
 
         var results = await Task.WhenAll(tasks);
@@ -162,7 +170,7 @@ public class InMemoryRepositoryTests
         results.Should().AllSatisfy(r =>
         {
             r.Should().NotBeNull();
-            r!.StoryId.Should().Be("story-concurrent");
+            r!.StoryId.Should().Be(storyId);
         });
     }
 
@@ -170,7 +178,8 @@ public class InMemoryRepositoryTests
     public async Task Repository_ShouldHandleConcurrentUpdates()
     {
         // Arrange
-        var storyInstance = CreateTestStoryInstance("story-update");
+        var storyId = Auid.New("TST");
+        var storyInstance = CreateTestStoryInstance(storyId);
         storyInstance.Status = StoryStatus.Running;
         await _repository.SaveAsync(storyInstance);
 
@@ -178,7 +187,7 @@ public class InMemoryRepositoryTests
         var tasks = Enumerable.Range(1, 10).Select(i =>
             Task.Run(async () =>
             {
-                var story = await _repository.FindById("story-update");
+                var story = await _repository.FindById(storyId);
                 if (story != null)
                 {
                     story.History.Add(new ChapterInfo
@@ -195,16 +204,17 @@ public class InMemoryRepositoryTests
         await Task.WhenAll(tasks);
 
         // Assert - Final state should be consistent
-        var finalStory = await _repository.FindById("story-update");
+        var finalStory = await _repository.FindById(storyId);
         finalStory.Should().NotBeNull();
-        finalStory!.StoryId.Should().Be("story-update");
+        finalStory!.StoryId.Should().Be(storyId);
     }
 
     [Test]
     public async Task Repository_ShouldPreserveChapterHistory()
     {
         // Arrange
-        var storyInstance = CreateTestStoryInstance("story-history");
+        var storyId = Auid.New("TST");
+        var storyInstance = CreateTestStoryInstance(storyId);
         storyInstance.History.Add(new ChapterInfo
         {
             ChapterId = "Chapter1",
@@ -224,7 +234,7 @@ public class InMemoryRepositoryTests
         await _repository.SaveAsync(storyInstance);
 
         // Assert
-        var retrieved = await _repository.FindById("story-history");
+        var retrieved = await _repository.FindById(storyId);
         retrieved!.History.Should().HaveCount(2);
         retrieved.History[0].ChapterId.Should().Be("Chapter1");
         retrieved.History[1].ChapterId.Should().Be("Chapter2");
@@ -234,7 +244,8 @@ public class InMemoryRepositoryTests
     public async Task Repository_ShouldPreserveCurrentChapter()
     {
         // Arrange
-        var storyInstance = CreateTestStoryInstance("story-current");
+        var storyId = Auid.New("TST");
+        var storyInstance = CreateTestStoryInstance(storyId);
         storyInstance.CurrentChapter = new ChapterInfo
         {
             ChapterId = "WaitingChapter",
@@ -250,7 +261,7 @@ public class InMemoryRepositoryTests
         await _repository.SaveAsync(storyInstance);
 
         // Assert
-        var retrieved = await _repository.FindById("story-current");
+        var retrieved = await _repository.FindById(storyId);
         retrieved!.CurrentChapter.Should().NotBeNull();
         retrieved.CurrentChapter!.ChapterId.Should().Be("WaitingChapter");
         retrieved.CurrentChapter.Status.Should().Be(StoryStatus.WaitingForInput);
@@ -261,27 +272,31 @@ public class InMemoryRepositoryTests
     public async Task Repository_ShouldHandleMultipleStories()
     {
         // Arrange & Act
+        var storyIds = new List<(Auid Id, StoryStatus Status)>();
         for (int i = 1; i <= 10; i++)
         {
-            var story = CreateTestStoryInstance($"story-{i}");
-            story.Status = i % 2 == 0 ? StoryStatus.Completed : StoryStatus.Running;
+            var storyId = Auid.New("TST");
+            var expectedStatus = i % 2 == 0 ? StoryStatus.Completed : StoryStatus.Running;
+            var story = CreateTestStoryInstance(storyId);
+            story.Status = expectedStatus;
             await _repository.SaveAsync(story);
+            storyIds.Add((storyId, expectedStatus));
         }
 
         // Assert - Verify all stories were saved correctly
-        for (int i = 1; i <= 10; i++)
+        foreach (var (id, expectedStatus) in storyIds)
         {
-            var retrieved = await _repository.FindById($"story-{i}");
+            var retrieved = await _repository.FindById(id);
             retrieved.Should().NotBeNull();
-            retrieved!.Status.Should().Be(i % 2 == 0 ? StoryStatus.Completed : StoryStatus.Running);
+            retrieved!.Status.Should().Be(expectedStatus);
         }
     }
 
-    private StoryInstance CreateTestStoryInstance(string storyId)
+    private StoryInstance CreateTestStoryInstance(Auid? storyId = null)
     {
         return new StoryInstance
         {
-            StoryId = storyId,
+            StoryId = storyId ?? Auid.New("TST"),
             HandlerTypeName = "TestStory",
             Status = StoryStatus.Running,
             CreatedAt = DateTime.UtcNow,

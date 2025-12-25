@@ -70,7 +70,8 @@
       "Bash(timeout 300 dotnet test:*)",
       "Bash(Select-String -Pattern \"Niepowodzenie|Failed|Error\" -Context 5)",
       "Bash(wc:*)",
-      "Bash(Select-Object -Last 30)"
+      "Bash(Select-Object -Last 30)",
+      "Bash(Select-String -Pattern \"error|Build|succeeded|failed\")"
     ],
     "deny": [],
     "ask": []

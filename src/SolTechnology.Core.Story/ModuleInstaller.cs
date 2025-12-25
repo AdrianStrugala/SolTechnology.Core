@@ -47,8 +47,23 @@ public static class ModuleInstaller
         var options = StoryOptions.Default;
         configureOptions?.Invoke(options);
 
-        // Register options as singleton
+        // Register options as singleton (for StopOnFirstError and other configuration)
         services.AddSingleton(options);
+
+        // Register repository if persistence is enabled
+        if (options.EnablePersistence)
+        {
+            if (options.Repository == null)
+            {
+                throw new InvalidOperationException(
+                    "EnablePersistence is true but Repository is null. " +
+                    "Use StoryOptions.WithInMemoryPersistence() or StoryOptions.WithSqlitePersistence(), " +
+                    "or manually set options.Repository.");
+            }
+
+            services.AddSingleton<Persistence.IStoryRepository>(options.Repository);
+            services.AddScoped<Orchestration.StoryManager>();
+        }
 
         // Auto-discover all chapters in the calling assembly
         var callingAssembly = Assembly.GetCallingAssembly();
@@ -63,21 +78,6 @@ public static class ModuleInstaller
         foreach (var chapterType in chapterTypes)
         {
             services.AddTransient(chapterType);
-        }
-
-        // Register persistence infrastructure if enabled
-        if (options.EnablePersistence)
-        {
-            if (options.Repository == null)
-            {
-                throw new InvalidOperationException(
-                    "EnablePersistence is true but Repository is null. " +
-                    "Use StoryOptions.WithInMemoryPersistence() or StoryOptions.WithSqlitePersistence(), " +
-                    "or manually set options.Repository.");
-            }
-
-            services.AddSingleton(options.Repository);
-            services.AddScoped<Orchestration.StoryManager>();
         }
 
         return services;
@@ -94,8 +94,23 @@ public static class ModuleInstaller
         this IServiceCollection services,
         StoryOptions options)
     {
-        // Register options as singleton
+        // Register options as singleton (for StopOnFirstError and other configuration)
         services.AddSingleton(options);
+
+        // Register repository if persistence is enabled
+        if (options.EnablePersistence)
+        {
+            if (options.Repository == null)
+            {
+                throw new InvalidOperationException(
+                    "EnablePersistence is true but Repository is null. " +
+                    "Use StoryOptions.WithInMemoryPersistence() or StoryOptions.WithSqlitePersistence(), " +
+                    "or manually set options.Repository.");
+            }
+
+            services.AddSingleton<Persistence.IStoryRepository>(options.Repository);
+            services.AddScoped<Orchestration.StoryManager>();
+        }
 
         // Auto-discover all chapters in the calling assembly
         var callingAssembly = Assembly.GetCallingAssembly();
@@ -110,21 +125,6 @@ public static class ModuleInstaller
         foreach (var chapterType in chapterTypes)
         {
             services.AddTransient(chapterType);
-        }
-
-        // Register persistence infrastructure if enabled
-        if (options.EnablePersistence)
-        {
-            if (options.Repository == null)
-            {
-                throw new InvalidOperationException(
-                    "EnablePersistence is true but Repository is null. " +
-                    "Use StoryOptions.WithInMemoryPersistence() or StoryOptions.WithSqlitePersistence(), " +
-                    "or manually set options.Repository.");
-            }
-
-            services.AddSingleton(options.Repository);
-            services.AddScoped<Orchestration.StoryManager>();
         }
 
         return services;

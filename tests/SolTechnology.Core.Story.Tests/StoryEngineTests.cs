@@ -67,9 +67,16 @@ public class StoryEngineTests
     [Test]
     public async Task StoryEngine_ShouldAggregateErrors_WhenMultipleChaptersFail()
     {
-        // Arrange
-        var options = new StoryOptions { StopOnFirstError = false };
-        var handler = new MultipleErrorsStory(_serviceProvider, GetLogger<MultipleErrorsStory>(), options);
+        // Arrange - create service provider with StopOnFirstError = false
+        var services = new ServiceCollection();
+        services.AddLogging(builder => builder.AddConsole());
+        services.AddSingleton(new StoryOptions { StopOnFirstError = false });
+        services.AddTransient<EngineTestFailingChapter>();
+        services.AddTransient<EngineTestFailingChapter2>();
+        services.AddTransient<EngineTestFailingChapter3>();
+        var sp = services.BuildServiceProvider();
+
+        var handler = new MultipleErrorsStory(sp, sp.GetRequiredService<ILogger<MultipleErrorsStory>>());
         var input = new EngineTestInput { Value = 1 };
 
         // Act
@@ -89,9 +96,16 @@ public class StoryEngineTests
     [Test]
     public async Task StoryEngine_ShouldStopOnFirstError_WhenConfigured()
     {
-        // Arrange
-        var options = new StoryOptions { StopOnFirstError = true };
-        var handler = new MultipleErrorsStory(_serviceProvider, GetLogger<MultipleErrorsStory>(), options);
+        // Arrange - create service provider with StopOnFirstError = true
+        var services = new ServiceCollection();
+        services.AddLogging(builder => builder.AddConsole());
+        services.AddSingleton(new StoryOptions { StopOnFirstError = true });
+        services.AddTransient<EngineTestFailingChapter>();
+        services.AddTransient<EngineTestFailingChapter2>();
+        services.AddTransient<EngineTestFailingChapter3>();
+        var sp = services.BuildServiceProvider();
+
+        var handler = new MultipleErrorsStory(sp, sp.GetRequiredService<ILogger<MultipleErrorsStory>>());
         var input = new EngineTestInput { Value = 1 };
 
         // Act
@@ -109,9 +123,16 @@ public class StoryEngineTests
     [Test]
     public async Task StoryEngine_ShouldContinueAfterErrors_WhenStopOnFirstErrorIsFalse()
     {
-        // Arrange
-        var options = new StoryOptions { StopOnFirstError = false };
-        var handler = new MultipleErrorsStory(_serviceProvider, GetLogger<MultipleErrorsStory>(), options);
+        // Arrange - create service provider with StopOnFirstError = false
+        var services = new ServiceCollection();
+        services.AddLogging(builder => builder.AddConsole());
+        services.AddSingleton(new StoryOptions { StopOnFirstError = false });
+        services.AddTransient<EngineTestFailingChapter>();
+        services.AddTransient<EngineTestFailingChapter2>();
+        services.AddTransient<EngineTestFailingChapter3>();
+        var sp = services.BuildServiceProvider();
+
+        var handler = new MultipleErrorsStory(sp, sp.GetRequiredService<ILogger<MultipleErrorsStory>>());
         var input = new EngineTestInput { Value = 1 };
 
         // Act
@@ -221,9 +242,8 @@ public class MultipleErrorsStory : StoryHandler<EngineTestInput, EngineTestNarra
 {
     public MultipleErrorsStory(
         IServiceProvider sp,
-        ILogger<MultipleErrorsStory> logger,
-        StoryOptions? options = null)
-        : base(sp, logger, options)
+        ILogger<MultipleErrorsStory> logger)
+        : base(sp, logger)
     {
     }
 

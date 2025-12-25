@@ -88,15 +88,7 @@ public class Program
         builder.Services.InstallGraphDatabase();
         
         //Journey (migrated to Story framework)
-        builder.Services.AddFlows();
-
-        //Story Framework with persistence
-        builder.Services.RegisterStories(SolTechnology.Core.Story.StoryOptions.WithInMemoryPersistence());
-
-        // Manually register chapters from DreamTravel.Flows assembly
-        builder.Services.AddTransient<DreamTravel.Flows.SampleOrderWorkflow.Chapters.RequestUserInputChapter>();
-        builder.Services.AddTransient<DreamTravel.Flows.SampleOrderWorkflow.Chapters.BackendProcessingChapter>();
-        builder.Services.AddTransient<DreamTravel.Flows.SampleOrderWorkflow.Chapters.FetchExternalDataChapter>();
+        builder.Services.AddFlows(SolTechnology.Core.Story.StoryOptions.WithInMemoryPersistence());
         
         //The rest
         builder.Services.AddCache();

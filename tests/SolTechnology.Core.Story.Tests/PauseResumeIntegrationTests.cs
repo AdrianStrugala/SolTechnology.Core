@@ -29,6 +29,9 @@ public class PauseResumeIntegrationTests
 
         _repository = new InMemoryStoryRepository();
 
+        // Register StoryOptions with persistence
+        services.AddSingleton(StoryOptions.WithInMemoryPersistence());
+
         // Register repository
         services.AddSingleton<IStoryRepository>(_repository);
 
@@ -208,7 +211,7 @@ public class PauseResumeIntegrationTests
         var manager = _serviceProvider.GetRequiredService<StoryManager>();
 
         // Act
-        var result = await manager.GetStoryState("non-existent-id");
+        var result = await manager.GetStoryState(Auid.New("TST"));
 
         // Assert
         result.IsFailure.Should().BeTrue();
@@ -242,9 +245,8 @@ public class OrderProcessingStory : StoryHandler<OrderInput, OrderNarration, Ord
 {
     public OrderProcessingStory(
         IServiceProvider sp,
-        ILogger<OrderProcessingStory> logger,
-        StoryOptions? options = null)
-        : base(sp, logger, options ?? StoryOptions.WithInMemoryPersistence())
+        ILogger<OrderProcessingStory> logger)
+        : base(sp, logger)
     {
     }
 

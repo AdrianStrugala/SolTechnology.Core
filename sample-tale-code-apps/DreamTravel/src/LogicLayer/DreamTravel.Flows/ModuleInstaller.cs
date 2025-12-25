@@ -5,9 +5,17 @@ namespace DreamTravel.Flows;
 
 public static class ModuleInstaller
 {
-    public static IServiceCollection AddFlows(this IServiceCollection services)
+    public static IServiceCollection AddFlows(this IServiceCollection services, StoryOptions? options = null)
     {
-        services.RegisterStories();
+        // If options provided, use them; otherwise use default
+        if (options != null)
+        {
+            services.RegisterStories(options);
+        }
+        else
+        {
+            services.RegisterStories();
+        }
 
         return services;
     }

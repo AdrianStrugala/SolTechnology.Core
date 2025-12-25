@@ -1,6 +1,8 @@
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using SolTechnology.Core.CQRS;
 using SolTechnology.Core.CQRS.Errors;
+using SolTechnology.Core.Story.Persistence;
 
 namespace SolTechnology.Core.Story;
 
@@ -44,30 +46,25 @@ public abstract class StoryHandler<TInput, TNarration, TOutput>
     private readonly ILogger _logger;
 
     /// <summary>
-    /// Constructor for simple stories without persistence.
+    /// Constructor for story handlers.
+    /// Repository and StopOnFirstError are injected from DI based on RegisterStories() configuration.
     /// </summary>
     /// <param name="serviceProvider">DI container for resolving chapters</param>
     /// <param name="logger">Logger for this story handler</param>
     protected StoryHandler(
         IServiceProvider serviceProvider,
         ILogger<StoryHandler<TInput, TNarration, TOutput>> logger)
-        : this(serviceProvider, logger, null)
-    {
-    }
-
-    /// <summary>
-    /// Constructor for advanced stories with custom options (persistence, etc).
-    /// </summary>
-    /// <param name="serviceProvider">DI container for resolving chapters</param>
-    /// <param name="logger">Logger for this story handler</param>
-    /// <param name="options">Story options (persistence, REST API, etc). Use StoryOptions.WithInMemoryPersistence() or StoryOptions.WithSqlitePersistence()</param>
-    protected StoryHandler(
-        IServiceProvider serviceProvider,
-        ILogger<StoryHandler<TInput, TNarration, TOutput>> logger,
-        StoryOptions? options)
     {
         _logger = logger;
-        _engine = new StoryEngine(serviceProvider, logger, options ?? StoryOptions.Default);
+
+        // Try to resolve IStoryRepository from DI (optional - null if not registered)
+        var repository = serviceProvider.GetService<IStoryRepository>();
+
+        // Get StopOnFirstError from StoryOptions if available, otherwise default to true
+        var options = serviceProvider.GetService<StoryOptions>();
+        var stopOnFirstError = options?.StopOnFirstError ?? true;
+
+        _engine = new StoryEngine(serviceProvider, logger, repository, stopOnFirstError);
     }
 
     /// <summary>

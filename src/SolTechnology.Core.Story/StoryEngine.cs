@@ -5,6 +5,7 @@ using Microsoft.Extensions.Logging;
 using SolTechnology.Core.CQRS;
 using SolTechnology.Core.CQRS.Errors;
 using SolTechnology.Core.Story.Models;
+using SolTechnology.Core.Story.Persistence;
 
 namespace SolTechnology.Core.Story;
 
@@ -30,7 +31,8 @@ internal class StoryEngine
 {
     private readonly IServiceProvider _serviceProvider;
     private readonly ILogger _logger;
-    private readonly StoryOptions _options;
+    private readonly IStoryRepository? _repository;
+    private readonly bool _stopOnFirstError;
     private readonly List<Error> _errors = new();
     private CancellationToken _cancellationToken;
     private object _narration = null!;
@@ -45,11 +47,13 @@ internal class StoryEngine
     public StoryEngine(
         IServiceProvider serviceProvider,
         ILogger logger,
-        StoryOptions options)
+        IStoryRepository? repository,
+        bool stopOnFirstError = true)
     {
         _serviceProvider = serviceProvider;
         _logger = logger;
-        _options = options;
+        _repository = repository;
+        _stopOnFirstError = stopOnFirstError;
     }
 
     /// <summary>
@@ -70,12 +74,12 @@ internal class StoryEngine
 
         // If persistence is enabled and this narration has a StoryInstanceId,
         // we might be resuming - load any previous state
-        if (_options.EnablePersistence && narration.StoryInstanceId != Auid.Empty)
+        if (_repository != null && narration.StoryInstanceId != Auid.Empty)
         {
             await LoadStoryState(narration.StoryInstanceId);
             _logger.LogInformation("Story {StoryId} resuming from saved state", narration.StoryInstanceId);
         }
-        else if (_options.EnablePersistence)
+        else if (_repository != null)
         {
             // Generate new story ID for first execution
             var storyId = Auid.New("STR");
@@ -110,7 +114,7 @@ internal class StoryEngine
 
         // Skip if failed (and stop-on-error is enabled)
         // Note: Don't skip if paused but we have chapter input (resume scenario)
-        if ((_isPaused && _chapterInput == null) || (_hasFailed && _options.StopOnFirstError))
+        if ((_isPaused && _chapterInput == null) || (_hasFailed && _stopOnFirstError))
         {
             _logger.LogDebug("Skipping chapter execution - story is paused (no input) or failed");
             return;
@@ -215,7 +219,7 @@ internal class StoryEngine
         }
 
         // Persist state if enabled
-        if (_options.EnablePersistence)
+        if (_repository != null)
         {
             await SaveStoryState();
         }
@@ -348,7 +352,7 @@ internal class StoryEngine
     /// </summary>
     private async Task SaveStoryState()
     {
-        if (_options.Repository == null)
+        if (_repository == null)
         {
             _logger.LogWarning("Persistence enabled but no repository configured");
             return;
@@ -377,7 +381,7 @@ internal class StoryEngine
             Context = JsonSerializer.Serialize(_narration, StoryJsonOptions.Default)
         };
 
-        await _options.Repository.SaveAsync(storyInstance);
+        await _repository.SaveAsync(storyInstance);
         _logger.LogDebug("Story state saved for {StoryId}", storyId);
     }
 
@@ -386,13 +390,13 @@ internal class StoryEngine
     /// </summary>
     private async Task LoadStoryState(Auid storyId)
     {
-        if (_options.Repository == null)
+        if (_repository == null)
         {
             _logger.LogWarning("Persistence enabled but no repository configured");
             return;
         }
 
-        var storyInstance = await _options.Repository.FindById(storyId);
+        var storyInstance = await _repository.FindById(storyId);
         if (storyInstance == null)
         {
             _logger.LogWarning("Story {StoryId} not found in repository", storyId);

@@ -42,19 +42,13 @@ public class StoryManager
 
         try
         {
-            // Create handler with persistence options
+            // Create handler - repository is already registered in DI
             var logger = _serviceProvider.GetRequiredService<ILogger<THandler>>();
-            var options = new StoryOptions
-            {
-                EnablePersistence = true,
-                Repository = _repository
-            };
 
             var handler = (THandler)Activator.CreateInstance(
                 typeof(THandler),
                 _serviceProvider,
-                logger,
-                options)!;
+                logger)!;
 
             // Execute the story
             var result = await handler.Handle(input);
@@ -135,20 +129,14 @@ public class StoryManager
             // Restore the story ID
             narration.StoryInstanceId = storyId;
 
-            // Create handler with options for persistence
+            // Create handler - repository is already registered in DI
             var logger = _serviceProvider.GetRequiredService<ILogger<THandler>>();
-            var options = new StoryOptions
-            {
-                EnablePersistence = true,
-                Repository = _repository
-            };
 
-            // Create handler instance using reflection (since we need to pass options)
+            // Create handler instance using reflection
             var handler = (THandler)Activator.CreateInstance(
                 typeof(THandler),
                 _serviceProvider,
-                logger,
-                options)!;
+                logger)!;
 
             // Set the narration with restored context
             handler.Narration = narration;
