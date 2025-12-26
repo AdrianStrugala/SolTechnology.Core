@@ -687,13 +687,13 @@ public class ValidInputChapter : InteractiveChapter<TestAdvancedNarration, UserI
     {
         // Validate
         if (string.IsNullOrWhiteSpace(userInput.Name))
-            return Result.FailAsTask("Name cannot be empty");
+            return Result.FailAsTask("Name is required");
 
         if (string.IsNullOrWhiteSpace(userInput.Email))
-            return Result.FailAsTask("Email cannot be empty");
+            return Result.FailAsTask("Email is required");
 
         if (userInput.Age < 0)
-            return Result.FailAsTask("Age cannot be negative");
+            return Result.FailAsTask("Age must be a positive number - invalid age");
 
         if (userInput.Age > 150)
             return Result.FailAsTask("Invalid age - too high");
