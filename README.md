@@ -13,7 +13,7 @@
 </p>
 
 <p align="center">
- <a href="https://dotnet.microsoft.com/download/dotnet/10.0"><img src="https://img.shields.io/badge/%7F-10.0-512BD4?logo=dotnet"></a>
+ <a href="https://dotnet.microsoft.com/download/dotnet/10.0"><img src="https://img.shields.io/badge/.NET-10.0-512BD4?logo=microsoft"></a>
  <a href="https://github.com/AdrianStrugala/SolTechnology.Core/actions"><img src="https://img.shields.io/github/actions/workflow/status/AdrianStrugala/SolTechnology.Core/publishPackages.yml?branch=master&logo=github&label=build%26tests"></a>
  <a href="https://www.nuget.org/packages?q=SolTechnology"><img src="https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fraw.githubusercontent.com%2FAdrianStrugala%2FSolTechnology.Core%2Fmaster%2Fnuget-stats.json&query=%24.totals.downloads&label=NuGet%20Downloads&logo=nuget&color=blue"></a>
 </p>
