@@ -294,11 +294,15 @@ Validators are automatically discovered and executed when registered via `Regist
 4. **Solution Format**: `.slnx` (XML-based solution file format)
 5. **Nullable Reference Types**: Enabled across all projects
 6. **Implicit Usings**: Enabled
-7. **Testing Framework**:
+7. **No Regions**: NEVER use `#region` directives - if code needs separation, use separate classes or partial classes instead
+   - ❌ BAD: `#region Private Methods` / `#region Test Data`
+   - ✅ GOOD: Create separate class or use partial class
+   - **Exception**: Test files with existing regions (like `AdvancedScenariosTests.cs`) may keep them for organizing test categories
+8. **Testing Framework**:
    - Use NUnit for all tests
    - For integration tests, use WebApplicationFactory and Testcontainers
    - Write comprehensive QA scenarios covering edge cases, error handling, concurrency, and security
-8. **Validation Framework**: Use FluentValidation for all input validation
+9. **Validation Framework**: Use FluentValidation for all input validation
 
 ## Important Implementation Notes
 
