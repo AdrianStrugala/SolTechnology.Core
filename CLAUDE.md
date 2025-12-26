@@ -6,6 +6,13 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 SolTechnology.Core is a collection of NuGet packages that provide a foundation for building CQRS-driven applications using Azure technologies. The repository follows the "Tale Code" philosophy - making code readable like well-written prose. It includes both the core libraries (in `src/`) and a sample application called DreamTravel (in `sample-tale-code-apps/DreamTravel/`).
 
+**Development Environment:**
+- **Platform**: Windows (PowerShell is the primary shell)
+- **IDE**: Works with Visual Studio, Rider, VS Code
+- **Framework**: .NET 10.0
+- **Package Manager**: NuGet
+- **Total Test Suite**: 334+ tests across all core libraries
+
 ## Project Structure
 
 The solution follows Clean Architecture with strict layer separation:
@@ -25,7 +32,7 @@ Each library is a separate NuGet package with its own `ModuleInstaller.cs` for d
 - **SolTechnology.Core.Scheduler** - Cron-based task scheduling
 - **SolTechnology.Core.Api** - API utilities and filters
 - **SolTechnology.Core.Cache** - Caching abstractions
-- **SolTechnology.Core.Flow** - Workflow and chain framework with pausable flows
+- **SolTechnology.Core.Story** - Story Framework for workflow orchestration with pausable workflows, persistence, and Tale Code philosophy
 - **SolTechnology.Core.AUID** - AUID (Application Unique ID) implementation
 - **SolTechnology.Core.Faker** - Test data generation
 
@@ -175,27 +182,89 @@ City city = GetCity();
 return city;  // Automatically converts to Result<City>
 ```
 
-### Chain Pattern (SuperChain)
+### Story Framework Pattern
 
-For complex multi-step operations, use `ChainHandler<TInput, TContext, TOutput>`:
+**Story Framework** is the unified approach for workflow orchestration, replacing the deprecated Chain pattern. It supports both simple automated workflows and pausable workflows with persistence.
 
-1. Define context inheriting from `ChainContext<TInput, TOutput>`
-2. Create steps implementing `IChainStep<TContext>`
-3. Handler orchestrates steps via `Invoke<TStep>()`
-4. Register with `services.RegisterChain()`
+**Key Concepts:**
+- **StoryHandler** - Main orchestrator, inherits from `StoryHandler<TInput, TNarration, TOutput>`
+- **Narration** - Context object that carries state through the story, inherits from `Narration<TInput, TOutput>`
+- **Chapter** - Individual step in the story, implements `IChapter<TNarration>`
+- **InteractiveChapter** - Chapter that pauses for user input, inherits from `InteractiveChapter<TNarration, TChapterInput>`
 
-Example:
+**Basic Story (automated workflow):**
 ```csharp
-public class MyHandler : ChainHandler<MyInput, MyContext, MyOutput>
+public class OrderProcessingStory : StoryHandler<OrderInput, OrderNarration, OrderOutput>
 {
-    protected override async Task HandleChain()
+    public OrderProcessingStory(IServiceProvider sp, ILogger<OrderProcessingStory> logger)
+        : base(sp, logger) { }
+
+    protected override async Task TellStory()
     {
-        await Invoke<Step1>();
-        await Invoke<Step2>();
-        await Invoke<Step3>();
+        await ReadChapter<ValidateOrderChapter>();
+        await ReadChapter<ProcessPaymentChapter>();
+        await ReadChapter<ShipOrderChapter>();
+
+        Narration.Output.OrderId = Narration.ProcessedOrderId;
     }
 }
 ```
+
+**Interactive Story (pausable workflow with persistence):**
+```csharp
+public class UserOnboardingStory : StoryHandler<OnboardingInput, OnboardingNarration, OnboardingOutput>
+{
+    protected override async Task TellStory()
+    {
+        await ReadChapter<CollectBasicInfoChapter>();     // Pauses for user input
+        await ReadChapter<VerifyEmailChapter>();           // Pauses for email verification
+        await ReadChapter<SetupPreferencesChapter>();      // Pauses for preferences
+        await ReadChapter<CompleteOnboardingChapter>();    // Automated
+    }
+}
+
+// Interactive chapter with validation
+public class CollectBasicInfoChapter : InteractiveChapter<OnboardingNarration, UserBasicInfo>
+{
+    public override Task<Result> ReadWithInput(OnboardingNarration narration, UserBasicInfo userInput)
+    {
+        if (string.IsNullOrWhiteSpace(userInput.Name))
+            return Result.FailAsTask("Name is required");
+
+        narration.UserName = userInput.Name;
+        narration.UserEmail = userInput.Email;
+        return Result.SuccessAsTask();
+    }
+}
+```
+
+**Registration:**
+```csharp
+services.AddStoryFramework(options =>
+{
+    options.EnablePersistence = true;  // For pausable workflows
+    options.DatabasePath = "stories.db"; // SQLite persistence
+});
+
+// Or for in-memory testing
+services.AddSingleton(StoryOptions.WithInMemoryPersistence());
+```
+
+**Usage with StoryManager (for pausable workflows):**
+```csharp
+// Start story
+var result = await storyManager.StartStory<UserOnboardingStory, OnboardingInput, OnboardingNarration, OnboardingOutput>(input);
+var storyId = result.Data.StoryId;
+
+// Resume with user input
+var userInput = JsonDocument.Parse("{\"name\": \"John\", \"email\": \"john@example.com\"}");
+var resumeResult = await storyManager.ResumeStory<UserOnboardingStory, OnboardingInput, OnboardingNarration, OnboardingOutput>(
+    storyId,
+    userInput.RootElement);
+```
+
+**Tale Code Philosophy:**
+Stories read like prose - `TellStory()` method narrates what happens, chapters are named as actions (verbs), and the flow is clear and linear.
 
 ### ModuleInstaller Pattern
 
@@ -228,6 +297,7 @@ Validators are automatically discovered and executed when registered via `Regist
 7. **Testing Framework**:
    - Use NUnit for all tests
    - For integration tests, use WebApplicationFactory and Testcontainers
+   - Write comprehensive QA scenarios covering edge cases, error handling, concurrency, and security
 8. **Validation Framework**: Use FluentValidation for all input validation
 
 ## Important Implementation Notes
@@ -243,10 +313,11 @@ Dependencies flow in one direction only (from top to bottom):
 
 Handlers should contain minimal code - they orchestrate executors/steps:
 - **Query/Command** - Input model with validation
-- **Context** (optional) - Intermediate model for internal operations (performance optimization)
-- **Handler** - Orchestrates the flow
-- **Executors/Steps** - Actual implementation logic
+- **Handler** - Orchestrates the flow (for complex workflows, use Story Framework)
+- **Executors** - Actual implementation logic
 - **Result** - Output model
+
+For multi-step workflows with complex orchestration, prefer Story Framework over putting logic directly in handlers.
 
 ### Pipeline Behaviors
 
@@ -259,8 +330,43 @@ Both are registered automatically when using `RegisterCommands()` or `RegisterQu
 ### Error Handling
 
 - Use `Result` pattern - avoid throwing exceptions for business logic failures
-- Exceptions are caught in chain steps and converted to `Error`
-- Use `AggregateError` for multiple errors in chain operations
+- Exceptions are caught in Story chapters and converted to `Error`
+- Use `AggregateError` for multiple errors in Story operations
+
+### Testing Philosophy
+
+**Comprehensive QA Approach:**
+When testing complex features (especially workflows, state machines, or frameworks), write extensive scenario-based tests covering:
+
+1. **Happy Path**: Standard usage scenarios
+2. **Error Handling**: Invalid inputs, missing data, type mismatches
+3. **Edge Cases**: Empty strings, whitespace, null values, extreme values (very long strings, negative numbers, max integers)
+4. **Security**: Special characters, potential injection attempts, Unicode characters
+5. **Concurrency**: Multiple simultaneous operations, race conditions
+6. **State Management**: Pause/resume cycles, state transitions, history tracking
+7. **Repository Failures**: Database errors, persistence failures, load/save errors
+
+**Example from Story Framework tests:**
+```csharp
+[Test]
+public async Task Resume_WithExtremelyLongStrings_ShouldHandleOrReject()
+{
+    var longString = new string('A', 10000);
+    var input = JsonDocument.Parse($"{{\"name\": \"{longString}\", ...}}");
+    var result = await storyManager.ResumeStory(..., input.RootElement);
+
+    // Should either handle gracefully or fail with clear validation error
+    if (result.IsFailure)
+        result.Error.Message.Should().ContainAny("too long", "length", "maximum");
+}
+```
+
+**Best Practices:**
+- Test both success and failure paths
+- Use descriptive test names (e.g., `Resume_WithMissingRequiredFields_ShouldReturnError`)
+- Organize tests by category (regions or separate classes)
+- Verify error messages contain meaningful keywords (not just "failed" or "error")
+- Test actual behavior, not implementation details
 
 ## CI/CD Pipelines
 
@@ -290,10 +396,11 @@ ForEach ($folder in (Get-ChildItem -Path tests -Directory)) {
 }
 ```
 Tests covered:
-- `tests/SolTechnology.Core.AUID.Tests`
-- `tests/SolTechnology.Core.ApiClient.Tests`
-- `tests/SolTechnology.Core.Guards.Tests`
-- `tests/SolTechnology.Core.Sql.Tests`
+- `tests/SolTechnology.Core.AUID.Tests` (91 tests)
+- `tests/SolTechnology.Core.ApiClient.Tests` (1 test)
+- `tests/SolTechnology.Core.Guards.Tests` (150 tests)
+- `tests/SolTechnology.Core.Sql.Tests` (1 test)
+- `tests/SolTechnology.Core.Story.Tests` (91 tests - includes comprehensive QA scenarios)
 
 ### Azure DevOps (DreamTravel Sample)
 
@@ -382,23 +489,30 @@ Tests covered:
 
 DreamTravel is a Traveling Salesman Problem solver that demonstrates:
 - CQRS pattern with Commands and Queries
-- Chain-based workflows
+- Story Framework for workflow orchestration (migrated from deprecated Chain pattern)
 - Integration with external APIs (Google Maps, Michelin)
 - .NET Aspire for orchestration
 - Multi-layer architecture
+- Clean Architecture with strict layer separation
 
 Key entry points:
 - API: `DreamTravel.Api` - Controllers for user-facing queries
 - Worker: `DreamTravel.Worker` - Background processing triggered by messages
 - UI: `DreamTravel.Ui` - Blazor UI
 
+**Note**: DreamTravel is being actively migrated to use Story Framework for all workflow orchestration, replacing the deprecated Flow/Chain pattern.
+
 ## Common Gotchas
 
 1. **Test Discovery**: Tests are in `tests/` directory (outside `src/`), referenced in solution as `Tests` folder
 2. **Assembly Scanning**: `ModuleInstaller` methods use `Assembly.GetCallingAssembly()` - they must be called from the assembly containing handlers
-3. **Chain Steps**: Must be registered with `RegisterChain()` before use
+3. **Story Chapters**: Must be registered in DI (automatically scanned when using `AddStoryFramework()`)
 4. **Result Implicit Conversion**: You can return domain objects directly - they'll auto-convert to `Result<T>`
 5. **Workload Restore**: Required before build - see GitHub workflow for reference
+6. **Windows PowerShell**: This repo runs on Windows, so shell commands use PowerShell syntax (e.g., `Select-String`, `Select-Object`) not bash
+7. **Story Persistence**: SQLite database for pausable workflows is stored in configured path (default: `stories.db`), use in-memory for tests
+8. **Auid Serialization**: Always use ProjectReference (not PackageReference) for SolTechnology.Core.AUID to ensure AuidJsonConverter is available for System.Text.Json serialization
+9. **JSON Options**: Story Framework uses `StoryJsonOptions.Default` with `PropertyNameCaseInsensitive = true` and `IncludeFields = true` for consistent serialization
 
 ## Technical Requirements
 
