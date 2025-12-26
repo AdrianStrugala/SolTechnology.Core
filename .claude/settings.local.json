@@ -71,7 +71,10 @@
       "Bash(Select-String -Pattern \"Niepowodzenie|Failed|Error\" -Context 5)",
       "Bash(wc:*)",
       "Bash(Select-Object -Last 30)",
-      "Bash(Select-String -Pattern \"error|Build|succeeded|failed\")"
+      "Bash(Select-String -Pattern \"error|Build|succeeded|failed\")",
+      "Bash(dotnet nuget search:*)",
+      "Bash(nuget list:*)",
+      "Bash(Select-String -Pattern \"Passed|Failed|Total tests\" -Context 2)"
     ],
     "deny": [],
     "ask": []

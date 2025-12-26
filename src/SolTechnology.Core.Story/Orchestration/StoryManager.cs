@@ -73,17 +73,30 @@ public class StoryManager
                 _logger.LogInformation("Story {HandlerType} completed successfully", typeof(THandler).Name);
 
                 // Create a completed story instance
+                var storyId = handler.Narration.StoryInstanceId != Auid.Empty
+                    ? handler.Narration.StoryInstanceId
+                    : Auid.New("STR");
+
                 var completedInstance = new StoryInstance
                 {
-                    StoryId = handler.Narration.StoryInstanceId != Auid.Empty
-                        ? handler.Narration.StoryInstanceId
-                        : Auid.New("STR"),
+                    StoryId = storyId,
                     HandlerTypeName = typeof(THandler).Name,
                     Status = StoryStatus.Completed,
                     CreatedAt = DateTime.UtcNow,
                     LastUpdatedAt = DateTime.UtcNow,
                     History = new List<ChapterInfo>()
                 };
+
+                // Save the completed story to repository
+                try
+                {
+                    await _repository.SaveAsync(completedInstance);
+                }
+                catch (Exception saveEx)
+                {
+                    _logger.LogWarning(saveEx, "Failed to save completed story {StoryId}, but story execution succeeded", storyId);
+                    // Don't fail the overall operation - story execution was successful
+                }
 
                 return Result<StoryInstance>.Success(completedInstance);
             }
@@ -113,10 +126,26 @@ public class StoryManager
         try
         {
             // Load the story instance
-            var storyInstance = await _repository.FindById(storyId);
+            StoryInstance? storyInstance;
+            try
+            {
+                storyInstance = await _repository.FindById(storyId);
+            }
+            catch (Exception repoEx)
+            {
+                _logger.LogError(repoEx, "Repository error while loading story {StoryId}", storyId);
+                return Result<StoryInstance>.Fail($"Failed to load story from storage: {repoEx.Message}");
+            }
+
             if (storyInstance == null)
             {
                 return Result<StoryInstance>.Fail($"Story {storyId} not found");
+            }
+
+            // Check if story is already completed
+            if (storyInstance.Status == StoryStatus.Completed)
+            {
+                return Result<StoryInstance>.Fail($"Story {storyId} is already completed and cannot be resumed");
             }
 
             // Deserialize the narration context with consistent JSON options
@@ -197,12 +226,20 @@ public class StoryManager
     /// </summary>
     public async Task<Result<StoryInstance>> GetStoryState(Auid storyId)
     {
-        var storyInstance = await _repository.FindById(storyId);
-        if (storyInstance == null)
+        try
         {
-            return Result<StoryInstance>.Fail($"Story {storyId} not found");
-        }
+            var storyInstance = await _repository.FindById(storyId);
+            if (storyInstance == null)
+            {
+                return Result<StoryInstance>.Fail($"Story {storyId} not found");
+            }
 
-        return Result<StoryInstance>.Success(storyInstance);
+            return Result<StoryInstance>.Success(storyInstance);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to retrieve story state for {StoryId}", storyId);
+            return Result<StoryInstance>.Fail($"Failed to retrieve story from storage: {ex.Message}");
+        }
     }
 }

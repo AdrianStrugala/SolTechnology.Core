@@ -347,7 +347,7 @@ public class AdvancedScenariosTests
         var storyId = startResult.Data!.StoryId;
 
         // Act 2 - Resume with first input (pauses at second interactive chapter)
-        var firstInput = JsonDocument.Parse("{\"name\": \"John\", \"email\": \"john@example.com\", \"age\": 30}");
+        var firstInput = JsonDocument.Parse("{\"Name\": \"John\", \"Email\": \"john@example.com\", \"Age\": 30}");
         var resume1 = await _storyManager.ResumeStory<MultiPauseStory, TestAdvancedInput, TestAdvancedNarration, TestAdvancedOutput>(
             storyId,
             firstInput.RootElement);
@@ -355,7 +355,7 @@ public class AdvancedScenariosTests
         resume1.Data!.Status.Should().Be(StoryStatus.WaitingForInput);
 
         // Act 3 - Resume with second input (pauses at third interactive chapter)
-        var secondInput = JsonDocument.Parse("{\"address\": \"123 Main St\", \"city\": \"New York\"}");
+        var secondInput = JsonDocument.Parse("{\"Address\": \"123 Main St\", \"City\": \"New York\"}");
         var resume2 = await _storyManager.ResumeStory<MultiPauseStory, TestAdvancedInput, TestAdvancedNarration, TestAdvancedOutput>(
             storyId,
             secondInput.RootElement);
@@ -363,7 +363,7 @@ public class AdvancedScenariosTests
         resume2.Data!.Status.Should().Be(StoryStatus.WaitingForInput);
 
         // Act 4 - Resume with third input (completes)
-        var thirdInput = JsonDocument.Parse("{\"cardNumber\": \"1234-5678\", \"cvv\": \"123\"}");
+        var thirdInput = JsonDocument.Parse("{\"CardNumber\": \"1234-5678\", \"Cvv\": \"123\"}");
         var resume3 = await _storyManager.ResumeStory<MultiPauseStory, TestAdvancedInput, TestAdvancedNarration, TestAdvancedOutput>(
             storyId,
             thirdInput.RootElement);

@@ -269,7 +269,9 @@ internal class StoryEngine
         var baseType = chapterType.BaseType;
         var inputType = baseType!.GetGenericArguments()[1]; // TChapterInput
 
-        var deserializedInput = JsonSerializer.Deserialize(_chapterInput.Value, inputType);
+        _logger.LogDebug("Deserializing input: {InputJson} to type {InputType}", _chapterInput.Value.GetRawText(), inputType.Name);
+        var deserializedInput = JsonSerializer.Deserialize(_chapterInput.Value, inputType, StoryJsonOptions.Default);
+        _logger.LogDebug("Deserialized input: {Input}", JsonSerializer.Serialize(deserializedInput));
         chapterInfo.ProvidedData = _chapterInput;
 
         // Call ExecuteWithInput via reflection
