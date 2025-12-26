@@ -298,11 +298,15 @@ Validators are automatically discovered and executed when registered via `Regist
    - ❌ BAD: `#region Private Methods` / `#region Test Data`
    - ✅ GOOD: Create separate class or use partial class
    - **Exception**: Test files with existing regions (like `AdvancedScenariosTests.cs`) may keep them for organizing test categories
-8. **Testing Framework**:
+8. **Logging Values**: Always wrap variable values in square brackets `[]` to make empty values visible
+   - ❌ BAD: `_logger.LogInformation($"Processing order {orderId}")`
+   - ✅ GOOD: `_logger.LogInformation($"Processing order [{orderId}]")`
+   - This makes it clear when a value is empty: `"Processing order []"` vs `"Processing order "`
+9. **Testing Framework**:
    - Use NUnit for all tests
    - For integration tests, use WebApplicationFactory and Testcontainers
    - Write comprehensive QA scenarios covering edge cases, error handling, concurrency, and security
-9. **Validation Framework**: Use FluentValidation for all input validation
+10. **Validation Framework**: Use FluentValidation for all input validation
 
 ## Important Implementation Notes
 
