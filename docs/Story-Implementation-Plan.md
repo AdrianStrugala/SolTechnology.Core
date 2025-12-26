@@ -22,7 +22,7 @@ The codebase currently has **two separate orchestration patterns** for multi-ste
    - Tightly coupled to CQRS patterns
 
 2. **FlowHandler** (in `SolTechnology.Core.Flow`)
-   - Used for complex, pausable workflows
+   - Used for complex, interactive workflows
    - Supports interactive user input
    - Has persistence infrastructure
    - Separate module with its own abstractions
@@ -894,7 +894,7 @@ Move Flow features into SolTechnology.Core.CQRS as ChainHandler extensions
 **Cons:**
 - ❌ Forces dependency on all CQRS users
 - ❌ Mixes concerns (patterns vs orchestration)
-- ❌ Name "Chain" doesn't reflect pausable nature
+- ❌ Name "Chain" doesn't reflect interactive nature
 
 **Why Rejected:** Violates separation of concerns, creates heavy dependency
 

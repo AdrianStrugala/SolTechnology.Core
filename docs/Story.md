@@ -1,6 +1,6 @@
 ### Overview
 
-The SolTechnology.Core.Story library provides a unified workflow orchestration framework for multi-step business processes. It supports both simple automated workflows and pausable interactive workflows with SQLite persistence. Built on the Tale Code philosophy, Story Framework makes complex workflows read like well-written prose.
+The SolTechnology.Core.Story library provides a unified workflow orchestration framework for multi-step business processes. It supports both simple automated workflows and interactive workflows with SQLite persistence. Built on the Tale Code philosophy, Story Framework makes complex workflows read like well-written prose.
 
 ### Installation
 
@@ -16,7 +16,7 @@ dotnet add package SolTechnology.Core.Story
 // Basic registration (automated workflows only)
 services.AddStoryFramework();
 
-// With persistence (for pausable interactive workflows)
+// With persistence (for interactive workflows)
 services.AddStoryFramework(options =>
 {
     options.EnablePersistence = true;
@@ -192,7 +192,7 @@ public class OrderController : ControllerBase
 
 - **Tale Code Philosophy**: Workflows read like well-written stories with `TellStory()`, chapters, and context
 - **Automated Workflows**: Simple linear workflows without user interaction
-- **Interactive Workflows**: Pausable workflows with user input validation
+- **Interactive Workflows**: User-driven workflows with input validation
 - **SQLite Persistence**: Save and resume workflow state across restarts
 - **Result Pattern**: Explicit success/failure handling integrated with CQRS
 - **Chapter Validation**: Built-in input validation for interactive chapters

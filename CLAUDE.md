@@ -32,7 +32,7 @@ Each library is a separate NuGet package with its own `ModuleInstaller.cs` for d
 - **SolTechnology.Core.Scheduler** - Cron-based task scheduling
 - **SolTechnology.Core.Api** - API utilities and filters
 - **SolTechnology.Core.Cache** - Caching abstractions
-- **SolTechnology.Core.Story** - Story Framework for workflow orchestration with pausable workflows, persistence, and Tale Code philosophy
+- **SolTechnology.Core.Story** - Story Framework for workflow orchestration with interactive workflows, persistence, and Tale Code philosophy
 - **SolTechnology.Core.AUID** - AUID (Application Unique ID) implementation
 - **SolTechnology.Core.Faker** - Test data generation
 
@@ -184,7 +184,7 @@ return city;  // Automatically converts to Result<City>
 
 ### Story Framework Pattern
 
-**Story Framework** is the unified approach for workflow orchestration, replacing the deprecated Chain pattern. It supports both simple automated workflows and pausable workflows with persistence.
+**Story Framework** is the unified approach for workflow orchestration, replacing the deprecated Chain pattern. It supports both simple automated workflows and interactive workflows with persistence.
 
 **Key Concepts:**
 - **StoryHandler** - Main orchestrator, inherits from `StoryHandler<TInput, TContext, TOutput>`
@@ -210,7 +210,7 @@ public class OrderProcessingStory : StoryHandler<OrderInput, Ordercontext, Order
 }
 ```
 
-**Interactive Story (pausable workflow with persistence):**
+**Interactive Story (interactive workflow with persistence):**
 ```csharp
 public class UserOnboardingStory : StoryHandler<OnboardingInput, Onboardingcontext, OnboardingOutput>
 {
@@ -242,7 +242,7 @@ public class CollectBasicInfoChapter : InteractiveChapter<Onboardingcontext, Use
 ```csharp
 services.AddStoryFramework(options =>
 {
-    options.EnablePersistence = true;  // For pausable workflows
+    options.EnablePersistence = true;  // For interactive workflows
     options.DatabasePath = "stories.db"; // SQLite persistence
 });
 
@@ -250,7 +250,7 @@ services.AddStoryFramework(options =>
 services.AddSingleton(StoryOptions.WithInMemoryPersistence());
 ```
 
-**Usage with StoryManager (for pausable workflows):**
+**Usage with StoryManager (for interactive workflows):**
 ```csharp
 // Start story
 var result = await storyManager.StartStory<UserOnboardingStory, OnboardingInput, Onboardingcontext, OnboardingOutput>(input);
@@ -525,7 +525,7 @@ Key entry points:
 4. **Result Implicit Conversion**: You can return domain objects directly - they'll auto-convert to `Result<T>`
 5. **Workload Restore**: Required before build - see GitHub workflow for reference
 6. **Windows PowerShell**: This repo runs on Windows, so shell commands use PowerShell syntax (e.g., `Select-String`, `Select-Object`) not bash
-7. **Story Persistence**: SQLite database for pausable workflows is stored in configured path (default: `stories.db`), use in-memory for tests
+7. **Story Persistence**: SQLite database for interactive workflows is stored in configured path (default: `stories.db`), use in-memory for tests
 8. **Auid Serialization**: Always use ProjectReference (not PackageReference) for SolTechnology.Core.AUID to ensure AuidJsonConverter is available for System.Text.Json serialization
 9. **JSON Options**: Story Framework uses `StoryJsonOptions.Default` with `PropertyNameCaseInsensitive = true` and `IncludeFields = true` for consistent serialization
 

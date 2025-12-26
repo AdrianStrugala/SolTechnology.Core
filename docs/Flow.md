@@ -1,6 +1,6 @@
 ### Overview
 
-The SolTechnology.Core.Flow library provides a workflow and chain framework with support for pausable flows. It enables building complex, multi-step workflows that can be paused and resumed, with state persistence using either in-memory or SQLite storage.
+The SolTechnology.Core.Flow library provides a workflow and chain framework with support for interactive flows. It enables building complex, multi-step workflows that can be paused and resumed, with state persistence using either in-memory or SQLite storage.
 
 ### Registration
 
