@@ -111,6 +111,30 @@ dotnet pack -c Release -o . ./src/SolTechnology.Core.CQRS/SolTechnology.Core.CQR
 - Dependencies are correct
 - Changes are compatible with existing code
 
+### Command Permissions and Allow List
+
+**IMPORTANT**: Before asking the user for permission to execute a Bash command, ALWAYS check `.claude/settings.local.json` for similar existing patterns in the `allow` list to avoid unnecessary interaction delays.
+
+**Examples of reusable patterns:**
+- `Bash(Select-String -Pattern "...")` - Many patterns already allowed for filtering test output (error, failed, passed, Niepowodzenie, Failed, etc.)
+- `Bash(Select-Object -Last N)` - Multiple variants exist (Last 5, 10, 20, 30)
+- `Bash(timeout N dotnet test:*)` - Several timeout variants exist (60, 120, 180, 300 seconds)
+- `Bash(dotnet *:*)` - Most dotnet commands are pre-approved
+
+**How to check:**
+1. Before executing a command that might need permission, mentally check if a similar pattern exists in the allow list
+2. Look for wildcard patterns (`*`) that might match your command
+3. For `Select-String` commands, check if a similar pattern exists even with different search terms
+4. For `Select-Object` commands, use existing `-Last N` values if available
+5. Prefer using existing approved patterns over asking for new permissions
+
+**Example decision tree:**
+- Need to filter test output for "Success"? → Check if `Select-String -Pattern "..."` with similar terms exists (passed, failed, etc.)
+- Need to show last 15 lines? → Use existing `Select-Object -Last 10` or `Last 20` instead of asking for `-Last 15`
+- Need to run tests with timeout? → Use existing timeout values (60, 120, 180, 300) instead of custom values
+
+This reduces user interruptions and speeds up development workflow.
+
 ## Architecture Patterns
 
 ### CQRS Pattern
