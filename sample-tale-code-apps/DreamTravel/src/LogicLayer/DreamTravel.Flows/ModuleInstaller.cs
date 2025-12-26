@@ -1,23 +1,22 @@
-﻿using DreamTravel.Flows.SampleOrderWorkflow;
-using DreamTravel.Flows.SampleOrderWorkflow.Steps;
-using Microsoft.Extensions.DependencyInjection;
-using SolTechnology.Core.Flow.Workflow.ChainFramework;
+﻿using Microsoft.Extensions.DependencyInjection;
+using SolTechnology.Core.Story;
 
 namespace DreamTravel.Flows;
 
 public static class ModuleInstaller
 {
-        public static IServiceCollection AddFlows(
-            this IServiceCollection services)
+    public static IServiceCollection AddFlows(this IServiceCollection services, StoryOptions? options = null)
+    {
+        // If options provided, use them; otherwise use default
+        if (options != null)
         {
-            services.AddScoped<IFlowHandler, SampleOrderWorkflowHandler>();
-            services.AddScoped<SampleOrderWorkflowHandler>();
-            
-            services.AddScoped<RequestUserInputStep>();
-            services.AddScoped<FetchExternalDataStep>();
-            services.AddScoped<BackendProcessingStep>();
-
-            return services;
+            services.RegisterStories(options);
         }
-        
+        else
+        {
+            services.RegisterStories();
+        }
+
+        return services;
+    }
 }

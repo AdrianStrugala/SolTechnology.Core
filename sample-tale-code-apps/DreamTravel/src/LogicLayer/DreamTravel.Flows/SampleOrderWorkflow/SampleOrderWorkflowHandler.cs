@@ -1,38 +1,37 @@
-using DreamTravel.Flows.SampleOrderWorkflow.Steps;
+using DreamTravel.Flows.SampleOrderWorkflow.Chapters;
 using Microsoft.Extensions.Logging;
-using SolTechnology.Core.Flow.Workflow.ChainFramework;
+using SolTechnology.Core.Story;
 using SolTechnology.Core.Journey.Workflow.Handlers;
 
 namespace DreamTravel.Flows.SampleOrderWorkflow
 {
-    public class SampleOrderWorkflowHandler(
-        IServiceProvider serviceProvider,
-        ILogger<SampleOrderWorkflowHandler> logger)
-        : PausableChainHandler<SampleOrderInput, SampleOrderContext, SampleOrderResult>(serviceProvider, logger)
+    public class SampleOrderWorkflowHandler : StoryHandler<SampleOrderInput, SampleOrderContext, SampleOrderResult>
     {
-        protected override async Task HandleChainDefinition(SampleOrderContext context)
+        public SampleOrderWorkflowHandler(
+            IServiceProvider serviceProvider,
+            ILogger<SampleOrderWorkflowHandler> logger)
+            : base(serviceProvider, logger)
         {
-            // The PausableChainHandler's ExecuteHandler will manage continuing or stopping based on these results.
-            // Invoke should internally handle the "don't proceed if prior step failed/paused" logic.
+        }
+        protected override async Task TellStory()
+        {
+            // Chapter 1: Request User Input for Customer Details
+            await ReadChapter<RequestUserInputChapter>();
 
-            // Step 1: Request User Input for Customer Details
-            await Invoke<RequestUserInputStep>();
+            // Chapter 2: Process Payment (Automated)
+            await ReadChapter<BackendProcessingChapter>();
 
-            // Step 2: Process Payment (Automated)
-            await Invoke<BackendProcessingStep>();
+            // Chapter 3: Fetch Shipping Estimate (Automated)
+            await ReadChapter<FetchExternalDataChapter>();
 
-            // Step 3: Fetch Shipping Estimate (Automated)
-            await Invoke<FetchExternalDataStep>();
-
-            // If all steps complete successfully:
-            context.Output.OrderId = context.Input.OrderId;
-            context.Output.IsSuccessfullyProcessed = true;
-            context.Output.Name = context.CustomerDetails?.Name;
-            if (string.IsNullOrEmpty(context.Output.FinalMessage)) // Ensure FinalMessage has a value
+            // If all chapters complete successfully:
+            Context.Output.OrderId = Context.Input.OrderId;
+            Context.Output.IsSuccessfullyProcessed = true;
+            Context.Output.Name = Context.CustomerDetails?.Name;
+            if (string.IsNullOrEmpty(Context.Output.FinalMessage))
             {
-                context.Output.FinalMessage = "Order processed and shipping estimate obtained.";
+                Context.Output.FinalMessage = "Order processed and shipping estimate obtained.";
             }
-            // Status will be set to Completed by ExecuteHandler if HandleChainDefinition finishes.
         }
     }
 }

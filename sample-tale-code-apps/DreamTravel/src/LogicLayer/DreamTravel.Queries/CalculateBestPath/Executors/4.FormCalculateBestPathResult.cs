@@ -1,13 +1,13 @@
 ﻿using DreamTravel.Domain.Cities;
 using SolTechnology.Core.CQRS;
-using SolTechnology.Core.CQRS.SuperChain;
+using SolTechnology.Core.Story;
 using Path = DreamTravel.Domain.Paths.Path;
 
-namespace DreamTravel.Queries.CalculateBestPath.Executors;
+namespace DreamTravel.Queries.CalculateBestPath.Chapters;
 
-public class FormCalculateBestPathResult : IChainStep<CalculateBestPathContext>
+public class FormCalculateBestPathResult : Chapter<CalculateBestPathContext>
 {
-    public Task<Result> Execute(CalculateBestPathContext context)
+    public override Task<Result> Read(CalculateBestPathContext context)
     {
         CalculateBestPathResult calculateBestPathResult = new CalculateBestPathResult
         {

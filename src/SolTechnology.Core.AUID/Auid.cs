@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using System.Text.Json.Serialization;
 
 /// <summary>
 /// A unique 64-bit identifier (AUID) designed for high-performance scenarios.
@@ -9,6 +10,7 @@ using System.Runtime.InteropServices;
 /// </summary>
 [StructLayout(LayoutKind.Auto)]
 [TypeConverter(typeof(AuidTypeConverter))]
+[JsonConverter(typeof(AuidJsonConverter))]
 public readonly struct Auid : IComparable<Auid>, IEquatable<Auid>, IParsable<Auid>
 {
     // --- Configuration ---

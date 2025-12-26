@@ -7,8 +7,9 @@ namespace SolTechnology.Core.CQRS.Errors;
 public class AggregateError : Error
 {
   private readonly IEnumerable<Error> _innerExceptions;
+  private readonly string _baseMessage;
 
-  
+
   /// <summary>Initializes a new instance of the <see cref="T:System.AggregateException" /> class with references to the inner exceptions that are the cause of this exception.</summary>
   /// <param name="innerExceptions">The exceptions that are the cause of the current exception.</param>
   /// <exception cref="T:System.ArgumentNullException">The <paramref name="innerExceptions" /> argument is null.</exception>
@@ -17,8 +18,8 @@ public class AggregateError : Error
     : this("One or more errors occurred.", innerExceptions)
   {
   }
-  
-  
+
+
   /// <summary>Initializes a new instance of the <see cref="T:System.AggregateException" /> class with a specified error message and references to the inner exceptions that are the cause of this exception.</summary>
   /// <param name="message">The error message that explains the reason for the exception.</param>
   /// <param name="innerExceptions">The exceptions that are the cause of the current exception.</param>
@@ -26,6 +27,7 @@ public class AggregateError : Error
   /// <exception cref="T:System.ArgumentException">An element of <paramref name="innerExceptions" /> is null.</exception>
   public AggregateError(string message, IEnumerable<Error> innerExceptions)
   {
+    _baseMessage = message;
     _innerExceptions = new List<Error>(innerExceptions ?? throw new ArgumentNullException(nameof(innerExceptions)))
       .ToArray();
   }
@@ -43,9 +45,9 @@ public class AggregateError : Error
     get
     {
       if (!_innerExceptions.Any())
-        return base.Message;
+        return _baseMessage ?? base.Message;
       StringBuilder valueStringBuilder = new StringBuilder();
-      valueStringBuilder.Append(base.Message);
+      valueStringBuilder.Append(_baseMessage ?? base.Message);
       valueStringBuilder.Append(' ');
       for (int index = 0; index < this._innerExceptions.Count(); ++index)
       {

@@ -57,6 +57,73 @@ paths:
             application/json:
               schema:
                 type: string
+  '/api/dreamtravel/story/{handlerTypeName}/start':
+    post:
+      tags:
+        - DreamTravelStory
+      parameters:
+        - name: handlerTypeName
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema: { }
+          text/json:
+            schema: { }
+          application/*+json:
+            schema: { }
+      responses:
+        '200':
+          description: OK
+  '/api/dreamtravel/story/{storyId}':
+    post:
+      tags:
+        - DreamTravelStory
+      parameters:
+        - name: storyId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema: { }
+          text/json:
+            schema: { }
+          application/*+json:
+            schema: { }
+      responses:
+        '200':
+          description: OK
+    get:
+      tags:
+        - DreamTravelStory
+      parameters:
+        - name: storyId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+  '/api/dreamtravel/story/{storyId}/result':
+    get:
+      tags:
+        - DreamTravelStory
+      parameters:
+        - name: storyId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
   /api/v2/FindCityByCoordinates:
     post:
       tags:
@@ -173,77 +240,6 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/ValidationResult'
-  '/api/flow/{flowName}/start':
-    post:
-      tags:
-        - Flow
-      parameters:
-        - name: flowName
-          in: path
-          required: true
-          schema:
-            type: string
-      requestBody:
-        content:
-          application/json:
-            schema: { }
-          text/json:
-            schema: { }
-          application/*+json:
-            schema: { }
-      responses:
-        '200':
-          description: OK
-  '/api/flow/{flowId}':
-    post:
-      tags:
-        - Flow
-      parameters:
-        - name: flowId
-          in: path
-          required: true
-          schema:
-            type: string
-        - name: stepId
-          in: query
-          schema:
-            type: string
-      requestBody:
-        content:
-          application/json:
-            schema: { }
-          text/json:
-            schema: { }
-          application/*+json:
-            schema: { }
-      responses:
-        '200':
-          description: OK
-    get:
-      tags:
-        - Flow
-      parameters:
-        - name: flowId
-          in: path
-          required: true
-          schema:
-            type: string
-      responses:
-        '200':
-          description: OK
-  '/api/flow/{flowId}/result':
-    get:
-      tags:
-        - Flow
-      parameters:
-        - name: flowId
-          in: path
-          required: true
-          schema:
-            type: string
-      responses:
-        '200':
-          description: OK
   /:
     get:
       tags:

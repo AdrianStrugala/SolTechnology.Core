@@ -97,7 +97,7 @@ In DreamTravel, the LogicLayer is organized into several projects, each serving 
 ```
 LogicLayer/
 ├── DreamTravel.DomainServices/       (Reusable business logic)
-├── DreamTravel.Flows/                (Pausable workflows)
+├── DreamTravel.Flows/                (Interactive workflows)
 ├── DreamTravel.Trips.Commands/       (Write operations)
 └── DreamTravel.Trips.Queries/        (Read operations)
 ```
@@ -676,7 +676,7 @@ Not every operation needs the full DomainService + Steps treatment. Here's when 
 | Simple write operation | Direct handler with DbContext | Update city name |
 | Complex write operation | ChainHandler + Steps | Multi-step data processing |
 | Reusable write logic | DomainService + SaveSteps | Save city with alternatives |
-| Pausable user workflow | PausableChainHandler + Flow | Order processing with user input |
+| Interactive user workflow | PausableChainHandler + Flow | Order processing with user input |
 
 The key is to use the simplest pattern that solves your problem. Don't reach for ChainHandler if a simple handler will do. Don't create DomainService if the logic is used in only one place. Keep it readable, keep it simple.
 

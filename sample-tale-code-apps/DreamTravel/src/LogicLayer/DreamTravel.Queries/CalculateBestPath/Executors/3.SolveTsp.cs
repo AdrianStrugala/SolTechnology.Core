@@ -1,10 +1,10 @@
 ﻿using DreamTravel.TravelingSalesmanProblem;
 using SolTechnology.Core.CQRS;
-using SolTechnology.Core.CQRS.SuperChain;
+using SolTechnology.Core.Story;
 
-namespace DreamTravel.Queries.CalculateBestPath.Executors;
+namespace DreamTravel.Queries.CalculateBestPath.Chapters;
 
-public class SolveTsp : IChainStep<CalculateBestPathContext>
+public class SolveTsp : Chapter<CalculateBestPathContext>
 {
     private readonly ITSP _tsp;
 
@@ -13,7 +13,7 @@ public class SolveTsp : IChainStep<CalculateBestPathContext>
         _tsp = tsp;
     }
 
-    public Task<Result> Execute(CalculateBestPathContext calculateBestPathContext)
+    public override Task<Result> Read(CalculateBestPathContext calculateBestPathContext)
     {
         calculateBestPathContext.OrderOfCities = _tsp.SolveTSP(calculateBestPathContext.OptimalDistances.ToList());
         return Result.SuccessAsTask();

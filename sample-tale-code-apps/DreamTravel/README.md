@@ -438,18 +438,6 @@ public class CalculateBestPathResult
 
 ### Testing & Quality
 
-- [ ] **Component Integration Tests** - Playwright tests for UI workflows
-  - `TspUiIntegrationTest.cs` - End-to-end TSP flow testing
-  - Mock Google API responses with WireMock
-  - Automated UI interaction testing
-  - CI/CD integration
-
-- [ ] **E2E Tests** - Full system end-to-end tests
-  - Critical user journeys
-  - Cross-browser compatibility (Chrome, Firefox, Safari)
-  - Mobile responsiveness testing
-  - Performance benchmarks
-
 - [ ] **Unit Test Coverage** - Expand unit test coverage
   - TspService business logic
   - CitiesPanel component behavior
@@ -469,8 +457,6 @@ public class CalculateBestPathResult
   - Fallback strategies
 
 - [ ] **Background Processing** - Move heavy computations to background jobs
-  - Azure Functions for TSP calculations
-  - Queue-based processing (Azure Service Bus)
   - Progress notifications via SignalR
 
 ### DevOps & Monitoring
@@ -502,11 +488,4 @@ public class CalculateBestPathResult
   - Feature walkthroughs
   - Troubleshooting guide
 
-- [ ] **Architecture Decision Records** - Document key technical decisions
-  - Blazor vs Angular migration rationale
-  - CQRS pattern implementation
-  - Google Maps vs alternatives
-
 ---
-
-**Note**: Items marked with priority (P0/P1/P2) should be prioritized accordingly. For contribution guidelines, see [CONTRIBUTING.md](../CONTRIBUTING.md).

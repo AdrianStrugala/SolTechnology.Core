@@ -2,11 +2,11 @@
 using DreamTravel.GeolocationDataClients.GoogleApi;
 using DreamTravel.GeolocationDataClients.MichelinApi;
 using SolTechnology.Core.CQRS;
-using SolTechnology.Core.CQRS.SuperChain;
+using SolTechnology.Core.Story;
 
-namespace DreamTravel.Queries.CalculateBestPath.Executors;
+namespace DreamTravel.Queries.CalculateBestPath.Chapters;
 
-public class DownloadRoadData : IChainStep<CalculateBestPathContext>
+public class DownloadRoadData : Chapter<CalculateBestPathContext>
 {
     private readonly IGoogleApiClient _googleApiClient;
     private readonly IMichelinApiClient _michelinApiClient;
@@ -17,7 +17,7 @@ public class DownloadRoadData : IChainStep<CalculateBestPathContext>
         _michelinApiClient = michelinApiClient;
     }
 
-    public async Task<Result> Execute(CalculateBestPathContext calculateBestPathContext)
+    public override async Task<Result> Read(CalculateBestPathContext calculateBestPathContext)
     {
         var listOfCities = calculateBestPathContext.Cities;
         List<Task> tasks = new List<Task>

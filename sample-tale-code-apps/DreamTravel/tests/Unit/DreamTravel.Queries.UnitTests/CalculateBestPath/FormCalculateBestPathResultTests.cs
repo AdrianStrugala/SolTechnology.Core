@@ -1,6 +1,6 @@
 using DreamTravel.Domain.Cities;
 using DreamTravel.Queries.CalculateBestPath;
-using DreamTravel.Queries.CalculateBestPath.Executors;
+using DreamTravel.Queries.CalculateBestPath.Chapters;
 using SolTechnology.Core.CQRS;
 
 namespace DreamTravel.Queries.UnitTests.CalculateBestPath
@@ -53,7 +53,7 @@ namespace DreamTravel.Queries.UnitTests.CalculateBestPath
             };
 
             //Act
-            Result result = await _sut.Execute(calculateBestPathContext);
+            Result result = await _sut.Read(calculateBestPathContext);
 
             //Assert
             Assert.True(result.IsSuccess);

@@ -2,8 +2,8 @@
 
   <PropertyGroup>
 	  <Version>0.5.0</Version>
-	  <Description>Complete CQRS implementation built on MediatR with Result pattern, SuperChain for complex workflows, automatic FluentValidation, and logging pipeline behaviors. Enforces clean separation between reads and writes with explicit success/failure handling.</Description>
-	  <PackageTags>sol technology cqrs mediatr command query result-pattern chain fluentvalidation architecture clean-code dotnet design-patterns</PackageTags>
+	  <Description>Complete CQRS implementation built on MediatR with Result pattern, automatic FluentValidation, and logging pipeline behaviors. Enforces clean separation between reads and writes with explicit success/failure handling.</Description>
+	  <PackageTags>sol technology cqrs mediatr command query result-pattern fluentvalidation architecture clean-code dotnet design-patterns</PackageTags>
 	  <Product>SolTechnology.Core.CQRS</Product>
 	  <PackageId>SolTechnology.Core.CQRS</PackageId>
 	  <AssemblyName>SolTechnology.Core.CQRS</AssemblyName>

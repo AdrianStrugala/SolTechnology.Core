@@ -1,6 +1,7 @@
 using DreamTravel.DomainServices.CityDomain;
 using DreamTravel.DomainServices.CityDomain.SaveSteps;
 using Microsoft.Extensions.DependencyInjection;
+using SolTechnology.Core.Story;
 
 namespace DreamTravel.DomainServices
 {
@@ -11,7 +12,7 @@ namespace DreamTravel.DomainServices
     {
         /// <summary>
         /// Registers all domain services and related dependencies.
-        /// This includes city domain services, mappers, and city save steps.
+        /// This includes city domain services, mappers, city save steps, and story handlers.
         /// </summary>
         /// <param name="services">The service collection to add services to.</param>
         /// <returns>The service collection for chaining.</returns>
@@ -21,6 +22,9 @@ namespace DreamTravel.DomainServices
             services.AddScoped<ICityMapper, CityMapper>();
             services.AddScoped<IAssignAlternativeNameStep, AssignAlternativeNameStep>();
             services.AddScoped<IIncrementSearchCountStep, IncrementSearchCountStep>();
+
+            // Register all story handlers and chapters
+            services.RegisterStories();
 
             return services;
         }

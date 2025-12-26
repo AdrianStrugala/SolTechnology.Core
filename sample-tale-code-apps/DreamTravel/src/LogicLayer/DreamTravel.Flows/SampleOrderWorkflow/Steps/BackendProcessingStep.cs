@@ -1,16 +1,17 @@
 using SolTechnology.Core.CQRS;
-using SolTechnology.Core.Flow.Workflow.ChainFramework;
+using SolTechnology.Core.Story;
 
-namespace DreamTravel.Flows.SampleOrderWorkflow.Steps;
+namespace DreamTravel.Flows.SampleOrderWorkflow.Chapters;
 
-public class BackendProcessingStep : AutomatedFlowStep<SampleOrderContext>
+public class BackendProcessingChapter : Chapter<SampleOrderContext>
 {
-    public string StepId => "ProcessOrderPayment";
-    
-    public override Task<Result> Execute(SampleOrderContext context)
+    public override string ChapterId => "ProcessOrderPayment";
+
+    public override Task<Result> Read(SampleOrderContext context)
     {
         // Example condition for forced test failure
-        if (context.Input.Quantity < 0) { 
+        if (context.Input.Quantity < 0)
+        {
             var errorMessage = "Invalid quantity for processing.";
             return Task.FromResult(Result.Fail(errorMessage));
         }
@@ -22,7 +23,7 @@ public class BackendProcessingStep : AutomatedFlowStep<SampleOrderContext>
         // Simulate a potential failure scenario based on OrderId (can be kept or removed if covered by above)
         if (context.Input.OrderId.Contains("FAIL_PAYMENT"))
         {
-            var errorMessage  = "Simulated payment failure for OrderID: " + context.Input.OrderId;
+            var errorMessage = "Simulated payment failure for OrderID: " + context.Input.OrderId;
             return Task.FromResult(Result.Fail(errorMessage));
         }
 
