@@ -52,7 +52,7 @@ public class InteractiveChapterTests
     {
         // Arrange
         var chapter = new TestInteractiveChapter();
-        var narration = new TestInteractiveNarration
+        var context = new TestInteractiveContext
         {
             Input = new TestInteractiveInput()
         };
@@ -64,12 +64,12 @@ public class InteractiveChapterTests
         };
 
         // Act
-        var result = await chapter.ReadWithInput(narration, userInput);
+        var result = await chapter.ReadWithInput(context, userInput);
 
         // Assert
         result.IsSuccess.Should().BeTrue();
-        narration.CustomerName.Should().Be("John Doe");
-        narration.CustomerAge.Should().Be(30);
+        context.CustomerName.Should().Be("John Doe");
+        context.CustomerAge.Should().Be(30);
     }
 
     [Test]
@@ -77,7 +77,7 @@ public class InteractiveChapterTests
     {
         // Arrange
         var chapter = new TestInteractiveChapter();
-        var narration = new TestInteractiveNarration
+        var context = new TestInteractiveContext
         {
             Input = new TestInteractiveInput()
         };
@@ -89,7 +89,7 @@ public class InteractiveChapterTests
         };
 
         // Act
-        var result = await chapter.ReadWithInput(narration, invalidInput);
+        var result = await chapter.ReadWithInput(context, invalidInput);
 
         // Assert
         result.IsFailure.Should().BeTrue();
@@ -102,13 +102,13 @@ public class InteractiveChapterTests
     {
         // Arrange
         var chapter = new TestInteractiveChapter();
-        var narration = new TestInteractiveNarration
+        var context = new TestInteractiveContext
         {
             Input = new TestInteractiveInput()
         };
 
         // Act & Assert
-        var act = async () => await ((IChapter<TestInteractiveNarration>)chapter).Read(narration);
+        var act = async () => await ((IChapter<TestInteractiveContext>)chapter).Read(context);
 
         act.Should().ThrowAsync<InvalidOperationException>()
             .WithMessage("*requires user input*");
@@ -132,7 +132,7 @@ public class InteractiveChapterTests
     {
         // Arrange
         var chapter = new ComplexInputChapter();
-        var narration = new TestInteractiveNarration
+        var context = new TestInteractiveContext
         {
             Input = new TestInteractiveInput()
         };
@@ -147,11 +147,11 @@ public class InteractiveChapterTests
         };
 
         // Act
-        var result = await chapter.ReadWithInput(narration, complexInput);
+        var result = await chapter.ReadWithInput(context, complexInput);
 
         // Assert
         result.IsSuccess.Should().BeTrue();
-        narration.ComplexData.Should().Be("Order: ORD-123, Quantity: 5");
+        context.ComplexData.Should().Be("Order: ORD-123, Quantity: 5");
     }
 
     [Test]
@@ -174,10 +174,10 @@ public class InteractiveChapterTests
 
 #region Test Interactive Chapters
 
-public class TestInteractiveChapter : InteractiveChapter<TestInteractiveNarration, CustomerDetailsInput>
+public class TestInteractiveChapter : InteractiveChapter<TestInteractiveContext, CustomerDetailsInput>
 {
     public override Task<Result> ReadWithInput(
-        TestInteractiveNarration narration,
+        TestInteractiveContext context,
         CustomerDetailsInput userInput)
     {
         // Validate input
@@ -192,21 +192,21 @@ public class TestInteractiveChapter : InteractiveChapter<TestInteractiveNarratio
         }
 
         // Process input
-        narration.CustomerName = userInput.CustomerName;
-        narration.CustomerAge = userInput.Age;
-        narration.CustomerEmail = userInput.Email;
+        context.CustomerName = userInput.CustomerName;
+        context.CustomerAge = userInput.Age;
+        context.CustomerEmail = userInput.Email;
 
         return Result.SuccessAsTask();
     }
 }
 
-public class ComplexInputChapter : InteractiveChapter<TestInteractiveNarration, ComplexInput>
+public class ComplexInputChapter : InteractiveChapter<TestInteractiveContext, ComplexInput>
 {
     public override Task<Result> ReadWithInput(
-        TestInteractiveNarration narration,
+        TestInteractiveContext context,
         ComplexInput userInput)
     {
-        narration.ComplexData = $"Order: {userInput.OrderDetails.OrderId}, Quantity: {userInput.Quantity}";
+        context.ComplexData = $"Order: {userInput.OrderDetails.OrderId}, Quantity: {userInput.Quantity}";
         return Result.SuccessAsTask();
     }
 }
@@ -236,7 +236,7 @@ public class OrderDetails
 
 #endregion
 
-#region Test Narration
+#region Test context
 
 public class TestInteractiveInput
 {
@@ -247,7 +247,7 @@ public class TestInteractiveOutput
     public string Result { get; set; } = string.Empty;
 }
 
-public class TestInteractiveNarration : Narration<TestInteractiveInput, TestInteractiveOutput>
+public class TestInteractiveContext : Context<TestInteractiveInput, TestInteractiveOutput>
 {
     public string CustomerName { get; set; } = string.Empty;
     public int CustomerAge { get; set; }

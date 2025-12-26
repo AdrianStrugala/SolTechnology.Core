@@ -3,7 +3,7 @@ using SolTechnology.Core.Journey.Workflow.Handlers;
 
 namespace DreamTravel.Flows.SampleOrderWorkflow
 {
-    public class SampleOrderNarration : Narration<SampleOrderInput, SampleOrderResult>
+    public class SampleOrderContext : Context<SampleOrderInput, SampleOrderResult>
     {
         // Custom properties for this specific workflow context
         public CustomerDetails CustomerDetails { get; set; } = null!;

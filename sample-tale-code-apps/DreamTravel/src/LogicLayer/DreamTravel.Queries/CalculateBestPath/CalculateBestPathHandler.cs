@@ -8,7 +8,7 @@ namespace DreamTravel.Queries.CalculateBestPath;
 public class CalculateBestPathHandler(
     IServiceProvider serviceProvider,
     ILogger<CalculateBestPathHandler> logger)
-    : StoryHandler<CalculateBestPathQuery, CalculateBestPathNarration, CalculateBestPathResult>(serviceProvider, logger),
+    : StoryHandler<CalculateBestPathQuery, CalculateBestPathContext, CalculateBestPathResult>(serviceProvider, logger),
       IQueryHandler<CalculateBestPathQuery, CalculateBestPathResult>
 {
     protected override async Task TellStory()

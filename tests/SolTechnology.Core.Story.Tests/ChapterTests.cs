@@ -7,7 +7,7 @@ namespace SolTechnology.Core.Story.Tests;
 
 /// <summary>
 /// Tests for basic chapter execution.
-/// Verifies that chapters can execute, modify narration, return success/failure, and use DI.
+/// Verifies that chapters can execute, modify context, return success/failure, and use DI.
 /// </summary>
 [TestFixture]
 public class ChapterTests
@@ -17,27 +17,27 @@ public class ChapterTests
     {
         // Arrange
         var chapter = new TestSuccessChapter();
-        var narration = new TestNarration { Input = new TestInput { Value = 10 } };
+        var context = new TestContext { Input = new TestInput { Value = 10 } };
 
         // Act
-        var result = await chapter.Read(narration);
+        var result = await chapter.Read(context);
 
         // Assert
         result.IsSuccess.Should().BeTrue();
     }
 
     [Test]
-    public async Task Chapter_ShouldModifyNarration()
+    public async Task Chapter_ShouldModifyContext()
     {
         // Arrange
-        var chapter = new TestModifyNarrationChapter();
-        var narration = new TestNarration { Input = new TestInput { Value = 10 } };
+        var chapter = new TestModifyContextChapter();
+        var context = new TestContext { Input = new TestInput { Value = 10 } };
 
         // Act
-        await chapter.Read(narration);
+        await chapter.Read(context);
 
         // Assert
-        narration.ProcessedValue.Should().Be(20); // Should double the input value
+        context.ProcessedValue.Should().Be(20); // Should double the input value
     }
 
     [Test]
@@ -45,10 +45,10 @@ public class ChapterTests
     {
         // Arrange
         var chapter = new TestFailureChapter();
-        var narration = new TestNarration { Input = new TestInput { Value = -1 } };
+        var context = new TestContext { Input = new TestInput { Value = -1 } };
 
         // Act
-        var result = await chapter.Read(narration);
+        var result = await chapter.Read(context);
 
         // Assert
         result.IsFailure.Should().BeTrue();
@@ -62,13 +62,13 @@ public class ChapterTests
         // Arrange
         var testService = new TestService();
         var chapter = new TestChapterWithDI(testService);
-        var narration = new TestNarration { Input = new TestInput { Value = 10 } };
+        var context = new TestContext { Input = new TestInput { Value = 10 } };
 
         // Act
-        await chapter.Read(narration);
+        await chapter.Read(context);
 
         // Assert
-        narration.ServiceResult.Should().Be("Service called with value: 10");
+        context.ServiceResult.Should().Be("Service called with value: 10");
     }
 
     [Test]
@@ -103,22 +103,22 @@ public class ChapterTests
 /// <summary>
 /// Test chapter that always succeeds.
 /// </summary>
-public class TestSuccessChapter : Chapter<TestNarration>
+public class TestSuccessChapter : Chapter<TestContext>
 {
-    public override Task<Result> Read(TestNarration narration)
+    public override Task<Result> Read(TestContext context)
     {
         return Result.SuccessAsTask();
     }
 }
 
 /// <summary>
-/// Test chapter that modifies the narration.
+/// Test chapter that modifies the context.
 /// </summary>
-public class TestModifyNarrationChapter : Chapter<TestNarration>
+public class TestModifyContextChapter : Chapter<TestContext>
 {
-    public override Task<Result> Read(TestNarration narration)
+    public override Task<Result> Read(TestContext context)
     {
-        narration.ProcessedValue = narration.Input.Value * 2;
+        context.ProcessedValue = context.Input.Value * 2;
         return Result.SuccessAsTask();
     }
 }
@@ -126,11 +126,11 @@ public class TestModifyNarrationChapter : Chapter<TestNarration>
 /// <summary>
 /// Test chapter that fails on negative values.
 /// </summary>
-public class TestFailureChapter : Chapter<TestNarration>
+public class TestFailureChapter : Chapter<TestContext>
 {
-    public override Task<Result> Read(TestNarration narration)
+    public override Task<Result> Read(TestContext context)
     {
-        if (narration.Input.Value < 0)
+        if (context.Input.Value < 0)
         {
             return Result.FailAsTask("Negative values are not allowed");
         }
@@ -142,7 +142,7 @@ public class TestFailureChapter : Chapter<TestNarration>
 /// <summary>
 /// Test chapter that uses dependency injection.
 /// </summary>
-public class TestChapterWithDI : Chapter<TestNarration>
+public class TestChapterWithDI : Chapter<TestContext>
 {
     private readonly TestService _service;
 
@@ -151,9 +151,9 @@ public class TestChapterWithDI : Chapter<TestNarration>
         _service = service;
     }
 
-    public override Task<Result> Read(TestNarration narration)
+    public override Task<Result> Read(TestContext context)
     {
-        narration.ServiceResult = _service.Process(narration.Input.Value);
+        context.ServiceResult = _service.Process(context.Input.Value);
         return Result.SuccessAsTask();
     }
 }
@@ -161,11 +161,11 @@ public class TestChapterWithDI : Chapter<TestNarration>
 /// <summary>
 /// Test chapter with a custom chapter ID.
 /// </summary>
-public class TestCustomIdChapter : Chapter<TestNarration>
+public class TestCustomIdChapter : Chapter<TestContext>
 {
     public override string ChapterId => "CustomChapterId";
 
-    public override Task<Result> Read(TestNarration narration)
+    public override Task<Result> Read(TestContext context)
     {
         return Result.SuccessAsTask();
     }
@@ -185,7 +185,7 @@ public class TestOutput
     public int FinalValue { get; set; }
 }
 
-public class TestNarration : Narration<TestInput, TestOutput>
+public class TestContext : Context<TestInput, TestOutput>
 {
     public int ProcessedValue { get; set; }
     public string? ServiceResult { get; set; }

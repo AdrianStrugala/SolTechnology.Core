@@ -64,7 +64,7 @@ public class StoryHandlerTests
     }
 
     [Test]
-    public async Task StoryHandler_ShouldPopulateNarration_WithInput()
+    public async Task StoryHandler_ShouldPopulateContext_WithInput()
     {
         // Arrange
         var handler = new SimpleCalculationStory(_serviceProvider, GetLogger<SimpleCalculationStory>());
@@ -74,8 +74,8 @@ public class StoryHandlerTests
         await handler.Handle(input);
 
         // Assert
-        handler.Narration.Input.Should().Be(input);
-        handler.Narration.Input.Number.Should().Be(5);
+        handler.Context.Input.Should().Be(input);
+        handler.Context.Input.Number.Should().Be(5);
     }
 
     [Test]
@@ -124,8 +124,8 @@ public class StoryHandlerTests
         await handler.Handle(input);
 
         // Assert - the third chapter should not have been executed
-        handler.Narration.ChapterExecutionLog.Should().Contain("FailingChapter");
-        handler.Narration.ChapterExecutionLog.Should().NotContain("FormatResultChapter");
+        handler.Context.ChapterExecutionLog.Should().Contain("FailingChapter");
+        handler.Context.ChapterExecutionLog.Should().NotContain("FormatResultChapter");
     }
 
     [Test]
@@ -171,7 +171,7 @@ public class StoryHandlerTests
 /// <summary>
 /// Simple story that performs a calculation across 3 chapters.
 /// </summary>
-public class SimpleCalculationStory : StoryHandler<CalculationInput, CalculationNarration, CalculationOutput>
+public class SimpleCalculationStory : StoryHandler<CalculationInput, CalculationContext, CalculationOutput>
 {
     public SimpleCalculationStory(IServiceProvider sp, ILogger<SimpleCalculationStory> logger)
         : base(sp, logger)
@@ -189,7 +189,7 @@ public class SimpleCalculationStory : StoryHandler<CalculationInput, Calculation
 /// <summary>
 /// Story that fails during validation.
 /// </summary>
-public class FailingStory : StoryHandler<CalculationInput, CalculationNarration, CalculationOutput>
+public class FailingStory : StoryHandler<CalculationInput, CalculationContext, CalculationOutput>
 {
     public FailingStory(IServiceProvider sp, ILogger<FailingStory> logger)
         : base(sp, logger)
@@ -207,7 +207,7 @@ public class FailingStory : StoryHandler<CalculationInput, CalculationNarration,
 /// <summary>
 /// Story that sets output directly in TellStory.
 /// </summary>
-public class DirectOutputStory : StoryHandler<CalculationInput, CalculationNarration, CalculationOutput>
+public class DirectOutputStory : StoryHandler<CalculationInput, CalculationContext, CalculationOutput>
 {
     public DirectOutputStory(IServiceProvider sp, ILogger<DirectOutputStory> logger)
         : base(sp, logger)
@@ -217,7 +217,7 @@ public class DirectOutputStory : StoryHandler<CalculationInput, CalculationNarra
     protected override async Task TellStory()
     {
         await ReadChapter<ModifyOutputChapter>();
-        Narration.Output.Result = $"Direct output: {Narration.Input.Number}";
+        Context.Output.Result = $"Direct output: {Context.Input.Number}";
     }
 }
 
@@ -225,23 +225,23 @@ public class DirectOutputStory : StoryHandler<CalculationInput, CalculationNarra
 
 #region Test Chapters
 
-public class CalculateChapter : Chapter<CalculationNarration>
+public class CalculateChapter : Chapter<CalculationContext>
 {
-    public override Task<Result> Read(CalculationNarration narration)
+    public override Task<Result> Read(CalculationContext context)
     {
-        narration.ChapterExecutionLog.Add("CalculateChapter");
-        narration.IntermediateValue = narration.Input.Number + 10;
+        context.ChapterExecutionLog.Add("CalculateChapter");
+        context.IntermediateValue = context.Input.Number + 10;
         return Result.SuccessAsTask();
     }
 }
 
-public class ValidateChapter : Chapter<CalculationNarration>
+public class ValidateChapter : Chapter<CalculationContext>
 {
-    public override Task<Result> Read(CalculationNarration narration)
+    public override Task<Result> Read(CalculationContext context)
     {
-        narration.ChapterExecutionLog.Add("ValidateChapter");
+        context.ChapterExecutionLog.Add("ValidateChapter");
 
-        if (narration.IntermediateValue < 0)
+        if (context.IntermediateValue < 0)
         {
             return Result.FailAsTask("Validation failed: negative value");
         }
@@ -250,32 +250,32 @@ public class ValidateChapter : Chapter<CalculationNarration>
     }
 }
 
-public class FormatResultChapter : Chapter<CalculationNarration>
+public class FormatResultChapter : Chapter<CalculationContext>
 {
-    public override Task<Result> Read(CalculationNarration narration)
+    public override Task<Result> Read(CalculationContext context)
     {
-        narration.ChapterExecutionLog.Add("FormatResultChapter");
-        var finalValue = narration.IntermediateValue * 1.5;
-        narration.Output.Result = $"Result: {finalValue}";
+        context.ChapterExecutionLog.Add("FormatResultChapter");
+        var finalValue = context.IntermediateValue * 1.5;
+        context.Output.Result = $"Result: {finalValue}";
         return Result.SuccessAsTask();
     }
 }
 
-public class FailingChapter : Chapter<CalculationNarration>
+public class FailingChapter : Chapter<CalculationContext>
 {
-    public override Task<Result> Read(CalculationNarration narration)
+    public override Task<Result> Read(CalculationContext context)
     {
-        narration.ChapterExecutionLog.Add("FailingChapter");
+        context.ChapterExecutionLog.Add("FailingChapter");
         return Result.FailAsTask("Validation failed: intentional failure");
     }
 }
 
-public class ModifyOutputChapter : Chapter<CalculationNarration>
+public class ModifyOutputChapter : Chapter<CalculationContext>
 {
-    public override Task<Result> Read(CalculationNarration narration)
+    public override Task<Result> Read(CalculationContext context)
     {
-        narration.ChapterExecutionLog.Add("ModifyOutputChapter");
-        narration.Output.Result = "Modified by chapter";
+        context.ChapterExecutionLog.Add("ModifyOutputChapter");
+        context.Output.Result = "Modified by chapter";
         return Result.SuccessAsTask();
     }
 }
@@ -294,7 +294,7 @@ public class CalculationOutput
     public string Result { get; set; } = string.Empty;
 }
 
-public class CalculationNarration : Narration<CalculationInput, CalculationOutput>
+public class CalculationContext : Context<CalculationInput, CalculationOutput>
 {
     public int IntermediateValue { get; set; }
     public List<string> ChapterExecutionLog { get; set; } = new();

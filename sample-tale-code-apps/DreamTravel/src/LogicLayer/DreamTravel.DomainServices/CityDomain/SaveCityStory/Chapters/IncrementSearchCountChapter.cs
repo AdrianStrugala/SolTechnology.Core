@@ -7,7 +7,7 @@ namespace DreamTravel.DomainServices.CityDomain.SaveCityStory.Chapters;
 /// <summary>
 /// Chapter that increments search count statistics for the city.
 /// </summary>
-public class IncrementSearchCountChapter : Chapter<SaveCityNarration>
+public class IncrementSearchCountChapter : Chapter<SaveCityContext>
 {
     private readonly IIncrementSearchCountStep _incrementSearchCountStep;
 
@@ -16,9 +16,9 @@ public class IncrementSearchCountChapter : Chapter<SaveCityNarration>
         _incrementSearchCountStep = incrementSearchCountStep;
     }
 
-    public override Task<Result> Read(SaveCityNarration narration)
+    public override Task<Result> Read(SaveCityContext context)
     {
-        _incrementSearchCountStep.Invoke(narration.CityEntity, narration.Today);
+        _incrementSearchCountStep.Invoke(context.CityEntity, context.Today);
 
         return Result.SuccessAsTask();
     }

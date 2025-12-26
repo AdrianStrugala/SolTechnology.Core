@@ -31,11 +31,11 @@ public class StoryManager
     /// Start a new story with the given input.
     /// Returns the story instance with its ID for future resume operations.
     /// </summary>
-    public async Task<Result<StoryInstance>> StartStory<THandler, TInput, TNarration, TOutput>(
+    public async Task<Result<StoryInstance>> StartStory<THandler, TInput, TContext, TOutput>(
         TInput input)
-        where THandler : StoryHandler<TInput, TNarration, TOutput>
+        where THandler : StoryHandler<TInput, TContext, TOutput>
         where TInput : class
-        where TNarration : Narration<TInput, TOutput>, new()
+        where TContext : Context<TInput, TOutput>, new()
         where TOutput : class, new()
     {
         _logger.LogInformation("Starting new story {HandlerType}", typeof(THandler).Name);
@@ -56,7 +56,7 @@ public class StoryManager
             // If story is paused, return the instance
             if (result.IsFailure && result.Error?.Message.Contains("paused") == true)
             {
-                var storyId = handler.Narration.StoryInstanceId;
+                var storyId = handler.Context.StoryInstanceId;
                 if (storyId != Auid.Empty)
                 {
                     var storyInstance = await _repository.FindById(storyId);
@@ -73,8 +73,8 @@ public class StoryManager
                 _logger.LogInformation("Story {HandlerType} completed successfully", typeof(THandler).Name);
 
                 // Create a completed story instance
-                var storyId = handler.Narration.StoryInstanceId != Auid.Empty
-                    ? handler.Narration.StoryInstanceId
+                var storyId = handler.Context.StoryInstanceId != Auid.Empty
+                    ? handler.Context.StoryInstanceId
                     : Auid.New("STR");
 
                 var completedInstance = new StoryInstance
@@ -113,12 +113,12 @@ public class StoryManager
     /// <summary>
     /// Resume a paused story with user input for the interactive chapter.
     /// </summary>
-    public async Task<Result<StoryInstance>> ResumeStory<THandler, TInput, TNarration, TOutput>(
+    public async Task<Result<StoryInstance>> ResumeStory<THandler, TInput, TContext, TOutput>(
         Auid storyId,
         JsonElement? userInput = null)
-        where THandler : StoryHandler<TInput, TNarration, TOutput>
+        where THandler : StoryHandler<TInput, TContext, TOutput>
         where TInput : class
-        where TNarration : Narration<TInput, TOutput>, new()
+        where TContext : Context<TInput, TOutput>, new()
         where TOutput : class, new()
     {
         _logger.LogInformation("Resuming story {StoryId}", storyId);
@@ -148,15 +148,15 @@ public class StoryManager
                 return Result<StoryInstance>.Fail($"Story {storyId} is already completed and cannot be resumed");
             }
 
-            // Deserialize the narration context with consistent JSON options
-            var narration = JsonSerializer.Deserialize<TNarration>(storyInstance.Context, StoryJsonOptions.Default);
-            if (narration == null)
+            // Deserialize the context with consistent JSON options
+            var context = JsonSerializer.Deserialize<TContext>(storyInstance.Context, StoryJsonOptions.Default);
+            if (context == null)
             {
                 return Result<StoryInstance>.Fail("Failed to deserialize story context");
             }
 
             // Restore the story ID
-            narration.StoryInstanceId = storyId;
+            context.StoryInstanceId = storyId;
 
             // Create handler - repository is already registered in DI
             var logger = _serviceProvider.GetRequiredService<ILogger<THandler>>();
@@ -167,8 +167,8 @@ public class StoryManager
                 _serviceProvider,
                 logger)!;
 
-            // Set the narration with restored context
-            handler.Narration = narration;
+            // Set the Context with restored context
+            handler.Context = context;
 
             // If user input is provided, we need to pass it to the engine
             // This is done through the handler's internal engine via reflection
@@ -186,7 +186,7 @@ public class StoryManager
             }
 
             // Execute the story
-            var result = await handler.Handle(narration.Input);
+            var result = await handler.Handle(context.Input);
 
             // Return updated story instance
             if (result.IsFailure && result.Error?.Message.Contains("paused") == true)

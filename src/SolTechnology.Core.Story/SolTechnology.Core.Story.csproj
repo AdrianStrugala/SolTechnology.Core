@@ -2,7 +2,7 @@
 
     <PropertyGroup>
         <Version>0.6.0</Version>
-        <Description>Story Framework - Unified workflow orchestration for multi-step business processes. Supports both simple automated chains and pausable workflows with persistence. Features Tale Code philosophy with StoryHandler, Chapters, and Narration for readable, maintainable business logic.</Description>
+        <Description>Story Framework - Unified workflow orchestration for multi-step business processes. Supports both simple automated chains and pausable workflows with persistence. Features Tale Code philosophy with StoryHandler, Chapters, and Context for readable, maintainable business logic.</Description>
         <PackageTags>sol technology core story workflow chain pausable state-machine saga orchestration sqlite async dotnet business-process tale-code</PackageTags>
         <Product>SolTechnology.Core.Story</Product>
         <PackageId>SolTechnology.Core.Story</PackageId>

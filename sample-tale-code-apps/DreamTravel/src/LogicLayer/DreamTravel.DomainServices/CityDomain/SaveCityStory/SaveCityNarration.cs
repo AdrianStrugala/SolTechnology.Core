@@ -4,9 +4,9 @@ using SolTechnology.Core.Story;
 namespace DreamTravel.DomainServices.CityDomain.SaveCityStory;
 
 /// <summary>
-/// Narration for SaveCityStory - holds the context for saving a city.
+/// Context for SaveCityStory - holds the context for saving a city.
 /// </summary>
-public class SaveCityNarration : Narration<SaveCityInput, SaveCityResult>
+public class SaveCityContext : Context<SaveCityInput, SaveCityResult>
 {
     /// <summary>
     /// The city entity to save (existing or new).

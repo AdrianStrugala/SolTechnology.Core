@@ -69,7 +69,12 @@
       "Bash(Select-String -Pattern \"Passed|Failed|Total tests\" -Context 2)",
       "Bash(Select-String -Pattern \"Failed|Passed|Expected|but was\" -Context 2)",
       "Bash(Select-String -Pattern \"Niepowodzenie|Failed\" -Context 1)",
-      "Bash(Select-String -Pattern \"Łączna liczba testów|Zakończone|Total tests|Passed|Failed\")"
+      "Bash(Select-String -Pattern \"Łączna liczba testów|Zakończone|Total tests|Passed|Failed\")",
+      "Bash(grep:*)",
+      "Bash(powershell.exe -Command \"Get-ChildItem -Path src/SolTechnology.Core.Story -Recurse -Include *.cs | Select-String -Pattern ''Narration'' -CaseSensitive | Select-Object -First 20\")",
+      "Bash(powershell.exe -Command:*)",
+      "Bash(Select-String -Pattern \"\\(error|warning|succeeded|failed\\)\")",
+      "Bash(Select-Object -Last 50)"
     ],
     "deny": [],
     "ask": []

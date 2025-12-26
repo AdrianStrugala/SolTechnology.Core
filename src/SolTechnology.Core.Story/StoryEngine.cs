@@ -57,34 +57,34 @@ internal class StoryEngine
     }
 
     /// <summary>
-    /// Initialize the engine with narration and cancellation token.
+    /// Initialize the engine with Context and cancellation token.
     /// Must be called before executing any chapters.
     /// </summary>
     public async Task Initialize<TInput, TOutput>(
-        Narration<TInput, TOutput> narration,
+        Context<TInput, TOutput> context,
         string handlerTypeName,
         CancellationToken cancellationToken)
         where TInput : class
         where TOutput : class, new()
     {
-        _narration = narration;
+        _narration = context;
         _handlerTypeName = handlerTypeName;
         _cancellationToken = cancellationToken;
         _isInitialized = true;
 
-        // If persistence is enabled and this narration has a StoryInstanceId,
+        // If persistence is enabled and this Context has a StoryInstanceId,
         // we might be resuming - load any previous state
-        if (_repository != null && narration.StoryInstanceId != Auid.Empty)
+        if (_repository != null && context.StoryInstanceId != Auid.Empty)
         {
-            await LoadStoryState(narration.StoryInstanceId);
-            _logger.LogInformation("Story {StoryId} resuming from saved state", narration.StoryInstanceId);
+            await LoadStoryState(context.StoryInstanceId);
+            _logger.LogInformation("Story {StoryId} resuming from saved state", context.StoryInstanceId);
         }
         else if (_repository != null)
         {
             // Generate new story ID for first execution
             var storyId = Auid.New("STR");
-            var baseNarration = narration as dynamic;
-            baseNarration.StoryInstanceId = storyId;
+            var baseContext = _narration as dynamic;
+            baseContext.StoryInstanceId = storyId;
             _logger.LogInformation("Story started with ID {StoryId}", storyId);
         }
     }
@@ -103,9 +103,9 @@ internal class StoryEngine
     /// Execute a single chapter.
     /// Handles skipping (for resume), error collection, and persistence.
     /// </summary>
-    public async Task ExecuteChapter<TChapter, TNarration>(TNarration narration)
-        where TChapter : IChapter<TNarration>
-        where TNarration : class
+    public async Task ExecuteChapter<TChapter, TContext>(TContext context)
+        where TChapter : IChapter<TContext>
+        where TContext : class
     {
         if (!_isInitialized)
         {
@@ -172,11 +172,11 @@ internal class StoryEngine
 
             if (isInteractive)
             {
-                result = await ExecuteInteractiveChapter(chapter, narration, chapterInfo);
+                result = await ExecuteInteractiveChapter(chapter, context, chapterInfo);
             }
             else
             {
-                result = await chapter.Read(narration);
+                result = await chapter.Read(context);
             }
 
             if (result.IsFailure)
@@ -228,11 +228,11 @@ internal class StoryEngine
     /// <summary>
     /// Execute an interactive chapter - handles schema and user input.
     /// </summary>
-    private async Task<Result> ExecuteInteractiveChapter<TNarration>(
-        IChapter<TNarration> chapter,
-        TNarration narration,
+    private async Task<Result> ExecuteInteractiveChapter<TContext>(
+        IChapter<TContext> chapter,
+        TContext context,
         ChapterInfo chapterInfo)
-        where TNarration : class
+        where TContext : class
     {
         chapterInfo.ChapterType = "Interactive";
 
@@ -251,10 +251,10 @@ internal class StoryEngine
             _isPaused = true;
             chapterInfo.Status = StoryStatus.WaitingForInput;
 
-            // Update narration's current chapter
-            if (_narration is Narration<object, object> baseNarration)
+            // Update context's current chapter
+            if (_narration is Context<object, object> baseContext)
             {
-                baseNarration.CurrentChapterId = chapter.ChapterId;
+                baseContext.CurrentChapterId = chapter.ChapterId;
             }
 
             _logger.LogInformation(
@@ -276,7 +276,7 @@ internal class StoryEngine
 
         // Call ExecuteWithInput via reflection
         var executeMethod = chapterType.GetMethod("ReadWithInput");
-        var task = executeMethod!.Invoke(chapter, new[] { narration, deserializedInput }) as Task<Result>;
+        var task = executeMethod!.Invoke(chapter, new[] { context, deserializedInput }) as Task<Result>;
         var result = await task!;
 
         // Clear pause flag and chapter input after successful execution
@@ -329,7 +329,7 @@ internal class StoryEngine
         // Then check for pause (only if no errors occurred)
         if (_isPaused)
         {
-            var narrationBase = _narration as Narration<object, object>;
+            var narrationBase = _narration as Context<object, object>;
             return Result<TOutput>.Fail(new Error
             {
                 Message = "Story paused waiting for user input",
@@ -337,16 +337,16 @@ internal class StoryEngine
             });
         }
 
-        // Extract output from narration
-        var narrationProperty = _narration.GetType().GetProperty("Output");
-        var output = narrationProperty?.GetValue(_narration);
+        // Extract output from context
+        var contextProperty = _narration.GetType().GetProperty("Output");
+        var output = contextProperty?.GetValue(_narration);
 
         if (output is TOutput typedOutput)
         {
             return Result<TOutput>.Success(typedOutput);
         }
 
-        return Result<TOutput>.Fail("Failed to extract output from narration");
+        return Result<TOutput>.Fail("Failed to extract output from context");
     }
 
     /// <summary>
@@ -422,8 +422,8 @@ internal class StoryEngine
                 _resumeFromChapterId);
         }
 
-        // Note: Narration context restoration happens in StoryManager/StoryHandler
-        // since the engine doesn't know the concrete narration type
+        // Note: Context context restoration happens in StoryManager/StoryHandler
+        // since the engine doesn't know the concrete Context type
         _logger.LogDebug("Story state loaded for {StoryId}", storyId);
     }
 }

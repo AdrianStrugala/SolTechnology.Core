@@ -72,7 +72,7 @@ The sample application is the most common case that came to my mind. It's built 
 <b>Code design is the main goal</b> of Tale Code. Logical flow and code structure are described in detail, and it reads like a well-written story:
 
 ```csharp
-public class CalculateBestPathStory : StoryHandler<PathInput, PathNarration, PathOutput>
+public class CalculateBestPathStory : StoryHandler<PathInput, Pathcontext, PathOutput>
 {
     protected override async Task TellStory()
     {
@@ -81,7 +81,7 @@ public class CalculateBestPathStory : StoryHandler<PathInput, PathNarration, Pat
         await ReadChapter<SolveTspChapter>();
         await ReadChapter<FormResultChapter>();
 
-        Narration.Output.BestPath = Narration.OptimalRoute;
+        context.Output.BestPath = context.OptimalRoute;
     }
 }
 ```

@@ -71,7 +71,7 @@ public class PauseResumeIntegrationTests
         var input = new OrderInput { OrderId = "ORD-001", Amount = 100.50m };
 
         // Act - Start the story
-        var result = await manager.StartStory<OrderProcessingStory, OrderInput, OrderNarration, OrderOutput>(input);
+        var result = await manager.StartStory<OrderProcessingStory, OrderInput, OrderContext, OrderOutput>(input);
 
         // Assert - Should pause at interactive chapter
         result.IsSuccess.Should().BeTrue();
@@ -91,7 +91,7 @@ public class PauseResumeIntegrationTests
         var input = new OrderInput { OrderId = "ORD-002", Amount = 200m };
 
         // Act - Start the story (should pause)
-        var startResult = await manager.StartStory<OrderProcessingStory, OrderInput, OrderNarration, OrderOutput>(input);
+        var startResult = await manager.StartStory<OrderProcessingStory, OrderInput, OrderContext, OrderOutput>(input);
         var storyId = startResult.Data!.StoryId;
 
         // Prepare user input
@@ -104,7 +104,7 @@ public class PauseResumeIntegrationTests
         var userInput = JsonSerializer.SerializeToElement(customerDetails);
 
         // Resume the story with user input
-        var resumeResult = await manager.ResumeStory<OrderProcessingStory, OrderInput, OrderNarration, OrderOutput>(
+        var resumeResult = await manager.ResumeStory<OrderProcessingStory, OrderInput, OrderContext, OrderOutput>(
             storyId,
             userInput);
 
@@ -121,18 +121,18 @@ public class PauseResumeIntegrationTests
         var input = new OrderInput { OrderId = "ORD-003", Amount = 150m };
 
         // Act - Start story
-        var startResult = await manager.StartStory<OrderProcessingStory, OrderInput, OrderNarration, OrderOutput>(input);
+        var startResult = await manager.StartStory<OrderProcessingStory, OrderInput, OrderContext, OrderOutput>(input);
         var storyId = startResult.Data!.StoryId;
 
         // Load story state
         var storyInstance = await _repository.FindById(storyId);
-        var narration = JsonSerializer.Deserialize<OrderNarration>(storyInstance!.Context);
+        var context = JsonSerializer.Deserialize<OrderContext>(storyInstance!.Context);
 
         // Assert - Context should be preserved
-        narration.Should().NotBeNull();
-        narration!.Input.OrderId.Should().Be("ORD-003");
-        narration.Input.Amount.Should().Be(150m);
-        narration.ValidationPassed.Should().BeTrue(); // From first chapter
+        context.Should().NotBeNull();
+        context!.Input.OrderId.Should().Be("ORD-003");
+        context.Input.Amount.Should().Be(150m);
+        context.ValidationPassed.Should().BeTrue(); // From first chapter
     }
 
     [Test]
@@ -143,7 +143,7 @@ public class PauseResumeIntegrationTests
         var input = new OrderInput { OrderId = "ORD-004", Amount = 99.99m };
 
         // Act - Start and pause
-        var startResult = await manager.StartStory<OrderProcessingStory, OrderInput, OrderNarration, OrderOutput>(input);
+        var startResult = await manager.StartStory<OrderProcessingStory, OrderInput, OrderContext, OrderOutput>(input);
         startResult.IsSuccess.Should().BeTrue();
         var storyId = startResult.Data!.StoryId;
 
@@ -156,7 +156,7 @@ public class PauseResumeIntegrationTests
         };
         var userInput = JsonSerializer.SerializeToElement(customerDetails);
 
-        var resumeResult = await manager.ResumeStory<OrderProcessingStory, OrderInput, OrderNarration, OrderOutput>(
+        var resumeResult = await manager.ResumeStory<OrderProcessingStory, OrderInput, OrderContext, OrderOutput>(
             storyId,
             userInput);
 
@@ -183,7 +183,7 @@ public class PauseResumeIntegrationTests
         var input = new OrderInput { OrderId = "ORD-005", Amount = 50m };
 
         // Act - Start story
-        var startResult = await manager.StartStory<OrderProcessingStory, OrderInput, OrderNarration, OrderOutput>(input);
+        var startResult = await manager.StartStory<OrderProcessingStory, OrderInput, OrderContext, OrderOutput>(input);
         var storyId = startResult.Data!.StoryId;
 
         // Resume with invalid input (empty name)
@@ -195,7 +195,7 @@ public class PauseResumeIntegrationTests
         };
         var userInput = JsonSerializer.SerializeToElement(invalidDetails);
 
-        var resumeResult = await manager.ResumeStory<OrderProcessingStory, OrderInput, OrderNarration, OrderOutput>(
+        var resumeResult = await manager.ResumeStory<OrderProcessingStory, OrderInput, OrderContext, OrderOutput>(
             storyId,
             userInput);
 
@@ -226,7 +226,7 @@ public class PauseResumeIntegrationTests
         var input = new OrderInput { OrderId = "ORD-006", Amount = 75m };
 
         // Act - Start story
-        var startResult = await manager.StartStory<OrderProcessingStory, OrderInput, OrderNarration, OrderOutput>(input);
+        var startResult = await manager.StartStory<OrderProcessingStory, OrderInput, OrderContext, OrderOutput>(input);
         var storyId = startResult.Data!.StoryId;
 
         // Get story state
@@ -241,7 +241,7 @@ public class PauseResumeIntegrationTests
 
 #region Test Story and Chapters
 
-public class OrderProcessingStory : StoryHandler<OrderInput, OrderNarration, OrderOutput>
+public class OrderProcessingStory : StoryHandler<OrderInput, OrderContext, OrderOutput>
 {
     public OrderProcessingStory(
         IServiceProvider sp,
@@ -259,58 +259,58 @@ public class OrderProcessingStory : StoryHandler<OrderInput, OrderNarration, Ord
     }
 }
 
-public class OrderValidationChapter : Chapter<OrderNarration>
+public class OrderValidationChapter : Chapter<OrderContext>
 {
-    public override Task<Result> Read(OrderNarration narration)
+    public override Task<Result> Read(OrderContext context)
     {
-        if (narration.Input.Amount <= 0)
+        if (context.Input.Amount <= 0)
         {
             return Result.FailAsTask("Order amount must be positive");
         }
 
-        narration.ValidationPassed = true;
+        context.ValidationPassed = true;
         return Result.SuccessAsTask();
     }
 }
 
-public class RequestCustomerDetailsChapter : InteractiveChapter<OrderNarration, CustomerDetails>
+public class RequestCustomerDetailsChapter : InteractiveChapter<OrderContext, CustomerDetails>
 {
-    public override Task<Result> ReadWithInput(OrderNarration narration, CustomerDetails userInput)
+    public override Task<Result> ReadWithInput(OrderContext context, CustomerDetails userInput)
     {
         if (string.IsNullOrWhiteSpace(userInput.Name))
         {
             return Result.FailAsTask("Customer name is required");
         }
 
-        narration.CustomerName = userInput.Name;
-        narration.CustomerEmail = userInput.Email;
-        narration.CustomerAddress = userInput.Address;
+        context.CustomerName = userInput.Name;
+        context.CustomerEmail = userInput.Email;
+        context.CustomerAddress = userInput.Address;
 
         return Result.SuccessAsTask();
     }
 }
 
-public class ProcessPaymentChapter : Chapter<OrderNarration>
+public class ProcessPaymentChapter : Chapter<OrderContext>
 {
-    public override Task<Result> Read(OrderNarration narration)
+    public override Task<Result> Read(OrderContext context)
     {
         // Simulate payment processing
-        narration.PaymentProcessed = true;
-        narration.TransactionId = $"TXN-{Guid.NewGuid():N}";
+        context.PaymentProcessed = true;
+        context.TransactionId = $"TXN-{Guid.NewGuid():N}";
 
         return Result.SuccessAsTask();
     }
 }
 
-public class SendConfirmationChapter : Chapter<OrderNarration>
+public class SendConfirmationChapter : Chapter<OrderContext>
 {
-    public override Task<Result> Read(OrderNarration narration)
+    public override Task<Result> Read(OrderContext context)
     {
         // Populate output
-        narration.Output.OrderId = narration.Input.OrderId;
-        narration.Output.TransactionId = narration.TransactionId;
-        narration.Output.CustomerName = narration.CustomerName;
-        narration.Output.ConfirmationSent = true;
+        context.Output.OrderId = context.Input.OrderId;
+        context.Output.TransactionId = context.TransactionId;
+        context.Output.CustomerName = context.CustomerName;
+        context.Output.ConfirmationSent = true;
 
         return Result.SuccessAsTask();
     }
@@ -334,7 +334,7 @@ public class OrderOutput
     public bool ConfirmationSent { get; set; }
 }
 
-public class OrderNarration : Narration<OrderInput, OrderOutput>
+public class OrderContext : Context<OrderInput, OrderOutput>
 {
     public bool ValidationPassed { get; set; }
     public string CustomerName { get; set; } = string.Empty;

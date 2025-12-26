@@ -5,9 +5,9 @@ using Path = DreamTravel.Domain.Paths.Path;
 
 namespace DreamTravel.Queries.CalculateBestPath.Chapters;
 
-public class FormCalculateBestPathResult : Chapter<CalculateBestPathNarration>
+public class FormCalculateBestPathResult : Chapter<CalculateBestPathContext>
 {
-    public override Task<Result> Read(CalculateBestPathNarration context)
+    public override Task<Result> Read(CalculateBestPathContext context)
     {
         CalculateBestPathResult calculateBestPathResult = new CalculateBestPathResult
         {
@@ -20,7 +20,7 @@ public class FormCalculateBestPathResult : Chapter<CalculateBestPathNarration>
         return Result.SuccessAsTask();
     }
 
-    private List<Path> FormPathsFromMatrices(List<City> listOfCities, CalculateBestPathNarration calculateBestPathContext, List<int> orderOfCities = null)
+    private List<Path> FormPathsFromMatrices(List<City> listOfCities, CalculateBestPathContext calculateBestPathContext, List<int> orderOfCities = null)
     {
         if (orderOfCities == null)
         {

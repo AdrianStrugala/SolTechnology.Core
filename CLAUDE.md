@@ -187,14 +187,14 @@ return city;  // Automatically converts to Result<City>
 **Story Framework** is the unified approach for workflow orchestration, replacing the deprecated Chain pattern. It supports both simple automated workflows and pausable workflows with persistence.
 
 **Key Concepts:**
-- **StoryHandler** - Main orchestrator, inherits from `StoryHandler<TInput, TNarration, TOutput>`
-- **Narration** - Context object that carries state through the story, inherits from `Narration<TInput, TOutput>`
-- **Chapter** - Individual step in the story, implements `IChapter<TNarration>`
-- **InteractiveChapter** - Chapter that pauses for user input, inherits from `InteractiveChapter<TNarration, TChapterInput>`
+- **StoryHandler** - Main orchestrator, inherits from `StoryHandler<TInput, TContext, TOutput>`
+- **Narration** - Context object that carries state through the story, inherits from `Context<TInput, TOutput>`
+- **Chapter** - Individual step in the story, implements `IChapter<TContext>`
+- **InteractiveChapter** - Chapter that pauses for user input, inherits from `InteractiveChapter<TContext, TChapterInput>`
 
 **Basic Story (automated workflow):**
 ```csharp
-public class OrderProcessingStory : StoryHandler<OrderInput, OrderNarration, OrderOutput>
+public class OrderProcessingStory : StoryHandler<OrderInput, Ordercontext, OrderOutput>
 {
     public OrderProcessingStory(IServiceProvider sp, ILogger<OrderProcessingStory> logger)
         : base(sp, logger) { }
@@ -205,14 +205,14 @@ public class OrderProcessingStory : StoryHandler<OrderInput, OrderNarration, Ord
         await ReadChapter<ProcessPaymentChapter>();
         await ReadChapter<ShipOrderChapter>();
 
-        Narration.Output.OrderId = Narration.ProcessedOrderId;
+        context.Output.OrderId = context.ProcessedOrderId;
     }
 }
 ```
 
 **Interactive Story (pausable workflow with persistence):**
 ```csharp
-public class UserOnboardingStory : StoryHandler<OnboardingInput, OnboardingNarration, OnboardingOutput>
+public class UserOnboardingStory : StoryHandler<OnboardingInput, Onboardingcontext, OnboardingOutput>
 {
     protected override async Task TellStory()
     {
@@ -224,15 +224,15 @@ public class UserOnboardingStory : StoryHandler<OnboardingInput, OnboardingNarra
 }
 
 // Interactive chapter with validation
-public class CollectBasicInfoChapter : InteractiveChapter<OnboardingNarration, UserBasicInfo>
+public class CollectBasicInfoChapter : InteractiveChapter<Onboardingcontext, UserBasicInfo>
 {
-    public override Task<Result> ReadWithInput(OnboardingNarration narration, UserBasicInfo userInput)
+    public override Task<Result> ReadWithInput(OnboardingNarration context, UserBasicInfo userInput)
     {
         if (string.IsNullOrWhiteSpace(userInput.Name))
             return Result.FailAsTask("Name is required");
 
-        narration.UserName = userInput.Name;
-        narration.UserEmail = userInput.Email;
+        context.UserName = userInput.Name;
+        context.UserEmail = userInput.Email;
         return Result.SuccessAsTask();
     }
 }
@@ -253,12 +253,12 @@ services.AddSingleton(StoryOptions.WithInMemoryPersistence());
 **Usage with StoryManager (for pausable workflows):**
 ```csharp
 // Start story
-var result = await storyManager.StartStory<UserOnboardingStory, OnboardingInput, OnboardingNarration, OnboardingOutput>(input);
+var result = await storyManager.StartStory<UserOnboardingStory, OnboardingInput, Onboardingcontext, OnboardingOutput>(input);
 var storyId = result.Data.StoryId;
 
 // Resume with user input
 var userInput = JsonDocument.Parse("{\"name\": \"John\", \"email\": \"john@example.com\"}");
-var resumeResult = await storyManager.ResumeStory<UserOnboardingStory, OnboardingInput, OnboardingNarration, OnboardingOutput>(
+var resumeResult = await storyManager.ResumeStory<UserOnboardingStory, OnboardingInput, Onboardingcontext, OnboardingOutput>(
     storyId,
     userInput.RootElement);
 ```

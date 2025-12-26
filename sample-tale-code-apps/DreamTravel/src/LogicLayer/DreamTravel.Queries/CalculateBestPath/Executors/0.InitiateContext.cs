@@ -3,9 +3,9 @@ using SolTechnology.Core.Story;
 
 namespace DreamTravel.Queries.CalculateBestPath.Chapters;
 
-public class InitiateContext : Chapter<CalculateBestPathNarration>
+public class InitiateContext : Chapter<CalculateBestPathContext>
 {
-    public override Task<Result> Read(CalculateBestPathNarration narration)
+    public override Task<Result> Read(CalculateBestPathContext narration)
     {
          var cities = narration.Input.Cities.Where(c => c != null).ToList();
 

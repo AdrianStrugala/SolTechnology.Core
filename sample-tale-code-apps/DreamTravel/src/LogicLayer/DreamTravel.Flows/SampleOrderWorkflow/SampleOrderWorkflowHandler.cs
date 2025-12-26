@@ -5,7 +5,7 @@ using SolTechnology.Core.Journey.Workflow.Handlers;
 
 namespace DreamTravel.Flows.SampleOrderWorkflow
 {
-    public class SampleOrderWorkflowHandler : StoryHandler<SampleOrderInput, SampleOrderNarration, SampleOrderResult>
+    public class SampleOrderWorkflowHandler : StoryHandler<SampleOrderInput, SampleOrderContext, SampleOrderResult>
     {
         public SampleOrderWorkflowHandler(
             IServiceProvider serviceProvider,
@@ -25,12 +25,12 @@ namespace DreamTravel.Flows.SampleOrderWorkflow
             await ReadChapter<FetchExternalDataChapter>();
 
             // If all chapters complete successfully:
-            Narration.Output.OrderId = Narration.Input.OrderId;
-            Narration.Output.IsSuccessfullyProcessed = true;
-            Narration.Output.Name = Narration.CustomerDetails?.Name;
-            if (string.IsNullOrEmpty(Narration.Output.FinalMessage))
+            Context.Output.OrderId = Context.Input.OrderId;
+            Context.Output.IsSuccessfullyProcessed = true;
+            Context.Output.Name = Context.CustomerDetails?.Name;
+            if (string.IsNullOrEmpty(Context.Output.FinalMessage))
             {
-                Narration.Output.FinalMessage = "Order processed and shipping estimate obtained.";
+                Context.Output.FinalMessage = "Order processed and shipping estimate obtained.";
             }
         }
     }

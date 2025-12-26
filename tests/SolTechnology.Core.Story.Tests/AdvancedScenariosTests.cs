@@ -60,7 +60,7 @@ public class AdvancedScenariosTests
         var fakeStoryId = Auid.New();
 
         // Act
-        var result = await _storyManager.ResumeStory<TestAdvancedStory, TestAdvancedInput, TestAdvancedNarration, TestAdvancedOutput>(
+        var result = await _storyManager.ResumeStory<TestAdvancedStory, TestAdvancedInput, TestAdvancedContext, TestAdvancedOutput>(
             fakeStoryId,
             null);
 
@@ -75,14 +75,14 @@ public class AdvancedScenariosTests
     {
         // Arrange - Start and complete a story
         var input = new TestAdvancedInput { Value = "test" };
-        var startResult = await _storyManager.StartStory<SimpleCompletionStory, TestAdvancedInput, TestAdvancedNarration, TestAdvancedOutput>(input);
+        var startResult = await _storyManager.StartStory<SimpleCompletionStory, TestAdvancedInput, TestAdvancedContext, TestAdvancedOutput>(input);
         var storyId = startResult.Data!.StoryId;
 
         // Wait for story to complete (no interactive chapters)
         await Task.Delay(100);
 
         // Act - Try to resume completed story
-        var result = await _storyManager.ResumeStory<SimpleCompletionStory, TestAdvancedInput, TestAdvancedNarration, TestAdvancedOutput>(
+        var result = await _storyManager.ResumeStory<SimpleCompletionStory, TestAdvancedInput, TestAdvancedContext, TestAdvancedOutput>(
             storyId,
             null);
 
@@ -96,12 +96,12 @@ public class AdvancedScenariosTests
     {
         // Arrange - Start story that pauses at interactive chapter
         var input = new TestAdvancedInput { Value = "test" };
-        var startResult = await _storyManager.StartStory<SinglePauseStory, TestAdvancedInput, TestAdvancedNarration, TestAdvancedOutput>(input);
+        var startResult = await _storyManager.StartStory<SinglePauseStory, TestAdvancedInput, TestAdvancedContext, TestAdvancedOutput>(input);
         var storyId = startResult.Data!.StoryId;
 
         // Act - Resume with completely wrong input structure
         var wrongInput = JsonDocument.Parse("{\"wrongField\": \"wrongValue\", \"number\": 123}");
-        var result = await _storyManager.ResumeStory<SinglePauseStory, TestAdvancedInput, TestAdvancedNarration, TestAdvancedOutput>(
+        var result = await _storyManager.ResumeStory<SinglePauseStory, TestAdvancedInput, TestAdvancedContext, TestAdvancedOutput>(
             storyId,
             wrongInput.RootElement);
 
@@ -115,12 +115,12 @@ public class AdvancedScenariosTests
     {
         // Arrange
         var input = new TestAdvancedInput { Value = "test" };
-        var startResult = await _storyManager.StartStory<SinglePauseStory, TestAdvancedInput, TestAdvancedNarration, TestAdvancedOutput>(input);
+        var startResult = await _storyManager.StartStory<SinglePauseStory, TestAdvancedInput, TestAdvancedContext, TestAdvancedOutput>(input);
         var storyId = startResult.Data!.StoryId;
 
         // Act - Resume with missing required fields
         var incompleteInput = JsonDocument.Parse("{\"name\": \"John\"}"); // Missing 'email' and 'age'
-        var result = await _storyManager.ResumeStory<SinglePauseStory, TestAdvancedInput, TestAdvancedNarration, TestAdvancedOutput>(
+        var result = await _storyManager.ResumeStory<SinglePauseStory, TestAdvancedInput, TestAdvancedContext, TestAdvancedOutput>(
             storyId,
             incompleteInput.RootElement);
 
@@ -134,12 +134,12 @@ public class AdvancedScenariosTests
     {
         // Arrange
         var input = new TestAdvancedInput { Value = "test" };
-        var startResult = await _storyManager.StartStory<SinglePauseStory, TestAdvancedInput, TestAdvancedNarration, TestAdvancedOutput>(input);
+        var startResult = await _storyManager.StartStory<SinglePauseStory, TestAdvancedInput, TestAdvancedContext, TestAdvancedOutput>(input);
         var storyId = startResult.Data!.StoryId;
 
         // Act - Resume with null values
         var nullInput = JsonDocument.Parse("{\"name\": null, \"email\": null, \"age\": null}");
-        var result = await _storyManager.ResumeStory<SinglePauseStory, TestAdvancedInput, TestAdvancedNarration, TestAdvancedOutput>(
+        var result = await _storyManager.ResumeStory<SinglePauseStory, TestAdvancedInput, TestAdvancedContext, TestAdvancedOutput>(
             storyId,
             nullInput.RootElement);
 
@@ -152,7 +152,7 @@ public class AdvancedScenariosTests
     {
         // Arrange
         var input = new TestAdvancedInput { Value = "test" };
-        var startResult = await _storyManager.StartStory<SinglePauseStory, TestAdvancedInput, TestAdvancedNarration, TestAdvancedOutput>(input);
+        var startResult = await _storyManager.StartStory<SinglePauseStory, TestAdvancedInput, TestAdvancedContext, TestAdvancedOutput>(input);
         var storyId = startResult.Data!.StoryId;
 
         // Act - Resume with extra unexpected fields
@@ -164,7 +164,7 @@ public class AdvancedScenariosTests
             ""extraField2"": 999,
             ""nestedExtra"": { ""foo"": ""bar"" }
         }");
-        var result = await _storyManager.ResumeStory<SinglePauseStory, TestAdvancedInput, TestAdvancedNarration, TestAdvancedOutput>(
+        var result = await _storyManager.ResumeStory<SinglePauseStory, TestAdvancedInput, TestAdvancedContext, TestAdvancedOutput>(
             storyId,
             extraFieldsInput.RootElement);
 
@@ -181,12 +181,12 @@ public class AdvancedScenariosTests
     {
         // Arrange
         var input = new TestAdvancedInput { Value = "test" };
-        var startResult = await _storyManager.StartStory<SinglePauseStory, TestAdvancedInput, TestAdvancedNarration, TestAdvancedOutput>(input);
+        var startResult = await _storyManager.StartStory<SinglePauseStory, TestAdvancedInput, TestAdvancedContext, TestAdvancedOutput>(input);
         var storyId = startResult.Data!.StoryId;
 
         // Act - Resume with empty strings
         var emptyInput = JsonDocument.Parse("{\"name\": \"\", \"email\": \"\", \"age\": 0}");
-        var result = await _storyManager.ResumeStory<SinglePauseStory, TestAdvancedInput, TestAdvancedNarration, TestAdvancedOutput>(
+        var result = await _storyManager.ResumeStory<SinglePauseStory, TestAdvancedInput, TestAdvancedContext, TestAdvancedOutput>(
             storyId,
             emptyInput.RootElement);
 
@@ -200,12 +200,12 @@ public class AdvancedScenariosTests
     {
         // Arrange
         var input = new TestAdvancedInput { Value = "test" };
-        var startResult = await _storyManager.StartStory<SinglePauseStory, TestAdvancedInput, TestAdvancedNarration, TestAdvancedOutput>(input);
+        var startResult = await _storyManager.StartStory<SinglePauseStory, TestAdvancedInput, TestAdvancedContext, TestAdvancedOutput>(input);
         var storyId = startResult.Data!.StoryId;
 
         // Act - Resume with whitespace-only strings
         var whitespaceInput = JsonDocument.Parse("{\"name\": \"   \", \"email\": \"\\t\\n\", \"age\": 25}");
-        var result = await _storyManager.ResumeStory<SinglePauseStory, TestAdvancedInput, TestAdvancedNarration, TestAdvancedOutput>(
+        var result = await _storyManager.ResumeStory<SinglePauseStory, TestAdvancedInput, TestAdvancedContext, TestAdvancedOutput>(
             storyId,
             whitespaceInput.RootElement);
 
@@ -218,13 +218,13 @@ public class AdvancedScenariosTests
     {
         // Arrange
         var input = new TestAdvancedInput { Value = "test" };
-        var startResult = await _storyManager.StartStory<SinglePauseStory, TestAdvancedInput, TestAdvancedNarration, TestAdvancedOutput>(input);
+        var startResult = await _storyManager.StartStory<SinglePauseStory, TestAdvancedInput, TestAdvancedContext, TestAdvancedOutput>(input);
         var storyId = startResult.Data!.StoryId;
 
         // Act - Resume with extremely long string (10,000 characters)
         var longString = new string('A', 10000);
         var longInput = JsonDocument.Parse($"{{\"name\": \"{longString}\", \"email\": \"test@example.com\", \"age\": 25}}");
-        var result = await _storyManager.ResumeStory<SinglePauseStory, TestAdvancedInput, TestAdvancedNarration, TestAdvancedOutput>(
+        var result = await _storyManager.ResumeStory<SinglePauseStory, TestAdvancedInput, TestAdvancedContext, TestAdvancedOutput>(
             storyId,
             longInput.RootElement);
 
@@ -244,7 +244,7 @@ public class AdvancedScenariosTests
     {
         // Arrange
         var input = new TestAdvancedInput { Value = "test" };
-        var startResult = await _storyManager.StartStory<SinglePauseStory, TestAdvancedInput, TestAdvancedNarration, TestAdvancedOutput>(input);
+        var startResult = await _storyManager.StartStory<SinglePauseStory, TestAdvancedInput, TestAdvancedContext, TestAdvancedOutput>(input);
         var storyId = startResult.Data!.StoryId;
 
         // Act - Resume with special characters, potential injection attempts
@@ -253,7 +253,7 @@ public class AdvancedScenariosTests
             ""email"": ""test@example.com'; DROP TABLE Users;--"",
             ""age"": 25
         }");
-        var result = await _storyManager.ResumeStory<SinglePauseStory, TestAdvancedInput, TestAdvancedNarration, TestAdvancedOutput>(
+        var result = await _storyManager.ResumeStory<SinglePauseStory, TestAdvancedInput, TestAdvancedContext, TestAdvancedOutput>(
             storyId,
             specialCharsInput.RootElement);
 
@@ -272,7 +272,7 @@ public class AdvancedScenariosTests
     {
         // Arrange
         var input = new TestAdvancedInput { Value = "test" };
-        var startResult = await _storyManager.StartStory<SinglePauseStory, TestAdvancedInput, TestAdvancedNarration, TestAdvancedOutput>(input);
+        var startResult = await _storyManager.StartStory<SinglePauseStory, TestAdvancedInput, TestAdvancedContext, TestAdvancedOutput>(input);
         var storyId = startResult.Data!.StoryId;
 
         // Act - Resume with Unicode characters (emoji, non-Latin scripts)
@@ -281,7 +281,7 @@ public class AdvancedScenariosTests
             ""email"": ""test@example.com"",
             ""age"": 25
         }");
-        var result = await _storyManager.ResumeStory<SinglePauseStory, TestAdvancedInput, TestAdvancedNarration, TestAdvancedOutput>(
+        var result = await _storyManager.ResumeStory<SinglePauseStory, TestAdvancedInput, TestAdvancedContext, TestAdvancedOutput>(
             storyId,
             unicodeInput.RootElement);
 
@@ -299,12 +299,12 @@ public class AdvancedScenariosTests
     {
         // Arrange
         var input = new TestAdvancedInput { Value = "test" };
-        var startResult = await _storyManager.StartStory<SinglePauseStory, TestAdvancedInput, TestAdvancedNarration, TestAdvancedOutput>(input);
+        var startResult = await _storyManager.StartStory<SinglePauseStory, TestAdvancedInput, TestAdvancedContext, TestAdvancedOutput>(input);
         var storyId = startResult.Data!.StoryId;
 
         // Act - Resume with negative age
         var negativeInput = JsonDocument.Parse("{\"name\": \"John\", \"email\": \"test@example.com\", \"age\": -5}");
-        var result = await _storyManager.ResumeStory<SinglePauseStory, TestAdvancedInput, TestAdvancedNarration, TestAdvancedOutput>(
+        var result = await _storyManager.ResumeStory<SinglePauseStory, TestAdvancedInput, TestAdvancedContext, TestAdvancedOutput>(
             storyId,
             negativeInput.RootElement);
 
@@ -318,12 +318,12 @@ public class AdvancedScenariosTests
     {
         // Arrange
         var input = new TestAdvancedInput { Value = "test" };
-        var startResult = await _storyManager.StartStory<SinglePauseStory, TestAdvancedInput, TestAdvancedNarration, TestAdvancedOutput>(input);
+        var startResult = await _storyManager.StartStory<SinglePauseStory, TestAdvancedInput, TestAdvancedContext, TestAdvancedOutput>(input);
         var storyId = startResult.Data!.StoryId;
 
         // Act - Resume with Int32.MaxValue
         var extremeInput = JsonDocument.Parse($"{{\"name\": \"John\", \"email\": \"test@example.com\", \"age\": {int.MaxValue}}}");
-        var result = await _storyManager.ResumeStory<SinglePauseStory, TestAdvancedInput, TestAdvancedNarration, TestAdvancedOutput>(
+        var result = await _storyManager.ResumeStory<SinglePauseStory, TestAdvancedInput, TestAdvancedContext, TestAdvancedOutput>(
             storyId,
             extremeInput.RootElement);
 
@@ -342,13 +342,13 @@ public class AdvancedScenariosTests
         var input = new TestAdvancedInput { Value = "multi-pause" };
 
         // Act 1 - Start story (pauses at first interactive chapter)
-        var startResult = await _storyManager.StartStory<MultiPauseStory, TestAdvancedInput, TestAdvancedNarration, TestAdvancedOutput>(input);
+        var startResult = await _storyManager.StartStory<MultiPauseStory, TestAdvancedInput, TestAdvancedContext, TestAdvancedOutput>(input);
         startResult.IsSuccess.Should().BeTrue();
         var storyId = startResult.Data!.StoryId;
 
         // Act 2 - Resume with first input (pauses at second interactive chapter)
         var firstInput = JsonDocument.Parse("{\"Name\": \"John\", \"Email\": \"john@example.com\", \"Age\": 30}");
-        var resume1 = await _storyManager.ResumeStory<MultiPauseStory, TestAdvancedInput, TestAdvancedNarration, TestAdvancedOutput>(
+        var resume1 = await _storyManager.ResumeStory<MultiPauseStory, TestAdvancedInput, TestAdvancedContext, TestAdvancedOutput>(
             storyId,
             firstInput.RootElement);
         resume1.IsSuccess.Should().BeTrue();
@@ -356,7 +356,7 @@ public class AdvancedScenariosTests
 
         // Act 3 - Resume with second input (pauses at third interactive chapter)
         var secondInput = JsonDocument.Parse("{\"Address\": \"123 Main St\", \"City\": \"New York\"}");
-        var resume2 = await _storyManager.ResumeStory<MultiPauseStory, TestAdvancedInput, TestAdvancedNarration, TestAdvancedOutput>(
+        var resume2 = await _storyManager.ResumeStory<MultiPauseStory, TestAdvancedInput, TestAdvancedContext, TestAdvancedOutput>(
             storyId,
             secondInput.RootElement);
         resume2.IsSuccess.Should().BeTrue();
@@ -364,7 +364,7 @@ public class AdvancedScenariosTests
 
         // Act 4 - Resume with third input (completes)
         var thirdInput = JsonDocument.Parse("{\"CardNumber\": \"1234-5678\", \"Cvv\": \"123\"}");
-        var resume3 = await _storyManager.ResumeStory<MultiPauseStory, TestAdvancedInput, TestAdvancedNarration, TestAdvancedOutput>(
+        var resume3 = await _storyManager.ResumeStory<MultiPauseStory, TestAdvancedInput, TestAdvancedContext, TestAdvancedOutput>(
             storyId,
             thirdInput.RootElement);
 
@@ -379,11 +379,11 @@ public class AdvancedScenariosTests
     {
         // Arrange
         var input = new TestAdvancedInput { Value = "test" };
-        var startResult = await _storyManager.StartStory<SinglePauseStory, TestAdvancedInput, TestAdvancedNarration, TestAdvancedOutput>(input);
+        var startResult = await _storyManager.StartStory<SinglePauseStory, TestAdvancedInput, TestAdvancedContext, TestAdvancedOutput>(input);
         var storyId = startResult.Data!.StoryId;
 
         // Act - Try to resume without providing user input
-        var result = await _storyManager.ResumeStory<SinglePauseStory, TestAdvancedInput, TestAdvancedNarration, TestAdvancedOutput>(
+        var result = await _storyManager.ResumeStory<SinglePauseStory, TestAdvancedInput, TestAdvancedContext, TestAdvancedOutput>(
             storyId,
             null);
 
@@ -411,7 +411,7 @@ public class AdvancedScenariosTests
         for (int i = 0; i < 10; i++)
         {
             var input = new TestAdvancedInput { Value = $"concurrent-{i}" };
-            tasks.Add(_storyManager.StartStory<SinglePauseStory, TestAdvancedInput, TestAdvancedNarration, TestAdvancedOutput>(input));
+            tasks.Add(_storyManager.StartStory<SinglePauseStory, TestAdvancedInput, TestAdvancedContext, TestAdvancedOutput>(input));
         }
 
         // Act
@@ -430,7 +430,7 @@ public class AdvancedScenariosTests
     {
         // Arrange - Start a story
         var input = new TestAdvancedInput { Value = "concurrent-resume" };
-        var startResult = await _storyManager.StartStory<SinglePauseStory, TestAdvancedInput, TestAdvancedNarration, TestAdvancedOutput>(input);
+        var startResult = await _storyManager.StartStory<SinglePauseStory, TestAdvancedInput, TestAdvancedContext, TestAdvancedOutput>(input);
         var storyId = startResult.Data!.StoryId;
 
         // Act - Try to resume concurrently 5 times with same input
@@ -439,7 +439,7 @@ public class AdvancedScenariosTests
 
         for (int i = 0; i < 5; i++)
         {
-            resumeTasks.Add(_storyManager.ResumeStory<SinglePauseStory, TestAdvancedInput, TestAdvancedNarration, TestAdvancedOutput>(
+            resumeTasks.Add(_storyManager.ResumeStory<SinglePauseStory, TestAdvancedInput, TestAdvancedContext, TestAdvancedOutput>(
                 storyId,
                 userInput.RootElement));
         }
@@ -482,7 +482,7 @@ public class AdvancedScenariosTests
 
         // Act - Try to start a story (should fail when saving)
         var input = new TestAdvancedInput { Value = "test" };
-        var result = await manager.StartStory<SinglePauseStory, TestAdvancedInput, TestAdvancedNarration, TestAdvancedOutput>(input);
+        var result = await manager.StartStory<SinglePauseStory, TestAdvancedInput, TestAdvancedContext, TestAdvancedOutput>(input);
 
         // Assert
         result.IsFailure.Should().BeTrue();
@@ -527,7 +527,7 @@ public class AdvancedScenariosTests
         };
 
         // Act
-        var result = await _storyManager.StartStory<LargeDataStory, TestAdvancedInput, TestAdvancedNarration, TestAdvancedOutput>(input);
+        var result = await _storyManager.StartStory<LargeDataStory, TestAdvancedInput, TestAdvancedContext, TestAdvancedOutput>(input);
 
         // Assert - Should handle large data without issues
         result.IsSuccess.Should().BeTrue();
@@ -546,7 +546,7 @@ public class AdvancedScenariosTests
     {
         // Arrange
         var input = new TestAdvancedInput { Value = "state-check" };
-        var startResult = await _storyManager.StartStory<SinglePauseStory, TestAdvancedInput, TestAdvancedNarration, TestAdvancedOutput>(input);
+        var startResult = await _storyManager.StartStory<SinglePauseStory, TestAdvancedInput, TestAdvancedContext, TestAdvancedOutput>(input);
         var storyId = startResult.Data!.StoryId;
 
         // Act - Get state while paused
@@ -567,17 +567,17 @@ public class AdvancedScenariosTests
         var input = new TestAdvancedInput { Value = "history-test" };
 
         // Act - Complete multi-pause story
-        var startResult = await _storyManager.StartStory<MultiPauseStory, TestAdvancedInput, TestAdvancedNarration, TestAdvancedOutput>(input);
+        var startResult = await _storyManager.StartStory<MultiPauseStory, TestAdvancedInput, TestAdvancedContext, TestAdvancedOutput>(input);
         var storyId = startResult.Data!.StoryId;
 
         var input1 = JsonDocument.Parse("{\"name\": \"John\", \"email\": \"john@example.com\", \"age\": 30}");
-        await _storyManager.ResumeStory<MultiPauseStory, TestAdvancedInput, TestAdvancedNarration, TestAdvancedOutput>(storyId, input1.RootElement);
+        await _storyManager.ResumeStory<MultiPauseStory, TestAdvancedInput, TestAdvancedContext, TestAdvancedOutput>(storyId, input1.RootElement);
 
         var input2 = JsonDocument.Parse("{\"address\": \"123 Main St\", \"city\": \"New York\"}");
-        await _storyManager.ResumeStory<MultiPauseStory, TestAdvancedInput, TestAdvancedNarration, TestAdvancedOutput>(storyId, input2.RootElement);
+        await _storyManager.ResumeStory<MultiPauseStory, TestAdvancedInput, TestAdvancedContext, TestAdvancedOutput>(storyId, input2.RootElement);
 
         var input3 = JsonDocument.Parse("{\"cardNumber\": \"1234-5678\", \"cvv\": \"123\"}");
-        var finalResult = await _storyManager.ResumeStory<MultiPauseStory, TestAdvancedInput, TestAdvancedNarration, TestAdvancedOutput>(storyId, input3.RootElement);
+        var finalResult = await _storyManager.ResumeStory<MultiPauseStory, TestAdvancedInput, TestAdvancedContext, TestAdvancedOutput>(storyId, input3.RootElement);
 
         // Assert - History should contain all chapters
         finalResult.IsSuccess.Should().BeTrue();
@@ -604,7 +604,7 @@ public class AdvancedScenariosTests
 
 #region Test Stories
 
-public class TestAdvancedStory : StoryHandler<TestAdvancedInput, TestAdvancedNarration, TestAdvancedOutput>
+public class TestAdvancedStory : StoryHandler<TestAdvancedInput, TestAdvancedContext, TestAdvancedOutput>
 {
     public TestAdvancedStory(IServiceProvider sp, ILogger<TestAdvancedStory> logger)
         : base(sp, logger)
@@ -614,11 +614,11 @@ public class TestAdvancedStory : StoryHandler<TestAdvancedInput, TestAdvancedNar
     protected override async Task TellStory()
     {
         await ReadChapter<ValidInputChapter>();
-        Narration.Output.Result = "Completed";
+        Context.Output.Result = "Completed";
     }
 }
 
-public class SimpleCompletionStory : StoryHandler<TestAdvancedInput, TestAdvancedNarration, TestAdvancedOutput>
+public class SimpleCompletionStory : StoryHandler<TestAdvancedInput, TestAdvancedContext, TestAdvancedOutput>
 {
     public SimpleCompletionStory(IServiceProvider sp, ILogger<SimpleCompletionStory> logger)
         : base(sp, logger)
@@ -629,11 +629,11 @@ public class SimpleCompletionStory : StoryHandler<TestAdvancedInput, TestAdvance
     {
         // No interactive chapters - completes immediately
         await Task.CompletedTask;
-        Narration.Output.Result = "Done";
+        Context.Output.Result = "Done";
     }
 }
 
-public class SinglePauseStory : StoryHandler<TestAdvancedInput, TestAdvancedNarration, TestAdvancedOutput>
+public class SinglePauseStory : StoryHandler<TestAdvancedInput, TestAdvancedContext, TestAdvancedOutput>
 {
     public SinglePauseStory(IServiceProvider sp, ILogger<SinglePauseStory> logger)
         : base(sp, logger)
@@ -643,11 +643,11 @@ public class SinglePauseStory : StoryHandler<TestAdvancedInput, TestAdvancedNarr
     protected override async Task TellStory()
     {
         await ReadChapter<ValidInputChapter>();
-        Narration.Output.Result = "Completed after pause";
+        Context.Output.Result = "Completed after pause";
     }
 }
 
-public class MultiPauseStory : StoryHandler<TestAdvancedInput, TestAdvancedNarration, TestAdvancedOutput>
+public class MultiPauseStory : StoryHandler<TestAdvancedInput, TestAdvancedContext, TestAdvancedOutput>
 {
     public MultiPauseStory(IServiceProvider sp, ILogger<MultiPauseStory> logger)
         : base(sp, logger)
@@ -659,11 +659,11 @@ public class MultiPauseStory : StoryHandler<TestAdvancedInput, TestAdvancedNarra
         await ReadChapter<ValidInputChapter>();
         await ReadChapter<SecondInteractiveChapter>();
         await ReadChapter<ThirdInteractiveChapter>();
-        Narration.Output.Result = "Completed all pauses";
+        Context.Output.Result = "Completed all pauses";
     }
 }
 
-public class LargeDataStory : StoryHandler<TestAdvancedInput, TestAdvancedNarration, TestAdvancedOutput>
+public class LargeDataStory : StoryHandler<TestAdvancedInput, TestAdvancedContext, TestAdvancedOutput>
 {
     public LargeDataStory(IServiceProvider sp, ILogger<LargeDataStory> logger)
         : base(sp, logger)
@@ -673,7 +673,7 @@ public class LargeDataStory : StoryHandler<TestAdvancedInput, TestAdvancedNarrat
     protected override async Task TellStory()
     {
         await ReadChapter<LargeDataChapter>();
-        Narration.Output.Result = "Large data processed";
+        Context.Output.Result = "Large data processed";
     }
 }
 
@@ -681,9 +681,9 @@ public class LargeDataStory : StoryHandler<TestAdvancedInput, TestAdvancedNarrat
 
 #region Test Chapters
 
-public class ValidInputChapter : InteractiveChapter<TestAdvancedNarration, UserInputData>
+public class ValidInputChapter : InteractiveChapter<TestAdvancedContext, UserInputData>
 {
-    public override Task<Result> ReadWithInput(TestAdvancedNarration narration, UserInputData userInput)
+    public override Task<Result> ReadWithInput(TestAdvancedContext context, UserInputData userInput)
     {
         // Validate
         if (string.IsNullOrWhiteSpace(userInput.Name))
@@ -699,56 +699,56 @@ public class ValidInputChapter : InteractiveChapter<TestAdvancedNarration, UserI
             return Result.FailAsTask("Invalid age - too high");
 
         // Process
-        narration.UserName = userInput.Name.Trim();
-        narration.UserEmail = userInput.Email.Trim();
-        narration.UserAge = userInput.Age;
+        context.UserName = userInput.Name.Trim();
+        context.UserEmail = userInput.Email.Trim();
+        context.UserAge = userInput.Age;
 
         return Result.SuccessAsTask();
     }
 }
 
-public class SecondInteractiveChapter : InteractiveChapter<TestAdvancedNarration, AddressInputData>
+public class SecondInteractiveChapter : InteractiveChapter<TestAdvancedContext, AddressInputData>
 {
-    public override Task<Result> ReadWithInput(TestAdvancedNarration narration, AddressInputData userInput)
+    public override Task<Result> ReadWithInput(TestAdvancedContext context, AddressInputData userInput)
     {
         if (string.IsNullOrWhiteSpace(userInput.Address))
             return Result.FailAsTask("Address required");
 
-        narration.Address = userInput.Address;
-        narration.City = userInput.City ?? "";
+        context.Address = userInput.Address;
+        context.City = userInput.City ?? "";
 
         return Result.SuccessAsTask();
     }
 }
 
-public class ThirdInteractiveChapter : InteractiveChapter<TestAdvancedNarration, PaymentInputData>
+public class ThirdInteractiveChapter : InteractiveChapter<TestAdvancedContext, PaymentInputData>
 {
-    public override Task<Result> ReadWithInput(TestAdvancedNarration narration, PaymentInputData userInput)
+    public override Task<Result> ReadWithInput(TestAdvancedContext context, PaymentInputData userInput)
     {
         if (string.IsNullOrWhiteSpace(userInput.CardNumber))
             return Result.FailAsTask("Card number required");
 
-        narration.PaymentInfo = $"Card: {userInput.CardNumber}";
+        context.PaymentInfo = $"Card: {userInput.CardNumber}";
 
         return Result.SuccessAsTask();
     }
 }
 
-public class ComplexValidationChapter : Chapter<TestAdvancedNarration>
+public class ComplexValidationChapter : Chapter<TestAdvancedContext>
 {
-    public override Task<Result> Read(TestAdvancedNarration narration)
+    public override Task<Result> Read(TestAdvancedContext context)
     {
         // Simulate complex business logic validation
-        if (narration.UserAge < 18)
+        if (context.UserAge < 18)
             return Result.FailAsTask("User must be 18 or older");
 
         return Result.SuccessAsTask();
     }
 }
 
-public class TimeoutSimulationChapter : Chapter<TestAdvancedNarration>
+public class TimeoutSimulationChapter : Chapter<TestAdvancedContext>
 {
-    public override async Task<Result> Read(TestAdvancedNarration narration)
+    public override async Task<Result> Read(TestAdvancedContext context)
     {
         // Simulate long-running operation
         await Task.Delay(100);
@@ -756,14 +756,14 @@ public class TimeoutSimulationChapter : Chapter<TestAdvancedNarration>
     }
 }
 
-public class LargeDataChapter : Chapter<TestAdvancedNarration>
+public class LargeDataChapter : Chapter<TestAdvancedContext>
 {
-    public override Task<Result> Read(TestAdvancedNarration narration)
+    public override Task<Result> Read(TestAdvancedContext context)
     {
         // Process large data from input
-        if (!string.IsNullOrEmpty(narration.Input.LargeData))
+        if (!string.IsNullOrEmpty(context.Input.LargeData))
         {
-            narration.ProcessedData = $"Processed {narration.Input.LargeData.Length} bytes";
+            context.ProcessedData = $"Processed {context.Input.LargeData.Length} bytes";
         }
 
         return Result.SuccessAsTask();
@@ -785,7 +785,7 @@ public class TestAdvancedOutput
     public string Result { get; set; } = string.Empty;
 }
 
-public class TestAdvancedNarration : Narration<TestAdvancedInput, TestAdvancedOutput>
+public class TestAdvancedContext : Context<TestAdvancedInput, TestAdvancedOutput>
 {
     public string UserName { get; set; } = string.Empty;
     public string UserEmail { get; set; } = string.Empty;

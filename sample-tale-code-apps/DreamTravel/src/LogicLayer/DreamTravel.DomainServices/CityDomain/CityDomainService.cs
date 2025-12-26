@@ -60,7 +60,7 @@ public class CityDomainService(
     IGoogleApiClient googleApiClient,
     IServiceProvider serviceProvider,
     ILogger<CityDomainService> logger)
-    : StoryHandler<SaveCityInput, SaveCityNarration, SaveCityResult>(serviceProvider, logger), ICityDomainService
+    : StoryHandler<SaveCityInput, SaveCityContext, SaveCityResult>(serviceProvider, logger), ICityDomainService
 {
     public async Task<City> Get(string name, Action<CityReadOptions>? configureOptions = null)
     {
@@ -138,8 +138,8 @@ public class CityDomainService(
     /// </summary>
     protected override async Task TellStory()
     {
-        var city = Narration.Input.City;
-        Narration.Today = DateOnly.FromDateTime(DateTime.UtcNow);
+        var city = Context.Input.City;
+        Context.Today = DateOnly.FromDateTime(DateTime.UtcNow);
 
         // Ensure city has statistics enabled
         city.ReadOptions = city.ReadOptions.WithStatistics();
@@ -151,10 +151,10 @@ public class CityDomainService(
             .WhereCoordinates(city.Latitude, city.Longitude)
             .FirstOrDefaultAsync();
 
-        Narration.IsNew = existingEntity == null;
+        Context.IsNew = existingEntity == null;
 
         // Apply update to existing entity or create new one
-        Narration.CityEntity = cityMapper.ApplyUpdate(existingEntity, city);
+        Context.CityEntity = cityMapper.ApplyUpdate(existingEntity, city);
 
         // Chapter: Assign alternative name to the city
         await ReadChapter<AssignAlternativeNameChapter>();
@@ -163,18 +163,18 @@ public class CityDomainService(
         await ReadChapter<IncrementSearchCountChapter>();
 
         // Save the city entity to database
-        if (Narration.IsNew)
+        if (Context.IsNew)
         {
-            await dbContext.Cities.AddAsync(Narration.CityEntity);
+            await dbContext.Cities.AddAsync(Context.CityEntity);
         }
         else
         {
-            dbContext.Update(Narration.CityEntity);
+            dbContext.Update(Context.CityEntity);
         }
 
         await dbContext.SaveChangesAsync();
 
         // Set the final result
-        Narration.Output.IsNew = Narration.IsNew;
+        Context.Output.IsNew = Context.IsNew;
     }
 }

@@ -6,7 +6,7 @@ using SolTechnology.Core.Story;
 
 namespace DreamTravel.Queries.CalculateBestPath.Chapters;
 
-public class DownloadRoadData : Chapter<CalculateBestPathNarration>
+public class DownloadRoadData : Chapter<CalculateBestPathContext>
 {
     private readonly IGoogleApiClient _googleApiClient;
     private readonly IMichelinApiClient _michelinApiClient;
@@ -17,7 +17,7 @@ public class DownloadRoadData : Chapter<CalculateBestPathNarration>
         _michelinApiClient = michelinApiClient;
     }
 
-    public override async Task<Result> Read(CalculateBestPathNarration calculateBestPathContext)
+    public override async Task<Result> Read(CalculateBestPathContext calculateBestPathContext)
     {
         var listOfCities = calculateBestPathContext.Cities;
         List<Task> tasks = new List<Task>
@@ -33,7 +33,7 @@ public class DownloadRoadData : Chapter<CalculateBestPathNarration>
         return Result.Success();
     }
 
-    private List<Task> DownloadCostMatrix(List<City> listOfCities, CalculateBestPathNarration calculateBestPathContext)
+    private List<Task> DownloadCostMatrix(List<City> listOfCities, CalculateBestPathContext calculateBestPathContext)
     {
         List<Task> tasks = new List<Task>();
 

@@ -38,7 +38,7 @@ namespace DreamTravel.Queries.UnitTests.CalculateBestPath
             };
 
             int expectedLength = cities.Count * cities.Count; // 3 x 3 = 9
-            var context = new CalculateBestPathNarration
+            var context = new CalculateBestPathContext
             {
                 Cities = cities,
                 Costs = new double[expectedLength],

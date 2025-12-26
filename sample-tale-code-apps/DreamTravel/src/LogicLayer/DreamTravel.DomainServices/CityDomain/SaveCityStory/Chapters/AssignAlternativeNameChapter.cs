@@ -7,7 +7,7 @@ namespace DreamTravel.DomainServices.CityDomain.SaveCityStory.Chapters;
 /// <summary>
 /// Chapter that assigns alternative name to the city entity.
 /// </summary>
-public class AssignAlternativeNameChapter : Chapter<SaveCityNarration>
+public class AssignAlternativeNameChapter : Chapter<SaveCityContext>
 {
     private readonly IAssignAlternativeNameStep _assignAlternativeNameStep;
 
@@ -16,10 +16,10 @@ public class AssignAlternativeNameChapter : Chapter<SaveCityNarration>
         _assignAlternativeNameStep = assignAlternativeNameStep;
     }
 
-    public override Task<Result> Read(SaveCityNarration narration)
+    public override Task<Result> Read(SaveCityContext context)
     {
-        var cityName = narration.Input.City.Name;
-        _assignAlternativeNameStep.Invoke(narration.CityEntity, cityName);
+        var cityName = context.Input.City.Name;
+        _assignAlternativeNameStep.Invoke(context.CityEntity, cityName);
 
         return Result.SuccessAsTask();
     }

@@ -40,7 +40,7 @@ No additional configuration needed. The registration automatically:
 #### 1) Basic Automated Story
 
 ```csharp
-// Define input, output, and narration
+// Define input, output, and context
 public class OrderInput
 {
     public int OrderId { get; set; }
@@ -51,14 +51,14 @@ public class OrderOutput
     public string Status { get; set; }
 }
 
-public class OrderNarration : Narration<OrderInput, OrderOutput>
+public class OrderNarration : Context<OrderInput, OrderOutput>
 {
     public string CustomerEmail { get; set; }
     public decimal TotalAmount { get; set; }
 }
 
 // Define story handler
-public class ProcessOrderStory : StoryHandler<OrderInput, OrderNarration, OrderOutput>
+public class ProcessOrderStory : StoryHandler<OrderInput, Ordercontext, OrderOutput>
 {
     public ProcessOrderStory(IServiceProvider sp, ILogger<ProcessOrderStory> logger)
         : base(sp, logger) { }
@@ -69,17 +69,17 @@ public class ProcessOrderStory : StoryHandler<OrderInput, OrderNarration, OrderO
         await ReadChapter<ProcessPaymentChapter>();
         await ReadChapter<SendConfirmationChapter>();
 
-        Narration.Output.Status = "Completed";
+        context.Output.Status = "Completed";
     }
 }
 
 // Define chapters
 public class ValidateOrderChapter : Chapter<OrderNarration>
 {
-    public override async Task<Result> Read(OrderNarration narration)
+    public override async Task<Result> Read(OrderNarration context)
     {
         // Validation logic
-        if (narration.Input.OrderId <= 0)
+        if (context.Input.OrderId <= 0)
             return Result.Fail("Invalid order ID");
 
         return Result.Success();
@@ -91,9 +91,9 @@ public class ValidateOrderChapter : Chapter<OrderNarration>
 
 ```csharp
 // Define interactive chapter
-public class CollectPaymentInfoChapter : InteractiveChapter<OrderNarration, PaymentInfo>
+public class CollectPaymentInfoChapter : InteractiveChapter<Ordercontext, PaymentInfo>
 {
-    public override Task<Result> ReadWithInput(OrderNarration narration, PaymentInfo userInput)
+    public override Task<Result> ReadWithInput(OrderNarration context, PaymentInfo userInput)
     {
         // Validate user input
         if (string.IsNullOrWhiteSpace(userInput.CardNumber))
@@ -103,7 +103,7 @@ public class CollectPaymentInfoChapter : InteractiveChapter<OrderNarration, Paym
             return Result.FailAsTask("Invalid card number");
 
         // Process input
-        narration.PaymentMethod = userInput.CardNumber;
+        context.PaymentMethod = userInput.CardNumber;
         return Result.SuccessAsTask();
     }
 }
@@ -115,7 +115,7 @@ public class PaymentInfo
 }
 
 // Story with interactive chapter
-public class CheckoutStory : StoryHandler<OrderInput, OrderNarration, OrderOutput>
+public class CheckoutStory : StoryHandler<OrderInput, Ordercontext, OrderOutput>
 {
     protected override async Task TellStory()
     {
@@ -124,7 +124,7 @@ public class CheckoutStory : StoryHandler<OrderInput, OrderNarration, OrderOutpu
         await ReadChapter<ProcessPaymentChapter>();
         await ReadChapter<SendConfirmationChapter>();
 
-        Narration.Output.Status = "Completed";
+        context.Output.Status = "Completed";
     }
 }
 ```
@@ -134,7 +134,7 @@ public class CheckoutStory : StoryHandler<OrderInput, OrderNarration, OrderOutpu
 ```csharp
 // Start a story
 var input = new OrderInput { OrderId = 123 };
-var result = await storyManager.StartStory<CheckoutStory, OrderInput, OrderNarration, OrderOutput>(input);
+var result = await storyManager.StartStory<CheckoutStory, OrderInput, Ordercontext, OrderOutput>(input);
 
 if (result.IsSuccess)
 {
@@ -150,7 +150,7 @@ if (result.IsSuccess)
 
         // Resume with user input
         var userInput = JsonDocument.Parse("{\"cardNumber\": \"1234567812345678\", \"cvv\": \"123\"}");
-        var resumeResult = await storyManager.ResumeStory<CheckoutStory, OrderInput, OrderNarration, OrderOutput>(
+        var resumeResult = await storyManager.ResumeStory<CheckoutStory, OrderInput, Ordercontext, OrderOutput>(
             storyId,
             userInput.RootElement);
 
@@ -190,7 +190,7 @@ public class OrderController : ControllerBase
 
 ### Key Features
 
-- **Tale Code Philosophy**: Workflows read like well-written stories with `TellStory()`, chapters, and narration
+- **Tale Code Philosophy**: Workflows read like well-written stories with `TellStory()`, chapters, and context
 - **Automated Workflows**: Simple linear workflows without user interaction
 - **Interactive Workflows**: Pausable workflows with user input validation
 - **SQLite Persistence**: Save and resume workflow state across restarts
@@ -236,7 +236,7 @@ protected override async Task TellStory()
     await ReadChapter<ProcessPaymentChapter>();
     await ReadChapter<SendConfirmationChapter>();
 
-    Narration.Output.Status = "Order processed successfully";
+    context.Output.Status = "Order processed successfully";
 }
 ```
 

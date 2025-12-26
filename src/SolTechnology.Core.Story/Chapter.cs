@@ -7,21 +7,21 @@ namespace SolTechnology.Core.Story;
 /// Chapters are the building blocks of your story - each represents a focused step in your business logic.
 /// For chapters that need user input, use InteractiveChapter instead.
 /// </summary>
-/// <typeparam name="TNarration">The narration type that flows through this chapter</typeparam>
+/// <typeparam name="TContext">The Context type that flows through this chapter</typeparam>
 /// <example>
 /// <code>
-/// public class CalculateTotal : Chapter&lt;OrderNarration&gt;
+/// public class CalculateTotal : Chapter&lt;OrderContext&gt;
 /// {
-///     public override Task&lt;Result&gt; Read(OrderNarration narration)
+///     public override Task&lt;Result&gt; Read(OrderContext context)
 ///     {
-///         narration.Total = narration.Items.Sum(i => i.Price * i.Quantity);
+///         context.Total = context.Items.Sum(i => i.Price * i.Quantity);
 ///         return Result.SuccessAsTask();
 ///     }
 /// }
 /// </code>
 /// </example>
-public abstract class Chapter<TNarration> : IChapter<TNarration>
-    where TNarration : class
+public abstract class Chapter<TContext> : IChapter<TContext>
+    where TContext : class
 {
     /// <summary>
     /// Unique identifier for this chapter.
@@ -31,10 +31,10 @@ public abstract class Chapter<TNarration> : IChapter<TNarration>
 
     /// <summary>
     /// Execute this chapter's logic.
-    /// Read from narration, perform your business logic, then update narration with results.
+    /// Read from context, perform your business logic, then update Context with results.
     /// Return Result.Success() if successful, or Result.Fail("message") if something goes wrong.
     /// </summary>
-    /// <param name="narration">The narration containing all story data</param>
+    /// <param name="context">The Context containing all story data</param>
     /// <returns>Result indicating success or failure</returns>
-    public abstract Task<Result> Read(TNarration narration);
+    public abstract Task<Result> Read(TContext context);
 }

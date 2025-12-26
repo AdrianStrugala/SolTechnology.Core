@@ -5,10 +5,10 @@ namespace SolTechnology.Core.Story;
 /// <summary>
 /// Base interface for all story chapters.
 /// A chapter represents a single step in your story - a focused piece of business logic.
-/// Each chapter reads from and writes to the shared narration.
+/// Each chapter reads from and writes to the shared context.
 /// </summary>
-/// <typeparam name="TNarration">The narration type that flows through this chapter</typeparam>
-public interface IChapter<in TNarration> where TNarration : class
+/// <typeparam name="TContext">The Context type that flows through this chapter</typeparam>
+public interface IChapter<in TContext> where TContext : class
 {
     /// <summary>
     /// Unique identifier for this chapter.
@@ -19,11 +19,11 @@ public interface IChapter<in TNarration> where TNarration : class
 
     /// <summary>
     /// Execute this chapter's logic.
-    /// Read from narration, perform your business logic, then update narration with results.
+    /// Read from context, perform your business logic, then update Context with results.
     /// Return Result.Success() if the chapter completes successfully.
     /// Return Result.Fail("message") if something goes wrong.
     /// </summary>
-    /// <param name="narration">The narration containing input, output, and intermediate data</param>
+    /// <param name="narration">The Context containing input, output, and intermediate data</param>
     /// <returns>Result indicating success or failure of this chapter</returns>
-    Task<Result> Read(TNarration narration);
+    Task<Result> Read(TContext context);
 }

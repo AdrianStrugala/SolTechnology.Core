@@ -12,11 +12,11 @@ namespace SolTechnology.Core.Story;
 /// Use TellStory() to define your story's chapter sequence.
 /// </summary>
 /// <typeparam name="TInput">The input type that initiates the story</typeparam>
-/// <typeparam name="TNarration">The narration type that flows through chapters</typeparam>
+/// <typeparam name="TContext">The Context type that flows through chapters</typeparam>
 /// <typeparam name="TOutput">The output type returned when the story completes</typeparam>
 /// <example>
 /// <code>
-/// public class SaveCityStory : StoryHandler&lt;SaveCityInput, SaveCityNarration, SaveCityResult&gt;
+/// public class SaveCityStory : StoryHandler&lt;SaveCityInput, SaveCitycontext, SaveCityResult&gt;
 /// {
 ///     public SaveCityStory(IServiceProvider sp, ILogger&lt;SaveCityStory&gt; logger)
 ///         : base(sp, logger) { }
@@ -31,16 +31,16 @@ namespace SolTechnology.Core.Story;
 /// }
 /// </code>
 /// </example>
-public abstract class StoryHandler<TInput, TNarration, TOutput>
+public abstract class StoryHandler<TInput, TContext, TOutput>
     where TInput : class
-    where TNarration : Narration<TInput, TOutput>, new()
+    where TContext : Context<TInput, TOutput>, new()
     where TOutput : class, new()
 {
     /// <summary>
-    /// The narration (context) flowing through this story.
+    /// The Context (context) flowing through this story.
     /// Access this in your TellStory() method if you need to set output directly.
     /// </summary>
-    public TNarration Narration { get; set; } = null!;
+    public TContext Context { get; set; } = null!;
 
     private readonly StoryEngine _engine;
     private readonly ILogger _logger;
@@ -53,7 +53,7 @@ public abstract class StoryHandler<TInput, TNarration, TOutput>
     /// <param name="logger">Logger for this story handler</param>
     protected StoryHandler(
         IServiceProvider serviceProvider,
-        ILogger<StoryHandler<TInput, TNarration, TOutput>> logger)
+        ILogger<StoryHandler<TInput, TContext, TOutput>> logger)
     {
         _logger = logger;
 
@@ -91,9 +91,9 @@ public abstract class StoryHandler<TInput, TNarration, TOutput>
     /// For pausable workflows: resumes from the correct chapter based on saved state.
     /// </summary>
     /// <typeparam name="TChapter">The chapter type to execute</typeparam>
-    protected async Task ReadChapter<TChapter>() where TChapter : IChapter<TNarration>
+    protected async Task ReadChapter<TChapter>() where TChapter : IChapter<TContext>
     {
-        await _engine.ExecuteChapter<TChapter, TNarration>(Narration);
+        await _engine.ExecuteChapter<TChapter, TContext>(Context);
     }
 
     /// <summary>
@@ -120,14 +120,14 @@ public abstract class StoryHandler<TInput, TNarration, TOutput>
 
         try
         {
-            // Create narration if not already set (for resume scenarios)
-            if (Narration == null || Narration.StoryInstanceId == Auid.Empty)
+            // Create Context if not already set (for resume scenarios)
+            if (Context == null || Context.StoryInstanceId == Auid.Empty)
             {
-                Narration = new TNarration { Input = input };
+                Context = new TContext { Input = input };
             }
 
             // Initialize the engine
-            await _engine.Initialize(Narration, GetType().Name, cancellationToken);
+            await _engine.Initialize(Context, GetType().Name, cancellationToken);
 
             // Execute the story (calls TellStory() which calls Chapter<T>() methods)
             await TellStory();

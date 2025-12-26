@@ -3,7 +3,7 @@ using SolTechnology.Core.Story;
 
 namespace DreamTravel.Queries.CalculateBestPath;
 
-public sealed class CalculateBestPathNarration : Narration<CalculateBestPathQuery, CalculateBestPathResult>
+public sealed class CalculateBestPathContext : Context<CalculateBestPathQuery, CalculateBestPathResult>
 {
     public List<City> Cities { get; set; }
     public int NoOfCities { get; set; }

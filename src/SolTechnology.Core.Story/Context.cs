@@ -1,13 +1,13 @@
 namespace SolTechnology.Core.Story;
 
 /// <summary>
-/// Base narration (context) for story execution.
+/// Base context for story execution.
 /// Holds input, output, and intermediate data that flows through all chapters of the story.
-/// Think of narration as the thread connecting all chapters - it carries the story's state forward.
+/// Think of context as the thread connecting all chapters - it carries the story's state forward.
 /// </summary>
 /// <typeparam name="TInput">The input type that initiates the story</typeparam>
 /// <typeparam name="TOutput">The output type returned when the story completes</typeparam>
-public abstract class Narration<TInput, TOutput>
+public abstract class Context<TInput, TOutput>
     where TInput : class
     where TOutput : class, new()
 {

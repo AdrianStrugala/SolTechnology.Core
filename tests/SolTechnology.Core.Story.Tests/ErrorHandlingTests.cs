@@ -189,7 +189,7 @@ public class ErrorHandlingTests
         result.Error!.Message.Should().Be("First failure");
 
         // Verify only first chapter executed
-        handler.Narration.ExecutionLog.Should().HaveCount(1);
+        handler.Context.ExecutionLog.Should().HaveCount(1);
     }
 
     [Test]
@@ -213,7 +213,7 @@ public class ErrorHandlingTests
         result.IsFailure.Should().BeTrue();
 
         // Verify all chapters executed despite errors
-        handler.Narration.ExecutionLog.Should().HaveCount(2);
+        handler.Context.ExecutionLog.Should().HaveCount(2);
     }
 
     [Test]
@@ -247,7 +247,7 @@ public class ErrorHandlingTests
 
 #region Test Stories
 
-public class SuccessfulStory : StoryHandler<ErrorTestInput, ErrorTestNarration, ErrorTestOutput>
+public class SuccessfulStory : StoryHandler<ErrorTestInput, ErrorTesTContext, ErrorTestOutput>
 {
     public SuccessfulStory(IServiceProvider sp, ILogger<SuccessfulStory> logger)
         : base(sp, logger)
@@ -257,11 +257,11 @@ public class SuccessfulStory : StoryHandler<ErrorTestInput, ErrorTestNarration, 
     protected override async Task TellStory()
     {
         await ReadChapter<ErrorTestSuccessChapter>();
-        Narration.Output.Result = "Success";
+        Context.Output.Result = "Success";
     }
 }
 
-public class SingleFailureStory : StoryHandler<ErrorTestInput, ErrorTestNarration, ErrorTestOutput>
+public class SingleFailureStory : StoryHandler<ErrorTestInput, ErrorTesTContext, ErrorTestOutput>
 {
     public SingleFailureStory(IServiceProvider sp, ILogger<SingleFailureStory> logger)
         : base(sp, logger)
@@ -276,7 +276,7 @@ public class SingleFailureStory : StoryHandler<ErrorTestInput, ErrorTestNarratio
     }
 }
 
-public class MultipleFailuresStory : StoryHandler<ErrorTestInput, ErrorTestNarration, ErrorTestOutput>
+public class MultipleFailuresStory : StoryHandler<ErrorTestInput, ErrorTesTContext, ErrorTestOutput>
 {
     public MultipleFailuresStory(
         IServiceProvider sp,
@@ -292,7 +292,7 @@ public class MultipleFailuresStory : StoryHandler<ErrorTestInput, ErrorTestNarra
     }
 }
 
-public class ExceptionStory : StoryHandler<ErrorTestInput, ErrorTestNarration, ErrorTestOutput>
+public class ExceptionStory : StoryHandler<ErrorTestInput, ErrorTesTContext, ErrorTestOutput>
 {
     public ExceptionStory(IServiceProvider sp, ILogger<ExceptionStory> logger)
         : base(sp, logger)
@@ -305,7 +305,7 @@ public class ExceptionStory : StoryHandler<ErrorTestInput, ErrorTestNarration, E
     }
 }
 
-public class CustomErrorStory : StoryHandler<ErrorTestInput, ErrorTestNarration, ErrorTestOutput>
+public class CustomErrorStory : StoryHandler<ErrorTestInput, ErrorTesTContext, ErrorTestOutput>
 {
     public CustomErrorStory(IServiceProvider sp, ILogger<CustomErrorStory> logger)
         : base(sp, logger)
@@ -322,53 +322,53 @@ public class CustomErrorStory : StoryHandler<ErrorTestInput, ErrorTestNarration,
 
 #region Test Chapters
 
-public class ErrorTestSuccessChapter : Chapter<ErrorTestNarration>
+public class ErrorTestSuccessChapter : Chapter<ErrorTesTContext>
 {
-    public override Task<Result> Read(ErrorTestNarration narration)
+    public override Task<Result> Read(ErrorTesTContext context)
     {
-        narration.ExecutionLog.Add("Success");
+        context.ExecutionLog.Add("Success");
         return Result.SuccessAsTask();
     }
 }
 
-public class ErrorTestFailureChapter : Chapter<ErrorTestNarration>
+public class ErrorTestFailureChapter : Chapter<ErrorTesTContext>
 {
-    public override Task<Result> Read(ErrorTestNarration narration)
+    public override Task<Result> Read(ErrorTesTContext context)
     {
-        narration.ExecutionLog.Add("Failure");
+        context.ExecutionLog.Add("Failure");
         return Result.FailAsTask("Chapter failed intentionally");
     }
 }
 
-public class ErrorTestFirstFailureChapter : Chapter<ErrorTestNarration>
+public class ErrorTestFirstFailureChapter : Chapter<ErrorTesTContext>
 {
-    public override Task<Result> Read(ErrorTestNarration narration)
+    public override Task<Result> Read(ErrorTesTContext context)
     {
-        narration.ExecutionLog.Add("FirstFailure");
+        context.ExecutionLog.Add("FirstFailure");
         return Result.FailAsTask("First failure");
     }
 }
 
-public class ErrorTestSecondFailureChapter : Chapter<ErrorTestNarration>
+public class ErrorTestSecondFailureChapter : Chapter<ErrorTesTContext>
 {
-    public override Task<Result> Read(ErrorTestNarration narration)
+    public override Task<Result> Read(ErrorTesTContext context)
     {
-        narration.ExecutionLog.Add("SecondFailure");
+        context.ExecutionLog.Add("SecondFailure");
         return Result.FailAsTask("Second failure");
     }
 }
 
-public class ErrorTestExceptionChapter : Chapter<ErrorTestNarration>
+public class ErrorTestExceptionChapter : Chapter<ErrorTesTContext>
 {
-    public override Task<Result> Read(ErrorTestNarration narration)
+    public override Task<Result> Read(ErrorTesTContext context)
     {
         throw new InvalidOperationException("Test exception from chapter");
     }
 }
 
-public class ErrorTestCustomErrorChapter : Chapter<ErrorTestNarration>
+public class ErrorTestCustomErrorChapter : Chapter<ErrorTesTContext>
 {
-    public override Task<Result> Read(ErrorTestNarration narration)
+    public override Task<Result> Read(ErrorTesTContext context)
     {
         var customError = new Error
         {
@@ -394,7 +394,7 @@ public class ErrorTestOutput
     public string Result { get; set; } = string.Empty;
 }
 
-public class ErrorTestNarration : Narration<ErrorTestInput, ErrorTestOutput>
+public class ErrorTesTContext : Context<ErrorTestInput, ErrorTestOutput>
 {
     public List<string> ExecutionLog { get; set; } = new();
 }

@@ -9,26 +9,26 @@ namespace SolTechnology.Core.Story;
 /// The story pauses at these chapters and waits for external input before continuing.
 /// Use this for steps that need approval, additional data, or human decision-making.
 /// </summary>
-/// <typeparam name="TNarration">The narration type that flows through this chapter</typeparam>
+/// <typeparam name="TContext">The Context type that flows through this chapter</typeparam>
 /// <typeparam name="TChapterInput">The input type that the user must provide</typeparam>
 /// <example>
 /// <code>
-/// public class RequestApproval : InteractiveChapter&lt;OrderNarration, ApprovalInput&gt;
+/// public class RequestApproval : InteractiveChapter&lt;OrderContext, ApprovalInput&gt;
 /// {
-///     public override Task&lt;Result&gt; ReadWithInput(OrderNarration narration, ApprovalInput userInput)
+///     public override Task&lt;Result&gt; ReadWithInput(OrderContext context, ApprovalInput userInput)
 ///     {
 ///         if (!userInput.IsApproved)
 ///             return Result.FailAsTask("Order was not approved");
 ///
-///         narration.ApprovalTimestamp = DateTime.UtcNow;
-///         narration.ApprovedBy = userInput.ApproverName;
+///         context.ApprovalTimestamp = DateTime.UtcNow;
+///         context.ApprovedBy = userInput.ApproverName;
 ///         return Result.SuccessAsTask();
 ///     }
 /// }
 /// </code>
 /// </example>
-public abstract class InteractiveChapter<TNarration, TChapterInput> : IChapter<TNarration>
-    where TNarration : class
+public abstract class InteractiveChapter<TContext, TChapterInput> : IChapter<TContext>
+    where TContext : class
     where TChapterInput : class, new()
 {
     /// <summary>
@@ -48,18 +48,18 @@ public abstract class InteractiveChapter<TNarration, TChapterInput> : IChapter<T
 
     /// <summary>
     /// Process user-provided input for this chapter.
-    /// Validate the input, update the narration based on user choices, and return success or failure.
+    /// Validate the input, update the Context based on user choices, and return success or failure.
     /// </summary>
-    /// <param name="narration">The narration containing all story data</param>
+    /// <param name="context">The Context containing all story data</param>
     /// <param name="userInput">The input provided by the user</param>
     /// <returns>Result indicating whether the input was valid and processed successfully</returns>
-    public abstract Task<Result> ReadWithInput(TNarration narration, TChapterInput userInput);
+    public abstract Task<Result> ReadWithInput(TContext context, TChapterInput userInput);
 
     /// <summary>
     /// Internal implementation of IChapter.Read - should not be called directly.
     /// Interactive chapters must be executed via ReadWithInput() or through StoryManager orchestration.
     /// </summary>
-    Task<Result> IChapter<TNarration>.Read(TNarration narration)
+    Task<Result> IChapter<TContext>.Read(TContext context)
     {
         throw new InvalidOperationException(
             $"Interactive chapter '{ChapterId}' requires user input. " +
