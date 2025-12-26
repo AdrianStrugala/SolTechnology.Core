@@ -9,6 +9,7 @@ namespace DreamTravel.Api.Controllers;
 /// Inherits from the base StoryController provided by SolTechnology.Core.Story.
 /// Can be customized to add authentication, logging, or other application-specific behavior.
 /// </summary>
+[Route("api/dreamtravel/story")]
 public class DreamTravelStoryController : StoryController
 {
     public DreamTravelStoryController(

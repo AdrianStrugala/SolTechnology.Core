@@ -14,7 +14,7 @@ namespace SolTechnology.Core.Story.Api;
 /// </summary>
 [ApiController]
 [Route("api/story")]
-public class StoryController : ControllerBase
+public abstract class StoryController : ControllerBase
 {
     protected readonly StoryManager StoryManager;
     protected readonly ILogger<StoryController> Logger;

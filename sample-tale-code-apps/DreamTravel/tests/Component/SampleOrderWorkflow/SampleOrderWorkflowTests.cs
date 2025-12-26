@@ -24,7 +24,7 @@ public class SampleOrderWorkflowTests
     {
         // Given: Initiate story request
         var createStoryResponse = await _apiClient
-            .CreateRequest("/api/story/SampleOrderWorkflowHandler/start")
+            .CreateRequest("/api/dreamtravel/story/SampleOrderWorkflowHandler/start")
             .WithHeader("X-API-KEY", "<SECRET>")
             .WithBody(new
             {
@@ -46,7 +46,7 @@ public class SampleOrderWorkflowTests
 
         // When: Calling resume without user input
         var resumeWithoutInput = await _apiClient
-            .CreateRequest($"/api/story/{storyId}")
+            .CreateRequest($"/api/dreamtravel/story/{storyId}")
             .WithHeader("X-API-KEY", "<SECRET>")
             .PostAsync<Result<StoryInstanceDto>>();
 
@@ -57,7 +57,7 @@ public class SampleOrderWorkflowTests
 
         // When: Calling resume with valid user input
         var resumeWithInput = await _apiClient
-            .CreateRequest($"/api/story/{storyId}")
+            .CreateRequest($"/api/dreamtravel/story/{storyId}")
             .WithHeader("X-API-KEY", "<SECRET>")
             .WithBody(new
             {
@@ -75,7 +75,7 @@ public class SampleOrderWorkflowTests
 
         // When: Getting story state
         var storyState = await _apiClient
-            .CreateRequest($"/api/story/{storyId}")
+            .CreateRequest($"/api/dreamtravel/story/{storyId}")
             .WithHeader("X-API-KEY", "<SECRET>")
             .GetAsync<Result<StoryInstanceDto>>();
 
@@ -88,7 +88,7 @@ public class SampleOrderWorkflowTests
 
         // When: Getting story result
         var storyResult = await _apiClient
-            .CreateRequest($"/api/story/{storyId}/result")
+            .CreateRequest($"/api/dreamtravel/story/{storyId}/result")
             .WithHeader("X-API-KEY", "<SECRET>")
             .GetAsync<Result<StoryInstanceDto>>();
 
