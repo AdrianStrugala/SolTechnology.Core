@@ -16,7 +16,7 @@
 
     <ItemGroup>
         <None Include="..\..\docs\mini-logo.png" Pack="true" Visible="false" PackagePath="docs\mini-logo.png" />
-        <None Include="..\..\docs\Story-Implementation-Plan.md" Pack="true" Visible="false" PackagePath="docs\readme.md" />
+        <None Include="..\..\docs\Story.md" Pack="true" Visible="false" PackagePath="docs\readme.md" />
     </ItemGroup>
 
     <ItemGroup>
