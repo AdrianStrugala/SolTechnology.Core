@@ -302,11 +302,18 @@ Validators are automatically discovered and executed when registered via `Regist
    - ❌ BAD: `_logger.LogInformation($"Processing order {orderId}")`
    - ✅ GOOD: `_logger.LogInformation($"Processing order [{orderId}]")`
    - This makes it clear when a value is empty: `"Processing order []"` vs `"Processing order "`
-9. **Testing Framework**:
+9. **Acronym Casing**: Follow Microsoft .NET naming guidelines for acronyms
+   - **2-letter acronyms**: ALL CAPS → `UI`, `IO`, `DB`
+   - **3+ letter acronyms**: Pascal case → `Api`, `Xml`, `Html`, `Sql`, `Cqrs`, `Auid`
+   - Examples:
+     - ✅ GOOD: `ApiClient`, `XmlDocument`, `HtmlHelper`, `SqlConnection`, `UIControl`, `IOStream`
+     - ❌ BAD: `XMLDocument`, `HTMLHelper`, `SQLConnection`, `CQRS`, `AUID`
+   - **Note**: Existing projects (`SolTechnology.Core.CQRS`, `SolTechnology.Core.AUID`) keep their current names for backwards compatibility, but new code should follow this convention
+10. **Testing Framework**:
    - Use NUnit for all tests
    - For integration tests, use WebApplicationFactory and Testcontainers
    - Write comprehensive QA scenarios covering edge cases, error handling, concurrency, and security
-10. **Validation Framework**: Use FluentValidation for all input validation
+11. **Validation Framework**: Use FluentValidation for all input validation
 
 ## Important Implementation Notes
 
