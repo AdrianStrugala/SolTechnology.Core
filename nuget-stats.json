@@ -1,0 +1,99 @@
+{
+  "lastUpdated": "2025-12-29T19:34:51Z",
+  "packages": [
+    {
+      "downloads": 21401,
+      "version": "0.1.0",
+      "id": "SolTechnology.Avro.Kafka"
+    },
+    {
+      "downloads": 6645,
+      "version": "3.0.1",
+      "id": "SolTechnology.Avro.Http"
+    },
+    {
+      "downloads": 3322,
+      "version": "0.5.0",
+      "id": "SolTechnology.Core.ApiClient"
+    },
+    {
+      "downloads": 2526,
+      "version": "0.5.0",
+      "id": "SolTechnology.Core.CQRS"
+    },
+    {
+      "downloads": 2438,
+      "version": "0.5.0",
+      "id": "SolTechnology.Core.Sql"
+    },
+    {
+      "downloads": 2244,
+      "version": "0.5.0",
+      "id": "SolTechnology.Core.Logging"
+    },
+    {
+      "downloads": 2239,
+      "version": "0.5.0",
+      "id": "SolTechnology.Core.BlobStorage"
+    },
+    {
+      "downloads": 2177,
+      "version": "0.5.0",
+      "id": "SolTechnology.Core.MessageBus"
+    },
+    {
+      "downloads": 2177,
+      "version": "0.5.0",
+      "id": "SolTechnology.Core.Guards"
+    },
+    {
+      "downloads": 1672,
+      "version": "0.5.0",
+      "id": "SolTechnology.Core.Authentication"
+    },
+    {
+      "downloads": 1647,
+      "version": "0.5.0",
+      "id": "SolTechnology.Core.Api"
+    },
+    {
+      "downloads": 1063,
+      "version": "0.5.0",
+      "id": "SolTechnology.Core.Cache"
+    },
+    {
+      "downloads": 891,
+      "version": "0.5.0",
+      "id": "SolTechnology.Core.Scheduler"
+    },
+    {
+      "downloads": 691,
+      "version": "0.5.0",
+      "id": "SolTechnology.Core.AUID"
+    },
+    {
+      "downloads": 674,
+      "version": "1.0.0",
+      "id": "SolTechnology.Core.Flow"
+    },
+    {
+      "downloads": 563,
+      "version": "1.0.1",
+      "id": "SolTechnology.DateTimeZone"
+    },
+    {
+      "downloads": 249,
+      "version": "1.0.0",
+      "id": "SolTechnology.Core.Faker"
+    },
+    {
+      "downloads": 56,
+      "version": "0.6.0",
+      "id": "SolTechnology.Core.Story"
+    }
+  ],
+  "totals": {
+    "packages": 18,
+    "downloads": 52675
+  }
+}
