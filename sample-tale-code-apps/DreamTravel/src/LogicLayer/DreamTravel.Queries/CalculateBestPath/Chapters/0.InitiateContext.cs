@@ -1,8 +1,10 @@
-﻿using SolTechnology.Core.CQRS;
+﻿using Hangfire.Annotations;
+using SolTechnology.Core.CQRS;
 using SolTechnology.Core.Story;
 
 namespace DreamTravel.Queries.CalculateBestPath.Chapters;
 
+[UsedImplicitly]
 public class InitiateContext : Chapter<CalculateBestPathContext>
 {
     public override Task<Result> Read(CalculateBestPathContext narration)

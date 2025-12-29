@@ -39,10 +39,10 @@
   </Folder>
   <Folder Name="/SampleApps/DreamTravel/src/LogicLayer/">
     <Project Path="sample-tale-code-apps/DreamTravel/src/LogicLayer/DreamTravel.DomainServices/DreamTravel.DomainServices.csproj" />
-    <Project Path="sample-tale-code-apps/DreamTravel/src/LogicLayer/DreamTravel.Flows/DreamTravel.Flows.csproj" />
     <Project Path="sample-tale-code-apps/DreamTravel/src/LogicLayer/DreamTravel.Commands/DreamTravel.Commands.csproj" />
     <Project Path="sample-tale-code-apps/DreamTravel/src/LogicLayer/DreamTravel.Queries/DreamTravel.Queries.csproj" />
     <Project Path="sample-tale-code-apps/DreamTravel/src/LogicLayer/DreamTravel.TravelingSalesmanProblem/DreamTravel.TravelingSalesmanProblem.csproj" />
+    <Project Path="sample-tale-code-apps/DreamTravel/src/LogicLayer/DreamTravel.Workflows/DreamTravel.Workflows.csproj" />
   </Folder>
   <Folder Name="/SampleApps/DreamTravel/src/Presentation/">
     <Project Path="sample-tale-code-apps/DreamTravel/src/Presentation/DreamTravel.Api/DreamTravel.Api.csproj" />

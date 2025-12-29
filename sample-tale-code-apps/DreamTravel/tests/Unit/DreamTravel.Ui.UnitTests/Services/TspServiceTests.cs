@@ -1,5 +1,6 @@
 using DreamTravel.Ui.Services;
 using FluentAssertions;
+using NUnit.Framework;
 
 namespace DreamTravel.Ui.UnitTests.Services;
 

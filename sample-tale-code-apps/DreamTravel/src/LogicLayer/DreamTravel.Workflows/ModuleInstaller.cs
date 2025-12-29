@@ -7,7 +7,6 @@ public static class ModuleInstaller
 {
     public static IServiceCollection AddFlows(this IServiceCollection services, StoryOptions? options = null)
     {
-        // If options provided, use them; otherwise use default
         if (options != null)
         {
             services.RegisterStories(options);

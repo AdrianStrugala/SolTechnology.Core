@@ -10,7 +10,7 @@ namespace DreamTravel.FunctionalTests.Trips
 {
     public class PerformanceTests
     {
-        private readonly CalculateBestPathHandler _sut;
+        private readonly CalculateBestPathStory _sut;
 
         public PerformanceTests()
         {

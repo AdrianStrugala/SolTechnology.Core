@@ -23,7 +23,7 @@ public interface IChapter<in TContext> where TContext : class
     /// Return Result.Success() if the chapter completes successfully.
     /// Return Result.Fail("message") if something goes wrong.
     /// </summary>
-    /// <param name="narration">The Context containing input, output, and intermediate data</param>
+    /// <param name="context">The Context containing input, output, and intermediate data</param>
     /// <returns>Result indicating success or failure of this chapter</returns>
     Task<Result> Read(TContext context);
 }

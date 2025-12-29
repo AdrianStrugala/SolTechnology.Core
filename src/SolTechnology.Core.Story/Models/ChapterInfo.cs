@@ -16,11 +16,6 @@ public class ChapterInfo
     public required string ChapterId { get; set; }
 
     /// <summary>
-    /// Type of chapter: "Automated" or "Interactive".
-    /// </summary>
-    public string ChapterType { get; set; } = "Automated";
-
-    /// <summary>
     /// When this chapter started executing.
     /// </summary>
     public required DateTime StartedAt { get; set; }

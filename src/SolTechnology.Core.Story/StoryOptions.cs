@@ -29,12 +29,6 @@ public class StoryOptions
     public IStoryRepository? Repository { get; init; }
 
     /// <summary>
-    /// Enable REST API endpoints for story control via StoryController.
-    /// Requires EnablePersistence to be true.
-    /// </summary>
-    public bool EnableRestApi { get; init; } = false;
-
-    /// <summary>
     /// Stop story execution on the first chapter error (true) or collect all errors (false).
     /// When false, all chapters execute and errors are aggregated into AggregateError.
     /// When true, execution stops at the first failure.

@@ -74,7 +74,9 @@
       "Bash(powershell.exe -Command \"Get-ChildItem -Path src/SolTechnology.Core.Story -Recurse -Include *.cs | Select-String -Pattern ''Narration'' -CaseSensitive | Select-Object -First 20\")",
       "Bash(powershell.exe -Command:*)",
       "Bash(Select-String -Pattern \"\\(error|warning|succeeded|failed\\)\")",
-      "Bash(Select-Object -Last 50)"
+      "Bash(Select-Object -Last 50)",
+      "Bash(Select-String -Pattern \"Niepowodzenie|Powodzenie|niepowodzenie|powodzenie\")",
+      "Bash(Select-Object -Last 3)"
     ],
     "deny": [],
     "ask": []

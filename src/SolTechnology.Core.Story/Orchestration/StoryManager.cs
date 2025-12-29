@@ -8,29 +8,23 @@ using SolTechnology.Core.Story.Persistence;
 namespace SolTechnology.Core.Story.Orchestration;
 
 /// <summary>
-/// High-level orchestration manager for stories.
-/// Provides start/resume capabilities for complex pausable workflows.
+/// Manages story lifecycle for interactive workflows with persistence.
+/// Handles starting, resuming, and querying story state.
 /// </summary>
-public class StoryManager
+public class StoryManager(
+    IServiceProvider serviceProvider,
+    IStoryRepository repository,
+    ILogger<StoryManager> logger)
 {
-    private readonly IServiceProvider _serviceProvider;
-    private readonly IStoryRepository _repository;
-    private readonly ILogger<StoryManager> _logger;
-
-    public StoryManager(
-        IServiceProvider serviceProvider,
-        IStoryRepository repository,
-        ILogger<StoryManager> logger)
-    {
-        _serviceProvider = serviceProvider;
-        _repository = repository;
-        _logger = logger;
-    }
-
     /// <summary>
-    /// Start a new story with the given input.
-    /// Returns the story instance with its ID for future resume operations.
+    /// Starts a new story execution.
     /// </summary>
+    /// <typeparam name="THandler">The story handler type</typeparam>
+    /// <typeparam name="TInput">The input type</typeparam>
+    /// <typeparam name="TContext">The context type</typeparam>
+    /// <typeparam name="TOutput">The output type</typeparam>
+    /// <param name="input">Initial input for the story</param>
+    /// <returns>Story instance with state and ID</returns>
     public async Task<Result<StoryInstance>> StartStory<THandler, TInput, TContext, TOutput>(
         TInput input)
         where THandler : StoryHandler<TInput, TContext, TOutput>
@@ -38,81 +32,19 @@ public class StoryManager
         where TContext : Context<TInput, TOutput>, new()
         where TOutput : class, new()
     {
-        _logger.LogInformation("Starting new story {HandlerType}", typeof(THandler).Name);
-
-        try
-        {
-            // Create handler - repository is already registered in DI
-            var logger = _serviceProvider.GetRequiredService<ILogger<THandler>>();
-
-            var handler = (THandler)Activator.CreateInstance(
-                typeof(THandler),
-                _serviceProvider,
-                logger)!;
-
-            // Execute the story
-            var result = await handler.Handle(input);
-
-            // If story is paused, return the instance
-            if (result.IsFailure && result.Error?.Message.Contains("paused") == true)
-            {
-                var storyId = handler.Context.StoryInstanceId;
-                if (storyId != Auid.Empty)
-                {
-                    var storyInstance = await _repository.FindById(storyId);
-                    if (storyInstance != null)
-                    {
-                        return Result<StoryInstance>.Success(storyInstance);
-                    }
-                }
-            }
-
-            // Story completed or failed
-            if (result.IsSuccess)
-            {
-                _logger.LogInformation("Story {HandlerType} completed successfully", typeof(THandler).Name);
-
-                // Create a completed story instance
-                var storyId = handler.Context.StoryInstanceId != Auid.Empty
-                    ? handler.Context.StoryInstanceId
-                    : Auid.New("STR");
-
-                var completedInstance = new StoryInstance
-                {
-                    StoryId = storyId,
-                    HandlerTypeName = typeof(THandler).Name,
-                    Status = StoryStatus.Completed,
-                    CreatedAt = DateTime.UtcNow,
-                    LastUpdatedAt = DateTime.UtcNow,
-                    History = new List<ChapterInfo>()
-                };
-
-                // Save the completed story to repository
-                try
-                {
-                    await _repository.SaveAsync(completedInstance);
-                }
-                catch (Exception saveEx)
-                {
-                    _logger.LogWarning(saveEx, "Failed to save completed story {StoryId}, but story execution succeeded", storyId);
-                    // Don't fail the overall operation - story execution was successful
-                }
-
-                return Result<StoryInstance>.Success(completedInstance);
-            }
-
-            return Result<StoryInstance>.Fail(result.Error!);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Failed to start story {HandlerType}", typeof(THandler).Name);
-            return Result<StoryInstance>.Fail($"Failed to start story: {ex.Message}");
-        }
+        return await ExecuteStoryPipeline<THandler, TInput, TContext, TOutput>(input, null, Auid.Empty);
     }
 
     /// <summary>
-    /// Resume a paused story with user input for the interactive chapter.
+    /// Resumes a paused story with user input.
     /// </summary>
+    /// <typeparam name="THandler">The story handler type</typeparam>
+    /// <typeparam name="TInput">The input type</typeparam>
+    /// <typeparam name="TContext">The context type</typeparam>
+    /// <typeparam name="TOutput">The output type</typeparam>
+    /// <param name="storyId">ID of the story to resume</param>
+    /// <param name="userInput">User input for the interactive chapter</param>
+    /// <returns>Updated story instance</returns>
     public async Task<Result<StoryInstance>> ResumeStory<THandler, TInput, TContext, TOutput>(
         Auid storyId,
         JsonElement? userInput = null)
@@ -121,125 +53,131 @@ public class StoryManager
         where TContext : Context<TInput, TOutput>, new()
         where TOutput : class, new()
     {
-        _logger.LogInformation("Resuming story {StoryId}", storyId);
+        return await ExecuteStoryPipeline<THandler, TInput, TContext, TOutput>(null!, userInput, storyId);
+    }
 
+    private async Task<Result<StoryInstance>> ExecuteStoryPipeline<THandler, TInput, TContext, TOutput>(
+        TInput? input,
+        JsonElement? userInput,
+        Auid storyId)
+        where THandler : StoryHandler<TInput, TContext, TOutput>
+        where TInput : class
+        where TContext : Context<TInput, TOutput>, new()
+        where TOutput : class, new()
+    {
         try
         {
-            // Load the story instance
-            StoryInstance? storyInstance;
-            try
-            {
-                storyInstance = await _repository.FindById(storyId);
-            }
-            catch (Exception repoEx)
-            {
-                _logger.LogError(repoEx, "Repository error while loading story {StoryId}", storyId);
-                return Result<StoryInstance>.Fail($"Failed to load story from storage: {repoEx.Message}");
-            }
+            TContext? context = null;
 
-            if (storyInstance == null)
+            // 1. Resume Logic: Load and Deserialize Context
+            if (storyId != Auid.Empty)
             {
-                return Result<StoryInstance>.Fail($"Story {storyId} not found");
-            }
+                var existingInstance = await repository.FindById(storyId);
+                if (existingInstance == null) return Result<StoryInstance>.Fail($"Story {storyId} not found");
+                if (existingInstance.Status == StoryStatus.Completed) return Result<StoryInstance>.Fail("Story already completed");
 
-            // Check if story is already completed
-            if (storyInstance.Status == StoryStatus.Completed)
-            {
-                return Result<StoryInstance>.Fail($"Story {storyId} is already completed and cannot be resumed");
+                context = JsonSerializer.Deserialize<TContext>(existingInstance.Context, StoryJsonOptions.Default);
+                if (context != null) context.StoryInstanceId = storyId;
+                
+                // If resuming, input comes from context, not parameter
+                if (context != null) input = context.Input;
             }
 
-            // Deserialize the context with consistent JSON options
-            var context = JsonSerializer.Deserialize<TContext>(storyInstance.Context, StoryJsonOptions.Default);
-            if (context == null)
-            {
-                return Result<StoryInstance>.Fail("Failed to deserialize story context");
-            }
+            if (input == null && context == null)
+                return Result<StoryInstance>.Fail("Input is required to start a story");
 
-            // Restore the story ID
-            context.StoryInstanceId = storyId;
+            // 2. Create Handler using ActivatorUtilities (Allows extra DI in Handler constructor)
+            var handler = ActivatorUtilities.CreateInstance<THandler>(serviceProvider);
+            
+            if (context != null) handler.Context = context;
 
-            // Create handler - repository is already registered in DI
-            var logger = _serviceProvider.GetRequiredService<ILogger<THandler>>();
+            // 3. Execute Handler (Pass userInput officially)
+            Result<TOutput> result = await handler.Handle(input!, userInput);
 
-            // Create handler instance using reflection
-            var handler = (THandler)Activator.CreateInstance(
-                typeof(THandler),
-                _serviceProvider,
-                logger)!;
+            // 4. Handle Result State
+            Auid activeStoryId = handler.Context.StoryInstanceId;
 
-            // Set the Context with restored context
-            handler.Context = context;
-
-            // If user input is provided, we need to pass it to the engine
-            // This is done through the handler's internal engine via reflection
-            if (userInput != null)
-            {
-                var engineField = typeof(THandler).BaseType!
-                    .GetField("_engine", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-                if (engineField != null)
-                {
-                    var engine = engineField.GetValue(handler);
-                    var setInputMethod = engine?.GetType()
-                        .GetMethod("SetChapterInput", System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance);
-                    setInputMethod?.Invoke(engine, new object?[] { userInput });
-                }
-            }
-
-            // Execute the story
-            var result = await handler.Handle(context.Input);
-
-            // Return updated story instance
+            // Case A: Paused (Waiting for input)
             if (result.IsFailure && result.Error?.Message.Contains("paused") == true)
             {
-                var updatedInstance = await _repository.FindById(storyId);
-                if (updatedInstance != null)
-                {
-                    return Result<StoryInstance>.Success(updatedInstance);
-                }
+                return await GetLatestInstance(activeStoryId);
             }
 
-            // Story completed - get the latest version from repository
+            // Case B: Completed Successfully
             if (result.IsSuccess)
             {
-                var updatedInstance = await _repository.FindById(storyId);
-                if (updatedInstance != null)
-                {
-                    updatedInstance.Status = StoryStatus.Completed;
-                    updatedInstance.LastUpdatedAt = DateTime.UtcNow;
-                    await _repository.SaveAsync(updatedInstance);
-
-                    return Result<StoryInstance>.Success(updatedInstance);
-                }
+                var completedInstance = await MarkAsCompleted(activeStoryId, typeof(THandler).Name);
+                return Result<StoryInstance>.Success(completedInstance);
             }
 
+            // Case C: Failed
             return Result<StoryInstance>.Fail(result.Error!);
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Failed to resume story {StoryId}", storyId);
-            return Result<StoryInstance>.Fail($"Failed to resume story: {ex.Message}");
+            logger.LogError(ex, "Error executing story {Handler}", typeof(THandler).Name);
+            return Result<StoryInstance>.Fail(ex.Message);
         }
     }
 
+    private async Task<Result<StoryInstance>> GetLatestInstance(Auid storyId)
+    {
+        var instance = await repository.FindById(storyId);
+        return instance != null 
+            ? Result<StoryInstance>.Success(instance) 
+            : Result<StoryInstance>.Fail("Instance not found after execution");
+    }
+
+    private async Task<StoryInstance> MarkAsCompleted(Auid storyId, string handlerName)
+    {
+        // Check if exists (Resume scenario)
+        var instance = await repository.FindById(storyId);
+        
+        if (instance == null)
+        {
+            // Create new for one-shot stories
+            instance = new StoryInstance
+            {
+                StoryId = storyId,
+                HandlerTypeName = handlerName,
+                CreatedAt = DateTime.UtcNow,
+                History = new List<ChapterInfo>()
+            };
+        }
+
+        instance.Status = StoryStatus.Completed;
+        instance.LastUpdatedAt = DateTime.UtcNow;
+
+        try
+        {
+            await repository.SaveAsync(instance);
+        }
+        catch (Exception ex)
+        {
+            logger.LogWarning(ex, "Failed to save completion status for {StoryId}", storyId);
+        }
+
+        return instance;
+    }
+
     /// <summary>
-    /// Get the current state of a story.
+    /// Retrieves the current state of a story.
     /// </summary>
+    /// <param name="storyId">The story ID</param>
+    /// <returns>Story instance with current state, history, and context</returns>
     public async Task<Result<StoryInstance>> GetStoryState(Auid storyId)
     {
         try
         {
-            var storyInstance = await _repository.FindById(storyId);
-            if (storyInstance == null)
-            {
-                return Result<StoryInstance>.Fail($"Story {storyId} not found");
-            }
-
-            return Result<StoryInstance>.Success(storyInstance);
+            var instance = await repository.FindById(storyId);
+            return instance != null
+                ? Result<StoryInstance>.Success(instance)
+                : Result<StoryInstance>.Fail("Story not found");
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Failed to retrieve story state for {StoryId}", storyId);
-            return Result<StoryInstance>.Fail($"Failed to retrieve story from storage: {ex.Message}");
+            logger.LogError(ex, "Failed to load story state for {StoryId}", storyId);
+            return Result<StoryInstance>.Fail($"Failed to load story: {ex.Message}");
         }
     }
 }

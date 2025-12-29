@@ -1,4 +1,4 @@
-namespace SolTechnology.Core.Journey.Workflow.Handlers
+namespace DreamTravel.Flows.SampleOrderWorkflow
 {
     public class SampleOrderInput
     {

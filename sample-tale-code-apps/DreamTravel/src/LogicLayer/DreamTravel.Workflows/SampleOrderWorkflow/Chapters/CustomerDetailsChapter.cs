@@ -1,10 +1,12 @@
+using JetBrains.Annotations;
 using SolTechnology.Core.CQRS;
 using SolTechnology.Core.Story;
 using SolTechnology.Core.Journey.Workflow.Steps.Dtos;
 
 namespace DreamTravel.Flows.SampleOrderWorkflow.Chapters;
 
-public class RequestUserInputChapter : InteractiveChapter<SampleOrderContext, CustomerDetailsInput>
+[UsedImplicitly]
+public class CustomerDetailsChapter : InteractiveChapter<SampleOrderContext, CustomerDetailsInput>
 {
     public override string ChapterId => "RequestCustomerDetails";
 

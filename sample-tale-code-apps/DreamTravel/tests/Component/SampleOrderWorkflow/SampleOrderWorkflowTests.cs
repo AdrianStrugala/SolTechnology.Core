@@ -24,7 +24,7 @@ public class SampleOrderWorkflowTests
     {
         // Given: Initiate story request
         var createStoryResponse = await _apiClient
-            .CreateRequest("/api/dreamtravel/story/SampleOrderWorkflowHandler/start")
+            .CreateRequest("/api/dreamtravel/story/SampleOrderWorkflowStory/start")
             .WithHeader("X-API-KEY", "<SECRET>")
             .WithBody(new
             {

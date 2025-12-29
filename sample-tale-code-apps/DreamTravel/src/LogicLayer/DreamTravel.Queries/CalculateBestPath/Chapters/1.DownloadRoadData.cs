@@ -1,29 +1,23 @@
 ﻿using DreamTravel.Domain.Cities;
 using DreamTravel.GeolocationDataClients.GoogleApi;
 using DreamTravel.GeolocationDataClients.MichelinApi;
+using JetBrains.Annotations;
 using SolTechnology.Core.CQRS;
 using SolTechnology.Core.Story;
 
 namespace DreamTravel.Queries.CalculateBestPath.Chapters;
 
-public class DownloadRoadData : Chapter<CalculateBestPathContext>
+[UsedImplicitly]
+public class DownloadRoadData(IGoogleApiClient googleApiClient, IMichelinApiClient michelinApiClient)
+    : Chapter<CalculateBestPathContext>
 {
-    private readonly IGoogleApiClient _googleApiClient;
-    private readonly IMichelinApiClient _michelinApiClient;
-
-    public DownloadRoadData(IGoogleApiClient googleApiClient, IMichelinApiClient michelinApiClient)
-    {
-        _googleApiClient = googleApiClient;
-        _michelinApiClient = michelinApiClient;
-    }
-
     public override async Task<Result> Read(CalculateBestPathContext calculateBestPathContext)
     {
         var listOfCities = calculateBestPathContext.Cities;
         List<Task> tasks = new List<Task>
         {
-            Task.Run(async () => calculateBestPathContext.TollDistances = await _googleApiClient.GetDurationMatrixByTollRoad(listOfCities)),
-            Task.Run(async () => calculateBestPathContext.FreeDistances = await _googleApiClient.GetDurationMatrixByFreeRoad(listOfCities))
+            Task.Run(async () => calculateBestPathContext.TollDistances = await googleApiClient.GetDurationMatrixByTollRoad(listOfCities)),
+            Task.Run(async () => calculateBestPathContext.FreeDistances = await googleApiClient.GetDurationMatrixByFreeRoad(listOfCities))
         };
 
         tasks.AddRange(DownloadCostMatrix(listOfCities, calculateBestPathContext));
@@ -46,7 +40,7 @@ public class DownloadRoadData : Chapter<CalculateBestPathContext>
                 var i1 = i;
                 var j1 = j;
                 tasks.Add(Task.Run(async () => (calculateBestPathContext.Costs[iterator], calculateBestPathContext.VinietaCosts[iterator]) =
-                    await _michelinApiClient.DownloadCostBetweenTwoCities(listOfCities[i1], listOfCities[j1])));
+                    await michelinApiClient.DownloadCostBetweenTwoCities(listOfCities[i1], listOfCities[j1])));
             }
         }
 
