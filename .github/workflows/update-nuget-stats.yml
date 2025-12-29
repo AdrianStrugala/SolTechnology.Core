@@ -2,45 +2,65 @@ name: Update NuGet Statistics
 
 on:
   schedule:
-    # Run weekly on Sunday at 00:00 UTC
     - cron: '0 0 * * 0'
-  workflow_dispatch: # Allow manual trigger
+  workflow_dispatch:
 
 jobs:
   update-stats:
     runs-on: ubuntu-latest
     permissions:
       contents: write
-    
-    # ❌ WAŻNE: USUŃ SEKCJĘ ENV Z TEGO MIEJSCA
-    # env:
-    #   GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
     steps:
     - uses: actions/checkout@v4
 
-    - name: Setup .NET
-      uses: actions/setup-dotnet@v4
-      with:
-        dotnet-version: '10.0.x'
-
-    - name: Install dotnet-sponsor
-      run: dotnet tool update --global dotnet-sponsor
-
-    # ✅ Logujemy się ręcznie, żeby utworzyć plik hosts.yml
-    # Używamy nazwy ENV_TOKEN, żeby gh nie myślał, że ma użyć zmiennej środowiskowej
-    - name: Authenticate GitHub CLI (File Mode)
-      env:
-        ENV_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      run: echo "$ENV_TOKEN" | gh auth login --with-token
-
-    # Opcjonalnie: sprawdźmy status, żeby zobaczyć różnicę w outpucie
-    - name: Verify GitHub CLI auth
-      run: gh auth status
-
-    - name: Generate NuGet statistics
-      # Tu już nie potrzebujemy zmiennych, bo gh bierze dane z pliku konfiguracyjnego
-      run: sponsor nuget --tos --oss-only false --owner AdrianStrugala -o nuget-stats.json
+    - name: Fetch NuGet Statistics
+      shell: pwsh
+      run: |
+        $owner = "AdrianStrugala"
+        $prefix = "SolTechnology."
+        
+        # Szukaj pakietów
+        $searchUrl = "https://api-v2v3search-0.nuget.org/query?q=owner:$owner&take=100"
+        $searchResult = Invoke-RestMethod -Uri $searchUrl
+        
+        $packages = @()
+        $totalDownloads = 0
+        
+        foreach ($package in $searchResult.data) {
+            if ($package.id -like "$prefix*") {
+                Write-Host "Processing: $($package.id) - $($package.totalDownloads.ToString('N0')) downloads"
+                
+                $totalDownloads += $package.totalDownloads
+                
+                $packages += @{
+                    id = $package.id
+                    downloads = $package.totalDownloads
+                    version = $package.version
+                }
+            }
+        }
+        
+        # Posortuj po liczbie pobrań
+        $packages = $packages | Sort-Object { $_.downloads } -Descending
+        
+        # Stwórz obiekt wynikowy
+        $result = @{
+            totals = @{
+                downloads = $totalDownloads
+                packages = $packages.Count
+            }
+            packages = $packages
+            lastUpdated = (Get-Date).ToString("yyyy-MM-ddTHH:mm:ssZ")
+        }
+        
+        # Zapisz do pliku
+        $result | ConvertTo-Json -Depth 10 | Set-Content "nuget-stats.json"
+        
+        # Pokaż podsumowanie
+        Write-Host "`n📊 Summary:"
+        Write-Host "Total packages: $($packages.Count)"
+        Write-Host "Total downloads: $($totalDownloads.ToString('N0'))"
 
     - name: Commit and push if changed
       run: |
