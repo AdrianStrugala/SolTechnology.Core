@@ -5,17 +5,19 @@ on:
     # Run weekly on Sunday at 00:00 UTC
     - cron: '0 0 * * 0'
   workflow_dispatch: # Allow manual trigger
+  workflow_dispatch:
 
 jobs:
   update-stats:
     runs-on: ubuntu-latest
     permissions:
       contents: write
+    
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
     steps:
     - uses: actions/checkout@v4
-      with:
-        token: ${{ secrets.GITHUB_TOKEN }}
 
     - name: Setup .NET
       uses: actions/setup-dotnet@v4
@@ -24,15 +26,11 @@ jobs:
 
     - name: Install dotnet-sponsor
       run: dotnet tool update --global dotnet-sponsor
-      
-    - name: Authenticate GitHub CLI
-      env:
-        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      run: echo "$GH_TOKEN" | gh auth login --with-token
+
+    - name: Verify GitHub CLI auth
+      run: gh auth status
 
     - name: Generate NuGet statistics
-      env:
-        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: sponsor nuget --tos --oss-only false --owner AdrianStrugala -o nuget-stats.json
 
     - name: Commit and push if changed
