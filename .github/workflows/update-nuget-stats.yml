@@ -9,6 +9,8 @@ on:
 jobs:
   update-stats:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
 
     steps:
     - uses: actions/checkout@v4
@@ -24,6 +26,8 @@ jobs:
       run: dotnet tool update --global dotnet-sponsor
 
     - name: Generate NuGet statistics
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: sponsor nuget --tos --oss-only false --owner AdrianStrugala -o nuget-stats.json
 
     - name: Commit and push if changed
