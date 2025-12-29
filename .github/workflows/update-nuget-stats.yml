@@ -12,8 +12,9 @@ jobs:
     permissions:
       contents: write
     
-    env:
-      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    # ❌ WAŻNE: USUŃ SEKCJĘ ENV Z TEGO MIEJSCA
+    # env:
+    #   GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
     steps:
     - uses: actions/checkout@v4
@@ -26,10 +27,19 @@ jobs:
     - name: Install dotnet-sponsor
       run: dotnet tool update --global dotnet-sponsor
 
+    # ✅ Logujemy się ręcznie, żeby utworzyć plik hosts.yml
+    # Używamy nazwy ENV_TOKEN, żeby gh nie myślał, że ma użyć zmiennej środowiskowej
+    - name: Authenticate GitHub CLI (File Mode)
+      env:
+        ENV_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: echo "$ENV_TOKEN" | gh auth login --with-token
+
+    # Opcjonalnie: sprawdźmy status, żeby zobaczyć różnicę w outpucie
     - name: Verify GitHub CLI auth
       run: gh auth status
 
     - name: Generate NuGet statistics
+      # Tu już nie potrzebujemy zmiennych, bo gh bierze dane z pliku konfiguracyjnego
       run: sponsor nuget --tos --oss-only false --owner AdrianStrugala -o nuget-stats.json
 
     - name: Commit and push if changed
