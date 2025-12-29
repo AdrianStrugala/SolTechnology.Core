@@ -10,6 +10,7 @@ using Microsoft.JSInterop;
 using MudBlazor;
 using MudBlazor.Services;
 using NSubstitute;
+using NUnit.Framework;
 using SolTechnology.Core.CQRS;
 using Path = DreamTravel.Domain.Paths.Path;
 

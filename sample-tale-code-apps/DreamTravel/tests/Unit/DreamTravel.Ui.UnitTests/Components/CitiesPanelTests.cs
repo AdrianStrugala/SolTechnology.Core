@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+using System.Linq;
 using Bunit;
 using DreamTravel.Domain.Cities;
 using DreamTravel.Ui.Components.TripPlanner;
@@ -6,6 +8,7 @@ using FluentAssertions;
 using Microsoft.AspNetCore.Components;
 using Microsoft.Extensions.DependencyInjection;
 using MudBlazor;
+using NUnit.Framework;
 
 namespace DreamTravel.Ui.UnitTests.Components;
 

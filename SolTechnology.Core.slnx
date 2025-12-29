@@ -39,10 +39,10 @@
   </Folder>
   <Folder Name="/SampleApps/DreamTravel/src/LogicLayer/">
     <Project Path="sample-tale-code-apps/DreamTravel/src/LogicLayer/DreamTravel.DomainServices/DreamTravel.DomainServices.csproj" />
-    <Project Path="sample-tale-code-apps/DreamTravel/src/LogicLayer/DreamTravel.Flows/DreamTravel.Flows.csproj" />
     <Project Path="sample-tale-code-apps/DreamTravel/src/LogicLayer/DreamTravel.Commands/DreamTravel.Commands.csproj" />
     <Project Path="sample-tale-code-apps/DreamTravel/src/LogicLayer/DreamTravel.Queries/DreamTravel.Queries.csproj" />
     <Project Path="sample-tale-code-apps/DreamTravel/src/LogicLayer/DreamTravel.TravelingSalesmanProblem/DreamTravel.TravelingSalesmanProblem.csproj" />
+    <Project Path="sample-tale-code-apps/DreamTravel/src/LogicLayer/DreamTravel.Workflows/DreamTravel.Workflows.csproj" />
   </Folder>
   <Folder Name="/SampleApps/DreamTravel/src/Presentation/">
     <Project Path="sample-tale-code-apps/DreamTravel/src/Presentation/DreamTravel.Api/DreamTravel.Api.csproj" />
@@ -78,6 +78,7 @@
     <Project Path="tests/SolTechnology.Core.AUID.Tests/SolTechnology.Core.AUID.Tests.csproj" />
     <Project Path="tests/SolTechnology.Core.Guards.Tests/SolTechnology.Core.Guards.Tests.csproj" />
     <Project Path="tests/SolTechnology.Core.Sql.Tests/SolTechnology.Core.Sql.Tests.csproj" />
+    <Project Path="tests/SolTechnology.Core.Story.Tests/SolTechnology.Core.Story.Tests.csproj" />
   </Folder>
   <Folder Name="/src/">
     <File Path="src/Directory.Build.props" />
@@ -89,7 +90,7 @@
     <Project Path="src/SolTechnology.Core.Cache/SolTechnology.Core.Cache.csproj" />
     <Project Path="src/SolTechnology.Core.CQRS/SolTechnology.Core.CQRS.csproj" />
     <Project Path="src/SolTechnology.Core.Faker/SolTechnology.Core.Faker.csproj" />
-    <Project Path="src/SolTechnology.Core.Flow/SolTechnology.Core.Flow.csproj" />
+    <Project Path="src/SolTechnology.Core.Story/SolTechnology.Core.Story.csproj" />
     <Project Path="src/SolTechnology.Core.Guards/SolTechnology.Core.Guards.csproj" />
     <Project Path="src/SolTechnology.Core.Logging/SolTechnology.Core.Logging.csproj" />
     <Project Path="src/SolTechnology.Core.MessageBus/SolTechnology.Core.MessageBus.csproj" />

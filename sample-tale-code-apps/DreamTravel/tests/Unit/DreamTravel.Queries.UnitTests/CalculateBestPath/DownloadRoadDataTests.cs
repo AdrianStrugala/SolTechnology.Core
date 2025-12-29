@@ -4,7 +4,7 @@ using DreamTravel.Domain.Cities;
 using DreamTravel.GeolocationDataClients.GoogleApi;
 using DreamTravel.GeolocationDataClients.MichelinApi;
 using DreamTravel.Queries.CalculateBestPath;
-using DreamTravel.Queries.CalculateBestPath.Executors;
+using DreamTravel.Queries.CalculateBestPath.Chapters;
 using FluentAssertions;
 using NSubstitute;
 
@@ -56,7 +56,7 @@ namespace DreamTravel.Queries.UnitTests.CalculateBestPath
                 .Returns(Task.FromResult((10.0, 5.0)));
 
             // Act
-            var result = await _sut.Execute(context);
+            var result = await _sut.Read(context);
 
             // Assert
             result.IsSuccess.Should().BeTrue();

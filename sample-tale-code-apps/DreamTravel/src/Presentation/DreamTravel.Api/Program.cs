@@ -12,9 +12,9 @@ using Microsoft.OpenApi.Models;
 using SolTechnology.Core.Api.Filters;
 using SolTechnology.Core.Authentication;
 using SolTechnology.Core.Cache;
-using SolTechnology.Core.Flow.Workflow;
 using SolTechnology.Core.Logging.Middleware;
 using SolTechnology.Core.Sql;
+using SolTechnology.Core.Story;
 
 namespace DreamTravel.Api;
 
@@ -87,9 +87,8 @@ public class Program
             builder.Configuration.GetSection("Neo4j"));
         builder.Services.InstallGraphDatabase();
         
-        //Journey
-        builder.Services.AddFlows();
-        builder.Services.AddFlowFramework();
+        //Journey (migrated to Story framework)
+        builder.Services.AddFlows(SolTechnology.Core.Story.StoryOptions.WithInMemoryPersistence());
         
         //The rest
         builder.Services.AddCache();

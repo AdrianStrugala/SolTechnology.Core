@@ -13,9 +13,9 @@
 </p>
 
 <p align="center">
- <a href="https://dotnet.microsoft.com/download/dotnet/10.0"><img src="https://img.shields.io/badge/%7F-10.0-512BD4?logo=dotnet"></a>
- <a href="https://github.com/AdrianStrugala/SolTechnology.Core/actions"><img src="https://img.shields.io/github/actions/workflow/status/AdrianStrugala/SolTechnology.Core/publishPackages.yml?branch=master&logo=github&label=build%26tests"></a> 
- <a href="https://www.nuget.org/packages?q=SolTechnology"><img src="https://badgen.net/badge/%E2%AD%90Stars/%E2%98%855%E2%98%85/yellow"></a>
+ <a href="https://dotnet.microsoft.com/download/dotnet/10.0"><img src="https://img.shields.io/badge/.NET-10.0-512BD4?logo=microsoft"></a>
+ <a href="https://www.nuget.org/packages?q=SolTechnology"><img src="https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fraw.githubusercontent.com%2FAdrianStrugala%2FSolTechnology.Core%2Fmaster%2Fnuget-stats.json&query=%24.totals.downloads&label=NuGet%20Downloads&logo=nuget&color=blue"></a>
+ <a href="https://github.com/AdrianStrugala/SolTechnology.Core/actions"><img src="https://img.shields.io/github/actions/workflow/status/AdrianStrugala/SolTechnology.Core/publishPackages.yml?branch=master&logo=github&label=build%26tests"></a>
 </p>
 
 <i>
@@ -23,7 +23,7 @@
 "Clean code is simple and direct. Clean code reads like well-written prose. Clean code never obscures the designer's intent but rather is full of crisp abstractions and straightforward lines of control."
 </p>
 <p align="right">
-~Grady Booch, author of *Object-Oriented Analysis and Design with Applications*
+~Grady Booch, author of 'Object-Oriented Analysis and Design with Applications'
 </p>
 </i>
 
@@ -41,7 +41,7 @@ The SolTechnology.Core repository contains a set of shared libraries. This is a 
 | [Blob Storage](https://github.com/AdrianStrugala/SolTechnology.Core/tree/master/docs/Blob.md)              | `Azure`, `Blob`, `Storage`, `no-SQL`             | <a href="https://www.nuget.org/packages/SolTechnology.Core.BlobStorage/"><img src="https://badgen.net/nuget/v/SolTechnology.Core.BlobStorage?icon=nuget&color=blue"></a> |
 | [Cache](https://github.com/AdrianStrugala/SolTechnology.Core/tree/master/docs/Cache.md)                    | `Cache`, `Memory`, `Performance`       | <a href="https://www.nuget.org/packages/SolTechnology.Core.Cache/"><img src="https://badgen.net/nuget/v/SolTechnology.Core.Cache?icon=nuget&color=blue"></a>           |
 | [CQRS](https://github.com/AdrianStrugala/SolTechnology.Core/tree/master/docs/CQRS.md)                      | `CQRS`, `Patterns`, `Architecture`     | <a href="https://www.nuget.org/packages/SolTechnology.Core.CQRS/"><img src="https://badgen.net/nuget/v/SolTechnology.Core.CQRS?icon=nuget&color=blue"></a>             |
-| [Flow](https://github.com/AdrianStrugala/SolTechnology.Core/tree/master/docs/Flow.md)                      | `Workflow`, `Chain`, `Pausable`, `Flow`| <a href="https://www.nuget.org/packages/SolTechnology.Core.Flow/"><img src="https://badgen.net/nuget/v/SolTechnology.Core.Flow?icon=nuget&color=blue"></a>             |
+| [Story Framework](https://github.com/AdrianStrugala/SolTechnology.Core/tree/master/docs/Story.md)          | `Workflow`, `Interactive`, `Tale Code` | <a href="https://www.nuget.org/packages/SolTechnology.Core.Story/"><img src="https://badgen.net/nuget/v/SolTechnology.Core.Story?icon=nuget&color=blue"></a>             |
 | [Guards](https://github.com/AdrianStrugala/SolTechnology.Core/tree/master/docs/Guards.md)                  | `Validation`, `Guards`, `Checks`       | <a href="https://www.nuget.org/packages/SolTechnology.Core.Guards/"><img src="https://badgen.net/nuget/v/SolTechnology.Core.Guards?icon=nuget&color=blue"></a>        |
 | [Logging](https://github.com/AdrianStrugala/SolTechnology.Core/tree/master/docs/Log.md)                    | `Logging`, `Diagnostics`, `Tracing`    | <a href="https://www.nuget.org/packages/SolTechnology.Core.Logging/"><img src="https://badgen.net/nuget/v/SolTechnology.Core.Logging?icon=nuget&color=blue"></a>       |
 | [Message Bus](https://github.com/AdrianStrugala/SolTechnology.Core/tree/master/docs/Bus.md)                | `Azure`, `Messaging`, `Async`, `Queue`          | <a href="https://www.nuget.org/packages/SolTechnology.Core.MessageBus/"><img src="https://badgen.net/nuget/v/SolTechnology.Core.MessageBus?icon=nuget&color=blue"></a>  |
@@ -60,7 +60,7 @@ In the Tale Code approach, I am trying to summarize all the information about co
 "Make your code a pleasure to read, like a tale."
 </p>
 <p align="right">
-~Adrian Strugała
+~Adrian Aleksander Strugała
 </p>
 </i>
 
@@ -69,17 +69,21 @@ The sample application is the most common case that came to my mind. It's built 
 ![design](./docs/taleCodeArchitecture.png)
 
 <p>
-<b>Code design is the main goal</b> of Tale Code. Logical flow and code structure are described in detail, and it even follows a more human-friendly, functional-like notation:
+<b>Code design is the main goal</b> of Tale Code. Logical flow and code structure are described in detail, and it reads like a well-written story:
 
 ```csharp
-var context = new CalculateBestPathContext(cities!);
+public class CalculateBestPathStory : StoryHandler<Input, Context, Output>
+{
+    protected override async Task TellStory()
+    {
+        await ReadChapter<DownloadRoadDataChapter>();
+        await ReadChapter<FindProfitablePathChapter>();
+        await ReadChapter<SolveTspChapter>();
+        await ReadChapter<FormResultChapter>();
 
-var result = await Chain
-     .Start(context, cancellationToken)
-     .Then(_downloadRoadData)
-     .Then(_findProfitablePath)
-     .Then(_solveTSP)
-     .End(_formResult);
+        context.Output.BestPath = context.OptimalRoute;
+    }
+}
 ```
 
 

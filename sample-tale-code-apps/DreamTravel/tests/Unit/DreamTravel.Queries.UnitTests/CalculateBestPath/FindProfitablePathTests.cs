@@ -1,6 +1,6 @@
 ﻿using DreamTravel.Domain.Cities;
 using DreamTravel.Queries.CalculateBestPath;
-using DreamTravel.Queries.CalculateBestPath.Executors;
+using DreamTravel.Queries.CalculateBestPath.Chapters;
 
 namespace DreamTravel.Queries.UnitTests.CalculateBestPath
 {
@@ -50,7 +50,7 @@ namespace DreamTravel.Queries.UnitTests.CalculateBestPath
 
 
             //Act 
-            await _sut.Execute(matrix);
+            await _sut.Read(matrix);
 
 
             //Assert

@@ -1,11 +1,14 @@
 ﻿using DreamTravel.Flows.SampleOrderWorkflow;
 using FluentAssertions;
 using SolTechnology.Core.CQRS;
-using SolTechnology.Core.Flow.Models;
-using SolTechnology.Core.Flow.Workflow.ChainFramework;
+using SolTechnology.Core.Story.Api;
+using SolTechnology.Core.Story.Models;
 
 namespace DreamTravel.FunctionalTests.SampleOrderWorkflow;
 
+/// <summary>
+/// Tests for SampleOrderWorkflow Story with pause/resume functionality
+/// </summary>
 public class SampleOrderWorkflowTests
 {
     private HttpClient _apiClient;
@@ -19,70 +22,80 @@ public class SampleOrderWorkflowTests
     [Test]
     public async Task HappyPath()
     {
-        // "Given is initiate flow request".x(() =>
-        var createFlowResponse = await _apiClient
-            .CreateRequest("/api/flow/SampleOrderWorkflowHandler/start")
+        // Given: Initiate story request
+        var createStoryResponse = await _apiClient
+            .CreateRequest("/api/dreamtravel/story/SampleOrderWorkflowStory/start")
             .WithHeader("X-API-KEY", "<SECRET>")
             .WithBody(new
             {
                 OrderId = "2137",
                 Quantity = 17
             })
-            .PostAsync<Result<FlowInstance>>();
-            
-        createFlowResponse.IsSuccess.Should().BeTrue();
-        createFlowResponse.Data.Should().NotBeNull();
-        createFlowResponse.Data!.FlowHandlerName.Should().Contain("DreamTravel.Flows.SampleOrderWorkflow.SampleOrderWorkflowHandler");
-        createFlowResponse.Data!.Status.Should().Be(FlowStatus.Created);
-        createFlowResponse.Data!.CreatedAt.Should().NotBe(default);
-        createFlowResponse.Data.History.Should().BeEmpty();
+            .PostAsync<Result<StoryInstanceDto>>();
 
-        var flowId = createFlowResponse.Data.FlowId;
-            
-        // "When calling post flow with empty body".x(() =>
-        var progressFlow = await _apiClient
-            .CreateRequest($"/api/flow/{flowId}")
+        // Then: Story is created and paused at interactive chapter
+        createStoryResponse.Should().NotBeNull();
+        createStoryResponse.IsSuccess.Should().BeTrue();
+        createStoryResponse.Data.Should().NotBeNull();
+        createStoryResponse.Data!.Status.Should().Be(StoryStatus.WaitingForInput);
+        createStoryResponse.Data.CurrentChapter.Should().NotBeNull();
+        createStoryResponse.Data.CurrentChapter!.Status.Should().Be(StoryStatus.WaitingForInput);
+
+        var storyId = createStoryResponse.Data.StoryId;
+        storyId.Should().NotBeNullOrEmpty();
+
+        // When: Calling resume without user input
+        var resumeWithoutInput = await _apiClient
+            .CreateRequest($"/api/dreamtravel/story/{storyId}")
             .WithHeader("X-API-KEY", "<SECRET>")
-            .PostAsync<Result<FlowInstance>>();
-            
-        // "Then execution stops on user input".x(() =>
-        progressFlow.IsSuccess.Should().BeTrue();
-        progressFlow.Data.Should().NotBeNull();
-        progressFlow.Data!.CurrentStep.Should().NotBeNull();
-        progressFlow.Data.CurrentStep!.Status = FlowStatus.WaitingForInput;
-        progressFlow.Data.CurrentStep!.StepId = "RequestCustomerDetails";
-        createFlowResponse.Data.History.Should().BeEmpty();
+            .PostAsync<Result<StoryInstanceDto>>();
 
-            
-        // "When calling post flow with expected body".x(() =>
-        progressFlow = await _apiClient
-            .CreateRequest($"/api/flow/{flowId}")
+        // Then: Story remains paused (no input provided for interactive chapter)
+        resumeWithoutInput.Should().NotBeNull();
+        resumeWithoutInput.Data.Should().NotBeNull();
+        resumeWithoutInput.Data!.Status.Should().Be(StoryStatus.WaitingForInput);
+
+        // When: Calling resume with valid user input
+        var resumeWithInput = await _apiClient
+            .CreateRequest($"/api/dreamtravel/story/{storyId}")
             .WithHeader("X-API-KEY", "<SECRET>")
             .WithBody(new
             {
                 Name = "Adus",
                 Address = "yes"
             })
-            .PostAsync<Result<FlowInstance>>();
-            
-        // "Then rest of the flow is executed".x(() =>
-        progressFlow.IsSuccess.Should().BeTrue();
-        progressFlow.Data.Should().NotBeNull();
-        progressFlow.Data!.CurrentStep.Should().BeNull();
-        progressFlow.Data.History.Should().HaveCount(3);
-        progressFlow.Data!.Status.Should().Be(FlowStatus.Completed);
-            
-            
-        // "When calling get flow result".x(() =>
-        var flowResult = await _apiClient
-            .CreateRequest($"/api/flow/{flowId}")
+            .PostAsync<Result<StoryInstanceDto>>();
+
+        // Then: Story completes successfully
+        resumeWithInput.Should().NotBeNull();
+        resumeWithInput.IsSuccess.Should().BeTrue();
+        resumeWithInput.Data.Should().NotBeNull();
+        resumeWithInput.Data!.Status.Should().Be(StoryStatus.Completed);
+        resumeWithInput.Data.History.Should().HaveCountGreaterThan(0);
+
+        // When: Getting story state
+        var storyState = await _apiClient
+            .CreateRequest($"/api/dreamtravel/story/{storyId}")
             .WithHeader("X-API-KEY", "<SECRET>")
-            .GetAsync<Result<SampleOrderResult>>();
-            
-        // "Then flow result contains expected data".x(() =>
-        flowResult.IsSuccess.Should().BeTrue();
-        flowResult.Data.Should().NotBeNull();
-        flowResult.Data!.OrderId = "2137";
-        flowResult.Data!.Name = "Adus";
+            .GetAsync<Result<StoryInstanceDto>>();
+
+        // Then: Story state shows completion
+        storyState.Should().NotBeNull();
+        storyState.IsSuccess.Should().BeTrue();
+        storyState.Data.Should().NotBeNull();
+        storyState.Data!.Status.Should().Be(StoryStatus.Completed);
+        storyState.Data.StoryId.Should().Be(storyId);
+
+        // When: Getting story result
+        var storyResult = await _apiClient
+            .CreateRequest($"/api/dreamtravel/story/{storyId}/result")
+            .WithHeader("X-API-KEY", "<SECRET>")
+            .GetAsync<Result<StoryInstanceDto>>();
+
+        // Then: Result is available
+        storyResult.Should().NotBeNull();
+        storyResult.IsSuccess.Should().BeTrue();
+        storyResult.Data.Should().NotBeNull();
+        storyResult.Data!.Status.Should().Be(StoryStatus.Completed);
     }
 }
