@@ -1,5 +1,5 @@
 ﻿using Azure.Messaging.ServiceBus;
-using Microsoft.Azure.ServiceBus.Management;
+using Azure.Messaging.ServiceBus.Administration;
 using Microsoft.Extensions.Options;
 using SolTechnology.Core.MessageBus.Configuration;
 
@@ -9,7 +9,7 @@ namespace SolTechnology.Core.MessageBus.Broker
     {
         private readonly ServiceBusClient _serviceBusClient;
         private readonly bool _createResources;
-        private readonly ManagementClient _managementClient;
+        private readonly ServiceBusAdministrationClient? _managementClient;
 
         private static readonly List<(string, ServiceBusSender)> MessageToSenderMap = new();
         private static readonly List<(Type, ServiceBusProcessor)> MessageToProcessorMap = new();
@@ -31,7 +31,7 @@ namespace SolTechnology.Core.MessageBus.Broker
 
             if (_createResources)
             {
-                _managementClient = new ManagementClient(connectionString);
+                _managementClient = new ServiceBusAdministrationClient(connectionString);
             }
         }
 
@@ -41,9 +41,9 @@ namespace SolTechnology.Core.MessageBus.Broker
             var topicSender = _serviceBusClient.CreateSender(topicName);
             MessageToSenderMap.Add((messageType, topicSender));
 
-            if (_createResources)
+            if (_createResources && _managementClient != null)
             {
-                if (!_managementClient.TopicExistsAsync(topicName).GetAwaiter().GetResult())
+                if (!_managementClient.TopicExistsAsync(topicName).GetAwaiter().GetResult().Value)
                 {
                     _managementClient.CreateTopicAsync(topicName).GetAwaiter().GetResult();
                 }
@@ -76,9 +76,9 @@ namespace SolTechnology.Core.MessageBus.Broker
             ServiceBusProcessor serviceBusProcessor = _serviceBusClient.CreateProcessor(topicName, subscriptionName, serviceBusProcessorOptions);
             MessageToProcessorMap.Add((messageType, serviceBusProcessor));
 
-            if (_createResources)
+            if (_createResources && _managementClient != null)
             {
-                if (!_managementClient.SubscriptionExistsAsync(topicName, subscriptionName).GetAwaiter().GetResult())
+                if (!_managementClient.SubscriptionExistsAsync(topicName, subscriptionName).GetAwaiter().GetResult().Value)
                 {
                     _managementClient.CreateSubscriptionAsync(topicName, subscriptionName).GetAwaiter().GetResult();
                 }
@@ -109,9 +109,9 @@ namespace SolTechnology.Core.MessageBus.Broker
             var queueSender = _serviceBusClient.CreateSender(queueName);
             MessageToSenderMap.Add((messageType, queueSender));
 
-            if (_createResources)
+            if (_createResources && _managementClient != null)
             {
-                if (!_managementClient.QueueExistsAsync(queueName).GetAwaiter().GetResult())
+                if (!_managementClient.QueueExistsAsync(queueName).GetAwaiter().GetResult().Value)
                 {
                     _managementClient.CreateQueueAsync(queueName).GetAwaiter().GetResult();
                 }
@@ -129,9 +129,9 @@ namespace SolTechnology.Core.MessageBus.Broker
             ServiceBusProcessor serviceBusProcessor = _serviceBusClient.CreateProcessor(queueName, serviceBusProcessorOptions);
             MessageToProcessorMap.Add((messageType, serviceBusProcessor));
 
-            if (_createResources)
+            if (_createResources && _managementClient != null)
             {
-                if (!_managementClient.QueueExistsAsync(queueName).GetAwaiter().GetResult())
+                if (!_managementClient.QueueExistsAsync(queueName).GetAwaiter().GetResult().Value)
                 {
                     _managementClient.CreateQueueAsync(queueName).GetAwaiter().GetResult();
                 }

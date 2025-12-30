@@ -85,6 +85,104 @@ dotnet test SolTechnology.Core.Guards.Tests --no-build
 dotnet pack -c Release -o . ./src/SolTechnology.Core.CQRS/SolTechnology.Core.CQRS.csproj
 ```
 
+### Dependency Management
+
+**CRITICAL: Always update packages at source, never mask problems with overrides.**
+
+When encountering NuGet security warnings (NU1902, NU1903, NU1603):
+
+#### 1. **Identify the Root Cause** (Don't Add Overrides Immediately!)
+
+```bash
+# Check which package introduces the vulnerable dependency
+dotnet list <project.csproj> package --include-transitive | grep -B3 "<VulnerablePackage>"
+
+# Check for outdated packages
+dotnet list <project.csproj> package --outdated
+```
+
+#### 2. **Fix at Source** (Preferred Approach)
+
+**Option A: Update the parent package**
+```bash
+# Example: If Microsoft.AspNetCore.Authentication 2.2.0 brings old dependencies
+# Update it to the latest version or remove if unused
+dotnet add package Microsoft.AspNetCore.Authentication --version 2.3.0
+```
+
+**Option B: Remove unused packages**
+```bash
+# Check if package is actually used in code
+grep -r "PackageName" <project-directory> --include="*.cs"
+
+# If not used, remove it completely
+dotnet remove package PackageName
+```
+
+**Option C: Migrate to newer SDK**
+```bash
+# Example: Microsoft.Azure.ServiceBus (old) → Azure.Messaging.ServiceBus (new)
+# 1. Update code to use new namespaces
+# 2. Remove old package, add new one
+dotnet remove package Microsoft.Azure.ServiceBus
+dotnet add package Azure.Messaging.ServiceBus
+```
+
+#### 3. **Override Only as Last Resort**
+
+Only add direct `PackageReference` overrides when:
+- The parent package cannot be updated (breaking changes)
+- The parent package is a third-party library you don't control
+- Migration to a new package is not feasible
+
+```xml
+<!-- Last resort: Override transitive dependency -->
+<ItemGroup>
+  <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
+</ItemGroup>
+```
+
+**Add overrides ONLY in the project that directly references the problematic parent package** - transitive dependencies will propagate to child projects automatically.
+
+#### 4. **Verify the Fix**
+
+```bash
+# Build and check for security warnings
+dotnet build SolTechnology.Core.slnx 2>&1 | grep -E "NU1902|NU1903|NU1603"
+
+# Should return nothing if all vulnerabilities are fixed
+```
+
+#### Example: Fixing Hangfire Security Warning
+
+❌ **BAD** (Masking the problem):
+```xml
+<!-- DreamTravel.Commands.csproj -->
+<PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
+
+<!-- DreamTravel.Queries.csproj -->
+<PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
+
+<!-- DreamTravel.Infrastructure.csproj -->
+<PackageReference Include="Hangfire.Core" Version="1.8.16" />  <!-- Old version! -->
+<PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
+```
+
+✅ **GOOD** (Fixing at source):
+```xml
+<!-- DreamTravel.Infrastructure.csproj -->
+<PackageReference Include="Hangfire.Core" Version="1.8.22" />  <!-- Updated! -->
+<PackageReference Include="Newtonsoft.Json" Version="13.0.4" />  <!-- Only here if still needed -->
+
+<!-- Child projects automatically get the fix through ProjectReference -->
+```
+
+**Why this matters:**
+- Updating at source fixes the root cause
+- Reduces duplicate package references across projects
+- Makes future maintenance easier
+- Ensures compatibility with the parent package's expectations
+
 ## Claude Code Workflow
 
 **IMPORTANT**: When working on tasks, always verify changes by building the solution after completing each task.
