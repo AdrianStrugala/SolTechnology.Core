@@ -17,7 +17,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\..\..\..\src\SolTechnology.Core.AUID\SolTechnology.Core.AUID.csproj" />
-    <ProjectReference Include="..\..\..\..\..\src\SolTechnology.Core.Sql\SolTechnology.Core.Sql.csproj" />
+    <ProjectReference Include="..\..\..\..\..\src\SolTechnology.Core.SQL\SolTechnology.Core.SQL.csproj" />
     <ProjectReference Include="..\..\DreamTravel.Domain\DreamTravel.Domain.csproj" />
   </ItemGroup>
 

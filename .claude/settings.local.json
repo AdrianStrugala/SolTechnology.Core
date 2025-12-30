@@ -81,7 +81,8 @@
       "Bash(Get-ChildItem -Recurse -Filter \"*.globalconfig\")",
       "Bash(Select-Object -First 5)",
       "Bash(timeout 300 dotnet build:*)",
-      "Bash(powershell.exe -File ..githubrunTests.ps1)"
+      "Bash(powershell.exe -File ..githubrunTests.ps1)",
+      "Bash(Select-String:*)"
     ],
     "deny": [],
     "ask": []

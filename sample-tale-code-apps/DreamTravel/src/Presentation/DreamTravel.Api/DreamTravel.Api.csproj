@@ -31,7 +31,7 @@
 		</None>
 	</ItemGroup>
 	<ItemGroup>
-	  <ProjectReference Include="..\..\..\..\..\src\SolTechnology.Core.Api\SolTechnology.Core.Api.csproj" />
+	  <ProjectReference Include="..\..\..\..\..\src\SolTechnology.Core.API\SolTechnology.Core.API.csproj" />
 	  <ProjectReference Include="..\..\..\..\..\src\SolTechnology.Core.Authentication\SolTechnology.Core.Authentication.csproj" />
 	  <ProjectReference Include="..\..\..\..\..\src\SolTechnology.Core.CQRS\SolTechnology.Core.CQRS.csproj" />
 	  <ProjectReference Include="..\..\DataLayer\DreamTravel.GraphDatabase\DreamTravel.GraphDatabase.csproj" />

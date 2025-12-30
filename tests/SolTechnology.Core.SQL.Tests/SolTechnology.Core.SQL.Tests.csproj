@@ -19,7 +19,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\SolTechnology.Core.Sql\SolTechnology.Core.Sql.csproj" />
+    <ProjectReference Include="..\..\src\SolTechnology.Core.SQL\SolTechnology.Core.SQL.csproj" />
   </ItemGroup>
 
 </Project>
