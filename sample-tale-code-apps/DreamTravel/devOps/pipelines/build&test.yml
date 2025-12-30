@@ -112,7 +112,7 @@ stages:
         - task: CopyFiles@2
           displayName: 'Publish Infrastructure'
           inputs:
-            sourceFolder: '$(workingDirectory)/../devOps/infrastructure'
+            sourceFolder: '$(workingDirectory)/devOps/infrastructure'
             contents: '*'
             targetFolder: $(Build.ArtifactStagingDirectory)/Infrastructure
 
