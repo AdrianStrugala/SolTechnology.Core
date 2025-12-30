@@ -13,17 +13,17 @@ namespace DreamTravel.Queries.UnitTests.CalculateBestPath
     public class DownloadRoadDataTests
     {
         private readonly DownloadRoadData _sut;
-        private readonly IGoogleApiClient _googleApiClient;
-        private readonly IMichelinApiClient _michelinApiClient;
-        
+        private readonly IGoogleHTTPClient _googleHTTPClient;
+        private readonly IMichelinHTTPClient _michelinHTTPClient;
+
         public DownloadRoadDataTests()
         {
             var fixture = new Fixture().Customize(
                 new AutoNSubstituteCustomization { ConfigureMembers = true });
 
-            _googleApiClient = fixture.Freeze<IGoogleApiClient>();
-            _michelinApiClient = fixture.Freeze<IMichelinApiClient>();
-            
+            _googleHTTPClient = fixture.Freeze<IGoogleHTTPClient>();
+            _michelinHTTPClient = fixture.Freeze<IMichelinHTTPClient>();
+
             _sut = fixture.Create<DownloadRoadData>();
         } 
         [Fact]
@@ -48,11 +48,11 @@ namespace DreamTravel.Queries.UnitTests.CalculateBestPath
             // Setup Google API substitutes to return dummy double arrays.
             var tollMatrix = new double[] { 1.1, 2.2, 3.3 };
             var freeMatrix = new double[] { 4.4, 5.5, 6.6 };
-            _googleApiClient.GetDurationMatrixByTollRoad(cities).Returns(Task.FromResult(tollMatrix));
-            _googleApiClient.GetDurationMatrixByFreeRoad(cities).Returns(Task.FromResult(freeMatrix));
+            _googleHTTPClient.GetDurationMatrixByTollRoad(cities).Returns(Task.FromResult(tollMatrix));
+            _googleHTTPClient.GetDurationMatrixByFreeRoad(cities).Returns(Task.FromResult(freeMatrix));
 
             // Setup Michelin API substitute: for any city pair, return (10.0, 5.0).
-            _michelinApiClient.DownloadCostBetweenTwoCities(Arg.Any<City>(), Arg.Any<City>())
+            _michelinHTTPClient.DownloadCostBetweenTwoCities(Arg.Any<City>(), Arg.Any<City>())
                 .Returns(Task.FromResult((10.0, 5.0)));
 
             // Act
@@ -72,9 +72,9 @@ namespace DreamTravel.Queries.UnitTests.CalculateBestPath
             }
 
             // Verify that each Google API method was called exactly once.
-            await _googleApiClient.Received(1).GetDurationMatrixByTollRoad(cities);
-            await _googleApiClient.Received(1).GetDurationMatrixByFreeRoad(cities);
+            await _googleHTTPClient.Received(1).GetDurationMatrixByTollRoad(cities);
+            await _googleHTTPClient.Received(1).GetDurationMatrixByFreeRoad(cities);
             // Verify that the Michelin API was called for every city pair (9 calls).
-            await _michelinApiClient.Received(expectedLength).DownloadCostBetweenTwoCities(Arg.Any<City>(), Arg.Any<City>());}
+            await _michelinHTTPClient.Received(expectedLength).DownloadCostBetweenTwoCities(Arg.Any<City>(), Arg.Any<City>());}
     }
 }

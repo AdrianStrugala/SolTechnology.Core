@@ -35,7 +35,7 @@ namespace DreamTravel.FunctionalTests.Trips
             // "Given is fake google city API".x(() =>
             foreach (var city in cities)
             {
-                _wireMockFixture.Fake<IGoogleApiClient>()
+                _wireMockFixture.Fake<IGoogleHTTPClient>()
                     .WithRequest(x => x.GetLocationOfCity, city.Name)
                     .WithResponse(x => x
                         .WithSuccess()
@@ -43,11 +43,11 @@ namespace DreamTravel.FunctionalTests.Trips
             }
 
             // "Given is fake google distance API".x(() =>
-            _wireMockFixture.Fake<IGoogleApiClient>()
+            _wireMockFixture.Fake<IGoogleHTTPClient>()
                 .WithRequest(x => x.GetDurationMatrixByFreeRoad, cities)
                 .WithResponse(x => x.WithSuccess().WithBody(GoogleFakeApi.FreeDistanceMatrix));
 
-            _wireMockFixture.Fake<IGoogleApiClient>()
+            _wireMockFixture.Fake<IGoogleHTTPClient>()
                 .WithRequest(x => x.GetDurationMatrixByTollRoad, cities)
                 .WithResponse(x => x.WithSuccess().WithBody(GoogleFakeApi.TollDistanceMatrix));
 

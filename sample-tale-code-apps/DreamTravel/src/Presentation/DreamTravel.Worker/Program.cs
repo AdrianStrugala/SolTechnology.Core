@@ -7,7 +7,7 @@ using DreamTravel.Worker.BackgroundJobs;
 using EntityGraphQL.AspNet;
 using Hangfire;
 using SolTechnology.Core.Cache;
-using SolTechnology.Core.Sql;
+using SolTechnology.Core.SQL;
 using System.Globalization;
 using DreamTravel.DomainServices;
 using DreamTravel.ServiceDefaults;
@@ -32,7 +32,7 @@ public class Program
 
         
         //INSTALL MODULES
-        var sqlConfiguration = builder.Configuration.GetSection("Sql").Get<SqlConfiguration>()!;
+        var sqlConfiguration = builder.Configuration.GetSection("Sql").Get<SQLConfiguration>()!;
         builder.Services.InstallTripsSql(sqlConfiguration);
         builder.Services.InstallGeolocationDataClients();
         builder.Services.InstallInfrastructure();

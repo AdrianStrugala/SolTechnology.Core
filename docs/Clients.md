@@ -1,13 +1,13 @@
 ### Overview
 
-The SolTechnology.Core.ApiClient library provides minimum functionality needed for API calls over HTTP. It handles needed services registration and configuration and a result provides HttpClients.
+The SolTechnology.Core.HTTP library provides minimum functionality needed for API calls over HTTP. It handles needed services registration and configuration and a result provides HttpClients.
 
 ### Registration
 
-For installing the library, reference **SolTechnology.Core.ApiClient** nuget package and invoke **AddApiClient<IApiClient, ApiClient>("http-client-name")** service collection extension method:
+For installing the library, reference **SolTechnology.Core.HTTP** nuget package and invoke **AddHTTPClient<IHTTPClient, HTTPClient>("http-client-name")** service collection extension method:
 
 ```csharp
-services.AddApiClient<IFootballDataApiClient, FootballDataApiClient>("football-data");  //has to match the name from configuration
+services.AddHTTPClient<IFootballDataHTTPClient, FootballDataHTTPClient>("football-data");  //has to match the name from configuration
 ```
 
 ### Configuration
@@ -16,7 +16,7 @@ services.AddApiClient<IFootballDataApiClient, FootballDataApiClient>("football-d
 
 ```csharp
   "Configuration": {
-    "ApiClients": {
+    "HTTPClients": {
       "football-data": {
         "BaseAddress": "http://api.football-data.org",
         "Headers": [
@@ -46,7 +46,7 @@ services.AddApiClient<IFootballDataApiClient, FootballDataApiClient>("football-d
 2) Alternatevely the same settings can be provided by optional parameter during registration:
 
 ```csharp
-    var footballDataApiConfiguration = new ApiClientConfiguration
+    var footballDataHTTPConfiguration = new HTTPClientConfiguration
     {
         BaseAddress = "http://api.football-data.org",
         Name = "football-data",
@@ -60,7 +60,7 @@ services.AddApiClient<IFootballDataApiClient, FootballDataApiClient>("football-d
         }
     };
 
-    services.AddApiClient<IFootballDataApiClient, FootballDataApiClient>("football-data", footballDataApiConfiguration);  //has to match the name from configuration
+    services.AddHTTPClient<IFootballDataHTTPClient, FootballDataHTTPClient>("football-data", footballDataHTTPConfiguration);  //has to match the name from configuration
 ```
 
 
@@ -69,7 +69,7 @@ services.AddApiClient<IFootballDataApiClient, FootballDataApiClient>("football-d
 1) Inject HttpClient to previously registered class
 
 ```csharp
-      public FootballDataApiClient(HttpClient httpClient)
+      public FootballDataHTTPClient(HttpClient httpClient)
         {
             _httpClient = httpClient;
         }

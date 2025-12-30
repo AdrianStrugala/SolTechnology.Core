@@ -11,7 +11,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\..\..\src\SolTechnology.Core.ApiClient\SolTechnology.Core.ApiClient.csproj" />
+    <ProjectReference Include="..\..\..\..\..\src\SolTechnology.Core.HTTP\SolTechnology.Core.HTTP.csproj" />
     <ProjectReference Include="..\..\..\..\..\src\SolTechnology.Core.CQRS\SolTechnology.Core.CQRS.csproj" />
     <ProjectReference Include="..\..\DreamTravel.Domain\DreamTravel.Domain.csproj" />
   </ItemGroup>

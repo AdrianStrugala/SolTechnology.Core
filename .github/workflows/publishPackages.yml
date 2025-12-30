@@ -28,14 +28,14 @@ jobs:
       run: |
            .\.github\runTests.ps1
    
-    - name: Pack SolTechnology.Core.Sql
-      run: dotnet pack -c Release -o . ./src/SolTechnology.Core.Sql/SolTechnology.Core.Sql.csproj
+    - name: Pack SolTechnology.Core.SQL
+      run: dotnet pack -c Release -o . ./src/SolTechnology.Core.SQL/SolTechnology.Core.SQL.csproj
 
     - name: Pack SolTechnology.Core.BlobStorage
       run: dotnet pack -c Release -o . ./src/SolTechnology.Core.BlobStorage/SolTechnology.Core.BlobStorage.csproj
 
-    - name: Pack SolTechnology.Core.ApiClient
-      run: dotnet pack -c Release -o . ./src/SolTechnology.Core.ApiClient/SolTechnology.Core.ApiClient.csproj
+    - name: Pack SolTechnology.Core.HTTP
+      run: dotnet pack -c Release -o . ./src/SolTechnology.Core.HTTP/SolTechnology.Core.HTTP.csproj
 
     - name: Pack SolTechnology.Core.Guards
       run: dotnet pack -c Release -o . ./src/SolTechnology.Core.Guards/SolTechnology.Core.Guards.csproj
@@ -55,8 +55,8 @@ jobs:
     - name: Pack SolTechnology.Core.CQRS
       run: dotnet pack -c Release -o . ./src/SolTechnology.Core.CQRS/SolTechnology.Core.CQRS.csproj
 
-    - name: Pack SolTechnology.Core.Api
-      run: dotnet pack -c Release -o . ./src/SolTechnology.Core.Api/SolTechnology.Core.Api.csproj
+    - name: Pack SolTechnology.Core.API
+      run: dotnet pack -c Release -o . ./src/SolTechnology.Core.API/SolTechnology.Core.API.csproj
 
     - name: Pack SolTechnology.Core.Cache
       run: dotnet pack -c Release -o . ./src/SolTechnology.Core.Cache/SolTechnology.Core.Cache.csproj

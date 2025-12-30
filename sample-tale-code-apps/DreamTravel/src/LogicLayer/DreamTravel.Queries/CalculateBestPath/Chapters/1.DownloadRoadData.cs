@@ -8,7 +8,7 @@ using SolTechnology.Core.Story;
 namespace DreamTravel.Queries.CalculateBestPath.Chapters;
 
 [UsedImplicitly]
-public class DownloadRoadData(IGoogleApiClient googleApiClient, IMichelinApiClient michelinApiClient)
+public class DownloadRoadData(IGoogleHTTPClient googleHTTPClient, IMichelinHTTPClient michelinHTTPClient)
     : Chapter<CalculateBestPathContext>
 {
     public override async Task<Result> Read(CalculateBestPathContext calculateBestPathContext)
@@ -16,8 +16,8 @@ public class DownloadRoadData(IGoogleApiClient googleApiClient, IMichelinApiClie
         var listOfCities = calculateBestPathContext.Cities;
         List<Task> tasks = new List<Task>
         {
-            Task.Run(async () => calculateBestPathContext.TollDistances = await googleApiClient.GetDurationMatrixByTollRoad(listOfCities)),
-            Task.Run(async () => calculateBestPathContext.FreeDistances = await googleApiClient.GetDurationMatrixByFreeRoad(listOfCities))
+            Task.Run(async () => calculateBestPathContext.TollDistances = await googleHTTPClient.GetDurationMatrixByTollRoad(listOfCities)),
+            Task.Run(async () => calculateBestPathContext.FreeDistances = await googleHTTPClient.GetDurationMatrixByFreeRoad(listOfCities))
         };
 
         tasks.AddRange(DownloadCostMatrix(listOfCities, calculateBestPathContext));
@@ -40,7 +40,7 @@ public class DownloadRoadData(IGoogleApiClient googleApiClient, IMichelinApiClie
                 var i1 = i;
                 var j1 = j;
                 tasks.Add(Task.Run(async () => (calculateBestPathContext.Costs[iterator], calculateBestPathContext.VinietaCosts[iterator]) =
-                    await michelinApiClient.DownloadCostBetweenTwoCities(listOfCities[i1], listOfCities[j1])));
+                    await michelinHTTPClient.DownloadCostBetweenTwoCities(listOfCities[i1], listOfCities[j1])));
             }
         }
 

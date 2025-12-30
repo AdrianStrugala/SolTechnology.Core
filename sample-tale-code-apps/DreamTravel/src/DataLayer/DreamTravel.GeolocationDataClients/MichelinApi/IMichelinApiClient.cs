@@ -2,7 +2,7 @@
 
 namespace DreamTravel.GeolocationDataClients.MichelinApi
 {
-    public interface IMichelinApiClient
+    public interface IMichelinHTTPClient
     {
         Task<(double, double)> DownloadCostBetweenTwoCities(City origin, City destination);
     }

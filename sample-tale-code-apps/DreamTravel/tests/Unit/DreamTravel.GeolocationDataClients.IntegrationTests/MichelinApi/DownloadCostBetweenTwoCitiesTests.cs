@@ -11,7 +11,7 @@ namespace DreamTravel.GeolocationDataClients.IntegrationTests.MichelinApi
 {
     public class DownloadCostBetweenTwoCitiesTests
     {
-        private readonly MichelinApiClient _sut = new MichelinApiClient(Options.Create(new MichelinApiOptions()), Substitute.For<HttpClient>(), NullLogger<MichelinApiClient>.Instance);
+        private readonly MichelinHTTPClient _sut = new MichelinHTTPClient(Options.Create(new MichelinHTTPOptions()), Substitute.For<HttpClient>(), NullLogger<MichelinHTTPClient>.Instance);
 
 
         [Fact(Skip = "Paid test")]

@@ -209,7 +209,7 @@ public class CityDomainService(
     IAssignAlternativeNameStep assignAlternativeNameStep,
     IIncrementSearchCountStep incrementSearchCountStep,
     DreamTripsDbContext dbContext,
-    IGoogleApiClient googleApiClient)
+    IGoogleHTTPClient googleHTTPClient)
     : ICityDomainService
 {
     public async Task<City> Get(string name, Action<CityReadOptions>? configureOptions = null)
@@ -229,7 +229,7 @@ public class CityDomainService(
         }
 
         // Fallback to external API
-        var cityFromApi = await googleApiClient.GetLocationOfCity(name);
+        var cityFromApi = await googleHTTPClient.GetLocationOfCity(name);
         await Save(cityFromApi);
 
         return cityFromApi;
@@ -517,7 +517,7 @@ graph TB
     QueryHandler[Query Handler<br/><b>Logic Layer</b>]
     DomainService[Domain Service<br/><b>Logic Layer</b>]
     DbContext[DbContext<br/><b>Data Layer</b>]
-    ApiClient[External API Client<br/><b>Data Layer</b>]
+    HTTPClient[External HTTP Client<br/><b>Data Layer</b>]
     Mapper[Mapper<br/><b>Logic Layer</b>]
     SaveSteps[Save Steps<br/><b>Logic Layer</b>]
 
@@ -525,8 +525,8 @@ graph TB
     Controller -->|MediatR Send| QueryHandler
     QueryHandler -->|Delegates to| DomainService
     DomainService -->|Query Database| DbContext
-    DbContext -.->|Not Found| ApiClient
-    ApiClient -.->|Maps Response| Mapper
+    DbContext -.->|Not Found| HTTPClient
+    HTTPClient -.->|Maps Response| Mapper
     Mapper -.->|Executes| SaveSteps
     SaveSteps -.->|Persists| DbContext
     DbContext -->|Returns Entity| DomainService
@@ -541,7 +541,7 @@ graph TB
     style Mapper fill:#fff4e1
     style SaveSteps fill:#fff4e1
     style DbContext fill:#e8f5e9
-    style ApiClient fill:#e8f5e9
+    style HTTPClient fill:#e8f5e9
     style User fill:#f3e5f5
 ```
 
@@ -686,18 +686,18 @@ The key is to use the simplest pattern that solves your problem. Don't reach for
 
 Encapsulates all of the code needed for external components or services integration.
 
-#### ApiClients
+#### HTTP Clients
 
-External API clients:
+External HTTP clients:
 
 ```csharp
-    public partial class GoogleApiClient : IGoogleApiClient
+    public partial class GoogleHTTPClient : IGoogleHTTPClient
     {
-        private readonly GoogleApiOptions _options;
-        private readonly ILogger<GoogleApiClient> _logger;
+        private readonly GoogleHTTPOptions _options;
+        private readonly ILogger<GoogleHTTPClient> _logger;
         private readonly HttpClient _httpClient;
 
-        public GoogleApiClient(IOptions<GoogleApiOptions> options, HttpClient httpClient, ILogger<GoogleApiClient> logger)
+        public GoogleHTTPClient(IOptions<GoogleHTTPOptions> options, HttpClient httpClient, ILogger<GoogleHTTPClient> logger)
         {
             _options = options.Value;
             _httpClient = httpClient;

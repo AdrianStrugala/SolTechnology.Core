@@ -13,7 +13,7 @@ namespace DreamTravel.GeolocationDataClients.IntegrationTests.GoogleApi
 {
     public class DownloadDurationMatrixByFreeRoadTests
     {
-        readonly GoogleApiClient _sut = new(Options.Create(new GoogleApiOptions()), Substitute.For<HttpClient>(), NullLogger<GoogleApiClient>.Instance);
+        readonly GoogleHTTPClient _sut = new(Options.Create(new GoogleHTTPOptions()), Substitute.For<HttpClient>(), NullLogger<GoogleHTTPClient>.Instance);
 
 
         [Fact(Skip = "Paid test")]

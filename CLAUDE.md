@@ -22,15 +22,15 @@ The solution follows Clean Architecture with strict layer separation:
 Each library is a separate NuGet package with its own `ModuleInstaller.cs` for dependency registration:
 
 - **SolTechnology.Core.CQRS** - CQRS implementation with MediatR, Result pattern, and Chain handlers
-- **SolTechnology.Core.Sql** - SQL database access with Dapper and Entity Framework
+- **SolTechnology.Core.SQL** - SQL database access with Dapper and Entity Framework
 - **SolTechnology.Core.BlobStorage** - Azure Blob Storage wrapper
-- **SolTechnology.Core.ApiClient** - HTTP client abstractions
+- **SolTechnology.Core.HTTP** - HTTP client abstractions and utilities
 - **SolTechnology.Core.MessageBus** - Azure Service Bus messaging
 - **SolTechnology.Core.Guards** - Input validation utilities
 - **SolTechnology.Core.Authentication** - Basic and API key authentication
 - **SolTechnology.Core.Logging** - Logging abstractions
 - **SolTechnology.Core.Scheduler** - Cron-based task scheduling
-- **SolTechnology.Core.Api** - API utilities and filters
+- **SolTechnology.Core.API** - API utilities and filters
 - **SolTechnology.Core.Cache** - Caching abstractions
 - **SolTechnology.Core.Story** - Story Framework for workflow orchestration with interactive workflows, persistence, and Tale Code philosophy
 - **SolTechnology.Core.AUID** - AUID (Application Unique ID) implementation
@@ -73,8 +73,8 @@ dotnet build SolTechnology.Core.slnx
 
 # Or manually run tests for each project
 cd tests
-dotnet test SolTechnology.Core.Sql.Tests --no-build
-dotnet test SolTechnology.Core.ApiClient.Tests --no-build
+dotnet test SolTechnology.Core.SQL.Tests --no-build
+dotnet test SolTechnology.Core.HTTP.Tests --no-build
 dotnet test SolTechnology.Core.Guards.Tests --no-build
 ```
 
@@ -302,13 +302,15 @@ Validators are automatically discovered and executed when registered via `Regist
    - ❌ BAD: `_logger.LogInformation($"Processing order {orderId}")`
    - ✅ GOOD: `_logger.LogInformation($"Processing order [{orderId}]")`
    - This makes it clear when a value is empty: `"Processing order []"` vs `"Processing order "`
-9. **Acronym Casing**: Follow Microsoft .NET naming guidelines for acronyms
-   - **2-letter acronyms**: ALL CAPS → `UI`, `IO`, `DB`
-   - **3+ letter acronyms**: Pascal case → `Api`, `Xml`, `Html`, `Sql`, `Cqrs`, `Auid`
+9. **Acronym Casing**: Use ALL CAPS for all acronyms (Python PEP 8 style)
+   - **All acronyms**: ALL CAPS regardless of length → `UUID`, `API`, `SQL`, `HTML`, `XML`, `UI`, `IO`, `DB`, `CQRS`, `AUID`
+   - **In class names**: `UUIDGenerator`, `APIClient`, `SQLConnection`, `HTMLParser`, `XMLDocument`
+   - **In namespaces**: `SolTechnology.Core.API`, `SolTechnology.Core.SQL`, `SolTechnology.Core.HTML`, `SolTechnology.Core.CQRS`
    - Examples:
-     - ✅ GOOD: `ApiClient`, `XmlDocument`, `HtmlHelper`, `SqlConnection`, `UIControl`, `IOStream`
-     - ❌ BAD: `XMLDocument`, `HTMLHelper`, `SQLConnection`, `CQRS`, `AUID`
-   - **Note**: Existing projects (`SolTechnology.Core.CQRS`, `SolTechnology.Core.AUID`) keep their current names for backwards compatibility, but new code should follow this convention
+     - ✅ GOOD: `APIClient`, `XMLDocument`, `HTMLHelper`, `SQLConnection`, `UUIDGenerator`, `CQRSHandler`
+     - ❌ BAD: `ApiClient`, `XmlDocument`, `HtmlHelper`, `SqlConnection`, `UuidGenerator`, `CqrsHandler`
+   - **Rationale**: Follows Python PEP 8 convention - acronyms are visually distinct and immediately recognizable
+   - **Note**: Existing published packages (`SolTechnology.Core.CQRS`, `SolTechnology.Core.AUID`) keep their current names for backwards compatibility
 10. **Testing Framework**:
    - Use NUnit for all tests
    - For integration tests, use WebApplicationFactory and Testcontainers
@@ -412,9 +414,9 @@ ForEach ($folder in (Get-ChildItem -Path tests -Directory)) {
 ```
 Tests covered:
 - `tests/SolTechnology.Core.AUID.Tests` (91 tests)
-- `tests/SolTechnology.Core.ApiClient.Tests` (1 test)
+- `tests/SolTechnology.Core.HTTP.Tests` (1 test)
 - `tests/SolTechnology.Core.Guards.Tests` (150 tests)
-- `tests/SolTechnology.Core.Sql.Tests` (1 test)
+- `tests/SolTechnology.Core.SQL.Tests` (1 test)
 - `tests/SolTechnology.Core.Story.Tests` (91 tests - includes comprehensive QA scenarios)
 
 ### Azure DevOps (DreamTravel Sample)

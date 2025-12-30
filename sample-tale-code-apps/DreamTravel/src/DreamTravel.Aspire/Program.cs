@@ -1,6 +1,6 @@
 using Microsoft.Data.SqlClient;
 using Neo4j.Driver;
-using SolTechnology.Core.Sql.SqlProject;
+using SolTechnology.Core.SQL.SQLProject;
 
 var builder = DistributedApplication.CreateBuilder(args);
 
@@ -104,7 +104,7 @@ var dbDeployment = dreamTravelDb.OnResourceReady(async (resource, @event, ct) =>
 
     Console.WriteLine($"🔧 Deploying dacpac: {dacpacPath}");
 
-    await SqlProjectDeployer.DeployDacpacAsync(dacpacPath, connectionString, "DreamTravelDatabase", ct);
+    await SQLProjectDeployer.DeployDacpacAsync(dacpacPath, connectionString, "DreamTravelDatabase", ct);
 
     Console.WriteLine("✅ Database is ready for connections!");
 });

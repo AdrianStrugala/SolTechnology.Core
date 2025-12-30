@@ -9,11 +9,11 @@ using DreamTravel.Queries;
 using DreamTravel.Sql;
 using MicroElements.Swashbuckle.FluentValidation.AspNetCore;
 using Microsoft.OpenApi.Models;
-using SolTechnology.Core.Api.Filters;
+using SolTechnology.Core.API.Filters;
 using SolTechnology.Core.Authentication;
 using SolTechnology.Core.Cache;
 using SolTechnology.Core.Logging.Middleware;
-using SolTechnology.Core.Sql;
+using SolTechnology.Core.SQL;
 using SolTechnology.Core.Story;
 
 namespace DreamTravel.Api;
@@ -70,8 +70,8 @@ public class Program
         });
 
         //SQL
-        var sqlConfiguration = builder.Configuration.GetSection("Sql").Get<SqlConfiguration>()!;
-        builder.Services.AddSql(sqlConfiguration);
+        var sqlConfiguration = builder.Configuration.GetSection("Sql").Get<SQLConfiguration>()!;
+        builder.Services.AddSQL(sqlConfiguration);
 
 
         //Trips

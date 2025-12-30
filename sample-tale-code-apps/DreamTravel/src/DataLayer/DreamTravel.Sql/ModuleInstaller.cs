@@ -3,15 +3,15 @@ using Hangfire;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using SolTechnology.Core.Sql;
+using SolTechnology.Core.SQL;
 
 namespace DreamTravel.Sql
 {
     public static class ModuleInstaller
     {
-        public static IServiceCollection InstallTripsSql(this IServiceCollection services, SqlConfiguration sqlConfiguration)
+        public static IServiceCollection InstallTripsSql(this IServiceCollection services, SQLConfiguration sqlConfiguration)
         {
-            services.AddSql(sqlConfiguration);
+            services.AddSQL(sqlConfiguration);
             
             services.AddDbContext<DreamTripsDbContext>(options =>
                 options.UseSqlServer(sqlConfiguration.ConnectionString));

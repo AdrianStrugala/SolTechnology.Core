@@ -2,7 +2,7 @@
 
 namespace DreamTravel.GeolocationDataClients.GeoDb;
 
-public interface IGeoDbApiClient
+public interface IGeoDbHTTPClient
 {
     Task<CityDetails?> GetCityDetails(string cityName);
 }

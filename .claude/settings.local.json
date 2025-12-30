@@ -76,7 +76,12 @@
       "Bash(Select-String -Pattern \"\\(error|warning|succeeded|failed\\)\")",
       "Bash(Select-Object -Last 50)",
       "Bash(Select-String -Pattern \"Niepowodzenie|Powodzenie|niepowodzenie|powodzenie\")",
-      "Bash(Select-Object -Last 3)"
+      "Bash(Select-Object -Last 3)",
+      "WebFetch(domain:www.nuget.org)",
+      "Bash(Get-ChildItem -Recurse -Filter \"*.globalconfig\")",
+      "Bash(Select-Object -First 5)",
+      "Bash(timeout 300 dotnet build:*)",
+      "Bash(powershell.exe -File ..githubrunTests.ps1)"
     ],
     "deny": [],
     "ask": []

@@ -4,7 +4,7 @@ using DreamTravel.Domain.Cities;
 using DreamTravel.Queries.FindCityByName;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using SolTechnology.Core.Api.Filters;
+using SolTechnology.Core.API.Filters;
 using SolTechnology.Core.CQRS;
 
 namespace DreamTravel.Api.Controllers.Trips.v2

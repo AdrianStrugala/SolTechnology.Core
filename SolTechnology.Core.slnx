@@ -74,16 +74,16 @@
     </Folder>
   </Folder>
   <Folder Name="/Tests/">
-    <Project Path="tests/SolTechnology.Core.ApiClient.Tests/SolTechnology.Core.ApiClient.Tests.csproj" />
+    <Project Path="tests/SolTechnology.Core.HTTP.Tests/SolTechnology.Core.HTTP.Tests.csproj" />
     <Project Path="tests/SolTechnology.Core.AUID.Tests/SolTechnology.Core.AUID.Tests.csproj" />
     <Project Path="tests/SolTechnology.Core.Guards.Tests/SolTechnology.Core.Guards.Tests.csproj" />
-    <Project Path="tests/SolTechnology.Core.Sql.Tests/SolTechnology.Core.Sql.Tests.csproj" />
+    <Project Path="tests/SolTechnology.Core.SQL.Tests/SolTechnology.Core.SQL.Tests.csproj" />
     <Project Path="tests/SolTechnology.Core.Story.Tests/SolTechnology.Core.Story.Tests.csproj" />
   </Folder>
   <Folder Name="/src/">
     <File Path="src/Directory.Build.props" />
-    <Project Path="src/SolTechnology.Core.Api/SolTechnology.Core.Api.csproj" />
-    <Project Path="src/SolTechnology.Core.ApiClient/SolTechnology.Core.ApiClient.csproj" />
+    <Project Path="src/SolTechnology.Core.API/SolTechnology.Core.API.csproj" />
+    <Project Path="src/SolTechnology.Core.HTTP/SolTechnology.Core.HTTP.csproj" />
     <Project Path="src/SolTechnology.Core.AUID/SolTechnology.Core.AUID.csproj" />
     <Project Path="src/SolTechnology.Core.Authentication/SolTechnology.Core.Authentication.csproj" />
     <Project Path="src/SolTechnology.Core.BlobStorage/SolTechnology.Core.BlobStorage.csproj" />
@@ -95,6 +95,6 @@
     <Project Path="src/SolTechnology.Core.Logging/SolTechnology.Core.Logging.csproj" />
     <Project Path="src/SolTechnology.Core.MessageBus/SolTechnology.Core.MessageBus.csproj" />
     <Project Path="src/SolTechnology.Core.Scheduler/SolTechnology.Core.Scheduler.csproj" />
-    <Project Path="src/SolTechnology.Core.Sql/SolTechnology.Core.Sql.csproj" />
+    <Project Path="src/SolTechnology.Core.SQL/SolTechnology.Core.SQL.csproj" />
   </Folder>
 </Solution>

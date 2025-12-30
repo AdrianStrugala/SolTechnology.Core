@@ -16,11 +16,11 @@ namespace DreamTravel.GeolocationDataClients.IntegrationTests.GoogleApi
 {
     public class CitiesTests
     {
-        private readonly GoogleApiClient _sut;
+        private readonly GoogleHTTPClient _sut;
 
         public CitiesTests()
         {
-            _sut = new GoogleApiClient(Options.Create(new GoogleApiOptions()), Substitute.For<HttpClient>(), NullLogger<GoogleApiClient>.Instance);
+            _sut = new GoogleHTTPClient(Options.Create(new GoogleHTTPOptions()), Substitute.For<HttpClient>(), NullLogger<GoogleHTTPClient>.Instance);
         }
 
         [Fact (Skip = "Paid test")]

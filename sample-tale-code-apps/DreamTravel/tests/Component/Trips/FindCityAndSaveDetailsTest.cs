@@ -40,7 +40,7 @@ public class FindCityAndSaveDetailsTest
             Country = "Poland"
         };
 
-        _wireMockFixture.Fake<IGoogleApiClient>()
+        _wireMockFixture.Fake<IGoogleHTTPClient>()
             .WithRequest(x => x.GetLocationOfCity, city.Name)
             .WithResponse(x => x
                 .WithSuccess()

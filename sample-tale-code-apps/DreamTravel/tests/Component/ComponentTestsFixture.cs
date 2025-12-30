@@ -3,9 +3,9 @@ using DreamTravel.FunctionalTests.FakeApis;
 using DreamTravel.Sql;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
-using SolTechnology.Core.Api.Testing;
+using SolTechnology.Core.API.Testing;
 using SolTechnology.Core.Faker;
-using SolTechnology.Core.Sql.Testing;
+using SolTechnology.Core.SQL.Testing;
 
 namespace DreamTravel.FunctionalTests
 {
@@ -14,11 +14,11 @@ namespace DreamTravel.FunctionalTests
     public static class ComponentTestsFixture
     {
         // In-memory fixtures (for API integration tests)
-        public static ApiFixture<Program> ApiFixture { get; set; } = null!;
-        public static ApiFixture<Worker.Program> WorkerFixture { get; set; } = null!;
+        public static APIFixture<Program> ApiFixture { get; set; } = null!;
+        public static APIFixture<Worker.Program> WorkerFixture { get; set; } = null!;
 
         // Shared fixtures
-        public static SqlFixture SqlFixture { get; set; } = null!;
+        public static SQLFixture SqlFixture { get; set; } = null!;
         public static WireMockFixture WireMockFixture { get; set; } = null!;
 
         [OneTimeSetUp]
@@ -27,8 +27,8 @@ namespace DreamTravel.FunctionalTests
             Environment.SetEnvironmentVariable("ASPNETCORE_ENVIRONMENT", "development");
 
             // 1. Start SQL Server (Docker container)
-            SqlFixture = new SqlFixture("DreamTravelDatabase")
-                .WithSqlProject(Path.GetFullPath("../../../../../src/Infrastructure/DreamTravelDatabase/DreamTravelDatabase.csproj"));
+            SqlFixture = new SQLFixture("DreamTravelDatabase")
+                .WithSQLProject(Path.GetFullPath("../../../../../src/Infrastructure/DreamTravelDatabase/DreamTravelDatabase.csproj"));
             await SqlFixture.InitializeAsync();
 
             // 2. Start WireMock (mocks Google API) on port 2137
@@ -45,8 +45,8 @@ namespace DreamTravel.FunctionalTests
                 .Build();
 
             // 3. Start in-memory API fixtures (for API integration tests)
-            ApiFixture = new ApiFixture<Program>(configuration);
-            WorkerFixture = new ApiFixture<Worker.Program>(configuration);
+            ApiFixture = new APIFixture<Program>(configuration);
+            WorkerFixture = new APIFixture<Worker.Program>(configuration);
         }
 
 

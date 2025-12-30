@@ -1,9 +1,9 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
-using SolTechnology.Core.Sql.Connections;
+using SolTechnology.Core.SQL.Connections;
 using Xunit;
 
-namespace SolTechnology.Core.Sql.Tests
+namespace SolTechnology.Core.SQL.Tests
 {
     public class ModuleInstallerTests
     {
@@ -15,24 +15,24 @@ namespace SolTechnology.Core.Sql.Tests
         }
 
         [Fact]
-        public void AddSql_ConfigurationProvidedAsParameter_SqlServicesAreAddedToServiceCollection()
+        public void AddSQL_ConfigurationProvidedAsParameter_SQLServicesAreAddedToServiceCollection()
         {
 
-            //Arrange 
-            SqlConfiguration sqlConfiguration = new SqlConfiguration
+            //Arrange
+            SQLConfiguration sqlConfiguration = new SQLConfiguration
             {
                 ConnectionString = "ExampleConnectionString"
             };
 
 
             //Act
-            _sut.Services.AddSql(sqlConfiguration);
+            _sut.Services.AddSQL(sqlConfiguration);
 
 
             //Assert
             var app = _sut.Build();
 
-            ISqlConnectionFactory? sqlConnectionFactory = app.Services.GetService<ISqlConnectionFactory>();
+            ISQLConnectionFactory? sqlConnectionFactory = app.Services.GetService<ISQLConnectionFactory>();
             Assert.NotNull(sqlConnectionFactory);
             Assert.Equal(sqlConfiguration.ConnectionString, sqlConnectionFactory.GetConnectionString());
         }

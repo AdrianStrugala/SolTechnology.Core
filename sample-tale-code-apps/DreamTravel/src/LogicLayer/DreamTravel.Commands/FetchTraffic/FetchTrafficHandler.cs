@@ -8,7 +8,7 @@ using Hangfire;
 namespace DreamTravel.Commands.FetchTraffic
 {
     public class FetchTrafficHandler(
-        IGoogleApiClient googleClient,
+        IGoogleHTTPClient googleClient,
         IIntersectionRepository intersectionRepo,
         IStreetRepository streetRepo,
         ILogger<FetchTrafficHandler> logger)

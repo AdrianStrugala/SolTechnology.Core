@@ -57,7 +57,7 @@ public interface ICityDomainService
 public class CityDomainService(
     ICityMapper cityMapper,
     DreamTripsDbContext dbContext,
-    IGoogleApiClient googleApiClient,
+    IGoogleHTTPClient googleHTTPClient,
     IServiceProvider serviceProvider,
     ILogger<CityDomainService> logger)
     : StoryHandler<SaveCityInput, SaveCityContext, SaveCityResult>(serviceProvider, logger), ICityDomainService
@@ -81,7 +81,7 @@ public class CityDomainService(
         }
         else
         {
-            result = await googleApiClient.GetLocationOfCity(name);
+            result = await googleHTTPClient.GetLocationOfCity(name);
         }
         
         result.ReadOptions = options;
@@ -108,7 +108,7 @@ public class CityDomainService(
         }
         else
         {
-            result = await googleApiClient.GetNameOfCity(new City
+            result = await googleHTTPClient.GetNameOfCity(new City
             {
                 Latitude = latitude,
                 Longitude = longitude

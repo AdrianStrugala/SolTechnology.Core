@@ -14,8 +14,8 @@ namespace DreamTravel.FunctionalTests.Trips
 
         public PerformanceTests()
         {
-            // IGoogleApiClient googleApiClient = new GoogleApiClient(Options.Create(new GoogleApiOptions()), Substitute.For<HttpClient>(), NullLogger<GoogleApiClient>.Instance);
-            // IMichelinApiClient michelinApiClient = new MichelinApiClient(Options.Create(new MichelinApiOptions()), Substitute.For<HttpClient>(), NullLogger<MichelinApiClient>.Instance);
+            // IGoogleHTTPClient googleHTTPClient = new GoogleHTTPClient(Options.Create(new GoogleHTTPOptions()), Substitute.For<HttpClient>(), NullLogger<GoogleHTTPClient>.Instance);
+            // IMichelinHTTPClient michelinHTTPClient = new MichelinHTTPClient(Options.Create(new MichelinHTTPOptions()), Substitute.For<HttpClient>(), NullLogger<MichelinHTTPClient>.Instance);
             //
             // DownloadRoadData downloadRoadData = new DownloadRoadData(googleApiClient, michelinApiClient);
             // IFormCalculateBestPathResult formOutputData = new FormPathsFromMatrices();

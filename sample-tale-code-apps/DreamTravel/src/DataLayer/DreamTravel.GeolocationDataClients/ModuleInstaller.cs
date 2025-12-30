@@ -2,7 +2,7 @@
 using DreamTravel.GeolocationDataClients.GoogleApi;
 using DreamTravel.GeolocationDataClients.MichelinApi;
 using Microsoft.Extensions.DependencyInjection;
-using SolTechnology.Core.ApiClient;
+using SolTechnology.Core.HTTP;
 
 namespace DreamTravel.GeolocationDataClients
 {
@@ -10,11 +10,11 @@ namespace DreamTravel.GeolocationDataClients
     {
         public static IServiceCollection InstallGeolocationDataClients(this IServiceCollection services)
         {
-            services.AddApiClient<IGoogleApiClient, GoogleApiClient, GoogleApiOptions>("Google");
-            services.Decorate(typeof(IGoogleApiClient), typeof(GoogleApiClientCachingDecorator));
+            services.AddHTTPClient<IGoogleHTTPClient, GoogleHTTPClient, GoogleHTTPOptions>("Google");
+            services.Decorate(typeof(IGoogleHTTPClient), typeof(GoogleHTTPClientCachingDecorator));
 
-            services.AddApiClient<IMichelinApiClient, MichelinApiClient, MichelinApiOptions>("Michelin");
-            services.AddApiClient<IGeoDbApiClient, GeoDbApiClient>("GeoDb");
+            services.AddHTTPClient<IMichelinHTTPClient, MichelinHTTPClient, MichelinHTTPOptions>("Michelin");
+            services.AddHTTPClient<IGeoDbHTTPClient, GeoDbHTTPClient>("GeoDb");
 
             return services;
         }
