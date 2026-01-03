@@ -42,18 +42,18 @@ Everything else. Drivers, extensions, and the rest of the technical details need
 
 Starting from the top, Tale Code is organized in well-known and old-fashioned layers. The first and initial layer is the Presentation Layer.
 
-This layer is responsible for communication with the outside world. It contains a minimum of code. Presentation is only a wrapper for the logic, containing all presentation-specific aspects (like authentication). In the sample app, it's built of 2 components:
+This layer is responsible for communication with the outside world. It contains a minimum of code. Presentation is only a wrapper for the logic, containing all presentation-specific aspects (like authentication). In the sample app, it's built of 3 main components:
 
 #### BackgroundWorker
 
-Subscribes to messages and invokes operations based on them. In this scenario, on CitySearched event invokes FetchCityDetails command:
+Subscribes to domain events and invokes operations based on them. In this scenario, on CitySearched event saves the city using DomainService:
 
 ```csharp
-    public class FetchCityDetailsJob(IMediator mediator) : INotificationHandler<CitySearched>
+    public class SaveCitySearchJob(ICityDomainService cityDomainService) : INotificationHandler<CitySearched>
     {
         public async Task Handle(CitySearched notification, CancellationToken cancellationToken)
         {
-            await mediator.Send(new FetchCityDetailsCommand {Name = notification.Name}, cancellationToken);
+            await cityDomainService.Save(notification.City);
         }
     }
 ```
@@ -63,6 +63,7 @@ Subscribes to messages and invokes operations based on them. In this scenario, o
 Provides a public interface for queries:
 
 ```csharp
+    [ApiVersion("2.0")]
     [Route(Route)]
     [ServiceFilter(typeof(ExceptionFilter))]
     [ServiceFilter(typeof(ResponseEnvelopeFilter))]
@@ -71,8 +72,7 @@ Provides a public interface for queries:
         ILogger<FindCityByNameController> logger)
         : ControllerBase
     {
-        public const string Route = "api/v2/FindCityByName";
-
+        public const string Route = "api/FindCityByName";
 
         [HttpPost]
         [Produces(MediaTypeNames.Application.Json)]
@@ -80,11 +80,15 @@ Provides a public interface for queries:
         [ProducesResponseType(typeof(Result), (int)HttpStatusCode.BadRequest)]
         public async Task<IActionResult> FindCityByName([FromBody] FindCityByNameQuery query)
         {
-            logger.LogInformation("Looking for city: " + query.Name);
+            logger.LogInformation($"Looking for city: [{query.Name}]");
             return Ok(await mediator.Send(query));
         }
     }
 ```
+
+#### Blazor UI
+
+Provides interactive web interface for users. Built with Blazor WebAssembly, allowing client-side execution and rich user experiences. The UI communicates with the API layer to execute queries and commands, maintaining the separation of concerns between presentation and business logic.
 
 
 
@@ -96,10 +100,10 @@ In DreamTravel, the LogicLayer is organized into several projects, each serving 
 
 ```
 LogicLayer/
+├── DreamTravel.Commands/             (Write operations)
+├── DreamTravel.Queries/              (Read operations)
 ├── DreamTravel.DomainServices/       (Reusable business logic)
-├── DreamTravel.Flows/                (Interactive workflows)
-├── DreamTravel.Trips.Commands/       (Write operations)
-└── DreamTravel.Trips.Queries/        (Read operations)
+└── DreamTravel.Workflows/            (Interactive workflows with Story Framework)
 ```
 
 #### Commands
@@ -145,19 +149,22 @@ public class FindCityByNameHandler(
 }
 ```
 
-**Chain Handlers** - for complex multi-step operations:
+**Story Handlers** - for complex multi-step operations using Story Framework:
 
 ```csharp
-public class CalculateBestPathHandler(IServiceProvider serviceProvider)
-    : ChainHandler<CalculateBestPathQuery, CalculateBestPathContext, CalculateBestPathResult>(serviceProvider)
+public class CalculateBestPathStory(
+    IServiceProvider serviceProvider,
+    ILogger<CalculateBestPathStory> logger)
+    : StoryHandler<CalculateBestPathQuery, CalculateBestPathContext, CalculateBestPathResult>(serviceProvider, logger),
+      IQueryHandler<CalculateBestPathQuery, CalculateBestPathResult>
 {
-    protected override async Task HandleChain()
+    protected override async Task TellStory()
     {
-        await Invoke<InitiateContext>();
-        await Invoke<DownloadRoadData>();
-        await Invoke<FindProfitablePath>();
-        await Invoke<SolveTsp>();
-        await Invoke<FormCalculateBestPathResult>();
+        await ReadChapter<InitiateContext>();
+        await ReadChapter<DownloadRoadData>();
+        await ReadChapter<FindProfitablePath>();
+        await ReadChapter<SolveTsp>();
+        await ReadChapter<FormCalculateBestPathResult>();
     }
 }
 ```
@@ -166,31 +173,31 @@ The repository is structured in this way:
 
 ```
 LogicLayer/
-├─ DreamTravel.Trips.Queries/
+├─ DreamTravel.Queries/
 │  ├─ CalculateBestPath/
 │  │  ├─ CalculateBestPathQuery.cs        (Input model with validation)
-│  │  ├─ CalculateBestPathHandler.cs      (Orchestrator)
-│  │  ├─ CalculateBestPathContext.cs      (Shared data for all steps)
+│  │  ├─ CalculateBestPathStory.cs        (Story orchestrator)
+│  │  ├─ CalculateBestPathContext.cs      (Shared data)
 │  │  ├─ CalculateBestPathResult.cs       (Output model)
-│  │  ├─ Executors/
-│  │  │  ├─ 0.InitiateContext.cs          (Step 1)
-│  │  │  ├─ 1.DownloadRoadData.cs         (Step 2)
-│  │  │  ├─ 2.FindProfitablePath.cs       (Step 3)
-│  │  │  ├─ 3.SolveTsp.cs                 (Step 4)
-│  │  │  ├─ 4.FormCalculateBestPathResult.cs (Step 5)
+│  │  ├─ Chapters/
+│  │  │  ├─ 0.InitiateContext.cs          (Chapter 1)
+│  │  │  ├─ 1.DownloadRoadData.cs         (Chapter 2)
+│  │  │  ├─ 2.FindProfitablePath.cs       (Chapter 3)
+│  │  │  ├─ 3.SolveTsp.cs                 (Chapter 4)
+│  │  │  ├─ 4.FormCalculateBestPathResult.cs (Chapter 5)
 ```
 
 Where:
 
 - **Query/Command** - Input anemic model with FluentValidation rules
-- **Handler** - Orchestrates the flow, contains minimal code
-- **Context** - Shared data structure passed through all executors
+- **Story** - Orchestrates the flow using `TellStory()` method, contains minimal code
+- **Context** - Shared data structure (Narration) passed through all chapters, inherits from `Context<TInput, TOutput>`
 - **Result** - Output model returned to the caller
-- **Executors** - Individual steps with single, clear purpose (numbered for ordering)
+- **Chapters** - Individual story chapters with single, clear purpose (numbered for ordering)
+  - `Chapter<TContext>` - Automated chapter with `Read()` method
+  - `InteractiveChapter<TContext, TInput>` - Pauses for user input with `ReadWithInput()` method
 
-For maximum readability, Handler behaves like a table of contents. Each step is explicitly listed, making the business flow obvious from a glance. No hidden magic, no searching through inheritance chains - just a clear list of "what happens next."
-
-<img alt="design" src="./handlerStructure.JPG">
+For maximum readability, Story behaves like a table of contents. Each chapter is explicitly listed in `TellStory()`, making the business flow obvious from a glance - reading like well-written prose. No hidden magic, no searching through inheritance chains - just a clear narrative of "what happens next."
 
 #### DomainServices - The Reusable Business Logic
 
@@ -421,7 +428,7 @@ public class CityMapper : ICityMapper
         {
             return new CityEntity
             {
-                CityId = Guid.NewGuid(),
+                CityId = Auid.New("CTY"),
                 Latitude = city.Latitude,
                 Longitude = city.Longitude,
                 Country = city.Country
@@ -462,7 +469,8 @@ public class AssignAlternativeNameStep : IAssignAlternativeNameStep
         var exists = cityEntity.AlternativeNames
             .Any(an => an.AlternativeName.Equals(name, StringComparison.OrdinalIgnoreCase));
 
-        if (exists) return;
+        if (exists)
+            return;
 
         cityEntity.AlternativeNames.Add(new AlternativeNameEntity
         {
@@ -504,6 +512,94 @@ public class IncrementSearchCountStep : IIncrementSearchCountStep
 
 Files are numbered (`1.`, `2.`) to make the execution order obvious. Each step has a single `Invoke` method that modifies the entity. The DomainService calls them in sequence before saving to the database.
 
+#### Story Framework Chapters - The Building Blocks
+
+Story Framework uses Chapters to organize multi-step workflows. Each chapter is a single responsibility unit that reads or modifies the story's context (Narration).
+
+**Automated Chapter** - executes without user intervention:
+
+```csharp
+public class InitiateContext : Chapter<CalculateBestPathContext>
+{
+    public override Task<Result> Read(CalculateBestPathContext narration)
+    {
+        // Map input data to domain models
+        var cities = narration.Input.Cities
+            .Select(dto => new City
+            {
+                Name = dto.Name,
+                Latitude = dto.Latitude,
+                Longitude = dto.Longitude
+            })
+            .ToList();
+
+        narration.Cities = cities;
+        narration.NoOfCities = cities.Count;
+
+        return Result.SuccessAsTask();
+    }
+}
+```
+
+**Interactive Chapter** - pauses for user input:
+
+```csharp
+public class CustomerDetailsChapter : InteractiveChapter<SampleOrderContext, CustomerDetailsInput>
+{
+    public override string ChapterId => "RequestCustomerDetails";
+
+    public override Task<Result> ReadWithInput(SampleOrderContext context, CustomerDetailsInput userInput)
+    {
+        // Validate user input
+        if (string.IsNullOrWhiteSpace(userInput.Name) || string.IsNullOrWhiteSpace(userInput.Address))
+        {
+            return Task.FromResult(Result.Fail("Name and Address cannot be empty."));
+        }
+
+        // Store in context
+        context.CustomerDetails = new CustomerDetails
+        {
+            Address = userInput.Address,
+            Name = userInput.Name
+        };
+
+        return Task.FromResult(Result.Success());
+    }
+}
+```
+
+**Key Differences:**
+- **Automated chapters** extend `Chapter<TContext>` and implement `Read(TContext narration)`
+- **Interactive chapters** extend `InteractiveChapter<TContext, TInput>` and implement `ReadWithInput(TContext context, TInput userInput)`
+- Interactive chapters pause story execution and wait for user to provide input via `StoryManager.ResumeStory()`
+- All chapters return `Result` to indicate success or failure
+- Chapters are numbered (0., 1., 2., etc.) for clear execution order
+
+**Usage in Story:**
+
+```csharp
+public class SampleOrderWorkflowStory : StoryHandler<SampleOrderInput, SampleOrderContext, SampleOrderResult>
+{
+    protected override async Task TellStory()
+    {
+        // Interactive - pauses here
+        await ReadChapter<CustomerDetailsChapter>();
+
+        // Automated - runs immediately
+        await ReadChapter<BackendProcessingChapter>();
+
+        // Automated - runs immediately
+        await ReadChapter<FetchExternalDataChapter>();
+
+        // Set final result
+        Context.Output.OrderId = Context.Input.OrderId;
+        Context.Output.IsSuccessfullyProcessed = true;
+    }
+}
+```
+
+Interactive workflows require `StoryManager` for pause/resume functionality. For fully automated workflows, the Story can be invoked directly via MediatR like a regular handler.
+
 #### How It All Fits Together
 
 Here's a visual representation of how a typical query flows through the system:
@@ -517,18 +613,12 @@ graph TB
     QueryHandler[Query Handler<br/><b>Logic Layer</b>]
     DomainService[Domain Service<br/><b>Logic Layer</b>]
     DbContext[DbContext<br/><b>Data Layer</b>]
-    HTTPClient[External HTTP Client<br/><b>Data Layer</b>]
     Mapper[Mapper<br/><b>Logic Layer</b>]
-    SaveSteps[Save Steps<br/><b>Logic Layer</b>]
 
     User -->|HTTP Request| Controller
     Controller -->|MediatR Send| QueryHandler
     QueryHandler -->|Delegates to| DomainService
     DomainService -->|Query Database| DbContext
-    DbContext -.->|Not Found| HTTPClient
-    HTTPClient -.->|Maps Response| Mapper
-    Mapper -.->|Executes| SaveSteps
-    SaveSteps -.->|Persists| DbContext
     DbContext -->|Returns Entity| DomainService
     DomainService -->|Maps to Domain| Mapper
     Mapper -->|Result&lt;City&gt;| QueryHandler
@@ -539,55 +629,53 @@ graph TB
     style QueryHandler fill:#fff4e1
     style DomainService fill:#fff4e1
     style Mapper fill:#fff4e1
-    style SaveSteps fill:#fff4e1
     style DbContext fill:#e8f5e9
-    style HTTPClient fill:#e8f5e9
     style User fill:#f3e5f5
 ```
 
-##### Complex Query Flow (ChainHandler)
+##### Complex Query Flow (Story Framework)
 
 ```mermaid
 graph TB
     User([User])
     Controller[Controller<br/><b>Presentation Layer</b>]
-    ChainHandler[Chain Handler<br/><b>Logic Layer</b>]
-    Context[(Shared Context)]
+    StoryHandler[Story Handler<br/><b>Logic Layer</b>]
+    Context[(Narration / Context)]
 
-    Exec1[Step 1: InitiateContext<br/><b>Logic Layer</b>]
-    Exec2[Step 2: DownloadRoadData<br/><b>Logic Layer</b>]
-    Exec3[Step 3: FindProfitablePath<br/><b>Logic Layer</b>]
-    Exec4[Step 4: SolveTsp<br/><b>Logic Layer</b>]
-    Exec5[Step 5: FormResult<br/><b>Logic Layer</b>]
+    Chapter1[Chapter 1: InitiateContext<br/><b>Logic Layer</b>]
+    Chapter2[Chapter 2: DownloadRoadData<br/><b>Logic Layer</b>]
+    Chapter3[Chapter 3: FindProfitablePath<br/><b>Logic Layer</b>]
+    Chapter4[Chapter 4: SolveTsp<br/><b>Logic Layer</b>]
+    Chapter5[Chapter 5: FormResult<br/><b>Logic Layer</b>]
 
     ExternalAPI[External APIs<br/><b>Data Layer</b>]
 
     User -->|HTTP Request| Controller
-    Controller -->|MediatR Send| ChainHandler
+    Controller -->|MediatR Send| StoryHandler
 
-    ChainHandler -->|Invoke| Exec1
-    Exec1 -->|Mutates| Context
-    Context -->|Passes to| Exec2
-    Exec2 -->|Calls| ExternalAPI
-    ExternalAPI -->|Returns Data| Exec2
-    Exec2 -->|Mutates| Context
-    Context -->|Passes to| Exec3
-    Exec3 -->|Business Logic| Context
-    Context -->|Passes to| Exec4
-    Exec4 -->|Algorithm| Context
-    Context -->|Passes to| Exec5
-    Exec5 -->|Builds Result| ChainHandler
+    StoryHandler -->|ReadChapter| Chapter1
+    Chapter1 -->|Mutates| Context
+    Context -->|Passes to| Chapter2
+    Chapter2 -->|Calls| ExternalAPI
+    ExternalAPI -->|Returns Data| Chapter2
+    Chapter2 -->|Mutates| Context
+    Context -->|Passes to| Chapter3
+    Chapter3 -->|Business Logic| Context
+    Context -->|Passes to| Chapter4
+    Chapter4 -->|Algorithm| Context
+    Context -->|Passes to| Chapter5
+    Chapter5 -->|Builds Result| StoryHandler
 
-    ChainHandler -->|Result&lt;T&gt;| Controller
+    StoryHandler -->|Result&lt;T&gt;| Controller
     Controller -->|HTTP Response| User
 
     style Controller fill:#e1f5ff
-    style ChainHandler fill:#fff4e1
-    style Exec1 fill:#fff4e1
-    style Exec2 fill:#fff4e1
-    style Exec3 fill:#fff4e1
-    style Exec4 fill:#fff4e1
-    style Exec5 fill:#fff4e1
+    style StoryHandler fill:#fff4e1
+    style Chapter1 fill:#fff4e1
+    style Chapter2 fill:#fff4e1
+    style Chapter3 fill:#fff4e1
+    style Chapter4 fill:#fff4e1
+    style Chapter5 fill:#fff4e1
     style Context fill:#fce4ec
     style ExternalAPI fill:#e8f5e9
     style User fill:#f3e5f5
@@ -602,10 +690,10 @@ graph TB
         Worker[Background Workers]
     end
 
-    subgraph Logic["<b>Logic Layer</b><br/>(Commands, Queries, Domain Services, Flows)"]
+    subgraph Logic["<b>Logic Layer</b><br/>(Commands, Queries, Domain Services, Workflows)"]
         Handlers[Handlers]
         DomainServices[Domain Services]
-        ChainSteps[Chain Steps / Executors]
+        Chapters[Story Chapters]
         Mappers[Mappers]
         Validators[Validators]
     end
@@ -629,13 +717,13 @@ graph TB
     API -->|MediatR| Handlers
     Worker -->|MediatR| Handlers
     Handlers -->|Uses| DomainServices
-    Handlers -->|Uses| ChainSteps
+    Handlers -->|Uses| Chapters
     DomainServices -->|Uses| Mappers
     DomainServices -->|Uses| EF
     DomainServices -->|Uses| HttpClients
-    ChainSteps -->|Uses| EF
-    ChainSteps -->|Uses| HttpClients
-    ChainSteps -->|Uses| BlobStorage
+    Chapters -->|Uses| EF
+    Chapters -->|Uses| HttpClients
+    Chapters -->|Uses| BlobStorage
     Handlers -->|Validates via| Validators
 
     Handlers -.->|References| Models
@@ -654,9 +742,9 @@ graph TB
     style Infrastructure fill:#f5f5f5
 ```
 
-**Flow Principles:**
+**Story Framework Principles:**
 
-Each executor/step receives a `Context` object, mutates it, and returns `Result.Success()` or `Result.Fail()`. The handler stops on first failure.
+Each chapter receives a `Context` (Narration) object, mutates it, and returns `Result.Success()` or `Result.Fail()`. The story stops on first failure. Interactive chapters pause execution and wait for user input before continuing.
 
 **Dependency Rules:**
 - Dependencies flow **downward only**: Presentation → Logic → Data → Infrastructure
@@ -672,13 +760,13 @@ Not every operation needs the full DomainService + Steps treatment. Here's when 
 |----------|---------------------|---------|
 | Simple read without business logic | Direct DbContext + Projection in Handler | Get all cities from DB |
 | Read with reusable business logic | DomainService | Find city (DB → fallback to API) |
-| Complex multi-step query | ChainHandler + Executors | Calculate best path with TSP |
+| Complex multi-step query | StoryHandler + Chapters | Calculate best path with TSP |
 | Simple write operation | Direct handler with DbContext | Update city name |
-| Complex write operation | ChainHandler + Steps | Multi-step data processing |
+| Complex write operation | StoryHandler + Chapters | Multi-step data processing |
 | Reusable write logic | DomainService + SaveSteps | Save city with alternatives |
-| Interactive user workflow | PausableChainHandler + Flow | Order processing with user input |
+| Interactive user workflow | StoryHandler + Interactive Chapters | Order processing with user input |
 
-The key is to use the simplest pattern that solves your problem. Don't reach for ChainHandler if a simple handler will do. Don't create DomainService if the logic is used in only one place. Keep it readable, keep it simple.
+The key is to use the simplest pattern that solves your problem. Don't reach for StoryHandler if a simple handler will do. Don't create DomainService if the logic is used in only one place. Keep it readable, keep it simple.
 
 
 
@@ -691,40 +779,50 @@ Encapsulates all of the code needed for external components or services integrat
 External HTTP clients:
 
 ```csharp
-    public partial class GoogleHTTPClient : IGoogleHTTPClient
+    public partial class GoogleHTTPClient(
+        IOptions<GoogleHTTPOptions> options,
+        HttpClient httpClient,
+        ILogger<GoogleHTTPClient> logger)
+        : IGoogleHTTPClient
     {
-        private readonly GoogleHTTPOptions _options;
-        private readonly ILogger<GoogleHTTPClient> _logger;
-        private readonly HttpClient _httpClient;
-
-        public GoogleHTTPClient(IOptions<GoogleHTTPOptions> options, HttpClient httpClient, ILogger<GoogleHTTPClient> logger)
-        {
-            _options = options.Value;
-            _httpClient = httpClient;
-            _logger = logger;
-        }
+        private readonly GoogleHTTPOptions _options = options.Value;
 
         public async Task<City> GetLocationOfCity(string cityName)
         {
             try
             {
-                City result = new City { Name = cityName };
-
-                var request = await _httpClient
+                var request = await httpClient
                     .CreateRequest($"maps/api/geocode/json?address={cityName}&key={_options.Key}")
                     .GetAsync();
 
                 var response = await request.Content.ReadAsStringAsync();
                 JObject json = JObject.Parse(response);
 
-                result.Latitude = json["results"][0]["geometry"]["location"]["lat"].Value<double>();
-                result.Longitude = json["results"][0]["geometry"]["location"]["lng"].Value<double>();
+                var results = json["results"];
+                if (results == null || !results.Any())
+                {
+                    throw new InvalidDataException($"No results found for city [{cityName}]");
+                }
+
+                var location = results[0]["geometry"]?["location"];
+                if (location == null)
+                {
+                    throw new InvalidDataException($"No location data found for city [{cityName}]");
+                }
+
+                var result = new City
+                {
+                    Name = cityName,
+                    Latitude = location["lat"].Value<double>(),
+                    Longitude = location["lng"].Value<double>()
+                };
+
                 return result;
             }
-
-            catch (Exception)
+            catch (Exception e)
             {
-                throw new InvalidDataException($"Cannot find city [{cityName}]");
+                logger.LogError(e, $"Cannot find city [{cityName}]");
+                throw new InvalidDataException($"Cannot find city [{cityName}]", e);
             }
         }
     }
@@ -781,7 +879,7 @@ VALUES (@ApiId, @Name, @DateOfBirth, @Nationality, @Position)
     }
 ```
 
-What is worth to mention here. in purpose of keeping classes small and readabe, the adventage of partial classes can be used:
+What is worth to mention here. In purpose of keeping classes small and readable, the advantage of partial classes can be used:
 
 <img alt="design" src="./partialClasses.JPG">
 
