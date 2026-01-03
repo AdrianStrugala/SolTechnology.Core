@@ -414,6 +414,10 @@ Validators are automatically discovered and executed when registered via `Regist
    - For integration tests, use WebApplicationFactory and Testcontainers
    - Write comprehensive QA scenarios covering edge cases, error handling, concurrency, and security
 11. **Validation Framework**: Use FluentValidation for all input validation
+12. **Documentation Language**: All documentation must be written in English
+   - **Includes**: ADRs, README files, package documentation (*.md files), XML comments, code comments
+   - **Exception**: User-facing UI text and error messages can be localized
+   - **Rationale**: Ensures consistency and accessibility for international developers
 
 ## Important Implementation Notes
 

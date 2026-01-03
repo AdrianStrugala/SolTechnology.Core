@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.Net;
 using System.Net.Mime;
+using Asp.Versioning;
 using DreamTravel.Domain.Cities;
 using DreamTravel.Queries.FindCityByCoordinates;
 using Microsoft.AspNetCore.Mvc;
@@ -9,6 +10,7 @@ using SolTechnology.Core.CQRS;
 
 namespace DreamTravel.Api.Controllers.v1
 {
+    [ApiVersion("1.0", Deprecated = true)]
     [Route(Route)]
     public class FindNameOfCityController : Controller
     {

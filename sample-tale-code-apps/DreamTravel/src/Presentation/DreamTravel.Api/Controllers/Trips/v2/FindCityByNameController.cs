@@ -1,5 +1,6 @@
 ﻿using System.Net;
 using System.Net.Mime;
+using Asp.Versioning;
 using DreamTravel.Domain.Cities;
 using DreamTravel.Queries.FindCityByName;
 using MediatR;
@@ -9,6 +10,7 @@ using SolTechnology.Core.CQRS;
 
 namespace DreamTravel.Api.Controllers.Trips.v2
 {
+    [ApiVersion("2.0")]
     [Route(Route)]
     [ServiceFilter(typeof(ExceptionFilter))]
     [ServiceFilter(typeof(ResponseEnvelopeFilter))]
@@ -17,7 +19,7 @@ namespace DreamTravel.Api.Controllers.Trips.v2
         ILogger<FindCityByNameController> logger)
         : ControllerBase
     {
-        public const string Route = "api/v2/FindCityByName";
+        public const string Route = "api/FindCityByName";
 
 
         [HttpPost]

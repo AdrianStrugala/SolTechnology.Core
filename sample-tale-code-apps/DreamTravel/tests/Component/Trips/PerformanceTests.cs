@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using DreamTravel.Domain.Cities;
 using DreamTravel.Queries.CalculateBestPath;
 using FluentAssertions;
 using NUnit.Framework;
@@ -32,19 +31,19 @@ namespace DreamTravel.FunctionalTests.Trips
         {
             //Arrange
 
-            List<City> cities = new List<City>
-            {
-                new City { Name = "Wroclaw", Latitude = 51, Longitude = 17 },
-                new City { Name = "Warsaw", Latitude = 52, Longitude = 21 },
-                new City { Name = "Gdańsk", Latitude = 54, Longitude = 18 },
-                new City { Name = "Rzeszów", Latitude = 50, Longitude = 22 },
-                new City { Name = "Lublin", Latitude = 51, Longitude = 22 },
-                new City { Name = "Poznan", Latitude = 52, Longitude = 16 },
-                new City { Name = "Kraków", Latitude = 50, Longitude = 20 },
-                new City { Name = "Białystok", Latitude = 53, Longitude = 53 },
-                new City { Name = "Łódź", Latitude = 51, Longitude = 19 },
-                new City { Name = "Opole", Latitude = 50, Longitude = 17 }
-            };
+            List<CalculateBestPathQuery.CityQueryModel> cities =
+            [
+                new() { Name = "Wroclaw", Latitude = 51, Longitude = 17, Country = "Poland" },
+                new() { Name = "Warsaw", Latitude = 52, Longitude = 21, Country = "Poland" },
+                new() { Name = "Gdańsk", Latitude = 54, Longitude = 18, Country = "Poland" },
+                new() { Name = "Rzeszów", Latitude = 50, Longitude = 22, Country = "Poland" },
+                new() { Name = "Lublin", Latitude = 51, Longitude = 22, Country = "Poland" },
+                new() { Name = "Poznan", Latitude = 52, Longitude = 16, Country = "Poland" },
+                new() { Name = "Kraków", Latitude = 50, Longitude = 20, Country = "Poland" },
+                new() { Name = "Białystok", Latitude = 53, Longitude = 53, Country = "Poland" },
+                new() { Name = "Łódź", Latitude = 51, Longitude = 19, Country = "Poland" },
+                new() { Name = "Opole", Latitude = 50, Longitude = 17, Country = "Poland" }
+            ];
 
             //Act
             var result = await _sut.Handle(new CalculateBestPathQuery { Cities = cities });

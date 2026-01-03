@@ -1,5 +1,6 @@
 <Solution>
   <Folder Name="/Docs/">
+    <File Path="docs/Api.md" />
     <File Path="docs/AUID.md" />
     <File Path="docs/Auth.md" />
     <File Path="docs/Blob.md" />

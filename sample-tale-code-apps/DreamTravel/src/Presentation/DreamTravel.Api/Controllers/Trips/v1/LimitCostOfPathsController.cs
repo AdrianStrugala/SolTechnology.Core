@@ -1,5 +1,6 @@
 ﻿using System.Net;
 using System.Net.Mime;
+using Asp.Versioning;
 using DreamTravel.Queries.LimitCostOfPaths;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
@@ -8,6 +9,7 @@ using Path = DreamTravel.Domain.Paths.Path;
 
 namespace DreamTravel.Api.Controllers.v1
 {
+    [ApiVersion("1.0", Deprecated = true)]
     [Route(Route)]
     [Obsolete]
     public class LimitCostOfPathsController : Controller

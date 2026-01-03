@@ -1,4 +1,5 @@
-﻿using Hangfire.Annotations;
+﻿using DreamTravel.Domain.Cities;
+using Hangfire.Annotations;
 using SolTechnology.Core.CQRS;
 using SolTechnology.Core.Story;
 
@@ -9,9 +10,20 @@ public class InitiateContext : Chapter<CalculateBestPathContext>
 {
     public override Task<Result> Read(CalculateBestPathContext narration)
     {
-         var cities = narration.Input.Cities.Where(c => c != null).ToList();
+         // Map CityDto to City domain model
+         var cities = narration.Input.Cities
+             .Select(dto => new City
+             {
+                 Name = dto.Name,
+                 Latitude = dto.Latitude,
+                 Longitude = dto.Longitude,
+                 Country = dto.Country,
+                 SearchStatistics = new List<CitySearchStatistics>(),
+                 ReadOptions = CityReadOptions.Default
+             })
+             .ToList();
 
-         narration.Cities = cities!;
+         narration.Cities = cities;
          narration.NoOfCities = cities.Count;
          int matrixSize = cities.Count * cities.Count;
 

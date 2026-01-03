@@ -1,4 +1,5 @@
 using System.Globalization;
+using Asp.Versioning.ApiExplorer;
 using DreamTravel.DomainServices;
 using DreamTravel.Flows;
 using DreamTravel.GraphDatabase;
@@ -9,6 +10,7 @@ using DreamTravel.Queries;
 using DreamTravel.Sql;
 using MicroElements.Swashbuckle.FluentValidation.AspNetCore;
 using Microsoft.OpenApi.Models;
+using SolTechnology.Core.API;
 using SolTechnology.Core.API.Filters;
 using SolTechnology.Core.Authentication;
 using SolTechnology.Core.Cache;
@@ -80,16 +82,16 @@ public class Program
         builder.Services.InstallInfrastructure();
         builder.Services.InstallDomainServices();
         builder.Services.InstallTripsQueries();
-        
-        
+
+
         //Graph
         builder.Services.Configure<Neo4jSettings>(
             builder.Configuration.GetSection("Neo4j"));
         builder.Services.InstallGraphDatabase();
-        
+
         //Journey (migrated to Story framework)
         builder.Services.AddFlows(SolTechnology.Core.Story.StoryOptions.WithInMemoryPersistence());
-        
+
         //The rest
         builder.Services.AddCache();
 
@@ -99,12 +101,12 @@ public class Program
         var authenticationConfiguration = builder.Configuration.GetRequiredSection("Authentication").Get<AuthenticationConfiguration>()!;
         var authFilter = builder.Services.AddAuthenticationAndBuildFilter(authenticationConfiguration);
 
-        builder.Services.AddControllers();
+        // API Versioning
+        builder.Services.AddVersioning(apiTitle: "DreamTravel API");
 
         //SWAGGER
         builder.Services.AddSwaggerGen(c =>
         {
-            c.SwaggerDoc("v1", new OpenApiInfo { Title = "DreamTravel", Version = "v1" });
             c.AddSecurityDefinition(ApiKeyAuthenticationSchemeOptions.AuthenticationScheme, new OpenApiSecurityScheme
             {
                 Type = SecuritySchemeType.ApiKey,
@@ -127,20 +129,18 @@ public class Program
                 }
             });
         });
+
         builder.Services.AddFluentValidationRulesToSwagger();
 
         builder.Services.AddScoped<ExceptionFilter>();
         builder.Services.AddScoped<ResponseEnvelopeFilter>();
 
-        //MVC
-        builder.Services.AddMvc(opts =>
+        builder.Services.AddControllers(opts =>
         {
             opts.Filters.Add(authFilter);
             opts.Filters.Add<ExceptionFilter>();
             opts.Filters.Add<ResponseEnvelopeFilter>();
         });
-
-        
 
         var app = builder.Build();
 
@@ -148,7 +148,18 @@ public class Program
 
         app.UseDeveloperExceptionPage();
         app.UseSwagger();
-        app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "Dream Travel"));
+
+        var apiVersionDescriptionProvider = app.Services.GetRequiredService<IApiVersionDescriptionProvider>();
+        app.UseSwaggerUI(c =>
+        {
+            foreach (var description in apiVersionDescriptionProvider.ApiVersionDescriptions.Reverse())
+            {
+                c.SwaggerEndpoint(
+                    $"/swagger/{description.GroupName}/swagger.json",
+                    $"DreamTravel API {description.GroupName.ToUpperInvariant()}" +
+                    $"{(description.IsDeprecated ? " (Deprecated)" : "")}");
+            }
+        });
 
         app.UseCors(CorsPolicy);
         app.UseHttpsRedirection();

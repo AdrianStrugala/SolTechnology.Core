@@ -47,8 +47,9 @@ public class FindCityAndSaveDetailsTest
                 .WithBody(GoogleFakeApi.BuildGeocodingResponse(city)));
 
         var apiResponse = await _apiClient
-            .CreateRequest("/api/v2/FindCityByName")
+            .CreateRequest("/api/FindCityByName")
             .WithHeader("X-API-KEY", "<SECRET>")
+            .WithHeader("X-API-VERSION", "2.0")
             .WithBody(new { city.Name })
             .PostAsync<Result<City>>();
 

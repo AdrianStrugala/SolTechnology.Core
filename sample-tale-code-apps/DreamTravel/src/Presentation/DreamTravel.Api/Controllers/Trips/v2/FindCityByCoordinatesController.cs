@@ -1,5 +1,6 @@
 ﻿using System.Net;
 using System.Net.Mime;
+using Asp.Versioning;
 using DreamTravel.Domain.Cities;
 using DreamTravel.Queries.FindCityByCoordinates;
 using MediatR;
@@ -8,13 +9,14 @@ using SolTechnology.Core.CQRS;
 
 namespace DreamTravel.Api.Controllers.Trips.v2
 {
+    [ApiVersion("2.0")]
     [Route(Route)]
     public class FindCityByCoordinatesController(
         IMediator mediator,
         ILogger<FindCityByCoordinatesController> logger)
         : ControllerBase
     {
-        public const string Route = "api/v2/FindCityByCoordinates";
+        public const string Route = "api/FindCityByCoordinates";
 
 
         [HttpPost]

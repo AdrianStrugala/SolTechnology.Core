@@ -55,8 +55,9 @@ namespace DreamTravel.FunctionalTests.Trips
             foreach (var city in cities)
             {
                 var findCityByNameResponse = await _apiClient
-                    .CreateRequest("/api/v2/FindCityByName")
+                    .CreateRequest("/api/FindCityByName")
                     .WithHeader("X-API-KEY", "<SECRET>")
+                    .WithHeader("X-API-VERSION", "2.0")
                     .WithBody(new { city.Name })
                     .PostAsync<Result<City>>();
 
@@ -66,8 +67,9 @@ namespace DreamTravel.FunctionalTests.Trips
 
             // "And when user searches for the best path".x(async () =>
             var apiResponse = await _apiClient
-                .CreateRequest("/api/v2/CalculateBestPath")
+                .CreateRequest("/api/CalculateBestPath")
                 .WithHeader("X-API-KEY", "<SECRET>")
+                .WithHeader("X-API-VERSION", "2.0")
                 .WithBody(new { Cities = cities })
                 .PostAsync<Result<CalculateBestPathResult>>();
             apiResponse.IsSuccess.Should().BeTrue();

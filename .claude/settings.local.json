@@ -82,7 +82,13 @@
       "Bash(Select-Object -First 5)",
       "Bash(timeout 300 dotnet build:*)",
       "Bash(powershell.exe -File ..githubrunTests.ps1)",
-      "Bash(Select-String:*)"
+      "Bash(Select-String:*)",
+      "Bash(timeout 10 powershell.exe:*)",
+      "Bash(timeout 10 dotnet run:*)",
+      "Bash(Select-Object -First 50)",
+      "Bash(timeout 12 powershell.exe:*)",
+      "Bash(timeout 15 dotnet run:*)",
+      "Bash(timeout 12 dotnet run:*)"
     ],
     "deny": [],
     "ask": []
