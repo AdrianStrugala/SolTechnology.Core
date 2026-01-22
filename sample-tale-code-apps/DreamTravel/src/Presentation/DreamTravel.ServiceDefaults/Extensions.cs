@@ -113,6 +113,18 @@ namespace DreamTravel.ServiceDefaults
                 });
             }
 
+            // Liveness probe - only checks if the app is running (quick response, no external dependencies)
+            app.MapHealthChecks("/health/live", new HealthCheckOptions
+            {
+                Predicate = r => r.Tags.Contains("live")
+            });
+
+            // Readiness probe - checks if the app can handle requests (includes DB + external services)
+            app.MapHealthChecks("/health/ready", new HealthCheckOptions
+            {
+                Predicate = r => r.Tags.Contains("ready")
+            });
+
             return app;
         }
     }

@@ -36,6 +36,7 @@ public class Program
         builder.Services.InstallTripsSql(sqlConfiguration);
         builder.Services.InstallGeolocationDataClients();
         builder.Services.InstallInfrastructure();
+        builder.Services.AddHangfireSmartRetry();
         builder.Services.InstallDomainServices();
         builder.Services.InstallDreamTripsCommands();
         

@@ -1,5 +1,7 @@
 using System.Globalization;
 using Asp.Versioning.ApiExplorer;
+using DreamTravel.Api.HealthChecks;
+using DreamTravel.Api.Middleware;
 using DreamTravel.DomainServices;
 using DreamTravel.Flows;
 using DreamTravel.GraphDatabase;
@@ -10,6 +12,8 @@ using DreamTravel.Queries;
 using DreamTravel.Sql;
 using MicroElements.Swashbuckle.FluentValidation.AspNetCore;
 using Microsoft.OpenApi.Models;
+using Serilog;
+using Serilog.Events;
 using SolTechnology.Core.API;
 using SolTechnology.Core.API.Filters;
 using SolTechnology.Core.Authentication;
@@ -28,11 +32,25 @@ public class Program
     public static void Main(string[] args)
     {
         var builder = WebApplication.CreateBuilder(args);
+
+        // Configure Serilog
+        Log.Logger = new LoggerConfiguration()
+            .MinimumLevel.Information()
+            .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
+            .MinimumLevel.Override("Microsoft.Hosting.Lifetime", LogEventLevel.Information)
+            .Enrich.FromLogContext()
+            .Enrich.WithEnvironmentName()
+            .Enrich.WithMachineName()
+            .Enrich.WithThreadId()
+            .WriteTo.Console(outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3}] {CorrelationId} {TripId} {Message:lj}{NewLine}{Exception}")
+            .CreateLogger();
+
+        builder.Host.UseSerilog();
         builder.AddServiceDefaults();
 
 
         var cultureInfo = new CultureInfo("en-US");
-        cultureInfo.NumberFormat.CurrencySymbol = "�";
+        cultureInfo.NumberFormat.CurrencySymbol = "€";
 
         CultureInfo.DefaultThreadCurrentCulture = cultureInfo;
         CultureInfo.DefaultThreadCurrentUICulture = cultureInfo;
@@ -70,6 +88,12 @@ public class Program
                         .AllowCredentials();
                 });
         });
+
+        //Health Checks
+        builder.Services.AddHealthChecks()
+            .AddCheck<DatabaseHealthCheck>("database", tags: ["ready"])
+            .AddCheck<GoogleApiHealthCheck>("google-api", tags: ["ready"]);
+        builder.Services.AddHttpClient();
 
         //SQL
         var sqlConfiguration = builder.Configuration.GetSection("Sql").Get<SQLConfiguration>()!;
@@ -168,6 +192,8 @@ public class Program
 
         app.UseAuthorization();
         app.UseAuthentication();
+        app.UseCorrelationId();
+        app.UseLogIdentifiers();
         app.UseMiddleware<LoggingMiddleware>();
 
         app.Use(async (context, next) =>
