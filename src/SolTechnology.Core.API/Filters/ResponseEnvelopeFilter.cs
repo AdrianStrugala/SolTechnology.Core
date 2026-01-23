@@ -7,7 +7,6 @@ namespace SolTechnology.Core.API.Filters;
 /// <summary>
 /// Wraps API responses in Result envelope.
 /// </summary>
-[Obsolete("Use ProblemDetails for error responses instead (RFC 7807). Controllers should return domain objects directly without wrapping. Register ProblemDetailsExceptionHandler for consistent error handling.")]
 public class ResponseEnvelopeFilter : IResultFilter
 {
     public void OnResultExecuting(ResultExecutingContext context)

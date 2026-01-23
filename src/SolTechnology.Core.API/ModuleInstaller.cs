@@ -9,40 +9,42 @@ namespace SolTechnology.Core.API;
 
 public static class ModuleInstaller
 {
-    /// <summary>
-    /// Configures API versioning using header-based versioning (X-API-VERSION)
-    /// </summary>
     /// <param name="services">Service collection</param>
-    /// <param name="defaultMajorVersion">Default major version (default: 2)</param>
-    /// <param name="defaultMinorVersion">Default minor version (default: 0)</param>
-    /// <param name="apiTitle">API title for Swagger documentation (default: "API")</param>
-    /// <returns>Service collection for chaining</returns>
-    public static IServiceCollection AddVersioning(
-        this IServiceCollection services,
-        int defaultMajorVersion = 2,
-        int defaultMinorVersion = 0,
-        string apiTitle = "API")
+    extension(IServiceCollection services)
     {
-        // API Versioning
-        services.AddApiVersioning(options =>
+        /// <summary>
+        /// Configures API versioning using header-based versioning (X-API-VERSION)
+        /// </summary>
+        /// <param name="defaultMajorVersion">Default major version (default: 2)</param>
+        /// <param name="defaultMinorVersion">Default minor version (default: 0)</param>
+        /// <param name="apiTitle">API title for Swagger documentation (default: "API")</param>
+        /// <returns>Service collection for chaining</returns>
+        public IServiceCollection AddVersioning(int defaultMajorVersion = 2,
+            int defaultMinorVersion = 0,
+            string apiTitle = "API")
         {
-            options.DefaultApiVersion = new ApiVersion(defaultMajorVersion, defaultMinorVersion);
-            options.AssumeDefaultVersionWhenUnspecified = true;
-            options.ReportApiVersions = true;
-            options.ApiVersionReader = new HeaderApiVersionReader("X-API-VERSION");
-        }).AddApiExplorer(options =>
-        {
-            options.GroupNameFormat = "'v'V";  // Major version only
-            options.SubstituteApiVersionInUrl = true;
-        });
+            // API Versioning
+            services.AddApiVersioning(options =>
+            {
+                options.DefaultApiVersion = new ApiVersion(defaultMajorVersion, defaultMinorVersion);
+                options.AssumeDefaultVersionWhenUnspecified = true;
+                options.ReportApiVersions = true;
+                options.ApiVersionReader = new HeaderApiVersionReader("X-API-VERSION");
+            }).AddApiExplorer(options =>
+            {
+                options.GroupNameFormat = "'v'V";  // Major version only
+                options.SubstituteApiVersionInUrl = true;
+            });
 
-        // Swagger configuration for versioning
-        services.AddTransient<IConfigureOptions<SwaggerGenOptions>>(sp =>
-            new ConfigureSwaggerOptions(
-                sp.GetRequiredService<IApiVersionDescriptionProvider>(),
-                apiTitle));
+            // Swagger configuration for versioning
+            services.AddTransient<IConfigureOptions<SwaggerGenOptions>>(sp =>
+                new ConfigureSwaggerOptions(
+                    sp.GetRequiredService<IApiVersionDescriptionProvider>(),
+                    apiTitle));
 
-        return services;
+            return services;
+        }
+
     }
 }
 

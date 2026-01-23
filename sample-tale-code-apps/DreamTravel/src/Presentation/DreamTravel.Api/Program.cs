@@ -15,7 +15,7 @@ using Microsoft.OpenApi.Models;
 using Serilog;
 using Serilog.Events;
 using SolTechnology.Core.API;
-using SolTechnology.Core.API.ExceptionHandling;
+using SolTechnology.Core.API.Filters;
 using SolTechnology.Core.Authentication;
 using SolTechnology.Core.Cache;
 using SolTechnology.Core.Logging.Middleware;
@@ -95,8 +95,8 @@ public class Program
             .AddCheck<GoogleApiHealthCheck>("google-api", tags: ["ready"]);
         builder.Services.AddHttpClient();
 
-        //ProblemDetails Exception Handler (RFC 7807)
-        builder.Services.AddProblemDetailsExceptionHandler();
+        //Exception Filter (converts exceptions to RFC 7807 ProblemDetails in Result envelope)
+        builder.Services.AddScoped<ExceptionFilter>();
 
         //SQL
         var sqlConfiguration = builder.Configuration.GetSection("Sql").Get<SQLConfiguration>()!;
@@ -162,14 +162,12 @@ public class Program
         builder.Services.AddControllers(opts =>
         {
             opts.Filters.Add(authFilter);
+            opts.Filters.Add<ExceptionFilter>();
         });
 
         var app = builder.Build();
 
         app.MapDefaultEndpoints();
-
-        // Use ProblemDetails for exceptions
-        app.UseExceptionHandler();
 
         app.UseSwagger();
 
