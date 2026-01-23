@@ -51,18 +51,9 @@ dotnet_diagnostic.CA1708.severity = none
 # Disable IDE1006 (Naming rule violation) - allows custom acronym casing
 dotnet_diagnostic.IDE1006.severity = none
 
-# Explicitly allow acronyms in ALL CAPS
-# Per ADR 001: ALL acronyms use ALL CAPS regardless of length
-# Examples: HTTP, API, SQL, HTML, XML, UUID, IO, DB, CQRS, AUID, UI
-dotnet_naming_rule.acronyms_should_be_all_caps.severity = none
-dotnet_naming_rule.acronyms_should_be_all_caps.symbols = all_symbols
-dotnet_naming_rule.acronyms_should_be_all_caps.style = all_caps
-
-dotnet_naming_symbols.all_symbols.applicable_kinds = *
-dotnet_naming_symbols.all_symbols.applicable_accessibilities = *
-
-dotnet_naming_style.all_caps.capitalization = all_upper
-dotnet_naming_style.all_caps.word_separator = _
+# Acronym naming is handled by disabling IDE1006 above
+# This allows ALL CAPS acronyms like HTTP, API, SQL, HTML, XML, UUID, IO, DB, CQRS, AUID, UI
+# without forcing other identifiers to change case
 
 # Code quality
 dotnet_code_quality_unused_parameters = all:suggestion
