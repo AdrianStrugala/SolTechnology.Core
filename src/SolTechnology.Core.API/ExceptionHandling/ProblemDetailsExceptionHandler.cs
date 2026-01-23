@@ -9,15 +9,8 @@ namespace SolTechnology.Core.API.ExceptionHandling;
 /// <summary>
 /// Global exception handler that converts exceptions to RFC 7807 ProblemDetails responses.
 /// </summary>
-public sealed class ProblemDetailsExceptionHandler : IExceptionHandler
+public sealed class ProblemDetailsExceptionHandler(ILogger<ProblemDetailsExceptionHandler> logger) : IExceptionHandler
 {
-    private readonly ILogger<ProblemDetailsExceptionHandler> _logger;
-
-    public ProblemDetailsExceptionHandler(ILogger<ProblemDetailsExceptionHandler> logger)
-    {
-        _logger = logger;
-    }
-
     public async ValueTask<bool> TryHandleAsync(
         HttpContext httpContext,
         Exception exception,
@@ -25,7 +18,7 @@ public sealed class ProblemDetailsExceptionHandler : IExceptionHandler
     {
         var (statusCode, problemDetails) = MapExceptionToProblemDetails(exception, httpContext);
 
-        _logger.LogError(
+        logger.LogError(
             exception,
             "Exception occurred: [{ExceptionType}] [{Message}]",
             exception.GetType().Name,
