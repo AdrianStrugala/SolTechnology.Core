@@ -27,7 +27,7 @@ public class HangfireNotificationPublisher : IHangfireNotificationPublisher
     }
 
 
-    [Hangfire.AutomaticRetry(Attempts = 0)] // Optional: prevent retries if not needed
+    [global::Hangfire.AutomaticRetry(Attempts = 0)] // Optional: prevent retries if not needed
     public void DispatchEvent(INotification notification)
     {
         using var scope = _serviceScopeFactory.CreateScope();

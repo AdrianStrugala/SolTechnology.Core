@@ -5,15 +5,12 @@ using DreamTravel.Domain.Cities;
 using DreamTravel.Queries.FindCityByName;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using SolTechnology.Core.API.Filters;
 using SolTechnology.Core.CQRS;
 
 namespace DreamTravel.Api.Controllers.Trips.v2
 {
     [ApiVersion("2.0")]
     [Route(Route)]
-    [ServiceFilter(typeof(ExceptionFilter))]
-    [ServiceFilter(typeof(ResponseEnvelopeFilter))]
     public class FindCityByNameController(
         IMediator mediator,
         ILogger<FindCityByNameController> logger)

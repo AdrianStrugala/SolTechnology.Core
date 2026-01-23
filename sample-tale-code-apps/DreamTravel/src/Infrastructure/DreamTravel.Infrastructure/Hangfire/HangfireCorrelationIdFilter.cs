@@ -43,12 +43,11 @@ public class HangfireCorrelationIdFilter : JobFilterAttribute, IClientFilter, IS
 
     public void OnCreated(CreatedContext context)
     {
-        var correlationId = context.GetJobParameter<string>(CorrelationIdKey);
-
+        // CorrelationId was set in OnCreating, just log the job creation
         _logger?.LogDebug(
             "Job [{JobId}] created with CorrelationId: [{CorrelationId}]",
             context.BackgroundJob?.Id,
-            correlationId);
+            CurrentCorrelationId.Value);
     }
 
     public void OnPerforming(PerformingContext context)

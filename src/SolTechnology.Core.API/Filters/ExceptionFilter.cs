@@ -11,6 +11,7 @@ namespace SolTechnology.Core.API.Filters;
 /// <summary>
 /// Global exception filter that catches unhandled exceptions and converts them to structured API responses.
 /// </summary>
+[Obsolete("Use ProblemDetailsExceptionHandler instead. Register with services.AddProblemDetailsExceptionHandler() and app.UseExceptionHandler(). See RFC 7807 for ProblemDetails standard.")]
 public class ExceptionFilter : IExceptionFilter
 {
     private readonly ILogger<ExceptionFilter> _logger;
