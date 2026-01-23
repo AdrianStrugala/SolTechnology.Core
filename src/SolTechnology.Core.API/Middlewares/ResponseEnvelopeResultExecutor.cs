@@ -6,7 +6,7 @@ using SolTechnology.Core.CQRS;
 
 namespace SolTechnology.Core.API.Middlewares;
 
-//FILTER is preferred
+[Obsolete("FILTER is preferred")]
 public class ResponseEnvelopeResultExecutor : ObjectResultExecutor
 {
     public ResponseEnvelopeResultExecutor(OutputFormatterSelector formatterSelector, IHttpResponseStreamWriterFactory writerFactory, ILoggerFactory loggerFactory, IOptions<MvcOptions> mvcOptions) : base(formatterSelector, writerFactory, loggerFactory, mvcOptions)

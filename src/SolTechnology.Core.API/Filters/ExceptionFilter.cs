@@ -10,20 +10,13 @@ namespace SolTechnology.Core.API.Filters;
 /// Global exception filter that catches unhandled exceptions and converts them to
 /// RFC 7807 ProblemDetails responses wrapped in a Result envelope.
 /// </summary>
-public class ExceptionFilter : IExceptionFilter
+public class ExceptionFilter(ILogger<ExceptionFilter> logger) : IExceptionFilter
 {
-    private readonly ILogger<ExceptionFilter> _logger;
-
-    public ExceptionFilter(ILogger<ExceptionFilter> logger)
-    {
-        _logger = logger;
-    }
-
     public void OnException(ExceptionContext context)
     {
         var problemDetails = MapExceptionToProblemDetails(context.Exception, context.HttpContext.Request.Path);
 
-        _logger.LogError(
+        logger.LogError(
             context.Exception,
             "Unhandled exception occurred. Title: [{Title}], Detail: [{Detail}]",
             problemDetails.Title,

@@ -6,7 +6,7 @@ using SolTechnology.Core.CQRS.Errors;
 
 namespace SolTechnology.Core.API.Middlewares;
 
-//FILTER is preferred
+[Obsolete("FILTER is preferred")]
 public class ExceptionHandlerMiddleware
 {
     private readonly RequestDelegate _next;
