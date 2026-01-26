@@ -1,4 +1,3 @@
-using DreamTravel.Domain.Errors;
 using SolTechnology.Core.CQRS;
 
 namespace DreamTravel.Infrastructure.Hangfire;

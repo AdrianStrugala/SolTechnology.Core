@@ -97,6 +97,7 @@ public class Program
 
         //Exception Filter (converts exceptions to RFC 7807 ProblemDetails in Result envelope)
         builder.Services.AddScoped<ExceptionFilter>();
+        builder.Services.AddScoped<ResponseEnvelopeFilter>();
 
         //SQL
         var sqlConfiguration = builder.Configuration.GetSection("Sql").Get<SQLConfiguration>()!;
@@ -116,8 +117,8 @@ public class Program
             builder.Configuration.GetSection("Neo4j"));
         builder.Services.InstallGraphDatabase();
 
-        //Journey (migrated to Story framework)
-        builder.Services.AddFlows(SolTechnology.Core.Story.StoryOptions.WithInMemoryPersistence());
+        //Story
+        builder.Services.AddFlows(StoryOptions.WithInMemoryPersistence());
 
         //The rest
         builder.Services.AddCache();
@@ -163,6 +164,7 @@ public class Program
         {
             opts.Filters.Add(authFilter);
             opts.Filters.Add<ExceptionFilter>();
+            opts.Filters.Add<ResponseEnvelopeFilter>();
         });
 
         var app = builder.Build();
