@@ -1,95 +1,151 @@
-﻿using System.Text;
-using System.Text.Json;
+using System.Text.RegularExpressions;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Primitives;
 
 namespace SolTechnology.Core.Logging.Middleware;
 
-public class LoggingMiddleware
+/// <summary>
+/// Middleware that provides comprehensive request logging with:
+/// - Correlation ID extraction/generation and propagation
+/// - Custom identifier extraction for domain-specific logging
+/// - Request timing and status code logging
+/// </summary>
+public class LoggingMiddleware(RequestDelegate next, IOptions<LoggingMiddlewareOptions> options)
 {
-    private readonly RequestDelegate _next;
-    private ILogger<LoggingMiddleware> _logger = null!;
+    private readonly LoggingMiddlewareOptions _options = options.Value;
 
-    public LoggingMiddleware(RequestDelegate next)
+    private static readonly AsyncLocal<string?> CurrentCorrelationId = new();
+
+    /// <summary>
+    /// Gets the current correlation ID for the executing async context.
+    /// </summary>
+    public static string? Current => CurrentCorrelationId.Value;
+
+    public async Task InvokeAsync(HttpContext context, ILogger<LoggingMiddleware> logger)
     {
-        _next = next;
-    }
+        var stopwatch = new AsyncStopwatch();
 
-    public async Task Invoke(HttpContext context, ILogger<LoggingMiddleware> logger)
-    {
-        _logger = logger;
-        var asyncStopwatch = new AsyncStopwatch();
+        // Extract or generate correlation ID
+        var correlationId = GetOrCreateCorrelationId(context);
+        CurrentCorrelationId.Value = correlationId;
 
-        //cannot put await to using. It causes logger scope to be disposed
-        using (AddRequestIdsToScope(context))
+        // Add correlation ID to response headers
+        context.Response.OnStarting(() =>
         {
-            _logger.LogInformation("Started request: [{RequestMethod} {RequestPath}]",
+            if (!context.Response.Headers.ContainsKey(_options.CorrelationIdHeader))
+            {
+                context.Response.Headers[_options.CorrelationIdHeader] = correlationId;
+            }
+            return Task.CompletedTask;
+        });
+
+        // Build scope identifiers
+        var identifiers = new Dictionary<string, object?>
+        {
+            ["CorrelationId"] = correlationId
+        };
+
+        // Extract configured identifiers
+        foreach (var identifier in _options.Identifiers)
+        {
+            var value = ExtractIdentifier(context, identifier);
+            if (value != null)
+            {
+                identifiers[identifier] = value;
+            }
+        }
+
+        using (logger.BeginScope(identifiers))
+        {
+            logger.LogInformation("Started request: [{RequestMethod} {RequestPath}]",
                 context.Request.Method, context.Request.Path);
 
             try
             {
-                await _next(context).ConfigureAwait(false);
+                await next(context);
             }
             finally
             {
-                _logger.LogInformation("Finished request in [{ElapsedMilliseconds}] ms with status code [{StatusCode}]",
-                    asyncStopwatch.Elapsed.TotalMilliseconds, context.Response.StatusCode);
+                logger.LogInformation("Finished request in [{ElapsedMilliseconds}] ms with status code [{StatusCode}]",
+                    stopwatch.Elapsed.TotalMilliseconds, context.Response.StatusCode);
+
+                CurrentCorrelationId.Value = null;
             }
         }
     }
 
-    private IDisposable AddRequestIdsToScope(HttpContext context)
+    private string GetOrCreateCorrelationId(HttpContext context)
     {
-        //To show how can some id's be extracted from query
-        context.Request.Query.TryGetValue("userId", out var userId);
-
-        //To show how can some id's be extracted from route
-        // context.Request.RouteValues.TryGetValue("category", out var category);
-
-        //To show how can some id's be extracted from body
-        var body = ReadRequestBody(context.Request);
-
-        string? name = null;
-        if (body is not null)
+        if (context.Request.Headers.TryGetValue(_options.CorrelationIdHeader, out StringValues existingCorrelationId) &&
+            !string.IsNullOrEmpty(existingCorrelationId))
         {
-            if (body.RootElement.TryGetProperty("name", out var nameElement))
-            {
-                name = nameElement.ToString();
-            }
+            return existingCorrelationId.ToString();
         }
 
-
-        var disposable = new DisposableCollection
-        {
-            _logger.AddToScope("environment", Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "unknown"),
-            _logger.AddToScope("correlationId", Guid.NewGuid().ToString()),
-            _logger.AddToScope("userId", userId.ToString() ?? "unknown"),
-            // _logger.AddToScope("category", category?.ToString() ?? "unknown"),
-            _logger.AddToScope("name", name ?? "unknown"),
-        };
-
-        return disposable;
+        return Auid.New("COR").ToString();
     }
 
-    private JsonDocument? ReadRequestBody(HttpRequest request)
+    private static string? ExtractIdentifier(HttpContext context, string identifierName)
     {
-        request.EnableBuffering();
-        request.Body.Position = 0;
+        var path = context.Request.Path.Value ?? string.Empty;
 
-        try
+        // Try to extract from route: /{identifierName}/{value} or /{identifierName}s/{value}
+        // Pattern matches: /city/Warsaw, /cities/Warsaw, /trip/123, /trips/123
+        var routePattern = $@"/{Regex.Escape(identifierName)}s?/([^/]+)";
+        var routeMatch = Regex.Match(path, routePattern, RegexOptions.IgnoreCase);
+        if (routeMatch.Success)
         {
-            using var reader = new StreamReader(request.Body, Encoding.UTF8, leaveOpen: true);
-            var bodyAsText = reader.ReadToEnd();
-            var document = JsonDocument.Parse(bodyAsText);
-            return document;
+            return Uri.UnescapeDataString(routeMatch.Groups[1].Value);
         }
-        catch (Exception)
+
+        // Try to extract from query parameter
+        if (context.Request.Query.TryGetValue(identifierName, out var queryValue) &&
+            !string.IsNullOrEmpty(queryValue))
         {
-            return null;
+            return queryValue.ToString();
         }
-        finally
-        {
-            request.Body.Position = 0;
-        }
+
+        return null;
+    }
+}
+
+/// <summary>
+/// Extension methods for adding LoggingMiddleware to the application pipeline.
+/// </summary>
+public static class LoggingMiddlewareExtensions
+{
+    /// <summary>
+    /// Adds the LoggingMiddleware to the application pipeline with default options.
+    /// </summary>
+    public static IApplicationBuilder UseLoggingMiddleware(this IApplicationBuilder builder)
+    {
+        return builder.UseMiddleware<LoggingMiddleware>();
+    }
+
+    /// <summary>
+    /// Adds the LoggingMiddleware to the application pipeline with custom options.
+    /// </summary>
+    /// <param name="builder">The application builder.</param>
+    /// <param name="configure">Action to configure logging middleware options.</param>
+    /// <example>
+    /// <code>
+    /// app.UseLoggingMiddleware(options =>
+    /// {
+    ///     options.CorrelationIdHeader = "X-Request-Id";
+    ///     options.Identifiers = ["tripId", "cityId", "userId"];
+    /// });
+    /// </code>
+    /// </example>
+    public static IApplicationBuilder UseLoggingMiddleware(
+        this IApplicationBuilder builder,
+        Action<LoggingMiddlewareOptions> configure)
+    {
+        var options = new LoggingMiddlewareOptions();
+        configure(options);
+
+        return builder.UseMiddleware<LoggingMiddleware>(Options.Create(options));
     }
 }

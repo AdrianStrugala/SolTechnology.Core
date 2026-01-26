@@ -1,7 +1,6 @@
 using System.Globalization;
 using Asp.Versioning.ApiExplorer;
 using DreamTravel.Api.HealthChecks;
-using DreamTravel.Api.Middleware;
 using DreamTravel.DomainServices;
 using DreamTravel.Flows;
 using DreamTravel.GraphDatabase;
@@ -42,7 +41,7 @@ public class Program
             .Enrich.WithEnvironmentName()
             .Enrich.WithMachineName()
             .Enrich.WithThreadId()
-            .WriteTo.Console(outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3}] {CorrelationId} {TripId} {Message:lj}{NewLine}{Exception}")
+            .WriteTo.Console(outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3}] {CorrelationId} {trip} {city} {Message:lj}{NewLine}{Exception}")
             .CreateLogger();
 
         builder.Host.UseSerilog();
@@ -192,9 +191,10 @@ public class Program
 
         app.UseAuthorization();
         app.UseAuthentication();
-        app.UseCorrelationId();
-        app.UseLogIdentifiers();
-        app.UseMiddleware<LoggingMiddleware>();
+        app.UseLoggingMiddleware(options =>
+        {
+            options.Identifiers = ["trip", "city"];
+        });
 
         app.Use(async (context, next) =>
         {
