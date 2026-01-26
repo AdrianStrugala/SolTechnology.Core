@@ -29,7 +29,7 @@ Each library is a separate NuGet package with its own `ModuleInstaller.cs` for d
 - **SolTechnology.Core.Guards** - Input validation utilities
 - **SolTechnology.Core.Authentication** - Basic and API key authentication
 - **SolTechnology.Core.Logging** - Logging abstractions
-- **SolTechnology.Core.Scheduler** - Cron-based task scheduling
+- **SolTechnology.Core.Jobs** - Hangfire utilities (smart retry, correlation ID, structured errors)
 - **SolTechnology.Core.API** - API utilities and filters
 - **SolTechnology.Core.Cache** - Caching abstractions
 - **SolTechnology.Core.Story** - Story Framework for workflow orchestration with interactive workflows, persistence, and Tale Code philosophy

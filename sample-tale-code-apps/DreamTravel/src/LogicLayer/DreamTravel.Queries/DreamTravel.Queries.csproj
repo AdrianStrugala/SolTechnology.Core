@@ -2,6 +2,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\..\..\..\src\SolTechnology.Core.CQRS\SolTechnology.Core.CQRS.csproj" />
+    <ProjectReference Include="..\..\..\..\..\src\SolTechnology.Core.Jobs\SolTechnology.Core.Jobs.csproj" />
     <ProjectReference Include="..\..\Infrastructure\DreamTravel.Infrastructure\DreamTravel.Infrastructure.csproj" />
     <ProjectReference Include="..\DreamTravel.DomainServices\DreamTravel.DomainServices.csproj" />
     <ProjectReference Include="..\DreamTravel.TravelingSalesmanProblem\DreamTravel.TravelingSalesmanProblem.csproj" />

@@ -1,17 +1,16 @@
 ﻿using System.Diagnostics;
 using DreamTravel.DomainServices.CityDomain;
-using DreamTravel.Infrastructure.Events;
 using DreamTravel.Domain.Cities;
 using DreamTravel.Domain.Events;
-using DreamTravel.GeolocationDataClients.GoogleApi;
 using Microsoft.Extensions.Logging;
 using SolTechnology.Core.CQRS;
+using SolTechnology.Core.Jobs;
 
 namespace DreamTravel.Queries.FindCityByName
 {
     public class FindCityByNameHandler(
         ICityDomainService cityDomainService,
-        IHangfireNotificationPublisher hangfireNotificationPublisher,
+        IHangfireEventPublisher hangfireNotificationPublisher,
         ILogger<FindCityByNameHandler> logger)
         : IQueryHandler<FindCityByNameQuery, City>
     {

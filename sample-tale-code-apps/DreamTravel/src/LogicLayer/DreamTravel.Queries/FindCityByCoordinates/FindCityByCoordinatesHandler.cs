@@ -1,14 +1,14 @@
 ﻿using DreamTravel.DomainServices.CityDomain;
-using DreamTravel.Infrastructure.Events;
 using DreamTravel.Domain.Cities;
 using DreamTravel.Domain.Events;
 using SolTechnology.Core.CQRS;
+using SolTechnology.Core.Jobs;
 
 namespace DreamTravel.Queries.FindCityByCoordinates
 {
     public class FindCityByCoordinatesHandler(
         ICityDomainService cityDomainService,
-        IHangfireNotificationPublisher notificationPublisher)
+        IHangfireEventPublisher notificationPublisher)
         : IQueryHandler<FindCityByCoordinatesQuery, City>
     {
         public async Task<Result<City>> Handle(FindCityByCoordinatesQuery query, CancellationToken cancellationToken)

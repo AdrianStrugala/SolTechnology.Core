@@ -3,7 +3,7 @@ using Hangfire.Common;
 using Hangfire.Server;
 using Microsoft.Extensions.Logging;
 
-namespace DreamTravel.Infrastructure.Hangfire;
+namespace SolTechnology.Core.Jobs;
 
 /// <summary>
 /// Hangfire filter that propagates correlation IDs through background jobs.
@@ -43,7 +43,6 @@ public class HangfireCorrelationIdFilter : JobFilterAttribute, IClientFilter, IS
 
     public void OnCreated(CreatedContext context)
     {
-        // CorrelationId was set in OnCreating, just log the job creation
         _logger?.LogDebug(
             "Job [{JobId}] created with CorrelationId: [{CorrelationId}]",
             context.BackgroundJob?.Id,

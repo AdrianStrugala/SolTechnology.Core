@@ -1,6 +1,6 @@
 using SolTechnology.Core.CQRS;
 
-namespace DreamTravel.Infrastructure.Hangfire;
+namespace SolTechnology.Core.Jobs;
 
 /// <summary>
 /// Interface for Hangfire jobs that return structured error information.

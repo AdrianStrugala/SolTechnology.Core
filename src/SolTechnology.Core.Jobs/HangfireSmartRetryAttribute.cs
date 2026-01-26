@@ -3,7 +3,7 @@ using Hangfire.States;
 using Hangfire.Storage;
 using Microsoft.Extensions.Logging;
 
-namespace DreamTravel.Infrastructure.Hangfire;
+namespace SolTechnology.Core.Jobs;
 
 /// <summary>
 /// Hangfire filter that implements smart retry logic with configurable delays.

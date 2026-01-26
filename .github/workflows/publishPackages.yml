@@ -27,7 +27,7 @@ jobs:
       shell: pwsh
       run: |
            .\.github\runTests.ps1
-   
+
     - name: Pack SolTechnology.Core.SQL
       run: dotnet pack -c Release -o . ./src/SolTechnology.Core.SQL/SolTechnology.Core.SQL.csproj
 
@@ -49,8 +49,8 @@ jobs:
     - name: Pack SolTechnology.Core.MessageBus
       run: dotnet pack -c Release -o . ./src/SolTechnology.Core.MessageBus/SolTechnology.Core.MessageBus.csproj
 
-    - name: Pack SolTechnology.Core.Scheduler
-      run: dotnet pack -c Release -o . ./src/SolTechnology.Core.Scheduler/SolTechnology.Core.Scheduler.csproj
+    - name: Pack SolTechnology.Core.Jobs
+      run: dotnet pack -c Release -o . ./src/SolTechnology.Core.Jobs/SolTechnology.Core.Jobs.csproj
 
     - name: Pack SolTechnology.Core.CQRS
       run: dotnet pack -c Release -o . ./src/SolTechnology.Core.CQRS/SolTechnology.Core.CQRS.csproj
@@ -71,4 +71,49 @@ jobs:
       run: dotnet pack -c Release -o . ./src/SolTechnology.Core.Faker/SolTechnology.Core.Faker.csproj
 
     - name: Publish all nuget packages
+      if: github.ref == 'refs/heads/master'
       run: dotnet nuget push *.nupkg -k ${{secrets.NUGET_API_KEY}} -s https://api.nuget.org/v3/index.json --skip-duplicate
+
+    - name: Deprecate SolTechnology.Core.Scheduler
+      if: github.ref == 'refs/heads/master'
+      run: |
+        dotnet nuget deprecate SolTechnology.Core.Scheduler \
+          --version "*" \
+          --deprecation-type Legacy \
+          --alternative-package SolTechnology.Core.Jobs \
+          --message "This package is deprecated. Use SolTechnology.Core.Jobs instead for Hangfire utilities." \
+          --api-key ${{secrets.NUGET_API_KEY}} \
+          --source https://api.nuget.org/v3/index.json
+
+    - name: Deprecate SolTechnology.Avro.Http
+      if: github.ref == 'refs/heads/master'
+      run: |
+        dotnet nuget deprecate SolTechnology.Avro.Http \
+          --version "*" \
+          --deprecation-type Legacy \
+          --alternative-package SolTechnology.Core.HTTP \
+          --message "This package is deprecated. Use SolTechnology.Core.HTTP instead." \
+          --api-key ${{secrets.NUGET_API_KEY}} \
+          --source https://api.nuget.org/v3/index.json
+
+    - name: Deprecate SolTechnology.Core.ApiClient
+      if: github.ref == 'refs/heads/master'
+      run: |
+        dotnet nuget deprecate SolTechnology.Core.ApiClient \
+          --version "*" \
+          --deprecation-type Legacy \
+          --alternative-package SolTechnology.Core.HTTP \
+          --message "This package is deprecated. Use SolTechnology.Core.HTTP instead." \
+          --api-key ${{secrets.NUGET_API_KEY}} \
+          --source https://api.nuget.org/v3/index.json
+
+    - name: Deprecate SolTechnology.Core.Flow
+      if: github.ref == 'refs/heads/master'
+      run: |
+        dotnet nuget deprecate SolTechnology.Core.Flow \
+          --version "*" \
+          --deprecation-type Legacy \
+          --alternative-package SolTechnology.Core.Story \
+          --message "This package is deprecated. Use SolTechnology.Core.Story instead for workflow orchestration." \
+          --api-key ${{secrets.NUGET_API_KEY}} \
+          --source https://api.nuget.org/v3/index.json

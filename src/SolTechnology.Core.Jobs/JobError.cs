@@ -1,6 +1,6 @@
 using SolTechnology.Core.CQRS.Errors;
 
-namespace DreamTravel.Infrastructure.Hangfire;
+namespace SolTechnology.Core.Jobs;
 
 /// <summary>
 /// Error type for Hangfire job failures with job-specific context.

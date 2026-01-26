@@ -1,13 +1,11 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
-    <PackageReference Include="Hangfire.Core" Version="1.8.22" />
-    <PackageReference Include="MediatR" Version="12.3.0" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\..\..\src\SolTechnology.Core.CQRS\SolTechnology.Core.CQRS.csproj" />
+    <ProjectReference Include="..\..\..\..\..\src\SolTechnology.Core.Jobs\SolTechnology.Core.Jobs.csproj" />
     <ProjectReference Include="..\..\DreamTravel.Domain\DreamTravel.Domain.csproj" />
   </ItemGroup>
 

@@ -7,8 +7,8 @@
     <File Path="docs/Bus.md" />
     <File Path="docs/Cache.md" />
     <File Path="docs/Clients.md" />
-    <File Path="docs/Cron.md" />
     <File Path="docs/Guards.md" />
+    <File Path="docs/Jobs.md" />
     <File Path="docs/Log.md" />
     <File Path="docs/Sql.md" />
     <File Path="docs/theAutomation.md" />
@@ -95,7 +95,7 @@
     <Project Path="src/SolTechnology.Core.Guards/SolTechnology.Core.Guards.csproj" />
     <Project Path="src/SolTechnology.Core.Logging/SolTechnology.Core.Logging.csproj" />
     <Project Path="src/SolTechnology.Core.MessageBus/SolTechnology.Core.MessageBus.csproj" />
-    <Project Path="src/SolTechnology.Core.Scheduler/SolTechnology.Core.Scheduler.csproj" />
     <Project Path="src/SolTechnology.Core.SQL/SolTechnology.Core.SQL.csproj" />
+    <Project Path="src/SolTechnology.Core.Jobs/SolTechnology.Core.Jobs.csproj" />
   </Folder>
 </Solution>

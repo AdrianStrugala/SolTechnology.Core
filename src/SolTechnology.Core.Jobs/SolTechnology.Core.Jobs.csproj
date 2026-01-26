@@ -1,0 +1,34 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<Version>0.5.0</Version>
+		<TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+
+		<Description>Hangfire job processing utilities with smart retry logic, correlation ID propagation, and MediatR event publishing. Provides structured error handling with retryable/non-retryable job errors, configurable exponential backoff, and seamless integration with CQRS Result pattern.</Description>
+		<PackageTags>sol technology core hangfire jobs background-jobs retry smart-retry correlation-id mediatr event-publishing cqrs dotnet</PackageTags>
+		<Product>SolTechnology.Core.Jobs</Product>
+		<PackageId>SolTechnology.Core.Jobs</PackageId>
+		<AssemblyName>SolTechnology.Core.Jobs</AssemblyName>
+
+		<PackageIcon>docs\mini-logo.png</PackageIcon>
+		<PackageReadmeFile>docs\readme.md</PackageReadmeFile>
+		<RepositoryUrl>https://github.com/AdrianStrugala/SolTechnology.Core</RepositoryUrl>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<None Include="..\..\docs\mini-logo.png" Pack="true" Visible="false" PackagePath="docs\mini-logo.png" />
+		<None Include="..\..\docs\Jobs.md" Pack="true" Visible="false" PackagePath="docs\readme.md" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Hangfire.Core" Version="1.8.22" />
+		<PackageReference Include="MediatR" Version="12.3.0" />
+		<PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.1" />
+		<PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="10.0.0" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\SolTechnology.Core.CQRS\SolTechnology.Core.CQRS.csproj" />
+	</ItemGroup>
+
+</Project>
