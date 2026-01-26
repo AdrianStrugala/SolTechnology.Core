@@ -11,12 +11,11 @@ using DreamTravel.Queries;
 using DreamTravel.Sql;
 using MicroElements.Swashbuckle.FluentValidation.AspNetCore;
 using Microsoft.OpenApi.Models;
-using Serilog;
-using Serilog.Events;
 using SolTechnology.Core.API;
 using SolTechnology.Core.API.Filters;
 using SolTechnology.Core.Authentication;
 using SolTechnology.Core.Cache;
+using SolTechnology.Core.Logging;
 using SolTechnology.Core.Logging.Middleware;
 using SolTechnology.Core.SQL;
 using SolTechnology.Core.Story;
@@ -32,19 +31,8 @@ public class Program
     {
         var builder = WebApplication.CreateBuilder(args);
 
-        // Configure Serilog
-        Log.Logger = new LoggerConfiguration()
-            .MinimumLevel.Information()
-            .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
-            .MinimumLevel.Override("Microsoft.Hosting.Lifetime", LogEventLevel.Information)
-            .Enrich.FromLogContext()
-            .Enrich.WithEnvironmentName()
-            .Enrich.WithMachineName()
-            .Enrich.WithThreadId()
-            .WriteTo.Console(outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3}] {CorrelationId} {trip} {city} {Message:lj}{NewLine}{Exception}")
-            .CreateLogger();
-
-        builder.Host.UseSerilog();
+        string[] logIdentifiers = ["trip", "city"];
+        builder.UseSerilogDefaults(logIdentifiers);
         builder.AddServiceDefaults();
 
 
@@ -193,7 +181,7 @@ public class Program
         app.UseAuthentication();
         app.UseLoggingMiddleware(options =>
         {
-            options.Identifiers = ["trip", "city"];
+            options.Identifiers = logIdentifiers;
         });
 
         app.Use(async (context, next) =>
