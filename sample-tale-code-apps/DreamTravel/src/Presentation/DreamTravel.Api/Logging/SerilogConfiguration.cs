@@ -3,7 +3,7 @@ using Microsoft.Extensions.Hosting;
 using Serilog;
 using Serilog.Events;
 
-namespace SolTechnology.Core.Logging;
+namespace DreamTravel.Api.Logging;
 
 /// <summary>
 /// Extension methods for configuring Serilog with sensible defaults.

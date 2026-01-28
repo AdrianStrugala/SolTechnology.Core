@@ -15,7 +15,7 @@ using SolTechnology.Core.API;
 using SolTechnology.Core.API.Filters;
 using SolTechnology.Core.Authentication;
 using SolTechnology.Core.Cache;
-using SolTechnology.Core.Logging;
+using DreamTravel.Api.Logging;
 using SolTechnology.Core.Logging.Middleware;
 using SolTechnology.Core.SQL;
 using SolTechnology.Core.Story;
