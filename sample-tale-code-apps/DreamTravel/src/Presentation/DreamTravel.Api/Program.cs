@@ -77,18 +77,18 @@ public class Program
         });
 
         //Health Checks
-        builder.Services.AddHealthChecks()
+        builder.Services.AddSolHealthChecks()
             .AddCheck<DatabaseHealthCheck>("database", tags: ["ready"])
             .AddCheck<GoogleApiHealthCheck>("google-api", tags: ["ready"]);
         builder.Services.AddHttpClient();
 
         //Exception Filter (converts exceptions to RFC 7807 ProblemDetails in Result envelope)
-        builder.Services.AddScoped<ExceptionFilter>();
-        builder.Services.AddScoped<ResponseEnvelopeFilter>();
+        builder.Services.AddScoped<SolExceptionFilter>();
+        builder.Services.AddScoped<SolResponseEnvelopeFilter>();
 
         //SQL
         var sqlConfiguration = builder.Configuration.GetSection("Sql").Get<SQLConfiguration>()!;
-        builder.Services.AddSQL(sqlConfiguration);
+        builder.Services.AddSolSQL(sqlConfiguration);
 
 
         //Trips
@@ -105,10 +105,10 @@ public class Program
         builder.Services.InstallGraphDatabase();
 
         //Story
-        builder.Services.AddFlows(StoryOptions.WithInMemoryPersistence());
+        builder.Services.AddSolStories(StoryOptions.WithInMemoryPersistence());
 
         //The rest
-        builder.Services.AddCache();
+        builder.Services.AddSolCache();
 
         var thisAssembly = typeof(Program).Assembly;
         builder.Services.AddMediatR(cfg => { cfg.RegisterServicesFromAssemblies(thisAssembly); });
@@ -117,7 +117,7 @@ public class Program
         var authFilter = builder.Services.AddAuthenticationAndBuildFilter(authenticationConfiguration);
 
         // API Versioning
-        builder.Services.AddVersioning(apiTitle: "DreamTravel API");
+        builder.Services.AddSolVersioning(apiTitle: "DreamTravel API");
 
         //SWAGGER
         builder.Services.AddSwaggerGen(c =>
@@ -150,13 +150,13 @@ public class Program
         builder.Services.AddControllers(opts =>
         {
             opts.Filters.Add(authFilter);
-            opts.Filters.Add<ExceptionFilter>();
-            opts.Filters.Add<ResponseEnvelopeFilter>();
+            opts.Filters.Add<SolExceptionFilter>();
+            opts.Filters.Add<SolResponseEnvelopeFilter>();
         });
 
         var app = builder.Build();
 
-        app.MapDefaultEndpoints();
+        app.MapSolHealthCheckEndpoints();
 
         app.UseSwagger();
 
@@ -179,7 +179,7 @@ public class Program
 
         app.UseAuthorization();
         app.UseAuthentication();
-        app.UseLoggingMiddleware(options =>
+        app.UseSolLoggingMiddleware(options =>
         {
             options.Identifiers = logIdentifiers;
         });

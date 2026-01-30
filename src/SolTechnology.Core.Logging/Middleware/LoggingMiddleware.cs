@@ -120,7 +120,7 @@ public static class LoggingMiddlewareExtensions
     /// <summary>
     /// Adds the LoggingMiddleware to the application pipeline with default options.
     /// </summary>
-    public static IApplicationBuilder UseLoggingMiddleware(this IApplicationBuilder builder)
+    public static IApplicationBuilder UseSolLoggingMiddleware(this IApplicationBuilder builder)
     {
         return builder.UseMiddleware<LoggingMiddleware>();
     }
@@ -139,7 +139,7 @@ public static class LoggingMiddlewareExtensions
     /// });
     /// </code>
     /// </example>
-    public static IApplicationBuilder UseLoggingMiddleware(
+    public static IApplicationBuilder UseSolLoggingMiddleware(
         this IApplicationBuilder builder,
         Action<LoggingMiddlewareOptions> configure)
     {

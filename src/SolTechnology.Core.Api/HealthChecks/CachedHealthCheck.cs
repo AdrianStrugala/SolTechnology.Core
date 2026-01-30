@@ -14,6 +14,11 @@ public abstract class CachedHealthCheck : IHealthCheck
     private readonly SemaphoreSlim _semaphore = new(1, 1);
 
     /// <summary>
+    /// Override this method to implement the actual health check logic.
+    /// </summary>
+    protected abstract Task<HealthCheckResult> ExecuteHealthCheckAsync(HealthCheckContext context, CancellationToken cancellationToken);
+
+    /// <summary>
     /// Creates a new cached health check with the specified cache duration.
     /// </summary>
     /// <param name="cacheDuration">How long to cache health check results. Defaults to 30 seconds.</param>
@@ -53,8 +58,5 @@ public abstract class CachedHealthCheck : IHealthCheck
         }
     }
 
-    /// <summary>
-    /// Override this method to implement the actual health check logic.
-    /// </summary>
-    protected abstract Task<HealthCheckResult> ExecuteHealthCheckAsync(HealthCheckContext context, CancellationToken cancellationToken);
+
 }

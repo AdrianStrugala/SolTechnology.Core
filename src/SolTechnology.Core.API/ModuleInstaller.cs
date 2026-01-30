@@ -1,8 +1,12 @@
 using Asp.Versioning;
 using Asp.Versioning.ApiExplorer;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
+using SolTechnology.Core.API.HealthChecks;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
 namespace SolTechnology.Core.API;
@@ -19,7 +23,7 @@ public static class ModuleInstaller
         /// <param name="defaultMinorVersion">Default minor version (default: 0)</param>
         /// <param name="apiTitle">API title for Swagger documentation (default: "API")</param>
         /// <returns>Service collection for chaining</returns>
-        public IServiceCollection AddVersioning(int defaultMajorVersion = 2,
+        public IServiceCollection AddSolVersioning(int defaultMajorVersion = 2,
             int defaultMinorVersion = 0,
             string apiTitle = "API")
         {
@@ -45,6 +49,39 @@ public static class ModuleInstaller
             return services;
         }
 
+        /// <summary>
+        /// Adds a default liveness health check tagged with "live".
+        /// </summary>
+        public IHealthChecksBuilder AddSolHealthChecks()
+        {
+            var healthChecksBuilder = services.AddHealthChecks()
+                .AddCheck("self", () => HealthCheckResult.Healthy(), ["live"]);
+
+            return healthChecksBuilder;
+        }
+    }
+
+    /// <summary>
+    /// Maps health check endpoints:
+    /// - /health - liveness probe (plain text, fast)
+    /// - /health/ready - readiness probe with detailed JSON response
+    /// </summary>
+    public static WebApplication MapSolHealthCheckEndpoints(this WebApplication app)
+    {
+        // Liveness probe - quick check if app is running
+        app.MapHealthChecks("/health", new HealthCheckOptions
+        {
+            Predicate = r => r.Tags.Contains("live")
+        });
+
+        // Readiness probe - detailed JSON with all health checks
+        app.MapHealthChecks("/health/ready", new HealthCheckOptions
+        {
+            Predicate = r => r.Tags.Contains("ready"),
+            ResponseWriter = HealthCheckResponseWriter.WriteResponse
+        });
+
+        return app;
     }
 }
 

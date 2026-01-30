@@ -7,18 +7,11 @@ namespace DreamTravel.Api.HealthChecks;
 /// <summary>
 /// Health check for SQL Server database connectivity.
 /// </summary>
-public class DatabaseHealthCheck : CachedHealthCheck
+public class DatabaseHealthCheck(IConfiguration configuration, ILogger<DatabaseHealthCheck> logger)
+    : CachedHealthCheck(TimeSpan.FromSeconds(30))
 {
-    private readonly string _connectionString;
-    private readonly ILogger<DatabaseHealthCheck> _logger;
-
-    public DatabaseHealthCheck(IConfiguration configuration, ILogger<DatabaseHealthCheck> logger)
-        : base(TimeSpan.FromSeconds(30))
-    {
-        _connectionString = configuration.GetSection("Sql:ConnectionString").Value
-            ?? throw new ArgumentNullException(nameof(configuration), "SQL connection string is not configured");
-        _logger = logger;
-    }
+    private readonly string _connectionString = configuration.GetSection("Sql:ConnectionString").Value
+                                                ?? throw new ArgumentNullException(nameof(configuration), "SQL connection string is not configured");
 
     protected override async Task<HealthCheckResult> ExecuteHealthCheckAsync(HealthCheckContext context, CancellationToken cancellationToken)
     {
@@ -30,13 +23,13 @@ public class DatabaseHealthCheck : CachedHealthCheck
             await using var command = new SqlCommand("SELECT 1", connection);
             await command.ExecuteScalarAsync(cancellationToken);
 
-            _logger.LogDebug("Database health check passed");
+            logger.LogDebug("Database health check passed");
 
             return HealthCheckResult.Healthy("Database connection is healthy");
         }
         catch (SqlException ex)
         {
-            _logger.LogError(ex, "Database health check failed");
+            logger.LogError(ex, "Database health check failed");
 
             return HealthCheckResult.Unhealthy(
                 "Database connection failed",
@@ -49,7 +42,7 @@ public class DatabaseHealthCheck : CachedHealthCheck
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Database health check failed with unexpected error");
+            logger.LogError(ex, "Database health check failed with unexpected error");
 
             return HealthCheckResult.Unhealthy("Database connection failed", ex);
         }

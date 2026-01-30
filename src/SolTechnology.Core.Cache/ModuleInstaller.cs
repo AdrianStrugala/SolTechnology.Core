@@ -5,7 +5,7 @@ namespace SolTechnology.Core.Cache
 {
     public static class ModuleInstaller
     {
-        public static IServiceCollection AddCache(this IServiceCollection services, CacheConfiguration? cacheConfiguration = null)
+        public static IServiceCollection AddSolCache(this IServiceCollection services, CacheConfiguration? cacheConfiguration = null)
         {
             if (cacheConfiguration == null)
             {

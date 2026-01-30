@@ -11,7 +11,7 @@ namespace DreamTravel.Sql
     {
         public static IServiceCollection InstallTripsSql(this IServiceCollection services, SQLConfiguration sqlConfiguration)
         {
-            services.AddSQL(sqlConfiguration);
+            services.AddSolSQL(sqlConfiguration);
             
             services.AddDbContext<DreamTripsDbContext>(options =>
                 options.UseSqlServer(sqlConfiguration.ConnectionString));

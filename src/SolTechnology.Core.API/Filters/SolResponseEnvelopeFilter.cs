@@ -10,7 +10,7 @@ namespace SolTechnology.Core.API.Filters;
 /// Wraps API responses in Result envelope.
 /// For failed Results, converts Error to RFC 7807 ProblemDetails.
 /// </summary>
-public class ResponseEnvelopeFilter : IResultFilter
+public class SolResponseEnvelopeFilter : IResultFilter
 {
     public void OnResultExecuting(ResultExecutingContext context)
     {

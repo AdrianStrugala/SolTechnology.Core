@@ -5,7 +5,7 @@ namespace DreamTravel.Flows;
 
 public static class ModuleInstaller
 {
-    public static IServiceCollection AddFlows(this IServiceCollection services, StoryOptions? options = null)
+    public static IServiceCollection AddSolStories(this IServiceCollection services, StoryOptions? options = null)
     {
         if (options != null)
         {

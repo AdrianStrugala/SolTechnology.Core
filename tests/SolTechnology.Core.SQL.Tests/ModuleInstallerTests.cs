@@ -26,7 +26,7 @@ namespace SolTechnology.Core.SQL.Tests
 
 
             //Act
-            _sut.Services.AddSQL(sqlConfiguration);
+            _sut.Services.AddSolSQL(sqlConfiguration);
 
 
             //Assert

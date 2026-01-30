@@ -13,9 +13,9 @@
 
 
   <ItemGroup>
-    <ProjectReference Include="..\..\DreamTravel.Domain\DreamTravel.Domain.csproj" />
     <ProjectReference Include="..\..\LogicLayer\DreamTravel.Commands\DreamTravel.Commands.csproj" />
     <ProjectReference Include="..\DreamTravel.ServiceDefaults\DreamTravel.ServiceDefaults.csproj" />
+    <ProjectReference Include="..\..\..\..\..\src\SolTechnology.Core.Api\SolTechnology.Core.Api.csproj" />
   </ItemGroup>
 
   <ItemGroup>

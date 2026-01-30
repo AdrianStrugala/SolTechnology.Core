@@ -12,7 +12,7 @@ namespace SolTechnology.Core.API.Filters;
 /// Global exception filter that catches unhandled exceptions and converts them to
 /// Result with Error. The ResponseEnvelopeFilter will then convert the Error to ProblemDetails.
 /// </summary>
-public class ExceptionFilter(ILogger<ExceptionFilter> logger) : IExceptionFilter
+public class SolExceptionFilter(ILogger<SolExceptionFilter> logger) : IExceptionFilter
 {
     public void OnException(ExceptionContext context)
     {

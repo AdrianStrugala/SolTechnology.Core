@@ -6,8 +6,9 @@ using DreamTravel.Sql;
 using DreamTravel.Worker.BackgroundJobs;
 using EntityGraphQL.AspNet;
 using Hangfire;
+using SolTechnology.Core.API;
+using SolTechnology.Core.API.HealthChecks;
 using SolTechnology.Core.Cache;
-using SolTechnology.Core.Jobs;
 using SolTechnology.Core.SQL;
 using System.Globalization;
 using DreamTravel.DomainServices;
@@ -26,12 +27,15 @@ public class Program
         CultureInfo.DefaultThreadCurrentUICulture = cultureInfo;
 
         builder.AddServiceDefaults();
-        
+
+        //Health Checks
+        builder.Services.AddSolHealthChecks();
+
         builder.Services.AddEndpointsApiExplorer();
         builder.Services.AddLogging(c =>
             c.AddConsole());
 
-        
+
         //INSTALL MODULES
         var sqlConfiguration = builder.Configuration.GetSection("Sql").Get<SQLConfiguration>()!;
         builder.Services.InstallTripsSql(sqlConfiguration);
@@ -39,15 +43,15 @@ public class Program
         builder.Services.InstallInfrastructure();
         builder.Services.InstallDomainServices();
         builder.Services.InstallDreamTripsCommands();
-        
+
         //Graph
         builder.Services.Configure<Neo4jSettings>(
             builder.Configuration.GetSection("Neo4j"));
         builder.Services.InstallGraphDatabase();
-        
+
         //CACHE
         var cacheConfiguration = builder.Configuration.GetSection("Cache").Get<CacheConfiguration>()!;
-        builder.Services.AddCache(cacheConfiguration);
+        builder.Services.AddSolCache(cacheConfiguration);
 
         //MEDIATR
         builder.Services.AddMediatR(cfg =>
@@ -58,7 +62,7 @@ public class Program
         //APP
         var app = builder.Build();
 
-        app.MapDefaultEndpoints();
+        app.MapSolHealthCheckEndpoints();
 
         var recurringJobManager = app.Services.GetRequiredService<IRecurringJobManager>();
         recurringJobManager.AddOrUpdate("LogFromJob", () => Console.WriteLine("Hello from Job"), Cron.Daily);
