@@ -29,7 +29,8 @@ public class SolResponseEnvelopeFilter : IResultFilter
                 {
                     if (errorProperty?.GetValue(resultValue) is Error error)
                     {
-                        context.Result = CreateProblemDetailsResult(error, context.HttpContext.Request.Path);
+                        var statusCode = objectResult.StatusCode ?? StatusCodes.Status500InternalServerError;
+                        context.Result = CreateProblemDetailsResult(error, statusCode, context.HttpContext.Request.Path);
                         return;
                     }
                 }
@@ -43,14 +44,15 @@ public class SolResponseEnvelopeFilter : IResultFilter
             {
                 if (result is { IsFailure: true, Error: not null })
                 {
-                    context.Result = CreateProblemDetailsResult(result.Error, context.HttpContext.Request.Path);
+                    var statusCode = objectResult.StatusCode ?? StatusCodes.Status500InternalServerError;
+                    context.Result = CreateProblemDetailsResult(result.Error, statusCode, context.HttpContext.Request.Path);
                 }
                 return;
             }
 
             // Wrap non-Result responses in Result envelope
-            var statusCode = objectResult.StatusCode ?? 200;
-            var isSuccess = statusCode >= 200 && statusCode < 400;
+            var responseStatusCode = objectResult.StatusCode ?? 200;
+            var isSuccess = responseStatusCode >= 200 && responseStatusCode < 400;
 
             context.Result = new ObjectResult(isSuccess
                 ? new Result<object?>
@@ -65,9 +67,8 @@ public class SolResponseEnvelopeFilter : IResultFilter
         }
     }
 
-    private static ObjectResult CreateProblemDetailsResult(Error error, string instance)
+    private static ObjectResult CreateProblemDetailsResult(Error error, int statusCode, string instance)
     {
-        var statusCode = (int)error.StatusCode;
         var (type, title) = GetTypeAndTitle(statusCode);
 
         var problemDetails = new ProblemDetails

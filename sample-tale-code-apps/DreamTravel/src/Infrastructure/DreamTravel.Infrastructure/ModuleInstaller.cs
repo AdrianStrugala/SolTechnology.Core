@@ -8,6 +8,7 @@ namespace DreamTravel.Infrastructure
         public static IServiceCollection InstallInfrastructure(this IServiceCollection services)
         {
             services.AddSolHangfire();
+            services.AddHangfireEventPublisher();
 
             return services;
         }

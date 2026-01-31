@@ -1,5 +1,3 @@
-using System.Net;
-
 namespace SolTechnology.Core.CQRS.Errors;
 
 /// <summary>
@@ -23,11 +21,6 @@ public class Error
     public bool Recoverable { get; set; } = false;
 
     /// <summary>
-    /// The HTTP status code associated with this error.
-    /// </summary>
-    public HttpStatusCode StatusCode { get; set; } = HttpStatusCode.InternalServerError;
-
-    /// <summary>
     /// Creates an Error from an exception.
     /// </summary>
     public static Error From(Exception exception) =>
@@ -35,7 +28,6 @@ public class Error
         {
             Message = exception.Message,
             Description = exception.StackTrace,
-            StatusCode = HttpStatusCode.InternalServerError,
             Recoverable = false
         };
 }

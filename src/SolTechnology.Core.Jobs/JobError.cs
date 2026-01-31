@@ -43,8 +43,7 @@ public class JobError : Error
             JobId = jobId,
             AttemptNumber = attemptNumber,
             Message = error.Message,
-            Recoverable = error.Recoverable,
-            StatusCode = error.StatusCode
+            Recoverable = error.Recoverable
         };
     }
 }
