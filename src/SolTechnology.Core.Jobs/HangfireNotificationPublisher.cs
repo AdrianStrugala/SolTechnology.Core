@@ -7,7 +7,7 @@ namespace SolTechnology.Core.Jobs;
 /// <summary>
 /// Interface for publishing MediatR notifications through Hangfire background jobs.
 /// </summary>
-public interface IHangfireEventPublisher
+public interface IHangfireNotificationPublisher
 {
     /// <summary>
     /// Enqueues a notification to be published asynchronously via Hangfire.
@@ -24,12 +24,12 @@ public interface IHangfireEventPublisher
 /// Publishes MediatR notifications through Hangfire background jobs.
 /// Enables fire-and-forget event publishing with automatic persistence and retry support.
 /// </summary>
-public class HangfireEventPublisher : IHangfireEventPublisher
+public class HangfireNotificationPublisher : IHangfireNotificationPublisher
 {
     private readonly IServiceScopeFactory _serviceScopeFactory;
     private readonly IBackgroundJobClient _backgroundJobClient;
 
-    public HangfireEventPublisher(IServiceScopeFactory serviceScopeFactory, IBackgroundJobClient backgroundJobClient)
+    public HangfireNotificationPublisher(IServiceScopeFactory serviceScopeFactory, IBackgroundJobClient backgroundJobClient)
     {
         _serviceScopeFactory = serviceScopeFactory;
         _backgroundJobClient = backgroundJobClient;

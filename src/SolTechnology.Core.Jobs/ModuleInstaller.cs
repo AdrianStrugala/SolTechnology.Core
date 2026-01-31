@@ -21,7 +21,7 @@ public static class ModuleInstaller
         /// </summary>
         /// <param name="options">Optional configuration for job processing.</param>
         /// <returns>The service collection for chaining.</returns>
-        public IServiceCollection AddHangfire(JobsOptions? options = null)
+        public IServiceCollection AddSolHangfire(JobsOptions? options = null)
         {
             options ??= new JobsOptions();
 
@@ -43,11 +43,11 @@ public static class ModuleInstaller
         /// </summary>
         /// <param name="configure">Action to configure job processing options.</param>
         /// <returns>The service collection for chaining.</returns>
-        public IServiceCollection AddHangfire(Action<JobsOptions> configure)
+        public IServiceCollection AddSolHangfire(Action<JobsOptions> configure)
         {
             var options = new JobsOptions();
             configure(options);
-            return services.AddHangfire(options);
+            return services.AddSolHangfire(options);
         }
 
         /// <summary>
@@ -78,7 +78,7 @@ public static class ModuleInstaller
         /// <returns>The service collection for chaining.</returns>
         public IServiceCollection AddHangfireEventPublisher()
         {
-            services.AddTransient<IHangfireEventPublisher, HangfireEventPublisher>();
+            services.AddTransient<IHangfireNotificationPublisher, HangfireNotificationPublisher>();
             return services;
         }
     }

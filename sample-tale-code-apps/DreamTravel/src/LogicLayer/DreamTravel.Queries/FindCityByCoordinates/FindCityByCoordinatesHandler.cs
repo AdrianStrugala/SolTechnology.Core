@@ -8,7 +8,7 @@ namespace DreamTravel.Queries.FindCityByCoordinates
 {
     public class FindCityByCoordinatesHandler(
         ICityDomainService cityDomainService,
-        IHangfireEventPublisher notificationPublisher)
+        IHangfireNotificationPublisher notificationPublisher)
         : IQueryHandler<FindCityByCoordinatesQuery, City>
     {
         public async Task<Result<City>> Handle(FindCityByCoordinatesQuery query, CancellationToken cancellationToken)

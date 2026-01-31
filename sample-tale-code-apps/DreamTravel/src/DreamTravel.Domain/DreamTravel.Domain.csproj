@@ -5,7 +5,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\..\src\SolTechnology.Core.CQRS\SolTechnology.Core.CQRS.csproj" />
+    <ProjectReference Include="..\Infrastructure\DreamTravel.Infrastructure\DreamTravel.Infrastructure.csproj" />
   </ItemGroup>
 
 </Project>

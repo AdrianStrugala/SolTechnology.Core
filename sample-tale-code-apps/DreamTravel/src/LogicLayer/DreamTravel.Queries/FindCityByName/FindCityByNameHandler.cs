@@ -10,7 +10,7 @@ namespace DreamTravel.Queries.FindCityByName
 {
     public class FindCityByNameHandler(
         ICityDomainService cityDomainService,
-        IHangfireEventPublisher hangfireNotificationPublisher,
+        IHangfireNotificationPublisher hangfireNotificationPublisher,
         ILogger<FindCityByNameHandler> logger)
         : IQueryHandler<FindCityByNameQuery, City>
     {

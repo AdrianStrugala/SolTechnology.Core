@@ -1,4 +1,4 @@
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 using SolTechnology.Core.Jobs;
 
 namespace DreamTravel.Infrastructure
@@ -7,7 +7,7 @@ namespace DreamTravel.Infrastructure
     {
         public static IServiceCollection InstallInfrastructure(this IServiceCollection services)
         {
-            services.AddHangfire();
+            services.AddSolHangfire();
 
             return services;
         }

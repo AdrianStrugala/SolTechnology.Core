@@ -1,12 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\..\..\..\..\src\SolTechnology.Core.Jobs\SolTechnology.Core.Jobs.csproj" />
-    <ProjectReference Include="..\..\DreamTravel.Domain\DreamTravel.Domain.csproj" />
   </ItemGroup>
 
 </Project>
