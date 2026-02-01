@@ -1,78 +1,81 @@
 {
-  "lastUpdated": "2026-01-25T02:29:28Z",
+  "totals": {
+    "downloads": 54257,
+    "packages": 19
+  },
   "packages": [
     {
-      "downloads": 21700,
+      "downloads": 21870,
       "version": "0.1.0",
       "id": "SolTechnology.Avro.Kafka"
     },
     {
-      "downloads": 6780,
+      "downloads": 6821,
       "version": "3.0.1",
       "id": "SolTechnology.Avro.Http"
     },
     {
-      "downloads": 3379,
+      "downloads": 3398,
       "version": "0.5.0",
       "id": "SolTechnology.Core.ApiClient"
     },
     {
-      "downloads": 2595,
+      "downloads": 2615,
       "version": "0.5.0",
       "id": "SolTechnology.Core.CQRS"
     },
     {
-      "downloads": 2493,
+      "downloads": 2509,
       "version": "0.5.0",
       "id": "SolTechnology.Core.Sql"
     },
     {
-      "downloads": 2318,
+      "downloads": 2328,
       "version": "0.5.0",
       "id": "SolTechnology.Core.Logging"
     },
     {
-      "downloads": 2279,
+      "downloads": 2288,
       "version": "0.5.0",
       "id": "SolTechnology.Core.BlobStorage"
     },
     {
-      "downloads": 2216,
+      "downloads": 2224,
       "version": "0.5.0",
       "id": "SolTechnology.Core.MessageBus"
     },
     {
-      "downloads": 2215,
+      "downloads": 2224,
       "version": "0.5.0",
       "id": "SolTechnology.Core.Guards"
     },
     {
-      "downloads": 1778,
+      "downloads": 1794,
       "version": "0.6.0",
       "id": "SolTechnology.Core.Api"
     },
     {
-      "downloads": 1711,
+      "downloads": 1719,
       "version": "0.5.0",
       "id": "SolTechnology.Core.Authentication"
     },
     {
-      "downloads": 1085,
+      "downloads": 1096,
       "version": "0.5.0",
       "id": "SolTechnology.Core.Cache"
     },
     {
-      "downloads": 921,
+      "downloads": 927,
       "version": "0.5.0",
       "id": "SolTechnology.Core.Scheduler"
     },
     {
-      "downloads": 714,
+      "downloads": 715,
       "version": "0.5.0",
       "id": "SolTechnology.Core.AUID"
     },
     {
-      "downloads": 690,
+      "downloads": 694,
       "version": "1.0.0",
       "id": "SolTechnology.Core.Flow"
     },
@@ -87,18 +90,15 @@
       "id": "SolTechnology.Core.Faker"
     },
     {
-      "downloads": 112,
+      "downloads": 114,
       "version": "0.6.0",
       "id": "SolTechnology.Core.Story"
     },
     {
-      "downloads": 94,
+      "downloads": 97,
       "version": "0.5.0",
       "id": "SolTechnology.Core.HTTP"
     }
   ],
-  "totals": {
-    "downloads": 53904,
-    "packages": 19
-  }
+  "lastUpdated": "2026-02-01T03:14:18Z"
 }
