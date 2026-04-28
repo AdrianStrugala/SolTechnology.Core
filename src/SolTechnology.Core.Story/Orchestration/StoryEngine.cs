@@ -1,4 +1,7 @@
+using System.Collections.Concurrent;
+using System.Reflection;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using SolTechnology.Core.CQRS;
@@ -9,108 +12,118 @@ using SolTechnology.Core.Story.Persistence;
 namespace SolTechnology.Core.Story.Orchestration;
 
 /// <summary>
-/// JSON serialization options used throughout the Story framework for consistent serialization.
+/// JSON serialization options shared across the Story framework.
 /// </summary>
 internal static class StoryJsonOptions
 {
-    public static JsonSerializerOptions Default => new()
+    public static JsonSerializerOptions Default { get; } = new()
     {
         IncludeFields = true,
         PropertyNameCaseInsensitive = true,
-        WriteIndented = false
+        WriteIndented = false,
+        DefaultIgnoreCondition = JsonIgnoreCondition.Never
     };
 }
 
 /// <summary>
-/// Internal execution engine for Story Framework.
-/// Manages chapter execution, state persistence, and error handling.
+/// Internal execution engine for a story. Strongly typed — no <c>dynamic</c>, no string-matched
+/// pause detection. Tracks chapter execution, manages pause/resume, aggregates errors and
+/// (optionally) persists state.
 /// </summary>
-/// <typeparam name="TContext">The context type carrying state through the story</typeparam>
-internal class StoryEngine<TContext>(
-    IServiceProvider serviceProvider,
-    ILogger logger,
-    IStoryRepository? repository,
-    bool stopOnFirstError = true)
-    where TContext : class
+internal sealed class StoryEngine<TInput, TContext, TOutput>
+    where TInput : class
+    where TContext : Context<TInput, TOutput>, new()
+    where TOutput : class, new()
 {
+    private readonly IServiceProvider _serviceProvider;
+    private readonly ILogger _logger;
+    private readonly IStoryRepository? _repository;
+    private readonly StoryOptions _options;
+
     private TContext _context = null!;
     private CancellationToken _cancellationToken;
     private JsonElement? _resumeInput;
-    
+    private DateTime _createdAt;
+
     private readonly List<Error> _errors = new();
     private readonly List<ChapterInfo> _chapterHistory = new();
-    
+
     private bool _isPaused;
     private bool _hasFailed;
+    private bool _isCancelled;
     private bool _isInitialized;
     private string _handlerTypeName = string.Empty;
 
-    /// <summary>
-    /// Initializes the story engine with context and optional resume data.
-    /// </summary>
-    /// <param name="context">The story context</param>
-    /// <param name="handlerTypeName">Name of the handler for logging</param>
-    /// <param name="resumeInput">Optional input for resuming an interactive chapter</param>
-    /// <param name="cancellationToken">Cancellation token for the execution</param>
-    public async Task Initialize(
+    public StoryEngine(
+        IServiceProvider serviceProvider,
+        ILogger logger,
+        IStoryRepository? repository,
+        StoryOptions? options)
+    {
+        _serviceProvider = serviceProvider;
+        _logger = logger;
+        _repository = repository;
+        _options = options ?? StoryOptions.Default;
+    }
+
+    public bool IsPaused => _isPaused;
+    public bool HasFailed => _hasFailed;
+    public bool IsCancelled => _isCancelled;
+    public IReadOnlyList<Error> Errors => _errors;
+    public IReadOnlyList<ChapterInfo> History => _chapterHistory;
+    public Auid StoryId => _context is null ? Auid.Empty : _context.StoryInstanceId;
+
+    public async Task<Result> Initialize(
         TContext context,
-        string handlerTypeName,
+        Type handlerType,
         JsonElement? resumeInput,
         CancellationToken cancellationToken)
     {
         _context = context;
-        _handlerTypeName = handlerTypeName;
+        _handlerTypeName = handlerType.Name;
         _resumeInput = resumeInput;
         _cancellationToken = cancellationToken;
         _isInitialized = true;
 
-        dynamic contextBase = _context;
-        
-        Auid storyId = Auid.Empty;
-        try 
+        if (_repository != null && context.StoryInstanceId != Auid.Empty)
         {
-            storyId = contextBase.StoryInstanceId;
+            var loaded = await LoadStoryState(context.StoryInstanceId);
+            if (loaded.IsFailure) return loaded;
+            _logger.LogInformation("Story {StoryId} resuming from saved state", context.StoryInstanceId);
         }
-        catch (Microsoft.CSharp.RuntimeBinder.RuntimeBinderException)
+        else
         {
-            // Jeśli właściwość nie istnieje, traktujemy jako Empty
+            _createdAt = DateTime.UtcNow;
+            if (_repository != null)
+            {
+                var newId = Auid.New(_options.StoryIdPrefix);
+                context.StoryInstanceId = newId;
+                _logger.LogInformation("Story started with ID {StoryId}", newId);
+            }
         }
 
-        if (repository != null && storyId != Auid.Empty)
-        {
-            await LoadStoryState(storyId);
-            logger.LogInformation("Story {StoryId} resuming from saved state", storyId);
-        }
-        else if (repository != null)
-        {
-            var newId = Auid.New("STR");
-            contextBase.StoryInstanceId = newId;
-            logger.LogInformation("Story started with ID {StoryId}", newId);
-        }
+        return Result.Success();
     }
 
-    /// <summary>
-    /// Executes a chapter in the story. Handles interactive chapters, resumption, and state persistence.
-    /// </summary>
-    /// <typeparam name="TChapter">The chapter type to execute</typeparam>
-    /// <param name="context">The story context</param>
-    public async Task ExecuteChapter<TChapter>(TContext context)
-        where TChapter : IChapter<TContext>
+    public async Task ExecuteChapter<TChapter>() where TChapter : IChapter<TContext>
     {
         if (!_isInitialized)
             throw new InvalidOperationException("StoryEngine must be initialized first");
 
-        if ((_isPaused && _resumeInput == null) || (_hasFailed && stopOnFirstError))
+        if (_isCancelled) return;
+        if (_isPaused && _resumeInput == null) return;
+        if (_hasFailed && _options.StopOnFirstError) return;
+
+        var chapter = _serviceProvider.GetService<TChapter>();
+        if (chapter == null)
         {
+            HandleChapterFailure(null, new Error
+            {
+                Message = $"Chapter {typeof(TChapter).Name} not registered in DI container"
+            });
             return;
         }
 
-        var chapter = serviceProvider.GetService<TChapter>();
-        if (chapter == null)
-        {
-            HandleChapterFailure(null, new Error { Message = $"Chapter {typeof(TChapter).Name} not registered in DI container" });
-            return;
-        }
 
         var existingChapter = _chapterHistory.FirstOrDefault(h => h.ChapterId == chapter.ChapterId);
         if (existingChapter is { Status: StoryStatus.Completed })
@@ -118,10 +131,10 @@ internal class StoryEngine<TContext>(
             return;
         }
 
-        // Clear pause flag ONLY if this is the chapter waiting for input
-        if (_isPaused && existingChapter?.Status == StoryStatus.WaitingForInput && existingChapter?.ChapterId == chapter.ChapterId)
+        if (_isPaused && existingChapter?.Status == StoryStatus.WaitingForInput &&
+            existingChapter.ChapterId == chapter.ChapterId)
         {
-            logger.LogInformation("Resuming story at chapter {ChapterId}", chapter.ChapterId);
+            _logger.LogInformation("Resuming story at chapter {ChapterId}", chapter.ChapterId);
             _isPaused = false;
         }
 
@@ -134,23 +147,20 @@ internal class StoryEngine<TContext>(
 
         if (existingChapter == null) _chapterHistory.Add(chapterInfo);
 
-        logger.LogInformation("Executing chapter: {ChapterId}", chapter.ChapterId);
+        _logger.LogInformation("Executing chapter: {ChapterId}", chapter.ChapterId);
 
         try
         {
             _cancellationToken.ThrowIfCancellationRequested();
+
             Result result;
-
-            var isInteractive = typeof(TChapter).BaseType?.IsGenericType == true &&
-                                typeof(TChapter).BaseType?.GetGenericTypeDefinition() == typeof(InteractiveChapter<,>);
-
-            if (isInteractive)
+            if (TryGetInteractiveInputType(chapter.GetType(), out var inputType))
             {
-                result = await ExecuteInteractiveChapter(chapter, context, chapterInfo);
+                result = await ExecuteInteractiveChapter(chapter, inputType!, chapterInfo);
             }
             else
             {
-                result = await chapter.Read(context);
+                result = await chapter.Read(_context);
             }
 
             if (result.IsFailure)
@@ -165,66 +175,90 @@ internal class StoryEngine<TContext>(
         }
         catch (OperationCanceledException)
         {
-            // Re-throw cancellation to be handled by StoryHandler
+            _isCancelled = true;
+            chapterInfo.Status = StoryStatus.Cancelled;
+            chapterInfo.FinishedAt = DateTime.UtcNow;
             throw;
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Chapter {ChapterId} failed", chapter.ChapterId);
+            _logger.LogError(ex, "Chapter {ChapterId} failed", chapter.ChapterId);
             HandleChapterFailure(chapterInfo, Error.From(ex));
         }
 
-        if (repository != null) await SaveStoryState();
+        if (_repository != null) await SaveStoryState(terminal: false);
+    }
+
+    /// <summary>
+    /// Walks the type hierarchy looking for <see cref="InteractiveChapter{TContext,TChapterInput}"/>.
+    /// Supports multi-level inheritance.
+    /// </summary>
+    private static bool TryGetInteractiveInputType(Type chapterType, out Type? inputType)
+    {
+        var t = chapterType;
+        while (t != null && t != typeof(object))
+        {
+            if (t.IsGenericType && t.GetGenericTypeDefinition() == typeof(InteractiveChapter<,>))
+            {
+                inputType = t.GetGenericArguments()[1];
+                return true;
+            }
+            t = t.BaseType;
+        }
+        inputType = null;
+        return false;
     }
 
     private async Task<Result> ExecuteInteractiveChapter(
-        object chapter,
-        TContext context,
+        IChapter<TContext> chapter,
+        Type inputType,
         ChapterInfo chapterInfo)
     {
         var chapterType = chapter.GetType();
 
-        var getSchemaMethod = chapterType.GetMethod("GetRequiredInputSchema");
-        if (getSchemaMethod != null)
+        var schema = InteractiveChapterReflection.GetSchema(chapterType, chapter);
+        if (schema != null)
         {
-            chapterInfo.RequiredData = getSchemaMethod.Invoke(chapter, null) as List<DataField> ?? new();
+            chapterInfo.RequiredData = schema.ToList();
         }
 
         if (_resumeInput == null)
         {
             _isPaused = true;
             chapterInfo.Status = StoryStatus.WaitingForInput;
-
-            dynamic baseContext = _context;
-
-            try
-            {
-                var idProp = chapterType.GetProperty("ChapterId");
-                var chapterId = idProp?.GetValue(chapter) as string;
-                baseContext.CurrentChapterId = chapterId;
-            }
-            catch (Microsoft.CSharp.RuntimeBinder.RuntimeBinderException)
-            {
-                // Ignorujemy, jeśli kontekst nie ma właściwości CurrentChapterId
-            }
-
+            _context.CurrentChapterId = chapter.ChapterId;
             return Result.Success();
         }
 
-        var inputType = chapterType.BaseType!.GetGenericArguments()[1];
-        var deserializedInput = JsonSerializer.Deserialize(_resumeInput.Value, inputType, StoryJsonOptions.Default);
+        object? deserializedInput;
+        try
+        {
+            deserializedInput = JsonSerializer.Deserialize(_resumeInput.Value, inputType, StoryJsonOptions.Default);
+        }
+        catch (JsonException ex)
+        {
+            return Result.Fail(new Error
+            {
+                Message = $"Failed to deserialize input for chapter '{chapter.ChapterId}': {ex.Message}",
+                Description = ex.ToString()
+            });
+        }
+
+        if (deserializedInput == null)
+        {
+            return Result.Fail($"Input for chapter '{chapter.ChapterId}' deserialized to null.");
+        }
 
         chapterInfo.ProvidedData = _resumeInput;
 
-        var executeMethod = chapterType.GetMethod("ReadWithInput");
-        var task = executeMethod!.Invoke(chapter, [context, deserializedInput]) as Task<Result>;
-        var result = await task!;
+        var result = await InteractiveChapterReflection.InvokeReadWithInput(
+            chapterType, chapter, _context, deserializedInput);
 
         if (result.IsSuccess)
         {
             _resumeInput = null;
-            // Reset status from WaitingForInput to Running so it can be marked as Completed
             chapterInfo.Status = StoryStatus.Running;
+            _context.CurrentChapterId = null;
         }
 
         return result;
@@ -242,74 +276,120 @@ internal class StoryEngine<TContext>(
         }
     }
 
-    /// <summary>
-    /// Gets the final result of the story execution.
-    /// Returns success with output if completed, or failure if errors occurred or story is paused.
-    /// </summary>
-    /// <typeparam name="TOutput">The output type</typeparam>
-    /// <returns>Result containing output or error</returns>
-    public Result<TOutput> GetResult<TOutput>() where TOutput : class, new()
+    public Result<TOutput> GetResult()
     {
-        if (_errors.Any())
+        if (_isCancelled)
+            return Result<TOutput>.Fail(new StoryCancelledError(_context is null ? Auid.Empty : _context.StoryInstanceId));
+
+        if (_errors.Count > 0)
         {
-            // Return single error if only one, otherwise aggregate
             return _errors.Count == 1
                 ? Result<TOutput>.Fail(_errors[0])
                 : Result<TOutput>.Fail(new AggregateError(_errors));
         }
 
         if (_isPaused)
-        {
-            return Result<TOutput>.Fail(new Error
-            {
-                Message = "Story paused waiting for user input"
-            });
-        }
+            return Result<TOutput>.Fail(new StoryPausedError(_context.StoryInstanceId, _context.CurrentChapterId));
 
-        // FIX: Rzutowanie na dynamic w nawiasach jest bezpieczne
-        dynamic contextBase = _context;
-        try
-        {
-            return Result<TOutput>.Success((TOutput)contextBase.Output);
-        }
-        catch (Microsoft.CSharp.RuntimeBinder.RuntimeBinderException)
-        {
-            return Result<TOutput>.Fail("Could not retrieve Output from Context");
-        }
+        return Result<TOutput>.Success(_context.Output);
     }
 
-    private async Task SaveStoryState()
+    public StoryStatus GetTerminalStatus()
     {
-        if (repository == null) return;
-        
-        dynamic contextBase = _context;
-        Auid storyId = contextBase.StoryInstanceId;
+        if (_isCancelled) return StoryStatus.Cancelled;
+        if (_hasFailed) return StoryStatus.Failed;
+        if (_isPaused) return StoryStatus.WaitingForInput;
+        return StoryStatus.Completed;
+    }
+
+    public Task PersistTerminalState()
+    {
+        if (_repository == null) return Task.CompletedTask;
+        return SaveStoryState(terminal: true);
+    }
+
+    private async Task SaveStoryState(bool terminal)
+    {
+        if (_repository == null) return;
+        if (_context.StoryInstanceId == Auid.Empty) return;
 
         var instance = new StoryInstance
         {
-            StoryId = storyId,
+            StoryId = _context.StoryInstanceId,
             HandlerTypeName = _handlerTypeName,
-            Status = _isPaused ? StoryStatus.WaitingForInput : _hasFailed ? StoryStatus.Failed : StoryStatus.Running,
-            CreatedAt = DateTime.UtcNow,
+            Status = terminal ? GetTerminalStatus() : IntermediateStatus(),
+            CreatedAt = _createdAt == default ? DateTime.UtcNow : _createdAt,
             LastUpdatedAt = DateTime.UtcNow,
             History = new List<ChapterInfo>(_chapterHistory),
             CurrentChapter = _isPaused ? _chapterHistory.LastOrDefault() : null,
             Context = JsonSerializer.Serialize(_context, StoryJsonOptions.Default)
         };
 
-        await repository.SaveAsync(instance);
+        await _repository.SaveAsync(instance);
     }
 
-    private async Task LoadStoryState(Auid storyId)
+    private StoryStatus IntermediateStatus()
     {
-        if (repository == null) return;
-        var instance = await repository.FindById(storyId);
-        if (instance == null) return;
+        if (_isCancelled) return StoryStatus.Cancelled;
+        if (_isPaused) return StoryStatus.WaitingForInput;
+        if (_hasFailed) return StoryStatus.Failed;
+        return StoryStatus.Running;
+    }
+
+    private async Task<Result> LoadStoryState(Auid storyId)
+    {
+        if (_repository == null) return Result.Success();
+
+        var instance = await _repository.FindById(storyId);
+        if (instance == null) return Result.Success();
+
 
         _chapterHistory.Clear();
         _chapterHistory.AddRange(instance.History);
-        
+        _createdAt = instance.CreatedAt;
         _isPaused = instance.Status == StoryStatus.WaitingForInput;
         _hasFailed = instance.Status == StoryStatus.Failed;
+        _isCancelled = instance.Status == StoryStatus.Cancelled;
+
+        return Result.Success();
     }
 }
+
+/// <summary>
+/// Reflection helpers for interactive chapters. Method handles are cached for performance.
+/// </summary>
+internal static class InteractiveChapterReflection
+{
+    private static readonly ConcurrentDictionary<Type, MethodInfo?> _getSchemaCache = new();
+    private static readonly ConcurrentDictionary<Type, MethodInfo?> _readWithInputCache = new();
+
+    public static IReadOnlyList<DataField>? GetSchema(Type chapterType, object chapterInstance)
+    {
+        var method = _getSchemaCache.GetOrAdd(chapterType, t =>
+            t.GetMethod("GetRequiredInputSchema", BindingFlags.Public | BindingFlags.Instance));
+        if (method == null) return null;
+
+        var result = method.Invoke(chapterInstance, null);
+        return result switch
+        {
+            IReadOnlyList<DataField> ro => ro,
+            IEnumerable<DataField> list => list.ToList(),
+            _ => null
+        };
+    }
+
+    public static async Task<Result> InvokeReadWithInput(
+        Type chapterType, object chapterInstance, object context, object input)
+    {
+        var method = _readWithInputCache.GetOrAdd(chapterType, t =>
+            t.GetMethod("ReadWithInput", BindingFlags.Public | BindingFlags.Instance));
+        if (method == null)
+        {
+            return Result.Fail($"ReadWithInput not found on {chapterType.Name}");
+        }
+
+        var task = (Task<Result>)method.Invoke(chapterInstance, new[] { context, input })!;
+        return await task;
+    }
+}
+

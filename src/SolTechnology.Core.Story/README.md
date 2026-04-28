@@ -1,1036 +1,518 @@
 # SolTechnology.Core.Story
 
-A powerful workflow orchestration framework for building complex, multi-step business processes with support for persistence, pause/resume, and interactive chapters.
+> **Workflows that read like prose.** A narrative-driven orchestration framework for
+> multi-step business processes — automated pipelines, interactive sagas, durable long-running
+> workflows. Pluggable persistence, typed lifecycle, zero magic.
 
-## Overview
+[![NuGet](https://img.shields.io/nuget/v/SolTechnology.Core.Story.svg)](https://www.nuget.org/packages/SolTechnology.Core.Story/)
 
-The Story Framework provides a narrative-driven approach to orchestrating complex workflows. It replaces the older Chain and Flow frameworks with a unified, more expressive API that reads like a table of contents.
+## Why Story Framework?
 
-### Key Features
+Most workflow engines force you to learn a DSL, fight a state machine, or accept a runtime
+that hijacks your code. Story does the opposite — your workflow **is** a method that calls
+chapters in order. Read the method, you understand the workflow.
 
-- **Narrative Structure** - Workflows read like stories with chapters
-- **Type-Safe Context** - Strongly-typed narration flows through all chapters
-- **Interactive Chapters** - Pause workflows to collect user input
-- **Persistence** - Save and resume stories across application restarts
-- **Error Handling** - Comprehensive error aggregation and reporting
-- **DI Integration** - First-class dependency injection support
-- **CQRS Compatible** - Works seamlessly with CQRS handlers
+- **📖 Tale Code philosophy** — `TellStory()` narrates what happens. Chapters are named as
+  actions. The flow is linear and obvious.
+- **🧩 First-class DI** — chapters and handlers are registered transients; injecting
+  repositories, HTTP clients, mediators, anything Scoped — just works.
+- **⏸ Pause & resume** — interactive chapters declare a typed input schema, the engine
+  persists state, your API resumes the story when the user replies.
+- **🔌 Pluggable persistence** — in-memory by default, SQLite for production, or bring your
+  own (`IStoryRepository`) for Postgres / Cosmos / EF Core / whatever.
+- **🛡 Typed lifecycle errors** — `StoryPausedError`, `StoryCancelledError` — never parse
+  strings to detect state.
+- **🆔 Idempotency built-in** — `Idempotency-Key` header / `idempotencyKey` parameter
+  deduplicates retries automatically.
+- **🌐 Opt-in REST API** — inherit `StoryController`, get `start` / `resume` / `cancel` /
+  `state` endpoints with the right HTTP semantics out of the box.
+- **🚫 No `dynamic`, no reflection into your data** — fully generic, fully typed, fully
+  refactor-safe.
 
-## Installation
+## Install
 
 ```bash
 dotnet add package SolTechnology.Core.Story
 ```
 
-## Quick Start
+## Quick start
 
-### 1. Define Your Story Models
+### 1. Define input, context and output
 
 ```csharp
-// Input - what starts the story
-public class SaveCityInput
-{
-    public string CityName { get; set; }
-    public string CountryCode { get; set; }
-}
+public record SaveCityInput(string CityName);
+public class SaveCityOutput { public string CityId { get; set; } = ""; }
 
-// Narration - the context that flows through chapters
-public class SaveCityNarration : Narration<SaveCityInput, SaveCityResult>
+public class SaveCityContext : Context<SaveCityInput, SaveCityOutput>
 {
-    public City? ExistingCity { get; set; }
-    public string? AlternativeName { get; set; }
-    public int SearchCount { get; set; }
-}
-
-// Output - what the story returns
-public class SaveCityResult
-{
-    public string CityId { get; set; }
-    public bool IsNew { get; set; }
+    public bool Exists { get; set; }
 }
 ```
 
-### 2. Create Chapters
+### 2. Write chapters
 
 ```csharp
-// Regular chapter - executes automatically
-public class LoadExistingCity : Chapter<SaveCityNarration>
+public class LoadExistingCity : Chapter<SaveCityContext>
 {
-    private readonly ICityRepository _repository;
-
-    public LoadExistingCity(ICityRepository repository)
+    public override Task<Result> Read(SaveCityContext ctx)
     {
-        _repository = repository;
-    }
-
-    public override async Task<Result> Read(SaveCityNarration narration)
-    {
-        narration.ExistingCity = await _repository.FindByName(narration.Input.CityName);
-        return Result.Success();
-    }
-}
-
-// Another chapter in the sequence
-public class AssignAlternativeName : Chapter<SaveCityNarration>
-{
-    public override Task<Result> Read(SaveCityNarration narration)
-    {
-        if (narration.ExistingCity == null)
-        {
-            narration.AlternativeName = GenerateAlternativeName(narration.Input.CityName);
-        }
+        ctx.Exists = ctx.Input.CityName == "Paris";
         return Result.SuccessAsTask();
     }
+}
 
-    private string GenerateAlternativeName(string cityName) => $"{cityName}-Alt";
+public class SaveCity : Chapter<SaveCityContext>
+{
+    public override Task<Result> Read(SaveCityContext ctx)
+    {
+        ctx.Output.CityId = ctx.Exists ? "1" : Guid.NewGuid().ToString();
+        return Result.SuccessAsTask();
+    }
 }
 ```
 
-### 3. Write Your Story
+### 3. Tell the story
 
 ```csharp
-public class SaveCityStory : StoryHandler<SaveCityInput, SaveCityNarration, SaveCityResult>
+public class SaveCityStory
+    : StoryHandler<SaveCityInput, SaveCityContext, SaveCityOutput>
 {
-    public SaveCityStory(
-        IServiceProvider serviceProvider,
-        ILogger<SaveCityStory> logger)
-        : base(serviceProvider, logger)
-    {
-    }
+    public SaveCityStory(IServiceProvider sp, ILogger<SaveCityStory> log)
+        : base(sp, log) { }
 
     protected override async Task TellStory()
     {
         await ReadChapter<LoadExistingCity>();
-        await ReadChapter<AssignAlternativeName>();
-        await ReadChapter<IncrementSearchCount>();
-        await ReadChapter<SaveToDatabase>();
-    }
-}
-```
-
-### 4. Register and Execute
-
-```csharp
-// In Startup/Program.cs
-services.RegisterStories();
-
-// Execute the story
-var story = serviceProvider.GetRequiredService<SaveCityStory>();
-var input = new SaveCityInput { CityName = "Paris", CountryCode = "FR" };
-var result = await story.Handle(input);
-
-if (result.IsSuccess)
-{
-    Console.WriteLine($"City saved: {result.Data.CityId}");
-}
-```
-
-## Core Concepts
-
-### StoryHandler
-
-The orchestrator that defines the sequence of chapters. It's the "director" of your workflow.
-
-```csharp
-public abstract class StoryHandler<TInput, TNarration, TOutput>
-    where TInput : class
-    where TNarration : Narration<TInput, TOutput>, new()
-    where TOutput : class, new()
-```
-
-**Key Methods:**
-- `TellStory()` - Define your chapter sequence
-- `ReadChapter<TChapter>()` - Execute a chapter
-- `Handle(TInput input)` - Entry point to run the story
-
-### Narration
-
-The context object that flows through all chapters, carrying state and intermediate data.
-
-```csharp
-public abstract class Narration<TInput, TOutput>
-    where TInput : class
-    where TOutput : class, new()
-{
-    public TInput Input { get; set; }
-    public TOutput Output { get; set; }
-}
-```
-
-**Design Pattern:**
-- Add properties for intermediate data needed by chapters
-- Initialize `Output` properties in the final chapter
-- Read-only access to `Input` throughout the story
-
-### Chapter
-
-A single step in your story that performs a specific task.
-
-```csharp
-public abstract class Chapter<TNarration> : IChapter<TNarration>
-    where TNarration : class
-{
-    public abstract Task<Result> Read(TNarration narration);
-}
-```
-
-**Best Practices:**
-- Keep chapters focused on a single responsibility
-- Use dependency injection for services
-- Return `Result.Success()` or `Result.Fail("error message")`
-- Chapters are resolved from DI, so they can have dependencies
-
-### InteractiveChapter
-
-A chapter that pauses the story to collect user input.
-
-```csharp
-public abstract class InteractiveChapter<TNarration, TChapterInput> : IChapter<TNarration>
-    where TNarration : class
-{
-    // Define what data is required
-    public abstract List<DataField> GetRequiredInputSchema();
-
-    // Execute when input is provided
-    public abstract Task<Result> ReadWithInput(TNarration narration, TChapterInput userInput);
-}
-```
-
-**Example:**
-
-```csharp
-public class RequestCustomerDetails : InteractiveChapter<OrderNarration, CustomerDetails>
-{
-    public override List<DataField> GetRequiredInputSchema()
-    {
-        return new List<DataField>
-        {
-            new() { Name = "Name", Type = "string", Required = true },
-            new() { Name = "Email", Type = "string", Required = true },
-            new() { Name = "Address", Type = "string", Required = false }
-        };
-    }
-
-    public override Task<Result> ReadWithInput(OrderNarration narration, CustomerDetails userInput)
-    {
-        if (string.IsNullOrWhiteSpace(userInput.Name))
-        {
-            return Result.FailAsTask("Customer name is required");
-        }
-
-        narration.CustomerName = userInput.Name;
-        narration.CustomerEmail = userInput.Email;
-
-        return Result.SuccessAsTask();
-    }
-}
-```
-
-## Advanced Features
-
-### Persistence & Pause/Resume
-
-Stories can be paused at interactive chapters and resumed later, even after application restart.
-
-#### 1. Enable Persistence
-
-```csharp
-// In-Memory (for testing)
-var options = StoryOptions.WithInMemoryPersistence();
-
-// SQLite (for production)
-var options = StoryOptions.WithSqlitePersistence("path/to/stories.db");
-
-// Custom repository
-var options = new StoryOptions
-{
-    EnablePersistence = true,
-    Repository = new MyCustomRepository()
-};
-```
-
-#### 2. Create Story with Persistence
-
-```csharp
-public class OrderProcessingStory : StoryHandler<OrderInput, OrderNarration, OrderOutput>
-{
-    public OrderProcessingStory(
-        IServiceProvider serviceProvider,
-        ILogger<OrderProcessingStory> logger,
-        StoryOptions options) // Accept options
-        : base(serviceProvider, logger, options)
-    {
-    }
-
-    protected override async Task TellStory()
-    {
-        await ReadChapter<ValidateOrder>();
-        await ReadChapter<RequestCustomerDetails>(); // Interactive - will pause here
-        await ReadChapter<ProcessPayment>();
-        await ReadChapter<SendConfirmation>();
-    }
-}
-```
-
-#### 3. Use StoryManager for Orchestration
-
-```csharp
-// Start a story
-var manager = serviceProvider.GetRequiredService<StoryManager>();
-var startResult = await manager.StartStory<OrderProcessingStory, OrderInput, OrderNarration, OrderOutput>(input);
-
-if (startResult.IsFailure && startResult.Error.Message.Contains("paused"))
-{
-    var storyId = startResult.Data!.StoryId;
-    Console.WriteLine($"Story paused at: {startResult.Data.CurrentChapter?.ChapterId}");
-
-    // Later, resume with user input
-    var customerDetails = new CustomerDetails
-    {
-        Name = "John Doe",
-        Email = "john@example.com"
-    };
-    var userInput = JsonSerializer.SerializeToElement(customerDetails);
-
-    var resumeResult = await manager.ResumeStory<OrderProcessingStory, OrderInput, OrderNarration, OrderOutput>(
-        storyId,
-        userInput);
-
-    if (resumeResult.IsSuccess)
-    {
-        Console.WriteLine("Story completed successfully");
-    }
-}
-```
-
-#### 4. Query Story State
-
-```csharp
-var storyState = await manager.GetStoryState(storyId);
-
-if (storyState.IsSuccess)
-{
-    var instance = storyState.Data;
-    Console.WriteLine($"Status: {instance.Status}");
-    Console.WriteLine($"Current Chapter: {instance.CurrentChapter?.ChapterId}");
-    Console.WriteLine($"History: {instance.History.Count} chapters executed");
-
-    // Check required input schema
-    if (instance.CurrentChapter?.RequiredData != null)
-    {
-        foreach (var field in instance.CurrentChapter.RequiredData)
-        {
-            Console.WriteLine($"  - {field.Name} ({field.Type}): {(field.Required ? "Required" : "Optional")}");
-        }
-    }
-}
-```
-
-### Story Status Lifecycle
-
-```
-Created → Running → WaitingForInput ⟲
-                ↓
-           Completed / Failed / Cancelled
-```
-
-- **Created**: Story instance created but not started
-- **Running**: Currently executing chapters
-- **WaitingForInput**: Paused at an interactive chapter
-- **Completed**: All chapters executed successfully
-- **Failed**: A chapter returned an error
-- **Cancelled**: Execution was cancelled via CancellationToken
-
-### Error Handling
-
-Stories automatically collect and aggregate errors from all chapters.
-
-```csharp
-var result = await story.Handle(input);
-
-if (result.IsFailure)
-{
-    if (result.Error is AggregateError aggregateError)
-    {
-        // Multiple chapters failed
-        foreach (var error in aggregateError.Errors)
-        {
-            Console.WriteLine($"Error: {error.Message}");
-        }
-    }
-    else
-    {
-        // Single error
-        Console.WriteLine($"Error: {result.Error.Message}");
-    }
-}
-```
-
-### Stop on First Error
-
-By default, stories continue executing chapters even after failures. To stop on first error:
-
-```csharp
-var options = new StoryOptions
-{
-    StopOnFirstError = true
-};
-```
-
-## Integration Patterns
-
-### CQRS Integration
-
-Stories work seamlessly as Query or Command handlers:
-
-```csharp
-public class CalculateBestPathHandler :
-    StoryHandler<CalculateBestPathQuery, CalculateBestPathNarration, CalculateBestPathResult>,
-    IQueryHandler<CalculateBestPathQuery, CalculateBestPathResult>
-{
-    public CalculateBestPathHandler(
-        IServiceProvider serviceProvider,
-        ILogger<CalculateBestPathHandler> logger)
-        : base(serviceProvider, logger)
-    {
-    }
-
-    protected override async Task TellStory()
-    {
-        await ReadChapter<InitiateContext>();
-        await ReadChapter<DownloadRoadData>();
-        await ReadChapter<FindProfitablePath>();
-        await ReadChapter<SolveTsp>();
-        await ReadChapter<FormResult>();
-    }
-}
-
-// Register as both Story and Query
-services.RegisterStories();
-services.RegisterQueries();
-
-// Use through MediatR
-var result = await mediator.Send(new CalculateBestPathQuery { ... });
-```
-
-### Domain Services
-
-Use stories to implement complex domain services:
-
-```csharp
-public class SaveCityDomainService :
-    StoryHandler<SaveCityInput, SaveCityNarration, SaveCityResult>
-{
-    protected override async Task TellStory()
-    {
-        await ReadChapter<LoadCity>();
-        await ReadChapter<GenerateAlternativeName>();
-        await ReadChapter<IncrementSearchCount>();
         await ReadChapter<SaveCity>();
     }
 }
 ```
 
-## Repository Implementations
-
-### In-Memory Repository
-
-For testing and development:
+### 4. Register and run
 
 ```csharp
-var options = StoryOptions.WithInMemoryPersistence();
-```
-
-- Stories stored in memory
-- Lost on application restart
-- Thread-safe with proper locking
-
-### SQLite Repository
-
-For production persistence:
-
-```csharp
-var options = StoryOptions.WithSqlitePersistence("stories.db");
-// or
-var options = StoryOptions.WithSqlitePersistence(); // Uses default path
-```
-
-- Stories persisted to SQLite database
-- Survives application restarts
-- Default path: `%LocalAppData%/SolTechnology/StoryFramework/stories.db`
-- Thread-safe with connection pooling
-
-### Custom Repository
-
-Implement your own repository:
-
-```csharp
-public class CosmosDbStoryRepository : IStoryRepository
-{
-    public Task<StoryInstance?> FindById(string storyId) { ... }
-    public Task SaveAsync(StoryInstance storyInstance) { ... }
-    public Task DeleteAsync(string storyId) { ... }
-}
-
-// Use it
-var options = new StoryOptions
-{
-    EnablePersistence = true,
-    Repository = new CosmosDbStoryRepository(cosmosClient)
-};
-```
-
-## Registration
-
-### Automatic Registration
-
-Scans the calling assembly for all stories and chapters:
-
-```csharp
+// One line — defaults to in-memory persistence so interactive stories work immediately.
 services.RegisterStories();
+
+var story = sp.GetRequiredService<SaveCityStory>();
+var result = await story.Handle(new SaveCityInput("Paris"), CancellationToken.None);
+// result.Data.CityId == "1"
 ```
 
-This registers:
-- All `StoryHandler<,,>` implementations
-- All `Chapter<>` implementations
-- All `InteractiveChapter<,>` implementations
-- `StoryManager` for orchestration
-- Default `InMemoryStoryRepository`
+That's it. No DSL. No state machine. No `[Activity]` attributes. Just a method that reads
+top-to-bottom.
 
-### With Persistence
+## Core concepts
 
-```csharp
-// In-memory
-services.RegisterStories(StoryOptions.WithInMemoryPersistence());
+### `StoryHandler<TInput, TContext, TOutput>`
 
-// SQLite
-services.RegisterStories(StoryOptions.WithSqlitePersistence("stories.db"));
+The orchestrator. Define your workflow as a sequence of `ReadChapter<T>()` calls in
+`TellStory()`. Compatible with CQRS — the same handler is also a `IQueryHandler` /
+`ICommandHandler`. Auto-registered as `Transient` by `RegisterStories()`.
 
-// Custom
-services.RegisterStories(new StoryOptions
-{
-    EnablePersistence = true,
-    Repository = new MyRepository(),
-    StopOnFirstError = true
-});
-```
+### `Context<TInput, TOutput>`
 
-### Manual Registration
+The state object that flows between chapters. Holds `Input`, `Output`, and any
+intermediate values you want to share between chapters.
 
-For more control:
+### `Chapter<TContext>`
+
+A unit of business logic. Returns `Result.Success()` or `Result.Fail("reason")`. Resolved
+from DI, so it can declare any dependencies in its constructor.
 
 ```csharp
-services.AddTransient<SaveCityStory>();
-services.AddTransient<LoadExistingCity>();
-services.AddTransient<AssignAlternativeName>();
-// ... register each chapter individually
-```
-
-## Testing Stories
-
-### Testing Individual Chapters
-
-```csharp
-[Test]
-public async Task LoadExistingCity_CityExists_LoadsCity()
-{
-    // Arrange
-    var repository = new Mock<ICityRepository>();
-    repository.Setup(r => r.FindByName("Paris"))
-        .ReturnsAsync(new City { Id = "1", Name = "Paris" });
-
-    var chapter = new LoadExistingCity(repository.Object);
-    var narration = new SaveCityNarration
-    {
-        Input = new SaveCityInput { CityName = "Paris" }
-    };
-
-    // Act
-    var result = await chapter.Read(narration);
-
-    // Assert
-    result.IsSuccess.Should().BeTrue();
-    narration.ExistingCity.Should().NotBeNull();
-    narration.ExistingCity!.Name.Should().Be("Paris");
-}
-```
-
-### Testing Complete Stories
-
-```csharp
-[Test]
-public async Task SaveCityStory_NewCity_SavesSuccessfully()
-{
-    // Arrange
-    var services = new ServiceCollection();
-    services.AddLogging();
-    services.RegisterStories();
-    services.AddTransient<ICityRepository, InMemoryCityRepository>();
-
-    var serviceProvider = services.BuildServiceProvider();
-    var story = serviceProvider.GetRequiredService<SaveCityStory>();
-
-    // Act
-    var input = new SaveCityInput { CityName = "Paris", CountryCode = "FR" };
-    var result = await story.Handle(input);
-
-    // Assert
-    result.IsSuccess.Should().BeTrue();
-    result.Data.IsNew.Should().BeTrue();
-}
-```
-
-### Testing Pause/Resume
-
-```csharp
-[Test]
-public async Task OrderStory_PausesAndResumes_WithUserInput()
-{
-    // Arrange
-    var services = new ServiceCollection();
-    services.AddLogging();
-    services.RegisterStories(StoryOptions.WithInMemoryPersistence());
-    var serviceProvider = services.BuildServiceProvider();
-    var manager = serviceProvider.GetRequiredService<StoryManager>();
-
-    // Act - Start story
-    var input = new OrderInput { OrderId = "ORD-001" };
-    var startResult = await manager.StartStory<OrderProcessingStory, OrderInput, OrderNarration, OrderOutput>(input);
-
-    // Assert - Should pause
-    startResult.IsFailure.Should().BeTrue();
-    startResult.Error!.Message.Should().Contain("paused");
-    var storyId = startResult.Data!.StoryId;
-
-    // Act - Resume with input
-    var customerDetails = new CustomerDetails { Name = "John", Email = "john@example.com" };
-    var userInput = JsonSerializer.SerializeToElement(customerDetails);
-    var resumeResult = await manager.ResumeStory<OrderProcessingStory, OrderInput, OrderNarration, OrderOutput>(
-        storyId,
-        userInput);
-
-    // Assert - Should complete
-    resumeResult.IsSuccess.Should().BeTrue();
-    resumeResult.Data!.Status.Should().Be(StoryStatus.Completed);
-}
-```
-
-## Best Practices
-
-### 1. Keep Chapters Focused
-
-Each chapter should have a single, clear responsibility:
-
-```csharp
-// ✅ Good - focused responsibility
-public class LoadExistingCity : Chapter<SaveCityNarration>
-{
-    public override async Task<Result> Read(SaveCityNarration narration)
-    {
-        narration.ExistingCity = await _repository.FindByName(narration.Input.CityName);
-        return Result.Success();
-    }
-}
-
-// ❌ Bad - doing too much
-public class LoadAndSaveCity : Chapter<SaveCityNarration>
-{
-    public override async Task<Result> Read(SaveCityNarration narration)
-    {
-        var city = await _repository.FindByName(narration.Input.CityName);
-        if (city == null)
-        {
-            city = new City { Name = narration.Input.CityName };
-            await _repository.Save(city);
-        }
-        narration.ExistingCity = city;
-        return Result.Success();
-    }
-}
-```
-
-### 2. Use Meaningful Names
-
-Chapter names should clearly describe what they do:
-
-```csharp
-// ✅ Good
-await ReadChapter<ValidateOrderDetails>();
-await ReadChapter<CalculateShippingCost>();
-await ReadChapter<ApplyDiscountCodes>();
-await ReadChapter<ProcessPayment>();
-
-// ❌ Bad
-await ReadChapter<Step1>();
-await ReadChapter<Step2>();
-await ReadChapter<ProcessStuff>();
-```
-
-### 3. Design Your Narration
-
-Think carefully about what data flows through your story:
-
-```csharp
-// ✅ Good - clear, organized narration
-public class OrderNarration : Narration<OrderInput, OrderOutput>
-{
-    // Loaded data
-    public Customer? Customer { get; set; }
-    public List<Product> Products { get; set; } = new();
-
-    // Calculated values
-    public decimal SubTotal { get; set; }
-    public decimal ShippingCost { get; set; }
-    public decimal TotalCost { get; set; }
-
-    // Validation results
-    public bool IsValid { get; set; }
-    public List<string> ValidationErrors { get; set; } = new();
-}
-```
-
-### 4. Handle Errors Gracefully
-
-Always validate inputs and return meaningful errors:
-
-```csharp
-public override Task<Result> Read(SaveCityNarration narration)
-{
-    if (string.IsNullOrWhiteSpace(narration.Input.CityName))
-    {
-        return Result.FailAsTask("City name is required");
-    }
-
-    if (narration.Input.CityName.Length > 100)
-    {
-        return Result.FailAsTask("City name must be less than 100 characters");
-    }
-
-    // Process...
-    return Result.SuccessAsTask();
-}
-```
-
-### 5. Use Dependency Injection
-
-Chapters should declare their dependencies in the constructor:
-
-```csharp
-public class LoadExistingCity : Chapter<SaveCityNarration>
+public class LoadExistingCity : Chapter<SaveCityContext>
 {
     private readonly ICityRepository _repository;
-    private readonly ILogger<LoadExistingCity> _logger;
-    private readonly IDistributedCache _cache;
 
-    public LoadExistingCity(
-        ICityRepository repository,
-        ILogger<LoadExistingCity> logger,
-        IDistributedCache cache)
-    {
-        _repository = repository;
-        _logger = logger;
-        _cache = cache;
-    }
+    public LoadExistingCity(ICityRepository repository) => _repository = repository;
 
-    public override async Task<Result> Read(SaveCityNarration narration)
+    public override async Task<Result> Read(SaveCityContext ctx)
     {
-        _logger.LogInformation("Loading city: {CityName}", narration.Input.CityName);
-        // ...
+        ctx.ExistingCity = await _repository.FindByName(ctx.Input.CityName);
+        return Result.Success();
     }
 }
 ```
 
-### 6. Interactive Chapter Design
+**Best practices**
 
-Keep interactive chapters simple and validation-focused:
+- Keep each chapter focused on one thing. If the name needs an "And", split it.
+- Inject what you need — chapters are `Transient`, constructor injection is free.
+- Return `Result.Fail("reason")` instead of throwing. Exceptions are caught and wrapped,
+  but explicit failures produce cleaner error trails.
+- Don't mutate `ctx.Input` — treat it as read-only. Write intermediate data as new
+  properties on the `Context`.
+- Don't populate `ctx.Output` until the final chapter — keeps partial failures from
+  leaking half-baked results.
+
+### `InteractiveChapter<TContext, TChapterInput>`
+
+A chapter that pauses the story and waits for caller input. Declares its expected input
+shape so consumers (e.g. a SPA, a form generator, OpenAPI-driven clients) can render the
+right UI without hardcoding field lists:
 
 ```csharp
-public class RequestCustomerDetails : InteractiveChapter<OrderNarration, CustomerDetails>
+public class RequestCustomerDetails
+    : InteractiveChapter<OrderContext, CustomerDetails>
 {
-    public override List<DataField> GetRequiredInputSchema()
+    public override List<DataField> GetRequiredInputSchema() => new()
     {
-        // Clearly define what you need
-        return new List<DataField>
-        {
-            new() { Name = "Name", Type = "string", Required = true, Description = "Customer full name" },
-            new() { Name = "Email", Type = "email", Required = true, Description = "Contact email address" },
-            new() { Name = "Phone", Type = "string", Required = false, Description = "Phone number (optional)" }
-        };
-    }
+        new() { Name = "Name",    Type = "string", Required = true  },
+        new() { Name = "Email",   Type = "string", Required = true  },
+        new() { Name = "Address", Type = "string", Required = false },
+    };
 
-    public override Task<Result> ReadWithInput(OrderNarration narration, CustomerDetails input)
+    public override Task<Result> ReadWithInput(OrderContext ctx, CustomerDetails input)
     {
-        // Validate thoroughly
         if (string.IsNullOrWhiteSpace(input.Name))
+        {
             return Result.FailAsTask("Customer name is required");
+        }
 
-        if (!IsValidEmail(input.Email))
-            return Result.FailAsTask("Invalid email address");
-
-        // Store in narration
-        narration.CustomerName = input.Name;
-        narration.CustomerEmail = input.Email;
-        narration.CustomerPhone = input.Phone;
-
+        ctx.CustomerName  = input.Name;
+        ctx.CustomerEmail = input.Email;
         return Result.SuccessAsTask();
     }
 }
 ```
 
-## Migration from Chain/Flow
-
-If you're migrating from the older Chain or Flow frameworks:
-
-### Chain → Story
+Minimal variant — just the logic, schema inferred from `TChapterInput` via reflection:
 
 ```csharp
-// Old Chain
-public class MyHandler : ChainHandler<MyInput, MyContext, MyOutput>
+public class CollectEmailChapter : InteractiveChapter<OrderContext, EmailInput>
 {
-    protected override async Task HandleChain()
+    public override Task<Result> ReadWithInput(OrderContext ctx, EmailInput input)
     {
-        await Invoke<Step1>();
-        await Invoke<Step2>();
-    }
-}
+        if (!input.Email.Contains("@"))
+        {
+            return Result.FailAsTask("Invalid e-mail");
+        }
 
-// New Story
-public class MyStory : StoryHandler<MyInput, MyNarration, MyOutput>
-{
-    protected override async Task TellStory()
-    {
-        await ReadChapter<Step1>();
-        await ReadChapter<Step2>();
+        ctx.CustomerEmail = input.Email;
+        return Result.SuccessAsTask();
     }
 }
 ```
 
-**Changes:**
-- `ChainHandler` → `StoryHandler`
-- `ChainContext` → `Narration`
-- `Invoke<T>()` → `ReadChapter<T>()`
-- `HandleChain()` → `TellStory()`
-- `IChainStep` → `Chapter`
+**Best practices**
 
-### Flow → Story
+- Validate inside `ReadWithInput` — treat the paused input as untrusted. Return
+  `Result.Fail` with a human-readable reason; the error surfaces in the HTTP response.
+- Keep `TChapterInput` narrow. One chapter, one conceptual step of user interaction.
+- Override `GetRequiredInputSchema()` only when you need hand-tuned metadata (hints,
+  default values, richer types). Otherwise, let reflection derive it.
+
+#### Use cases
+
+##### Order checkout with pause-for-customer-details
+
+A classic e-commerce flow. Validation and inventory check run automatically; the story
+pauses to collect customer details from the user; payment and confirmation run after the
+resume.
 
 ```csharp
-// Old Flow
-public class MyWorkflow : FlowHandler<MyInput, MyState, MyOutput>
+public class OrderProcessingStory
+    : StoryHandler<OrderInput, OrderContext, OrderOutput>
 {
-    protected override async Task ExecuteFlow()
-    {
-        await RunNode<Node1>();
-        await RunNode<Node2>();
-    }
-}
+    public OrderProcessingStory(IServiceProvider sp, ILogger<OrderProcessingStory> log)
+        : base(sp, log) { }
 
-// New Story
-public class MyStory : StoryHandler<MyInput, MyNarration, MyOutput>
-{
     protected override async Task TellStory()
     {
-        await ReadChapter<Chapter1>();
-        await ReadChapter<Chapter2>();
+        await ReadChapter<ValidateOrder>();         // automated
+        await ReadChapter<ReserveInventory>();      // automated
+        await ReadChapter<RequestCustomerDetails>();// ⏸ pause — interactive
+        await ReadChapter<ProcessPayment>();        // automated, runs on resume
+        await ReadChapter<SendConfirmation>();      // automated
     }
 }
 ```
 
-**Changes:**
-- `FlowHandler` → `StoryHandler`
-- `FlowState` → `Narration`
-- `RunNode<T>()` → `ReadChapter<T>()`
-- `ExecuteFlow()` → `TellStory()`
-- `IFlowNode` → `Chapter`
+Driving the lifecycle from your application code:
 
-## Troubleshooting
-
-### "Chapter not registered in DI container"
-
-**Problem**: Chapter isn't found when executing story.
-
-**Solution**:
 ```csharp
-// Make sure you called RegisterStories()
+var manager = sp.GetRequiredService<StoryManager>();
+
+// 1. Start — runs up to the first interactive chapter.
+var start = await manager.StartStory<OrderProcessingStory, OrderInput, OrderContext, OrderOutput>(
+    new OrderInput { Cart = cart });
+
+if (start.IsSuccess && start.Data!.Status == StoryStatus.WaitingForInput)
+{
+    var storyId = start.Data.StoryId;
+
+    // 2. Inspect the schema required for the paused chapter — render a form from it.
+    foreach (var field in start.Data.CurrentChapter!.RequiredData)
+    {
+        Console.WriteLine($"  {field.Name} ({field.Type}) {(field.Required ? "*" : "")}");
+    }
+
+    // 3. Later, after the user submits, resume with the typed payload.
+    var userInput = JsonSerializer.SerializeToElement(new CustomerDetails
+    {
+        Name  = "John Doe",
+        Email = "john@example.com",
+    });
+
+    var resume = await manager.ResumeStory<OrderProcessingStory, OrderInput, OrderContext, OrderOutput>(
+        storyId, userInput);
+
+    if (resume.IsSuccess && resume.Data!.Status == StoryStatus.Completed)
+    {
+        // Payment processed, confirmation sent.
+    }
+}
+```
+
+Between start and resume, pull a snapshot of the story state any time — audit logs,
+dashboards, "resume later" links in an email:
+
+```csharp
+var state = await manager.GetStoryState(storyId);
+Console.WriteLine($"Status: {state.Data!.Status}");
+Console.WriteLine($"Current: {state.Data.CurrentChapter?.ChapterId}");
+Console.WriteLine($"History: {state.Data.History.Count} chapters executed");
+```
+
+##### Approval workflow with multiple pause points
+
+A request-for-approval pipeline where each approver pauses the story in turn. Same
+mechanism, different shape — two interactive chapters in sequence.
+
+```csharp
+public class ExpenseApprovalStory
+    : StoryHandler<ExpenseInput, ExpenseContext, ExpenseOutput>
+{
+    public ExpenseApprovalStory(IServiceProvider sp, ILogger<ExpenseApprovalStory> log)
+        : base(sp, log) { }
+
+    protected override async Task TellStory()
+    {
+        await ReadChapter<ClassifyExpense>();           // automated
+        await ReadChapter<ManagerApprovalChapter>();    // ⏸ pause — manager signs off
+        await ReadChapter<FinanceApprovalChapter>();    // ⏸ pause — finance signs off (only if > threshold)
+        await ReadChapter<PostToLedger>();              // automated
+        await ReadChapter<NotifyRequester>();           // automated
+    }
+}
+
+public class ManagerApprovalChapter
+    : InteractiveChapter<ExpenseContext, ApprovalDecision>
+{
+    public override Task<Result> ReadWithInput(ExpenseContext ctx, ApprovalDecision decision)
+    {
+        if (!decision.Approved)
+        {
+            return Result.FailAsTask($"Rejected by manager: {decision.Reason}");
+        }
+
+        ctx.ManagerApproval = decision;
+        return Result.SuccessAsTask();
+    }
+}
+```
+
+Two real callers, two resumes — between them the story sits persisted in the repository.
+Persistence survives process restarts, so the manager can approve on Monday and finance
+on Wednesday.
+
+##### User onboarding with progressive disclosure
+
+Long-form interactive flow — collect minimum info up front, pause, collect more, pause,
+etc. The `Context` accumulates data between pauses; each interactive chapter only cares
+about *its* slice.
+
+```csharp
+public class UserOnboardingStory
+    : StoryHandler<OnboardingInput, OnboardingContext, OnboardingOutput>
+{
+    public UserOnboardingStory(IServiceProvider sp, ILogger<UserOnboardingStory> log)
+        : base(sp, log) { }
+
+    protected override async Task TellStory()
+    {
+        await ReadChapter<CollectBasicInfoChapter>();      // ⏸ name, email
+        await ReadChapter<SendVerificationEmail>();        // automated
+        await ReadChapter<VerifyEmailChapter>();           // ⏸ verification code
+        await ReadChapter<CollectPreferencesChapter>();    // ⏸ preferences
+        await ReadChapter<CompleteOnboardingChapter>();    // automated — creates account
+    }
+}
+```
+
+The engine automatically skips chapters already recorded in `History` when resuming, so
+refreshing the browser or retrying the request is safe.
+
+### `StoryManager`
+
+Orchestrates persisted workflows: `StartStory`, `ResumeStory`, `CancelStory`,
+`GetStoryState`. Creates a fresh DI scope per invocation, so Scoped dependencies
+(`DbContext`, EF Core, per-request services) work correctly across pause/resume
+boundaries.
+
+### `StoryController` *(opt-in REST API)*
+
+Inherit and add your auth attributes. You get the four canonical endpoints, with proper
+HTTP semantics:
+
+| Method | Route | Returns |
+|---|---|---|
+| `POST` | `/api/story/{handlerName}/start` | `200 OK` (completed) or `202 Accepted` (paused) |
+| `POST` | `/api/story/{storyId}` | resume with body as user input |
+| `GET`  | `/api/story/{storyId}` | current state |
+| `GET`  | `/api/story/{storyId}/result` | deserialized output (only if `Completed`) |
+| `DELETE` | `/api/story/{storyId}` | cancel |
+
+Only handlers registered through `RegisterStories()` are exposed (whitelist via
+`StoryHandlerRegistry`). `Idempotency-Key` HTTP header is honored.
+
+## Persistence
+
+Persistence providers plug in through the builder returned by `RegisterStories()`. The
+default is in-memory, so interactive stories work the moment you call `RegisterStories()`
+with no arguments.
+
+```csharp
+// Default: in-memory (dev/test/single-process).
 services.RegisterStories();
+// equivalent to:
+services.RegisterStories().UseInMemoryStoryRepository();
 
-// Or register the chapter manually
-services.AddTransient<MyChapter>();
+// Production: SQLite (WAL journal, retries on SQLITE_BUSY, indexed).
+services.RegisterStories().UseSqliteStoryRepository("Data Source=stories.db");
+
+// Production with full tuning:
+services.RegisterStories().UseSqliteStoryRepository(o =>
+{
+    o.ConnectionString = "Data Source=stories.db;Cache=Shared";
+    o.MaxRetries       = 5;
+    o.EnableWalMode    = true;
+});
+
+// Bring your own backend — Postgres, Cosmos, EF Core, anything that implements IStoryRepository:
+services.RegisterStories()
+        .UseStoryRepository<MyPostgresStoryRepository>(ServiceLifetime.Scoped);
 ```
 
-### "Failed to deserialize story context"
+> Implementing a custom backend? `IStoryRepository` is a five-method interface
+> (`FindById`, `FindByIdempotencyKey`, `ListAsync`, `SaveAsync`, `DeleteAsync`).
+> See `InMemoryStoryRepository` and `SqliteStoryRepository` for reference implementations.
 
-**Problem**: Narration can't be deserialized during resume.
+## Pause & resume
 
-**Solution**: Ensure your Narration class and all its properties are JSON-serializable:
+Detecting pause — type-check the error, never string-match:
+
 ```csharp
-public class MyNarration : Narration<MyInput, MyOutput>
-{
-    // ✅ Good - simple types
-    public string Name { get; set; }
-    public int Count { get; set; }
-    public List<string> Items { get; set; } = new();
+var start = await manager.StartStory<OrderStory, OrderInput, OrderContext, OrderOutput>(input);
 
-    // ❌ Bad - complex types without converters
-    public MyComplexType ComplexData { get; set; } // Won't serialize well
+if (start.IsSuccess && start.Data!.Status == StoryStatus.WaitingForInput)
+{
+    // Render a form using start.Data.CurrentChapter.RequiredData …
+}
+
+// later, when the user replies:
+var resume = await manager.ResumeStory<OrderStory, OrderInput, OrderContext, OrderOutput>(
+    start.Data.StoryId,
+    JsonSerializer.SerializeToElement(new EmailInput { Email = "x@y.z" }));
+```
+
+Pause is also surfaced as a typed `Result.Fail`:
+
+```csharp
+if (result.Error is StoryPausedError paused)
+{
+    // paused.StoryId, paused.ChapterId
 }
 ```
 
-### Story doesn't pause at interactive chapter
-
-**Problem**: Interactive chapter executes without waiting for input.
-
-**Solution**: Make sure you're using `StoryManager` to start the story:
-```csharp
-// ❌ Wrong - direct execution
-var story = serviceProvider.GetRequiredService<MyStory>();
-await story.Handle(input); // Won't pause properly
-
-// ✅ Correct - use StoryManager
-var manager = serviceProvider.GetRequiredService<StoryManager>();
-await manager.StartStory<MyStory, MyInput, MyNarration, MyOutput>(input);
-```
-
-## Performance Considerations
-
-### Chapter Execution
-
-- Chapters are resolved from DI for each execution
-- Use transient lifetime for stateless chapters
-- Use scoped lifetime if chapters need to share state within a request
-
-### Persistence
-
-- In-memory repository: Fast but lost on restart
-- SQLite repository: Slower but persistent
-- Custom repository: Performance depends on implementation
-
-### Large Narrations
-
-If your narration becomes very large:
-- Consider breaking into multiple smaller stories
-- Store large data externally and keep references in narration
-- Use compression for serialized context
-
-## API Reference
-
-### Core Classes
-
-#### StoryHandler<TInput, TNarration, TOutput>
+## Idempotency
 
 ```csharp
-public abstract class StoryHandler<TInput, TNarration, TOutput>
-    where TInput : class
-    where TNarration : Narration<TInput, TOutput>, new()
-    where TOutput : class, new()
-{
-    protected StoryHandler(IServiceProvider serviceProvider, ILogger logger);
-    protected StoryHandler(IServiceProvider serviceProvider, ILogger logger, StoryOptions? options);
-
-    protected abstract Task TellStory();
-    protected Task ReadChapter<TChapter>() where TChapter : IChapter<TNarration>;
-
-    public virtual Task<Result<TOutput>> Handle(TInput input, CancellationToken cancellationToken = default);
-
-    public TNarration Narration { get; set; }
-}
+await manager.StartStory<…>(input, idempotencyKey: "order-42");
 ```
 
-#### Narration<TInput, TOutput>
+Retries with the same key return the existing story instead of starting a new one. Works
+through the HTTP `Idempotency-Key` header on `StoryController.StartStory` too.
+
+## Cancellation
 
 ```csharp
-public abstract class Narration<TInput, TOutput>
-    where TInput : class
-    where TOutput : class, new()
-{
-    public TInput Input { get; set; }
-    public TOutput Output { get; set; }
-    public string? StoryInstanceId { get; internal set; }
-    public string? CurrentChapterId { get; internal set; }
-}
+await manager.CancelStory(storyId);
 ```
 
-#### Chapter<TNarration>
+Status becomes `Cancelled`. Subsequent resume attempts fail cleanly.
+
+## Error handling
+
+Chapters return `Result.Success()` / `Result.Fail("reason")`. The engine aggregates errors
+into an `AggregateError` when `StoryOptions.StopOnFirstError = false`.
+
+Marker error types — detect by **type**, never by string:
+
+| Error | Meaning |
+|---|---|
+| `StoryPausedError` | Story is waiting for user input at an interactive chapter. |
+| `StoryCancelledError` | Story was cancelled by token or `CancelStory`. |
+
+**Best practices**
+
+- Use `is StoryPausedError` / `is StoryCancelledError` in callers. Never `Message.Contains(...)`.
+- Prefer `Result.Fail("business reason")` over `throw` in chapter bodies — exceptions are
+  wrapped but your reason string is clearer than a stack trace.
+- Set `StopOnFirstError = false` only when chapters are independent and you actually want
+  the full error list (e.g. batch validation). For sequential flows keep the default.
+
+## Versioning
+
+Handler versioning is **not currently implemented**. See ADR-002
+("Future extensions → Handler versioning") for the planned SemVer-based compatibility
+design. Today the engine accepts any persisted state regardless of how the handler has
+changed; you are responsible for keeping chapter sequences and context shapes
+backward-compatible when redeploying with in-flight stories.
+
+## Registration API
 
 ```csharp
-public abstract class Chapter<TNarration> : IChapter<TNarration>
-    where TNarration : class
-{
-    public virtual string ChapterId { get; }
-    public abstract Task<Result> Read(TNarration narration);
-}
+public static IStoryBuilder RegisterStories(
+    this IServiceCollection services,
+    Action<StoryOptions>? configure = null,
+    params Assembly[] assemblies);
 ```
 
-#### InteractiveChapter<TNarration, TChapterInput>
+Returns `IStoryBuilder` for chaining a persistence provider:
 
-```csharp
-public abstract class InteractiveChapter<TNarration, TChapterInput> : IChapter<TNarration>
-    where TNarration : class
-{
-    public virtual string ChapterId { get; }
-    public abstract List<DataField> GetRequiredInputSchema();
-    public abstract Task<Result> ReadWithInput(TNarration narration, TChapterInput userInput);
+- `.UseInMemoryStoryRepository()` — default; explicit for clarity.
+- `.UseSqliteStoryRepository("Data Source=…")` — connection string shortcut.
+- `.UseSqliteStoryRepository(opts => …)` — full options callback.
+- `.UseStoryRepository<TRepository>(ServiceLifetime)` — your own backend.
 
-    Task<Result> IChapter<TNarration>.Read(TNarration narration);
-    public Task<Result> ReadWithInput(TNarration narration, TChapterInput userInput);
-}
-```
+A persistence provider is always present — the minimum is in-memory.
 
-#### StoryManager
+If no assemblies are passed, the entry assembly and the calling assembly are scanned for
+`IChapter<>` and `StoryHandler<,,>` implementations.
 
-```csharp
-public class StoryManager
-{
-    public StoryManager(IServiceProvider serviceProvider, IStoryRepository repository, ILogger<StoryManager> logger);
+`StoryOptions` (configurable via the callback) — engine-level policies:
 
-    public Task<Result<StoryInstance>> StartStory<THandler, TInput, TNarration, TOutput>(TInput input)
-        where THandler : StoryHandler<TInput, TNarration, TOutput>
-        where TInput : class
-        where TNarration : Narration<TInput, TOutput>, new()
-        where TOutput : class, new();
+| Option | Default | Effect |
+|---|---|---|
+| `StopOnFirstError` | `true` | Halt the story on the first chapter failure (vs. aggregate). |
+| `StoryIdPrefix` | `"STR"` | Prefix for generated `Auid` story identifiers. |
+| `RestrictControllerToRegisteredHandlers` | `true` | Whitelist enforcement on `StoryController`. |
 
-    public Task<Result<StoryInstance>> ResumeStory<THandler, TInput, TNarration, TOutput>(
-        string storyId,
-        JsonElement? userInput = null)
-        where THandler : StoryHandler<TInput, TNarration, TOutput>
-        where TInput : class
-        where TNarration : Narration<TInput, TOutput>, new()
-        where TOutput : class, new();
+## Not supported (yet)
 
-    public Task<Result<StoryInstance>> GetStoryState(string storyId);
-}
-```
+Parallel chapter execution, durable retries with backoff, cross-process sagas / compensation,
+distributed tracing via `ActivitySource`, handler versioning. Tracked in
+[`docs/reviews/Story-Framework-Review.md`](../../docs/reviews/Story-Framework-Review.md)
+and [ADR-002](../../docs/adr/002-Story-Framework-Implementation.md).
 
-#### StoryOptions
+## Learn more
 
-```csharp
-public class StoryOptions
-{
-    public bool EnablePersistence { get; set; }
-    public IStoryRepository? Repository { get; set; }
-    public bool StopOnFirstError { get; set; }
-
-    public static StoryOptions Default { get; }
-    public static StoryOptions WithInMemoryPersistence();
-    public static StoryOptions WithSqlitePersistence(string? dbPath = null);
-}
-```
-
-### Extension Methods
-
-```csharp
-public static class ModuleInstaller
-{
-    public static IServiceCollection RegisterStories(
-        this IServiceCollection services,
-        StoryOptions? options = null);
-}
-```
+- [Full user guide (`docs/Story.md`)](../../docs/Story.md)
+- [Tale Code philosophy (`docs/Tale.md`)](../../docs/Tale.md)
+- [Architecture decision record (ADR-002)](../../docs/adr/002-Story-Framework-Implementation.md)
 
 ## License
 
-This library is part of the SolTechnology.Core framework.
-
-## Support
-
-For issues, questions, or contributions, please refer to the main SolTechnology.Core repository.
+Part of the [SolTechnology.Core](https://github.com/SolarFr/SolTechnology.Core) framework.

@@ -1,4 +1,3 @@
-using System.Text.Json;
 using SolTechnology.Core.CQRS;
 using SolTechnology.Core.Story.Models;
 
@@ -7,62 +6,32 @@ namespace SolTechnology.Core.Story;
 /// <summary>
 /// Base class for interactive story chapters that require user input.
 /// The story pauses at these chapters and waits for external input before continuing.
-/// Use this for steps that need approval, additional data, or human decision-making.
 /// </summary>
-/// <typeparam name="TContext">The Context type that flows through this chapter</typeparam>
-/// <typeparam name="TChapterInput">The input type that the user must provide</typeparam>
-/// <example>
-/// <code>
-/// public class RequestApproval : InteractiveChapter&lt;OrderContext, ApprovalInput&gt;
-/// {
-///     public override Task&lt;Result&gt; ReadWithInput(OrderContext context, ApprovalInput userInput)
-///     {
-///         if (!userInput.IsApproved)
-///             return Result.FailAsTask("Order was not approved");
-///
-///         context.ApprovalTimestamp = DateTime.UtcNow;
-///         context.ApprovedBy = userInput.ApproverName;
-///         return Result.SuccessAsTask();
-///     }
-/// }
-/// </code>
-/// </example>
-public abstract class InteractiveChapter<TContext, TChapterInput> : IChapter<TContext>
+/// <typeparam name="TContext">The Context type that flows through this chapter.</typeparam>
+/// <typeparam name="TChapterInput">The input type that the user must provide.</typeparam>
+public abstract class InteractiveChapter<TContext, TChapterInput>
+    : Chapter<TContext>, IInteractiveChapter<TContext, TChapterInput>
     where TContext : class
     where TChapterInput : class, new()
 {
     /// <summary>
-    /// Unique identifier for this chapter.
-    /// Defaults to the type name. Override if you need custom identification.
-    /// </summary>
-    public virtual string ChapterId => GetType().Name;
-
-    /// <summary>
     /// Returns the schema describing the expected input for this chapter.
-    /// Used to generate API responses and validate user input structure.
-    /// Automatically introspects TChapterInput using reflection.
+    /// Uses reflection over <typeparamref name="TChapterInput"/>.
     /// </summary>
-    /// <returns>List of fields describing the required input structure</returns>
-    public List<DataField> GetRequiredInputSchema() =>
+    public virtual IReadOnlyList<DataField> GetRequiredInputSchema() =>
         typeof(TChapterInput).ToDataFields();
 
     /// <summary>
     /// Process user-provided input for this chapter.
     /// Validate the input, update the Context based on user choices, and return success or failure.
     /// </summary>
-    /// <param name="context">The Context containing all story data</param>
-    /// <param name="userInput">The input provided by the user</param>
-    /// <returns>Result indicating whether the input was valid and processed successfully</returns>
     public abstract Task<Result> ReadWithInput(TContext context, TChapterInput userInput);
 
     /// <summary>
-    /// Internal implementation of IChapter.Read - should not be called directly.
-    /// Interactive chapters must be executed via ReadWithInput() or through StoryManager orchestration.
+    /// Interactive chapters are orchestrated by <c>StoryEngine</c> via <see cref="ReadWithInput"/>.
+    /// Calling this directly is a programming error.
     /// </summary>
-    Task<Result> IChapter<TContext>.Read(TContext context)
-    {
+    public sealed override Task<Result> Read(TContext context) =>
         throw new InvalidOperationException(
-            $"Interactive chapter '{ChapterId}' requires user input. " +
-            "Use ReadWithInput() method or execute through StoryManager for proper orchestration.");
-    }
+            $"Interactive chapter '{ChapterId}' requires user input. Use ReadWithInput() or orchestrate through StoryManager/StoryHandler.");
 }

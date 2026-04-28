@@ -2,6 +2,22 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+> **🚨 MANDATORY READING BEFORE WRITING CODE 🚨**
+>
+> Whenever you write or modify C# code in this repository, you **must** first consult
+> [`docs/ClaudeCodingGuide.md`](docs/ClaudeCodingGuide.md). It defines the canonical
+> structure, dependencies, naming, file layout, class-size budget, and anti-patterns
+> for this codebase (built on the DreamTravel sample). The rules in that file are
+> binding and override any contradicting pattern found in legacy code.
+
+> **🔁 SELF-IMPROVEMENT RULE 🔁**
+>
+> If you learn something new during a task — a correction from the user, a non-obvious
+> codebase constraint, a repeated mistake, a new "the way" pattern, an ADR — **update
+> your own instructions in the same turn before yielding back**. See
+> [`docs/ClaudeCodingGuide.md` §18](docs/ClaudeCodingGuide.md). Silent retention is
+> forbidden: if a lesson is worth remembering, write it down now.
+
 ## Repository Overview
 
 SolTechnology.Core is a collection of NuGet packages that provide a foundation for building CQRS-driven applications using Azure technologies. The repository follows the "Tale Code" philosophy - making code readable like well-written prose. It includes both the core libraries (in `src/`) and a sample application called DreamTravel (in `sample-tale-code-apps/DreamTravel/`).
@@ -90,6 +106,15 @@ dotnet pack -c Release -o . ./src/SolTechnology.Core.CQRS/SolTechnology.Core.CQR
 **CRITICAL: Always update packages at source, never mask problems with overrides.**
 
 When encountering NuGet security warnings (NU1902, NU1903, NU1603):
+
+> **Note on `NU1900`** — `NU1900` is *not* a CVE finding. It means NuGet Audit
+> could not download vulnerability data (typically because a configured feed is
+> unreachable or requires auth, e.g. a corporate Azure DevOps feed behind VPN).
+> It is intentionally demoted from error to warning in `src/Directory.Build.props`
+> via `<WarningsNotAsErrors>NU1900</WarningsNotAsErrors>` so transient connectivity
+> never breaks the build. Real CVE warnings (`NU1901`–`NU1904`) remain errors.
+> If you see NU1900 locally, fix the unreachable feed in your user-level
+> `NuGet.config` or remove it; do not change the project files.
 
 #### 1. **Identify the Root Cause** (Don't Add Overrides Immediately!)
 
@@ -285,14 +310,14 @@ return city;  // Automatically converts to Result<City>
 **Story Framework** is the unified approach for workflow orchestration, replacing the deprecated Chain pattern. It supports both simple automated workflows and interactive workflows with persistence.
 
 **Key Concepts:**
-- **StoryHandler** - Main orchestrator, inherits from `StoryHandler<TInput, TContext, TOutput>`
-- **Narration** - Context object that carries state through the story, inherits from `Context<TInput, TOutput>`
-- **Chapter** - Individual step in the story, implements `IChapter<TContext>`
-- **InteractiveChapter** - Chapter that pauses for user input, inherits from `InteractiveChapter<TContext, TChapterInput>`
+- **StoryHandler** — main orchestrator, inherits from `StoryHandler<TInput, TContext, TOutput>`.
+- **Context** — state object that carries data through the story, inherits from `Context<TInput, TOutput>`.
+- **Chapter** — individual step, inherits from `Chapter<TContext>` (or implements `IChapter<TContext>`).
+- **InteractiveChapter** — chapter that pauses for user input, inherits from `InteractiveChapter<TContext, TChapterInput>`.
 
 **Basic Story (automated workflow):**
 ```csharp
-public class OrderProcessingStory : StoryHandler<OrderInput, Ordercontext, OrderOutput>
+public class OrderProcessingStory : StoryHandler<OrderInput, OrderContext, OrderOutput>
 {
     public OrderProcessingStory(IServiceProvider sp, ILogger<OrderProcessingStory> logger)
         : base(sp, logger) { }
@@ -303,33 +328,32 @@ public class OrderProcessingStory : StoryHandler<OrderInput, Ordercontext, Order
         await ReadChapter<ProcessPaymentChapter>();
         await ReadChapter<ShipOrderChapter>();
 
-        context.Output.OrderId = context.ProcessedOrderId;
+        Context.Output.OrderId = Context.ProcessedOrderId;
     }
 }
 ```
 
 **Interactive Story (interactive workflow with persistence):**
 ```csharp
-public class UserOnboardingStory : StoryHandler<OnboardingInput, Onboardingcontext, OnboardingOutput>
+public class UserOnboardingStory : StoryHandler<OnboardingInput, OnboardingContext, OnboardingOutput>
 {
     protected override async Task TellStory()
     {
-        await ReadChapter<CollectBasicInfoChapter>();     // Pauses for user input
-        await ReadChapter<VerifyEmailChapter>();           // Pauses for email verification
-        await ReadChapter<SetupPreferencesChapter>();      // Pauses for preferences
-        await ReadChapter<CompleteOnboardingChapter>();    // Automated
+        await ReadChapter<CollectBasicInfoChapter>();   // Pauses for user input
+        await ReadChapter<VerifyEmailChapter>();        // Pauses for email verification
+        await ReadChapter<SetupPreferencesChapter>();   // Pauses for preferences
+        await ReadChapter<CompleteOnboardingChapter>(); // Automated
     }
 }
 
-// Interactive chapter with validation
-public class CollectBasicInfoChapter : InteractiveChapter<Onboardingcontext, UserBasicInfo>
+public class CollectBasicInfoChapter : InteractiveChapter<OnboardingContext, UserBasicInfo>
 {
-    public override Task<Result> ReadWithInput(OnboardingNarration context, UserBasicInfo userInput)
+    public override Task<Result> ReadWithInput(OnboardingContext context, UserBasicInfo userInput)
     {
         if (string.IsNullOrWhiteSpace(userInput.Name))
             return Result.FailAsTask("Name is required");
 
-        context.UserName = userInput.Name;
+        context.UserName  = userInput.Name;
         context.UserEmail = userInput.Email;
         return Result.SuccessAsTask();
     }
@@ -338,31 +362,56 @@ public class CollectBasicInfoChapter : InteractiveChapter<Onboardingcontext, Use
 
 **Registration:**
 ```csharp
-services.AddStoryFramework(options =>
-{
-    options.EnablePersistence = true;  // For interactive workflows
-    options.DatabasePath = "stories.db"; // SQLite persistence
-});
+// Default: in-memory persistence — supports both automated AND interactive stories.
+// Ideal for dev, tests, single-process apps. Registers StoryManager + InMemoryStoryRepository.
+services.RegisterStories();
 
-// Or for in-memory testing
-services.AddSingleton(StoryOptions.WithInMemoryPersistence());
+// Production: durable SQLite persistence.
+services.RegisterStories(StoryOptions.WithSqlitePersistence("stories.db"));
+
+// Opt-out: no repository, no StoryManager. Automated TellStory() flows only.
+// Running an InteractiveChapter fails with a clear error message.
+services.RegisterStories(StoryOptions.WithoutPersistence());
+
+// Scan additional assemblies (MediatR-style)
+services.RegisterStories(StoryOptions.WithInMemoryPersistence(),
+    typeof(UserOnboardingStory).Assembly);
 ```
+
+`RegisterStories` registers `IChapter<>` implementations, `StoryHandler<,,>` subclasses,
+`StoryHandlerRegistry` (controller whitelist), and — when persistence is enabled — the
+configured `IStoryRepository` plus `StoryManager`.
+
+**Behavioral breaking change:** `RegisterStories()` without arguments now defaults to
+in-memory persistence (previously no persistence). Use `StoryOptions.WithoutPersistence()`
+to recover the old behavior.
 
 **Usage with StoryManager (for interactive workflows):**
 ```csharp
-// Start story
-var result = await storyManager.StartStory<UserOnboardingStory, OnboardingInput, Onboardingcontext, OnboardingOutput>(input);
-var storyId = result.Data.StoryId;
+var start = await storyManager.StartStory<UserOnboardingStory, OnboardingInput, OnboardingContext, OnboardingOutput>(
+    input,
+    idempotencyKey: Request.Headers["Idempotency-Key"]);
+
+var storyId = start.Data!.StoryId;
 
 // Resume with user input
 var userInput = JsonDocument.Parse("{\"name\": \"John\", \"email\": \"john@example.com\"}");
-var resumeResult = await storyManager.ResumeStory<UserOnboardingStory, OnboardingInput, Onboardingcontext, OnboardingOutput>(
+var resume = await storyManager.ResumeStory<UserOnboardingStory, OnboardingInput, OnboardingContext, OnboardingOutput>(
     storyId,
     userInput.RootElement);
+
+// Cancel a paused story
+await storyManager.CancelStory(storyId);
 ```
 
-**Tale Code Philosophy:**
-Stories read like prose - `TellStory()` method narrates what happens, chapters are named as actions (verbs), and the flow is clear and linear.
+**Pause / cancel errors are typed markers — detect by type, not by string:**
+
+```csharp
+if (result.Error is StoryPausedError p)         { /* paused at p.ChapterId */ }
+if (result.Error is StoryCancelledError)        { /* cancelled */ }
+```
+
+**Tale Code philosophy:** Stories read like prose — `TellStory()` narrates what happens; chapters are named as actions (verbs); the flow is linear and obvious.
 
 ### ModuleInstaller Pattern
 
@@ -412,12 +461,82 @@ Validators are automatically discovered and executed when registered via `Regist
 10. **Testing Framework**:
    - Use NUnit for all tests
    - For integration tests, use WebApplicationFactory and Testcontainers
-   - Write comprehensive QA scenarios covering edge cases, error handling, concurrency, and security
+   - **Prefer fewer, denser tests over many shallow ones** — see `Testing Philosophy` section for full guidance
+   - **For DreamTravel: prefer full integration tests** (real API host + Testcontainers for SQL/ServiceBus/etc.) over unit tests that mock MediatR or `HttpClient`
+   - Parameterize with `TestCase` / `TestCaseSource` instead of duplicating test methods
+   - A test earns its place only if its removal would let a real regression through
 11. **Validation Framework**: Use FluentValidation for all input validation
-12. **Documentation Language**: All documentation must be written in English
+12. **String composition**:
+   - **Avoid `+` concatenation chains and mixed `$"..." + "literal"`** — every `+` between a non-constant and another string is a separate runtime allocation (`string.Concat` over the result of `string.Format` / interpolation handler). For multi-line messages prefer a single interpolated raw string literal:
+     ```csharp
+     // ❌ BAD — N+1 allocations: one for the interpolation, one per `+`
+     throw new InvalidOperationException(
+         $"Chapter '{id}' is interactive and requires persistence. " +
+         "Register a repository via the builder, e.g. " +
+         ".UseInMemoryStoryRepository() (default).");
+
+     // ✅ GOOD — single allocation via raw interpolated string
+     throw new InvalidOperationException(
+         $"""
+         Chapter '{id}' is interactive and requires persistence.
+         Register a repository via the builder, e.g.
+         .UseInMemoryStoryRepository() (default).
+         """);
+     ```
+   - For purely-literal multi-line text use a raw string literal `"""..."""` (no interpolation overhead at all — the compiler emits one constant).
+   - For dynamic loops use `StringBuilder` or `string.Create` / `string.Concat(IEnumerable<string>)` — never `result += item` in a loop.
+   - Compile-time constant folding only kicks in for `"a" + "b"` where **both** sides are literals; the moment one side is interpolated or a variable, you pay the allocation.
+13. **Documentation Language**: All documentation must be written in English
    - **Includes**: ADRs, README files, package documentation (*.md files), XML comments, code comments
    - **Exception**: User-facing UI text and error messages can be localized
    - **Rationale**: Ensures consistency and accessibility for international developers
+14. **Primary constructors**: Always prefer C# 12 primary constructors for classes whose only ctor responsibility is dependency capture. Stop hand-writing `private readonly` field + assigning constructor when the compiler will do it for free.
+   ```csharp
+   // ❌ BAD — boilerplate, four lines for one idea
+   public sealed class StoryManager
+   {
+       private readonly IServiceScopeFactory _scopeFactory;
+       private readonly ILogger<StoryManager> _logger;
+
+       public StoryManager(IServiceScopeFactory scopeFactory, ILogger<StoryManager> logger)
+       {
+           _scopeFactory = scopeFactory;
+           _logger = logger;
+       }
+   }
+
+   // ✅ GOOD — primary constructor; parameters are in scope inside the class body
+   public sealed class StoryManager(
+       IServiceScopeFactory scopeFactory,
+       ILogger<StoryManager> logger)
+   {
+       // use `scopeFactory` / `logger` directly inside methods
+   }
+   ```
+   - Applies to `class`, `struct`, `record`, `record struct`. For `record`, primary constructor parameters become public properties — that's the intended behavior.
+   - When you need additional ctors (validation, defaults), keep the primary one and add `: this(...)` overloads.
+   - Don't redeclare a primary constructor parameter as a field/property unless you need a different lifecycle (e.g. lazy init, mutability, explicit `[FromKeyedServices]`).
+   - When inheriting, forward through the base primary constructor: `class Foo(Bar bar) : Base(bar)`.
+15. **Always brace `if`/`else`/`for`/`foreach`/`while`/`using`** — even single-statement bodies. No exceptions for "short" lines, no exceptions for early-returns. Bracing is non-negotiable because:
+   - One-liners silently break when a second statement is added (the classic Apple `goto fail;` bug).
+   - Diff churn when adding logging/asserts later is contained to one line instead of reshaping the block.
+   - Code reviewers don't have to mentally parse indentation as control flow.
+   ```csharp
+   // ❌ BAD
+   if (input == null) return BadRequest();
+   foreach (var x in items) Process(x);
+
+   // ✅ GOOD
+   if (input == null)
+   {
+       return BadRequest();
+   }
+   foreach (var x in items)
+   {
+       Process(x);
+   }
+   ```
+   - The only acceptable single-line forms are expression-bodied members (`=>`) and ternary expressions, because those are *expressions*, not control flow.
 
 ## Important Implementation Notes
 
@@ -454,16 +573,32 @@ Both are registered automatically when using `RegisterCommands()` or `RegisterQu
 
 ### Testing Philosophy
 
-**Comprehensive QA Approach:**
-When testing complex features (especially workflows, state machines, or frameworks), write extensive scenario-based tests covering:
+**Core principle: fewer, denser tests — not more, shallower ones.**
 
-1. **Happy Path**: Standard usage scenarios
-2. **Error Handling**: Invalid inputs, missing data, type mismatches
-3. **Edge Cases**: Empty strings, whitespace, null values, extreme values (very long strings, negative numbers, max integers)
-4. **Security**: Special characters, potential injection attempts, Unicode characters
-5. **Concurrency**: Multiple simultaneous operations, race conditions
-6. **State Management**: Pause/resume cycles, state transitions, history tracking
-7. **Repository Failures**: Database errors, persistence failures, load/save errors
+Prefer a small number of tests that each exercise a meaningful slice of behavior end-to-end over a large number of tests that each assert a single trivial fact. One test that drives a full pause → persist → resume → complete cycle is worth more than five tests that each poke at a single property.
+
+**Guidelines:**
+
+1. **Consolidate, don't multiply.** If three tests share 80% of their arrange/act and differ only in one assertion, merge them — or parameterize with `TestCase` / `TestCaseSource`.
+2. **Test behavior, not shape.** Don't write tests that mirror the implementation (e.g. "property X has a setter"). Test observable outcomes: persisted state, returned `Result`, logged events, HTTP status, DB rows.
+3. **Each test must earn its place.** A test is worth writing only if removing it would let a real bug slip through. Coverage-padding tests are noise — they slow the suite and obscure real failures.
+4. **Prefer wide scenarios over narrow unit tests** for workflow-like features (Story Framework, CQRS pipelines, chains). One realistic flow catches integration bugs that unit tests cannot.
+5. **Name tests by the scenario.** `Resume_AfterPause_CompletesStory_AndPersistsTerminalState` beats `ResumeStory_ReturnsSuccess`.
+
+**Bar for adding a new test:**
+
+- Does it cover a scenario no existing test covers?
+- Would it fail on a real regression?
+- Is the assertion specific enough that the failure message tells you what broke?
+
+If any answer is "no", extend an existing test instead.
+
+**Comprehensive QA — dense, not bloated.** Cover these dimensions with a small set of dense tests:
+
+1. Happy path + primary error paths in the same class, ideally parameterized.
+2. Edge cases (empty, null, extremes, Unicode) consolidated into one or two `TestCaseSource`-driven tests.
+3. Concurrency and state transitions — one realistic scenario per transition, end-to-end.
+4. Persistence failures — injected via fake repository, one test per failure mode.
 
 **Example from Story Framework tests:**
 ```csharp
@@ -474,18 +609,38 @@ public async Task Resume_WithExtremelyLongStrings_ShouldHandleOrReject()
     var input = JsonDocument.Parse($"{{\"name\": \"{longString}\", ...}}");
     var result = await storyManager.ResumeStory(..., input.RootElement);
 
-    // Should either handle gracefully or fail with clear validation error
     if (result.IsFailure)
         result.Error.Message.Should().ContainAny("too long", "length", "maximum");
 }
 ```
 
-**Best Practices:**
-- Test both success and failure paths
-- Use descriptive test names (e.g., `Resume_WithMissingRequiredFields_ShouldReturnError`)
-- Organize tests by category (regions or separate classes)
-- Verify error messages contain meaningful keywords (not just "failed" or "error")
-- Test actual behavior, not implementation details
+### Integration Tests — Preferred for DreamTravel
+
+**For DreamTravel, strongly prefer full integration tests over isolated unit tests.**
+
+Unit tests on DreamTravel handlers, executors, and domain services have marginal value — they mostly re-test MediatR, AutoMapper, and FluentValidation plumbing. Real bugs live at the seams: SQL, HTTP clients, Service Bus, Story persistence, Aspire wiring. Those seams are exercised only by integration tests.
+
+**What "full integration test" means:**
+
+- `WebApplicationFactory<TEntryPoint>` boots the real API or Worker pipeline — controllers, MediatR, validators, DI, configuration.
+- **Testcontainers** for real infrastructure: SQL Server, Service Bus emulator, Azurite, Redis. No infra mocks.
+- Full request path: HTTP in → validation → handler → executors → SQL/HTTP/bus → Result → HTTP response.
+- Seeds and asserts against the real database, not an in-memory substitute.
+- Story-driven flows: start a story through the API, assert the persisted `StoryInstance`, resume through the API, assert terminal state and side effects.
+
+**When unit tests are still justified in DreamTravel:**
+
+- Pure algorithmic code with many input permutations (e.g. `TravelingSalesmanProblem` solver) — parameterized unit tests are appropriate and much faster than containers.
+- Domain invariants on value objects and entities.
+- Edge cases that are expensive or non-deterministic to reproduce at integration level.
+
+**Anti-patterns to avoid in DreamTravel tests:**
+
+- Unit tests that mock `IMediator`, `IDbConnection`, or `HttpClient` to assert that a handler "calls" them — this tests nothing real.
+- One test class per handler with trivial `Handle_ReturnsSuccess` tests.
+- "Integration" tests that mock out the database or external APIs — at that point it's a unit test in disguise.
+
+**Layout signal:** `tests/Component/` and `tests/EndToEnd/` are where the value is. `tests/Unit/` stays small and targeted — not the default home for new tests.
 
 ## CI/CD Pipelines
 
@@ -625,7 +780,7 @@ Key entry points:
 
 1. **Test Discovery**: Tests are in `tests/` directory (outside `src/`), referenced in solution as `Tests` folder
 2. **Assembly Scanning**: `ModuleInstaller` methods use `Assembly.GetCallingAssembly()` - they must be called from the assembly containing handlers
-3. **Story Chapters**: Must be registered in DI (automatically scanned when using `AddStoryFramework()`)
+3. **Story Chapters**: Must be registered in DI (automatically scanned when using `RegisterStories()`)
 4. **Result Implicit Conversion**: You can return domain objects directly - they'll auto-convert to `Result<T>`
 5. **Workload Restore**: Required before build - see GitHub workflow for reference
 6. **Windows PowerShell**: This repo runs on Windows, so shell commands use PowerShell syntax (e.g., `Select-String`, `Select-Object`) not bash

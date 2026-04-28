@@ -3,6 +3,14 @@
 
     <PropertyGroup>
         <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+        <!--
+            NU1900 = NuGet Audit could not fetch vulnerability data (transport/auth failure
+            against a configured feed, e.g. unreachable corporate Azure DevOps feed).
+            This is NOT a CVE finding — real vulnerability warnings are NU1901-NU1904 and
+            stay as errors. We demote NU1900 so transient feed connectivity does not break
+            the build for developers behind restricted networks.
+        -->
+        <WarningsNotAsErrors>$(WarningsNotAsErrors);NU1900</WarningsNotAsErrors>
         <Authors>Adrian Strugala</Authors>
         <RepositoryUrl>https://github.com/AdrianStrugala/SolTechnology.Core</RepositoryUrl>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>

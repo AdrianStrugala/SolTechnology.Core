@@ -88,7 +88,9 @@ public class ErrorHandlingTests
         // Arrange - create service provider with StopOnFirstError = false
         var services = new ServiceCollection();
         services.AddLogging(builder => builder.AddConsole());
-        services.AddSingleton(new StoryOptions { StopOnFirstError = false });
+        var options1 = new StoryOptions();
+        options1.StopOnFirstError = false;
+        services.AddSingleton(options1);
         services.AddTransient<ErrorTestFirstFailureChapter>();
         services.AddTransient<ErrorTestSecondFailureChapter>();
         var sp = services.BuildServiceProvider();
@@ -114,7 +116,9 @@ public class ErrorHandlingTests
         // Arrange - create service provider with StopOnFirstError = false
         var services = new ServiceCollection();
         services.AddLogging(builder => builder.AddConsole());
-        services.AddSingleton(new StoryOptions { StopOnFirstError = false });
+        var options2 = new StoryOptions();
+        options2.StopOnFirstError = false;
+        services.AddSingleton(options2);
         services.AddTransient<ErrorTestFirstFailureChapter>();
         services.AddTransient<ErrorTestSecondFailureChapter>();
         var sp = services.BuildServiceProvider();
@@ -172,7 +176,9 @@ public class ErrorHandlingTests
         // Arrange - create service provider with StopOnFirstError = true
         var services = new ServiceCollection();
         services.AddLogging(builder => builder.AddConsole());
-        services.AddSingleton(new StoryOptions { StopOnFirstError = true });
+        var options3 = new StoryOptions();
+        options3.StopOnFirstError = true;
+        services.AddSingleton(options3);
         services.AddTransient<ErrorTestFirstFailureChapter>();
         services.AddTransient<ErrorTestSecondFailureChapter>();
         var sp = services.BuildServiceProvider();
@@ -198,7 +204,9 @@ public class ErrorHandlingTests
         // Arrange - create service provider with StopOnFirstError = false
         var services = new ServiceCollection();
         services.AddLogging(builder => builder.AddConsole());
-        services.AddSingleton(new StoryOptions { StopOnFirstError = false });
+        var options4 = new StoryOptions();
+        options4.StopOnFirstError = false;
+        services.AddSingleton(options4);
         services.AddTransient<ErrorTestFirstFailureChapter>();
         services.AddTransient<ErrorTestSecondFailureChapter>();
         var sp = services.BuildServiceProvider();

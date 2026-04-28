@@ -1,66 +1,36 @@
-using SolTechnology.Core.Story.Persistence;
-
 namespace SolTechnology.Core.Story;
 
 /// <summary>
-/// Configuration options for story execution.
-/// Use this to opt-in to advanced features like persistence and REST API.
-/// By default, stories execute immediately without persistence (simple mode).
+/// Engine-level policies for the Story framework. Does not own persistence — the repository
+/// is chosen and registered independently through the <see cref="Builder.IStoryBuilder"/>
+/// returned by <c>RegisterStories(...)</c> (e.g. <c>UseInMemoryStoryRepository</c>,
+/// <c>UseSqliteStoryRepository</c>, <c>UseStoryRepository&lt;T&gt;</c>). A repository is
+/// always present — in-memory is the default.
 /// </summary>
-public class StoryOptions
+public sealed class StoryOptions
 {
     /// <summary>
-    /// Default options for simple, immediate story execution without persistence.
-    /// Use this when you don't need pause/resume functionality.
+    /// Stop story execution on the first chapter error (true) or aggregate all errors (false).
     /// </summary>
-    public static StoryOptions Default => new();
+    public bool StopOnFirstError { get; set; } = true;
 
     /// <summary>
-    /// Enable workflow state persistence for pausable stories.
-    /// Required for stories with interactive chapters that need to pause and resume.
+    /// Prefix used when generating new <see cref="Auid"/> story identifiers. Use distinct
+    /// prefixes to separate tenants or environments in a shared persistence store.
     /// </summary>
-    public bool EnablePersistence { get; init; } = false;
+    public string StoryIdPrefix { get; set; } = "STR";
+
 
     /// <summary>
-    /// Repository for workflow state persistence.
-    /// Required if EnablePersistence is true.
-    /// Use WithInMemoryPersistence() or WithSqlitePersistence() factory methods.
+    /// When true, <see cref="Api.StoryController"/> exposes only handlers that were
+    /// registered via <c>RegisterStories</c>. Defaults to true — strongly recommended.
     /// </summary>
-    public IStoryRepository? Repository { get; init; }
+    public bool RestrictControllerToRegisteredHandlers { get; set; } = true;
 
     /// <summary>
-    /// Stop story execution on the first chapter error (true) or collect all errors (false).
-    /// When false, all chapters execute and errors are aggregated into AggregateError.
-    /// When true, execution stops at the first failure.
-    /// Default is true for intuitive fail-fast behavior.
+    /// Internal fallback used by the engine when options are not present in DI (e.g. when a
+    /// <see cref="StoryHandler{TInput,TContext,TOutput}"/> is resolved from a container that
+    /// does not call <c>RegisterStories</c>). Application code should not depend on this.
     /// </summary>
-    public bool StopOnFirstError { get; init; } = true;
-
-    /// <summary>
-    /// Factory method for persistence-enabled stories with in-memory repository.
-    /// Story state is kept in memory - will be lost on application restart.
-    /// Good for development and testing.
-    /// </summary>
-    /// <returns>StoryOptions configured with in-memory persistence</returns>
-    public static StoryOptions WithInMemoryPersistence() => new()
-    {
-        EnablePersistence = true,
-        Repository = new InMemoryStoryRepository()
-    };
-
-    /// <summary>
-    /// Factory method for persistence-enabled stories with SQLite repository.
-    /// Story state is persisted to SQLite database file.
-    /// Survives application restarts.
-    /// </summary>
-    /// <param name="dbPath">
-    /// Optional path to SQLite database file.
-    /// If null, uses default location: %LOCALAPPDATA%/SolTechnology/StoryFramework/stories.db
-    /// </param>
-    /// <returns>StoryOptions configured with SQLite persistence</returns>
-    public static StoryOptions WithSqlitePersistence(string? dbPath = null) => new()
-    {
-        EnablePersistence = true,
-        Repository = new SqliteStoryRepository(dbPath)
-    };
+    internal static StoryOptions Default { get; } = new();
 }

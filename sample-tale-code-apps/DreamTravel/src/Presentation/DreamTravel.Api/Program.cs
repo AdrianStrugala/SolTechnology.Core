@@ -89,8 +89,8 @@ public class Program
             builder.Configuration.GetSection("Neo4j"));
         builder.Services.InstallGraphDatabase();
 
-        //Journey (migrated to Story framework)
-        builder.Services.AddFlows(SolTechnology.Core.Story.StoryOptions.WithInMemoryPersistence());
+        //Journey (migrated to Story framework) — defaults to in-memory persistence.
+        builder.Services.AddFlows();
 
         //The rest
         builder.Services.AddCache();

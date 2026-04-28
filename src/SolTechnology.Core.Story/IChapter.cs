@@ -12,10 +12,9 @@ public interface IChapter<in TContext> where TContext : class
 {
     /// <summary>
     /// Unique identifier for this chapter.
-    /// Defaults to the type name, but you can override for custom identification.
     /// Used by the framework for logging, debugging, and pause/resume functionality.
     /// </summary>
-    string ChapterId => GetType().Name;
+    string ChapterId { get; }
 
     /// <summary>
     /// Execute this chapter's logic.

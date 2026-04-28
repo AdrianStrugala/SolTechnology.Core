@@ -9,15 +9,17 @@ using SolTechnology.Core.Story.Persistence;
 namespace SolTechnology.Core.Story;
 
 /// <summary>
-/// Base class for story handlers that orchestrate chapter execution.
-/// Supports both automated workflows and interactive workflows with pause/resume.
+/// Base handler for orchestrating multi-chapter stories.
+/// Supports both simple automated workflows and interactive (pausable) workflows with persistence.
+/// Override <see cref="TellStory"/> to describe the chapter sequence — it reads like a table of contents.
 /// </summary>
-/// <typeparam name="TInput">The input type for the story</typeparam>
-/// <typeparam name="TContext">The context type carrying state through chapters</typeparam>
-/// <typeparam name="TOutput">The output type produced by the story</typeparam>
+/// <typeparam name="TInput">The input type that initiates the story.</typeparam>
+/// <typeparam name="TContext">The context type carrying state through chapters.</typeparam>
+/// <typeparam name="TOutput">The output type returned when the story completes.</typeparam>
 /// <example>
+/// Automated story (no user interaction):
 /// <code>
-/// public class SaveCityStory : StoryHandler&lt;SaveCityInput, SaveCitycontext, SaveCityResult&gt;
+/// public class SaveCityStory : StoryHandler&lt;SaveCityInput, SaveCityContext, SaveCityResult&gt;
 /// {
 ///     public SaveCityStory(IServiceProvider sp, ILogger&lt;SaveCityStory&gt; logger)
 ///         : base(sp, logger) { }
@@ -32,38 +34,48 @@ namespace SolTechnology.Core.Story;
 /// }
 /// </code>
 /// </example>
+/// <example>
+/// Interactive story (pauses for user input, requires persistence):
+/// <code>
+/// public class UserOnboardingStory : StoryHandler&lt;OnboardingInput, OnboardingContext, OnboardingOutput&gt;
+/// {
+///     public UserOnboardingStory(IServiceProvider sp, ILogger&lt;UserOnboardingStory&gt; logger)
+///         : base(sp, logger) { }
+///
+///     protected override async Task TellStory()
+///     {
+///         await ReadChapter&lt;CollectBasicInfoChapter&gt;();   // pauses for user input
+///         await ReadChapter&lt;VerifyEmailChapter&gt;();        // pauses for email verification
+///         await ReadChapter&lt;SetupPreferencesChapter&gt;();   // pauses for preferences
+///         await ReadChapter&lt;CompleteOnboardingChapter&gt;(); // automated finalization
+///     }
+/// }
+/// </code>
+/// </example>
 public abstract class StoryHandler<TInput, TContext, TOutput>
     where TInput : class
     where TContext : Context<TInput, TOutput>, new()
     where TOutput : class, new()
 {
     /// <summary>
-    /// Gets or sets the story context. Context carries state across chapters.
+    /// The story context. Settable only by the framework; external mutation during
+    /// a single <c>Handle</c> invocation is not supported.
     /// </summary>
-    public TContext Context { get; set; } = null!;
+    public TContext Context { get; internal set; } = null!;
 
-    private readonly StoryEngine<TContext> _engine;
+    private StoryEngine<TInput, TContext, TOutput> _engine = null!;
     private readonly ILogger _logger;
+    private readonly IServiceProvider _serviceProvider;
 
-    protected StoryHandler(
-        IServiceProvider serviceProvider,
-        ILogger logger)
+    protected StoryHandler(IServiceProvider serviceProvider, ILogger logger)
     {
         _logger = logger;
-        
-        var repository = serviceProvider.GetService<IStoryRepository>();
-        var options = serviceProvider.GetService<StoryOptions>();
-        
-        _engine = new StoryEngine<TContext>(
-            serviceProvider, 
-            logger, 
-            repository, 
-            options?.StopOnFirstError ?? true);
+        _serviceProvider = serviceProvider;
     }
 
     /// <summary>
-    /// Defines the story flow by calling ReadChapter for each chapter in sequence.
-    /// Override this method to define your story's narrative.
+    /// Defines the story flow. Override this method to narrate the chapter sequence —
+    /// it should read like a table of contents for the workflow.
     /// </summary>
     /// <example>
     /// <code>
@@ -72,40 +84,39 @@ public abstract class StoryHandler<TInput, TContext, TOutput>
     ///     await ReadChapter&lt;ValidateInput&gt;();
     ///     await ReadChapter&lt;ProcessData&gt;();
     ///     await ReadChapter&lt;SaveResults&gt;();
+    ///
+    ///     Context.Output.OrderId = Context.ProcessedOrderId;
     /// }
     /// </code>
     /// </example>
     protected abstract Task TellStory();
 
     /// <summary>
-    /// Executes a chapter in the story.
+    /// Executes a single chapter resolved from DI.
+    /// For automated chapters: runs immediately.
+    /// For <see cref="InteractiveChapter{TContext,TInput}"/>: either pauses (first run) or
+    /// resumes from persisted state on a subsequent <c>StoryManager.ResumeStory</c> call.
     /// </summary>
-    /// <typeparam name="TChapter">The chapter type to execute</typeparam>
-    protected async Task ReadChapter<TChapter>() where TChapter : IChapter<TContext>
-    {
-        await _engine.ExecuteChapter<TChapter>(Context);
-    }
+    /// <typeparam name="TChapter">The chapter type to execute.</typeparam>
+    /// <example>
+    /// <code>
+    /// await ReadChapter&lt;LoadCustomer&gt;();
+    /// await ReadChapter&lt;CollectBasicInfoChapter&gt;(); // interactive — pauses here
+    /// await ReadChapter&lt;FinalizeOrder&gt;();
+    /// </code>
+    /// </example>
+    protected Task ReadChapter<TChapter>() where TChapter : IChapter<TContext>
+        => _engine.ExecuteChapter<TChapter>();
 
     /// <summary>
-    /// Handles story execution when used as a MediatR query/command.
-    /// Routes to the full Handle method with no resume input.
+    /// Entry point compatible with CQRS <c>IQueryHandler</c>/<c>ICommandHandler</c>.
     /// </summary>
-    /// <param name="input">The input for the story</param>
-    /// <param name="cancellationToken">Cancellation token</param>
-    /// <returns>Result with output or error</returns>
     public Task<Result<TOutput>> Handle(TInput input, CancellationToken cancellationToken)
-    {
-        return Handle(input, null, cancellationToken);
-    }
+        => Handle(input, null, cancellationToken);
 
     /// <summary>
-    /// Executes the story with optional resume input for interactive chapters.
-    /// Used by StoryManager for managing interactive workflows.
+    /// Executes the story with optional resume input.
     /// </summary>
-    /// <param name="input">The input for the story</param>
-    /// <param name="resumeInput">Optional user input for resuming an interactive chapter</param>
-    /// <param name="cancellationToken">Cancellation token</param>
-    /// <returns>Result with output or error</returns>
     public virtual async Task<Result<TOutput>> Handle(
         TInput input,
         JsonElement? resumeInput = null,
@@ -113,30 +124,58 @@ public abstract class StoryHandler<TInput, TContext, TOutput>
     {
         _logger.LogInformation("Story {Handler} processing...", GetType().Name);
 
+        var repository = _serviceProvider.GetService<IStoryRepository>();
+        var options = _serviceProvider.GetService<StoryOptions>() ?? StoryOptions.Default;
+        _engine = new StoryEngine<TInput, TContext, TOutput>(_serviceProvider, _logger, repository, options);
+
+        if (Context is null || Context.StoryInstanceId == Auid.Empty)
+        {
+            Context = new TContext { Input = input };
+        }
+
+        using var _ = _logger.BeginScope(new Dictionary<string, object?>
+        {
+            ["StoryHandler"] = GetType().Name,
+            ["StoryId"] = Context.StoryInstanceId
+        });
+
         try
         {
-            // Initialize Context if starting fresh
-            if (Context == null || Context.StoryInstanceId == Auid.Empty)
+            var init = await _engine.Initialize(Context, GetType(), resumeInput, cancellationToken);
+            if (init.IsFailure)
             {
-                Context = new TContext { Input = input };
+                await SafePersistTerminalState();
+                return Result<TOutput>.Fail(init.Error!);
             }
 
-            // Initialize engine with Context and potential Resume Input
-            await _engine.Initialize(Context, GetType().Name, resumeInput, cancellationToken);
-
-            // Execute chapters
             await TellStory();
 
-            return _engine.GetResult<TOutput>();
+            var result = _engine.GetResult();
+            await SafePersistTerminalState();
+            return result;
         }
         catch (OperationCanceledException)
         {
-            return Result<TOutput>.Fail("Story execution cancelled");
+            await SafePersistTerminalState();
+            return Result<TOutput>.Fail(new StoryCancelledError(Context.StoryInstanceId));
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Story {Handler} failed", GetType().Name);
+            await SafePersistTerminalState();
             return Result<TOutput>.Fail(Error.From(ex));
+        }
+    }
+
+    private async Task SafePersistTerminalState()
+    {
+        try
+        {
+            await _engine.PersistTerminalState();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "Failed to persist terminal story state for {StoryId}", Context.StoryInstanceId);
         }
     }
 }

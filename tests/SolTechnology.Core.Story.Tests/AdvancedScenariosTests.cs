@@ -29,7 +29,7 @@ public class AdvancedScenariosTests
         services.AddLogging(builder => builder.AddConsole().SetMinimumLevel(LogLevel.Debug));
 
         _repository = new InMemoryStoryRepository();
-        services.AddSingleton(StoryOptions.WithInMemoryPersistence());
+        services.AddSingleton(new StoryOptions());
         services.AddSingleton<IStoryRepository>(_repository);
         services.AddScoped<StoryManager>();
 
@@ -472,7 +472,7 @@ public class AdvancedScenariosTests
         var failingRepo = new FailingStoryRepository(simulateSaveFailure: true);
         var services = new ServiceCollection();
         services.AddLogging(builder => builder.AddConsole());
-        services.AddSingleton(StoryOptions.WithInMemoryPersistence());
+        services.AddSingleton(new StoryOptions());
         services.AddSingleton<IStoryRepository>(failingRepo);
         services.AddScoped<StoryManager>();
         services.AddTransient<ValidInputChapter>();
@@ -496,7 +496,7 @@ public class AdvancedScenariosTests
         var failingRepo = new FailingStoryRepository(simulateLoadFailure: true);
         var services = new ServiceCollection();
         services.AddLogging(builder => builder.AddConsole());
-        services.AddSingleton(StoryOptions.WithInMemoryPersistence());
+        services.AddSingleton(new StoryOptions());
         services.AddSingleton<IStoryRepository>(failingRepo);
         services.AddScoped<StoryManager>();
 
@@ -837,6 +837,9 @@ public class FailingStoryRepository : IStoryRepository
 
         return Task.FromResult<StoryInstance?>(null);
     }
+
+    public Task<StoryInstance?> FindByIdempotencyKey(string idempotencyKey)
+        => Task.FromResult<StoryInstance?>(null);
 
     public Task SaveAsync(StoryInstance storyInstance)
     {

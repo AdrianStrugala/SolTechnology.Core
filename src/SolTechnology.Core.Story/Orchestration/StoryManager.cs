@@ -9,174 +9,198 @@ namespace SolTechnology.Core.Story.Orchestration;
 
 /// <summary>
 /// Manages story lifecycle for interactive workflows with persistence.
-/// Handles starting, resuming, and querying story state.
+/// Creates a fresh DI scope for every <c>StartStory</c>/<c>ResumeStory</c>/<c>CancelStory</c> call
+/// to avoid captive-dependency issues (review §3.2).
 /// </summary>
-public class StoryManager(
-    IServiceProvider serviceProvider,
-    IStoryRepository repository,
-    ILogger<StoryManager> logger)
+public class StoryManager
 {
-    /// <summary>
-    /// Starts a new story execution.
-    /// </summary>
-    /// <typeparam name="THandler">The story handler type</typeparam>
-    /// <typeparam name="TInput">The input type</typeparam>
-    /// <typeparam name="TContext">The context type</typeparam>
-    /// <typeparam name="TOutput">The output type</typeparam>
-    /// <param name="input">Initial input for the story</param>
-    /// <returns>Story instance with state and ID</returns>
+    private readonly IServiceScopeFactory _scopeFactory;
+    private readonly IStoryRepository _repository;
+    private readonly ILogger<StoryManager> _logger;
+
+    public StoryManager(
+        IServiceScopeFactory scopeFactory,
+        IStoryRepository repository,
+        ILogger<StoryManager> logger)
+    {
+        _scopeFactory = scopeFactory;
+        _repository = repository;
+        _logger = logger;
+    }
+
+    /// <summary>Starts a new story execution.</summary>
+    /// <param name="input">Initial input for the story.</param>
+    /// <param name="idempotencyKey">
+    /// Optional caller-supplied idempotency key. If a story with the same key already exists,
+    /// its current state is returned instead of starting a new story.
+    /// </param>
     public async Task<Result<StoryInstance>> StartStory<THandler, TInput, TContext, TOutput>(
-        TInput input)
+        TInput input,
+        string? idempotencyKey = null,
+        CancellationToken cancellationToken = default)
         where THandler : StoryHandler<TInput, TContext, TOutput>
         where TInput : class
         where TContext : Context<TInput, TOutput>, new()
         where TOutput : class, new()
     {
-        return await ExecuteStoryPipeline<THandler, TInput, TContext, TOutput>(input, null, Auid.Empty);
+        if (!string.IsNullOrEmpty(idempotencyKey))
+        {
+            var existing = await _repository.FindByIdempotencyKey(idempotencyKey!);
+            if (existing != null) return Result<StoryInstance>.Success(existing);
+        }
+
+        return await ExecuteStoryPipeline<THandler, TInput, TContext, TOutput>(
+            input, null, Auid.Empty, idempotencyKey, cancellationToken);
+    }
+
+    /// <summary>Resumes a paused story with user input.</summary>
+    public async Task<Result<StoryInstance>> ResumeStory<THandler, TInput, TContext, TOutput>(
+        Auid storyId,
+        JsonElement? userInput = null,
+        CancellationToken cancellationToken = default)
+        where THandler : StoryHandler<TInput, TContext, TOutput>
+        where TInput : class
+        where TContext : Context<TInput, TOutput>, new()
+        where TOutput : class, new()
+    {
+        return await ExecuteStoryPipeline<THandler, TInput, TContext, TOutput>(
+            null, userInput, storyId, null, cancellationToken);
     }
 
     /// <summary>
-    /// Resumes a paused story with user input.
+    /// Cancels a running or paused story. Sets its terminal status to <see cref="StoryStatus.Cancelled"/>.
     /// </summary>
-    /// <typeparam name="THandler">The story handler type</typeparam>
-    /// <typeparam name="TInput">The input type</typeparam>
-    /// <typeparam name="TContext">The context type</typeparam>
-    /// <typeparam name="TOutput">The output type</typeparam>
-    /// <param name="storyId">ID of the story to resume</param>
-    /// <param name="userInput">User input for the interactive chapter</param>
-    /// <returns>Updated story instance</returns>
-    public async Task<Result<StoryInstance>> ResumeStory<THandler, TInput, TContext, TOutput>(
-        Auid storyId,
-        JsonElement? userInput = null)
-        where THandler : StoryHandler<TInput, TContext, TOutput>
-        where TInput : class
-        where TContext : Context<TInput, TOutput>, new()
-        where TOutput : class, new()
+    public async Task<Result<StoryInstance>> CancelStory(Auid storyId)
     {
-        return await ExecuteStoryPipeline<THandler, TInput, TContext, TOutput>(null!, userInput, storyId);
+        var instance = await _repository.FindById(storyId);
+        if (instance == null) return Result<StoryInstance>.Fail($"Story {storyId} not found");
+        if (instance.Status == StoryStatus.Completed)
+            return Result<StoryInstance>.Fail("Cannot cancel a completed story");
+        if (instance.Status == StoryStatus.Cancelled)
+            return Result<StoryInstance>.Success(instance);
+
+        instance.Status = StoryStatus.Cancelled;
+        instance.LastUpdatedAt = DateTime.UtcNow;
+        instance.CurrentChapter = null;
+        await _repository.SaveAsync(instance);
+        return Result<StoryInstance>.Success(instance);
     }
 
     private async Task<Result<StoryInstance>> ExecuteStoryPipeline<THandler, TInput, TContext, TOutput>(
         TInput? input,
         JsonElement? userInput,
-        Auid storyId)
+        Auid storyId,
+        string? idempotencyKey,
+        CancellationToken cancellationToken)
         where THandler : StoryHandler<TInput, TContext, TOutput>
         where TInput : class
         where TContext : Context<TInput, TOutput>, new()
         where TOutput : class, new()
     {
+        // Dedicated DI scope for this invocation — avoids captive dependencies (Scoped DbContext etc.).
+        using var scope = _scopeFactory.CreateScope();
+        var sp = scope.ServiceProvider;
+
         try
         {
             TContext? context = null;
 
-            // 1. Resume Logic: Load and Deserialize Context
             if (storyId != Auid.Empty)
             {
-                var existingInstance = await repository.FindById(storyId);
-                if (existingInstance == null) return Result<StoryInstance>.Fail($"Story {storyId} not found");
-                if (existingInstance.Status == StoryStatus.Completed) return Result<StoryInstance>.Fail("Story already completed");
+                var existing = await _repository.FindById(storyId);
+                if (existing == null) return Result<StoryInstance>.Fail($"Story {storyId} not found");
+                if (existing.Status == StoryStatus.Completed)
+                    return Result<StoryInstance>.Fail("Story already completed");
+                if (existing.Status == StoryStatus.Cancelled)
+                    return Result<StoryInstance>.Fail("Story has been cancelled");
 
-                context = JsonSerializer.Deserialize<TContext>(existingInstance.Context, StoryJsonOptions.Default);
-                if (context != null) context.StoryInstanceId = storyId;
-                
-                // If resuming, input comes from context, not parameter
-                if (context != null) input = context.Input;
+                try
+                {
+                    context = JsonSerializer.Deserialize<TContext>(existing.Context, StoryJsonOptions.Default);
+                }
+                catch (JsonException ex)
+                {
+                    return Result<StoryInstance>.Fail(
+                        $"Persisted context for story {storyId} is corrupt and cannot be deserialized: {ex.Message}");
+                }
+
+                if (context == null)
+                    return Result<StoryInstance>.Fail($"Persisted context for story {storyId} deserialized to null");
+
+                context.StoryInstanceId = storyId;
+                input = context.Input;
             }
 
             if (input == null && context == null)
                 return Result<StoryInstance>.Fail("Input is required to start a story");
 
-            // 2. Create Handler using ActivatorUtilities (Allows extra DI in Handler constructor)
-            var handler = ActivatorUtilities.CreateInstance<THandler>(serviceProvider);
-            
+            var handler = ActivatorUtilities.CreateInstance<THandler>(sp);
             if (context != null) handler.Context = context;
 
-            // 3. Execute Handler (Pass userInput officially)
-            Result<TOutput> result = await handler.Handle(input!, userInput);
+            var result = await handler.Handle(input!, userInput, cancellationToken);
 
-            // 4. Handle Result State
-            Auid activeStoryId = handler.Context.StoryInstanceId;
+            var activeId = handler.Context.StoryInstanceId;
 
-            // Case A: Paused (Waiting for input)
-            if (result.IsFailure && result.Error?.Message.Contains("paused") == true)
+            // Stamp the idempotency key (if provided and this is a fresh story).
+            if (!string.IsNullOrEmpty(idempotencyKey))
             {
-                return await GetLatestInstance(activeStoryId);
+                var persisted = await _repository.FindById(activeId);
+                if (persisted != null && persisted.IdempotencyKey == null)
+                {
+                    persisted.IdempotencyKey = idempotencyKey;
+                    await _repository.SaveAsync(persisted);
+                }
             }
 
-            // Case B: Completed Successfully
+            if (result.IsFailure && result.Error is StoryPausedError)
+                return await GetLatestInstance(activeId);
+
             if (result.IsSuccess)
             {
-                var completedInstance = await MarkAsCompleted(activeStoryId, typeof(THandler).Name);
-                return Result<StoryInstance>.Success(completedInstance);
+                var instance = await _repository.FindById(activeId);
+                if (instance != null) return Result<StoryInstance>.Success(instance);
+
+                // Story ran to completion without persistence being triggered by the handler.
+                return Result<StoryInstance>.Success(new StoryInstance
+                {
+                    StoryId = activeId,
+                    HandlerTypeName = typeof(THandler).Name,
+                    Status = StoryStatus.Completed,
+                    CreatedAt = DateTime.UtcNow,
+                    LastUpdatedAt = DateTime.UtcNow
+                });
             }
 
-            // Case C: Failed
             return Result<StoryInstance>.Fail(result.Error!);
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Error executing story {Handler}", typeof(THandler).Name);
+            _logger.LogError(ex, "Error executing story {Handler}", typeof(THandler).Name);
             return Result<StoryInstance>.Fail(ex.Message);
         }
     }
 
     private async Task<Result<StoryInstance>> GetLatestInstance(Auid storyId)
     {
-        var instance = await repository.FindById(storyId);
-        return instance != null 
-            ? Result<StoryInstance>.Success(instance) 
+        var instance = await _repository.FindById(storyId);
+        return instance != null
+            ? Result<StoryInstance>.Success(instance)
             : Result<StoryInstance>.Fail("Instance not found after execution");
     }
 
-    private async Task<StoryInstance> MarkAsCompleted(Auid storyId, string handlerName)
-    {
-        // Check if exists (Resume scenario)
-        var instance = await repository.FindById(storyId);
-        
-        if (instance == null)
-        {
-            // Create new for one-shot stories
-            instance = new StoryInstance
-            {
-                StoryId = storyId,
-                HandlerTypeName = handlerName,
-                CreatedAt = DateTime.UtcNow,
-                History = new List<ChapterInfo>()
-            };
-        }
-
-        instance.Status = StoryStatus.Completed;
-        instance.LastUpdatedAt = DateTime.UtcNow;
-
-        try
-        {
-            await repository.SaveAsync(instance);
-        }
-        catch (Exception ex)
-        {
-            logger.LogWarning(ex, "Failed to save completion status for {StoryId}", storyId);
-        }
-
-        return instance;
-    }
-
-    /// <summary>
-    /// Retrieves the current state of a story.
-    /// </summary>
-    /// <param name="storyId">The story ID</param>
-    /// <returns>Story instance with current state, history, and context</returns>
+    /// <summary>Retrieves the current state of a story.</summary>
     public async Task<Result<StoryInstance>> GetStoryState(Auid storyId)
     {
         try
         {
-            var instance = await repository.FindById(storyId);
+            var instance = await _repository.FindById(storyId);
             return instance != null
                 ? Result<StoryInstance>.Success(instance)
                 : Result<StoryInstance>.Fail("Story not found");
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Failed to load story state for {StoryId}", storyId);
+            _logger.LogError(ex, "Failed to load story state for {StoryId}", storyId);
             return Result<StoryInstance>.Fail($"Failed to load story: {ex.Message}");
         }
     }

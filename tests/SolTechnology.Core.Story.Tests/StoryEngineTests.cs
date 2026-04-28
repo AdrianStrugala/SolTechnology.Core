@@ -70,7 +70,9 @@ public class StoryEngineTests
         // Arrange - create service provider with StopOnFirstError = false
         var services = new ServiceCollection();
         services.AddLogging(builder => builder.AddConsole());
-        services.AddSingleton(new StoryOptions { StopOnFirstError = false });
+        var optsA = new StoryOptions();
+        optsA.StopOnFirstError = false;
+        services.AddSingleton(optsA);
         services.AddTransient<EngineTestFailingChapter>();
         services.AddTransient<EngineTestFailingChapter2>();
         services.AddTransient<EngineTestFailingChapter3>();
@@ -99,7 +101,9 @@ public class StoryEngineTests
         // Arrange - create service provider with StopOnFirstError = true
         var services = new ServiceCollection();
         services.AddLogging(builder => builder.AddConsole());
-        services.AddSingleton(new StoryOptions { StopOnFirstError = true });
+        var optsB = new StoryOptions();
+        optsB.StopOnFirstError = true;
+        services.AddSingleton(optsB);
         services.AddTransient<EngineTestFailingChapter>();
         services.AddTransient<EngineTestFailingChapter2>();
         services.AddTransient<EngineTestFailingChapter3>();
@@ -126,7 +130,9 @@ public class StoryEngineTests
         // Arrange - create service provider with StopOnFirstError = false
         var services = new ServiceCollection();
         services.AddLogging(builder => builder.AddConsole());
-        services.AddSingleton(new StoryOptions { StopOnFirstError = false });
+        var optsC = new StoryOptions();
+        optsC.StopOnFirstError = false;
+        services.AddSingleton(optsC);
         services.AddTransient<EngineTestFailingChapter>();
         services.AddTransient<EngineTestFailingChapter2>();
         services.AddTransient<EngineTestFailingChapter3>();

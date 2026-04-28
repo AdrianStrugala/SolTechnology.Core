@@ -30,7 +30,7 @@ public class PauseResumeIntegrationTests
         _repository = new InMemoryStoryRepository();
 
         // Register StoryOptions with persistence
-        services.AddSingleton(StoryOptions.WithInMemoryPersistence());
+        services.AddSingleton(new StoryOptions());
 
         // Register repository
         services.AddSingleton<IStoryRepository>(_repository);

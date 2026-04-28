@@ -20,7 +20,7 @@ public class SqliteRepositoryTests
     {
         // Create unique test database for each test
         _testDbPath = Path.Combine(Path.GetTempPath(), $"test_stories_{Guid.NewGuid()}.db");
-        _repository = new SqliteStoryRepository(_testDbPath);
+        _repository = new SqliteStoryRepository($"Data Source={_testDbPath}");
     }
 
     [TearDown]
@@ -352,7 +352,7 @@ public class SqliteRepositoryTests
         await _repository.SaveAsync(storyInstance);
 
         // Act - Create new repository instance pointing to same database
-        var newRepository = new SqliteStoryRepository(_testDbPath);
+        var newRepository = new SqliteStoryRepository($"Data Source={_testDbPath}");
         var retrieved = await newRepository.FindById(storyId);
 
         // Assert

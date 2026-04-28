@@ -8,25 +8,30 @@ namespace SolTechnology.Core.Story.Persistence;
 /// </summary>
 public interface IStoryRepository
 {
-    /// <summary>
-    /// Find a story instance by its unique identifier.
-    /// Returns null if the story is not found.
-    /// </summary>
-    /// <param name="storyId">The unique identifier of the story</param>
-    /// <returns>The story instance if found, null otherwise</returns>
+    /// <summary>Find a story instance by its unique identifier. Returns null if not found.</summary>
     Task<StoryInstance?> FindById(Auid storyId);
 
     /// <summary>
-    /// Save or update a story instance.
-    /// If the story already exists (same StoryId), it should be updated.
-    /// If it's new, it should be inserted.
+    /// Find a previously-saved story with the given caller-supplied idempotency key.
+    /// Used by <c>StoryManager.StartStory</c> to deduplicate retried requests.
+    /// Returns null if none found.
     /// </summary>
-    /// <param name="storyInstance">The story instance to save</param>
-    Task SaveAsync(StoryInstance storyInstance);
+    Task<StoryInstance?> FindByIdempotencyKey(string idempotencyKey);
 
     /// <summary>
-    /// Delete a story instance permanently.
+    /// Enumerates story instances matching the filter. Intended for dashboards / operator tooling.
+    /// Default implementation throws; override in repositories that want to support listing.
     /// </summary>
-    /// <param name="storyId">The unique identifier of the story to delete</param>
+    Task<IReadOnlyList<StoryInstance>> ListAsync(
+        StoryStatus? status = null,
+        string? handlerTypeName = null,
+        int skip = 0,
+        int take = 100)
+        => throw new NotSupportedException("This repository does not support listing.");
+
+    /// <summary>Save or update a story instance (upsert).</summary>
+    Task SaveAsync(StoryInstance storyInstance);
+
+    /// <summary>Delete a story instance permanently.</summary>
     Task DeleteAsync(Auid storyId);
 }

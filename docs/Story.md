@@ -1,10 +1,10 @@
 ### Overview
 
-The SolTechnology.Core.Story library provides a unified workflow orchestration framework for multi-step business processes. It supports both simple automated workflows and interactive workflows with SQLite persistence. Built on the Tale Code philosophy, Story Framework makes complex workflows read like well-written prose.
+The **SolTechnology.Core.Story** library provides workflow orchestration for multi-step
+business processes. It supports both automated workflows and interactive workflows with
+SQLite persistence. Built on the Tale Code philosophy — workflows read like prose.
 
 ### Installation
-
-Install the **SolTechnology.Core.Story** NuGet package:
 
 ```bash
 dotnet add package SolTechnology.Core.Story
@@ -13,52 +13,59 @@ dotnet add package SolTechnology.Core.Story
 ### Registration
 
 ```csharp
-// Basic registration (automated workflows only)
-services.AddStoryFramework();
+// Default: in-memory persistence — supports both automated and interactive stories.
+// Ideal for dev, tests, and single-process apps. Registers StoryManager +
+// InMemoryStoryRepository.
+services.RegisterStories();
 
-// With persistence (for interactive workflows)
-services.AddStoryFramework(options =>
-{
-    options.EnablePersistence = true;
-    options.DatabasePath = "stories.db";
-});
+// Production: durable SQLite persistence.
+services.RegisterStories(StoryOptions.WithSqlitePersistence("stories.db"));
 
-// For testing - in-memory persistence
-services.AddSingleton(StoryOptions.WithInMemoryPersistence());
+// Explicit opt-out: no repository, no StoryManager. Only fully automated
+// TellStory() flows are allowed — running an InteractiveChapter fails with a
+// clear, actionable error.
+services.RegisterStories(StoryOptions.WithoutPersistence());
+
+// Scan additional assemblies for chapters & handlers (MediatR-style).
+services.RegisterStories(StoryOptions.WithInMemoryPersistence(),
+    typeof(MySaveCityStory).Assembly,
+    typeof(MyOtherStory).Assembly);
+
+// Tweaks (mutable settable properties on the returned options).
+var opts = StoryOptions.WithSqlitePersistence("stories.db");
+opts.StopOnFirstError = false;
+opts.StoryIdPrefix = "ORDER";
+services.RegisterStories(opts);
 ```
 
-### Configuration
+> **Breaking change:** prior to this revision, `RegisterStories()` without arguments
+> registered no persistence. It now defaults to in-memory. Use
+> `StoryOptions.WithoutPersistence()` to recover the old behavior.
 
-No additional configuration needed. The registration automatically:
-- Registers all StoryHandlers and Chapters from calling assembly
-- Configures StoryEngine for orchestration
-- Sets up SQLite persistence (if enabled)
-- Integrates with CQRS Result pattern
+`RegisterStories` registers:
+
+- All concrete `IChapter<>` implementations as **transient**.
+- All concrete `StoryHandler<,,>` implementations as **transient**.
+- `StoryHandlerRegistry` (singleton) — name-to-type whitelist used by `StoryController`.
+- `StoryManager` (scoped) — when persistence is enabled.
+- `IStoryRepository` (singleton) — the repository produced by the factory.
 
 ### Usage
 
-#### 1) Basic Automated Story
+#### 1. Automated story
 
 ```csharp
-// Define input, output, and context
-public class OrderInput
-{
-    public int OrderId { get; set; }
-}
+public class OrderInput  { public int OrderId { get; set; } }
+public class OrderOutput { public string Status { get; set; } = ""; }
 
-public class OrderOutput
+public class OrderContext : Context<OrderInput, OrderOutput>
 {
-    public string Status { get; set; }
-}
-
-public class OrderNarration : Context<OrderInput, OrderOutput>
-{
-    public string CustomerEmail { get; set; }
+    public string CustomerEmail { get; set; } = "";
     public decimal TotalAmount { get; set; }
 }
 
-// Define story handler
-public class ProcessOrderStory : StoryHandler<OrderInput, Ordercontext, OrderOutput>
+public class ProcessOrderStory
+    : StoryHandler<OrderInput, OrderContext, OrderOutput>
 {
     public ProcessOrderStory(IServiceProvider sp, ILogger<ProcessOrderStory> logger)
         : base(sp, logger) { }
@@ -69,179 +76,197 @@ public class ProcessOrderStory : StoryHandler<OrderInput, Ordercontext, OrderOut
         await ReadChapter<ProcessPaymentChapter>();
         await ReadChapter<SendConfirmationChapter>();
 
-        context.Output.Status = "Completed";
+        Context.Output.Status = "Completed";
     }
 }
 
-// Define chapters
-public class ValidateOrderChapter : Chapter<OrderNarration>
+public class ValidateOrderChapter : Chapter<OrderContext>
 {
-    public override async Task<Result> Read(OrderNarration context)
-    {
-        // Validation logic
-        if (context.Input.OrderId <= 0)
-            return Result.Fail("Invalid order ID");
-
-        return Result.Success();
-    }
+    public override Task<Result> Read(OrderContext context)
+        => context.Input.OrderId <= 0
+            ? Result.FailAsTask("Invalid order ID")
+            : Result.SuccessAsTask();
 }
 ```
 
-#### 2) Interactive Story with Pause/Resume
+#### 2. Interactive story (pause / resume)
 
 ```csharp
-// Define interactive chapter
-public class CollectPaymentInfoChapter : InteractiveChapter<Ordercontext, PaymentInfo>
+public class PaymentInfo
 {
-    public override Task<Result> ReadWithInput(OrderNarration context, PaymentInfo userInput)
+    public string CardNumber { get; set; } = "";
+    public string Cvv { get; set; } = "";
+}
+
+public class CollectPaymentInfoChapter
+    : InteractiveChapter<OrderContext, PaymentInfo>
+{
+    public override Task<Result> ReadWithInput(OrderContext context, PaymentInfo userInput)
     {
-        // Validate user input
         if (string.IsNullOrWhiteSpace(userInput.CardNumber))
             return Result.FailAsTask("Card number is required");
-
         if (userInput.CardNumber.Length != 16)
             return Result.FailAsTask("Invalid card number");
 
-        // Process input
-        context.PaymentMethod = userInput.CardNumber;
+        context.TotalAmount = 99m;
         return Result.SuccessAsTask();
     }
 }
-
-public class PaymentInfo
-{
-    public string CardNumber { get; set; }
-    public string Cvv { get; set; }
-}
-
-// Story with interactive chapter
-public class CheckoutStory : StoryHandler<OrderInput, Ordercontext, OrderOutput>
-{
-    protected override async Task TellStory()
-    {
-        await ReadChapter<ValidateCartChapter>();
-        await ReadChapter<CollectPaymentInfoChapter>();  // Pauses here for user input
-        await ReadChapter<ProcessPaymentChapter>();
-        await ReadChapter<SendConfirmationChapter>();
-
-        context.Output.Status = "Completed";
-    }
-}
 ```
 
-#### 3) Using StoryManager for Pause/Resume
+#### 3. Using `StoryManager` for pause / resume
 
 ```csharp
-// Start a story
 var input = new OrderInput { OrderId = 123 };
-var result = await storyManager.StartStory<CheckoutStory, OrderInput, Ordercontext, OrderOutput>(input);
 
-if (result.IsSuccess)
+var start = await storyManager
+    .StartStory<ProcessOrderStory, OrderInput, OrderContext, OrderOutput>(
+        input,
+        idempotencyKey: Request.Headers["Idempotency-Key"]);
+
+if (start.IsSuccess && start.Data!.Status == StoryStatus.WaitingForInput)
 {
-    var storyInstance = result.Data;
+    var storyId = start.Data.StoryId;
+    var schema  = start.Data.CurrentChapter!.RequiredData;
 
-    if (storyInstance.Status == StoryStatus.WaitingForInput)
-    {
-        // Story paused at interactive chapter
-        var storyId = storyInstance.StoryId;
-        var requiredData = storyInstance.CurrentChapter.RequiredData;
+    // …collect user input from UI…
 
-        // ... collect user input ...
+    var userInput = JsonSerializer.SerializeToElement(
+        new PaymentInfo { CardNumber = "1234567812345678", Cvv = "123" });
 
-        // Resume with user input
-        var userInput = JsonDocument.Parse("{\"cardNumber\": \"1234567812345678\", \"cvv\": \"123\"}");
-        var resumeResult = await storyManager.ResumeStory<CheckoutStory, OrderInput, Ordercontext, OrderOutput>(
+    var resume = await storyManager
+        .ResumeStory<ProcessOrderStory, OrderInput, OrderContext, OrderOutput>(
             storyId,
-            userInput.RootElement);
+            userInput);
 
-        if (resumeResult.IsSuccess)
-        {
-            // Story completed or paused again
-        }
+    if (resume.IsSuccess && resume.Data!.Status == StoryStatus.Completed)
+    {
+        // done
     }
 }
 ```
 
-#### 4) Direct Handler Usage (for simple workflows)
+#### 4. Cancellation
 
 ```csharp
-// Inject handler directly
+await storyManager.CancelStory(storyId);
+```
+
+#### 5. Direct handler usage (simple, no persistence)
+
+```csharp
 public class OrderController : ControllerBase
 {
     private readonly ProcessOrderStory _story;
-
-    public OrderController(ProcessOrderStory story)
-    {
-        _story = story;
-    }
+    public OrderController(ProcessOrderStory story) { _story = story; }
 
     [HttpPost]
-    public async Task<IActionResult> ProcessOrder([FromBody] OrderInput input)
+    public async Task<IActionResult> Post([FromBody] OrderInput input)
     {
-        var result = await _story.Handle(input);
-
-        if (result.IsSuccess)
-            return Ok(result.Value);
-
-        return BadRequest(result.Error);
+        var result = await _story.Handle(input, CancellationToken.None);
+        return result.IsSuccess ? Ok(result.Data) : BadRequest(result.Error);
     }
 }
 ```
 
-### Key Features
+> **Note.** The handler is resolved via DI — `RegisterStories()` already registers every
+> concrete `StoryHandler<,,>` found in the scanned assemblies.
 
-- **Tale Code Philosophy**: Workflows read like well-written stories with `TellStory()`, chapters, and context
-- **Automated Workflows**: Simple linear workflows without user interaction
-- **Interactive Workflows**: User-driven workflows with input validation
-- **SQLite Persistence**: Save and resume workflow state across restarts
-- **Result Pattern**: Explicit success/failure handling integrated with CQRS
-- **Chapter Validation**: Built-in input validation for interactive chapters
-- **History Tracking**: Full audit trail of chapter execution
-- **Cancellation Support**: Graceful cancellation with `CancellationToken`
-- **Error Aggregation**: Collect multiple errors during workflow execution
-- **DI Integration**: Full dependency injection support for chapters
+### Pause-as-state (NOT pause-as-failure)
 
-### API Controller Integration
+When a story pauses, `Handle(...)` returns `Result<TOutput>.Fail(new StoryPausedError(...))`.
+`StoryManager` transparently converts that into `Result<StoryInstance>.Success(...)` with
+`Status = WaitingForInput`. Detect pause with **type test**, never with string match:
 
-Story Framework includes a base `StoryController` for HTTP APIs:
+```csharp
+if (result.IsFailure && result.Error is StoryPausedError paused)
+{
+    // Story paused at paused.ChapterId inside paused.StoryId
+}
+```
+
+Analogous: `StoryCancelledError`.
+
+### Versioning
+
+Handler versioning (compatibility checks on resume after redeploy) is **not currently
+implemented** — see ADR-002 for the planned design (SemVer-based compatibility) under
+"Future extensions". Today the engine accepts any persisted state regardless of how the
+handler has changed; the developer is responsible for ensuring backward-compatible
+chapter sequences and context shapes when redeploying with active in-flight stories.
+
+
+### Error handling
+
+Chapters return `Result.Success()` / `Result.Fail(...)`. By default the engine aborts on
+first error (`StoryOptions.StopOnFirstError = true`). Set to `false` to collect all errors
+into an `AggregateError`.
+
+### REST API
+
+Derive from `StoryController`:
 
 ```csharp
 public class OrderStoryController : StoryController
 {
-    public OrderStoryController(StoryManager manager) : base(manager) { }
+    public OrderStoryController(
+        StoryManager manager,
+        StoryHandlerRegistry registry,
+        StoryOptions options,
+        ILogger<StoryController> logger)
+        : base(manager, registry, options, logger) { }
 }
-
-// Endpoints automatically available:
-// POST /api/story/start/{storyType} - Start a new story
-// POST /api/story/resume/{storyId} - Resume paused story
-// GET /api/story/{storyId} - Get story state
 ```
 
-### Tale Code Example
+Endpoints:
+
+| Method | Path                          | Purpose                                     |
+|--------|-------------------------------|---------------------------------------------|
+| POST   | `/api/story/{handlerName}/start` | Start a new story (whitelisted handlers only) |
+| POST   | `/api/story/{storyId}`           | Resume a paused story                      |
+| DELETE | `/api/story/{storyId}`           | Cancel a running / paused story            |
+| GET    | `/api/story/{storyId}`           | Current state                              |
+| GET    | `/api/story/{storyId}/result`    | Deserialized output (Completed only)       |
+
+`Idempotency-Key` header is honored on `/start` — retried calls with the same key return
+the existing instance instead of creating a new one.
+
+HTTP semantics:
+
+- `Status.WaitingForInput` → `202 Accepted`
+- `Status.Completed` → `200 OK`
+- `Status.Failed` / not found → `4xx`
+
+### Security notes
+
+- Only handlers reachable through `StoryHandlerRegistry` are exposed — add authorization
+  attributes (`[Authorize(...)]`) to your derived controller before exposing it publicly.
+- Do not place secrets or PII in `Context`. For SQLite, prefer filesystem-level encryption
+  or store references to an external secret store and load them on demand.
+- `SqliteStoryRepository` validates the supplied path. Do not interpolate user-controlled
+  strings into it.
+
+### Observability
+
+Every log entry emitted by the engine is scoped with `StoryId` and `StoryHandler`, so
+configure your logger filters accordingly:
 
 ```csharp
-// Traditional approach
-var step1Result = await ValidateOrder(order);
-if (!step1Result.IsSuccess) return step1Result.Error;
-var step2Result = await ProcessPayment(order);
-if (!step2Result.IsSuccess) return step2Result.Error;
-var step3Result = await SendConfirmation(order);
-if (!step3Result.IsSuccess) return step3Result.Error;
-return Result.Success();
-
-// Story Framework approach - reads like a tale
-protected override async Task TellStory()
-{
-    await ReadChapter<ValidateOrderChapter>();
-    await ReadChapter<ProcessPaymentChapter>();
-    await ReadChapter<SendConfirmationChapter>();
-
-    context.Output.Status = "Order processed successfully";
-}
+logging.AddFilter("SolTechnology.Core.Story.Orchestration.StoryEngine", LogLevel.Information);
 ```
 
-### Documentation
+### Key features
 
-- [Story Implementation Plan](https://github.com/AdrianStrugala/SolTechnology.Core/blob/master/docs/Story-Implementation-Plan.md) - Architecture decisions and migration guide
-- [Tale Code Philosophy](https://github.com/AdrianStrugala/SolTechnology.Core/blob/master/docs/Tale.md) - Making code readable like prose
-- [GitHub Repository](https://github.com/AdrianStrugala/SolTechnology.Core)
+- Narrative pipeline (`TellStory`, `ReadChapter<T>`).
+- Typed context — no `dynamic`, no runtime reflection into your data.
+- Interactive chapters with schema introspection for API consumers.
+- Pause / resume with SQLite (WAL mode, retry on busy) or in-memory persistence.
+- Idempotency-key deduplication, cancellation, listing.
+- Strongly-typed error markers (`StoryPausedError`, `StoryCancelledError`).
+
+### Related documentation
+
+- [Story framework architecture (ADR-002)](./adr/002-Story-Framework-Implementation.md)
+- [Tale Code philosophy](./Tale.md)
+- [Review document](./reviews/Story-Framework-Review.md)
+
