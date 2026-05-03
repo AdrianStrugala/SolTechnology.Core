@@ -1,104 +1,104 @@
 {
+  "lastUpdated": "2026-05-03T03:53:16Z",
   "totals": {
-    "downloads": 57750,
+    "downloads": 57955,
     "packages": 19
   },
-  "lastUpdated": "2026-04-26T03:38:30Z",
   "packages": [
     {
-      "id": "SolTechnology.Avro.Kafka",
       "version": "0.1.0",
-      "downloads": 23573
+      "downloads": 23658,
+      "id": "SolTechnology.Avro.Kafka"
     },
     {
-      "id": "SolTechnology.Avro.Http",
       "version": "3.0.1",
-      "downloads": 7231
+      "downloads": 7254,
+      "id": "SolTechnology.Avro.Http"
     },
     {
-      "id": "SolTechnology.Core.ApiClient",
       "version": "0.5.0",
-      "downloads": 3545
+      "downloads": 3554,
+      "id": "SolTechnology.Core.ApiClient"
     },
     {
-      "id": "SolTechnology.Core.CQRS",
       "version": "0.5.0",
-      "downloads": 2780
+      "downloads": 2792,
+      "id": "SolTechnology.Core.CQRS"
     },
     {
-      "id": "SolTechnology.Core.Sql",
       "version": "0.5.0",
-      "downloads": 2622
+      "downloads": 2632,
+      "id": "SolTechnology.Core.Sql"
     },
     {
-      "id": "SolTechnology.Core.Logging",
       "version": "0.5.0",
-      "downloads": 2477
+      "downloads": 2488,
+      "id": "SolTechnology.Core.Logging"
     },
     {
-      "id": "SolTechnology.Core.BlobStorage",
       "version": "0.5.0",
-      "downloads": 2378
+      "downloads": 2380,
+      "id": "SolTechnology.Core.BlobStorage"
     },
     {
-      "id": "SolTechnology.Core.Guards",
       "version": "0.5.0",
-      "downloads": 2319
+      "downloads": 2325,
+      "id": "SolTechnology.Core.Guards"
     },
     {
-      "id": "SolTechnology.Core.MessageBus",
       "version": "0.5.0",
-      "downloads": 2300
+      "downloads": 2310,
+      "id": "SolTechnology.Core.MessageBus"
     },
     {
-      "id": "SolTechnology.Core.Api",
       "version": "0.6.0",
-      "downloads": 1924
+      "downloads": 1937,
+      "id": "SolTechnology.Core.Api"
     },
     {
-      "id": "SolTechnology.Core.Authentication",
       "version": "0.5.0",
-      "downloads": 1799
+      "downloads": 1803,
+      "id": "SolTechnology.Core.Authentication"
     },
     {
-      "id": "SolTechnology.Core.Cache",
       "version": "0.5.0",
-      "downloads": 1166
+      "downloads": 1169,
+      "id": "SolTechnology.Core.Cache"
     },
     {
-      "id": "SolTechnology.Core.Scheduler",
       "version": "0.5.0",
-      "downloads": 984
+      "downloads": 986,
+      "id": "SolTechnology.Core.Scheduler"
     },
     {
-      "id": "SolTechnology.Core.AUID",
       "version": "0.5.0",
-      "downloads": 763
+      "downloads": 768,
+      "id": "SolTechnology.Core.AUID"
     },
     {
-      "id": "SolTechnology.Core.Flow",
       "version": "1.0.0",
-      "downloads": 738
+      "downloads": 741,
+      "id": "SolTechnology.Core.Flow"
     },
     {
-      "id": "SolTechnology.DateTimeZone",
       "version": "1.0.1",
-      "downloads": 611
+      "downloads": 616,
+      "id": "SolTechnology.DateTimeZone"
     },
     {
-      "id": "SolTechnology.Core.Faker",
       "version": "1.0.0",
-      "downloads": 279
+      "downloads": 280,
+      "id": "SolTechnology.Core.Faker"
     },
     {
-      "id": "SolTechnology.Core.Story",
       "version": "0.6.0",
-      "downloads": 138
+      "downloads": 138,
+      "id": "SolTechnology.Core.Story"
     },
     {
-      "id": "SolTechnology.Core.HTTP",
       "version": "0.5.0",
-      "downloads": 123
+      "downloads": 124,
+      "id": "SolTechnology.Core.HTTP"
     }
   ]
 }
