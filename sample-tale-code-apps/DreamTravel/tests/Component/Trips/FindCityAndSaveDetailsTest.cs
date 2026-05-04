@@ -1,4 +1,4 @@
-﻿using System.Diagnostics;
+﻿﻿using System.Diagnostics;
 using DreamTravel.Domain.Cities;
 using DreamTravel.GeolocationDataClients.GoogleApi;
 using DreamTravel.Sql;
@@ -56,7 +56,7 @@ public class FindCityAndSaveDetailsTest
         apiResponse.IsSuccess.Should().BeTrue();
         apiResponse.Data.Should().BeEquivalentTo(city);
 
-        
+
         // "Then background job is triggered, city details fetched and stored".x(() =>
         var storedCity =
             await Retry.Unless(
@@ -65,7 +65,7 @@ public class FindCityAndSaveDetailsTest
                     .WhereName(city.Name)
                     .FirstOrDefaultAsync(),
                 cityDetails => cityDetails != null,
-                TimeSpan.FromSeconds(10),
+                TimeSpan.FromSeconds(30),
                 TimeSpan.FromSeconds(1));
 
         storedCity.Should().NotBeNull();

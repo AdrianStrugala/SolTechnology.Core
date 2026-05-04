@@ -1,6 +1,11 @@
-﻿namespace SolTechnology.Core.MessageBus.Publish;
+﻿﻿namespace SolTechnology.Core.MessageBus.Publish;
 
 public interface IMessagePublisher
 {
-    Task Publish(IMessage message);
+    /// <summary>
+    /// Serialises and publishes <paramref name="message"/> to every Service Bus
+    /// entity (queue/topic) registered for its concrete type.
+    /// </summary>
+    Task Publish(IMessage message, CancellationToken cancellationToken = default);
 }
+

@@ -1,4 +1,4 @@
-﻿using DreamTravel.Domain.Cities;
+﻿﻿using DreamTravel.Domain.Cities;
 using DreamTravel.FunctionalTests.FakeApis;
 using DreamTravel.GeolocationDataClients.GoogleApi;
 using FluentAssertions;
@@ -72,6 +72,10 @@ namespace DreamTravel.FunctionalTests.Trips
                 .WithHeader("X-API-VERSION", "2.0")
                 .WithBody(new { Cities = cities })
                 .PostAsync<Result<CalculateBestPathResult>>();
+            if (!apiResponse.IsSuccess)
+            {
+                TestContext.Out.WriteLine($"CalculateBestPath FAILED: {Newtonsoft.Json.JsonConvert.SerializeObject(apiResponse.Error)}");
+            }
             apiResponse.IsSuccess.Should().BeTrue();
             var paths = apiResponse.Data.BestPaths;
 

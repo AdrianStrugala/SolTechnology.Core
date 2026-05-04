@@ -1,6 +1,7 @@
 using System.Collections.Concurrent;
 using System.Reflection;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using SolTechnology.Core.Story.Builder;
 using SolTechnology.Core.Story.Orchestration;
 using SolTechnology.Core.Story.Persistence;
@@ -58,15 +59,23 @@ public static class ModuleInstaller
         Action<StoryOptions>? configure = null,
         params Assembly[] assemblies)
     {
-        var options = new StoryOptions();
+        // Idempotent: multiple modules may each call this with their own assembly.
+        var existingOptions = services
+            .FirstOrDefault(d => d.ServiceType == typeof(StoryOptions))?.ImplementationInstance as StoryOptions;
+        var options = existingOptions ?? new StoryOptions();
         configure?.Invoke(options);
-        services.AddSingleton(options);
+        if (existingOptions is null)
+        {
+            services.AddSingleton(options);
+        }
+
+        var existingRegistry = services
+            .FirstOrDefault(d => d.ServiceType == typeof(StoryHandlerRegistry))?.ImplementationInstance as StoryHandlerRegistry;
+        var registry = existingRegistry ?? new StoryHandlerRegistry();
 
         var targets = assemblies is { Length: > 0 }
             ? assemblies.Distinct().ToArray()
             : DefaultScanAssemblies();
-
-        var registry = new StoryHandlerRegistry();
 
         foreach (var assembly in targets)
         {
@@ -97,12 +106,12 @@ public static class ModuleInstaller
             }
         }
 
-        services.AddSingleton(registry);
-
-        // Default persistence: in-memory. User can override via the builder
-        // (UseSqliteStoryRepository, UseStoryRepository<T>). A repository is always present.
-        services.AddSingleton<IStoryRepository>(_ => new InMemoryStoryRepository());
-        services.AddScoped<StoryManager>();
+        if (existingRegistry is null)
+        {
+            services.AddSingleton(registry);
+            services.TryAddSingleton<IStoryRepository>(_ => new InMemoryStoryRepository());
+            services.AddScoped<StoryManager>();
+        }
 
         return new StoryBuilder(services, options);
     }

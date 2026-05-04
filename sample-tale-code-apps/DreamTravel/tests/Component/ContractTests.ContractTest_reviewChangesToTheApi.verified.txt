@@ -43,6 +43,10 @@ paths:
           required: true
           schema:
             type: string
+        - name: Idempotency-Key
+          in: header
+          schema:
+            type: string
         - name: X-API-VERSION
           in: header
           schema:
@@ -84,6 +88,22 @@ paths:
         '200':
           description: OK
     get:
+      tags:
+        - DreamTravelStory
+      parameters:
+        - name: storyId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: X-API-VERSION
+          in: header
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+    delete:
       tags:
         - DreamTravelStory
       parameters:

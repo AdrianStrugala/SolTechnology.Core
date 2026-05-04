@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Hosting;
+﻿﻿using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.Configuration;
@@ -16,7 +16,7 @@ namespace SolTechnology.Core.API.Testing
         public HttpClient ServerClient { get; }
 
 
-        public APIFixture(IConfiguration? configuration = null)
+        public APIFixture(IConfiguration? configuration = null, Action<IServiceCollection>? configureServices = null)
         {
             var webAppFactory = new WebApplicationFactory<TEntryPoint>()
                 .WithWebHostBuilder(builder =>
@@ -28,7 +28,10 @@ namespace SolTechnology.Core.API.Testing
 
                         builder
                             .ConfigureServices((context, services) =>
-                                services.AddLogging(l => l.AddConsole()));
+                            {
+                                services.AddLogging(l => l.AddConsole());
+                                configureServices?.Invoke(services);
+                            });
                     });
 
             TestServer = webAppFactory.Server;

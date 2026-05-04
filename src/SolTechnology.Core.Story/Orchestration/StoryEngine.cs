@@ -21,7 +21,9 @@ internal static class StoryJsonOptions
         IncludeFields = true,
         PropertyNameCaseInsensitive = true,
         WriteIndented = false,
-        DefaultIgnoreCondition = JsonIgnoreCondition.Never
+        DefaultIgnoreCondition = JsonIgnoreCondition.Never,
+        // Story Context may carry EF/domain entities with bidirectional navs.
+        ReferenceHandler = ReferenceHandler.IgnoreCycles
     };
 }
 

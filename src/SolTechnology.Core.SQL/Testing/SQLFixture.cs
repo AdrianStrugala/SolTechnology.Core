@@ -1,93 +1,102 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
 using DotNet.Testcontainers.Builders;
-using DotNet.Testcontainers.Networks;
+using DotNet.Testcontainers.Containers;
 using Microsoft.Data.SqlClient;
 using Microsoft.SqlServer.Dac;
-using Testcontainers.MsSql;
-
 namespace SolTechnology.Core.SQL.Testing;
-
-public sealed class SQLFixture(string databaseName) : IAsyncDisposable
+/// <summary>
+/// Spins up a SQL Server container, deploys a <c>.dacpac</c> built from the supplied
+/// <c>.sqlproj</c>, and exposes a ready-to-use <see cref="DatabaseConnectionString"/>.
+/// </summary>
+/// <remarks>
+/// Uses a generic <see cref="ContainerBuilder"/> instead of <c>MsSqlBuilder</c> from
+/// <c>Testcontainers.MsSql</c>: the latter forces an
+/// <c>UntilUnixCommandIsCompleted</c> wait that shells out to <c>sqlcmd</c> inside
+/// the container — a binary that is missing from <c>azure-sql-edge</c>, and whose
+/// failure cascades into a confusing <c>Could not find resource 'MsSqlContainer'</c>
+/// once the container is auto-removed. Wait is host-side only (log + login probe).
+/// </remarks>
+public sealed class SQLFixture : IAsyncDisposable
 {
-    private const string MssqlImage = "mcr.microsoft.com/azure-sql-edge:latest";
-    private static readonly INetwork Network = new NetworkBuilder().Build();
-    private const string NetworkAlias = "testing-network";
-    
-    private readonly MsSqlContainer _container = new MsSqlBuilder()
-        .WithImage(MssqlImage)
-        .WithEnvironment("ACCEPT_EULA", "Y")
-        .WithCleanUp(true)
-        .WithAutoRemove(true)
-        .WithNetwork(Network)
-        .WithNetworkAliases(NetworkAlias)
-        .WithWaitStrategy(Wait.ForUnixContainer()
-            .UntilPortIsAvailable(1433)
-            .UntilMessageIsLogged("SQL Server is now ready for client connections"))
-        .Build();
-
+    private const string DefaultImage = "mcr.microsoft.com/mssql/server:2022-latest";
+    private const string SaPassword = "Strong_p@ssw0rd!";
+    private const int InternalPort = 1433;
+    private readonly string _databaseName;
+    private readonly IContainer _container;
     private string? _sqlProjPath;
-
-    public string ConnectionString => _container.GetConnectionString();
+    public SQLFixture(string databaseName, string? image = null)
+    {
+        _databaseName = databaseName ?? throw new ArgumentNullException(nameof(databaseName));
+        _container = new ContainerBuilder()
+            .WithImage(image ?? DefaultImage)
+            .WithEnvironment("ACCEPT_EULA", "Y")
+            .WithEnvironment("MSSQL_SA_PASSWORD", SaPassword)
+            .WithEnvironment("MSSQL_PID", "Developer")
+            .WithPortBinding(InternalPort, assignRandomHostPort: true)
+            .WithCleanUp(true)
+            // Host-side only: `nc`/`sqlcmd` are not present in some SQL images.
+            .WithWaitStrategy(Wait.ForUnixContainer()
+                .UntilMessageIsLogged("SQL Server is now ready for client connections")
+                .AddCustomWaitStrategy(new SqlServerLoginWaitStrategy(() => ConnectionString)))
+            .Build();
+    }
+    public string ConnectionString
+    {
+        get
+        {
+            var host = _container.Hostname;
+            var port = _container.GetMappedPublicPort(InternalPort);
+            return new SqlConnectionStringBuilder
+            {
+                DataSource = $"{host},{port}",
+                UserID = "sa",
+                Password = SaPassword,
+                TrustServerCertificate = true,
+                Encrypt = false,
+                ConnectTimeout = 30
+            }.ToString();
+        }
+    }
     public string DatabaseConnectionString => new SqlConnectionStringBuilder(ConnectionString)
     {
-        InitialCatalog = databaseName
+        InitialCatalog = _databaseName
     }.ToString();
-
-    // Ścieżka do .sqlproj, np. ../../db/DreamTravelDatabase/DreamTravelDatabase.sqlproj
+    /// <summary>Path to a .sqlproj that will be built and deployed into the container.</summary>
     public SQLFixture WithSQLProject(string sqlProjPath)
     {
         _sqlProjPath = sqlProjPath;
         return this;
     }
-
     public async Task InitializeAsync(CancellationToken ct = default)
     {
         if (_sqlProjPath is null)
             throw new InvalidOperationException("Call WithSQLProject(pathToSqlProj) before InitializeAsync.");
-
-        await _container.StartAsync(ct);
-
-        // Publikuj .sqlproj -> kontener
-        await PublishDacpacAsync(_sqlProjPath, ConnectionString, databaseName, ct);
-
-        // sanity check, że DB istnieje
+        await _container.StartAsync(ct).ConfigureAwait(false);
+        await PublishDacpacAsync(_sqlProjPath, ConnectionString, _databaseName, ct).ConfigureAwait(false);
         await using var conn = new SqlConnection(DatabaseConnectionString);
-        await conn.OpenAsync(ct);
+        await conn.OpenAsync(ct).ConfigureAwait(false);
     }
-
-    public async ValueTask DisposeAsync() => await _container.DisposeAsync();
-
+    public async ValueTask DisposeAsync() => await _container.DisposeAsync().ConfigureAwait(false);
     private static async Task PublishDacpacAsync(string sqlProjPath, string serverConnStr, string dbName, CancellationToken ct)
     {
-        // 1) Build dacpac
-        await Run("dotnet", new[] { "build", sqlProjPath, "-c", "Release" }, ct);
-
-        // 2) Wyznacz ścieżkę do dacpac
-        var projDir  = Path.GetDirectoryName(sqlProjPath)!;
+        await Run("dotnet", new[] { "build", sqlProjPath, "-c", "Release" }, ct).ConfigureAwait(false);
+        var projDir = Path.GetDirectoryName(sqlProjPath)!;
         var projName = Path.GetFileNameWithoutExtension(sqlProjPath);
-        var dacpac   = Path.Combine(projDir, "bin", "Release", projName + ".dacpac");
-
+        var dacpac = Path.Combine(projDir, "bin", "Release", projName + ".dacpac");
         if (!File.Exists(dacpac))
             throw new FileNotFoundException("Dacpac not found", dacpac);
-
-        // 3) Deploy dacpac
         var serverCs = new SqlConnectionStringBuilder(serverConnStr) { InitialCatalog = "master" }.ToString();
         var options = new DacDeployOptions
         {
             CreateNewDatabase = true,
             DropObjectsNotInSource = true,
-            BlockOnPossibleDataLoss = true,
-            // W razie potrzeby:
-            // AllowIncompatiblePlatform = true (DacFx nie ma tego jako opcji, ale i tak zadziała)
+            BlockOnPossibleDataLoss = true
         };
-
         using var package = DacPackage.Load(dacpac);
         var services = new DacServices(serverCs);
         services.Message += (_, e) => Console.WriteLine(e.Message);
-
-        await Task.Run(() => services.Deploy(package, dbName, upgradeExisting: true, options), ct);
+        await Task.Run(() => services.Deploy(package, dbName, upgradeExisting: true, options), ct).ConfigureAwait(false);
     }
-
     private static async Task Run(string file, IEnumerable<string> args, CancellationToken ct)
     {
         var psi = new ProcessStartInfo(file)
@@ -98,9 +107,10 @@ public sealed class SQLFixture(string databaseName) : IAsyncDisposable
         foreach (var a in args) psi.ArgumentList.Add(a);
         using var p = new Process { StartInfo = psi };
         p.Start();
-        var stdout = await p.StandardOutput.ReadToEndAsync(ct);
-        var stderr = await p.StandardError.ReadToEndAsync(ct);
-        await p.WaitForExitAsync(ct);
-        if (p.ExitCode != 0) throw new InvalidOperationException($"{file} failed ({p.ExitCode}).\nSTDOUT:\n{stdout}\nSTDERR:\n{stderr}");
+        var stdout = await p.StandardOutput.ReadToEndAsync(ct).ConfigureAwait(false);
+        var stderr = await p.StandardError.ReadToEndAsync(ct).ConfigureAwait(false);
+        await p.WaitForExitAsync(ct).ConfigureAwait(false);
+        if (p.ExitCode != 0)
+            throw new InvalidOperationException($"{file} failed ({p.ExitCode}).\nSTDOUT:\n{stdout}\nSTDERR:\n{stderr}");
     }
 }

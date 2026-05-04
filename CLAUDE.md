@@ -464,6 +464,7 @@ Validators are automatically discovered and executed when registered via `Regist
    - **Prefer fewer, denser tests over many shallow ones** — see `Testing Philosophy` section for full guidance
    - **For DreamTravel: prefer full integration tests** (real API host + Testcontainers for SQL/ServiceBus/etc.) over unit tests that mock MediatR or `HttpClient`
    - Parameterize with `TestCase` / `TestCaseSource` instead of duplicating test methods
+   - **Always delimit test phases with `// Arrange`, `// Act`, `// Assert` comments** — the one place where comments restating *what* is mandatory (they make failure triage and review much faster). Skip a phase only when genuinely empty. See `docs/ClaudeCodingGuide.md` §8.
    - A test earns its place only if its removal would let a real regression through
 11. **Validation Framework**: Use FluentValidation for all input validation
 12. **String composition**:
@@ -537,6 +538,7 @@ Validators are automatically discovered and executed when registered via `Regist
    }
    ```
    - The only acceptable single-line forms are expression-bodied members (`=>`) and ternary expressions, because those are *expressions*, not control flow.
+16. **Comments are why-not-what, ≤ 2 lines.** Tale Code reads like prose — names carry the meaning. Write a comment only when a reader cannot infer the *why* from the code (non-obvious framework quirk, workaround for a specific bug/version, ADR pointer). No essays, no restating the next line. If the explanation needs a paragraph, it belongs in an ADR or XML doc on the public type. See `docs/ClaudeCodingGuide.md` §9.11.
 
 ## Important Implementation Notes
 

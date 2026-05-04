@@ -1,29 +1,26 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
-
-	<PropertyGroup>
-		<Version>0.5.0</Version>
-		<TreatWarningsAsErrors>false</TreatWarningsAsErrors>
-
-		<Description>Azure Service Bus wrapper for building event-driven architectures with message queues and topics. Supports publish/subscribe patterns, automatic queue management, background message processing, and reliable asynchronous communication between services.</Description>
-		<PackageTags>sol technology core azure servicebus messaging queue topic pubsub async event-driven microservices dotnet cloud</PackageTags>
-		<Product>SolTechnology.Core.MessageBus</Product>
-		<PackageId>SolTechnology.Core.MessageBus</PackageId>
-		<AssemblyName>SolTechnology.Core.MessageBus</AssemblyName>
-
-		<PackageIcon>docs\mini-logo.png</PackageIcon>
-		<PackageReadmeFile>docs\readme.md</PackageReadmeFile>
-		<RepositoryUrl>https://github.com/AdrianStrugala/SolTechnology.Core</RepositoryUrl>
-	</PropertyGroup>
-
-	<ItemGroup>
-		<None Include="..\..\docs\mini-logo.png" Pack="true" Visible="false" PackagePath="docs\mini-logo.png" />
-		<None Include="..\..\docs\Bus.md" Pack="true" Visible="false" PackagePath="docs\readme.md" />
-	</ItemGroup>
-
-	<ItemGroup>
-	  <PackageReference Include="Azure.Messaging.ServiceBus" Version="7.20.1" />
-	  <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="10.0.1" />
-	  <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
-	</ItemGroup>
-
+<Project Sdk="Microsoft.NET.Sdk">
+<PropertyGroup>
+<Version>0.6.0</Version>
+<TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+<Description>Azure Service Bus wrapper for event-driven architectures.</Description>
+<PackageTags>sol technology core azure servicebus messaging queue topic pubsub async event-driven microservices dotnet cloud</PackageTags>
+<Product>SolTechnology.Core.MessageBus</Product>
+<PackageId>SolTechnology.Core.MessageBus</PackageId>
+<AssemblyName>SolTechnology.Core.MessageBus</AssemblyName>
+<PackageIcon>docs\mini-logo.png</PackageIcon>
+<PackageReadmeFile>docs\readme.md</PackageReadmeFile>
+<RepositoryUrl>https://github.com/AdrianStrugala/SolTechnology.Core</RepositoryUrl>
+</PropertyGroup>
+<ItemGroup>
+<None Include="..\..\docs\mini-logo.png" Pack="true" Visible="false" PackagePath="docs\mini-logo.png" />
+<None Include="..\..\docs\Bus.md" Pack="true" Visible="false" PackagePath="docs\readme.md" />
+</ItemGroup>
+<ItemGroup>
+<InternalsVisibleTo Include="SolTechnology.Core.MessageBus.Tests" />
+</ItemGroup>
+<ItemGroup>
+<PackageReference Include="Azure.Messaging.ServiceBus" Version="7.20.1" />
+<PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="10.0.1" />
+<PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
+</ItemGroup>
 </Project>
