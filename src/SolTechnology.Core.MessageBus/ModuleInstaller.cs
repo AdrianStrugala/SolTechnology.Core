@@ -1,5 +1,5 @@
-﻿using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
+﻿﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
 using SolTechnology.Core.MessageBus.Broker;
 using SolTechnology.Core.MessageBus.Configuration;
@@ -14,38 +14,41 @@ namespace SolTechnology.Core.MessageBus
             this IServiceCollection services,
             MessageBusConfiguration messageBusConfiguration)
         {
-            if (messageBusConfiguration == null)
-            {
-                throw new ArgumentException($"The [{nameof(MessageBusConfiguration)}] is missing. Provide it by parameter.");
-            }
+            ArgumentNullException.ThrowIfNull(messageBusConfiguration);
 
             services
-            .AddOptions<MessageBusConfiguration>()
-            .Configure(config =>
-            {
-                config.ConnectionString = messageBusConfiguration.ConnectionString;
-                config.Queues = messageBusConfiguration.Queues;
-                config.CreateResources = messageBusConfiguration.CreateResources;
-            });
+                .AddOptions<MessageBusConfiguration>()
+                .Configure(config =>
+                {
+                    config.ConnectionString = messageBusConfiguration.ConnectionString;
+                    config.Queues = messageBusConfiguration.Queues;
+                    config.CreateResources = messageBusConfiguration.CreateResources;
+                    config.TransportType = messageBusConfiguration.TransportType;
+                    config.MaxConcurrentCalls = messageBusConfiguration.MaxConcurrentCalls;
+                    config.PrefetchCount = messageBusConfiguration.PrefetchCount;
+                    config.RetryOptions = messageBusConfiguration.RetryOptions;
+                });
 
-            services.AddSingleton<IMessagePublisher, MessagePublisher>();
-            services.AddSingleton<IMessageBusBroker, MessageBusBroker>();
+            // Registry is a singleton populated synchronously during DI configuration.
+            services.TryAddSingleton<MessageBusRegistry>();
+
+            services.TryAddSingleton<IMessageBusBroker, MessageBusBroker>();
+            services.TryAddSingleton<IMessagePublisher, MessagePublisher>();
 
             services.AddHostedService<MessageBusReceiver>();
 
             return services;
         }
 
-        //TOPIC
+        // ---- TOPIC ----
         public static IServiceCollection WithTopicPublisher<TMessage>(
             this IServiceCollection services,
             string topicName) where TMessage : IMessage
         {
-            var configurationProvider = services.BuildServiceProvider().GetRequiredService<IMessageBusBroker>();
+            ArgumentException.ThrowIfNullOrWhiteSpace(topicName);
 
-            string messageType = typeof(TMessage).Name;
-
-            configurationProvider.RegisterTopicPublisher(messageType, topicName);
+            GetRegistry(services).Add(new EndpointRegistration(
+                typeof(TMessage), EndpointKind.Topic, EndpointRole.Publisher, topicName, SubscriptionName: null));
 
             return services;
         }
@@ -56,70 +59,93 @@ namespace SolTechnology.Core.MessageBus
             string subscriptionName)
             where TMessage : IMessage where THandler : class, IMessageHandler<TMessage>
         {
-            var configurationProvider = services.BuildServiceProvider()
-                .GetRequiredService<IMessageBusBroker>();
+            ArgumentException.ThrowIfNullOrWhiteSpace(topicName);
+            ArgumentException.ThrowIfNullOrWhiteSpace(subscriptionName);
 
             services.AddScoped<IMessageHandler<TMessage>, THandler>();
 
-            string messageType = typeof(TMessage).Name;
-
-            configurationProvider.RegisterTopicReceiver(typeof(TMessage), topicName, subscriptionName);
+            GetRegistry(services).Add(new EndpointRegistration(
+                typeof(TMessage), EndpointKind.Topic, EndpointRole.Receiver, topicName, subscriptionName));
 
             return services;
         }
 
-        //QUEUE
+        // ---- QUEUE ----
         public static IServiceCollection WithQueuePublisher<TMessage>(
             this IServiceCollection services,
-            string queueName = null) where TMessage : IMessage
+            string? queueName = null) where TMessage : IMessage
         {
-            string messageType = typeof(TMessage).Name;
+            queueName = ResolveQueueName<TMessage>(services, queueName);
 
-            if (queueName == null)
-            {
-                var options = services.BuildServiceProvider().GetRequiredService<IOptions<MessageBusConfiguration>>().Value;
-                queueName = options.Queues.FirstOrDefault(q => q.MessageType == messageType)?.QueueName;
-            }
-
-            if (queueName == null)
-            {
-                throw new ArgumentException($"The [{nameof(queueName)}] for message type: [{messageType}]is missing. Provide it by parameter or appsettings configuration section");
-            }
-
-            var configurationProvider = services.BuildServiceProvider().GetRequiredService<IMessageBusBroker>();
-
-
-            configurationProvider.RegisterQueuePublisher(messageType, queueName);
+            GetRegistry(services).Add(new EndpointRegistration(
+                typeof(TMessage), EndpointKind.Queue, EndpointRole.Publisher, queueName, SubscriptionName: null));
 
             return services;
         }
 
         public static IServiceCollection WithQueueReceiver<TMessage, THandler>(
             this IServiceCollection services,
-            string queueName = null)
+            string? queueName = null)
             where TMessage : IMessage where THandler : class, IMessageHandler<TMessage>
         {
-            string messageType = typeof(TMessage).Name;
-
-            if (queueName == null)
-            {
-                var options = services.BuildServiceProvider().GetRequiredService<IOptions<MessageBusConfiguration>>().Value;
-                queueName = options.Queues.FirstOrDefault(q => q.MessageType == messageType)?.QueueName;
-            }
-
-            if (queueName == null)
-            {
-                throw new ArgumentException($"The [{nameof(queueName)}] is missing for message type: [{messageType}] is missing. Provide it by parameter or appsettings configuration section");
-            }
-
-            var configurationProvider = services.BuildServiceProvider()
-                .GetRequiredService<IMessageBusBroker>();
+            queueName = ResolveQueueName<TMessage>(services, queueName);
 
             services.AddScoped<IMessageHandler<TMessage>, THandler>();
 
-            configurationProvider.RegisterQueueReceiver(typeof(TMessage), queueName);
+            GetRegistry(services).Add(new EndpointRegistration(
+                typeof(TMessage), EndpointKind.Queue, EndpointRole.Receiver, queueName, SubscriptionName: null));
 
             return services;
         }
+
+        private static string ResolveQueueName<TMessage>(IServiceCollection services, string? queueName)
+        {
+            if (!string.IsNullOrWhiteSpace(queueName)) return queueName;
+
+            var messageType = typeof(TMessage).Name;
+
+            // Read the configured queue list directly from registered IConfigureOptions
+            // instances without spinning a temporary ServiceProvider.
+            var probe = new MessageBusConfiguration();
+            foreach (var d in services.Where(d =>
+                         d.ServiceType == typeof(IConfigureOptions<MessageBusConfiguration>)))
+            {
+                if (d.ImplementationInstance is IConfigureOptions<MessageBusConfiguration> instance)
+                {
+                    instance.Configure(probe);
+                }
+            }
+
+            queueName = probe.Queues.FirstOrDefault(q => q.MessageType == messageType)?.QueueName;
+
+            if (string.IsNullOrWhiteSpace(queueName))
+            {
+                throw new ArgumentException(
+                    $"Queue name for message type [{messageType}] is missing. " +
+                    "Provide it as the parameter or configure it under " +
+                    $"{nameof(MessageBusConfiguration)}.{nameof(MessageBusConfiguration.Queues)}.");
+            }
+
+            return queueName;
+        }
+
+        private static MessageBusRegistry GetRegistry(IServiceCollection services)
+        {
+            var descriptor = services.FirstOrDefault(d => d.ServiceType == typeof(MessageBusRegistry));
+            if (descriptor?.ImplementationInstance is MessageBusRegistry existing)
+            {
+                return existing;
+            }
+
+            // First registration: replace the TryAddSingleton<MessageBusRegistry>()
+            // (registered by AddMessageBus) with a concrete singleton instance so
+            // that all WithQueue*/WithTopic* calls collaborate on the same object,
+            // and the DI container later resolves THIS instance.
+            var registry = new MessageBusRegistry();
+            services.RemoveAll<MessageBusRegistry>();
+            services.AddSingleton(registry);
+            return registry;
+        }
     }
 }
+

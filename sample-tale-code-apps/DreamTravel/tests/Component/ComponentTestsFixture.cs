@@ -1,8 +1,11 @@
-﻿using DreamTravel.Api;
+﻿﻿using DreamTravel.Api;
 using DreamTravel.FunctionalTests.FakeApis;
+using DreamTravel.Infrastructure.Events;
 using DreamTravel.Sql;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using SolTechnology.Core.API.Testing;
 using SolTechnology.Core.Faker;
 using SolTechnology.Core.SQL.Testing;
@@ -44,9 +47,17 @@ namespace DreamTravel.FunctionalTests
                 })
                 .Build();
 
-            // 3. Start in-memory API fixtures (for API integration tests)
-            ApiFixture = new APIFixture<Program>(configuration);
+            // Worker first — its scope factory is what the sync publisher dispatches into.
             WorkerFixture = new APIFixture<Worker.Program>(configuration);
+            SyncHangfireNotificationPublisher.UseScopeFactory(
+                () => WorkerFixture.TestServer.Services.GetRequiredService<IServiceScopeFactory>());
+
+            // Replace the Hangfire publisher with the deterministic in-process variant.
+            ApiFixture = new APIFixture<Program>(configuration, services =>
+            {
+                services.RemoveAll<IHangfireNotificationPublisher>();
+                services.AddSingleton<IHangfireNotificationPublisher, SyncHangfireNotificationPublisher>();
+            });
         }
 
 
@@ -60,3 +71,6 @@ namespace DreamTravel.FunctionalTests
         }
     }
 }
+
+
+

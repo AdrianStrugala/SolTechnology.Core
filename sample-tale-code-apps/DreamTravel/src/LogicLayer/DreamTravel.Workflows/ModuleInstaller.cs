@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿﻿using DreamTravel.Flows.SampleOrderWorkflow;
+using Microsoft.Extensions.DependencyInjection;
 using SolTechnology.Core.Story;
 using SolTechnology.Core.Story.Builder;
 
@@ -14,6 +15,11 @@ public static class ModuleInstaller
     public static IStoryBuilder AddFlows(
         this IServiceCollection services,
         Action<StoryOptions>? configure = null)
-        => services.RegisterStories(configure);
+        // Explicit assembly: GetCallingAssembly() is unreliable under JIT inlining / WAF.
+        => services.RegisterStories(configure, typeof(SampleOrderWorkflowStory).Assembly);
 }
+
+
+
+
 

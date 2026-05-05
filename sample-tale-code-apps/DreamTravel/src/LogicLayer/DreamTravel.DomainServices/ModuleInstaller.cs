@@ -23,8 +23,8 @@ namespace DreamTravel.DomainServices
             services.AddScoped<IAssignAlternativeNameStep, AssignAlternativeNameStep>();
             services.AddScoped<IIncrementSearchCountStep, IncrementSearchCountStep>();
 
-            // Register all story handlers and chapters
-            services.RegisterStories();
+            // Explicit assembly: GetCallingAssembly() is unreliable under JIT inlining / WAF.
+            services.RegisterStories(assemblies: typeof(CityDomainService).Assembly);
 
             return services;
         }

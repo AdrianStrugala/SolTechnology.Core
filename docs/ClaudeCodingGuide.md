@@ -355,6 +355,24 @@ tests/Unit/DreamTravel.Queries.UnitTests/
 - Test class field: `_sut` for the system under test. Dependencies frozen via `fixture.Freeze<T>()`.
 - Test name format: `Method_Scenario_ExpectedOutcome` (`Execute_ShouldPopulateContextWithRoadData`, `Resume_AfterPause_CompletesStory_AndPersistsTerminalState`).
 - One arrange / one act / one assert *block* per test — but multiple related assertions inside the assert block are encouraged (denser tests > more tests).
+- **Mark the three blocks with `// Arrange`, `// Act`, `// Assert` comments.** This is the one place where comments restating *what* is allowed (and required) — they delimit the test phases, which makes scanning failures and reviewing tests dramatically faster. Skip a phase only when it is genuinely empty (e.g. a parameterless `// Act` for a static call). Example:
+  ```csharp
+  [Test]
+  public async Task Resume_AfterPause_CompletesStory_AndPersistsTerminalState()
+  {
+      // Arrange
+      var input = _fixture.Create<OnboardingInput>();
+      var start = await _sut.StartStory<UserOnboardingStory, ...>(input);
+
+      // Act
+      var resume = await _sut.ResumeStory<UserOnboardingStory, ...>(start.Data!.StoryId, _userInput);
+
+      // Assert
+      resume.IsSuccess.Should().BeTrue();
+      resume.Data!.Status.Should().Be(StoryStatus.Completed);
+      (await _repo.GetAsync(start.Data.StoryId))!.Status.Should().Be(StoryStatus.Completed);
+  }
+  ```
 - Parameterize with `[TestCase]` / `[TestCaseSource]` instead of duplicating tests.
 - A test earns its place only if removing it would let a real regression through. Do not write tests that mirror the implementation shape.
 
@@ -374,6 +392,20 @@ These apply to every class you write, regardless of layer.
 8. **`internal` by default.** A type is `public` only when it crosses an assembly boundary intentionally.
 9. **No "Manager", "Helper", "Util" suffixes** unless the class genuinely is a generic helper (rare). Name by responsibility: `CityMapper`, `StreetTrafficUpdater`, `GoogleHTTPClient`.
 10. **No `#region`.** Use partial classes (one method per file for HTTP clients) or extract a new class. The only exception is legacy test files explicitly listed in the root `CLAUDE.md`.
+11. **Comments earn their place.** Tale Code reads like prose — let names carry the meaning. Write a comment **only** when a reader cannot infer the *why* from the code itself: a non-obvious framework constraint, a workaround for a specific bug/version, an ADR pointer. Keep it to **one or two lines**, no essays, no restating *what* the next line does. If the explanation needs a paragraph, it belongs in an ADR or XML doc on the public type — not inline.
+    ```csharp
+    // ❌ BAD — three-line essay restating what the call does and re-explaining
+    //         framework internals everyone can google.
+    // Pass the assembly explicitly: the default scanner uses
+    // Assembly.GetCallingAssembly() which is unreliable under JIT
+    // inlining (and under WebApplicationFactory the entry assembly
+    // becomes the test host, not the API).
+    services.RegisterStories(assemblies: typeof(SaveCityStory).Assembly);
+
+    // ✅ GOOD — one line, why-not-what, points at the root cause.
+    // Explicit: GetCallingAssembly() is unreliable under JIT inlining / WAF.
+    services.RegisterStories(assemblies: typeof(SaveCityStory).Assembly);
+    ```
 
 ---
 
@@ -441,6 +473,7 @@ These are real examples spotted in DreamTravel. Fix them when you touch the surr
 | Mocking `IMediator` / `DbContext` in unit tests | hypothetical | Write a Component test instead. |
 | Hand-written `private readonly` ctor capture | hypothetical | C# 12 primary constructor. |
 | `#region` to organize a class | forbidden | Split into partial files or new classes. |
+| Multi-line "essay" comment restating *what* the next line does | various | One line, *why* only. See §9.11. |
 
 ---
 
