@@ -9,7 +9,7 @@ namespace SolTechnology.Core.SQL.Testing;
 /// Connection string is resolved lazily — the mapped host port is unknown until
 /// <c>StartAsync</c> assigns it.
 /// </summary>
-internal sealed class SqlServerLoginWaitStrategy : IWaitUntil
+internal sealed class SqlServerLoginWaitStrategy(Func<string> connectionStringFactory) : IWaitUntil
 {
     public async Task<bool> UntilAsync(IContainer container)
     {
