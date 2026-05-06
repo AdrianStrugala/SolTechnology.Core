@@ -2,6 +2,7 @@
 using MediatR;
 using Microsoft.Extensions.Logging;
 using SolTechnology.Core.Logging;
+using SolTechnology.Core.Logging.Operations;
 
 namespace SolTechnology.Core.CQRS.PipelineBehaviors;
 
@@ -13,6 +14,10 @@ namespace SolTechnology.Core.CQRS.PipelineBehaviors;
 ///   <item>Logs <c>OperationFailed</c> (EventId 2139) with the exception when the handler throws,
 ///         then rethrows.</item>
 ///   <item>Opens a logger scope containing every property marked with <see cref="LogScopeAttribute"/>.</item>
+///   <item>Starts a child <see cref="Activity"/> on
+///         <see cref="CoreLoggingActivitySources.Operations"/> so the operation shows up as a
+///         distinct span in OpenTelemetry / Application Insights distributed traces. Tags
+///         mirror the scope properties.</item>
 /// </list>
 /// <para>
 /// Zero per-request configuration: every request is tracked, only properties marked with
@@ -21,6 +26,12 @@ namespace SolTechnology.Core.CQRS.PipelineBehaviors;
 /// <para>
 /// Reflection scan of <typeparamref name="TRequest"/> happens at most once per process — bindings
 /// are cached as compiled getters in <see cref="LogScopeBindingCache"/>.
+/// </para>
+/// <para>
+/// When no <see cref="ActivityListener"/> is registered for
+/// <see cref="CoreLoggingActivitySources.OperationsName"/>, <see cref="ActivitySource.StartActivity(string, ActivityKind)"/>
+/// returns <c>null</c> and the tracing path collapses to a few null-conditional accesses — apps
+/// that don't opt into OpenTelemetry pay nothing.
 /// </para>
 /// </summary>
 public sealed class LoggingPipelineBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>
@@ -38,15 +49,23 @@ public sealed class LoggingPipelineBehavior<TRequest, TResponse> : IPipelineBeha
         var operationName = typeof(TRequest).Name;
         var bindings = LogScopeBindingCache.GetBindings(typeof(TRequest));
 
-        // Build the scope only when there is something to put in it. The OperationName itself
-        // is part of the structured log template (no need to duplicate it as a scope property).
+        // Activity is null when nobody listens on the source - effectively free in apps without OTel.
+        using var activity = CoreLoggingActivitySources.Operations.StartActivity(
+            operationName,
+            ActivityKind.Internal);
+
+        // Build the scope (and mirror to Activity tags) only when there is something to put in it.
+        // The OperationName is already the Activity DisplayName / log message template, no need
+        // to duplicate it as a scope property.
         IDisposable? scope = null;
         if (bindings.Length > 0)
         {
             var scopeProperties = new Dictionary<string, object?>(bindings.Length);
             foreach (var binding in bindings)
             {
-                scopeProperties[binding.Key] = binding.Getter(request);
+                var value = binding.Getter(request);
+                scopeProperties[binding.Key] = value;
+                activity?.SetTag(binding.Key, value);
             }
             scope = _logger.BeginScope(scopeProperties);
         }
@@ -62,15 +81,20 @@ public sealed class LoggingPipelineBehavior<TRequest, TResponse> : IPipelineBeha
             {
                 var result = await next();
                 _logger.OperationSucceeded(operationName, sw.ElapsedMilliseconds);
+                activity?.SetStatus(ActivityStatusCode.Ok);
                 return result;
             }
             catch (Exception e)
             {
                 _logger.OperationFailed(operationName, sw.ElapsedMilliseconds, e);
+                activity?.SetStatus(ActivityStatusCode.Error, e.Message);
+                activity?.AddException(e);
                 throw;
             }
         }
     }
 }
+
+
 
 
