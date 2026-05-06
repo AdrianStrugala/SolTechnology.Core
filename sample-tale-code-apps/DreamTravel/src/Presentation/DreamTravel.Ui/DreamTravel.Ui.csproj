@@ -2,6 +2,16 @@
 
   <PropertyGroup>
     <UserSecretsId>00cd322a-f074-4e43-841b-ee4c3f545340</UserSecretsId>
+    <!--
+      Blazor WebAssembly runs on the 'browser-wasm' RID; Microsoft.AspNetCore.App has no
+      runtime pack for that RID (it is server-side only). Project references to libraries
+      that target ASP.NET Core (here: SolTechnology.Core.HTTP, transitively pulled
+      Microsoft.Extensions.* shared-framework packages) propagate FrameworkReferences via
+      the SDK, which then triggers NETSDK1082. This MSBuild property tells the SDK to
+      ignore framework references coming in transitively from P2P, restoring the .NET 9
+      behaviour for WebAssembly clients.
+    -->
+    <DisableTransitiveFrameworkReferences>true</DisableTransitiveFrameworkReferences>
   </PropertyGroup>
 
   <ItemGroup>
