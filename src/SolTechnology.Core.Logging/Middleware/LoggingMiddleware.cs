@@ -46,6 +46,15 @@ public sealed class LoggingMiddleware
             corr.EnrichResponse(httpContext.Response);
             return Task.CompletedTask;
         }, (context, correlation));
+
+        // Skip noisy paths (health checks, liveness probes, swagger). Correlation is still set
+        // and echoed; we just don't emit the request envelope logs and skip enrichers entirely.
+        if (ShouldSkipPath(context.Request.Path))
+        {
+            await _next(context).ConfigureAwait(false);
+            return;
+        }
+
         var stopwatch = ValueStopwatch.StartNew();
         // Build the scope dictionary: correlation first, then per-app enrichers fold in.
         var scopeDictionary = correlation.GetScope();
@@ -193,6 +202,31 @@ public sealed class LoggingMiddleware
                 request.Body.Position = 0;
             }
         }
+    }
+
+    private bool ShouldSkipPath(PathString path)
+    {
+        if (_options.SkipPaths is null || _options.SkipPaths.Count == 0)
+        {
+            return false;
+        }
+
+        var value = path.Value;
+        if (string.IsNullOrEmpty(value))
+        {
+            return false;
+        }
+
+        for (var i = 0; i < _options.SkipPaths.Count; i++)
+        {
+            var prefix = _options.SkipPaths[i];
+            if (!string.IsNullOrEmpty(prefix) &&
+                value.StartsWith(prefix, StringComparison.OrdinalIgnoreCase))
+            {
+                return true;
+            }
+        }
+        return false;
     }
 
     /// <summary>

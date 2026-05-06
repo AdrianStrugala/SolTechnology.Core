@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.Configuration;
 using SolTechnology.Core.Logging.Correlations;
 using SolTechnology.Core.Logging.Enrichment;
 using SolTechnology.Core.Logging.Middleware;
@@ -9,7 +10,7 @@ namespace SolTechnology.Core.Logging;
 
 /// <summary>
 /// DI / pipeline wiring for <c>SolTechnology.Core.Logging</c>. Use
-/// <see cref="AddCoreLogging"/> in <c>ConfigureServices</c> and <see cref="UseCoreLogging"/>
+/// <c>AddCoreLogging</c> in <c>ConfigureServices</c> and <see cref="UseCoreLogging"/>
 /// in the request pipeline (early — before <c>UseRouting</c>).
 /// </summary>
 public static class LoggingServiceCollectionExtensions
@@ -25,11 +26,35 @@ public static class LoggingServiceCollectionExtensions
         {
             services.TryAddSingleton<ICorrelationIdService, CorrelationIdService>();
 
-            var options = services.AddOptions<LoggingOptions>();
+            var optionsBuilder = services.AddOptions<LoggingOptions>()
+                .ValidateDataAnnotations()
+                .Validate(o => o.SkipPaths is null || o.SkipPaths.All(p => !string.IsNullOrWhiteSpace(p)),
+                    "LoggingOptions.SkipPaths must not contain null or whitespace entries.");
+
             if (configure is not null)
             {
-                options.Configure(configure);
+                optionsBuilder.Configure(configure);
             }
+
+            return services;
+        }
+
+        /// <summary>
+        /// Binds <see cref="LoggingOptions"/> from the configuration section
+        /// <c>Logging:Core</c> (see <see cref="LoggingOptions.SectionName"/>) and registers
+        /// the correlation service.
+        /// </summary>
+        public IServiceCollection AddCoreLogging(IConfiguration configuration)
+        {
+            ArgumentNullException.ThrowIfNull(configuration);
+
+            services.TryAddSingleton<ICorrelationIdService, CorrelationIdService>();
+
+            services.AddOptions<LoggingOptions>()
+                .Bind(configuration.GetSection(LoggingOptions.SectionName))
+                .ValidateDataAnnotations()
+                .Validate(o => o.SkipPaths is null || o.SkipPaths.All(p => !string.IsNullOrWhiteSpace(p)),
+                    "LoggingOptions.SkipPaths must not contain null or whitespace entries.");
 
             return services;
         }
