@@ -6,7 +6,16 @@ namespace SolTechnology.Core.Logging.Correlations;
 /// </summary>
 public interface ICorrelationIdService
 {
+    /// <summary>Stores <paramref name="correlationId"/> for the current async-flow.</summary>
     void Set(CorrelationId correlationId);
+
+    /// <summary>Returns the correlation set for the current async-flow, or <c>null</c> if none.</summary>
     CorrelationId? Get();
+
+    /// <summary>
+    /// Returns the current correlation, generating + setting a new one when none is present.
+    /// Use from non-HTTP entry points (background jobs, scheduled tasks) to ensure correlation
+    /// always exists in the scope.
+    /// </summary>
     CorrelationId GetOrGenerate();
 }

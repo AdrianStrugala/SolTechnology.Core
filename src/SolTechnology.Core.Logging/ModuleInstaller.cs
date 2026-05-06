@@ -7,6 +7,11 @@ using SolTechnology.Core.Logging.Middleware;
 
 namespace SolTechnology.Core.Logging;
 
+/// <summary>
+/// DI / pipeline wiring for <c>SolTechnology.Core.Logging</c>. Use
+/// <see cref="AddCoreLogging"/> in <c>ConfigureServices</c> and <see cref="UseCoreLogging"/>
+/// in the request pipeline (early — before <c>UseRouting</c>).
+/// </summary>
 public static class LoggingServiceCollectionExtensions
 {
     /// <param name="services">DI container.</param>

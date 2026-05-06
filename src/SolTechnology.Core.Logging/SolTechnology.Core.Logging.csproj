@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<Version>1.1.0</Version>
+		<Version>1.1.1</Version>
 		<Description>Structured logging abstractions with HTTP context enrichment for ASP.NET Core applications. Provides consistent logging patterns, correlation IDs, and request/response tracing for better observability in distributed systems.</Description>
 		<PackageTags>sol technology core logging aspnetcore structured-logging tracing diagnostics observability correlation-id dotnet monitoring</PackageTags>
 		<Product>SolTechnology.Core.Logging</Product>
@@ -12,12 +12,17 @@
 		<PackageReadmeFile>docs\readme.md</PackageReadmeFile>
 		<RepositoryUrl>https://github.com/AdrianStrugala/SolTechnology.Core</RepositoryUrl>
 
+		<!-- Ship XML doc file in the NuGet package so consumers get IntelliSense on public API. -->
+		<GenerateDocumentationFile>true</GenerateDocumentationFile>
+
 		<!--
 			NU1510: Microsoft.Extensions.* PackageReferences inherited from src/Directory.Build.props
 			are already provided by FrameworkReference Microsoft.AspNetCore.App and would be pruned.
 			Suppressed because this project intentionally targets ASP.NET Core shared framework.
+			CS1591: don't fail the build for any remaining undocumented public member -
+			TreatWarningsAsErrors would otherwise turn each one into an error.
 		-->
-		<NoWarn>$(NoWarn);NU1510</NoWarn>
+		<NoWarn>$(NoWarn);NU1510;CS1591</NoWarn>
 	</PropertyGroup>
 	<ItemGroup>
 		<None Include="..\..\docs\mini-logo.png" Pack="true" Visible="false" PackagePath="docs\mini-logo.png" />
