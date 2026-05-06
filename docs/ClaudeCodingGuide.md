@@ -426,9 +426,17 @@ These apply to every class you write, regardless of layer.
 
 - Inject `ILogger<TSelf>` via the primary constructor.
 - **Always wrap variable values in square brackets:** `logger.LogInformation("Processing city [{CityName}]", name);`. Empty values become visible (`[]`) instead of invisible.
+  - Rule applies to **every** placeholder, including:
+    - forwarded user/exception messages: `logger.LogInformation("[{Message}]", message);`
+    - durations and numbers: `"Duration: [{ElapsedMs} ms]"`, not `"Duration: {ElapsedMs} ms"`.
+    - HTTP fields: `"[{RequestMethod}] [{RequestPath}] -> [{StatusCode}]"`.
+  - The only acceptable bare placeholder is when the entire message is a single quoted literal that already provides visual delimiters (rare — prefer `[]` even then).
 - Use structured logging placeholders (`{Name}`), never string interpolation in log messages — interpolation breaks log aggregation.
+- **Never** pass an exception's `Message` (or any user-supplied string) as the message *template*: `logger.LogError(ex, ex.Message)` will throw `FormatException` if the text contains `{` / `}`. Always use a placeholder: `logger.LogError(ex, "[{Message}]", ex.Message)`.
+- Property names use **PascalCase** (`{OperationName}`, not `{operationName}`) — matches MEL/Serilog/App Insights convention and KQL queries that consumers write.
 - Log at the boundaries (handler entry/exit, external call start/end, chapter transitions). Do not log inside tight loops.
 - Errors: `logger.LogError(exception, "Message with [{Context}]", ctx);` — pass the exception as the first argument, never `ex.ToString()` inside the message.
+- Reusable extension methods that emit common shapes (operation lifecycle, HTTP request lifecycle) live in `SolTechnology.Core.Logging` and are the preferred entry point — `_logger.OperationStarted(name)` over hand-rolled templates.
 
 ---
 
@@ -481,11 +489,16 @@ These are real examples spotted in DreamTravel. Fix them when you touch the surr
 
 Before declaring a task done, you must:
 
+0. ✅ **Before the first code edit in the session**, open this guide and the section(s)
+     relevant to the change (e.g. §11 for any `logger.Log*`, §3 for handlers, §10 for
+     renames). State the rules you will follow in your reply — one sentence, see root
+     `CLAUDE.md` "Evidence-of-consumption rule".
 1. ✅ Layer dependencies respected (run mental check from §1).
 2. ✅ New services registered through a `ModuleInstaller`, not in `Program.cs`.
 3. ✅ Class size, method size, ctor-arg budget within §9.
 4. ✅ Public types have XML `<summary>` (English).
-5. ✅ Logging uses placeholders + `[{value}]` brackets.
+5. ✅ Logging uses placeholders + `[{Value}]` brackets — **every** placeholder, including
+     forwarded user/exception messages and durations (§11).
 6. ✅ No `#region`, no placeholder strings, no swallowed exceptions, no `try/catch` in controllers/handlers.
 7. ✅ Tests added/updated — Component test preferred, Unit test only for pure logic.
 8. ✅ `dotnet build SolTechnology.Core.slnx` is green. For DreamTravel changes, `cd sample-tale-code-apps/DreamTravel && dotnet build` is green.

@@ -10,13 +10,16 @@ using DreamTravel.Queries;
 using DreamTravel.Sql;
 using MicroElements.Swashbuckle.FluentValidation.AspNetCore;
 using Microsoft.OpenApi.Models;
+using OpenTelemetry;
+using OpenTelemetry.Trace;
 using SolTechnology.Core.API;
 using SolTechnology.Core.API.Filters;
 using SolTechnology.Core.Authentication;
 using SolTechnology.Core.Cache;
-using SolTechnology.Core.Logging.Middleware;
+using SolTechnology.Core.Logging;
+using SolTechnology.Core.Logging.Enrichment;
+using SolTechnology.Core.Logging.Operations;
 using SolTechnology.Core.SQL;
-using SolTechnology.Core.Story;
 
 namespace DreamTravel.Api;
 
@@ -29,6 +32,13 @@ public class Program
     {
         var builder = WebApplication.CreateBuilder(args);
         builder.AddServiceDefaults();
+
+        // Aspire's ServiceDefaults already wires AddAspNetCoreInstrumentation()
+        // + AddHttpClientInstrumentation(). Subscribe SolTechnology.Core's operation
+        // ActivitySource so MediatR requests show up as child spans alongside the
+        // HTTP request and dependency calls in the same trace (App Insights / Jaeger / OTLP).
+        builder.Services.AddOpenTelemetry()
+            .WithTracing(tracing => tracing.AddSource(CoreLoggingActivitySources.OperationsName));
 
 
         var cultureInfo = new CultureInfo("en-US");
@@ -94,6 +104,13 @@ public class Program
 
         //The rest
         builder.Services.AddCache();
+        builder.Services.AddCoreLogging();
+        builder.Services.LogDetail(
+            "name",
+            asName: "CityName",
+            source: LogDetailSource.Body,
+            endpoints: ["/api/v1/FindLocationOfCity", "/api/FindCityByName"]);
+
 
         var thisAssembly = typeof(Program).Assembly;
         builder.Services.AddMediatR(cfg => { cfg.RegisterServicesFromAssemblies(thisAssembly); });
@@ -168,7 +185,7 @@ public class Program
 
         app.UseAuthorization();
         app.UseAuthentication();
-        app.UseMiddleware<LoggingMiddleware>();
+        app.UseCoreLogging();
 
         app.Use(async (context, next) =>
         {
