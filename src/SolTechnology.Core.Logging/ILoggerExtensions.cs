@@ -1,67 +1,40 @@
-﻿using System.ComponentModel;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 
 namespace SolTechnology.Core.Logging;
 
 // ReSharper disable once InconsistentNaming
 public static class ILoggerExtensions
 {
-    public static IDisposable BeginOperationScope(this ILogger logger, object operationIdentifiers)
-    {
-        var operationIdentifiersDictionary = TypeDescriptor.GetProperties(operationIdentifiers)
-            .OfType<PropertyDescriptor>()
-            .ToDictionary(
-                prop => prop.Name,
-                prop => prop.GetValue(operationIdentifiers)
-            );
-
-        return logger.BeginScope(operationIdentifiersDictionary)!;
-    }
-
-    public static IDisposable AddToScope(this ILogger logger, string key, object value)
-    {
-        var scopeDictionary = new Dictionary<string, object>
-        {
-            { key, value }
-        };
-
-        return logger.BeginScope(scopeDictionary)!;
-    }
-
-    public static IDisposable BeginOperationScope(this ILogger logger, KeyValuePair<string, object> operationIdentifier)
-    {
-        return logger.AddToScope(operationIdentifier.Key, operationIdentifier.Value);
-    }
-
-    public static IDisposable BeginOperationScope(this ILogger logger, Dictionary<string, object> operationIdentifiers)
-    {
-        return logger.BeginScope(operationIdentifiers)!;
-    }
 
     public static void OperationStarted(this ILogger logger, string operationName, string? message = null)
     {
         if (message != null)
         {
-            logger.LogInformation(message);
+            // 'message' is user input - never use it as a message template (curly braces break the formatter).
+            logger.LogInformation("{Message}", message);
         }
-        logger.LogInformation(2137, "Operation: [{operationName}]. Status: [{status}]",
-            operationName, "START");
 
-        return;
+        logger.LogInformation(
+            new EventId(2137, nameof(OperationStarted)),
+            "Operation: [{OperationName}]. Status: [{Status}]",
+            operationName, "START");
     }
 
     public static void OperationFailed(this ILogger logger, string operationName, long elapsedMilliseconds,
         Exception? exception = null, string? message = null)
     {
-        if (exception != null)
-        {
-            logger.LogError(exception, message ?? exception.Message);
-        }
-
-        logger.LogInformation(2137, "Operation: [{operationName}]. Status: [{status}]. Duration: [{duration}]",
-            operationName, "FAIL", elapsedMilliseconds);
-
-        return;
+        // Never pass an exception/user message as a message template - any '{' / '}'
+        // in the text breaks the structured-logging formatter (FormatException at runtime).
+        // Pass it as a templated argument instead.
+        logger.Log(
+            LogLevel.Error,
+            new EventId(2139, nameof(OperationFailed)),
+            exception,
+            "Operation: [{OperationName}]. Status: [{Status}]. Duration: [{DurationMs} ms]. Message: [{Message}]",
+            operationName,
+            "FAIL",
+            elapsedMilliseconds,
+            message ?? exception?.Message);
     }
 
     public static void OperationSucceeded(this ILogger logger, string operationName, long elapsedMilliseconds,
@@ -69,10 +42,12 @@ public static class ILoggerExtensions
     {
         if (message != null)
         {
-            logger.LogInformation(message);
+            logger.LogInformation("[{Message}]", message);
         }
 
-        logger.LogInformation(2137, "Operation: [{operationName}]. Status: [{status}]. Duration: [{duration}]",
+        logger.LogInformation(
+            new EventId(2138, nameof(OperationSucceeded)),
+            "Operation: [{OperationName}]. Status: [{Status}]. Duration: [{DurationMs} ms]",
             operationName, "SUCCESS", elapsedMilliseconds);
     }
 }

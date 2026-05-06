@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<Version>0.5.0</Version>
+		<Version>1.0.0</Version>
 		<Description>Structured logging abstractions with HTTP context enrichment for ASP.NET Core applications. Provides consistent logging patterns, correlation IDs, and request/response tracing for better observability in distributed systems.</Description>
 		<PackageTags>sol technology core logging aspnetcore structured-logging tracing diagnostics observability correlation-id dotnet monitoring</PackageTags>
 		<Product>SolTechnology.Core.Logging</Product>
@@ -11,15 +11,33 @@
 		<PackageIcon>docs\mini-logo.png</PackageIcon>
 		<PackageReadmeFile>docs\readme.md</PackageReadmeFile>
 		<RepositoryUrl>https://github.com/AdrianStrugala/SolTechnology.Core</RepositoryUrl>
+
+		<!--
+			NU1510: Microsoft.Extensions.* PackageReferences inherited from src/Directory.Build.props
+			are already provided by FrameworkReference Microsoft.AspNetCore.App and would be pruned.
+			Suppressed because this project intentionally targets ASP.NET Core shared framework.
+		-->
+		<NoWarn>$(NoWarn);NU1510</NoWarn>
 	</PropertyGroup>
 	<ItemGroup>
 		<None Include="..\..\docs\mini-logo.png" Pack="true" Visible="false" PackagePath="docs\mini-logo.png" />
 		<None Include="..\..\docs\Log.md" Pack="true" Visible="false" PackagePath="docs\readme.md" />
 	</ItemGroup>
 	<ItemGroup>
-		<PackageReference Include="Microsoft.AspNetCore.Http" Version="2.3.0" />
-		<PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.3.0" />
-		<PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="8.0.3" />
+		<FrameworkReference Include="Microsoft.AspNetCore.App" />
+		<!--
+			Microsoft.Extensions.* PackageReferences are inherited from src/Directory.Build.props.
+			FrameworkReference Microsoft.AspNetCore.App already provides them, so NuGet would prune
+			them anyway (NU1510). Removing here keeps the package graph clean.
+		-->
+		<PackageReference Remove="Microsoft.Extensions.Configuration" />
+		<PackageReference Remove="Microsoft.Extensions.Configuration.Binder" />
+		<PackageReference Remove="Microsoft.Extensions.DependencyInjection" />
+		<PackageReference Remove="Microsoft.Extensions.Options" />
+	</ItemGroup>
+	<ItemGroup>
+	  <Folder Include="Extensions\" />
 	</ItemGroup>
 
 </Project>
+

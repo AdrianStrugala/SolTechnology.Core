@@ -9,6 +9,20 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 > structure, dependencies, naming, file layout, class-size budget, and anti-patterns
 > for this codebase (built on the DreamTravel sample). The rules in that file are
 > binding and override any contradicting pattern found in legacy code.
+>
+> **Evidence-of-consumption rule.** Before the *first* code-writing tool call in a
+> session/task that touches `*.cs` files, you must:
+>
+> 1. Open `docs/ClaudeCodingGuide.md` and the relevant section(s) for the work
+>    (e.g. §11 Logging when adding any `logger.Log*` call, §3 CQRS when adding a
+>    handler, §10 Naming when renaming a public symbol).
+> 2. State in the assistant turn which sections you read and the concrete rules
+>    you will follow. One short sentence is enough — its purpose is to defeat
+>    the failure mode "I assumed I knew the convention".
+> 3. Only then make the edit.
+>
+> This rule applies even when the user's request *seems* narrow (e.g. "fix this
+> one bug"). Logging, naming, and structure rules cross-cut every change.
 
 > **🔁 SELF-IMPROVEMENT RULE 🔁**
 >

@@ -14,9 +14,9 @@ using SolTechnology.Core.API;
 using SolTechnology.Core.API.Filters;
 using SolTechnology.Core.Authentication;
 using SolTechnology.Core.Cache;
-using SolTechnology.Core.Logging.Middleware;
+using SolTechnology.Core.Logging;
+using SolTechnology.Core.Logging.Enrichment;
 using SolTechnology.Core.SQL;
-using SolTechnology.Core.Story;
 
 namespace DreamTravel.Api;
 
@@ -94,6 +94,13 @@ public class Program
 
         //The rest
         builder.Services.AddCache();
+        builder.Services.AddCoreLogging();
+        builder.Services.LogDetail(
+            "name",
+            asName: "CityName",
+            source: LogDetailSource.Body,
+            endpoints: ["/api/v1/FindLocationOfCity", "/api/FindCityByName"]);
+
 
         var thisAssembly = typeof(Program).Assembly;
         builder.Services.AddMediatR(cfg => { cfg.RegisterServicesFromAssemblies(thisAssembly); });
@@ -168,7 +175,7 @@ public class Program
 
         app.UseAuthorization();
         app.UseAuthentication();
-        app.UseMiddleware<LoggingMiddleware>();
+        app.UseCoreLogging();
 
         app.Use(async (context, next) =>
         {
