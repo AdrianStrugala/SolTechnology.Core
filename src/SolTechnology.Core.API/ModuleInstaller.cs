@@ -3,12 +3,52 @@ using Asp.Versioning.ApiExplorer;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
+using SolTechnology.Core.API.Exceptions;
+using SolTechnology.Core.API.Filters;
+using SolTechnology.Core.Logging;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
 namespace SolTechnology.Core.API;
 
 public static class ModuleInstaller
 {
+    /// <summary>
+    /// Registers <see cref="ExceptionFilter"/>, binds <see cref="ApiExceptionOptions"/>, and
+    /// ensures <c>SolTechnology.Core.Logging</c>'s <c>ICorrelationIdService</c> is available
+    /// (used to populate <c>Error.CorrelationId</c> on the response body).
+    /// <para>
+    /// Call once during service configuration, then add the filter to the MVC pipeline:
+    /// </para>
+    /// <code>
+    /// services.AddApiExceptionHandling(o =&gt;
+    ///     o.IncludeExceptionDetails = builder.Environment.IsDevelopment());
+    /// services.AddControllers(o =&gt; o.Filters.Add&lt;ExceptionFilter&gt;());
+    /// </code>
+    /// <para>
+    /// Calling <see cref="LoggingServiceCollectionExtensions.AddCoreLogging(IServiceCollection, Action{LoggingOptions}?)"/>
+    /// independently is still recommended (e.g. to bind <c>LoggingOptions</c> from configuration);
+    /// the calls are idempotent.
+    /// </para>
+    /// </summary>
+    /// <param name="services">DI container.</param>
+    /// <param name="configure">Optional configuration delegate for <see cref="ApiExceptionOptions"/>.</param>
+    public static IServiceCollection AddApiExceptionHandling(
+        this IServiceCollection services,
+        Action<ApiExceptionOptions>? configure = null)
+    {
+        // Idempotent: TryAddSingleton inside guards against double-registration.
+        services.AddCoreLogging();
+
+        var optionsBuilder = services.AddOptions<ApiExceptionOptions>();
+        if (configure is not null)
+        {
+            optionsBuilder.Configure(configure);
+        }
+
+        services.AddScoped<ExceptionFilter>();
+        return services;
+    }
+
     /// <summary>
     /// Configures API versioning using header-based versioning (X-API-VERSION)
     /// </summary>

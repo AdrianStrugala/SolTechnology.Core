@@ -88,13 +88,37 @@ var response = await httpClient.GetAsync("api/mycontroller");
 - Default version for clients without header (`AssumeDefaultVersionWhenUnspecified = true`)
 - Clean URLs without version prefix
 
-#### 2. Exception Handling Middleware
+#### 2. Exception Handling
 
-Add the exception handler middleware to automatically handle exceptions in your API:
+Register the exception filter (and its options) once in DI:
+
+```csharp
+// Map known exceptions to a Result envelope; rethrow unmapped ones to the host pipeline.
+// Enable IncludeExceptionDetails ONLY in Development — stack traces in Production responses
+// are an information disclosure (CWE-209).
+builder.Services.AddApiExceptionHandling(o =>
+    o.IncludeExceptionDetails = builder.Environment.IsDevelopment());
+
+builder.Services.AddControllers(o => o.Filters.Add<ExceptionFilter>());
+```
+
+For non-MVC requests (auth, routing, other middleware), wire the safety-net middleware:
 
 ```csharp
 app.UseMiddleware<ExceptionHandlerMiddleware>();
 ```
+
+Behavior:
+
+| Exception | Outcome |
+|---|---|
+| Mapped (e.g. `FluentValidation.ValidationException`) | Wrapped in `Result` + appropriate status code, logged at `Error` |
+| Client-abort (`OperationCanceledException` + `RequestAborted`) | Rethrown silently — `Core.Logging` finishes the request log at `Warning` |
+| Unmapped | Logged at `Critical` with `ExceptionType`, then rethrown to the host pipeline (DeveloperExceptionPage in Development, generic 500 in Production, or your `UseExceptionHandler`) |
+
+`ApiExceptionOptions.IncludeExceptionDetails = true` augments `Error.Description` with the exception type and stack trace. **Off by default**; enable in Development only.
+
+Every error response carries `Error.CorrelationId` matching the `X-Correlation-Id` response header and the `CorrelationId` property on the request log scope (provided by `SolTechnology.Core.Logging`). Clients can quote it in support tickets and the value resolves to the same logs in Seq / Application Insights.
 
 #### 3. Response Envelope Filter
 
