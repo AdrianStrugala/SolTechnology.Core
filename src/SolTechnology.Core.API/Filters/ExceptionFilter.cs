@@ -3,11 +3,8 @@ using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using System.Net;
 using FluentValidation;
 using SolTechnology.Core.API.Exceptions;
-using SolTechnology.Core.CQRS;
-using SolTechnology.Core.CQRS.Errors;
 using SolTechnology.Core.Logging.Correlations;
 
 namespace SolTechnology.Core.API.Filters;
@@ -30,7 +27,7 @@ public class ExceptionFilter : IExceptionFilter
 
     public void OnException(ExceptionContext context)
     {
-        // Client disconnected mid-request — not our incident, no envelope to send.
+        // Client disconnected mid-request — not our incident, no body to send.
         // SolTechnology.Core.Logging.LoggingMiddleware (if registered) will downgrade the
         // finish event to Warning. We leave ExceptionHandled = false so MVC rethrows.
         if (IsClientAbort(context.HttpContext, context.Exception))
@@ -41,14 +38,12 @@ public class ExceptionFilter : IExceptionFilter
         // Source of truth for the correlation id is Core.Logging's ICorrelationIdService,
         // which already aligned its value with Activity.Current.TraceId (W3C Trace Context)
         // and echoed it on the X-Correlation-Id response header. We surface the same value
-        // in the body so a client quoting it can be looked up in Seq/AppInsights logs by
-        // identical token. Fallback to GetOrGenerate ensures non-null even if UseCoreLogging
-        // is not in the pipeline (e.g. minimal hosts) — the value still ends up on the
-        // log scope via .GetScope() in the structured log call below.
+        // in ProblemDetails.Extensions["correlationId"] so a client quoting it can be looked
+        // up in Seq/AppInsights logs by identical token.
         var correlationId = _correlationIdService.GetOrGenerate().Value;
 
-        // Mapped exception types — wrap in envelope, set status, mark handled.
-        if (TryMap(context.Exception, correlationId, _options, out var statusCode, out var error))
+        // Mapped exception types — emit RFC 7807 ProblemDetails, set status, mark handled.
+        if (TryMap(context.Exception, out var statusCode))
         {
             // Log the exception object (not just the message) so structured-logging providers
             // (Serilog/Seq/App Insights) capture exception type, stack trace, inner exceptions
@@ -62,13 +57,13 @@ public class ExceptionFilter : IExceptionFilter
                 context.HttpContext.Request.Path,
                 statusCode);
 
-            context.Result = new ObjectResult(new Result
+            var problemDetails = ApiProblemDetailsFactory.FromException(
+                context.Exception, statusCode, correlationId, _options);
+
+            context.Result = new ObjectResult(problemDetails)
             {
-                Error = error,
-                IsSuccess = false
-            })
-            {
-                StatusCode = statusCode
+                StatusCode = statusCode,
+                ContentTypes = { "application/problem+json" }
             };
             context.ExceptionHandled = true;
             return;
@@ -76,8 +71,8 @@ public class ExceptionFilter : IExceptionFilter
 
         // Unmapped exception type. Drift in the API contract — page on-call so the type can
         // be added to the mapper. We do NOT pick a default status code: the host pipeline
-        // (DeveloperExceptionPage in Development, generic 500 in Production, or a custom
-        // UseExceptionHandler) decides. ExceptionHandled stays false → MVC rethrows.
+        // (DeveloperExceptionPage in Development, ASP.NET Core's ProblemDetails-aware
+        // UseExceptionHandler in Production) decides. ExceptionHandled stays false → MVC rethrows.
         _logger.LogCritical(
             context.Exception,
             "Unmapped exception of type {ExceptionType} in {RequestMethod} {RequestPath} — rethrowing to host pipeline. " +
@@ -87,30 +82,16 @@ public class ExceptionFilter : IExceptionFilter
             context.HttpContext.Request.Path);
     }
 
-    private static bool TryMap(
-        Exception exception,
-        string? correlationId,
-        ApiExceptionOptions options,
-        out int statusCode,
-        out Error error)
+    private static bool TryMap(Exception exception, out int statusCode)
     {
         switch (exception)
         {
             case ValidationException:
-                statusCode = (int)HttpStatusCode.BadRequest;
-                // FluentValidation's exception.Message is already user-facing (rule list).
-                // ApiErrorFactory will append diagnostic only when IncludeExceptionDetails is on.
-                error = ApiErrorFactory.Build(
-                    exception,
-                    userMessage: "Validation failed",
-                    userDescription: exception.Message,
-                    correlationId: correlationId,
-                    options);
+                statusCode = StatusCodes.Status400BadRequest;
                 return true;
 
             default:
                 statusCode = default;
-                error = default!;
                 return false;
         }
     }

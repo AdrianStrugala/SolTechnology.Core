@@ -13,22 +13,31 @@ namespace SolTechnology.Core.API;
 public static class ModuleInstaller
 {
     /// <summary>
-    /// Registers <see cref="ExceptionFilter"/>, binds <see cref="ApiExceptionOptions"/>, and
-    /// ensures <c>SolTechnology.Core.Logging</c>'s <c>ICorrelationIdService</c> is available
-    /// (used to populate <c>Error.CorrelationId</c> on the response body).
+    /// Registers the API error pipeline:
+    /// <list type="bullet">
+    ///   <item><see cref="ExceptionFilter"/> — maps known exceptions to RFC 7807
+    ///         <see cref="Microsoft.AspNetCore.Mvc.ProblemDetails"/>; rethrows unmapped ones.</item>
+    ///   <item><see cref="ResultConversionFilter"/> — converts <c>Result&lt;T&gt;</c> returned
+    ///         from controller actions to a raw success body (200) or to <c>ProblemDetails</c>
+    ///         (status from <c>Error.StatusCode</c>, defaulting to 500).</item>
+    ///   <item><see cref="ApiExceptionOptions"/> bound through <see cref="IOptions{TOptions}"/>.</item>
+    ///   <item>ASP.NET Core's <c>AddProblemDetails()</c> — produces <c>ProblemDetails</c> for
+    ///         status-code pages and any path that does not pass through MVC.</item>
+    ///   <item><c>SolTechnology.Core.Logging</c>'s <c>ICorrelationIdService</c> — used to populate
+    ///         <c>ProblemDetails.Extensions["correlationId"]</c>.</item>
+    /// </list>
     /// <para>
-    /// Call once during service configuration, then add the filter to the MVC pipeline:
+    /// Call once during service configuration, then add the filters to the MVC pipeline:
     /// </para>
     /// <code>
     /// services.AddApiExceptionHandling(o =&gt;
     ///     o.IncludeExceptionDetails = builder.Environment.IsDevelopment());
-    /// services.AddControllers(o =&gt; o.Filters.Add&lt;ExceptionFilter&gt;());
+    /// services.AddControllers(o =&gt;
+    /// {
+    ///     o.Filters.Add&lt;ExceptionFilter&gt;();
+    ///     o.Filters.Add&lt;ResultConversionFilter&gt;();
+    /// });
     /// </code>
-    /// <para>
-    /// Calling <see cref="LoggingServiceCollectionExtensions.AddCoreLogging(IServiceCollection, Action{LoggingOptions}?)"/>
-    /// independently is still recommended (e.g. to bind <c>LoggingOptions</c> from configuration);
-    /// the calls are idempotent.
-    /// </para>
     /// </summary>
     /// <param name="services">DI container.</param>
     /// <param name="configure">Optional configuration delegate for <see cref="ApiExceptionOptions"/>.</param>
@@ -36,8 +45,10 @@ public static class ModuleInstaller
         this IServiceCollection services,
         Action<ApiExceptionOptions>? configure = null)
     {
-        // Idempotent: TryAddSingleton inside guards against double-registration.
+        // Idempotent. TryAddSingleton inside Core.Logging guards against double-registration,
+        // and the framework's AddProblemDetails is also self-guarded.
         services.AddCoreLogging();
+        services.AddProblemDetails();
 
         var optionsBuilder = services.AddOptions<ApiExceptionOptions>();
         if (configure is not null)
@@ -46,6 +57,7 @@ public static class ModuleInstaller
         }
 
         services.AddScoped<ExceptionFilter>();
+        services.AddScoped<ResultConversionFilter>();
         return services;
     }
 

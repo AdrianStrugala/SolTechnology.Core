@@ -88,50 +88,127 @@ var response = await httpClient.GetAsync("api/mycontroller");
 - Default version for clients without header (`AssumeDefaultVersionWhenUnspecified = true`)
 - Clean URLs without version prefix
 
-#### 2. Exception Handling
+#### 2. Errors and Result conversion (RFC 7807 ProblemDetails)
 
-Register the exception filter (and its options) once in DI:
+`SolTechnology.Core.Api` follows the .NET 7+ standard for HTTP errors: every failure response is
+[RFC 7807 / RFC 9457 ProblemDetails](https://www.rfc-editor.org/rfc/rfc9457) served as
+`application/problem+json`. There is **no custom envelope** on the wire — successful responses
+carry the raw payload, failures carry `ProblemDetails`.
+
+Register the pipeline once in DI:
 
 ```csharp
-// Map known exceptions to a Result envelope; rethrow unmapped ones to the host pipeline.
-// Enable IncludeExceptionDetails ONLY in Development — stack traces in Production responses
+// Registers ExceptionFilter + ResultConversionFilter, binds ApiExceptionOptions, calls
+// AddProblemDetails(), and ensures Core.Logging's ICorrelationIdService is available.
+// IncludeExceptionDetails MUST stay false in Production — stack traces over the wire
 // are an information disclosure (CWE-209).
 builder.Services.AddApiExceptionHandling(o =>
     o.IncludeExceptionDetails = builder.Environment.IsDevelopment());
 
-builder.Services.AddControllers(o => o.Filters.Add<ExceptionFilter>());
-```
-
-For non-MVC requests (auth, routing, other middleware), wire the safety-net middleware:
-
-```csharp
-app.UseMiddleware<ExceptionHandlerMiddleware>();
-```
-
-Behavior:
-
-| Exception | Outcome |
-|---|---|
-| Mapped (e.g. `FluentValidation.ValidationException`) | Wrapped in `Result` + appropriate status code, logged at `Error` |
-| Client-abort (`OperationCanceledException` + `RequestAborted`) | Rethrown silently — `Core.Logging` finishes the request log at `Warning` |
-| Unmapped | Logged at `Critical` with `ExceptionType`, then rethrown to the host pipeline (DeveloperExceptionPage in Development, generic 500 in Production, or your `UseExceptionHandler`) |
-
-`ApiExceptionOptions.IncludeExceptionDetails = true` augments `Error.Description` with the exception type and stack trace. **Off by default**; enable in Development only.
-
-Every error response carries `Error.CorrelationId` matching the `X-Correlation-Id` response header and the `CorrelationId` property on the request log scope (provided by `SolTechnology.Core.Logging`). Clients can quote it in support tickets and the value resolves to the same logs in Seq / Application Insights.
-
-#### 3. Response Envelope Filter
-
-Add the response envelope filter to wrap your API responses in a consistent format:
-
-```csharp
-builder.Services.AddControllers(options =>
+builder.Services.AddControllers(o =>
 {
-    options.Filters.Add<ResponseEnvelopeFilter>();
+    o.Filters.Add<ExceptionFilter>();          // exceptions → ProblemDetails
+    o.Filters.Add<ResultConversionFilter>();   // Result<T> → unwrapped data / ProblemDetails
 });
 ```
 
-#### 4. API Testing
+##### Behaviour matrix
+
+| Action returns / throws | HTTP outcome |
+|---|---|
+| `Result<T>.Success(data)` | `200 OK`, body = raw `data` (DTO is not wrapped in any envelope) |
+| `Result.Success()` (non-generic) | `204 No Content`, no body |
+| `Result<T>.Fail(error)` / `Result.Fail(error)` | `ProblemDetails` at `error.StatusCode` (defaults to `500`); `application/problem+json` |
+| `BadRequest(error)` (action returned a bare `Error`) | `ProblemDetails` at the explicit status code or `error.StatusCode`, fallback `500` |
+| Throws `FluentValidation.ValidationException` | `400` `ValidationProblemDetails` with strongly-typed `errors` per field |
+| Throws any other mapped type | `ProblemDetails` at the mapped status |
+| Throws an unmapped type | `LogCritical` + rethrow → host pipeline (`DeveloperExceptionPage` / `UseExceptionHandler`) |
+| Client aborted the request (`OperationCanceledException` + `RequestAborted`) | Rethrown silently; `Core.Logging` logs the finish at `Warning` |
+
+Application-layer code (CQRS handlers, services) continues to return `Result<T>` and never
+references HTTP types. The boundary conversion lives in `ResultConversionFilter`.
+
+##### Failure semantics — `Error` subtypes
+
+Application-layer failures use semantic subtypes from `SolTechnology.Core.CQRS.Errors`. The
+API layer maps each subtype to a status code; other transports (gRPC, message bus) can map
+to their own codes from the same source of truth.
+
+| Error subtype | HTTP status | Body shape |
+|---|---|---|
+| `NotFoundError` | `404 Not Found` | `ProblemDetails` |
+| `ConflictError` | `409 Conflict` | `ProblemDetails` |
+| `ValidationError` | `400 Bad Request` | `ValidationProblemDetails` (with `errors`) |
+| `UnauthorizedError` | `401 Unauthorized` | `ProblemDetails` |
+| `ForbiddenError` | `403 Forbidden` | `ProblemDetails` |
+| Bare `Error` (or any other subtype) | `500 Internal Server Error` | `ProblemDetails` |
+
+```csharp
+// Handler — pure domain semantics, no HTTP types.
+public Task<Result<Trip>> Handle(GetTripQuery q, CancellationToken ct)
+{
+    var trip = _trips.Find(q.Id);
+    return trip is null
+        ? Result<Trip>.FailAsTask(new NotFoundError { Message = $"Trip {q.Id} not found." })
+        : Result<Trip>.SuccessAsTask(trip);
+}
+```
+
+Producing:
+
+```http
+HTTP/1.1 404 Not Found
+Content-Type: application/problem+json
+
+{
+  "type":   "https://tools.ietf.org/html/rfc9110#section-15.5.5",
+  "title":  "Trip 42 not found.",
+  "status": 404,
+  "correlationId": "4bf92f3577b34da6a3ce929d0e0e4736"
+}
+```
+
+For validation:
+
+```csharp
+return Result<CreatedOrder>.Fail(new ValidationError
+{
+    Message = "Invalid order.",
+    Errors = new Dictionary<string, string[]>
+    {
+        ["email"] = ["'Email' is not a valid email address."],
+        ["age"]   = ["'Age' must be greater than 0."]
+    }
+});
+```
+
+##### CorrelationId
+
+Every `ProblemDetails` carries `extensions.correlationId` matching the `X-Correlation-Id`
+response header and the `CorrelationId` property on the request log scope (provided by
+`SolTechnology.Core.Logging`). Clients quote the value in support tickets and it resolves
+to the same logs in Seq / Application Insights.
+
+##### Diagnostic detail
+
+`ApiExceptionOptions.IncludeExceptionDetails = true` adds `extensions.exception` with the
+exception type, message, and stack trace. **Off by default**; enable in Development only.
+
+```json
+{
+  "type": "https://tools.ietf.org/html/rfc9110#section-15.6.1",
+  "title": "Object reference not set to an instance of an object.",
+  "status": 500,
+  "correlationId": "4bf92f3577b34da6a3ce929d0e0e4736",
+  "exception": {
+    "type": "System.NullReferenceException",
+    "message": "Object reference not set to an instance of an object.",
+    "stackTrace": "   at MyApp.Foo() in /src/..."
+  }
+}
+```
+
+#### 3. API Testing
 
 Use the ApiFixture class for integration testing your API:
 

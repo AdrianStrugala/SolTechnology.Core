@@ -1,5 +1,17 @@
 ﻿﻿namespace SolTechnology.Core.CQRS.Errors;
 
+/// <summary>
+/// Generic failure surfaced by the application layer through <c>Result</c> /
+/// <c>Result&lt;T&gt;</c>. Use a subtype (<see cref="NotFoundError"/>, <see cref="ConflictError"/>,
+/// <see cref="ValidationError"/>, <see cref="UnauthorizedError"/>, <see cref="ForbiddenError"/>)
+/// when the failure has a well-known semantic that downstream layers (HTTP, gRPC, message bus)
+/// can map deterministically.
+/// <para>
+/// Subtype-based modeling keeps <c>Core.CQRS</c> free of transport concerns: handlers state
+/// "resource not found" via <see cref="NotFoundError"/>; the API layer turns it into
+/// <c>404 Not Found</c>; a hypothetical gRPC layer turns it into <c>StatusCode.NotFound</c>.
+/// </para>
+/// </summary>
 public class Error
 {
     public virtual string Message { get; set; } = null!;
