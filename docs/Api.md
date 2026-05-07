@@ -128,6 +128,40 @@ builder.Services.AddControllers(o =>
 Application-layer code (CQRS handlers, services) continues to return `Result<T>` and never
 references HTTP types. The boundary conversion lives in `ResultConversionFilter`.
 
+##### Exception → status mapping (extension point)
+
+The default mapper covers the most common BCL / FluentValidation exception types:
+
+| Exception | Status |
+|---|---|
+| `FluentValidation.ValidationException` | `400` (`ValidationProblemDetails` with per-field errors) |
+| `ArgumentException` (and `ArgumentNullException`) | `400` |
+| `UnauthorizedAccessException` | `403` (per RFC 7235 — `403` means "identified, forbidden") |
+| `KeyNotFoundException` | `404` |
+| `NotImplementedException` | `501` |
+| anything else | unmapped → `LogCritical` + rethrow to host |
+
+Extend the map for project-specific exception types:
+
+```csharp
+public sealed class AppExceptionMapper : DefaultExceptionStatusCodeMapper
+{
+    public override bool TryMap(Exception exception, out int statusCode)
+    {
+        if (exception is OptimisticConcurrencyException) { statusCode = 409; return true; }
+        if (exception is PaymentDeclinedException)        { statusCode = 402; return true; }
+        return base.TryMap(exception, out statusCode);
+    }
+}
+
+services.AddApiExceptionHandling();
+services.Replace(ServiceDescriptor.Singleton<IExceptionStatusCodeMapper, AppExceptionMapper>());
+```
+
+The deliberate refusal to default unknown types to `500` keeps every unrecognized exception
+visible in the operations log (`LogCritical` + `ExceptionType`) so the team can decide
+whether it is a bug, a transient infrastructure error, or a missing mapping.
+
 ##### Failure semantics — `Error` subtypes
 
 Application-layer failures use semantic subtypes from `SolTechnology.Core.CQRS.Errors`. The

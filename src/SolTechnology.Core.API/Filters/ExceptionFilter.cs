@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using FluentValidation;
 using SolTechnology.Core.API.Exceptions;
 using SolTechnology.Core.Logging.Correlations;
 
@@ -13,15 +12,18 @@ public class ExceptionFilter : IExceptionFilter
 {
     private readonly ILogger<ExceptionFilter> _logger;
     private readonly ICorrelationIdService _correlationIdService;
+    private readonly IExceptionStatusCodeMapper _statusCodeMapper;
     private readonly ApiExceptionOptions _options;
 
     public ExceptionFilter(
         ILogger<ExceptionFilter> logger,
         ICorrelationIdService correlationIdService,
+        IExceptionStatusCodeMapper statusCodeMapper,
         IOptions<ApiExceptionOptions> options)
     {
         _logger = logger;
         _correlationIdService = correlationIdService;
+        _statusCodeMapper = statusCodeMapper;
         _options = options.Value;
     }
 
@@ -43,14 +45,24 @@ public class ExceptionFilter : IExceptionFilter
         var correlationId = _correlationIdService.GetOrGenerate().Value;
 
         // Mapped exception types — emit RFC 7807 ProblemDetails, set status, mark handled.
-        if (TryMap(context.Exception, out var statusCode))
+        if (_statusCodeMapper.TryMap(context.Exception, out var statusCode))
         {
-            // Log the exception object (not just the message) so structured-logging providers
-            // (Serilog/Seq/App Insights) capture exception type, stack trace, inner exceptions
-            // and Data. Property names {RequestMethod}/{RequestPath} are aligned with
-            // SolTechnology.Core.Logging.LoggingMiddleware so the same Seq filter works
-            // regardless of which component emits the event.
-            _logger.LogError(
+            // Log level coordinated with SolTechnology.Core.Logging.LoggingMiddleware's
+            // finish-log: 5xx is a server fault (Error, alerts ops), 4xx is a client fault
+            // (Warning, visible but not paging). Without this split, every ValidationException
+            // would fire LogError and drown PagerDuty / Sentry / App Insights smart-detection
+            // in 400-noise.
+            //
+            // Property names {RequestMethod}/{RequestPath} are aligned with the same middleware
+            // so a single Seq filter catches events from both components. The exception object
+            // is logged (not just the message) so structured-logging providers capture
+            // exception type, stack trace, inner exceptions and Data.
+            var level = statusCode >= StatusCodes.Status500InternalServerError
+                ? LogLevel.Error
+                : LogLevel.Warning;
+
+            _logger.Log(
+                level,
                 context.Exception,
                 "Unhandled exception in {RequestMethod} {RequestPath} → {StatusCode}",
                 context.HttpContext.Request.Method,
@@ -82,19 +94,6 @@ public class ExceptionFilter : IExceptionFilter
             context.HttpContext.Request.Path);
     }
 
-    private static bool TryMap(Exception exception, out int statusCode)
-    {
-        switch (exception)
-        {
-            case ValidationException:
-                statusCode = StatusCodes.Status400BadRequest;
-                return true;
-
-            default:
-                statusCode = default;
-                return false;
-        }
-    }
 
     private static bool IsClientAbort(HttpContext context, Exception exception)
     {

@@ -1,6 +1,7 @@
 using Asp.Versioning;
 using Asp.Versioning.ApiExplorer;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
 using SolTechnology.Core.API.Exceptions;
@@ -19,7 +20,10 @@ public static class ModuleInstaller
     ///         <see cref="Microsoft.AspNetCore.Mvc.ProblemDetails"/>; rethrows unmapped ones.</item>
     ///   <item><see cref="ResultConversionFilter"/> — converts <c>Result&lt;T&gt;</c> returned
     ///         from controller actions to a raw success body (200) or to <c>ProblemDetails</c>
-    ///         (status from <c>Error.StatusCode</c>, defaulting to 500).</item>
+    ///         derived from the <c>Error</c> subtype.</item>
+    ///   <item><see cref="IExceptionStatusCodeMapper"/> — default exception → status mapping;
+    ///         registered via <c>TryAddSingleton</c> so consumers can replace it with their
+    ///         own implementation (typically extending <see cref="DefaultExceptionStatusCodeMapper"/>).</item>
     ///   <item><see cref="ApiExceptionOptions"/> bound through <see cref="IOptions{TOptions}"/>.</item>
     ///   <item>ASP.NET Core's <c>AddProblemDetails()</c> — produces <c>ProblemDetails</c> for
     ///         status-code pages and any path that does not pass through MVC.</item>
@@ -49,6 +53,10 @@ public static class ModuleInstaller
         // and the framework's AddProblemDetails is also self-guarded.
         services.AddCoreLogging();
         services.AddProblemDetails();
+
+        // TryAdd → consumer's earlier registration of a custom IExceptionStatusCodeMapper wins.
+        // Lifetime: singleton, the mapper is stateless and thread-safe.
+        services.TryAddSingleton<IExceptionStatusCodeMapper, DefaultExceptionStatusCodeMapper>();
 
         var optionsBuilder = services.AddOptions<ApiExceptionOptions>();
         if (configure is not null)
