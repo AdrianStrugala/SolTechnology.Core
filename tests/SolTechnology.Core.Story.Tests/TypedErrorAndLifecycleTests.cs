@@ -12,8 +12,7 @@ using SolTechnology.Core.Story.Persistence;
 namespace SolTechnology.Core.Story.Tests;
 
 /// <summary>
-/// Tests for the typed pause/cancel/version error markers and the engine behaviors
-/// introduced after the framework review.
+/// Tests for the typed pause/cancel/version error markers and the engine behaviors.
 /// </summary>
 [TestFixture]
 public class TypedErrorAndLifecycleTests

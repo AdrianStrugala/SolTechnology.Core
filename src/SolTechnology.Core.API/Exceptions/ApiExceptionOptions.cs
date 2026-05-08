@@ -2,7 +2,7 @@ namespace SolTechnology.Core.API.Exceptions;
 
 /// <summary>
 /// Options governing how unhandled exceptions are turned into HTTP response bodies by
-/// <see cref="Filters.ExceptionFilter"/> and <see cref="Middlewares.ExceptionHandlerMiddleware"/>.
+/// <see cref="Filters.ExceptionFilter"/>.
 /// Configure via <c>services.AddApiExceptionHandling(opts =&gt; ...)</c>.
 /// </summary>
 public class ApiExceptionOptions

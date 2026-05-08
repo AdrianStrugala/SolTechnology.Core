@@ -75,7 +75,7 @@ public class StatisticsTests
             .WithHeader("X-API-VERSION", "2.0")
             .GetAsync<GetSearchStatisticsResult>();
 
-        // Assert — post-pivot wire shape: success → raw DTO; failure → ProblemDetails (non-2xx).
+        // Assert
         apiResponse.Should().NotBeNull();
 
         var polskaStats = apiResponse.CountryStatistics.FirstOrDefault(c => c.Country == "Polska");

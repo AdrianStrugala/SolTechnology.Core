@@ -51,9 +51,6 @@ public class FindCityAndSaveDetailsTest
             .WithBody(new { city.Name })
             .PostAsync<City>();
 
-        // Post-pivot wire shape: success → raw DTO (no Result envelope).
-        // Failure path would arrive as application/problem+json with a non-2xx status,
-        // which PostAsync<T> would surface as deserialization error / non-success status.
         apiResponse.Should().BeEquivalentTo(city);
 
 

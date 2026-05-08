@@ -20,13 +20,12 @@
 
 	<ItemGroup>
 		<!-- Mvc.Testing pulls TestHost transitively, but we keep TestHost explicit because
-		     APIFixture exposes its TestServer property publicly. Both packages live here
-		     (not in SolTechnology.Core.Api) so that consumers shipping to production don't
-		     drag a TestHost into their runtime closure. -->
+		     APIFixture exposes its TestServer property publicly. -->
 		<PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="10.0.0" />
 		<PackageReference Include="Microsoft.AspNetCore.TestHost" Version="10.0.0" />
 	</ItemGroup>
 
 </Project>
+
 
 

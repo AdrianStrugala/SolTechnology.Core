@@ -60,7 +60,6 @@ namespace DreamTravel.FunctionalTests.Trips
                     .WithBody(new { city.Name })
                     .PostAsync<City>();
 
-                // Post-pivot wire shape: success → raw DTO; failure → ProblemDetails (non-2xx).
                 findCityByNameResponse.Should().BeEquivalentTo(city);
             }
 

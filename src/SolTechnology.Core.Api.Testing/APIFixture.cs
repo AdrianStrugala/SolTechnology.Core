@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Hosting;
+﻿﻿using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.Configuration;
@@ -12,12 +12,6 @@ namespace SolTechnology.Core.API.Testing
     /// in-memory ASP.NET Core host and exposes its <see cref="TestServer"/> + a ready-to-use
     /// <see cref="HttpClient"/>. Use from integration / component tests; never reference at
     /// runtime in production code.
-    /// <para>
-    /// Lives in <c>SolTechnology.Core.Api.Testing</c> so that test-host dependencies
-    /// (<c>Microsoft.AspNetCore.Mvc.Testing</c>, <c>Microsoft.AspNetCore.TestHost</c>) do not
-    /// leak into the runtime closure of consumers shipping <c>SolTechnology.Core.Api</c> to
-    /// production.
-    /// </para>
     /// </summary>
     /// <typeparam name="TEntryPoint">A type in the entry point assembly of the application
     /// under test. Typically the <c>Program</c> class.</typeparam>
@@ -59,4 +53,5 @@ namespace SolTechnology.Core.API.Testing
         }
     }
 }
+
 

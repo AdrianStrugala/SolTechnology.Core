@@ -42,8 +42,7 @@ namespace DreamTravel.Api.Controllers.Trips
         }
 
         /// <summary>
-        /// V2 - Returns the raw CalculateBestPathResult (post-pivot wire shape: success → DTO,
-        /// failure → application/problem+json from the global ResultConversionFilter).
+        /// V2
         /// </summary>
         [HttpPost]
         [MapToApiVersion("2.0")]

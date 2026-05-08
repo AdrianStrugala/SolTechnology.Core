@@ -20,10 +20,6 @@ public class SampleOrderWorkflowTests
     [Test]
     public async Task HappyPath()
     {
-        // Post-pivot wire shape: Story endpoints (StoryController returns Result<StoryInstanceDto>
-        // internally) are unwrapped by Core.Api's global ResultConversionFilter into raw DTOs on
-        // the wire. Failure responses arrive as application/problem+json with non-2xx status,
-        // surfaced by RestEase/PostAsync<T> as deserialization errors / non-success status codes.
 
         // Given: Initiate story request
         var createStoryResponse = await _apiClient
