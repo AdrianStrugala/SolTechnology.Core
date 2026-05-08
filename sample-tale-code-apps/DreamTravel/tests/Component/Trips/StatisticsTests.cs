@@ -3,7 +3,6 @@ using DreamTravel.Sql;
 using DreamTravel.Sql.DbModels;
 using FluentAssertions;
 using Microsoft.Extensions.DependencyInjection;
-using SolTechnology.Core.CQRS;
 
 namespace DreamTravel.FunctionalTests.Trips;
 
@@ -65,25 +64,25 @@ public class StatisticsTests
                 }
             }
         };
-    
+
         await _dbContext.Cities.AddRangeAsync(cities);
         await _dbContext.SaveChangesAsync();
-    
+
         // Act
         var apiResponse = await _apiClient
             .CreateRequest("/api/statistics/countries")
             .WithHeader("X-API-KEY", "<SECRET>")
             .WithHeader("X-API-VERSION", "2.0")
-            .GetAsync<Result<GetSearchStatisticsResult>>();
+            .GetAsync<GetSearchStatisticsResult>();
 
-        // Assert
-        apiResponse.IsSuccess.Should().BeTrue();
+        // Assert — post-pivot wire shape: success → raw DTO; failure → ProblemDetails (non-2xx).
+        apiResponse.Should().NotBeNull();
 
-        var polskaStats = apiResponse.Data!.CountryStatistics.FirstOrDefault(c => c.Country == "Polska");
+        var polskaStats = apiResponse.CountryStatistics.FirstOrDefault(c => c.Country == "Polska");
         polskaStats.Should().NotBeNull();
         polskaStats!.TotalSearchCount.Should().BeGreaterOrEqualTo(5, "because we added 3 + 2 searches for Polska");
 
-        var germanyStats = apiResponse.Data!.CountryStatistics.FirstOrDefault(c => c.Country == "Germany");
+        var germanyStats = apiResponse.CountryStatistics.FirstOrDefault(c => c.Country == "Germany");
         germanyStats.Should().NotBeNull();
         germanyStats!.TotalSearchCount.Should().BeGreaterOrEqualTo(2, "because we added 2 searches for Germany");
     }

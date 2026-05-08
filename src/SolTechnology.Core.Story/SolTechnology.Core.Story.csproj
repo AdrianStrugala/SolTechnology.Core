@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <Version>0.6.0</Version>
+        <Version>0.7.0</Version>
         <Description>Story Framework - Unified workflow orchestration for multi-step business processes. Supports both simple automated chains and pausable workflows with persistence. Features Tale Code philosophy with StoryHandler, Chapters, and Context for readable, maintainable business logic.</Description>
         <PackageTags>sol technology core story workflow chain pausable state-machine saga orchestration sqlite async dotnet business-process tale-code</PackageTags>
         <Product>SolTechnology.Core.Story</Product>
@@ -20,10 +20,27 @@
     </ItemGroup>
 
     <ItemGroup>
-      <PackageReference Include="Microsoft.AspNetCore.Mvc.Core" Version="2.2.5" />
-      <PackageReference Include="Microsoft.Data.Sqlite.Core" Version="9.0.5" />
-      <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
-      <PackageReference Include="SQLitePCLRaw.bundle_green" Version="2.1.11" />
+        <!--
+            FrameworkReference replaces a stale Microsoft.AspNetCore.Mvc.Core 2.2.5 PackageReference
+            that pulled System.Text.Encodings.Web 4.5.0 (CVE-2021-26701, Critical) into the graph.
+            Story only uses stock MVC controller types (ControllerBase, [HttpGet/Post], IActionResult,
+            [FromRoute/Body/Header]) which all live in the ASP.NET Core shared framework. Same
+            approach as SolTechnology.Core.Logging.
+        -->
+        <FrameworkReference Include="Microsoft.AspNetCore.App" />
+        <PackageReference Include="Microsoft.Data.Sqlite.Core" Version="9.0.5" />
+        <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
+        <PackageReference Include="SQLitePCLRaw.bundle_green" Version="2.1.11" />
+
+        <!--
+            Microsoft.Extensions.* PackageReferences inherited from src/Directory.Build.props
+            are already provided by the shared framework. Removing them here mirrors the
+            SolTechnology.Core.Logging setup and keeps the package graph clean.
+        -->
+        <PackageReference Remove="Microsoft.Extensions.Configuration" />
+        <PackageReference Remove="Microsoft.Extensions.Configuration.Binder" />
+        <PackageReference Remove="Microsoft.Extensions.DependencyInjection" />
+        <PackageReference Remove="Microsoft.Extensions.Options" />
     </ItemGroup>
 
     <ItemGroup>

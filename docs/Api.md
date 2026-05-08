@@ -1,14 +1,39 @@
 ### Overview
 
-The SolTechnology.Core.Api library provides API utilities and filters for ASP.NET Core applications. It includes exception handling middleware, response envelope filters, and testing utilities for API integration tests.
+`SolTechnology.Core.Api` is the ASP.NET Core integration layer for the SolTechnology stack. It
+ships:
+
+- **RFC 7807 / RFC 9457 ProblemDetails error pipeline** (`application/problem+json`) — no
+  custom envelope on the wire; success returns the raw DTO, failure returns `ProblemDetails`.
+- **`Result<T>` ↔ HTTP conversion** in MVC — handlers stay HTTP-agnostic; `ResultConversionFilter`
+  translates `Result<T>` into the wire format at the controller boundary.
+- **`Error` subtype → status code mapping** — `NotFoundError` → 404, `ValidationError` → 400
+  (with structured per-field `errors`), `ConflictError` → 409, `UnauthorizedError` → 401,
+  `ForbiddenError` → 403; default 500 for the bare `Error` type. Replaceable through
+  `IExceptionStatusCodeMapper`.
+- **Header-based API versioning** (`X-API-VERSION`) with Swagger docs per version, deprecation
+  badges, newest-first dropdown.
+- **Correlation id propagation** — every error response carries
+  `extensions.correlationId` matching the `X-Correlation-Id` response header and the log
+  scope from `SolTechnology.Core.Logging`.
+- **Log-level alignment with `Core.Logging`** — mapped 4xx → `Warning`, mapped 5xx → `Error`,
+  unmapped exceptions → `Critical` + rethrow to host. PagerDuty / Sentry / App Insights
+  smart-detection sees only real server faults, not validation noise.
+- **One-call bootstrap** — `services.AddApiCore(...)` + `opts.AddApiCoreFilters()` +
+  `app.UseSwaggerWithVersioning(...)` replaces ~30 lines of boilerplate.
+
+Integration tests use a separate companion package, **`SolTechnology.Core.Api.Testing`**, so
+that test-host dependencies do not leak into production assemblies.
 
 ### Registration
 
-For installing the library, reference **SolTechnology.Core.Api** nuget package.
+Reference the `SolTechnology.Core.Api` NuGet package. For integration tests, additionally
+reference `SolTechnology.Core.Api.Testing`.
 
 ### Configuration
 
-No configuration is needed.
+No appsettings binding is required. The optional `ApiExceptionOptions.IncludeExceptionDetails`
+flag (default `false`) is set in code, typically to `IsDevelopment()`.
 
 ### Usage
 
@@ -19,26 +44,17 @@ Configure header-based API versioning with automatic Swagger documentation:
 ```csharp
 // In Program.cs, before builder.Services.AddControllers()
 builder.Services.AddVersioning(
-    defaultMajorVersion: 2,     // Default: 2
+    defaultMajorVersion: 1,     // Default: 1
     defaultMinorVersion: 0,     // Default: 0
     apiTitle: "My API"          // For Swagger docs
 );
 
-// Configure Swagger UI (after app.Build())
-var apiVersionDescriptionProvider = app.Services
-    .GetRequiredService<IApiVersionDescriptionProvider>();
-
-app.UseSwaggerUI(c =>
-{
-    foreach (var description in apiVersionDescriptionProvider.ApiVersionDescriptions.Reverse())
-    {
-        c.SwaggerEndpoint(
-            $"/swagger/{description.GroupName}/swagger.json",
-            $"My API {description.GroupName.ToUpperInvariant()}" +
-            $"{(description.IsDeprecated ? " (Deprecated)" : "")}");
-    }
-});
+// In the request pipeline:
+app.UseSwaggerWithVersioning("My API");
 ```
+
+> Tip: `AddApiCore` (see section 2) wraps both `AddVersioning` and the error pipeline in a
+> single call.
 
 **Controller Configuration**:
 
@@ -95,7 +111,32 @@ var response = await httpClient.GetAsync("api/mycontroller");
 `application/problem+json`. There is **no custom envelope** on the wire — successful responses
 carry the raw payload, failures carry `ProblemDetails`.
 
-Register the pipeline once in DI:
+##### One-call bootstrap
+
+```csharp
+builder.Services.AddApiCore(
+    o => o.IncludeExceptionDetails = builder.Environment.IsDevelopment(),
+    apiTitle: "DreamTravel API",
+    defaultMajorVersion: 1);
+
+builder.Services.AddControllers(opts => opts.AddApiCoreFilters());
+
+var app = builder.Build();
+app.UseSwaggerWithVersioning("DreamTravel API");
+```
+
+`AddApiCore` is a rollup that registers:
+- `ExceptionFilter` + `ResultConversionFilter` (in DI; added to MVC by `AddApiCoreFilters`)
+- `IExceptionStatusCodeMapper` (`DefaultExceptionStatusCodeMapper`, replaceable)
+- `ApiExceptionOptions` bound through `IOptions<>`
+- ASP.NET Core's `AddProblemDetails()` for non-MVC paths
+- `Core.Logging` + `ICorrelationIdService` (used as `ProblemDetails.Extensions["correlationId"]`)
+- API versioning (header `X-API-VERSION`) + per-version Swagger docs
+
+For finer-grained control, the underlying `AddApiExceptionHandling` and `AddVersioning`
+extensions remain available and compose freely.
+
+##### Manual setup (when AddApiCore is too coarse)
 
 ```csharp
 // Registers ExceptionFilter + ResultConversionFilter, binds ApiExceptionOptions, calls
@@ -105,11 +146,7 @@ Register the pipeline once in DI:
 builder.Services.AddApiExceptionHandling(o =>
     o.IncludeExceptionDetails = builder.Environment.IsDevelopment());
 
-builder.Services.AddControllers(o =>
-{
-    o.Filters.Add<ExceptionFilter>();          // exceptions → ProblemDetails
-    o.Filters.Add<ResultConversionFilter>();   // Result<T> → unwrapped data / ProblemDetails
-});
+builder.Services.AddControllers(o => o.AddApiCoreFilters());
 ```
 
 ##### Behaviour matrix

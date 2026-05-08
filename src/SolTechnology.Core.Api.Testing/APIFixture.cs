@@ -1,4 +1,4 @@
-﻿﻿using Microsoft.AspNetCore.Hosting;
+﻿using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.Configuration;
@@ -7,8 +7,20 @@ using Microsoft.Extensions.Logging;
 
 namespace SolTechnology.Core.API.Testing
 {
-    /// <typeparam name="TEntryPoint">A type in the entry point assembly of the application.
-    /// Typically the Startup or Program classes can be used.</typeparam>
+    /// <summary>
+    /// Lightweight wrapper around <see cref="WebApplicationFactory{TEntryPoint}"/> that boots an
+    /// in-memory ASP.NET Core host and exposes its <see cref="TestServer"/> + a ready-to-use
+    /// <see cref="HttpClient"/>. Use from integration / component tests; never reference at
+    /// runtime in production code.
+    /// <para>
+    /// Lives in <c>SolTechnology.Core.Api.Testing</c> so that test-host dependencies
+    /// (<c>Microsoft.AspNetCore.Mvc.Testing</c>, <c>Microsoft.AspNetCore.TestHost</c>) do not
+    /// leak into the runtime closure of consumers shipping <c>SolTechnology.Core.Api</c> to
+    /// production.
+    /// </para>
+    /// </summary>
+    /// <typeparam name="TEntryPoint">A type in the entry point assembly of the application
+    /// under test. Typically the <c>Program</c> class.</typeparam>
     public class APIFixture<TEntryPoint> : IDisposable where TEntryPoint : class
     {
         public TestServer TestServer { get; }
@@ -47,3 +59,4 @@ namespace SolTechnology.Core.API.Testing
         }
     }
 }
+

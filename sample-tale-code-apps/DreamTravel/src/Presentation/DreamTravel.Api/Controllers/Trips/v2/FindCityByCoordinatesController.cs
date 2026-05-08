@@ -1,11 +1,10 @@
-﻿using System.Net;
+﻿﻿using System.Net;
 using System.Net.Mime;
 using Asp.Versioning;
 using DreamTravel.Domain.Cities;
 using DreamTravel.Queries.FindCityByCoordinates;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using SolTechnology.Core.CQRS;
 
 namespace DreamTravel.Api.Controllers.Trips.v2
 {
@@ -21,8 +20,8 @@ namespace DreamTravel.Api.Controllers.Trips.v2
 
         [HttpPost]
         [Produces(MediaTypeNames.Application.Json)]
-        [ProducesResponseType(typeof(Result<City>), (int)HttpStatusCode.OK)]
-        [ProducesResponseType(typeof(Result), (int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType(typeof(City), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(ProblemDetails), (int)HttpStatusCode.BadRequest)]
         public async Task<IActionResult> FindCityByCoordinates([FromBody] FindCityByCoordinatesQuery query)
         {
             logger.LogInformation("Looking for city: " + query.Lat + ";" + query.Lng);

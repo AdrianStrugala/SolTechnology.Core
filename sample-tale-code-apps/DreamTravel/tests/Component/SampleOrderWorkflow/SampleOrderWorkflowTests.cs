@@ -1,6 +1,4 @@
-﻿using DreamTravel.Flows.SampleOrderWorkflow;
-using FluentAssertions;
-using SolTechnology.Core.CQRS;
+﻿﻿using FluentAssertions;
 using SolTechnology.Core.Story.Api;
 using SolTechnology.Core.Story.Models;
 
@@ -22,6 +20,11 @@ public class SampleOrderWorkflowTests
     [Test]
     public async Task HappyPath()
     {
+        // Post-pivot wire shape: Story endpoints (StoryController returns Result<StoryInstanceDto>
+        // internally) are unwrapped by Core.Api's global ResultConversionFilter into raw DTOs on
+        // the wire. Failure responses arrive as application/problem+json with non-2xx status,
+        // surfaced by RestEase/PostAsync<T> as deserialization errors / non-success status codes.
+
         // Given: Initiate story request
         var createStoryResponse = await _apiClient
             .CreateRequest("/api/dreamtravel/story/SampleOrderWorkflowStory/start")
@@ -31,29 +34,26 @@ public class SampleOrderWorkflowTests
                 OrderId = "2137",
                 Quantity = 17
             })
-            .PostAsync<Result<StoryInstanceDto>>();
+            .PostAsync<StoryInstanceDto>();
 
         // Then: Story is created and paused at interactive chapter
         createStoryResponse.Should().NotBeNull();
-        createStoryResponse.IsSuccess.Should().BeTrue();
-        createStoryResponse.Data.Should().NotBeNull();
-        createStoryResponse.Data!.Status.Should().Be(StoryStatus.WaitingForInput);
-        createStoryResponse.Data.CurrentChapter.Should().NotBeNull();
-        createStoryResponse.Data.CurrentChapter!.Status.Should().Be(StoryStatus.WaitingForInput);
+        createStoryResponse.Status.Should().Be(StoryStatus.WaitingForInput);
+        createStoryResponse.CurrentChapter.Should().NotBeNull();
+        createStoryResponse.CurrentChapter!.Status.Should().Be(StoryStatus.WaitingForInput);
 
-        var storyId = createStoryResponse.Data.StoryId;
+        var storyId = createStoryResponse.StoryId;
         storyId.Should().NotBeNullOrEmpty();
 
         // When: Calling resume without user input
         var resumeWithoutInput = await _apiClient
             .CreateRequest($"/api/dreamtravel/story/{storyId}")
             .WithHeader("X-API-KEY", "<SECRET>")
-            .PostAsync<Result<StoryInstanceDto>>();
+            .PostAsync<StoryInstanceDto>();
 
         // Then: Story remains paused (no input provided for interactive chapter)
         resumeWithoutInput.Should().NotBeNull();
-        resumeWithoutInput.Data.Should().NotBeNull();
-        resumeWithoutInput.Data!.Status.Should().Be(StoryStatus.WaitingForInput);
+        resumeWithoutInput.Status.Should().Be(StoryStatus.WaitingForInput);
 
         // When: Calling resume with valid user input
         var resumeWithInput = await _apiClient
@@ -64,38 +64,32 @@ public class SampleOrderWorkflowTests
                 Name = "Adus",
                 Address = "yes"
             })
-            .PostAsync<Result<StoryInstanceDto>>();
+            .PostAsync<StoryInstanceDto>();
 
         // Then: Story completes successfully
         resumeWithInput.Should().NotBeNull();
-        resumeWithInput.IsSuccess.Should().BeTrue();
-        resumeWithInput.Data.Should().NotBeNull();
-        resumeWithInput.Data!.Status.Should().Be(StoryStatus.Completed);
-        resumeWithInput.Data.History.Should().HaveCountGreaterThan(0);
+        resumeWithInput.Status.Should().Be(StoryStatus.Completed);
+        resumeWithInput.History.Should().HaveCountGreaterThan(0);
 
         // When: Getting story state
         var storyState = await _apiClient
             .CreateRequest($"/api/dreamtravel/story/{storyId}")
             .WithHeader("X-API-KEY", "<SECRET>")
-            .GetAsync<Result<StoryInstanceDto>>();
+            .GetAsync<StoryInstanceDto>();
 
         // Then: Story state shows completion
         storyState.Should().NotBeNull();
-        storyState.IsSuccess.Should().BeTrue();
-        storyState.Data.Should().NotBeNull();
-        storyState.Data!.Status.Should().Be(StoryStatus.Completed);
-        storyState.Data.StoryId.Should().Be(storyId);
+        storyState.Status.Should().Be(StoryStatus.Completed);
+        storyState.StoryId.Should().Be(storyId);
 
         // When: Getting story result
         var storyResult = await _apiClient
             .CreateRequest($"/api/dreamtravel/story/{storyId}/result")
             .WithHeader("X-API-KEY", "<SECRET>")
-            .GetAsync<Result<StoryInstanceDto>>();
+            .GetAsync<StoryInstanceDto>();
 
         // Then: Result is available
         storyResult.Should().NotBeNull();
-        storyResult.IsSuccess.Should().BeTrue();
-        storyResult.Data.Should().NotBeNull();
-        storyResult.Data!.Status.Should().Be(StoryStatus.Completed);
+        storyResult.Status.Should().Be(StoryStatus.Completed);
     }
 }

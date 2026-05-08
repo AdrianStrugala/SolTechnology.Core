@@ -118,10 +118,19 @@ public class Program
         var authenticationConfiguration = builder.Configuration.GetRequiredSection("Authentication").Get<AuthenticationConfiguration>()!;
         var authFilter = builder.Services.AddAuthenticationAndBuildFilter(authenticationConfiguration);
 
-        // API Versioning
-        builder.Services.AddVersioning(apiTitle: "DreamTravel API");
+        // SolTechnology.Core.Api one-liner — wires:
+        //   - Header-based API versioning (X-API-VERSION) + per-version Swagger docs
+        //   - ExceptionFilter (mapped exceptions → RFC 7807 ProblemDetails; unmapped → LogCritical+rethrow)
+        //   - ResultConversionFilter (Result<T> → unwrapped DTO / ProblemDetails by Error subtype)
+        //   - IExceptionStatusCodeMapper (default mapping; replaceable)
+        //   - Microsoft AddProblemDetails() for non-MVC paths
+        //   - Core.Logging's ICorrelationIdService (used as ProblemDetails.Extensions["correlationId"])
+        builder.Services.AddApiCore(
+            o => o.IncludeExceptionDetails = builder.Environment.IsDevelopment(),
+            apiTitle: "DreamTravel API",
+            defaultMajorVersion: 2);
 
-        //SWAGGER
+        //SWAGGER — security definitions (project-specific)
         builder.Services.AddSwaggerGen(c =>
         {
             c.AddSecurityDefinition(ApiKeyAuthenticationSchemeOptions.AuthenticationScheme, new OpenApiSecurityScheme
@@ -149,14 +158,10 @@ public class Program
 
         builder.Services.AddFluentValidationRulesToSwagger();
 
-        builder.Services.AddScoped<ExceptionFilter>();
-        builder.Services.AddScoped<ResponseEnvelopeFilter>();
-
         builder.Services.AddControllers(opts =>
         {
             opts.Filters.Add(authFilter);
-            opts.Filters.Add<ExceptionFilter>();
-            opts.Filters.Add<ResponseEnvelopeFilter>();
+            opts.AddApiCoreFilters();
         });
 
         var app = builder.Build();
@@ -164,19 +169,9 @@ public class Program
         app.MapDefaultEndpoints();
 
         app.UseDeveloperExceptionPage();
-        app.UseSwagger();
 
-        var apiVersionDescriptionProvider = app.Services.GetRequiredService<IApiVersionDescriptionProvider>();
-        app.UseSwaggerUI(c =>
-        {
-            foreach (var description in apiVersionDescriptionProvider.ApiVersionDescriptions.Reverse())
-            {
-                c.SwaggerEndpoint(
-                    $"/swagger/{description.GroupName}/swagger.json",
-                    $"DreamTravel API {description.GroupName.ToUpperInvariant()}" +
-                    $"{(description.IsDeprecated ? " (Deprecated)" : "")}");
-            }
-        });
+        // SolTechnology.Core.Api: per-version Swagger UI (newest first, deprecation badges).
+        app.UseSwaggerWithVersioning("DreamTravel API");
 
         app.UseCors(CorsPolicy);
         app.UseHttpsRedirection();

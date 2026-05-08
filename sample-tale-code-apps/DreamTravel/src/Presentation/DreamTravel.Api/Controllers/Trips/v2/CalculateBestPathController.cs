@@ -1,4 +1,4 @@
-﻿using System.Net;
+﻿﻿using System.Net;
 using System.Net.Mime;
 using Asp.Versioning;
 using DreamTravel.Queries.CalculateBestPath;
@@ -42,12 +42,14 @@ namespace DreamTravel.Api.Controllers.Trips
         }
 
         /// <summary>
-        /// V2 - Zwraca pełny Result wrapper
+        /// V2 - Returns the raw CalculateBestPathResult (post-pivot wire shape: success → DTO,
+        /// failure → application/problem+json from the global ResultConversionFilter).
         /// </summary>
         [HttpPost]
         [MapToApiVersion("2.0")]
         [Produces(MediaTypeNames.Application.Json)]
-        [ProducesResponseType(typeof(Result<CalculateBestPathResult>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(CalculateBestPathResult), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(ProblemDetails), (int)HttpStatusCode.BadRequest)]
         public async Task<IActionResult> CalculateBestPathV2([FromBody] CalculateBestPathQuery query)
         {
             logger.LogInformation("TSP Engine V2: Fire!");

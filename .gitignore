@@ -356,3 +356,9 @@ nul
 
 # Blazor WebAssembly development settings with secrets
 **/wwwroot/appsettings.Development.json
+
+# Verify (Verify.NUnit / Verify.Xunit) — only *.verified.* files belong in source control;
+# *.received.* are local diff artifacts produced when a snapshot test fails, to be reviewed
+# by the developer (e.g. via the Verify Rider/VS plugin) and merged into *.verified.*.
+*.received.*
+

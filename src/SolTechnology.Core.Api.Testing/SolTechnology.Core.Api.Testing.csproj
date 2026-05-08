@@ -1,0 +1,32 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<Version>0.6.0</Version>
+		<Description>Integration testing fixtures for SolTechnology.Core.Api consumers — wraps Microsoft.AspNetCore.Mvc.Testing and TestHost into a small APIFixture&lt;TEntryPoint&gt; helper. Reference this from your test projects only; not needed at runtime in production assemblies.</Description>
+		<PackageTags>sol technology core api testing aspnetcore integration-tests testserver mvc-testing webapplicationfactory</PackageTags>
+		<Product>SolTechnology.Core.Api.Testing</Product>
+		<PackageId>SolTechnology.Core.Api.Testing</PackageId>
+		<AssemblyName>SolTechnology.Core.Api.Testing</AssemblyName>
+
+		<PackageIcon>docs\mini-logo.png</PackageIcon>
+		<PackageReadmeFile>docs\readme.md</PackageReadmeFile>
+		<RepositoryUrl>https://github.com/AdrianStrugala/SolTechnology.Core</RepositoryUrl>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<None Include="..\..\docs\mini-logo.png" Pack="true" Visible="false" PackagePath="docs\mini-logo.png" />
+		<None Include="..\..\docs\Api.md" Pack="true" Visible="false" PackagePath="docs\readme.md" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<!-- Mvc.Testing pulls TestHost transitively, but we keep TestHost explicit because
+		     APIFixture exposes its TestServer property publicly. Both packages live here
+		     (not in SolTechnology.Core.Api) so that consumers shipping to production don't
+		     drag a TestHost into their runtime closure. -->
+		<PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="10.0.0" />
+		<PackageReference Include="Microsoft.AspNetCore.TestHost" Version="10.0.0" />
+	</ItemGroup>
+
+</Project>
+
+
