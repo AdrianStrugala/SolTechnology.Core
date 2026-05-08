@@ -1,4 +1,4 @@
-﻿﻿using System.Diagnostics;
+﻿﻿﻿using System.Diagnostics;
 using DreamTravel.Domain.Cities;
 using DreamTravel.GeolocationDataClients.GoogleApi;
 using DreamTravel.Sql;
@@ -7,9 +7,7 @@ using DreamTravel.FunctionalTests.FakeApis;
 using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using SolTechnology.Core.CQRS;
 using SolTechnology.Core.Faker;
-using Path = DreamTravel.Domain.Paths.Path;
 
 namespace DreamTravel.FunctionalTests.Trips;
 
@@ -51,10 +49,9 @@ public class FindCityAndSaveDetailsTest
             .WithHeader("X-API-KEY", "<SECRET>")
             .WithHeader("X-API-VERSION", "2.0")
             .WithBody(new { city.Name })
-            .PostAsync<Result<City>>();
+            .PostAsync<City>();
 
-        apiResponse.IsSuccess.Should().BeTrue();
-        apiResponse.Data.Should().BeEquivalentTo(city);
+        apiResponse.Should().BeEquivalentTo(city);
 
 
         // "Then background job is triggered, city details fetched and stored".x(() =>

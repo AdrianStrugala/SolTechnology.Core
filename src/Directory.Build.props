@@ -9,8 +9,18 @@
             This is NOT a CVE finding — real vulnerability warnings are NU1901-NU1904 and
             stay as errors. We demote NU1900 so transient feed connectivity does not break
             the build for developers behind restricted networks.
+
+            NU1510 = "PackageReference X will not be pruned" — emitted when a project
+            consumes the ASP.NET Core shared framework (transitively, e.g. via a reference
+            to SolTechnology.Core.Logging) and a Microsoft.Extensions.* PackageReference is
+            redundant. Each shared-framework-aware project (Logging, Story, …) suppresses
+            it locally with `<PackageReference Remove="…" />`, but the warning still echoes
+            into pure-NuGet consumers (e.g. CQRS) where the suppression cannot apply
+            without making them also depend on the shared framework. We keep the message
+            visible (so we can still spot real misconfiguration) but stop it from failing
+            the build.
         -->
-        <WarningsNotAsErrors>$(WarningsNotAsErrors);NU1900</WarningsNotAsErrors>
+        <WarningsNotAsErrors>$(WarningsNotAsErrors);NU1900;NU1510</WarningsNotAsErrors>
         <Authors>Adrian Strugala</Authors>
         <RepositoryUrl>https://github.com/AdrianStrugala/SolTechnology.Core</RepositoryUrl>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>

@@ -1,10 +1,9 @@
-﻿﻿using DreamTravel.Domain.Cities;
+﻿﻿﻿using DreamTravel.Domain.Cities;
 using DreamTravel.FunctionalTests.FakeApis;
 using DreamTravel.GeolocationDataClients.GoogleApi;
 using FluentAssertions;
 using SolTechnology.Core.Faker;
 using DreamTravel.Queries.CalculateBestPath;
-using SolTechnology.Core.CQRS;
 
 namespace DreamTravel.FunctionalTests.Trips
 {
@@ -59,10 +58,9 @@ namespace DreamTravel.FunctionalTests.Trips
                     .WithHeader("X-API-KEY", "<SECRET>")
                     .WithHeader("X-API-VERSION", "2.0")
                     .WithBody(new { city.Name })
-                    .PostAsync<Result<City>>();
+                    .PostAsync<City>();
 
-                findCityByNameResponse.IsSuccess.Should().BeTrue();
-                findCityByNameResponse.Data.Should().BeEquivalentTo(city);
+                findCityByNameResponse.Should().BeEquivalentTo(city);
             }
 
             // "And when user searches for the best path".x(async () =>
@@ -71,13 +69,10 @@ namespace DreamTravel.FunctionalTests.Trips
                 .WithHeader("X-API-KEY", "<SECRET>")
                 .WithHeader("X-API-VERSION", "2.0")
                 .WithBody(new { Cities = cities })
-                .PostAsync<Result<CalculateBestPathResult>>();
-            if (!apiResponse.IsSuccess)
-            {
-                TestContext.Out.WriteLine($"CalculateBestPath FAILED: {Newtonsoft.Json.JsonConvert.SerializeObject(apiResponse.Error)}");
-            }
-            apiResponse.IsSuccess.Should().BeTrue();
-            var paths = apiResponse.Data.BestPaths;
+                .PostAsync<CalculateBestPathResult>();
+
+            apiResponse.Should().NotBeNull();
+            var paths = apiResponse.BestPaths;
 
             // "Then returned path is optimal".x(() =>
             paths[0].StartingCity.Name.Should().Be("Wroclaw");
