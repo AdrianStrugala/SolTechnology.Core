@@ -1,6 +1,7 @@
 using Asp.Versioning;
 using Asp.Versioning.ApiExplorer;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
@@ -8,6 +9,7 @@ using Microsoft.OpenApi.Models;
 using SolTechnology.Core.API.Exceptions;
 using SolTechnology.Core.API.Filters;
 using SolTechnology.Core.Logging;
+using SolTechnology.Core.Logging.Correlations;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using Swashbuckle.AspNetCore.SwaggerUI;
 
@@ -92,7 +94,62 @@ public static class ModuleInstaller
         // Idempotent. TryAddSingleton inside Core.Logging guards against double-registration,
         // and the framework's AddProblemDetails is also self-guarded.
         services.AddCoreLogging();
-        services.AddProblemDetails();
+
+        // CustomizeProblemDetails fires for every ProblemDetails the framework produces outside
+        // the MVC pipeline — routing 404, UseStatusCodePages, UseExceptionHandler, auth challenges.
+        // Without this hook those bodies would be missing extensions["correlationId"], giving
+        // the same API two different ProblemDetails shapes depending on which pipeline emitted
+        // them. We echo the same id that ExceptionFilter / ResultConversionFilter / X-Correlation-Id
+        // header carry — single token for the client, single lookup in Seq / App Insights.
+        services.AddProblemDetails(opts =>
+        {
+            opts.CustomizeProblemDetails = ctx =>
+            {
+                if (ctx.ProblemDetails.Extensions.ContainsKey(ApiProblemDetailsFactory.CorrelationIdKey))
+                {
+                    return;
+                }
+
+                var correlationIdService = ctx.HttpContext.RequestServices
+                    .GetService<ICorrelationIdService>();
+                if (correlationIdService is null)
+                {
+                    return;
+                }
+
+                ctx.ProblemDetails.Extensions[ApiProblemDetailsFactory.CorrelationIdKey] =
+                    correlationIdService.GetOrGenerate().Value;
+            };
+        });
+
+        // [ApiController] auto-builds a 400 ValidationProblemDetails for model-binding /
+        // [DataAnnotations] failures via ApiBehaviorOptions.InvalidModelStateResponseFactory,
+        // BEFORE the request reaches MVC filters. Without this hook the body would be missing
+        // extensions["correlationId"] — clients hitting a bind failure on /api/trip/{id:int}
+        // would have no token to quote in a support ticket. We wrap the default factory so the
+        // per-field errors dictionary stays intact and only enrich the body with correlationId.
+        services.PostConfigure<ApiBehaviorOptions>(opts =>
+        {
+            var defaultFactory = opts.InvalidModelStateResponseFactory;
+            opts.InvalidModelStateResponseFactory = actionContext =>
+            {
+                var response = defaultFactory(actionContext);
+
+                if (response is ObjectResult { Value: ProblemDetails problem } &&
+                    !problem.Extensions.ContainsKey(ApiProblemDetailsFactory.CorrelationIdKey))
+                {
+                    var correlationIdService = actionContext.HttpContext.RequestServices
+                        .GetService<ICorrelationIdService>();
+                    if (correlationIdService is not null)
+                    {
+                        problem.Extensions[ApiProblemDetailsFactory.CorrelationIdKey] =
+                            correlationIdService.GetOrGenerate().Value;
+                    }
+                }
+
+                return response;
+            };
+        });
 
         // TryAdd → consumer's earlier registration of a custom IExceptionStatusCodeMapper wins.
         // Lifetime: singleton, the mapper is stateless and thread-safe.
