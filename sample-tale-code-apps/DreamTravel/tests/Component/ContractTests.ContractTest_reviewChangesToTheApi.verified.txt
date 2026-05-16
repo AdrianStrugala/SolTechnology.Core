@@ -32,7 +32,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/CalculateBestPathResultResult'
+                $ref: '#/components/schemas/CalculateBestPathResult'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
   '/api/dreamtravel/story/{handlerTypeName}/start':
     post:
       tags:
@@ -157,13 +163,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/CityResult'
+                $ref: '#/components/schemas/City'
         '400':
           description: Bad Request
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Result'
+                $ref: '#/components/schemas/ProblemDetails'
   /api/FindCityByName:
     post:
       tags:
@@ -185,13 +191,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/CityResult'
+                $ref: '#/components/schemas/City'
         '400':
           description: Bad Request
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Result'
+                $ref: '#/components/schemas/ProblemDetails'
   /api/FindLocationOfCity:
     post:
       tags:
@@ -343,13 +349,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/GetSearchStatisticsResultResult'
+                $ref: '#/components/schemas/GetSearchStatisticsResult'
         '400':
           description: Bad Request
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Result'
+                $ref: '#/components/schemas/ProblemDetails'
   /api/Traffic/recalculate:
     post:
       tags:
@@ -409,16 +415,6 @@ components:
             $ref: '#/components/schemas/City'
           nullable: true
       additionalProperties: false
-    CalculateBestPathResultResult:
-      type: object
-      properties:
-        isSuccess:
-          type: boolean
-        error:
-          $ref: '#/components/schemas/Error'
-        data:
-          $ref: '#/components/schemas/CalculateBestPathResult'
-      additionalProperties: false
     City:
       type: object
       properties:
@@ -464,16 +460,6 @@ components:
         statistics:
           $ref: '#/components/schemas/StatisticsOptions'
       additionalProperties: false
-    CityResult:
-      type: object
-      properties:
-        isSuccess:
-          type: boolean
-        error:
-          $ref: '#/components/schemas/Error'
-        data:
-          $ref: '#/components/schemas/City'
-      additionalProperties: false
     CitySearchStatistics:
       type: object
       properties:
@@ -507,6 +493,9 @@ components:
           nullable: true
         recoverable:
           type: boolean
+        correlationId:
+          type: string
+          nullable: true
       additionalProperties: false
     FindCityByCoordinatesQuery:
       type: object
@@ -539,16 +528,6 @@ components:
           items:
             $ref: '#/components/schemas/CountryStatistics'
           nullable: true
-      additionalProperties: false
-    GetSearchStatisticsResultResult:
-      type: object
-      properties:
-        isSuccess:
-          type: boolean
-        error:
-          $ref: '#/components/schemas/Error'
-        data:
-          $ref: '#/components/schemas/GetSearchStatisticsResult'
       additionalProperties: false
     Intersection:
       type: object
@@ -608,6 +587,26 @@ components:
           type: number
           format: double
       additionalProperties: false
+    ProblemDetails:
+      type: object
+      properties:
+        type:
+          type: string
+          nullable: true
+        title:
+          type: string
+          nullable: true
+        status:
+          type: integer
+          format: int32
+          nullable: true
+        detail:
+          type: string
+          nullable: true
+        instance:
+          type: string
+          nullable: true
+      additionalProperties: { }
     RecalculateTrafficCommand:
       type: object
       properties:
@@ -626,14 +625,6 @@ components:
           items:
             $ref: '#/components/schemas/Intersection'
           nullable: true
-      additionalProperties: false
-    Result:
-      type: object
-      properties:
-        isSuccess:
-          type: boolean
-        error:
-          $ref: '#/components/schemas/Error'
       additionalProperties: false
     StatisticsOptions:
       type: object
