@@ -18,6 +18,7 @@ Application Insights dependency required; works seamlessly with both.
 | Correlation id (W3C `traceparent` + `X-Correlation-Id`) | `ICorrelationIdService`, `CorrelationId` |
 | Request envelope logs (start / finish, status-aware levels) | `LoggingMiddleware` (auto-wired by `UseCoreLogging`) |
 | Declarative scope enrichment from header / url / body | `services.LogDetail(...)` |
+| Request-headers scope (PII-safe, opt-in)              | `LoggingOptions.LogRequestHeaders` + `MaskedHeaders` |
 | Custom enrichers | `services.AddLogScopeEnricher<T>()`, `ILogScopeEnricher` |
 | Operation lifecycle events (allocation-free) | `ILogger.OperationStarted/Succeeded/Failed` |
 | OpenTelemetry tracing | `CoreLoggingActivitySources.OperationsName` |
@@ -64,7 +65,9 @@ authentication — gets a correlation id and a request-envelope log entry.
   "Logging:Core": {
     "MaxLoggedJsonBodyBytes": 65536,
     "LogClientCorrelationParseErrors": true,
-    "SkipPaths": [ "/health", "/alive", "/metrics", "/swagger" ]
+    "LogRequestHeaders": false,
+    "SkipPaths": [ "/health", "/alive", "/metrics", "/swagger" ],
+    "MaskedHeaders": [ "Authorization", "Cookie", "X-Api-Key" ]
   }
 }
 ```
@@ -74,7 +77,46 @@ builder.Services.AddCoreLogging(builder.Configuration);
 ```
 
 `SkipPaths` silences request-envelope logs for liveness / readiness / metrics
-scrapes — correlation is still propagated, only the noise is gone.
+scrapes — correlation is still propagated, only the noise is gone. A curated
+starter list is available as `LoggingDefaults.InfrastructurePaths`:
+
+```csharp
+builder.Services.AddCoreLogging(o =>
+{
+    o.SkipPaths = LoggingDefaults.InfrastructurePaths.ToList();
+});
+```
+
+---
+
+## Logging request headers (with PII masking)
+
+Opt in to dump every inbound HTTP header into the per-request log scope under
+the property name `RequestHeaders`. Sensitive values are masked **before**
+they reach any sink:
+
+```csharp
+builder.Services.AddCoreLogging(o =>
+{
+    o.LogRequestHeaders = true;
+    // Defaults to LoggingDefaults.SensitiveHeaders
+    // (Authorization, Cookie, X-Api-Key, X-Auth-Token, X-Csrf-Token, …).
+    // Replace or extend for app-specific headers:
+    o.MaskedHeaders = LoggingDefaults.SensitiveHeaders
+        .Concat(new[] { "X-Internal-Token" })
+        .ToList();
+});
+```
+
+Masking rules:
+
+- Header name listed in `MaskedHeaders` → value replaced with `***MASKED***`
+  (case-insensitive match).
+- Any value starting with `Bearer ` is masked regardless of header name —
+  catches tokens forwarded via custom proxies (e.g. `X-Forwarded-Authorization`).
+
+When `LogRequestHeaders = false` (the default) the enricher pays zero cost —
+it short-circuits in O(1) without iterating headers.
 
 ---
 

@@ -32,6 +32,59 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 > [`docs/ClaudeCodingGuide.md` §18](docs/ClaudeCodingGuide.md). Silent retention is
 > forbidden: if a lesson is worth remembering, write it down now.
 
+## Agents & Skills
+
+This repo ships a small skill library at [`.github/skills/`](.github/skills/) for AI agents (Claude
+Code, Copilot, etc.). The conventions below are the canonical agent doctrine for this repo —
+there is no separate `AGENTS.md`.
+
+### Key Principles
+
+All agents working in this repo follow these:
+
+- **Evidence-based.** Never assume or guess — cite file paths and line numbers.
+- **Risk-averse.** Think holistically about negative impact on NuGet consumers, not just the local diff.
+- **Systematic.** Follow the skill's documented process; do not improvise the steps.
+- **Factual reporting.** Report what is being changed; let the reader judge whether it is correct.
+- **Documentation-first.** Search [`docs/`](docs/) — especially
+  [`docs/ClaudeCodingGuide.md`](docs/ClaudeCodingGuide.md), [`docs/adr/`](docs/adr/), and
+  [`docs/reviews/`](docs/reviews/) — before analysing code.
+
+### Quality Standards
+
+- Include specific file paths and line numbers in every finding.
+- Markdown links use angle brackets when the path contains spaces: `[Text](<path/file.md>)`.
+- Verify every link resolves on disk before printing it.
+- Mermaid node labels with spaces use `<br>` line breaks: `Node[Name<br>With<br>Spaces]`.
+- No issue-tracker IDs (Jira, etc.) unless the user supplies them.
+
+### Mandatory Skill Read
+
+Before using any skill, **`read_file` its `SKILL.md`**. Skills are not pre-loaded — their
+instructions live only inside the file. Never infer what a skill does from its name. If you have
+not opened the SKILL.md in this session, you have not read the skill and must not proceed.
+
+### Skill Index
+
+See [`.github/skills/README.md`](.github/skills/README.md) for the workflow diagram. Quick map:
+
+| Skill | Path | Trigger |
+|---|---|---|
+| premortem | [`.github/skills/premortem/SKILL.md`](.github/skills/premortem/SKILL.md) | **Mandatory** before merging changes to public NuGet API, `ModuleInstaller.cs`, persisted contracts, or `Directory.Build.props`. |
+| blue-red-team | [`.github/skills/blue-red-team/SKILL.md`](.github/skills/blue-red-team/SKILL.md) | Design-level decision / ADR seeding. |
+| code-review | [`.github/skills/code-review/SKILL.md`](.github/skills/code-review/SKILL.md) | Reviewing a diff against the Coding Guide and module review templates. |
+| commit-message | [`.github/skills/commit-message/SKILL.md`](.github/skills/commit-message/SKILL.md) | Producing a Conventional Commits message with semver footer. |
+| documentation-cleanup | [`.github/skills/documentation-cleanup/SKILL.md`](.github/skills/documentation-cleanup/SKILL.md) | Validating docs integrity (module/doc parity, indexes, Mermaid, ADRs). |
+| implementation-planning | [`.github/skills/implementation-planning/SKILL.md`](.github/skills/implementation-planning/SKILL.md) | Planning a multi-module or breaking change; produces ADR draft. |
+
+### Premortem Gate
+
+**Before merging** any change that touches a public/protected symbol in `src/SolTechnology.Core.*`,
+a `ModuleInstaller.cs`, `Directory.Build.props`, or a persisted contract: run the
+[premortem](.github/skills/premortem/SKILL.md) skill and attach its output to the PR. Implementation
+is blocked until the premortem decision is *Go* or *Go with mitigations* and every required
+mitigation is in place. See [ADR-004](docs/adr/004-ai-agents-and-skills.md) for rationale.
+
 ## Repository Overview
 
 SolTechnology.Core is a collection of NuGet packages that provide a foundation for building CQRS-driven applications using Azure technologies. The repository follows the "Tale Code" philosophy - making code readable like well-written prose. It includes both the core libraries (in `src/`) and a sample application called DreamTravel (in `sample-tale-code-apps/DreamTravel/`).

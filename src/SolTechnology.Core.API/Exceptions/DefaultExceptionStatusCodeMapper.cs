@@ -1,5 +1,6 @@
 using FluentValidation;
 using Microsoft.AspNetCore.Http;
+using System.Net;
 
 namespace SolTechnology.Core.API.Exceptions;
 
@@ -55,6 +56,25 @@ public class DefaultExceptionStatusCodeMapper : IExceptionStatusCodeMapper
             // required to fulfill the request" (RFC 9110 §15.6.2).
             case NotImplementedException:
                 statusCode = StatusCodes.Status501NotImplemented;
+                return true;
+
+            // Outbound HTTP call to an upstream dependency failed. From OUR API's perspective
+            // this is a gateway problem, not an internal-server bug — we are functioning, the
+            // dependency isn't. RFC 9110 §15.6.3 (502) and §15.6.5 (504) cover exactly this.
+            //
+            // Catches HttpRequestFailedException from SolTechnology.Core.HTTP plus the plain
+            // HttpRequestException raised by any client library (Refit, Flurl, raw HttpClient,
+            // EnsureSuccessStatusCode) — Core.Api therefore stays free of a dependency on
+            // Core.HTTP and the integration works for every HTTP stack the consumer might
+            // pick. The body of the upstream response is NOT propagated to our client: callers
+            // that need it can downcast to HttpRequestFailedException and read ResponseBody.
+            case HttpRequestException httpException:
+                statusCode = httpException.StatusCode switch
+                {
+                    HttpStatusCode.RequestTimeout or HttpStatusCode.GatewayTimeout
+                        => StatusCodes.Status504GatewayTimeout,
+                    _ => StatusCodes.Status502BadGateway
+                };
                 return true;
 
             default:

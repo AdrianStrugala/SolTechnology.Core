@@ -67,8 +67,9 @@ public class ModuleInstallerTests
         var sp = services.BuildServiceProvider();
         var enrichers = sp.GetServices<ILogScopeEnricher>().ToArray();
 
-        // Two LogDetail calls but a single aggregating enricher.
-        enrichers.Should().HaveCount(1);
+        // Two LogDetail calls but a single aggregating LogDetail enricher,
+        // plus the always-on RequestHeadersEnricher registered by AddCoreLogging.
+        enrichers.Should().HaveCount(2);
     }
 
     private sealed class DummyEnricher : ILogScopeEnricher
@@ -87,7 +88,8 @@ public class ModuleInstallerTests
         var sp = services.BuildServiceProvider();
         var enrichers = sp.GetServices<ILogScopeEnricher>().ToArray();
 
-        enrichers.Should().HaveCount(2);
+        // RequestHeadersEnricher (built-in) + LogDetailEnricher + DummyEnricher (user).
+        enrichers.Should().HaveCount(3);
         enrichers.Should().ContainSingle(e => e is DummyEnricher);
     }
 }

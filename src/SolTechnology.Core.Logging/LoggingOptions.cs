@@ -34,9 +34,28 @@ public sealed class LoggingOptions
     /// the <c>Started</c> / <c>Finished</c> request log entries and will not run enrichers.
     /// Correlation id propagation still happens. Use to silence health-check / liveness /
     /// metrics scrape noise (<c>/health</c>, <c>/metrics</c>, <c>/swagger</c>, ...).
-    /// Defaults to an empty list.
+    /// Defaults to an empty list — see <see cref="LoggingDefaults.InfrastructurePaths"/>
+    /// for an opinionated starter set.
     /// </summary>
     public IList<string> SkipPaths { get; set; } = new List<string>();
+
+    /// <summary>
+    /// When <c>true</c>, the built-in request-headers enricher folds every inbound HTTP
+    /// header into the per-request log scope under key <c>RequestHeaders</c>.
+    /// Values for headers listed in <see cref="MaskedHeaders"/> (case-insensitive) are
+    /// replaced with <see cref="LoggingDefaults.MaskedValue"/>, and any value starting
+    /// with <c>Bearer </c> is also masked regardless of header name.
+    /// Defaults to <c>false</c> — opt in deliberately because headers may carry PII.
+    /// </summary>
+    public bool LogRequestHeaders { get; set; }
+
+    /// <summary>
+    /// Header names whose values are replaced with <see cref="LoggingDefaults.MaskedValue"/>
+    /// when <see cref="LogRequestHeaders"/> is enabled. Defaults to
+    /// <see cref="LoggingDefaults.SensitiveHeaders"/> (Authorization, Cookie, X-Api-Key, …).
+    /// Replace or extend to add app-specific sensitive headers.
+    /// </summary>
+    public IList<string> MaskedHeaders { get; set; } = LoggingDefaults.SensitiveHeaders.ToList();
 }
 
 
