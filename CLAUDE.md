@@ -35,7 +35,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## Agents & Skills
 
 This repo ships a small skill library at [`.github/skills/`](.github/skills/) for AI agents (Claude
-Code, Copilot, etc.). The conventions below merge the aiex `AGENTS.md` doctrine into this file —
+Code, Copilot, etc.). The conventions below are the canonical agent doctrine for this repo —
 there is no separate `AGENTS.md`.
 
 ### Key Principles

@@ -20,23 +20,22 @@ change, but they had no codified, repo-specific procedure for:
 3. Reviewing diffs against the Coding Guide and module reviews.
 4. Keeping the docs tree (`docs/`, ADRs, READMEs) internally consistent.
 
-A related effort, **aiex**, packages a "Copilot Change Manager" workflow with a set of skills under
-`.github/skills/<name>/SKILL.md` and a shared `AGENTS.md`. aiex is built for an Open Banking
-operations domain (Mastercard adapters, EUEC work items, Risk Matrix, legislation) — most of which
-is irrelevant here — but its **mechanism** (front-matter SKILL.md files, evidence-based doctrine,
-mandatory read-before-use) maps cleanly onto this repo.
+Prior art exists for packaging a "Copilot Change Manager" workflow as a set of skills under
+`.github/skills/<name>/SKILL.md` files. Its **mechanism** (front-matter SKILL.md files,
+evidence-based doctrine, mandatory read-before-use) maps cleanly onto this repo, even though the
+upstream domain and skill catalogue are not directly relevant here.
 
 ## Decision
 
-Adopt the aiex skills mechanism in SolTechnology.Core, with three concrete decisions:
+Adopt the SKILL.md / `.github/skills/` mechanism in SolTechnology.Core, with three concrete decisions:
 
 1. **Merge agent doctrine into [`CLAUDE.md`](../../CLAUDE.md).** No separate `AGENTS.md`. The
    "Agents & Skills" section in `CLAUDE.md` is the single source of truth for principles, quality
    standards, the mandatory-read rule, the skill index, and the premortem gate.
 
-2. **Maintain a refactored copy of aiex skills under [`.github/skills/`](../../.github/skills/).**
-   We do not git-submodule aiex; we copy and adapt. Adaptations strip the banking domain and
-   re-target the workflow at a NuGet-package codebase.
+2. **Maintain a refactored, repo-local copy of the skills under [`.github/skills/`](../../.github/skills/).**
+   No git-submodule on the upstream skill set; we copy and adapt. Adaptations re-target the
+   workflow at a NuGet-package codebase.
 
 3. **Make `premortem` the central risk gate** for the repo. The skill is mandatory before merging
    any change that touches a public/protected symbol in `src/SolTechnology.Core.*`, a
@@ -46,26 +45,16 @@ Adopt the aiex skills mechanism in SolTechnology.Core, with three concrete decis
 
 | Skill | Origin | Adaptation |
 |---|---|---|
-| [premortem](../../.github/skills/premortem/SKILL.md) | aiex `premortem-failure-analysis` | Module-specific failure-mode checklists (CQRS, Story, Logging, HTTP, MessageBus, Sql, Blob, Cache, DI, Build, .NET 10). Output extended with semver classification, blast radius, decision verdict. |
-| [blue-red-team](../../.github/skills/blue-red-team/SKILL.md) | aiex `blue-red-team-analysis` | Tale Code readability lens; explicit pairing with premortem; ADR-seeding focus. |
-| [documentation-cleanup](../../.github/skills/documentation-cleanup/SKILL.md) | aiex `documentation-cleanup` | Re-targeted from `Documentation/` to [`docs/`](../); added module ↔ doc parity check and ADR structural validation; EUEC rule removed. |
+| [premortem](../../.github/skills/premortem/SKILL.md) | adapted from upstream `premortem-failure-analysis` | Module-specific failure-mode checklists (CQRS, Story, Logging, HTTP, MessageBus, Sql, Blob, Cache, DI, Build, .NET 10). Output extended with semver classification, blast radius, decision verdict. |
+| [blue-red-team](../../.github/skills/blue-red-team/SKILL.md) | adapted from upstream `blue-red-team-analysis` | Tale Code readability lens; explicit pairing with premortem; ADR-seeding focus. |
+| [documentation-cleanup](../../.github/skills/documentation-cleanup/SKILL.md) | adapted from upstream `documentation-cleanup` | Re-targeted from `Documentation/` to [`docs/`](../); added module ↔ doc parity check and ADR structural validation; domain-specific rules removed. |
 | [code-review](../../.github/skills/code-review/SKILL.md) | none (new) | Built around [`docs/ClaudeCodingGuide.md`](../ClaudeCodingGuide.md) sections and [`docs/reviews/`](../reviews/) templates. |
 | [commit-message](../../.github/skills/commit-message/SKILL.md) | none (new) | Conventional Commits with module-name scopes; semver footer mandatory for public-API changes. |
-| [implementation-planning](../../.github/skills/implementation-planning/SKILL.md) | aiex `implementation-planning` (concept) | Output is an ADR draft matching [ADR-001..003](.) shape; ends with mandatory premortem gate. |
-
-### Skills Rejected
-
-| aiex skill | Reason |
-|---|---|
-| `agent-output-file-writer` | Generic IO utility; current tooling persists outputs directly via PR review. |
-| `change-scope-selection` | Tied to a multi-repo banking workflow with `vscode/askQuestions`; over-engineered for a single-repo NuGet codebase. |
-| `git-change-analysis` | References Mastercard `Services.md` and EUEC work items; no analogue here. |
-| `human-factors-framework` | Ten-dimension behavioural-science framework citing 12 books; valuable but out of scope for an OSS NuGet repo. |
-| `inverse-dependency-analysis` | Targets a service architecture documented as Mermaid in aiex; SolTechnology.Core has a static module graph already visible in [README.md](../../README.md). |
+| [implementation-planning](../../.github/skills/implementation-planning/SKILL.md) | adapted from upstream `implementation-planning` (concept) | Output is an ADR draft matching [ADR-001..003](.) shape; ends with mandatory premortem gate. |
 
 ## Alternatives Considered
 
-1. **Git submodule aiex.** Rejected: pulls in banking-domain skills, legislation HTML, and a
+1. **Git-submodule the upstream skill set.** Rejected: pulls in unrelated domain skills and a
    `Documentation/` tree we do not want to maintain in this repo.
 2. **Keep `AGENTS.md` separate from `CLAUDE.md`.** Rejected: a second file with overlapping
    doctrine invites drift. `CLAUDE.md` already enforces a self-improvement rule; folding agent
