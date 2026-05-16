@@ -11,6 +11,17 @@ namespace SolTechnology.Core.API.Exceptions;
 ///     public override bool TryMap(Exception exception, out int statusCode)
 ///     {
 ///         if (exception is MyDomainTimeoutException) { statusCode = 504; return true; }
+///
+///         // Per-upstream granularity: surface a specific dependency as 503 instead of
+///         // the default 502, so dashboards can distinguish "Stripe is down" from
+///         // "any upstream is down".
+///         if (exception is HttpRequestException http &amp;&amp;
+///             http.Data.Contains("Upstream") &amp;&amp; (string?)http.Data["Upstream"] == "Stripe")
+///         {
+///             statusCode = 503;
+///             return true;
+///         }
+///
 ///         return base.TryMap(exception, out statusCode);
 ///     }
 /// }

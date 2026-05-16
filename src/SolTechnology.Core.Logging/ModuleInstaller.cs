@@ -29,13 +29,16 @@ public static class LoggingServiceCollectionExtensions
             var optionsBuilder = services.AddOptions<LoggingOptions>()
                 .ValidateDataAnnotations()
                 .Validate(o => o.SkipPaths is null || o.SkipPaths.All(p => !string.IsNullOrWhiteSpace(p)),
-                    "LoggingOptions.SkipPaths must not contain null or whitespace entries.");
+                    "LoggingOptions.SkipPaths must not contain null or whitespace entries.")
+                .Validate(o => o.MaskedHeaders is null || o.MaskedHeaders.All(p => !string.IsNullOrWhiteSpace(p)),
+                    "LoggingOptions.MaskedHeaders must not contain null or whitespace entries.");
 
             if (configure is not null)
             {
                 optionsBuilder.Configure(configure);
             }
 
+            EnsureRequestHeadersEnricherRegistered(services);
             return services;
         }
 
@@ -54,8 +57,11 @@ public static class LoggingServiceCollectionExtensions
                 .Bind(configuration.GetSection(LoggingOptions.SectionName))
                 .ValidateDataAnnotations()
                 .Validate(o => o.SkipPaths is null || o.SkipPaths.All(p => !string.IsNullOrWhiteSpace(p)),
-                    "LoggingOptions.SkipPaths must not contain null or whitespace entries.");
+                    "LoggingOptions.SkipPaths must not contain null or whitespace entries.")
+                .Validate(o => o.MaskedHeaders is null || o.MaskedHeaders.All(p => !string.IsNullOrWhiteSpace(p)),
+                    "LoggingOptions.MaskedHeaders must not contain null or whitespace entries.");
 
+            EnsureRequestHeadersEnricherRegistered(services);
             return services;
         }
 
@@ -106,6 +112,23 @@ public static class LoggingServiceCollectionExtensions
             services.AddSingleton<ILogScopeEnricher, TEnricher>();
             return services;
         }
+
+        /// <summary>
+        /// Registers only the <see cref="ICorrelationIdService"/> — without the request-
+        /// logging middleware or <see cref="LoggingOptions"/> apparatus that
+        /// <c>AddCoreLogging</c> brings.
+        /// <para>
+        /// Intended for non-ASP.NET consumers (workers, background jobs, library packages
+        /// such as <c>SolTechnology.Core.HTTP</c>) that need to read or seed the ambient
+        /// correlation id but don't host an HTTP pipeline. Idempotent — safe to call from
+        /// multiple installers; <c>AddCoreLogging</c> reuses the same registration.
+        /// </para>
+        /// </summary>
+        public IServiceCollection AddCorrelationIdService()
+        {
+            services.TryAddSingleton<ICorrelationIdService, CorrelationIdService>();
+            return services;
+        }
     }
 
     /// <summary>
@@ -124,6 +147,17 @@ public static class LoggingServiceCollectionExtensions
 
         services.AddSingleton<LogDetailEnricher>();
         services.AddSingleton<ILogScopeEnricher>(sp => sp.GetRequiredService<LogDetailEnricher>());
+    }
+
+    private static void EnsureRequestHeadersEnricherRegistered(IServiceCollection services)
+    {
+        if (services.Any(d => d.ImplementationType == typeof(RequestHeadersEnricher)))
+        {
+            return;
+        }
+
+        services.AddSingleton<RequestHeadersEnricher>();
+        services.AddSingleton<ILogScopeEnricher>(sp => sp.GetRequiredService<RequestHeadersEnricher>());
     }
 }
 

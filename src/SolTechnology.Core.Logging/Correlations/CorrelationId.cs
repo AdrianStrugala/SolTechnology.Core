@@ -110,6 +110,29 @@ public sealed record CorrelationId
     public override string ToString() => Value;
 
     /// <summary>
+    /// Renders <see cref="Activity.Current"/> as a W3C <c>traceparent</c> header value
+    /// (<c>00-{trace-id}-{parent-id}-{flags}</c>). Returns <c>null</c> when no Activity
+    /// is in scope or its trace id is uninitialised.
+    /// <para>
+    /// Shared between <see cref="EnrichResponse"/> (inbound side, owned by
+    /// <c>Core.Logging</c>) and the outbound correlation handler in
+    /// <c>SolTechnology.Core.HTTP</c>. Two callers, one implementation — keeps the
+    /// header format from drifting.
+    /// </para>
+    /// </summary>
+    public static string? TryBuildTraceParentFromCurrentActivity()
+    {
+        var activity = Activity.Current;
+        if (activity is null || activity.TraceId == default)
+        {
+            return null;
+        }
+
+        var flags = ((activity.ActivityTraceFlags & ActivityTraceFlags.Recorded) != 0) ? "01" : "00";
+        return $"00-{activity.TraceId.ToHexString()}-{activity.SpanId.ToHexString()}-{flags}";
+    }
+
+    /// <summary>
     /// Renders the current Activity as a W3C <c>traceparent</c> value
     /// (<c>00-{trace-id}-{parent-id}-{flags}</c>). Returns <c>null</c> when no Activity is in scope
     /// or the id was sourced from the legacy <c>X-Correlation-Id</c> header (no real trace context).
@@ -129,7 +152,6 @@ public sealed record CorrelationId
             return null;
         }
 
-        var flags = ((activity.ActivityTraceFlags & ActivityTraceFlags.Recorded) != 0) ? "01" : "00";
-        return $"00-{activity.TraceId.ToHexString()}-{activity.SpanId.ToHexString()}-{flags}";
+        return TryBuildTraceParentFromCurrentActivity();
     }
 }

@@ -44,5 +44,10 @@
 	  <Folder Include="Extensions\" />
 	</ItemGroup>
 
+	<ItemGroup>
+		<InternalsVisibleTo Include="SolTechnology.Core.HTTP.Tests" />
+		<InternalsVisibleTo Include="SolTechnology.Core.Logging.Tests" />
+	</ItemGroup>
+
 </Project>
 

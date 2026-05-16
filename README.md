@@ -99,6 +99,15 @@ Enjoy your reading!
 [2. The Automation](https://github.com/AdrianStrugala/SolTechnology.Core/tree/master/docs/theAutomation.md) \
 [3. The Quality](https://github.com/AdrianStrugala/SolTechnology.Core/tree/master/docs/theQuality.md)
 
+## AI Agents & Skills
+
+The repo ships a small skill library for AI assistants (Claude Code, Copilot) under
+[`.github/skills/`](.github/skills/README.md). The central skill is
+[`premortem`](.github/skills/premortem/SKILL.md) — a mandatory risk gate before merging changes to
+the public NuGet API, `ModuleInstaller`, persisted contracts, or build files. Agent doctrine lives
+in [`CLAUDE.md`](CLAUDE.md#agents--skills); rationale is recorded in
+[ADR-004](docs/adr/004-ai-agents-and-skills.md).
+
 *Some ending words*
 
 

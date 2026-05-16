@@ -1,23 +1,13 @@
 namespace SolTechnology.Core.HTTP.Tests;
 
-interface ISampleHTTPClient
+internal interface ISampleHTTPClient
 {
-    string DownloadSth();
-
-    System.Net.Http.HttpClient HttpClient { get; set; }
+    System.Net.Http.HttpClient HttpClient { get; }
 }
 
-class SampleHTTPClient : ISampleHTTPClient
+internal sealed class SampleHTTPClient : ISampleHTTPClient
 {
-    public System.Net.Http.HttpClient HttpClient { get; set; }
+    public System.Net.Http.HttpClient HttpClient { get; }
 
-    public SampleHTTPClient(System.Net.Http.HttpClient httpClient)
-    {
-        HttpClient = httpClient;
-    }
-    public string DownloadSth()
-    {
-        return "it";
-    }
-
+    public SampleHTTPClient(System.Net.Http.HttpClient httpClient) => HttpClient = httpClient;
 }
