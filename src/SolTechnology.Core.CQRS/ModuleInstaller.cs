@@ -27,6 +27,31 @@ public static class ModuleInstaller
         return services;
     }
 
+    /// <summary>
+    /// Registers command handlers, validators, and MediatR pipeline behaviors from the specified assemblies.
+    /// Use this overload when command handlers span multiple assemblies registered from a shared entry point.
+    /// Pipeline behaviors are added once regardless of assembly count, avoiding double-registration.
+    /// </summary>
+    public static IServiceCollection RegisterCommands(this IServiceCollection services, params Assembly[] assemblies)
+    {
+        foreach (var assembly in assemblies)
+        {
+            services.RegisterAllImplementations(typeof(ICommandHandler<>), assembly);
+            services.RegisterAllImplementations(typeof(ICommandHandler<,>), assembly);
+            services.AddValidatorsFromAssembly(assembly);
+        }
+
+        services.AddMediatR(config =>
+        {
+            foreach (var assembly in assemblies)
+                config.RegisterServicesFromAssembly(assembly);
+            config.AddOpenBehavior(typeof(LoggingPipelineBehavior<,>));
+            config.AddOpenBehavior(typeof(FluentValidationPipelineBehavior<,>));
+        });
+
+        return services;
+    }
+
     public static IServiceCollection RegisterQueries(this IServiceCollection services)
     {
         var callingAssembly = Assembly.GetCallingAssembly();
@@ -41,6 +66,30 @@ public static class ModuleInstaller
                 config.AddOpenBehavior(typeof(LoggingPipelineBehavior<,>));
                 config.AddOpenBehavior(typeof(FluentValidationPipelineBehavior<,>));
             });
+
+        return services;
+    }
+
+    /// <summary>
+    /// Registers query handlers, validators, and MediatR pipeline behaviors from the specified assemblies.
+    /// Use this overload when query handlers span multiple assemblies registered from a shared entry point.
+    /// Pipeline behaviors are added once regardless of assembly count, avoiding double-registration.
+    /// </summary>
+    public static IServiceCollection RegisterQueries(this IServiceCollection services, params Assembly[] assemblies)
+    {
+        foreach (var assembly in assemblies)
+        {
+            services.RegisterAllImplementations(typeof(IQueryHandler<,>), assembly);
+            services.AddValidatorsFromAssembly(assembly);
+        }
+
+        services.AddMediatR(config =>
+        {
+            foreach (var assembly in assemblies)
+                config.RegisterServicesFromAssembly(assembly);
+            config.AddOpenBehavior(typeof(LoggingPipelineBehavior<,>));
+            config.AddOpenBehavior(typeof(FluentValidationPipelineBehavior<,>));
+        });
 
         return services;
     }
