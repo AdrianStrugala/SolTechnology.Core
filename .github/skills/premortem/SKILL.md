@@ -36,6 +36,8 @@ happens**, then works backward to identify causes and mitigations.
   the blast radius; the bug does not stop at the repo boundary.
 - **Pair with [blue-red-team](../blue-red-team/SKILL.md)** when the change is a design decision,
   not just a code edit.
+- **Cite Coding Guide sections by number** (§3, §11, §18) — `ClaudeCodingGuide.md` sections are
+  stable; if a reference looks wrong, the *reference* is stale, not the section.
 
 ## Process
 

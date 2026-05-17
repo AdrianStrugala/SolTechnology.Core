@@ -22,8 +22,8 @@ For single-file local refactors, skip this skill and go straight to
 ## Critical Rules
 
 - **Documentation-first.** Do not write code in this skill. The output is plan + ADR draft only.
-- **Numbered ADR.** Use the next free `NNN` in [docs/adr/](../../../docs/adr/) (current highest:
-  [003](../../../docs/adr/003-api-versioning-strategy.md)).
+- **Numbered ADR.** Use the next free `NNN` in [docs/adr/](../../../docs/adr/). Read the
+  directory first; do not hard-code a number from memory.
 - **End with premortem.** The last step in every plan is "run [premortem](../premortem/SKILL.md)".
   Implementation does not begin until premortem returns *Go* or *Go with mitigations*.
 

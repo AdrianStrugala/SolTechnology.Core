@@ -178,7 +178,7 @@ public sealed class ResultConversionFilterTests
 
     // ---- helpers ---------------------------------------------------------
 
-    private static Task NoOpNext()
+    private static Task<ResultExecutedContext> NoOpNext()
     {
         var ctx = new ResultExecutedContext(
             new ActionContext(new DefaultHttpContext(), new RouteData(), new ActionDescriptor()),

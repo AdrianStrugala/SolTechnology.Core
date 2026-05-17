@@ -44,7 +44,7 @@ Walk through the relevant sections of
   ([ADR-001](../../../docs/adr/001-acronym-capitalization-refactoring.md)).
 - §11 Logging — `logger.Log*` template, level, scope, no PII.
 - Class-size budget — flag files exceeding the limit.
-- §18 Self-Improvement — if a lesson was learnt, the guide itself or `CLAUDE.md` must be updated
+- §20 Self-Improvement — if a lesson was learnt, the guide itself or `CLAUDE.md` must be updated
   in the same PR.
 
 ### 3. Module-Specific Checks

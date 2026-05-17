@@ -1,70 +1,71 @@
-# SolTechnology.Core.Logging
+## SolTechnology.Core.Logging
 
-Production-ready logging primitives for ASP.NET Core: W3C-compliant correlation,
-request envelope logs with status-aware levels, declarative log-scope enrichment,
-allocation-free operation lifecycle events, and OpenTelemetry-friendly
-`ActivitySource`s — all on top of `Microsoft.Extensions.Logging`. No Serilog or
-Application Insights dependency required; works seamlessly with both.
+Production-ready logging primitives for ASP.NET Core on top of
+`Microsoft.Extensions.Logging`. Pull it in and your app gets a W3C-compliant
+correlation id on every request, status-aware request envelope logs, declarative
+log-scope enrichment, allocation-free operation lifecycle events, and an
+OpenTelemetry-friendly `ActivitySource` — with zero ambient state and no Serilog
+or Application Insights dependency required.
 
-> NuGet: **`SolTechnology.Core.Logging`** · target: `net10.0` /
-> `Microsoft.AspNetCore.App` · zero ambient state, no `AsyncLocal` traps.
+### Features
 
----
+- **W3C correlation id** — `traceparent` + `X-Correlation-Id` resolved from the
+  inbound request and echoed on the response. Same id flows through the log
+  scope, downstream HTTP calls, and `Activity.Current`.
+- **Request envelope logs** — one `Started` / `Finished` pair per request with
+  log levels aligned to the status code (`Information` < 400, `Warning` 4xx,
+  `Error` 5xx) and `Warning` for client aborts.
+- **Declarative scope enrichment** — promote a header, route value, query
+  parameter, or JSON body field into the per-request log scope with one DI line:
+  `services.LogDetail("X-Tenant-Id", asName: "TenantId", source: LogDetailSource.Header)`.
+- **Custom enrichers** — drop in `ILogScopeEnricher` for anything the
+  declarative form can't express (claims, async lookups, multi-source values).
+- **Request-header scope with PII masking** — opt-in dump of every inbound
+  header into the scope; sensitive values (`Authorization`, `Cookie`, anything
+  starting with `Bearer `) are masked before they reach any sink.
+- **Operation lifecycle events** — `OperationStarted` / `OperationSucceeded` /
+  `OperationFailed` with stable `EventId`s (2137–2140) and `[LoggerMessage]`
+  source generators (allocation-free, short-circuits when disabled).
+- **OpenTelemetry tracing** — `CoreLoggingActivitySources.OperationsName` ready
+  to plug into `WithTracing(...).AddSource(...)`. Zero cost when no listener
+  attaches.
+- **Skip-paths for liveness / metrics noise** — silences envelope logs for
+  `/health`, `/metrics`, `/swagger`, etc., while still propagating correlation.
 
-## What you get
-
-| Feature | API |
-|---|---|
-| Correlation id (W3C `traceparent` + `X-Correlation-Id`) | `ICorrelationIdService`, `CorrelationId` |
-| Request envelope logs (start / finish, status-aware levels) | `LoggingMiddleware` (auto-wired by `UseCoreLogging`) |
-| Declarative scope enrichment from header / url / body | `services.LogDetail(...)` |
-| Request-headers scope (PII-safe, opt-in)              | `LoggingOptions.LogRequestHeaders` + `MaskedHeaders` |
-| Custom enrichers | `services.AddLogScopeEnricher<T>()`, `ILogScopeEnricher` |
-| Operation lifecycle events (allocation-free) | `ILogger.OperationStarted/Succeeded/Failed` |
-| OpenTelemetry tracing | `CoreLoggingActivitySources.OperationsName` |
-
----
-
-## Getting started
-
-### 1. Install
-
-```bash
-dotnet add package SolTechnology.Core.Logging
-```
-
-### 2. Register
+### Registration
 
 ```csharp
 // Program.cs
-builder.Services.AddCoreLogging();          // or AddCoreLogging(opts => { ... })
-                                            // or AddCoreLogging(builder.Configuration)
-```
+builder.Services.AddCoreLogging();                       // or .AddCoreLogging(opts => { ... })
+                                                         // or .AddCoreLogging(builder.Configuration)
 
-`AddCoreLogging` is idempotent and registers the `ICorrelationIdService` and
-`LoggingOptions` (validated on application start).
-
-### 3. Wire the middleware
-
-```csharp
 var app = builder.Build();
-
-app.UseCoreLogging();   // EARLY in the pipeline, before UseRouting / UseEndpoints
+app.UseCoreLogging();   // EARLY — before UseRouting / UseEndpoints
 app.UseRouting();
 app.UseAuthorization();
 app.MapControllers();
 ```
 
-Place `UseCoreLogging` early so every request — including ones that fail
-authentication — gets a correlation id and a request-envelope log entry.
+`AddCoreLogging` is idempotent; safe to call from multiple module installers.
+Place `UseCoreLogging` before `UseRouting` so requests that fail authentication
+still get a correlation id and an envelope log entry.
 
-### 4. (Optional) Configure via `appsettings.json`
+### Configuration
+
+`LoggingOptions` bind from `Logging:Core`:
+
+| Option | Default | Purpose |
+|---|---|---|
+| `MaxLoggedJsonBodyBytes` | `65536` | Cap on JSON body buffered for `LogDetailSource.Body` enrichment. |
+| `LogClientCorrelationParseErrors` | `true` | Emit a `Warning` when an inbound `X-Correlation-Id` header is malformed. |
+| `LogRequestHeaders` | `false` | Project every inbound header into the scope as `RequestHeaders` (masked). |
+| `SkipPaths` | `[]` | Path prefixes for which the request envelope logs and enrichers are skipped. Correlation is still set and echoed. |
+| `MaskedHeaders` | `LoggingDefaults.SensitiveHeaders` | Header names whose values are replaced with `***MASKED***`. Case-insensitive. |
 
 ```jsonc
 {
   "Logging:Core": {
     "MaxLoggedJsonBodyBytes": 65536,
-    "LogClientCorrelationParseErrors": true,
     "LogRequestHeaders": false,
     "SkipPaths": [ "/health", "/alive", "/metrics", "/swagger" ],
     "MaskedHeaders": [ "Authorization", "Cookie", "X-Api-Key" ]
@@ -74,70 +75,18 @@ authentication — gets a correlation id and a request-envelope log entry.
 
 ```csharp
 builder.Services.AddCoreLogging(builder.Configuration);
+// or:
+builder.Services.AddCoreLogging(o => o.SkipPaths = LoggingDefaults.InfrastructurePaths.ToList());
 ```
 
-`SkipPaths` silences request-envelope logs for liveness / readiness / metrics
-scrapes — correlation is still propagated, only the noise is gone. A curated
-starter list is available as `LoggingDefaults.InfrastructurePaths`:
+### Usage
 
-```csharp
-builder.Services.AddCoreLogging(o =>
-{
-    o.SkipPaths = LoggingDefaults.InfrastructurePaths.ToList();
-});
-```
+#### Correlation id from anywhere
 
----
-
-## Logging request headers (with PII masking)
-
-Opt in to dump every inbound HTTP header into the per-request log scope under
-the property name `RequestHeaders`. Sensitive values are masked **before**
-they reach any sink:
-
-```csharp
-builder.Services.AddCoreLogging(o =>
-{
-    o.LogRequestHeaders = true;
-    // Defaults to LoggingDefaults.SensitiveHeaders
-    // (Authorization, Cookie, X-Api-Key, X-Auth-Token, X-Csrf-Token, …).
-    // Replace or extend for app-specific headers:
-    o.MaskedHeaders = LoggingDefaults.SensitiveHeaders
-        .Concat(new[] { "X-Internal-Token" })
-        .ToList();
-});
-```
-
-Masking rules:
-
-- Header name listed in `MaskedHeaders` → value replaced with `***MASKED***`
-  (case-insensitive match).
-- Any value starting with `Bearer ` is masked regardless of header name —
-  catches tokens forwarded via custom proxies (e.g. `X-Forwarded-Authorization`).
-
-When `LogRequestHeaders = false` (the default) the enricher pays zero cost —
-it short-circuits in O(1) without iterating headers.
-
----
-
-## Correlation IDs
-
-`CorrelationId` aligns with the **W3C Trace Context** standard and integrates
-with `System.Diagnostics.Activity`, so OpenTelemetry, Application Insights and
-ASP.NET Core 6+ all see the same id.
-
-Inbound resolution order:
-
-1. The current `Activity.TraceId` (populated by ASP.NET Core from the
-   `traceparent` header).
-2. A custom override via `X-Correlation-Id` (only when no Activity is in scope).
-3. A freshly generated 32-character hex string.
-
-Outbound: both `traceparent` and `X-Correlation-Id` are echoed on the response
-so support can quote a single short id without parsing W3C trace context.
-
-Use it from anywhere — background jobs, message-bus handlers, outbound
-`HttpClient` handlers — via DI:
+Inbound resolution order: current `Activity.TraceId` → inbound
+`X-Correlation-Id` (only when no Activity is in scope) → a freshly generated
+32-character hex id. Both `traceparent` and `X-Correlation-Id` are echoed on the
+response.
 
 ```csharp
 public sealed class AuditWriter(ICorrelationIdService correlation, ILogger<AuditWriter> logger)
@@ -151,18 +100,9 @@ public sealed class AuditWriter(ICorrelationIdService correlation, ILogger<Audit
 }
 ```
 
----
-
-## Per-request scope enrichment
-
-### Declarative — `LogDetail`
-
-Promote a property from header, query/route, or JSON body into the
-per-request log scope without writing any code:
+#### Declarative scope enrichment — `LogDetail`
 
 ```csharp
-builder.Services.AddCoreLogging();
-
 // Header → scope["TenantId"]
 builder.Services.LogDetail("X-Tenant-Id", asName: "TenantId", source: LogDetailSource.Header);
 
@@ -177,15 +117,12 @@ builder.Services.LogDetail(
     endpoints: ["/api/v1/FindLocationOfCity", "/api/FindCityByName"]);
 ```
 
-Body parsing is opt-in (driven by `LogDetailSource.Body` registrations), bounded
-by `LoggingOptions.MaxLoggedJsonBodyBytes` (default 64 KB), only runs on
-`application/json`, restores the request stream so MVC model binding still
-works, and silently no-ops on malformed JSON.
+Body parsing is opt-in (only when a `LogDetailSource.Body` registration exists),
+bounded by `MaxLoggedJsonBodyBytes`, runs only on `application/json`, restores
+the request stream so MVC model binding still works, and silently no-ops on
+malformed JSON.
 
-### Programmatic — `ILogScopeEnricher`
-
-When `LogDetail` is not expressive enough (composing values from claims,
-multiple sources, async lookups, header masking), implement `ILogScopeEnricher`:
+#### Custom enricher — `ILogScopeEnricher`
 
 ```csharp
 public sealed class UserScopeEnricher : ILogScopeEnricher
@@ -193,33 +130,46 @@ public sealed class UserScopeEnricher : ILogScopeEnricher
     public void Enrich(HttpContext context, IDictionary<string, object?> scope)
     {
         if (context.User?.Identity?.IsAuthenticated == true)
-        {
             scope["UserId"] = context.User.FindFirst("sub")?.Value;
-        }
     }
 }
 
 builder.Services.AddLogScopeEnricher<UserScopeEnricher>();
 ```
 
-The middleware catches and warns on enricher failures so a faulty enricher
-cannot take a request down.
+A faulty enricher cannot take a request down — the middleware catches and warns
+on enricher failures.
 
----
+#### Request headers in the scope (opt-in, PII-safe)
 
-## Operation lifecycle events
+```csharp
+builder.Services.AddCoreLogging(o =>
+{
+    o.LogRequestHeaders = true;
+    o.MaskedHeaders = LoggingDefaults.SensitiveHeaders
+        .Concat(new[] { "X-Internal-Token" })
+        .ToList();
+});
+```
 
-Three canonical events with stable `EventId`s for dashboard queries:
+Masking rules:
+
+| Trigger | Outcome |
+|---|---|
+| Header name listed in `MaskedHeaders` (case-insensitive) | Value → `***MASKED***`. |
+| Any value starting with `Bearer ` (regardless of header name) | Value → `***MASKED***`. |
+
+When `LogRequestHeaders = false` the enricher short-circuits in O(1) without
+iterating headers.
+
+#### Operation lifecycle events
 
 | EventId | Method               | Level       | Template |
-|---------|----------------------|-------------|----------|
-| 2137    | `OperationStarted`   | Information | `Operation: [{OperationName}]. Status: [START]` |
-| 2138    | `OperationSucceeded` | Information | `Operation: [{OperationName}]. Status: [SUCCESS]. Duration: [{DurationMs} ms]` |
-| 2139    | `OperationFailed`    | Error       | `Operation: [{OperationName}]. Status: [FAIL]. Duration: [{DurationMs} ms]. Message: [{Message}]` |
-| 2140    | (user message)       | Information | `[{Message}]` |
-
-Backed by `[LoggerMessage]` source generators — allocation-free, short-circuit
-when the level is disabled.
+|---:|---|---|---|
+| 2137 | `OperationStarted`   | Information | `Operation: [{OperationName}]. Status: [START]` |
+| 2138 | `OperationSucceeded` | Information | `Operation: [{OperationName}]. Status: [SUCCESS]. Duration: [{DurationMs} ms]` |
+| 2139 | `OperationFailed`    | Error       | `Operation: [{OperationName}]. Status: [FAIL]. Duration: [{DurationMs} ms]. Message: [{Message}]` |
+| 2140 | (user message)       | Information | `[{Message}]` |
 
 ```csharp
 var sw = ValueStopwatch.StartNew();
@@ -236,12 +186,10 @@ catch (Exception ex)
 }
 ```
 
-Inside a CQRS pipeline these are emitted automatically — see
-`SolTechnology.Core.CQRS` and the `[LogScope]` attribute.
+Inside a CQRS pipeline these are emitted automatically via the `[LogScope]`
+attribute — see `SolTechnology.Core.CQRS`.
 
----
-
-## OpenTelemetry
+#### OpenTelemetry
 
 ```csharp
 builder.Services.AddOpenTelemetry()
@@ -252,49 +200,70 @@ builder.Services.AddOpenTelemetry()
         .AddOtlpExporter());
 ```
 
-When no listener is attached, `ActivitySource.StartActivity` returns `null`
-and per-request overhead collapses to one null-conditional access — apps that
-don't opt in pay nothing.
+#### Result in App Insights / structured sink
 
----
+| Timestamp | Message | CorrelationId | CityName |
+|---|---|---|---|
+| 2026-05-06T08:00:10.738Z | Started request [POST] [/api/v1/FindLocationOfCity] | 8fa1… | Warsaw |
+| 2026-05-06T08:00:10.745Z | Operation: [FindLocationOfCity]. Status: [START] | 8fa1… | Warsaw |
+| 2026-05-06T08:00:12.859Z | Operation: [FindLocationOfCity]. Status: [SUCCESS]. Duration: [2114 ms] | 8fa1… | Warsaw |
+| 2026-05-06T08:00:12.860Z | Finished request [POST] [/api/v1/FindLocationOfCity] -> [200] in [2122 ms] | 8fa1… | Warsaw |
 
-## Recommended log levels (production)
+### Testing
 
-```jsonc
+No dedicated fixture — use `Microsoft.Extensions.Logging.Testing.FakeLogger` (or
+NSubstitute on `ILogger<T>`) and assert on the captured entries. For component
+tests, `ApiFixture` from `SolTechnology.Core.Api.Testing` already wires
+`AddCoreLogging` + `UseCoreLogging`, so correlation flows end-to-end out of the
+box.
+
+```csharp
+[Test]
+public async Task Endpoint_AcceptsCorrelationId_AndEchoesItBack()
 {
-  "Logging": {
-    "LogLevel": {
-      "Default": "Warning",
-      "Microsoft": "Warning",
-      "Microsoft.Hosting.Lifetime": "Information",
-      "SolTechnology.Core.Logging.Middleware.LoggingMiddleware": "Information",
-      "SolTechnology.Core.CQRS.PipelineBehaviors.LoggingPipelineBehavior": "Information"
-    },
-    "Console": {
-      "FormatterName": "json",
-      "FormatterOptions": {
-        "IncludeScopes": true,
-        "TimestampFormat": "yyyy-MM-ddTHH:mm:ss.fffZ",
-        "UseUtcTimestamp": true
-      }
-    }
-  }
+    // Arrange
+    var client = _fixture.CreateClient();
+    var correlation = "0123456789abcdef0123456789abcdef";
+    client.DefaultRequestHeaders.Add("X-Correlation-Id", correlation);
+
+    // Act
+    var response = await client.GetAsync("/api/trips/42");
+
+    // Assert
+    response.Headers.GetValues("X-Correlation-Id").Should().ContainSingle().Which.Should().Be(correlation);
 }
 ```
 
-`IncludeScopes: true` is required for any sink that should see correlation /
-enrichment properties (Console JSON formatter, App Insights provider, Loki,
-Datadog, etc.).
+### Conventions
 
----
+- **`UseCoreLogging` runs before `UseRouting`.** Otherwise pre-routing failures
+  (auth challenges, 404s) leave production without a correlation id.
+- **`IncludeScopes: true` in the console formatter** — any sink that should see
+  correlation / enrichment properties (Console JSON, App Insights, Loki,
+  Datadog) requires it.
+- **`{PascalCase}` placeholders** — matches MEL / Serilog / App Insights and the
+  KQL queries consumers will write. See `ClaudeCodingGuide.md` §11.
+- **Wrap values in `[]`** in every placeholder. Empty becomes `[]` instead of
+  invisible.
+- **Never log secrets.** Add the header to `MaskedHeaders`; never craft a
+  bespoke log line that bypasses the enricher.
+- **Production levels:** `Default: Warning`,
+  `Microsoft.Hosting.Lifetime: Information`,
+  `SolTechnology.Core.Logging.Middleware.LoggingMiddleware: Information`,
+  `SolTechnology.Core.CQRS.PipelineBehaviors.LoggingPipelineBehavior: Information`.
 
-## Result in App Insights / structured sink
+### What ships in DI
 
-| Timestamp                  | Message                                                                  | CorrelationId | CityName |
-|----------------------------|--------------------------------------------------------------------------|---------------|----------|
-| 2026-05-06T08:00:10.738Z   | Started request [POST] [/api/v1/FindLocationOfCity]                      | 8fa1...       | Warsaw   |
-| 2026-05-06T08:00:10.745Z   | Operation: [FindLocationOfCity]. Status: [START]                         | 8fa1...       | Warsaw   |
-| 2026-05-06T08:00:12.859Z   | Operation: [FindLocationOfCity]. Status: [SUCCESS]. Duration: [2114 ms]  | 8fa1...       | Warsaw   |
-| 2026-05-06T08:00:12.860Z   | Finished request [POST] [/api/v1/FindLocationOfCity] -> [200] in [2122 ms] | 8fa1...     | Warsaw   |
+`AddCoreLogging` registers:
 
+- `ICorrelationIdService` — ambient correlation accessor (singleton, no
+  `AsyncLocal` traps).
+- `LoggingOptions` — bound and validated on application start.
+- `LoggingMiddleware` — request envelope + scope composition, activated by
+  `UseCoreLogging`.
+- `ILogScopeEnricher` set — declarative `LogDetail` registrations plus any
+  custom enricher you add via `AddLogScopeEnricher<T>()`.
+- `CoreLoggingActivitySources` — `OperationsName` activity source for
+  OpenTelemetry plumbing.
 
+All registrations are `TryAdd*` so a consumer's custom registration always wins.

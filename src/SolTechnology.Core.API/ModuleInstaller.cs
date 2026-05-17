@@ -91,16 +91,12 @@ public static class ModuleInstaller
         this IServiceCollection services,
         Action<ApiExceptionOptions>? configure = null)
     {
-        // Idempotent. TryAddSingleton inside Core.Logging guards against double-registration,
-        // and the framework's AddProblemDetails is also self-guarded.
+        // Idempotent: AddCoreLogging and AddProblemDetails are both self-guarded.
         services.AddCoreLogging();
 
-        // CustomizeProblemDetails fires for every ProblemDetails the framework produces outside
-        // the MVC pipeline — routing 404, UseStatusCodePages, UseExceptionHandler, auth challenges.
-        // Without this hook those bodies would be missing extensions["correlationId"], giving
-        // the same API two different ProblemDetails shapes depending on which pipeline emitted
-        // them. We echo the same id that ExceptionFilter / ResultConversionFilter / X-Correlation-Id
-        // header carry — single token for the client, single lookup in Seq / App Insights.
+        // Stamp correlationId on every ProblemDetails the framework produces outside MVC
+        // (routing 404, UseStatusCodePages, UseExceptionHandler, auth challenges) so the
+        // body shape matches what ExceptionFilter / ResultConversionFilter emit.
         services.AddProblemDetails(opts =>
         {
             opts.CustomizeProblemDetails = ctx =>
@@ -122,12 +118,8 @@ public static class ModuleInstaller
             };
         });
 
-        // [ApiController] auto-builds a 400 ValidationProblemDetails for model-binding /
-        // [DataAnnotations] failures via ApiBehaviorOptions.InvalidModelStateResponseFactory,
-        // BEFORE the request reaches MVC filters. Without this hook the body would be missing
-        // extensions["correlationId"] — clients hitting a bind failure on /api/trip/{id:int}
-        // would have no token to quote in a support ticket. We wrap the default factory so the
-        // per-field errors dictionary stays intact and only enrich the body with correlationId.
+        // [ApiController]'s 400 ValidationProblemDetails is built before MVC filters run; wrap the
+        // default factory to stamp correlationId without disturbing the per-field errors dictionary.
         services.PostConfigure<ApiBehaviorOptions>(opts =>
         {
             var defaultFactory = opts.InvalidModelStateResponseFactory;
@@ -151,8 +143,7 @@ public static class ModuleInstaller
             };
         });
 
-        // TryAdd → consumer's earlier registration of a custom IExceptionStatusCodeMapper wins.
-        // Lifetime: singleton, the mapper is stateless and thread-safe.
+        // TryAdd: a consumer's custom IExceptionStatusCodeMapper wins. Mapper is stateless → singleton.
         services.TryAddSingleton<IExceptionStatusCodeMapper, DefaultExceptionStatusCodeMapper>();
 
         var optionsBuilder = services.AddOptions<ApiExceptionOptions>();
@@ -167,7 +158,8 @@ public static class ModuleInstaller
     }
 
     /// <summary>
-    /// Configures API versioning using header-based versioning (X-API-VERSION)
+    /// Configures header-based API versioning (<c>X-API-VERSION</c>) and per-version Swagger
+    /// document generation. Pair with <see cref="UseSwaggerWithVersioning"/>.
     /// </summary>
     /// <param name="services">Service collection</param>
     /// <param name="defaultMajorVersion">Default major version (default: 1)</param>
@@ -180,7 +172,6 @@ public static class ModuleInstaller
         int defaultMinorVersion = 0,
         string apiTitle = "API")
     {
-        // API Versioning
         services.AddApiVersioning(options =>
         {
             options.DefaultApiVersion = new ApiVersion(defaultMajorVersion, defaultMinorVersion);
@@ -193,7 +184,6 @@ public static class ModuleInstaller
             options.SubstituteApiVersionInUrl = true;
         });
 
-        // Swagger configuration for versioning
         services.AddTransient<IConfigureOptions<SwaggerGenOptions>>(sp =>
             new ConfigureSwaggerOptions(
                 sp.GetRequiredService<IApiVersionDescriptionProvider>(),
@@ -252,7 +242,7 @@ public static class ModuleInstaller
 }
 
 /// <summary>
-/// Configures Swagger to generate documentation for each API version
+/// Generates one Swagger document per registered API version.
 /// </summary>
 public class ConfigureSwaggerOptions(IApiVersionDescriptionProvider provider, string apiTitle)
     : IConfigureOptions<SwaggerGenOptions>

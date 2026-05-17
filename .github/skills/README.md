@@ -4,9 +4,9 @@ Skill library for AI agents working in SolTechnology.Core. Adapted from
 [aiex](https://github.com/) (Open Banking Copilot Change Manager) and refactored for a NuGet-package
 codebase that follows the [Tale Code](../../docs/ClaudeCodingGuide.md) philosophy.
 
-> **MANDATORY.** Before using a skill you must `read_file` its `SKILL.md`. Skills are *not*
-> pre-loaded — their instructions must be fetched explicitly. Never infer what a skill does from
-> its name. Conventions, references, and output formats live only inside `SKILL.md`.
+Before invoking a skill you **must** `read_file` its `SKILL.md`. Skills are not pre-loaded —
+their instructions live only inside the file. Never infer what a skill does from its name.
+Conventions, references, and output formats live only inside `SKILL.md`.
 
 ## Index
 
