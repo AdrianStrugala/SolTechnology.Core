@@ -1,7 +1,6 @@
 ---
 name: commit-message
 description: Produce a Conventional Commits message for SolTechnology.Core, using module names as scopes and surfacing semver impact in the footer.
-user-invocable: true
 ---
 
 # Commit Message
@@ -54,8 +53,8 @@ Meta: `docs`, `adr`, `skills`, `build`, `ci`.
   - `Semver: PATCH` — internal only / docs / tests.
   - `Semver: MINOR` — additive public API.
   - `Semver: MAJOR` — breaking public API. **Must** also include a
-    `BREAKING CHANGE: <one-line description>` footer and reference an ADR in
-    [docs/adr/](../../../docs/adr/).
+    `BREAKING CHANGE: <one-line description>` footer and reference an ADR from the
+    [ADR index](../../../docs/adr/README.md).
 - Reference the [premortem](../premortem/SKILL.md) output in the body when the change required one.
 - No issue tracker IDs unless the user supplies them.
 
@@ -69,7 +68,7 @@ Meta: `docs`, `adr`, `skills`, `build`, `ci`.
 6. Add the semver footer when applicable. Add `BREAKING CHANGE:` when MAJOR.
 7. Re-read against the rules above before printing.
 
-## Standard Output Format
+## Output format
 
 ```
 <type>(<scope>): <subject>

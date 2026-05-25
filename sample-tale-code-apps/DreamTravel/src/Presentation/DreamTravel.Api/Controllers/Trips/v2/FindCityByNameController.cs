@@ -24,7 +24,7 @@ namespace DreamTravel.Api.Controllers.Trips.v2
         [ProducesResponseType(typeof(ProblemDetails), (int)HttpStatusCode.BadRequest)]
         public async Task<IActionResult> FindCityByName([FromBody] FindCityByNameQuery query)
         {
-            logger.LogInformation("Looking for city: " + query.Name);
+            logger.LogInformation("Looking for city [{CityName}]", query.Name);
             return Ok(await mediator.Send(query));
         }
     }

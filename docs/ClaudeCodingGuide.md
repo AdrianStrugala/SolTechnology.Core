@@ -502,6 +502,8 @@ These are real examples spotted in DreamTravel. Fix them when you touch the surr
 | Hand-written `private readonly` ctor capture | hypothetical | C# 12 primary constructor. |
 | `#region` to organize a class | forbidden | Split into partial files or new classes. |
 | Multi-line "essay" comment restating *what* the next line does | various | One line, *why* only. See §9.11. |
+| Returning a persistence-layer entity (`*Entity` from `DbModels/`) past the DataLayer boundary — e.g. as a controller / handler / repository return type | DataLayer projects | Map to a domain type at the DataLayer boundary (`*Mapper.ToDomain`). Consumers see domain types only — see §5 and §6. Leaking an entity bypasses lazy-loading control, change-tracking lifetime, and JSON serialisation contracts. |
+| Splitting a schema change across multiple commits (entity in one, `DbContext` registration in another, EF migration in a third) | DataLayer changes | Single PR: entity class + `DbContext` `DbSet<>` + `EntityTypeConfiguration` + EF migration land together. The reviewer sees the full schema delta in one diff; rollback is one revert. |
 
 ---
 
@@ -728,9 +730,9 @@ shape — bring them in line when you touch the surrounding module.
 ## 19. AI-only documentation (`CLAUDE.md`, this guide, `SKILL.md`)
 
 A third class of docs lives in this repo: files read **exclusively by AI agents**
-(`CLAUDE.md` at root, this guide, every `.github/skills/*/SKILL.md`). They are not
-user-facing; they are not narrative; they are the agent's operational and convention
-memory. Optimise them for four things, in this order:
+(`CLAUDE.md` at root, this guide, every `.github/agents/*.agent.md`, every
+`.github/skills/*/SKILL.md`). They are not user-facing; they are not narrative; they are the
+agent's operational and convention memory. Optimise them for four things, in this order:
 
 1. **Routing speed** — the agent must find the rule for the task in the first ~N tokens.
 2. **Compliance verification** — both agent and reviewer must be able to point at "you
@@ -869,7 +871,8 @@ Triggers — update the guide when:
 - You discover a non-obvious constraint of the codebase (build quirks, framework rule, DI pitfall).
 - A repeated mistake gets called out (e.g. forgetting `{}` after `if`, missing primary ctor, partial code dumps).
 - A new pattern, helper, or framework addition becomes "the way" to do something here.
-- An ADR is written or amended — reflect its rule here in one line + link.
+- An ADR is written or amended — reflect its rule here in one line + link, **and** update the
+  ADR index at [`docs/adr/README.md`](adr/README.md) in the same change ([ADR-006](adr/006-implementation-plan-workflow.md)).
 
 How to update:
 

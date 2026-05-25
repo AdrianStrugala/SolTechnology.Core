@@ -51,24 +51,42 @@ For each of these, surface the intended change and the reasoning, then wait.
 | After a build-relevant change | Run the affected tests (`./.github/runTests.ps1` for core; `dotnet test <project>` for a single target). |
 | Before asking for Bash permission | Check `.claude/settings.local.json` `allow` list for a matching wildcard. Reuse existing patterns (`-Last 10/20/30`, `timeout 60/120/180/300`) instead of asking for a new one. |
 | When invoking a custom agent / skill | Read its instructions first. Do not paraphrase its task; pass the user's intent verbatim where possible. |
+| When a specific skill / agent is mandated and unavailable | STOP. Tell the user which skill / agent is required and why the requested work is gated on it. Do **not** produce a freehand substitute (no hand-drafted diagram, no inline mini-plan, no improvised review checklist). |
+| When adding a sequence or component diagram | Use the [`diagram`](.github/agents/diagram.agent.md) agent. Output Mermaid only, five canonical layer boxes, immutable file per version. Never hand-draft a diagram inline in a doc / ADR / review. |
 | When edits don't persist | Stop. Report it. Do **not** retry blindly — IDE buffers can overwrite tool-applied changes; ask the user to close the file in their IDE. |
 
 ---
 
-## §3. Skills
+## §3. Agents and Skills
 
-Skill library lives at [`.github/skills/`](.github/skills/). Always `read_file` the
-`SKILL.md` before invoking — skill descriptions in this index are routing hints, not
-contracts.
+Two libraries of AI tooling live in `.github/`. **Agents** ([`.github/agents/`](.github/agents/))
+own multi-step workflows. **Skills** ([`.github/skills/`](.github/skills/)) are narrow procedures
+loaded on demand. Always `read_file` the relevant file before invoking — descriptions in these
+indexes are routing hints, not contracts.
+
+### Agents
+
+| Agent | Path | Invoke when |
+|---|---|---|
+| implementation-planning | [`.github/agents/implementation-planning.agent.md`](.github/agents/implementation-planning.agent.md) | Planning a multi-module or breaking change; produces an ADR + step files under `docs/adr/<NNN>-<feature>/to-do/` per [ADR-006](docs/adr/006-implementation-plan-workflow.md). |
+| plan-reviewer | [`.github/agents/plan-reviewer.agent.md`](.github/agents/plan-reviewer.agent.md) | Critiquing a plan in `docs/adr/<NNN>-<feature>/to-do/` before implementation. Writes revised drafts to `reviewed/`, deletes originals from `to-do/`. Never writes production code. |
+| diagram | [`.github/agents/diagram.agent.md`](.github/agents/diagram.agent.md) | Authoring a sequence or component diagram under `docs/diagrams/`. Mermaid only, five canonical layer boxes (`Presentation` / `Logic` / `Data` / `Domain` / `External`), immutable file per version. **Required** for every sequence or component diagram added under `docs/`. |
+
+### Skills
 
 | Skill | Path | Invoke when |
 |---|---|---|
+| roast-me | [`.github/skills/roast-me/SKILL.md`](.github/skills/roast-me/SKILL.md) | Vague request, under-specified intent, before any non-trivial planning. One question per turn with a running ledger. |
 | premortem | [`.github/skills/premortem/SKILL.md`](.github/skills/premortem/SKILL.md) | **Mandatory** before merging changes to public NuGet API, `ModuleInstaller.cs`, persisted contracts, or `Directory.Build.props`. |
 | blue-red-team | [`.github/skills/blue-red-team/SKILL.md`](.github/skills/blue-red-team/SKILL.md) | Design-level decision / ADR seeding. |
 | code-review | [`.github/skills/code-review/SKILL.md`](.github/skills/code-review/SKILL.md) | Reviewing a diff against the Coding Guide and module review templates. |
 | commit-message | [`.github/skills/commit-message/SKILL.md`](.github/skills/commit-message/SKILL.md) | Producing a Conventional Commits message with semver footer. |
 | documentation-cleanup | [`.github/skills/documentation-cleanup/SKILL.md`](.github/skills/documentation-cleanup/SKILL.md) | Validating docs integrity (module/doc parity, indexes, Mermaid, ADRs). |
-| implementation-planning | [`.github/skills/implementation-planning/SKILL.md`](.github/skills/implementation-planning/SKILL.md) | Planning a multi-module or breaking change; produces ADR draft. |
+| package-management | [`.github/skills/package-management/SKILL.md`](.github/skills/package-management/SKILL.md) | Adding / bumping a `PackageReference` — looks up the canonical version, prevents drift and version-by-memory hallucination. |
+| dependency-audit | [`.github/skills/dependency-audit/SKILL.md`](.github/skills/dependency-audit/SKILL.md) | Resolving `NU1901`–`NU1904` CVE warnings or `NU1605` downgrades. Drives the parent-lookup → fix-at-source → override-only-as-last-resort flow from §5. |
+| test-writing | [`.github/skills/test-writing/SKILL.md`](.github/skills/test-writing/SKILL.md) | Authoring or extending tests under `tests/` (xUnit) or sample apps (NUnit for DreamTravel). Encodes the FluentAssertions + NSubstitute + AutoFixture stack and the `// Arrange` / `// Act` / `// Assert` convention from `ClaudeCodingGuide.md` §8. |
+| refactor | [`.github/skills/refactor/SKILL.md`](.github/skills/refactor/SKILL.md) | Behaviour-preserving cleanup inside a single module — rename internals, split a class above the §9 size budget, extract a primary constructor, remove `#region`, pay down a §15 anti-pattern. Routes to `implementation-planning` if scope grows past one module or touches a public symbol. |
+| implement-plan | [`.github/skills/implement-plan/SKILL.md`](.github/skills/implement-plan/SKILL.md) | Executing one step from an ADR's `to-do/` or `reviewed/` folder. Moves the file to `done/`, updates the summary, optionally records deviations. |
 
 ### Premortem gate
 
@@ -99,6 +117,10 @@ Markdown / Mermaid hygiene:
 ---
 
 ## §5. Dependency management — fix at source, never mask
+
+The full procedure (parent lookup, source fix, override-as-last-resort, verification, commit
+hygiene) lives in the [`dependency-audit`](.github/skills/dependency-audit/SKILL.md) skill —
+invoke it whenever an `NU190x` or `NU1605` warning appears. Summary of the rules:
 
 When a CVE warning (`NU1901`–`NU1904`) appears:
 
@@ -178,6 +200,8 @@ touch `Directory.Build.props`.
 | Per-module review templates | `docs/reviews/<Module>-Review.md` |
 | HTTP production rollout | `docs/HTTP-Production-Checklist.md` + [ADR-005](docs/adr/005-http-production-defaults.md) |
 | AI agents / skills rationale | [ADR-004](docs/adr/004-ai-agents-and-skills.md) |
+| ADR index + status tracker | [`docs/adr/README.md`](docs/adr/README.md) |
+| Multi-step implementation plan layout (`to-do/` / `reviewed/` / `done/`) | [ADR-006](docs/adr/006-implementation-plan-workflow.md) |
 
 If a rule appears here **and** in the guide, the guide is authoritative — this file
 intentionally does not duplicate convention text.
