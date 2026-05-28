@@ -16,6 +16,7 @@ using SolTechnology.Core.API;
 using SolTechnology.Core.API.Filters;
 using SolTechnology.Core.Authentication;
 using SolTechnology.Core.Cache;
+using SolTechnology.Core.CQRS;
 using SolTechnology.Core.Logging;
 using SolTechnology.Core.Logging.Enrichment;
 using SolTechnology.Core.Logging.Operations;
@@ -35,7 +36,7 @@ public class Program
 
         // Aspire's ServiceDefaults already wires AddAspNetCoreInstrumentation()
         // + AddHttpClientInstrumentation(). Subscribe SolTechnology.Core's operation
-        // ActivitySource so MediatR requests show up as child spans alongside the
+        // ActivitySource so CQRS requests show up as child spans alongside the
         // HTTP request and dependency calls in the same trace (App Insights / Jaeger / OTLP).
         builder.Services.AddOpenTelemetry()
             .WithTracing(tracing => tracing.AddSource(CoreLoggingActivitySources.OperationsName));
@@ -113,7 +114,7 @@ public class Program
 
 
         var thisAssembly = typeof(Program).Assembly;
-        builder.Services.AddMediatR(cfg => { cfg.RegisterServicesFromAssemblies(thisAssembly); });
+        builder.Services.AddCQRS(assemblies: thisAssembly);
 
         var authenticationConfiguration = builder.Configuration.GetRequiredSection("Authentication").Get<AuthenticationConfiguration>()!;
         var authFilter = builder.Services.AddAuthenticationAndBuildFilter(authenticationConfiguration);

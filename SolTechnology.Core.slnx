@@ -84,6 +84,7 @@
     <Project Path="tests/SolTechnology.Core.SQL.Tests/SolTechnology.Core.SQL.Tests.csproj" />
     <Project Path="tests/SolTechnology.Core.Story.Tests/SolTechnology.Core.Story.Tests.csproj" />
     <Project Path="tests/SolTechnology.Core.MessageBus.Tests/SolTechnology.Core.MessageBus.Tests.csproj" />
+    <Project Path="tests/SolTechnology.Core.CQRS.Tests/SolTechnology.Core.CQRS.Tests.csproj" />
   </Folder>
   <Folder Name="/src/">
     <File Path="src/Directory.Build.props" />

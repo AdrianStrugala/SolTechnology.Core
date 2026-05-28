@@ -27,12 +27,14 @@ and the canonical test stack discovered in `tests/*.csproj`.
 
 | Location | Framework | Assertions | Mocks | Data |
 |---|---|---|---|---|
-| `tests/SolTechnology.Core.<Module>.Tests/` | **xUnit** 2.9.2 | **FluentAssertions** 6.12.x / 7.0 | **NSubstitute** 5.x | **AutoFixture** + `AutoNSubstituteCustomization` |
-| `sample-tale-code-apps/DreamTravel/tests/{Unit,Component,EndToEnd}/` | **NUnit** (per §8) | FluentAssertions | NSubstitute | AutoFixture |
-| `sample-tale-code-apps/TaleCode/tests/` | xUnit | FluentAssertions | NSubstitute | AutoFixture |
+| `tests/SolTechnology.Core.<Module>.Tests/` | **NUnit** 4.x | **FluentAssertions** 6.12.x / 7.0 | **NSubstitute** 5.x | **AutoFixture** + `AutoNSubstituteCustomization` |
+| `sample-tale-code-apps/DreamTravel/tests/{Unit,Component,EndToEnd}/` | NUnit | FluentAssertions | NSubstitute | AutoFixture |
+| `sample-tale-code-apps/TaleCode/tests/` | xUnit *(legacy — do not propagate)* | FluentAssertions | NSubstitute | AutoFixture |
 
-**Tests are the explicit exception to `ClaudeCodingGuide §15`.** FluentAssertions is forbidden
-in `src/`, mandatory in tests. Same for NSubstitute over Moq.
+**Default stack is NUnit + NSubstitute + FluentAssertions + AutoFixture.** xUnit lives on only
+where it already exists; new test projects use NUnit. Tests are the explicit exception to
+`ClaudeCodingGuide §15` — FluentAssertions is forbidden in `src/`, mandatory in tests. Same for
+NSubstitute over Moq.
 
 ## Procedure
 
@@ -83,7 +85,7 @@ Mandatory `// Arrange`, `// Act`, `// Assert` comments — the **one** place in 
 restating *what* in a comment is required (§8). Skip a phase only when it is genuinely empty.
 
 ```csharp
-[Fact]
+[Test]
 public async Task Send_WhenBrokerThrows_ReturnsResultFailure()
 {
     // Arrange
@@ -105,8 +107,8 @@ public async Task Send_WhenBrokerThrows_ReturnsResultFailure()
 
 ### 6. Parameterise instead of duplicating
 
-- xUnit: `[Theory]` + `[InlineData]` / `[MemberData]`.
 - NUnit: `[TestCase]` / `[TestCaseSource]`.
+- xUnit (legacy): `[Theory]` + `[InlineData]` / `[MemberData]`.
 
 Two tests differing only in input → one parameterised test.
 
@@ -130,7 +132,7 @@ code, the test must assert the exact `Error.Code` string (it is part of the publ
 ## Pre-yield checklist
 
 - [ ] Test lives under `tests/` (core) or `sample-tale-code-apps/<app>/tests/`, never under `src/`.
-- [ ] Framework matches the project's existing references (xUnit for core; NUnit for DreamTravel).
+- [ ] Framework matches the project's existing references (NUnit by default; xUnit only in projects already on it).
 - [ ] FluentAssertions + NSubstitute + AutoFixture used; no Moq, no plain `Assert.True(...)`.
 - [ ] `_sut` field name, `// Arrange` / `// Act` / `// Assert` comments present.
 - [ ] No mocking of `IMediator` / `HttpClient` / `DbContext` / `IRepository` in a unit test —

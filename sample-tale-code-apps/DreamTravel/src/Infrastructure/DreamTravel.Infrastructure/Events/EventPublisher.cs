@@ -1,5 +1,5 @@
 using Hangfire;
-using MediatR;
+using SolTechnology.Core.CQRS;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace DreamTravel.Infrastructure.Events;
@@ -27,12 +27,12 @@ public class HangfireNotificationPublisher : IHangfireNotificationPublisher
     }
 
 
-    [Hangfire.AutomaticRetry(Attempts = 0)] // Optional: prevent retries if not needed
+    [Hangfire.AutomaticRetry(Attempts = 0)]
     public void DispatchEvent(INotification notification)
     {
         using var scope = _serviceScopeFactory.CreateScope();
         var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
-        mediator.Publish(notification).GetAwaiter().GetResult();
+        mediator.Publish(notification);
     }
 
 }

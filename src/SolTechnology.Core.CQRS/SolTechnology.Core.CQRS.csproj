@@ -1,9 +1,9 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-		<Version>0.7.0</Version>
-	  <Description>Complete CQRS implementation built on MediatR with Result pattern, automatic FluentValidation, and logging pipeline behaviors. Enforces clean separation between reads and writes with explicit success/failure handling.</Description>
-	  <PackageTags>sol technology cqrs mediatr command query result-pattern fluentvalidation architecture clean-code dotnet design-patterns</PackageTags>
+		<Version>0.8.0</Version>
+	  <Description>Complete CQRS implementation with an in-house mediator, Result pattern, automatic FluentValidation, fire-and-forget notifications, and logging pipeline behaviors.</Description>
+	  <PackageTags>sol technology cqrs mediator command query result-pattern fluentvalidation architecture clean-code dotnet design-patterns</PackageTags>
 	  <Product>SolTechnology.Core.CQRS</Product>
 	  <PackageId>SolTechnology.Core.CQRS</PackageId>
 	  <AssemblyName>SolTechnology.Core.CQRS</AssemblyName>
@@ -20,7 +20,7 @@
 	<ItemGroup>
 		<PackageReference Include="FluentValidation" Version="11.11.0" />
 		<PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="11.11.0" />
-		<PackageReference Include="MediatR" Version="12.3.0" />
+		<PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.1" />
 		<PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="8.0.3" />
 	</ItemGroup>
 

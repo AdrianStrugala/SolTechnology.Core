@@ -1,12 +1,11 @@
-﻿using DreamTravel.Domain.Cities;
+﻿﻿using DreamTravel.Domain.Cities;
 using FluentValidation;
-using MediatR;
 using SolTechnology.Core.CQRS;
 using SolTechnology.Core.Logging;
 
 namespace DreamTravel.Queries.FindCityByName;
 
-public class FindCityByNameQuery : IRequest<Result<City>>
+public class FindCityByNameQuery : IQuery<City>
 {
     [LogScope]
     public string Name { get; set; } = null!;

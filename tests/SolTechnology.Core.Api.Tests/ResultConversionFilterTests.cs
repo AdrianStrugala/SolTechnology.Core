@@ -81,7 +81,7 @@ public sealed class ResultConversionFilterTests
         Type errorType, int expectedStatus)
     {
         var error = (Error)Activator.CreateInstance(errorType)!;
-        error.Message = "boom";
+        error = error with { Message = "boom" };
         var context = BuildResultExecutingContext(Result<Payload>.Fail(error));
 
         await _filter.OnResultExecutionAsync(context, NoOpNext);

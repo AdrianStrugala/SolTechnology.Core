@@ -13,6 +13,7 @@ Decisions that shape SolTechnology.Core. One ADR = one decision. Filenames follo
 | 004 | [AI agents and skills](004-ai-agents-and-skills.md) | Accepted | ✅ Done |
 | 005 | [HTTP production defaults](005-http-production-defaults.md) | Accepted | ✅ Done |
 | 006 | [Implementation plan workflow](006-implementation-plan-workflow.md) | Accepted | ✅ Done |
+| 007 | [CQRS production hardening + in-house mediator](007-cqrs-production-hardening.md) | Accepted | ✅ Done |
 
 Status values: `Proposed` / `Accepted` / `Superseded` / `Rejected`.
 Implementation values: `N/A` / `⬜ To-do` / `🔍 Implementing` / `✅ Done`.
