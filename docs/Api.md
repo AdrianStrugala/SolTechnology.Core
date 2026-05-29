@@ -229,7 +229,7 @@ Off by default. Never enable in Production.
 
 ### Testing
 
-Reference `SolTechnology.Core.Api.Testing` from your test project and use `ApiFixture`:
+Reference `SolTechnology.Core.API.Testing` from your test project and use `ApiFixture`:
 
 ```csharp
 public class TripsApiTests
