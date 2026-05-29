@@ -1,12 +1,15 @@
-﻿using System.Text.Encodings.Web;
-using System.Text.Json;
-using FluentValidation;
-using FluentValidation.Results;
-using MediatR;
+﻿using FluentValidation;
+using SolTechnology.Core.CQRS.Errors;
 
 namespace SolTechnology.Core.CQRS.PipelineBehaviors;
 
-public class FluentValidationPipelineBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse> where TResponse : class where TRequest : notnull
+/// <summary>
+/// Runs all registered <see cref="IValidator{T}"/> for the request. On failure, short-circuits
+/// the pipeline with <see cref="Result.Fail(Error)"/> carrying a <see cref="ValidationError"/>
+/// — never throws for <see cref="ICommand"/>/<see cref="IQuery{TResult}"/> paths.
+/// </summary>
+public sealed class FluentValidationPipelineBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>
+    where TRequest : notnull
 {
     private readonly IEnumerable<IValidator<TRequest>> _validators;
 
@@ -15,44 +18,38 @@ public class FluentValidationPipelineBehavior<TRequest, TResponse> : IPipelineBe
         _validators = validators;
     }
 
-    //MediatR pipeline behavior
-    //Executes all fluent validators for given request
-
     public async Task<TResponse> Handle(TRequest request, RequestHandlerDelegate<TResponse> next, CancellationToken cancellationToken)
     {
         var context = new ValidationContext<TRequest>(request);
-        var validationResults = _validators
-            .Select(validator => validator.Validate(context))
-            .ToList();
 
-        var errors = validationResults
-            .SelectMany(result => result.Errors)
-            .Where(failure => failure != null)
-            .ToList();
-
-        if (errors.Any())
+        var validationResults = new List<FluentValidation.Results.ValidationResult>();
+        foreach (var validator in _validators)
         {
-            throw new ValidationException(BuildErrorMessage(errors));
+            validationResults.Add(await validator.ValidateAsync(context, cancellationToken));
         }
 
-        return await next();
-    }
+        var errors = validationResults
+            .SelectMany(r => r.Errors)
+            .Where(f => f != null)
+            .ToList();
 
-    private string BuildErrorMessage(IEnumerable<ValidationFailure> errors)
-    {
-        var groupedErrors = errors
+        if (errors.Count == 0)
+        {
+            return await next();
+        }
+
+        var grouped = errors
             .GroupBy(e => e.PropertyName)
             .ToDictionary(
                 g => g.Key,
-                g => g.Select(e => e.ErrorMessage).ToArray()
-            );
+                g => g.Select(e => e.ErrorMessage).ToArray());
 
-
-        var options = new JsonSerializerOptions
+        var validationError = new ValidationError
         {
-            WriteIndented = true
+            Message = "Validation failed",
+            Errors = grouped
         };
 
-        return JsonSerializer.Serialize(new { errors = groupedErrors }, options);
+        return ValidationFailureFactory.Create<TResponse>(validationError);
     }
 }

@@ -1,73 +1,78 @@
 ﻿using System.Reflection;
 using FluentValidation;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
+using SolTechnology.Core.CQRS.Internal;
 using SolTechnology.Core.CQRS.PipelineBehaviors;
 
 namespace SolTechnology.Core.CQRS;
 
+/// <summary>
+/// Registration entrypoint for the CQRS module.
+/// </summary>
 public static class ModuleInstaller
 {
-    public static IServiceCollection RegisterCommands(this IServiceCollection services)
+    /// <summary>
+    /// Registers the in-house mediator, pipeline behaviors, command/query/notification handlers,
+    /// and (optionally) FluentValidation validators from the specified assemblies.
+    /// Idempotent — safe to call multiple times.
+    /// </summary>
+    public static IServiceCollection AddCQRS(this IServiceCollection services, Action<CQRSOptions>? configure = null, params Assembly[] assemblies)
     {
-        var callingAssembly = Assembly.GetCallingAssembly();
+        var options = new CQRSOptions();
+        configure?.Invoke(options);
 
-        services.RegisterAllImplementations(typeof(ICommandHandler<>), callingAssembly);
-        services.RegisterAllImplementations(typeof(ICommandHandler<,>), callingAssembly);
-
-        services.AddValidatorsFromAssembly(callingAssembly);
-
-        services.AddMediatR(
-            config =>
-            {
-                config.RegisterServicesFromAssembly(callingAssembly);
-                config.AddOpenBehavior(typeof(LoggingPipelineBehavior<,>));
-                config.AddOpenBehavior(typeof(FluentValidationPipelineBehavior<,>));
-            });
-
-        return services;
-    }
-
-    public static IServiceCollection RegisterQueries(this IServiceCollection services)
-    {
-        var callingAssembly = Assembly.GetCallingAssembly();
-        services.RegisterAllImplementations(typeof(IQueryHandler<,>), callingAssembly);
-
-        services.AddValidatorsFromAssembly(callingAssembly);
-
-        services.AddMediatR(
-            config =>
-            {
-                config.RegisterServicesFromAssembly(callingAssembly);
-                config.AddOpenBehavior(typeof(LoggingPipelineBehavior<,>));
-                config.AddOpenBehavior(typeof(FluentValidationPipelineBehavior<,>));
-            });
-
-        return services;
-    }
-
-    private static IServiceCollection RegisterAllImplementations(this IServiceCollection services, Type genericInterface, Assembly assembly)
-    {
-        if (!genericInterface.IsInterface || !genericInterface.IsGenericType)
+        if (assemblies.Length == 0)
         {
-            throw new ArgumentException("Invalid generic interface type", nameof(genericInterface));
+            assemblies = new[] { Assembly.GetCallingAssembly() };
         }
 
+        // Register mediator (scoped — shares request lifetime)
+        services.TryAddScoped<IMediator, CQRSMediator>();
+
+        // Register pipeline behaviors
+        if (options.UseLogging)
+        {
+            services.TryAddEnumerable(ServiceDescriptor.Transient(typeof(IPipelineBehavior<,>), typeof(LoggingPipelineBehavior<,>)));
+        }
+
+        if (options.UseFluentValidation)
+        {
+            services.TryAddEnumerable(ServiceDescriptor.Transient(typeof(IPipelineBehavior<,>), typeof(FluentValidationPipelineBehavior<,>)));
+        }
+
+        // Scan assemblies for handlers and validators
+        foreach (var assembly in assemblies)
+        {
+            RegisterHandlers(services, assembly, typeof(ICommandHandler<>));
+            RegisterHandlers(services, assembly, typeof(ICommandHandler<,>));
+            RegisterHandlers(services, assembly, typeof(IQueryHandler<,>));
+            RegisterHandlers(services, assembly, typeof(INotificationHandler<>));
+
+            if (options.UseFluentValidation)
+            {
+                services.AddValidatorsFromAssembly(assembly);
+            }
+        }
+
+        return services;
+    }
+
+    private static void RegisterHandlers(IServiceCollection services, Assembly assembly, Type genericInterface)
+    {
         var types = assembly
             .GetExportedTypes()
-            .Where(t => t.IsClass && !t.IsAbstract)
-            .Select(t => new
-            {
-                Service = t.GetInterfaces()
-                    .FirstOrDefault(x => x.IsGenericType && x.GetGenericTypeDefinition() == genericInterface),
-                Implementation = t
-            })
-            .Where(t => t.Service != null);
+            .Where(t => t.IsClass && !t.IsAbstract);
 
         foreach (var type in types)
         {
-            services.AddTransient(type.Service!, type.Implementation);
-        }
+            var interfaces = type.GetInterfaces()
+                .Where(i => i.IsGenericType && i.GetGenericTypeDefinition() == genericInterface);
 
-        return services;
+            foreach (var serviceType in interfaces)
+            {
+                services.TryAddEnumerable(ServiceDescriptor.Transient(serviceType, type));
+            }
+        }
     }
 }

@@ -1,4 +1,4 @@
-﻿using DreamTravel.TravelingSalesmanProblem;
+﻿﻿using DreamTravel.TravelingSalesmanProblem;
 using Microsoft.Extensions.DependencyInjection;
 using SolTechnology.Core.CQRS;
 
@@ -9,7 +9,7 @@ namespace DreamTravel.Commands
         public static IServiceCollection InstallDreamTripsCommands(this IServiceCollection services)
         {
             //Commands
-            services.RegisterCommands();
+            services.AddCQRS(assemblies: typeof(ModuleInstaller).Assembly);
 
             //TSP engine
             services.AddScoped<ITSP, AntColony>();

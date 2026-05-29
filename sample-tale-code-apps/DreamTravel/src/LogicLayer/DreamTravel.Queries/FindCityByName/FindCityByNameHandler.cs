@@ -1,4 +1,4 @@
-﻿using System.Diagnostics;
+﻿﻿using System.Diagnostics;
 using DreamTravel.DomainServices.CityDomain;
 using DreamTravel.Infrastructure.Events;
 using DreamTravel.Domain.Cities;
@@ -27,9 +27,9 @@ namespace DreamTravel.Queries.FindCityByName
             //to test cache
             result = await cityDomainService.Get(query.Name);
             logger.LogInformation($"FindCityByName. Cache hit took: [{stopwatch.ElapsedMilliseconds}]ms");
-            
+
             hangfireNotificationPublisher.Publish(new CitySearched { City = result });
-            
+
             stopwatch.Stop();
 
             return result;

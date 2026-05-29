@@ -1,6 +1,6 @@
 using DreamTravel.Domain.Events;
 using Hangfire.Annotations;
-using MediatR;
+using SolTechnology.Core.CQRS;
 
 namespace DreamTravel.Worker.EventHandlers.OnCitySearched;
 

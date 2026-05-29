@@ -1,9 +1,12 @@
-﻿﻿#nullable enable
+﻿#nullable enable
 using System.Text.Json.Serialization;
 using SolTechnology.Core.CQRS.Errors;
 
 namespace SolTechnology.Core.CQRS
 {
+    /// <summary>
+    /// Represents the outcome of a command or query — either success or failure with an error.
+    /// </summary>
     public record Result
     {
         public bool IsSuccess { get; init; }
@@ -14,148 +17,63 @@ namespace SolTechnology.Core.CQRS
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public Error? Error { get; init; }
 
-        // Non-generic accessor for the payload carried by Result<T>. Returns null on the base
-        // type (no data) and is overridden in Result<T>. A null payload — both from the base
-        // and from Result<T>.Success(default) — is rendered as 204 No Content by the HTTP
-        // boundary; callers that need a 200 with an explicit null body should send a sentinel
-        // value, not default(T).
+        /// <summary>
+        /// Non-generic accessor for the payload carried by <see cref="Result{T}"/>.
+        /// Returns null on the base type.
+        /// </summary>
         public virtual object? GetData() => null;
 
+        public static Result Success() => new() { IsSuccess = true };
 
-        public static Result Success()
-        {
-            return new Result
-            {
-                IsSuccess = true
-            };
-        }
+        public static Task<Result> SuccessAsTask() => Task.FromResult(Success());
 
-        public static Task<Result> SuccessAsTask()
+        public static Result Fail(string message) => new()
         {
-            return Task.FromResult(new Result
-            {
-                IsSuccess = true
-            });
-        }
+            IsSuccess = false,
+            Error = new Error { Message = message }
+        };
 
-        public static Result Fail(string message)
+        public static Result Fail(Error error) => new()
         {
-            return new Result
-            {
-                Error = new Error
-                {
-                    Message = message
-                },
-                IsSuccess = false
-            };
-        }
+            IsSuccess = false,
+            Error = error
+        };
 
-        public static Result Fail(Error error)
-        {
-            return new Result
-            {
-                Error = error,
-                IsSuccess = false
-            };
-        }
+        public static Task<Result> FailAsTask(string message) => Task.FromResult(Fail(message));
 
-        public static Task<Result> FailAsTask(string message)
-        {
-            return Task.FromResult(new Result
-            {
-                Error = new Error
-                {
-                    Message = message
-                },
-                IsSuccess = false
-            });
-        }
-
-        public static Task<Result> FailAsTask(Error error)
-        {
-            return Task.FromResult(new Result
-            {
-                Error = error,
-                IsSuccess = false
-            });
-        }
+        public static Task<Result> FailAsTask(Error error) => Task.FromResult(Fail(error));
     }
 
+    /// <summary>
+    /// Represents the outcome of a query or command that produces data of type <typeparamref name="T"/>.
+    /// </summary>
     public record Result<T> : Result
     {
         [JsonIgnore(Condition = JsonIgnoreCondition.Never)]
-        public T? Data { get; set; }
+        public T? Data { get; init; }
 
-        // Non-generic view of Data for boundary code (HTTP filter, message bus, gRPC) that
-        // sees Result as object and cannot bind T. Avoids reflection over Result<T>.Data —
-        // required for AOT / trim where reflection over generic instantiations is unsafe.
         public override object? GetData() => Data;
 
-        public static implicit operator Result<T>(T value)
-        {
-            return Success(value);
-        }
+        public static implicit operator Result<T>(T value) => Success(value);
 
-        public static implicit operator Result<T>(Exception e)
-        {
-            return Fail(e.Message);
-        }
+        public static implicit operator Result<T>(Error e) => Fail(e);
 
-        public static implicit operator Result<T>(Error e)
-        {
-            return Fail(e);
-        }
+        public static Result<T> Success(T data) => new() { IsSuccess = true, Data = data };
 
-        public static Result<T> Success(T data)
+        public new static Result<T> Fail(string message) => new()
         {
-            return new Result<T>
-            {
-                IsSuccess = true,
-                Data = data
-            };
-        }
+            IsSuccess = false,
+            Error = new Error { Message = message }
+        };
 
-        public new static Result<T> Fail(string message)
+        public new static Result<T> Fail(Error error) => new()
         {
-            return new Result<T>
-            {
-                Error = new Error
-                {
-                    Message = message
-                },
-                IsSuccess = false
-            };
-        }
+            IsSuccess = false,
+            Error = error
+        };
 
-        public new static Result<T> Fail(Error error)
-        {
-            return new Result<T>
-            {
-                Error = error,
-                IsSuccess = false
-            };
-        }
+        public new static Task<Result<T>> FailAsTask(string message) => Task.FromResult(Fail(message));
 
-
-        public new static Task<Result<T>> FailAsTask(string message)
-        {
-            return Task.FromResult(new Result<T>
-            {
-                Error = new Error
-                {
-                    Message = message
-                },
-                IsSuccess = false
-            });
-        }
-
-        public static Task<Result<T>> SuccessAsTask(T data)
-        {
-            return Task.FromResult(new Result<T>
-            {
-                IsSuccess = true,
-                Data = data
-            });
-        }
+        public static Task<Result<T>> SuccessAsTask(T data) => Task.FromResult(Success(data));
     }
 }

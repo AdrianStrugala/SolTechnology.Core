@@ -1,10 +1,6 @@
 namespace SolTechnology.Core.CQRS.Errors;
 
 /// <summary>
-/// Failure caused by a state collision (e.g. duplicate key, optimistic-concurrency mismatch,
-/// resource-already-exists). The API layer maps this to <c>HTTP 409 Conflict</c>.
+/// Failure caused by a state collision (duplicate key, optimistic concurrency). Maps to HTTP 409.
 /// </summary>
-public class ConflictError : Error
-{
-}
-
+public record ConflictError : Error;

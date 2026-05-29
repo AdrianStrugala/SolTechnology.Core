@@ -1,4 +1,4 @@
-﻿﻿using DreamTravel.Queries.CalculateBestPath;
+﻿﻿﻿using DreamTravel.Queries.CalculateBestPath;
 using DreamTravel.TravelingSalesmanProblem;
 using Microsoft.Extensions.DependencyInjection;
 using SolTechnology.Core.CQRS;
@@ -10,7 +10,7 @@ namespace DreamTravel.Queries
     {
         public static IServiceCollection InstallTripsQueries(this IServiceCollection services)
         {
-            services.RegisterQueries();
+            services.AddCQRS(assemblies: typeof(ModuleInstaller).Assembly);
             // Explicit assembly: GetCallingAssembly() is unreliable under JIT inlining / WAF.
             services.RegisterStories(assemblies: typeof(CalculateBestPathStory).Assembly);
 

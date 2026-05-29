@@ -1,10 +1,9 @@
-﻿using FluentValidation;
-using MediatR;
+﻿﻿using FluentValidation;
 using SolTechnology.Core.CQRS;
 
 namespace DreamTravel.Queries.CalculateBestPath;
 
-public class CalculateBestPathQuery : IRequest<Result<CalculateBestPathResult>>
+public class CalculateBestPathQuery : IQuery<CalculateBestPathResult>
 {
     public List<CityQueryModel> Cities { get; set; } = new();
 

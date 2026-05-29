@@ -1,14 +1,12 @@
 using DreamTravel.Infrastructure.Events;
-using MediatR;
+using SolTechnology.Core.CQRS;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace DreamTravel.FunctionalTests;
 
 /// <summary>
 /// Test-only synchronous replacement for <see cref="IHangfireNotificationPublisher"/>.
-/// Dispatches the notification through MediatR resolved from the Worker host's
-/// scope (handlers live there), bypassing Hangfire SQL polling that adds 15-30 s
-/// latency to component tests.
+/// Dispatches the notification through IMediator resolved from the Worker host's scope.
 /// </summary>
 internal sealed class SyncHangfireNotificationPublisher : IHangfireNotificationPublisher
 {
@@ -28,9 +26,6 @@ internal sealed class SyncHangfireNotificationPublisher : IHangfireNotificationP
 
         using var scope = factory.CreateScope();
         var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
-        mediator.Publish(notification).GetAwaiter().GetResult();
+        mediator.Publish(notification);
     }
 }
-
-
-
