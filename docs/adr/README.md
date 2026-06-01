@@ -14,6 +14,7 @@ Decisions that shape SolTechnology.Core. One ADR = one decision. Filenames follo
 | 005 | [HTTP production defaults](005-http-production-defaults.md) | Accepted | ✅ Done |
 | 006 | [Implementation plan workflow](006-implementation-plan-workflow.md) | Accepted | ✅ Done |
 | 007 | [CQRS production hardening + in-house mediator](007-cqrs-production-hardening.md) | Accepted | ✅ Done |
+| 008 | [Testing framework `.Testing` companion packages](008-testing-framework-companions.md) | Proposed | 🔍 Implementing — see [summary](008-testing-framework-companions/summary.md) |
 
 Status values: `Proposed` / `Accepted` / `Superseded` / `Rejected`.
 Implementation values: `N/A` / `⬜ To-do` / `🔍 Implementing` / `✅ Done`.
