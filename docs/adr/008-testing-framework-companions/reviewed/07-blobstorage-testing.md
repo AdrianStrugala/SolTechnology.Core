@@ -22,7 +22,7 @@ one concern.
 
 ## Details
 - Azure-specific by design: the LocalStack/S3 path from KYC is intentionally **not** ported.
-- **Consume the shared lifetime model from step 02**: `TESTCONTAINERS_REUSE` reuse policy + `ContainerReuse` (stable name, one-time init, cached connection string) + `ContainerLifecycleHelper.EnsureRunningAsync`; dispose no-op when reuse on. Do not re-implement reuse.
+- **Consume the shared lifetime model from step 02**: booted once by the consumer's assembly-level `[OneTimeSetUp]` (within-run reuse free); across-run reuse via `TestContainersContext`'s `TESTCONTAINERS_REUSE` policy (Testcontainers-native `.WithReuse(true)` + stable name) + `ContainerLifecycleHelper.EnsureRunningAsync`; dispose no-op when reuse on. No `ContainerReuse` helper — do not hand-roll a reuse cache.
 - No coupling to `SolTechnology.Core.BlobStorage` runtime registration — the fixture only stands up Azurite + returns connection details.
 - Optional container-reset / clear-containers helper for between-test cleanup.
 - **No test project.** Per ADR-008 there is intentionally no `tests/SolTechnology.Core.BlobStorage.Testing.Tests`; validation is build-based plus a documented manual smoke (blob round-trips). Nothing is added to `tests/`, so PR/CI builds are unaffected.

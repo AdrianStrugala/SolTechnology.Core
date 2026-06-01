@@ -81,10 +81,16 @@ for new tests. Both stacks are listed; pick NUnit for new projects.
 | `Microsoft.NET.Test.Sdk` | `17.12.0` | All `tests/*` | Required by every test project. |
 | `xunit` | `2.9.2` | All `tests/*` (legacy) | Keep for existing tests. Do not add to a new test project. |
 | `xunit.runner.visualstudio` | `2.8.2` | All `tests/*` (legacy) | Must match `xunit` major. |
-| `NUnit` | _not yet pinned_ | New test projects per `ClaudeCodingGuide §8` | First new NUnit project records the chosen version here. |
+| `Microsoft.NET.Test.Sdk` (NUnit) | `17.12.0` | New NUnit test projects | Same SDK as xUnit projects. |
+| `NUnit` | `4.2.2` | `SolTechnology.Core.Testing` (first new NUnit project); DreamTravel sample app | Recorded per `ClaudeCodingGuide §8`. |
 | `FluentAssertions` | `6.12.2` | Most `tests/*` | `tests/SolTechnology.Core.Logging.Tests` on `6.12.1` — align on next touch. |
-| `NSubstitute` | `5.3.0` | `tests/SolTechnology.Core.Api.Tests` | — |
-| `AutoFixture` | _not yet pinned_ | New test projects per `ClaudeCodingGuide §8` | First new project records the chosen version here. |
+| `NSubstitute` | `5.3.0` | `tests/SolTechnology.Core.Api.Tests`, `SolTechnology.Core.Testing` | House mock — `Moq` is anti-stack. |
+| `AutoFixture` | `4.18.1` | `SolTechnology.Core.Testing` | Core 4.x family caps at 4.18.1. |
+| `AutoFixture.AutoNSubstitute` | `4.18.1` | `SolTechnology.Core.Testing` | NSubstitute auto-faking (not `AutoFixture.AutoMoq` — Moq is anti-stack). |
+| `AutoFixture.NUnit4` | `4.19.0` | `SolTechnology.Core.Testing` | NUnit4 adapter ships a 4.19.0; depends on AutoFixture ≥ 4.18.1. |
+| `Bogus` | `35.6.1` | `SolTechnology.Core.Testing` (opt-in customization) | Realistic data generator; complements AutoFixture, does not replace it. |
+| `Docker.DotNet` | `3.125.15` | `SolTechnology.Core.Testing` | Container restart-if-stopped + health/AMQP probes. |
+| `Serilog.Sinks.InMemory` | `0.11.0` | `SolTechnology.Core.Testing` | In-memory log assertions. |
 | `coverlet.collector` | `6.0.4` | All `tests/*` | Coverage collector — wire as a `PrivateAssets="all"` developer dependency. |
 
 ## Anti-stack — never add to this repo

@@ -22,7 +22,7 @@ one concern.
 
 ## Details
 - Expose connection string in the shape apps wire today (`Redis:HostName` = `host:port`, `Redis:Enabled`).
-- **Consume the shared lifetime model from step 02**: `TESTCONTAINERS_REUSE` reuse policy + `ContainerReuse` (stable name, one-time init, cached connection string) + dispose no-op when reuse on. Do not re-implement reuse.
+- **Consume the shared lifetime model from step 02**: booted once by the consumer's assembly-level `[OneTimeSetUp]` (within-run reuse free); across-run reuse via `TestContainersContext`'s `TESTCONTAINERS_REUSE` policy (Testcontainers-native `.WithReuse(true)` + stable name); dispose no-op when reuse on. No `ContainerReuse` helper — do not hand-roll a reuse cache.
 - No coupling to `SolTechnology.Core.Cache` runtime types — fixture only provides a running Redis + connection string.
 - Optional `FlushAsync()` helper for between-test reset (the reset path when the container is reused).
 - **No test project.** Per ADR-008 there is intentionally no `tests/SolTechnology.Core.Redis.Testing.Tests`; validation is build-based plus a documented manual smoke (container starts, `PING` succeeds). Nothing is added to `tests/`, so PR/CI builds are unaffected.
