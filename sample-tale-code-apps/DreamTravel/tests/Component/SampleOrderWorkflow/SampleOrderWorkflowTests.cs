@@ -1,4 +1,4 @@
-﻿﻿using FluentAssertions;
+using FluentAssertions;
 using SolTechnology.Core.Story.Api;
 using SolTechnology.Core.Story.Models;
 

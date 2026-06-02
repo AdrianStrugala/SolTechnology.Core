@@ -1,4 +1,4 @@
-﻿using WireMock.ResponseBuilders;
+using WireMock.ResponseBuilders;
 
 namespace SolTechnology.Core.HTTP.Testing.Faker
 {

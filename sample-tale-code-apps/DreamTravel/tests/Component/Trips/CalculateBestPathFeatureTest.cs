@@ -1,4 +1,4 @@
-﻿﻿﻿﻿﻿using DreamTravel.Domain.Cities;
+using DreamTravel.Domain.Cities;
 using DreamTravel.FunctionalTests.FakeApis;
 using DreamTravel.GeolocationDataClients.GoogleApi;
 using FluentAssertions;

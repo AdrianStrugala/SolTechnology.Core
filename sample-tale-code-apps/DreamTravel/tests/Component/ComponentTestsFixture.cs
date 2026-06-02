@@ -1,4 +1,4 @@
-﻿﻿﻿﻿using DreamTravel.Api;
+using DreamTravel.Api;
 using DreamTravel.FunctionalTests.FakeApis;
 using DreamTravel.Infrastructure.Events;
 using DreamTravel.Sql;

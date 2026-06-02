@@ -1,4 +1,4 @@
-﻿﻿﻿using SolTechnology.Core.HTTP.Testing.Faker;
+using SolTechnology.Core.HTTP.Testing.Faker;
   using WireMock.Logging;
 using WireMock.Net.StandAlone;
 using WireMock.Server;

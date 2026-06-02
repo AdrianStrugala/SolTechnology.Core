@@ -1,4 +1,4 @@
-﻿using DreamTravel.Queries.LimitCostOfPaths;
+using DreamTravel.Queries.LimitCostOfPaths;
 using Path = DreamTravel.Domain.Paths.Path;
 
 namespace DreamTravel.Queries.UnitTests.LimitCostOfPaths

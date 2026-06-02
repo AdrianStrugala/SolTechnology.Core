@@ -1,4 +1,4 @@
-﻿﻿﻿﻿﻿using System.Diagnostics;
+using System.Diagnostics;
 using DreamTravel.Domain.Cities;
 using DreamTravel.GeolocationDataClients.GoogleApi;
 using DreamTravel.Sql;

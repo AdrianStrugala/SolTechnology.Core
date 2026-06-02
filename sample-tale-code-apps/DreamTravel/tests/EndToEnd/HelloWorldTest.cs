@@ -1,4 +1,4 @@
-﻿namespace DreamTravel.E2E.Tests;
+namespace DreamTravel.E2E.Tests;
 
 public class Tests
 {

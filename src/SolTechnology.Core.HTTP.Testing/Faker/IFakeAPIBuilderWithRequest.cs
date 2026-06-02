@@ -1,4 +1,4 @@
-﻿﻿ namespace SolTechnology.Core.HTTP.Testing.Faker
+ namespace SolTechnology.Core.HTTP.Testing.Faker
 {
     public interface IFakeApiBuilderWithRequest<out TApiClient> where TApiClient : class
     {

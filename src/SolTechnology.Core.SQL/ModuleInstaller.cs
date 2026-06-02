@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using SolTechnology.Core.SQL.Connections;
 using SolTechnology.Core.SQL.Transactions;

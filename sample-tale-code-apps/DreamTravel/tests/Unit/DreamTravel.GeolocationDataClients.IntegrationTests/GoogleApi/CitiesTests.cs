@@ -1,4 +1,4 @@
-﻿//Reference
+//Reference
 //https://github.com/nchaulet/node-geocoder/blob/master/lib/geocoder/googlegeocoder.js
 
 
