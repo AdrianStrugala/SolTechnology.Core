@@ -1,7 +1,7 @@
 ---
 adr: 008-testing-framework-companions
 step: 03 of 11
-status: reviewed
+status: done
 ---
 
 <!-- Reviewed: renumbered from to-do/02-sql-testing-extract.md. Type stays `SQLFixture`

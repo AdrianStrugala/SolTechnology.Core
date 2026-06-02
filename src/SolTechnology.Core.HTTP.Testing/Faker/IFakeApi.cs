@@ -1,6 +1,6 @@
 ﻿using WireMock.Server;
 
-namespace SolTechnology.Core.Faker.FakesBase
+namespace SolTechnology.Core.HTTP.Testing.Faker
 {
     public interface IFakeApi
     {

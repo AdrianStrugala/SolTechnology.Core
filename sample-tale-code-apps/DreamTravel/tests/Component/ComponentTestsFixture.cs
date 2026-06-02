@@ -1,4 +1,4 @@
-﻿﻿using DreamTravel.Api;
+﻿﻿﻿﻿using DreamTravel.Api;
 using DreamTravel.FunctionalTests.FakeApis;
 using DreamTravel.Infrastructure.Events;
 using DreamTravel.Sql;
@@ -7,7 +7,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using SolTechnology.Core.API.Testing;
-using SolTechnology.Core.Faker;
+using SolTechnology.Core.HTTP.Testing;
 using SolTechnology.Core.SQL.Testing;
 
 namespace DreamTravel.FunctionalTests
@@ -34,7 +34,7 @@ namespace DreamTravel.FunctionalTests
                 .WithSQLProject(Path.GetFullPath("../../../../../src/Infrastructure/DreamTravelDatabase/DreamTravelDatabase.csproj"));
             await SqlFixture.InitializeAsync();
 
-            // 2. Start WireMock (mocks Google API) on port 2137
+            // 2. Start WireMock (mocks Google API) on a dynamic port — read its URL into config below.
             WireMockFixture = new WireMockFixture();
             WireMockFixture.Initialize();
             WireMockFixture.RegisterFakeApi(new GoogleFakeApi());
@@ -43,7 +43,8 @@ namespace DreamTravel.FunctionalTests
                 .AddJsonFile("appsettings.tests.json")
                 .AddInMemoryCollection(new Dictionary<string, string?>
                 {
-                    {"Sql:ConnectionString", SqlFixture.DatabaseConnectionString}
+                    {"Sql:ConnectionString", SqlFixture.DatabaseConnectionString},
+                    {"HTTPClients:Google:BaseAddress", $"{WireMockFixture.Url}/google/"}
                 })
                 .Build();
 

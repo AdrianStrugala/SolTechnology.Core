@@ -1,8 +1,8 @@
-﻿﻿﻿using DreamTravel.Domain.Cities;
+﻿﻿﻿﻿﻿using DreamTravel.Domain.Cities;
 using DreamTravel.FunctionalTests.FakeApis;
 using DreamTravel.GeolocationDataClients.GoogleApi;
 using FluentAssertions;
-using SolTechnology.Core.Faker;
+using SolTechnology.Core.HTTP.Testing;
 using DreamTravel.Queries.CalculateBestPath;
 
 namespace DreamTravel.FunctionalTests.Trips
@@ -35,7 +35,7 @@ namespace DreamTravel.FunctionalTests.Trips
             foreach (var city in cities)
             {
                 _wireMockFixture.Fake<IGoogleHTTPClient>()
-                    .WithRequest(x => x.GetLocationOfCity, city.Name)
+                    .WithRequest(x => x.GetLocationOfCity(city.Name))
                     .WithResponse(x => x
                         .WithSuccess()
                         .WithBody(GoogleFakeApi.BuildGeocodingResponse(city)));
@@ -43,11 +43,11 @@ namespace DreamTravel.FunctionalTests.Trips
 
             // "Given is fake google distance API".x(() =>
             _wireMockFixture.Fake<IGoogleHTTPClient>()
-                .WithRequest(x => x.GetDurationMatrixByFreeRoad, cities)
+                .WithRequest(x => x.GetDurationMatrixByFreeRoad(cities))
                 .WithResponse(x => x.WithSuccess().WithBody(GoogleFakeApi.FreeDistanceMatrix));
 
             _wireMockFixture.Fake<IGoogleHTTPClient>()
-                .WithRequest(x => x.GetDurationMatrixByTollRoad, cities)
+                .WithRequest(x => x.GetDurationMatrixByTollRoad(cities))
                 .WithResponse(x => x.WithSuccess().WithBody(GoogleFakeApi.TollDistanceMatrix));
 
             // "When user searches for location of each of the cities".x(async () =>

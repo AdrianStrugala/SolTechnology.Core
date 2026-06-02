@@ -9,7 +9,7 @@ Tracking the implementation steps for [ADR-008](../008-testing-framework-compani
 | 01 | Run premortem (plan gate) | [`done/01-run-premortem.md`](done/01-run-premortem.md) | ✅ done |
 | 02 | Foundation package `SolTechnology.Core.Testing` (+ container lifetime/reuse) | [`done/02-core-testing-foundation.md`](done/02-core-testing-foundation.md) | ✅ done |
 | 03 | Extract `SQL.Testing` (MSSQL + Postgres, ORM-agnostic) | [`done/03-sql-testing-extract.md`](done/03-sql-testing-extract.md) | ✅ done |
-| 04 | Migrate WireMock DSL to `HTTP.Testing` (breaking `Faker` rename) | [`reviewed/04-http-testing-from-faker.md`](reviewed/04-http-testing-from-faker.md) | 🔍 reviewed |
+| 04 | Migrate WireMock DSL to `HTTP.Testing` (breaking `Faker` rename) | [`done/04-http-testing-from-faker.md`](done/04-http-testing-from-faker.md) | ✅ done |
 | 05 | Extend `API.Testing` (auth clients + config overrides) | [`reviewed/05-api-testing-extensions.md`](reviewed/05-api-testing-extensions.md) | 🔍 reviewed |
 | 06 | `Redis.Testing` fixture | [`reviewed/06-redis-testing.md`](reviewed/06-redis-testing.md) | 🔍 reviewed |
 | 07 | `BlobStorage.Testing` (Azurite, Azure-specific) | [`reviewed/07-blobstorage-testing.md`](reviewed/07-blobstorage-testing.md) | 🔍 reviewed |

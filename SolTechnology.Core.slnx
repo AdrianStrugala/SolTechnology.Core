@@ -15,6 +15,7 @@
     <File Path="docs/theDesign.md" />
     <File Path="docs/theQuality.md" />
     <File Path="docs\HTTP-Production-Checklist.md" />
+    <File Path="docs\HTTP.Testing.md" />
     <File Path="docs\Testing.md" />
   </Folder>
   <Folder Name="/SampleApps/" />
@@ -97,7 +98,7 @@
     <Project Path="src/SolTechnology.Core.BlobStorage/SolTechnology.Core.BlobStorage.csproj" />
     <Project Path="src/SolTechnology.Core.Cache/SolTechnology.Core.Cache.csproj" />
     <Project Path="src/SolTechnology.Core.CQRS/SolTechnology.Core.CQRS.csproj" />
-    <Project Path="src/SolTechnology.Core.Faker/SolTechnology.Core.Faker.csproj" />
+    <Project Path="src/SolTechnology.Core.HTTP.Testing/SolTechnology.Core.HTTP.Testing.csproj" />
     <Project Path="src/SolTechnology.Core.Story/SolTechnology.Core.Story.csproj" />
     <Project Path="src/SolTechnology.Core.Guards/SolTechnology.Core.Guards.csproj" />
     <Project Path="src/SolTechnology.Core.Logging/SolTechnology.Core.Logging.csproj" />

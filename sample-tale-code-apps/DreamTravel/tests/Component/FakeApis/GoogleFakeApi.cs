@@ -1,15 +1,15 @@
-﻿using System.Collections.Generic;
+﻿﻿using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 using DreamTravel.Domain.Cities;
 using DreamTravel.GeolocationDataClients.GoogleApi;
-using SolTechnology.Core.Faker.FakesBase;
+using SolTechnology.Core.HTTP.Testing.Faker;
 using WireMock.Matchers;
 using WireMock.RequestBuilders;
 
 namespace DreamTravel.FunctionalTests.FakeApis
 {
-    public class GoogleFakeApi : FakeApiBase<IGoogleHTTPClient>, IGoogleHTTPClient
+    public class GoogleFakeApi : FakeApiBase, IGoogleHTTPClient
     {
         protected override string BaseUrl => "google";
 
@@ -86,32 +86,32 @@ namespace DreamTravel.FunctionalTests.FakeApis
 
         internal static string TollDistanceMatrix = @"
 {
-   ""destination_addresses"" : 
+   ""destination_addresses"" :
    [
       ""Droga bez nazwy, 50-438 Wrocław, Poland"",
       ""P.za della Signoria, 16, 50122 Firenze FI, Italy"",
       ""Minoritenplatz 5, 1010 Wien, Austria"",
       ""C/ de Muntaner, 139, 08036 Barcelona, Spain""
    ],
-   ""origin_addresses"" : 
+   ""origin_addresses"" :
    [
       ""Droga bez nazwy, 50-438 Wrocław, Poland"",
       ""P.za della Signoria, 16, 50122 Firenze FI, Italy"",
       ""Minoritenplatz 5, 1010 Wien, Austria"",
       ""C/ de Muntaner, 139, 08036 Barcelona, Spain""
    ],
-   ""rows"" : 
+   ""rows"" :
    [
       {
-         ""elements"" : 
+         ""elements"" :
          [
             {
-               ""distance"" : 
+               ""distance"" :
                {
                   ""text"" : ""1 ft"",
                   ""value"" : 0
                },
-               ""duration"" : 
+               ""duration"" :
                {
                   ""text"" : ""1 min"",
                   ""value"" : 0
@@ -119,12 +119,12 @@ namespace DreamTravel.FunctionalTests.FakeApis
                ""status"" : ""OK""
             },
             {
-               ""distance"" : 
+               ""distance"" :
                {
                   ""text"" : ""864 mi"",
                   ""value"" : 1390052
                },
-               ""duration"" : 
+               ""duration"" :
                {
                   ""text"" : ""13 hours 57 mins"",
                   ""value"" : 50193
@@ -132,12 +132,12 @@ namespace DreamTravel.FunctionalTests.FakeApis
                ""status"" : ""OK""
             },
             {
-               ""distance"" : 
+               ""distance"" :
                {
                   ""text"" : ""336 mi"",
                   ""value"" : 540565
                },
-               ""duration"" : 
+               ""duration"" :
                {
                   ""text"" : ""5 hours 37 mins"",
                   ""value"" : 20220
@@ -145,12 +145,12 @@ namespace DreamTravel.FunctionalTests.FakeApis
                ""status"" : ""OK""
             },
             {
-               ""distance"" : 
+               ""distance"" :
                {
                   ""text"" : ""1,244 mi"",
                   ""value"" : 2001261
                },
-               ""duration"" : 
+               ""duration"" :
                {
                   ""text"" : ""19 hours 51 mins"",
                   ""value"" : 71459
@@ -160,15 +160,15 @@ namespace DreamTravel.FunctionalTests.FakeApis
          ]
       },
       {
-         ""elements"" : 
+         ""elements"" :
          [
             {
-               ""distance"" : 
+               ""distance"" :
                {
                   ""text"" : ""865 mi"",
                   ""value"" : 1391959
                },
-               ""duration"" : 
+               ""duration"" :
                {
                   ""text"" : ""14 hours 1 min"",
                   ""value"" : 50454
@@ -176,12 +176,12 @@ namespace DreamTravel.FunctionalTests.FakeApis
                ""status"" : ""OK""
             },
             {
-               ""distance"" : 
+               ""distance"" :
                {
                   ""text"" : ""1 ft"",
                   ""value"" : 0
                },
-               ""duration"" : 
+               ""duration"" :
                {
                   ""text"" : ""1 min"",
                   ""value"" : 0
@@ -189,12 +189,12 @@ namespace DreamTravel.FunctionalTests.FakeApis
                ""status"" : ""OK""
             },
             {
-               ""distance"" : 
+               ""distance"" :
                {
                   ""text"" : ""537 mi"",
                   ""value"" : 863662
                },
-               ""duration"" : 
+               ""duration"" :
                {
                   ""text"" : ""8 hours 47 mins"",
                   ""value"" : 31608
@@ -202,12 +202,12 @@ namespace DreamTravel.FunctionalTests.FakeApis
                ""status"" : ""OK""
             },
             {
-               ""distance"" : 
+               ""distance"" :
                {
                   ""text"" : ""676 mi"",
                   ""value"" : 1088260
                },
-               ""duration"" : 
+               ""duration"" :
                {
                   ""text"" : ""11 hours 23 mins"",
                   ""value"" : 40982
@@ -217,15 +217,15 @@ namespace DreamTravel.FunctionalTests.FakeApis
          ]
       },
       {
-         ""elements"" : 
+         ""elements"" :
          [
             {
-               ""distance"" : 
+               ""distance"" :
                {
                   ""text"" : ""335 mi"",
                   ""value"" : 538921
                },
-               ""duration"" : 
+               ""duration"" :
                {
                   ""text"" : ""5 hours 41 mins"",
                   ""value"" : 20461
@@ -233,12 +233,12 @@ namespace DreamTravel.FunctionalTests.FakeApis
                ""status"" : ""OK""
             },
             {
-               ""distance"" : 
+               ""distance"" :
                {
                   ""text"" : ""539 mi"",
                   ""value"" : 867277
                },
-               ""duration"" : 
+               ""duration"" :
                {
                   ""text"" : ""8 hours 47 mins"",
                   ""value"" : 31597
@@ -246,12 +246,12 @@ namespace DreamTravel.FunctionalTests.FakeApis
                ""status"" : ""OK""
             },
             {
-               ""distance"" : 
+               ""distance"" :
                {
                   ""text"" : ""1 ft"",
                   ""value"" : 0
                },
-               ""duration"" : 
+               ""duration"" :
                {
                   ""text"" : ""1 min"",
                   ""value"" : 0
@@ -259,12 +259,12 @@ namespace DreamTravel.FunctionalTests.FakeApis
                ""status"" : ""OK""
             },
             {
-               ""distance"" : 
+               ""distance"" :
                {
                   ""text"" : ""1,107 mi"",
                   ""value"" : 1780836
                },
-               ""duration"" : 
+               ""duration"" :
                {
                   ""text"" : ""18 hours 2 mins"",
                   ""value"" : 64925
@@ -274,15 +274,15 @@ namespace DreamTravel.FunctionalTests.FakeApis
          ]
       },
       {
-         ""elements"" : 
+         ""elements"" :
          [
             {
-               ""distance"" : 
+               ""distance"" :
                {
                   ""text"" : ""1,244 mi"",
                   ""value"" : 2002210
                },
-               ""duration"" : 
+               ""duration"" :
                {
                   ""text"" : ""19 hours 46 mins"",
                   ""value"" : 71157
@@ -290,12 +290,12 @@ namespace DreamTravel.FunctionalTests.FakeApis
                ""status"" : ""OK""
             },
             {
-               ""distance"" : 
+               ""distance"" :
                {
                   ""text"" : ""684 mi"",
                   ""value"" : 1100142
                },
-               ""duration"" : 
+               ""duration"" :
                {
                   ""text"" : ""11 hours 25 mins"",
                   ""value"" : 41083
@@ -303,12 +303,12 @@ namespace DreamTravel.FunctionalTests.FakeApis
                ""status"" : ""OK""
             },
             {
-               ""distance"" : 
+               ""distance"" :
                {
                   ""text"" : ""1,118 mi"",
                   ""value"" : 1799561
                },
-               ""duration"" : 
+               ""duration"" :
                {
                   ""text"" : ""17 hours 55 mins"",
                   ""value"" : 64526
@@ -316,12 +316,12 @@ namespace DreamTravel.FunctionalTests.FakeApis
                ""status"" : ""OK""
             },
             {
-               ""distance"" : 
+               ""distance"" :
                {
                   ""text"" : ""1 ft"",
                   ""value"" : 0
                },
-               ""duration"" : 
+               ""duration"" :
                {
                   ""text"" : ""1 min"",
                   ""value"" : 0
@@ -337,32 +337,32 @@ namespace DreamTravel.FunctionalTests.FakeApis
 
         internal static string FreeDistanceMatrix = @"
 {
-   ""destination_addresses"" : 
+   ""destination_addresses"" :
    [
       ""Droga bez nazwy, 50-438 Wrocław, Poland"",
       ""P.za della Signoria, 16, 50122 Firenze FI, Italy"",
       ""Minoritenplatz 5, 1010 Wien, Austria"",
       ""C/ de Muntaner, 139, 08036 Barcelona, Spain""
    ],
-   ""origin_addresses"" : 
+   ""origin_addresses"" :
    [
       ""Droga bez nazwy, 50-438 Wrocław, Poland"",
       ""P.za della Signoria, 16, 50122 Firenze FI, Italy"",
       ""Minoritenplatz 5, 1010 Wien, Austria"",
       ""C/ de Muntaner, 139, 08036 Barcelona, Spain""
    ],
-   ""rows"" : 
+   ""rows"" :
    [
       {
-         ""elements"" : 
+         ""elements"" :
          [
             {
-               ""distance"" : 
+               ""distance"" :
                {
                   ""text"" : ""1 ft"",
                   ""value"" : 0
                },
-               ""duration"" : 
+               ""duration"" :
                {
                   ""text"" : ""1 min"",
                   ""value"" : 0
@@ -370,12 +370,12 @@ namespace DreamTravel.FunctionalTests.FakeApis
                ""status"" : ""OK""
             },
             {
-               ""distance"" : 
+               ""distance"" :
                {
                   ""text"" : ""866 mi"",
                   ""value"" : 1394314
                },
-               ""duration"" : 
+               ""duration"" :
                {
                   ""text"" : ""18 hours 28 mins"",
                   ""value"" : 66480
@@ -383,12 +383,12 @@ namespace DreamTravel.FunctionalTests.FakeApis
                ""status"" : ""OK""
             },
             {
-               ""distance"" : 
+               ""distance"" :
                {
                   ""text"" : ""242 mi"",
                   ""value"" : 388914
                },
-               ""duration"" : 
+               ""duration"" :
                {
                   ""text"" : ""6 hours 46 mins"",
                   ""value"" : 24381
@@ -396,12 +396,12 @@ namespace DreamTravel.FunctionalTests.FakeApis
                ""status"" : ""OK""
             },
             {
-               ""distance"" : 
+               ""distance"" :
                {
                   ""text"" : ""1,309 mi"",
                   ""value"" : 2107316
                },
-               ""duration"" : 
+               ""duration"" :
                {
                   ""text"" : ""23 hours 49 mins"",
                   ""value"" : 85713
@@ -411,15 +411,15 @@ namespace DreamTravel.FunctionalTests.FakeApis
          ]
       },
       {
-         ""elements"" : 
+         ""elements"" :
          [
             {
-               ""distance"" : 
+               ""distance"" :
                {
                   ""text"" : ""864 mi"",
                   ""value"" : 1391229
                },
-               ""duration"" : 
+               ""duration"" :
                {
                   ""text"" : ""18 hours 32 mins"",
                   ""value"" : 66739
@@ -427,12 +427,12 @@ namespace DreamTravel.FunctionalTests.FakeApis
                ""status"" : ""OK""
             },
             {
-               ""distance"" : 
+               ""distance"" :
                {
                   ""text"" : ""1 ft"",
                   ""value"" : 0
                },
-               ""duration"" : 
+               ""duration"" :
                {
                   ""text"" : ""1 min"",
                   ""value"" : 0
@@ -440,12 +440,12 @@ namespace DreamTravel.FunctionalTests.FakeApis
                ""status"" : ""OK""
             },
             {
-               ""distance"" : 
+               ""distance"" :
                {
                   ""text"" : ""509 mi"",
                   ""value"" : 818437
                },
-               ""duration"" : 
+               ""duration"" :
                {
                   ""text"" : ""14 hours 48 mins"",
                   ""value"" : 53279
@@ -453,12 +453,12 @@ namespace DreamTravel.FunctionalTests.FakeApis
                ""status"" : ""OK""
             },
             {
-               ""distance"" : 
+               ""distance"" :
                {
                   ""text"" : ""766 mi"",
                   ""value"" : 1232538
                },
-               ""duration"" : 
+               ""duration"" :
                {
                   ""text"" : ""20 hours 29 mins"",
                   ""value"" : 73765
@@ -468,15 +468,15 @@ namespace DreamTravel.FunctionalTests.FakeApis
          ]
       },
       {
-         ""elements"" : 
+         ""elements"" :
          [
             {
-               ""distance"" : 
+               ""distance"" :
                {
                   ""text"" : ""242 mi"",
                   ""value"" : 390156
                },
-               ""duration"" : 
+               ""duration"" :
                {
                   ""text"" : ""6 hours 45 mins"",
                   ""value"" : 24319
@@ -484,12 +484,12 @@ namespace DreamTravel.FunctionalTests.FakeApis
                ""status"" : ""OK""
             },
             {
-               ""distance"" : 
+               ""distance"" :
                {
                   ""text"" : ""516 mi"",
                   ""value"" : 830266
                },
-               ""duration"" : 
+               ""duration"" :
                {
                   ""text"" : ""14 hours 39 mins"",
                   ""value"" : 52732
@@ -497,12 +497,12 @@ namespace DreamTravel.FunctionalTests.FakeApis
                ""status"" : ""OK""
             },
             {
-               ""distance"" : 
+               ""distance"" :
                {
                   ""text"" : ""1 ft"",
                   ""value"" : 0
                },
-               ""duration"" : 
+               ""duration"" :
                {
                   ""text"" : ""1 min"",
                   ""value"" : 0
@@ -510,12 +510,12 @@ namespace DreamTravel.FunctionalTests.FakeApis
                ""status"" : ""OK""
             },
             {
-               ""distance"" : 
+               ""distance"" :
                {
                   ""text"" : ""1,270 mi"",
                   ""value"" : 2043640
                },
-               ""duration"" : 
+               ""duration"" :
                {
                   ""text"" : ""1 day 1 hour"",
                   ""value"" : 88235
@@ -525,15 +525,15 @@ namespace DreamTravel.FunctionalTests.FakeApis
          ]
       },
       {
-         ""elements"" : 
+         ""elements"" :
          [
             {
-               ""distance"" : 
+               ""distance"" :
                {
                   ""text"" : ""1,310 mi"",
                   ""value"" : 2109014
                },
-               ""duration"" : 
+               ""duration"" :
                {
                   ""text"" : ""23 hours 45 mins"",
                   ""value"" : 85522
@@ -541,12 +541,12 @@ namespace DreamTravel.FunctionalTests.FakeApis
                ""status"" : ""OK""
             },
             {
-               ""distance"" : 
+               ""distance"" :
                {
                   ""text"" : ""763 mi"",
                   ""value"" : 1227477
                },
-               ""duration"" : 
+               ""duration"" :
                {
                   ""text"" : ""20 hours 27 mins"",
                   ""value"" : 73632
@@ -554,12 +554,12 @@ namespace DreamTravel.FunctionalTests.FakeApis
                ""status"" : ""OK""
             },
             {
-               ""distance"" : 
+               ""distance"" :
                {
                   ""text"" : ""1,267 mi"",
                   ""value"" : 2039683
                },
-               ""duration"" : 
+               ""duration"" :
                {
                   ""text"" : ""1 day 0 hours"",
                   ""value"" : 88050
@@ -567,12 +567,12 @@ namespace DreamTravel.FunctionalTests.FakeApis
                ""status"" : ""OK""
             },
             {
-               ""distance"" : 
+               ""distance"" :
                {
                   ""text"" : ""1 ft"",
                   ""value"" : 0
                },
-               ""duration"" : 
+               ""duration"" :
                {
                   ""text"" : ""1 min"",
                   ""value"" : 0

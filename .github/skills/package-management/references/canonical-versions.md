@@ -58,6 +58,14 @@ change**. When rows drift between projects, the row records the highest version 
 | `Npgsql` | `8.0.5` | `SolTechnology.Core.SQL.Testing` | Postgres ADO provider. |
 | `Respawn` | `6.2.1` | `SolTechnology.Core.SQL.Testing` | Between-test database reset (SqlServer + Postgres adapters). |
 
+## HTTP / mocking (test companions)
+
+| Package | Version | Used by | Notes |
+|---|---|---|---|
+| `WireMock.Net` | `1.6.8` | `SolTechnology.Core.HTTP.Testing` | Fake HTTP server. Carried over from the retired `SolTechnology.Core.Faker`. |
+| `WireMock.Net.StandAlone` | `1.6.8` | `SolTechnology.Core.HTTP.Testing` | Standalone server host. Match `WireMock.Net`. |
+| `System.Linq.Dynamic.Core` | `1.6.0` | `SolTechnology.Core.HTTP.Testing` | **Transitive CVE override** — `WireMock.Net` drags the vulnerable `1.3.12` (CVE-2024-51417 / GHSA-4cv2-4hjh-77rx, HIGH); this pins it up to the patched `1.6.0`. Not used directly in source. |
+
 ## Serialisation
 
 | Package | Version | Used by | Notes |

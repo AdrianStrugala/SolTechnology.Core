@@ -1,4 +1,4 @@
-﻿﻿﻿using System.Diagnostics;
+﻿﻿﻿﻿﻿using System.Diagnostics;
 using DreamTravel.Domain.Cities;
 using DreamTravel.GeolocationDataClients.GoogleApi;
 using DreamTravel.Sql;
@@ -7,7 +7,7 @@ using DreamTravel.FunctionalTests.FakeApis;
 using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using SolTechnology.Core.Faker;
+using SolTechnology.Core.HTTP.Testing;
 
 namespace DreamTravel.FunctionalTests.Trips;
 
@@ -39,7 +39,7 @@ public class FindCityAndSaveDetailsTest
         };
 
         _wireMockFixture.Fake<IGoogleHTTPClient>()
-            .WithRequest(x => x.GetLocationOfCity, city.Name)
+            .WithRequest(x => x.GetLocationOfCity(city.Name))
             .WithResponse(x => x
                 .WithSuccess()
                 .WithBody(GoogleFakeApi.BuildGeocodingResponse(city)));

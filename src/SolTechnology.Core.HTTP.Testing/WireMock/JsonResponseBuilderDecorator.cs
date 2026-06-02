@@ -8,7 +8,7 @@ using WireMock.ResponseBuilders;
 using WireMock.Settings;
 using WireMock.Types;
 
-namespace SolTechnology.Core.Faker.WireMock;
+namespace SolTechnology.Core.HTTP.Testing.WireMock;
 
 public class JsonResponseBuilderDecorator : IResponseBuilder
 {
@@ -117,19 +117,22 @@ public class JsonResponseBuilderDecorator : IResponseBuilder
     public IResponseBuilder WithBodyAsProtoBuf(string protoDefinition, string messageType, object value,
         IJsonConverter? jsonConverter = null, JsonConverterOptions? options = null)
     {
-        throw new NotImplementedException();
+        _originalBuilder.WithBodyAsProtoBuf(protoDefinition, messageType, value, jsonConverter, options);
+        return this;
     }
 
     public IResponseBuilder WithBodyAsProtoBuf(IReadOnlyList<string> protoDefinitions, string messageType, object value,
         IJsonConverter? jsonConverter = null, JsonConverterOptions? options = null)
     {
-        throw new NotImplementedException();
+        _originalBuilder.WithBodyAsProtoBuf(protoDefinitions, messageType, value, jsonConverter, options);
+        return this;
     }
 
     public IResponseBuilder WithBodyAsProtoBuf(string messageType, object value, IJsonConverter? jsonConverter = null,
         JsonConverterOptions? options = null)
     {
-        throw new NotImplementedException();
+        _originalBuilder.WithBodyAsProtoBuf(messageType, value, jsonConverter, options);
+        return this;
     }
 
     public IResponseBuilder WithBodyAsJson(object body, Encoding? encoding = null, bool? indented = null)
@@ -148,12 +151,14 @@ public class JsonResponseBuilderDecorator : IResponseBuilder
 
     public IResponseBuilder WithBodyAsJson(Func<IRequestMessage, object> bodyFactory, Encoding? encoding = null)
     {
-        throw new NotImplementedException();
+        _originalBuilder.WithBodyAsJson(bodyFactory, encoding);
+        return this;
     }
 
     public IResponseBuilder WithBodyAsJson(Func<IRequestMessage, Task<object>> bodyFactory, Encoding? encoding = null)
     {
-        throw new NotImplementedException();
+        _originalBuilder.WithBodyAsJson(bodyFactory, encoding);
+        return this;
     }
 
     public IResponseBuilder WithBodyFromFile(string filename, bool cache = true)
@@ -188,22 +193,26 @@ public class JsonResponseBuilderDecorator : IResponseBuilder
 
     public IResponseBuilder WithTrailingHeader(string name, params string[] values)
     {
-        throw new NotImplementedException();
+        _originalBuilder.WithTrailingHeader(name, values);
+        return this;
     }
 
     public IResponseBuilder WithTrailingHeaders(IDictionary<string, string> headers)
     {
-        throw new NotImplementedException();
+        _originalBuilder.WithTrailingHeaders(headers);
+        return this;
     }
 
     public IResponseBuilder WithTrailingHeaders(IDictionary<string, string[]> headers)
     {
-        throw new NotImplementedException();
+        _originalBuilder.WithTrailingHeaders(headers);
+        return this;
     }
 
     public IResponseBuilder WithTrailingHeaders(IDictionary<string, WireMockList<string>> headers)
     {
-        throw new NotImplementedException();
+        _originalBuilder.WithTrailingHeaders(headers);
+        return this;
     }
 
     public IResponseBuilder WithStatusCode(int code)
@@ -250,6 +259,7 @@ public class JsonResponseBuilderDecorator : IResponseBuilder
 
     public IResponseBuilder WithProxy(string proxyUrl, X509Certificate2 certificate)
     {
-        throw new NotImplementedException();
+        _originalBuilder.WithProxy(proxyUrl, certificate);
+        return this;
     }
 }

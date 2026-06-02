@@ -1,12 +1,30 @@
 ---
 adr: 008-testing-framework-companions
 step: 04 of 11
-status: reviewed
+status: done
 ---
 
 <!-- Reviewed: renumbered from to-do/03-http-testing-from-faker.md. Faker rename is an
      ACCEPTED breaking change; type-forwarding dropped (impossible across a namespace
      change); consumer migration is step 10. -->
+
+<!-- IMPLEMENTATION DECISIONS (done):
+  1. Faker package DELETED (not kept as an [Obsolete] shim). The whole `src/SolTechnology.Core.Faker`
+     folder was `git mv`'d to `src/SolTechnology.Core.HTTP.Testing` and the namespace renamed
+     `SolTechnology.Core.Faker` → `SolTechnology.Core.HTTP.Testing`. A shim is pointless here: there is
+     one in-repo consumer (DreamTravel) and it is migrated in the same change, and the repo is pre-1.0
+     with a fix-at-source philosophy (same as the SQL extraction). The old `Faker` PackageId is
+     orphaned on NuGet — accepted breaking change per ADR-008.
+  2. csproj gained full package metadata (was a bare stub) + a ProjectReference to
+     `SolTechnology.Core.Testing`. Deps unchanged: WireMock.Net 1.6.8, WireMock.Net.StandAlone 1.6.8,
+     System.Linq.Dynamic.Core 1.6.0.
+  3. DreamTravel migrated NOW (brought forward from step 10, because deleting Faker breaks its build):
+     `DreamTravel.Component.Tests.csproj` ProjectReference Faker → HTTP.Testing; `using`
+     `SolTechnology.Core.Faker[.FakesBase]` → `SolTechnology.Core.HTTP.Testing[.FakesBase]` in
+     ComponentTestsFixture, GoogleFakeApi, CalculateBestPathFeatureTest, FindCityAndSaveDetailsTest.
+  Builds: HTTP.Testing `-c Release` → 0 warnings / 0 errors; DreamTravel.Component.Tests `-c Debug`
+  → 0 errors (pre-existing DreamTravel warnings only). Note: the BOM-prefixed DreamTravel test files
+  needed the editor (a shell `sed` pass silently no-op'd on them). -->
 
 # Step 04: Migrate the WireMock DSL to `SolTechnology.Core.HTTP.Testing`
 
