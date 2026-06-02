@@ -4,7 +4,7 @@ The SolTechnology.Core.SQL library provides minimum functionality needed for SQL
 
 ### Registration
 
-For installing the library, reference **SolTechnology.Core.Sql** nuget package and invoke **AddSQL()** service collection extension method:
+For installing the library, reference **SolTechnology.Core.SQL** nuget package and invoke **AddSQL()** service collection extension method:
 
 ```csharp
 services.AddSQL();

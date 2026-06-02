@@ -1,4 +1,4 @@
-# Sql — `src/SolTechnology.Core.Sql/`
+# SQL — `src/SolTechnology.Core.SQL/`
 
 - Migration ordering / missing migration → schema drift between envs.
 - Mixed Dapper + EF in one transaction → inconsistent state on failure.

@@ -10,11 +10,12 @@
     <File Path="docs/Cron.md" />
     <File Path="docs/Guards.md" />
     <File Path="docs/Log.md" />
-    <File Path="docs/Sql.md" />
+    <File Path="docs/SQL.md" />
     <File Path="docs/theAutomation.md" />
     <File Path="docs/theDesign.md" />
     <File Path="docs/theQuality.md" />
     <File Path="docs\HTTP-Production-Checklist.md" />
+    <File Path="docs\Testing.md" />
   </Folder>
   <Folder Name="/SampleApps/" />
   <Folder Name="/SampleApps/DreamTravel/">
@@ -103,5 +104,7 @@
     <Project Path="src/SolTechnology.Core.MessageBus/SolTechnology.Core.MessageBus.csproj" />
     <Project Path="src/SolTechnology.Core.Scheduler/SolTechnology.Core.Scheduler.csproj" />
     <Project Path="src/SolTechnology.Core.SQL/SolTechnology.Core.SQL.csproj" />
+    <Project Path="src/SolTechnology.Core.Testing/SolTechnology.Core.Testing.csproj" />
+    <Project Path="src/SolTechnology.Core.SQL.Testing/SolTechnology.Core.SQL.Testing.csproj" />
   </Folder>
 </Solution>

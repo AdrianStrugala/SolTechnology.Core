@@ -18,7 +18,15 @@ status: done
      kept. AutoFixture remains the engine; Bogus complements it (ADR-008 Alternative 4 unchanged).
   Versions: NUnit 4.2.2; AutoFixture + AutoFixture.AutoNSubstitute 4.18.1; AutoFixture.NUnit4 4.19.0;
   NSubstitute 5.3.0; Bogus 35.6.1; Testcontainers 3.9.0; Docker.DotNet 3.125.15;
-  Serilog.Sinks.InMemory 0.11.0. Build: `dotnet build -c Release` → 0 warnings, 0 errors. -->
+  Serilog.Sinks.InMemory 0.11.0. Build: `dotnet build -c Release` → 0 warnings, 0 errors.
+  3. Post-review fixes (code-review): removed the `BogusCustomization(int seed)` overload (Bogus' global
+     seed is process-wide and unreliable under parallelism — determinism is via `BogusCustomization<T>`
+     with a user-seeded `Faker<T>`); reordered the member-name heuristics so `username` wins over the
+     generic `…name` fallback.
+  4. Follow-up (CVE): added `System.Text.RegularExpressions` 4.3.1 to prune the vulnerable 4.3.0
+     (CVE-2019-0820, HIGH) that `Docker.DotNet` drags in. Surfaced when a pruning-disabled consumer
+     (DreamTravel) restored Core.Testing in its graph; fixed at source so every consumer is covered.
+     net10 prunes the framework copy → demoted NU1510 only. -->
 
 # Step 02: Foundation package `SolTechnology.Core.Testing`
 

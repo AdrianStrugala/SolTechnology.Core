@@ -5,7 +5,7 @@ status: reviewed
 ---
 
 <!-- Reviewed: renumbered from to-do/07-servicebus-testing.md. Shared MSSQL now flows through
-     SQL.Testing's ISharedSqlContainer (isolated emulator catalog); step-01 refs → step 02. -->
+     SQL.Testing's ISharedSQLContainer (isolated emulator catalog); step-01 refs → step 02. -->
 
 # Step 08: `SolTechnology.Core.ServiceBus.Testing` (Azure Service Bus emulator)
 
@@ -17,7 +17,7 @@ fixture plus its emulator builder; the AMQP readiness probe itself lives in `Cor
 and is consumed here.
 
 ## Affected components
-- `src/SolTechnology.Core.ServiceBus.Testing/SolTechnology.Core.ServiceBus.Testing.csproj` — new package (`Testcontainers.ServiceBus`, `Docker.DotNet`), version `0.1.0`. Depends on `SolTechnology.Core.Testing` **and `SolTechnology.Core.SQL.Testing`** (for the shared MSSQL container via `ISharedSqlContainer`). **No `Testcontainers.MsSql`** — the sibling MSSQL is provided by `SQL.Testing`'s generic-`ContainerBuilder` engine, not spawned here.
+- `src/SolTechnology.Core.ServiceBus.Testing/SolTechnology.Core.ServiceBus.Testing.csproj` — new package (`Testcontainers.ServiceBus`, `Docker.DotNet`), version `0.1.0`. Depends on `SolTechnology.Core.Testing` **and `SolTechnology.Core.SQL.Testing`** (for the shared MSSQL container via `ISharedSQLContainer`). **No `Testcontainers.MsSql`** — the sibling MSSQL is provided by `SQL.Testing`'s generic-`ContainerBuilder` engine, not spawned here.
 - `src/SolTechnology.Core.ServiceBus.Testing/ServiceBusFixture.cs` — port of KYC `Infrastructure/Containers/ServiceBusFixture.cs`. Generalise: remove `aiia-kyc-*` hard-coded names into a configurable instance name; keep multi-named-instance support.
 - `src/SolTechnology.Core.ServiceBus.Testing/ServiceBusInstanceBuilder.cs` — port of KYC `ServiceBusInstanceBuilder` (emulator builder wired to the **shared** MSSQL container from `SQL.Testing` on the shared network).
 - `src/SolTechnology.Core.ServiceBus.Testing/servicebus-emulator-config.json` — emulator topology config (port of KYC's, made consumer-overridable).
@@ -31,7 +31,7 @@ and is consumed here.
   - **Semaphore-guarded, per-instance one-time init** + `ConcurrentDictionary` caches for connection strings and initialized flags — needed here because a single fixture instance may be asked to provide multiple named emulator instances; these caches are private to this fixture.
   - **Restart-if-stopped** via `ContainerLifecycleHelper.EnsureRunningAsync` (handles Docker Desktop stops).
   - **Dispose is a no-op when `TESTCONTAINERS_REUSE` is on.**
-- **Shared MSSQL contract (resolved in step 03).** The fixture consumes the MSSQL container exposed by `SQL.Testing` via `ISharedSqlContainer` rather than spawning a second instance. The emulator's backing database is an **isolated catalog**; `SQL.Testing`'s `SqlReset` is scoped to the application catalog only, so a between-test reset never truncates the emulator's tables.
+- **Shared MSSQL contract (resolved in step 03).** The fixture consumes the MSSQL container exposed by `SQL.Testing` via `ISharedSQLContainer` rather than spawning a second instance. The emulator's backing database is an **isolated catalog**; `SQL.Testing`'s `SQLReset` is scoped to the application catalog only, so a between-test reset never truncates the emulator's tables.
 - Keep app-specific topology (queue/topic names) out of the package — config is consumer-supplied.
 - **No test project.** Per ADR-008 there is intentionally no `tests/SolTechnology.Core.ServiceBus.Testing.Tests`; validation is build-based plus a documented manual smoke (message round-trip gated on the AMQP probe). Nothing is added to `tests/`, so PR/CI builds are unaffected.
 
@@ -43,5 +43,5 @@ and is consumed here.
 - No `aiia-kyc` / app-specific identifiers remain in the package.
 
 ## Open questions
-- none — the shared-MSSQL contract is now an `ISharedSqlContainer` interface exposed by `SQL.Testing` (resolved in step 03).
+- none — the shared-MSSQL contract is now an `ISharedSQLContainer` interface exposed by `SQL.Testing` (resolved in step 03).
 

@@ -126,7 +126,7 @@ flowchart LR
         CQRS[SolTechnology.Core.CQRS]
     end
     subgraph Data
-        Sql[SolTechnology.Core.Sql]
+        Sql[SolTechnology.Core.SQL]
     end
     Api --> CQRS --> Sql
 ```

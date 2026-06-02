@@ -30,7 +30,7 @@ change**. When rows drift between projects, the row records the highest version 
 
 | Package | Version | Used by | Notes |
 |---|---|---|---|
-| `Polly` | `8.5.0` | `SolTechnology.Core.Sql`, indirectly via `Microsoft.Extensions.Http.Resilience` in `SolTechnology.Core.HTTP` | Polly v8 family. v7 is forbidden in new code. |
+| `Polly` | `8.5.0` | `SolTechnology.Core.SQL`, indirectly via `Microsoft.Extensions.Http.Resilience` in `SolTechnology.Core.HTTP` | Polly v8 family. v7 is forbidden in new code. |
 
 ## CQRS / validation
 
@@ -51,8 +51,12 @@ change**. When rows drift between projects, the row records the highest version 
 
 | Package | Version | Used by | Notes |
 |---|---|---|---|
-| `Microsoft.SqlServer.DacFx` | `170.1.61` | `SolTechnology.Core.Sql` | — |
-| `Testcontainers` | `3.9.0` | `SolTechnology.Core.Sql` | Integration tests for SQL providers. |
+| `Microsoft.SqlServer.DacFx` | `170.1.61` | `SolTechnology.Core.SQL` (runtime, `SQLProjectDeployer`), `SolTechnology.Core.SQL.Testing` (dacpac deploy) | Stays in `SQL` even though testing moved out. |
+| `Testcontainers` | `3.9.0` | `SolTechnology.Core.Testing`, `SolTechnology.Core.SQL.Testing` | Container fixtures. Removed from `Sql` runtime in v0.6.0. |
+| `Testcontainers.PostgreSql` | `3.9.0` | `SolTechnology.Core.SQL.Testing` | Postgres engine. Match `Testcontainers`. (MSSQL uses the generic builder — no `Testcontainers.MsSql`.) |
+| `Microsoft.Data.SqlClient` | `5.2.2` | `SolTechnology.Core.SQL.Testing` | MSSQL ADO provider + login probe. |
+| `Npgsql` | `8.0.5` | `SolTechnology.Core.SQL.Testing` | Postgres ADO provider. |
+| `Respawn` | `6.2.1` | `SolTechnology.Core.SQL.Testing` | Between-test database reset (SqlServer + Postgres adapters). |
 
 ## Serialisation
 
@@ -91,6 +95,7 @@ for new tests. Both stacks are listed; pick NUnit for new projects.
 | `Bogus` | `35.6.1` | `SolTechnology.Core.Testing` (opt-in customization) | Realistic data generator; complements AutoFixture, does not replace it. |
 | `Docker.DotNet` | `3.125.15` | `SolTechnology.Core.Testing` | Container restart-if-stopped + health/AMQP probes. |
 | `Serilog.Sinks.InMemory` | `0.11.0` | `SolTechnology.Core.Testing` | In-memory log assertions. |
+| `System.Text.RegularExpressions` | `4.3.1` | `SolTechnology.Core.Testing` | CVE override (CVE-2019-0820 / GHSA-cmhx-cq75-c4mj, HIGH). `Docker.DotNet` drags the vulnerable 4.3.0; this prunes it. net10 carries it in-framework, so consumers with package pruning see NU1510 (demoted repo-wide). |
 | `coverlet.collector` | `6.0.4` | All `tests/*` | Coverage collector — wire as a `PrivateAssets="all"` developer dependency. |
 
 ## Anti-stack — never add to this repo

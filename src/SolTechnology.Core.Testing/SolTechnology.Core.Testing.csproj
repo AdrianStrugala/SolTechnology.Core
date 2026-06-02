@@ -32,6 +32,11 @@
 		<PackageReference Include="Testcontainers" Version="3.9.0" />
 		<PackageReference Include="Docker.DotNet" Version="3.125.15" />
 
+		<!-- CVE-2019-0820 (GHSA-cmhx-cq75-c4mj, HIGH): Docker.DotNet drags the legacy out-of-band
+		     System.Text.RegularExpressions 4.3.0 cluster. Override at source with the patched 4.3.1;
+		     net10 carries it in-framework, so this only prunes the vulnerable transitive. -->
+		<PackageReference Include="System.Text.RegularExpressions" Version="4.3.1" />
+
 		<!-- In-memory Serilog sink for log assertions. -->
 		<PackageReference Include="Serilog.Sinks.InMemory" Version="0.11.0" />
 	</ItemGroup>

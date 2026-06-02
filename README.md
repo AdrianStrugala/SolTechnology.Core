@@ -49,7 +49,7 @@ The SolTechnology.Core repository contains a set of shared libraries. This is a 
 | [Logging](https://github.com/AdrianStrugala/SolTechnology.Core/tree/master/docs/Log.md)                    | `Logging`, `Diagnostics`, `Tracing`    | <a href="https://www.nuget.org/packages/SolTechnology.Core.Logging/"><img src="https://badgen.net/nuget/v/SolTechnology.Core.Logging?icon=nuget&color=blue"></a>       |
 | [Message Bus](https://github.com/AdrianStrugala/SolTechnology.Core/tree/master/docs/Bus.md)                | `Azure`, `Messaging`, `Async`, `Queue`          | <a href="https://www.nuget.org/packages/SolTechnology.Core.MessageBus/"><img src="https://badgen.net/nuget/v/SolTechnology.Core.MessageBus?icon=nuget&color=blue"></a>  |
 | [Scheduler](https://github.com/AdrianStrugala/SolTechnology.Core/tree/master/docs/Cron.md)                 | `Scheduler`, `Cron`, `Tasks`           | <a href="https://www.nuget.org/packages/SolTechnology.Core.Scheduler/"><img src="https://badgen.net/nuget/v/SolTechnology.Core.Scheduler?icon=nuget&color=blue"></a>    |
-| [SQL Database](https://github.com/AdrianStrugala/SolTechnology.Core/tree/master/docs/Sql.md)               | `Database`, `SQL`, `ORM`, `Dapper`, `EF`               | <a href="https://www.nuget.org/packages/SolTechnology.Core.Sql/"><img src="https://badgen.net/nuget/v/SolTechnology.Core.Sql?icon=nuget&color=blue"></a>           |
+| [SQL Database](https://github.com/AdrianStrugala/SolTechnology.Core/tree/master/docs/SQL.md)               | `Database`, `SQL`, `ORM`, `Dapper`, `EF`               | <a href="https://www.nuget.org/packages/SolTechnology.Core.SQL/"><img src="https://badgen.net/nuget/v/SolTechnology.Core.SQL?icon=nuget&color=blue"></a>           |
 
 
 

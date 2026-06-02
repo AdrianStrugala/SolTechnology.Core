@@ -15,7 +15,7 @@ loop opened by the readme stubs in steps 02–08. Separate PR — pure documenta
 ## Affected components
 - `docs/theQuality.md` — replace the inline `SQLFixture`/`IntegrationTestsFixture`/`WireMockFixture` code samples with the new companion packages; add a "Testing framework packages" section mapping concern → package; add a **"Container lifetime & reuse"** subsection (`TESTCONTAINERS_REUSE`, restart-if-stopped, readiness probes); keep the NUnit pyramid intact. Note the deliberate **no-automated-test-project / manual-smoke** policy for the `.Testing` packages.
 - `docs/Testing.md` — readme for `SolTechnology.Core.Testing` (created as stub in step 02); document the AutoFixture (not Bogus) decision and the lifetime/reuse model.
-- `docs/Sql.md` — add `SQL.Testing` companion section (MSSQL + Postgres, dacpac/EF/scripts provisioning, Respawn reset, the `ISharedSqlContainer` shared-MSSQL contract, `SQLFixture` all-caps type name). Note DacFx stays in `Sql` at runtime.
+- `docs/Sql.md` — add `SQL.Testing` companion section (MSSQL + Postgres, dacpac/EF/scripts provisioning, Respawn reset, the `ISharedSQLContainer` shared-MSSQL contract, `SQLFixture` all-caps type name). Note DacFx stays in `Sql` at runtime.
 - `docs/Clients.md` / `docs/HTTP-Production-Checklist.md` — document `HTTP.Testing` mock DSL + the **breaking** `Faker` → `HTTP.Testing` migration note.
 - `docs/Api.md` — document the new `API.Testing` auth-client + config-override helpers.
 - `docs/Cache.md` (and/or new `docs/Redis.md`) — `Redis.Testing`.

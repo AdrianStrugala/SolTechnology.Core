@@ -2,14 +2,14 @@ using DotNet.Testcontainers.Configurations;
 using DotNet.Testcontainers.Containers;
 using Microsoft.Data.SqlClient;
 
-namespace SolTechnology.Core.SQL.Testing;
+namespace SolTechnology.Core.SQL.Testing.Engines;
 
 /// <summary>
 /// Wait strategy that polls a real authenticated <c>SELECT 1</c> against <c>master</c>.
 /// Connection string is resolved lazily — the mapped host port is unknown until
 /// <c>StartAsync</c> assigns it.
 /// </summary>
-internal sealed class SqlServerLoginWaitStrategy(Func<string> connectionStringFactory) : IWaitUntil
+internal sealed class SQLServerLoginWaitStrategy(Func<string> connectionStringFactory) : IWaitUntil
 {
     public async Task<bool> UntilAsync(IContainer container)
     {
@@ -37,4 +37,5 @@ internal sealed class SqlServerLoginWaitStrategy(Func<string> connectionStringFa
         }
     }
 }
+
 

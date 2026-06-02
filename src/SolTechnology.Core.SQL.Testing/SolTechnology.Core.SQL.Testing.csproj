@@ -1,0 +1,39 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<Version>0.1.0</Version>
+		<Description>Integration-testing fixtures for SolTechnology.Core.SQL consumers — a Testcontainers-backed SQLFixture for MSSQL (dacpac) and PostgreSQL, with pluggable schema provisioning (dacpac / raw scripts / delegate, e.g. EF migrations) and Respawn-based reset. ORM-agnostic: serves Dapper and EF alike. Reference from test projects only; not needed at runtime in production assemblies.</Description>
+		<PackageTags>sol technology core sql testing testcontainers mssql postgres dacpac respawn integration-tests component-tests</PackageTags>
+		<Product>SolTechnology.Core.SQL.Testing</Product>
+		<PackageId>SolTechnology.Core.SQL.Testing</PackageId>
+		<AssemblyName>SolTechnology.Core.SQL.Testing</AssemblyName>
+
+		<PackageIcon>docs\mini-logo.png</PackageIcon>
+		<PackageReadmeFile>docs\readme.md</PackageReadmeFile>
+		<RepositoryUrl>https://github.com/AdrianStrugala/SolTechnology.Core</RepositoryUrl>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<None Include="..\..\docs\mini-logo.png" Pack="true" Visible="false" PackagePath="docs\mini-logo.png" />
+		<None Include="..\..\docs\SQL.md" Pack="true" Visible="false" PackagePath="docs\readme.md" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\SolTechnology.Core.Testing\SolTechnology.Core.Testing.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<!-- MSSQL uses the generic ContainerBuilder + host-side login probe (NOT Testcontainers.MsSql:
+		     azure-sql-edge lacks sqlcmd, which breaks its built-in wait). Postgres uses the dedicated builder. -->
+		<PackageReference Include="Testcontainers" Version="3.9.0" />
+		<PackageReference Include="Testcontainers.PostgreSql" Version="3.9.0" />
+		<PackageReference Include="Microsoft.SqlServer.DacFx" Version="170.1.61" />
+		<PackageReference Include="Microsoft.Data.SqlClient" Version="5.2.2" />
+		<PackageReference Include="Npgsql" Version="8.0.5" />
+		<PackageReference Include="Respawn" Version="6.2.1" />
+	</ItemGroup>
+
+</Project>
+
+
+

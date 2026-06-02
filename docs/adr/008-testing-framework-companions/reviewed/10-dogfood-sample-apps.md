@@ -7,6 +7,12 @@ status: reviewed
 <!-- Reviewed: renumbered from to-do/08-dogfood-sample-apps.md. This is the consumer-migration
      step referenced by step 04 (Faker breaking change). -->
 
+<!-- PARTIAL BRING-FORWARD (after step 03, at maintainer request "make DreamTravel build"):
+     DreamTravel.Component.Tests.csproj already gained `<ProjectReference>` to
+     SolTechnology.Core.SQL.Testing (SQLFixture moved out of Sql) and bumped NSubstitute 4.0.0 → 5.3.0
+     (NU1605 vs Core.Testing's 5.3.0). The Faker → HTTP.Testing migration for DreamTravel is still
+     pending here (step 04 not yet done). TaleCode is untouched so far. -->
+
 # Step 10: Dogfood — migrate in-repo sample apps, delete duplicates
 
 ## Summary
