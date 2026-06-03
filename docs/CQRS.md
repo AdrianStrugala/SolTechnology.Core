@@ -1,57 +1,23 @@
 ### Overview
 
-The SolTechnology.Core.CQRS library provides a complete CQRS (Command Query Responsibility Segregation) implementation built on MediatR. It includes the Result pattern for explicit success/failure handling, Chain handlers for complex multi-step operations, and automatic validation and logging through pipeline behaviors.
+The SolTechnology.Core.CQRS library provides a complete CQRS (Command Query Responsibility Segregation) implementation with an in-house mediator, Result pattern for explicit success/failure handling, automatic FluentValidation, fire-and-forget notifications, and logging pipeline behaviors.
 
 ### Registration
 
-For installing the library, reference **SolTechnology.Core.CQRS** nuget package and invoke the appropriate registration methods:
-
 ```csharp
-// Register command handlers
-services.RegisterCommands();
+services.AddCQRS();
 
-// Register query handlers
-services.RegisterQueries();
-
-// Register chain steps (for complex operations)
-services.RegisterChain();
+// Or with explicit assembly scanning and options:
+services.AddCQRS(
+    o => o.UseFluentValidation = true,
+    typeof(Program).Assembly);
 ```
 
-### Configuration
-
-No configuration is needed. The registration methods automatically:
-- Register all command and query handlers from the calling assembly
-- Configure FluentValidation for input validation
-- Add logging and validation pipeline behaviors
-
-### Usage
-
-1) Define a Query and Handler
+### Defining a Command
 
 ```csharp
-public class GetUserQuery : IRequest<Result<User>>
-{
-    public int UserId { get; set; }
-}
-
-public class GetUserQueryHandler : IQueryHandler<GetUserQuery, User>
-{
-    public async Task<Result<User>> Handle(GetUserQuery request, CancellationToken cancellationToken)
-    {
-        var user = await _userRepository.GetById(request.UserId);
-
-        if (user == null)
-            return Result<User>.Fail("User not found");
-
-        return Result<User>.Success(user);
-    }
-}
-```
-
-2) Define a Command and Handler
-
-```csharp
-public class CreateUserCommand : IRequest<Result>
+// Command with no return data (side-effect only)
+public class CreateUserCommand : ICommand
 {
     public string Name { get; set; }
     public string Email { get; set; }
@@ -59,20 +25,54 @@ public class CreateUserCommand : IRequest<Result>
 
 public class CreateUserCommandHandler : ICommandHandler<CreateUserCommand>
 {
-    public async Task<Result> Handle(CreateUserCommand request, CancellationToken cancellationToken)
+    public async Task<Result> Handle(CreateUserCommand command, CancellationToken cancellationToken)
     {
-        await _userRepository.Create(new User
-        {
-            Name = request.Name,
-            Email = request.Email
-        });
-
+        await _userRepository.Create(command.Name, command.Email);
         return Result.Success();
+    }
+}
+
+// Command with return data
+public class CreateOrderCommand : ICommand<int>
+{
+    public string Product { get; set; }
+}
+
+public class CreateOrderCommandHandler : ICommandHandler<CreateOrderCommand, int>
+{
+    public async Task<Result<int>> Handle(CreateOrderCommand command, CancellationToken cancellationToken)
+    {
+        var orderId = await _orderRepository.Create(command.Product);
+        return Result<int>.Success(orderId);
     }
 }
 ```
 
-3) Add Validation (Optional)
+### Defining a Query
+
+```csharp
+public class GetUserQuery : IQuery<User>
+{
+    public int UserId { get; set; }
+}
+
+public class GetUserQueryHandler : IQueryHandler<GetUserQuery, User>
+{
+    public async Task<Result<User>> Handle(GetUserQuery query, CancellationToken cancellationToken)
+    {
+        var user = await _userRepository.GetById(query.UserId);
+
+        if (user == null)
+            return Result<User>.Fail(new NotFoundError { Message = "User not found" });
+
+        return user;
+    }
+}
+```
+
+### Validation
+
+Register a `FluentValidation` validator — failures are returned as `Result.Fail(ValidationError)` automatically. The handler is never invoked.
 
 ```csharp
 public class CreateUserCommandValidator : AbstractValidator<CreateUserCommand>
@@ -85,48 +85,68 @@ public class CreateUserCommandValidator : AbstractValidator<CreateUserCommand>
 }
 ```
 
-4) Use Chain Pattern for Complex Operations
+### Notifications
+
+Fire-and-forget events dispatched to all registered handlers. Each handler runs on its own background task with a fresh DI scope. Failures are isolated and logged — they never propagate to the caller and never stop other handlers.
 
 ```csharp
-public class ComplexOperationContext : ChainContext<MyInput, MyOutput>
+public class UserCreated : INotification
 {
-    public string IntermediateData { get; set; }
+    public int UserId { get; set; }
 }
 
-public class Step1 : IChainStep<ComplexOperationContext>
+public class SendWelcomeEmailHandler : INotificationHandler<UserCreated>
 {
-    public async Task<Result> Execute(ComplexOperationContext context)
+    public async Task Handle(UserCreated notification, CancellationToken cancellationToken)
     {
-        // Step 1 logic
-        context.IntermediateData = "processed";
-        return Result.Success();
+        await _emailService.SendWelcome(notification.UserId);
     }
 }
 
-public class ComplexOperationHandler : ChainHandler<MyInput, ComplexOperationContext, MyOutput>
-{
-    protected override async Task HandleChain()
-    {
-        await Invoke<Step1>();
-        await Invoke<Step2>();
-        await Invoke<Step3>();
-    }
-}
+// Publishing (returns immediately)
+_mediator.Publish(new UserCreated { UserId = 42 });
 ```
 
-5) Result Pattern Usage
+### Result Pattern
 
 ```csharp
 var result = await _mediator.Send(new GetUserQuery { UserId = 1 });
 
 if (result.IsSuccess)
 {
-    var user = result.Value;
-    // Use the user
+    var user = result.Data;
 }
 else
 {
     var error = result.Error;
-    // Handle the error
+}
+
+// Combinators
+var output = await _mediator.Send(new GetUserQuery { UserId = 1 })
+    .Map(user => user.Name)
+    .Ensure(name => name.Length > 0, new Error { Message = "Empty name" });
+```
+
+For multi-step orchestration, see [Story.md](Story.md).
+
+### Pipeline Behaviors
+
+Custom behaviors can be registered to wrap every request:
+
+```csharp
+public class MyBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>
+    where TRequest : notnull
+{
+    public async Task<TResponse> Handle(TRequest request, RequestHandlerDelegate<TResponse> next, CancellationToken ct)
+    {
+        // before
+        var response = await next();
+        // after
+        return response;
+    }
 }
 ```
+
+Built-in behaviors (registered automatically):
+- **LoggingPipelineBehavior** — tracks every request as a logical operation with structured logging and OpenTelemetry spans.
+- **FluentValidationPipelineBehavior** — runs all validators; short-circuits with `ValidationError` on failure.

@@ -1,117 +1,33 @@
-### Overview
+## SolTechnology.Core.Api
 
-`SolTechnology.Core.Api` is the ASP.NET Core integration layer for the SolTechnology stack. It
-ships:
+ASP.NET Core integration layer for the SolTechnology stack. Bring it in and your API speaks
+**RFC 7807 ProblemDetails**, returns `Result<T>` from handlers without ever touching HTTP types,
+versions itself by header, and propagates a correlation id from log to wire — out of the box.
 
-- **RFC 7807 / RFC 9457 ProblemDetails error pipeline** (`application/problem+json`) — no
-  custom envelope on the wire; success returns the raw DTO, failure returns `ProblemDetails`.
-- **`Result<T>` ↔ HTTP conversion** in MVC — handlers stay HTTP-agnostic; `ResultConversionFilter`
-  translates `Result<T>` into the wire format at the controller boundary.
-- **`Error` subtype → status code mapping** — `NotFoundError` → 404, `ValidationError` → 400
-  (with structured per-field `errors`), `ConflictError` → 409, `UnauthorizedError` → 401,
-  `ForbiddenError` → 403; default 500 for the bare `Error` type. Replaceable through
-  `IExceptionStatusCodeMapper`.
-- **Header-based API versioning** (`X-API-VERSION`) with Swagger docs per version, deprecation
-  badges, newest-first dropdown.
-- **Correlation id propagation** — every error response carries
-  `extensions.correlationId` matching the `X-Correlation-Id` response header and the log
-  scope from `SolTechnology.Core.Logging`.
-- **Log-level alignment with `Core.Logging`** — mapped 4xx → `Warning`, mapped 5xx → `Error`,
-  unmapped exceptions → `Critical` + rethrow to host. PagerDuty / Sentry / App Insights
-  smart-detection sees only real server faults, not validation noise.
-- **One-call bootstrap** — `services.AddApiCore(...)` + `opts.AddApiCoreFilters()` +
-  `app.UseSwaggerWithVersioning(...)` replaces ~30 lines of boilerplate.
+### Features
 
-Integration tests use a separate companion package, **`SolTechnology.Core.Api.Testing`**, so
-that test-host dependencies do not leak into production assemblies.
+- **Standard error pipeline** — every failure is RFC 7807 / RFC 9457 `application/problem+json`.
+  No custom envelope, no per-controller `try/catch`, no string error bodies.
+- **`Result<T>` ↔ HTTP at the boundary** — controllers and handlers stay HTTP-agnostic;
+  the filter converts `Result<T>` to raw DTO on success and to `ProblemDetails` on failure.
+- **Semantic `Error` → status mapping** — `NotFoundError` → 404, `ValidationError` → 400 (with
+  per-field `errors`), `ConflictError` → 409, `UnauthorizedError` → 401, `ForbiddenError` → 403.
+  Replace or extend via `IExceptionStatusCodeMapper`.
+- **Header-based API versioning** with per-version Swagger documents, deprecation badges and
+  newest-first dropdown — one call wires it.
+- **Correlation id everywhere** — `extensions.correlationId` on every error, matching the
+  `X-Correlation-Id` response header and the request log scope. One token, one search in Seq /
+  App Insights.
+- **Log-level alignment** — mapped 4xx → `Warning`, mapped 5xx → `Error`, unmapped exceptions →
+  `Critical` + rethrow. Smart-detection in Sentry / App Insights sees real faults, not noise.
+- **One-call bootstrap** — `AddApiCore` + `AddApiCoreFilters` + `UseSwaggerWithVersioning`
+  replaces ~30 lines of plumbing.
+- **Testing companion** — `SolTechnology.Core.Api.Testing` ships `ApiFixture` so test-host
+  dependencies never leak into production assemblies.
 
 ### Registration
 
-Reference the `SolTechnology.Core.Api` NuGet package. For integration tests, additionally
-reference `SolTechnology.Core.Api.Testing`.
-
-### Configuration
-
-No appsettings binding is required. The optional `ApiExceptionOptions.IncludeExceptionDetails`
-flag (default `false`) is set in code, typically to `IsDevelopment()`.
-
-### Usage
-
-#### 1. API Versioning
-
-Configure header-based API versioning with automatic Swagger documentation:
-
-```csharp
-// In Program.cs, before builder.Services.AddControllers()
-builder.Services.AddVersioning(
-    defaultMajorVersion: 1,     // Default: 1
-    defaultMinorVersion: 0,     // Default: 0
-    apiTitle: "My API"          // For Swagger docs
-);
-
-// In the request pipeline:
-app.UseSwaggerWithVersioning("My API");
-```
-
-> Tip: `AddApiCore` (see section 2) wraps both `AddVersioning` and the error pipeline in a
-> single call.
-
-**Controller Configuration**:
-
-```csharp
-[ApiController]
-[ApiVersion("1.0", Deprecated = true)]
-[ApiVersion("2.0")]
-[Route("api/[controller]")]
-public class MyController : ControllerBase
-{
-    /// <summary>
-    /// V1 - DEPRECATED
-    /// </summary>
-    [HttpGet]
-    [MapToApiVersion("1.0")]
-    public IActionResult GetV1()
-    {
-        return Ok("Version 1");
-    }
-
-    /// <summary>
-    /// V2 - Current
-    /// </summary>
-    [HttpGet]
-    [MapToApiVersion("2.0")]
-    public IActionResult GetV2()
-    {
-        return Ok("Version 2");
-    }
-}
-```
-
-**Client Usage**:
-
-```csharp
-// Request specific version
-httpClient.DefaultRequestHeaders.Add("X-API-VERSION", "2.0");
-
-// No header = default version (configured in AddVersioning)
-var response = await httpClient.GetAsync("api/mycontroller");
-```
-
-**Features**:
-- Header-based versioning using `X-API-VERSION` header
-- Automatic Swagger documentation for each version
-- Deprecation warnings in response headers (`api-deprecated-versions`, `api-supported-versions`)
-- Default version for clients without header (`AssumeDefaultVersionWhenUnspecified = true`)
-- Clean URLs without version prefix
-
-#### 2. Errors and Result conversion (RFC 7807 ProblemDetails)
-
-`SolTechnology.Core.Api` follows the .NET 7+ standard for HTTP errors: every failure response is
-[RFC 7807 / RFC 9457 ProblemDetails](https://www.rfc-editor.org/rfc/rfc9457) served as
-`application/problem+json`. There is **no custom envelope** on the wire — successful responses
-carry the raw payload, failures carry `ProblemDetails`.
-
-##### One-call bootstrap
+Reference the NuGet package and call `AddApiCore` once:
 
 ```csharp
 builder.Services.AddApiCore(
@@ -125,97 +41,63 @@ var app = builder.Build();
 app.UseSwaggerWithVersioning("DreamTravel API");
 ```
 
-`AddApiCore` is a rollup that registers:
-- `ExceptionFilter` + `ResultConversionFilter` (in DI; added to MVC by `AddApiCoreFilters`)
-- `IExceptionStatusCodeMapper` (`DefaultExceptionStatusCodeMapper`, replaceable)
-- `ApiExceptionOptions` bound through `IOptions<>`
-- ASP.NET Core's `AddProblemDetails()` for non-MVC paths
-- `Core.Logging` + `ICorrelationIdService` (used as `ProblemDetails.Extensions["correlationId"]`)
-- API versioning (header `X-API-VERSION`) + per-version Swagger docs
-
-For finer-grained control, the underlying `AddApiExceptionHandling` and `AddVersioning`
-extensions remain available and compose freely.
-
-##### Manual setup (when AddApiCore is too coarse)
+If you want finer control, compose the lower-level extensions yourself:
 
 ```csharp
-// Registers ExceptionFilter + ResultConversionFilter, binds ApiExceptionOptions, calls
-// AddProblemDetails(), and ensures Core.Logging's ICorrelationIdService is available.
-// IncludeExceptionDetails MUST stay false in Production — stack traces over the wire
-// are an information disclosure (CWE-209).
 builder.Services.AddApiExceptionHandling(o =>
     o.IncludeExceptionDetails = builder.Environment.IsDevelopment());
-
+builder.Services.AddVersioning(defaultMajorVersion: 1, apiTitle: "DreamTravel API");
 builder.Services.AddControllers(o => o.AddApiCoreFilters());
 ```
 
-##### Behaviour matrix
+For integration tests, additionally reference `SolTechnology.Core.Api.Testing`.
+
+### Configuration
+
+No `appsettings.json` binding is required. The only knob is `ApiExceptionOptions`:
+
+| Option | Default | Purpose |
+|---|---|---|
+| `IncludeExceptionDetails` | `false` | Adds `extensions.exception` (type, message, stack) to `ProblemDetails`. **Keep `false` in Production** — stack traces over the wire are CWE-209. |
+
+```csharp
+builder.Services.Configure<ApiExceptionOptions>(o =>
+    o.IncludeExceptionDetails = builder.Environment.IsDevelopment());
+```
+
+### Usage
+
+#### Returning `Result<T>` from controllers
+
+Handlers and controllers return `Result<T>` from `SolTechnology.Core.CQRS`. The filter does the
+wire conversion:
+
+```csharp
+[ApiController]
+[Route("api/[controller]")]
+public class TripsController(IQueryHandler<GetTripQuery, Trip> handler) : ControllerBase
+{
+    [HttpGet("{id}")]
+    public Task<Result<Trip>> Get(int id, CancellationToken ct)
+        => handler.Handle(new GetTripQuery { Id = id }, ct);
+}
+```
+
+Behaviour matrix:
 
 | Action returns / throws | HTTP outcome |
 |---|---|
-| `Result<T>.Success(data)` | `200 OK`, body = raw `data` (DTO is not wrapped in any envelope) |
-| `Result.Success()` (non-generic) | `204 No Content`, no body |
-| `Result<T>.Fail(error)` / `Result.Fail(error)` | `ProblemDetails` at `error.StatusCode` (defaults to `500`); `application/problem+json` |
-| `BadRequest(error)` (action returned a bare `Error`) | `ProblemDetails` at the explicit status code or `error.StatusCode`, fallback `500` |
-| Throws `FluentValidation.ValidationException` | `400` `ValidationProblemDetails` with strongly-typed `errors` per field |
-| Throws any other mapped type | `ProblemDetails` at the mapped status |
-| Throws an unmapped type | `LogCritical` + rethrow → host pipeline (`DeveloperExceptionPage` / `UseExceptionHandler`) |
-| Client aborted the request (`OperationCanceledException` + `RequestAborted`) | Rethrown silently; `Core.Logging` logs the finish at `Warning` |
+| `Result<T>.Success(data)` | `200 OK`, body = raw DTO |
+| `Result.Success()` | `204 No Content` |
+| `Result<T>.Fail(error)` | `ProblemDetails` at `error.StatusCode` (default `500`) |
+| Throws `FluentValidation.ValidationException` | `400` `ValidationProblemDetails` |
+| Throws a mapped exception | `ProblemDetails` at the mapped status |
+| Throws an unmapped exception | `LogCritical` + rethrow to host |
+| Client aborts (`OperationCanceledException` + `RequestAborted`) | Rethrown silently; `Core.Logging` logs finish at `Warning` |
 
-Application-layer code (CQRS handlers, services) continues to return `Result<T>` and never
-references HTTP types. The boundary conversion lives in `ResultConversionFilter`.
-
-##### Exception → status mapping (extension point)
-
-The default mapper covers the most common BCL / FluentValidation exception types:
-
-| Exception | Status |
-|---|---|
-| `FluentValidation.ValidationException` | `400` (`ValidationProblemDetails` with per-field errors) |
-| `ArgumentException` (and `ArgumentNullException`) | `400` |
-| `UnauthorizedAccessException` | `403` (per RFC 7235 — `403` means "identified, forbidden") |
-| `KeyNotFoundException` | `404` |
-| `NotImplementedException` | `501` |
-| anything else | unmapped → `LogCritical` + rethrow to host |
-
-Extend the map for project-specific exception types:
+#### Failure semantics — `Error` subtypes
 
 ```csharp
-public sealed class AppExceptionMapper : DefaultExceptionStatusCodeMapper
-{
-    public override bool TryMap(Exception exception, out int statusCode)
-    {
-        if (exception is OptimisticConcurrencyException) { statusCode = 409; return true; }
-        if (exception is PaymentDeclinedException)        { statusCode = 402; return true; }
-        return base.TryMap(exception, out statusCode);
-    }
-}
-
-services.AddApiExceptionHandling();
-services.Replace(ServiceDescriptor.Singleton<IExceptionStatusCodeMapper, AppExceptionMapper>());
-```
-
-The deliberate refusal to default unknown types to `500` keeps every unrecognized exception
-visible in the operations log (`LogCritical` + `ExceptionType`) so the team can decide
-whether it is a bug, a transient infrastructure error, or a missing mapping.
-
-##### Failure semantics — `Error` subtypes
-
-Application-layer failures use semantic subtypes from `SolTechnology.Core.CQRS.Errors`. The
-API layer maps each subtype to a status code; other transports (gRPC, message bus) can map
-to their own codes from the same source of truth.
-
-| Error subtype | HTTP status | Body shape |
-|---|---|---|
-| `NotFoundError` | `404 Not Found` | `ProblemDetails` |
-| `ConflictError` | `409 Conflict` | `ProblemDetails` |
-| `ValidationError` | `400 Bad Request` | `ValidationProblemDetails` (with `errors`) |
-| `UnauthorizedError` | `401 Unauthorized` | `ProblemDetails` |
-| `ForbiddenError` | `403 Forbidden` | `ProblemDetails` |
-| Bare `Error` (or any other subtype) | `500 Internal Server Error` | `ProblemDetails` |
-
-```csharp
-// Handler — pure domain semantics, no HTTP types.
 public Task<Result<Trip>> Handle(GetTripQuery q, CancellationToken ct)
 {
     var trip = _trips.Find(q.Id);
@@ -225,21 +107,28 @@ public Task<Result<Trip>> Handle(GetTripQuery q, CancellationToken ct)
 }
 ```
 
-Producing:
-
 ```http
 HTTP/1.1 404 Not Found
 Content-Type: application/problem+json
 
 {
-  "type":   "https://tools.ietf.org/html/rfc9110#section-15.5.5",
-  "title":  "Trip 42 not found.",
-  "status": 404,
+  "type":          "https://tools.ietf.org/html/rfc9110#section-15.5.5",
+  "title":         "Trip 42 not found.",
+  "status":        404,
   "correlationId": "4bf92f3577b34da6a3ce929d0e0e4736"
 }
 ```
 
-For validation:
+| `Error` subtype | HTTP | Body |
+|---|---|---|
+| `NotFoundError` | 404 | `ProblemDetails` |
+| `ConflictError` | 409 | `ProblemDetails` |
+| `ValidationError` | 400 | `ValidationProblemDetails` with `errors` |
+| `UnauthorizedError` | 401 | `ProblemDetails` |
+| `ForbiddenError` | 403 | `ProblemDetails` |
+| bare `Error` / unknown subtype | 500 | `ProblemDetails` |
+
+Validation errors carry the per-field dictionary:
 
 ```csharp
 return Result<CreatedOrder>.Fail(new ValidationError
@@ -253,52 +142,147 @@ return Result<CreatedOrder>.Fail(new ValidationError
 });
 ```
 
-##### CorrelationId
+#### Mapping project-specific exceptions
 
-Every `ProblemDetails` carries `extensions.correlationId` matching the `X-Correlation-Id`
-response header and the `CorrelationId` property on the request log scope (provided by
-`SolTechnology.Core.Logging`). Clients quote the value in support tickets and it resolves
-to the same logs in Seq / Application Insights.
+Extend `DefaultExceptionStatusCodeMapper` and replace the DI registration:
 
-##### Diagnostic detail
+```csharp
+public sealed class AppExceptionMapper : DefaultExceptionStatusCodeMapper
+{
+    public override bool TryMap(Exception exception, out int statusCode)
+    {
+        if (exception is OptimisticConcurrencyException) { statusCode = 409; return true; }
+        if (exception is PaymentDeclinedException)        { statusCode = 402; return true; }
+        return base.TryMap(exception, out statusCode);
+    }
+}
 
-`ApiExceptionOptions.IncludeExceptionDetails = true` adds `extensions.exception` with the
-exception type, message, and stack trace. **Off by default**; enable in Development only.
+services.Replace(ServiceDescriptor.Singleton<IExceptionStatusCodeMapper, AppExceptionMapper>());
+```
+
+Default mapping covers common BCL / FluentValidation types:
+
+| Exception | Status |
+|---|---|
+| `FluentValidation.ValidationException` | 400 (`ValidationProblemDetails`) |
+| `ArgumentException` / `ArgumentNullException` | 400 |
+| `UnauthorizedAccessException` | 403 |
+| `KeyNotFoundException` | 404 |
+| `NotImplementedException` | 501 |
+| anything else | `LogCritical` + rethrow |
+
+#### API versioning
+
+Header-based (`X-API-VERSION`); no version prefix in the URL.
+
+```csharp
+[ApiController]
+[ApiVersion("1.0", Deprecated = true)]
+[ApiVersion("2.0")]
+[Route("api/[controller]")]
+public class TripsController : ControllerBase
+{
+    [HttpGet, MapToApiVersion("1.0")]
+    public IActionResult GetV1() => Ok("v1");
+
+    [HttpGet, MapToApiVersion("2.0")]
+    public IActionResult GetV2() => Ok("v2");
+}
+```
+
+Client picks a version (or omits the header to take the default):
+
+```csharp
+httpClient.DefaultRequestHeaders.Add("X-API-VERSION", "2.0");
+var response = await httpClient.GetAsync("api/trips");
+```
+
+`UseSwaggerWithVersioning(...)` exposes one Swagger document per version, newest first, with
+deprecation badges on the dropdown.
+
+#### CorrelationId
+
+Every `ProblemDetails` carries `extensions.correlationId`, the same value that:
+- is echoed on the response as `X-Correlation-Id`,
+- is pushed into the request log scope by `SolTechnology.Core.Logging`,
+- the client can quote in a support ticket to find the request in Seq / App Insights.
+
+#### Diagnostic detail (Development only)
+
+`ApiExceptionOptions.IncludeExceptionDetails = true` adds `extensions.exception`:
 
 ```json
 {
-  "type": "https://tools.ietf.org/html/rfc9110#section-15.6.1",
-  "title": "Object reference not set to an instance of an object.",
-  "status": 500,
+  "type":          "https://tools.ietf.org/html/rfc9110#section-15.6.1",
+  "title":         "Object reference not set to an instance of an object.",
+  "status":        500,
   "correlationId": "4bf92f3577b34da6a3ce929d0e0e4736",
   "exception": {
-    "type": "System.NullReferenceException",
-    "message": "Object reference not set to an instance of an object.",
+    "type":       "System.NullReferenceException",
+    "message":    "Object reference not set to an instance of an object.",
     "stackTrace": "   at MyApp.Foo() in /src/..."
   }
 }
 ```
 
-#### 3. API Testing
+Off by default. Never enable in Production.
 
-Use the ApiFixture class for integration testing your API:
+### Testing
+
+Reference `SolTechnology.Core.API.Testing` from your test project and use `ApiFixture`:
 
 ```csharp
-public class MyApiTests
+public class TripsApiTests
 {
-    private readonly ApiFixture _fixture;
-
-    public MyApiTests()
-    {
-        _fixture = new ApiFixture();
-    }
+    private readonly ApiFixture _fixture = new();
 
     [Test]
-    public async Task TestMyEndpoint()
+    public async Task Get_ReturnsTrip()
     {
+        // Arrange
         var client = _fixture.CreateClient();
-        var response = await client.GetAsync("/api/myendpoint");
-        Assert.That(response.IsSuccessStatusCode, Is.True);
+
+        // Act
+        var response = await client.GetAsync("/api/trips/42");
+
+        // Assert
+        response.IsSuccessStatusCode.Should().BeTrue();
     }
 }
 ```
+
+`ApiFixture` wraps `WebApplicationFactory<Program>` with the conventions used across the
+SolTechnology stack — service overrides, correlation propagation, JSON options — so component
+tests stay short and focused.
+
+### Conventions
+
+- **Controllers are thin.** Action body ≤ 3 lines: invoke handler, return `Result<T>`. No
+  `try/catch` (the filter handles it). No manual error serialization.
+- **No custom envelope on the wire.** Success = raw DTO. Failure = `ProblemDetails`. If you
+  feel the urge to wrap success in `{ data, error, success }`, you're fighting the framework.
+- **`Result<T>` flows through MVC.** Handlers and domain code never see `IActionResult`,
+  `HttpStatusCode`, or `ProblemDetails`.
+- **Errors carry semantics, not status codes.** Application code returns `NotFoundError` /
+  `ConflictError` / `ValidationError`; the API layer (and only the API layer) decides what
+  that means on HTTP.
+- **One `ApiVersion` per controller class** when versions diverge in shape; share a class with
+  `[MapToApiVersion]` per action when they share most of the surface.
+- **Always document with XML `<summary>` + `[ProducesResponseType]`** for every status the
+  action can return — Swagger consumers and SDK generators depend on it.
+
+### What ships in DI
+
+`AddApiCore` registers (and `AddApiExceptionHandling` registers a subset of) the following:
+
+- `ExceptionFilter` — exception → `ProblemDetails`; rethrows the unmapped.
+- `ResultConversionFilter` — `Result<T>` → wire format.
+- `IExceptionStatusCodeMapper` (default `DefaultExceptionStatusCodeMapper`, `TryAddSingleton`).
+- `ApiExceptionOptions` bound through `IOptions<>`.
+- ASP.NET Core's `AddProblemDetails()` for paths that bypass MVC (routing 404, auth challenges,
+  `UseStatusCodePages`) — same body shape, same `correlationId`.
+- `SolTechnology.Core.Logging` + `ICorrelationIdService`.
+- API versioning + per-version Swagger doc generation.
+
+Replace or decorate any of the above; `TryAdd*` registrations mean your custom registration
+wins.

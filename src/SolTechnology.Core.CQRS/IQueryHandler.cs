@@ -1,8 +1,9 @@
-﻿using MediatR;
+﻿namespace SolTechnology.Core.CQRS;
 
-namespace SolTechnology.Core.CQRS
+/// <summary>
+/// Handles a query that returns <typeparamref name="TResult"/>.
+/// </summary>
+public interface IQueryHandler<in TQuery, TResult> where TQuery : IQuery<TResult>
 {
-    public interface IQueryHandler<in TQuery, TResult> : IRequestHandler<TQuery, Result<TResult>> where TQuery : IRequest<Result<TResult>>
-    {
-    }
+    Task<Result<TResult>> Handle(TQuery query, CancellationToken cancellationToken);
 }

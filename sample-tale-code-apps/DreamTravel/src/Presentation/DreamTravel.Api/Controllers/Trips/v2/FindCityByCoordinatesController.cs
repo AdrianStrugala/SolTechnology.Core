@@ -1,9 +1,9 @@
-﻿﻿using System.Net;
+﻿﻿﻿using System.Net;
 using System.Net.Mime;
 using Asp.Versioning;
 using DreamTravel.Domain.Cities;
 using DreamTravel.Queries.FindCityByCoordinates;
-using MediatR;
+using SolTechnology.Core.CQRS;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DreamTravel.Api.Controllers.Trips.v2

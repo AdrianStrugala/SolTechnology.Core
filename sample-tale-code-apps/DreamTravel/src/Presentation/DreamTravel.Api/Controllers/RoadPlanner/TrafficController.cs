@@ -1,5 +1,5 @@
-﻿using DreamTravel.Commands.RecalculateTraffic;
-using MediatR;
+﻿﻿using DreamTravel.Commands.RecalculateTraffic;
+using SolTechnology.Core.CQRS;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DreamTravel.Api.Controllers.RoadPlanner;

@@ -66,20 +66,17 @@ namespace SolTechnology.Core.HTTP
             bool propagateCorrelation)
             where TIClient : class where TClient : class, TIClient
         {
-            // Shared singletons. HttpClientMetrics owns the Meter so all clients
-            // emit on the same well-known meter name (see HttpClientMetrics).
+            // HttpClientMetrics owns the shared Meter so all clients emit on the same name.
             services.TryAddSingleton<HttpPolicyFactory>();
             services.TryAddSingleton<HttpClientMetrics>();
 
             if (propagateCorrelation)
             {
-                // AddCorrelationIdService is idempotent (TryAddSingleton under the
-                // hood) and shared with Core.Logging.AddCoreLogging.
+                // Idempotent; shared with Core.Logging.AddCoreLogging.
                 services.AddCorrelationIdService();
                 services.TryAddTransient<CorrelationPropagatingHandler>();
             }
 
-            // ---- Named options: HTTPClientConfiguration ------------------------------
             services
                 .AddOptions<HTTPClientConfiguration>(httpClientName)
                 .Configure<IConfiguration>((opts, configuration) =>
@@ -101,12 +98,8 @@ namespace SolTechnology.Core.HTTP
                     $"[{nameof(HTTPClientConfiguration.BaseAddress)}] is required for HTTP client [{httpClientName}].")
                 .ValidateOnStart();
 
-            // ---- Named options: HttpPolicyConfiguration ------------------------------
-            //
             // Precedence: explicit parameter > "HTTPClients:{name}:Policy" > "HttpPolicy" (global) > defaults.
-            // ValidateDataAnnotations + ValidateOnStart enforces [Range] constraints
-            // at host startup so misconfiguration cannot pass a health-check
-            // and surface only on the first production request.
+            // ValidateOnStart fails the host on misconfiguration instead of the first production request.
             services
                 .AddOptions<HttpPolicyConfiguration>(httpClientName)
                 .Configure<IConfiguration>((opts, configuration) =>
@@ -124,7 +117,6 @@ namespace SolTechnology.Core.HTTP
                     $"[{nameof(HttpPolicyConfiguration.OverallRequestBudget)}] must be greater than [{nameof(HttpPolicyConfiguration.RequestTimeout)}] to allow at least one full attempt.")
                 .ValidateOnStart();
 
-            // ---- HttpClient registration --------------------------------------------
             var httpClientBuilder = services
                 .AddHttpClient<TIClient, TClient>(httpClientName, (sp, httpClient) =>
                 {
@@ -134,12 +126,7 @@ namespace SolTechnology.Core.HTTP
 
                     httpClient.BaseAddress = new Uri(cfg.BaseAddress);
 
-                    // Two timeout systems were a confusing source of incidents:
-                    // Polly's per-attempt RequestTimeout and HttpClient.Timeout
-                    // could fight, with the latter killing a retry mid-flight.
-                    // When the resilience pipeline is active, Polly owns time;
-                    // we set HttpClient.Timeout to InfiniteTimeSpan so the only
-                    // deadline is the one configured on HttpPolicyConfiguration.
+                    // Polly owns the deadline when active; HttpClient.Timeout would otherwise kill retries mid-flight.
                     if (policyCfg.UsePolly)
                     {
                         httpClient.Timeout = Timeout.InfiniteTimeSpan;
@@ -153,8 +140,7 @@ namespace SolTechnology.Core.HTTP
                     }
                     else if (cfg.TimeoutSeconds.HasValue)
                     {
-                        // Fallback path: caller explicitly disabled Polly, the
-                        // only remaining deadline is HttpClient's.
+                        // No Polly: HttpClient.Timeout is the only deadline.
                         httpClient.Timeout = TimeSpan.FromSeconds(cfg.TimeoutSeconds.Value);
                     }
 
@@ -178,12 +164,7 @@ namespace SolTechnology.Core.HTTP
 
                 if (!policyCfg.UsePolly)
                 {
-                    // Operationally significant: an operator who toggles this
-                    // flag in production removes retry, breaker, and per-attempt
-                    // timeout for the client. Log once per pipeline build (i.e.
-                    // once per client) so it shows up in startup logs and is
-                    // searchable when an incident asks "where did the timeouts
-                    // go?".
+                    // Surface once at startup: no retry, breaker, or per-attempt timeout for this client.
                     var logger = context.ServiceProvider
                         .GetRequiredService<ILoggerFactory>()
                         .CreateLogger("SolTechnology.Core.HTTP");
@@ -231,9 +212,7 @@ namespace SolTechnology.Core.HTTP
                 }
 
                 var value = prop.GetValue(source);
-                // Force invariant culture so that, e.g., a German host doesn't
-                // serialise 0.3 as "0,3" — ConfigurationBinder parses the
-                // produced string with InvariantCulture and would reject it.
+                // Invariant culture: ConfigurationBinder parses with invariant; "0,3" would be rejected.
                 data[prop.Name] = value switch
                 {
                     null => null,

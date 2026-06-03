@@ -7,6 +7,7 @@ using DreamTravel.Worker.BackgroundJobs;
 using EntityGraphQL.AspNet;
 using Hangfire;
 using SolTechnology.Core.Cache;
+using SolTechnology.Core.CQRS;
 using SolTechnology.Core.SQL;
 using System.Globalization;
 using DreamTravel.DomainServices;
@@ -25,12 +26,12 @@ public class Program
         CultureInfo.DefaultThreadCurrentUICulture = cultureInfo;
 
         builder.AddServiceDefaults();
-        
+
         builder.Services.AddEndpointsApiExplorer();
         builder.Services.AddLogging(c =>
             c.AddConsole());
 
-        
+
         //INSTALL MODULES
         var sqlConfiguration = builder.Configuration.GetSection("Sql").Get<SQLConfiguration>()!;
         builder.Services.InstallTripsSql(sqlConfiguration);
@@ -38,19 +39,18 @@ public class Program
         builder.Services.InstallInfrastructure();
         builder.Services.InstallDomainServices();
         builder.Services.InstallDreamTripsCommands();
-        
+
         //Graph
         builder.Services.Configure<Neo4jSettings>(
             builder.Configuration.GetSection("Neo4j"));
         builder.Services.InstallGraphDatabase();
-        
+
         //CACHE
         var cacheConfiguration = builder.Configuration.GetSection("Cache").Get<CacheConfiguration>()!;
         builder.Services.AddCache(cacheConfiguration);
 
-        //MEDIATR
-        builder.Services.AddMediatR(cfg =>
-            cfg.RegisterServicesFromAssemblyContaining<Program>());
+        //CQRS
+        builder.Services.AddCQRS(assemblies: typeof(Program).Assembly);
 
         builder.Services.AddHangfireServer();
 

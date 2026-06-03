@@ -1,4 +1,4 @@
-﻿using DreamTravel.DomainServices.CityDomain;
+﻿﻿﻿using DreamTravel.DomainServices.CityDomain;
 using DreamTravel.Infrastructure.Events;
 using DreamTravel.Domain.Cities;
 using DreamTravel.Domain.Events;
@@ -16,7 +16,7 @@ namespace DreamTravel.Queries.FindCityByCoordinates
             var result = await cityDomainService.Get(query.Lat, query.Lng);
 
             notificationPublisher.Publish(new CitySearched{ City = result });
-            
+
             return result;
         }
     }

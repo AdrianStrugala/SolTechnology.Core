@@ -1,9 +1,8 @@
-﻿using MediatR;
-using SolTechnology.Core.CQRS;
+﻿﻿using SolTechnology.Core.CQRS;
 
 namespace DreamTravel.Commands.FetchTraffic
 {
-    public class FetchTrafficCommand : IRequest<Result>
+    public class FetchTrafficCommand : ICommand
     {
         public DateTime DepartureTime { get; set; }
     }

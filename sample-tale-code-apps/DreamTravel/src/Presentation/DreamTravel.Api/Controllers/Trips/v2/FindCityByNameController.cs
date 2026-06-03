@@ -1,9 +1,9 @@
-﻿﻿using System.Net;
+﻿﻿﻿using System.Net;
 using System.Net.Mime;
 using Asp.Versioning;
 using DreamTravel.Domain.Cities;
 using DreamTravel.Queries.FindCityByName;
-using MediatR;
+using SolTechnology.Core.CQRS;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DreamTravel.Api.Controllers.Trips.v2
@@ -24,7 +24,7 @@ namespace DreamTravel.Api.Controllers.Trips.v2
         [ProducesResponseType(typeof(ProblemDetails), (int)HttpStatusCode.BadRequest)]
         public async Task<IActionResult> FindCityByName([FromBody] FindCityByNameQuery query)
         {
-            logger.LogInformation("Looking for city: " + query.Name);
+            logger.LogInformation("Looking for city [{CityName}]", query.Name);
             return Ok(await mediator.Send(query));
         }
     }

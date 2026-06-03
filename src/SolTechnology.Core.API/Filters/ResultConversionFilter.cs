@@ -34,25 +34,19 @@ namespace SolTechnology.Core.API.Filters;
 /// know about HTTP. The HTTP boundary is this filter.
 /// </para>
 /// </summary>
-public sealed class ResultConversionFilter : IAsyncResultFilter
+public sealed class ResultConversionFilter(ICorrelationIdService correlationIdService) : IAsyncResultFilter
 {
-    private readonly ICorrelationIdService _correlationIdService;
-
-    public ResultConversionFilter(ICorrelationIdService correlationIdService)
-    {
-        _correlationIdService = correlationIdService;
-    }
-
     public Task OnResultExecutionAsync(ResultExecutingContext context, ResultExecutionDelegate next)
     {
         if (context.Result is ObjectResult { Value: { } value })
         {
-            // Order matters: Result<T> is a Result, so the generic check must come first. A
-            // bare Error (BadRequest(error)) is a separate case — handlers occasionally surface
-            // an Error directly without wrapping in Result.
-            if (value is Result baseResult)
+            // Dispatch is fully static: Result covers both Result and Result<T> (Data is exposed
+            // through the virtual GetData() — null on the base, payload on the generic). A bare
+            // Error catches the BadRequest(error) shorthand some handlers still use. No
+            // reflection — AOT/trim safe, no PropertyInfo lookups per request.
+            if (value is Result result)
             {
-                context.Result = ConvertResult(baseResult, value);
+                context.Result = Convert(result);
             }
             else if (value is Error error)
             {
@@ -63,29 +57,19 @@ public sealed class ResultConversionFilter : IAsyncResultFilter
         return next();
     }
 
-    private IActionResult ConvertResult(Result baseResult, object originalValue)
+    private IActionResult Convert(Result result)
     {
-        if (baseResult.IsSuccess)
+        if (!result.IsSuccess)
         {
-            // Result<T> carries a Data property; non-generic Result does not. Reflection here
-            // is bound to the public property and only runs on the success path of an MVC action,
-            // i.e. once per request. JIT optimization makes this negligible vs. the JSON write.
-            var dataProperty = originalValue.GetType().GetProperty(nameof(Result<object>.Data));
-
-            if (dataProperty is null)
-            {
-                // Non-generic Result success → 204 No Content. Body intentionally absent.
-                return new StatusCodeResult(StatusCodes.Status204NoContent);
-            }
-
-            var data = dataProperty.GetValue(originalValue);
-            return new ObjectResult(data) { StatusCode = StatusCodes.Status200OK };
+            return BuildProblem(result.Error ?? new Error { Message = "Operation failed." });
         }
 
-        // Failed result. Error must be present by Result contract; fall back to a placeholder
-        // so we still emit a valid ProblemDetails if a caller built a malformed instance.
-        var error = baseResult.Error ?? new Error { Message = "Operation failed." };
-        return BuildProblem(error);
+        // Success: GetData() returns the payload for Result<T> or null for the non-generic
+        // base. Null payload → 204 No Content (no body). See Result.GetData() remarks.
+        var data = result.GetData();
+        return data is null
+            ? new StatusCodeResult(StatusCodes.Status204NoContent)
+            : new ObjectResult(data) { StatusCode = StatusCodes.Status200OK };
     }
 
     private ObjectResult BuildProblem(Error error)
@@ -93,7 +77,7 @@ public sealed class ResultConversionFilter : IAsyncResultFilter
         // Source of truth for correlation id is Core.Logging — same value as the
         // X-Correlation-Id response header and the CorrelationId log scope property. We only
         // generate one if the caller did not already populate it on the Error.
-        var correlationId = error.CorrelationId ?? _correlationIdService.GetOrGenerate().Value;
+        var correlationId = error.CorrelationId ?? correlationIdService.GetOrGenerate().Value;
 
         var problem = ApiProblemDetailsFactory.FromError(error, correlationId);
 

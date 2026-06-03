@@ -39,7 +39,6 @@ public sealed class LoggingMiddleware
         ArgumentNullException.ThrowIfNull(context);
         var correlation = CorrelationId.FromRequest(context.Request, out var headerError);
         correlationIdService.Set(correlation);
-        // Echo correlation back on the response.
         context.Response.OnStarting(static state =>
         {
             var (httpContext, corr) = ((HttpContext, CorrelationId))state;
@@ -47,8 +46,7 @@ public sealed class LoggingMiddleware
             return Task.CompletedTask;
         }, (context, correlation));
 
-        // Skip noisy paths (health checks, liveness probes, swagger). Correlation is still set
-        // and echoed; we just don't emit the request envelope logs and skip enrichers entirely.
+        // Noisy paths (health, swagger) skip envelope logs + enrichers; correlation is still echoed.
         if (ShouldSkipPath(context.Request.Path))
         {
             await _next(context).ConfigureAwait(false);
@@ -56,14 +54,12 @@ public sealed class LoggingMiddleware
         }
 
         var stopwatch = ValueStopwatch.StartNew();
-        // Build the scope dictionary: correlation first, then per-app enrichers fold in.
         var scopeDictionary = correlation.GetScope();
 
-        // Snapshot once - we iterate the enricher sequence twice (body-prepare scan + Enrich loop).
+        // Snapshot: the enricher sequence is iterated twice (body-prepare + Enrich).
         var enricherList = enrichers as IList<ILogScopeEnricher> ?? enrichers.ToArray();
 
-        // If any enricher needs the JSON body, async-buffer + parse it once before invoking
-        // the (synchronous) Enrich loop. Body is reset so MVC model binding still works.
+        // Async-buffer + parse the JSON body once if any enricher requested it; body is reset for model binding.
         await PrepareJsonBodyIfRequestedAsync(context, enricherList, logger).ConfigureAwait(false);
 
         foreach (var enricher in enricherList)
@@ -80,7 +76,6 @@ public sealed class LoggingMiddleware
                     enricher.GetType().FullName);
             }
         }
-        // Single ambient scope for the lifetime of the request.
         using var scope = logger.BeginScope(scopeDictionary);
         if (headerError is not null && _options.LogClientCorrelationParseErrors)
         {
@@ -99,7 +94,6 @@ public sealed class LoggingMiddleware
         }
         catch (Exception ex) when (IsClientAbort(ex, context))
         {
-            // Client closed the connection - not a server fault.
             logger.LogWarning(
                 ex,
                 "Request [{RequestMethod}] [{RequestPath}] aborted by client after [{ElapsedMs} ms]",
@@ -184,8 +178,7 @@ public sealed class LoggingMiddleware
         }
         catch (JsonException ex)
         {
-            // Malformed body is the caller's problem, not ours - downstream model binding
-            // will surface it as a 400. Just skip enrichment.
+            // Malformed body - model binding will surface a 400; skip enrichment.
             logger.LogDebug(
                 ex,
                 "Skipping body-based log enrichment for [{RequestPath}] - JSON could not be parsed",
@@ -193,7 +186,7 @@ public sealed class LoggingMiddleware
         }
         catch (OperationCanceledException)
         {
-            // Client gone, nothing to enrich. Don't surface as an error.
+            // Client gone - nothing to enrich.
         }
         finally
         {

@@ -1,12 +1,13 @@
 # Claude Coding Guide — SolTechnology.Core / DreamTravel
 
-> **Audience:** Claude Code (autonomous agent). This file is mandatory reading whenever
-> you write or modify C# code in this repository. It is referenced from the root
-> `CLAUDE.md` and supersedes any older convention you find in legacy code.
->
-> **Goal:** every file you produce must be small, single-purpose, and read like prose.
-> When in doubt, choose the option that makes the *next* developer reading the code
-> understand it without scrolling.
+Convention layer for the agent. Defines **what** the agent writes: project structure,
+CQRS, naming, logging, tests, documentation shape. Operational behaviour (pre-flight,
+tool usage, forbidden actions, dependency management) lives in the root
+[`CLAUDE.md`](../CLAUDE.md). One source of truth per topic — when in doubt, link,
+don't copy.
+
+Section numbers (§0–§N) are stable cite-targets. `CLAUDE.md`, ADRs and skills reference
+them by number; never renumber an existing section. New rules append at the end.
 
 ---
 
@@ -386,13 +387,13 @@ These apply to every class you write, regardless of layer.
 2. **Size budget:** target ≤ 100 lines, hard cap ~150. Above that, extract a collaborator.
 3. **Method size:** target ≤ 20 lines. Methods longer than that almost always hide a missing abstraction.
 4. **Constructor size:** ≤ 5 dependencies. More than five = the class does too much. Move work into a Story or split the class. (`ILogger<T>` does not count toward the budget.)
-5. **Primary constructors** are mandatory for DI capture (see root `CLAUDE.md` §14). Do not hand-write `private readonly` fields just to assign them.
+5. **Primary constructors** are mandatory for DI capture. Do not hand-write `private readonly` fields just to assign them.
 6. **No statics with state.** Static methods are fine for pure helpers (`CityQueryBuilder`). Static *fields* with mutable state are forbidden outside `const` and `static readonly` lookup tables.
 7. **`sealed` by default** for non-abstract classes. Open them up only when inheritance is the explicit design.
 8. **`internal` by default.** A type is `public` only when it crosses an assembly boundary intentionally.
 9. **No "Manager", "Helper", "Util" suffixes** unless the class genuinely is a generic helper (rare). Name by responsibility: `CityMapper`, `StreetTrafficUpdater`, `GoogleHTTPClient`.
 10. **No `#region`.** Use partial classes (one method per file for HTTP clients) or extract a new class. The only exception is legacy test files explicitly listed in the root `CLAUDE.md`.
-11. **Comments earn their place.** Tale Code reads like prose — let names carry the meaning. Write a comment **only** when a reader cannot infer the *why* from the code itself: a non-obvious framework constraint, a workaround for a specific bug/version, an ADR pointer. Keep it to **one or two lines**, no essays, no restating *what* the next line does. If the explanation needs a paragraph, it belongs in an ADR or XML doc on the public type — not inline.
+11. **Comments earn their place.** Tale Code reads like prose — let names carry the meaning. Write a comment **only** when a reader cannot infer the *why* from the code itself: a non-obvious framework constraint, a workaround for a specific bug/version, an ADR pointer. Hard rule: **one line — two as the absolute exception**. No multi-line narration, no incident retrospectives in `//`, no restating *what* the next line does. If the explanation needs a paragraph, it belongs in an **ADR** (link it: `// See ADR-005.`) or in an **XML `<summary>`** on the public type — not inline. Inline `//` is a *pointer*, not the storage.
     ```csharp
     // ❌ BAD — three-line essay restating what the call does and re-explaining
     //         framework internals everyone can google.
@@ -406,6 +407,25 @@ These apply to every class you write, regardless of layer.
     // Explicit: GetCallingAssembly() is unreliable under JIT inlining / WAF.
     services.RegisterStories(assemblies: typeof(SaveCityStory).Assembly);
     ```
+    ```csharp
+    // ❌ BAD — 6-line incident retrospective lives in code forever.
+    // Two timeout systems were a confusing source of incidents:
+    // Polly's per-attempt RequestTimeout and HttpClient.Timeout
+    // could fight, with the latter killing a retry mid-flight.
+    // When the resilience pipeline is active, Polly owns time;
+    // we set HttpClient.Timeout to InfiniteTimeSpan so the only
+    // deadline is the one configured on HttpPolicyConfiguration.
+    if (policyCfg.UsePolly) { httpClient.Timeout = Timeout.InfiniteTimeSpan; /* ... */ }
+
+    // ✅ GOOD — one sentence, the why; the war story goes to docs/HTTP-Production-Checklist.md.
+    // Polly owns the deadline when active; HttpClient.Timeout would otherwise kill retries mid-flight.
+    if (policyCfg.UsePolly) { httpClient.Timeout = Timeout.InfiniteTimeSpan; /* ... */ }
+    ```
+    **Decision rule when you feel the urge to write 3+ comment lines:**
+    - Does it document the *type's contract*? → move to XML `<summary>`.
+    - Does it record a design decision / incident? → move to an ADR, link from one-line `//`.
+    - Does it explain *what* the code does? → delete it, rename the symbol instead.
+    - Is it genuinely a single non-obvious *why*? → keep, one line.
 
 ---
 
@@ -482,6 +502,8 @@ These are real examples spotted in DreamTravel. Fix them when you touch the surr
 | Hand-written `private readonly` ctor capture | hypothetical | C# 12 primary constructor. |
 | `#region` to organize a class | forbidden | Split into partial files or new classes. |
 | Multi-line "essay" comment restating *what* the next line does | various | One line, *why* only. See §9.11. |
+| Returning a persistence-layer entity (`*Entity` from `DbModels/`) past the DataLayer boundary — e.g. as a controller / handler / repository return type | DataLayer projects | Map to a domain type at the DataLayer boundary (`*Mapper.ToDomain`). Consumers see domain types only — see §5 and §6. Leaking an entity bypasses lazy-loading control, change-tracking lifetime, and JSON serialisation contracts. |
+| Splitting a schema change across multiple commits (entity in one, `DbContext` registration in another, EF migration in a third) | DataLayer changes | Single PR: entity class + `DbContext` `DbSet<>` + `EntityTypeConfiguration` + EF migration land together. The reviewer sees the full schema delta in one diff; rollback is one revert. |
 
 ---
 
@@ -623,7 +645,221 @@ public static class ModuleInstaller
 
 ---
 
-## 18. Self-improvement — keep this guide alive
+## 18. Public module documentation (`docs/<Module>.md`)
+
+Every module under `src/SolTechnology.Core.*` has a companion page in `docs/`. These are the
+**user-facing docs** — what a developer reads on GitHub before deciding to pull the package
+in. They are technical, dense, and example-driven; not marketing prose, not internal incident
+retrospectives.
+
+### Canonical structure (do not reorder, do not invent new top-level sections)
+
+```
+## SolTechnology.Core.<Module>
+<one-paragraph lead — what the package gives you, in one sentence + one elaboration>
+
+### Features
+- bullet 1 — concrete user benefit
+- bullet 2 — concrete user benefit
+…  (5–9 bullets; each is one observable capability the consumer gets, not an internal detail)
+
+### Registration
+<one or two snippets: the one-call happy path, then the lower-level compose path if it exists>
+
+### Configuration
+<table of options (Name | Default | Purpose) + one binding snippet; "no config needed" if true>
+
+### Usage
+<subsections per capability, each a short prose lead-in (≤ 1 line) + a code example>
+<tables for behaviour matrices / mappings>
+
+### Testing
+<the testing fixture / helpers this module ships, one snippet with Arrange/Act/Assert>
+
+### Conventions
+<bulleted DOs/DON'Ts for consumers of this module — short, imperative>
+
+### What ships in DI   (optional — include when AddXxx registers more than 2 services)
+<bulleted list of registered services so consumers can Replace/Decorate>
+```
+
+Anything that does not fit one of those headings is a sign the doc is drifting — either it
+belongs in an **ADR** (`docs/adr/*.md`) or in **inline XML doc** on a public type.
+
+### Hard rules
+
+1. **No essays, no war stories, no incident retrospectives.** "Two timeout systems were a
+   confusing source of incidents…" is for ADRs, not user docs. The user doc says what the
+   knob does and what the default is.
+2. **Features = user-observable benefits, not implementation details.** "RFC 7807 error
+   pipeline" ✅ — "Uses `IExceptionStatusCodeMapper` internally with `TryAddSingleton`" ❌
+   (that belongs under §What ships in DI or in XML doc).
+3. **Lead-in lines under `###` / `####` headings are ≤ 1 sentence.** If you wrote "Configure
+   X with automatic Y to do Z:" above a code block — delete it; the code block speaks.
+4. **Code examples are runnable.** No `// ...` ellipsis in the middle of a snippet unless it
+   replaces unrelated boilerplate. The snippet must compile in the consumer's project as-is.
+5. **Tables over prose for matrices.** Status code mappings, default-value tables, option
+   defaults — always tables.
+6. **No `> Tip:` / `> Note:` blockquote noise.** Either the info matters (then it's a regular
+   sentence in the body) or it doesn't (then it's deleted).
+7. **One module = one page.** Don't split into sub-pages; don't merge two modules. If the page
+   exceeds ~300 lines, the module is doing too much and probably needs splitting in code first.
+8. **Cross-links instead of duplication.** When `Api.md` and `Log.md` both touch correlation,
+   one is canonical and the other links; the description is not copy-pasted.
+9. **Companion to ADRs, not a replacement.** A doc page never explains *why we built it this
+   way*; that's `docs/adr/NNN-*.md`. The doc explains *how to use it*.
+
+### When refactoring an existing doc
+
+- Strip every "Overview" / "Introduction" / "About" heading — fold the content into the lead.
+- Strip every paraphrasing intro under a heading ("Configure X to do Y:" above a code block).
+- Pull every numbered "1. … 2. … 3. …" structure that wasn't a real sequence into either a
+  table or flat `####` subsections. Numbered headings imply order; if the user can skip them,
+  use flat headings.
+- Move any "Manual setup", "Behind the scenes", "How it works internally" content into either
+  XML doc on the type or an ADR; the user doc keeps only what the consumer touches.
+
+### Reference implementation
+
+`docs/Api.md` is the canonical example. When in doubt, compare structure against it. Other
+module docs (`Log.md`, `Bus.md`, `HTTP-Production-Checklist.md`) are migrating toward this
+shape — bring them in line when you touch the surrounding module.
+
+---
+
+## 19. AI-only documentation (`CLAUDE.md`, this guide, `SKILL.md`)
+
+A third class of docs lives in this repo: files read **exclusively by AI agents**
+(`CLAUDE.md` at root, this guide, every `.github/agents/*.agent.md`, every
+`.github/skills/*/SKILL.md`). They are not user-facing; they are not narrative; they are the
+agent's operational and convention memory. Optimise them for four things, in this order:
+
+1. **Routing speed** — the agent must find the rule for the task in the first ~N tokens.
+2. **Compliance verification** — both agent and reviewer must be able to point at "you
+   broke §X" without ambiguity.
+3. **Token efficiency** — every sentence competes with code for context window space.
+4. **Self-update loop** — agents must be able to append rules without breaking sections
+   that other docs / ADRs / skills cite.
+
+Everything else (prose, motivation, history) is waste.
+
+### Three-layer hierarchy (one role per file)
+
+| File | Role | Size budget |
+|---|---|---|
+| `CLAUDE.md` (root) | Operational protocol: how the agent behaves (pre-flight, tool usage, forbidden actions, dependency management, self-improvement routing). | ≤ 300 lines |
+| `docs/ClaudeCodingGuide.md` (this) | Conventions: what the agent writes (project structure, CQRS, naming, logging, anti-patterns, doc shape). | indexable; sections are stable cite-targets |
+| `.github/skills/*/SKILL.md` | One task, end-to-end (code-review, premortem, planning). Loaded on demand. | as short as the task allows |
+
+One rule = one place. Other files **link**, never copy.
+
+### Hard rules
+
+#### A. Form and tone
+
+1. **Imperative, present tense.** "Use primary constructors." not "You should consider
+   using primary constructors". "Never throw in `TellStory()`." not "Throwing here is
+   usually a bad idea".
+2. **One term per concept.** If you say "chapter", do not later say "step" / "stage" /
+   "phase". LLMs split semantics on synonyms and hallucinate distinctions.
+3. **`MUST` / `NEVER` / `PREFER` in caps** for critical rules; ordinary text for the
+   rest. The caps build a force hierarchy without prose.
+4. **No history.** "We used to have a `RegisterCommands` overload that…" → delete.
+   State the current rule. War stories go to ADRs.
+5. **No marketing / praise.** "Beautifully designed Tale Code framework…" → delete.
+   The agent does not need motivation; it needs the rule.
+6. **No `> Note:` / `> Tip:` / `> IMPORTANT:` blockquotes.** Either the info matters
+   (regular sentence) or it doesn't (delete). Same rule as §18.6.
+
+#### B. Structure
+
+7. **Stable section numbering.** §0, §1, …, §N. Numbers are cite-targets — `CLAUDE.md`,
+   ADRs and skills reference "§9.11", "§18", "§4". **Never renumber existing sections.**
+   New rules append at the end; if a section grows beyond cohesion, split it but keep
+   the old number with a "moved to §M" pointer for one release.
+8. **Front-load.** Rules with the highest cost of violation (layer boundaries, secrets
+   in config, missing primary ctor, forbidden actions) go to §0–§3. Edge cases at the
+   end.
+9. **Decision tree at the entry.** First section answers "what am I writing?" in 5–7
+   points. The agent routes before the first edit.
+10. **Tables over prose for matrices.** Layer → types, exception → status, topic →
+    source-of-truth, anti-pattern → fix. Same rule as §18.5 — agents parse tables
+    faster than paragraphs.
+11. **Workflow / pre-yield checklist at the end.** `- [ ]` list the agent ticks before
+    handing control back. Lets the agent self-verify.
+
+#### C. Concrete over abstract
+
+12. **BAD/GOOD code pairs for every non-trivial rule.** Few-shot is the strongest signal
+    for an LLM — stronger than the prose rule above it. "Comments ≤ 1 line" + ❌/✅
+    block beats an essay every time.
+13. **Cite-able names.** Types, files, options, methods — always in `backticks`,
+    exact-string-searchable. "Inject `ILogger<TSelf>`" not "inject a logger of the
+    self type".
+14. **Anti-patterns with locations.** "`CalculateBestPathController.CalculateBestPathV1`
+    has `try/catch + JsonConvert`" — the agent knows where to fix it on the next pass.
+    Mythical "somewhere in the codebase" → delete.
+15. **Concrete numbers, not adjectives.** "≤ 100 lines, hard cap 150." not "classes
+    should be small". LLMs have no intuition for "small".
+
+#### D. Agent-specific mechanics
+
+16. **Evidence-of-consumption rule.** Before the first code-writing tool call in a
+    session, the agent **must** cite which sections it consulted (`CLAUDE.md §0`).
+    Without it, the agent silently forgets the rule by turn 4.
+17. **Forbidden-action list.** Explicit list of actions requiring user confirmation
+    (rename public symbols, bump majors, edit ADRs, push to master, mask CVEs). See
+    `CLAUDE.md §1`.
+18. **Tool-usage hints next to the rule that needs the tool.** "After editing a file,
+    call `get_errors`." — the agent knows it is part of the protocol, not a suggestion.
+19. **Self-improvement clause with explicit triggers.** List the events that mandate
+    an update (user correction, discovered constraint, repeated mistake, new ADR) →
+    agent updates the guide *in the same turn* before yielding. See §20 below.
+20. **Token-budget hint.** Single section ≤ ~150 lines. Above that the LLM starts
+    losing earlier fragments under resampling. If a section grows — split it or move
+    detail into a skill.
+
+#### E. Cross-file discipline
+
+21. **Cross-link, never copy-paste.** Logging convention lives in §11 of this guide.
+    `CLAUDE.md` says "follow §11 for any `logger.Log*`". The `code-review` skill says
+    "check §11". One source of truth.
+22. **Skills are situational, not pre-loaded.** Not every rule lives in the guide.
+    Skills (`code-review`, `premortem`, `implementation-planning`) load on demand —
+    that saves tokens in sessions that don't need them. Read the `SKILL.md` before
+    invoking; never infer from the skill's name.
+
+#### F. What to avoid
+
+23. **No emoji decoration** beyond `✅` / `❌` in BAD/GOOD pairs and `- [ ]` in
+    checklists. LLMs handle `**bold**` and headings well; piktograms are noise.
+24. **No "you can" / "usually" / "in most cases".** Either a rule or an exception.
+    Exceptions are explicit: "Exception: legacy test files listed in `CLAUDE.md §X`."
+25. **No `TODO` / "we should later".** Either it's an issue in the tracker or it
+    doesn't exist. AI-only docs are not a todo board.
+
+### When refactoring an AI-only doc
+
+- Strip every blockquote (`> Note:`, `> IMPORTANT:`, `> 🚨`).
+- Replace soft-language ("usually", "consider", "it's good to") with imperative.
+- Pull every convention rule out of `CLAUDE.md` into this guide; replace with a
+  cross-link in §7's table.
+- Collapse repeated triggers (the same evidence-of-consumption rule stated in three
+  places) into one canonical section.
+- Verify section numbers in this guide and skills still match every cross-reference.
+
+### Reference implementations
+
+- `CLAUDE.md` — operational protocol (≤ 300 lines, §0 pre-flight, §1 forbidden,
+  §7 cross-ref table to this guide).
+- This guide — conventions (§0 decision tree, stable §0–§N, BAD/GOOD pairs in §9.11,
+  §18, §19).
+- `.github/skills/code-review/SKILL.md` — single-task skill (front-loaded routing,
+  no convention duplication, links to this guide for every rule check).
+
+---
+
+## 20. Self-improvement — keep this guide alive
 
 Whenever you (Claude / the agent) **learn something new** during a task that future iterations
 should not have to rediscover, you must update your own instructions immediately, in the same
@@ -635,7 +871,8 @@ Triggers — update the guide when:
 - You discover a non-obvious constraint of the codebase (build quirks, framework rule, DI pitfall).
 - A repeated mistake gets called out (e.g. forgetting `{}` after `if`, missing primary ctor, partial code dumps).
 - A new pattern, helper, or framework addition becomes "the way" to do something here.
-- An ADR is written or amended — reflect its rule here in one line + link.
+- An ADR is written or amended — reflect its rule here in one line + link, **and** update the
+  ADR index at [`docs/adr/README.md`](adr/README.md) in the same change ([ADR-006](adr/006-implementation-plan-workflow.md)).
 
 How to update:
 
@@ -648,8 +885,3 @@ How to update:
 Do **not** wait to be told to update the guide — silent retention is forbidden. If a lesson is
 worth remembering for next time, it is worth writing down now.
 
----
-
-**Last word.** Code in this repository is written for the next reader, not the next compiler.
-If a chapter, handler, or controller is hard to read aloud, it is wrong — split it,
-rename it, narrate it. That is the Tale Code philosophy, and it is enforced.

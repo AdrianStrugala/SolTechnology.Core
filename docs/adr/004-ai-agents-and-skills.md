@@ -50,7 +50,7 @@ Adopt the SKILL.md / `.github/skills/` mechanism in SolTechnology.Core, with thr
 | [documentation-cleanup](../../.github/skills/documentation-cleanup/SKILL.md) | adapted from upstream `documentation-cleanup` | Re-targeted from `Documentation/` to [`docs/`](../); added module ↔ doc parity check and ADR structural validation; domain-specific rules removed. |
 | [code-review](../../.github/skills/code-review/SKILL.md) | none (new) | Built around [`docs/ClaudeCodingGuide.md`](../ClaudeCodingGuide.md) sections and [`docs/reviews/`](../reviews/) templates. |
 | [commit-message](../../.github/skills/commit-message/SKILL.md) | none (new) | Conventional Commits with module-name scopes; semver footer mandatory for public-API changes. |
-| [implementation-planning](../../.github/skills/implementation-planning/SKILL.md) | adapted from upstream `implementation-planning` (concept) | Output is an ADR draft matching [ADR-001..003](.) shape; ends with mandatory premortem gate. |
+| [implementation-planning](../../.github/agents/implementation-planning.agent.md) | adapted from upstream `implementation-planning` (concept) | Migrated from skill to agent per [ADR-006](006-implementation-plan-workflow.md). Output is an ADR draft + step files under `docs/adr/<NNN>-<feature>/to-do/`; ends with mandatory premortem gate. |
 
 ## Alternatives Considered
 

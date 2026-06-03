@@ -4,9 +4,9 @@
 		<Version>0.6.0</Version>
 		<Description>Integration testing fixtures for SolTechnology.Core.Api consumers — wraps Microsoft.AspNetCore.Mvc.Testing and TestHost into a small APIFixture&lt;TEntryPoint&gt; helper. Reference this from your test projects only; not needed at runtime in production assemblies.</Description>
 		<PackageTags>sol technology core api testing aspnetcore integration-tests testserver mvc-testing webapplicationfactory</PackageTags>
-		<Product>SolTechnology.Core.Api.Testing</Product>
-		<PackageId>SolTechnology.Core.Api.Testing</PackageId>
-		<AssemblyName>SolTechnology.Core.Api.Testing</AssemblyName>
+		<Product>SolTechnology.Core.API.Testing</Product>
+		<PackageId>SolTechnology.Core.API.Testing</PackageId>
+		<AssemblyName>SolTechnology.Core.API.Testing</AssemblyName>
 
 		<PackageIcon>docs\mini-logo.png</PackageIcon>
 		<PackageReadmeFile>docs\readme.md</PackageReadmeFile>

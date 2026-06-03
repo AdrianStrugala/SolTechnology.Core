@@ -1,7 +1,6 @@
 ---
 name: blue-red-team
 description: Evaluate a SolTechnology.Core design decision from both supportive (Blue) and skeptical (Red) perspectives. Companion to premortem for ADR-grade choices.
-user-invocable: true
 ---
 
 # Blue / Red Team
@@ -14,7 +13,7 @@ Use this skill alongside [premortem](../premortem/SKILL.md):
 - **blue-red-team** answers *should we do this at all?*
 - **premortem** answers *if we do this, how does it fail?*
 
-## When to Run
+## When to use
 
 - Before opening an [ADR](../../../docs/adr/) — the Blue/Red output seeds the
   *Decision* and *Alternatives Considered* sections.
@@ -22,7 +21,7 @@ Use this skill alongside [premortem](../premortem/SKILL.md):
   Chain handler vs single handler, Story step vs CQRS handler).
 - When introducing a new module to `src/SolTechnology.Core.*`.
 
-## Critical Rules
+## Critical rules
 
 - **No strawmen.** Make the strongest honest case for each side.
 - **Be specific to this repo.** Cite modules, files, ADRs, sample apps — not generic
@@ -32,11 +31,11 @@ Use this skill alongside [premortem](../premortem/SKILL.md):
 
 ## Process
 
-### 1. State the Proposal
+### 1. State the proposal
 
 One sentence. Include the concrete change (file / module / API shape).
 
-### 2. Blue Team — Arguments For
+### 2. Blue team — arguments for
 
 Consider:
 
@@ -46,7 +45,7 @@ Consider:
 - Test simplification, fewer mocks, smaller files (class-size budget).
 - Strategic alignment with [docs/theDesign.md](../../../docs/theDesign.md).
 
-### 3. Red Team — Arguments Against
+### 3. Red team — arguments against
 
 Consider:
 
@@ -63,7 +62,7 @@ Identify the cruxes — points where Blue and Red disagree on fact, not preferen
 For each crux, state what evidence would settle it (a benchmark, a prototype, a
 consumer survey, an ADR).
 
-## Standard Output Format
+## Output format
 
 ### Proposal
 

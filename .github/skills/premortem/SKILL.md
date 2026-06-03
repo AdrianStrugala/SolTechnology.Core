@@ -1,7 +1,6 @@
 ---
 name: premortem
 description: Imagine the change has shipped and broken production; work backward through SolTechnology.Core module-specific failure modes to identify causes, blast radius, and mitigations before merge.
-user-invocable: true
 ---
 
 # Premortem
@@ -14,7 +13,7 @@ plus public consumers of `SolTechnology.Core.*` from NuGet.org).
 Unlike a post-mortem (analysing failure after it happens), a pre-mortem **imagines failure before it
 happens**, then works backward to identify causes and mitigations.
 
-## When to Run
+## When to use
 
 **Mandatory** before merging any change that touches:
 
@@ -25,7 +24,7 @@ happens**, then works backward to identify causes and mitigations.
 
 **Recommended** for any change that crosses module boundaries (e.g. CQRS ↔ Story ↔ Logging).
 
-## Critical Rules
+## Critical rules
 
 - **No probability percentages.** Use plausibility + impact, not maths.
 - **Assume the change shipped as planned.** A failure is not "we forgot to implement X" — it is
@@ -36,10 +35,12 @@ happens**, then works backward to identify causes and mitigations.
   the blast radius; the bug does not stop at the repo boundary.
 - **Pair with [blue-red-team](../blue-red-team/SKILL.md)** when the change is a design decision,
   not just a code edit.
+- **Cite Coding Guide sections by number** (§3, §11, §18) — `ClaudeCodingGuide.md` sections are
+  stable; if a reference looks wrong, the *reference* is stale, not the section.
 
 ## Process
 
-### 1. Frame the Change
+### 1. Frame the change
 
 Record:
 
@@ -51,7 +52,7 @@ Record:
   (search `sample-tale-code-apps/**` for `using SolTechnology.Core.<Module>`).
 - **External consumers** — assume public NuGet downloaders exist; their code is invisible to us.
 
-### 2. Imagine the Failure
+### 2. Imagine the failure
 
 Pick a moment in the future (next release, next quarter). **The change has failed spectacularly.**
 Briefly describe the worst-credible end state in one paragraph before enumerating scenarios.
@@ -74,7 +75,7 @@ Generate **5–10 concrete scenarios**. For each, answer:
 Use the module checklists in §6 to seed scenarios — do not rely on memory alone. Read each relevant
 checklist before listing scenarios for that module.
 
-### 4. Score Blast Radius, Severity, Likelihood
+### 4. Score blast radius, severity, likelihood
 
 For each scenario:
 
@@ -85,7 +86,7 @@ For each scenario:
 
 No numeric probabilities.
 
-### 5. Map to Existing Controls and Propose Mitigations
+### 5. Map to existing controls and propose mitigations
 
 For each scenario:
 
@@ -100,92 +101,27 @@ For each scenario:
     prevented for future contributors.
   - Defer with explicit rationale ("accepted risk").
 
-### 6. Module Failure-Mode Checklists
+### 6. Module failure-mode checklists
 
-Read only the checklists for modules in the diff. Each bullet is a failure mode worth a sentence
-of evidence before dismissing.
+Lazy-loaded — read **only** the references that match the modules in the diff. Each file lists
+failure modes specific to that module; every bullet is worth one sentence of evidence before
+dismissing it.
 
-#### CQRS — `src/SolTechnology.Core.CQRS/`
+| Module(s) in diff | Reference file |
+|---|---|
+| `SolTechnology.Core.CQRS` | [`references/cqrs.md`](references/cqrs.md) |
+| `SolTechnology.Core.Story` | [`references/story.md`](references/story.md) |
+| `SolTechnology.Core.Logging` | [`references/logging.md`](references/logging.md) |
+| `SolTechnology.Core.HTTP`, `SolTechnology.Core.ApiClient` | [`references/http.md`](references/http.md) |
+| `SolTechnology.Core.MessageBus` | [`references/messagebus.md`](references/messagebus.md) |
+| `SolTechnology.Core.Sql` | [`references/sql.md`](references/sql.md) |
+| `SolTechnology.Core.BlobStorage` | [`references/blob.md`](references/blob.md) |
+| `SolTechnology.Core.Cache` | [`references/cache.md`](references/cache.md) |
+| Any `ModuleInstaller.cs` change | [`references/di.md`](references/di.md) |
+| `Directory.Build.props`, `src/Directory.Build.props`, TFM bump | [`references/build-and-nuget.md`](references/build-and-nuget.md) |
 
-- Handler not registered in `ModuleInstaller` → MediatR throws at first request, not at startup.
-- Result pattern bypassed (throws instead of returning `Result.Failure(...)`) — see
-  [docs/ClaudeCodingGuide.md](../../../docs/ClaudeCodingGuide.md) §3.
-- Chain handler ordering changed → silent behaviour drift (no compile-time guard).
-- `IRequest<Result<T>>` signature change → consumers' handlers no longer match registration.
-- Cancellation token dropped on the boundary.
-
-#### Story — `src/SolTechnology.Core.Story/`
-
-- Persisted state schema delta without a migration path → workflows fail to resume after deploy.
-- Step name/identity changed → in-flight workflows resume on the wrong step.
-- Idempotency broken: replay of a step causes side effects twice.
-- Interactive workflow waiting on user input deadlocks when the input channel changes.
-- Serialization contract drift between worker and API host.
-
-#### Logging — `src/SolTechnology.Core.Logging/`
-
-- `logger.Log*` contract change (template, level, scope) violates
-  [docs/ClaudeCodingGuide.md](../../../docs/ClaudeCodingGuide.md) §11.
-- Structured field renamed → downstream queries / dashboards silently empty.
-- PII leak via new field, exception message, or scope value.
-- Performance regression (boxing, string concat) on hot path.
-- Shared-framework reference change (`Microsoft.Extensions.Logging`) triggers
-  [NU1510](../../../src/Directory.Build.props) noise for pure-NuGet consumers.
-
-#### HTTP / ApiClient — `src/SolTechnology.Core.HTTP/`, `src/SolTechnology.Core.ApiClient/`
-
-- Default timeout / retry policy change → upstream service marked unhealthy.
-- Response contract change (added required member, renamed) → consumer deserialization fails.
-- `HttpClient` registration leak (transient instead of typed/factory).
-- TLS / handler behaviour change on .NET 10 surface.
-
-#### MessageBus — `src/SolTechnology.Core.MessageBus/`
-
-- Message contract drift between producer and consumer versions.
-- Poison message handling change → dead-letter loop or silent drop.
-- Lock duration / max delivery count change → duplicate processing.
-- Topic / subscription naming change → silent missed messages.
-
-#### Sql — `src/SolTechnology.Core.Sql/`
-
-- Migration ordering / missing migration → schema drift between envs.
-- Mixed Dapper + EF in one transaction → inconsistent state on failure.
-- Connection / transaction leak under exception path.
-- Parameter binding change → SQL injection regression.
-
-#### BlobStorage — `src/SolTechnology.Core.BlobStorage/`
-
-- SAS / connection string handling change → permissions either too narrow or too broad.
-- ETag / optimistic concurrency removed → last-write-wins regression.
-- Streaming vs buffered upload change → memory spike.
-
-#### Cache — `src/SolTechnology.Core.Cache/`
-
-- TTL semantics change (sliding ↔ absolute) → stale data served.
-- Key format change → silent cache miss (perf regression, not correctness).
-- Cache stampede on cold start with new eviction policy.
-
-#### DI / ModuleInstaller — every module
-
-- Registration removed or renamed → null reference at runtime, build green.
-- Lifetime change (singleton ↔ scoped) → captive dependency or state bleed.
-- Decorator order change → behaviour drift with no test coverage.
-
-#### Build & NuGet — `Directory.Build.props`, `src/Directory.Build.props`
-
-- `TreatWarningsAsErrors=true` → a new analyzer warning fails consumer builds. Confirm with
-  [src/Directory.Build.props](../../../src/Directory.Build.props).
-- Demoted warnings (`NU1900`, `NU1510`) hide a real regression.
-- Transitive `Microsoft.Extensions.*` 10.0.1 bumped → downstream apps still on `net9.0` get
-  NU1605 / runtime mismatch.
-- `snupkg` symbol package missing → debugging broken for consumers.
-- Author / RepositoryUrl / license metadata regressed.
-
-#### .NET 10 target
-
-- New language / runtime feature used in a public signature → consumers on older TFM cannot
-  reference the package.
-- Nullable annotations changed on a public surface → consumer warnings turn into errors.
+If the diff touches a module without a reference file, write one (same shape as the existing
+files) in the **same** PR so the next contributor inherits the checklist.
 
 ### 7. Decide
 
@@ -197,7 +133,7 @@ Produce one of:
 - **No-go** — at least one `H` severity scenario with no plausible mitigation; needs redesign or
   an ADR documenting the breaking change.
 
-## Standard Output Format
+## Output format
 
 ### Premortem — `<change title>`
 

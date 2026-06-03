@@ -1,11 +1,10 @@
-﻿using DreamTravel.Domain.Cities;
+﻿﻿using DreamTravel.Domain.Cities;
 using FluentValidation;
-using MediatR;
 using SolTechnology.Core.CQRS;
 
 namespace DreamTravel.Queries.FindCityByCoordinates;
 
-public class FindCityByCoordinatesQuery : IRequest<Result<City>>
+public class FindCityByCoordinatesQuery : IQuery<City>
 {
     public double Lat { get; set; }
     public double Lng { get; set; }

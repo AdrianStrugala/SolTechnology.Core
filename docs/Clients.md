@@ -1,59 +1,69 @@
-### Overview
+## SolTechnology.Core.HTTP
 
-`SolTechnology.Core.HTTP` is a thin, opinionated wrapper around `HttpClient` that bakes production-ready resilience, observability, and ergonomics into outbound HTTP integrations. Drop it into any ASP.NET Core / worker service and you get:
+A thin, opinionated wrapper around `HttpClient` that bakes production-ready
+resilience, observability, and ergonomics into outbound HTTP integrations. Drop
+it into any ASP.NET Core / worker service and your typed clients ship with
+retry + circuit breaker + per-attempt timeout, correlation propagation, a
+fluent request builder, and a diagnostic exception type — no boilerplate, no
+hand-rolled Polly pipelines, no leaking secrets into log sinks.
 
-> **Production reading**: before pointing this at production traffic, walk
-> through the [HTTP Production Checklist](HTTP-Production-Checklist.md) —
-> idempotency defaults, PII hygiene, timeout ownership, and the
-> `SolTechnology.Core.HTTP` metrics contract. The design rationale lives in
-> [ADR 005](adr/005-http-production-defaults.md).
+Design rationale lives in [ADR 005](adr/005-http-production-defaults.md);
+before pointing this at production traffic, walk through the
+[HTTP Production Checklist](HTTP-Production-Checklist.md).
 
-| Feature | Out of the box |
-|---|---|
-| Typed-client registration | `services.AddHTTPClient<IFooClient, FooClient>("foo")` |
-| Resilience pipeline | retry (exponential backoff + jitter) → circuit breaker → per-attempt timeout (Microsoft.Extensions.Http.Resilience / Polly v8); optional outer `OverallRequestBudget` |
-| Idempotent-only retry | `POST` / `PATCH` are NOT retried by default — opt in with `RetryOnUnsafeVerbs` |
-| `Retry-After` honouring | 429 + 5xx with a `Retry-After` header back off as the server asks (capped at `RetryTimeout`) |
-| Correlation propagation | `X-Correlation-Id` + W3C `traceparent` attached to every outbound request (and every retry) — additive-only, opt-out per client |
-| Fluent request builder | `httpClient.CreateRequest("/path").WithHeader(...).WithBody(...).GetAsync<T>()` |
-| Per-request overrides | `CreateRequest(path, HttpPolicyConfiguration)` + `WithJsonOptions(...)` |
-| Diagnostic exceptions | `HttpRequestFailedException` carries method/URI/status; body capture is opt-in (`IncludeResponseBodyInException`) |
-| Metrics | `Meter("SolTechnology.Core.HTTP")` with `retries` / `circuit_state_changes` counters |
-| Startup validation | `.ValidateOnStart()` on every option type — bad config fails the host, not the first request |
-| System.Text.Json | streaming serialize + deserialize, no LOH pressure on large payloads |
+### Features
 
----
+- **Typed-client registration** — `services.AddHTTPClient<IFooClient, FooClient>("foo")`
+  with optional strongly-typed options bound from configuration.
+- **Resilience pipeline** — retry (exponential backoff + jitter) → circuit
+  breaker → per-attempt timeout, built on
+  `Microsoft.Extensions.Http.Resilience` / Polly v8. Optional outer
+  `OverallRequestBudget` caps the total wall-clock per call.
+- **Idempotent-only retry by default** — `POST` / `PATCH` are NOT retried
+  unless you opt in with `RetryOnUnsafeVerbs`. No silent double-charges.
+- **`Retry-After` honoured** — 429 and 5xx with a `Retry-After` header back off
+  exactly as the server asks, capped at `RetryTimeout`.
+- **Correlation propagation** — `X-Correlation-Id` + W3C `traceparent` on every
+  outbound request and every retry. Caller-supplied headers win.
+- **Fluent request builder** — `httpClient.CreateRequest("/path").WithHeader(...).WithBody(...).GetAsync<T>()`,
+  reusable across multiple terminal verbs.
+- **Per-request policy override** — `CreateRequest(path, HttpPolicyConfiguration)`
+  + `WithJsonOptions(...)` for one-off debug or migration scenarios.
+- **Diagnostic exceptions** — `HttpRequestFailedException` carries method, URI,
+  status, reason phrase. Response body capture is opt-in
+  (`IncludeResponseBodyInException`) and bounded to 8 KiB so PII / tokens don't
+  flow into logs through `Exception.Message`.
+- **Metrics out of the box** — `Meter("SolTechnology.Core.HTTP")` with
+  `retries` and `circuit_state_changes` counters.
+- **Startup validation** — every option type uses `.ValidateOnStart()`, so bad
+  config fails the host instead of the first production request.
+- **`System.Text.Json` streaming** — serialize + deserialize without LOH
+  pressure on large payloads. Avro supported via `DataType.Avro`.
 
 ### Registration
-
-Reference the **SolTechnology.Core.HTTP** NuGet package and register your typed clients in `Program.cs`:
 
 ```csharp
 services.AddHTTPClient<IFootballDataHTTPClient, FootballDataHTTPClient>("football-data");
 ```
 
-The string `"football-data"` is the client name. It must match the key under `HTTPClients:` in `appsettings.json` (when the configuration is resolved from `IConfiguration`).
-
-If your client needs strongly-typed options bound from configuration, use the three-parameter overload:
+The string `"football-data"` is the client name and must match the key under
+`HTTPClients:` in `appsettings.json` when the configuration is bound from
+`IConfiguration`. For a client with its own options section, use the
+three-parameter overload — `GoogleHTTPOptions` is bound from
+`HTTPClients:Google:Options`:
 
 ```csharp
 services.AddHTTPClient<IGoogleHTTPClient, GoogleHTTPClient, GoogleHTTPOptions>("Google");
 ```
 
-`GoogleHTTPOptions` is bound from the `HTTPClients:Google:Options` section.
-
----
-
 ### Configuration
 
-Two layers can be configured independently per client:
+Two layers configured independently per client:
 
-1. **`HTTPClientConfiguration`** — base address, request timeout, default headers.
-2. **`HttpPolicyConfiguration`** — retry / circuit breaker / timeout policy.
+- **`HTTPClientConfiguration`** — base address, request timeout, default headers.
+- **`HttpPolicyConfiguration`** — retry / circuit breaker / timeout policy.
 
-#### 1) `appsettings.json` — the recommended path
-
-```json
+```jsonc
 {
   "HTTPClients": {
     "football-data": {
@@ -75,49 +85,43 @@ Two layers can be configured independently per client:
 }
 ```
 
-**Policy precedence (most specific wins):**
+Policy precedence (most specific wins):
 
 1. Explicit `HttpPolicyConfiguration` passed to `AddHTTPClient`.
 2. `HTTPClients:{name}:Policy` — per-client override.
 3. `HttpPolicy` — global default for all clients.
-4. Built-in defaults (see below).
+4. Built-in defaults (table below).
 
-#### 2) Parameter-based — for short scripts or unit tests
+For short scripts or unit tests, pass the configuration directly:
 
 ```csharp
-var configuration = new HTTPClientConfiguration
-{
-    BaseAddress = "https://api.football-data.org",
-    TimeoutSeconds = 30,
-    Headers = new List<Header>
-    {
-        new() { Name = "X-Auth-Token", Value = "..." }
-    }
-};
-
 services.AddHTTPClient<IFootballDataHTTPClient, FootballDataHTTPClient>(
-    "football-data", configuration);
+    "football-data",
+    new HTTPClientConfiguration
+    {
+        BaseAddress    = "https://api.football-data.org",
+        TimeoutSeconds = 30,
+        Headers        = [ new() { Name = "X-Auth-Token", Value = "..." } ]
+    });
 ```
 
-#### Built-in policy defaults
-
-`HttpPolicyConfiguration` is validated at first resolve (`OptionsValidationException` on misconfiguration). Defaults:
+`HttpPolicyConfiguration` defaults:
 
 | Field | Default | Notes |
 |---|---:|---|
-| `UsePolly` | `true` | set to `false` to bypass the whole pipeline |
-| `RequestTimeout` | 30 000 ms | per-attempt timeout |
-| `MaxRequestRetries` | 3 | initial attempt + 3 retries |
-| `RetryInitialDelay` | 200 ms | seed for the exponential-jitter sequence |
-| `RetryTimeout` | 30 000 ms | upper bound on a single retry delay |
-| `CircuitBreakerFailureThreshold` | 0.3 | ratio in [0.0, 1.0] |
-| `CircuitBreakerSamplingDuration` | 30 000 ms | window over which the ratio is sampled |
-| `CircuitBreakerMinimumThroughput` | 10 | minimum requests in the window before the breaker can trip |
-| `CircuitBreakerDelayDuration` | 10 000 ms | time the breaker stays open before half-opening |
+| `UsePolly` | `true` | Set to `false` to bypass the whole pipeline. Surfaced at startup as a `Warning`. |
+| `RequestTimeout` | 30 000 ms | Per-attempt timeout. |
+| `MaxRequestRetries` | 3 | Initial attempt + 3 retries. |
+| `RetryInitialDelay` | 200 ms | Seed for the exponential-jitter sequence. |
+| `RetryTimeout` | 30 000 ms | Upper bound on a single retry delay. |
+| `CircuitBreakerFailureThreshold` | 0.3 | Ratio in `[0.0, 1.0]`. |
+| `CircuitBreakerSamplingDuration` | 30 000 ms | Window over which the ratio is sampled. |
+| `CircuitBreakerMinimumThroughput` | 10 | Minimum requests in the window before the breaker can trip. |
+| `CircuitBreakerDelayDuration` | 10 000 ms | Time the breaker stays open before half-opening. |
 
-Retried automatically: `408 Request Timeout`, `429 Too Many Requests` (honours `Retry-After`), `500`, `502`, `503` (also honours `Retry-After`), `504`, plus `HttpRequestException` / `TimeoutRejectedException` / `TaskCanceledException`.
-
----
+Retried automatically: `408`, `429` (honours `Retry-After`), `500`, `502`,
+`503` (honours `Retry-After`), `504`, plus `HttpRequestException` /
+`TimeoutRejectedException` / `TaskCanceledException`.
 
 ### Usage
 
@@ -133,7 +137,7 @@ public sealed class FootballDataHTTPClient(HttpClient httpClient) : IFootballDat
 }
 ```
 
-#### Fluent builder API
+#### Fluent builder
 
 ```csharp
 // GET typed
@@ -152,9 +156,9 @@ var created = await httpClient.CreateRequest("v2/matches")
 using var response = await httpClient.CreateRequest("v2/matches/42").GetAsync(cancellationToken);
 ```
 
-Verbs supported: `GetAsync`, `PostAsync`, `PutAsync`, `PatchAsync`, `DeleteAsync` — each with both typed (`<T>` deserialized) and untyped (`HttpResponseMessage`) overloads. Avro is also supported via `DataType.Avro` on both request and response sides.
-
-The same builder instance is safe to reuse across multiple terminal verbs:
+Verbs supported: `GetAsync`, `PostAsync`, `PutAsync`, `PatchAsync`,
+`DeleteAsync`. Each has a typed (`<T>`) and untyped (`HttpResponseMessage`)
+overload. The same builder is safe to reuse across multiple terminal verbs:
 
 ```csharp
 var builder = httpClient.CreateRequest("v2/health").WithHeader("X-Probe", "true");
@@ -162,9 +166,21 @@ var head = await builder.GetAsync();   // call 1 — OK
 var poke = await builder.PostAsync();  // call 2 — still OK
 ```
 
----
+#### Per-request policy override
 
-### Handling failures
+```csharp
+var debugPolicy = new HttpPolicyConfiguration { IncludeResponseBodyInException = true };
+
+var match = await httpClient
+    .CreateRequest("v2/matches/42", debugPolicy)
+    .GetAsync<MatchModel>(ct);
+```
+
+Typed clients should pull
+`IOptionsMonitor<HttpPolicyConfiguration>.Get(clientName)` and pass it in
+explicitly rather than constructing the override ad-hoc.
+
+#### Handling failures
 
 Any non-2xx response on a typed call throws `HttpRequestFailedException`:
 
@@ -175,54 +191,125 @@ try
 }
 catch (HttpRequestFailedException ex)
 {
-    // ex.StatusCode    — System.Net.HttpStatusCode
-    // ex.Method        — HttpMethod
-    // ex.RequestUri    — absolute URI of the failing call
-    // ex.ReasonPhrase  — server-side reason phrase
-    // ex.ResponseBody  — first 8 KiB of the body (best-effort, truncated on overflow)
     logger.LogWarning(ex,
-        "Upstream returned {Status} for {Method} {Uri}",
+        "Upstream returned [{Status}] for [{Method}] [{Uri}]",
         ex.StatusCode, ex.Method, ex.RequestUri);
 }
 ```
 
-Notes:
+| Property | Value |
+|---|---|
+| `StatusCode` | `System.Net.HttpStatusCode` |
+| `Method` | `HttpMethod` of the failing call |
+| `RequestUri` | Absolute URI of the failing call |
+| `ReasonPhrase` | Server-side reason phrase |
+| `ResponseBody` | First 8 KiB of the body, opt-in; oversize bodies end with `… [response body truncated]` |
 
-- `HttpRequestFailedException` inherits from `HttpRequestException`, so existing `catch (HttpRequestException)` handlers continue to work.
-- `Exception.Message` carries only metadata. The response body is exposed **only** via `ResponseBody` so tokens / PII do not leak into logging sinks.
-- The body is captured up to 8 KiB; oversize bodies end with `… [response body truncated]`.
+`HttpRequestFailedException` inherits from `HttpRequestException`, so existing
+`catch (HttpRequestException)` handlers continue to work. `Exception.Message`
+carries only metadata — the response body is exposed **only** via
+`ResponseBody`, so tokens / PII do not leak into logging sinks.
 
----
-
-### Correlation propagation
+#### Correlation propagation
 
 Every outbound request automatically carries:
 
-- `X-Correlation-Id` — sourced from the ambient `ICorrelationIdService` (provided by `SolTechnology.Core.Logging`). One id per logical call, preserved across retries.
-- `traceparent` — full W3C Trace Context value built from `Activity.Current`, attached **only** when a real Activity is in scope. Compatible with OpenTelemetry, Application Insights, Datadog, and the rest of the W3C-aware ecosystem.
+- `X-Correlation-Id` — sourced from the ambient `ICorrelationIdService`
+  (provided by `SolTechnology.Core.Logging`). One id per logical call,
+  preserved across retries.
+- `traceparent` — full W3C Trace Context value built from `Activity.Current`,
+  attached only when a real Activity is in scope.
 
-Both headers are added with "caller wins" semantics — a `WithHeader("X-Correlation-Id", "...")` override is honoured.
+Both headers use "caller wins" semantics — `WithHeader("X-Correlation-Id", "...")`
+overrides the ambient value. Works equally well in background workers /
+functions: the handler generates one on the first outbound call and persists it
+for the rest of the async scope.
 
-Pairs naturally with `Core.Logging.AddCoreLogging()` on the inbound side: the same id flows through the request scope and onto every downstream call. Works equally well in background workers / functions — the handler generates one on the first outbound call and persists it for the rest of the async scope.
-
----
-
-### Observability
-
-`Microsoft.Extensions.Http.Resilience` tags every resilience event with the pipeline name `core-http-{httpClientName}`. OpenTelemetry consumers wire it up via:
+#### Observability
 
 ```csharp
 services.AddOpenTelemetry()
-    .WithMetrics(b => b.AddMeter("Polly"))     // resilience-pipeline metrics
+    .WithMetrics(b => b
+        .AddMeter("Polly")                       // resilience-pipeline metrics
+        .AddMeter("SolTechnology.Core.HTTP"))    // retries / circuit_state_changes counters
     .WithTracing(b => b.AddHttpClientInstrumentation());
 ```
 
-Each retry / circuit-breaker state transition is also logged at `Warning` level via the `ILogger<HttpPolicyFactory>` category.
+Each retry / circuit-breaker state transition is also logged at `Warning` via
+the `ILogger<HttpPolicyFactory>` category. The resilience pipeline name is
+`core-http-{httpClientName}` for filtering in dashboards.
 
----
+### Testing
 
-### Version & compatibility
+No dedicated fixture — typed clients are plain `HttpClient` consumers, so the
+standard approach is `WebApplicationFactory<Program>` + a stub server
+(`WireMock.Net`, `RichardSzalay.MockHttp`) or replacing the registered client
+in a test override:
 
-- TFM: `net10.0`.
-- Depends on: `Microsoft.AspNetCore.App` (shared framework — uses the Options / DI / Configuration / Logging stacks shipped with ASP.NET Core), `Microsoft.Extensions.Http.Resilience` 10.x, `Polly` 8.x, `SolTechnology.Core.Logging`, `AvroConvert`.
-- Public API is at `0.x` — breaking changes (notably the planned `HTTP→Http` naming pass) are tracked in `docs/reviews/HTTP-Review.md` and gated on a `1.0.0` release.
+```csharp
+[Test]
+public async Task GetMatch_RetriesOnce_OnTransient503()
+{
+    // Arrange
+    using var server = WireMockServer.Start();
+    server.Given(Request.Create().WithPath("/v2/matches/42"))
+          .InScenario("retry").WillSetStateTo("served")
+          .RespondWith(Response.Create().WithStatusCode(503));
+    server.Given(Request.Create().WithPath("/v2/matches/42"))
+          .InScenario("retry").WhenStateIs("served")
+          .RespondWith(Response.Create().WithStatusCode(200).WithBodyAsJson(new { id = 42 }));
+
+    var fixture = new ApiFixture().WithReplacedHttpClient("football-data", server.Url);
+    var sut = fixture.Services.GetRequiredService<IFootballDataHTTPClient>();
+
+    // Act
+    var match = await sut.GetMatchAsync(42);
+
+    // Assert
+    match.Id.Should().Be(42);
+    server.LogEntries.Should().HaveCount(2);
+}
+```
+
+For unit-testing a typed client in isolation, inject a `HttpClient` built on a
+`HttpMessageHandler` stub — bypass the resilience pipeline entirely and assert
+the request shape your client produces.
+
+### Conventions
+
+- **One typed client per upstream system.** Name it after the system
+  (`GoogleHTTPClient`, `FootballDataHTTPClient`); the partial class lives in a
+  folder with one method per file (`GoogleHTTPClient.GetLocationOfCity.cs`).
+  See `ClaudeCodingGuide.md` §5.
+- **Never leak transport types.** The interface returns domain models or DTOs,
+  never `HttpResponseMessage`, `JObject`, or `Stream`.
+- **Idempotency keys on `POST` / `PATCH`** if you opt into `RetryOnUnsafeVerbs`.
+  The retry policy will not deduplicate for you.
+- **`IncludeResponseBodyInException = true` only when you need it.** Bodies can
+  contain PII; the default opt-out is intentional.
+- **Catch `HttpRequestFailedException`, not `HttpRequestException`,** when you
+  need the status / URI / body. The latter is the base type and still works for
+  unconditional retries / circuit logging.
+- **Per-attempt timeout < `OverallRequestBudget`.** Validation enforces this on
+  startup; if you tune them, keep the gap large enough for at least one
+  complete attempt.
+
+### What ships in DI
+
+`AddHTTPClient` (and the three-parameter overload) registers, per client name:
+
+- The typed client (`TClient`) and its interface (`TIClient`), via
+  `AddHttpClient<TIClient, TClient>`.
+- A named `HttpClient` configured with the base address, timeout, and default
+  headers from `HTTPClientConfiguration`.
+- A named `HttpPolicyConfiguration` bound through `IOptionsMonitor<>`,
+  validated on start.
+- The shared `HttpPolicyFactory` and `HttpClientMetrics` singletons (idempotent
+  `TryAddSingleton`).
+- A resilience handler under pipeline name `core-http-{clientName}`.
+- `CorrelationPropagatingHandler` (when `propagateCorrelation: true`, the
+  default) inserted before the resilience handler so every retry carries the
+  same correlation headers.
+
+`TOptions` (when supplied) is bound from `HTTPClients:{name}:Options` and
+available via `IOptions<TOptions>` / `IOptionsMonitor<TOptions>`.

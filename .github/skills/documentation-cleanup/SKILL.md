@@ -1,15 +1,13 @@
 ---
 name: documentation-cleanup
 description: Validate and fix documentation integrity in SolTechnology.Core — module/doc parity, indexes, tables, Mermaid diagrams, links, ADR formatting, numbered lists.
-user-invocable: true
 ---
 
 # Documentation Cleanup
 
-Adapted from the aiex documentation-cleanup skill for the
-[docs/](../../../docs/) folder layout of SolTechnology.Core.
+Validate and fix documentation integrity across the [docs/](../../../docs/) folder.
 
-## Process Overview
+## Process overview
 
 1. Identify files to validate
 2. Check module ↔ doc parity
@@ -19,15 +17,15 @@ Adapted from the aiex documentation-cleanup skill for the
 6. Check links and formatting
 7. Fix numbered lists
 
-## Documentation References
+## Documentation references
 
 - [README.md](../../../README.md) — top-level module index
 - [docs/](../../../docs/) — per-module docs and reviews
 - [docs/adr/](../../../docs/adr/) — Architecture Decision Records
 
-## Step-by-Step Instructions
+## Step-by-step procedure
 
-### 1. Identify Files
+### 1. Identify files
 
 Collect every `*.md` under [docs/](../../../docs/) and the workspace root.
 
@@ -88,7 +86,7 @@ For every file under [docs/adr/](../../../docs/adr/):
 
 Ignore backtick / inline-code formatting issues unless they break rendering.
 
-## Standard Output Format
+## Output format
 
 ### Documentation Cleanup Report
 
