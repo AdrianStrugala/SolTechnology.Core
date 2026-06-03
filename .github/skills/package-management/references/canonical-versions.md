@@ -57,6 +57,10 @@ change**. When rows drift between projects, the row records the highest version 
 | `Microsoft.Data.SqlClient` | `5.2.2` | `SolTechnology.Core.SQL.Testing` | MSSQL ADO provider + login probe. |
 | `Npgsql` | `8.0.5` | `SolTechnology.Core.SQL.Testing` | Postgres ADO provider. |
 | `Respawn` | `6.2.1` | `SolTechnology.Core.SQL.Testing` | Between-test database reset (SqlServer + Postgres adapters). |
+| `Testcontainers.Redis` | `3.9.0` | `SolTechnology.Core.Redis.Testing` | Redis container engine. Match `Testcontainers`. |
+| `StackExchange.Redis` | `2.8.16` | `SolTechnology.Core.Redis.Testing` | Used by `RedisFixture.FlushAsync()` (admin-mode `FLUSHALL`). |
+| `Testcontainers.Azurite` | `3.9.0` | `SolTechnology.Core.BlobStorage.Testing` | Azurite (Azure Storage emulator) container engine. Match `Testcontainers` family (NOT `4.x`, which pulls Testcontainers 4 and conflicts with the rest of the companions). |
+| `Azure.Storage.Blobs` | `12.23.0` | `SolTechnology.Core.BlobStorage`, `SolTechnology.Core.BlobStorage.Testing` | Blob SDK. Match the runtime package. |
 
 ## HTTP / mocking (test companions)
 

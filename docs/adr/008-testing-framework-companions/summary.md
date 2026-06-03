@@ -11,8 +11,8 @@ Tracking the implementation steps for [ADR-008](../008-testing-framework-compani
 | 03 | Extract `SQL.Testing` (MSSQL + Postgres, ORM-agnostic) | [`done/03-sql-testing-extract.md`](done/03-sql-testing-extract.md) | ✅ done |
 | 04 | Migrate WireMock DSL to `HTTP.Testing` (breaking `Faker` rename) | [`done/04-http-testing-from-faker.md`](done/04-http-testing-from-faker.md) | ✅ done |
 | 05 | Extend `API.Testing` (auth clients + config overrides) | [`done/05-api-testing-extensions.md`](done/05-api-testing-extensions.md) | ✅ done |
-| 06 | `Redis.Testing` fixture | [`reviewed/06-redis-testing.md`](reviewed/06-redis-testing.md) | 🔍 reviewed |
-| 07 | `BlobStorage.Testing` (Azurite, Azure-specific) | [`reviewed/07-blobstorage-testing.md`](reviewed/07-blobstorage-testing.md) | 🔍 reviewed |
+| 06 | `Redis.Testing` fixture | [`done/06-redis-testing.md`](done/06-redis-testing.md) | ✅ done |
+| 07 | `BlobStorage.Testing` (Azurite, Azure-specific) | [`done/07-blobstorage-testing.md`](done/07-blobstorage-testing.md) | ✅ done |
 | 08 | `ServiceBus.Testing` (Azure Service Bus emulator) | [`reviewed/08-servicebus-testing.md`](reviewed/08-servicebus-testing.md) | 🔍 reviewed |
 | 09 | Wire publish workflow for the seven companion packages | [`reviewed/09-publish-workflow.md`](reviewed/09-publish-workflow.md) | 🔍 reviewed |
 | 10 | Dogfood: migrate sample apps, delete duplicates | [`reviewed/10-dogfood-sample-apps.md`](reviewed/10-dogfood-sample-apps.md) | 🔍 reviewed |

@@ -1,0 +1,31 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<Version>0.1.0</Version>
+		<Description>Integration-testing fixture for SolTechnology.Core.BlobStorage consumers — a Testcontainers-backed AzuriteFixture (the Azure Storage emulator) exposing the Azure Storage connection string, with CreateBlobContainerAsync / ClearAsync helpers and the shared container reuse model. Azure-specific by design. Reference from test projects only; not needed at runtime in production assemblies.</Description>
+		<PackageTags>sol technology core azure blob storage testing testcontainers azurite integration-tests component-tests</PackageTags>
+		<Product>SolTechnology.Core.BlobStorage.Testing</Product>
+		<PackageId>SolTechnology.Core.BlobStorage.Testing</PackageId>
+		<AssemblyName>SolTechnology.Core.BlobStorage.Testing</AssemblyName>
+
+		<PackageIcon>docs\mini-logo.png</PackageIcon>
+		<PackageReadmeFile>docs\readme.md</PackageReadmeFile>
+		<RepositoryUrl>https://github.com/AdrianStrugala/SolTechnology.Core</RepositoryUrl>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<None Include="..\..\docs\mini-logo.png" Pack="true" Visible="false" PackagePath="docs\mini-logo.png" />
+		<None Include="..\..\docs\BlobStorage.Testing.md" Pack="true" Visible="false" PackagePath="docs\readme.md" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\SolTechnology.Core.Testing\SolTechnology.Core.Testing.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Testcontainers.Azurite" Version="3.9.0" />
+		<PackageReference Include="Azure.Storage.Blobs" Version="12.23.0" />
+	</ItemGroup>
+
+</Project>
+
