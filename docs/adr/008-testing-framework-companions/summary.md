@@ -13,9 +13,9 @@ Tracking the implementation steps for [ADR-008](../008-testing-framework-compani
 | 05 | Extend `API.Testing` (auth clients + config overrides) | [`done/05-api-testing-extensions.md`](done/05-api-testing-extensions.md) | ✅ done |
 | 06 | `Redis.Testing` fixture | [`done/06-redis-testing.md`](done/06-redis-testing.md) | ✅ done |
 | 07 | `BlobStorage.Testing` (Azurite, Azure-specific) | [`done/07-blobstorage-testing.md`](done/07-blobstorage-testing.md) | ✅ done |
-| 08 | `ServiceBus.Testing` (Azure Service Bus emulator) | [`reviewed/08-servicebus-testing.md`](reviewed/08-servicebus-testing.md) | 🔍 reviewed |
+| 08 | `ServiceBus.Testing` (Azure Service Bus emulator) | [`done/08-servicebus-testing.md`](done/08-servicebus-testing.md) | ✅ done |
 | 09 | Wire publish workflow for the seven companion packages | [`reviewed/09-publish-workflow.md`](reviewed/09-publish-workflow.md) | 🔍 reviewed |
-| 10 | Dogfood: migrate sample apps, delete duplicates | [`reviewed/10-dogfood-sample-apps.md`](reviewed/10-dogfood-sample-apps.md) | 🔍 reviewed |
+| 10 | Dogfood: migrate sample apps, delete duplicates | [`done/10-dogfood-sample-apps.md`](done/10-dogfood-sample-apps.md) | ✅ done |
 | 11 | Documentation + per-package readmes | [`reviewed/11-documentation.md`](reviewed/11-documentation.md) | 🔍 reviewed |
 
 Status values: `⬜ to-do` / `🔍 reviewed` / `✅ done`. Link in each row points to the step's

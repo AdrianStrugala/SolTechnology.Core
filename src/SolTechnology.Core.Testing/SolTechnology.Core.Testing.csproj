@@ -28,8 +28,10 @@
 		<PackageReference Include="NSubstitute" Version="5.3.0" />
 		<PackageReference Include="Bogus" Version="35.6.1" />
 
-		<!-- Shared container lifetime / reuse model. -->
-		<PackageReference Include="Testcontainers" Version="3.9.0" />
+		<!-- Shared container lifetime / reuse model. Testcontainers 4.x: the family is pinned to 4.3.0
+		     because the Azure Service Bus emulator (ServiceBus.Testing) only exists from Testcontainers 4.
+		     KYC runs the whole family on 4.3.0 in production. -->
+		<PackageReference Include="Testcontainers" Version="4.3.0" />
 		<PackageReference Include="Docker.DotNet" Version="3.125.15" />
 
 		<!-- CVE-2019-0820 (GHSA-cmhx-cq75-c4mj, HIGH): Docker.DotNet drags the legacy out-of-band

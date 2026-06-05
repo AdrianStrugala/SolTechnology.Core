@@ -1,7 +1,7 @@
 ---
 adr: 008-testing-framework-companions
 step: 08 of 11
-status: reviewed
+status: done
 ---
 
 <!-- Reviewed: renumbered from to-do/07-servicebus-testing.md. Shared MSSQL now flows through
@@ -44,4 +44,31 @@ and is consumed here.
 
 ## Open questions
 - none — the shared-MSSQL contract is now an `ISharedSQLContainer` interface exposed by `SQL.Testing` (resolved in step 03).
+
+## Retrospective — Implementation Deviations
+
+### 1. Emulator owns its MSSQL sidecar — `ISharedSQLContainer` contract NOT consumed (acceptance criterion #4 amended)
+**Original plan:** the fixture consumes the shared MSSQL exposed by `SQL.Testing` via `ISharedSQLContainer`
+(no second MSSQL container, emulator wired on the shared docker network), and depends on
+`SolTechnology.Core.SQL.Testing`.
+**Actual implementation:** `Testcontainers.ServiceBus` 4.3.0 **provisions and manages the emulator's MSSQL
+sidecar internally**. Attaching an external MSSQL via a shared network / `DependsOn` makes the 4.x
+emulator's `UnsafeCreateAsync` throw *"Sequence contains more than one element"*; the 4.x `ServiceBusBuilder`
+also expects a concrete `MsSqlContainer`, which is incompatible with `SQL.Testing`'s deliberately
+generic-`ContainerBuilder` engine (step 03 dropped `Testcontainers.MsSql` on purpose). Consequences:
+- `ServiceBus.Testing.csproj` does **not** reference `SolTechnology.Core.SQL.Testing` (only `Core.Testing` +
+  `Testcontainers.ServiceBus` + `Docker.DotNet`); the unmet half of criterion #4 is "no *second* MSSQL
+  container" — the emulator does run its own. The "no direct `Testcontainers.MsSql` dependency" half still
+  holds. The `ISharedSQLContainer` seam shipped in step 03 remains in `SQL.Testing` but is unused by this
+  fixture (kept for any future direct-MSSQL consumer).
+- `ServiceBusFixture` ctor is `(string containerName, string? instanceName, string? configFilePath)` — there
+  is no `sharedSql` / `sqlNetworkAlias` parameter. Reuse-by-name, the AMQP SASL-echo probe, the
+  semaphore-guarded per-instance one-time init, and the dispose-no-op-on-reuse behaviour are all preserved
+  verbatim from the KYC port.
+
+### 2. Doc reconciled to shipped API
+**Original plan / draft:** `docs/ServiceBus.Testing.md` (authored ahead of code) documented the
+`ISharedSQLContainer` design and a `new ServiceBusFixture(sharedSql, sqlNetworkAlias)` signature.
+**Actual implementation:** the readme was rewritten to match the self-managed-sidecar API (constructor,
+"Why it needs SQL", reuse rationale, isolation paragraph). The fuller documentation pass remains step 11.
 

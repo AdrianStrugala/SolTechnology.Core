@@ -18,6 +18,7 @@
     <File Path="docs\HTTP-Production-Checklist.md" />
     <File Path="docs\HTTP.Testing.md" />
     <File Path="docs\Redis.Testing.md" />
+    <File Path="docs\ServiceBus.Testing.md" />
     <File Path="docs\Testing.md" />
   </Folder>
   <Folder Name="/SampleApps/" />
@@ -111,5 +112,6 @@
     <Project Path="src/SolTechnology.Core.SQL.Testing/SolTechnology.Core.SQL.Testing.csproj" />
     <Project Path="src/SolTechnology.Core.Redis.Testing/SolTechnology.Core.Redis.Testing.csproj" />
     <Project Path="src/SolTechnology.Core.BlobStorage.Testing/SolTechnology.Core.BlobStorage.Testing.csproj" />
+    <Project Path="src/SolTechnology.Core.ServiceBus.Testing/SolTechnology.Core.ServiceBus.Testing.csproj" />
   </Folder>
 </Solution>

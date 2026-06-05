@@ -23,7 +23,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Testcontainers.Azurite" Version="3.9.0" />
+		<PackageReference Include="Testcontainers.Azurite" Version="4.3.0" />
 		<PackageReference Include="Azure.Storage.Blobs" Version="12.23.0" />
 	</ItemGroup>
 

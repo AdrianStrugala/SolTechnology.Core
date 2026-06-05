@@ -1,4 +1,3 @@
-using System.Diagnostics;
 using DreamTravel.Domain.Cities;
 using DreamTravel.GeolocationDataClients.GoogleApi;
 using DreamTravel.Sql;
@@ -8,6 +7,7 @@ using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using SolTechnology.Core.HTTP.Testing;
+using SolTechnology.Core.Testing;
 
 namespace DreamTravel.FunctionalTests.Trips;
 
@@ -56,7 +56,7 @@ public class FindCityAndSaveDetailsTest
 
         // "Then background job is triggered, city details fetched and stored".x(() =>
         var storedCity =
-            await Retry.Unless(
+            await Retry.UntilConditionMetOrTimeout(
                 async () => await _dbContext.Cities
                     .Include(c => c.AlternativeNames)
                     .WhereName(city.Name)
@@ -77,29 +77,3 @@ public class FindCityAndSaveDetailsTest
     }
 }
 
-public static class Retry
-{
-    public static async Task<T?> Unless<T>(
-        Func<Task<T>> action,
-        Func<T, bool> condition,
-        TimeSpan totalWaitTime,
-        TimeSpan pauseInterval,
-        CancellationToken ct = default)
-    {
-        Stopwatch stopwatch = new Stopwatch();
-        stopwatch.Start();
-        do
-        {
-            var result = await action();
-
-            if (condition(result))
-            {
-                return result;
-            }
-
-            await Task.Delay(pauseInterval, ct);
-        } while (stopwatch.Elapsed < totalWaitTime);
-
-        return default;
-    }
-}

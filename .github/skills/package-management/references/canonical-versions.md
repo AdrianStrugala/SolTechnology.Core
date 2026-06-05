@@ -52,15 +52,17 @@ change**. When rows drift between projects, the row records the highest version 
 | Package | Version | Used by | Notes |
 |---|---|---|---|
 | `Microsoft.SqlServer.DacFx` | `170.1.61` | `SolTechnology.Core.SQL` (runtime, `SQLProjectDeployer`), `SolTechnology.Core.SQL.Testing` (dacpac deploy) | Stays in `SQL` even though testing moved out. |
-| `Testcontainers` | `3.9.0` | `SolTechnology.Core.Testing`, `SolTechnology.Core.SQL.Testing` | Container fixtures. Removed from `Sql` runtime in v0.6.0. |
-| `Testcontainers.PostgreSql` | `3.9.0` | `SolTechnology.Core.SQL.Testing` | Postgres engine. Match `Testcontainers`. (MSSQL uses the generic builder — no `Testcontainers.MsSql`.) |
+| `Testcontainers` | `4.3.0` | `SolTechnology.Core.Testing`, `SolTechnology.Core.SQL.Testing` | Container fixtures. **Family pinned to 4.3.0** — the Azure Service Bus emulator (`ServiceBus.Testing`) only exists from Testcontainers 4; KYC runs the whole family on 4.3.0. |
+| `Testcontainers.PostgreSql` | `4.3.0` | `SolTechnology.Core.SQL.Testing` | Postgres engine. Match `Testcontainers`. (MSSQL uses the generic builder — no `Testcontainers.MsSql`.) |
 | `Microsoft.Data.SqlClient` | `5.2.2` | `SolTechnology.Core.SQL.Testing` | MSSQL ADO provider + login probe. |
 | `Npgsql` | `8.0.5` | `SolTechnology.Core.SQL.Testing` | Postgres ADO provider. |
 | `Respawn` | `6.2.1` | `SolTechnology.Core.SQL.Testing` | Between-test database reset (SqlServer + Postgres adapters). |
-| `Testcontainers.Redis` | `3.9.0` | `SolTechnology.Core.Redis.Testing` | Redis container engine. Match `Testcontainers`. |
+| `Testcontainers.Redis` | `4.3.0` | `SolTechnology.Core.Redis.Testing` | Redis container engine. Match `Testcontainers`. |
 | `StackExchange.Redis` | `2.8.16` | `SolTechnology.Core.Redis.Testing` | Used by `RedisFixture.FlushAsync()` (admin-mode `FLUSHALL`). |
-| `Testcontainers.Azurite` | `3.9.0` | `SolTechnology.Core.BlobStorage.Testing` | Azurite (Azure Storage emulator) container engine. Match `Testcontainers` family (NOT `4.x`, which pulls Testcontainers 4 and conflicts with the rest of the companions). |
+| `Testcontainers.Azurite` | `4.3.0` | `SolTechnology.Core.BlobStorage.Testing` | Azurite (Azure Storage emulator) container engine. Match `Testcontainers`. |
 | `Azure.Storage.Blobs` | `12.23.0` | `SolTechnology.Core.BlobStorage`, `SolTechnology.Core.BlobStorage.Testing` | Blob SDK. Match the runtime package. |
+| `Testcontainers.ServiceBus` | `4.3.0` | `SolTechnology.Core.ServiceBus.Testing` | Azure Service Bus emulator engine. Only exists from Testcontainers 4. |
+| `Docker.DotNet` | `3.125.15` | `SolTechnology.Core.Testing`, `SolTechnology.Core.ServiceBus.Testing` | Stable-name reuse + restart management for the emulator. |
 
 ## HTTP / mocking (test companions)
 

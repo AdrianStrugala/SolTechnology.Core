@@ -94,3 +94,9 @@ public class CalculatePlayerStatistics : IMessageHandler<PlayerMatchesSynchroniz
 - The Message Handler is registered as IHostedService
 - Topics and subsriptions are created from code on registration using default values
 - Message has to implement IMessage inteface
+
+### Testing
+
+For integration/component tests, reference the **[SolTechnology.Core.ServiceBus.Testing](ServiceBus.Testing.md)**
+companion package. It spins up the official Azure Service Bus emulator via Testcontainers and hands back a
+connection string you can override `MessageBus:ConnectionString` with — no cloud namespace required.

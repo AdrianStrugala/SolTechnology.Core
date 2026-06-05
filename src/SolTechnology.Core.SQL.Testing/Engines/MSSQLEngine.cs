@@ -88,9 +88,10 @@ internal sealed class MSSQLEngine(string? image, string containerName) : IDataba
         await connection.OpenAsync(ct).ConfigureAwait(false);
 
         await using var command = connection.CreateCommand();
-        // QUOTENAME guards the identifier; the EXEC keeps CREATE DATABASE out of the parameterised path.
+        // QUOTENAME guards the identifier; build the statement into a variable first because EXEC()
+        // does not allow a function call (QUOTENAME) inside its string-concatenation argument.
         command.CommandText =
-            "IF DB_ID(@name) IS NULL EXEC('CREATE DATABASE ' + QUOTENAME(@name));";
+            "IF DB_ID(@name) IS NULL BEGIN DECLARE @sql nvarchar(max) = N'CREATE DATABASE ' + QUOTENAME(@name); EXEC(@sql); END";
         command.Parameters.AddWithValue("@name", databaseName);
         await command.ExecuteNonQueryAsync(ct).ConfigureAwait(false);
     }

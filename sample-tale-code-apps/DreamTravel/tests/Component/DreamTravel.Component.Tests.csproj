@@ -24,6 +24,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <ProjectReference Include="..\..\..\..\src\SolTechnology.Core.Testing\SolTechnology.Core.Testing.csproj" />
 	  <ProjectReference Include="..\..\..\..\src\SolTechnology.Core.API.Testing\SolTechnology.Core.API.Testing.csproj" />
 	  <ProjectReference Include="..\..\..\..\src\SolTechnology.Core.SQL.Testing\SolTechnology.Core.SQL.Testing.csproj" />
 	  <ProjectReference Include="..\..\..\..\src\SolTechnology.Core.HTTP.Testing\SolTechnology.Core.HTTP.Testing.csproj" />

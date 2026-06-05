@@ -25,8 +25,8 @@
 	<ItemGroup>
 		<!-- MSSQL uses the generic ContainerBuilder + host-side login probe (NOT Testcontainers.MsSql:
 		     azure-sql-edge lacks sqlcmd, which breaks its built-in wait). Postgres uses the dedicated builder. -->
-		<PackageReference Include="Testcontainers" Version="3.9.0" />
-		<PackageReference Include="Testcontainers.PostgreSql" Version="3.9.0" />
+		<PackageReference Include="Testcontainers" Version="4.3.0" />
+		<PackageReference Include="Testcontainers.PostgreSql" Version="4.3.0" />
 		<PackageReference Include="Microsoft.SqlServer.DacFx" Version="170.1.61" />
 		<PackageReference Include="Microsoft.Data.SqlClient" Version="5.2.2" />
 		<PackageReference Include="Npgsql" Version="8.0.5" />
