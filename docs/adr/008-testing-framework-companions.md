@@ -1,6 +1,6 @@
 # ADR-008: Modular `.Testing` companion packages for the SolTechnology.Core testing framework
 
-> **Status:** Proposed
+> **Status:** Accepted
 > **Decision Date:** 2026-05-30
 > **Decision Maker:** Adrian Strugala / Core maintainers
 
@@ -164,3 +164,47 @@ and type-name (`SQLFixture`) preservation. The `Faker` rename is an **accepted b
 - [`docs/theQuality.md`](../theQuality.md) — testing pyramid + Component test guidance updated by this plan.
 - Surveyed apps: `sample-tale-code-apps/TaleCode`, `sample-tale-code-apps/DreamTravel`,
   `tests/tests-kyc`, `tests/tests-mts`.
+
+## Implementation summary
+
+Partially collapsed 2026-06-06. Ten of the eleven steps shipped; the per-step working folder
+(`docs/adr/008-testing-framework-companions/`) was pruned to **only the one outstanding step** — the
+publish workflow — per a maintainer call (a variation on the ADR-006 collapse-on-completion rule, which
+normally deletes the whole folder once *every* step ships).
+
+| # | Step | Shipped |
+|---|---|---|
+| 01 | Premortem (plan gate) | Verdict *Go with mitigations*; HTTP.Testing hardening pass recorded (dynamic port, `Dispose`/`Reset` split, type-safe `Fake<T>`). |
+| 02 | `SolTechnology.Core.Testing` (foundation) | `Retry`, `AutoNSubstituteData` / `InlineAutoNSubstituteData` / `AutoBogusData`, `BogusCustomization`, `DateOnlyCustomization`, `TestContainersContext`, `ContainerLifecycleHelper` (AMQP probe), `InMemorySinkAssertions`. |
+| 03 | `SolTechnology.Core.SQL.Testing` | `SQLFixture` (MSSQL + Postgres via `IDatabaseEngine`; dacpac / EF / scripts provisioning; Respawn `SQLReset`; `ISharedSQLContainer`). `SolTechnology.Core.SQL` keeps DacFx, drops the Testcontainers runtime dep. |
+| 04 | `SolTechnology.Core.HTTP.Testing` | WireMock DSL migrated from `Faker`; `WireMockFixture` + `Fake<T>` + `FakeApiBase`. **Breaking** namespace change. |
+| 05 | `SolTechnology.Core.API.Testing` (extended) | `AuthClientExtensions` (`CreateAuthorizedClient` / `CreateAnonymousClient`), `TestConfigurationBuilder`; `0.6.0 → 0.7.0`. |
+| 06 | `SolTechnology.Core.Redis.Testing` | `RedisFixture` (`HostName` / `ConnectionString` / `FlushAsync` / `WithNetwork`). |
+| 07 | `SolTechnology.Core.BlobStorage.Testing` | `AzuriteFixture` (Azure-only; `CreateBlobContainerAsync` / `ClearAsync`). |
+| 08 | `SolTechnology.Core.ServiceBus.Testing` | `ServiceBusFixture` (emulator + AMQP readiness probe + stable-name reuse). |
+| 10 | Dogfood DreamTravel | Component suite runs on the packages (5/5; ~4× faster on warm reuse); local `Retry` removed; orphan `src/SolTechnology.Core.Faker` deleted. |
+| 11 | Documentation | Per-package readmes + `theQuality.md` framework story + README testing-companions table. |
+
+### Preserved deviations
+
+- **02** — `Moq` is on the repo anti-stack → shipped `AutoNSubstituteData`, not `AutoMoqData`. Bogus is an
+  *optional* complement (`BogusCustomization`); AutoFixture stays the engine. The `ContainerReuse` helper
+  was dropped — an assembly-level `[OneTimeSetUp]` already gives within-run reuse for free.
+- **04** — `Faker` was **deleted outright** (no `[Obsolete]` shim): one in-repo consumer, pre-1.0,
+  fix-at-source. `FakeApiBase` is non-generic and `WithRequest` uses a direct call (no reflection →
+  IntelliSense + compile-time arg checks).
+- **06** — `RedisFixture.FlushAsync` needs `AllowAdmin = true` (`FLUSHALL` is a server/admin command).
+- **07** — pinned the **Testcontainers 3.9.0** family (KYC's 4.3.0 would conflict with the other companions).
+- **08** — `Testcontainers.ServiceBus` 4.x makes the emulator **self-manage its MSSQL sidecar**; the
+  `ISharedSQLContainer` contract is therefore **not** consumed by `ServiceBus.Testing` (the seam still
+  ships in `SQL.Testing` for any future direct-MSSQL consumer).
+- **10** — TaleCode has **no tracked in-repo source** (only stale `obj/`), so it could not be migrated;
+  only DreamTravel was dogfooded.
+
+### Remaining — the one open TODO
+
+- **Step 09 — wire the publish workflow.** `.github/workflows/publishPackages.yml` must `dotnet pack` all
+  seven companions (including `API.Testing`, currently unpacked) and stop packing `Faker`; otherwise the
+  packages build but never reach NuGet. Plan preserved at
+  [`008-testing-framework-companions/reviewed/09-publish-workflow.md`](008-testing-framework-companions/reviewed/09-publish-workflow.md).
+
