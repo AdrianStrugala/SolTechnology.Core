@@ -1,5 +1,4 @@
 using System.Data.Common;
-using DotNet.Testcontainers.Containers;
 using DotNet.Testcontainers.Networks;
 using Respawn;
 
@@ -12,8 +11,6 @@ namespace SolTechnology.Core.SQL.Testing.Engines;
 /// </summary>
 internal interface IDatabaseEngine
 {
-    /// <summary>The running container (valid after <see cref="StartAsync"/>).</summary>
-    IContainer Container { get; }
 
     /// <summary>Server-level connection string with no specific catalog (admin login).</summary>
     string ServerConnectionString { get; }

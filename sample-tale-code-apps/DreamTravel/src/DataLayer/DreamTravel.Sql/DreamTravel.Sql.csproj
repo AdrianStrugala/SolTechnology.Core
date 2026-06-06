@@ -1,9 +1,15 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
-    <PackageReference Include="Hangfire.NetCore" Version="1.8.16" />
-    <PackageReference Include="Hangfire.SqlServer" Version="1.8.16" />
+    <PackageReference Include="Hangfire.NetCore" Version="1.8.22" />
+    <PackageReference Include="Hangfire.SqlServer" Version="1.8.22" />
     <PackageReference Include="Hangfire.InMemory" Version="1.0.0" />
+    <!-- Hangfire.Core's transitive Newtonsoft.Json floor is 11.0.1 (NU1903 / CVE-2024-21907).
+         Pin 13.0.4 at this seam (mirrors DreamTravel.Infrastructure). Remove when Hangfire raises its floor. -->
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
+    <!-- EntityGraphQL.AspNet 5.5.3 pulls HotChocolate.Language 13.9.11 (NU1904 / CVE-2026-40324).
+         Pin the same-line patched 13.9.16. Remove when EntityGraphQL references a patched HotChocolate. -->
+    <PackageReference Include="HotChocolate.Language" Version="13.9.16" />
     <PackageReference Include="Microsoft.Data.SqlClient" Version="6.1.2" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.11" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.11">

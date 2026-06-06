@@ -93,8 +93,6 @@ Notes:
   (per [ADR-001](adr/001-acronym-capitalization-refactoring.md)).
 - **DacFx stays in `SolTechnology.Core.SQL` at runtime** (used by `SQLProjectDeployer`); only the
   test-only fixture moved to the companion package.
-- **`ISharedSQLContainer`** exposes the running container + network so another fixture can share one
-  SQL instance instead of spawning a second.
 - Container lifetime / `TESTCONTAINERS_REUSE` reuse is the shared model from
   [theQuality.md → Container lifetime & reuse](theQuality.md#container-lifetime--reuse).
 

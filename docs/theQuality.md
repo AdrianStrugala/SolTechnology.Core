@@ -262,7 +262,7 @@ single `[SetUpFixture]`. Defined in [ADR-008](adr/008-testing-framework-companio
 |---|---|---|---|
 | Foundation: data attributes, `Retry`, container lifetime, log assertions | `SolTechnology.Core.Testing` | `AutoNSubstituteData`, `Retry`, `TestContainersContext`, `ContainerLifecycleHelper` | [Testing.md](Testing.md) |
 | In-memory API host + config / auth helpers | `SolTechnology.Core.API.Testing` | `APIFixture<T>`, `TestConfigurationBuilder`, `CreateAuthorizedClient` | [Api.md#testing](Api.md#testing) |
-| SQL (MSSQL + Postgres), dacpac / EF / scripts | `SolTechnology.Core.SQL.Testing` | `SQLFixture`, `ResetAsync`, `ISharedSQLContainer` | [SQL.md#testing](SQL.md#testing) |
+| SQL (MSSQL + Postgres), dacpac / EF / scripts | `SolTechnology.Core.SQL.Testing` | `SQLFixture`, `ResetAsync`, `UsePostgres` | [SQL.md#testing](SQL.md#testing) |
 | HTTP mocks (typed-client fakes) | `SolTechnology.Core.HTTP.Testing` | `WireMockFixture`, `Fake<T>`, `FakeApiBase` | [HTTP.Testing.md](HTTP.Testing.md) |
 | Redis | `SolTechnology.Core.Redis.Testing` | `RedisFixture`, `FlushAsync` | [Redis.Testing.md](Redis.Testing.md) |
 | Azure Blob (Azurite) | `SolTechnology.Core.BlobStorage.Testing` | `AzuriteFixture`, `ClearAsync` | [BlobStorage.Testing.md](BlobStorage.Testing.md) |

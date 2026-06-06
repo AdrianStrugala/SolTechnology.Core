@@ -1,5 +1,4 @@
 using System.Data.Common;
-using DotNet.Testcontainers.Containers;
 using DotNet.Testcontainers.Networks;
 using SolTechnology.Core.SQL.Testing.Engines;
 using SolTechnology.Core.SQL.Testing.Provisioning;
@@ -18,7 +17,7 @@ namespace SolTechnology.Core.SQL.Testing;
 /// engines / provisioning with <see cref="UsePostgres"/>, <see cref="WithScripts"/>,
 /// <see cref="WithEfMigrations"/> or <see cref="WithSchema"/>.
 /// </remarks>
-public sealed class SQLFixture : IAsyncDisposable, ISharedSQLContainer
+public sealed class SQLFixture : IAsyncDisposable
 {
     private readonly string? _image;
     private readonly string _containerName;
@@ -33,7 +32,7 @@ public sealed class SQLFixture : IAsyncDisposable, ISharedSQLContainer
     {
         DatabaseName = databaseName ?? throw new ArgumentNullException(nameof(databaseName));
         _image = image;
-        _containerName = $"soltech-sql-{databaseName.ToLowerInvariant()}";
+        _containerName = $"sol-sql-{databaseName.ToLowerInvariant()}";
     }
 
     /// <summary>The application database name.</summary>
@@ -48,12 +47,6 @@ public sealed class SQLFixture : IAsyncDisposable, ISharedSQLContainer
     /// <summary>Connection string targeting the application database. Valid after <see cref="InitializeAsync"/>.</summary>
     public string DatabaseConnectionString => Engine.DatabaseConnectionString(DatabaseName);
 
-    // ---- ISharedSQLContainer ----
-    IContainer ISharedSQLContainer.Container => Engine.Container;
-    INetwork? ISharedSQLContainer.Network => _network;
-    string ISharedSQLContainer.ServerConnectionString => Engine.ServerConnectionString;
-    string ISharedSQLContainer.GetDatabaseConnectionString(string databaseName) =>
-        Engine.DatabaseConnectionString(databaseName);
 
     // ---- fluent configuration ----
 

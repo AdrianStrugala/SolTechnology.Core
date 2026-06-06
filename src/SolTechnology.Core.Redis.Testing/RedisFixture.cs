@@ -9,8 +9,7 @@ namespace SolTechnology.Core.Redis.Testing;
 /// <summary>
 /// Spins up a Redis container and exposes the connection details in the shape apps wire today
 /// (<c>Redis:HostName</c> = <c>host:port</c>, plus a full StackExchange.Redis
-/// <see cref="ConnectionString"/>). Generalised from the inline <c>RedisBuilder</c> fixture in the
-/// MTS / KYC suites. No coupling to <c>SolTechnology.Core.Cache</c> runtime types — the fixture only
+/// <see cref="ConnectionString"/>). No coupling to <c>SolTechnology.Core.Cache</c> runtime types — the fixture only
 /// provides a running Redis + connection string.
 /// </summary>
 /// <remarks>

@@ -1,6 +1,5 @@
 using System.Data.Common;
 using DotNet.Testcontainers.Builders;
-using DotNet.Testcontainers.Containers;
 using DotNet.Testcontainers.Networks;
 using Npgsql;
 using Respawn;
@@ -10,7 +9,7 @@ using Testcontainers.PostgreSql;
 namespace SolTechnology.Core.SQL.Testing.Engines;
 
 /// <summary>
-/// PostgreSQL engine, ported from the MTS integration-test fixture. Uses the dedicated
+/// PostgreSQL engine. Uses the dedicated
 /// <see cref="PostgreSqlBuilder"/> (Testcontainers.PostgreSql is safe — only MSSQL had the
 /// <c>sqlcmd</c> wait pitfall) with a log-based readiness probe.
 /// </summary>
@@ -21,8 +20,6 @@ internal sealed class PostgresEngine(string? image, string databaseName, string 
 
     private PostgreSqlContainer? _container;
 
-    public IContainer Container =>
-        _container ?? throw new InvalidOperationException("Container not started. Call StartAsync first.");
 
     public string ServerConnectionString => DatabaseConnectionString(AdminDatabase);
 

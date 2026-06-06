@@ -14,7 +14,7 @@ not ours). The emulator's backing MSSQL sidecar is **provisioned and managed by 
 itself** — you do not (and must not) wire your own. Attaching an external MSSQL via a shared network or
 `DependsOn` makes the 4.x emulator's `UnsafeCreateAsync` throw *"Sequence contains more than one element"*,
 so the fixture deliberately lets the emulator own its sidecar. This is why the package does **not** depend
-on `SolTechnology.Core.SQL.Testing` or consume its `ISharedSQLContainer` — see
+on `SolTechnology.Core.SQL.Testing` or share its SQL container — see
 [Container lifetime & reuse](#container-lifetime--reuse).
 
 ## What's in the box

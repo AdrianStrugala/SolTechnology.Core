@@ -23,15 +23,15 @@ internal sealed class MSSQLEngine(string? image, string containerName) : IDataba
 
     private IContainer? _container;
 
-    public IContainer Container =>
+    private IContainer RequireContainer() =>
         _container ?? throw new InvalidOperationException("Container not started. Call StartAsync first.");
 
     public string ServerConnectionString
     {
         get
         {
-            var host = Container.Hostname;
-            var port = Container.GetMappedPublicPort(InternalPort);
+            var host = RequireContainer().Hostname;
+            var port = RequireContainer().GetMappedPublicPort(InternalPort);
             return new SqlConnectionStringBuilder
             {
                 DataSource = $"{host},{port}",

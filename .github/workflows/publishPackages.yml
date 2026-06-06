@@ -27,7 +27,7 @@ jobs:
       shell: pwsh
       run: |
            .\.github\runTests.ps1
-   
+
     - name: Pack SolTechnology.Core.SQL
       run: dotnet pack -c Release -o . ./src/SolTechnology.Core.SQL/SolTechnology.Core.SQL.csproj
 
@@ -66,9 +66,6 @@ jobs:
 
     - name: Pack SolTechnology.Core.AUID
       run: dotnet pack -c Release -o . ./src/SolTechnology.Core.AUID/SolTechnology.Core.AUID.csproj
-
-    - name: Pack SolTechnology.Core.Faker
-      run: dotnet pack -c Release -o . ./src/SolTechnology.Core.Faker/SolTechnology.Core.Faker.csproj
 
     - name: Publish all nuget packages
       run: dotnet nuget push *.nupkg -k ${{secrets.NUGET_API_KEY}} -s https://api.nuget.org/v3/index.json --skip-duplicate

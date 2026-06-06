@@ -176,7 +176,7 @@ normally deletes the whole folder once *every* step ships).
 |---|---|---|
 | 01 | Premortem (plan gate) | Verdict *Go with mitigations*; HTTP.Testing hardening pass recorded (dynamic port, `Dispose`/`Reset` split, type-safe `Fake<T>`). |
 | 02 | `SolTechnology.Core.Testing` (foundation) | `Retry`, `AutoNSubstituteData` / `InlineAutoNSubstituteData` / `AutoBogusData`, `BogusCustomization`, `DateOnlyCustomization`, `TestContainersContext`, `ContainerLifecycleHelper` (AMQP probe), `InMemorySinkAssertions`. |
-| 03 | `SolTechnology.Core.SQL.Testing` | `SQLFixture` (MSSQL + Postgres via `IDatabaseEngine`; dacpac / EF / scripts provisioning; Respawn `SQLReset`; `ISharedSQLContainer`). `SolTechnology.Core.SQL` keeps DacFx, drops the Testcontainers runtime dep. |
+| 03 | `SolTechnology.Core.SQL.Testing` | `SQLFixture` (MSSQL + Postgres via `IDatabaseEngine`; dacpac / EF / scripts provisioning; Respawn `SQLReset`). `SolTechnology.Core.SQL` keeps DacFx, drops the Testcontainers runtime dep. |
 | 04 | `SolTechnology.Core.HTTP.Testing` | WireMock DSL migrated from `Faker`; `WireMockFixture` + `Fake<T>` + `FakeApiBase`. **Breaking** namespace change. |
 | 05 | `SolTechnology.Core.API.Testing` (extended) | `AuthClientExtensions` (`CreateAuthorizedClient` / `CreateAnonymousClient`), `TestConfigurationBuilder`; `0.6.0 → 0.7.0`. |
 | 06 | `SolTechnology.Core.Redis.Testing` | `RedisFixture` (`HostName` / `ConnectionString` / `FlushAsync` / `WithNetwork`). |
@@ -196,8 +196,9 @@ normally deletes the whole folder once *every* step ships).
 - **06** — `RedisFixture.FlushAsync` needs `AllowAdmin = true` (`FLUSHALL` is a server/admin command).
 - **07** — pinned the **Testcontainers 3.9.0** family (KYC's 4.3.0 would conflict with the other companions).
 - **08** — `Testcontainers.ServiceBus` 4.x makes the emulator **self-manage its MSSQL sidecar**; the
-  `ISharedSQLContainer` contract is therefore **not** consumed by `ServiceBus.Testing` (the seam still
-  ships in `SQL.Testing` for any future direct-MSSQL consumer).
+  `ISharedSQLContainer` contract was therefore **never consumed** by `ServiceBus.Testing`. Since nothing
+  else consumed it either, the unused seam (the interface, its `SQLFixture` implementation, and the
+  `IDatabaseEngine.Container` member behind it) was **removed as dead code** (2026-06-06).
 - **10** — TaleCode has **no tracked in-repo source** (only stale `obj/`), so it could not be migrated;
   only DreamTravel was dogfooded.
 

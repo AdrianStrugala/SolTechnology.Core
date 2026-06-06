@@ -4,8 +4,7 @@ namespace SolTechnology.Core.API.Testing
 {
     /// <summary>
     /// Ergonomic helpers for creating <see cref="HttpClient"/>s against an <see cref="APIFixture{TEntryPoint}"/>'s
-    /// in-memory host. Generalised from the per-app auth-client helpers seen in production suites
-    /// (e.g. MTS <c>GetUserAuthClient</c> / <c>GetNoAuthClient</c>) so apps stop hand-rolling them.
+    /// in-memory host.
     /// </summary>
     public static class AuthClientExtensions
     {

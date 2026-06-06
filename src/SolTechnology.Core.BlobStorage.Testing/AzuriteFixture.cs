@@ -8,12 +8,9 @@ namespace SolTechnology.Core.BlobStorage.Testing;
 /// <summary>
 /// Spins up an <see href="https://github.com/Azure/Azurite">Azurite</see> container (the Azure Storage
 /// emulator) and exposes its <see cref="ConnectionString"/>. The Azure-specific companion of
-/// <c>SolTechnology.Core.BlobStorage</c> — generalised from the KYC <c>BlobStorageFixture</c>.
+/// <c>SolTechnology.Core.BlobStorage</c>
 /// </summary>
 /// <remarks>
-/// <para>
-/// <b>Azure only by design.</b> The LocalStack / S3 path is intentionally not provided.
-/// </para>
 /// <para>
 /// Boot once from the consumer's assembly-level <c>[OneTimeSetUp]</c> (within-run reuse is free);
 /// across-run reuse is opt-in via <c>TESTCONTAINERS_REUSE</c> (see <see cref="TestContainersContext"/>),

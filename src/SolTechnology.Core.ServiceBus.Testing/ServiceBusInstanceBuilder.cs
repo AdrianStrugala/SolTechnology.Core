@@ -12,9 +12,9 @@ namespace SolTechnology.Core.ServiceBus.Testing;
 /// The emulator persists its state in SQL Server. <c>Testcontainers.ServiceBus</c> provisions and manages
 /// that backing MSSQL sidecar <b>internally</b> — you do not (and must not) wire your own. Attaching an
 /// extra network or <c>DependsOn</c> makes the emulator's <c>UnsafeCreateAsync</c> throw
-/// "Sequence contains more than one element". This is why the fixture does not consume
-/// <c>SolTechnology.Core.SQL.Testing</c>'s <c>ISharedSQLContainer</c>: the 4.x emulator API requires a
-/// concrete <c>MsSqlContainer</c>, incompatible with SQL.Testing's generic-builder engine.
+/// "Sequence contains more than one element". This is why the fixture does not share a SQL container with
+/// <c>SolTechnology.Core.SQL.Testing</c>: the 4.x emulator API requires a concrete <c>MsSqlContainer</c>,
+/// incompatible with SQL.Testing's generic-builder engine.
 /// </para>
 /// </remarks>
 public static class ServiceBusInstanceBuilder

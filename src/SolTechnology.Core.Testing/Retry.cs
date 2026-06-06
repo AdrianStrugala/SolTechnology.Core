@@ -4,8 +4,7 @@ namespace SolTechnology.Core.Testing;
 
 /// <summary>
 /// Polls an operation until a condition is met — the canonical way to assert against
-/// eventually-consistent state (queues, projections, async handlers) in component / integration
-/// tests. Replaces the three divergent copies that lived in MTS, KYC and the sample apps.
+/// eventually-consistent state (queues, projections, async handlers) in component / integration tests
 /// </summary>
 public static class Retry
 {
@@ -14,7 +13,7 @@ public static class Retry
     /// first result that satisfies <paramref name="condition"/>. Throws <see cref="TimeoutException"/>
     /// if the condition is never met.
     /// </summary>
-    public static async Task<T> UntilConditionMet<T>(
+    public static async Task<T> Until<T>(
         Func<Task<T>> action,
         Func<T, bool> condition,
         int maxAttempts,
@@ -43,25 +42,10 @@ public static class Retry
     }
 
     /// <summary>
-    /// Synchronous-source overload: wraps a non-async <paramref name="action"/> in the same
-    /// attempt/poll loop. Useful for probes that are themselves synchronous (e.g. a DB query helper).
-    /// </summary>
-    public static Task<T> UntilConditionMet<T>(
-        Func<T> action,
-        Func<T, bool> condition,
-        int maxAttempts,
-        TimeSpan pauseInterval,
-        CancellationToken ct = default)
-    {
-        ArgumentNullException.ThrowIfNull(action);
-        return UntilConditionMet(() => Task.FromResult(action()), condition, maxAttempts, pauseInterval, ct);
-    }
-
-    /// <summary>
     /// Time-budget variant: keeps invoking <paramref name="action"/> until the condition is met or
     /// <paramref name="totalWaitTime"/> elapses, then returns the last result (does not throw).
     /// </summary>
-    public static async Task<T> UntilConditionMetOrTimeout<T>(
+    public static async Task<T> Until<T>(
         Func<Task<T>> action,
         Func<T, bool> condition,
         TimeSpan totalWaitTime,
