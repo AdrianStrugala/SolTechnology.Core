@@ -241,17 +241,36 @@ the `ILogger<HttpPolicyFactory>` category. The resilience pipeline name is
 
 ### Testing
 
-No dedicated fixture — typed clients are plain `HttpClient` consumers, so the
-standard approach is `WebApplicationFactory<Program>` + a stub server
-(`WireMock.Net`, `RichardSzalay.MockHttp`) or replacing the registered client
-in a test override:
+The companion package **`SolTechnology.Core.HTTP.Testing`** mocks typed clients in component tests: a
+`WireMockFixture` plus a fluent `Fake<TClient>()` DSL keyed off your generated client interface — full
+IntelliSense, compile-time argument checks, no hand-written URL matchers. Reference it from test projects
+only. Full reference: [HTTP.Testing.md](HTTP.Testing.md).
+
+> **Breaking migration:** this package replaces `SolTechnology.Core.Faker`. The namespace changed
+> (`SolTechnology.Core.Faker` → `SolTechnology.Core.HTTP.Testing`), so there is no type-forwarding — swap
+> the package reference **and** update `using` directives. See [ADR-008](adr/008-testing-framework-companions.md).
+
+```csharp
+// Arrange a fake via a DIRECT method call — full IntelliSense + compile-time argument checks.
+wireMockFixture.Fake<IFootballDataHTTPClient>()
+    .WithRequest(x => x.GetMatchAsync(42))
+    .WithResponse(r => r.WithSuccess().WithBodyAsJson(new { id = 42 }));
+
+var match = await sut.GetMatchAsync(42);
+match.Id.Should().Be(42);
+```
+
+When you need to assert the **resilience pipeline** itself (retry / circuit breaker), drive the raw
+WireMock server with a stateful scenario — it returns `503` then `200`, and you assert two attempts hit
+the wire:
 
 ```csharp
 [Test]
 public async Task GetMatch_RetriesOnce_OnTransient503()
 {
-    // Arrange
-    using var server = WireMockServer.Start();
+    // Arrange — first call 503, second 200 (the retry). Initialize() returns the underlying
+    // WireMockStartup, whose WireMockServer drives raw stateful scenarios.
+    var server = wireMockFixture.Initialize().WireMockServer;
     server.Given(Request.Create().WithPath("/v2/matches/42"))
           .InScenario("retry").WillSetStateTo("served")
           .RespondWith(Response.Create().WithStatusCode(503));
@@ -259,21 +278,17 @@ public async Task GetMatch_RetriesOnce_OnTransient503()
           .InScenario("retry").WhenStateIs("served")
           .RespondWith(Response.Create().WithStatusCode(200).WithBodyAsJson(new { id = 42 }));
 
-    var fixture = new ApiFixture().WithReplacedHttpClient("football-data", server.Url);
-    var sut = fixture.Services.GetRequiredService<IFootballDataHTTPClient>();
-
     // Act
     var match = await sut.GetMatchAsync(42);
 
     // Assert
     match.Id.Should().Be(42);
-    server.LogEntries.Should().HaveCount(2);
+    wireMockFixture.LogEntries.Should().HaveCount(2);
 }
 ```
 
-For unit-testing a typed client in isolation, inject a `HttpClient` built on a
-`HttpMessageHandler` stub — bypass the resilience pipeline entirely and assert
-the request shape your client produces.
+For unit-testing a typed client in isolation, inject a `HttpClient` built on a `HttpMessageHandler`
+stub — bypass the resilience pipeline entirely and assert the request shape your client produces.
 
 ### Conventions
 

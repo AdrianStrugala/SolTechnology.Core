@@ -1,7 +1,7 @@
 ---
 adr: 008-testing-framework-companions
 step: 11 of 11
-status: reviewed
+status: done
 ---
 
 <!-- Reviewed: renumbered from to-do/09-documentation.md. Readme-stub references → steps 02–08. -->

@@ -4,8 +4,8 @@ Foundation NUnit testing helpers shared by every `SolTechnology.Core.*.Testing` 
 by consumer test projects. **Reference from test projects only** — never from production assemblies.
 
 > Part of the testing framework defined in
-> [ADR-008](adr/008-testing-framework-companions.md). This file is a stub; the full guide is written
-> in the documentation step of that plan.
+> [ADR-008](adr/008-testing-framework-companions.md). For the testing strategy and how the companion
+> packages compose into a component-test harness, see [theQuality.md](theQuality.md).
 
 ## What's inside
 

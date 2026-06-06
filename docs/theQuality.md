@@ -60,7 +60,7 @@ The key prerequisite is deep understanding of application flows and functionalit
 - **Pipeline linking**: [example](https://github.com/AdrianStrugala/SolTechnology.Core/blob/bca831703c7fd251775ef95f9c568dc31025c6da/sample-tale-code-apps/DreamTravel/devOps/pipelines/build%26test.yml#L83)
 
 ### Example Repositories
-- Dream Travel E2E Tests: https://github.com/AdrianStrugala/SolTechnology.Core/tree/master/sample-tale-code-apps/DreamTravel/backend/tests/EndToEnd
+- Dream Travel E2E Tests: https://github.com/AdrianStrugala/SolTechnology.Core/tree/master/sample-tale-code-apps/DreamTravel/tests/EndToEnd
 
 ## 3. Component Testing
 
@@ -76,99 +76,87 @@ Component tests (could be called also Integration or Functional) are designed to
 
 ### Setup
 
-#### Database Configuration
+#### Provisioning containers — the `.Testing` companion packages
 
-Firstly, the correct configuration has to be setup:
+Component-test infrastructure ships as **NUnit `.Testing` companion packages**, referenced from test
+projects only. DreamTravel's component suite composes three: `SolTechnology.Core.SQL.Testing`,
+`SolTechnology.Core.HTTP.Testing` and `SolTechnology.Core.API.Testing` (see the
+[Testing framework packages](#testing-framework-packages) map).
 
-```csharp
-"ConnectionString": "Data Source=localhost,1401;Database=TaleCodeDatabase; User ID=SA;Password=password_xxddd_2137;Persist Security Info=True;MultipleActiveResultSets=True;Trusted_Connection=False;Connect Timeout=60;Encrypt=False;TrustServerCertificate=True"
-```
-
-Connection string points to local host on both: local and build (pipeline) environments.
-
-The SQL Server is run in docker using following script:
+`SQLFixture` (from `SolTechnology.Core.SQL.Testing`) starts a SQL Server container, deploys the dacpac
+and resets state between tests:
 
 ```csharp
-docker run -e 'ACCEPT_EULA=Y' -e 'SA_PASSWORD=password_xxddd_2137' -p 1401:1433 --name DB -d mcr.microsoft.com/mssql/server:2019-latest
-dotnet publish /p:TargetServerName=localhost /p:TargetPort=1401 /p:TargetUser=sa /p:TargetPassword=password_xxddd_2137 /p:TargetDatabaseName=TaleCodeDatabase (from 'taleCode/src/TaleCodeDatabase' directory)
+SqlFixture = new SQLFixture("DreamTravelDatabase")
+    .WithSQLProject("../../../../../src/Infrastructure/DreamTravelDatabase/DreamTravelDatabase.csproj");
+await SqlFixture.InitializeAsync();
 ```
 
-As you can see, the two prerequisites are needed in this configuration:
-- docker
-- SQL proj containing database schema or Entity Framework migrations
+Prerequisites: **docker** and a **schema source**. DreamTravel uses a dacpac (`.sqlproj`); EF migrations
+(`.WithEfMigrations(...)`), raw `.sql` scripts (`.WithScripts(...)`) and Postgres (`.UsePostgres()`) are
+also supported — see [SQL.md](SQL.md#testing).
 
-
-The SqlFixture is introduced to fulfill these needs:
-
-```csharp
-public class SqlFixture : IAsyncLifetime
-{
-    public ISqlConnectionFactory SqlConnectionFactory;
-    public SqlConnection SqlConnection { get; private set; }
-    private string _connectionString;
-
-    public async Task InitializeAsync()
-    {
-        var config = Options.Create(new SqlConfiguration
-        {
-            //could be fetched from appSettings or environmental variable
-            ConnectionString =
-                "Data Source=localhost,1401;Database=TaleCodeDatabase; User ID=SA;Password=password_xxddd_2137;Persist Security Info=True;MultipleActiveResultSets=True;Trusted_Connection=False;Connect Timeout=60;Encrypt=False;TrustServerCertificate=True"
-        });
-
-        _connectionString = config.Value.ConnectionString;
-
-        SqlConnectionFactory = new SqlConnectionFactory(config);
-
-        SqlConnection?.Dispose();
-        SqlConnection = new SqlConnection(_connectionString);
-        SqlConnection.Open();
-
-        await new Respawn.Checkpoint().Reset(_connectionString);
-    }
-
-    public async Task DisposeAsync()
-    {
-        SqlConnection?.Dispose();
-        await new Respawn.Checkpoint().Reset(_connectionString);
-    }
-}
-```
 #### Initialize the Environment
 
-The TestsFixture class is responsible for setting up the testing environment. It initializes the necessary components and dependencies, such as the API server and mock services.
+A single assembly-level `[SetUpFixture]` boots every container **once** for the whole run.
+`TestConfigurationBuilder` (from `SolTechnology.Core.API.Testing`) merges `appsettings.tests.json` with
+the container connection string and the dynamic WireMock URL. The API host swaps the Hangfire publisher
+for a deterministic in-process one via the service-override hook:
 
 ```csharp
 [SetUpFixture]
 [SetCulture("en-US")]
-public static class IntegrationTestsFixture
+public static class ComponentTestsFixture
 {
-    public static ApiFixture<Program> ApiFixture { get; set; }
-    public static ApiFixture<Worker.Program> WorkerFixture { get; set; }
-    public static WireMockFixture WireMockFixture { get; set; }
+    public static APIFixture<Program> ApiFixture { get; set; } = null!;
+    public static APIFixture<Worker.Program> WorkerFixture { get; set; } = null!;
+    public static SQLFixture SqlFixture { get; set; } = null!;
+    public static WireMockFixture WireMockFixture { get; set; } = null!;
 
     [OneTimeSetUp]
-    public static void SetUp()
+    public static async Task SetUp()
     {
         Environment.SetEnvironmentVariable("ASPNETCORE_ENVIRONMENT", "development");
 
-        ApiFixture = new ApiFixture<Program>();
-        WorkerFixture = new ApiFixture<Worker.Program>();
+        SqlFixture = new SQLFixture("DreamTravelDatabase")
+            .WithSQLProject(Path.GetFullPath(
+                "../../../../../src/Infrastructure/DreamTravelDatabase/DreamTravelDatabase.csproj"));
+        await SqlFixture.InitializeAsync();
 
         WireMockFixture = new WireMockFixture();
-        WireMockFixture.Initialize();
+        WireMockFixture.Initialize();                 // dynamic port — read Url below
         WireMockFixture.RegisterFakeApi(new GoogleFakeApi());
+
+        var configuration = new TestConfigurationBuilder()
+            .AddJsonFile("appsettings.tests.json")
+            .Override("Sql:ConnectionString", SqlFixture.DatabaseConnectionString)
+            .Override("HTTPClients:Google:BaseAddress", $"{WireMockFixture.Url}/google/")
+            .Build();
+
+        WorkerFixture = new APIFixture<Worker.Program>(configuration);
+        SyncHangfireNotificationPublisher.UseScopeFactory(
+            () => WorkerFixture.TestServer.Services.GetRequiredService<IServiceScopeFactory>());
+
+        ApiFixture = new APIFixture<Program>(configuration, services =>
+        {
+            services.RemoveAll<IHangfireNotificationPublisher>();
+            services.AddSingleton<IHangfireNotificationPublisher, SyncHangfireNotificationPublisher>();
+        });
     }
 
     [OneTimeTearDown]
-    public static void TearDown()
+    public static async Task TearDown()
     {
+        await SqlFixture.DisposeAsync();               // no-op when TESTCONTAINERS_REUSE=true
         ApiFixture.Dispose();
         WorkerFixture.Dispose();
         WireMockFixture.Dispose();
     }
 }
 ```
+
+Reset SQL state between tests with `await SqlFixture.ResetAsync();` (Respawn-based, schema preserved) in a
+`[TearDown]`; mocks are cleared with `WireMockFixture.Reset();`.
 
 #### Define Test Scenarios
 
@@ -192,8 +180,8 @@ public async Task FindsOptimalPath()
     // Given a fake Google city API
     foreach (var city in cities)
     {
-        _wireMockFixture.Fake<IGoogleApiClient>()
-            .WithRequest(x => x.GetLocationOfCity, city.Name)
+        _wireMockFixture.Fake<IGoogleHTTPClient>()
+            .WithRequest(x => x.GetLocationOfCity(city.Name))
             .WithResponse(x => x.WithSuccess().WithBody(
             $@"{{
                    ""results"" :
@@ -214,12 +202,12 @@ public async Task FindsOptimalPath()
     }
 
     // Given a fake Google distance API
-    _wireMockFixture.Fake<IGoogleApiClient>()
-        .WithRequest(x => x.GetDurationMatrixByFreeRoad, cities)
+    _wireMockFixture.Fake<IGoogleHTTPClient>()
+        .WithRequest(x => x.GetDurationMatrixByFreeRoad(cities))
         .WithResponse(x => x.WithSuccess().WithBody(GoogleFakeApi.FreeDistanceMatrix));
 
-    _wireMockFixture.Fake<IGoogleApiClient>()
-        .WithRequest(x => x.GetDurationMatrixByTollRoad, cities)
+    _wireMockFixture.Fake<IGoogleHTTPClient>()
+        .WithRequest(x => x.GetDurationMatrixByTollRoad(cities))
         .WithResponse(x => x.WithSuccess().WithBody(GoogleFakeApi.TollDistanceMatrix));
 
     // When user searches for the location of each city
@@ -258,17 +246,50 @@ public async Task FindsOptimalPath()
 }
 ```
 
-This test verifies that the CalculateBestPath feature correctly finds the optimal path between a list of cities by interacting with the fake Google APIs. The test ensures that the entire feature works as expected in an isolated environment, providing confidence in the system's behavior.
-
 ### Tools
-- **Spawn required resources just for the test run**: Test Containers
-- **Spawn application under test**: WebApplicationFactory
-- **Mock external APIs**: Wiremock
+- **Spawn required resources just for the test run**: [Testcontainers](https://dotnet.testcontainers.org/), wrapped by the `.Testing` companion packages
+- **Spawn application under test**: `WebApplicationFactory`, wrapped by `APIFixture<T>` (`SolTechnology.Core.API.Testing`)
+- **Mock external APIs**: WireMock.Net, wrapped by `WireMockFixture` + the `Fake<T>` DSL (`SolTechnology.Core.HTTP.Testing`)
 - **Preferred testing framework**: NUnit
 
+### Testing framework packages
+
+Component-test infrastructure is modular: one `.Testing` NuGet companion per concern, all built on the
+shared `SolTechnology.Core.Testing` foundation. Reference only what a suite needs — they compose in a
+single `[SetUpFixture]`. Defined in [ADR-008](adr/008-testing-framework-companions.md).
+
+| Concern | Package | Key types | Readme |
+|---|---|---|---|
+| Foundation: data attributes, `Retry`, container lifetime, log assertions | `SolTechnology.Core.Testing` | `AutoNSubstituteData`, `Retry`, `TestContainersContext`, `ContainerLifecycleHelper` | [Testing.md](Testing.md) |
+| In-memory API host + config / auth helpers | `SolTechnology.Core.API.Testing` | `APIFixture<T>`, `TestConfigurationBuilder`, `CreateAuthorizedClient` | [Api.md#testing](Api.md#testing) |
+| SQL (MSSQL + Postgres), dacpac / EF / scripts | `SolTechnology.Core.SQL.Testing` | `SQLFixture`, `ResetAsync`, `ISharedSQLContainer` | [SQL.md#testing](SQL.md#testing) |
+| HTTP mocks (typed-client fakes) | `SolTechnology.Core.HTTP.Testing` | `WireMockFixture`, `Fake<T>`, `FakeApiBase` | [HTTP.Testing.md](HTTP.Testing.md) |
+| Redis | `SolTechnology.Core.Redis.Testing` | `RedisFixture`, `FlushAsync` | [Redis.Testing.md](Redis.Testing.md) |
+| Azure Blob (Azurite) | `SolTechnology.Core.BlobStorage.Testing` | `AzuriteFixture`, `ClearAsync` | [BlobStorage.Testing.md](BlobStorage.Testing.md) |
+| Azure Service Bus (emulator) | `SolTechnology.Core.ServiceBus.Testing` | `ServiceBusFixture` | [ServiceBus.Testing.md](ServiceBus.Testing.md) |
+
+> The data engine is **AutoFixture** (with NSubstitute auto-faking), not Bogus. Bogus ships as an
+> *optional, complementary* realistic-value builder (`BogusCustomization`), not a replacement — see
+> [Testing.md](Testing.md) and ADR-008.
+
+### Container lifetime & reuse
+
+Every container-backed fixture follows one lifetime model, centralised in `SolTechnology.Core.Testing`:
+
+- **Within a run** — the assembly-level `[SetUpFixture]` `[OneTimeSetUp]` boots each container **once**;
+  every test class shares them for free.
+- **Across runs** — set `TESTCONTAINERS_REUSE=true` (env var or `.runsettings`) to keep containers alive
+  between runs (Testcontainers-native `.WithReuse(true)` + stable names). `DisposeAsync()` becomes a
+  no-op; `ContainerLifecycleHelper.EnsureRunningAsync` restarts a reused container stopped externally.
+  Default is **off** so CI stays hermetic.
+- **Between tests** — reset state without restarting: `SqlFixture.ResetAsync()` (Respawn),
+  `RedisFixture.FlushAsync()`, `AzuriteFixture.ClearAsync()`, `WireMockFixture.Reset()`.
+- **Readiness probes, not TCP-accept** — host-side login probe (SQL) and AMQP SASL-echo probe
+  (Service Bus); Ryuk is disabled for Docker Desktop Enhanced Container Isolation.
+
 ### Example Repositories
-- Dream Travel Component Tests: https://github.com/AdrianStrugala/SolTechnology.Core/tree/master/sample-tale-code-apps/DreamTravel/backend/tests/Component
-- 
+- Dream Travel Component Tests: https://github.com/AdrianStrugala/SolTechnology.Core/tree/master/sample-tale-code-apps/DreamTravel/tests/Component
+
 ## 4. Unit Testing
 
 ### Overview

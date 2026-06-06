@@ -16,7 +16,7 @@ Tracking the implementation steps for [ADR-008](../008-testing-framework-compani
 | 08 | `ServiceBus.Testing` (Azure Service Bus emulator) | [`done/08-servicebus-testing.md`](done/08-servicebus-testing.md) | ✅ done |
 | 09 | Wire publish workflow for the seven companion packages | [`reviewed/09-publish-workflow.md`](reviewed/09-publish-workflow.md) | 🔍 reviewed |
 | 10 | Dogfood: migrate sample apps, delete duplicates | [`done/10-dogfood-sample-apps.md`](done/10-dogfood-sample-apps.md) | ✅ done |
-| 11 | Documentation + per-package readmes | [`reviewed/11-documentation.md`](reviewed/11-documentation.md) | 🔍 reviewed |
+| 11 | Documentation + per-package readmes | [`done/11-documentation.md`](done/11-documentation.md) | ✅ done |
 
 Status values: `⬜ to-do` / `🔍 reviewed` / `✅ done`. Link in each row points to the step's
 current location (`to-do/` / `reviewed/` / `done/`).

@@ -62,3 +62,29 @@ builder.Services.AddCache(cacheConfiguration);
 ```
 
 3) The key is supposed to be a complex object (ex: command or query), to avoid returning incorrect cache item
+
+### Testing
+
+When the cache is backed by **Redis**, the companion package **`SolTechnology.Core.Redis.Testing`**
+provides `RedisFixture` — a [Testcontainers](https://dotnet.testcontainers.org/)-backed Redis container
+for component tests. Reference it from test projects only. Full reference: [Redis.Testing.md](Redis.Testing.md).
+
+```csharp
+// Assembly-level [OneTimeSetUp]
+RedisFixture = new RedisFixture();
+await RedisFixture.InitializeAsync();
+
+var configuration = new TestConfigurationBuilder()
+    .AddJsonFile("appsettings.tests.json")
+    .Override("Redis:HostName", RedisFixture.HostName)
+    .Override("Redis:Enabled", "true")
+    .Build();
+
+await RedisFixture.FlushAsync();    // between-test reset (clears all keys)
+await RedisFixture.DisposeAsync();  // no-op when TESTCONTAINERS_REUSE=true
+```
+
+> The in-memory `IMemoryCache` path needs no fixture — it is exercised directly in unit tests. The
+> `RedisFixture` is only for suites that bind the cache to a real Redis instance. Container lifetime /
+> reuse follows the shared model in
+> [theQuality.md → Container lifetime & reuse](theQuality.md#container-lifetime--reuse).
