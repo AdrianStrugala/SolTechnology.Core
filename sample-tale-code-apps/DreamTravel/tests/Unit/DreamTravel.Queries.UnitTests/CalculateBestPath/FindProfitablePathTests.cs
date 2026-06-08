@@ -1,4 +1,4 @@
-﻿using DreamTravel.Domain.Cities;
+using DreamTravel.Domain.Cities;
 using DreamTravel.Queries.CalculateBestPath;
 using DreamTravel.Queries.CalculateBestPath.Chapters;
 

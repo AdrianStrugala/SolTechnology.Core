@@ -1,4 +1,4 @@
-﻿namespace SolTechnology.Core.SQL
+namespace SolTechnology.Core.SQL
 {
     public class SQLConfiguration
     {

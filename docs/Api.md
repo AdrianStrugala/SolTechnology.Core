@@ -22,7 +22,7 @@ versions itself by header, and propagates a correlation id from log to wire — 
   `Critical` + rethrow. Smart-detection in Sentry / App Insights sees real faults, not noise.
 - **One-call bootstrap** — `AddApiCore` + `AddApiCoreFilters` + `UseSwaggerWithVersioning`
   replaces ~30 lines of plumbing.
-- **Testing companion** — `SolTechnology.Core.Api.Testing` ships `ApiFixture` so test-host
+- **Testing companion** — `SolTechnology.Core.API.Testing` ships `APIFixture<TEntryPoint>` so test-host
   dependencies never leak into production assemblies.
 
 ### Registration
@@ -50,7 +50,7 @@ builder.Services.AddVersioning(defaultMajorVersion: 1, apiTitle: "DreamTravel AP
 builder.Services.AddControllers(o => o.AddApiCoreFilters());
 ```
 
-For integration tests, additionally reference `SolTechnology.Core.Api.Testing`.
+For integration tests, additionally reference `SolTechnology.Core.API.Testing`.
 
 ### Configuration
 
@@ -229,18 +229,31 @@ Off by default. Never enable in Production.
 
 ### Testing
 
-Reference `SolTechnology.Core.API.Testing` from your test project and use `ApiFixture`:
+Reference `SolTechnology.Core.API.Testing` from your test project. It wraps
+`WebApplicationFactory<TEntryPoint>` as `APIFixture<TEntryPoint>` and adds the config-override and
+auth-client helpers every suite was hand-rolling.
+
+| Member | Purpose |
+|---|---|
+| `APIFixture<TEntryPoint>` | Boots the in-memory host. Exposes `TestServer` and a ready `ServerClient` (`HttpClient`). Ctor takes an optional `IConfiguration` and an optional `Action<IServiceCollection>` for service overrides. |
+| `TestConfigurationBuilder` | Fluent `appsettings.tests.json` + in-memory overrides → `IConfiguration` (container connection strings, dynamic mock URLs). In-memory overrides win. |
+| `CreateAuthorizedClient(scheme, token)` | Client with an `Authorization` header (scheme-agnostic: `Bearer`, a custom test scheme, …). |
+| `CreateAnonymousClient()` | Client with no `Authorization` header — for unauthenticated paths. |
 
 ```csharp
 public class TripsApiTests
 {
-    private readonly ApiFixture _fixture = new();
-
     [Test]
     public async Task Get_ReturnsTrip()
     {
-        // Arrange
-        var client = _fixture.CreateClient();
+        // Arrange — compose config, then boot the host (typically in an assembly-level [SetUpFixture]).
+        var configuration = new TestConfigurationBuilder()
+            .AddJsonFile("appsettings.tests.json")
+            .Override("Sql:ConnectionString", sqlFixture.DatabaseConnectionString)
+            .Build();
+
+        using var fixture = new APIFixture<Program>(configuration);
+        var client = fixture.CreateAuthorizedClient("Bearer", token: "test-token");
 
         // Act
         var response = await client.GetAsync("/api/trips/42");
@@ -251,9 +264,18 @@ public class TripsApiTests
 }
 ```
 
-`ApiFixture` wraps `WebApplicationFactory<Program>` with the conventions used across the
-SolTechnology stack — service overrides, correlation propagation, JSON options — so component
-tests stay short and focused.
+Override services at boot — e.g. swap a background publisher for a deterministic in-process one:
+
+```csharp
+var fixture = new APIFixture<Program>(configuration, services =>
+{
+    services.RemoveAll<IHangfireNotificationPublisher>();
+    services.AddSingleton<IHangfireNotificationPublisher, SyncHangfireNotificationPublisher>();
+});
+```
+
+`APIFixture` is part of the modular testing framework — compose it with `SQLFixture`,
+`WireMockFixture`, etc. See [theQuality.md](theQuality.md) for the full component-test harness.
 
 ### Conventions
 

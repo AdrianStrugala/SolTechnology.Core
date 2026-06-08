@@ -1,0 +1,47 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<Version>0.1.0</Version>
+		<Description>Foundation NUnit testing helpers for SolTechnology.Core consumers — AutoFixture data attributes (NSubstitute-based), optional Bogus customizations for realistic data, a Retry helper for eventual-consistency assertions, a shared Testcontainers lifetime/reuse model (TESTCONTAINERS_REUSE, restart-if-stopped, readiness probes) and Serilog in-memory log assertions. Reference from test projects only; not needed at runtime in production assemblies.</Description>
+		<PackageTags>sol technology core testing nunit autofixture nsubstitute bogus testcontainers integration-tests component-tests</PackageTags>
+		<Product>SolTechnology.Core.Testing</Product>
+		<PackageId>SolTechnology.Core.Testing</PackageId>
+		<AssemblyName>SolTechnology.Core.Testing</AssemblyName>
+
+		<PackageIcon>docs\mini-logo.png</PackageIcon>
+		<PackageReadmeFile>docs\readme.md</PackageReadmeFile>
+		<RepositoryUrl>https://github.com/AdrianStrugala/SolTechnology.Core</RepositoryUrl>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<None Include="..\..\docs\mini-logo.png" Pack="true" Visible="false" PackagePath="docs\mini-logo.png" />
+		<None Include="..\..\docs\Testing.md" Pack="true" Visible="false" PackagePath="docs\readme.md" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<!-- NUnit + AutoFixture data attributes. NSubstitute (not Moq) per the repo anti-stack
+		     in package-management/references/canonical-versions.md. -->
+		<PackageReference Include="NUnit" Version="4.2.2" />
+		<PackageReference Include="AutoFixture" Version="4.18.1" />
+		<PackageReference Include="AutoFixture.AutoNSubstitute" Version="4.18.1" />
+		<PackageReference Include="AutoFixture.NUnit4" Version="4.19.0" />
+		<PackageReference Include="NSubstitute" Version="5.3.0" />
+		<PackageReference Include="Bogus" Version="35.6.1" />
+		<PackageReference Include="Testcontainers" Version="4.3.0" />
+		<PackageReference Include="Docker.DotNet" Version="3.125.15" />
+
+		<!-- CVE-2019-0820 (GHSA-cmhx-cq75-c4mj, HIGH): Docker.DotNet drags the legacy out-of-band
+		     System.Text.RegularExpressions 4.3.0 cluster. Override at source with the patched 4.3.1;
+		     net10 carries it in-framework, so this only prunes the vulnerable transitive. -->
+		<PackageReference Include="System.Text.RegularExpressions" Version="4.3.1" />
+
+		<!-- In-memory Serilog sink for log assertions. -->
+		<PackageReference Include="Serilog.Sinks.InMemory" Version="0.11.0" />
+	</ItemGroup>
+
+</Project>
+
+
+
+
+

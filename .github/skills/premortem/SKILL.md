@@ -114,7 +114,7 @@ dismissing it.
 | `SolTechnology.Core.Logging` | [`references/logging.md`](references/logging.md) |
 | `SolTechnology.Core.HTTP`, `SolTechnology.Core.ApiClient` | [`references/http.md`](references/http.md) |
 | `SolTechnology.Core.MessageBus` | [`references/messagebus.md`](references/messagebus.md) |
-| `SolTechnology.Core.Sql` | [`references/sql.md`](references/sql.md) |
+| `SolTechnology.Core.SQL` | [`references/sql.md`](references/sql.md) |
 | `SolTechnology.Core.BlobStorage` | [`references/blob.md`](references/blob.md) |
 | `SolTechnology.Core.Cache` | [`references/cache.md`](references/cache.md) |
 | Any `ModuleInstaller.cs` change | [`references/di.md`](references/di.md) |

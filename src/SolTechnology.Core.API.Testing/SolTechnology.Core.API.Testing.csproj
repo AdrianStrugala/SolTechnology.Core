@@ -1,8 +1,8 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<Version>0.6.0</Version>
-		<Description>Integration testing fixtures for SolTechnology.Core.Api consumers — wraps Microsoft.AspNetCore.Mvc.Testing and TestHost into a small APIFixture&lt;TEntryPoint&gt; helper. Reference this from your test projects only; not needed at runtime in production assemblies.</Description>
+		<Version>0.7.0</Version>
+		<Description>Integration testing fixtures for SolTechnology.Core.Api consumers — APIFixture&lt;TEntryPoint&gt; (wraps Microsoft.AspNetCore.Mvc.Testing / TestHost) plus auth-client helpers (CreateAuthorizedClient / CreateAnonymousClient) and a TestConfigurationBuilder for the appsettings + in-memory override pattern. Reference this from your test projects only; not needed at runtime in production assemblies.</Description>
 		<PackageTags>sol technology core api testing aspnetcore integration-tests testserver mvc-testing webapplicationfactory</PackageTags>
 		<Product>SolTechnology.Core.API.Testing</Product>
 		<PackageId>SolTechnology.Core.API.Testing</PackageId>
@@ -16,6 +16,10 @@
 	<ItemGroup>
 		<None Include="..\..\docs\mini-logo.png" Pack="true" Visible="false" PackagePath="docs\mini-logo.png" />
 		<None Include="..\..\docs\Api.md" Pack="true" Visible="false" PackagePath="docs\readme.md" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\SolTechnology.Core.Testing\SolTechnology.Core.Testing.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>

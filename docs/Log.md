@@ -213,7 +213,7 @@ builder.Services.AddOpenTelemetry()
 
 No dedicated fixture — use `Microsoft.Extensions.Logging.Testing.FakeLogger` (or
 NSubstitute on `ILogger<T>`) and assert on the captured entries. For component
-tests, `ApiFixture` from `SolTechnology.Core.Api.Testing` already wires
+tests, `APIFixture<TEntryPoint>` from `SolTechnology.Core.API.Testing` already wires
 `AddCoreLogging` + `UseCoreLogging`, so correlation flows end-to-end out of the
 box.
 

@@ -1,4 +1,4 @@
-﻿using Microsoft.Data.SqlClient;
+using Microsoft.Data.SqlClient;
 using Microsoft.SqlServer.Dac;
 
 namespace SolTechnology.Core.SQL.SQLProject;

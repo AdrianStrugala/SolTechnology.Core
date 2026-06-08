@@ -1,0 +1,38 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<Version>0.1.0</Version>
+		<Description>Integration-testing fixture for SolTechnology.Core.MessageBus consumers — a Testcontainers-backed ServiceBusFixture running the Azure Service Bus emulator (which manages its own backing MSSQL sidecar) with an AMQP readiness probe and stable-name reuse. Reference from test projects only; not needed at runtime in production assemblies.</Description>
+		<PackageTags>sol technology core servicebus testing testcontainers azure-service-bus emulator amqp integration-tests component-tests</PackageTags>
+		<Product>SolTechnology.Core.ServiceBus.Testing</Product>
+		<PackageId>SolTechnology.Core.ServiceBus.Testing</PackageId>
+		<AssemblyName>SolTechnology.Core.ServiceBus.Testing</AssemblyName>
+
+		<PackageIcon>docs\mini-logo.png</PackageIcon>
+		<PackageReadmeFile>docs\readme.md</PackageReadmeFile>
+		<RepositoryUrl>https://github.com/AdrianStrugala/SolTechnology.Core</RepositoryUrl>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<None Include="..\..\docs\mini-logo.png" Pack="true" Visible="false" PackagePath="docs\mini-logo.png" />
+		<None Include="..\..\docs\ServiceBus.Testing.md" Pack="true" Visible="false" PackagePath="docs\readme.md" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<!-- The bundled default emulator topology, read back at runtime and bind-mounted into the container. -->
+		<EmbeddedResource Include="servicebus-emulator-config.json" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\SolTechnology.Core.Testing\SolTechnology.Core.Testing.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Testcontainers.ServiceBus" Version="4.3.0" />
+		<!-- Docker.DotNet comes transitively from Core.Testing, but ServiceBusFixture uses it directly
+		     for stable-name reuse, so keep it explicit. -->
+		<PackageReference Include="Docker.DotNet" Version="3.125.15" />
+	</ItemGroup>
+
+</Project>
+

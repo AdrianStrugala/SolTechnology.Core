@@ -1,4 +1,4 @@
-﻿namespace SolTechnology.Core.SQL.Transactions;
+namespace SolTechnology.Core.SQL.Transactions;
 
 public interface IUnitOfWork
 {

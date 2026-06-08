@@ -362,3 +362,9 @@ nul
 # by the developer (e.g. via the Verify Rider/VS plugin) and merged into *.verified.*.
 *.received.*
 
+# Throwaway manual-smoke projects and scratch logs (used to verify Testcontainers fixtures
+# locally; never committed — see ADR-008 "no test project, documented manual smoke").
+.*-smoke/
+*.smoke.out
+.scratch/
+
