@@ -23,8 +23,8 @@ change**. When rows drift between projects, the row records the highest version 
 | `Microsoft.Extensions.Hosting.Abstractions` | `10.0.1` | `SolTechnology.Core.MessageBus` | `SolTechnology.Core.Scheduler` still on `10.0.0`. Align on next touch. |
 | `Microsoft.Extensions.Logging.Abstractions` | `10.0.0` | `SolTechnology.Core.Scheduler` | `SolTechnology.Core.CQRS` pinned `8.0.3` — investigate before bumping (intentional floor for older consumers?). |
 | `Microsoft.Extensions.Caching.Memory` | `8.0.1` | `SolTechnology.Core.Cache` | Sits on 8.x while rest of MEL is 10.x. Confirm 10.x has no API churn before bumping. |
-| `Microsoft.AspNetCore.Mvc.Testing` | `10.0.0` | `SolTechnology.Core.Api.Testing` | Mirrors target framework. |
-| `Microsoft.AspNetCore.TestHost` | `10.0.0` | `SolTechnology.Core.Api.Testing` | — |
+| `Microsoft.AspNetCore.Mvc.Testing` | `10.0.0` | `SolTechnology.Core.API.Testing` | Mirrors target framework. |
+| `Microsoft.AspNetCore.TestHost` | `10.0.0` | `SolTechnology.Core.API.Testing` | — |
 
 ## Resilience / HTTP
 
@@ -37,7 +37,7 @@ change**. When rows drift between projects, the row records the highest version 
 | Package | Version | Used by | Notes |
 |---|---|---|---|
 | `MediatR` | `12.3.0` | `SolTechnology.Core.CQRS` | — |
-| `FluentValidation` | `11.11.0` | `SolTechnology.Core.CQRS` | `tests/SolTechnology.Core.Api.Tests` pinned `11.10.0` — align on next touch. |
+| `FluentValidation` | `11.11.0` | `SolTechnology.Core.CQRS` | `tests/SolTechnology.Core.API.Tests` pinned `11.10.0` — align on next touch. |
 | `FluentValidation.DependencyInjectionExtensions` | `11.11.0` | `SolTechnology.Core.CQRS` | Must match `FluentValidation`. |
 
 ## Azure SDKs
@@ -52,7 +52,7 @@ change**. When rows drift between projects, the row records the highest version 
 | Package | Version | Used by | Notes |
 |---|---|---|---|
 | `Microsoft.SqlServer.DacFx` | `170.1.61` | `SolTechnology.Core.SQL` (runtime, `SQLProjectDeployer`), `SolTechnology.Core.SQL.Testing` (dacpac deploy) | Stays in `SQL` even though testing moved out. |
-| `Testcontainers` | `4.3.0` | `SolTechnology.Core.Testing`, `SolTechnology.Core.SQL.Testing` | Container fixtures. **Family pinned to 4.3.0** — the Azure Service Bus emulator (`ServiceBus.Testing`) only exists from Testcontainers 4; KYC runs the whole family on 4.3.0. |
+| `Testcontainers` | `4.3.0` | `SolTechnology.Core.Testing`, `SolTechnology.Core.SQL.Testing` | Container fixtures. **Family pinned to 4.3.0** — the Azure Service Bus emulator (`ServiceBus.Testing`) only exists from Testcontainers 4 |
 | `Testcontainers.PostgreSql` | `4.3.0` | `SolTechnology.Core.SQL.Testing` | Postgres engine. Match `Testcontainers`. (MSSQL uses the generic builder — no `Testcontainers.MsSql`.) |
 | `Microsoft.Data.SqlClient` | `5.2.2` | `SolTechnology.Core.SQL.Testing` | MSSQL ADO provider + login probe. |
 | `Npgsql` | `8.0.5` | `SolTechnology.Core.SQL.Testing` | Postgres ADO provider. |
@@ -102,7 +102,7 @@ for new tests. Both stacks are listed; pick NUnit for new projects.
 | `Microsoft.NET.Test.Sdk` (NUnit) | `17.12.0` | New NUnit test projects | Same SDK as xUnit projects. |
 | `NUnit` | `4.2.2` | `SolTechnology.Core.Testing` (first new NUnit project); DreamTravel sample app | Recorded per `ClaudeCodingGuide §8`. |
 | `FluentAssertions` | `6.12.2` | Most `tests/*` | `tests/SolTechnology.Core.Logging.Tests` on `6.12.1` — align on next touch. |
-| `NSubstitute` | `5.3.0` | `tests/SolTechnology.Core.Api.Tests`, `SolTechnology.Core.Testing` | House mock — `Moq` is anti-stack. |
+| `NSubstitute` | `5.3.0` | `tests/SolTechnology.Core.API.Tests`, `SolTechnology.Core.Testing` | House mock — `Moq` is anti-stack. |
 | `AutoFixture` | `4.18.1` | `SolTechnology.Core.Testing` | Core 4.x family caps at 4.18.1. |
 | `AutoFixture.AutoNSubstitute` | `4.18.1` | `SolTechnology.Core.Testing` | NSubstitute auto-faking (not `AutoFixture.AutoMoq` — Moq is anti-stack). |
 | `AutoFixture.NUnit4` | `4.19.0` | `SolTechnology.Core.Testing` | NUnit4 adapter ships a 4.19.0; depends on AutoFixture ≥ 4.18.1. |

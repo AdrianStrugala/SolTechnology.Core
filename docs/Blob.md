@@ -59,8 +59,7 @@ services.AddBlobStorage(blobStorageConfiguration);
 
 The companion package **`SolTechnology.Core.BlobStorage.Testing`** provides `AzuriteFixture` — a
 [Testcontainers](https://dotnet.testcontainers.org/)-backed [Azurite](https://github.com/Azure/Azurite)
-container (the Azure Storage emulator) for component tests. **Azure-specific by design** — there is no
-LocalStack / S3 path. Reference it from test projects only. Full reference:
+container (the Azure Storage emulator) for component tests. Reference it from test projects only. Full reference:
 [BlobStorage.Testing.md](BlobStorage.Testing.md).
 
 ```csharp
