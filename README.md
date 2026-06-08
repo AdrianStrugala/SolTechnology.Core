@@ -55,9 +55,7 @@ The SolTechnology.Core repository contains a set of shared libraries. This is a 
 ### Testing companions
 
 Modular NUnit `.Testing` packages for component / integration tests — one companion per concern, all on
-the shared `SolTechnology.Core.Testing` foundation. Reference from test projects only. Strategy and
-composition: [The Quality](https://github.com/AdrianStrugala/SolTechnology.Core/tree/master/docs/theQuality.md)
-· design: [ADR-008](https://github.com/AdrianStrugala/SolTechnology.Core/tree/master/docs/adr/008-testing-framework-companions.md).
+the shared `SolTechnology.Core.Testing` foundation. Reference from test projects only.
 
 | Documentation                                                                                                              | Tags                                   | NuGet                                                                                                                                                                       |
 |----------------------------------------------------------------------------------------------------------------------------|----------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
