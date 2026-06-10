@@ -1,6 +1,6 @@
 ---
 name: test-writing
-description: Author or extend tests for a SolTechnology.Core module or sample app. Use when implementing behaviour that needs coverage, fixing a `Result.Failure` path without a negative test, or adding a regression test for a bug. Picks the right test project, framework (xUnit for core libs, NUnit for DreamTravel), assertion library, mocking style, and file layout. Never invents a new test project.
+description: Author or extend tests for a SolTechnology.Core module or sample app. Use when implementing behaviour that needs coverage, fixing a `Result.Failure` path without a negative test, or adding a regression test for a bug. Picks the right test project, framework (NUnit for core libs and DreamTravel; xUnit is legacy-only in TaleCode), assertion library, mocking style, and file layout. Never invents a new test project.
 ---
 
 # Test Writing
@@ -58,7 +58,7 @@ For sample apps, match the existing split:
 | Pure algorithm, domain invariant, or single chapter logic? | Unit |
 | Crosses two or more layers (handler + DbContext + HTTP client)? | Component (`WebApplicationFactory` + Testcontainers) |
 | Real environment smoke test? | EndToEnd |
-| Public NuGet surface of `SolTechnology.Core.<Module>`? | Module test project (xUnit) |
+| Public NuGet surface of `SolTechnology.Core.<Module>`? | Module test project (NUnit) |
 
 Never write a unit test that mocks `IMediator`, `HttpClient`, `DbContext`, or `IRepository` to
 assert "the handler called X" — that is a §8 anti-pattern. Promote to Component instead.
