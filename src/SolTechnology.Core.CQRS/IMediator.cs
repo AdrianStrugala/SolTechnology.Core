@@ -17,9 +17,8 @@ public interface IMediator
     Task<Result<TResult>> Send<TResult>(IQuery<TResult> query, CancellationToken cancellationToken = default);
 
     /// <summary>
-    /// Fire-and-forget dispatch to every registered <see cref="IEventHandler{T}"/>.
-    /// Returns immediately. Every handler runs on its own background task with a fresh DI scope.
-    /// Failures are isolated and logged — they never propagate to the caller and never stop other handlers.
+    /// Fire-and-forget dispatch to every registered <see cref="IEventHandler{T}"/> via
+    /// <see cref="IEventPublisher"/>. Failures are isolated — never propagate to the caller.
     /// </summary>
     void Publish<TEvent>(TEvent notification) where TEvent : IEvent;
 

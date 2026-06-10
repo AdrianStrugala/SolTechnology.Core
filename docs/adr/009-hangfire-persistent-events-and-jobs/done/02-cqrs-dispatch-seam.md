@@ -1,7 +1,7 @@
 ---
 adr: 009-hangfire-persistent-events-and-jobs
 step: 02 of 10
-status: reviewed
+status: done
 ---
 
 # Step 02: CQRS dispatch seam — `IEventPublisher` / `IEventDispatcher`

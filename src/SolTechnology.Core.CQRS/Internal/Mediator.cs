@@ -1,23 +1,20 @@
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 
 namespace SolTechnology.Core.CQRS.Internal;
 
 /// <summary>
 /// In-house mediator implementation. Dispatches commands and queries through the pipeline
-/// behavior chain, and publishes events fire-and-forget.
+/// behavior chain, and publishes events via <see cref="IEventPublisher"/>.
 /// </summary>
 internal sealed class CQRSMediator : IMediator
 {
     private readonly IServiceProvider _serviceProvider;
-    private readonly IServiceScopeFactory _scopeFactory;
-    private readonly ILogger<CQRSMediator> _logger;
+    private readonly IEventPublisher _eventPublisher;
 
-    public CQRSMediator(IServiceProvider serviceProvider, IServiceScopeFactory scopeFactory, ILogger<CQRSMediator> logger)
+    public CQRSMediator(IServiceProvider serviceProvider, IEventPublisher eventPublisher)
     {
         _serviceProvider = serviceProvider;
-        _scopeFactory = scopeFactory;
-        _logger = logger;
+        _eventPublisher = eventPublisher;
     }
 
     public Task<Result> Send(ICommand command, CancellationToken cancellationToken = default)
@@ -41,34 +38,13 @@ internal sealed class CQRSMediator : IMediator
     public void Publish<TEvent>(TEvent notification) where TEvent : IEvent
     {
         ArgumentNullException.ThrowIfNull(notification);
-
-        _ = Task.Run(async () =>
-        {
-            await using var scope = _scopeFactory.CreateAsyncScope();
-            var handlers = scope.ServiceProvider.GetServices<IEventHandler<TEvent>>();
-            foreach (var handler in handlers)
-            {
-                try
-                {
-                    await handler.Handle(notification, CancellationToken.None);
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogError(ex, "Event handler {HandlerType} failed for {EventType}",
-                        handler.GetType().Name, typeof(TEvent).Name);
-                }
-            }
-        });
+        _eventPublisher.Publish(notification);
     }
 
     public void Publish(IEvent notification)
     {
         ArgumentNullException.ThrowIfNull(notification);
-        // Dispatch via reflection to the generic Publish<T> method
-        var notificationType = notification.GetType();
-        var method = typeof(CQRSMediator).GetMethod(nameof(Publish), 1, new[] { Type.MakeGenericMethodParameter(0) })!;
-        var generic = method.MakeGenericMethod(notificationType);
-        generic.Invoke(this, new object[] { notification });
+        _eventPublisher.Publish(notification);
     }
 
     private async Task<TResponse> SendInternal<TResponse>(object request, CancellationToken cancellationToken)

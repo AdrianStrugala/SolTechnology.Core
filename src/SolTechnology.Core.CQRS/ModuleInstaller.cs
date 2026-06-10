@@ -30,6 +30,10 @@ public static class ModuleInstaller
         // Register mediator (scoped — shares request lifetime)
         services.TryAddScoped<IMediator, CQRSMediator>();
 
+        // Register event dispatch seam defaults (plugin can replace the publisher)
+        services.TryAddSingleton<IEventPublisher, InMemoryEventPublisher>();
+        services.TryAddScoped<IEventDispatcher, EventDispatcher>();
+
         // Register pipeline behaviors
         if (options.UseLogging)
         {

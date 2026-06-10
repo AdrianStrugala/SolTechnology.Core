@@ -7,7 +7,7 @@ Tracking the implementation steps for [ADR-009](../009-hangfire-persistent-event
 | # | Title | File | Status |
 |---|---|---|---|
 | 01 | CQRS event marker split + `IEvent` rename | [`done/01-cqrs-event-marker-rename.md`](done/01-cqrs-event-marker-rename.md) | ✅ done |
-| 02 | CQRS dispatch seam (`IEventPublisher` / `IEventDispatcher`) | [`reviewed/02-cqrs-dispatch-seam.md`](reviewed/02-cqrs-dispatch-seam.md) | 🔍 reviewed |
+| 02 | CQRS dispatch seam (`IEventPublisher` / `IEventDispatcher`) | [`done/02-cqrs-dispatch-seam.md`](done/02-cqrs-dispatch-seam.md) | ✅ done |
 | 03 | Hangfire plugin project skeleton + dependency report | [`reviewed/03-hangfire-plugin-project-skeleton.md`](reviewed/03-hangfire-plugin-project-skeleton.md) | 🔍 reviewed |
 | 04 | Persistent events publisher + `AddPersistentEvents()` | [`reviewed/04-persistent-events-publisher.md`](reviewed/04-persistent-events-publisher.md) | 🔍 reviewed |
 | 05 | Recurring jobs — `IJob` + `AddRecurringJob<TJob>(cron)` | [`reviewed/05-recurring-jobs.md`](reviewed/05-recurring-jobs.md) | 🔍 reviewed |
