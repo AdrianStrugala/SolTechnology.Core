@@ -6,7 +6,7 @@ Tracking the implementation steps for [ADR-009](../009-hangfire-persistent-event
 
 | # | Title | File | Status |
 |---|---|---|---|
-| 01 | CQRS event marker split + `IEvent` rename | [`reviewed/01-cqrs-event-marker-rename.md`](reviewed/01-cqrs-event-marker-rename.md) | 🔍 reviewed |
+| 01 | CQRS event marker split + `IEvent` rename | [`done/01-cqrs-event-marker-rename.md`](done/01-cqrs-event-marker-rename.md) | ✅ done |
 | 02 | CQRS dispatch seam (`IEventPublisher` / `IEventDispatcher`) | [`reviewed/02-cqrs-dispatch-seam.md`](reviewed/02-cqrs-dispatch-seam.md) | 🔍 reviewed |
 | 03 | Hangfire plugin project skeleton + dependency report | [`reviewed/03-hangfire-plugin-project-skeleton.md`](reviewed/03-hangfire-plugin-project-skeleton.md) | 🔍 reviewed |
 | 04 | Persistent events publisher + `AddPersistentEvents()` | [`reviewed/04-persistent-events-publisher.md`](reviewed/04-persistent-events-publisher.md) | 🔍 reviewed |
@@ -15,7 +15,7 @@ Tracking the implementation steps for [ADR-009](../009-hangfire-persistent-event
 | 07 | Documentation (`Hangfire.md` + parity) | [`reviewed/07-documentation.md`](reviewed/07-documentation.md) | 🔍 reviewed |
 | 08 | DreamTravel migration to the new seam | [`reviewed/08-dreamtravel-migration.md`](reviewed/08-dreamtravel-migration.md) | 🔍 reviewed |
 | 09 | `SolTechnology.Core.Hangfire.Tests` | [`reviewed/09-plugin-tests.md`](reviewed/09-plugin-tests.md) | 🔍 reviewed |
-| 10 | Run premortem (mandatory gate) | [`reviewed/10-run-premortem.md`](reviewed/10-run-premortem.md) | 🔍 reviewed |
+| 10 | Run premortem (mandatory gate) | [`done/10-run-premortem.md`](done/10-run-premortem.md) | ✅ done |
 
 Status values: `⬜ to-do` / `🔍 reviewed` / `✅ done`. Link in each row points to the step's
 current location (`to-do/` / `reviewed/` / `done/`).

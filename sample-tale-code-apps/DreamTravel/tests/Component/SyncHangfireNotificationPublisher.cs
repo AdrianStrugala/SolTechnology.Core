@@ -15,9 +15,9 @@ internal sealed class SyncHangfireNotificationPublisher : IHangfireNotificationP
     public static void UseScopeFactory(Func<IServiceScopeFactory> accessor)
         => _workerScopeFactoryAccessor = accessor;
 
-    public void Publish(INotification notification) => DispatchEvent(notification);
+    public void Publish(IEvent notification) => DispatchEvent(notification);
 
-    public void DispatchEvent(INotification notification)
+    public void DispatchEvent(IEvent notification)
     {
         var factory = _workerScopeFactoryAccessor?.Invoke()
             ?? throw new InvalidOperationException(

@@ -1,7 +1,7 @@
 ---
 adr: 009-hangfire-persistent-events-and-jobs
 step: 01 of 10
-status: reviewed
+status: done
 ---
 
 # Step 01: CQRS event marker split + `IEvent` rename

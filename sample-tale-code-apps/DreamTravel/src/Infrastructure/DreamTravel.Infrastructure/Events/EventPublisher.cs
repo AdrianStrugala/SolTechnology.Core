@@ -6,8 +6,8 @@ namespace DreamTravel.Infrastructure.Events;
 
 public interface IHangfireNotificationPublisher
 {
-    void Publish(INotification notification);
-    void DispatchEvent(INotification notification);
+    void Publish(IEvent notification);
+    void DispatchEvent(IEvent notification);
 }
 
 public class HangfireNotificationPublisher : IHangfireNotificationPublisher
@@ -21,14 +21,14 @@ public class HangfireNotificationPublisher : IHangfireNotificationPublisher
         _backgroundJobClient = backgroundJobClient;
     }
 
-    public void Publish(INotification notification)
+    public void Publish(IEvent notification)
     {
         _backgroundJobClient.Enqueue(() => DispatchEvent(notification));
     }
 
 
     [Hangfire.AutomaticRetry(Attempts = 0)]
-    public void DispatchEvent(INotification notification)
+    public void DispatchEvent(IEvent notification)
     {
         using var scope = _serviceScopeFactory.CreateScope();
         var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();

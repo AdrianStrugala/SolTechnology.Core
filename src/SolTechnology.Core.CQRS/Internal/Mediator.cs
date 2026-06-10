@@ -5,7 +5,7 @@ namespace SolTechnology.Core.CQRS.Internal;
 
 /// <summary>
 /// In-house mediator implementation. Dispatches commands and queries through the pipeline
-/// behavior chain, and publishes notifications fire-and-forget.
+/// behavior chain, and publishes events fire-and-forget.
 /// </summary>
 internal sealed class CQRSMediator : IMediator
 {
@@ -38,14 +38,14 @@ internal sealed class CQRSMediator : IMediator
         return SendInternal<Result<TResult>>(query, cancellationToken);
     }
 
-    public void Publish<TNotification>(TNotification notification) where TNotification : INotification
+    public void Publish<TEvent>(TEvent notification) where TEvent : IEvent
     {
         ArgumentNullException.ThrowIfNull(notification);
 
         _ = Task.Run(async () =>
         {
             await using var scope = _scopeFactory.CreateAsyncScope();
-            var handlers = scope.ServiceProvider.GetServices<INotificationHandler<TNotification>>();
+            var handlers = scope.ServiceProvider.GetServices<IEventHandler<TEvent>>();
             foreach (var handler in handlers)
             {
                 try
@@ -54,14 +54,14 @@ internal sealed class CQRSMediator : IMediator
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogError(ex, "Notification handler {HandlerType} failed for {NotificationType}",
-                        handler.GetType().Name, typeof(TNotification).Name);
+                    _logger.LogError(ex, "Event handler {HandlerType} failed for {EventType}",
+                        handler.GetType().Name, typeof(TEvent).Name);
                 }
             }
         });
     }
 
-    public void Publish(INotification notification)
+    public void Publish(IEvent notification)
     {
         ArgumentNullException.ThrowIfNull(notification);
         // Dispatch via reflection to the generic Publish<T> method
