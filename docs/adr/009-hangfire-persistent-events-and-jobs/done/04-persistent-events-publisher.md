@@ -1,7 +1,7 @@
 ---
 adr: 009-hangfire-persistent-events-and-jobs
 step: 04 of 10
-status: reviewed
+status: done
 ---
 
 # Step 04: Persistent events publisher + `AddPersistentEvents()`

@@ -8,8 +8,8 @@ Tracking the implementation steps for [ADR-009](../009-hangfire-persistent-event
 |---|---|---|---|
 | 01 | CQRS event marker split + `IEvent` rename | [`done/01-cqrs-event-marker-rename.md`](done/01-cqrs-event-marker-rename.md) | ✅ done |
 | 02 | CQRS dispatch seam (`IEventPublisher` / `IEventDispatcher`) | [`done/02-cqrs-dispatch-seam.md`](done/02-cqrs-dispatch-seam.md) | ✅ done |
-| 03 | Hangfire plugin project skeleton + dependency report | [`reviewed/03-hangfire-plugin-project-skeleton.md`](reviewed/03-hangfire-plugin-project-skeleton.md) | 🔍 reviewed |
-| 04 | Persistent events publisher + `AddPersistentEvents()` | [`reviewed/04-persistent-events-publisher.md`](reviewed/04-persistent-events-publisher.md) | 🔍 reviewed |
+| 03 | Hangfire plugin project skeleton + dependency report | [`done/03-hangfire-plugin-project-skeleton.md`](done/03-hangfire-plugin-project-skeleton.md) | ✅ done |
+| 04 | Persistent events publisher + `AddPersistentEvents()` | [`done/04-persistent-events-publisher.md`](done/04-persistent-events-publisher.md) | ✅ done |
 | 05 | Recurring jobs — `IJob` + `AddRecurringJob<TJob>(cron)` | [`reviewed/05-recurring-jobs.md`](reviewed/05-recurring-jobs.md) | 🔍 reviewed |
 | 06 | Deprecate `Scheduler` + delete orphan `Jobs` | [`reviewed/06-deprecate-scheduler-remove-orphan.md`](reviewed/06-deprecate-scheduler-remove-orphan.md) | 🔍 reviewed |
 | 07 | Documentation (`Hangfire.md` + parity) | [`reviewed/07-documentation.md`](reviewed/07-documentation.md) | 🔍 reviewed |

@@ -15,6 +15,7 @@
     <File Path="docs/theDesign.md" />
     <File Path="docs/theQuality.md" />
     <File Path="docs\BlobStorage.Testing.md" />
+    <File Path="docs\Hangfire.md" />
     <File Path="docs\HTTP-Production-Checklist.md" />
     <File Path="docs\HTTP.Testing.md" />
     <File Path="docs\Redis.Testing.md" />
@@ -90,6 +91,7 @@
     <Project Path="tests/SolTechnology.Core.Story.Tests/SolTechnology.Core.Story.Tests.csproj" />
     <Project Path="tests/SolTechnology.Core.MessageBus.Tests/SolTechnology.Core.MessageBus.Tests.csproj" />
     <Project Path="tests/SolTechnology.Core.CQRS.Tests/SolTechnology.Core.CQRS.Tests.csproj" />
+    <Project Path="tests/SolTechnology.Core.Hangfire.Tests/SolTechnology.Core.Hangfire.Tests.csproj" />
   </Folder>
   <Folder Name="/src/">
     <File Path="src/Directory.Build.props" />
@@ -107,6 +109,7 @@
     <Project Path="src/SolTechnology.Core.Logging/SolTechnology.Core.Logging.csproj" />
     <Project Path="src/SolTechnology.Core.MessageBus/SolTechnology.Core.MessageBus.csproj" />
     <Project Path="src/SolTechnology.Core.Scheduler/SolTechnology.Core.Scheduler.csproj" />
+    <Project Path="src/SolTechnology.Core.Hangfire/SolTechnology.Core.Hangfire.csproj" />
     <Project Path="src/SolTechnology.Core.SQL/SolTechnology.Core.SQL.csproj" />
     <Project Path="src/SolTechnology.Core.Testing/SolTechnology.Core.Testing.csproj" />
     <Project Path="src/SolTechnology.Core.SQL.Testing/SolTechnology.Core.SQL.Testing.csproj" />

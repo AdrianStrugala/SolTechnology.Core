@@ -1,7 +1,7 @@
 ---
 adr: 009-hangfire-persistent-events-and-jobs
 step: 03 of 10
-status: reviewed
+status: done
 ---
 
 # Step 03: Hangfire plugin project skeleton + dependency report

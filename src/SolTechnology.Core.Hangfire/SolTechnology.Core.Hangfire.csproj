@@ -1,0 +1,38 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<Version>0.1.0</Version>
+		<Description>Hangfire-backed persistent event dispatch and recurring jobs for SolTechnology.Core.CQRS. Opt in with AddPersistentEvents() — events survive process restarts via Hangfire storage.</Description>
+		<PackageTags>sol technology core hangfire persistent-events background-jobs recurring-jobs cqrs dotnet</PackageTags>
+		<Product>SolTechnology.Core.Hangfire</Product>
+		<PackageId>SolTechnology.Core.Hangfire</PackageId>
+		<AssemblyName>SolTechnology.Core.Hangfire</AssemblyName>
+
+		<PackageIcon>docs\mini-logo.png</PackageIcon>
+		<PackageReadmeFile>docs\readme.md</PackageReadmeFile>
+		<RepositoryUrl>https://github.com/AdrianStrugala/SolTechnology.Core</RepositoryUrl>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<InternalsVisibleTo Include="SolTechnology.Core.Hangfire.Tests" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<None Include="..\..\docs\mini-logo.png" Pack="true" Visible="false" PackagePath="docs\mini-logo.png" />
+		<None Include="..\..\docs\Hangfire.md" Pack="true" Visible="false" PackagePath="docs\readme.md" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<!-- Hangfire.Core pulls Newtonsoft.Json >= 11.0.1 (CVE-2024-21907 / NU1903). Pin to 13.0.4. -->
+		<PackageReference Include="Hangfire.Core" Version="1.8.22" />
+		<PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\SolTechnology.Core.CQRS\SolTechnology.Core.CQRS.csproj" />
+	</ItemGroup>
+
+</Project>
+
+
+
