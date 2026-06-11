@@ -1,7 +1,7 @@
 ---
 adr: 009-hangfire-persistent-events-and-jobs
 step: 06 of 10
-status: reviewed
+status: done
 ---
 
 # Step 06: Deprecate `Scheduler` + delete orphan `Jobs`

@@ -8,6 +8,7 @@ using EntityGraphQL.AspNet;
 using Hangfire;
 using SolTechnology.Core.Cache;
 using SolTechnology.Core.CQRS;
+using SolTechnology.Core.Hangfire;
 using SolTechnology.Core.SQL;
 using System.Globalization;
 using DreamTravel.DomainServices;
@@ -51,6 +52,7 @@ public class Program
 
         //CQRS
         builder.Services.AddCQRS(assemblies: typeof(Program).Assembly);
+        builder.Services.AddPersistentEvents();
 
         builder.Services.AddHangfireServer();
 

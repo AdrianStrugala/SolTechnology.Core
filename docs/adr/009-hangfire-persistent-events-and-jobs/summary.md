@@ -11,9 +11,9 @@ Tracking the implementation steps for [ADR-009](../009-hangfire-persistent-event
 | 03 | Hangfire plugin project skeleton + dependency report | [`done/03-hangfire-plugin-project-skeleton.md`](done/03-hangfire-plugin-project-skeleton.md) | ✅ done |
 | 04 | Persistent events publisher + `AddPersistentEvents()` | [`done/04-persistent-events-publisher.md`](done/04-persistent-events-publisher.md) | ✅ done |
 | 05 | Recurring jobs — `IJob` + `AddRecurringJob<TJob>(cron)` | [`done/05-recurring-jobs.md`](done/05-recurring-jobs.md) | ✅ done |
-| 06 | Deprecate `Scheduler` + delete orphan `Jobs` | [`reviewed/06-deprecate-scheduler-remove-orphan.md`](reviewed/06-deprecate-scheduler-remove-orphan.md) | 🔍 reviewed |
+| 06 | Deprecate `Scheduler` + delete orphan `Jobs` | [`done/06-deprecate-scheduler-remove-orphan.md`](done/06-deprecate-scheduler-remove-orphan.md) | ✅ done |
 | 07 | Documentation (`Hangfire.md` + parity) | [`reviewed/07-documentation.md`](reviewed/07-documentation.md) | 🔍 reviewed |
-| 08 | DreamTravel migration to the new seam | [`reviewed/08-dreamtravel-migration.md`](reviewed/08-dreamtravel-migration.md) | 🔍 reviewed |
+| 08 | DreamTravel migration to the new seam | [`done/08-dreamtravel-migration.md`](done/08-dreamtravel-migration.md) | ✅ done |
 | 09 | `SolTechnology.Core.Hangfire.Tests` | [`reviewed/09-plugin-tests.md`](reviewed/09-plugin-tests.md) | 🔍 reviewed |
 | 10 | Run premortem (mandatory gate) | [`done/10-run-premortem.md`](done/10-run-premortem.md) | ✅ done |
 

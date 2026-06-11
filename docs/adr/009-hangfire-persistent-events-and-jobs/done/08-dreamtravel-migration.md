@@ -1,7 +1,7 @@
 ---
 adr: 009-hangfire-persistent-events-and-jobs
 step: 08 of 10
-status: reviewed
+status: done
 ---
 
 # Step 08: DreamTravel migration to the new seam
@@ -97,3 +97,26 @@ poll/delay-after-publish style, and pick the blocking variant if any assertion c
 - Does `DreamTravel.Infrastructure` still need a direct `Hangfire.Core` reference after delegating to
   the plugin, or can it rely on the transitive one? Confirm the CVE pin remains satisfied.
 
+## Retrospective — Implementation Deviations
+
+### 1. `AddPersistentEvents()` lives in Worker's `Program.cs`, not `InstallInfrastructure`
+**Original plan:** suggested placing the opt-in inside `InstallInfrastructure` or deciding between
+the installer and each host's `Program.cs`.
+**Actual implementation:** `AddPersistentEvents()` requires `AddCQRS()` to be called first (fail-fast
+guard). In both hosts, `InstallInfrastructure()` is called before `AddCQRS()`. Moving
+`AddPersistentEvents()` to `Program.cs` after `AddCQRS()` avoids reordering the install chain.
+`InstallInfrastructure()` is kept as an empty stable seam.
+
+### 2. API host does not call `AddPersistentEvents()`
+**Original plan:** noted the API should also call `AddPersistentEvents()` if it publishes events.
+**Actual implementation:** the API has no `Hangfire` infrastructure (no `AddHangfire`/`AddHangfireServer`,
+no `IBackgroundJobClient`). Events published in the API use the default in-memory `IEventPublisher`
+from CQRS (fire-and-forget, same as before). Only the Worker — which owns the Hangfire server and
+storage — opts into persistence.
+
+### 3. Removed `DreamTravel.Infrastructure → DreamTravel.Queries` project reference
+**Original plan:** did not explicitly mention removing this reference.
+**Actual implementation:** query handlers no longer depend on `DreamTravel.Infrastructure.Events`
+(they use `IMediator` from CQRS). The project reference was removed to enforce the dependency
+direction rule (LogicLayer must not depend on Infrastructure through a direct reference to the
+namespace that was deleted).
