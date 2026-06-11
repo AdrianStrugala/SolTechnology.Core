@@ -85,27 +85,30 @@ public class CreateUserCommandValidator : AbstractValidator<CreateUserCommand>
 }
 ```
 
-### Notifications
+### Events
 
 Fire-and-forget events dispatched to all registered handlers. Each handler runs on its own background task with a fresh DI scope. Failures are isolated and logged — they never propagate to the caller and never stop other handlers.
 
 ```csharp
-public class UserCreated : INotification
+public class UserCreated : IEvent
 {
     public int UserId { get; set; }
 }
 
-public class SendWelcomeEmailHandler : INotificationHandler<UserCreated>
+public class SendWelcomeEmailHandler : IEventHandler<UserCreated>
 {
-    public async Task Handle(UserCreated notification, CancellationToken cancellationToken)
+    public async Task Handle(UserCreated @event, CancellationToken cancellationToken)
     {
-        await _emailService.SendWelcome(notification.UserId);
+        await _emailService.SendWelcome(@event.UserId);
     }
 }
 
 // Publishing (returns immediately)
 _mediator.Publish(new UserCreated { UserId = 42 });
 ```
+
+> For durable (persistent) event dispatch backed by Hangfire, see
+> [SolTechnology.Core.Hangfire](Hangfire.md).
 
 ### Result Pattern
 

@@ -1,7 +1,7 @@
 ---
 adr: 009-hangfire-persistent-events-and-jobs
 step: 07 of 10
-status: reviewed
+status: done
 ---
 
 # Step 07: Documentation — `Hangfire.md` + parity
@@ -97,4 +97,5 @@ historical decision records.
   sample app? Default: link + a minimal snippet, full migration lives in step 08.
 - **ADR-009 status row — RESOLVED (2026-06-10):** owned by the **plan close-out**, not this step. (Retry
   and rate limit are resolved on step 04: no automatic retry; rate limit out of scope.)
+
 

@@ -1,3 +1,7 @@
+> ⚠️ **Deprecated** — `SolTechnology.Core.Scheduler` is deprecated in favour of
+> [SolTechnology.Core.Hangfire](Hangfire.md) recurring jobs. See
+> [ADR-009](adr/009-hangfire-persistent-events-and-jobs.md).
+
 ### Overview
 
 The SolTechnology.Core.Scheduler library provides minimum functionality needed for scheduled background tasks. It handles needed services registration and configuration. It is based on Hangfire.Cronos library. The service is using in-memory scheduler, so does not share the scheduling information between instances.

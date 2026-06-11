@@ -49,7 +49,7 @@ This layer is responsible for communication with the outside world. It contains 
 Subscribes to domain events and invokes operations based on them. In this scenario, on CitySearched event saves the city using DomainService:
 
 ```csharp
-    public class SaveCitySearchJob(ICityDomainService cityDomainService) : INotificationHandler<CitySearched>
+    public class SaveCitySearchJob(ICityDomainService cityDomainService) : IEventHandler<CitySearched>
     {
         public async Task Handle(CitySearched notification, CancellationToken cancellationToken)
         {
