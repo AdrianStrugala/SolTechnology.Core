@@ -91,23 +91,20 @@ change**. When rows drift between projects, the row records the highest version 
 
 ## Test stack
 
-The current repo uses **xUnit** for the existing tests; `ClaudeCodingGuide §8` mandates **NUnit**
-for new tests. Both stacks are listed; pick NUnit for new projects.
+All test projects use **NUnit**. Canonical versions are centralized in `tests/Directory.Build.props`.
 
-| Package | Version | Used by | Notes |
-|---|---|---|---|
-| `Microsoft.NET.Test.Sdk` | `17.12.0` | All `tests/*` | Required by every test project. |
-| `xunit` | `2.9.2` | All `tests/*` (legacy) | Keep for existing tests. Do not add to a new test project. |
-| `xunit.runner.visualstudio` | `2.8.2` | All `tests/*` (legacy) | Must match `xunit` major. |
-| `Microsoft.NET.Test.Sdk` (NUnit) | `17.12.0` | New NUnit test projects | Same SDK as xUnit projects. |
-| `NUnit` | `4.2.2` | `SolTechnology.Core.Testing` (first new NUnit project); DreamTravel sample app | Recorded per `ClaudeCodingGuide §8`. |
-| `FluentAssertions` | `6.12.2` | Most `tests/*` | `tests/SolTechnology.Core.Logging.Tests` on `6.12.1` — align on next touch. |
-| `NSubstitute` | `5.3.0` | `tests/SolTechnology.Core.API.Tests`, `SolTechnology.Core.Testing` | House mock — `Moq` is anti-stack. |
-| `AutoFixture` | `4.18.1` | `SolTechnology.Core.Testing` | Core 4.x family caps at 4.18.1. |
-| `AutoFixture.AutoNSubstitute` | `4.18.1` | `SolTechnology.Core.Testing` | NSubstitute auto-faking (not `AutoFixture.AutoMoq` — Moq is anti-stack). |
-| `AutoFixture.NUnit4` | `4.19.0` | `SolTechnology.Core.Testing` | NUnit4 adapter ships a 4.19.0; depends on AutoFixture ≥ 4.18.1. |
-| `Bogus` | `35.6.1` | `SolTechnology.Core.Testing` (opt-in customization) | Realistic data generator; complements AutoFixture, does not replace it. |
-| `Docker.DotNet` | `3.125.15` | `SolTechnology.Core.Testing` | Container restart-if-stopped + health/AMQP probes. |
+| Package | Version | Notes |
+|---|---|---|
+| `Microsoft.NET.Test.Sdk` | `17.12.0` | Required by every test project. |
+| `NUnit` | `4.3.2` | All `tests/*`. |
+| `NUnit3TestAdapter` | `4.6.0` | All `tests/*`. |
+| `NUnit.Analyzers` | `4.4.0` | All `tests/*`. |
+| `FluentAssertions` | `6.12.2` | All `tests/*`. |
+| `FluentValidation` | `11.11.0` | All `tests/*`. |
+| `NSubstitute` | `5.3.0` | All `tests/*`. |
+| `AutoFixture` | `4.18.1` | All `tests/*`. Core 4.x family caps at 4.18.1. |
+| `AutoFixture.AutoNSubstitute` | `4.18.1` | All `tests/*`. NSubstitute auto-faking (not `AutoFixture.AutoMoq` — Moq is anti-stack). |
+| `coverlet.collector` | `6.0.4` | All `tests/*`. |
 | `Serilog.Sinks.InMemory` | `0.11.0` | `SolTechnology.Core.Testing` | In-memory log assertions. |
 | `System.Text.RegularExpressions` | `4.3.1` | `SolTechnology.Core.Testing` | CVE override (CVE-2019-0820 / GHSA-cmhx-cq75-c4mj, HIGH). `Docker.DotNet` drags the vulnerable 4.3.0; this prunes it. net10 carries it in-framework, so consumers with package pruning see NU1510 (demoted repo-wide). |
 | `coverlet.collector` | `6.0.4` | All `tests/*` | Coverage collector — wire as a `PrivateAssets="all"` developer dependency. |

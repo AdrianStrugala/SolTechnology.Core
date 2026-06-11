@@ -1,6 +1,6 @@
 ---
 name: test-writing
-description: Author or extend tests for a SolTechnology.Core module or sample app. Use when implementing behaviour that needs coverage, fixing a `Result.Failure` path without a negative test, or adding a regression test for a bug. Picks the right test project, framework (NUnit for core libs and DreamTravel; xUnit is legacy-only in TaleCode), assertion library, mocking style, and file layout. Never invents a new test project.
+description: Author or extend tests for a SolTechnology.Core module or sample app. Use when implementing behaviour that needs coverage, fixing a `Result.Failure` path without a negative test, or adding a regression test for a bug. Picks the right test project, framework (NUnit for all projects), assertion library, mocking style, and file layout. Never invents a new test project.
 ---
 
 # Test Writing
@@ -31,7 +31,7 @@ and the canonical test stack discovered in `tests/*.csproj`.
 | `sample-tale-code-apps/DreamTravel/tests/{Unit,Component,EndToEnd}/` | NUnit | FluentAssertions | NSubstitute | AutoFixture |
 | `sample-tale-code-apps/TaleCode/tests/` | xUnit *(legacy — do not propagate)* | FluentAssertions | NSubstitute | AutoFixture |
 
-**Default stack is NUnit + NSubstitute + FluentAssertions + AutoFixture.** xUnit lives on only
+**Default stack is NUnit + NSubstitute + FluentAssertions + AutoFixture.** All test projects use NUnit.
 where it already exists; new test projects use NUnit. Tests are the explicit exception to
 `ClaudeCodingGuide §15` — FluentAssertions is forbidden in `src/`, mandatory in tests. Same for
 NSubstitute over Moq.

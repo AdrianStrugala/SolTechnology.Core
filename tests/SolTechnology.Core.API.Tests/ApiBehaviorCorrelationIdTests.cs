@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Abstractions;
 using Microsoft.Extensions.Options;
 using SolTechnology.Core.API;
-using Xunit;
+using NUnit.Framework;
 
 namespace SolTechnology.Core.API.Tests;
 
@@ -19,7 +19,7 @@ public sealed class ApiBehaviorCorrelationIdTests
 {
     private const string CorrelationIdKey = "correlationId";
 
-    [Fact]
+    [Test]
     public void Auto400_From_ApiController_Carries_CorrelationId()
     {
         using var host = BuildHost();
@@ -38,7 +38,7 @@ public sealed class ApiBehaviorCorrelationIdTests
         problem.Extensions[CorrelationIdKey].Should().NotBeNull();
     }
 
-    [Fact]
+    [Test]
     public void Auto400_Preserves_PerField_Errors()
     {
         // Guard against an accidental rewrite that drops the framework's per-field error map.

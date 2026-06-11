@@ -4,7 +4,7 @@ using FluentValidation;
 using FluentValidation.Results;
 using Microsoft.AspNetCore.Http;
 using SolTechnology.Core.API.Exceptions;
-using Xunit;
+using NUnit.Framework;
 
 namespace SolTechnology.Core.API.Tests;
 
@@ -17,7 +17,7 @@ public sealed class DefaultExceptionStatusCodeMapperTests
 {
     private readonly DefaultExceptionStatusCodeMapper _mapper = new();
 
-    [Fact]
+    [Test]
     public void ValidationException_Maps_To_400()
     {
         var failure = new ValidationFailure("Email", "invalid");
@@ -29,9 +29,9 @@ public sealed class DefaultExceptionStatusCodeMapperTests
         status.Should().Be(StatusCodes.Status400BadRequest);
     }
 
-    [Theory]
-    [InlineData(typeof(ArgumentException))]
-    [InlineData(typeof(ArgumentNullException))]
+    [Test]
+    [TestCase(typeof(ArgumentException))]
+    [TestCase(typeof(ArgumentNullException))]
     public void ArgumentException_And_Subtypes_Map_To_400(Type exceptionType)
     {
         var ex = (Exception)Activator.CreateInstance(exceptionType)!;
@@ -40,7 +40,7 @@ public sealed class DefaultExceptionStatusCodeMapperTests
         status.Should().Be(StatusCodes.Status400BadRequest);
     }
 
-    [Fact]
+    [Test]
     public void UnauthorizedAccessException_Maps_To_403_Not_401()
     {
         // Documented decision (RFC 7235): 401 means "no credentials", emitted by the auth
@@ -49,30 +49,30 @@ public sealed class DefaultExceptionStatusCodeMapperTests
         status.Should().Be(StatusCodes.Status403Forbidden);
     }
 
-    [Fact]
+    [Test]
     public void KeyNotFoundException_Maps_To_404()
     {
         _mapper.TryMap(new KeyNotFoundException(), out var status).Should().BeTrue();
         status.Should().Be(StatusCodes.Status404NotFound);
     }
 
-    [Fact]
+    [Test]
     public void NotImplementedException_Maps_To_501()
     {
         _mapper.TryMap(new NotImplementedException(), out var status).Should().BeTrue();
         status.Should().Be(StatusCodes.Status501NotImplemented);
     }
 
-    [Fact]
+    [Test]
     public void HttpRequestException_WithoutStatus_Maps_To_502_BadGateway()
     {
         _mapper.TryMap(new HttpRequestException("boom"), out var status).Should().BeTrue();
         status.Should().Be(StatusCodes.Status502BadGateway);
     }
 
-    [Theory]
-    [InlineData(HttpStatusCode.RequestTimeout)]
-    [InlineData(HttpStatusCode.GatewayTimeout)]
+    [Test]
+    [TestCase(HttpStatusCode.RequestTimeout)]
+    [TestCase(HttpStatusCode.GatewayTimeout)]
     public void HttpRequestException_WithTimeoutStatus_Maps_To_504(HttpStatusCode upstream)
     {
         var ex = new HttpRequestException("upstream timed out", inner: null, statusCode: upstream);
@@ -81,7 +81,7 @@ public sealed class DefaultExceptionStatusCodeMapperTests
         status.Should().Be(StatusCodes.Status504GatewayTimeout);
     }
 
-    [Fact]
+    [Test]
     public void UnknownExceptionType_Returns_False_So_Filter_Rethrows()
     {
         // A+E policy: unmapped types must NOT receive a default status. The filter relies on
@@ -91,7 +91,7 @@ public sealed class DefaultExceptionStatusCodeMapperTests
         status.Should().Be(0);
     }
 
-    [Fact]
+    [Test]
     public void Subclass_Can_Extend_Map_Without_Losing_Defaults()
     {
         // The interface contract advertises subclass + base.TryMap as the extension point.

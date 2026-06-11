@@ -352,7 +352,7 @@ tests/Unit/DreamTravel.Queries.UnitTests/
 
 ### Test conventions
 
-- Frameworks: **NUnit** (core libs use xUnit historically; new tests use NUnit per repo convention). Assertion: **FluentAssertions**. Mocks: **NSubstitute**. Data: **AutoFixture** with `AutoNSubstituteCustomization`.
+- Frameworks: **NUnit** (all test projects). Assertion: **FluentAssertions**. Mocks: **NSubstitute**. Data: **AutoFixture** with `AutoNSubstituteCustomization`.
 - Test class field: `_sut` for the system under test. Dependencies frozen via `fixture.Freeze<T>()`.
 - Test name format: `Method_Scenario_ExpectedOutcome` (`Execute_ShouldPopulateContextWithRoadData`, `Resume_AfterPause_CompletesStory_AndPersistsTerminalState`).
 - One arrange / one act / one assert *block* per test — but multiple related assertions inside the assert block are encouraged (denser tests > more tests).

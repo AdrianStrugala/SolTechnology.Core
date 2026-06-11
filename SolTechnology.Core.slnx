@@ -82,10 +82,10 @@
     </Folder>
   </Folder>
   <Folder Name="/Tests/">
+    <File Path="tests\Directory.Build.props" />
     <Project Path="tests/SolTechnology.Core.API.Tests/SolTechnology.Core.API.Tests.csproj" />
     <Project Path="tests/SolTechnology.Core.HTTP.Tests/SolTechnology.Core.HTTP.Tests.csproj" />
     <Project Path="tests/SolTechnology.Core.AUID.Tests/SolTechnology.Core.AUID.Tests.csproj" />
-    <Project Path="tests/SolTechnology.Core.Guards.Tests/SolTechnology.Core.Guards.Tests.csproj" />
     <Project Path="tests/SolTechnology.Core.Logging.Tests/SolTechnology.Core.Logging.Tests.csproj" />
     <Project Path="tests/SolTechnology.Core.SQL.Tests/SolTechnology.Core.SQL.Tests.csproj" />
     <Project Path="tests/SolTechnology.Core.Story.Tests/SolTechnology.Core.Story.Tests.csproj" />
@@ -105,7 +105,6 @@
     <Project Path="src/SolTechnology.Core.CQRS/SolTechnology.Core.CQRS.csproj" />
     <Project Path="src/SolTechnology.Core.HTTP.Testing/SolTechnology.Core.HTTP.Testing.csproj" />
     <Project Path="src/SolTechnology.Core.Story/SolTechnology.Core.Story.csproj" />
-    <Project Path="src/SolTechnology.Core.Guards/SolTechnology.Core.Guards.csproj" />
     <Project Path="src/SolTechnology.Core.Logging/SolTechnology.Core.Logging.csproj" />
     <Project Path="src/SolTechnology.Core.MessageBus/SolTechnology.Core.MessageBus.csproj" />
     <Project Path="src/SolTechnology.Core.Scheduler/SolTechnology.Core.Scheduler.csproj" />

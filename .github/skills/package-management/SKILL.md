@@ -1,6 +1,6 @@
 ---
 name: package-management
-description: Look up canonical NuGet package versions used in this repo before adding a PackageReference. Use when adding a new package to any .csproj, creating a new project, or checking which version of Microsoft.Extensions, Polly, FluentValidation, NUnit / xUnit, FluentAssertions, NSubstitute, AutoFixture, Azure SDK, or other shared packages to use. Avoids drift and version-by-memory hallucination.
+description: Look up canonical NuGet package versions used in this repo before adding a PackageReference. Use when adding a new package to any .csproj, creating a new project, or checking which version of Microsoft.Extensions, Polly, FluentValidation, NUnit, FluentAssertions, NSubstitute, AutoFixture, Azure SDK, or other shared packages to use. Avoids drift and version-by-memory hallucination.
 ---
 # Package Management
 Single source of truth for which version of which package this repo uses. Prevents the failure

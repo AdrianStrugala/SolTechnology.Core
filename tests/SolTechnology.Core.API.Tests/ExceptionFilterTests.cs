@@ -12,7 +12,7 @@ using NSubstitute;
 using SolTechnology.Core.API.Exceptions;
 using SolTechnology.Core.API.Filters;
 using SolTechnology.Core.Logging.Correlations;
-using Xunit;
+using NUnit.Framework;
 
 namespace SolTechnology.Core.API.Tests;
 
@@ -32,7 +32,7 @@ public sealed class ExceptionFilterTests
         _correlationIdService.GetOrGenerate().Returns(CorrelationId.Generate());
     }
 
-    [Fact]
+    [Test]
     public void MappedException_Produces_ProblemDetails_With_CorrelationId_And_NoStackTrace_ByDefault()
     {
         // CWE-209 guard: IncludeExceptionDetails defaults to false. Stack trace must not leak
@@ -56,7 +56,7 @@ public sealed class ExceptionFilterTests
             "stack trace must not leak in Production — IncludeExceptionDetails is false by default");
     }
 
-    [Fact]
+    [Test]
     public void MappedException_With_IncludeExceptionDetails_Emits_Diagnostic_Block()
     {
         _options.IncludeExceptionDetails = true;
@@ -73,7 +73,7 @@ public sealed class ExceptionFilterTests
             "developer opted in to diagnostic detail explicitly");
     }
 
-    [Fact]
+    [Test]
     public void UnmappedException_Is_Rethrown_To_Host_Via_ExceptionHandledFalse()
     {
         // A+E policy: the filter does not invent a default status. ExceptionHandled stays
@@ -89,7 +89,7 @@ public sealed class ExceptionFilterTests
         ctx.Result.Should().BeNull();
     }
 
-    [Fact]
+    [Test]
     public void ClientAbort_Is_Silently_Skipped()
     {
         // When the client cancels mid-request, we don't try to write a body. ExceptionHandled
@@ -108,7 +108,7 @@ public sealed class ExceptionFilterTests
         ctx.Result.Should().BeNull();
     }
 
-    [Fact]
+    [Test]
     public void ValidationException_Becomes_ValidationProblemDetails_With_PerField_Errors()
     {
         // The factory's special-case branch: FluentValidation failures are grouped by property

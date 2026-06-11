@@ -1,7 +1,7 @@
 using FluentAssertions;
 using Microsoft.Extensions.DependencyInjection;
 using SolTechnology.Core.Logging.Correlations;
-using Xunit;
+using NUnit.Framework;
 
 namespace SolTechnology.Core.Logging.Tests.Correlations;
 
@@ -14,7 +14,7 @@ public class CorrelationIdServiceTests
         return services.BuildServiceProvider().GetRequiredService<ICorrelationIdService>();
     }
 
-    [Fact]
+    [Test]
     public async Task Set_and_Get_flow_through_async_local()
     {
         var service = BuildService();
@@ -26,7 +26,7 @@ public class CorrelationIdServiceTests
         service.Get().Should().Be(id);
     }
 
-    [Fact]
+    [Test]
     public void GetOrGenerate_creates_value_when_none_set()
     {
         var service = BuildService();

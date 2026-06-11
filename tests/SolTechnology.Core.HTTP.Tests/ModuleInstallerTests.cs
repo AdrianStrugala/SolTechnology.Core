@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
-using Xunit;
+using NUnit.Framework;
 
 namespace SolTechnology.Core.HTTP.Tests;
 
@@ -17,7 +17,7 @@ public sealed class ModuleInstallerTests
 
     // ---- Original smoke test (preserved) ---------------------------------
 
-    [Fact]
+    [Test]
     public void AddHTTPClient_ConfigurationProvidedAsParameter_ClientHasExpectedBaseAddressAndHeader_TimeoutIgnoredWhenPollyOn()
     {
         // Under the default UsePolly=true, HttpClient.Timeout is set to
@@ -46,7 +46,7 @@ public sealed class ModuleInstallerTests
             .GetValues("HeaderName").Single().Should().Be("HeaderValue");
     }
 
-    [Fact]
+    [Test]
     public void AddHTTPClient_UsePollyFalse_HttpClientOwnsTimeoutFromTimeoutSeconds()
     {
         // Fallback path: with Polly disabled, HttpClient.Timeout is the only
@@ -69,7 +69,7 @@ public sealed class ModuleInstallerTests
 
     // ---- Configuration-driven registration --------------------------------
 
-    [Fact]
+    [Test]
     public void AddHTTPClient_ConfigurationProvidedFromAppsettings_ClientReadsBaseAddressAndHeadersFromSection()
     {
         var sut = NewBuilder();
@@ -90,7 +90,7 @@ public sealed class ModuleInstallerTests
         client.HttpClient.Timeout.Should().Be(Timeout.InfiniteTimeSpan);
     }
 
-    [Fact]
+    [Test]
     public void AddHTTPClient_ConfigurationMissing_FailsHostStartupOrFirstResolve()
     {
         var sut = NewBuilder();
@@ -113,7 +113,7 @@ public sealed class ModuleInstallerTests
 
     // ---- Policy options precedence ---------------------------------------
 
-    [Fact]
+    [Test]
     public void AddHTTPClient_PolicyOptions_PerClientSectionOverridesGlobal()
     {
         var sut = NewBuilder();
@@ -131,7 +131,7 @@ public sealed class ModuleInstallerTests
         policy.MaxRequestRetries.Should().Be(1);
     }
 
-    [Fact]
+    [Test]
     public void AddHTTPClient_PolicyOptions_GlobalUsedWhenNoPerClientOverride()
     {
         var sut = NewBuilder();
@@ -148,7 +148,7 @@ public sealed class ModuleInstallerTests
         policy.MaxRequestRetries.Should().Be(7);
     }
 
-    [Fact]
+    [Test]
     public void AddHTTPClient_PolicyOptions_FallbackToProductionDefaults_WhenNoConfig()
     {
         var sut = NewBuilder();
@@ -175,7 +175,7 @@ public sealed class ModuleInstallerTests
         policy.OverallRequestBudget.Should().BeNull("outer budget is opt-in");
     }
 
-    [Fact]
+    [Test]
     public void AddHTTPClient_PolicyOptions_InvalidValueFromConfig_FailsValidationOnResolve()
     {
         // FailureThreshold is a ratio in [0.0, 1.0]. A value of 5.0 is a
@@ -199,7 +199,7 @@ public sealed class ModuleInstallerTests
             .WithMessage("*CircuitBreakerFailureThreshold*");
     }
 
-    [Fact]
+    [Test]
     public void AddHTTPClient_PolicyOptions_NegativeRetries_FailsValidation()
     {
         var sut = NewBuilder();
@@ -218,7 +218,7 @@ public sealed class ModuleInstallerTests
 
     // ---- New: propagateCorrelation opt-out ------------------------------
 
-    [Fact]
+    [Test]
     public void AddHTTPClient_PropagateCorrelationFalse_DoesNotRegisterCorrelationHandler()
     {
         // When the host owns correlation (OpenTelemetry, firm middleware) we
@@ -236,7 +236,7 @@ public sealed class ModuleInstallerTests
         sut.Services.Should().NotContain(d => d.ServiceType.Name == "CorrelationPropagatingHandler");
     }
 
-    [Fact]
+    [Test]
     public void AddHTTPClient_PropagateCorrelationTrue_RegistersCorrelationHandler()
     {
         var sut = NewBuilder();
@@ -249,7 +249,7 @@ public sealed class ModuleInstallerTests
 
     // ---- New: OverallRequestBudget cross-field validation ---------------
 
-    [Fact]
+    [Test]
     public void AddHTTPClient_OverallBudgetSmallerThanRequestTimeout_FailsValidation()
     {
         var sut = NewBuilder();
@@ -276,7 +276,7 @@ public sealed class ModuleInstallerTests
 
     // ---- New: BuildInMemorySource projector guard -----------------------
 
-    [Fact]
+    [Test]
     public void BuildInMemorySource_CoversEveryPublicHttpPolicyProperty()
     {
         // Reflection guard: if a future maintainer adds a List<T> / complex

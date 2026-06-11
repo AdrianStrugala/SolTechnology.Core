@@ -2,13 +2,13 @@ using System.Diagnostics;
 using FluentAssertions;
 using Microsoft.AspNetCore.Http;
 using SolTechnology.Core.Logging.Correlations;
-using Xunit;
+using NUnit.Framework;
 
 namespace SolTechnology.Core.Logging.Tests.Correlations;
 
 public class CorrelationIdTests
 {
-    [Fact]
+    [Test]
     public void FromRequest_uses_X_Correlation_Id_header_when_no_activity_in_scope()
     {
         // Ensure no Activity is in scope so the header path is exercised.
@@ -23,7 +23,7 @@ public class CorrelationIdTests
         error.Should().BeNull();
     }
 
-    [Fact]
+    [Test]
     public void FromRequest_rejects_overlong_header_and_generates_new_id()
     {
         Activity.Current = null;
@@ -37,7 +37,7 @@ public class CorrelationIdTests
         id.Value.Length.Should().BeLessThanOrEqualTo(CorrelationId.MaxLength);
     }
 
-    [Fact]
+    [Test]
     public void FromRequest_prefers_activity_trace_id_over_header()
     {
         using var activity = new Activity("test").Start();
@@ -50,7 +50,7 @@ public class CorrelationIdTests
         id.Value.Should().Be(activity.TraceId.ToHexString());
     }
 
-    [Fact]
+    [Test]
     public void EnrichResponse_sets_X_Correlation_Id()
     {
         Activity.Current = null;
@@ -63,7 +63,7 @@ public class CorrelationIdTests
         ctx.Response.Headers[CorrelationId.HeaderKey].ToString().Should().Be("id-1");
     }
 
-    [Fact]
+    [Test]
     public void GetScope_returns_correlation_under_canonical_key()
     {
         Activity.Current = null;

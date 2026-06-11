@@ -9,7 +9,7 @@ using Microsoft.Extensions.DependencyInjection;
 using SolTechnology.Core.HTTP.Handlers;
 using SolTechnology.Core.Logging;
 using SolTechnology.Core.Logging.Correlations;
-using Xunit;
+using NUnit.Framework;
 
 namespace SolTechnology.Core.HTTP.Tests;
 
@@ -41,7 +41,7 @@ public sealed class CorrelationPropagationTests
         return (client, capture, service);
     }
 
-    [Fact]
+    [Test]
     public async Task OutboundRequest_NoActivity_CarriesXCorrelationIdOnly()
     {
         // Run in a fresh ExecutionContext so any ambient Activity from the test
@@ -59,7 +59,7 @@ public sealed class CorrelationPropagationTests
             "stand-alone correlation must not fabricate a traceparent span id");
     }
 
-    [Fact]
+    [Test]
     public async Task OutboundRequest_ActivityInScope_CarriesTraceparentAndMatchingCorrelationId()
     {
         using var activity = new Activity("test").Start();
@@ -78,7 +78,7 @@ public sealed class CorrelationPropagationTests
         traceparent.Should().StartWith("00-").And.Contain(activity.TraceId.ToHexString());
     }
 
-    [Fact]
+    [Test]
     public async Task OutboundRequest_AmbientCorrelationIdMatchesService()
     {
         // The handler must source its id from the same ICorrelationIdService
@@ -103,7 +103,7 @@ public sealed class CorrelationPropagationTests
         fromHeader.Should().Be(expected.Value);
     }
 
-    [Fact]
+    [Test]
     public async Task AddCorrelationIdService_RegistrationIsIdempotent()
     {
         // ModuleInstaller calls AddCorrelationIdService for every typed client;
@@ -121,7 +121,7 @@ public sealed class CorrelationPropagationTests
         a.Should().BeSameAs(b);
     }
 
-    [Fact]
+    [Test]
     public async Task Handler_PreExistingCorrelationHeader_PreservesCallerValueAndSkipsGenerate()
     {
         // Hosts that own correlation (OpenTelemetry / firm middleware) attach
