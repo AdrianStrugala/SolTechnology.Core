@@ -1,6 +1,6 @@
 # ADR-009: Persistent events and recurring jobs via `SolTechnology.Core.Hangfire`
 
-> **Status:** Proposed
+> **Status:** Accepted
 > **Decision Date:** 2026-06-09
 > **Decision Maker:** Repository maintainers
 > **Stakeholders:** CQRS consumers (NuGet + DreamTravel), Scheduler consumers
@@ -156,5 +156,25 @@ lands as a `0.8.0 → 0.9.0` minor bump. New `SolTechnology.Core.Hangfire` `0.1.
 
 ## Implementation summary
 
-Tracked in [`009-hangfire-persistent-events-and-jobs/summary.md`](009-hangfire-persistent-events-and-jobs/summary.md).
+Completed 2026-06-11. The per-step working folder
+(`docs/adr/009-hangfire-persistent-events-and-jobs/`) was deleted per the ADR-006 collapse-on-completion rule.
+
+| # | Step | Shipped |
+|---|---|---|
+| 01 | CQRS event marker split + `IEvent` rename | `INotification` → `IEvent`, `INotificationHandler<T>` → `IEventHandler<T>` in `src/SolTechnology.Core.CQRS/` |
+| 02 | CQRS dispatch seam | `IEventPublisher`, `IEventDispatcher`, `InMemoryEventPublisher`, `EventDispatcher` in `src/SolTechnology.Core.CQRS/` |
+| 03 | Hangfire plugin project skeleton | `src/SolTechnology.Core.Hangfire/` — `Hangfire.Core` 1.8.22, `Newtonsoft.Json` 13.0.4 pin |
+| 04 | Persistent events publisher | `HangfireEventPublisher`, `AddPersistentEvents()`, `PersistentEventsOptions` |
+| 05 | Recurring jobs | `IJob`, `AddRecurringJob<TJob>(cron)`, `RecurringJobRunner<T>`, `RecurringJobRegistrar` (IHostedService) |
+| 06 | Deprecate Scheduler + delete orphan Jobs | `[Obsolete]` on `AddScheduledJob<T>` + `ScheduledJob`, version 0.6.0; deleted `src/SolTechnology.Core.Jobs/` |
+| 07 | Documentation | `docs/Hangfire.md`, updated `CQRS.md`, `theDesign.md`, `Cron.md` deprecation banner, README table |
+| 08 | DreamTravel migration | Deleted `IHangfireNotificationPublisher`; handlers use `IMediator.Publish`; Worker calls `AddPersistentEvents()` |
+| 09 | Plugin tests | `tests/SolTechnology.Core.Hangfire.Tests/` — 16 tests (NUnit + FluentAssertions + NSubstitute) |
+| 10 | Premortem | Go with mitigations (CVE pin, no in-repo Scheduler consumers, idempotency documented) |
+
+### Preserved deviations
+
+- **Step 08** — `AddPersistentEvents()` lives in Worker's `Program.cs` (not `InstallInfrastructure`) because it requires `AddCQRS()` first and the install order in both hosts calls Infrastructure before CQRS.
+- **Step 08** — API host uses default in-memory publisher (no Hangfire infra); only Worker persists events.
+- **Step 08** — Removed `DreamTravel.Queries → DreamTravel.Infrastructure` project reference (handlers no longer depend on Infrastructure).
 

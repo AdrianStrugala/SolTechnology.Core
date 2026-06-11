@@ -16,12 +16,26 @@ new knobs require an [ADR](adr/009-hangfire-persistent-events-and-jobs.md).
 
 ## Registration
 
+The plugin offers two independent features — use either or both:
+
 ```csharp
-// Program.cs (the host that owns Hangfire server + storage)
+// Persistent events only (requires AddCQRS first)
 builder.Services.AddCQRS(assemblies: typeof(Program).Assembly);
-builder.Services.AddPersistentEvents();                      // replaces in-memory publisher
-builder.Services.AddRecurringJob<MyDailyJob>(Cron.Daily);    // optional recurring jobs
+builder.Services.AddPersistentEvents();
+
+// Recurring jobs only (no AddCQRS dependency)
+builder.Services.AddRecurringJob<MyDailyJob>(Cron.Daily);
+
+// Both together
+builder.Services.AddCQRS(assemblies: typeof(Program).Assembly);
+builder.Services.AddPersistentEvents();
+builder.Services.AddRecurringJob<MyDailyJob>(Cron.Daily);
 ```
+
+| Method | Requires `AddCQRS()` | What it does |
+|--------|---------------------|--------------|
+| `AddPersistentEvents()` | ✅ yes | Replaces in-memory event publisher with Hangfire-backed durable dispatch |
+| `AddRecurringJob<TJob>(cron)` | ❌ no | Registers a typed job on a cron schedule via Hangfire |
 
 ## Configuration
 
