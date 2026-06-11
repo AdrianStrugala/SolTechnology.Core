@@ -10,7 +10,7 @@ Tracking the implementation steps for [ADR-009](../009-hangfire-persistent-event
 | 02 | CQRS dispatch seam (`IEventPublisher` / `IEventDispatcher`) | [`done/02-cqrs-dispatch-seam.md`](done/02-cqrs-dispatch-seam.md) | ✅ done |
 | 03 | Hangfire plugin project skeleton + dependency report | [`done/03-hangfire-plugin-project-skeleton.md`](done/03-hangfire-plugin-project-skeleton.md) | ✅ done |
 | 04 | Persistent events publisher + `AddPersistentEvents()` | [`done/04-persistent-events-publisher.md`](done/04-persistent-events-publisher.md) | ✅ done |
-| 05 | Recurring jobs — `IJob` + `AddRecurringJob<TJob>(cron)` | [`reviewed/05-recurring-jobs.md`](reviewed/05-recurring-jobs.md) | 🔍 reviewed |
+| 05 | Recurring jobs — `IJob` + `AddRecurringJob<TJob>(cron)` | [`done/05-recurring-jobs.md`](done/05-recurring-jobs.md) | ✅ done |
 | 06 | Deprecate `Scheduler` + delete orphan `Jobs` | [`reviewed/06-deprecate-scheduler-remove-orphan.md`](reviewed/06-deprecate-scheduler-remove-orphan.md) | 🔍 reviewed |
 | 07 | Documentation (`Hangfire.md` + parity) | [`reviewed/07-documentation.md`](reviewed/07-documentation.md) | 🔍 reviewed |
 | 08 | DreamTravel migration to the new seam | [`reviewed/08-dreamtravel-migration.md`](reviewed/08-dreamtravel-migration.md) | 🔍 reviewed |

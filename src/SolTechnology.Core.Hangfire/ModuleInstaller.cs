@@ -1,5 +1,6 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.Hosting;
 using SolTechnology.Core.CQRS;
 
 namespace SolTechnology.Core.Hangfire;
@@ -18,7 +19,6 @@ public static class ModuleInstaller
         this IServiceCollection services,
         Action<PersistentEventsOptions>? configure = null)
     {
-        // Fail fast if CQRS seam is missing.
         if (!services.Any(d => d.ServiceType == typeof(IEventDispatcher)))
         {
             throw new InvalidOperationException(
@@ -29,9 +29,28 @@ public static class ModuleInstaller
         configure?.Invoke(options);
         services.Configure<PersistentEventsOptions>(o => o.QueueName = options.QueueName);
 
-        // Order-independent: remove the CQRS default, then add ours.
         services.RemoveAll<IEventPublisher>();
         services.AddSingleton<IEventPublisher, HangfireEventPublisher>();
+
+        return services;
+    }
+
+    /// <summary>
+    /// Registers a recurring job that runs on the given cron schedule via Hangfire.
+    /// The app must call <c>AddHangfire(...)</c> and <c>AddHangfireServer()</c>.
+    /// </summary>
+    public static IServiceCollection AddRecurringJob<TJob>(
+        this IServiceCollection services,
+        string cronExpression) where TJob : class, IJob
+    {
+        ArgumentNullException.ThrowIfNull(cronExpression);
+
+        services.AddScoped<TJob>();
+        services.AddSingleton(new RecurringJobDescriptor(typeof(TJob), cronExpression));
+        services.AddSingleton<RecurringJobRunner<TJob>>();
+
+        services.TryAddEnumerable(
+            ServiceDescriptor.Singleton<IHostedService, RecurringJobRegistrar>());
 
         return services;
     }

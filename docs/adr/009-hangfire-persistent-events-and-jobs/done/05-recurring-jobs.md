@@ -1,7 +1,7 @@
- ---
+---
 adr: 009-hangfire-persistent-events-and-jobs
 step: 05 of 10
-status: reviewed
+status: done
 ---
 
 # Step 05: Recurring jobs — `IJob` + `AddRecurringJob<TJob>(cron)`
@@ -82,4 +82,5 @@ rather than copying it.
   is needed now (same answer as step 04). `Hangfire.Core` bounds **concurrency** app-side (worker count
   / named queues); true **rate-limiting** (jobs-per-interval) is `Hangfire.Throttling`/infra and is not
   built. No rate-limit surface ships for recurring jobs.
+
 
