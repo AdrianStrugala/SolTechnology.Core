@@ -57,4 +57,3 @@ namespace DreamTravel.TravelingSalesmanProblem.UnitTests
         }
     }
 }
-}

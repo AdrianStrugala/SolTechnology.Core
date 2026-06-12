@@ -27,44 +27,44 @@ public class SmartRetryJobFilterTests
     public void OnPerformed_WhenResultIsRecoverableFailure_SetsRetryParameter()
     {
         // Arrange
-        var context = CreatePerformedContext(
-            result: Result.Fail(new Error { Message = "Timeout", Recoverable = true }));
+        var failedResult = Result.Fail(new Error { Message = "Timeout", Recoverable = true });
+        var connection = Substitute.For<IStorageConnection>();
+        var context = CreatePerformedContext(failedResult, connection: connection);
 
         // Act
         _sut.OnPerformed(context);
 
-        // Assert
-        var errorParam = context.GetJobParameter<string>("SmartRetry_Error");
-        errorParam.Should().Be("Timeout");
+        // Assert — the filter wrote the retry parameter to the connection
+        connection.Received(1).SetJobParameter("job-1", "SmartRetry_Error", Arg.Is<string>(s => s.Contains("Timeout")));
     }
 
     [Test]
     public void OnPerformed_WhenResultIsNonRecoverableFailure_DoesNotSetParameter()
     {
         // Arrange
+        var connection = Substitute.For<IStorageConnection>();
         var context = CreatePerformedContext(
-            result: Result.Fail(new Error { Message = "Bad data", Recoverable = false }));
+            result: Result.Fail(new Error { Message = "Bad data", Recoverable = false }), connection: connection);
 
         // Act
         _sut.OnPerformed(context);
 
         // Assert
-        var errorParam = context.GetJobParameter<string>("SmartRetry_Error");
-        errorParam.Should().BeNull();
+        connection.DidNotReceive().SetJobParameter(Arg.Any<string>(), "SmartRetry_Error", Arg.Any<string>());
     }
 
     [Test]
     public void OnPerformed_WhenResultIsSuccess_DoesNotSetParameter()
     {
         // Arrange
-        var context = CreatePerformedContext(result: Result.Success());
+        var connection = Substitute.For<IStorageConnection>();
+        var context = CreatePerformedContext(result: Result.Success(), connection: connection);
 
         // Act
         _sut.OnPerformed(context);
 
         // Assert
-        var errorParam = context.GetJobParameter<string>("SmartRetry_Error");
-        errorParam.Should().BeNull();
+        connection.DidNotReceive().SetJobParameter(Arg.Any<string>(), "SmartRetry_Error", Arg.Any<string>());
     }
 
     [Test]
@@ -84,8 +84,10 @@ public class SmartRetryJobFilterTests
     public void OnStateElection_WhenRetryErrorSet_ForcesFailedState()
     {
         // Arrange
-        var context = CreateElectStateContext();
-        context.SetJobParameter("SmartRetry_Error", "Timeout error");
+        var connection = Substitute.For<IStorageConnection>();
+        connection.GetJobParameter("job-1", "SmartRetry_Error")
+            .Returns("\"Timeout error\"");
+        var context = CreateElectStateContext(connection);
 
         // Act
         _sut.OnStateElection(context);
@@ -109,25 +111,25 @@ public class SmartRetryJobFilterTests
         context.CandidateState.Should().BeSameAs(originalState);
     }
 
-    private static PerformedContext CreatePerformedContext(object? result, Exception? exception = null)
+    private static PerformedContext CreatePerformedContext(object? result, Exception? exception = null, IStorageConnection? connection = null)
     {
         var storage = Substitute.For<JobStorage>();
-        var connection = Substitute.For<IStorageConnection>();
+        connection ??= Substitute.For<IStorageConnection>();
         var job = Job.FromExpression(() => Console.WriteLine("test"));
         var backgroundJob = new BackgroundJob("job-1", job, DateTime.UtcNow);
         var performContext = new PerformContext(storage, connection, backgroundJob, Substitute.For<IJobCancellationToken>());
         var performingContext = new PerformingContext(performContext);
         return new PerformedContext(performingContext, result, false, exception);
     }
-
-    private static ElectStateContext CreateElectStateContext()
+    private static ElectStateContext CreateElectStateContext(IStorageConnection? connection = null)
     {
         var storage = Substitute.For<JobStorage>();
-        var connection = Substitute.For<IStorageConnection>();
+        connection ??= Substitute.For<IStorageConnection>();
+        var transaction = Substitute.For<IWriteOnlyTransaction>();
         var job = Job.FromExpression(() => Console.WriteLine("test"));
         var backgroundJob = new BackgroundJob("job-1", job, DateTime.UtcNow);
         var candidateState = new EnqueuedState();
-        return new ElectStateContext(new ApplyStateContext(storage, connection, null, backgroundJob, candidateState, null));
+        return new ElectStateContext(new ApplyStateContext(storage, connection, transaction, backgroundJob, candidateState, null));
     }
 }
 

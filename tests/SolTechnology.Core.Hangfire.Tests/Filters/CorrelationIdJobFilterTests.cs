@@ -4,7 +4,7 @@ using Hangfire.Client;
 using Hangfire.Common;
 using Hangfire.Server;
 using Hangfire.Storage;
-using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using NSubstitute;
 using NUnit.Framework;
 using SolTechnology.Core.Hangfire.Filters;
@@ -16,15 +16,13 @@ namespace SolTechnology.Core.Hangfire.Tests.Filters;
 public class CorrelationIdJobFilterTests
 {
     private ICorrelationIdService _correlationIdService = null!;
-    private ILogger<CorrelationIdJobFilter> _logger = null!;
     private CorrelationIdJobFilter _sut = null!;
 
     [SetUp]
     public void Setup()
     {
         _correlationIdService = Substitute.For<ICorrelationIdService>();
-        _logger = Substitute.For<ILogger<CorrelationIdJobFilter>>();
-        _sut = new CorrelationIdJobFilter(_correlationIdService, _logger);
+        _sut = new CorrelationIdJobFilter(_correlationIdService, NullLogger<CorrelationIdJobFilter>.Instance);
     }
 
     [Test]
@@ -48,8 +46,12 @@ public class CorrelationIdJobFilterTests
     public void OnPerforming_RestoresCorrelationIdFromJobParameter()
     {
         // Arrange
-        var context = CreatePerformingContext();
-        context.SetJobParameter(CorrelationId.ScopeKey, "restored-id-456");
+        var connection = Substitute.For<IStorageConnection>();
+        // Hangfire serializes string parameters as plain JSON strings (quoted)
+        connection.GetJobParameter("job-1", CorrelationId.ScopeKey)
+            .Returns("\"restored-id-456\"");
+
+        var context = CreatePerformingContext(connection);
 
         // Act
         _sut.OnPerforming(context);
@@ -112,10 +114,10 @@ public class CorrelationIdJobFilterTests
         return new CreatingContext(new CreateContext(storage, connection, job, null));
     }
 
-    private static PerformingContext CreatePerformingContext()
+    private static PerformingContext CreatePerformingContext(IStorageConnection? connection = null)
     {
         var storage = Substitute.For<JobStorage>();
-        var connection = Substitute.For<IStorageConnection>();
+        connection ??= Substitute.For<IStorageConnection>();
         var job = Job.FromExpression(() => Console.WriteLine("test"));
         var backgroundJob = new BackgroundJob("job-1", job, DateTime.UtcNow);
         return new PerformingContext(new PerformContext(storage, connection, backgroundJob, Substitute.For<IJobCancellationToken>()));

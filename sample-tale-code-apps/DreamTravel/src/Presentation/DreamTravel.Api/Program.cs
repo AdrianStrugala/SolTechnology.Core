@@ -17,6 +17,7 @@ using SolTechnology.Core.API.Filters;
 using SolTechnology.Core.Authentication;
 using SolTechnology.Core.Cache;
 using SolTechnology.Core.CQRS;
+using SolTechnology.Core.Hangfire;
 using SolTechnology.Core.Logging;
 using SolTechnology.Core.Logging.Enrichment;
 using SolTechnology.Core.Logging.Operations;
@@ -115,6 +116,7 @@ public class Program
 
         var thisAssembly = typeof(Program).Assembly;
         builder.Services.AddCQRS(assemblies: thisAssembly);
+        builder.Services.AddPersistentEvents();
 
         var authenticationConfiguration = builder.Configuration.GetRequiredSection("Authentication").Get<AuthenticationConfiguration>()!;
         var authFilter = builder.Services.AddAuthenticationAndBuildFilter(authenticationConfiguration);

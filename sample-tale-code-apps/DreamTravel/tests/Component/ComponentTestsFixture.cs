@@ -23,6 +23,7 @@ namespace DreamTravel.FunctionalTests
         public static async Task SetUp()
         {
             Environment.SetEnvironmentVariable("ASPNETCORE_ENVIRONMENT", "development");
+            Environment.SetEnvironmentVariable("TESTCONTAINERS_REUSE", "true");
 
             // 1. Start SQL Server (Docker container)
             SqlFixture = new SQLFixture("DreamTravelDatabase")
