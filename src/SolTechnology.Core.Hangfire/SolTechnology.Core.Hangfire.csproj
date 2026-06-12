@@ -31,6 +31,7 @@
 
 	<ItemGroup>
 		<ProjectReference Include="..\SolTechnology.Core.CQRS\SolTechnology.Core.CQRS.csproj" />
+		<ProjectReference Include="..\SolTechnology.Core.Logging\SolTechnology.Core.Logging.csproj" />
 	</ItemGroup>
 
 </Project>

@@ -54,6 +54,8 @@ public class Program
         builder.Services.AddCQRS(assemblies: typeof(Program).Assembly);
         builder.Services.AddPersistentEvents();
 
+        //JOBS
+        builder.Services.AddRecurringJob<FetchTrafficJob>(Cron.Never());
         builder.Services.AddHangfireServer();
 
         //APP
@@ -61,11 +63,6 @@ public class Program
 
         app.MapDefaultEndpoints();
 
-        var recurringJobManager = app.Services.GetRequiredService<IRecurringJobManager>();
-        recurringJobManager.AddOrUpdate("LogFromJob", () => Console.WriteLine("Hello from Job"), Cron.Daily);
-
-
-        FetchTrafficJob.Register();
 
         app.MapHangfireDashboard("/hangfire/ui");
         app.MapGraphQL<DreamTripsDbContext>(); // default url: /graphql

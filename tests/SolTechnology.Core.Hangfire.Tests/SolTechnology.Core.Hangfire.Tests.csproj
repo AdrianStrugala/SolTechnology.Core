@@ -2,6 +2,8 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\SolTechnology.Core.Hangfire\SolTechnology.Core.Hangfire.csproj" />
+    <ProjectReference Include="..\..\src\SolTechnology.Core.CQRS\SolTechnology.Core.CQRS.csproj" />
+    <ProjectReference Include="..\..\src\SolTechnology.Core.Logging\SolTechnology.Core.Logging.csproj" />
   </ItemGroup>
 
 </Project>

@@ -16,6 +16,7 @@ Decisions that shape SolTechnology.Core. One ADR = one decision. Filenames follo
 | 007 | [CQRS production hardening + in-house mediator](007-cqrs-production-hardening.md) | 2026-05-26 | Accepted | ✅ Done |
 | 008 | [Testing framework `.Testing` companion packages](008-testing-framework-companions.md) | 2026-05-30 | Accepted | 🔍 Implementing — 10/11 shipped; only [publish workflow](008-testing-framework-companions/reviewed/09-publish-workflow.md) left (see [summary](008-testing-framework-companions.md#implementation-summary)) |
 | 009 | [Persistent events and recurring jobs via `SolTechnology.Core.Hangfire`](009-hangfire-persistent-events-and-jobs.md) | 2026-06-09 | Accepted | ✅ Done |
+| 010 | [Production-pattern adoption programme](010-production-pattern-adoption-programme.md) | 2026-06-12 | Proposed | 🔍 Implementing — see [summary](010-production-pattern-adoption-programme/summary.md) |
 
 Status values: `Proposed` / `Accepted` / `Superseded` / `Rejected`.
 Implementation values: `N/A` / `⬜ To-do` / `🔍 Implementing` / `✅ Done`.

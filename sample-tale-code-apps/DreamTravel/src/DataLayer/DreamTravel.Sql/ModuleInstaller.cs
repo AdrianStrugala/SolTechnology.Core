@@ -1,8 +1,8 @@
-﻿using EntityGraphQL.AspNet;
+﻿﻿using EntityGraphQL.AspNet;
 using Hangfire;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using SolTechnology.Core.Hangfire;
 using SolTechnology.Core.SQL;
 
 namespace DreamTravel.Sql
@@ -12,18 +12,17 @@ namespace DreamTravel.Sql
         public static IServiceCollection InstallTripsSql(this IServiceCollection services, SQLConfiguration sqlConfiguration)
         {
             services.AddSQL(sqlConfiguration);
-            
+
             services.AddDbContext<DreamTripsDbContext>(options =>
                 options.UseSqlServer(sqlConfiguration.ConnectionString));
-                // options.UseInMemoryDatabase("DreamTravelDatabase"));
 
-            services.AddHangfire(configuration => configuration
+            services.AddHangfire((sp, configuration) => configuration
                 .SetDataCompatibilityLevel(CompatibilityLevel.Version_180)
                 .UseSimpleAssemblyNameTypeSerializer()
                 .UseRecommendedSerializerSettings()
-                .UseSqlServerStorage(sqlConfiguration.ConnectionString));
-                // .UseInMemoryStorage());
-                
+                .UseSqlServerStorage(sqlConfiguration.ConnectionString)
+                .UseSolTechnologyFilters(sp));
+
             services.AddGraphQLSchema<DreamTripsDbContext>();
             return services;
         }

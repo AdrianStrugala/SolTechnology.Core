@@ -7,23 +7,26 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using DreamTravel.Domain.Cities;
 using DreamTravel.GeolocationDataClients.GoogleApi;
+using FluentAssertions;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
 using NSubstitute;
-using Xunit;
+using NUnit.Framework;
 
 namespace DreamTravel.GeolocationDataClients.IntegrationTests.GoogleApi
 {
+    [TestFixture]
     public class CitiesTests
     {
-        private readonly GoogleHTTPClient _sut;
+        private GoogleHTTPClient _sut = null!;
 
-        public CitiesTests()
+        [SetUp]
+        public void Setup()
         {
             _sut = new GoogleHTTPClient(Options.Create(new GoogleHTTPOptions()), Substitute.For<HttpClient>(), NullLogger<GoogleHTTPClient>.Instance);
         }
 
-        [Fact (Skip = "Paid test")]
+        [Test, Ignore("Paid test")]
         public async Task Execute_WildernessUnderCoordinates_ReturnsFormattedAddress()
         {
             //Arrange
@@ -38,10 +41,10 @@ namespace DreamTravel.GeolocationDataClients.IntegrationTests.GoogleApi
             var result = await _sut.GetNameOfCity(city);
 
             //Assert
-            Assert.Equal("Kufra District, Libya", result.Name);
+            result.Name.Should().Be("Kufra District, Libya");
         }
 
-        [Fact(Skip = "Paid test")]
+        [Test, Ignore("Paid test")]
         public async Task Execute_InvokeWithValidCoordinates_ReturnsActualNameOfCity()
         {
             //Arrange
@@ -56,10 +59,10 @@ namespace DreamTravel.GeolocationDataClients.IntegrationTests.GoogleApi
             var result = await _sut.GetNameOfCity(city);
 
             //Assert
-            Assert.Equal("Wrocław", result.Name);
+            result.Name.Should().Be("Wrocław");
         }
 
-        [Fact(Skip = "Paid test")]
+        [Test, Ignore("Paid test")]
         public async Task Execute_SeeUnderCoordinates_NameOfTheSeeIsReturned()
         {
             //Arrange
@@ -74,10 +77,10 @@ namespace DreamTravel.GeolocationDataClients.IntegrationTests.GoogleApi
             var result = await _sut.GetNameOfCity(city);
 
             //Assert
-            Assert.Equal("Baltic Sea", result.Name);
+            result.Name.Should().Be("Baltic Sea");
         }
 
-        [Fact(Skip = "Paid test")]
+        [Test, Ignore("Paid test")]
         public async Task GetCityByName_InvokeWithRealName_ReturnsCityObject()
         {
             //Arrange
@@ -87,23 +90,22 @@ namespace DreamTravel.GeolocationDataClients.IntegrationTests.GoogleApi
             var result = await _sut.GetLocationOfCity(cityName);
 
             //Assert
-            Assert.Equal("Wroclaw", result.Name);
-            Assert.NotEqual(0, result.Latitude);
-            Assert.NotEqual(0, result.Longitude);
+            result.Name.Should().Be("Wroclaw");
+            result.Latitude.Should().NotBe(0);
+            result.Longitude.Should().NotBe(0);
         }
 
-        [Fact(Skip = "Paid test")]
+        [Test, Ignore("Paid test")]
         public async Task GetCityByName_NonExistingCity_ExceptionIsThrown()
         {
             //Arrange
             string cityName = "DUPA";
 
             //Act
-            // ReSharper disable once PossibleNullReferenceException
-            var exception = await Record.ExceptionAsync(async () => await _sut.GetLocationOfCity(cityName));
+            var act = async () => await _sut.GetLocationOfCity(cityName);
 
             //Assert
-            Assert.IsType<InvalidDataException>(exception);
+            await act.Should().ThrowAsync<InvalidDataException>();
         }
 
     }

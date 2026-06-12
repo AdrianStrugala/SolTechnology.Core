@@ -4,19 +4,21 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using DreamTravel.Domain.Cities;
 using DreamTravel.GeolocationDataClients.GoogleApi;
+using FluentAssertions;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
 using NSubstitute;
-using Xunit;
+using NUnit.Framework;
 
 namespace DreamTravel.GeolocationDataClients.IntegrationTests.GoogleApi
 {
+    [TestFixture]
     public class DownloadDurationMatrixByFreeRoadTests
     {
         readonly GoogleHTTPClient _sut = new(Options.Create(new GoogleHTTPOptions()), Substitute.For<HttpClient>(), NullLogger<GoogleHTTPClient>.Instance);
 
 
-        [Fact(Skip = "Paid test")]
+        [Test, Ignore("Paid test")]
         public async Task DownloadDurationMatrixByFreeRoad_InvokeWithValidCities_ReturnsSomeDuration()
         {
             //Arrange
@@ -40,12 +42,12 @@ namespace DreamTravel.GeolocationDataClients.IntegrationTests.GoogleApi
             var result = await _sut.GetDurationMatrixByFreeRoad(list);
 
             //Assert
-            Assert.NotEqual(0, result[1]);
-            Assert.NotEqual(double.MaxValue, result[1]);
-            Assert.Equal(double.MaxValue, result[0]);
+            result[1].Should().NotBe(0);
+            result[1].Should().NotBe(double.MaxValue);
+            result[0].Should().Be(double.MaxValue);
         }
 
-        [Fact(Skip = "Paid test")]
+        [Test, Ignore("Paid test")]
         public async Task DownloadDurationMatrixByFreeRoad_InvalidCities_ExceptionIsThrown()
         {
             //Arrange
@@ -66,10 +68,10 @@ namespace DreamTravel.GeolocationDataClients.IntegrationTests.GoogleApi
             var list = new List<City> { firstCity, secondCity };
 
             //Act
-            var exception = await Record.ExceptionAsync(async () => await _sut.GetDurationMatrixByFreeRoad(list));
+            var act = async () => await _sut.GetDurationMatrixByFreeRoad(list);
 
             //Assert
-            Assert.IsType<InvalidDataException>(exception);
+            await act.Should().ThrowAsync<InvalidDataException>();
         }
     }
 }

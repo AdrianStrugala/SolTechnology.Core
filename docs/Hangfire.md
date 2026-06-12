@@ -156,6 +156,50 @@ Intentionally minimal:
 `IEvent`, `IEventHandler<T>`, `IEventPublisher`, `IEventDispatcher` live in
 `SolTechnology.Core.CQRS` — see [CQRS docs](CQRS.md).
 
+## Filters
+
+The plugin ships three Hangfire job filters. Register them globally via
+`UseSolTechnologyFilters()` in the app's `AddHangfire` callback:
+
+```csharp
+builder.Services.AddHangfire((sp, config) => config
+    .UseRecommendedSerializerSettings()
+    .UseSimpleAssemblyNameTypeSerializer()
+    .UseSqlServerStorage(connectionString)
+    .UseSolTechnologyFilters(sp));   // registers correlation + smart-retry filters
+```
+
+### Correlation-id propagation
+
+Preserves the `X-Correlation-Id` across the enqueue→execute boundary. On enqueue
+the current correlation id is saved as a job parameter; on execute it is restored
+into `ICorrelationIdService` and pushed as a log scope — so logs from background
+handlers appear under the same correlation as the original request.
+
+### Smart retry (Result-aware)
+
+Bridges the `Result` pattern with Hangfire's exception-only retry model. If a job
+returns `Result.Fail(new Error { Recoverable = true })`, the filter forces the job
+into `FailedState` so Hangfire retries it. Non-recoverable failures are left as
+succeeded — no pointless retries, no silent swallowing.
+
+### Prevent overlap
+
+Cancels a job execution if another instance with the same method + arguments is
+already scheduled or processing. Prevents pile-up when a recurring job is mid-retry
+and the next cron trigger fires. Apply as an attribute on a job method:
+
+```csharp
+[PreventOverlapJobFilter]
+public async Task RunAsync(CancellationToken cancellationToken) { ... }
+```
+
+Or register for a specific recurring job:
+
+```csharp
+builder.Services.AddRecurringJob<MyJob>(Cron.Hourly, preventOverlap: true);
+```
+
 ## Testing
 
 In component/integration tests, **do not call `AddPersistentEvents()`**. The default

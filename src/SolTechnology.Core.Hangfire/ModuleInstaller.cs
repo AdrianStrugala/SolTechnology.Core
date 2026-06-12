@@ -1,7 +1,9 @@
+using Hangfire;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
 using SolTechnology.Core.CQRS;
+using SolTechnology.Core.Hangfire.Filters;
 
 namespace SolTechnology.Core.Hangfire;
 
@@ -32,6 +34,10 @@ public static class ModuleInstaller
         services.RemoveAll<IEventPublisher>();
         services.AddSingleton<IEventPublisher, HangfireEventPublisher>();
 
+        // Filters
+        services.TryAddSingleton<CorrelationIdJobFilter>();
+        services.TryAddSingleton<SmartRetryJobFilter>();
+
         return services;
     }
 
@@ -39,20 +45,57 @@ public static class ModuleInstaller
     /// Registers a recurring job that runs on the given cron schedule via Hangfire.
     /// The app must call <c>AddHangfire(...)</c> and <c>AddHangfireServer()</c>.
     /// </summary>
+    /// <param name="services">Service collection.</param>
+    /// <param name="cronExpression">Cron expression (use <see cref="Cron"/> helpers).</param>
+    /// <param name="preventOverlap">
+    /// When true, a new execution is cancelled if the same job is already scheduled or processing.
+    /// Prevents pile-up when a previous run is mid-retry and the next cron trigger fires.
+    /// </param>
     public static IServiceCollection AddRecurringJob<TJob>(
         this IServiceCollection services,
-        string cronExpression) where TJob : class, IJob
+        string cronExpression,
+        bool preventOverlap = false) where TJob : class, IJob
     {
         ArgumentNullException.ThrowIfNull(cronExpression);
 
         services.AddScoped<TJob>();
-        services.AddSingleton(new RecurringJobDescriptor(typeof(TJob), cronExpression));
+        services.AddSingleton(new RecurringJobDescriptor(typeof(TJob), cronExpression, preventOverlap));
         services.AddSingleton<RecurringJobRunner<TJob>>();
 
         services.TryAddEnumerable(
             ServiceDescriptor.Singleton<IHostedService, RecurringJobRegistrar>());
 
+        // Filters (shared with persistent events)
+        services.TryAddSingleton<CorrelationIdJobFilter>();
+        services.TryAddSingleton<SmartRetryJobFilter>();
+
         return services;
+    }
+
+    /// <summary>
+    /// Adds the Hangfire global job filters (correlation-id propagation, smart retry).
+    /// Call from the app's <c>AddHangfire</c> configuration callback:
+    /// <code>
+    /// services.AddHangfire((sp, config) => config.UseSolTechnologyFilters(sp));
+    /// </code>
+    /// </summary>
+    public static IGlobalConfiguration UseSolTechnologyFilters(
+        this IGlobalConfiguration configuration,
+        IServiceProvider serviceProvider)
+    {
+        var correlationFilter = serviceProvider.GetService<CorrelationIdJobFilter>();
+        if (correlationFilter is not null)
+        {
+            configuration.UseFilter(correlationFilter);
+        }
+
+        var smartRetryFilter = serviceProvider.GetService<SmartRetryJobFilter>();
+        if (smartRetryFilter is not null)
+        {
+            configuration.UseFilter(smartRetryFilter);
+        }
+
+        return configuration;
     }
 }
 
