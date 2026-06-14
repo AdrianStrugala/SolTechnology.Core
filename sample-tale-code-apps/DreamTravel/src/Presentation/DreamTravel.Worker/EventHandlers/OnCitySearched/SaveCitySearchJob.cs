@@ -6,7 +6,7 @@ using SolTechnology.Core.CQRS;
 namespace DreamTravel.Worker.EventHandlers.OnCitySearched;
 
 [UsedImplicitly]
-public class SaveCitySearchJob(ICityDomainService cityDomainService) : INotificationHandler<CitySearched>
+public class SaveCitySearchJob(ICityDomainService cityDomainService) : IEventHandler<CitySearched>
 {
     public async Task Handle(CitySearched notification, CancellationToken cancellationToken)
     {

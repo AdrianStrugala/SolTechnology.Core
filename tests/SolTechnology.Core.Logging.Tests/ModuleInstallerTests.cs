@@ -3,13 +3,13 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using SolTechnology.Core.Logging.Correlations;
 using SolTechnology.Core.Logging.Enrichment;
-using Xunit;
+using NUnit.Framework;
 
 namespace SolTechnology.Core.Logging.Tests;
 
 public class ModuleInstallerTests
 {
-    [Fact]
+    [Test]
     public void AddCoreLogging_registers_correlation_service_as_singleton()
     {
         var services = new ServiceCollection();
@@ -22,7 +22,7 @@ public class ModuleInstallerTests
         first.Should().BeSameAs(second);
     }
 
-    [Fact]
+    [Test]
     public void AddCoreLogging_is_idempotent()
     {
         var services = new ServiceCollection();
@@ -32,7 +32,7 @@ public class ModuleInstallerTests
         services.Count(d => d.ServiceType == typeof(ICorrelationIdService)).Should().Be(1);
     }
 
-    [Fact]
+    [Test]
     public void AddCoreLogging_validates_options_on_resolution()
     {
         var services = new ServiceCollection();
@@ -44,7 +44,7 @@ public class ModuleInstallerTests
         act.Should().Throw<OptionsValidationException>();
     }
 
-    [Fact]
+    [Test]
     public void AddCoreLogging_rejects_whitespace_skip_paths()
     {
         var services = new ServiceCollection();
@@ -56,7 +56,7 @@ public class ModuleInstallerTests
         act.Should().Throw<OptionsValidationException>();
     }
 
-    [Fact]
+    [Test]
     public void LogDetail_registers_descriptor_and_aggregating_enricher_once()
     {
         var services = new ServiceCollection();
@@ -77,7 +77,7 @@ public class ModuleInstallerTests
         public void Enrich(Microsoft.AspNetCore.Http.HttpContext context, IDictionary<string, object?> scope) { }
     }
 
-    [Fact]
+    [Test]
     public void AddLogScopeEnricher_appends_user_enricher_alongside_built_in()
     {
         var services = new ServiceCollection();

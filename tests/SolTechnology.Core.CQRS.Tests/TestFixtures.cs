@@ -72,9 +72,9 @@ public class ValidatedCommandHandler : ICommandHandler<ValidatedCommand>
     }
 }
 
-// --- Notifications ---
+// --- Events ---
 
-public class TestNotification : INotification
+public class TestNotification : IEvent
 {
     public string Message { get; set; } = "event";
 }
@@ -85,7 +85,7 @@ public class NotificationLog
     public System.Collections.Concurrent.ConcurrentBag<string> Messages { get; } = new();
 }
 
-public class TestNotificationHandler : INotificationHandler<TestNotification>
+public class TestNotificationHandler : IEventHandler<TestNotification>
 {
     private readonly NotificationLog _log;
     public TestNotificationHandler(NotificationLog log) => _log = log;
@@ -97,7 +97,7 @@ public class TestNotificationHandler : INotificationHandler<TestNotification>
     }
 }
 
-public class ThrowingNotificationHandler : INotificationHandler<TestNotification>
+public class ThrowingNotificationHandler : IEventHandler<TestNotification>
 {
     public Task Handle(TestNotification notification, CancellationToken cancellationToken)
     {

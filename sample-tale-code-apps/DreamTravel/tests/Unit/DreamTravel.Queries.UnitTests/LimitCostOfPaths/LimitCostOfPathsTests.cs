@@ -1,13 +1,15 @@
 using DreamTravel.Queries.LimitCostOfPaths;
+using FluentAssertions;
 using Path = DreamTravel.Domain.Paths.Path;
 
 namespace DreamTravel.Queries.UnitTests.LimitCostOfPaths
 {
+    [TestFixture]
     public class LimitCostOfPathsTests
     {
         private readonly LimitCostOfPathsService _sut = new();
 
-        [Fact]
+        [Test]
         public async Task Handle_ValidInput_ListOfCitiesIsSortedByIndex()
         {
             //Arrange
@@ -50,21 +52,16 @@ namespace DreamTravel.Queries.UnitTests.LimitCostOfPaths
             }, CancellationToken.None)).Data;
 
             //Assert
-            Assert.Equal(0, result[0].Index);
-            Assert.Equal(1, result[1].Index);
-            Assert.Equal(2, result[2].Index);
-            Assert.Equal(3, result[3].Index);
+            result[0].Index.Should().Be(0);
+            result[1].Index.Should().Be(1);
+            result[2].Index.Should().Be(2);
+            result[3].Index.Should().Be(3);
 
-            double totalCost = 0;
-            foreach (var path in result)
-            {
-                totalCost += path.OptimalCost;
-            }
-
-            Assert.True(totalCost < costLimit);
+            double totalCost = result.Sum(p => p.OptimalCost);
+            totalCost.Should().BeLessThan(costLimit);
         }
 
-        [Fact]
+        [Test]
         public async Task Handle_PathWithVinietaCostAndLimitDecreases_FreePathIsReturned()
         {
             //Arrange
@@ -89,11 +86,11 @@ namespace DreamTravel.Queries.UnitTests.LimitCostOfPaths
 
 
             //Assert
-            Assert.Equal(0, result[0].OptimalCost);
+            result[0].OptimalCost.Should().Be(0);
         }
 
 
-        [Fact]
+        [Test]
         public async Task Handle_2PathsUsingTheSameVinieta_ResultContainsOptimalCostForThem()
         {
             //Arrange
@@ -127,8 +124,8 @@ namespace DreamTravel.Queries.UnitTests.LimitCostOfPaths
 
 
             //Assert
-            Assert.Equal(5, result[0].OptimalCost);
-            Assert.Equal(5, result[1].OptimalCost);
+            result[0].OptimalCost.Should().Be(5);
+            result[1].OptimalCost.Should().Be(5);
         }
     }
 }

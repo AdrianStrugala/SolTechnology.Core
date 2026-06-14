@@ -9,7 +9,7 @@ using Microsoft.Extensions.Options;
 using SolTechnology.Core.Logging.Correlations;
 using SolTechnology.Core.Logging.Enrichment;
 using SolTechnology.Core.Logging.Middleware;
-using Xunit;
+using NUnit.Framework;
 
 namespace SolTechnology.Core.Logging.Tests.Middleware;
 
@@ -57,7 +57,7 @@ public class LoggingMiddlewareTests
             => throw new InvalidOperationException("boom");
     }
 
-    [Fact]
+    [Test]
     public async Task Echoes_X_Correlation_Id_header_on_response()
     {
         Activity.Current = null;
@@ -76,7 +76,7 @@ public class LoggingMiddlewareTests
         store.Stored!.Value.Should().Be("test-id-123");
     }
 
-    [Fact]
+    [Test]
     public async Task Generates_correlation_when_no_header_or_activity_provided()
     {
         Activity.Current = null;
@@ -90,7 +90,7 @@ public class LoggingMiddlewareTests
         store.Stored!.Value.Should().NotBeNullOrWhiteSpace();
     }
 
-    [Fact]
+    [Test]
     public async Task Sets_500_status_and_rethrows_on_unhandled_exception()
     {
         var (mw, _) = Build(handler: _ => throw new InvalidOperationException("boom"));
@@ -103,7 +103,7 @@ public class LoggingMiddlewareTests
         ctx.Response.StatusCode.Should().Be(StatusCodes.Status500InternalServerError);
     }
 
-    [Fact]
+    [Test]
     public async Task Faulty_enricher_does_not_break_request()
     {
         var faulty = new ThrowingEnricher();
@@ -116,7 +116,7 @@ public class LoggingMiddlewareTests
         next.WasInvoked.Should().BeTrue();
     }
 
-    [Fact]
+    [Test]
     public async Task SkipPaths_short_circuits_middleware_after_setting_correlation()
     {
         var options = new LoggingOptions { SkipPaths = new[] { "/health" } };
@@ -134,7 +134,7 @@ public class LoggingMiddlewareTests
         capturing.Captured.Should().BeNull("enrichers must be skipped on skip paths");
     }
 
-    [Fact]
+    [Test]
     public async Task Body_LogDetail_projects_property_into_scope_via_LogDetailEnricher()
     {
         var services = new ServiceCollection();

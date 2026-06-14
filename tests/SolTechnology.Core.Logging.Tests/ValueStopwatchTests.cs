@@ -1,12 +1,12 @@
 using System.Threading;
 using FluentAssertions;
-using Xunit;
+using NUnit.Framework;
 
 namespace SolTechnology.Core.Logging.Tests;
 
 public class ValueStopwatchTests
 {
-    [Fact]
+    [Test]
     public void StartNew_returns_running_stopwatch()
     {
         var sw = ValueStopwatch.StartNew();
@@ -16,7 +16,7 @@ public class ValueStopwatchTests
         sw.ElapsedMilliseconds.Should().BeGreaterThan(0);
     }
 
-    [Fact]
+    [Test]
     public async Task Two_independent_stopwatches_in_same_async_flow_do_not_share_state()
     {
         // Regression: replacement of the previous AsyncLocal-backed AsyncStopwatch.

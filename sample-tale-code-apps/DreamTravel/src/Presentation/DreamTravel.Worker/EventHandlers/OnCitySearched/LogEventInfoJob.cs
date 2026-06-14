@@ -5,7 +5,7 @@ using SolTechnology.Core.CQRS;
 namespace DreamTravel.Worker.EventHandlers.OnCitySearched;
 
 [UsedImplicitly]
-public class LogEventInfoJob(ILogger<LogEventInfoJob> logger) : INotificationHandler<CitySearched>
+public class LogEventInfoJob(ILogger<LogEventInfoJob> logger) : IEventHandler<CitySearched>
 {
     public Task Handle(CitySearched notification, CancellationToken cancellationToken)
     {

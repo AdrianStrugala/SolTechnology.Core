@@ -9,7 +9,7 @@ using SolTechnology.Core.API.Filters;
 using SolTechnology.Core.CQRS;
 using SolTechnology.Core.CQRS.Errors;
 using SolTechnology.Core.Logging.Correlations;
-using Xunit;
+using NUnit.Framework;
 
 namespace SolTechnology.Core.API.Tests;
 
@@ -19,20 +19,23 @@ namespace SolTechnology.Core.API.Tests;
 /// The previous reflection-based implementation could silently drop the payload under AOT/trim;
 /// these tests would have caught that regression.
 /// </summary>
+[TestFixture]
 public sealed class ResultConversionFilterTests
 {
     private record Payload(string Name, int Count);
 
-    private readonly ICorrelationIdService _correlationIdService = Substitute.For<ICorrelationIdService>();
-    private readonly ResultConversionFilter _filter;
+    private ICorrelationIdService _correlationIdService = null!;
+    private ResultConversionFilter _filter = null!;
 
-    public ResultConversionFilterTests()
+    [SetUp]
+    public void SetUp()
     {
+        _correlationIdService = Substitute.For<ICorrelationIdService>();
         _correlationIdService.GetOrGenerate().Returns(CorrelationId.Generate());
         _filter = new ResultConversionFilter(_correlationIdService);
     }
 
-    [Fact]
+    [Test]
     public async Task GenericResultSuccess_Unwraps_To_RawData_With_Status200()
     {
         // Regression guard for premortem #1: AOT/trim could turn a successful Result<T> into
@@ -47,7 +50,7 @@ public sealed class ResultConversionFilterTests
         result.Value.Should().BeSameAs(payload, "the wire body is the raw DTO, not an envelope");
     }
 
-    [Fact]
+    [Test]
     public async Task NonGenericResultSuccess_Maps_To_204_NoContent()
     {
         var context = BuildResultExecutingContext(Result.Success());
@@ -58,7 +61,7 @@ public sealed class ResultConversionFilterTests
             .Which.StatusCode.Should().Be(StatusCodes.Status204NoContent);
     }
 
-    [Fact]
+    [Test]
     public async Task GenericResultSuccess_With_NullData_Maps_To_204_NoContent()
     {
         // Documented edge case (Result.GetData remarks): a null payload is treated as "no body".
@@ -71,12 +74,12 @@ public sealed class ResultConversionFilterTests
             .Which.StatusCode.Should().Be(StatusCodes.Status204NoContent);
     }
 
-    [Theory]
-    [InlineData(typeof(NotFoundError), StatusCodes.Status404NotFound)]
-    [InlineData(typeof(ConflictError), StatusCodes.Status409Conflict)]
-    [InlineData(typeof(UnauthorizedError), StatusCodes.Status401Unauthorized)]
-    [InlineData(typeof(ForbiddenError), StatusCodes.Status403Forbidden)]
-    [InlineData(typeof(Error), StatusCodes.Status500InternalServerError)]
+    [Test]
+    [TestCase(typeof(NotFoundError), StatusCodes.Status404NotFound)]
+    [TestCase(typeof(ConflictError), StatusCodes.Status409Conflict)]
+    [TestCase(typeof(UnauthorizedError), StatusCodes.Status401Unauthorized)]
+    [TestCase(typeof(ForbiddenError), StatusCodes.Status403Forbidden)]
+    [TestCase(typeof(Error), StatusCodes.Status500InternalServerError)]
     public async Task GenericResultFail_Maps_ErrorSubtype_To_ProblemDetails_WithStatus(
         Type errorType, int expectedStatus)
     {
@@ -93,7 +96,7 @@ public sealed class ResultConversionFilterTests
             .Which.Status.Should().Be(expectedStatus);
     }
 
-    [Fact]
+    [Test]
     public async Task ValidationError_Produces_ValidationProblemDetails_With_PerField_Errors()
     {
         var error = new ValidationError
@@ -116,7 +119,7 @@ public sealed class ResultConversionFilterTests
         problem.Errors.Should().ContainKey("age");
     }
 
-    [Fact]
+    [Test]
     public async Task BareError_Returned_From_Action_Is_Converted_To_ProblemDetails()
     {
         // BadRequest(error) shorthand: action sets ObjectResult.Value = Error directly,
@@ -131,7 +134,7 @@ public sealed class ResultConversionFilterTests
         result.Value.Should().BeAssignableTo<ProblemDetails>();
     }
 
-    [Fact]
+    [Test]
     public async Task NonResultPayload_Is_Passed_Through_Untouched()
     {
         // DTO returned directly from controller — filter must not touch it.
@@ -145,7 +148,7 @@ public sealed class ResultConversionFilterTests
         result.StatusCode.Should().BeNull("filter must not override status for non-Result values");
     }
 
-    [Fact]
+    [Test]
     public async Task Failed_Result_Without_Error_Falls_Back_To_500_ProblemDetails()
     {
         // Malformed Result (IsSuccess=false but Error=null) — must still produce a valid body,
@@ -160,7 +163,7 @@ public sealed class ResultConversionFilterTests
         result.Value.Should().BeAssignableTo<ProblemDetails>();
     }
 
-    [Fact]
+    [Test]
     public async Task Error_CorrelationId_Is_Preserved_When_Already_Set()
     {
         // Source-of-truth contract: if the error already carries a correlation id (e.g. set by

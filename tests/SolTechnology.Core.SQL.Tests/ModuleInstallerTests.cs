@@ -1,10 +1,12 @@
+using FluentAssertions;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using SolTechnology.Core.SQL.Connections;
-using Xunit;
+using NUnit.Framework;
 
 namespace SolTechnology.Core.SQL.Tests
 {
+    [TestFixture]
     public class ModuleInstallerTests
     {
         private readonly WebApplicationBuilder _sut;
@@ -14,27 +16,24 @@ namespace SolTechnology.Core.SQL.Tests
             _sut = WebApplication.CreateBuilder();
         }
 
-        [Fact]
+        [Test]
         public void AddSQL_ConfigurationProvidedAsParameter_SQLServicesAreAddedToServiceCollection()
         {
-
             //Arrange
             SQLConfiguration sqlConfiguration = new SQLConfiguration
             {
                 ConnectionString = "ExampleConnectionString"
             };
 
-
             //Act
             _sut.Services.AddSQL(sqlConfiguration);
-
 
             //Assert
             var app = _sut.Build();
 
-            ISQLConnectionFactory? sqlConnectionFactory = app.Services.GetService<ISQLConnectionFactory>();
-            Assert.NotNull(sqlConnectionFactory);
-            Assert.Equal(sqlConfiguration.ConnectionString, sqlConnectionFactory.GetConnectionString());
+            var sqlConnectionFactory = app.Services.GetService<ISQLConnectionFactory>();
+            sqlConnectionFactory.Should().NotBeNull();
+            sqlConnectionFactory!.GetConnectionString().Should().Be(sqlConfiguration.ConnectionString);
         }
     }
 }

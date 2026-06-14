@@ -1,5 +1,4 @@
-﻿using DreamTravel.Infrastructure.Events;
-using Microsoft.Extensions.DependencyInjection;
+﻿﻿using Microsoft.Extensions.DependencyInjection;
 
 namespace DreamTravel.Infrastructure
 {
@@ -7,7 +6,6 @@ namespace DreamTravel.Infrastructure
     {
         public static IServiceCollection InstallInfrastructure(this IServiceCollection services)
         {
-            services.AddTransient<IHangfireNotificationPublisher, HangfireNotificationPublisher>();
 
             return services;
         }

@@ -12,14 +12,3 @@ public interface ICommand : ICommand<Nothing> { }
 /// </summary>
 public interface ICommand<TResult> { }
 
-/// <summary>
-/// Marker for a query that returns <typeparamref name="TResult"/>.
-/// Handler returns <see cref="Result{TResult}"/>. Queries must be side-effect-free.
-/// </summary>
-public interface IQuery<TResult> { }
-
-/// <summary>
-/// Marker for a notification dispatched fire-and-forget to all registered handlers.
-/// </summary>
-public interface INotification { }
-

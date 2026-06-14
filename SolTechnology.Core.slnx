@@ -15,6 +15,7 @@
     <File Path="docs/theDesign.md" />
     <File Path="docs/theQuality.md" />
     <File Path="docs\BlobStorage.Testing.md" />
+    <File Path="docs\Hangfire.md" />
     <File Path="docs\HTTP-Production-Checklist.md" />
     <File Path="docs\HTTP.Testing.md" />
     <File Path="docs\Redis.Testing.md" />
@@ -81,15 +82,16 @@
     </Folder>
   </Folder>
   <Folder Name="/Tests/">
+    <File Path="tests\Directory.Build.props" />
     <Project Path="tests/SolTechnology.Core.API.Tests/SolTechnology.Core.API.Tests.csproj" />
     <Project Path="tests/SolTechnology.Core.HTTP.Tests/SolTechnology.Core.HTTP.Tests.csproj" />
     <Project Path="tests/SolTechnology.Core.AUID.Tests/SolTechnology.Core.AUID.Tests.csproj" />
-    <Project Path="tests/SolTechnology.Core.Guards.Tests/SolTechnology.Core.Guards.Tests.csproj" />
     <Project Path="tests/SolTechnology.Core.Logging.Tests/SolTechnology.Core.Logging.Tests.csproj" />
     <Project Path="tests/SolTechnology.Core.SQL.Tests/SolTechnology.Core.SQL.Tests.csproj" />
     <Project Path="tests/SolTechnology.Core.Story.Tests/SolTechnology.Core.Story.Tests.csproj" />
     <Project Path="tests/SolTechnology.Core.MessageBus.Tests/SolTechnology.Core.MessageBus.Tests.csproj" />
     <Project Path="tests/SolTechnology.Core.CQRS.Tests/SolTechnology.Core.CQRS.Tests.csproj" />
+    <Project Path="tests/SolTechnology.Core.Hangfire.Tests/SolTechnology.Core.Hangfire.Tests.csproj" />
   </Folder>
   <Folder Name="/src/">
     <File Path="src/Directory.Build.props" />
@@ -103,10 +105,10 @@
     <Project Path="src/SolTechnology.Core.CQRS/SolTechnology.Core.CQRS.csproj" />
     <Project Path="src/SolTechnology.Core.HTTP.Testing/SolTechnology.Core.HTTP.Testing.csproj" />
     <Project Path="src/SolTechnology.Core.Story/SolTechnology.Core.Story.csproj" />
-    <Project Path="src/SolTechnology.Core.Guards/SolTechnology.Core.Guards.csproj" />
     <Project Path="src/SolTechnology.Core.Logging/SolTechnology.Core.Logging.csproj" />
     <Project Path="src/SolTechnology.Core.MessageBus/SolTechnology.Core.MessageBus.csproj" />
     <Project Path="src/SolTechnology.Core.Scheduler/SolTechnology.Core.Scheduler.csproj" />
+    <Project Path="src/SolTechnology.Core.Hangfire/SolTechnology.Core.Hangfire.csproj" />
     <Project Path="src/SolTechnology.Core.SQL/SolTechnology.Core.SQL.csproj" />
     <Project Path="src/SolTechnology.Core.Testing/SolTechnology.Core.Testing.csproj" />
     <Project Path="src/SolTechnology.Core.SQL.Testing/SolTechnology.Core.SQL.Testing.csproj" />

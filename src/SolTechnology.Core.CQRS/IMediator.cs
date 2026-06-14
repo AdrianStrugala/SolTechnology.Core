@@ -1,9 +1,9 @@
 namespace SolTechnology.Core.CQRS;
 
 /// <summary>
-/// Dispatches commands, queries, and notifications through the CQRS pipeline.
+/// Dispatches commands, queries, and events through the CQRS pipeline.
 /// Overload resolution on marker types (<see cref="ICommand"/>, <see cref="IQuery{TResult}"/>,
-/// <see cref="INotification"/>) distinguishes intent at compile time.
+/// <see cref="IEvent"/>) distinguishes intent at compile time.
 /// </summary>
 public interface IMediator
 {
@@ -17,17 +17,16 @@ public interface IMediator
     Task<Result<TResult>> Send<TResult>(IQuery<TResult> query, CancellationToken cancellationToken = default);
 
     /// <summary>
-    /// Fire-and-forget dispatch to every registered <see cref="INotificationHandler{T}"/>.
-    /// Returns immediately. Every handler runs on its own background task with a fresh DI scope.
-    /// Failures are isolated and logged — they never propagate to the caller and never stop other handlers.
+    /// Fire-and-forget dispatch to every registered <see cref="IEventHandler{T}"/> via
+    /// <see cref="IEventPublisher"/>. Failures are isolated — never propagate to the caller.
     /// </summary>
-    void Publish<TNotification>(TNotification notification) where TNotification : INotification;
+    void Publish<TEvent>(TEvent notification) where TEvent : IEvent;
 
     /// <summary>
-    /// Non-generic overload for runtime dispatch when the concrete notification type is not
+    /// Non-generic overload for runtime dispatch when the concrete event type is not
     /// known at compile time (e.g. deserialized from a queue).
     /// </summary>
-    void Publish(INotification notification);
+    void Publish(IEvent notification);
 }
 
 

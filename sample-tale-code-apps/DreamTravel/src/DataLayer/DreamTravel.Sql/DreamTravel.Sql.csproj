@@ -23,6 +23,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\..\..\..\src\SolTechnology.Core.AUID\SolTechnology.Core.AUID.csproj" />
+    <ProjectReference Include="..\..\..\..\..\src\SolTechnology.Core.Hangfire\SolTechnology.Core.Hangfire.csproj" />
     <ProjectReference Include="..\..\..\..\..\src\SolTechnology.Core.SQL\SolTechnology.Core.SQL.csproj" />
     <ProjectReference Include="..\..\DreamTravel.Domain\DreamTravel.Domain.csproj" />
   </ItemGroup>

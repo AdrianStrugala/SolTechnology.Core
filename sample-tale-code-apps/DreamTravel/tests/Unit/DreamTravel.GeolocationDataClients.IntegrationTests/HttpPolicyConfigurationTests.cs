@@ -1,37 +1,13 @@
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using DreamTravel.GeolocationDataClients.GeoDb;
-using DreamTravel.GeolocationDataClients.GoogleApi;
-using DreamTravel.GeolocationDataClients.MichelinApi;
 using FluentAssertions;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
+using NUnit.Framework;
 using SolTechnology.Core.HTTP;
-using Xunit;
 
 namespace DreamTravel.GeolocationDataClients.IntegrationTests;
 
-/// <summary>
-/// Pins the per-client <see cref="HttpPolicyConfiguration"/> contract that
-/// DreamTravel relies on after the <c>SolTechnology.Core.HTTP</c> 0.7.0 rework.
-/// <para>
-/// These tests are configuration-only — they do not hit any external endpoint.
-/// They guard against silent drift in the per-client <c>Policy</c> sections
-/// (timeouts, retry budgets, overall budget) the operator team tunes for
-/// prod incidents.
-/// </para>
-/// </summary>
+[TestFixture]
 public sealed class HttpPolicyConfigurationTests
 {
-    /// <summary>
-    /// Composes a minimal host that mirrors what <c>DreamTravel.Api</c> does at
-    /// startup for the three geolocation clients. Config is supplied inline so
-    /// the test is independent of the appsettings.json files on disk.
-    /// </summary>
     private static WebApplication BuildHost(IDictionary<string, string?> config)
     {
         var builder = WebApplication.CreateBuilder();
@@ -40,14 +16,9 @@ public sealed class HttpPolicyConfigurationTests
         return builder.Build();
     }
 
-    [Fact]
+    [Test]
     public void Google_DefaultDevPolicy_FromAppSettings_IsApplied()
     {
-        // Mirrors the per-client Policy block in
-        // src/Presentation/DreamTravel.Api/appsettings.json. If those values
-        // change in config but the test is not updated, the prod incident
-        // we tuned them against may resurface — this test forces an explicit
-        // re-acknowledgement.
         using var app = BuildHost(new Dictionary<string, string?>
         {
             ["HTTPClients:Google:BaseAddress"] = "http://localhost:2137/google/",
@@ -70,11 +41,9 @@ public sealed class HttpPolicyConfigurationTests
             "DreamTravel geolocation clients are GET-only; retrying unsafe verbs is never wanted");
     }
 
-    [Fact]
+    [Test]
     public void GeoDb_RateLimitFriendlyPolicy_IsApplied()
     {
-        // GeoDB free-tier hits 429 under load. The dev config picks a higher
-        // RetryInitialDelay so we don't hammer immediately on backoff start.
         using var app = BuildHost(new Dictionary<string, string?>
         {
             ["HTTPClients:Google:BaseAddress"] = "http://x/",
@@ -95,15 +64,9 @@ public sealed class HttpPolicyConfigurationTests
         policy.RequestTimeout.Should().Be(10_000);
     }
 
-    [Fact]
+    [Test]
     public void AllClients_FallBackTo070ProductionDefaults_WhenNoPolicyOverride()
     {
-        // Smoke regression for the policy contract — we resolve options
-        // directly rather than the typed clients themselves because the
-        // production clients pull additional dependencies (caching decorator
-        // for Google) that this test deliberately does not compose. The point
-        // is to pin the per-client Polly defaults DreamTravel inherits from
-        // SolTechnology.Core.HTTP 0.7.0.
         using var app = BuildHost(new Dictionary<string, string?>
         {
             ["HTTPClients:Google:BaseAddress"] = "http://localhost/",
@@ -126,16 +89,12 @@ public sealed class HttpPolicyConfigurationTests
         }
     }
 
-    [Fact]
+    [Test]
     public async Task MissingBaseAddress_FailsHostStartup_ThanksToValidateOnStart()
     {
-        // .ValidateOnStart() runs validators when IHost.StartAsync fires (not
-        // at .Build()). DreamTravel inherits this from Core.HTTP — exercise
-        // the same path the production host hits at deploy time.
         var builder = WebApplication.CreateBuilder();
         builder.Configuration.AddInMemoryCollection(new Dictionary<string, string?>
         {
-            // GeoDb deliberately missing BaseAddress.
             ["HTTPClients:Google:BaseAddress"] = "http://localhost/",
             ["HTTPClients:Google:Options:Key"] = "k",
             ["HTTPClients:Michelin:BaseAddress"] = "http://localhost/",

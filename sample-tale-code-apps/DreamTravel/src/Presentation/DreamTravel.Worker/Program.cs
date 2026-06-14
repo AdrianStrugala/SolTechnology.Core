@@ -8,6 +8,7 @@ using EntityGraphQL.AspNet;
 using Hangfire;
 using SolTechnology.Core.Cache;
 using SolTechnology.Core.CQRS;
+using SolTechnology.Core.Hangfire;
 using SolTechnology.Core.SQL;
 using System.Globalization;
 using DreamTravel.DomainServices;
@@ -51,7 +52,10 @@ public class Program
 
         //CQRS
         builder.Services.AddCQRS(assemblies: typeof(Program).Assembly);
+        builder.Services.AddPersistentEvents();
 
+        //JOBS
+        builder.Services.AddRecurringJob<FetchTrafficJob>(Cron.Never());
         builder.Services.AddHangfireServer();
 
         //APP
@@ -59,11 +63,6 @@ public class Program
 
         app.MapDefaultEndpoints();
 
-        var recurringJobManager = app.Services.GetRequiredService<IRecurringJobManager>();
-        recurringJobManager.AddOrUpdate("LogFromJob", () => Console.WriteLine("Hello from Job"), Cron.Daily);
-
-
-        FetchTrafficJob.Register();
 
         app.MapHangfireDashboard("/hangfire/ui");
         app.MapGraphQL<DreamTripsDbContext>(); // default url: /graphql

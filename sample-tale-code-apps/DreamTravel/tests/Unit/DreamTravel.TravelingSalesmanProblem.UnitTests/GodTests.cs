@@ -1,14 +1,16 @@
 using System;
 using System.Linq;
-using Xunit;
+using FluentAssertions;
+using NUnit.Framework;
 
 namespace DreamTravel.TravelingSalesmanProblem.UnitTests
 {
+    [TestFixture]
     public class GodTests
     {
         readonly DreamTravel.TravelingSalesmanProblem.God _sut = new DreamTravel.TravelingSalesmanProblem.God();
 
-        [Fact]
+        [Test]
         public void SolveTSP_RunWithValidParameters_FirstAndLastCitiesStaysTheSame()
         {
             //Arrange
@@ -25,11 +27,11 @@ namespace DreamTravel.TravelingSalesmanProblem.UnitTests
             var result = _sut.SolveTSP(distances.ToList());
 
             //Assert
-            Assert.Equal(0, result[0]);
-            Assert.Equal(noOfCities - 1, result.Last());
+            result[0].Should().Be(0);
+            result.Last().Should().Be(noOfCities - 1);
         }
 
-        [Fact]
+        [Test]
         public void SolveTSP_RunWithValidParameters_EachCityAppearsOnlyOnce()
         {
             //Arrange
@@ -47,13 +49,10 @@ namespace DreamTravel.TravelingSalesmanProblem.UnitTests
             var result = _sut.SolveTSP(distances.ToList());
 
             //Assert
-            Assert.Equal(1, result.Count(i => i.Equals(0)));
-            Assert.Equal(1, result.Count(i => i.Equals(1)));
-            Assert.Equal(1, result.Count(i => i.Equals(2)));
-            Assert.Equal(1, result.Count(i => i.Equals(3)));
-            Assert.Equal(1, result.Count(i => i.Equals(4)));
-            Assert.Equal(1, result.Count(i => i.Equals(5)));
-            Assert.Equal(1, result.Count(i => i.Equals(6)));
+            for (int i = 0; i < noOfCities; i++)
+            {
+                result.Count(x => x.Equals(i)).Should().Be(1);
+            }
         }
     }
 }

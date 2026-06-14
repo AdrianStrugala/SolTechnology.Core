@@ -7,16 +7,19 @@ using DreamTravel.Queries.CalculateBestPath;
 using DreamTravel.Queries.CalculateBestPath.Chapters;
 using FluentAssertions;
 using NSubstitute;
+using NUnit.Framework;
 
 namespace DreamTravel.Queries.UnitTests.CalculateBestPath
 {
+    [TestFixture]
     public class DownloadRoadDataTests
     {
-        private readonly DownloadRoadData _sut;
-        private readonly IGoogleHTTPClient _googleHTTPClient;
-        private readonly IMichelinHTTPClient _michelinHTTPClient;
+        private DownloadRoadData _sut = null!;
+        private IGoogleHTTPClient _googleHTTPClient = null!;
+        private IMichelinHTTPClient _michelinHTTPClient = null!;
 
-        public DownloadRoadDataTests()
+        [SetUp]
+        public void Setup()
         {
             var fixture = new Fixture().Customize(
                 new AutoNSubstituteCustomization { ConfigureMembers = true });
@@ -25,8 +28,9 @@ namespace DreamTravel.Queries.UnitTests.CalculateBestPath
             _michelinHTTPClient = fixture.Freeze<IMichelinHTTPClient>();
 
             _sut = fixture.Create<DownloadRoadData>();
-        } 
-        [Fact]
+        }
+
+        [Test]
         public async Task Execute_ShouldPopulateContextWithRoadData()
         {
             // Arrange: Create a list of 3 cities.
@@ -62,7 +66,7 @@ namespace DreamTravel.Queries.UnitTests.CalculateBestPath
             result.IsSuccess.Should().BeTrue();
             context.TollDistances.Should().Equal(tollMatrix);
             context.FreeDistances.Should().Equal(freeMatrix);
-            
+
             context.Costs.Length.Should().Be(expectedLength);
             context.VinietaCosts.Length.Should().Be(expectedLength);
             for (int i = 0; i < expectedLength; i++)

@@ -1,19 +1,16 @@
 using DreamTravel.Commands.FetchTraffic;
-using Hangfire;
+using SolTechnology.Core.CQRS;
+using SolTechnology.Core.Hangfire;
 
 namespace DreamTravel.Worker.BackgroundJobs;
 
-public static class FetchTrafficJob
+public class FetchTrafficJob(IMediator mediator) : IJob
 {
-    public static void Register()
+    public async Task Execute(CancellationToken cancellationToken)
     {
-        RecurringJob.AddOrUpdate<FetchTrafficHandler>(
-            "traffic-regular-update",
-            handler => handler.Handle(new FetchTrafficCommand
-            {
-                DepartureTime = new DateTime(2025, 10, 1, 14, 0, 0)
-            }, CancellationToken.None),
-            Cron.Never
-        );
+        await mediator.Send(new FetchTrafficCommand
+        {
+            DepartureTime = new DateTime(2025, 10, 1, 14, 0, 0, DateTimeKind.Utc)
+        }, cancellationToken);
     }
 }

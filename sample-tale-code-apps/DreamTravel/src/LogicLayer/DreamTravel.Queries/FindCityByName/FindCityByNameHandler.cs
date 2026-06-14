@@ -1,6 +1,5 @@
-﻿﻿using System.Diagnostics;
+﻿﻿﻿using System.Diagnostics;
 using DreamTravel.DomainServices.CityDomain;
-using DreamTravel.Infrastructure.Events;
 using DreamTravel.Domain.Cities;
 using DreamTravel.Domain.Events;
 using DreamTravel.GeolocationDataClients.GoogleApi;
@@ -11,7 +10,7 @@ namespace DreamTravel.Queries.FindCityByName
 {
     public class FindCityByNameHandler(
         ICityDomainService cityDomainService,
-        IHangfireNotificationPublisher hangfireNotificationPublisher,
+        IMediator mediator,
         ILogger<FindCityByNameHandler> logger)
         : IQueryHandler<FindCityByNameQuery, City>
     {
@@ -28,7 +27,7 @@ namespace DreamTravel.Queries.FindCityByName
             result = await cityDomainService.Get(query.Name);
             logger.LogInformation($"FindCityByName. Cache hit took: [{stopwatch.ElapsedMilliseconds}]ms");
 
-            hangfireNotificationPublisher.Publish(new CitySearched { City = result });
+            mediator.Publish(new CitySearched { City = result });
 
             stopwatch.Stop();
 

@@ -1,14 +1,16 @@
 using DreamTravel.Domain.Cities;
 using DreamTravel.Queries.CalculateBestPath;
 using DreamTravel.Queries.CalculateBestPath.Chapters;
-
+using FluentAssertions;
+using SolTechnology.Core.CQRS;
 namespace DreamTravel.Queries.UnitTests.CalculateBestPath
 {
+    [TestFixture]
     public class FindProfitablePathTests
     {
         private readonly FindProfitablePath _sut = new();
 
-        [Fact]
+        [Test]
         public async Task EvaluateCost_ValidData_IntelligentResults()
         {
             //Arrange
@@ -49,28 +51,28 @@ namespace DreamTravel.Queries.UnitTests.CalculateBestPath
             };
 
 
-            //Act 
+            //Act
             await _sut.Read(matrix);
 
 
             //Assert
             //1) takes profitable road
-            Assert.Equal(20, matrix.OptimalDistances[2]);
-            Assert.Equal(19, matrix.OptimalCosts[2]);
-            Assert.Equal(20, matrix.OptimalDistances[6]);
-            Assert.Equal(19, matrix.OptimalCosts[6]);
+            matrix.OptimalDistances[2].Should().Be(20);
+            matrix.OptimalCosts[2].Should().Be(19);
+            matrix.OptimalDistances[6].Should().Be(20);
+            matrix.OptimalCosts[6].Should().Be(19);
 
             //2) Rejects non-profitable road
-            Assert.Equal(100, matrix.OptimalDistances[1]);
-            Assert.Equal(0, matrix.OptimalCosts[1]);
-            Assert.Equal(100, matrix.OptimalDistances[3]);
-            Assert.Equal(0, matrix.OptimalCosts[3]);
+            matrix.OptimalDistances[1].Should().Be(100);
+            matrix.OptimalCosts[1].Should().Be(0);
+            matrix.OptimalDistances[3].Should().Be(100);
+            matrix.OptimalCosts[3].Should().Be(0);
 
             //3) Rejects toll road longer than free
-            Assert.Equal(300, matrix.OptimalDistances[5]);
-            Assert.Equal(0, matrix.OptimalCosts[5]);
-            Assert.Equal(300, matrix.OptimalDistances[7]);
-            Assert.Equal(0, matrix.OptimalCosts[7]);
+            matrix.OptimalDistances[5].Should().Be(300);
+            matrix.OptimalCosts[5].Should().Be(0);
+            matrix.OptimalDistances[7].Should().Be(300);
+            matrix.OptimalCosts[7].Should().Be(0);
         }
     }
 }

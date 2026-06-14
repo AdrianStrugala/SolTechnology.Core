@@ -37,6 +37,13 @@ public sealed record CorrelationId
 
     public string Value { get; }
 
+    /// <summary>Wraps an existing correlation id string (e.g. restored from a job parameter).</summary>
+    public static CorrelationId FromString(string value)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(value);
+        return new CorrelationId(value);
+    }
+
     /// <summary>Generates a new id, preferring <see cref="Activity.Current"/>'s trace id.</summary>
     public static CorrelationId Generate()
     {

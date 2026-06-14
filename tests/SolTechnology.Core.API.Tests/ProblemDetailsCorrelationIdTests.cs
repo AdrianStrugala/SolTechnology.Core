@@ -2,7 +2,7 @@ using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using SolTechnology.Core.API;
-using Xunit;
+using NUnit.Framework;
 
 namespace SolTechnology.Core.API.Tests;
 
@@ -18,7 +18,7 @@ public sealed class ProblemDetailsCorrelationIdTests
     // Wire contract key — pinned as a literal so this test fails loudly if anyone renames the
     // internal constant. The string IS the contract; clients query the body by this exact name.
     private const string CorrelationIdKey = "correlationId";
-    [Fact]
+    [Test]
     public void Framework_ProblemDetails_Outside_Mvc_Carries_CorrelationId()
     {
         // The framework calls CustomizeProblemDetails through IProblemDetailsService.WriteAsync;
@@ -39,7 +39,7 @@ public sealed class ProblemDetailsCorrelationIdTests
         problem.Extensions[CorrelationIdKey].Should().NotBeNull();
     }
 
-    [Fact]
+    [Test]
     public void Existing_CorrelationId_Is_Not_Overwritten()
     {
         // The MVC filters set correlationId before the framework hook runs. The hook must be

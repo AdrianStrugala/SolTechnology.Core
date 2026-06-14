@@ -84,7 +84,7 @@ indexes are routing hints, not contracts.
 | documentation-cleanup | [`.github/skills/documentation-cleanup/SKILL.md`](.github/skills/documentation-cleanup/SKILL.md) | Validating docs integrity (module/doc parity, indexes, Mermaid, ADRs). |
 | package-management | [`.github/skills/package-management/SKILL.md`](.github/skills/package-management/SKILL.md) | Adding / bumping a `PackageReference` — looks up the canonical version, prevents drift and version-by-memory hallucination. |
 | dependency-audit | [`.github/skills/dependency-audit/SKILL.md`](.github/skills/dependency-audit/SKILL.md) | Resolving `NU1901`–`NU1904` CVE warnings or `NU1605` downgrades. Drives the parent-lookup → fix-at-source → override-only-as-last-resort flow from §5. |
-| test-writing | [`.github/skills/test-writing/SKILL.md`](.github/skills/test-writing/SKILL.md) | Authoring or extending tests under `tests/` (xUnit) or sample apps (NUnit for DreamTravel). Encodes the FluentAssertions + NSubstitute + AutoFixture stack and the `// Arrange` / `// Act` / `// Assert` convention from `ClaudeCodingGuide.md` §8. |
+| test-writing | [`.github/skills/test-writing/SKILL.md`](.github/skills/test-writing/SKILL.md) | Authoring or extending tests under `tests/` (NUnit) or sample apps (NUnit for DreamTravel). Encodes the FluentAssertions + NSubstitute + AutoFixture stack and the `// Arrange` / `// Act` / `// Assert` convention from `ClaudeCodingGuide.md` §8. |
 | refactor | [`.github/skills/refactor/SKILL.md`](.github/skills/refactor/SKILL.md) | Behaviour-preserving cleanup inside a single module — rename internals, split a class above the §9 size budget, extract a primary constructor, remove `#region`, pay down a §15 anti-pattern. Routes to `implementation-planning` if scope grows past one module or touches a public symbol. |
 | implement-plan | [`.github/skills/implement-plan/SKILL.md`](.github/skills/implement-plan/SKILL.md) | Executing one step from an ADR's `to-do/` or `reviewed/` folder. Moves the file to `done/`, updates the summary, optionally records deviations. |
 
@@ -264,3 +264,69 @@ If any item fails, fix it before yielding.
 | Interactive story fails immediately | Persistence is opt-out. `RegisterStories(StoryOptions.WithoutPersistence())` disables `StoryManager`; switch to `WithInMemoryPersistence()` (default) or `WithSqlitePersistence(...)`. |
 | Workload missing on CI | Run `dotnet workload restore SolTechnology.Core.slnx` before `restore` / `build`. See `.github/workflows/publishPackages.yml`. |
 | Edits applied via tool don't show in `git diff` | An IDE buffer is overwriting the file. Ask the user to close the file in their IDE, then re-apply. |
+
+# CLAUDE.md
+
+Behavioral guidelines to reduce common LLM coding mistakes. Merge with project-specific instructions as needed.
+
+**Tradeoff:** These guidelines bias toward caution over speed. For trivial tasks, use judgment.
+
+## 1. Think Before Coding
+
+**Don't assume. Don't hide confusion. Surface tradeoffs.**
+
+Before implementing:
+- State your assumptions explicitly. If uncertain, ask.
+- If multiple interpretations exist, present them - don't pick silently.
+- If a simpler approach exists, say so. Push back when warranted.
+- If something is unclear, stop. Name what's confusing. Ask.
+
+## 2. Simplicity First
+
+**Minimum code that solves the problem. Nothing speculative.**
+
+- No features beyond what was asked.
+- No abstractions for single-use code.
+- No "flexibility" or "configurability" that wasn't requested.
+- No error handling for impossible scenarios.
+- If you write 200 lines and it could be 50, rewrite it.
+
+Ask yourself: "Would a senior engineer say this is overcomplicated?" If yes, simplify.
+
+## 3. Surgical Changes
+
+**Touch only what you must. Clean up only your own mess.**
+
+When editing existing code:
+- Don't "improve" adjacent code, comments, or formatting.
+- Don't refactor things that aren't broken.
+- Match existing style, even if you'd do it differently.
+- If you notice unrelated dead code, mention it - don't delete it.
+
+When your changes create orphans:
+- Remove imports/variables/functions that YOUR changes made unused.
+- Don't remove pre-existing dead code unless asked.
+
+The test: Every changed line should trace directly to the user's request.
+
+## 4. Goal-Driven Execution
+
+**Define success criteria. Loop until verified.**
+
+Transform tasks into verifiable goals:
+- "Add validation" → "Write tests for invalid inputs, then make them pass"
+- "Fix the bug" → "Write a test that reproduces it, then make it pass"
+- "Refactor X" → "Ensure tests pass before and after"
+
+For multi-step tasks, state a brief plan:
+```
+1. [Step] → verify: [check]
+2. [Step] → verify: [check]
+3. [Step] → verify: [check]
+```
+
+Strong success criteria let you loop independently. Weak criteria ("make it work") require constant clarification.
+
+---
+
+**These guidelines are working if:** fewer unnecessary changes in diffs, fewer rewrites due to overcomplication, and clarifying questions come before implementation rather than after mistakes.

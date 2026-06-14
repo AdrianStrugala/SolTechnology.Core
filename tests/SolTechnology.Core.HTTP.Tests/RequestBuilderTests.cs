@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 using FluentAssertions;
 using RichardSzalay.MockHttp;
 using SolTechnology.Core.HTTP;
-using Xunit;
+using NUnit.Framework;
 
 namespace SolTechnology.Core.HTTP.Tests;
 
@@ -41,7 +41,7 @@ public sealed class RequestBuilderTests
 
     // ---- Happy path: typed verbs -----------------------------------------
 
-    [Fact]
+    [Test]
     public async Task GetAsync_TypedSuccessfulResponse_DeserializesBody()
     {
         var (client, mock) = NewClient();
@@ -55,11 +55,11 @@ public sealed class RequestBuilderTests
         result.Should().BeEquivalentTo(new Match(1, "A", "B", 3));
     }
 
-    [Theory]
-    [InlineData("post")]
-    [InlineData("put")]
-    [InlineData("patch")]
-    [InlineData("delete")]
+    [Test]
+    [TestCase("post")]
+    [TestCase("put")]
+    [TestCase("patch")]
+    [TestCase("delete")]
     public async Task TypedVerbs_AllSucceed(string verb)
     {
         var (client, mock) = NewClient();
@@ -86,7 +86,7 @@ public sealed class RequestBuilderTests
         result.Score.Should().BeNull();
     }
 
-    [Fact]
+    [Test]
     public async Task PostAsync_TypedBody_SerializesJson()
     {
         var (client, mock) = NewClient();
@@ -103,7 +103,7 @@ public sealed class RequestBuilderTests
         mock.VerifyNoOutstandingExpectation();
     }
 
-    [Fact]
+    [Test]
     public async Task PostAsync_Body_SetsApplicationJsonContentType()
     {
         var (client, mock) = NewClient();
@@ -118,7 +118,7 @@ public sealed class RequestBuilderTests
         captured!.MediaType.Should().Be("application/json");
     }
 
-    [Fact]
+    [Test]
     public async Task WithJsonOptions_AppliesPerRequestSerializerOptions()
     {
         // Override the default (PropertyNamingPolicy=null) with camelCase to
@@ -144,7 +144,7 @@ public sealed class RequestBuilderTests
         capturedBody.Should().Contain("\"homeTeam\"").And.NotContain("\"HomeTeam\"");
     }
 
-    [Fact]
+    [Test]
     public async Task WithHeader_SuppliedHeader_AppearsOnOutgoingRequest()
     {
         var (client, mock) = NewClient();
@@ -164,7 +164,7 @@ public sealed class RequestBuilderTests
 
     // ---- Builder reuse — regression test for the request-already-sent bug
 
-    [Fact]
+    [Test]
     public async Task Builder_ReusedAcrossMultipleSends_DoesNotThrow()
     {
         var (client, mock) = NewClient();
@@ -182,7 +182,7 @@ public sealed class RequestBuilderTests
 
     // ---- Error path -------------------------------------------------------
 
-    [Fact]
+    [Test]
     public async Task Send_NonSuccessStatus_DefaultPolicy_ExcludesResponseBody()
     {
         // Default policy: IncludeResponseBodyInException = false. The body
@@ -203,7 +203,7 @@ public sealed class RequestBuilderTests
         ex.ResponseBody.Should().BeNull("response body capture is opt-in");
     }
 
-    [Fact]
+    [Test]
     public async Task Send_NonSuccessStatus_OptedInPolicy_PopulatesResponseBody()
     {
         var (client, mock) = NewClient();
@@ -218,7 +218,7 @@ public sealed class RequestBuilderTests
         ex.ResponseBody.Should().Be("""{"error":"not found"}""");
     }
 
-    [Fact]
+    [Test]
     public async Task Send_NonSuccessStatus_ExceptionMessageDoesNotLeakResponseBody()
     {
         // Belt-and-braces: even when body capture is opted in, the captured
@@ -239,7 +239,7 @@ public sealed class RequestBuilderTests
         ex.ResponseBody.Should().Be(secret);
     }
 
-    [Fact]
+    [Test]
     public async Task Send_NonSuccessStatus_ExceptionToStringDoesNotLeakResponseBody()
     {
         // Logger formatters in the wild call .ToString() on exceptions. Our
@@ -258,7 +258,7 @@ public sealed class RequestBuilderTests
         ex.ToString().Should().NotContain(secret);
     }
 
-    [Fact]
+    [Test]
     public async Task Send_LargeErrorBody_TruncatesAtCap()
     {
         var oversize = new string('x', 64 * 1024);
@@ -279,7 +279,7 @@ public sealed class RequestBuilderTests
 
     // ---- Cancellation -----------------------------------------------------
 
-    [Fact]
+    [Test]
     public async Task GetAsync_CallerCancelsToken_PropagatesOperationCanceled()
     {
         var (client, mock) = NewClient();
@@ -301,7 +301,7 @@ public sealed class RequestBuilderTests
 
     // ---- Policy options flow ---------------------------------------------
 
-    [Fact]
+    [Test]
     public void CreateRequest_WithPolicy_AttachesPolicyToRequestOptions()
     {
         // White-box test: the policy must travel via HttpRequestMessage.Options

@@ -1,4 +1,4 @@
-﻿using System.Reflection;
+﻿﻿using System.Reflection;
 using FluentValidation;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
@@ -13,7 +13,7 @@ namespace SolTechnology.Core.CQRS;
 public static class ModuleInstaller
 {
     /// <summary>
-    /// Registers the in-house mediator, pipeline behaviors, command/query/notification handlers,
+    /// Registers the in-house mediator, pipeline behaviors, command/query/event handlers,
     /// and (optionally) FluentValidation validators from the specified assemblies.
     /// Idempotent — safe to call multiple times.
     /// </summary>
@@ -29,6 +29,10 @@ public static class ModuleInstaller
 
         // Register mediator (scoped — shares request lifetime)
         services.TryAddScoped<IMediator, CQRSMediator>();
+
+        // Register event dispatch seam defaults (plugin can replace the publisher)
+        services.TryAddSingleton<IEventPublisher, InMemoryEventPublisher>();
+        services.TryAddScoped<IEventDispatcher, EventDispatcher>();
 
         // Register pipeline behaviors
         if (options.UseLogging)
@@ -47,7 +51,7 @@ public static class ModuleInstaller
             RegisterHandlers(services, assembly, typeof(ICommandHandler<>));
             RegisterHandlers(services, assembly, typeof(ICommandHandler<,>));
             RegisterHandlers(services, assembly, typeof(IQueryHandler<,>));
-            RegisterHandlers(services, assembly, typeof(INotificationHandler<>));
+            RegisterHandlers(services, assembly, typeof(IEventHandler<>));
 
             if (options.UseFluentValidation)
             {

@@ -2,19 +2,21 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using DreamTravel.Domain.Cities;
 using DreamTravel.GeolocationDataClients.MichelinApi;
+using FluentAssertions;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
 using NSubstitute;
-using Xunit;
+using NUnit.Framework;
 
 namespace DreamTravel.GeolocationDataClients.IntegrationTests.MichelinApi
 {
+    [TestFixture]
     public class DownloadCostBetweenTwoCitiesTests
     {
         private readonly MichelinHTTPClient _sut = new MichelinHTTPClient(Options.Create(new MichelinHTTPOptions()), Substitute.For<HttpClient>(), NullLogger<MichelinHTTPClient>.Instance);
 
 
-        [Fact(Skip = "Paid test")]
+        [Test, Ignore("Paid test")]
         public async Task DownloadCostBetweenTwoCities_InvokeWithValidCities_ReturnsSomeCost()
         {
             //Arrange
@@ -36,11 +38,11 @@ namespace DreamTravel.GeolocationDataClients.IntegrationTests.MichelinApi
             var result = await _sut.DownloadCostBetweenTwoCities(firstCity, secondCity);
 
             //Assert
-            Assert.NotEqual((0, 0), result);
+            result.Should().NotBe((0, 0));
         }
 
 
-        [Fact(Skip = "Paid test")]
+        [Test, Ignore("Paid test")]
         public async Task DownloadCostBetweenTwoCities_InvalidCities_MinusCostIsReturned()
         {
             //Arrange
@@ -62,7 +64,7 @@ namespace DreamTravel.GeolocationDataClients.IntegrationTests.MichelinApi
             var result = await _sut.DownloadCostBetweenTwoCities(firstCity, secondCity);
 
             //Assert
-            Assert.Equal((-1, -1), result);
+            result.Should().Be((-1, -1));
         }
     }
 }

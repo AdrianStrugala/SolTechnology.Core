@@ -1,6 +1,6 @@
 using FluentAssertions;
 using SolTechnology.Core.Logging.Enrichment;
-using Xunit;
+using NUnit.Framework;
 
 namespace SolTechnology.Core.Logging.Tests.Enrichment;
 
@@ -31,7 +31,7 @@ public class RequestHeadersEnricherTests
         return ctx;
     }
 
-    [Fact]
+    [Test]
     public void Disabled_by_default_writes_nothing_to_scope()
     {
         var enricher = BuildEnricher(o => o.LogRequestHeaders = false);
@@ -43,7 +43,7 @@ public class RequestHeadersEnricherTests
         scope.Should().BeEmpty();
     }
 
-    [Fact]
+    [Test]
     public void Enabled_projects_all_headers_under_RequestHeaders_key()
     {
         var enricher = BuildEnricher();
@@ -58,7 +58,7 @@ public class RequestHeadersEnricherTests
         projected["User-Agent"].Should().Be("tests/1.0");
     }
 
-    [Fact]
+    [Test]
     public void Masks_default_sensitive_headers_case_insensitively()
     {
         var enricher = BuildEnricher();
@@ -76,7 +76,7 @@ public class RequestHeadersEnricherTests
         projected["X-Tenant"].Should().Be("acme");
     }
 
-    [Fact]
+    [Test]
     public void Masks_Bearer_values_in_unexpected_headers()
     {
         var enricher = BuildEnricher();
@@ -89,7 +89,7 @@ public class RequestHeadersEnricherTests
         projected["X-Forwarded-Authorization"].Should().Be(LoggingDefaults.MaskedValue);
     }
 
-    [Fact]
+    [Test]
     public void Custom_MaskedHeaders_replace_defaults()
     {
         var enricher = BuildEnricher(o => o.MaskedHeaders = new List<string> { "X-Internal-Token" });

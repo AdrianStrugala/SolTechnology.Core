@@ -1,8 +1,6 @@
 using DreamTravel.Api;
 using DreamTravel.FunctionalTests.FakeApis;
-using DreamTravel.Infrastructure.Events;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection.Extensions;
 using SolTechnology.Core.API.Testing;
 using SolTechnology.Core.HTTP.Testing;
 using SolTechnology.Core.SQL.Testing;
@@ -25,6 +23,7 @@ namespace DreamTravel.FunctionalTests
         public static async Task SetUp()
         {
             Environment.SetEnvironmentVariable("ASPNETCORE_ENVIRONMENT", "development");
+            Environment.SetEnvironmentVariable("TESTCONTAINERS_REUSE", "true");
 
             // 1. Start SQL Server (Docker container)
             SqlFixture = new SQLFixture("DreamTravelDatabase")
@@ -42,17 +41,8 @@ namespace DreamTravel.FunctionalTests
                 .Override("HTTPClients:Google:BaseAddress", $"{WireMockFixture.Url}/google/")
                 .Build();
 
-            // Worker first — its scope factory is what the sync publisher dispatches into.
             WorkerFixture = new APIFixture<Worker.Program>(configuration);
-            SyncHangfireNotificationPublisher.UseScopeFactory(
-                () => WorkerFixture.TestServer.Services.GetRequiredService<IServiceScopeFactory>());
-
-            // Replace the Hangfire publisher with the deterministic in-process variant.
-            ApiFixture = new APIFixture<Program>(configuration, services =>
-            {
-                services.RemoveAll<IHangfireNotificationPublisher>();
-                services.AddSingleton<IHangfireNotificationPublisher, SyncHangfireNotificationPublisher>();
-            });
+            ApiFixture = new APIFixture<Program>(configuration);
         }
 
 

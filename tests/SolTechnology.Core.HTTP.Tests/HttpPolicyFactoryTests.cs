@@ -9,7 +9,7 @@ using Microsoft.Extensions.Logging.Abstractions;
 using Polly;
 using SolTechnology.Core.HTTP;
 using SolTechnology.Core.HTTP.Telemetry;
-using Xunit;
+using NUnit.Framework;
 
 namespace SolTechnology.Core.HTTP.Tests;
 
@@ -74,7 +74,7 @@ public sealed class HttpPolicyFactoryTests
         public void Dispose() { }
     }
 
-    [Fact]
+    [Test]
     public async Task Retry_TransientFailureThenSuccess_SucceedsOnLaterAttempt()
     {
         var pipeline = BuildPipeline();
@@ -90,7 +90,7 @@ public sealed class HttpPolicyFactoryTests
         result.StatusCode.Should().Be(HttpStatusCode.OK);
     }
 
-    [Fact]
+    [Test]
     public async Task Retry_NonTransientStatus_DoesNotRetry()
     {
         var pipeline = BuildPipeline();
@@ -106,13 +106,13 @@ public sealed class HttpPolicyFactoryTests
         result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
     }
 
-    [Theory]
-    [InlineData(HttpStatusCode.RequestTimeout)]        // 408
-    [InlineData(HttpStatusCode.TooManyRequests)]       // 429
-    [InlineData(HttpStatusCode.InternalServerError)]   // 500
-    [InlineData(HttpStatusCode.BadGateway)]            // 502
-    [InlineData(HttpStatusCode.ServiceUnavailable)]    // 503
-    [InlineData(HttpStatusCode.GatewayTimeout)]        // 504
+    [Test]
+    [TestCase(HttpStatusCode.RequestTimeout)]        // 408
+    [TestCase(HttpStatusCode.TooManyRequests)]       // 429
+    [TestCase(HttpStatusCode.InternalServerError)]   // 500
+    [TestCase(HttpStatusCode.BadGateway)]            // 502
+    [TestCase(HttpStatusCode.ServiceUnavailable)]    // 503
+    [TestCase(HttpStatusCode.GatewayTimeout)]        // 504
     public async Task Retry_TransientStatusCodes_AreRetriedForGet(HttpStatusCode code)
     {
         var pipeline = BuildPipeline();
@@ -127,7 +127,7 @@ public sealed class HttpPolicyFactoryTests
         attempts.Should().Be(4); // initial + 3 retries
     }
 
-    [Fact]
+    [Test]
     public async Task Retry_PostByDefault_DoesNotRetry()
     {
         // Default RetryOnUnsafeVerbs=false. A POST that 5xx's must NOT be
@@ -147,7 +147,7 @@ public sealed class HttpPolicyFactoryTests
         result.StatusCode.Should().Be(HttpStatusCode.InternalServerError);
     }
 
-    [Fact]
+    [Test]
     public async Task Retry_PatchByDefault_DoesNotRetry()
     {
         var pipeline = BuildPipeline();
@@ -162,7 +162,7 @@ public sealed class HttpPolicyFactoryTests
         attempts.Should().Be(1);
     }
 
-    [Fact]
+    [Test]
     public async Task Retry_PostWithUnsafeVerbsEnabled_Retries()
     {
         // Caller opted in: endpoint is documented as idempotent (e.g. uses
@@ -179,7 +179,7 @@ public sealed class HttpPolicyFactoryTests
         attempts.Should().Be(4);
     }
 
-    [Fact]
+    [Test]
     public async Task Retry_PutAndDelete_AreRetriedAsIdempotentVerbs()
     {
         // RFC 7231: PUT and DELETE are idempotent — retrying them after a 5xx
@@ -204,7 +204,7 @@ public sealed class HttpPolicyFactoryTests
         deleteAttempts.Should().Be(4);
     }
 
-    [Fact]
+    [Test]
     public async Task RetryAfter_DeltaSeconds_DelaysRequestedAmount()
     {
         var pipeline = BuildPipeline();
@@ -233,7 +233,7 @@ public sealed class HttpPolicyFactoryTests
         observed.Should().BeGreaterThanOrEqualTo(TimeSpan.FromMilliseconds(150));
     }
 
-    [Fact]
+    [Test]
     public async Task RetryAfter_ExcessiveValue_CappedAtRetryTimeout()
     {
         var pipeline = BuildPipeline();
@@ -260,7 +260,7 @@ public sealed class HttpPolicyFactoryTests
         (second - first).Should().BeLessThan(TimeSpan.FromSeconds(2));
     }
 
-    [Fact]
+    [Test]
     public async Task UsePollyFalse_ProducesPassthroughPipeline()
     {
         var pipeline = BuildPipeline(cfg => cfg.UsePolly = false);
@@ -276,7 +276,7 @@ public sealed class HttpPolicyFactoryTests
         result.StatusCode.Should().Be(HttpStatusCode.InternalServerError);
     }
 
-    [Fact]
+    [Test]
     public async Task OverallRequestBudget_TerminatesRetrySequenceWhenExceeded()
     {
         // Outer budget caps the whole logical call. With aggressive retries
