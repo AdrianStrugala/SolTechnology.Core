@@ -20,6 +20,7 @@ Conventions, references, and output formats live only inside `SKILL.md`.
 | [package-management](package-management/SKILL.md) | Adding or bumping a `PackageReference`. Single source of truth for canonical versions. | independent |
 | [dependency-audit](dependency-audit/SKILL.md) | Resolving `NU1901`–`NU1904` CVE warnings or `NU1605` downgrades. Drives fix-at-source over masking. | independent |
 | [test-writing](test-writing/SKILL.md) | Authoring or extending tests under `tests/` (NUnit) or sample apps (NUnit for DreamTravel). | independent |
+| [command-query-event-story](command-query-event-story/SKILL.md) | Authoring a command, query, event, or Story (chapters) in any app on the `SolTechnology.Core.CQRS` / `.Story` packages — per `ClaudeCodingGuide` §0/§3/§4/§11 and the DreamTravel reference app. Covers `Commands`/`Queries`, domain-model `DomainServices`, persisted `Workflows`, and `[LogScope]` logging. | independent |
 | [refactor](refactor/SKILL.md) | Behaviour-preserving cleanup local to one module (rename internals, split a class, extract a primary ctor, pay down a §15 anti-pattern). | independent |
 | [roast-me](roast-me/SKILL.md) | Vague request, under-specified intent, before any non-trivial planning. | runs *before* planning |
 | [implement-plan](implement-plan/SKILL.md) | Executing one step from an ADR's `to-do/` or `reviewed/` folder. | independent |

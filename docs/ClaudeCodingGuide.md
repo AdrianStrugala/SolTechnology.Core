@@ -152,7 +152,7 @@ FetchTraffic/
 - **Result class** is a plain DTO — no behavior, no nullable mystery.
 - **Handler** implements `IQueryHandler<,>` or `ICommandHandler<>` from `SolTechnology.Core.CQRS`. Always returns `Result` / `Result<T>`. Never throws for business failures.
 - **Validators** are `AbstractValidator<TInput>` and live in the same file as the input. They are auto-discovered by `RegisterCommands()` / `RegisterQueries()`.
-- A handler longer than ~40 lines of business logic must be converted into a Story (chapters).
+- A handler longer than ~100 lines of business logic must be converted into a Story (chapters).
 - If a handler talks to more than one external system, it must be a Story.
 
 ### Result pattern
@@ -165,6 +165,9 @@ return Result.Fail(new Error { Message = "..." });
 ```
 
 Implicit conversion is allowed in handlers: `return city;` becomes `Result<City>.Success(city)` automatically. Use it.
+
+> **Procedure:** the step-by-step for authoring a command/query/event/story lives in the
+> [`command-query-event-story`](../.github/skills/command-query-event-story/SKILL.md) skill.
 
 ---
 
@@ -208,12 +211,17 @@ public class CalculateBestPathStory(IServiceProvider sp, ILogger<CalculateBestPa
 
 ### When to choose `DomainServices` vs Story-in-Queries/Commands
 
-- **Story in `Queries/` or `Commands/`** — the operation is a single use case triggered by one entry point.
-- **Story in `DomainServices/`** — the operation is reusable across multiple commands/queries (e.g. `CityDomainService.Save` is reused by several import flows). The domain service exposes the plain interface (`ICityDomainService.Save(...)`) and internally inherits `StoryHandler` to implement the orchestration.
+- **Story in `Queries/`** — a complex query is **always dedicated to its use case**. Never extract a query into a domain service; there is no reuse case that justifies it.
+- **Story in `Commands/`** — a single write triggered by one entry point.
+- **Story in `DomainServices/`** — the orchestration works **directly on domain models** (a save / update / mutation) and is **reused by multiple commands or event handlers** (e.g. `CityDomainService.Save` is reused by the `CitySearched` event handler and import flows). The domain service exposes a plain interface (`ICityDomainService.Save(...)`) and internally inherits `StoryHandler`. Domain services are a write/command-side concept — never a home for queries.
 
 ### `Workflows/` project
 
 Reserved for **long-running, interactive, persisted** stories (require `RegisterStories(StoryOptions.WithSqlitePersistence(...))`). One folder per workflow, mirroring the CQRS use-case layout (`SampleOrderWorkflow/Chapters/...`).
+
+> **Procedure:** authoring a Story (chapters, contexts, `DomainServices` vs `Workflows` hosting)
+> is driven by the [`command-query-event-story`](../.github/skills/command-query-event-story/SKILL.md)
+> skill.
 
 ---
 
@@ -569,7 +577,7 @@ public class FetchTrafficHandler(
     public async Task<Result> Handle(FetchTrafficCommand request, CancellationToken ct)
     {
         logger.LogInformation("Fetching traffic at [{Time}]", request.DepartureTime);
-        // ... orchestration, ≤ 40 lines; otherwise convert to a Story ...
+        // ... orchestration, ≤ 100 lines; otherwise convert to a Story ...
         return Result.Success();
     }
 }
