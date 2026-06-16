@@ -689,6 +689,9 @@ retrospectives.
 
 ### What ships in DI   (optional — include when AddXxx registers more than 2 services)
 <bulleted list of registered services so consumers can Replace/Decorate>
+
+### Working with AI Agent   (optional — include when the module has a companion skill in `.github/skills/`)
+<one-line lead + bullet links to the companion SKILL.md and the relevant ClaudeCodingGuide §, absolute GitHub URLs>
 ```
 
 Anything that does not fit one of those headings is a sign the doc is drifting — either it
@@ -716,6 +719,12 @@ belongs in an **ADR** (`docs/adr/*.md`) or in **inline XML doc** on a public typ
    one is canonical and the other links; the description is not copy-pasted.
 9. **Companion to ADRs, not a replacement.** A doc page never explains *why we built it this
    way*; that's `docs/adr/NNN-*.md`. The doc explains *how to use it*.
+10. **Companion-skill section uses absolute URLs.** When a module ships an authoring skill under
+    `.github/skills/`, link it from a `### Working with AI Agent` section with absolute
+    `https://github.com/AdrianStrugala/SolTechnology.Core/blob/master/…` URLs — nuget.org cannot
+    resolve repo-relative `.github/` links. The skill is opt-in (the consumer points their agent
+    at it), NEVER auto-installed. Delivery policy: [`.github/skills/README.md`](../.github/skills/README.md)
+    → "Package-companion skills".
 
 ### When refactoring an existing doc
 

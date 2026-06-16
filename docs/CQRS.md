@@ -153,3 +153,18 @@ public class MyBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, TResp
 Built-in behaviors (registered automatically):
 - **LoggingPipelineBehavior** — tracks every request as a logical operation with structured logging and OpenTelemetry spans.
 - **FluentValidationPipelineBehavior** — runs all validators; short-circuits with `ValidationError` on failure.
+
+### Working with AI Agent
+
+Building commands, queries, and events with an AI assistant (GitHub Copilot, Claude Code)? The
+repository ships a **skill** — a narrow, file-cited procedure your agent can read on demand:
+
+- [`command-query-event-story`](https://github.com/AdrianStrugala/SolTechnology.Core/blob/master/.github/skills/command-query-event-story/SKILL.md)
+  — classify the artifact (command / query / event / Story), lay out the files one-folder-per-use-case,
+  return `Result<T>`, wire `AddCQRS`, and add `[LogScope]` logging.
+
+It points at the binding rules in the Coding Guide — keep these open while you write:
+
+- [§3 — CQRS: commands, queries, validators, the `Result` pattern](https://github.com/AdrianStrugala/SolTechnology.Core/blob/master/docs/ClaudeCodingGuide.md)
+- [§4 — Story framework for multi-step orchestration](https://github.com/AdrianStrugala/SolTechnology.Core/blob/master/docs/ClaudeCodingGuide.md)
+

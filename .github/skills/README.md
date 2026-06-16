@@ -56,6 +56,32 @@ Any change that touches a public/protected symbol in `src/SolTechnology.Core.*`,
 premortem. Attach the skill's output to the PR. Block on *Go* / *Go with mitigations* with
 mitigations in place. Rationale: [ADR-004](../../docs/adr/004-ai-agents-and-skills.md).
 
+## Package-companion skills
+
+A **package-companion skill** encodes the usage of a shipped NuGet package (e.g.
+[command-query-event-story](command-query-event-story/SKILL.md) for `SolTechnology.Core.CQRS` /
+`.Story`). It serves two audiences through two different delivery channels:
+
+| Audience | Delivery | Mechanism |
+|---|---|---|
+| Repo contributors | Auto-loaded | Lives in `.github/skills/<name>/SKILL.md`; the agent discovers it from the workspace, same as every skill. |
+| Package consumers (other repos) | Pull, opt-in | Linked from the package README (`docs/<Module>.md`, packed as `PackageReadmeFile`) with an **absolute** GitHub URL. The consumer points their agent at the file or copies it into their own `.github/skills/`. |
+
+Rules:
+
+- The skill file **MUST** live in `.github/skills/` like every other skill — NEVER inside `src/`
+  and NEVER inside the `.nupkg`. A skill under `src/` loses auto-discovery; a markdown file in a
+  `.nupkg` lands in `~/.nuget` where no agent reads it.
+- The package README (`docs/<Module>.md`) **MUST** link the companion skill from a
+  `### Working with AI Agent` section (see [`ClaudeCodingGuide §18`](../../docs/ClaudeCodingGuide.md)).
+  Links **MUST** be absolute `https://github.com/AdrianStrugala/SolTechnology.Core/blob/master/…`
+  URLs — nuget.org does not resolve repo-relative links to `.github/`.
+- Delivery is **pull, never push.** NEVER ship a build `.targets`, analyzer, or tool that writes a
+  skill into a consumer's repository without an explicit, documented opt-in command. Silent
+  copying into someone's `.github/` is forbidden.
+- Link, never copy. The skill cites the Coding Guide §-numbers, the README links the skill, the
+  skill links the guide — one source of truth.
+
 ## Self-improvement
 
 Rules for editing skill files are in [`docs/ClaudeCodingGuide.md` §19](../../docs/ClaudeCodingGuide.md).

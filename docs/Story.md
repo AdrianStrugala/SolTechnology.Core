@@ -264,9 +264,23 @@ logging.AddFilter("SolTechnology.Core.Story.Orchestration.StoryEngine", LogLevel
 - Idempotency-key deduplication, cancellation, listing.
 - Strongly-typed error markers (`StoryPausedError`, `StoryCancelledError`).
 
+### Working with AI Agent
+
+Writing a Story with an AI assistant (GitHub Copilot, Claude Code)? The repository ships a
+**skill** — a narrow, file-cited procedure your agent can read on demand:
+
+- [`command-query-event-story`](https://github.com/AdrianStrugala/SolTechnology.Core/blob/master/.github/skills/command-query-event-story/SKILL.md)
+  — decide when a handler becomes a Story, keep `TellStory()` logic-free, name chapters one-verb-per-file,
+  flow state through the `Context`, and choose where the Story lives (`Commands`/`Queries` vs a
+  domain-model `DomainServices` Story vs a persisted interactive `Workflows` Story).
+
+It points at the binding rules in the Coding Guide — [§4 — Story framework](https://github.com/AdrianStrugala/SolTechnology.Core/blob/master/docs/ClaudeCodingGuide.md)
+keeps the anatomy and chapter rules in one place.
+
 ### Related documentation
 
 - [Story framework architecture (ADR-002)](./adr/002-Story-Framework-Implementation.md)
 - [Tale Code philosophy](./Tale.md)
 - [Review document](./reviews/Story-Framework-Review.md)
+- [Authoring skill: `command-query-event-story`](https://github.com/AdrianStrugala/SolTechnology.Core/blob/master/.github/skills/command-query-event-story/SKILL.md)
 
