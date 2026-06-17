@@ -8,7 +8,7 @@ Tracking the implementation steps for
 | # | Title | File | Status |
 |---|---|---|---|
 | 01 | Logging: document correlation + `PushToScope` helpers + `PiiMask`/`[Masked]` | [`done/01-logging.md`](done/01-logging.md) | ✅ done |
-| 02 | Cache: `IDistributedTaskCache` + resilient cache-aside + decorator + invalidator | [`to-do/02-cache.md`](to-do/02-cache.md) | ⬜ to-do |
+| 02 | Cache: `IDistributedTaskCache` + resilient cache-aside + decorator + invalidator | [`done/02-cache.md`](done/02-cache.md) | ✅ done |
 | 03 | SQL: provider seam + error translator + repository convention docs | [`to-do/03-sql.md`](to-do/03-sql.md) | ⬜ to-do |
 | 04 | Cross-cutting: `MapError` + `ValidateOnStart` + `TimeProvider` + coding-guide rules | [`to-do/04-cross-cutting.md`](to-do/04-cross-cutting.md) | ⬜ to-do |
 | 05 | MessageBus: correlation in receiver + in-process pipeline extraction | [`to-do/05-messagebus.md`](to-do/05-messagebus.md) | ⬜ to-do |

@@ -1,76 +1,158 @@
-### Overview
+# SolTechnology.Core.Cache
 
-The SolTechnology.Core.Cache library provides functionality needed for task caching. It handles needed services registration and configuration. It relies on IMemoryCache. The use case is to cache parts of the code which are time consuming and the result does not change. Ex: external http calls for non-changing data. 
+## Overview
 
-### Registration
+Two-tier caching library with a **unified interface** — both tiers expose the same `GetOrAdd<TKey, TItem>` contract:
 
-For installing the library, reference **SolTechnology.Core.Cache** nuget package and invoke **AddCache()** service collection extension method:
+| Tier | Backing store | Registration | Interface |
+|------|--------------|--------------|-----------|
+| **Local** | `IMemoryCache` (in-process) | `AddLocalCache()` | `ISingletonCache`, `IScopedCache<TKey,TItem>` |
+| **Distributed** | Redis via `StackExchange.Redis` | `AddDistributedCache(config)` | `IRedisCache` |
 
-```csharp
-services.AddCache();
+Both tiers can be used independently or together. Distributed tier is **fail-open** — Redis failures log a warning and fall through to the factory instead of throwing.
+
+---
+
+## Installation
+
+```
+dotnet add package SolTechnology.Core.Cache
 ```
 
-### Configuration
+---
 
-1) The first option is to create an appsettings.json section:
+## Registration
+
+### Local cache (in-memory)
 
 ```csharp
+services.AddLocalCache();
+```
+
+Or with explicit configuration:
+
+```csharp
+services.AddLocalCache(new CacheConfiguration
+{
+    ExpirationMode = ExpirationMode.Absolute,
+    ExpirationSeconds = 600
+});
+```
+
+### Distributed cache (Redis)
+
+```csharp
+services.AddDistributedCache(new DistributedCacheConfiguration
+{
+    ConnectionString = "localhost:6379",
+    InstanceName = "MyApp:",
+    ExpirationSeconds = 300
+});
+```
+
+### Both tiers together
+
+```csharp
+services.AddLocalCache();
+services.AddDistributedCache(configuration.GetSection("Redis").Get<DistributedCacheConfiguration>()!);
+```
+
+> Use `ISingletonCache` for hot in-process data and `IRedisCache` for shared cross-instance data.
+
+---
+
+## Configuration
+
+### CacheConfiguration (local)
+
+| Property | Type | Default | Description |
+|----------|------|---------|-------------|
+| `ExpirationMode` | `ExpirationMode` | `Absolute` | `Absolute` or `Sliding` |
+| `ExpirationSeconds` | `int` | `1200` (20 min) | Time before entry expires |
+
+Can be provided via `appsettings.json`:
+
+```json
+{
   "Configuration": {
     "CacheConfiguration": {
-        "ExpirationMode": "Absolute or Sliding",
-        "ExpirationSeconds": 300
-     }
+      "ExpirationMode": "Absolute",
+      "ExpirationSeconds": 300
+    }
   }
+}
 ```
 
-2) Alternatevely the same settings can be provided by optional parameter during registration:
+### DistributedCacheConfiguration (Redis)
+
+| Property | Type | Default | Description |
+|----------|------|---------|-------------|
+| `ConnectionString` | `string` | — (required) | Redis connection string |
+| `InstanceName` | `string` | `"SolTechnology:"` | Key prefix in Redis |
+| `ExpirationSeconds` | `int` | `300` (5 min) | Default absolute TTL |
+
+---
+
+## Usage
+
+All caches share the same contract: `GetOrAdd<TKey, TItem>(key, factory)`.  
+Key is serialized to JSON internally — pass any object.
+
+### ISingletonCache — long-lived in-memory cache
+
+Singleton-scoped. Entries survive across requests until expiration.
 
 ```csharp
-var cacheConfiguration = new CacheConfiguration
+public class GetWeatherHandler(ISingletonCache cache, IWeatherApi api)
 {
-    ExpirationMode = "Absolute",
-	ExpirationSeconds= 300
-};
-
-builder.Services.AddCache(cacheConfiguration);
+    public Task<Weather> Handle(GetWeatherQuery query)
+    {
+        return cache.GetOrAdd(query.CityId, api.FetchWeather);
+    }
+}
 ```
 
-3) If not provided, the default configuration will be applied, which is Sliding ExpirationMode and 300 seconds expiration time. That means if the cache was not hit in 5 mins, it will be cleared.
+### IScopedCache<TKey, TItem> — request-scoped deduplication
 
-### Usage
-
-1) Inject ILazyTaskCache into your service 
+Scoped to the DI scope (typically one HTTP request). Prevents duplicate calls within the same request.
 
 ```csharp
-        public SyncPlayer(
-            IFootballDataApiClient footballDataApiClient,
-            IPlayerRepository playerRepository,
-            IApiFootballApiClient apiFootballApiClient,
-            ILazyTaskCache lazyTaskCache)
-        {
-            _footballDataApiClient = footballDataApiClient;
-            _playerRepository = playerRepository;
-            _apiFootballApiClient = apiFootballApiClient;
-            _lazyTaskCache = lazyTaskCache;
-        }
+public class SyncPlayer(IScopedCache<int, Player> cache, IPlayerApi api)
+{
+    public Task<Player> Resolve(int playerId)
+    {
+        return cache.GetOrAdd(playerId, api.GetPlayerById);
+    }
+}
 ```
 
-2) Cache repeatable operation and it's key
+### IRedisCache — Redis-backed distributed cache
+
+Same `GetOrAdd` contract. If Redis is down, factory is called and result returned without caching.
 
 ```csharp
-         var clientPlayer = await _lazyTaskCache.GetOrAdd(playerIdMap.FootballDataId, _footballDataApiClient.GetPlayerById);
+public class GetProductHandler(IRedisCache cache, IProductRepository repo)
+{
+    public Task<Product> Handle(int productId)
+    {
+        return cache.GetOrAdd(productId, id => repo.GetById(id));
+    }
+}
 ```
 
-3) The key is supposed to be a complex object (ex: command or query), to avoid returning incorrect cache item
+---
 
-### Testing
+## Testing
 
-When the cache is backed by **Redis**, the companion package **`SolTechnology.Core.Redis.Testing`**
-provides `RedisFixture` — a [Testcontainers](https://dotnet.testcontainers.org/)-backed Redis container
-for component tests. Reference it from test projects only. Full reference: [Redis.Testing.md](Redis.Testing.md).
+### Local tier
+
+No fixture needed — `IMemoryCache` works out of the box in unit tests.
+
+### Redis tier
+
+Use **`SolTechnology.Core.Redis.Testing`** with Testcontainers:
 
 ```csharp
-// Assembly-level [OneTimeSetUp]
 RedisFixture = new RedisFixture();
 await RedisFixture.InitializeAsync();
 
@@ -80,11 +162,34 @@ var configuration = new TestConfigurationBuilder()
     .Override("Redis:Enabled", "true")
     .Build();
 
-await RedisFixture.FlushAsync();    // between-test reset (clears all keys)
-await RedisFixture.DisposeAsync();  // no-op when TESTCONTAINERS_REUSE=true
+await RedisFixture.FlushAsync();    // between-test reset
+await RedisFixture.DisposeAsync();  // teardown
 ```
 
-> The in-memory `IMemoryCache` path needs no fixture — it is exercised directly in unit tests. The
-> `RedisFixture` is only for suites that bind the cache to a real Redis instance. Container lifetime /
-> reuse follows the shared model in
-> [theQuality.md → Container lifetime & reuse](theQuality.md#container-lifetime--reuse).
+Full reference: [Redis.Testing.md](Redis.Testing.md).
+
+---
+
+## API Reference
+
+### ModuleInstaller
+
+| Method | Description |
+|--------|-------------|
+| `AddLocalCache(CacheConfiguration?)` | Registers `ISingletonCache`, `IScopedCache<,>` |
+| `AddDistributedCache(DistributedCacheConfiguration)` | Registers `IRedisCache` (Redis-backed) |
+
+### Unified Interface
+
+```csharp
+// ISingletonCache
+Task<TItem> GetOrAdd<TKey, TItem>(TKey key, Func<TKey, Task<TItem>> factory);
+
+// IRedisCache
+Task<TItem> GetOrAdd<TKey, TItem>(TKey key, Func<TKey, Task<TItem>> factory);
+
+// IScopedCache<TKey, TItem>
+Task<TItem> GetOrAdd(TKey key, Func<TKey, Task<TItem>> factory);
+```
+
+Same shape everywhere. Key is any serializable object. Factory is called on cache miss.

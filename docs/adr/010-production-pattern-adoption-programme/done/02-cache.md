@@ -1,7 +1,7 @@
 ---
 adr: 010-production-pattern-adoption-programme
 step: 02 of 07
-status: to-do
+status: done
 ---
 # Step 02: Cache — distributed tier + resilient cache-aside + decorator + invalidator
 
@@ -34,4 +34,5 @@ Add `IDistributedTaskCache` (Redis-backed), fail-open degradation, Scrutor decor
 
 ## Open questions
 - none
+
 

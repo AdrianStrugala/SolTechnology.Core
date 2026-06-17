@@ -48,7 +48,7 @@ public class Program
 
         //CACHE
         var cacheConfiguration = builder.Configuration.GetSection("Cache").Get<CacheConfiguration>()!;
-        builder.Services.AddCache(cacheConfiguration);
+        builder.Services.AddLocalCache(cacheConfiguration);
 
         //CQRS
         builder.Services.AddCQRS(assemblies: typeof(Program).Assembly);

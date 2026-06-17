@@ -86,6 +86,10 @@ Create a new `.csproj` only if **all** apply:
 Otherwise add a folder inside an existing project. Never split on technical grounds
 (e.g. "Models project" / "Helpers project") — split on responsibility.
 
+### Interface + implementation co-location
+
+When a class is small (≤ ~80 lines total including the interface), put the interface and its single implementation in the **same file**. Name the file after the implementation (e.g. `RedisCache.cs` contains both `IRedisCache` and `RedisCache`). Split into separate files only when the implementation grows large or there are multiple implementations.
+
 ---
 
 ## 2. The `ModuleInstaller` Pattern (mandatory)
