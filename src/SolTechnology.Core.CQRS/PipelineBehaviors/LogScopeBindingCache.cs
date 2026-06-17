@@ -2,13 +2,15 @@ using System.Collections.Concurrent;
 using System.Linq.Expressions;
 using System.Reflection;
 using SolTechnology.Core.Logging;
+using SolTechnology.Core.Logging.Masking;
 
 namespace SolTechnology.Core.CQRS.PipelineBehaviors;
 
 /// <summary>
 /// One <c>[LogScope]</c>-marked property of a request, compiled into a fast getter.
+/// When <see cref="Masking"/> is not null, the value is masked before entering the scope.
 /// </summary>
-internal sealed record LogScopeBinding(string Key, Func<object, object?> Getter);
+internal sealed record LogScopeBinding(string Key, Func<object, object?> Getter, MaskedAttribute? Masking);
 
 /// <summary>
 /// Per-request-type cache of compiled <c>[LogScope]</c> getters. Reflection happens at most
@@ -41,7 +43,8 @@ internal static class LogScopeBindingCache
 
             var key = string.IsNullOrWhiteSpace(attribute.Name) ? property.Name : attribute.Name!;
             var getter = BuildGetter(requestType, property);
-            bindings.Add(new LogScopeBinding(key, getter));
+            var masked = property.GetCustomAttribute<MaskedAttribute>(inherit: true);
+            bindings.Add(new LogScopeBinding(key, getter, masked));
         }
 
         return bindings.Count == 0 ? Array.Empty<LogScopeBinding>() : bindings.ToArray();

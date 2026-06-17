@@ -1,7 +1,7 @@
 ---
 adr: 010-production-pattern-adoption-programme
 step: 01 of 07
-status: to-do
+status: done
 ---
 # Step 01: Logging — correlation docs + scope helpers + PII masking
 

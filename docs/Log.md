@@ -234,6 +234,53 @@ public async Task Endpoint_AcceptsCorrelationId_AndEchoesItBack()
 }
 ```
 
+### Correlation
+
+`ICorrelationIdService` is the single correlation primitive across all transports.
+Resolution order: `Activity.Current.TraceId` → `X-Correlation-Id` header → generated GUID.
+
+```csharp
+public sealed class MyJob(ICorrelationIdService correlation, ILogger<MyJob> logger)
+{
+    public async Task ExecuteAsync(CancellationToken ct)
+    {
+        var id = correlation.GetOrGenerate();
+        using var scope = logger.BeginScope(id.GetScope());
+        // all logs in this scope carry CorrelationId
+    }
+}
+```
+
+Already consumed by: `Core.HTTP`, `Core.Hangfire`, `Core.Api`.
+Pending: `Core.MessageBus` (ADR-010 step 05).
+
+### Scope helpers
+
+```csharp
+using SolTechnology.Core.Logging;
+
+using var scope = logger.PushToScope("TenantId", tenantId);
+// or multiple:
+using var scope = logger.PushToScope(("TenantId", tenantId), ("Region", region));
+```
+
+### PII masking
+
+```csharp
+using SolTechnology.Core.Logging.Masking;
+
+PiiMask.Full("secret@email.com");        // "***MASKED***"
+PiiMask.Partial("secret@email.com", 3);  // "sec***com"
+```
+
+On CQRS requests, combine `[LogScope]` with `[Masked]`:
+
+```csharp
+[LogScope, Masked(MaskMode.Partial, keepChars: 4)]
+public string Email { get; set; } = null!;
+// scope["Email"] = "john***.com"
+```
+
 ### Conventions
 
 - **`UseCoreLogging` runs before `UseRouting`.** Otherwise pre-routing failures
