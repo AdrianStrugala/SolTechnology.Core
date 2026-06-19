@@ -15,9 +15,7 @@ public sealed class UtcDateTimeSpecimen : ISpecimenBuilder
             return new NoSpecimen();
         }
 
-        return DateTime.SpecifyKind(
-            DateTime.Now.AddSeconds(Random.Shared.Next(-100_000, 100_000)),
-            DateTimeKind.Utc);
+        return DateTime.UtcNow.AddSeconds(Random.Shared.Next(-100_000, 100_000));
     }
 }
 

@@ -1,8 +1,7 @@
-
 namespace SolTechnology.Core.Story.Tale;
 
 /// <summary>
-/// One recorded step in a <see cref="object"/>. A Tale is a plan — a list of these
+/// One recorded step in a <see cref="Tale{TOutput}"/>. A Tale is a plan — a list of these
 /// steps — that the <c>StoryEngine</c> later interprets against the live <c>Context</c>. Steps close
 /// over the context as <see cref="Tale{TContext,TOutput}"/>; the engine knows the concrete context type and casts.
 /// </summary>
