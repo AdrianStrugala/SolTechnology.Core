@@ -25,18 +25,17 @@ dotnet add package SolTechnology.Core.Cache
 
 ### Local cache (in-memory)
 
+DreamTravel's API host registers the local tier with one line (`DreamTravel.Api/Program.cs`):
+
 ```csharp
-services.AddLocalCache();
+builder.Services.AddLocalCache();
 ```
 
-Or with explicit configuration:
+The Worker host binds expiration from configuration (`DreamTravel.Worker/Program.cs`):
 
 ```csharp
-services.AddLocalCache(new CacheConfiguration
-{
-    ExpirationMode = ExpirationMode.Absolute,
-    ExpirationSeconds = 600
-});
+var cacheConfiguration = builder.Configuration.GetSection("Cache").Get<CacheConfiguration>()!;
+builder.Services.AddLocalCache(cacheConfiguration);
 ```
 
 ### Distributed cache (Redis)
@@ -45,7 +44,7 @@ services.AddLocalCache(new CacheConfiguration
 services.AddDistributedCache(new DistributedCacheConfiguration
 {
     ConnectionString = "localhost:6379",
-    InstanceName = "MyApp:",
+    InstanceName = "DreamTravel:",
     ExpirationSeconds = 300
 });
 ```
@@ -53,8 +52,9 @@ services.AddDistributedCache(new DistributedCacheConfiguration
 ### Both tiers together
 
 ```csharp
-services.AddLocalCache();
-services.AddDistributedCache(configuration.GetSection("Redis").Get<DistributedCacheConfiguration>()!);
+builder.Services.AddLocalCache();
+builder.Services.AddDistributedCache(
+    builder.Configuration.GetSection("Redis").Get<DistributedCacheConfiguration>()!);
 ```
 
 > Use `ISingletonCache` for hot in-process data and `IRedisCache` for shared cross-instance data.
@@ -70,15 +70,13 @@ services.AddDistributedCache(configuration.GetSection("Redis").Get<DistributedCa
 | `ExpirationMode` | `ExpirationMode` | `Absolute` | `Absolute` or `Sliding` |
 | `ExpirationSeconds` | `int` | `1200` (20 min) | Time before entry expires |
 
-Can be provided via `appsettings.json`:
+Can be provided via `appsettings.json` — DreamTravel's Worker binds the `Cache` section:
 
 ```json
 {
-  "Configuration": {
-    "CacheConfiguration": {
-      "ExpirationMode": "Absolute",
-      "ExpirationSeconds": 300
-    }
+  "Cache": {
+    "ExpirationMode": "Absolute",
+    "ExpirationSeconds": 300
   }
 }
 ```
@@ -98,45 +96,75 @@ Can be provided via `appsettings.json`:
 All caches share the same contract: `GetOrAdd<TKey, TItem>(key, factory)`.  
 Key is serialized to JSON internally — pass any object.
 
-### ISingletonCache — long-lived in-memory cache
+### Real example — a caching decorator over an HTTP client
 
-Singleton-scoped. Entries survive across requests until expiration.
+DreamTravel wraps its Google geolocation client with a thin caching decorator
+(`GoogleHTTPClientCachingDecorator`). It uses **both** local tiers — each one fits a
+different access pattern:
 
 ```csharp
-public class GetWeatherHandler(ISingletonCache cache, IWeatherApi api)
+public class GoogleHTTPClientCachingDecorator(
+    IGoogleHTTPClient innerClient,
+    IScopedCache<string, City> scopedCache,
+    ISingletonCache singletonCache) : IGoogleHTTPClient
 {
-    public Task<Weather> Handle(GetWeatherQuery query)
-    {
-        return cache.GetOrAdd(query.CityId, api.FetchWeather);
-    }
+    // Forward-geocode the same city name repeatedly within one request → one HTTP call.
+    public Task<City> GetLocationOfCity(string cityName)
+        => scopedCache.GetOrAdd(cityName, key => innerClient.GetLocationOfCity(key));
+
+    // Reverse-geocode rarely changes → cache across requests for the process lifetime.
+    public Task<City> GetNameOfCity(City city)
+        => singletonCache.GetOrAdd(city, key => innerClient.GetNameOfCity(key));
+
+    // Uncached calls just pass through to the inner client.
+    public Task<double[]> GetDurationMatrixByTollRoad(List<City> cities)
+        => innerClient.GetDurationMatrixByTollRoad(cities);
 }
+```
+
+Wire the decorator with Scrutor, right after registering the real client
+(`DreamTravel.GeolocationDataClients/ModuleInstaller.cs`):
+
+```csharp
+services.AddHTTPClient<IGoogleHTTPClient, GoogleHTTPClient, GoogleHTTPOptions>("Google");
+services.Decorate(typeof(IGoogleHTTPClient), typeof(GoogleHTTPClientCachingDecorator));
+```
+
+Consumers keep depending on `IGoogleHTTPClient` — they never see the cache.
+
+### ISingletonCache — long-lived in-memory cache
+
+Singleton-scoped. Entries survive across requests until expiration. Reach for it when the
+underlying value is stable and shared by everyone — like the reverse-geocode above:
+
+```csharp
+public Task<City> GetNameOfCity(City city)
+    => singletonCache.GetOrAdd(city, key => innerClient.GetNameOfCity(key));
 ```
 
 ### IScopedCache<TKey, TItem> — request-scoped deduplication
 
-Scoped to the DI scope (typically one HTTP request). Prevents duplicate calls within the same request.
+Scoped to the DI scope (typically one HTTP request). Prevents duplicate calls within the same
+request — multiple chapters resolving the same city name share a single lookup:
 
 ```csharp
-public class SyncPlayer(IScopedCache<int, Player> cache, IPlayerApi api)
-{
-    public Task<Player> Resolve(int playerId)
-    {
-        return cache.GetOrAdd(playerId, api.GetPlayerById);
-    }
-}
+public Task<City> GetLocationOfCity(string cityName)
+    => scopedCache.GetOrAdd(cityName, key => innerClient.GetLocationOfCity(key));
 ```
 
 ### IRedisCache — Redis-backed distributed cache
 
-Same `GetOrAdd` contract. If Redis is down, factory is called and result returned without caching.
+Same `GetOrAdd` contract, same decorator shape — swap the in-process tier for Redis when the
+value should be shared **across instances**. If Redis is down, the factory is called and the
+result returned without caching (fail-open):
 
 ```csharp
-public class GetProductHandler(IRedisCache cache, IProductRepository repo)
+public class GoogleHTTPClientCachingDecorator(
+    IGoogleHTTPClient innerClient,
+    IRedisCache cache) : IGoogleHTTPClient
 {
-    public Task<Product> Handle(int productId)
-    {
-        return cache.GetOrAdd(productId, id => repo.GetById(id));
-    }
+    public Task<City> GetLocationOfCity(string cityName)
+        => cache.GetOrAdd(cityName, key => innerClient.GetLocationOfCity(key));
 }
 ```
 
