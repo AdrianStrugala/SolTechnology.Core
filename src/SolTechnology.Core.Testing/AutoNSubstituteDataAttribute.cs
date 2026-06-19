@@ -20,6 +20,7 @@ public class AutoNSubstituteDataAttribute(params Type[] customizations)
         var fixture = new Fixture();
         fixture.Customize(new AutoNSubstituteCustomization { ConfigureMembers = true });
         fixture.Customize(new DateOnlyCustomization());
+        fixture.Customizations.Add(new UtcDateTimeSpecimen());
 
         foreach (var customization in customizations)
         {

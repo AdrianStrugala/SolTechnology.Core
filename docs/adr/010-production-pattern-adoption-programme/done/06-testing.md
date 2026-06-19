@@ -1,7 +1,7 @@
 ---
 adr: 010-production-pattern-adoption-programme
 step: 06 of 07
-status: to-do
+status: done
 ---
 # Step 06: Testing — `UtcDateTimeSpecimen` + composable data attribute
 
@@ -24,4 +24,5 @@ Add UTC DateTime specimen and extend `AutoNSubstituteDataAttribute` to accept co
 
 ## Open questions
 - none
+
 
