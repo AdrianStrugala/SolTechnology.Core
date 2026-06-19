@@ -33,7 +33,8 @@ namespace SolTechnology.Core.SQL
                 .Configure(options =>
                 {
                     options.ConnectionString = sqlConfiguration.ConnectionString;
-                });
+                })
+                .ValidateOnStart();
 
             services.AddTransient<ISQLConnectionFactory, SQLConnectionFactory>();
             services.AddTransient<IUnitOfWork, UnitOfWork>();

@@ -1,4 +1,4 @@
-﻿﻿using Microsoft.Extensions.DependencyInjection;
+﻿﻿﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
 using SolTechnology.Core.MessageBus.Broker;
@@ -27,7 +27,8 @@ namespace SolTechnology.Core.MessageBus
                     config.MaxConcurrentCalls = messageBusConfiguration.MaxConcurrentCalls;
                     config.PrefetchCount = messageBusConfiguration.PrefetchCount;
                     config.RetryOptions = messageBusConfiguration.RetryOptions;
-                });
+                })
+                .ValidateOnStart();
 
             // Registry is a singleton populated synchronously during DI configuration.
             services.TryAddSingleton<MessageBusRegistry>();

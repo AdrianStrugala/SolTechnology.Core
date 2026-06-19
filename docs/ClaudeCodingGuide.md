@@ -401,11 +401,10 @@ These apply to every class you write, regardless of layer.
 4. **Constructor size:** ≤ 5 dependencies. More than five = the class does too much. Move work into a Story or split the class. (`ILogger<T>` does not count toward the budget.)
 5. **Primary constructors** are mandatory for DI capture. Do not hand-write `private readonly` fields just to assign them.
 6. **No statics with state.** Static methods are fine for pure helpers (`CityQueryBuilder`). Static *fields* with mutable state are forbidden outside `const` and `static readonly` lookup tables.
-7. **`sealed` by default** for non-abstract classes. Open them up only when inheritance is the explicit design.
-8. **`internal` by default.** A type is `public` only when it crosses an assembly boundary intentionally.
-9. **No "Manager", "Helper", "Util" suffixes** unless the class genuinely is a generic helper (rare). Name by responsibility: `CityMapper`, `StreetTrafficUpdater`, `GoogleHTTPClient`.
-10. **No `#region`.** Use partial classes (one method per file for HTTP clients) or extract a new class. The only exception is legacy test files explicitly listed in the root `CLAUDE.md`.
-11. **Comments earn their place.** Tale Code reads like prose — let names carry the meaning. Write a comment **only** when a reader cannot infer the *why* from the code itself: a non-obvious framework constraint, a workaround for a specific bug/version, an ADR pointer. Hard rule: **one line — two as the absolute exception**. No multi-line narration, no incident retrospectives in `//`, no restating *what* the next line does. If the explanation needs a paragraph, it belongs in an **ADR** (link it: `// See ADR-005.`) or in an **XML `<summary>`** on the public type — not inline. Inline `//` is a *pointer*, not the storage.
+7. **Use .NET 10 `extension` blocks** for extension methods. Do not write `static class` + `this` parameter — use the C# 14 `extension` syntax instead.
+8. **No "Manager", "Helper", "Util" suffixes** unless the class genuinely is a generic helper (rare). Name by responsibility: `CityMapper`, `StreetTrafficUpdater`, `GoogleHTTPClient`.
+9. **No `#region`.** Use partial classes (one method per file for HTTP clients) or extract a new class. The only exception is legacy test files explicitly listed in the root `CLAUDE.md`.
+10. **Comments earn their place.** Tale Code reads like prose — let names carry the meaning. Write a comment **only** when a reader cannot infer the *why* from the code itself: a non-obvious framework constraint, a workaround for a specific bug/version, an ADR pointer. Hard rule: **one line — two as the absolute exception**. No multi-line narration, no incident retrospectives in `//`, no restating *what* the next line does. If the explanation needs a paragraph, it belongs in an **ADR** (link it: `// See ADR-005.`) or in an **XML `<summary>`** on the public type — not inline. Inline `//` is a *pointer*, not the storage.
     ```csharp
     // ❌ BAD — three-line essay restating what the call does and re-explaining
     //         framework internals everyone can google.
@@ -438,6 +437,7 @@ These apply to every class you write, regardless of layer.
     - Does it record a design decision / incident? → move to an ADR, link from one-line `//`.
     - Does it explain *what* the code does? → delete it, rename the symbol instead.
     - Is it genuinely a single non-obvious *why*? → keep, one line.
+
 
 ---
 
@@ -495,6 +495,7 @@ These apply to every class you write, regardless of layer.
 
 - Bind config sections to options classes (`SQLConfiguration`, `Neo4jSettings`, `GoogleHTTPOptions`).
 - Bind in `Program.cs` and pass the *configuration object* into `Install...` methods — installers must not call `IConfiguration` directly.
+- **Every `AddOptions<T>()` chain must end with `.ValidateOnStart()`.** Bad config = host refuses to start. Never let a misconfiguration slip through to the first production request.
 - Secrets never live in `appsettings.json`. Use environment variables / Aspire / Key Vault.
 
 ---
@@ -512,6 +513,7 @@ These are real examples spotted in DreamTravel. Fix them when you touch the surr
 | Naked `Newtonsoft.Json` usage in new code | `CalculateBestPathController` | `System.Text.Json` (and the Story/AUID converters) is the default. Newtonsoft only where Hangfire / legacy serialization requires it. |
 | Mocking `IMediator` / `DbContext` in unit tests | hypothetical | Write a Component test instead. |
 | Hand-written `private readonly` ctor capture | hypothetical | C# 12 primary constructor. |
+| `static class` + `this` extension methods | various | .NET 10 / C# 14 `extension` block. See §9.12. |
 | `#region` to organize a class | forbidden | Split into partial files or new classes. |
 | Multi-line "essay" comment restating *what* the next line does | various | One line, *why* only. See §9.11. |
 | Returning a persistence-layer entity (`*Entity` from `DbModels/`) past the DataLayer boundary — e.g. as a controller / handler / repository return type | DataLayer projects | Map to a domain type at the DataLayer boundary (`*Mapper.ToDomain`). Consumers see domain types only — see §5 and §6. Leaking an entity bypasses lazy-loading control, change-tracking lifetime, and JSON serialisation contracts. |

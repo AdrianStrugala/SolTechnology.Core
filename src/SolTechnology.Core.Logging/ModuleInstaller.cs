@@ -28,6 +28,7 @@ public static class LoggingServiceCollectionExtensions
 
             var optionsBuilder = services.AddOptions<LoggingOptions>()
                 .ValidateDataAnnotations()
+                .ValidateOnStart()
                 .Validate(o => o.SkipPaths is null || o.SkipPaths.All(p => !string.IsNullOrWhiteSpace(p)),
                     "LoggingOptions.SkipPaths must not contain null or whitespace entries.")
                 .Validate(o => o.MaskedHeaders is null || o.MaskedHeaders.All(p => !string.IsNullOrWhiteSpace(p)),
@@ -56,6 +57,7 @@ public static class LoggingServiceCollectionExtensions
             services.AddOptions<LoggingOptions>()
                 .Bind(configuration.GetSection(LoggingOptions.SectionName))
                 .ValidateDataAnnotations()
+                .ValidateOnStart()
                 .Validate(o => o.SkipPaths is null || o.SkipPaths.All(p => !string.IsNullOrWhiteSpace(p)),
                     "LoggingOptions.SkipPaths must not contain null or whitespace entries.")
                 .Validate(o => o.MaskedHeaders is null || o.MaskedHeaders.All(p => !string.IsNullOrWhiteSpace(p)),

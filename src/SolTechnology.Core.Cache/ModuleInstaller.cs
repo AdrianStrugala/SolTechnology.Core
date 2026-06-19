@@ -1,4 +1,4 @@
-﻿﻿using Microsoft.Extensions.Caching.Memory;
+﻿﻿﻿using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace SolTechnology.Core.Cache;
@@ -21,7 +21,8 @@ public static class ModuleInstaller
                 {
                     config.ExpirationMode = cacheConfiguration.ExpirationMode;
                     config.ExpirationSeconds = cacheConfiguration.ExpirationSeconds;
-                });
+                })
+                .ValidateOnStart();
 
             services.AddMemoryCache();
             services.AddSingleton<ISingletonCache, SingletonCache>();
@@ -39,7 +40,8 @@ public static class ModuleInstaller
                     config.ConnectionString = configuration.ConnectionString;
                     config.InstanceName = configuration.InstanceName;
                     config.ExpirationSeconds = configuration.ExpirationSeconds;
-                });
+                })
+                .ValidateOnStart();
 
             services.AddStackExchangeRedisCache(options =>
             {

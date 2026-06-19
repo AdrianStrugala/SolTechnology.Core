@@ -1,4 +1,4 @@
-﻿using System.ComponentModel;
+﻿﻿using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Text.Json.Serialization;
@@ -18,20 +18,26 @@ public readonly struct Auid : IComparable<Auid>, IEquatable<Auid>, IParsable<Aui
     // Code:   15 bits (17,576 combinations) -> Bits 63-49
     // Time:   32 bits (Seconds since 2001)  -> Bits 48-17
     // Random: 17 bits (131,072 combinations)-> Bits 16-0
-    
+
     private const int BitsRandom = 17;
     private const int BitsTime = 32;
     // BitsCode = 15 (Calculated implicitly)
 
     private const long MaskRandom = (1L << BitsRandom) - 1;     // 0x1FFFF
     private const long MaskTime = (1L << BitsTime) - 1;         // 0xFFFFFFFF
-    
+
     // Epoch: 2001-01-01 UTC
     private static readonly long EpochTicks = new DateTime(2001, 1, 1, 0, 0, 0, DateTimeKind.Utc).Ticks;
-    
+
     // Defaults
     private const string DefaultCode = "XXX";
     private const char Separator = '_';
+
+    /// <summary>
+    /// The <see cref="System.TimeProvider"/> used for timestamp generation. Defaults to
+    /// <see cref="TimeProvider.System"/>. Override in tests to control time deterministically.
+    /// </summary>
+    public static TimeProvider TimeProvider { get; set; } = TimeProvider.System;
 
     /// <summary>
     /// The raw 64-bit integer value. Can be negative due to full 64-bit usage.
@@ -171,7 +177,7 @@ public readonly struct Auid : IComparable<Auid>, IEquatable<Auid>, IParsable<Aui
         }
 
         // 2. Encode Time (32 bits)
-        long seconds = (DateTime.UtcNow.Ticks - EpochTicks) / TimeSpan.TicksPerSecond;
+        long seconds = (TimeProvider.GetUtcNow().Ticks - EpochTicks) / TimeSpan.TicksPerSecond;
 
         // Validate timestamp doesn't exceed 32-bit limit
         if (seconds > MaskTime)

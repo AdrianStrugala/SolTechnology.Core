@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using SolTechnology.Core.BlobStorage.Connection;
 
@@ -18,7 +18,8 @@ namespace SolTechnology.Core.BlobStorage
                 .Configure(config =>
                 {
                     config.ConnectionString = blobStorageConfiguration.ConnectionString;
-                });
+                })
+                .ValidateOnStart();
 
             services.AddSingleton<IBlobConnectionFactory, BlobConnectionFactory>();
 

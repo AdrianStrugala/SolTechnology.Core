@@ -139,7 +139,8 @@ public abstract class StoryHandler<TInput, TContext, TOutput>
 
         var repository = _serviceProvider.GetService<IStoryRepository>();
         var options = _serviceProvider.GetService<StoryOptions>() ?? StoryOptions.Default;
-        _engine = new StoryEngine<TInput, TContext, TOutput>(_serviceProvider, _logger, repository, options);
+        var timeProvider = _serviceProvider.GetService<TimeProvider>();
+        _engine = new StoryEngine<TInput, TContext, TOutput>(_serviceProvider, _logger, repository, options, timeProvider);
 
         if (Context is null || Context.StoryInstanceId == Auid.Empty)
         {

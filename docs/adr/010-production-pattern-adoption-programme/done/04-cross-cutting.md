@@ -1,15 +1,14 @@
 ---
 adr: 010-production-pattern-adoption-programme
 step: 04 of 07
-status: to-do
+status: done
 ---
-# Step 04: Cross-cutting — `MapError` + `ValidateOnStart` + `TimeProvider` + coding-guide
+# Step 04: Cross-cutting — `ValidateOnStart` + `TimeProvider` + coding-guide rules
 
 ## Summary
-Add `MapError` combinator, wire `ValidateOnStart` in all modules, replace `DateTime.UtcNow` with `TimeProvider`, update coding guide.
+Wire `ValidateOnStart` in all modules, replace `DateTime.UtcNow` with `TimeProvider`, update coding guide.
 
 ## Affected components
-- `src/SolTechnology.Core.CQRS/ResultExtensions.cs` — add `MapError` (G5)
 - `src/SolTechnology.Core.Cache/ModuleInstaller.cs` — `.ValidateDataAnnotations().ValidateOnStart()` (G3)
 - `src/SolTechnology.Core.SQL/ModuleInstaller.cs` — same (G3)
 - `src/SolTechnology.Core.MessageBus/ModuleInstaller.cs` — same (G3)
@@ -23,13 +22,11 @@ Add `MapError` combinator, wire `ValidateOnStart` in all modules, replace `DateT
 - `docs/ClaudeCodingGuide.md` — G2 (static JsonSerializerOptions), G6 ([ExcludeFromCodeCoverage]), G7 (primary-ctor), logging guard-rail
 
 ## Details
-- **G5:** `MapError(Func<Error, Error> mapper)` — transforms error on failure, passes through on success.
-- **G3:** Behaviour change — bad config = host won't start. Document in release notes.
+- **G3:** Behaviour change — bad config = host won't start.
 - **G1:** Replace `DateTime.UtcNow` with `timeProvider.GetUtcNow()` in AUID + Story.
 - **G2/G6/G7:** Documentation rules in coding guide.
 
 ## Acceptance criteria
-- `MapError` on success → pass-through; on failure → transforms error
 - All modules with `AddOptions<T>` have `ValidateOnStart`
 - No `DateTime.UtcNow` in `src/` (except test infra)
 - Tests pass; `dotnet build` green

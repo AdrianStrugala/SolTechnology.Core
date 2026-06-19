@@ -39,6 +39,7 @@ internal sealed class StoryEngine<TInput, TContext, TOutput>
     private readonly ILogger _logger;
     private readonly IStoryRepository? _repository;
     private readonly StoryOptions _options;
+    private readonly TimeProvider _timeProvider;
 
     private TContext _context = null!;
     private CancellationToken _cancellationToken;
@@ -58,12 +59,14 @@ internal sealed class StoryEngine<TInput, TContext, TOutput>
         IServiceProvider serviceProvider,
         ILogger logger,
         IStoryRepository? repository,
-        StoryOptions? options)
+        StoryOptions? options,
+        TimeProvider? timeProvider = null)
     {
         _serviceProvider = serviceProvider;
         _logger = logger;
         _repository = repository;
         _options = options ?? StoryOptions.Default;
+        _timeProvider = timeProvider ?? TimeProvider.System;
     }
 
     public bool IsPaused => _isPaused;
@@ -93,7 +96,7 @@ internal sealed class StoryEngine<TInput, TContext, TOutput>
         }
         else
         {
-            _createdAt = DateTime.UtcNow;
+            _createdAt = _timeProvider.GetUtcNow().UtcDateTime;
             if (_repository != null)
             {
                 var newId = Auid.New(_options.StoryIdPrefix);
@@ -229,7 +232,7 @@ internal sealed class StoryEngine<TInput, TContext, TOutput>
         var chapterInfo = existingChapter ?? new ChapterInfo
         {
             ChapterId = chapter.ChapterId,
-            StartedAt = DateTime.UtcNow,
+            StartedAt = _timeProvider.GetUtcNow().UtcDateTime,
             Status = StoryStatus.Running
         };
 
@@ -258,14 +261,14 @@ internal sealed class StoryEngine<TInput, TContext, TOutput>
             else if (chapterInfo.Status != StoryStatus.WaitingForInput)
             {
                 chapterInfo.Status = StoryStatus.Completed;
-                chapterInfo.FinishedAt = DateTime.UtcNow;
+                chapterInfo.FinishedAt = _timeProvider.GetUtcNow().UtcDateTime;
             }
         }
         catch (OperationCanceledException)
         {
             _isCancelled = true;
             chapterInfo.Status = StoryStatus.Cancelled;
-            chapterInfo.FinishedAt = DateTime.UtcNow;
+            chapterInfo.FinishedAt = _timeProvider.GetUtcNow().UtcDateTime;
             throw;
         }
         catch (Exception ex)
@@ -360,7 +363,7 @@ internal sealed class StoryEngine<TInput, TContext, TOutput>
         {
             chapterInfo.Error = error;
             chapterInfo.Status = StoryStatus.Failed;
-            chapterInfo.FinishedAt = DateTime.UtcNow;
+            chapterInfo.FinishedAt = _timeProvider.GetUtcNow().UtcDateTime;
         }
     }
 
@@ -402,8 +405,8 @@ internal sealed class StoryEngine<TInput, TContext, TOutput>
             StoryId = _context.StoryInstanceId,
             HandlerTypeName = _handlerTypeName,
             Status = terminal ? GetTerminalStatus() : IntermediateStatus(),
-            CreatedAt = _createdAt == default ? DateTime.UtcNow : _createdAt,
-            LastUpdatedAt = DateTime.UtcNow,
+            CreatedAt = _createdAt == default ? _timeProvider.GetUtcNow().UtcDateTime : _createdAt,
+            LastUpdatedAt = _timeProvider.GetUtcNow().UtcDateTime,
             History = new List<ChapterInfo>(_chapterHistory),
             CurrentChapter = _isPaused ? _chapterHistory.LastOrDefault() : null,
             Context = JsonSerializer.Serialize(_context, StoryJsonOptions.Default)
