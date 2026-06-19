@@ -6,8 +6,8 @@ using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Routing;
 using NSubstitute;
 using SolTechnology.Core.API.Filters;
-using SolTechnology.Core.CQRS;
-using SolTechnology.Core.CQRS.Errors;
+using SolTechnology.Core;
+using SolTechnology.Core.Errors;
 using SolTechnology.Core.Logging.Correlations;
 using NUnit.Framework;
 

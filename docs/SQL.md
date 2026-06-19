@@ -52,7 +52,52 @@ services.AddSQL(sqlConfiguration);
 
 3) Works well with raw SQL and Dapper ORM.
 
-### Testing
+---
+
+### Error Translation
+
+`SqlErrorTranslator` maps SQL Server exceptions to typed `Result` failures — keeping `SqlException` from leaking into the application layer.
+
+| SQL Error Code | Mapped Error Type | Recoverable |
+|---|---|---|
+| 2627, 2601 | `ConflictError` (duplicate key) | No |
+| 1205 | `DeadlockError` | Yes |
+| -2 | `TimeoutError` | Yes |
+| other | `Error` (generic) | No |
+
+#### Usage in repositories
+
+```csharp
+public async Task<Result> Save(City city)
+{
+    return await SqlErrorTranslator.Execute(async () =>
+    {
+        using var connection = _connectionFactory.CreateConnection();
+        await connection.ExecuteAsync("INSERT INTO Cities ...", city);
+    });
+}
+
+public async Task<Result<City>> GetById(int id)
+{
+    return await SqlErrorTranslator.Execute(async () =>
+    {
+        using var connection = _connectionFactory.CreateConnection();
+        return await connection.QuerySingleAsync<City>("SELECT * FROM Cities WHERE Id = @id", new { id });
+    });
+}
+```
+
+---
+
+### Repository Convention
+
+- Repositories return `Result` / `Result<T>`, never throw for expected outcomes (duplicates, timeouts, deadlocks).
+- Wrap database calls with `SqlErrorTranslator.Execute(...)` to translate SQL errors.
+- Repositories return **domain types**, not EF entities or driver types.
+- Methods are intent-named (`GetById`, `SaveTrip`), not generic CRUD (`Update`, `Save`).
+- One repository per aggregate / bounded context.
+
+--- Testing
 
 The companion package **`SolTechnology.Core.SQL.Testing`** provides `SQLFixture` — a
 [Testcontainers](https://dotnet.testcontainers.org/)-backed database fixture for component tests.

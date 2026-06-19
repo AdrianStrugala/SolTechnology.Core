@@ -3,11 +3,12 @@ using FluentAssertions;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using NUnit.Framework;
-using SolTechnology.Core.CQRS;
+using SolTechnology.Core;
 using SolTechnology.Core.Story;
 using SolTechnology.Core.Story.Models;
 using SolTechnology.Core.Story.Orchestration;
 using SolTechnology.Core.Story.Persistence;
+using SolTechnology.Core.Story.Tale;
 
 namespace SolTechnology.Core.Story.Tests;
 
@@ -194,22 +195,20 @@ public class LifecycleCompleteChapter : Chapter<LifecycleContext>
 public class LifecycleStoryV1 : StoryHandler<LifecycleInput, LifecycleContext, LifecycleOutput>
 {
     public LifecycleStoryV1(IServiceProvider sp, ILogger<LifecycleStoryV1> log) : base(sp, log) { }
-    protected override async Task TellStory()
-    {
-        await ReadChapter<LifecyclePassingChapter>();
-        await ReadChapter<LifecyclePauseChapter>();
-        await ReadChapter<LifecycleCompleteChapter>();
-    }
+    protected override Tale<LifecycleOutput> Tell() =>
+        Open<LifecyclePassingChapter>()
+            .Read<LifecyclePauseChapter>()
+            .Read<LifecycleCompleteChapter>()
+            .Finale(ctx => ctx.Output);
 }
 
 public class LifecycleStoryV2 : StoryHandler<LifecycleInput, LifecycleContext, LifecycleOutput>
 {
     public LifecycleStoryV2(IServiceProvider sp, ILogger<LifecycleStoryV2> log) : base(sp, log) { }
-    protected override async Task TellStory()
-    {
-        await ReadChapter<LifecyclePassingChapter>();
-        await ReadChapter<LifecycleCompleteChapter>();
-    }
+    protected override Tale<LifecycleOutput> Tell() =>
+        Open<LifecyclePassingChapter>()
+            .Read<LifecycleCompleteChapter>()
+            .Finale(ctx => ctx.Output);
 }
 
 #endregion

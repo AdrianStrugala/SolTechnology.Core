@@ -1,5 +1,3 @@
-using SolTechnology.Core.CQRS;
-
 namespace SolTechnology.Core.Story;
 
 /// <summary>

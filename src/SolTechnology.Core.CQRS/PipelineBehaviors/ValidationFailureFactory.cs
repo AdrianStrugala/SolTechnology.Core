@@ -1,6 +1,6 @@
 using System.Collections.Concurrent;
 using System.Linq.Expressions;
-using SolTechnology.Core.CQRS.Errors;
+using SolTechnology.Core.Errors;
 
 namespace SolTechnology.Core.CQRS.PipelineBehaviors;
 

@@ -3,11 +3,12 @@ using FluentAssertions;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using NUnit.Framework;
-using SolTechnology.Core.CQRS;
+using SolTechnology.Core;
 using SolTechnology.Core.Story;
 using SolTechnology.Core.Story.Models;
 using SolTechnology.Core.Story.Orchestration;
 using SolTechnology.Core.Story.Persistence;
+using SolTechnology.Core.Story.Tale;
 
 namespace SolTechnology.Core.Story.Tests;
 
@@ -250,13 +251,12 @@ public class OrderProcessingStory : StoryHandler<OrderInput, OrderContext, Order
     {
     }
 
-    protected override async Task TellStory()
-    {
-        await ReadChapter<OrderValidationChapter>();
-        await ReadChapter<RequestCustomerDetailsChapter>(); // Interactive - will pause here
-        await ReadChapter<ProcessPaymentChapter>();
-        await ReadChapter<SendConfirmationChapter>();
-    }
+    protected override Tale<OrderOutput> Tell() =>
+        Open<OrderValidationChapter>()
+            .Read<RequestCustomerDetailsChapter>() // Interactive - will pause here
+            .Read<ProcessPaymentChapter>()
+            .Read<SendConfirmationChapter>()
+            .Finale(ctx => ctx.Output);
 }
 
 public class OrderValidationChapter : Chapter<OrderContext>

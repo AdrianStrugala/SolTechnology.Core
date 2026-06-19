@@ -5,7 +5,7 @@ namespace SolTechnology.Core.Cache
 {
     public interface ISingletonCache
     {
-        Task<TItem> GetOrAdd<TKey, TItem>(TKey key, Func<TKey, Task<TItem>> factory, MemoryCacheEntryOptions? memoryCacheEntryOptions = null);
+        Task<TItem> GetOrAdd<TKey, TItem>(TKey key, Func<TKey, Task<TItem>> factory);
     }
 
     public class SingletonCache : ISingletonCache
@@ -19,8 +19,7 @@ namespace SolTechnology.Core.Cache
             _cacheConfiguration = cacheConfiguration.CurrentValue;
         }
 
-        public Task<TItem> GetOrAdd<TKey, TItem>(TKey key, Func<TKey, Task<TItem>> factory,
-            MemoryCacheEntryOptions? memoryCacheEntryOptions = null)
+        public Task<TItem> GetOrAdd<TKey, TItem>(TKey key, Func<TKey, Task<TItem>> factory)
         {
             var keyString = System.Text.Json.JsonSerializer.Serialize(key);
             if (string.IsNullOrWhiteSpace(keyString))
@@ -28,32 +27,29 @@ namespace SolTechnology.Core.Cache
 
             if (!_memoryCache.TryGetValue<Lazy<Task<TItem>>>(keyString, out var result))
             {
-                var entryOptions = new MemoryCacheEntryOptions();
-                if (memoryCacheEntryOptions == null)
-                {
-                    //Apply values from CacheConfiguration if not specified for the entry
-                    if (_cacheConfiguration.ExpirationMode == ExpirationMode.Absolute)
-                    {
-                        entryOptions.SetAbsoluteExpiration(TimeSpan.FromSeconds(_cacheConfiguration.ExpirationSeconds));
-                    }
-                    else if (_cacheConfiguration.ExpirationMode == ExpirationMode.Sliding)
-                    {
-                        entryOptions.SetSlidingExpiration(TimeSpan.FromSeconds(_cacheConfiguration.ExpirationSeconds));
-                    }
-                }
-                else
-                {
-                    //Override CacheConfiguration value with provided argument
-                    entryOptions = memoryCacheEntryOptions;
-                }
-               
-                var mode = LazyThreadSafetyMode.ExecutionAndPublication;
-                result = new Lazy<Task<TItem>>(() => factory(key), mode);
-                
-                _memoryCache.Set(keyString, result, entryOptions);
+                var options = BuildEntryOptions();
+                result = new Lazy<Task<TItem>>(() => factory(key), LazyThreadSafetyMode.ExecutionAndPublication);
+                _memoryCache.Set(keyString, result, options);
             }
 
             return result!.Value;
+        }
+
+        private MemoryCacheEntryOptions BuildEntryOptions()
+        {
+            var options = new MemoryCacheEntryOptions();
+            var expiration = TimeSpan.FromSeconds(_cacheConfiguration.ExpirationSeconds);
+
+            if (_cacheConfiguration.ExpirationMode == ExpirationMode.Sliding)
+            {
+                options.SetSlidingExpiration(expiration);
+            }
+            else
+            {
+                options.SetAbsoluteExpiration(expiration);
+            }
+
+            return options;
         }
     }
 }

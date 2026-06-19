@@ -1,6 +1,7 @@
-﻿using System.Diagnostics;
+﻿﻿using System.Diagnostics;
 using Microsoft.Extensions.Logging;
 using SolTechnology.Core.Logging;
+using SolTechnology.Core.Logging.Masking;
 using SolTechnology.Core.Logging.Operations;
 
 namespace SolTechnology.Core.CQRS.PipelineBehaviors;
@@ -35,8 +36,11 @@ public sealed class LoggingPipelineBehavior<TRequest, TResponse> : IPipelineBeha
             foreach (var binding in bindings)
             {
                 var value = binding.Getter(request);
-                scopeProperties[binding.Key] = value;
-                activity?.SetTag(binding.Key, value);
+                var scopeValue = binding.Masking is not null
+                    ? PiiMask.Apply(value?.ToString(), binding.Masking.Mode, binding.Masking.KeepChars)
+                    : value;
+                scopeProperties[binding.Key] = scopeValue;
+                activity?.SetTag(binding.Key, scopeValue);
             }
             scope = _logger.BeginScope(scopeProperties);
         }

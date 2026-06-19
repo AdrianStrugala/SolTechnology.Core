@@ -1,7 +1,6 @@
 using System.Text.Json;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using SolTechnology.Core.CQRS;
 using SolTechnology.Core.Story.Models;
 using SolTechnology.Core.Story.Persistence;
 
@@ -17,15 +16,18 @@ public class StoryManager
     private readonly IServiceScopeFactory _scopeFactory;
     private readonly IStoryRepository _repository;
     private readonly ILogger<StoryManager> _logger;
+    private readonly TimeProvider _timeProvider;
 
     public StoryManager(
         IServiceScopeFactory scopeFactory,
         IStoryRepository repository,
-        ILogger<StoryManager> logger)
+        ILogger<StoryManager> logger,
+        TimeProvider? timeProvider = null)
     {
         _scopeFactory = scopeFactory;
         _repository = repository;
         _logger = logger;
+        _timeProvider = timeProvider ?? TimeProvider.System;
     }
 
     /// <summary>Starts a new story execution.</summary>
@@ -80,7 +82,7 @@ public class StoryManager
             return Result<StoryInstance>.Success(instance);
 
         instance.Status = StoryStatus.Cancelled;
-        instance.LastUpdatedAt = DateTime.UtcNow;
+        instance.LastUpdatedAt = _timeProvider.GetUtcNow().UtcDateTime;
         instance.CurrentChapter = null;
         await _repository.SaveAsync(instance);
         return Result<StoryInstance>.Success(instance);
@@ -166,8 +168,8 @@ public class StoryManager
                     StoryId = activeId,
                     HandlerTypeName = typeof(THandler).Name,
                     Status = StoryStatus.Completed,
-                    CreatedAt = DateTime.UtcNow,
-                    LastUpdatedAt = DateTime.UtcNow
+                    CreatedAt = _timeProvider.GetUtcNow().UtcDateTime,
+                    LastUpdatedAt = _timeProvider.GetUtcNow().UtcDateTime
                 });
             }
 

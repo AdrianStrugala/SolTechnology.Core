@@ -3,11 +3,12 @@ using FluentAssertions;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using NUnit.Framework;
-using SolTechnology.Core.CQRS;
+using SolTechnology.Core;
 using SolTechnology.Core.Story;
 using SolTechnology.Core.Story.Models;
 using SolTechnology.Core.Story.Orchestration;
 using SolTechnology.Core.Story.Persistence;
+using SolTechnology.Core.Story.Tale;
 
 namespace SolTechnology.Core.Story.Tests;
 
@@ -611,11 +612,10 @@ public class TestAdvancedStory : StoryHandler<TestAdvancedInput, TestAdvancedCon
     {
     }
 
-    protected override async Task TellStory()
-    {
-        await ReadChapter<ValidInputChapter>();
-        Context.Output.Result = "Completed";
-    }
+    protected override Tale<TestAdvancedOutput> Tell() =>
+        Open<ValidInputChapter>()
+            .Do(ctx => ctx.Output.Result = "Completed")
+            .Finale(ctx => ctx.Output);
 }
 
 public class SimpleCompletionStory : StoryHandler<TestAdvancedInput, TestAdvancedContext, TestAdvancedOutput>
@@ -625,12 +625,10 @@ public class SimpleCompletionStory : StoryHandler<TestAdvancedInput, TestAdvance
     {
     }
 
-    protected override async Task TellStory()
-    {
+    protected override Tale<TestAdvancedOutput> Tell() =>
         // No interactive chapters - completes immediately
-        await Task.CompletedTask;
-        Context.Output.Result = "Done";
-    }
+        Open(ctx => ctx.Output.Result = "Done")
+            .Finale(ctx => ctx.Output);
 }
 
 public class SinglePauseStory : StoryHandler<TestAdvancedInput, TestAdvancedContext, TestAdvancedOutput>
@@ -640,11 +638,10 @@ public class SinglePauseStory : StoryHandler<TestAdvancedInput, TestAdvancedCont
     {
     }
 
-    protected override async Task TellStory()
-    {
-        await ReadChapter<ValidInputChapter>();
-        Context.Output.Result = "Completed after pause";
-    }
+    protected override Tale<TestAdvancedOutput> Tell() =>
+        Open<ValidInputChapter>()
+            .Do(ctx => ctx.Output.Result = "Completed after pause")
+            .Finale(ctx => ctx.Output);
 }
 
 public class MultiPauseStory : StoryHandler<TestAdvancedInput, TestAdvancedContext, TestAdvancedOutput>
@@ -654,13 +651,12 @@ public class MultiPauseStory : StoryHandler<TestAdvancedInput, TestAdvancedConte
     {
     }
 
-    protected override async Task TellStory()
-    {
-        await ReadChapter<ValidInputChapter>();
-        await ReadChapter<SecondInteractiveChapter>();
-        await ReadChapter<ThirdInteractiveChapter>();
-        Context.Output.Result = "Completed all pauses";
-    }
+    protected override Tale<TestAdvancedOutput> Tell() =>
+        Open<ValidInputChapter>()
+            .Read<SecondInteractiveChapter>()
+            .Read<ThirdInteractiveChapter>()
+            .Do(ctx => ctx.Output.Result = "Completed all pauses")
+            .Finale(ctx => ctx.Output);
 }
 
 public class LargeDataStory : StoryHandler<TestAdvancedInput, TestAdvancedContext, TestAdvancedOutput>
@@ -670,11 +666,10 @@ public class LargeDataStory : StoryHandler<TestAdvancedInput, TestAdvancedContex
     {
     }
 
-    protected override async Task TellStory()
-    {
-        await ReadChapter<LargeDataChapter>();
-        Context.Output.Result = "Large data processed";
-    }
+    protected override Tale<TestAdvancedOutput> Tell() =>
+        Open<LargeDataChapter>()
+            .Do(ctx => ctx.Output.Result = "Large data processed")
+            .Finale(ctx => ctx.Output);
 }
 
 #endregion

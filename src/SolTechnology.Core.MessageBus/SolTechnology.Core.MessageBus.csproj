@@ -23,4 +23,7 @@
 <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="10.0.1" />
 <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
 </ItemGroup>
+<ItemGroup>
+<ProjectReference Include="..\SolTechnology.Core.Logging\SolTechnology.Core.Logging.csproj" />
+</ItemGroup>
 </Project>

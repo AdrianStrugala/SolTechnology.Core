@@ -2,7 +2,7 @@ using DreamTravel.Domain.Cities;
 using DreamTravel.Queries.CalculateBestPath;
 using DreamTravel.Queries.CalculateBestPath.Chapters;
 using FluentAssertions;
-using SolTechnology.Core.CQRS;
+using SolTechnology.Core;
 
 namespace DreamTravel.Queries.UnitTests.CalculateBestPath
 {

@@ -152,20 +152,20 @@ public class FindCityByNameHandler(
 **Story Handlers** - for complex multi-step operations using Story Framework:
 
 ```csharp
-public class CalculateBestPathStory(
+public class CalculateBestPathTale(
     IServiceProvider serviceProvider,
-    ILogger<CalculateBestPathStory> logger)
+    ILogger<CalculateBestPathTale> logger)
     : StoryHandler<CalculateBestPathQuery, CalculateBestPathContext, CalculateBestPathResult>(serviceProvider, logger),
       IQueryHandler<CalculateBestPathQuery, CalculateBestPathResult>
 {
-    protected override async Task TellStory()
-    {
-        await ReadChapter<InitiateContext>();
-        await ReadChapter<DownloadRoadData>();
-        await ReadChapter<FindProfitablePath>();
-        await ReadChapter<SolveTsp>();
-        await ReadChapter<FormCalculateBestPathResult>();
-    }
+    protected override Tale<CalculateBestPathResult> Tell() =>
+        Open<InitiateContext>()
+            .Read<DownloadRoadData>()
+            .Read<FindProfitablePath>()
+            .Otherwise<JustOrderCities>()
+            .Read<SolveTsp>()
+            .Read<FormCalculateBestPathResult>()
+            .Finale(ctx => ctx.Output);
 }
 ```
 
@@ -176,7 +176,7 @@ LogicLayer/
 ├─ DreamTravel.Queries/
 │  ├─ CalculateBestPath/
 │  │  ├─ CalculateBestPathQuery.cs        (Input model with validation)
-│  │  ├─ CalculateBestPathStory.cs        (Story orchestrator)
+│  │  ├─ CalculateBestPathTale.cs         (Story orchestrator)
 │  │  ├─ CalculateBestPathContext.cs      (Shared data)
 │  │  ├─ CalculateBestPathResult.cs       (Output model)
 │  │  ├─ Chapters/
@@ -190,14 +190,14 @@ LogicLayer/
 Where:
 
 - **Query/Command** - Input anemic model with FluentValidation rules
-- **Story** - Orchestrates the flow using `TellStory()` method, contains minimal code
+- **Story** - Orchestrates the flow using the `Tell()` method, which returns a `Tale` and contains minimal code
 - **Context** - Shared data structure (Narration) passed through all chapters, inherits from `Context<TInput, TOutput>`
 - **Result** - Output model returned to the caller
 - **Chapters** - Individual story chapters with single, clear purpose (numbered for ordering)
   - `Chapter<TContext>` - Automated chapter with `Read()` method
   - `InteractiveChapter<TContext, TInput>` - Pauses for user input with `ReadWithInput()` method
 
-For maximum readability, Story behaves like a table of contents. Each chapter is explicitly listed in `TellStory()`, making the business flow obvious from a glance - reading like well-written prose. No hidden magic, no searching through inheritance chains - just a clear narrative of "what happens next."
+For maximum readability, Story behaves like a table of contents. Each chapter is explicitly listed in `Tell()`, making the business flow obvious from a glance - reading like well-written prose. No hidden magic, no searching through inheritance chains - just a clear narrative of "what happens next."
 
 #### DomainServices - The Reusable Business Logic
 
@@ -580,21 +580,16 @@ public class CustomerDetailsChapter : InteractiveChapter<SampleOrderContext, Cus
 ```csharp
 public class SampleOrderWorkflowStory : StoryHandler<SampleOrderInput, SampleOrderContext, SampleOrderResult>
 {
-    protected override async Task TellStory()
-    {
-        // Interactive - pauses here
-        await ReadChapter<CustomerDetailsChapter>();
-
-        // Automated - runs immediately
-        await ReadChapter<BackendProcessingChapter>();
-
-        // Automated - runs immediately
-        await ReadChapter<FetchExternalDataChapter>();
-
-        // Set final result
-        Context.Output.OrderId = Context.Input.OrderId;
-        Context.Output.IsSuccessfullyProcessed = true;
-    }
+    protected override Tale<SampleOrderResult> Tell() =>
+        Open<CustomerDetailsChapter>()         // Interactive - pauses here
+            .Read<BackendProcessingChapter>()  // Automated - runs immediately
+            .Read<FetchExternalDataChapter>()  // Automated - runs immediately
+            .Finale(ctx =>
+            {
+                ctx.Output.OrderId = ctx.Input.OrderId;
+                ctx.Output.IsSuccessfullyProcessed = true;
+                return ctx.Output;
+            });
 }
 ```
 
@@ -653,7 +648,7 @@ graph TB
     User -->|HTTP Request| Controller
     Controller -->|MediatR Send| StoryHandler
 
-    StoryHandler -->|ReadChapter| Chapter1
+    StoryHandler -->|Read| Chapter1
     Chapter1 -->|Mutates| Context
     Context -->|Passes to| Chapter2
     Chapter2 -->|Calls| ExternalAPI

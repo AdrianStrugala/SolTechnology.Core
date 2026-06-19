@@ -234,6 +234,34 @@ public async Task Endpoint_AcceptsCorrelationId_AndEchoesItBack()
 }
 ```
 
+
+### Scope helpers
+
+```csharp
+using SolTechnology.Core.Logging;
+
+using var scope = logger.PushToScope("TenantId", tenantId);
+// or multiple:
+using var scope = logger.PushToScope(("TenantId", tenantId), ("Region", region));
+```
+
+### PII masking
+
+```csharp
+using SolTechnology.Core.Logging.Masking;
+
+PiiMask.Full("secret@email.com");        // "***MASKED***"
+PiiMask.Partial("secret@email.com", 3);  // "sec***com"
+```
+
+On CQRS requests, combine `[LogScope]` with `[Masked]`:
+
+```csharp
+[LogScope, Masked(MaskMode.Partial, keepChars: 4)]
+public string Email { get; set; } = null!;
+// scope["Email"] = "john***.com"
+```
+
 ### Conventions
 
 - **`UseCoreLogging` runs before `UseRouting`.** Otherwise pre-routing failures

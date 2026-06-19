@@ -1,5 +1,5 @@
-﻿using FluentValidation;
-using SolTechnology.Core.CQRS.Errors;
+using FluentValidation;
+using SolTechnology.Core.Errors;
 
 namespace SolTechnology.Core.CQRS.PipelineBehaviors;
 

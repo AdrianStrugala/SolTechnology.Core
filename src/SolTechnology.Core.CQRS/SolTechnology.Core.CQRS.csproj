@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
 		<Version>0.8.0</Version>
@@ -25,6 +25,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <ProjectReference Include="..\SolTechnology.Core\SolTechnology.Core.csproj" />
 	  <ProjectReference Include="..\SolTechnology.Core.Logging\SolTechnology.Core.Logging.csproj" />
 	</ItemGroup>
 

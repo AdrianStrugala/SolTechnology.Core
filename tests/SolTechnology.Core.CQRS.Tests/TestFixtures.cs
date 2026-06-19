@@ -1,4 +1,5 @@
 using FluentValidation;
+using SolTechnology.Core;
 using SolTechnology.Core.CQRS;
 
 namespace SolTechnology.Core.CQRS.Tests;

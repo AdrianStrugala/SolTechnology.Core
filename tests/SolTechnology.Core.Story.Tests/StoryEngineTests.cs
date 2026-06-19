@@ -2,9 +2,10 @@ using FluentAssertions;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using NUnit.Framework;
-using SolTechnology.Core.CQRS;
-using SolTechnology.Core.CQRS.Errors;
+using SolTechnology.Core;
+using SolTechnology.Core.Errors;
 using SolTechnology.Core.Story;
+using SolTechnology.Core.Story.Tale;
 
 namespace SolTechnology.Core.Story.Tests;
 
@@ -65,14 +66,12 @@ public class StoryEngineTests
     }
 
     [Test]
-    public async Task StoryEngine_ShouldAggregateErrors_WhenMultipleChaptersFail()
+    public async Task StoryEngine_ShouldStopOnFirstError()
     {
-        // Arrange - create service provider with StopOnFirstError = false
+        // Arrange
         var services = new ServiceCollection();
         services.AddLogging(builder => builder.AddConsole());
-        var optsA = new StoryOptions();
-        optsA.StopOnFirstError = false;
-        services.AddSingleton(optsA);
+        services.AddSingleton(new StoryOptions());
         services.AddTransient<EngineTestFailingChapter>();
         services.AddTransient<EngineTestFailingChapter2>();
         services.AddTransient<EngineTestFailingChapter3>();
@@ -86,70 +85,13 @@ public class StoryEngineTests
 
         // Assert
         result.IsFailure.Should().BeTrue();
-        result.Error.Should().BeOfType<AggregateError>();
-
-        var aggregateError = result.Error as AggregateError;
-        aggregateError!.InnerErrors.Should().HaveCount(3);
-        aggregateError.InnerErrors.Select(e => e.Message).Should().Contain("Error from Chapter 1");
-        aggregateError.InnerErrors.Select(e => e.Message).Should().Contain("Error from Chapter 2");
-        aggregateError.InnerErrors.Select(e => e.Message).Should().Contain("Error from Chapter 3");
-    }
-
-    [Test]
-    public async Task StoryEngine_ShouldStopOnFirstError_WhenConfigured()
-    {
-        // Arrange - create service provider with StopOnFirstError = true
-        var services = new ServiceCollection();
-        services.AddLogging(builder => builder.AddConsole());
-        var optsB = new StoryOptions();
-        optsB.StopOnFirstError = true;
-        services.AddSingleton(optsB);
-        services.AddTransient<EngineTestFailingChapter>();
-        services.AddTransient<EngineTestFailingChapter2>();
-        services.AddTransient<EngineTestFailingChapter3>();
-        var sp = services.BuildServiceProvider();
-
-        var handler = new MultipleErrorsStory(sp, sp.GetRequiredService<ILogger<MultipleErrorsStory>>());
-        var input = new EngineTestInput { Value = 1 };
-
-        // Act
-        var result = await handler.Handle(input);
-
-        // Assert
-        result.IsFailure.Should().BeTrue();
-        result.Error.Should().NotBeOfType<AggregateError>(); // Should be single error
+        result.Error.Should().NotBeOfType<AggregateError>(); // single, first error
         result.Error!.Message.Should().Be("Error from Chapter 1");
 
-        // Only first chapter should have executed
+        // Only the first chapter should have executed
         handler.Context.ExecutionOrder.Should().Equal(new[] { "Chapter1" });
     }
 
-    [Test]
-    public async Task StoryEngine_ShouldContinueAfterErrors_WhenStopOnFirstErrorIsFalse()
-    {
-        // Arrange - create service provider with StopOnFirstError = false
-        var services = new ServiceCollection();
-        services.AddLogging(builder => builder.AddConsole());
-        var optsC = new StoryOptions();
-        optsC.StopOnFirstError = false;
-        services.AddSingleton(optsC);
-        services.AddTransient<EngineTestFailingChapter>();
-        services.AddTransient<EngineTestFailingChapter2>();
-        services.AddTransient<EngineTestFailingChapter3>();
-        var sp = services.BuildServiceProvider();
-
-        var handler = new MultipleErrorsStory(sp, sp.GetRequiredService<ILogger<MultipleErrorsStory>>());
-        var input = new EngineTestInput { Value = 1 };
-
-        // Act
-        var result = await handler.Handle(input);
-
-        // Assert
-        result.IsFailure.Should().BeTrue();
-
-        // All chapters should have executed despite errors
-        handler.Context.ExecutionOrder.Should().Equal(new[] { "Chapter1", "Chapter2", "Chapter3" });
-    }
 
     [Test]
     public async Task StoryEngine_ShouldConvertExceptions_ToErrors()
@@ -236,12 +178,11 @@ public class EngineTestStory : StoryHandler<EngineTestInput, EngineTesTContext, 
     {
     }
 
-    protected override async Task TellStory()
-    {
-        await ReadChapter<EngineTestChapter1>();
-        await ReadChapter<EngineTestChapter2>();
-        await ReadChapter<EngineTestChapter3>();
-    }
+    protected override Tale<EngineTestOutput> Tell() =>
+        Open<EngineTestChapter1>()
+            .Read<EngineTestChapter2>()
+            .Read<EngineTestChapter3>()
+            .Finale(ctx => ctx.Output);
 }
 
 public class MultipleErrorsStory : StoryHandler<EngineTestInput, EngineTesTContext, EngineTestOutput>
@@ -253,12 +194,11 @@ public class MultipleErrorsStory : StoryHandler<EngineTestInput, EngineTesTConte
     {
     }
 
-    protected override async Task TellStory()
-    {
-        await ReadChapter<EngineTestFailingChapter>();
-        await ReadChapter<EngineTestFailingChapter2>();
-        await ReadChapter<EngineTestFailingChapter3>();
-    }
+    protected override Tale<EngineTestOutput> Tell() =>
+        Open<EngineTestFailingChapter>()
+            .Read<EngineTestFailingChapter2>()
+            .Read<EngineTestFailingChapter3>()
+            .Finale(ctx => ctx.Output);
 }
 
 public class SingleErrorStory : StoryHandler<EngineTestInput, EngineTesTContext, EngineTestOutput>
@@ -268,12 +208,11 @@ public class SingleErrorStory : StoryHandler<EngineTestInput, EngineTesTContext,
     {
     }
 
-    protected override async Task TellStory()
-    {
-        await ReadChapter<EngineTestChapter1>();
-        await ReadChapter<EngineTestSingleErrorChapter>();
-        await ReadChapter<EngineTestChapter3>();
-    }
+    protected override Tale<EngineTestOutput> Tell() =>
+        Open<EngineTestChapter1>()
+            .Read<EngineTestSingleErrorChapter>()
+            .Read<EngineTestChapter3>()
+            .Finale(ctx => ctx.Output);
 }
 
 public class ThrowingStory : StoryHandler<EngineTestInput, EngineTesTContext, EngineTestOutput>
@@ -283,10 +222,9 @@ public class ThrowingStory : StoryHandler<EngineTestInput, EngineTesTContext, En
     {
     }
 
-    protected override async Task TellStory()
-    {
-        await ReadChapter<EngineTestThrowingChapter>();
-    }
+    protected override Tale<EngineTestOutput> Tell() =>
+        Open<EngineTestThrowingChapter>()
+            .Finale(ctx => ctx.Output);
 }
 
 public class LongRunningStory : StoryHandler<EngineTestInput, EngineTesTContext, EngineTestOutput>
@@ -296,10 +234,9 @@ public class LongRunningStory : StoryHandler<EngineTestInput, EngineTesTContext,
     {
     }
 
-    protected override async Task TellStory()
-    {
-        await ReadChapter<EngineTestChapter1>();
-    }
+    protected override Tale<EngineTestOutput> Tell() =>
+        Open<EngineTestChapter1>()
+            .Finale(ctx => ctx.Output);
 }
 
 public class UnregisteredChapterStory : StoryHandler<EngineTestInput, EngineTesTContext, EngineTestOutput>
@@ -309,10 +246,9 @@ public class UnregisteredChapterStory : StoryHandler<EngineTestInput, EngineTesT
     {
     }
 
-    protected override async Task TellStory()
-    {
-        await ReadChapter<UnregisteredChapter>();
-    }
+    protected override Tale<EngineTestOutput> Tell() =>
+        Open<UnregisteredChapter>()
+            .Finale(ctx => ctx.Output);
 }
 
 #endregion

@@ -3,7 +3,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\SolTechnology.Core.API\SolTechnology.Core.API.csproj" />
-    <ProjectReference Include="..\..\src\SolTechnology.Core.CQRS\SolTechnology.Core.CQRS.csproj" />
+    <ProjectReference Include="..\..\src\SolTechnology.Core\SolTechnology.Core.csproj" />
     <ProjectReference Include="..\..\src\SolTechnology.Core.Logging\SolTechnology.Core.Logging.csproj" />
   </ItemGroup>
 

@@ -1,5 +1,4 @@
 using System.Data;
-using System.Data.SqlClient;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Options;
 using Polly;

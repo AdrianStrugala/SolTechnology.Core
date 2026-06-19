@@ -41,4 +41,8 @@
 	  <ProjectReference Include="..\DreamTravel.ServiceDefaults\DreamTravel.ServiceDefaults.csproj" />
 	</ItemGroup>
 
+	<ItemGroup>
+	  <Using Include="SolTechnology.Core" />
+	</ItemGroup>
+
 </Project>

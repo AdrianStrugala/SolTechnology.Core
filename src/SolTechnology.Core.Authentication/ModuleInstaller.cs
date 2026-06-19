@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -22,7 +22,8 @@ namespace SolTechnology.Core.Authentication
             .Configure(config =>
             {
                 config.ApiKey = authenticationConfiguration.ApiKey;
-            });
+            })
+            .ValidateOnStart();
 
             var options = services.BuildServiceProvider().GetRequiredService<IOptions<AuthenticationConfiguration>>().Value;
 

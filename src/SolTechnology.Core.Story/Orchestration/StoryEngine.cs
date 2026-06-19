@@ -2,12 +2,10 @@ using System.Collections.Concurrent;
 using System.Reflection;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using SolTechnology.Core.CQRS;
-using SolTechnology.Core.CQRS.Errors;
 using SolTechnology.Core.Story.Models;
 using SolTechnology.Core.Story.Persistence;
+using SolTechnology.Core.Story.Tale;
 
 namespace SolTechnology.Core.Story.Orchestration;
 
@@ -41,6 +39,7 @@ internal sealed class StoryEngine<TInput, TContext, TOutput>
     private readonly ILogger _logger;
     private readonly IStoryRepository? _repository;
     private readonly StoryOptions _options;
+    private readonly TimeProvider _timeProvider;
 
     private TContext _context = null!;
     private CancellationToken _cancellationToken;
@@ -60,12 +59,14 @@ internal sealed class StoryEngine<TInput, TContext, TOutput>
         IServiceProvider serviceProvider,
         ILogger logger,
         IStoryRepository? repository,
-        StoryOptions? options)
+        StoryOptions? options,
+        TimeProvider? timeProvider = null)
     {
         _serviceProvider = serviceProvider;
         _logger = logger;
         _repository = repository;
         _options = options ?? StoryOptions.Default;
+        _timeProvider = timeProvider ?? TimeProvider.System;
     }
 
     public bool IsPaused => _isPaused;
@@ -95,7 +96,7 @@ internal sealed class StoryEngine<TInput, TContext, TOutput>
         }
         else
         {
-            _createdAt = DateTime.UtcNow;
+            _createdAt = _timeProvider.GetUtcNow().UtcDateTime;
             if (_repository != null)
             {
                 var newId = Auid.New(_options.StoryIdPrefix);
@@ -107,21 +108,109 @@ internal sealed class StoryEngine<TInput, TContext, TOutput>
         return Result.Success();
     }
 
-    public async Task ExecuteChapter<TChapter>() where TChapter : IChapter<TContext>
+    /// <summary>
+    /// Interprets a <see cref="Tale{TOutput}"/> plan: walks each recorded step in order, applying the
+    /// first-error short-circuit. Chapters after a failure are skipped; an <c>Otherwise</c> step can
+    /// clear the failure and resume.
+    /// </summary>
+    public async Task Run(IReadOnlyList<TaleStep> steps)
+    {
+        foreach (var step in steps)
+        {
+            switch (step)
+            {
+                case ReadStep s:
+                    await ExecuteChapter(s.ChapterType);
+                    break;
+                case GuardStep s:
+                    ApplyGuard(s);
+                    break;
+                case FallbackChapterStep s:
+                    await ApplyFallbackChapter(s.ChapterType);
+                    break;
+                case FallbackStep s:
+                    await ApplyFallback(s.Recover);
+                    break;
+                case OnLostStep s:
+                    await ApplyOnLost(s.Effect);
+                    break;
+                case OnWonStep s:
+                    await ApplyOnWon(s.Effect);
+                    break;
+                case InlineStep s:
+                    await ApplyInline(s.Action);
+                    break;
+            }
+        }
+    }
+
+    // The story runs on one of two tracks. Won-track steps act only while it is still succeeding;
+    // lost-track steps act only after a failure (until an Otherwise recovers). Both tracks are
+    // suspended once the story is cancelled or paused.
+    private bool OnWonTrack => !_isCancelled && !_isPaused && !_hasFailed;
+    private bool OnLostTrack => !_isCancelled && !_isPaused && _hasFailed;
+
+    private void ApplyGuard(GuardStep step)
+    {
+        if (!OnWonTrack) return;
+        if (!step.Predicate(_context)) HandleChapterFailure(null, step.Error);
+    }
+
+    private async Task ApplyFallbackChapter(Type chapterType)
+    {
+        if (!OnLostTrack) return;
+        ClearFailure();
+        await ExecuteChapter(chapterType);
+    }
+
+    private async Task ApplyFallback(Func<object, Task<Result>> recover)
+    {
+        if (!OnLostTrack) return;
+        ClearFailure();
+        var result = await recover(_context);
+        if (result.IsFailure) HandleChapterFailure(null, result.Error!);
+    }
+
+    private async Task ApplyOnLost(Func<Error, Task> effect)
+    {
+        if (!OnLostTrack) return;
+        await effect(_errors[^1]);
+    }
+
+    private async Task ApplyOnWon(Func<object, Task> effect)
+    {
+        if (!OnWonTrack) return;
+        await effect(_context);
+    }
+
+    private async Task ApplyInline(Func<object, Task<Result>> action)
+    {
+        if (!OnWonTrack) return;
+        var result = await action(_context);
+        if (result.IsFailure) HandleChapterFailure(null, result.Error!);
+    }
+
+    private void ClearFailure()
+    {
+        _hasFailed = false;
+        _errors.Clear();
+    }
+
+    private async Task ExecuteChapter(Type chapterType)
     {
         if (!_isInitialized)
             throw new InvalidOperationException("StoryEngine must be initialized first");
 
         if (_isCancelled) return;
         if (_isPaused && _resumeInput == null) return;
-        if (_hasFailed && _options.StopOnFirstError) return;
+        if (_hasFailed) return;
 
-        var chapter = _serviceProvider.GetService<TChapter>();
+        var chapter = _serviceProvider.GetService(chapterType) as IChapter<TContext>;
         if (chapter == null)
         {
             HandleChapterFailure(null, new Error
             {
-                Message = $"Chapter {typeof(TChapter).Name} not registered in DI container"
+                Message = $"Chapter {chapterType.Name} not registered in DI container"
             });
             return;
         }
@@ -143,7 +232,7 @@ internal sealed class StoryEngine<TInput, TContext, TOutput>
         var chapterInfo = existingChapter ?? new ChapterInfo
         {
             ChapterId = chapter.ChapterId,
-            StartedAt = DateTime.UtcNow,
+            StartedAt = _timeProvider.GetUtcNow().UtcDateTime,
             Status = StoryStatus.Running
         };
 
@@ -172,14 +261,14 @@ internal sealed class StoryEngine<TInput, TContext, TOutput>
             else if (chapterInfo.Status != StoryStatus.WaitingForInput)
             {
                 chapterInfo.Status = StoryStatus.Completed;
-                chapterInfo.FinishedAt = DateTime.UtcNow;
+                chapterInfo.FinishedAt = _timeProvider.GetUtcNow().UtcDateTime;
             }
         }
         catch (OperationCanceledException)
         {
             _isCancelled = true;
             chapterInfo.Status = StoryStatus.Cancelled;
-            chapterInfo.FinishedAt = DateTime.UtcNow;
+            chapterInfo.FinishedAt = _timeProvider.GetUtcNow().UtcDateTime;
             throw;
         }
         catch (Exception ex)
@@ -274,26 +363,22 @@ internal sealed class StoryEngine<TInput, TContext, TOutput>
         {
             chapterInfo.Error = error;
             chapterInfo.Status = StoryStatus.Failed;
-            chapterInfo.FinishedAt = DateTime.UtcNow;
+            chapterInfo.FinishedAt = _timeProvider.GetUtcNow().UtcDateTime;
         }
     }
 
-    public Result<TOutput> GetResult()
+    public Result<TOutput> GetResult(Func<object, TOutput> conclusion)
     {
         if (_isCancelled)
             return Result<TOutput>.Fail(new StoryCancelledError(_context is null ? Auid.Empty : _context.StoryInstanceId));
 
         if (_errors.Count > 0)
-        {
-            return _errors.Count == 1
-                ? Result<TOutput>.Fail(_errors[0])
-                : Result<TOutput>.Fail(new AggregateError(_errors));
-        }
+            return Result<TOutput>.Fail(_errors[0]);
 
         if (_isPaused)
             return Result<TOutput>.Fail(new StoryPausedError(_context.StoryInstanceId, _context.CurrentChapterId));
 
-        return Result<TOutput>.Success(_context.Output);
+        return Result<TOutput>.Success(conclusion(_context));
     }
 
     public StoryStatus GetTerminalStatus()
@@ -320,8 +405,8 @@ internal sealed class StoryEngine<TInput, TContext, TOutput>
             StoryId = _context.StoryInstanceId,
             HandlerTypeName = _handlerTypeName,
             Status = terminal ? GetTerminalStatus() : IntermediateStatus(),
-            CreatedAt = _createdAt == default ? DateTime.UtcNow : _createdAt,
-            LastUpdatedAt = DateTime.UtcNow,
+            CreatedAt = _createdAt == default ? _timeProvider.GetUtcNow().UtcDateTime : _createdAt,
+            LastUpdatedAt = _timeProvider.GetUtcNow().UtcDateTime,
             History = new List<ChapterInfo>(_chapterHistory),
             CurrentChapter = _isPaused ? _chapterHistory.LastOrDefault() : null,
             Context = JsonSerializer.Serialize(_context, StoryJsonOptions.Default)

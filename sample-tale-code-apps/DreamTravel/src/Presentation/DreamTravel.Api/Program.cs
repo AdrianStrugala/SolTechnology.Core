@@ -105,7 +105,7 @@ public class Program
         builder.Services.AddFlows();
 
         //The rest
-        builder.Services.AddCache();
+        builder.Services.AddLocalCache();
         builder.Services.AddCoreLogging();
         builder.Services.LogDetail(
             "name",

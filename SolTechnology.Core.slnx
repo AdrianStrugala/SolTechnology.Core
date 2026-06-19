@@ -95,6 +95,7 @@
   </Folder>
   <Folder Name="/src/">
     <File Path="src/Directory.Build.props" />
+    <Project Path="src/SolTechnology.Core/SolTechnology.Core.csproj" />
     <Project Path="src/SolTechnology.Core.API/SolTechnology.Core.API.csproj" />
     <Project Path="src/SolTechnology.Core.API.Testing/SolTechnology.Core.API.Testing.csproj" />
     <Project Path="src/SolTechnology.Core.HTTP/SolTechnology.Core.HTTP.csproj" />

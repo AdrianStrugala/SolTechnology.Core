@@ -36,6 +36,7 @@ The SolTechnology.Core repository contains a set of shared libraries. This is a 
 
 | Documentation                                                                                                    | Tags                                   | NuGet                                                                                                                                                   |
 |------------------------------------------------------------------------------------------------------------|----------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------|
+| [Core (foundation)](https://github.com/AdrianStrugala/SolTechnology.Core/tree/master/docs/CQRS.md#result-pattern) | `Result`, `Error`, `Foundation`        | <a href="https://www.nuget.org/packages/SolTechnology.Core/"><img src="https://badgen.net/nuget/v/SolTechnology.Core?icon=nuget&color=blue"></a>                       |
 | [API](https://github.com/AdrianStrugala/SolTechnology.Core/tree/master/docs/Api.md)                        | `API`, `Web`, `Controllers`            | <a href="https://www.nuget.org/packages/SolTechnology.Core.Api/"><img src="https://badgen.net/nuget/v/SolTechnology.Core.Api?icon=nuget&color=blue"></a>               |
 | [HTTP Clients](https://github.com/AdrianStrugala/SolTechnology.Core/tree/master/docs/Clients.md)           | `HTTP`, `Client`, `REST`               | <a href="https://www.nuget.org/packages/SolTechnology.Core.ApiClient/"><img src="https://badgen.net/nuget/v/SolTechnology.Core.ApiClient?icon=nuget&color=blue"></a>    |
 | [AUID](https://github.com/AdrianStrugala/SolTechnology.Core/tree/master/docs/AUID.md)                      | `GUID`, `UUID`, `ID`, `Identifier`     | <a href="https://www.nuget.org/packages/SolTechnology.Core.AUID/"><img src="https://badgen.net/nuget/v/SolTechnology.Core.AUID?icon=nuget&color=blue"></a>             |
@@ -92,17 +93,21 @@ The sample application is the most common case that came to my mind. It's built 
 <b>Code design is the main goal</b> of Tale Code. Logical flow and code structure are described in detail, and it reads like a well-written story:
 
 ```csharp
-public class CalculateBestPathStory : StoryHandler<Input, Context, Output>
+public class CalculateBestPathTale(IServiceProvider serviceProvider, ILogger<CalculateBestPathTale> logger)
+    : StoryHandler<CalculateBestPathQuery, CalculateBestPathContext, CalculateBestPathResult>(serviceProvider, logger),
+      IQueryHandler<CalculateBestPathQuery, CalculateBestPathResult>
 {
-    protected override async Task TellStory()
-    {
-        await ReadChapter<DownloadRoadDataChapter>();
-        await ReadChapter<FindProfitablePathChapter>();
-        await ReadChapter<SolveTspChapter>();
-        await ReadChapter<FormResultChapter>();
-
-        context.Output.BestPath = context.OptimalRoute;
-    }
+    protected override Tale<CalculateBestPathResult> Tell() =>
+        Open<InitiateContext>()
+            .Expect(ctx => ctx.NoOfCities > 1,
+                    new NotFoundError { Message = "A route needs at least two cities." })
+            .Read<DownloadRoadData>()
+            .Read<FindProfitablePath>()
+            .Otherwise<JustOrderCities>()      // no profitable route → just order by distance
+            .Read<SolveTsp>()
+            .WhenLost(error => logger.LogWarning("Best path calculation failed: {Error}", error.Message))
+            .Read<FormCalculateBestPathResult>()
+            .Finale(ctx => ctx.Output);
 }
 ```
 

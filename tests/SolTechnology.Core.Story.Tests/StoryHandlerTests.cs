@@ -2,8 +2,9 @@ using FluentAssertions;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using NUnit.Framework;
-using SolTechnology.Core.CQRS;
+using SolTechnology.Core;
 using SolTechnology.Core.Story;
+using SolTechnology.Core.Story.Tale;
 
 namespace SolTechnology.Core.Story.Tests;
 
@@ -178,12 +179,11 @@ public class SimpleCalculationStory : StoryHandler<CalculationInput, Calculation
     {
     }
 
-    protected override async Task TellStory()
-    {
-        await ReadChapter<CalculateChapter>();
-        await ReadChapter<ValidateChapter>();
-        await ReadChapter<FormatResultChapter>();
-    }
+    protected override Tale<CalculationOutput> Tell() =>
+        Open<CalculateChapter>()
+            .Read<ValidateChapter>()
+            .Read<FormatResultChapter>()
+            .Finale(ctx => ctx.Output);
 }
 
 /// <summary>
@@ -196,16 +196,15 @@ public class FailingStory : StoryHandler<CalculationInput, CalculationContext, C
     {
     }
 
-    protected override async Task TellStory()
-    {
-        await ReadChapter<CalculateChapter>();
-        await ReadChapter<FailingChapter>();
-        await ReadChapter<FormatResultChapter>(); // Should not be executed
-    }
+    protected override Tale<CalculationOutput> Tell() =>
+        Open<CalculateChapter>()
+            .Read<FailingChapter>()
+            .Read<FormatResultChapter>() // Should not be executed
+            .Finale(ctx => ctx.Output);
 }
 
 /// <summary>
-/// Story that sets output directly in TellStory.
+/// Story that sets output directly via an inline step.
 /// </summary>
 public class DirectOutputStory : StoryHandler<CalculationInput, CalculationContext, CalculationOutput>
 {
@@ -214,11 +213,10 @@ public class DirectOutputStory : StoryHandler<CalculationInput, CalculationConte
     {
     }
 
-    protected override async Task TellStory()
-    {
-        await ReadChapter<ModifyOutputChapter>();
-        Context.Output.Result = $"Direct output: {Context.Input.Number}";
-    }
+    protected override Tale<CalculationOutput> Tell() =>
+        Open<ModifyOutputChapter>()
+            .Do(ctx => ctx.Output.Result = $"Direct output: {ctx.Input.Number}")
+            .Finale(ctx => ctx.Output);
 }
 
 #endregion

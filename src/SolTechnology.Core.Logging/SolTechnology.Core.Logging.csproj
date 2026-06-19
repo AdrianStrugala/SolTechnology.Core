@@ -40,9 +40,6 @@
 		<PackageReference Remove="Microsoft.Extensions.DependencyInjection" />
 		<PackageReference Remove="Microsoft.Extensions.Options" />
 	</ItemGroup>
-	<ItemGroup>
-	  <Folder Include="Extensions\" />
-	</ItemGroup>
 
 	<ItemGroup>
 		<InternalsVisibleTo Include="SolTechnology.Core.HTTP.Tests" />

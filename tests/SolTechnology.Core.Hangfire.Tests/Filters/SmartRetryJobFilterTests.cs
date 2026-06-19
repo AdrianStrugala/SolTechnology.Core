@@ -6,8 +6,8 @@ using Hangfire.States;
 using Hangfire.Storage;
 using NSubstitute;
 using NUnit.Framework;
-using SolTechnology.Core.CQRS;
-using SolTechnology.Core.CQRS.Errors;
+using SolTechnology.Core;
+using SolTechnology.Core.Errors;
 using SolTechnology.Core.Hangfire.Filters;
 
 namespace SolTechnology.Core.Hangfire.Tests.Filters;

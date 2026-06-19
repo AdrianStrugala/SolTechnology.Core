@@ -1,6 +1,7 @@
 using FluentAssertions;
 using FluentValidation;
 using Microsoft.Extensions.DependencyInjection;
+using SolTechnology.Core;
 using SolTechnology.Core.CQRS;
 using SolTechnology.Core.CQRS.PipelineBehaviors;
 
