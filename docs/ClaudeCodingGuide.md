@@ -132,7 +132,7 @@ LogicLayer/DreamTravel.Queries/CalculateBestPath/
   CalculateBestPathQuery.cs        ← input + validator (one file)
   CalculateBestPathResult.cs       ← output DTO
   CalculateBestPathContext.cs      ← Story context (only if it's a Story)
-  CalculateBestPathStory.cs        ← StoryHandler implementation
+  CalculateBestPathTale.cs         ← StoryHandler implementation
   Chapters/
     0.InitiateContext.cs
     1.DownloadRoadData.cs
@@ -188,24 +188,24 @@ public sealed class CalculateBestPathContext : Context<CalculateBestPathQuery, C
     // ...accumulator state used across chapters...
 }
 
-public class CalculateBestPathStory(IServiceProvider sp, ILogger<CalculateBestPathStory> logger)
+public class CalculateBestPathTale(IServiceProvider sp, ILogger<CalculateBestPathTale> logger)
     : StoryHandler<CalculateBestPathQuery, CalculateBestPathContext, CalculateBestPathResult>(sp, logger),
       IQueryHandler<CalculateBestPathQuery, CalculateBestPathResult>
 {
-    protected override async Task TellStory()
-    {
-        await ReadChapter<InitiateContext>();
-        await ReadChapter<DownloadRoadData>();
-        await ReadChapter<FindProfitablePath>();
-        await ReadChapter<SolveTsp>();
-        await ReadChapter<FormCalculateBestPathResult>();
-    }
+    protected override Tale<CalculateBestPathResult> Tell() =>
+        Open<InitiateContext>()
+            .Read<DownloadRoadData>()
+            .Read<FindProfitablePath>()
+            .Otherwise<JustOrderCities>()
+            .Read<SolveTsp>()
+            .Read<FormCalculateBestPathResult>()
+            .Finale(ctx => ctx.Output);
 }
 ```
 
 ### Rules
 
-- `TellStory()` is the table of contents — it must read top-to-bottom as plain English and contain **no logic**, no `if`, no `try`, no loops. If you feel the urge to branch, split the branches into separate chapters or move the decision into a chapter that returns `Result.Fail` to short-circuit.
+- `Tell()` is the table of contents — it returns a `Tale` that reads top-to-bottom as plain English and contains **no logic**, no `if`, no `try`, no loops. Open the story with `Open<FirstChapter>()`, chain with `.Read<Chapter>()`, guard with `.Expect(...)`, recover with `.Otherwise<Fallback>()`, and conclude with `.Finale(ctx => ctx.Output)`. If you feel the urge to branch, split the branches into separate chapters or use `.Expect`/`.Otherwise`.
 - One chapter = one verb = one file. File names are prefixed with their order: `0.InitiateContext.cs`, `1.DownloadRoadData.cs`. Class names omit the prefix (`InitiateContext`, `DownloadRoadData`).
 - Chapter classes inherit `Chapter<TContext>` (automated) or `InteractiveChapter<TContext, TInput>` (user input pause).
 - All cross-chapter state lives on the `Context`. Chapters do not share fields, do not call each other.
@@ -590,19 +590,19 @@ public class FetchTrafficHandler(
 ### Story query
 
 ```csharp
-// CalculateBestPathStory.cs
-public class CalculateBestPathStory(IServiceProvider sp, ILogger<CalculateBestPathStory> logger)
+// CalculateBestPathTale.cs
+public class CalculateBestPathTale(IServiceProvider sp, ILogger<CalculateBestPathTale> logger)
     : StoryHandler<CalculateBestPathQuery, CalculateBestPathContext, CalculateBestPathResult>(sp, logger),
       IQueryHandler<CalculateBestPathQuery, CalculateBestPathResult>
 {
-    protected override async Task TellStory()
-    {
-        await ReadChapter<InitiateContext>();
-        await ReadChapter<DownloadRoadData>();
-        await ReadChapter<FindProfitablePath>();
-        await ReadChapter<SolveTsp>();
-        await ReadChapter<FormCalculateBestPathResult>();
-    }
+    protected override Tale<CalculateBestPathResult> Tell() =>
+        Open<InitiateContext>()
+            .Read<DownloadRoadData>()
+            .Read<FindProfitablePath>()
+            .Otherwise<JustOrderCities>()
+            .Read<SolveTsp>()
+            .Read<FormCalculateBestPathResult>()
+            .Finale(ctx => ctx.Output);
 }
 ```
 

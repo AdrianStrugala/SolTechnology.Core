@@ -1,6 +1,6 @@
 using System.Text.Json;
-using SolTechnology.Core.CQRS;
-using SolTechnology.Core.CQRS.Errors;
+using SolTechnology.Core;
+using SolTechnology.Core.Errors;
 
 namespace SolTechnology.Core.Story.Models;
 

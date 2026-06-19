@@ -3,8 +3,8 @@ using System.Reflection;
 using System.Text.Json;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using SolTechnology.Core.CQRS;
-using SolTechnology.Core.CQRS.Errors;
+using SolTechnology.Core;
+using SolTechnology.Core.Errors;
 using SolTechnology.Core.Story.Models;
 using SolTechnology.Core.Story.Orchestration;
 

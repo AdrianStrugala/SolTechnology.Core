@@ -1,7 +1,8 @@
 using FluentAssertions;
 using Microsoft.Extensions.DependencyInjection;
+using SolTechnology.Core;
 using SolTechnology.Core.CQRS;
-using SolTechnology.Core.CQRS.Errors;
+using SolTechnology.Core.Errors;
 
 namespace SolTechnology.Core.CQRS.Tests.PipelineBehaviors;
 

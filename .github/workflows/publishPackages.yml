@@ -52,6 +52,9 @@ jobs:
     - name: Pack SolTechnology.Core.Scheduler
       run: dotnet pack -c Release -o . ./src/SolTechnology.Core.Scheduler/SolTechnology.Core.Scheduler.csproj
 
+    - name: Pack SolTechnology.Core
+      run: dotnet pack -c Release -o . ./src/SolTechnology.Core/SolTechnology.Core.csproj
+
     - name: Pack SolTechnology.Core.CQRS
       run: dotnet pack -c Release -o . ./src/SolTechnology.Core.CQRS/SolTechnology.Core.CQRS.csproj
 

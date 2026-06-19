@@ -1,7 +1,8 @@
-﻿#nullable enable
+#nullable enable
 using System.Text.Json.Serialization;
+using SolTechnology.Core.Errors;
 
-namespace SolTechnology.Core.CQRS.Errors;
+namespace SolTechnology.Core;
 
 /// <summary>
 /// Base error surfaced by the application layer through <see cref="Result"/> /
@@ -16,6 +17,8 @@ namespace SolTechnology.Core.CQRS.Errors;
 [JsonDerivedType(typeof(UnauthorizedError), "unauthorized")]
 [JsonDerivedType(typeof(ForbiddenError), "forbidden")]
 [JsonDerivedType(typeof(AggregateError), "aggregate")]
+[JsonDerivedType(typeof(TimeoutError), "timeout")]
+[JsonDerivedType(typeof(DeadlockError), "deadlock")]
 public record Error
 {
     public virtual string Message { get; init; } = null!;
@@ -36,3 +39,4 @@ public record Error
             Message = exception.Message
         };
 }
+

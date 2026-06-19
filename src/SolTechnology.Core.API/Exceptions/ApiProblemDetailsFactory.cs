@@ -1,7 +1,7 @@
 using FluentValidation;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using SolTechnology.Core.CQRS.Errors;
+using SolTechnology.Core.Errors;
 
 namespace SolTechnology.Core.API.Exceptions;
 

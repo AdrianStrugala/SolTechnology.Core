@@ -226,7 +226,6 @@ non-issue; the feature exists strictly for long-lived workflows.
 ## References
 
 - Framework review: `docs/reviews/Story-Framework-Review.md`
-- User guide: `docs/Story.md`
-- Package README: `src/SolTechnology.Core.Story/README.md`
+- User guide / package README: `docs/Story.md`
 - Tale Code philosophy: `docs/Tale.md`
 

@@ -1,7 +1,6 @@
 using System.Text.Json;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using SolTechnology.Core.CQRS;
 using SolTechnology.Core.Story.Models;
 using SolTechnology.Core.Story.Persistence;
 

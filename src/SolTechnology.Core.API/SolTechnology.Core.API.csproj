@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
 		<Version>0.7.0</Version>
@@ -20,12 +20,13 @@
 	<ItemGroup>
 		<PackageReference Include="Asp.Versioning.Mvc" Version="8.1.0" />
 		<PackageReference Include="Asp.Versioning.Mvc.ApiExplorer" Version="8.1.0" />
+		<PackageReference Include="FluentValidation" Version="11.11.0" />
 		<PackageReference Include="Swashbuckle.AspNetCore.SwaggerGen" Version="7.1.0" />
 		<PackageReference Include="Swashbuckle.AspNetCore.SwaggerUI" Version="7.1.0" />
 	</ItemGroup>
 
 	<ItemGroup>
-	  <ProjectReference Include="..\SolTechnology.Core.CQRS\SolTechnology.Core.CQRS.csproj" />
+	  <ProjectReference Include="..\SolTechnology.Core\SolTechnology.Core.csproj" />
 	  <ProjectReference Include="..\SolTechnology.Core.Logging\SolTechnology.Core.Logging.csproj" />
 	</ItemGroup>
 

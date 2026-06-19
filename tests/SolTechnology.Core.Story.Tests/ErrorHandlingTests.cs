@@ -2,9 +2,10 @@ using FluentAssertions;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using NUnit.Framework;
-using SolTechnology.Core.CQRS;
-using SolTechnology.Core.CQRS.Errors;
+using SolTechnology.Core;
+using SolTechnology.Core.Errors;
 using SolTechnology.Core.Story;
+using SolTechnology.Core.Story.Tale;
 
 namespace SolTechnology.Core.Story.Tests;
 
@@ -83,14 +84,12 @@ public class ErrorHandlingTests
     }
 
     [Test]
-    public async Task ErrorHandling_ShouldReturnAggregateError_WhenMultipleChaptersFail()
+    public async Task ErrorHandling_ShouldReturnFirstError_WhenMultipleChaptersFail()
     {
-        // Arrange - create service provider with StopOnFirstError = false
+        // Arrange
         var services = new ServiceCollection();
         services.AddLogging(builder => builder.AddConsole());
-        var options1 = new StoryOptions();
-        options1.StopOnFirstError = false;
-        services.AddSingleton(options1);
+        services.AddSingleton(new StoryOptions());
         services.AddTransient<ErrorTestFirstFailureChapter>();
         services.AddTransient<ErrorTestSecondFailureChapter>();
         var sp = services.BuildServiceProvider();
@@ -103,38 +102,8 @@ public class ErrorHandlingTests
 
         // Assert
         result.IsFailure.Should().BeTrue();
-        result.Error.Should().BeOfType<AggregateError>();
-
-        var aggregateError = result.Error as AggregateError;
-        aggregateError!.InnerErrors.Should().HaveCount(2);
-        aggregateError.Message.Should().Contain("One or more errors occurred");
-    }
-
-    [Test]
-    public async Task ErrorHandling_AggregateError_ShouldContainAllErrors()
-    {
-        // Arrange - create service provider with StopOnFirstError = false
-        var services = new ServiceCollection();
-        services.AddLogging(builder => builder.AddConsole());
-        var options2 = new StoryOptions();
-        options2.StopOnFirstError = false;
-        services.AddSingleton(options2);
-        services.AddTransient<ErrorTestFirstFailureChapter>();
-        services.AddTransient<ErrorTestSecondFailureChapter>();
-        var sp = services.BuildServiceProvider();
-
-        var handler = new MultipleFailuresStory(sp, sp.GetRequiredService<ILogger<MultipleFailuresStory>>());
-        var input = new ErrorTestInput { Value = 10 };
-
-        // Act
-        var result = await handler.Handle(input);
-
-        // Assert
-        var aggregateError = result.Error as AggregateError;
-        var errorMessages = aggregateError!.InnerErrors.Select(e => e.Message).ToList();
-
-        errorMessages.Should().Contain("First failure");
-        errorMessages.Should().Contain("Second failure");
+        result.Error.Should().NotBeOfType<AggregateError>();
+        result.Error!.Message.Should().Be("First failure");
     }
 
     [Test]
@@ -171,14 +140,12 @@ public class ErrorHandlingTests
     }
 
     [Test]
-    public async Task ErrorHandling_ShouldNotExecuteRemainingChapters_WhenStopOnFirstError()
+    public async Task ErrorHandling_ShouldNotExecuteRemainingChapters_AfterFirstFailure()
     {
-        // Arrange - create service provider with StopOnFirstError = true
+        // Arrange
         var services = new ServiceCollection();
         services.AddLogging(builder => builder.AddConsole());
-        var options3 = new StoryOptions();
-        options3.StopOnFirstError = true;
-        services.AddSingleton(options3);
+        services.AddSingleton(new StoryOptions());
         services.AddTransient<ErrorTestFirstFailureChapter>();
         services.AddTransient<ErrorTestSecondFailureChapter>();
         var sp = services.BuildServiceProvider();
@@ -191,38 +158,12 @@ public class ErrorHandlingTests
 
         // Assert
         result.IsFailure.Should().BeTrue();
-        result.Error.Should().NotBeOfType<AggregateError>(); // Only first error
         result.Error!.Message.Should().Be("First failure");
 
-        // Verify only first chapter executed
+        // Verify only the first chapter executed (story short-circuits on first error)
         handler.Context.ExecutionLog.Should().HaveCount(1);
     }
 
-    [Test]
-    public async Task ErrorHandling_ShouldExecuteAllChapters_WhenStopOnFirstErrorIsFalse()
-    {
-        // Arrange - create service provider with StopOnFirstError = false
-        var services = new ServiceCollection();
-        services.AddLogging(builder => builder.AddConsole());
-        var options4 = new StoryOptions();
-        options4.StopOnFirstError = false;
-        services.AddSingleton(options4);
-        services.AddTransient<ErrorTestFirstFailureChapter>();
-        services.AddTransient<ErrorTestSecondFailureChapter>();
-        var sp = services.BuildServiceProvider();
-
-        var handler = new MultipleFailuresStory(sp, sp.GetRequiredService<ILogger<MultipleFailuresStory>>());
-        var input = new ErrorTestInput { Value = 10 };
-
-        // Act
-        var result = await handler.Handle(input);
-
-        // Assert
-        result.IsFailure.Should().BeTrue();
-
-        // Verify all chapters executed despite errors
-        handler.Context.ExecutionLog.Should().HaveCount(2);
-    }
 
     [Test]
     public async Task ErrorHandling_ShouldReturnError_ForNullResult()
@@ -262,11 +203,10 @@ public class SuccessfulStory : StoryHandler<ErrorTestInput, ErrorTesTContext, Er
     {
     }
 
-    protected override async Task TellStory()
-    {
-        await ReadChapter<ErrorTestSuccessChapter>();
-        Context.Output.Result = "Success";
-    }
+    protected override Tale<ErrorTestOutput> Tell() =>
+        Open<ErrorTestSuccessChapter>()
+            .Do(ctx => ctx.Output.Result = "Success")
+            .Finale(ctx => ctx.Output);
 }
 
 public class SingleFailureStory : StoryHandler<ErrorTestInput, ErrorTesTContext, ErrorTestOutput>
@@ -276,12 +216,11 @@ public class SingleFailureStory : StoryHandler<ErrorTestInput, ErrorTesTContext,
     {
     }
 
-    protected override async Task TellStory()
-    {
-        await ReadChapter<ErrorTestSuccessChapter>();
-        await ReadChapter<ErrorTestFailureChapter>();
-        await ReadChapter<ErrorTestSuccessChapter>();
-    }
+    protected override Tale<ErrorTestOutput> Tell() =>
+        Open<ErrorTestSuccessChapter>()
+            .Read<ErrorTestFailureChapter>()
+            .Read<ErrorTestSuccessChapter>()
+            .Finale(ctx => ctx.Output);
 }
 
 public class MultipleFailuresStory : StoryHandler<ErrorTestInput, ErrorTesTContext, ErrorTestOutput>
@@ -293,11 +232,10 @@ public class MultipleFailuresStory : StoryHandler<ErrorTestInput, ErrorTesTConte
     {
     }
 
-    protected override async Task TellStory()
-    {
-        await ReadChapter<ErrorTestFirstFailureChapter>();
-        await ReadChapter<ErrorTestSecondFailureChapter>();
-    }
+    protected override Tale<ErrorTestOutput> Tell() =>
+        Open<ErrorTestFirstFailureChapter>()
+            .Read<ErrorTestSecondFailureChapter>()
+            .Finale(ctx => ctx.Output);
 }
 
 public class ExceptionStory : StoryHandler<ErrorTestInput, ErrorTesTContext, ErrorTestOutput>
@@ -307,10 +245,9 @@ public class ExceptionStory : StoryHandler<ErrorTestInput, ErrorTesTContext, Err
     {
     }
 
-    protected override async Task TellStory()
-    {
-        await ReadChapter<ErrorTestExceptionChapter>();
-    }
+    protected override Tale<ErrorTestOutput> Tell() =>
+        Open<ErrorTestExceptionChapter>()
+            .Finale(ctx => ctx.Output);
 }
 
 public class CustomErrorStory : StoryHandler<ErrorTestInput, ErrorTesTContext, ErrorTestOutput>
@@ -320,10 +257,9 @@ public class CustomErrorStory : StoryHandler<ErrorTestInput, ErrorTesTContext, E
     {
     }
 
-    protected override async Task TellStory()
-    {
-        await ReadChapter<ErrorTestCustomErrorChapter>();
-    }
+    protected override Tale<ErrorTestOutput> Tell() =>
+        Open<ErrorTestCustomErrorChapter>()
+            .Finale(ctx => ctx.Output);
 }
 
 #endregion

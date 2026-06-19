@@ -1,5 +1,6 @@
 using FluentAssertions;
 using Microsoft.Extensions.DependencyInjection;
+using SolTechnology.Core;
 using SolTechnology.Core.CQRS;
 
 namespace SolTechnology.Core.CQRS.Tests;

@@ -112,6 +112,9 @@ _mediator.Publish(new UserCreated { UserId = 42 });
 
 ### Result Pattern
 
+Every handler returns a `Result` or `Result<T>` (from the foundational `SolTechnology.Core` package).
+Inspect it explicitly:
+
 ```csharp
 var result = await _mediator.Send(new GetUserQuery { UserId = 1 });
 
@@ -123,14 +126,11 @@ else
 {
     var error = result.Error;
 }
-
-// Combinators
-var output = await _mediator.Send(new GetUserQuery { UserId = 1 })
-    .Map(user => user.Name)
-    .Ensure(name => name.Length > 0, new Error { Message = "Empty name" });
 ```
 
-For multi-step orchestration, see [Story.md](Story.md).
+For multi-step orchestration with fluent success/failure flow — chaining steps, guarding with
+preconditions, recovering from failures — promote the handler to a **Story** and describe it as a
+`Tale`. See [Story.md](Story.md).
 
 ### Pipeline Behaviors
 

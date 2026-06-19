@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <Version>0.1.0</Version>
+    <Description>Foundational types shared across all SolTechnology.Core modules — Result, Error and typed error subtypes.</Description>
+    <PackageTags>sol technology core result error types shared</PackageTags>
+    <Product>SolTechnology.Core</Product>
+    <PackageId>SolTechnology.Core</PackageId>
+    <AssemblyName>SolTechnology.Core</AssemblyName>
+
+    <PackageIcon>docs\mini-logo.png</PackageIcon>
+    <PackageReadmeFile>docs\readme.md</PackageReadmeFile>
+    <RepositoryUrl>https://github.com/AdrianStrugala/SolTechnology.Core</RepositoryUrl>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\..\docs\mini-logo.png" Pack="true" Visible="false" PackagePath="docs\mini-logo.png" />
+    <None Include="..\..\README.md" Pack="true" Visible="false" PackagePath="docs\readme.md" />
+  </ItemGroup>
+
+</Project>
+

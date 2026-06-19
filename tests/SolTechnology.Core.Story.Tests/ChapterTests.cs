@@ -1,6 +1,6 @@
 using FluentAssertions;
 using NUnit.Framework;
-using SolTechnology.Core.CQRS;
+using SolTechnology.Core;
 using SolTechnology.Core.Story;
 
 namespace SolTechnology.Core.Story.Tests;

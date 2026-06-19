@@ -1,6 +1,6 @@
-﻿﻿using System.Text.Json.Serialization;
+using System.Text.Json.Serialization;
 
-namespace SolTechnology.Core.CQRS.Errors;
+namespace SolTechnology.Core.Errors;
 
 /// <summary>
 /// Aggregates multiple errors into one. The <see cref="Message"/> property is computed
@@ -38,3 +38,4 @@ public record AggregateError : Error
         return baseMessage + " " + string.Join(" ", errors.Select(e => $"({e.Message})"));
     }
 }
+

@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
 	<PropertyGroup>
 		<RootNamespace>DreamTravel.Api</RootNamespace>
@@ -39,6 +39,10 @@
 	  <ProjectReference Include="..\..\LogicLayer\DreamTravel.Commands\DreamTravel.Commands.csproj" />
 	  <ProjectReference Include="..\..\LogicLayer\DreamTravel.Queries\DreamTravel.Queries.csproj" />
 	  <ProjectReference Include="..\DreamTravel.ServiceDefaults\DreamTravel.ServiceDefaults.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Using Include="SolTechnology.Core" />
 	</ItemGroup>
 
 </Project>

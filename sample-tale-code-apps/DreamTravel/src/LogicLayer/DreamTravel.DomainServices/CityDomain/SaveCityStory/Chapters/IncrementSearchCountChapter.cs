@@ -1,5 +1,5 @@
 using DreamTravel.DomainServices.CityDomain.SaveSteps;
-using SolTechnology.Core.CQRS;
+using SolTechnology.Core;
 using SolTechnology.Core.Story;
 
 namespace DreamTravel.DomainServices.CityDomain.SaveCityStory.Chapters;

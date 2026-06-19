@@ -45,7 +45,7 @@
 
     <ItemGroup>
       <ProjectReference Include="..\SolTechnology.Core.AUID\SolTechnology.Core.AUID.csproj" />
-      <ProjectReference Include="..\SolTechnology.Core.CQRS\SolTechnology.Core.CQRS.csproj" />
+      <ProjectReference Include="..\SolTechnology.Core\SolTechnology.Core.csproj" />
     </ItemGroup>
 
 </Project>

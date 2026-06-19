@@ -1,4 +1,4 @@
-namespace SolTechnology.Core.CQRS.Errors;
+namespace SolTechnology.Core.Errors;
 
 /// <summary>
 /// Validation failure with per-field error messages. Maps to HTTP 400.
@@ -11,3 +11,4 @@ public record ValidationError : Error
     public IReadOnlyDictionary<string, string[]> Errors { get; init; }
         = new Dictionary<string, string[]>(StringComparer.Ordinal);
 }
+

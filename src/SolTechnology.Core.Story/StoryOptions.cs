@@ -9,10 +9,6 @@ namespace SolTechnology.Core.Story;
 /// </summary>
 public sealed class StoryOptions
 {
-    /// <summary>
-    /// Stop story execution on the first chapter error (true) or aggregate all errors (false).
-    /// </summary>
-    public bool StopOnFirstError { get; set; } = true;
 
     /// <summary>
     /// Prefix used when generating new <see cref="Auid"/> story identifiers. Use distinct

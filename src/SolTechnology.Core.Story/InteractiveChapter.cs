@@ -1,4 +1,4 @@
-using SolTechnology.Core.CQRS;
+using SolTechnology.Core;
 using SolTechnology.Core.Story.Models;
 
 namespace SolTechnology.Core.Story;

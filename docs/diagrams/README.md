@@ -3,6 +3,13 @@
 Sequence and component diagrams for SolTechnology.Core. One Markdown file per diagram,
 authored via the [`diagram` agent](../../.github/agents/diagram.agent.md).
 
+## Index
+
+| Diagram | Type | Covers |
+|---|---|---|
+| [`story-framework-components.md`](./story-framework-components.md) | Component | Story core types after the railway→Tale migration — `StoryHandler` → `Tale` (builder/plan) → `StoryEngine` → `Chapter` → `Context`, with the plan-vs-interpreter split. |
+| [`story-handle-sequence.md`](./story-handle-sequence.md) | Sequence | One `StoryHandler.Handle()` call: build plan → `StoryEngine.Run` → `ExecuteChapter` → `Chapter.Read` mutates `Context` → `GetResult` projects `Output`. |
+
 ## Conventions
 
 - **Mermaid only.** No PlantUML, no inline colour styling — renderer-specific colours break

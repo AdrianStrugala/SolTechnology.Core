@@ -1,4 +1,4 @@
-﻿using DreamTravel.DomainServices.CityDomain.SaveSteps;
+﻿﻿using DreamTravel.DomainServices.CityDomain.SaveSteps;
 using DreamTravel.DomainServices.CityDomain.SaveCityStory;
 using DreamTravel.DomainServices.CityDomain.SaveCityStory.Chapters;
 using DreamTravel.Domain.Cities;
@@ -8,6 +8,7 @@ using DreamTravel.Sql.QueryBuilders;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using SolTechnology.Core.Story;
+using SolTechnology.Core.Story.Tale;
 
 namespace DreamTravel.DomainServices.CityDomain;
 
@@ -65,10 +66,10 @@ public class CityDomainService(
     public async Task<City> Get(string name, Action<CityReadOptions>? configureOptions = null)
     {
         City result;
-        
+
         var options = CityReadOptions.Default;
         configureOptions?.Invoke(options);
-        
+
         var cityEntity = await dbContext.Cities
             .ApplyReadOptions(options)
             .Include(c => c.AlternativeNames)
@@ -83,7 +84,7 @@ public class CityDomainService(
         {
             result = await googleHTTPClient.GetLocationOfCity(name);
         }
-        
+
         result.ReadOptions = options;
 
         return result;
@@ -92,10 +93,10 @@ public class CityDomainService(
     public async Task<City> Get(double latitude, double longitude, Action<CityReadOptions>? configureOptions = null)
     {
         City result;
-        
+
         var options = CityReadOptions.Default;
         configureOptions?.Invoke(options);
-        
+
         var cityEntity = await dbContext.Cities
             .ApplyReadOptions(options)
             .Include(c => c.AlternativeNames)
@@ -114,7 +115,7 @@ public class CityDomainService(
                 Longitude = longitude
             });
         }
-        
+
         result.ReadOptions = options;
 
         return result;
@@ -132,49 +133,13 @@ public class CityDomainService(
     }
 
     /// <summary>
-    /// Story for saving a city to the database.
-    /// Orchestrates loading existing city, assigning alternative name,
-    /// incrementing search count, and saving to database.
+    /// Story for saving a city to the database. Loads (or creates) the entity, assigns its
+    /// alternative name, increments search statistics, and persists the result.
     /// </summary>
-    protected override async Task TellStory()
-    {
-        var city = Context.Input.City;
-        Context.Today = DateOnly.FromDateTime(DateTime.UtcNow);
-
-        // Ensure city has statistics enabled
-        city.ReadOptions = city.ReadOptions.WithStatistics();
-
-        // Load existing city from database or create new one
-        var existingEntity = await dbContext.Cities
-            .ApplyReadOptions(city.ReadOptions)
-            .Include(c => c.AlternativeNames)
-            .WhereCoordinates(city.Latitude, city.Longitude)
-            .FirstOrDefaultAsync();
-
-        Context.IsNew = existingEntity == null;
-
-        // Apply update to existing entity or create new one
-        Context.CityEntity = cityMapper.ApplyUpdate(existingEntity, city);
-
-        // Chapter: Assign alternative name to the city
-        await ReadChapter<AssignAlternativeNameChapter>();
-
-        // Chapter: Increment search count statistics
-        await ReadChapter<IncrementSearchCountChapter>();
-
-        // Save the city entity to database
-        if (Context.IsNew)
-        {
-            await dbContext.Cities.AddAsync(Context.CityEntity);
-        }
-        else
-        {
-            dbContext.Update(Context.CityEntity);
-        }
-
-        await dbContext.SaveChangesAsync();
-
-        // Set the final result
-        Context.Output.IsNew = Context.IsNew;
-    }
+    protected override Tale<SaveCityResult> Tell() =>
+        Open<LoadCityForSave>()
+            .Read<AssignAlternativeNameChapter>()
+            .Read<IncrementSearchCountChapter>()
+            .Read<PersistCity>()
+            .Finale(ctx => ctx.Output);
 }

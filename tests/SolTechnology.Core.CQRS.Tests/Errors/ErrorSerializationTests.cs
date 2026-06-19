@@ -1,6 +1,6 @@
 using System.Text.Json;
 using FluentAssertions;
-using SolTechnology.Core.CQRS.Errors;
+using SolTechnology.Core.Errors;
 
 namespace SolTechnology.Core.CQRS.Tests.Errors;
 
