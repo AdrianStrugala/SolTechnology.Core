@@ -216,6 +216,43 @@ If your tests assert on handler side-effects, the in-memory publisher's `Task.Ru
 is fast enough for most scenarios. For strict synchronous guarantees, assert with a short
 poll/retry — not a custom publisher.
 
+## Recommended defaults
+
+### Retry backoff
+
+`SmartRetryJobFilter` applies this 10-attempt schedule by default:
+
+```
+10s → 30s → 1m → 5m → 15m → 30m → 1h → 2h → 4h → 8h
+```
+
+After the 10th failure, the job is moved to the Failed state (visible in the dashboard).
+Override per-job with `[SmartRetry(attempts: 5)]` if you need fewer attempts.
+
+### Worker count
+
+Hangfire defaults to `Environment.ProcessorCount * 2` workers. This is a good starting
+point for IO-bound handlers (events, notifications). Do not override unless you have
+measured contention — more workers on CPU-bound work causes context-switch overhead.
+
+## Database migration
+
+Hangfire requires its own schema tables (`HangfireJob`, `HangfireState`, `HangfireServer`,
+etc.). The storage provider creates them automatically on first use via
+`SqlServerStorage.Install(...)`, which is **idempotent** — safe to call on every startup.
+
+```csharp
+// Program.cs — call before UseHangfireServer/Dashboard
+var connectionString = builder.Configuration.GetConnectionString("Hangfire");
+Hangfire.SqlServer.SqlServerObjectsInstaller.Install(
+    new System.Data.SqlClient.SqlConnection(connectionString));
+```
+
+> **Why no framework helper?** The storage (connection string, database, schema) is owned by
+> the application, not by `SolTechnology.Core.Hangfire`. The framework registers jobs and
+> event dispatch; the application owns infrastructure. This keeps the library independent of
+> any specific ADO.NET provider or migration tool.
+
 ## See Also
 
 - [ADR-009 — Persistent events and recurring jobs](adr/009-hangfire-persistent-events-and-jobs.md)

@@ -87,4 +87,25 @@ can be merged separately.
 
 ## Implementation plan
 
-Multi-step plan in [`010-production-pattern-adoption-programme/`](010-production-pattern-adoption-programme/summary.md).
+Completed — see [Implementation summary](#implementation-summary) above.
+
+## Implementation summary
+
+Completed 2026-06-19. The per-step working folder
+(`docs/adr/010-production-pattern-adoption-programme/`) was deleted per the ADR-006
+collapse-on-completion rule.
+
+| # | Step | Shipped |
+|---|---|---|
+| 01 | Logging: correlation + PushToScope + PiiMask | `src/SolTechnology.Core.Logging/` — `ICorrelationIdService`, scope helpers, `[Masked]` attribute |
+| 02 | Cache: local + distributed with unified interface | `src/SolTechnology.Core.Cache/` — `ISingletonCache`, `IScopedCache<,>`, Redis `IDistributedCache` wrapper |
+| 03 | SQL: error translator + repository convention | `src/SolTechnology.Core.SQL/SqlErrorTranslator.cs` — maps `SqlException` → typed `Error` |
+| 04 | Cross-cutting: ValidateOnStart + TimeProvider + coding-guide | `.ValidateOnStart()` on all module installers; `TimeProvider` in AUID + Story; §9.12 + §14 rules |
+| 05 | MessageBus: correlation propagation | `MessagePublisher` stamps `CorrelationId`; `MessageBusReceiver` reads + sets + pushes log scope |
+| 06 | Testing: UtcDateTimeSpecimen | `src/SolTechnology.Core.Testing/Customizations/UtcDateTimeSpecimen.cs` — default in `AutoNSubstituteData` |
+| 07 | Hangfire: document defaults | `docs/Hangfire.md` — retry backoff, worker count, database migration snippet |
+
+### Preserved deviations
+
+- **Step 04** — `MapError` combinator removed from scope; `ResultExtensions` no longer exists after Tale DSL migration.
+- **Step 05** — Pipeline extraction (M4) skipped; `HandleMessageAsync` is under the size budget and extracting 5 middleware files would be over-engineering for zero functional gain.
