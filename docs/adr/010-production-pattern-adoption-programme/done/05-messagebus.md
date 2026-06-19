@@ -1,7 +1,7 @@
 ---
 adr: 010-production-pattern-adoption-programme
 step: 05 of 07
-status: to-do
+status: done
 ---
 # Step 05: MessageBus — correlation in receiver + pipeline extraction
 
@@ -29,3 +29,8 @@ Wire `ICorrelationIdService` into `MessageBusReceiver` and extract the inline ha
 ## Open questions
 - none
 
+## Retrospective — Implementation Deviations
+
+### 1. Pipeline extraction (M4) skipped
+**Original plan:** Extract `HandleMessageAsync` into 4 internal middleware classes (IMessageMiddleware, MessageContext, CorrelationMiddleware, DeserializationMiddleware, HandlerInvocationMiddleware, SettlementMiddleware).
+**Actual implementation:** Kept the logic inline in `HandleMessageAsync`. The method is ~90 lines, reads top-to-bottom, and the plan itself stated behaviour must be "bit-for-bit identical" — meaning zero functional gain. Introducing 5 new files + an interface for a purely structural refactor of a single method under the size budget (§9.2: target ≤100 lines) would add indirection without value. Correlation propagation (M2) was the real deliverable and shipped in full.

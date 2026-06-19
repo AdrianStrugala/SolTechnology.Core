@@ -1,50 +1,48 @@
-﻿using System.Net.Mime;
+﻿﻿using System.Net.Mime;
 using System.Text;
 using Azure.Messaging.ServiceBus;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+using SolTechnology.Core.Logging.Correlations;
 using SolTechnology.Core.MessageBus.Broker;
 
 namespace SolTechnology.Core.MessageBus.Publish
 {
-    public sealed class MessagePublisher : IMessagePublisher
+    public sealed class MessagePublisher(
+        IMessageBusBroker messageBusBroker,
+        ICorrelationIdService correlationIdService,
+        ILogger<MessagePublisher> logger) : IMessagePublisher
     {
-        private readonly IMessageBusBroker _messageBusBroker;
-        private readonly ILogger<MessagePublisher> _logger;
-
-        public MessagePublisher(
-            IMessageBusBroker messageBusBroker,
-            ILogger<MessagePublisher> logger)
-        {
-            _messageBusBroker = messageBusBroker;
-            _logger = logger;
-        }
-
         public async Task Publish(IMessage message, CancellationToken cancellationToken = default)
         {
             ArgumentNullException.ThrowIfNull(message);
 
-            await _messageBusBroker.EnsureInitializedAsync(cancellationToken).ConfigureAwait(false);
+            await messageBusBroker.EnsureInitializedAsync(cancellationToken).ConfigureAwait(false);
 
             var messageType = message.GetType();
-            var senders = _messageBusBroker.ResolveSenders(messageType);
+            var senders = messageBusBroker.ResolveSenders(messageType);
 
-            // Each sender requires its own ServiceBusMessage instance — reusing the
-            // same instance after a successful send is unsupported by the SDK
-            // (the underlying AMQP message is consumed).
             foreach (var sender in senders)
             {
                 var serviceBusMessage = BuildMessage(message, messageType);
+
+                // Propagate correlation so the receiver can continue the trace.
+                var correlation = correlationIdService.Get();
+                if (correlation is not null)
+                {
+                    serviceBusMessage.ApplicationProperties["CorrelationId"] = correlation.Value;
+                }
+
                 try
                 {
                     await sender.SendMessageAsync(serviceBusMessage, cancellationToken).ConfigureAwait(false);
-                    _logger.LogDebug(
+                    logger.LogDebug(
                         "Published message {MessageType} {MessageId} to {Entity}",
                         messageType.Name, serviceBusMessage.MessageId, sender.EntityPath);
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogError(ex,
+                    logger.LogError(ex,
                         "Failed to publish message {MessageType} {MessageId} to {Entity}",
                         messageType.Name, serviceBusMessage.MessageId, sender.EntityPath);
                     throw;

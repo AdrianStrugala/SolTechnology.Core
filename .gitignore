@@ -368,3 +368,6 @@ nul
 *.smoke.out
 .scratch/
 
+
+# Rider Copilot plugin internal state
+.idea/**/copilot.data.migration*.xml
