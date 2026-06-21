@@ -22,8 +22,7 @@ namespace DreamTravel.GraphDatabase
 
         public async ValueTask DisposeAsync()
         {
-            await Driver.CloseAsync();
-            Driver.Dispose();
+            await Driver.DisposeAsync();
         }
     }
 }

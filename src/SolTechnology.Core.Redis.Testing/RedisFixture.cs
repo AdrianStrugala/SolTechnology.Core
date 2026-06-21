@@ -57,8 +57,7 @@ public sealed class RedisFixture : IAsyncDisposable
 
     public async Task InitializeAsync(CancellationToken ct = default)
     {
-        var builder = new RedisBuilder()
-            .WithImage(_image ?? DefaultImage)
+        var builder = new RedisBuilder(_image ?? DefaultImage)
             .WithPortBinding(InternalPort, assignRandomHostPort: true)
             .WithCleanUp(!TestContainersContext.ReuseContainers);
 

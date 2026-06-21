@@ -49,8 +49,7 @@ internal sealed class MSSQLEngine(string? image, string containerName) : IDataba
 
     public Task StartAsync(INetwork? network, string? networkAlias, CancellationToken ct)
     {
-        var builder = new ContainerBuilder()
-            .WithImage(image ?? DefaultImage)
+        var builder = new ContainerBuilder(image ?? DefaultImage)
             .WithEnvironment("ACCEPT_EULA", "Y")
             .WithEnvironment("MSSQL_SA_PASSWORD", SaPassword)
             .WithEnvironment("MSSQL_PID", "Developer")

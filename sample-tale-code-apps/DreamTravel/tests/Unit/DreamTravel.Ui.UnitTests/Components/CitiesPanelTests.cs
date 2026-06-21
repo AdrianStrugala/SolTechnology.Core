@@ -33,7 +33,7 @@ public class CitiesPanelTests : Bunit.TestContext
         var cities = new List<CityEntry>();
 
         // Act
-        var cut = RenderComponent<CitiesPanel>(parameters => parameters
+        var cut = Render<CitiesPanel>(parameters => parameters
             .Add(p => p.Cities, cities)
             .Add(p => p.IsLoading, false)
             .Add(p => p.TotalTime, "")
@@ -62,7 +62,7 @@ public class CitiesPanelTests : Bunit.TestContext
         };
 
         // Act
-        var cut = RenderComponent<CitiesPanel>(parameters => parameters
+        var cut = Render<CitiesPanel>(parameters => parameters
             .Add(p => p.Cities, cities)
             .Add(p => p.IsLoading, false)
             .Add(p => p.TotalTime, "")
@@ -97,7 +97,7 @@ public class CitiesPanelTests : Bunit.TestContext
         };
 
         // Act
-        var cut = RenderComponent<CitiesPanel>(parameters => parameters
+        var cut = Render<CitiesPanel>(parameters => parameters
             .Add(p => p.Cities, cities)
             .Add(p => p.IsLoading, false)
             .Add(p => p.TotalTime, "")
@@ -132,7 +132,7 @@ public class CitiesPanelTests : Bunit.TestContext
         };
 
         // Act
-        var cut = RenderComponent<CitiesPanel>(parameters => parameters
+        var cut = Render<CitiesPanel>(parameters => parameters
             .Add(p => p.Cities, cities)
             .Add(p => p.IsLoading, true)
             .Add(p => p.TotalTime, "")
@@ -167,7 +167,7 @@ public class CitiesPanelTests : Bunit.TestContext
         };
 
         // Act
-        var cut = RenderComponent<CitiesPanel>(parameters => parameters
+        var cut = Render<CitiesPanel>(parameters => parameters
             .Add(p => p.Cities, cities)
             .Add(p => p.IsLoading, true)
             .Add(p => p.TotalTime, "")
@@ -185,7 +185,7 @@ public class CitiesPanelTests : Bunit.TestContext
         var cities = new List<CityEntry>();
 
         // Act
-        var cut = RenderComponent<CitiesPanel>(parameters => parameters
+        var cut = Render<CitiesPanel>(parameters => parameters
             .Add(p => p.Cities, cities)
             .Add(p => p.IsLoading, false)
             .Add(p => p.TotalTime, "")
@@ -214,7 +214,7 @@ public class CitiesPanelTests : Bunit.TestContext
         };
 
         // Act
-        var cut = RenderComponent<CitiesPanel>(parameters => parameters
+        var cut = Render<CitiesPanel>(parameters => parameters
             .Add(p => p.Cities, cities)
             .Add(p => p.IsLoading, false)
             .Add(p => p.TotalTime, "")
@@ -255,7 +255,7 @@ public class CitiesPanelTests : Bunit.TestContext
         };
 
         // Act
-        var cut = RenderComponent<CitiesPanel>(parameters => parameters
+        var cut = Render<CitiesPanel>(parameters => parameters
             .Add(p => p.Cities, cities)
             .Add(p => p.IsLoading, false)
             .Add(p => p.TotalTime, "")
@@ -279,7 +279,7 @@ public class CitiesPanelTests : Bunit.TestContext
         var cities = new List<CityEntry>();
 
         // Act
-        var cut = RenderComponent<CitiesPanel>(parameters => parameters
+        var cut = Render<CitiesPanel>(parameters => parameters
             .Add(p => p.Cities, cities)
             .Add(p => p.IsLoading, false)
             .Add(p => p.TotalTime, "")
@@ -310,7 +310,7 @@ public class CitiesPanelTests : Bunit.TestContext
         };
 
         // Act
-        var cut = RenderComponent<CitiesPanel>(parameters => parameters
+        var cut = Render<CitiesPanel>(parameters => parameters
             .Add(p => p.Cities, cities)
             .Add(p => p.IsLoading, false)
             .Add(p => p.TotalTime, "2:30:00")

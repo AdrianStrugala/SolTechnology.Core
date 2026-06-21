@@ -1,7 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
-    <!-- xUnit project — remove NUnit stack from Directory.Build.props -->
+    <!-- LEGACY — not referenced by SolTechnology.Core.slnx, excluded from the active build/test pipeline.
+         xUnit project — remove NUnit stack from Directory.Build.props -->
     <PackageReference Remove="NUnit" />
     <PackageReference Remove="NUnit3TestAdapter" />
     <PackageReference Remove="NUnit.Analyzers" />

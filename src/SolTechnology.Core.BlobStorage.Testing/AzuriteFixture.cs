@@ -52,8 +52,7 @@ public sealed class AzuriteFixture : IAsyncDisposable
 
     public async Task InitializeAsync(CancellationToken ct = default)
     {
-        var builder = new AzuriteBuilder()
-            .WithImage(_image ?? DefaultImage)
+        var builder = new AzuriteBuilder(_image ?? DefaultImage)
             .WithCleanUp(!TestContainersContext.ReuseContainers);
 
         if (TestContainersContext.ReuseContainers)

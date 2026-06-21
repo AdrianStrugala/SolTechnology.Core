@@ -30,10 +30,10 @@ public static class ContainerLifecycleHelper
         var shortId = containerId.Length > 12 ? containerId[..12] : containerId;
         try
         {
-            using var docker = new DockerClientConfiguration().CreateClient();
+            using var docker = new DockerClientBuilder().Build();
             var inspect = await docker.Containers.InspectContainerAsync(containerId, ct).ConfigureAwait(false);
 
-            if (!inspect.State.Running)
+            if (inspect.State is null || !inspect.State.Running)
             {
                 Console.WriteLine($"[ContainerLifecycle] Container {shortId} was stopped; restarting...");
                 await docker.Containers.StartContainerAsync(containerId, new ContainerStartParameters(), ct)
@@ -65,7 +65,7 @@ public static class ContainerLifecycleHelper
             var inspect = await docker.Containers.InspectContainerAsync(containerId, ct).ConfigureAwait(false);
             var state = inspect.State;
 
-            if (state.Running)
+            if (state is not null && state.Running)
             {
                 if (state.Health == null || state.Health.Status == "healthy")
                 {

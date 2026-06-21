@@ -34,8 +34,7 @@ public static class ServiceBusInstanceBuilder
     {
         var configPath = PrepareConfig(configFilePath);
 
-        var builder = new ServiceBusBuilder()
-            .WithImage(image ?? DefaultImage)
+        var builder = new ServiceBusBuilder(image ?? DefaultImage)
             .WithAcceptLicenseAgreement(true)
             // Target is the directory; Testcontainers writes the source file (Config.json) into it.
             .WithResourceMapping(configPath, ContainerConfigDir);

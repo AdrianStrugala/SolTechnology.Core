@@ -61,7 +61,7 @@ public class TspMapTests
     public void TspMap_Renders_WithoutErrors()
     {
         // Act
-        var cut = _testContext.RenderComponent<TspMap>();
+        var cut = _testContext.Render<TspMap>();
 
         // Assert - Component renders without throwing
         cut.Should().NotBeNull();

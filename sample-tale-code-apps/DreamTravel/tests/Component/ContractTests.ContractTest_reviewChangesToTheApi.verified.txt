@@ -1,4 +1,4 @@
-﻿openapi: 3.0.1
+﻿openapi: 3.0.4
 info:
   title: DreamTravel API
   description: Current stable API version
@@ -745,3 +745,15 @@ components:
       in: header
 security:
   - ApiKey: [ ]
+tags:
+  - name: CalculateBestPath
+  - name: DreamTravelStory
+  - name: FindCityByCoordinates
+  - name: FindCityByName
+  - name: FindLocationOfCity
+  - name: FindNameOfCity
+  - name: Home
+  - name: LimitCostOfPaths
+  - name: Projects
+  - name: Statistics
+  - name: Traffic

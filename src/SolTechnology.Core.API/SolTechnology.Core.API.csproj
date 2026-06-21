@@ -18,11 +18,11 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Asp.Versioning.Mvc" Version="8.1.0" />
-		<PackageReference Include="Asp.Versioning.Mvc.ApiExplorer" Version="8.1.0" />
-		<PackageReference Include="FluentValidation" Version="11.11.0" />
-		<PackageReference Include="Swashbuckle.AspNetCore.SwaggerGen" Version="7.1.0" />
-		<PackageReference Include="Swashbuckle.AspNetCore.SwaggerUI" Version="7.1.0" />
+		<PackageReference Include="Asp.Versioning.Mvc" Version="10.0.0" />
+		<PackageReference Include="Asp.Versioning.Mvc.ApiExplorer" Version="10.0.0" />
+		<PackageReference Include="FluentValidation" Version="12.1.1" />
+		<PackageReference Include="Swashbuckle.AspNetCore.SwaggerGen" Version="10.2.2" />
+		<PackageReference Include="Swashbuckle.AspNetCore.SwaggerUI" Version="10.2.2" />
 	</ItemGroup>
 
 	<ItemGroup>

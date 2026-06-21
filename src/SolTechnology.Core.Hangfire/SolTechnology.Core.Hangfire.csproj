@@ -24,8 +24,8 @@
 
 	<ItemGroup>
 		<!-- Hangfire.Core pulls Newtonsoft.Json >= 11.0.1 (CVE-2024-21907 / NU1903). Pin to 13.0.4. -->
-		<PackageReference Include="Hangfire.Core" Version="1.8.22" />
-		<PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="8.0.1" />
+		<PackageReference Include="Hangfire.Core" Version="1.8.23" />
+		<PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="10.0.9" />
 		<PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
 	</ItemGroup>
 

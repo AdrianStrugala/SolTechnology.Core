@@ -3,10 +3,13 @@ using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Text.Json;
 using JsonConverter.Abstractions;
+using Microsoft.AspNetCore.Http;
 using WireMock;
+using WireMock.Models;
 using WireMock.ResponseBuilders;
 using WireMock.Settings;
 using WireMock.Types;
+using WireMock.WebSockets;
 
 namespace SolTechnology.Core.HTTP.Testing.WireMock;
 
@@ -16,19 +19,48 @@ public class JsonResponseBuilderDecorator : IResponseBuilder
 
     public JsonResponseBuilderDecorator(IResponseBuilder originalBuilder) => _originalBuilder = originalBuilder;
 
-    public Task<(IResponseMessage Message, IMapping? Mapping)> ProvideResponseAsync(IMapping mapping,
-        IRequestMessage requestMessage, WireMockServerSettings settings) =>
-        _originalBuilder.ProvideResponseAsync(mapping, requestMessage, settings);
+    public IMapping Mapping => _originalBuilder.Mapping;
 
-    public IResponseBuilder WithCallback(Func<IRequestMessage, ResponseMessage> callbackHandler)
+    public IResponseMessage ResponseMessage => _originalBuilder.ResponseMessage;
+
+    public Task<(IResponseMessage Message, IMapping? Mapping)> ProvideResponseAsync(IMapping mapping,
+        HttpContext context, IRequestMessage requestMessage, WireMockServerSettings settings) =>
+        _originalBuilder.ProvideResponseAsync(mapping, context, requestMessage, settings);
+
+    public IResponseBuilder WithCallback(Func<IRequestMessage, IResponseMessage> callbackHandler)
     {
         _originalBuilder.WithCallback(callbackHandler);
         return this;
     }
 
-    public IResponseBuilder WithCallback(Func<IRequestMessage, Task<ResponseMessage>> callbackHandler)
+    public IResponseBuilder WithCallback(Func<IRequestMessage, Task<IResponseMessage>> callbackHandler)
     {
         _originalBuilder.WithCallback(callbackHandler);
+        return this;
+    }
+
+    public IResponseBuilder WithWebSocket(Action<IWebSocketBuilder> configure)
+    {
+        _originalBuilder.WithWebSocket(configure);
+        return this;
+    }
+
+    public IResponseBuilder WithWebSocketProxy(string targetUrl)
+    {
+        _originalBuilder.WithWebSocketProxy(targetUrl);
+        return this;
+    }
+
+    public IResponseBuilder WithWebSocketProxy(ProxyAndRecordSettings settings)
+    {
+        _originalBuilder.WithWebSocketProxy(settings);
+        return this;
+    }
+
+    public IResponseBuilder WithSseBody(Func<IRequestMessage, IBlockingQueue<string?>, Task> bodyFactory,
+        TimeSpan? timeout = null)
+    {
+        _originalBuilder.WithSseBody(bodyFactory, timeout);
         return this;
     }
 
@@ -78,6 +110,13 @@ public class JsonResponseBuilderDecorator : IResponseBuilder
     public IResponseBuilder WithBody(string body, string? destination = "SameAsSource", Encoding? encoding = null)
     {
         _originalBuilder.WithBody(body, destination, encoding);
+        return this;
+    }
+
+    public IResponseBuilder WithBody(string body, string? destination, Encoding? encoding, IJsonConverter? jsonConverter,
+        JsonConverterOptions? options = null)
+    {
+        _originalBuilder.WithBody(body, destination, encoding, jsonConverter, options);
         return this;
     }
 

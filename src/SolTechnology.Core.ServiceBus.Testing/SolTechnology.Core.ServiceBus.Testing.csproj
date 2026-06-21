@@ -28,10 +28,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Testcontainers.ServiceBus" Version="4.3.0" />
-		<!-- Docker.DotNet comes transitively from Core.Testing, but ServiceBusFixture uses it directly
-		     for stable-name reuse, so keep it explicit. -->
-		<PackageReference Include="Docker.DotNet" Version="3.125.15" />
+		<PackageReference Include="Testcontainers.ServiceBus" Version="4.12.0" />
 	</ItemGroup>
 
 </Project>

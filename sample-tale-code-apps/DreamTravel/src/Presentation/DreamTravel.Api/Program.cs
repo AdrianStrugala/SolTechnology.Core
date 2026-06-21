@@ -9,7 +9,7 @@ using DreamTravel.GeolocationDataClients;
 using DreamTravel.Queries;
 using DreamTravel.Sql;
 using MicroElements.Swashbuckle.FluentValidation.AspNetCore;
-using Microsoft.OpenApi.Models;
+using Microsoft.OpenApi;
 using OpenTelemetry;
 using OpenTelemetry.Trace;
 using SolTechnology.Core.API;
@@ -143,17 +143,10 @@ public class Program
                 Name = ApiKeyAuthenticationSchemeOptions.AuthenticationHeaderName,
                 Description = "Authentication: Api Key for using Dream Travel"
             });
-            c.AddSecurityRequirement(new OpenApiSecurityRequirement
+            c.AddSecurityRequirement(doc => new OpenApiSecurityRequirement
             {
                 {
-                    new OpenApiSecurityScheme
-                    {
-                        Reference = new OpenApiReference
-                        {
-                            Type = ReferenceType.SecurityScheme,
-                            Id = ApiKeyAuthenticationSchemeOptions.AuthenticationScheme
-                        }
-                    },
+                    new OpenApiSecuritySchemeReference(ApiKeyAuthenticationSchemeOptions.AuthenticationScheme, doc),
                     []
                 }
             });

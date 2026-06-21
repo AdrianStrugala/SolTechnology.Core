@@ -130,7 +130,7 @@ public sealed class ServiceBusFixture : IAsyncDisposable
     {
         try
         {
-            using var docker = new DockerClientConfiguration().CreateClient();
+            using var docker = new DockerClientBuilder().Build();
             var containers = await docker.Containers.ListContainersAsync(new ContainersListParameters
             {
                 All = true,
@@ -182,7 +182,7 @@ public sealed class ServiceBusFixture : IAsyncDisposable
     {
         try
         {
-            using var docker = new DockerClientConfiguration().CreateClient();
+            using var docker = new DockerClientBuilder().Build();
             var containers = await docker.Containers.ListContainersAsync(new ContainersListParameters
             {
                 All = true,
@@ -206,10 +206,10 @@ public sealed class ServiceBusFixture : IAsyncDisposable
         }
     }
 
-    private static ushort? GetMappedPort(IList<Port> ports, int containerPort)
+    private static ushort? GetMappedPort(IList<PortSummary> ports, int containerPort)
     {
         var mapping = ports.FirstOrDefault(p => p.PrivatePort == containerPort && p.PublicPort > 0);
-        return mapping == null ? null : (ushort)mapping.PublicPort;
+        return mapping?.PublicPort;
     }
 
     private static ushort? GetMappedPortFromInspect(ContainerInspectResponse inspect, int containerPort)

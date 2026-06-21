@@ -1,6 +1,5 @@
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.OpenApi.Extensions;
-using Microsoft.OpenApi.Models;
+using Microsoft.OpenApi;
 using Swashbuckle.AspNetCore.Swagger;
 
 namespace DreamTravel.FunctionalTests;
@@ -24,11 +23,11 @@ public class ContractTests
     /// </summary>
 
     [Test]
-    public Task ContractTest_reviewChangesToTheApi()
+    public async Task ContractTest_reviewChangesToTheApi()
     {
         OpenApiDocument doc = _swaggerProvider.GetSwagger("v2", null, "/");
-        string swaggerFile = doc.SerializeAsYaml(Microsoft.OpenApi.OpenApiSpecVersion.OpenApi3_0);
+        string swaggerFile = await doc.SerializeAsYamlAsync(OpenApiSpecVersion.OpenApi3_0);
 
-        return Verify(swaggerFile);
+        await Verify(swaggerFile);
     }
 }

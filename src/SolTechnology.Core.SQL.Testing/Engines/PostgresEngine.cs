@@ -31,8 +31,7 @@ internal sealed class PostgresEngine(string? image, string databaseName, string 
 
     public Task StartAsync(INetwork? network, string? networkAlias, CancellationToken ct)
     {
-        var builder = new PostgreSqlBuilder()
-            .WithImage(image ?? DefaultImage)
+        var builder = new PostgreSqlBuilder(image ?? DefaultImage)
             .WithDatabase(databaseName)
             .WithCleanUp(!TestContainersContext.ReuseContainers)
             .WithWaitStrategy(Wait.ForUnixContainer()
