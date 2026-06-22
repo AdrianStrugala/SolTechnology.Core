@@ -36,7 +36,7 @@ removed. Code removal (logic) and package/suppress removal (plumbing) are separa
 
 | # | Title | File | Status |
 |---|---|---|---|
-| 01 | Scaffold the `DreamTravel.SQLite` project (csproj + packages + suppress + slnx) | [`reviewed/01-scaffold-dreamtravel-sqlite-project.md`](reviewed/01-scaffold-dreamtravel-sqlite-project.md) | 🔍 reviewed |
+| 01 | Scaffold the `DreamTravel.SQLite` project (csproj + packages + suppress + slnx) | [`done/01-scaffold-dreamtravel-sqlite-project.md`](done/01-scaffold-dreamtravel-sqlite-project.md) | ✅ done |
 | 02 | Relocate + rename `SQLiteStoryRepository` + `SQLiteStoryRepositoryOptions` | [`reviewed/02-relocate-sqlite-repository-and-options.md`](reviewed/02-relocate-sqlite-repository-and-options.md) | 🔍 reviewed |
 | 03 | Consumer-side `UseSQLiteStoryRepository` builder extension | [`reviewed/03-sqlite-story-builder-extension.md`](reviewed/03-sqlite-story-builder-extension.md) | 🔍 reviewed |
 | 04 | New test project: relocate SQLite tests + SampleOrderWorkflowStory SQLite end-to-end coverage | [`reviewed/04-relocate-sqlite-tests.md`](reviewed/04-relocate-sqlite-tests.md) | 🔍 reviewed |

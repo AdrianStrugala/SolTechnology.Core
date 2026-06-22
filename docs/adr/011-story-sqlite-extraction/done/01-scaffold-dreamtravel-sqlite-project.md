@@ -1,7 +1,7 @@
 ---
 adr: 011-story-sqlite-extraction
 step: 01 of 09
-status: reviewed
+status: done
 ---
 
 # Step 01: Scaffold the `DreamTravel.SQLite` DataLayer project
