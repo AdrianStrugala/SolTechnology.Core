@@ -1,7 +1,7 @@
 ---
 adr: 011-story-sqlite-extraction
 step: 03 of 09
-status: reviewed
+status: done
 ---
 
 # Step 03: Add the consumer-side `UseSQLiteStoryRepository` builder extension
