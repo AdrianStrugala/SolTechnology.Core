@@ -1,7 +1,7 @@
 ---
 adr: 011-story-sqlite-extraction
 step: 04 of 09
-status: reviewed
+status: done
 ---
 
 # Step 04: Create the SQLite test project, relocate the repo tests, and add SampleOrderWorkflowStory SQLite coverage

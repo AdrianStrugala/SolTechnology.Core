@@ -25,6 +25,7 @@
 	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 	    <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
 	  </Content>
+	  <Content Include="DreamTravel.SQLite.Tests\DreamTravel.SQLite.Tests.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>

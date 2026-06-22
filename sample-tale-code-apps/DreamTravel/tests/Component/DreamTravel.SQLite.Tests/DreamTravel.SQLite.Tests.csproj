@@ -1,0 +1,19 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="10.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\src\DataLayer\DreamTravel.SQLite\DreamTravel.SQLite.csproj" />
+    <ProjectReference Include="..\..\..\src\LogicLayer\DreamTravel.Workflows\DreamTravel.Workflows.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- CVE-2025-6965 (GHSA-2m69-gcr7-jv3q): inherited transitively from DreamTravel.SQLite.
+         Suppress keeps test build output clean. Remove together with the src project suppress. -->
+    <NuGetAuditSuppress Include="https://github.com/advisories/GHSA-2m69-gcr7-jv3q" />
+  </ItemGroup>
+
+</Project>
+
