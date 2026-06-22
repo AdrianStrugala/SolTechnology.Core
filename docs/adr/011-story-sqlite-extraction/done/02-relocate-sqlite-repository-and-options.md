@@ -1,7 +1,7 @@
 ---
 adr: 011-story-sqlite-extraction
 step: 02 of 09
-status: reviewed
+status: done
 ---
 
 # Step 02: Relocate + rename `SQLiteStoryRepository` + `SQLiteStoryRepositoryOptions` into the new project
