@@ -1,5 +1,6 @@
 using DreamTravel.SQLite;
 using FluentAssertions;
+using Microsoft.Data.Sqlite;
 using NUnit.Framework;
 using SolTechnology.Core.Story.Models;
 
@@ -25,9 +26,7 @@ public class SQLiteRepositoryTests
     [TearDown]
     public void TearDown()
     {
-        // Force GC to release pooled SQLite connection handles so the temp DB file can be deleted.
-        GC.Collect();
-        GC.WaitForPendingFinalizers();
+        SqliteConnection.ClearAllPools();
 
         if (File.Exists(_testDbPath))
         {

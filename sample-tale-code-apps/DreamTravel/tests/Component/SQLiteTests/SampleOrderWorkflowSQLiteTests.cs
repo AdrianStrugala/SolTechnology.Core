@@ -2,6 +2,7 @@ using System.Text.Json;
 using DreamTravel.Flows.SampleOrderWorkflow;
 using DreamTravel.SQLite;
 using FluentAssertions;
+using Microsoft.Data.Sqlite;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using NUnit.Framework;
@@ -32,9 +33,7 @@ public class SampleOrderWorkflowSQLiteTests
     [TearDown]
     public void TearDown()
     {
-        // Force GC to release pooled SQLite connection handles so the temp DB file can be deleted.
-        GC.Collect();
-        GC.WaitForPendingFinalizers();
+        SqliteConnection.ClearAllPools();
         if (File.Exists(_testDbPath)) try { File.Delete(_testDbPath); } catch { }
     }
 
