@@ -1,7 +1,7 @@
 ---
 adr: 011-story-sqlite-extraction
 step: 08 of 09
-status: reviewed
+status: done
 ---
 
 # Step 08: Final verification — clean audit + green solution

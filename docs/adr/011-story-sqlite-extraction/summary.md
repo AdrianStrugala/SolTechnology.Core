@@ -43,8 +43,8 @@ removed. Code removal (logic) and package/suppress removal (plumbing) are separa
 | 05 | Remove SQLite *code* from library + Story.Tests | [`done/05-remove-sqlite-code-from-library.md`](done/05-remove-sqlite-code-from-library.md) | ✅ done |
 | 06 | Remove SQLite *packages* + suppression from `src/` | [`done/06-remove-sqlite-packages-and-suppress.md`](done/06-remove-sqlite-packages-and-suppress.md) | ✅ done |
 | 07 | Repoint docs + fix phantom persistence API | [`done/07-update-documentation.md`](done/07-update-documentation.md) | ✅ done |
-| 08 | Final verification (clean audit + green solution) | [`reviewed/08-final-verification.md`](reviewed/08-final-verification.md) | 🔍 reviewed |
-| 09 | Run premortem (mandatory gate) | [`reviewed/09-run-premortem.md`](reviewed/09-run-premortem.md) | ✅ done — Go with mitigations |
+| 08 | Final verification (clean audit + green solution) | [`done/08-final-verification.md`](done/08-final-verification.md) | ✅ done |
+| 09 | Run premortem (mandatory gate) | [`done/09-run-premortem.md`](done/09-run-premortem.md) | ✅ done — Go with mitigations |
 
 Status values: `⬜ to-do` / `🔍 reviewed` / `✅ done`. Link in each row points to the step's current
 location (`to-do/` / `reviewed/` / `done/`).

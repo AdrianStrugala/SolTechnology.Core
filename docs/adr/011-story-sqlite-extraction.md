@@ -1,6 +1,6 @@
 # ADR-011: Extract SQLite Story persistence out of `SolTechnology.Core.Story` into the DreamTravel sample
 
-> **Status:** Proposed
+> **Status:** Accepted
 > **Decision Date:** 2026-06-22
 > **Decision Maker:** Repository maintainers
 > **Stakeholders:** Story framework consumers, DreamTravel sample maintainers
