@@ -361,17 +361,25 @@ internal sealed class StoryEngine<TInput, TContext, TOutput>
         }
         else
         {
-            // Validation failure — keep the chapter paused so the user can retry with valid input.
-            // Clear _resumeInput so the next ResumeStory call can provide new data.
-            // The error is stored on the chapter but does NOT set _hasFailed (the story is not
-            // terminally failed — it is still waiting for input).
-            _resumeInput = null;
-            _isPaused = true;
-            chapterInfo.Status = StoryStatus.WaitingForInput;
-            chapterInfo.Error = result.Error;
+            PauseForRetry(chapter, chapterInfo, result.Error);
         }
 
         return result;
+    }
+
+    /// <summary>
+    /// Keeps the story paused at the current interactive chapter after a validation failure,
+    /// allowing the user to retry with corrected input. Does NOT set <see cref="_hasFailed"/>
+    /// — the story is still alive and waiting for input.
+    /// </summary>
+    private void PauseForRetry(IChapter<TContext> chapter, ChapterInfo chapterInfo, Error? error)
+    {
+        _logger.LogInformation("Interactive chapter {ChapterId} rejected input: {Error}",
+            chapter.ChapterId, error?.Message);
+        _resumeInput = null;
+        _isPaused = true;
+        chapterInfo.Status = StoryStatus.WaitingForInput;
+        chapterInfo.Error = error;
     }
 
     private void HandleChapterFailure(ChapterInfo? chapterInfo, Error error)

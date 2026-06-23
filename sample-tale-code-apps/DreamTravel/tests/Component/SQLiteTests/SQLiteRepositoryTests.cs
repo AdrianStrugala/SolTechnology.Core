@@ -25,6 +25,7 @@ public class SQLiteRepositoryTests
     [TearDown]
     public void TearDown()
     {
+        // Force GC to release pooled SQLite connection handles so the temp DB file can be deleted.
         GC.Collect();
         GC.WaitForPendingFinalizers();
 

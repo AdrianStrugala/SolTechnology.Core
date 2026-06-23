@@ -10,6 +10,12 @@ namespace DreamTravel.SQLite;
 /// SQLite implementation of <see cref="IStoryRepository"/>. Configured via
 /// <see cref="SQLiteStoryRepositoryOptions"/> (connection string + tuning). Enables WAL
 /// journal mode for concurrency and retries on <c>SQLITE_BUSY</c>/<c>SQLITE_LOCKED</c>.
+/// <para>
+/// <b>Static state:</b> database initialization (schema creation, WAL pragma) is cached per
+/// connection string in a static <c>HashSet</c>. This avoids redundant DDL on every request but
+/// means the cache survives across test runs in the same process. Use unique temp-file connection
+/// strings in tests to avoid cross-contamination.
+/// </para>
 /// </summary>
 public class SQLiteStoryRepository : IStoryRepository
 {

@@ -32,6 +32,7 @@ public class SampleOrderWorkflowSQLiteTests
     [TearDown]
     public void TearDown()
     {
+        // Force GC to release pooled SQLite connection handles so the temp DB file can be deleted.
         GC.Collect();
         GC.WaitForPendingFinalizers();
         if (File.Exists(_testDbPath)) try { File.Delete(_testDbPath); } catch { }

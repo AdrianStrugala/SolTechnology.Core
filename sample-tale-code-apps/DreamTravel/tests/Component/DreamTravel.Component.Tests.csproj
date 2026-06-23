@@ -3,7 +3,6 @@
 	<PropertyGroup>
 		<IsPackable>false</IsPackable>
 		<RootNamespace>DreamTravel.FunctionalTests</RootNamespace>
-		<DefaultItemExcludes>$(DefaultItemExcludes);DreamTravel.SQLite.Tests\**</DefaultItemExcludes>
 	</PropertyGroup>
 
 	<ItemGroup>
