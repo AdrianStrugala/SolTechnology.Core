@@ -1,7 +1,7 @@
 ---
 adr: 011-story-sqlite-extraction
 step: 05 of 09
-status: reviewed
+status: done
 ---
 
 # Step 05: Remove the SQLite *code* from the library and Story.Tests

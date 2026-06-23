@@ -6,8 +6,8 @@ using SolTechnology.Core.Story.Persistence;
 namespace SolTechnology.Core.Story.Builder;
 
 /// <summary>
-/// Persistence-provider extension methods for <see cref="IStoryBuilder"/>. Each
-/// <c>UseXxxStoryRepository</c> replaces whatever <see cref="IStoryRepository"/> was
+/// Persistence-provider extension methods for <see cref="IStoryBuilder"/>.
+/// <c>UseStoryRepository&lt;T&gt;</c> replaces whatever <see cref="IStoryRepository"/> was
 /// registered previously. A persistence provider is always present — the default after
 /// <c>RegisterStories()</c> is in-memory.
 /// </summary>
@@ -21,42 +21,6 @@ public static class StoryBuilderExtensions
     {
         ReplaceRepository(builder.Services, ServiceLifetime.Singleton,
             _ => new InMemoryStoryRepository());
-        EnsureStoryManager(builder.Services);
-        return builder;
-    }
-
-    /// <summary>
-    /// Use the built-in <see cref="SqliteStoryRepository"/> with the given connection string.
-    /// </summary>
-    /// <example><c>.UseSqliteStoryRepository("Data Source=stories.db")</c></example>
-    public static IStoryBuilder UseSqliteStoryRepository(
-        this IStoryBuilder builder,
-        string connectionString)
-    {
-        if (string.IsNullOrWhiteSpace(connectionString))
-            throw new ArgumentException("Connection string cannot be empty.", nameof(connectionString));
-
-        return builder.UseSqliteStoryRepository(opts => opts.ConnectionString = connectionString);
-    }
-
-    /// <summary>
-    /// Use the built-in <see cref="SqliteStoryRepository"/> with full control over
-    /// <see cref="SqliteStoryRepositoryOptions"/> (connection string, retries, WAL mode).
-    /// </summary>
-    public static IStoryBuilder UseSqliteStoryRepository(
-        this IStoryBuilder builder,
-        Action<SqliteStoryRepositoryOptions> configure)
-    {
-        if (configure is null) throw new ArgumentNullException(nameof(configure));
-
-        var options = new SqliteStoryRepositoryOptions();
-        configure(options);
-
-        builder.Services.RemoveAll<SqliteStoryRepositoryOptions>();
-        builder.Services.AddSingleton(options);
-
-        ReplaceRepository(builder.Services, ServiceLifetime.Singleton,
-            _ => new SqliteStoryRepository(options));
         EnsureStoryManager(builder.Services);
         return builder;
     }

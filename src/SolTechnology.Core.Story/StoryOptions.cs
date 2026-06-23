@@ -4,7 +4,7 @@ namespace SolTechnology.Core.Story;
 /// Engine-level policies for the Story framework. Does not own persistence — the repository
 /// is chosen and registered independently through the <see cref="Builder.IStoryBuilder"/>
 /// returned by <c>RegisterStories(...)</c> (e.g. <c>UseInMemoryStoryRepository</c>,
-/// <c>UseSqliteStoryRepository</c>, <c>UseStoryRepository&lt;T&gt;</c>). A repository is
+/// <c>UseStoryRepository&lt;T&gt;</c>). A repository is
 /// always present — in-memory is the default.
 /// </summary>
 public sealed class StoryOptions

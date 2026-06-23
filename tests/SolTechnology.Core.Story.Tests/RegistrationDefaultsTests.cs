@@ -35,58 +35,6 @@ public class RegistrationDefaultsTests
         await AssertFullCycleCompletes(sp);
     }
 
-    /// <summary>
-    /// <c>.UseSqliteStoryRepository(connectionString)</c> must replace the default repository,
-    /// physically create the database file and still support the complete pause/resume cycle.
-    /// </summary>
-    [Test]
-    public async Task UseSqliteStoryRepository_ReplacesDefault_CreatesDatabaseFile_AndSupportsFullCycle()
-    {
-        var dbPath = Path.Combine(Path.GetTempPath(), $"stories-reg-{Guid.NewGuid():N}.db");
-        var connectionString = $"Data Source={dbPath}";
-        try
-        {
-            using var sp = BuildProvider(b => b.UseSqliteStoryRepository(connectionString));
-
-            sp.GetRequiredService<IStoryRepository>().Should().BeOfType<SqliteStoryRepository>();
-            File.Exists(dbPath).Should().BeTrue();
-
-            await AssertFullCycleCompletes(sp);
-        }
-        finally
-        {
-            TryDelete(dbPath);
-        }
-    }
-
-    /// <summary>
-    /// <c>.UseSqliteStoryRepository(configure)</c> must accept a full options callback so
-    /// non-connection-string tuning (retries, WAL, synchronous mode) is reachable; the
-    /// options instance must be registered in DI so a repository re-created later sees it.
-    /// </summary>
-    [Test]
-    public void UseSqliteStoryRepository_ConfigureCallback_AppliesOptions_AndRegistersThemInDI()
-    {
-        var dbPath = Path.Combine(Path.GetTempPath(), $"stories-cfg-{Guid.NewGuid():N}.db");
-        try
-        {
-            using var sp = BuildProvider(b => b.UseSqliteStoryRepository(o =>
-            {
-                o.ConnectionString = $"Data Source={dbPath}";
-                o.MaxRetries = 0;
-                o.EnableWalMode = false;
-            }));
-
-            var opts = sp.GetRequiredService<SqliteStoryRepositoryOptions>();
-            opts.ConnectionString.Should().Contain(dbPath);
-            opts.MaxRetries.Should().Be(0);
-            opts.EnableWalMode.Should().BeFalse();
-        }
-        finally
-        {
-            TryDelete(dbPath);
-        }
-    }
 
     /// <summary>
     /// <c>.UseStoryRepository&lt;T&gt;()</c> is the OCP escape hatch. A custom repository

@@ -40,7 +40,7 @@ removed. Code removal (logic) and package/suppress removal (plumbing) are separa
 | 02 | Relocate + rename `SQLiteStoryRepository` + `SQLiteStoryRepositoryOptions` | [`done/02-relocate-sqlite-repository-and-options.md`](done/02-relocate-sqlite-repository-and-options.md) | ✅ done |
 | 03 | Consumer-side `UseSQLiteStoryRepository` builder extension | [`done/03-sqlite-story-builder-extension.md`](done/03-sqlite-story-builder-extension.md) | ✅ done |
 | 04 | New test project: relocate SQLite tests + SampleOrderWorkflowStory SQLite end-to-end coverage | [`done/04-relocate-sqlite-tests.md`](done/04-relocate-sqlite-tests.md) | ✅ done |
-| 05 | Remove SQLite *code* from library + Story.Tests | [`reviewed/05-remove-sqlite-code-from-library.md`](reviewed/05-remove-sqlite-code-from-library.md) | 🔍 reviewed |
+| 05 | Remove SQLite *code* from library + Story.Tests | [`done/05-remove-sqlite-code-from-library.md`](done/05-remove-sqlite-code-from-library.md) | ✅ done |
 | 06 | Remove SQLite *packages* + suppression from `src/` | [`reviewed/06-remove-sqlite-packages-and-suppress.md`](reviewed/06-remove-sqlite-packages-and-suppress.md) | 🔍 reviewed |
 | 07 | Repoint docs + fix phantom persistence API | [`reviewed/07-update-documentation.md`](reviewed/07-update-documentation.md) | 🔍 reviewed |
 | 08 | Final verification (clean audit + green solution) | [`reviewed/08-final-verification.md`](reviewed/08-final-verification.md) | 🔍 reviewed |
