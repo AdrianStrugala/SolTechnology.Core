@@ -61,7 +61,6 @@
   </Folder>
   <Folder Name="/SampleApps/DreamTravel/tests/">
     <Project Path="sample-tale-code-apps/DreamTravel/tests/Component/DreamTravel.Component.Tests.csproj" />
-    <Project Path="sample-tale-code-apps/DreamTravel/tests/Component/DreamTravel.SQLite.Tests/DreamTravel.SQLite.Tests.csproj" />
     <Project Path="sample-tale-code-apps/DreamTravel/tests/EndToEnd/DreamTravel.E2E.Tests.csproj" />
   </Folder>
   <Folder Name="/SampleApps/DreamTravel/tests/Unit/">

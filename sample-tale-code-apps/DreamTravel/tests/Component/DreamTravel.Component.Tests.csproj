@@ -3,6 +3,7 @@
 	<PropertyGroup>
 		<IsPackable>false</IsPackable>
 		<RootNamespace>DreamTravel.FunctionalTests</RootNamespace>
+		<DefaultItemExcludes>$(DefaultItemExcludes);DreamTravel.SQLite.Tests\**</DefaultItemExcludes>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -17,6 +18,13 @@
 	  <ProjectReference Include="..\..\..\..\src\SolTechnology.Core.HTTP.Testing\SolTechnology.Core.HTTP.Testing.csproj" />
 	  <ProjectReference Include="..\..\src\Presentation\DreamTravel.Api\DreamTravel.Api.csproj" />
 	  <ProjectReference Include="..\..\src\Presentation\DreamTravel.Worker\DreamTravel.Worker.csproj" />
+	  <ProjectReference Include="..\..\src\DataLayer\DreamTravel.SQLite\DreamTravel.SQLite.csproj" />
+	  <ProjectReference Include="..\..\src\LogicLayer\DreamTravel.Workflows\DreamTravel.Workflows.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <!-- CVE-2025-6965 (GHSA-2m69-gcr7-jv3q): transitive via DreamTravel.SQLite. Sample-only. -->
+	  <NuGetAuditSuppress Include="https://github.com/advisories/GHSA-2m69-gcr7-jv3q" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -25,7 +33,6 @@
 	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 	    <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
 	  </Content>
-	  <Content Include="DreamTravel.SQLite.Tests\DreamTravel.SQLite.Tests.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>
