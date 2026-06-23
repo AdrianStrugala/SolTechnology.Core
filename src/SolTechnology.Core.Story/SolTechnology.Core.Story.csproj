@@ -1,9 +1,9 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <Version>0.7.0</Version>
+        <Version>0.8.0</Version>
         <Description>Story Framework - Unified workflow orchestration for multi-step business processes. Supports both simple automated chains and pausable workflows with persistence. Features Tale Code philosophy with StoryHandler, Chapters, and Context for readable, maintainable business logic.</Description>
-        <PackageTags>sol technology core story workflow chain pausable state-machine saga orchestration sqlite async dotnet business-process tale-code</PackageTags>
+        <PackageTags>sol technology core story workflow chain pausable state-machine saga orchestration async dotnet business-process tale-code</PackageTags>
         <Product>SolTechnology.Core.Story</Product>
         <PackageId>SolTechnology.Core.Story</PackageId>
         <AssemblyName>SolTechnology.Core.Story</AssemblyName>
@@ -28,21 +28,6 @@
             approach as SolTechnology.Core.Logging.
         -->
         <FrameworkReference Include="Microsoft.AspNetCore.App" />
-        <PackageReference Include="Microsoft.Data.Sqlite.Core" Version="10.0.9" />
-        <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
-        <PackageReference Include="SQLitePCLRaw.bundle_green" Version="2.1.11" />
-
-        <!--
-            CVE-2025-6965 (GHSA-2m69-gcr7-jv3q): SQLite < 3.50.2 memory corruption, reached
-            transitively via Microsoft.Data.Sqlite.Core -> SQLitePCLRaw.bundle_green ->
-            SQLitePCLRaw.lib.e_sqlite3 2.1.11. No patched SQLitePCLRaw release exists yet
-            (2.1.11 is the latest on nuget.org as of 2026-06). SQLite is an opt-in,
-            non-default Story persistence provider (in-memory is the default), so the blast
-            radius is limited to apps that explicitly call UseSqliteStoryRepository(...).
-            Suppress this single advisory only — audit stays active for every other package.
-            REMOVE once SQLitePCLRaw ships a bundle on SQLite >= 3.50.2.
-        -->
-        <NuGetAuditSuppress Include="https://github.com/advisories/GHSA-2m69-gcr7-jv3q" />
 
         <!--
             Microsoft.Extensions.* PackageReferences inherited from src/Directory.Build.props

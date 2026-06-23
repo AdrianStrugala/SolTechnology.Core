@@ -1,7 +1,7 @@
 ---
 adr: 011-story-sqlite-extraction
 step: 06 of 09
-status: reviewed
+status: done
 ---
 
 # Step 06: Remove the SQLite packages and the CVE suppression from `src/`
