@@ -256,7 +256,15 @@ internal sealed class StoryEngine<TInput, TContext, TOutput>
 
             if (result.IsFailure)
             {
-                HandleChapterFailure(chapterInfo, result.Error!);
+                // When the interactive chapter's ReadWithInput returns a validation error,
+                // ExecuteInteractiveChapter re-pauses the story (_isPaused = true) so the
+                // user can retry. In that case, skip HandleChapterFailure — the story is
+                // NOT terminally failed. For all other failures (deserialization errors,
+                // automated chapters), _isPaused stays false → terminal failure.
+                if (!_isPaused)
+                {
+                    HandleChapterFailure(chapterInfo, result.Error!);
+                }
             }
             else if (chapterInfo.Status != StoryStatus.WaitingForInput)
             {
@@ -350,6 +358,17 @@ internal sealed class StoryEngine<TInput, TContext, TOutput>
             _resumeInput = null;
             chapterInfo.Status = StoryStatus.Running;
             _context.CurrentChapterId = null;
+        }
+        else
+        {
+            // Validation failure — keep the chapter paused so the user can retry with valid input.
+            // Clear _resumeInput so the next ResumeStory call can provide new data.
+            // The error is stored on the chapter but does NOT set _hasFailed (the story is not
+            // terminally failed — it is still waiting for input).
+            _resumeInput = null;
+            _isPaused = true;
+            chapterInfo.Status = StoryStatus.WaitingForInput;
+            chapterInfo.Error = result.Error;
         }
 
         return result;

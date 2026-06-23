@@ -100,13 +100,24 @@ public class SampleOrderWorkflowSQLiteTests
             SampleOrderWorkflowStory, SampleOrderInput, SampleOrderContext, SampleOrderResult>(
             storyId, invalidInput);
 
-        // Assert — engine returns failure (chapter rejection bubbles as Result.Fail)
-        resumeResult.IsSuccess.Should().BeFalse();
+        // Assert — story stays paused (validation failure is retryable, not terminal)
+        resumeResult.IsSuccess.Should().BeTrue();
+        resumeResult.Data!.Status.Should().Be(StoryStatus.WaitingForInput);
 
-        // Verify persisted state is Failed (engine treats interactive-chapter rejection as terminal)
+        // Verify persisted state is still WaitingForInput
         var freshRepo = new SQLiteStoryRepository($"Data Source={_testDbPath}");
         var persisted = await freshRepo.FindById(storyId);
-        persisted!.Status.Should().Be(StoryStatus.Failed);
+        persisted!.Status.Should().Be(StoryStatus.WaitingForInput);
+
+        // Act — Retry with valid input should now succeed
+        var validInput = JsonSerializer.SerializeToElement(new { Name = "Adus", Address = "yes" });
+        var retryResult = await manager.ResumeStory<
+            SampleOrderWorkflowStory, SampleOrderInput, SampleOrderContext, SampleOrderResult>(
+            storyId, validInput);
+
+        // Assert — story completes after valid retry
+        retryResult.IsSuccess.Should().BeTrue();
+        retryResult.Data!.Status.Should().Be(StoryStatus.Completed);
     }
 
     [Test]
