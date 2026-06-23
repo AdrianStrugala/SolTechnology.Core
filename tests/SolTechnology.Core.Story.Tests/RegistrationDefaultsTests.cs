@@ -92,11 +92,6 @@ public class RegistrationDefaultsTests
         resumed.Data!.Status.Should().Be(StoryStatus.Completed);
     }
 
-    private static void TryDelete(string path)
-    {
-        try { if (File.Exists(path)) File.Delete(path); }
-        catch { /* best-effort cleanup */ }
-    }
 
     private sealed class RecordingStoryRepository : IStoryRepository
     {

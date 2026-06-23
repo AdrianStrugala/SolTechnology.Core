@@ -221,7 +221,7 @@ public class CalculateBestPathTale(IServiceProvider sp, ILogger<CalculateBestPat
 
 ### `Workflows/` project
 
-Reserved for **long-running, interactive, persisted** stories (require `RegisterStories(StoryOptions.WithSqlitePersistence(...))`). One folder per workflow, mirroring the CQRS use-case layout (`SampleOrderWorkflow/Chapters/...`).
+Reserved for **long-running, interactive, persisted** stories (require a durable `IStoryRepository` — e.g. the DreamTravel sample's `UseStoryRepository<SQLiteStoryRepository>()`, or any `UseStoryRepository<T>()` backend). One folder per workflow, mirroring the CQRS use-case layout (`SampleOrderWorkflow/Chapters/...`).
 
 > **Procedure:** authoring a Story (chapters, contexts, `DomainServices` vs `Workflows` hosting)
 > is driven by the [`command-query-event-story`](../.github/skills/command-query-event-story/SKILL.md)

@@ -1,4 +1,4 @@
-﻿﻿using DreamTravel.Flows.SampleOrderWorkflow;
+﻿﻿﻿using DreamTravel.Flows.SampleOrderWorkflow;
 using Microsoft.Extensions.DependencyInjection;
 using SolTechnology.Core.Story;
 using SolTechnology.Core.Story.Builder;
@@ -9,8 +9,8 @@ public static class ModuleInstaller
 {
     /// <summary>
     /// Registers DreamTravel stories. Returns the <see cref="IStoryBuilder"/> so the caller
-    /// can pick a persistence provider (e.g. <c>.UseSqliteStoryRepository(...)</c>).
-    /// Defaults to in-memory persistence — sufficient for dev/tests.
+    /// can pick a persistence provider (e.g. <c>.UseStoryRepository&lt;SQLiteStoryRepository&gt;()</c>
+    /// from <c>DreamTravel.SQLite</c>). Defaults to in-memory persistence — sufficient for dev/tests.
     /// </summary>
     public static IStoryBuilder AddFlows(
         this IServiceCollection services,
