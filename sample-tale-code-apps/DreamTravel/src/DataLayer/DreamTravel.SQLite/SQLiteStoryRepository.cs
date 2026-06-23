@@ -2,17 +2,24 @@ using System.Globalization;
 using System.Text.Json;
 using Microsoft.Data.Sqlite;
 using SolTechnology.Core.Story.Models;
+using SolTechnology.Core.Story.Persistence;
 
-namespace SolTechnology.Core.Story.Persistence;
+namespace DreamTravel.SQLite;
 
 /// <summary>
 /// SQLite implementation of <see cref="IStoryRepository"/>. Configured via
-/// <see cref="SqliteStoryRepositoryOptions"/> (connection string + tuning). Enables WAL
+/// <see cref="SQLiteStoryRepositoryOptions"/> (connection string + tuning). Enables WAL
 /// journal mode for concurrency and retries on <c>SQLITE_BUSY</c>/<c>SQLITE_LOCKED</c>.
+/// <para>
+/// <b>Static state:</b> database initialization (schema creation, WAL pragma) is cached per
+/// connection string in a static <c>HashSet</c>. This avoids redundant DDL on every request but
+/// means the cache survives across test runs in the same process. Use unique temp-file connection
+/// strings in tests to avoid cross-contamination.
+/// </para>
 /// </summary>
-public class SqliteStoryRepository : IStoryRepository
+public class SQLiteStoryRepository : IStoryRepository
 {
-    private readonly SqliteStoryRepositoryOptions _options;
+    private readonly SQLiteStoryRepositoryOptions _options;
     private readonly string _connectionString;
 
     private static readonly object _initLock = new();
@@ -21,19 +28,19 @@ public class SqliteStoryRepository : IStoryRepository
 
     /// <summary>
     /// Creates a repository using the provided options. When <paramref name="options"/> is
-    /// <c>null</c>, the defaults from <see cref="SqliteStoryRepositoryOptions"/> are used
+    /// <c>null</c>, the defaults from <see cref="SQLiteStoryRepositoryOptions"/> are used
     /// (database under LocalApplicationData).
     /// </summary>
-    public SqliteStoryRepository(SqliteStoryRepositoryOptions? options = null)
+    public SQLiteStoryRepository(SQLiteStoryRepositoryOptions? options = null)
     {
-        _options = options ?? new SqliteStoryRepositoryOptions();
+        _options = options ?? new SQLiteStoryRepositoryOptions();
         _connectionString = ValidateConnectionString(_options.ConnectionString);
         EnsureDatabaseInitialized();
     }
 
     /// <summary>Convenience ctor for a connection string without options.</summary>
-    public SqliteStoryRepository(string connectionString)
-        : this(new SqliteStoryRepositoryOptions { ConnectionString = connectionString }) { }
+    public SQLiteStoryRepository(string connectionString)
+        : this(new SQLiteStoryRepositoryOptions { ConnectionString = connectionString }) { }
 
     private static string ValidateConnectionString(string connectionString)
     {
@@ -42,8 +49,6 @@ public class SqliteStoryRepository : IStoryRepository
 
         try
         {
-            // Let the provider validate format. Failures raise a clear exception at startup
-            // instead of at the first command.
             _ = new SqliteConnectionStringBuilder(connectionString);
         }
         catch (Exception ex)
@@ -289,3 +294,4 @@ public class SqliteStoryRepository : IStoryRepository
         }
     }
 }
+

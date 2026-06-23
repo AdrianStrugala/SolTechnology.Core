@@ -200,9 +200,9 @@ public class PauseResumeIntegrationTests
             storyId,
             userInput);
 
-        // Assert - Should fail validation
-        resumeResult.IsFailure.Should().BeTrue();
-        resumeResult.Error!.Message.Should().Contain("name");
+        // Assert — validation failure keeps the story paused for retry
+        resumeResult.IsSuccess.Should().BeTrue();
+        resumeResult.Data!.Status.Should().Be(StoryStatus.WaitingForInput);
     }
 
     [Test]

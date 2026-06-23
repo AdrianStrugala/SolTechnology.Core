@@ -1,11 +1,11 @@
-namespace SolTechnology.Core.Story.Persistence;
+namespace DreamTravel.SQLite;
 
 /// <summary>
-/// Configuration for <see cref="SqliteStoryRepository"/>. Exposed so the registration
-/// helper <c>UseSqliteStoryRepository</c> can be called either with a connection string
+/// Configuration for <see cref="SQLiteStoryRepository"/>. Exposed so the registration
+/// helper <c>UseSQLiteStoryRepository</c> can be called either with a connection string
 /// shortcut or with a configure callback for fine-grained tuning.
 /// </summary>
-public sealed class SqliteStoryRepositoryOptions
+public sealed class SQLiteStoryRepositoryOptions
 {
     /// <summary>
     /// ADO.NET connection string. Defaults to a file under

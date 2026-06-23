@@ -262,7 +262,7 @@ If any item fails, fix it before yielding.
 | `dotnet test` "no tests discovered" | Tests live in `tests/` (outside `src/`). Path: `tests/<Project>.Tests`. |
 | AUID JSON round-trip drops the value | The consumer is using `PackageReference` to `SolTechnology.Core.AUID` instead of `ProjectReference` in the sample; `AuidJsonConverter` is missing. |
 | Story JSON deserialisation case-sensitive issues | Use `StoryJsonOptions.Default` (`PropertyNameCaseInsensitive = true`, `IncludeFields = true`). |
-| Interactive story fails immediately | Persistence is opt-out. `RegisterStories(StoryOptions.WithoutPersistence())` disables `StoryManager`; switch to `WithInMemoryPersistence()` (default) or `WithSqlitePersistence(...)`. |
+| Interactive story fails immediately | Ensure `RegisterStories()` is called — it wires `StoryManager` + in-memory persistence by default. For durable persistence, use `.UseStoryRepository<T>()` (see `DreamTravel.SQLite` sample). |
 | Workload missing on CI | Run `dotnet workload restore SolTechnology.Core.slnx` before `restore` / `build`. See `.github/workflows/publishPackages.yml`. |
 | Edits applied via tool don't show in `git diff` | An IDE buffer is overwriting the file. Ask the user to close the file in their IDE, then re-apply. |
 

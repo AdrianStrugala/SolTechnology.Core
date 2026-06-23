@@ -18,8 +18,9 @@ of contents the engine reads top-to-bottom.
   HTTP clients, mediators, anything Scoped — it just works.
 - **⏸ Pause & resume** — interactive chapters declare a typed input schema, the engine persists
   state, your API resumes the story when the user replies.
-- **🔌 Pluggable persistence** — in-memory by default, SQLite for production, or bring your own
-  (`IStoryRepository`) for Postgres / Cosmos / EF Core / whatever.
+- **🔌 Pluggable persistence** — in-memory by default, or bring your own
+  (`IStoryRepository`) for SQLite / Postgres / Cosmos / EF Core / whatever.
+  See `DreamTravel.SQLite` for a production-ready SQLite reference implementation.
 - **🛡 Typed lifecycle errors** — `StoryPausedError`, `StoryCancelledError` — never parse strings
   to detect state.
 - **🆔 Idempotency built-in** — `Idempotency-Key` header / `idempotencyKey` parameter deduplicates
@@ -36,28 +37,22 @@ dotnet add package SolTechnology.Core.Story
 ## Registration
 
 ```csharp
-// Default: in-memory persistence — supports both automated and interactive stories.
-// Ideal for dev, tests, and single-process apps. Registers StoryManager +
-// InMemoryStoryRepository.
+// In-memory persistence (default). Ideal for dev, tests, and single-process apps.
 services.RegisterStories();
 
-// Production: durable SQLite persistence.
-services.RegisterStories(StoryOptions.WithSqlitePersistence("stories.db"));
+// Scan additional assemblies for chapters & handlers.
+services.RegisterStories(
+    configure: opts => opts.StoryIdPrefix = "ORDER",
+    assemblies: typeof(MySaveCityStory).Assembly);
 
-// Explicit opt-out: no repository, no StoryManager. Only fully automated
-// Tale flows are allowed — running an InteractiveChapter fails with a
-// clear, actionable error.
-services.RegisterStories(StoryOptions.WithoutPersistence());
+// Durable SQLite persistence — provided by the DreamTravel sample (DreamTravel.SQLite).
+// Copy the sample project into your app and reference it, then:
+services.RegisterStories(assemblies: typeof(MySaveCityStory).Assembly)
+    .UseStoryRepository<SQLiteStoryRepository>();
 
-// Scan additional assemblies for chapters & handlers (MediatR-style).
-services.RegisterStories(StoryOptions.WithInMemoryPersistence(),
-    typeof(MySaveCityStory).Assembly,
-    typeof(MyOtherStory).Assembly);
-
-// Tweaks (mutable settable properties on the returned options).
-var opts = StoryOptions.WithSqlitePersistence("stories.db");
-opts.StoryIdPrefix = "ORDER";
-services.RegisterStories(opts);
+// Bring your own backend — Postgres, Cosmos, EF Core, anything implementing IStoryRepository:
+services.RegisterStories()
+    .UseStoryRepository<MyPostgresStoryRepository>(ServiceLifetime.Scoped);
 ```
 
 
@@ -66,8 +61,8 @@ services.RegisterStories(opts);
 - All concrete `IChapter<>` implementations as **transient**.
 - All concrete `StoryHandler<,,>` implementations as **transient**.
 - `StoryHandlerRegistry` (singleton) — name-to-type whitelist used by `StoryController`.
-- `StoryManager` (scoped) — when persistence is enabled.
-- `IStoryRepository` (singleton) — the repository produced by the factory.
+- `StoryManager` (scoped) — the orchestrator.
+- `IStoryRepository` (singleton) — in-memory by default; swapped via `UseStoryRepository<T>()`.
 
 If no assemblies are passed, the entry assembly and the calling assembly are scanned for
 `IChapter<>` and `StoryHandler<,,>` implementations.
@@ -417,16 +412,10 @@ services.RegisterStories();
 // equivalent to:
 services.RegisterStories().UseInMemoryStoryRepository();
 
-// Production: SQLite (WAL journal, retries on SQLITE_BUSY, indexed).
-services.RegisterStories().UseSqliteStoryRepository("Data Source=stories.db");
-
-// Production with full tuning:
-services.RegisterStories().UseSqliteStoryRepository(o =>
-{
-    o.ConnectionString = "Data Source=stories.db;Cache=Shared";
-    o.MaxRetries       = 5;
-    o.EnableWalMode    = true;
-});
+// Production: SQLite — provided by the DreamTravel sample (DreamTravel.SQLite).
+// Copy it into your app, reference it, then:
+services.RegisterStories()
+    .UseStoryRepository<SQLiteStoryRepository>();
 
 // Bring your own backend — Postgres, Cosmos, EF Core, anything that implements IStoryRepository:
 services.RegisterStories()
@@ -435,7 +424,8 @@ services.RegisterStories()
 
 > Implementing a custom backend? `IStoryRepository` is a five-method interface
 > (`FindById`, `FindByIdempotencyKey`, `ListAsync`, `SaveAsync`, `DeleteAsync`).
-> See `InMemoryStoryRepository` and `SqliteStoryRepository` for reference implementations.
+> See `InMemoryStoryRepository` (in-box) and the sample's `SQLiteStoryRepository`
+> (`DreamTravel.SQLite`) for reference implementations.
 
 ## Idempotency
 
@@ -519,10 +509,10 @@ Only handlers registered through `RegisterStories()` are exposed (whitelist via
 
 - Only handlers reachable through `StoryHandlerRegistry` are exposed — add authorization
   attributes (`[Authorize(...)]`) to your derived controller before exposing it publicly.
-- Do not place secrets or PII in `Context`. For SQLite, prefer filesystem-level encryption or
-  store references to an external secret store and load them on demand.
-- `SqliteStoryRepository` validates the supplied path. Do not interpolate user-controlled strings
-  into it.
+- Do not place secrets or PII in `Context`. For SQLite persistence, prefer filesystem-level
+  encryption or store references to an external secret store and load them on demand.
+- The sample `SQLiteStoryRepository` validates the supplied path. Do not interpolate
+  user-controlled strings into connection strings.
 
 ## Observability
 

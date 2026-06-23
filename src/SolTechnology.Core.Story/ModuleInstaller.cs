@@ -46,8 +46,7 @@ public static class ModuleInstaller
     ///   <item>Registers an <see cref="InMemoryStoryRepository"/> as the default
     ///   <see cref="IStoryRepository"/> and the <see cref="StoryManager"/> as
     ///   <c>Scoped</c>. The repository can be replaced through the returned
-    ///   <see cref="IStoryBuilder"/> (<c>UseSqliteStoryRepository</c>,
-    ///   <c>UseStoryRepository&lt;T&gt;</c>). A repository is always registered — the
+    ///   <see cref="IStoryBuilder"/> (<c>UseStoryRepository&lt;T&gt;</c>). A repository is always registered — the
     ///   minimum is in-memory.</item>
     /// </list>
     /// </remarks>

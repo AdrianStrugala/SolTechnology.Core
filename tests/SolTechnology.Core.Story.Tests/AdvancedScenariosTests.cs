@@ -93,7 +93,7 @@ public class AdvancedScenariosTests
     }
 
     [Test]
-    public async Task Resume_WithWrongInputType_ShouldReturnError()
+    public async Task Resume_WithWrongInputType_ShouldStayPaused()
     {
         // Arrange - Start story that pauses at interactive chapter
         var input = new TestAdvancedInput { Value = "test" };
@@ -106,13 +106,13 @@ public class AdvancedScenariosTests
             storyId,
             wrongInput.RootElement);
 
-        // Assert - Should fail validation
-        result.IsFailure.Should().BeTrue();
-        result.Error.Should().NotBeNull();
+        // Assert — wrong input deserializes to defaults → chapter validation rejects → stays paused
+        result.IsSuccess.Should().BeTrue();
+        result.Data!.Status.Should().Be(StoryStatus.WaitingForInput);
     }
 
     [Test]
-    public async Task Resume_WithMissingRequiredFields_ShouldReturnError()
+    public async Task Resume_WithMissingRequiredFields_ShouldStayPaused()
     {
         // Arrange
         var input = new TestAdvancedInput { Value = "test" };
@@ -125,13 +125,13 @@ public class AdvancedScenariosTests
             storyId,
             incompleteInput.RootElement);
 
-        // Assert
-        result.IsFailure.Should().BeTrue();
-        result.Error!.Message.Should().ContainAny("required", "missing", "invalid");
+        // Assert — validation failure keeps the story paused for retry
+        result.IsSuccess.Should().BeTrue();
+        result.Data!.Status.Should().Be(StoryStatus.WaitingForInput);
     }
 
     [Test]
-    public async Task Resume_WithNullValues_ShouldHandleGracefully()
+    public async Task Resume_WithNullValues_ShouldNotComplete()
     {
         // Arrange
         var input = new TestAdvancedInput { Value = "test" };
@@ -144,8 +144,13 @@ public class AdvancedScenariosTests
             storyId,
             nullInput.RootElement);
 
-        // Assert - Should fail validation
-        result.IsFailure.Should().BeTrue();
+        // Assert — nulls must NOT produce a completed story.
+        // Either deserialization fails (terminal → IsFailure) or chapter validation
+        // rejects them (retryable → IsSuccess + WaitingForInput).
+        if (result.IsSuccess)
+        {
+            result.Data!.Status.Should().Be(StoryStatus.WaitingForInput);
+        }
     }
 
     [Test]
@@ -178,7 +183,7 @@ public class AdvancedScenariosTests
     #region Input Validation Edge Cases
 
     [Test]
-    public async Task Resume_WithEmptyStrings_ShouldFailValidation()
+    public async Task Resume_WithEmptyStrings_ShouldStayPaused()
     {
         // Arrange
         var input = new TestAdvancedInput { Value = "test" };
@@ -191,13 +196,13 @@ public class AdvancedScenariosTests
             storyId,
             emptyInput.RootElement);
 
-        // Assert
-        result.IsFailure.Should().BeTrue();
-        result.Error!.Message.Should().ContainAny("empty", "required", "invalid");
+        // Assert — validation failure keeps the story paused for retry
+        result.IsSuccess.Should().BeTrue();
+        result.Data!.Status.Should().Be(StoryStatus.WaitingForInput);
     }
 
     [Test]
-    public async Task Resume_WithWhitespaceStrings_ShouldFailValidation()
+    public async Task Resume_WithWhitespaceStrings_ShouldStayPaused()
     {
         // Arrange
         var input = new TestAdvancedInput { Value = "test" };
@@ -210,8 +215,9 @@ public class AdvancedScenariosTests
             storyId,
             whitespaceInput.RootElement);
 
-        // Assert
-        result.IsFailure.Should().BeTrue();
+        // Assert — validation failure keeps the story paused for retry
+        result.IsSuccess.Should().BeTrue();
+        result.Data!.Status.Should().Be(StoryStatus.WaitingForInput);
     }
 
     [Test]
@@ -296,7 +302,7 @@ public class AdvancedScenariosTests
     }
 
     [Test]
-    public async Task Resume_WithNegativeNumbers_ShouldValidate()
+    public async Task Resume_WithNegativeNumbers_ShouldStayPaused()
     {
         // Arrange
         var input = new TestAdvancedInput { Value = "test" };
@@ -309,9 +315,9 @@ public class AdvancedScenariosTests
             storyId,
             negativeInput.RootElement);
 
-        // Assert - Should fail validation
-        result.IsFailure.Should().BeTrue();
-        result.Error!.Message.Should().ContainAny("negative", "positive", "invalid age");
+        // Assert — validation failure keeps the story paused for retry
+        result.IsSuccess.Should().BeTrue();
+        result.Data!.Status.Should().Be(StoryStatus.WaitingForInput);
     }
 
     [Test]
