@@ -365,6 +365,8 @@ internal sealed class StoryEngine<TInput, TContext, TOutput>
             // Clear _resumeInput so the next ResumeStory call can provide new data.
             // The error is stored on the chapter but does NOT set _hasFailed (the story is not
             // terminally failed — it is still waiting for input).
+            _logger.LogInformation("Interactive chapter {ChapterId} rejected input: {Error}",
+                chapter.ChapterId, result.Error?.Message);
             _resumeInput = null;
             _isPaused = true;
             chapterInfo.Status = StoryStatus.WaitingForInput;
