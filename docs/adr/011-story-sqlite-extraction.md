@@ -184,16 +184,31 @@ removal, permitted under 0.x semantics; would be MAJOR post-1.0.
    non-existent `StoryOptions.WithSqlitePersistence(...)` / `WithInMemoryPersistence()` /
    `WithoutPersistence()` factory methods — they stay out of scope.
 
-## Related
+## Implementation summary
 
-- [ADR-002](002-Story-Framework-Implementation.md) — original Story framework design; documents the
-  built-in SQLite provider this ADR relocates.
-- [ADR-008](008-testing-framework-companions.md) — the `.Testing` companion-package pattern referenced
-  in Alternative 2.
-- [ADR-006](006-implementation-plan-workflow.md) — the plan workflow this document follows.
-- `docs/Story.md` §Registration / §Persistence — consumer-facing persistence docs corrected here.
-- CVE-2025-6965 / [GHSA-2m69-gcr7-jv3q](https://github.com/advisories/GHSA-2m69-gcr7-jv3q) — the
-  driving advisory (HIGH, no patched release as of 2026-06-22).
+Completed 2026-06-23. The per-step working folder (`docs/adr/011-story-sqlite-extraction/`) was
+deleted per the ADR-006 collapse-on-completion rule.
 
+| # | Step | Shipped |
+|---|---|---|
+| 01 | Scaffold project | `sample-tale-code-apps/DreamTravel/src/DataLayer/DreamTravel.SQLite/DreamTravel.SQLite.csproj` |
+| 02 | Relocate repo + options | `DreamTravel.SQLite/SQLiteStoryRepository.cs`, `SQLiteStoryRepositoryOptions.cs` |
+| 03 | Builder seam | No wrapper needed — `UseStoryRepository<SQLiteStoryRepository>()` is the public seam |
+| 04 | Tests | `tests/Component/SQLiteTests/` — 10 tests (7 repo CRUD + 3 SampleOrderWorkflow E2E) |
+| 05 | Remove SQLite code | Deleted `SqliteStoryRepository.cs`, `SqliteStoryRepositoryOptions.cs`, `UseSqliteStoryRepository` overloads |
+| 06 | Remove packages + bump | `Story.csproj` 0.7.0 → 0.8.0; removed Sqlite.Core, SQLitePCLRaw, Newtonsoft.Json, suppress |
+| 07 | Docs | Story.md, CLAUDE.md, ClaudeCodingGuide.md — phantom API eliminated |
+| 08 | Final verification | 0 NU1903 in `src/`, build green with TreatWarningsAsErrors, 100 Story + 10 SQLite tests |
+| 09 | Premortem | Go with mitigations — all required mitigations executed |
 
+### Preserved deviations
 
+- **Step 04 → Engine bug fix.** Empirically discovered that `StoryEngine` treated interactive-chapter
+  validation failure as terminal (`Failed`). Fixed: validation rejection now keeps the story paused
+  (`WaitingForInput`) so users can retry. Extracted `PauseForRetry()` method. Separate commit
+  `fix(story): interactive chapter validation failure stays WaitingForInput, not Failed`.
+- **Step 03 → No wrapper extension.** Plan called for a consumer-side `UseSQLiteStoryRepository`
+  extension class. Determined it was over-engineering — the library's existing
+  `UseStoryRepository<T>()` + DI-registered options is sufficient. Extension file deleted.
+- **Step 04 → Tests are component, not unit.** Tests use a real SQLite file DB + full DI container,
+  so they live in `DreamTravel.Component.Tests` (not a separate unit-test project) per project convention.
