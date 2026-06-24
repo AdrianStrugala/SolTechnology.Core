@@ -14,6 +14,7 @@ using OpenTelemetry;
 using OpenTelemetry.Trace;
 using SolTechnology.Core.API;
 using SolTechnology.Core.API.Filters;
+using SolTechnology.Core.API.Security;
 using SolTechnology.Core.Authentication;
 using SolTechnology.Core.Cache;
 using SolTechnology.Core.CQRS;
@@ -163,6 +164,8 @@ public class Program
         var app = builder.Build();
 
         app.MapDefaultEndpoints();
+
+        app.UseSecurityHeaders();
 
         app.UseDeveloperExceptionPage();
 
