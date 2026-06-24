@@ -70,9 +70,9 @@ have a dedicated decision sub-section (below). Implementation is gated by the **
 |---|---|---|---|---|
 | API quick wins | A6 security-headers middleware · B4 surface `Recoverable` in `ProblemDetails` | `Core.Api` | none | MINOR |
 | Testing quick wins | D1 `Result` assertion helpers · D2 `Ct` matcher alias | `Core.Testing` | none | MINOR |
-| **New package** | A2 distributed lock + leader-election primitive | **`Core.DistributedLock`** | `DistributedLock.*` (Medallion.Threading) | MINOR (new package) |
+| ~~New package~~ **→ Option B** | A2 distributed lock | **`Core.Cache`** (thin layer, not a separate package) | none (reuses existing `StackExchange.Redis`) | MINOR |
 | **New package** | A3 cached upstream health-check base + JSON writer + per-module checks | **`Core.HealthChecks`** + SQL/Cache/Bus/HTTP | none (uses `Microsoft.Extensions.Diagnostics.HealthChecks`) | MINOR (new package) |
-| Background | C1 deployment-slot gating · C2 leader-elected polling base | `Core.Scheduler` (→ `Core.DistributedLock`) | none | MINOR |
+| Background | C1 deployment-slot gating · C2 leader-elected polling base | `Core.Scheduler` (→ `Core.Cache`) | none | MINOR |
 | API idempotency | A1 inbound HTTP idempotency middleware + store abstraction | `Core.Api` (+ `Core.Cache` store) | none | MINOR |
 | Correlation deltas | B1 two-level model · inbound+response · outbound · queue | `Core.Logging`/`Api`/`HTTP`/`MessageBus` | none | MINOR |
 | HTTP enhancements | B2 recoverable-aware retry predicate · B3 typed call-error taxonomy | `Core.HTTP` | none | MINOR |
@@ -90,22 +90,23 @@ have a dedicated decision sub-section (below). Implementation is gated by the **
 - **B5** (`OperationCanceledException` response) — already handled by `Core.Api` cancellation
   logging; parity only. **D4** (primary-ctor caution) — already a Core rule (ADR-010 G7).
 
-### Decision sub-section — new package `SolTechnology.Core.DistributedLock` (A2)
+### Decision sub-section — Distributed Lock (A2) — implemented in `Core.Cache` (Option B)
 
-**Why a new package.** No existing module owns cross-instance coordination. Folding a distributed
-lock into `Core.Scheduler` or `Core.SQL` would drag a `DistributedLock.*` (Medallion.Threading)
-dependency into every consumer of those modules. A dedicated, dependency-light package keeps the
-lock opt-in.
+> **Original plan** was a separate `SolTechnology.Core.DistributedLock` package with
+> Medallion.Threading. During implementation (2026-06-24) the maintainer chose **Option B**: a thin
+> lock layer directly in `Core.Cache`. Rationale: same Redis, same connection, same namespace — a
+> separate package adds complexity with no value when the infra already exists.
 
-**Surface.** `IDistributedLockService.TryAcquireLockAsync(string name, TimeSpan timeout,
+**Surface.** `IDistributedLockService.TryAcquireLockAsync(string name, TimeSpan expiry,
 CancellationToken ct) → ValueTask<IAsyncDisposable?>`. A non-null handle means the lock is held;
 disposing it releases. `null` means "not acquired" — **never an exception** into the caller's loop.
 
-**Backends.** `DistributedLock.Postgres` and `DistributedLock.SqlServer` for production (advisory /
-app locks), `DistributedLock.FileSystem` for single-box local dev. The public namespace is
-`Medallion.Threading.*`; the NuGet IDs are `DistributedLock.*`. CVE check at 2026-06-24 returned
-**no known CVEs** for the `DistributedLock.*` family — the implementer re-runs the check at the
-exact pinned versions before merge.
+**Backends (in `Core.Cache`):**
+- `AddDistributedLock()` — Redis `SET NX EX` with Lua fencing release (production, multi-instance).
+- `AddLocalLock()` — in-process `SemaphoreSlim` per key (local dev, single instance).
+
+No Medallion.Threading, no new NuGet dependencies — `StackExchange.Redis` (already a transitive
+dependency of the distributed cache tier) is the only requirement.
 
 **Guard-rail.** Lock keys MUST be tenant/principal-namespaced where relevant. Acquisition failure
 returns `null` + logs at a single level; it never throws into the host loop.
@@ -145,14 +146,15 @@ dependency); every upstream call MUST carry its own timeout independent of the p
 
 | Package (NuGet ID) | Module | Already in repo? | Note |
 |---|---|---|---|
-| `DistributedLock.Postgres` | `Core.DistributedLock` | no | Namespace `Medallion.Threading.Postgres`. Pin via `package-management`; CVE-check before merge. |
-| `DistributedLock.SqlServer` | `Core.DistributedLock` | no | Namespace `Medallion.Threading.SqlServer`. |
-| `DistributedLock.FileSystem` | `Core.DistributedLock` | no | Local-dev backend. |
+| ~~`DistributedLock.*`~~ | ~~`Core.DistributedLock`~~ | — | **Superseded by Option B** — lock uses existing `StackExchange.Redis` in `Core.Cache`. No new dependency. |
+| `StackExchange.Redis` | `Core.Cache` | yes (transitive via `Microsoft.Extensions.Caching.StackExchangeRedis`) | Now also a **direct** `PackageReference` (`2.8.41`) for `IConnectionMultiplexer` access in the lock service. |
 | `Microsoft.Extensions.Diagnostics.HealthChecks` | `Core.HealthChecks` | no | Health-check abstractions + builder. Shared-framework family (`10.0.x`). |
 | (existing) `Microsoft.AspNetCore.RateLimiting` | `Core.Api` (recipe only) | built-in (`net10.0`) | F recipe — no `PackageReference`. |
 
-Both new packages add a `.slnx` `Project` entry, inherit `src/Directory.Build.props` (so
-`TreatWarningsAsErrors=true` applies), and are added to `.github/workflows/publishPackages.yml`.
+The new `Core.HealthChecks` package (and the glue `Core.Api.Idempotency.Redis`) add `.slnx`
+`Project` entries, inherit `src/Directory.Build.props` (so `TreatWarningsAsErrors=true` applies),
+and are added to `.github/workflows/publishPackages.yml`. The distributed lock does **not** add a
+package — it is part of `Core.Cache` (Option B).
 
 ## Alternatives Considered
 

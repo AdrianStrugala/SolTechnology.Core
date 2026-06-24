@@ -206,6 +206,8 @@ Full reference: [Redis.Testing.md](Redis.Testing.md).
 |--------|-------------|
 | `AddLocalCache(CacheConfiguration?)` | Registers `ISingletonCache`, `IScopedCache<,>` |
 | `AddDistributedCache(DistributedCacheConfiguration)` | Registers `IRedisCache` (Redis-backed) |
+| `AddLocalLock()` | Registers `IDistributedLockService` (in-process, for local dev / single instance) |
+| `AddDistributedLock()` | Registers `IDistributedLockService` (Redis `SET NX`, requires `AddDistributedCache`) |
 
 ### Unified Interface
 
@@ -221,3 +223,72 @@ Task<TItem> GetOrAdd(TKey key, Func<TKey, Task<TItem>> factory);
 ```
 
 Same shape everywhere. Key is any serializable object. Factory is called on cache miss.
+
+---
+
+## Distributed Lock
+
+`IDistributedLockService` provides cross-instance mutual exclusion backed by the **same Redis**
+that powers the distributed cache. Two registration methods mirror the cache pattern:
+
+```csharp
+// Local dev / single instance — in-process SemaphoreSlim, no Redis needed
+services.AddLocalLock();
+
+// Production — Redis SET NX (requires AddDistributedCache to be called first)
+services.AddDistributedCache(redisConfig);
+services.AddDistributedLock();
+```
+
+### Usage
+
+```csharp
+public class SettlementPoller(IDistributedLockService locks)
+{
+    public async Task PollAsync(CancellationToken ct)
+    {
+        await using var handle = await locks.TryAcquireLockAsync(
+            "settlement/batch-process", expiry: TimeSpan.FromMinutes(5), ct);
+
+        if (handle is null)
+            return; // another instance holds the lock — skip this cycle
+
+        // Only one instance executes this at a time
+        await ProcessBatchAsync(ct);
+    }
+}
+```
+
+### Contract
+
+| Aspect | Behaviour |
+|---|---|
+| **Success** | Returns `IAsyncDisposable` — disposing releases the lock immediately. |
+| **Lock held by another** | Returns `null` — never blocks. |
+| **Redis unavailable** | Returns `null` + logs Warning — **never throws** (fail-open like the cache). |
+| **Caller cancellation** | May throw `OperationCanceledException` — the only exception path. |
+| **Expiry (TTL)** | Lock auto-releases after `expiry` even if the holder crashes. Prevents deadlocks. |
+| **Fencing** | Each acquisition generates a unique token — release only deletes the key if the token still matches (prevents releasing someone else's lock after expiry). |
+
+### Guard-rails
+
+- **Never throws into a host loop.** A backend failure degrades to `null`, not an exception. Your
+  polling loop stays alive.
+- **Include tenant/principal in the lock name** where relevant — e.g. `$"settlements/{tenantId}/batch"`.
+  The library prefixes with the configured `InstanceName` automatically.
+- **Keep expiry honest.** Set it longer than the expected work duration but short enough that a crash
+  doesn't hold the lock forever. 2–5× the expected duration is a good heuristic.
+
+### How it works (Redis `SET NX`)
+
+```
+SET "SolTechnology:lock:settlement/batch-process" "<unique-guid>" NX EX 300
+```
+
+- `NX` = only set if **N**ot e**X**ists (atomic mutual exclusion)
+- `EX 300` = auto-expire after 300s (crash safety)
+- Release = Lua script: `DEL key` only if value still matches (fencing)
+
+No external libraries needed — it's `StackExchange.Redis` under the hood (already a dependency of
+the distributed cache tier).
+

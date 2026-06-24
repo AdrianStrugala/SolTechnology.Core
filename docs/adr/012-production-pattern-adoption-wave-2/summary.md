@@ -23,8 +23,8 @@ The gate is authored last but **numbered first** so it runs before any code
 | 01 | A6 — Security-headers middleware (`Core.Api`) | [`done/01-api-security-headers-middleware.md`](done/01-api-security-headers-middleware.md) | ✅ done |
 | 02 | B4 — Surface `Recoverable` in API `ProblemDetails` (`Core.Api`) | [`done/02-api-problemdetails-recoverable.md`](done/02-api-problemdetails-recoverable.md) | ✅ done |
 | 03 | D1+D2 — `Result` assertions + `Ct` matcher (`Core.Testing`) | [`done/03-testing-result-assertions-and-ct-matcher.md`](done/03-testing-result-assertions-and-ct-matcher.md) | ✅ done |
-| 04 | A2.1 — `Core.DistributedLock` scaffold + abstraction + file backend | [`reviewed/04-distributedlock-package-and-abstraction.md`](reviewed/04-distributedlock-package-and-abstraction.md) | 🔍 reviewed |
-| 05 | A2.2 — Medallion.Threading Postgres + SqlServer backends | [`reviewed/05-distributedlock-medallion-backends.md`](reviewed/05-distributedlock-medallion-backends.md) | 🔍 reviewed |
+| 04 | A2.1 — `Core.DistributedLock` → **implemented in `Core.Cache`** (Option B) | [`done/04-distributedlock-package-and-abstraction.md`](done/04-distributedlock-package-and-abstraction.md) | ✅ done |
+| 05 | ~~A2.2 — Medallion.Threading backends~~ — **superseded by Option B** (lock lives in Core.Cache, no Medallion) | [`reviewed/05-distributedlock-medallion-backends.md`](reviewed/05-distributedlock-medallion-backends.md) | ~~superseded~~ |
 | 06 | A3.1 — `Core.HealthChecks` foundation (base upstream check + JSON formatter) | [`reviewed/06-healthchecks-package-foundation.md`](reviewed/06-healthchecks-package-foundation.md) | 🔍 reviewed |
 | 07 | A3.2 — Data-store health checks (`Core.SQL` + `Core.Cache`) | [`reviewed/07-healthchecks-datastore-modules.md`](reviewed/07-healthchecks-datastore-modules.md) | 🔍 reviewed |
 | 08 | A3.3 — Messaging + upstream health checks (`Core.MessageBus` + `Core.HTTP`) | [`reviewed/08-healthchecks-messaging-and-http-modules.md`](reviewed/08-healthchecks-messaging-and-http-modules.md) | 🔍 reviewed |
@@ -49,8 +49,9 @@ current location (`to-do/` / `reviewed/` / `done/`).
 
 ## Dependency notes
 
-- **Steps 04–05 (DistributedLock)** must land before **step 10** (leader-elected poller depends on
-  `IDistributedLockService`).
+- **Steps 04–05 (DistributedLock)** — step 04 shipped as thin lock layer in `Core.Cache` (Option B);
+  step 05 (Medallion) is **superseded**. Step 10 (leader-elected poller) depends on `Core.Cache`
+  (which now contains `IDistributedLockService`).
 - **Step 06 (HealthChecks foundation)** must land before **steps 07–08** (per-module checks
   reference the base class + the pure `HealthReport`→JSON formatter; the foundation is ASP.NET-free).
 - **Step 11 (store abstraction)** must land before **steps 12–13** (middleware + Redis store
@@ -58,8 +59,9 @@ current location (`to-do/` / `reviewed/` / `done/`).
   glue package **`SolTechnology.Core.Api.Idempotency.Redis`** (references `Core.Api` + `Core.Cache`),
   so `Core.Api` stays Redis-free.
 - **Step 14 (correlation model)** must land before **steps 15–17** (each module consumes the model).
-- **Step 23 (publish workflow)** must land after **steps 04, 06 and 13** (all three new packages —
-  `Core.DistributedLock`, `Core.HealthChecks`, `Core.Api.Idempotency.Redis` — must exist).
+- **Step 23 (publish workflow)** must land after **steps 06 and 13** (the two new packages —
+  `Core.HealthChecks` and `Core.Api.Idempotency.Redis` — must exist; `Core.DistributedLock` is no
+  longer a separate package per Option B).
 - **Step 00 (premortem)** is the gate — it is authored last but **runs first**; implementation of any
   `01..23` step is blocked until it returns *Go* or *Go with mitigations*
   ([ADR-006 §5](../006-implementation-plan-workflow.md)).

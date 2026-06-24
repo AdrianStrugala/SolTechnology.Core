@@ -1,7 +1,7 @@
 ---
 adr: 012-production-pattern-adoption-wave-2
 step: 04 of 24
-status: reviewed
+status: done
 ---
 
 # Step 04: A2.1 — `Core.DistributedLock` scaffold + abstraction + file backend (new package)
@@ -75,4 +75,34 @@ exists, is registrable, and is usable without any external infrastructure. The p
 - Whether the file backend uses `DistributedLock.FileSystem` (then it moves to step 05 with the
   other Medallion packages) or a hand-rolled local lock here. Recommend: hand-rolled minimal local
   lock in step 04 so this slice stays dependency-free; `DistributedLock.FileSystem` optional in 05.
+
+## Retrospective — Implementation Deviations
+
+### 1. No separate package — lock lives in `Core.Cache` (Option B)
+**Original plan:** Create a new `SolTechnology.Core.DistributedLock` package with Medallion.Threading
+backends (steps 04+05 = abstraction + Postgres/SqlServer backends).
+
+**Actual implementation:** The maintainer decided during implementation that a separate package adds
+unnecessary complexity given that:
+- The Redis backend (`SET NX EX`) shares the **same connection** as the distributed cache.
+- The overlap between cache and lock infrastructure is ~95% (same Redis, same connection string,
+  same `InstanceName` namespace).
+- Medallion.Threading introduces 3 new NuGet dependencies with no added value when Redis is already
+  available.
+
+Chosen: **Option B — thin lock layer directly in `Core.Cache`**:
+- `IDistributedLockService` interface added to `Core.Cache`.
+- `RedisDistributedLockService` — Redis `SET NX EX` + Lua atomic release with fencing token.
+- `LocalDistributedLockService` — in-process `SemaphoreSlim` per key (local dev, no Redis needed).
+- Two explicit `ModuleInstaller` methods: `AddLocalLock()` / `AddDistributedLock()` — mirrors
+  the existing `AddLocalCache()` / `AddDistributedCache()` symmetry.
+- Zero new packages, zero Medallion, zero new `.csproj`.
+
+**Impact on downstream steps:**
+- **Step 05** (Medallion backends) — **superseded**, no longer needed.
+- **Step 10** (leader-elected poller) — `Core.Scheduler → Core.Cache` (instead of → `Core.DistributedLock`).
+- **Step 23** (publish workflow) — no new package to add (one fewer pack step).
+- **Premortem M3** (no-throw guard-rail) — still applies, just in `Core.Cache` not a separate package.
+
+
 
