@@ -1,7 +1,7 @@
 ---
 adr: 012-production-pattern-adoption-wave-2
 step: 02 of 24
-status: reviewed
+status: done
 ---
 
 # Step 02: B4 — Surface `Recoverable` in the API `ProblemDetails` (`Core.Api`)

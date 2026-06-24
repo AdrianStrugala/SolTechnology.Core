@@ -115,8 +115,27 @@ Content-Type: application/problem+json
   "type":          "https://tools.ietf.org/html/rfc9110#section-15.5.5",
   "title":         "Trip 42 not found.",
   "status":        404,
-  "correlationId": "4bf92f3577b34da6a3ce929d0e0e4736"
+  "correlationId": "4bf92f3577b34da6a3ce929d0e0e4736",
+  "recoverable":   false
 }
+```
+
+#### `extensions.recoverable` — retry-ability hint
+
+Every `ProblemDetails` response carries `extensions.recoverable` (boolean, **always present** —
+absence is never ambiguous). It tells the client whether the failure is worth retrying:
+
+| Source | `recoverable` value |
+|---|---|
+| `Result.Fail(error)` | `error.Recoverable` — set by the application layer (`Error.Recoverable` init property). |
+| Mapped exception → 4xx | `false` — deterministic client/business rejection; retry will produce the same result. |
+| Mapped exception → 5xx | `true` — transient server fault; worth retrying. |
+| `ValidationException` → 400 | `false` — the input is structurally wrong. |
+
+Use `Recoverable = true` on your `Error` when the failure is transient and retryable:
+
+```csharp
+return Result<Trip>.Fail(new Error { Message = "Upstream timeout.", Recoverable = true });
 ```
 
 | `Error` subtype | HTTP | Body |
