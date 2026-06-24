@@ -20,7 +20,7 @@ The gate is authored last but **numbered first** so it runs before any code
 | # | Title | File | Status |
 |---|---|---|---|
 | 00 | Run premortem — **gate, cleared (Go w/ mitigations)** | [`done/00-run-premortem.md`](done/00-run-premortem.md) | ✅ done |
-| 01 | A6 — Security-headers middleware (`Core.Api`) | [`to-do/01-api-security-headers-middleware.md`](to-do/01-api-security-headers-middleware.md) | ⬜ to-do |
+| 01 | A6 — Security-headers middleware (`Core.Api`) | [`done/01-api-security-headers-middleware.md`](done/01-api-security-headers-middleware.md) | ✅ done |
 | 02 | B4 — Surface `Recoverable` in API `ProblemDetails` (`Core.Api`) | [`reviewed/02-api-problemdetails-recoverable.md`](reviewed/02-api-problemdetails-recoverable.md) | 🔍 reviewed |
 | 03 | D1+D2 — `Result` assertions + `Ct` matcher (`Core.Testing`) | [`reviewed/03-testing-result-assertions-and-ct-matcher.md`](reviewed/03-testing-result-assertions-and-ct-matcher.md) | 🔍 reviewed |
 | 04 | A2.1 — `Core.DistributedLock` scaffold + abstraction + file backend | [`reviewed/04-distributedlock-package-and-abstraction.md`](reviewed/04-distributedlock-package-and-abstraction.md) | 🔍 reviewed |

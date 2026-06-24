@@ -1,7 +1,7 @@
 ---
 adr: 012-production-pattern-adoption-wave-2
 step: 01 of 24
-status: to-do
+status: done
 ---
 
 # Step 01: A6 — Security-headers middleware (`Core.Api`)
@@ -52,4 +52,5 @@ dependency on any other wave-2 step.
 ## Open questions
 - `Referrer-Policy` default value: `no-referrer` vs `strict-origin-when-cross-origin` — decide and
   document. Recommend `no-referrer` to match the otherwise-strict baseline.
+
 

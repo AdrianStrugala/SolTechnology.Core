@@ -308,3 +308,50 @@ var fixture = new APIFixture<Program>(configuration, services =>
 
 Replace or decorate any of the above; `TryAdd*` registrations mean your custom registration
 wins.
+
+---
+
+### Security headers
+
+`UseSecurityHeaders()` stamps a strict baseline of security headers on **every** response — including
+error responses produced by the ProblemDetails pipeline. It is a pipeline (`Use…`) concern the host
+opts into; it is NOT wired into `AddApiCore` automatically.
+
+```csharp
+app.UseSecurityHeaders();
+```
+
+| Header | Default value | Purpose |
+|---|---|---|
+| `Content-Security-Policy` | `default-src 'none'; frame-ancestors 'none'` | No script/style/img loading; no iframe embedding. Strictest possible for a JSON API. |
+| `X-Content-Type-Options` | `nosniff` | Prevent MIME-type sniffing. |
+| `Referrer-Policy` | `no-referrer` | Never leak the request URL as a `Referer` header. |
+
+Pre-existing headers set by an upstream middleware are **never overwritten** (`TryAdd` semantics).
+
+#### Relaxing for Swagger / Redoc
+
+Swagger UI and Redoc need inline scripts/styles. By default, paths prefixed with `/swagger` or
+`/docs` receive a relaxed CSP (`default-src 'self'; script-src 'self' 'unsafe-inline'; …`). The
+strict policy remains on all other paths.
+
+```csharp
+app.UseSecurityHeaders(o =>
+{
+    // Add a custom docs path
+    o.RelaxedPathPrefixes.Add("/my-docs");
+
+    // Or override the referrer policy
+    o.ReferrerPolicy = "strict-origin-when-cross-origin";
+});
+```
+
+| Option | Type | Default |
+|---|---|---|
+| `ContentSecurityPolicy` | `string` | `default-src 'none'; frame-ancestors 'none'` |
+| `RelaxedContentSecurityPolicy` | `string` | `default-src 'self'; script-src 'self' 'unsafe-inline'; …` |
+| `RelaxedPathPrefixes` | `List<string>` | `["/swagger", "/docs"]` |
+| `ContentTypeOptions` | `string` | `nosniff` |
+| `ReferrerPolicy` | `string` | `no-referrer` |
+
+
