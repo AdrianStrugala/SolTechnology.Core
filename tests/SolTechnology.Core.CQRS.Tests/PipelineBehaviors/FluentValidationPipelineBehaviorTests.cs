@@ -3,6 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 using SolTechnology.Core;
 using SolTechnology.Core.CQRS;
 using SolTechnology.Core.Errors;
+using SolTechnology.Core.Testing.Assertions;
 
 namespace SolTechnology.Core.CQRS.Tests.PipelineBehaviors;
 
@@ -36,9 +37,7 @@ public class FluentValidationPipelineBehaviorTests
         var result = await _sut.Send(command);
 
         // Assert
-        result.IsFailure.Should().BeTrue();
-        result.Error.Should().BeOfType<ValidationError>();
-        var validationError = (ValidationError)result.Error!;
+        var validationError = result.ShouldBeFailure<ValidationError>();
         validationError.Errors.Should().ContainKey("Name");
     }
 
@@ -65,7 +64,7 @@ public class FluentValidationPipelineBehaviorTests
         var result = await _sut.Send(command);
 
         // Assert
-        result.IsSuccess.Should().BeTrue();
+        result.ShouldBeSuccess();
         ValidatedCommandHandler.WasCalled.Should().BeTrue();
     }
 }

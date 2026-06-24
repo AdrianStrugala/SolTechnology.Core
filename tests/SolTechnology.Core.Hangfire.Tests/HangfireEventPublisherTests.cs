@@ -8,6 +8,7 @@ using NSubstitute;
 using NUnit.Framework;
 using SolTechnology.Core.CQRS;
 using SolTechnology.Core.Hangfire;
+using SolTechnology.Core.Testing.Substitutes;
 
 namespace SolTechnology.Core.Hangfire.Tests;
 
@@ -66,7 +67,7 @@ public class HangfireEventPublisherTests
     {
         // Arrange
         var dispatcher = Substitute.For<IEventDispatcher>();
-        dispatcher.Dispatch(Arg.Any<IEvent>(), Arg.Any<CancellationToken>()).Returns(Task.CompletedTask);
+        dispatcher.Dispatch(Arg.Any<IEvent>(), Ct.Any).Returns(Task.CompletedTask);
 
         var scopedSp = Substitute.For<IServiceProvider>();
         scopedSp.GetService(typeof(IEventDispatcher)).Returns(dispatcher);
@@ -86,7 +87,7 @@ public class HangfireEventPublisherTests
         sut.DispatchInScope(@event);
 
         // Assert
-        dispatcher.Received(1).Dispatch(@event, Arg.Any<CancellationToken>());
+        dispatcher.Received(1).Dispatch(@event, Ct.Any);
         scopeFactory.Received(1).CreateScope();
     }
 }

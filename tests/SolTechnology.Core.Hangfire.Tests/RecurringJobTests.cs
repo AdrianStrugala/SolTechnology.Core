@@ -5,6 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using NSubstitute;
 using NUnit.Framework;
+using SolTechnology.Core.Testing.Substitutes;
 
 namespace SolTechnology.Core.Hangfire.Tests;
 
@@ -154,7 +155,7 @@ public class RecurringJobTests
         await runner.RunAsync(CancellationToken.None);
 
         // Assert
-        await job.Received(1).Execute(Arg.Any<CancellationToken>());
+        await job.Received(1).Execute(Ct.Any);
     }
 }
 

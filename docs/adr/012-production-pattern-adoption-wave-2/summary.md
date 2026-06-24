@@ -22,7 +22,7 @@ The gate is authored last but **numbered first** so it runs before any code
 | 00 | Run premortem — **gate, cleared (Go w/ mitigations)** | [`done/00-run-premortem.md`](done/00-run-premortem.md) | ✅ done |
 | 01 | A6 — Security-headers middleware (`Core.Api`) | [`done/01-api-security-headers-middleware.md`](done/01-api-security-headers-middleware.md) | ✅ done |
 | 02 | B4 — Surface `Recoverable` in API `ProblemDetails` (`Core.Api`) | [`done/02-api-problemdetails-recoverable.md`](done/02-api-problemdetails-recoverable.md) | ✅ done |
-| 03 | D1+D2 — `Result` assertions + `Ct` matcher (`Core.Testing`) | [`reviewed/03-testing-result-assertions-and-ct-matcher.md`](reviewed/03-testing-result-assertions-and-ct-matcher.md) | 🔍 reviewed |
+| 03 | D1+D2 — `Result` assertions + `Ct` matcher (`Core.Testing`) | [`done/03-testing-result-assertions-and-ct-matcher.md`](done/03-testing-result-assertions-and-ct-matcher.md) | ✅ done |
 | 04 | A2.1 — `Core.DistributedLock` scaffold + abstraction + file backend | [`reviewed/04-distributedlock-package-and-abstraction.md`](reviewed/04-distributedlock-package-and-abstraction.md) | 🔍 reviewed |
 | 05 | A2.2 — Medallion.Threading Postgres + SqlServer backends | [`reviewed/05-distributedlock-medallion-backends.md`](reviewed/05-distributedlock-medallion-backends.md) | 🔍 reviewed |
 | 06 | A3.1 — `Core.HealthChecks` foundation (base upstream check + JSON formatter) | [`reviewed/06-healthchecks-package-foundation.md`](reviewed/06-healthchecks-package-foundation.md) | 🔍 reviewed |

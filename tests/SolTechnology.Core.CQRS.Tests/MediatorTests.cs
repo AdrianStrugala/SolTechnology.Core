@@ -2,6 +2,7 @@ using FluentAssertions;
 using Microsoft.Extensions.DependencyInjection;
 using SolTechnology.Core;
 using SolTechnology.Core.CQRS;
+using SolTechnology.Core.Testing.Assertions;
 
 namespace SolTechnology.Core.CQRS.Tests;
 
@@ -31,8 +32,7 @@ public class MediatorTests
         var result = await _sut.Send<string>(new TestQuery { Input = "World" });
 
         // Assert
-        result.IsSuccess.Should().BeTrue();
-        result.Data.Should().Be("Hello World");
+        result.ShouldBeSuccess().Should().Be("Hello World");
     }
 
     [Test]
@@ -42,7 +42,7 @@ public class MediatorTests
         var result = await _sut.Send(new TestCommand());
 
         // Assert
-        result.IsSuccess.Should().BeTrue();
+        result.ShouldBeSuccess();
     }
 
     [Test]
@@ -52,8 +52,7 @@ public class MediatorTests
         var result = await _sut.Send<int>(new TestCommandWithResult { Value = 21 });
 
         // Assert
-        result.IsSuccess.Should().BeTrue();
-        result.Data.Should().Be(42);
+        result.ShouldBeSuccess().Should().Be(42);
     }
 
     [Test]

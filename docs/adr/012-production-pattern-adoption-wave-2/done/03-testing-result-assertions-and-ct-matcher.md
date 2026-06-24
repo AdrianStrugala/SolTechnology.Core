@@ -1,7 +1,7 @@
 ---
 adr: 012-production-pattern-adoption-wave-2
 step: 03 of 24
-status: reviewed
+status: done
 ---
 
 # Step 03: D1 + D2 — `Result` assertion helpers + `Ct` matcher alias (`Core.Testing`)
