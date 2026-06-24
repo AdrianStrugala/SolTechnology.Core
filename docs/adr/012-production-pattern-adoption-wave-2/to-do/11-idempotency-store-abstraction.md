@@ -52,3 +52,14 @@ This is the "what gets stored and where" slice — pure primitives, no middlewar
 - Header-replay policy: which headers are safe to store/replay. Recommend an allow-list
   (`Content-Type`, `Location`, app-specific) rather than replaying everything; flag for the reviewer.
 
+## Premortem mitigations (required — added by the `00` gate, 2026-06-24)
+- **M2 (security, H):** the header-replay open question is **resolved to an allow-list**. The
+  `StoredResponse` stores **only** an explicit allow-list (`Content-Type`, `Location`, app-specific);
+  it MUST **never** store or replay `Set-Cookie` or `Authorization`. Add a test proving those headers
+  are dropped. Rationale: replaying a stored `Set-Cookie`/`Authorization` to a different caller's
+  duplicate is a session/credential leak.
+- **M1 (correctness, H):** add an **explicit concurrency test** — two concurrent requests with the
+  same key must resolve via the store's **atomic add** (first writer wins; the second sees the
+  in-flight/stored entry), never two parallel executions. The atomic-add contract is acceptance-critical
+  for step 12's conflict detection and step 13's Redis store.
+

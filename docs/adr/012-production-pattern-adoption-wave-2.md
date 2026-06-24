@@ -1,6 +1,6 @@
 # ADR-012: Production pattern adoption — wave 2
 
-> **Status:** Proposed
+> **Status:** Accepted
 > **Decision Date:** 2026-06-24
 > **Decision Maker:** Repository maintainers
 > **Stakeholders:** Consumers of `SolTechnology.Core.*` (NuGet + `sample-tale-code-apps/DreamTravel`)

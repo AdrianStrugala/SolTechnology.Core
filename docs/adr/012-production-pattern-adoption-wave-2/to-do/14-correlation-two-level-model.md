@@ -51,3 +51,13 @@ with distinct header keys and lifetimes. This is the model/abstraction the other
 - Whether to default the two-level split **on** or **off**. Recommend off by default (single
   platform id preserves ADR-010 behaviour); the client layer is opt-in. Flag for the reviewer.
 
+## Premortem mitigations (required — added by the `00` gate, 2026-06-24)
+- **M6 (breaking-change risk, H):** the two-level split is **off by default** (resolve the open
+  question) — the platform id maps onto the existing single id so ADR-010 consumers see no change.
+  The client layer is strictly opt-in. Rationale: `ICorrelationIdService`
+  (`src/SolTechnology.Core.Logging/Correlations/ICorrelationIdService.cs:7`) and the `CorrelationId`
+  record are **public, shipped** surface; a re-signed member or a new required field is a MAJOR break.
+- **M6 (breaking-change risk, H):** add an **API-compat test** asserting `GetOrGenerate()`, `Set`,
+  `Get`, and the `X-Correlation-Id` semantics from ADR-010 are unchanged. Any change to an existing
+  member signature is out of scope for this MINOR wave.
+

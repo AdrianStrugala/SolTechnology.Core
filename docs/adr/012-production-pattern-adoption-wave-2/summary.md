@@ -10,11 +10,16 @@ Implementation is **blocked** until the **`00` premortem gate** returns *Go* or 
 The gate is authored last but **numbered first** so it runs before any code
 ([ADR-006 §5](../006-implementation-plan-workflow.md)).
 
+> **Gate cleared 2026-06-24 — verdict: GO WITH MITIGATIONS.** Required mitigations **M1–M8** are
+> recorded in [`done/00-run-premortem.md`](done/00-run-premortem.md) and folded into the owning step
+> files (11, 12, 13, 06, 14 carry a `## Premortem mitigations (required)` section; 04/05/10/21 were
+> already covered by their acceptance criteria). Steps `01..23` may now proceed.
+
 ## Steps
 
 | # | Title | File | Status |
 |---|---|---|---|
-| 00 | Run premortem — **gate, runs first** | [`reviewed/00-run-premortem.md`](reviewed/00-run-premortem.md) | 🔍 reviewed |
+| 00 | Run premortem — **gate, cleared (Go w/ mitigations)** | [`done/00-run-premortem.md`](done/00-run-premortem.md) | ✅ done |
 | 01 | A6 — Security-headers middleware (`Core.Api`) | [`to-do/01-api-security-headers-middleware.md`](to-do/01-api-security-headers-middleware.md) | ⬜ to-do |
 | 02 | B4 — Surface `Recoverable` in API `ProblemDetails` (`Core.Api`) | [`reviewed/02-api-problemdetails-recoverable.md`](reviewed/02-api-problemdetails-recoverable.md) | 🔍 reviewed |
 | 03 | D1+D2 — `Result` assertions + `Ct` matcher (`Core.Testing`) | [`reviewed/03-testing-result-assertions-and-ct-matcher.md`](reviewed/03-testing-result-assertions-and-ct-matcher.md) | 🔍 reviewed |

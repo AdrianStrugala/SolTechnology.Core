@@ -97,3 +97,13 @@ steps 07–08. New-package decision sub-section: see
   reports first failure) in this foundation step or defer it. Recommend deferring — it is not needed
   by the per-module checks and can be a follow-up; note the deferral.
 
+## Premortem mitigations (required — added by the `00` gate, 2026-06-24)
+- **M4 (dependency hygiene, M):** make "the foundation `.csproj` has **no** `FrameworkReference`
+  `Microsoft.AspNetCore.App`" an **executable assertion** (csproj-walking test, or fold into the
+  step-21 build-hygiene guard) rather than a manual acceptance line. This is the executable form of
+  the Blocker-1 fix — without it, a later edit can silently re-introduce ASP.NET into the foundation
+  and, transitively, into `Core.SQL` / `Core.Cache` (steps 07–08).
+- **M3 (correctness, H):** the caller-cancellation-rethrow test is acceptance-critical — a cancelled
+  probe (deploy/shutdown) must **not** be reported as `Unhealthy`, or orchestrators cycle healthy
+  pods.
+

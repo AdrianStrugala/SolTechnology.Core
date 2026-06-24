@@ -82,3 +82,12 @@ opt-in registration that replaces the in-memory default from step 12.
 - none — the placement is resolved (separate `SolTechnology.Core.Api.Idempotency.Redis` glue package;
   `Core.Api` stays Redis-free).
 
+## Premortem mitigations (required — added by the `00` gate, 2026-06-24)
+- **M5 (dependency hygiene, M):** make "`Core.API` has no `ProjectReference` to `Core.Cache`" an
+  **executable assertion** (a small csproj-walking test, or wire it into the step-21 build-hygiene
+  guard) so the Blocker-2 isolation cannot silently regress in a future PR. Manual acceptance alone
+  is not enough — the whole point of the glue package is that nothing re-adds the reference.
+- **M1 (correctness, H):** the atomic-add concurrency test is acceptance-critical here (two instances,
+  same key, exactly one execution). Use the Redis primitive's "add if absent" (`SET NX` semantics),
+  not get-then-set.
+

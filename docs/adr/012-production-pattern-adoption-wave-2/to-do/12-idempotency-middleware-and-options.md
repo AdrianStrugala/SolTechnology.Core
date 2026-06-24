@@ -63,3 +63,13 @@ consumes it) and the `AddIdempotency()` / `UseIdempotency()` entry points.
 - The in-flight-duplicate response shape (409 Conflict `ProblemDetails` vs 425 Too Early). Recommend
   a `ProblemDetails`-shaped 409 with `recoverable=true` (pairs with step 02); flag for the reviewer.
 
+## Premortem mitigations (required — added by the `00` gate, 2026-06-24)
+- **M1 (correctness, H):** the middleware MUST use the store's **atomic add** (step 11) to detect an
+  in-flight duplicate and return the defined conflict response rather than racing two executions; add
+  a concurrency test (two simultaneous same-key requests ⇒ one execution + one conflict/replay).
+- **M1 (correctness, H):** keep the "never store `5xx`" + "remove key on handler exception" tests as
+  hard acceptance — these two guard-rails are the difference between a transient blip and a
+  permanently wedged key for payment-style endpoints.
+- **M7 (config, M):** `AddIdempotency()` MUST register `IdempotencyOptions` with `.ValidateOnStart()`
+  (ADR-010 G3) so misconfiguration fails at boot, not first request.
+
