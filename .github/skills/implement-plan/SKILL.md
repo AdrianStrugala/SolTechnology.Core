@@ -34,6 +34,12 @@ docs/adr/<NNN>-<feature>/
   first ADR with status `🔍 Implementing`.
 - Open its `summary.md`. Pick the first row with status `⬜ to-do`. If none exists, ask the user
   which ADR to work on.
+- **Premortem gate (`00`).** If that first `⬜ to-do` row is step `00` (`00-run-premortem.md`), it is
+  the [ADR-006 §5](../../../docs/adr/006-implementation-plan-workflow.md) gate, not an implementation
+  step. Execute it by running the [`premortem`](../premortem/SKILL.md) skill and recording the
+  verdict in the step file — **touch no `src/` / `tests/` code**. Mark it `✅ done` only on a **Go** /
+  **Go with mitigations** verdict (fold any *No-Go* mitigation into the relevant step first), then
+  move it to `done/` and yield. **No `01..NN` step may start while `00` is still `⬜ to-do`.**
 - The step file lives in `to-do/` or `reviewed/` per `summary.md`'s "File" column.
 
 ### 2. Read the full step file before editing
@@ -53,8 +59,9 @@ Skills referenced or implied by the step:
 - Adding a `PackageReference` → [`package-management`](../package-management/SKILL.md).
 - Writing tests → consult `ClaudeCodingGuide §8`.
 - Logging additions → consult `ClaudeCodingGuide §11`.
-- Public API surface change → [`premortem`](../premortem/SKILL.md) BEFORE the implementation
-  lands.
+- Public API surface change → already covered by the plan's `00` premortem gate
+  ([ADR-006 §5](../../../docs/adr/006-implementation-plan-workflow.md)); if the step adds surface the
+  gate did not foresee, STOP and re-run [`premortem`](../premortem/SKILL.md) before it lands.
 
 ### 4. Implement exactly the step
 
@@ -187,6 +194,9 @@ Before yielding back to the user:
 
 ## Constraints
 
+- DO NOT start any `01..NN` implementation step while the plan's `00` premortem gate is still
+  `⬜ to-do`. The gate runs first ([ADR-006 §5](../../../docs/adr/006-implementation-plan-workflow.md));
+  starting code before a *Go* verdict turns the premortem into a postmortem.
 - DO NOT implement work outside the named step. Scope is one step.
 - DO NOT modify the original "Summary / Affected components / Details / Acceptance criteria"
   sections of the moved step file. They are a historical record.

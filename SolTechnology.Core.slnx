@@ -18,6 +18,7 @@
     <File Path="docs\Hangfire.md" />
     <File Path="docs\HTTP-Production-Checklist.md" />
     <File Path="docs\HTTP.Testing.md" />
+    <File Path="docs\production-harvest-second-app.md" />
     <File Path="docs\Redis.Testing.md" />
     <File Path="docs\ServiceBus.Testing.md" />
     <File Path="docs\Testing.md" />

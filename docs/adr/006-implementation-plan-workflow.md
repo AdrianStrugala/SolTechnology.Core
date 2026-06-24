@@ -78,6 +78,30 @@ stay as skills.
 Sequence / component / flow diagrams use Mermaid (GitHub renders natively). Diagrams produced by
 agents live in `docs/diagrams/`.
 
+### 5. The premortem is a gate — numbered `00`, executed first (Amendment 2026-06-24)
+
+A [premortem](../../.github/skills/premortem/SKILL.md) imagines failure **before** the change is
+written; run after the code exists, it is a *post*-mortem and its value is gone. Yet the planner can
+only premortem a **complete** plan — so it is **authored last** (once all implementation steps exist)
+but must be **executed first** (before any of them). These two facts pulled in opposite directions
+under the original numbering: a premortem written as the highest-numbered step (`NN of NN`) collides
+with the "pick the lowest `⬜ to-do` first" execution rule (the
+[`implement-plan`](../../.github/skills/implement-plan/SKILL.md) skill + the index's *For agents
+picking up work* procedure), which would run it dead last.
+
+**Rule:** the premortem step is numbered **`00`** and titled as a gate (`00-run-premortem.md`).
+Implementation steps keep `01..NN`. Because step numbers encode **execution order**, the
+"lowest `⬜ to-do` first" rule then structurally runs the premortem before step `01` — no reliance on
+a human or agent remembering it is special.
+
+- **Authored last, numbered first.** The planner writes `00-run-premortem.md` after composing
+  `01..NN`, then places it at the **top** of `summary.md`.
+- **`00` gates `01`.** No implementation step may move to `done/` until step `00` is `✅ done` with a
+  **Go** / **Go with mitigations** verdict. A *No-Go* blocks the plan until its mitigation is folded
+  back into a step.
+- **The gate produces a record, not `src/` code.** Executing step `00` means running the premortem
+  skill and recording the verdict in the step file; it touches no production code.
+
 ## Alternatives Considered
 
 1. **`.github/work/<task>/`** as the plan location. Rejected: `docs/adr/` already carries the
@@ -87,6 +111,11 @@ agents live in `docs/diagrams/`.
 3. **Keep `agents/` and `skills/` unified.** Rejected: roles and procedures have different read
    patterns. Agents need broad context; skills are narrow. A single folder forces the agent to
    guess which kind a file is.
+4. **(Amendment 2026-06-24) Premortem numbering.** *Leave it last-numbered and add a "run first"
+   note* — rejected: relies on prose, the exact fragility that triggered the amendment. *Make the
+   premortem a special non-file row in `summary.md`* — rejected: `implement-plan` operates on step
+   files; a bodiless row needs a parallel code path. *Number it `00`* — chosen: the number already
+   encodes execution order, so the gate sorts first for free with zero new machinery.
 
 ## Consequences
 
