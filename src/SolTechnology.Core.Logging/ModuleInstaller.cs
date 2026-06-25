@@ -25,6 +25,8 @@ public static class LoggingServiceCollectionExtensions
         public IServiceCollection AddCoreLogging(Action<LoggingOptions>? configure = null)
         {
             services.TryAddSingleton<ICorrelationIdService, CorrelationIdService>();
+            services.TryAddSingleton(TimeProvider.System);
+            services.TryAddScoped<ITimingService, TimingService>();
 
             var optionsBuilder = services.AddOptions<LoggingOptions>()
                 .ValidateDataAnnotations()

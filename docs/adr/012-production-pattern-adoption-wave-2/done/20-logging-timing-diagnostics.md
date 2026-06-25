@@ -1,7 +1,7 @@
 ---
 adr: 012-production-pattern-adoption-wave-2
 step: 20 of 24
-status: to-do
+status: done
 ---
 
 # Step 20: A5 — Per-request timing diagnostics (`Core.Logging`)
@@ -50,4 +50,5 @@ APM. Drops the harvested app-specific coupling.
 - Static `TimingService` (matches the harvest) vs an injected `ITimingService`. Recommend following
   the module's existing pattern (the correlation/scope helpers) — likely an injected service with an
   `AsyncLocal` backing; flag for the reviewer.
+
 

@@ -57,6 +57,8 @@ public class LoggingMiddlewareTests
             => throw new InvalidOperationException("boom");
     }
 
+    private static ITimingService NoOpTiming() => new TimingService(TimeProvider.System);
+
     [Test]
     public async Task Echoes_X_Correlation_Id_header_on_response()
     {
@@ -67,7 +69,7 @@ public class LoggingMiddlewareTests
         var store = new CorrelationStore();
 
         await mw.InvokeAsync(ctx, NullLogger<LoggingMiddleware>.Instance,
-            store, Array.Empty<ILogScopeEnricher>());
+            store, Array.Empty<ILogScopeEnricher>(), NoOpTiming());
 
         // The middleware stores the correlation for the async-flow and registers an OnStarting
         // callback that echoes it on the response. The echo itself is asserted in the
@@ -84,7 +86,7 @@ public class LoggingMiddlewareTests
         var ctx = new DefaultHttpContext();
         var store = new CorrelationStore();
 
-        await mw.InvokeAsync(ctx, NullLogger<LoggingMiddleware>.Instance, store, Array.Empty<ILogScopeEnricher>());
+        await mw.InvokeAsync(ctx, NullLogger<LoggingMiddleware>.Instance, store, Array.Empty<ILogScopeEnricher>(), NoOpTiming());
 
         store.Stored.Should().NotBeNull();
         store.Stored!.Value.Should().NotBeNullOrWhiteSpace();
@@ -97,7 +99,7 @@ public class LoggingMiddlewareTests
         var ctx = new DefaultHttpContext();
 
         Func<Task> act = () => mw.InvokeAsync(ctx, NullLogger<LoggingMiddleware>.Instance,
-            new CorrelationStore(), Array.Empty<ILogScopeEnricher>());
+            new CorrelationStore(), Array.Empty<ILogScopeEnricher>(), NoOpTiming());
 
         await act.Should().ThrowAsync<InvalidOperationException>();
         ctx.Response.StatusCode.Should().Be(StatusCodes.Status500InternalServerError);
@@ -111,7 +113,7 @@ public class LoggingMiddlewareTests
         var ctx = new DefaultHttpContext();
 
         await mw.InvokeAsync(ctx, NullLogger<LoggingMiddleware>.Instance,
-            new CorrelationStore(), new ILogScopeEnricher[] { faulty });
+            new CorrelationStore(), new ILogScopeEnricher[] { faulty }, NoOpTiming());
 
         next.WasInvoked.Should().BeTrue();
     }
@@ -127,7 +129,7 @@ public class LoggingMiddlewareTests
         var capturing = new CapturingEnricher();
 
         await mw.InvokeAsync(ctx, NullLogger<LoggingMiddleware>.Instance,
-            store, new ILogScopeEnricher[] { capturing });
+            store, new ILogScopeEnricher[] { capturing }, NoOpTiming());
 
         next.WasInvoked.Should().BeTrue();
         store.Stored.Should().NotBeNull("correlation must still be set even on skipped paths");
@@ -157,7 +159,7 @@ public class LoggingMiddlewareTests
         ctx.Request.ContentLength = bytes.Length;
 
         await mw.InvokeAsync(ctx, NullLogger<LoggingMiddleware>.Instance,
-            new CorrelationStore(), allEnrichers);
+            new CorrelationStore(), allEnrichers, NoOpTiming());
 
         capturing.Captured.Should().NotBeNull();
         capturing.Captured!.Should().ContainKey("CityName").WhoseValue.Should().Be("Warsaw");
