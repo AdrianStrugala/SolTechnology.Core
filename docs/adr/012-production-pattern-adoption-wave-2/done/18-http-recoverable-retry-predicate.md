@@ -1,7 +1,7 @@
 ---
 adr: 012-production-pattern-adoption-wave-2
 step: 18 of 24
-status: reviewed
+status: done
 ---
 
 # Step 18: B2 — Recoverable-aware retry predicate (`Core.HTTP`)
@@ -57,4 +57,5 @@ deterministic business rejection that returned `200`/`4xx` but will never succee
 ## Open questions
 - Whether the predicate can *expand* retries (retry a normally-non-retryable status when recoverable)
   or only *restrict* them. Recommend restrict-only for safety; flag for the reviewer.
+
 

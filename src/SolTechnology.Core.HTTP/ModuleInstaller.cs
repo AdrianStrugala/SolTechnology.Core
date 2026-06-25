@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Logging;
@@ -111,6 +111,13 @@ namespace SolTechnology.Core.HTTP
                             : configuration.GetSection(HttpPolicyConfiguration.SectionName);
 
                     source.Bind(opts);
+
+                    // Delegate properties (e.g. RetryPredicate) cannot be config-bound — copy
+                    // them from the explicit parameter when provided.
+                    if (httpPolicyConfigurationParam?.RetryPredicate is not null)
+                    {
+                        opts.RetryPredicate = httpPolicyConfigurationParam.RetryPredicate;
+                    }
                 })
                 .ValidateDataAnnotations()
                 .Validate(cfg => cfg.OverallRequestBudget is null || cfg.OverallRequestBudget > cfg.RequestTimeout,
@@ -196,6 +203,13 @@ namespace SolTechnology.Core.HTTP
             foreach (var prop in typeof(HttpPolicyConfiguration).GetProperties(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance))
             {
                 if (!prop.CanRead || !prop.CanWrite)
+                {
+                    continue;
+                }
+
+                // Delegates (e.g. RetryPredicate) are runtime-only — set programmatically,
+                // not bindable from IConfiguration. Skip them silently.
+                if (typeof(Delegate).IsAssignableFrom(prop.PropertyType))
                 {
                     continue;
                 }

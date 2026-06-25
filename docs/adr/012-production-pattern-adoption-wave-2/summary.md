@@ -30,14 +30,14 @@ The gate is authored last but **numbered first** so it runs before any code
 | 08 | A3.3 — Messaging + upstream health checks (`Core.MessageBus` + `Core.HTTP`; base lives in `Core.HTTP`) | [`done/08-healthchecks-messaging-and-http-modules.md`](done/08-healthchecks-messaging-and-http-modules.md) | ✅ done |
 | 09 | ~~C1 — Deployment-slot gating (`Core.Scheduler`)~~ | [`docs/future-ideas/003`](../../future-ideas/003-deployment-slot-gating.md) | 🔮 deferred |
 | 10 | ~~C2 — Leader-elected polling service base (`Core.Scheduler`)~~ | [`docs/future-ideas/004`](../../future-ideas/004-leader-elected-poller.md) | 🔮 deferred |
-| 11 | A1.1 — Idempotency store → **implemented in `Core.Cache`** (same pattern as lock) | [`done/04-distributedlock-package-and-abstraction.md`](done/04-distributedlock-package-and-abstraction.md) | ✅ done |
+| 11 | A1.1 — Idempotency store → **implemented in `Core.Cache`** (same pattern as lock) | [`docs/Cache.md`](../../Cache.md) | ✅ done |
 | 12 | ~~A1.2 — Idempotency middleware~~ — **recipe in docs** (no library middleware, same as lock) | [`docs/Cache.md`](../../Cache.md) | ✅ done (docs) |
-| 13 | ~~A1.3 — Redis idempotency store (new glue package)~~ — **superseded** (store lives in Core.Cache) | — | 🔮 deferred |
-| 14 | B1.1 — Two-level correlation model (`Core.Logging`) | [`to-do/14-correlation-two-level-model.md`](to-do/14-correlation-two-level-model.md) | ⬜ to-do |
-| 15 | B1.2 — Inbound extraction + response enrichment (`Core.Api`) | [`to-do/15-correlation-api-inbound-and-response.md`](to-do/15-correlation-api-inbound-and-response.md) | ⬜ to-do |
-| 16 | B1.3 — Outbound `AddCorrelation` helper (`Core.HTTP`) | [`reviewed/16-correlation-http-outbound.md`](reviewed/16-correlation-http-outbound.md) | 🔍 reviewed |
-| 17 | B1.4 — Queue correlation propagation (`Core.MessageBus`) | [`to-do/17-correlation-messagebus-queue.md`](to-do/17-correlation-messagebus-queue.md) | ⬜ to-do |
-| 18 | B2 — Recoverable-aware retry predicate (`Core.HTTP`) | [`reviewed/18-http-recoverable-retry-predicate.md`](reviewed/18-http-recoverable-retry-predicate.md) | 🔍 reviewed |
+| 13 | ~~A1.3 — Redis idempotency store (new glue package)~~ — **superseded** (Redis store lives in Core.Cache) | — | ❌ removed |
+| 14 | ~~B1.1 — Two-level correlation model (`Core.Logging`)~~ | — | ❌ removed |
+| 15 | ~~B1.2 — Inbound extraction + response enrichment (`Core.Api`)~~ | — | ❌ removed |
+| 16 | ~~B1.3 — Outbound `AddCorrelation` helper (`Core.HTTP`)~~ | — | ❌ removed |
+| 17 | ~~B1.4 — Queue correlation propagation (`Core.MessageBus`)~~ | — | ❌ removed |
+| 18 | B2 — Recoverable-aware retry predicate (`Core.HTTP`) | [`done/18-http-recoverable-retry-predicate.md`](done/18-http-recoverable-retry-predicate.md) | ✅ done |
 | 19 | B3 — Typed service-call error taxonomy (`Core.HTTP`) | [`reviewed/19-http-typed-call-error-taxonomy.md`](reviewed/19-http-typed-call-error-taxonomy.md) | 🔍 reviewed |
 | 20 | A5 — Per-request timing diagnostics (`Core.Logging`) | [`to-do/20-logging-timing-diagnostics.md`](to-do/20-logging-timing-diagnostics.md) | ⬜ to-do |
 | 21 | D3 — Architecture fitness guard tests + recipe (`Core.Testing`) | [`to-do/21-testing-architecture-fitness-guards.md`](to-do/21-testing-architecture-fitness-guards.md) | ⬜ to-do |
@@ -62,7 +62,7 @@ current location (`to-do/` / `reviewed/` / `done/`).
   step 13 (Redis glue package) is **superseded** — Redis store lives in `Core.Cache` alongside the
   local store. Step 12 (ASP.NET middleware in `Core.Api`) consumes `IIdempotencyStore` and is
   independent.
-- **Step 14 (correlation model)** must land before **steps 15–17** (each module consumes the model).
+- **Step 14 (correlation model)** — ❌ **removed** (steps 14–17 dropped entirely from scope).
 - **Step 23 (publish workflow)** — **no new packages this wave.** `Core.DistributedLock`,
   `Core.HealthChecks`, and `Core.Api.Idempotency.Redis` were all eliminated by in-module decisions.
   All changes ship via version bumps of existing packages. Step 23 is effectively a no-op (or can

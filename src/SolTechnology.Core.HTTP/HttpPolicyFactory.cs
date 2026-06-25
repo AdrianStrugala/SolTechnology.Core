@@ -64,14 +64,30 @@ internal sealed class HttpPolicyFactory(ILogger<HttpPolicyFactory> logger, HttpC
         // Retry predicate is distinct from the breaker's so we can refuse retries
         // on POST/PATCH while still letting the breaker observe their failures —
         // a 500-storm on POST should still trip the breaker for subsequent GETs.
-        ValueTask<bool> ShouldRetry(Outcome<HttpResponseMessage> outcome)
+        async ValueTask<bool> ShouldRetry(Outcome<HttpResponseMessage> outcome)
         {
             if (!configuration.RetryOnUnsafeVerbs && IsUnsafeVerb(outcome.Result?.RequestMessage?.Method))
             {
-                return ValueTask.FromResult(false);
+                return false;
             }
 
-            return IsTransientFailure(outcome, retryableStatusCodes);
+            var isTransient = await IsTransientFailure(outcome, retryableStatusCodes);
+            if (!isTransient)
+            {
+                return false;
+            }
+
+            // If no body-aware predicate is configured, honour the standard transient logic.
+            if (configuration.RetryPredicate is null || outcome.Result is null)
+            {
+                return true;
+            }
+
+            // Buffer the body so the predicate can read it without corrupting the
+            // stream for the caller (Content becomes seekable after this call).
+            await outcome.Result.Content.LoadIntoBufferAsync();
+
+            return await configuration.RetryPredicate(outcome.Result);
         }
 
         ValueTask<bool> ShouldBreak(Outcome<HttpResponseMessage> outcome)

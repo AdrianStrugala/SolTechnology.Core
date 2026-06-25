@@ -21,6 +21,9 @@ before pointing this at production traffic, walk through the
   `OverallRequestBudget` caps the total wall-clock per call.
 - **Idempotent-only retry by default** — `POST` / `PATCH` are NOT retried
   unless you opt in with `RetryOnUnsafeVerbs`. No silent double-charges.
+- **Recoverable-aware retry** — opt-in `RetryPredicate` inspects the response body
+  and refuses retries when the upstream signals a non-recoverable business error
+  (`"recoverable": false` in ProblemDetails). Built-in helper: `RetryPredicates.RecoverableOnly`.
 - **`Retry-After` honoured** — 429 and 5xx with a `Retry-After` header back off
   exactly as the server asks, capped at `RetryTimeout`.
 - **Correlation propagation** — `X-Correlation-Id` + W3C `traceparent` on every
@@ -308,6 +311,39 @@ stub — bypass the resilience pipeline entirely and assert the request shape yo
 - **Per-attempt timeout < `OverallRequestBudget`.** Validation enforces this on
   startup; if you tune them, keep the gap large enough for at least one
   complete attempt.
+
+### Recoverable-aware retry predicate
+
+By default, the pipeline retries on transient status codes (408/429/5xx) regardless of the response
+body. When the upstream uses `Core.Api`'s `ProblemDetails` with `"recoverable": true/false`, you can
+opt in to body-aware retry — stop wasting retries on deterministic business rejections:
+
+```csharp
+services.AddHTTPClient<IPaymentsClient, PaymentsClient>(
+    "Payments",
+    new HTTPClientConfiguration { BaseAddress = "https://payments/" },
+    new HttpPolicyConfiguration
+    {
+        RetryPredicate = RetryPredicates.RecoverableOnly
+    });
+```
+
+**Semantics (restrict-only):**
+- Predicate is called **only** when the standard checks (transient status + safe verb) already passed.
+- `true` → allow the retry (body says recoverable, or unparseable — benefit of the doubt).
+- `false` → **stop retrying** (body says non-recoverable — will never succeed on retry).
+- A non-retryable status (400, 401, 403, 404) is **never** retried regardless of body content.
+  The predicate cannot expand retries, only restrict them.
+
+**Custom predicate** — use any logic:
+
+```csharp
+RetryPredicate = async response =>
+{
+    var body = await response.Content.ReadAsStringAsync();
+    return !body.Contains("DUPLICATE_DETECTED");
+}
+```
 
 ### What ships in DI
 
