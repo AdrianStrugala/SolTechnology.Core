@@ -15,6 +15,7 @@
     <File Path="docs/theDesign.md" />
     <File Path="docs/theQuality.md" />
     <File Path="docs\BlobStorage.Testing.md" />
+    <File Path="docs\future-ideas.md" />
     <File Path="docs\Hangfire.md" />
     <File Path="docs\HTTP-Production-Checklist.md" />
     <File Path="docs\HTTP.Testing.md" />

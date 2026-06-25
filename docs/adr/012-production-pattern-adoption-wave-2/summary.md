@@ -24,15 +24,15 @@ The gate is authored last but **numbered first** so it runs before any code
 | 02 | B4 — Surface `Recoverable` in API `ProblemDetails` (`Core.Api`) | [`done/02-api-problemdetails-recoverable.md`](done/02-api-problemdetails-recoverable.md) | ✅ done |
 | 03 | D1+D2 — `Result` assertions + `Ct` matcher (`Core.Testing`) | [`done/03-testing-result-assertions-and-ct-matcher.md`](done/03-testing-result-assertions-and-ct-matcher.md) | ✅ done |
 | 04 | A2.1 — `Core.DistributedLock` → **implemented in `Core.Cache`** (Option B) | [`done/04-distributedlock-package-and-abstraction.md`](done/04-distributedlock-package-and-abstraction.md) | ✅ done |
-| 05 | ~~A2.2 — Medallion.Threading backends~~ — **superseded by Option B** (lock lives in Core.Cache, no Medallion) | [`reviewed/05-distributedlock-medallion-backends.md`](reviewed/05-distributedlock-medallion-backends.md) | ~~superseded~~ |
+| 05 | ~~A2.2 — Medallion.Threading backends~~ — **superseded by Option B** (lock lives in Core.Cache, no Medallion) | [`docs/future-ideas/005`](../../future-ideas/005-medallion-lock-backends.md) | 🔮 deferred |
 | 06 | A3.1 — Health endpoint (`Core.Api`: JSON formatter + `MapCoreHealthChecks`) — **no foundation package** | [`done/06-healthchecks-api-endpoint.md`](done/06-healthchecks-api-endpoint.md) | ✅ done |
 | 07 | A3.2 — Data-store health checks (`Core.SQL` + `Core.Cache`, ref framework pkg directly) | [`done/07-healthchecks-datastore-modules.md`](done/07-healthchecks-datastore-modules.md) | ✅ done |
 | 08 | A3.3 — Messaging + upstream health checks (`Core.MessageBus` + `Core.HTTP`; base lives in `Core.HTTP`) | [`done/08-healthchecks-messaging-and-http-modules.md`](done/08-healthchecks-messaging-and-http-modules.md) | ✅ done |
-| 09 | C1 — Deployment-slot gating (`Core.Scheduler`) | [`reviewed/09-scheduler-deployment-slot-gating.md`](reviewed/09-scheduler-deployment-slot-gating.md) | 🔍 reviewed |
-| 10 | C2 — Leader-elected polling service base (`Core.Scheduler`) | [`reviewed/10-scheduler-leader-elected-poller.md`](reviewed/10-scheduler-leader-elected-poller.md) | 🔍 reviewed |
-| 11 | A1.1 — Idempotency store abstraction + in-memory + selector (`Core.Api`) | [`to-do/11-idempotency-store-abstraction.md`](to-do/11-idempotency-store-abstraction.md) | ⬜ to-do |
-| 12 | A1.2 — Idempotency middleware + options + Add/Use + logging (`Core.Api`) | [`to-do/12-idempotency-middleware-and-options.md`](to-do/12-idempotency-middleware-and-options.md) | ⬜ to-do |
-| 13 | A1.3 — Redis idempotency store (new glue package `Core.Api.Idempotency.Redis`) | [`reviewed/13-idempotency-redis-store.md`](reviewed/13-idempotency-redis-store.md) | 🔍 reviewed |
+| 09 | ~~C1 — Deployment-slot gating (`Core.Scheduler`)~~ | [`docs/future-ideas/003`](../../future-ideas/003-deployment-slot-gating.md) | 🔮 deferred |
+| 10 | ~~C2 — Leader-elected polling service base (`Core.Scheduler`)~~ | [`docs/future-ideas/004`](../../future-ideas/004-leader-elected-poller.md) | 🔮 deferred |
+| 11 | A1.1 — Idempotency store → **implemented in `Core.Cache`** (same pattern as lock) | [`done/04-distributedlock-package-and-abstraction.md`](done/04-distributedlock-package-and-abstraction.md) | ✅ done |
+| 12 | ~~A1.2 — Idempotency middleware~~ — **recipe in docs** (no library middleware, same as lock) | [`docs/Cache.md`](../../Cache.md) | ✅ done (docs) |
+| 13 | ~~A1.3 — Redis idempotency store (new glue package)~~ — **superseded** (store lives in Core.Cache) | — | 🔮 deferred |
 | 14 | B1.1 — Two-level correlation model (`Core.Logging`) | [`to-do/14-correlation-two-level-model.md`](to-do/14-correlation-two-level-model.md) | ⬜ to-do |
 | 15 | B1.2 — Inbound extraction + response enrichment (`Core.Api`) | [`to-do/15-correlation-api-inbound-and-response.md`](to-do/15-correlation-api-inbound-and-response.md) | ⬜ to-do |
 | 16 | B1.3 — Outbound `AddCorrelation` helper (`Core.HTTP`) | [`reviewed/16-correlation-http-outbound.md`](reviewed/16-correlation-http-outbound.md) | 🔍 reviewed |
@@ -58,14 +58,15 @@ current location (`to-do/` / `reviewed/` / `done/`).
   `Microsoft.Extensions.Diagnostics.HealthChecks` **directly**. The cached upstream base lives in
   `Core.HTTP` (step 08). All three steps are **independent** — the endpoint renders whatever checks
   are registered.
-- **Step 11 (store abstraction)** must land before **steps 12–13** (middleware + Redis store
-  consume the **public** `IIdempotencyStore` / `StoredResponse`). Step 13 ships them in the separate
-  glue package **`SolTechnology.Core.Api.Idempotency.Redis`** (references `Core.Api` + `Core.Cache`),
-  so `Core.Api` stays Redis-free.
+- **Steps 11–13 (Idempotency)** — step 11 shipped the store in `Core.Cache` (same pattern as lock);
+  step 13 (Redis glue package) is **superseded** — Redis store lives in `Core.Cache` alongside the
+  local store. Step 12 (ASP.NET middleware in `Core.Api`) consumes `IIdempotencyStore` and is
+  independent.
 - **Step 14 (correlation model)** must land before **steps 15–17** (each module consumes the model).
-- **Step 23 (publish workflow)** must land after **step 13** (the only new package this wave —
-  `Core.Api.Idempotency.Redis`; `Core.DistributedLock` and `Core.HealthChecks` are no longer separate
-  packages per the Option-B / no-foundation decisions).
+- **Step 23 (publish workflow)** — **no new packages this wave.** `Core.DistributedLock`,
+  `Core.HealthChecks`, and `Core.Api.Idempotency.Redis` were all eliminated by in-module decisions.
+  All changes ship via version bumps of existing packages. Step 23 is effectively a no-op (or can
+  be used for version-bump coordination).
 - **Step 00 (premortem)** is the gate — it is authored last but **runs first**; implementation of any
   `01..23` step is blocked until it returns *Go* or *Go with mitigations*
   ([ADR-006 §5](../006-implementation-plan-workflow.md)).

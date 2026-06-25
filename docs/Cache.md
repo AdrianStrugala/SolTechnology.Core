@@ -208,6 +208,8 @@ Full reference: [Redis.Testing.md](Redis.Testing.md).
 | `AddDistributedCache(DistributedCacheConfiguration)` | Registers `IRedisCache` (Redis-backed) |
 | `AddLocalLock()` | Registers `IDistributedLockService` (in-process, for local dev / single instance) |
 | `AddDistributedLock()` | Registers `IDistributedLockService` (Redis `SET NX`, requires `AddDistributedCache`) |
+| `AddLocalIdempotency(TimeSpan?)` | Registers `IIdempotencyStore` (in-process, for local dev / single instance) |
+| `AddDistributedIdempotency(TimeSpan?)` | Registers `IIdempotencyStore` (Redis `SET NX`, requires `AddDistributedCache`) |
 
 ### Unified Interface
 
@@ -291,4 +293,158 @@ SET "SolTechnology:lock:settlement/batch-process" "<unique-guid>" NX EX 300
 
 No external libraries needed — it's `StackExchange.Redis` under the hood (already a dependency of
 the distributed cache tier).
+
+### When to use (Lock vs Cache)
+
+| You need… | Use |
+|---|---|
+| "Don't **compute** this twice" (same result, expensive to produce) | Cache (`GetOrAdd`) |
+| "Don't **do** this twice at the same time" (side-effectful, one winner) | Lock (`TryAcquireLockAsync`) |
+
+**Concrete examples:**
+- ✅ Lock: "Only one instance polls for new settlements every 30s" (leader election)
+- ✅ Lock: "Only one instance runs the nightly cleanup job" (singleton background task)
+- ✅ Lock: "Don't process the same payment event concurrently on two pods" (deduplication at execution level)
+- ❌ Lock for: "Don't call the Google API twice for the same city" → that's a cache miss, use `GetOrAdd`
+
+---
+
+## Idempotency Store
+
+`IIdempotencyStore` manages request deduplication keys — ensuring that retried HTTP requests with the
+same `Idempotency-Key` header produce the **exact same response** without re-executing the handler.
+Backed by the **same Redis** that powers the cache and lock.
+
+### The problem it solves
+
+```
+Client sends: POST /payments  (Idempotency-Key: abc-123)
+Server processes payment → 201 Created
+Network drops before client gets the response
+Client retries: POST /payments  (Idempotency-Key: abc-123)
+Without idempotency: payment executes AGAIN → double charge 💸
+With idempotency: server replays the stored 201 response → safe ✅
+```
+
+### Registration
+
+```csharp
+// Local dev / single instance — in-process ConcurrentDictionary with TTL
+services.AddLocalIdempotency();
+
+// Production — Redis SET NX (requires AddDistributedCache to be called first)
+services.AddDistributedCache(redisConfig);
+services.AddDistributedIdempotency();
+
+// Optional: custom TTL (default 24h)
+services.AddDistributedIdempotency(ttl: TimeSpan.FromHours(48));
+```
+
+### Contract
+
+| Operation | Behaviour |
+|---|---|
+| **`TryAddAsync(key)`** | Atomically reserves a key. Returns `true` if this caller won (key is new); `false` if already held by another request. |
+| **`GetAsync(key)`** | Gets the stored response for replay, or `null` if the handler hasn't completed yet. |
+| **`SetResponseAsync(key, response)`** | Persists the handler's response (status + headers + body) under the key. |
+| **`RemoveAsync(key)`** | Removes the key — used when the handler throws (allows retry). |
+
+### Guard-rails
+
+- **Never store 5xx.** A transient failure must not become the permanent "answer" for that key.
+  The middleware (in `Core.Api`) calls `RemoveAsync` on exception — the client can safely retry.
+- **Atomic reservation.** Two identical requests hitting two pods simultaneously: only one wins the
+  `SET NX` — the other waits and replays the stored response.
+- **TTL auto-expiry.** Keys don't grow forever — expired after the configured TTL (default 24h).
+- **Fail-open.** If Redis is unavailable, `TryAddAsync` returns `true` (lets the request through)
+  rather than blocking. Better to risk a duplicate than to reject all traffic.
+
+### When to use (Idempotency vs Lock vs Cache)
+
+| You need… | Use |
+|---|---|
+| "Don't **compute** this twice" | Cache |
+| "Don't **do** this twice at the same time" | Lock |
+| "Don't **do** this twice ever (even across retries minutes apart)" | Idempotency |
+
+**Concrete examples:**
+- ✅ Idempotency: "Client retries a payment POST — serve the same 201 without double-charging"
+- ✅ Idempotency: "Mobile app loses network after submit — user hits retry — same result"
+- ❌ Idempotency for: "Two pods processing the same queue message simultaneously" → that's a Lock
+- ❌ Idempotency for: "Don't call an expensive API twice for the same input" → that's a Cache
+
+### Middleware recipe (copy into your app)
+
+The library provides the **store** — the middleware is a ~30-line snippet in your app:
+
+```csharp
+app.Use(async (context, next) =>
+{
+    var store = context.RequestServices.GetRequiredService<IIdempotencyStore>();
+    var key = context.Request.Headers["Idempotency-Key"].FirstOrDefault();
+
+    if (string.IsNullOrEmpty(key))
+    {
+        await next(); // no key — pass through
+        return;
+    }
+
+    // Check if we already have a stored response
+    var stored = await store.GetAsync(key, context.RequestAborted);
+    if (stored is not null)
+    {
+        context.Response.StatusCode = stored.StatusCode;
+        foreach (var h in stored.Headers) context.Response.Headers[h.Key] = h.Value;
+        await context.Response.Body.WriteAsync(stored.Body, context.RequestAborted);
+        return;
+    }
+
+    // Try to reserve the key
+    if (!await store.TryAddAsync(key, context.RequestAborted))
+    {
+        context.Response.StatusCode = 409; // Conflict — someone else is processing
+        return;
+    }
+
+    // Capture the response
+    var originalBody = context.Response.Body;
+    using var buffer = new MemoryStream();
+    context.Response.Body = buffer;
+
+    try
+    {
+        await next();
+
+        // Only store 2xx responses — never cache failures
+        if (context.Response.StatusCode is >= 200 and < 300)
+        {
+            buffer.Seek(0, SeekOrigin.Begin);
+            var response = new StoredResponse
+            {
+                StatusCode = context.Response.StatusCode,
+                Headers = context.Response.Headers
+                    .ToDictionary(h => h.Key, h => h.Value.ToArray()),
+                Body = buffer.ToArray()
+            };
+            await store.SetResponseAsync(key, response, context.RequestAborted);
+        }
+        else
+        {
+            await store.RemoveAsync(key, context.RequestAborted); // allow retry on non-2xx
+        }
+
+        buffer.Seek(0, SeekOrigin.Begin);
+        await buffer.CopyToAsync(originalBody, context.RequestAborted);
+    }
+    catch
+    {
+        await store.RemoveAsync(key); // handler threw — allow retry
+        throw;
+    }
+    finally
+    {
+        context.Response.Body = originalBody;
+    }
+});
+```
 
