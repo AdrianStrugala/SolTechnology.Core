@@ -14,7 +14,9 @@ using OpenTelemetry;
 using OpenTelemetry.Trace;
 using SolTechnology.Core.API;
 using SolTechnology.Core.API.Filters;
+using SolTechnology.Core.API.HealthChecks;
 using SolTechnology.Core.API.Security;
+using SolTechnology.Core.SQL.HealthChecks;
 using SolTechnology.Core.Authentication;
 using SolTechnology.Core.Cache;
 using SolTechnology.Core.CQRS;
@@ -87,6 +89,10 @@ public class Program
         //SQL
         var sqlConfiguration = builder.Configuration.GetSection("Sql").Get<SQLConfiguration>()!;
         builder.Services.AddSQL(sqlConfiguration);
+
+        // Health checks — chain per-module checks onto the builder Aspire already registered.
+        builder.Services.AddHealthChecks()
+            .AddSqlHealthCheck();
 
 
         //Trips
@@ -188,6 +194,11 @@ public class Program
         });
 
         app.MapControllers();
+
+        // SolTechnology.Core.Api: JSON health endpoint (Aspire's MapDefaultEndpoints owns the
+        // plaintext /health + /alive in Development, so the Core JSON endpoint maps at /healthz).
+        app.MapCoreHealthChecks("/healthz");
+
         LogAvailableEndpoints(app.Services);
 
         app.Run();

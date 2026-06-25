@@ -373,4 +373,42 @@ app.UseSecurityHeaders(o =>
 | `ContentTypeOptions` | `string` | `nosniff` |
 | `ReferrerPolicy` | `string` | `no-referrer` |
 
+---
+
+### Health endpoint
+
+`MapCoreHealthChecks(path)` maps an ASP.NET health endpoint that renders the registered checks as
+JSON via `HealthReportJsonFormatter`. Health checks live **next to the module they probe** — there
+is no foundation package. Compose with the framework `AddHealthChecks()` and chain the per-module
+checks, then map the endpoint:
+
+```csharp
+builder.Services.AddHealthChecks()
+    .AddSqlHealthCheck()            // Core.SQL
+    .AddRedisHealthCheck()          // Core.Cache
+    .AddServiceBusHealthCheck()     // Core.MessageBus
+    .AddUpstreamHttpHealthCheck<MyReport>("payments", "https://payments/health"); // Core.HTTP
+
+app.MapCoreHealthChecks("/health");
+```
+
+Status codes follow the framework default: **200** for `Healthy`/`Degraded`, **503** for
+`Unhealthy`. The JSON body:
+
+```json
+{
+  "status": "Healthy",
+  "totalDuration": "00:00:00.0123456",
+  "entries": {
+    "sql":   { "status": "Healthy", "description": "SQL reachable", "duration": "00:00:00.0050000" },
+    "redis": { "status": "Healthy", "duration": "00:00:00.0010000" }
+  }
+}
+```
+
+`HealthReportJsonFormatter.Format(report)` is a **pure** `HealthReport` → JSON formatter (no
+`HttpContext`), so it is independently testable and reusable; `MapCoreHealthChecks` is the thin
+ASP.NET adapter. This is the only ASP.NET-coupled piece of the health-check feature — the per-module
+checks reference the framework-agnostic `Microsoft.Extensions.Diagnostics.HealthChecks` directly.
+
 

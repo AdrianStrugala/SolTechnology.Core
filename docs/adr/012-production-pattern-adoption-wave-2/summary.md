@@ -2,9 +2,9 @@
 
 Tracking the implementation steps for [ADR-012](../012-production-pattern-adoption-wave-2.md).
 Steps are ordered by the harvest's prioritised roadmap (quick `Core.Api`/`Core.Testing` wins →
-the two new foundation packages → background → idempotency (incl. the third new package, the
-`Core.Api.Idempotency.Redis` glue package) → correlation/HTTP deltas → diagnostics → fitness →
-recipes). Each step is independently mergeable.
+distributed lock (in `Core.Cache`, Option B) → health checks (per-module, no foundation package) →
+background → idempotency (incl. the one new package, the `Core.Api.Idempotency.Redis` glue package) →
+correlation/HTTP deltas → diagnostics → fitness → recipes). Each step is independently mergeable.
 
 Implementation is **blocked** until the **`00` premortem gate** returns *Go* or *Go with mitigations*.
 The gate is authored last but **numbered first** so it runs before any code
@@ -25,9 +25,9 @@ The gate is authored last but **numbered first** so it runs before any code
 | 03 | D1+D2 — `Result` assertions + `Ct` matcher (`Core.Testing`) | [`done/03-testing-result-assertions-and-ct-matcher.md`](done/03-testing-result-assertions-and-ct-matcher.md) | ✅ done |
 | 04 | A2.1 — `Core.DistributedLock` → **implemented in `Core.Cache`** (Option B) | [`done/04-distributedlock-package-and-abstraction.md`](done/04-distributedlock-package-and-abstraction.md) | ✅ done |
 | 05 | ~~A2.2 — Medallion.Threading backends~~ — **superseded by Option B** (lock lives in Core.Cache, no Medallion) | [`reviewed/05-distributedlock-medallion-backends.md`](reviewed/05-distributedlock-medallion-backends.md) | ~~superseded~~ |
-| 06 | A3.1 — `Core.HealthChecks` foundation (base upstream check + JSON formatter) | [`reviewed/06-healthchecks-package-foundation.md`](reviewed/06-healthchecks-package-foundation.md) | 🔍 reviewed |
-| 07 | A3.2 — Data-store health checks (`Core.SQL` + `Core.Cache`) | [`reviewed/07-healthchecks-datastore-modules.md`](reviewed/07-healthchecks-datastore-modules.md) | 🔍 reviewed |
-| 08 | A3.3 — Messaging + upstream health checks (`Core.MessageBus` + `Core.HTTP`) | [`reviewed/08-healthchecks-messaging-and-http-modules.md`](reviewed/08-healthchecks-messaging-and-http-modules.md) | 🔍 reviewed |
+| 06 | A3.1 — Health endpoint (`Core.Api`: JSON formatter + `MapCoreHealthChecks`) — **no foundation package** | [`done/06-healthchecks-api-endpoint.md`](done/06-healthchecks-api-endpoint.md) | ✅ done |
+| 07 | A3.2 — Data-store health checks (`Core.SQL` + `Core.Cache`, ref framework pkg directly) | [`done/07-healthchecks-datastore-modules.md`](done/07-healthchecks-datastore-modules.md) | ✅ done |
+| 08 | A3.3 — Messaging + upstream health checks (`Core.MessageBus` + `Core.HTTP`; base lives in `Core.HTTP`) | [`done/08-healthchecks-messaging-and-http-modules.md`](done/08-healthchecks-messaging-and-http-modules.md) | ✅ done |
 | 09 | C1 — Deployment-slot gating (`Core.Scheduler`) | [`reviewed/09-scheduler-deployment-slot-gating.md`](reviewed/09-scheduler-deployment-slot-gating.md) | 🔍 reviewed |
 | 10 | C2 — Leader-elected polling service base (`Core.Scheduler`) | [`reviewed/10-scheduler-leader-elected-poller.md`](reviewed/10-scheduler-leader-elected-poller.md) | 🔍 reviewed |
 | 11 | A1.1 — Idempotency store abstraction + in-memory + selector (`Core.Api`) | [`to-do/11-idempotency-store-abstraction.md`](to-do/11-idempotency-store-abstraction.md) | ⬜ to-do |
@@ -52,16 +52,20 @@ current location (`to-do/` / `reviewed/` / `done/`).
 - **Steps 04–05 (DistributedLock)** — step 04 shipped as thin lock layer in `Core.Cache` (Option B);
   step 05 (Medallion) is **superseded**. Step 10 (leader-elected poller) depends on `Core.Cache`
   (which now contains `IDistributedLockService`).
-- **Step 06 (HealthChecks foundation)** must land before **steps 07–08** (per-module checks
-  reference the base class + the pure `HealthReport`→JSON formatter; the foundation is ASP.NET-free).
+- **Steps 06–08 (HealthChecks)** — **no foundation package** (2026-06-25 decision). Step 06 ships the
+  ASP.NET endpoint in `Core.Api` (JSON formatter + `MapCoreHealthChecks`); steps 07–08 ship per-module
+  checks (`Core.SQL`/`Core.Cache`/`Core.MessageBus`/`Core.HTTP`) that reference the framework-agnostic
+  `Microsoft.Extensions.Diagnostics.HealthChecks` **directly**. The cached upstream base lives in
+  `Core.HTTP` (step 08). All three steps are **independent** — the endpoint renders whatever checks
+  are registered.
 - **Step 11 (store abstraction)** must land before **steps 12–13** (middleware + Redis store
   consume the **public** `IIdempotencyStore` / `StoredResponse`). Step 13 ships them in the separate
   glue package **`SolTechnology.Core.Api.Idempotency.Redis`** (references `Core.Api` + `Core.Cache`),
   so `Core.Api` stays Redis-free.
 - **Step 14 (correlation model)** must land before **steps 15–17** (each module consumes the model).
-- **Step 23 (publish workflow)** must land after **steps 06 and 13** (the two new packages —
-  `Core.HealthChecks` and `Core.Api.Idempotency.Redis` — must exist; `Core.DistributedLock` is no
-  longer a separate package per Option B).
+- **Step 23 (publish workflow)** must land after **step 13** (the only new package this wave —
+  `Core.Api.Idempotency.Redis`; `Core.DistributedLock` and `Core.HealthChecks` are no longer separate
+  packages per the Option-B / no-foundation decisions).
 - **Step 00 (premortem)** is the gate — it is authored last but **runs first**; implementation of any
   `01..23` step is blocked until it returns *Go* or *Go with mitigations*
   ([ADR-006 §5](../006-implementation-plan-workflow.md)).

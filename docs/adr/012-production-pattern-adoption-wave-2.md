@@ -71,7 +71,7 @@ have a dedicated decision sub-section (below). Implementation is gated by the **
 | API quick wins | A6 security-headers middleware · B4 surface `Recoverable` in `ProblemDetails` | `Core.Api` | none | MINOR |
 | Testing quick wins | D1 `Result` assertion helpers · D2 `Ct` matcher alias | `Core.Testing` | none | MINOR |
 | ~~New package~~ **→ Option B** | A2 distributed lock | **`Core.Cache`** (thin layer, not a separate package) | none (reuses existing `StackExchange.Redis`) | MINOR |
-| **New package** | A3 cached upstream health-check base + JSON writer + per-module checks | **`Core.HealthChecks`** + SQL/Cache/Bus/HTTP | none (uses `Microsoft.Extensions.Diagnostics.HealthChecks`) | MINOR (new package) |
+| ~~New package~~ **→ per-module** | A3 health checks: endpoint + per-module checks + upstream base | **`Core.Api`** (endpoint) + `Core.SQL`/`Core.Cache`/`Core.MessageBus`/`Core.HTTP` (checks; base in `Core.HTTP`) | `Microsoft.Extensions.Diagnostics.HealthChecks` (per data/messaging module) | MINOR |
 | Background | C1 deployment-slot gating · C2 leader-elected polling base | `Core.Scheduler` (→ `Core.Cache`) | none | MINOR |
 | API idempotency | A1 inbound HTTP idempotency middleware + store abstraction | `Core.Api` (+ `Core.Cache` store) | none | MINOR |
 | Correlation deltas | B1 two-level model · inbound+response · outbound · queue | `Core.Logging`/`Api`/`HTTP`/`MessageBus` | none | MINOR |
@@ -111,20 +111,36 @@ dependency of the distributed cache tier) is the only requirement.
 **Guard-rail.** Lock keys MUST be tenant/principal-namespaced where relevant. Acquisition failure
 returns `null` + logs at a single level; it never throws into the host loop.
 
-### Decision sub-section — new package `SolTechnology.Core.HealthChecks` (A3)
+### Decision sub-section — Health checks (A3) — per-module, no foundation package
 
-**Why a new package.** Core ships no health-check helpers today. A naïve upstream check is a known
-production footgun — it either hammers the dependency or hangs the probe and takes the pod down. A
-reusable, cached, correctly-timed base solves it once. It lives in its own package so the
-`Microsoft.Extensions.Diagnostics.HealthChecks` surface and the per-module check helpers do not
-leak into modules that do not want them.
+> **Original plan** was a separate `SolTechnology.Core.HealthChecks` foundation package that every
+> module would reference. During implementation (2026-06-25) the maintainer chose to **drop the
+> foundation package** — same reasoning as the DistributedLock Option-B decision: health checks
+> should live **next to the implementation they probe**, not behind a shared foundation that every
+> module must reference (and that risks dragging ASP.NET into data-store modules).
 
-**Surface.** `BaseUpstreamServiceHealthCheck<TReport>` — calls a downstream `/health`, caches the
-result in memory (~30 s), applies a per-call timeout independent of the probe, deserialises a typed
-report, and maps the exception taxonomy: connection failure → `Unhealthy`, timeout → `Unhealthy`,
-**caller-cancellation → rethrow** (not "Unhealthy"), bad payload → `Degraded`. Plus a JSON
-`ResponseWriter` for the health endpoint. Per-module checks (`Core.SQL`, `Core.Cache`/Redis,
-`Core.MessageBus`, `Core.HTTP`) reference this package and contribute an `AddXxxHealthCheck()`.
+**Placement.** Each check lives in its own module and references the framework-agnostic
+`Microsoft.Extensions.Diagnostics.HealthChecks` **directly**:
+- `Core.SQL` → `AddSqlHealthCheck()` (`SELECT 1` connectivity ping)
+- `Core.Cache` → `AddRedisHealthCheck()` (Redis ping via `IConnectionMultiplexer`)
+- `Core.MessageBus` → `AddServiceBusHealthCheck()` (broker liveness)
+- `Core.HTTP` → `BaseUpstreamServiceHealthCheck<TReport>` + `AddUpstreamHttpHealthCheck<TReport>()`
+  — the cached upstream base lives here (it probes a downstream `/health` over `HttpClient`)
+- `Core.Api` → `HealthReportJsonFormatter` + `MapCoreHealthChecks(path)` — the **only** ASP.NET piece
+
+**Composition.** Consumers call the framework `AddHealthChecks()` directly and chain the per-module
+checks; no `AddCoreHealthChecks()` wrapper:
+```csharp
+builder.Services.AddHealthChecks()
+    .AddSqlHealthCheck().AddRedisHealthCheck().AddServiceBusHealthCheck();
+app.MapCoreHealthChecks("/health");
+```
+
+**Blocker-1 (stronger than the package plan).** With no foundation, there is no shared package that
+could drag ASP.NET into `Core.SQL`/`Core.Cache`. Data/messaging modules reference only the
+framework-agnostic abstractions; the ASP.NET endpoint is isolated to `Core.Api` (already an ASP.NET
+package). The step-21 build-hygiene guard asserts no data/messaging module gains a
+`FrameworkReference Microsoft.AspNetCore.App`.
 
 **Guard-rail.** Caller-cancellation MUST rethrow (a cancelled probe is not an Unhealthy
 dependency); every upstream call MUST carry its own timeout independent of the probe deadline.
@@ -148,13 +164,14 @@ dependency); every upstream call MUST carry its own timeout independent of the p
 |---|---|---|---|
 | ~~`DistributedLock.*`~~ | ~~`Core.DistributedLock`~~ | — | **Superseded by Option B** — lock uses existing `StackExchange.Redis` in `Core.Cache`. No new dependency. |
 | `StackExchange.Redis` | `Core.Cache` | yes (transitive via `Microsoft.Extensions.Caching.StackExchangeRedis`) | Now also a **direct** `PackageReference` (`2.8.41`) for `IConnectionMultiplexer` access in the lock service. |
-| `Microsoft.Extensions.Diagnostics.HealthChecks` | `Core.HealthChecks` | no | Health-check abstractions + builder. Shared-framework family (`10.0.x`). |
+| `Microsoft.Extensions.Diagnostics.HealthChecks` | `Core.SQL`, `Core.Cache`, `Core.MessageBus`, `Core.HTTP` | no | Framework-agnostic health-check abstractions + builder (`10.0.x`). Referenced **per-module** — no foundation package. **Not** the ASP.NET variant. |
 | (existing) `Microsoft.AspNetCore.RateLimiting` | `Core.Api` (recipe only) | built-in (`net10.0`) | F recipe — no `PackageReference`. |
 
-The new `Core.HealthChecks` package (and the glue `Core.Api.Idempotency.Redis`) add `.slnx`
-`Project` entries, inherit `src/Directory.Build.props` (so `TreatWarningsAsErrors=true` applies),
-and are added to `.github/workflows/publishPackages.yml`. The distributed lock does **not** add a
-package — it is part of `Core.Cache` (Option B).
+The only new package this wave is the glue `Core.Api.Idempotency.Redis` (step 13) — it adds a `.slnx`
+`Project` entry, inherits `src/Directory.Build.props` (so `TreatWarningsAsErrors=true` applies), and
+is added to `.github/workflows/publishPackages.yml`. The distributed lock (Option B) and the health
+checks (per-module) do **not** add packages — they live in `Core.Cache` and in each probed module
+respectively; the health **endpoint** lives in `Core.Api`.
 
 ## Alternatives Considered
 

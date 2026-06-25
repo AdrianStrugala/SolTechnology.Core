@@ -141,3 +141,22 @@ Notes:
 - Container lifetime / `TESTCONTAINERS_REUSE` reuse is the shared model from
   [theQuality.md → Container lifetime & reuse](theQuality.md#container-lifetime--reuse).
 
+---
+
+### Health check
+
+```csharp
+builder.Services.AddHealthChecks()
+    .AddSqlHealthCheck();          // opens a fresh connection + SELECT 1
+```
+
+| Aspect | Behaviour |
+|---|---|
+| Reachable | `Healthy` |
+| Unreachable / timeout | `Unhealthy` (configurable via `failureStatus`) |
+| Caller-cancellation | Rethrows (not `Unhealthy`) |
+| Timeout | 5 s per-call (configurable) |
+
+The check deliberately **bypasses** the `SQLConnectionFactory`'s Polly retry ladder — a health probe
+must be fast and honest, not wait 3+9+27 s against a dead server.
+

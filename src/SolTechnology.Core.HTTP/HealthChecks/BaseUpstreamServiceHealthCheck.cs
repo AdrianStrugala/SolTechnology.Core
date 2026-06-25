@@ -1,0 +1,128 @@
+using System.Collections.Concurrent;
+using System.Net.Http.Json;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
+using Microsoft.Extensions.Logging;
+
+namespace SolTechnology.Core.HTTP.HealthChecks;
+
+/// <summary>
+/// Options for configuring <see cref="BaseUpstreamServiceHealthCheck{TReport}"/>.
+/// </summary>
+public sealed class UpstreamHealthCheckOptions
+{
+    /// <summary>
+    /// How long a successful probe result is cached before re-hitting the upstream.
+    /// Default 30 seconds.
+    /// </summary>
+    public TimeSpan CacheDuration { get; set; } = TimeSpan.FromSeconds(30);
+
+    /// <summary>
+    /// Per-call timeout for the upstream HTTP request. Independent of the health-check probe
+    /// deadline. Default 10 seconds.
+    /// </summary>
+    public TimeSpan Timeout { get; set; } = TimeSpan.FromSeconds(10);
+}
+
+/// <summary>
+/// Base class for a cached upstream service health check that calls a downstream
+/// <c>/health</c> endpoint, deserialises a typed <typeparamref name="TReport"/>, and maps
+/// the exception taxonomy:
+/// <list type="bullet">
+///   <item>Connection failure → <c>Unhealthy</c></item>
+///   <item>Timeout → <c>Unhealthy</c></item>
+///   <item>Caller-cancellation → <b>rethrow</b> (not <c>Unhealthy</c>)</item>
+///   <item>Bad payload (deserialisation failure) → <c>Degraded</c></item>
+///   <item>2xx with valid report → mapped via <see cref="EvaluateReport"/></item>
+/// </list>
+/// Lives in <c>Core.HTTP</c> because it probes a downstream over <see cref="HttpClient"/>.
+/// </summary>
+/// <typeparam name="TReport">Typed report model deserialised from the upstream JSON body.</typeparam>
+public abstract class BaseUpstreamServiceHealthCheck<TReport>(
+    HttpClient httpClient,
+    string healthPath,
+    UpstreamHealthCheckOptions options,
+    ILogger logger) : IHealthCheck
+    where TReport : class
+{
+    private static readonly ConcurrentDictionary<string, (HealthCheckResult Result, DateTime CachedAt)> Cache = new();
+
+    /// <summary>
+    /// Override to map the deserialised <typeparamref name="TReport"/> to a
+    /// <see cref="HealthCheckResult"/>. Called only when the upstream returned 2xx with a
+    /// valid body.
+    /// </summary>
+    protected abstract HealthCheckResult EvaluateReport(TReport report);
+
+    public async Task<HealthCheckResult> CheckHealthAsync(
+        HealthCheckContext context,
+        CancellationToken cancellationToken = default)
+    {
+        var cacheKey = httpClient.BaseAddress + healthPath;
+
+        // Return cached if still fresh.
+        if (Cache.TryGetValue(cacheKey, out var cached) &&
+            DateTime.UtcNow - cached.CachedAt < options.CacheDuration)
+        {
+            return cached.Result;
+        }
+
+        using var timeoutCts = new CancellationTokenSource(options.Timeout);
+        using var linked = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, timeoutCts.Token);
+
+        try
+        {
+            var response = await httpClient.GetAsync(healthPath, linked.Token);
+            response.EnsureSuccessStatusCode();
+
+            var report = await response.Content.ReadFromJsonAsync<TReport>(linked.Token);
+            if (report is null)
+            {
+                var degraded = HealthCheckResult.Degraded("Upstream returned null report");
+                Cache[cacheKey] = (degraded, DateTime.UtcNow);
+                return degraded;
+            }
+
+            var result = EvaluateReport(report);
+            Cache[cacheKey] = (result, DateTime.UtcNow);
+            return result;
+        }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+        {
+            // Caller cancelled — not an unhealthy dependency. Rethrow.
+            throw;
+        }
+        catch (OperationCanceledException)
+        {
+            // Our per-call timeout fired — upstream is too slow.
+            var unhealthy = new HealthCheckResult(
+                context.Registration.FailureStatus, "Upstream timed out");
+            Cache[cacheKey] = (unhealthy, DateTime.UtcNow);
+            return unhealthy;
+        }
+        catch (HttpRequestException ex)
+        {
+            logger.LogWarning(ex, "Upstream health check failed for {HealthPath}", cacheKey);
+            var unhealthy = new HealthCheckResult(
+                context.Registration.FailureStatus, "Upstream connection failure", ex);
+            Cache[cacheKey] = (unhealthy, DateTime.UtcNow);
+            return unhealthy;
+        }
+        catch (System.Text.Json.JsonException ex)
+        {
+            // Deserialization failed — the upstream is reachable but returning garbage.
+            logger.LogWarning(ex, "Bad payload from upstream {HealthPath}", cacheKey);
+            var degraded = HealthCheckResult.Degraded("Bad payload from upstream", ex);
+            Cache[cacheKey] = (degraded, DateTime.UtcNow);
+            return degraded;
+        }
+        catch (Exception ex)
+        {
+            logger.LogWarning(ex, "Unexpected error in upstream health check {HealthPath}", cacheKey);
+            var unhealthy = new HealthCheckResult(
+                context.Registration.FailureStatus, "Unexpected error", ex);
+            Cache[cacheKey] = (unhealthy, DateTime.UtcNow);
+            return unhealthy;
+        }
+    }
+}
+
