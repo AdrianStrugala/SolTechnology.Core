@@ -1,4 +1,5 @@
-﻿﻿using SolTechnology.Avro;
+﻿﻿﻿using SolTechnology.Avro;
+using SolTechnology.Core;
 using System.Buffers;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
@@ -237,6 +238,32 @@ public class RequestBuilder
     public Task<TResponse> DeleteAsync<TResponse>(CancellationToken cancellationToken = default)
         => Send<TResponse>(HttpMethod.Delete, cancellationToken);
 
+    // --- Result<T>-returning alternatives (typed error taxonomy, no exceptions) ---
+
+    /// <summary>
+    /// Same as <see cref="GetAsync{TResponse}"/> but returns <see cref="Result{T}"/> instead of
+    /// throwing. Failures are mapped onto Core <see cref="Error"/> subtypes via
+    /// <see cref="ServiceCallErrorMapper"/>.
+    /// </summary>
+    public Task<Result<TResponse>> TryGetAsync<TResponse>(CancellationToken cancellationToken = default)
+        => TrySend<TResponse>(HttpMethod.Get, cancellationToken);
+
+    /// <inheritdoc cref="TryGetAsync{TResponse}"/>
+    public Task<Result<TResponse>> TryPostAsync<TResponse>(CancellationToken cancellationToken = default)
+        => TrySend<TResponse>(HttpMethod.Post, cancellationToken);
+
+    /// <inheritdoc cref="TryGetAsync{TResponse}"/>
+    public Task<Result<TResponse>> TryPutAsync<TResponse>(CancellationToken cancellationToken = default)
+        => TrySend<TResponse>(HttpMethod.Put, cancellationToken);
+
+    /// <inheritdoc cref="TryGetAsync{TResponse}"/>
+    public Task<Result<TResponse>> TryPatchAsync<TResponse>(CancellationToken cancellationToken = default)
+        => TrySend<TResponse>(HttpMethod.Patch, cancellationToken);
+
+    /// <inheritdoc cref="TryGetAsync{TResponse}"/>
+    public Task<Result<TResponse>> TryDeleteAsync<TResponse>(CancellationToken cancellationToken = default)
+        => TrySend<TResponse>(HttpMethod.Delete, cancellationToken);
+
     private Task<HttpResponseMessage> SendRaw(HttpMethod method, CancellationToken cancellationToken)
     {
         // Caller owns the response (and transitively the request — modern
@@ -272,6 +299,64 @@ public class RequestBuilder
 
             default:
                 throw new ArgumentOutOfRangeException();
+        }
+    }
+
+    /// <summary>
+    /// Railway-style alternative to <see cref="Send{TResponse}"/>: returns <see cref="Result{T}"/>
+    /// instead of throwing. Maps transport, status, and deserialisation failures onto Core
+    /// <see cref="Error"/> subtypes via <see cref="ServiceCallErrorMapper"/>.
+    /// </summary>
+    private async Task<Result<TResponse>> TrySend<TResponse>(HttpMethod method, CancellationToken cancellationToken)
+    {
+        HttpResponseMessage response;
+        try
+        {
+            using var request = BuildRequest(method);
+            response = await _httpClient
+                .SendAsync(request, HttpCompletionOption.ResponseHeadersRead, cancellationToken)
+                .ConfigureAwait(false);
+        }
+        catch (Exception ex) when (ex is not OperationCanceledException)
+        {
+            return Result<TResponse>.Fail(ServiceCallErrorMapper.FromException(ex));
+        }
+
+        using (response)
+        {
+            if (!response.IsSuccessStatusCode)
+            {
+                var body = await TryReadCappedBodyAsync(response, cancellationToken).ConfigureAwait(false);
+                return Result<TResponse>.Fail(ServiceCallErrorMapper.FromStatusCode(response.StatusCode, body));
+            }
+
+            try
+            {
+                switch (_responseType)
+                {
+                    case DataType.Json:
+                        var result = await response.Content
+                            .ReadFromJsonAsync<TResponse>(JsonOptions, cancellationToken)
+                            .ConfigureAwait(false);
+                        return Result<TResponse>.Success(result!);
+
+                    case DataType.Avro:
+                        var bytes = await response.Content.ReadAsByteArrayAsync(cancellationToken).ConfigureAwait(false);
+                        return Result<TResponse>.Success(AvroConvert.Deserialize<TResponse>(bytes));
+
+                    default:
+                        return Result<TResponse>.Fail(new Error
+                        {
+                            Message = "Unsupported response type",
+                            Recoverable = false
+                        });
+                }
+            }
+            catch (Exception ex) when (ex is not OperationCanceledException)
+            {
+                var body = await TryReadCappedBodyAsync(response, cancellationToken).ConfigureAwait(false);
+                return Result<TResponse>.Fail(ServiceCallErrorMapper.FromDeserializationFailure(ex, body));
+            }
         }
     }
 

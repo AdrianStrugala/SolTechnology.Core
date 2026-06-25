@@ -345,6 +345,47 @@ RetryPredicate = async response =>
 }
 ```
 
+### Typed service-call error taxonomy (`TryXxxAsync<T>`)
+
+The existing `GetAsync<T>()` / `PostAsync<T>()` methods **throw** on failure. When you prefer
+railway-style error handling (`Result<T>`), use the `Try` variants:
+
+```csharp
+var result = await httpClient.CreateRequest("/api/payments")
+    .WithBody(payment)
+    .TryPostAsync<PaymentResponse>();
+
+if (result.IsFailure)
+{
+    // result.Error is a typed Core Error: NotFoundError, ValidationError, TimeoutError, etc.
+    logger.LogWarning("Payment call failed: {Error}", result.Error.Message);
+    return Result<PaymentResponse>.Fail(result.Error);
+}
+
+return Result<PaymentResponse>.Success(result.Data);
+```
+
+**Error mapping taxonomy (`ServiceCallErrorMapper`):**
+
+| Failure | Mapped to | Recoverable? |
+|---|---|---|
+| Socket-level (DNS, connection refused) | `TimeoutError` | ✅ yes |
+| Timeout (per-attempt or outer budget) | `TimeoutError` | ✅ yes |
+| 404 | `NotFoundError` | ❌ no (heuristic) |
+| 401 | `UnauthorizedError` | ❌ no |
+| 403 | `ForbiddenError` | ❌ no |
+| 400 / 422 | `ValidationError` | ❌ no |
+| 409 | `ConflictError` | ❌ no |
+| 408 / 504 | `TimeoutError` | ✅ yes |
+| 5xx | `Error` | ✅ yes (heuristic) |
+| Deserialization failure (bad JSON) | `Error` | ❌ no |
+
+**ProblemDetails override:** if the response body contains `"recoverable": true/false`, it
+**overrides** the status-code heuristic. The `title` field is extracted as the error `Message`.
+
+**Additive:** the existing exception-throwing path (`GetAsync<T>()` → `HttpRequestFailedException`)
+stays unchanged. `TryXxxAsync<T>` is an opt-in alternative — choose per call site.
+
 ### What ships in DI
 
 `AddHTTPClient` (and the three-parameter overload) registers, per client name:

@@ -1,7 +1,7 @@
 ---
 adr: 012-production-pattern-adoption-wave-2
 step: 19 of 24
-status: reviewed
+status: done
 ---
 
 # Step 19: B3 — Typed service-call error taxonomy (`Core.HTTP`)
@@ -56,4 +56,5 @@ unwrapping `SocketException`), `HttpErrorCode` (carries status + extracted valid
   `TimeoutError`/a generic `Error` for connection failures. Recommend a dedicated subtype only if a
   consumer needs to branch on it; otherwise reuse. Flag for the reviewer (touches the foundation
   `Error` JSON-derived-type list — a public-surface change with its own premortem weight).
+
 

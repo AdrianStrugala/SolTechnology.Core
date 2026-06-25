@@ -38,7 +38,7 @@ The gate is authored last but **numbered first** so it runs before any code
 | 16 | ~~B1.3 — Outbound `AddCorrelation` helper (`Core.HTTP`)~~ | — | ❌ removed |
 | 17 | ~~B1.4 — Queue correlation propagation (`Core.MessageBus`)~~ | — | ❌ removed |
 | 18 | B2 — Recoverable-aware retry predicate (`Core.HTTP`) | [`done/18-http-recoverable-retry-predicate.md`](done/18-http-recoverable-retry-predicate.md) | ✅ done |
-| 19 | B3 — Typed service-call error taxonomy (`Core.HTTP`) | [`reviewed/19-http-typed-call-error-taxonomy.md`](reviewed/19-http-typed-call-error-taxonomy.md) | 🔍 reviewed |
+| 19 | B3 — Typed service-call error taxonomy (`Core.HTTP`) | [`done/19-http-typed-call-error-taxonomy.md`](done/19-http-typed-call-error-taxonomy.md) | ✅ done |
 | 20 | A5 — Per-request timing diagnostics (`Core.Logging`) | [`to-do/20-logging-timing-diagnostics.md`](to-do/20-logging-timing-diagnostics.md) | ⬜ to-do |
 | 21 | D3 — Architecture fitness guard tests + recipe (`Core.Testing`) | [`to-do/21-testing-architecture-fitness-guards.md`](to-do/21-testing-architecture-fitness-guards.md) | ⬜ to-do |
 | 22 | F — Document-only recipes (rate limiting · singleton→scoped · delay-queue) | [`to-do/22-document-only-recipes.md`](to-do/22-document-only-recipes.md) | ⬜ to-do |
