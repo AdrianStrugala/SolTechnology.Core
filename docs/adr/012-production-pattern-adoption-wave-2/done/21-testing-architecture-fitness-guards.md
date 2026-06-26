@@ -1,7 +1,7 @@
 ---
 adr: 012-production-pattern-adoption-wave-2
 step: 21 of 24
-status: to-do
+status: done
 ---
 
 # Step 21: D3 — Architecture "fitness" guard tests + recipe (`Core.Testing` + repo self-tests)

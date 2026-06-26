@@ -10,16 +10,18 @@ internal sealed class LocalIdempotencyStore : IIdempotencyStore
 {
     private readonly ConcurrentDictionary<string, Entry> _store = new(StringComparer.Ordinal);
     private readonly TimeSpan _ttl;
+    private readonly TimeProvider _timeProvider;
 
-    public LocalIdempotencyStore(TimeSpan ttl)
+    public LocalIdempotencyStore(TimeSpan ttl, TimeProvider? timeProvider = null)
     {
         _ttl = ttl;
+        _timeProvider = timeProvider ?? TimeProvider.System;
     }
 
     public Task<bool> TryAddAsync(string key, CancellationToken ct = default)
     {
         Evict();
-        var entry = new Entry(null, DateTime.UtcNow);
+        var entry = new Entry(null, _timeProvider.GetUtcNow());
         var added = _store.TryAdd(key, entry);
         return Task.FromResult(added);
     }
@@ -35,7 +37,7 @@ internal sealed class LocalIdempotencyStore : IIdempotencyStore
 
     public Task SetResponseAsync(string key, StoredResponse response, CancellationToken ct = default)
     {
-        _store[key] = new Entry(response, DateTime.UtcNow);
+        _store[key] = new Entry(response, _timeProvider.GetUtcNow());
         return Task.CompletedTask;
     }
 
@@ -45,7 +47,7 @@ internal sealed class LocalIdempotencyStore : IIdempotencyStore
         return Task.CompletedTask;
     }
 
-    private bool IsExpired(Entry entry) => DateTime.UtcNow - entry.CreatedAt > _ttl;
+    private bool IsExpired(Entry entry) => _timeProvider.GetUtcNow() - entry.CreatedAt > _ttl;
 
     private void Evict()
     {
@@ -59,6 +61,6 @@ internal sealed class LocalIdempotencyStore : IIdempotencyStore
         }
     }
 
-    private sealed record Entry(StoredResponse? Response, DateTime CreatedAt);
+    private sealed record Entry(StoredResponse? Response, DateTimeOffset CreatedAt);
 }
 

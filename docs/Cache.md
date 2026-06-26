@@ -357,7 +357,16 @@ services.AddDistributedIdempotency(ttl: TimeSpan.FromHours(48));
   `SET NX` — the other waits and replays the stored response.
 - **TTL auto-expiry.** Keys don't grow forever — expired after the configured TTL (default 24h).
 - **Fail-open.** If Redis is unavailable, `TryAddAsync` returns `true` (lets the request through)
-  rather than blocking. Better to risk a duplicate than to reject all traffic.
+  rather than blocking.
+
+> ⚠️ **Fail-open means duplicate side-effects during a Redis outage.** Unlike the distributed lock
+> (where a backend outage degrades to "might run twice but the work is idempotent"), the idempotency
+> store fails open in the **dangerous** direction: if Redis is down, two retried `POST /payments`
+> requests both run the handler → **double charge**. This is a deliberate availability-over-safety
+> trade-off (reject-all-traffic is worse for most APIs), but if your operation is **not** safe to
+> execute twice, do **not** rely solely on this store — pair it with a downstream idempotency key
+> (e.g. the payment provider's own `Idempotency-Key`) so the duplicate is caught at the system of
+> record.
 
 ### When to use (Idempotency vs Lock vs Cache)
 

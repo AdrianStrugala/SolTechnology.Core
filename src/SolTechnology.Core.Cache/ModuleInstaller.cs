@@ -1,4 +1,4 @@
-﻿﻿﻿﻿﻿using Microsoft.Extensions.Caching.Memory;
+﻿﻿﻿﻿﻿﻿using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.DependencyInjection;
 using StackExchange.Redis;
 
@@ -90,7 +90,10 @@ public static class ModuleInstaller
         public IServiceCollection AddLocalIdempotency(TimeSpan? ttl = null)
         {
             var expiry = ttl ?? TimeSpan.FromHours(24);
-            services.AddSingleton<IIdempotencyStore>(new LocalIdempotencyStore(expiry));
+            services.AddSingleton<IIdempotencyStore>(sp =>
+                new LocalIdempotencyStore(
+                    expiry,
+                    sp.GetService<TimeProvider>() ?? TimeProvider.System));
             return services;
         }
 

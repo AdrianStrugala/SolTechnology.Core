@@ -40,9 +40,9 @@ The gate is authored last but **numbered first** so it runs before any code
 | 18 | B2 — Recoverable-aware retry predicate (`Core.HTTP`) | [`done/18-http-recoverable-retry-predicate.md`](done/18-http-recoverable-retry-predicate.md) | ✅ done |
 | 19 | B3 — Typed service-call error taxonomy (`Core.HTTP`) | [`done/19-http-typed-call-error-taxonomy.md`](done/19-http-typed-call-error-taxonomy.md) | ✅ done |
 | 20 | A5 — Per-request timing diagnostics (`Core.Logging`) | [`done/20-logging-timing-diagnostics.md`](done/20-logging-timing-diagnostics.md) | ✅ done |
-| 21 | D3 — Architecture fitness guard tests + recipe (`Core.Testing`) | [`to-do/21-testing-architecture-fitness-guards.md`](to-do/21-testing-architecture-fitness-guards.md) | ⬜ to-do |
-| 22 | F — Document-only recipes (rate limiting · singleton→scoped · delay-queue) | [`to-do/22-document-only-recipes.md`](to-do/22-document-only-recipes.md) | ⬜ to-do |
-| 23 | Wire new packages into the publish workflow | [`reviewed/23-publish-workflow-new-packages.md`](reviewed/23-publish-workflow-new-packages.md) | 🔍 reviewed |
+| 21 | D3 — Architecture fitness guard tests + recipe (`Core.Testing`) | [`done/21-testing-architecture-fitness-guards.md`](done/21-testing-architecture-fitness-guards.md) | ✅ done |
+| 22 | F — Document-only recipes (rate limiting · singleton→scoped · delay-queue) | [`done/22-document-only-recipes.md`](done/22-document-only-recipes.md) | ✅ done |
+| 23 | Wire new packages into the publish workflow — **no-op** (zero new packages this wave) | [`done/23-publish-workflow-new-packages.md`](done/23-publish-workflow-new-packages.md) | ✅ done |
 
 Status values: `⬜ to-do` / `🔍 reviewed` / `✅ done`. Link in each row points to the step's
 current location (`to-do/` / `reviewed/` / `done/`).

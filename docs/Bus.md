@@ -100,3 +100,25 @@ public class CalculatePlayerStatistics : IMessageHandler<PlayerMatchesSynchroniz
 For integration/component tests, reference the **[SolTechnology.Core.ServiceBus.Testing](ServiceBus.Testing.md)**
 companion package. It spins up the official Azure Service Bus emulator via Testcontainers and hands back a
 connection string you can override `MessageBus:ConnectionString` with — no cloud namespace required.
+
+### Health check
+
+```csharp
+builder.Services.AddHealthChecks()
+    .AddServiceBusHealthCheck();        // peeks the first configured queue (non-destructive)
+```
+
+Requires `ServiceBusClient` + `MessageBusConfiguration` in DI (registered by `AddMessageBus(...)`).
+
+| Outcome | Status |
+|---|---|
+| Peek succeeds (broker reachable + Listen claim) | `Healthy` |
+| Broker answers but rejects the probe (`UnauthorizedAccessException` / `MessagingEntityNotFound`) | `Degraded` — connectivity is proven, the probe just lacks the claim/entity |
+| No queue configured to probe | `Degraded` — connectivity cannot be verified |
+| Connection / DNS / timeout failure | `Unhealthy` (configurable via `failureStatus`) |
+| Caller-cancellation | Rethrows (not `Unhealthy`) |
+
+The probe uses **`ServiceBusReceiver.PeekMessageAsync`** (not `CreateSender`, which is lazy and never opens a
+link). Peek forces a real AMQP round-trip to the broker and is non-destructive (no lock/complete),
+requiring only the **Listen** claim. Default per-call timeout is 10 s (configurable).
+

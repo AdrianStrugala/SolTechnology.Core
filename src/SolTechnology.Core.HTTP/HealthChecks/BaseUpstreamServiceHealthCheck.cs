@@ -41,10 +41,16 @@ public abstract class BaseUpstreamServiceHealthCheck<TReport>(
     HttpClient httpClient,
     string healthPath,
     UpstreamHealthCheckOptions options,
-    ILogger logger) : IHealthCheck
+    ILogger logger,
+    TimeProvider? timeProvider = null) : IHealthCheck
     where TReport : class
 {
-    private static readonly ConcurrentDictionary<string, (HealthCheckResult Result, DateTime CachedAt)> Cache = new();
+    private readonly TimeProvider _timeProvider = timeProvider ?? TimeProvider.System;
+
+    // Instance cache: the check is registered as a singleton (see UpstreamHttpHealthCheckExtensions)
+    // so a fresh result is cached across probe invocations without leaking across other
+    // registrations or test instances.
+    private readonly ConcurrentDictionary<string, (HealthCheckResult Result, DateTimeOffset CachedAt)> _cache = new();
 
     /// <summary>
     /// Override to map the deserialised <typeparamref name="TReport"/> to a
@@ -57,11 +63,11 @@ public abstract class BaseUpstreamServiceHealthCheck<TReport>(
         HealthCheckContext context,
         CancellationToken cancellationToken = default)
     {
-        var cacheKey = httpClient.BaseAddress + healthPath;
+        var cacheKey = $"{httpClient.BaseAddress}{healthPath}";
 
         // Return cached if still fresh.
-        if (Cache.TryGetValue(cacheKey, out var cached) &&
-            DateTime.UtcNow - cached.CachedAt < options.CacheDuration)
+        if (_cache.TryGetValue(cacheKey, out var cached) &&
+            _timeProvider.GetUtcNow() - cached.CachedAt < options.CacheDuration)
         {
             return cached.Result;
         }
@@ -78,12 +84,12 @@ public abstract class BaseUpstreamServiceHealthCheck<TReport>(
             if (report is null)
             {
                 var degraded = HealthCheckResult.Degraded("Upstream returned null report");
-                Cache[cacheKey] = (degraded, DateTime.UtcNow);
+                _cache[cacheKey] = (degraded, _timeProvider.GetUtcNow());
                 return degraded;
             }
 
             var result = EvaluateReport(report);
-            Cache[cacheKey] = (result, DateTime.UtcNow);
+            _cache[cacheKey] = (result, _timeProvider.GetUtcNow());
             return result;
         }
         catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
@@ -96,7 +102,7 @@ public abstract class BaseUpstreamServiceHealthCheck<TReport>(
             // Our per-call timeout fired — upstream is too slow.
             var unhealthy = new HealthCheckResult(
                 context.Registration.FailureStatus, "Upstream timed out");
-            Cache[cacheKey] = (unhealthy, DateTime.UtcNow);
+            _cache[cacheKey] = (unhealthy, _timeProvider.GetUtcNow());
             return unhealthy;
         }
         catch (HttpRequestException ex)
@@ -104,7 +110,7 @@ public abstract class BaseUpstreamServiceHealthCheck<TReport>(
             logger.LogWarning(ex, "Upstream health check failed for {HealthPath}", cacheKey);
             var unhealthy = new HealthCheckResult(
                 context.Registration.FailureStatus, "Upstream connection failure", ex);
-            Cache[cacheKey] = (unhealthy, DateTime.UtcNow);
+            _cache[cacheKey] = (unhealthy, _timeProvider.GetUtcNow());
             return unhealthy;
         }
         catch (System.Text.Json.JsonException ex)
@@ -112,7 +118,7 @@ public abstract class BaseUpstreamServiceHealthCheck<TReport>(
             // Deserialization failed — the upstream is reachable but returning garbage.
             logger.LogWarning(ex, "Bad payload from upstream {HealthPath}", cacheKey);
             var degraded = HealthCheckResult.Degraded("Bad payload from upstream", ex);
-            Cache[cacheKey] = (degraded, DateTime.UtcNow);
+            _cache[cacheKey] = (degraded, _timeProvider.GetUtcNow());
             return degraded;
         }
         catch (Exception ex)
@@ -120,7 +126,7 @@ public abstract class BaseUpstreamServiceHealthCheck<TReport>(
             logger.LogWarning(ex, "Unexpected error in upstream health check {HealthPath}", cacheKey);
             var unhealthy = new HealthCheckResult(
                 context.Registration.FailureStatus, "Unexpected error", ex);
-            Cache[cacheKey] = (unhealthy, DateTime.UtcNow);
+            _cache[cacheKey] = (unhealthy, _timeProvider.GetUtcNow());
             return unhealthy;
         }
     }

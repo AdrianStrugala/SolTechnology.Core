@@ -405,3 +405,44 @@ stays unchanged. `TryXxxAsync<T>` is an opt-in alternative — choose per call s
 
 `TOptions` (when supplied) is bound from `HTTPClients:{name}:Options` and
 available via `IOptions<TOptions>` / `IOptionsMonitor<TOptions>`.
+
+### Upstream service health check
+
+Probe a downstream service's `/health` endpoint as part of your own health report. Subclass
+`BaseUpstreamServiceHealthCheck<TReport>` with your downstream's report shape and map it to a
+`HealthCheckResult`:
+
+```csharp
+public sealed record PartnerHealth(string Status);
+
+public sealed class PartnerHealthCheck(HttpClient client)
+    : BaseUpstreamServiceHealthCheck<PartnerHealth>(
+        client, "/health", new UpstreamHealthCheckOptions(), logger)
+{
+    protected override HealthCheckResult EvaluateReport(PartnerHealth report) =>
+        report.Status == "ok"
+            ? HealthCheckResult.Healthy()
+            : HealthCheckResult.Degraded($"partner status: {report.Status}");
+}
+
+// Registration — resolves the named HttpClient and registers the check as a singleton:
+builder.Services.AddHealthChecks()
+    .AddUpstreamHttpHealthCheck<PartnerHealthCheck>("partner");
+```
+
+**Taxonomy:**
+
+| Outcome | Status |
+|---|---|
+| 2xx + valid report | mapped via your `EvaluateReport` |
+| 2xx + `null` / bad JSON body | `Degraded` (upstream reachable, payload broken) |
+| Connection failure | `Unhealthy` (configurable) |
+| Per-call timeout | `Unhealthy` |
+| Caller-cancellation | Rethrows (not `Unhealthy`) |
+
+**Caching:** a successful (or failed) probe result is cached per upstream for
+`UpstreamHealthCheckOptions.CacheDuration` (default 30 s) so a flurry of `/healthz` hits doesn't
+hammer the downstream. The check is registered as a **singleton** so the cache survives across
+probes; timing is driven by `TimeProvider` (injectable for tests). Per-call `Timeout` (default 10 s)
+is independent of the cache window.
+

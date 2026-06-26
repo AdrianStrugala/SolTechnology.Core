@@ -10,6 +10,11 @@ namespace SolTechnology.Core.Cache;
 /// the full <see cref="StoredResponse"/> as a JSON value. Multi-instance safe — two pods racing
 /// the same key: only one wins the <c>NX</c> (the other gets <c>false</c> from TryAdd and must
 /// replay or wait).
+/// <para>
+/// The <c>CancellationToken</c> parameters are accepted for interface symmetry but are best-effort:
+/// the underlying <c>StackExchange.Redis</c> APIs do not take a token, so a call already dispatched
+/// to Redis is not cancelled mid-flight.
+/// </para>
 /// </summary>
 internal sealed class RedisIdempotencyStore : IIdempotencyStore
 {
@@ -58,8 +63,10 @@ internal sealed class RedisIdempotencyStore : IIdempotencyStore
             var db = _redis.GetDatabase();
             var value = await db.StringGetAsync(FullKey(key));
 
-            if (value.IsNullOrEmpty || value == "")
-                return null; // Key reserved but response not yet persisted.
+            // IsNullOrEmpty also covers the empty placeholder written by TryAddAsync —
+            // key reserved but the response has not been persisted yet.
+            if (value.IsNullOrEmpty)
+                return null;
 
             return JsonSerializer.Deserialize<StoredResponse>((string)value!, JsonOptions);
         }

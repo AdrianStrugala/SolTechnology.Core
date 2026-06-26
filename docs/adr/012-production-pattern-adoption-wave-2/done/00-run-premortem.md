@@ -1,7 +1,7 @@
 ---
 adr: 012-production-pattern-adoption-wave-2
 step: 00 of 24 (premortem gate)
-status: reviewed
+status: done
 ---
 
 # Step 00: Run premortem (implementation gate)

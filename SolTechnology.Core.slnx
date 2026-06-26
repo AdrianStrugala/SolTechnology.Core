@@ -95,6 +95,8 @@
     <Project Path="tests/SolTechnology.Core.MessageBus.Tests/SolTechnology.Core.MessageBus.Tests.csproj" />
     <Project Path="tests/SolTechnology.Core.CQRS.Tests/SolTechnology.Core.CQRS.Tests.csproj" />
     <Project Path="tests/SolTechnology.Core.Hangfire.Tests/SolTechnology.Core.Hangfire.Tests.csproj" />
+    <Project Path="tests/SolTechnology.Core.Cache.Tests/SolTechnology.Core.Cache.Tests.csproj" />
+    <Project Path="tests/SolTechnology.Core.Tests/SolTechnology.Core.Tests.csproj" />
   </Folder>
   <Folder Name="/src/">
     <File Path="src/Directory.Build.props" />
@@ -111,7 +113,6 @@
     <Project Path="src/SolTechnology.Core.Story/SolTechnology.Core.Story.csproj" />
     <Project Path="src/SolTechnology.Core.Logging/SolTechnology.Core.Logging.csproj" />
     <Project Path="src/SolTechnology.Core.MessageBus/SolTechnology.Core.MessageBus.csproj" />
-    <Project Path="src/SolTechnology.Core.Scheduler/SolTechnology.Core.Scheduler.csproj" />
     <Project Path="src/SolTechnology.Core.Hangfire/SolTechnology.Core.Hangfire.csproj" />
     <Project Path="src/SolTechnology.Core.SQL/SolTechnology.Core.SQL.csproj" />
     <Project Path="src/SolTechnology.Core.Testing/SolTechnology.Core.Testing.csproj" />

@@ -1,7 +1,7 @@
 ---
 adr: 012-production-pattern-adoption-wave-2
 step: 22 of 24
-status: to-do
+status: done
 ---
 
 # Step 22: F — Document-only recipes (rate limiting · singleton→scoped bridge · delay-queue)

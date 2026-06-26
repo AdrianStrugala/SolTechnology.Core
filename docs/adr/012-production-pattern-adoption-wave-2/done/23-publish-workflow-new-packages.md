@@ -1,7 +1,7 @@
 ---
 adr: 012-production-pattern-adoption-wave-2
 step: 23 of 24
-status: reviewed
+status: done
 ---
 
 # Step 23: Wire the new package into the publish workflow

@@ -6,10 +6,18 @@ using SolTechnology.Core.MessageBus.Configuration;
 namespace SolTechnology.Core.MessageBus.HealthChecks;
 
 /// <summary>
-/// Lightweight liveness check for the configured Azure Service Bus: creates a short-lived sender
-/// on a well-known entity and closes it. Reachable → <see cref="HealthStatus.Healthy"/>,
-/// unreachable → the configured failure status. Caller-cancellation is rethrown. Does not
-/// consume or send real messages.
+/// Connectivity check for the configured Azure Service Bus. Opens a real AMQP link by peeking the
+/// first configured queue (non-destructive — no lock/complete, requires only the <i>Listen</i>
+/// claim) and round-trips to the broker:
+/// <list type="bullet">
+///   <item>Peek succeeds → <see cref="HealthStatus.Healthy"/>.</item>
+///   <item>Broker answers but rejects the probe (<c>Unauthorized</c> / <c>MessagingEntityNotFound</c>)
+///         → <see cref="HealthStatus.Degraded"/> — connectivity is proven, the probe just lacks the
+///         claim/entity.</item>
+///   <item>No queue configured to probe → <see cref="HealthStatus.Degraded"/> (cannot verify).</item>
+///   <item>Connection / DNS / timeout failure → the configured failure status.</item>
+/// </list>
+/// Caller-cancellation is rethrown. Does not consume or send real messages.
 /// </summary>
 internal sealed class ServiceBusHealthCheck(
     ServiceBusClient client,
@@ -20,26 +28,46 @@ internal sealed class ServiceBusHealthCheck(
         HealthCheckContext context,
         CancellationToken cancellationToken = default)
     {
+        var entityName = options.Value.Queues.FirstOrDefault()?.QueueName;
+        if (string.IsNullOrWhiteSpace(entityName))
+        {
+            // No data-plane entity to probe and a claim-free namespace probe is not available
+            // without the Manage claim — be honest that we cannot verify connectivity.
+            return HealthCheckResult.Degraded(
+                "No queue configured to probe — Service Bus connectivity cannot be verified.");
+        }
+
         using var timeoutCts = new CancellationTokenSource(timeout);
         using var linked = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, timeoutCts.Token);
 
         try
         {
-            // Pick the first configured queue as the probe entity. If none configured, use a
-            // well-known probe entity name — the broker rejects unknown entities with a
-            // ServiceBusException which we map to Unhealthy below.
-            var entityName = options.Value.Queues.FirstOrDefault()?.QueueName ?? "$probe-health";
-
-            // Creating + closing a sender is the cheapest operation that validates connectivity
-            // to the broker without consuming messages or requiring Manage claims.
-            var sender = client.CreateSender(entityName);
-            await sender.CloseAsync(linked.Token);
+            // PeekMessageAsync forces a real AMQP link to open and round-trips to the broker —
+            // unlike CreateSender, which is lazy and never validates connectivity. Peek is
+            // non-destructive and needs only the Listen claim.
+            await using var receiver = client.CreateReceiver(entityName);
+            await receiver.PeekMessageAsync(fromSequenceNumber: null, linked.Token);
 
             return HealthCheckResult.Healthy("Service Bus reachable");
         }
         catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
         {
+            // Caller cancelled the probe — not an unhealthy dependency. Rethrow.
             throw;
+        }
+        catch (UnauthorizedAccessException uaex)
+        {
+            // The broker answered and rejected our claim — connectivity is proven even though this
+            // probe lacks the Listen claim to peek. Degraded, not Unhealthy.
+            return HealthCheckResult.Degraded("Service Bus reachable but probe unauthorized", uaex);
+        }
+        catch (ServiceBusException sbex) when (
+            sbex.Reason == ServiceBusFailureReason.MessagingEntityNotFound)
+        {
+            // The broker answered — the configured probe entity just does not exist. Connectivity
+            // is proven; this is a configuration issue, not an outage.
+            return HealthCheckResult.Degraded(
+                $"Service Bus reachable but probe entity not found: {sbex.Reason}", sbex);
         }
         catch (Exception ex)
         {

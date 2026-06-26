@@ -1,6 +1,6 @@
 # ADR-012: Production pattern adoption — wave 2
 
-> **Status:** Accepted
+> **Status:** Accepted — **Implemented** (2026-06-25; see [Implementation summary](#implementation-summary))
 > **Decision Date:** 2026-06-24
 > **Decision Maker:** Repository maintainers
 > **Stakeholders:** Consumers of `SolTechnology.Core.*` (NuGet + `sample-tale-code-apps/DreamTravel`)
@@ -226,7 +226,57 @@ respectively; the health **endpoint** lives in `Core.Api`.
 
 ## Implementation plan
 
-Tracked in [`012-production-pattern-adoption-wave-2/summary.md`](012-production-pattern-adoption-wave-2/summary.md).
-Implementation is **blocked** until the **`00` premortem gate** returns *Go* or *Go with
-mitigations* — it is authored last but runs first ([ADR-006 §5](006-implementation-plan-workflow.md)).
+Tracked under the (now-collapsed) per-step working folder; see the Implementation summary below.
+
+---
+
+## Implementation summary
+
+Completed 2026-06-25. The per-step working folder (`docs/adr/012-production-pattern-adoption-wave-2/`)
+was deleted per the [ADR-006](006-implementation-plan-workflow.md) collapse-on-completion rule; this
+section is the surviving record. The `00` premortem gate cleared **Go with mitigations** (M1–M8)
+before any code began.
+
+| # | Step | Shipped |
+|---|---|---|
+| 00 | Premortem gate | *Go with mitigations* (M1–M8); no `src/` code. |
+| 01 | A6 — Security headers | `SecurityHeadersMiddleware` + `UseSecurityHeaders()` (`src/SolTechnology.Core.API/Security/`); CSP/`nosniff`/`Referrer-Policy`, Swagger relaxation. |
+| 02 | B4 — `Recoverable` in ProblemDetails | `ApiProblemDetailsFactory` writes `extensions.recoverable` on both `FromError` (direct) and `FromException` (5xx⇒true, 4xx⇒false). |
+| 03 | D1+D2 — Test helpers | `ResultAssertions` (`ShouldBeSuccess/Failure`) + `Ct.Any` matcher in `Core.Testing`. |
+| 04 | A2 — Distributed lock | `IDistributedLockService` (local `SemaphoreSlim` + Redis `SET NX EX` w/ fencing) **in `Core.Cache`** — `AddLocalLock()` / `AddDistributedLock()`. **No new package** (Option B). |
+| 05 | A2.2 — Medallion backends | **Superseded** by Option B → [`future-ideas/005`](../future-ideas/005-medallion-lock-backends.md). |
+| 06 | A3.1 — Health endpoint | Pure `HealthReportJsonFormatter` + `MapCoreHealthChecks()` in `Core.Api`. **No foundation package.** |
+| 07 | A3.2 — Data-store checks | `AddSqlHealthCheck()` (`Core.SQL`) + `AddRedisHealthCheck()` (`Core.Cache`), referencing framework-agnostic `Microsoft.Extensions.Diagnostics.HealthChecks`. |
+| 08 | A3.3 — Messaging + upstream | `AddServiceBusHealthCheck()` (`Core.MessageBus`, `PeekMessageAsync` probe) + `BaseUpstreamServiceHealthCheck<TReport>` / `AddUpstreamHttpHealthCheck()` (`Core.HTTP`, cached + `TimeProvider`). |
+| 09 | C1 — Deployment-slot gating | **Deferred** → [`future-ideas/003`](../future-ideas/003-deployment-slot-gating.md). |
+| 10 | C2 — Leader-elected poller | **Deferred** → [`future-ideas/004`](../future-ideas/004-leader-elected-poller.md). |
+| 11 | A1.1 — Idempotency store | `IIdempotencyStore` / `StoredResponse` (local + Redis) **in `Core.Cache`** — `AddLocalIdempotency()` / `AddDistributedIdempotency()`. |
+| 12 | A1.2 — Idempotency middleware | **Docs recipe** in `Cache.md` (no library middleware — same call as the lock). |
+| 13 | A1.3 — Redis glue package | **Removed** — the Redis store lives in `Core.Cache`. |
+| 14–17 | B1 — Two-level correlation | **Removed** from scope — the single `ICorrelationIdService` (ADR-010) already propagates across HTTP / queue / jobs. |
+| 18 | B2 — Recoverable-aware retry | `RetryPredicates.RecoverableOnly` + `HttpPolicyConfiguration.RetryPredicate` (`Core.HTTP`). |
+| 19 | B3 — Typed call-error taxonomy | `ServiceCallErrorMapper` + `RequestBuilder.TryXxxAsync<T>()` → `Result<T>` (`Core.HTTP`). |
+| 20 | A5 — Timing diagnostics | `ITimingService` + emission in `LoggingMiddleware` (`Core.Logging`), `TimeProvider`-sourced. |
+| 21 | D3 — Fitness guards | `BuildHygieneGuardTests` + `TestHostContainmentGuardTests` in `tests/SolTechnology.Core.Tests`. |
+| 22 | F — Document-only recipes | Per-principal rate limiting (`Api.md`), singleton→scoped correlation bridge (`Log.md`), delay-queue-vs-Hangfire note (`Hangfire.md`). |
+| 23 | Publish workflow | **No-op** — zero new package IDs; everything ships via version bumps of existing packages. |
+
+**Net surface delta:** additive APIs on `Core.Api`, `Core.Cache`, `Core.HTTP`, `Core.Logging`,
+`Core.Testing`, `Core.SQL`, `Core.MessageBus` — all via **version bumps of existing packages**.
+Semver impact **MINOR** as predicted, but with **zero new package IDs**.
+
+### Preserved deviations
+
+- **No new packages (steps 04–06, 11–13).** Both proposed packages (`Core.DistributedLock`,
+  `Core.HealthChecks`) and the idempotency glue package were eliminated by in-module decisions: the
+  lock and idempotency store live in `Core.Cache` (≈95 % infra overlap with the cache — same Redis,
+  connection, `InstanceName` namespace), and health checks live per-module referencing the
+  framework-agnostic `Microsoft.Extensions.Diagnostics.HealthChecks`. **Lesson:** prefer extending an
+  existing module over minting a package when the infrastructure overlap is high.
+- **Correlation (14–17) removed.** The two-level model added no value without a consumer; the single
+  `ICorrelationIdService` from ADR-010 already covers HTTP / queue / job propagation.
+- **`Core.Scheduler` deprecated + removed from the solution** rather than extended (steps 09–10
+  deferred). The D3 build-hygiene guard then drove `Core.SQL` and `Core.MessageBus` to **remove**
+  their `TreatWarningsAsErrors=false` (both compiled clean); only the deprecated `Core.Scheduler`
+  remains allow-listed.
 

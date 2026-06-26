@@ -1,6 +1,7 @@
 using System.Net;
 using System.Net.Sockets;
 using System.Text.Json;
+using Polly.Timeout;
 using SolTechnology.Core.Errors;
 
 namespace SolTechnology.Core.HTTP;
@@ -18,9 +19,19 @@ public static class ServiceCallErrorMapper
     /// </summary>
     public static SolTechnology.Core.Error FromException(Exception exception) => exception switch
     {
-        // Timeout — pipeline or per-attempt timeout fired.
-        TaskCanceledException or OperationCanceledException
-            when !CancellationToken.None.IsCancellationRequested
+        // Polly per-attempt / outer-budget timeout fired.
+        TimeoutRejectedException
+            => new TimeoutError
+            {
+                Message = "Service call timed out",
+                Description = exception.Message,
+                Recoverable = true
+            },
+
+        // HttpClient request timeout surfaces as TaskCanceledException with no caller token.
+        // (The TrySend caller filters genuine caller-cancellation before reaching here, so a
+        // TaskCanceledException at this point is a timeout, not a deliberate cancel.)
+        TaskCanceledException
             => new TimeoutError
             {
                 Message = "Service call timed out",

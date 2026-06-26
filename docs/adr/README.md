@@ -18,7 +18,7 @@ Decisions that shape SolTechnology.Core. One ADR = one decision. Filenames follo
 | 009 | [Persistent events and recurring jobs via `SolTechnology.Core.Hangfire`](009-hangfire-persistent-events-and-jobs.md) | 2026-06-09 | Accepted | ✅ Done |
 | 010 | [Production hardening of SolTechnology.Core libraries](010-production-pattern-adoption-programme.md) | 2026-06-12 | Accepted | 🔍 Implementing — see [summary](010-production-pattern-adoption-programme/summary.md) |
 | 011 | [Extract SQLite Story persistence into the DreamTravel sample](011-story-sqlite-extraction.md) | 2026-06-22 | Accepted | ✅ Done |
-| 012 | [Production pattern adoption — wave 2](012-production-pattern-adoption-wave-2.md) | 2026-06-24 | Accepted | 🔍 Implementing — `00` premortem cleared (Go w/ mitigations); steps 01–23 open (see [summary](012-production-pattern-adoption-wave-2/summary.md)) |
+| 012 | [Production pattern adoption — wave 2](012-production-pattern-adoption-wave-2.md) | 2026-06-24 | Accepted | ✅ Done — see [Implementation summary](012-production-pattern-adoption-wave-2.md#implementation-summary) |
 
 Status values: `Proposed` / `Accepted` / `Superseded` / `Rejected`.
 Implementation values: `N/A` / `⬜ To-do` / `🔍 Implementing` / `✅ Done`.

@@ -411,4 +411,60 @@ Status codes follow the framework default: **200** for `Healthy`/`Degraded`, **5
 ASP.NET adapter. This is the only ASP.NET-coupled piece of the health-check feature — the per-module
 checks reference the framework-agnostic `Microsoft.Extensions.Diagnostics.HealthChecks` directly.
 
+---
+
+### Recipe: Per-principal rate limiting
+
+> **This is a recipe, not shipped code.** Copy into your host — no `Core.Api` change needed.
+
+Uses the built-in `Microsoft.AspNetCore.RateLimiting` middleware with a per-principal (tenant)
+partition, falling back to IP for unauthenticated requests. The `429` response is shaped as
+`ProblemDetails` so it matches the rest of the API's error contract (including `recoverable: true`
+— the client can retry after the window):
+
+```csharp
+builder.Services.AddRateLimiter(options =>
+{
+    options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+
+    options.AddPolicy("per-principal", context =>
+    {
+        var principalId = context.User?.FindFirst("sub")?.Value
+                       ?? context.Connection.RemoteIpAddress?.ToString()
+                       ?? "anonymous";
+
+        return RateLimitPartition.GetFixedWindowLimiter(principalId, _ => new FixedWindowRateLimiterOptions
+        {
+            PermitLimit = 100,
+            Window = TimeSpan.FromMinutes(1),
+            QueueLimit = 0
+        });
+    });
+
+    // Shape the 429 as ProblemDetails with recoverable=true
+    options.OnRejected = async (ctx, ct) =>
+    {
+        ctx.HttpContext.Response.ContentType = "application/problem+json";
+        var problem = new
+        {
+            type = "https://tools.ietf.org/html/rfc6585#section-4",
+            title = "Too Many Requests",
+            status = 429,
+            detail = "Rate limit exceeded. Retry after the window resets.",
+            recoverable = true
+        };
+        await ctx.HttpContext.Response.WriteAsJsonAsync(problem, ct);
+    };
+});
+
+// In the pipeline (after UseRouting, before MapControllers):
+app.UseRateLimiter();
+```
+
+Apply to specific endpoints or controllers:
+```csharp
+[EnableRateLimiting("per-principal")]
+public class PaymentsController : ControllerBase { }
+```
+
 

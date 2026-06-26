@@ -258,3 +258,32 @@ Hangfire.SqlServer.SqlServerObjectsInstaller.Install(
 - [ADR-009 — Persistent events and recurring jobs](adr/009-hangfire-persistent-events-and-jobs.md)
 - [CQRS](CQRS.md) — commands, queries, events (in-memory default)
 - [Cron / Scheduler](Cron.md) _(deprecated)_
+
+---
+
+## Decision note: Delay-queue vs Hangfire scheduled jobs
+
+> **TL;DR:** use Hangfire scheduled jobs. Don't build a bespoke delay-queue.
+
+**The pattern:** "hold a message until time T, then process it." Examples: send a reminder email
+in 24h, retry a failed webhook in 5 minutes, expire a draft after 7 days.
+
+**Hangfire already does this:**
+```csharp
+// Fire-and-forget in 5 minutes
+BackgroundJob.Schedule(() => handler.ProcessAsync(payload), TimeSpan.FromMinutes(5));
+
+// Or via the typed IJob + cron for recurring
+services.AddRecurringJob<ExpireDraftsJob>("0 */6 * * *"); // every 6 hours
+```
+
+**When NOT to use Hangfire:** if you need sub-second delay precision or millions of pending
+messages (Hangfire polls SQL storage — latency floor ~15s, throughput ceiling ~100/s per server).
+In that case, use Azure Service Bus scheduled messages or a Redis sorted set.
+
+**Why not build a library primitive:**
+- Hangfire gives you dashboard visibility, retry, dead-letter, correlation (via
+  `CorrelationIdJobFilter`), and persistence for free.
+- A bespoke delay-queue duplicates that stack without the observability.
+- See also: [FI-002 — Priority background jobs](future-ideas/002-priority-background-jobs-hangfire.md).
+
