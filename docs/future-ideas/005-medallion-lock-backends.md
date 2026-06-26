@@ -2,7 +2,7 @@
 
 > **Status:** ⏸️ Parked
 > **Parked date:** 2026-06-25
-> **Source:** [ADR-012 step 05](../adr/012-production-pattern-adoption-wave-2/summary.md) — superseded by Option B
+> **Source:** [ADR-012 step 05](../adr/012-production-pattern-adoption-wave-2.md#implementation-summary) — superseded by Option B
 > **Would-be target:** `SolTechnology.Core.Cache` (or a dedicated package if Redis isn't available)
 > **Semver / Effort:** MINOR · M
 

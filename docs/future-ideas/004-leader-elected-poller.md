@@ -2,7 +2,7 @@
 
 > **Status:** ⏸️ Parked
 > **Parked date:** 2026-06-25
-> **Source:** [ADR-012 step 10](../adr/012-production-pattern-adoption-wave-2/future-ideas.md)
+> **Source:** [ADR-012 step 10](../adr/012-production-pattern-adoption-wave-2.md#implementation-summary)
 > **Would-be target:** `SolTechnology.Core.Scheduler`
 > **Semver / Effort:** MINOR · M
 
