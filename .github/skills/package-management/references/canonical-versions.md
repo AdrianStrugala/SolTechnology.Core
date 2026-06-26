@@ -24,6 +24,7 @@ change**. When rows drift between projects, the row records the highest version 
 | `Microsoft.Extensions.Logging.Abstractions` | `10.0.9` | `SolTechnology.Core.Scheduler` | — |
 | `Microsoft.Extensions.Caching.Memory` | `10.0.9` | `SolTechnology.Core.Cache` | Aligned with the rest of the MEL family. |
 | `Microsoft.Extensions.Caching.StackExchangeRedis` | `10.0.1` | `SolTechnology.Core.Cache` | — |
+| `Microsoft.Extensions.Diagnostics.HealthChecks` | `10.0.9` | `SolTechnology.Core.Cache`, `SolTechnology.Core.SQL`, `SolTechnology.Core.MessageBus`, `SolTechnology.Core.HTTP` | Framework-agnostic health-check abstractions + builder (`IHealthCheck`, `IHealthChecksBuilder`, `HealthCheckRegistration`). **NOT** the ASP.NET `Microsoft.AspNetCore.Diagnostics.HealthChecks` — checks live per-module with no ASP.NET `FrameworkReference`; the endpoint lives in `Core.Api` (which gets the same types via the ASP.NET shared framework). |
 | `Microsoft.Extensions.DependencyInjection.Abstractions` | `10.0.9` | Various | — |
 | `Microsoft.Extensions.Logging.Console` | `10.0.9` | Various | — |
 | `Microsoft.Extensions.Http.Resilience` | `10.7.0` | `SolTechnology.Core.HTTP` | Aspire-family version (not aligned to plain `10.0.x` MEL minor — ships on its own cadence). |
@@ -78,7 +79,7 @@ change**. When rows drift between projects, the row records the highest version 
 | `Respawn` | `7.0.0` | `SolTechnology.Core.SQL.Testing` | Between-test database reset (SqlServer + Postgres adapters). |
 | `Scrutor` | `7.0.0` | DI assembly-scanning consumers | — |
 | `Testcontainers.Redis` | `4.12.0` | `SolTechnology.Core.Redis.Testing` | Redis container engine. Match `Testcontainers`. |
-| `StackExchange.Redis` | `3.0.0` | `SolTechnology.Core.Redis.Testing` | Used by `RedisFixture.FlushAsync()` (admin-mode `FLUSHALL`). |
+| `StackExchange.Redis` | `3.0.0` | `SolTechnology.Core.Cache`, `SolTechnology.Core.Redis.Testing` | `Core.Cache`: direct `IConnectionMultiplexer` for the distributed lock (`SET NX`) + Redis health check. `Redis.Testing`: `RedisFixture.FlushAsync()` (admin-mode `FLUSHALL`). |
 | `Testcontainers.Azurite` | `4.12.0` | `SolTechnology.Core.BlobStorage.Testing` | Azurite (Azure Storage emulator) container engine. Match `Testcontainers`. |
 | `Testcontainers.ServiceBus` | `4.12.0` | `SolTechnology.Core.ServiceBus.Testing` | Azure Service Bus emulator engine. |
 | `Docker.DotNet` | `3.125.15` | `SolTechnology.Core.Testing`, `SolTechnology.Core.ServiceBus.Testing` | Stable-name reuse + restart management for the emulator. |

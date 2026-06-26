@@ -1,7 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
 <PropertyGroup>
 <Version>0.6.0</Version>
-<TreatWarningsAsErrors>false</TreatWarningsAsErrors>
 <Description>Azure Service Bus wrapper for event-driven architectures.</Description>
 <PackageTags>sol technology core azure servicebus messaging queue topic pubsub async event-driven microservices dotnet cloud</PackageTags>
 <Product>SolTechnology.Core.MessageBus</Product>
@@ -20,6 +19,7 @@
 </ItemGroup>
 <ItemGroup>
 <PackageReference Include="Azure.Messaging.ServiceBus" Version="7.20.1" />
+<PackageReference Include="Microsoft.Extensions.Diagnostics.HealthChecks" Version="10.0.9" />
 <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="10.0.9" />
 <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
 </ItemGroup>

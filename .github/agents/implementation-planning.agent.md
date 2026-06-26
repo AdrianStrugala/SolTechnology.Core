@@ -31,9 +31,11 @@ For a single-file local refactor, skip this agent and go straight to the
   + step files only.
 - **Next free ADR number.** Read [`docs/adr/README.md`](../../docs/adr/README.md) FIRST to pick
   the next free `NNN`. Never hard-code from memory.
-- **End with premortem.** The last step in every plan is "run the
-  [premortem](../skills/premortem/SKILL.md) skill". Implementation is blocked until premortem
-  returns *Go* or *Go with mitigations*.
+- **Premortem is the gate, numbered `00`.** Every plan's premortem is `00-run-premortem.md` —
+  **authored last** (you can only premortem a complete plan) but **numbered first** so the
+  "lowest `⬜ to-do` first" execution rule runs it before any code
+  ([ADR-006 §5](../../docs/adr/006-implementation-plan-workflow.md)). Implementation is blocked until
+  it returns *Go* or *Go with mitigations*.
 - **Step files go to `to-do/`, never `done/`.** New step files always start in `to-do/`. The
   [`implement-plan`](../skills/implement-plan/SKILL.md) skill (planned — see ADR-006) moves
   them when complete.
@@ -96,11 +98,13 @@ File path: `docs/adr/<NNN>-<kebab-title>/summary.md`. Template in §Output below
 Add a row to [`docs/adr/README.md`](../../docs/adr/README.md) with `Status: Proposed`,
 `Implementation: 🔍 Implementing — see <summary path>`.
 
-### 9. Gate with premortem
+### 9. Gate with premortem (`00`)
 
-Add a final step file (`NN-run-premortem.md`) instructing the implementer to invoke the
-[premortem](../skills/premortem/SKILL.md) skill before starting code. Implementation is blocked
-until premortem returns *Go* or *Go with mitigations*.
+Author the premortem step **last** (you need the full plan to premortem it) but number it
+**`00`** — `docs/adr/<NNN>-<kebab-title>/to-do/00-run-premortem.md` — and place it as the **first**
+row in `summary.md`. Implementation steps are `01..NN`; the `00` gate sorts ahead of them under the
+"lowest `⬜ to-do` first" rule, so it runs before any code. Implementation is blocked until the
+premortem returns *Go* or *Go with mitigations* ([ADR-006 §5](../../docs/adr/006-implementation-plan-workflow.md)).
 
 ### 10. Hand off to `plan-reviewer`
 
@@ -178,12 +182,14 @@ Tracking the implementation steps for [ADR-<NNN>](../<NNN>-<feature>.md).
 
 | # | Title | File | Status |
 |---|---|---|---|
+| 00 | Run premortem (gate) | [`to-do/00-run-premortem.md`](to-do/00-run-premortem.md) | ⬜ to-do |
 | 01 | <title> | [`to-do/01-<title>.md`](to-do/01-<title>.md) | ⬜ to-do |
 | 02 | <title> | [`to-do/02-<title>.md`](to-do/02-<title>.md) | ⬜ to-do |
-| NN | Run premortem | [`to-do/NN-run-premortem.md`](to-do/NN-run-premortem.md) | ⬜ to-do |
 
 Status values: `⬜ to-do` / `🔍 reviewed` / `✅ done`. Link in each row points to the step's
-current location (`to-do/` / `reviewed/` / `done/`).
+current location (`to-do/` / `reviewed/` / `done/`). Step `00` is the premortem gate
+([ADR-006 §5](../../docs/adr/006-implementation-plan-workflow.md)) — it runs first and blocks
+`01..NN` until it returns *Go*.
 ```
 
 ## Constraints

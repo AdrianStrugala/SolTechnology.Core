@@ -65,6 +65,27 @@ public class HttpPolicyConfiguration
     public bool IncludeResponseBodyInException { get; set; } = false;
 
     /// <summary>
+    /// Optional predicate consulted <b>after</b> the standard transient-status + verb checks pass.
+    /// When set, the retry pipeline calls it with the response and retries <b>only</b> if it returns
+    /// <c>true</c>. Use this to inspect the response body and refuse retries when the upstream
+    /// signals a non-recoverable business error (e.g. <c>Error.Recoverable = false</c> in a
+    /// ProblemDetails envelope).
+    /// <para>
+    /// <b>Restrict-only semantics:</b> a <c>false</c> return short-circuits the retry even when the
+    /// status code is normally retryable. A <c>true</c> return does <b>not</b> make a non-retryable
+    /// status retryable — it only confirms "yes, retry this transient-looking failure".
+    /// </para>
+    /// <para>
+    /// <b>Body buffering:</b> the response is buffered (via <c>LoadIntoBufferAsync</c>) before the
+    /// predicate is called, so reading <c>Content</c> does not corrupt the stream for the caller.
+    /// </para>
+    /// <para>
+    /// Default: <c>null</c> (no body inspection — existing behaviour unchanged).
+    /// </para>
+    /// </summary>
+    public Func<HttpResponseMessage, ValueTask<bool>>? RetryPredicate { get; set; }
+
+    /// <summary>
     /// Optional outer time budget (milliseconds) for the entire resilience
     /// pipeline — retries, breaker state changes, and per-attempt timeout
     /// combined. When set, requests that exceed this budget are cancelled even

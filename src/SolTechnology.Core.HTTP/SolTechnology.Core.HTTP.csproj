@@ -42,6 +42,7 @@
 	-->
 	<ItemGroup>
 		<FrameworkReference Include="Microsoft.AspNetCore.App" />
+		<ProjectReference Include="..\SolTechnology.Core\SolTechnology.Core.csproj" />
 		<ProjectReference Include="..\SolTechnology.Core.Logging\SolTechnology.Core.Logging.csproj" />
 	</ItemGroup>
 

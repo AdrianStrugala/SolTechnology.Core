@@ -115,8 +115,27 @@ Content-Type: application/problem+json
   "type":          "https://tools.ietf.org/html/rfc9110#section-15.5.5",
   "title":         "Trip 42 not found.",
   "status":        404,
-  "correlationId": "4bf92f3577b34da6a3ce929d0e0e4736"
+  "correlationId": "4bf92f3577b34da6a3ce929d0e0e4736",
+  "recoverable":   false
 }
+```
+
+#### `extensions.recoverable` — retry-ability hint
+
+Every `ProblemDetails` response carries `extensions.recoverable` (boolean, **always present** —
+absence is never ambiguous). It tells the client whether the failure is worth retrying:
+
+| Source | `recoverable` value |
+|---|---|
+| `Result.Fail(error)` | `error.Recoverable` — set by the application layer (`Error.Recoverable` init property). |
+| Mapped exception → 4xx | `false` — deterministic client/business rejection; retry will produce the same result. |
+| Mapped exception → 5xx | `true` — transient server fault; worth retrying. |
+| `ValidationException` → 400 | `false` — the input is structurally wrong. |
+
+Use `Recoverable = true` on your `Error` when the failure is transient and retryable:
+
+```csharp
+return Result<Trip>.Fail(new Error { Message = "Upstream timeout.", Recoverable = true });
 ```
 
 | `Error` subtype | HTTP | Body |
@@ -308,3 +327,144 @@ var fixture = new APIFixture<Program>(configuration, services =>
 
 Replace or decorate any of the above; `TryAdd*` registrations mean your custom registration
 wins.
+
+---
+
+### Security headers
+
+`UseSecurityHeaders()` stamps a strict baseline of security headers on **every** response — including
+error responses produced by the ProblemDetails pipeline. It is a pipeline (`Use…`) concern the host
+opts into; it is NOT wired into `AddApiCore` automatically.
+
+```csharp
+app.UseSecurityHeaders();
+```
+
+| Header | Default value | Purpose |
+|---|---|---|
+| `Content-Security-Policy` | `default-src 'none'; frame-ancestors 'none'` | No script/style/img loading; no iframe embedding. Strictest possible for a JSON API. |
+| `X-Content-Type-Options` | `nosniff` | Prevent MIME-type sniffing. |
+| `Referrer-Policy` | `no-referrer` | Never leak the request URL as a `Referer` header. |
+
+Pre-existing headers set by an upstream middleware are **never overwritten** (`TryAdd` semantics).
+
+#### Relaxing for Swagger / Redoc
+
+Swagger UI and Redoc need inline scripts/styles. By default, paths prefixed with `/swagger` or
+`/docs` receive a relaxed CSP (`default-src 'self'; script-src 'self' 'unsafe-inline'; …`). The
+strict policy remains on all other paths.
+
+```csharp
+app.UseSecurityHeaders(o =>
+{
+    // Add a custom docs path
+    o.RelaxedPathPrefixes.Add("/my-docs");
+
+    // Or override the referrer policy
+    o.ReferrerPolicy = "strict-origin-when-cross-origin";
+});
+```
+
+| Option | Type | Default |
+|---|---|---|
+| `ContentSecurityPolicy` | `string` | `default-src 'none'; frame-ancestors 'none'` |
+| `RelaxedContentSecurityPolicy` | `string` | `default-src 'self'; script-src 'self' 'unsafe-inline'; …` |
+| `RelaxedPathPrefixes` | `List<string>` | `["/swagger", "/docs"]` |
+| `ContentTypeOptions` | `string` | `nosniff` |
+| `ReferrerPolicy` | `string` | `no-referrer` |
+
+---
+
+### Health endpoint
+
+`MapCoreHealthChecks(path)` maps an ASP.NET health endpoint that renders the registered checks as
+JSON via `HealthReportJsonFormatter`. Health checks live **next to the module they probe** — there
+is no foundation package. Compose with the framework `AddHealthChecks()` and chain the per-module
+checks, then map the endpoint:
+
+```csharp
+builder.Services.AddHealthChecks()
+    .AddSqlHealthCheck()            // Core.SQL
+    .AddRedisHealthCheck()          // Core.Cache
+    .AddServiceBusHealthCheck()     // Core.MessageBus
+    .AddUpstreamHttpHealthCheck<MyReport>("payments", "https://payments/health"); // Core.HTTP
+
+app.MapCoreHealthChecks("/health");
+```
+
+Status codes follow the framework default: **200** for `Healthy`/`Degraded`, **503** for
+`Unhealthy`. The JSON body:
+
+```json
+{
+  "status": "Healthy",
+  "totalDuration": "00:00:00.0123456",
+  "entries": {
+    "sql":   { "status": "Healthy", "description": "SQL reachable", "duration": "00:00:00.0050000" },
+    "redis": { "status": "Healthy", "duration": "00:00:00.0010000" }
+  }
+}
+```
+
+`HealthReportJsonFormatter.Format(report)` is a **pure** `HealthReport` → JSON formatter (no
+`HttpContext`), so it is independently testable and reusable; `MapCoreHealthChecks` is the thin
+ASP.NET adapter. This is the only ASP.NET-coupled piece of the health-check feature — the per-module
+checks reference the framework-agnostic `Microsoft.Extensions.Diagnostics.HealthChecks` directly.
+
+---
+
+### Recipe: Per-principal rate limiting
+
+> **This is a recipe, not shipped code.** Copy into your host — no `Core.Api` change needed.
+
+Uses the built-in `Microsoft.AspNetCore.RateLimiting` middleware with a per-principal (tenant)
+partition, falling back to IP for unauthenticated requests. The `429` response is shaped as
+`ProblemDetails` so it matches the rest of the API's error contract (including `recoverable: true`
+— the client can retry after the window):
+
+```csharp
+builder.Services.AddRateLimiter(options =>
+{
+    options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+
+    options.AddPolicy("per-principal", context =>
+    {
+        var principalId = context.User?.FindFirst("sub")?.Value
+                       ?? context.Connection.RemoteIpAddress?.ToString()
+                       ?? "anonymous";
+
+        return RateLimitPartition.GetFixedWindowLimiter(principalId, _ => new FixedWindowRateLimiterOptions
+        {
+            PermitLimit = 100,
+            Window = TimeSpan.FromMinutes(1),
+            QueueLimit = 0
+        });
+    });
+
+    // Shape the 429 as ProblemDetails with recoverable=true
+    options.OnRejected = async (ctx, ct) =>
+    {
+        ctx.HttpContext.Response.ContentType = "application/problem+json";
+        var problem = new
+        {
+            type = "https://tools.ietf.org/html/rfc6585#section-4",
+            title = "Too Many Requests",
+            status = 429,
+            detail = "Rate limit exceeded. Retry after the window resets.",
+            recoverable = true
+        };
+        await ctx.HttpContext.Response.WriteAsJsonAsync(problem, ct);
+    };
+});
+
+// In the pipeline (after UseRouting, before MapControllers):
+app.UseRateLimiter();
+```
+
+Apply to specific endpoints or controllers:
+```csharp
+[EnableRateLimiting("per-principal")]
+public class PaymentsController : ControllerBase { }
+```
+
+

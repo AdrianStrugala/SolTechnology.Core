@@ -18,6 +18,7 @@ Decisions that shape SolTechnology.Core. One ADR = one decision. Filenames follo
 | 009 | [Persistent events and recurring jobs via `SolTechnology.Core.Hangfire`](009-hangfire-persistent-events-and-jobs.md) | 2026-06-09 | Accepted | ✅ Done |
 | 010 | [Production hardening of SolTechnology.Core libraries](010-production-pattern-adoption-programme.md) | 2026-06-12 | Accepted | 🔍 Implementing — see [summary](010-production-pattern-adoption-programme/summary.md) |
 | 011 | [Extract SQLite Story persistence into the DreamTravel sample](011-story-sqlite-extraction.md) | 2026-06-22 | Accepted | ✅ Done |
+| 012 | [Production pattern adoption — wave 2](012-production-pattern-adoption-wave-2.md) | 2026-06-24 | Accepted | ✅ Done — see [Implementation summary](012-production-pattern-adoption-wave-2.md#implementation-summary) |
 
 Status values: `Proposed` / `Accepted` / `Superseded` / `Rejected`.
 Implementation values: `N/A` / `⬜ To-do` / `🔍 Implementing` / `✅ Done`.
@@ -37,6 +38,10 @@ Authoritative source: [ADR-006](006-implementation-plan-workflow.md). Summary mi
     done/         ← completed steps
   ```
 - **Step files**: `NN-step-title.md` (numeric, kebab-case, no dates).
+- **Premortem is the gate — numbered `00`.** Every plan's premortem step is `00-run-premortem.md`,
+  authored last but **executed first**. Because step numbers encode execution order, the
+  "lowest `⬜ to-do` first" rule runs it before step `01`. No implementation step ships until `00`
+  returns *Go* / *Go with mitigations* ([ADR-006 §5](006-implementation-plan-workflow.md)).
 - **`summary.md`** is the row-by-row tracker. Status column uses `⬜ to-do` / `🔍 reviewed` /
   `✅ done`. Link in each row points to the step's current location.
 - **ADRs without multi-step work have no sibling folder.**
@@ -59,8 +64,11 @@ For agents picking up work:
 1. Open this index. Find an ADR with `🔍 Implementing` status. ADRs marked `✅ Done` have no
    working folder — their `## Implementation summary` section in the ADR file is the record.
 2. Open its `summary.md`. Find the next `⬜ to-do` step.
-3. Open the step file in `to-do/` (or `reviewed/`).
-4. Invoke the [`implement-plan`](../../.github/skills/implement-plan/SKILL.md) skill.
+3. **If that step is `00` (premortem gate), run it first** — invoke the
+   [`premortem`](../../.github/skills/premortem/SKILL.md) skill, record the verdict, and only
+   proceed when it returns *Go* / *Go with mitigations*. No `01..NN` step starts until `00` is done.
+4. Open the step file in `to-do/` (or `reviewed/`).
+5. Invoke the [`implement-plan`](../../.github/skills/implement-plan/SKILL.md) skill.
 
 ## Creating a new ADR
 

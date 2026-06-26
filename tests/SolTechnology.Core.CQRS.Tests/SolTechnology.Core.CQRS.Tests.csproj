@@ -2,6 +2,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\SolTechnology.Core.CQRS\SolTechnology.Core.CQRS.csproj" />
+    <ProjectReference Include="..\..\src\SolTechnology.Core.Testing\SolTechnology.Core.Testing.csproj" />
   </ItemGroup>
 
 </Project>

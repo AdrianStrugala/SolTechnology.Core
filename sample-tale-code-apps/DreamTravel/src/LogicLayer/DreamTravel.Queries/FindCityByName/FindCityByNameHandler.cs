@@ -1,35 +1,36 @@
-﻿﻿﻿using System.Diagnostics;
-using DreamTravel.DomainServices.CityDomain;
+﻿using DreamTravel.DomainServices.CityDomain;
 using DreamTravel.Domain.Cities;
 using DreamTravel.Domain.Events;
 using DreamTravel.GeolocationDataClients.GoogleApi;
 using Microsoft.Extensions.Logging;
 using SolTechnology.Core.CQRS;
+using SolTechnology.Core.Logging;
 
 namespace DreamTravel.Queries.FindCityByName
 {
     public class FindCityByNameHandler(
         ICityDomainService cityDomainService,
         IMediator mediator,
+        ITimingService timingService,
         ILogger<FindCityByNameHandler> logger)
         : IQueryHandler<FindCityByNameQuery, City>
     {
         public async Task<Result<City>> Handle(FindCityByNameQuery query, CancellationToken cancellationToken)
         {
-            var stopwatch = new Stopwatch();
-            stopwatch.Start();
+            City result;
 
-            var result = await cityDomainService.Get(query.Name);
-            logger.LogInformation($"FindCityByName. Http request took: [{stopwatch.ElapsedMilliseconds}]ms");
-            stopwatch.Restart();
+            using (timingService.StartContext("http"))
+            {
+                result = await cityDomainService.Get(query.Name);
+            }
 
-            //to test cache
-            result = await cityDomainService.Get(query.Name);
-            logger.LogInformation($"FindCityByName. Cache hit took: [{stopwatch.ElapsedMilliseconds}]ms");
+            using (timingService.StartContext("cache"))
+            {
+                //to test cache
+                result = await cityDomainService.Get(query.Name);
+            }
 
             mediator.Publish(new CitySearched { City = result });
-
-            stopwatch.Stop();
 
             return result;
         }

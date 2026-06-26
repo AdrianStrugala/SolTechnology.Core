@@ -34,7 +34,8 @@ public sealed class LoggingMiddleware
         HttpContext context,
         ILogger<LoggingMiddleware> logger,
         ICorrelationIdService correlationIdService,
-        IEnumerable<ILogScopeEnricher> enrichers)
+        IEnumerable<ILogScopeEnricher> enrichers,
+        ITimingService timingService)
     {
         ArgumentNullException.ThrowIfNull(context);
         var correlation = CorrelationId.FromRequest(context.Request, out var headerError);
@@ -54,6 +55,7 @@ public sealed class LoggingMiddleware
         }
 
         var stopwatch = ValueStopwatch.StartNew();
+        timingService.Reset();
         var scopeDictionary = correlation.GetScope();
 
         // Snapshot: the enricher sequence is iterated twice (body-prepare + Enrich).
@@ -122,13 +124,29 @@ public sealed class LoggingMiddleware
             var level = statusCode >= 500 ? LogLevel.Error
                       : statusCode >= 400 ? LogLevel.Warning
                                           : LogLevel.Information;
-            logger.Log(
-                level,
-                "Finished request [{RequestMethod}] [{RequestPath}] -> [{StatusCode}] in [{ElapsedMs} ms]",
-                context.Request.Method,
-                context.Request.Path,
-                statusCode,
-                stopwatch.ElapsedMilliseconds);
+
+            var timings = timingService.GetTimings();
+            if (timings.Count > 0)
+            {
+                logger.Log(
+                    level,
+                    "Finished request [{RequestMethod}] [{RequestPath}] -> [{StatusCode}] in [{ElapsedMs} ms] — timings: [{@Timings}]",
+                    context.Request.Method,
+                    context.Request.Path,
+                    statusCode,
+                    stopwatch.ElapsedMilliseconds,
+                    timings);
+            }
+            else
+            {
+                logger.Log(
+                    level,
+                    "Finished request [{RequestMethod}] [{RequestPath}] -> [{StatusCode}] in [{ElapsedMs} ms]",
+                    context.Request.Method,
+                    context.Request.Path,
+                    statusCode,
+                    stopwatch.ElapsedMilliseconds);
+            }
         }
     }
     private async Task PrepareJsonBodyIfRequestedAsync(

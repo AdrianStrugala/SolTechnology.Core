@@ -21,6 +21,9 @@ before pointing this at production traffic, walk through the
   `OverallRequestBudget` caps the total wall-clock per call.
 - **Idempotent-only retry by default** — `POST` / `PATCH` are NOT retried
   unless you opt in with `RetryOnUnsafeVerbs`. No silent double-charges.
+- **Recoverable-aware retry** — opt-in `RetryPredicate` inspects the response body
+  and refuses retries when the upstream signals a non-recoverable business error
+  (`"recoverable": false` in ProblemDetails). Built-in helper: `RetryPredicates.RecoverableOnly`.
 - **`Retry-After` honoured** — 429 and 5xx with a `Retry-After` header back off
   exactly as the server asks, capped at `RetryTimeout`.
 - **Correlation propagation** — `X-Correlation-Id` + W3C `traceparent` on every
@@ -309,6 +312,80 @@ stub — bypass the resilience pipeline entirely and assert the request shape yo
   startup; if you tune them, keep the gap large enough for at least one
   complete attempt.
 
+### Recoverable-aware retry predicate
+
+By default, the pipeline retries on transient status codes (408/429/5xx) regardless of the response
+body. When the upstream uses `Core.Api`'s `ProblemDetails` with `"recoverable": true/false`, you can
+opt in to body-aware retry — stop wasting retries on deterministic business rejections:
+
+```csharp
+services.AddHTTPClient<IPaymentsClient, PaymentsClient>(
+    "Payments",
+    new HTTPClientConfiguration { BaseAddress = "https://payments/" },
+    new HttpPolicyConfiguration
+    {
+        RetryPredicate = RetryPredicates.RecoverableOnly
+    });
+```
+
+**Semantics (restrict-only):**
+- Predicate is called **only** when the standard checks (transient status + safe verb) already passed.
+- `true` → allow the retry (body says recoverable, or unparseable — benefit of the doubt).
+- `false` → **stop retrying** (body says non-recoverable — will never succeed on retry).
+- A non-retryable status (400, 401, 403, 404) is **never** retried regardless of body content.
+  The predicate cannot expand retries, only restrict them.
+
+**Custom predicate** — use any logic:
+
+```csharp
+RetryPredicate = async response =>
+{
+    var body = await response.Content.ReadAsStringAsync();
+    return !body.Contains("DUPLICATE_DETECTED");
+}
+```
+
+### Typed service-call error taxonomy (`TryXxxAsync<T>`)
+
+The existing `GetAsync<T>()` / `PostAsync<T>()` methods **throw** on failure. When you prefer
+railway-style error handling (`Result<T>`), use the `Try` variants:
+
+```csharp
+var result = await httpClient.CreateRequest("/api/payments")
+    .WithBody(payment)
+    .TryPostAsync<PaymentResponse>();
+
+if (result.IsFailure)
+{
+    // result.Error is a typed Core Error: NotFoundError, ValidationError, TimeoutError, etc.
+    logger.LogWarning("Payment call failed: {Error}", result.Error.Message);
+    return Result<PaymentResponse>.Fail(result.Error);
+}
+
+return Result<PaymentResponse>.Success(result.Data);
+```
+
+**Error mapping taxonomy (`ServiceCallErrorMapper`):**
+
+| Failure | Mapped to | Recoverable? |
+|---|---|---|
+| Socket-level (DNS, connection refused) | `TimeoutError` | ✅ yes |
+| Timeout (per-attempt or outer budget) | `TimeoutError` | ✅ yes |
+| 404 | `NotFoundError` | ❌ no (heuristic) |
+| 401 | `UnauthorizedError` | ❌ no |
+| 403 | `ForbiddenError` | ❌ no |
+| 400 / 422 | `ValidationError` | ❌ no |
+| 409 | `ConflictError` | ❌ no |
+| 408 / 504 | `TimeoutError` | ✅ yes |
+| 5xx | `Error` | ✅ yes (heuristic) |
+| Deserialization failure (bad JSON) | `Error` | ❌ no |
+
+**ProblemDetails override:** if the response body contains `"recoverable": true/false`, it
+**overrides** the status-code heuristic. The `title` field is extracted as the error `Message`.
+
+**Additive:** the existing exception-throwing path (`GetAsync<T>()` → `HttpRequestFailedException`)
+stays unchanged. `TryXxxAsync<T>` is an opt-in alternative — choose per call site.
+
 ### What ships in DI
 
 `AddHTTPClient` (and the three-parameter overload) registers, per client name:
@@ -328,3 +405,44 @@ stub — bypass the resilience pipeline entirely and assert the request shape yo
 
 `TOptions` (when supplied) is bound from `HTTPClients:{name}:Options` and
 available via `IOptions<TOptions>` / `IOptionsMonitor<TOptions>`.
+
+### Upstream service health check
+
+Probe a downstream service's `/health` endpoint as part of your own health report. Subclass
+`BaseUpstreamServiceHealthCheck<TReport>` with your downstream's report shape and map it to a
+`HealthCheckResult`:
+
+```csharp
+public sealed record PartnerHealth(string Status);
+
+public sealed class PartnerHealthCheck(HttpClient client)
+    : BaseUpstreamServiceHealthCheck<PartnerHealth>(
+        client, "/health", new UpstreamHealthCheckOptions(), logger)
+{
+    protected override HealthCheckResult EvaluateReport(PartnerHealth report) =>
+        report.Status == "ok"
+            ? HealthCheckResult.Healthy()
+            : HealthCheckResult.Degraded($"partner status: {report.Status}");
+}
+
+// Registration — resolves the named HttpClient and registers the check as a singleton:
+builder.Services.AddHealthChecks()
+    .AddUpstreamHttpHealthCheck<PartnerHealthCheck>("partner");
+```
+
+**Taxonomy:**
+
+| Outcome | Status |
+|---|---|
+| 2xx + valid report | mapped via your `EvaluateReport` |
+| 2xx + `null` / bad JSON body | `Degraded` (upstream reachable, payload broken) |
+| Connection failure | `Unhealthy` (configurable) |
+| Per-call timeout | `Unhealthy` |
+| Caller-cancellation | Rethrows (not `Unhealthy`) |
+
+**Caching:** a successful (or failed) probe result is cached per upstream for
+`UpstreamHealthCheckOptions.CacheDuration` (default 30 s) so a flurry of `/healthz` hits doesn't
+hammer the downstream. The check is registered as a **singleton** so the cache survives across
+probes; timing is driven by `TimeProvider` (injectable for tests). Per-call `Timeout` (default 10 s)
+is independent of the cache window.
+

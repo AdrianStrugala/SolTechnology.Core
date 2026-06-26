@@ -1,5 +1,6 @@
-﻿﻿﻿using Microsoft.Extensions.Caching.Memory;
+﻿﻿﻿﻿﻿﻿using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.DependencyInjection;
+using StackExchange.Redis;
 
 namespace SolTechnology.Core.Cache;
 
@@ -49,8 +50,68 @@ public static class ModuleInstaller
                 options.InstanceName = configuration.InstanceName;
             });
 
+            services.AddSingleton<IConnectionMultiplexer>(_ =>
+                ConnectionMultiplexer.Connect(configuration.ConnectionString));
+
             services.AddSingleton<IRedisCache, RedisCache>();
 
+            return services;
+        }
+
+        /// <summary>
+        /// Registers an in-process <see cref="IDistributedLockService"/> backed by
+        /// <see cref="SemaphoreSlim"/>. No Redis required — suitable for local dev and
+        /// single-instance deployments.
+        /// </summary>
+        public IServiceCollection AddLocalLock()
+        {
+            services.AddSingleton<IDistributedLockService, LocalDistributedLockService>();
+            return services;
+        }
+
+        /// <summary>
+        /// Registers a Redis-backed <see cref="IDistributedLockService"/> using <c>SET NX EX</c>.
+        /// Requires <see cref="AddDistributedCache"/> to have been called first (reuses the same
+        /// <see cref="IConnectionMultiplexer"/>).
+        /// </summary>
+        public IServiceCollection AddDistributedLock()
+        {
+            services.AddSingleton<IDistributedLockService, RedisDistributedLockService>();
+
+            return services;
+        }
+
+        /// <summary>
+        /// Registers an in-process <see cref="IIdempotencyStore"/> backed by
+        /// <see cref="System.Collections.Concurrent.ConcurrentDictionary{TKey,TValue}"/> with TTL.
+        /// No Redis required — suitable for local dev and single-instance deployments.
+        /// </summary>
+        /// <param name="ttl">How long a stored response is kept before eviction (default 24 h).</param>
+        public IServiceCollection AddLocalIdempotency(TimeSpan? ttl = null)
+        {
+            var expiry = ttl ?? TimeSpan.FromHours(24);
+            services.AddSingleton<IIdempotencyStore>(sp =>
+                new LocalIdempotencyStore(
+                    expiry,
+                    sp.GetService<TimeProvider>() ?? TimeProvider.System));
+            return services;
+        }
+
+        /// <summary>
+        /// Registers a Redis-backed <see cref="IIdempotencyStore"/> using <c>SET NX EX</c> for
+        /// atomic key reservation. Multi-instance safe. Requires <see cref="AddDistributedCache"/>
+        /// to have been called first (reuses the same <see cref="IConnectionMultiplexer"/>).
+        /// </summary>
+        /// <param name="ttl">How long a stored response is kept in Redis (default 24 h).</param>
+        public IServiceCollection AddDistributedIdempotency(TimeSpan? ttl = null)
+        {
+            var expiry = ttl ?? TimeSpan.FromHours(24);
+            services.AddSingleton<IIdempotencyStore>(sp =>
+                new RedisIdempotencyStore(
+                    sp.GetRequiredService<IConnectionMultiplexer>(),
+                    sp.GetRequiredService<Microsoft.Extensions.Options.IOptions<DistributedCacheConfiguration>>(),
+                    sp.GetRequiredService<Microsoft.Extensions.Logging.ILogger<RedisIdempotencyStore>>(),
+                    expiry));
             return services;
         }
     }

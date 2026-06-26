@@ -26,6 +26,10 @@ or Application Insights dependency required.
 - **Operation lifecycle events** — `OperationStarted` / `OperationSucceeded` /
   `OperationFailed` with stable `EventId`s (2137–2140) and `[LoggerMessage]`
   source generators (allocation-free, short-circuits when disabled).
+- **Per-request timing diagnostics** — `ITimingService.StartContext("name")`
+  records named sub-context durations; the aggregated map is emitted in the
+  "Finished request" log automatically. Lightweight "where did the time go?"
+  without a full APM.
 - **OpenTelemetry tracing** — `CoreLoggingActivitySources.OperationsName` ready
   to plug into `WithTracing(...).AddSource(...)`. Zero cost when no listener
   attaches.
@@ -286,6 +290,10 @@ public string Email { get; set; } = null!;
 
 - `ICorrelationIdService` — ambient correlation accessor (singleton, no
   `AsyncLocal` traps).
+- `ITimingService` — per-request timing diagnostics (scoped). Handlers wrap
+  sub-operations in `StartContext("name")` and the map is emitted on finish.
+- `TimeProvider` — `TimeProvider.System` (singleton, TryAdd — your custom
+  registration wins for testing).
 - `LoggingOptions` — bound and validated on application start.
 - `LoggingMiddleware` — request envelope + scope composition, activated by
   `UseCoreLogging`.
@@ -295,3 +303,111 @@ public string Email { get; set; } = null!;
   OpenTelemetry plumbing.
 
 All registrations are `TryAdd*` so a consumer's custom registration always wins.
+
+---
+
+### Per-request timing diagnostics (`ITimingService`)
+
+A lightweight "where did the time go in this request?" breakdown — without a full APM. Handlers
+wrap sub-operations in `using (timingService.StartContext("name"))` and the aggregated
+`{ name → elapsed ms }` map is emitted automatically in the "Finished request" log:
+
+```
+Finished request [GET] [/api/v2/cities/find] -> [200] in [156 ms] — timings: [{"http": 120, "cache": 2}]
+```
+
+#### Registration
+
+Registered automatically by `AddCoreLogging()` — no extra call needed.
+
+#### Usage (in a handler or service)
+
+```csharp
+public class FindCityByNameHandler(
+    ICityDomainService cityDomainService,
+    ITimingService timingService) : IQueryHandler<FindCityByNameQuery, City>
+{
+    public async Task<Result<City>> Handle(FindCityByNameQuery query, CancellationToken ct)
+    {
+        City result;
+
+        using (timingService.StartContext("http"))
+        {
+            result = await cityDomainService.Get(query.Name);
+        }
+
+        using (timingService.StartContext("cache"))
+        {
+            result = await cityDomainService.Get(query.Name);
+        }
+
+        return result;
+    }
+}
+```
+
+#### API
+
+| Method | Behaviour |
+|---|---|
+| `StartContext(name)` | Starts a named timer. Returns `IDisposable` — disposing stops and accumulates. Multiple calls with the same name **sum** (e.g. two DB calls both named `"db"` aggregate into one total). |
+| `GetTimings()` | Returns `IDictionary<string, long>` — name → total elapsed ms. Called by the middleware on request finish. |
+| `Reset()` | Clears all accumulated timings. Called by the middleware at request start. |
+
+#### Design notes
+
+- **Scoped** — each HTTP request gets its own `TimingService` instance (no cross-request leakage).
+- **`TimeProvider`-sourced** — all timing reads go through `TimeProvider` (testable with `FakeTimeProvider`).
+- **Idempotent dispose** — double-disposing a handle is safe (second dispose is a no-op).
+- **Zero cost when unused** — if no handler calls `StartContext`, the "Finished request" log omits
+  the `timings` field entirely (no empty `{}` noise).
+- **Aggregates, not traces** — this is a request-level summary, not a span tree. For full
+  distributed tracing, wire `CoreLoggingActivitySources` into OpenTelemetry.
+
+---
+
+### Recipe: Singleton→scoped correlation bridge (background workers)
+
+> **This is a pattern, not shipped code.** The shape is too tenant-model-coupled to generalise
+> into a library primitive. Copy and adapt.
+
+A singleton background worker (Hangfire job, `BackgroundService`) has no HTTP request scope — so
+`ICorrelationIdService` is empty and DI scoped services aren't available. The recipe spins a DI
+scope manually and attaches correlation + principal context:
+
+```csharp
+public class SettlementPollerJob(IServiceScopeFactory scopeFactory, ICorrelationIdService correlation)
+{
+    public async Task ExecuteAsync(CancellationToken ct)
+    {
+        // 1. Generate a correlation for this background unit-of-work
+        var correlationId = CorrelationId.Generate();
+        correlation.Set(correlationId);
+
+        // 2. Spin a DI scope (so scoped services like DbContext are fresh)
+        await using var scope = scopeFactory.CreateAsyncScope();
+        var handler = scope.ServiceProvider.GetRequiredService<ISettlementHandler>();
+
+        // 3. Push a log scope so every log in this UoW carries the correlation
+        using var logScope = scope.ServiceProvider
+            .GetRequiredService<ILogger<SettlementPollerJob>>()
+            .BeginScope(new Dictionary<string, object?>
+            {
+                ["CorrelationId"] = correlationId.Value,
+                ["JobName"] = "SettlementPoller"
+            });
+
+        // 4. Do the work
+        await handler.ProcessAsync(ct);
+    }
+}
+```
+
+**Key points:**
+- `ICorrelationIdService` is singleton — set it before starting work so downstream HTTP calls
+  (`CorrelationPropagatingHandler`) pick it up.
+- Dispose the scope when done — `DbContext`, `IIdempotencyStore`, etc. are released.
+- For Hangfire jobs: `Core.Hangfire`'s `CorrelationIdJobFilter` does steps 1+3 automatically.
+  Use this pattern only for raw `BackgroundService` or custom polling loops.
+
+

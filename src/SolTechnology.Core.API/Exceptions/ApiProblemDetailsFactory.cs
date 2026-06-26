@@ -28,6 +28,7 @@ namespace SolTechnology.Core.API.Exceptions;
 internal static class ApiProblemDetailsFactory
 {
     public const string CorrelationIdKey = "correlationId";
+    public const string RecoverableKey = "recoverable";
     public const string ExceptionKey = "exception";
 
     /// <summary>
@@ -53,6 +54,11 @@ internal static class ApiProblemDetailsFactory
             Type = TypeForStatus(statusCode)
         };
         ApplyExtensions(problem, exception, correlationId, options);
+
+        // Conservative default: unmapped 5xx is a transient server fault (worth retrying);
+        // mapped 4xx is a deterministic client/business rejection (retry is pointless).
+        problem.Extensions[RecoverableKey] = statusCode >= StatusCodes.Status500InternalServerError;
+
         return problem;
     }
 
@@ -99,6 +105,10 @@ internal static class ApiProblemDetailsFactory
         {
             problem.Extensions[CorrelationIdKey] = corr;
         }
+
+        // Always emit — absence would be ambiguous for the client.
+        problem.Extensions[RecoverableKey] = error.Recoverable;
+
         return problem;
     }
 
@@ -138,6 +148,7 @@ internal static class ApiProblemDetailsFactory
             Type = TypeForStatus(StatusCodes.Status400BadRequest)
         };
         ApplyExtensions(problem, exception, correlationId, options);
+        problem.Extensions[RecoverableKey] = false;
         return problem;
     }
 
