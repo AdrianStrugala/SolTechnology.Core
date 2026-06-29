@@ -43,7 +43,7 @@ runs after `implement-plan` has started moving files to `done/`.
 
 If the user did not specify:
 
-1. List `docs/adr/*/to-do/*.md` ordered by ADR number, newest first.
+1. List `docs/adr/*/to-do/*.md` and `docs/features/*/to-do/*.md` ordered by number, newest first.
 2. Show the candidates and ask which feature to review.
 
 ### 2. Read everything

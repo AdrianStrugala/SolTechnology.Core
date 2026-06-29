@@ -1,18 +1,19 @@
-# ADR-010: Production hardening of SolTechnology.Core libraries
+# Feature-001: Production hardening of SolTechnology.Core libraries
 
-> **Status:** Accepted
-> **Decision Date:** 2026-06-12
-> **Decision Maker:** Repository maintainers
+> **Status:** ✅ Done
+> **Created:** 2026-06-12
 > **Stakeholders:** Consumers of `SolTechnology.Core.*` (NuGet + DreamTravel)
+> **Note:** Relocated from `docs/adr/010-…` — this is a backlog batch (a feature wave), not a single
+> hard-to-reverse decision. Kept as an example feature plan.
 
 ---
 
-## Context
+## Goal
 
 A catalogue of patterns harvested from a sample production application identified gaps in the
 `SolTechnology.Core.*` libraries. Three proposals (Hangfire filters) already shipped under
-[ADR-009](009-hangfire-persistent-events-and-jobs.md). This ADR addresses the **remaining backlog**
-as a single production-hardening effort.
+[ADR-009](../adr/009-hangfire-persistent-events-and-jobs.md). This feature adopts the **remaining
+backlog** as a single production-hardening effort: one plan, steps grouped by module.
 
 ### Resolved open questions (2026-06-16)
 
@@ -24,10 +25,9 @@ as a single production-hardening effort.
 | Q4 | Single `Result` | Confirmed: `Result`/`Error` canonical in `SolTechnology.Core`; `ResultExtensions` removed (railway moved to Tale DSL) |
 | Q5 | `ValidateOnStart` scope | Every module with `AddOptions<T>` (fail-fast everywhere) |
 
-## Decision
+## Scope
 
-Ship all production-hardening work **under this single ADR** with a direct implementation plan.
-The work is grouped by module but sequenced as steps in one plan.
+Ship all production-hardening work under one feature plan, grouped by module but sequenced as steps.
 
 ### What ships
 
@@ -41,7 +41,7 @@ The work is grouped by module but sequenced as steps in one plan.
 | Testing | T1: `UtcDateTimeSpecimen` · T2: composable `AutoNSubstituteDataAttribute` | Testing | none | MINOR |
 | Hangfire | H4: document retry-backoff defaults + `MigrateHangfire()` pattern | Hangfire (docs) | none | PATCH |
 
-### What does NOT ship
+### Out of scope
 
 - **M1** (broker-agnostic seam) — descoped; MessageBus stays ServiceBus-only.
 - **S3** (EF `EntityBase` package) — deferred; documented as guidance only.
@@ -61,38 +61,25 @@ The work is grouped by module but sequenced as steps in one plan.
 | `Scrutor` | Cache | 5.0.2 in DreamTravel | For `AddCachedDecorator<,>` |
 | `Azure.Identity` | SQL | no | Only if managed-identity provider is configured |
 
-## Alternatives Considered
+## Affected modules
 
-1. **7 separate child ADRs (011–017) each with own plan + premortem** — rejected by maintainer:
-   too much process overhead for the scope of work. The items are related production-hardening
-   concerns, not separate architectural decisions.
-2. **No ADR, just do it** — rejected: the `ValidateOnStart` behaviour change and new dependencies
-   warrant a recorded decision.
+`Logging`, `Cache`, `SQL`, `CQRS`, `MessageBus`, `Testing`, `Hangfire` (docs) + AUID & Story for
+`TimeProvider`. Sample app: DreamTravel.
 
-## Consequences
+## Semver impact
 
-**Positive:** One place to track all production-hardening. Less ADR overhead. Work progresses
-without intermediate planning gates.
-
-**Negative:** Larger blast radius per ADR (multiple modules). Mitigated: steps are independent and
-can be merged separately.
-
-**Semver:** **MINOR** overall (additive APIs + `ValidateOnStart` behaviour fix).
+**MINOR** overall (additive APIs + `ValidateOnStart` behaviour fix).
 
 ## Related
 
-- [ADR-006](006-implementation-plan-workflow.md) — plan-folder layout.
-- [ADR-007](007-cqrs-production-hardening.md) — `Result` + `ResultExtensions`.
-- [ADR-009](009-hangfire-persistent-events-and-jobs.md) — shipped Hangfire filters.
-
-## Implementation plan
-
-Completed — see [Implementation summary](#implementation-summary) above.
+- [ADR-006](../adr/006-implementation-plan-workflow.md) — plan-folder layout.
+- [ADR-007](../adr/007-cqrs-production-hardening.md) — `Result` + `ResultExtensions`.
+- [ADR-009](../adr/009-hangfire-persistent-events-and-jobs.md) — shipped Hangfire filters.
+- [Feature-002](002-production-pattern-adoption-wave-2.md) — wave 2 continues this programme.
 
 ## Implementation summary
 
-Completed 2026-06-19. The per-step working folder
-(`docs/adr/010-production-pattern-adoption-programme/`) was deleted per the ADR-006
+Completed 2026-06-19. The per-step working folder was deleted per the ADR-006
 collapse-on-completion rule.
 
 | # | Step | Shipped |
@@ -109,3 +96,5 @@ collapse-on-completion rule.
 
 - **Step 04** — `MapError` combinator removed from scope; `ResultExtensions` no longer exists after Tale DSL migration.
 - **Step 05** — Pipeline extraction (M4) skipped; `HandleMessageAsync` is under the size budget and extracting 5 middleware files would be over-engineering for zero functional gain.
+
+

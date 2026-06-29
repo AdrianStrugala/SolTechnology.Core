@@ -2,7 +2,7 @@
 
 > **Status:** ⏸️ Parked
 > **Parked date:** 2026-06-25
-> **Source:** [ADR-012 step 05](../adr/012-production-pattern-adoption-wave-2.md#implementation-summary) — superseded by Option B
+> **Source:** [Feature-002 step 05](../features/002-production-pattern-adoption-wave-2.md#implementation-summary) — superseded by Option B
 > **Would-be target:** `SolTechnology.Core.Cache` (or a dedicated package if Redis isn't available)
 > **Semver / Effort:** MINOR · M
 
@@ -18,7 +18,7 @@ Redis is not available but Postgres or SQL Server is:
 - **File-system locks** (`DistributedLock.FileSystem`) — single-box local dev without Redis.
 
 Each backend would honour the same `IDistributedLockService` contract (degrade-to-`null`,
-never-throw, fencing) already shipped in `Core.Cache` (ADR-012 step 04, Option B).
+never-throw, fencing) already shipped in `Core.Cache` (Feature-002 step 04, Option B).
 
 ## Why parked
 

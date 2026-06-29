@@ -2,7 +2,7 @@
 
 > **Status:** ⏸️ Parked
 > **Parked date:** 2026-06-25
-> **Source:** [ADR-012 step 10](../adr/012-production-pattern-adoption-wave-2.md#implementation-summary)
+> **Source:** [Feature-002 step 10](../features/002-production-pattern-adoption-wave-2.md#implementation-summary)
 > **Would-be target:** `SolTechnology.Core.Scheduler`
 > **Semver / Effort:** MINOR · M
 
@@ -11,7 +11,7 @@
 ## Context — what it is
 
 A `LeaderElectedPollerBase<T>` that composes:
-- `IDistributedLockService` (from `Core.Cache`, ADR-012 step 04) — exactly one instance acquires
+- `IDistributedLockService` (from `Core.Cache`, Feature-002 step 04) — exactly one instance acquires
 - `DeploymentSlotGuard` (FI-003) — only the live slot attempts acquisition
 - A configurable poll interval + jitter
 

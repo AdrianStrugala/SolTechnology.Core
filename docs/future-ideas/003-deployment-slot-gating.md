@@ -2,7 +2,7 @@
 
 > **Status:** ⏸️ Parked
 > **Parked date:** 2026-06-25
-> **Source:** [ADR-012 step 09](../adr/012-production-pattern-adoption-wave-2.md#implementation-summary)
+> **Source:** [Feature-002 step 09](../features/002-production-pattern-adoption-wave-2.md#implementation-summary)
 > **Would-be target:** `SolTechnology.Core.Scheduler`
 > **Semver / Effort:** MINOR · S
 
@@ -21,7 +21,7 @@ to the configured "live" slot name. Custom providers can be registered for non-A
 
 - No current production app needs slot-aware background job suppression.
 - Adds DI complexity without an immediate consumer.
-- Hangfire's built-in queue mechanism + the distributed lock from `Core.Cache` (ADR-012 step 04)
+- Hangfire's built-in queue mechanism + the distributed lock from `Core.Cache` (Feature-002 step 04)
   cover the "don't run on multiple instances" need without slot awareness.
 
 ## What would unpark it

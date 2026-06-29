@@ -31,7 +31,8 @@ docs/adr/<NNN>-<feature>/
 
 - If the user named the step, open that file directly.
 - If not, open the ADR index ([`docs/adr/README.md`](../../../docs/adr/README.md)) — find the
-  first ADR with status `🔍 Implementing`.
+  first ADR with status `🔍 Implementing`. Feature plans live under `docs/features/<NNN>-<feature>/`
+  with the identical layout; check [`docs/features/README.md`](../../../docs/features/README.md) too.
 - Open its `summary.md`. Pick the first row with status `⬜ to-do`. If none exists, ask the user
   which ADR to work on.
 - **Premortem gate (`00`).** If that first `⬜ to-do` row is step `00` (`00-run-premortem.md`), it is

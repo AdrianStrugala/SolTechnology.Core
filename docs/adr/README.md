@@ -16,12 +16,14 @@ Decisions that shape SolTechnology.Core. One ADR = one decision. Filenames follo
 | 007 | [CQRS production hardening + in-house mediator](007-cqrs-production-hardening.md) | 2026-05-26 | Accepted | ✅ Done |
 | 008 | [Testing framework `.Testing` companion packages](008-testing-framework-companions.md) | 2026-05-30 | Accepted | 🔍 Implementing — 10/11 shipped; only [publish workflow](008-testing-framework-companions/reviewed/09-publish-workflow.md) left (see [summary](008-testing-framework-companions.md#implementation-summary)) |
 | 009 | [Persistent events and recurring jobs via `SolTechnology.Core.Hangfire`](009-hangfire-persistent-events-and-jobs.md) | 2026-06-09 | Accepted | ✅ Done |
-| 010 | [Production hardening of SolTechnology.Core libraries](010-production-pattern-adoption-programme.md) | 2026-06-12 | Accepted | 🔍 Implementing — see [summary](010-production-pattern-adoption-programme/summary.md) |
 | 011 | [Extract SQLite Story persistence into the DreamTravel sample](011-story-sqlite-extraction.md) | 2026-06-22 | Accepted | ✅ Done |
-| 012 | [Production pattern adoption — wave 2](012-production-pattern-adoption-wave-2.md) | 2026-06-24 | Accepted | ✅ Done — see [Implementation summary](012-production-pattern-adoption-wave-2.md#implementation-summary) |
 
 Status values: `Proposed` / `Accepted` / `Superseded` / `Rejected`.
 Implementation values: `N/A` / `⬜ To-do` / `🔍 Implementing` / `✅ Done`.
+
+> ADR-010 and ADR-012 (production-pattern adoption, waves 1 & 2) were backlog batches, not single
+> decisions — relocated to [`docs/features/`](../features/README.md) as Feature-001 and Feature-002.
+> Numbers 010 and 012 are retired and not reused.
 
 ## Plan workflow (canonical)
 
@@ -72,6 +74,8 @@ For agents picking up work:
 
 ## Creating a new ADR
 
+- **Classify first (ADR-006 §6).** Only a hard-to-reverse choice with real alternatives is an ADR.
+  Plain backlog goes to [`docs/features/`](../features/README.md).
 - Pick the next free `NNN` from the table above.
 - Filename `NNN-kebab-title.md`. Required sections: Status, Context, Decision, Consequences.
 - Recommended sections: Alternatives Considered, Related.

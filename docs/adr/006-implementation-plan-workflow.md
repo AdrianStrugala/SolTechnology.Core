@@ -116,6 +116,10 @@ a human or agent remembering it is special.
    premortem a special non-file row in `summary.md`* — rejected: `implement-plan` operates on step
    files; a bodiless row needs a parallel code path. *Number it `00`* — chosen: the number already
    encodes execution order, so the gate sorts first for free with zero new machinery.
+5. **(Amendment 2026-06-29) File features as ADRs too** — rejected: dilutes "one ADR = one
+   decision" into a roadmap. *Keep features only in chat / a flat doc* — rejected: loses the
+   resume-across-sessions plan mechanism. *Separate tree under `docs/features/`* — chosen: same
+   machinery, honest indexes.
 
 ## Consequences
 

@@ -2,7 +2,7 @@
 
 This file tells you (Claude Code / Copilot / any agent) **how to behave** in this repo.
 Code conventions live in [`docs/ClaudeCodingGuide.md`](docs/ClaudeCodingGuide.md). Module
-docs in [`docs/`](docs/). Architectural decisions in [`docs/adr/`](docs/adr/). One source
+docs in [`docs/`](docs/ClaudeCodingGuide.md). Architectural decisions in [`docs/adr/`](docs/adr/README.md). One source
 of truth per topic — when in doubt, link, don't copy.
 
 ---
@@ -59,8 +59,8 @@ For each of these, surface the intended change and the reasoning, then wait.
 
 ## §3. Agents and Skills
 
-Two libraries of AI tooling live in `.github/`. **Agents** ([`.github/agents/`](.github/agents/))
-own multi-step workflows. **Skills** ([`.github/skills/`](.github/skills/)) are narrow procedures
+Two libraries of AI tooling live in `.github/`. **Agents** ([`.github/agents/`](.github/agents/README.md))
+own multi-step workflows. **Skills** ([`.github/skills/`](.github/skills/README.md)) are narrow procedures
 loaded on demand. Always `read_file` the relevant file before invoking — descriptions in these
 indexes are routing hints, not contracts.
 
@@ -105,7 +105,7 @@ gated by a premortem. Attach the skill's output to the PR. Block on *Go* /
 - **Risk-aware.** Consider the impact on NuGet consumers, not just the local diff.
 - **Systematic.** Follow the skill's documented process; do not improvise the steps.
 - **Factual.** Report what you are changing; let the reader judge correctness.
-- **Doc-first.** Search [`docs/`](docs/) — especially `ClaudeCodingGuide.md`, `adr/`,
+- **Doc-first.** Search [`docs/`](docs/ClaudeCodingGuide.md) — especially `ClaudeCodingGuide.md`, `adr/`,
   `reviews/` — before analysing code.
 
 Markdown / Mermaid hygiene:
@@ -202,6 +202,7 @@ touch `Directory.Build.props`.
 | HTTP production rollout | `docs/HTTP-Production-Checklist.md` + [ADR-005](docs/adr/005-http-production-defaults.md) |
 | AI agents / skills rationale | [ADR-004](docs/adr/004-ai-agents-and-skills.md) |
 | ADR index + status tracker | [`docs/adr/README.md`](docs/adr/README.md) |
+| Feature backlog index (non-decision plans) | [`docs/features/README.md`](docs/features/README.md) |
 | Multi-step implementation plan layout (`to-do/` / `reviewed/` / `done/`) | [ADR-006](docs/adr/006-implementation-plan-workflow.md) |
 
 If a rule appears here **and** in the guide, the guide is authoritative — this file

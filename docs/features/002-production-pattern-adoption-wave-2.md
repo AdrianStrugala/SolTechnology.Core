@@ -1,27 +1,25 @@
-# ADR-012: Production pattern adoption — wave 2
+# Feature-002: Production pattern adoption — wave 2
 
-> **Status:** Accepted — **Implemented** (2026-06-25; see [Implementation summary](#implementation-summary))
-> **Decision Date:** 2026-06-24
-> **Decision Maker:** Repository maintainers
+> **Status:** ✅ Done (2026-06-25; see [Implementation summary](#implementation-summary))
+> **Created:** 2026-06-24
 > **Stakeholders:** Consumers of `SolTechnology.Core.*` (NuGet + `sample-tale-code-apps/DreamTravel`)
+> **Note:** Relocated from `docs/adr/012-…` — a backlog batch (a feature wave), not a single
+> decision. Two genuinely new packages were considered; both were folded into existing modules at
+> implementation time (see sub-sections), so no buried decision needed a separate ADR.
 
 ---
 
-## Context
+## Goal
 
 A second production application — a multi-tenant, multi-region payments / financial-storage
 service built on the same Tale-Code philosophy — was onboarded into the production-pattern
-programme started by [ADR-010](010-production-pattern-adoption-programme.md). The harvest is
+programme started by [Feature-001](001-production-pattern-adoption-programme.md). The harvest is
 recorded in [`docs/production-harvest-second-app.md`](../production-harvest-second-app.md), which
 catalogues each candidate with a verdict, target module, semver and effort, and records the
 decisions taken on 2026-06-24.
 
-This ADR is the **direct continuation** of the ADR-010 programme. It adopts the **accepted** items
-from the wave-2 harvest as a single production-hardening effort, grouped by module and sequenced as
-independent, individually-mergeable steps — exactly the shape ADR-010 used. Two of the accepted
-items are **genuinely new packages** (`SolTechnology.Core.DistributedLock`,
-`SolTechnology.Core.HealthChecks`); because they add new NuGet surface and new third-party
-dependencies, each gets its own decision sub-section below.
+This is the **direct continuation** of the Feature-001 programme: adopt the **accepted** wave-2
+items as one production-hardening effort, grouped by module and sequenced as independent steps.
 
 ### Constraints
 
@@ -30,8 +28,8 @@ dependencies, each gets its own decision sub-section below.
 - **Tale-Code readability first.** New surface follows the module conventions in
   [`docs/ClaudeCodingGuide.md`](../ClaudeCodingGuide.md) (single `ModuleInstaller` entry point,
   options bound + `ValidateOnStart`, `Result`/`Error` at boundaries, `TimeProvider` for time).
-- **Build on ADR-010, don't duplicate it.** Correlation work extends the `ICorrelationIdService`
-  already shipped in ADR-010; timing diagnostics reuse `TimeProvider` (ADR-010 G1); typed HTTP
+- **Build on Feature-001, don't duplicate it.** Correlation work extends the `ICorrelationIdService`
+  already shipped in Feature-001; timing diagnostics reuse `TimeProvider` (G1); typed HTTP
   errors map onto the canonical `Error` subtypes (`src/SolTechnology.Core/Errors/`).
 - **Guard-rails are source-defect rules**, not suggestions — each carries into its step file's
   acceptance criteria and the `00` premortem gate.
@@ -57,12 +55,12 @@ dependencies, each gets its own decision sub-section below.
 - `sample-tale-code-apps/aiia-storage` — `Aiia.Storage.SolutionTests/SolutionTest.cs` is prior art
   for the D3 build-hygiene guard.
 
-## Decision
+## Scope
 
-Ship all accepted wave-2 items **under this single ADR** with one implementation plan, mirroring
-ADR-010. Work is grouped by module and sequenced as independent steps. The two new packages each
-have a dedicated decision sub-section (below). Implementation is gated by the **`00` premortem**
-(authored last, executed first — [ADR-006 §5](006-implementation-plan-workflow.md)).
+Ship all accepted wave-2 items under one feature plan, grouped by module, sequenced as independent
+steps. Two candidates looked like new packages; both were folded into existing modules during
+implementation (sub-sections below). Implementation is gated by the **`00` premortem** (authored
+last, executed first — [ADR-006 §5](../adr/006-implementation-plan-workflow.md)).
 
 ### What ships
 
@@ -80,15 +78,15 @@ have a dedicated decision sub-section (below). Implementation is gated by the **
 | Fitness | D3 build-hygiene + test-host containment guard tests | `Core.Testing` + repo self-tests | none | MINOR (docs+tests) |
 | Recipes | F per-principal rate limiting · singleton→scoped bridge (B6) · delay-queue vs Hangfire (C4) | docs only | none | PATCH (docs) |
 
-### What does NOT ship (explicitly out of scope)
+### Out of scope (explicit)
 
 - **FI-001 outbound webhooks** (was A4) and **FI-002 priority worker pool** (was C3) — parked in
   [`docs/future-ideas/`](../future-ideas/README.md); each wants its own ADR when a consumer exists.
-- **Section E "not porting"** — custom `IDateTimeProvider` (Core uses `TimeProvider`, ADR-010 G1),
-  encryption-at-rest, multi-cloud broker switch (ADR-010 Q3), MACRO_CASE JSON policy, app-specific
+- **Section E "not porting"** — custom `IDateTimeProvider` (Core uses `TimeProvider`, Feature-001 G1),
+  encryption-at-rest, multi-cloud broker switch (Feature-001 Q3), MACRO_CASE JSON policy, app-specific
   domain code.
 - **B5** (`OperationCanceledException` response) — already handled by `Core.Api` cancellation
-  logging; parity only. **D4** (primary-ctor caution) — already a Core rule (ADR-010 G7).
+  logging; parity only. **D4** (primary-ctor caution) — already a Core rule (Feature-001 G7).
 
 ### Decision sub-section — Distributed Lock (A2) — implemented in `Core.Cache` (Option B)
 
@@ -175,16 +173,16 @@ respectively; the health **endpoint** lives in `Core.Api`.
 
 ## Alternatives Considered
 
-1. **One child ADR per item (012–02x), each with its own plan + premortem.** Rejected for the same
-   reason ADR-010 rejected it: process overhead disproportionate to the work. The items are related
-   production-hardening concerns harvested together, not independent architectural decisions. A
-   blue/red review of this (see the `00` premortem gate) favoured the single-ADR shape: one
-   place to track, steps still independently mergeable.
+1. **One child ADR per item, each with its own plan + premortem.** Rejected for the same reason
+   Feature-001 rejected it: process overhead disproportionate to the work. The items are related
+   production-hardening concerns harvested together, not independent decisions. A blue/red review
+   (the `00` premortem gate) favoured the single-plan shape: one place to track, steps still
+   independently mergeable.
 2. **Fold the distributed lock into `Core.Scheduler` and the upstream check into `Core.HTTP`
    instead of new packages.** Rejected: it forces a `DistributedLock.*` dependency on every
    `Core.Scheduler` consumer and a health-check dependency on every `Core.HTTP` consumer, even
    those that want neither. Dedicated opt-in packages keep the dependency graph honest (mirrors
-   ADR-010 Q1/Q2 reasoning on isolating new dependencies).
+   Feature-001 Q1/Q2 reasoning on isolating new dependencies).
 3. **Ship A1 idempotency as a standalone `Core.Idempotency` package.** Rejected: the middleware is
    ASP.NET-Core-coupled and belongs with the other request-pipeline middleware in `Core.Api`; the
    pluggable store keeps the Redis dependency optional without a new package.
@@ -192,50 +190,25 @@ respectively; the health **endpoint** lives in `Core.Api`.
    (health checks) are genuine capability gaps every multi-instance deployment hits; a recipe
    cannot substitute for a tested, shipped primitive.
 
-## Consequences
+## Semver impact
 
-**Positive**
-
-- One tracked place for all wave-2 hardening; steps remain independently mergeable.
-- Two long-standing gaps (distributed coordination, production-safe health checks) close with
-  tested primitives instead of per-app reinvention.
-- Correlation, retry, and error-shape deltas compose with ADR-010's foundation rather than
-  duplicating it.
-- The D3 fitness guards make several existing coding-guide rules self-enforcing.
-
-**Negative**
-
-- Large blast radius per ADR — wave 2 touches ~8 modules and adds 2 packages. Mitigated: steps are
-  independent, additive, and opt-in; nothing changes for consumers who do not call the new APIs.
-- Two new packages add NuGet surface to maintain and version. Mitigated: dependency-light, each
-  with its own decision sub-section and CVE gate.
-- The D3 build-hygiene guard will immediately flag existing `TreatWarningsAsErrors=false` projects
-  (`Core.SQL`, `Core.Scheduler`, `Core.MessageBus`). Mitigated: the guard ships with an explicit,
-  commented allow-list documenting each laggard (or they are fixed in the same step).
-
-**Semver impact:** **MINOR** overall (additive APIs + two new packages; recipes are PATCH/docs).
+**MINOR** overall (additive APIs + two new packages; recipes are PATCH/docs).
 
 ## Related
 
-- [ADR-010](010-production-pattern-adoption-programme.md) — wave-1 programme this continues.
-- [ADR-005](005-http-production-defaults.md) — HTTP resilience that B2/B3 extend.
-- [ADR-006](006-implementation-plan-workflow.md) — plan-folder layout this plan follows.
+- [Feature-001](001-production-pattern-adoption-programme.md) — wave-1 programme this continues.
+- [ADR-005](../adr/005-http-production-defaults.md) — HTTP resilience that B2/B3 extend.
+- [ADR-006](../adr/006-implementation-plan-workflow.md) — plan-folder layout this plan follows.
 - [`docs/production-harvest-second-app.md`](../production-harvest-second-app.md) — authoritative
   harvest + decisions.
 - [`docs/future-ideas/`](../future-ideas/README.md) — parked FI-001 / FI-002 (out of scope).
 
-## Implementation plan
-
-Tracked under the (now-collapsed) per-step working folder; see the Implementation summary below.
-
----
-
 ## Implementation summary
 
-Completed 2026-06-25. The per-step working folder (`docs/adr/012-production-pattern-adoption-wave-2/`)
-was deleted per the [ADR-006](006-implementation-plan-workflow.md) collapse-on-completion rule; this
-section is the surviving record. The `00` premortem gate cleared **Go with mitigations** (M1–M8)
-before any code began.
+Completed 2026-06-25. The per-step working folder was deleted per the
+[ADR-006](../adr/006-implementation-plan-workflow.md) collapse-on-completion rule; this section is
+the surviving record. The `00` premortem gate cleared **Go with mitigations** (M1–M8) before any
+code began.
 
 | # | Step | Shipped |
 |---|---|---|
@@ -253,7 +226,7 @@ before any code began.
 | 11 | A1.1 — Idempotency store | `IIdempotencyStore` / `StoredResponse` (local + Redis) **in `Core.Cache`** — `AddLocalIdempotency()` / `AddDistributedIdempotency()`. |
 | 12 | A1.2 — Idempotency middleware | **Docs recipe** in `Cache.md` (no library middleware — same call as the lock). |
 | 13 | A1.3 — Redis glue package | **Removed** — the Redis store lives in `Core.Cache`. |
-| 14–17 | B1 — Two-level correlation | **Removed** from scope — the single `ICorrelationIdService` (ADR-010) already propagates across HTTP / queue / jobs. |
+| 14–17 | B1 — Two-level correlation | **Removed** from scope — the single `ICorrelationIdService` (Feature-001) already propagates across HTTP / queue / jobs. |
 | 18 | B2 — Recoverable-aware retry | `RetryPredicates.RecoverableOnly` + `HttpPolicyConfiguration.RetryPredicate` (`Core.HTTP`). |
 | 19 | B3 — Typed call-error taxonomy | `ServiceCallErrorMapper` + `RequestBuilder.TryXxxAsync<T>()` → `Result<T>` (`Core.HTTP`). |
 | 20 | A5 — Timing diagnostics | `ITimingService` + emission in `LoggingMiddleware` (`Core.Logging`), `TimeProvider`-sourced. |
@@ -274,9 +247,10 @@ Semver impact **MINOR** as predicted, but with **zero new package IDs**.
   framework-agnostic `Microsoft.Extensions.Diagnostics.HealthChecks`. **Lesson:** prefer extending an
   existing module over minting a package when the infrastructure overlap is high.
 - **Correlation (14–17) removed.** The two-level model added no value without a consumer; the single
-  `ICorrelationIdService` from ADR-010 already covers HTTP / queue / job propagation.
+  `ICorrelationIdService` from Feature-001 already covers HTTP / queue / job propagation.
 - **`Core.Scheduler` deprecated + removed from the solution** rather than extended (steps 09–10
   deferred). The D3 build-hygiene guard then drove `Core.SQL` and `Core.MessageBus` to **remove**
   their `TreatWarningsAsErrors=false` (both compiled clean); only the deprecated `Core.Scheduler`
   remains allow-listed.
+
 

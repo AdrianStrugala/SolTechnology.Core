@@ -101,7 +101,7 @@ public sealed class BuildHygieneGuardTests
     [Test]
     public void No_Data_Messaging_Module_Has_AspNet_FrameworkReference()
     {
-        // Blocker-1 fitness guard (ADR-012): data/messaging modules must NOT carry ASP.NET surface.
+        // Blocker-1 fitness guard (Feature-002): data/messaging modules must NOT carry ASP.NET surface.
         var nonAspNetModules = new[]
         {
             "SolTechnology.Core.SQL",
