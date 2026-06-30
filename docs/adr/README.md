@@ -17,6 +17,7 @@ Decisions that shape SolTechnology.Core. One ADR = one decision. Filenames follo
 | 008 | [Testing framework `.Testing` companion packages](008-testing-framework-companions.md) | 2026-05-30 | Accepted | 🔍 Implementing — 10/11 shipped; only [publish workflow](008-testing-framework-companions/reviewed/09-publish-workflow.md) left (see [summary](008-testing-framework-companions.md#implementation-summary)) |
 | 009 | [Persistent events and recurring jobs via `SolTechnology.Core.Hangfire`](009-hangfire-persistent-events-and-jobs.md) | 2026-06-09 | Accepted | ✅ Done |
 | 011 | [Extract SQLite Story persistence into the DreamTravel sample](011-story-sqlite-extraction.md) | 2026-06-22 | Accepted | ✅ Done |
+| 013 | [Release 1.0 — versioning, hard registration-API rename, Story→Tale rebrand, deprecations, publish hardening](013-release-1.0.md) | 2026-06-29 | Proposed | 🔍 Implementing — see [summary](013-release-1.0/summary.md) |
 
 Status values: `Proposed` / `Accepted` / `Superseded` / `Rejected`.
 Implementation values: `N/A` / `⬜ To-do` / `🔍 Implementing` / `✅ Done`.
