@@ -94,6 +94,21 @@ none of them auto-publish a broken patch. Pure pipeline configuration — its ow
   for the source-bearing libs (`Scheduler`/`Guards`, step 07) — **not** from a nuget.org deprecation
   message. The old `Story`/`ApiClient` ids carry no `[Obsolete]` (no source), so their only nuget.org
   signal is the unlist.
+- **Unlist job operational guards (premortem scenarios 6 / 10 — required mitigations).**
+  - **Misfire containment (the only protection — answer U3: `NUGET_API_KEY` is a full-account key).**
+    Because the key is **not** scoped to the four ghost ids, the gate is the sole safeguard: the job
+    runs only on `workflow_dispatch` + an explicit boolean input (e.g. `unlist_deprecated: true`) —
+    **never** on `push`/tag/`pull_request`, so a routine release publish cannot trigger an unlist; and
+    the four ghost ids are **hardcoded** in the job (not derived from any expandable list), so it can
+    never unlist a supported package even with a full-account key. **No GitHub Environment / required
+    reviewer** (answer U2: declined) — the `workflow_dispatch`+boolean gate + hardcoded ids are the
+    agreed protection.
+  - **Timing (answer U4: unlist at `1.0`).** The unlist job runs as part of the `1.0` release — no
+    grace period; the ghost ids leave nuget.org search immediately. Consumers learn the successor from
+    the migration map shipped with the same release.
+  - **Recovery path is web-UI only.** `dotnet nuget delete` unlists but there is **no** CLI/API to
+    **re-list**; relisting is done through the nuget.org web UI (Manage packages → Listing). The
+    runbook (step 10) records this so an accidental unlist has a documented undo.
 
 ## Acceptance criteria
 - [ ] `publishPackages.yml` packs every `src/` slnx project with `IsPackable != false` via a loop, with
@@ -110,6 +125,8 @@ none of them auto-publish a broken patch. Pure pipeline configuration — its ow
       published version of `ApiClient`, `Story`, `Scheduler`, `Guards` via `dotnet nuget delete`,
       with versions enumerated from the flat-container index (none hardcoded). It never runs on a tag
       or `master` push, and never fires on a normal publish.
+- [ ] The unlist job's four ghost ids are hardcoded (cannot expand to a supported package); the job
+      is gated such that a normal release publish cannot trigger it (premortem scenario 6).
 - [ ] Workflow YAML parses cleanly (valid YAML; `actionlint` clean if it is available in the
       toolchain) and `dotnet build SolTechnology.Core.slnx` is green.
 

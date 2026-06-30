@@ -60,6 +60,11 @@ Docs-only PR; depends on the final rename names (steps 03–06) and versioning (
   (Under **B1** this sub-table shrinks to the base class + package + namespace rows; the gate's `13a`
   verdict decides. `CityDomainService` keeps its name; `Tell()` is the real method — the docs’ old
   `TellStory()` is a drift fixed in step 11.)
+- **Persisted-state migration is out of scope (premortem scenario 7 — answer U1: accepted risk).**
+  The repo is **pre-1.0**, so no persisted `Story` workflow-state compatibility is promised across the
+  rename. The migration guide notes only that `Tale` is a new package id (a `using`/type rename, not a
+  state migration); it carries **no** drain-before-migrate procedure. In-memory-repository consumers
+  (the default) are unaffected.
 - **CHANGELOG** — `## [1.0.0]` with Added / Changed (breaking renames) / Deprecated / Removed; note
   `Logging 1.2.0` and why it differs.
 - **Release runbook** — ordered release steps: tag `v1.0.0` (triggers the gated publish from step 01)
@@ -92,6 +97,8 @@ Docs-only PR; depends on the final rename names (steps 03–06) and versioning (
 - [ ] `docs/MIGRATION-0.x-to-1.0.md` lists every renamed public symbol with old + new name (all four
       health checks and the endpoint/middleware names included) **and** the `Story → Tale` sub-table
       (package + namespace + types).
+- [ ] `docs/release-runbook-1.0.md` records that **re-listing is web-UI only** (no CLI/API) as the
+      undo for an accidental unlist (premortem scenario 6/10).
 - [ ] `CHANGELOG.md` has a `1.0.0` entry that names the Logging `1.2.0` exception and the `Story → Tale`
       package rename.
 - [ ] `docs/release-runbook-1.0.md` enumerates the tag / `workflow_dispatch` trigger + the

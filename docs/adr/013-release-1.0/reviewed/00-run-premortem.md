@@ -237,17 +237,77 @@ verdict) before any step ships.
     nonexistent `dotnet nuget deprecate`. Propagated into steps 01/07/10.
 
 ## Acceptance criteria
-- [ ] `premortem` skill executed; failure modes 1–8 each have a cause + mitigation recorded in this
+- [x] `premortem` skill executed; failure modes 1–8 each have a cause + mitigation recorded in this
       file.
-- [ ] All 13 recorded decisions/answers are reflected into steps `01–11` (incl. new step `05b`);
+- [x] All 13 recorded decisions/answers are reflected into steps `01–11` (incl. new step `05b`);
       sub-questions `13a` (**→ B2**), `13b` (**→ rename skill**), and `13c` (**→ route to `api/tale`,
       breaking accepted, snapshot regenerated**) are answered and propagated (13b→step 11; 13c→step 05b;
       13a→no structural change). Answer `14` (**→ unlist-only, CI-automated; deprecate dropped**) is
       propagated into steps `01/07/10`. The Go/No-Go verdict below is still produced when the gate
       executes.
-- [ ] Verdict recorded: **Go** / **Go with mitigations** / **No-Go**. A *No-Go* names the step that
+- [x] Verdict recorded: **Go** / **Go with mitigations** / **No-Go**. A *No-Go* names the step that
       must absorb the mitigation before the plan proceeds.
-- [ ] This step touches no `src/` code — it produces only this record.
+- [x] This step touches no `src/` code — it produces only this record.
+
+## Verdict — executed 2026-06-30
+
+**GO WITH MITIGATIONS.** No `H`-severity scenario lacks a plausible mitigation; every `H` is covered
+by the plan's sequencing or an existing step. The change ships per-step only once the mitigation each
+step owns is in place.
+
+### Scenarios (worked backward from "1.0 shipped and broke prod")
+
+| # | Scenario | Trigger | Blast | Sev | Lik | Existing control | Mitigation (owning step) |
+|---|---|---|---|---|---|---|---|
+| 1 | Hard rename breaks consumer builds | every `ModuleInstaller.cs`; `DreamTravel.Api/Program.cs` | public + sample | H | H | call sites updated same-PR | migration guide + symbol table ships **with** release (10); each wave build-green (03–06) |
+| 2 | Stale symbol in `throw`/log/XML-doc → runtime test break | `Hangfire/ModuleInstaller.cs:27` ↔ `Hangfire.Tests/ModuleInstallerTests.cs:25` | internal | M | M | string-assert tests | repo-wide symbol-string sweep (03–07) |
+| 3 | CI auto-publishes a broken `0.x` before the gate lands | `publishPackages.yml` push-on-master | public | H | M | none pre-01 | **step 01 merges before 03–06**; `--skip-duplicate` + `if:` guard |
+| 4 | Logging `1.1.1`→`1.0.0` downgrade rejected | shared `1.0.0` in `src/Directory.Build.props` | public | H | M | none | step 08 override `Logging 1.2.0` + pack dry-run |
+| 5 | `BuildServiceProvider` fix regresses auth | `Authentication/ModuleInstaller.cs` (06) | sample + public | M | M | new test host | `Authentication.Tests` wired into `.slnx` (06) + DreamTravel E2E |
+| 6 | Unlist job (answer 14) fires on a normal publish / wrong id | `publishPackages.yml` `unlist-deprecated` | public | H | L | gated `workflow_dispatch`+bool | never on tag/master; 4 hardcoded ghost ids (full-account key, U3); no Environment gate (U2) (01) |
+| 7 | Persisted `Story` state fails to deserialize after `Tale` migration | `Story→Tale` namespace collapse (05b) | public (migrators) | H | L | `StoryJsonOptions`; Tale = new opt-in id | **accepted (U1): pre-1.0, no persisted-state compat promised**; in-memory default unaffected (10) |
+| 8 | Unlist breaks floating-range consumers of `Story`/`ApiClient` | `dotnet nuget delete` per-version (01) | public | M | M | intended | documented in `dontreadme` + migration map (10) — **accepted** |
+| 9 | Pack glob silently drops a packable project missing from `.slnx` | slnx-driven glob (01) | public | M | L | none (relocated) | step 01 slnx-membership fail-fast guard |
+| 10 | `NUGET_API_KEY` missing/mis-scoped → unlist job fails | repo secret | internal | L | M | none | loud job failure; key in release checklist (10) |
+
+### Required mitigations before merge (per owning step)
+
+1. **Sequencing** — step 01 (publish gate) merges **before** steps 03–06. (Scenario 3)
+2. **Logging** — step 08 pins `Logging 1.2.0`; pack dry-run shows `SolTechnology.Core.Logging.1.2.0.nupkg`. (Scenario 4)
+3. **Symbol-string sweep** — steps 03–07 sweep `throw`/log/XML-doc; the `Hangfire:27` ↔ test:25 pair is the load-bearing case. (Scenario 2)
+4. **Auth test host** — `SolTechnology.Core.Authentication.Tests` wired into `.slnx`. (Scenario 5)
+5. **Unlist job** — gated **only** on `workflow_dispatch` + boolean; the 4 ghost ids are hardcoded
+   (full-account key per U3, so the gate + hardcoded ids are the sole containment; no Environment gate
+   per U2). Persisted-state migration is **out of scope (U1, pre-1.0)** — no drain note. (Scenarios 6, 7)
+6. **slnx guard** — step 01 fail-fast when a packable `src/` project is absent from `.slnx`. (Scenario 9)
+
+### Accepted risks
+
+- **Scenario 8** — unlisting breaks floating-range consumers of `Story`/`ApiClient`: intended, documented, successor named.
+- **Scenario 7** — persisted `Story` workflow state not migrated to `Tale` types: **accepted (U1)** — the
+  repo is pre-1.0; no persisted-state compatibility is promised. In-memory-repository consumers (default)
+  are unaffected.
+- The window where `master` carries renamed APIs while nuget.org still serves `0.x`: acceptable (gated publish + `--skip-duplicate`).
+
+The gate is now **executed**. Steps `01–11` (incl. `05b`) may proceed in order, each gated on the
+mitigation it owns above.
+
+### Open questions surfaced by the premortem (need a maintainer call — not resolvable from code)
+
+These do **not** block the *Go with mitigations* verdict (each has a safe default), but they are real
+calls the maintainer should make before the unlist job runs and before `1.0` ships:
+
+- **U1 — Do any external consumers persist workflow state?** Scenario 7's severity (`H`) assumes a
+  durable `IStoryRepository`. We cannot see public consumers. **→ ANSWERED (2026-06-30): ignore — we are
+  pre-1.0.** No persisted-state compatibility is promised; the drain-before-migrate note is **dropped**
+  from step 10 and scenario 7 is an accepted risk. In-memory default is unaffected.
+- **U2 — Should the `unlist-deprecated` job require manual approval?** A mis-fired unlist is silent (no
+  build break) and the only undo is the web UI. **→ ANSWERED (2026-06-30): no.** No GitHub Environment /
+  required reviewer; the `workflow_dispatch`+boolean gate + hardcoded ids are the agreed protection.
+- **U3 — Is `NUGET_API_KEY` scoped?** **→ ANSWERED (2026-06-30): full-account key.** It is **not** scoped
+  to the four ghost ids, so the gate + hardcoded ids are the sole containment (recorded in step 01).
+- **U4 — Unlist timing: at `1.0` or after a grace period?** **→ ANSWERED (2026-06-30): at `1.0`.** The
+  unlist runs as part of the release — no grace window; the migration map ships in the same release.
 
 ## Open questions
 - **13a — ANSWERED → B2** (full `Tale*` rebrand + `…Story.Tale` namespace collapse into root

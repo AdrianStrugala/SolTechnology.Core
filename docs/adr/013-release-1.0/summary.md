@@ -6,7 +6,7 @@ Tracking the implementation steps for the spec [`../013-release-1.0.md`](../013-
 
 | # | Title | File | Status |
 |---|---|---|---|
-| 00 | Run premortem (gate) + resolve open questions | [`reviewed/00-run-premortem.md`](reviewed/00-run-premortem.md) | 🔍 reviewed |
+| 00 | Run premortem (gate) + resolve open questions | [`reviewed/00-run-premortem.md`](reviewed/00-run-premortem.md) | ✅ executed — **Go with mitigations** |
 | 01 | CI: gate publish behind release trigger + pack-by-glob | [`reviewed/01-ci-publish-gate-and-glob-pack.md`](reviewed/01-ci-publish-gate-and-glob-pack.md) | 🔍 reviewed |
 | 02 | Centralise NuGet metadata + SourceLink + per-package READMEs (no version change) | [`reviewed/02-nuget-metadata-and-sourcelink.md`](reviewed/02-nuget-metadata-and-sourcelink.md) | 🔍 reviewed |
 | 03 | Rename wave 1 — Logging surface (+ Api/HTTP callers) | [`reviewed/03-rename-logging-surface.md`](reviewed/03-rename-logging-surface.md) | 🔍 reviewed |
@@ -109,7 +109,27 @@ lives in the doc-level migration map + `[Obsolete]` (Scheduler/Guards). This **c
 plan's reference to a nonexistent `dotnet nuget deprecate`. Folded into the spec (decision 4 + Amendments),
 step `00` (new answer 14), step `01` (the unlist job), step `07` (retirement = CI unlist), and step `10`
 (runbook command fix). No code-step count change — it extends step `01`.
+**Premortem gate EXECUTED 2026-06-30 — verdict: Go with mitigations.** The `premortem` skill was run
+over the full plan (build-and-nuget, di, story checklists + failure modes 1–8 + answer 14). Ten
+scenarios were worked backward; no `H`-severity scenario lacks a mitigation. Required mitigations
+(each owned by a step): step 01 merges before 03–06 (publish gate); Logging `1.2.0` override (08);
+repo-wide symbol-string sweep (03–07); `Authentication.Tests` in `.slnx` (06); unlist job gated on
+`workflow_dispatch`+bool with scoped `NUGET_API_KEY` + a "drain in-flight Tale workflows before
+migrating" note in the migration guide (01/10); slnx-membership guard (01). Accepted: unlisting breaks
+floating-range `Story`/`ApiClient` consumers (intended, documented). Steps `01–11` (incl. `05b`) may
+now proceed in order, each gated on the mitigation it owns. Full verdict + scenario table in
+[`reviewed/00-run-premortem.md`](reviewed/00-run-premortem.md).
 
+**Post-premortem follow-through 2026-06-30.** Two required mitigations the verdict named were **folded
+back into their owning steps** (they had been asserted in the verdict but not yet written into the
+steps): the **drain-before-migrate** warning for persisted workflows → step `10` (scenario 7), and the
+**unlist-job operational guards** (hardcoded ids, misfire containment, web-UI-only relist recovery) →
+step `01` (scenarios 6/10). The premortem also surfaced **four open questions** (`U1`–`U4`) recorded in
+step `00` — **all answered by the maintainer 2026-06-30**: **U1 → ignore (pre-1.0, no persisted-state
+compat)** so the drain note is **dropped** from step 10 and scenario 7 becomes an accepted risk;
+**U2 → no** GitHub Environment / approval gate on the unlist job; **U3 → `NUGET_API_KEY` is full-account**
+(gate + hardcoded ids are the sole containment); **U4 → unlist at `1.0`** (no grace period). None changed
+the *Go with mitigations* verdict; all are propagated into steps `00/01/10`.
 
 
 
