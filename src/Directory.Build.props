@@ -22,9 +22,26 @@
         -->
         <WarningsNotAsErrors>$(WarningsNotAsErrors);NU1900;NU1510</WarningsNotAsErrors>
         <Authors>Adrian Strugala</Authors>
+        <Company>Sol Technology</Company>
         <RepositoryUrl>https://github.com/AdrianStrugala/SolTechnology.Core</RepositoryUrl>
+        <PackageProjectUrl>https://github.com/AdrianStrugala/SolTechnology.Core</PackageProjectUrl>
+        <PackageLicenseExpression>MIT</PackageLicenseExpression>
+        <PackageIcon>docs\mini-logo.png</PackageIcon>
+        <PackageReadmeFile>docs\readme.md</PackageReadmeFile>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+        <IncludeSymbols>true</IncludeSymbols>
+
+        <!-- SourceLink ships in the .NET SDK; no Microsoft.SourceLink.* PackageReference is needed. -->
+        <PublishRepositoryUrl>true</PublishRepositoryUrl>
+        <EmbedUntrackedSources>true</EmbedUntrackedSources>
+        <ContinuousIntegrationBuild Condition="'$(GITHUB_ACTIONS)' == 'true'">true</ContinuousIntegrationBuild>
     </PropertyGroup>
+
+    <!-- Package README + icon, sourced from docs/*.md via a per-project PackageReadmeSource. -->
+    <ItemGroup Condition="'$(PackageReadmeSource)' != ''">
+        <None Include="$(MSBuildThisFileDirectory)..\docs\$(PackageReadmeSource)" Pack="true" Visible="false" PackagePath="docs\readme.md" />
+        <None Include="$(MSBuildThisFileDirectory)..\docs\mini-logo.png" Pack="true" Visible="false" PackagePath="docs\mini-logo.png" />
+    </ItemGroup>
 
 	<ItemGroup>
 		<PackageReference Include="Microsoft.Extensions.Configuration" Version="10.0.9" />

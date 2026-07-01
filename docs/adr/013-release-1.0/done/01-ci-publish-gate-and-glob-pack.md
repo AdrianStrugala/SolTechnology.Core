@@ -1,7 +1,7 @@
 ---
 adr: 013-release-1.0
 step: 01 of 11
-status: reviewed
+status: done
 ---
 
 <!-- Reviewed (2026-06-30): locked the release trigger to tag v1.0.0 AND workflow_dispatch (answer 12);
@@ -132,6 +132,25 @@ none of them auto-publish a broken patch. Pure pipeline configuration — its ow
 
 ## Open questions
 - none — release trigger (both tag + dispatch) and the stop-packing decision are resolved at step 00.
+
+## Retrospective — Implementation Deviations
+- **Guard matches on the `.csproj` file name, not the full path (case-insensitivity fix).** The plan
+  said "assert each `src/**/*.csproj` appears in `dotnet sln … list`". A naïve full-path `grep -F`
+  false-fails on `SolTechnology.Core.Api`: the folder is on disk as `SolTechnology.Core.Api` but the
+  `.slnx` records `src/SolTechnology.Core.API/…` (the same casing mismatch this step sidesteps for
+  pack). The guard therefore matches the trailing `/<name>.csproj` **case-insensitively** — the file
+  name (`SolTechnology.Core.API.csproj`) is identical in both places even when the folder casing
+  differs. Verified locally: guard reports `missing=0`.
+- **`Scheduler` / `Guards` kept in the guard's explicit `excluded` list (interim).** They are still
+  packable-by-default on disk (`<IsPackable>false>` lands in step 07) and absent from `.slnx`, so
+  without the exclusion the guard would fail in the 01→07 window. The list is annotated to be dropped
+  once step 07 sets `<IsPackable>false>` (after which they fall out via the `IsPackable` check anyway).
+- **`actions/checkout@v2` → `@v4`.** The rewritten workflow bumps the EOL checkout action; no
+  behavioural change to the pipeline logic.
+- **Verification.** `dotnet build SolTechnology.Core.slnx` green (0 errors); YAML parses (`jobs:
+  build, unlist-deprecated`; `on: push, pull_request, workflow_dispatch`); pack glob selects the 21
+  `src/` slnx projects (incl. `Hangfire` + all 7 `.Testing`), excludes `Scheduler`/`Guards`.
+
 
 
 

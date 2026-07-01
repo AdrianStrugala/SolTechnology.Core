@@ -8,9 +8,7 @@
 		<PackageId>SolTechnology.Core.Logging</PackageId>
 		<AssemblyName>SolTechnology.Core.Logging</AssemblyName>
 
-		<PackageIcon>docs\mini-logo.png</PackageIcon>
-		<PackageReadmeFile>docs\readme.md</PackageReadmeFile>
-		<RepositoryUrl>https://github.com/AdrianStrugala/SolTechnology.Core</RepositoryUrl>
+		<PackageReadmeSource>Log.md</PackageReadmeSource>
 
 		<!-- Ship XML doc file in the NuGet package so consumers get IntelliSense on public API. -->
 		<GenerateDocumentationFile>true</GenerateDocumentationFile>
@@ -24,10 +22,6 @@
 		-->
 		<NoWarn>$(NoWarn);NU1510;CS1591</NoWarn>
 	</PropertyGroup>
-	<ItemGroup>
-		<None Include="..\..\docs\mini-logo.png" Pack="true" Visible="false" PackagePath="docs\mini-logo.png" />
-		<None Include="..\..\docs\Log.md" Pack="true" Visible="false" PackagePath="docs\readme.md" />
-	</ItemGroup>
 	<ItemGroup>
 		<FrameworkReference Include="Microsoft.AspNetCore.App" />
 		<!--

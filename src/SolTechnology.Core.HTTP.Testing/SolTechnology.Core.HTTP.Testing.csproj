@@ -8,15 +8,8 @@
 		<PackageId>SolTechnology.Core.HTTP.Testing</PackageId>
 		<AssemblyName>SolTechnology.Core.HTTP.Testing</AssemblyName>
 
-		<PackageIcon>docs\mini-logo.png</PackageIcon>
-		<PackageReadmeFile>docs\readme.md</PackageReadmeFile>
-		<RepositoryUrl>https://github.com/AdrianStrugala/SolTechnology.Core</RepositoryUrl>
+		<PackageReadmeSource>HTTP.Testing.md</PackageReadmeSource>
 	</PropertyGroup>
-
-	<ItemGroup>
-		<None Include="..\..\docs\mini-logo.png" Pack="true" Visible="false" PackagePath="docs\mini-logo.png" />
-		<None Include="..\..\docs\HTTP.Testing.md" Pack="true" Visible="false" PackagePath="docs\readme.md" />
-	</ItemGroup>
 
 	<ItemGroup>
 		<ProjectReference Include="..\SolTechnology.Core.Testing\SolTechnology.Core.Testing.csproj" />

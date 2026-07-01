@@ -8,13 +8,7 @@
         <PackageId>SolTechnology.Core.AUID</PackageId>
         <AssemblyName>SolTechnology.Core.AUID</AssemblyName>
 
-        <PackageIcon>docs\mini-logo.png</PackageIcon>
-        <PackageReadmeFile>docs\readme.md</PackageReadmeFile>
-        <RepositoryUrl>https://github.com/AdrianStrugala/SolTechnology.Core</RepositoryUrl>
+        <PackageReadmeSource>AUID.md</PackageReadmeSource>
     </PropertyGroup>
-    <ItemGroup>
-        <None Include="..\..\docs\mini-logo.png" Pack="true" Visible="false" PackagePath="docs\mini-logo.png" />
-        <None Include="..\..\docs\AUID.md" Pack="true" Visible="false" PackagePath="docs\readme.md" />
-    </ItemGroup>
 
 </Project>

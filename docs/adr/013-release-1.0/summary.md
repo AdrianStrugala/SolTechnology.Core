@@ -6,9 +6,9 @@ Tracking the implementation steps for the spec [`../013-release-1.0.md`](../013-
 
 | # | Title | File | Status |
 |---|---|---|---|
-| 00 | Run premortem (gate) + resolve open questions | [`reviewed/00-run-premortem.md`](reviewed/00-run-premortem.md) | ✅ executed — **Go with mitigations** |
-| 01 | CI: gate publish behind release trigger + pack-by-glob | [`reviewed/01-ci-publish-gate-and-glob-pack.md`](reviewed/01-ci-publish-gate-and-glob-pack.md) | 🔍 reviewed |
-| 02 | Centralise NuGet metadata + SourceLink + per-package READMEs (no version change) | [`reviewed/02-nuget-metadata-and-sourcelink.md`](reviewed/02-nuget-metadata-and-sourcelink.md) | 🔍 reviewed |
+| 00 | Run premortem (gate) + resolve open questions | [`done/00-run-premortem.md`](done/00-run-premortem.md) | ✅ done — **Go with mitigations** |
+| 01 | CI: gate publish behind release trigger + pack-by-glob | [`done/01-ci-publish-gate-and-glob-pack.md`](done/01-ci-publish-gate-and-glob-pack.md) | ✅ done |
+| 02 | Centralise NuGet metadata + SourceLink + README wiring (docs-sourced, no version change) | [`done/02-nuget-metadata-and-sourcelink.md`](done/02-nuget-metadata-and-sourcelink.md) | ✅ done |
 | 03 | Rename wave 1 — Logging surface (+ Api/HTTP callers) | [`reviewed/03-rename-logging-surface.md`](reviewed/03-rename-logging-surface.md) | 🔍 reviewed |
 | 04 | Rename wave 2 — data + transport modules | [`reviewed/04-rename-data-and-transport-modules.md`](reviewed/04-rename-data-and-transport-modules.md) | 🔍 reviewed |
 | 05 | Rename wave 3 — Api + Authentication (rename only) | [`reviewed/05-rename-api-authentication.md`](reviewed/05-rename-api-authentication.md) | 🔍 reviewed |
@@ -36,9 +36,10 @@ Risky / foundational first, then docs:
 
 - **01–02 (safety rails):** the publish gate lands *before* any rename so the incremental breaking
   PRs cannot auto-publish a broken `0.x`; metadata centralisation carries **no** version change.
-  Step 02 also authors **one README per shipped package** (answer 9 — ~20 READMEs sourced from
-  `docs/*.md`), so it is materially larger than a metadata-only change; it is kept as one step because
-  `PackageReadmeFile` is a hard pack failure without the README files it points at.
+  Step 02 also **centralises the existing per-package README wiring** (each package already ships a
+  README sourced from `docs/*.md`; answer 9's "~20 new `src/` READMEs" is dropped as duplication per
+  the 2026-07-01 amendment) and fills the three missing docs (`Core`, `API.Testing`, `SQL.Testing`) in
+  `docs/`; it carries **no** version change.
 - **03–06 (the breaking rename):** ordered callee-before-caller — Logging first (its only Core callers
   are Api + HTTP, fixed in the same PR), then data/transport, then top-level Api + Auth (05). The
   **`Story → Tale` rebrand + package rename is its own step (05b)** — the largest single rename

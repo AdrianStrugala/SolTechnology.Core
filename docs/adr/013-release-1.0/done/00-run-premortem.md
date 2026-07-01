@@ -1,7 +1,7 @@
 ---
 adr: 013-release-1.0
 step: 00 of 11
-status: reviewed
+status: done
 ---
 
 <!-- Reviewed (2026-06-30): recorded the maintainer's answers to all 12 open questions inline;

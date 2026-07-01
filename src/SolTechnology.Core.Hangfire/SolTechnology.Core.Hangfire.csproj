@@ -8,18 +8,11 @@
 		<PackageId>SolTechnology.Core.Hangfire</PackageId>
 		<AssemblyName>SolTechnology.Core.Hangfire</AssemblyName>
 
-		<PackageIcon>docs\mini-logo.png</PackageIcon>
-		<PackageReadmeFile>docs\readme.md</PackageReadmeFile>
-		<RepositoryUrl>https://github.com/AdrianStrugala/SolTechnology.Core</RepositoryUrl>
+		<PackageReadmeSource>Hangfire.md</PackageReadmeSource>
 	</PropertyGroup>
 
 	<ItemGroup>
 		<InternalsVisibleTo Include="SolTechnology.Core.Hangfire.Tests" />
-	</ItemGroup>
-
-	<ItemGroup>
-		<None Include="..\..\docs\mini-logo.png" Pack="true" Visible="false" PackagePath="docs\mini-logo.png" />
-		<None Include="..\..\docs\Hangfire.md" Pack="true" Visible="false" PackagePath="docs\readme.md" />
 	</ItemGroup>
 
 	<ItemGroup>

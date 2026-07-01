@@ -7,10 +7,6 @@
     <Product>SolTechnology.Core</Product>
     <PackageId>SolTechnology.Core</PackageId>
     <AssemblyName>SolTechnology.Core</AssemblyName>
-
-    <PackageIcon>docs\mini-logo.png</PackageIcon>
-    <PackageReadmeFile>docs\readme.md</PackageReadmeFile>
-    <RepositoryUrl>https://github.com/AdrianStrugala/SolTechnology.Core</RepositoryUrl>
   </PropertyGroup>
 
   <ItemGroup>

@@ -8,15 +8,8 @@
 		<PackageId>SolTechnology.Core.Testing</PackageId>
 		<AssemblyName>SolTechnology.Core.Testing</AssemblyName>
 
-		<PackageIcon>docs\mini-logo.png</PackageIcon>
-		<PackageReadmeFile>docs\readme.md</PackageReadmeFile>
-		<RepositoryUrl>https://github.com/AdrianStrugala/SolTechnology.Core</RepositoryUrl>
+		<PackageReadmeSource>Testing.md</PackageReadmeSource>
 	</PropertyGroup>
-
-	<ItemGroup>
-		<None Include="..\..\docs\mini-logo.png" Pack="true" Visible="false" PackagePath="docs\mini-logo.png" />
-		<None Include="..\..\docs\Testing.md" Pack="true" Visible="false" PackagePath="docs\readme.md" />
-	</ItemGroup>
 
 	<ItemGroup>
 		<!-- NUnit + AutoFixture data attributes. NSubstitute (not Moq) per the repo anti-stack

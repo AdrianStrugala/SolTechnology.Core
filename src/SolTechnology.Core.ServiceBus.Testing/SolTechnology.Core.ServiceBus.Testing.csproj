@@ -8,15 +8,8 @@
 		<PackageId>SolTechnology.Core.ServiceBus.Testing</PackageId>
 		<AssemblyName>SolTechnology.Core.ServiceBus.Testing</AssemblyName>
 
-		<PackageIcon>docs\mini-logo.png</PackageIcon>
-		<PackageReadmeFile>docs\readme.md</PackageReadmeFile>
-		<RepositoryUrl>https://github.com/AdrianStrugala/SolTechnology.Core</RepositoryUrl>
+		<PackageReadmeSource>ServiceBus.Testing.md</PackageReadmeSource>
 	</PropertyGroup>
-
-	<ItemGroup>
-		<None Include="..\..\docs\mini-logo.png" Pack="true" Visible="false" PackagePath="docs\mini-logo.png" />
-		<None Include="..\..\docs\ServiceBus.Testing.md" Pack="true" Visible="false" PackagePath="docs\readme.md" />
-	</ItemGroup>
 
 	<ItemGroup>
 		<!-- The bundled default emulator topology, read back at runtime and bind-mounted into the container. -->

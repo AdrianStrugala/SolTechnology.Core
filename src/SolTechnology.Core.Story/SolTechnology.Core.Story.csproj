@@ -9,15 +9,8 @@
         <AssemblyName>SolTechnology.Core.Story</AssemblyName>
         <RootNamespace>SolTechnology.Core.Story</RootNamespace>
 
-        <PackageIcon>docs\mini-logo.png</PackageIcon>
-        <PackageReadmeFile>docs\readme.md</PackageReadmeFile>
-        <RepositoryUrl>https://github.com/AdrianStrugala/SolTechnology.Core</RepositoryUrl>
+        <PackageReadmeSource>Story.md</PackageReadmeSource>
     </PropertyGroup>
-
-    <ItemGroup>
-        <None Include="..\..\docs\mini-logo.png" Pack="true" Visible="false" PackagePath="docs\mini-logo.png" />
-        <None Include="..\..\docs\Story.md" Pack="true" Visible="false" PackagePath="docs\readme.md" />
-    </ItemGroup>
 
     <ItemGroup>
         <!--

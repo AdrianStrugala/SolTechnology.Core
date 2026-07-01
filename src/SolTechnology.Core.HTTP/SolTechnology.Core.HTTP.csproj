@@ -8,14 +8,8 @@
 		<PackageId>SolTechnology.Core.HTTP</PackageId>
 		<AssemblyName>SolTechnology.Core.HTTP</AssemblyName>
 
-		<PackageIcon>docs\mini-logo.png</PackageIcon>
-		<PackageReadmeFile>docs\readme.md</PackageReadmeFile>
-		<RepositoryUrl>https://github.com/AdrianStrugala/SolTechnology.Core</RepositoryUrl>
+		<PackageReadmeSource>Clients.md</PackageReadmeSource>
 	</PropertyGroup>
-	<ItemGroup>
-		<None Include="..\..\docs\mini-logo.png" Pack="true" Visible="false" PackagePath="docs\mini-logo.png" />
-		<None Include="..\..\docs\Clients.md" Pack="true" Visible="false" PackagePath="docs\readme.md" />
-	</ItemGroup>
 
 	<ItemGroup>
 		<PackageReference Include="AvroConvert" Version="3.4.16" />

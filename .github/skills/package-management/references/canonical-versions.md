@@ -16,6 +16,10 @@ change**. When rows drift between projects, the row records the highest version 
 | `Microsoft.Extensions.DependencyInjection` | `10.0.9` | Same. | — |
 | `Microsoft.Extensions.Options` | `10.0.9` | Same. | — |
 
+**SourceLink:** no `PackageReference`. SourceLink ships inside the .NET SDK — `src/Directory.Build.props`
+enables it purely through MSBuild properties (`PublishRepositoryUrl`, `EmbedUntrackedSources`,
+`ContinuousIntegrationBuild`). Do **not** add `Microsoft.SourceLink.GitHub`.
+
 ## `Microsoft.Extensions.*` per-module references
 
 | Package | Version | Used by | Known drift |
