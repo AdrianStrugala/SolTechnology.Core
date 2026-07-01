@@ -2,7 +2,7 @@ namespace SolTechnology.Core.API.Security;
 
 /// <summary>
 /// Options for the security-headers middleware registered via
-/// <see cref="SecurityHeadersApplicationBuilderExtensions.UseSecurityHeaders"/>.
+/// <see cref="SecurityHeadersApplicationBuilderExtensions.UseSolSecurityHeaders"/>.
 /// </summary>
 public sealed class SecurityHeadersOptions
 {

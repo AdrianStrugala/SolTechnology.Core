@@ -23,21 +23,21 @@ public static class ModuleInstaller
     /// dependencies they pull in (<c>Core.Logging</c>, <c>AddProblemDetails</c>).
     /// <para>
     /// After calling this, register the MVC filters globally with
-    /// <see cref="ApiCoreMvcOptionsExtensions.AddApiCoreFilters(Microsoft.AspNetCore.Mvc.MvcOptions)"/>
-    /// and use <see cref="UseSwaggerWithVersioning"/> in the request pipeline.
+    /// <see cref="ApiCoreMvcOptionsExtensions.AddSolApiCoreFilters(Microsoft.AspNetCore.Mvc.MvcOptions)"/>
+    /// and use <see cref="UseSolSwaggerWithVersioning"/> in the request pipeline.
     /// </para>
     /// <code>
     /// builder.Services
-    ///     .AddApiCore(o =&gt; o.IncludeExceptionDetails = builder.Environment.IsDevelopment(),
+    ///     .AddSolApiCore(o =&gt; o.IncludeExceptionDetails = builder.Environment.IsDevelopment(),
     ///                 apiTitle: "DreamTravel API");
     ///
-    /// builder.Services.AddControllers(opts =&gt; opts.AddApiCoreFilters());
+    /// builder.Services.AddControllers(opts =&gt; opts.AddSolApiCoreFilters());
     ///
     /// var app = builder.Build();
-    /// app.UseSwaggerWithVersioning("DreamTravel API");
+    /// app.UseSolSwaggerWithVersioning("DreamTravel API");
     /// </code>
     /// <para>
-    /// Use the lower-level <see cref="AddApiExceptionHandling"/> / <see cref="AddVersioning"/>
+    /// Use the lower-level <see cref="AddSolApiExceptionHandling"/> / <see cref="AddSolVersioning"/>
     /// extensions when you need finer-grained control (e.g. registering only one of the two,
     /// or composing your own bootstrap).
     /// </para>
@@ -47,15 +47,15 @@ public static class ModuleInstaller
     /// <param name="apiTitle">API title for the generated Swagger documents (default: <c>"API"</c>).</param>
     /// <param name="defaultMajorVersion">Default major API version (default: <c>1</c>).</param>
     /// <param name="defaultMinorVersion">Default minor API version (default: <c>0</c>).</param>
-    public static IServiceCollection AddApiCore(
+    public static IServiceCollection AddSolApiCore(
         this IServiceCollection services,
         Action<ApiExceptionOptions>? configure = null,
         string apiTitle = "API",
         int defaultMajorVersion = 1,
         int defaultMinorVersion = 0)
     {
-        services.AddApiExceptionHandling(configure);
-        services.AddVersioning(defaultMajorVersion, defaultMinorVersion, apiTitle);
+        services.AddSolApiExceptionHandling(configure);
+        services.AddSolVersioning(defaultMajorVersion, defaultMinorVersion, apiTitle);
         return services;
     }
 
@@ -80,14 +80,14 @@ public static class ModuleInstaller
     /// Call once during service configuration, then add the filters to the MVC pipeline:
     /// </para>
     /// <code>
-    /// services.AddApiExceptionHandling(o =&gt;
+    /// services.AddSolApiExceptionHandling(o =&gt;
     ///     o.IncludeExceptionDetails = builder.Environment.IsDevelopment());
-    /// services.AddControllers(o =&gt; o.AddApiCoreFilters());
+    /// services.AddControllers(o =&gt; o.AddSolApiCoreFilters());
     /// </code>
     /// </summary>
     /// <param name="services">DI container.</param>
     /// <param name="configure">Optional configuration delegate for <see cref="ApiExceptionOptions"/>.</param>
-    public static IServiceCollection AddApiExceptionHandling(
+    public static IServiceCollection AddSolApiExceptionHandling(
         this IServiceCollection services,
         Action<ApiExceptionOptions>? configure = null)
     {
@@ -159,14 +159,14 @@ public static class ModuleInstaller
 
     /// <summary>
     /// Configures header-based API versioning (<c>X-API-VERSION</c>) and per-version Swagger
-    /// document generation. Pair with <see cref="UseSwaggerWithVersioning"/>.
+    /// document generation. Pair with <see cref="UseSolSwaggerWithVersioning"/>.
     /// </summary>
     /// <param name="services">Service collection</param>
     /// <param name="defaultMajorVersion">Default major version (default: 1)</param>
     /// <param name="defaultMinorVersion">Default minor version (default: 0)</param>
     /// <param name="apiTitle">API title for Swagger documentation (default: "API")</param>
     /// <returns>Service collection for chaining</returns>
-    public static IServiceCollection AddVersioning(
+    public static IServiceCollection AddSolVersioning(
         this IServiceCollection services,
         int defaultMajorVersion = 1,
         int defaultMinorVersion = 0,
@@ -194,8 +194,8 @@ public static class ModuleInstaller
 
     /// <summary>
     /// Wires <c>UseSwagger</c> + <c>UseSwaggerUI</c> with one Swagger endpoint per registered
-    /// API version, ordered newest-first. Combine with <see cref="AddVersioning"/> /
-    /// <see cref="AddApiCore"/>, which generated the per-version <c>SwaggerDoc</c>s.
+    /// API version, ordered newest-first. Combine with <see cref="AddSolVersioning"/> /
+    /// <see cref="AddSolApiCore"/>, which generated the per-version <c>SwaggerDoc</c>s.
     /// <para>
     /// Replaces the boilerplate loop that every API consumer otherwise repeats:
     /// </para>
@@ -213,7 +213,7 @@ public static class ModuleInstaller
     /// <param name="apiTitle">Title shown in the Swagger UI version dropdown (default: <c>"API"</c>).</param>
     /// <param name="configureUi">Optional callback to further customize <see cref="SwaggerUIOptions"/>
     /// (e.g. <c>RoutePrefix</c>, <c>OAuth*</c> settings, document expansion).</param>
-    public static IApplicationBuilder UseSwaggerWithVersioning(
+    public static IApplicationBuilder UseSolSwaggerWithVersioning(
         this IApplicationBuilder app,
         string apiTitle = "API",
         Action<SwaggerUIOptions>? configureUi = null)

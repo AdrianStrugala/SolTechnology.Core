@@ -62,7 +62,7 @@ public sealed class ProblemDetailsCorrelationIdTests
     private static WebApplication BuildHost()
     {
         var builder = WebApplication.CreateBuilder();
-        builder.Services.AddApiExceptionHandling();
+        builder.Services.AddSolApiExceptionHandling();
         return builder.Build();
     }
 

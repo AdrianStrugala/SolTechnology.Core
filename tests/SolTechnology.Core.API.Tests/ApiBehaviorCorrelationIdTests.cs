@@ -58,7 +58,7 @@ public sealed class ApiBehaviorCorrelationIdTests
     {
         var builder = WebApplication.CreateBuilder();
         builder.Services.AddControllers();
-        builder.Services.AddApiExceptionHandling();
+        builder.Services.AddSolApiExceptionHandling();
         return builder.Build();
     }
 

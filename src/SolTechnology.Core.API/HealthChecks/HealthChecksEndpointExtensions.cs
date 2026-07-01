@@ -26,12 +26,12 @@ public static class HealthChecksEndpointExtensions
     ///     .AddSolSqlHealthCheck()
     ///     .AddSolRedisHealthCheck();
     ///
-    /// app.MapCoreHealthChecks("/health");
+    /// app.MapSolHealthChecks("/health");
     /// </code>
     /// </summary>
     /// <param name="endpoints">The endpoint route builder (e.g. <c>WebApplication</c>).</param>
     /// <param name="path">The endpoint path (default <c>/health</c>).</param>
-    public static IEndpointConventionBuilder MapCoreHealthChecks(
+    public static IEndpointConventionBuilder MapSolHealthChecks(
         this IEndpointRouteBuilder endpoints,
         string path = "/health")
     {

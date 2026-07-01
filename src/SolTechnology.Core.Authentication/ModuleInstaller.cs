@@ -8,7 +8,7 @@ namespace SolTechnology.Core.Authentication
 {
     public static class ModuleInstaller
     {
-        public static AuthorizeFilter AddAuthenticationAndBuildFilter(
+        public static AuthorizeFilter AddSolAuthentication(
             this IServiceCollection services,
             AuthenticationConfiguration authenticationConfiguration)
         {

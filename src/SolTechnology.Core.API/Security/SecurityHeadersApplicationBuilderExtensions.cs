@@ -16,10 +16,10 @@ public static class SecurityHeadersApplicationBuilderExtensions
     /// Configure via the <paramref name="configure"/> delegate to adjust behaviour.
     /// </para>
     /// <code>
-    /// app.UseSecurityHeaders();
+    /// app.UseSolSecurityHeaders();
     ///
     /// // Or with customisation:
-    /// app.UseSecurityHeaders(o =&gt;
+    /// app.UseSolSecurityHeaders(o =&gt;
     /// {
     ///     o.ReferrerPolicy = "strict-origin-when-cross-origin";
     ///     o.RelaxedPathPrefixes.Add("/my-docs");
@@ -29,7 +29,7 @@ public static class SecurityHeadersApplicationBuilderExtensions
     /// <param name="app">The application builder.</param>
     /// <param name="configure">Optional delegate to customise the security header values.</param>
     /// <returns>The <see cref="IApplicationBuilder"/> for chaining.</returns>
-    public static IApplicationBuilder UseSecurityHeaders(
+    public static IApplicationBuilder UseSolSecurityHeaders(
         this IApplicationBuilder app,
         Action<SecurityHeadersOptions>? configure = null)
     {

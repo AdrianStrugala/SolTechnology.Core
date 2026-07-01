@@ -1,7 +1,7 @@
 ---
 adr: 013-release-1.0
 step: 05 of 11
-status: reviewed
+status: done
 ---
 
 <!-- Reviewed (2026-06-30): locked the name map (answers 1/2: AddApiCore→AddSolApiCore,

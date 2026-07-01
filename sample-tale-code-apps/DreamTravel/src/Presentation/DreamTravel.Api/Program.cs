@@ -125,7 +125,7 @@ public class Program
         builder.Services.AddSolPersistentEvents();
 
         var authenticationConfiguration = builder.Configuration.GetRequiredSection("Authentication").Get<AuthenticationConfiguration>()!;
-        var authFilter = builder.Services.AddAuthenticationAndBuildFilter(authenticationConfiguration);
+        var authFilter = builder.Services.AddSolAuthentication(authenticationConfiguration);
 
         // SolTechnology.Core.Api one-liner — wires:
         //   - Header-based API versioning (X-API-VERSION) + per-version Swagger docs
@@ -134,7 +134,7 @@ public class Program
         //   - IExceptionStatusCodeMapper (default mapping; replaceable)
         //   - Microsoft AddProblemDetails() for non-MVC paths
         //   - Core.Logging's ICorrelationIdService (used as ProblemDetails.Extensions["correlationId"])
-        builder.Services.AddApiCore(
+        builder.Services.AddSolApiCore(
             o => o.IncludeExceptionDetails = builder.Environment.IsDevelopment(),
             apiTitle: "DreamTravel API",
             defaultMajorVersion: 2);
@@ -163,19 +163,19 @@ public class Program
         builder.Services.AddControllers(opts =>
         {
             opts.Filters.Add(authFilter);
-            opts.AddApiCoreFilters();
+            opts.AddSolApiCoreFilters();
         });
 
         var app = builder.Build();
 
         app.MapDefaultEndpoints();
 
-        app.UseSecurityHeaders();
+        app.UseSolSecurityHeaders();
 
         app.UseDeveloperExceptionPage();
 
         // SolTechnology.Core.Api: per-version Swagger UI (newest first, deprecation badges).
-        app.UseSwaggerWithVersioning("DreamTravel API");
+        app.UseSolSwaggerWithVersioning("DreamTravel API");
 
         app.UseCors(CorsPolicy);
         app.UseHttpsRedirection();
@@ -196,7 +196,7 @@ public class Program
 
         // SolTechnology.Core.Api: JSON health endpoint (Aspire's MapDefaultEndpoints owns the
         // plaintext /health + /alive in Development, so the Core JSON endpoint maps at /healthz).
-        app.MapCoreHealthChecks("/healthz");
+        app.MapSolHealthChecks("/healthz");
 
         LogAvailableEndpoints(app.Services);
 
