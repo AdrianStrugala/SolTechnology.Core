@@ -6,7 +6,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\..\..\..\src\SolTechnology.Core.CQRS\SolTechnology.Core.CQRS.csproj" />
-    <ProjectReference Include="..\..\..\..\..\src\SolTechnology.Core.Story\SolTechnology.Core.Story.csproj" />
+    <ProjectReference Include="..\..\..\..\..\src\SolTechnology.Core.Tale\SolTechnology.Core.Tale.csproj" />
   </ItemGroup>
 
   <ItemGroup>

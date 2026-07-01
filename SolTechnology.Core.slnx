@@ -91,7 +91,7 @@
     <Project Path="tests/SolTechnology.Core.AUID.Tests/SolTechnology.Core.AUID.Tests.csproj" />
     <Project Path="tests/SolTechnology.Core.Logging.Tests/SolTechnology.Core.Logging.Tests.csproj" />
     <Project Path="tests/SolTechnology.Core.SQL.Tests/SolTechnology.Core.SQL.Tests.csproj" />
-    <Project Path="tests/SolTechnology.Core.Story.Tests/SolTechnology.Core.Story.Tests.csproj" />
+    <Project Path="tests/SolTechnology.Core.Tale.Tests/SolTechnology.Core.Tale.Tests.csproj" />
     <Project Path="tests/SolTechnology.Core.MessageBus.Tests/SolTechnology.Core.MessageBus.Tests.csproj" />
     <Project Path="tests/SolTechnology.Core.CQRS.Tests/SolTechnology.Core.CQRS.Tests.csproj" />
     <Project Path="tests/SolTechnology.Core.Hangfire.Tests/SolTechnology.Core.Hangfire.Tests.csproj" />
@@ -110,7 +110,7 @@
     <Project Path="src/SolTechnology.Core.Cache/SolTechnology.Core.Cache.csproj" />
     <Project Path="src/SolTechnology.Core.CQRS/SolTechnology.Core.CQRS.csproj" />
     <Project Path="src/SolTechnology.Core.HTTP.Testing/SolTechnology.Core.HTTP.Testing.csproj" />
-    <Project Path="src/SolTechnology.Core.Story/SolTechnology.Core.Story.csproj" />
+    <Project Path="src/SolTechnology.Core.Tale/SolTechnology.Core.Tale.csproj" />
     <Project Path="src/SolTechnology.Core.Logging/SolTechnology.Core.Logging.csproj" />
     <Project Path="src/SolTechnology.Core.MessageBus/SolTechnology.Core.MessageBus.csproj" />
     <Project Path="src/SolTechnology.Core.Hangfire/SolTechnology.Core.Hangfire.csproj" />

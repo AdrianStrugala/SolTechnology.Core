@@ -1,7 +1,7 @@
 using DreamTravel.DomainServices.CityDomain;
 using DreamTravel.DomainServices.CityDomain.SaveSteps;
 using Microsoft.Extensions.DependencyInjection;
-using SolTechnology.Core.Story;
+using SolTechnology.Core.Tale;
 
 namespace DreamTravel.DomainServices
 {
@@ -24,7 +24,7 @@ namespace DreamTravel.DomainServices
             services.AddScoped<IIncrementSearchCountStep, IncrementSearchCountStep>();
 
             // Explicit assembly: GetCallingAssembly() is unreliable under JIT inlining / WAF.
-            services.RegisterStories(assemblies: typeof(CityDomainService).Assembly);
+            services.AddSolTale(assemblies: typeof(CityDomainService).Assembly);
 
             return services;
         }

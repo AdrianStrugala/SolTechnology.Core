@@ -2,15 +2,15 @@ using DreamTravel.Queries.CalculateBestPath.Chapters;
 using Microsoft.Extensions.Logging;
 using SolTechnology.Core.CQRS;
 using SolTechnology.Core.Errors;
-using SolTechnology.Core.Story;
-using SolTechnology.Core.Story.Tale;
+using SolTechnology.Core.Tale;
+using SolTechnology.Core.Tale;
 
 namespace DreamTravel.Queries.CalculateBestPath;
 
 public class CalculateBestPathTale(
     IServiceProvider serviceProvider,
     ILogger<CalculateBestPathTale> logger)
-    : StoryHandler<CalculateBestPathQuery, CalculateBestPathContext, CalculateBestPathResult>(serviceProvider, logger),
+    : TaleHandler<CalculateBestPathQuery, CalculateBestPathContext, CalculateBestPathResult>(serviceProvider, logger),
       IQueryHandler<CalculateBestPathQuery, CalculateBestPathResult>
 {
     protected override Tale<CalculateBestPathResult> Tell() =>

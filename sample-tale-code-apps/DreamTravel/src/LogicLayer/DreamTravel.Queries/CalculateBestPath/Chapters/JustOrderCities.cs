@@ -1,6 +1,6 @@
 using JetBrains.Annotations;
 using SolTechnology.Core;
-using SolTechnology.Core.Story;
+using SolTechnology.Core.Tale;
 
 namespace DreamTravel.Queries.CalculateBestPath.Chapters;
 

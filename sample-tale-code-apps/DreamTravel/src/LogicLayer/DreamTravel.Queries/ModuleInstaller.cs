@@ -2,7 +2,7 @@
 using DreamTravel.TravelingSalesmanProblem;
 using Microsoft.Extensions.DependencyInjection;
 using SolTechnology.Core.CQRS;
-using SolTechnology.Core.Story;
+using SolTechnology.Core.Tale;
 
 namespace DreamTravel.Queries
 {
@@ -12,7 +12,7 @@ namespace DreamTravel.Queries
         {
             services.AddSolCQRS(o => o.RegisterQueriesFromAssembly(typeof(ModuleInstaller).Assembly));
             // Explicit assembly: GetCallingAssembly() is unreliable under JIT inlining / WAF.
-            services.RegisterStories(assemblies: typeof(CalculateBestPathTale).Assembly);
+            services.AddSolTale(assemblies: typeof(CalculateBestPathTale).Assembly);
 
             //TSP engine
             services.AddTransient<ITSP, AntColony>();

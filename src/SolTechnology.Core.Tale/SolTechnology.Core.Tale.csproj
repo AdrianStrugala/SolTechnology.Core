@@ -1,0 +1,41 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <Version>0.8.0</Version>
+        <Description>Tale Framework - Unified workflow orchestration for multi-step business processes. Supports both simple automated chains and pausable workflows with persistence. Features Tale Code philosophy with TaleHandler, Chapters, and Context for readable, maintainable business logic.</Description>
+        <PackageTags>sol technology core tale workflow chain pausable state-machine saga orchestration async dotnet business-process tale-code</PackageTags>
+        <Product>SolTechnology.Core.Tale</Product>
+        <PackageId>SolTechnology.Core.Tale</PackageId>
+        <AssemblyName>SolTechnology.Core.Tale</AssemblyName>
+        <RootNamespace>SolTechnology.Core.Tale</RootNamespace>
+
+        <PackageReadmeSource>Tale.md</PackageReadmeSource>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <!--
+            FrameworkReference replaces a stale Microsoft.AspNetCore.Mvc.Core 2.2.5 PackageReference
+            that pulled System.Text.Encodings.Web 4.5.0 (CVE-2021-26701, Critical) into the graph.
+            Tale only uses stock MVC controller types (ControllerBase, [HttpGet/Post], IActionResult,
+            [FromRoute/Body/Header]) which all live in the ASP.NET Core shared framework. Same
+            approach as SolTechnology.Core.Logging.
+        -->
+        <FrameworkReference Include="Microsoft.AspNetCore.App" />
+
+        <!--
+            Microsoft.Extensions.* PackageReferences inherited from src/Directory.Build.props
+            are already provided by the shared framework. Removing them here mirrors the
+            SolTechnology.Core.Logging setup and keeps the package graph clean.
+        -->
+        <PackageReference Remove="Microsoft.Extensions.Configuration" />
+        <PackageReference Remove="Microsoft.Extensions.Configuration.Binder" />
+        <PackageReference Remove="Microsoft.Extensions.DependencyInjection" />
+        <PackageReference Remove="Microsoft.Extensions.Options" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\SolTechnology.Core.AUID\SolTechnology.Core.AUID.csproj" />
+      <ProjectReference Include="..\SolTechnology.Core\SolTechnology.Core.csproj" />
+    </ItemGroup>
+
+</Project>

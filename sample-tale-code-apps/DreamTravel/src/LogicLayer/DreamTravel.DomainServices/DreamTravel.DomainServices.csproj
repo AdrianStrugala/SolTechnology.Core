@@ -4,7 +4,7 @@
       <ProjectReference Include="..\..\..\..\..\src\SolTechnology.Core.SQL\SolTechnology.Core.SQL.csproj" />
       <ProjectReference Include="..\..\DataLayer\DreamTravel.GeolocationDataClients\DreamTravel.GeolocationDataClients.csproj" />
       <ProjectReference Include="..\..\DataLayer\DreamTravel.Sql\DreamTravel.Sql.csproj" />
-      <ProjectReference Include="..\..\..\..\..\src\SolTechnology.Core.Story\SolTechnology.Core.Story.csproj" />
+      <ProjectReference Include="..\..\..\..\..\src\SolTechnology.Core.Tale\SolTechnology.Core.Tale.csproj" />
     </ItemGroup>
 
     <ItemGroup>

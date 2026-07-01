@@ -108,7 +108,7 @@ public class Program
             builder.Configuration.GetSection("Neo4j"));
         builder.Services.InstallGraphDatabase();
 
-        //Journey (migrated to Story framework) — defaults to in-memory persistence.
+        //Journey (migrated to Tale framework) — defaults to in-memory persistence.
         builder.Services.AddFlows();
 
         //The rest

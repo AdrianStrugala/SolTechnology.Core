@@ -1,22 +1,22 @@
 ﻿﻿﻿using DreamTravel.Flows.SampleOrderWorkflow;
 using Microsoft.Extensions.DependencyInjection;
-using SolTechnology.Core.Story;
-using SolTechnology.Core.Story.Builder;
+using SolTechnology.Core.Tale;
+using SolTechnology.Core.Tale.Builder;
 
 namespace DreamTravel.Flows;
 
 public static class ModuleInstaller
 {
     /// <summary>
-    /// Registers DreamTravel stories. Returns the <see cref="IStoryBuilder"/> so the caller
-    /// can pick a persistence provider (e.g. <c>.UseStoryRepository&lt;SQLiteStoryRepository&gt;()</c>
+    /// Registers DreamTravel stories. Returns the <see cref="ITaleBuilder"/> so the caller
+    /// can pick a persistence provider (e.g. <c>.UseTaleRepository&lt;SQLiteTaleRepository&gt;()</c>
     /// from <c>DreamTravel.SQLite</c>). Defaults to in-memory persistence — sufficient for dev/tests.
     /// </summary>
-    public static IStoryBuilder AddFlows(
+    public static ITaleBuilder AddFlows(
         this IServiceCollection services,
-        Action<StoryOptions>? configure = null)
+        Action<TaleOptions>? configure = null)
         // Explicit assembly: GetCallingAssembly() is unreliable under JIT inlining / WAF.
-        => services.RegisterStories(configure, typeof(SampleOrderWorkflowStory).Assembly);
+        => services.AddSolTale(configure, typeof(SampleOrderWorkflowTale).Assembly);
 }
 
 

@@ -1,7 +1,7 @@
 ﻿using DreamTravel.Domain.Cities;
 using Hangfire.Annotations;
 using SolTechnology.Core.CQRS;
-using SolTechnology.Core.Story;
+using SolTechnology.Core.Tale;
 
 namespace DreamTravel.Queries.CalculateBestPath.Chapters;
 

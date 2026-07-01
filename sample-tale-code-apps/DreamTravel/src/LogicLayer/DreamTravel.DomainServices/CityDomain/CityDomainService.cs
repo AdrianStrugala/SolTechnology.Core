@@ -1,14 +1,14 @@
 ﻿﻿using DreamTravel.DomainServices.CityDomain.SaveSteps;
-using DreamTravel.DomainServices.CityDomain.SaveCityStory;
-using DreamTravel.DomainServices.CityDomain.SaveCityStory.Chapters;
+using DreamTravel.DomainServices.CityDomain.SaveCityTale;
+using DreamTravel.DomainServices.CityDomain.SaveCityTale.Chapters;
 using DreamTravel.Domain.Cities;
 using DreamTravel.GeolocationDataClients.GoogleApi;
 using DreamTravel.Sql;
 using DreamTravel.Sql.QueryBuilders;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using SolTechnology.Core.Story;
-using SolTechnology.Core.Story.Tale;
+using SolTechnology.Core.Tale;
+using SolTechnology.Core.Tale;
 
 namespace DreamTravel.DomainServices.CityDomain;
 
@@ -61,7 +61,7 @@ public class CityDomainService(
     IGoogleHTTPClient googleHTTPClient,
     IServiceProvider serviceProvider,
     ILogger<CityDomainService> logger)
-    : StoryHandler<SaveCityInput, SaveCityContext, SaveCityResult>(serviceProvider, logger), ICityDomainService
+    : TaleHandler<SaveCityInput, SaveCityContext, SaveCityResult>(serviceProvider, logger), ICityDomainService
 {
     public async Task<City> Get(string name, Action<CityReadOptions>? configureOptions = null)
     {
@@ -133,7 +133,7 @@ public class CityDomainService(
     }
 
     /// <summary>
-    /// Story for saving a city to the database. Loads (or creates) the entity, assigns its
+    /// Tale for saving a city to the database. Loads (or creates) the entity, assigns its
     /// alternative name, increments search statistics, and persists the result.
     /// </summary>
     protected override Tale<SaveCityResult> Tell() =>
