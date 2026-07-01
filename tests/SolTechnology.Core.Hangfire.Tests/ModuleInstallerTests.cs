@@ -12,30 +12,30 @@ namespace SolTechnology.Core.Hangfire.Tests;
 public class ModuleInstallerTests
 {
     [Test]
-    public void AddPersistentEvents_WithoutAddCQRS_Throws()
+    public void AddSolPersistentEvents_WithoutAddSolCQRS_Throws()
     {
         // Arrange
         var services = new ServiceCollection();
 
         // Act
-        var act = () => services.AddPersistentEvents();
+        var act = () => services.AddSolPersistentEvents();
 
         // Assert
         act.Should().Throw<InvalidOperationException>()
-            .WithMessage("*AddCQRS()*");
+            .WithMessage("*AddSolCQRS()*");
     }
 
     [Test]
-    public void AddPersistentEvents_AfterAddCQRS_ReplacesPublisher()
+    public void AddSolPersistentEvents_AfterAddSolCQRS_ReplacesPublisher()
     {
         // Arrange
         var services = new ServiceCollection();
         services.AddLogging();
         services.AddSingleton(Substitute.For<IBackgroundJobClient>());
-        services.AddCQRS(assemblies: typeof(ModuleInstallerTests).Assembly);
+        services.AddSolCQRS(o => o.RegisterEventsFromAssembly(typeof(ModuleInstallerTests).Assembly));
 
         // Act
-        services.AddPersistentEvents();
+        services.AddSolPersistentEvents();
         var sp = services.BuildServiceProvider();
 
         // Assert
@@ -44,17 +44,17 @@ public class ModuleInstallerTests
     }
 
     [Test]
-    public void AddPersistentEvents_BeforeAddCQRS_StillResolvesHangfirePublisher()
+    public void AddSolPersistentEvents_BeforeAddSolCQRS_StillResolvesHangfirePublisher()
     {
         // Arrange
         var services = new ServiceCollection();
         services.AddLogging();
         services.AddSingleton(Substitute.For<IBackgroundJobClient>());
-        services.AddCQRS(assemblies: typeof(ModuleInstallerTests).Assembly);
-        services.AddPersistentEvents();
+        services.AddSolCQRS(o => o.RegisterEventsFromAssembly(typeof(ModuleInstallerTests).Assembly));
+        services.AddSolPersistentEvents();
 
-        // Re-call AddCQRS to simulate order-independence (TryAdd yields to existing)
-        services.AddCQRS(assemblies: typeof(ModuleInstallerTests).Assembly);
+        // Re-call AddSolCQRS to simulate order-independence (TryAdd yields to existing)
+        services.AddSolCQRS(o => o.RegisterEventsFromAssembly(typeof(ModuleInstallerTests).Assembly));
         var sp = services.BuildServiceProvider();
 
         // Assert
@@ -63,16 +63,16 @@ public class ModuleInstallerTests
     }
 
     [Test]
-    public void AddPersistentEvents_WithCustomQueueName_BindsOptions()
+    public void AddSolPersistentEvents_WithCustomQueueName_BindsOptions()
     {
         // Arrange
         var services = new ServiceCollection();
         services.AddLogging();
         services.AddSingleton(Substitute.For<IBackgroundJobClient>());
-        services.AddCQRS(assemblies: typeof(ModuleInstallerTests).Assembly);
+        services.AddSolCQRS(o => o.RegisterEventsFromAssembly(typeof(ModuleInstallerTests).Assembly));
 
         // Act
-        services.AddPersistentEvents(o => o.QueueName = "events");
+        services.AddSolPersistentEvents(o => o.QueueName = "events");
         var sp = services.BuildServiceProvider();
         var options = sp.GetRequiredService<Microsoft.Extensions.Options.IOptions<PersistentEventsOptions>>();
 

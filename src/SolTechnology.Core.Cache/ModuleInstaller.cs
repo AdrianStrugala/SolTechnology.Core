@@ -8,7 +8,7 @@ public static class ModuleInstaller
 {
     extension(IServiceCollection services)
     {
-        public IServiceCollection AddLocalCache(CacheConfiguration? cacheConfiguration = null)
+        public IServiceCollection AddSolLocalCache(CacheConfiguration? cacheConfiguration = null)
         {
             cacheConfiguration ??= new CacheConfiguration
             {
@@ -32,7 +32,7 @@ public static class ModuleInstaller
             return services;
         }
 
-        public IServiceCollection AddDistributedCache(DistributedCacheConfiguration configuration)
+        public IServiceCollection AddSolDistributedCache(DistributedCacheConfiguration configuration)
         {
             services
                 .AddOptions<DistributedCacheConfiguration>()
@@ -63,7 +63,7 @@ public static class ModuleInstaller
         /// <see cref="SemaphoreSlim"/>. No Redis required — suitable for local dev and
         /// single-instance deployments.
         /// </summary>
-        public IServiceCollection AddLocalLock()
+        public IServiceCollection AddSolLocalLock()
         {
             services.AddSingleton<IDistributedLockService, LocalDistributedLockService>();
             return services;
@@ -71,10 +71,10 @@ public static class ModuleInstaller
 
         /// <summary>
         /// Registers a Redis-backed <see cref="IDistributedLockService"/> using <c>SET NX EX</c>.
-        /// Requires <see cref="AddDistributedCache"/> to have been called first (reuses the same
+        /// Requires <see cref="AddSolDistributedCache"/> to have been called first (reuses the same
         /// <see cref="IConnectionMultiplexer"/>).
         /// </summary>
-        public IServiceCollection AddDistributedLock()
+        public IServiceCollection AddSolDistributedLock()
         {
             services.AddSingleton<IDistributedLockService, RedisDistributedLockService>();
 
@@ -87,7 +87,7 @@ public static class ModuleInstaller
         /// No Redis required — suitable for local dev and single-instance deployments.
         /// </summary>
         /// <param name="ttl">How long a stored response is kept before eviction (default 24 h).</param>
-        public IServiceCollection AddLocalIdempotency(TimeSpan? ttl = null)
+        public IServiceCollection AddSolLocalIdempotency(TimeSpan? ttl = null)
         {
             var expiry = ttl ?? TimeSpan.FromHours(24);
             services.AddSingleton<IIdempotencyStore>(sp =>
@@ -99,11 +99,11 @@ public static class ModuleInstaller
 
         /// <summary>
         /// Registers a Redis-backed <see cref="IIdempotencyStore"/> using <c>SET NX EX</c> for
-        /// atomic key reservation. Multi-instance safe. Requires <see cref="AddDistributedCache"/>
+        /// atomic key reservation. Multi-instance safe. Requires <see cref="AddSolDistributedCache"/>
         /// to have been called first (reuses the same <see cref="IConnectionMultiplexer"/>).
         /// </summary>
         /// <param name="ttl">How long a stored response is kept in Redis (default 24 h).</param>
-        public IServiceCollection AddDistributedIdempotency(TimeSpan? ttl = null)
+        public IServiceCollection AddSolDistributedIdempotency(TimeSpan? ttl = null)
         {
             var expiry = ttl ?? TimeSpan.FromHours(24);
             services.AddSingleton<IIdempotencyStore>(sp =>

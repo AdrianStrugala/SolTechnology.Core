@@ -10,7 +10,7 @@ namespace DreamTravel.Queries
     {
         public static IServiceCollection InstallTripsQueries(this IServiceCollection services)
         {
-            services.AddCQRS(assemblies: typeof(ModuleInstaller).Assembly);
+            services.AddSolCQRS(o => o.RegisterQueriesFromAssembly(typeof(ModuleInstaller).Assembly));
             // Explicit assembly: GetCallingAssembly() is unreliable under JIT inlining / WAF.
             services.RegisterStories(assemblies: typeof(CalculateBestPathTale).Assembly);
 

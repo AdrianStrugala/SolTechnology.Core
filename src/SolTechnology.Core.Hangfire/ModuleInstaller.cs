@@ -14,17 +14,17 @@ public static class ModuleInstaller
 {
     /// <summary>
     /// Replaces the in-memory event publisher with a Hangfire-backed durable publisher.
-    /// Requires <c>AddCQRS()</c> first. The app must also call <c>AddHangfire(...)</c> and
+    /// Requires <c>AddSolCQRS()</c> first. The app must also call <c>AddHangfire(...)</c> and
     /// <c>AddHangfireServer()</c> with a DI-aware activator and type-aware serializer settings.
     /// </summary>
-    public static IServiceCollection AddPersistentEvents(
+    public static IServiceCollection AddSolPersistentEvents(
         this IServiceCollection services,
         Action<PersistentEventsOptions>? configure = null)
     {
         if (!services.Any(d => d.ServiceType == typeof(IEventDispatcher)))
         {
             throw new InvalidOperationException(
-                "AddPersistentEvents() requires AddCQRS() to be called first.");
+                "AddSolPersistentEvents() requires AddSolCQRS() to be called first.");
         }
 
         var options = new PersistentEventsOptions();
@@ -51,7 +51,7 @@ public static class ModuleInstaller
     /// When true, a new execution is cancelled if the same job is already scheduled or processing.
     /// Prevents pile-up when a previous run is mid-retry and the next cron trigger fires.
     /// </param>
-    public static IServiceCollection AddRecurringJob<TJob>(
+    public static IServiceCollection AddSolRecurringJob<TJob>(
         this IServiceCollection services,
         string cronExpression,
         bool preventOverlap = false) where TJob : class, IJob
@@ -76,10 +76,10 @@ public static class ModuleInstaller
     /// Adds the Hangfire global job filters (correlation-id propagation, smart retry).
     /// Call from the app's <c>AddHangfire</c> configuration callback:
     /// <code>
-    /// services.AddHangfire((sp, config) => config.UseSolTechnologyFilters(sp));
+    /// services.AddHangfire((sp, config) => config.UseSolFilters(sp));
     /// </code>
     /// </summary>
-    public static IGlobalConfiguration UseSolTechnologyFilters(
+    public static IGlobalConfiguration UseSolFilters(
         this IGlobalConfiguration configuration,
         IServiceProvider serviceProvider)
     {

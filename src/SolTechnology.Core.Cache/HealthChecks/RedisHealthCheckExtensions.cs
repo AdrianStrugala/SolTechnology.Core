@@ -12,14 +12,14 @@ public static class RedisHealthCheckExtensions
 {
     /// <summary>
     /// Adds a <c>PING</c> connectivity check for the distributed cache. Requires
-    /// <see cref="IConnectionMultiplexer"/> to be registered (via <c>AddDistributedCache(...)</c>).
+    /// <see cref="IConnectionMultiplexer"/> to be registered (via <c>AddSolDistributedCache(...)</c>).
     /// </summary>
     /// <param name="builder">The framework health-checks builder (from <c>AddHealthChecks()</c>).</param>
     /// <param name="name">Check name in the report (default <c>redis</c>).</param>
     /// <param name="timeout">Per-call probe timeout (default 5s) — guards against a hung server.</param>
     /// <param name="failureStatus">Status reported on failure (default <see cref="HealthStatus.Unhealthy"/>).</param>
     /// <param name="tags">Optional tags for endpoint filtering (e.g. <c>"ready"</c>).</param>
-    public static IHealthChecksBuilder AddRedisHealthCheck(
+    public static IHealthChecksBuilder AddSolRedisHealthCheck(
         this IHealthChecksBuilder builder,
         string name = "redis",
         TimeSpan? timeout = null,

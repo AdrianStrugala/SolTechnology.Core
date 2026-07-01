@@ -13,19 +13,16 @@ namespace SolTechnology.Core.CQRS;
 public static class ModuleInstaller
 {
     /// <summary>
-    /// Registers the in-house mediator, pipeline behaviors, command/query/event handlers,
-    /// and (optionally) FluentValidation validators from the specified assemblies.
-    /// Idempotent — safe to call multiple times.
+    /// Registers the in-house mediator, pipeline behaviors, and the command/query/event handlers
+    /// (and optional FluentValidation validators) discovered from the assemblies configured on
+    /// <see cref="CQRSOptions"/> via <see cref="CQRSOptions.RegisterCommandsFromAssembly"/>,
+    /// <see cref="CQRSOptions.RegisterQueriesFromAssembly"/>, and
+    /// <see cref="CQRSOptions.RegisterEventsFromAssembly"/>. Idempotent — safe to call multiple times.
     /// </summary>
-    public static IServiceCollection AddCQRS(this IServiceCollection services, Action<CQRSOptions>? configure = null, params Assembly[] assemblies)
+    public static IServiceCollection AddSolCQRS(this IServiceCollection services, Action<CQRSOptions>? configure = null)
     {
         var options = new CQRSOptions();
         configure?.Invoke(options);
-
-        if (assemblies.Length == 0)
-        {
-            assemblies = new[] { Assembly.GetCallingAssembly() };
-        }
 
         // Register mediator (scoped — shares request lifetime)
         services.TryAddScoped<IMediator, CQRSMediator>();
@@ -45,15 +42,32 @@ public static class ModuleInstaller
             services.TryAddEnumerable(ServiceDescriptor.Transient(typeof(IPipelineBehavior<,>), typeof(FluentValidationPipelineBehavior<,>)));
         }
 
-        // Scan assemblies for handlers and validators
-        foreach (var assembly in assemblies)
+        // Scan the explicitly-registered assemblies, one handler family per registration method
+        foreach (var assembly in options.CommandAssemblies)
         {
             RegisterHandlers(services, assembly, typeof(ICommandHandler<>));
             RegisterHandlers(services, assembly, typeof(ICommandHandler<,>));
-            RegisterHandlers(services, assembly, typeof(IQueryHandler<,>));
-            RegisterHandlers(services, assembly, typeof(IEventHandler<>));
+        }
 
-            if (options.UseFluentValidation)
+        foreach (var assembly in options.QueryAssemblies)
+        {
+            RegisterHandlers(services, assembly, typeof(IQueryHandler<,>));
+        }
+
+        foreach (var assembly in options.EventAssemblies)
+        {
+            RegisterHandlers(services, assembly, typeof(IEventHandler<>));
+        }
+
+        if (options.UseFluentValidation)
+        {
+            // Validators guard command/query inputs — scan every distinct registered assembly once
+            var validatorAssemblies = options.CommandAssemblies
+                .Concat(options.QueryAssemblies)
+                .Concat(options.EventAssemblies)
+                .Distinct();
+
+            foreach (var assembly in validatorAssemblies)
             {
                 services.AddValidatorsFromAssembly(assembly);
             }

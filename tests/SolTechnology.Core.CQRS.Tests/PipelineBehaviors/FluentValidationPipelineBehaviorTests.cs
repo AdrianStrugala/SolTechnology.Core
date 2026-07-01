@@ -19,7 +19,10 @@ public class FluentValidationPipelineBehaviorTests
         ValidatedCommandHandler.WasCalled = false;
         var services = new ServiceCollection();
         services.AddLogging();
-        services.AddCQRS(assemblies: typeof(FluentValidationPipelineBehaviorTests).Assembly);
+        services.AddSolCQRS(o => o
+            .RegisterCommandsFromAssembly(typeof(FluentValidationPipelineBehaviorTests).Assembly)
+            .RegisterQueriesFromAssembly(typeof(FluentValidationPipelineBehaviorTests).Assembly)
+            .RegisterEventsFromAssembly(typeof(FluentValidationPipelineBehaviorTests).Assembly));
         _sp = services.BuildServiceProvider();
         _sut = _sp.CreateScope().ServiceProvider.GetRequiredService<IMediator>();
     }

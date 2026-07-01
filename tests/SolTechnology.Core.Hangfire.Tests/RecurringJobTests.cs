@@ -13,13 +13,13 @@ namespace SolTechnology.Core.Hangfire.Tests;
 public class RecurringJobTests
 {
     [Test]
-    public void AddRecurringJob_RegistersJobAsScoped()
+    public void AddSolRecurringJob_RegistersJobAsScoped()
     {
         // Arrange
         var services = new ServiceCollection();
 
         // Act
-        services.AddRecurringJob<TestJob>("0 0 * * *");
+        services.AddSolRecurringJob<TestJob>("0 0 * * *");
         var sp = services.BuildServiceProvider();
 
         // Assert
@@ -28,14 +28,14 @@ public class RecurringJobTests
     }
 
     [Test]
-    public void AddRecurringJob_RegistersRecurringJobRegistrarAsHostedService()
+    public void AddSolRecurringJob_RegistersRecurringJobRegistrarAsHostedService()
     {
         // Arrange
         var services = new ServiceCollection();
         services.AddSingleton(Substitute.For<IRecurringJobManager>());
 
         // Act
-        services.AddRecurringJob<TestJob>("0 0 * * *");
+        services.AddSolRecurringJob<TestJob>("0 0 * * *");
         var sp = services.BuildServiceProvider();
 
         // Assert
@@ -44,15 +44,15 @@ public class RecurringJobTests
     }
 
     [Test]
-    public void AddRecurringJob_CalledTwice_RegistersOnlyOneRegistrar()
+    public void AddSolRecurringJob_CalledTwice_RegistersOnlyOneRegistrar()
     {
         // Arrange
         var services = new ServiceCollection();
         services.AddSingleton(Substitute.For<IRecurringJobManager>());
 
         // Act
-        services.AddRecurringJob<TestJob>("0 0 * * *");
-        services.AddRecurringJob<AnotherTestJob>("0 12 * * *");
+        services.AddSolRecurringJob<TestJob>("0 0 * * *");
+        services.AddSolRecurringJob<AnotherTestJob>("0 12 * * *");
         var sp = services.BuildServiceProvider();
 
         // Assert
@@ -62,13 +62,13 @@ public class RecurringJobTests
     }
 
     [Test]
-    public void AddRecurringJob_NullCronExpression_Throws()
+    public void AddSolRecurringJob_NullCronExpression_Throws()
     {
         // Arrange
         var services = new ServiceCollection();
 
         // Act
-        var act = () => services.AddRecurringJob<TestJob>(null!);
+        var act = () => services.AddSolRecurringJob<TestJob>(null!);
 
         // Assert
         act.Should().Throw<ArgumentNullException>();

@@ -18,7 +18,7 @@ public sealed class ModuleInstallerTests
     // ---- Original smoke test (preserved) ---------------------------------
 
     [Test]
-    public void AddHTTPClient_ConfigurationProvidedAsParameter_ClientHasExpectedBaseAddressAndHeader_TimeoutIgnoredWhenPollyOn()
+    public void AddSolHTTPClient_ConfigurationProvidedAsParameter_ClientHasExpectedBaseAddressAndHeader_TimeoutIgnoredWhenPollyOn()
     {
         // Under the default UsePolly=true, HttpClient.Timeout is set to
         // InfiniteTimeSpan so the Polly per-attempt timeout is the single
@@ -35,7 +35,7 @@ public sealed class ModuleInstallerTests
         };
 
         var sut = NewBuilder();
-        sut.Services.AddHTTPClient<ISampleHTTPClient, SampleHTTPClient>("Sample", configuration);
+        sut.Services.AddSolHTTPClient<ISampleHTTPClient, SampleHTTPClient>("Sample", configuration);
         var app = sut.Build();
 
         var client = app.Services.GetRequiredService<ISampleHTTPClient>();
@@ -47,7 +47,7 @@ public sealed class ModuleInstallerTests
     }
 
     [Test]
-    public void AddHTTPClient_UsePollyFalse_HttpClientOwnsTimeoutFromTimeoutSeconds()
+    public void AddSolHTTPClient_UsePollyFalse_HttpClientOwnsTimeoutFromTimeoutSeconds()
     {
         // Fallback path: with Polly disabled, HttpClient.Timeout is the only
         // remaining deadline and must honour TimeoutSeconds.
@@ -60,7 +60,7 @@ public sealed class ModuleInstallerTests
         var policy = new HttpPolicyConfiguration { UsePolly = false };
 
         var sut = NewBuilder();
-        sut.Services.AddHTTPClient<ISampleHTTPClient, SampleHTTPClient>("Sample", configuration, policy);
+        sut.Services.AddSolHTTPClient<ISampleHTTPClient, SampleHTTPClient>("Sample", configuration, policy);
         var app = sut.Build();
 
         var client = app.Services.GetRequiredService<ISampleHTTPClient>();
@@ -70,7 +70,7 @@ public sealed class ModuleInstallerTests
     // ---- Configuration-driven registration --------------------------------
 
     [Test]
-    public void AddHTTPClient_ConfigurationProvidedFromAppsettings_ClientReadsBaseAddressAndHeadersFromSection()
+    public void AddSolHTTPClient_ConfigurationProvidedFromAppsettings_ClientReadsBaseAddressAndHeadersFromSection()
     {
         var sut = NewBuilder();
         sut.Configuration.AddInMemoryCollection(new Dictionary<string, string?>
@@ -79,22 +79,22 @@ public sealed class ModuleInstallerTests
             ["HTTPClients:Sample:TimeoutSeconds"] = "42",
         });
 
-        sut.Services.AddHTTPClient<ISampleHTTPClient, SampleHTTPClient>("Sample");
+        sut.Services.AddSolHTTPClient<ISampleHTTPClient, SampleHTTPClient>("Sample");
         var app = sut.Build();
 
         var client = app.Services.GetRequiredService<ISampleHTTPClient>();
         client.HttpClient.BaseAddress.Should().Be(new Uri("http://from-config/"));
         // Default UsePolly=true → HttpClient.Timeout is infinite, TimeoutSeconds
-        // is a documented warning. See AddHTTPClient_UsePollyFalse_... for the
+        // is a documented warning. See AddSolHTTPClient_UsePollyFalse_... for the
         // fallback case.
         client.HttpClient.Timeout.Should().Be(Timeout.InfiniteTimeSpan);
     }
 
     [Test]
-    public void AddHTTPClient_ConfigurationMissing_FailsHostStartupOrFirstResolve()
+    public void AddSolHTTPClient_ConfigurationMissing_FailsHostStartupOrFirstResolve()
     {
         var sut = NewBuilder();
-        sut.Services.AddHTTPClient<ISampleHTTPClient, SampleHTTPClient>("Nonexistent");
+        sut.Services.AddSolHTTPClient<ISampleHTTPClient, SampleHTTPClient>("Nonexistent");
 
         // .ValidateOnStart() is wired in ModuleInstaller. The contract is:
         // bad / missing config must surface at host startup or, at the latest,
@@ -114,7 +114,7 @@ public sealed class ModuleInstallerTests
     // ---- Policy options precedence ---------------------------------------
 
     [Test]
-    public void AddHTTPClient_PolicyOptions_PerClientSectionOverridesGlobal()
+    public void AddSolHTTPClient_PolicyOptions_PerClientSectionOverridesGlobal()
     {
         var sut = NewBuilder();
         sut.Configuration.AddInMemoryCollection(new Dictionary<string, string?>
@@ -124,7 +124,7 @@ public sealed class ModuleInstallerTests
             ["HTTPClients:Sample:Policy:MaxRequestRetries"] = "1",
         });
 
-        sut.Services.AddHTTPClient<ISampleHTTPClient, SampleHTTPClient>("Sample");
+        sut.Services.AddSolHTTPClient<ISampleHTTPClient, SampleHTTPClient>("Sample");
         var app = sut.Build();
 
         var policy = app.Services.GetRequiredService<IOptionsMonitor<HttpPolicyConfiguration>>().Get("Sample");
@@ -132,7 +132,7 @@ public sealed class ModuleInstallerTests
     }
 
     [Test]
-    public void AddHTTPClient_PolicyOptions_GlobalUsedWhenNoPerClientOverride()
+    public void AddSolHTTPClient_PolicyOptions_GlobalUsedWhenNoPerClientOverride()
     {
         var sut = NewBuilder();
         sut.Configuration.AddInMemoryCollection(new Dictionary<string, string?>
@@ -141,7 +141,7 @@ public sealed class ModuleInstallerTests
             ["HttpPolicy:MaxRequestRetries"] = "7",
         });
 
-        sut.Services.AddHTTPClient<ISampleHTTPClient, SampleHTTPClient>("Sample");
+        sut.Services.AddSolHTTPClient<ISampleHTTPClient, SampleHTTPClient>("Sample");
         var app = sut.Build();
 
         var policy = app.Services.GetRequiredService<IOptionsMonitor<HttpPolicyConfiguration>>().Get("Sample");
@@ -149,7 +149,7 @@ public sealed class ModuleInstallerTests
     }
 
     [Test]
-    public void AddHTTPClient_PolicyOptions_FallbackToProductionDefaults_WhenNoConfig()
+    public void AddSolHTTPClient_PolicyOptions_FallbackToProductionDefaults_WhenNoConfig()
     {
         var sut = NewBuilder();
         sut.Configuration.AddInMemoryCollection(new Dictionary<string, string?>
@@ -157,7 +157,7 @@ public sealed class ModuleInstallerTests
             ["HTTPClients:Sample:BaseAddress"] = "http://example/",
         });
 
-        sut.Services.AddHTTPClient<ISampleHTTPClient, SampleHTTPClient>("Sample");
+        sut.Services.AddSolHTTPClient<ISampleHTTPClient, SampleHTTPClient>("Sample");
         var app = sut.Build();
 
         var policy = app.Services.GetRequiredService<IOptionsMonitor<HttpPolicyConfiguration>>().Get("Sample");
@@ -176,7 +176,7 @@ public sealed class ModuleInstallerTests
     }
 
     [Test]
-    public void AddHTTPClient_PolicyOptions_InvalidValueFromConfig_FailsValidationOnResolve()
+    public void AddSolHTTPClient_PolicyOptions_InvalidValueFromConfig_FailsValidationOnResolve()
     {
         // FailureThreshold is a ratio in [0.0, 1.0]. A value of 5.0 is a
         // configuration mistake we want surfaced eagerly with a clear
@@ -190,7 +190,7 @@ public sealed class ModuleInstallerTests
             ["HTTPClients:Sample:Policy:CircuitBreakerFailureThreshold"] = "5.0",
         });
 
-        sut.Services.AddHTTPClient<ISampleHTTPClient, SampleHTTPClient>("Sample");
+        sut.Services.AddSolHTTPClient<ISampleHTTPClient, SampleHTTPClient>("Sample");
         var app = sut.Build();
 
         var act = () => app.Services.GetRequiredService<IOptionsMonitor<HttpPolicyConfiguration>>().Get("Sample");
@@ -200,7 +200,7 @@ public sealed class ModuleInstallerTests
     }
 
     [Test]
-    public void AddHTTPClient_PolicyOptions_NegativeRetries_FailsValidation()
+    public void AddSolHTTPClient_PolicyOptions_NegativeRetries_FailsValidation()
     {
         var sut = NewBuilder();
         sut.Configuration.AddInMemoryCollection(new Dictionary<string, string?>
@@ -209,7 +209,7 @@ public sealed class ModuleInstallerTests
             ["HTTPClients:Sample:Policy:MaxRequestRetries"] = "-1",
         });
 
-        sut.Services.AddHTTPClient<ISampleHTTPClient, SampleHTTPClient>("Sample");
+        sut.Services.AddSolHTTPClient<ISampleHTTPClient, SampleHTTPClient>("Sample");
         var app = sut.Build();
 
         var act = () => app.Services.GetRequiredService<IOptionsMonitor<HttpPolicyConfiguration>>().Get("Sample");
@@ -219,13 +219,13 @@ public sealed class ModuleInstallerTests
     // ---- New: propagateCorrelation opt-out ------------------------------
 
     [Test]
-    public void AddHTTPClient_PropagateCorrelationFalse_DoesNotRegisterCorrelationHandler()
+    public void AddSolHTTPClient_PropagateCorrelationFalse_DoesNotRegisterCorrelationHandler()
     {
         // When the host owns correlation (OpenTelemetry, firm middleware) we
         // must not register our handler — otherwise the AsyncLocal store may
         // diverge from the inbound id.
         var sut = NewBuilder();
-        sut.Services.AddHTTPClient<ISampleHTTPClient, SampleHTTPClient>(
+        sut.Services.AddSolHTTPClient<ISampleHTTPClient, SampleHTTPClient>(
             "Sample",
             new HTTPClientConfiguration { BaseAddress = "http://example/" },
             propagateCorrelation: false);
@@ -237,10 +237,10 @@ public sealed class ModuleInstallerTests
     }
 
     [Test]
-    public void AddHTTPClient_PropagateCorrelationTrue_RegistersCorrelationHandler()
+    public void AddSolHTTPClient_PropagateCorrelationTrue_RegistersCorrelationHandler()
     {
         var sut = NewBuilder();
-        sut.Services.AddHTTPClient<ISampleHTTPClient, SampleHTTPClient>(
+        sut.Services.AddSolHTTPClient<ISampleHTTPClient, SampleHTTPClient>(
             "Sample",
             new HTTPClientConfiguration { BaseAddress = "http://example/" });
 
@@ -250,7 +250,7 @@ public sealed class ModuleInstallerTests
     // ---- New: OverallRequestBudget cross-field validation ---------------
 
     [Test]
-    public void AddHTTPClient_OverallBudgetSmallerThanRequestTimeout_FailsValidation()
+    public void AddSolHTTPClient_OverallBudgetSmallerThanRequestTimeout_FailsValidation()
     {
         var sut = NewBuilder();
         sut.Configuration.AddInMemoryCollection(new Dictionary<string, string?>
@@ -260,7 +260,7 @@ public sealed class ModuleInstallerTests
             ["HTTPClients:Sample:Policy:OverallRequestBudget"] = "1000",
         });
 
-        sut.Services.AddHTTPClient<ISampleHTTPClient, SampleHTTPClient>("Sample");
+        sut.Services.AddSolHTTPClient<ISampleHTTPClient, SampleHTTPClient>("Sample");
 
         // Either Build() (ValidateOnStart) or first resolve raises — accept both
         // to stay tolerant of HostBuilder eager-init changes.
@@ -285,7 +285,7 @@ public sealed class ModuleInstallerTests
         // primitive / string / IFormattable, so binding through the
         // explicit-parameter path must succeed.
         var sut = NewBuilder();
-        sut.Services.AddHTTPClient<ISampleHTTPClient, SampleHTTPClient>(
+        sut.Services.AddSolHTTPClient<ISampleHTTPClient, SampleHTTPClient>(
             "Sample",
             new HTTPClientConfiguration { BaseAddress = "http://example/" },
             new HttpPolicyConfiguration

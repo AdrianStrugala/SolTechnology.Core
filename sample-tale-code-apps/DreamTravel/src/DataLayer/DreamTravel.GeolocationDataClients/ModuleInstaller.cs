@@ -28,11 +28,11 @@ namespace DreamTravel.GeolocationDataClients
         /// </summary>
         public static IServiceCollection InstallGeolocationDataClients(this IServiceCollection services)
         {
-            services.AddHTTPClient<IGoogleHTTPClient, GoogleHTTPClient, GoogleHTTPOptions>("Google");
+            services.AddSolHTTPClient<IGoogleHTTPClient, GoogleHTTPClient, GoogleHTTPOptions>("Google");
             services.Decorate(typeof(IGoogleHTTPClient), typeof(GoogleHTTPClientCachingDecorator));
 
-            services.AddHTTPClient<IMichelinHTTPClient, MichelinHTTPClient, MichelinHTTPOptions>("Michelin");
-            services.AddHTTPClient<IGeoDbHTTPClient, GeoDbHTTPClient>("GeoDb");
+            services.AddSolHTTPClient<IMichelinHTTPClient, MichelinHTTPClient, MichelinHTTPOptions>("Michelin");
+            services.AddSolHTTPClient<IGeoDbHTTPClient, GeoDbHTTPClient>("GeoDb");
 
             return services;
         }

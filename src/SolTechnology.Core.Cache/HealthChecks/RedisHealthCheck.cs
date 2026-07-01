@@ -5,7 +5,7 @@ namespace SolTechnology.Core.Cache.HealthChecks;
 
 /// <summary>
 /// Connectivity health check for the distributed cache (Redis): issues a <c>PING</c> via the
-/// shared <see cref="IConnectionMultiplexer"/> registered by <c>AddDistributedCache</c>.
+/// shared <see cref="IConnectionMultiplexer"/> registered by <c>AddSolDistributedCache</c>.
 /// Reachable → <see cref="HealthStatus.Healthy"/>, unreachable → the configured failure status.
 /// Caller-cancellation is rethrown; a per-call timeout guards against a hung server.
 /// </summary>

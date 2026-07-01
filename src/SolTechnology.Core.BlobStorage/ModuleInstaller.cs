@@ -6,7 +6,7 @@ namespace SolTechnology.Core.BlobStorage
 {
     public static class ModuleInstaller
     {
-        public static IServiceCollection AddBlobStorage(this IServiceCollection services, BlobStorageConfiguration blobStorageConfiguration)
+        public static IServiceCollection AddSolBlobStorage(this IServiceCollection services, BlobStorageConfiguration blobStorageConfiguration)
         {
             if (blobStorageConfiguration == null)
             {

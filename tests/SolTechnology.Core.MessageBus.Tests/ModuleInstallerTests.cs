@@ -33,10 +33,10 @@ public sealed class ModuleInstallerTests
             .AddSingleton(typeof(ILogger<>), typeof(NullLogger<>));
 
     [Test]
-    public void AddMessageBus_registers_required_services()
+    public void AddSolMessageBus_registers_required_services()
     {
         var services = BaseServices()
-            .AddMessageBus(new MessageBusConfiguration
+            .AddSolMessageBus(new MessageBusConfiguration
             {
                 ConnectionString = "Endpoint=sb://example.servicebus.windows.net/;SharedAccessKeyName=k;SharedAccessKey=v",
             });
@@ -51,7 +51,7 @@ public sealed class ModuleInstallerTests
     public void With_methods_collect_endpoints_into_a_single_registry()
     {
         var services = BaseServices()
-            .AddMessageBus(new MessageBusConfiguration
+            .AddSolMessageBus(new MessageBusConfiguration
             {
                 ConnectionString = "Endpoint=sb://example.servicebus.windows.net/;SharedAccessKeyName=k;SharedAccessKey=v",
             })
@@ -82,7 +82,7 @@ public sealed class ModuleInstallerTests
     public void WithQueueReceiver_resolves_queue_name_from_configuration_when_omitted()
     {
         var services = BaseServices()
-            .AddMessageBus(new MessageBusConfiguration
+            .AddSolMessageBus(new MessageBusConfiguration
             {
                 ConnectionString = "Endpoint=sb://example.servicebus.windows.net/;SharedAccessKeyName=k;SharedAccessKey=v",
                 Queues = new List<QueueConfiguration>
@@ -104,7 +104,7 @@ public sealed class ModuleInstallerTests
     public void WithQueueReceiver_throws_when_queue_name_cannot_be_resolved()
     {
         var services = BaseServices()
-            .AddMessageBus(new MessageBusConfiguration
+            .AddSolMessageBus(new MessageBusConfiguration
             {
                 ConnectionString = "Endpoint=sb://example.servicebus.windows.net/;SharedAccessKeyName=k;SharedAccessKey=v",
             });
@@ -116,9 +116,9 @@ public sealed class ModuleInstallerTests
     }
 
     [Test]
-    public void AddMessageBus_throws_when_configuration_is_null()
+    public void AddSolMessageBus_throws_when_configuration_is_null()
     {
-        var act = () => BaseServices().AddMessageBus(null!);
+        var act = () => BaseServices().AddSolMessageBus(null!);
         act.Should().Throw<ArgumentNullException>();
     }
 }

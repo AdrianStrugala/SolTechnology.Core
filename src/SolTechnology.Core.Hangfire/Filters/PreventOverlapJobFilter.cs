@@ -9,7 +9,7 @@ namespace SolTechnology.Core.Hangfire.Filters;
 /// method + arguments is already scheduled or processing. Useful for recurring jobs
 /// where a previous run is mid-retry and the next cron trigger fires.
 /// Apply as <c>[PreventOverlapJobFilter]</c> on the job method, or register globally
-/// via <c>UseSolTechnologyFilters()</c>.
+/// via <c>UseSolFilters()</c>.
 /// </summary>
 public sealed class PreventOverlapJobFilter : JobFilterAttribute, IServerFilter
 {

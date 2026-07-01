@@ -1,7 +1,7 @@
 namespace SolTechnology.Core.Hangfire;
 
 /// <summary>
-/// Descriptor for a recurring job registered via <c>AddRecurringJob&lt;TJob&gt;</c>.
+/// Descriptor for a recurring job registered via <c>AddSolRecurringJob&lt;TJob&gt;</c>.
 /// </summary>
 internal sealed class RecurringJobDescriptor(Type jobType, string cronExpression, bool preventOverlap = false)
 {

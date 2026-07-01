@@ -17,7 +17,10 @@ public class MediatorTests
     {
         var services = new ServiceCollection();
         services.AddLogging();
-        services.AddCQRS(assemblies: typeof(MediatorTests).Assembly);
+        services.AddSolCQRS(o => o
+            .RegisterCommandsFromAssembly(typeof(MediatorTests).Assembly)
+            .RegisterQueriesFromAssembly(typeof(MediatorTests).Assembly)
+            .RegisterEventsFromAssembly(typeof(MediatorTests).Assembly));
         _sp = services.BuildServiceProvider();
         _sut = _sp.CreateScope().ServiceProvider.GetRequiredService<IMediator>();
     }

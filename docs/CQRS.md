@@ -5,12 +5,14 @@ The SolTechnology.Core.CQRS library provides a complete CQRS (Command Query Resp
 ### Registration
 
 ```csharp
-services.AddCQRS();
-
-// Or with explicit assembly scanning and options:
-services.AddCQRS(
-    o => o.UseFluentValidation = true,
-    typeof(Program).Assembly);
+// Configure handler discovery explicitly, one handler family at a time:
+services.AddCQRS(o =>
+{
+    o.UseFluentValidation = true;
+    o.RegisterCommandsFromAssembly(typeof(CreateUserCommand).Assembly);
+    o.RegisterQueriesFromAssembly(typeof(GetUserQuery).Assembly);
+    o.RegisterEventsFromAssembly(typeof(UserCreatedEvent).Assembly);
+});
 ```
 
 ### Defining a Command

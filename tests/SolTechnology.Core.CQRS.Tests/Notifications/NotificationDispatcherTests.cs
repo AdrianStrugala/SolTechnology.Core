@@ -19,7 +19,10 @@ public class NotificationDispatcherTests
         var services = new ServiceCollection();
         services.AddLogging();
         services.AddSingleton(_log);
-        services.AddCQRS(assemblies: typeof(NotificationDispatcherTests).Assembly);
+        services.AddSolCQRS(o => o
+            .RegisterCommandsFromAssembly(typeof(NotificationDispatcherTests).Assembly)
+            .RegisterQueriesFromAssembly(typeof(NotificationDispatcherTests).Assembly)
+            .RegisterEventsFromAssembly(typeof(NotificationDispatcherTests).Assembly));
         _sp = services.BuildServiceProvider();
         _sut = _sp.CreateScope().ServiceProvider.GetRequiredService<IMediator>();
     }

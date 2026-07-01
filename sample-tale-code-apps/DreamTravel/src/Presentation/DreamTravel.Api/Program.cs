@@ -88,11 +88,11 @@ public class Program
 
         //SQL
         var sqlConfiguration = builder.Configuration.GetSection("Sql").Get<SQLConfiguration>()!;
-        builder.Services.AddSQL(sqlConfiguration);
+        builder.Services.AddSolSQL(sqlConfiguration);
 
         // Health checks — chain per-module checks onto the builder Aspire already registered.
         builder.Services.AddHealthChecks()
-            .AddSqlHealthCheck();
+            .AddSolSqlHealthCheck();
 
 
         //Trips
@@ -112,7 +112,7 @@ public class Program
         builder.Services.AddFlows();
 
         //The rest
-        builder.Services.AddLocalCache();
+        builder.Services.AddSolLocalCache();
         builder.Services.AddSolLogging();
         builder.Services.LogDetail(
             "name",
@@ -121,9 +121,8 @@ public class Program
             endpoints: ["/api/v1/FindLocationOfCity", "/api/FindCityByName"]);
 
 
-        var thisAssembly = typeof(Program).Assembly;
-        builder.Services.AddCQRS(assemblies: thisAssembly);
-        builder.Services.AddPersistentEvents();
+        builder.Services.AddSolCQRS();
+        builder.Services.AddSolPersistentEvents();
 
         var authenticationConfiguration = builder.Configuration.GetRequiredSection("Authentication").Get<AuthenticationConfiguration>()!;
         var authFilter = builder.Services.AddAuthenticationAndBuildFilter(authenticationConfiguration);

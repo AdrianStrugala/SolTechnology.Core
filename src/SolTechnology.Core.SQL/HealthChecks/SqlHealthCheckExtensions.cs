@@ -19,7 +19,7 @@ public static class SqlHealthCheckExtensions
     /// <param name="timeout">Per-call probe timeout (default 5s) — guards against a hung server.</param>
     /// <param name="failureStatus">Status reported on failure (default <see cref="HealthStatus.Unhealthy"/>).</param>
     /// <param name="tags">Optional tags for endpoint filtering (e.g. <c>"ready"</c>).</param>
-    public static IHealthChecksBuilder AddSqlHealthCheck(
+    public static IHealthChecksBuilder AddSolSqlHealthCheck(
         this IHealthChecksBuilder builder,
         string name = "sql",
         TimeSpan? timeout = null,
