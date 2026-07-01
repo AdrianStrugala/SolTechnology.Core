@@ -113,7 +113,7 @@ public class Program
 
         //The rest
         builder.Services.AddLocalCache();
-        builder.Services.AddCoreLogging();
+        builder.Services.AddSolLogging();
         builder.Services.LogDetail(
             "name",
             asName: "CityName",
@@ -185,7 +185,7 @@ public class Program
 
         app.UseAuthorization();
         app.UseAuthentication();
-        app.UseCoreLogging();
+        app.UseSolLogging();
 
         app.Use(async (context, next) =>
         {

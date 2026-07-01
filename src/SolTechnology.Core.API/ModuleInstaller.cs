@@ -91,8 +91,8 @@ public static class ModuleInstaller
         this IServiceCollection services,
         Action<ApiExceptionOptions>? configure = null)
     {
-        // Idempotent: AddCoreLogging and AddProblemDetails are both self-guarded.
-        services.AddCoreLogging();
+        // Idempotent: AddSolLogging and AddProblemDetails are both self-guarded.
+        services.AddSolLogging();
 
         // Stamp correlationId on every ProblemDetails the framework produces outside MVC
         // (routing 404, UseStatusCodePages, UseExceptionHandler, auth challenges) so the

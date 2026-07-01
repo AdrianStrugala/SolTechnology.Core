@@ -9,7 +9,7 @@ public class RequestHeadersEnricherTests
     private static ILogScopeEnricher BuildEnricher(Action<LoggingOptions>? configure = null)
     {
         var services = new ServiceCollection();
-        services.AddCoreLogging(o =>
+        services.AddSolLogging(o =>
         {
             // Header logging is off by default; tests opt in unless overridden.
             o.LogRequestHeaders = true;

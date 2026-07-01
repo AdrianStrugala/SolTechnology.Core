@@ -104,15 +104,15 @@ public sealed class CorrelationPropagationTests
     }
 
     [Test]
-    public async Task AddCorrelationIdService_RegistrationIsIdempotent()
+    public async Task AddSolCorrelationIdService_RegistrationIsIdempotent()
     {
-        // ModuleInstaller calls AddCorrelationIdService for every typed client;
-        // calling AddCoreLogging in the same host adds it again. Both paths
+        // ModuleInstaller calls AddSolCorrelationIdService for every typed client;
+        // calling AddSolLogging in the same host adds it again. Both paths
         // must resolve to the SAME singleton instance — otherwise inbound
         // middleware and outbound handler see different AsyncLocal stores.
         var services = new ServiceCollection();
-        services.AddCorrelationIdService();
-        services.AddCorrelationIdService();
+        services.AddSolCorrelationIdService();
+        services.AddSolCorrelationIdService();
 
         var sp = services.BuildServiceProvider();
 

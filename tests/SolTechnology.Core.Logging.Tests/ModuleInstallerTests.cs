@@ -10,10 +10,10 @@ namespace SolTechnology.Core.Logging.Tests;
 public class ModuleInstallerTests
 {
     [Test]
-    public void AddCoreLogging_registers_correlation_service_as_singleton()
+    public void AddSolLogging_registers_correlation_service_as_singleton()
     {
         var services = new ServiceCollection();
-        services.AddCoreLogging();
+        services.AddSolLogging();
         var sp = services.BuildServiceProvider();
 
         var first = sp.GetRequiredService<ICorrelationIdService>();
@@ -23,20 +23,20 @@ public class ModuleInstallerTests
     }
 
     [Test]
-    public void AddCoreLogging_is_idempotent()
+    public void AddSolLogging_is_idempotent()
     {
         var services = new ServiceCollection();
-        services.AddCoreLogging();
-        services.AddCoreLogging();
+        services.AddSolLogging();
+        services.AddSolLogging();
 
         services.Count(d => d.ServiceType == typeof(ICorrelationIdService)).Should().Be(1);
     }
 
     [Test]
-    public void AddCoreLogging_validates_options_on_resolution()
+    public void AddSolLogging_validates_options_on_resolution()
     {
         var services = new ServiceCollection();
-        services.AddCoreLogging(o => o.MaxLoggedJsonBodyBytes = -1);
+        services.AddSolLogging(o => o.MaxLoggedJsonBodyBytes = -1);
         var sp = services.BuildServiceProvider();
 
         var act = () => sp.GetRequiredService<IOptions<LoggingOptions>>().Value;
@@ -45,10 +45,10 @@ public class ModuleInstallerTests
     }
 
     [Test]
-    public void AddCoreLogging_rejects_whitespace_skip_paths()
+    public void AddSolLogging_rejects_whitespace_skip_paths()
     {
         var services = new ServiceCollection();
-        services.AddCoreLogging(o => o.SkipPaths = new[] { "/health", "  " });
+        services.AddSolLogging(o => o.SkipPaths = new[] { "/health", "  " });
         var sp = services.BuildServiceProvider();
 
         var act = () => sp.GetRequiredService<IOptions<LoggingOptions>>().Value;
@@ -60,7 +60,7 @@ public class ModuleInstallerTests
     public void LogDetail_registers_descriptor_and_aggregating_enricher_once()
     {
         var services = new ServiceCollection();
-        services.AddCoreLogging();
+        services.AddSolLogging();
         services.LogDetail("X-Tenant-Id", asName: "TenantId", source: LogDetailSource.Header);
         services.LogDetail("name", source: LogDetailSource.Body);
 
@@ -68,7 +68,7 @@ public class ModuleInstallerTests
         var enrichers = sp.GetServices<ILogScopeEnricher>().ToArray();
 
         // Two LogDetail calls but a single aggregating LogDetail enricher,
-        // plus the always-on RequestHeadersEnricher registered by AddCoreLogging.
+        // plus the always-on RequestHeadersEnricher registered by AddSolLogging.
         enrichers.Should().HaveCount(2);
     }
 
@@ -78,12 +78,12 @@ public class ModuleInstallerTests
     }
 
     [Test]
-    public void AddLogScopeEnricher_appends_user_enricher_alongside_built_in()
+    public void AddSolLogScopeEnricher_appends_user_enricher_alongside_built_in()
     {
         var services = new ServiceCollection();
-        services.AddCoreLogging();
+        services.AddSolLogging();
         services.LogDetail("X-Tenant-Id", source: LogDetailSource.Header);
-        services.AddLogScopeEnricher<DummyEnricher>();
+        services.AddSolLogScopeEnricher<DummyEnricher>();
 
         var sp = services.BuildServiceProvider();
         var enrichers = sp.GetServices<ILogScopeEnricher>().ToArray();

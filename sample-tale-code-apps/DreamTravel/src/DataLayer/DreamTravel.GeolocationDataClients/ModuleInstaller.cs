@@ -21,7 +21,7 @@ namespace DreamTravel.GeolocationDataClients
         /// </para>
         /// <para>
         /// Correlation propagation stays on (the default) because both the API
-        /// and Worker hosts use <c>AddCoreLogging</c>; the outbound
+        /// and Worker hosts use <c>AddSolLogging</c>; the outbound
         /// <c>X-Correlation-Id</c> matches the inbound one written by the
         /// logging middleware.
         /// </para>

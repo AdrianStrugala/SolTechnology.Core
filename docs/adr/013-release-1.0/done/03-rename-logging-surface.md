@@ -1,7 +1,7 @@
 ---
 adr: 013-release-1.0
 step: 03 of 11
-status: reviewed
+status: done
 ---
 
 <!-- Reviewed (2026-06-30): locked the name map (answer 1: AddCoreLogging→AddSolLogging,
@@ -61,4 +61,22 @@ keeps every later wave free of cross-module breakage. Pure DI/middleware plumbin
 
 ## Open questions
 - none — naming transform and `LogDetail` are resolved at step 00.
+
+## Retrospective — Implementation Deviations
+- **Optional class rename applied.** Per the user's explicit go ("razem z opcjonalnymi"), the class
+  `LoggingServiceCollectionExtensions` was renamed to `ModuleInstaller` (`ClaudeCodingGuide` §2).
+- **`docs/Log.md` swept fully.** Every old symbol reference in `docs/Log.md` (code snippets +
+  inline backticks) was replaced with the `Sol`-prefixed name — treated as a pure symbol swap, not
+  prose re-authoring. `CoreLoggingActivitySources` and the `SolTechnology.Core.Logging` namespace
+  were left unchanged (not in the rename map).
+- **Published ADR left untouched.** `docs/adr/013-release-1.0.md` still names the old symbols at
+  lines 14/50/51 — these are the plan's historical "before" state; editing a published ADR is
+  forbidden (CLAUDE.md §1). Remaining grep hits are ADR/plan files describing the rename map.
+- **Test method names renamed to match.** `AddCoreLogging_*` → `AddSolLogging_*`,
+  `AddLogScopeEnricher_*` → `AddSolLogScopeEnricher_*`, and
+  `AddCorrelationIdService_RegistrationIsIdempotent` → `AddSolCorrelationIdService_RegistrationIsIdempotent`.
+- **DreamTravel XML-doc caller fixed.** `DreamTravel.GeolocationDataClients/ModuleInstaller.cs` had a
+  `<c>AddCoreLogging</c>` XML-doc reference caught by the M1 sweep — updated to `AddSolLogging`.
+- **Validation:** `dotnet build SolTechnology.Core.slnx -c Release` green (0 errors);
+  `SolTechnology.Core.Logging.Tests` 43/43 pass; `SolTechnology.Core.HTTP.Tests` 79/79 pass.
 

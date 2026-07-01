@@ -72,8 +72,8 @@ namespace SolTechnology.Core.HTTP
 
             if (propagateCorrelation)
             {
-                // Idempotent; shared with Core.Logging.AddCoreLogging.
-                services.AddCorrelationIdService();
+                // Idempotent; shared with Core.Logging.AddSolLogging.
+                services.AddSolCorrelationIdService();
                 services.TryAddTransient<CorrelationPropagatingHandler>();
             }
 

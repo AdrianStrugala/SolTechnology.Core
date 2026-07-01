@@ -10,10 +10,10 @@ namespace SolTechnology.Core.Logging;
 
 /// <summary>
 /// DI / pipeline wiring for <c>SolTechnology.Core.Logging</c>. Use
-/// <c>AddCoreLogging</c> in <c>ConfigureServices</c> and <see cref="UseCoreLogging"/>
+/// <c>AddSolLogging</c> in <c>ConfigureServices</c> and <see cref="UseSolLogging"/>
 /// in the request pipeline (early — before <c>UseRouting</c>).
 /// </summary>
-public static class LoggingServiceCollectionExtensions
+public static class ModuleInstaller
 {
     /// <param name="services">DI container.</param>
     extension(IServiceCollection services)
@@ -22,7 +22,7 @@ public static class LoggingServiceCollectionExtensions
         /// Registers the correlation service used by <see cref="LoggingMiddleware"/>.
         /// Safe to call multiple times.
         /// </summary>
-        public IServiceCollection AddCoreLogging(Action<LoggingOptions>? configure = null)
+        public IServiceCollection AddSolLogging(Action<LoggingOptions>? configure = null)
         {
             services.TryAddSingleton<ICorrelationIdService, CorrelationIdService>();
             services.TryAddSingleton(TimeProvider.System);
@@ -50,7 +50,7 @@ public static class LoggingServiceCollectionExtensions
         /// <c>Logging:Core</c> (see <see cref="LoggingOptions.SectionName"/>) and registers
         /// the correlation service.
         /// </summary>
-        public IServiceCollection AddCoreLogging(IConfiguration configuration)
+        public IServiceCollection AddSolLogging(IConfiguration configuration)
         {
             ArgumentNullException.ThrowIfNull(configuration);
 
@@ -110,7 +110,7 @@ public static class LoggingServiceCollectionExtensions
         /// Registers a custom <see cref="ILogScopeEnricher"/> when <see cref="LogDetail"/> is not
         /// expressive enough (e.g. composing a value from claims, multiple sources, async lookups).
         /// </summary>
-        public IServiceCollection AddLogScopeEnricher<TEnricher>()
+        public IServiceCollection AddSolLogScopeEnricher<TEnricher>()
             where TEnricher : class, ILogScopeEnricher
         {
             services.AddSingleton<ILogScopeEnricher, TEnricher>();
@@ -120,15 +120,15 @@ public static class LoggingServiceCollectionExtensions
         /// <summary>
         /// Registers only the <see cref="ICorrelationIdService"/> — without the request-
         /// logging middleware or <see cref="LoggingOptions"/> apparatus that
-        /// <c>AddCoreLogging</c> brings.
+        /// <c>AddSolLogging</c> brings.
         /// <para>
         /// Intended for non-ASP.NET consumers (workers, background jobs, library packages
         /// such as <c>SolTechnology.Core.HTTP</c>) that need to read or seed the ambient
         /// correlation id but don't host an HTTP pipeline. Idempotent — safe to call from
-        /// multiple installers; <c>AddCoreLogging</c> reuses the same registration.
+        /// multiple installers; <c>AddSolLogging</c> reuses the same registration.
         /// </para>
         /// </summary>
-        public IServiceCollection AddCorrelationIdService()
+        public IServiceCollection AddSolCorrelationIdService()
         {
             services.TryAddSingleton<ICorrelationIdService, CorrelationIdService>();
             return services;
@@ -139,7 +139,7 @@ public static class LoggingServiceCollectionExtensions
     /// Adds the request-logging middleware. Should be registered early in the pipeline
     /// (before <c>UseRouting</c>) so that all requests are observed.
     /// </summary>
-    public static IApplicationBuilder UseCoreLogging(this IApplicationBuilder app)
+    public static IApplicationBuilder UseSolLogging(this IApplicationBuilder app)
         => app.UseMiddleware<LoggingMiddleware>();
 
     private static void EnsureLogDetailEnricherRegistered(IServiceCollection services)

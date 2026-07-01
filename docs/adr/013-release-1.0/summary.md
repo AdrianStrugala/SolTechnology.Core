@@ -9,7 +9,7 @@ Tracking the implementation steps for the spec [`../013-release-1.0.md`](../013-
 | 00 | Run premortem (gate) + resolve open questions | [`done/00-run-premortem.md`](done/00-run-premortem.md) | ✅ done — **Go with mitigations** |
 | 01 | CI: gate publish behind release trigger + pack-by-glob | [`done/01-ci-publish-gate-and-glob-pack.md`](done/01-ci-publish-gate-and-glob-pack.md) | ✅ done |
 | 02 | Centralise NuGet metadata + SourceLink + README wiring (docs-sourced, no version change) | [`done/02-nuget-metadata-and-sourcelink.md`](done/02-nuget-metadata-and-sourcelink.md) | ✅ done |
-| 03 | Rename wave 1 — Logging surface (+ Api/HTTP callers) | [`reviewed/03-rename-logging-surface.md`](reviewed/03-rename-logging-surface.md) | 🔍 reviewed |
+| 03 | Rename wave 1 — Logging surface (+ Api/HTTP callers) | [`done/03-rename-logging-surface.md`](done/03-rename-logging-surface.md) | ✅ done |
 | 04 | Rename wave 2 — data + transport modules | [`reviewed/04-rename-data-and-transport-modules.md`](reviewed/04-rename-data-and-transport-modules.md) | 🔍 reviewed |
 | 05 | Rename wave 3 — Api + Authentication (rename only) | [`reviewed/05-rename-api-authentication.md`](reviewed/05-rename-api-authentication.md) | 🔍 reviewed |
 | 05b | Tale rebrand + package rename (`Story` → `Tale`) + route/controller/snapshot (13c) | [`reviewed/05b-tale-rebrand-and-package-rename.md`](reviewed/05b-tale-rebrand-and-package-rename.md) | 🔍 reviewed |
