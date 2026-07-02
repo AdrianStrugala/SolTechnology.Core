@@ -1,16 +1,16 @@
-# Story framework — one `StoryHandler.Handle()` call
+# Tale framework — one `TaleHandler.Handle()` call
 
 The runtime view that complements the
-[component diagram](./story-framework-components.md): a single
-`StoryHandler.Handle(input, ct)` invocation — build the plan, interpret the steps, let a
+[component diagram](./tale-framework-components.md): a single
+`TaleHandler.Handle(input, ct)` invocation — build the plan, interpret the steps, let a
 `Chapter` mutate the shared `Context`, then project the `Output`. The `Caller` actor is whatever
 CQRS command/query dispatch invokes the handler. Derived from
-[`StoryHandler.cs`](../../src/SolTechnology.Core.Story/StoryHandler.cs) (`Handle`),
-[`Tale/Tale.cs`](../../src/SolTechnology.Core.Story/Tale/Tale.cs) (`Finale`),
-[`Orchestration/StoryEngine.cs`](../../src/SolTechnology.Core.Story/Orchestration/StoryEngine.cs)
+[`TaleHandler.cs`](../../src/SolTechnology.Core.Tale/TaleHandler.cs) (`Handle`),
+[`Tale.cs`](../../src/SolTechnology.Core.Tale/Tale.cs) (`Finale`),
+[`Orchestration/TaleEngine.cs`](../../src/SolTechnology.Core.Tale/Orchestration/TaleEngine.cs)
 (`Initialize` / `Run` / `ExecuteChapter` / `GetResult`),
-[`Chapter.cs`](../../src/SolTechnology.Core.Story/Chapter.cs) (`Read`) and
-[`Persistence/IStoryRepository.cs`](../../src/SolTechnology.Core.Story/Persistence/IStoryRepository.cs).
+[`Chapter.cs`](../../src/SolTechnology.Core.Tale/Chapter.cs) (`Read`) and
+[`Persistence/ITaleRepository.cs`](../../src/SolTechnology.Core.Tale/Persistence/ITaleRepository.cs).
 
 ## Sequence diagram
 
@@ -19,13 +19,13 @@ sequenceDiagram
     autonumber
     actor Caller
     box Logic
-        participant Handler as StoryHandler
+        participant Handler as TaleHandler
         participant Builder as Tale (builder + plan)
-        participant Engine as StoryEngine
+        participant Engine as TaleEngine
         participant Chapter as Chapter
     end
     box Data
-        participant Repo as IStoryRepository
+        participant Repo as ITaleRepository
     end
     box Domain
         participant Context as Context
@@ -39,9 +39,9 @@ sequenceDiagram
 
     Handler->>Engine: construct + Initialize(Context, GetType(), resumeInput, ct)
     activate Engine
-    opt resuming a persisted story
+    opt resuming a persisted tale
         Engine->>Repo: FindById(storyId)
-        Repo-->>Engine: StoryInstance?
+        Repo-->>Engine: TaleInstance?
     end
     Engine-->>Handler: Result.Success()
     deactivate Engine
@@ -83,7 +83,7 @@ sequenceDiagram
         Context-->>Engine: TOutput
         Engine-->>Handler: Result&lt;TOutput&gt;.Success(output)
     else lost / paused / cancelled
-        Engine-->>Handler: Result&lt;TOutput&gt;.Fail(Error / StoryPausedError / StoryCancelledError)
+        Engine-->>Handler: Result&lt;TOutput&gt;.Fail(Error / TalePausedError / TaleCancelledError)
     end
     deactivate Engine
 
@@ -106,10 +106,10 @@ sequenceDiagram
 - `Run` (step 8) hands the plan to the **interpreter**; the loop body (steps 9–16) handles one
   `TaleStep` per pass — a `ReadStep` resolves the `Chapter` from DI (steps 9–10) and calls
   `Read(Context)` (step 11), which mutates the shared `Context` (step 12). Other step kinds map
-  to the engine's `Apply*` handlers (step 15). The first failure flips the story to the lost
+  to the engine's `Apply*` handlers (step 15). The first failure flips the tale to the lost
   track and later steps short-circuit until an `Otherwise` recovers.
 - `GetResult` (step 18) projects the final `Context` into `TOutput` on the won track
-  (steps 19–21), or surfaces the first `Error` / `StoryPausedError` / `StoryCancelledError`
+  (steps 19–21), or surfaces the first `Error` / `TalePausedError` / `TaleCancelledError`
   otherwise (step 22).
 
 

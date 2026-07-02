@@ -212,9 +212,42 @@ publish is a clean `1.0.0`; `SolTechnology.Core.Story` is retired (**unlisted** 
 
 ## Implementation
 
-Multi-step plan in [`013-release-1.0/`](013-release-1.0/summary.md). Premortem gate
-(`00-run-premortem.md`) runs first and **must** return *Go* / *Go with mitigations* — and answer the
-open questions it enumerates — before any code step ships.
+Delivered as an 11-step plan (plus the split-out `05b`), gated by a premortem (`00`) that returned
+**Go with mitigations**. See the **Implementation summary** below — the per-step working folder
+(`013-release-1.0/`) was deleted per the [ADR-006](006-implementation-plan-workflow.md) §5
+collapse-on-completion rule.
+
+## Implementation summary
+
+Completed 2026-07-01. All 11 steps shipped (step `05` was split into `05` + `05b` when the accepted
+"Tale noun" decision made the `Story → Tale` rebrand the single largest rename). The per-step working
+folder (`docs/adr/013-release-1.0/`) was deleted per the ADR-006 collapse-on-completion rule; this
+section is the durable record.
+
+| # | Step | Shipped |
+|---|---|---|
+| 00 | Premortem gate | **Go with mitigations** — open questions resolved (`13a`→B2, `13b`→rename skill, `13c`→`api/tale`, breaking accepted). |
+| 01 | CI publish gate + pack-by-glob | `.github/workflows/publishPackages.yml` gates publish behind the release trigger, packs the 21 `src/` slnx projects by glob, adds the `unlist-deprecated` job; `checkout@v2`→`@v4`. |
+| 02 | NuGet metadata + SourceLink | Centralised license/icon/readme/repository + SourceLink into `src/Directory.Build.props`; added `LICENSE` (MIT), `docs/API.Testing.md`, `docs/SQL.Testing.md`; `Core` keeps the root `README.md`. |
+| 03 | Rename wave 1 — Logging | `AddCoreLogging`→`AddSolLogging` (+ `LogScopeEnricher`/`CorrelationIdService`), class → `ModuleInstaller`; Api/HTTP callers + `docs/Log.md` swept; Logging 43 + HTTP 79 tests green. |
+| 04 | Rename wave 2 — data + transport | 18 public symbols renamed (`AddCQRS`→`AddSolCQRS`, `AddHTTPClient`→`AddSolHTTPClient`, MessageBus/Cache/SQL/Hangfire); all in-slnx + DreamTravel call sites updated; docs deferred to step 11. |
+| 05 | Rename wave 3 — Api + Authentication | `AddVersioning`→`AddSolVersioning` + Authentication registration renames, mechanical only. |
+| 05b | Tale rebrand + package rename | New package identity `SolTechnology.Core.Tale`, ~15 public types `Story*`→`Tale*`, namespace collapse, route `api/story`→`api/tale`, tests + DreamTravel sample; manager/controller verb methods intentionally keep the `Story` suffix. |
+| 06 | Authentication anti-pattern fix | Removed the `BuildServiceProvider` call; added the `SolTechnology.Core.Authentication.Tests` host. |
+| 07 | Deprecate Scheduler + Guards | `[Obsolete]` + `<IsPackable>false>` on the source-bearing deprecated libs; `Story` ghost handled via the step-10 runbook (unlist). |
+| 08 | Version flip 1.0.0 | Shared version → `1.0.0` (Logging `1.2.0`; Tale ships its first at `1.0.0`, clean new id, no downgrade). |
+| 09 | README + successors + parity | README rows for the `HTTP` (ApiClient successor) + `Tale` packages; owns `Clients.md`. |
+| 10 | Runbook + dontreadme + CICD | `docs/release-runbook-1.0.md`, filled `docs/CICD.md`, `dontreadme.md` successor rows; migration guide + CHANGELOG dropped (pre-1.0). Unlist via `dotnet nuget delete` (no `deprecate` CLI). |
+| 11 | Doc integrity sweep | `Story.md`→`Tale.md` rewrite, skill `command-query-event-story`→`command-query-event-tale`, guide/CLAUDE/theDesign/diagrams swept, deprecation banners on Guards/Flow, canonical-versions reconciled; build green, live docs free of dead links. |
+
+### Preserved deviations
+
+- **Manager/controller verb methods keep the `Story` suffix** (`TaleManager.StartStory/ResumeStory/CancelStory/GetStoryState`, `TaleOptions.TaleIdPrefix = "STR"`). The *types* are `Tale*`; these method names were intentionally not renamed in 05b. Tale docs mirror the real API, not a naïve global rename.
+- **Deprecated docs are landing pages, not deletions.** `Cron.md` / `Guards.md` / `Flow.md` kept with deprecation banners (Guards→FluentValidation `AbstractValidator<T>`, Flow→Tale); only `Story.md` was deleted (superseded by `Tale.md`).
+- **Docs were swept only in step 11.** Steps 03–05b renamed symbols in `src`/`tests`/sample and their XML-doc/comment/exception/log strings but deliberately left `docs/` untouched until the step-11 integrity pass.
+- **Published historical ADRs left as-is.** ADR-002 / ADR-011 (Story framework + SQLite) and the "before" symbol names in this ADR are historical records, not renamed (CLAUDE.md §1).
+- **Pre-1.0 scope cuts.** No `MIGRATION-0.x-to-1.0.md`, no `CHANGELOG.md`, no per-`src` READMEs (root/`docs/*.md` READMEs reused); server-side nuget.org *deprecation* dropped in favour of CI *unlist*.
+- **Diagrams renamed to match code** (`story-*`→`tale-*`, `Story*`→`Tale*`) as a rename-to-match fix, not new `diagram`-agent authoring.
 
 
 

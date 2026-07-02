@@ -110,12 +110,12 @@ dismissing it.
 | Module(s) in diff | Reference file |
 |---|---|
 | `SolTechnology.Core.CQRS` | [`references/cqrs.md`](references/cqrs.md) |
-| `SolTechnology.Core.Story` | [`references/story.md`](references/story.md) |
+| `SolTechnology.Core.Tale` | [`references/story.md`](references/story.md) |
 | `SolTechnology.Core.Logging` | [`references/logging.md`](references/logging.md) |
 | `SolTechnology.Core.HTTP`, `SolTechnology.Core.ApiClient` | [`references/http.md`](references/http.md) |
 | `SolTechnology.Core.MessageBus` | [`references/messagebus.md`](references/messagebus.md) |
 | `SolTechnology.Core.SQL` | [`references/sql.md`](references/sql.md) |
-| `SolTechnology.Core.BlobStorage` | [`references/blob.md`](references/blob.md) |
+| `SolTechnology.Core.Blob` | [`references/blob.md`](references/blob.md) |
 | `SolTechnology.Core.Cache` | [`references/cache.md`](references/cache.md) |
 | Any `ModuleInstaller.cs` change | [`references/di.md`](references/di.md) |
 | `Directory.Build.props`, `src/Directory.Build.props`, TFM bump | [`references/build-and-nuget.md`](references/build-and-nuget.md) |

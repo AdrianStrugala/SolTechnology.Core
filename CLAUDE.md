@@ -85,7 +85,7 @@ indexes are routing hints, not contracts.
 | package-management | [`.github/skills/package-management/SKILL.md`](.github/skills/package-management/SKILL.md) | Adding / bumping a `PackageReference` — looks up the canonical version, prevents drift and version-by-memory hallucination. |
 | dependency-audit | [`.github/skills/dependency-audit/SKILL.md`](.github/skills/dependency-audit/SKILL.md) | Resolving `NU1901`–`NU1904` CVE warnings or `NU1605` downgrades. Drives the parent-lookup → fix-at-source → override-only-as-last-resort flow from §5. |
 | test-writing | [`.github/skills/test-writing/SKILL.md`](.github/skills/test-writing/SKILL.md) | Authoring or extending tests under `tests/` (NUnit) or sample apps (NUnit for DreamTravel). Encodes the FluentAssertions + NSubstitute + AutoFixture stack and the `// Arrange` / `// Act` / `// Assert` convention from `ClaudeCodingGuide.md` §8. |
-| command-query-event-story | [`.github/skills/command-query-event-story/SKILL.md`](.github/skills/command-query-event-story/SKILL.md) | Authoring a command, query, fire-and-forget event, or Story (chapters) in any app built on the `SolTechnology.Core.CQRS` / `.Story` NuGet packages — per `ClaudeCodingGuide.md` §0/§3/§4/§11 and the DreamTravel reference app. Covers Stories hosted in `Commands`/`Queries`, domain-model Stories in `DomainServices`, persisted interactive `Workflows`, and `[LogScope]` logging. Routes tests to `test-writing`, review to `code-review`, cleanup to `refactor`. |
+| command-query-event-tale | [`.github/skills/command-query-event-tale/SKILL.md`](.github/skills/command-query-event-tale/SKILL.md) | Authoring a command, query, fire-and-forget event, or Tale (chapters) in any app built on the `SolTechnology.Core.CQRS` / `.Tale` NuGet packages — per `ClaudeCodingGuide.md` §0/§3/§4/§11 and the DreamTravel reference app. Covers Tales hosted in `Commands`/`Queries`, domain-model Tales in `DomainServices`, persisted interactive `Workflows`, and `[LogScope]` logging. Routes tests to `test-writing`, review to `code-review`, cleanup to `refactor`. |
 | refactor | [`.github/skills/refactor/SKILL.md`](.github/skills/refactor/SKILL.md) | Behaviour-preserving cleanup inside a single module — rename internals, split a class above the §9 size budget, extract a primary constructor, remove `#region`, pay down a §15 anti-pattern. Routes to `implementation-planning` if scope grows past one module or touches a public symbol. |
 | implement-plan | [`.github/skills/implement-plan/SKILL.md`](.github/skills/implement-plan/SKILL.md) | Executing one step from an ADR's `to-do/` or `reviewed/` folder. Moves the file to `done/`, updates the summary, optionally records deviations. |
 
@@ -184,7 +184,7 @@ touch `Directory.Build.props`.
 | Project / folder layout, layer dependencies | `docs/ClaudeCodingGuide.md` §1 |
 | `ModuleInstaller` pattern | `docs/ClaudeCodingGuide.md` §2 |
 | CQRS (commands, queries, validators) | `docs/ClaudeCodingGuide.md` §3 |
-| Story Framework (chapters, contexts, persistence) | `docs/ClaudeCodingGuide.md` §4 |
+| Tale Framework (chapters, contexts, persistence) | `docs/ClaudeCodingGuide.md` §4 |
 | DataLayer (SQL, HTTP clients, repositories) | `docs/ClaudeCodingGuide.md` §5 |
 | Domain layer rules | `docs/ClaudeCodingGuide.md` §6 |
 | API / `Program.cs` / controllers | `docs/ClaudeCodingGuide.md` §7 |
@@ -259,11 +259,11 @@ If any item fails, fix it before yielding.
 
 | Symptom | Cause / fix |
 |---|---|
-| `RegisterCommands` / `RegisterQueries` / `RegisterStories` find nothing | Called from the wrong assembly. They use `Assembly.GetCallingAssembly()` — invoke from inside the assembly that owns the handlers. |
+| `RegisterCommands` / `RegisterQueries` / `AddSolTale` find nothing | Called from the wrong assembly. They use `Assembly.GetCallingAssembly()` — invoke from inside the assembly that owns the handlers. |
 | `dotnet test` "no tests discovered" | Tests live in `tests/` (outside `src/`). Path: `tests/<Project>.Tests`. |
 | AUID JSON round-trip drops the value | The consumer is using `PackageReference` to `SolTechnology.Core.AUID` instead of `ProjectReference` in the sample; `AuidJsonConverter` is missing. |
-| Story JSON deserialisation case-sensitive issues | Use `StoryJsonOptions.Default` (`PropertyNameCaseInsensitive = true`, `IncludeFields = true`). |
-| Interactive story fails immediately | Ensure `RegisterStories()` is called — it wires `StoryManager` + in-memory persistence by default. For durable persistence, use `.UseStoryRepository<T>()` (see `DreamTravel.SQLite` sample). |
+| Tale JSON deserialisation case-sensitive issues | Use `TaleJsonOptions.Default` (`PropertyNameCaseInsensitive = true`, `IncludeFields = true`). |
+| Interactive tale fails immediately | Ensure `AddSolTale()` is called — it wires `TaleManager` + in-memory persistence by default. For durable persistence, use `.UseTaleRepository<T>()` (see `DreamTravel.SQLite` sample). |
 | Workload missing on CI | Run `dotnet workload restore SolTechnology.Core.slnx` before `restore` / `build`. See `.github/workflows/publishPackages.yml`. |
 | Edits applied via tool don't show in `git diff` | An IDE buffer is overwriting the file. Ask the user to close the file in their IDE, then re-apply. |
 

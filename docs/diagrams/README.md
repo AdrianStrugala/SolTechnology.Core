@@ -7,8 +7,8 @@ authored via the [`diagram` agent](../../.github/agents/diagram.agent.md).
 
 | Diagram | Type | Covers |
 |---|---|---|
-| [`story-framework-components.md`](./story-framework-components.md) | Component | Story core types after the railway→Tale migration — `StoryHandler` → `Tale` (builder/plan) → `StoryEngine` → `Chapter` → `Context`, with the plan-vs-interpreter split. |
-| [`story-handle-sequence.md`](./story-handle-sequence.md) | Sequence | One `StoryHandler.Handle()` call: build plan → `StoryEngine.Run` → `ExecuteChapter` → `Chapter.Read` mutates `Context` → `GetResult` projects `Output`. |
+| [`tale-framework-components.md`](./tale-framework-components.md) | Component | Tale core types after the railway→Tale migration — `TaleHandler` → `Tale` (builder/plan) → `TaleEngine` → `Chapter` → `Context`, with the plan-vs-interpreter split. |
+| [`tale-handle-sequence.md`](./tale-handle-sequence.md) | Sequence | One `TaleHandler.Handle()` call: build plan → `TaleEngine.Run` → `ExecuteChapter` → `Chapter.Read` mutates `Context` → `GetResult` projects `Output`. |
 | [`tale-code-flow.md`](./tale-code-flow.md) | Flowchart | DreamTravel's `CalculateBestPathTale` as a won/lost-track flow — `Open` → `Expect` → `Read` chapters → `Otherwise` recovery → `WhenLost` → `Finale`. Embeddable companion to `taleCodeFlow.drawio`. |
 
 ## Conventions

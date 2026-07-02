@@ -34,7 +34,7 @@ Collect every `*.md` under [docs/](../../../docs/) and the workspace root.
 For each folder `src/SolTechnology.Core.<Module>/`:
 
 - A documentation file exists under [docs/](../../../docs/) (the file name is set by
-  [README.md](../../../README.md) — e.g. `Story` → `docs/Story.md`,
+  [README.md](../../../README.md) — e.g. `Tale` → `docs/Tale.md`,
   `MessageBus` → `docs/Bus.md`).
 - The module is listed in the README table with a NuGet badge.
 - A review template exists under [docs/reviews/](../../../docs/reviews/) when the module is

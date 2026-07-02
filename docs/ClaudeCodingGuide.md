@@ -67,7 +67,7 @@ Presentation ──► LogicLayer ──► DataLayer ──► Infrastructure
 
 Concrete rules:
 
-- `Domain` references **nothing** (no EF, no MediatR, no Story, no logging).
+- `Domain` references **nothing** (no EF, no MediatR, no Tale, no logging).
 - `DataLayer` may reference `Domain` and `SolTechnology.Core.*` packages — never `LogicLayer` or `Presentation`.
 - `LogicLayer` may reference `DataLayer`, `Domain`, `Infrastructure`, and core packages — never `Presentation`.
 - `Presentation` references everything below it but contains no business rules.
@@ -104,7 +104,7 @@ public static class ModuleInstaller
     public static IServiceCollection InstallTripsQueries(this IServiceCollection services)
     {
         services.RegisterQueries();   // SolTechnology.Core.CQRS scans the calling assembly
-        services.RegisterStories();   // SolTechnology.Core.Story scans chapters & handlers
+        services.AddSolTale();        // SolTechnology.Core.Tale scans chapters & handlers
         services.AddTransient<ITSP, AntColony>();
         return services;
     }
@@ -116,7 +116,7 @@ Rules:
 - One `Install<ProjectName>(this IServiceCollection)` extension method per project. Name it after the project domain, not the type — `InstallTripsQueries`, not `AddQueryHandlers`.
 - `ModuleInstaller` lives at the project root, never nested.
 - `Program.cs` calls only these extensions. It must not register individual services itself (with the narrow exception of framework wiring: CORS, Swagger, Auth, MVC filters, MediatR root, configuration binding).
-- Do not call `RegisterCommands` / `RegisterQueries` / `RegisterStories` from `Program.cs` — they use `Assembly.GetCallingAssembly()` and must be invoked from inside the assembly that owns the handlers.
+- Do not call `RegisterCommands` / `RegisterQueries` / `AddSolTale` from `Program.cs` — they use `Assembly.GetCallingAssembly()` and must be invoked from inside the assembly that owns the handlers.
 - Decorators go in the installer right after the registration they decorate (`services.Decorate(typeof(IGoogleHTTPClient), typeof(GoogleHTTPClientCachingDecorator));`).
 
 ---
@@ -131,8 +131,8 @@ One folder per use case. Folder name = use case name. Inside the folder:
 LogicLayer/DreamTravel.Queries/CalculateBestPath/
   CalculateBestPathQuery.cs        ← input + validator (one file)
   CalculateBestPathResult.cs       ← output DTO
-  CalculateBestPathContext.cs      ← Story context (only if it's a Story)
-  CalculateBestPathTale.cs         ← StoryHandler implementation
+  CalculateBestPathContext.cs      ← Tale context (only if it's a Tale)
+  CalculateBestPathTale.cs         ← TaleHandler implementation
   Chapters/
     0.InitiateContext.cs
     1.DownloadRoadData.cs
@@ -141,7 +141,7 @@ LogicLayer/DreamTravel.Queries/CalculateBestPath/
     4.FormCalculateBestPathResult.cs
 ```
 
-For a simple (non-Story) handler the folder shrinks to:
+For a simple (non-Tale) handler the folder shrinks to:
 
 ```
 FetchTraffic/
@@ -156,8 +156,8 @@ FetchTraffic/
 - **Result class** is a plain DTO — no behavior, no nullable mystery.
 - **Handler** implements `IQueryHandler<,>` or `ICommandHandler<>` from `SolTechnology.Core.CQRS`. Always returns `Result` / `Result<T>`. Never throws for business failures.
 - **Validators** are `AbstractValidator<TInput>` and live in the same file as the input. They are auto-discovered by `RegisterCommands()` / `RegisterQueries()`.
-- A handler longer than ~100 lines of business logic must be converted into a Story (chapters).
-- If a handler talks to more than one external system, it must be a Story.
+- A handler longer than ~100 lines of business logic must be converted into a Tale (chapters).
+- If a handler talks to more than one external system, it must be a Tale.
 
 ### Result pattern
 
@@ -170,14 +170,14 @@ return Result.Fail(new Error { Message = "..." });
 
 Implicit conversion is allowed in handlers: `return city;` becomes `Result<City>.Success(city)` automatically. Use it.
 
-> **Procedure:** the step-by-step for authoring a command/query/event/story lives in the
-> [`command-query-event-story`](../.github/skills/command-query-event-story/SKILL.md) skill.
+> **Procedure:** the step-by-step for authoring a command/query/event/tale lives in the
+> [`command-query-event-tale`](../.github/skills/command-query-event-tale/SKILL.md) skill.
 
 ---
 
-## 4. Story Framework (preferred for any multi-step orchestration)
+## 4. Tale Framework (preferred for any multi-step orchestration)
 
-Use a Story whenever the operation has ≥ 2 logical steps, or any single step is non-trivial.
+Use a Tale whenever the operation has ≥ 2 logical steps, or any single step is non-trivial.
 
 ### Anatomy
 
@@ -189,7 +189,7 @@ public sealed class CalculateBestPathContext : Context<CalculateBestPathQuery, C
 }
 
 public class CalculateBestPathTale(IServiceProvider sp, ILogger<CalculateBestPathTale> logger)
-    : StoryHandler<CalculateBestPathQuery, CalculateBestPathContext, CalculateBestPathResult>(sp, logger),
+    : TaleHandler<CalculateBestPathQuery, CalculateBestPathContext, CalculateBestPathResult>(sp, logger),
       IQueryHandler<CalculateBestPathQuery, CalculateBestPathResult>
 {
     protected override Tale<CalculateBestPathResult> Tell() =>
@@ -205,26 +205,26 @@ public class CalculateBestPathTale(IServiceProvider sp, ILogger<CalculateBestPat
 
 ### Rules
 
-- `Tell()` is the table of contents — it returns a `Tale` that reads top-to-bottom as plain English and contains **no logic**, no `if`, no `try`, no loops. Open the story with `Open<FirstChapter>()`, chain with `.Read<Chapter>()`, guard with `.Expect(...)`, recover with `.Otherwise<Fallback>()`, and conclude with `.Finale(ctx => ctx.Output)`. If you feel the urge to branch, split the branches into separate chapters or use `.Expect`/`.Otherwise`.
+- `Tell()` is the table of contents — it returns a `Tale` that reads top-to-bottom as plain English and contains **no logic**, no `if`, no `try`, no loops. Open the tale with `Open<FirstChapter>()`, chain with `.Read<Chapter>()`, guard with `.Expect(...)`, recover with `.Otherwise<Fallback>()`, and conclude with `.Finale(ctx => ctx.Output)`. If you feel the urge to branch, split the branches into separate chapters or use `.Expect`/`.Otherwise`.
 - One chapter = one verb = one file. File names are prefixed with their order: `0.InitiateContext.cs`, `1.DownloadRoadData.cs`. Class names omit the prefix (`InitiateContext`, `DownloadRoadData`).
 - Chapter classes inherit `Chapter<TContext>` (automated) or `InteractiveChapter<TContext, TInput>` (user input pause).
 - All cross-chapter state lives on the `Context`. Chapters do not share fields, do not call each other.
 - Mark chapters with `[UsedImplicitly]` if the IDE flags them — they are resolved via DI.
 - Chapters return `Result.Success()` / `Result.Fail(...)`. Throwing is reserved for true exceptions (network, IO) — the framework converts them to errors.
-- The `StoryHandler` may also implement `IQueryHandler<,>` / `ICommandHandler<>` so MediatR resolves it directly. This is the standard wiring.
+- The `TaleHandler` may also implement `IQueryHandler<,>` / `ICommandHandler<>` so MediatR resolves it directly. This is the standard wiring.
 
-### When to choose `DomainServices` vs Story-in-Queries/Commands
+### When to choose `DomainServices` vs Tale-in-Queries/Commands
 
-- **Story in `Queries/`** — a complex query is **always dedicated to its use case**. Never extract a query into a domain service; there is no reuse case that justifies it.
-- **Story in `Commands/`** — a single write triggered by one entry point.
-- **Story in `DomainServices/`** — the orchestration works **directly on domain models** (a save / update / mutation) and is **reused by multiple commands or event handlers** (e.g. `CityDomainService.Save` is reused by the `CitySearched` event handler and import flows). The domain service exposes a plain interface (`ICityDomainService.Save(...)`) and internally inherits `StoryHandler`. Domain services are a write/command-side concept — never a home for queries.
+- **Tale in `Queries/`** — a complex query is **always dedicated to its use case**. Never extract a query into a domain service; there is no reuse case that justifies it.
+- **Tale in `Commands/`** — a single write triggered by one entry point.
+- **Tale in `DomainServices/`** — the orchestration works **directly on domain models** (a save / update / mutation) and is **reused by multiple commands or event handlers** (e.g. `CityDomainService.Save` is reused by the `CitySearched` event handler and import flows). The domain service exposes a plain interface (`ICityDomainService.Save(...)`) and internally inherits `TaleHandler`. Domain services are a write/command-side concept — never a home for queries.
 
 ### `Workflows/` project
 
-Reserved for **long-running, interactive, persisted** stories (require a durable `IStoryRepository` — e.g. the DreamTravel sample's `UseStoryRepository<SQLiteStoryRepository>()`, or any `UseStoryRepository<T>()` backend). One folder per workflow, mirroring the CQRS use-case layout (`SampleOrderWorkflow/Chapters/...`).
+Reserved for **long-running, interactive, persisted** tales (require a durable `ITaleRepository` — e.g. the DreamTravel sample's `UseTaleRepository<SQLiteTaleRepository>()`, or any `UseTaleRepository<T>()` backend). One folder per workflow, mirroring the CQRS use-case layout (`SampleOrderWorkflow/Chapters/...`).
 
-> **Procedure:** authoring a Story (chapters, contexts, `DomainServices` vs `Workflows` hosting)
-> is driven by the [`command-query-event-story`](../.github/skills/command-query-event-story/SKILL.md)
+> **Procedure:** authoring a Tale (chapters, contexts, `DomainServices` vs `Workflows` hosting)
+> is driven by the [`command-query-event-tale`](../.github/skills/command-query-event-tale/SKILL.md)
 > skill.
 
 ---
@@ -366,24 +366,24 @@ tests/Unit/DreamTravel.Queries.UnitTests/
 
 - Frameworks: **NUnit** (all test projects). Assertion: **FluentAssertions**. Mocks: **NSubstitute**. Data: **AutoFixture** with `AutoNSubstituteCustomization`.
 - Test class field: `_sut` for the system under test. Dependencies frozen via `fixture.Freeze<T>()`.
-- Test name format: `Method_Scenario_ExpectedOutcome` (`Execute_ShouldPopulateContextWithRoadData`, `Resume_AfterPause_CompletesStory_AndPersistsTerminalState`).
+- Test name format: `Method_Scenario_ExpectedOutcome` (`Execute_ShouldPopulateContextWithRoadData`, `Resume_AfterPause_CompletesTale_AndPersistsTerminalState`).
 - One arrange / one act / one assert *block* per test — but multiple related assertions inside the assert block are encouraged (denser tests > more tests).
 - **Mark the three blocks with `// Arrange`, `// Act`, `// Assert` comments.** This is the one place where comments restating *what* is allowed (and required) — they delimit the test phases, which makes scanning failures and reviewing tests dramatically faster. Skip a phase only when it is genuinely empty (e.g. a parameterless `// Act` for a static call). Example:
   ```csharp
   [Test]
-  public async Task Resume_AfterPause_CompletesStory_AndPersistsTerminalState()
+  public async Task Resume_AfterPause_CompletesTale_AndPersistsTerminalState()
   {
       // Arrange
       var input = _fixture.Create<OnboardingInput>();
-      var start = await _sut.StartStory<UserOnboardingStory, ...>(input);
+      var start = await _sut.StartStory<UserOnboardingTale, ...>(input);
 
       // Act
-      var resume = await _sut.ResumeStory<UserOnboardingStory, ...>(start.Data!.StoryId, _userInput);
+      var resume = await _sut.ResumeStory<UserOnboardingTale, ...>(start.Data!.TaleId, _userInput);
 
       // Assert
       resume.IsSuccess.Should().BeTrue();
-      resume.Data!.Status.Should().Be(StoryStatus.Completed);
-      (await _repo.GetAsync(start.Data.StoryId))!.Status.Should().Be(StoryStatus.Completed);
+      resume.Data!.Status.Should().Be(TaleStatus.Completed);
+      (await _repo.GetAsync(start.Data.TaleId))!.Status.Should().Be(TaleStatus.Completed);
   }
   ```
 - Parameterize with `[TestCase]` / `[TestCaseSource]` instead of duplicating tests.
@@ -398,7 +398,7 @@ These apply to every class you write, regardless of layer.
 1. **One reason to change.** If you can describe the class with the word "and", split it.
 2. **Size budget:** target ≤ 100 lines, hard cap ~150. Above that, extract a collaborator.
 3. **Method size:** target ≤ 20 lines. Methods longer than that almost always hide a missing abstraction.
-4. **Constructor size:** ≤ 5 dependencies. More than five = the class does too much. Move work into a Story or split the class. (`ILogger<T>` does not count toward the budget.)
+4. **Constructor size:** ≤ 5 dependencies. More than five = the class does too much. Move work into a Tale or split the class. (`ILogger<T>` does not count toward the budget.)
 5. **Primary constructors** are mandatory for DI capture. Do not hand-write `private readonly` fields just to assign them.
 6. **No statics with state.** Static methods are fine for pure helpers (`CityQueryBuilder`). Static *fields* with mutable state are forbidden outside `const` and `static readonly` lookup tables.
 7. **Use .NET 10 `extension` blocks** for extension methods. Do not write `static class` + `this` parameter — use the C# 14 `extension` syntax instead.
@@ -412,11 +412,11 @@ These apply to every class you write, regardless of layer.
     // Assembly.GetCallingAssembly() which is unreliable under JIT
     // inlining (and under WebApplicationFactory the entry assembly
     // becomes the test host, not the API).
-    services.RegisterStories(assemblies: typeof(SaveCityStory).Assembly);
+    services.AddSolTale(assemblies: typeof(SaveCityTale).Assembly);
 
     // ✅ GOOD — one line, why-not-what, points at the root cause.
     // Explicit: GetCallingAssembly() is unreliable under JIT inlining / WAF.
-    services.RegisterStories(assemblies: typeof(SaveCityStory).Assembly);
+    services.AddSolTale(assemblies: typeof(SaveCityTale).Assembly);
     ```
     ```csharp
     // ❌ BAD — 6-line incident retrospective lives in code forever.
@@ -484,8 +484,8 @@ These apply to every class you write, regardless of layer.
 ## 13. Error handling
 
 - Default to `Result` / `Result<T>`. Throw only for genuinely exceptional conditions (network, IO, programmer error).
-- A chapter that fails returns `Result.Fail(...)` — the Story stops. Do not throw to abort a Story.
-- `try/catch` is allowed at the boundary of an external call inside a chapter or HTTP client method (to translate driver exceptions into domain errors). It is **not** allowed in controllers, handlers, or `TellStory()`.
+- A chapter that fails returns `Result.Fail(...)` — the Tale stops. Do not throw to abort a Tale.
+- `try/catch` is allowed at the boundary of an external call inside a chapter or HTTP client method (to translate driver exceptions into domain errors). It is **not** allowed in controllers, handlers, or `Tell()`.
 - Never swallow exceptions silently. If a `catch` block has no `throw` and no `logger.LogError`, it is a bug.
 - For aggregated failures across chapters, use `AggregateError` from `SolTechnology.Core.CQRS`.
 
@@ -510,7 +510,7 @@ These are real examples spotted in DreamTravel. Fix them when you touch the surr
 | `try/catch` + `JsonConvert.SerializeObject(ex.Message)` in a controller | `CalculateBestPathController.CalculateBestPathV1` | Let `ExceptionFilter` handle it; return `Ok(result)`. |
 | `logger.LogInformation("Skipped " + s.Name);` | `FetchTrafficHandler` | `logger.LogInformation("Skipped [{Street}]", s.Name);` |
 | Multiple `+`-concatenated log strings | various | Structured placeholders, single interpolated raw string. |
-| Naked `Newtonsoft.Json` usage in new code | `CalculateBestPathController` | `System.Text.Json` (and the Story/AUID converters) is the default. Newtonsoft only where Hangfire / legacy serialization requires it. |
+| Naked `Newtonsoft.Json` usage in new code | `CalculateBestPathController` | `System.Text.Json` (and the Tale/AUID converters) is the default. Newtonsoft only where Hangfire / legacy serialization requires it. |
 | Mocking `IMediator` / `DbContext` in unit tests | hypothetical | Write a Component test instead. |
 | Hand-written `private readonly` ctor capture | hypothetical | C# 12 primary constructor. |
 | `static class` + `this` extension methods | various | .NET 10 / C# 14 `extension` block. See §9.12. |
@@ -583,18 +583,18 @@ public class FetchTrafficHandler(
     public async Task<Result> Handle(FetchTrafficCommand request, CancellationToken ct)
     {
         logger.LogInformation("Fetching traffic at [{Time}]", request.DepartureTime);
-        // ... orchestration, ≤ 100 lines; otherwise convert to a Story ...
+        // ... orchestration, ≤ 100 lines; otherwise convert to a Tale ...
         return Result.Success();
     }
 }
 ```
 
-### Story query
+### Tale query
 
 ```csharp
 // CalculateBestPathTale.cs
 public class CalculateBestPathTale(IServiceProvider sp, ILogger<CalculateBestPathTale> logger)
-    : StoryHandler<CalculateBestPathQuery, CalculateBestPathContext, CalculateBestPathResult>(sp, logger),
+    : TaleHandler<CalculateBestPathQuery, CalculateBestPathContext, CalculateBestPathResult>(sp, logger),
       IQueryHandler<CalculateBestPathQuery, CalculateBestPathResult>
 {
     protected override Tale<CalculateBestPathResult> Tell() =>
@@ -648,7 +648,7 @@ public static class ModuleInstaller
     public static IServiceCollection InstallTripsQueries(this IServiceCollection services)
     {
         services.RegisterQueries();
-        services.RegisterStories();
+        services.AddSolTale();
         services.AddTransient<ITSP, AntColony>();
         return services;
     }
@@ -781,7 +781,7 @@ One rule = one place. Other files **link**, never copy.
 #### A. Form and tone
 
 1. **Imperative, present tense.** "Use primary constructors." not "You should consider
-   using primary constructors". "Never throw in `TellStory()`." not "Throwing here is
+   using primary constructors". "Never throw in `Tell()`." not "Throwing here is
    usually a bad idea".
 2. **One term per concept.** If you say "chapter", do not later say "step" / "stage" /
    "phase". LLMs split semantics on synonyms and hallucinate distinctions.
@@ -902,7 +902,7 @@ How to update:
 1. Find the most relevant section (§0–§17). If none fits, add a new numbered section at the end.
 2. Add the rule as a single, imperative bullet — short, concrete, copy-pasteable. No prose essays.
 3. If the lesson is broad enough to affect *all* tasks, also add it to the §16 workflow checklist.
-4. If it is repository-wide (not Story/CQRS/etc. specific), mirror a one-liner into root `CLAUDE.md`.
+4. If it is repository-wide (not Tale/CQRS/etc. specific), mirror a one-liner into root `CLAUDE.md`.
 5. Mention the update in your reply to the user (one sentence: *"Added rule X to §N."*).
 
 Do **not** wait to be told to update the guide — silent retention is forbidden. If a lesson is
