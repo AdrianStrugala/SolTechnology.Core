@@ -1,6 +1,6 @@
-# SolTechnology.Core.BlobStorage.Testing
+# SolTechnology.Core.Blob.Testing
 
-Integration-testing fixture for apps backed by Azure Blob Storage (e.g. `SolTechnology.Core.BlobStorage`
+Integration-testing fixture for apps backed by Azure Blob Storage (e.g. `SolTechnology.Core.Blob`
 consumers): a [Testcontainers](https://dotnet.testcontainers.org/)-backed `AzuriteFixture` that boots an
 [Azurite](https://github.com/Azure/Azurite) container (the Azure Storage emulator) and hands back the
 connection string your app already wires.
@@ -27,7 +27,7 @@ await AzuriteFixture.InitializeAsync();
 
 var configuration = new TestConfigurationBuilder()
     .AddJsonFile("appsettings.tests.json")
-    .Override("BlobStorage:ConnectionString", AzuriteFixture.ConnectionString)
+    .Override("Blob:ConnectionString", AzuriteFixture.ConnectionString)
     .Build();
 
 // Arrange a blob container in a test:

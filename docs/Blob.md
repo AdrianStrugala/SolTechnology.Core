@@ -1,13 +1,13 @@
 ### Overview
 
-The SolTechnology.Core.BlobStorage library provides minimum functionality needed for Azure Blob storage connection. It handles needed services registration and configuration and additionally provides BlobContainerClientExtensions methods for convinient read and write operation.
+The SolTechnology.Core.Blob library provides minimum functionality needed for Azure Blob storage connection. It handles needed services registration and configuration and additionally provides BlobContainerClientExtensions methods for convinient read and write operation.
 
 ### Registration
 
-For installing the library, reference **SolTechnology.Core.BlobStorage** nuget package and invoke **AddBlobStorage()** service collection extension method:
+For installing the library, reference **SolTechnology.Core.Blob** nuget package and invoke **AddSolBlob()** service collection extension method:
 
 ```csharp
-services.AddBlobStorage();
+services.AddSolBlob(blobConfiguration);
 ```
 
 ### Configuration
@@ -16,7 +16,7 @@ services.AddBlobStorage();
 
 ```csharp
   "Configuration": {
-    "BlobStorage": {
+    "Blob": {
       "ConnectionString": "UseDevelopmentStorage=true"
     }
   }
@@ -25,11 +25,11 @@ services.AddBlobStorage();
 2) Alternatevely the same settings can be provided by optional parameter during registration:
 
 ```csharp
-var blobStorageConfiguration = new BlobStorageConfiguration
+var blobConfiguration = new BlobConfiguration
 {
     ConnectionString = "UseDevelopmentStorage=true"
 };
-services.AddBlobStorage(blobStorageConfiguration);
+services.AddSolBlob(blobConfiguration);
 ```
 
 
@@ -57,10 +57,10 @@ services.AddBlobStorage(blobStorageConfiguration);
 
 ### Testing
 
-The companion package **`SolTechnology.Core.BlobStorage.Testing`** provides `AzuriteFixture` — a
+The companion package **`SolTechnology.Core.Blob.Testing`** provides `AzuriteFixture` — a
 [Testcontainers](https://dotnet.testcontainers.org/)-backed [Azurite](https://github.com/Azure/Azurite)
 container (the Azure Storage emulator) for component tests. Reference it from test projects only. Full reference:
-[BlobStorage.Testing.md](BlobStorage.Testing.md).
+[Blob.Testing.md](Blob.Testing.md).
 
 ```csharp
 // Assembly-level [OneTimeSetUp]
@@ -69,7 +69,7 @@ await AzuriteFixture.InitializeAsync();
 
 var configuration = new TestConfigurationBuilder()
     .AddJsonFile("appsettings.tests.json")
-    .Override("BlobStorage:ConnectionString", AzuriteFixture.ConnectionString)
+    .Override("Blob:ConnectionString", AzuriteFixture.ConnectionString)
     .Build();
 
 // Arrange a blob container in a test:

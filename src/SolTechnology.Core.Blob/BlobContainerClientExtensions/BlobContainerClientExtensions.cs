@@ -1,5 +1,5 @@
 ﻿using SolTechnology.Avro;
-using SolTechnology.Core.BlobStorage;
+using SolTechnology.Core.Blob;
 
 // ReSharper disable once CheckNamespace
 namespace Azure.Storage.Blobs

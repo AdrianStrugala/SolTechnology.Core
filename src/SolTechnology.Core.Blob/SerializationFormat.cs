@@ -1,4 +1,4 @@
-﻿namespace SolTechnology.Core.BlobStorage;
+﻿namespace SolTechnology.Core.Blob;
 
 public enum SerializationFormat
 {

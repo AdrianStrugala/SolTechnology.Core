@@ -3,12 +3,12 @@ using DotNet.Testcontainers.Networks;
 using SolTechnology.Core.Testing.Containers;
 using Testcontainers.Azurite;
 
-namespace SolTechnology.Core.BlobStorage.Testing;
+namespace SolTechnology.Core.Blob.Testing;
 
 /// <summary>
 /// Spins up an <see href="https://github.com/Azure/Azurite">Azurite</see> container (the Azure Storage
 /// emulator) and exposes its <see cref="ConnectionString"/>. The Azure-specific companion of
-/// <c>SolTechnology.Core.BlobStorage</c>
+/// <c>SolTechnology.Core.Blob</c>
 /// </summary>
 /// <remarks>
 /// <para>

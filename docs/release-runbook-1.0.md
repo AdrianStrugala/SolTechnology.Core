@@ -52,7 +52,7 @@ The push uses `--skip-duplicate`, so a re-run cannot clobber an already-publishe
 - [ ] `SolTechnology.Core.Tale` published as **`1.0.0`** — a **new package id**, so this is its first
       version (not an upgrade of `SolTechnology.Core.Story`).
 - [ ] `SolTechnology.Core.Hangfire` and the seven `.Testing` companions
-      (`API.Testing`, `BlobStorage.Testing`, `HTTP.Testing`, `Redis.Testing`, `ServiceBus.Testing`,
+      (`API.Testing`, `Blob.Testing`, `HTTP.Testing`, `Redis.Testing`, `ServiceBus.Testing`,
       `SQL.Testing`, `Testing`) appear on nuget.org at `1.0.0`.
 - [ ] Each package's per-package README renders on its nuget.org page. For `Tale`, the README source
       is the `docs/Tale.md` content.
@@ -61,15 +61,15 @@ The push uses `--skip-duplicate`, so a re-run cannot clobber an already-publishe
 
 ## 4. Unlist the deprecated ghost ids (automated, opt-in)
 
-Hides the four deprecated ids from nuget.org search. **Opt-in only** — it never runs on a tag or
+Hides the deprecated ghost ids from nuget.org search. **Opt-in only** — it never runs on a tag or
 `master` push, so a normal release publish can never trigger an unlist.
 
 - Run the `Build, test and publish` workflow via **workflow_dispatch** with
   **`unlist_deprecated` = true**.
 - The `unlist-deprecated` job enumerates every published version of `ApiClient`, `Story`, `Scheduler`,
-  and `Guards` live from the flat-container index and unlists each with `dotnet nuget delete`
-  (needs `NUGET_API_KEY`). The four ids are **hardcoded** in the job, so even a full-account key
-  cannot unlist a supported package.
+  `Guards`, `BlobStorage` and `BlobStorage.Testing` live from the flat-container index and unlists each
+  with `dotnet nuget delete` (needs `NUGET_API_KEY`). The ids are **hardcoded** in the job, so even a
+  full-account key cannot unlist a supported package.
 
 > **Undo.** Re-listing an accidentally unlisted version is a **manual web-UI action only** — there is
 > no `dotnet nuget` re-list command. If a wrong version is unlisted, re-list it from
@@ -92,6 +92,7 @@ name its successor:
 | `SolTechnology.Core.Story` | `SolTechnology.Core.Tale` |
 | `SolTechnology.Core.Scheduler` | `SolTechnology.Core.Hangfire` |
 | `SolTechnology.Core.Guards` | `FluentValidation` (auto-discovered by the CQRS pipeline) |
+| `SolTechnology.Core.BlobStorage` | `SolTechnology.Core.Blob` |
 
 See [`dontreadme.md`](../dontreadme.md) for the consumer-facing successor map.
 

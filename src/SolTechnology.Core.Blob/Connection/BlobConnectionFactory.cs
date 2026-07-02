@@ -1,7 +1,7 @@
 ﻿using Azure.Storage.Blobs;
 using Microsoft.Extensions.Options;
 
-namespace SolTechnology.Core.BlobStorage.Connection
+namespace SolTechnology.Core.Blob.Connection
 {
     public class BlobConnectionFactory : IBlobConnectionFactory
     {
@@ -9,7 +9,7 @@ namespace SolTechnology.Core.BlobStorage.Connection
 
         private readonly Dictionary<string, BlobContainerClient> _blobContainerCache = new();
 
-        public BlobConnectionFactory(IOptions<BlobStorageConfiguration> blobConfiguration)
+        public BlobConnectionFactory(IOptions<BlobConfiguration> blobConfiguration)
         {
             _connectionString = blobConfiguration.Value.ConnectionString;
         }

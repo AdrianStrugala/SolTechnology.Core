@@ -1,6 +1,6 @@
 ﻿using Azure.Storage.Blobs;
 
-namespace SolTechnology.Core.BlobStorage.Connection
+namespace SolTechnology.Core.Blob.Connection
 {
     public interface IBlobConnectionFactory
     {

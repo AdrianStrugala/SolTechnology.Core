@@ -14,7 +14,7 @@
     <File Path="docs/theAutomation.md" />
     <File Path="docs/theDesign.md" />
     <File Path="docs/theQuality.md" />
-    <File Path="docs\BlobStorage.Testing.md" />
+    <File Path="docs\Blob.Testing.md" />
     <File Path="docs\future-ideas.md" />
     <File Path="docs\Hangfire.md" />
     <File Path="docs\HTTP-Production-Checklist.md" />
@@ -107,7 +107,7 @@
     <Project Path="src/SolTechnology.Core.HTTP/SolTechnology.Core.HTTP.csproj" />
     <Project Path="src/SolTechnology.Core.AUID/SolTechnology.Core.AUID.csproj" />
     <Project Path="src/SolTechnology.Core.Authentication/SolTechnology.Core.Authentication.csproj" />
-    <Project Path="src/SolTechnology.Core.BlobStorage/SolTechnology.Core.BlobStorage.csproj" />
+    <Project Path="src/SolTechnology.Core.Blob/SolTechnology.Core.Blob.csproj" />
     <Project Path="src/SolTechnology.Core.Cache/SolTechnology.Core.Cache.csproj" />
     <Project Path="src/SolTechnology.Core.CQRS/SolTechnology.Core.CQRS.csproj" />
     <Project Path="src/SolTechnology.Core.HTTP.Testing/SolTechnology.Core.HTTP.Testing.csproj" />
@@ -119,7 +119,7 @@
     <Project Path="src/SolTechnology.Core.Testing/SolTechnology.Core.Testing.csproj" />
     <Project Path="src/SolTechnology.Core.SQL.Testing/SolTechnology.Core.SQL.Testing.csproj" />
     <Project Path="src/SolTechnology.Core.Redis.Testing/SolTechnology.Core.Redis.Testing.csproj" />
-    <Project Path="src/SolTechnology.Core.BlobStorage.Testing/SolTechnology.Core.BlobStorage.Testing.csproj" />
+    <Project Path="src/SolTechnology.Core.Blob.Testing/SolTechnology.Core.Blob.Testing.csproj" />
     <Project Path="src/SolTechnology.Core.ServiceBus.Testing/SolTechnology.Core.ServiceBus.Testing.csproj" />
   </Folder>
 </Solution>
