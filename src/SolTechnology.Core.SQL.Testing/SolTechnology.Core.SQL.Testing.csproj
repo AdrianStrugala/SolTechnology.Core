@@ -1,9 +1,10 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<Description>Integration-testing fixtures for SolTechnology.Core.SQL consumers — a Testcontainers-backed SQLFixture for MSSQL (dacpac) and PostgreSQL, with pluggable schema provisioning (dacpac / raw scripts / delegate, e.g. EF migrations) and Respawn-based reset. ORM-agnostic: serves Dapper and EF alike. Reference from test projects only; not needed at runtime in production assemblies.</Description>
-		<PackageTags>sol technology core sql testing testcontainers mssql postgres dacpac respawn integration-tests component-tests</PackageTags>
+		<Description>Integration-test your data layer against real MSSQL and PostgreSQL databases. A Testcontainers-backed SQLFixture with pluggable schema provisioning (dacpac / raw scripts / delegate, e.g. EF migrations) and Respawn-based reset. ORM-agnostic — serves Dapper and EF alike. Reference from test projects only; not needed at runtime in production assemblies.</Description>
+		<PackageTags>soltechnology core sql testing testcontainers mssql sqlserver postgres postgresql dacpac respawn integration-tests component-tests dotnet csharp</PackageTags>
 		<Product>SolTechnology.Core.SQL.Testing</Product>
+		<Title>SolTechnology.Core SQL Testing</Title>
 		<PackageId>SolTechnology.Core.SQL.Testing</PackageId>
 		<AssemblyName>SolTechnology.Core.SQL.Testing</AssemblyName>
 

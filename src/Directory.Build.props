@@ -24,7 +24,9 @@
         <WarningsNotAsErrors>$(WarningsNotAsErrors);NU1900;NU1510</WarningsNotAsErrors>
         <Authors>Adrian Strugala</Authors>
         <Company>Sol Technology</Company>
+        <Copyright>© 2026 Sol Technology</Copyright>
         <RepositoryUrl>https://github.com/AdrianStrugala/SolTechnology.Core</RepositoryUrl>
+        <RepositoryType>git</RepositoryType>
         <PackageProjectUrl>https://github.com/AdrianStrugala/SolTechnology.Core</PackageProjectUrl>
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
         <PackageIcon>docs\mini-logo.png</PackageIcon>

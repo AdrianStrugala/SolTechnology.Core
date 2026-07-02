@@ -1,9 +1,10 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <Description>Tale Framework - Unified workflow orchestration for multi-step business processes. Supports both simple automated chains and pausable workflows with persistence. Features Tale Code philosophy with TaleHandler, Chapters, and Context for readable, maintainable business logic.</Description>
-        <PackageTags>sol technology core tale workflow chain pausable state-machine saga orchestration async dotnet business-process tale-code</PackageTags>
+        <Description>The Tale Framework — unified workflow orchestration for multi-step business processes. Compose simple automated chains or pausable, persistable workflows with the Tale Code philosophy: readable, maintainable logic built from TaleHandler, Chapters and Context.</Description>
+        <PackageTags>soltechnology core tale workflow orchestration saga state-machine chain pausable persistence business-process async tale-code dotnet csharp</PackageTags>
         <Product>SolTechnology.Core.Tale</Product>
+        <Title>SolTechnology.Core Tale Framework</Title>
         <PackageId>SolTechnology.Core.Tale</PackageId>
         <AssemblyName>SolTechnology.Core.Tale</AssemblyName>
         <RootNamespace>SolTechnology.Core.Tale</RootNamespace>

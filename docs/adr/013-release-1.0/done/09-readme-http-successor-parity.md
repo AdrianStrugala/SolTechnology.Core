@@ -1,7 +1,7 @@
 ---
 adr: 013-release-1.0
 step: 09 of 11
-status: reviewed
+status: done
 ---
 
 <!-- Reviewed (2026-06-30): made step 09 the sole OWNER of the docs/Clients.md → HTTP disposition

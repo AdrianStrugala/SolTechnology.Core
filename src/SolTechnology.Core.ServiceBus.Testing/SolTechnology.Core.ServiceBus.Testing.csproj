@@ -1,9 +1,10 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<Description>Integration-testing fixture for SolTechnology.Core.MessageBus consumers — a Testcontainers-backed ServiceBusFixture running the Azure Service Bus emulator (which manages its own backing MSSQL sidecar) with an AMQP readiness probe and stable-name reuse. Reference from test projects only; not needed at runtime in production assemblies.</Description>
-		<PackageTags>sol technology core servicebus testing testcontainers azure-service-bus emulator amqp integration-tests component-tests</PackageTags>
+		<Description>Integration-test your Azure Service Bus messaging against the official emulator. A Testcontainers-backed ServiceBusFixture runs the emulator (which manages its own backing MSSQL sidecar) with an AMQP readiness probe and stable-name reuse. Reference from test projects only; not needed at runtime in production assemblies.</Description>
+		<PackageTags>soltechnology core azure servicebus testing testcontainers emulator amqp messaging integration-tests component-tests dotnet csharp</PackageTags>
 		<Product>SolTechnology.Core.ServiceBus.Testing</Product>
+		<Title>SolTechnology.Core Service Bus Testing</Title>
 		<PackageId>SolTechnology.Core.ServiceBus.Testing</PackageId>
 		<AssemblyName>SolTechnology.Core.ServiceBus.Testing</AssemblyName>
 

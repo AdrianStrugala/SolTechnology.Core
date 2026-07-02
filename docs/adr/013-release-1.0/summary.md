@@ -16,8 +16,8 @@ Tracking the implementation steps for the spec [`../013-release-1.0.md`](../013-
 | 06 | Fix Authentication `BuildServiceProvider` anti-pattern (+ new test project) | [`done/06-authentication-antipattern-fix.md`](done/06-authentication-antipattern-fix.md) | ✅ done |
 | 07 | Deprecate `Scheduler` + `Guards` in source (+ `Story` ghost via runbook) | [`done/07-deprecate-scheduler-and-guards.md`](done/07-deprecate-scheduler-and-guards.md) | ✅ done |
 | 08 | Flip shared version to `1.0.0` (Logging `1.2.0`; Tale first at `1.0.0`) | [`done/08-version-flip-1.0.md`](done/08-version-flip-1.0.md) | ✅ done |
-| 09 | README + `HTTP`-successor + `Tale` row parity (owns `Clients.md`) | [`reviewed/09-readme-http-successor-parity.md`](reviewed/09-readme-http-successor-parity.md) | 🔍 reviewed |
-| 10 | Migration guide + CHANGELOG + runbook + `dontreadme` + `CICD.md` (incl. `Story → Tale`) | [`reviewed/10-migration-runbook-changelog.md`](reviewed/10-migration-runbook-changelog.md) | 🔍 reviewed |
+| 09 | README + `HTTP`-successor + `Tale` row parity (owns `Clients.md`) | [`done/09-readme-http-successor-parity.md`](done/09-readme-http-successor-parity.md) | ✅ done |
+| 10 | Release runbook + `dontreadme` + `CICD.md` (migration guide & CHANGELOG dropped — pre-1.0) | [`done/10-migration-runbook-changelog.md`](done/10-migration-runbook-changelog.md) | ✅ done |
 | 11 | Doc integrity sweep + `Story.md → Tale.md` + skill rename → `command-query-event-tale` | [`reviewed/11-doc-integrity-sweep.md`](reviewed/11-doc-integrity-sweep.md) | 🔍 reviewed |
 
 Status values: `⬜ to-do` / `🔍 reviewed` / `✅ done`. Link in each row points to the step's current

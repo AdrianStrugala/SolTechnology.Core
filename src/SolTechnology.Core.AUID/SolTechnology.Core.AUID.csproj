@@ -1,9 +1,10 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <Description>High-performance 64-bit unique identifier (AUID) for distributed systems. Zero-allocation, sortable, human-readable alternative to GUIDs.</Description>
-        <PackageTags>sol technology guid uuid auid id identifier unique distributed performance zero-allocation</PackageTags>
+        <Description>A high-performance, 64-bit unique identifier (AUID) for distributed systems — a zero-allocation, sortable, human-readable alternative to GUIDs. Ideal for database keys and event ids where ordering and compactness matter.</Description>
+        <PackageTags>soltechnology core auid guid uuid id identifier unique distributed sortable zero-allocation performance dotnet csharp</PackageTags>
         <Product>SolTechnology.Core.AUID</Product>
+        <Title>SolTechnology.Core AUID</Title>
         <PackageId>SolTechnology.Core.AUID</PackageId>
         <AssemblyName>SolTechnology.Core.AUID</AssemblyName>
 

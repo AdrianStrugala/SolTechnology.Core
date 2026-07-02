@@ -1,9 +1,10 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<Description>Resilient HTTP client wrapper with built-in retry policies, exponential backoff, circuit breaker (Microsoft.Extensions.Http.Resilience / Polly v8), correlation propagation, idempotent-only retry by default, opt-in response-body capture, ValidateOnStart configuration, and first-class metrics on the 'SolTechnology.Core.HTTP' meter.</Description>
-		<PackageTags>sol technology core httpclient rest api polly retry resilience circuit-breaker avro http dotnet metrics opentelemetry</PackageTags>
+		<Description>A resilient, strongly-typed HTTP client wrapper built on Microsoft.Extensions.Http.Resilience / Polly v8: retry with exponential backoff, circuit breaker, idempotent-only retry by default, correlation propagation, opt-in response-body capture, ValidateOnStart configuration, and first-class metrics on the 'SolTechnology.Core.HTTP' meter.</Description>
+		<PackageTags>soltechnology core http httpclient rest api polly retry resilience circuit-breaker correlation metrics opentelemetry avro dotnet csharp</PackageTags>
 		<Product>SolTechnology.Core.HTTP</Product>
+		<Title>SolTechnology.Core HTTP</Title>
 		<PackageId>SolTechnology.Core.HTTP</PackageId>
 		<AssemblyName>SolTechnology.Core.HTTP</AssemblyName>
 

@@ -1,8 +1,17 @@
 ---
 adr: 013-release-1.0
 step: 10 of 11
-status: reviewed
+status: done
 ---
+
+<!-- Retrospective — Implementation Deviations (pre-1.0 scope reduction):
+     Two of the five planned deliverables were CANCELLED by the user because the project was pre-1.0
+     and warrants no consumer-migration artifacts yet:
+       - docs/MIGRATION-0.x-to-1.0.md  — NOT written (no cross-version compatibility was ever promised).
+       - CHANGELOG.md                  — NOT written ("Changelog też jeszcze nie").
+     Delivered: docs/release-runbook-1.0.md, filled docs/CICD.md, and the dontreadme.md rows
+     (ApiClient→HTTP, Story→Tale) + the AddRecurringJob→AddSolRecurringJob symbol fix. The README
+     "succeeds …" notes were repointed from the cancelled migration guide to dontreadme.md. -->
 
 <!-- Reviewed (2026-06-30): folded the dontreadme.md stale-symbol fix into this step (M1 — its
      AddRecurringJob<TJob>(cron) row must become AddSolRecurringJob<TJob>(cron)); added a runbook check

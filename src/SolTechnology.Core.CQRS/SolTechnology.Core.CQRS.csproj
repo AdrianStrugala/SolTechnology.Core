@@ -1,9 +1,10 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-	  <Description>Complete CQRS implementation with an in-house mediator, Result pattern, automatic FluentValidation, fire-and-forget notifications, and logging pipeline behaviors.</Description>
-	  <PackageTags>sol technology cqrs mediator command query result-pattern fluentvalidation architecture clean-code dotnet design-patterns</PackageTags>
+	  <Description>A complete, dependency-light CQRS toolkit: an in-house mediator, the Result pattern, automatic FluentValidation, fire-and-forget notifications, and logging pipeline behaviors — everything to keep your application layer clean, decoupled and testable.</Description>
+	  <PackageTags>soltechnology core cqrs mediator command query handler result-pattern fluentvalidation clean-architecture design-patterns dotnet csharp</PackageTags>
 	  <Product>SolTechnology.Core.CQRS</Product>
+	  <Title>SolTechnology.Core CQRS</Title>
 	  <PackageId>SolTechnology.Core.CQRS</PackageId>
 	  <AssemblyName>SolTechnology.Core.CQRS</AssemblyName>
 
