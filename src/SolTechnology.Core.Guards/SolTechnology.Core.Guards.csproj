@@ -2,7 +2,9 @@
 
 	<PropertyGroup>
 		<Version>0.5.0</Version>
-		<Description>Fluent API for code contract validation supporting multiple data types (int, long, double, decimal, float, string, object). Provides chainable guards with readable syntax for enforcing preconditions and business rules with clear error messages.</Description>
+		<IsPackable>false</IsPackable>
+		<Description>[DEPRECATED] Use FluentValidation AbstractValidator&lt;T&gt; (auto-discovered by the CQRS pipeline) instead. Fluent API for code contract validation supporting multiple data types (int, long, double, decimal, float, string, object). Provides chainable guards with readable syntax for enforcing preconditions and business rules with clear error messages.</Description>
+		<PackageReleaseNotes>[DEPRECATED] This package is deprecated and no longer maintained. Migrate to FluentValidation AbstractValidator&lt;T&gt;. See dontreadme.md.</PackageReleaseNotes>
 		<PackageTags>sol technology core guards validation contracts fluent-api preconditions defensive-programming dotnet code-quality</PackageTags>
 		<Product>SolTechnology.Core.Guards</Product>
 		<PackageId>SolTechnology.Core.Guards</PackageId>

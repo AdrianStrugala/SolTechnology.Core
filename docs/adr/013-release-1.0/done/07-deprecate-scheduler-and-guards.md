@@ -1,7 +1,7 @@
 ---
 adr: 013-release-1.0
 step: 07 of 11
-status: reviewed
+status: done
 ---
 
 <!-- Reviewed (2026-06-30): locked "stop packing now" (answer 10) — both projects are already outside

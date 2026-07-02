@@ -2,8 +2,10 @@
 
 	<PropertyGroup>
 		<Version>0.5.0</Version>
+		<IsPackable>false</IsPackable>
 		<TreatWarningsAsErrors>false</TreatWarningsAsErrors>
-		<Description>Cron-based task scheduler using Cronos for .NET applications. Enables background job scheduling with flexible cron expressions, configurable execution intervals, and integration with hosted services for automated recurring tasks.</Description>
+		<Description>[DEPRECATED] Use SolTechnology.Core.Hangfire (AddSolRecurringJob&lt;TJob&gt;(cron)) instead. Cron-based task scheduler using Cronos for .NET applications. Enables background job scheduling with flexible cron expressions, configurable execution intervals, and integration with hosted services for automated recurring tasks.</Description>
+		<PackageReleaseNotes>[DEPRECATED] This package is deprecated and no longer maintained. Migrate to SolTechnology.Core.Hangfire (AddSolRecurringJob&lt;TJob&gt;(cron)). See dontreadme.md.</PackageReleaseNotes>
 		<PackageTags>sol technology core scheduler cron cronos background-jobs task-scheduling recurring-tasks dotnet automation timer</PackageTags>
 		<Product>SolTechnology.Core.Scheduler</Product>
 		<PackageId>SolTechnology.Core.Scheduler</PackageId>
