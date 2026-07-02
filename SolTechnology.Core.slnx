@@ -87,6 +87,7 @@
   <Folder Name="/Tests/">
     <File Path="tests\Directory.Build.props" />
     <Project Path="tests/SolTechnology.Core.API.Tests/SolTechnology.Core.API.Tests.csproj" />
+    <Project Path="tests/SolTechnology.Core.Authentication.Tests/SolTechnology.Core.Authentication.Tests.csproj" />
     <Project Path="tests/SolTechnology.Core.HTTP.Tests/SolTechnology.Core.HTTP.Tests.csproj" />
     <Project Path="tests/SolTechnology.Core.AUID.Tests/SolTechnology.Core.AUID.Tests.csproj" />
     <Project Path="tests/SolTechnology.Core.Logging.Tests/SolTechnology.Core.Logging.Tests.csproj" />

@@ -1,7 +1,7 @@
 ---
 adr: 013-release-1.0
 step: 06 of 11
-status: reviewed
+status: done
 ---
 
 <!-- Reviewed (2026-06-30): de-contingented this step (answer 3 = fix); resolved the missing-test-host

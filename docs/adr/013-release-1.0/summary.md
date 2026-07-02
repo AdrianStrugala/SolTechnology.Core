@@ -13,7 +13,7 @@ Tracking the implementation steps for the spec [`../013-release-1.0.md`](../013-
 | 04 | Rename wave 2 — data + transport modules | [`done/04-rename-data-and-transport-modules.md`](done/04-rename-data-and-transport-modules.md) | ✅ done |
 | 05 | Rename wave 3 — Api + Authentication (rename only) | [`done/05-rename-api-authentication.md`](done/05-rename-api-authentication.md) | ✅ done |
 | 05b | Tale rebrand + package rename (`Story` → `Tale`) + route/controller/snapshot (13c) | [`done/05b-tale-rebrand-and-package-rename.md`](done/05b-tale-rebrand-and-package-rename.md) | ✅ done |
-| 06 | Fix Authentication `BuildServiceProvider` anti-pattern (+ new test project) | [`reviewed/06-authentication-antipattern-fix.md`](reviewed/06-authentication-antipattern-fix.md) | 🔍 reviewed |
+| 06 | Fix Authentication `BuildServiceProvider` anti-pattern (+ new test project) | [`done/06-authentication-antipattern-fix.md`](done/06-authentication-antipattern-fix.md) | ✅ done |
 | 07 | Deprecate `Scheduler` + `Guards` in source (+ `Story` ghost via runbook) | [`reviewed/07-deprecate-scheduler-and-guards.md`](reviewed/07-deprecate-scheduler-and-guards.md) | 🔍 reviewed |
 | 08 | Flip shared version to `1.0.0` (Logging `1.2.0`; Tale first at `1.0.0`) | [`reviewed/08-version-flip-1.0.md`](reviewed/08-version-flip-1.0.md) | 🔍 reviewed |
 | 09 | README + `HTTP`-successor + `Tale` row parity (owns `Clients.md`) | [`reviewed/09-readme-http-successor-parity.md`](reviewed/09-readme-http-successor-parity.md) | 🔍 reviewed |

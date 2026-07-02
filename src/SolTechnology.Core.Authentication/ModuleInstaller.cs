@@ -1,14 +1,13 @@
 ﻿﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Authorization;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Options;
 
 namespace SolTechnology.Core.Authentication
 {
     public static class ModuleInstaller
     {
-        public static AuthorizeFilter AddSolAuthentication(
+        public static IServiceCollection AddSolAuthentication(
             this IServiceCollection services,
             AuthenticationConfiguration authenticationConfiguration)
         {
@@ -17,27 +16,25 @@ namespace SolTechnology.Core.Authentication
                 throw new ArgumentException($"The [{nameof(AuthenticationConfiguration)}{nameof(authenticationConfiguration.ApiKey)}] is missing. Provide it by parameter.");
             }
 
-            services
-            .AddOptions<AuthenticationConfiguration>()
-            .Configure(config =>
-            {
-                config.ApiKey = authenticationConfiguration.ApiKey;
-            })
-            .ValidateOnStart();
+            var apiKey = authenticationConfiguration.ApiKey;
 
-            var options = services.BuildServiceProvider().GetRequiredService<IOptions<AuthenticationConfiguration>>().Value;
+            services
+                .AddOptions<AuthenticationConfiguration>()
+                .Configure(config => config.ApiKey = apiKey)
+                .ValidateOnStart();
 
             services.AddAuthentication(ApiKeyAuthenticationSchemeOptions.AuthenticationScheme)
                 .AddScheme<ApiKeyAuthenticationSchemeOptions, ApiKeyAuthenticationHandler>(
-                    ApiKeyAuthenticationSchemeOptions.AuthenticationScheme, c => c.ApiKey = options.ApiKey);
+                    ApiKeyAuthenticationSchemeOptions.AuthenticationScheme, c => c.ApiKey = apiKey);
 
             var policy = new AuthorizationPolicyBuilder()
                 .RequireAuthenticatedUser()
                 .Build();
 
-            var filter = new AuthorizeFilter(policy);
+            // Register the global authorization filter through MvcOptions so consumers no longer thread a returned filter.
+            services.Configure<MvcOptions>(options => options.Filters.Add(new AuthorizeFilter(policy)));
 
-            return filter;
+            return services;
         }
     }
 }

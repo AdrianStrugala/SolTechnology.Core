@@ -125,7 +125,7 @@ public class Program
         builder.Services.AddSolPersistentEvents();
 
         var authenticationConfiguration = builder.Configuration.GetRequiredSection("Authentication").Get<AuthenticationConfiguration>()!;
-        var authFilter = builder.Services.AddSolAuthentication(authenticationConfiguration);
+        builder.Services.AddSolAuthentication(authenticationConfiguration);
 
         // SolTechnology.Core.Api one-liner — wires:
         //   - Header-based API versioning (X-API-VERSION) + per-version Swagger docs
@@ -162,7 +162,6 @@ public class Program
 
         builder.Services.AddControllers(opts =>
         {
-            opts.Filters.Add(authFilter);
             opts.AddSolApiCoreFilters();
         });
 
