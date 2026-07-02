@@ -1,7 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-	  <Version>0.5.0</Version>
 	  <Description>Lightweight ASP.NET Core authentication library with API key and basic authentication support. Provides simple, configurable filters for securing APIs without the complexity of full OAuth/OIDC implementations.</Description>
 	  <PackageTags>sol technology core authentication apikey security aspnetcore middleware authorization filters basic-auth</PackageTags>
 	  <Product>SolTechnology.Core.Authentication</Product>

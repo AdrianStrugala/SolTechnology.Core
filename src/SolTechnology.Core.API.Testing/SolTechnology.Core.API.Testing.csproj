@@ -1,7 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<Version>0.7.0</Version>
 		<Description>Integration testing fixtures for SolTechnology.Core.Api consumers — APIFixture&lt;TEntryPoint&gt; (wraps Microsoft.AspNetCore.Mvc.Testing / TestHost) plus auth-client helpers (CreateAuthorizedClient / CreateAnonymousClient) and a TestConfigurationBuilder for the appsettings + in-memory override pattern. Reference this from your test projects only; not needed at runtime in production assemblies.</Description>
 		<PackageTags>sol technology core api testing aspnetcore integration-tests testserver mvc-testing webapplicationfactory</PackageTags>
 		<Product>SolTechnology.Core.API.Testing</Product>

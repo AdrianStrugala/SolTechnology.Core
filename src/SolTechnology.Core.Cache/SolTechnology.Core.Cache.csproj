@@ -1,7 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<Version>0.5.0</Version>
 		<Description>In-memory caching abstraction with lazy task caching support for async operations. Features configurable expiration modes (sliding/absolute), thread-safe operations, and optimized for caching expensive computations and external API calls.</Description>
 		<PackageTags>sol technology core cache memory performance lazy-loading async task caching dotnet optimization</PackageTags>
 		<Product>SolTechnology.Core.Cache</Product>

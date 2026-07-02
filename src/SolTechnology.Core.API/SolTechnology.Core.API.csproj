@@ -1,7 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<Version>0.7.0</Version>
 		<Description>ASP.NET Core API utilities: RFC 7807 ProblemDetails error pipeline, header-based API versioning, MVC filters that auto-convert Result&lt;T&gt; to wire format. One-call AddSolApiCore + AddSolApiCoreFilters + UseSolSwaggerWithVersioning bootstrap. CorrelationId propagation through Core.Logging.</Description>
 		<PackageTags>sol technology core api aspnetcore middleware filters problemdetails rfc7807 testing webapi rest controllers versioning api-versioning swagger</PackageTags>
 		<Product>SolTechnology.Core.Api</Product>

@@ -1,6 +1,5 @@
 <Project Sdk="Microsoft.NET.Sdk">
 <PropertyGroup>
-<Version>0.6.0</Version>
 <Description>Azure Service Bus wrapper for event-driven architectures.</Description>
 <PackageTags>sol technology core azure servicebus messaging queue topic pubsub async event-driven microservices dotnet cloud</PackageTags>
 <Product>SolTechnology.Core.MessageBus</Product>

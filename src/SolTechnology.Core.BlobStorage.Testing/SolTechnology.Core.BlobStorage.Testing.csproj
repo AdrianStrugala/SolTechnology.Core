@@ -1,7 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<Version>0.1.0</Version>
 		<Description>Integration-testing fixture for SolTechnology.Core.BlobStorage consumers — a Testcontainers-backed AzuriteFixture (the Azure Storage emulator) exposing the Azure Storage connection string, with CreateBlobContainerAsync / ClearAsync helpers and the shared container reuse model. Azure-specific by design. Reference from test projects only; not needed at runtime in production assemblies.</Description>
 		<PackageTags>sol technology core azure blob storage testing testcontainers azurite integration-tests component-tests</PackageTags>
 		<Product>SolTechnology.Core.BlobStorage.Testing</Product>

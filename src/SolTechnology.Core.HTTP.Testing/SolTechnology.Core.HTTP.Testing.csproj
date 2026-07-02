@@ -1,7 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<Version>0.1.0</Version>
 		<Description>Integration-testing fixtures for SolTechnology.Core.HTTP consumers — a WireMock.Net-backed WireMockFixture and a fluent fake-API DSL (Fake&lt;TClient&gt;().WithRequest(...).WithResponse(...)) keyed off your generated HTTP client interfaces. Reference from test projects only; not needed at runtime in production assemblies.</Description>
 		<PackageTags>sol technology core http testing wiremock mock fake-api integration-tests component-tests</PackageTags>
 		<Product>SolTechnology.Core.HTTP.Testing</Product>

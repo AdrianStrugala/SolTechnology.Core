@@ -1,7 +1,7 @@
 ---
 adr: 013-release-1.0
 step: 08 of 11
-status: reviewed
+status: done
 ---
 
 <!-- Reviewed (2026-06-30): tidied the Scheduler/Guards version note to a plain explicit 0.5.0 (answer

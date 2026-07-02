@@ -1,7 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<Version>0.1.0</Version>
 		<Description>Integration-testing fixture for SolTechnology.Core.Cache / Redis consumers — a Testcontainers-backed RedisFixture exposing HostName (host:port) and a StackExchange.Redis connection string, with a FlushAsync() between-test reset and the shared container reuse model. Reference from test projects only; not needed at runtime in production assemblies.</Description>
 		<PackageTags>sol technology core redis testing testcontainers cache integration-tests component-tests</PackageTags>
 		<Product>SolTechnology.Core.Redis.Testing</Product>

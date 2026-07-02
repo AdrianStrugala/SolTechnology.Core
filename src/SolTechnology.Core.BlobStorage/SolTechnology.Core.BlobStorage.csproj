@@ -1,7 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<Version>0.5.0</Version>
 		<Description>Azure Blob Storage wrapper with Avro serialization support. Simplifies blob operations with strongly-typed models, automatic serialization/deserialization, and streamlined configuration for cloud-native applications.</Description>
 		<PackageTags>sol technology core azure blob storage cloud avro serialization nosql dotnet file-storage</PackageTags>
 		<Product>SolTechnology.Core.BlobStorage</Product>

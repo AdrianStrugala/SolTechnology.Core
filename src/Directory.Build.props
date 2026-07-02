@@ -2,6 +2,7 @@
     <Import Project="$([MSBuild]::GetPathOfFileAbove('Directory.Build.props', '$(MSBuildThisFileDirectory)../'))" />
 
     <PropertyGroup>
+        <Version>1.0.0</Version>
         <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
         <!--
             NU1900 = NuGet Audit could not fetch vulnerability data (transport/auth failure
