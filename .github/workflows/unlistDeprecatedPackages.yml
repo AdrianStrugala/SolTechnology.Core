@@ -8,7 +8,7 @@ on:
   workflow_dispatch:
     inputs:
       confirm:
-        description: 'Type UNLIST to confirm hiding every published version of the deprecated ghost packages (ApiClient, Story, Scheduler, Guards, BlobStorage, BlobStorage.Testing) on nuget.org'
+        description: 'Type UNLIST to confirm hiding every published version of the deprecated ghost packages (ApiClient, Story, Scheduler, Guards, BlobStorage, BlobStorage.Testing, Faker, Flow) on nuget.org'
         type: string
         required: true
         default: ''
@@ -32,7 +32,8 @@ jobs:
         # flat-container index - never hardcoded. Re-listing, if needed, is a manual web-UI action.
         for id in SolTechnology.Core.ApiClient SolTechnology.Core.Story \
                   SolTechnology.Core.Scheduler SolTechnology.Core.Guards \
-                  SolTechnology.Core.BlobStorage SolTechnology.Core.BlobStorage.Testing; do
+                  SolTechnology.Core.BlobStorage SolTechnology.Core.BlobStorage.Testing \
+                  SolTechnology.Core.Faker SolTechnology.Core.Flow; do
           lower="$(printf '%s' "$id" | tr '[:upper:]' '[:lower:]')"
           versions="$(curl -fsSL "https://api.nuget.org/v3-flatcontainer/$lower/index.json" 2>/dev/null | jq -r '.versions[]' || true)"
           if [ -z "$versions" ]; then
