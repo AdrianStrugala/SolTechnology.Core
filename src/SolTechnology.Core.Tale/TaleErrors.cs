@@ -1,16 +1,16 @@
 namespace SolTechnology.Core.Tale;
 
 /// <summary>
-/// Marker error indicating that a story has paused at an interactive chapter
+/// Marker error indicating that a tale has paused at an interactive chapter
 /// and is awaiting external input.
 /// </summary>
 public sealed record TalePausedError : Error
 {
     public const string DefaultMessage = "Tale paused waiting for user input.";
 
-    public TalePausedError(Auid storyId, string? chapterId = null)
+    public TalePausedError(Auid taleId, string? chapterId = null)
     {
-        TaleId = storyId;
+        TaleId = taleId;
         ChapterId = chapterId;
         Message = DefaultMessage;
         Recoverable = true;
@@ -21,13 +21,13 @@ public sealed record TalePausedError : Error
 }
 
 /// <summary>
-/// Marker error indicating that a story was cancelled.
+/// Marker error indicating that a tale was cancelled.
 /// </summary>
 public sealed record TaleCancelledError : Error
 {
-    public TaleCancelledError(Auid storyId)
+    public TaleCancelledError(Auid taleId)
     {
-        TaleId = storyId;
+        TaleId = taleId;
         Message = "Tale execution cancelled.";
         Recoverable = false;
     }

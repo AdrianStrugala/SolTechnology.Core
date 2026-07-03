@@ -92,19 +92,19 @@ public class TaleControllerTests
 
         // Extract TaleId via reflection on the Result<TaleInstanceDto> shape.
         var dto = (TaleInstanceDto)startPayload!.GetType().GetProperty("Data")!.GetValue(startPayload)!;
-        var storyId = dto.TaleId;
+        var taleId = dto.TaleId;
 
         // GetStoryState should return 200 with WaitingForInput.
-        var state = await _controller.GetStoryState(storyId);
+        var state = await _controller.GetStoryState(taleId);
         state.Should().BeOfType<OkObjectResult>();
 
         // Resume with valid payload.
         var payload = JsonSerializer.SerializeToElement(new PausePayload { Token = "ABC" });
-        var resume = await _controller.ResumeStory(storyId, payload);
+        var resume = await _controller.ResumeStory(taleId, payload);
         resume.Should().BeOfType<OkObjectResult>();
 
         // Get result.
-        var resultResp = await _controller.GetStoryResult(storyId);
+        var resultResp = await _controller.GetStoryResult(taleId);
         resultResp.Should().BeOfType<OkObjectResult>();
 
         var resultDto = (TaleResultDto)((OkObjectResult)resultResp).Value!;

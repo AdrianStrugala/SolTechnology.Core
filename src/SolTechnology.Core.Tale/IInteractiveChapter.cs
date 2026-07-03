@@ -6,7 +6,7 @@ namespace SolTechnology.Core.Tale;
 /// pipeline, but consumers should prefer <see cref="ReadWithInput"/> over the inherited
 /// <see cref="IChapter{TContext}.Read"/> (which always throws for interactive chapters).
 /// </summary>
-/// <typeparam name="TContext">Context type flowing through the story.</typeparam>
+/// <typeparam name="TContext">Context type flowing through the tale.</typeparam>
 /// <typeparam name="TChapterInput">Input required from the caller.</typeparam>
 public interface IInteractiveChapter<in TContext, in TChapterInput> : IChapter<TContext>
     where TContext : class
@@ -17,7 +17,7 @@ public interface IInteractiveChapter<in TContext, in TChapterInput> : IChapter<T
     IReadOnlyList<Models.DataField> GetRequiredInputSchema();
 
     /// <summary>
-    /// Processes user input and advances the story.
+    /// Processes user input and advances the tale.
     /// </summary>
     Task<Result> ReadWithInput(TContext context, TChapterInput userInput);
 }

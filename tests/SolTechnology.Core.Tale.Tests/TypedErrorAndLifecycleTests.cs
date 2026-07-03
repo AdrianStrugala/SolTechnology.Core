@@ -80,15 +80,15 @@ public class TypedErrorAndLifecycleTests
     {
         var start = await Manager.StartStory<LifecycleTaleV1, LifecycleInput, LifecycleContext, LifecycleOutput>(
             new LifecycleInput { Value = 1 });
-        var storyId = start.Data!.TaleId;
+        var taleId = start.Data!.TaleId;
 
-        var cancel = await Manager.CancelStory(storyId);
+        var cancel = await Manager.CancelStory(taleId);
         cancel.IsSuccess.Should().BeTrue();
         cancel.Data!.Status.Should().Be(TaleStatus.Cancelled);
 
         // Resume attempt should fail.
         var resume = await Manager.ResumeStory<LifecycleTaleV1, LifecycleInput, LifecycleContext, LifecycleOutput>(
-            storyId,
+            taleId,
             JsonSerializer.SerializeToElement(new PausePayload { Token = "x" }));
         resume.IsFailure.Should().BeTrue();
     }
@@ -113,7 +113,7 @@ public class TypedErrorAndLifecycleTests
         first.IsSuccess.Should().BeTrue();
         var firstId = first.Data!.TaleId;
 
-        // Repeat with the same key — should return the same story.
+        // Repeat with the same key — should return the same tale.
         var second = await Manager.StartStory<LifecycleTaleV1, LifecycleInput, LifecycleContext, LifecycleOutput>(
             new LifecycleInput { Value = 99 }, idempotencyKey: "idem-42");
         second.IsSuccess.Should().BeTrue();

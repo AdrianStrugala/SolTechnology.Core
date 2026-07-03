@@ -20,13 +20,13 @@ namespace SolTechnology.Core.Tale.Api;
 [ApiController]
 [Route("api/tale")]
 public abstract class TaleController(
-    TaleManager storyManager,
+    TaleManager taleManager,
     TaleHandlerRegistry registry,
     TaleOptions options,
     ILogger<TaleController> logger)
     : ControllerBase
 {
-    protected TaleManager TaleManager { get; } = storyManager;
+    protected TaleManager TaleManager { get; } = taleManager;
     protected TaleHandlerRegistry Registry { get; } = registry;
     protected TaleOptions Options { get; } = options;
     protected ILogger<TaleController> Logger { get; } = logger;
@@ -34,7 +34,7 @@ public abstract class TaleController(
     // Cached MethodInfo handles for TaleManager generic methods.
     private static readonly ConcurrentDictionary<(Type, string), MethodInfo> _methodCache = new();
 
-    /// <summary>Start a new story with the given input.</summary>
+    /// <summary>Start a new tale with the given input.</summary>
     [HttpPost("{handlerTypeName}/start")]
     public virtual async Task<IActionResult> StartStory(
         [FromRoute] string handlerTypeName,
@@ -42,7 +42,7 @@ public abstract class TaleController(
         [FromHeader(Name = "Idempotency-Key")] string? idempotencyKey = null,
         CancellationToken cancellationToken = default)
     {
-        Logger.LogInformation("Starting story: {HandlerType}", handlerTypeName);
+        Logger.LogInformation("Starting tale: {HandlerType}", handlerTypeName);
 
         if (!TryResolveHandler(handlerTypeName, out var handlerType, out var error))
         {
@@ -80,31 +80,31 @@ public abstract class TaleController(
         }
         catch (TargetInvocationException tie) when (tie.InnerException != null)
         {
-            Logger.LogError(tie.InnerException, "Failed to start story {HandlerType}", handlerTypeName);
+            Logger.LogError(tie.InnerException, "Failed to start tale {HandlerType}", handlerTypeName);
             return StatusCode(500, Result.Fail(tie.InnerException.Message));
         }
         catch (Exception ex)
         {
-            Logger.LogError(ex, "Failed to start story {HandlerType}", handlerTypeName);
+            Logger.LogError(ex, "Failed to start tale {HandlerType}", handlerTypeName);
             return StatusCode(500, Result.Fail(ex.Message));
         }
     }
 
-    /// <summary>Resume a paused story with user input.</summary>
-    [HttpPost("{storyId}")]
+    /// <summary>Resume a paused tale with user input.</summary>
+    [HttpPost("{taleId}")]
     public virtual async Task<IActionResult> ResumeStory(
-        [FromRoute] string storyId,
+        [FromRoute] string taleId,
         [FromBody] JsonElement? userInput = null,
         CancellationToken cancellationToken = default)
     {
-        Logger.LogInformation("Resuming story: {TaleId}", storyId);
+        Logger.LogInformation("Resuming tale: {TaleId}", taleId);
 
-        if (!Auid.TryParse(storyId, null, out var parsedStoryId))
+        if (!Auid.TryParse(taleId, null, out var parsedTaleId))
         {
-            return BadRequest(Result.Fail($"Invalid story ID format: {storyId}"));
+            return BadRequest(Result.Fail($"Invalid tale ID format: {taleId}"));
         }
 
-        var state = await TaleManager.GetStoryState(parsedStoryId);
+        var state = await TaleManager.GetStoryState(parsedTaleId);
         if (state.IsFailure)
         {
             return NotFound(state);
@@ -126,32 +126,32 @@ public abstract class TaleController(
             var method = GetCachedMethod(nameof(TaleManager.ResumeStory))
                 .MakeGenericMethod(handlerType!, args![0], args[1], args[2]);
 
-            var task = (Task)method.Invoke(TaleManager, new object?[] { parsedStoryId, userInput, cancellationToken })!;
+            var task = (Task)method.Invoke(TaleManager, new object?[] { parsedTaleId, userInput, cancellationToken })!;
             await task;
             return UnwrapResult(task);
         }
         catch (TargetInvocationException tie) when (tie.InnerException != null)
         {
-            Logger.LogError(tie.InnerException, "Failed to resume story {TaleId}", storyId);
+            Logger.LogError(tie.InnerException, "Failed to resume tale {TaleId}", taleId);
             return StatusCode(500, Result.Fail(tie.InnerException.Message));
         }
         catch (Exception ex)
         {
-            Logger.LogError(ex, "Failed to resume story {TaleId}", storyId);
+            Logger.LogError(ex, "Failed to resume tale {TaleId}", taleId);
             return StatusCode(500, Result.Fail(ex.Message));
         }
     }
 
-    /// <summary>Get the current state of a story.</summary>
-    [HttpGet("{storyId}")]
-    public virtual async Task<IActionResult> GetStoryState([FromRoute] string storyId)
+    /// <summary>Get the current state of a tale.</summary>
+    [HttpGet("{taleId}")]
+    public virtual async Task<IActionResult> GetStoryState([FromRoute] string taleId)
     {
-        if (!Auid.TryParse(storyId, null, out var parsedStoryId))
+        if (!Auid.TryParse(taleId, null, out var parsedTaleId))
         {
-            return BadRequest(Result.Fail($"Invalid story ID format: {storyId}"));
+            return BadRequest(Result.Fail($"Invalid tale ID format: {taleId}"));
         }
 
-        var result = await TaleManager.GetStoryState(parsedStoryId);
+        var result = await TaleManager.GetStoryState(parsedTaleId);
         if (result.IsFailure)
         {
             return NotFound(result);
@@ -160,16 +160,16 @@ public abstract class TaleController(
         return Ok(Result<TaleInstanceDto>.Success(TaleInstanceDto.FromModel(result.Data!)));
     }
 
-    /// <summary>Get the deserialized output of a completed story.</summary>
-    [HttpGet("{storyId}/result")]
-    public virtual async Task<IActionResult> GetStoryResult([FromRoute] string storyId)
+    /// <summary>Get the deserialized output of a completed tale.</summary>
+    [HttpGet("{taleId}/result")]
+    public virtual async Task<IActionResult> GetStoryResult([FromRoute] string taleId)
     {
-        if (!Auid.TryParse(storyId, null, out var parsedStoryId))
+        if (!Auid.TryParse(taleId, null, out var parsedTaleId))
         {
-            return BadRequest(Result.Fail($"Invalid story ID format: {storyId}"));
+            return BadRequest(Result.Fail($"Invalid tale ID format: {taleId}"));
         }
 
-        var state = await TaleManager.GetStoryState(parsedStoryId);
+        var state = await TaleManager.GetStoryState(parsedTaleId);
         if (state.IsFailure)
         {
             return NotFound(state);
@@ -206,21 +206,21 @@ public abstract class TaleController(
         }
         catch (Exception ex)
         {
-            Logger.LogError(ex, "Failed to extract result for story {TaleId}", storyId);
-            return StatusCode(500, Result.Fail($"Failed to extract story output: {ex.Message}"));
+            Logger.LogError(ex, "Failed to extract result for tale {TaleId}", taleId);
+            return StatusCode(500, Result.Fail($"Failed to extract tale output: {ex.Message}"));
         }
     }
 
-    /// <summary>Cancel a running or paused story.</summary>
-    [HttpDelete("{storyId}")]
-    public virtual async Task<IActionResult> CancelStory([FromRoute] string storyId)
+    /// <summary>Cancel a running or paused tale.</summary>
+    [HttpDelete("{taleId}")]
+    public virtual async Task<IActionResult> CancelStory([FromRoute] string taleId)
     {
-        if (!Auid.TryParse(storyId, null, out var parsedStoryId))
+        if (!Auid.TryParse(taleId, null, out var parsedTaleId))
         {
-            return BadRequest(Result.Fail($"Invalid story ID format: {storyId}"));
+            return BadRequest(Result.Fail($"Invalid tale ID format: {taleId}"));
         }
 
-        var result = await TaleManager.CancelStory(parsedStoryId);
+        var result = await TaleManager.CancelStory(parsedTaleId);
         if (result.IsFailure)
         {
             return BadRequest(result);

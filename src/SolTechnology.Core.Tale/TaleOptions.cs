@@ -11,7 +11,7 @@ public sealed class TaleOptions
 {
 
     /// <summary>
-    /// Prefix used when generating new <see cref="Auid"/> story identifiers. Use distinct
+    /// Prefix used when generating new <see cref="Auid"/> tale identifiers. Use distinct
     /// prefixes to separate tenants or environments in a shared persistence store.
     /// </summary>
     public string TaleIdPrefix { get; set; } = "STR";

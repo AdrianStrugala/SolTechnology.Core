@@ -4,8 +4,8 @@ using SolTechnology.Core.Tale.Models;
 namespace SolTechnology.Core.Tale;
 
 /// <summary>
-/// Base class for interactive story chapters that require user input.
-/// The story pauses at these chapters and waits for external input before continuing.
+/// Base class for interactive tale chapters that require user input.
+/// The tale pauses at these chapters and waits for external input before continuing.
 /// </summary>
 /// <typeparam name="TContext">The Context type that flows through this chapter.</typeparam>
 /// <typeparam name="TChapterInput">The input type that the user must provide.</typeparam>

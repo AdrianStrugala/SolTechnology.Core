@@ -1,8 +1,8 @@
 namespace SolTechnology.Core.Tale;
 
 /// <summary>
-/// Base class for story chapters.
-/// Chapters are the building blocks of your story - each represents a focused step in your business logic.
+/// Base class for tale chapters.
+/// Chapters are the building blocks of your tale - each represents a focused step in your business logic.
 /// For chapters that need user input, use InteractiveChapter instead.
 /// </summary>
 /// <typeparam name="TContext">The Context type that flows through this chapter</typeparam>
@@ -32,7 +32,7 @@ public abstract class Chapter<TContext> : IChapter<TContext>
     /// Read from context, perform your business logic, then update Context with results.
     /// Return Result.Success() if successful, or Result.Fail("message") if something goes wrong.
     /// </summary>
-    /// <param name="context">The Context containing all story data</param>
+    /// <param name="context">The Context containing all tale data</param>
     /// <returns>Result indicating success or failure</returns>
     public abstract Task<Result> Read(TContext context);
 }

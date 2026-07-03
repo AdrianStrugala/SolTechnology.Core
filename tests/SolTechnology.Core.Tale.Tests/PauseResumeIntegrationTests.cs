@@ -45,7 +45,7 @@ public class PauseResumeIntegrationTests
         services.AddTransient<ProcessPaymentChapter>();
         services.AddTransient<SendConfirmationChapter>();
 
-        // Register test story handler
+        // Register test tale handler
         services.AddTransient<OrderProcessingTale>();
 
         _serviceProvider = services.BuildServiceProvider();
@@ -71,17 +71,17 @@ public class PauseResumeIntegrationTests
         var manager = _serviceProvider.GetRequiredService<TaleManager>();
         var input = new OrderInput { OrderId = "ORD-001", Amount = 100.50m };
 
-        // Act - Start the story
+        // Act - Start the tale
         var result = await manager.StartStory<OrderProcessingTale, OrderInput, OrderContext, OrderOutput>(input);
 
         // Assert - Should pause at interactive chapter
         result.IsSuccess.Should().BeTrue();
-        var storyInstance = result.Data!;
+        var taleInstance = result.Data!;
 
-        storyInstance.Status.Should().Be(TaleStatus.WaitingForInput);
-        storyInstance.CurrentChapter.Should().NotBeNull();
-        storyInstance.CurrentChapter!.ChapterId.Should().Be("RequestCustomerDetailsChapter");
-        storyInstance.CurrentChapter.RequiredData.Should().NotBeEmpty();
+        taleInstance.Status.Should().Be(TaleStatus.WaitingForInput);
+        taleInstance.CurrentChapter.Should().NotBeNull();
+        taleInstance.CurrentChapter!.ChapterId.Should().Be("RequestCustomerDetailsChapter");
+        taleInstance.CurrentChapter.RequiredData.Should().NotBeEmpty();
     }
 
     [Test]
@@ -91,9 +91,9 @@ public class PauseResumeIntegrationTests
         var manager = _serviceProvider.GetRequiredService<TaleManager>();
         var input = new OrderInput { OrderId = "ORD-002", Amount = 200m };
 
-        // Act - Start the story (should pause)
+        // Act - Start the tale (should pause)
         var startResult = await manager.StartStory<OrderProcessingTale, OrderInput, OrderContext, OrderOutput>(input);
-        var storyId = startResult.Data!.TaleId;
+        var taleId = startResult.Data!.TaleId;
 
         // Prepare user input
         var customerDetails = new CustomerDetails
@@ -104,9 +104,9 @@ public class PauseResumeIntegrationTests
         };
         var userInput = JsonSerializer.SerializeToElement(customerDetails);
 
-        // Resume the story with user input
+        // Resume the tale with user input
         var resumeResult = await manager.ResumeStory<OrderProcessingTale, OrderInput, OrderContext, OrderOutput>(
-            storyId,
+            taleId,
             userInput);
 
         // Assert - Should complete successfully
@@ -121,13 +121,13 @@ public class PauseResumeIntegrationTests
         var manager = _serviceProvider.GetRequiredService<TaleManager>();
         var input = new OrderInput { OrderId = "ORD-003", Amount = 150m };
 
-        // Act - Start story
+        // Act - Start tale
         var startResult = await manager.StartStory<OrderProcessingTale, OrderInput, OrderContext, OrderOutput>(input);
-        var storyId = startResult.Data!.TaleId;
+        var taleId = startResult.Data!.TaleId;
 
-        // Load story state
-        var storyInstance = await _repository.FindById(storyId);
-        var context = JsonSerializer.Deserialize<OrderContext>(storyInstance!.Context);
+        // Load tale state
+        var taleInstance = await _repository.FindById(taleId);
+        var context = JsonSerializer.Deserialize<OrderContext>(taleInstance!.Context);
 
         // Assert - Context should be preserved
         context.Should().NotBeNull();
@@ -146,7 +146,7 @@ public class PauseResumeIntegrationTests
         // Act - Start and pause
         var startResult = await manager.StartStory<OrderProcessingTale, OrderInput, OrderContext, OrderOutput>(input);
         startResult.IsSuccess.Should().BeTrue();
-        var storyId = startResult.Data!.TaleId;
+        var taleId = startResult.Data!.TaleId;
 
         // Resume with input
         var customerDetails = new CustomerDetails
@@ -158,14 +158,14 @@ public class PauseResumeIntegrationTests
         var userInput = JsonSerializer.SerializeToElement(customerDetails);
 
         var resumeResult = await manager.ResumeStory<OrderProcessingTale, OrderInput, OrderContext, OrderOutput>(
-            storyId,
+            taleId,
             userInput);
 
         // Assert
         resumeResult.IsSuccess.Should().BeTrue();
 
         // All chapters should have executed
-        var finalState = await _repository.FindById(storyId);
+        var finalState = await _repository.FindById(taleId);
         finalState.Should().NotBeNull();
         finalState!.History.Should().HaveCount(4); // All 4 chapters
         finalState.History.Select(h => h.ChapterId).Should().ContainInOrder(
@@ -183,9 +183,9 @@ public class PauseResumeIntegrationTests
         var manager = _serviceProvider.GetRequiredService<TaleManager>();
         var input = new OrderInput { OrderId = "ORD-005", Amount = 50m };
 
-        // Act - Start story
+        // Act - Start tale
         var startResult = await manager.StartStory<OrderProcessingTale, OrderInput, OrderContext, OrderOutput>(input);
-        var storyId = startResult.Data!.TaleId;
+        var taleId = startResult.Data!.TaleId;
 
         // Resume with invalid input (empty name)
         var invalidDetails = new CustomerDetails
@@ -197,10 +197,10 @@ public class PauseResumeIntegrationTests
         var userInput = JsonSerializer.SerializeToElement(invalidDetails);
 
         var resumeResult = await manager.ResumeStory<OrderProcessingTale, OrderInput, OrderContext, OrderOutput>(
-            storyId,
+            taleId,
             userInput);
 
-        // Assert — validation failure keeps the story paused for retry
+        // Assert — validation failure keeps the tale paused for retry
         resumeResult.IsSuccess.Should().BeTrue();
         resumeResult.Data!.Status.Should().Be(TaleStatus.WaitingForInput);
     }
@@ -226,16 +226,16 @@ public class PauseResumeIntegrationTests
         var manager = _serviceProvider.GetRequiredService<TaleManager>();
         var input = new OrderInput { OrderId = "ORD-006", Amount = 75m };
 
-        // Act - Start story
+        // Act - Start tale
         var startResult = await manager.StartStory<OrderProcessingTale, OrderInput, OrderContext, OrderOutput>(input);
-        var storyId = startResult.Data!.TaleId;
+        var taleId = startResult.Data!.TaleId;
 
-        // Get story state
-        var stateResult = await manager.GetStoryState(storyId);
+        // Get tale state
+        var stateResult = await manager.GetStoryState(taleId);
 
         // Assert
         stateResult.IsSuccess.Should().BeTrue();
-        stateResult.Data!.TaleId.Should().Be(storyId);
+        stateResult.Data!.TaleId.Should().Be(taleId);
         stateResult.Data.Status.Should().Be(TaleStatus.WaitingForInput);
     }
 }

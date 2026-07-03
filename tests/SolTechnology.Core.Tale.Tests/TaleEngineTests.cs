@@ -145,7 +145,7 @@ public class TaleEngineTests
     [Test]
     public async Task TaleEngine_ShouldNotExecuteChapter_WhenNotRegisteredInDI()
     {
-        // Arrange - Create a story that references an unregistered chapter
+        // Arrange - Create a tale that references an unregistered chapter
         var services = new ServiceCollection();
         services.AddLogging(builder => builder.AddConsole());
         // Intentionally NOT registering UnregisteredChapter

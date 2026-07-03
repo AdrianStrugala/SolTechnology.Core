@@ -26,7 +26,7 @@ internal static class TaleJsonOptions
 }
 
 /// <summary>
-/// Internal execution engine for a story. Strongly typed — no <c>dynamic</c>, no string-matched
+/// Internal execution engine for a tale. Strongly typed — no <c>dynamic</c>, no string-matched
 /// pause detection. Tracks chapter execution, manages pause/resume, aggregates errors and
 /// (optionally) persists state.
 /// </summary>
@@ -144,9 +144,9 @@ internal sealed class TaleEngine<TInput, TContext, TOutput>
         }
     }
 
-    // The story runs on one of two tracks. Won-track steps act only while it is still succeeding;
+    // The tale runs on one of two tracks. Won-track steps act only while it is still succeeding;
     // lost-track steps act only after a failure (until an Otherwise recovers). Both tracks are
-    // suspended once the story is cancelled or paused.
+    // suspended once the tale is cancelled or paused.
     private bool OnWonTrack => !_isCancelled && !_isPaused && !_hasFailed;
     private bool OnLostTrack => !_isCancelled && !_isPaused && _hasFailed;
 
@@ -225,7 +225,7 @@ internal sealed class TaleEngine<TInput, TContext, TOutput>
         if (_isPaused && existingChapter?.Status == TaleStatus.WaitingForInput &&
             existingChapter.ChapterId == chapter.ChapterId)
         {
-            _logger.LogInformation("Resuming story at chapter {ChapterId}", chapter.ChapterId);
+            _logger.LogInformation("Resuming tale at chapter {ChapterId}", chapter.ChapterId);
             _isPaused = false;
         }
 
@@ -257,8 +257,8 @@ internal sealed class TaleEngine<TInput, TContext, TOutput>
             if (result.IsFailure)
             {
                 // When the interactive chapter's ReadWithInput returns a validation error,
-                // ExecuteInteractiveChapter re-pauses the story (_isPaused = true) so the
-                // user can retry. In that case, skip HandleChapterFailure — the story is
+                // ExecuteInteractiveChapter re-pauses the tale (_isPaused = true) so the
+                // user can retry. In that case, skip HandleChapterFailure — the tale is
                 // NOT terminally failed. For all other failures (deserialization errors,
                 // automated chapters), _isPaused stays false → terminal failure.
                 if (!_isPaused)
@@ -368,9 +368,9 @@ internal sealed class TaleEngine<TInput, TContext, TOutput>
     }
 
     /// <summary>
-    /// Keeps the story paused at the current interactive chapter after a validation failure,
+    /// Keeps the tale paused at the current interactive chapter after a validation failure,
     /// allowing the user to retry with corrected input. Does NOT set <see cref="_hasFailed"/>
-    /// — the story is still alive and waiting for input.
+    /// — the tale is still alive and waiting for input.
     /// </summary>
     private void PauseForRetry(IChapter<TContext> chapter, ChapterInfo chapterInfo, Error? error)
     {
@@ -450,11 +450,11 @@ internal sealed class TaleEngine<TInput, TContext, TOutput>
         return TaleStatus.Running;
     }
 
-    private async Task<Result> LoadTaleState(Auid storyId)
+    private async Task<Result> LoadTaleState(Auid taleId)
     {
         if (_repository == null) return Result.Success();
 
-        var instance = await _repository.FindById(storyId);
+        var instance = await _repository.FindById(taleId);
         if (instance == null) return Result.Success();
 
 

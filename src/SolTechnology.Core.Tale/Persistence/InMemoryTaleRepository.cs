@@ -9,18 +9,18 @@ namespace SolTechnology.Core.Tale.Persistence;
 /// </summary>
 public class InMemoryTaleRepository : ITaleRepository
 {
-    private readonly ConcurrentDictionary<Auid, TaleInstance> _stories = new();
+    private readonly ConcurrentDictionary<Auid, TaleInstance> _tales = new();
 
-    public Task<TaleInstance?> FindById(Auid storyId)
+    public Task<TaleInstance?> FindById(Auid taleId)
     {
-        if (_stories.TryGetValue(storyId, out var story))
-            return Task.FromResult<TaleInstance?>(story.Clone());
+        if (_tales.TryGetValue(taleId, out var tale))
+            return Task.FromResult<TaleInstance?>(tale.Clone());
         return Task.FromResult<TaleInstance?>(null);
     }
 
     public Task<TaleInstance?> FindByIdempotencyKey(string idempotencyKey)
     {
-        var match = _stories.Values.FirstOrDefault(s =>
+        var match = _tales.Values.FirstOrDefault(s =>
             !string.IsNullOrEmpty(s.IdempotencyKey) &&
             s.IdempotencyKey == idempotencyKey);
         return Task.FromResult(match?.Clone());
@@ -32,7 +32,7 @@ public class InMemoryTaleRepository : ITaleRepository
         int skip = 0,
         int take = 100)
     {
-        IEnumerable<TaleInstance> query = _stories.Values;
+        IEnumerable<TaleInstance> query = _tales.Values;
         if (status.HasValue) query = query.Where(s => s.Status == status.Value);
         if (!string.IsNullOrEmpty(handlerTypeName))
             query = query.Where(s => s.HandlerTypeName == handlerTypeName);
@@ -47,14 +47,14 @@ public class InMemoryTaleRepository : ITaleRepository
         return Task.FromResult<IReadOnlyList<TaleInstance>>(result);
     }
 
-    public Task SaveAsync(TaleInstance storyInstance)
+    public Task SaveAsync(TaleInstance taleInstance)
     {
-        _stories.AddOrUpdate(
-            storyInstance.TaleId,
-            storyInstance.Clone(),
+        _tales.AddOrUpdate(
+            taleInstance.TaleId,
+            taleInstance.Clone(),
             (_, existing) =>
             {
-                var updated = storyInstance.Clone();
+                var updated = taleInstance.Clone();
                 // Preserve CreatedAt from the original record (review §2.2).
                 updated.CreatedAt = existing.CreatedAt;
                 return updated;
@@ -63,9 +63,9 @@ public class InMemoryTaleRepository : ITaleRepository
         return Task.CompletedTask;
     }
 
-    public Task DeleteAsync(Auid storyId)
+    public Task DeleteAsync(Auid taleId)
     {
-        _stories.TryRemove(storyId, out _);
+        _tales.TryRemove(taleId, out _);
         return Task.CompletedTask;
     }
 }

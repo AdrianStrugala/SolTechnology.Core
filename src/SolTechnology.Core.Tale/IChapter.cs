@@ -1,8 +1,8 @@
 namespace SolTechnology.Core.Tale;
 
 /// <summary>
-/// Base interface for all story chapters.
-/// A chapter represents a single step in your story - a focused piece of business logic.
+/// Base interface for all tale chapters.
+/// A chapter represents a single step in your tale - a focused piece of business logic.
 /// Each chapter reads from and writes to the shared context.
 /// </summary>
 /// <typeparam name="TContext">The Context type that flows through this chapter</typeparam>

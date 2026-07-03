@@ -4,12 +4,12 @@ using System.Text.Json.Serialization;
 namespace SolTechnology.Core.Tale.Models;
 
 /// <summary>
-/// Represents a persisted story instance with its current state.
-/// Used by repositories to save and restore story execution state.
+/// Represents a persisted tale instance with its current state.
+/// Used by repositories to save and restore tale execution state.
 /// </summary>
 public class TaleInstance
 {
-    /// <summary>Unique identifier for this story instance.</summary>
+    /// <summary>Unique identifier for this tale instance.</summary>
     public Auid TaleId { get; set; } = default!;
 
     /// <summary>
@@ -31,23 +31,23 @@ public class TaleInstance
     /// <summary>Execution history — all chapters that have been executed so far, chronologically.</summary>
     public List<ChapterInfo> History { get; set; } = new();
 
-    /// <summary>Current status of the story.</summary>
+    /// <summary>Current status of the tale.</summary>
     public TaleStatus Status { get; set; } = TaleStatus.Created;
 
-    /// <summary>When this story instance was first created. Never updated.</summary>
+    /// <summary>When this tale instance was first created. Never updated.</summary>
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
-    /// <summary>When this story instance was last updated.</summary>
+    /// <summary>When this tale instance was last updated.</summary>
     public DateTime LastUpdatedAt { get; set; } = DateTime.UtcNow;
 
-    /// <summary>The complete context for this story, serialized as JSON.</summary>
+    /// <summary>The complete context for this tale, serialized as JSON.</summary>
     public string Context { get; set; } = string.Empty;
 
     [JsonConstructor]
     public TaleInstance() { }
 
     /// <summary>
-    /// Create a deep clone of this story instance (used by in-memory repository
+    /// Create a deep clone of this tale instance (used by in-memory repository
     /// to emulate database immutability).
     /// </summary>
     public TaleInstance Clone()

@@ -170,7 +170,7 @@ public class TaleHandlerTests
 #region Test Stories
 
 /// <summary>
-/// Simple story that performs a calculation across 3 chapters.
+/// Simple tale that performs a calculation across 3 chapters.
 /// </summary>
 public class SimpleCalculationTale : TaleHandler<CalculationInput, CalculationContext, CalculationOutput>
 {

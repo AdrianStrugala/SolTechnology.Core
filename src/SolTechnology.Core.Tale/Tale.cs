@@ -3,15 +3,15 @@ using SolTechnology.Core.Tale.Orchestration;
 namespace SolTechnology.Core.Tale;
 
 /// <summary>
-/// A fluent plan for a story — the chapters to read, in order, with guards and recovery — written so
+/// A fluent plan for a tale — the chapters to read, in order, with guards and recovery — written so
 /// <c>Tell()</c> reads like a table of contents. A Tale describes the flow; the <c>TaleEngine</c>
-/// executes it. Like a railway, the story runs on one of two tracks — <b>won</b> or <b>lost</b>.
-/// Every step acts only on the won track; the first failure switches the story to the lost track and
+/// executes it. Like a railway, the tale runs on one of two tracks — <b>won</b> or <b>lost</b>.
+/// Every step acts only on the won track; the first failure switches the tale to the lost track and
 /// the remaining chapters are skipped, unless an <see cref="Otherwise{TChapter}()">Otherwise</see>
 /// puts it back.
 /// </summary>
 /// <typeparam name="TContext">The context carrying state through the chapters.</typeparam>
-/// <typeparam name="TOutput">The output produced when the story concludes.</typeparam>
+/// <typeparam name="TOutput">The output produced when the tale concludes.</typeparam>
 /// <example>
 /// <code>
 /// protected override Tale&lt;RouteResult&gt; Tell() =&gt;
@@ -46,7 +46,7 @@ public sealed class Tale<TContext, TOutput>
 
     internal IReadOnlyList<TaleStep> Steps => _steps;
 
-    /// <summary>Read the next chapter. Skipped if the story has already switched to the lost track.</summary>
+    /// <summary>Read the next chapter. Skipped if the tale has already switched to the lost track.</summary>
     /// <typeparam name="TChapter">The chapter to read; resolved from DI.</typeparam>
     public Tale<TContext, TOutput> Read<TChapter>() where TChapter : IChapter<TContext>
     {
@@ -56,7 +56,7 @@ public sealed class Tale<TContext, TOutput>
 
     /// <summary>
     /// Stay on the won track only while <paramref name="condition"/> holds; otherwise switch to the
-    /// lost track carrying <paramref name="otherwise"/>. The story's precondition check.
+    /// lost track carrying <paramref name="otherwise"/>. The tale's precondition check.
     /// </summary>
     /// <param name="condition">What the context must satisfy to keep going.</param>
     /// <param name="otherwise">The error to fail with when the condition does not hold.</param>
@@ -67,8 +67,8 @@ public sealed class Tale<TContext, TOutput>
     }
 
     /// <summary>
-    /// Recover from a lost story by reading a fallback chapter — clears the error and puts the story
-    /// back on the won track. Runs only when the story has failed; ignored otherwise.
+    /// Recover from a lost tale by reading a fallback chapter — clears the error and puts the tale
+    /// back on the won track. Runs only when the tale has failed; ignored otherwise.
     /// </summary>
     /// <typeparam name="TChapter">The fallback chapter; resolved from DI.</typeparam>
     public Tale<TContext, TOutput> Otherwise<TChapter>() where TChapter : IChapter<TContext>
@@ -78,8 +78,8 @@ public sealed class Tale<TContext, TOutput>
     }
 
     /// <summary>
-    /// Recover from a lost story with an inline fallback — clears the error and puts the story back on
-    /// the won track. Runs only when the story has failed; ignored otherwise.
+    /// Recover from a lost tale with an inline fallback — clears the error and puts the tale back on
+    /// the won track. Runs only when the tale has failed; ignored otherwise.
     /// </summary>
     /// <param name="recover">Inline recovery that mutates the context and returns its own result.</param>
     public Tale<TContext, TOutput> Otherwise(Func<TContext, Task<Result>> recover)
@@ -88,7 +88,7 @@ public sealed class Tale<TContext, TOutput>
         return this;
     }
 
-    /// <summary>Run a side-effect (logging, metrics, alerting) when the story has been lost. Track unchanged.</summary>
+    /// <summary>Run a side-effect (logging, metrics, alerting) when the tale has been lost. Track unchanged.</summary>
     public Tale<TContext, TOutput> WhenLost(Action<Error> effect)
     {
         _steps.Add(new OnLostStep(error => { effect(error); return Task.CompletedTask; }));
@@ -102,7 +102,7 @@ public sealed class Tale<TContext, TOutput>
         return this;
     }
 
-    /// <summary>Run a side-effect when the story is still being won. Track unchanged.</summary>
+    /// <summary>Run a side-effect when the tale is still being won. Track unchanged.</summary>
     public Tale<TContext, TOutput> WhenWon(Action<TContext> effect)
     {
         _steps.Add(new OnWonStep(ctx => { effect((TContext)ctx); return Task.CompletedTask; }));
@@ -131,9 +131,9 @@ public sealed class Tale<TContext, TOutput>
     }
 
     /// <summary>
-    /// Conclude the story: project the final context into the output. This seals the plan into a
-    /// <see cref="Tale{TOutput}"/> that <c>Tell()</c> returns. Runs only when the story is won — a
-    /// lost or paused story returns its error instead.
+    /// Conclude the tale: project the final context into the output. This seals the plan into a
+    /// <see cref="Tale{TOutput}"/> that <c>Tell()</c> returns. Runs only when the tale is won — a
+    /// lost or paused tale returns its error instead.
     /// </summary>
     /// <param name="conclusion">Builds the output from the final context (commonly <c>ctx =&gt; ctx.Output</c>).</param>
     public Tale<TOutput> Finale(Func<TContext, TOutput> conclusion)
@@ -141,11 +141,11 @@ public sealed class Tale<TContext, TOutput>
 }
 
 /// <summary>
-/// A sealed story plan: the ordered steps plus the concluding projection. Produced by
+/// A sealed tale plan: the ordered steps plus the concluding projection. Produced by
 /// <see cref="Tale{TContext,TOutput}.Finale"/> and returned from <c>Tell()</c>. The engine reads
-/// <see cref="Steps"/> and applies <see cref="Conclusion"/> when the story is won.
+/// <see cref="Steps"/> and applies <see cref="Conclusion"/> when the tale is won.
 /// </summary>
-/// <typeparam name="TOutput">The output produced when the story concludes.</typeparam>
+/// <typeparam name="TOutput">The output produced when the tale concludes.</typeparam>
 public sealed class Tale<TOutput>
     where TOutput : class
 {

@@ -1,7 +1,7 @@
 namespace SolTechnology.Core.Tale.Models;
 
 /// <summary>
-/// Represents the current status of a story or chapter.
+/// Represents the current status of a tale or chapter.
 /// </summary>
 public enum TaleStatus
 {

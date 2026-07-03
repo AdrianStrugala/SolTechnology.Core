@@ -8,16 +8,16 @@ using SolTechnology.Core.Tale.Persistence;
 namespace SolTechnology.Core.Tale;
 
 /// <summary>
-/// Base handler for orchestrating multi-chapter stories.
+/// Base handler for orchestrating multi-chapter tales.
 /// Supports both simple automated workflows and interactive (pausable) workflows with persistence.
 /// Override <see cref="Tell"/> to describe the chapter sequence as a <see cref="Tale{TOutput}"/> —
 /// it reads like a table of contents.
 /// </summary>
-/// <typeparam name="TInput">The input type that initiates the story.</typeparam>
+/// <typeparam name="TInput">The input type that initiates the tale.</typeparam>
 /// <typeparam name="TContext">The context type carrying state through chapters.</typeparam>
-/// <typeparam name="TOutput">The output type returned when the story completes.</typeparam>
+/// <typeparam name="TOutput">The output type returned when the tale completes.</typeparam>
 /// <example>
-/// Automated story (no user interaction):
+/// Automated tale (no user interaction):
 /// <code>
 /// public class SaveCityTale : TaleHandler&lt;SaveCityInput, SaveCityContext, SaveCityResult&gt;
 /// {
@@ -34,7 +34,7 @@ namespace SolTechnology.Core.Tale;
 /// </code>
 /// </example>
 /// <example>
-/// Interactive story (pauses for user input, requires persistence):
+/// Interactive tale (pauses for user input, requires persistence):
 /// <code>
 /// public class UserOnboardingTale : TaleHandler&lt;OnboardingInput, OnboardingContext, OnboardingOutput&gt;
 /// {
@@ -56,7 +56,7 @@ public abstract class TaleHandler<TInput, TContext, TOutput>
     where TOutput : class, new()
 {
     /// <summary>
-    /// The story context. Settable only by the framework; external mutation during
+    /// The tale context. Settable only by the framework; external mutation during
     /// a single <c>Handle</c> invocation is not supported.
     /// </summary>
     public TContext Context { get; internal set; } = null!;
@@ -72,7 +72,7 @@ public abstract class TaleHandler<TInput, TContext, TOutput>
     }
 
     /// <summary>
-    /// Defines the story flow. Override this to narrate the chapter sequence as a fluent
+    /// Defines the tale flow. Override this to narrate the chapter sequence as a fluent
     /// <see cref="Tale{TOutput}"/> — it should read like a table of contents for the workflow.
     /// Start with <see cref="Open{TChapter}"/>, chain chapters with <c>Read</c>, guard with
     /// <c>Expect</c>, recover with <c>Otherwise</c>, and conclude with <c>Finale</c>.
@@ -88,15 +88,15 @@ public abstract class TaleHandler<TInput, TContext, TOutput>
     /// </example>
     /// <remarks>
     /// <c>Tell()</c> must be deterministic. It is re-invoked on every <c>Handle</c> call — including
-    /// each resume of a paused story — and the engine replays the rebuilt plan against the persisted
+    /// each resume of a paused tale — and the engine replays the rebuilt plan against the persisted
     /// chapter history. Branch on context state via <c>Expect</c> / <c>Otherwise</c>, never on ambient
     /// inputs (clock, random, feature flags) that can differ between the original run and a resume,
-    /// or the story will resume on the wrong step.
+    /// or the tale will resume on the wrong step.
     /// </remarks>
     protected abstract Tale<TOutput> Tell();
 
     /// <summary>
-    /// Opens a story with its first chapter, returning a <see cref="Tale{TContext,TOutput}"/> to
+    /// Opens a tale with its first chapter, returning a <see cref="Tale{TContext,TOutput}"/> to
     /// continue building. For automated chapters the engine runs them immediately; for
     /// <see cref="InteractiveChapter{TContext,TInput}"/> it pauses on the first run and resumes from
     /// persisted state on a subsequent <c>TaleManager.ResumeStory</c> call.
@@ -113,11 +113,11 @@ public abstract class TaleHandler<TInput, TContext, TOutput>
     protected Tale<TContext, TOutput> Open<TChapter>() where TChapter : IChapter<TContext>
         => Tale<TContext, TOutput>.Open<TChapter>();
 
-    /// <summary>Opens a story with an inline step, for flows whose first action is not a dedicated chapter.</summary>
+    /// <summary>Opens a tale with an inline step, for flows whose first action is not a dedicated chapter.</summary>
     protected Tale<TContext, TOutput> Open(Action<TContext> step)
         => Tale<TContext, TOutput>.Open(step);
 
-    /// <summary>Opens a story with an inline step that may itself fail.</summary>
+    /// <summary>Opens a tale with an inline step that may itself fail.</summary>
     protected Tale<TContext, TOutput> Open(Func<TContext, Task<Result>> step)
         => Tale<TContext, TOutput>.Open(step);
 
@@ -128,7 +128,7 @@ public abstract class TaleHandler<TInput, TContext, TOutput>
         => Handle(input, null, cancellationToken);
 
     /// <summary>
-    /// Executes the story with optional resume input.
+    /// Executes the tale with optional resume input.
     /// </summary>
     public virtual async Task<Result<TOutput>> Handle(
         TInput input,

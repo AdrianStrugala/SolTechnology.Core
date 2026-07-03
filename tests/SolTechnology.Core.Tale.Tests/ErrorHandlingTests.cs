@@ -160,7 +160,7 @@ public class ErrorHandlingTests
         result.IsFailure.Should().BeTrue();
         result.Error!.Message.Should().Be("First failure");
 
-        // Verify only the first chapter executed (story short-circuits on first error)
+        // Verify only the first chapter executed (tale short-circuits on first error)
         handler.Context.ExecutionLog.Should().HaveCount(1);
     }
 

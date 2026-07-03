@@ -1,0 +1,14 @@
+{
+    "chat.tools.terminal.autoApprove": {
+        "git rev-parse": true,
+        "git merge-base": true,
+        "git rev-list": true,
+        "dotnet build": true,
+        "dotnet test": true,
+        "/^perl -i -pe 's/storyInstance/taleInstance/g; s/storyIds/taleIds/g; s/storyId/taleId/g; s/_storyManager/_taleManager/g; s/\\\\bstory\\\\b/tale/g; s/\\\\bStory\\\\b/Tale/g;' tests/SolTechnology\\.Core\\.Tale\\.Tests/\\*\\.cs\necho '--- remaining story/Story \\(excluding kept names \\+ history\\) ---'\ngrep -rnE \"story\\|Story\" tests --include=\"\\*\\.cs\" \\| grep -vE \"/obj/\\|/bin/\" \\| grep -viE \"StartStory\\|ResumeStory\\|CancelStory\\|GetStoryState\\|GetStoryResult\\|history\"$/": {
+            "approve": true,
+            "matchCommandLine": true
+        },
+        "diff": true
+    }
+}

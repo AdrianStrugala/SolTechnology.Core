@@ -99,10 +99,10 @@ public class RegistrationDefaultsTests
         public int SaveCount;
         public int FindByIdCount;
 
-        public Task<TaleInstance?> FindById(Auid storyId)
+        public Task<TaleInstance?> FindById(Auid taleId)
         {
             Interlocked.Increment(ref FindByIdCount);
-            return _inner.FindById(storyId);
+            return _inner.FindById(taleId);
         }
 
         public Task<TaleInstance?> FindByIdempotencyKey(string idempotencyKey)
@@ -115,12 +115,12 @@ public class RegistrationDefaultsTests
             int take = 100)
             => _inner.ListAsync(status, handlerTypeName, skip, take);
 
-        public Task SaveAsync(TaleInstance storyInstance)
+        public Task SaveAsync(TaleInstance taleInstance)
         {
             Interlocked.Increment(ref SaveCount);
-            return _inner.SaveAsync(storyInstance);
+            return _inner.SaveAsync(taleInstance);
         }
 
-        public Task DeleteAsync(Auid storyId) => _inner.DeleteAsync(storyId);
+        public Task DeleteAsync(Auid taleId) => _inner.DeleteAsync(taleId);
     }
 }
