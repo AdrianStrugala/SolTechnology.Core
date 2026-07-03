@@ -1,5 +1,6 @@
 ﻿namespace SolTechnology.Core.Guards
 {
+    [Obsolete("SolTechnology.Core.Guards is deprecated. Use FluentValidation AbstractValidator<T> (auto-discovered by the CQRS pipeline). See dontreadme.md.", error: false)]
     public class Guards
     {
         public Guards()

@@ -1,3 +1,7 @@
+> ⚠️ **Deprecated** — `SolTechnology.Core.Guards` is superseded by FluentValidation
+> `AbstractValidator<T>`, auto-discovered by the CQRS pipeline (validators live in the same file as
+> the input DTO). See [CQRS validation](CQRS.md) and [deprecated libraries](../dontreadme.md).
+
 ### Overview
 
 The SolTechnology.Core.Guards library provides functionality needed for code contracts. It is based on fluent api providing checks for the most popular data types.

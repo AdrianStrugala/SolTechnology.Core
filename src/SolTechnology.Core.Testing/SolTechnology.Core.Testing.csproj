@@ -1,22 +1,15 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<Version>0.1.0</Version>
-		<Description>Foundation NUnit testing helpers for SolTechnology.Core consumers — AutoFixture data attributes (NSubstitute-based), optional Bogus customizations for realistic data, a Retry helper for eventual-consistency assertions, a shared Testcontainers lifetime/reuse model (TESTCONTAINERS_REUSE, restart-if-stopped, readiness probes) and Serilog in-memory log assertions. Reference from test projects only; not needed at runtime in production assemblies.</Description>
-		<PackageTags>sol technology core testing nunit autofixture nsubstitute bogus testcontainers integration-tests component-tests</PackageTags>
+		<Description>Foundation NUnit testing helpers for SolTechnology.Core consumers: AutoFixture data attributes (NSubstitute-based), optional Bogus customizations for realistic data, a Retry helper for eventual-consistency assertions, a shared Testcontainers lifetime/reuse model (TESTCONTAINERS_REUSE, restart-if-stopped, readiness probes) and Serilog in-memory log assertions. Reference from test projects only; not needed at runtime in production assemblies.</Description>
+		<PackageTags>soltechnology core testing nunit autofixture nsubstitute bogus testcontainers unit-tests integration-tests component-tests dotnet csharp</PackageTags>
 		<Product>SolTechnology.Core.Testing</Product>
+		<Title>SolTechnology.Core Testing</Title>
 		<PackageId>SolTechnology.Core.Testing</PackageId>
 		<AssemblyName>SolTechnology.Core.Testing</AssemblyName>
 
-		<PackageIcon>docs\mini-logo.png</PackageIcon>
-		<PackageReadmeFile>docs\readme.md</PackageReadmeFile>
-		<RepositoryUrl>https://github.com/AdrianStrugala/SolTechnology.Core</RepositoryUrl>
+		<PackageReadmeSource>Testing.md</PackageReadmeSource>
 	</PropertyGroup>
-
-	<ItemGroup>
-		<None Include="..\..\docs\mini-logo.png" Pack="true" Visible="false" PackagePath="docs\mini-logo.png" />
-		<None Include="..\..\docs\Testing.md" Pack="true" Visible="false" PackagePath="docs\readme.md" />
-	</ItemGroup>
 
 	<ItemGroup>
 		<!-- NUnit + AutoFixture data attributes. NSubstitute (not Moq) per the repo anti-stack

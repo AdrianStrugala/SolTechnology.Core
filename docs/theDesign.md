@@ -103,7 +103,7 @@ LogicLayer/
 ├── DreamTravel.Commands/             (Write operations)
 ├── DreamTravel.Queries/              (Read operations)
 ├── DreamTravel.DomainServices/       (Reusable business logic)
-└── DreamTravel.Workflows/            (Interactive workflows with Story Framework)
+└── DreamTravel.Workflows/            (Interactive workflows with Tale Framework)
 ```
 
 #### Commands
@@ -149,13 +149,13 @@ public class FindCityByNameHandler(
 }
 ```
 
-**Story Handlers** - for complex multi-step operations using Story Framework:
+**Tale Handlers** - for complex multi-step operations using the Tale Framework:
 
 ```csharp
 public class CalculateBestPathTale(
     IServiceProvider serviceProvider,
     ILogger<CalculateBestPathTale> logger)
-    : StoryHandler<CalculateBestPathQuery, CalculateBestPathContext, CalculateBestPathResult>(serviceProvider, logger),
+    : TaleHandler<CalculateBestPathQuery, CalculateBestPathContext, CalculateBestPathResult>(serviceProvider, logger),
       IQueryHandler<CalculateBestPathQuery, CalculateBestPathResult>
 {
     protected override Tale<CalculateBestPathResult> Tell() =>
@@ -176,7 +176,7 @@ LogicLayer/
 ├─ DreamTravel.Queries/
 │  ├─ CalculateBestPath/
 │  │  ├─ CalculateBestPathQuery.cs        (Input model with validation)
-│  │  ├─ CalculateBestPathTale.cs         (Story orchestrator)
+│  │  ├─ CalculateBestPathTale.cs         (Tale orchestrator)
 │  │  ├─ CalculateBestPathContext.cs      (Shared data)
 │  │  ├─ CalculateBestPathResult.cs       (Output model)
 │  │  ├─ Chapters/
@@ -190,14 +190,14 @@ LogicLayer/
 Where:
 
 - **Query/Command** - Input anemic model with FluentValidation rules
-- **Story** - Orchestrates the flow using the `Tell()` method, which returns a `Tale` and contains minimal code
+- **Tale** - Orchestrates the flow using the `Tell()` method, which returns a `Tale` and contains minimal code
 - **Context** - Shared data structure (Narration) passed through all chapters, inherits from `Context<TInput, TOutput>`
 - **Result** - Output model returned to the caller
-- **Chapters** - Individual story chapters with single, clear purpose (numbered for ordering)
+- **Chapters** - Individual tale chapters with single, clear purpose (numbered for ordering)
   - `Chapter<TContext>` - Automated chapter with `Read()` method
   - `InteractiveChapter<TContext, TInput>` - Pauses for user input with `ReadWithInput()` method
 
-For maximum readability, Story behaves like a table of contents. Each chapter is explicitly listed in `Tell()`, making the business flow obvious from a glance - reading like well-written prose. No hidden magic, no searching through inheritance chains - just a clear narrative of "what happens next."
+For maximum readability, a Tale behaves like a table of contents. Each chapter is explicitly listed in `Tell()`, making the business flow obvious from a glance - reading like well-written prose. No hidden magic, no searching through inheritance chains - just a clear narrative of "what happens next."
 
 #### DomainServices - The Reusable Business Logic
 
@@ -512,9 +512,9 @@ public class IncrementSearchCountStep : IIncrementSearchCountStep
 
 Files are numbered (`1.`, `2.`) to make the execution order obvious. Each step has a single `Invoke` method that modifies the entity. The DomainService calls them in sequence before saving to the database.
 
-#### Story Framework Chapters - The Building Blocks
+#### Tale Framework Chapters - The Building Blocks
 
-Story Framework uses Chapters to organize multi-step workflows. Each chapter is a single responsibility unit that reads or modifies the story's context (Narration).
+The Tale Framework uses Chapters to organize multi-step workflows. Each chapter is a single responsibility unit that reads or modifies the tale's context (Narration).
 
 **Automated Chapter** - executes without user intervention:
 
@@ -571,14 +571,14 @@ public class CustomerDetailsChapter : InteractiveChapter<SampleOrderContext, Cus
 **Key Differences:**
 - **Automated chapters** extend `Chapter<TContext>` and implement `Read(TContext narration)`
 - **Interactive chapters** extend `InteractiveChapter<TContext, TInput>` and implement `ReadWithInput(TContext context, TInput userInput)`
-- Interactive chapters pause story execution and wait for user to provide input via `StoryManager.ResumeStory()`
+- Interactive chapters pause tale execution and wait for user to provide input via `TaleManager.ResumeStory()`
 - All chapters return `Result` to indicate success or failure
 - Chapters are numbered (0., 1., 2., etc.) for clear execution order
 
-**Usage in Story:**
+**Usage in a Tale:**
 
 ```csharp
-public class SampleOrderWorkflowStory : StoryHandler<SampleOrderInput, SampleOrderContext, SampleOrderResult>
+public class SampleOrderWorkflowTale : TaleHandler<SampleOrderInput, SampleOrderContext, SampleOrderResult>
 {
     protected override Tale<SampleOrderResult> Tell() =>
         Open<CustomerDetailsChapter>()         // Interactive - pauses here
@@ -593,7 +593,7 @@ public class SampleOrderWorkflowStory : StoryHandler<SampleOrderInput, SampleOrd
 }
 ```
 
-Interactive workflows require `StoryManager` for pause/resume functionality. For fully automated workflows, the Story can be invoked directly via MediatR like a regular handler.
+Interactive workflows require `TaleManager` for pause/resume functionality. For fully automated workflows, the Tale can be invoked directly via MediatR like a regular handler.
 
 #### How It All Fits Together
 
@@ -628,13 +628,13 @@ graph TB
     style User fill:#f3e5f5
 ```
 
-##### Complex Query Flow (Story Framework)
+##### Complex Query Flow (Tale Framework)
 
 ```mermaid
 graph TB
     User([User])
     Controller[Controller<br/><b>Presentation Layer</b>]
-    StoryHandler[Story Handler<br/><b>Logic Layer</b>]
+    TaleHandler[Tale Handler<br/><b>Logic Layer</b>]
     Context[(Narration / Context)]
 
     Chapter1[Chapter 1: InitiateContext<br/><b>Logic Layer</b>]
@@ -646,9 +646,9 @@ graph TB
     ExternalAPI[External APIs<br/><b>Data Layer</b>]
 
     User -->|HTTP Request| Controller
-    Controller -->|MediatR Send| StoryHandler
+    Controller -->|MediatR Send| TaleHandler
 
-    StoryHandler -->|Read| Chapter1
+    TaleHandler -->|Read| Chapter1
     Chapter1 -->|Mutates| Context
     Context -->|Passes to| Chapter2
     Chapter2 -->|Calls| ExternalAPI
@@ -659,13 +659,13 @@ graph TB
     Context -->|Passes to| Chapter4
     Chapter4 -->|Algorithm| Context
     Context -->|Passes to| Chapter5
-    Chapter5 -->|Builds Result| StoryHandler
+    Chapter5 -->|Builds Result| TaleHandler
 
-    StoryHandler -->|Result&lt;T&gt;| Controller
+    TaleHandler -->|Result&lt;T&gt;| Controller
     Controller -->|HTTP Response| User
 
     style Controller fill:#e1f5ff
-    style StoryHandler fill:#fff4e1
+    style TaleHandler fill:#fff4e1
     style Chapter1 fill:#fff4e1
     style Chapter2 fill:#fff4e1
     style Chapter3 fill:#fff4e1
@@ -688,7 +688,7 @@ graph TB
     subgraph Logic["<b>Logic Layer</b><br/>(Commands, Queries, Domain Services, Workflows)"]
         Handlers[Handlers]
         DomainServices[Domain Services]
-        Chapters[Story Chapters]
+        Chapters[Tale Chapters]
         Mappers[Mappers]
         Validators[Validators]
     end
@@ -737,9 +737,9 @@ graph TB
     style Infrastructure fill:#f5f5f5
 ```
 
-**Story Framework Principles:**
+**Tale Framework Principles:**
 
-Each chapter receives a `Context` (Narration) object, mutates it, and returns `Result.Success()` or `Result.Fail()`. The story stops on first failure. Interactive chapters pause execution and wait for user input before continuing.
+Each chapter receives a `Context` (Narration) object, mutates it, and returns `Result.Success()` or `Result.Fail()`. The tale stops on first failure. Interactive chapters pause execution and wait for user input before continuing.
 
 **Dependency Rules:**
 - Dependencies flow **downward only**: Presentation → Logic → Data → Infrastructure
@@ -755,13 +755,13 @@ Not every operation needs the full DomainService + Steps treatment. Here's when 
 |----------|---------------------|---------|
 | Simple read without business logic | Direct DbContext + Projection in Handler | Get all cities from DB |
 | Read with reusable business logic | DomainService | Find city (DB → fallback to API) |
-| Complex multi-step query | StoryHandler + Chapters | Calculate best path with TSP |
+| Complex multi-step query | TaleHandler + Chapters | Calculate best path with TSP |
 | Simple write operation | Direct handler with DbContext | Update city name |
-| Complex write operation | StoryHandler + Chapters | Multi-step data processing |
+| Complex write operation | TaleHandler + Chapters | Multi-step data processing |
 | Reusable write logic | DomainService + SaveSteps | Save city with alternatives |
-| Interactive user workflow | StoryHandler + Interactive Chapters | Order processing with user input |
+| Interactive user workflow | TaleHandler + Interactive Chapters | Order processing with user input |
 
-The key is to use the simplest pattern that solves your problem. Don't reach for StoryHandler if a simple handler will do. Don't create DomainService if the logic is used in only one place. Keep it readable, keep it simple.
+The key is to use the simplest pattern that solves your problem. Don't reach for TaleHandler if a simple handler will do. Don't create DomainService if the logic is used in only one place. Keep it readable, keep it simple.
 
 
 

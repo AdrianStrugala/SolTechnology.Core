@@ -1,16 +1,12 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <Version>0.1.0</Version>
-    <Description>Foundational types shared across all SolTechnology.Core modules — Result, Error and typed error subtypes.</Description>
-    <PackageTags>sol technology core result error types shared</PackageTags>
+    <Description>The lightweight foundation of the SolTechnology.Core toolkit: a Result / Error result-pattern for modeling success and failure as values instead of throwing exceptions. Zero-dependency primitives (Result, Result&lt;T&gt;, Error and typed error subtypes) that every other Core package builds on.</Description>
+    <PackageTags>soltechnology core result error result-pattern railway-oriented functional error-handling types dotnet csharp</PackageTags>
     <Product>SolTechnology.Core</Product>
+    <Title>SolTechnology.Core</Title>
     <PackageId>SolTechnology.Core</PackageId>
     <AssemblyName>SolTechnology.Core</AssemblyName>
-
-    <PackageIcon>docs\mini-logo.png</PackageIcon>
-    <PackageReadmeFile>docs\readme.md</PackageReadmeFile>
-    <RepositoryUrl>https://github.com/AdrianStrugala/SolTechnology.Core</RepositoryUrl>
   </PropertyGroup>
 
   <ItemGroup>

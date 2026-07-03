@@ -1,5 +1,5 @@
 ﻿using DreamTravel.Domain.Cities;
-using SolTechnology.Core.Story;
+using SolTechnology.Core.Tale;
 
 namespace DreamTravel.Queries.CalculateBestPath;
 

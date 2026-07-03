@@ -19,19 +19,19 @@ public static class HealthChecksEndpointExtensions
     /// <c>200</c> for <c>Healthy</c>/<c>Degraded</c>, <c>503</c> for <c>Unhealthy</c>.
     /// <para>
     /// Requires <c>AddHealthChecks()</c> to have been called. Chain the per-module checks
-    /// (<c>AddSqlHealthCheck()</c>, <c>AddRedisHealthCheck()</c>, …) onto that builder.
+    /// (<c>AddSolSqlHealthCheck()</c>, <c>AddSolRedisHealthCheck()</c>, …) onto that builder.
     /// </para>
     /// <code>
     /// builder.Services.AddHealthChecks()
-    ///     .AddSqlHealthCheck()
-    ///     .AddRedisHealthCheck();
+    ///     .AddSolSqlHealthCheck()
+    ///     .AddSolRedisHealthCheck();
     ///
-    /// app.MapCoreHealthChecks("/health");
+    /// app.MapSolHealthChecks("/health");
     /// </code>
     /// </summary>
     /// <param name="endpoints">The endpoint route builder (e.g. <c>WebApplication</c>).</param>
     /// <param name="path">The endpoint path (default <c>/health</c>).</param>
-    public static IEndpointConventionBuilder MapCoreHealthChecks(
+    public static IEndpointConventionBuilder MapSolHealthChecks(
         this IEndpointRouteBuilder endpoints,
         string path = "/health")
     {

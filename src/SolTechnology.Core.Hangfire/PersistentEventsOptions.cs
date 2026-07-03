@@ -1,7 +1,7 @@
 namespace SolTechnology.Core.Hangfire;
 
 /// <summary>
-/// Options for <c>AddPersistentEvents()</c>.
+/// Options for <c>AddSolPersistentEvents()</c>.
 /// </summary>
 public sealed class PersistentEventsOptions
 {

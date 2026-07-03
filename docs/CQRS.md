@@ -5,12 +5,14 @@ The SolTechnology.Core.CQRS library provides a complete CQRS (Command Query Resp
 ### Registration
 
 ```csharp
-services.AddCQRS();
-
-// Or with explicit assembly scanning and options:
-services.AddCQRS(
-    o => o.UseFluentValidation = true,
-    typeof(Program).Assembly);
+// Configure handler discovery explicitly, one handler family at a time:
+services.AddCQRS(o =>
+{
+    o.UseFluentValidation = true;
+    o.RegisterCommandsFromAssembly(typeof(CreateUserCommand).Assembly);
+    o.RegisterQueriesFromAssembly(typeof(GetUserQuery).Assembly);
+    o.RegisterEventsFromAssembly(typeof(UserCreatedEvent).Assembly);
+});
 ```
 
 ### Defining a Command
@@ -129,8 +131,8 @@ else
 ```
 
 For multi-step orchestration with fluent success/failure flow — chaining steps, guarding with
-preconditions, recovering from failures — promote the handler to a **Story** and describe it as a
-`Tale`. See [Story.md](Story.md).
+preconditions, recovering from failures — promote the handler to a **Tale** and describe its flow
+with the fluent `Tale` builder. See [Tale.md](Tale.md).
 
 ### Pipeline Behaviors
 
@@ -159,12 +161,12 @@ Built-in behaviors (registered automatically):
 Building commands, queries, and events with an AI assistant (GitHub Copilot, Claude Code)? The
 repository ships a **skill** — a narrow, file-cited procedure your agent can read on demand:
 
-- [`command-query-event-story`](https://github.com/AdrianStrugala/SolTechnology.Core/blob/master/.github/skills/command-query-event-story/SKILL.md)
-  — classify the artifact (command / query / event / Story), lay out the files one-folder-per-use-case,
+- [`command-query-event-tale`](https://github.com/AdrianStrugala/SolTechnology.Core/blob/master/.github/skills/command-query-event-tale/SKILL.md)
+  — classify the artifact (command / query / event / Tale), lay out the files one-folder-per-use-case,
   return `Result<T>`, wire `AddCQRS`, and add `[LogScope]` logging.
 
 It points at the binding rules in the Coding Guide — keep these open while you write:
 
 - [§3 — CQRS: commands, queries, validators, the `Result` pattern](https://github.com/AdrianStrugala/SolTechnology.Core/blob/master/docs/ClaudeCodingGuide.md)
-- [§4 — Story framework for multi-step orchestration](https://github.com/AdrianStrugala/SolTechnology.Core/blob/master/docs/ClaudeCodingGuide.md)
+- [§4 — Tale framework for multi-step orchestration](https://github.com/AdrianStrugala/SolTechnology.Core/blob/master/docs/ClaudeCodingGuide.md)
 

@@ -21,7 +21,7 @@ namespace SolTechnology.Core.SQL
         /// <returns>
         /// The updated <see cref="IServiceCollection"/> with the SQL services registered.
         /// </returns>
-        public static IServiceCollection AddSQL(this IServiceCollection services, SQLConfiguration sqlConfiguration)
+        public static IServiceCollection AddSolSQL(this IServiceCollection services, SQLConfiguration sqlConfiguration)
         {
             if (sqlConfiguration == null)
             {

@@ -25,7 +25,7 @@ public static class UpstreamHttpHealthCheckExtensions
     /// <param name="name">Check name in the report.</param>
     /// <param name="failureStatus">Status on failure (default <see cref="HealthStatus.Unhealthy"/>).</param>
     /// <param name="tags">Optional tags for filtering.</param>
-    public static IHealthChecksBuilder AddUpstreamHttpHealthCheck<TCheck>(
+    public static IHealthChecksBuilder AddSolUpstreamHttpHealthCheck<TCheck>(
         this IHealthChecksBuilder builder,
         string name,
         HealthStatus failureStatus = HealthStatus.Unhealthy,

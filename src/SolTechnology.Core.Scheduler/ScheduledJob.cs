@@ -5,6 +5,7 @@ using SolTechnology.Core.Scheduler.Configuration;
 
 namespace SolTechnology.Core.Scheduler;
 
+[Obsolete("SolTechnology.Core.Scheduler is deprecated. Use SolTechnology.Core.Hangfire — AddSolRecurringJob<TJob>(cron). See dontreadme.md.", error: false)]
 public abstract class ScheduledJob : IHostedService, IDisposable
 {
     private readonly ISchedulerConfigurationProvider _schedulerConfigurationProvider;

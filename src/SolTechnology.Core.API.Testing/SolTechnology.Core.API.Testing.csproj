@@ -1,22 +1,15 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<Version>0.7.0</Version>
-		<Description>Integration testing fixtures for SolTechnology.Core.Api consumers — APIFixture&lt;TEntryPoint&gt; (wraps Microsoft.AspNetCore.Mvc.Testing / TestHost) plus auth-client helpers (CreateAuthorizedClient / CreateAnonymousClient) and a TestConfigurationBuilder for the appsettings + in-memory override pattern. Reference this from your test projects only; not needed at runtime in production assemblies.</Description>
-		<PackageTags>sol technology core api testing aspnetcore integration-tests testserver mvc-testing webapplicationfactory</PackageTags>
+		<Description>Spin up your ASP.NET Core API in-memory for fast, realistic integration tests. Provides APIFixture&lt;TEntryPoint&gt; (wrapping Microsoft.AspNetCore.Mvc.Testing / TestHost), auth-client helpers (CreateAuthorizedClient / CreateAnonymousClient) and a TestConfigurationBuilder for the appsettings + in-memory override pattern. Reference from test projects only; not needed at runtime in production assemblies.</Description>
+		<PackageTags>soltechnology core api testing aspnetcore integration-tests component-tests testserver mvc-testing webapplicationfactory nunit dotnet csharp</PackageTags>
 		<Product>SolTechnology.Core.API.Testing</Product>
+		<Title>SolTechnology.Core API Testing</Title>
 		<PackageId>SolTechnology.Core.API.Testing</PackageId>
 		<AssemblyName>SolTechnology.Core.API.Testing</AssemblyName>
 
-		<PackageIcon>docs\mini-logo.png</PackageIcon>
-		<PackageReadmeFile>docs\readme.md</PackageReadmeFile>
-		<RepositoryUrl>https://github.com/AdrianStrugala/SolTechnology.Core</RepositoryUrl>
+		<PackageReadmeSource>API.Testing.md</PackageReadmeSource>
 	</PropertyGroup>
-
-	<ItemGroup>
-		<None Include="..\..\docs\mini-logo.png" Pack="true" Visible="false" PackagePath="docs\mini-logo.png" />
-		<None Include="..\..\docs\Api.md" Pack="true" Visible="false" PackagePath="docs\readme.md" />
-	</ItemGroup>
 
 	<ItemGroup>
 		<ProjectReference Include="..\SolTechnology.Core.Testing\SolTechnology.Core.Testing.csproj" />

@@ -1,0 +1,41 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <Description>The Tale Framework — unified workflow orchestration for multi-step business processes. Compose simple automated chains or pausable, persistable workflows with the Tale Code philosophy: readable, maintainable logic built from TaleHandler, Chapters and Context.</Description>
+        <PackageTags>soltechnology core tale workflow orchestration saga state-machine chain pausable persistence business-process async tale-code dotnet csharp</PackageTags>
+        <Product>SolTechnology.Core.Tale</Product>
+        <Title>SolTechnology.Core Tale Framework</Title>
+        <PackageId>SolTechnology.Core.Tale</PackageId>
+        <AssemblyName>SolTechnology.Core.Tale</AssemblyName>
+        <RootNamespace>SolTechnology.Core.Tale</RootNamespace>
+
+        <PackageReadmeSource>Tale.md</PackageReadmeSource>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <!--
+            FrameworkReference replaces a stale Microsoft.AspNetCore.Mvc.Core 2.2.5 PackageReference
+            that pulled System.Text.Encodings.Web 4.5.0 (CVE-2021-26701, Critical) into the graph.
+            Tale only uses stock MVC controller types (ControllerBase, [HttpGet/Post], IActionResult,
+            [FromRoute/Body/Header]) which all live in the ASP.NET Core shared framework. Same
+            approach as SolTechnology.Core.Logging.
+        -->
+        <FrameworkReference Include="Microsoft.AspNetCore.App" />
+
+        <!--
+            Microsoft.Extensions.* PackageReferences inherited from src/Directory.Build.props
+            are already provided by the shared framework. Removing them here mirrors the
+            SolTechnology.Core.Logging setup and keeps the package graph clean.
+        -->
+        <PackageReference Remove="Microsoft.Extensions.Configuration" />
+        <PackageReference Remove="Microsoft.Extensions.Configuration.Binder" />
+        <PackageReference Remove="Microsoft.Extensions.DependencyInjection" />
+        <PackageReference Remove="Microsoft.Extensions.Options" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\SolTechnology.Core.AUID\SolTechnology.Core.AUID.csproj" />
+      <ProjectReference Include="..\SolTechnology.Core\SolTechnology.Core.csproj" />
+    </ItemGroup>
+
+</Project>

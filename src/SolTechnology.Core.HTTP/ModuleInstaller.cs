@@ -23,7 +23,7 @@ namespace SolTechnology.Core.HTTP
         /// (OpenTelemetry, firm-specific middleware) and want this library to
         /// keep its hands off the headers and the AsyncLocal correlation store.
         /// </param>
-        public static IServiceCollection AddHTTPClient<TIClient, TClient>(
+        public static IServiceCollection AddSolHTTPClient<TIClient, TClient>(
             this IServiceCollection services,
             string httpClientName,
             HTTPClientConfiguration? httpClientConfiguration = null,
@@ -31,12 +31,12 @@ namespace SolTechnology.Core.HTTP
             bool propagateCorrelation = true)
             where TIClient : class where TClient : class, TIClient
         {
-            AddHTTPClientInternal<TIClient, TClient>(services, httpClientName, httpClientConfiguration, httpPolicyConfiguration, propagateCorrelation);
+            AddSolHTTPClientInternal<TIClient, TClient>(services, httpClientName, httpClientConfiguration, httpPolicyConfiguration, propagateCorrelation);
             return services;
         }
 
-        /// <inheritdoc cref="AddHTTPClient{TIClient,TClient}(IServiceCollection,string,HTTPClientConfiguration?,HttpPolicyConfiguration?,bool)"/>
-        public static IServiceCollection AddHTTPClient<TIClient, TClient, TOptions>(
+        /// <inheritdoc cref="AddSolHTTPClient{TIClient,TClient}(IServiceCollection,string,HTTPClientConfiguration?,HttpPolicyConfiguration?,bool)"/>
+        public static IServiceCollection AddSolHTTPClient<TIClient, TClient, TOptions>(
             this IServiceCollection services,
             string httpClientName,
             HTTPClientConfiguration? httpClientConfiguration = null,
@@ -44,7 +44,7 @@ namespace SolTechnology.Core.HTTP
             bool propagateCorrelation = true)
             where TIClient : class where TClient : class, TIClient where TOptions : class
         {
-            AddHTTPClientInternal<TIClient, TClient>(services, httpClientName, httpClientConfiguration, httpPolicyConfiguration, propagateCorrelation);
+            AddSolHTTPClientInternal<TIClient, TClient>(services, httpClientName, httpClientConfiguration, httpPolicyConfiguration, propagateCorrelation);
 
             services
                 .AddOptions<TOptions>()
@@ -58,7 +58,7 @@ namespace SolTechnology.Core.HTTP
             return services;
         }
 
-        private static void AddHTTPClientInternal<TIClient, TClient>(
+        private static void AddSolHTTPClientInternal<TIClient, TClient>(
             IServiceCollection services,
             string httpClientName,
             HTTPClientConfiguration? httpClientConfigurationParam,
@@ -72,8 +72,8 @@ namespace SolTechnology.Core.HTTP
 
             if (propagateCorrelation)
             {
-                // Idempotent; shared with Core.Logging.AddCoreLogging.
-                services.AddCorrelationIdService();
+                // Idempotent; shared with Core.Logging.AddSolLogging.
+                services.AddSolCorrelationIdService();
                 services.TryAddTransient<CorrelationPropagatingHandler>();
             }
 

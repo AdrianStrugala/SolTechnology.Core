@@ -1,22 +1,15 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<Version>0.1.0</Version>
-		<Description>Integration-testing fixtures for SolTechnology.Core.HTTP consumers — a WireMock.Net-backed WireMockFixture and a fluent fake-API DSL (Fake&lt;TClient&gt;().WithRequest(...).WithResponse(...)) keyed off your generated HTTP client interfaces. Reference from test projects only; not needed at runtime in production assemblies.</Description>
-		<PackageTags>sol technology core http testing wiremock mock fake-api integration-tests component-tests</PackageTags>
+		<Description>Mock external HTTP APIs in your tests with zero ceremony. A WireMock.Net-backed WireMockFixture plus a fluent fake-API DSL (Fake&lt;TClient&gt;().WithRequest(...).WithResponse(...)) keyed off your generated HTTP client interfaces. Reference from test projects only; not needed at runtime in production assemblies.</Description>
+		<PackageTags>soltechnology core http testing wiremock mock stub fake-api integration-tests component-tests dotnet csharp</PackageTags>
 		<Product>SolTechnology.Core.HTTP.Testing</Product>
+		<Title>SolTechnology.Core HTTP Testing</Title>
 		<PackageId>SolTechnology.Core.HTTP.Testing</PackageId>
 		<AssemblyName>SolTechnology.Core.HTTP.Testing</AssemblyName>
 
-		<PackageIcon>docs\mini-logo.png</PackageIcon>
-		<PackageReadmeFile>docs\readme.md</PackageReadmeFile>
-		<RepositoryUrl>https://github.com/AdrianStrugala/SolTechnology.Core</RepositoryUrl>
+		<PackageReadmeSource>HTTP.Testing.md</PackageReadmeSource>
 	</PropertyGroup>
-
-	<ItemGroup>
-		<None Include="..\..\docs\mini-logo.png" Pack="true" Visible="false" PackagePath="docs\mini-logo.png" />
-		<None Include="..\..\docs\HTTP.Testing.md" Pack="true" Visible="false" PackagePath="docs\readme.md" />
-	</ItemGroup>
 
 	<ItemGroup>
 		<ProjectReference Include="..\SolTechnology.Core.Testing\SolTechnology.Core.Testing.csproj" />

@@ -1,16 +1,15 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<Version>1.1.1</Version>
-		<Description>Structured logging abstractions with HTTP context enrichment for ASP.NET Core applications. Provides consistent logging patterns, correlation IDs, and request/response tracing for better observability in distributed systems.</Description>
-		<PackageTags>sol technology core logging aspnetcore structured-logging tracing diagnostics observability correlation-id dotnet monitoring</PackageTags>
+		<Version>1.2.0</Version>
+		<Description>Structured logging with automatic HTTP context enrichment for ASP.NET Core. Consistent logging patterns, correlation IDs, and request/response tracing that make distributed systems observable out of the box.</Description>
+		<PackageTags>soltechnology core logging structured-logging aspnetcore tracing diagnostics observability correlation-id monitoring dotnet csharp</PackageTags>
 		<Product>SolTechnology.Core.Logging</Product>
+		<Title>SolTechnology.Core Logging</Title>
 		<PackageId>SolTechnology.Core.Logging</PackageId>
 		<AssemblyName>SolTechnology.Core.Logging</AssemblyName>
 
-		<PackageIcon>docs\mini-logo.png</PackageIcon>
-		<PackageReadmeFile>docs\readme.md</PackageReadmeFile>
-		<RepositoryUrl>https://github.com/AdrianStrugala/SolTechnology.Core</RepositoryUrl>
+		<PackageReadmeSource>Log.md</PackageReadmeSource>
 
 		<!-- Ship XML doc file in the NuGet package so consumers get IntelliSense on public API. -->
 		<GenerateDocumentationFile>true</GenerateDocumentationFile>
@@ -24,10 +23,6 @@
 		-->
 		<NoWarn>$(NoWarn);NU1510;CS1591</NoWarn>
 	</PropertyGroup>
-	<ItemGroup>
-		<None Include="..\..\docs\mini-logo.png" Pack="true" Visible="false" PackagePath="docs\mini-logo.png" />
-		<None Include="..\..\docs\Log.md" Pack="true" Visible="false" PackagePath="docs\readme.md" />
-	</ItemGroup>
 	<ItemGroup>
 		<FrameworkReference Include="Microsoft.AspNetCore.App" />
 		<!--

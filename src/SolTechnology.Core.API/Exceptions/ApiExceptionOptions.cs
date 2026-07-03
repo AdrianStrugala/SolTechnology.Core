@@ -3,7 +3,7 @@ namespace SolTechnology.Core.API.Exceptions;
 /// <summary>
 /// Options governing how unhandled exceptions are turned into HTTP response bodies by
 /// <see cref="Filters.ExceptionFilter"/>.
-/// Configure via <c>services.AddApiExceptionHandling(opts =&gt; ...)</c>.
+/// Configure via <c>services.AddSolApiExceptionHandling(opts =&gt; ...)</c>.
 /// </summary>
 public class ApiExceptionOptions
 {
@@ -20,7 +20,7 @@ public class ApiExceptionOptions
     /// <c>Development</c>:
     /// </para>
     /// <code>
-    /// services.AddApiExceptionHandling(o =&gt;
+    /// services.AddSolApiExceptionHandling(o =&gt;
     ///     o.IncludeExceptionDetails = builder.Environment.IsDevelopment());
     /// </code>
     /// </summary>

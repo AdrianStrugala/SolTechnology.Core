@@ -26,7 +26,7 @@ namespace SolTechnology.Core.API.Exceptions;
 ///     }
 /// }
 ///
-/// services.AddApiExceptionHandling();
+/// services.AddSolApiExceptionHandling();
 /// services.Replace(ServiceDescriptor.Singleton&lt;IExceptionStatusCodeMapper, AppExceptionMapper&gt;());
 /// </code>
 /// <para>

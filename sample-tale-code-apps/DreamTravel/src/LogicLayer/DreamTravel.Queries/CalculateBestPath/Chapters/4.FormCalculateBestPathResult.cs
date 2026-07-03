@@ -1,6 +1,6 @@
 ﻿using DreamTravel.Domain.Cities;
 using SolTechnology.Core.CQRS;
-using SolTechnology.Core.Story;
+using SolTechnology.Core.Tale;
 using Path = DreamTravel.Domain.Paths.Path;
 
 namespace DreamTravel.Queries.CalculateBestPath.Chapters;

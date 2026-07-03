@@ -13,7 +13,7 @@ namespace SolTechnology.Core.Logging.Enrichment;
 /// <see cref="LoggingDefaults.MaskedValue"/>.
 /// </summary>
 /// <remarks>
-/// Auto-registered by <c>AddCoreLogging</c>. Pays nothing when the option is off
+/// Auto-registered by <c>AddSolLogging</c>. Pays nothing when the option is off
 /// (the <see cref="Enrich"/> implementation short-circuits in O(1)).
 /// </remarks>
 internal sealed class RequestHeadersEnricher : ILogScopeEnricher

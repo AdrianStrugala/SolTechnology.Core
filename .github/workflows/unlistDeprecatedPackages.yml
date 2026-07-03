@@ -1,0 +1,47 @@
+name: Unlist deprecated packages
+
+# Manual, opt-in only. This workflow has NO push/tag/pull_request trigger, so it can never be
+# reached by a normal release publish - the only way to run it is the "Run workflow" button.
+# The ghost ids below are HARDCODED (not derived from any expandable list), so even a full-account
+# NUGET_API_KEY cannot unlist a supported package (premortem scenario 6).
+on:
+  workflow_dispatch:
+    inputs:
+      confirm:
+        description: 'Type UNLIST to confirm hiding every published version of the deprecated ghost packages (ApiClient, Story, Scheduler, Guards, BlobStorage, BlobStorage.Testing) on nuget.org'
+        type: string
+        required: true
+        default: ''
+
+jobs:
+  unlist-deprecated:
+    if: inputs.confirm == 'UNLIST'
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Setup .NET 10
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '10.0.x'
+    - name: Unlist every published version of the deprecated ghost packages
+      shell: bash
+      run: |
+        set -euo pipefail
+        # Unlist = hide from search (dotnet nuget delete). It is NOT deprecation (no CLI/API for that -
+        # web UI only) and is strictly per-version, so versions are enumerated live from the
+        # flat-container index - never hardcoded. Re-listing, if needed, is a manual web-UI action.
+        for id in SolTechnology.Core.ApiClient SolTechnology.Core.Story \
+                  SolTechnology.Core.Scheduler SolTechnology.Core.Guards \
+                  SolTechnology.Core.BlobStorage SolTechnology.Core.BlobStorage.Testing; do
+          lower="$(printf '%s' "$id" | tr '[:upper:]' '[:lower:]')"
+          versions="$(curl -fsSL "https://api.nuget.org/v3-flatcontainer/$lower/index.json" 2>/dev/null | jq -r '.versions[]' || true)"
+          if [ -z "$versions" ]; then
+            echo "No published versions for $id (already unlisted or never published) - skipping"
+            continue
+          fi
+          for v in $versions; do
+            echo "Unlisting $id $v"
+            dotnet nuget delete "$id" "$v" --non-interactive \
+              --api-key ${{secrets.NUGET_API_KEY}} -s https://api.nuget.org/v3/index.json
+          done
+        done

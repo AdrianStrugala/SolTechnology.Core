@@ -14,9 +14,9 @@ public static class ServiceBusHealthCheckExtensions
 {
     /// <summary>
     /// Adds a Service Bus liveness check. Requires <see cref="ServiceBusClient"/> and
-    /// <see cref="MessageBusConfiguration"/> to be registered (via <c>AddMessageBus(...)</c>).
+    /// <see cref="MessageBusConfiguration"/> to be registered (via <c>AddSolMessageBus(...)</c>).
     /// </summary>
-    public static IHealthChecksBuilder AddServiceBusHealthCheck(
+    public static IHealthChecksBuilder AddSolServiceBusHealthCheck(
         this IHealthChecksBuilder builder,
         string name = "servicebus",
         TimeSpan? timeout = null,

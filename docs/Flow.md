@@ -1,3 +1,7 @@
+> ⚠️ **Deprecated** — `SolTechnology.Core.Flow` was the experimental predecessor of the Tale
+> Framework and is no longer built from this repository. Use
+> [SolTechnology.Core.Tale](Tale.md) for interactive, pausable, persisted workflows.
+
 ### Overview
 
 The SolTechnology.Core.Flow library provides a workflow and chain framework with support for interactive flows. It enables building complex, multi-step workflows that can be paused and resumed, with state persistence using either in-memory or SQLite storage.

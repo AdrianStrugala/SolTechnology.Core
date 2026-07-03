@@ -2,7 +2,7 @@ namespace SolTechnology.Core.CQRS;
 
 /// <summary>
 /// Replaceable seam for event publishing. The default dispatches fire-and-forget in-process.
-/// Plugins (e.g. <c>AddPersistentEvents()</c>) swap the implementation for durable dispatch.
+/// Plugins (e.g. <c>AddSolPersistentEvents()</c>) swap the implementation for durable dispatch.
 /// </summary>
 public interface IEventPublisher
 {

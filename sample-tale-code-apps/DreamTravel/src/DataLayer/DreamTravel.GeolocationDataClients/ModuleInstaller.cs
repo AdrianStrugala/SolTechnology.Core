@@ -21,18 +21,18 @@ namespace DreamTravel.GeolocationDataClients
         /// </para>
         /// <para>
         /// Correlation propagation stays on (the default) because both the API
-        /// and Worker hosts use <c>AddCoreLogging</c>; the outbound
+        /// and Worker hosts use <c>AddSolLogging</c>; the outbound
         /// <c>X-Correlation-Id</c> matches the inbound one written by the
         /// logging middleware.
         /// </para>
         /// </summary>
         public static IServiceCollection InstallGeolocationDataClients(this IServiceCollection services)
         {
-            services.AddHTTPClient<IGoogleHTTPClient, GoogleHTTPClient, GoogleHTTPOptions>("Google");
+            services.AddSolHTTPClient<IGoogleHTTPClient, GoogleHTTPClient, GoogleHTTPOptions>("Google");
             services.Decorate(typeof(IGoogleHTTPClient), typeof(GoogleHTTPClientCachingDecorator));
 
-            services.AddHTTPClient<IMichelinHTTPClient, MichelinHTTPClient, MichelinHTTPOptions>("Michelin");
-            services.AddHTTPClient<IGeoDbHTTPClient, GeoDbHTTPClient>("GeoDb");
+            services.AddSolHTTPClient<IMichelinHTTPClient, MichelinHTTPClient, MichelinHTTPOptions>("Michelin");
+            services.AddSolHTTPClient<IGeoDbHTTPClient, GeoDbHTTPClient>("GeoDb");
 
             return services;
         }

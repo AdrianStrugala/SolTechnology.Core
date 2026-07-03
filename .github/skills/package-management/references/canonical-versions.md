@@ -16,6 +16,10 @@ change**. When rows drift between projects, the row records the highest version 
 | `Microsoft.Extensions.DependencyInjection` | `10.0.9` | Same. | — |
 | `Microsoft.Extensions.Options` | `10.0.9` | Same. | — |
 
+**SourceLink:** no `PackageReference`. SourceLink ships inside the .NET SDK — `src/Directory.Build.props`
+enables it purely through MSBuild properties (`PublishRepositoryUrl`, `EmbedUntrackedSources`,
+`ContinuousIntegrationBuild`). Do **not** add `Microsoft.SourceLink.GitHub`.
+
 ## `Microsoft.Extensions.*` per-module references
 
 | Package | Version | Used by | Known drift |
@@ -62,7 +66,7 @@ change**. When rows drift between projects, the row records the highest version 
 | Package | Version | Used by | Notes |
 |---|---|---|---|
 | `Azure.Messaging.ServiceBus` | `7.20.1` | `SolTechnology.Core.MessageBus` | Modern SDK. NEVER add `Microsoft.Azure.ServiceBus` (deprecated). |
-| `Azure.Storage.Blobs` | `12.29.0` | `SolTechnology.Core.BlobStorage`, `SolTechnology.Core.BlobStorage.Testing` | Match across runtime + testing. |
+| `Azure.Storage.Blobs` | `12.29.0` | `SolTechnology.Core.Blob`, `SolTechnology.Core.Blob.Testing` | Match across runtime + testing. |
 
 ## SQL / data
 
@@ -72,21 +76,20 @@ change**. When rows drift between projects, the row records the highest version 
 | `Testcontainers` | `4.12.0` | `SolTechnology.Core.Testing`, `SolTechnology.Core.SQL.Testing` | Container fixtures. **Family pinned to 4.12.0.** `ContainerLifecycleHelper.cs` was migrated to the 4.12.0 builder API (the old fluent shortcuts changed shape between 4.3.0 and 4.12.0). |
 | `Testcontainers.PostgreSql` | `4.12.0` | `SolTechnology.Core.SQL.Testing` | Postgres engine. Match `Testcontainers`. (MSSQL uses the generic builder — no `Testcontainers.MsSql`.) |
 | `Microsoft.Data.SqlClient` | `7.0.1` | `SolTechnology.Core.SQL.Testing` | MSSQL ADO provider + login probe. |
-| `Microsoft.Data.Sqlite.Core` | `10.0.9` | `SolTechnology.Core.Story` (Sqlite persistence) | Drags `SQLitePCLRaw.lib.e_sqlite3` 2.1.11, which carries an unpatched NU1903 (CVE-2025-6965, no `first_patched_version` upstream yet) — left unmasked per dependency-audit §5 ("nothing to fix at source yet"), not introduced by this bump. |
-| `SQLitePCLRaw.bundle_green` | `2.1.11` | `SolTechnology.Core.Story` | Pulls the same unpatched `SQLitePCLRaw.lib.e_sqlite3` 2.1.11 — see above. |
+| `Microsoft.Data.Sqlite.Core` | `10.0.9` | `DreamTravel.SQLite` (Sqlite persistence) | Drags `SQLitePCLRaw.lib.e_sqlite3` 2.1.11, which carries an unpatched NU1903 (CVE-2025-6965, no `first_patched_version` upstream yet) — left unmasked per dependency-audit §5 ("nothing to fix at source yet"), not introduced by this bump. |
+| `SQLitePCLRaw.bundle_green` | `2.1.11` | `DreamTravel.SQLite` | Pulls the same unpatched `SQLitePCLRaw.lib.e_sqlite3` 2.1.11 — see above. |
 | `Microsoft.EntityFrameworkCore` / `.Design` / `.InMemory` / `.SqlServer` | `10.0.9` | `SolTechnology.Core.SQL`-adjacent and DreamTravel data layers | Keep all four on the same minor. |
 | `Npgsql` | `10.0.3` | `SolTechnology.Core.SQL.Testing` | Postgres ADO provider. |
 | `Respawn` | `7.0.0` | `SolTechnology.Core.SQL.Testing` | Between-test database reset (SqlServer + Postgres adapters). |
 | `Scrutor` | `7.0.0` | DI assembly-scanning consumers | — |
 | `Testcontainers.Redis` | `4.12.0` | `SolTechnology.Core.Redis.Testing` | Redis container engine. Match `Testcontainers`. |
 | `StackExchange.Redis` | `3.0.0` | `SolTechnology.Core.Cache`, `SolTechnology.Core.Redis.Testing` | `Core.Cache`: direct `IConnectionMultiplexer` for the distributed lock (`SET NX`) + Redis health check. `Redis.Testing`: `RedisFixture.FlushAsync()` (admin-mode `FLUSHALL`). |
-| `Testcontainers.Azurite` | `4.12.0` | `SolTechnology.Core.BlobStorage.Testing` | Azurite (Azure Storage emulator) container engine. Match `Testcontainers`. |
+| `Testcontainers.Azurite` | `4.12.0` | `SolTechnology.Core.Blob.Testing` | Azurite (Azure Storage emulator) container engine. Match `Testcontainers`. |
 | `Testcontainers.ServiceBus` | `4.12.0` | `SolTechnology.Core.ServiceBus.Testing` | Azure Service Bus emulator engine. |
 | `Docker.DotNet` | `3.125.15` | `SolTechnology.Core.Testing`, `SolTechnology.Core.ServiceBus.Testing` | Stable-name reuse + restart management for the emulator. |
 | `Neo4j.Driver` | `6.2.0` | `DreamTravel.GraphDatabase` | `IDriver` now implements `IAsyncDisposable` directly — dispose via `await Driver.DisposeAsync()`, not the old `CloseAsync()` + `Dispose()` pair. |
 | `Cronos` | `0.13.0` | `SolTechnology.Core.Scheduler`/Hangfire-adjacent cron parsing | — |
 | `Hangfire.Core` / `.AspNetCore` / `.NetCore` / `.SqlServer` | `1.8.23` | `SolTechnology.Core.Hangfire` | Keep all four on the same minor. |
-| `Hangfire.InMemory` | `1.0.0` | `SolTechnology.Core.Hangfire.Testing` | — |
 
 ## HTTP / mocking (test companions)
 
@@ -103,7 +106,7 @@ change**. When rows drift between projects, the row records the highest version 
 |---|---|---|---|
 | `System.Text.Json` | built-in (`net10.0`) | All modules (default) | DEFAULT serialiser. No `PackageReference` needed. |
 | `Newtonsoft.Json` | `13.0.4` | `SolTechnology.Core.MessageBus` | Reserved for Service Bus payload compatibility + Hangfire integration. NEVER add to new code without an ADR. |
-| `AvroConvert` | `3.4.16` | `SolTechnology.Core.BlobStorage` | Avro support in `DataType.Avro`. |
+| `AvroConvert` | `3.4.16` | `SolTechnology.Core.Blob` | Avro support in `DataType.Avro`. |
 
 `HotChocolate.Language` was pinned in `DreamTravel.Sql.csproj` as a transitive-CVE override
 (NU1904 / CVE-2026-40324, via `EntityGraphQL.AspNet` → `EntityGraphQL` → vulnerable `13.9.11`).

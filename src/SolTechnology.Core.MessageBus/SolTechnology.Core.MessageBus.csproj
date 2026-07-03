@@ -1,19 +1,13 @@
 <Project Sdk="Microsoft.NET.Sdk">
 <PropertyGroup>
-<Version>0.6.0</Version>
-<Description>Azure Service Bus wrapper for event-driven architectures.</Description>
-<PackageTags>sol technology core azure servicebus messaging queue topic pubsub async event-driven microservices dotnet cloud</PackageTags>
+<Description>A clean, strongly-typed Azure Service Bus wrapper for event-driven architectures. Publish and subscribe to messages with minimal boilerplate — queues, topics and pub/sub for decoupled microservices.</Description>
+<PackageTags>soltechnology core azure servicebus messaging message-bus queue topic pubsub event-driven microservices cloud dotnet csharp</PackageTags>
 <Product>SolTechnology.Core.MessageBus</Product>
+<Title>SolTechnology.Core Message Bus</Title>
 <PackageId>SolTechnology.Core.MessageBus</PackageId>
 <AssemblyName>SolTechnology.Core.MessageBus</AssemblyName>
-<PackageIcon>docs\mini-logo.png</PackageIcon>
-<PackageReadmeFile>docs\readme.md</PackageReadmeFile>
-<RepositoryUrl>https://github.com/AdrianStrugala/SolTechnology.Core</RepositoryUrl>
+<PackageReadmeSource>Bus.md</PackageReadmeSource>
 </PropertyGroup>
-<ItemGroup>
-<None Include="..\..\docs\mini-logo.png" Pack="true" Visible="false" PackagePath="docs\mini-logo.png" />
-<None Include="..\..\docs\Bus.md" Pack="true" Visible="false" PackagePath="docs\readme.md" />
-</ItemGroup>
 <ItemGroup>
 <InternalsVisibleTo Include="SolTechnology.Core.MessageBus.Tests" />
 </ItemGroup>

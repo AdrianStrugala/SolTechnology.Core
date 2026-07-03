@@ -1,6 +1,6 @@
 using JetBrains.Annotations;
 using SolTechnology.Core.CQRS;
-using SolTechnology.Core.Story;
+using SolTechnology.Core.Tale;
 using SolTechnology.Core.Journey.Workflow.Steps.Dtos;
 
 namespace DreamTravel.Flows.SampleOrderWorkflow.Chapters;

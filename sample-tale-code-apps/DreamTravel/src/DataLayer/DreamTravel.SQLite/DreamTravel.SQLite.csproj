@@ -11,6 +11,6 @@
     <NuGetAuditSuppress Include="https://github.com/advisories/GHSA-2m69-gcr7-jv3q" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\..\..\src\SolTechnology.Core.Story\SolTechnology.Core.Story.csproj" />
+    <ProjectReference Include="..\..\..\..\..\src\SolTechnology.Core.Tale\SolTechnology.Core.Tale.csproj" />
   </ItemGroup>
 </Project>

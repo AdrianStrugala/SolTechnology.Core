@@ -140,7 +140,7 @@ public class LoggingMiddlewareTests
     public async Task Body_LogDetail_projects_property_into_scope_via_LogDetailEnricher()
     {
         var services = new ServiceCollection();
-        services.AddCoreLogging();
+        services.AddSolLogging();
         services.LogDetail("name", asName: "CityName", source: LogDetailSource.Body);
         var sp = services.BuildServiceProvider();
         var builtIn = sp.GetServices<ILogScopeEnricher>().ToArray();

@@ -9,7 +9,7 @@ namespace SolTechnology.Core.API.HealthChecks;
 /// Renders a <see cref="HealthReport"/> as JSON. Pure formatter — it has <b>no</b>
 /// <c>HttpContext</c> dependency, so it is independently unit-testable and reusable by any host.
 /// The ASP.NET adapter that calls it lives in
-/// <see cref="HealthChecksEndpointExtensions.MapCoreHealthChecks"/>.
+/// <see cref="HealthChecksEndpointExtensions.MapSolHealthChecks"/>.
 /// </summary>
 public static class HealthReportJsonFormatter
 {

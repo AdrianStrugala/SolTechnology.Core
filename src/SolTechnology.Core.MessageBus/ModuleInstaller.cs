@@ -10,7 +10,7 @@ namespace SolTechnology.Core.MessageBus
 {
     public static class ModuleInstaller
     {
-        public static IServiceCollection AddMessageBus(
+        public static IServiceCollection AddSolMessageBus(
             this IServiceCollection services,
             MessageBusConfiguration messageBusConfiguration)
         {
@@ -139,7 +139,7 @@ namespace SolTechnology.Core.MessageBus
             }
 
             // First registration: replace the TryAddSingleton<MessageBusRegistry>()
-            // (registered by AddMessageBus) with a concrete singleton instance so
+            // (registered by AddSolMessageBus) with a concrete singleton instance so
             // that all WithQueue*/WithTopic* calls collaborate on the same object,
             // and the DI container later resolves THIS instance.
             var registry = new MessageBusRegistry();

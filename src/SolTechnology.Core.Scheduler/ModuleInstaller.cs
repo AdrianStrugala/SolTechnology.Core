@@ -8,6 +8,7 @@ namespace SolTechnology.Core.Scheduler
 
     public static class ModuleInstaller
     {
+        [Obsolete("SolTechnology.Core.Scheduler is deprecated. Use SolTechnology.Core.Hangfire — AddSolRecurringJob<TJob>(cron). See dontreadme.md.", error: false)]
         public static IServiceCollection AddScheduledJob<T>(
             this IServiceCollection services,
             ScheduledJobConfiguration scheduledJobConfiguration = null)

@@ -40,18 +40,18 @@ or Application Insights dependency required.
 
 ```csharp
 // Program.cs
-builder.Services.AddCoreLogging();                       // or .AddCoreLogging(opts => { ... })
-                                                         // or .AddCoreLogging(builder.Configuration)
+builder.Services.AddSolLogging();                       // or .AddSolLogging(opts => { ... })
+                                                         // or .AddSolLogging(builder.Configuration)
 
 var app = builder.Build();
-app.UseCoreLogging();   // EARLY — before UseRouting / UseEndpoints
+app.UseSolLogging();   // EARLY — before UseRouting / UseEndpoints
 app.UseRouting();
 app.UseAuthorization();
 app.MapControllers();
 ```
 
-`AddCoreLogging` is idempotent; safe to call from multiple module installers.
-Place `UseCoreLogging` before `UseRouting` so requests that fail authentication
+`AddSolLogging` is idempotent; safe to call from multiple module installers.
+Place `UseSolLogging` before `UseRouting` so requests that fail authentication
 still get a correlation id and an envelope log entry.
 
 ### Configuration
@@ -78,9 +78,9 @@ still get a correlation id and an envelope log entry.
 ```
 
 ```csharp
-builder.Services.AddCoreLogging(builder.Configuration);
+builder.Services.AddSolLogging(builder.Configuration);
 // or:
-builder.Services.AddCoreLogging(o => o.SkipPaths = LoggingDefaults.InfrastructurePaths.ToList());
+builder.Services.AddSolLogging(o => o.SkipPaths = LoggingDefaults.InfrastructurePaths.ToList());
 ```
 
 ### Usage
@@ -138,7 +138,7 @@ public sealed class UserScopeEnricher : ILogScopeEnricher
     }
 }
 
-builder.Services.AddLogScopeEnricher<UserScopeEnricher>();
+builder.Services.AddSolLogScopeEnricher<UserScopeEnricher>();
 ```
 
 A faulty enricher cannot take a request down — the middleware catches and warns
@@ -147,7 +147,7 @@ on enricher failures.
 #### Request headers in the scope (opt-in, PII-safe)
 
 ```csharp
-builder.Services.AddCoreLogging(o =>
+builder.Services.AddSolLogging(o =>
 {
     o.LogRequestHeaders = true;
     o.MaskedHeaders = LoggingDefaults.SensitiveHeaders
@@ -218,7 +218,7 @@ builder.Services.AddOpenTelemetry()
 No dedicated fixture — use `Microsoft.Extensions.Logging.Testing.FakeLogger` (or
 NSubstitute on `ILogger<T>`) and assert on the captured entries. For component
 tests, `APIFixture<TEntryPoint>` from `SolTechnology.Core.API.Testing` already wires
-`AddCoreLogging` + `UseCoreLogging`, so correlation flows end-to-end out of the
+`AddSolLogging` + `UseSolLogging`, so correlation flows end-to-end out of the
 box.
 
 ```csharp
@@ -268,7 +268,7 @@ public string Email { get; set; } = null!;
 
 ### Conventions
 
-- **`UseCoreLogging` runs before `UseRouting`.** Otherwise pre-routing failures
+- **`UseSolLogging` runs before `UseRouting`.** Otherwise pre-routing failures
   (auth challenges, 404s) leave production without a correlation id.
 - **`IncludeScopes: true` in the console formatter** — any sink that should see
   correlation / enrichment properties (Console JSON, App Insights, Loki,
@@ -286,7 +286,7 @@ public string Email { get; set; } = null!;
 
 ### What ships in DI
 
-`AddCoreLogging` registers:
+`AddSolLogging` registers:
 
 - `ICorrelationIdService` — ambient correlation accessor (singleton, no
   `AsyncLocal` traps).
@@ -296,9 +296,9 @@ public string Email { get; set; } = null!;
   registration wins for testing).
 - `LoggingOptions` — bound and validated on application start.
 - `LoggingMiddleware` — request envelope + scope composition, activated by
-  `UseCoreLogging`.
+  `UseSolLogging`.
 - `ILogScopeEnricher` set — declarative `LogDetail` registrations plus any
-  custom enricher you add via `AddLogScopeEnricher<T>()`.
+  custom enricher you add via `AddSolLogScopeEnricher<T>()`.
 - `CoreLoggingActivitySources` — `OperationsName` activity source for
   OpenTelemetry plumbing.
 
@@ -318,7 +318,7 @@ Finished request [GET] [/api/v2/cities/find] -> [200] in [156 ms] — timings: [
 
 #### Registration
 
-Registered automatically by `AddCoreLogging()` — no extra call needed.
+Registered automatically by `AddSolLogging()` — no extra call needed.
 
 #### Usage (in a handler or service)
 

@@ -6,7 +6,7 @@ namespace SolTechnology.Core.Logging;
 /// Tunables for <see cref="Middleware.LoggingMiddleware"/>.
 /// </summary>
 /// <remarks>
-/// Validated on application start when registered via <c>AddCoreLogging</c>: invalid values
+/// Validated on application start when registered via <c>AddSolLogging</c>: invalid values
 /// (e.g. negative <see cref="MaxLoggedJsonBodyBytes"/>) fail fast instead of silently
 /// degrading observability in production.
 /// </remarks>

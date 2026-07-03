@@ -9,7 +9,7 @@ namespace DreamTravel.Commands
         public static IServiceCollection InstallDreamTripsCommands(this IServiceCollection services)
         {
             //Commands
-            services.AddCQRS(assemblies: typeof(ModuleInstaller).Assembly);
+            services.AddSolCQRS(o => o.RegisterCommandsFromAssembly(typeof(ModuleInstaller).Assembly));
 
             //TSP engine
             services.AddScoped<ITSP, AntColony>();

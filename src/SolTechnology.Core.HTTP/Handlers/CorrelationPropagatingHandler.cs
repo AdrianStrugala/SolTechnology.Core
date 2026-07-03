@@ -5,7 +5,7 @@ namespace SolTechnology.Core.HTTP.Handlers;
 /// <summary>
 /// <see cref="DelegatingHandler"/> that propagates the ambient correlation
 /// identifier onto every outbound HTTP request. Registered automatically by
-/// <c>AddHTTPClient&lt;,&gt;</c> and runs before the resilience handler so the
+/// <c>AddSolHTTPClient&lt;,&gt;</c> and runs before the resilience handler so the
 /// same headers are attached to every retry attempt.
 ///
 /// <para>

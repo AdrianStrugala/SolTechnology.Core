@@ -265,7 +265,7 @@ single `[SetUpFixture]`. Defined in [ADR-008](adr/008-testing-framework-companio
 | SQL (MSSQL + Postgres), dacpac / EF / scripts | `SolTechnology.Core.SQL.Testing` | `SQLFixture`, `ResetAsync`, `UsePostgres` | [SQL.md#testing](SQL.md#testing) |
 | HTTP mocks (typed-client fakes) | `SolTechnology.Core.HTTP.Testing` | `WireMockFixture`, `Fake<T>`, `FakeApiBase` | [HTTP.Testing.md](HTTP.Testing.md) |
 | Redis | `SolTechnology.Core.Redis.Testing` | `RedisFixture`, `FlushAsync` | [Redis.Testing.md](Redis.Testing.md) |
-| Azure Blob (Azurite) | `SolTechnology.Core.BlobStorage.Testing` | `AzuriteFixture`, `ClearAsync` | [BlobStorage.Testing.md](BlobStorage.Testing.md) |
+| Azure Blob (Azurite) | `SolTechnology.Core.Blob.Testing` | `AzuriteFixture`, `ClearAsync` | [Blob.Testing.md](Blob.Testing.md) |
 | Azure Service Bus (emulator) | `SolTechnology.Core.ServiceBus.Testing` | `ServiceBusFixture` | [ServiceBus.Testing.md](ServiceBus.Testing.md) |
 
 > The data engine is **AutoFixture** (with NSubstitute auto-faking), not Bogus. Bogus ships as an

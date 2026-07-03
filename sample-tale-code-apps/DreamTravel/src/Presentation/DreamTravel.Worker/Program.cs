@@ -48,14 +48,14 @@ public class Program
 
         //CACHE
         var cacheConfiguration = builder.Configuration.GetSection("Cache").Get<CacheConfiguration>()!;
-        builder.Services.AddLocalCache(cacheConfiguration);
+        builder.Services.AddSolLocalCache(cacheConfiguration);
 
         //CQRS
-        builder.Services.AddCQRS(assemblies: typeof(Program).Assembly);
-        builder.Services.AddPersistentEvents();
+        builder.Services.AddSolCQRS(o => o.RegisterEventsFromAssembly(typeof(Program).Assembly));
+        builder.Services.AddSolPersistentEvents();
 
         //JOBS
-        builder.Services.AddRecurringJob<FetchTrafficJob>(Cron.Never());
+        builder.Services.AddSolRecurringJob<FetchTrafficJob>(Cron.Never());
         builder.Services.AddHangfireServer();
 
         //APP

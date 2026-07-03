@@ -10,7 +10,7 @@ public class CorrelationIdServiceTests
     private static ICorrelationIdService BuildService()
     {
         var services = new ServiceCollection();
-        services.AddCoreLogging();
+        services.AddSolLogging();
         return services.BuildServiceProvider().GetRequiredService<ICorrelationIdService>();
     }
 

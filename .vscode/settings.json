@@ -1,0 +1,11 @@
+{
+    "chat.tools.terminal.autoApprove": {
+        "git rev-parse": true,
+        "git merge-base": true,
+        "git rev-list": true,
+        "dotnet build": true,
+        "dotnet test": true,
+        "grep": true,
+        "diff": true
+    }
+}

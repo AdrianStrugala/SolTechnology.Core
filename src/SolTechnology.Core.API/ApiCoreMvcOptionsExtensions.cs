@@ -19,22 +19,22 @@ public static class ApiCoreMvcOptionsExtensions
     /// </list>
     /// <para>
     /// Both filter types must be registered in DI first. The recommended way is
-    /// <c>services.AddApiCore(...)</c> on <see cref="ModuleInstaller"/>, which performs the
+    /// <c>services.AddSolApiCore(...)</c> on <see cref="ModuleInstaller"/>, which performs the
     /// registration and configures all dependencies (correlation id, problem details, exception
     /// status mapper, options).
     /// </para>
     /// <code>
-    /// builder.Services.AddApiCore(o =&gt;
+    /// builder.Services.AddSolApiCore(o =&gt;
     ///     o.IncludeExceptionDetails = builder.Environment.IsDevelopment());
     ///
     /// builder.Services.AddControllers(opts =&gt;
     /// {
-    ///     opts.AddApiCoreFilters();
+    ///     opts.AddSolApiCoreFilters();
     ///     // ... project-specific filters
     /// });
     /// </code>
     /// </summary>
-    public static MvcOptions AddApiCoreFilters(this MvcOptions options)
+    public static MvcOptions AddSolApiCoreFilters(this MvcOptions options)
     {
         ArgumentNullException.ThrowIfNull(options);
 

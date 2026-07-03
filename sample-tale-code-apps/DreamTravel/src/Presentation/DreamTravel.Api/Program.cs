@@ -88,11 +88,11 @@ public class Program
 
         //SQL
         var sqlConfiguration = builder.Configuration.GetSection("Sql").Get<SQLConfiguration>()!;
-        builder.Services.AddSQL(sqlConfiguration);
+        builder.Services.AddSolSQL(sqlConfiguration);
 
         // Health checks — chain per-module checks onto the builder Aspire already registered.
         builder.Services.AddHealthChecks()
-            .AddSqlHealthCheck();
+            .AddSolSqlHealthCheck();
 
 
         //Trips
@@ -108,12 +108,12 @@ public class Program
             builder.Configuration.GetSection("Neo4j"));
         builder.Services.InstallGraphDatabase();
 
-        //Journey (migrated to Story framework) — defaults to in-memory persistence.
+        //Journey (migrated to Tale framework) — defaults to in-memory persistence.
         builder.Services.AddFlows();
 
         //The rest
-        builder.Services.AddLocalCache();
-        builder.Services.AddCoreLogging();
+        builder.Services.AddSolLocalCache();
+        builder.Services.AddSolLogging();
         builder.Services.LogDetail(
             "name",
             asName: "CityName",
@@ -121,12 +121,11 @@ public class Program
             endpoints: ["/api/v1/FindLocationOfCity", "/api/FindCityByName"]);
 
 
-        var thisAssembly = typeof(Program).Assembly;
-        builder.Services.AddCQRS(assemblies: thisAssembly);
-        builder.Services.AddPersistentEvents();
+        builder.Services.AddSolCQRS();
+        builder.Services.AddSolPersistentEvents();
 
         var authenticationConfiguration = builder.Configuration.GetRequiredSection("Authentication").Get<AuthenticationConfiguration>()!;
-        var authFilter = builder.Services.AddAuthenticationAndBuildFilter(authenticationConfiguration);
+        builder.Services.AddSolAuthentication(authenticationConfiguration);
 
         // SolTechnology.Core.Api one-liner — wires:
         //   - Header-based API versioning (X-API-VERSION) + per-version Swagger docs
@@ -135,7 +134,7 @@ public class Program
         //   - IExceptionStatusCodeMapper (default mapping; replaceable)
         //   - Microsoft AddProblemDetails() for non-MVC paths
         //   - Core.Logging's ICorrelationIdService (used as ProblemDetails.Extensions["correlationId"])
-        builder.Services.AddApiCore(
+        builder.Services.AddSolApiCore(
             o => o.IncludeExceptionDetails = builder.Environment.IsDevelopment(),
             apiTitle: "DreamTravel API",
             defaultMajorVersion: 2);
@@ -163,20 +162,19 @@ public class Program
 
         builder.Services.AddControllers(opts =>
         {
-            opts.Filters.Add(authFilter);
-            opts.AddApiCoreFilters();
+            opts.AddSolApiCoreFilters();
         });
 
         var app = builder.Build();
 
         app.MapDefaultEndpoints();
 
-        app.UseSecurityHeaders();
+        app.UseSolSecurityHeaders();
 
         app.UseDeveloperExceptionPage();
 
         // SolTechnology.Core.Api: per-version Swagger UI (newest first, deprecation badges).
-        app.UseSwaggerWithVersioning("DreamTravel API");
+        app.UseSolSwaggerWithVersioning("DreamTravel API");
 
         app.UseCors(CorsPolicy);
         app.UseHttpsRedirection();
@@ -185,7 +183,7 @@ public class Program
 
         app.UseAuthorization();
         app.UseAuthentication();
-        app.UseCoreLogging();
+        app.UseSolLogging();
 
         app.Use(async (context, next) =>
         {
@@ -197,7 +195,7 @@ public class Program
 
         // SolTechnology.Core.Api: JSON health endpoint (Aspire's MapDefaultEndpoints owns the
         // plaintext /health + /alive in Development, so the Core JSON endpoint maps at /healthz).
-        app.MapCoreHealthChecks("/healthz");
+        app.MapSolHealthChecks("/healthz");
 
         LogAvailableEndpoints(app.Services);
 

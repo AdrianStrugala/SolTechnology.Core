@@ -1,0 +1,19 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<Description>A strongly-typed Azure Blob Storage wrapper with built-in Avro serialization. Read and write your domain models directly — automatic serialization/deserialization and streamlined configuration for cloud-native applications.</Description>
+		<PackageTags>soltechnology core azure blob-storage storage cloud avro serialization nosql file-storage dotnet csharp</PackageTags>
+		<Product>SolTechnology.Core.Blob</Product>
+		<Title>SolTechnology.Core Blob</Title>
+		<PackageId>SolTechnology.Core.Blob</PackageId>
+		<AssemblyName>SolTechnology.Core.Blob</AssemblyName>
+
+		<PackageReadmeSource>Blob.md</PackageReadmeSource>
+	</PropertyGroup>
+
+	<ItemGroup>
+	  <PackageReference Include="AvroConvert" Version="3.4.16" />
+	  <PackageReference Include="Azure.Storage.Blobs" Version="12.29.0" />
+	</ItemGroup>
+
+</Project>

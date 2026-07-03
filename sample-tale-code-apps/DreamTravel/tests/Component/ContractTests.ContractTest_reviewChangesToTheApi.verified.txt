@@ -39,10 +39,10 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ProblemDetails'
-  '/api/dreamtravel/story/{handlerTypeName}/start':
+  '/api/dreamtravel/tale/{handlerTypeName}/start':
     post:
       tags:
-        - DreamTravelStory
+        - DreamTravelTale
       parameters:
         - name: handlerTypeName
           in: path
@@ -68,12 +68,12 @@ paths:
       responses:
         '200':
           description: OK
-  '/api/dreamtravel/story/{storyId}':
+  '/api/dreamtravel/tale/{taleId}':
     post:
       tags:
-        - DreamTravelStory
+        - DreamTravelTale
       parameters:
-        - name: storyId
+        - name: taleId
           in: path
           required: true
           schema:
@@ -95,9 +95,9 @@ paths:
           description: OK
     get:
       tags:
-        - DreamTravelStory
+        - DreamTravelTale
       parameters:
-        - name: storyId
+        - name: taleId
           in: path
           required: true
           schema:
@@ -111,9 +111,9 @@ paths:
           description: OK
     delete:
       tags:
-        - DreamTravelStory
+        - DreamTravelTale
       parameters:
-        - name: storyId
+        - name: taleId
           in: path
           required: true
           schema:
@@ -125,12 +125,12 @@ paths:
       responses:
         '200':
           description: OK
-  '/api/dreamtravel/story/{storyId}/result':
+  '/api/dreamtravel/tale/{taleId}/result':
     get:
       tags:
-        - DreamTravelStory
+        - DreamTravelTale
       parameters:
-        - name: storyId
+        - name: taleId
           in: path
           required: true
           schema:
@@ -747,7 +747,7 @@ security:
   - ApiKey: [ ]
 tags:
   - name: CalculateBestPath
-  - name: DreamTravelStory
+  - name: DreamTravelTale
   - name: FindCityByCoordinates
   - name: FindCityByName
   - name: FindLocationOfCity
