@@ -38,8 +38,7 @@ Trigger **one** of:
   git push origin v1.0.0
   ```
   The `Publish all nuget packages` step runs on `refs/tags/v*`.
-- **Manual** — run the `Build, test and publish` workflow via **workflow_dispatch** (leave
-  `unlist_deprecated` **unchecked**).
+- **Manual** — run the `Build, test and publish` workflow via **workflow_dispatch**.
 
 The push uses `--skip-duplicate`, so a re-run cannot clobber an already-published version.
 
@@ -59,13 +58,15 @@ The push uses `--skip-duplicate`, so a re-run cannot clobber an already-publishe
 
 ---
 
-## 4. Unlist the deprecated ghost ids (automated, opt-in)
+## 4. Unlist the deprecated ghost ids (automated, manual-only workflow)
 
-Hides the deprecated ghost ids from nuget.org search. **Opt-in only** — it never runs on a tag or
-`master` push, so a normal release publish can never trigger an unlist.
+Hides the deprecated ghost ids from nuget.org search. Lives in its **own** workflow with no `push`,
+tag, or `pull_request` trigger, so a normal release publish can never reach it.
 
-- Run the `Build, test and publish` workflow via **workflow_dispatch** with
-  **`unlist_deprecated` = true**.
+- Run the `Unlist deprecated packages` workflow
+  ([`unlistDeprecatedPackages.yml`](../.github/workflows/unlistDeprecatedPackages.yml)) via
+  **workflow_dispatch**, typing **`UNLIST`** into the `confirm` input. Any other value is a no-op
+  (`if: inputs.confirm == 'UNLIST'`).
 - The `unlist-deprecated` job enumerates every published version of `ApiClient`, `Story`, `Scheduler`,
   `Guards`, `BlobStorage` and `BlobStorage.Testing` live from the flat-container index and unlists each
   with `dotnet nuget delete` (needs `NUGET_API_KEY`). The ids are **hardcoded** in the job, so even a

@@ -1,9 +1,11 @@
 # CI/CD
 
-How `SolTechnology.Core` is built, tested, packed, and published to nuget.org. The single automation
+How `SolTechnology.Core` is built, tested, packed, and published to nuget.org. The primary automation
 entry point is [`.github/workflows/publishPackages.yml`](../.github/workflows/publishPackages.yml).
-The manual release steps that CI cannot perform are captured in the
-[release runbook](release-runbook-1.0.md).
+Unlisting the deprecated ghost ids lives in a separate, manual-only workflow,
+[`.github/workflows/unlistDeprecatedPackages.yml`](../.github/workflows/unlistDeprecatedPackages.yml),
+so a normal release publish can never reach it. The manual release steps that CI cannot perform are
+captured in the [release runbook](release-runbook-1.0.md).
 
 ---
 
@@ -11,16 +13,16 @@ The manual release steps that CI cannot perform are captured in the
 
 ### Triggers
 
-| Trigger | Build + test | Pack | Publish | Unlist |
-|---|:---:|:---:|:---:|:---:|
-| `pull_request` → `master` | ✅ | ✅ | — | — |
-| `push` → `master` | ✅ | ✅ | ✅ | — |
-| `push` tag `v*` | ✅ | ✅ | ✅ | — |
-| `workflow_dispatch` (`unlist_deprecated` = false) | ✅ | ✅ | ✅ | — |
-| `workflow_dispatch` (`unlist_deprecated` = true) | ✅ | ✅ | ✅ | ✅ |
+| Trigger | Build + test | Pack | Publish |
+|---|:---:|:---:|:---:|
+| `pull_request` → `master` | ✅ | ✅ | — |
+| `push` → `master` | ✅ | ✅ | ✅ |
+| `push` tag `v*` | ✅ | ✅ | ✅ |
+| `workflow_dispatch` | ✅ | ✅ | ✅ |
 
 Publish runs only for `workflow_dispatch` or a `refs/tags/v*` push. Unlisting the deprecated ghost
-ids is a separate, opt-in `workflow_dispatch` boolean — it never runs on a tag or `master` push.
+ids is **not** part of this pipeline — it lives in its own manual-only workflow (see below), so it can
+never run on a tag or `master` push.
 
 ### `build` job
 
@@ -37,12 +39,16 @@ ids is a separate, opt-in `workflow_dispatch` boolean — it never runs on a tag
 7. **Publish** (gated) — `dotnet nuget push ./artifacts/*.nupkg` with `--skip-duplicate`, so re-runs
    cannot clobber an already-published version. Needs the `NUGET_API_KEY` repo secret.
 
-### `unlist-deprecated` job
+## Unlisting deprecated packages — `Unlist deprecated packages`
 
-Opt-in only (`workflow_dispatch` + `unlist_deprecated` = true). Enumerates every published version of
-the four ghost ids — `ApiClient`, `Story`, `Scheduler`, `Guards` — live from the flat-container index
-and unlists each with `dotnet nuget delete`. The four ids are **hardcoded** in the job, so even a
-full-account key cannot unlist a supported package.
+A dedicated workflow, [`unlistDeprecatedPackages.yml`](../.github/workflows/unlistDeprecatedPackages.yml),
+with **only** a `workflow_dispatch` trigger — no `push`, tag, or `pull_request` hook, so a release
+publish can never reach it. Running it requires typing `UNLIST` into the `confirm` input
+(`if: inputs.confirm == 'UNLIST'`); any other value is a no-op. The job enumerates every published
+version of the six ghost ids — `ApiClient`, `Story`, `Scheduler`, `Guards`, `BlobStorage`,
+`BlobStorage.Testing` — live from the flat-container index and unlists each with
+`dotnet nuget delete`. The ids are **hardcoded** in the job, so even a full-account key cannot unlist
+a supported package.
 
 ---
 
@@ -65,7 +71,7 @@ if it needs to move independently), then follow the [release runbook](release-ru
 
 | Action | What it does | Automatable? |
 |---|---|---|
-| **Unlist** (`dotnet nuget delete`) | Hides a version from search; still installable by exact version. | ✅ CI (`unlist-deprecated` job). Undo (re-list) is web-UI only. |
+| **Unlist** (`dotnet nuget delete`) | Hides a version from search; still installable by exact version. | ✅ CI (`unlistDeprecatedPackages.yml` workflow). Undo (re-list) is web-UI only. |
 | **Deprecate** | Adds the "deprecated" badge + successor message on nuget.org. | ❌ Web UI only — no `dotnet nuget deprecate` command or public API. Optional, not a release blocker. |
 
 ---

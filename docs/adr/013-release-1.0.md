@@ -80,7 +80,8 @@ deliberate release trigger fires.
    *deprecation* (the "deprecated" badge + successor message) has **no** public CLI/API — it is
    web-UI-only (Manage packages → Deprecation; verified MS Learn 2025-10-31), so it is **dropped**
    from the release-blocking path. The repo-automatable action is `dotnet nuget delete` = **unlist**,
-   run by a gated `unlist-deprecated` CI job (step 01) that unlists **every** published version of
+   run by a dedicated manual-only `Unlist deprecated packages` workflow
+   (`.github/workflows/unlistDeprecatedPackages.yml`, step 01) that unlists **every** published version of
    each ghost id (`ApiClient`, `Story`, `Scheduler`, `Guards`) — versions enumerated live from the
    flat-container index, never hardcoded. Compile-time deprecation stays via `[Obsolete]` where source
    exists (`Scheduler`, `Guards`); the successor mapping is carried by the doc-level migration map
@@ -188,7 +189,8 @@ publish is a clean `1.0.0`; `SolTechnology.Core.Story` is retired (**unlisted** 
   **does not exist** — nuget.org deprecation is exposed only through the web UI (verified MS Learn
   2025-10-31). The repo-automatable action is `dotnet nuget delete` = **unlist** (per-version). Per
   the maintainer decision ("manage packages in one place", unlist-only), ghost-package retirement is
-  now an **automated, gated `unlist-deprecated` CI job** (step 01) that unlists every published
+  now an **automated, manual-only `Unlist deprecated packages` workflow** (`unlistDeprecatedPackages.yml`,
+  step 01) that unlists every published
   version of `ApiClient` / `Story` / `Scheduler` / `Guards`; server-side deprecation is dropped to an
   optional non-blocking follow-up. Recorded as step-00 answer 14; propagated into steps 01/07/10.
   Prose elsewhere in this ADR that reads "deprecated + unlisted" refers to the `[Obsolete]` /
@@ -227,7 +229,7 @@ section is the durable record.
 | # | Step | Shipped |
 |---|---|---|
 | 00 | Premortem gate | **Go with mitigations** — open questions resolved (`13a`→B2, `13b`→rename skill, `13c`→`api/tale`, breaking accepted). |
-| 01 | CI publish gate + pack-by-glob | `.github/workflows/publishPackages.yml` gates publish behind the release trigger, packs the 21 `src/` slnx projects by glob, adds the `unlist-deprecated` job; `checkout@v2`→`@v4`. |
+| 01 | CI publish gate + pack-by-glob | `.github/workflows/publishPackages.yml` gates publish behind the release trigger, packs the 21 `src/` slnx projects by glob; deprecated-id unlisting split into a dedicated manual-only `.github/workflows/unlistDeprecatedPackages.yml` (typed `confirm == 'UNLIST'` gate, no push/tag/PR trigger); `checkout@v2`→`@v4`. |
 | 02 | NuGet metadata + SourceLink | Centralised license/icon/readme/repository + SourceLink into `src/Directory.Build.props`; added `LICENSE` (MIT), `docs/API.Testing.md`, `docs/SQL.Testing.md`; `Core` keeps the root `README.md`. |
 | 03 | Rename wave 1 — Logging | `AddCoreLogging`→`AddSolLogging` (+ `LogScopeEnricher`/`CorrelationIdService`), class → `ModuleInstaller`; Api/HTTP callers + `docs/Log.md` swept; Logging 43 + HTTP 79 tests green. |
 | 04 | Rename wave 2 — data + transport | 18 public symbols renamed (`AddCQRS`→`AddSolCQRS`, `AddHTTPClient`→`AddSolHTTPClient`, MessageBus/Cache/SQL/Hangfire); all in-slnx + DreamTravel call sites updated; docs deferred to step 11. |
