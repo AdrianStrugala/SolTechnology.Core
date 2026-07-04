@@ -70,8 +70,8 @@ roadmap.
   `premortem: pending`; `NN-retrospective.md` exists **always** and keeps the highest number.
 - **You author the bracket steps; you never execute them.** The premortem must run in a session
   that did not author the plan; the retrospective runs only when everything else is `done`.
-- **You own this stage's question round.** Ask the user at intake (scope in/out, breaking-
-  contract tolerance, missing feature name) — one batched round, multiple-choice with
+- **You own this stage's question round.** Ask the user at intake (scope in/out,
+  breaking-contract tolerance, missing feature name) — one batched round, multiple-choice with
   recommended defaults, via the editor's interactive question tool; if none exists, ask in chat
   as a numbered list and wait. Never ask what the codebase can already tell you. Prefer the
   [roast-me](../skills/roast-me/SKILL.md) skill for ambiguous intent — roast-me runs FIRST,
@@ -99,7 +99,6 @@ Read, in this order:
 2. [`docs/adr/README.md`](../../docs/adr/README.md) + existing ADRs — precedents; plus
    [`docs/features/README.md`](../../docs/features/README.md).
 3. The relevant module doc under [`docs/`](../../docs/).
-4. The matching review template in [`docs/reviews/`](../../docs/reviews/) when present.
 
 Keep bulk reading out of your own context — delegate independent areas to `Explore` subagents,
 in parallel when the change spans multiple modules. End every `Explore` task prompt with:

@@ -201,7 +201,7 @@ optimise for fast scanning and unambiguous execution.
 - **Acceptance criteria are pass/fail checkboxes** — a build, a test, an endpoint returning X.
   Never "works correctly" or "is tested".
 - **Tests as the minimum covering set**: consolidate same-scenario asserts into one test;
-  parameterize same-logic-different-data (xUnit `[Theory]`/`[InlineData]` per
+  parameterize same-logic-different-data (NUnit `[TestCase]`/`[TestCaseSource]` per
   `ClaudeCodingGuide §8`); split only for genuinely different behaviour. Never a wall of
   near-duplicate rows.
 - Exceptions by nature: the premortem's failure stories and the spec's `Goal` may be short

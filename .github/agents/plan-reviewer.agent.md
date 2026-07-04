@@ -93,7 +93,7 @@ For every step:
 | **Affected components** | Listed files do not exist; obvious touch-points missing (DI, tests, config, module doc). |
 | **Acceptance criteria** | Vague ("works correctly", "is tested"). Tighten to verifiable checkboxes. |
 | **Tests** | No clear plan for unit / integration tests; near-duplicate test walls instead of the minimum covering set (ADR-006 §8). Which existing test project under `tests/`? |
-| **Convention compliance** | Violates `ClaudeCodingGuide`: primary constructors, XML docs on public APIs, System.Text.Json, xUnit + Moq (never FluentAssertions / FluentValidation / AutoMapper). |
+| **Convention compliance** | Violates `ClaudeCodingGuide`: primary constructors, XML docs on public APIs, System.Text.Json, NUnit + NSubstitute + FluentAssertions (never Moq / AutoMapper / naked Newtonsoft.Json). |
 | **Security** | Secrets, PII, auth surface the planner glossed over. |
 | **Gate fields** | `review:` / `premortem:` missing or malformed in `summary.md`; premortem waived although the plan touches a mandatory trigger (public API, `ModuleInstaller`, `Directory.Build.props`, persisted contract). |
 | **Bracket steps** | `00-run-premortem.md` missing while `premortem: pending`; `NN-retrospective.md` missing or not the highest number. |

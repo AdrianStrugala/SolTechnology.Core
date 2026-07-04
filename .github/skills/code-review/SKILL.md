@@ -1,6 +1,6 @@
 ---
 name: code-review
-description: Review a SolTechnology.Core change against the Tale Code philosophy, ClaudeCodingGuide rules, module conventions, and existing per-module review templates.
+description: Review a SolTechnology.Core change against the Tale Code philosophy, ClaudeCodingGuide rules, and module conventions.
 ---
 
 # Code Review
@@ -10,18 +10,12 @@ Evidence-based review skill for changes inside `src/SolTechnology.Core.*` and th
 ## Documentation references
 
 - [docs/ClaudeCodingGuide.md](../../../docs/ClaudeCodingGuide.md) — binding coding rules
-- [docs/reviews/](../../../docs/reviews/) — module-specific review templates
-  ([Api](../../../docs/reviews/Api-Review.md),
-  [HTTP](../../../docs/reviews/HTTP-Review.md),
-  [Logging](../../../docs/reviews/Logging-Review.md),
-  [MessageBus](../../../docs/reviews/MessageBus-Review.md),
-  [Story](../../../docs/reviews/Story-Framework-Review.md))
 - [docs/adr/](../../../docs/adr/) — accepted decisions
 
 ## Critical rules
 
 - **Cite file:line** for every finding. No vibe reviews.
-- **Reference the rule.** Each finding links to the Coding Guide section, ADR, or module review
+- **Reference the rule.** Each finding links to the Coding Guide section, ADR, or module doc
   that the change violates.
 - **Report what, not why-it-feels-wrong.** Suggested fix must be concrete.
 - **Tale Code first.** Readability is a primary criterion, not a nice-to-have.
@@ -51,8 +45,9 @@ Walk through the relevant sections of
 
 ### 3. Module-specific checks
 
-Open the matching template in [docs/reviews/](../../../docs/reviews/) for each touched module and
-verify its checklist is satisfied. If a module has no review template, note it as a gap.
+Verify the change against each touched module's conventions — its doc under
+[docs/](../../../docs/) and the relevant [ClaudeCodingGuide](../../../docs/ClaudeCodingGuide.md)
+sections. Note any module-specific convention the diff violates.
 
 ### 4. Public API and semver
 

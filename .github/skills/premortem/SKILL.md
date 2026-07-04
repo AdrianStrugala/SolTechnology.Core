@@ -6,10 +6,8 @@ description: Imagine the change has shipped exactly as planned and broken produc
 # Premortem
 
 Pre-mortem methodology (Gary Klein) adapted for **SolTechnology.Core** — a collection of NuGet
-packages consumed by external apps (e.g.
-[DreamTravel](../../../sample-tale-code-apps/DreamTravel/),
-plus public consumers of `SolTechnology.Core.*`
-from NuGet.org).
+packages consumed by external apps (e.g. [DreamTravel](../../../sample-tale-code-apps/DreamTravel/),
+plus public consumers of `SolTechnology.Core.*` from NuGet.org).
 
 Instead of asking "what could go wrong?", **assume the change already shipped and failed**, then
 work backwards to explain why. Prospective hindsight produces concrete failure stories where a
@@ -54,7 +52,7 @@ Within a plan, this skill executes the `00-run-premortem.md` gate
   not just a code edit.
 - **Cite Coding Guide sections by number** (§3, §11, §18) — if a reference looks wrong, the
   *reference* is stale, not the section.
-- **English record; conversation mirrors the user** (ADR-006 §8).
+- **English record; conversation mirrors the user** (ADR-006 §9).
 
 ## Process
 

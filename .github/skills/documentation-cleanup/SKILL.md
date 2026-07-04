@@ -37,8 +37,6 @@ For each folder `src/SolTechnology.Core.<Module>/`:
   [README.md](../../../README.md) — e.g. `Tale` → `docs/Tale.md`,
   `MessageBus` → `docs/Bus.md`).
 - The module is listed in the README table with a NuGet badge.
-- A review template exists under [docs/reviews/](../../../docs/reviews/) when the module is
-  publicly consumed; missing review templates are reported as gaps, not failures.
 
 ### 3. Check Indexes
 
