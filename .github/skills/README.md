@@ -85,4 +85,4 @@ Rules:
 ## Self-improvement
 
 Rules for editing skill files are in [`docs/ClaudeCodingGuide.md` §19](../../docs/ClaudeCodingGuide.md).
-When you add or remove a skill, update the index above and `CLAUDE.md §3` in the same change.
+When you add or remove a skill, update the index above and `CLAUDE.md §4` in the same change.

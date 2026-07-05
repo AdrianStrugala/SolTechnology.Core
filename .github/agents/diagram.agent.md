@@ -161,7 +161,7 @@ flowchart LR
 - ALWAYS reference cite-able source paths (`src/SolTechnology.Core.X/Y.cs`) in the
   description so a reviewer can verify.
 - IF this agent is unavailable, STOP. Tell the user the `diagram` agent is required for
-  sequence and component diagrams (CLAUDE.md §2). Do not hand-draft a Mermaid (or any other)
+  sequence and component diagrams (CLAUDE.md §3). Do not hand-draft a Mermaid (or any other)
   diagram inline in the doc / ADR / review as a substitute — that bypasses the layer-box and
   versioning conventions this agent enforces.
 

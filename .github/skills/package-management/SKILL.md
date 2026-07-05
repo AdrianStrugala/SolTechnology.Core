@@ -31,14 +31,14 @@ mode *"I added `<PackageReference Include="..." Version="..."/>` with a number p
 - NEVER pin a package below the version in `canonical-versions.md` without a CVE / breaking-change
   justification documented in the `.csproj` near the reference.
 - Source: [`nuget.org`](https://www.nuget.org/). No internal feed is configured for this repo.
-- New external dependencies in `src/SolTechnology.Core.*` are a `CLAUDE.md §1` forbidden action
+- New external dependencies in `src/SolTechnology.Core.*` are a `CLAUDE.md §2` forbidden action
   — get user confirmation, check [`nuget-stats.json`](../../../nuget-stats.json), then add.
 ## Constraints
 - DO NOT add a version to `canonical-versions.md` without first verifying it is what `dotnet add`
   resolved.
-- DO NOT use this skill as a substitute for checking CVEs — that is `CLAUDE.md §5`.
+- DO NOT use this skill as a substitute for checking CVEs — that is `CLAUDE.md §6`.
 - DO NOT replace `Newtonsoft.Json` with `System.Text.Json` in MessageBus or Hangfire-integrated
   code without an ADR — both serialisers have documented uses (see canonical table).
 - DO NOT invent a freehand version table when this skill is unavailable. STOP and tell the user
-  `package-management` is required (CLAUDE.md §2). Drift across projects is the failure mode
+  `package-management` is required (CLAUDE.md §3). Drift across projects is the failure mode
   this skill exists to prevent.

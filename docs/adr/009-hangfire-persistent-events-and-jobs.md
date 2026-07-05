@@ -134,7 +134,7 @@ command-only consumers pay nothing.
 - **New external dependency** for `src/SolTechnology.Core.*`: `Hangfire.Core` 1.8.22 is **absent from
   `nuget-stats.json`** and pulls a transitive `Newtonsoft.Json` **11.0.1** floor carrying
   **CVE-2024-21907 (HIGH, NU1903)**. The plugin MUST pin `Newtonsoft.Json` to **13.0.x** at the seam,
-  exactly as `DreamTravel.Infrastructure.csproj` pins 13.0.4. CLAUDE.md §1 dependency-impact reporting
+  exactly as `DreamTravel.Infrastructure.csproj` pins 13.0.4. CLAUDE.md §2 dependency-impact reporting
   applies.
 - Apps still own the Hangfire storage/server/dashboard bootstrap — `AddPersistentEvents()` does not
   hide it. This is deliberate (deployment concern) but is one more thing the consumer must wire.

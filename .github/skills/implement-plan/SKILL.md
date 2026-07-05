@@ -1,222 +1,219 @@
 ---
 name: implement-plan
-description: Execute one step from a multi-step implementation plan. Use when the user says "implement next step", "proceed with the plan", "work on step N", or hands off from the `plan-reviewer` agent. Reads the step file, implements exactly the work described, moves the file from `to-do/` (or `reviewed/`) to `done/`, updates the plan summary, and optionally records implementation deviations.
+description: Execute one step from a multi-step implementation plan. Use when the user says "implement next step", "proceed with the plan", "work on step N", or after plan review. Hard-checks the pipeline gate fields, implements exactly the work described, flips the step's status field, updates the summary, records deviations. The final retrospective step reviews the whole feature and collapses the working folder.
 ---
 
 # Implement Plan
 
 Execute **one** step from an implementation plan produced by the
-[implementation-planning](../../agents/implementation-planning.agent.md) agent. Plan layout is
-fixed by [ADR-006](../../../docs/adr/006-implementation-plan-workflow.md):
+[implementation-planning](../../agents/implementation-planning.agent.md) agent. Plan layout,
+status vocabulary, gate fields, and bracket steps are fixed by
+[ADR-006](../../../docs/adr/006-implementation-plan-workflow.md) — **read it before touching any
+plan file**:
 
 ```
-docs/adr/<NNN>-<feature>/
-  summary.md
-  to-do/       NN-<step>.md
-  reviewed/    NN-<step>.md   (drafts produced by plan-reviewer)
-  done/        NN-<step>.md
+docs/features/YYYY-MM-DD-<feature>/
+  summary.md                 (frontmatter: review / premortem gate fields)
+  steps/
+    00-run-premortem.md      (only when premortem is required — opening bracket)
+    NN-<step>.md             (frontmatter: status: to-do | blocked | in-progress | done)
+    NN-retrospective.md      (always the highest number — closing bracket)
 ```
+
+Step files never move. State lives in each file's `status:` frontmatter field, mirrored to the
+summary table in the same change.
 
 ## When to use
 
 - The user says: "implement next step", "proceed with the plan", "work on step N",
   "go ahead with the plan".
-- Handed off from the [`plan-reviewer`](../../agents/) agent (planned) after a plan is approved.
-- An ADR has `Implementation: 🔍 Implementing` in [`docs/adr/README.md`](../../../docs/adr/README.md)
-  and the user wants the next step done.
+- A feature has `Implementation: 🔍 Implementing` in
+  [`docs/features/README.md`](../../../docs/features/README.md) and the user wants the next
+  step done.
+- The user abandons a feature → run the **retro-lite** path (§8, last paragraph).
 
 ## Procedure
 
-### 1. Locate the step file
+### 1. Locate the step and check the gates
 
-- If the user named the step, open that file directly.
-- If not, open the ADR index ([`docs/adr/README.md`](../../../docs/adr/README.md)) — find the
-  first ADR with status `🔍 Implementing`. Feature plans live under `docs/features/<NNN>-<feature>/`
-  with the identical layout; check [`docs/features/README.md`](../../../docs/features/README.md) too.
-- Open its `summary.md`. Pick the first row with status `⬜ to-do`. If none exists, ask the user
-  which ADR to work on.
-- **Premortem gate (`00`).** If that first `⬜ to-do` row is step `00` (`00-run-premortem.md`), it is
-  the [ADR-006 §5](../../../docs/adr/006-implementation-plan-workflow.md) gate, not an implementation
-  step. Execute it by running the [`premortem`](../premortem/SKILL.md) skill and recording the
-  verdict in the step file — **touch no `src/` / `tests/` code**. Mark it `✅ done` only on a **Go** /
-  **Go with mitigations** verdict (fold any *No-Go* mitigation into the relevant step first), then
-  move it to `done/` and yield. **No `01..NN` step may start while `00` is still `⬜ to-do`.**
-- The step file lives in `to-do/` or `reviewed/` per `summary.md`'s "File" column.
+1. If the user named the step, open that file directly. Otherwise: find the active feature via
+   the [feature index](../../../docs/features/README.md), open its `summary.md`, and pick the
+   **lowest-numbered step whose file (enumerate `steps/` by directory listing, not by summary
+   links) shows `status: to-do`**.
+2. **Hard gate preconditions (ADR-006 §7)** — check `summary.md` frontmatter:
+   - Executing `00`: refuse while `review: pending`. Report; suggest the
+     [`plan-reviewer`](../../agents/plan-reviewer.agent.md) agent or an explicit user skip
+     (`skipped (<reason — user, date>)` — only the user may authorize it; record their words
+     verbatim).
+   - Executing `01..NN`: refuse unless `premortem` ∈ {`go`, `go-with-mitigations`,
+     `waived(...)`, `skipped(...)`} **and** (when `00-run-premortem.md` exists) step `00` shows
+     `status: done`.
+   - Executing the retrospective: refuse unless **every other step** is `done`.
+   - A missing or malformed gate field blocks execution — report, never guess.
+3. **Executing the `00` gate**: run the [`premortem`](../premortem/SKILL.md) skill and record
+   the full output in the step file **and** the verdict in the summary's `premortem:` field —
+   touch no `src/` / `tests/` code. On *Go with mitigations*: fold each required mitigation into
+   the named step file(s) (docs-only edit) **before** flipping `00` to `done`. On *No-Go*: leave
+   `00` at `to-do`, set `premortem: no-go (<date>)`, report the blocking scenarios, and yield —
+   the plan goes back to the planner. Then yield; implementing `01` is a separate invocation.
+4. **Executing the retrospective**: docs-only — jump to §8.
 
 ### 2. Read the full step file before editing
 
-Read the entire step file in full. Note:
+Read the entire step file. Note:
 
 - **Affected components** — the exact files to touch.
-- **Details** — what to do.
+- **Changes** — what to do.
 - **Acceptance criteria** — how to verify.
-- **Open questions** — if any are unresolved, STOP and invoke
+- **Open questions / `status: blocked`** — if any entry is unanswered, STOP and invoke
   [`roast-me`](../roast-me/SKILL.md). Do NOT implement against an open question.
+
+Flip the step to `status: in-progress` (frontmatter + summary row, same change) before the first
+code edit.
 
 ### 3. Load related skills
 
-Skills referenced or implied by the step:
-
 - Adding a `PackageReference` → [`package-management`](../package-management/SKILL.md).
-- Writing tests → consult `ClaudeCodingGuide §8`.
-- Logging additions → consult `ClaudeCodingGuide §11`.
-- Public API surface change → already covered by the plan's `00` premortem gate
-  ([ADR-006 §5](../../../docs/adr/006-implementation-plan-workflow.md)); if the step adds surface the
-  gate did not foresee, STOP and re-run [`premortem`](../premortem/SKILL.md) before it lands.
+- Writing tests → `ClaudeCodingGuide §8`.
+- Logging additions → `ClaudeCodingGuide §11`.
+- Public API surface change the `00` gate did not foresee → STOP and re-run
+  [`premortem`](../premortem/SKILL.md) before it lands.
 
 ### 4. Implement exactly the step
 
 - Scope is limited to **the single step**. Do not bleed into the next step.
 - Respect every rule in `CLAUDE.md §0` (pre-flight cite the sections you read) and the relevant
   `ClaudeCodingGuide` section(s).
-- After each edit, call `get_errors` per `CLAUDE.md §2`.
+- After each edit, run the environment's diagnostics (`get_errors` per `CLAUDE.md §3`, or
+  `dotnet build` when no such tool exists).
 - After the step is functionally complete, build the relevant solution
-  (`dotnet build SolTechnology.Core.slnx`, plus DreamTravel build for samples).
+  (`dotnet build SolTechnology.Core.slnx`, plus the DreamTravel build for sample changes).
 
-### 5. Move the step file
+### 5. Flip the status
 
-`to-do/` → `done/` (or `reviewed/` → `done/`):
+In the step file: `status: in-progress` → `status: done`. In `summary.md`: the row's status
+cell → `✅ done`. Same change, no other rows touched, no files moved.
 
-```bash
-mv docs/adr/<NNN>-<feature>/to-do/NN-<step>.md docs/adr/<NNN>-<feature>/done/NN-<step>.md
-```
+### 6. Record implementation deviations (if any)
 
-If the file was in `reviewed/`, source path is `reviewed/` instead of `to-do/`. Either way the
-destination is always `done/`.
-
-### 6. Update the plan file's frontmatter
-
-In the moved file, change `status: to-do` → `status: done`.
-
-### 7. Update `summary.md`
-
-Find the row for the step. Change:
-
-- Status cell: `⬜ to-do` (or `🔍 reviewed`) → `✅ done`.
-- File link path: `to-do/NN-<step>.md` (or `reviewed/NN-<step>.md`) → `done/NN-<step>.md`.
-
-Do **not** modify any other rows.
-
-#### Example row — before and after
-
-**Before** (was in `to-do/`):
-```markdown
-| 02 | Agents/Skills split | [`to-do/02-agents-skills-split.md`](to-do/02-agents-skills-split.md) | ⬜ to-do |
-```
-
-**After**:
-```markdown
-| 02 | Agents/Skills split | [`done/02-agents-skills-split.md`](done/02-agents-skills-split.md) | ✅ done |
-```
-
-### 8. Record implementation deviations (if any)
-
-If you deviated from the plan (different file, different approach, discovered a constraint that
-forced a change), append a `## Retrospective — Implementation Deviations` section at the end of
-the moved step file. Do NOT modify the original plan sections — preserve the historical record
-of what was planned.
-
-#### Format
+If you deviated from the plan (different file, different approach, a constraint that forced a
+change), fill the step file's `## Deviations` section. Do NOT modify the original
+Summary / Affected components / Changes / Acceptance criteria sections — they are the historical
+record of what was planned. **Unrecorded deviations are invisible to the retrospective.**
 
 ```markdown
-## Retrospective — Implementation Deviations
+## Deviations
 
-### 1. <Short title describing the deviation>
+### 1. <Short title>
 **Original plan:** <what the plan said or implied>
-**Actual implementation:** <what was done and the technical reason for the change>
-
-### 2. <Another deviation>
-**Original plan:** ...
-**Actual implementation:** ...
+**Actual implementation:** <what was done and the technical reason>
 ```
 
-This section is **optional**. Add it only when a deviation is worth recording. Trivial path
-adjustments and obvious bug fixes do not need an entry.
+Optional — only when worth recording. Trivial path adjustments and obvious bug fixes do not
+need an entry.
 
-### 9. Check if the ADR is now fully implemented
+### 7. Yield
 
-If every row in `summary.md` is `✅ done`, the ADR is complete. Trigger step 10. If not, you
-are done — yield back to the user.
+If the just-finished step was not the retrospective, yield back to the user. The retrospective
+is picked up by the next invocation once it is the lowest `to-do` — its own invocation
+guarantees it runs with fresh context, not as an afterthought of a coding session.
 
-### 10. Collapse on completion
+### 8. Executing the retrospective step (review → consolidate → verify → collapse)
 
-Per ADR-006 (Amendment 2026-05-25), when every step ships, the per-ADR working folder is **not
-preserved**. Information that matters survives in the ADR file; everything else is noise that
-inflates the repo.
+Per ADR-006 §6, the working folder is **not preserved**. Durable information survives in the
+**feature spec**. Execute in order — one transaction, consolidate first, delete second:
 
-Procedure — execute in order, one ADR per invocation:
-
-1. **Read every file under `done/`.** Identify what belongs in the ADR's Implementation summary:
-   shipped artifact (file path / skill / agent name), one-line outcome, plus any
-   `Retrospective — Implementation Deviations` entries that document a recurring failure mode
-   (not trivia like "fixed a typo").
-2. **Append an `## Implementation summary` section to the ADR file** (`docs/adr/NNN-<feature>.md`).
-   This is the **only** trace that survives. Format:
+1. **Review the whole feature against the plan.** For each step (directory listing of
+   `steps/`): diff plan vs delivered code — acceptance criteria demonstrably met? deviations
+   visible in the code but absent from `## Deviations`? Then look **across** steps: integration
+   seams between PRs, drift accumulated over the sequence, residual tech debt. Run diagnostics
+   / `dotnet build` on the touched solution one final time. Record findings; anything genuinely
+   unresolved becomes a listed follow-up — never invent a resolution.
+2. **Consolidate into the feature spec.** Append to
+   `docs/features/YYYY-MM-DD-<feature>.md`:
 
    ```markdown
    ## Implementation summary
 
-   Completed <YYYY-MM-DD>. The per-step working folder
-   (`docs/adr/NNN-<feature>/`) was deleted per the ADR-006 collapse-on-completion rule.
+   Completed <YYYY-MM-DD>. Gates: review — <done/waived/skipped + reason>; premortem —
+   <go/go-with-mitigations/waived/skipped + reason>. The working folder
+   (`docs/features/YYYY-MM-DD-<feature>/`) was deleted per the ADR-006 collapse rule.
 
    | # | Step | Shipped |
    |---|---|---|
    | 01 | <title> | <one-line outcome with cite-able file path> |
-   | ... | ... | ... |
 
    ### Preserved deviations
 
    - **<step>** — <one-line lesson worth keeping>.
+
+   ### Follow-ups
+
+   - <anything left open, or remove this subsection>
    ```
 
-3. **Update the [ADR index](../../../docs/adr/README.md)** — flip the implementation column
-   from `🔍 Implementing` to `✅ Done`. Drop any link to the (now-deleted) `summary.md`.
-4. **Delete the working folder.** `rm -rf docs/adr/NNN-<feature>/` — `to-do/`, `reviewed/`,
-   `done/`, and `summary.md` go together. Verify the folder is gone before yielding.
-5. **Verify no dangling links.** `grep -rn 'NNN-<feature>/' .` should return zero results in
-   `.github/`, `docs/` (outside the deleted folder), `CLAUDE.md`, or `src/`. If a doc / skill /
-   agent linked into the working folder, update the link to the ADR file instead.
+   Promote every `Deviations` entry documenting a recurring failure mode (not trivia) to
+   `### Preserved deviations`.
+3. **Verify before deleting.** Re-read the appended section: every step from the directory
+   listing appears with its outcome; gate verdicts, preserved deviations, and follow-ups are
+   captured; no link in the spec points into the working folder. Fix gaps now — this is the
+   last moment the step files exist.
+4. **Update the indexes.** [Feature index](../../../docs/features/README.md): flip
+   `🔍 Implementing` to `✅ Done`, drop the link to the (about-to-be-deleted) `summary.md`. If
+   the feature implements an ADR: point the ADR's `Implemented via` line at the spec and flip
+   the [ADR index](../../../docs/adr/README.md) row.
+5. **Delete the working folder.** `rm -rf docs/features/YYYY-MM-DD-<feature>/` — `steps/` and
+   `summary.md` go together. Verify the folder is gone.
+6. **Verify no dangling links.** `grep -rn 'YYYY-MM-DD-<feature>/' .` must return zero hits in
+   `.github/`, `docs/` (outside the deleted folder), `CLAUDE.md`, `src/`. Any doc that linked
+   into the working folder now links to the feature spec instead.
+7. Flip the retrospective step's own status to `done` conceptually via the index update — the
+   file is deleted with the folder; the Implementation summary is its record.
 
-The ADR file becomes the single source of truth for what shipped under that decision.
+**Retro-lite (abandoned feature — explicit user request only):** skip the all-steps-`done`
+precondition and step 1's build; record each step's last state and the abandonment reason in
+the spec under `## Implementation summary` with `Status: Abandoned`; then run steps 3–6
+unchanged. No working folder outlives its feature.
 
 ## Quality checks
 
 Before yielding back to the user:
 
-- [ ] The step file lives in `done/` only (verify it is gone from `to-do/` / `reviewed/`).
-- [ ] The moved file's frontmatter shows `status: done`.
-- [ ] `summary.md`: the row shows `✅ done` and links to `done/`.
-- [ ] No other `summary.md` rows were modified.
-- [ ] If the ADR is fully implemented, the index row in `docs/adr/README.md` is also updated.
+- [ ] Gate preconditions were checked before any edit (and the refusal path taken if unmet).
+- [ ] The step file's frontmatter shows `status: done` (or the correct blocked/refused state).
+- [ ] `summary.md`: the row matches the frontmatter; no other rows modified.
 - [ ] Every file in the step's "Affected components" actually changed.
-- [ ] `get_errors` clean per `CLAUDE.md §2`.
-- [ ] `dotnet build SolTechnology.Core.slnx` green (and DreamTravel build for sample changes).
+- [ ] Diagnostics clean per `CLAUDE.md §3`; `dotnet build SolTechnology.Core.slnx` green (and
+      DreamTravel build for sample changes).
 - [ ] Acceptance criteria from the step file are demonstrably met.
+- [ ] Retrospective invocation only: consolidation verified before deletion; indexes updated;
+      dangling-link grep clean; folder gone.
 
 ## Constraints
 
-- DO NOT start any `01..NN` implementation step while the plan's `00` premortem gate is still
-  `⬜ to-do`. The gate runs first ([ADR-006 §5](../../../docs/adr/006-implementation-plan-workflow.md));
-  starting code before a *Go* verdict turns the premortem into a postmortem.
-- DO NOT implement work outside the named step. Scope is one step.
-- DO NOT modify the original "Summary / Affected components / Details / Acceptance criteria"
-  sections of the moved step file. They are a historical record.
-- DO NOT move files in bulk (multiple steps per invocation). One step per invocation, even when
-  several are obviously trivial — keeps the audit trail clean and lets the user diff one
-  decision at a time.
-- DO NOT skip the `get_errors` / build / test checks because "the change looks obvious".
-- DO NOT mark a step `done` if any acceptance criterion is unmet — instead, surface the gap and
-  ask the user whether to split the step or amend the plan.
-- DO NOT skip the collapse procedure (step 10) when the last step completes. Leaving stale
-  `to-do/` / `done/` / `summary.md` files after the ADR ships re-introduces the noise ADR-006
-  Amendment 2026-05-25 exists to remove.
-- DO NOT delete the working folder before the Implementation summary lands in the ADR file.
-  The collapse is one transaction: summary first, delete second.
-- DO NOT bury a recurring failure mode in the deleted `done/` files. If a `Retrospective —
-  Implementation Deviations` entry describes a pattern future implementers should know about,
-  promote it to the ADR's `### Preserved deviations` block.
+- DO NOT start any `01..NN` step while the gates are unmet (§1.2). Starting code before a *Go*
+  verdict turns the premortem into a postmortem.
+- DO NOT run the premortem in the session that authored the plan — fresh eyes are the point of
+  the gate.
+- DO NOT run the retrospective while any other step is not `done` (retro-lite on explicit user
+  request excepted).
+- DO NOT set `review: skipped` or `premortem: skipped` on your own initiative — only the user
+  may skip a required gate; record their reason verbatim.
+- DO NOT implement work outside the named step. Scope is one step, one invocation — even when
+  several steps look trivial. Keeps the audit trail clean, lets the user diff one decision at a
+  time, and guarantees the retrospective its own fresh session.
+- DO NOT modify the original planned sections of a step file. Deviations go in `## Deviations`.
+- DO NOT move step files. State changes are frontmatter flips mirrored to the summary.
+- DO NOT skip diagnostics / build / test checks because "the change looks obvious".
+- DO NOT mark a step `done` if any acceptance criterion is unmet — surface the gap and ask the
+  user whether to split the step or amend the plan.
+- DO NOT delete the working folder before the Implementation summary is written **and
+  verified** in the feature spec — consolidate first, delete second, always.
+- DO NOT bury a recurring failure mode in the deleted `steps/` files — promote it to
+  `### Preserved deviations`.
 - DO NOT invent an ad-hoc multi-step workflow when this skill is unavailable. STOP and tell the
-  user `implement-plan` is required (CLAUDE.md §2). The step lifecycle (`to-do/` → `reviewed/`
-  → `done/`, frontmatter flip, summary update, deviation log, collapse on completion) is the
-  skill's contract; a freehand substitute silently breaks the ADR-006 audit trail.
-
+  user `implement-plan` is required (`CLAUDE.md §3`). The step lifecycle (gate checks, status
+  flips, summary sync, deviation log, retrospective collapse) is the skill's contract; a
+  freehand substitute silently breaks the ADR-006 audit trail.
+- ALWAYS write artifacts in English and in the ADR-006 §8 style; converse in the user's
+  language (ADR-006 §9).

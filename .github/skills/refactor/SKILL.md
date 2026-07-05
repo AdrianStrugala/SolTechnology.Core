@@ -26,7 +26,7 @@ a behaviour change?"*.
 ## When NOT to use
 
 - The change adds, removes, or renames a **public/protected** symbol in
-  `src/SolTechnology.Core.*` — that is `CLAUDE.md §1` forbidden without confirmation and an
+  `src/SolTechnology.Core.*` — that is `CLAUDE.md §2` forbidden without confirmation and an
   ADR. Route to [`implementation-planning`](../../agents/implementation-planning.agent.md).
 - The refactor crosses two or more modules. Route to `implementation-planning`.
 - The refactor changes behaviour — even subtly (different error code, different log level,
@@ -110,7 +110,7 @@ dotnet build SolTechnology.Core.slnx
 dotnet test tests/SolTechnology.Core.<Module>.Tests/
 ```
 
-Plus `get_errors` per `CLAUDE.md §2` after every file edit.
+Plus `get_errors` per `CLAUDE.md §3` after every file edit.
 
 Any test that flips red → STOP. The refactor was not behaviour-preserving. Revert the edit;
 re-think; do not "fix" the test to match the new behaviour.
@@ -119,7 +119,7 @@ re-think; do not "fix" the test to match the new behaviour.
 
 If the smell you fixed was **not** in [§15](../../../docs/ClaudeCodingGuide.md), add a row to
 the §15 table in the same PR with the file you fixed as the "Where seen" cell. This is the
-self-improvement loop from `CLAUDE.md §8` — silent retention is forbidden.
+self-improvement loop from `CLAUDE.md §9` — silent retention is forbidden.
 
 ### 7. Commit per `commit-message`
 
@@ -157,7 +157,7 @@ must be `PATCH` because consumers see no contract change.
   exception type, or branching outcome is a feature change — re-route to
   `implementation-planning`.
 - DO NOT touch public / protected symbols in `src/SolTechnology.Core.*`. That is
-  `CLAUDE.md §1` forbidden.
+  `CLAUDE.md §2` forbidden.
 - DO NOT cross module boundaries inside this skill. One module, one PR.
 - DO NOT add or remove a `PackageReference`. Use `package-management` / `dependency-audit`.
 - DO NOT write new tests in the same commit as the refactor — they belong in a prior commit so
@@ -169,6 +169,6 @@ must be `PATCH` because consumers see no contract change.
 - DO NOT use `feat` / `fix` commit types for a refactor. `refactor` + `Semver: PATCH` is the
   only correct shape.
 - DO NOT improvise a freehand refactor flow when this skill is unavailable. STOP and tell the
-  user `refactor` is required (CLAUDE.md §2). Freehand refactors are how silent behavioural
+  user `refactor` is required (CLAUDE.md §3). Freehand refactors are how silent behavioural
   drift ships under an innocent-looking commit.
 
