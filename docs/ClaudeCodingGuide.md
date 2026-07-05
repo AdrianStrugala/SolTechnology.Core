@@ -2,12 +2,13 @@
 
 Convention layer for the agent. Defines **what** the agent writes: project structure,
 CQRS, naming, logging, tests, documentation shape. Operational behaviour (pre-flight,
-tool usage, forbidden actions, dependency management) lives in the root
-[`CLAUDE.md`](../CLAUDE.md). One source of truth per topic — when in doubt, link,
-don't copy.
+behavioral core, tool usage, forbidden actions, dependency management) lives in the
+root [`CLAUDE.md`](../CLAUDE.md). AI-doc authoring rules live in
+[`AiDocsGuide.md`](AiDocsGuide.md). One source of truth per topic — when in doubt,
+link, don't copy.
 
 Section numbers (§0–§N) are stable cite-targets. `CLAUDE.md`, ADRs and skills reference
-them by number; never renumber an existing section. New rules append at the end.
+them by number; NEVER renumber an existing section. New rules append at the end.
 
 ---
 
@@ -38,8 +39,8 @@ src/
   LogicLayer/
     DreamTravel.Commands/         ← write side (CQRS)
     DreamTravel.Queries/          ← read side (CQRS)
-    DreamTravel.DomainServices/   ← reusable domain operations + Stories spanning multiple commands
-    DreamTravel.Workflows/        ← long-running interactive Stories
+    DreamTravel.DomainServices/   ← reusable domain operations + Tales spanning multiple commands
+    DreamTravel.Workflows/        ← long-running interactive Tales
     DreamTravel.TravelingSalesmanProblem/ ← isolated algorithmic engine
   DataLayer/
     DreamTravel.Sql/              ← EF Core DbContext + entities + QueryBuilders
@@ -56,24 +57,18 @@ tests/
   EndToEnd/            ← real environment smoke tests
 ```
 
-### Dependency direction (enforced — never violate)
+### Layer references (enforced — NEVER violate)
 
-```
-Presentation ──► LogicLayer ──► DataLayer ──► Infrastructure
-                                   │
-                                   ▼
-                                 Domain  (depended on by everything, depends on nothing)
-```
+| Layer | May reference |
+|---|---|
+| `Presentation` | `LogicLayer`, `DataLayer`, `Infrastructure`, `Domain`, `SolTechnology.Core.*` |
+| `LogicLayer` | `DataLayer`, `Infrastructure`, `Domain`, `SolTechnology.Core.*` |
+| `DataLayer` | `Infrastructure`, `Domain`, `SolTechnology.Core.*` |
+| `Infrastructure` | `Domain`, `SolTechnology.Core.*` |
+| `Domain` | nothing (no EF, no MediatR, no Tale, no logging) |
 
-Concrete rules:
-
-- `Domain` references **nothing** (no EF, no MediatR, no Tale, no logging).
-- `DataLayer` may reference `Domain` and `SolTechnology.Core.*` packages — never `LogicLayer` or `Presentation`.
-- `LogicLayer` may reference `DataLayer`, `Domain`, `Infrastructure`, and core packages — never `Presentation`.
-- `Presentation` references everything below it but contains no business rules.
-- `Infrastructure` is referenced by `LogicLayer` / `Presentation` for plumbing only; it never references them back.
-
-If you need `LogicLayer` from `DataLayer`, the abstraction is in the wrong layer — move it.
+References MUST point only downward in this table. If you need `LogicLayer` from
+`DataLayer`, the abstraction is in the wrong layer — move it.
 
 ### When to create a new project
 
@@ -83,12 +78,16 @@ Create a new `.csproj` only if **all** apply:
 - It has its own `ModuleInstaller.cs`.
 - It would otherwise force two unrelated concerns into one assembly.
 
-Otherwise add a folder inside an existing project. Never split on technical grounds
+Otherwise add a folder inside an existing project. NEVER split on technical grounds
 (e.g. "Models project" / "Helpers project") — split on responsibility.
 
 ### Interface + implementation co-location
 
-When a class is small (≤ ~80 lines total including the interface), put the interface and its single implementation in the **same file**. Name the file after the implementation (e.g. `RedisCache.cs` contains both `IRedisCache` and `RedisCache`). Split into separate files only when the implementation grows large or there are multiple implementations.
+When a class is ≤ 80 lines total (including the interface), put the interface and its
+single implementation in the **same file**. Name the file after the implementation
+(e.g. `RedisCache.cs` contains both `IRedisCache` and `RedisCache`). Split into
+separate files only when the implementation exceeds 80 lines or there are multiple
+implementations.
 
 ---
 
@@ -115,8 +114,11 @@ Rules:
 
 - One `Install<ProjectName>(this IServiceCollection)` extension method per project. Name it after the project domain, not the type — `InstallTripsQueries`, not `AddQueryHandlers`.
 - `ModuleInstaller` lives at the project root, never nested.
-- `Program.cs` calls only these extensions. It must not register individual services itself (with the narrow exception of framework wiring: CORS, Swagger, Auth, MVC filters, MediatR root, configuration binding).
-- Do not call `RegisterCommands` / `RegisterQueries` / `AddSolTale` from `Program.cs` — they use `Assembly.GetCallingAssembly()` and must be invoked from inside the assembly that owns the handlers.
+- `Program.cs` calls **installer-level extension methods only** — module installers
+  (`Install*`) and framework-level installers (`AddCache`, `AddMediatR`, CORS, Swagger,
+  Auth, versioning, MVC filters, configuration binding). It MUST NOT register
+  individual services (`services.AddTransient<IFoo, Foo>()` belongs in a `ModuleInstaller`).
+- NEVER call `RegisterCommands` / `RegisterQueries` / `AddSolTale` from `Program.cs` — they use `Assembly.GetCallingAssembly()` and must be invoked from inside the assembly that owns the handlers.
 - Decorators go in the installer right after the registration they decorate (`services.Decorate(typeof(IGoogleHTTPClient), typeof(GoogleHTTPClientCachingDecorator));`).
 
 ---
@@ -154,10 +156,10 @@ FetchTraffic/
 
 - **Query / Command class** holds *only* the input DTO + its `AbstractValidator<>` in the same file. No logic.
 - **Result class** is a plain DTO — no behavior, no nullable mystery.
-- **Handler** implements `IQueryHandler<,>` or `ICommandHandler<>` from `SolTechnology.Core.CQRS`. Always returns `Result` / `Result<T>`. Never throws for business failures.
+- **Handler** implements `IQueryHandler<,>` or `ICommandHandler<>` from `SolTechnology.Core.CQRS`. Always returns `Result` / `Result<T>`. NEVER throws for business failures.
 - **Validators** are `AbstractValidator<TInput>` and live in the same file as the input. They are auto-discovered by `RegisterCommands()` / `RegisterQueries()`.
-- A handler longer than ~100 lines of business logic must be converted into a Tale (chapters).
-- If a handler talks to more than one external system, it must be a Tale.
+- Tale threshold: the single criterion lives in §4 (MUST when > 100 lines of business
+  logic OR > 1 external system).
 
 ### Result pattern
 
@@ -175,9 +177,13 @@ Implicit conversion is allowed in handlers: `return city;` becomes `Result<City>
 
 ---
 
-## 4. Tale Framework (preferred for any multi-step orchestration)
+## 4. Tale Framework
 
-Use a Tale whenever the operation has ≥ 2 logical steps, or any single step is non-trivial.
+Threshold (single source of truth):
+
+- **MUST** be a Tale when the handler exceeds **100 lines of business logic** OR talks
+  to **more than one external system**.
+- **PREFER** a Tale for any multi-step orchestration below that threshold.
 
 ### Anatomy
 
@@ -187,21 +193,20 @@ public sealed class CalculateBestPathContext : Context<CalculateBestPathQuery, C
     public List<City> Cities { get; set; } = null!;
     // ...accumulator state used across chapters...
 }
-
-public class CalculateBestPathTale(IServiceProvider sp, ILogger<CalculateBestPathTale> logger)
-    : TaleHandler<CalculateBestPathQuery, CalculateBestPathContext, CalculateBestPathResult>(sp, logger),
-      IQueryHandler<CalculateBestPathQuery, CalculateBestPathResult>
-{
-    protected override Tale<CalculateBestPathResult> Tell() =>
-        Open<InitiateContext>()
-            .Read<DownloadRoadData>()
-            .Read<FindProfitablePath>()
-            .Otherwise<JustOrderCities>()
-            .Read<SolveTsp>()
-            .Read<FormCalculateBestPathResult>()
-            .Finale(ctx => ctx.Output);
-}
 ```
+
+```csharp
+protected override Tale<CalculateBestPathResult> Tell() =>
+    Open<InitiateContext>()
+        .Read<DownloadRoadData>()
+        .Read<FindProfitablePath>()
+        .Otherwise<JustOrderCities>()
+        .Read<SolveTsp>()
+        .Read<FormCalculateBestPathResult>()
+        .Finale(ctx => ctx.Output);
+```
+
+Full `TaleHandler` template: §17.
 
 ### Rules
 
@@ -209,13 +214,15 @@ public class CalculateBestPathTale(IServiceProvider sp, ILogger<CalculateBestPat
 - One chapter = one verb = one file. File names are prefixed with their order: `0.InitiateContext.cs`, `1.DownloadRoadData.cs`. Class names omit the prefix (`InitiateContext`, `DownloadRoadData`).
 - Chapter classes inherit `Chapter<TContext>` (automated) or `InteractiveChapter<TContext, TInput>` (user input pause).
 - All cross-chapter state lives on the `Context`. Chapters do not share fields, do not call each other.
-- Mark chapters with `[UsedImplicitly]` if the IDE flags them — they are resolved via DI.
-- Chapters return `Result.Success()` / `Result.Fail(...)`. Throwing is reserved for true exceptions (network, IO) — the framework converts them to errors.
+- **Always** mark chapter classes with `[UsedImplicitly]` — they are resolved via DI.
+- Chapters return `Result.Success()` / `Result.Fail(...)`. Chapter code NEVER throws —
+  exceptions originate only from DataLayer / Infrastructure / external libraries and
+  the framework converts them to errors. Layer rules for throw/catch: §13.
 - The `TaleHandler` may also implement `IQueryHandler<,>` / `ICommandHandler<>` so MediatR resolves it directly. This is the standard wiring.
 
 ### When to choose `DomainServices` vs Tale-in-Queries/Commands
 
-- **Tale in `Queries/`** — a complex query is **always dedicated to its use case**. Never extract a query into a domain service; there is no reuse case that justifies it.
+- **Tale in `Queries/`** — a complex query is **always dedicated to its use case**. NEVER extract a query into a domain service; there is no reuse case that justifies it.
 - **Tale in `Commands/`** — a single write triggered by one entry point.
 - **Tale in `DomainServices/`** — the orchestration works **directly on domain models** (a save / update / mutation) and is **reused by multiple commands or event handlers** (e.g. `CityDomainService.Save` is reused by the `CitySearched` event handler and import flows). The domain service exposes a plain interface (`ICityDomainService.Save(...)`) and internally inherits `TaleHandler`. Domain services are a write/command-side concept — never a home for queries.
 
@@ -246,10 +253,10 @@ ModuleInstaller.cs
 Rules:
 
 - **Entities are persistence shape, not domain.** They live in `DbModels/`, suffixed `Entity`. Domain models live in `*.Domain/` and are mapped via dedicated `*Mapper` classes (e.g. `CityMapper`).
-- **Never expose `IQueryable<TEntity>` outside the SQL project.** Consumers receive domain objects.
+- **NEVER expose `IQueryable<TEntity>` outside the SQL project.** Consumers receive domain objects.
 - Reusable query composition goes into `QueryBuilders/` as `IQueryable<T>` extension methods (`WhereName`, `WhereCoordinates`, `ApplyReadOptions`). Keep them small, single-predicate, and named after what they filter.
 - Configuration binding: `services.AddSQL(sqlConfiguration)` from `SolTechnology.Core.SQL` first, then `AddDbContext<>` for project-specific context.
-- Migrations live in `Infrastructure/DreamTravelDatabase/`. Never put migrations next to the DbContext.
+- Migrations live in `Infrastructure/DreamTravelDatabase/`. NEVER put migrations next to the DbContext.
 
 ### HTTP clients (`DreamTravel.GeolocationDataClients`)
 
@@ -294,16 +301,16 @@ Rules:
 
 ### `Program.cs`
 
-`Program.cs` is wiring, not logic. Order:
+`Program.cs` is wiring, not logic. It calls installer-level extensions only (§2). Order:
 
 1. `builder.AddServiceDefaults();` (Aspire).
 2. Culture, CORS, configuration binding.
 3. **Module installers** (one line per project): `InstallTripsSql`, `InstallGeolocationDataClients`, `InstallInfrastructure`, `InstallDomainServices`, `InstallTripsQueries`, `InstallGraphDatabase`, `AddFlows`, etc.
-4. Cross-cutting: `AddCache`, `AddMediatR`, authentication, versioning, Swagger.
+4. Framework installers: `AddCache`, `AddMediatR`, authentication, versioning, Swagger.
 5. Filters: `ExceptionFilter`, `ResponseEnvelopeFilter` (always wired globally).
 6. Build, configure pipeline, `MapControllers`, `Run`.
 
-CORS policy names, scheme names, and other constants must be `const` with a meaningful name — never placeholder strings like `"dupa"`. If you encounter such a placeholder in legacy code, fix it as part of your task.
+CORS policy names, scheme names, and other constants MUST be `const` with a meaningful name — never placeholder strings like `"dupa"` (§15).
 
 ### Controllers
 
@@ -331,7 +338,7 @@ Rules:
 
 - Controllers are **thin**. Body of an action ≤ 3 lines: log (optional), invoke handler, return.
 - Inject the specific `IQueryHandler<,>` / `ICommandHandler<>` rather than `IMediator` whenever a single use case is involved. `IMediator` is acceptable when the controller fans out to multiple handlers.
-- Never `try/catch` in a controller — `ExceptionFilter` handles it. Never serialize errors manually.
+- NEVER `try/catch` in a controller — `ExceptionFilter` handles it (§13). NEVER serialize errors manually.
 - One controller per resource/route; one folder per bounded context (`Trips/`, `RoadPlanner/`, `Statistics/`).
 - API versioning: place version-specific controllers under `Trips/v1/`, `Trips/v2/`. Use `[ApiVersion]` + `[MapToApiVersion]`. Mark deprecated versions `Deprecated = true`.
 - Document every action with XML `<summary>` (in English) and `[ProducesResponseType]` for every status code returned.
@@ -348,7 +355,7 @@ Rules:
 
 ### Where do tests go?
 
-- **Unit (`tests/Unit/`)** — only for pure algorithms (e.g. `TravelingSalesmanProblem`), domain invariants, and individual chapters with non-trivial logic. Never write a unit test that mocks `IMediator`, `HttpClient`, `DbContext`, or `IRepository` to assert "the handler called X".
+- **Unit (`tests/Unit/`)** — only for pure algorithms (e.g. `TravelingSalesmanProblem`), domain invariants, and individual chapters with non-trivial logic. NEVER write a unit test that mocks `IMediator`, `HttpClient`, `DbContext`, or `IRepository` to assert "the handler called X".
 - **Component (`tests/Component/`)** — preferred. `WebApplicationFactory<Program>` + Testcontainers for SQL/Bus/Blob. This is the default home for new tests in DreamTravel.
 - **EndToEnd (`tests/EndToEnd/`)** — real environment smoke tests, manual or pipeline-triggered.
 
@@ -368,7 +375,7 @@ tests/Unit/DreamTravel.Queries.UnitTests/
 - Test class field: `_sut` for the system under test. Dependencies frozen via `fixture.Freeze<T>()`.
 - Test name format: `Method_Scenario_ExpectedOutcome` (`Execute_ShouldPopulateContextWithRoadData`, `Resume_AfterPause_CompletesTale_AndPersistsTerminalState`).
 - One arrange / one act / one assert *block* per test — but multiple related assertions inside the assert block are encouraged (denser tests > more tests).
-- **Mark the three blocks with `// Arrange`, `// Act`, `// Assert` comments.** This is the one place where comments restating *what* is allowed (and required) — they delimit the test phases, which makes scanning failures and reviewing tests dramatically faster. Skip a phase only when it is genuinely empty (e.g. a parameterless `// Act` for a static call). Example:
+- **Mark the three blocks with `// Arrange`, `// Act`, `// Assert` comments.** This is the one place where comments restating *what* is allowed (and required) — they delimit the test phases, which makes scanning failures and reviewing tests dramatically faster. Skip a phase only when it is genuinely empty (e.g. a parameterless `// Act` for a static call). Example (`StartStory` / `ResumeStory` are the framework's API names):
   ```csharp
   [Test]
   public async Task Resume_AfterPause_CompletesTale_AndPersistsTerminalState()
@@ -396,12 +403,12 @@ tests/Unit/DreamTravel.Queries.UnitTests/
 These apply to every class you write, regardless of layer.
 
 1. **One reason to change.** If you can describe the class with the word "and", split it.
-2. **Size budget:** target ≤ 100 lines, hard cap ~150. Above that, extract a collaborator.
+2. **Size budget:** target ≤ 100 lines, hard cap 150. Above that, extract a collaborator.
 3. **Method size:** target ≤ 20 lines. Methods longer than that almost always hide a missing abstraction.
 4. **Constructor size:** ≤ 5 dependencies. More than five = the class does too much. Move work into a Tale or split the class. (`ILogger<T>` does not count toward the budget.)
-5. **Primary constructors** are mandatory for DI capture. Do not hand-write `private readonly` fields just to assign them.
+5. **Primary constructors** are mandatory for DI capture. NEVER hand-write `private readonly` fields just to assign them.
 6. **No statics with state.** Static methods are fine for pure helpers (`CityQueryBuilder`). Static *fields* with mutable state are forbidden outside `const` and `static readonly` lookup tables.
-7. **Use .NET 10 `extension` blocks** for extension methods. Do not write `static class` + `this` parameter — use the C# 14 `extension` syntax instead.
+7. **Use .NET 10 `extension` blocks** for extension methods. NEVER write `static class` + `this` parameter — use the C# 14 `extension` syntax instead.
 8. **No "Manager", "Helper", "Util" suffixes** unless the class genuinely is a generic helper (rare). Name by responsibility: `CityMapper`, `StreetTrafficUpdater`, `GoogleHTTPClient`.
 9. **No `#region`.** Use partial classes (one method per file for HTTP clients) or extract a new class. The only exception is legacy test files explicitly listed in the root `CLAUDE.md`.
 10. **Comments earn their place.** Tale Code reads like prose — let names carry the meaning. Write a comment **only** when a reader cannot infer the *why* from the code itself: a non-obvious framework constraint, a workaround for a specific bug/version, an ADR pointer. Hard rule: **one line — two as the absolute exception**. No multi-line narration, no incident retrospectives in `//`, no restating *what* the next line does. If the explanation needs a paragraph, it belongs in an **ADR** (link it: `// See ADR-005.`) or in an **XML `<summary>`** on the public type — not inline. Inline `//` is a *pointer*, not the storage.
@@ -438,12 +445,11 @@ These apply to every class you write, regardless of layer.
     - Does it explain *what* the code does? → delete it, rename the symbol instead.
     - Is it genuinely a single non-obvious *why*? → keep, one line.
 
-
 ---
 
 ## 10. Naming conventions
 
-- **Acronyms: ALL CAPS** (PEP 8 style) — `APIClient`, `SQLConfiguration`, `XMLDocument`, `CQRSHandler`, `AUID`, `HTTP`, `UI`, `IO`, `DB`. (See ADR-001.)
+- **Acronyms: ALL CAPS** — `APIClient`, `SQLConfiguration`, `XMLDocument`, `CQRSHandler`, `AUID`, `HTTP`, `UI`, `IO`, `DB`. (See ADR-001.)
   - Existing published package names (`SolTechnology.Core.CQRS`, `SolTechnology.Core.AUID`) are grandfathered. New types follow the rule.
 - **Files mirror their primary type name.** Exception: HTTP-client partials (`GoogleHTTPClient.<MethodName>.cs`) and ordered chapters (`0.InitiateContext.cs`).
 - **Folders are nouns in PascalCase.** Use case folders are verb-noun (`CalculateBestPath`, `FetchTraffic`).
@@ -462,13 +468,13 @@ These apply to every class you write, regardless of layer.
     - forwarded user/exception messages: `logger.LogInformation("[{Message}]", message);`
     - durations and numbers: `"Duration: [{ElapsedMs} ms]"`, not `"Duration: {ElapsedMs} ms"`.
     - HTTP fields: `"[{RequestMethod}] [{RequestPath}] -> [{StatusCode}]"`.
-  - The only acceptable bare placeholder is when the entire message is a single quoted literal that already provides visual delimiters (rare — prefer `[]` even then).
-- Use structured logging placeholders (`{Name}`), never string interpolation in log messages — interpolation breaks log aggregation.
-- **Never** pass an exception's `Message` (or any user-supplied string) as the message *template*: `logger.LogError(ex, ex.Message)` will throw `FormatException` if the text contains `{` / `}`. Always use a placeholder: `logger.LogError(ex, "[{Message}]", ex.Message)`.
+  - The only acceptable bare placeholder is when the entire message is a single quoted literal that already provides visual delimiters (rare — PREFER `[]` even then).
+- Use structured logging placeholders (`{Name}`). NEVER use string interpolation or `+`-concatenation in log messages — both break log aggregation.
+- **NEVER** pass an exception's `Message` (or any user-supplied string) as the message *template*: `logger.LogError(ex, ex.Message)` will throw `FormatException` if the text contains `{` / `}`. Always use a placeholder: `logger.LogError(ex, "[{Message}]", ex.Message)`.
 - Property names use **PascalCase** (`{OperationName}`, not `{operationName}`) — matches MEL/Serilog/App Insights convention and KQL queries that consumers write.
 - Log at the boundaries (handler entry/exit, external call start/end, chapter transitions). Do not log inside tight loops.
 - Errors: `logger.LogError(exception, "Message with [{Context}]", ctx);` — pass the exception as the first argument, never `ex.ToString()` inside the message.
-- Reusable extension methods that emit common shapes (operation lifecycle, HTTP request lifecycle) live in `SolTechnology.Core.Logging` and are the preferred entry point — `_logger.OperationStarted(name)` over hand-rolled templates.
+- Reusable extension methods that emit common shapes (operation lifecycle, HTTP request lifecycle) live in `SolTechnology.Core.Logging` and are the PREFERred entry point — `_logger.OperationStarted(name)` over hand-rolled templates.
 
 ---
 
@@ -477,16 +483,23 @@ These apply to every class you write, regardless of layer.
 - Input validation = **FluentValidation** in the same file as the Command/Query.
 - Business invariants = inside the domain or chapter, returning `Result.Fail(...)`.
 - Defensive parameter checks at module/library boundaries = **`SolTechnology.Core.Guards`**.
-- Never validate in the controller. Never validate in the handler if a validator exists.
+- NEVER validate in the controller. NEVER validate in the handler if a validator exists.
 
 ---
 
 ## 13. Error handling
 
-- Default to `Result` / `Result<T>`. Throw only for genuinely exceptional conditions (network, IO, programmer error).
-- A chapter that fails returns `Result.Fail(...)` — the Tale stops. Do not throw to abort a Tale.
-- `try/catch` is allowed at the boundary of an external call inside a chapter or HTTP client method (to translate driver exceptions into domain errors). It is **not** allowed in controllers, handlers, or `Tell()`.
-- Never swallow exceptions silently. If a `catch` block has no `throw` and no `logger.LogError`, it is a bug.
+Layer rule — who may throw, who may catch:
+
+| Layer | Throw | Catch |
+|---|---|---|
+| Controllers, handlers, chapters, `Tell()`, Domain | NEVER (business failures = `Result.Fail`) | NEVER (`ExceptionFilter` / the Tale framework handle it) |
+| DataLayer / Infrastructure (HTTP client methods, repositories) | only for genuinely exceptional conditions (network, IO) | allowed at the external-call boundary, to translate driver exceptions into domain errors |
+| External libraries | may throw — out of your control | — |
+
+- Default to `Result` / `Result<T>` everywhere.
+- A chapter that fails returns `Result.Fail(...)` — the Tale stops. NEVER throw to abort a Tale; exceptions escaping from DataLayer / external libraries are converted to errors by the framework (§4).
+- NEVER swallow exceptions silently. If a `catch` block has no `throw` and no `logger.LogError`, it is a bug.
 - For aggregated failures across chapters, use `AggregateError` from `SolTechnology.Core.CQRS`.
 
 ---
@@ -494,60 +507,63 @@ These apply to every class you write, regardless of layer.
 ## 14. Configuration
 
 - Bind config sections to options classes (`SQLConfiguration`, `Neo4jSettings`, `GoogleHTTPOptions`).
-- Bind in `Program.cs` and pass the *configuration object* into `Install...` methods — installers must not call `IConfiguration` directly.
-- **Every `AddOptions<T>()` chain must end with `.ValidateOnStart()`.** Bad config = host refuses to start. Never let a misconfiguration slip through to the first production request.
-- Secrets never live in `appsettings.json`. Use environment variables / Aspire / Key Vault.
+- Bind in `Program.cs` and pass the *configuration object* into `Install...` methods — installers MUST NOT call `IConfiguration` directly.
+- **Every `AddOptions<T>()` chain MUST end with `.ValidateOnStart()`.** Bad config = host refuses to start. NEVER let a misconfiguration slip through to the first production request.
+- Secrets NEVER live in `appsettings.json`. Use environment variables / Aspire / Key Vault.
 
 ---
 
 ## 15. Anti-patterns observed in this codebase — do not propagate
 
-These are real examples spotted in DreamTravel. Fix them when you touch the surrounding file; never copy them.
+Real examples spotted in DreamTravel. NEVER copy them. Policy column drives the
+surgical-change exception in root `CLAUDE.md` §1.3: **fix on touch** = fix when the
+entry sits in code you already edit (separate `chore:` commit); **report only** =
+the fix changes an observable contract (log templates, serialization, public types) —
+report it, never auto-fix.
 
-| Anti-pattern | Where seen | Correct form |
-| --- | --- | --- |
-| Placeholder constant `private static readonly string CorsPolicy = "dupa";` | `DreamTravel.Api/Program.cs` | `private const string CorsPolicyName = "DreamTravelDefault";` |
-| `try/catch` + `JsonConvert.SerializeObject(ex.Message)` in a controller | `CalculateBestPathController.CalculateBestPathV1` | Let `ExceptionFilter` handle it; return `Ok(result)`. |
-| `logger.LogInformation("Skipped " + s.Name);` | `FetchTrafficHandler` | `logger.LogInformation("Skipped [{Street}]", s.Name);` |
-| Multiple `+`-concatenated log strings | various | Structured placeholders, single interpolated raw string. |
-| Naked `Newtonsoft.Json` usage in new code | `CalculateBestPathController` | `System.Text.Json` (and the Tale/AUID converters) is the default. Newtonsoft only where Hangfire / legacy serialization requires it. |
-| Mocking `IMediator` / `DbContext` in unit tests | hypothetical | Write a Component test instead. |
-| Hand-written `private readonly` ctor capture | hypothetical | C# 12 primary constructor. |
-| `static class` + `this` extension methods | various | .NET 10 / C# 14 `extension` block. See §9.12. |
-| `#region` to organize a class | forbidden | Split into partial files or new classes. |
-| Multi-line "essay" comment restating *what* the next line does | various | One line, *why* only. See §9.11. |
-| Returning a persistence-layer entity (`*Entity` from `DbModels/`) past the DataLayer boundary — e.g. as a controller / handler / repository return type | DataLayer projects | Map to a domain type at the DataLayer boundary (`*Mapper.ToDomain`). Consumers see domain types only — see §5 and §6. Leaking an entity bypasses lazy-loading control, change-tracking lifetime, and JSON serialisation contracts. |
-| Splitting a schema change across multiple commits (entity in one, `DbContext` registration in another, EF migration in a third) | DataLayer changes | Single PR: entity class + `DbContext` `DbSet<>` + `EntityTypeConfiguration` + EF migration land together. The reviewer sees the full schema delta in one diff; rollback is one revert. |
+| Anti-pattern | Where seen | Correct form | Policy |
+| --- | --- | --- | --- |
+| Placeholder constant `private static readonly string CorsPolicy = "dupa";` | `DreamTravel.Api/Program.cs` | Meaningful `const` (§7) | fix on touch |
+| `try/catch` + `JsonConvert.SerializeObject(ex.Message)` in a controller | `CalculateBestPathController.CalculateBestPathV1` | `ExceptionFilter` handles it (§13) | fix on touch |
+| `logger.LogInformation("Skipped " + s.Name);` | `FetchTrafficHandler` | Structured placeholder + `[]` (§11) | report only — changes the log template consumers query |
+| Multiple `+`-concatenated log strings | various | Structured placeholders (§11) | report only — changes the log template consumers query |
+| Naked `Newtonsoft.Json` usage in new code | `CalculateBestPathController` | `System.Text.Json` + Tale/AUID converters; Newtonsoft only where Hangfire / legacy serialization requires it | report only — changes serialization behaviour |
+| Mocking `IMediator` / `DbContext` in unit tests | hypothetical | Component test (§8) | fix on touch |
+| Hand-written `private readonly` ctor capture | hypothetical | Primary constructor (§9.5) | fix on touch |
+| `static class` + `this` extension methods | various | `extension` block (§9.7) | fix on touch |
+| `#region` to organize a class | forbidden | Partial files or new class (§9.9) | fix on touch |
+| Multi-line "essay" comment restating *what* the next line does | various | One line, *why* only (§9.10) | fix on touch |
+| Returning a persistence-layer entity (`*Entity` from `DbModels/`) past the DataLayer boundary | DataLayer projects | Map at the boundary via `*Mapper.ToDomain` (§5, §6) | report only — changes a public contract |
+| Splitting a schema change across multiple commits | DataLayer changes | Single PR: entity + `DbSet<>` + `EntityTypeConfiguration` + EF migration together | fix on touch (process rule) |
 
 ---
 
-## 16. Workflow checklist (run for every task)
+## 16. Convention checklist (run for every task)
 
-Before declaring a task done, you must:
+Operational checks (build, tests, `get_errors`, NU warnings, forbidden actions) live
+in root `CLAUDE.md` §10 — run both lists. Before declaring a task done:
 
-0. ✅ **Before the first code edit in the session**, open this guide and the section(s)
-     relevant to the change (e.g. §11 for any `logger.Log*`, §3 for handlers, §10 for
-     renames). State the rules you will follow in your reply — one sentence, see root
-     `CLAUDE.md` "Evidence-of-consumption rule".
-1. ✅ Layer dependencies respected (run mental check from §1).
-2. ✅ New services registered through a `ModuleInstaller`, not in `Program.cs`.
-3. ✅ Class size, method size, ctor-arg budget within §9.
-4. ✅ Public types have XML `<summary>` (English).
-5. ✅ Logging uses placeholders + `[{Value}]` brackets — **every** placeholder, including
-     forwarded user/exception messages and durations (§11).
-6. ✅ No `#region`, no placeholder strings, no swallowed exceptions, no `try/catch` in controllers/handlers.
-7. ✅ Tests added/updated — Component test preferred, Unit test only for pure logic.
-8. ✅ `dotnet build SolTechnology.Core.slnx` is green. For DreamTravel changes, `cd sample-tale-code-apps/DreamTravel && dotnet build` is green.
-9. ✅ Relevant tests run green.
-10. ✅ No new NU1902 / NU1903 / NU1603 warnings (see root `CLAUDE.md` §"Dependency Management").
+- [ ] Relevant guide section(s) read and cited in the reply (root `CLAUDE.md` §0).
+- [ ] Layer references match the §1 table.
+- [ ] New services registered through a `ModuleInstaller`, not in `Program.cs` (§2).
+- [ ] Tale threshold respected — MUST-Tale when > 100 lines or > 1 external system (§4).
+- [ ] Class size, method size, ctor-arg budget within §9.
+- [ ] Public types have XML `<summary>` (English).
+- [ ] Logging uses placeholders + `[{Value}]` brackets — **every** placeholder (§11).
+- [ ] No `#region`, no placeholder strings, no swallowed exceptions; throw/catch respects the §13 layer table.
+- [ ] Comments are one-line *why-not-what* (§9.10).
+- [ ] Tests added/updated — Component test preferred, Unit test only for pure logic (§8).
 
-If any item fails, fix it before yielding back to the user.
+If any item fails, fix it before yielding.
 
 ---
 
 ## 17. Quick reference — file templates
 
 ### Command
+
+Commands implement `IRequest<Result>` so they flow through the MediatR pipeline;
+the handler implements `ICommandHandler<>` (which the framework maps onto MediatR).
 
 ```csharp
 // FetchTrafficCommand.cs
@@ -583,13 +599,13 @@ public class FetchTrafficHandler(
     public async Task<Result> Handle(FetchTrafficCommand request, CancellationToken ct)
     {
         logger.LogInformation("Fetching traffic at [{Time}]", request.DepartureTime);
-        // ... orchestration, ≤ 100 lines; otherwise convert to a Tale ...
+        // ... orchestration; above the §4 threshold convert to a Tale ...
         return Result.Success();
     }
 }
 ```
 
-### Tale query
+### Tale query (canonical full template — §4 links here)
 
 ```csharp
 // CalculateBestPathTale.cs
@@ -654,8 +670,6 @@ public static class ModuleInstaller
     }
 }
 ```
-
----
 
 ---
 
@@ -750,161 +764,29 @@ shape — bring them in line when you touch the surrounding module.
 
 ---
 
-## 19. AI-only documentation (`CLAUDE.md`, this guide, `SKILL.md`)
+## 19. AI-only documentation — moved
 
-A third class of docs lives in this repo: files read **exclusively by AI agents**
-(`CLAUDE.md` at root, this guide, every `.github/agents/*.agent.md`, every
-`.github/skills/*/SKILL.md`). They are not user-facing; they are not narrative; they are the
-agent's operational and convention memory. Optimise them for four things, in this order:
-
-1. **Routing speed** — the agent must find the rule for the task in the first ~N tokens.
-2. **Compliance verification** — both agent and reviewer must be able to point at "you
-   broke §X" without ambiguity.
-3. **Token efficiency** — every sentence competes with code for context window space.
-4. **Self-update loop** — agents must be able to append rules without breaking sections
-   that other docs / ADRs / skills cite.
-
-Everything else (prose, motivation, history) is waste.
-
-### Three-layer hierarchy (one role per file)
-
-| File | Role | Size budget |
-|---|---|---|
-| `CLAUDE.md` (root) | Operational protocol: how the agent behaves (pre-flight, tool usage, forbidden actions, dependency management, self-improvement routing). | ≤ 300 lines |
-| `docs/ClaudeCodingGuide.md` (this) | Conventions: what the agent writes (project structure, CQRS, naming, logging, anti-patterns, doc shape). | indexable; sections are stable cite-targets |
-| `.github/skills/*/SKILL.md` | One task, end-to-end (code-review, premortem, planning). Loaded on demand. | as short as the task allows |
-
-One rule = one place. Other files **link**, never copy.
-
-### Hard rules
-
-#### A. Form and tone
-
-1. **Imperative, present tense.** "Use primary constructors." not "You should consider
-   using primary constructors". "Never throw in `Tell()`." not "Throwing here is
-   usually a bad idea".
-2. **One term per concept.** If you say "chapter", do not later say "step" / "stage" /
-   "phase". LLMs split semantics on synonyms and hallucinate distinctions.
-3. **`MUST` / `NEVER` / `PREFER` in caps** for critical rules; ordinary text for the
-   rest. The caps build a force hierarchy without prose.
-4. **No history.** "We used to have a `RegisterCommands` overload that…" → delete.
-   State the current rule. War stories go to ADRs.
-5. **No marketing / praise.** "Beautifully designed Tale Code framework…" → delete.
-   The agent does not need motivation; it needs the rule.
-6. **No `> Note:` / `> Tip:` / `> IMPORTANT:` blockquotes.** Either the info matters
-   (regular sentence) or it doesn't (delete). Same rule as §18.6.
-
-#### B. Structure
-
-7. **Stable section numbering.** §0, §1, …, §N. Numbers are cite-targets — `CLAUDE.md`,
-   ADRs and skills reference "§9.11", "§18", "§4". **Never renumber existing sections.**
-   New rules append at the end; if a section grows beyond cohesion, split it but keep
-   the old number with a "moved to §M" pointer for one release.
-8. **Front-load.** Rules with the highest cost of violation (layer boundaries, secrets
-   in config, missing primary ctor, forbidden actions) go to §0–§3. Edge cases at the
-   end.
-9. **Decision tree at the entry.** First section answers "what am I writing?" in 5–7
-   points. The agent routes before the first edit.
-10. **Tables over prose for matrices.** Layer → types, exception → status, topic →
-    source-of-truth, anti-pattern → fix. Same rule as §18.5 — agents parse tables
-    faster than paragraphs.
-11. **Workflow / pre-yield checklist at the end.** `- [ ]` list the agent ticks before
-    handing control back. Lets the agent self-verify.
-
-#### C. Concrete over abstract
-
-12. **BAD/GOOD code pairs for every non-trivial rule.** Few-shot is the strongest signal
-    for an LLM — stronger than the prose rule above it. "Comments ≤ 1 line" + ❌/✅
-    block beats an essay every time.
-13. **Cite-able names.** Types, files, options, methods — always in `backticks`,
-    exact-string-searchable. "Inject `ILogger<TSelf>`" not "inject a logger of the
-    self type".
-14. **Anti-patterns with locations.** "`CalculateBestPathController.CalculateBestPathV1`
-    has `try/catch + JsonConvert`" — the agent knows where to fix it on the next pass.
-    Mythical "somewhere in the codebase" → delete.
-15. **Concrete numbers, not adjectives.** "≤ 100 lines, hard cap 150." not "classes
-    should be small". LLMs have no intuition for "small".
-
-#### D. Agent-specific mechanics
-
-16. **Evidence-of-consumption rule.** Before the first code-writing tool call in a
-    session, the agent **must** cite which sections it consulted (`CLAUDE.md §0`).
-    Without it, the agent silently forgets the rule by turn 4.
-17. **Forbidden-action list.** Explicit list of actions requiring user confirmation
-    (rename public symbols, bump majors, edit ADRs, push to master, mask CVEs). See
-    `CLAUDE.md §1`.
-18. **Tool-usage hints next to the rule that needs the tool.** "After editing a file,
-    call `get_errors`." — the agent knows it is part of the protocol, not a suggestion.
-19. **Self-improvement clause with explicit triggers.** List the events that mandate
-    an update (user correction, discovered constraint, repeated mistake, new ADR) →
-    agent updates the guide *in the same turn* before yielding. See §20 below.
-20. **Token-budget hint.** Single section ≤ ~150 lines. Above that the LLM starts
-    losing earlier fragments under resampling. If a section grows — split it or move
-    detail into a skill.
-
-#### E. Cross-file discipline
-
-21. **Cross-link, never copy-paste.** Logging convention lives in §11 of this guide.
-    `CLAUDE.md` says "follow §11 for any `logger.Log*`". The `code-review` skill says
-    "check §11". One source of truth.
-22. **Skills are situational, not pre-loaded.** Not every rule lives in the guide.
-    Skills (`code-review`, `premortem`, `implementation-planning`) load on demand —
-    that saves tokens in sessions that don't need them. Read the `SKILL.md` before
-    invoking; never infer from the skill's name.
-
-#### F. What to avoid
-
-23. **No emoji decoration** beyond `✅` / `❌` in BAD/GOOD pairs and `- [ ]` in
-    checklists. LLMs handle `**bold**` and headings well; piktograms are noise.
-24. **No "you can" / "usually" / "in most cases".** Either a rule or an exception.
-    Exceptions are explicit: "Exception: legacy test files listed in `CLAUDE.md §X`."
-25. **No `TODO` / "we should later".** Either it's an issue in the tracker or it
-    doesn't exist. AI-only docs are not a todo board.
-
-### When refactoring an AI-only doc
-
-- Strip every blockquote (`> Note:`, `> IMPORTANT:`, `> 🚨`).
-- Replace soft-language ("usually", "consider", "it's good to") with imperative.
-- Pull every convention rule out of `CLAUDE.md` into this guide; replace with a
-  cross-link in §7's table.
-- Collapse repeated triggers (the same evidence-of-consumption rule stated in three
-  places) into one canonical section.
-- Verify section numbers in this guide and skills still match every cross-reference.
-
-### Reference implementations
-
-- `CLAUDE.md` — operational protocol (≤ 300 lines, §0 pre-flight, §1 forbidden,
-  §7 cross-ref table to this guide).
-- This guide — conventions (§0 decision tree, stable §0–§N, BAD/GOOD pairs in §9.11,
-  §18, §19).
-- `.github/skills/code-review/SKILL.md` — single-task skill (front-loaded routing,
-  no convention duplication, links to this guide for every rule check).
+Content lives in [`docs/AiDocsGuide.md`](AiDocsGuide.md). Section number retained as a
+cite-target for one release; update your references, then this stub disappears.
 
 ---
 
-## 20. Self-improvement — keep this guide alive
+## 20. Self-improvement — how to append to this guide
 
-Whenever you (Claude / the agent) **learn something new** during a task that future iterations
-should not have to rediscover, you must update your own instructions immediately, in the same
-turn, before yielding back to the user.
+Triggers and routing live in root `CLAUDE.md` §9 (single source of truth). When a
+lesson routes here:
 
-Triggers — update the guide when:
-
-- The user corrects you on a convention, naming, structure, or workflow.
-- You discover a non-obvious constraint of the codebase (build quirks, framework rule, DI pitfall).
-- A repeated mistake gets called out (e.g. forgetting `{}` after `if`, missing primary ctor, partial code dumps).
-- A new pattern, helper, or framework addition becomes "the way" to do something here.
-- An ADR is written or amended — reflect its rule here in one line + link, **and** update the
-  ADR index at [`docs/adr/README.md`](adr/README.md) in the same change ([ADR-006](adr/006-implementation-plan-workflow.md)).
-
-How to update:
-
-1. Find the most relevant section (§0–§17). If none fits, add a new numbered section at the end.
+1. Find the most relevant section (§0–§18). If none fits, add a new numbered section at the end — NEVER renumber existing ones.
 2. Add the rule as a single, imperative bullet — short, concrete, copy-pasteable. No prose essays.
-3. If the lesson is broad enough to affect *all* tasks, also add it to the §16 workflow checklist.
-4. If it is repository-wide (not Tale/CQRS/etc. specific), mirror a one-liner into root `CLAUDE.md`.
-5. Mention the update in your reply to the user (one sentence: *"Added rule X to §N."*).
+3. If the lesson affects *all* tasks, also add it to the §16 checklist.
+4. If it is repository-wide (not convention-specific), mirror a one-liner into root `CLAUDE.md` instead.
+5. Mention the update in your reply (one sentence: *"Added rule X to §N."*).
 
-Do **not** wait to be told to update the guide — silent retention is forbidden. If a lesson is
-worth remembering for next time, it is worth writing down now.
+---
 
+## 21. Markdown / Mermaid hygiene (all docs)
+
+- Links with spaces in the path: `[Text](<path/file.md>)`.
+- Verify every link resolves on disk before printing it.
+- Mermaid node labels with spaces use `<br>`: `Node[Name<br>With<br>Spaces]`.
+- No issue-tracker IDs (Jira, etc.) unless the user supplies them.
