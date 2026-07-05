@@ -1,12 +1,12 @@
 ---
 name: dependency-audit
-description: Resolve a NU1901–NU1904 CVE warning, an NU1605 downgrade, or a transitive vulnerability in SolTechnology.Core. Drives the parent-lookup → fix-at-source → override-only-as-last-resort flow from CLAUDE.md §5. Companion to `package-management` (which only handles "add a package").
+description: Resolve a NU1901–NU1904 CVE warning, an NU1605 downgrade, or a transitive vulnerability in SolTechnology.Core. Drives the parent-lookup → fix-at-source → override-only-as-last-resort flow from CLAUDE.md §6. Companion to `package-management` (which only handles "add a package").
 ---
 
 # Dependency Audit
 
 Drive the CVE / downgrade resolution flow from
-[`CLAUDE.md §5`](../../../CLAUDE.md). Where `package-management` answers *"which version do I
+[`CLAUDE.md §6`](../../../CLAUDE.md). Where `package-management` answers *"which version do I
 pin?"*, this skill answers *"how do I fix a vulnerability or downgrade warning at source?"*.
 
 ## When to use
@@ -20,11 +20,11 @@ pin?"*, this skill answers *"how do I fix a vulnerability or downgrade warning a
 ## When NOT to use
 
 - Adding a brand-new package — use [`package-management`](../package-management/SKILL.md).
-- **NU1900** alone (audit data unreachable). Per `CLAUDE.md §5`, NU1900 is **not** a CVE;
+- **NU1900** alone (audit data unreachable). Per `CLAUDE.md §6`, NU1900 is **not** a CVE;
   it means the audit feed is offline. Fix your feed; do not touch `Directory.Build.props`.
 - Bumping a package for a non-security reason — use `package-management`.
 
-## Critical rules — from `CLAUDE.md §5`
+## Critical rules — from `CLAUDE.md §6`
 
 - **Fix at source, never mask.** A direct `PackageReference` override hides a vulnerable parent
   for one project at a time; the next consumer pulls the vulnerable parent again.
@@ -33,7 +33,7 @@ pin?"*, this skill answers *"how do I fix a vulnerability or downgrade warning a
 - **Override is a last resort.** Only when the parent has no patched version and removing it is
   not viable. Document the reason in an inline comment next to the override.
 - **No `NU190x` masking.** Adding the warning to `<NoWarn>` or `<WarningsNotAsErrors>` for a
-  real CVE is a `CLAUDE.md §1` forbidden action.
+  real CVE is a `CLAUDE.md §2` forbidden action.
 
 ## Procedure
 
@@ -160,7 +160,7 @@ If a CVE shaped a public API change (e.g. forced a serialiser swap), file an ADR
 ## Constraints
 
 - DO NOT mask `NU190x` with `<NoWarn>`, `<WarningsNotAsErrors>`, or pragma suppression. That is
-  `CLAUDE.md §1` forbidden.
+  `CLAUDE.md §2` forbidden.
 - DO NOT touch `src/Directory.Build.props` to silence audit warnings. The only legitimate audit
   exception there is **NU1900** (audit feed offline) which is unrelated to CVEs.
 - DO NOT migrate an SDK family inside this skill (e.g. `Microsoft.Azure.ServiceBus` →
@@ -171,6 +171,6 @@ If a CVE shaped a public API change (e.g. forced a serialiser swap), file an ADR
   [`package-management/references/canonical-versions.md`](../package-management/references/canonical-versions.md).
   A CVE fix is no excuse for drift.
 - DO NOT improvise a freehand audit flow when this skill is unavailable. STOP and tell the user
-  `dependency-audit` is required (CLAUDE.md §2). The masking-by-override anti-pattern is exactly
+  `dependency-audit` is required (CLAUDE.md §3). The masking-by-override anti-pattern is exactly
   what this skill exists to prevent.
 

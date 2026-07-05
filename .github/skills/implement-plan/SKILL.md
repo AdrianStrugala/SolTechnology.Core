@@ -84,7 +84,7 @@ code edit.
 - Scope is limited to **the single step**. Do not bleed into the next step.
 - Respect every rule in `CLAUDE.md §0` (pre-flight cite the sections you read) and the relevant
   `ClaudeCodingGuide` section(s).
-- After each edit, run the environment's diagnostics (`get_errors` per `CLAUDE.md §2`, or
+- After each edit, run the environment's diagnostics (`get_errors` per `CLAUDE.md §3`, or
   `dotnet build` when no such tool exists).
 - After the step is functionally complete, build the relevant solution
   (`dotnet build SolTechnology.Core.slnx`, plus the DreamTravel build for sample changes).
@@ -183,7 +183,7 @@ Before yielding back to the user:
 - [ ] The step file's frontmatter shows `status: done` (or the correct blocked/refused state).
 - [ ] `summary.md`: the row matches the frontmatter; no other rows modified.
 - [ ] Every file in the step's "Affected components" actually changed.
-- [ ] Diagnostics clean per `CLAUDE.md §2`; `dotnet build SolTechnology.Core.slnx` green (and
+- [ ] Diagnostics clean per `CLAUDE.md §3`; `dotnet build SolTechnology.Core.slnx` green (and
       DreamTravel build for sample changes).
 - [ ] Acceptance criteria from the step file are demonstrably met.
 - [ ] Retrospective invocation only: consolidation verified before deletion; indexes updated;
@@ -212,7 +212,7 @@ Before yielding back to the user:
 - DO NOT bury a recurring failure mode in the deleted `steps/` files — promote it to
   `### Preserved deviations`.
 - DO NOT invent an ad-hoc multi-step workflow when this skill is unavailable. STOP and tell the
-  user `implement-plan` is required (`CLAUDE.md §2`). The step lifecycle (gate checks, status
+  user `implement-plan` is required (`CLAUDE.md §3`). The step lifecycle (gate checks, status
   flips, summary sync, deviation log, retrospective collapse) is the skill's contract; a
   freehand substitute silently breaks the ADR-006 audit trail.
 - ALWAYS write artifacts in English and in the ADR-006 §8 style; converse in the user's

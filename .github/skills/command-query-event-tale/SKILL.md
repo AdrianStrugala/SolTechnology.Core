@@ -34,7 +34,7 @@ structure — recommended, but a consumer app may use its own names. When in dou
 ## When NOT to use
 
 - Adding or changing a **public/protected symbol** in `src/SolTechnology.Core.*` (the CQRS/Tale
-  *framework* itself). That is `CLAUDE.md §1` forbidden without an ADR — route to
+  *framework* itself). That is `CLAUDE.md §2` forbidden without an ADR — route to
   [`implementation-planning`](../../agents/implementation-planning.agent.md) and gate on
   [`premortem`](../premortem/SKILL.md).
 - Writing tests for the use case → [`test-writing`](../test-writing/SKILL.md).
@@ -211,11 +211,11 @@ per-type DI line:
 - Persisted workflow: `services.AddSolTale(assemblies: …).UseTaleRepository<SomeTaleRepository>();`.
 
 Only hand-rolled collaborators (a `*Step`, a TSP engine) need an explicit `AddScoped`. If you add
-or change a `ModuleInstaller.cs` contract, that is premortem-gated (`CLAUDE.md §2`).
+or change a `ModuleInstaller.cs` contract, that is premortem-gated (`CLAUDE.md §4`).
 
 ### 11. Verify and hand off
 
-- `get_errors` after every file edit (`CLAUDE.md §2`).
+- `get_errors` after every file edit (`CLAUDE.md §3`).
 - Build the sample: `cd sample-tale-code-apps/DreamTravel && dotnet build`.
 - Tests are **not** optional — hand off to [`test-writing`](../test-writing/SKILL.md). Every new
   `Result.Fail(...)` branch needs a negative test asserting the exact `Error.Code`.
@@ -252,6 +252,6 @@ or change a `ModuleInstaller.cs` contract, that is premortem-gated (`CLAUDE.md �
 - DO NOT exceed the §3 promotion threshold without converting to a Tale.
 - DO NOT write the tests inline here — hand off to `test-writing`.
 - DO NOT improvise a freehand use-case layout when this skill is unavailable. STOP and tell the
-  user `command-query-event-tale` is required (`CLAUDE.md §2`). Freehand handlers are how
+  user `command-query-event-tale` is required (`CLAUDE.md §3`). Freehand handlers are how
   100-line god-handlers and logic-in-`Tell()` re-enter the codebase.
 

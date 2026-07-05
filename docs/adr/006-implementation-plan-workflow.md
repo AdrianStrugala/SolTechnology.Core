@@ -281,9 +281,9 @@ was deleted per the collapse-on-completion rule. This summary is the durable rec
 | 04 | Skill `package-management` + canonical-versions table | [`.github/skills/package-management/SKILL.md`](../../.github/skills/package-management/SKILL.md) + `references/canonical-versions.md`. |
 | 05 | §15 anti-patterns: entity leak + split schema change | [`docs/ClaudeCodingGuide.md`](../ClaudeCodingGuide.md) §15 table rows. |
 | 06 | Skill `implement-plan` + first-consumer demonstration | [`.github/skills/implement-plan/SKILL.md`](../../.github/skills/implement-plan/SKILL.md); this ADR was the first consumer. |
-| 07 | Agent `plan-reviewer` | [`.github/agents/plan-reviewer.agent.md`](../../.github/agents/plan-reviewer.agent.md), wired into [`agents/README.md`](../../.github/agents/README.md), CLAUDE.md §3, and the planner handoff. |
-| 08 | Agent `diagram` + Mermaid conventions + `docs/diagrams/` | [`.github/agents/diagram.agent.md`](../../.github/agents/diagram.agent.md) + [`docs/diagrams/README.md`](../diagrams/README.md); CLAUDE.md §2 enforces routing through the agent. |
-| 09 | "Refuse if tool unavailable" rule + `temp/` cleanup | CLAUDE.md §2 row added; `roast-me`, `implement-plan`, `diagram` reinforce the rule; `temp/` removed from repo root. |
+| 07 | Agent `plan-reviewer` | [`.github/agents/plan-reviewer.agent.md`](../../.github/agents/plan-reviewer.agent.md), wired into [`agents/README.md`](../../.github/agents/README.md), CLAUDE.md §4, and the planner handoff. |
+| 08 | Agent `diagram` + Mermaid conventions + `docs/diagrams/` | [`.github/agents/diagram.agent.md`](../../.github/agents/diagram.agent.md) + [`docs/diagrams/README.md`](../diagrams/README.md); CLAUDE.md §3 enforces routing through the agent. |
+| 09 | "Refuse if tool unavailable" rule + `temp/` cleanup | CLAUDE.md §3 row added; `roast-me`, `implement-plan`, `diagram` reinforce the rule; `temp/` removed from repo root. |
 
 ### Preserved deviations
 

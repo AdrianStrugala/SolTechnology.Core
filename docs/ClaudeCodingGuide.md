@@ -4,7 +4,7 @@ Convention layer for the agent. Defines **what** the agent writes: project struc
 CQRS, naming, logging, tests, documentation shape. Operational behaviour (pre-flight,
 behavioral core, tool usage, forbidden actions, dependency management) lives in the
 root [`CLAUDE.md`](../CLAUDE.md). AI-doc authoring rules live in
-[`AiDocsGuide.md`](AiDocsGuide.md). One source of truth per topic — when in doubt,
+[`AIDocsGuide.md`](AIDocsGuide.md). One source of truth per topic — when in doubt,
 link, don't copy.
 
 Section numbers (§0–§N) are stable cite-targets. `CLAUDE.md`, ADRs and skills reference
@@ -172,8 +172,8 @@ return Result.Fail(new Error { Message = "..." });
 
 Implicit conversion is allowed in handlers: `return city;` becomes `Result<City>.Success(city)` automatically. Use it.
 
-> **Procedure:** the step-by-step for authoring a command/query/event/tale lives in the
-> [`command-query-event-tale`](../.github/skills/command-query-event-tale/SKILL.md) skill.
+**Procedure:** the step-by-step for authoring a command/query/event/tale lives in the
+[`command-query-event-tale`](../.github/skills/command-query-event-tale/SKILL.md) skill.
 
 ---
 
@@ -230,9 +230,9 @@ Full `TaleHandler` template: §17.
 
 Reserved for **long-running, interactive, persisted** tales (require a durable `ITaleRepository` — e.g. the DreamTravel sample's `UseTaleRepository<SQLiteTaleRepository>()`, or any `UseTaleRepository<T>()` backend). One folder per workflow, mirroring the CQRS use-case layout (`SampleOrderWorkflow/Chapters/...`).
 
-> **Procedure:** authoring a Tale (chapters, contexts, `DomainServices` vs `Workflows` hosting)
-> is driven by the [`command-query-event-tale`](../.github/skills/command-query-event-tale/SKILL.md)
-> skill.
+**Procedure:** authoring a Tale (chapters, contexts, `DomainServices` vs `Workflows` hosting)
+is driven by the [`command-query-event-tale`](../.github/skills/command-query-event-tale/SKILL.md)
+skill.
 
 ---
 
@@ -766,7 +766,7 @@ shape — bring them in line when you touch the surrounding module.
 
 ## 19. AI-only documentation — moved
 
-Content lives in [`docs/AiDocsGuide.md`](AiDocsGuide.md). Section number retained as a
+Content lives in [`docs/AIDocsGuide.md`](AIDocsGuide.md). Section number retained as a
 cite-target for one release; update your references, then this stub disappears.
 
 ---

@@ -247,7 +247,7 @@ section is the durable record.
 - **Manager/controller verb methods keep the `Story` suffix** (`TaleManager.StartStory/ResumeStory/CancelStory/GetStoryState`, `TaleOptions.TaleIdPrefix = "STR"`). The *types* are `Tale*`; these method names were intentionally not renamed in 05b. Tale docs mirror the real API, not a naïve global rename.
 - **Deprecated docs are landing pages, not deletions.** `Cron.md` / `Guards.md` / `Flow.md` kept with deprecation banners (Guards→FluentValidation `AbstractValidator<T>`, Flow→Tale); only `Story.md` was deleted (superseded by `Tale.md`).
 - **Docs were swept only in step 11.** Steps 03–05b renamed symbols in `src`/`tests`/sample and their XML-doc/comment/exception/log strings but deliberately left `docs/` untouched until the step-11 integrity pass.
-- **Published historical ADRs left as-is.** ADR-002 / ADR-011 (Story framework + SQLite) and the "before" symbol names in this ADR are historical records, not renamed (CLAUDE.md §1).
+- **Published historical ADRs left as-is.** ADR-002 / ADR-011 (Story framework + SQLite) and the "before" symbol names in this ADR are historical records, not renamed (CLAUDE.md §2).
 - **Pre-1.0 scope cuts.** No `MIGRATION-0.x-to-1.0.md`, no `CHANGELOG.md`, no per-`src` READMEs (root/`docs/*.md` READMEs reused); server-side nuget.org *deprecation* dropped in favour of CI *unlist*.
 - **Diagrams renamed to match code** (`story-*`→`tale-*`, `Story*`→`Tale*`) as a rename-to-match fix, not new `diagram`-agent authoring.
 

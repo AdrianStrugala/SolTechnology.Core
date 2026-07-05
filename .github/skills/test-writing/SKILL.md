@@ -42,7 +42,7 @@ NSubstitute over Moq.
 
 For a module `src/SolTechnology.Core.<Module>/` the test project is
 `tests/SolTechnology.Core.<Module>.Tests/`. Do not create a new project unless the module is
-new — and only after confirming with the user (`CLAUDE.md §1` forbidden action: new top-level
+new — and only after confirming with the user (`CLAUDE.md §2` forbidden action: new top-level
 folder).
 
 For sample apps, match the existing split:
@@ -144,7 +144,7 @@ code, the test must assert the exact `Error.Code` string (it is part of the publ
 ## Constraints
 
 - DO NOT introduce a new assertion or mocking library. The repo is FluentAssertions + NSubstitute.
-  A new library is a `CLAUDE.md §1` forbidden action.
+  A new library is a `CLAUDE.md §2` forbidden action.
 - DO NOT mock the world in a unit test to verify call patterns — `code-review` will reject it.
 - DO NOT skip `// Arrange` / `// Act` / `// Assert` comments. They are the one mandated
   `restate-the-what` comments per §8.
@@ -153,6 +153,6 @@ code, the test must assert the exact `Error.Code` string (it is part of the publ
 - DO NOT pin to a higher FluentAssertions / NSubstitute / xUnit version than the project
   already uses without invoking `package-management`.
 - DO NOT invent a freehand test layout when this skill is unavailable. STOP and tell the user
-  `test-writing` is required (CLAUDE.md §2). Freehand tests are how mock-IMediator anti-patterns
+  `test-writing` is required (CLAUDE.md §3). Freehand tests are how mock-IMediator anti-patterns
   re-enter the codebase.
 

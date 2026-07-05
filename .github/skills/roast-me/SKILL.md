@@ -128,7 +128,7 @@ This summary becomes the seed for the next phase. Pass it verbatim to the next s
 - ❌ Asking the user something the codebase or a specialist skill can already answer. Find the
   answer first; confirm only if it materially affects the plan.
 - ❌ Improvising a freehand mini-interview when this skill is unavailable. STOP and tell the
-  user `roast-me` is required (CLAUDE.md §2). Do not substitute a hand-rolled questionnaire.
+  user `roast-me` is required (CLAUDE.md §3). Do not substitute a hand-rolled questionnaire.
 
 ## Constraints
 

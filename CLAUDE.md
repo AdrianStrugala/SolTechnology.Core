@@ -2,7 +2,7 @@
 
 This file tells you (Claude Code / Copilot / any agent) **how to behave** in this repo.
 Code conventions live in [`docs/ClaudeCodingGuide.md`](docs/ClaudeCodingGuide.md).
-AI-doc authoring rules live in [`docs/AiDocsGuide.md`](docs/AiDocsGuide.md).
+AI-doc authoring rules live in [`docs/AIDocsGuide.md`](docs/AIDocsGuide.md).
 Module docs in [`docs/`](docs/ClaudeCodingGuide.md). Architectural decisions in
 [`docs/adr/`](docs/adr/README.md). One source of truth per topic — when in doubt,
 link, don't copy.
@@ -206,7 +206,7 @@ touch `Directory.Build.props` for it.
 | Configuration binding | `docs/ClaudeCodingGuide.md` §14 |
 | Anti-patterns + fix-on-touch / report-only policy | `docs/ClaudeCodingGuide.md` §15 |
 | Public module documentation structure | `docs/ClaudeCodingGuide.md` §18 |
-| AI-only documentation authoring | [`docs/AiDocsGuide.md`](docs/AiDocsGuide.md) |
+| AI-only documentation authoring | [`docs/AIDocsGuide.md`](docs/AIDocsGuide.md) |
 | Markdown / Mermaid hygiene | `docs/ClaudeCodingGuide.md` §21 |
 | Per-module user docs | `docs/<Module>.md` (e.g. `docs/Api.md`, `docs/Log.md`) |
 | Per-module review templates | `docs/reviews/<Module>-Review.md` |
@@ -240,7 +240,7 @@ Routing:
 
 1. Convention / coding rule → `docs/ClaudeCodingGuide.md` (per its §20).
 2. Repo-wide operational / tool / protocol rule → this file (`CLAUDE.md`).
-3. AI-doc authoring rule → `docs/AiDocsGuide.md`.
+3. AI-doc authoring rule → `docs/AIDocsGuide.md`.
 4. Skill-specific lesson → the skill's `SKILL.md`.
 5. User-facing docs lesson → `docs/ClaudeCodingGuide.md` §18.
 
