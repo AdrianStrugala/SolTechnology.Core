@@ -13,26 +13,34 @@ The plan workflow is identical to ADR-006 — only the parent folder differs.
 |---|---|---|---|
 | 001 | [Production pattern adoption — wave 1](001-production-pattern-adoption-programme.md) | 2026-06-12 | ✅ Done |
 | 002 | [Production pattern adoption — wave 2](002-production-pattern-adoption-wave-2.md) | 2026-06-24 | ✅ Done |
+| 2026-07-06 | [JWT Bearer authentication + API-key hardening](2026-07-06-jwt-bearer-authentication.md) | 2026-07-06 | 🔍 Implementing — see [summary](2026-07-06-jwt-bearer-authentication/summary.md) |
 
 Status values: `⬜ To-do` / `🔍 Implementing` / `✅ Done`.
 
 ## Layout
 
-Same three-folder, mutually-exclusive state model as ADR plans:
+Layout, naming, status vocabulary, and gate fields are fixed by
+[ADR-006](../adr/006-implementation-plan-workflow.md) (amended 2026-07-04) — this section is a
+pointer, not a second source of truth:
 
 ```
-NNN-feature-name/
-  summary.md
-  to-do/        ← steps not yet started
-  reviewed/     ← drafts produced by the `plan-reviewer` agent
-  done/         ← completed steps
+YYYY-MM-DD-<feature>.md               ← feature spec
+YYYY-MM-DD-<feature>/                 ← working folder (exists only while work is in flight)
+  summary.md                          ← step table + pipeline gate fields (frontmatter)
+  steps/
+    00-run-premortem.md               ← opening bracket (only when premortem: pending)
+    01-<step-title>.md
+    NN-retrospective.md               ← closing bracket, always the highest number
 ```
 
-- **Spec file**: `NNN-kebab-title.md` (monotonic numbering, no gaps, separate from ADR numbers).
-- **Step files**: `NN-step-title.md` (numeric, kebab-case, no dates).
-- **Premortem `00` gate** still applies when the feature touches public API, `ModuleInstaller`,
+- **Spec file**: `YYYY-MM-DD-kebab-title.md` — dates self-allocate; no numbers to reserve.
+- **Step files**: `NN-step-title.md` (numeric, kebab-case, no dates). Files never move —
+  state lives in each file's frontmatter `status: to-do | blocked | in-progress | done`.
+- **Gate fields** (`review:`, `premortem:`) live in `summary.md` frontmatter per ADR-006 §7;
+  the premortem gate applies when the feature touches public API, `ModuleInstaller`,
   `Directory.Build.props`, or a persisted contract.
-- **`summary.md`** is the row-by-row tracker (`⬜ to-do` / `🔍 reviewed` / `✅ done`).
+- **`summary.md`** mirrors each step's status (`⬜ to-do` / `⛔ blocked` / `🔧 in-progress` /
+  `✅ done`) in the same change that flips it.
 
 ## Decision vs feature
 

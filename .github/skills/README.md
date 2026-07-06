@@ -23,7 +23,7 @@ Conventions, references, and output formats live only inside `SKILL.md`.
 | [command-query-event-tale](command-query-event-tale/SKILL.md) | Authoring a command, query, event, or Tale (chapters) in any app on the `SolTechnology.Core.CQRS` / `.Tale` packages — per `ClaudeCodingGuide` §0/§3/§4/§11 and the DreamTravel reference app. Covers `Commands`/`Queries`, domain-model `DomainServices`, persisted `Workflows`, and `[LogScope]` logging. | independent |
 | [refactor](refactor/SKILL.md) | Behaviour-preserving cleanup local to one module (rename internals, split a class, extract a primary ctor, pay down a §15 anti-pattern). | independent |
 | [roast-me](roast-me/SKILL.md) | Vague request, under-specified intent, before any non-trivial planning. | runs *before* planning |
-| [implement-plan](implement-plan/SKILL.md) | Executing one step from an ADR's `to-do/` or `reviewed/` folder. | independent |
+| [implement-plan](implement-plan/SKILL.md) | Executing one step from a feature's `steps/` folder — gate fields checked, frontmatter `status:` flipped. | independent |
 
 For multi-step planning, use the [implementation-planning](../agents/implementation-planning.agent.md)
 agent — not a skill. See [`../agents/README.md`](../agents/README.md) for the agent index.

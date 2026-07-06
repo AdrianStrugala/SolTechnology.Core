@@ -11,8 +11,8 @@ Conventions, tool list, handoffs and output formats live only inside the file.
 
 | Agent | When to invoke | Hands off to |
 |---|---|---|
-| [implementation-planning](implementation-planning.agent.md) | Planning a new feature, multi-module change, or breaking API change. Produces an ADR + step files under [`docs/adr/<NNN>-<feature>/to-do/`](../../docs/adr/). | [plan-reviewer](plan-reviewer.agent.md) |
-| [plan-reviewer](plan-reviewer.agent.md) | Critiquing a plan in `docs/adr/<NNN>-<feature>/to-do/`. Writes revised drafts to `reviewed/`, deletes originals from `to-do/`. Never writes production code, never mutates `done/`. | premortem skill (mandatory gate before implementation) |
+| [implementation-planning](implementation-planning.agent.md) | Planning a new feature, multi-module change, or breaking API change. Classifies decision vs feature; produces an ADR and/or feature spec + step files under [`docs/features/`](../../docs/features/README.md)`YYYY-MM-DD-<feature>/steps/` per [ADR-006](../../docs/adr/006-implementation-plan-workflow.md). | [plan-reviewer](plan-reviewer.agent.md) |
+| [plan-reviewer](plan-reviewer.agent.md) | Critiquing a plan under `docs/features/YYYY-MM-DD-<feature>/`. Edits step files in place, sets `review:` in `summary.md`. Never writes production code. | premortem gate via `summary.md` `premortem:` field (ADR-006 §7) |
 | [diagram](diagram.agent.md) | Authoring a sequence or component diagram under [`docs/diagrams/`](../../docs/diagrams/). Mermaid only, five canonical layer boxes, immutable file per version. | — |
 
 ## Agent vs Skill — which kind is this?

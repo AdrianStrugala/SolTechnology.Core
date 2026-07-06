@@ -99,8 +99,8 @@ contracts — read the file before invoking (§0.3).
 
 | Agent | Path | Invoke when |
 |---|---|---|
-| implementation-planning | [`.github/agents/implementation-planning.agent.md`](.github/agents/implementation-planning.agent.md) | Planning a multi-module or breaking change; produces an ADR + step files under `docs/adr/<NNN>-<feature>/to-do/` per [ADR-006](docs/adr/006-implementation-plan-workflow.md). |
-| plan-reviewer | [`.github/agents/plan-reviewer.agent.md`](.github/agents/plan-reviewer.agent.md) | Critiquing a plan in `docs/adr/<NNN>-<feature>/to-do/` before implementation. Writes revised drafts to `reviewed/`, deletes originals from `to-do/`. NEVER writes production code. |
+| implementation-planning | [`.github/agents/implementation-planning.agent.md`](.github/agents/implementation-planning.agent.md) | Planning a multi-module or breaking change; classifies decision vs feature and produces an ADR and/or feature spec + step files under `docs/features/YYYY-MM-DD-<feature>/steps/` per [ADR-006](docs/adr/006-implementation-plan-workflow.md). |
+| plan-reviewer | [`.github/agents/plan-reviewer.agent.md`](.github/agents/plan-reviewer.agent.md) | Critiquing a plan under `docs/features/YYYY-MM-DD-<feature>/` before implementation. Edits step files in place, sets `review:` in `summary.md`. NEVER writes production code. |
 | diagram | [`.github/agents/diagram.agent.md`](.github/agents/diagram.agent.md) | **Required** for every sequence or component diagram added under `docs/`. Mermaid only, five canonical layer boxes (`Presentation` / `Logic` / `Data` / `Domain` / `External`), immutable file per version. NEVER hand-draft a diagram inline in a doc / ADR / review. |
 
 ### Skills
@@ -109,7 +109,7 @@ contracts — read the file before invoking (§0.3).
 |---|---|---|
 | premortem | [`.github/skills/premortem/SKILL.md`](.github/skills/premortem/SKILL.md) | **Mandatory** for the changes listed in the premortem gate below. |
 | blue-red-team | [`.github/skills/blue-red-team/SKILL.md`](.github/skills/blue-red-team/SKILL.md) | Design-level decision / ADR seeding. |
-| code-review | [`.github/skills/code-review/SKILL.md`](.github/skills/code-review/SKILL.md) | Reviewing a diff against the Coding Guide and module review templates. |
+| code-review | [`.github/skills/code-review/SKILL.md`](.github/skills/code-review/SKILL.md) | Reviewing a diff against the Tale Code philosophy and Coding Guide rules. |
 | commit-message | [`.github/skills/commit-message/SKILL.md`](.github/skills/commit-message/SKILL.md) | Producing a Conventional Commits message with semver footer. |
 | documentation-cleanup | [`.github/skills/documentation-cleanup/SKILL.md`](.github/skills/documentation-cleanup/SKILL.md) | Validating docs integrity (module/doc parity, indexes, Mermaid, ADRs). |
 | package-management | [`.github/skills/package-management/SKILL.md`](.github/skills/package-management/SKILL.md) | Adding / bumping a `PackageReference` — looks up the canonical version, prevents drift and version-by-memory hallucination. |
@@ -117,7 +117,7 @@ contracts — read the file before invoking (§0.3).
 | test-writing | [`.github/skills/test-writing/SKILL.md`](.github/skills/test-writing/SKILL.md) | Authoring or extending tests (NUnit everywhere). Encodes the FluentAssertions + NSubstitute + AutoFixture stack and Guide §8 conventions. |
 | command-query-event-tale | [`.github/skills/command-query-event-tale/SKILL.md`](.github/skills/command-query-event-tale/SKILL.md) | Authoring a command, query, fire-and-forget event, or Tale in any app built on `SolTechnology.Core.CQRS` / `.Tale` — per Guide §0/§3/§4/§11. Details live in the skill. |
 | refactor | [`.github/skills/refactor/SKILL.md`](.github/skills/refactor/SKILL.md) | Behaviour-preserving cleanup inside a single module (Guide §9 budgets, §15 debt). Routes to `implementation-planning` if scope grows past one module or touches a public symbol. |
-| implement-plan | [`.github/skills/implement-plan/SKILL.md`](.github/skills/implement-plan/SKILL.md) | Executing one step from an ADR's `to-do/` or `reviewed/` folder. Moves the file to `done/`, updates the summary, optionally records deviations. |
+| implement-plan | [`.github/skills/implement-plan/SKILL.md`](.github/skills/implement-plan/SKILL.md) | Executing one step from a feature's `steps/` folder. Checks the ADR-006 §7 gate fields, flips the step's frontmatter `status:` (mirrored in `summary.md`), optionally records deviations. |
 
 ### Premortem gate
 
@@ -140,7 +140,7 @@ they require user confirmation only (§2). Rationale:
 - **Risk-aware.** Consider the impact on NuGet consumers, not just the local diff.
 - **Systematic.** Follow the skill's documented process; NEVER improvise the steps.
 - **Doc-first.** Search [`docs/`](docs/ClaudeCodingGuide.md) — especially `ClaudeCodingGuide.md`,
-  `adr/`, `reviews/` — before analysing code.
+  `adr/`, `features/` — before analysing code.
 
 Markdown / Mermaid hygiene rules live in Guide §21.
 
@@ -209,12 +209,11 @@ touch `Directory.Build.props` for it.
 | AI-only documentation authoring | [`docs/AIDocsGuide.md`](docs/AIDocsGuide.md) |
 | Markdown / Mermaid hygiene | `docs/ClaudeCodingGuide.md` §21 |
 | Per-module user docs | `docs/<Module>.md` (e.g. `docs/Api.md`, `docs/Log.md`) |
-| Per-module review templates | `docs/reviews/<Module>-Review.md` |
 | HTTP production rollout | `docs/HTTP-Production-Checklist.md` + [ADR-005](docs/adr/005-http-production-defaults.md) |
 | AI agents / skills rationale | [ADR-004](docs/adr/004-ai-agents-and-skills.md) |
 | ADR index + status tracker | [`docs/adr/README.md`](docs/adr/README.md) |
 | Feature backlog index (non-decision plans) | [`docs/features/README.md`](docs/features/README.md) |
-| Multi-step implementation plan layout (`to-do/` / `reviewed/` / `done/`) | [ADR-006](docs/adr/006-implementation-plan-workflow.md) |
+| Multi-step implementation plan layout (frontmatter `status:` + gate fields) | [ADR-006](docs/adr/006-implementation-plan-workflow.md) |
 
 If a rule appears here **and** in the guide, the guide is authoritative — this file
 intentionally does not duplicate convention text.

@@ -18,6 +18,7 @@ Decisions that shape SolTechnology.Core. One ADR = one decision. Filenames follo
 | 009 | [Persistent events and recurring jobs via `SolTechnology.Core.Hangfire`](009-hangfire-persistent-events-and-jobs.md) | 2026-06-09 | Accepted | ✅ Done |
 | 011 | [Extract SQLite Story persistence into the DreamTravel sample](011-story-sqlite-extraction.md) | 2026-06-22 | Accepted | ✅ Done |
 | 013 | [Release 1.0 — versioning, hard registration-API rename, Story→Tale rebrand, deprecations, publish hardening](013-release-1.0.md) | 2026-06-29 | Proposed | ✅ Done — see [Implementation summary](013-release-1.0.md#implementation-summary) |
+| 014 | [JWT Bearer authentication in `SolTechnology.Core.Authentication`](014-jwt-bearer-authentication.md) | 2026-07-06 | Proposed | 🔍 Implementing — see [feature plan](../features/2026-07-06-jwt-bearer-authentication.md) |
 
 Status values: `Proposed` / `Accepted` / `Superseded` / `Rejected`.
 Implementation values: `N/A` / `⬜ To-do` / `🔍 Implementing` / `✅ Done`.
