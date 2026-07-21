@@ -1,19 +1,18 @@
-# Feature-001: Production hardening of SolTechnology.Core libraries
-
-> **Status:** ✅ Done
-> **Created:** 2026-06-12
-> **Stakeholders:** Consumers of `SolTechnology.Core.*` (NuGet + DreamTravel)
-> **Note:** Relocated from `docs/adr/010-…` — this is a backlog batch (a feature wave), not a single
-> hard-to-reverse decision. Kept as an example feature plan.
-
 ---
+status: completed
+created: 2026-06-12
+completed: 2026-06-19
+---
+
+# Production Hardening of SolTechnology.Core Libraries
+
+> Historical delivery record. It may not describe the current system.
 
 ## Goal
 
 A catalogue of patterns harvested from a sample production application identified gaps in the
-`SolTechnology.Core.*` libraries. Three proposals (Hangfire filters) already shipped under
-[ADR-009](../adr/009-hangfire-persistent-events-and-jobs.md). This feature adopts the **remaining
-backlog** as a single production-hardening effort: one plan, steps grouped by module.
+`SolTechnology.Core.*` libraries. Hangfire filters had already shipped. This feature adopted the
+remaining backlog as a single production-hardening effort: one plan, steps grouped by module.
 
 ### Resolved open questions (2026-06-16)
 
@@ -72,15 +71,14 @@ Ship all production-hardening work under one feature plan, grouped by module but
 
 ## Related
 
-- [ADR-006](../adr/006-implementation-plan-workflow.md) — plan-folder layout.
-- [ADR-007](../adr/007-cqrs-production-hardening.md) — `Result` + `ResultExtensions`.
-- [ADR-009](../adr/009-hangfire-persistent-events-and-jobs.md) — shipped Hangfire filters.
-- [Feature-002](002-production-pattern-adoption-wave-2.md) — wave 2 continues this programme.
+- [Delivery workflow](../architecture/delivery-workflow.md)
+- [CQRS architecture](../architecture/cqrs.md)
+- [Background processing architecture](../architecture/background-processing.md)
+- [Production pattern adoption — wave 2](2026-06-24-production-pattern-adoption-wave-2.md)
 
-## Implementation summary
+## Completion summary
 
-Completed 2026-06-19. The per-step working folder was deleted per the ADR-006
-collapse-on-completion rule.
+Completed 2026-06-19. The temporary step folder was deleted after consolidation.
 
 | # | Step | Shipped |
 |---|---|---|

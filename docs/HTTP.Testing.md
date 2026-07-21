@@ -5,7 +5,8 @@ Integration-testing fixtures for `SolTechnology.Core.HTTP` consumers: a [WireMoc
 
 > Reference from test projects only — not needed at runtime in production assemblies.
 > **Migrated from `SolTechnology.Core.Faker`** (namespace `SolTechnology.Core.Faker` →
-> `SolTechnology.Core.HTTP.Testing`) — an accepted breaking change. See ADR-008.
+> `SolTechnology.Core.HTTP.Testing`) — an accepted breaking change. See the
+> [testing companions feature record](features/2026-05-30-testing-framework-companions.md).
 
 ## What's in the box
 

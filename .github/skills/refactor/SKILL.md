@@ -26,12 +26,12 @@ a behaviour change?"*.
 ## When NOT to use
 
 - The change adds, removes, or renames a **public/protected** symbol in
-  `src/SolTechnology.Core.*` — that is `CLAUDE.md §2` forbidden without confirmation and an
-  ADR. Route to [`implementation-planning`](../../agents/implementation-planning.agent.md).
+  `src/SolTechnology.Core.*` — that is `CLAUDE.md §2` forbidden without confirmation. Route to
+  [`implementation-planning`](../../agents/implementation-planning.agent.md) for a dated feature.
 - The refactor crosses two or more modules. Route to `implementation-planning`.
 - The refactor changes behaviour — even subtly (different error code, different log level,
   different exception type). Route to `implementation-planning` with the behavioural change as
-  the explicit decision to record in the ADR.
+  the explicit rationale to record in the feature brief and current architecture after delivery.
 - The refactor introduces or removes a `PackageReference`. Use
   [`package-management`](../package-management/SKILL.md) (add / bump) or
   [`dependency-audit`](../dependency-audit/SKILL.md) (CVE) first.
@@ -74,7 +74,7 @@ grep -rE 'public (class|record|interface|struct|enum) <TypeName>' src/SolTechnol
 ```
 
 If the type or any member you plan to touch is referenced outside its module, STOP and route
-to `implementation-planning`. Public-surface refactors are ADR-grade.
+to `implementation-planning`. Public-surface refactors need an explicit feature plan.
 
 ### 3. Verify test coverage of the affected surface
 

@@ -2,7 +2,7 @@
 
 > **Status:** ⏸️ Parked
 > **Parked date:** 2026-06-24
-> **Source:** [Production pattern harvest — wave 2](../production-harvest-second-app.md) (candidate A4)
+> **Source:** [Production pattern adoption — wave 2](../features/2026-06-24-production-pattern-adoption-wave-2.md) (candidate A4)
 > **Would-be target:** new `SolTechnology.Core.Webhooks` package (on top of `Core.HTTP`)
 > **Semver / Effort:** MINOR (new package) · M
 
@@ -38,7 +38,7 @@ sharp edges (signature scheme, SSRF/timeout, partial reads, mTLS). Core has none
 - **New public surface + new NuGet package**, which warrants its own decision rather than riding in a
   multi-item hardening wave.
 - Cleanly separable: parking it does not block any roadmap item in
-  [harvest wave 2](../production-harvest-second-app.md#prioritised-roadmap-proposed).
+  [production pattern adoption wave 2](../features/2026-06-24-production-pattern-adoption-wave-2.md).
 
 ## Sketch (when picked up)
 
@@ -58,7 +58,7 @@ sharp edges (signature scheme, SSRF/timeout, partial reads, mTLS). Core has none
 
 ## Graduation triggers
 
-Promote to an ADR when **any** of these hold:
+Create a dated feature when **any** of these hold:
 
 - A Core consumer (sample app or downstream service) needs to deliver signed callbacks.
 - We want a reusable HMAC utility in the foundation independently of webhooks.
@@ -66,7 +66,7 @@ Promote to an ADR when **any** of these hold:
 
 ## Related
 
-- [Harvest wave 2 — A4](../production-harvest-second-app.md) — original assessment.
+- [Production pattern adoption wave 2](../features/2026-06-24-production-pattern-adoption-wave-2.md) — original assessment.
 - [`SolTechnology.Core.HTTP`](../Clients.md) — resilience + correlation foundation to build on.
-- [ADR index](../adr/README.md) — where this graduates to.
+- [Delivery workflow](../architecture/delivery-workflow.md) — how this graduates.
 

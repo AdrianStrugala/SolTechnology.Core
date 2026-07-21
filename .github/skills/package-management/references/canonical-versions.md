@@ -105,7 +105,7 @@ enables it purely through MSBuild properties (`PublishRepositoryUrl`, `EmbedUntr
 | Package | Version | Used by | Notes |
 |---|---|---|---|
 | `System.Text.Json` | built-in (`net10.0`) | All modules (default) | DEFAULT serialiser. No `PackageReference` needed. |
-| `Newtonsoft.Json` | `13.0.4` | `SolTechnology.Core.MessageBus` | Reserved for Service Bus payload compatibility + Hangfire integration. NEVER add to new code without an ADR. |
+| `Newtonsoft.Json` | `13.0.4` | `SolTechnology.Core.MessageBus` | Reserved for Service Bus payload compatibility + Hangfire integration. NEVER add to new code without a dated feature plan. |
 | `AvroConvert` | `3.4.16` | `SolTechnology.Core.Blob` | Avro support in `DataType.Avro`. |
 
 `HotChocolate.Language` was pinned in `DreamTravel.Sql.csproj` as a transitive-CVE override

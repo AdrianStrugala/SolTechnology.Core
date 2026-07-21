@@ -10,12 +10,13 @@ Evidence-based review skill for changes inside `src/SolTechnology.Core.*` and th
 ## Documentation references
 
 - [docs/ClaudeCodingGuide.md](../../../docs/ClaudeCodingGuide.md) — binding coding rules
-- [docs/adr/](../../../docs/adr/) — accepted decisions
+- [docs/architecture/](../../../docs/architecture/) — current architecture and rationale
+- [docs/features/](../../../docs/features/) — historical delivery context
 
 ## Critical rules
 
 - **Cite file:line** for every finding. No vibe reviews.
-- **Reference the rule.** Each finding links to the Coding Guide section, ADR, or module doc
+- **Reference the rule.** Each finding links to the Coding Guide section, architecture page, or module doc
   that the change violates.
 - **Report what, not why-it-feels-wrong.** Suggested fix must be concrete.
 - **Tale Code first.** Readability is a primary criterion, not a nice-to-have.
@@ -33,8 +34,8 @@ Walk through the relevant sections of
 [docs/ClaudeCodingGuide.md](../../../docs/ClaudeCodingGuide.md) for each diff hunk:
 
 - §3 CQRS — handlers return `Result<T>`, registered in `ModuleInstaller`, single responsibility.
-- §10 Naming — public symbols follow acronym capitalization
-  ([ADR-001](../../../docs/adr/001-acronym-capitalization-refactoring.md)).
+- §10 Naming — public symbols follow acronym capitalization and compatibility constraints from
+  [`naming-and-public-api.md`](../../../docs/architecture/naming-and-public-api.md).
 - §11 Logging — `logger.Log*` template, level, scope, no PII.
 - Class-size budget — flag files exceeding the limit.
 - §20 Self-Improvement — if a lesson was learnt, the guide itself or `CLAUDE.md` must be updated
@@ -53,8 +54,9 @@ sections. Note any module-specific convention the diff violates.
 
 - Identify added / removed / changed public/protected symbols in `src/SolTechnology.Core.*`.
 - Classify semver impact (MAJOR / MINOR / PATCH).
-- If MAJOR: require an ADR in [docs/adr/](../../../docs/adr/) and a `BREAKING CHANGE:` footer in
-  the commit (see [commit-message](../commit-message/SKILL.md)).
+- If MAJOR: require explicit user confirmation, a dated feature record that explains the breaking
+  rationale and migration, and a `BREAKING CHANGE:` footer (see
+  [commit-message](../commit-message/SKILL.md)).
 
 ### 5. Tests
 
@@ -77,13 +79,17 @@ sections. Note any module-specific convention the diff violates.
 
 - Each touched module has a docs file under [docs/](../../../docs/) — verify it is updated when the
   public API changes.
+- Each architecture-affecting change updates the owning page under
+  [docs/architecture/](../../../docs/architecture/) to current behavior and rationale.
+- The active dated feature record captures delivery outcome and material deviations.
 - The module is listed in [README.md](../../../README.md).
 - Run [documentation-cleanup](../documentation-cleanup/SKILL.md) if doc changes are non-trivial.
 
 ### 8. Premortem hand-off
 
-If the change touches public API, `ModuleInstaller`, or persisted contracts, require a
-[premortem](../premortem/SKILL.md) before merge.
+Require a [premortem](../premortem/SKILL.md) before merge exactly for `CLAUDE.md §4` triggers.
+Check `CLAUDE.md §2` confirmation gates separately. Recommend premortem for other changes only when
+their risk warrants it.
 
 ## Output format
 
@@ -94,7 +100,7 @@ If the change touches public API, `ModuleInstaller`, or persisted contracts, req
 
 #### Findings
 
-| # | Severity | File:Line | Rule (Guide §/ADR/Review) | Finding | Suggested Fix |
+| # | Severity | File:Line | Rule (Guide §/Architecture/Review) | Finding | Suggested Fix |
 |---|---|---|---|---|---|
 | 1 | Blocking / Major / Minor / Nit | <placeholder> | <placeholder> | <placeholder> | <placeholder> |
 

@@ -8,32 +8,35 @@ status: to-do
 
 ## Summary
 
-Whole-feature review and collapse, per ADR-006 §6. Runs only when steps 00–04 are `done`.
-Docs-only.
+Whole-feature review and collapse per the
+[delivery workflow](../../../architecture/delivery-workflow.md). Runs only when steps 00–04 are
+`done`. Docs-only.
 
 ## Affected components
 
-- `docs/features/2026-07-06-jwt-bearer-authentication.md` — EDIT — add `## Implementation summary`
+- `docs/features/2026-07-06-jwt-bearer-authentication.md` — EDIT — complete durable record and status
 - `docs/features/2026-07-06-jwt-bearer-authentication/` — DELETE — collapse after consolidation
-- `docs/features/README.md` — EDIT — status → `✅ Done`
-- `docs/adr/README.md` — EDIT — ADR-014 implementation status
-- `docs/adr/014-jwt-bearer-authentication.md` — EDIT — status `Proposed` → `Accepted`
+- `docs/architecture/authentication.md` — EDIT — replace API-key-only architecture with delivered behavior
 
 ## Changes
 
 - Review the delivered feature against the plan: diff plan vs code per step and across
   step seams; catch deviations visible in code but absent from `## Deviations`; note
   residual tech debt (e.g. multi-key API-key identity left out of scope) as follow-ups.
-- Consolidate `summary.md` gate verdicts, per-step outcomes, preserved deviations, and
-  follow-ups into the spec's `## Implementation summary`.
+- Consolidate gate verdicts, per-step outcomes, preserved deviations, and follow-ups into the
+  feature's `## Completion summary`, `## Deviations`, and `## Follow-ups`.
+- Update `docs/architecture/authentication.md` from verified code and tests; remove obsolete
+  API-key-only claims only after JWT ships.
+- Set feature `status: completed` and `completed: YYYY-MM-DD`.
 - Verify the summary section for completeness and dead links **before** deleting the
   working folder — consolidate first, delete second (one transaction).
 
 ## Acceptance criteria
 
-- [ ] Spec carries a complete `## Implementation summary`; no link into the deleted
+- [ ] Feature carries a complete `## Completion summary`; no link into the deleted
       working folder remains anywhere under `docs/`.
-- [ ] Both indexes and the ADR status updated in the same change.
+- [ ] `docs/architecture/authentication.md` describes the delivered current behavior and rationale.
+- [ ] Feature frontmatter is `status: completed` with a completion date.
 
 ## Open questions
 

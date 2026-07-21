@@ -1,6 +1,6 @@
 ---
 name: blue-red-team
-description: Evaluate a SolTechnology.Core design decision from both supportive (Blue) and skeptical (Red) perspectives. Companion to premortem for ADR-grade choices.
+description: Evaluate a SolTechnology.Core design choice from supportive and skeptical perspectives. Records alternatives in the dated feature brief and informs current architecture after delivery.
 ---
 
 # Blue / Red Team
@@ -15,8 +15,8 @@ Use this skill alongside [premortem](../premortem/SKILL.md):
 
 ## When to use
 
-- Before opening an [ADR](../../../docs/adr/) — the Blue/Red output seeds the
-  *Decision* and *Alternatives Considered* sections.
+- Before committing to a hard-to-reverse approach — the output seeds the feature brief's
+  `Context` and `Implementation plan`.
 - When choosing between two patterns within Tale Code (e.g. Result vs exception,
   Chain handler vs single handler, Story step vs CQRS handler).
 - When introducing a new module to `src/SolTechnology.Core.*`.
@@ -24,7 +24,8 @@ Use this skill alongside [premortem](../premortem/SKILL.md):
 ## Critical rules
 
 - **No strawmen.** Make the strongest honest case for each side.
-- **Be specific to this repo.** Cite modules, files, ADRs, sample apps — not generic
+- **Be specific to this repo.** Cite modules, files, current architecture, feature records, and
+  sample apps — not generic
   industry talking points.
 - **Tale Code lens.** Both sides must address readability and prose-like flow
   (see [docs/ClaudeCodingGuide.md](../../../docs/ClaudeCodingGuide.md)).
@@ -60,7 +61,7 @@ Consider:
 
 Identify the cruxes — points where Blue and Red disagree on fact, not preference.
 For each crux, state what evidence would settle it (a benchmark, a prototype, a
-consumer survey, an ADR).
+consumer survey, or a focused feature experiment).
 
 ## Output format
 
@@ -69,10 +70,10 @@ consumer survey, an ADR).
 <placeholder>One-sentence statement.</placeholder>
 
 ### Blue Team
-1. <placeholder>argument with file / module / ADR reference</placeholder>
+1. <placeholder>argument with file / module / architecture reference</placeholder>
 
 ### Red Team
-1. <placeholder>argument with file / module / ADR reference</placeholder>
+1. <placeholder>argument with file / module / architecture reference</placeholder>
 
 ### Cruxes
 1. <placeholder>disputed fact + evidence that would settle it</placeholder>

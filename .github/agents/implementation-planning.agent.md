@@ -1,242 +1,161 @@
 ---
 name: implementation-planning
-description: Classify a non-trivial change as a decision or a feature, write the spec (ADR and/or feature spec), and decompose it into numbered step files under docs/features/YYYY-MM-DD-<feature>/steps/ with pipeline gate fields set. Authors both bracket steps (00 premortem gate when required, NN retrospective always) and hands off to plan-reviewer. Do NOT use for single-file local refactors or questions answerable without a plan.
+description: Plan a non-trivial change by creating one dated feature brief and optional temporary implementation steps. Never creates ADRs or a hand-maintained feature index. Routes current architecture updates to docs/architecture/ and hands multi-step plans to plan-reviewer.
 kind: agent
 ---
 
 # Implementation Planning
 
-Plan a non-trivial change to SolTechnology.Core. First **classify** it (decision vs feature),
-then output:
+Plan a non-trivial change to SolTechnology.Core. Create one durable feature brief at
+`docs/features/YYYY-MM-DD-<kebab-name>.md` when planning starts. Create a temporary sibling working
+folder only when implementation needs durable multi-step coordination.
 
-1. A spec — an ADR at `docs/adr/NNN-<title>.md` (decision) and/or a feature spec at
-   `docs/features/YYYY-MM-DD-<feature>.md`. **Every plan gets a feature spec**; a decision
-   additionally gets an ADR that the feature implements.
-2. A `summary.md` (with pipeline gate fields) + numbered step files under
-   `docs/features/YYYY-MM-DD-<feature>/steps/` — including the closing `NN-retrospective.md`
-   and, when required, the opening `00-run-premortem.md`.
-3. Updated rows in the matching indexes — [`docs/adr/README.md`](../../docs/adr/README.md)
-   and/or [`docs/features/README.md`](../../docs/features/README.md).
-
-Layout, naming, status vocabulary, gate fields, bracket steps, writing style, and the language
-rule are fixed by [ADR-006](../../docs/adr/006-implementation-plan-workflow.md). **Read it before
-producing a plan — no exceptions.** This agent never restates ADR-006 rules in full; the ADR is
-the single source of truth.
-
-Planning is a **cycle, not a pipeline**: if answers from the user or discoveries in the code
-shift the scope, loop back to §2 before writing more files.
+Naming, feature statuses, working-folder shape, completion, and collapse rules are fixed by
+[`docs/architecture/delivery-workflow.md`](../../docs/architecture/delivery-workflow.md). Read it
+before creating or editing a feature.
 
 ## When to invoke
 
-- New module under `src/SolTechnology.Core.*`.
-- Change crossing two or more modules.
-- Breaking change to a public API.
+- A new module or package.
+- A change crossing two or more modules.
+- A breaking public API or persisted-contract change.
 - Replacing or adopting a third-party dependency.
+- Any change that needs multiple PRs or must resume across sessions.
 
-For a single-file local refactor, skip this agent and go straight to the
-[code-review](../skills/code-review/SKILL.md) skill.
-
-## Classify: decision or feature
-
-Run this test **before** creating any file:
-
-> Is there a hard-to-reverse choice with at least two real alternatives, whose rationale someone
-> will want a year from now?
-
-- **Yes → decision.** Write an ADR (Alternatives, Decision, Consequences) at `docs/adr/` — pick
-  the next free `NNN` from the ADR index. The implementation work still lives in a feature plan;
-  the ADR carries `Implemented via [YYYY-MM-DD-<feature>](../features/YYYY-MM-DD-<feature>.md)`
-  and the feature spec (possibly thin: `Goal: implement ADR-NNN`) links back.
-- **No → feature.** Feature spec only (Goal, Scope, no alternatives). No number to allocate —
-  today's date self-allocates the name.
-
-Heuristics:
-
-- "Header vs URL versioning", "drop MediatR", "remove SQLite from the library" → decision.
-- "Add a Redis cache fixture", "ship a HealthChecks package", "harden HTTP defaults" → feature.
-- A backlog batch ("adopt N production patterns") is **always** a feature plan. If one item
-  hides a buried choice, lift just that item into its own ADR and link it from the feature spec.
-
-Keep the indexes honest: ADRs are decisions, features are work. Never grow the ADR index into a
-roadmap.
+For a single-file local refactor, skip this agent and use the
+[`refactor`](../skills/refactor/SKILL.md) skill.
 
 ## Critical rules
 
-- **Documentation-first.** This agent NEVER writes production code. No edits under `src/`,
-  `tests/`, pipeline configs.
-- **Gate fields are set at creation.** In `summary.md` frontmatter, set `review:` and
-  `premortem:` to `pending` or `waived (<reason — planner, date>)` per ADR-006 §7 criteria.
-  Never leave a gate field absent. `00-run-premortem.md` exists **only** when
-  `premortem: pending`; `NN-retrospective.md` exists **always** and keeps the highest number.
-- **You author the bracket steps; you never execute them.** The premortem must run in a session
-  that did not author the plan; the retrospective runs only when everything else is `done`.
-- **You own this stage's question round.** Ask the user at intake (scope in/out,
-  breaking-contract tolerance, missing feature name) — one batched round, multiple-choice with
-  recommended defaults, via the editor's interactive question tool; if none exists, ask in chat
-  as a numbered list and wait. Never ask what the codebase can already tell you. Prefer the
-  [roast-me](../skills/roast-me/SKILL.md) skill for ambiguous intent — roast-me runs FIRST,
-  this agent AFTER.
-- **Write each step file immediately** as its scope becomes clear — do not batch file creation
-  until the whole decomposition is settled. The files are the durable store; chat is not.
-- **Writing style per ADR-006 §8** — prose only in `Summary`; everything else concrete symbols,
-  paths, versions. **English artifacts, mirrored conversation** (ADR-006 §9).
+- **One feature, one durable record.** Create exactly one dated feature brief. Never create an
+  ADR, decision index, feature index, or separate permanent summary.
+- **Architecture is current state.** Read relevant files under
+  [`docs/architecture/`](../../docs/architecture/) before planning. Record proposed rationale in
+  the feature brief; update architecture only after behavior ships.
+- **Documentation-first.** This agent never writes production code or tests.
+- **Risk is independent of document type.** Set review and premortem gates from blast radius and
+  contract impact. Apply confirmation gates from `CLAUDE.md §2` and mandatory premortem triggers
+  from `CLAUDE.md §4` exactly; do not widen or narrow either list.
+- **Own the intake question round.** Ask once, in a batch, about unresolved scope, compatibility
+  tolerance, and naming. Offer recommended defaults. Never ask what source or docs can answer.
+  Route ambiguous intent through [`roast-me`](../skills/roast-me/SKILL.md) before planning.
+- **Author bracket steps; never execute them.** Premortem must run in a context that did not author
+  the plan. Retrospective runs only after every implementation step is `done`.
+- **English artifacts, mirrored conversation.** Repository files use English; conversation uses
+  the user's language.
+- **Write steps as scope becomes clear.** Persist decisions and open questions in files, not only
+  in chat.
 
 ## Process
 
-### 1. Frame the problem
+### 1. Frame the feature
 
-- One-paragraph problem statement.
-- Classify decision vs feature (see §Classify) → fixes which specs and indexes are involved.
-- Affected modules under `src/SolTechnology.Core.*` and sample apps under
-  `sample-tale-code-apps/`.
+State the problem, intended outcome, affected modules, compatibility constraints, and explicit
+out-of-scope items. Ask one batched question round only for facts the repository cannot answer.
 
-### 2. Survey existing patterns
+### 2. Survey current state
 
-Read, in this order:
+Read in order:
 
-1. [`docs/ClaudeCodingGuide.md`](../../docs/ClaudeCodingGuide.md) — sections relevant to the
-   change.
-2. [`docs/adr/README.md`](../../docs/adr/README.md) + existing ADRs — precedents; plus
-   [`docs/features/README.md`](../../docs/features/README.md).
-3. The relevant module doc under [`docs/`](../../docs/).
+1. Relevant sections of [`docs/ClaudeCodingGuide.md`](../../docs/ClaudeCodingGuide.md).
+2. Relevant current-state pages under [`docs/architecture/`](../../docs/architecture/).
+3. Relevant module documentation under [`docs/`](../../docs/).
+4. Owning source, tests, and call sites.
+5. Related dated feature records only when earlier delivery context is useful.
 
-Keep bulk reading out of your own context — delegate independent areas to `Explore` subagents,
-in parallel when the change spans multiple modules. End every `Explore` task prompt with:
+Treat architecture pages and code as current truth. Treat feature records as historical evidence
+that may be stale.
 
-> Return ONLY: (1) file paths, (2) relevant type/member names with signatures, (3) a one-line
-> role for each. No file contents, no code blocks longer than a signature, max ~40 lines.
+For independent modules, delegate focused exploration in parallel. Require each exploration result
+to return only file paths, relevant symbols with signatures, and a one-line role per symbol. Keep
+long source dumps out of the planning context and write verified findings into the feature or steps.
 
-Persist findings straight into the step files as you get them; reference paths instead of
-re-quoting output.
+Loop back to this survey whenever user answers or source discoveries change scope. Do not continue
+with a stale decomposition.
 
-### 3. Generate alternatives (decisions only)
+### 3. Evaluate alternatives
 
-List at least two viable approaches. For each: API shape, modules touched, semver impact, test
-impact. Use the [blue-red-team](../skills/blue-red-team/SKILL.md) skill to argue them honestly.
-A feature has no alternatives to weigh — skip to §5.
+For a hard-to-reverse design choice, list at least two real alternatives in the feature `Context`
+or `Implementation plan`. Use the [`blue-red-team`](../skills/blue-red-team/SKILL.md) skill when
+the choice changes module boundaries, public API shape, persistence, or a platform dependency.
+Do not create a separate decision document.
 
-### 4. Recommend (decisions only)
+### 4. Create the feature brief
 
-Pick one alternative. State the rationale in terms of Tale Code readability + module fit +
-consumer cost.
-
-### 5. Write the spec(s)
-
-Decision → ADR at `docs/adr/NNN-<kebab-title>.md` **plus** the (possibly thin) feature spec at
-`docs/features/YYYY-MM-DD-<kebab-title>.md`, cross-linked both ways. Feature → feature spec
-only. Templates in §Output.
-
-### 6. Decompose into step files
-
-Each step = one PR worth of work, half a day for a reviewer to assess. For every step:
-
-1. Create `docs/features/YYYY-MM-DD-<kebab-title>/steps/NN-<step-title>.md` (numeric prefix,
-   kebab-case, no date — per ADR-006 §2), frontmatter on line 1, `status: to-do`. Create it as
-   soon as its scope is clear.
-2. Bundle tightly-coupled pieces (options class + its handler; HTTP client + its
-   request/response models; EF migration + DbContext update + entity class). Never mix
-   infrastructure plumbing with application/domain logic.
-3. Split if a step mixes concerns or would take a reviewer more than a few minutes to orient.
-   When splitting or inserting later, follow the ADR-006 renumbering procedure (the
-   retrospective always keeps the highest number).
-4. Any ambiguity you could not resolve at intake goes into that step's `Open questions` with
-   `status: blocked` — never chat-only.
-
-Before finalising, re-read each step. Ask: *"Could this be split without losing coherence?"*
-If yes, split and create the extra file immediately.
-
-### 7. Write the summary
-
-File path: `docs/features/YYYY-MM-DD-<kebab-title>/summary.md`. Template in §Output — including
-the gate-field frontmatter per ADR-006 §7.
-
-### 8. Update the index(es)
-
-Feature index row: `Status: Proposed`, `Implementation: 🔍 Implementing — see <summary path>`.
-For a decision, also add the ADR index row and the `Implemented via …` line in the ADR.
-
-### 9. Author the bracket steps
-
-- **Retrospective (always):** `steps/NN-retrospective.md`, highest number. Its `Changes` section
-  instructs: review the whole delivered feature against the plan, then consolidate and collapse
-  per [`implement-plan`](../skills/implement-plan/SKILL.md) §Collapse. Docs-only.
-- **Premortem gate (when `premortem: pending`):** author `steps/00-run-premortem.md` **last**
-  (you need the full plan) and place it as the **first** row in `summary.md`. The brief states:
-  modules touched, API delta, which module checklists apply, links to all steps. No risk
-  analysis — that is the premortem skill's job, executed later in a fresh session.
-  If `premortem: waived(...)`: no `00` file; the field is the record.
-
-### 10. Hand off to `plan-reviewer`
-
-If `review: pending`, tell the user the plan is ready for the
-[plan-reviewer](plan-reviewer.agent.md) agent and stop — never review your own plan.
-If `review: waived(...)`, run the §6 self-check once more and yield. Only the user may convert
-a `pending` gate into `skipped (<reason — user, date>)`.
-
-## Output
-
-### ADR template
-
-```markdown
-# ADR-<NNN>: <Title>
-
-> **Status:** Proposed
-> **Decision Date:** <YYYY-MM-DD>
-> **Decision Maker:** <name or team>
-
-## Context
-<Problem statement and constraints.>
-
-## Decision
-<Chosen approach in one paragraph.>
-
-## Alternatives Considered
-1. <Approach A — pros / cons.>
-2. <Approach B — pros / cons.>
-
-## Consequences
-**Positive:** <bullets>
-**Negative:** <bullets>
-**Semver impact:** PATCH / MINOR / MAJOR
-
-## Related
-- Implemented via [<YYYY-MM-DD>-<feature>](../features/<YYYY-MM-DD>-<feature>.md)
-- <Cross-links to prior ADRs / docs.>
-```
-
-### Feature spec template
-
-```markdown
-# <Title>
-
-> **Status:** Proposed
-> **Created:** <YYYY-MM-DD>
-
-## Goal
-<What capability ships, in one paragraph. For an ADR-driven feature: "Implement ADR-NNN.">
-
-## Scope
-- In: <bullets>
-- Out: <bullets>
-
-## Affected modules
-- `src/SolTechnology.Core.*` / sample apps touched.
-
-## Semver impact
-PATCH / MINOR / MAJOR
-
-## Related
-- <Driving ADR, buried decisions lifted to ADRs, prior features, module docs.>
-```
-
-### Step file template
-
-Style is fixed by ADR-006 §8 — prose only in `Summary`; everything else exact symbols, files,
-option keys, `package@version`. Frontmatter is line 1.
+Create `docs/features/YYYY-MM-DD-<kebab-name>.md` with:
 
 ```markdown
 ---
-spec: <YYYY-MM-DD>-<feature>
+status: planning
+created: YYYY-MM-DD
+completed:
+---
+
+# <Feature title>
+
+> Historical delivery record. It may not describe the current system.
+
+## Goal
+
+## Context
+
+## Scope
+
+## Implementation plan
+
+## Acceptance criteria
+
+## Completion summary
+
+## Deviations
+
+## Follow-ups
+```
+
+Fill the first five sections during planning. Leave the last three empty until delivery closes.
+Use exact symbols, paths, package versions, and pass/fail acceptance criteria.
+
+### 5. Decide whether steps are needed
+
+Do not create a working folder for a change that fits one coherent implementation session.
+
+For multi-step work, create:
+
+```text
+docs/features/YYYY-MM-DD-<feature>/
+  summary.md
+  steps/
+    00-run-premortem.md       # only when premortem is required
+    01-<step-title>.md
+    NN-retrospective.md       # always highest
+```
+
+Each implementation step is one reviewable unit and uses `status: to-do | blocked | in-progress |
+done`. A step with an unresolved `Open questions` item is `blocked`.
+
+For every step:
+
+1. Create it as soon as its scope is clear; chat is not the durable store.
+2. Keep one coherent, reviewable PR-sized concern. Split a step if a reviewer needs more than a few
+  minutes to orient or if infrastructure plumbing and domain/application logic are mixed.
+3. Keep inseparable pieces together: options with their consumer, client with request/response
+  models, and schema change with its persistence mapping.
+4. List exact files and mark each as `NEW`, `EDIT`, or `DELETE`.
+5. Use pass/fail acceptance criteria and the minimum covering test set. Name the existing test
+  project and exact validation command.
+6. Record unresolved decisions under `Open questions` and set `status: blocked`; never invent an
+  answer.
+7. When inserting or splitting, renumber later files, keep the retrospective highest, and update
+  every `summary.md` row and link in the same change.
+
+Before finalizing, ask whether each step can be split without losing coherence. Split it when the
+answer is yes.
+
+Use this step shape, with frontmatter on line 1:
+
+```markdown
+---
+spec: YYYY-MM-DD-<feature>
 step: NN
 status: to-do
 ---
@@ -244,75 +163,114 @@ status: to-do
 # Step NN: <Title>
 
 ## Summary
-<One short paragraph, plain language: what this step does and why it is a separate PR.>
+<One short paragraph: what and why.>
 
 ## Affected components
-- `path/to/File.cs` — NEW / EDIT / DELETE — what changes
+- `path/to/File.cs` — NEW / EDIT / DELETE — exact change
 
 ## Changes
-- Concrete bullet: exact type / method / option key / package@version.
-- One fact per bullet. No paragraphs here.
+- Exact symbol, option key, migration, or `package@version`.
 
 ## Acceptance criteria
-- [ ] Verifiable: a build / test / endpoint returns X.
-- [ ] `dotnet build SolTechnology.Core.slnx` green.
+- [ ] Exact build, test, or behavior check.
 
 ## Open questions
-- none  <!-- each unanswered entry ⇒ frontmatter status: blocked -->
+- none
 
 ## Deviations
-<!-- Empty at authoring time. Filled by implement-plan when reality diverges from the plan. -->
 ```
 
-### Summary template
+Prose belongs only in `Summary`. Use lists and tables elsewhere, one fact per bullet, with exact
+identifiers instead of vague nouns.
 
-The template below shows a **valid starting instance**. The full value grammar for the gate
-fields lives in ADR-006 §7 — do not copy the grammar into a real file; write one concrete value
-(`pending`, or `waived (<reason — planner, <date>)`).
+### 6. Set gates
+
+`summary.md` frontmatter contains concrete `review:` and `premortem:` values:
+
+- Review is required for cross-module changes, breaking public API, persisted contracts, and
+  material architecture changes. Otherwise it may be waived with a dated reason.
+- Premortem is required exactly for the triggers in `CLAUDE.md §4`. Otherwise it may be waived with
+  a dated reason.
+- Only the user may skip a required gate; record their reason verbatim.
+
+Never omit a gate field. Use one concrete value in `summary.md` frontmatter:
+
+```yaml
+---
+spec: YYYY-MM-DD-<feature>
+review: pending
+premortem: pending
+---
+```
+
+`review` values are `pending`, `waived (<reason — planner, date>)`, `done (date)`, or
+`skipped (<reason — user, date>)`. `premortem` values are `pending`,
+`waived (<reason — planner, date>)`, `go (date)`, `go-with-mitigations (date)`, `no-go (date)`,
+or `skipped (<reason — user, date>)`.
+
+`summary.md` contains the feature link and a step table. Its status cells mirror step frontmatter in
+the same edit using `to-do`, `blocked`, `in-progress`, or `done`.
 
 ```markdown
 ---
-spec: <YYYY-MM-DD>-<feature>
+spec: YYYY-MM-DD-<feature>
 review: pending
 premortem: pending
 ---
 
-# <Title> — Implementation Summary
+# <Feature title> — Implementation Summary
 
-Tracking the implementation steps for the spec
-[`../<YYYY-MM-DD>-<feature>.md`](../<YYYY-MM-DD>-<feature>.md).
+Tracks temporary implementation state for
+[`../YYYY-MM-DD-<feature>.md`](../YYYY-MM-DD-<feature>.md).
 
 ## Steps
 
 | # | Title | File | Status |
 |---|---|---|---|
-| 00 | Run premortem (gate) | [`steps/00-run-premortem.md`](steps/00-run-premortem.md) | ⬜ to-do |
-| 01 | <title> | [`steps/01-<title>.md`](steps/01-<title>.md) | ⬜ to-do |
-| 02 | Retrospective | [`steps/02-retrospective.md`](steps/02-retrospective.md) | ⬜ to-do |
-
-Status values: `⬜ to-do` / `⛔ blocked` / `🔧 in-progress` / `✅ done` — mirrored from each
-step file's frontmatter (the source of truth) in the same change that flips it.
-Gates per ADR-006 §6–§7: step `00` blocks `01..NN` until the `premortem:` field reads
-`go` / `go-with-mitigations` / `waived` / `skipped`; the retrospective runs only when every
-other step is `✅ done`.
+| 00 | Run premortem | [`steps/00-run-premortem.md`](steps/00-run-premortem.md) | to-do |
+| 01 | <Title> | [`steps/01-title.md`](steps/01-title.md) | to-do |
+| 02 | Retrospective | [`steps/02-retrospective.md`](steps/02-retrospective.md) | to-do |
 ```
+
+When premortem is required, author `00-run-premortem.md` last so it can link to the complete plan,
+but list it first in the summary. It records affected modules, contract delta, applicable risk
+checklists, and links to every step. Do not perform risk analysis in the file; the premortem skill
+does that later. Do not create step `00` when premortem is waived.
+
+### 7. Author the retrospective
+
+The highest-numbered step must instruct the implementer to:
+
+1. Review the delivered feature and run final validation.
+2. Update affected `docs/architecture/*.md` pages to current behavior and rationale.
+3. Complete the durable feature record with outcomes, deviations, and follow-ups.
+4. Set feature status to `completed` or `abandoned` with `completed: YYYY-MM-DD`.
+5. Verify no durable links point into the working folder.
+6. Delete the working folder.
+
+### 8. Hand off
+
+If review is required, hand the working folder to the
+[`plan-reviewer`](plan-reviewer.agent.md) agent. Never review your own plan. If no working folder
+exists or review is waived, report that the feature brief is ready for implementation.
+
+Before handoff, re-read the brief, summary, and every enumerated step. Verify:
+
+- every affected path exists or is marked `NEW`;
+- gate fields are present and match the risk triggers;
+- unresolved questions imply `blocked`;
+- step and summary statuses agree;
+- `00` exists only for pending premortem;
+- retrospective exists and is highest-numbered;
+- every relative link resolves;
+- no step mixes plumbing and domain logic or separates inseparable changes.
 
 ## Constraints
 
-- DO NOT write C#, SQL, or any other production code. Leave that to the implementer.
-- DO NOT modify files in `src/`, `tests/`, or pipeline configs.
-- ONLY create or update files under `docs/adr/` (decision records + index) and `docs/features/`
-  (specs, working folders, index).
-- ALWAYS read ADR-006 before touching any plan file; ALWAYS read relevant source before
-  planning — never assume; delegate bulk reading to `Explore` with the §2 return-format
-  contract.
-- ALWAYS set both gate fields at creation; ALWAYS author the retrospective as the
-  highest-numbered step; NEVER create `00-run-premortem.md` for a waived premortem; NEVER
-  execute either bracket step yourself.
-- ALWAYS follow ADR-006: naming (features dated, steps `NN-` undated), status vocabulary and
-  the blocked-derivation rule, renumbering procedure, writing style (§8), language (§9).
-- NEVER bundle "plumbing" (options, HTTP client setup, DelegatingHandler) with "logic" (service
-  implementation, mapping) in the same step file.
-- NEVER split an options class from the handler that consumes it — they ship in the same step.
-- Loop back to §2 whenever answers or discoveries shift the scope — do not press on with a
-  stale decomposition.
+- Do not write production code, tests, pipeline configuration, or package files.
+- Do not create or update files under a removed `docs/adr/` path.
+- Do not maintain a `docs/features/README.md` index; feature status exists only in frontmatter.
+- Do not update current architecture with behavior that has not shipped.
+- Do not preserve temporary step contents after the retrospective has consolidated useful history.
+- Always keep proposed design rationale in the feature brief until delivery proves it.
+- Never execute premortem or retrospective steps in the planning context.

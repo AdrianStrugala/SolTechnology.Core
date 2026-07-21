@@ -12,18 +12,18 @@ Conventions, references, and output formats live only inside `SKILL.md`.
 
 | Skill | When to use | Premortem coupling |
 |---|---|---|
-| [premortem](premortem/SKILL.md) | Any change touching public NuGet API, `ModuleInstaller`, persisted contracts, or build files. **The primary risk gate.** | self |
-| [blue-red-team](blue-red-team/SKILL.md) | Design-level decision, ADR seeding. | runs *before* premortem |
-| [code-review](code-review/SKILL.md) | Reviewing a diff against Coding Guide + module review templates. | requires premortem when API surface changes |
+| [premortem](premortem/SKILL.md) | Mandatory for `CLAUDE.md §4` triggers; recommended for other high-risk changes. **The primary risk gate.** | self |
+| [blue-red-team](blue-red-team/SKILL.md) | Compare design alternatives inside a feature plan. | runs *before* premortem |
+| [code-review](code-review/SKILL.md) | Reviewing a diff against Coding Guide + module review templates. | checks canonical premortem triggers |
 | [commit-message](commit-message/SKILL.md) | Producing a Conventional Commits message with semver footer. | reads premortem output |
-| [documentation-cleanup](documentation-cleanup/SKILL.md) | Validating module/doc parity, indexes, tables, Mermaid, ADRs, links. | independent |
+| [documentation-cleanup](documentation-cleanup/SKILL.md) | Validate architecture currency, dated feature records, module/doc parity, tables, Mermaid, and links. | independent |
 | [package-management](package-management/SKILL.md) | Adding or bumping a `PackageReference`. Single source of truth for canonical versions. | independent |
 | [dependency-audit](dependency-audit/SKILL.md) | Resolving `NU1901`–`NU1904` CVE warnings or `NU1605` downgrades. Drives fix-at-source over masking. | independent |
 | [test-writing](test-writing/SKILL.md) | Authoring or extending tests under `tests/` (NUnit) or sample apps (NUnit for DreamTravel). | independent |
 | [command-query-event-tale](command-query-event-tale/SKILL.md) | Authoring a command, query, event, or Tale (chapters) in any app on the `SolTechnology.Core.CQRS` / `.Tale` packages — per `ClaudeCodingGuide` §0/§3/§4/§11 and the DreamTravel reference app. Covers `Commands`/`Queries`, domain-model `DomainServices`, persisted `Workflows`, and `[LogScope]` logging. | independent |
 | [refactor](refactor/SKILL.md) | Behaviour-preserving cleanup local to one module (rename internals, split a class, extract a primary ctor, pay down a §15 anti-pattern). | independent |
 | [roast-me](roast-me/SKILL.md) | Vague request, under-specified intent, before any non-trivial planning. | runs *before* planning |
-| [implement-plan](implement-plan/SKILL.md) | Executing one step from a feature's `steps/` folder — gate fields checked, frontmatter `status:` flipped. | independent |
+| [implement-plan](implement-plan/SKILL.md) | Execute one temporary step; close delivery by updating architecture and the durable feature record before collapse. | independent |
 
 For multi-step planning, use the [implementation-planning](../agents/implementation-planning.agent.md)
 agent — not a skill. See [`../agents/README.md`](../agents/README.md) for the agent index.
@@ -51,10 +51,10 @@ live at [`../agents/`](../agents/).
 
 ## Premortem gate
 
-Any change that touches a public/protected symbol in `src/SolTechnology.Core.*`, a
-`ModuleInstaller.cs`, `Directory.Build.props`, or a persisted contract **must** be gated by a
-premortem. Attach the skill's output to the PR. Block on *Go* / *Go with mitigations* with
-mitigations in place. Rationale: [ADR-004](../../docs/adr/004-ai-agents-and-skills.md).
+Apply the mandatory trigger list from `CLAUDE.md §4` exactly. Attach the skill's output to the PR.
+Block on *Go* / *Go with mitigations* with mitigations in place. Apply confirmation gates separately
+from `CLAUDE.md §2`; do not infer a premortem requirement from them. Current rationale lives in
+[`docs/architecture/ai-assisted-development.md`](../../docs/architecture/ai-assisted-development.md).
 
 ## Package-companion skills
 

@@ -135,7 +135,7 @@ Engine + provisioning options (fluent, set before `InitializeAsync`):
 Notes:
 
 - **Type name is all-caps `SQLFixture`** and the namespace is `SolTechnology.Core.SQL.Testing`
-  (per [ADR-001](adr/001-acronym-capitalization-refactoring.md)).
+  (per [naming and public API architecture](architecture/naming-and-public-api.md)).
 - **DacFx stays in `SolTechnology.Core.SQL` at runtime** (used by `SQLProjectDeployer`); only the
   test-only fixture moved to the companion package.
 - Container lifetime / `TESTCONTAINERS_REUSE` reuse is the shared model from

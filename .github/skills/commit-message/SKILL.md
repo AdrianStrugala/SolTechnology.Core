@@ -26,7 +26,7 @@ Generate a commit message that matches the SolTechnology.Core convention.
 | `refactor` | Behaviour-preserving change |
 | `perf` | Performance improvement |
 | `test` | Tests only |
-| `docs` | Docs only (incl. ADRs, READMEs) |
+| `docs` | Docs only (architecture, feature records, READMEs) |
 | `build` | Build / packaging / `Directory.Build.props` |
 | `ci` | CI workflow under `.github/workflows/` |
 | `chore` | Repo housekeeping with no other category |
@@ -41,7 +41,7 @@ Use the module name in lowercase, dropping `soltechnology.core.`:
 
 Cross-module: `core` (multiple modules) or `repo` (root files only).
 Sample apps: `dreamtravel`, `talecode`, `elsa`.
-Meta: `docs`, `adr`, `skills`, `build`, `ci`.
+Meta: `docs`, `architecture`, `features`, `skills`, `build`, `ci`.
 
 ## Rules
 
@@ -53,8 +53,8 @@ Meta: `docs`, `adr`, `skills`, `build`, `ci`.
   - `Semver: PATCH` — internal only / docs / tests.
   - `Semver: MINOR` — additive public API.
   - `Semver: MAJOR` — breaking public API. **Must** also include a
-    `BREAKING CHANGE: <one-line description>` footer and reference an ADR from the
-    [ADR index](../../../docs/adr/README.md).
+    `BREAKING CHANGE: <one-line description>` footer and reference the dated feature record that
+    explains the rationale and migration.
 - Reference the [premortem](../premortem/SKILL.md) output in the body when the change required one.
 - No issue tracker IDs unless the user supplies them.
 
@@ -101,6 +101,6 @@ Result.IsFailure.
 
 Semver: MAJOR
 BREAKING CHANGE: ValidationException no longer thrown from CQRS pipeline.
-See docs/adr/00X-cqrs-validation-result.md.
+See docs/features/2026-07-21-cqrs-validation-result.md.
 ```
 

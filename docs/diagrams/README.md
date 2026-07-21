@@ -18,7 +18,7 @@ authored via the [`diagram` agent](../../.github/agents/diagram.agent.md).
 - **Five layer boxes:** `Presentation`, `Logic`, `Data`, `Domain`, `External`. Boxes appear
   in that order. If a component does not fit, it is `External`.
 - **Filename:** kebab-case (`<flow-name>.md`). Updates create `<flow-name>-v2.md`,
-  `<flow-name>-v3.md`, … — the original is immutable so older docs / ADRs / reviews keep
+  `<flow-name>-v3.md`, … — the original is immutable so older architecture pages, feature records, and reviews keep
   pointing at the version they were written against.
 - **Participants are real C# types.** Type names from `src/SolTechnology.Core.*` (or the
   sample apps) only. No invented labels.

@@ -2,7 +2,7 @@
 
 > **Status:** ⏸️ Parked
 > **Parked date:** 2026-06-25
-> **Source:** [Feature-002 step 10](../features/002-production-pattern-adoption-wave-2.md#implementation-summary)
+> **Source:** [Production pattern adoption wave 2, step 10](../features/2026-06-24-production-pattern-adoption-wave-2.md#completion-summary)
 > **Would-be target:** `SolTechnology.Core.Scheduler`
 > **Semver / Effort:** MINOR · M
 

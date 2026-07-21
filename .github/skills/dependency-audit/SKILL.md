@@ -94,7 +94,7 @@ Pick the first option that applies:
 2. **Remove the parent** if it is unused. `dotnet remove package <Parent>` then verify the build.
 
 3. **Migrate the SDK family.** Some parents are dead (e.g. `Microsoft.Azure.ServiceBus` →
-   `Azure.Messaging.ServiceBus`). Migration is its own ADR and triggers
+  `Azure.Messaging.ServiceBus`). Migration is its own dated feature and triggers
    [`implementation-planning`](../../agents/implementation-planning.agent.md). Do not migrate
    inside this skill.
 
@@ -115,7 +115,7 @@ Rules for the override:
 - Lives in the **seam project** (the one that directly references the vulnerable parent),
   not at every leaf.
 - Comment cites the CVE and the removal trigger.
-- File a follow-up issue or ADR if the override has to live longer than one release cycle.
+- File a follow-up issue or dated feature if the override has to live longer than one release cycle.
 
 ### 6. Verify
 
@@ -145,7 +145,8 @@ clears the warning for every downstream project via ProjectReference.
 Semver: PATCH
 ```
 
-If a CVE shaped a public API change (e.g. forced a serialiser swap), file an ADR.
+If a CVE shapes a public API change, create a dated feature and update the owning architecture
+page after delivery.
 
 ## Pre-yield checklist
 
@@ -164,7 +165,7 @@ If a CVE shaped a public API change (e.g. forced a serialiser swap), file an ADR
 - DO NOT touch `src/Directory.Build.props` to silence audit warnings. The only legitimate audit
   exception there is **NU1900** (audit feed offline) which is unrelated to CVEs.
 - DO NOT migrate an SDK family inside this skill (e.g. `Microsoft.Azure.ServiceBus` →
-  `Azure.Messaging.ServiceBus`). That is an ADR-driven change — hand off to
+  `Azure.Messaging.ServiceBus`). That is a planned feature — hand off to
   [`implementation-planning`](../../agents/implementation-planning.agent.md).
 - DO NOT add an override without an inline comment citing the CVE and removal trigger.
 - DO NOT bump a package without checking

@@ -12,7 +12,7 @@ below.
 
 ## When to invoke
 
-- A doc, ADR, review, or skill needs a sequence or component diagram.
+- An architecture page, feature record, review, or skill needs a sequence or component diagram.
 - A flow crosses two or more modules under `src/SolTechnology.Core.*` (or two or more layers
   in a sample app under `sample-tale-code-apps/`).
 - A reviewer asks "show me the call chain" for a non-trivial operation.
@@ -162,7 +162,7 @@ flowchart LR
   description so a reviewer can verify.
 - IF this agent is unavailable, STOP. Tell the user the `diagram` agent is required for
   sequence and component diagrams (CLAUDE.md §3). Do not hand-draft a Mermaid (or any other)
-  diagram inline in the doc / ADR / review as a substitute — that bypasses the layer-box and
+  diagram inline in another doc or review as a substitute — that bypasses the layer-box and
   versioning conventions this agent enforces.
 
 

@@ -2,7 +2,7 @@
 
 > **Status:** ⏸️ Parked
 > **Parked date:** 2026-06-24
-> **Source:** [Production pattern harvest — wave 2](../production-harvest-second-app.md) (candidate C3)
+> **Source:** [Production pattern adoption — wave 2](../features/2026-06-24-production-pattern-adoption-wave-2.md) (candidate C3)
 > **Would-be target:** `SolTechnology.Core.Hangfire` (docs / helper)
 > **Semver / Effort:** MINOR · M
 
@@ -18,7 +18,7 @@ true preemption), which the source code honestly documents.
 ## Decision context
 
 We **do not** want to port that shape. The house preference is **Hangfire-backed durable background
-jobs** ([ADR-009](../adr/009-hangfire-persistent-events-and-jobs.md)), not a bespoke in-process worker
+jobs** ([background-processing architecture](../architecture/background-processing.md)), not a bespoke in-process worker
 pool with its own scope/correlation plumbing.
 
 ## Why parked
@@ -27,7 +27,7 @@ pool with its own scope/correlation plumbing.
   not a gap.
 - No current consumer is asking for tiered priority.
 - Porting the hand-rolled pool would duplicate scope/correlation machinery that
-  `Core.Hangfire` + the ADR-009 filters already provide.
+  `Core.Hangfire` filters already provide.
 
 ## Sketch (when picked up) — the Hangfire-native design
 
@@ -38,7 +38,7 @@ Instead of an in-process task-per-tier pool, build priority natively on
 - **Route jobs** with the `[Queue("…")]` attribute (or an enqueue-time queue selector).
 - **Per-queue worker counts / ordering** on the Hangfire server —
   `BackgroundJobServerOptions.Queues` listed **in priority order** so higher tiers are polled first.
-- **Reuse** the existing scope + correlation handling from `Core.Hangfire` + the ADR-009 filters — no
+- **Reuse** the existing scope and correlation handling from `Core.Hangfire` filters — no
   bespoke plumbing.
 
 This keeps a single durable-jobs mechanism and adds priority as configuration, not as a parallel
@@ -51,14 +51,14 @@ subsystem.
 
 ## Graduation triggers
 
-Promote to an ADR (or a small `Core.Hangfire` docs/helper change) when:
+Create a dated feature (or make a small `Core.Hangfire` docs correction) when:
 
 - A consumer needs genuine tiering (latency-sensitive jobs starved by bulk work).
 - We observe head-of-line blocking on a single default queue in a real deployment.
 
 ## Related
 
-- [ADR-009 — Persistent events and recurring jobs via `SolTechnology.Core.Hangfire`](../adr/009-hangfire-persistent-events-and-jobs.md).
+- [Background-processing architecture](../architecture/background-processing.md).
 - [Hangfire module docs](../Hangfire.md) — worker counts, queues, retry defaults.
-- [Harvest wave 2 — C3](../production-harvest-second-app.md) — original assessment.
+- [Production pattern adoption wave 2](../features/2026-06-24-production-pattern-adoption-wave-2.md) — original assessment.
 

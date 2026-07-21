@@ -26,8 +26,7 @@ mode *"I added `<PackageReference Include="..." Version="..."/>` with a number p
 ## Key rules
 - MUST use the version listed in `canonical-versions.md` when present.
 - When versions differ across projects, PREFER the highest — file a follow-up to align the
-  laggards in [ADR-006 implementation tracking](../../../docs/adr/006-implementation-plan-workflow.md)
-  or open an issue.
+  laggards in the active dated feature record or open an issue.
 - NEVER pin a package below the version in `canonical-versions.md` without a CVE / breaking-change
   justification documented in the `.csproj` near the reference.
 - Source: [`nuget.org`](https://www.nuget.org/). No internal feed is configured for this repo.
@@ -38,7 +37,8 @@ mode *"I added `<PackageReference Include="..." Version="..."/>` with a number p
   resolved.
 - DO NOT use this skill as a substitute for checking CVEs — that is `CLAUDE.md §6`.
 - DO NOT replace `Newtonsoft.Json` with `System.Text.Json` in MessageBus or Hangfire-integrated
-  code without an ADR — both serialisers have documented uses (see canonical table).
+  code without a dated feature plan and current architecture update — both serializers have
+  documented uses (see canonical table).
 - DO NOT invent a freehand version table when this skill is unavailable. STOP and tell the user
   `package-management` is required (CLAUDE.md §3). Drift across projects is the failure mode
   this skill exists to prevent.

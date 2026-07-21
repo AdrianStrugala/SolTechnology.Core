@@ -3,9 +3,9 @@
 This file tells you (Claude Code / Copilot / any agent) **how to behave** in this repo.
 Code conventions live in [`docs/ClaudeCodingGuide.md`](docs/ClaudeCodingGuide.md).
 AI-doc authoring rules live in [`docs/AIDocsGuide.md`](docs/AIDocsGuide.md).
-Module docs in [`docs/`](docs/ClaudeCodingGuide.md). Architectural decisions in
-[`docs/adr/`](docs/adr/README.md). One source of truth per topic — when in doubt,
-link, don't copy.
+Current architecture and rationale live in [`docs/architecture/`](docs/architecture/README.md).
+Delivery history lives in dated records under [`docs/features/`](docs/features/). One source of
+truth per topic — when in doubt, link, don't copy.
 
 ---
 
@@ -47,6 +47,8 @@ Highest-priority rules. They govern every task, before any convention applies.
      method/class), in a **separate `chore:` commit**. Entries marked
      *report only* (they change an observable contract: log templates,
      serialization, public types) are NEVER auto-fixed — report them instead.
+   - Update affected `docs/architecture/` pages in the same change. Preserve delivery context in
+     the dated feature record, never in a second architecture-history document.
 4. **Goal-driven execution.** Before starting, transform the task into verifiable
    success criteria ("fix the bug" → "a test reproduces it, then passes"). For
    multi-step tasks state a brief `step → verify` plan and loop until verified.
@@ -60,7 +62,8 @@ NEVER perform any of these without explicit user confirmation in the current tur
 - Rename, move, or delete a **public/protected** symbol in `src/SolTechnology.Core.*`.
   (Confirmation is the only gate — a premortem is NOT required for symbol changes; see §4.)
 - Bump the major version, `<AssemblyVersion>`, or `<PackageVersion>` of any package.
-- Edit a published ADR (`docs/adr/*.md`) other than appending a *Supersession* / *Amendment* note.
+- Mark a feature `completed` or `abandoned`, or delete its working folder, before the completion
+  summary and affected architecture pages are verified.
 - Push to `master`, force-push, or rewrite shared history.
 - Add a `PackageReference` override that masks a CVE without fixing at source (see §6).
 - Disable `TreatWarningsAsErrors`, `Nullable`, or analyser rules in `Directory.Build.props`.
@@ -99,25 +102,25 @@ contracts — read the file before invoking (§0.3).
 
 | Agent | Path | Invoke when |
 |---|---|---|
-| implementation-planning | [`.github/agents/implementation-planning.agent.md`](.github/agents/implementation-planning.agent.md) | Planning a multi-module or breaking change; classifies decision vs feature and produces an ADR and/or feature spec + step files under `docs/features/YYYY-MM-DD-<feature>/steps/` per [ADR-006](docs/adr/006-implementation-plan-workflow.md). |
+| implementation-planning | [`.github/agents/implementation-planning.agent.md`](.github/agents/implementation-planning.agent.md) | Planning a non-trivial change; creates one dated feature brief and optional steps per [delivery workflow](docs/architecture/delivery-workflow.md). |
 | plan-reviewer | [`.github/agents/plan-reviewer.agent.md`](.github/agents/plan-reviewer.agent.md) | Critiquing a plan under `docs/features/YYYY-MM-DD-<feature>/` before implementation. Edits step files in place, sets `review:` in `summary.md`. NEVER writes production code. |
-| diagram | [`.github/agents/diagram.agent.md`](.github/agents/diagram.agent.md) | **Required** for every sequence or component diagram added under `docs/`. Mermaid only, five canonical layer boxes (`Presentation` / `Logic` / `Data` / `Domain` / `External`), immutable file per version. NEVER hand-draft a diagram inline in a doc / ADR / review. |
+| diagram | [`.github/agents/diagram.agent.md`](.github/agents/diagram.agent.md) | **Required** for every sequence or component diagram added under `docs/`. Mermaid only, five canonical layer boxes (`Presentation` / `Logic` / `Data` / `Domain` / `External`), immutable file per version. NEVER hand-draft a diagram inline in another doc or review. |
 
 ### Skills
 
 | Skill | Path | Invoke when |
 |---|---|---|
 | premortem | [`.github/skills/premortem/SKILL.md`](.github/skills/premortem/SKILL.md) | **Mandatory** for the changes listed in the premortem gate below. |
-| blue-red-team | [`.github/skills/blue-red-team/SKILL.md`](.github/skills/blue-red-team/SKILL.md) | Design-level decision / ADR seeding. |
+| blue-red-team | [`.github/skills/blue-red-team/SKILL.md`](.github/skills/blue-red-team/SKILL.md) | Evaluate competing architecture approaches before selecting a feature plan. |
 | code-review | [`.github/skills/code-review/SKILL.md`](.github/skills/code-review/SKILL.md) | Reviewing a diff against the Tale Code philosophy and Coding Guide rules. |
 | commit-message | [`.github/skills/commit-message/SKILL.md`](.github/skills/commit-message/SKILL.md) | Producing a Conventional Commits message with semver footer. |
-| documentation-cleanup | [`.github/skills/documentation-cleanup/SKILL.md`](.github/skills/documentation-cleanup/SKILL.md) | Validating docs integrity (module/doc parity, indexes, Mermaid, ADRs). |
+| documentation-cleanup | [`.github/skills/documentation-cleanup/SKILL.md`](.github/skills/documentation-cleanup/SKILL.md) | Validate architecture currency, feature records, module-doc parity, Mermaid, and links. |
 | package-management | [`.github/skills/package-management/SKILL.md`](.github/skills/package-management/SKILL.md) | Adding / bumping a `PackageReference` — looks up the canonical version, prevents drift and version-by-memory hallucination. |
 | dependency-audit | [`.github/skills/dependency-audit/SKILL.md`](.github/skills/dependency-audit/SKILL.md) | Resolving `NU1901`–`NU1904` CVE warnings or `NU1605` downgrades. Owns the full procedure summarised in §6. |
 | test-writing | [`.github/skills/test-writing/SKILL.md`](.github/skills/test-writing/SKILL.md) | Authoring or extending tests (NUnit everywhere). Encodes the FluentAssertions + NSubstitute + AutoFixture stack and Guide §8 conventions. |
 | command-query-event-tale | [`.github/skills/command-query-event-tale/SKILL.md`](.github/skills/command-query-event-tale/SKILL.md) | Authoring a command, query, fire-and-forget event, or Tale in any app built on `SolTechnology.Core.CQRS` / `.Tale` — per Guide §0/§3/§4/§11. Details live in the skill. |
 | refactor | [`.github/skills/refactor/SKILL.md`](.github/skills/refactor/SKILL.md) | Behaviour-preserving cleanup inside a single module (Guide §9 budgets, §15 debt). Routes to `implementation-planning` if scope grows past one module or touches a public symbol. |
-| implement-plan | [`.github/skills/implement-plan/SKILL.md`](.github/skills/implement-plan/SKILL.md) | Executing one step from a feature's `steps/` folder. Checks the ADR-006 §7 gate fields, flips the step's frontmatter `status:` (mirrored in `summary.md`), optionally records deviations. |
+| implement-plan | [`.github/skills/implement-plan/SKILL.md`](.github/skills/implement-plan/SKILL.md) | Execute one step, enforce risk gates, record deviations, and collapse temporary steps into the dated feature record. |
 
 ### Premortem gate
 
@@ -129,8 +132,8 @@ A premortem is **mandatory** before merging a change that touches any of:
 
 Attach the skill's output to the PR. Block on *Go* / *Go with mitigations* with
 mitigations in place. Public/protected symbol changes are NOT premortem-gated —
-they require user confirmation only (§2). Rationale:
-[ADR-004](docs/adr/004-ai-agents-and-skills.md).
+they require user confirmation only (§2). Current rationale lives in
+[`docs/architecture/ai-assisted-development.md`](docs/architecture/ai-assisted-development.md).
 
 ---
 
@@ -139,8 +142,8 @@ they require user confirmation only (§2). Rationale:
 - **Evidence-based.** Cite file paths and line numbers. No "somewhere in the codebase".
 - **Risk-aware.** Consider the impact on NuGet consumers, not just the local diff.
 - **Systematic.** Follow the skill's documented process; NEVER improvise the steps.
-- **Doc-first.** Search [`docs/`](docs/ClaudeCodingGuide.md) — especially `ClaudeCodingGuide.md`,
-  `adr/`, `features/` — before analysing code.
+- **Doc-first.** Search [`docs/`](docs/ClaudeCodingGuide.md) — especially `architecture/`,
+  `ClaudeCodingGuide.md`, and the active feature brief — before analysing code.
 
 Markdown / Mermaid hygiene rules live in Guide §21.
 
@@ -209,11 +212,11 @@ touch `Directory.Build.props` for it.
 | AI-only documentation authoring | [`docs/AIDocsGuide.md`](docs/AIDocsGuide.md) |
 | Markdown / Mermaid hygiene | `docs/ClaudeCodingGuide.md` §21 |
 | Per-module user docs | `docs/<Module>.md` (e.g. `docs/Api.md`, `docs/Log.md`) |
-| HTTP production rollout | `docs/HTTP-Production-Checklist.md` + [ADR-005](docs/adr/005-http-production-defaults.md) |
-| AI agents / skills rationale | [ADR-004](docs/adr/004-ai-agents-and-skills.md) |
-| ADR index + status tracker | [`docs/adr/README.md`](docs/adr/README.md) |
-| Feature backlog index (non-decision plans) | [`docs/features/README.md`](docs/features/README.md) |
-| Multi-step implementation plan layout (frontmatter `status:` + gate fields) | [ADR-006](docs/adr/006-implementation-plan-workflow.md) |
+| HTTP production architecture | [`docs/architecture/http-client.md`](docs/architecture/http-client.md) + `docs/HTTP-Production-Checklist.md` |
+| AI agents / skills rationale | [`docs/architecture/ai-assisted-development.md`](docs/architecture/ai-assisted-development.md) |
+| Current architecture and rationale | [`docs/architecture/`](docs/architecture/README.md) |
+| Feature delivery records | [`docs/features/`](docs/features/) |
+| Feature and step lifecycle | [`docs/architecture/delivery-workflow.md`](docs/architecture/delivery-workflow.md) |
 
 If a rule appears here **and** in the guide, the guide is authoritative — this file
 intentionally does not duplicate convention text.
@@ -232,16 +235,17 @@ Triggers:
 - You discover a non-obvious codebase constraint (build quirk, framework rule, DI pitfall).
 - A repeated mistake gets called out.
 - A new pattern, helper, or framework addition becomes "the way".
-- An ADR is written or amended — also update [`docs/adr/README.md`](docs/adr/README.md)
-  in the same change.
+- Current design or rationale changes — update the owning `docs/architecture/*.md` page in the
+  same change.
 
 Routing:
 
 1. Convention / coding rule → `docs/ClaudeCodingGuide.md` (per its §20).
 2. Repo-wide operational / tool / protocol rule → this file (`CLAUDE.md`).
 3. AI-doc authoring rule → `docs/AIDocsGuide.md`.
-4. Skill-specific lesson → the skill's `SKILL.md`.
-5. User-facing docs lesson → `docs/ClaudeCodingGuide.md` §18.
+4. Current architecture or rationale → the relevant `docs/architecture/*.md` page.
+5. Skill-specific lesson → the skill's `SKILL.md`.
+6. User-facing docs lesson → `docs/ClaudeCodingGuide.md` §18.
 
 In the same reply, mention the update in one sentence: *"Added rule X to §N of <file>."*
 
@@ -254,6 +258,8 @@ Convention checks live in Guide §16 — run both lists. Before declaring a task
 - [ ] Pre-flight done: relevant Guide sections read and cited in the reply (§0).
 - [ ] No forbidden action taken without confirmation (§2).
 - [ ] Diff is surgical; §15 fixes (if any) sit in a separate `chore:` commit (§1.3).
+- [ ] Affected architecture pages describe the delivered current state; feature history is not
+  used as current documentation.
 - [ ] `get_errors` clean (or remaining warnings explicitly noted as pre-existing) (§3).
 - [ ] `dotnet build SolTechnology.Core.slnx` green; for DreamTravel changes, sample app build green (§3).
 - [ ] Relevant tests green (§3).

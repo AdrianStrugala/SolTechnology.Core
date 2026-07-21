@@ -11,7 +11,7 @@ for four things, in this order:
    broke §X" without ambiguity.
 3. **Token efficiency** — every sentence competes with code for context window space.
 4. **Self-update loop** — agents must be able to append rules without breaking sections
-   that other docs / ADRs / skills cite.
+    that other docs, architecture pages, and skills cite.
 
 Everything else (prose, motivation, history) is waste.
 
@@ -37,7 +37,7 @@ One rule = one place. Other files **link**, never copy.
 3. **`MUST` / `NEVER` / `PREFER` in caps** for critical rules; ordinary text for the
    rest. The caps build a force hierarchy without prose.
 4. **No history.** "We used to have a `RegisterCommands` overload that…" → delete.
-   State the current rule. War stories go to ADRs.
+    State the current rule. Delivery history goes to dated feature records.
 5. **No marketing / praise.** "Beautifully designed Tale Code framework…" → delete.
    The agent does not need motivation; it needs the rule.
 6. **No `> Note:` / `> Tip:` / `> IMPORTANT:` blockquotes.** Either the info matters
@@ -46,7 +46,7 @@ One rule = one place. Other files **link**, never copy.
 ### B. Structure
 
 7. **Stable section numbering.** §0, §1, …, §N. Numbers are cite-targets — `CLAUDE.md`,
-   ADRs and skills reference "§9.10", "§18", "§4". **NEVER renumber existing sections.**
+   architecture docs, and skills reference "§9.10", "§18", "§4". **NEVER renumber existing sections.**
    New rules append at the end; if a section grows beyond cohesion, split it but keep
    the old number with a "moved to §M" pointer for one release.
 8. **Front-load.** Rules with the highest cost of violation (layer boundaries, secrets
@@ -119,6 +119,11 @@ One rule = one place. Other files **link**, never copy.
 - Collapse any rule stated in more than one place into one canonical section + links.
 - Verify section numbers in the Coding Guide and skills still match every
   cross-reference — a dangling "§9.11" is worse than no reference.
+- Compare workflow behavior before and after every agent or skill refactor. Preserve intake
+    triggers, state transitions, gates, refusal paths, artifact templates, verification, and handoffs;
+    reduced line count is not evidence that the refactor is behavior-preserving.
+- Verify current design rationale lives under `docs/architecture/` and delivery history lives in
+    one dated `docs/features/YYYY-MM-DD-<name>.md` record.
 
 ## Reference implementations
 

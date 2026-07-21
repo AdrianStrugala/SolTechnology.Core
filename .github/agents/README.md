@@ -11,8 +11,8 @@ Conventions, tool list, handoffs and output formats live only inside the file.
 
 | Agent | When to invoke | Hands off to |
 |---|---|---|
-| [implementation-planning](implementation-planning.agent.md) | Planning a new feature, multi-module change, or breaking API change. Classifies decision vs feature; produces an ADR and/or feature spec + step files under [`docs/features/`](../../docs/features/README.md)`YYYY-MM-DD-<feature>/steps/` per [ADR-006](../../docs/adr/006-implementation-plan-workflow.md). | [plan-reviewer](plan-reviewer.agent.md) |
-| [plan-reviewer](plan-reviewer.agent.md) | Critiquing a plan under `docs/features/YYYY-MM-DD-<feature>/`. Edits step files in place, sets `review:` in `summary.md`. Never writes production code. | premortem gate via `summary.md` `premortem:` field (ADR-006 §7) |
+| [implementation-planning](implementation-planning.agent.md) | Planning a new feature, multi-module change, or breaking API change. Creates one dated feature brief and optional temporary steps per the [delivery workflow](../../docs/architecture/delivery-workflow.md). | [plan-reviewer](plan-reviewer.agent.md) |
+| [plan-reviewer](plan-reviewer.agent.md) | Critiquing a plan under `docs/features/YYYY-MM-DD-<feature>/`. Cross-checks the feature brief, current architecture, code, and temporary steps. | premortem gate via `summary.md` |
 | [diagram](diagram.agent.md) | Authoring a sequence or component diagram under [`docs/diagrams/`](../../docs/diagrams/). Mermaid only, five canonical layer boxes, immutable file per version. | — |
 
 ## Agent vs Skill — which kind is this?
@@ -21,7 +21,7 @@ Conventions, tool list, handoffs and output formats live only inside the file.
 |---|---|---|
 | Owns a multi-turn workflow with handoffs? | Agent | Skill |
 | Loaded for a single narrow procedure (commit message, review, doc cleanup)? | Skill | Agent |
-| Reads broad context (codebase, ADRs, docs) before acting? | Agent | Skill |
+| Reads broad context (codebase, architecture, feature history) before acting? | Agent | Skill |
 | Has a fixed output artifact spec (template, file location)? | Either — both ship templates |
 
 Filename conventions:

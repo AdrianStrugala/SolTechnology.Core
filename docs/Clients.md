@@ -7,7 +7,7 @@ retry + circuit breaker + per-attempt timeout, correlation propagation, a
 fluent request builder, and a diagnostic exception type — no boilerplate, no
 hand-rolled Polly pipelines, no leaking secrets into log sinks.
 
-Design rationale lives in [ADR 005](adr/005-http-production-defaults.md);
+Design rationale lives in [HTTP client architecture](architecture/http-client.md);
 before pointing this at production traffic, walk through the
 [HTTP Production Checklist](HTTP-Production-Checklist.md).
 
@@ -251,7 +251,8 @@ only. Full reference: [HTTP.Testing.md](HTTP.Testing.md).
 
 > **Breaking migration:** this package replaces `SolTechnology.Core.Faker`. The namespace changed
 > (`SolTechnology.Core.Faker` → `SolTechnology.Core.HTTP.Testing`), so there is no type-forwarding — swap
-> the package reference **and** update `using` directives. See [ADR-008](adr/008-testing-framework-companions.md).
+> the package reference **and** update `using` directives. See the
+> [testing companions feature record](features/2026-05-30-testing-framework-companions.md).
 
 ```csharp
 // Arrange a fake via a DIRECT method call — full IntelliSense + compile-time argument checks.

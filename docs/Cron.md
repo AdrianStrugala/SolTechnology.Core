@@ -1,6 +1,6 @@
 > ⚠️ **Deprecated** — `SolTechnology.Core.Scheduler` is deprecated in favour of
 > [SolTechnology.Core.Hangfire](Hangfire.md) recurring jobs. See
-> [ADR-009](adr/009-hangfire-persistent-events-and-jobs.md).
+> [background-processing architecture](architecture/background-processing.md).
 
 ### Overview
 

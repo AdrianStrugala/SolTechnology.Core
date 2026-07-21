@@ -4,7 +4,7 @@ Integration-testing fixtures for `SolTechnology.Core.Api` consumers. **Reference
 only** — never from production assemblies.
 
 > Part of the testing framework defined in
-> [ADR-008](adr/008-testing-framework-companions.md). For the overall testing strategy see
+> [testing architecture](architecture/testing.md). For the overall testing strategy see
 > [theQuality.md](theQuality.md); for the shared foundation helpers see [Testing.md](Testing.md).
 
 ## What's inside

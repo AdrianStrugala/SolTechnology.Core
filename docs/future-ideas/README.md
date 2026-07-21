@@ -15,7 +15,7 @@ Each file is a self-contained brief with context, rationale for parking, and con
 
 ## How to promote
 
-1. Create a new ADR with a proper implementation plan.
+1. Create `docs/features/YYYY-MM-DD-<kebab-name>.md` with `status: planning`.
 2. Remove the row from this index.
-3. Reference this folder in the new ADR's "Context" as the origin of the idea.
+3. Reference this idea from the feature's `Context`.
 

@@ -20,7 +20,7 @@ and the canonical test stack discovered in `tests/*.csproj`.
 ## When NOT to use
 
 - Pure refactor with zero behavioural change and existing tests still green.
-- Doc-only / ADR-only PR.
+- Documentation-only PR.
 - Generated code where tests would mirror the generator output.
 
 ## Test stack — by location

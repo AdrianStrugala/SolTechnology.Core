@@ -1,6 +1,6 @@
 ---
 name: documentation-cleanup
-description: Validate and fix documentation integrity in SolTechnology.Core — module/doc parity, indexes, tables, Mermaid diagrams, links, ADR formatting, numbered lists.
+description: Validate and fix documentation integrity in SolTechnology.Core — current architecture, dated feature records, module/doc parity, indexes, tables, Mermaid diagrams, links, and numbered lists.
 ---
 
 # Documentation Cleanup
@@ -13,7 +13,7 @@ Validate and fix documentation integrity across the [docs/](../../../docs/) fold
 2. Check module ↔ doc parity
 3. Check indexes
 4. Validate tables and Mermaid diagrams
-5. Validate ADR structure
+5. Validate architecture and feature records
 6. Check links and formatting
 7. Fix numbered lists
 
@@ -21,7 +21,8 @@ Validate and fix documentation integrity across the [docs/](../../../docs/) fold
 
 - [README.md](../../../README.md) — top-level module index
 - [docs/](../../../docs/) — per-module docs and reviews
-- [docs/adr/](../../../docs/adr/) — Architecture Decision Records
+- [docs/architecture/](../../../docs/architecture/) — current system and rationale
+- [docs/features/](../../../docs/features/) — historical delivery records
 
 ## Step-by-step procedure
 
@@ -40,7 +41,7 @@ For each folder `src/SolTechnology.Core.<Module>/`:
 
 ### 3. Check Indexes
 
-For files that contain an index (README, [docs/Story.md](../../../docs/Story.md), etc.):
+For files that contain an index (README, [docs/Tale.md](../../../docs/Tale.md), etc.):
 
 - Every index entry has a matching section in the document.
 - Every top-level section is listed in the index.
@@ -59,14 +60,25 @@ For each Mermaid block:
 - `classDef` declared before first use.
 - Node names with spaces use `<br>` line breaks: `Node[Name<br>With<br>Spaces]`.
 
-### 5. Validate ADR Structure
+### 5. Validate Architecture and Feature Records
 
-For every file under [docs/adr/](../../../docs/adr/):
+For every file under [docs/architecture/](../../../docs/architecture/):
 
-- File name matches `NNN-kebab-title.md`, numbering monotonic with no gaps.
-- Required sections present: Status, Context, Decision, Consequences.
-- Recommended sections noted as gaps when missing: Alternatives Considered, Stakeholders.
-- ADR is linked from at least one other doc or from `CLAUDE.md` / `README.md`.
+- It describes current behavior and rationale, verified against source and tests.
+- It contains no obsolete status, implementation tracker, or historical narrative.
+- It links to code and module docs instead of copying contracts.
+
+For every durable file directly under [docs/features/](../../../docs/features/):
+
+- Filename matches `YYYY-MM-DD-<kebab-name>.md`.
+- Frontmatter contains `status`, `created`, and `completed`.
+- Status is `planning | planned | in-progress | blocked | completed | abandoned`.
+- Completed and abandoned records have a completion date and completion summary.
+- The record warns that it may not describe the current system.
+- No durable link points into a deleted or unrelated working folder.
+
+Flag `docs/adr/`, `docs/features/README.md`, numbered feature filenames, or hand-maintained feature
+status indexes as obsolete workflow artifacts.
 
 ### 6. Check Links and Formatting
 
@@ -102,7 +114,7 @@ Ignore backtick / inline-code formatting issues unless they break rendering.
 ##### Table / Mermaid Issues
 <placeholder></placeholder>
 
-##### ADR Issues
+##### Architecture / Feature Issues
 <placeholder></placeholder>
 
 ##### Link Issues

@@ -15,17 +15,14 @@ forward-looking review produces vague worries.
 
 ## When to use
 
-**Mandatory** before merging any change that touches:
+**Mandatory** before merging exactly for the trigger list in `CLAUDE.md §4`. Apply forbidden-action
+confirmation gates from `CLAUDE.md §2` separately; they do not imply a premortem requirement.
 
-- A public/protected symbol in `src/SolTechnology.Core.*` (NuGet API surface)
-- Any `ModuleInstaller.cs` (DI registration contract)
-- `Directory.Build.props` / `src/Directory.Build.props` (build / package metadata)
-- A persisted contract (Story state shape, message contract, SQL migration)
-
-**Recommended** for any change crossing module boundaries (e.g. CQRS ↔ Story ↔ Logging).
+**Recommended** for other high-risk changes, including public API changes and changes crossing
+module boundaries (e.g. CQRS ↔ Story ↔ Logging).
 
 Within a plan, this skill executes the `00-run-premortem.md` gate
-([ADR-006 §6](../../../docs/adr/006-implementation-plan-workflow.md)), invoked by
+([delivery workflow](../../../docs/architecture/delivery-workflow.md)), invoked by
 [`implement-plan`](../implement-plan/SKILL.md).
 
 ## Critical rules
@@ -52,7 +49,7 @@ Within a plan, this skill executes the `00-run-premortem.md` gate
   not just a code edit.
 - **Cite Coding Guide sections by number** (§3, §11, §18) — if a reference looks wrong, the
   *reference* is stale, not the section.
-- **English record; conversation mirrors the user** (ADR-006 §9).
+- **English record; conversation mirrors the user.**
 
 ## Process
 
@@ -135,10 +132,12 @@ existing control.
 
 For each surviving scenario:
 
-- **Existing control** — test in `tests/SolTechnology.Core.<Module>.Tests/`, guard, ADR, doc,
+- **Existing control** — test in `tests/SolTechnology.Core.<Module>.Tests/`, guard, architecture
+  rule, module doc,
   lint, build setting. If none: `none — gap`.
 - **Mitigation** — one of: add/extend a test (link the test class); add a `Guards.*`
-  precondition; document a breaking change in `docs/adr/` + bump major; add a runtime check
+  precondition; document a breaking change in the dated feature record and current architecture
+  plus bump major; add a runtime check
   (`ModuleInstaller` validation); update `docs/ClaudeCodingGuide.md` so the failure mode is
   prevented for future contributors; defer with explicit rationale ("accepted risk").
 - Every mitigation names the **step file** that must carry it.

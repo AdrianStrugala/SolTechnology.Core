@@ -7,7 +7,7 @@ root [`CLAUDE.md`](../CLAUDE.md). AI-doc authoring rules live in
 [`AIDocsGuide.md`](AIDocsGuide.md). One source of truth per topic — when in doubt,
 link, don't copy.
 
-Section numbers (§0–§N) are stable cite-targets. `CLAUDE.md`, ADRs and skills reference
+Section numbers (§0–§N) are stable cite-targets. `CLAUDE.md`, architecture docs, and skills reference
 them by number; NEVER renumber an existing section. New rules append at the end.
 
 ---
@@ -411,7 +411,7 @@ These apply to every class you write, regardless of layer.
 7. **Use .NET 10 `extension` blocks** for extension methods. NEVER write `static class` + `this` parameter — use the C# 14 `extension` syntax instead.
 8. **No "Manager", "Helper", "Util" suffixes** unless the class genuinely is a generic helper (rare). Name by responsibility: `CityMapper`, `StreetTrafficUpdater`, `GoogleHTTPClient`.
 9. **No `#region`.** Use partial classes (one method per file for HTTP clients) or extract a new class. The only exception is legacy test files explicitly listed in the root `CLAUDE.md`.
-10. **Comments earn their place.** Tale Code reads like prose — let names carry the meaning. Write a comment **only** when a reader cannot infer the *why* from the code itself: a non-obvious framework constraint, a workaround for a specific bug/version, an ADR pointer. Hard rule: **one line — two as the absolute exception**. No multi-line narration, no incident retrospectives in `//`, no restating *what* the next line does. If the explanation needs a paragraph, it belongs in an **ADR** (link it: `// See ADR-005.`) or in an **XML `<summary>`** on the public type — not inline. Inline `//` is a *pointer*, not the storage.
+10. **Comments earn their place.** Tale Code reads like prose — let names carry the meaning. Write a comment **only** when a reader cannot infer the *why* from the code itself: a non-obvious framework constraint, a workaround for a specific bug/version, or an architecture pointer. Hard rule: **one line — two as the absolute exception**. No multi-line narration, no incident retrospectives in `//`, no restating *what* the next line does. If the explanation needs a paragraph, it belongs in `docs/architecture/` or in an **XML `<summary>`** on the public type — not inline. Inline `//` is a *pointer*, not the storage.
     ```csharp
     // ❌ BAD — three-line essay restating what the call does and re-explaining
     //         framework internals everyone can google.
@@ -441,7 +441,9 @@ These apply to every class you write, regardless of layer.
     ```
     **Decision rule when you feel the urge to write 3+ comment lines:**
     - Does it document the *type's contract*? → move to XML `<summary>`.
-    - Does it record a design decision / incident? → move to an ADR, link from one-line `//`.
+    - Does it explain current architecture or rationale? → move it to `docs/architecture/` and
+      link from a one-line `//`.
+    - Does it record delivery history? → move it to the dated feature record.
     - Does it explain *what* the code does? → delete it, rename the symbol instead.
     - Is it genuinely a single non-obvious *why*? → keep, one line.
 
@@ -449,7 +451,7 @@ These apply to every class you write, regardless of layer.
 
 ## 10. Naming conventions
 
-- **Acronyms: ALL CAPS** — `APIClient`, `SQLConfiguration`, `XMLDocument`, `CQRSHandler`, `AUID`, `HTTP`, `UI`, `IO`, `DB`. (See ADR-001.)
+- **Acronyms: ALL CAPS** — `APIClient`, `SQLConfiguration`, `XMLDocument`, `CQRSHandler`, `AUID`, `HTTP`, `UI`, `IO`, `DB`. See [`docs/architecture/naming-and-public-api.md`](architecture/naming-and-public-api.md).
   - Existing published package names (`SolTechnology.Core.CQRS`, `SolTechnology.Core.AUID`) are grandfathered. New types follow the rule.
 - **Files mirror their primary type name.** Exception: HTTP-client partials (`GoogleHTTPClient.<MethodName>.cs`) and ordered chapters (`0.InitiateContext.cs`).
 - **Folders are nouns in PascalCase.** Use case folders are verb-noun (`CalculateBestPath`, `FetchTraffic`).
@@ -715,12 +717,13 @@ retrospectives.
 ```
 
 Anything that does not fit one of those headings is a sign the doc is drifting — either it
-belongs in an **ADR** (`docs/adr/*.md`) or in **inline XML doc** on a public type.
+belongs in the current **architecture** (`docs/architecture/*.md`), the dated feature record, or
+in **inline XML doc** on a public type.
 
 ### Hard rules
 
 1. **No essays, no war stories, no incident retrospectives.** "Two timeout systems were a
-   confusing source of incidents…" is for ADRs, not user docs. The user doc says what the
+  confusing source of incidents…" is for feature records, not user docs. The user doc says what the
    knob does and what the default is.
 2. **Features = user-observable benefits, not implementation details.** "RFC 7807 error
    pipeline" ✅ — "Uses `IExceptionStatusCodeMapper` internally with `TryAddSingleton`" ❌
@@ -737,8 +740,11 @@ belongs in an **ADR** (`docs/adr/*.md`) or in **inline XML doc** on a public typ
    exceeds ~300 lines, the module is doing too much and probably needs splitting in code first.
 8. **Cross-links instead of duplication.** When `Api.md` and `Log.md` both touch correlation,
    one is canonical and the other links; the description is not copy-pasted.
-9. **Companion to ADRs, not a replacement.** A doc page never explains *why we built it this
-   way*; that's `docs/adr/NNN-*.md`. The doc explains *how to use it*.
+9. **Companion to architecture, not a replacement.** A module page explains how to use the
+  package. Current system rationale lives under `docs/architecture/`; historical delivery context
+  lives in the dated feature record.
+10. **Do not rewrite module pages during a project-documentation migration.** Change only links or
+  content directly required by the task; audit public API accuracy as a separate, explicit scope.
 10. **Companion-skill section uses absolute URLs.** When a module ships an authoring skill under
     `.github/skills/`, link it from a `### Working with AI Agent` section with absolute
     `https://github.com/AdrianStrugala/SolTechnology.Core/blob/master/…` URLs — nuget.org cannot
@@ -754,7 +760,7 @@ belongs in an **ADR** (`docs/adr/*.md`) or in **inline XML doc** on a public typ
   table or flat `####` subsections. Numbered headings imply order; if the user can skip them,
   use flat headings.
 - Move any "Manual setup", "Behind the scenes", "How it works internally" content into either
-  XML doc on the type or an ADR; the user doc keeps only what the consumer touches.
+  XML doc on the type or an architecture page; the user doc keeps only what the consumer touches.
 
 ### Reference implementation
 

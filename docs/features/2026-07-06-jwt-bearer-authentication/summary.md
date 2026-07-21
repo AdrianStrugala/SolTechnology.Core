@@ -7,8 +7,7 @@ premortem: pending
 # JWT Bearer authentication + API-key hardening — Implementation Summary
 
 Tracking the implementation steps for the spec
-[`../2026-07-06-jwt-bearer-authentication.md`](../2026-07-06-jwt-bearer-authentication.md),
-implementing [ADR-014](../../adr/014-jwt-bearer-authentication.md).
+[`../2026-07-06-jwt-bearer-authentication.md`](../2026-07-06-jwt-bearer-authentication.md).
 
 ## Steps
 
@@ -23,6 +22,7 @@ implementing [ADR-014](../../adr/014-jwt-bearer-authentication.md).
 
 Status values: `⬜ to-do` / `⛔ blocked` / `🔧 in-progress` / `✅ done` — mirrored from each
 step file's frontmatter (the source of truth) in the same change that flips it.
-Gates per ADR-006 §6–§7: step `00` blocks `01..05` until the `premortem:` field reads
+Gates per the [delivery workflow](../../architecture/delivery-workflow.md): step `00` blocks
+`01..05` until the `premortem:` field reads
 `go` / `go-with-mitigations` / `waived` / `skipped`; the retrospective runs only when every
 other step is `✅ done`.

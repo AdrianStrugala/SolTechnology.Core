@@ -1,22 +1,19 @@
-# Feature-002: Production pattern adoption — wave 2
-
-> **Status:** ✅ Done (2026-06-25; see [Implementation summary](#implementation-summary))
-> **Created:** 2026-06-24
-> **Stakeholders:** Consumers of `SolTechnology.Core.*` (NuGet + `sample-tale-code-apps/DreamTravel`)
-> **Note:** Relocated from `docs/adr/012-…` — a backlog batch (a feature wave), not a single
-> decision. Two genuinely new packages were considered; both were folded into existing modules at
-> implementation time (see sub-sections), so no buried decision needed a separate ADR.
-
 ---
+status: completed
+created: 2026-06-24
+completed: 2026-06-25
+---
+
+# Production Pattern Adoption — Wave 2
+
+> Historical delivery record. It may not describe the current system.
 
 ## Goal
 
 A second production application — a multi-tenant, multi-region payments / financial-storage
 service built on the same Tale-Code philosophy — was onboarded into the production-pattern
-programme started by [Feature-001](001-production-pattern-adoption-programme.md). The harvest is
-recorded in [`docs/production-harvest-second-app.md`](../production-harvest-second-app.md), which
-catalogues each candidate with a verdict, target module, semver and effort, and records the
-decisions taken on 2026-06-24.
+programme started by [wave 1](2026-06-12-production-pattern-adoption-wave-1.md). The candidates
+were evaluated by target module, semver impact, effort, and production value.
 
 This is the **direct continuation** of the Feature-001 programme: adopt the **accepted** wave-2
 items as one production-hardening effort, grouped by module and sequenced as independent steps.
@@ -59,8 +56,7 @@ items as one production-hardening effort, grouped by module and sequenced as ind
 
 Ship all accepted wave-2 items under one feature plan, grouped by module, sequenced as independent
 steps. Two candidates looked like new packages; both were folded into existing modules during
-implementation (sub-sections below). Implementation is gated by the **`00` premortem** (authored
-last, executed first — [ADR-006 §5](../adr/006-implementation-plan-workflow.md)).
+implementation (sub-sections below). A premortem gate ran before implementation.
 
 ### What ships
 
@@ -81,7 +77,8 @@ last, executed first — [ADR-006 §5](../adr/006-implementation-plan-workflow.m
 ### Out of scope (explicit)
 
 - **FI-001 outbound webhooks** (was A4) and **FI-002 priority worker pool** (was C3) — parked in
-  [`docs/future-ideas/`](../future-ideas/README.md); each wants its own ADR when a consumer exists.
+  [`docs/future-ideas/`](../future-ideas/README.md); each starts a dated feature when a consumer
+  exists.
 - **Section E "not porting"** — custom `IDateTimeProvider` (Core uses `TimeProvider`, Feature-001 G1),
   encryption-at-rest, multi-cloud broker switch (Feature-001 Q3), MACRO_CASE JSON policy, app-specific
   domain code.
@@ -171,10 +168,10 @@ is added to `.github/workflows/publishPackages.yml`. The distributed lock (Optio
 checks (per-module) do **not** add packages — they live in `Core.Cache` and in each probed module
 respectively; the health **endpoint** lives in `Core.Api`.
 
-## Alternatives Considered
+## Alternatives considered
 
-1. **One child ADR per item, each with its own plan + premortem.** Rejected for the same reason
-   Feature-001 rejected it: process overhead disproportionate to the work. The items are related
+1. **One feature per item, each with its own plan and premortem.** Rejected for the same reason
+  wave 1 rejected it: process overhead disproportionate to the work. The items are related
    production-hardening concerns harvested together, not independent decisions. A blue/red review
    (the `00` premortem gate) favoured the single-plan shape: one place to track, steps still
    independently mergeable.
@@ -196,19 +193,15 @@ respectively; the health **endpoint** lives in `Core.Api`.
 
 ## Related
 
-- [Feature-001](001-production-pattern-adoption-programme.md) — wave-1 programme this continues.
-- [ADR-005](../adr/005-http-production-defaults.md) — HTTP resilience that B2/B3 extend.
-- [ADR-006](../adr/006-implementation-plan-workflow.md) — plan-folder layout this plan follows.
-- [`docs/production-harvest-second-app.md`](../production-harvest-second-app.md) — authoritative
-  harvest + decisions.
+- [Production pattern adoption — wave 1](2026-06-12-production-pattern-adoption-wave-1.md)
+- [HTTP client architecture](../architecture/http-client.md)
+- [Delivery workflow](../architecture/delivery-workflow.md)
 - [`docs/future-ideas/`](../future-ideas/README.md) — parked FI-001 / FI-002 (out of scope).
 
-## Implementation summary
+## Completion summary
 
-Completed 2026-06-25. The per-step working folder was deleted per the
-[ADR-006](../adr/006-implementation-plan-workflow.md) collapse-on-completion rule; this section is
-the surviving record. The `00` premortem gate cleared **Go with mitigations** (M1–M8) before any
-code began.
+Completed 2026-06-25. The temporary step folder was deleted after consolidation. The `00`
+premortem gate cleared **Go with mitigations** (M1–M8) before any code began.
 
 | # | Step | Shipped |
 |---|---|---|

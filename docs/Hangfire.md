@@ -3,7 +3,7 @@
 Hangfire-backed persistent event dispatch and recurring jobs for `SolTechnology.Core.CQRS`.
 Events survive process restarts via Hangfire storage; recurring jobs run on cron schedules
 with typed, DI-resolved handlers. Intentionally minimal public surface —
-new knobs require an [ADR](adr/009-hangfire-persistent-events-and-jobs.md).
+new knobs require a [dated feature](architecture/delivery-workflow.md).
 
 ## Features
 
@@ -255,7 +255,7 @@ Hangfire.SqlServer.SqlServerObjectsInstaller.Install(
 
 ## See Also
 
-- [ADR-009 — Persistent events and recurring jobs](adr/009-hangfire-persistent-events-and-jobs.md)
+- [Background-processing architecture](architecture/background-processing.md)
 - [CQRS](CQRS.md) — commands, queries, events (in-memory default)
 - [Cron / Scheduler](Cron.md) _(deprecated)_
 
@@ -286,4 +286,3 @@ In that case, use Azure Service Bus scheduled messages or a Redis sorted set.
   `CorrelationIdJobFilter`), and persistence for free.
 - A bespoke delay-queue duplicates that stack without the observability.
 - See also: [FI-002 — Priority background jobs](future-ideas/002-priority-background-jobs-hangfire.md).
-

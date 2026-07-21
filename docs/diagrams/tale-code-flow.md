@@ -5,8 +5,7 @@ read as a flow. The `Tell()` plan narrates chapters on a **won / lost track**: a
 switches the story to the lost track and later chapters are skipped, unless an `Otherwise`
 recovers it. Solid arrows are the won track; dashed arrows are failure / recovery.
 
-This is the directly-embeddable companion to [`taleCodeFlow.drawio`](../taleCodeFlow.drawio) —
-GitHub renders Mermaid in Markdown natively, so no image export step is needed.
+GitHub renders this Mermaid diagram in Markdown natively, so no image export step is needed.
 
 ```csharp
 protected override Tale<CalculateBestPathResult> Tell() =>

@@ -256,7 +256,7 @@ public async Task FindsOptimalPath()
 
 Component-test infrastructure is modular: one `.Testing` NuGet companion per concern, all built on the
 shared `SolTechnology.Core.Testing` foundation. Reference only what a suite needs — they compose in a
-single `[SetUpFixture]`. Defined in [ADR-008](adr/008-testing-framework-companions.md).
+single `[SetUpFixture]`. Defined in the [testing architecture](architecture/testing.md).
 
 | Concern | Package | Key types | Readme |
 |---|---|---|---|
@@ -270,7 +270,8 @@ single `[SetUpFixture]`. Defined in [ADR-008](adr/008-testing-framework-companio
 
 > The data engine is **AutoFixture** (with NSubstitute auto-faking), not Bogus. Bogus ships as an
 > *optional, complementary* realistic-value builder (`BogusCustomization`), not a replacement — see
-> [Testing.md](Testing.md) and ADR-008.
+> [Testing.md](Testing.md) and the
+> [testing companions feature record](features/2026-05-30-testing-framework-companions.md).
 
 ### Container lifetime & reuse
 

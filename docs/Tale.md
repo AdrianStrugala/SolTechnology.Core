@@ -526,16 +526,14 @@ logging.AddFilter("SolTechnology.Core.Tale.Orchestration.TaleEngine", LogLevel.I
 ## Versioning
 
 Handler versioning (compatibility checks on resume after redeploy) is **not currently
-implemented** — see ADR-002 ("Future extensions → Handler versioning") for the planned
-SemVer-based design. Today the engine accepts any persisted state regardless of how the handler
+implemented**. Today the engine accepts any persisted state regardless of how the handler
 has changed; you are responsible for keeping chapter sequences and context shapes
 backward-compatible when redeploying with in-flight tales.
 
 ## Not supported (yet)
 
 Parallel chapter execution, durable retries with backoff, cross-process sagas / compensation,
-distributed tracing via `ActivitySource`, handler versioning. Tracked in
-[ADR-002](./adr/002-Story-Framework-Implementation.md).
+distributed tracing via `ActivitySource`, and handler versioning.
 
 ## Working with AI Agent
 
@@ -554,6 +552,6 @@ keeps the anatomy and chapter rules in one place.
 ## Related documentation
 
 - [Tale Code philosophy (`docs/ClaudeCodingGuide.md`)](./ClaudeCodingGuide.md)
-- [Tale framework architecture (ADR-002)](./adr/002-Story-Framework-Implementation.md)
+- [Tale framework architecture](./architecture/tale-framework.md)
 - [Component & sequence diagrams](./diagrams/README.md)
 - [Authoring skill: `command-query-event-tale`](https://github.com/AdrianStrugala/SolTechnology.Core/blob/master/.github/skills/command-query-event-tale/SKILL.md)
