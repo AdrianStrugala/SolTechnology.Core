@@ -73,7 +73,8 @@ Rules:
   and NEVER inside the `.nupkg`. A skill under `src/` loses auto-discovery; a markdown file in a
   `.nupkg` lands in `~/.nuget` where no agent reads it.
 - The package README (`docs/<Module>.md`) **MUST** link the companion skill from a
-  `### Working with AI Agent` section (see [`ClaudeCodingGuide §18`](../../docs/ClaudeCodingGuide.md)).
+  `### Working with AI Agent` section (see the
+  [`Public Documentation Guide`](../../docs/PublicDocumentationGuide.md)).
   Links **MUST** be absolute `https://github.com/AdrianStrugala/SolTechnology.Core/blob/master/…`
   URLs — nuget.org does not resolve repo-relative links to `.github/`.
 - Delivery is **pull, never push.** NEVER ship a build `.targets`, analyzer, or tool that writes a

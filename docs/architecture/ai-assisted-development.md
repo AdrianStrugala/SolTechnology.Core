@@ -5,7 +5,8 @@ Repository-specific instructions are divided by responsibility:
 | Artifact | Responsibility |
 |---|---|
 | `CLAUDE.md` | Operational protocol: behavior, tools, gates, and forbidden actions. |
-| `docs/ClaudeCodingGuide.md` | Coding and documentation conventions. |
+| `docs/ClaudeCodingGuide.md` | C# coding conventions. |
+| `docs/PublicDocumentationGuide.md` | Public module documentation authoring conventions. |
 | `.github/agents/*.agent.md` | Roles that own multi-step workflows or require a fresh context. |
 | `.github/skills/*/SKILL.md` | Focused procedures loaded on demand. |
 

@@ -1,11 +1,12 @@
 # Claude Coding Guide — SolTechnology.Core / DreamTravel
 
 Convention layer for the agent. Defines **what** the agent writes: project structure,
-CQRS, naming, logging, tests, documentation shape. Operational behaviour (pre-flight,
+CQRS, naming, logging, and tests. Operational behaviour (pre-flight,
 behavioral core, tool usage, forbidden actions, dependency management) lives in the
 root [`CLAUDE.md`](../CLAUDE.md). AI-doc authoring rules live in
-[`AIDocsGuide.md`](AIDocsGuide.md). One source of truth per topic — when in doubt,
-link, don't copy.
+[`AIDocsGuide.md`](AIDocsGuide.md). Public module documentation authoring rules live in
+[`PublicDocumentationGuide.md`](PublicDocumentationGuide.md). One source of truth per topic — when
+in doubt, link, don't copy.
 
 Section numbers (§0–§N) are stable cite-targets. `CLAUDE.md`, architecture docs, and skills reference
 them by number; NEVER renumber an existing section. New rules append at the end.
@@ -83,11 +84,9 @@ Otherwise add a folder inside an existing project. NEVER split on technical grou
 
 ### Interface + implementation co-location
 
-When a class is ≤ 80 lines total (including the interface), put the interface and its
-single implementation in the **same file**. Name the file after the implementation
-(e.g. `RedisCache.cs` contains both `IRedisCache` and `RedisCache`). Split into
-separate files only when the implementation exceeds 80 lines or there are multiple
-implementations.
+Put an interface and its single implementation in the **same file**. Name the file after the
+implementation (e.g. `RedisCache.cs` contains both `IRedisCache` and `RedisCache`). Keep a shared
+interface in its own file only when it has multiple implementations.
 
 ---
 
@@ -102,7 +101,8 @@ public static class ModuleInstaller
 {
     public static IServiceCollection InstallTripsQueries(this IServiceCollection services)
     {
-        services.RegisterQueries();   // SolTechnology.Core.CQRS scans the calling assembly
+    services.AddSolCQRS(o =>
+      o.RegisterQueriesFromAssembly(typeof(ModuleInstaller).Assembly));
         services.AddSolTale();        // SolTechnology.Core.Tale scans chapters & handlers
         services.AddTransient<ITSP, AntColony>();
         return services;
@@ -115,10 +115,13 @@ Rules:
 - One `Install<ProjectName>(this IServiceCollection)` extension method per project. Name it after the project domain, not the type — `InstallTripsQueries`, not `AddQueryHandlers`.
 - `ModuleInstaller` lives at the project root, never nested.
 - `Program.cs` calls **installer-level extension methods only** — module installers
-  (`Install*`) and framework-level installers (`AddCache`, `AddMediatR`, CORS, Swagger,
+  (`Install*`) and framework-level installers (`AddCache`, CORS, Swagger,
   Auth, versioning, MVC filters, configuration binding). It MUST NOT register
   individual services (`services.AddTransient<IFoo, Foo>()` belongs in a `ModuleInstaller`).
-- NEVER call `RegisterCommands` / `RegisterQueries` / `AddSolTale` from `Program.cs` — they use `Assembly.GetCallingAssembly()` and must be invoked from inside the assembly that owns the handlers.
+- Register commands and queries inside their owning module with
+  `AddSolCQRS(o => o.RegisterCommandsFromAssembly(typeof(ModuleInstaller).Assembly))` or the
+  query equivalent. Register Tales there with an explicit owning assembly when discovery would
+  otherwise be ambiguous. `Program.cs` calls only the module installer.
 - Decorators go in the installer right after the registration they decorate (`services.Decorate(typeof(IGoogleHTTPClient), typeof(GoogleHTTPClientCachingDecorator));`).
 
 ---
@@ -157,7 +160,8 @@ FetchTraffic/
 - **Query / Command class** holds *only* the input DTO + its `AbstractValidator<>` in the same file. No logic.
 - **Result class** is a plain DTO — no behavior, no nullable mystery.
 - **Handler** implements `IQueryHandler<,>` or `ICommandHandler<>` from `SolTechnology.Core.CQRS`. Always returns `Result` / `Result<T>`. NEVER throws for business failures.
-- **Validators** are `AbstractValidator<TInput>` and live in the same file as the input. They are auto-discovered by `RegisterCommands()` / `RegisterQueries()`.
+- **Validators** are `AbstractValidator<TInput>` and live in the same file as the input. They are
+  auto-discovered from assemblies registered through `AddSolCQRS`.
 - Tale threshold: the single criterion lives in §4 (MUST when > 100 lines of business
   logic OR > 1 external system).
 
@@ -218,7 +222,8 @@ Full `TaleHandler` template: §17.
 - Chapters return `Result.Success()` / `Result.Fail(...)`. Chapter code NEVER throws —
   exceptions originate only from DataLayer / Infrastructure / external libraries and
   the framework converts them to errors. Layer rules for throw/catch: §13.
-- The `TaleHandler` may also implement `IQueryHandler<,>` / `ICommandHandler<>` so MediatR resolves it directly. This is the standard wiring.
+- The `TaleHandler` may also implement `IQueryHandler<,>` / `ICommandHandler<>` so the Core
+  `IMediator` resolves it through the normal pipeline. This is the standard wiring.
 
 ### When to choose `DomainServices` vs Tale-in-Queries/Commands
 
@@ -306,7 +311,7 @@ Rules:
 1. `builder.AddServiceDefaults();` (Aspire).
 2. Culture, CORS, configuration binding.
 3. **Module installers** (one line per project): `InstallTripsSql`, `InstallGeolocationDataClients`, `InstallInfrastructure`, `InstallDomainServices`, `InstallTripsQueries`, `InstallGraphDatabase`, `AddFlows`, etc.
-4. Framework installers: `AddCache`, `AddMediatR`, authentication, versioning, Swagger.
+4. Framework installers: `AddCache`, authentication, versioning, Swagger.
 5. Filters: `ExceptionFilter`, `ResponseEnvelopeFilter` (always wired globally).
 6. Build, configure pipeline, `MapControllers`, `Run`.
 
@@ -319,7 +324,7 @@ CORS policy names, scheme names, and other constants MUST be `const` with a mean
 [ApiVersion("2.0")]
 [Route("api/[controller]")]
 public class CalculateBestPathController(
-    IQueryHandler<CalculateBestPathQuery, CalculateBestPathResult> handler,
+  IMediator mediator,
     ILogger<CalculateBestPathController> logger)
     : ControllerBase
 {
@@ -329,7 +334,7 @@ public class CalculateBestPathController(
     [ProducesResponseType(typeof(Result<CalculateBestPathResult>), (int)HttpStatusCode.OK)]
     public async Task<IActionResult> CalculateBestPath([FromBody] CalculateBestPathQuery query)
     {
-        return Ok(await handler.Handle(query, CancellationToken.None));
+      return Ok(await mediator.Send(query, HttpContext.RequestAborted));
     }
 }
 ```
@@ -337,7 +342,11 @@ public class CalculateBestPathController(
 Rules:
 
 - Controllers are **thin**. Body of an action ≤ 3 lines: log (optional), invoke handler, return.
-- Inject the specific `IQueryHandler<,>` / `ICommandHandler<>` rather than `IMediator` whenever a single use case is involved. `IMediator` is acceptable when the controller fans out to multiple handlers.
+- Inject the Core `IMediator` and call `Send(...)`. NEVER inject `IQueryHandler<,>` or
+  `ICommandHandler<>` into controllers; direct handler calls bypass validation, logging, and other
+  pipeline behaviors.
+- Accept the request `CancellationToken` or use `HttpContext.RequestAborted`; NEVER use
+  `CancellationToken.None` in a request path.
 - NEVER `try/catch` in a controller — `ExceptionFilter` handles it (§13). NEVER serialize errors manually.
 - One controller per resource/route; one folder per bounded context (`Trips/`, `RoadPlanner/`, `Statistics/`).
 - API versioning: place version-specific controllers under `Trips/v1/`, `Trips/v2/`. Use `[ApiVersion]` + `[MapToApiVersion]`. Mark deprecated versions `Deprecated = true`.
@@ -446,11 +455,19 @@ These apply to every class you write, regardless of layer.
     - Does it record delivery history? → move it to the dated feature record.
     - Does it explain *what* the code does? → delete it, rename the symbol instead.
     - Is it genuinely a single non-obvious *why*? → keep, one line.
+  11. **Always use braces** for `if`, `else`, `for`, `foreach`, `while`, and `using`, including a
+    single `return`, `continue`, or `throw`.
+  12. **Types are `public` by default** in application/sample projects and whenever assembly
+    scanning resolves them. In `src/SolTechnology.Core.*`, `public` and `protected` members are
+    NuGet contracts: expose them intentionally and apply the confirmation and semver rules from
+    root `CLAUDE.md`.
 
 ---
 
 ## 10. Naming conventions
 
+- **Do not add `Async` to project-owned method names.** A `Task` / `Task<T>` return type already
+  communicates asynchrony. Keep framework and external API method names unchanged.
 - **Acronyms: ALL CAPS** — `APIClient`, `SQLConfiguration`, `XMLDocument`, `CQRSHandler`, `AUID`, `HTTP`, `UI`, `IO`, `DB`. See [`docs/architecture/naming-and-public-api.md`](architecture/naming-and-public-api.md).
   - Existing published package names (`SolTechnology.Core.CQRS`, `SolTechnology.Core.AUID`) are grandfathered. New types follow the rule.
 - **Files mirror their primary type name.** Exception: HTTP-client partials (`GoogleHTTPClient.<MethodName>.cs`) and ordered chapters (`0.InitiateContext.cs`).
@@ -553,6 +570,8 @@ in root `CLAUDE.md` §10 — run both lists. Before declaring a task done:
 - [ ] Public types have XML `<summary>` (English).
 - [ ] Logging uses placeholders + `[{Value}]` brackets — **every** placeholder (§11).
 - [ ] No `#region`, no placeholder strings, no swallowed exceptions; throw/catch respects the §13 layer table.
+- [ ] Control-flow bodies always use braces (§9.11).
+- [ ] Controllers use Core `IMediator`; no direct handler injection or `CancellationToken.None` (§7).
 - [ ] Comments are one-line *why-not-what* (§9.10).
 - [ ] Tests added/updated — Component test preferred, Unit test only for pure logic (§8).
 
@@ -562,211 +581,18 @@ If any item fails, fix it before yielding.
 
 ## 17. Quick reference — file templates
 
-### Command
-
-Commands implement `IRequest<Result>` so they flow through the MediatR pipeline;
-the handler implements `ICommandHandler<>` (which the framework maps onto MediatR).
-
-```csharp
-// FetchTrafficCommand.cs
-using FluentValidation;
-using MediatR;
-using SolTechnology.Core.CQRS;
-
-namespace DreamTravel.Commands.FetchTraffic;
-
-public class FetchTrafficCommand : IRequest<Result>
-{
-    public DateTime DepartureTime { get; set; }
-}
-
-public class FetchTrafficCommandValidator : AbstractValidator<FetchTrafficCommand>
-{
-    public FetchTrafficCommandValidator()
-    {
-        RuleFor(x => x.DepartureTime).NotEmpty();
-    }
-}
-```
-
-### Command handler (simple)
-
-```csharp
-public class FetchTrafficHandler(
-    IGoogleHTTPClient googleClient,
-    IStreetRepository streetRepo,
-    ILogger<FetchTrafficHandler> logger)
-    : ICommandHandler<FetchTrafficCommand>
-{
-    public async Task<Result> Handle(FetchTrafficCommand request, CancellationToken ct)
-    {
-        logger.LogInformation("Fetching traffic at [{Time}]", request.DepartureTime);
-        // ... orchestration; above the §4 threshold convert to a Tale ...
-        return Result.Success();
-    }
-}
-```
-
-### Tale query (canonical full template — §4 links here)
-
-```csharp
-// CalculateBestPathTale.cs
-public class CalculateBestPathTale(IServiceProvider sp, ILogger<CalculateBestPathTale> logger)
-    : TaleHandler<CalculateBestPathQuery, CalculateBestPathContext, CalculateBestPathResult>(sp, logger),
-      IQueryHandler<CalculateBestPathQuery, CalculateBestPathResult>
-{
-    protected override Tale<CalculateBestPathResult> Tell() =>
-        Open<InitiateContext>()
-            .Read<DownloadRoadData>()
-            .Read<FindProfitablePath>()
-            .Otherwise<JustOrderCities>()
-            .Read<SolveTsp>()
-            .Read<FormCalculateBestPathResult>()
-            .Finale(ctx => ctx.Output);
-}
-```
-
-### Chapter
-
-```csharp
-[UsedImplicitly]
-public class DownloadRoadData(IGoogleHTTPClient google, IMichelinHTTPClient michelin)
-    : Chapter<CalculateBestPathContext>
-{
-    public override async Task<Result> Read(CalculateBestPathContext context)
-    {
-        // single responsibility; no branching across chapters
-        return Result.Success();
-    }
-}
-```
-
-### Controller
-
-```csharp
-[ApiController]
-[ApiVersion("1.0")]
-[Route("api/[controller]")]
-public class FindCityByNameController(
-    IQueryHandler<FindCityByNameQuery, FindCityByNameResult> handler)
-    : ControllerBase
-{
-    [HttpGet("{name}")]
-    [ProducesResponseType(typeof(Result<FindCityByNameResult>), (int)HttpStatusCode.OK)]
-    public async Task<IActionResult> Get(string name, CancellationToken ct)
-        => Ok(await handler.Handle(new FindCityByNameQuery { Name = name }, ct));
-}
-```
-
-### Module installer
-
-```csharp
-public static class ModuleInstaller
-{
-    public static IServiceCollection InstallTripsQueries(this IServiceCollection services)
-    {
-        services.RegisterQueries();
-        services.AddSolTale();
-        services.AddTransient<ITSP, AntColony>();
-        return services;
-    }
-}
-```
+Canonical templates and the end-to-end authoring procedure live in the
+[`command-query-event-tale`](../.github/skills/command-query-event-tale/SKILL.md) skill. Current
+compiling examples live under `sample-tale-code-apps/DreamTravel/src/LogicLayer/`. Apply §2–§4
+and §7; do not maintain a second copy of those templates here.
 
 ---
 
 ## 18. Public module documentation (`docs/<Module>.md`)
 
-Every module under `src/SolTechnology.Core.*` has a companion page in `docs/`. These are the
-**user-facing docs** — what a developer reads on GitHub before deciding to pull the package
-in. They are technical, dense, and example-driven; not marketing prose, not internal incident
-retrospectives.
-
-### Canonical structure (do not reorder, do not invent new top-level sections)
-
-```
-## SolTechnology.Core.<Module>
-<one-paragraph lead — what the package gives you, in one sentence + one elaboration>
-
-### Features
-- bullet 1 — concrete user benefit
-- bullet 2 — concrete user benefit
-…  (5–9 bullets; each is one observable capability the consumer gets, not an internal detail)
-
-### Registration
-<one or two snippets: the one-call happy path, then the lower-level compose path if it exists>
-
-### Configuration
-<table of options (Name | Default | Purpose) + one binding snippet; "no config needed" if true>
-
-### Usage
-<subsections per capability, each a short prose lead-in (≤ 1 line) + a code example>
-<tables for behaviour matrices / mappings>
-
-### Testing
-<the testing fixture / helpers this module ships, one snippet with Arrange/Act/Assert>
-
-### Conventions
-<bulleted DOs/DON'Ts for consumers of this module — short, imperative>
-
-### What ships in DI   (optional — include when AddXxx registers more than 2 services)
-<bulleted list of registered services so consumers can Replace/Decorate>
-
-### Working with AI Agent   (optional — include when the module has a companion skill in `.github/skills/`)
-<one-line lead + bullet links to the companion SKILL.md and the relevant ClaudeCodingGuide §, absolute GitHub URLs>
-```
-
-Anything that does not fit one of those headings is a sign the doc is drifting — either it
-belongs in the current **architecture** (`docs/architecture/*.md`), the dated feature record, or
-in **inline XML doc** on a public type.
-
-### Hard rules
-
-1. **No essays, no war stories, no incident retrospectives.** "Two timeout systems were a
-  confusing source of incidents…" is for feature records, not user docs. The user doc says what the
-   knob does and what the default is.
-2. **Features = user-observable benefits, not implementation details.** "RFC 7807 error
-   pipeline" ✅ — "Uses `IExceptionStatusCodeMapper` internally with `TryAddSingleton`" ❌
-   (that belongs under §What ships in DI or in XML doc).
-3. **Lead-in lines under `###` / `####` headings are ≤ 1 sentence.** If you wrote "Configure
-   X with automatic Y to do Z:" above a code block — delete it; the code block speaks.
-4. **Code examples are runnable.** No `// ...` ellipsis in the middle of a snippet unless it
-   replaces unrelated boilerplate. The snippet must compile in the consumer's project as-is.
-5. **Tables over prose for matrices.** Status code mappings, default-value tables, option
-   defaults — always tables.
-6. **No `> Tip:` / `> Note:` blockquote noise.** Either the info matters (then it's a regular
-   sentence in the body) or it doesn't (then it's deleted).
-7. **One module = one page.** Don't split into sub-pages; don't merge two modules. If the page
-   exceeds ~300 lines, the module is doing too much and probably needs splitting in code first.
-8. **Cross-links instead of duplication.** When `Api.md` and `Log.md` both touch correlation,
-   one is canonical and the other links; the description is not copy-pasted.
-9. **Companion to architecture, not a replacement.** A module page explains how to use the
-  package. Current system rationale lives under `docs/architecture/`; historical delivery context
-  lives in the dated feature record.
-10. **Do not rewrite module pages during a project-documentation migration.** Change only links or
-  content directly required by the task; audit public API accuracy as a separate, explicit scope.
-10. **Companion-skill section uses absolute URLs.** When a module ships an authoring skill under
-    `.github/skills/`, link it from a `### Working with AI Agent` section with absolute
-    `https://github.com/AdrianStrugala/SolTechnology.Core/blob/master/…` URLs — nuget.org cannot
-    resolve repo-relative `.github/` links. The skill is opt-in (the consumer points their agent
-    at it), NEVER auto-installed. Delivery policy: [`.github/skills/README.md`](../.github/skills/README.md)
-    → "Package-companion skills".
-
-### When refactoring an existing doc
-
-- Strip every "Overview" / "Introduction" / "About" heading — fold the content into the lead.
-- Strip every paraphrasing intro under a heading ("Configure X to do Y:" above a code block).
-- Pull every numbered "1. … 2. … 3. …" structure that wasn't a real sequence into either a
-  table or flat `####` subsections. Numbered headings imply order; if the user can skip them,
-  use flat headings.
-- Move any "Manual setup", "Behind the scenes", "How it works internally" content into either
-  XML doc on the type or an architecture page; the user doc keeps only what the consumer touches.
-
-### Reference implementation
-
-`docs/Api.md` is the canonical example. When in doubt, compare structure against it. Other
-module docs (`Log.md`, `Bus.md`, `HTTP-Production-Checklist.md`) are migrating toward this
-shape — bring them in line when you touch the surrounding module.
+Authoring structure, hard rules, refactoring instructions, companion-skill linking, and the
+canonical example live in [`PublicDocumentationGuide.md`](PublicDocumentationGuide.md). This
+section number remains a stable cite-target; do not duplicate those rules here.
 
 ---
 
@@ -782,7 +608,9 @@ cite-target for one release; update your references, then this stub disappears.
 Triggers and routing live in root `CLAUDE.md` §9 (single source of truth). When a
 lesson routes here:
 
-1. Find the most relevant section (§0–§18). If none fits, add a new numbered section at the end — NEVER renumber existing ones.
+1. Find the most relevant coding section (§0–§17). Public documentation lessons route to
+  [`PublicDocumentationGuide.md`](PublicDocumentationGuide.md). If no coding section fits, add a
+  new numbered section at the end — NEVER renumber existing ones.
 2. Add the rule as a single, imperative bullet — short, concrete, copy-pasteable. No prose essays.
 3. If the lesson affects *all* tasks, also add it to the §16 checklist.
 4. If it is repository-wide (not convention-specific), mirror a one-liner into root `CLAUDE.md` instead.

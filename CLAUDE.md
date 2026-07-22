@@ -208,7 +208,7 @@ touch `Directory.Build.props` for it.
 | Error handling (`Result`, throw/catch layer rules) | `docs/ClaudeCodingGuide.md` §13 |
 | Configuration binding | `docs/ClaudeCodingGuide.md` §14 |
 | Anti-patterns + fix-on-touch / report-only policy | `docs/ClaudeCodingGuide.md` §15 |
-| Public module documentation structure | `docs/ClaudeCodingGuide.md` §18 |
+| Public module documentation authoring | [`docs/PublicDocumentationGuide.md`](docs/PublicDocumentationGuide.md) |
 | AI-only documentation authoring | [`docs/AIDocsGuide.md`](docs/AIDocsGuide.md) |
 | Markdown / Mermaid hygiene | `docs/ClaudeCodingGuide.md` §21 |
 | Per-module user docs | `docs/<Module>.md` (e.g. `docs/Api.md`, `docs/Log.md`) |
@@ -245,7 +245,7 @@ Routing:
 3. AI-doc authoring rule → `docs/AIDocsGuide.md`.
 4. Current architecture or rationale → the relevant `docs/architecture/*.md` page.
 5. Skill-specific lesson → the skill's `SKILL.md`.
-6. User-facing docs lesson → `docs/ClaudeCodingGuide.md` §18.
+6. User-facing docs lesson → `docs/PublicDocumentationGuide.md`.
 
 In the same reply, mention the update in one sentence: *"Added rule X to §N of <file>."*
 
@@ -275,7 +275,8 @@ If any item fails, fix it before yielding.
 
 | Symptom | Cause / fix |
 |---|---|
-| `RegisterCommands` / `RegisterQueries` / `AddSolTale` find nothing | Called from the wrong assembly. They use `Assembly.GetCallingAssembly()` — invoke from inside the assembly that owns the handlers. |
+| CQRS handlers are not resolved | Register the owning assembly explicitly through `AddSolCQRS(o => o.RegisterCommandsFromAssembly(...))` or the query/event equivalent in its `ModuleInstaller`. |
+| `AddSolTale` finds no chapters or handlers | Pass the owning assembly explicitly when entry/calling assembly discovery is ambiguous. |
 | `dotnet test` "no tests discovered" | Tests live in `tests/` (outside `src/`). Path: `tests/<Project>.Tests`. |
 | AUID JSON round-trip drops the value | The consumer is using `PackageReference` to `SolTechnology.Core.AUID` instead of `ProjectReference` in the sample; `AuidJsonConverter` is missing. |
 | Tale JSON deserialisation case-sensitive issues | Use `TaleJsonOptions.Default` (`PropertyNameCaseInsensitive = true`, `IncludeFields = true`). |

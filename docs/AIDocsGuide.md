@@ -20,7 +20,8 @@ Everything else (prose, motivation, history) is waste.
 | File | Role | Size budget |
 |---|---|---|
 | `CLAUDE.md` (root) | Operational protocol: how the agent behaves (pre-flight, behavioral core, tool usage, forbidden actions, dependency management, self-improvement routing). | ≤ 300 lines |
-| `docs/ClaudeCodingGuide.md` | Conventions: what the agent writes (project structure, CQRS, naming, logging, anti-patterns, doc shape). | indexable; sections are stable cite-targets |
+| `docs/ClaudeCodingGuide.md` | C# conventions: what the agent writes (project structure, CQRS, naming, logging, anti-patterns). | indexable; sections are stable cite-targets |
+| `docs/PublicDocumentationGuide.md` | Public module documentation structure and authoring rules. | task-focused; link instead of copying |
 | `.github/skills/*/SKILL.md` | One task, end-to-end (code-review, premortem, planning). Loaded on demand. | as short as the task allows |
 
 One rule = one place. Other files **link**, never copy.
@@ -41,7 +42,8 @@ One rule = one place. Other files **link**, never copy.
 5. **No marketing / praise.** "Beautifully designed Tale Code framework…" → delete.
    The agent does not need motivation; it needs the rule.
 6. **No `> Note:` / `> Tip:` / `> IMPORTANT:` blockquotes.** Either the info matters
-   (regular sentence) or it doesn't (delete). Same rule as Coding Guide §18.6.
+    (regular sentence) or it doesn't (delete). Same rule as
+    [`PublicDocumentationGuide.md`](PublicDocumentationGuide.md#hard-rules).
 
 ### B. Structure
 
@@ -54,8 +56,9 @@ One rule = one place. Other files **link**, never copy.
 9. **Decision tree at the entry.** First section answers "what am I writing?" in 5–7
    points. The agent routes before the first edit.
 10. **Tables over prose for matrices.** Layer → references, exception → status, topic →
-    source-of-truth, anti-pattern → fix. Same rule as Coding Guide §18.5 — agents parse
-    tables faster than paragraphs.
+    source-of-truth, anti-pattern → fix. The public-doc equivalent lives in
+    [`PublicDocumentationGuide.md`](PublicDocumentationGuide.md#hard-rules); agents parse tables
+    faster than paragraphs.
 11. **Workflow / pre-yield checklist at the end.** `- [ ]` list the agent ticks before
     handing control back. Lets the agent self-verify. Operational items belong in
     `CLAUDE.md` §10; convention items in Coding Guide §16 — never both.
@@ -129,7 +132,8 @@ One rule = one place. Other files **link**, never copy.
 
 - `CLAUDE.md` — operational protocol (≤ 300 lines, §0 pre-flight, §1 behavioral core,
   §2 forbidden, §8 cross-ref table).
-- `docs/ClaudeCodingGuide.md` — conventions (§0 decision tree, stable §0–§N, BAD/GOOD
-  pairs in §9.10, §15 policy column, §18).
+- `docs/ClaudeCodingGuide.md` — C# conventions (§0 decision tree, stable §0–§N, BAD/GOOD
+    pairs in §9.10, §15 policy column).
+- `docs/PublicDocumentationGuide.md` — public module documentation structure and authoring rules.
 - `.github/skills/code-review/SKILL.md` — single-task skill (front-loaded routing,
   no convention duplication, links to the Coding Guide for every rule check).

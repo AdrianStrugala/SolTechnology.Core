@@ -15,7 +15,7 @@ walkthrough for user-facing clients. Docs-only PR.
 
 ## Affected components
 
-- `docs/Auth.md` — EDIT — full rewrite per `ClaudeCodingGuide §18` structure
+- `docs/Auth.md` — EDIT — full rewrite per `PublicDocumentationGuide.md` structure
 
 ## Changes
 
@@ -42,7 +42,7 @@ walkthrough for user-facing clients. Docs-only PR.
 
 - [ ] Every code snippet in `Auth.md` compiles against the step 01 API (manual check).
 - [ ] Every relative link in `Auth.md` resolves on disk.
-- [ ] Structure follows `ClaudeCodingGuide §18`; diagram authored by the diagram agent.
+- [ ] Structure follows `docs/PublicDocumentationGuide.md`; diagram authored by the diagram agent.
 
 ## Open questions
 

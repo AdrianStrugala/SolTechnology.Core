@@ -47,8 +47,9 @@ Within a plan, this skill executes the `00-run-premortem.md` gate
   stating exactly what must be decided; the planner owns the follow-up conversation.
 - **Pair with [blue-red-team](../blue-red-team/SKILL.md)** when the change is a design decision,
   not just a code edit.
-- **Cite Coding Guide sections by number** (§3, §11, §18) — if a reference looks wrong, the
-  *reference* is stale, not the section.
+- **Cite canonical guides directly** (`ClaudeCodingGuide` §3/§11,
+  `PublicDocumentationGuide.md`) — if a reference looks wrong, the *reference* is stale, not the
+  rule.
 - **English record; conversation mirrors the user.**
 
 ## Process

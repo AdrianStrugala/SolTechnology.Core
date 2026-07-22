@@ -34,6 +34,8 @@ Walk through the relevant sections of
 [docs/ClaudeCodingGuide.md](../../../docs/ClaudeCodingGuide.md) for each diff hunk:
 
 - §3 CQRS — handlers return `Result<T>`, registered in `ModuleInstaller`, single responsibility.
+- §7 API — controllers send through Core `IMediator`; direct handler injection bypasses pipeline
+  behaviors and is a finding.
 - §10 Naming — public symbols follow acronym capitalization and compatibility constraints from
   [`naming-and-public-api.md`](../../../docs/architecture/naming-and-public-api.md).
 - §11 Logging — `logger.Log*` template, level, scope, no PII.
@@ -71,7 +73,9 @@ sections. Note any module-specific convention the diff violates.
 - Every new injectable type is registered in its module's `ModuleInstaller.cs`.
 - No new warnings under `TreatWarningsAsErrors=true`
   ([src/Directory.Build.props](../../../src/Directory.Build.props)).
-- `Microsoft.Extensions.*` references stay aligned at version `10.0.1`.
+- Package versions match
+  [`package-management/references/canonical-versions.md`](../package-management/references/canonical-versions.md);
+  do not hard-code a remembered version in the review.
 - Any `NU1605` / `NU190x` warning surfaced by the diff → hand off to
   [dependency-audit](../dependency-audit/SKILL.md). Do not approve a PR that masks the warning.
 
