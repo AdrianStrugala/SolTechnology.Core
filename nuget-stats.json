@@ -1,159 +1,159 @@
 {
-  "lastUpdated": "2026-08-23T01:45:54Z",
   "packages": [
     {
-      "id": "SolTechnology.Avro.Kafka",
-      "downloads": 25281,
-      "version": "0.1.0"
+      "version": "0.1.0",
+      "downloads": 25346,
+      "id": "SolTechnology.Avro.Kafka"
     },
     {
-      "id": "SolTechnology.Avro.Http",
-      "downloads": 7554,
-      "version": "3.0.1"
+      "version": "3.0.1",
+      "downloads": 7557,
+      "id": "SolTechnology.Avro.Http"
     },
     {
-      "id": "SolTechnology.Core.ApiClient",
-      "downloads": 3793,
-      "version": "0.5.0"
+      "version": "0.5.0",
+      "downloads": 3794,
+      "id": "SolTechnology.Core.ApiClient"
     },
     {
-      "id": "SolTechnology.Core.CQRS",
-      "downloads": 3765,
-      "version": "1.0.0"
+      "version": "1.0.0",
+      "downloads": 3773,
+      "id": "SolTechnology.Core.CQRS"
     },
     {
-      "id": "SolTechnology.Core.Logging",
-      "downloads": 3416,
-      "version": "1.2.0"
+      "version": "1.2.0",
+      "downloads": 3428,
+      "id": "SolTechnology.Core.Logging"
     },
     {
-      "id": "SolTechnology.Core.SQL",
-      "downloads": 3052,
-      "version": "1.0.0"
+      "version": "1.0.0",
+      "downloads": 3068,
+      "id": "SolTechnology.Core.SQL"
     },
     {
-      "id": "SolTechnology.Core.Api",
-      "downloads": 2808,
-      "version": "1.0.0"
+      "version": "1.0.0",
+      "downloads": 2819,
+      "id": "SolTechnology.Core.Api"
     },
     {
-      "id": "SolTechnology.Core.MessageBus",
-      "downloads": 2697,
-      "version": "1.0.0"
+      "version": "1.0.0",
+      "downloads": 2708,
+      "id": "SolTechnology.Core.MessageBus"
     },
     {
-      "id": "SolTechnology.Core.BlobStorage",
-      "downloads": 2488,
-      "version": "0.5.0"
+      "version": "0.5.0",
+      "downloads": 2491,
+      "id": "SolTechnology.Core.BlobStorage"
     },
     {
-      "id": "SolTechnology.Core.Guards",
+      "version": "0.5.0",
       "downloads": 2434,
-      "version": "0.5.0"
+      "id": "SolTechnology.Core.Guards"
     },
     {
-      "id": "SolTechnology.Core.Authentication",
-      "downloads": 2028,
-      "version": "1.0.0"
+      "version": "1.0.0",
+      "downloads": 2030,
+      "id": "SolTechnology.Core.Authentication"
     },
     {
-      "id": "SolTechnology.Core.Cache",
-      "downloads": 1385,
-      "version": "1.0.0"
+      "version": "1.0.0",
+      "downloads": 1391,
+      "id": "SolTechnology.Core.Cache"
     },
     {
-      "id": "SolTechnology.Core.Scheduler",
-      "downloads": 1055,
-      "version": "0.5.0"
+      "version": "0.5.0",
+      "downloads": 1060,
+      "id": "SolTechnology.Core.Scheduler"
     },
     {
-      "id": "SolTechnology.Core.AUID",
-      "downloads": 985,
-      "version": "1.0.0"
+      "version": "1.0.0",
+      "downloads": 987,
+      "id": "SolTechnology.Core.AUID"
     },
     {
-      "id": "SolTechnology.Core.HTTP",
-      "downloads": 910,
-      "version": "1.0.0"
+      "version": "1.0.0",
+      "downloads": 918,
+      "id": "SolTechnology.Core.HTTP"
     },
     {
-      "id": "SolTechnology.Core.Flow",
+      "version": "1.0.0",
       "downloads": 797,
-      "version": "1.0.0"
+      "id": "SolTechnology.Core.Flow"
     },
     {
-      "id": "SolTechnology.DateTimeZone",
+      "version": "1.0.1",
       "downloads": 665,
-      "version": "1.0.1"
+      "id": "SolTechnology.DateTimeZone"
     },
     {
-      "id": "SolTechnology.Core",
-      "downloads": 635,
-      "version": "1.0.0"
+      "version": "1.0.0",
+      "downloads": 641,
+      "id": "SolTechnology.Core"
     },
     {
-      "id": "SolTechnology.Core.Story",
-      "downloads": 417,
-      "version": "0.8.0"
+      "version": "0.8.0",
+      "downloads": 424,
+      "id": "SolTechnology.Core.Story"
     },
     {
-      "id": "SolTechnology.Core.Testing",
-      "downloads": 416,
-      "version": "1.0.0"
+      "version": "1.0.0",
+      "downloads": 418,
+      "id": "SolTechnology.Core.Testing"
     },
     {
-      "id": "SolTechnology.Core.SQL.Testing",
-      "downloads": 347,
-      "version": "1.0.0"
+      "version": "1.0.0",
+      "downloads": 349,
+      "id": "SolTechnology.Core.SQL.Testing"
     },
     {
-      "id": "SolTechnology.Core.API.Testing",
-      "downloads": 340,
-      "version": "1.0.0"
+      "version": "1.0.0",
+      "downloads": 344,
+      "id": "SolTechnology.Core.API.Testing"
     },
     {
-      "id": "SolTechnology.Core.Faker",
+      "version": "1.0.0",
       "downloads": 319,
-      "version": "1.0.0"
+      "id": "SolTechnology.Core.Faker"
     },
     {
-      "id": "SolTechnology.Core.HTTP.Testing",
-      "downloads": 144,
-      "version": "1.0.0"
+      "version": "1.0.0",
+      "downloads": 145,
+      "id": "SolTechnology.Core.HTTP.Testing"
     },
     {
-      "id": "SolTechnology.Core.Redis.Testing",
-      "downloads": 137,
-      "version": "1.0.0"
+      "version": "1.0.0",
+      "downloads": 138,
+      "id": "SolTechnology.Core.Redis.Testing"
     },
     {
-      "id": "SolTechnology.Core.Tale",
-      "downloads": 132,
-      "version": "1.0.0"
+      "version": "1.0.0",
+      "downloads": 135,
+      "id": "SolTechnology.Core.Tale"
     },
     {
-      "id": "SolTechnology.Core.Hangfire",
-      "downloads": 130,
-      "version": "1.0.0"
+      "version": "1.0.0",
+      "downloads": 135,
+      "id": "SolTechnology.Core.Hangfire"
     },
     {
-      "id": "SolTechnology.Core.ServiceBus.Testing",
+      "version": "1.0.0",
       "downloads": 129,
-      "version": "1.0.0"
+      "id": "SolTechnology.Core.ServiceBus.Testing"
     },
     {
-      "id": "SolTechnology.Core.Blob",
-      "downloads": 125,
-      "version": "1.0.0"
+      "version": "1.0.0",
+      "downloads": 127,
+      "id": "SolTechnology.Core.Blob"
     },
     {
-      "id": "SolTechnology.Core.Blob.Testing",
-      "downloads": 124,
-      "version": "1.0.0"
+      "version": "1.0.0",
+      "downloads": 127,
+      "id": "SolTechnology.Core.Blob.Testing"
     }
   ],
+  "lastUpdated": "2026-08-30T04:55:13Z",
   "totals": {
-    "packages": 30,
-    "downloads": 68508
+    "downloads": 68697,
+    "packages": 30
   }
 }
