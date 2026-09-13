@@ -1,159 +1,159 @@
 {
-  "lastUpdated": "2026-09-06T04:04:42Z",
-  "totals": {
-    "packages": 30,
-    "downloads": 68916
-  },
   "packages": [
     {
       "id": "SolTechnology.Avro.Kafka",
-      "downloads": 25457,
+      "downloads": 25563,
       "version": "0.1.0"
     },
     {
       "id": "SolTechnology.Avro.Http",
-      "downloads": 7565,
+      "downloads": 7576,
       "version": "3.0.1"
     },
     {
       "id": "SolTechnology.Core.ApiClient",
-      "downloads": 3797,
+      "downloads": 3806,
       "version": "0.5.0"
     },
     {
       "id": "SolTechnology.Core.CQRS",
-      "downloads": 3781,
+      "downloads": 3788,
       "version": "1.0.0"
     },
     {
       "id": "SolTechnology.Core.Logging",
-      "downloads": 3436,
+      "downloads": 3449,
       "version": "1.2.0"
     },
     {
       "id": "SolTechnology.Core.SQL",
-      "downloads": 3079,
+      "downloads": 3092,
       "version": "1.0.0"
     },
     {
       "id": "SolTechnology.Core.Api",
-      "downloads": 2826,
+      "downloads": 2842,
       "version": "1.0.0"
     },
     {
       "id": "SolTechnology.Core.MessageBus",
-      "downloads": 2710,
+      "downloads": 2720,
       "version": "1.0.0"
     },
     {
       "id": "SolTechnology.Core.BlobStorage",
-      "downloads": 2493,
+      "downloads": 2498,
       "version": "0.5.0"
     },
     {
       "id": "SolTechnology.Core.Guards",
-      "downloads": 2435,
+      "downloads": 2441,
       "version": "0.5.0"
     },
     {
       "id": "SolTechnology.Core.Authentication",
-      "downloads": 2034,
+      "downloads": 2042,
       "version": "1.0.0"
     },
     {
       "id": "SolTechnology.Core.Cache",
-      "downloads": 1392,
+      "downloads": 1400,
       "version": "1.0.0"
     },
     {
       "id": "SolTechnology.Core.Scheduler",
-      "downloads": 1065,
+      "downloads": 1070,
       "version": "0.5.0"
     },
     {
       "id": "SolTechnology.Core.AUID",
-      "downloads": 990,
+      "downloads": 997,
       "version": "1.0.0"
     },
     {
       "id": "SolTechnology.Core.HTTP",
-      "downloads": 922,
+      "downloads": 929,
       "version": "1.0.0"
     },
     {
       "id": "SolTechnology.Core.Flow",
-      "downloads": 797,
+      "downloads": 803,
       "version": "1.0.0"
     },
     {
       "id": "SolTechnology.DateTimeZone",
-      "downloads": 670,
+      "downloads": 672,
       "version": "1.0.1"
     },
     {
       "id": "SolTechnology.Core",
-      "downloads": 653,
+      "downloads": 658,
       "version": "1.0.0"
     },
     {
       "id": "SolTechnology.Core.Story",
-      "downloads": 427,
+      "downloads": 434,
       "version": "0.8.0"
     },
     {
       "id": "SolTechnology.Core.Testing",
-      "downloads": 420,
+      "downloads": 423,
       "version": "1.0.0"
     },
     {
       "id": "SolTechnology.Core.SQL.Testing",
-      "downloads": 352,
+      "downloads": 354,
       "version": "1.0.0"
     },
     {
       "id": "SolTechnology.Core.API.Testing",
-      "downloads": 345,
+      "downloads": 349,
       "version": "1.0.0"
     },
     {
       "id": "SolTechnology.Core.Faker",
-      "downloads": 324,
+      "downloads": 326,
       "version": "1.0.0"
     },
     {
       "id": "SolTechnology.Core.HTTP.Testing",
-      "downloads": 147,
+      "downloads": 149,
       "version": "1.0.0"
     },
     {
       "id": "SolTechnology.Core.Redis.Testing",
-      "downloads": 139,
+      "downloads": 143,
       "version": "1.0.0"
     },
     {
       "id": "SolTechnology.Core.Tale",
-      "downloads": 136,
+      "downloads": 139,
       "version": "1.0.0"
     },
     {
       "id": "SolTechnology.Core.Hangfire",
-      "downloads": 136,
+      "downloads": 139,
       "version": "1.0.0"
     },
     {
       "id": "SolTechnology.Core.ServiceBus.Testing",
-      "downloads": 131,
+      "downloads": 137,
       "version": "1.0.0"
     },
     {
       "id": "SolTechnology.Core.Blob.Testing",
-      "downloads": 129,
+      "downloads": 131,
       "version": "1.0.0"
     },
     {
       "id": "SolTechnology.Core.Blob",
-      "downloads": 128,
+      "downloads": 130,
       "version": "1.0.0"
     }
-  ]
+  ],
+  "totals": {
+    "packages": 30,
+    "downloads": 69200
+  },
+  "lastUpdated": "2026-09-13T04:20:11Z"
 }
