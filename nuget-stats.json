@@ -1,159 +1,159 @@
 {
   "totals": {
-    "downloads": 71755,
+    "downloads": 72525,
     "packages": 30
   },
-  "lastUpdated": "2026-10-25T04:11:44Z",
   "packages": [
     {
       "id": "SolTechnology.Avro.Kafka",
       "version": "0.1.0",
-      "downloads": 26315
+      "downloads": 26594
     },
     {
       "id": "SolTechnology.Avro.Http",
       "version": "3.0.1",
-      "downloads": 7719
+      "downloads": 7873
     },
     {
       "id": "SolTechnology.Core.CQRS",
       "version": "1.0.0",
-      "downloads": 3969
+      "downloads": 3988
     },
     {
       "id": "SolTechnology.Core.ApiClient",
       "version": "0.5.0",
-      "downloads": 3923
+      "downloads": 3936
     },
     {
       "id": "SolTechnology.Core.Logging",
       "version": "1.2.0",
-      "downloads": 3575
+      "downloads": 3595
     },
     {
       "id": "SolTechnology.Core.SQL",
       "version": "1.0.0",
-      "downloads": 3201
+      "downloads": 3214
     },
     {
       "id": "SolTechnology.Core.Api",
       "version": "1.0.0",
-      "downloads": 2969
+      "downloads": 2991
     },
     {
       "id": "SolTechnology.Core.MessageBus",
       "version": "1.0.0",
-      "downloads": 2813
+      "downloads": 2832
     },
     {
       "id": "SolTechnology.Core.BlobStorage",
       "version": "0.5.0",
-      "downloads": 2571
+      "downloads": 2586
     },
     {
       "id": "SolTechnology.Core.Guards",
       "version": "0.5.0",
-      "downloads": 2516
+      "downloads": 2524
     },
     {
       "id": "SolTechnology.Core.Authentication",
       "version": "1.0.0",
-      "downloads": 2124
+      "downloads": 2136
     },
     {
       "id": "SolTechnology.Core.Cache",
       "version": "1.0.0",
-      "downloads": 1481
+      "downloads": 1494
     },
     {
       "id": "SolTechnology.Core.Scheduler",
       "version": "0.5.0",
-      "downloads": 1116
+      "downloads": 1122
     },
     {
       "id": "SolTechnology.Core.AUID",
       "version": "1.0.0",
-      "downloads": 1046
+      "downloads": 1056
     },
     {
       "id": "SolTechnology.Core.HTTP",
       "version": "1.0.0",
-      "downloads": 995
+      "downloads": 1009
     },
     {
       "id": "SolTechnology.Core.Flow",
       "version": "1.0.0",
-      "downloads": 831
+      "downloads": 843
+    },
+    {
+      "id": "SolTechnology.DateTimeZone",
+      "version": "2.0.0",
+      "downloads": 756
     },
     {
       "id": "SolTechnology.Core",
       "version": "1.0.0",
-      "downloads": 712
-    },
-    {
-      "id": "SolTechnology.DateTimeZone",
-      "version": "1.0.1",
-      "downloads": 700
+      "downloads": 724
     },
     {
       "id": "SolTechnology.Core.Story",
       "version": "0.8.0",
-      "downloads": 482
+      "downloads": 493
     },
     {
       "id": "SolTechnology.Core.Testing",
       "version": "1.0.0",
-      "downloads": 445
+      "downloads": 453
     },
     {
       "id": "SolTechnology.Core.API.Testing",
       "version": "1.0.0",
-      "downloads": 376
+      "downloads": 384
     },
     {
       "id": "SolTechnology.Core.SQL.Testing",
       "version": "1.0.0",
-      "downloads": 375
+      "downloads": 377
     },
     {
       "id": "SolTechnology.Core.Faker",
       "version": "1.0.0",
-      "downloads": 340
+      "downloads": 346
     },
     {
       "id": "SolTechnology.Core.HTTP.Testing",
       "version": "1.0.0",
-      "downloads": 175
+      "downloads": 179
     },
     {
       "id": "SolTechnology.Core.Tale",
       "version": "1.0.0",
-      "downloads": 170
-    },
-    {
-      "id": "SolTechnology.Core.Hangfire",
-      "version": "1.0.0",
-      "downloads": 170
+      "downloads": 176
     },
     {
       "id": "SolTechnology.Core.Redis.Testing",
       "version": "1.0.0",
-      "downloads": 167
+      "downloads": 176
+    },
+    {
+      "id": "SolTechnology.Core.Hangfire",
+      "version": "1.0.0",
+      "downloads": 175
     },
     {
       "id": "SolTechnology.Core.Blob.Testing",
       "version": "1.0.0",
-      "downloads": 162
+      "downloads": 166
     },
     {
       "id": "SolTechnology.Core.ServiceBus.Testing",
       "version": "1.0.0",
-      "downloads": 160
+      "downloads": 165
     },
     {
       "id": "SolTechnology.Core.Blob",
       "version": "1.0.0",
-      "downloads": 157
+      "downloads": 162
     }
-  ]
+  ],
+  "lastUpdated": "2026-11-01T05:32:50Z"
 }
