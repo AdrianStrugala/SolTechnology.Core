@@ -22,11 +22,6 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <!-- CVE-2025-6965 (GHSA-2m69-gcr7-jv3q): transitive via DreamTravel.SQLite. Sample-only. -->
-	  <NuGetAuditSuppress Include="https://github.com/advisories/GHSA-2m69-gcr7-jv3q" />
-	</ItemGroup>
-
-	<ItemGroup>
 	  <Content Update="appsettings.integration.tests.json">
 	    <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
 	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
