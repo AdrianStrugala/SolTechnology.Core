@@ -73,19 +73,20 @@ enables it purely through MSBuild properties (`PublishRepositoryUrl`, `EmbedUntr
 | Package | Version | Used by | Notes |
 |---|---|---|---|
 | `Microsoft.SqlServer.DacFx` | `170.4.83` | `SolTechnology.Core.SQL` (runtime, `SQLProjectDeployer`), `SolTechnology.Core.SQL.Testing` (dacpac deploy) | Stays in `SQL` even though testing moved out. |
-| `Testcontainers` | `4.12.0` | `SolTechnology.Core.Testing`, `SolTechnology.Core.SQL.Testing` | Container fixtures. **Family pinned to 4.12.0.** `ContainerLifecycleHelper.cs` was migrated to the 4.12.0 builder API (the old fluent shortcuts changed shape between 4.3.0 and 4.12.0). |
-| `Testcontainers.PostgreSql` | `4.12.0` | `SolTechnology.Core.SQL.Testing` | Postgres engine. Match `Testcontainers`. (MSSQL uses the generic builder — no `Testcontainers.MsSql`.) |
+| `Testcontainers` | `4.16.0` | `SolTechnology.Core.Testing`, `SolTechnology.Core.SQL.Testing` | Container fixtures. **Family pinned to 4.16.0** (floor 4.14.0: earlier versions pull SSH.NET 2025.1.0, NU1903 GHSA-q939-rpr3-3284 / GHSA-mggc-4xg6-vcxf). `ContainerLifecycleHelper.cs` uses the 4.12+ builder API. |
+| `Testcontainers.PostgreSql` | `4.16.0` | `SolTechnology.Core.SQL.Testing` | Postgres engine. Match `Testcontainers`. (MSSQL uses the generic builder — no `Testcontainers.MsSql`.) |
 | `Microsoft.Data.SqlClient` | `7.0.1` | `SolTechnology.Core.SQL.Testing` | MSSQL ADO provider + login probe. |
-| `Microsoft.Data.Sqlite.Core` | `10.0.9` | `DreamTravel.SQLite` (Sqlite persistence) | Drags `SQLitePCLRaw.lib.e_sqlite3` 2.1.11, which carries an unpatched NU1903 (CVE-2025-6965, no `first_patched_version` upstream yet) — left unmasked per dependency-audit §5 ("nothing to fix at source yet"), not introduced by this bump. |
-| `SQLitePCLRaw.bundle_green` | `2.1.11` | `DreamTravel.SQLite` | Pulls the same unpatched `SQLitePCLRaw.lib.e_sqlite3` 2.1.11 — see above. |
+| `Microsoft.Data.Sqlite.Core` | `10.0.9` | `DreamTravel.SQLite` (Sqlite persistence) | Native SQLite comes from `SQLitePCLRaw.bundle_e_sqlite3` below; do not reintroduce `bundle_green`. |
+| `SQLitePCLRaw.bundle_e_sqlite3` | `2.1.14` | `DreamTravel.SQLite` | Replaces `bundle_green` (no release after 2.1.11). Pulls `lib.e_sqlite3` 2.1.14, outside GHSA-2m69-gcr7-jv3q / CVE-2025-6965 (`<= 2.1.11`). |
+| `System.Security.Cryptography.Pkcs` | `10.0.13` | `SolTechnology.Core.SQL`, `SolTechnology.Core.SQL.Testing` | CVE override (GHSA-846f-f764-76mx / CVE-2026-84008, HIGH). `Microsoft.Data.SqlClient` 7.x drags vulnerable 9.0.x and no SqlClient release fixes it; user-confirmed leaf override (2026-11-02). Remove when SqlClient depends on a patched Pkcs. |
 | `Microsoft.EntityFrameworkCore` / `.Design` / `.InMemory` / `.SqlServer` | `10.0.9` | `SolTechnology.Core.SQL`-adjacent and DreamTravel data layers | Keep all four on the same minor. |
 | `Npgsql` | `10.0.3` | `SolTechnology.Core.SQL.Testing` | Postgres ADO provider. |
 | `Respawn` | `7.0.0` | `SolTechnology.Core.SQL.Testing` | Between-test database reset (SqlServer + Postgres adapters). |
 | `Scrutor` | `7.0.0` | DI assembly-scanning consumers | — |
-| `Testcontainers.Redis` | `4.12.0` | `SolTechnology.Core.Redis.Testing` | Redis container engine. Match `Testcontainers`. |
+| `Testcontainers.Redis` | `4.16.0` | `SolTechnology.Core.Redis.Testing` | Redis container engine. Match `Testcontainers`. |
 | `StackExchange.Redis` | `3.0.0` | `SolTechnology.Core.Cache`, `SolTechnology.Core.Redis.Testing` | `Core.Cache`: direct `IConnectionMultiplexer` for the distributed lock (`SET NX`) + Redis health check. `Redis.Testing`: `RedisFixture.FlushAsync()` (admin-mode `FLUSHALL`). |
-| `Testcontainers.Azurite` | `4.12.0` | `SolTechnology.Core.Blob.Testing` | Azurite (Azure Storage emulator) container engine. Match `Testcontainers`. |
-| `Testcontainers.ServiceBus` | `4.12.0` | `SolTechnology.Core.ServiceBus.Testing` | Azure Service Bus emulator engine. |
+| `Testcontainers.Azurite` | `4.16.0` | `SolTechnology.Core.Blob.Testing` | Azurite (Azure Storage emulator) container engine. Match `Testcontainers`. |
+| `Testcontainers.ServiceBus` | `4.16.0` | `SolTechnology.Core.ServiceBus.Testing` | Azure Service Bus emulator engine. |
 | `Docker.DotNet` | `3.125.15` | `SolTechnology.Core.Testing`, `SolTechnology.Core.ServiceBus.Testing` | Stable-name reuse + restart management for the emulator. |
 | `Neo4j.Driver` | `6.2.0` | `DreamTravel.GraphDatabase` | `IDriver` now implements `IAsyncDisposable` directly — dispose via `await Driver.DisposeAsync()`, not the old `CloseAsync()` + `Dispose()` pair. |
 | `Cronos` | `0.13.0` | `SolTechnology.Core.Scheduler`/Hangfire-adjacent cron parsing | — |
@@ -158,8 +159,8 @@ All test projects use **NUnit**. Canonical versions are centralized in `tests/Di
 
 | Package | Version | Used by | Notes |
 |---|---|---|---|
-| `Aspire.Hosting.AppHost` | `13.4.6` | `DreamTravel.AppHost` | — |
-| `Aspire.Hosting.SqlServer` | `13.4.6` | `DreamTravel.AppHost` | — |
+| `Aspire.Hosting.AppHost` | `13.6.4` | `DreamTravel.AppHost` | 13.6.x brings `MessagePack` 2.5.307 (clears GHSA-qhrr-8q5h-9q3h). `Aspire.AppHost.Sdk` matches. |
+| `Aspire.Hosting.SqlServer` | `13.6.4` | `DreamTravel.AppHost` | — |
 | `MudBlazor` | `9.5.0` | `DreamTravel.Ui` | — |
 | `Microsoft.AspNetCore.Components.WebAssembly` / `.DevServer` | `10.0.9` | `DreamTravel.Ui` | Match target framework minor. |
 | `Microsoft.Playwright.NUnit` | `1.60.0` | DreamTravel E2E tests | — |
