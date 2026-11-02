@@ -72,8 +72,8 @@ Baseline verified by the review (.NET SDK 10.0.100, Docker available):
 - [`2026-07-06-jwt-bearer-authentication.md`](2026-07-06-jwt-bearer-authentication.md) is still
   `planning`. Its step `02-api-key-hardening` duplicates `S5` and `http-api#4`, and its step
   `04-documentation` duplicates the `docs/Auth.md` drift rewrite (`http-api#11`). **Q5 decision
-  (user, 2026-11-02):** this feature owns the constant-time API-key fix (step 07) and the
-  `docs/Auth.md` rewrite (step 59). The JWT feature stays JWT-only; its own planner supersedes its
+  (user, 2026-11-02):** this feature owns the constant-time API-key fix (former step 07, now
+  api-auth 03) and the `docs/Auth.md` rewrite (former step 59, now api-auth 07). The JWT feature stays JWT-only; its own planner supersedes its
   steps 02 and 04. This feature does not edit that feature's files.
 - [`2026-06-29-release-1-0.md`](2026-06-29-release-1-0.md) is the precedent for release mechanics
   (`docs/release-runbook-1.0.md`).
@@ -89,12 +89,12 @@ recommendation is the planned default. The plan-reviewer and premortem may overt
 | A2 | Scope of automatic Tale persistence (`B8`, `Tale/ModuleInstaller.cs:108`) | (a) persist only runs started through `TaleManager`; (b) keep persisting all runs but add TTL/eviction to `InMemoryTaleRepository` | **(a).** Blue: removes the leak and PII retention at the source and matches the docs' "direct handler usage (no persistence)". Red: changes what lands in user repositories. Crux: no workspace consumer reads non-`TaleManager` runs from the repository (verify in premortem). |
 | A3 | `ITaleRepository` concurrency (`cqrs-tale#8`) | (a) `TaleInstance.Version` + `Save` returning `Task<Result>` with `ConflictError` on mismatch; (b) `Save` throws `TaleConcurrencyException`; (c) no concurrency, documented | **(a).** Uses the existing `ConflictError` and the Result-everywhere rule (Guide §13). Red: every custom repository must implement a conditional write. Accepted for 2.0. |
 | A4 | `IUnitOfWork.Begin` (`B3`) | (a) add `IUnitOfWork Begin(IsolationLevel)` to the interface and make it extend `IDisposable`; (b) `Begin` returns an `IAsyncDisposable` transaction scope; (c) open the scope in the constructor (scoped lifetime) | **(a).** Smallest change that makes the DI-resolved contract usable. (b) is cleaner but forces every caller to restructure `using` blocks. Confirmation `C-15`. |
-| A5 | `IMessageBusBroker` resolution (`B1`) | (a) make the constructor public; (b) register with a factory lambda and keep the constructor internal | **(b) in step 12**, then make the types internal in step 48 (`C-14`). Adds no public surface that 2.0 would remove again. |
+| A5 | `IMessageBusBroker` resolution (`B1`) | (a) make the constructor public; (b) register with a factory lambda and keep the constructor internal | **(b) in former step 12 (messagebus 02)**, then make the types internal in former step 48 (messagebus 04, `C-14`). Adds no public surface that 2.0 would remove again. |
 | A6 | Hangfire Smart Retry for plugin jobs (`infra#10`) | (a) `IJob.Execute` returns `Task<Result>` so `SmartRetryJobFilter` sees a `Result`; (b) keep `Task` and remove the claim from docs | **(a)** if `C-19` is confirmed, otherwise (b). Aligns jobs with Guide §13. |
 | A7 | `preventOverlap` (`B5`) | (a) implement through `PreventOverlapJobFilter` (already in `Hangfire/Filters/`); (b) delete the parameter | **(a).** Non-breaking, and the docs already promise it. |
 | A8 | Weekly NuGet stats bot (`repo#A5`) | (a) commit to a `stats` branch; (b) drop the bot and use shields.io NuGet badges; (c) keep committing to `master` with a ruleset bypass | **(c)**, decided by the user (Q7, 2026-11-02). `CLAUDE.md §2` keeps reading `nuget-stats.json` from `master`. Since decision A (user, 2026-11-02) `master` has no ruleset, so the bot pushes directly without a bypass actor (release feature). |
 | A9 | Leaked secrets in history (`S2`) | (a) revoke and leave history as is; (b) `git filter-repo` plus force-push | **(a)**, decided by the user (D1). |
-| A10 | `IncludeResponseBodyInException` per client (`http-api#6`) | (a) flow the named policy through a `DelegatingHandler`; (b) document it as per-request only | **(b)** in step 20 (simplicity). (a) is a follow-up. |
+| A10 | `IncludeResponseBodyInException` per client (`http-api#6`) | (a) flow the named policy through a `DelegatingHandler`; (b) document it as per-request only | **(b)** in former step 20 (http 03) (simplicity). (a) is a follow-up. |
 
 ## Scope
 
@@ -116,7 +116,11 @@ recommendation is the planned default. The plan-reviewer and premortem may overt
   self-consistency (`P1-6`) moved to showcase step 04 at the split.
 - **Phase H — Guide §9/§11 conformance**: size caps, primary constructors, `extension` blocks,
   braces and comments, and `[{Placeholder}]` log templates.
-- **Close** — retrospective (step 71).
+- **Close** — retrospective (former step 71; now core 09 plus one retrospective per library feature).
+
+Since the per-library regroup (user, 2026-11-02) phases A, B (DreamTravel and secrets), the
+zero-dependency package, the central XML-docs switch, and the close stay here; every library-scoped
+item of phases B–H is delivered by the library features listed under "Per-library regroup".
 
 Split off on 2026-11-02 (RQ8): the former phase I (flagship hygiene) and Guide self-consistency
 form [`2026-11-02-flagship-showcase-hygiene`](2026-11-02-flagship-showcase-hygiene.md); the former phases J–K (org transfer, release 2.0.0) form [`2026-11-02-org-transfer-and-2-0-release`](2026-11-02-org-transfer-and-2-0-release.md).
@@ -153,25 +157,154 @@ form [`2026-11-02-flagship-showcase-hygiene`](2026-11-02-flagship-showcase-hygie
 ## Implementation plan
 
 The steps are the execution units. Gates: review and premortem are both required (see
-`summary.md`). The premortem (step `00`) covers steps 01–70, because they edit
+`summary.md`). The premortem (step `00`) covers former steps 01–70, because they edit
 `ModuleInstaller.cs` files, `src/Directory.Build.props`, and persisted contracts
-(`CLAUDE.md §4`).
+(`CLAUDE.md §4`). Since the per-library regroup it also covers the library features' steps.
+
+### Per-library regroup (user, 2026-11-02)
+
+**Scope change 2026-11-02 (user: "podziel implementację feature 1 na każdą bibliotekę osobno"):**
+the implementation steps 05–70 were regrouped into one feature per library, each with its own
+dated brief, working folder, and retrospective, delivered end-to-end: correctness and broken-module
+fixes → 2.0 breaking API cleanup → XML docs and module docs → Coding Guide conformance and
+`[{Placeholder}]` log templates for that library. This feature keeps step 00 (premortem, `done`),
+01 (`done`), the foundation steps 02–04, the cross-cutting steps 05–08, and the umbrella
+retrospective 09. No step content was dropped; multi-library steps (former 10, 11, 17, 52, 55–61,
+65–71) were split into per-library pieces with their content preserved. This brief keeps the
+shared decision tables (`C-nn`, `P-nn`, `L-nn`, `A`, `AR`, `Q`, `RQ`); each library brief copies
+only the rows it owns.
+
+Gates of the library features: the core premortem verdict `go-with-mitigations (2026-11-02)` covers
+the regrouped steps (user decision, 2026-11-02), so every library records
+`premortem: skipped (… — user, 2026-11-02)`, except testing kits, which has no `CLAUDE.md §4`
+trigger and records `waived (… — planner, 2026-11-02)`. Each `RM-n` mitigation stays verbatim in
+the step that carries it. `review` is `pending` in every library summary: the planner may not waive
+a required gate, and no user skip reason was recorded.
+
+Notation: an unqualified step number is a step of this feature; `core NN` is also this feature;
+`result NN`, `logging NN`, `cqrs NN`, `auid NN`, `tale NN`, `http NN`, `api-auth NN`, `cache NN`,
+`sql NN`, `blob NN`, `messagebus NN`, `hangfire NN`, and `testing-kits NN` name step `NN` of the
+library features below; `showcase NN` and `release NN` name the split-off features. "Former step
+NN" and numbers in the historical tables of this brief (`Q`, `RQ`, `AR`, "Plan-review revisions",
+"Split", the phase table) are pre-regroup numbers; translate them with the table below.
+
+Delivery order (dependency-driven). Every library feature starts after core 02–04 are `done`.
+AUID moved ahead of Tale: `SolTechnology.Core.Tale` references `SolTechnology.Core.AUID`, and
+tale 14 guards the Tale JSON test that auid 03 adds.
+
+| Order | Short | Feature brief | Packages | Steps | Former steps | Builds on |
+|---|---|---|---|---|---|---|
+| 1 | `result` | [`2026-11-02-core-2-0-core-result`](2026-11-02-core-2-0-core-result.md) | `SolTechnology.Core` | 6 | 17, 38, 55, 60, 66, 70, 71 | core 02–04 |
+| 2 | `logging` | [`2026-11-02-core-2-0-logging`](2026-11-02-core-2-0-logging.md) | `SolTechnology.Core.Logging` | 8 | 10, 14, 30, 31, 52, 60, 66, 67, 70, 71 | core 02–04 |
+| 3 | `cqrs` | [`2026-11-02-core-2-0-cqrs`](2026-11-02-core-2-0-cqrs.md) | `SolTechnology.Core.CQRS` | 7 | 10, 23, 24, 55, 60, 66, 70, 71 | core 02–04; result, logging |
+| 4 | `auid` | [`2026-11-02-core-2-0-auid`](2026-11-02-core-2-0-auid.md) | `SolTechnology.Core.AUID` | 7 | 19, 35, 44, 55, 60, 67, 70, 71 | core 02–04 |
+| 5 | `tale` | [`2026-11-02-core-2-0-tale`](2026-11-02-core-2-0-tale.md) | `SolTechnology.Core.Tale` | 17 | 10, 17, 18, 25, 26, 27, 39, 40, 41, 42, 43, 55, 60, 62, 63, 70, 71 | core 02–04; result, auid |
+| 6 | `http` | [`2026-11-02-core-2-0-http`](2026-11-02-core-2-0-http.md) | `SolTechnology.Core.HTTP` | 11 | 05, 10, 20, 21, 45, 46, 56, 59, 64, 70, 71 | core 02–04; result, logging |
+| 7 | `api-auth` | [`2026-11-02-core-2-0-api-auth`](2026-11-02-core-2-0-api-auth.md) | `SolTechnology.Core.API`, `SolTechnology.Core.Authentication` | 10 | 06, 07, 10, 22, 52, 56, 59, 65, 66, 70, 71 | core 02–04; result, logging, http |
+| 8 | `cache` | [`2026-11-02-core-2-0-cache`](2026-11-02-core-2-0-cache.md) | `SolTechnology.Core.Cache` | 9 | 11, 28, 29, 47, 57, 60, 67, 70, 71 | core 02–04 |
+| 9 | `sql` | [`2026-11-02-core-2-0-sql`](2026-11-02-core-2-0-sql.md) | `SolTechnology.Core.SQL` | 8 | 11, 15, 33, 49, 57, 61, 69, 70, 71 | core 02–04; result |
+| 10 | `blob` | [`2026-11-02-core-2-0-blob`](2026-11-02-core-2-0-blob.md) | `SolTechnology.Core.Blob` | 6 | 16, 50, 57, 61, 69, 70, 71 | core 02–04 |
+| 11 | `messagebus` | [`2026-11-02-core-2-0-messagebus`](2026-11-02-core-2-0-messagebus.md) | `SolTechnology.Core.MessageBus` | 9 | 11, 12, 34, 48, 57, 61, 68, 70, 71 | core 02–04; logging |
+| 12 | `hangfire` | [`2026-11-02-core-2-0-hangfire`](2026-11-02-core-2-0-hangfire.md) | `SolTechnology.Core.Hangfire` | 8 | 11, 13, 32, 51, 57, 61, 69, 70, 71 | core 02–04; result, logging, cqrs |
+| 13 | `testing-kits` | [`2026-11-02-core-2-0-testing-kits`](2026-11-02-core-2-0-testing-kits.md) | `.Testing`, `.HTTP.Testing`, `.API.Testing`, `.SQL.Testing`, `.Redis.Testing`, `.Blob.Testing`, `.ServiceBus.Testing` | 7 | 36, 37, 53, 56, 58, 59, 60, 61, 65, 68, 69, 70, 71 | core 02–04; http, api-auth, sql, cache, blob, messagebus |
+
+Remaining foundation steps: core 05 and 06 may run at any time; core 07 (zero-dependency base
+package) runs after core 04; core 08 (central `GenerateDocumentationFile`) runs after every library
+XML-docs step; core 09 closes this feature last, after every library feature is `completed`.
+
+Former → current step mapping (`*` = only the library-scoped part of the former repository-wide
+`[{Placeholder}]` and empty-`catch` check, carried in that library's conformance step):
+
+| Former | Title | Now |
+|---|---|---|
+| 00 | Run premortem (gate) | core 00 |
+| 01 | Clear NU1903 — Testcontainers and DreamTravel parent bumps, Pkcs override in SQL | core 01 |
+| 02 | Fail CI on any test-project failure | core 02 |
+| 03 | Publish to nuget.org only from `v*` tags behind a protected environment | core 03 |
+| 04 | Bump every package to 2.0.0 | core 04 |
+| 05 | HTTP — never retry unsafe verbs after an exception or timeout | http 02 |
+| 06 | Keep upstream URIs and query strings out of `ProblemDetails` and exception messages | api-auth 02 |
+| 07 | Authentication — constant-time API-key comparison and per-instance logger | api-auth 03 |
+| 08 | DreamTravel — Development-only developer exception page | core 05 |
+| 09 | Remove leaked-secret artifacts and personal settings; record revocation | core 06 |
+| 10 | DI resolution tests — application modules | logging 01, cqrs 01, tale 01, http 01, api-auth 01 |
+| 11 | DI resolution tests — infrastructure modules | cache 01, sql 01, messagebus 01, hangfire 01 |
+| 12 | MessageBus — resolvable broker, registered health-check client, correlation service | messagebus 02 |
+| 13 | Hangfire — implement `preventOverlap`; register the correlation service | hangfire 02 |
+| 14 | Logging — `AddSolLogging(IConfiguration)` registers its middleware dependencies | logging 02 |
+| 15 | SQL — `Begin` on `IUnitOfWork` | sql 02 |
+| 16 | Blob — thread-safe container cache with async creation | blob 01 |
+| 17 | Core — open `Error` polymorphism; `AggregateError` round-trip | result 01, tale 02 |
+| 18 | Tale — per-run state isolation; persist only `TaleManager`-driven runs | tale 03 |
+| 19 | AUID — culture-invariant formatting, range-checked parsing, English overflow message | auid 01 |
+| 20 | HTTP — request pipeline correctness | http 03 |
+| 21 | HTTP — upstream health-check disposal and options validation | http 04 |
+| 22 | Api — keep 201/202 in `ResultConversionFilter`; real filter registration | api-auth 04 |
+| 23 | CQRS — descriptive missing-handler errors and interface-based dispatch | cqrs 02 |
+| 24 | CQRS — log failed `Result`s as failures | cqrs 03 |
+| 25 | Tale engine — caller-only cancellation, no resume of failed tales, deterministic tests | tale 04 |
+| 26 | Tale — registration and schema safety, correct log scope | tale 05 |
+| 27 | Tale controller — consistent JSON options, no internal detail in responses | tale 06 |
+| 28 | Cache — local cache fault eviction, single flight, and a correct local lock | cache 02 |
+| 29 | Cache — type-namespaced keys, validated non-empty `InstanceName`, validated options | cache 03 |
+| 30 | Logging — segment-aware path matching; one Error entry per failure | logging 03 |
+| 31 | Logging — sanitize inbound correlation IDs; safe timings and masking | logging 04 |
+| 32 | Hangfire — restore ambient correlation state; async, cancellable event dispatch | hangfire 03 |
+| 33 | SQL — transient-only connection retry, safer error translation, options validation | sql 03 |
+| 34 | MessageBus — receiver settlement matches its contract; publish→receive round-trip | messagebus 03 |
+| 35 | AUID — standards-compliant converters; honest uniqueness and ordering docs | auid 02 |
+| 36 | API and HTTP testing kits — dispose the test host; strict WireMock by default | testing-kits 01 |
+| 37 | Container fixtures — per-instance state; honour Ryuk settings | testing-kits 02 |
+| 38 | Core — immutable `Result` and a typed `Result<T>.FailAsTask` | result 02 |
+| 39 | Tale — `CancellationToken` on chapters | tale 07 |
+| 40 | Tale — `ITaleRepository` 2.0 signatures (cancellation and names) | tale 08 |
+| 41 | Tale — optimistic concurrency on `ITaleRepository.Save` | tale 09 |
+| 42 | Tale — chapter history keyed by step index and full type name | tale 10 |
+| 43 | Tale — explicit HTTP exposure; internal plumbing types | tale 11 |
+| 44 | AUID — `SolTechnology.Core.AUID` namespace; no process-wide `TimeProvider` | auid 03 |
+| 45 | HTTP — own namespace for `HttpClientExtensions`; factory-based upstream health check | http 05 |
+| 46 | HTTP — drop `Async` from `RequestBuilder` verbs (optional) | http 06 |
+| 47 | Cache — drop `Async` from lock and idempotency contracts | cache 04 |
+| 48 | MessageBus — internal implementation types | messagebus 04 |
+| 49 | SQL — internal implementations; safe-by-default DACPAC deployment | sql 04 |
+| 50 | Blob — 2.0 surface (own namespace, cancellation, atomic metadata, internal factory) | blob 02 |
+| 51 | Hangfire — recurring job contract for 2.0 | hangfire 04 |
+| 52 | Logging, Authentication, and Api — public surface cleanup | logging 05, api-auth 05 |
+| 53 | Testing kits — 2.0 surface (optional `Async` renames, WireMock fields) | testing-kits 03 |
+| 54 | Packaging — a truly zero-dependency `SolTechnology.Core` | core 07 |
+| 55 | XML docs shipped — Core, CQRS, Tale, AUID | result 03, cqrs 04, auid 04, tale 12 |
+| 56 | XML docs shipped — HTTP, HTTP.Testing, Api, API.Testing, Authentication | http 07, api-auth 06, testing-kits 04 |
+| 57 | XML docs shipped — Cache, MessageBus, SQL, Blob, Hangfire | cache 05, sql 05, blob 03, messagebus 05, hangfire 05 |
+| 58 | XML docs shipped — testing kits, then one central switch | core 08, testing-kits 04 |
+| 59 | Module docs — Api, Clients, HTTP checklist, API/HTTP testing, Auth | http 08, api-auth 07, testing-kits 05 |
+| 60 | Module docs — Core, CQRS, Tale, AUID, Cache, Log, Redis.Testing | result 04, logging 06, cqrs 05, auid 05, tale 13, cache 06, testing-kits 05 |
+| 61 | Module docs — Bus, Hangfire, SQL, Blob, Testing kits | sql 06, blob 04, messagebus 06, hangfire 06, testing-kits 05 |
+| 62 | Guide conformance — Tale engine split | tale 14 |
+| 63 | Guide conformance — Tale controller, manager, handler, `Tale`, and tests | tale 15 |
+| 64 | Guide conformance — HTTP | http 09 |
+| 65 | Guide conformance — Api, Authentication file names, HTTP.Testing | api-auth 08, testing-kits 06 |
+| 66 | Guide conformance — CQRS, Core, Authentication | result 05, logging 07, cqrs 06, api-auth 08 |
+| 67 | Guide conformance — Logging, Cache, AUID | logging 07, auid 06, cache 07 |
+| 68 | Guide conformance — MessageBus and ServiceBus.Testing | messagebus 07, testing-kits 06 |
+| 69 | Guide conformance — SQL, Blob, Hangfire, and the remaining testing kits | sql 07, blob 05, hangfire 07, testing-kits 06 |
+| 70 | Log templates — `[{Placeholder}]` everywhere (log contract change L-03) | tale 16, http 10, api-auth 09, cache 08, messagebus 08, result 05*, logging 07*, cqrs 06*, auid 06*, sql 07*, blob 05*, hangfire 07*, testing-kits 06* |
+| 71 | Retrospective | core 09, result 06, logging 08, cqrs 07, auid 07, tale 17, http 11, api-auth 10, cache 09, sql 08, blob 06, messagebus 09, hangfire 08, testing-kits 07 |
 
 **Scope change 2026-11-02:** credential scrub dropped (user decision B: "czy DreamTravel nie miało
 haseł tylko lokalnych w repo? Jeżeli tak, to zostaw."); premortem mitigations referring to it are
-void. Step 08 keeps only the `S6` Development-only exception page (and its fix-on-touch CORS
+void. Former step 08 (now core 05) keeps only the `S6` Development-only exception page (and its fix-on-touch CORS
 `chore:`); AR-6 records the accepted risk. Rows that described the `master` ruleset and stats-bot
 bypass now point at user decision A (2026-11-02, no `master` ruleset; see the release feature).
 `review` stays `done (2026-11-02)` and the step 00 verdict stands: both changes only remove
 user-decided scope and add no step, file, contract, or dependency.
 
 **Split-off features (RQ8, user, 2026-11-02):** [`2026-11-02-flagship-showcase-hygiene`](2026-11-02-flagship-showcase-hygiene.md) (depends on
-steps 02, 03, 04, 08, 18, 22, 38, 39, 43, 44, 54 of this feature) and
-[`2026-11-02-org-transfer-and-2-0-release`](2026-11-02-org-transfer-and-2-0-release.md) (depends on this feature and the showcase feature being
-`completed`). Each has its own review, premortem, and retrospective.
+core 02, 03, 04, 05, 07, result 02, tale 03, 07, 11, api-auth 04, and auid 03; former steps 02,
+03, 04, 08, 18, 22, 38, 39, 43, 44, 54) and
+[`2026-11-02-org-transfer-and-2-0-release`](2026-11-02-org-transfer-and-2-0-release.md) (depends on this feature, every library feature, the showcase feature, and
+[`2026-11-02-logging-chronicle`](2026-11-02-logging-chronicle.md) being `completed`). Each has its own review, premortem, and retrospective.
 
-Notation: an unqualified step number is a step of this feature; `showcase NN` and `release NN`
-name step `NN` of the two split-off features.
+Original phase layout (former step numbers; see "Per-library regroup" for the current location):
 
 | Phase | Steps | Notes |
 |---|---|---|
@@ -278,32 +411,32 @@ in the plan-review answers (RQ5, RQ6, user, 2026-11-02).
 
 | ID | Package | Exact change | Step |
 |---|---|---|---|
-| C-01 | all | `src/Directory.Build.props` `<Version>1.0.0</Version>` → `2.0.0`; delete `<Version>1.2.0</Version>` from `src/SolTechnology.Core.Logging/SolTechnology.Core.Logging.csproj:4` (Logging 1.2.0 → 2.0.0) | 04 |
-| C-02 | Core | `Result.IsSuccess { get; init; }`, `Result.Error { get; init; }`, `Result<T>.Data { get; init; }` (`Result.cs:11,17,52`) → `private init`; NEW `Result<T>.FailAsTask(Error)` returning `Task<Result<T>>` | 38 |
-| C-03 | Tale | `IChapter<TContext>.Read(TContext)` (`IChapter.cs:25`) and `Chapter<TContext>.Read(TContext)` (`Chapter.cs:37`) → `Read(TContext context, CancellationToken cancellationToken)` | 39 |
-| C-04 | Tale | `IInteractiveChapter<TContext,TChapterInput>.ReadWithInput(TContext, TChapterInput)` (`IInteractiveChapter.cs:22`) and `InteractiveChapter<,>.ReadWithInput` (`InteractiveChapter.cs:28`) → add `CancellationToken cancellationToken` | 39 |
-| C-05 | Tale | `ITaleRepository`: `FindById(Auid)` → `FindById(Auid, CancellationToken)`; `FindByIdempotencyKey(string)` → `(string, CancellationToken)`; `ListAsync(...)` → `List(..., CancellationToken)`; `SaveAsync(TaleInstance)` → `Task<Result> Save(TaleInstance, CancellationToken)` (returns `ConflictError` on version mismatch); `DeleteAsync(Auid)` → `Delete(Auid, CancellationToken)`; the same on `InMemoryTaleRepository`; NEW `TaleInstance.Version` (`long`) | 40 (signatures), 41 (`Version`, `ConflictError`) |
-| C-06 | Tale | DELETE `TaleOptions.RestrictControllerToRegisteredHandlers` (`TaleOptions.cs:24`); `TaleHandlerRegistry.Register(Type)` (`ModuleInstaller.cs:21`) → `internal`; NEW `ITaleBuilder.ExposeOverHttp<THandler>()` opt-in | 43 |
-| C-07 | Tale | `SolTechnology.Core.Tale.Models.SchemaBuilder` (`Models/DataField.cs:36`) → `internal` | 43 |
-| C-08 | AUID | `Auid`, `AuidTypeConverter`, `AuidJsonConverter` move from the global namespace to `SolTechnology.Core.AUID`; both converters become `sealed` | 44 |
-| C-09 | AUID | DELETE static `Auid.TimeProvider { get; set; }` (`Auid.cs:40`); NEW `Auid.New(string? code, TimeProvider timeProvider)` and `Auid.New<T>(TimeProvider timeProvider)` | 44 |
-| C-10 | HTTP | `System.Net.Http.HttpClientExtensions` (`HttpClientExtensions.cs:4`, both `CreateRequest` overloads) → `SolTechnology.Core.HTTP.HttpClientExtensions` | 45 |
-| C-11 | HTTP | `BaseUpstreamServiceHealthCheck<TReport>` primary constructor: `HttpClient` parameter → `IHttpClientFactory httpClientFactory, string httpClientName`; `AddSolUpstreamHttpHealthCheck<TCheck>` stops registering `TCheck` as a singleton that captures an `HttpClient` | 45 |
-| C-12 | HTTP (optional) | `RequestBuilder.GetAsync/PostAsync/PutAsync/PatchAsync/DeleteAsync` (plus the `<TResponse>` overloads) and `TryGetAsync/TryPostAsync/TryPutAsync/TryPatchAsync/TryDeleteAsync<TResponse>` lose the `Async` suffix | 46 |
-| C-13 | Cache | `IDistributedLockService.TryAcquireLockAsync` → `TryAcquireLock`; `IIdempotencyStore.TryAddAsync/GetAsync/SetResponseAsync/RemoveAsync` → `TryAdd/Get/SetResponse/Remove` | 47 |
-| C-14 | MessageBus | `MessageBusBroker`, `IMessageBusBroker` (with `EnsureInitializedAsync`), `MessagePublisher`, `MessageBusReceiver` → `internal` | 48 |
-| C-15 | SQL | `IUnitOfWork` gains `IUnitOfWork Begin(IsolationLevel isolationLevel = IsolationLevel.ReadCommitted)` and extends `IDisposable`; `UnitOfWork.Begin` return type `UnitOfWork` → `IUnitOfWork` | 15 |
-| C-16 | SQL | `SQLConnectionFactory`, `UnitOfWork` → `internal` | 49 |
-| C-17 | SQL | `SQLProjectDeployer.DeployDacpacAsync(string, string, string, CancellationToken)` → `DeployDacpac(string dacpacPath, string connectionString, string databaseName, ILogger logger, DacDeployOptions? deployOptions = null, CancellationToken ct = default)`, with `BlockOnPossibleDataLoss = true` by default | 49 |
-| C-18 | Blob | `BlobConnectionFactory` → `internal`; `BlobContainerClientExtensions` namespace `Azure.Storage.Blobs` → `SolTechnology.Core.Blob`; `ReadFromBlob<T>` and both `WriteToBlob` overloads gain `CancellationToken ct = default` | 50 |
-| C-19 | Hangfire | `IJob.Execute(CancellationToken)` returns `Task<Result>` instead of `Task`; `AddSolRecurringJob<TJob>` gains optional `string? jobId = null, TimeZoneInfo? timeZone = null` (binary break) | 51 |
-| C-20 | Logging | `ILoggerExtensions` (`ILoggerExtensions.cs:12`) → `LoggerExtensions` with an `extension(ILogger logger)` block; `CoreLoggingActivitySources.Operations` (`CoreLoggingActivitySources.cs:32`) → `internal`; `OperationsName` stays public and CQRS creates its own `ActivitySource` with that name (RQ9) | 52 |
-| C-21 | Authentication | `ApiKeyAuthenticationSchemeOptions.ApiKey` public field → `{ get; set; }` property; `ApiKeyAuthenticationHandler` constructor drops the `ILogger<ApiKeyAuthenticationHandler> logger` parameter (uses the inherited `Logger`) | 52 |
-| C-22 | Api | `ConfigureSwaggerOptions` (`Api/ModuleInstaller.cs:247`) → `internal sealed` | 52 |
-| C-23 | Testing kits (optional) | Drop `Async`: `AzuriteFixture.InitializeAsync/ClearAsync/CreateBlobContainerAsync`, `RedisFixture.InitializeAsync/FlushAsync`, `SQLFixture.InitializeAsync/ResetAsync`, `ServiceBusFixture.InitializeAsync` (also gains `CancellationToken ct = default`), `ContainerLifecycleHelper.EnsureRunningAsync/WaitForAmqpReadyAsync/WaitForHealthyAsync` | 53 |
-| C-24 | HTTP.Testing (optional) | `WireMockStartup.WireMockServer` public field → get-only property; DELETE unused abstract `FakeApiBase.BaseUrl` | 53 |
-| C-26 | Tale (additive) | NEW public `SolTechnology.Core.Tale.Persistence.TaleJsonOptions` with `JsonSerializerOptions Default { get; }` (moved from the internal `Orchestration.TaleJsonOptions`, read-only instance); used by `TaleInstance.Clone()` and documented for custom repositories (RQ5) | 17 |
-| C-27 | MessageBus (additive) | NEW `MessageBusConfiguration.MaxDeliveryCount` (`int`, default 10) used by the receiver to dead-letter on the last attempt (RQ6) | 34 |
+| C-01 | all | `src/Directory.Build.props` `<Version>1.0.0</Version>` → `2.0.0`; delete `<Version>1.2.0</Version>` from `src/SolTechnology.Core.Logging/SolTechnology.Core.Logging.csproj:4` (Logging 1.2.0 → 2.0.0) | core 04 |
+| C-02 | Core | `Result.IsSuccess { get; init; }`, `Result.Error { get; init; }`, `Result<T>.Data { get; init; }` (`Result.cs:11,17,52`) → `private init`; NEW `Result<T>.FailAsTask(Error)` returning `Task<Result<T>>` | result 02 |
+| C-03 | Tale | `IChapter<TContext>.Read(TContext)` (`IChapter.cs:25`) and `Chapter<TContext>.Read(TContext)` (`Chapter.cs:37`) → `Read(TContext context, CancellationToken cancellationToken)` | tale 07 |
+| C-04 | Tale | `IInteractiveChapter<TContext,TChapterInput>.ReadWithInput(TContext, TChapterInput)` (`IInteractiveChapter.cs:22`) and `InteractiveChapter<,>.ReadWithInput` (`InteractiveChapter.cs:28`) → add `CancellationToken cancellationToken` | tale 07 |
+| C-05 | Tale | `ITaleRepository`: `FindById(Auid)` → `FindById(Auid, CancellationToken)`; `FindByIdempotencyKey(string)` → `(string, CancellationToken)`; `ListAsync(...)` → `List(..., CancellationToken)`; `SaveAsync(TaleInstance)` → `Task<Result> Save(TaleInstance, CancellationToken)` (returns `ConflictError` on version mismatch); `DeleteAsync(Auid)` → `Delete(Auid, CancellationToken)`; the same on `InMemoryTaleRepository`; NEW `TaleInstance.Version` (`long`) | tale 08 (signatures), tale 09 (`Version`, `ConflictError`) |
+| C-06 | Tale | DELETE `TaleOptions.RestrictControllerToRegisteredHandlers` (`TaleOptions.cs:24`); `TaleHandlerRegistry.Register(Type)` (`ModuleInstaller.cs:21`) → `internal`; NEW `ITaleBuilder.ExposeOverHttp<THandler>()` opt-in | tale 11 |
+| C-07 | Tale | `SolTechnology.Core.Tale.Models.SchemaBuilder` (`Models/DataField.cs:36`) → `internal` | tale 11 |
+| C-08 | AUID | `Auid`, `AuidTypeConverter`, `AuidJsonConverter` move from the global namespace to `SolTechnology.Core.AUID`; both converters become `sealed` | auid 03 |
+| C-09 | AUID | DELETE static `Auid.TimeProvider { get; set; }` (`Auid.cs:40`); NEW `Auid.New(string? code, TimeProvider timeProvider)` and `Auid.New<T>(TimeProvider timeProvider)` | auid 03 |
+| C-10 | HTTP | `System.Net.Http.HttpClientExtensions` (`HttpClientExtensions.cs:4`, both `CreateRequest` overloads) → `SolTechnology.Core.HTTP.HttpClientExtensions` | http 05 |
+| C-11 | HTTP | `BaseUpstreamServiceHealthCheck<TReport>` primary constructor: `HttpClient` parameter → `IHttpClientFactory httpClientFactory, string httpClientName`; `AddSolUpstreamHttpHealthCheck<TCheck>` stops registering `TCheck` as a singleton that captures an `HttpClient` | http 05 |
+| C-12 | HTTP (optional) | `RequestBuilder.GetAsync/PostAsync/PutAsync/PatchAsync/DeleteAsync` (plus the `<TResponse>` overloads) and `TryGetAsync/TryPostAsync/TryPutAsync/TryPatchAsync/TryDeleteAsync<TResponse>` lose the `Async` suffix | http 06 |
+| C-13 | Cache | `IDistributedLockService.TryAcquireLockAsync` → `TryAcquireLock`; `IIdempotencyStore.TryAddAsync/GetAsync/SetResponseAsync/RemoveAsync` → `TryAdd/Get/SetResponse/Remove` | cache 04 |
+| C-14 | MessageBus | `MessageBusBroker`, `IMessageBusBroker` (with `EnsureInitializedAsync`), `MessagePublisher`, `MessageBusReceiver` → `internal` | messagebus 04 |
+| C-15 | SQL | `IUnitOfWork` gains `IUnitOfWork Begin(IsolationLevel isolationLevel = IsolationLevel.ReadCommitted)` and extends `IDisposable`; `UnitOfWork.Begin` return type `UnitOfWork` → `IUnitOfWork` | sql 02 |
+| C-16 | SQL | `SQLConnectionFactory`, `UnitOfWork` → `internal` | sql 04 |
+| C-17 | SQL | `SQLProjectDeployer.DeployDacpacAsync(string, string, string, CancellationToken)` → `DeployDacpac(string dacpacPath, string connectionString, string databaseName, ILogger logger, DacDeployOptions? deployOptions = null, CancellationToken ct = default)`, with `BlockOnPossibleDataLoss = true` by default | sql 04 |
+| C-18 | Blob | `BlobConnectionFactory` → `internal`; `BlobContainerClientExtensions` namespace `Azure.Storage.Blobs` → `SolTechnology.Core.Blob`; `ReadFromBlob<T>` and both `WriteToBlob` overloads gain `CancellationToken ct = default` | blob 02 |
+| C-19 | Hangfire | `IJob.Execute(CancellationToken)` returns `Task<Result>` instead of `Task`; `AddSolRecurringJob<TJob>` gains optional `string? jobId = null, TimeZoneInfo? timeZone = null` (binary break) | hangfire 04 |
+| C-20 | Logging | `ILoggerExtensions` (`ILoggerExtensions.cs:12`) → `LoggerExtensions` with an `extension(ILogger logger)` block; `CoreLoggingActivitySources.Operations` (`CoreLoggingActivitySources.cs:32`) → `internal`; `OperationsName` stays public and CQRS creates its own `ActivitySource` with that name (RQ9) | logging 05 |
+| C-21 | Authentication | `ApiKeyAuthenticationSchemeOptions.ApiKey` public field → `{ get; set; }` property; `ApiKeyAuthenticationHandler` constructor drops the `ILogger<ApiKeyAuthenticationHandler> logger` parameter (uses the inherited `Logger`) | api-auth 05 |
+| C-22 | Api | `ConfigureSwaggerOptions` (`Api/ModuleInstaller.cs:247`) → `internal sealed` | api-auth 05 |
+| C-23 | Testing kits (optional) | Drop `Async`: `AzuriteFixture.InitializeAsync/ClearAsync/CreateBlobContainerAsync`, `RedisFixture.InitializeAsync/FlushAsync`, `SQLFixture.InitializeAsync/ResetAsync`, `ServiceBusFixture.InitializeAsync` (also gains `CancellationToken ct = default`), `ContainerLifecycleHelper.EnsureRunningAsync/WaitForAmqpReadyAsync/WaitForHealthyAsync` | testing-kits 03 |
+| C-24 | HTTP.Testing (optional) | `WireMockStartup.WireMockServer` public field → get-only property; DELETE unused abstract `FakeApiBase.BaseUrl` | testing-kits 03 |
+| C-26 | Tale (additive) | NEW public `SolTechnology.Core.Tale.Persistence.TaleJsonOptions` with `JsonSerializerOptions Default { get; }` (moved from the internal `Orchestration.TaleJsonOptions`, read-only instance); used by `TaleInstance.Clone()` and documented for custom repositories (RQ5) | tale 02 |
+| C-27 | MessageBus (additive) | NEW `MessageBusConfiguration.MaxDeliveryCount` (`int`, default 10) used by the receiver to dead-letter on the last attempt (RQ6) | messagebus 03 |
 | C-25 | Guards, Scheduler | **Rejected (Q1, user, 2026-11-02).** Was: DELETE projects `src/SolTechnology.Core.Guards`, `src/SolTechnology.Core.Scheduler`, `tests/SolTechnology.Core.Guards.Tests` (all public symbols) | — (step removed) |
 
 **Not planned** (recorded so the omission is deliberate, per `naming-and-public-api.md`):
@@ -318,30 +451,30 @@ parameter; `UntilAsync`, `CheckHealthAsync`, `InvokeAsync`, `StartAsync`/`StopAs
 
 | ID | Change | Consumer impact | Step |
 |---|---|---|---|
-| P-01 | `Error` subtypes not registered serialize as their nearest ancestor; Tale errors gain discriminators through `TaleJsonOptions.Default`, which `TaleInstance.Clone()` and the DreamTravel SQLite repository now use | JSON shape for unknown subtypes; no more `NotSupportedException`; custom repositories must use `TaleJsonOptions.Default` to keep Tale error types (`C-26`) | 17 |
-| P-02 | Only `TaleManager`-driven runs are persisted | Custom repositories stop receiving direct-handler runs | 18 |
-| P-03 | Chapter history keyed by step index + `Type.FullName` | In-flight persisted tales created by 1.x cannot resume; migration note | 42 |
-| P-04 | `TaleInstance.Version` persisted; conditional save | Custom repositories and the DreamTravel SQLite schema add a `Version` column | 41 |
-| P-05 | New event jobs target `Task DispatchInScope(IEvent, CancellationToken)` (internal type, persisted job signature); the 1.x `DispatchInScope(IEvent)` overload stays for 2.x (RQ10) | Already-enqueued 1.x event jobs still run; the legacy overload is removed in 3.0 | 32 |
-| P-06 | Recurring job id `Type.Name` → `Type.FullName`; stale tracked ids and legacy `Type.Name` ids removed at start (RQ10) | Old recurring entries are removed automatically and re-created under new ids; no double firing | 51 |
-| P-07 | Cache keys namespaced by `TKey`/`TItem`; `DistributedCacheConfiguration.InstanceName` has no default and is validated non-empty at start (no `required` keyword) | Existing Redis entries are orphaned (cold cache); config without `InstanceName` fails at start | 29 |
-| P-08 | `AuidJsonConverter` throws `JsonException` on invalid input; empty string no longer becomes `Auid.Empty` | Error type at deserialization | 35 |
-| P-09 | 5xx `ProblemDetails.title` is a fixed text; `HttpRequestFailedException.Message` has no query string | Clients that parsed the title | 06 |
-| P-10 | POST/PATCH not retried after an exception or timeout | Fewer retries for unsafe verbs | 05 |
-| P-11 | `WireMockStartup` `AllowPartialMapping` defaults to `false` | Loose tests start failing (intended) | 36 |
-| P-12 | `TaleController` serves only handlers opted in via `ExposeOverHttp<T>()` | Endpoints that worked implicitly return 404 | 43 |
-| P-13 | `SolTechnology.Core` no longer brings `Microsoft.Extensions.*` transitively | Consumers relying on the transitive reference must add it | 54 |
-| P-14 | Inbound `X-Correlation-Id` outside `[A-Za-z0-9._:-]` is replaced | Clients sending such IDs see a new ID | 31 |
-| P-15 | A failed request logs one Error entry, not two | Error-rate alerts change | 30 |
-| P-16 | API key in the request is compared as a SHA-256 hash in constant time | None functional | 07 |
-| P-17 | The receiver dead-letters a failing message when `DeliveryCount >= MessageBusConfiguration.MaxDeliveryCount` (default 10) instead of always abandoning | Set `MaxDeliveryCount` to the entity's value; a lower value dead-letters earlier than the broker would | 34 |
+| P-01 | `Error` subtypes not registered serialize as their nearest ancestor; Tale errors gain discriminators through `TaleJsonOptions.Default`, which `TaleInstance.Clone()` and the DreamTravel SQLite repository now use | JSON shape for unknown subtypes; no more `NotSupportedException`; custom repositories must use `TaleJsonOptions.Default` to keep Tale error types (`C-26`) | result 01, tale 02 |
+| P-02 | Only `TaleManager`-driven runs are persisted | Custom repositories stop receiving direct-handler runs | tale 03 |
+| P-03 | Chapter history keyed by step index + `Type.FullName` | In-flight persisted tales created by 1.x cannot resume; migration note | tale 10 |
+| P-04 | `TaleInstance.Version` persisted; conditional save | Custom repositories and the DreamTravel SQLite schema add a `Version` column | tale 09 |
+| P-05 | New event jobs target `Task DispatchInScope(IEvent, CancellationToken)` (internal type, persisted job signature); the 1.x `DispatchInScope(IEvent)` overload stays for 2.x (RQ10) | Already-enqueued 1.x event jobs still run; the legacy overload is removed in 3.0 | hangfire 03 |
+| P-06 | Recurring job id `Type.Name` → `Type.FullName`; stale tracked ids and legacy `Type.Name` ids removed at start (RQ10) | Old recurring entries are removed automatically and re-created under new ids; no double firing | hangfire 04 |
+| P-07 | Cache keys namespaced by `TKey`/`TItem`; `DistributedCacheConfiguration.InstanceName` has no default and is validated non-empty at start (no `required` keyword) | Existing Redis entries are orphaned (cold cache); config without `InstanceName` fails at start | cache 03 |
+| P-08 | `AuidJsonConverter` throws `JsonException` on invalid input; empty string no longer becomes `Auid.Empty` | Error type at deserialization | auid 02 |
+| P-09 | 5xx `ProblemDetails.title` is a fixed text; `HttpRequestFailedException.Message` has no query string | Clients that parsed the title | api-auth 02 |
+| P-10 | POST/PATCH not retried after an exception or timeout | Fewer retries for unsafe verbs | http 02 |
+| P-11 | `WireMockStartup` `AllowPartialMapping` defaults to `false` | Loose tests start failing (intended) | testing-kits 01 |
+| P-12 | `TaleController` serves only handlers opted in via `ExposeOverHttp<T>()` | Endpoints that worked implicitly return 404 | tale 11 |
+| P-13 | `SolTechnology.Core` no longer brings `Microsoft.Extensions.*` transitively | Consumers relying on the transitive reference must add it | core 07 |
+| P-14 | Inbound `X-Correlation-Id` outside `[A-Za-z0-9._:-]` is replaced | Clients sending such IDs see a new ID | logging 04 |
+| P-15 | A failed request logs one Error entry, not two | Error-rate alerts change | logging 03 |
+| P-16 | API key in the request is compared as a SHA-256 hash in constant time | None functional | api-auth 03 |
+| P-17 | The receiver dead-letters a failing message when `DeliveryCount >= MessageBusConfiguration.MaxDeliveryCount` (default 10) instead of always abandoning | Set `MaxDeliveryCount` to the entity's value; a lower value dead-letters earlier than the broker would | messagebus 03 |
 
 ### Log contract changes (Guide §15 "report only", accepted for 2.0)
 
 - **L-01** `LoggingPipelineBehavior` logs `Result.Fail` as a failure with the error type
-  (`CQRS/PipelineBehaviors/LoggingPipelineBehavior.cs:55-57`). Step 24.
+  (`CQRS/PipelineBehaviors/LoggingPipelineBehavior.cs:55-57`). Step: cqrs 03.
 - **L-02** `HttpPolicyFactory` retry log passes the exception as the first argument, so the
-  `{Exception}` placeholder disappears (`HttpPolicyFactory.cs:140-143`). Step 20.
+  `{Exception}` placeholder disappears (`HttpPolicyFactory.cs:140-143`). Step: http 03.
 - **L-03** `[{Placeholder}]` brackets in every module:
   - Tale: `TaleEngine.cs`, `TaleHandler.cs`, `TaleManager.cs`, `TaleController.cs`
     (`cqrs-tale#24`).
@@ -352,23 +485,26 @@ parameter; `UntilAsync`, `CheckHealthAsync`, `InvokeAsync`, `StartAsync`/`StopAs
     `[{IdempotencyKey}]`.
   - MessageBus: the receiver and publisher (`infra#20`).
 
-  Step 70.
-- **L-04** `SQLProjectDeployer` logs through `ILogger` instead of `Console.WriteLine`. Step 49.
-- **L-05** Tale log scope carries the real `TaleId` instead of `Auid.Empty`. Step 26.
+  Steps: tale 16, api-auth 09, http 10, cache 08, messagebus 08; every other library checks its
+  templates in its conformance step (result 05, logging 07, cqrs 06, auid 06, sql 07, blob 05,
+  hangfire 07, testing-kits 06).
+- **L-04** `SQLProjectDeployer` logs through `ILogger` instead of `Console.WriteLine`. Step: sql 04.
+- **L-05** Tale log scope carries the real `TaleId` instead of `Auid.Empty`. Step: tale 05.
 
 ### Release-notes inputs (consumed by release 05)
 
 Release 05 writes `CHANGELOG.md` and `docs/migration-2.0.md` from this brief after this feature's
 working folder is deleted. Its inputs are the `C-nn`, `P-nn`, and `L-nn` tables above, as amended
-by `Deviations`, plus these notes from the steps:
+by the `Deviations` of this brief and of every library brief (see "Per-library regroup"), plus
+these notes from the steps:
 
-- Step 19: `Auid.TryParse` rejects an out-of-range ID that 1.x parsed and stored. Such IDs had
+- auid 01 (former step 19): `Auid.TryParse` rejects an out-of-range ID that 1.x parsed and stored. Such IDs had
   corrupted code bits, so they never round-tripped.
-- Step 32 (P-05): 1.x event jobs keep running in 2.x; the legacy one-argument overload is removed
+- hangfire 03 (former step 32, P-05): 1.x event jobs keep running in 2.x; the legacy one-argument overload is removed
   in 3.0. No queue drain is needed.
-- Step 41 (P-04): custom repositories add a `Version` column and a conditional write; DreamTravel's
+- tale 09 (former step 41, P-04): custom repositories add a `Version` column and a conditional write; DreamTravel's
   SQLite file is migrated on start.
-- Step 04: 1.x hotfixes, if ever needed, branch from the `v1.0.0` tag, never from `master`.
+- core 04: 1.x hotfixes, if ever needed, branch from the `v1.0.0` tag, never from `master`.
 
 ### Resolved questions (user answers, 2026-11-02)
 
@@ -410,7 +546,8 @@ The plan-reviewer's critique raised twelve questions. The user answered all of t
 
 ### Accepted risks (consequences of the 2026-11-02 decisions)
 
-The retrospective (step 71) carries each item it owns into `Follow-ups`; AR-3 and the release half
+The retrospectives (core 09 and the library retrospectives; former step 71) carry each item they own
+into `Follow-ups`; AR-3 and the release half
 of AR-5 are carried by the release feature, and AR-4 also by the showcase feature.
 
 | ID | Risk | Source | Mitigation in this plan |
@@ -434,7 +571,7 @@ of AR-5 are carried by the release feature, and AR-4 also by the showcase featur
       and `SQL.Testing` with a removal comment, and the removal is listed under `Follow-ups`.
 - [ ] `publishPackages.yml` pushes to nuget.org only for `refs/tags/v*`, through a GitHub
       environment that has required reviewers and existed before the workflow change merged.
-- [ ] Owner confirmation is recorded in step 09, and copied into `Completion summary` by step 71,
+- [ ] Owner confirmation is recorded in core 06, and copied into `Completion summary` by core 09,
       that both zip keys, the four history Google keys, and the `talecodeservicebus` SAS key are
       revoked or their resources deleted.
 - [ ] `git ls-files | grep -E "\.zip$|\.idea/|settings\.local\.json"` prints nothing.
@@ -445,20 +582,23 @@ of AR-5 are carried by the release feature, and AR-4 also by the showcase featur
       on `4097d47f` and passes at feature close.
 - [ ] `S5` (timing leak, not functionally observable) is covered by a source check
       (`CryptographicOperations.FixedTimeEquals` present, no string equality on the key) plus the
-      handler unit-test matrix (step 07).
+      handler unit-test matrix (api-auth 03).
 - [ ] `S6` is covered by a DreamTravel component test that runs the API in the `Production`
       environment and asserts that an unhandled exception returns no developer exception page
-      (step 08).
+      (core 05).
 - [ ] The confirmed `C-01`…`C-24`, `C-26`, and `C-27` shipped, and `C-25` (rejected) did not: `src/SolTechnology.Core.Guards`,
       `src/SolTechnology.Core.Scheduler`, and `tests/SolTechnology.Core.Guards.Tests` still exist.
 - [ ] Every `docs/<Module>.md` referenced by a `PackageReadmeSource` compiles: each C# snippet
-      builds in a throwaway console app against the 2.0 packages (recorded in steps 59–61).
+      builds in a throwaway console app against the 2.0 packages (recorded in each library feature's
+      module-docs step).
 - [ ] `GenerateDocumentationFile` is `true` for every packable project via `src/Directory.Build.props`.
 - [ ] No `src/SolTechnology.Core.*/**/*.cs` file exceeds 150 lines
       (`find src -name "*.cs" -not -path "*/obj/*" | xargs wc -l | awk '$1>150'` lists none
       except `total`).
 - [ ] `dotnet msbuild src/SolTechnology.Core.CQRS/SolTechnology.Core.CQRS.csproj -getProperty:Version`
       prints `2.0.0`, and no `v2.*` tag exists (publishing 2.0.0 is release 05).
+
+- [ ] Every library feature brief listed under "Per-library regroup" is `status: completed`.
 
 The community-file, README quick-start, and Dependabot criteria moved to the showcase feature;
 the license, organization, Trusted Publishing, published-2.0.0, and stats-bot criteria moved to

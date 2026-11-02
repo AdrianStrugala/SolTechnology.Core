@@ -23,7 +23,7 @@ interim `NUGET_API_KEY` is revoked only after it succeeds (AR-5).
 - GitHub environment `nuget-release` and nuget.org — MANUAL (owner) — after the `v2.0.0` publish succeeds, delete the interim `NUGET_API_KEY` secret and revoke the key on nuget.org (step 04)
 
 ## Changes
-- Source of the release notes and migration guide: the [`2026-11-02-core-2-0-flagship-hardening`](../../2026-11-02-core-2-0-flagship-hardening.md) brief — tables "Public API changes requiring `CLAUDE.md §2` confirmation" (`C-nn`), "Behavioural and persisted-contract breaks" (P-01…P-17), "Log contract changes" (L-01…L-05), and "Release-notes inputs" (including the core step 19 AUID note and the core step 32 P-05 note). Its `Deviations` and `Completion summary` override the planned rows.
+- Source of the release notes and migration guide: the [`2026-11-02-core-2-0-flagship-hardening`](../../2026-11-02-core-2-0-flagship-hardening.md) brief — tables "Public API changes requiring `CLAUDE.md §2` confirmation" (`C-nn`), "Behavioural and persisted-contract breaks" (P-01…P-17), "Log contract changes" (L-01…L-05), and "Release-notes inputs" (including the `auid 01` AUID note, the `hangfire 03` P-05 note, and the `tale 09` P-04 note; former core steps 19, 32, 41). Its `Deviations` and `Completion summary`, and those of every library feature brief listed in its "Per-library regroup" section, override the planned rows. The [`2026-11-02-logging-chronicle`](../../2026-11-02-logging-chronicle.md) brief contributes its own release-notes inputs.
 
 ## Acceptance criteria
 - [ ] The `publish` job succeeded for `v2.0.0`.

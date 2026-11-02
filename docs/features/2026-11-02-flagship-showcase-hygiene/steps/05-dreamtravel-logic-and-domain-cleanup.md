@@ -34,7 +34,7 @@ planned").
 
 ## Changes
 - `git mv` for renames to keep history.
-- Prerequisite: core step 39 is merged ([`2026-11-02-core-2-0-flagship-hardening`](../../2026-11-02-core-2-0-flagship-hardening.md)); it edits the same `DreamTravel.Queries` chapter files.
+- Prerequisite: tale 07 ([`2026-11-02-core-2-0-tale`](../../2026-11-02-core-2-0-tale.md); former core step 39) is merged; it edits the same `DreamTravel.Queries` chapter files.
 - Persisted-contract note (premortem trigger, found at the split on 2026-11-02): DreamTravel registers `AddSolPersistentEvents()` (`DreamTravel.Api/Program.cs:125`, `DreamTravel.Worker/Program.cs:55`), so `CitySearched` is stored as a Hangfire job argument. Moving it from `DreamTravel.Domain.Events` to `DreamTravel.Queries.Events` changes the stored type name; jobs enqueued before the move may fail to deserialize. The premortem (step 00) decides the mitigation.
 
 ## Acceptance criteria

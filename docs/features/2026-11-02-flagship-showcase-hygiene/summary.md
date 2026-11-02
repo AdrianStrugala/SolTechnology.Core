@@ -12,8 +12,9 @@ Tracks temporary implementation state for
 Gate order: `review` (plan-reviewer) → step `00` premortem → steps `01`–`07` → `08` retrospective.
 Split from
 [`../2026-11-02-core-2-0-flagship-hardening.md`](../2026-11-02-core-2-0-flagship-hardening.md) on
-2026-11-02 (RQ8, user). Implementation starts only after core steps 02, 03, 04, 08, 18, 22, 38,
-39, 43, 44, and 54 are `done` (per-step table in the brief). No step is `blocked`.
+2026-11-02 (RQ8, user). Implementation starts only after core 02, 03, 04, 05, 07, result 02,
+auid 03, tale 03, 07, 11, and api-auth 04 are `done` (former core steps 02, 03, 04, 08, 54, 38,
+44, 18, 39, 43, 22; per-step table and links in the brief). No step is `blocked`.
 
 ## Steps
 

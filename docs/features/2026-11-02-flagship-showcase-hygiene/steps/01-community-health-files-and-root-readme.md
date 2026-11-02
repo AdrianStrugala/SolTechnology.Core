@@ -41,9 +41,9 @@ Both are missing pieces; they ship as one PR (merged during plan review, RQ11):
 
 ## Changes
 - English only. Each community file stays under one screen; link to existing docs instead of copying them.
-- The quick-start snippet compiles against 2.0: copy it into a throwaway console project (not committed) that references `src/SolTechnology.Core.CQRS` through a `ProjectReference` or a local `dotnet pack` feed, then run `dotnet build` (the method of core step 59). Release 05 repeats the check against the published 2.0.0 package.
+- The quick-start snippet compiles against 2.0: copy it into a throwaway console project (not committed) that references `src/SolTechnology.Core.CQRS` through a `ProjectReference` or a local `dotnet pack` feed, then run `dotnet build` (the method of api-auth 07 and the other module-docs steps; former core step 59). Release 05 repeats the check against the published 2.0.0 package.
 - Badge and doc URLs keep `AdrianStrugala` until release step 02 ([`2026-11-02-org-transfer-and-2-0-release`](../../2026-11-02-org-transfer-and-2-0-release.md)).
-- Prerequisite: core steps 04, 38, and 54 are merged, so the quick start compiles against the final 2.0 `Result` and package graph ([`2026-11-02-core-2-0-flagship-hardening`](../../2026-11-02-core-2-0-flagship-hardening.md)).
+- Prerequisite: core 04 and core 07 ([`2026-11-02-core-2-0-flagship-hardening`](../../2026-11-02-core-2-0-flagship-hardening.md)) and result 02 ([`2026-11-02-core-2-0-core-result`](../../2026-11-02-core-2-0-core-result.md)) are merged (former core steps 04, 54, 38), so the quick start compiles against the final 2.0 `Result` and package graph.
 
 ## Acceptance criteria
 - [ ] GitHub "Community Standards" page (Insights → Community) shows every item checked after merge.

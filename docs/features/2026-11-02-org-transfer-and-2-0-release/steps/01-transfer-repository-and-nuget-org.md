@@ -20,7 +20,9 @@ a clean `master`. No repository file changes except this step's Deviations.
 
 ## Changes
 - Pre-checks:
-  - The [`2026-11-02-core-2-0-flagship-hardening`](../../2026-11-02-core-2-0-flagship-hardening.md) brief is `status: completed`, and its Completion summary records the core step 09 revocation dates.
+  - The [`2026-11-02-core-2-0-flagship-hardening`](../../2026-11-02-core-2-0-flagship-hardening.md) brief is `status: completed`, and its Completion summary records the core step 06 (former 09) revocation dates.
+  - Every library feature brief is `status: completed`: [`2026-11-02-core-2-0-core-result`](../../2026-11-02-core-2-0-core-result.md), [`2026-11-02-core-2-0-logging`](../../2026-11-02-core-2-0-logging.md), [`2026-11-02-core-2-0-cqrs`](../../2026-11-02-core-2-0-cqrs.md), [`2026-11-02-core-2-0-auid`](../../2026-11-02-core-2-0-auid.md), [`2026-11-02-core-2-0-tale`](../../2026-11-02-core-2-0-tale.md), [`2026-11-02-core-2-0-http`](../../2026-11-02-core-2-0-http.md), [`2026-11-02-core-2-0-api-auth`](../../2026-11-02-core-2-0-api-auth.md), [`2026-11-02-core-2-0-cache`](../../2026-11-02-core-2-0-cache.md), [`2026-11-02-core-2-0-sql`](../../2026-11-02-core-2-0-sql.md), [`2026-11-02-core-2-0-blob`](../../2026-11-02-core-2-0-blob.md), [`2026-11-02-core-2-0-messagebus`](../../2026-11-02-core-2-0-messagebus.md), [`2026-11-02-core-2-0-hangfire`](../../2026-11-02-core-2-0-hangfire.md), [`2026-11-02-core-2-0-testing-kits`](../../2026-11-02-core-2-0-testing-kits.md).
+  - The [`2026-11-02-logging-chronicle`](../../2026-11-02-logging-chronicle.md) brief is `status: completed`.
   - The [`2026-11-02-flagship-showcase-hygiene`](../../2026-11-02-flagship-showcase-hygiene.md) brief is `status: completed`.
   - CI on `master` is green.
 - GitHub: Settings → Danger Zone → Transfer → `sol-technology`.

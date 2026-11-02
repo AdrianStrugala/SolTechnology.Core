@@ -25,19 +25,29 @@ transfer. Success means:
 
 ## Context
 
-**Depends on:** [`2026-11-02-core-2-0-flagship-hardening`](2026-11-02-core-2-0-flagship-hardening.md)
-steps 02, 03, 04, 08, 18, 22, 38, 39, 43, 44, and 54 are `done`. The whole core feature does not
-need to be `completed`. Per step:
+**Depends on** (rewritten 2026-11-02 after the per-library regroup of the core feature; former core
+step numbers in parentheses):
 
-| Step here | Core steps required | Why |
+- [`2026-11-02-core-2-0-flagship-hardening`](2026-11-02-core-2-0-flagship-hardening.md) steps
+  02, 03, 04, 05 (08), and 07 (54) are `done`;
+- [`2026-11-02-core-2-0-core-result`](2026-11-02-core-2-0-core-result.md) step 02 (38),
+  [`2026-11-02-core-2-0-auid`](2026-11-02-core-2-0-auid.md) step 03 (44),
+  [`2026-11-02-core-2-0-tale`](2026-11-02-core-2-0-tale.md) steps 03 (18), 07 (39), and 11 (43), and
+  [`2026-11-02-core-2-0-api-auth`](2026-11-02-core-2-0-api-auth.md) step 04 (22) are `done`.
+
+None of these features needs to be `completed`. Notation: `core NN` names a step of the core
+(foundation) feature; `result NN`, `auid NN`, `tale NN`, and `api-auth NN` name steps of the library
+features above. Per step:
+
+| Step here | Steps required | Why |
 |---|---|---|
-| 01 | 04, 38, 54 | The README quick start compiles against the 2.0 version, the immutable `Result` (`C-02`), and the zero-dependency base package (P-13). |
-| 02 | 02, 03 | Same workflow file; core 03 adds the `publish` job and the `actions/upload-artifact`/`actions/download-artifact` uses pinned here. |
-| 03 | 08, 22 | Core 08 adds the Production component test in the same test project; core 22 makes `ResultConversionFilter` turn a failed `Result` into ProblemDetails. |
-| 04 | 08, 18, 43, 44 | Guide §15 marks the "dupa" example fixed by core 08 as historical; `CLAUDE.md §11` rows must match core 18, 43, 44. Also requires step 03 here. |
-| 05 | 39 | Core 39 edits the same `DreamTravel.Queries` chapter files. |
-| 06 | — | None since 2026-11-02: core 08 no longer adds `dotnet user-secrets` commands or edits `docker-compose.yml` (decision B, user, 2026-11-02: local-only DreamTravel dev credentials stay committed). |
-| 07 | 02, 03 | Core 02 fixes the runner scope; core 03 creates the `build`/`publish` job layout the new job joins. Also requires step 02 here. |
+| 01 | core 04, result 02, core 07 | The README quick start compiles against the 2.0 version, the immutable `Result` (`C-02`), and the zero-dependency base package (P-13). |
+| 02 | core 02, core 03 | Same workflow file; core 03 adds the `publish` job and the `actions/upload-artifact`/`actions/download-artifact` uses pinned here. |
+| 03 | core 05, api-auth 04 | Core 05 adds the Production component test in the same test project; api-auth 04 makes `ResultConversionFilter` turn a failed `Result` into ProblemDetails. |
+| 04 | core 05, tale 03, tale 11, auid 03 | Guide §15 marks the "dupa" example fixed by core 05 as historical; `CLAUDE.md §11` rows must match tale 03, tale 11, and auid 03. Also requires step 03 here. |
+| 05 | tale 07 | Tale 07 edits the same `DreamTravel.Queries` chapter files. |
+| 06 | — | None since 2026-11-02: core 05 (former 08) no longer adds `dotnet user-secrets` commands or edits `docker-compose.yml` (decision B, user, 2026-11-02: local-only DreamTravel dev credentials stay committed). |
+| 07 | core 02, core 03 | Core 02 fixes the runner scope; core 03 creates the `build`/`publish` job layout the new job joins. Also requires step 02 here. |
 
 [`2026-11-02-org-transfer-and-2-0-release`](2026-11-02-org-transfer-and-2-0-release.md) depends
 on this feature being `completed`.
@@ -70,7 +80,8 @@ feature. It moved here as step 04 because it must run after step 03 (post-review
 presents `CalculateBestPathController` as the `IMediator` template, and §15 lists controller
 `try/catch` as a live example; only step 03 fixes both. Keeping it in the core feature would make
 the core feature depend on this one while this one depends on the core feature. Its other
-prerequisites (core 08, 18, 43, 44) point in the allowed direction. Step 01's
+prerequisites (core 05, tale 03, tale 11, auid 03; former core 08, 18, 43, 44) point in the
+allowed direction. Step 01's
 `docs/deprecated-packages.md` Guards row names the same BCL guards that step 04 writes into Guide
 §12, so both now live in one feature.
 
@@ -139,21 +150,23 @@ edits in steps 02 and 07 are not a `CLAUDE.md §4` trigger by themselves.
 
 **Scope change 2026-11-02 (user decisions A and B):** `dreamtravel-tests` runs on push and PR but
 is not a required check, because `master` gets no ruleset (A); step 06 no longer depends on core
-08, because the local-only DreamTravel dev credentials stay committed (B). `review` stays
+05 (former 08), because the local-only DreamTravel dev credentials stay committed (B). `review` stays
 `done (2026-11-02)`: no step, file, contract, or dependency is added; `premortem` is still
 `pending` and runs on this revised plan.
 
 Notation: an unqualified step number is a step of this feature; `core NN` and `release NN` name
 step `NN` of [`2026-11-02-core-2-0-flagship-hardening`](2026-11-02-core-2-0-flagship-hardening.md)
-and [`2026-11-02-org-transfer-and-2-0-release`](2026-11-02-org-transfer-and-2-0-release.md).
+and [`2026-11-02-org-transfer-and-2-0-release`](2026-11-02-org-transfer-and-2-0-release.md);
+`result NN`, `auid NN`, `tale NN`, and `api-auth NN` name steps of the core 2.0 library features
+listed in "Depends on". The "Post-review core no." column below uses pre-regroup numbers.
 
 | Step | Post-review core no. | Title | Notes |
 |---|---|---|---|
 | 00 | — | Run premortem | Gate; runs after review. |
 | 01 | 71 | Community health files and root README | `SECURITY.md` names Private Vulnerability Reporting, enabled in release 03. `CHANGELOG.md` 2.0.0 section filled in release 05. |
 | 02 | 72 | Workflow supply-chain hardening | After core 02 and 03. |
-| 03 | 73 | DreamTravel — mediator-only, thin controllers | After core 08 and 22. |
-| 04 | 74 | Coding Guide self-consistency | After step 03 and core 08, 18, 43, 44. |
+| 03 | 73 | DreamTravel — mediator-only, thin controllers | After core 05 and api-auth 04. |
+| 04 | 74 | Coding Guide self-consistency | After step 03, core 05, tale 03, tale 11, and auid 03. |
 | 05 | 75 | DreamTravel — logic and domain cleanup | Premortem-gated (`ModuleInstaller.cs`, persisted event type). |
 | 06 | 76 | DreamTravel — run instructions and architecture section | No core prerequisite since decision B (2026-11-02). |
 | 07 | 77 | DreamTravel — tests in GitHub CI | After step 02. Runs on push and PR; not a required check (decision A, user, 2026-11-02: no `master` ruleset). |

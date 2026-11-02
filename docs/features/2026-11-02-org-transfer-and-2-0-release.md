@@ -26,9 +26,27 @@ the product site can present it next to AvroConvert. Success means:
 
 ## Context
 
-**Depends on:** [`2026-11-02-core-2-0-flagship-hardening`](2026-11-02-core-2-0-flagship-hardening.md)
-and [`2026-11-02-flagship-showcase-hygiene`](2026-11-02-flagship-showcase-hygiene.md) are both
-`status: completed`. Step 01 pre-checks this before the transfer.
+**Depends on** (updated 2026-11-02 after the per-library regroup of the core feature): all of the
+following briefs are `status: completed`. Step 01 pre-checks this before the transfer.
+
+- [`2026-11-02-core-2-0-flagship-hardening`](2026-11-02-core-2-0-flagship-hardening.md) (foundation
+  and umbrella);
+- the 13 library features listed in its "Per-library regroup" section:
+  [`2026-11-02-core-2-0-core-result`](2026-11-02-core-2-0-core-result.md),
+  [`2026-11-02-core-2-0-logging`](2026-11-02-core-2-0-logging.md),
+  [`2026-11-02-core-2-0-cqrs`](2026-11-02-core-2-0-cqrs.md),
+  [`2026-11-02-core-2-0-auid`](2026-11-02-core-2-0-auid.md),
+  [`2026-11-02-core-2-0-tale`](2026-11-02-core-2-0-tale.md),
+  [`2026-11-02-core-2-0-http`](2026-11-02-core-2-0-http.md),
+  [`2026-11-02-core-2-0-api-auth`](2026-11-02-core-2-0-api-auth.md),
+  [`2026-11-02-core-2-0-cache`](2026-11-02-core-2-0-cache.md),
+  [`2026-11-02-core-2-0-sql`](2026-11-02-core-2-0-sql.md),
+  [`2026-11-02-core-2-0-blob`](2026-11-02-core-2-0-blob.md),
+  [`2026-11-02-core-2-0-messagebus`](2026-11-02-core-2-0-messagebus.md),
+  [`2026-11-02-core-2-0-hangfire`](2026-11-02-core-2-0-hangfire.md),
+  [`2026-11-02-core-2-0-testing-kits`](2026-11-02-core-2-0-testing-kits.md);
+- [`2026-11-02-flagship-showcase-hygiene`](2026-11-02-flagship-showcase-hygiene.md);
+- [`2026-11-02-logging-chronicle`](2026-11-02-logging-chronicle.md).
 
 ### Origin
 
@@ -56,7 +74,7 @@ The 2026-11-02 review against `master@4097d47f` found:
 
 ### Decisions that apply (user, 2026-11-02)
 
-- **D1 — Secrets.** The owner revokes the leaked keys (recorded by core step 09). Git history is
+- **D1 — Secrets.** The owner revokes the leaked keys (recorded by core step 06, former 09). Git history is
   not rewritten: no `git filter-repo`, no force-push. Org secret scanning and push protection are
   enabled after the transfer (step 03).
 - **D2 — Versioning.** 2.0 is a major release. The confirmed public API changes (`C-01`…`C-24`,
@@ -140,10 +158,11 @@ and runs on this revised plan.
 
 Notation: an unqualified step number is a step of this feature; `core NN` and `showcase NN` name
 step `NN` of [`2026-11-02-core-2-0-flagship-hardening`](2026-11-02-core-2-0-flagship-hardening.md)
-and [`2026-11-02-flagship-showcase-hygiene`](2026-11-02-flagship-showcase-hygiene.md). Those
-features' working folders are deleted before this feature starts, so steps here cite their briefs
-(`Completion summary`, `Deviations`, and the core "Release-notes inputs" section), not their step
-files.
+and [`2026-11-02-flagship-showcase-hygiene`](2026-11-02-flagship-showcase-hygiene.md); library
+short names (`result`, `auid`, `hangfire`, …) name the core 2.0 library features listed in "Depends
+on". All those features' working folders are deleted before this feature starts, so steps here
+cite their briefs (`Completion summary`, `Deviations`, and the core "Release-notes inputs"
+section), not their step files.
 
 | Step | Post-review core no. | Title | Notes |
 |---|---|---|---|

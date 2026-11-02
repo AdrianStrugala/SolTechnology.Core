@@ -23,7 +23,7 @@ switch; the README documents the equivalents instead).
 - `sample-tale-code-apps/DreamTravel/docker-compose.yml` — EDIT or DELETE — keep only if the README references it
 
 ## Changes
-- No core prerequisite: since decision B (user, 2026-11-02) core step 08 ([`2026-11-02-core-2-0-flagship-hardening`](../../2026-11-02-core-2-0-flagship-hardening.md)) no longer adds `dotnet user-secrets` commands or edits `docker-compose.yml`.
+- No core prerequisite: since decision B (user, 2026-11-02) core 05 ([`2026-11-02-core-2-0-flagship-hardening`](../../2026-11-02-core-2-0-flagship-hardening.md); former core step 08) no longer adds `dotnet user-secrets` commands or edits `docker-compose.yml`.
 - Verify the instructions on a clean clone (macOS or Windows) and note the platform in the PR.
 
 ## Acceptance criteria
