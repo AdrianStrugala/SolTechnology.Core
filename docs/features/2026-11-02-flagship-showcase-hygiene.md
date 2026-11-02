@@ -1,0 +1,187 @@
+---
+status: planned
+created: 2026-11-02
+completed:
+---
+
+# SolTechnology.Core — flagship showcase hygiene
+
+> Historical delivery record. It may not describe the current system.
+
+## Goal
+
+Make the repository presentable as the Sol Technology organization's flagship before the org
+transfer. Success means:
+
+- A visitor arriving from the product site finds a root README quick start that compiles against
+  2.0, plus `CONTRIBUTING.md`, `SECURITY.md`, `CODE_OF_CONDUCT.md`, issue and PR templates,
+  `CODEOWNERS`, and `CHANGELOG.md`.
+- Every GitHub Actions `uses:` is pinned to a commit SHA, Dependabot watches `nuget` and
+  `github-actions`, and workflow comments are in English.
+- DreamTravel, the reference app the Coding Guide cites, follows that guide: mediator-only thin
+  controllers, a Domain that references nothing, a README that runs in two minutes, and tests that
+  run in GitHub CI.
+- `docs/ClaudeCodingGuide.md` and `CLAUDE.md` no longer contradict the code.
+
+## Context
+
+**Depends on:** [`2026-11-02-core-2-0-flagship-hardening`](2026-11-02-core-2-0-flagship-hardening.md)
+steps 02, 03, 04, 08, 18, 22, 38, 39, 43, 44, and 54 are `done`. The whole core feature does not
+need to be `completed`. Per step:
+
+| Step here | Core steps required | Why |
+|---|---|---|
+| 01 | 04, 38, 54 | The README quick start compiles against the 2.0 version, the immutable `Result` (`C-02`), and the zero-dependency base package (P-13). |
+| 02 | 02, 03 | Same workflow file; core 03 adds the `publish` job and the `actions/upload-artifact`/`actions/download-artifact` uses pinned here. |
+| 03 | 08, 22 | Core 08 adds the Production component test in the same test project; core 22 makes `ResultConversionFilter` turn a failed `Result` into ProblemDetails. |
+| 04 | 08, 18, 43, 44 | Guide §15 marks the "dupa" example fixed by core 08 as historical; `CLAUDE.md §11` rows must match core 18, 43, 44. Also requires step 03 here. |
+| 05 | 39 | Core 39 edits the same `DreamTravel.Queries` chapter files. |
+| 06 | — | None since 2026-11-02: core 08 no longer adds `dotnet user-secrets` commands or edits `docker-compose.yml` (decision B, user, 2026-11-02: local-only DreamTravel dev credentials stay committed). |
+| 07 | 02, 03 | Core 02 fixes the runner scope; core 03 creates the `build`/`publish` job layout the new job joins. Also requires step 02 here. |
+
+[`2026-11-02-org-transfer-and-2-0-release`](2026-11-02-org-transfer-and-2-0-release.md) depends
+on this feature being `completed`.
+
+### Origin
+
+This feature was split from
+[`2026-11-02-core-2-0-flagship-hardening`](2026-11-02-core-2-0-flagship-hardening.md) on
+2026-11-02 (RQ8, user: one premortem over ~84 steps delivered over months would rely on stale
+evidence). Its steps are the core feature's post-review steps 71–77; that brief's "Split" table
+maps the numbers.
+
+### Evidence
+
+A full-repository code review ran on 2026-11-02 against `master@4097d47f`. The review artifacts
+live outside the repository, so this brief and its steps carry every finding they act on, with
+`file:line`. Finding IDs used here:
+
+| Prefix | Meaning |
+|---|---|
+| `P1-n` | P1 systemic items: `P1-1` docs drift, `P1-5` Polish text, `P1-6` Guide consistency, `P1-9` hygiene |
+| `repo#An` | Repository and CI findings |
+| `repo#Bn` | DreamTravel findings |
+| `logging-cache#16` | Guide §12 requires the obsolete `SolTechnology.Core.Guards` |
+
+### Boundary adjustment at the split
+
+The user's recommended partition kept Guide self-consistency (post-review step 74) in the core
+feature. It moved here as step 04 because it must run after step 03 (post-review 73): Guide §7
+presents `CalculateBestPathController` as the `IMediator` template, and §15 lists controller
+`try/catch` as a live example; only step 03 fixes both. Keeping it in the core feature would make
+the core feature depend on this one while this one depends on the core feature. Its other
+prerequisites (core 08, 18, 43, 44) point in the allowed direction. Step 01's
+`docs/deprecated-packages.md` Guards row names the same BCL guards that step 04 writes into Guide
+§12, so both now live in one feature.
+
+### Decisions that apply (user, 2026-11-02)
+
+| ID | Decision | Steps |
+|---|---|---|
+| Q1 | Keep `SolTechnology.Core.Guards`, `SolTechnology.Core.Scheduler`, `tests/SolTechnology.Core.Guards.Tests`, `docs/Guards.md`, `docs/Cron.md`. `C-25` rejected. The Guide §12 fix to BCL guards stays; `docs/deprecated-packages.md` names BCL guards for Guards. | 01, 04 |
+| Q4 | No DreamTravel `UseNuGet=true` switch. The DreamTravel README documents the `PackageReference` equivalents. | 06 |
+| Q7 | The weekly NuGet stats bot keeps committing to `master` as-is. This feature only pins its action and translates its comments. | 02 |
+| Q8 | `SECURITY.md` channel: GitHub Private Vulnerability Reporting; Code of Conduct: Contributor Covenant 2.1; `CODEOWNERS`: `* @AdrianStrugala`. | 01 |
+| Q9 | Keep the DreamTravel Azure DevOps pipelines, `devOps/scripts/`, and `devOps/infrastructure/legacy_AzureResourceGroup/` as a memento; do not delete. Only a new `dreamtravel-tests` GitHub Actions job is added. | 07 |
+| RQ4 | Guards.Tests is not added to CI; Guards is reference-only. | 01 |
+| RQ8 | Split the original feature; each part has its own premortem. | 00 |
+| RQ11 | Post-review restructuring: former 72 + 74 merged into community health files and root README (step 01 here). | 01 |
+| RQ12 | Applied here: `dontreadme.md` link repairs (01), SHA pins and `needs` for the DreamTravel CI job (07), Guide self-consistency after the DreamTravel controllers (04). | 01, 04, 07 |
+
+No public/protected symbol in `src/SolTechnology.Core.*` changes in this feature, so no `C-nn`
+confirmation applies. The `IEvent` move into `SolTechnology.Core` stays "Not planned" (core brief).
+
+### Design alternatives
+
+| # | Choice | Alternatives | Recommendation and crux |
+|---|---|---|---|
+| H1 | Where `CitySearched` lives (`repo#B5`, step 05) | (a) move the record to `DreamTravel.Queries.Events`; (b) keep it in `DreamTravel.Domain` with the CQRS reference; (c) move `IEvent` into `SolTechnology.Core` | **(a).** (b) keeps breaking "Domain references nothing" (Guide §1/§6). (c) moves a public Core symbol and is "Not planned". Red team: DreamTravel stores `CitySearched` as a Hangfire job argument (`AddSolPersistentEvents()`), so the move changes a persisted type name. The premortem decides the mitigation. |
+
+### Accepted risks
+
+| ID | Risk | Source | Mitigation in this plan |
+|---|---|---|---|
+| AR-4 | The DreamTravel Azure DevOps pipelines and legacy ARM folder stay without CI coverage. | Q9 | Step 07 runs DreamTravel tests in GitHub Actions. Their local-only credential values stay committed (decision B, user, 2026-11-02; core AR-6). |
+
+The ID keeps its number from the core brief.
+
+## Scope
+
+### In scope
+
+- Community health files and root README (`repo#A6`, `repo#A7`, `repo#A10`, `P1-9`) — step 01.
+- Workflow supply-chain hardening (`repo#A6`, `repo#A8`, `repo#A15`, `P1-5`) — step 02.
+- DreamTravel mediator-only controllers (`repo#B1`, `repo#B2`, `repo#B9`, `P1-1`) — step 03.
+- Coding Guide self-consistency (`P1-6`, `logging-cache#16`) — step 04.
+- DreamTravel logic and domain cleanup (`repo#B5`, `repo#B10`, `repo#B12`) — step 05.
+- DreamTravel run instructions and an accurate architecture section (`repo#B7`, `repo#B8`) — step 06.
+- DreamTravel tests in GitHub CI (`repo#B11`) — step 07.
+
+### Out of scope
+
+- Deleting the DreamTravel Azure DevOps pipelines, `devOps/scripts/`, or
+  `devOps/infrastructure/legacy_AzureResourceGroup/` (Q9).
+- A DreamTravel `UseNuGet` MSBuild switch (Q4).
+- Moving the NuGet stats bot off `master` and changing `CLAUDE.md §2` (Q7).
+- Moving `wroclaw_drive.graphml` (10.2 MB, used by `DreamTravel.Aspire/Program.cs`) and
+  `research_documentation.docx` to Git LFS or release assets.
+- Moving `IEvent` into `SolTechnology.Core` (core brief, "Not planned").
+- Repository URLs, badges, authorship, and organization settings (release feature).
+- Filling the `CHANGELOG.md` 2.0.0 section (release 05).
+
+## Implementation plan
+
+Gates (see `summary.md`): review required — the feature crosses root docs, CI workflows,
+DreamTravel, and the Coding Guide. Premortem required — step 05 edits
+`sample-tale-code-apps/DreamTravel/src/LogicLayer/DreamTravel.Queries/ModuleInstaller.cs` and
+moves a type that DreamTravel persists as a Hangfire job argument (`CLAUDE.md §4`). The workflow
+edits in steps 02 and 07 are not a `CLAUDE.md §4` trigger by themselves.
+
+**Scope change 2026-11-02 (user decisions A and B):** `dreamtravel-tests` runs on push and PR but
+is not a required check, because `master` gets no ruleset (A); step 06 no longer depends on core
+08, because the local-only DreamTravel dev credentials stay committed (B). `review` stays
+`done (2026-11-02)`: no step, file, contract, or dependency is added; `premortem` is still
+`pending` and runs on this revised plan.
+
+Notation: an unqualified step number is a step of this feature; `core NN` and `release NN` name
+step `NN` of [`2026-11-02-core-2-0-flagship-hardening`](2026-11-02-core-2-0-flagship-hardening.md)
+and [`2026-11-02-org-transfer-and-2-0-release`](2026-11-02-org-transfer-and-2-0-release.md).
+
+| Step | Post-review core no. | Title | Notes |
+|---|---|---|---|
+| 00 | — | Run premortem | Gate; runs after review. |
+| 01 | 71 | Community health files and root README | `SECURITY.md` names Private Vulnerability Reporting, enabled in release 03. `CHANGELOG.md` 2.0.0 section filled in release 05. |
+| 02 | 72 | Workflow supply-chain hardening | After core 02 and 03. |
+| 03 | 73 | DreamTravel — mediator-only, thin controllers | After core 08 and 22. |
+| 04 | 74 | Coding Guide self-consistency | After step 03 and core 08, 18, 43, 44. |
+| 05 | 75 | DreamTravel — logic and domain cleanup | Premortem-gated (`ModuleInstaller.cs`, persisted event type). |
+| 06 | 76 | DreamTravel — run instructions and architecture section | No core prerequisite since decision B (2026-11-02). |
+| 07 | 77 | DreamTravel — tests in GitHub CI | After step 02. Runs on push and PR; not a required check (decision A, user, 2026-11-02: no `master` ruleset). |
+| 08 | — | Retrospective | — |
+
+## Acceptance criteria
+
+- [ ] The root `README.md` has a quick start that builds in a throwaway project against the 2.0
+      packages, and `CONTRIBUTING.md`, `SECURITY.md`, `CODE_OF_CONDUCT.md`, `CHANGELOG.md`, and
+      `.github/dependabot.yml` exist.
+- [ ] The GitHub "Community Standards" page shows every item checked.
+- [ ] `grep -rn "dontreadme" --include=*.md --include=*.slnx . | grep -v "^./docs/features/"`
+      prints nothing.
+- [ ] `grep -rnE "uses: [^@]+@v[0-9]" .github/workflows` prints nothing.
+- [ ] `grep -rnE "IQueryHandler<|ICommandHandler<|CancellationToken\.None|catch \(" sample-tale-code-apps/DreamTravel/src/Presentation/DreamTravel.Api/Controllers`
+      prints nothing.
+- [ ] `grep -n "SolTechnology.Core.CQRS" sample-tale-code-apps/DreamTravel/src/DreamTravel.Domain/DreamTravel.Domain.csproj`
+      prints nothing.
+- [ ] `grep -nE "SolTechnology\.Core\.Guards|AddAuthenticationAndBuildFilter|ResponseEnvelopeFilter" docs/ClaudeCodingGuide.md`
+      prints nothing.
+- [ ] Following the DreamTravel README on a clean clone starts the Aspire dashboard and the API
+      (manual check, recorded in step 06).
+- [ ] The `dreamtravel-tests` job runs green on a PR, and the `publish` job declares
+      `needs: [build, dreamtravel-tests]`.
+- [ ] `sample-tale-code-apps/DreamTravel/devOps` is unchanged by this feature (Q9).
+
+## Completion summary
+
+## Deviations
+
+## Follow-ups

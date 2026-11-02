@@ -112,6 +112,11 @@ from §3.
 | `SolTechnology.Core.Cache` | [`references/cache.md`](references/cache.md) |
 | Any `ModuleInstaller.cs` change | [`references/di.md`](references/di.md) |
 | `Directory.Build.props`, TFM bump | [`references/build-and-nuget.md`](references/build-and-nuget.md) |
+| `SolTechnology.Core.Hangfire` | [`references/hangfire.md`](references/hangfire.md) |
+| `SolTechnology.Core.AUID` | [`references/auid.md`](references/auid.md) |
+| `SolTechnology.Core.Api` | [`references/api.md`](references/api.md) |
+| `SolTechnology.Core.Authentication` | [`references/authentication.md`](references/authentication.md) |
+| `SolTechnology.Core.*.Testing` | [`references/testing-kits.md`](references/testing-kits.md) |
 
 If the diff touches a module without a reference file, write one (same shape as the existing
 files) in the **same** PR so the next contributor inherits the checklist.
