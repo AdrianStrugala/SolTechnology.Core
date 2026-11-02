@@ -27,7 +27,7 @@ and premortem verdicts above cover the regrouped plan (user decision, 2026-11-02
 |---|---|---|---|
 | 00 | Run premortem (gate) | [`steps/00-run-premortem.md`](steps/00-run-premortem.md) | done |
 | 01 | Clear NU1903 — Testcontainers and DreamTravel parent bumps, Pkcs override in SQL | [`steps/01-clear-nu1903-at-source.md`](steps/01-clear-nu1903-at-source.md) | done |
-| 02 | Fail CI on any test-project failure | [`steps/02-fail-ci-on-any-test-failure.md`](steps/02-fail-ci-on-any-test-failure.md) | to-do |
+| 02 | Fail CI on any test-project failure | [`steps/02-fail-ci-on-any-test-failure.md`](steps/02-fail-ci-on-any-test-failure.md) | done |
 | 03 | Publish to nuget.org only from `v*` tags behind a protected environment | [`steps/03-publish-only-from-tags.md`](steps/03-publish-only-from-tags.md) | to-do |
 | 04 | Bump every package to 2.0.0 | [`steps/04-bump-version-2-0-0.md`](steps/04-bump-version-2-0-0.md) | to-do |
 | 05 | DreamTravel — Development-only developer exception page | [`steps/05-dreamtravel-dev-only-exception-page-and-credentials.md`](steps/05-dreamtravel-dev-only-exception-page-and-credentials.md) | to-do |

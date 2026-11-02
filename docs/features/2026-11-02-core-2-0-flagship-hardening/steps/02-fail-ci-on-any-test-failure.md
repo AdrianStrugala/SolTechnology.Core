@@ -1,7 +1,7 @@
 ---
 spec: 2026-11-02-core-2-0-flagship-hardening
 step: 02
-status: to-do
+status: done
 ---
 
 # Step 02: Fail CI on any test-project failure
@@ -26,10 +26,10 @@ collects every exit code, and fails at the end.
 - Keep `excluded="SolTechnology.Core.Scheduler SolTechnology.Core.Guards"` in `publishPackages.yml`.
 
 ## Acceptance criteria
-- [ ] `dotnet build SolTechnology.Core.slnx && pwsh ./.github/runTests.ps1` exits 0 on a green tree.
-- [ ] On a throwaway local branch, a forced `Assert.Fail()` in `tests/SolTechnology.Core.AUID.Tests` (not the last project) makes `runTests.ps1` exit non-zero, and the later projects still run (their results appear in the output). Revert it before committing.
-- [ ] The runner output does not mention `SolTechnology.Core.Guards.Tests`.
-- [ ] `git diff --stat -- SolTechnology.Core.slnx` prints nothing.
+- [x] `dotnet build SolTechnology.Core.slnx && pwsh ./.github/runTests.ps1` exits 0 on a green tree.
+- [x] On a throwaway local branch, a forced `Assert.Fail()` in `tests/SolTechnology.Core.AUID.Tests` (not the last project) makes `runTests.ps1` exit non-zero, and the later projects still run (their results appear in the output). Revert it before committing.
+- [x] The runner output does not mention `SolTechnology.Core.Guards.Tests`.
+- [x] `git diff --stat -- SolTechnology.Core.slnx` prints nothing.
 
 ## Open questions
 - none (RQ4 resolved by the user on 2026-11-02: Guards.Tests stays out of the slnx and CI)
