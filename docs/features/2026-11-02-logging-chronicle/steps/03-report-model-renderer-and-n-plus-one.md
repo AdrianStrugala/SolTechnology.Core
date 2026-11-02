@@ -46,10 +46,21 @@ pure and has no logging dependency, so golden-string tests pin the format.
   - `Report_FortyTwoIdenticalSQLSteps_AggregatesWithNPlusOneHint` (group key set directly on the node).
   - `Report_OverflowAggregate_MergedIntoGroupLine`.
   - `Render_OutputIsASCIIOnly` (every char < 128).
+- Premortem mitigations (step 00, 2026-11-02):
+  - CRM-3: the renderer enforces an internal total budget of 32,768 chars. Lines beyond the
+    budget are replaced by one `+{n} lines truncated` marker; the root line and the marker are
+    always present. Test `Render_WorstCaseDefaults_AtMost32768Chars` (256 steps × 8 attributes ×
+    200-char values, 1,000-char names, default options).
+  - CRM-4: the builder sets an internal (not public) `ChronicleReport.HasFailedSteps`. It is true
+    when any recorded node is `Failed`, an aggregated line has `FailedCount > 0`, or an overflow
+    aggregate has a failed count. Tests `Report_FailedChildUnderOkRoot_HasFailedSteps` and
+    `Report_FailedOverflowStep_HasFailedSteps`.
 
 ## Acceptance criteria
 - [ ] `dotnet test tests/SolTechnology.Core.Logging.Tests --filter "FullyQualifiedName~Chronicles"` is green.
 - [ ] `find src/SolTechnology.Core.Logging/Chronicles -name "*.cs" | xargs wc -l | awk '$1>150 && $2!="total"'` prints nothing.
+- [ ] CRM-3: `Render_WorstCaseDefaults_AtMost32768Chars` is green.
+- [ ] CRM-4: `Report_FailedChildUnderOkRoot_HasFailedSteps` and `Report_FailedOverflowStep_HasFailedSteps` are green; `HasFailedSteps` is `internal`.
 
 ## Open questions
 - none (OQ-1 confirmed by the user 2026-11-02: `CH-04` thresholds, `CH-06` report model)

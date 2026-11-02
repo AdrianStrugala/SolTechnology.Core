@@ -47,11 +47,22 @@ the event type, so reports read like the work instead of `RecurringJobRunner<TJo
   - `UseSolFilters_AddsChronicleFilter`.
   - `AddSolRecurringJob_RegistersChronicle`.
   - `AddSolPersistentEvents_RegistersChronicle`.
+- Premortem mitigations (step 00, 2026-11-02):
+  - CRM-2: `OnPerformed` disposes the root handle from `filterContext.Items` inside a `finally`,
+    so the root closes and the ambient node is restored on every `OnPerformed` path, including the
+    exception path and a failure raised by a later filter. A Hangfire worker thread must never keep
+    a job root as its ambient node after the perform.
+  - Tests through a real `BackgroundJobPerformer`:
+    `OnPerforming_LaterFilterThrows_RootEmittedFailedAndAmbientRestored` (a test filter ordered
+    after `ChronicleJobFilter` throws in `OnPerforming`) and
+    `SequentialJobsOnSameThread_SecondReportHasNoStepsOfFirst` (two jobs performed on one thread;
+    after each, `IChronicle.IsActive` is `false`).
 
 ## Acceptance criteria
 - [ ] `dotnet test tests/SolTechnology.Core.Hangfire.Tests` is green.
 - [ ] `dotnet build SolTechnology.Core.slnx` is green, and `cd sample-tale-code-apps/DreamTravel && dotnet build` is green.
 - [ ] Premortem mitigations for `ModuleInstaller.cs` (step 00) are applied.
+- [ ] CRM-2: `OnPerforming_LaterFilterThrows_RootEmittedFailedAndAmbientRestored` and `SequentialJobsOnSameThread_SecondReportHasNoStepsOfFirst` are green.
 
 ## Open questions
 - none

@@ -23,6 +23,7 @@ plan review (brief, Current state).
 - `src/SolTechnology.Core.Logging/Chronicles/SQL/SQLClientPayloadReader.cs` — NEW — internal; reads `OperationId` (`Guid`), `Command` (as `System.Data.IDbCommand`: `CommandText`, `CommandType`), and `Exception` by enumerating the payload as `IReadOnlyList<KeyValuePair<string, object>>`; no reflection and no `Microsoft.Data.SqlClient` reference
 - `src/SolTechnology.Core.Logging/Chronicles/SQL/ChronicleSQLClientSubscription.cs` — NEW — `internal sealed class … : IHostedService` (subscribe on start, dispose on stop)
 - `src/SolTechnology.Core.Logging/Chronicles/ChronicleRecorder.cs` — EDIT — internal `StartDetachedLeaf(string name, string groupKey)` (appends a child of the ambient node without changing the ambient node) and `Complete(leaf, status, error)`
+- `src/SolTechnology.Core.Logging/Chronicles/ChronicleRoot.cs` — EDIT — internal `Owner` (the recorder that started the root; CRM-1)
 - `src/SolTechnology.Core.Logging/Chronicles/ChronicleOptions.cs` — EDIT — `CaptureSQLCommands` (`true`), `CaptureSQLCommandText` (`false`) (CH-04)
 - `src/SolTechnology.Core.Logging/Chronicles/ChronicleServiceRegistrations.cs` — EDIT — `TryAddEnumerable` hosted service
 - `tests/SolTechnology.Core.Logging.Tests/Chronicles/ChronicleSQLClientObserverTests.cs` — NEW — synthetic `new DiagnosticListener("SqlClientDiagnosticListener")` writing `KeyValuePair<string, object>` lists shaped like the 7.x payloads (`OperationId`, `Command` = NSubstitute `IDbCommand`, `Exception`); each test disposes its subscription in `TearDown` (the `AllListeners` subscription is process-wide)
@@ -65,6 +66,26 @@ plan review (brief, Current state).
   - `After_OutsideAmbientFlow_StillCompletesPendingStep`.
   - `After_WithEmptyOperationId_Ignored`.
   - `ChronicleSQLIntegrationTests.Query_InsideRoot_AppearsAsSQLStep` (real SqlClient 7.0.1 against MSSQL; settles crux B3-1).
+- Premortem mitigations (step 00, 2026-11-02):
+  - CRM-1: every `ChronicleRoot` carries its owning recorder (internal `Owner`, set by
+    `ChronicleRecorder`). The observer records only into roots owned by its own host's recorder,
+    so N hosts in one process record each command once. `StopAsync` and `Dispose` unsubscribe from
+    `DiagnosticListener.AllListeners` and from every attached listener.
+  - CRM-15: `OnNext` re-checks the gate, because `DiagnosticListener.IsEnabled(name)` is true when
+    **any** subscriber enables the event and `Write` reaches every observer. `Before` records only
+    inside an open root owned by this recorder. `After`/`Error` without a matching pending entry
+    are ignored. The pending counter is decremented on every completion path.
+  - CRM-10: SQL leaves start no `Activity` (SqlClient and EF instrumentation already emit spans).
+  - CRM-11: with `CaptureSQLCommandText = false`, a failed SQL step records the exception type
+    only (`Fail(exceptionType)`); the message is recorded only when capture is on, cut to
+    `MaxAttributeValueLength`. SqlClient error messages can echo literal values.
+  - Tests: `TwoSubscriptions_OneCommand_RecordedOnce` (two `ServiceProvider`s, both hosted services
+    started, one synthetic command → one leaf), `Subscription_Stopped_ObserverReceivesNoEvents`,
+    `OtherSubscriberEnabled_BeforeOutsideRoot_RecordsNothing` (a second always-true subscriber),
+    `SQLStep_WithOperationsListener_StartsNoActivity`, and
+    `Error_CaptureCommandTextOff_MessageNotRecorded`.
+  - The integration test also records, in this step's `Deviations`, whether the SQL step duration
+    includes reader row streaming (input for CRM-11 in step 15).
 
 ## Acceptance criteria
 - [ ] `dotnet test tests/SolTechnology.Core.Logging.Tests` is green.
@@ -72,6 +93,10 @@ plan review (brief, Current state).
 - [ ] `grep -n "ProjectReference" src/SolTechnology.Core.Logging/SolTechnology.Core.Logging.csproj` prints nothing.
 - [ ] `git diff --stat -- src/SolTechnology.Core.SQL` for this step prints nothing.
 - [ ] If the integration test shows that SqlClient 7.0.1 raises no events, this step is set `blocked` and alternative B3 (b) goes back to the user. This is a pass/fail gate, not a silent fallback.
+- [ ] CRM-1: `TwoSubscriptions_OneCommand_RecordedOnce` and `Subscription_Stopped_ObserverReceivesNoEvents` are green.
+- [ ] CRM-15: `OtherSubscriberEnabled_BeforeOutsideRoot_RecordsNothing` is green.
+- [ ] CRM-10: `SQLStep_WithOperationsListener_StartsNoActivity` is green.
+- [ ] CRM-11: `Error_CaptureCommandTextOff_MessageNotRecorded` is green; the reader-duration finding is recorded under `Deviations`.
 
 ## Open questions
 - none (OQ-1 confirmed by the user 2026-11-02: `CH-04` `CaptureSQLCommands`/`CaptureSQLCommandText`)

@@ -48,6 +48,30 @@ retrospective (step 17) updates them.
 - `docs/SQL.md`: SqlClient commands captured from `SqlClientDiagnosticListener` for Dapper, EF Core, and raw `SqlConnection`; `CaptureSQLCommandText` is off by default because statements can contain PII; other providers are not captured.
 - `docs/Bus.md`: one root per message; settlement → status mapping; body never recorded.
 - `docs/Hangfire.md`: one root per job; `UseSolFilters(sp)` is required; recurring-job and persistent-event names.
+- Premortem mitigations (step 00, 2026-11-02):
+  - CRM-3 (`docs/Log.md`): the 32,768-char report budget and the `+{n} lines truncated` marker;
+    with OTel `IncludeFormattedMessage = true`, the tree is exported as both the body and the
+    `Chronicle` attribute.
+  - CRM-4 (`docs/Log.md`): reports that contain a failed step are never sampled away; with
+    `SampleRate < 1`, log-count request-rate and error-ratio queries are invalid, so use ASP.NET
+    Core request metrics instead.
+  - CRM-7 (`docs/Log.md`): a `Log contract changes in 2.0` table. It maps each 1.x entry
+    ("Finished request" with and without `{@Timings}`, "failed after", "aborted by client":
+    template, level, EventId) to its 2.0 replacement, with a before/after KQL pair, the
+    slow-request Warning, and the `SlowThreshold` knob.
+  - CRM-8 (`docs/Log.md`): flight-recorder worst-case memory (`MaxEntries × MaxMessageLength ×
+    2 bytes × concurrent roots`); inside roots, `IsEnabled(Debug)`-guarded code runs; a Serilog
+    example with per-sink `restrictedToMinimumLevel: Information`.
+  - CRM-9 (`docs/Log.md`): a root must not span a service lifetime; open one root per loop
+    iteration or job.
+  - CRM-10 (`docs/Log.md`): step names must be constant (no interpolated IDs; put IDs in
+    attributes), because they become span names and aggregation keys.
+  - CRM-11 (`docs/SQL.md`, `docs/Log.md`): with `CaptureSQLCommandText = false`, SQL error
+    messages are not recorded; what the SQL step duration covers (from step 07's `Deviations`);
+    `Set` records raw values and `SetMasked` is required for PII.
+  - CRM-12 (`docs/Log.md` migration subsection): the removal of `ITimingService` is
+    binary-breaking. Rebuild every assembly compiled against Logging 1.x that references it;
+    `SOLCORE001` does not detect this, and `ValidateOnBuild` surfaces it at startup.
 
 ## Acceptance criteria
 - [ ] `grep -c "^### Chronicle" docs/Log.md` prints `1`.
@@ -56,6 +80,7 @@ retrospective (step 17) updates them.
 - [ ] The sample tree in `docs/Log.md` is byte-identical to the golden string in `tests/SolTechnology.Core.Logging.Tests/Chronicles/ChronicleTreeRendererTests.cs`.
 - [ ] `git grep -niE "decompil|ilspy|dotpeek" -- docs ':!docs/features/2026-11-02-logging-chronicle*'` prints nothing (clean room).
 - [ ] The `documentation-cleanup` skill reports no broken links or tables in the edited files.
+- [ ] CRM-3, CRM-4, CRM-7, CRM-8, CRM-9, CRM-10, CRM-11, CRM-12: each bullet above is present in the named doc (`grep -n "lines truncated\|Log contract changes in 2.0\|restrictedToMinimumLevel\|binary-breaking" docs/Log.md` lists four matches; `grep -n "CaptureSQLCommandText" docs/SQL.md` mentions error messages).
 
 ## Open questions
 - none

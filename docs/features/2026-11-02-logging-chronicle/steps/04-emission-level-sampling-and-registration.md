@@ -68,6 +68,22 @@ failure, Warning when cancelled or slower than `SlowThreshold`, and Information 
   - `AddSolChronicle_InvalidOptions_FailsOnStart` (host start throws `OptionsValidationException`).
   - `AddSolLoggingConfiguration_BindsChronicleSection`.
   - `AddSolLoggingAction_RegistersChronicle`.
+- Premortem mitigations (step 00, 2026-11-02):
+  - CRM-4: the emission policy always emits when `HasFailedSteps` is true (step 03). Tests
+    `SampleRate0_OkRootWithFailedChild_Emitted` and
+    `SampleRate0_OkRootWithFailedOverflowStep_Emitted`.
+  - CRM-6: only service registrations are `TryAdd`-guarded. The options `Bind` (the
+    `IConfiguration` overload) and `Configure` (the `Action` overload) are applied on every call,
+    whatever the call order relative to the parameterless calls made by other installers. Tests
+    `AddSolChronicle_ParameterlessThenConfiguration_BindsSection` (`Enabled = false` from
+    configuration wins), `AddSolChronicle_ConfigurationThenParameterless_KeepsSection`, and
+    `AddSolChronicle_ActionAfterInstallerCall_Applies`.
+  - CRM-14: the reporter derives the level from status, duration, and HTTP status **before**
+    building the report, and builds nothing when `!logger.IsEnabled(level)`. Rendering runs only
+    when a provider formats the entry (lazy `ToString`, step 03). Tests
+    `CategoryAboveLevel_OkRoot_ReportNotBuilt` (an internal builder seam counts invocations) and
+    `Root_TenSteps_Emitted_AllocatesUnderCeiling`. The ceiling is pinned at the first green
+    measurement + 25% and recorded under `Deviations`.
 
 ## Acceptance criteria
 - [ ] `dotnet test tests/SolTechnology.Core.Logging.Tests` is green.
@@ -75,6 +91,9 @@ failure, Warning when cancelled or slower than `SlowThreshold`, and Information 
 - [ ] `wc -l < src/SolTechnology.Core.Logging/ModuleInstaller.cs` prints ≤ 150.
 - [ ] `dotnet build SolTechnology.Core.slnx` is green.
 - [ ] Premortem mitigations for `ModuleInstaller.cs` (step 00) are applied.
+- [ ] CRM-4: `SampleRate0_OkRootWithFailedChild_Emitted` and `SampleRate0_OkRootWithFailedOverflowStep_Emitted` are green.
+- [ ] CRM-6: the three `AddSolChronicle_*` call-order tests are green.
+- [ ] CRM-14: `CategoryAboveLevel_OkRoot_ReportNotBuilt` and `Root_TenSteps_Emitted_AllocatesUnderCeiling` are green; the pinned ceiling is recorded under `Deviations`.
 
 ## Open questions
 - none (OQ-1 confirmed 2026-11-02: `CH-04` `SlowThreshold`/`SampleRate`, `CH-07`; OQ-2 accepted 2026-11-02: `LC-03`, `LC-04`)

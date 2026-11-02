@@ -36,10 +36,16 @@ their spans. Attributes become tags. Status maps to `ActivityStatusCode`.
   - `Report_CarriesTraceIdOfAmbientActivity`.
 - `Step_ChronicleDisabled_AllocatesNothing` (step 01) still runs without a listener and still
   measures 0 bytes.
+- Premortem mitigations (step 00, 2026-11-02):
+  - CRM-10: inside an active root, only recorded nodes start Activities. Overflow handles
+    (beyond `MaxSteps`) and depth-dropped handles (beyond `MaxDepth`) start none, so spans per root
+    are bounded by `MaxSteps`. Test `MaxSteps_Exceeded_StartsNoActivityForDroppedSteps`
+    (`MaxSteps = 10`, 50 steps → at most 10 Activities from the root).
 
 ## Acceptance criteria
 - [ ] `dotnet test tests/SolTechnology.Core.Logging.Tests` is green.
 - [ ] `grep -rn "new ActivitySource" src/SolTechnology.Core.Logging` lists only `Operations/CoreLoggingActivitySources.cs`.
+- [ ] CRM-10: `MaxSteps_Exceeded_StartsNoActivityForDroppedSteps` is green.
 
 ## Open questions
 - none (OQ-1 confirmed by the user 2026-11-02: `CH-04` `EmitActivities`)

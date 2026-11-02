@@ -46,11 +46,20 @@ still feed a per-parent aggregate (count, total and max duration, failed count),
   - `AttributeValue_TooLong_TruncatedWithMarker`.
   - `FailMessage_TooLong_TruncatedWithMarker`.
   - `[TestCase]` validator rows for every range bound (valid and invalid).
+- Premortem mitigations (step 00, 2026-11-02):
+  - CRM-3: step names are cut to `MaxAttributeValueLength` and suffixed with `[truncated]`, like
+    attribute values. Test `StepName_TooLong_TruncatedWithMarker`.
+  - CRM-9: overflow groups per node are capped at an internal constant of 64. Further group keys
+    fold into one `(other)` aggregate (count, total, max, failed count). Test
+    `MaxSteps_Exceeded_TenThousandDistinctNames_OverflowGroupsBounded` (`MaxSteps = 10`, 10,000
+    distinct names → at most 65 overflow entries, the total count is preserved).
 
 ## Acceptance criteria
 - [ ] `dotnet test tests/SolTechnology.Core.Logging.Tests --filter "FullyQualifiedName~Chronicles"` is green.
 - [ ] `Step_ChronicleDisabled_AllocatesNothing` (step 01) is still green.
 - [ ] `find src/SolTechnology.Core.Logging/Chronicles -name "*.cs" | xargs wc -l | awk '$1>150 && $2!="total"'` prints nothing.
+- [ ] CRM-3: `StepName_TooLong_TruncatedWithMarker` is green.
+- [ ] CRM-9: `MaxSteps_Exceeded_TenThousandDistinctNames_OverflowGroupsBounded` is green.
 
 ## Open questions
 - none (OQ-1 confirmed by the user 2026-11-02: `CH-04` limit properties)

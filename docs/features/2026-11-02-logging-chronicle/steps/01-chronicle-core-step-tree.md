@@ -84,6 +84,13 @@ step 04 implements. Design: B1, B2, B9 in the brief.
   - `ParallelAppends_ToOneParent_LoseNoChildren` (1,000 concurrent `Step` calls under one parent → exactly 1,000 children).
   - `Step_ChronicleDisabled_AllocatesNothing` (`GC.GetAllocatedBytesForCurrentThread()` delta is `0` over 1,000 `Step`+`Dispose` calls with `Enabled = false`, measured after a warm-up loop).
   - `Step_EnabledNoRoot_AllocatesNothing` (same measurement with `Enabled = true` and no ambient root; this is the path that HTTP client and SQL calls outside roots take).
+- Premortem mitigations (step 00, 2026-11-02):
+  - CRM-13: attribute, status, and failure writes on a `ChronicleNode` happen under the node lock,
+    the same lock that guards its children. No `ChronicleStep` member lets an internal race escape
+    into the caller.
+  - Test `ParallelSet_OnSharedNode_NoExceptionAndNoLostKeys`: 64 `Task.WhenAll` branches call
+    `Current.Set` with distinct keys under `MaxAttributesPerStep = 64`; every key is present and
+    nothing throws.
 
 ## Acceptance criteria
 - [ ] `dotnet test tests/SolTechnology.Core.Logging.Tests --filter "FullyQualifiedName~Chronicles"` is green.
@@ -91,6 +98,7 @@ step 04 implements. Design: B1, B2, B9 in the brief.
 - [ ] `find src/SolTechnology.Core.Logging/Chronicles -name "*.cs" | xargs wc -l | awk '$1>150 && $2!="total"'` prints nothing.
 - [ ] `grep -rn "Stopwatch" src/SolTechnology.Core.Logging/Chronicles` prints nothing.
 - [ ] `grep -rn "public static" src/SolTechnology.Core.Logging/Chronicles` prints nothing.
+- [ ] CRM-13: `ParallelSet_OnSharedNode_NoExceptionAndNoLostKeys` is green.
 
 ## Open questions
 - none (OQ-1 confirmed by the user 2026-11-02: `CH-01`, `CH-02`, `CH-03`, `CH-04` `SectionName`/`Enabled`)

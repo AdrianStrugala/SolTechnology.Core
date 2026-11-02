@@ -32,6 +32,11 @@ step with nested HTTP steps. The call-site migration itself happened in step 09.
 - Test `FindCityByName_UnknownCity_ReportShowsFailedStep` when the fake API returns an error response: one 2151 entry, level ≥ Warning.
 - Read the report from `FakeLogCollector` through `ApiFixture.TestServer.Services.GetFakeLogCollector()`.
 - No secrets are added; configuration keys hold non-secret values only.
+- Premortem mitigations (step 00, 2026-11-02):
+  - CRM-6: the component test asserts that `IOptions<ChronicleOptions>` resolved from
+    `ApiFixture` reflects the `SlowThreshold` from `DreamTravel.Api/appsettings.json`, although
+    `AddSolCQRS()` also calls the parameterless `AddSolChronicle()`. Test
+    `ChronicleOptions_BoundFromAppsettings_DespiteInstallerDefaults`.
 
 ## Acceptance criteria
 - [ ] `cd sample-tale-code-apps/DreamTravel && dotnet build` is green.
@@ -39,6 +44,7 @@ step with nested HTTP steps. The call-site migration itself happened in step 09.
 - [ ] `cd sample-tale-code-apps/DreamTravel && dotnet test tests/Component` is green (no regression from the fixture change).
 - [ ] `grep -c "Chronicle" sample-tale-code-apps/DreamTravel/README.md` prints at least `1`, and the README tree came from a real run.
 - [ ] `git diff -- sample-tale-code-apps/DreamTravel | grep -iE "password|secret|apikey" | grep "^+"` prints nothing.
+- [ ] CRM-6: `ChronicleOptions_BoundFromAppsettings_DespiteInstallerDefaults` is green.
 
 ## Open questions
 - none

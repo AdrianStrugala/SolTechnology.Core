@@ -58,6 +58,14 @@ time kept as scalar placeholders. A failed request logs one Error 2151 entry wit
   - `InvokeAsync_RequestRoot_NoEventId2150Entry`.
   - `InvokeAsync_RouteAttribute_UsesTemplateNotRawPath`.
   - `RequestChronicleReported_Template_EveryPlaceholderBracketed`.
+- Premortem mitigations (step 00, 2026-11-02):
+  - CRM-5: when the final status code is ≥ 500 and no exception reached the middleware (for
+    example `SolTechnology.Core.Api`'s `ExceptionFilter` mapped it and set `ExceptionHandled`),
+    `ChronicleRequestRoot.Complete` calls `Fail($"HTTP{statusCode}")` on the root, the same
+    mapping as step 12. 4xx stays `Ok`. Test
+    `InvokeAsync_HandledExceptionMappedTo500_LogsErrorWithChronicleStatusFailed` (a terminal
+    middleware sets 500 without throwing → one Error 2151 entry, `ChronicleStatus = Failed`, no
+    exception attached).
 
 ## Acceptance criteria
 - [ ] `dotnet test tests/SolTechnology.Core.Logging.Tests` is green.
@@ -68,6 +76,7 @@ time kept as scalar placeholders. A failed request logs one Error 2151 entry wit
 - [ ] `dotnet build SolTechnology.Core.slnx` is green, and `cd sample-tale-code-apps/DreamTravel && dotnet build` is green.
 - [ ] `cd sample-tale-code-apps/DreamTravel && dotnet test tests/Unit/DreamTravel.Queries.UnitTests` is green.
 - [ ] Premortem mitigations for `ModuleInstaller.cs` (step 00) are applied.
+- [ ] CRM-5: `InvokeAsync_HandledExceptionMappedTo500_LogsErrorWithChronicleStatusFailed` is green.
 
 ## Open questions
 - none (OQ-1 confirmed 2026-11-02: `CH-08` delete `ITimingService`, `CH-09` `InvokeAsync` parameter; OQ-2 accepted 2026-11-02: `LC-01`, `LC-02`)

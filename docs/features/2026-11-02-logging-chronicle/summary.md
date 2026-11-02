@@ -1,7 +1,7 @@
 ---
 spec: 2026-11-02-logging-chronicle
 review: done (2026-11-02)
-premortem: pending
+premortem: go-with-mitigations (2026-11-02)
 ---
 
 # Chronicle — per-operation step reports in SolTechnology.Core.Logging — Implementation Summary
@@ -18,7 +18,7 @@ retrospective. Each step also waits for the cross-feature steps listed in the br
 
 | # | Title | File | Status |
 |---|---|---|---|
-| 00 | Run premortem (gate) | [`steps/00-run-premortem.md`](steps/00-run-premortem.md) | to-do |
+| 00 | Run premortem (gate) | [`steps/00-run-premortem.md`](steps/00-run-premortem.md) | done |
 | 01 | Chronicle core — ambient step tree and step handle | [`steps/01-chronicle-core-step-tree.md`](steps/01-chronicle-core-step-tree.md) | to-do |
 | 02 | Bounded recording and options validation | [`steps/02-bounded-recording-and-options-validation.md`](steps/02-bounded-recording-and-options-validation.md) | to-do |
 | 03 | Report model, ASCII tree renderer, and N+1 aggregation | [`steps/03-report-model-renderer-and-n-plus-one.md`](steps/03-report-model-renderer-and-n-plus-one.md) | to-do |

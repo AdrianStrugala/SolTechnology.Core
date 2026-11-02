@@ -51,11 +51,22 @@ are added only when the user configured no rule for the alias. Serilog hosts nee
   - `ChronicleCategory_NeverBuffered`.
   - `InformationEntries_NotBuffered`.
   - `AddSolChronicle_WithFlightRecorder_ResolvesLoggerFactoryWithoutCycle`.
+- Premortem mitigations (step 00, 2026-11-02):
+  - CRM-8: `ChronicleFlightRecorderLogger.Log` checks buffer capacity **before** invoking
+    `formatter`; beyond `MaxEntries` it only increments `DroppedFlightRecordCount`. The buffer is
+    allocated on the first record.
+  - CRM-8: when `FlightRecorder.Enabled = false` at startup and no user rule targets the alias or
+    provider type, `ChronicleFlightRecorderFilterSetup` adds a `LogLevel.None` rule for the alias
+    instead of the Debug defaults, so MEL never consults the provider.
+  - Tests `MaxEntries_Reached_FormatterNotInvoked` and
+    `FlightRecorderDisabled_ProviderNotConsultedForDebug` (the provider's `IsEnabled` call count
+    stays 0 for 1,000 `LogDebug` calls inside a root).
 
 ## Acceptance criteria
 - [ ] `dotnet test tests/SolTechnology.Core.Logging.Tests` is green.
 - [ ] `Step_ChronicleDisabled_AllocatesNothing` (step 01) is still green.
 - [ ] Premortem mitigations for `ModuleInstaller.cs` (step 00) are applied (the registrations reached from the installers change).
+- [ ] CRM-8: `MaxEntries_Reached_FormatterNotInvoked` and `FlightRecorderDisabled_ProviderNotConsultedForDebug` are green.
 
 ## Open questions
 - none (OQ-1 confirmed 2026-11-02: `CH-04` `FlightRecorder`, `CH-05`, `CH-06` `FlightRecords`/`ChronicleFlightRecord`; OQ-2 accepted 2026-11-02: `LC-05`)
