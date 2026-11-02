@@ -1,7 +1,7 @@
 ---
 spec: 2026-11-02-core-2-0-flagship-hardening
 step: 03
-status: to-do
+status: in-progress
 ---
 
 # Step 03: Publish to nuget.org only from `v*` tags behind a protected environment
@@ -30,15 +30,21 @@ is the control for that (accepted risk AR-5).
 - Premortem RM-18 (step 00, 2026-11-02): the uploaded artifact carries both `*.nupkg` and `*.snupkg`, and the `publish` job pushes from one folder that holds both, so the 2.0.0 symbol packages reach nuget.org.
 
 ## Acceptance criteria
-- [ ] `actionlint .github/workflows/publishPackages.yml` (or the GitHub workflow editor) reports no error.
+- [x] `actionlint .github/workflows/publishPackages.yml` (or the GitHub workflow editor) reports no error.
 - [ ] A `workflow_dispatch` run on a non-tag ref finishes with the `publish` job skipped.
 - [ ] The owner-confirmed date that `nuget-release` exists with ≥1 required reviewer and the `v*` tag rule precedes the merge date of this step's PR.
-- [ ] The workflow YAML shows the `publish` job referencing `environment: nuget-release`.
+- [x] The workflow YAML shows the `publish` job referencing `environment: nuget-release`.
 - [ ] `gh secret list` (repository level) no longer lists `NUGET_API_KEY`.
-- [ ] `docs/CICD.md` states "publishing only from `v*` tags through `nuget-release`" and the tag-equals-`<Version>` reviewer check.
+- [x] `docs/CICD.md` states "publishing only from `v*` tags through `nuget-release`" and the tag-equals-`<Version>` reviewer check.
 - [ ] RM-18: the workflow YAML uploads `./artifacts/*.snupkg` next to `*.nupkg`, and a `workflow_dispatch` run's artifact lists one `.snupkg` per `.nupkg`.
 
 ## Open questions
 - none
 
 ## Deviations
+
+### Awaiting owner actions
+
+**Original plan:** the owner creates `nuget-release` and moves `NUGET_API_KEY` before the workflow change merges.
+
+**Actual implementation:** the workflow and docs change is committed on branch `foundation/03-tag-only-publish` (not on `master`) and verified locally: actionlint 1.7.12 clean; a local Release pack of every slnx `src/` project produced 20 `.nupkg` and 20 matching `.snupkg`. The step stays `in-progress` until the owner creates the environment, moves the secret, merges the branch, and a `workflow_dispatch` run shows the `publish` job skipped.

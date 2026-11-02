@@ -16,28 +16,40 @@ captured in the [release runbook](release-runbook-1.0.md).
 | Trigger | Build + test | Pack | Publish |
 |---|:---:|:---:|:---:|
 | `pull_request` → `master` | ✅ | ✅ | — |
-| `push` → `master` | ✅ | ✅ | ✅ |
-| `push` tag `v*` | ✅ | ✅ | ✅ |
-| `workflow_dispatch` | ✅ | ✅ | ✅ |
+| `push` → `master` | ✅ | ✅ | — |
+| `push` tag `v*` | ✅ | ✅ | ✅ (after approval) |
+| `workflow_dispatch` | ✅ | ✅ | — |
 
-Publish runs only for `workflow_dispatch` or a `refs/tags/v*` push. Unlisting the deprecated ghost
-ids is **not** part of this pipeline — it lives in its own manual-only workflow (see below), so it can
-never run on a tag or `master` push.
+Publishing only from `v*` tags through `nuget-release`: the `publish` job runs only for a
+`refs/tags/v*` push and is bound to the protected GitHub environment `nuget-release`, which requires
+an approval from the repository owner and holds the `NUGET_API_KEY` secret. `workflow_dispatch`
+builds, tests and packs but never publishes. Unlisting the deprecated ghost ids is **not** part of
+this pipeline — it lives in its own manual-only workflow (see below), so it can never run on a tag
+or `master` push. The workflow token is read-only (`permissions: contents: read`).
 
 ### `build` job
 
 1. Checkout + set up .NET 10 (`10.0.x`).
 2. `dotnet workload restore SolTechnology.Core.slnx` — required before restore/build on a clean CI box.
 3. Restore + `dotnet build SolTechnology.Core.slnx --no-restore`.
-4. Test via `./.github/runTests.ps1` (walks every project under `tests/`).
+4. Test via `./.github/runTests.ps1` — runs every `tests/` project listed in the slnx and fails the
+   job if any of them fails.
 5. **slnx-membership guard** — every packable `src/*` project must be listed in
    `SolTechnology.Core.slnx`, otherwise the pack glob would silently skip it. Projects with
    `<IsPackable>false>` and the two deprecated ids kept out of the slnx (`Scheduler`, `Guards`) are
    excluded from the check.
 6. **Pack** — enumerates `src/*.csproj` from `dotnet sln … list` and `dotnet pack -c Release` each into
    `./artifacts`.
-7. **Publish** (gated) — `dotnet nuget push ./artifacts/*.nupkg` with `--skip-duplicate`, so re-runs
-   cannot clobber an already-published version. Needs the `NUGET_API_KEY` repo secret.
+7. **Upload** — `*.nupkg` and `*.snupkg` are uploaded as the `nuget-packages` artifact.
+
+### `publish` job
+
+Runs after `build` only for `v*` tags and waits for approval on the `nuget-release` environment.
+Before approving, the reviewer checks that the tag equals `<Version>` in
+[`src/Directory.Build.props`](../src/Directory.Build.props): the package version comes from the
+props file, not from the tag, and nuget.org versions can never be reused. The job downloads the
+artifact and runs `dotnet nuget push ./artifacts/*.nupkg --skip-duplicate`, which also pushes the
+matching `.snupkg` symbol packages.
 
 ## Unlisting deprecated packages — `Unlist deprecated packages`
 
