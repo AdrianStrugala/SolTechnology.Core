@@ -16,6 +16,8 @@
 		<PackageReference Include="Microsoft.Extensions.Diagnostics.HealthChecks" Version="10.0.9" />
 		<PackageReference Include="Microsoft.SqlServer.DacFx" Version="170.4.83" />
 		<PackageReference Include="Polly" Version="8.7.0" />
+		<!-- GHSA-846f-f764-76mx via Microsoft.Data.SqlClient; remove when SqlClient depends on a patched Pkcs. -->
+		<PackageReference Include="System.Security.Cryptography.Pkcs" Version="10.0.13" />
 	</ItemGroup>
 
 	<ItemGroup>

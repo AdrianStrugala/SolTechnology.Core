@@ -24,6 +24,8 @@
 		<PackageReference Include="Microsoft.Data.SqlClient" Version="7.0.1" />
 		<PackageReference Include="Npgsql" Version="10.0.3" />
 		<PackageReference Include="Respawn" Version="7.0.0" />
+		<!-- GHSA-846f-f764-76mx via Microsoft.Data.SqlClient; remove when SqlClient depends on a patched Pkcs. -->
+		<PackageReference Include="System.Security.Cryptography.Pkcs" Version="10.0.13" />
 	</ItemGroup>
 
 </Project>
