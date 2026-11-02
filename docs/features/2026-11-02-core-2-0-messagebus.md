@@ -95,9 +95,13 @@ MessageBus.Tests gains a `ProjectReference` to `SolTechnology.Core.ServiceBus.Te
 ## Implementation plan
 
 Steps live in the temporary working folder `2026-11-02-core-2-0-messagebus/` (see its `summary.md`). Gates: `review` is
-`pending` (breaking public API or persisted contract, so the planner cannot waive it; the user may
-skip it); `premortem` is `skipped` — the core premortem verdict `go-with-mitigations (2026-11-02)`
+`done (2026-11-02)`; `premortem` is `skipped` — the core premortem verdict `go-with-mitigations (2026-11-02)`
 covers these steps.
+
+Plan review (2026-11-02): the regrouping was checked against the pre-regroup plan (`dddac21c`) and
+found complete. User answers recorded, not re-asked: the delivery order with AUID before Tale is
+confirmed (Tale references AUID); the per-library split, the premortem reuse, and the `C-01`…`C-24`,
+`C-26`, `C-27` confirmations stand (`C-25` rejected). Review fixes applied here: the retrospective's DreamTravel test command is runnable.
 
 Notation: an unqualified step number is a step of this feature; `core NN` names step `NN` of
 [`2026-11-02-core-2-0-flagship-hardening`](2026-11-02-core-2-0-flagship-hardening.md); other short names (`result`, `logging`, `cqrs`, `auid`, `tale`, `http`, `api-auth`,

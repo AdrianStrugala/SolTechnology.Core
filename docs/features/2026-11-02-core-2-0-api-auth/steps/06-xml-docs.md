@@ -14,7 +14,7 @@ Former core step 56 (Api and Authentication parts); split per library on 2026-11
 ## Affected components
 - `src/SolTechnology.Core.API/SolTechnology.Core.API.csproj` — EDIT — `<GenerateDocumentationFile>true</GenerateDocumentationFile>`
 - `src/SolTechnology.Core.Authentication/SolTechnology.Core.Authentication.csproj` — EDIT — `<GenerateDocumentationFile>true</GenerateDocumentationFile>`
-- `src/SolTechnology.Core.API/**/*.cs`, `src/SolTechnology.Core.Authentication/**/*.cs` — EDIT — `<summary>` on every public/protected member reported by `CS1591` (XML doc comments only in both `ModuleInstaller.cs` files)
+- `src/SolTechnology.Core.API/**/*.cs`, `src/SolTechnology.Core.Authentication/**/*.cs` — EDIT — `<summary>` on every public/protected member reported by `CS1591` (both `ModuleInstaller.cs` files get XML doc comments only, no code change)
 
 ## Changes
 - English, one or two sentences per member, per [`PublicDocumentationGuide.md`](../../../../docs/PublicDocumentationGuide.md). No `<NoWarn>CS1591</NoWarn>` (`CLAUDE.md §2`).

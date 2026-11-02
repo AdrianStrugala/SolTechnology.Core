@@ -1,7 +1,7 @@
 ---
 spec: 2026-11-02-logging-chronicle
 step: 03
-status: blocked
+status: to-do
 ---
 
 # Step 03: Chronicle report model, ASCII tree renderer, and N+1 aggregation
@@ -28,7 +28,10 @@ pure and has no logging dependency, so golden-string tests pin the format.
   - Status is rendered lowercase: `ok`, `failed`, or `cancelled`.
   - A failed step adds `Error=[{type}: {message}]`.
 - Aggregated line: `{Name} x{Count} [total {DurationMs} ms] [max {MaxMs} ms] [failed {FailedCount}]`. At or above the N+1 threshold it appends `N+1 suspected`. The children of aggregated steps are not rendered (their count is shown as `+{n} nested`).
-- Markers: `[truncated]`, `+{n} steps dropped`, `+{n} deeper steps`, `+{n} attributes dropped`, `(unfinished)`, `+{n} late steps`.
+- Markers: `[truncated]`, `+{n} steps dropped`, `+{n} deeper steps`, `+{n} attributes dropped`, `+{n} nested`, `(unfinished)`, `+{n} late steps`.
+  - `+{n} late steps` and `ChronicleReport.LateStepCount` count steps started under an already
+    closed parent step while the root was open (step 01). Steps after root close never reach a
+    report.
 - Characters are ASCII only. The output starts with a newline, so the tree begins on its own line inside `[{@Chronicle}]`.
 - `ChronicleReport.ToString()` returns the rendered tree. The renderer is called once and the
   result cached, because the logger may call `ToString` more than once.
@@ -49,6 +52,6 @@ pure and has no logging dependency, so golden-string tests pin the format.
 - [ ] `find src/SolTechnology.Core.Logging/Chronicles -name "*.cs" | xargs wc -l | awk '$1>150 && $2!="total"'` prints nothing.
 
 ## Open questions
-- OQ-1 (brief): `CLAUDE.md §2` confirmation of `CH-04` (thresholds) and `CH-06` (report model).
+- none (OQ-1 confirmed by the user 2026-11-02: `CH-04` thresholds, `CH-06` report model)
 
 ## Deviations

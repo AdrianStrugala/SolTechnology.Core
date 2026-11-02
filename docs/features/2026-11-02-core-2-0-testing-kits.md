@@ -75,7 +75,7 @@ Accepted risks:
 
 Premortem mitigations carried verbatim from core 00: none.
 
-No test project exists for the `*.Testing` packages, and none is created (Q6, AR-1); the kits are exercised by the library test projects that use them (SQL.Tests, Cache.Tests, MessageBus.Tests, Api.Tests, HTTP.Tests). The kits have no L-03 template row; step 06 runs the library-scoped `[{Placeholder}]` check. Delivered last: step 03 renames fixture methods that the SQL, Cache, and MessageBus features start using.
+No test project exists for the `*.Testing` packages, and none is created (Q6); the kits are exercised by the library test projects that use them (SQL.Tests, Cache.Tests, MessageBus.Tests, API.Tests, HTTP.Tests, CQRS.Tests, Hangfire.Tests) and by the DreamTravel component tests. The kits have no L-03 template row; step 06 runs the library-scoped `[{Placeholder}]` check. Delivered last: step 03 renames fixture methods that the SQL, Cache, and MessageBus features start using.
 
 ## Scope
 
@@ -88,7 +88,7 @@ No test project exists for the `*.Testing` packages, and none is created (Q6, AR
 
 ### Out of scope
 
-- A test project for the `*.Testing` packages (Q6, AR-1).
+- A test project for the `*.Testing` packages (Q6).
 - WireMock 2.13 → 2.21 (outdated-package sweep).
 - Work owned by the foundation feature (CI, publishing, version, DreamTravel exception page, secret
   artifacts, zero-dependency base package, central `GenerateDocumentationFile`), the other library
@@ -97,9 +97,13 @@ No test project exists for the `*.Testing` packages, and none is created (Q6, AR
 ## Implementation plan
 
 Steps live in the temporary working folder `2026-11-02-core-2-0-testing-kits/` (see its `summary.md`). Gates: `review` is
-`pending` (breaking public API or persisted contract, so the planner cannot waive it; the user may
-skip it); `premortem` is `waived` — the core premortem verdict `go-with-mitigations (2026-11-02)`
+`done (2026-11-02)`; `premortem` is `waived` — the core premortem verdict `go-with-mitigations (2026-11-02)`
 covers these steps.
+
+Plan review (2026-11-02): the regrouping was checked against the pre-regroup plan (`dddac21c`) and
+found complete. User answers recorded, not re-asked: the delivery order with AUID before Tale is
+confirmed (Tale references AUID); the per-library split, the premortem reuse, and the `C-01`…`C-24`,
+`C-26`, `C-27` confirmations stand (`C-25` rejected). Review fixes applied here: step 06 regains the former step 65 DreamTravel component-test criterion; the brief's test list adds CQRS.Tests, Hangfire.Tests (both reference `SolTechnology.Core.Testing`), and the DreamTravel component tests, with the tracked `API` casing; the retrospective's DreamTravel test command is runnable.
 
 Notation: an unqualified step number is a step of this feature; `core NN` names step `NN` of
 [`2026-11-02-core-2-0-flagship-hardening`](2026-11-02-core-2-0-flagship-hardening.md); other short names (`result`, `logging`, `cqrs`, `auid`, `tale`, `http`, `api-auth`,
@@ -125,7 +129,8 @@ Steps run in number order; each is one PR.
 - [ ] `C-23` and `C-24` shipped; every test project that uses a fixture compiles against the renamed members.
 - [ ] A WireMock request without a matching mapping fails the test by default (P-11).
 - [ ] `dotnet build SolTechnology.Core.slnx -c Release` is green, and `dotnet build SolTechnology.Core.slnx 2>&1 | grep -E "NU190[1-4]|NU1605"` prints nothing.
-- [ ] `dotnet test tests/SolTechnology.Core.Api.Tests` and `dotnet test tests/SolTechnology.Core.HTTP.Tests` and `dotnet test tests/SolTechnology.Core.SQL.Tests` and `dotnet test tests/SolTechnology.Core.Cache.Tests` and `dotnet test tests/SolTechnology.Core.MessageBus.Tests` are green.
+- [ ] `dotnet test tests/SolTechnology.Core.API.Tests` and `dotnet test tests/SolTechnology.Core.HTTP.Tests` and `dotnet test tests/SolTechnology.Core.SQL.Tests` and `dotnet test tests/SolTechnology.Core.Cache.Tests` and `dotnet test tests/SolTechnology.Core.MessageBus.Tests` and `dotnet test tests/SolTechnology.Core.CQRS.Tests` and `dotnet test tests/SolTechnology.Core.Hangfire.Tests` (the last two reference `SolTechnology.Core.Testing`) are green.
+- [ ] `dotnet test sample-tale-code-apps/DreamTravel/tests/Component/DreamTravel.Component.Tests.csproj` is green (it uses the fixtures and the HTTP.Testing faker).
 - [ ] `find src/SolTechnology.Core.Testing src/SolTechnology.Core.HTTP.Testing src/SolTechnology.Core.API.Testing src/SolTechnology.Core.SQL.Testing src/SolTechnology.Core.Redis.Testing src/SolTechnology.Core.Blob.Testing src/SolTechnology.Core.ServiceBus.Testing -name "*.cs" -not -path "*/obj/*" | xargs wc -l | awk '$1>150 && $2!="total"'` prints nothing.
 - [ ] Every packed `.nupkg` of this feature contains `lib/net10.0/*.xml`.
 - [ ] Every C# snippet in `docs/Testing.md`, `docs/HTTP.Testing.md`, `docs/API.Testing.md`, `docs/SQL.Testing.md`, `docs/Redis.Testing.md`, `docs/Blob.Testing.md`, `docs/ServiceBus.Testing.md` compiles in a throwaway console project against the 2.0 API, as recorded in the module-docs step.

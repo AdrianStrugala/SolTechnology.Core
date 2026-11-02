@@ -1,7 +1,7 @@
 ---
 spec: 2026-11-02-logging-chronicle
 step: 05
-status: blocked
+status: to-do
 ---
 
 # Step 05: Chronicle steps as OpenTelemetry Activities on `OperationsName`
@@ -42,6 +42,6 @@ their spans. Attributes become tags. Status maps to `ActivityStatusCode`.
 - [ ] `grep -rn "new ActivitySource" src/SolTechnology.Core.Logging` lists only `Operations/CoreLoggingActivitySources.cs`.
 
 ## Open questions
-- OQ-1 (brief): `CLAUDE.md §2` confirmation of `CH-04` (`EmitActivities`).
+- none (OQ-1 confirmed by the user 2026-11-02: `CH-04` `EmitActivities`)
 
 ## Deviations

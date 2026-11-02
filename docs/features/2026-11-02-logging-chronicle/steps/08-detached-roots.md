@@ -1,7 +1,7 @@
 ---
 spec: 2026-11-02-logging-chronicle
 step: 08
-status: blocked
+status: to-do
 ---
 
 # Step 08: Chronicle detached roots — `IChronicle.BeginRoot`
@@ -27,7 +27,7 @@ Hangfire jobs (step 14) use it to guarantee their own report. The step is Loggin
   - `Enabled = false` → returns `default(ChronicleStep)` (no-op); an Activity is still started per step 05 when the source has listeners.
   - Otherwise starts a new `ChronicleRoot` and sets the ambient node to its root node.
   - When an open ambient root exists, `DetachedFrom` = that root's name. The outer root records nothing about the detached root.
-- `Dispose` of a detached root restores the ambient node captured at `BeginRoot`, even when that node's root is still open.
+- `Dispose` of a detached root restores the ambient node captured at `BeginRoot`, even when that node's root is still open (still only when the ambient node is the detached root, step 01 rule).
 - Steps started after the detached root is disposed land in the restored node.
 - Tests:
   - `BeginRoot_NoAmbientRoot_StartsRoot`.
@@ -45,6 +45,6 @@ Hangfire jobs (step 14) use it to guarantee their own report. The step is Loggin
 - [ ] `dotnet build SolTechnology.Core.slnx` is green.
 
 ## Open questions
-- OQ-1 (brief): `CLAUDE.md §2` confirmation of `CH-11` (`IChronicle.BeginRoot`).
+- none (OQ-1 confirmed by the user 2026-11-02: `CH-11` `IChronicle.BeginRoot`; B11 accepted by the plan review)
 
 ## Deviations

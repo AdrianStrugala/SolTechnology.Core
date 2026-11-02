@@ -26,9 +26,9 @@ step with nested HTTP steps. The call-site migration itself happened in step 09.
 
 ## Changes
 - Test `FindCityByName_OneRequest_EmitsOne2151EntryWithNestedCQRSAndHTTPSteps`:
-  - Arrange the Google fake API through `WireMockFixture`, as `FindCityAndSaveDetailsTest` does.
+  - Arrange the Google fake API through `WireMockFixture`, as `FindCityAndSaveDetailsTest` does, for a city name absent from the seeded database (`CityDomainService.Get` reads EF Core first and calls Google only on a miss).
   - Act: one API call that runs `FindCityByNameQuery`.
-  - Assert: exactly one 2151 record for the request path; its report contains `FindCityByNameQuery` with child `FetchCity`, and `FetchCity` contains at least one `HTTP GET` step; the status is `Ok`; the report has no `Event CitySearched` step (the event is persisted to Hangfire and handled in the Worker).
+  - Assert (on `FakeLogRecord.Message`): exactly one 2151 record for the request path; its report contains `FindCityByNameQuery` with child `FetchCity`, and `FetchCity` contains at least one `SQL SELECT` step (EF Core over SqlClient, step 07) and at least one `HTTP GET Google` step; the status is `Ok`; the report has no `Event CitySearched` step (the event is persisted to Hangfire and handled in the Worker).
 - Test `FindCityByName_UnknownCity_ReportShowsFailedStep` when the fake API returns an error response: one 2151 entry, level ≥ Warning.
 - Read the report from `FakeLogCollector` through `ApiFixture.TestServer.Services.GetFakeLogCollector()`.
 - No secrets are added; configuration keys hold non-secret values only.

@@ -33,13 +33,14 @@ the event type, so reports read like the work instead of `RecurringJobRunner<TJo
   - `Canceled` → `Cancel()`.
   - Otherwise `Ok`.
 - Event handler steps from step 10 nest under the `Event {EventType}` root, because `DispatchInScope` runs inside it.
-- Tests:
+- Tests (`FakeLogCollector`; tree assertions on `FakeLogRecord.Message`):
   - `OnPerformed_JobSucceeded_EmitsOneRootReportOk`.
   - `OnPerformed_JobThrew_RootFailedWithException`.
   - `OnPerformed_Canceled_RootCancelled`.
   - `OnPerforming_RecurringRunner_RootNamedAfterJobType`.
   - `OnPerforming_PersistentEvent_RootNamedAfterEventType`.
-  - `JobBody_ChronicleSteps_NestUnderJobRoot`.
+  - `JobBody_ChronicleSteps_NestUnderJobRoot`, run through a real `Hangfire.Server.BackgroundJobPerformer` with a `JobFilterCollection` holding `CorrelationIdJobFilter` and `ChronicleJobFilter` and an async job method, so the `AsyncLocal` flow from `OnPerforming` into the job body and the restore in `OnPerformed` are proven against Hangfire's real filter pipeline, not only against hand-built contexts.
+  - `OnPerforming_CanceledByEarlierFilter_StartsNoRoot` (for example `preventOverlap`).
   - `OnPerforming_InsideOpenRoot_StartsSeparateRoot`.
   - `OnPerformed_RestoresPreviousAmbientNode`.
   - `ChronicleJobFilter_Order_RunsAfterCorrelationFilter`.

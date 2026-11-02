@@ -82,9 +82,13 @@ Premortem mitigations carried verbatim from core 00: RM-20 (step 04).
 ## Implementation plan
 
 Steps live in the temporary working folder `2026-11-02-core-2-0-core-result/` (see its `summary.md`). Gates: `review` is
-`pending` (breaking public API or persisted contract, so the planner cannot waive it; the user may
-skip it); `premortem` is `skipped` — the core premortem verdict `go-with-mitigations (2026-11-02)`
+`done (2026-11-02)`; `premortem` is `skipped` — the core premortem verdict `go-with-mitigations (2026-11-02)`
 covers these steps.
+
+Plan review (2026-11-02): the regrouping was checked against the pre-regroup plan (`dddac21c`) and
+found complete. User answers recorded, not re-asked: the delivery order with AUID before Tale is
+confirmed (Tale references AUID); the per-library split, the premortem reuse, and the `C-01`…`C-24`,
+`C-26`, `C-27` confirmations stand (`C-25` rejected). Review fixes applied here: step 02 adds the missing `ProjectReference` from `tests/SolTechnology.Core.Tests` to `src/SolTechnology.Core` (the project held only guard tests); the brief's test criterion also names `tests/SolTechnology.Core.CQRS.Tests`, where `ErrorSerializationTests` lives; the retrospective's DreamTravel test command is runnable.
 
 Notation: an unqualified step number is a step of this feature; `core NN` names step `NN` of
 [`2026-11-02-core-2-0-flagship-hardening`](2026-11-02-core-2-0-flagship-hardening.md); other short names (`result`, `logging`, `cqrs`, `auid`, `tale`, `http`, `api-auth`,
@@ -109,7 +113,7 @@ Steps run in number order; each is one PR.
 - [ ] Regression tests for `B7` (unknown `Error` subtype, `AggregateError` round-trip) fail on `4097d47f` and pass.
 - [ ] `C-02` shipped: `Result.IsSuccess`, `Result.Error`, and `Result<T>.Data` have `private init`; `Result<T>.FailAsTask(Error)` returns `Task<Result<T>>`.
 - [ ] `dotnet build SolTechnology.Core.slnx -c Release` is green, and `dotnet build SolTechnology.Core.slnx 2>&1 | grep -E "NU190[1-4]|NU1605"` prints nothing.
-- [ ] `dotnet test tests/SolTechnology.Core.Tests` is green.
+- [ ] `dotnet test tests/SolTechnology.Core.Tests` and `dotnet test tests/SolTechnology.Core.CQRS.Tests` (home of `ErrorSerializationTests`) are green.
 - [ ] `find src/SolTechnology.Core -name "*.cs" -not -path "*/obj/*" | xargs wc -l | awk '$1>150 && $2!="total"'` prints nothing.
 - [ ] Every packed `.nupkg` of this feature contains `lib/net10.0/*.xml`.
 - [ ] Every C# snippet in `docs/Core.md` compiles in a throwaway console project against the 2.0 API, as recorded in the module-docs step.

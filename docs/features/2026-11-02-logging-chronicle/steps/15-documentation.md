@@ -35,7 +35,9 @@ retrospective (step 17) updates them.
   - EventIds table: 2150 `ChronicleReported`, 2151 `RequestChronicleReported`, and the unchanged 2137–2140.
   - KQL example filtering on `ChronicleStatus` and `ElapsedMs`; `Chronicle` is tree text in OTel and App Insights (B6).
   - Silencing 2137–2139 through the `SolTechnology.Core.CQRS.PipelineBehaviors.LoggingPipelineBehavior` category level.
-  - Flight recorder: opt-in, failed roots only, Serilog needs `writeToProviders: true` or `builder.Logging.AddSerilog()`.
+  - Flight recorder: opt-in, failed roots only, Serilog needs `writeToProviders: true` or `builder.Logging.AddSerilog()`; with `writeToProviders`, Serilog's `MinimumLevel` must admit Debug.
+  - Serilog: `{@Chronicle}` is destructured as a structure (not the ASCII tree) and capped by `MaximumDestructuringDepth` (default 10, below `MaxDepth` 12).
+  - SQL capture runs in a hosted service, so it is active only in hosts that start `IHostedService`s.
   - Console `SingleLine: true` flattens the tree into one line; recommend `SingleLine: false` where humans read the console.
   - OpenTelemetry: steps are Activities on `CoreLoggingActivitySources.OperationsName`; `EmitActivities = false` opts out; the CQRS span is now the Chronicle step span.
   - `#### Migrating from ITimingService (1.x)`: the brief's release-notes bullets. This subsection is the only place in `docs/` outside `docs/features/` that names `ITimingService`.
@@ -52,7 +54,7 @@ retrospective (step 17) updates them.
 - [ ] `grep -rln "ITimingService" docs --include=*.md | grep -v "docs/features/"` prints only `docs/Log.md`, and every match there lies under `#### Migrating from ITimingService (1.x)`.
 - [ ] `grep -l "Chronicle" docs/CQRS.md docs/Tale.md docs/Clients.md docs/SQL.md docs/Bus.md docs/Hangfire.md | wc -l` prints `6`.
 - [ ] The sample tree in `docs/Log.md` is byte-identical to the golden string in `tests/SolTechnology.Core.Logging.Tests/Chronicles/ChronicleTreeRendererTests.cs`.
-- [ ] `grep -rniE "aiia|LogStopwatch|GetTimingReportAndReset" docs | grep -v "docs/features/2026-11-02-logging-chronicle"` prints nothing.
+- [ ] `git grep -niE "decompil|ilspy|dotpeek" -- docs ':!docs/features/2026-11-02-logging-chronicle*'` prints nothing (clean room).
 - [ ] The `documentation-cleanup` skill reports no broken links or tables in the edited files.
 
 ## Open questions

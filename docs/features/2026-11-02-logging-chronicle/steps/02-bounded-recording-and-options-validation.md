@@ -1,7 +1,7 @@
 ---
 spec: 2026-11-02-logging-chronicle
 step: 02
-status: blocked
+status: to-do
 ---
 
 # Step 02: Chronicle — bounded recording and options validation
@@ -36,12 +36,15 @@ still feed a per-parent aggregate (count, total and max duration, failed count),
 - `MaxAttributesPerStep`: later keys are ignored and counted (`DroppedAttributeCount`). Setting an
   existing key overwrites it.
 - `MaxAttributeValueLength`: a longer value is cut to the limit and suffixed with `[truncated]`.
+  The same cut applies to the failure message stored by `Fail` (exception messages can be long
+  and can carry PII).
 - The group key equals the step name, except for SQL steps (step 07 sets it).
 - Tests:
   - `MaxSteps_Exceeded_DropsNodesAndAggregatesOverflow` (`MaxSteps = 10`, 50 identical steps → 9 child nodes + overflow count 41).
   - `MaxDepth_Exceeded_CountsDeeperSteps`.
   - `MaxAttributesPerStep_Exceeded_IgnoresAndCounts`.
   - `AttributeValue_TooLong_TruncatedWithMarker`.
+  - `FailMessage_TooLong_TruncatedWithMarker`.
   - `[TestCase]` validator rows for every range bound (valid and invalid).
 
 ## Acceptance criteria
@@ -50,6 +53,6 @@ still feed a per-parent aggregate (count, total and max duration, failed count),
 - [ ] `find src/SolTechnology.Core.Logging/Chronicles -name "*.cs" | xargs wc -l | awk '$1>150 && $2!="total"'` prints nothing.
 
 ## Open questions
-- OQ-1 (brief): `CLAUDE.md §2` confirmation of `CH-04` (the four limit properties).
+- none (OQ-1 confirmed by the user 2026-11-02: `CH-04` limit properties)
 
 ## Deviations

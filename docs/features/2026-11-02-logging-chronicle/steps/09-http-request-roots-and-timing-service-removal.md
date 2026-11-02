@@ -1,7 +1,7 @@
 ---
 spec: 2026-11-02-logging-chronicle
 step: 09
-status: blocked
+status: to-do
 ---
 
 # Step 09: HTTP request roots in `LoggingMiddleware`; remove `ITimingService`
@@ -37,14 +37,14 @@ time kept as scalar placeholders. A failed request logs one Error 2151 entry wit
 ## Changes
 - Root name: `HTTP {Method}`. The route template is added at completion as `Route`; requests with no endpoint get `Route=unmatched`.
 - The root starts through `BeginWithoutActivity(name, reportedByCaller: true)`: ASP.NET Core already owns the request Activity, and the reporter (step 04) must not emit a second entry.
-- Fallback when `IChronicle` is not `ChronicleRecorder` (a user replacement): `chronicle.Begin(name)` and no 2151 entry; the replacement owns reporting.
+- Fallback when `IChronicle` is not `ChronicleRecorder` (a user replacement): `chronicle.Begin(name)`, and the middleware logs the same entries as with `Enabled = false`. A request never ends without a finish entry; the replacement owns any report.
 - Status and level:
   - Unhandled exception → `Fail(exception)` → Error 2151 with the exception attached (LC-02). The "Request [..] failed after [..]" entry is not logged.
   - Client abort (the existing `IsClientAbort` check) → `Cancel()` → Warning 2151 (LC-02).
   - Otherwise `ChronicleEmissionPolicy.Decide(report, statusCode)` (step 04): 5xx → Error, 4xx → Warning, slow → Warning, else Information.
 - Sampling (LC-04) applies; failures and slow requests are always emitted.
 - `RequestPath` keeps the value the existing finish entry uses, so existing KQL keeps working.
-- Tests (`LoggingMiddlewareChronicleTests`, `FakeTimeProvider`, `FakeLogCollector`):
+- Tests (`LoggingMiddlewareChronicleTests`, `FakeTimeProvider`, `FakeLogCollector`; tree assertions on `FakeLogRecord.Message`, see the brief's testing conventions):
   - `InvokeAsync_SuccessfulRequest_EmitsOneEntryWithEventId2151`.
   - `InvokeAsync_EndpointSteps_ReportContainsNestedSteps`.
   - `InvokeAsync_SlowRequest_LogsWarning`.
@@ -52,6 +52,7 @@ time kept as scalar placeholders. A failed request logs one Error 2151 entry wit
   - `InvokeAsync_HandlerThrows_LogsExactlyOneErrorEntryWithException`.
   - `InvokeAsync_ClientAbort_LogsWarningCancelled`.
   - `InvokeAsync_ChronicleDisabled_LogsPreviousFinishEntryWithoutTimings`.
+  - `InvokeAsync_ReplacedChronicle_LogsPreviousFinishEntry`.
   - `InvokeAsync_SkippedPath_EmitsNoReport`.
   - `InvokeAsync_RequestRoot_StartsNoOperationsActivity`.
   - `InvokeAsync_RequestRoot_NoEventId2150Entry`.
@@ -69,7 +70,6 @@ time kept as scalar placeholders. A failed request logs one Error 2151 entry wit
 - [ ] Premortem mitigations for `ModuleInstaller.cs` (step 00) are applied.
 
 ## Open questions
-- OQ-1 (brief): `CLAUDE.md §2` confirmation of `CH-08` (delete `ITimingService`) and `CH-09` (`InvokeAsync` parameter).
-- OQ-2 (brief): acceptance of `LC-01` and `LC-02`.
+- none (OQ-1 confirmed 2026-11-02: `CH-08` delete `ITimingService`, `CH-09` `InvokeAsync` parameter; OQ-2 accepted 2026-11-02: `LC-01`, `LC-02`)
 
 ## Deviations

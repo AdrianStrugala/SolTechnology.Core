@@ -34,7 +34,7 @@ run's `IServiceProvider`, so no public Tale constructor changes. `AddSolTale` re
 - The step name uses `ChapterId`, not the history key from `2026-11-02-core-2-0-tale` step "Tale — chapter history keyed by step index and full type name", so names stay readable and aggregate by chapter.
 - Interactive chapter input is never recorded as an attribute (PII).
 - Logging must still have no `ProjectReference` (cycle guard).
-- Tests:
+- Tests (`FakeLogCollector`; tree assertions on `FakeLogRecord.Message`):
   - `Handle_ThreeChapters_TaleStepHasThreeChapterChildrenInOrder`.
   - `Handle_ChapterFails_ChapterAndTaleStepsFailedAndLaterChaptersAbsent`.
   - `Handle_CallerCancelled_ChapterCancelled`.
@@ -47,6 +47,7 @@ run's `IServiceProvider`, so no public Tale constructor changes. `AddSolTale` re
 
 ## Acceptance criteria
 - [ ] `dotnet test tests/SolTechnology.Core.Tale.Tests` is green.
+- [ ] `find src/SolTechnology.Core.Tale -name "*.cs" -not -path "*/obj/*" | xargs wc -l | awk '$1>150 && $2!="total"'` lists no file this step edited.
 - [ ] `grep -c "SolTechnology.Core.Logging.csproj" src/SolTechnology.Core.Tale/SolTechnology.Core.Tale.csproj` prints `1`.
 - [ ] `grep -n "ProjectReference" src/SolTechnology.Core.Logging/SolTechnology.Core.Logging.csproj` prints nothing.
 - [ ] `d=$(mktemp -d) && dotnet pack src/SolTechnology.Core.Tale -c Release -o "$d" && unzip -p "$d"/SolTechnology.Core.Tale.*.nupkg SolTechnology.Core.Tale.nuspec | grep 'id="SolTechnology.Core.Logging"'` prints one dependency line with the same version as Tale.

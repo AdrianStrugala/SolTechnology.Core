@@ -1,6 +1,6 @@
 ---
 spec: 2026-11-02-core-2-0-testing-kits
-review: pending
+review: done (2026-11-02)
 premortem: waived (no CLAUDE.md §4 trigger: no ModuleInstaller.cs, Directory.Build.props, or persisted-contract edit; content covered by core premortem go-with-mitigations 2026-11-02 in 2026-11-02-core-2-0-flagship-hardening — planner, 2026-11-02)
 ---
 

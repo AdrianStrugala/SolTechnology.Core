@@ -1,5 +1,5 @@
 ---
-status: planning
+status: planned
 created: 2026-11-02
 completed:
 ---
@@ -33,12 +33,12 @@ message, or a manual `Begin("ImportCities")`. Success means:
 
 The idea comes from an internal company library: named scopes accumulated in the async call
 context and emitted once as a "timing report" at request end. Chronicle is designed and
-implemented **from scratch**. No proprietary source, binary, decompiled code, or package content
-of that library is opened, copied, decompiled, or referenced, and nothing under
-`~/.nuget/packages/aiia*` or the related participant-service repository is read. Only the concept
-(ambient scopes plus one report per operation) is reused. Reviewers reject any PR that cites,
-pastes, or paraphrases that code. Feature acceptance includes a grep that finds no such reference
-in `src/`, `tests/`, `docs/` (outside this brief), or `sample-tale-code-apps/`.
+implemented **from scratch**. No proprietary source, binary, decompiled code, package, or
+repository of that library is opened, copied, decompiled, or referenced. Only the concept
+(ambient scopes plus one report per operation) is reused. This repository names none of that
+library's identifiers, packages, or repositories. Reviewers reject any PR that cites, pastes, or
+paraphrases that code. Every Chronicle PR description attests that no such material was opened,
+and feature acceptance includes a grep for decompiler traces.
 
 ### Decisions made by the user (2026-11-02, do not re-ask)
 
@@ -53,7 +53,7 @@ in `src/`, `tests/`, `docs/` (outside this brief), or `sample-tale-code-apps/`.
 | U7 | Extras, all selected: (1) N+1 detection, (2) level escalation, (3) flight recorder, (4) sampling, (5) OpenTelemetry Activities (BCL `System.Diagnostics` only). |
 | U8 | Performance: near-zero cost when disabled; allocation-conscious hot path; `TimeProvider`; options validated on start. |
 
-### Current state (verified 2026-11-02 against `master@a0a9bbc6`)
+### Current state (verified 2026-11-02 against `master@a0a9bbc6`; re-verified by the plan review at `497b21f3`)
 
 - `src/SolTechnology.Core.Logging/ITimingService.cs` is public: `StartContext(string)`,
   `GetTimings()`, `Reset()`.
@@ -66,7 +66,7 @@ in `src/`, `tests/`, `docs/` (outside this brief), or `sample-tale-code-apps/`.
   emits `{@Timings}` in the "Finished request" entry (`:128-149`). The public `InvokeAsync`
   signature contains `ITimingService`.
 - `OperationLogMessages.cs` has `[LoggerMessage]` EventIds 2137–2140.
-  `Operations/CoreLoggingActivitySources.cs:26,32` holds `OperationsName` (const) and
+  `Operations/CoreLoggingActivitySources.cs:29,32` holds `OperationsName` (const) and
   `Operations`, which `2026-11-02-core-2-0-logging` step "Logging — public surface cleanup (`LoggerExtensions`,
   internal `Operations`)" makes internal.
 - `CQRS/PipelineBehaviors/LoggingPipelineBehavior.cs:28` starts an Activity per request. The same
@@ -88,9 +88,13 @@ in `src/`, `tests/`, `docs/` (outside this brief), or `sample-tale-code-apps/`.
 - SQL: `ISQLConnectionFactory.CreateConnection()` returns `IDbConnection` backed by
   `Microsoft.Data.SqlClient` 7.0.1. SqlClient raises `DiagnosticListener`
   `"SqlClientDiagnosticListener"` events `Microsoft.Data.SqlClient.WriteCommandBefore`,
-  `WriteCommandAfter`, and `WriteCommandError`. Planning confirmed these event names on
-  2026-11-02 from the public OpenTelemetry SqlClient instrumentation, which still subscribes to
-  them; step 07's integration test is the binding evidence.
+  `WriteCommandAfter`, and `WriteCommandError`. The plan review verified this on 2026-11-02 in
+  the SqlClient `v7.0.1` tag source (`Diagnostics/SqlDiagnosticListener.cs`,
+  `Diagnostics/SqlClientCommandBefore.cs`): the listener is named `SqlClientDiagnosticListener`;
+  each write is guarded by the single-argument `IsEnabled(eventName)`; and the payloads are the
+  public sealed types `SqlClientCommandBefore`/`After`/`Error`. These types implement
+  `IReadOnlyList<KeyValuePair<string, object>>` and carry `OperationId`, `Command`, and
+  `Exception` for `Error`. Step 07's integration test remains the binding evidence.
 - MessageBus: `Receive/MessageBusReceiver.cs:67` `HandleMessageAsync` per message (internal after
   `2026-11-02-core-2-0-messagebus` step "MessageBus — internal implementation types"). Hangfire: `Filters/CorrelationIdJobFilter.cs` (AsyncLocal capture and restore
   per `2026-11-02-core-2-0-hangfire` step "Hangfire — restore ambient correlation state; async,
@@ -182,8 +186,8 @@ another location.
 **Red team.**
 
 1. Domain code and static helpers must inject `IChronicle`, which counts toward the ≤5
-   constructor-dependency budget (Guide §9.4). A static `Chronicle.Step()`, like the inspiration's
-   `EnterScope`, is more ergonomic.
+   constructor-dependency budget (Guide §9.4). A static `Chronicle.Step()` facade
+   is more ergonomic.
 2. Struct handles can be copied and disposed twice. Node close must be idempotent.
 3. `Current` lets deep code add attributes to an ancestor step (intended for HTTP retries, but
    open to misuse).
@@ -224,9 +228,10 @@ engine through the run's `IServiceProvider`. So does the only external call site
 **Red team.**
 
 1. Tale → Logging is a new package edge (CP-01) and couples the orchestration package to logging.
-2. The SQL observer depends on SqlClient's event names and anonymous payload property names
-   (`Command`, `CommandText`, `CommandType`, `Exception`). They are read through reflection, not
-   checked at compile time, and are not trimming-friendly.
+2. The SQL observer depends on SqlClient's event names and payload keys (`OperationId`,
+   `Command`, `Exception`), which are not checked at compile time. *Plan review:* the 7.x payloads
+   implement `IReadOnlyList<KeyValuePair<string, object>>`, and `Command` (a `SqlCommand`) is read
+   as the BCL `IDbCommand`, so step 07 needs no reflection and the observer stays trimming-safe.
 3. Command text can carry PII literals, so capturing it is off by default.
 
 **Alternatives.**
@@ -255,10 +260,10 @@ engine through the run's `IServiceProvider`. So does the only external call site
 |---|---|---|---|
 | B4 | Flight-recorder capture | (a) an `ILoggerProvider` with `[ProviderAlias("ChronicleFlightRecorder")]`, plus default `LoggerFilterOptions` rules (Debug for all categories; Warning for `Microsoft` and `System`) added only when no rule already targets the alias; (b) an `ILoggerFactory` decorator in DI; (c) a Serilog sink | **(a).** It is the canonical MEL extension point and composes with Console, OTel, and `builder.Logging.AddSerilog()`. It records only while a root is active (`IsEnabled` checks the ambient root), so it costs nothing outside roots. Crux: `UseSerilog()` replaces `ILoggerFactory`, so providers receive nothing unless `writeToProviders: true` is set; this is documented in `Log.md`. (b) depends on registration order relative to `UseSerilog` and misses factories created outside DI. (c) adds an external dependency (`§2`, `nuget-stats.json`). |
 | B5 | Middleware finish entry | (a) For HTTP roots the Chronicle report **is** the finish entry: EventId 2151, `Finished request [..] -> [..] in [..]` prefix and the `RequestMethod`/`RequestPath`/`StatusCode`/`ElapsedMs` properties kept, `{@Timings}` removed; (b) keep "Finished request" and add a separate report | **(a)**, per U5 ("one entry per root"). Existing KQL on the four properties keeps working. P-15 (one Error entry per failure, `2026-11-02-core-2-0-logging` step "Logging — segment-aware path matching; one Error entry per failure") holds: the report replaces the "failed after" entry. With `Enabled = false` the middleware keeps the entries defined by that logging step. Log contract changes LC-01/LC-02. |
-| B6 | Structured payload | (a) `[LoggerMessage]` with scalar placeholders plus `[{@Chronicle}]`, where `ChronicleReport.ToString()` renders the ASCII tree and Serilog destructures the public read-only model; (b) a hand-written `IReadOnlyList<KeyValuePair<string, object?>>` state with a JSON `Chronicle` property that does not appear in the message | **(a)**, because U5 mandates source generation. Limitation: OTel and App Insights receive `Chronicle` as tree text, and KQL filters on the scalar placeholders. (b) becomes a follow-up if per-step KQL is needed. Crux, settled in step 04: if the generator rejects `{@Chronicle}`, use `[{Chronicle}]`, record a deviation, and document that Serilog then stores the tree as a string. |
+| B6 | Structured payload | (a) `[LoggerMessage]` with scalar placeholders plus `[{@Chronicle}]`, where `ChronicleReport.ToString()` renders the ASCII tree and Serilog destructures the public read-only model; (b) a hand-written `IReadOnlyList<KeyValuePair<string, object?>>` state with a JSON `Chronicle` property that does not appear in the message | **(a)**, because U5 mandates source generation. Limitation: OTel and App Insights receive `Chronicle` as tree text, and KQL filters on the scalar placeholders. (b) becomes a follow-up if per-step KQL is needed. Crux settled by the plan review: the generator has accepted `{@Name}` templates since .NET 8 (dotnet/runtime#69490, closed in milestone 8.0.0), so `[{@Chronicle}]` is kept. If step 04 still observes `SYSLIB1014`, use `[{Chronicle}]`, record a deviation, and document that Serilog then stores the tree as a string. |
 | B7 | OpenTelemetry mapping | (a) Chronicle steps start Activities on the shared `OperationsName` source, only when it has listeners, and CQRS drops its step-52 `ActivitySource` because the Chronicle step now produces that Activity; (b) a new source `SolTechnology.Core.Chronicle`; (c) no Activities | **(a).** Consumers' existing `AddSource(OperationsName)` keeps working, with no duplicate CQRS span. HTTP steps are logical spans around HttpClient's physical spans; documented. Opt-out: `EmitActivities = false`. The HTTP request root never starts an Activity, because ASP.NET Core already has one. |
 | B8 | Sampling | (a) Tail-based at root end: always emit when the status is not `Ok`, the level is ≥ Warning, or N+1 is suspected; otherwise emit when `Random.Shared.NextDouble() < SampleRate`; (b) head-based at `Begin` | **(a).** Head-based sampling cannot keep failures. Default `SampleRate = 1.0`, so nothing is dropped unless the user opts in (LC-04). Activities are not affected by Chronicle sampling. |
-| B9 | Nested `Begin` | (a) `Begin` joins the open ambient root as a child, and starts a new root when there is none or the ambient root is already closed (fire-and-forget continuations); (b) `Begin` always starts a new root | **(a).** It keeps one report per request when CQRS runs inside a request, and gives CQRS-only workers a root per top-level command. `Step` on a closed root is dropped and counted (`LateStepCount`). |
+| B9 | Nested `Begin` | (a) `Begin` joins the open ambient root as a child, and starts a new root when there is none or the ambient root is already closed (fire-and-forget continuations); (b) `Begin` always starts a new root | **(a).** It keeps one report per request when CQRS runs inside a request, and gives CQRS-only workers a root per top-level command. A `Step` under an already closed parent step, while the root is still open, is recorded and counted (`LateStepCount`, shown as `+{n} late steps`). A `Step` after its root has closed cannot appear in any report; it is dropped without allocation (plan review: the original "count on the closed root" was always 0 in the emitted report). |
 | B10 | `ITimingService` | Replace and delete (U3) | `StartContext("db")` → `chronicle.Step("db")`; `GetTimings()` → the report; `Reset()` → not needed (one root per request). The internal `TimingService` and its tests are deleted in step 09. |
 | B11 | Fire-and-forget and job/message roots | (a) NEW `IChronicle.BeginRoot(name)` always starts a new root, whatever the ambient node, and restores the previous ambient node on `Dispose`; used by `InMemoryEventPublisher`, MessageBus, and Hangfire; (b) `ExecutionContext.SuppressFlow()` around `Task.Run` in `InMemoryEventPublisher`; (c) rely on `Begin` (B9) only | **(a)**, step 08. (b) also stops `CorrelationId` and `Activity.Current` from flowing, which breaks correlation. (c) makes a fire-and-forget event a child of the publishing handler's step, which usually closes first: the event is reported as `(unfinished)`/late in the request report and gets no report of its own. The detached root carries `DetachedFrom` (the ambient root's name) and the same `TraceId`, so reports stay linkable. Adds `CH-11`. |
 
@@ -294,17 +299,19 @@ Rendering and levels:
   count ≥ `AggregateThreshold` collapse into one line: `x{count}, total, max, failed count`.
 - **N+1 hint:** a count ≥ `NPlusOneThreshold` adds `N+1 suspected` and sets
   `IsNPlusOneSuspected = true`.
-- **Truncation markers:** `[truncated]` (attribute value), `+{n} steps dropped` (`MaxSteps`;
+- **Truncation markers:** `[truncated]` (attribute value or failure message), `+{n} steps dropped` (`MaxSteps`;
   dropped steps still feed their parent's per-group aggregate), `+{n} deeper steps` (`MaxDepth`),
-  and `(unfinished)` (a step still open when the root ends).
+  `+{n} attributes dropped` (`MaxAttributesPerStep`), `+{n} nested` (children of an aggregated
+  line), `+{n} late steps` (steps started under an already closed parent step, B9), and
+  `(unfinished)` (a step still open when the root ends).
 - **Logger categories:** HTTP roots log under the existing `LoggingMiddleware` category, so the
   existing level configuration keeps working. Other roots log under
   `SolTechnology.Core.Logging.Chronicle`.
 
 ### Public API changes requiring `CLAUDE.md §2` confirmation
 
-Namespace `SolTechnology.Core.Logging.Chronicles` unless stated otherwise. All are pending one
-confirmation round (open question OQ-1, `CH-01`…`CH-11`). The steps that implement them are `blocked` until then.
+Namespace `SolTechnology.Core.Logging.Chronicles` unless stated otherwise. The user confirmed
+`CH-01`…`CH-11` in one `CLAUDE.md §2` round on 2026-11-02 (OQ-1).
 
 | ID | Package | Exact change | Step |
 |---|---|---|---|
@@ -335,10 +342,10 @@ Integration types are internal: `ChronicleHTTPHandler`, `ChronicleHTTPAttemptHan
 | CP-02 | `OperationsName` spans now include manual steps, HTTP calls, Tale chapters, and job/message roots | More spans for consumers already subscribed. Opt-out: `EmitActivities = false`. | 05, 08, 10–14 |
 | CP-03 | `AddSolCQRS` (when `UseLogging`), `AddSolTale`, `AddSolHTTPClient`, `AddSolMessageBus`, `AddSolPersistentEvents`, and `AddSolRecurringJob` call `AddSolChronicle()` | `ChronicleOptions` validated on start in those hosts | 04, 10–14 |
 | CP-04 | Logging subscribes to `SqlClientDiagnosticListener` when `CaptureSQLCommands` is `true` | SqlClient writes diagnostic payloads only while a root is active (`IsEnabled` predicate) | 07 |
-| CP-06 | Fire-and-forget CQRS events dispatched by the default `InMemoryEventPublisher` each produce their own root (`Event {EventType}`, EventId 2150) when `IChronicle` is registered | One extra 2150 entry per published event (subject to sampling) | 10 |
 | CP-05 | A flight-recorder `ILoggerProvider` is registered; `IsEnabled(Debug)` returns `true` inside roots when `FlightRecorder.Enabled` | Debug templates are formatted inside roots only when opted in | 06 |
+| CP-06 | Fire-and-forget CQRS events dispatched by the default `InMemoryEventPublisher` each produce their own root (`Event {EventType}`, EventId 2150) when `IChronicle` is registered | One extra 2150 entry per published event (subject to sampling) | 10 |
 
-### Log contract changes (Guide §15 "report only", pending OQ-2)
+### Log contract changes (Guide §15 "report only", accepted by the user 2026-11-02, OQ-2)
 
 - **LC-01** — HTTP finish entry. EventId **2151** `RequestChronicleReported`, template
   `Finished request [{RequestMethod}] [{RequestPath}] -> [{StatusCode}] in [{ElapsedMs} ms]. Chronicle: [{ChronicleStatus}] [{@Chronicle}]`.
@@ -362,18 +369,16 @@ Integration types are internal: `ChronicleHTTPHandler`, `ChronicleHTTPAttemptHan
   conformance — Logging" (`RequestEnvelopeLogger`) assigns. Steps 04 and 09 check uniqueness
   with a grep.
 
-### Open questions (pending user, 2026-11-02)
+### Open questions (resolved 2026-11-02)
 
-Planning could not ask interactively. Each item blocks the steps listed until the user answers
-and the answer is recorded here.
-
-| ID | Question | Recommended answer | Blocks steps |
+| ID | Question | User answer (2026-11-02) | Steps unblocked |
 |---|---|---|---|
-| OQ-1 | Confirm the `CLAUDE.md §2` public API changes `CH-01`…`CH-11` (one round). | Confirm all. | 01, 02, 03, 04, 05, 06, 07, 08, 09, 10 |
-| OQ-2 | Accept the Guide §15 "report only" log contract changes `LC-01`…`LC-05` for 2.0. | Accept all. | 04, 06, 09 |
+| OQ-1 | Confirm the `CLAUDE.md §2` public API changes `CH-01`…`CH-11` (one round). | **Confirmed**: `IChronicle`, `ChronicleStep`, `ChronicleStepStatus`, `ChronicleOptions`, `ChronicleFlightRecorderOptions`, `ChronicleReport`/`ChronicleReportStep`/`ChronicleFlightRecord`, both `AddSolChronicle` overloads, DELETE `ITimingService`, `LoggingMiddleware.InvokeAsync` `ITimingService` → `IChronicle`, the `LoggingPipelineBehavior` constructor gaining `IChronicle`, and `IChronicle.BeginRoot`. | 01–10 |
+| OQ-2 | Accept the Guide §15 "report only" log contract changes `LC-01`…`LC-05` for 2.0. | **Accepted**: EventId 2151 report replaces "Finished request"; one Error entry per failure; new EventId 2150 for non-HTTP roots; sampling; flight recorder. | 04, 06, 09 |
 
-The package edge `CP-01` (Tale → Logging) is a planner decision (B3), not a `§2` item. The
-plan-reviewer may return it to the user together with OQ-1.
+Earlier user decisions U1–U8 stand. The plan-reviewer accepted the planner decisions `CP-01`
+(Tale → Logging edge, B3) and B11 (`BeginRoot`) on 2026-11-02. Neither creates a cycle, and both
+add no external package.
 
 ### Cross-feature dependencies
 
@@ -415,7 +420,7 @@ as release-notes inputs.
 | 08 | none outside this feature (after Chronicle 01–05) | Logging-internal. |
 | 09 | logging — "Logging — segment-aware path matching; one Error entry per failure"; logging — "Logging — sanitize inbound correlation IDs; safe timings and masking"; logging — "Guide conformance — Logging"; flagship-showcase-hygiene — "DreamTravel — mediator-only, thin controllers"; flagship-showcase-hygiene — "DreamTravel — logic and domain cleanup" | Middleware entries and P-15; that logging step's `ITimingService` snapshot edit becomes obsolete when step 09 deletes the file; `RequestEnvelopeLogger.cs` split, `TimingService` primary constructor, Logging templates; `FindCityByNameHandler.cs` overlap. |
 | 10 | cqrs — "CQRS — descriptive missing-handler errors and interface-based dispatch"; cqrs — "CQRS — log failed `Result`s as failures"; cqrs — "Guide conformance — CQRS"; logging — "Logging — public surface cleanup (`LoggerExtensions`, internal `Operations`)" | Dispatch delegates; failed-`Result` logging (RM-15: type and message only); primary constructors; the CQRS `ActivitySource` this step removes. |
-| 11 | tale — "Tale — per-run state isolation; persist only `TaleManager`-driven runs"; tale — "Tale engine — caller-only cancellation, no resume of failed tales, deterministic tests"; tale — "Tale — `CancellationToken` on chapters"; tale — "Tale — chapter history keyed by step index and full type name"; tale — "Guide conformance — Tale engine split"; tale — "Guide conformance — Tale controller, manager, handler, `Tale`, and tests"; tale — "Log templates — `[{Placeholder}]` in Tale (L-03)" | Per-run state; caller-only cancellation decides `Cancelled`; chapter token; history key (the step name stays `ChapterId`); `TaleStepInterpreter.cs`; `extension` blocks in `ModuleInstaller.cs`; templates. |
+| 11 | tale — "Tale — per-run state isolation; persist only `TaleManager`-driven runs"; tale — "Tale — registration and schema safety, correct log scope"; tale — "Tale engine — caller-only cancellation, no resume of failed tales, deterministic tests"; tale — "Tale — `CancellationToken` on chapters"; tale — "Tale — chapter history keyed by step index and full type name"; tale — "Guide conformance — Tale engine split"; tale — "Guide conformance — Tale controller, manager, handler, `Tale`, and tests"; tale — "Log templates — `[{Placeholder}]` in Tale (L-03)" | Per-run state; caller-only cancellation decides `Cancelled`; chapter token; history key (the step name stays `ChapterId`); `TaleStepInterpreter.cs`; `extension` blocks in `ModuleInstaller.cs`; templates. |
 | 12 | http — "HTTP — never retry unsafe verbs after an exception or timeout"; http — "HTTP — request pipeline correctness"; http — "HTTP — own namespace for `HttpClientExtensions`; factory-based upstream health check"; http — "HTTP — drop `Async` from `RequestBuilder` verbs (optional)"; http — "Guide conformance — HTTP"; http — "Log templates — `[{Placeholder}]` in HTTP (L-03)" | Retry predicate and handler order; namespace; `RequestBuilder` names; `RetryStrategyOptionsBuilder.cs` and installer helpers; templates. |
 | 13 | messagebus — "MessageBus — resolvable broker, registered health-check client, correlation service"; messagebus — "MessageBus — receiver settlement matches its contract; publish→receive round-trip"; messagebus — "MessageBus — internal implementation types"; messagebus — "Guide conformance — MessageBus"; messagebus — "Log templates — `[{Placeholder}]` in MessageBus (L-03)" | Resolvable broker; settlement outcomes map to root status; internal receiver; conformance; templates. |
 | 14 | hangfire — "Hangfire — implement `preventOverlap`; register the correlation service"; hangfire — "Hangfire — restore ambient correlation state; async, cancellable event dispatch"; hangfire — "Hangfire — recurring job contract for 2.0"; hangfire — "Guide conformance — Hangfire" | Filter registration; AsyncLocal capture and restore pattern; `IJob` contract; conformance. |
@@ -436,7 +441,9 @@ is fresh.
     `chronicle.BeginRoot("name")` to get its own report (B11).
   - The `{@Timings}` property in the finish entry is replaced by `{@Chronicle}` (LC-01).
 - Serilog hosts that want the flight recorder: `UseSerilog(..., writeToProviders: true)` or
-  `builder.Logging.AddSerilog()`.
+  `builder.Logging.AddSerilog()`. With `writeToProviders`, Serilog's own `MinimumLevel` must admit
+  Debug. Serilog destructures `{@Chronicle}` as a structure capped by `MaximumDestructuringDepth`
+  (default 10), not as the ASCII tree.
 - `CH-nn`, `CP-nn`, and `LC-nn` tables above, as amended by `Deviations`.
 
 ## Scope
@@ -469,8 +476,8 @@ is fresh.
 - A JSON-payload log state (B6 (b)), per-name slow thresholds, and trace-aligned sampling.
 - Metrics or histograms derived from Chronicle.
 - Report persistence or UI.
-- Trimming/AOT annotations for the SqlClient observer's reflection (consistent with the flagship's
-  AOT follow-up).
+- Trimming/AOT annotations (consistent with the flagship's AOT follow-up). The SqlClient observer
+  reads payloads without reflection (plan review), so it adds no new trimming debt.
 - A change to the CQRS lifecycle entries 2137–2139. They stay. `Log.md` documents how to silence
   them through the category level when only Chronicle reports are wanted.
 - Splitting the CQRS → Logging → ASP.NET Core dependency.
@@ -503,6 +510,36 @@ Testing conventions for every step:
   The version comes from the `package-management` skill; it is test-only, so no `§2` gate applies.
 - Names follow `Method_Scenario_ExpectedOutcome` with `// Arrange/Act/Assert` (Guide §8).
 - No new test project.
+- Report assertions: `FakeLogger` stores structured-state values as strings
+  (`FakeLogger.ConsumeTState`). Tests in other modules therefore assert on the rendered tree in
+  `FakeLogRecord.Message`, and never cast a state value to `ChronicleReport`. Only Logging.Tests
+  reads the `ChronicleReport` object, through a test-local `StateCapturingLoggerProvider` that
+  keeps the original `TState`.
+
+### Plan review (2026-11-02)
+
+Changes applied by the plan-reviewer. Each one is reflected in the step files:
+
+- OQ-1 and OQ-2 answered by the user. Steps 01–10 unblocked. CP-01 and B11 accepted.
+- Clean room: removed every identifier, package path, and repository name of the inspiration
+  library from this brief. The original grep could never pass, because one of its tokens already
+  occurs in public DreamTravel configuration for an unrelated payment API. It is replaced by a
+  decompiler-trace grep plus a PR attestation.
+- B6 crux settled: `{@Name}` has been supported by the generator since .NET 8.
+- B3 crux evidence: the SqlClient `v7.0.1` source was verified. Step 07 reads typed payloads
+  through `IReadOnlyList<KeyValuePair<string, object>>` plus `IDbCommand`, with no reflection. It
+  pairs steps by `OperationId`, and it gates only `Before` on the ambient root.
+- `LateStepCount` (CH-06, unchanged signature) now counts steps started under an already closed
+  parent step while the root is open. Counting on a closed root could never surface in a report.
+- `IChronicle.Current` returns a non-owning handle (its `Dispose` is a no-op). `Dispose` never
+  throws (listener failures are caught) and restores the ambient node only when that node is
+  still current.
+- Test plans: assertions use `FakeLogRecord.Message`; allocation tests warm up and also cover
+  `Enabled = true` with no root; Hangfire ambient flow is proven through a real
+  `BackgroundJobPerformer`; DreamTravel asserts an EF Core `SQL` step.
+- Step 09: when `IChronicle` is replaced, the middleware falls back to the `Enabled = false`
+  entries instead of logging nothing. Step 13: stop for `§2` if `MessageBusReceiver` is still
+  public.
 
 ## Acceptance criteria
 
@@ -513,10 +550,10 @@ Testing conventions for every step:
 - [ ] `grep -n "ProjectReference" src/SolTechnology.Core.Logging/SolTechnology.Core.Logging.csproj` prints nothing (no dependency cycle).
 - [ ] `git diff <feature-base>..HEAD -- src/*/*.csproj | grep "^+.*PackageReference"` prints nothing (no new external dependency in `src/`).
 - [ ] `grep -rnE "EventId = (2150|2151)" src --include=*.cs` lists exactly one `ChronicleReported` (2150) and one `RequestChronicleReported` (2151).
-- [ ] `grep -rniE "aiia|LogStopwatch|GetTimingReportAndReset" src tests sample-tale-code-apps docs | grep -v "docs/features/2026-11-02-logging-chronicle"` prints nothing (clean room).
+- [ ] `git grep -niE "decompil|ilspy|dotpeek" -- src tests sample-tale-code-apps docs ':!docs/features/2026-11-02-logging-chronicle*'` prints nothing, and every Chronicle PR description carries the clean-room attestation (clean room).
 - [ ] `find src/SolTechnology.Core.Logging/Chronicles -name "*.cs" | xargs wc -l | awk '$1>150 && $2!="total"'` prints nothing.
 - [ ] Logging.Tests has these tests green:
-  - `Step_ChronicleDisabled_AllocatesNothing`: 0 bytes from `GC.GetAllocatedBytesForCurrentThread()` over 1,000 steps, no listener.
+  - `Step_ChronicleDisabled_AllocatesNothing` and `Step_EnabledNoRoot_AllocatesNothing`: 0 bytes from `GC.GetAllocatedBytesForCurrentThread()` over 1,000 steps after a warm-up, no listener.
   - `WhenAll_ParallelBranches_BuildsIsolatedSubtrees`.
   - `Report_FortyTwoIdenticalSQLSteps_AggregatesWithNPlusOneHint`.
 - [ ] One root per HTTP request, CQRS-only command, fire-and-forget event, Hangfire job, and
@@ -527,8 +564,8 @@ Testing conventions for every step:
 - [ ] `docs/Log.md` contains a `Chronicle` section; `ITimingService` appears only in its `Migrating from ITimingService (1.x)` subsection.
 - [ ] DreamTravel `FindCityByName` produces one 2151 entry with nested CQRS and HTTP steps
       (component test, step 16).
-- [ ] `CH-01`…`CH-11` and `LC-01`…`LC-05` were confirmed by the user before their steps merged
-      (OQ-1, OQ-2 resolved in this brief).
+- [ ] `CH-01`…`CH-11` and `LC-01`…`LC-05` were confirmed by the user on 2026-11-02 (OQ-1, OQ-2
+      resolved in this brief); no further public symbol changed without a new confirmation.
 
 ## Completion summary
 

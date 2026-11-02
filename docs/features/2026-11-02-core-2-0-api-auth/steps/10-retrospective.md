@@ -18,7 +18,7 @@ Former core step 71 (the part that covers this library); split per library on 20
 - `docs/features/2026-11-02-core-2-0-api-auth/` — DELETE
 
 ## Changes
-1. Review every step against delivered code. Run final validation: `dotnet build SolTechnology.Core.slnx -c Release`, `dotnet test tests/SolTechnology.Core.API.Tests`, `dotnet test tests/SolTechnology.Core.Authentication.Tests`, `dotnet test tests/SolTechnology.Core.HTTP.Tests`, and the DreamTravel tests (`dotnet test` over `sample-tale-code-apps/DreamTravel/tests`).
+1. Review every step against delivered code. Run final validation: `dotnet build SolTechnology.Core.slnx -c Release`, `dotnet test tests/SolTechnology.Core.API.Tests`, `dotnet test tests/SolTechnology.Core.Authentication.Tests`, `dotnet test tests/SolTechnology.Core.HTTP.Tests`, and the DreamTravel component and unit tests (`git ls-files 'sample-tale-code-apps/DreamTravel/tests/Component/*.csproj' 'sample-tale-code-apps/DreamTravel/tests/Unit/*.csproj' | xargs -n1 dotnet test`).
 2. Update each affected `docs/architecture/*.md` page above to current behaviour and rationale. Record the S4/S5 rationale (CWE-209, timing leak).
 3. Complete the feature brief with outcomes, material deviations from each step, and follow-ups. The `Completion summary` must also record any deviation that changes a `C-nn`, `P-nn`, or `L-nn` row or a "Release-notes inputs" entry of the core brief ([`2026-11-02-core-2-0-flagship-hardening`](../../2026-11-02-core-2-0-flagship-hardening.md)); release step 05 ([`2026-11-02-org-transfer-and-2-0-release`](../../2026-11-02-org-transfer-and-2-0-release.md)) writes the 2.0 release notes and migration guide from the core brief plus every library brief's `Deviations` and `Completion summary`.
    Candidate follow-ups:

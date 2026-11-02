@@ -1,6 +1,6 @@
 ---
 spec: 2026-11-02-core-2-0-messagebus
-review: pending
+review: done (2026-11-02)
 premortem: skipped (covered by core premortem go-with-mitigations 2026-11-02 in 2026-11-02-core-2-0-flagship-hardening — user, 2026-11-02)
 ---
 

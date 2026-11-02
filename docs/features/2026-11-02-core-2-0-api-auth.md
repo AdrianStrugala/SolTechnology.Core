@@ -78,7 +78,8 @@ Q5: this feature owns `S5`/`http-api#4` and the `docs/Auth.md` rewrite; [`2026-0
 
 ### In scope
 
-- Source: `src/SolTechnology.Core.API`, `src/SolTechnology.Core.Authentication`, and the matching test projects.
+- Source: `src/SolTechnology.Core.API`, `src/SolTechnology.Core.Authentication`, and the matching test projects; plus
+  `src/SolTechnology.Core.HTTP/HttpRequestFailedException.cs` and its HTTP.Tests case (step 02, `S4`).
 - Module docs: `docs/Api.md`, `docs/Auth.md`.
 - Phases, in order: correctness and broken-module fixes → 2.0 breaking API cleanup → XML docs and
   module docs → Coding Guide conformance and `[{Placeholder}]` log templates → retrospective.
@@ -94,9 +95,13 @@ Q5: this feature owns `S5`/`http-api#4` and the `docs/Auth.md` rewrite; [`2026-0
 ## Implementation plan
 
 Steps live in the temporary working folder `2026-11-02-core-2-0-api-auth/` (see its `summary.md`). Gates: `review` is
-`pending` (breaking public API or persisted contract, so the planner cannot waive it; the user may
-skip it); `premortem` is `skipped` — the core premortem verdict `go-with-mitigations (2026-11-02)`
+`done (2026-11-02)`; `premortem` is `skipped` — the core premortem verdict `go-with-mitigations (2026-11-02)`
 covers these steps.
+
+Plan review (2026-11-02): the regrouping was checked against the pre-regroup plan (`dddac21c`) and
+found complete. User answers recorded, not re-asked: the delivery order with AUID before Tale is
+confirmed (Tale references AUID); the per-library split, the premortem reuse, and the `C-01`…`C-24`,
+`C-26`, `C-27` confirmations stand (`C-25` rejected). Review fixes applied here: `In scope` names the HTTP exception edit of step 02; step 07 owns the `docs/Api.md:387-389` health-check names that only the former step 61 `docs/*.md` grep covered; test paths use the tracked `API` casing; the retrospective's DreamTravel test command is runnable.
 
 Notation: an unqualified step number is a step of this feature; `core NN` names step `NN` of
 [`2026-11-02-core-2-0-flagship-hardening`](2026-11-02-core-2-0-flagship-hardening.md); other short names (`result`, `logging`, `cqrs`, `auid`, `tale`, `http`, `api-auth`,
@@ -126,7 +131,7 @@ Steps run in number order; each is one PR.
 - [ ] `S5`: `CryptographicOperations.FixedTimeEquals` is present in the handler, no string equality compares the key, and the handler unit-test matrix (step 03) is green.
 - [ ] `C-21` and `C-22` shipped.
 - [ ] `dotnet build SolTechnology.Core.slnx -c Release` is green, and `dotnet build SolTechnology.Core.slnx 2>&1 | grep -E "NU190[1-4]|NU1605"` prints nothing.
-- [ ] `dotnet test tests/SolTechnology.Core.Api.Tests` and `dotnet test tests/SolTechnology.Core.Authentication.Tests` are green.
+- [ ] `dotnet test tests/SolTechnology.Core.API.Tests` and `dotnet test tests/SolTechnology.Core.Authentication.Tests` are green.
 - [ ] The module resolution test uses `ValidateOnBuild = true` and `ValidateScopes = true`, and no resolution test is `[Ignore]`d.
 - [ ] `find src/SolTechnology.Core.API src/SolTechnology.Core.Authentication -name "*.cs" -not -path "*/obj/*" | xargs wc -l | awk '$1>150 && $2!="total"'` prints nothing.
 - [ ] Every packed `.nupkg` of this feature contains `lib/net10.0/*.xml`.

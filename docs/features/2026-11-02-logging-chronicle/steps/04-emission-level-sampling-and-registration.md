@@ -1,7 +1,7 @@
 ---
 spec: 2026-11-02-logging-chronicle
 step: 04
-status: blocked
+status: to-do
 ---
 
 # Step 04: Chronicle emission — one report entry per root, level escalation, sampling, DI registration
@@ -18,7 +18,7 @@ failure, Warning when cancelled or slower than `SlowThreshold`, and Information 
 ## Affected components
 - `src/SolTechnology.Core.Logging/Chronicles/ChronicleLogMessages.cs` — NEW — `internal static partial class` with `[LoggerMessage(EventId = 2150, EventName = "ChronicleReported", Message = "Chronicle [{ChronicleName}] [{ChronicleStatus}] in [{DurationMs} ms], [{StepCount}] steps: [{@Chronicle}]")] static partial void ChronicleReported(ILogger logger, LogLevel level, Exception? exception, string chronicleName, string chronicleStatus, long durationMs, int stepCount, ChronicleReport chronicle)`
 - `src/SolTechnology.Core.Logging/Chronicles/ChronicleEmissionPolicy.cs` — NEW — internal, pure: `(LogLevel Level, bool ShouldEmit) Decide(ChronicleReport report, int? httpStatusCode)`; level rules and sampling from the brief; random source injected as `Func<double>` (default `Random.Shared.NextDouble`)
-- `src/SolTechnology.Core.Logging/Chronicles/ChronicleReporter.cs` — NEW — `internal sealed class ChronicleReporter(ILoggerFactory loggerFactory, IOptions<ChronicleOptions> options, ...) : IChronicleRootListener`; logger category `SolTechnology.Core.Logging.Chronicle`; skips roots with `IsReportedByCaller` (set by step 09)
+- `src/SolTechnology.Core.Logging/Chronicles/ChronicleReporter.cs` — NEW — `internal sealed class ChronicleReporter(ILoggerFactory loggerFactory, IOptions<ChronicleOptions> options) : IChronicleRootListener`; builds the report (step 03), asks `ChronicleEmissionPolicy`, logs; logger category `SolTechnology.Core.Logging.Chronicle`; skips roots with `IsReportedByCaller` (set by step 09); catches and logs (Warning, plain template) its own failures
 - `src/SolTechnology.Core.Logging/Chronicles/ChronicleRoot.cs` — EDIT — `internal bool IsReportedByCaller`
 - `src/SolTechnology.Core.Logging/Chronicles/ChronicleOptions.cs` — EDIT — `SlowThreshold` (`TimeSpan`, 1 s), `SampleRate` (`double`, 1.0) (CH-04)
 - `src/SolTechnology.Core.Logging/Chronicles/ChronicleOptionsValidator.cs` — EDIT — `SlowThreshold > TimeSpan.Zero`, `0 <= SampleRate <= 1`
@@ -27,6 +27,7 @@ failure, Warning when cancelled or slower than `SlowThreshold`, and Information 
 - `src/SolTechnology.Core.Logging/LoggingServiceRegistrations.cs` — EDIT (created by `2026-11-02-core-2-0-logging` step "Guide conformance — Logging") — the shared path of both `AddSolLogging` overloads calls the Chronicle registrations; the `IConfiguration` overload binds `Logging:Core:Chronicle`
 - `tests/SolTechnology.Core.Logging.Tests/SolTechnology.Core.Logging.Tests.csproj` — EDIT — `PackageReference Microsoft.Extensions.Diagnostics.Testing` (version via the `package-management` skill)
 - `tests/SolTechnology.Core.Logging.Tests/Chronicles/ChronicleReporterTests.cs` — NEW
+- `tests/SolTechnology.Core.Logging.Tests/Chronicles/StateCapturingLoggerProvider.cs` — NEW — test-only `ILoggerProvider` that keeps the original `TState` (`IReadOnlyList<KeyValuePair<string, object?>>`); `FakeLogger` stringifies state values, so it cannot prove B6
 - `tests/SolTechnology.Core.Logging.Tests/Chronicles/ChronicleEmissionPolicyTests.cs` — NEW
 - `tests/SolTechnology.Core.Logging.Tests/ModuleInstallerTests.cs` — EDIT
 - `tests/SolTechnology.Core.Logging.Tests/ModuleResolutionTests.cs` — EDIT (created by `2026-11-02-core-2-0-logging` step "DI resolution test — Logging") — `IChronicle` resolves with `ValidateOnBuild` and `ValidateScopes`
@@ -37,11 +38,14 @@ failure, Warning when cancelled or slower than `SlowThreshold`, and Information 
   - Always emit when the status is not `Ok`, when the level is ≥ Warning, or when
     `IsNPlusOneSuspected` is set.
   - Otherwise emit when `nextSample() < SampleRate`.
-- B6 crux:
-  - If the source generator rejects `{@Chronicle}`, switch to `[{Chronicle}]` and record a
-    deviation.
-  - Test `ChronicleReported_State_CarriesChronicleReportObject` asserts that the state KVP for
-    `Chronicle`/`@Chronicle` holds the `ChronicleReport` instance, not a string.
+- B6 crux (settled by the plan review: `{@Name}` is supported since .NET 8, dotnet/runtime#69490):
+  - If the build still reports `SYSLIB1014` for `{@Chronicle}`, switch to `[{Chronicle}]` and
+    record a deviation.
+  - Test `ChronicleReported_State_CarriesChronicleReportObject` uses `StateCapturingLoggerProvider`
+    and asserts that the state KVP for `Chronicle`/`@Chronicle` holds the `ChronicleReport`
+    instance, not a string.
+- Other tests use `FakeLogCollector` and assert on `FakeLogRecord.Message` (rendered tree), level,
+  `Id`, and `Exception`.
 - The failed root's `Exception` is passed as the log exception, never embedded in the template
   (Guide §11).
 - Tests:
@@ -73,7 +77,6 @@ failure, Warning when cancelled or slower than `SlowThreshold`, and Information 
 - [ ] Premortem mitigations for `ModuleInstaller.cs` (step 00) are applied.
 
 ## Open questions
-- OQ-1 (brief): `CLAUDE.md §2` confirmation of `CH-04` (`SlowThreshold`, `SampleRate`) and `CH-07`.
-- OQ-2 (brief): acceptance of `LC-03` and `LC-04`.
+- none (OQ-1 confirmed 2026-11-02: `CH-04` `SlowThreshold`/`SampleRate`, `CH-07`; OQ-2 accepted 2026-11-02: `LC-03`, `LC-04`)
 
 ## Deviations

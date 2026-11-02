@@ -13,7 +13,7 @@ Former core step 57 (MessageBus part); split per library on 2026-11-02.
 
 ## Affected components
 - `src/SolTechnology.Core.MessageBus/SolTechnology.Core.MessageBus.csproj` — EDIT — `<GenerateDocumentationFile>true</GenerateDocumentationFile>`
-- `src/SolTechnology.Core.MessageBus/**/*.cs` — EDIT — `<summary>` on every public/protected member reported by `CS1591` (the review lists `QueueConfiguration`, `MessageBusConfiguration`, `IMessagePublisher`, `IMessageHandler`, and `ModuleInstaller.*` with no XML docs at all; XML doc comments only in `ModuleInstaller.cs`)
+- `src/SolTechnology.Core.MessageBus/**/*.cs` — EDIT — `<summary>` on every public/protected member reported by `CS1591` (the review lists `QueueConfiguration`, `MessageBusConfiguration`, `IMessagePublisher`, `IMessageHandler`, and `ModuleInstaller.*` with no XML docs at all; `ModuleInstaller.cs` gets XML doc comments only, no code change)
 
 ## Changes
 - English, one or two sentences per member, per [`PublicDocumentationGuide.md`](../../../../docs/PublicDocumentationGuide.md). No `<NoWarn>CS1591</NoWarn>` (`CLAUDE.md §2`).

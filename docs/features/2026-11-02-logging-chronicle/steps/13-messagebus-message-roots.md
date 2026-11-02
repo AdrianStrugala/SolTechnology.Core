@@ -15,7 +15,7 @@ processor shutdown → `Cancelled`. One EventId 2150 entry is emitted per messag
 message body is never recorded.
 
 ## Affected components
-- `src/SolTechnology.Core.MessageBus/Receive/MessageBusReceiver.cs` — EDIT — constructor gains `IChronicle chronicle` (internal type after `2026-11-02-core-2-0-messagebus` step "MessageBus — internal implementation types"); `HandleMessageAsync` becomes `internal` for tests and wraps handling in `BeginRoot($"Message {messageType.Name}")`. If `2026-11-02-core-2-0-messagebus` step "Guide conformance — MessageBus" moved per-message handling into another internal type, edit that type instead and list it under `Deviations`.
+- `src/SolTechnology.Core.MessageBus/Receive/MessageBusReceiver.cs` — EDIT — constructor gains `IChronicle chronicle` (internal type after `2026-11-02-core-2-0-messagebus` step "MessageBus — internal implementation types"); `HandleMessageAsync` becomes `internal` for tests and wraps handling in `BeginRoot($"Message {messageType.Name}")`. If `2026-11-02-core-2-0-messagebus` step "Guide conformance — MessageBus" moved per-message handling into another internal type, edit that type instead and list it under `Deviations`. **Guard:** `MessageBusReceiver` is `public sealed` with a public constructor at `497b21f3` (`Receive/MessageBusReceiver.cs:21`). If it is still public when this step starts, stop: the constructor change is a `CLAUDE.md §2` item that OQ-1 did not cover.
 - `src/SolTechnology.Core.MessageBus/ModuleInstaller.cs` — EDIT — `AddSolMessageBus` calls `services.AddSolChronicle()` (CP-03)
 - `tests/SolTechnology.Core.MessageBus.Tests/SolTechnology.Core.MessageBus.Tests.csproj` — EDIT — `PackageReference Microsoft.Extensions.Diagnostics.Testing` (same version as step 04)
 - `tests/SolTechnology.Core.MessageBus.Tests/MessageBusReceiverChronicleTests.cs` — NEW — messages from `ServiceBusModelFactory.ServiceBusReceivedMessage`, `ProcessMessageEventArgs` over an NSubstitute `ServiceBusReceiver`
@@ -29,7 +29,7 @@ message body is never recorded.
   - Handler exception that leads to abandon → `Fail(exception)`.
   - `args.CancellationToken` cancelled → `Cancel()`.
 - Logs inside the root keep today's scope (`CorrelationId`, `MessageId`, `MessageType`).
-- Tests:
+- Tests (`FakeLogCollector`; tree assertions on `FakeLogRecord.Message`):
   - `HandleMessage_Completed_EmitsOneRootReportOk`.
   - `HandleMessage_HandlerThrows_RootFailedWithException`.
   - `HandleMessage_EmptyBody_RootFailedDeadLettered`.
@@ -41,6 +41,7 @@ message body is never recorded.
 
 ## Acceptance criteria
 - [ ] `dotnet test tests/SolTechnology.Core.MessageBus.Tests` is green.
+- [ ] `grep -n "public sealed class MessageBusReceiver" src/SolTechnology.Core.MessageBus/Receive/MessageBusReceiver.cs` prints nothing (internal before the constructor changes).
 - [ ] `dotnet build SolTechnology.Core.slnx` is green.
 - [ ] Premortem mitigations for `ModuleInstaller.cs` (step 00) are applied.
 

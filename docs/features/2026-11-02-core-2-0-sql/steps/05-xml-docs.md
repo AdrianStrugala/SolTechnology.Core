@@ -13,7 +13,7 @@ Former core step 57 (SQL part); split per library on 2026-11-02.
 
 ## Affected components
 - `src/SolTechnology.Core.SQL/SolTechnology.Core.SQL.csproj` — EDIT — `<GenerateDocumentationFile>true</GenerateDocumentationFile>`
-- `src/SolTechnology.Core.SQL/**/*.cs` — EDIT — `<summary>` on every public/protected member reported by `CS1591` (the review lists `SQLConfiguration` and `ISQLConnectionFactory` with no XML docs at all; XML doc comments only in `ModuleInstaller.cs`)
+- `src/SolTechnology.Core.SQL/**/*.cs` — EDIT — `<summary>` on every public/protected member reported by `CS1591` (the review lists `SQLConfiguration` and `ISQLConnectionFactory` with no XML docs at all; `ModuleInstaller.cs` gets XML doc comments only, no code change)
 
 ## Changes
 - English, one or two sentences per member, per [`PublicDocumentationGuide.md`](../../../../docs/PublicDocumentationGuide.md). No `<NoWarn>CS1591</NoWarn>` (`CLAUDE.md §2`).

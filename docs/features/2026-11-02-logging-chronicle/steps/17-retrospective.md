@@ -47,7 +47,7 @@ brief's cross-feature dependencies have created the architecture pages this step
 ## Acceptance criteria
 - [ ] Every acceptance criterion in the brief is checked.
 - [ ] `grep -n "Chronicle" docs/architecture/logging.md docs/architecture/cqrs.md docs/architecture/tale-framework.md docs/architecture/http-client.md docs/architecture/background-processing.md docs/architecture/infrastructure-modules.md` lists each file.
-- [ ] The brief has `status: completed` (or `abandoned`), a `completed:` date, and non-empty `Completion summary`, `Deviations`, and `Follow-ups`.
+- [ ] The brief has `status: completed` (or `abandoned`), a `completed:` date, and non-empty `Completion summary`, `Deviations`, and `Follow-ups` (`none` is a valid entry).
 - [ ] `grep -rn "2026-11-02-logging-chronicle/" docs README.md src tests sample-tale-code-apps .github` prints nothing.
 - [ ] `test ! -d docs/features/2026-11-02-logging-chronicle` succeeds.
 

@@ -1,7 +1,7 @@
 ---
 spec: 2026-11-02-logging-chronicle
 step: 06
-status: blocked
+status: to-do
 ---
 
 # Step 06: Chronicle flight recorder — buffered Debug/Trace entries attached only on failure
@@ -33,8 +33,13 @@ are added only when the user configured no rule for the alias. Serilog hosts nee
 - Each record holds the offset from root start, the level, the category, the EventId, and the
   formatted message cut to `MaxMessageLength` with `[truncated]`. Its `ExceptionType` holds the
   exception type name only, never the stack trace.
-- The provider is registered even when disabled, because `IsEnabled` gates every call. This keeps
-  `appsettings` toggling free of DI changes.
+- The provider is registered even when disabled, because `IsEnabled` gates every call. Enabling
+  it is a configuration change only (no code or DI change); because the recorder reads
+  `IOptions<ChronicleOptions>`, the change takes effect on restart.
+- DI-cycle guard: the provider and its loggers depend only on `IOptions<ChronicleOptions>` and the
+  internal ambient accessor, never on `IChronicle`, `ILoggerFactory`, or `ILogger<T>`
+  (`ILoggerFactory` → providers → `IChronicle` → reporter → `ILoggerFactory` would be a cycle).
+  `ModuleResolutionTests` (`ValidateOnBuild`) covers it.
 - Tests (a `LoggerFactory` built from DI with `Logging:LogLevel:Default = Information`):
   - `FailedRoot_DebugEntries_AttachedToReport`.
   - `SucceededRoot_DebugEntries_Dropped`.
@@ -45,6 +50,7 @@ are added only when the user configured no rule for the alias. Serilog hosts nee
   - `UserRuleForAlias_WinsOverDefaults`.
   - `ChronicleCategory_NeverBuffered`.
   - `InformationEntries_NotBuffered`.
+  - `AddSolChronicle_WithFlightRecorder_ResolvesLoggerFactoryWithoutCycle`.
 
 ## Acceptance criteria
 - [ ] `dotnet test tests/SolTechnology.Core.Logging.Tests` is green.
@@ -52,7 +58,6 @@ are added only when the user configured no rule for the alias. Serilog hosts nee
 - [ ] Premortem mitigations for `ModuleInstaller.cs` (step 00) are applied (the registrations reached from the installers change).
 
 ## Open questions
-- OQ-1 (brief): `CLAUDE.md §2` confirmation of `CH-04` (`FlightRecorder`), `CH-05`, and `CH-06` (`FlightRecords`, `ChronicleFlightRecord`).
-- OQ-2 (brief): acceptance of `LC-05`.
+- none (OQ-1 confirmed 2026-11-02: `CH-04` `FlightRecorder`, `CH-05`, `CH-06` `FlightRecords`/`ChronicleFlightRecord`; OQ-2 accepted 2026-11-02: `LC-05`)
 
 ## Deviations

@@ -31,7 +31,7 @@ also catches chatty HTTP. This is a logical span around HttpClient's own physica
   - Exception (including `HttpRequestFailedException`, timeouts, and broken circuits) → `Fail(exception)`.
   - Caller cancellation (`OperationCanceledException` with the caller token cancelled) → `Cancel()`.
 - Outside a root, `chronicle.Step` returns a no-op handle; the handlers add no allocation beyond the `StrongBox` (allocated only when the step is recording).
-- Tests:
+- Tests (`FakeLogCollector`; tree assertions on `FakeLogRecord.Message`):
   - `Send_InsideRoot_RecordsOneStepWithMethodClientHostAndStatus`.
   - `Send_TransientFailureThenSuccess_OneStepWithAttempts2`.
   - `Send_500AfterRetries_StepFailedWithAttemptsCount`.

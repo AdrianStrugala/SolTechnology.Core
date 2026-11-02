@@ -13,7 +13,7 @@ Former core step 57 (Blob part); split per library on 2026-11-02.
 
 ## Affected components
 - `src/SolTechnology.Core.Blob/SolTechnology.Core.Blob.csproj` — EDIT — `<GenerateDocumentationFile>true</GenerateDocumentationFile>`
-- `src/SolTechnology.Core.Blob/**/*.cs` — EDIT — `<summary>` on every public/protected member reported by `CS1591` (the review lists `BlobConfiguration`, `IBlobConnectionFactory`, `SerializationFormat`, and `BlobContainerClientExtensions` with no XML docs at all; XML doc comments only in `ModuleInstaller.cs`)
+- `src/SolTechnology.Core.Blob/**/*.cs` — EDIT — `<summary>` on every public/protected member reported by `CS1591` (the review lists `BlobConfiguration`, `IBlobConnectionFactory`, `SerializationFormat`, and `BlobContainerClientExtensions` with no XML docs at all; `ModuleInstaller.cs` gets XML doc comments only, no code change)
 
 ## Changes
 - English, one or two sentences per member, per [`PublicDocumentationGuide.md`](../../../../docs/PublicDocumentationGuide.md). No `<NoWarn>CS1591</NoWarn>` (`CLAUDE.md §2`).

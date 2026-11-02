@@ -13,7 +13,7 @@ Former core step 56 (HTTP part); split per library on 2026-11-02.
 
 ## Affected components
 - `src/SolTechnology.Core.HTTP/SolTechnology.Core.HTTP.csproj` — EDIT — `<GenerateDocumentationFile>true</GenerateDocumentationFile>`
-- `src/SolTechnology.Core.HTTP/**/*.cs` — EDIT — `<summary>` on every public/protected member reported by `CS1591` (XML doc comments only in `ModuleInstaller.cs`)
+- `src/SolTechnology.Core.HTTP/**/*.cs` — EDIT — `<summary>` on every public/protected member reported by `CS1591` (`ModuleInstaller.cs` gets XML doc comments only, no code change)
 
 ## Changes
 - English, one or two sentences per member, per [`PublicDocumentationGuide.md`](../../../../docs/PublicDocumentationGuide.md). No `<NoWarn>CS1591</NoWarn>` (`CLAUDE.md §2`).

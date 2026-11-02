@@ -1,7 +1,7 @@
 ---
 spec: 2026-11-02-logging-chronicle
 step: 10
-status: blocked
+status: to-do
 ---
 
 # Step 10: CQRS auto-steps — pipeline requests, event handlers, fire-and-forget event roots
@@ -36,7 +36,7 @@ stay unchanged.
 - Event dispatch:
   - Handler exceptions keep today's per-handler isolation and Error log; the handler step is `Failed`.
   - `IChronicle` is optional (`= null` default) so `UseLogging = false` hosts without Chronicle keep working; the types stay internal, so no `§2` gate applies.
-- Tests (`FakeLogCollector`; reports read from the `@Chronicle` state value):
+- Tests (`FakeLogCollector`; reports asserted on the rendered tree in `FakeLogRecord.Message`, because `FakeLogger` stringifies state values):
   - `Handle_OutsideRoot_EmitsOne2150EntryNamedAfterRequest`.
   - `Handle_InsideRoot_AddsChildStepNamedAfterRequest`.
   - `Handle_NestedSend_BuildsNestedSteps`.
@@ -58,6 +58,6 @@ stay unchanged.
 - [ ] Premortem mitigations for `ModuleInstaller.cs` (step 00) are applied.
 
 ## Open questions
-- OQ-1 (brief): `CLAUDE.md §2` confirmation of `CH-10` (`LoggingPipelineBehavior` constructor); this step also consumes `CH-11` (step 08).
+- none (OQ-1 confirmed by the user 2026-11-02: `CH-10` `LoggingPipelineBehavior` constructor; `CH-11` consumed from step 08)
 
 ## Deviations

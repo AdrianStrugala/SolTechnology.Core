@@ -31,6 +31,7 @@ Former core step 42; moved here by the per-library regroup (user, 2026-11-02).
   - `Resume_1xHistory_FailsWithDescriptiveError`.
 - Premortem mitigations (core step 00, 2026-11-02):
   - RM-3 (scenario 3): the type part of the key carries no assembly information. `Type.FullName` of a closed generic embeds `Version=`/`PublicKeyToken=`, so a consumer redeploy would change the key of a paused tale and re-run a completed chapter. Use the same kind of version-free name as cache step 03 (namespace + name, generic arguments recursively without assembly). Test `HistoryKey_GenericChapter_HasNoAssemblyVersion`.
+    - Delivery-order note (plan review, 2026-11-02): cache step 03 and hangfire step 04 ship after this feature, so this step implements the rule itself and does not wait for them.
   - RM-4 (scenario 4):
     - `ChapterInfo.StepIndex` is `int?`, so a 1.x entry deserializes as `null`, not `0`.
     - `Resume_1xHistory_FailsWithDescriptiveError` deserializes a `TaleInstance` JSON literal captured at `4097d47f` (status `WaitingForInput`, at least one `Completed` history entry). It reads the literal through `TaleJsonOptions.Default` and through the DreamTravel `SQLiteTaleRepository` read path, not from objects built with 2.x code.

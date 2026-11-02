@@ -1,7 +1,7 @@
 ---
 spec: 2026-11-02-logging-chronicle
 step: 01
-status: blocked
+status: to-do
 ---
 
 # Step 01: Chronicle core — ambient step tree and step handle
@@ -36,13 +36,24 @@ step 04 implements. Design: B1, B2, B9 in the brief.
     `AsyncLocal` write flows to the caller.
 - `Step(name)`:
   - With an open root: a child of the ambient node.
+  - With an open root but an already closed ambient (parent) step, for example a continuation
+    that outlived its step: recorded as a child of that node, and `LateStepCount` is incremented
+    (rendered `+{n} late steps`, B9).
   - With no root or `Enabled = false`: returns `default(ChronicleStep)`, a no-op.
-  - With a closed root: the step is not recorded and `LateStepCount` is incremented.
+  - With a closed root: returns a no-op handle and records nothing. Such a step can never appear
+    in a report, because the report was built when the root closed.
+- `Current` returns a **non-owning** handle to the ambient node: `Set`, `SetMasked`, `Fail`, and
+  `Cancel` apply, and `Dispose` is a no-op, so `using var s = chronicle.Current` cannot close an
+  ancestor.
 - `ChronicleStep.Dispose()`:
-  - Closes the node idempotently and restores the ambient node to the node's parent.
+  - Closes the node idempotently.
+  - Restores the ambient node to the node's parent only when the ambient node is still this node,
+    so out-of-order disposal cannot corrupt the ambient tree.
   - Status defaults to `Ok` unless `Fail`/`Cancel` was called.
   - Disposing a root closes it, marks still-open descendants unfinished (end = root end), and
     calls every `IChronicleRootListener`.
+  - Never throws: a listener exception is caught and swallowed, so it cannot fail the caller's
+    `using` block. The reporter (step 04) logs its own failures.
 - `Fail(Exception)` stores the exception type name and message. For a root it also keeps the
   `Exception` reference for the log call. `Fail(string errorType, string? message)` stores the
   type and message only.
@@ -58,7 +69,11 @@ step 04 implements. Design: B1, B2, B9 in the brief.
   - `Begin_InsideOpenRoot_StartsChild`.
   - `Begin_AfterRootClosed_StartsNewRoot`.
   - `Step_NoRoot_ReturnsNonRecordingHandle`.
-  - `Step_AfterRootClosed_CountsLateStep`.
+  - `Step_AfterRootClosed_ReturnsNonRecordingHandle`.
+  - `Step_UnderClosedParentInOpenRoot_RecordedAndCountedLate`.
+  - `Current_Dispose_DoesNotCloseNode`.
+  - `Dispose_OutOfOrder_KeepsAmbientNodeConsistent`.
+  - `Dispose_ListenerThrows_DoesNotThrow`.
   - `Dispose_Twice_ClosesOnce`.
   - `Dispose_RootWithOpenChild_MarksChildUnfinished`.
   - `Fail_Exception_SetsFailedWithTypeAndMessage`.
@@ -67,7 +82,8 @@ step 04 implements. Design: B1, B2, B9 in the brief.
   - `Durations_UseTimeProvider` (`FakeTimeProvider.Advance`).
   - `WhenAll_ParallelBranches_BuildsIsolatedSubtrees` (64 branches, each with 3 nested steps; every branch subtree is intact and siblings never nest into each other).
   - `ParallelAppends_ToOneParent_LoseNoChildren` (1,000 concurrent `Step` calls under one parent → exactly 1,000 children).
-  - `Step_ChronicleDisabled_AllocatesNothing` (`GC.GetAllocatedBytesForCurrentThread()` delta is `0` over 1,000 `Step`+`Dispose` calls with `Enabled = false`).
+  - `Step_ChronicleDisabled_AllocatesNothing` (`GC.GetAllocatedBytesForCurrentThread()` delta is `0` over 1,000 `Step`+`Dispose` calls with `Enabled = false`, measured after a warm-up loop).
+  - `Step_EnabledNoRoot_AllocatesNothing` (same measurement with `Enabled = true` and no ambient root; this is the path that HTTP client and SQL calls outside roots take).
 
 ## Acceptance criteria
 - [ ] `dotnet test tests/SolTechnology.Core.Logging.Tests --filter "FullyQualifiedName~Chronicles"` is green.
@@ -77,6 +93,6 @@ step 04 implements. Design: B1, B2, B9 in the brief.
 - [ ] `grep -rn "public static" src/SolTechnology.Core.Logging/Chronicles` prints nothing.
 
 ## Open questions
-- OQ-1 (brief): `CLAUDE.md §2` confirmation of `CH-01`, `CH-02`, `CH-03`, and `CH-04` (`SectionName`, `Enabled`).
+- none (OQ-1 confirmed by the user 2026-11-02: `CH-01`, `CH-02`, `CH-03`, `CH-04` `SectionName`/`Enabled`)
 
 ## Deviations

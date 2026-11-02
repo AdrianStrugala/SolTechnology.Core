@@ -25,6 +25,7 @@ Former core step 45; moved here by the per-library regroup (user, 2026-11-02).
 - `src/SolTechnology.Core.HTTP/HealthChecks/BaseUpstreamServiceHealthCheck.cs` — EDIT — `:40` primary constructor takes `IHttpClientFactory httpClientFactory, string httpClientName`; `CreateClient` per probe
 - `src/SolTechnology.Core.HTTP/HealthChecks/UpstreamHttpHealthCheckExtensions.cs` — EDIT — registration passes the client name
 - `sample-tale-code-apps/DreamTravel/src/DataLayer/DreamTravel.GeolocationDataClients/**` — EDIT — usings and any health-check subclasses
+- `sample-tale-code-apps/DreamTravel/tests/Component/**` — EDIT — `using SolTechnology.Core.HTTP;` where `.CreateRequest(` relied on the `System.Net.Http` namespace (`grep -rln "CreateRequest(" sample-tale-code-apps/DreamTravel/tests`)
 - `tests/SolTechnology.Core.HTTP.Tests/BaseUpstreamServiceHealthCheckTests.cs` — EDIT — `CheckHealth_CreatesClientPerProbe`
 
 ## Changes

@@ -18,6 +18,7 @@ Former core step 38; moved here by the per-library regroup (user, 2026-11-02).
 - `src/SolTechnology.Core/Result.cs` — EDIT — `private init` on `IsSuccess`, `Error`, `Data`; NEW `public static new Task<Result<T>> FailAsTask(Error error)` on `Result<T>`
 - `src/**` and `sample-tale-code-apps/**` — EDIT — any object-initializer construction of `Result`/`Result<T>` (`grep -rnE "new Result(<[^>]+>)?\s*\{" src sample-tale-code-apps tests`)
 - `tests/SolTechnology.Core.CQRS.Tests/Errors/ErrorSerializationTests.cs` — EDIT — `Result` JSON round-trip still deserializes (`[JsonConstructor]` or `[JsonInclude]` on private init)
+- `tests/SolTechnology.Core.Tests/SolTechnology.Core.Tests.csproj` — EDIT — `ProjectReference` to `src/SolTechnology.Core/SolTechnology.Core.csproj` (the project holds only repository guard tests today and references no package; plan review 2026-11-02)
 - `tests/SolTechnology.Core.Tests/ResultTests.cs` — NEW — factory invariants and `FailAsTask` type
 
 ## Changes

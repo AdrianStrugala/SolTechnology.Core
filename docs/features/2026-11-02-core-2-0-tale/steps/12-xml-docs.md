@@ -13,7 +13,7 @@ Former core step 55 (Tale part); split per library on 2026-11-02.
 
 ## Affected components
 - `src/SolTechnology.Core.Tale/SolTechnology.Core.Tale.csproj` — EDIT — `<GenerateDocumentationFile>true</GenerateDocumentationFile>`
-- `src/SolTechnology.Core.Tale/**/*.cs` — EDIT — `<summary>` on every public/protected member reported by `CS1591` (e.g. `Tale/ModuleInstaller.cs:21-25`, `TaleController.cs:279-306`; XML doc comments only in `ModuleInstaller.cs`)
+- `src/SolTechnology.Core.Tale/**/*.cs` — EDIT — `<summary>` on every public/protected member reported by `CS1591` (e.g. `Tale/ModuleInstaller.cs:21-25`, `TaleController.cs:279-306`; `ModuleInstaller.cs` gets XML doc comments only, no code change)
 
 ## Changes
 - English, one or two sentences per member, per [`PublicDocumentationGuide.md`](../../../../docs/PublicDocumentationGuide.md). No `<NoWarn>CS1591</NoWarn>` (`CLAUDE.md §2`).
