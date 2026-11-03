@@ -1,7 +1,7 @@
 ---
 spec: 2026-11-02-core-2-0-tale
 step: 03
-status: to-do
+status: done
 ---
 
 # Step 03: Tale — per-run state isolation; persist only `TaleManager`-driven runs
@@ -34,12 +34,31 @@ Former core step 18; moved here by the per-library regroup (user, 2026-11-02).
 - `docs/Tale.md:369-385` is corrected in step 13.
 
 ## Acceptance criteria
-- [ ] `dotnet test tests/SolTechnology.Core.Tale.Tests` is green, and the two new negative tests fail on `4097d47f`.
-- [ ] `dotnet test sample-tale-code-apps/DreamTravel/tests/Component/DreamTravel.Component.Tests.csproj` is green.
-- [ ] No public or protected signature changed.
-- [ ] RM-17: `Handle_Direct_InteractiveChapterPauses_LogsNotPersistedWarning` is green.
+- [x] `dotnet test tests/SolTechnology.Core.Tale.Tests` is green, and the two new negative tests fail on `4097d47f`.
+- [x] `dotnet test sample-tale-code-apps/DreamTravel/tests/Component/DreamTravel.Component.Tests.csproj` is green.
+- [x] No public or protected signature changed.
+- [x] RM-17: `Handle_Direct_InteractiveChapterPauses_LogsNotPersistedWarning` is green.
 
 ## Open questions
 - none
 
 ## Deviations
+
+### Negative tests checked against the pre-change `master`, not `4097d47f`
+
+**Original plan:** The two new negative tests fail on `4097d47f`.
+
+**Actual implementation:** They were run against `master` immediately before this change
+(`41633d08`) and failed there (`Handle_TwiceOnSameInstance_ReturnsSecondResult` returned
+`Result: 30`; `Handle_Direct_DoesNotWriteRepository` found persisted runs). The `TaleHandler`,
+`TaleEngine`, and `TaleManager` paths involved are unchanged since `4097d47f` apart from the
+namespace import and step 02's serializer options, so the result carries over.
+
+### Resume state comes from `TaleManager`, and every run gets a `TaleId`
+
+**Original plan:** Internal `TaleRunOptions { bool Persist; TaleInstance? Resume; }`.
+
+**Actual implementation:** As planned; the engine now takes the history from `Resume` instead of
+reading the repository a second time. A direct run always gets a new `TaleId` (used by the log
+scope and `TalePausedError`), where 1.x assigned one only when a repository was registered —
+which `AddSolTale` always did.

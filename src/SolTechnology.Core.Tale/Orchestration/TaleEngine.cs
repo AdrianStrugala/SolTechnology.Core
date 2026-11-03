@@ -60,10 +60,11 @@ internal sealed class TaleEngine<TInput, TContext, TOutput>
     public IReadOnlyList<ChapterInfo> History => _chapterHistory;
     public Auid TaleId => _context is null ? Auid.Empty : _context.TaleInstanceId;
 
-    public async Task<Result> Initialize(
+    public void Initialize(
         TContext context,
         Type handlerType,
         JsonElement? resumeInput,
+        TaleInstance? resume,
         CancellationToken cancellationToken)
     {
         _context = context;
@@ -72,24 +73,17 @@ internal sealed class TaleEngine<TInput, TContext, TOutput>
         _cancellationToken = cancellationToken;
         _isInitialized = true;
 
-        if (_repository != null && context.TaleInstanceId != Auid.Empty)
+        if (resume != null)
         {
-            var loaded = await LoadTaleState(context.TaleInstanceId);
-            if (loaded.IsFailure) return loaded;
+            LoadTaleState(resume);
             _logger.LogInformation("Tale {TaleId} resuming from saved state", context.TaleInstanceId);
-        }
-        else
-        {
-            _createdAt = _timeProvider.GetUtcNow().UtcDateTime;
-            if (_repository != null)
-            {
-                var newId = Auid.New(_options.TaleIdPrefix);
-                context.TaleInstanceId = newId;
-                _logger.LogInformation("Tale started with ID {TaleId}", newId);
-            }
+            return;
         }
 
-        return Result.Success();
+        _createdAt = _timeProvider.GetUtcNow().UtcDateTime;
+        var newId = Auid.New(_options.TaleIdPrefix);
+        context.TaleInstanceId = newId;
+        _logger.LogInformation("Tale started with ID {TaleId}", newId);
     }
 
     /// <summary>
@@ -307,6 +301,13 @@ internal sealed class TaleEngine<TInput, TContext, TOutput>
 
         if (_resumeInput == null)
         {
+            if (_repository == null)
+            {
+                _logger.LogWarning(
+                    "Tale [{TaleHandler}] paused outside TaleManager; the run is not persisted and cannot be resumed.",
+                    _handlerTypeName);
+            }
+
             _isPaused = true;
             chapterInfo.Status = TaleStatus.WaitingForInput;
             _context.CurrentChapterId = chapter.ChapterId;
@@ -434,22 +435,14 @@ internal sealed class TaleEngine<TInput, TContext, TOutput>
         return TaleStatus.Running;
     }
 
-    private async Task<Result> LoadTaleState(Auid taleId)
+    private void LoadTaleState(TaleInstance instance)
     {
-        if (_repository == null) return Result.Success();
-
-        var instance = await _repository.FindById(taleId);
-        if (instance == null) return Result.Success();
-
-
         _chapterHistory.Clear();
         _chapterHistory.AddRange(instance.History);
         _createdAt = instance.CreatedAt;
         _isPaused = instance.Status == TaleStatus.WaitingForInput;
         _hasFailed = instance.Status == TaleStatus.Failed;
         _isCancelled = instance.Status == TaleStatus.Cancelled;
-
-        return Result.Success();
     }
 }
 

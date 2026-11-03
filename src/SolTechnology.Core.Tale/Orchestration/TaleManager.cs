@@ -106,11 +106,12 @@ public class TaleManager
 
         try
         {
-            TContext? context = null;
+            TContext? context;
+            TaleInstance? existing = null;
 
             if (taleId != Auid.Empty)
             {
-                var existing = await _repository.FindById(taleId);
+                existing = await _repository.FindById(taleId);
                 if (existing == null) return Result<TaleInstance>.Fail($"Tale {taleId} not found");
                 if (existing.Status == TaleStatus.Completed)
                     return Result<TaleInstance>.Fail("Tale already completed");
@@ -131,18 +132,20 @@ public class TaleManager
                     return Result<TaleInstance>.Fail($"Persisted context for tale {taleId} deserialized to null");
 
                 context.TaleInstanceId = taleId;
-                input = context.Input;
+            }
+            else
+            {
+                if (input == null)
+                    return Result<TaleInstance>.Fail("Input is required to start a tale");
+
+                context = new TContext { Input = input };
             }
 
-            if (input == null && context == null)
-                return Result<TaleInstance>.Fail("Input is required to start a tale");
-
             var handler = ActivatorUtilities.CreateInstance<THandler>(sp);
-            if (context != null) handler.Context = context;
+            var run = new TaleRunOptions { Persist = true, Resume = existing };
+            var result = await handler.Run(context, userInput, run, cancellationToken);
 
-            var result = await handler.Handle(input!, userInput, cancellationToken);
-
-            var activeId = handler.Context.TaleInstanceId;
+            var activeId = context.TaleInstanceId;
 
             // Stamp the idempotency key (if provided and this is a fresh tale).
             if (!string.IsNullOrEmpty(idempotencyKey))

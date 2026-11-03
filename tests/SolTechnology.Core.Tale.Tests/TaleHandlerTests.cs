@@ -3,6 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using NUnit.Framework;
 using SolTechnology.Core;
+using SolTechnology.Core.Tale.Persistence;
 using SolTechnology.Core.Tale;
 using SolTechnology.Core.Tale;
 
@@ -159,6 +160,74 @@ public class TaleHandlerTests
         // Assert
         result.IsFailure.Should().BeTrue();
         result.Error!.Message.Should().Contain("cancelled");
+    }
+
+    [Test]
+    public async Task Handle_TwiceOnSameInstance_ReturnsSecondResult()
+    {
+        // Arrange
+        using var sp = BuildTaleProvider();
+        var handler = sp.GetRequiredService<SimpleCalculationTale>();
+        await handler.Handle(new CalculationInput { Number = 10 }, CancellationToken.None);
+
+        // Act
+        var second = await handler.Handle(new CalculationInput { Number = 20 }, CancellationToken.None);
+
+        // Assert
+        second.IsSuccess.Should().BeTrue();
+        second.Data!.Result.Should().Be("Result: 45");
+        handler.Context.Input.Number.Should().Be(20);
+    }
+
+    [Test]
+    public async Task Handle_Direct_DoesNotWriteRepository()
+    {
+        // Arrange
+        using var sp = BuildTaleProvider();
+        var repository = (InMemoryTaleRepository)sp.GetRequiredService<ITaleRepository>();
+        var handler = sp.GetRequiredService<SimpleCalculationTale>();
+
+        // Act
+        for (var i = 0; i < 100; i++)
+        {
+            await handler.Handle(new CalculationInput { Number = i }, CancellationToken.None);
+        }
+
+        // Assert
+        (await repository.ListAsync(take: int.MaxValue)).Should().BeEmpty();
+    }
+
+    [Test]
+    public async Task Handle_Direct_InteractiveChapterPauses_LogsNotPersistedWarning()
+    {
+        // Arrange
+        var logs = new RecordingLoggerProvider();
+        using var sp = BuildTaleProvider(logs);
+        var repository = (InMemoryTaleRepository)sp.GetRequiredService<ITaleRepository>();
+        var handler = sp.GetRequiredService<LifecycleTaleV1>();
+
+        // Act
+        var result = await handler.Handle(new LifecycleInput { Value = 1 }, CancellationToken.None);
+
+        // Assert
+        result.Error.Should().BeOfType<TalePausedError>();
+        logs.Logs.Should().ContainSingle(log => log.Level == LogLevel.Warning).Which.Message.Should().Be(
+            "Tale [LifecycleTaleV1] paused outside TaleManager; the run is not persisted and cannot be resumed.");
+        (await repository.ListAsync()).Should().BeEmpty();
+    }
+
+    private static ServiceProvider BuildTaleProvider(RecordingLoggerProvider? logs = null)
+    {
+        var services = new ServiceCollection().AddLogging(builder =>
+        {
+            if (logs != null)
+            {
+                builder.AddProvider(logs);
+            }
+        });
+        services.AddSingleton<TestService>();
+        services.AddSolTale(assemblies: typeof(TaleHandlerTests).Assembly);
+        return services.BuildServiceProvider();
     }
 
     private ILogger<T> GetLogger<T>()

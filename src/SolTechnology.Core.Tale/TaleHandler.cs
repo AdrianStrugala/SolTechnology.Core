@@ -1,7 +1,6 @@
 using System.Text.Json;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using SolTechnology.Core.AUID;
 using SolTechnology.Core.Tale.Orchestration;
 using SolTechnology.Core.Tale.Persistence;
 // collapsed: using SolTechnology.Core.Tale.Tale;
@@ -129,24 +128,28 @@ public abstract class TaleHandler<TInput, TContext, TOutput>
         => Handle(input, null, cancellationToken);
 
     /// <summary>
-    /// Executes the tale with optional resume input.
+    /// Executes the tale with optional resume input. Every call starts a fresh, non-persisted run;
+    /// only <see cref="TaleManager"/> persists and resumes tales.
     /// </summary>
-    public virtual async Task<Result<TOutput>> Handle(
+    public virtual Task<Result<TOutput>> Handle(
         TInput input,
         JsonElement? resumeInput = null,
         CancellationToken cancellationToken = default)
+        => Run(new TContext { Input = input }, resumeInput, TaleRunOptions.Direct, cancellationToken);
+
+    internal async Task<Result<TOutput>> Run(
+        TContext context,
+        JsonElement? resumeInput,
+        TaleRunOptions run,
+        CancellationToken cancellationToken)
     {
         _logger.LogInformation("Tale {Handler} processing...", GetType().Name);
 
-        var repository = _serviceProvider.GetService<ITaleRepository>();
+        var repository = run.Persist ? _serviceProvider.GetService<ITaleRepository>() : null;
         var options = _serviceProvider.GetService<TaleOptions>() ?? TaleOptions.Default;
         var timeProvider = _serviceProvider.GetService<TimeProvider>();
         _engine = new TaleEngine<TInput, TContext, TOutput>(_serviceProvider, _logger, repository, options, timeProvider);
-
-        if (Context is null || Context.TaleInstanceId == Auid.Empty)
-        {
-            Context = new TContext { Input = input };
-        }
+        Context = context;
 
         using var _ = _logger.BeginScope(new Dictionary<string, object?>
         {
@@ -156,12 +159,7 @@ public abstract class TaleHandler<TInput, TContext, TOutput>
 
         try
         {
-            var init = await _engine.Initialize(Context, GetType(), resumeInput, cancellationToken);
-            if (init.IsFailure)
-            {
-                await SafePersistTerminalState();
-                return Result<TOutput>.Fail(init.Error!);
-            }
+            _engine.Initialize(Context, GetType(), resumeInput, run.Resume, cancellationToken);
 
             var tale = Tell();
             await _engine.Run(tale.Steps);

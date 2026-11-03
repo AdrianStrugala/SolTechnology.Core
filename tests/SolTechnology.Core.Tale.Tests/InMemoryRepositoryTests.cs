@@ -1,7 +1,9 @@
 using FluentAssertions;
+using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
 using SolTechnology.Core.AUID;
 using SolTechnology.Core.Tale.Models;
+using SolTechnology.Core.Tale.Orchestration;
 using SolTechnology.Core.Tale.Persistence;
 
 namespace SolTechnology.Core.Tale.Tests;
@@ -291,6 +293,28 @@ public class InMemoryRepositoryTests
             retrieved.Should().NotBeNull();
             retrieved!.Status.Should().Be(expectedStatus);
         }
+    }
+
+    [Test]
+    public async Task StartStory_ViaManager_Persists()
+    {
+        // Arrange
+        var services = new ServiceCollection().AddLogging();
+        services.AddSingleton<ITaleRepository>(_repository);
+        services.AddSingleton<TestService>();
+        services.AddSolTale(assemblies: typeof(InMemoryRepositoryTests).Assembly);
+        using var sp = services.BuildServiceProvider();
+        var manager = sp.GetRequiredService<TaleManager>();
+
+        // Act
+        var start = await manager.StartStory<LifecycleTaleV1, LifecycleInput, LifecycleContext, LifecycleOutput>(
+            new LifecycleInput { Value = 1 });
+
+        // Assert
+        var persisted = await _repository.FindById(start.Data!.TaleId);
+        persisted.Should().NotBeNull();
+        persisted!.Status.Should().Be(TaleStatus.WaitingForInput);
+        persisted.HandlerTypeName.Should().Be(nameof(LifecycleTaleV1));
     }
 
     [Test]
