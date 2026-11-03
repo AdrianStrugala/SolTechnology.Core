@@ -24,6 +24,8 @@ public sealed class TestHostContainmentGuardTests
         "ComponentTestsFixture.cs",
         "ApiFixture.cs",
         "WorkerFixture.cs",
+        // DreamTravel: a second host booted as Production to test error handling outside Development
+        "ProductionErrorHandlingTests.cs",
     };
 
     private static readonly Regex TestHostPattern = new(
