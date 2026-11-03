@@ -2,7 +2,6 @@
 using Microsoft.Extensions.Logging;
 using SolTechnology.Core.Logging;
 using SolTechnology.Core.Logging.Masking;
-using SolTechnology.Core.Logging.Operations;
 
 namespace SolTechnology.Core.CQRS.PipelineBehaviors;
 
@@ -25,7 +24,7 @@ public sealed class LoggingPipelineBehavior<TRequest, TResponse> : IPipelineBeha
         var operationName = typeof(TRequest).Name;
         var bindings = LogScopeBindingCache.GetBindings(typeof(TRequest));
 
-        using var activity = CoreLoggingActivitySources.Operations.StartActivity(
+        using var activity = OperationsActivitySource.Instance.StartActivity(
             operationName,
             ActivityKind.Internal);
 
