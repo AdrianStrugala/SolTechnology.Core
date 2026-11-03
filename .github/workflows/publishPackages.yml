@@ -61,6 +61,17 @@ jobs:
           exit 1
         fi
 
+    - name: Guard - release tag matches the package version
+      if: startsWith(github.ref, 'refs/tags/v')
+      shell: bash
+      run: |
+        set -euo pipefail
+        version="$(dotnet msbuild src/SolTechnology.Core/SolTechnology.Core.csproj -getProperty:Version -nologo)"
+        if [ "${GITHUB_REF_NAME}" != "v${version}" ]; then
+          echo "::error::Tag ${GITHUB_REF_NAME} does not match <Version>${version}</Version> in src/Directory.Build.props"
+          exit 1
+        fi
+
     - name: Pack every packable src project
       shell: bash
       run: |
@@ -85,7 +96,6 @@ jobs:
     needs: build
     if: startsWith(github.ref, 'refs/tags/v')
     runs-on: ubuntu-latest
-    environment: nuget-release
 
     steps:
     - name: Download packages

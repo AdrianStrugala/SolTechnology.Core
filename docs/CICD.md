@@ -17,13 +17,13 @@ captured in the [release runbook](release-runbook-1.0.md).
 |---|:---:|:---:|:---:|
 | `pull_request` → `master` | ✅ | ✅ | — |
 | `push` → `master` | ✅ | ✅ | — |
-| `push` tag `v*` | ✅ | ✅ | ✅ (after approval) |
+| `push` tag `v*` | ✅ | ✅ | ✅ |
 | `workflow_dispatch` | ✅ | ✅ | — |
 
-Publishing only from `v*` tags through `nuget-release`: the `publish` job runs only for a
-`refs/tags/v*` push and is bound to the protected GitHub environment `nuget-release`, which requires
-an approval from the repository owner and holds the `NUGET_API_KEY` secret. `workflow_dispatch`
-builds, tests and packs but never publishes. Unlisting the deprecated ghost ids is **not** part of
+Publishing only from `v*` tags: the `publish` job runs only for a `refs/tags/v*` push, and the
+build fails first if the tag does not match the package version. `workflow_dispatch` builds, tests
+and packs but never publishes. `NUGET_API_KEY` is a repository secret, shared with the unlist
+workflow. Unlisting the deprecated ghost ids is **not** part of
 this pipeline — it lives in its own manual-only workflow (see below), so it can never run on a tag
 or `master` push. The workflow token is read-only (`permissions: contents: read`).
 
@@ -40,16 +40,17 @@ or `master` push. The workflow token is read-only (`permissions: contents: read`
    excluded from the check.
 6. **Pack** — enumerates `src/*.csproj` from `dotnet sln … list` and `dotnet pack -c Release` each into
    `./artifacts`.
-7. **Upload** — `*.nupkg` and `*.snupkg` are uploaded as the `nuget-packages` artifact.
+7. **Tag guard** (tags only) — fails the build when the tag is not `v` + `<Version>` from
+   [`src/Directory.Build.props`](../src/Directory.Build.props). The package version comes from the
+   props file, not from the tag, and nuget.org versions can never be reused.
+8. **Upload** — `*.nupkg` and `*.snupkg` are uploaded as the `nuget-packages` artifact.
 
 ### `publish` job
 
-Runs after `build` only for `v*` tags and waits for approval on the `nuget-release` environment.
-Before approving, the reviewer checks that the tag equals `<Version>` in
-[`src/Directory.Build.props`](../src/Directory.Build.props): the package version comes from the
-props file, not from the tag, and nuget.org versions can never be reused. The job downloads the
-artifact and runs `dotnet nuget push ./artifacts/*.nupkg --skip-duplicate`, which also pushes the
-matching `.snupkg` symbol packages.
+Runs after `build` only for `v*` tags. It downloads the artifact and runs
+`dotnet nuget push ./artifacts/*.nupkg --skip-duplicate`, which also pushes the matching `.snupkg`
+symbol packages. To release, bump `<Version>` in `src/Directory.Build.props`, push it to `master`,
+then push the tag `v<Version>`.
 
 ## Unlisting deprecated packages — `Unlist deprecated packages`
 

@@ -43,8 +43,8 @@ is the control for that (accepted risk AR-5).
 
 ## Deviations
 
-### Awaiting owner actions
+### No `nuget-release` environment; automatic tag guard instead of a reviewer
 
-**Original plan:** the owner creates `nuget-release` and moves `NUGET_API_KEY` before the workflow change merges.
+**Original plan:** a `publish` job bound to a `nuget-release` environment with the owner as required reviewer, `NUGET_API_KEY` moved into the environment and deleted at repository level, and the reviewer checking that the tag equals `<Version>` (AR-5).
 
-**Actual implementation:** the workflow and docs change is committed on branch `foundation/03-tag-only-publish` (not on `master`) and verified locally: actionlint 1.7.12 clean; a local Release pack of every slnx `src/` project produced 20 `.nupkg` and 20 matching `.snupkg`. The step stays `in-progress` until the owner creates the environment, moves the secret, merges the branch, and a `workflow_dispatch` run shows the `publish` job skipped.
+**Actual implementation:** the owner declined being a required reviewer and chose no environment (2026-11-03). Deleting the repository secret would also break `unlistDeprecatedPackages.yml`, which reads it from `master`. The `publish` job runs only for `refs/tags/v*` without an environment; `NUGET_API_KEY` stays a repository secret. AR-5's human check is replaced by a build-job guard that fails a tag run when the tag is not `v` + `<Version>` (read with `dotnet msbuild -getProperty:Version`). The environment, reviewer and `gh secret list` criteria no longer apply. Verified locally: actionlint 1.7.12 clean; Release pack of every slnx `src/` project gives 20 `.nupkg` and 20 matching `.snupkg`; the guard expression passes for `v1.0.0` and fails for `v2.0.0` at `<Version>1.0.0</Version>`. The `workflow_dispatch` run check happens on the first CI run after the owner pushes. The release feature's Trusted Publishing step still names `nuget-release` and must be adjusted when it is implemented.
