@@ -143,6 +143,8 @@ internal sealed class InteractiveChapterInvoker<TInput, TContext, TOutput>(
             return Result.Fail($"ReadWithInput not found on {chapter.GetType().Name}");
         }
 
-        return await (Task<Result>)method.Invoke(chapter, [context, input, cancellationToken])!;
+        // DoNotWrapExceptions: a synchronous throw must surface as itself, not as TargetInvocationException.
+        return await (Task<Result>)method.Invoke(
+            chapter, BindingFlags.DoNotWrapExceptions, null, [context, input, cancellationToken], null)!;
     }
 }

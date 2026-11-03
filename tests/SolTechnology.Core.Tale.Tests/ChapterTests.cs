@@ -190,6 +190,8 @@ public class TestContext : Context<TestInput, TestOutput>
 
 public class TestService
 {
+    public CancellationTokenSource? RunCanceller { get; set; }
+
     public string Process(int value)
     {
         return $"Service called with value: {value}";
