@@ -1,7 +1,7 @@
 ---
 spec: 2026-11-02-core-2-0-logging
 step: 04
-status: to-do
+status: in-progress
 ---
 
 # Step 04: Logging — sanitize inbound correlation IDs; safe timings and masking
