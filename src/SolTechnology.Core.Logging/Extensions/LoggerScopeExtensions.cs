@@ -15,17 +15,18 @@ public static class LoggerScopeExtensions
         /// <summary>Pushes a single key/value pair into the logger scope.</summary>
         public IDisposable? PushToScope(string key, object? value)
             => logger.BeginScope(new Dictionary<string, object?>(1) { [key] = value });
+    }
 
-        /// <summary>Pushes multiple key/value pairs into the logger scope.</summary>
-        public IDisposable? PushToScope(params (string Key, object? Value)[] properties)
+    // Classic form: in an extension block, C# 14 reports CS8620 for tuple arguments to this params array.
+    /// <summary>Pushes multiple key/value pairs into the logger scope.</summary>
+    public static IDisposable? PushToScope(this ILogger logger, params (string Key, object? Value)[] properties)
+    {
+        var dict = new Dictionary<string, object?>(properties.Length);
+        foreach (var (k, v) in properties)
         {
-            var dict = new Dictionary<string, object?>(properties.Length);
-            foreach (var (k, v) in properties)
-            {
-                dict[k] = v;
-            }
-
-            return logger.BeginScope(dict);
+            dict[k] = v;
         }
+
+        return logger.BeginScope(dict);
     }
 }
