@@ -79,15 +79,8 @@ internal static class RequestDispatcherCache
 /// <summary>
 /// A compiled dispatcher that invokes the handler for a specific request type.
 /// </summary>
-internal sealed class RequestDispatcher
+internal sealed class RequestDispatcher(Func<IServiceProvider, object, CancellationToken, Task<object>> invoke)
 {
-    private readonly Func<IServiceProvider, object, CancellationToken, Task<object>> _invoke;
-
-    public RequestDispatcher(Func<IServiceProvider, object, CancellationToken, Task<object>> invoke)
-    {
-        _invoke = invoke;
-    }
-
     public Task<object> Invoke(IServiceProvider sp, object request, CancellationToken ct)
-        => _invoke(sp, request, ct);
+        => invoke(sp, request, ct);
 }

@@ -6,17 +6,8 @@ namespace SolTechnology.Core.CQRS.Internal;
 /// In-house mediator implementation. Dispatches commands and queries through the pipeline
 /// behavior chain, and publishes events via <see cref="IEventPublisher"/>.
 /// </summary>
-internal sealed class CQRSMediator : IMediator
+internal sealed class CQRSMediator(IServiceProvider serviceProvider, IEventPublisher eventPublisher) : IMediator
 {
-    private readonly IServiceProvider _serviceProvider;
-    private readonly IEventPublisher _eventPublisher;
-
-    public CQRSMediator(IServiceProvider serviceProvider, IEventPublisher eventPublisher)
-    {
-        _serviceProvider = serviceProvider;
-        _eventPublisher = eventPublisher;
-    }
-
     public Task<Result> Send(ICommand command, CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(command);
@@ -41,13 +32,13 @@ internal sealed class CQRSMediator : IMediator
     public void Publish<TEvent>(TEvent notification) where TEvent : IEvent
     {
         ArgumentNullException.ThrowIfNull(notification);
-        _eventPublisher.Publish(notification);
+        eventPublisher.Publish(notification);
     }
 
     public void Publish(IEvent notification)
     {
         ArgumentNullException.ThrowIfNull(notification);
-        _eventPublisher.Publish(notification);
+        eventPublisher.Publish(notification);
     }
 
     private async Task<TResponse> SendInternal<TResponse>(object request, Type handlerInterfaceType, CancellationToken cancellationToken)
@@ -55,10 +46,10 @@ internal sealed class CQRSMediator : IMediator
         var requestType = request.GetType();
 
         var dispatcher = RequestDispatcherCache.GetOrAdd(requestType, typeof(TResponse), handlerInterfaceType);
-        RequestHandlerDelegate<TResponse> pipeline = async () => (TResponse)await dispatcher.Invoke(_serviceProvider, request, cancellationToken);
+        RequestHandlerDelegate<TResponse> pipeline = async () => (TResponse)await dispatcher.Invoke(serviceProvider, request, cancellationToken);
 
         var behaviorType = typeof(IPipelineBehavior<,>).MakeGenericType(requestType, typeof(TResponse));
-        var behaviors = _serviceProvider.GetServices(behaviorType).Cast<object>().ToList();
+        var behaviors = serviceProvider.GetServices(behaviorType).Cast<object>().ToList();
         var invokeBehavior = PipelineBehaviorInvoker<TResponse>.For(requestType);
 
         // Fold right-to-left so the first registered behavior is the outermost.

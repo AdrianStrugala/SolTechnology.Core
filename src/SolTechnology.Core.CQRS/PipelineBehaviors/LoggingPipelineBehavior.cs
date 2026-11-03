@@ -9,17 +9,11 @@ namespace SolTechnology.Core.CQRS.PipelineBehaviors;
 /// Pipeline behavior that tracks every request as a logical operation with structured logging
 /// and optional OpenTelemetry Activity spans.
 /// </summary>
-public sealed class LoggingPipelineBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>
+/// <param name="logger">The logger the operation entries are written to.</param>
+public sealed class LoggingPipelineBehavior<TRequest, TResponse>(ILogger<LoggingPipelineBehavior<TRequest, TResponse>> logger)
+    : IPipelineBehavior<TRequest, TResponse>
     where TRequest : notnull
 {
-    private readonly ILogger<LoggingPipelineBehavior<TRequest, TResponse>> _logger;
-
-    /// <summary>Creates the behavior with the logger it writes operation entries to.</summary>
-    public LoggingPipelineBehavior(ILogger<LoggingPipelineBehavior<TRequest, TResponse>> logger)
-    {
-        _logger = logger;
-    }
-
     /// <summary>
     /// Logs the start and outcome of the request inside a <c>[LogScope]</c> scope and an activity: a
     /// success, a failed <see cref="Result"/> (error type and message only), or an exception.
@@ -46,13 +40,13 @@ public sealed class LoggingPipelineBehavior<TRequest, TResponse> : IPipelineBeha
                 scopeProperties[binding.Key] = scopeValue;
                 activity?.SetTag(binding.Key, scopeValue);
             }
-            scope = _logger.BeginScope(scopeProperties);
+            scope = logger.BeginScope(scopeProperties);
         }
 
         using (scope)
         {
             var sw = Stopwatch.StartNew();
-            _logger.OperationStarted(operationName);
+            logger.OperationStarted(operationName);
 
             try
             {
@@ -60,7 +54,7 @@ public sealed class LoggingPipelineBehavior<TRequest, TResponse> : IPipelineBeha
                 if (result is Result { IsFailure: true } failed)
                 {
                     OperationResultLogMessages.OperationFailedWithResult(
-                        _logger,
+                        logger,
                         operationName,
                         sw.ElapsedMilliseconds,
                         failed.Error?.GetType().Name ?? nameof(Error),
@@ -69,13 +63,13 @@ public sealed class LoggingPipelineBehavior<TRequest, TResponse> : IPipelineBeha
                     return result;
                 }
 
-                _logger.OperationSucceeded(operationName, sw.ElapsedMilliseconds);
+                logger.OperationSucceeded(operationName, sw.ElapsedMilliseconds);
                 activity?.SetStatus(ActivityStatusCode.Ok);
                 return result;
             }
             catch (Exception e)
             {
-                _logger.OperationFailed(operationName, sw.ElapsedMilliseconds, e);
+                logger.OperationFailed(operationName, sw.ElapsedMilliseconds, e);
                 activity?.SetStatus(ActivityStatusCode.Error, e.Message);
                 activity?.AddException(e);
                 throw;
