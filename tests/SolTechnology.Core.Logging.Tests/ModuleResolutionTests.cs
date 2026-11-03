@@ -1,8 +1,12 @@
+using System.Net;
 using FluentAssertions;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using NUnit.Framework;
 using SolTechnology.Core.Logging.Correlations;
@@ -36,18 +40,11 @@ public class ModuleResolutionTests
     }
 
     [Test]
-    [Ignore("B4: ITimingService/TimeProvider not registered")]
     public async Task AddSolLoggingWithConfiguration_ResolvesAllPublicServices_WithValidation()
     {
         // Arrange
-        var configuration = new ConfigurationBuilder()
-            .AddInMemoryCollection(new Dictionary<string, string?>
-            {
-                [$"{LoggingOptions.SectionName}:SkipPaths:0"] = "/health"
-            })
-            .Build();
         var services = new ServiceCollection().AddLogging();
-        services.AddSolLogging(configuration);
+        services.AddSolLogging(BuildConfiguration());
         services.LogDetail("X-Tenant-Id", asName: "TenantId", source: LogDetailSource.Header);
         await using var provider = services.BuildServiceProvider(StrictValidation);
 
@@ -58,6 +55,36 @@ public class ModuleResolutionTests
         resolved.StatusCode.Should().Be(StatusCodes.Status200OK);
         resolved.Services.Should().AllSatisfy(service => service.Should().NotBeNull());
     }
+
+    [Test]
+    public async Task AddSolLoggingWithConfiguration_RequestThroughUseSolLogging_Returns200()
+    {
+        // Arrange
+        using var host = await new HostBuilder()
+            .ConfigureWebHost(web => web
+                .UseTestServer()
+                .ConfigureServices(services => services.AddSolLogging(BuildConfiguration()))
+                .Configure(app =>
+                {
+                    app.UseSolLogging();
+                    app.Run(context => context.Response.WriteAsync("ok"));
+                }))
+            .StartAsync();
+
+        // Act
+        using var response = await host.GetTestClient().GetAsync("/api/trips");
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        response.Headers.Should().ContainKey(CorrelationId.HeaderKey);
+    }
+
+    private static IConfiguration BuildConfiguration() => new ConfigurationBuilder()
+        .AddInMemoryCollection(new Dictionary<string, string?>
+        {
+            [$"{LoggingOptions.SectionName}:SkipPaths:0"] = "/health"
+        })
+        .Build();
 
     private static async Task<(int StatusCode, object[] Services)> ResolveModuleServices(ServiceProvider provider)
     {

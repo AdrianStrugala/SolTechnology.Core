@@ -33,7 +33,7 @@ enables it purely through MSBuild properties (`PublishRepositoryUrl`, `EmbedUntr
 | `Microsoft.Extensions.Http.Resilience` | `10.7.0` | `SolTechnology.Core.HTTP` | Aspire-family version (not aligned to plain `10.0.x` MEL minor — ships on its own cadence). |
 | `Microsoft.Extensions.ServiceDiscovery` | `10.7.0` | Aspire-hosted apps | Same Aspire-family cadence as `Http.Resilience`. |
 | `Microsoft.AspNetCore.Mvc.Testing` | `10.0.9` | `SolTechnology.Core.API.Testing` | Mirrors target framework. |
-| `Microsoft.AspNetCore.TestHost` | `10.0.9` | `SolTechnology.Core.API.Testing` | — |
+| `Microsoft.AspNetCore.TestHost` | `10.0.9` | `SolTechnology.Core.API.Testing`, `SolTechnology.Core.Logging.Tests` | — |
 
 ## Resilience / HTTP
 

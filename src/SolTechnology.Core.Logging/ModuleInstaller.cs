@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Options;
 using SolTechnology.Core.Logging.Correlations;
 using SolTechnology.Core.Logging.Enrichment;
 using SolTechnology.Core.Logging.Middleware;
@@ -19,53 +20,30 @@ public static class ModuleInstaller
     extension(IServiceCollection services)
     {
         /// <summary>
-        /// Registers the correlation service used by <see cref="LoggingMiddleware"/>.
-        /// Safe to call multiple times.
+        /// Registers the correlation, timing and enrichment services used by
+        /// <see cref="LoggingMiddleware"/>. Safe to call multiple times.
         /// </summary>
         public IServiceCollection AddSolLogging(Action<LoggingOptions>? configure = null)
         {
-            services.TryAddSingleton<ICorrelationIdService, CorrelationIdService>();
-            services.TryAddSingleton(TimeProvider.System);
-            services.TryAddScoped<ITimingService, TimingService>();
-
-            var optionsBuilder = services.AddOptions<LoggingOptions>()
-                .ValidateDataAnnotations()
-                .ValidateOnStart()
-                .Validate(o => o.SkipPaths is null || o.SkipPaths.All(p => !string.IsNullOrWhiteSpace(p)),
-                    "LoggingOptions.SkipPaths must not contain null or whitespace entries.")
-                .Validate(o => o.MaskedHeaders is null || o.MaskedHeaders.All(p => !string.IsNullOrWhiteSpace(p)),
-                    "LoggingOptions.MaskedHeaders must not contain null or whitespace entries.");
-
+            var optionsBuilder = RegisterCore(services);
             if (configure is not null)
             {
                 optionsBuilder.Configure(configure);
             }
 
-            EnsureRequestHeadersEnricherRegistered(services);
             return services;
         }
 
         /// <summary>
         /// Binds <see cref="LoggingOptions"/> from the configuration section
-        /// <c>Logging:Core</c> (see <see cref="LoggingOptions.SectionName"/>) and registers
-        /// the correlation service.
+        /// <c>Logging:Core</c> (see <see cref="LoggingOptions.SectionName"/>) and registers the
+        /// same services as the <see cref="Action{T}"/> overload.
         /// </summary>
         public IServiceCollection AddSolLogging(IConfiguration configuration)
         {
             ArgumentNullException.ThrowIfNull(configuration);
 
-            services.TryAddSingleton<ICorrelationIdService, CorrelationIdService>();
-
-            services.AddOptions<LoggingOptions>()
-                .Bind(configuration.GetSection(LoggingOptions.SectionName))
-                .ValidateDataAnnotations()
-                .ValidateOnStart()
-                .Validate(o => o.SkipPaths is null || o.SkipPaths.All(p => !string.IsNullOrWhiteSpace(p)),
-                    "LoggingOptions.SkipPaths must not contain null or whitespace entries.")
-                .Validate(o => o.MaskedHeaders is null || o.MaskedHeaders.All(p => !string.IsNullOrWhiteSpace(p)),
-                    "LoggingOptions.MaskedHeaders must not contain null or whitespace entries.");
-
-            EnsureRequestHeadersEnricherRegistered(services);
+            RegisterCore(services).Bind(configuration.GetSection(LoggingOptions.SectionName));
             return services;
         }
 
@@ -141,6 +119,22 @@ public static class ModuleInstaller
     /// </summary>
     public static IApplicationBuilder UseSolLogging(this IApplicationBuilder app)
         => app.UseMiddleware<LoggingMiddleware>();
+
+    private static OptionsBuilder<LoggingOptions> RegisterCore(IServiceCollection services)
+    {
+        services.TryAddSingleton<ICorrelationIdService, CorrelationIdService>();
+        services.TryAddSingleton(TimeProvider.System);
+        services.TryAddScoped<ITimingService, TimingService>();
+        EnsureRequestHeadersEnricherRegistered(services);
+
+        return services.AddOptions<LoggingOptions>()
+            .ValidateDataAnnotations()
+            .ValidateOnStart()
+            .Validate(o => o.SkipPaths is null || o.SkipPaths.All(p => !string.IsNullOrWhiteSpace(p)),
+                "LoggingOptions.SkipPaths must not contain null or whitespace entries.")
+            .Validate(o => o.MaskedHeaders is null || o.MaskedHeaders.All(p => !string.IsNullOrWhiteSpace(p)),
+                "LoggingOptions.MaskedHeaders must not contain null or whitespace entries.");
+    }
 
     private static void EnsureLogDetailEnricherRegistered(IServiceCollection services)
     {
