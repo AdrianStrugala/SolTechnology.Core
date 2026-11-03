@@ -39,10 +39,7 @@ internal static class RequestBodyBuffer
         catch (JsonException ex)
         {
             // Malformed body - model binding will surface a 400; skip enrichment.
-            logger.LogDebug(
-                ex,
-                "Skipping body-based log enrichment for [{RequestPath}] - JSON could not be parsed",
-                request.Path);
+            RequestEnvelopeLogger.BodyEnrichmentSkipped(logger, ex, request.Path);
         }
         catch (OperationCanceledException)
         {

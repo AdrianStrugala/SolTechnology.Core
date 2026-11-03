@@ -55,12 +55,27 @@ public sealed class LoggingMiddleware
 
         var stopwatch = ValueStopwatch.StartNew();
         timingService.Reset();
-        var scopeDictionary = correlation.GetScope();
+        var scopeProperties = await BuildScope(context, correlation, enrichers, logger).ConfigureAwait(false);
+        using var scope = logger.BeginScope(scopeProperties);
+        if (headerError is not null && _options.LogClientCorrelationParseErrors)
+        {
+            RequestEnvelopeLogger.CorrelationHeaderRejected(logger, CorrelationId.HeaderKey, headerError);
+        }
+
+        RequestEnvelopeLogger.RequestStarted(logger, context.Request.Method, context.Request.Path);
+        await InvokeNextAndLogOutcome(context, logger, timingService, stopwatch).ConfigureAwait(false);
+    }
+
+    private async Task<IDictionary<string, object?>> BuildScope(
+        HttpContext context,
+        CorrelationId correlation,
+        IEnumerable<ILogScopeEnricher> enrichers,
+        ILogger logger)
+    {
+        var scopeProperties = correlation.GetScope();
 
         // Snapshot: the enricher sequence is iterated twice (body-prepare + Enrich).
         var enricherList = enrichers as IList<ILogScopeEnricher> ?? enrichers.ToArray();
-
-        // Async-buffer + parse the JSON body once if any enricher requested it; body is reset for model binding.
         await RequestBodyBuffer.ParseJsonIfRequested(context, enricherList, _options.MaxLoggedJsonBodyBytes, logger)
             .ConfigureAwait(false);
 
@@ -68,42 +83,31 @@ public sealed class LoggingMiddleware
         {
             try
             {
-                enricher.Enrich(context, scopeDictionary);
+                enricher.Enrich(context, scopeProperties);
             }
             catch (Exception ex)
             {
-                logger.LogWarning(
-                    ex,
-                    "Log scope enricher [{EnricherType}] threw and was skipped",
-                    enricher.GetType().FullName);
+                RequestEnvelopeLogger.EnricherFailed(logger, ex, enricher.GetType().FullName);
             }
         }
-        using var scope = logger.BeginScope(scopeDictionary);
-        if (headerError is not null && _options.LogClientCorrelationParseErrors)
-        {
-            logger.LogWarning(
-                "Invalid [{Header}] header rejected: [{CorrelationError}]",
-                CorrelationId.HeaderKey,
-                headerError);
-        }
-        logger.LogInformation(
-            "Started request [{RequestMethod}] [{RequestPath}]",
-            context.Request.Method,
-            context.Request.Path);
-        var exceptionLogged = false;
+
+        return scopeProperties;
+    }
+
+    private async Task InvokeNextAndLogOutcome(
+        HttpContext context,
+        ILogger logger,
+        ITimingService timingService,
+        ValueStopwatch stopwatch)
+    {
+        var request = context.Request;
         try
         {
             await _next(context).ConfigureAwait(false);
         }
         catch (Exception ex) when (IsClientAbort(ex, context))
         {
-            exceptionLogged = true;
-            logger.LogWarning(
-                ex,
-                "Request [{RequestMethod}] [{RequestPath}] aborted by client after [{ElapsedMs} ms]",
-                context.Request.Method,
-                context.Request.Path,
-                stopwatch.ElapsedMilliseconds);
+            RequestEnvelopeLogger.RequestAborted(logger, ex, request.Method, request.Path, stopwatch.ElapsedMilliseconds);
             throw;
         }
         catch (Exception ex)
@@ -112,54 +116,13 @@ public sealed class LoggingMiddleware
             {
                 context.Response.StatusCode = StatusCodes.Status500InternalServerError;
             }
-            exceptionLogged = true;
-            logger.LogError(
-                ex,
-                "Request [{RequestMethod}] [{RequestPath}] failed after [{ElapsedMs} ms]",
-                context.Request.Method,
-                context.Request.Path,
-                stopwatch.ElapsedMilliseconds);
+
+            RequestEnvelopeLogger.RequestFailed(logger, ex, request.Method, request.Path, stopwatch.ElapsedMilliseconds);
             throw;
         }
-        finally
-        {
-            // The failure entry already carries the outcome; a second Error entry would double-count error rates.
-            if (!exceptionLogged)
-            {
-                LogFinished(context, logger, timingService, stopwatch.ElapsedMilliseconds);
-            }
-        }
-    }
 
-    private static void LogFinished(HttpContext context, ILogger logger, ITimingService timingService, long elapsedMs)
-    {
-        var statusCode = context.Response.StatusCode;
-        var level = statusCode >= 500 ? LogLevel.Error
-                  : statusCode >= 400 ? LogLevel.Warning
-                                      : LogLevel.Information;
-
-        var timings = timingService.GetTimings();
-        if (timings.Count > 0)
-        {
-            logger.Log(
-                level,
-                "Finished request [{RequestMethod}] [{RequestPath}] -> [{StatusCode}] in [{ElapsedMs} ms] — timings: [{@Timings}]",
-                context.Request.Method,
-                context.Request.Path,
-                statusCode,
-                elapsedMs,
-                timings);
-        }
-        else
-        {
-            logger.Log(
-                level,
-                "Finished request [{RequestMethod}] [{RequestPath}] -> [{StatusCode}] in [{ElapsedMs} ms]",
-                context.Request.Method,
-                context.Request.Path,
-                statusCode,
-                elapsedMs);
-        }
+        // Only reached without an exception: a logged failure plus Finished would double-count error rates.
+        RequestEnvelopeLogger.RequestFinished(logger, context, timingService, stopwatch.ElapsedMilliseconds);
     }
 
     /// <summary>
