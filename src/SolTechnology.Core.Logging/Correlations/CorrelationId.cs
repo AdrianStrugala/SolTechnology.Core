@@ -9,10 +9,11 @@ namespace SolTechnology.Core.Logging.Correlations;
 ///
 /// Resolution order on inbound:
 /// <list type="number">
-///   <item>The trace id of the current <see cref="Activity"/> (populated automatically
-///         from the inbound <c>traceparent</c> header by ASP.NET Core).</item>
-///   <item>The optional override header <c>X-Correlation-Id</c> (only when no Activity is in scope),
-///         accepted only when it contains <c>[A-Za-z0-9._:-]</c> and is at most <see cref="MaxLength"/> long.</item>
+///   <item>The trace id of the current <see cref="Activity"/> when the request carried trace context
+///         (a <c>traceparent</c> header, or an Activity with a remote parent).</item>
+///   <item>The header <c>X-Correlation-Id</c>, accepted only when it contains <c>[A-Za-z0-9._:-]</c>
+///         and is at most <see cref="MaxLength"/> long.</item>
+///   <item>The trace id of the current <see cref="Activity"/> (a new trace started by the host).</item>
 ///   <item>A freshly generated 32-character hex string.</item>
 /// </list>
 /// On outbound the id is echoed on both <c>traceparent</c> (when an Activity is in scope,
@@ -58,10 +59,10 @@ public sealed record CorrelationId
     }
 
     /// <summary>
-    /// Reads the correlation id from the request. ASP.NET Core has already parsed
-    /// <c>traceparent</c> into <see cref="Activity.Current"/> by the time middleware runs,
-    /// so we use that as the source of truth. Falls back to <c>X-Correlation-Id</c> header
-    /// only when no Activity is in scope.
+    /// Reads the correlation id from the request. Inbound trace context wins: ASP.NET Core has already
+    /// parsed <c>traceparent</c> into <see cref="Activity.Current"/>. Without it, a valid
+    /// <c>X-Correlation-Id</c> wins over the trace the host just started, so a caller's id survives
+    /// even when the host creates a request Activity.
     /// </summary>
     /// <param name="request">Incoming HTTP request.</param>
     /// <param name="error">
@@ -73,7 +74,7 @@ public sealed record CorrelationId
         error = null;
 
         var activity = Activity.Current;
-        if (activity is not null && activity.TraceId != default)
+        if (activity is not null && activity.TraceId != default && HasInboundTraceContext(request, activity))
         {
             return new CorrelationId(activity.TraceId.ToHexString());
         }
@@ -87,6 +88,9 @@ public sealed record CorrelationId
         error = CorrelationIdValidator.Validate(headerValue);
         return error is null ? new CorrelationId(headerValue) : Generate();
     }
+
+    private static bool HasInboundTraceContext(HttpRequest request, Activity activity)
+        => activity.HasRemoteParent || request.Headers.ContainsKey(TraceParentHeaderKey);
 
     /// <summary>
     /// Adds correlation headers to the response:

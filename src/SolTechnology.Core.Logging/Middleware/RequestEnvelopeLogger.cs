@@ -43,6 +43,10 @@ internal static partial class RequestEnvelopeLogger
         var level = statusCode >= 500 ? LogLevel.Error
                   : statusCode >= 400 ? LogLevel.Warning
                                       : LogLevel.Information;
+        if (!logger.IsEnabled(level))
+        {
+            return;
+        }
 
         var timings = timingService.GetTimings();
         if (timings.Count > 0)

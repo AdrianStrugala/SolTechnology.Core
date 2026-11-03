@@ -27,7 +27,10 @@ consumer overrides are safe. `ModuleResolutionTests` resolves every service unde
 1. Build the log scope: the correlation id plus every `ILogScopeEnricher`. A failing enricher is
    logged and skipped. The JSON body is parsed once, only when an `IRequiresRequestBody` enricher
    asks for it, only for `application/json` within `MaxLoggedJsonBodyBytes`, and the stream is
-   rewound for model binding (`RequestBodyBuffer`).
+   rewound for model binding (`RequestBodyBuffer`). Malformed JSON is logged at Debug and skipped; a
+   client that disconnects mid-upload (`OperationCanceledException`, or an `IOException` such as
+   `ConnectionResetException` or `BadHttpRequestException`) only skips body enrichment, because the
+   pipeline's own read of the body surfaces the abort as the single Warning below.
 1. Write `Started`, call the rest of the pipeline, then write exactly one outcome entry.
 
 | Outcome | Entry | Level |
@@ -48,8 +51,19 @@ leading `/` never matches.
 
 ## Correlation ids
 
-The id is the current `Activity` trace id when one exists; otherwise the inbound `X-Correlation-Id`
-header; otherwise a generated 32-character hex value. The inbound header is accepted only when it is
+`CorrelationId.FromRequest` resolves the id in this order:
+
+1. The current `Activity` trace id when the request carried trace context: a `traceparent` header,
+   or an `Activity` with a remote parent (another propagator).
+1. A valid inbound `X-Correlation-Id`.
+1. The current `Activity` trace id: the new trace the host started for this request.
+1. A generated 32-character hex value.
+
+ASP.NET Core starts a request `Activity` whenever logging, a `DiagnosticListener`, or an
+`ActivitySource` listener is active, which is true in every real host. Letting that `Activity` win
+unconditionally would replace every caller's `X-Correlation-Id` with a fresh trace id in production;
+inbound trace context still wins because it already identifies the caller's trace.
+The inbound header is accepted only when it is
 at most 128 characters from `[A-Za-z0-9._:-]` (`CorrelationIdValidator`). The value is echoed on the
 response and written into every log scope, so anything else (CR/LF, markup, separators) is replaced
 by a generated id, and the rejection reason logged as a Warning never contains the rejected value.
@@ -63,7 +77,9 @@ by a generated id, and the rejection reason logged as a Warning never contains t
 
 `ITimingService` is scoped: each request gets its own instance, and the middleware resets it before
 `Started`. `GetTimings()` returns a read-only snapshot, so the logged map cannot change after it is
-taken and callers cannot mutate the service's state.
+taken and callers cannot mutate the service's state; with no timings it returns one shared empty
+read-only instance, so untimed requests allocate nothing. `RequestFinished` returns before reading
+timings when its level is disabled.
 
 `PiiMask.Partial` keeps `keepChars` characters at each end only when the value is longer than
 `4 * keepChars`, so at most half of a value is revealed; shorter values are fully masked, and a

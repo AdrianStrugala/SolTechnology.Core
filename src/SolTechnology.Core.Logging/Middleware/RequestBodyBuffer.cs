@@ -41,9 +41,9 @@ internal static class RequestBodyBuffer
             // Malformed body - model binding will surface a 400; skip enrichment.
             RequestEnvelopeLogger.BodyEnrichmentSkipped(logger, ex, request.Path);
         }
-        catch (OperationCanceledException)
+        catch (Exception ex) when (ex is OperationCanceledException or IOException)
         {
-            // Client gone - nothing to enrich.
+            // Client gone - nothing to enrich; the pipeline's own body read reports the abort.
         }
         finally
         {

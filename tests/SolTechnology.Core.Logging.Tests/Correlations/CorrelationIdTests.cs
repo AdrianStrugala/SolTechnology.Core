@@ -74,16 +74,92 @@ public class CorrelationIdTests
     }
 
     [Test]
-    public void FromRequest_prefers_activity_trace_id_over_header()
+    public void FromRequest_ValidHeaderWithoutTraceContext_UsesHeaderOverLocalActivity()
     {
-        using var activity = new Activity("test").Start();
+        // Arrange
+        Activity.Current = null;
+        using var activity = new Activity("request").Start();
         var ctx = new DefaultHttpContext();
         ctx.Request.Headers[CorrelationId.HeaderKey] = "header-id";
 
+        // Act
         var id = CorrelationId.FromRequest(ctx.Request, out var error);
 
+        // Assert
+        error.Should().BeNull();
+        id.Value.Should().Be("header-id");
+    }
+
+    [Test]
+    public void FromRequest_TraceParentHeader_UsesActivityTraceIdOverHeader()
+    {
+        // Arrange
+        Activity.Current = null;
+        using var activity = new Activity("request").Start();
+        var ctx = new DefaultHttpContext();
+        ctx.Request.Headers[CorrelationId.TraceParentHeaderKey] = $"00-{activity.TraceId.ToHexString()}-b7ad6b7169203331-01";
+        ctx.Request.Headers[CorrelationId.HeaderKey] = "header-id";
+
+        // Act
+        var id = CorrelationId.FromRequest(ctx.Request, out var error);
+
+        // Assert
         error.Should().BeNull();
         id.Value.Should().Be(activity.TraceId.ToHexString());
+    }
+
+    [Test]
+    public void FromRequest_ActivityWithRemoteParent_UsesActivityTraceIdOverHeader()
+    {
+        // Arrange
+        Activity.Current = null;
+        using var source = new ActivitySource(nameof(FromRequest_ActivityWithRemoteParent_UsesActivityTraceIdOverHeader));
+        using var listener = new ActivityListener
+        {
+            ShouldListenTo = s => s == source,
+            Sample = (ref ActivityCreationOptions<ActivityContext> _) => ActivitySamplingResult.AllData
+        };
+        ActivitySource.AddActivityListener(listener);
+        var remoteParent = new ActivityContext(
+            ActivityTraceId.CreateRandom(), ActivitySpanId.CreateRandom(), ActivityTraceFlags.Recorded, isRemote: true);
+        using var activity = source.StartActivity("request", ActivityKind.Server, remoteParent)!;
+        var ctx = new DefaultHttpContext();
+        ctx.Request.Headers[CorrelationId.HeaderKey] = "header-id";
+
+        // Act
+        var id = CorrelationId.FromRequest(ctx.Request, out _);
+
+        // Assert
+        activity.HasRemoteParent.Should().BeTrue();
+        id.Value.Should().Be(remoteParent.TraceId.ToHexString());
+    }
+
+    [TestCase(null, null)]
+    [TestCase("<script>", "X-Correlation-Id")]
+    public void FromRequest_NoUsableHeader_FallsBackToActivityTraceId(string? header, string? expectedError)
+    {
+        // Arrange
+        Activity.Current = null;
+        using var activity = new Activity("request").Start();
+        var ctx = new DefaultHttpContext();
+        if (header is not null)
+        {
+            ctx.Request.Headers[CorrelationId.HeaderKey] = header;
+        }
+
+        // Act
+        var id = CorrelationId.FromRequest(ctx.Request, out var error);
+
+        // Assert
+        id.Value.Should().Be(activity.TraceId.ToHexString());
+        if (expectedError is null)
+        {
+            error.Should().BeNull();
+        }
+        else
+        {
+            error.Should().Contain(expectedError);
+        }
     }
 
     [Test]

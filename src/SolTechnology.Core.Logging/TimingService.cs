@@ -19,7 +19,9 @@ internal sealed class TimingService(TimeProvider timeProvider) : ITimingService
     }
 
     public IDictionary<string, long> GetTimings()
-        => new ReadOnlyDictionary<string, long>(new Dictionary<string, long>(_timings, StringComparer.Ordinal));
+        => _timings.IsEmpty
+            ? ReadOnlyDictionary<string, long>.Empty
+            : new ReadOnlyDictionary<string, long>(new Dictionary<string, long>(_timings.ToArray(), StringComparer.Ordinal));
 
     public void Reset() => _timings.Clear();
 

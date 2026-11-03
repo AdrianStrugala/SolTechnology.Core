@@ -225,3 +225,49 @@ brief's decision rows and new release-notes inputs for release 05:
   snake_case names; rename them in a test-only change now that RM-16 no longer freezes them.
 - Release 05: take the amended P-14 / P-15 rows and the new behaviour notes above into the 2.0
   release notes and migration guide.
+
+## Post-completion review fixes (2026-11-03)
+
+An independent code review of the completed feature found four issues; the fixes are on `master`.
+
+- **L1 — finding:** `CorrelationId.FromRequest` preferred `Activity.Current` unconditionally. ASP.NET
+  Core starts a request `Activity` whenever logging is enabled, so in every real host a caller's
+  valid `X-Correlation-Id` was replaced by a fresh trace id (the `docs/Log.md` component-test snippet
+  could not pass). **Fix (user decision, 2026-11-03):** the `Activity` trace id wins only when the
+  request carried trace context (a `traceparent` header or an `Activity` with a remote parent);
+  otherwise a valid `X-Correlation-Id` is used and echoed; otherwise the `Activity` trace id;
+  otherwise a generated id. The `TryBuildTraceParent` guard is unchanged, so no span id is invented
+  for a header id. **Tests:** `CorrelationIdHostTests` (HostBuilder + TestServer with an enabled
+  logging provider, so hosting creates the `Activity`):
+  `Request_WithOnlyCorrelationHeader_UsesAndEchoesHeader` failed before the fix (the response echoed
+  the trace id) and passes; `Request_WithTraceParent_UsesInboundTraceId` passes before and after.
+  `CorrelationIdTests.FromRequest_prefers_activity_trace_id_over_header` pinned the old order and is
+  replaced by `FromRequest_ValidHeaderWithoutTraceContext_UsesHeaderOverLocalActivity` (failed
+  before), `FromRequest_TraceParentHeader_UsesActivityTraceIdOverHeader`,
+  `FromRequest_ActivityWithRemoteParent_UsesActivityTraceIdOverHeader`, and
+  `FromRequest_NoUsableHeader_FallsBackToActivityTraceId` (the invalid-header case failed before:
+  the header was not even validated while an `Activity` existed). `docs/Log.md` (resolution order,
+  the `Endpoint_AcceptsCorrelationId_AndEchoesItBack` snippet now sends a plain support id and
+  asserts no `traceparent`) and `docs/architecture/logging.md` updated. Release-notes input: amends
+  P-14 (umbrella brief).
+- **L2 — finding:** `RequestBodyBuffer` caught only `JsonException` and `OperationCanceledException`;
+  a client disconnecting mid-upload (`ConnectionResetException`, `BadHttpRequestException`, both
+  `IOException`) escaped scope building, so the request failed without any envelope entry. **Fix:**
+  `IOException` is treated like cancellation — body enrichment is skipped and the pipeline's own
+  body read reports the abort. **Test:**
+  `LoggingMiddlewareBodyBufferingTests.Invoke_ClientDisconnectsDuringBodyRead_LogsSingleWarningWithoutFinished`
+  (body stream throws `ConnectionResetException`): failed before (no entries at all), passes with one
+  Warning (2144) and no Finished entry.
+- **L3 — finding:** `TimingService.GetTimings()` allocated two dictionaries per request even when
+  empty, enumerated the live `ConcurrentDictionary`, and `RequestFinished` built the snapshot even
+  when its level was disabled. **Fix:** a shared `ReadOnlyDictionary<string, long>.Empty` when no
+  timing was recorded, the snapshot built from `_timings.ToArray()`, and an early return in
+  `RequestFinished` when the level is disabled. Behaviour unchanged. **Tests:**
+  `TimingServiceTests.GetTimings_WhenEmpty_ReturnsSharedReadOnlyInstance` and
+  `RequestEnvelopeLoggerTests.RequestFinished_LevelDisabled_DoesNotReadTimings` failed before and pass.
+- **L4 — finding:** the abort path had no envelope test, and the event ids 2141–2148 were not
+  asserted. **Fix (tests only):** `LoggingMiddlewareEnvelopeTests` captures `EventId` and asserts it
+  in every test; `Invoke_ClientAbortedRequest_LogsSingleWarningWithoutFinished` (cancelled
+  `RequestAborted` → one Warning 2144, no Finished) and
+  `Invoke_MalformedJsonBodyForBodyEnricher_LogsDebugSkipTemplate` (2148) are new. Both pass before
+  and after (coverage of existing behaviour).

@@ -90,10 +90,17 @@ builder.Services.AddSolLogging(o => o.SkipPaths = LoggingDefaults.Infrastructure
 
 #### Correlation id from anywhere
 
-Inbound resolution order: current `Activity.TraceId` → inbound
-`X-Correlation-Id` (only when no Activity is in scope) → a freshly generated
-32-character hex id. Both `traceparent` and `X-Correlation-Id` are echoed on the
-response.
+Inbound resolution order:
+
+1. The current `Activity.TraceId` when the request carried trace context (a
+   `traceparent` header, or an `Activity` with a remote parent).
+2. A valid inbound `X-Correlation-Id`.
+3. The current `Activity.TraceId` (the trace the host started for this request).
+4. A freshly generated 32-character hex id.
+
+`X-Correlation-Id` is always echoed on the response; `traceparent` is echoed only
+when the correlation id is the current trace id, so a caller's own id never gets
+an invented span id.
 
 | Inbound `X-Correlation-Id` | Outcome |
 |---|---|
@@ -246,14 +253,15 @@ public async Task Endpoint_AcceptsCorrelationId_AndEchoesItBack()
 {
     // Arrange
     var client = _fixture.ServerClient;
-    var correlation = "0123456789abcdef0123456789abcdef";
-    client.DefaultRequestHeaders.Add("X-Correlation-Id", correlation);
+    var request = new HttpRequestMessage(HttpMethod.Get, "/api/trips/42");
+    request.Headers.Add("X-Correlation-Id", "support-ticket-42");   // no traceparent
 
     // Act
-    var response = await client.GetAsync("/api/trips/42");
+    var response = await client.SendAsync(request);
 
     // Assert
-    response.Headers.GetValues("X-Correlation-Id").Should().ContainSingle().Which.Should().Be(correlation);
+    response.Headers.GetValues("X-Correlation-Id").Should().ContainSingle().Which.Should().Be("support-ticket-42");
+    response.Headers.Contains("traceparent").Should().BeFalse();
 }
 ```
 

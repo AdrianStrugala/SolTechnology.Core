@@ -529,6 +529,14 @@ these notes from the steps:
   (`new Result()` no longer compiles; build results through the factories). Deserializing JSON whose
   `IsSuccess` and `Error` disagree — `{}`, `{"IsSuccess":false}`, or a success carrying an error —
   throws `JsonException`; every shape 1.x and 2.0 write still reads.
+- logging (post-completion review, 2026-11-03, amends P-14): correlation id resolution is now
+  inbound trace context (`traceparent`, or an `Activity` with a remote parent) → a valid
+  `X-Correlation-Id` → the host's request `Activity` trace id → a generated id. Before, any
+  `Activity` won, and ASP.NET Core creates one whenever logging is on, so a caller's
+  `X-Correlation-Id` was replaced in production; it is now used and echoed (without a
+  `traceparent`). Callers that send both headers keep getting the trace id. A client that disconnects
+  while an `IRequiresRequestBody` enricher reads the body now produces the usual single abort
+  Warning instead of an unlogged exception from scope building.
 
 ### Resolved questions (user answers, 2026-11-02)
 

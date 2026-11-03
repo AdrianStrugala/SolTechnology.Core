@@ -127,4 +127,21 @@ public sealed class TimingServiceTests
         var mutate = () => snapshot["db"] = 0;
         mutate.Should().Throw<NotSupportedException>();
     }
+
+    [Test]
+    public void GetTimings_WhenEmpty_ReturnsSharedReadOnlyInstance()
+    {
+        // Arrange
+        var first = new TimingService(TimeProvider.System);
+        var second = new TimingService(TimeProvider.System);
+
+        // Act
+        var firstTimings = first.GetTimings();
+        var secondTimings = second.GetTimings();
+
+        // Assert
+        firstTimings.Should().BeEmpty();
+        firstTimings.IsReadOnly.Should().BeTrue();
+        secondTimings.Should().BeSameAs(firstTimings);
+    }
 }

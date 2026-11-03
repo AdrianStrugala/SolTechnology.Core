@@ -1,3 +1,4 @@
+using System.Text;
 using FluentAssertions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
@@ -13,7 +14,7 @@ public class LoggingMiddlewareEnvelopeTests
 {
     private sealed class TemplateCapturingLogger : ILogger<LoggingMiddleware>
     {
-        public List<(LogLevel Level, string Template, string Message, bool HasException)> Entries { get; } = [];
+        public List<(LogLevel Level, string Template, string Message, bool HasException, int EventId)> Entries { get; } = [];
         public IDisposable? BeginScope<TState>(TState state) where TState : notnull => null;
         public bool IsEnabled(LogLevel logLevel) => true;
 
@@ -23,7 +24,7 @@ public class LoggingMiddlewareEnvelopeTests
             var template = state is IReadOnlyList<KeyValuePair<string, object?>> values
                 ? values.First(v => v.Key == "{OriginalFormat}").Value as string
                 : null;
-            Entries.Add((logLevel, template ?? string.Empty, formatter(state, exception), exception is not null));
+            Entries.Add((logLevel, template ?? string.Empty, formatter(state, exception), exception is not null, eventId.Id));
         }
     }
 
@@ -42,7 +43,7 @@ public class LoggingMiddlewareEnvelopeTests
 
     private static async Task<TemplateCapturingLogger> Invoke(
         RequestDelegate next, ILogScopeEnricher[]? enrichers = null, Action<ITimingService>? useTiming = null,
-        string? correlationHeader = null)
+        string? correlationHeader = null, Action<HttpContext>? arrangeContext = null)
     {
         var logger = new TemplateCapturingLogger();
         var timing = new TimingService(TimeProvider.System);
@@ -61,11 +62,12 @@ public class LoggingMiddlewareEnvelopeTests
             context.Request.Headers[CorrelationId.HeaderKey] = correlationHeader;
         }
 
+        arrangeContext?.Invoke(context);
         try
         {
             await sut.InvokeAsync(context, logger, new NoOpCorrelationStore(), enrichers ?? [], timing);
         }
-        catch (InvalidOperationException)
+        catch (Exception ex) when (ex is InvalidOperationException or OperationCanceledException)
         {
         }
 
@@ -85,9 +87,9 @@ public class LoggingMiddlewareEnvelopeTests
         });
 
         // Assert
-        logger.Entries.Select(e => (e.Level, e.Template)).Should().Equal(
-            (LogLevel.Information, "Started request [{RequestMethod}] [{RequestPath}]"),
-            (finishedLevel, "Finished request [{RequestMethod}] [{RequestPath}] -> [{StatusCode}] in [{ElapsedMs} ms]"));
+        logger.Entries.Select(e => (e.Level, e.Template, e.EventId)).Should().Equal(
+            (LogLevel.Information, "Started request [{RequestMethod}] [{RequestPath}]", 2143),
+            (finishedLevel, "Finished request [{RequestMethod}] [{RequestPath}] -> [{StatusCode}] in [{ElapsedMs} ms]", 2146));
         logger.Entries[0].Message.Should().Be("Started request [GET] [/api/trips]");
         logger.Entries[1].Message.Should().StartWith($"Finished request [GET] [/api/trips] -> [{statusCode}] in [");
     }
@@ -101,6 +103,7 @@ public class LoggingMiddlewareEnvelopeTests
         // Assert
         logger.Entries.Last().Template.Should().Be(
             "Finished request [{RequestMethod}] [{RequestPath}] -> [{StatusCode}] in [{ElapsedMs} ms] — timings: [{@Timings}]");
+        logger.Entries.Last().EventId.Should().Be(2147);
     }
 
     [Test]
@@ -110,10 +113,11 @@ public class LoggingMiddlewareEnvelopeTests
         var logger = await Invoke(_ => throw new InvalidOperationException("boom"));
 
         // Assert
-        logger.Entries.Last().Should().Match<(LogLevel Level, string Template, string Message, bool HasException)>(e =>
+        logger.Entries.Last().Should().Match<(LogLevel Level, string Template, string Message, bool HasException, int EventId)>(e =>
             e.Level == LogLevel.Error
             && e.Template == "Request [{RequestMethod}] [{RequestPath}] failed after [{ElapsedMs} ms]"
-            && e.HasException);
+            && e.HasException
+            && e.EventId == 2145);
     }
 
     [Test]
@@ -123,8 +127,55 @@ public class LoggingMiddlewareEnvelopeTests
         var logger = await Invoke(_ => Task.CompletedTask, [new ThrowingEnricher()], correlationHeader: "<script>");
 
         // Assert
-        logger.Entries.Where(e => e.Level == LogLevel.Warning).Select(e => e.Template).Should().Equal(
-            "Log scope enricher [{EnricherType}] threw and was skipped",
-            "Invalid [{Header}] header rejected: [{CorrelationError}]");
+        logger.Entries.Where(e => e.Level == LogLevel.Warning).Select(e => (e.Template, e.EventId)).Should().Equal(
+            ("Log scope enricher [{EnricherType}] threw and was skipped", 2141),
+            ("Invalid [{Header}] header rejected: [{CorrelationError}]", 2142));
+    }
+
+    [Test]
+    public async Task Invoke_ClientAbortedRequest_LogsSingleWarningWithoutFinished()
+    {
+        // Arrange
+        using var aborted = new CancellationTokenSource();
+        await aborted.CancelAsync();
+
+        // Act
+        var logger = await Invoke(
+            context => throw new OperationCanceledException(context.RequestAborted),
+            arrangeContext: context => context.RequestAborted = aborted.Token);
+
+        // Assert
+        logger.Entries.Where(e => e.Level >= LogLevel.Warning).Should().ContainSingle().Which.Should()
+            .Match<(LogLevel Level, string Template, string Message, bool HasException, int EventId)>(e =>
+                e.Level == LogLevel.Warning
+                && e.Template == "Request [{RequestMethod}] [{RequestPath}] aborted by client after [{ElapsedMs} ms]"
+                && e.HasException
+                && e.EventId == 2144);
+        logger.Entries.Should().NotContain(e => e.Template.StartsWith("Finished request"));
+    }
+
+    [Test]
+    public async Task Invoke_MalformedJsonBodyForBodyEnricher_LogsDebugSkipTemplate()
+    {
+        // Arrange
+        var bodyEnricher = new LogDetailEnricher(
+            [new LogDetailDescriptor("name", "CityName", LogDetailSource.Body, null)]);
+        var body = Encoding.UTF8.GetBytes("{not json");
+
+        // Act
+        var logger = await Invoke(_ => Task.CompletedTask, [bodyEnricher], arrangeContext: context =>
+        {
+            context.Request.Method = "POST";
+            context.Request.ContentType = "application/json";
+            context.Request.ContentLength = body.Length;
+            context.Request.Body = new MemoryStream(body);
+        });
+
+        // Assert
+        logger.Entries.Should().ContainSingle(e => e.EventId == 2148).Which.Should()
+            .Match<(LogLevel Level, string Template, string Message, bool HasException, int EventId)>(e =>
+                e.Level == LogLevel.Debug
+                && e.Template == "Skipping body-based log enrichment for [{RequestPath}] - JSON could not be parsed"
+                && e.HasException);
     }
 }
