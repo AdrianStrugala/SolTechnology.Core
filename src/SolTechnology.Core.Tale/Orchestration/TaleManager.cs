@@ -107,7 +107,7 @@ public partial class TaleManager(
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Failed to load tale state for {TaleId}", taleId);
+            logger.LogError(ex, "Failed to load tale state for [{TaleId}]", taleId);
             return Result<TaleInstance>.Fail("Failed to load tale.");
         }
     }

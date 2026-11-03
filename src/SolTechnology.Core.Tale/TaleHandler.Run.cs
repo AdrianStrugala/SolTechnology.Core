@@ -14,7 +14,7 @@ public abstract partial class TaleHandler<TInput, TContext, TOutput>
         TaleRunOptions run,
         CancellationToken cancellationToken)
     {
-        _logger.LogInformation("Tale {Handler} processing...", GetType().Name);
+        _logger.LogInformation("Tale [{Handler}] processing...", GetType().Name);
 
         var repository = run.Persist ? _serviceProvider.GetService<ITaleRepository>() : null;
         var options = _serviceProvider.GetService<TaleOptions>() ?? TaleOptions.Default;
@@ -45,7 +45,7 @@ public abstract partial class TaleHandler<TInput, TContext, TOutput>
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Tale {Handler} failed", GetType().Name);
+            _logger.LogError(ex, "Tale [{Handler}] failed", GetType().Name);
             await SafePersistTerminalState();
             return Result<TOutput>.Fail(Error.From(ex));
         }
@@ -59,7 +59,7 @@ public abstract partial class TaleHandler<TInput, TContext, TOutput>
         }
         catch (Exception ex)
         {
-            _logger.LogWarning(ex, "Failed to persist terminal tale state for {TaleId}", Context.TaleInstanceId);
+            _logger.LogWarning(ex, "Failed to persist terminal tale state for [{TaleId}]", Context.TaleInstanceId);
         }
     }
 }

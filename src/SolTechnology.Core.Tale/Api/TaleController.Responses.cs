@@ -93,7 +93,7 @@ public abstract partial class TaleController
         }
         catch (Exception ex)
         {
-            Logger.LogError(ex, "Failed to extract result for tale {TaleId}", taleId);
+            Logger.LogError(ex, "Failed to extract result for tale [{TaleId}]", taleId);
             return UnexpectedFailure();
         }
     }

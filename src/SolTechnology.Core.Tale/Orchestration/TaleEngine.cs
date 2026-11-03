@@ -45,14 +45,14 @@ internal sealed class TaleEngine<TInput, TContext, TOutput>(
         if (run.Resume != null)
         {
             _persistence?.Restore(run.Resume);
-            logger.LogInformation("Tale {TaleId} resuming from saved state", context.TaleInstanceId);
+            logger.LogInformation("Tale [{TaleId}] resuming from saved state", context.TaleInstanceId);
             return;
         }
 
         _persistence?.Start(run.IdempotencyKey);
         var newId = Auid.New((options ?? TaleOptions.Default).TaleIdPrefix);
         context.TaleInstanceId = newId;
-        logger.LogInformation("Tale started with ID {TaleId}", newId);
+        logger.LogInformation("Tale started with ID [{TaleId}]", newId);
     }
 
     public async Task Run(IReadOnlyList<TaleStep> steps)
@@ -97,10 +97,10 @@ internal sealed class TaleEngine<TInput, TContext, TOutput>(
 
         if (resumed)
         {
-            logger.LogInformation("Resuming tale at chapter {ChapterId}", chapter.ChapterId);
+            logger.LogInformation("Resuming tale at chapter [{ChapterId}]", chapter.ChapterId);
         }
 
-        logger.LogInformation("Executing chapter: {ChapterId}", chapter.ChapterId);
+        logger.LogInformation("Executing chapter: [{ChapterId}]", chapter.ChapterId);
         await ReadChapter(chapter, chapterInfo);
         await Save(_state.IntermediateStatus, _cancellationToken);
     }
@@ -134,7 +134,7 @@ internal sealed class TaleEngine<TInput, TContext, TOutput>(
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Chapter {ChapterId} failed", chapter.ChapterId);
+            logger.LogError(ex, "Chapter [{ChapterId}] failed", chapter.ChapterId);
             _state.Fail(chapterInfo, Error.From(ex));
         }
     }

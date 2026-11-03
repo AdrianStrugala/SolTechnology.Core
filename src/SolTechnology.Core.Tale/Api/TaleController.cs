@@ -44,7 +44,7 @@ public abstract partial class TaleController(
         [FromHeader(Name = "Idempotency-Key")] string? idempotencyKey = null,
         CancellationToken cancellationToken = default)
     {
-        Logger.LogInformation("Starting tale: {HandlerType}", handlerTypeName);
+        Logger.LogInformation("Starting tale: [{HandlerType}]", handlerTypeName);
         if (!TryResolveHandler(handlerTypeName, out var handlerType, out var args, out var error))
         {
             return error;
@@ -54,7 +54,7 @@ public abstract partial class TaleController(
             ? error
             : await Dispatch(
                 () => TaleManagerInvoker.StartStory(TaleManager, handlerType, args, typedInput, idempotencyKey, cancellationToken),
-                ex => Logger.LogError(ex, "Failed to start tale {HandlerType}", handlerTypeName));
+                ex => Logger.LogError(ex, "Failed to start tale [{HandlerType}]", handlerTypeName));
     }
 
     /// <summary>Resume a paused tale with user input.</summary>
@@ -64,7 +64,7 @@ public abstract partial class TaleController(
         [FromBody] JsonElement? userInput = null,
         CancellationToken cancellationToken = default)
     {
-        Logger.LogInformation("Resuming tale: {TaleId}", taleId);
+        Logger.LogInformation("Resuming tale: [{TaleId}]", taleId);
         if (!Auid.TryParse(taleId, null, out var parsedTaleId))
         {
             return InvalidTaleId(taleId);
@@ -80,7 +80,7 @@ public abstract partial class TaleController(
             ? error
             : await Dispatch(
                 () => TaleManagerInvoker.ResumeStory(TaleManager, handlerType, args, parsedTaleId, userInput, cancellationToken),
-                ex => Logger.LogError(ex, "Failed to resume tale {TaleId}", taleId));
+                ex => Logger.LogError(ex, "Failed to resume tale [{TaleId}]", taleId));
     }
 
     /// <summary>Get the current state of a tale.</summary>

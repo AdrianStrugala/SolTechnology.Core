@@ -65,7 +65,7 @@ internal sealed class InteractiveChapterInvoker<TInput, TContext, TOutput>(
         }
         catch (JsonException ex)
         {
-            logger.LogWarning(ex, "Input for chapter {ChapterId} could not be deserialized", chapter.ChapterId);
+            logger.LogWarning(ex, "Input for chapter [{ChapterId}] could not be deserialized", chapter.ChapterId);
             return RejectInput(chapter, chapterInfo, $"Input for chapter '{chapter.ChapterId}' is invalid at '{ex.Path}'.");
         }
 
@@ -112,7 +112,7 @@ internal sealed class InteractiveChapterInvoker<TInput, TContext, TOutput>(
 
     private void PauseForRetry(IChapter<TContext> chapter, ChapterInfo chapterInfo, Error? error)
     {
-        logger.LogInformation("Interactive chapter {ChapterId} rejected input: {Error}",
+        logger.LogInformation("Interactive chapter [{ChapterId}] rejected input: [{Error}]",
             chapter.ChapterId, error?.Message);
         state.ResumeInput = null;
         state.IsPaused = true;

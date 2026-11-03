@@ -22,7 +22,7 @@ namespace SolTechnology.Core.Tale;
 ///         .Read&lt;FindProfitablePath&gt;()
 ///         .Otherwise&lt;OrderByDistance&gt;()                 // no profitable path → fall back
 ///         .Read&lt;SolveTsp&gt;()
-///         .WhenLost(error =&gt; logger.LogWarning("{Error}", error.Message))
+///         .WhenLost(error =&gt; logger.LogWarning("[{Error}]", error.Message))
 ///         .Read&lt;FormResult&gt;()
 ///         .Finale(ctx =&gt; ctx.Output);
 /// </code>

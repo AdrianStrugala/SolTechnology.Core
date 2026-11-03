@@ -3,6 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using NUnit.Framework;
 using SolTechnology.Core;
+using SolTechnology.Core.Tale.Orchestration;
 using SolTechnology.Core.Tale.Persistence;
 using SolTechnology.Core.Tale;
 using SolTechnology.Core.Tale;
@@ -214,6 +215,30 @@ public class TaleHandlerTests
         logs.Logs.Should().ContainSingle(log => log.Level == LogLevel.Warning).Which.Message.Should().Be(
             "Tale [LifecycleTaleV1] paused outside TaleManager; the run is not persisted and cannot be resumed.");
         (await repository.List()).Should().BeEmpty();
+    }
+
+    [Test]
+    public async Task TaleLogs_StartAndResume_BracketEveryPlaceholder()
+    {
+        // Arrange
+        var logs = new RecordingLoggerProvider();
+        using var sp = BuildTaleProvider(logs);
+        var manager = sp.GetRequiredService<TaleManager>();
+        var start = await manager.StartStory<LifecycleTaleV1, LifecycleInput, LifecycleContext, LifecycleOutput>(
+            new LifecycleInput { Value = 1 });
+
+        // Act
+        await manager.ResumeStory<LifecycleTaleV1, LifecycleInput, LifecycleContext, LifecycleOutput>(
+            start.Data!.TaleId, System.Text.Json.JsonSerializer.SerializeToElement(new PausePayload { Token = "t" }));
+
+        // Assert
+        var templates = logs.Logs
+            .Select(log => log.Properties.FirstOrDefault(p => p.Key == "{OriginalFormat}").Value as string)
+            .OfType<string>()
+            .Distinct()
+            .ToList();
+        templates.Should().Contain("Executing chapter: [{ChapterId}]").And.Contain("Tale [{TaleId}] resuming from saved state");
+        templates.Should().AllSatisfy(t => System.Text.RegularExpressions.Regex.IsMatch(t, @"(?<!\[)\{[A-Za-z]+\}").Should().BeFalse(t));
     }
 
     private static ServiceProvider BuildTaleProvider(RecordingLoggerProvider? logs = null)

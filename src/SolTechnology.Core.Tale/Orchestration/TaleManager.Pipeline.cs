@@ -41,7 +41,7 @@ public partial class TaleManager
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Error executing tale {Handler}", typeof(THandler).Name);
+            logger.LogError(ex, "Error executing tale [{Handler}]", typeof(THandler).Name);
             return Result<TaleInstance>.Fail($"Tale {typeof(THandler).Name} failed unexpectedly.");
         }
     }
