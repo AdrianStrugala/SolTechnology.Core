@@ -164,9 +164,8 @@ public abstract class TaleHandler<TInput, TContext, TOutput>
             var tale = Tell();
             await _engine.Run(tale.Steps);
 
-            var result = _engine.GetResult(tale.Conclusion);
             await SafePersistTerminalState();
-            return result;
+            return _engine.GetResult(tale.Conclusion);
         }
         catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
         {

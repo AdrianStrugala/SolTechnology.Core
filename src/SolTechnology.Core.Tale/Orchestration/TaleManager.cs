@@ -120,6 +120,8 @@ public class TaleManager
                     return Result<TaleInstance>.Fail("Tale has been cancelled");
                 if (existing.Status == TaleStatus.Failed)
                     return Result<TaleInstance>.Fail(new ConflictError { Message = "Tale has failed and cannot be resumed" });
+                if (existing.Status == TaleStatus.Running)
+                    return Result<TaleInstance>.Fail(new ConflictError { Message = "Tale is already running" });
 
                 try
                 {

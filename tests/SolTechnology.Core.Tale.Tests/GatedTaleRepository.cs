@@ -5,8 +5,8 @@ using SolTechnology.Core.Tale.Persistence;
 namespace SolTechnology.Core.Tale.Tests;
 
 /// <summary>
-/// In-memory repository that can hold the first N reads until all N callers arrived, so concurrent
-/// tests race on the same stored version, and that can run a hook before each save.
+/// In-memory repository that can hold the first N reads, after reading, until all N callers arrived,
+/// so concurrent tests race on the same stored version; it can also run a hook before each save.
 /// </summary>
 public sealed class GatedTaleRepository(InMemoryTaleRepository inner) : ITaleRepository
 {
@@ -20,14 +20,16 @@ public sealed class GatedTaleRepository(InMemoryTaleRepository inner) : ITaleRep
 
     public async Task<TaleInstance?> FindById(Auid taleId, CancellationToken cancellationToken)
     {
+        var tale = await inner.FindById(taleId, cancellationToken);
         await WaitAtGate();
-        return await inner.FindById(taleId, cancellationToken);
+        return tale;
     }
 
     public async Task<TaleInstance?> FindByIdempotencyKey(string idempotencyKey, CancellationToken cancellationToken)
     {
+        var tale = await inner.FindByIdempotencyKey(idempotencyKey, cancellationToken);
         await WaitAtGate();
-        return await inner.FindByIdempotencyKey(idempotencyKey, cancellationToken);
+        return tale;
     }
 
     public Task<IReadOnlyList<TaleInstance>> List(

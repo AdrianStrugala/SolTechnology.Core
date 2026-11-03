@@ -435,6 +435,37 @@ public class AdvancedScenariosTests
     }
 
     [Test]
+    public async Task Resume_WhileAnotherResumeRuns_ReturnsConflict()
+    {
+        // Arrange
+        var repository = new GatedTaleRepository(new InMemoryTaleRepository());
+        using var sp = BuildWithRepository(repository);
+        var manager = sp.GetRequiredService<TaleManager>();
+        var start = await manager.StartStory<SinglePauseTale, TestAdvancedInput, TestAdvancedContext, TestAdvancedOutput>(
+            new TestAdvancedInput { Value = "resume-while-running" });
+        var userInput = JsonSerializer.SerializeToElement(new UserInputData { Name = "John", Email = "john@example.com", Age = 30 });
+        Result<TaleInstance>? overlapping = null;
+        repository.BeforeSave = async instance =>
+        {
+            if (overlapping == null && instance.History.Any(h => h.Status == TaleStatus.Completed))
+            {
+                overlapping = Result<TaleInstance>.Fail("pending");
+                overlapping = await manager.ResumeStory<SinglePauseTale, TestAdvancedInput, TestAdvancedContext, TestAdvancedOutput>(
+                    start.Data!.TaleId, userInput);
+            }
+        };
+
+        // Act
+        var first = await manager.ResumeStory<SinglePauseTale, TestAdvancedInput, TestAdvancedContext, TestAdvancedOutput>(
+            start.Data!.TaleId, userInput);
+
+        // Assert
+        first.IsSuccess.Should().BeTrue();
+        first.Data!.Status.Should().Be(TaleStatus.Completed);
+        overlapping!.Error.Should().BeOfType<ConflictError>().Which.Message.Should().Be("Tale is already running");
+    }
+
+    [Test]
     public async Task CancelStory_DuringRun_IsNotOverwritten()
     {
         // Arrange

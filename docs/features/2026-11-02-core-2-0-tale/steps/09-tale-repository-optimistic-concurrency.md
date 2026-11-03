@@ -67,3 +67,20 @@ test `SQLiteRepositoryTests.Constructor_DatabaseWithoutVersionColumn_MigratesAnd
 (a database file created with the 1.x schema). The core brief's P-04 row and its `tale 09`
 release-notes input now spell out the contract. The persisted-contract premortem items for this
 step are RM-5 (documented in steps 10 and 13); no other `RM-n` targets step 09.
+
+### Every persisted run claims the tale first; a `Running` tale cannot be resumed (fixed during step 10)
+
+**Original plan:** As above; resuming a `Running` tale stayed allowed and only a new tale was
+claimed before its first chapter.
+
+**Actual implementation:** A full-suite run during step 10 made `ConcurrentResume_OneWins_OthersConflict`
+fail once with two successes. A resume that read the tale after the winner's first save saw
+`Running`, skipped the completed chapter, ran the rest, and reported success although its terminal
+save conflicted. Fix (separate commit before step 10): every persisted run, new or resumed, first
+saves the tale as `Running` with the version it read, so a concurrent run conflicts before any
+chapter; `TaleManager.ResumeStory` returns `ConflictError` ("Tale is already running") for a
+`Running` tale; the handler computes the result after the terminal save, so a conflicting terminal
+save is reported. A tale left `Running` by a crashed host can be cancelled and restarted, but no
+longer resumed. `GatedTaleRepository` now reads first and then waits, so all gated callers see the
+same version; the regression test `Resume_WhileAnotherResumeRuns_ReturnsConflict` failed before the
+fix, and the four concurrency tests passed 300 repetitions each after it.

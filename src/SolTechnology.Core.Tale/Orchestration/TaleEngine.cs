@@ -40,7 +40,6 @@ internal sealed class TaleEngine<TInput, TContext, TOutput>
     private Error? _saveError;
     private long _version;
     private string? _idempotencyKey;
-    private bool _isNew;
     private bool _isInitialized;
     private string _handlerTypeName = string.Empty;
 
@@ -86,7 +85,6 @@ internal sealed class TaleEngine<TInput, TContext, TOutput>
             return;
         }
 
-        _isNew = true;
         _createdAt = _timeProvider.GetUtcNow().UtcDateTime;
         var newId = Auid.New(_options.TaleIdPrefix);
         context.TaleInstanceId = newId;
@@ -100,10 +98,10 @@ internal sealed class TaleEngine<TInput, TContext, TOutput>
     /// </summary>
     public async Task Run(IReadOnlyList<TaleStep> steps)
     {
-        // The first save claims the id and the idempotency key before any chapter runs.
-        if (_repository != null && _isNew)
+        // The first save claims the tale (and a new tale's idempotency key) before any chapter runs.
+        if (_repository != null)
         {
-            await SaveTaleState(terminal: false);
+            await SaveTaleState(TaleStatus.Running, _cancellationToken);
         }
 
         foreach (var step in steps)
@@ -276,7 +274,7 @@ internal sealed class TaleEngine<TInput, TContext, TOutput>
             HandleChapterFailure(chapterInfo, Error.From(ex));
         }
 
-        if (_repository != null) await SaveTaleState(terminal: false);
+        if (_repository != null) await SaveTaleState(IntermediateStatus(), _cancellationToken);
     }
 
     /// <summary>
@@ -424,10 +422,11 @@ internal sealed class TaleEngine<TInput, TContext, TOutput>
     public Task PersistTerminalState()
     {
         if (_repository == null || _saveError != null) return Task.CompletedTask;
-        return SaveTaleState(terminal: true);
+        // The terminal state must be stored even when the run's token is what ended the run.
+        return SaveTaleState(GetTerminalStatus(), CancellationToken.None);
     }
 
-    private async Task SaveTaleState(bool terminal)
+    private async Task SaveTaleState(TaleStatus status, CancellationToken cancellationToken)
     {
         if (_repository == null) return;
         if (_context.TaleInstanceId == Auid.Empty) return;
@@ -436,18 +435,17 @@ internal sealed class TaleEngine<TInput, TContext, TOutput>
         {
             TaleId = _context.TaleInstanceId,
             HandlerTypeName = _handlerTypeName,
-            Status = terminal ? GetTerminalStatus() : IntermediateStatus(),
+            Status = status,
             CreatedAt = _createdAt == default ? _timeProvider.GetUtcNow().UtcDateTime : _createdAt,
             LastUpdatedAt = _timeProvider.GetUtcNow().UtcDateTime,
             History = new List<ChapterInfo>(_chapterHistory),
-            CurrentChapter = _isPaused ? _chapterHistory.LastOrDefault() : null,
+            CurrentChapter = status == TaleStatus.WaitingForInput ? _chapterHistory.LastOrDefault() : null,
             Context = JsonSerializer.Serialize(_context, TaleJsonOptions.Default),
             IdempotencyKey = _idempotencyKey,
             Version = _version
         };
 
-        // The terminal state must be stored even when the run's token is what ended the run.
-        var saved = await _repository.Save(instance, terminal ? CancellationToken.None : _cancellationToken);
+        var saved = await _repository.Save(instance, cancellationToken);
         if (saved.IsFailure)
         {
             _saveError = saved.Error;
