@@ -4,6 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using NUnit.Framework;
 using SolTechnology.Core;
+using SolTechnology.Core.AUID;
 using SolTechnology.Core.Tale;
 using SolTechnology.Core.Tale.Models;
 using SolTechnology.Core.Tale.Orchestration;
@@ -154,6 +155,27 @@ public class TypedErrorAndLifecycleTests
 
         var v1Only = await _repo.ListAsync(handlerTypeName: nameof(LifecycleTaleV1));
         v1Only.Count.Should().Be(2);
+    }
+
+    [Test]
+    public void RoundTrip_TalePausedError_WithTaleJsonOptions_PreservesType()
+    {
+        // Arrange
+        var taleId = Auid.New("TST");
+        Error[] errors = [new TalePausedError(taleId, "WaitingChapter"), new TaleCancelledError(taleId)];
+
+        // Act
+        var json = JsonSerializer.Serialize(errors, TaleJsonOptions.Default);
+        var roundTripped = JsonSerializer.Deserialize<Error[]>(json, TaleJsonOptions.Default)!;
+
+        // Assert
+        json.Should().Contain("\"$type\":\"talePaused\"").And.Contain("\"$type\":\"taleCancelled\"");
+        var paused = roundTripped[0].Should().BeOfType<TalePausedError>().Subject;
+        paused.TaleId.Should().Be(taleId);
+        paused.ChapterId.Should().Be("WaitingChapter");
+        paused.Message.Should().Be(TalePausedError.DefaultMessage);
+        roundTripped[1].Should().BeOfType<TaleCancelledError>().Which.TaleId.Should().Be(taleId);
+        TaleJsonOptions.Default.IsReadOnly.Should().BeTrue();
     }
 }
 

@@ -1,6 +1,7 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using SolTechnology.Core.AUID;
+using SolTechnology.Core.Tale.Persistence;
 
 namespace SolTechnology.Core.Tale.Models;
 
@@ -53,7 +54,7 @@ public class TaleInstance
     /// </summary>
     public TaleInstance Clone()
     {
-        var json = JsonSerializer.Serialize(this);
-        return JsonSerializer.Deserialize<TaleInstance>(json)!;
+        var json = JsonSerializer.Serialize(this, TaleJsonOptions.Default);
+        return JsonSerializer.Deserialize<TaleInstance>(json, TaleJsonOptions.Default)!;
     }
 }

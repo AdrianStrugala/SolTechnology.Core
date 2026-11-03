@@ -1,7 +1,7 @@
 ---
 spec: 2026-11-02-core-2-0-tale
 step: 02
-status: to-do
+status: done
 ---
 
 # Step 02: Tale — public `TaleJsonOptions.Default` with Tale error discriminators
@@ -34,9 +34,9 @@ Former core step 17 (Tale part); split per library on 2026-11-02. The Core part 
 - `docs/Tale.md` tells custom-repository authors to serialize `TaleInstance` parts with `TaleJsonOptions.Default` (step 13).
 
 ## Acceptance criteria
-- [ ] `dotnet test tests/SolTechnology.Core.Tale.Tests` is green.
-- [ ] No public or protected symbol renamed or removed; the only new public symbol is `TaleJsonOptions` (`C-26`, confirmed by the user on 2026-11-02, RQ5).
-- [ ] `grep -rn "JsonSerializer\.\(Serialize\|Deserialize\)" src/SolTechnology.Core.Tale/Models/TaleInstance.cs sample-tale-code-apps/DreamTravel/src/DataLayer/DreamTravel.SQLite/SQLiteTaleRepository.cs` shows `TaleJsonOptions.Default` on every call.
+- [x] `dotnet test tests/SolTechnology.Core.Tale.Tests` is green.
+- [x] No public or protected symbol renamed or removed; the only new public symbol is `TaleJsonOptions` (`C-26`, confirmed by the user on 2026-11-02, RQ5).
+- [x] `grep -rn "JsonSerializer\.\(Serialize\|Deserialize\)" src/SolTechnology.Core.Tale/Models/TaleInstance.cs sample-tale-code-apps/DreamTravel/src/DataLayer/DreamTravel.SQLite/SQLiteTaleRepository.cs` shows `TaleJsonOptions.Default` on every call.
 
 ## Open questions
 - none (RQ5 resolved by the user on 2026-11-02: public `TaleJsonOptions`)

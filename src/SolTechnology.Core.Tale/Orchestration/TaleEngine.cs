@@ -1,7 +1,6 @@
 using System.Collections.Concurrent;
 using System.Reflection;
 using System.Text.Json;
-using System.Text.Json.Serialization;
 using Microsoft.Extensions.Logging;
 using SolTechnology.Core.AUID;
 using SolTechnology.Core.Tale.Models;
@@ -9,22 +8,6 @@ using SolTechnology.Core.Tale.Persistence;
 // collapsed: using SolTechnology.Core.Tale.Tale;
 
 namespace SolTechnology.Core.Tale.Orchestration;
-
-/// <summary>
-/// JSON serialization options shared across the Tale framework.
-/// </summary>
-internal static class TaleJsonOptions
-{
-    public static JsonSerializerOptions Default { get; } = new()
-    {
-        IncludeFields = true,
-        PropertyNameCaseInsensitive = true,
-        WriteIndented = false,
-        DefaultIgnoreCondition = JsonIgnoreCondition.Never,
-        // Tale Context may carry EF/domain entities with bidirectional navs.
-        ReferenceHandler = ReferenceHandler.IgnoreCycles
-    };
-}
 
 /// <summary>
 /// Internal execution engine for a tale. Strongly typed — no <c>dynamic</c>, no string-matched

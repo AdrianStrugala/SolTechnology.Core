@@ -228,11 +228,11 @@ public class SQLiteTaleRepository : ITaleRepository
             command.Parameters.AddWithValue("@LastUpdatedAt", storyInstance.LastUpdatedAt.ToString("O"));
             command.Parameters.AddWithValue("@History",
                 storyInstance.History is { Count: > 0 }
-                    ? (object)JsonSerializer.Serialize(storyInstance.History)
+                    ? (object)JsonSerializer.Serialize(storyInstance.History, TaleJsonOptions.Default)
                     : DBNull.Value);
             command.Parameters.AddWithValue("@CurrentChapter",
                 storyInstance.CurrentChapter != null
-                    ? (object)JsonSerializer.Serialize(storyInstance.CurrentChapter)
+                    ? (object)JsonSerializer.Serialize(storyInstance.CurrentChapter, TaleJsonOptions.Default)
                     : DBNull.Value);
 
             await command.ExecuteNonQueryAsync();
@@ -269,10 +269,10 @@ public class SQLiteTaleRepository : ITaleRepository
         LastUpdatedAt = DateTime.Parse(reader.GetString(6), CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind),
         History = reader.IsDBNull(7)
             ? new List<ChapterInfo>()
-            : JsonSerializer.Deserialize<List<ChapterInfo>>(reader.GetString(7)) ?? new List<ChapterInfo>(),
+            : JsonSerializer.Deserialize<List<ChapterInfo>>(reader.GetString(7), TaleJsonOptions.Default) ?? new List<ChapterInfo>(),
         CurrentChapter = reader.IsDBNull(8)
             ? null
-            : JsonSerializer.Deserialize<ChapterInfo>(reader.GetString(8))
+            : JsonSerializer.Deserialize<ChapterInfo>(reader.GetString(8), TaleJsonOptions.Default)
     };
 
     private async Task<T> ExecuteWithRetry<T>(Func<Task<T>> operation)

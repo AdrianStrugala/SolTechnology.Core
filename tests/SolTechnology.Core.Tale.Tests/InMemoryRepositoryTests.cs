@@ -293,6 +293,30 @@ public class InMemoryRepositoryTests
         }
     }
 
+    [Test]
+    public void Clone_ChapterWithTalePausedError_PreservesErrorType()
+    {
+        // Arrange
+        var taleId = Auid.New("TST");
+        var taleInstance = CreateTestTaleInstance(taleId);
+        taleInstance.History.Add(new ChapterInfo
+        {
+            ChapterId = "WaitingChapter",
+            StartedAt = DateTime.UtcNow,
+            Status = TaleStatus.WaitingForInput,
+            Error = new TalePausedError(taleId, "WaitingChapter")
+        });
+
+        // Act
+        var clone = taleInstance.Clone();
+
+        // Assert
+        var error = clone.History[0].Error.Should().BeOfType<TalePausedError>().Subject;
+        error.TaleId.Should().Be(taleId);
+        error.ChapterId.Should().Be("WaitingChapter");
+        error.Recoverable.Should().BeTrue();
+    }
+
     private TaleInstance CreateTestTaleInstance(Auid? taleId = null)
     {
         return new TaleInstance
