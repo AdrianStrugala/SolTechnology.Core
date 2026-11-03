@@ -1,7 +1,7 @@
 ---
 spec: 2026-11-02-core-2-0-core-result
 step: 04
-status: to-do
+status: done
 ---
 
 # Step 04: Module docs — `docs/Core.md` as the `SolTechnology.Core` package README
@@ -26,11 +26,17 @@ Former core step 60 (Core part); split per library on 2026-11-02.
   - RM-20 (scenario 20): `docs/Core.md` states that the `Result`/`Error` JSON contract is System.Text.Json only, and that `Result` must not travel inside Newtonsoft-serialized payloads (MessageBus messages, Hangfire job arguments).
 
 ## Acceptance criteria
-- [ ] `dotnet pack src/SolTechnology.Core/SolTechnology.Core.csproj` contains `docs/readme.md` equal to `docs/Core.md`.
-- [ ] Snippets compile in the throwaway project (the PR author states it in the PR description).
-- [ ] RM-20: `grep -n "Newtonsoft" docs/Core.md` matches the new text.
+- [x] `dotnet pack src/SolTechnology.Core/SolTechnology.Core.csproj` contains `docs/readme.md` equal to `docs/Core.md`.
+- [x] Snippets compile in the throwaway project (the PR author states it in the PR description).
+- [x] RM-20: `grep -n "Newtonsoft" docs/Core.md` matches the new text.
 
 ## Open questions
 - none
 
 ## Deviations
+
+### Snippet verification
+
+**Original plan:** the PR author states in the PR description that the snippets compile.
+
+**Actual implementation:** delivered as a direct commit, so the check is recorded here: every C# block of `docs/Core.md` was copied into a throwaway console app and a throwaway NUnit project (referencing `SolTechnology.Core` and `SolTechnology.Core.Testing`, `TreatWarningsAsErrors` on). Both built; the app's output matched the comments in the page (aggregate message, `InnerErrors.Count`, the JSON literal, the restored `NotFoundError`), and the `ShouldBeFailure<NotFoundError>` test passed. No snippet is illustrative.
