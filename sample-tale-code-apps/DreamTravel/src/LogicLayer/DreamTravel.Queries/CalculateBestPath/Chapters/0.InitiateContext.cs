@@ -8,7 +8,7 @@ namespace DreamTravel.Queries.CalculateBestPath.Chapters;
 [UsedImplicitly]
 public class InitiateContext : Chapter<CalculateBestPathContext>
 {
-    public override Task<Result> Read(CalculateBestPathContext narration)
+    public override Task<Result> Read(CalculateBestPathContext narration, CancellationToken cancellationToken)
     {
          // Map CityDto to City domain model
          var cities = narration.Input.Cities

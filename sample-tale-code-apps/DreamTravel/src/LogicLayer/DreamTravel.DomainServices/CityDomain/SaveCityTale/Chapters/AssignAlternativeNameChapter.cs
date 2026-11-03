@@ -16,7 +16,7 @@ public class AssignAlternativeNameChapter : Chapter<SaveCityContext>
         _assignAlternativeNameStep = assignAlternativeNameStep;
     }
 
-    public override Task<Result> Read(SaveCityContext context)
+    public override Task<Result> Read(SaveCityContext context, CancellationToken cancellationToken)
     {
         var cityName = context.Input.City.Name;
         _assignAlternativeNameStep.Invoke(context.CityEntity, cityName);

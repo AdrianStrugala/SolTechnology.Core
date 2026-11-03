@@ -7,7 +7,7 @@ namespace DreamTravel.Queries.CalculateBestPath.Chapters;
 
 public class FormCalculateBestPathResult : Chapter<CalculateBestPathContext>
 {
-    public override Task<Result> Read(CalculateBestPathContext context)
+    public override Task<Result> Read(CalculateBestPathContext context, CancellationToken cancellationToken)
     {
         CalculateBestPathResult calculateBestPathResult = new CalculateBestPathResult
         {

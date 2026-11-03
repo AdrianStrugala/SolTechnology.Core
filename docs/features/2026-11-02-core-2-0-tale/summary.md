@@ -25,7 +25,7 @@ are `done` and after these library features are `completed`: `result`; `auid`. N
 | 04 | Tale engine — caller-only cancellation, no resume of failed tales, deterministic tests | [`steps/04-tale-engine-cancellation-and-resume.md`](steps/04-tale-engine-cancellation-and-resume.md) | done |
 | 05 | Tale — registration and schema safety, correct log scope | [`steps/05-tale-registration-and-schema-safety.md`](steps/05-tale-registration-and-schema-safety.md) | done |
 | 06 | Tale controller — consistent JSON options, no internal detail in responses | [`steps/06-tale-controller-hardening.md`](steps/06-tale-controller-hardening.md) | done |
-| 07 | Tale — `CancellationToken` on chapters | [`steps/07-tale-chapter-cancellation-token.md`](steps/07-tale-chapter-cancellation-token.md) | to-do |
+| 07 | Tale — `CancellationToken` on chapters | [`steps/07-tale-chapter-cancellation-token.md`](steps/07-tale-chapter-cancellation-token.md) | done |
 | 08 | Tale — `ITaleRepository` 2.0 signatures (cancellation and names) | [`steps/08-tale-repository-cancellation-and-names.md`](steps/08-tale-repository-cancellation-and-names.md) | to-do |
 | 09 | Tale — optimistic concurrency on `ITaleRepository.Save` | [`steps/09-tale-repository-optimistic-concurrency.md`](steps/09-tale-repository-optimistic-concurrency.md) | to-do |
 | 10 | Tale — chapter history keyed by step index and full type name | [`steps/10-tale-chapter-history-key.md`](steps/10-tale-chapter-history-key.md) | to-do |

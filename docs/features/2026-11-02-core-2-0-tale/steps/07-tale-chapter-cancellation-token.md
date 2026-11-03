@@ -1,7 +1,7 @@
 ---
 spec: 2026-11-02-core-2-0-tale
 step: 07
-status: to-do
+status: done
 ---
 
 # Step 07: Tale — `CancellationToken` on chapters
@@ -29,11 +29,22 @@ Former core step 39; moved here by the per-library regroup (user, 2026-11-02).
 - Test: `Chapter_ReceivesRunToken_AndCancellationStopsInFlightWork`.
 
 ## Acceptance criteria
-- [ ] `dotnet build SolTechnology.Core.slnx` is green, including DreamTravel.
-- [ ] `dotnet test tests/SolTechnology.Core.Tale.Tests` is green.
-- [ ] The DreamTravel unit and component tests are green.
+- [x] `dotnet build SolTechnology.Core.slnx` is green, including DreamTravel.
+- [x] `dotnet test tests/SolTechnology.Core.Tale.Tests` is green.
+- [x] The DreamTravel unit and component tests are green.
 
 ## Open questions
 - none (`C-03`, `C-04` confirmed by the user on 2026-11-02)
 
 ## Deviations
+
+### DreamTravel chapters pass the token on; `docs/theDesign.md` left for its owner
+
+**Original plan:** Update every `Read`/`ReadWithInput` override in the sample.
+
+**Actual implementation:** Besides the signatures, the DreamTravel chapters that await
+token-aware calls pass the token on (`LoadCityForSave` `FirstOrDefaultAsync`, `PersistCity`
+`AddAsync`/`SaveChangesAsync`, `FetchExternalDataStep` `Task.Delay`); the Google and Michelin
+clients take no token, so `DownloadRoadData` cannot pass it yet. The three DreamTravel chapter unit
+tests pass `CancellationToken.None`. `docs/theDesign.md` still shows the 1.x chapter signatures;
+it is not part of this feature (follow-up). `docs/Tale.md` is step 13.

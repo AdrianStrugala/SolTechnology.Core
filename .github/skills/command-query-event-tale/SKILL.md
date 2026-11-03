@@ -148,14 +148,15 @@ stop and convert to a Tale (step 6) — this is a §3 hard rule, not a preferenc
   ctor and may also implement `IQueryHandler<,>` / `ICommandHandler<,>` so the mediator resolves
   it directly (see `CalculateBestPathTale`).
 - `Tell()` lists chapters top-to-bottom — prose only, zero logic.
-- Each chapter inherits `Chapter<TContext>`, overrides `Read(TContext context)`, returns
-  `Result.Success()` / `Result.Fail(...)` (or the `…AsTask()` variants). Mark `[UsedImplicitly]`
+- Each chapter inherits `Chapter<TContext>`, overrides
+  `Read(TContext context, CancellationToken cancellationToken)`, passes the token to every awaited
+  call, and returns `Result.Success()` / `Result.Fail(...)` (or the `…AsTask()` variants). Mark `[UsedImplicitly]`
   if the IDE flags it (resolved via DI).
 
 ### 7. Interactive / persisted variant (`Workflows/`)
 
 For a pause/resume step, inherit `InteractiveChapter<TContext, TInput>`, override
-`ReadWithInput(context, userInput)`, and optionally override `ChapterId` for a stable resume
+`ReadWithInput(context, userInput, cancellationToken)`, and optionally override `ChapterId` for a stable resume
 token (see `CustomerDetailsChapter`). The workflow needs a durable tale repository registered
 (step 10) via `.UseTaleRepository<TRepository>()` — the default in-memory store cannot resume
 across a restart (Tale.md).

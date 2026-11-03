@@ -7,10 +7,10 @@ namespace DreamTravel.Flows.SampleOrderWorkflow.Chapters
     {
         public override string ChapterId => "FetchShippingEstimate";
 
-        public override async Task<Result> Read(SampleOrderContext context)
+        public override async Task<Result> Read(SampleOrderContext context, CancellationToken cancellationToken)
         {
             // Simulate an API call
-            await Task.Delay(50);
+            await Task.Delay(50, cancellationToken);
 
             // Set some value on the context's output
             context.Output.FinalMessage = $"Shipping estimate for Order {context.Input.OrderId}: 2 days";

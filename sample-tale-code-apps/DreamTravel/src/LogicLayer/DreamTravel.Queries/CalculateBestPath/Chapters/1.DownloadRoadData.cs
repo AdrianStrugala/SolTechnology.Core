@@ -11,7 +11,7 @@ namespace DreamTravel.Queries.CalculateBestPath.Chapters;
 public class DownloadRoadData(IGoogleHTTPClient googleHTTPClient, IMichelinHTTPClient michelinHTTPClient)
     : Chapter<CalculateBestPathContext>
 {
-    public override async Task<Result> Read(CalculateBestPathContext calculateBestPathContext)
+    public override async Task<Result> Read(CalculateBestPathContext calculateBestPathContext, CancellationToken cancellationToken)
     {
         var listOfCities = calculateBestPathContext.Cities;
         List<Task> tasks = new List<Task>

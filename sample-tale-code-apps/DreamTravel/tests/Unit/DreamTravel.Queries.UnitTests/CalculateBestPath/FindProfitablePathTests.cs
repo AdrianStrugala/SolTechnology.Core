@@ -52,7 +52,7 @@ namespace DreamTravel.Queries.UnitTests.CalculateBestPath
 
 
             //Act
-            await _sut.Read(matrix);
+            await _sut.Read(matrix, CancellationToken.None);
 
 
             //Assert

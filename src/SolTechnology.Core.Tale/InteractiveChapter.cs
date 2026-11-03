@@ -25,13 +25,16 @@ public abstract class InteractiveChapter<TContext, TChapterInput>
     /// Process user-provided input for this chapter.
     /// Validate the input, update the Context based on user choices, and return success or failure.
     /// </summary>
-    public abstract Task<Result> ReadWithInput(TContext context, TChapterInput userInput);
+    /// <param name="context">Context of the paused tale.</param>
+    /// <param name="userInput">The input supplied on resume.</param>
+    /// <param name="cancellationToken">The run's token; pass it to every awaited call.</param>
+    public abstract Task<Result> ReadWithInput(TContext context, TChapterInput userInput, CancellationToken cancellationToken);
 
     /// <summary>
     /// Interactive chapters are orchestrated by <c>TaleEngine</c> via <see cref="ReadWithInput"/>.
     /// Calling this directly is a programming error.
     /// </summary>
-    public sealed override Task<Result> Read(TContext context) =>
+    public sealed override Task<Result> Read(TContext context, CancellationToken cancellationToken) =>
         throw new InvalidOperationException(
             $"Interactive chapter '{ChapterId}' requires user input. Use ReadWithInput() or orchestrate through TaleManager/TaleHandler.");
 }

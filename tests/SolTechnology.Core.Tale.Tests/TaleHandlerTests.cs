@@ -294,7 +294,7 @@ public class DirectOutputTale : TaleHandler<CalculationInput, CalculationContext
 
 public class CalculateChapter : Chapter<CalculationContext>
 {
-    public override Task<Result> Read(CalculationContext context)
+    public override Task<Result> Read(CalculationContext context, CancellationToken cancellationToken)
     {
         context.ChapterExecutionLog.Add("CalculateChapter");
         context.IntermediateValue = context.Input.Number + 10;
@@ -304,7 +304,7 @@ public class CalculateChapter : Chapter<CalculationContext>
 
 public class ValidateChapter : Chapter<CalculationContext>
 {
-    public override Task<Result> Read(CalculationContext context)
+    public override Task<Result> Read(CalculationContext context, CancellationToken cancellationToken)
     {
         context.ChapterExecutionLog.Add("ValidateChapter");
 
@@ -319,7 +319,7 @@ public class ValidateChapter : Chapter<CalculationContext>
 
 public class FormatResultChapter : Chapter<CalculationContext>
 {
-    public override Task<Result> Read(CalculationContext context)
+    public override Task<Result> Read(CalculationContext context, CancellationToken cancellationToken)
     {
         context.ChapterExecutionLog.Add("FormatResultChapter");
         var finalValue = context.IntermediateValue * 1.5;
@@ -330,7 +330,7 @@ public class FormatResultChapter : Chapter<CalculationContext>
 
 public class FailingChapter : Chapter<CalculationContext>
 {
-    public override Task<Result> Read(CalculationContext context)
+    public override Task<Result> Read(CalculationContext context, CancellationToken cancellationToken)
     {
         context.ChapterExecutionLog.Add("FailingChapter");
         return Result.FailAsTask("Validation failed: intentional failure");
@@ -339,7 +339,7 @@ public class FailingChapter : Chapter<CalculationContext>
 
 public class ModifyOutputChapter : Chapter<CalculationContext>
 {
-    public override Task<Result> Read(CalculationContext context)
+    public override Task<Result> Read(CalculationContext context, CancellationToken cancellationToken)
     {
         context.ChapterExecutionLog.Add("ModifyOutputChapter");
         context.Output.Result = "Modified by chapter";

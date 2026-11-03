@@ -15,7 +15,7 @@ namespace DreamTravel.DomainServices.CityDomain.SaveCityTale.Chapters;
 public class LoadCityForSave(DreamTripsDbContext dbContext, ICityMapper cityMapper)
     : Chapter<SaveCityContext>
 {
-    public override async Task<Result> Read(SaveCityContext context)
+    public override async Task<Result> Read(SaveCityContext context, CancellationToken cancellationToken)
     {
         var city = context.Input.City;
         context.Today = DateOnly.FromDateTime(DateTime.UtcNow);
@@ -27,7 +27,7 @@ public class LoadCityForSave(DreamTripsDbContext dbContext, ICityMapper cityMapp
             .ApplyReadOptions(city.ReadOptions)
             .Include(c => c.AlternativeNames)
             .WhereCoordinates(city.Latitude, city.Longitude)
-            .FirstOrDefaultAsync();
+            .FirstOrDefaultAsync(cancellationToken);
 
         context.IsNew = existingEntity == null;
         context.CityEntity = cityMapper.ApplyUpdate(existingEntity, city);

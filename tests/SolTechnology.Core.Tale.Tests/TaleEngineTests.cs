@@ -1,3 +1,4 @@
+using System.Text.Json.Serialization;
 using FluentAssertions;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -33,6 +34,7 @@ public class TaleEngineTests
         services.AddTransient<EngineTestFailingChapter3>();
         services.AddTransient<EngineTestSingleErrorChapter>();
         services.AddTransient<EngineTestThrowingChapter>();
+        services.AddTransient<EngineTestBlockingChapter>();
 
         _serviceProvider = services.BuildServiceProvider();
     }
@@ -124,6 +126,24 @@ public class TaleEngineTests
         // Assert
         result.IsFailure.Should().BeTrue();
         result.Error!.Message.Should().Contain("cancelled");
+    }
+
+    [Test]
+    public async Task Chapter_ReceivesRunToken_AndCancellationStopsInFlightWork()
+    {
+        // Arrange
+        using var cts = new CancellationTokenSource();
+        var handler = new BlockingTale(_serviceProvider, GetLogger<BlockingTale>());
+        var run = handler.Handle(new EngineTestInput { Value = 1 }, cts.Token);
+
+        // Act
+        cts.Cancel();
+        var result = await run;
+
+        // Assert
+        handler.Context.Received.Should().Be(cts.Token);
+        handler.Context.Work!.IsCanceled.Should().BeTrue();
+        result.Error.Should().BeOfType<TaleCancelledError>();
     }
 
     [Test]
@@ -239,6 +259,38 @@ public class LongRunningTale : TaleHandler<EngineTestInput, EngineTesTContext, E
             .Finale(ctx => ctx.Output);
 }
 
+public class BlockingTale : TaleHandler<EngineTestInput, BlockingContext, EngineTestOutput>
+{
+    public BlockingTale(IServiceProvider sp, ILogger<BlockingTale> logger)
+        : base(sp, logger)
+    {
+    }
+
+    protected override Tale<EngineTestOutput> Tell() =>
+        Open<EngineTestBlockingChapter>()
+            .Finale(ctx => ctx.Output);
+}
+
+public class EngineTestBlockingChapter : Chapter<BlockingContext>
+{
+    public override async Task<Result> Read(BlockingContext context, CancellationToken cancellationToken)
+    {
+        context.Received = cancellationToken;
+        context.Work = Task.Delay(Timeout.Infinite, cancellationToken);
+        await context.Work;
+        return Result.Success();
+    }
+}
+
+public class BlockingContext : Context<EngineTestInput, EngineTestOutput>
+{
+    [JsonIgnore]
+    public CancellationToken Received { get; set; }
+
+    [JsonIgnore]
+    public Task? Work { get; set; }
+}
+
 public class UnregisteredChapterTale : TaleHandler<EngineTestInput, EngineTesTContext, EngineTestOutput>
 {
     public UnregisteredChapterTale(IServiceProvider sp, ILogger<UnregisteredChapterTale> logger)
@@ -257,7 +309,7 @@ public class UnregisteredChapterTale : TaleHandler<EngineTestInput, EngineTesTCo
 
 public class EngineTestChapter1 : Chapter<EngineTesTContext>
 {
-    public override Task<Result> Read(EngineTesTContext context)
+    public override Task<Result> Read(EngineTesTContext context, CancellationToken cancellationToken)
     {
         context.ExecutionOrder.Add("Chapter1");
         context.Value += 1;
@@ -267,7 +319,7 @@ public class EngineTestChapter1 : Chapter<EngineTesTContext>
 
 public class EngineTestChapter2 : Chapter<EngineTesTContext>
 {
-    public override Task<Result> Read(EngineTesTContext context)
+    public override Task<Result> Read(EngineTesTContext context, CancellationToken cancellationToken)
     {
         context.ExecutionOrder.Add("Chapter2");
         context.Value += 2;
@@ -277,7 +329,7 @@ public class EngineTestChapter2 : Chapter<EngineTesTContext>
 
 public class EngineTestChapter3 : Chapter<EngineTesTContext>
 {
-    public override Task<Result> Read(EngineTesTContext context)
+    public override Task<Result> Read(EngineTesTContext context, CancellationToken cancellationToken)
     {
         context.ExecutionOrder.Add("Chapter3");
         context.Value += 3;
@@ -287,7 +339,7 @@ public class EngineTestChapter3 : Chapter<EngineTesTContext>
 
 public class EngineTestFailingChapter : Chapter<EngineTesTContext>
 {
-    public override Task<Result> Read(EngineTesTContext context)
+    public override Task<Result> Read(EngineTesTContext context, CancellationToken cancellationToken)
     {
         context.ExecutionOrder.Add("Chapter1");
         return Result.FailAsTask("Error from Chapter 1");
@@ -296,7 +348,7 @@ public class EngineTestFailingChapter : Chapter<EngineTesTContext>
 
 public class EngineTestFailingChapter2 : Chapter<EngineTesTContext>
 {
-    public override Task<Result> Read(EngineTesTContext context)
+    public override Task<Result> Read(EngineTesTContext context, CancellationToken cancellationToken)
     {
         context.ExecutionOrder.Add("Chapter2");
         return Result.FailAsTask("Error from Chapter 2");
@@ -305,7 +357,7 @@ public class EngineTestFailingChapter2 : Chapter<EngineTesTContext>
 
 public class EngineTestFailingChapter3 : Chapter<EngineTesTContext>
 {
-    public override Task<Result> Read(EngineTesTContext context)
+    public override Task<Result> Read(EngineTesTContext context, CancellationToken cancellationToken)
     {
         context.ExecutionOrder.Add("Chapter3");
         return Result.FailAsTask("Error from Chapter 3");
@@ -314,7 +366,7 @@ public class EngineTestFailingChapter3 : Chapter<EngineTesTContext>
 
 public class EngineTestSingleErrorChapter : Chapter<EngineTesTContext>
 {
-    public override Task<Result> Read(EngineTesTContext context)
+    public override Task<Result> Read(EngineTesTContext context, CancellationToken cancellationToken)
     {
         context.ExecutionOrder.Add("Chapter2");
         return Result.FailAsTask("Single chapter error");
@@ -323,7 +375,7 @@ public class EngineTestSingleErrorChapter : Chapter<EngineTesTContext>
 
 public class EngineTestThrowingChapter : Chapter<EngineTesTContext>
 {
-    public override Task<Result> Read(EngineTesTContext context)
+    public override Task<Result> Read(EngineTesTContext context, CancellationToken cancellationToken)
     {
         throw new InvalidOperationException("Intentional exception for testing");
     }
@@ -331,7 +383,7 @@ public class EngineTestThrowingChapter : Chapter<EngineTesTContext>
 
 public class UnregisteredChapter : Chapter<EngineTesTContext>
 {
-    public override Task<Result> Read(EngineTesTContext context)
+    public override Task<Result> Read(EngineTesTContext context, CancellationToken cancellationToken)
     {
         return Result.SuccessAsTask();
     }

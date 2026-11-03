@@ -10,7 +10,7 @@ public class FindProfitablePath : Chapter<CalculateBestPathContext>
     private static double HighwayVelocity { get; } = 120;
     private static double RoadCombustion { get; } = 0.06; //per km
 
-    public override Task<Result> Read(CalculateBestPathContext context)
+    public override Task<Result> Read(CalculateBestPathContext context, CancellationToken cancellationToken)
     {
         Parallel.For(0, context.NoOfCities, i =>
         {

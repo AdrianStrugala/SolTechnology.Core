@@ -10,7 +10,7 @@ public class CustomerDetailsChapter : InteractiveChapter<SampleOrderContext, Cus
 {
     public override string ChapterId => "RequestCustomerDetails";
 
-    public override Task<Result> ReadWithInput(SampleOrderContext context, CustomerDetailsInput userInput)
+    public override Task<Result> ReadWithInput(SampleOrderContext context, CustomerDetailsInput userInput, CancellationToken cancellationToken)
     {
         if (string.IsNullOrWhiteSpace(userInput.Name) || string.IsNullOrWhiteSpace(userInput.Address))
         {

@@ -8,7 +8,7 @@ namespace DreamTravel.Queries.CalculateBestPath.Chapters;
 [UsedImplicitly]
 public class SolveTsp(ITSP tsp) : Chapter<CalculateBestPathContext>
 {
-    public override Task<Result> Read(CalculateBestPathContext calculateBestPathContext)
+    public override Task<Result> Read(CalculateBestPathContext calculateBestPathContext, CancellationToken cancellationToken)
     {
         calculateBestPathContext.OrderOfCities = tsp.SolveTSP(calculateBestPathContext.OptimalDistances.ToList());
         return Result.SuccessAsTask();

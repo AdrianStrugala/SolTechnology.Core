@@ -55,7 +55,7 @@ namespace DreamTravel.Queries.UnitTests.CalculateBestPath
             };
 
             //Act
-            Result result = await _sut.Read(calculateBestPathContext);
+            Result result = await _sut.Read(calculateBestPathContext, CancellationToken.None);
 
             //Assert
             result.IsSuccess.Should().BeTrue();

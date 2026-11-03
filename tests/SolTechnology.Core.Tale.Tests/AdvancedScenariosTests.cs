@@ -611,7 +611,7 @@ public class LargeDataTale : TaleHandler<TestAdvancedInput, TestAdvancedContext,
 
 public class ValidInputChapter : InteractiveChapter<TestAdvancedContext, UserInputData>
 {
-    public override Task<Result> ReadWithInput(TestAdvancedContext context, UserInputData userInput)
+    public override Task<Result> ReadWithInput(TestAdvancedContext context, UserInputData userInput, CancellationToken cancellationToken)
     {
         // Validate
         if (string.IsNullOrWhiteSpace(userInput.Name))
@@ -637,7 +637,7 @@ public class ValidInputChapter : InteractiveChapter<TestAdvancedContext, UserInp
 
 public class SecondInteractiveChapter : InteractiveChapter<TestAdvancedContext, AddressInputData>
 {
-    public override Task<Result> ReadWithInput(TestAdvancedContext context, AddressInputData userInput)
+    public override Task<Result> ReadWithInput(TestAdvancedContext context, AddressInputData userInput, CancellationToken cancellationToken)
     {
         if (string.IsNullOrWhiteSpace(userInput.Address))
             return Result.FailAsTask("Address required");
@@ -651,7 +651,7 @@ public class SecondInteractiveChapter : InteractiveChapter<TestAdvancedContext, 
 
 public class ThirdInteractiveChapter : InteractiveChapter<TestAdvancedContext, PaymentInputData>
 {
-    public override Task<Result> ReadWithInput(TestAdvancedContext context, PaymentInputData userInput)
+    public override Task<Result> ReadWithInput(TestAdvancedContext context, PaymentInputData userInput, CancellationToken cancellationToken)
     {
         if (string.IsNullOrWhiteSpace(userInput.CardNumber))
             return Result.FailAsTask("Card number required");
@@ -664,7 +664,7 @@ public class ThirdInteractiveChapter : InteractiveChapter<TestAdvancedContext, P
 
 public class ComplexValidationChapter : Chapter<TestAdvancedContext>
 {
-    public override Task<Result> Read(TestAdvancedContext context)
+    public override Task<Result> Read(TestAdvancedContext context, CancellationToken cancellationToken)
     {
         // Simulate complex business logic validation
         if (context.UserAge < 18)
@@ -676,7 +676,7 @@ public class ComplexValidationChapter : Chapter<TestAdvancedContext>
 
 public class TimeoutSimulationChapter : Chapter<TestAdvancedContext>
 {
-    public override async Task<Result> Read(TestAdvancedContext context)
+    public override async Task<Result> Read(TestAdvancedContext context, CancellationToken cancellationToken)
     {
         // Simulate long-running operation
         await Task.Delay(100);
@@ -686,7 +686,7 @@ public class TimeoutSimulationChapter : Chapter<TestAdvancedContext>
 
 public class LargeDataChapter : Chapter<TestAdvancedContext>
 {
-    public override Task<Result> Read(TestAdvancedContext context)
+    public override Task<Result> Read(TestAdvancedContext context, CancellationToken cancellationToken)
     {
         // Process large data from input
         if (!string.IsNullOrEmpty(context.Input.LargeData))

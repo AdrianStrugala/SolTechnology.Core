@@ -308,7 +308,7 @@ public class CustomErrorTale : TaleHandler<ErrorTestInput, ErrorTesTContext, Err
 
 public class ErrorTestSuccessChapter : Chapter<ErrorTesTContext>
 {
-    public override Task<Result> Read(ErrorTesTContext context)
+    public override Task<Result> Read(ErrorTesTContext context, CancellationToken cancellationToken)
     {
         context.ExecutionLog.Add("Success");
         return Result.SuccessAsTask();
@@ -317,7 +317,7 @@ public class ErrorTestSuccessChapter : Chapter<ErrorTesTContext>
 
 public class ErrorTestFailureChapter : Chapter<ErrorTesTContext>
 {
-    public override Task<Result> Read(ErrorTesTContext context)
+    public override Task<Result> Read(ErrorTesTContext context, CancellationToken cancellationToken)
     {
         context.ExecutionLog.Add("Failure");
         return Result.FailAsTask("Chapter failed intentionally");
@@ -326,7 +326,7 @@ public class ErrorTestFailureChapter : Chapter<ErrorTesTContext>
 
 public class ErrorTestFirstFailureChapter : Chapter<ErrorTesTContext>
 {
-    public override Task<Result> Read(ErrorTesTContext context)
+    public override Task<Result> Read(ErrorTesTContext context, CancellationToken cancellationToken)
     {
         context.ExecutionLog.Add("FirstFailure");
         return Result.FailAsTask("First failure");
@@ -335,7 +335,7 @@ public class ErrorTestFirstFailureChapter : Chapter<ErrorTesTContext>
 
 public class ErrorTestSecondFailureChapter : Chapter<ErrorTesTContext>
 {
-    public override Task<Result> Read(ErrorTesTContext context)
+    public override Task<Result> Read(ErrorTesTContext context, CancellationToken cancellationToken)
     {
         context.ExecutionLog.Add("SecondFailure");
         return Result.FailAsTask("Second failure");
@@ -344,7 +344,7 @@ public class ErrorTestSecondFailureChapter : Chapter<ErrorTesTContext>
 
 public class ErrorTestExceptionChapter : Chapter<ErrorTesTContext>
 {
-    public override Task<Result> Read(ErrorTesTContext context)
+    public override Task<Result> Read(ErrorTesTContext context, CancellationToken cancellationToken)
     {
         throw new InvalidOperationException("Test exception from chapter");
     }
@@ -352,7 +352,7 @@ public class ErrorTestExceptionChapter : Chapter<ErrorTesTContext>
 
 public class ErrorTestHttpTimeoutChapter : Chapter<ErrorTesTContext>
 {
-    public override Task<Result> Read(ErrorTesTContext context)
+    public override Task<Result> Read(ErrorTesTContext context, CancellationToken cancellationToken)
     {
         throw new TaskCanceledException(
             "The request was canceled due to the configured HttpClient.Timeout of 100 seconds elapsing.",
@@ -362,7 +362,7 @@ public class ErrorTestHttpTimeoutChapter : Chapter<ErrorTesTContext>
 
 public class ErrorTestCustomErrorChapter : Chapter<ErrorTesTContext>
 {
-    public override Task<Result> Read(ErrorTesTContext context)
+    public override Task<Result> Read(ErrorTesTContext context, CancellationToken cancellationToken)
     {
         var customError = new Error
         {

@@ -262,7 +262,7 @@ public class TaleControllerTests
 
     public sealed class SelfReferencingInputChapter : InteractiveChapter<LifecycleContext, SelfReferencingInput>
     {
-        public override Task<Result> ReadWithInput(LifecycleContext context, SelfReferencingInput userInput) =>
+        public override Task<Result> ReadWithInput(LifecycleContext context, SelfReferencingInput userInput, CancellationToken cancellationToken) =>
             Result.SuccessAsTask();
     }
 

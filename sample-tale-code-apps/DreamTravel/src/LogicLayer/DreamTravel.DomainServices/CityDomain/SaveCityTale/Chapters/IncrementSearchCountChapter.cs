@@ -16,7 +16,7 @@ public class IncrementSearchCountChapter : Chapter<SaveCityContext>
         _incrementSearchCountStep = incrementSearchCountStep;
     }
 
-    public override Task<Result> Read(SaveCityContext context)
+    public override Task<Result> Read(SaveCityContext context, CancellationToken cancellationToken)
     {
         _incrementSearchCountStep.Invoke(context.CityEntity, context.Today);
 

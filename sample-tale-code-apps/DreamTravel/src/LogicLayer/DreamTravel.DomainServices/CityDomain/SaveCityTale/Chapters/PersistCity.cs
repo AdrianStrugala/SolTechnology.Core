@@ -11,18 +11,18 @@ namespace DreamTravel.DomainServices.CityDomain.SaveCityTale.Chapters;
 /// </summary>
 public class PersistCity(DreamTripsDbContext dbContext) : Chapter<SaveCityContext>
 {
-    public override async Task<Result> Read(SaveCityContext context)
+    public override async Task<Result> Read(SaveCityContext context, CancellationToken cancellationToken)
     {
         if (context.IsNew)
         {
-            await dbContext.Cities.AddAsync(context.CityEntity);
+            await dbContext.Cities.AddAsync(context.CityEntity, cancellationToken);
         }
         else
         {
             dbContext.Update(context.CityEntity);
         }
 
-        await dbContext.SaveChangesAsync();
+        await dbContext.SaveChangesAsync(cancellationToken);
 
         context.Output.IsNew = context.IsNew;
 

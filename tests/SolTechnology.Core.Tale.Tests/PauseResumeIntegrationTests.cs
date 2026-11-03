@@ -307,7 +307,7 @@ public class OrderProcessingTale : TaleHandler<OrderInput, OrderContext, OrderOu
 
 public class OrderValidationChapter : Chapter<OrderContext>
 {
-    public override Task<Result> Read(OrderContext context)
+    public override Task<Result> Read(OrderContext context, CancellationToken cancellationToken)
     {
         if (context.Input.Amount <= 0)
         {
@@ -321,7 +321,7 @@ public class OrderValidationChapter : Chapter<OrderContext>
 
 public class RequestCustomerDetailsChapter : InteractiveChapter<OrderContext, CustomerDetails>
 {
-    public override Task<Result> ReadWithInput(OrderContext context, CustomerDetails userInput)
+    public override Task<Result> ReadWithInput(OrderContext context, CustomerDetails userInput, CancellationToken cancellationToken)
     {
         if (string.IsNullOrWhiteSpace(userInput.Name))
         {
@@ -338,7 +338,7 @@ public class RequestCustomerDetailsChapter : InteractiveChapter<OrderContext, Cu
 
 public class ProcessPaymentChapter : Chapter<OrderContext>
 {
-    public override Task<Result> Read(OrderContext context)
+    public override Task<Result> Read(OrderContext context, CancellationToken cancellationToken)
     {
         // Simulate payment processing
         context.PaymentProcessed = true;
@@ -350,7 +350,7 @@ public class ProcessPaymentChapter : Chapter<OrderContext>
 
 public class SendConfirmationChapter : Chapter<OrderContext>
 {
-    public override Task<Result> Read(OrderContext context)
+    public override Task<Result> Read(OrderContext context, CancellationToken cancellationToken)
     {
         // Populate output
         context.Output.OrderId = context.Input.OrderId;

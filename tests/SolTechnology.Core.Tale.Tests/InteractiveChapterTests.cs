@@ -64,7 +64,7 @@ public class InteractiveChapterTests
         };
 
         // Act
-        var result = await chapter.ReadWithInput(context, userInput);
+        var result = await chapter.ReadWithInput(context, userInput, CancellationToken.None);
 
         // Assert
         result.IsSuccess.Should().BeTrue();
@@ -89,7 +89,7 @@ public class InteractiveChapterTests
         };
 
         // Act
-        var result = await chapter.ReadWithInput(context, invalidInput);
+        var result = await chapter.ReadWithInput(context, invalidInput, CancellationToken.None);
 
         // Assert
         result.IsFailure.Should().BeTrue();
@@ -108,7 +108,7 @@ public class InteractiveChapterTests
         };
 
         // Act & Assert
-        var act = async () => await ((IChapter<TestInteractiveContext>)chapter).Read(context);
+        var act = async () => await ((IChapter<TestInteractiveContext>)chapter).Read(context, CancellationToken.None);
 
         act.Should().ThrowAsync<InvalidOperationException>()
             .WithMessage("*requires user input*");
@@ -147,7 +147,7 @@ public class InteractiveChapterTests
         };
 
         // Act
-        var result = await chapter.ReadWithInput(context, complexInput);
+        var result = await chapter.ReadWithInput(context, complexInput, CancellationToken.None);
 
         // Assert
         result.IsSuccess.Should().BeTrue();
@@ -178,7 +178,7 @@ public class TestInteractiveChapter : InteractiveChapter<TestInteractiveContext,
 {
     public override Task<Result> ReadWithInput(
         TestInteractiveContext context,
-        CustomerDetailsInput userInput)
+        CustomerDetailsInput userInput, CancellationToken cancellationToken)
     {
         // Validate input
         if (string.IsNullOrWhiteSpace(userInput.CustomerName))
@@ -204,7 +204,7 @@ public class ComplexInputChapter : InteractiveChapter<TestInteractiveContext, Co
 {
     public override Task<Result> ReadWithInput(
         TestInteractiveContext context,
-        ComplexInput userInput)
+        ComplexInput userInput, CancellationToken cancellationToken)
     {
         context.ComplexData = $"Order: {userInput.OrderDetails.OrderId}, Quantity: {userInput.Quantity}";
         return Result.SuccessAsTask();

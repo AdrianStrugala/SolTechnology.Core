@@ -156,7 +156,7 @@ public class TaleTestContext : Context<TaleInput, TaleOutput>
 
 public class TalePassChapter : Chapter<TaleTestContext>
 {
-    public override Task<Result> Read(TaleTestContext ctx)
+    public override Task<Result> Read(TaleTestContext ctx, CancellationToken cancellationToken)
     {
         ctx.Value += 1;
         ctx.Log.Add("pass");
@@ -166,7 +166,7 @@ public class TalePassChapter : Chapter<TaleTestContext>
 
 public class TaleBonusChapter : Chapter<TaleTestContext>
 {
-    public override Task<Result> Read(TaleTestContext ctx)
+    public override Task<Result> Read(TaleTestContext ctx, CancellationToken cancellationToken)
     {
         ctx.Value += 10;
         ctx.Log.Add("bonus");
@@ -176,7 +176,7 @@ public class TaleBonusChapter : Chapter<TaleTestContext>
 
 public class TaleFailChapter : Chapter<TaleTestContext>
 {
-    public override Task<Result> Read(TaleTestContext ctx)
+    public override Task<Result> Read(TaleTestContext ctx, CancellationToken cancellationToken)
     {
         ctx.Log.Add("fail");
         return Result.FailAsTask("boom");
@@ -185,7 +185,7 @@ public class TaleFailChapter : Chapter<TaleTestContext>
 
 public class TaleRecoverChapter : Chapter<TaleTestContext>
 {
-    public override Task<Result> Read(TaleTestContext ctx)
+    public override Task<Result> Read(TaleTestContext ctx, CancellationToken cancellationToken)
     {
         ctx.Value = 99;
         ctx.Log.Add("recover");

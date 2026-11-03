@@ -21,6 +21,7 @@ public interface IChapter<in TContext> where TContext : class
     /// Return Result.Fail("message") if something goes wrong.
     /// </summary>
     /// <param name="context">The Context containing input, output, and intermediate data</param>
+    /// <param name="cancellationToken">The run's token; pass it to every awaited call so that cancelling the tale stops in-flight work.</param>
     /// <returns>Result indicating success or failure of this chapter</returns>
-    Task<Result> Read(TContext context);
+    Task<Result> Read(TContext context, CancellationToken cancellationToken);
 }

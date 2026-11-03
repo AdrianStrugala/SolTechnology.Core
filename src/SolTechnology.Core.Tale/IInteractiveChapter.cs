@@ -19,6 +19,9 @@ public interface IInteractiveChapter<in TContext, in TChapterInput> : IChapter<T
     /// <summary>
     /// Processes user input and advances the tale.
     /// </summary>
-    Task<Result> ReadWithInput(TContext context, TChapterInput userInput);
+    /// <param name="context">Context of the paused tale.</param>
+    /// <param name="userInput">The input supplied on resume.</param>
+    /// <param name="cancellationToken">The run's token.</param>
+    Task<Result> ReadWithInput(TContext context, TChapterInput userInput, CancellationToken cancellationToken);
 }
 

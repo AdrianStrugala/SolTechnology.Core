@@ -60,7 +60,7 @@ namespace DreamTravel.Queries.UnitTests.CalculateBestPath
                 .Returns(Task.FromResult((10.0, 5.0)));
 
             // Act
-            var result = await _sut.Read(context);
+            var result = await _sut.Read(context, CancellationToken.None);
 
             // Assert
             result.IsSuccess.Should().BeTrue();

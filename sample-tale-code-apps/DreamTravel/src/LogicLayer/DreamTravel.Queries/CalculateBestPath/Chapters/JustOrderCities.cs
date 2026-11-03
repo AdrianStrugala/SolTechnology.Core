@@ -13,7 +13,7 @@ namespace DreamTravel.Queries.CalculateBestPath.Chapters;
 [UsedImplicitly]
 public class JustOrderCities : Chapter<CalculateBestPathContext>
 {
-    public override Task<Result> Read(CalculateBestPathContext context)
+    public override Task<Result> Read(CalculateBestPathContext context, CancellationToken cancellationToken)
     {
         for (int i = 0; i < context.OptimalDistances.Length; i++)
         {

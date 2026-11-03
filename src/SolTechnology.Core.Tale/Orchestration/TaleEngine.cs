@@ -230,7 +230,7 @@ internal sealed class TaleEngine<TInput, TContext, TOutput>
             }
             else
             {
-                result = await chapter.Read(_context);
+                result = await chapter.Read(_context, _cancellationToken);
             }
 
             if (result.IsFailure)
@@ -334,7 +334,7 @@ internal sealed class TaleEngine<TInput, TContext, TOutput>
         chapterInfo.ProvidedData = _resumeInput;
 
         var result = await InteractiveChapterReflection.InvokeReadWithInput(
-            chapterType, chapter, _context, deserializedInput);
+            chapterType, chapter, _context, deserializedInput, _cancellationToken);
 
         if (result.IsSuccess)
         {
@@ -475,7 +475,7 @@ internal static class InteractiveChapterReflection
     }
 
     public static async Task<Result> InvokeReadWithInput(
-        Type chapterType, object chapterInstance, object context, object input)
+        Type chapterType, object chapterInstance, object context, object input, CancellationToken cancellationToken)
     {
         var method = _readWithInputCache.GetOrAdd(chapterType, t =>
             t.GetMethod("ReadWithInput", BindingFlags.Public | BindingFlags.Instance));
@@ -484,7 +484,7 @@ internal static class InteractiveChapterReflection
             return Result.Fail($"ReadWithInput not found on {chapterType.Name}");
         }
 
-        var task = (Task<Result>)method.Invoke(chapterInstance, new[] { context, input })!;
+        var task = (Task<Result>)method.Invoke(chapterInstance, new[] { context, input, cancellationToken })!;
         return await task;
     }
 }

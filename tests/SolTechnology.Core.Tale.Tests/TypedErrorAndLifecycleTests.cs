@@ -193,12 +193,12 @@ public class PausePayload { public string Token { get; set; } = ""; }
 
 public class LifecyclePassingChapter : Chapter<LifecycleContext>
 {
-    public override Task<Result> Read(LifecycleContext ctx) => Result.SuccessAsTask();
+    public override Task<Result> Read(LifecycleContext ctx, CancellationToken cancellationToken) => Result.SuccessAsTask();
 }
 
 public class LifecyclePauseChapter : InteractiveChapter<LifecycleContext, PausePayload>
 {
-    public override Task<Result> ReadWithInput(LifecycleContext ctx, PausePayload input)
+    public override Task<Result> ReadWithInput(LifecycleContext ctx, PausePayload input, CancellationToken cancellationToken)
     {
         ctx.Token = input.Token;
         return Result.SuccessAsTask();
@@ -207,7 +207,7 @@ public class LifecyclePauseChapter : InteractiveChapter<LifecycleContext, PauseP
 
 public class LifecycleCompleteChapter : Chapter<LifecycleContext>
 {
-    public override Task<Result> Read(LifecycleContext ctx)
+    public override Task<Result> Read(LifecycleContext ctx, CancellationToken cancellationToken)
     {
         ctx.Output.Message = "done";
         return Result.SuccessAsTask();

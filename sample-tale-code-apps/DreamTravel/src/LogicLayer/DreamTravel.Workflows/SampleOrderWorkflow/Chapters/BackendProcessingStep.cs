@@ -7,7 +7,7 @@ public class BackendProcessingChapter : Chapter<SampleOrderContext>
 {
     public override string ChapterId => "ProcessOrderPayment";
 
-    public override Task<Result> Read(SampleOrderContext context)
+    public override Task<Result> Read(SampleOrderContext context, CancellationToken cancellationToken)
     {
         // Example condition for forced test failure
         if (context.Input.Quantity < 0)

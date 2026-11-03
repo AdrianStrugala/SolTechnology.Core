@@ -20,7 +20,7 @@ public class ChapterTests
         var context = new TestContext { Input = new TestInput { Value = 10 } };
 
         // Act
-        var result = await chapter.Read(context);
+        var result = await chapter.Read(context, CancellationToken.None);
 
         // Assert
         result.IsSuccess.Should().BeTrue();
@@ -34,7 +34,7 @@ public class ChapterTests
         var context = new TestContext { Input = new TestInput { Value = 10 } };
 
         // Act
-        await chapter.Read(context);
+        await chapter.Read(context, CancellationToken.None);
 
         // Assert
         context.ProcessedValue.Should().Be(20); // Should double the input value
@@ -48,7 +48,7 @@ public class ChapterTests
         var context = new TestContext { Input = new TestInput { Value = -1 } };
 
         // Act
-        var result = await chapter.Read(context);
+        var result = await chapter.Read(context, CancellationToken.None);
 
         // Assert
         result.IsFailure.Should().BeTrue();
@@ -65,7 +65,7 @@ public class ChapterTests
         var context = new TestContext { Input = new TestInput { Value = 10 } };
 
         // Act
-        await chapter.Read(context);
+        await chapter.Read(context, CancellationToken.None);
 
         // Assert
         context.ServiceResult.Should().Be("Service called with value: 10");
@@ -105,7 +105,7 @@ public class ChapterTests
 /// </summary>
 public class TestSuccessChapter : Chapter<TestContext>
 {
-    public override Task<Result> Read(TestContext context)
+    public override Task<Result> Read(TestContext context, CancellationToken cancellationToken)
     {
         return Result.SuccessAsTask();
     }
@@ -116,7 +116,7 @@ public class TestSuccessChapter : Chapter<TestContext>
 /// </summary>
 public class TestModifyContextChapter : Chapter<TestContext>
 {
-    public override Task<Result> Read(TestContext context)
+    public override Task<Result> Read(TestContext context, CancellationToken cancellationToken)
     {
         context.ProcessedValue = context.Input.Value * 2;
         return Result.SuccessAsTask();
@@ -128,7 +128,7 @@ public class TestModifyContextChapter : Chapter<TestContext>
 /// </summary>
 public class TestFailureChapter : Chapter<TestContext>
 {
-    public override Task<Result> Read(TestContext context)
+    public override Task<Result> Read(TestContext context, CancellationToken cancellationToken)
     {
         if (context.Input.Value < 0)
         {
@@ -151,7 +151,7 @@ public class TestChapterWithDI : Chapter<TestContext>
         _service = service;
     }
 
-    public override Task<Result> Read(TestContext context)
+    public override Task<Result> Read(TestContext context, CancellationToken cancellationToken)
     {
         context.ServiceResult = _service.Process(context.Input.Value);
         return Result.SuccessAsTask();
@@ -165,7 +165,7 @@ public class TestCustomIdChapter : Chapter<TestContext>
 {
     public override string ChapterId => "CustomChapterId";
 
-    public override Task<Result> Read(TestContext context)
+    public override Task<Result> Read(TestContext context, CancellationToken cancellationToken)
     {
         return Result.SuccessAsTask();
     }
