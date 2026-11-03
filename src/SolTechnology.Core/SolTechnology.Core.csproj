@@ -8,12 +8,9 @@
     <PackageId>SolTechnology.Core</PackageId>
     <AssemblyName>SolTechnology.Core</AssemblyName>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
-  </PropertyGroup>
 
-  <ItemGroup>
-    <None Include="..\..\docs\mini-logo.png" Pack="true" Visible="false" PackagePath="docs\mini-logo.png" />
-    <None Include="..\..\README.md" Pack="true" Visible="false" PackagePath="docs\readme.md" />
-  </ItemGroup>
+    <PackageReadmeSource>Core.md</PackageReadmeSource>
+  </PropertyGroup>
 
 </Project>
 
