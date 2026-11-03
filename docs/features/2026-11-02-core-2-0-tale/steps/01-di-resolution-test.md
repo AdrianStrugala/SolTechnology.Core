@@ -1,7 +1,7 @@
 ---
 spec: 2026-11-02-core-2-0-tale
 step: 01
-status: to-do
+status: done
 ---
 
 # Step 01: DI resolution test — Tale
@@ -23,7 +23,7 @@ Former core step 10 (Tale part); split per library on 2026-11-02.
 - Follow the [`test-writing`](../../../../.github/skills/test-writing/SKILL.md) skill. No shared helper in a shipped package.
 
 ## Acceptance criteria
-- [ ] `dotnet test tests/SolTechnology.Core.Tale.Tests` is green, with no ignored resolution test.
+- [x] `dotnet test tests/SolTechnology.Core.Tale.Tests` is green, with no ignored resolution test.
 
 ## Open questions
 - none
