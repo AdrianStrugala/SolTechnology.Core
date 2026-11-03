@@ -1,4 +1,3 @@
-using System.Buffers;
 using System.Diagnostics;
 using Microsoft.AspNetCore.Http;
 
@@ -34,9 +33,6 @@ public sealed record CorrelationId
 
     /// <summary>Logger-scope property name. Matches App Insights / OTel convention.</summary>
     public const string ScopeKey = "CorrelationId";
-
-    private static readonly SearchValues<char> AllowedInboundChars =
-        SearchValues.Create("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789._:-");
 
     private CorrelationId(string value) => Value = value;
 
@@ -83,24 +79,13 @@ public sealed record CorrelationId
         }
 
         var headerValue = request.Headers[HeaderKey].ToString();
-        if (!string.IsNullOrWhiteSpace(headerValue))
+        if (string.IsNullOrWhiteSpace(headerValue))
         {
-            if (headerValue.Length > MaxLength)
-            {
-                error = $"{HeaderKey} must not exceed {MaxLength} characters.";
-                return Generate();
-            }
-
-            if (headerValue.AsSpan().ContainsAnyExcept(AllowedInboundChars))
-            {
-                error = $"{HeaderKey} may contain only letters, digits, '.', '_', ':' and '-'.";
-                return Generate();
-            }
-
-            return new CorrelationId(headerValue);
+            return Generate();
         }
 
-        return Generate();
+        error = CorrelationIdValidator.Validate(headerValue);
+        return error is null ? new CorrelationId(headerValue) : Generate();
     }
 
     /// <summary>
@@ -133,13 +118,8 @@ public sealed record CorrelationId
     /// <summary>
     /// Renders <see cref="Activity.Current"/> as a W3C <c>traceparent</c> header value
     /// (<c>00-{trace-id}-{parent-id}-{flags}</c>). Returns <c>null</c> when no Activity
-    /// is in scope or its trace id is uninitialised.
-    /// <para>
-    /// Shared between <see cref="EnrichResponse"/> (inbound side, owned by
-    /// <c>Core.Logging</c>) and the outbound correlation handler in
-    /// <c>SolTechnology.Core.HTTP</c>. Two callers, one implementation — keeps the
-    /// header format from drifting.
-    /// </para>
+    /// is in scope or its trace id is uninitialised. Also used by the outbound correlation
+    /// handler in <c>SolTechnology.Core.HTTP</c>, so both directions share one header format.
     /// </summary>
     public static string? TryBuildTraceParentFromCurrentActivity()
     {
@@ -154,25 +134,13 @@ public sealed record CorrelationId
     }
 
     /// <summary>
-    /// Renders the current Activity as a W3C <c>traceparent</c> value
-    /// (<c>00-{trace-id}-{parent-id}-{flags}</c>). Returns <c>null</c> when no Activity is in scope
-    /// or the id was sourced from the legacy <c>X-Correlation-Id</c> header (no real trace context).
+    /// The current <c>traceparent</c>, only when <see cref="Value"/> is the current trace id; an id
+    /// taken from <c>X-Correlation-Id</c> has no trace context, so no span id is invented for it.
     /// </summary>
     private string? TryBuildTraceParent()
-    {
-        var activity = Activity.Current;
-        if (activity is null || activity.TraceId == default)
-        {
-            return null;
-        }
-
-        // Only emit traceparent when our Value is the actual trace id - otherwise we'd be lying
-        // about a span id that has nothing to do with the correlation id we just echoed.
-        if (!string.Equals(Value, activity.TraceId.ToHexString(), StringComparison.Ordinal))
-        {
-            return null;
-        }
-
-        return TryBuildTraceParentFromCurrentActivity();
-    }
+        => Activity.Current is { } activity
+           && activity.TraceId != default
+           && string.Equals(Value, activity.TraceId.ToHexString(), StringComparison.Ordinal)
+            ? TryBuildTraceParentFromCurrentActivity()
+            : null;
 }
