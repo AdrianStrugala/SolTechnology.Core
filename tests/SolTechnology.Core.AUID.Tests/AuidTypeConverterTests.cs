@@ -27,12 +27,12 @@ public class AuidTypeConverterTests
     }
 
     [Test]
-    public void ConvertFrom_Invalid_ThrowsNotSupportedExceptionWithValue()
+    public void ConvertFrom_Invalid_ThrowsFormatExceptionWithValue()
     {
         // Act
         var act = () => _sut.ConvertFromInvariantString("not-an-auid");
 
         // Assert
-        act.Should().Throw<NotSupportedException>().WithMessage("*not-an-auid*");
+        act.Should().Throw<FormatException>().WithMessage("*not-an-auid*");
     }
 }

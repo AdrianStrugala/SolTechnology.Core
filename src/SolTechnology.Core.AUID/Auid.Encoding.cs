@@ -30,7 +30,13 @@ public readonly partial struct Auid
     private static Auid CreateInternal(ReadOnlySpan<char> input, bool generateCode, TimeProvider timeProvider)
     {
         long codeEncoded = generateCode ? EncodeGeneratedCode(input) : Encode3Chars(input);
-        long seconds = (timeProvider.GetUtcNow().Ticks - EpochTicks) / TimeSpan.TicksPerSecond;
+        long seconds = (timeProvider.GetUtcNow().UtcTicks - EpochTicks) / TimeSpan.TicksPerSecond;
+
+        if (seconds < 0)
+        {
+            throw new InvalidOperationException(
+                "AUID timestamp underflow: the clock is before the AUID epoch 2001-01-01T00:00:00Z.");
+        }
 
         if (seconds > MaskTime)
         {

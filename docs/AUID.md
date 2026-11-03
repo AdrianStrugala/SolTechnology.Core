@@ -127,7 +127,7 @@ var back = JsonSerializer.Deserialize<Dictionary<Auid, decimal>>(json);
 | Input | `AuidJsonConverter` | `AuidTypeConverter` |
 |---|---|---|
 | Valid string | `Auid` | `Auid` |
-| Invalid or empty string | `JsonException` with the JSON path | `NotSupportedException` naming the value |
+| Invalid or empty string | `JsonException` with the JSON path | `FormatException` naming the value (MVC model binding reports "The value '…' is not valid…") |
 | Non-string token | `JsonException` | — |
 
 `Auid.Empty` (value `0`) serializes as `AAA_20010101000000_000000` and round-trips.
@@ -193,4 +193,5 @@ public class OrderIdTests
 - Do pass a `TimeProvider` in tests instead of waiting for the clock.
 - Don't use an AUID as a secret or a security token: the random part comes from `Random.Shared`.
 - Don't create more than a few dozen IDs per second for one code without a unique constraint.
-- Don't generate AUIDs after 2137-02-07 06:28:15 UTC; `New` throws `InvalidOperationException`.
+- Don't generate AUIDs before 2001-01-01 or after 2137-02-07 06:28:15 UTC; `New` throws
+  `InvalidOperationException`. The timestamp is the UTC instant, whatever the `TimeProvider`'s offset.

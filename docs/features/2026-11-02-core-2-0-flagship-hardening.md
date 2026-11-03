@@ -537,6 +537,12 @@ these notes from the steps:
   `traceparent`). Callers that send both headers keep getting the trace id. A client that disconnects
   while an `IRequiresRequestBody` enricher reads the body now produces the usual single abort
   Warning instead of an unlogged exception from scope building.
+- auid (post-completion review, 2026-11-03, amends P-08): `AuidTypeConverter.ConvertFrom` throws
+  `FormatException` for an invalid string, as 1.x did (the interim `NotSupportedException` is
+  dropped), so MVC model binding still reports "The value '…' is not valid…". `Auid.New` with a
+  `TimeProvider` encodes the UTC instant even when the provider reports a non-zero offset (1.x and
+  the 2.0 preview used the offset-local clock time), and a clock before 2001-01-01 now throws
+  `InvalidOperationException` instead of producing a wrong ID.
 
 ### Resolved questions (user answers, 2026-11-02)
 

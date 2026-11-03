@@ -23,7 +23,7 @@ public sealed class AuidTypeConverter : TypeConverter
                 return auid;
             }
 
-            throw new NotSupportedException($"Unable to convert [{str}] to Auid. Expected format COD_YYYYMMDDHHmmss_RANDOM.");
+            throw new FormatException($"Unable to convert [{str}] to Auid. Expected format COD_YYYYMMDDHHmmss_RANDOM.");
         }
 
         return base.ConvertFrom(context, culture, value);

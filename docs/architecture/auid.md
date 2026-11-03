@@ -26,8 +26,12 @@ process-wide clock: one library cannot change the time another library sees, and
 pass their own `FakeTimeProvider`. A null code with an explicit `TimeProvider` falls back to `XXX`,
 because that overload has no caller-file parameter to infer a code from.
 
-A time after the 32-bit limit throws `InvalidOperationException`; its Polish message is a
-deliberate joke and stays (Coding Guide §9.10).
+The timestamp is `GetUtcNow().UtcTicks`, so a `TimeProvider` that reports a non-zero offset still
+encodes the UTC instant and the range checks do not depend on the offset. A time after the 32-bit
+limit throws `InvalidOperationException`; its Polish message is a deliberate joke and stays (Coding
+Guide §9.10). A time before the 2001-01-01 epoch (for example a default `FakeTimeProvider`, which
+starts at 2000-01-01) throws `InvalidOperationException` with a separate English message instead of
+wrapping into the time bits.
 
 ## Formatting and parsing
 
@@ -48,10 +52,12 @@ different, valid-looking ID. `TryParse(long, …)` accepts any value whose code 
 | Input | `AuidJsonConverter` | `AuidTypeConverter.ConvertFrom` |
 |---|---|---|
 | Valid string | `Auid` | `Auid` |
-| Invalid or empty string | `JsonException`; System.Text.Json adds the JSON path | `NotSupportedException` naming the value |
+| Invalid or empty string | `JsonException`; System.Text.Json adds the JSON path | `FormatException` naming the value |
 | Non-string token | `JsonException` | base `TypeConverter` behaviour |
 
-Both converters are `sealed`. `AuidJsonConverter` also implements `ReadAsPropertyName` and
+`AuidTypeConverter` throws `FormatException`, as 1.x did through `Auid.Parse`: MVC model binding
+turns only `FormatException` and `OverflowException` into "The value '…' is not valid…"; any
+other exception becomes a generic invalid-input error. Both converters are `sealed`. `AuidJsonConverter` also implements `ReadAsPropertyName` and
 `WriteAsPropertyName`, so `Dictionary<Auid, T>` serializes with string keys. An empty string is an
 error rather than `Auid.Empty`, because the converter writes `Auid.Empty` as
 `AAA_20010101000000_000000` and an empty value therefore signals bad input. Persisted Tale

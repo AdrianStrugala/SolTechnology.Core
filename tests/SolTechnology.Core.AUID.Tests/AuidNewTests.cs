@@ -205,6 +205,52 @@ public class AuidNewTests
     }
 
     [Test]
+    public void New_ClockBeforeEpoch_Throws()
+    {
+        // Arrange
+        var before2001 = new FakeTimeProvider();
+
+        // Act
+        var act = () => Auid.New("ORD", before2001);
+
+        // Assert
+        before2001.GetUtcNow().Year.Should().Be(2000);
+        act.Should().Throw<InvalidOperationException>().WithMessage("*before the AUID epoch*");
+    }
+
+    [Test]
+    public void New_ClockWithNonZeroOffset_EncodesUtcTime()
+    {
+        // Arrange
+        var plusTwoHoursClock = new FakeTimeProvider(new DateTimeOffset(2024, 12, 5, 14, 34, 56, TimeSpan.FromHours(2)));
+
+        // Act
+        var auid = Auid.New("USR", plusTwoHoursClock);
+
+        // Assert
+        auid.ToString().Should().StartWith("USR_20241205123456_");
+    }
+
+    [TestCase(-12)]
+    [TestCase(14)]
+    public void New_OverflowCheck_IsOffsetIndependent(int offsetHours)
+    {
+        // Arrange
+        var lastValidUtc = new DateTimeOffset(2001, 1, 1, 0, 0, 0, TimeSpan.Zero).AddSeconds((1L << 32) - 1);
+        var offset = TimeSpan.FromHours(offsetHours);
+        var atLimit = new FakeTimeProvider(lastValidUtc.ToOffset(offset));
+        var pastLimit = new FakeTimeProvider(lastValidUtc.AddSeconds(1).ToOffset(offset));
+
+        // Act
+        var atLimitAct = () => Auid.New("ORD", atLimit);
+        var pastLimitAct = () => Auid.New("ORD", pastLimit);
+
+        // Assert
+        atLimitAct.Should().NotThrow();
+        pastLimitAct.Should().Throw<InvalidOperationException>().WithMessage("*Papież Polak robi BUM*");
+    }
+
+    [Test]
     public void New_WithTimeProvider_UsesItsClock()
     {
         // Arrange
