@@ -1,7 +1,7 @@
 ---
 spec: 2026-11-02-core-2-0-logging
 step: 01
-status: to-do
+status: done
 ---
 
 # Step 01: DI resolution test — Logging
@@ -24,8 +24,8 @@ Former core step 10 (Logging part); split per library on 2026-11-02.
 - Follow the [`test-writing`](../../../../.github/skills/test-writing/SKILL.md) skill. No shared helper in a shipped package.
 
 ## Acceptance criteria
-- [ ] `dotnet test tests/SolTechnology.Core.Logging.Tests` is green, with exactly one ignored test (B4).
-- [ ] Removing the `[Ignore]` locally reproduces the "Unable to resolve service for type 'ITimingService'" failure.
+- [x] `dotnet test tests/SolTechnology.Core.Logging.Tests` is green, with exactly one ignored test (B4).
+- [x] Removing the `[Ignore]` locally reproduces the "Unable to resolve service for type 'ITimingService'" failure.
 
 ## Open questions
 - none
