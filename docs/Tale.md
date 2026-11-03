@@ -1,557 +1,300 @@
-# SolTechnology.Core.Tale
+## SolTechnology.Core.Tale
 
-> **Workflows that read like prose.** A narrative-driven orchestration framework for
-> multi-step business processes — automated pipelines, interactive sagas, durable long-running
-> workflows. Pluggable persistence, typed lifecycle, zero magic.
+Write multi-step business processes as a `Tale`: a `Tell()` method that reads like a table of
+contents, chapters that do one thing each, and an engine that runs them, pauses for user input,
+and persists the tale between requests.
 
 [![NuGet](https://img.shields.io/nuget/v/SolTechnology.Core.Tale.svg)](https://www.nuget.org/packages/SolTechnology.Core.Tale/)
 
-## Why Tale?
+### Features
 
-Most workflow engines force you to learn a DSL, fight a state machine, or accept a runtime
-that hijacks your code. Tale does the opposite — your workflow **is** a `Tale`: a fluent table
-of contents the engine reads top-to-bottom.
+- `Tell()` returns a fluent plan — `Open`, `Read`, `Expect`, `Otherwise`, `WhenLost`, `Do`,
+  `Finale` — with no branching code in the handler.
+- Chapters are DI-resolved classes that return a `Result` and receive the run's
+  `CancellationToken`, so cancelling the run stops in-flight HTTP or database work.
+- `InteractiveChapter` pauses the tale and publishes its input schema; `TaleManager` resumes it
+  with typed input, across requests and restarts, through a pluggable `ITaleRepository`.
+- Every handler is also a plain CQRS handler: send it through `IMediator` when it needs no pause.
+- Optimistic concurrency and idempotency keys make concurrent starts, resumes and cancels safe.
+- Pause and cancellation are typed errors (`TalePausedError`, `TaleCancelledError`), never strings.
+- `TaleController` gives start / resume / cancel / state endpoints for the handlers you opt in.
 
-- **📖 Tale Code philosophy** — `Tell()` returns a `Tale` that narrates what happens. Chapters
-  are named as actions, chained with `Open`/`Read`. The flow is linear and obvious.
-- **🧩 First-class DI** — chapters and handlers are registered transients; inject repositories,
-  HTTP clients, mediators, anything Scoped — it just works.
-- **⏸ Pause & resume** — interactive chapters declare a typed input schema, the engine persists
-  state, your API resumes the tale when the user replies.
-- **🔌 Pluggable persistence** — in-memory by default, or bring your own
-  (`ITaleRepository`) for SQLite / Postgres / Cosmos / EF Core / whatever.
-  See `DreamTravel.SQLite` for a production-ready SQLite reference implementation.
-- **🛡 Typed lifecycle errors** — `TalePausedError`, `TaleCancelledError` — never parse strings
-  to detect state.
-- **🆔 Idempotency built-in** — `Idempotency-Key` header / `idempotencyKey` parameter deduplicates
-  retries automatically.
-- **🌐 Opt-in REST API** — inherit `TaleController`, get `start` / `resume` / `cancel` / `state`
-  endpoints with the right HTTP semantics out of the box.
+### Registration
 
-## Installation
-
-```bash
-dotnet add package SolTechnology.Core.Tale
-```
-
-## Registration
+`AddSolTale` scans the given assemblies for chapters and handlers; pass the owning assembly
+explicitly.
 
 ```csharp
-// In-memory persistence (default). Ideal for dev, tests, and single-process apps.
-services.AddSolTale();
+using SolTechnology.Core.Tale;
+using SolTechnology.Core.Tale.Builder;
 
-// Scan additional assemblies for chapters & handlers.
-services.AddSolTale(
-    configure: opts => opts.TaleIdPrefix = "ORDER",
-    assemblies: typeof(MySaveCityTale).Assembly);
-
-// Durable SQLite persistence — provided by the DreamTravel sample (DreamTravel.SQLite).
-// Copy the sample project into your app and reference it, then:
-services.AddSolTale(assemblies: typeof(MySaveCityTale).Assembly)
-    .UseTaleRepository<SQLiteTaleRepository>();
-
-// Bring your own backend — Postgres, Cosmos, EF Core, anything implementing ITaleRepository:
-services.AddSolTale()
-    .UseTaleRepository<MyPostgresTaleRepository>(ServiceLifetime.Scoped);
+builder.Services.AddSolTale(assemblies: typeof(ProcessOrderTale).Assembly);
 ```
 
+Choose the persistence provider and the handlers served over HTTP on the returned builder.
 
-`AddSolTale` registers:
+```csharp
+builder.Services.AddSolTale(assemblies: typeof(ProcessOrderTale).Assembly)
+    .UseTaleRepository<MyTaleRepository>(ServiceLifetime.Scoped)
+    .ExposeOverHttp<OrderProcessingTale>();
+```
 
-- All concrete `IChapter<>` implementations as **transient**.
-- All concrete `TaleHandler<,,>` implementations as **transient**.
-- `TaleHandlerRegistry` (singleton) — name-to-type whitelist used by `TaleController`.
-- `TaleManager` (scoped) — the orchestrator.
-- `ITaleRepository` (singleton) — in-memory by default; swapped via `UseTaleRepository<T>()`.
+### Configuration
 
-If no assemblies are passed, the entry assembly and the calling assembly are scanned for
-`IChapter<>` and `TaleHandler<,,>` implementations.
-
-`TaleOptions` — engine-level policies:
-
-| Option | Default | Effect |
+| Option | Default | Purpose |
 |---|---|---|
-| `TaleIdPrefix` | `"STR"` | Prefix for generated `Auid` tale identifiers. |
-| `RestrictControllerToRegisteredHandlers` | `true` | Whitelist enforcement on `TaleController`. |
-
-## Quick start
-
-### 1. Define input, context and output
+| `TaleOptions.TaleIdPrefix` | `"STR"` | Code of the generated `Auid` tale IDs; use one per tenant or environment sharing a store. |
 
 ```csharp
-public class OrderInput  { public int OrderId { get; set; } }
+builder.Services.AddSolTale(o => o.TaleIdPrefix = "ORD", typeof(ProcessOrderTale).Assembly);
+```
+
+### Usage
+
+#### Write a tale
+
+State flows through the `Context`; each chapter reads it, does one thing, and returns a `Result`.
+
+```csharp
+public class OrderInput : IQuery<OrderOutput> { public int OrderId { get; set; } }
 public class OrderOutput { public string Status { get; set; } = ""; }
 
 public class OrderContext : Context<OrderInput, OrderOutput>
 {
-    public string CustomerEmail { get; set; } = "";
-    public decimal TotalAmount { get; set; }
+    public decimal Total { get; set; }
+    public string CustomerName { get; set; } = "";
 }
-```
 
-### 2. Write chapters
-
-```csharp
-public class ValidateOrderChapter : Chapter<OrderContext>
+public class LoadOrder(IOrderRepository orders) : Chapter<OrderContext>
 {
-    public override Task<Result> Read(OrderContext context)
-        => context.Input.OrderId <= 0
-            ? Result.FailAsTask("Invalid order ID")
-            : Result.SuccessAsTask();
+    public override async Task<Result> Read(OrderContext context, CancellationToken cancellationToken)
+    {
+        context.Total = await orders.GetTotal(context.Input.OrderId, cancellationToken);
+        return context.Total > 0 ? Result.Success() : Result.Fail("Empty order");
+    }
 }
-```
 
-### 3. Tell the tale
-
-```csharp
-public class ProcessOrderTale
-    : TaleHandler<OrderInput, OrderContext, OrderOutput>
+public class ProcessOrderTale(IServiceProvider serviceProvider, ILogger<ProcessOrderTale> logger)
+    : TaleHandler<OrderInput, OrderContext, OrderOutput>(serviceProvider, logger),
+      IQueryHandler<OrderInput, OrderOutput>
 {
-    public ProcessOrderTale(IServiceProvider sp, ILogger<ProcessOrderTale> logger)
-        : base(sp, logger) { }
-
     protected override Tale<OrderOutput> Tell() =>
-        Open<ValidateOrderChapter>()
-            .Read<ProcessPaymentChapter>()
-            .Read<SendConfirmationChapter>()
-            .Do(ctx => ctx.Output.Status = "Completed")
+        Open<LoadOrder>()
+            .Expect(ctx => ctx.Total < 10_000, new ValidationError { Message = "Order needs approval." })
+            .Do(ctx => ctx.Output.Status = "Processed")
             .Finale(ctx => ctx.Output);
 }
 ```
 
-### 4. Register and run
+`Tell()` runs again on every resume, so it must not branch on the clock, random values, or flags.
+
+#### Run a tale through `IMediator`
+
+A handler that implements `IQueryHandler`/`ICommandHandler` runs like any CQRS handler, with
+validation and logging; register its assembly with `AddSolCQRS` too.
 
 ```csharp
-services.AddSolTale();
-
-var tale = sp.GetRequiredService<ProcessOrderTale>();
-var result = await tale.Handle(new OrderInput { OrderId = 42 }, CancellationToken.None);
-```
-
-That's it. No DSL. No state machine. No `[Activity]` attributes. Just a `Tale` that reads
-top-to-bottom.
-
-## Core concepts
-
-### `TaleHandler<TInput, TContext, TOutput>`
-
-The orchestrator. Describe your workflow as a `Tale` in `Tell()` — `Open<T>()` reads the first
-chapter, `.Read<T>()` chains the next, `.Finale(ctx => ctx.Output)` concludes. Compatible with
-CQRS — the same handler is also a `IQueryHandler` / `ICommandHandler`. Auto-registered as
-`Transient` by `AddSolTale()`.
-
-> `Tell()` must be **deterministic**. It is re-invoked on every `Handle` call — including each
-> resume of a paused tale — and the engine replays the rebuilt plan against the persisted chapter
-> history. Branch on context state via `Expect` / `Otherwise`, never on ambient inputs (clock,
-> random, feature flags) that can differ between the original run and a resume.
-
-### `Context<TInput, TOutput>`
-
-The state object that flows between chapters. Holds `Input`, `Output`, and any intermediate
-values you want to share. State flows through the `Context`, not through return values — chapters
-return only a `Result` to signal success or failure.
-
-### `Chapter<TContext>`
-
-A unit of business logic. Returns `Result.Success()` or `Result.Fail("reason")`. Resolved from
-DI, so it can declare any dependencies in its constructor.
-
-```csharp
-public class LoadExistingCity : Chapter<SaveCityContext>
+public class OrdersController(IMediator mediator) : ControllerBase
 {
-    private readonly ICityRepository _repository;
-
-    public LoadExistingCity(ICityRepository repository) => _repository = repository;
-
-    public override async Task<Result> Read(SaveCityContext ctx)
-    {
-        ctx.ExistingCity = await _repository.FindByName(ctx.Input.CityName);
-        return Result.Success();
-    }
+    [HttpPost]
+    public async Task<IActionResult> Process([FromBody] OrderInput input, CancellationToken cancellationToken)
+        => Ok(await mediator.Send(input, cancellationToken));
 }
 ```
 
-**Best practices**
+Such a direct run is not persisted. If it pauses on an interactive chapter it returns
+`TalePausedError`, logs a warning, and cannot be resumed: start interactive tales through
+`TaleManager`.
 
-- Keep each chapter focused on one thing. If the name needs an "And", split it.
-- Inject what you need — chapters are `Transient`, constructor injection is free.
-- Return `Result.Fail("reason")` instead of throwing. Exceptions are caught and wrapped,
-  but explicit failures produce cleaner error trails.
-- Don't mutate `ctx.Input` — treat it as read-only. Write intermediate data as new properties
-  on the `Context`.
-- Don't populate `ctx.Output` until the final chapter — keeps partial failures from leaking
-  half-baked results.
+#### Pause for input
 
-### `InteractiveChapter<TContext, TChapterInput>`
-
-A chapter that pauses the tale and waits for caller input. Declares its expected input shape so
-consumers (a SPA, a form generator, OpenAPI-driven clients) can render the right UI without
-hardcoding field lists:
+An interactive chapter pauses the tale until `ResumeStory` supplies its input; returning
+`Result.Fail` keeps the tale paused so the caller can retry.
 
 ```csharp
-public class RequestCustomerDetails
-    : InteractiveChapter<OrderContext, CustomerDetails>
-{
-    public override List<DataField> GetRequiredInputSchema() => new()
-    {
-        new() { Name = "Name",    Type = "string", Required = true  },
-        new() { Name = "Email",   Type = "string", Required = true  },
-        new() { Name = "Address", Type = "string", Required = false },
-    };
+public class CustomerDetails { public string Name { get; set; } = ""; }
 
-    public override Task<Result> ReadWithInput(OrderContext ctx, CustomerDetails input)
+public class RequestCustomerDetails : InteractiveChapter<OrderContext, CustomerDetails>
+{
+    public override Task<Result> ReadWithInput(
+        OrderContext context, CustomerDetails userInput, CancellationToken cancellationToken)
     {
-        if (string.IsNullOrWhiteSpace(input.Name))
+        if (string.IsNullOrWhiteSpace(userInput.Name))
         {
             return Result.FailAsTask("Customer name is required");
         }
 
-        ctx.CustomerName  = input.Name;
-        ctx.CustomerEmail = input.Email;
+        context.CustomerName = userInput.Name;
         return Result.SuccessAsTask();
     }
 }
 ```
 
-Minimal variant — just the logic, schema inferred from `TChapterInput` via reflection:
-
 ```csharp
-public class CollectEmailChapter : InteractiveChapter<OrderContext, EmailInput>
+public class OrderProcessingTale(IServiceProvider serviceProvider, ILogger<OrderProcessingTale> logger)
+    : TaleHandler<OrderInput, OrderContext, OrderOutput>(serviceProvider, logger)
 {
-    public override Task<Result> ReadWithInput(OrderContext ctx, EmailInput input)
-    {
-        if (!input.Email.Contains("@"))
-        {
-            return Result.FailAsTask("Invalid e-mail");
-        }
-
-        ctx.CustomerEmail = input.Email;
-        return Result.SuccessAsTask();
-    }
-}
-```
-
-**Best practices**
-
-- Validate inside `ReadWithInput` — treat the paused input as untrusted. Return `Result.Fail`
-  with a human-readable reason; the error surfaces in the HTTP response.
-- Keep `TChapterInput` narrow. One chapter, one conceptual step of user interaction.
-- Override `GetRequiredInputSchema()` only when you need hand-tuned metadata (hints, default
-  values, richer types). Otherwise, let reflection derive it.
-
-### `TaleManager`
-
-Orchestrates persisted workflows: `StartStory`, `ResumeStory`, `CancelStory`, `GetStoryState`.
-Creates a fresh DI scope per invocation, so Scoped dependencies (`DbContext`, EF Core,
-per-request services) work correctly across pause/resume boundaries.
-
-## Use cases
-
-### Order checkout with pause-for-customer-details
-
-A classic e-commerce flow. Validation and inventory check run automatically; the tale pauses to
-collect customer details from the user; payment and confirmation run after the resume.
-
-```csharp
-public class OrderProcessingTale
-    : TaleHandler<OrderInput, OrderContext, OrderOutput>
-{
-    public OrderProcessingTale(IServiceProvider sp, ILogger<OrderProcessingTale> log)
-        : base(sp, log) { }
-
     protected override Tale<OrderOutput> Tell() =>
-        Open<ValidateOrder>()                  // automated
-            .Read<ReserveInventory>()          // automated
-            .Read<RequestCustomerDetails>()    // ⏸ pause — interactive
-            .Read<ProcessPayment>()            // automated, runs on resume
-            .Read<SendConfirmation>()          // automated
+        Open<LoadOrder>()
+            .Read<RequestCustomerDetails>()
+            .Do(ctx => ctx.Output.Status = $"Confirmed for {ctx.CustomerName}")
             .Finale(ctx => ctx.Output);
 }
 ```
 
-Driving the lifecycle from your application code:
+The schema comes from the input type's public properties (`GetRequiredInputSchema()`); input that
+does not deserialize keeps the tale paused with a `ValidationError` naming the JSON path.
+
+#### Start, resume and cancel with `TaleManager`
+
+`TaleManager` persists every step, runs each call in its own DI scope, and returns the stored
+`TaleInstance`.
 
 ```csharp
-var manager = sp.GetRequiredService<TaleManager>();
+var start = await taleManager.StartStory<OrderProcessingTale, OrderInput, OrderContext, OrderOutput>(
+    new OrderInput { OrderId = 42 }, idempotencyKey: "order-42", cancellationToken);
+var taleId = start.Data!.TaleId;                      // Status: WaitingForInput
+var fields = start.Data.CurrentChapter!.RequiredData; // render a form from the schema
 
-// 1. Start — runs up to the first interactive chapter.
-var start = await manager.StartStory<OrderProcessingTale, OrderInput, OrderContext, OrderOutput>(
-    new OrderInput { Cart = cart });
+var input = JsonSerializer.SerializeToElement(new CustomerDetails { Name = "Jan" });
+var resume = await taleManager.ResumeStory<OrderProcessingTale, OrderInput, OrderContext, OrderOutput>(
+    taleId, input, cancellationToken);                // Status: Completed
 
-if (start.IsSuccess && start.Data!.Status == TaleStatus.WaitingForInput)
-{
-    var taleId = start.Data.TaleId;
-
-    // 2. Inspect the schema required for the paused chapter — render a form from it.
-    foreach (var field in start.Data.CurrentChapter!.RequiredData)
-    {
-        Console.WriteLine($"  {field.Name} ({field.Type}) {(field.Required ? "*" : "")}");
-    }
-
-    // 3. Later, after the user submits, resume with the typed payload.
-    var userInput = JsonSerializer.SerializeToElement(new CustomerDetails
-    {
-        Name  = "John Doe",
-        Email = "john@example.com",
-    });
-
-    var resume = await manager.ResumeStory<OrderProcessingTale, OrderInput, OrderContext, OrderOutput>(
-        taleId, userInput);
-
-    if (resume.IsSuccess && resume.Data!.Status == TaleStatus.Completed)
-    {
-        // Payment processed, confirmation sent.
-    }
-}
+var state = await taleManager.GetStoryState(taleId, cancellationToken);
 ```
 
-Between start and resume, pull a snapshot of the tale state any time — audit logs, dashboards,
-"resume later" links in an email:
-
-```csharp
-var state = await manager.GetStoryState(taleId);
-Console.WriteLine($"Status: {state.Data!.Status}");
-Console.WriteLine($"Current: {state.Data.CurrentChapter?.ChapterId}");
-Console.WriteLine($"History: {state.Data.History.Count} chapters executed");
-```
-
-### Approval workflow with multiple pause points
-
-A request-for-approval pipeline where each approver pauses the tale in turn. Same mechanism,
-different shape — two interactive chapters in sequence.
-
-```csharp
-public class ExpenseApprovalTale
-    : TaleHandler<ExpenseInput, ExpenseContext, ExpenseOutput>
-{
-    public ExpenseApprovalTale(IServiceProvider sp, ILogger<ExpenseApprovalTale> log)
-        : base(sp, log) { }
-
-    protected override Tale<ExpenseOutput> Tell() =>
-        Open<ClassifyExpense>()                    // automated
-            .Read<ManagerApprovalChapter>()        // ⏸ pause — manager signs off
-            .Read<FinanceApprovalChapter>()        // ⏸ pause — finance signs off (only if > threshold)
-            .Read<PostToLedger>()                  // automated
-            .Read<NotifyRequester>()               // automated
-            .Finale(ctx => ctx.Output);
-}
-```
-
-Two real callers, two resumes — between them the tale sits persisted in the repository.
-Persistence survives process restarts, so the manager can approve on Monday and finance on
-Wednesday.
-
-### User onboarding with progressive disclosure
-
-Long-form interactive flow — collect minimum info up front, pause, collect more, pause, etc. The
-`Context` accumulates data between pauses; each interactive chapter only cares about *its* slice.
-
-```csharp
-public class UserOnboardingTale
-    : TaleHandler<OnboardingInput, OnboardingContext, OnboardingOutput>
-{
-    public UserOnboardingTale(IServiceProvider sp, ILogger<UserOnboardingTale> log)
-        : base(sp, log) { }
-
-    protected override Tale<OnboardingOutput> Tell() =>
-        Open<CollectBasicInfoChapter>()            // ⏸ name, email
-            .Read<SendVerificationEmail>()         // automated
-            .Read<VerifyEmailChapter>()            // ⏸ verification code
-            .Read<CollectPreferencesChapter>()     // ⏸ preferences
-            .Read<CompleteOnboardingChapter>()     // automated — creates account
-            .Finale(ctx => ctx.Output);
-}
-```
-
-The engine automatically skips chapters already recorded in `History` when resuming, so refreshing
-the browser or retrying the request is safe.
-
-### Direct handler usage (simple, no persistence)
-
-For a fully automated tale you can skip `TaleManager` and call the handler directly — it is a
-plain CQRS handler:
-
-```csharp
-public class OrderController : ControllerBase
-{
-    private readonly ProcessOrderTale _tale;
-    public OrderController(ProcessOrderTale tale) { _tale = tale; }
-
-    [HttpPost]
-    public async Task<IActionResult> Post([FromBody] OrderInput input)
-    {
-        var result = await _tale.Handle(input, CancellationToken.None);
-        return result.IsSuccess ? Ok(result.Data) : BadRequest(result.Error);
-    }
-}
-```
-
-## Pause as state (NOT pause as failure)
-
-When a tale pauses, `Handle(...)` returns `Result<TOutput>.Fail(new TalePausedError(...))`.
-`TaleManager` transparently converts that into `Result<TaleInstance>.Success(...)` with
-`Status = WaitingForInput`. Detect pause with a **type test**, never with a string match:
-
-```csharp
-if (result.IsFailure && result.Error is TalePausedError paused)
-{
-    // Tale paused at paused.ChapterId inside paused.TaleId
-}
-```
-
-Analogous: `TaleCancelledError`.
-
-## Persistence
-
-Persistence providers plug in through the builder returned by `AddSolTale()`. The default is
-in-memory, so interactive tales work the moment you call `AddSolTale()` with no arguments.
-
-```csharp
-// Default: in-memory (dev/test/single-process).
-services.AddSolTale();
-// equivalent to:
-services.AddSolTale().UseInMemoryTaleRepository();
-
-// Production: SQLite — provided by the DreamTravel sample (DreamTravel.SQLite).
-// Copy it into your app, reference it, then:
-services.AddSolTale()
-    .UseTaleRepository<SQLiteTaleRepository>();
-
-// Bring your own backend — Postgres, Cosmos, EF Core, anything that implements ITaleRepository:
-services.AddSolTale()
-        .UseTaleRepository<MyPostgresTaleRepository>(ServiceLifetime.Scoped);
-```
-
-> Implementing a custom backend? `ITaleRepository` is a five-method interface
-> (`FindById`, `FindByIdempotencyKey`, `ListAsync`, `SaveAsync`, `DeleteAsync`).
-> See `InMemoryTaleRepository` (in-box) and the sample's `SQLiteTaleRepository`
-> (`DreamTravel.SQLite`) for reference implementations.
-
-## Idempotency
-
-```csharp
-await manager.StartStory<…>(input, idempotencyKey: "order-42");
-```
-
-Retries with the same key return the existing tale instead of starting a new one. Works through
-the HTTP `Idempotency-Key` header on `TaleController.StartStory` too.
-
-## Cancellation
-
-```csharp
-await manager.CancelStory(taleId);
-```
-
-Status becomes `Cancelled`. Subsequent resume attempts fail cleanly.
-
-## Error handling
-
-Chapters return `Result.Success()` / `Result.Fail("reason")`. The tale runs on two tracks —
-**won** or **lost**. The first failed chapter switches the tale to the lost track and the
-remaining chapters are skipped; the failing `Error` becomes the tale result. Recover from an
-acceptable failure with `.Otherwise<FallbackChapter>()` (or an inline `.Otherwise(ctx => …)`) to
-switch back to the won track.
-
-Marker error types — detect by **type**, never by string:
-
-| Error | Meaning |
+| Resume of a tale that is | Result |
 |---|---|
-| `TalePausedError` | Tale is waiting for user input at an interactive chapter. |
-| `TaleCancelledError` | Tale was cancelled by token or `CancelStory`. |
+| `WaitingForInput` | Runs from the paused chapter; completed chapters are skipped. |
+| `Running` (another call owns it) | `ConflictError` "Tale is already running". |
+| `Failed` | `ConflictError`; fallbacks do not run again. |
+| `Completed` or `Cancelled` | Failure, nothing runs. |
+| saved by 1.x | Failure asking to restart the tale. |
 
-**Best practices**
+A second `StartStory` with the same idempotency key, even a concurrent one, returns the first
+tale. `CancelStory(taleId, ct)` wins over a running tale, which stops at its next save with
+`ConflictError`. Only the caller's token cancels a tale; any other `OperationCanceledException`,
+such as an `HttpClient` timeout, fails the chapter.
 
-- Use `is TalePausedError` / `is TaleCancelledError` in callers. Never `Message.Contains(...)`.
-- Prefer `Result.Fail("business reason")` over `throw` in chapter bodies — exceptions are wrapped
-  but your reason string is clearer than a stack trace.
-- Recover from an acceptable failure with `.Otherwise<FallbackChapter>()` (or an inline
-  `.Otherwise(ctx => …)`) instead of letting it abort the tale.
+#### Guards and recovery
 
-## REST API
+| Step | Runs when | Effect |
+|---|---|---|
+| `Read<TChapter>()` | the tale is not lost | Runs the chapter; a failure loses the tale. |
+| `Expect(condition, error)` | the tale is not lost | Loses the tale with `error` unless `condition` holds. |
+| `Otherwise<TChapter>()` / `Otherwise(func)` | the tale is lost | Clears the error and runs the fallback. |
+| `WhenLost(effect)` / `WhenWon(effect)` | lost / not lost | Side effect only, such as a log line. |
+| `Do(step)` | the tale is not lost | Inline context change that may return a `Result`. |
 
-Inherit `TaleController` and add your auth attributes:
+The first error is the tale's result; `TalePausedError` and `TaleCancelledError` mark a paused and
+a cancelled run, so test with `result.Error is TalePausedError`.
+
+#### Expose over HTTP
+
+`TaleController` serves only handlers opted in with `ExposeOverHttp<THandler>()`; every other
+name returns a plain 404, and the server logs a warning when the name belongs to a scanned handler.
 
 ```csharp
-public class OrderTaleController : TaleController
+[Authorize]
+[Route("api/orders/tale")]
+public class OrderTaleController(
+    TaleManager taleManager, TaleHandlerRegistry registry, TaleOptions options, ILogger<TaleController> logger)
+    : TaleController(taleManager, registry, options, logger);
+```
+
+| Method | Path | Response |
+|---|---|---|
+| POST | `{route}/{handlerName}/start` | 202 when paused, 200 when completed; honours `Idempotency-Key`. |
+| POST | `{route}/{taleId}` | Resume with the JSON body as input; 202 or 200. |
+| GET | `{route}/{taleId}` | Current state without the stored context. |
+| GET | `{route}/{taleId}/result` | Output of a completed tale. |
+| DELETE | `{route}/{taleId}` | Cancel. |
+
+Business failures return 400; unexpected errors return 500 with a fixed message and the
+correlation ID, never the exception text.
+
+#### Persistence and custom repositories
+
+`UseTaleRepository<T>()` replaces the in-memory default; a repository must honour this contract.
+
+| Member | Contract |
+|---|---|
+| `Save(instance, ct)` | Write only when the stored version (a missing tale counts as `0`) equals `instance.Version`; then store and set `Version + 1`. Otherwise, or when a new tale reuses another tale's idempotency key, return `Result.Fail(new ConflictError { ... })` without writing. |
+| `FindById`, `FindByIdempotencyKey` | Return a copy, or `null` when missing. |
+| `List(...)` | Optional; the default throws `NotSupportedException`. |
+| `Delete(id, ct)` | Remove the tale; no error when it is missing. |
+
+Serialize `History` and `CurrentChapter` with `TaleJsonOptions.Default`, which keeps the
+`TalePausedError` and `TaleCancelledError` types. The DreamTravel sample's `SQLiteTaleRepository`
+is a reference implementation with a `Version` column and a conditional `UPDATE`.
+
+#### Logging
+
+Engine entries use your handler's logger category (for example `MyApp.Orders.ProcessOrderTale`)
+inside a scope with `TaleHandler` and `TaleId`; `TaleManager` and `TaleController` log under their
+full type names in `SolTechnology.Core.Tale`.
+
+#### Upgrading from 1.x
+
+Tales saved by 1.x cannot be resumed by 2.x, because 2.x matches chapter history by step position
+and full type name. Finish or cancel in-flight tales first, then cut every Tale host over in one
+step: stop all 1.x hosts before a 2.x host serves tale traffic. Do not roll back to 1.x once a 2.x
+host has written tale state; 2.x stores Tale error types, `StepIndex` and `Version` that 1.x cannot
+read or preserve. Custom repositories add the `Version` column and the conditional `Save` above.
+
+### Testing
+
+Run tales against the in-memory repository with a real `ServiceCollection`.
+
+```csharp
+[Test]
+public async Task StartStory_EmptyOrder_FailsAndPersistsFailure()
 {
-    public OrderTaleController(
-        TaleManager manager,
-        TaleHandlerRegistry registry,
-        TaleOptions options,
-        ILogger<TaleController> logger)
-        : base(manager, registry, options, logger) { }
+    // Arrange
+    var services = new ServiceCollection().AddLogging();
+    services.AddSingleton<IOrderRepository>(new FakeOrderRepository(total: 0));
+    services.AddSolTale(assemblies: typeof(ProcessOrderTale).Assembly);
+    await using var provider = services.BuildServiceProvider();
+    var taleManager = provider.GetRequiredService<TaleManager>();
+
+    // Act
+    var result = await taleManager.StartStory<ProcessOrderTale, OrderInput, OrderContext, OrderOutput>(
+        new OrderInput { OrderId = 1 });
+
+    // Assert
+    result.Error!.Message.Should().Be("Empty order");
+    var stored = await provider.GetRequiredService<ITaleRepository>().List(TaleStatus.Failed);
+    stored.Should().ContainSingle();
 }
 ```
 
-Endpoints:
+### Conventions
 
-| Method | Path | Purpose |
-|--------|------|---------|
-| POST   | `/api/tale/{handlerName}/start` | Start a new tale (whitelisted handlers only) |
-| POST   | `/api/tale/{taleId}`             | Resume a paused tale |
-| DELETE | `/api/tale/{taleId}`             | Cancel a running / paused tale |
-| GET    | `/api/tale/{taleId}`             | Current state |
-| GET    | `/api/tale/{taleId}/result`      | Deserialized output (Completed only) |
+- Keep `Tell()` free of `if`, loops and `try`; branch with `Expect` and `Otherwise`.
+- One chapter, one verb, one file; never call one chapter from another.
+- Pass the chapter's `CancellationToken` to every awaited call.
+- Return `Result.Fail` for business failures; keep secrets and personal data out of the `Context`,
+  which is stored as JSON.
+- Expose only the interactive workflows a client must drive, behind authorization.
 
-`Idempotency-Key` header is honored on `/start` — retried calls with the same key return the
-existing instance instead of creating a new one.
+### What ships in DI
 
-HTTP semantics:
+| Service | Lifetime | Notes |
+|---|---|---|
+| Chapters and handlers from the scanned assemblies | Transient | Concrete `IChapter<>` and `TaleHandler<,,>` types. |
+| `ITaleRepository` | Singleton | `InMemoryTaleRepository` until `UseTaleRepository<T>()`. |
+| `TaleManager` | Scoped | Creates its own scope per call. |
+| `TaleHandlerRegistry` | Singleton | Handlers exposed over HTTP. |
+| `TaleOptions` | Singleton | Shared by every `AddSolTale` call. |
 
-- `Status.WaitingForInput` → `202 Accepted`
-- `Status.Completed` → `200 OK`
-- `Status.Failed` / not found → `4xx`
+### Working with AI Agent
 
-Only handlers registered through `AddSolTale()` are exposed (whitelist via
-`TaleHandlerRegistry`).
-
-## Security notes
-
-- Only handlers reachable through `TaleHandlerRegistry` are exposed — add authorization
-  attributes (`[Authorize(...)]`) to your derived controller before exposing it publicly.
-- Do not place secrets or PII in `Context`. For SQLite persistence, prefer filesystem-level
-  encryption or store references to an external secret store and load them on demand.
-- The sample `SQLiteTaleRepository` validates the supplied path. Do not interpolate
-  user-controlled strings into connection strings.
-
-## Observability
-
-Every log entry emitted by the engine is scoped with `TaleId` and `TaleHandler`, so configure
-your logger filters accordingly:
-
-```csharp
-logging.AddFilter("SolTechnology.Core.Tale.Orchestration.TaleEngine", LogLevel.Information);
-```
-
-## Versioning
-
-Handler versioning (compatibility checks on resume after redeploy) is **not currently
-implemented**. Today the engine accepts any persisted state regardless of how the handler
-has changed; you are responsible for keeping chapter sequences and context shapes
-backward-compatible when redeploying with in-flight tales.
-
-## Not supported (yet)
-
-Parallel chapter execution, durable retries with backoff, cross-process sagas / compensation,
-distributed tracing via `ActivitySource`, and handler versioning.
-
-## Working with AI Agent
-
-Writing a Tale with an AI assistant (GitHub Copilot, Claude Code)? The repository ships a
-**skill** — a narrow, file-cited procedure your agent can read on demand:
+The repository ships a **skill** your AI assistant (GitHub Copilot, Claude Code) can read on demand:
 
 - [`command-query-event-tale`](https://github.com/AdrianStrugala/SolTechnology.Core/blob/master/.github/skills/command-query-event-tale/SKILL.md)
-  — decide when a handler becomes a Tale, keep the `Tell()` Tale logic-free, name chapters
-  one-verb-per-file, flow state through the `Context`, and choose where the Tale lives
-  (`Commands`/`Queries` vs a domain-model `DomainServices` Tale vs a persisted interactive
-  `Workflows` Tale).
+  — decide when a handler becomes a Tale, keep `Tell()` logic-free, name chapters one-verb-per-file,
+  and choose where the Tale lives (`Commands`/`Queries`, `DomainServices`, or `Workflows`).
 
-It points at the binding rules in the Coding Guide — [§4 — Tale framework](https://github.com/AdrianStrugala/SolTechnology.Core/blob/master/docs/ClaudeCodingGuide.md)
+It points at the binding rules in the Coding Guide —
+[§4 — Tale framework](https://github.com/AdrianStrugala/SolTechnology.Core/blob/master/docs/ClaudeCodingGuide.md)
 keeps the anatomy and chapter rules in one place.
-
-## Related documentation
-
-- [Tale Code philosophy (`docs/ClaudeCodingGuide.md`)](./ClaudeCodingGuide.md)
-- [Tale framework architecture](./architecture/tale-framework.md)
-- [Component & sequence diagrams](./diagrams/README.md)
-- [Authoring skill: `command-query-event-tale`](https://github.com/AdrianStrugala/SolTechnology.Core/blob/master/.github/skills/command-query-event-tale/SKILL.md)
