@@ -30,7 +30,7 @@ and premortem verdicts above cover the regrouped plan (user decision, 2026-11-02
 | 02 | Fail CI on any test-project failure | [`steps/02-fail-ci-on-any-test-failure.md`](steps/02-fail-ci-on-any-test-failure.md) | done |
 | 03 | Publish to nuget.org only from `v*` tags behind a protected environment | [`steps/03-publish-only-from-tags.md`](steps/03-publish-only-from-tags.md) | done |
 | 04 | Bump every package to 2.0.0 | [`steps/04-bump-version-2-0-0.md`](steps/04-bump-version-2-0-0.md) | done |
-| 05 | DreamTravel — Development-only developer exception page | [`steps/05-dreamtravel-dev-only-exception-page-and-credentials.md`](steps/05-dreamtravel-dev-only-exception-page-and-credentials.md) | to-do |
+| 05 | DreamTravel — Development-only developer exception page | [`steps/05-dreamtravel-dev-only-exception-page-and-credentials.md`](steps/05-dreamtravel-dev-only-exception-page-and-credentials.md) | done |
 | 06 | Remove leaked-secret artifacts and personal settings; record revocation | [`steps/06-remove-leaked-secret-artifacts.md`](steps/06-remove-leaked-secret-artifacts.md) | to-do |
 | 07 | Packaging — a truly zero-dependency `SolTechnology.Core` | [`steps/07-zero-dependency-base-package.md`](steps/07-zero-dependency-base-package.md) | to-do |
 | 08 | XML docs — one central `GenerateDocumentationFile` switch | [`steps/08-xml-docs-central-switch.md`](steps/08-xml-docs-central-switch.md) | to-do |

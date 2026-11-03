@@ -1,7 +1,7 @@
 ---
 spec: 2026-11-02-core-2-0-flagship-hardening
 step: 05
-status: to-do
+status: done
 ---
 
 # Step 05: DreamTravel — Development-only developer exception page
@@ -27,13 +27,19 @@ Former core step 08; moved here by the per-library regroup (user, 2026-11-02).
 - No credential change (decision B, user, 2026-11-02; AR-6).
 
 ## Acceptance criteria
-- [ ] `cd sample-tale-code-apps/DreamTravel && dotnet build` is green.
-- [ ] `dotnet test sample-tale-code-apps/DreamTravel/tests/Component/DreamTravel.Component.Tests.csproj` is green (Docker).
-- [ ] `Program.cs` has no `"dupa"`.
-- [ ] `S6` regression: the new Production-environment component test fails on `4097d47f` and passes after the change.
-- [ ] `git diff --stat origin/master -- sample-tale-code-apps/DreamTravel` lists only `Program.cs` and files under `tests/Component/`.
+- [x] `cd sample-tale-code-apps/DreamTravel && dotnet build` is green.
+- [x] `dotnet test sample-tale-code-apps/DreamTravel/tests/Component/DreamTravel.Component.Tests.csproj` is green (Docker).
+- [x] `Program.cs` has no `"dupa"`.
+- [x] `S6` regression: the new Production-environment component test fails on `4097d47f` and passes after the change.
+- [x] `git diff --stat origin/master -- sample-tale-code-apps/DreamTravel` lists only `Program.cs` and files under `tests/Component/`.
 
 ## Open questions
 - none
 
 ## Deviations
+
+### Generic error handler outside Development
+
+**Original plan:** gate `UseDeveloperExceptionPage()` with `app.Environment.IsDevelopment()`.
+
+**Actual implementation:** the `else` branch also calls `app.UseExceptionHandler()`, so Production answers an unhandled exception with a generic `application/problem+json` 500 through the `IProblemDetailsService` that `AddSolApiCore` registers; without it TestServer and Kestrel return an empty 500 and the planned test name ("ReturnsProblemDetails") could not hold. This matches the `ExceptionFilter` contract ("UseExceptionHandler in Production decides"). The test throws from an `IStartupFilter` branch appended after the app pipeline and boots the host with `environment=Production`; before the fix it failed because the response carried the exception message and full stack trace with local file paths. All 19 DreamTravel component tests pass.
