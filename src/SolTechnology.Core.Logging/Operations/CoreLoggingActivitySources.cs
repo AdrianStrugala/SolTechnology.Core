@@ -28,7 +28,10 @@ public static class CoreLoggingActivitySources
     /// </summary>
     public const string OperationsName = "SolTechnology.Core.Logging.Operations";
 
-    /// <summary>Internal handle used by the pipeline behavior. Not part of the public API.</summary>
-    public static readonly ActivitySource Operations = new(OperationsName);
+    /// <summary>
+    /// Handle for operations emitted by this assembly. Other packages create their own
+    /// <see cref="ActivitySource"/> named <see cref="OperationsName"/>; listeners see both.
+    /// </summary>
+    internal static readonly ActivitySource Operations = new(OperationsName);
 }
 

@@ -9,7 +9,7 @@ namespace SolTechnology.Core.Logging;
 /// over <c>ILogger.Log(...)</c> with <c>params object[]</c> are real.
 /// </summary>
 /// <remarks>
-/// Internal: consumers call the public extensions on <see cref="ILoggerExtensions"/>,
+/// Internal: consumers call the public extensions on <see cref="LoggerExtensions"/>,
 /// which forward here.
 /// </remarks>
 internal static partial class OperationLogMessages
