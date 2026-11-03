@@ -1,7 +1,7 @@
 ---
 spec: 2026-11-02-core-2-0-api-auth
-review: pending
-premortem: pending
+review: skipped (mechanical rename requested by the owner; the rest of the plan was reviewed 2026-11-02 — user, 2026-11-03)
+premortem: skipped (step 01 is a mechanical rename requested by the owner; steps 02–11 covered by the core premortem go-with-mitigations 2026-11-02 — user, 2026-11-03)
 ---
 
 # SolTechnology.Core 2.0 — Api and Auth — Implementation Summary
@@ -9,8 +9,7 @@ premortem: pending
 Tracks temporary implementation state for
 [`../2026-11-02-core-2-0-api-auth.md`](../2026-11-02-core-2-0-api-auth.md).
 
-Gate order: `review` (plan-reviewer) → step `00` premortem (step 01 only) → steps `01`–`10` →
-`11` retrospective. Step 01 starts after core 02–04 of
+Gate order: steps `01`–`10` → `11` retrospective (both gates skipped by the user, see frontmatter). Step 01 starts after core 02–04 of
 [`../2026-11-02-core-2-0-flagship-hardening.md`](../2026-11-02-core-2-0-flagship-hardening.md)
 are `done` and after these library features are `completed`: `result`; `logging`; `http`. No step
 is `blocked`.
@@ -25,13 +24,13 @@ Gate history:
   `SolTechnology.Core.Auth`, `C-28`): step 01 was inserted and former steps 01–10 became 02–11.
   `review` is `pending` again because the plan gained a breaking public API step after review.
   `premortem` is `pending` because step 01 edits a `ModuleInstaller.cs` and the core premortem
-  predates `C-28`; step 00 runs it for step 01 only. Only the user may skip either gate.
+  predates `C-28`.
+- 2026-11-03: the user skipped both gates for the rename ("skip": a mechanical rename they requested); step 00 was removed.
 
 ## Steps
 
 | # | Title | File | Status |
 |---|---|---|---|
-| 00 | Run premortem (gate) — step 01 rename | [`steps/00-run-premortem.md`](steps/00-run-premortem.md) | to-do |
 | 01 | Auth — rename SolTechnology.Core.Authentication to SolTechnology.Core.Auth | [`steps/01-rename-authentication-to-auth.md`](steps/01-rename-authentication-to-auth.md) | to-do |
 | 02 | DI resolution test — Api and Auth | [`steps/02-di-resolution-test.md`](steps/02-di-resolution-test.md) | to-do |
 | 03 | Keep upstream URIs and query strings out of `ProblemDetails` and exception messages | [`steps/03-no-upstream-uri-in-problem-details.md`](steps/03-no-upstream-uri-in-problem-details.md) | to-do |
