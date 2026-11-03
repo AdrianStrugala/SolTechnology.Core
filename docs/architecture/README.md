@@ -25,6 +25,7 @@ no longer describe the current system.
 - [Result and errors](core-result-and-errors.md)
 - [Delivery workflow](delivery-workflow.md)
 - [HTTP clients](http-client.md)
+- [Logging](logging.md)
 - [Naming and public API](naming-and-public-api.md)
 - [Package release](package-release.md)
 - [Tale framework](tale-framework.md)
