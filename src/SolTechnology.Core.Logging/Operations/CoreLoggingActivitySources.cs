@@ -21,8 +21,8 @@ namespace SolTechnology.Core.Logging.Operations;
 public static class CoreLoggingActivitySources
 {
     /// <summary>
-    /// Emits one <see cref="Activity"/> per logical operation tracked by the MediatR
-    /// pipeline behavior in <c>SolTechnology.Core.CQRS</c> (one Activity per request type).
+    /// Name of the sources that emit one <see cref="Activity"/> per command or query tracked by
+    /// the logging pipeline behavior in <c>SolTechnology.Core.CQRS</c>, which owns its own source.
     /// Tags mirror the <c>[LogScope]</c>-projected scope properties so trace UI and structured
     /// logs use identical keys.
     /// </summary>

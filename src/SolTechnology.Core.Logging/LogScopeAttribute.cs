@@ -1,7 +1,7 @@
 namespace SolTechnology.Core.Logging;
 
 /// <summary>
-/// Marks a property of a CQRS request (MediatR <c>IRequest&lt;&gt;</c>) whose value should be
+/// Marks a property of a CQRS command or query whose value should be
 /// added to the per-operation log scope automatically by the logging pipeline behavior.
 /// Without any <see cref="LogScopeAttribute"/> the request is still tracked
 /// (START / SUCCESS / FAIL with duration) — only properties marked with this attribute
@@ -9,13 +9,13 @@ namespace SolTechnology.Core.Logging;
 /// </summary>
 /// <example>
 /// <code>
-/// public sealed class FindCityByNameQuery : IRequest&lt;Result&lt;City&gt;&gt;
+/// public sealed class FindCityByNameQuery : IQuery&lt;City&gt;
 /// {
 ///     [LogScope]                       // -&gt; scope["Name"] = value
 ///     public string Name { get; set; } = null!;
 /// }
 ///
-/// public sealed class CreateTripCommand : IRequest&lt;Result&lt;int&gt;&gt;
+/// public sealed class CreateTripCommand : ICommand&lt;int&gt;
 /// {
 ///     [LogScope("Origin")]             // -&gt; scope["Origin"] = value (renamed)
 ///     public string OriginCity { get; set; } = null!;

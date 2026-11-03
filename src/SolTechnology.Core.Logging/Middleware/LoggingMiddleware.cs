@@ -16,9 +16,9 @@ namespace SolTechnology.Core.Logging.Middleware;
 ///   <item>Demotes <see cref="ConnectionResetException"/> to <see cref="LogLevel.Warning"/>
 ///         (client aborts are not server faults).</item>
 /// </list>
-/// Does <b>not</b> read the request body or query string itself. Application-specific
-/// enrichment (user id from claims, business field from body, etc.) is the responsibility
-/// of an <see cref="ILogScopeEnricher"/> implementation registered in DI.
+/// Reads the request body only when an <see cref="IRequiresRequestBody"/> enricher asks for it.
+/// Application-specific enrichment (user id from claims, business field from body, etc.) is the
+/// responsibility of an <see cref="ILogScopeEnricher"/> implementation registered in DI.
 /// </summary>
 public sealed class LoggingMiddleware(RequestDelegate next, IOptions<LoggingOptions>? options = null)
 {

@@ -5,7 +5,7 @@ namespace SolTechnology.Core.Logging;
 /// <summary>
 /// Source-generated, allocation-free emitters for the operation-lifecycle log events
 /// (<c>EventId</c> 2137 / 2138 / 2139 / 2140). These are the "hot path" for the CQRS
-/// pipeline behavior, which auto-tracks every MediatR request — at 1k RPS the savings
+/// pipeline behavior, which auto-tracks every command and query — at 1k RPS the savings
 /// over <c>ILogger.Log(...)</c> with <c>params object[]</c> are real.
 /// </summary>
 /// <remarks>
