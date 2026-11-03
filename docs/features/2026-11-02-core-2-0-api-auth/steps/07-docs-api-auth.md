@@ -25,7 +25,7 @@ Every C# snippet must compile against the 2.0 API.
 Former core step 59 (Api and Auth part); split per library on 2026-11-02.
 
 ## Affected components
-- `docs/Api.md` — EDIT — `:31-49,199` names; `:76-78` `IMediator.Send(query, HttpContext.RequestAborted)`; `:387-389` health-check names (`AddSqlHealthCheck`, `AddServiceBusHealthCheck` → the `AddSol*` names; former step 61 covered them only through its `docs/*.md` grep, which core 10 re-runs)
+- `docs/Api.md` — EDIT — `:31-49,199` names; `:76-78` `IMediator.Send(query, HttpContext.RequestAborted)`; `:387-389` health-check names (`AddSqlHealthCheck`, `AddServiceBusHealthCheck` → the `AddSol*` names; former step 61 covered them only through its `docs/*.md` grep, which core 11 re-runs)
 - `docs/Auth.md` — EDIT — rewrite from `src/SolTechnology.Core.Authentication/ModuleInstaller.cs`, `AuthenticationConfiguration.cs`, and `docs/architecture/authentication.md`
 
 ## Changes

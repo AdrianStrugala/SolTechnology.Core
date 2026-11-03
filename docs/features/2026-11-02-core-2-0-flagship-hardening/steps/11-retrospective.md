@@ -1,10 +1,10 @@
 ---
 spec: 2026-11-02-core-2-0-flagship-hardening
-step: 10
+step: 11
 status: to-do
 ---
 
-# Step 10: Retrospective
+# Step 11: Retrospective
 
 ## Summary
 This step closes the foundation feature with the [`implement-plan`](../../../../.github/skills/implement-plan/SKILL.md)

@@ -9,7 +9,7 @@ premortem: go-with-mitigations (2026-11-02)
 Tracks temporary implementation state for
 [`../2026-11-02-core-2-0-flagship-hardening.md`](../2026-11-02-core-2-0-flagship-hardening.md).
 
-Gate order: `review` (plan-reviewer) → step `00` premortem → steps `01`–`09` → `10` retrospective.
+Gate order: `review` (plan-reviewer) → step `00` premortem → steps `01`–`10` → `11` retrospective.
 The user answered `Q1`–`Q10`, confirmed `C-01`–`C-24`, and rejected `C-25` on 2026-11-02, then
 answered the plan-review questions `RQ1`–`RQ12` and confirmed the additive `C-26`/`C-27` the same
 day (see the feature brief). No step is `blocked`.
@@ -18,7 +18,7 @@ Per-library regroup (user, 2026-11-02): former steps 05–70 were regrouped into
 library, and the remaining steps here were renumbered `00`–`09`. The feature brief's "Per-library
 regroup" section lists the library feature briefs, the delivery order, and the former → current
 step mapping. Every library feature starts after steps 02–04 are `done`. Step 08 runs after every
-library XML-docs step; step 10 runs last, after every library feature is `completed`. The review
+library XML-docs step; step 11 runs last, after every library feature is `completed`. The review
 and premortem verdicts above cover the regrouped plan (user decision, 2026-11-02).
 
 ## Steps
@@ -35,4 +35,5 @@ and premortem verdicts above cover the regrouped plan (user decision, 2026-11-02
 | 07 | Packaging — a truly zero-dependency `SolTechnology.Core` | [`steps/07-zero-dependency-base-package.md`](steps/07-zero-dependency-base-package.md) | done |
 | 08 | XML docs — one central `GenerateDocumentationFile` switch | [`steps/08-xml-docs-central-switch.md`](steps/08-xml-docs-central-switch.md) | to-do |
 | 09 | Central Package Management | [`steps/09-central-package-management.md`](steps/09-central-package-management.md) | done |
-| 10 | Retrospective | [`steps/10-retrospective.md`](steps/10-retrospective.md) | to-do |
+| 10 | Per-package NuGet icons | [`steps/10-per-package-nuget-icons.md`](steps/10-per-package-nuget-icons.md) | done |
+| 11 | Retrospective | [`steps/11-retrospective.md`](steps/11-retrospective.md) | to-do |

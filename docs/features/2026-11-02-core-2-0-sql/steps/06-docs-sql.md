@@ -15,7 +15,7 @@ Former core step 61 (SQL part); split per library on 2026-11-02.
 
 ## Affected components
 - `docs/SQL.md` — EDIT — `:7-10,15-23,100,150` names; remove binding examples; fix the `--- Testing` heading; document `IUnitOfWork.Begin` (step 02); transient-only retry (step 03); `DeployDacpac` (step 04)
-- `docs/ClaudeCodingGuide.md` — EDIT — `:263` `services.AddSQL(sqlConfiguration)` → `services.AddSolSQL(sqlConfiguration)` only (former step 61's `docs/*.md` grep covered it and core 10 re-runs that grep; no other Guide change — Guide self-consistency stays with showcase 04)
+- `docs/ClaudeCodingGuide.md` — EDIT — `:263` `services.AddSQL(sqlConfiguration)` → `services.AddSolSQL(sqlConfiguration)` only (former step 61's `docs/*.md` grep covered it and core 11 re-runs that grep; no other Guide change — Guide self-consistency stays with showcase 04)
 
 ## Changes
 - Verification method: copy every C# block into a throwaway console project (not committed) that references `SolTechnology.Core.SQL`, then run `dotnet build`. Record the result in this step's Deviations if a snippet must stay illustrative (mark it with `// illustrative` in the doc).

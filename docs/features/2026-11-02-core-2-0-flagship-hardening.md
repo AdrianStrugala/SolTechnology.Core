@@ -116,7 +116,7 @@ recommendation is the planned default. The plan-reviewer and premortem may overt
   self-consistency (`P1-6`) moved to showcase step 04 at the split.
 - **Phase H — Guide §9/§11 conformance**: size caps, primary constructors, `extension` blocks,
   braces and comments, and `[{Placeholder}]` log templates.
-- **Close** — retrospective (former step 71; now core 10 plus one retrospective per library feature).
+- **Close** — retrospective (former step 71; now core 11 plus one retrospective per library feature).
 
 Since the per-library regroup (user, 2026-11-02) phases A, B (DreamTravel and secrets), the
 zero-dependency package, the central XML-docs switch, and the close stay here; every library-scoped
@@ -210,7 +210,7 @@ tale 14 guards the Tale JSON test that auid 03 adds.
 
 Remaining foundation steps: core 05 and 06 may run at any time; core 07 (zero-dependency base
 package) runs after core 04; core 08 (central `GenerateDocumentationFile`) runs after every library
-XML-docs step; core 10 closes this feature last, after every library feature is `completed`.
+XML-docs step; core 11 closes this feature last, after every library feature is `completed`.
 
 Former → current step mapping (`*` = only the library-scoped part of the former repository-wide
 `[{Placeholder}]` and empty-`catch` check, carried in that library's conformance step):
@@ -288,7 +288,7 @@ Former → current step mapping (`*` = only the library-scoped part of the forme
 | 68 | Guide conformance — MessageBus and ServiceBus.Testing | messagebus 07, testing-kits 06 |
 | 69 | Guide conformance — SQL, Blob, Hangfire, and the remaining testing kits | sql 07, blob 05, hangfire 07, testing-kits 06 |
 | 70 | Log templates — `[{Placeholder}]` everywhere (log contract change L-03) | tale 16, http 10, api-auth 09, cache 08, messagebus 08, result 05*, logging 07*, cqrs 06*, auid 06*, sql 07*, blob 05*, hangfire 07*, testing-kits 06* |
-| 71 | Retrospective | core 10, result 06, logging 08, cqrs 07, auid 07, tale 17, http 11, api-auth 10, cache 09, sql 08, blob 06, messagebus 09, hangfire 08, testing-kits 07 |
+| 71 | Retrospective | core 11, result 06, logging 08, cqrs 07, auid 07, tale 17, http 11, api-auth 10, cache 09, sql 08, blob 06, messagebus 09, hangfire 08, testing-kits 07 |
 
 **Scope change 2026-11-02:** credential scrub dropped (user decision B: "czy DreamTravel nie miało
 haseł tylko lokalnych w repo? Jeżeli tak, to zostaw."); premortem mitigations referring to it are
@@ -550,7 +550,7 @@ The plan-reviewer's critique raised twelve questions. The user answered all of t
 
 ### Accepted risks (consequences of the 2026-11-02 decisions)
 
-The retrospectives (core 10 and the library retrospectives; former step 71) carry each item they own
+The retrospectives (core 11 and the library retrospectives; former step 71) carry each item they own
 into `Follow-ups`; AR-3 and the release half
 of AR-5 are carried by the release feature, and AR-4 also by the showcase feature.
 
@@ -563,7 +563,8 @@ of AR-5 are carried by the release feature, and AR-4 also by the showcase featur
 | AR-5 | The package version comes from `<Version>` in `src/Directory.Build.props`, not from the tag, so any `v*` tag on a `master` at 2.0.0 would publish the final 2.0.0 packages; Trusted Publishing is first exercised by the real `v2.0.0` release. | RQ2 | Publishing is tag-only through the protected `nuget-release` environment (step 03); the required reviewer checks that the tag equals `<Version>` before approving (step 03; release 04, 05); 1.x hotfixes branch from the `v1.0.0` tag (step 04); the interim `NUGET_API_KEY` is revoked only after the `v2.0.0` publish succeeds (release 05). |
 | AR-6 | Local-only DreamTravel dev credentials stay committed (user decision 2026-11-02): the SQL `sa` password in `appsettings*.json` (including `appsettings.prod.json`, which targets `localhost,1404`), Neo4j at `bolt://localhost`, the Aspire `sql-password` parameter, the database `Dockerfile` `ARG`, and the `devOps/` psake script and `build&test.yml` `docker run`. All target local Docker/localhost; `deploy.yml` uses pipeline variables. | Decision B | No scrub (step 08 keeps only `S6`). The Google API keys and the Service Bus SAS key are real secrets, not covered by decision B; step 09 still removes them and records revocation. Secret scanning after the transfer (release 03) may flag the local values; dismiss those alerts as "used in tests". |
 
-Scope change 2026-11-03 (user): step 09 "Central Package Management" added after the plan review; the retrospective moved to step 10. It changes no package version.
+Scope change 2026-11-03 (user): step 09 "Central Package Management" added after the plan review; the retrospective moved to step 10.
+Scope change 2026-11-03 (user): step 10 "Per-package NuGet icons" added; the retrospective moved to step 11. It changes no package version.
 
 Scope change 2026-11-03 (user: "nie dropuj joke z kodu"): jokes in the code (humorous comments, messages, names, file names) stay exactly as written; recorded in `docs/ClaudeCodingGuide.md` §9.10 and §7 (the §15 "dupa" row is removed). `P1-5` now covers only non-joke Polish text. Affected places:
 - core 05 (`done`): the `"dupa"` CORS rename was reverted by commit `7601de9b`; only the `avroconvertonline.azurewebsites.net` origin removal remains (step 05 `Deviations`).
@@ -585,7 +586,7 @@ Scope change 2026-11-03 (user: "nie dropuj joke z kodu"): jokes in the code (hum
       and `SQL.Testing` with a removal comment, and the removal is listed under `Follow-ups`.
 - [ ] `publishPackages.yml` pushes to nuget.org only for `refs/tags/v*`, through a GitHub
       environment that has required reviewers and existed before the workflow change merged.
-- [ ] Owner confirmation is recorded in core 06, and copied into `Completion summary` by core 10,
+- [ ] Owner confirmation is recorded in core 06, and copied into `Completion summary` by core 11,
       that both zip keys, the four history Google keys, and the `talecodeservicebus` SAS key are
       revoked or their resources deleted.
 - [ ] `git ls-files | grep -E "\.zip$|\.idea/|settings\.local\.json"` prints nothing.
