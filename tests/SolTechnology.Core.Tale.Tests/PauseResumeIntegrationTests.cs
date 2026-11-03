@@ -263,14 +263,15 @@ public class PauseResumeIntegrationTests
     }
 
     [Test]
-    public async Task ResumeStory_TaleInstanceJsonPersistedBy1x_CompletesWithSameTaleId()
+    public async Task Resume_1xHistory_FailsWithDescriptiveError()
     {
         // Arrange
         const string persistedBy1x = """
             {"TaleId":"STR_20261103112154_050288","HandlerTypeName":"OrderProcessingTale","IdempotencyKey":null,"CurrentChapter":{"ChapterId":"RequestCustomerDetailsChapter","StartedAt":"2026-11-03T11:21:54.877769Z","FinishedAt":null,"Status":2,"RequiredData":[{"Name":"Name","Type":"String","IsComplex":false,"Children":[]},{"Name":"Email","Type":"String","IsComplex":false,"Children":[]},{"Name":"Address","Type":"String","IsComplex":false,"Children":[]}],"ProvidedData":null,"Error":null},"History":[{"ChapterId":"OrderValidationChapter","StartedAt":"2026-11-03T11:21:54.831843Z","FinishedAt":"2026-11-03T11:21:54.832482Z","Status":3,"RequiredData":[],"ProvidedData":null,"Error":null},{"ChapterId":"RequestCustomerDetailsChapter","StartedAt":"2026-11-03T11:21:54.877769Z","FinishedAt":null,"Status":2,"RequiredData":[{"Name":"Name","Type":"String","IsComplex":false,"Children":[]},{"Name":"Email","Type":"String","IsComplex":false,"Children":[]},{"Name":"Address","Type":"String","IsComplex":false,"Children":[]}],"ProvidedData":null,"Error":null}],"Status":2,"CreatedAt":"2026-11-03T11:21:54.828295Z","LastUpdatedAt":"2026-11-03T11:21:54.881759Z","Context":"{\u0022ValidationPassed\u0022:true,\u0022CustomerName\u0022:\u0022\u0022,\u0022CustomerEmail\u0022:\u0022\u0022,\u0022CustomerAddress\u0022:\u0022\u0022,\u0022PaymentProcessed\u0022:false,\u0022TransactionId\u0022:\u0022\u0022,\u0022Input\u0022:{\u0022OrderId\u0022:\u0022ORD-1X\u0022,\u0022Amount\u0022:42},\u0022Output\u0022:{\u0022OrderId\u0022:\u0022\u0022,\u0022TransactionId\u0022:\u0022\u0022,\u0022CustomerName\u0022:\u0022\u0022,\u0022ConfirmationSent\u0022:false},\u0022TaleInstanceId\u0022:\u0022STR_20261103112154_050288\u0022,\u0022CurrentChapterId\u0022:\u0022RequestCustomerDetailsChapter\u0022}"}
             """;
         var taleId = Auid.Parse("STR_20261103112154_050288");
-        await _repository.Save(JsonSerializer.Deserialize<TaleInstance>(persistedBy1x)!, CancellationToken.None);
+        var persisted = JsonSerializer.Deserialize<TaleInstance>(persistedBy1x, TaleJsonOptions.Default)!;
+        await _repository.Save(persisted, CancellationToken.None);
         var manager = _serviceProvider.GetRequiredService<TaleManager>();
         var userInput = JsonSerializer.SerializeToElement(new CustomerDetails { Name = "Jan", Email = "jan@example.com", Address = "Wadowice" });
 
@@ -278,11 +279,17 @@ public class PauseResumeIntegrationTests
         var resumeResult = await manager.ResumeStory<OrderProcessingTale, OrderInput, OrderContext, OrderOutput>(taleId, userInput);
 
         // Assert
-        resumeResult.IsSuccess.Should().BeTrue();
-        resumeResult.Data!.TaleId.Should().Be(taleId);
-        resumeResult.Data.Status.Should().Be(TaleStatus.Completed);
-        var finalContext = (await _repository.FindById(taleId, CancellationToken.None))!.Context;
-        finalContext.Should().Contain("\"OrderId\":\"ORD-1X\"").And.Contain("\"TaleInstanceId\":\"STR_20261103112154_050288\"");
+        new[] { (int)TaleStatus.Created, (int)TaleStatus.Running, (int)TaleStatus.WaitingForInput, (int)TaleStatus.Completed, (int)TaleStatus.Failed, (int)TaleStatus.Cancelled }
+            .Should().Equal(0, 1, 2, 3, 4, 5);
+        persisted.TaleId.Should().Be(taleId);
+        persisted.Status.Should().Be(TaleStatus.WaitingForInput);
+        persisted.History.Should().HaveCount(2).And.AllSatisfy(h => h.StepIndex.Should().BeNull());
+        resumeResult.IsFailure.Should().BeTrue();
+        resumeResult.Error!.Message.Should().Contain("created by SolTechnology.Core.Tale 1.x").And.Contain("restart the tale");
+        var stored = (await _repository.FindById(taleId, CancellationToken.None))!;
+        stored.Status.Should().Be(TaleStatus.WaitingForInput);
+        stored.History.Should().HaveCount(2);
+        stored.Context.Should().Contain("\"OrderId\":\"ORD-1X\"").And.Contain("\"TaleInstanceId\":\"STR_20261103112154_050288\"");
     }
 }
 

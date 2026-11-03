@@ -5,6 +5,7 @@ using Microsoft.Extensions.Logging;
 using NUnit.Framework;
 using SolTechnology.Core;
 using SolTechnology.Core.Errors;
+using SolTechnology.Core.Tale.Orchestration;
 using SolTechnology.Core.Tale;
 using SolTechnology.Core.Tale;
 
@@ -35,6 +36,8 @@ public class TaleEngineTests
         services.AddTransient<EngineTestSingleErrorChapter>();
         services.AddTransient<EngineTestThrowingChapter>();
         services.AddTransient<EngineTestBlockingChapter>();
+        services.AddTransient<Inbound.RecordStepChapter>();
+        services.AddTransient<Outbound.RecordStepChapter>();
 
         _serviceProvider = services.BuildServiceProvider();
     }
@@ -144,6 +147,57 @@ public class TaleEngineTests
         handler.Context.Received.Should().Be(cts.Token);
         handler.Context.Work!.IsCanceled.Should().BeTrue();
         result.Error.Should().BeOfType<TaleCancelledError>();
+    }
+
+    [Test]
+    public async Task Tell_SameChapterTwice_RunsBoth()
+    {
+        // Arrange
+        var handler = new SameChapterTwiceTale(_serviceProvider, GetLogger<SameChapterTwiceTale>());
+
+        // Act
+        var result = await handler.Handle(new EngineTestInput { Value = 0 }, CancellationToken.None);
+
+        // Assert
+        result.IsSuccess.Should().BeTrue();
+        handler.Context.ExecutionOrder.Should().Equal("Chapter1", "Chapter1");
+        handler.Context.Value.Should().Be(2);
+    }
+
+    [Test]
+    public async Task Tell_SameNameDifferentNamespaces_RunsBoth()
+    {
+        // Arrange
+        var handler = new SameNameChaptersTale(_serviceProvider, GetLogger<SameNameChaptersTale>());
+
+        // Act
+        var result = await handler.Handle(new EngineTestInput { Value = 0 }, CancellationToken.None);
+
+        // Assert
+        result.IsSuccess.Should().BeTrue();
+        handler.Context.ExecutionOrder.Should().Equal("Inbound", "Outbound");
+    }
+
+    [Test]
+    public async Task HistoryKey_GenericChapter_HasNoAssemblyVersion()
+    {
+        // Arrange
+        var services = new ServiceCollection().AddLogging();
+        services.AddSingleton<TestService>();
+        services.AddSolTale(assemblies: typeof(TaleEngineTests).Assembly);
+        using var sp = services.BuildServiceProvider();
+        var manager = sp.GetRequiredService<TaleManager>();
+
+        // Act
+        var start = await manager.StartStory<GenericChapterTale, EngineTestInput, EngineTesTContext, EngineTestOutput>(
+            new EngineTestInput { Value = 1 });
+
+        // Assert
+        var chapter = start.Data!.History.Should().ContainSingle().Subject;
+        chapter.StepIndex.Should().Be(0);
+        chapter.ChapterTypeName.Should().Be(
+            "SolTechnology.Core.Tale.Tests.GenericChapter`1[System.Collections.Generic.List`1[SolTechnology.Core.Tale.Tests.EngineTestInput]]");
+        $"{chapter.StepIndex}:{chapter.ChapterTypeName}".Should().NotContainAny("Version=", "Culture=", "PublicKeyToken=");
     }
 
     [Test]
@@ -289,6 +343,53 @@ public class BlockingContext : Context<EngineTestInput, EngineTestOutput>
 
     [JsonIgnore]
     public Task? Work { get; set; }
+}
+
+public class SameChapterTwiceTale : TaleHandler<EngineTestInput, EngineTesTContext, EngineTestOutput>
+{
+    public SameChapterTwiceTale(IServiceProvider sp, ILogger<SameChapterTwiceTale> logger)
+        : base(sp, logger)
+    {
+    }
+
+    protected override Tale<EngineTestOutput> Tell() =>
+        Open<EngineTestChapter1>()
+            .Read<EngineTestChapter1>()
+            .Finale(ctx => ctx.Output);
+}
+
+public class SameNameChaptersTale : TaleHandler<EngineTestInput, EngineTesTContext, EngineTestOutput>
+{
+    public SameNameChaptersTale(IServiceProvider sp, ILogger<SameNameChaptersTale> logger)
+        : base(sp, logger)
+    {
+    }
+
+    protected override Tale<EngineTestOutput> Tell() =>
+        Open<Inbound.RecordStepChapter>()
+            .Read<Outbound.RecordStepChapter>()
+            .Finale(ctx => ctx.Output);
+}
+
+public class GenericChapterTale : TaleHandler<EngineTestInput, EngineTesTContext, EngineTestOutput>
+{
+    public GenericChapterTale(IServiceProvider sp, ILogger<GenericChapterTale> logger)
+        : base(sp, logger)
+    {
+    }
+
+    protected override Tale<EngineTestOutput> Tell() =>
+        Open<GenericChapter<List<EngineTestInput>>>()
+            .Finale(ctx => ctx.Output);
+}
+
+public class GenericChapter<TPayload> : Chapter<EngineTesTContext>
+{
+    public override Task<Result> Read(EngineTesTContext context, CancellationToken cancellationToken)
+    {
+        context.ExecutionOrder.Add(typeof(TPayload).Name);
+        return Result.SuccessAsTask();
+    }
 }
 
 public class UnregisteredChapterTale : TaleHandler<EngineTestInput, EngineTesTContext, EngineTestOutput>

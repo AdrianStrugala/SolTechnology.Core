@@ -28,7 +28,7 @@ are `done` and after these library features are `completed`: `result`; `auid`. N
 | 07 | Tale — `CancellationToken` on chapters | [`steps/07-tale-chapter-cancellation-token.md`](steps/07-tale-chapter-cancellation-token.md) | done |
 | 08 | Tale — `ITaleRepository` 2.0 signatures (cancellation and names) | [`steps/08-tale-repository-cancellation-and-names.md`](steps/08-tale-repository-cancellation-and-names.md) | done |
 | 09 | Tale — optimistic concurrency on `ITaleRepository.Save` | [`steps/09-tale-repository-optimistic-concurrency.md`](steps/09-tale-repository-optimistic-concurrency.md) | done |
-| 10 | Tale — chapter history keyed by step index and full type name | [`steps/10-tale-chapter-history-key.md`](steps/10-tale-chapter-history-key.md) | to-do |
+| 10 | Tale — chapter history keyed by step index and full type name | [`steps/10-tale-chapter-history-key.md`](steps/10-tale-chapter-history-key.md) | done |
 | 11 | Tale — explicit HTTP exposure; internal plumbing types | [`steps/11-tale-http-exposure-opt-in.md`](steps/11-tale-http-exposure-opt-in.md) | to-do |
 | 12 | XML docs shipped — Tale | [`steps/12-xml-docs.md`](steps/12-xml-docs.md) | to-do |
 | 13 | Module docs — `docs/Tale.md` for the 2.0 Tale contract | [`steps/13-docs-tale.md`](steps/13-docs-tale.md) | to-do |

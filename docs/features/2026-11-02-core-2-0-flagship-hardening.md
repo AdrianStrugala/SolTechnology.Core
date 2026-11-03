@@ -457,7 +457,7 @@ parameter; `UntilAsync`, `CheckHealthAsync`, `InvokeAsync`, `StartAsync`/`StopAs
 |---|---|---|---|
 | P-01 | `Error` subtypes not registered serialize as their nearest ancestor; Tale errors gain discriminators through `TaleJsonOptions.Default`, which `TaleInstance.Clone()` and the DreamTravel SQLite repository now use | JSON shape for unknown subtypes; no more `NotSupportedException`; custom repositories must use `TaleJsonOptions.Default` to keep Tale error types (`C-26`) | result 01, tale 02 |
 | P-02 | Only `TaleManager`-driven runs are persisted | Custom repositories stop receiving direct-handler runs | tale 03 |
-| P-03 | Chapter history keyed by step index + `Type.FullName` | In-flight persisted tales created by 1.x cannot resume; migration note | tale 10 |
+| P-03 | Chapter history keyed by step index + version-free full type name (namespace, name and generic arguments, no assembly information), stored in the new `ChapterInfo.StepIndex` (`int?`) and `ChapterInfo.ChapterTypeName`; `ChapterId` is display only | In-flight persisted tales created by 1.x cannot resume: `ResumeStory` returns an error that says the tale was created by 1.x and must be restarted (the stored tale is left unchanged); migration note | tale 10 |
 | P-04 | `TaleInstance.Version` persisted; conditional save | Custom repositories add a `Version` column (existing rows default to `0`) and make `Save` conditional: write only when the stored version (a missing tale counts as `0`) equals `TaleInstance.Version`, then store and return `Version + 1`; on a mismatch, or when a new tale reuses another tale's idempotency key, return `ConflictError` without writing. DreamTravel's SQLite file gains the column on start | tale 09 |
 | P-05 | New event jobs target `Task DispatchInScope(IEvent, CancellationToken)` (internal type, persisted job signature); the 1.x `DispatchInScope(IEvent)` overload stays for 2.x (RQ10) | Already-enqueued 1.x event jobs still run; the legacy overload is removed in 3.0 | hangfire 03 |
 | P-06 | Recurring job id `Type.Name` → `Type.FullName`; stale tracked ids and legacy `Type.Name` ids removed at start (RQ10) | Old recurring entries are removed automatically and re-created under new ids; no double firing | hangfire 04 |
@@ -511,6 +511,9 @@ these notes from the steps:
   spells out the contract); DreamTravel's SQLite file is migrated on start. `TaleManager` now stores a new tale, with
   its idempotency key, before the first chapter runs, so a concurrent `StartStory` with the same key returns the
   first tale, and a `CancelStory` during a run is no longer overwritten (the run stops with `ConflictError`).
+- tale 10 (former step 42, premortem RM-5): Cut Tale hosts over in one step. Stop every 1.x host before a 2.x host
+  serves tale traffic. Do not roll back to 1.x after a 2.x host has written tale state: 2.x writes Tale-error
+  discriminators, `StepIndex`, and `Version` that 1.x cannot read or preserve.
 - core 04: 1.x hotfixes, if ever needed, branch from the `v1.0.0` tag, never from `master`.
 - core 04 (premortem RM-1): Upgrade every `SolTechnology.Core.*` package to 2.0 together. A mixed 1.x/2.x graph
   compiles but fails at runtime (`FieldAccessException`, `MissingMethodException`, `TypeLoadException`).

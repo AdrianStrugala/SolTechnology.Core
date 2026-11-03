@@ -1,7 +1,7 @@
 ---
 spec: 2026-11-02-core-2-0-tale
 step: 10
-status: to-do
+status: done
 ---
 
 # Step 10: Tale — chapter history keyed by step index and full type name
@@ -39,14 +39,48 @@ Former core step 42; moved here by the per-library regroup (user, 2026-11-02).
   - RM-5 (scenario 5): add to the core brief's "Release-notes inputs": "Cut Tale hosts over in one step. Stop every 1.x host before a 2.x host serves tale traffic. Do not roll back to 1.x after a 2.x host has written tale state: 2.x writes Tale-error discriminators, `StepIndex`, and `Version` that 1.x cannot read or preserve." The `docs/Tale.md` note is in step 13.
 
 ## Acceptance criteria
-- [ ] `dotnet test tests/SolTechnology.Core.Tale.Tests` is green, and the two duplicate tests fail on `4097d47f`.
-- [ ] The core brief's P-03 row matches the delivered behaviour; release step 05 ([`2026-11-02-org-transfer-and-2-0-release`](../../2026-11-02-org-transfer-and-2-0-release.md)) copies it into `docs/migration-2.0.md`.
-- [ ] Premortem mitigations for the persisted contract are applied.
-- [ ] RM-3: `HistoryKey_GenericChapter_HasNoAssemblyVersion` is green; the key contains none of `Version=`, `Culture=`, or `PublicKeyToken=`.
-- [ ] RM-4: `ChapterInfo.StepIndex` is `int?`; `Resume_1xHistory_FailsWithDescriptiveError` reads a `4097d47f` JSON literal and is green; the `TaleStatus` numeric assertion is green.
-- [ ] RM-5: the core brief's "Release-notes inputs" contains the single-cutover and no-rollback note.
+- [x] `dotnet test tests/SolTechnology.Core.Tale.Tests` is green, and the two duplicate tests fail on `4097d47f`.
+- [x] The core brief's P-03 row matches the delivered behaviour; release step 05 ([`2026-11-02-org-transfer-and-2-0-release`](../../2026-11-02-org-transfer-and-2-0-release.md)) copies it into `docs/migration-2.0.md`.
+- [x] Premortem mitigations for the persisted contract are applied.
+- [x] RM-3: `HistoryKey_GenericChapter_HasNoAssemblyVersion` is green; the key contains none of `Version=`, `Culture=`, or `PublicKeyToken=`.
+- [x] RM-4: `ChapterInfo.StepIndex` is `int?`; `Resume_1xHistory_FailsWithDescriptiveError` reads a `4097d47f` JSON literal and is green; the `TaleStatus` numeric assertion is green.
+- [x] RM-5: the core brief's "Release-notes inputs" contains the single-cutover and no-rollback note.
 
 ## Open questions
 - none
 
 ## Deviations
+
+### The type part is stored in a second new property, `ChapterInfo.ChapterTypeName`
+
+**Original plan:** History lookup by step index + version-free full type name; `ChapterInfo`
+stores `StepIndex` (`int?`).
+
+**Actual implementation:** The lookup needs the type part persisted too, so `ChapterInfo` gained
+`ChapterTypeName` (`string?`, additive) next to `StepIndex`; the key is
+`"{StepIndex}:{ChapterTypeName}"`. The name is the open generic's `FullName` plus the arguments in
+brackets, recursively (for example ``Ns.GenericChapter`1[System.Collections.Generic.List`1[Ns.Input]]``),
+built by the internal `ChapterTypeName` helper. An `Otherwise` chapter gets its own step index. The
+1.x check lives in `TaleManager.ResumeStory`, which returns the descriptive error before any write,
+so the stored 1.x tale is left as it was.
+
+### The `4097d47f` fixture is the AUID step 03 capture; the AUID guard test became the 1.x test
+
+**Original plan:** `Resume_1xHistory_FailsWithDescriptiveError` deserializes a `TaleInstance` JSON
+literal captured at `4097d47f`, through `TaleJsonOptions.Default` and through the DreamTravel
+`SQLiteTaleRepository` read path; the duplicate tests fail on `4097d47f`.
+
+**Actual implementation:** The literal is the one AUID step 03 captured from `master` just before
+the namespace move (status `WaitingForInput`, one `Completed` history entry; its record states the
+output equals `4097d47f`, whose Tale sources were unchanged then). The AUID guard test
+`ResumeStory_TaleInstanceJsonPersistedBy1x_CompletesWithSameTaleId` asserted that this 1.x tale
+completes, which P-03 deliberately ends, so it was replaced by
+`PauseResumeIntegrationTests.Resume_1xHistory_FailsWithDescriptiveError` on the same literal: the
+`Auid` values still parse, `StepIndex` reads as `null`, the numeric `TaleStatus` values are
+unchanged, and the resume fails with the 1.x message. The SQLite read path is covered by the
+component test `SampleOrderWorkflowSQLiteTests.Resume_1xHistory_FailsWithDescriptiveError`, which
+inserts the literal's columns into the table and reads them with `SQLiteTaleRepository`. The two
+duplicate tests and the 1.x test failed on `master` before the change (`8bf4ac2b`). Running the
+whole suite during this step exposed a resume race in step 09, fixed in a separate commit (see
+step 09's deviations). `RM-5` is in the core brief's release-notes inputs; P-03 there and in this
+feature's brief describes the delivered key.

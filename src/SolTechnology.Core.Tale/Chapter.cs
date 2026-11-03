@@ -22,8 +22,9 @@ public abstract class Chapter<TContext> : IChapter<TContext>
     where TContext : class
 {
     /// <summary>
-    /// Unique identifier for this chapter.
-    /// Defaults to the type name. Override if you need custom identification.
+    /// Display identifier for this chapter, used in logs, <see cref="TalePausedError"/> and the
+    /// chapter history. Defaults to the type name. The engine matches history by step position and
+    /// full type name, never by this value.
     /// </summary>
     public virtual string ChapterId => GetType().Name;
 

@@ -141,6 +141,54 @@ public class SampleOrderWorkflowSQLiteTests
         persisted!.Status.Should().Be(TaleStatus.Failed);
     }
 
+    [Test]
+    public async Task Resume_1xHistory_FailsWithDescriptiveError()
+    {
+        // Arrange
+        const string persistedBy1x = """
+            {"TaleId":"STR_20261103112154_050288","HandlerTypeName":"OrderProcessingTale","IdempotencyKey":null,"CurrentChapter":{"ChapterId":"RequestCustomerDetailsChapter","StartedAt":"2026-11-03T11:21:54.877769Z","FinishedAt":null,"Status":2,"RequiredData":[{"Name":"Name","Type":"String","IsComplex":false,"Children":[]},{"Name":"Email","Type":"String","IsComplex":false,"Children":[]},{"Name":"Address","Type":"String","IsComplex":false,"Children":[]}],"ProvidedData":null,"Error":null},"History":[{"ChapterId":"OrderValidationChapter","StartedAt":"2026-11-03T11:21:54.831843Z","FinishedAt":"2026-11-03T11:21:54.832482Z","Status":3,"RequiredData":[],"ProvidedData":null,"Error":null},{"ChapterId":"RequestCustomerDetailsChapter","StartedAt":"2026-11-03T11:21:54.877769Z","FinishedAt":null,"Status":2,"RequiredData":[{"Name":"Name","Type":"String","IsComplex":false,"Children":[]},{"Name":"Email","Type":"String","IsComplex":false,"Children":[]},{"Name":"Address","Type":"String","IsComplex":false,"Children":[]}],"ProvidedData":null,"Error":null}],"Status":2,"CreatedAt":"2026-11-03T11:21:54.828295Z","LastUpdatedAt":"2026-11-03T11:21:54.881759Z","Context":"{\u0022ValidationPassed\u0022:true,\u0022CustomerName\u0022:\u0022\u0022,\u0022CustomerEmail\u0022:\u0022\u0022,\u0022CustomerAddress\u0022:\u0022\u0022,\u0022PaymentProcessed\u0022:false,\u0022TransactionId\u0022:\u0022\u0022,\u0022Input\u0022:{\u0022OrderId\u0022:\u0022ORD-1X\u0022,\u0022Amount\u0022:42},\u0022Output\u0022:{\u0022OrderId\u0022:\u0022\u0022,\u0022TransactionId\u0022:\u0022\u0022,\u0022CustomerName\u0022:\u0022\u0022,\u0022ConfirmationSent\u0022:false},\u0022TaleInstanceId\u0022:\u0022STR_20261103112154_050288\u0022,\u0022CurrentChapterId\u0022:\u0022RequestCustomerDetailsChapter\u0022}"}
+            """;
+        using var json = JsonDocument.Parse(persistedBy1x);
+        var taleId = Auid.Parse(json.RootElement.GetProperty("TaleId").GetString()!);
+        using var sp = BuildProvider();
+        var repository = sp.GetRequiredService<ITaleRepository>();
+        await using (var connection = new SqliteConnection($"Data Source={_testDbPath}"))
+        {
+            await connection.OpenAsync();
+            var insert = connection.CreateCommand();
+            insert.CommandText = @"
+                INSERT INTO TaleInstances (TaleId, HandlerTypeName, Status, Context, CreatedAt, LastUpdatedAt, History, CurrentChapter)
+                VALUES (@TaleId, @Handler, @Status, @Context, @CreatedAt, @LastUpdatedAt, @History, @CurrentChapter)";
+            insert.Parameters.AddWithValue("@TaleId", taleId.ToString());
+            insert.Parameters.AddWithValue("@Handler", json.RootElement.GetProperty("HandlerTypeName").GetString());
+            insert.Parameters.AddWithValue("@Status", json.RootElement.GetProperty("Status").GetInt32());
+            insert.Parameters.AddWithValue("@Context", json.RootElement.GetProperty("Context").GetString());
+            insert.Parameters.AddWithValue("@CreatedAt", json.RootElement.GetProperty("CreatedAt").GetString());
+            insert.Parameters.AddWithValue("@LastUpdatedAt", json.RootElement.GetProperty("LastUpdatedAt").GetString());
+            insert.Parameters.AddWithValue("@History", json.RootElement.GetProperty("History").GetRawText());
+            insert.Parameters.AddWithValue("@CurrentChapter", json.RootElement.GetProperty("CurrentChapter").GetRawText());
+            await insert.ExecuteNonQueryAsync();
+        }
+
+        var manager = sp.GetRequiredService<TaleManager>();
+        var userInput = JsonSerializer.SerializeToElement(new { Name = "Jan", Address = "Wadowice" });
+
+        // Act
+        var stored = await repository.FindById(taleId, CancellationToken.None);
+        var resume = await manager.ResumeStory<
+            SampleOrderWorkflowTale, SampleOrderInput, SampleOrderContext, SampleOrderResult>(taleId, userInput);
+
+        // Assert
+        new[] { (int)TaleStatus.Created, (int)TaleStatus.Running, (int)TaleStatus.WaitingForInput, (int)TaleStatus.Completed, (int)TaleStatus.Failed, (int)TaleStatus.Cancelled }
+            .Should().Equal(0, 1, 2, 3, 4, 5);
+        stored!.Status.Should().Be(TaleStatus.WaitingForInput);
+        stored.Version.Should().Be(0);
+        stored.History.Should().HaveCount(2).And.AllSatisfy(h => h.StepIndex.Should().BeNull());
+        stored.CurrentChapter!.ChapterId.Should().Be("RequestCustomerDetailsChapter");
+        resume.IsFailure.Should().BeTrue();
+        resume.Error!.Message.Should().Contain("created by SolTechnology.Core.Tale 1.x").And.Contain("restart the tale");
+    }
+
     private ServiceProvider BuildProvider()
     {
         var services = new ServiceCollection();

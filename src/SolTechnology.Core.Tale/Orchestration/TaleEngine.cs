@@ -104,18 +104,18 @@ internal sealed class TaleEngine<TInput, TContext, TOutput>
             await SaveTaleState(TaleStatus.Running, _cancellationToken);
         }
 
-        foreach (var step in steps)
+        for (var stepIndex = 0; stepIndex < steps.Count; stepIndex++)
         {
-            switch (step)
+            switch (steps[stepIndex])
             {
                 case ReadStep s:
-                    await ExecuteChapter(s.ChapterType);
+                    await ExecuteChapter(s.ChapterType, stepIndex);
                     break;
                 case GuardStep s:
                     ApplyGuard(s);
                     break;
                 case FallbackChapterStep s:
-                    await ApplyFallbackChapter(s.ChapterType);
+                    await ApplyFallbackChapter(s.ChapterType, stepIndex);
                     break;
                 case FallbackStep s:
                     await ApplyFallback(s.Recover);
@@ -145,11 +145,11 @@ internal sealed class TaleEngine<TInput, TContext, TOutput>
         if (!step.Predicate(_context)) HandleChapterFailure(null, step.Error);
     }
 
-    private async Task ApplyFallbackChapter(Type chapterType)
+    private async Task ApplyFallbackChapter(Type chapterType, int stepIndex)
     {
         if (!OnLostTrack) return;
         ClearFailure();
-        await ExecuteChapter(chapterType);
+        await ExecuteChapter(chapterType, stepIndex);
     }
 
     private async Task ApplyFallback(Func<object, Task<Result>> recover)
@@ -185,7 +185,7 @@ internal sealed class TaleEngine<TInput, TContext, TOutput>
         _errors.Clear();
     }
 
-    private async Task ExecuteChapter(Type chapterType)
+    private async Task ExecuteChapter(Type chapterType, int stepIndex)
     {
         if (!_isInitialized)
             throw new InvalidOperationException("TaleEngine must be initialized first");
@@ -205,14 +205,15 @@ internal sealed class TaleEngine<TInput, TContext, TOutput>
         }
 
 
-        var existingChapter = _chapterHistory.FirstOrDefault(h => h.ChapterId == chapter.ChapterId);
+        var chapterTypeName = ChapterTypeName.Of(chapterType);
+        var existingChapter = _chapterHistory.FirstOrDefault(h =>
+            h.StepIndex == stepIndex && h.ChapterTypeName == chapterTypeName);
         if (existingChapter is { Status: TaleStatus.Completed })
         {
             return;
         }
 
-        if (_isPaused && existingChapter?.Status == TaleStatus.WaitingForInput &&
-            existingChapter.ChapterId == chapter.ChapterId)
+        if (_isPaused && existingChapter?.Status == TaleStatus.WaitingForInput)
         {
             _logger.LogInformation("Resuming tale at chapter {ChapterId}", chapter.ChapterId);
             _isPaused = false;
@@ -221,6 +222,8 @@ internal sealed class TaleEngine<TInput, TContext, TOutput>
         var chapterInfo = existingChapter ?? new ChapterInfo
         {
             ChapterId = chapter.ChapterId,
+            StepIndex = stepIndex,
+            ChapterTypeName = chapterTypeName,
             StartedAt = _timeProvider.GetUtcNow().UtcDateTime,
             Status = TaleStatus.Running
         };

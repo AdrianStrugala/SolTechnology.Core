@@ -122,6 +122,9 @@ public class TaleManager
                     return Result<TaleInstance>.Fail(new ConflictError { Message = "Tale has failed and cannot be resumed" });
                 if (existing.Status == TaleStatus.Running)
                     return Result<TaleInstance>.Fail(new ConflictError { Message = "Tale is already running" });
+                if (existing.History.Any(h => h.StepIndex is null))
+                    return Result<TaleInstance>.Fail(
+                        $"Tale {taleId} was created by SolTechnology.Core.Tale 1.x and cannot be resumed by 2.x; restart the tale.");
 
                 try
                 {

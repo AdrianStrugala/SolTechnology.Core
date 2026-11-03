@@ -11,9 +11,23 @@ namespace SolTechnology.Core.Tale.Models;
 public class ChapterInfo
 {
     /// <summary>
-    /// Unique identifier for the chapter (usually the type name).
+    /// Display identifier of the chapter (<see cref="IChapter{TContext}.ChapterId"/>, the type name by
+    /// default). Not used to match history; see <see cref="StepIndex"/>.
     /// </summary>
     public required string ChapterId { get; set; }
+
+    /// <summary>
+    /// Position of the chapter's step in the tale's <c>Tell()</c> plan. Together with
+    /// <see cref="ChapterTypeName"/> it identifies the chapter in the history. <c>null</c> for history
+    /// written by SolTechnology.Core.Tale 1.x, which cannot be resumed.
+    /// </summary>
+    public int? StepIndex { get; set; }
+
+    /// <summary>
+    /// Full type name of the chapter without assembly information (namespace, name and generic
+    /// arguments), so the history key survives a redeploy.
+    /// </summary>
+    public string? ChapterTypeName { get; set; }
 
     /// <summary>
     /// When this chapter started executing.
