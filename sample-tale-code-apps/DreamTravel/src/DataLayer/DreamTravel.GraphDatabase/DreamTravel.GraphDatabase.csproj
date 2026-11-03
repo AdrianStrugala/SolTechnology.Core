@@ -1,8 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <ItemGroup>
-      <PackageReference Include="Microsoft.Extensions.Options" Version="10.0.9" />
-      <PackageReference Include="Neo4j.Driver" Version="6.2.0" />
+      <PackageReference Include="Microsoft.Extensions.Options" />
+      <PackageReference Include="Neo4j.Driver" />
     </ItemGroup>
 
     <ItemGroup>

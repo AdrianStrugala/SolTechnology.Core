@@ -12,10 +12,10 @@
 <InternalsVisibleTo Include="SolTechnology.Core.MessageBus.Tests" />
 </ItemGroup>
 <ItemGroup>
-<PackageReference Include="Azure.Messaging.ServiceBus" Version="7.20.1" />
-<PackageReference Include="Microsoft.Extensions.Diagnostics.HealthChecks" Version="10.0.9" />
-<PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="10.0.9" />
-<PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
+<PackageReference Include="Azure.Messaging.ServiceBus" />
+<PackageReference Include="Microsoft.Extensions.Diagnostics.HealthChecks" />
+<PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" />
+<PackageReference Include="Newtonsoft.Json" />
 </ItemGroup>
 <ItemGroup>
 <ProjectReference Include="..\SolTechnology.Core.Logging\SolTechnology.Core.Logging.csproj" />

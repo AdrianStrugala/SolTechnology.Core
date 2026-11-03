@@ -4,7 +4,13 @@ description: Look up canonical NuGet package versions used in this repo before a
 ---
 # Package Management
 Single source of truth for which version of which package this repo uses. Prevents the failure
-mode *"I added `<PackageReference Include="..." Version="..."/>` with a number pulled from memory"*.
+mode *"I added a package version with a number pulled from memory"*.
+
+The repo uses **Central Package Management**: every version lives once, as a `PackageVersion` item in
+the root [`Directory.Packages.props`](../../../Directory.Packages.props). Project files carry only
+`<PackageReference Include="..." />`; a `Version` attribute there fails restore with `NU1008`.
+`tests/Directory.Build.props` still adds the shared test packages to every test project, without
+versions.
 ## When to use
 - Adding a new `PackageReference` to any `.csproj`.
 - Creating a new project that pulls in core dependencies.
@@ -15,20 +21,22 @@ mode *"I added `<PackageReference Include="..." Version="..."/>` with a number p
    package row.
 2. **Use the exact version listed.** Do not pick a different version unless a documented reason
    exists (e.g. CVE fix only available higher; new package only available newer).
-3. **If the package is not listed**, search existing `.csproj` files for a version already in
-   use: `grep -rE 'Include="<Package>" Version="' src/ tests/`. Prefer the **highest** version
-   found.
+3. **If the package is not listed**, check `Directory.Packages.props`: an existing
+   `PackageVersion` item is the version to use.
 4. **If still not found anywhere**, pick a version aligned with the family already in use
    (e.g. for a new `Microsoft.Extensions.*` package, match the `10.0.x` line).
-5. **After adding the package**, update `references/canonical-versions.md` if the package is new
+5. **Add the package:** a `<PackageVersion Include="<Package>" Version="<x.y.z>" />` item in the
+   matching `ItemGroup` of `Directory.Packages.props` (only if it is not there yet), and a
+   versionless `<PackageReference Include="<Package>" />` in the project.
+6. **After adding the package**, update `references/canonical-versions.md` if the package is new
    or the version is newer than what was listed. The skill is only useful if the table stays
    current.
 ## Key rules
 - MUST use the version listed in `canonical-versions.md` when present.
-- When versions differ across projects, PREFER the highest — file a follow-up to align the
-  laggards in the active dated feature record or open an issue.
+- One version per package for the whole repo. Do not use `VersionOverride` without a documented
+  CVE or breaking-change reason next to it.
 - NEVER pin a package below the version in `canonical-versions.md` without a CVE / breaking-change
-  justification documented in the `.csproj` near the reference.
+  justification documented in `Directory.Packages.props` next to the version.
 - Source: [`nuget.org`](https://www.nuget.org/). No internal feed is configured for this repo.
 - New external dependencies in `src/SolTechnology.Core.*` are a `CLAUDE.md §2` forbidden action
   — get user confirmation, check [`nuget-stats.json`](../../../nuget-stats.json), then add.

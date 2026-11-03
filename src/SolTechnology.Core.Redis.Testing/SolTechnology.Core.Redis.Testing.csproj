@@ -16,8 +16,8 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Testcontainers.Redis" Version="4.16.0" />
-		<PackageReference Include="StackExchange.Redis" Version="3.0.0" />
+		<PackageReference Include="Testcontainers.Redis" />
+		<PackageReference Include="StackExchange.Redis" />
 	</ItemGroup>
 
 </Project>

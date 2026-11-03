@@ -84,11 +84,14 @@ Pick the first option that applies:
    [`package-management/references/canonical-versions.md`](../package-management/references/canonical-versions.md)
    when listed there. Update the canonical table if the bumped version is new or higher.
 
+   Versions live in the root `Directory.Packages.props` (Central Package Management), so the bump
+   is one line there:
+
    ```xml
    <!-- Before -->
-   <PackageReference Include="Hangfire.Core" Version="1.8.16" />
+   <PackageVersion Include="Hangfire.Core" Version="1.8.16" />
    <!-- After — bump fixes vulnerable Newtonsoft.Json transitively -->
-   <PackageReference Include="Hangfire.Core" Version="1.8.22" />
+   <PackageVersion Include="Hangfire.Core" Version="1.8.22" />
    ```
 
 2. **Remove the parent** if it is unused. `dotnet remove package <Parent>` then verify the build.
@@ -106,8 +109,11 @@ If the parent has no patched version and removal / migration is not viable in th
 <!-- DreamTravel.Infrastructure.csproj -->
 <!-- Hangfire.Core 1.8.x has CVE-XXXX in transitive Newtonsoft.Json <13.0.4.
      Override pinned here at the seam. Remove once Hangfire 1.9 ships. -->
-<PackageReference Include="Hangfire.Core" Version="1.8.16" />
-<PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
+<PackageReference Include="Hangfire.Core" />
+<PackageReference Include="Newtonsoft.Json" />
+
+<!-- Directory.Packages.props -->
+<PackageVersion Include="Newtonsoft.Json" Version="13.0.4" />
 ```
 
 Rules for the override:

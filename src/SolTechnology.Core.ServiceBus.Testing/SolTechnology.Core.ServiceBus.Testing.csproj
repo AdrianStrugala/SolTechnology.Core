@@ -21,7 +21,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Testcontainers.ServiceBus" Version="4.16.0" />
+		<PackageReference Include="Testcontainers.ServiceBus" />
 	</ItemGroup>
 
 </Project>

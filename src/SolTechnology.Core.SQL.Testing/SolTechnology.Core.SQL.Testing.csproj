@@ -18,14 +18,14 @@
 	<ItemGroup>
 		<!-- MSSQL uses the generic ContainerBuilder + host-side login probe (NOT Testcontainers.MsSql:
 		     azure-sql-edge lacks sqlcmd, which breaks its built-in wait). Postgres uses the dedicated builder. -->
-		<PackageReference Include="Testcontainers" Version="4.16.0" />
-		<PackageReference Include="Testcontainers.PostgreSql" Version="4.16.0" />
-		<PackageReference Include="Microsoft.SqlServer.DacFx" Version="170.4.83" />
-		<PackageReference Include="Microsoft.Data.SqlClient" Version="7.0.1" />
-		<PackageReference Include="Npgsql" Version="10.0.3" />
-		<PackageReference Include="Respawn" Version="7.0.0" />
+		<PackageReference Include="Testcontainers" />
+		<PackageReference Include="Testcontainers.PostgreSql" />
+		<PackageReference Include="Microsoft.SqlServer.DacFx" />
+		<PackageReference Include="Microsoft.Data.SqlClient" />
+		<PackageReference Include="Npgsql" />
+		<PackageReference Include="Respawn" />
 		<!-- GHSA-846f-f764-76mx via Microsoft.Data.SqlClient; remove when SqlClient depends on a patched Pkcs. -->
-		<PackageReference Include="System.Security.Cryptography.Pkcs" Version="10.0.13" />
+		<PackageReference Include="System.Security.Cryptography.Pkcs" />
 	</ItemGroup>
 
 </Project>

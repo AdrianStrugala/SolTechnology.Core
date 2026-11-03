@@ -9,7 +9,9 @@ change**. When rows drift between projects, the row records the highest version 
 
 ## Build foundation (`src/Directory.Build.props`)
 
-`src/Directory.Build.props` adds **no** `PackageReference` (since 2.0). Each project declares the
+Versions are set centrally in the root `Directory.Packages.props` (Central Package Management);
+this table records which version is canonical and why. `src/Directory.Build.props` adds **no**
+`PackageReference` (since 2.0). Each project declares the
 `Microsoft.Extensions.*` packages it uses itself, so the base `SolTechnology.Core` package ships with zero
 dependencies. Projects with `<FrameworkReference Include="Microsoft.AspNetCore.App" />` get them from the
 shared framework and must not reference them (`NU1510`). When a project does need one, use `10.0.9` and
