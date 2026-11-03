@@ -1,7 +1,7 @@
 ---
 spec: 2026-11-02-core-2-0-tale
 step: 14
-status: to-do
+status: done
 ---
 
 # Step 14: Guide conformance — Tale engine split
@@ -33,12 +33,31 @@ Former core step 62; moved here by the per-library regroup (user, 2026-11-02).
   - the `4097d47f` Tale JSON test (auid step 03).
 
 ## Acceptance criteria
-- [ ] `find src/SolTechnology.Core.Tale/Orchestration -name "*.cs" -not -path "*/obj/*" | xargs wc -l | awk '$1>150 && $2!="total"'` lists no `TaleEngine`, `TaleStepInterpreter`, `TaleStatePersistence`, or `InteractiveChapterInvoker` file (`TaleManager.cs` is step 15).
-- [ ] `dotnet test tests/SolTechnology.Core.Tale.Tests` is green, and the DreamTravel component tests are green.
-- [ ] Public API diff is empty (compare `dotnet build` ref assemblies, or use `Microsoft.DotNet.ApiCompat` locally if available).
-- [ ] RM-16: `git diff --stat -- tests/` for this step prints nothing; the guard tests above are green.
+- [x] `find src/SolTechnology.Core.Tale/Orchestration -name "*.cs" -not -path "*/obj/*" | xargs wc -l | awk '$1>150 && $2!="total"'` lists no `TaleEngine`, `TaleStepInterpreter`, `TaleStatePersistence`, or `InteractiveChapterInvoker` file (`TaleManager.cs` is step 15).
+- [x] `dotnet test tests/SolTechnology.Core.Tale.Tests` is green, and the DreamTravel component tests are green.
+- [x] Public API diff is empty (compare `dotnet build` ref assemblies, or use `Microsoft.DotNet.ApiCompat` locally if available).
+- [x] RM-16: `git diff --stat -- tests/` for this step prints nothing; the guard tests above are green.
 
 ## Open questions
 - none
 
 ## Deviations
+
+### A fifth file for the shared run state
+
+**Original plan:** `TaleEngine` keeps the orchestration loop; `TaleStepInterpreter`,
+`TaleStatePersistence` and `InteractiveChapterInvoker` are extracted.
+
+**Actual implementation:** The three collaborators and the engine all read and change the same
+flags, history and errors, so that state moved into a fifth internal type, `TaleRunState`
+(102 lines), which also owns the track predicates, the status mapping and the history lookup by
+step index and type name. `InteractiveChapterInvoker` takes over the interactive-chapter flow
+(pause, deserialize, retry) together with the cached reflection of `InteractiveChapterReflection`.
+Sizes: `TaleEngine` 145, `InteractiveChapterInvoker` 148, `TaleStepInterpreter` 104,
+`TaleStatePersistence` 67, `TaleRunState` 102 lines. The engine's unused `IsPaused`, `HasFailed`,
+`IsCancelled`, `Errors`, `History` and `TaleId` members were dropped (internal type). Serializer
+options, the history key and the `Version` handling moved verbatim (RM-16). Public API:
+`Microsoft.DotNet.ApiCompat.Tool` 10.0.403 in strict mode found no difference in either direction
+between the Release `SolTechnology.Core.Tale.dll` of `916a8059` and this change.
+`git diff --stat -- tests/` printed nothing, and all 130 Tale tests and the DreamTravel suites
+passed.

@@ -1,68 +1,32 @@
-using System.Collections.Concurrent;
-using System.Reflection;
 using System.Text.Json;
 using Microsoft.Extensions.Logging;
 using SolTechnology.Core.AUID;
-using SolTechnology.Core.Errors;
 using SolTechnology.Core.Tale.Models;
 using SolTechnology.Core.Tale.Persistence;
-// collapsed: using SolTechnology.Core.Tale.Tale;
 
 namespace SolTechnology.Core.Tale.Orchestration;
 
 /// <summary>
 /// Internal execution engine for a tale. Strongly typed — no <c>dynamic</c>, no string-matched
-/// pause detection. Tracks chapter execution, manages pause/resume, aggregates errors and
-/// (optionally) persists state.
+/// pause detection. Runs the plan's chapters, manages pause/resume, aggregates errors and, for
+/// <see cref="TaleManager"/> runs, persists state.
 /// </summary>
-internal sealed class TaleEngine<TInput, TContext, TOutput>
+internal sealed class TaleEngine<TInput, TContext, TOutput>(
+    IServiceProvider serviceProvider,
+    ILogger logger,
+    ITaleRepository? repository,
+    TaleOptions? options,
+    TimeProvider? timeProvider = null)
     where TInput : class
     where TContext : Context<TInput, TOutput>, new()
     where TOutput : class, new()
 {
-    private readonly IServiceProvider _serviceProvider;
-    private readonly ILogger _logger;
-    private readonly ITaleRepository? _repository;
-    private readonly TaleOptions _options;
-    private readonly TimeProvider _timeProvider;
-
+    private readonly TaleRunState _state = new(timeProvider ?? TimeProvider.System);
+    private TaleStatePersistence? _persistence;
+    private InteractiveChapterInvoker<TInput, TContext, TOutput> _interactive = null!;
     private TContext _context = null!;
     private CancellationToken _cancellationToken;
-    private JsonElement? _resumeInput;
-    private DateTime _createdAt;
-
-    private readonly List<Error> _errors = new();
-    private readonly List<ChapterInfo> _chapterHistory = new();
-
-    private bool _isPaused;
-    private bool _hasFailed;
-    private bool _isCancelled;
-    private Error? _saveError;
-    private long _version;
-    private string? _idempotencyKey;
-    private bool _isInitialized;
     private string _handlerTypeName = string.Empty;
-
-    public TaleEngine(
-        IServiceProvider serviceProvider,
-        ILogger logger,
-        ITaleRepository? repository,
-        TaleOptions? options,
-        TimeProvider? timeProvider = null)
-    {
-        _serviceProvider = serviceProvider;
-        _logger = logger;
-        _repository = repository;
-        _options = options ?? TaleOptions.Default;
-        _timeProvider = timeProvider ?? TimeProvider.System;
-    }
-
-    public bool IsPaused => _isPaused;
-    public bool HasFailed => _hasFailed;
-    public bool IsCancelled => _isCancelled;
-    public IReadOnlyList<Error> Errors => _errors;
-    public IReadOnlyList<ChapterInfo> History => _chapterHistory;
-    public Auid TaleId => _context is null ? Auid.Empty : _context.TaleInstanceId;
 
     public void Initialize(
         TContext context,
@@ -73,447 +37,109 @@ internal sealed class TaleEngine<TInput, TContext, TOutput>
     {
         _context = context;
         _handlerTypeName = handlerType.Name;
-        _resumeInput = resumeInput;
+        _state.ResumeInput = resumeInput;
         _cancellationToken = cancellationToken;
-        _isInitialized = true;
+        _persistence = repository == null ? null : new TaleStatePersistence(repository, _state);
+        _interactive = new(logger, _state, _handlerTypeName, isPersisted: _persistence != null);
 
-        _idempotencyKey = run.IdempotencyKey;
         if (run.Resume != null)
         {
-            LoadTaleState(run.Resume);
-            _logger.LogInformation("Tale {TaleId} resuming from saved state", context.TaleInstanceId);
+            _persistence?.Restore(run.Resume);
+            logger.LogInformation("Tale {TaleId} resuming from saved state", context.TaleInstanceId);
             return;
         }
 
-        _createdAt = _timeProvider.GetUtcNow().UtcDateTime;
-        var newId = Auid.New(_options.TaleIdPrefix);
+        _persistence?.Start(run.IdempotencyKey);
+        var newId = Auid.New((options ?? TaleOptions.Default).TaleIdPrefix);
         context.TaleInstanceId = newId;
-        _logger.LogInformation("Tale started with ID {TaleId}", newId);
+        logger.LogInformation("Tale started with ID {TaleId}", newId);
     }
 
-    /// <summary>
-    /// Interprets a <see cref="Tale{TOutput}"/> plan: walks each recorded step in order, applying the
-    /// first-error short-circuit. Chapters after a failure are skipped; an <c>Otherwise</c> step can
-    /// clear the failure and resume.
-    /// </summary>
     public async Task Run(IReadOnlyList<TaleStep> steps)
     {
         // The first save claims the tale (and a new tale's idempotency key) before any chapter runs.
-        if (_repository != null)
-        {
-            await SaveTaleState(TaleStatus.Running, _cancellationToken);
-        }
-
-        for (var stepIndex = 0; stepIndex < steps.Count; stepIndex++)
-        {
-            switch (steps[stepIndex])
-            {
-                case ReadStep s:
-                    await ExecuteChapter(s.ChapterType, stepIndex);
-                    break;
-                case GuardStep s:
-                    ApplyGuard(s);
-                    break;
-                case FallbackChapterStep s:
-                    await ApplyFallbackChapter(s.ChapterType, stepIndex);
-                    break;
-                case FallbackStep s:
-                    await ApplyFallback(s.Recover);
-                    break;
-                case OnLostStep s:
-                    await ApplyOnLost(s.Effect);
-                    break;
-                case OnWonStep s:
-                    await ApplyOnWon(s.Effect);
-                    break;
-                case InlineStep s:
-                    await ApplyInline(s.Action);
-                    break;
-            }
-        }
+        await Save(TaleStatus.Running, _cancellationToken);
+        await new TaleStepInterpreter(_state, ExecuteChapter).Run(steps, _context);
     }
 
-    // The tale runs on one of two tracks. Won-track steps act only while it is still succeeding;
-    // lost-track steps act only after a failure (until an Otherwise recovers). Both tracks are
-    // suspended once the tale is cancelled or paused.
-    private bool OnWonTrack => !_isCancelled && !_isPaused && !_hasFailed && _saveError is null;
-    private bool OnLostTrack => !_isCancelled && !_isPaused && _hasFailed && _saveError is null;
-
-    private void ApplyGuard(GuardStep step)
+    public Result<TOutput> GetResult(Func<object, TOutput> conclusion) => _state switch
     {
-        if (!OnWonTrack) return;
-        if (!step.Predicate(_context)) HandleChapterFailure(null, step.Error);
-    }
+        { SaveError: { } saveError } => Result<TOutput>.Fail(saveError),
+        { IsCancelled: true } => Result<TOutput>.Fail(new TaleCancelledError(_context.TaleInstanceId)),
+        { Errors.Count: > 0 } => Result<TOutput>.Fail(_state.Errors[0]),
+        { IsPaused: true } => Result<TOutput>.Fail(new TalePausedError(_context.TaleInstanceId, _context.CurrentChapterId)),
+        _ => Result<TOutput>.Success(conclusion(_context))
+    };
 
-    private async Task ApplyFallbackChapter(Type chapterType, int stepIndex)
-    {
-        if (!OnLostTrack) return;
-        ClearFailure();
-        await ExecuteChapter(chapterType, stepIndex);
-    }
-
-    private async Task ApplyFallback(Func<object, Task<Result>> recover)
-    {
-        if (!OnLostTrack) return;
-        ClearFailure();
-        var result = await recover(_context);
-        if (result.IsFailure) HandleChapterFailure(null, result.Error!);
-    }
-
-    private async Task ApplyOnLost(Func<Error, Task> effect)
-    {
-        if (!OnLostTrack) return;
-        await effect(_errors[^1]);
-    }
-
-    private async Task ApplyOnWon(Func<object, Task> effect)
-    {
-        if (!OnWonTrack) return;
-        await effect(_context);
-    }
-
-    private async Task ApplyInline(Func<object, Task<Result>> action)
-    {
-        if (!OnWonTrack) return;
-        var result = await action(_context);
-        if (result.IsFailure) HandleChapterFailure(null, result.Error!);
-    }
-
-    private void ClearFailure()
-    {
-        _hasFailed = false;
-        _errors.Clear();
-    }
+    // The terminal state must be stored even when the run's token is what ended the run.
+    public Task PersistTerminalState() =>
+        _state.SaveError == null ? Save(_state.TerminalStatus, CancellationToken.None) : Task.CompletedTask;
 
     private async Task ExecuteChapter(Type chapterType, int stepIndex)
     {
-        if (!_isInitialized)
-            throw new InvalidOperationException("TaleEngine must be initialized first");
-
-        if (_isCancelled || _saveError != null) return;
-        if (_isPaused && _resumeInput == null) return;
-        if (_hasFailed) return;
-
-        var chapter = _serviceProvider.GetService(chapterType) as IChapter<TContext>;
-        if (chapter == null)
-        {
-            HandleChapterFailure(null, new Error
-            {
-                Message = $"Chapter {chapterType.Name} not registered in DI container"
-            });
-            return;
-        }
-
-
-        var chapterTypeName = ChapterTypeName.Of(chapterType);
-        var existingChapter = _chapterHistory.FirstOrDefault(h =>
-            h.StepIndex == stepIndex && h.ChapterTypeName == chapterTypeName);
-        if (existingChapter is { Status: TaleStatus.Completed })
+        if (_state.IsCancelled || _state.SaveError != null || _state.HasFailed
+            || (_state.IsPaused && _state.ResumeInput == null))
         {
             return;
         }
 
-        if (_isPaused && existingChapter?.Status == TaleStatus.WaitingForInput)
+        if (serviceProvider.GetService(chapterType) is not IChapter<TContext> chapter)
         {
-            _logger.LogInformation("Resuming tale at chapter {ChapterId}", chapter.ChapterId);
-            _isPaused = false;
+            _state.Fail(null, new Error { Message = $"Chapter {chapterType.Name} not registered in DI container" });
+            return;
         }
 
-        var chapterInfo = existingChapter ?? new ChapterInfo
+        var chapterInfo = _state.Track(chapter.ChapterId, ChapterTypeName.Of(chapterType), stepIndex, out var resumed);
+        if (chapterInfo == null)
         {
-            ChapterId = chapter.ChapterId,
-            StepIndex = stepIndex,
-            ChapterTypeName = chapterTypeName,
-            StartedAt = _timeProvider.GetUtcNow().UtcDateTime,
-            Status = TaleStatus.Running
-        };
+            return;
+        }
 
-        if (existingChapter == null) _chapterHistory.Add(chapterInfo);
+        if (resumed)
+        {
+            logger.LogInformation("Resuming tale at chapter {ChapterId}", chapter.ChapterId);
+        }
 
-        _logger.LogInformation("Executing chapter: {ChapterId}", chapter.ChapterId);
+        logger.LogInformation("Executing chapter: {ChapterId}", chapter.ChapterId);
+        await ReadChapter(chapter, chapterInfo);
+        await Save(_state.IntermediateStatus, _cancellationToken);
+    }
 
+    private async Task ReadChapter(IChapter<TContext> chapter, ChapterInfo chapterInfo)
+    {
         try
         {
             _cancellationToken.ThrowIfCancellationRequested();
+            var result = InteractiveChapterInvoker<TInput, TContext, TOutput>.TryGetInputType(chapter.GetType(), out var inputType)
+                ? await _interactive.Read(chapter, inputType!, chapterInfo, _context, _cancellationToken)
+                : await chapter.Read(_context, _cancellationToken);
 
-            Result result;
-            if (TryGetInteractiveInputType(chapter.GetType(), out var inputType))
+            // Rejected interactive input keeps the tale paused for a retry; it is not a failure.
+            if (result.IsFailure && !_state.IsPaused)
             {
-                result = await ExecuteInteractiveChapter(chapter, inputType!, chapterInfo);
+                _state.Fail(chapterInfo, result.Error!);
             }
-            else
-            {
-                result = await chapter.Read(_context, _cancellationToken);
-            }
-
-            if (result.IsFailure)
-            {
-                // When the interactive chapter's ReadWithInput returns a validation error,
-                // ExecuteInteractiveChapter re-pauses the tale (_isPaused = true) so the
-                // user can retry. In that case, skip HandleChapterFailure — the tale is
-                // NOT terminally failed. For all other failures (deserialization errors,
-                // automated chapters), _isPaused stays false → terminal failure.
-                if (!_isPaused)
-                {
-                    HandleChapterFailure(chapterInfo, result.Error!);
-                }
-            }
-            else if (chapterInfo.Status != TaleStatus.WaitingForInput)
+            else if (result.IsSuccess && chapterInfo.Status != TaleStatus.WaitingForInput)
             {
                 chapterInfo.Status = TaleStatus.Completed;
-                chapterInfo.FinishedAt = _timeProvider.GetUtcNow().UtcDateTime;
+                chapterInfo.FinishedAt = _state.Now;
             }
         }
         catch (OperationCanceledException) when (_cancellationToken.IsCancellationRequested)
         {
-            _isCancelled = true;
+            _state.IsCancelled = true;
             chapterInfo.Status = TaleStatus.Cancelled;
-            chapterInfo.FinishedAt = _timeProvider.GetUtcNow().UtcDateTime;
+            chapterInfo.FinishedAt = _state.Now;
             throw;
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Chapter {ChapterId} failed", chapter.ChapterId);
-            HandleChapterFailure(chapterInfo, Error.From(ex));
-        }
-
-        if (_repository != null) await SaveTaleState(IntermediateStatus(), _cancellationToken);
-    }
-
-    /// <summary>
-    /// Walks the type hierarchy looking for <see cref="InteractiveChapter{TContext,TChapterInput}"/>.
-    /// Supports multi-level inheritance.
-    /// </summary>
-    private static bool TryGetInteractiveInputType(Type chapterType, out Type? inputType)
-    {
-        var t = chapterType;
-        while (t != null && t != typeof(object))
-        {
-            if (t.IsGenericType && t.GetGenericTypeDefinition() == typeof(InteractiveChapter<,>))
-            {
-                inputType = t.GetGenericArguments()[1];
-                return true;
-            }
-            t = t.BaseType;
-        }
-        inputType = null;
-        return false;
-    }
-
-    private async Task<Result> ExecuteInteractiveChapter(
-        IChapter<TContext> chapter,
-        Type inputType,
-        ChapterInfo chapterInfo)
-    {
-        var chapterType = chapter.GetType();
-
-        var schema = InteractiveChapterReflection.GetSchema(chapterType, chapter);
-        if (schema != null)
-        {
-            chapterInfo.RequiredData = schema.ToList();
-        }
-
-        if (_resumeInput == null)
-        {
-            if (_repository == null)
-            {
-                _logger.LogWarning(
-                    "Tale [{TaleHandler}] paused outside TaleManager; the run is not persisted and cannot be resumed.",
-                    _handlerTypeName);
-            }
-
-            _isPaused = true;
-            chapterInfo.Status = TaleStatus.WaitingForInput;
-            _context.CurrentChapterId = chapter.ChapterId;
-            return Result.Success();
-        }
-
-        object? deserializedInput;
-        try
-        {
-            deserializedInput = JsonSerializer.Deserialize(_resumeInput.Value, inputType, TaleJsonOptions.Default);
-        }
-        catch (JsonException ex)
-        {
-            _logger.LogWarning(ex, "Input for chapter {ChapterId} could not be deserialized", chapter.ChapterId);
-            return RejectInput(chapter, chapterInfo, $"Input for chapter '{chapter.ChapterId}' is invalid at '{ex.Path}'.");
-        }
-
-        if (deserializedInput == null)
-        {
-            return RejectInput(chapter, chapterInfo, $"Input for chapter '{chapter.ChapterId}' is required.");
-        }
-
-        chapterInfo.ProvidedData = _resumeInput;
-
-        var result = await InteractiveChapterReflection.InvokeReadWithInput(
-            chapterType, chapter, _context, deserializedInput, _cancellationToken);
-
-        if (result.IsSuccess)
-        {
-            _resumeInput = null;
-            chapterInfo.Status = TaleStatus.Running;
-            _context.CurrentChapterId = null;
-        }
-        else
-        {
-            PauseForRetry(chapter, chapterInfo, result.Error);
-        }
-
-        return result;
-    }
-
-    private Result RejectInput(IChapter<TContext> chapter, ChapterInfo chapterInfo, string message)
-    {
-        var error = new ValidationError { Message = message };
-        PauseForRetry(chapter, chapterInfo, error);
-        return Result.Fail(error);
-    }
-
-    /// <summary>
-    /// Keeps the tale paused at the current interactive chapter after a validation failure,
-    /// allowing the user to retry with corrected input. Does NOT set <see cref="_hasFailed"/>
-    /// — the tale is still alive and waiting for input.
-    /// </summary>
-    private void PauseForRetry(IChapter<TContext> chapter, ChapterInfo chapterInfo, Error? error)
-    {
-        _logger.LogInformation("Interactive chapter {ChapterId} rejected input: {Error}",
-            chapter.ChapterId, error?.Message);
-        _resumeInput = null;
-        _isPaused = true;
-        chapterInfo.Status = TaleStatus.WaitingForInput;
-        chapterInfo.Error = error;
-    }
-
-    private void HandleChapterFailure(ChapterInfo? chapterInfo, Error error)
-    {
-        _errors.Add(error);
-        _hasFailed = true;
-        if (chapterInfo != null)
-        {
-            chapterInfo.Error = error;
-            chapterInfo.Status = TaleStatus.Failed;
-            chapterInfo.FinishedAt = _timeProvider.GetUtcNow().UtcDateTime;
+            logger.LogError(ex, "Chapter {ChapterId} failed", chapter.ChapterId);
+            _state.Fail(chapterInfo, Error.From(ex));
         }
     }
 
-    public Result<TOutput> GetResult(Func<object, TOutput> conclusion)
-    {
-        if (_saveError != null)
-            return Result<TOutput>.Fail(_saveError);
-
-        if (_isCancelled)
-            return Result<TOutput>.Fail(new TaleCancelledError(_context is null ? Auid.Empty : _context.TaleInstanceId));
-
-        if (_errors.Count > 0)
-            return Result<TOutput>.Fail(_errors[0]);
-
-        if (_isPaused)
-            return Result<TOutput>.Fail(new TalePausedError(_context.TaleInstanceId, _context.CurrentChapterId));
-
-        return Result<TOutput>.Success(conclusion(_context));
-    }
-
-    public TaleStatus GetTerminalStatus()
-    {
-        if (_isCancelled) return TaleStatus.Cancelled;
-        if (_hasFailed) return TaleStatus.Failed;
-        if (_isPaused) return TaleStatus.WaitingForInput;
-        return TaleStatus.Completed;
-    }
-
-    public Task PersistTerminalState()
-    {
-        if (_repository == null || _saveError != null) return Task.CompletedTask;
-        // The terminal state must be stored even when the run's token is what ended the run.
-        return SaveTaleState(GetTerminalStatus(), CancellationToken.None);
-    }
-
-    private async Task SaveTaleState(TaleStatus status, CancellationToken cancellationToken)
-    {
-        if (_repository == null) return;
-        if (_context.TaleInstanceId == Auid.Empty) return;
-
-        var instance = new TaleInstance
-        {
-            TaleId = _context.TaleInstanceId,
-            HandlerTypeName = _handlerTypeName,
-            Status = status,
-            CreatedAt = _createdAt == default ? _timeProvider.GetUtcNow().UtcDateTime : _createdAt,
-            LastUpdatedAt = _timeProvider.GetUtcNow().UtcDateTime,
-            History = new List<ChapterInfo>(_chapterHistory),
-            CurrentChapter = status == TaleStatus.WaitingForInput ? _chapterHistory.LastOrDefault() : null,
-            Context = JsonSerializer.Serialize(_context, TaleJsonOptions.Default),
-            IdempotencyKey = _idempotencyKey,
-            Version = _version
-        };
-
-        var saved = await _repository.Save(instance, cancellationToken);
-        if (saved.IsFailure)
-        {
-            _saveError = saved.Error;
-            return;
-        }
-
-        _version = instance.Version;
-    }
-
-    private TaleStatus IntermediateStatus()
-    {
-        if (_isCancelled) return TaleStatus.Cancelled;
-        if (_isPaused) return TaleStatus.WaitingForInput;
-        if (_hasFailed) return TaleStatus.Failed;
-        return TaleStatus.Running;
-    }
-
-    private void LoadTaleState(TaleInstance instance)
-    {
-        _chapterHistory.Clear();
-        _chapterHistory.AddRange(instance.History);
-        _createdAt = instance.CreatedAt;
-        _version = instance.Version;
-        _idempotencyKey = instance.IdempotencyKey;
-        _isPaused = instance.Status == TaleStatus.WaitingForInput;
-        _hasFailed = instance.Status == TaleStatus.Failed;
-        _isCancelled = instance.Status == TaleStatus.Cancelled;
-    }
+    private Task Save(TaleStatus status, CancellationToken cancellationToken) =>
+        _persistence?.Save(_context, _context.TaleInstanceId, _handlerTypeName, status, cancellationToken)
+        ?? Task.CompletedTask;
 }
-
-/// <summary>
-/// Reflection helpers for interactive chapters. Method handles are cached for performance.
-/// </summary>
-internal static class InteractiveChapterReflection
-{
-    private static readonly ConcurrentDictionary<Type, MethodInfo?> _getSchemaCache = new();
-    private static readonly ConcurrentDictionary<Type, MethodInfo?> _readWithInputCache = new();
-
-    public static IReadOnlyList<DataField>? GetSchema(Type chapterType, object chapterInstance)
-    {
-        var method = _getSchemaCache.GetOrAdd(chapterType, t =>
-            t.GetMethod("GetRequiredInputSchema", BindingFlags.Public | BindingFlags.Instance));
-        if (method == null) return null;
-
-        var result = method.Invoke(chapterInstance, null);
-        return result switch
-        {
-            IReadOnlyList<DataField> ro => ro,
-            IEnumerable<DataField> list => list.ToList(),
-            _ => null
-        };
-    }
-
-    public static async Task<Result> InvokeReadWithInput(
-        Type chapterType, object chapterInstance, object context, object input, CancellationToken cancellationToken)
-    {
-        var method = _readWithInputCache.GetOrAdd(chapterType, t =>
-            t.GetMethod("ReadWithInput", BindingFlags.Public | BindingFlags.Instance));
-        if (method == null)
-        {
-            return Result.Fail($"ReadWithInput not found on {chapterType.Name}");
-        }
-
-        var task = (Task<Result>)method.Invoke(chapterInstance, new[] { context, input, cancellationToken })!;
-        return await task;
-    }
-}
-
