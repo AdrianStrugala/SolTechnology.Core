@@ -33,7 +33,8 @@ or `master` push. The workflow token is read-only (`permissions: contents: read`
 2. `dotnet workload restore SolTechnology.Core.slnx` — required before restore/build on a clean CI box.
 3. Restore + `dotnet build SolTechnology.Core.slnx --no-restore`.
 4. Test via `./.github/runTests.ps1` — runs every `tests/` project listed in the slnx and fails the
-   job if any of them fails.
+   job if any of them fails. The script resolves the slnx from its own location, so it works from
+   any working directory, and it fails when `dotnet sln list` fails or finds no test project.
 5. **slnx-membership guard** — every packable `src/*` project must be listed in
    `SolTechnology.Core.slnx`, otherwise the pack glob would silently skip it. Projects with
    `<IsPackable>false>` and the two deprecated ids kept out of the slnx (`Scheduler`, `Guards`) are

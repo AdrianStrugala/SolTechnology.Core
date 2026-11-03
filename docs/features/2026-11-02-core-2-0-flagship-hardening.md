@@ -525,6 +525,10 @@ these notes from the steps:
   (`IOptions<AuthConfiguration>`). Behaviour, the `X-API-KEY` header, and the `ApiKey` scheme are unchanged.
   `SolTechnology.Core.Authentication` stays at 1.x and is deprecated on nuget.org; keeping it next to 2.x packages
   warns with `SOLCORE001`.
+- result (post-completion review, 2026-11-03): `Result` and `Result<T>` have no public constructor
+  (`new Result()` no longer compiles; build results through the factories). Deserializing JSON whose
+  `IsSuccess` and `Error` disagree — `{}`, `{"IsSuccess":false}`, or a success carrying an error —
+  throws `JsonException`; every shape 1.x and 2.0 write still reads.
 
 ### Resolved questions (user answers, 2026-11-02)
 
@@ -646,3 +650,19 @@ the release feature (split, 2026-11-02).
 - Remove the `System.Security.Cryptography.Pkcs 10.0.13` override from `SolTechnology.Core.SQL` and
   `SolTechnology.Core.SQL.Testing` once `Microsoft.Data.SqlClient` depends on a patched Pkcs
   (recorded at planning time, RQ1; the retrospective adds the rest).
+
+## Post-completion review fixes (2026-11-03)
+
+An independent code review of the completed core 02 (`runTests.ps1`) work found one issue.
+
+- **C2 — finding:** `.github/runTests.ps1` ignored the exit code of `dotnet sln ... list`, matched
+  projects with `-like 'tests/*'` (forward slash only), and resolved the slnx from the working
+  directory. Run from another directory it printed "All 0 test projects passed." and exited `0`.
+  **Fix:** the script resolves the slnx from `$PSScriptRoot/..`, exits `1` when the list command
+  fails, matches `^tests[\\/]`, exits `1` with a message when no test project is found, and passes
+  absolute project paths to `dotnet test`.
+  **Verification (pwsh 7):** the committed script, run from `/Users/.../GitHub` (outside the repo),
+  printed "Could not find solution" and exited `0`; after the fix the same run executed all 12 test
+  projects and exited `0`; a temporary `Assert.Fail` test (reverted) made it list
+  `tests/SolTechnology.Core.Tests/SolTechnology.Core.Tests.csproj` and exit `1`; a copy of the
+  script placed where no slnx exists exited `1` with "Listing projects ... failed".
