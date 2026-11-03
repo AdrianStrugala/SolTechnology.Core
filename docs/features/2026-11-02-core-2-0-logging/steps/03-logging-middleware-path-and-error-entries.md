@@ -1,7 +1,7 @@
 ---
 spec: 2026-11-02-core-2-0-logging
 step: 03
-status: to-do
+status: in-progress
 ---
 
 # Step 03: Logging — segment-aware path matching; one Error entry per failure

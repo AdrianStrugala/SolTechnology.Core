@@ -1,7 +1,7 @@
 ---
 spec: 2026-11-02-core-2-0-logging
 step: 02
-status: to-do
+status: done
 ---
 
 # Step 02: Logging — `AddSolLogging(IConfiguration)` registers its middleware dependencies
@@ -25,10 +25,16 @@ Former core step 14; moved here by the per-library regroup (user, 2026-11-02).
 - `Logging/ModuleInstaller.cs` is already 167 lines; keep the net growth minimal. Step 07 brings it under 150.
 
 ## Acceptance criteria
-- [ ] `dotnet test tests/SolTechnology.Core.Logging.Tests` is green with no `[Ignore]`.
-- [ ] A `TestServer` request through `UseSolLogging()` after `AddSolLogging(configuration)` returns 200 (added to the same test class).
+- [x] `dotnet test tests/SolTechnology.Core.Logging.Tests` is green with no `[Ignore]`.
+- [x] A `TestServer` request through `UseSolLogging()` after `AddSolLogging(configuration)` returns 200 (added to the same test class).
 
 ## Open questions
 - none
 
 ## Deviations
+
+### Shared path also owns option validation
+
+**Original plan:** Move the shared `TryAdd*` registrations (`ICorrelationIdService`, `ITimingService`, `TimeProvider.System`, enrichers) into a private `RegisterCore()`.
+
+**Actual implementation:** `RegisterCore()` also creates the `LoggingOptions` builder with the validation chain that both overloads duplicated, and returns it; the `Action` overload adds `Configure`, the configuration overload adds `Bind`. Option binding and validation rules are unchanged, and `ModuleInstaller.cs` shrinks from 167 to 161 lines instead of growing. The `Microsoft.AspNetCore.TestHost` consumer list in the package-management canonical-version table now includes `SolTechnology.Core.Logging.Tests`.

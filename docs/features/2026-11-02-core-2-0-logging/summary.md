@@ -20,8 +20,8 @@ are `done` and after these library features are `completed`: none. No step is `b
 | # | Title | File | Status |
 |---|---|---|---|
 | 01 | DI resolution test — Logging | [`steps/01-di-resolution-test.md`](steps/01-di-resolution-test.md) | done |
-| 02 | Logging — `AddSolLogging(IConfiguration)` registers its middleware dependencies | [`steps/02-logging-configuration-overload-registrations.md`](steps/02-logging-configuration-overload-registrations.md) | to-do |
-| 03 | Logging — segment-aware path matching; one Error entry per failure | [`steps/03-logging-middleware-path-and-error-entries.md`](steps/03-logging-middleware-path-and-error-entries.md) | to-do |
+| 02 | Logging — `AddSolLogging(IConfiguration)` registers its middleware dependencies | [`steps/02-logging-configuration-overload-registrations.md`](steps/02-logging-configuration-overload-registrations.md) | done |
+| 03 | Logging — segment-aware path matching; one Error entry per failure | [`steps/03-logging-middleware-path-and-error-entries.md`](steps/03-logging-middleware-path-and-error-entries.md) | in-progress |
 | 04 | Logging — sanitize inbound correlation IDs; safe timings and masking | [`steps/04-logging-correlation-and-masking-input.md`](steps/04-logging-correlation-and-masking-input.md) | to-do |
 | 05 | Logging — public surface cleanup (`LoggerExtensions`, internal `Operations`) | [`steps/05-logging-public-surface.md`](steps/05-logging-public-surface.md) | to-do |
 | 06 | Module docs — `docs/Log.md` | [`steps/06-docs-log.md`](steps/06-docs-log.md) | to-do |
