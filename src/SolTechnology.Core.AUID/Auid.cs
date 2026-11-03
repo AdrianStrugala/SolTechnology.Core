@@ -96,7 +96,7 @@ public readonly struct Auid : IComparable<Auid>, IEquatable<Auid>, IParsable<Aui
     /// // Explicit code
     /// var userId = Auid.New("USR");
     ///
-    /// // Inferred from file name (e.g., OrderService.cs -> ORS)
+    /// // Inferred from file name (e.g., OrderService.cs -> ORD)
     /// var id = Auid.New();
     /// </code>
     /// </example>

@@ -23,6 +23,6 @@ are `done` and after these library features are `completed`: none. No step is `b
 | 02 | AUID — standards-compliant converters; honest uniqueness and ordering docs | [`steps/02-auid-converters-and-docs.md`](steps/02-auid-converters-and-docs.md) | done |
 | 03 | AUID — `SolTechnology.Core.AUID` namespace; no process-wide `TimeProvider` | [`steps/03-auid-namespace-and-time-provider.md`](steps/03-auid-namespace-and-time-provider.md) | done |
 | 04 | XML docs shipped — AUID | [`steps/04-xml-docs.md`](steps/04-xml-docs.md) | done |
-| 05 | Module docs — `docs/AUID.md` for the 2.0 namespace and `TimeProvider` overloads | [`steps/05-docs-auid.md`](steps/05-docs-auid.md) | to-do |
+| 05 | Module docs — `docs/AUID.md` for the 2.0 namespace and `TimeProvider` overloads | [`steps/05-docs-auid.md`](steps/05-docs-auid.md) | done |
 | 06 | Guide conformance — AUID | [`steps/06-conform-auid.md`](steps/06-conform-auid.md) | to-do |
 | 07 | Retrospective | [`steps/07-retrospective.md`](steps/07-retrospective.md) | to-do |

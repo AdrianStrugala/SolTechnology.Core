@@ -1,119 +1,138 @@
-### Overview
+## SolTechnology.Core.AUID
 
-The **SolTechnology.Core.AUID** library provides a high-performance 64-bit unique identifier (AUID - Application Unique ID) designed for scenarios where GUIDs are too large and auto-increment IDs are insufficient.
-
-AUID structure: **[Code: 15 bits] [Timestamp: 32 bits] [Random: 17 bits]** = 64 bits total
-
-- **Code (15 bits)**: 3-letter identifier (AAA-ZZZ) for entity type
-- **Timestamp (32 bits)**: Seconds since 2001-01-01 UTC (valid until year 2137)
-- **Random (17 bits)**: Collision prevention within same second (0-131071). It is a bound, not a guarantee — see [Uniqueness and ordering](#uniqueness-and-ordering)
+A 64-bit, human-readable, time-ordered identifier (`Auid`) for entities and events — half the size
+of a GUID, with the entity type and creation second visible in the ID itself
+(`ORD_20241205123456_012345`).
 
 ### Features
 
-- Zero-allocation design using `Span<T>` and `stackalloc`
-- Type-safe with automatic code generation from type names
-- Human-readable string format: `COD_YYYYMMDDHHmmss_RANDOM` (e.g., `ORD_20241205123456_012345`)
-- Sortable by creation second within one code
-- Compact 64-bit storage (vs 128-bit GUID)
-- Built-in JSON converter (values and dictionary keys) and `TypeConverter`
+- Compact 64-bit value (`long`) instead of a 128-bit GUID; store it as `BIGINT`.
+- Human-readable string `COD_YYYYMMDDHHmmss_RANDOM`, formatted culture-invariantly.
+- 3-letter code per entity type, derived from a type name, a caller file name, or given explicitly.
+- Sortable by creation second within one code.
+- Strict parsing: malformed strings, codes outside `AAA`–`ZZZ` and timestamps outside
+  2001-01-01 to 2137-02-07 are rejected.
+- `System.Text.Json` support for values and dictionary keys, plus a `TypeConverter` for model and
+  configuration binding.
+- Deterministic tests through a `TimeProvider` overload — no process-wide clock.
+- Zero allocations for creation; formatting allocates only the resulting string.
 
-### Installation
+### Registration
 
-```bash
-dotnet add package SolTechnology.Core.AUID
+No registration or DI needed: reference the package and import the namespace.
+
+```csharp
+using SolTechnology.Core.AUID;
+
+var orderId = Auid.New<Order>();
 ```
+
+### Configuration
+
+No configuration needed.
 
 ### Usage
 
-#### 1. Generate from generic type
+#### Creating IDs
+
+`New<T>()` derives the code from the type name, `New("USR")` takes it explicitly, and `New()` derives
+it from the calling source file.
 
 ```csharp
-var orderId = Auid.New<Order>();
-// Creates AUID with code "ORD" derived from type name
-// Example output: ORD_20241205123456_012345
+using SolTechnology.Core.AUID;
+
+var orderId = Auid.New<Order>();   // ORD_20241205123456_012345
+var userId = Auid.New("USR");      // USR_20241205123458_012346
+var fileId = Auid.New();           // called from OrderService.cs -> ORD_...
 ```
 
-#### 2. Generate with explicit code
+The code is the first letter of the name followed by its next consonants (`A`, `E`, `I`, `O`, `U`,
+`Y` are skipped), padded with `X`:
+
+| Name | Code |
+|---|---|
+| `Order`, `OrderService` | `ORD` |
+| `User` | `USR` |
+| `City` | `CTX` |
+| `AI` | `AXX` |
+
+An explicit code must be exactly three uppercase letters `A`–`Z`; anything else throws
+`ArgumentException`.
+
+#### Controlling the clock
+
+Pass a `TimeProvider` to take the timestamp from it instead of `TimeProvider.System`.
 
 ```csharp
-var userId = Auid.New("USR");
-// Creates AUID with code "USR"
-// Example output: USR_20241205123458_012346
+using SolTechnology.Core.AUID;
+
+var clock = TimeProvider.System;   // or any TimeProvider, e.g. FakeTimeProvider in tests
+var orderId = Auid.New<Order>(clock);
+var userId = Auid.New("USR", clock);
+var defaultCodeId = Auid.New(null, clock);   // XXX_...
 ```
 
-#### 3. Generate with caller file inference
+#### Parsing
+
+`Parse` throws `FormatException` for invalid input; `TryParse` returns `false`.
 
 ```csharp
-var id = Auid.New();
-// Automatically infers code from source file name
-// Called from "OrderService.cs" -> generates code "ORS"
-```
+using SolTechnology.Core.AUID;
 
-#### 4. Parse from string
-
-```csharp
 var auid = Auid.Parse("ORD_20241205123456_012345");
-if (Auid.TryParse("ORD_20241205123456_012345", null, out var result))
+if (Auid.TryParse("ORD_20241205123456_012345", null, out var parsed))
 {
-    Console.WriteLine(result.Value); // Access raw 64-bit value
+    Console.WriteLine(parsed.Value);   // raw 64-bit value
 }
 ```
 
-#### 5. Parse from long
+`TryParse` returns `false` when:
+
+| Input | Example |
+|---|---|
+| Wrong length or separators | `ORD-20241205123456-012345` |
+| Code not three uppercase letters | `ord_20241205123456_012345` |
+| Timestamp not a valid date | `ORD_20241332123456_012345` |
+| Timestamp before 2001-01-01 or after 2137-02-07 06:28:15 UTC | `ORD_21380101000000_000001` |
+| Random part above 131071 | `ORD_20241205123456_999999` |
+
+#### Raw 64-bit value
+
+`Auid` converts implicitly to `long` and explicitly from `long`; `Parse(long)` validates the code bits.
 
 ```csharp
-long rawValue = 123456789L;
-var auid = Auid.Parse(rawValue);
+using SolTechnology.Core.AUID;
+
+long raw = Auid.New("ORD");        // implicit, e.g. for a BIGINT column
+var fromColumn = (Auid)raw;        // explicit, no validation
+var checkedId = Auid.Parse(raw);   // FormatException when the code bits exceed ZZZ
 ```
 
-### Code Generation Rules
+`Value` can be negative: codes from `YGE` to `ZZZ` set the sign bit.
 
-When using `Auid.New<T>()` or `Auid.New()`, the library generates a 3-letter code:
+#### JSON and binding
 
-1. First character: First letter of name (uppercase)
-2. Next characters: Next consonants from name (skip vowels)
-3. Padding: Fill with 'X' if needed
+`Auid` serializes as its string form through the built-in `AuidJsonConverter`, also as a
+dictionary key.
 
-Examples:
-- `Order` -> `ORD`
-- `User` -> `USR`
-- `City` -> `CTX`
-- `AI` -> `AXX` (padded)
+```csharp
+using System.Text.Json;
+using SolTechnology.Core.AUID;
 
-### Validation
+var totals = new Dictionary<Auid, decimal> { [Auid.New("ORD")] = 99.90m };
+var json = JsonSerializer.Serialize(totals);   // {"ORD_20241205123456_012345":99.90}
+var back = JsonSerializer.Deserialize<Dictionary<Auid, decimal>>(json);
+```
 
-- Code must be exactly 3 uppercase letters (A-Z)
-- Maximum date: **February 7, 2137** (32-bit timestamp limit)
-- Attempting to generate AUID after year 2137 throws `InvalidOperationException`
+| Input | `AuidJsonConverter` | `AuidTypeConverter` |
+|---|---|---|
+| Valid string | `Auid` | `Auid` |
+| Invalid or empty string | `JsonException` with the JSON path | `NotSupportedException` naming the value |
+| Non-string token | `JsonException` | — |
 
-### Performance
+`Auid.Empty` (value `0`) serializes as `AAA_20010101000000_000000` and round-trips.
 
-- Zero allocations for creation and formatting (uses `Span<T>`)
-- Aggressive inlining for hot paths
-- Fast parsing with zero-allocation span operations
-
-### String Format
-
-Format: `COD_YYYYMMDDHHmmss_RANDOM`
-- Code: 3 uppercase letters (AAA-ZZZ)
-- Timestamp: 14 digits representing date/time (YYYYMMDDHHmmss in UTC)
-- Random: 6 decimal digits (000000-131071, zero-padded)
-- Total length: 25 characters
-
-Example: `ORD_20241205123456_012345`
-- `ORD` = Order entity type
-- `20241205123456` = December 5, 2024 at 12:34:56 UTC
-- `012345` = Random collision prevention number
-
-### Use Cases
-
-- Database primary keys (more compact than GUID) at moderate creation rates per code
-- Distributed ID generation without coordination, within the collision bound below
-- IDs sortable by creation second within one code
-- Human-readable entity identification
-- API response identifiers
-
-### Uniqueness and ordering
+#### Uniqueness and ordering
 
 Two AUIDs with the same code and the same second differ only in their 17 random bits (131,072 values).
 The chance that a burst of IDs created for one code in one second contains a duplicate is:
@@ -130,9 +149,48 @@ Ordering (`CompareTo`, `<`, `>` and sorting by `Value`) follows creation time on
 same code; IDs created in the same second are in random order. Across codes the code bits dominate,
 and codes from `YGE` to `ZZZ` set the sign bit of the 64-bit value, so they sort before `AAA`.
 
-### Limitations
+#### String format
 
-- Maximum date: Year 2137 (32-bit timestamp overflow)
-- Clock skew may affect ordering across servers
-- Not cryptographically secure (uses `Random.Shared`)
-- Limited to 17,576 unique codes (26³)
+| Part | Length | Content |
+|---|---|---|
+| Code | 3 | `AAA`–`ZZZ` (15 bits) |
+| Separator | 1 | `_` |
+| Timestamp | 14 | `yyyyMMddHHmmss` in UTC, Gregorian calendar (32 bits, seconds since 2001-01-01) |
+| Separator | 1 | `_` |
+| Random | 6 | `000000`–`131071`, zero-padded (17 bits) |
+
+### Testing
+
+Use `FakeTimeProvider` from `Microsoft.Extensions.TimeProvider.Testing` to pin the timestamp.
+
+```csharp
+using FluentAssertions;
+using Microsoft.Extensions.Time.Testing;
+using NUnit.Framework;
+using SolTechnology.Core.AUID;
+
+public class OrderIdTests
+{
+    [Test]
+    public void New_WithFakeClock_EncodesItsTime()
+    {
+        // Arrange
+        var clock = new FakeTimeProvider(new DateTimeOffset(2024, 12, 5, 12, 34, 56, TimeSpan.Zero));
+
+        // Act
+        var orderId = Auid.New("ORD", clock);
+
+        // Assert
+        orderId.ToString().Should().StartWith("ORD_20241205123456_");
+    }
+}
+```
+
+### Conventions
+
+- Do give each entity type its own code; uniqueness and ordering hold per code.
+- Do store the `long` value in the database and the string form in APIs and logs.
+- Do pass a `TimeProvider` in tests instead of waiting for the clock.
+- Don't use an AUID as a secret or a security token: the random part comes from `Random.Shared`.
+- Don't create more than a few dozen IDs per second for one code without a unique constraint.
+- Don't generate AUIDs after 2137-02-07 06:28:15 UTC; `New` throws `InvalidOperationException`.
