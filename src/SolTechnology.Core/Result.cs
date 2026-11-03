@@ -1,4 +1,5 @@
 #nullable enable
+using System.Text.Json;
 using System.Text.Json.Serialization;
 
 namespace SolTechnology.Core;
@@ -7,9 +8,14 @@ namespace SolTechnology.Core;
 /// Represents the outcome of a command or query — either success or failure with an error.
 /// Build instances through the static factories (<see cref="Success()"/>, <see cref="Fail(Error)"/>);
 /// state cannot be set from outside, so a result is never both successful and failed.
+/// Deserialization rejects JSON whose <see cref="IsSuccess"/> and <see cref="Error"/> disagree.
 /// </summary>
-public record Result
+public record Result : IJsonOnDeserialized
 {
+    /// <summary>Reserved for the factories, derived types, and the JSON serializer.</summary>
+    [JsonConstructor]
+    protected Result() { }
+
     /// <summary>True when the operation succeeded.</summary>
     [JsonInclude]
     public bool IsSuccess { get; private protected init; }
@@ -28,6 +34,16 @@ public record Result
     /// Returns null on the base type.
     /// </summary>
     public virtual object? GetData() => null;
+
+    void IJsonOnDeserialized.OnDeserialized()
+    {
+        if (IsSuccess == (Error != null))
+        {
+            throw new JsonException(IsSuccess
+                ? "A successful Result must not carry an Error."
+                : "A failed Result must carry an Error.");
+        }
+    }
 
     /// <summary>Creates a successful result.</summary>
     public static Result Success() => new() { IsSuccess = true };
@@ -61,6 +77,10 @@ public record Result
 /// </summary>
 public record Result<T> : Result
 {
+    /// <summary>Reserved for the factories, derived types, and the JSON serializer.</summary>
+    [JsonConstructor]
+    protected Result() { }
+
     /// <summary>The produced value on success; <c>default</c> on failure.</summary>
     [JsonInclude]
     [JsonIgnore(Condition = JsonIgnoreCondition.Never)]

@@ -24,6 +24,9 @@ public sealed class ResultConversionFilterTests
 {
     private record Payload(string Name, int Count);
 
+    // Derived types are the only way left to build a failed result without an error.
+    private sealed record MalformedResult : Result<Payload>;
+
     private ICorrelationIdService _correlationIdService = null!;
     private ResultConversionFilter _filter = null!;
 
@@ -151,9 +154,9 @@ public sealed class ResultConversionFilterTests
     [Test]
     public async Task Failed_Result_Without_Error_Falls_Back_To_500_ProblemDetails()
     {
-        // Malformed Result (IsSuccess=false but Error=null), e.g. from a hand-written JSON payload —
+        // Malformed Result (IsSuccess=false but Error=null), e.g. from a consumer-derived result type —
         // must still produce a valid body, not a NullReferenceException at the boundary.
-        var malformed = System.Text.Json.JsonSerializer.Deserialize<Result<Payload>>("{\"IsSuccess\":false}")!;
+        var malformed = new MalformedResult();
         var context = BuildResultExecutingContext(malformed);
 
         await _filter.OnResultExecutionAsync(context, NoOpNext);

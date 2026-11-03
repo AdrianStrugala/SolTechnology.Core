@@ -7,8 +7,10 @@ dependencies. Consumer-facing usage is in [`docs/Core.md`](../Core.md).
 ## Results are built only through factories
 
 `Result.IsSuccess` and `Result.Error` can be set only inside the `SolTechnology.Core` assembly
-(`private protected init`), and `Result<T>.Data` only inside `Result<T>` (`private init`). The
-static factories (`Success`, `Fail`, `SuccessAsTask`, `FailAsTask`) and the implicit conversions
+(`private protected init`), and `Result<T>.Data` only inside `Result<T>` (`private init`). Both
+types declare a `protected` parameterless constructor, so the compiler does not generate a public
+one and `new Result()` (a failure without an error) does not compile; `protected` keeps derivation
+possible. The static factories (`Success`, `Fail`, `SuccessAsTask`, `FailAsTask`) and the implicit conversions
 from a value or an `Error` are the only public way to build a result. This rules out contradictory
 states such as a successful result that also carries an error, which downstream layers (the API
 `ResultConversionFilter`, CQRS behaviors, Tale) would otherwise have to guess about.
@@ -24,6 +26,12 @@ to 1.x. Consequences:
 
 - OpenAPI generators mark `isSuccess` and `data` as read-only, which is correct for a
   response-only type.
+- The protected constructor carries `[JsonConstructor]`, and `Result` implements
+  `IJsonOnDeserialized`: after reading, it throws `JsonException` when `IsSuccess == (Error != null)`.
+  `{}` and `{"IsSuccess":false}` (failure without an error) and a success carrying an error are
+  rejected; every shape 1.x wrote (`{"IsSuccess":true}`, `{"Data":0,"IsSuccess":false,"Error":{...}}`)
+  still reads. A type derived outside the assembly can still build a failure without an error,
+  which is why the API `ResultConversionFilter` keeps its 500 fallback for that state.
 - The contract is System.Text.Json only. Newtonsoft-serialized payloads (MessageBus messages,
   Hangfire job arguments) must not carry a `Result`.
 

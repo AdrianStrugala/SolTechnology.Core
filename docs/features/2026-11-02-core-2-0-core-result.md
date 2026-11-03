@@ -160,3 +160,23 @@ Changes to core-brief rows and release-notes inputs:
 
 - Tale step "Tale — `TaleJsonOptions.Default` registers the Tale error discriminators" (tale 02)
   extends the architecture page with the Tale discriminators.
+
+## Post-completion review fixes (2026-11-03)
+
+An independent code review of the completed feature found one issue; the fix is on `master`.
+
+- **C1 — finding:** `Result` and `Result<T>` still had a compiler-generated public parameterless
+  constructor, so `new Result()` (and the JSON `{}`) built a failure without an error, and
+  `{"IsSuccess":true,"Error":{...}}` deserialized to a success that carries an error.
+  **Fix:** both types declare `[JsonConstructor] protected Result() { }` (derivation stays
+  possible), and `Result` implements `IJsonOnDeserialized`, throwing `JsonException` when
+  `IsSuccess == (Error != null)`. The 1.x shapes still read (`RoundTrip_1xResultJson_Deserializes`
+  and `Serialize_Result_MatchesTheShapeStoredBy1x` unchanged and green).
+  **Tests:** `ResultTests.Constructors_AreNotPublic` (both types) and
+  `ResultTests.Deserialize_InconsistentState_ThrowsJsonException` (`{}`, `{"IsSuccess":false}`,
+  success with an error; `Result` and `Result<int>`) — 5 cases failed before the fix and pass after.
+  **Test change:** `ResultConversionFilterTests.Failed_Result_Without_Error_Falls_Back_To_500_ProblemDetails`
+  can no longer build its malformed result from `{"IsSuccess":false}`; it now uses a test-local
+  record derived from `Result<Payload>`, which is the only remaining way to reach that state (this
+  supersedes the step 02 deviation note). DreamTravel's UI reads `Result<T>` only from 2xx
+  responses, so it is unaffected.

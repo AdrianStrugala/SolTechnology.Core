@@ -31,7 +31,8 @@ No configuration needed.
 
 #### Return a result
 
-Build results through the factories or the implicit conversions; their state is read-only.
+Build results through the factories or the implicit conversions; their state is read-only and
+`Result`/`Result<T>` have no public constructor.
 
 ```csharp
 using SolTechnology.Core;
@@ -145,7 +146,9 @@ var restored = JsonSerializer.Deserialize<Result<int>>(json)!;
 | `deadlock` | `DeadlockError` |
 
 Your own `Error` subtypes serialize as their nearest registered ancestor (`$type: "error"` for a
-direct subclass), so their extra properties are not written. The `Result`/`Error` JSON contract is
+direct subclass), so their extra properties are not written. Deserialization throws `JsonException`
+when the JSON contradicts itself: a failure without an `Error` (including `{}`) or a success with
+one. The `Result`/`Error` JSON contract is
 System.Text.Json only: do not send a `Result` inside Newtonsoft-serialized payloads (for example
 MessageBus messages or Hangfire job arguments), where the discriminators and read-only state do not
 round-trip.

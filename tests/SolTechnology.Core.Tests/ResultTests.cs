@@ -1,3 +1,5 @@
+using System.Reflection;
+using System.Text.Json;
 using FluentAssertions;
 using NUnit.Framework;
 using SolTechnology.Core.Errors;
@@ -58,5 +60,30 @@ public sealed class ResultTests
         success.Data.Should().Be(3);
         failure.IsFailure.Should().BeTrue();
         failure.Error.Should().BeOfType<ConflictError>();
+    }
+
+    [TestCase(typeof(Result))]
+    [TestCase(typeof(Result<int>))]
+    public void Constructors_AreNotPublic(Type resultType)
+    {
+        // Act
+        var publicConstructors = resultType.GetConstructors(BindingFlags.Public | BindingFlags.Instance);
+
+        // Assert
+        publicConstructors.Should().BeEmpty("a result is built only through Success/Fail");
+    }
+
+    [TestCase("{}")]
+    [TestCase("{\"IsSuccess\":false}")]
+    [TestCase("{\"IsSuccess\":true,\"Error\":{\"Message\":\"Boom\"}}")]
+    public void Deserialize_InconsistentState_ThrowsJsonException(string json)
+    {
+        // Act
+        var deserializeResult = () => JsonSerializer.Deserialize<Result>(json);
+        var deserializeResultOfInt = () => JsonSerializer.Deserialize<Result<int>>(json);
+
+        // Assert
+        deserializeResult.Should().Throw<JsonException>();
+        deserializeResultOfInt.Should().Throw<JsonException>();
     }
 }
