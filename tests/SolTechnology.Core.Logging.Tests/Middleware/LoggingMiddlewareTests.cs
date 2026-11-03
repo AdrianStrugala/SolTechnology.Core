@@ -4,6 +4,7 @@ using System.Text.Json;
 using FluentAssertions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
 using SolTechnology.Core.Logging.Correlations;
@@ -57,7 +58,57 @@ public class LoggingMiddlewareTests
             => throw new InvalidOperationException("boom");
     }
 
+    private sealed class CapturingLogger : ILogger<LoggingMiddleware>
+    {
+        public List<(LogLevel Level, string Message)> Entries { get; } = [];
+        public IDisposable? BeginScope<TState>(TState state) where TState : notnull => null;
+        public bool IsEnabled(LogLevel logLevel) => true;
+
+        public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception? exception,
+            Func<TState, Exception?, string> formatter)
+            => Entries.Add((logLevel, formatter(state, exception)));
+    }
+
     private static ITimingService NoOpTiming() => new TimingService(TimeProvider.System);
+
+    [TestCase("/healthcare/x", true)]
+    [TestCase("/health", false)]
+    [TestCase("/health/ready", false)]
+    [TestCase("/HEALTH/live", false)]
+    public async Task Invoke_PathMatching_LogsBusinessRoutes(string path, bool expectedLogged)
+    {
+        // Arrange
+        var (mw, next) = Build(new LoggingOptions { SkipPaths = ["/health"] });
+        var ctx = new DefaultHttpContext();
+        ctx.Request.Path = path;
+        var logger = new CapturingLogger();
+
+        // Act
+        await mw.InvokeAsync(ctx, logger, new CorrelationStore(), Array.Empty<ILogScopeEnricher>(), NoOpTiming());
+
+        // Assert
+        next.WasInvoked.Should().BeTrue();
+        logger.Entries.Any(e => e.Message.StartsWith("Started request")).Should().Be(expectedLogged);
+    }
+
+    [Test]
+    public async Task Invoke_HandlerThrows_LogsExactlyOneError()
+    {
+        // Arrange
+        var (mw, _) = Build(handler: _ => throw new InvalidOperationException("boom"));
+        var ctx = new DefaultHttpContext();
+        ctx.Request.Path = "/api/trips";
+        var logger = new CapturingLogger();
+
+        // Act
+        var act = () => mw.InvokeAsync(ctx, logger, new CorrelationStore(), Array.Empty<ILogScopeEnricher>(), NoOpTiming());
+
+        // Assert
+        await act.Should().ThrowAsync<InvalidOperationException>();
+        logger.Entries.Where(e => e.Level == LogLevel.Error).Should().ContainSingle()
+            .Which.Message.Should().Contain("failed after");
+        logger.Entries.Should().NotContain(e => e.Message.StartsWith("Finished request"));
+    }
 
     [Test]
     public async Task Echoes_X_Correlation_Id_header_on_response()

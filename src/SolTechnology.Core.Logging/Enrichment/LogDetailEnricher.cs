@@ -1,5 +1,6 @@
 using System.Text.Json;
 using Microsoft.AspNetCore.Http;
+using SolTechnology.Core.Logging.Middleware;
 
 namespace SolTechnology.Core.Logging.Enrichment;
 
@@ -63,15 +64,7 @@ internal sealed class LogDetailEnricher : ILogScopeEnricher, IRequiresRequestBod
             return true;
         }
 
-        var path = context.Request.Path.Value ?? string.Empty;
-        foreach (var prefix in descriptor.Endpoints)
-        {
-            if (path.StartsWith(prefix, StringComparison.OrdinalIgnoreCase))
-            {
-                return true;
-            }
-        }
-        return false;
+        return LoggingPathMatcher.MatchesAny(context.Request.Path, descriptor.Endpoints);
     }
 
     private static string? ReadHeader(HttpContext context, string name)

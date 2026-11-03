@@ -30,7 +30,8 @@ public sealed class LoggingOptions
     public long MaxLoggedJsonBodyBytes { get; set; } = 64 * 1024;
 
     /// <summary>
-    /// Request-path prefixes (case-insensitive) for which the middleware will <b>not</b> emit
+    /// Request-path prefixes (case-insensitive, matched per segment: <c>/health</c> covers
+    /// <c>/health/ready</c> but not <c>/healthcare</c>) for which the middleware will <b>not</b> emit
     /// the <c>Started</c> / <c>Finished</c> request log entries and will not run enrichers.
     /// Correlation id propagation still happens. Use to silence health-check / liveness /
     /// metrics scrape noise (<c>/health</c>, <c>/metrics</c>, <c>/swagger</c>, ...).

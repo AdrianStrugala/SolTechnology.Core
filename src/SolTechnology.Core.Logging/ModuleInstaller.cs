@@ -63,8 +63,8 @@ public static class ModuleInstaller
         /// <param name="source">Where to read the value from. Defaults to <see cref="LogDetailSource.Body"/>.</param>
         /// <param name="endpoints">
         /// Optional list of request-path prefixes (case-insensitive) the rule applies to.
-        /// <c>null</c> or empty = all endpoints. Path-prefix match: e.g. <c>/api/v1/Trips</c>
-        /// matches <c>/api/v1/Trips/42</c>.
+        /// <c>null</c> or empty = all endpoints. Path-prefix match per segment: e.g. <c>/api/v1/Trips</c>
+        /// matches <c>/api/v1/Trips/42</c> but not <c>/api/v1/TripsArchive</c>.
         /// </param>
         public IServiceCollection LogDetail(string propertyName,
             string? asName = null,

@@ -48,7 +48,7 @@ public sealed class LoggingMiddleware
         }, (context, correlation));
 
         // Noisy paths (health, swagger) skip envelope logs + enrichers; correlation is still echoed.
-        if (ShouldSkipPath(context.Request.Path))
+        if (LoggingPathMatcher.MatchesAny(context.Request.Path, _options.SkipPaths))
         {
             await _next(context).ConfigureAwait(false);
             return;
@@ -90,12 +90,14 @@ public sealed class LoggingMiddleware
             "Started request [{RequestMethod}] [{RequestPath}]",
             context.Request.Method,
             context.Request.Path);
+        var exceptionLogged = false;
         try
         {
             await _next(context).ConfigureAwait(false);
         }
         catch (Exception ex) when (IsClientAbort(ex, context))
         {
+            exceptionLogged = true;
             logger.LogWarning(
                 ex,
                 "Request [{RequestMethod}] [{RequestPath}] aborted by client after [{ElapsedMs} ms]",
@@ -110,6 +112,7 @@ public sealed class LoggingMiddleware
             {
                 context.Response.StatusCode = StatusCodes.Status500InternalServerError;
             }
+            exceptionLogged = true;
             logger.LogError(
                 ex,
                 "Request [{RequestMethod}] [{RequestPath}] failed after [{ElapsedMs} ms]",
@@ -120,33 +123,42 @@ public sealed class LoggingMiddleware
         }
         finally
         {
-            var statusCode = context.Response.StatusCode;
-            var level = statusCode >= 500 ? LogLevel.Error
-                      : statusCode >= 400 ? LogLevel.Warning
-                                          : LogLevel.Information;
+            // The failure entry already carries the outcome; a second Error entry would double-count error rates.
+            if (!exceptionLogged)
+            {
+                LogFinished(context, logger, timingService, stopwatch.ElapsedMilliseconds);
+            }
+        }
+    }
 
-            var timings = timingService.GetTimings();
-            if (timings.Count > 0)
-            {
-                logger.Log(
-                    level,
-                    "Finished request [{RequestMethod}] [{RequestPath}] -> [{StatusCode}] in [{ElapsedMs} ms] — timings: [{@Timings}]",
-                    context.Request.Method,
-                    context.Request.Path,
-                    statusCode,
-                    stopwatch.ElapsedMilliseconds,
-                    timings);
-            }
-            else
-            {
-                logger.Log(
-                    level,
-                    "Finished request [{RequestMethod}] [{RequestPath}] -> [{StatusCode}] in [{ElapsedMs} ms]",
-                    context.Request.Method,
-                    context.Request.Path,
-                    statusCode,
-                    stopwatch.ElapsedMilliseconds);
-            }
+    private static void LogFinished(HttpContext context, ILogger logger, ITimingService timingService, long elapsedMs)
+    {
+        var statusCode = context.Response.StatusCode;
+        var level = statusCode >= 500 ? LogLevel.Error
+                  : statusCode >= 400 ? LogLevel.Warning
+                                      : LogLevel.Information;
+
+        var timings = timingService.GetTimings();
+        if (timings.Count > 0)
+        {
+            logger.Log(
+                level,
+                "Finished request [{RequestMethod}] [{RequestPath}] -> [{StatusCode}] in [{ElapsedMs} ms] — timings: [{@Timings}]",
+                context.Request.Method,
+                context.Request.Path,
+                statusCode,
+                elapsedMs,
+                timings);
+        }
+        else
+        {
+            logger.Log(
+                level,
+                "Finished request [{RequestMethod}] [{RequestPath}] -> [{StatusCode}] in [{ElapsedMs} ms]",
+                context.Request.Method,
+                context.Request.Path,
+                statusCode,
+                elapsedMs);
         }
     }
     private async Task PrepareJsonBodyIfRequestedAsync(
@@ -213,31 +225,6 @@ public sealed class LoggingMiddleware
                 request.Body.Position = 0;
             }
         }
-    }
-
-    private bool ShouldSkipPath(PathString path)
-    {
-        if (_options.SkipPaths is null || _options.SkipPaths.Count == 0)
-        {
-            return false;
-        }
-
-        var value = path.Value;
-        if (string.IsNullOrEmpty(value))
-        {
-            return false;
-        }
-
-        for (var i = 0; i < _options.SkipPaths.Count; i++)
-        {
-            var prefix = _options.SkipPaths[i];
-            if (!string.IsNullOrEmpty(prefix) &&
-                value.StartsWith(prefix, StringComparison.OrdinalIgnoreCase))
-            {
-                return true;
-            }
-        }
-        return false;
     }
 
     /// <summary>
