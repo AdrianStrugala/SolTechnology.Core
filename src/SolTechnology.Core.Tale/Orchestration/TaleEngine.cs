@@ -38,6 +38,9 @@ internal sealed class TaleEngine<TInput, TContext, TOutput>
     private bool _hasFailed;
     private bool _isCancelled;
     private Error? _saveError;
+    private long _version;
+    private string? _idempotencyKey;
+    private bool _isNew;
     private bool _isInitialized;
     private string _handlerTypeName = string.Empty;
 
@@ -66,7 +69,7 @@ internal sealed class TaleEngine<TInput, TContext, TOutput>
         TContext context,
         Type handlerType,
         JsonElement? resumeInput,
-        TaleInstance? resume,
+        TaleRunOptions run,
         CancellationToken cancellationToken)
     {
         _context = context;
@@ -75,13 +78,15 @@ internal sealed class TaleEngine<TInput, TContext, TOutput>
         _cancellationToken = cancellationToken;
         _isInitialized = true;
 
-        if (resume != null)
+        _idempotencyKey = run.IdempotencyKey;
+        if (run.Resume != null)
         {
-            LoadTaleState(resume);
+            LoadTaleState(run.Resume);
             _logger.LogInformation("Tale {TaleId} resuming from saved state", context.TaleInstanceId);
             return;
         }
 
+        _isNew = true;
         _createdAt = _timeProvider.GetUtcNow().UtcDateTime;
         var newId = Auid.New(_options.TaleIdPrefix);
         context.TaleInstanceId = newId;
@@ -95,6 +100,12 @@ internal sealed class TaleEngine<TInput, TContext, TOutput>
     /// </summary>
     public async Task Run(IReadOnlyList<TaleStep> steps)
     {
+        // The first save claims the id and the idempotency key before any chapter runs.
+        if (_repository != null && _isNew)
+        {
+            await SaveTaleState(terminal: false);
+        }
+
         foreach (var step in steps)
         {
             switch (step)
@@ -430,7 +441,9 @@ internal sealed class TaleEngine<TInput, TContext, TOutput>
             LastUpdatedAt = _timeProvider.GetUtcNow().UtcDateTime,
             History = new List<ChapterInfo>(_chapterHistory),
             CurrentChapter = _isPaused ? _chapterHistory.LastOrDefault() : null,
-            Context = JsonSerializer.Serialize(_context, TaleJsonOptions.Default)
+            Context = JsonSerializer.Serialize(_context, TaleJsonOptions.Default),
+            IdempotencyKey = _idempotencyKey,
+            Version = _version
         };
 
         // The terminal state must be stored even when the run's token is what ended the run.
@@ -438,7 +451,10 @@ internal sealed class TaleEngine<TInput, TContext, TOutput>
         if (saved.IsFailure)
         {
             _saveError = saved.Error;
+            return;
         }
+
+        _version = instance.Version;
     }
 
     private TaleStatus IntermediateStatus()
@@ -454,6 +470,8 @@ internal sealed class TaleEngine<TInput, TContext, TOutput>
         _chapterHistory.Clear();
         _chapterHistory.AddRange(instance.History);
         _createdAt = instance.CreatedAt;
+        _version = instance.Version;
+        _idempotencyKey = instance.IdempotencyKey;
         _isPaused = instance.Status == TaleStatus.WaitingForInput;
         _hasFailed = instance.Status == TaleStatus.Failed;
         _isCancelled = instance.Status == TaleStatus.Cancelled;

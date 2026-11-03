@@ -3,6 +3,7 @@ using System.Text.Json;
 using Microsoft.Data.Sqlite;
 using SolTechnology.Core;
 using SolTechnology.Core.AUID;
+using SolTechnology.Core.Errors;
 using SolTechnology.Core.Tale.Models;
 using SolTechnology.Core.Tale.Persistence;
 
@@ -92,7 +93,8 @@ public class SQLiteTaleRepository : ITaleRepository
                     CreatedAt TEXT NOT NULL,
                     LastUpdatedAt TEXT NOT NULL,
                     History TEXT,
-                    CurrentChapter TEXT
+                    CurrentChapter TEXT,
+                    Version INTEGER NOT NULL DEFAULT 0
                 );
 
                 CREATE INDEX IF NOT EXISTS IX_TaleInstances_Status ON TaleInstances(Status);
@@ -132,6 +134,7 @@ public class SQLiteTaleRepository : ITaleRepository
         }
 
         AddColumn("IdempotencyKey", "TEXT");
+        AddColumn("Version", "INTEGER NOT NULL DEFAULT 0");
     }
 
     public Task<TaleInstance?> FindById(Auid storyId, CancellationToken cancellationToken) =>
@@ -206,19 +209,15 @@ public class SQLiteTaleRepository : ITaleRepository
 
             var command = connection.CreateCommand();
             command.CommandText = @"
-                INSERT INTO TaleInstances
-                    (TaleId, HandlerTypeName, IdempotencyKey, Status, Context,
-                     CreatedAt, LastUpdatedAt, History, CurrentChapter)
-                VALUES
-                    (@TaleId, @HandlerTypeName, @IdempotencyKey, @Status, @Context,
-                     @CreatedAt, @LastUpdatedAt, @History, @CurrentChapter)
-                ON CONFLICT(TaleId) DO UPDATE SET
-                    IdempotencyKey = COALESCE(@IdempotencyKey, TaleInstances.IdempotencyKey),
+                UPDATE TaleInstances SET
+                    IdempotencyKey = COALESCE(@IdempotencyKey, IdempotencyKey),
                     Status = @Status,
                     Context = @Context,
                     LastUpdatedAt = @LastUpdatedAt,
                     History = @History,
-                    CurrentChapter = @CurrentChapter
+                    CurrentChapter = @CurrentChapter,
+                    Version = @Version + 1
+                WHERE TaleId = @TaleId AND Version = @Version
             ";
 
             command.Parameters.AddWithValue("@TaleId", storyInstance.TaleId.ToString());
@@ -237,9 +236,39 @@ public class SQLiteTaleRepository : ITaleRepository
                     ? (object)JsonSerializer.Serialize(storyInstance.CurrentChapter, TaleJsonOptions.Default)
                     : DBNull.Value);
 
-            await command.ExecuteNonQueryAsync(cancellationToken);
+            command.Parameters.AddWithValue("@Version", storyInstance.Version);
+
+            var written = await command.ExecuteNonQueryAsync(cancellationToken) == 1
+                || (storyInstance.Version == 0 && await TryInsert(command, cancellationToken));
+            if (!written)
+            {
+                return Result.Fail(new ConflictError { Message = $"Tale {storyInstance.TaleId} was changed by another writer." });
+            }
+
+            storyInstance.Version++;
             return Result.Success();
         }, cancellationToken);
+
+    private static async Task<bool> TryInsert(SqliteCommand command, CancellationToken cancellationToken)
+    {
+        command.CommandText = @"
+            INSERT INTO TaleInstances
+                (TaleId, HandlerTypeName, IdempotencyKey, Status, Context,
+                 CreatedAt, LastUpdatedAt, History, CurrentChapter, Version)
+            VALUES
+                (@TaleId, @HandlerTypeName, @IdempotencyKey, @Status, @Context,
+                 @CreatedAt, @LastUpdatedAt, @History, @CurrentChapter, 1)
+        ";
+        try
+        {
+            await command.ExecuteNonQueryAsync(cancellationToken);
+            return true;
+        }
+        catch (SqliteException ex) when (ex.SqliteErrorCode == 19 /* SQLITE_CONSTRAINT */)
+        {
+            return false;
+        }
+    }
 
     public Task Delete(Auid storyId, CancellationToken cancellationToken) =>
         ExecuteWithRetry(async () =>
@@ -257,7 +286,7 @@ public class SQLiteTaleRepository : ITaleRepository
 
     private const string SelectSql = @"
         SELECT TaleId, HandlerTypeName, IdempotencyKey, Status, Context,
-               CreatedAt, LastUpdatedAt, History, CurrentChapter
+               CreatedAt, LastUpdatedAt, History, CurrentChapter, Version
         FROM TaleInstances";
 
     private static TaleInstance MapRow(SqliteDataReader reader) => new()
@@ -274,7 +303,8 @@ public class SQLiteTaleRepository : ITaleRepository
             : JsonSerializer.Deserialize<List<ChapterInfo>>(reader.GetString(7), TaleJsonOptions.Default) ?? new List<ChapterInfo>(),
         CurrentChapter = reader.IsDBNull(8)
             ? null
-            : JsonSerializer.Deserialize<ChapterInfo>(reader.GetString(8), TaleJsonOptions.Default)
+            : JsonSerializer.Deserialize<ChapterInfo>(reader.GetString(8), TaleJsonOptions.Default),
+        Version = reader.GetInt64(9)
     };
 
     private async Task<T> ExecuteWithRetry<T>(Func<Task<T>> operation, CancellationToken cancellationToken)

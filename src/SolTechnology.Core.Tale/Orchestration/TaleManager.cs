@@ -145,22 +145,15 @@ public class TaleManager
             }
 
             var handler = ActivatorUtilities.CreateInstance<THandler>(sp);
-            var run = new TaleRunOptions { Persist = true, Resume = existing };
+            var run = new TaleRunOptions { Persist = true, Resume = existing, IdempotencyKey = idempotencyKey };
             var result = await handler.Run(context, userInput, run, cancellationToken);
 
             var activeId = context.TaleInstanceId;
 
-            // Stamp the idempotency key (if provided and this is a fresh tale).
-            if (!string.IsNullOrEmpty(idempotencyKey))
+            if (result.Error is ConflictError && !string.IsNullOrEmpty(idempotencyKey))
             {
-                var persisted = await _repository.FindById(activeId, cancellationToken);
-                if (persisted != null && persisted.IdempotencyKey == null)
-                {
-                    persisted.IdempotencyKey = idempotencyKey;
-                    var stamped = await _repository.Save(persisted, cancellationToken);
-                    if (stamped.IsFailure)
-                        return Result<TaleInstance>.Fail(stamped.Error!);
-                }
+                var winner = await _repository.FindByIdempotencyKey(idempotencyKey, cancellationToken);
+                if (winner != null) return Result<TaleInstance>.Success(winner);
             }
 
             if (result.IsFailure && result.Error is TalePausedError)

@@ -5,6 +5,7 @@ using Microsoft.Extensions.Logging;
 using NUnit.Framework;
 using SolTechnology.Core;
 using SolTechnology.Core.AUID;
+using SolTechnology.Core.Errors;
 using SolTechnology.Core.Tale;
 using SolTechnology.Core.Tale.Models;
 using SolTechnology.Core.Tale.Orchestration;
@@ -409,6 +410,86 @@ public class AdvancedScenariosTests
         // All should have unique IDs
         var taleIds = results.Select(r => r.Data!.TaleId).ToList();
         taleIds.Should().OnlyHaveUniqueItems();
+    }
+
+    [Test]
+    public async Task ConcurrentResume_OneWins_OthersConflict()
+    {
+        // Arrange
+        var repository = new GatedTaleRepository(new InMemoryTaleRepository());
+        using var sp = BuildWithRepository(repository);
+        var manager = sp.GetRequiredService<TaleManager>();
+        var start = await manager.StartStory<SinglePauseTale, TestAdvancedInput, TestAdvancedContext, TestAdvancedOutput>(
+            new TestAdvancedInput { Value = "concurrent-resume" });
+        var userInput = JsonSerializer.SerializeToElement(new UserInputData { Name = "John", Email = "john@example.com", Age = 30 });
+        repository.GateReads(5);
+
+        // Act
+        var results = await Task.WhenAll(Enumerable.Range(0, 5).Select(_ =>
+            manager.ResumeStory<SinglePauseTale, TestAdvancedInput, TestAdvancedContext, TestAdvancedOutput>(start.Data!.TaleId, userInput)));
+
+        // Assert
+        results.Should().ContainSingle(r => r.IsSuccess).Which.Data!.Status.Should().Be(TaleStatus.Completed);
+        results.Where(r => r.IsFailure).Should().HaveCount(4).And.AllSatisfy(r => r.Error.Should().BeOfType<ConflictError>());
+        (await repository.FindById(start.Data!.TaleId, CancellationToken.None))!.Status.Should().Be(TaleStatus.Completed);
+    }
+
+    [Test]
+    public async Task CancelStory_DuringRun_IsNotOverwritten()
+    {
+        // Arrange
+        var repository = new GatedTaleRepository(new InMemoryTaleRepository());
+        using var sp = BuildWithRepository(repository);
+        var manager = sp.GetRequiredService<TaleManager>();
+        var saves = 0;
+        repository.BeforeSave = async instance =>
+        {
+            if (Interlocked.Increment(ref saves) == 2)
+            {
+                await manager.CancelStory(instance.TaleId);
+            }
+        };
+
+        // Act
+        var start = await manager.StartStory<LifecycleTaleV2, LifecycleInput, LifecycleContext, LifecycleOutput>(
+            new LifecycleInput { Value = 1 });
+
+        // Assert
+        start.Error.Should().BeOfType<ConflictError>();
+        var stored = (await repository.List()).Should().ContainSingle().Subject;
+        stored.Status.Should().Be(TaleStatus.Cancelled);
+        stored.History.Should().NotContain(h => h.ChapterId == nameof(LifecycleCompleteChapter));
+    }
+
+    [Test]
+    public async Task StartStory_SameIdempotencyKeyConcurrently_StartsOnce()
+    {
+        // Arrange
+        var repository = new GatedTaleRepository(new InMemoryTaleRepository());
+        using var sp = BuildWithRepository(repository);
+        var manager = sp.GetRequiredService<TaleManager>();
+        repository.GateReads(2);
+
+        // Act
+        var results = await Task.WhenAll(Enumerable.Range(0, 2).Select(i =>
+            manager.StartStory<LifecycleTaleV1, LifecycleInput, LifecycleContext, LifecycleOutput>(
+                new LifecycleInput { Value = i }, idempotencyKey: "idem-race")));
+
+        // Assert
+        results.Should().AllSatisfy(r => r.IsSuccess.Should().BeTrue());
+        results.Select(r => r.Data!.TaleId).Distinct().Should().ContainSingle();
+        var stored = (await repository.List()).Should().ContainSingle().Subject;
+        stored.IdempotencyKey.Should().Be("idem-race");
+        stored.Status.Should().Be(TaleStatus.WaitingForInput);
+    }
+
+    private static ServiceProvider BuildWithRepository(ITaleRepository repository)
+    {
+        var services = new ServiceCollection().AddLogging();
+        services.AddSingleton(repository);
+        services.AddSingleton<TestService>();
+        services.AddSolTale(assemblies: typeof(AdvancedScenariosTests).Assembly);
+        return services.BuildServiceProvider();
     }
 
     [Test]

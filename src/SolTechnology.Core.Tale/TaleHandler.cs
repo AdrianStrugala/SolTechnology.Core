@@ -151,7 +151,7 @@ public abstract class TaleHandler<TInput, TContext, TOutput>
         _engine = new TaleEngine<TInput, TContext, TOutput>(_serviceProvider, _logger, repository, options, timeProvider);
         Context = context;
 
-        _engine.Initialize(Context, GetType(), resumeInput, run.Resume, cancellationToken);
+        _engine.Initialize(Context, GetType(), resumeInput, run, cancellationToken);
 
         using var _ = _logger.BeginScope(new Dictionary<string, object?>
         {

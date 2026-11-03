@@ -31,7 +31,14 @@ public interface ITaleRepository
         CancellationToken cancellationToken = default)
         => throw new NotSupportedException("This repository does not support listing.");
 
-    /// <summary>Save or update a tale instance (upsert).</summary>
+    /// <summary>
+    /// Conditionally writes a tale instance. The write succeeds only when the stored version (a
+    /// missing tale counts as <c>0</c>) equals <see cref="TaleInstance.Version"/>; the stored version
+    /// and <see cref="TaleInstance.Version"/> of the passed instance then become <c>Version + 1</c>.
+    /// Returns a failed <see cref="Result"/> with a <see cref="Errors.ConflictError"/>, without
+    /// writing, on a version mismatch or when a new tale reuses another tale's idempotency key.
+    /// Never throws for a conflict.
+    /// </summary>
     Task<Result> Save(TaleInstance taleInstance, CancellationToken cancellationToken);
 
     /// <summary>Delete a tale instance permanently.</summary>

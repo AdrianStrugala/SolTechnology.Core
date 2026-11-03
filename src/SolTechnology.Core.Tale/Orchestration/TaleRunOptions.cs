@@ -13,4 +13,6 @@ internal sealed class TaleRunOptions
     public bool Persist { get; init; }
 
     public TaleInstance? Resume { get; init; }
+
+    public string? IdempotencyKey { get; init; }
 }

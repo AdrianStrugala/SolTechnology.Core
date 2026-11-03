@@ -3,6 +3,7 @@ using FluentAssertions;
 using Microsoft.Data.Sqlite;
 using NUnit.Framework;
 using SolTechnology.Core.AUID;
+using SolTechnology.Core.Errors;
 using SolTechnology.Core.Tale.Models;
 
 namespace DreamTravel.FunctionalTests.SQLiteTests;
@@ -61,6 +62,53 @@ public class SQLiteRepositoryTests
         retrieved.Context.Should().Be("{\"value\":42}");
         retrieved.History.Should().HaveCount(1);
         retrieved.History[0].ChapterId.Should().Be("Chapter1");
+    }
+
+    [Test]
+    public async Task Constructor_DatabaseWithoutVersionColumn_MigratesAndSavesConditionally()
+    {
+        // Arrange
+        var legacyPath = Path.Combine(Path.GetTempPath(), $"test_stories_1x_{Guid.NewGuid()}.db");
+        var connectionString = $"Data Source={legacyPath}";
+        var taleId = Auid.New("TST");
+        await using (var connection = new SqliteConnection(connectionString))
+        {
+            await connection.OpenAsync();
+            var command = connection.CreateCommand();
+            command.CommandText = @"
+                CREATE TABLE TaleInstances (
+                    TaleId TEXT PRIMARY KEY, HandlerTypeName TEXT NOT NULL, IdempotencyKey TEXT,
+                    Status INTEGER NOT NULL, Context TEXT NOT NULL, CreatedAt TEXT NOT NULL,
+                    LastUpdatedAt TEXT NOT NULL, History TEXT, CurrentChapter TEXT);
+                INSERT INTO TaleInstances VALUES
+                    (@TaleId, 'TestHandler', NULL, 2, '{}', '2026-11-03T10:00:00.0000000Z', '2026-11-03T10:00:00.0000000Z', NULL, NULL);";
+            command.Parameters.AddWithValue("@TaleId", taleId.ToString());
+            await command.ExecuteNonQueryAsync();
+        }
+
+        try
+        {
+            // Act
+            var repository = new SQLiteTaleRepository(connectionString);
+            var legacy = (await repository.FindById(taleId, CancellationToken.None))!;
+            var stale = (await repository.FindById(taleId, CancellationToken.None))!;
+            legacy.Status = TaleStatus.Completed;
+            var saved = await repository.Save(legacy, CancellationToken.None);
+            var conflict = await repository.Save(stale, CancellationToken.None);
+
+            // Assert
+            saved.IsSuccess.Should().BeTrue();
+            legacy.Version.Should().Be(1);
+            conflict.Error.Should().BeOfType<ConflictError>();
+            var stored = (await repository.FindById(taleId, CancellationToken.None))!;
+            stored.Status.Should().Be(TaleStatus.Completed);
+            stored.Version.Should().Be(1);
+        }
+        finally
+        {
+            SqliteConnection.ClearAllPools();
+            File.Delete(legacyPath);
+        }
     }
 
     [Test]

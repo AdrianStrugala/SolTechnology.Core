@@ -1,7 +1,7 @@
 ---
 spec: 2026-11-02-core-2-0-tale
 step: 09
-status: to-do
+status: done
 ---
 
 # Step 09: Tale — optimistic concurrency on `ITaleRepository.Save`
@@ -36,12 +36,34 @@ Former core step 41; moved here by the per-library regroup (user, 2026-11-02).
 - DreamTravel SQLite migration test: an existing database file without `Version` is migrated on start (component test or a SQLite unit test; record which).
 
 ## Acceptance criteria
-- [ ] `dotnet test tests/SolTechnology.Core.Tale.Tests` is green.
-- [ ] The DreamTravel build and component tests are green; the migration test is green.
-- [ ] The core brief's P-04 row matches the delivered behaviour and names the custom-repository migration; release step 05 ([`2026-11-02-org-transfer-and-2-0-release`](../../2026-11-02-org-transfer-and-2-0-release.md)) copies it into `docs/migration-2.0.md`.
-- [ ] Premortem mitigations for the persisted contract are applied.
+- [x] `dotnet test tests/SolTechnology.Core.Tale.Tests` is green.
+- [x] The DreamTravel build and component tests are green; the migration test is green.
+- [x] The core brief's P-04 row matches the delivered behaviour and names the custom-repository migration; release step 05 ([`2026-11-02-org-transfer-and-2-0-release`](../../2026-11-02-org-transfer-and-2-0-release.md)) copies it into `docs/migration-2.0.md`.
+- [x] Premortem mitigations for the persisted contract are applied.
 
 ## Open questions
 - none (`C-05` confirmed by the user on 2026-11-02)
 
 ## Deviations
+
+### `Version` semantics, the claim save, and test doubles
+
+**Original plan:** `Save` becomes a conditional write on `TaleInstance.Version`; the engine
+increments `Version` per save and stops on `ConflictError`; `TaleManager` stamps the idempotency
+key on the first save.
+
+**Actual implementation:** `Version` is the stored version the instance was read at (`0` = never
+stored). `Save` writes only when the stored version (a missing tale counts as `0`) equals it, then
+stores `Version + 1` and updates the passed instance, so the engine just keeps the value the
+repository returns. A new tale is stored once, with its idempotency key, before the first chapter
+runs; a second tale that reuses the key gets `ConflictError` from the repository (in-memory check
+under a lock; SQLite unique index) and `TaleManager` returns the first tale instead. After a
+conflict the engine runs no further chapters and skips the terminal save. Resuming a `Running` tale
+stays allowed (crash recovery); concurrent resumes are serialized by the first save after the
+interactive chapter. The three concurrency tests use a new test double, `GatedTaleRepository`,
+which holds the first N reads until all N callers arrived and can run a hook before each save; all
+three failed on `master` before the change (`ca4cab1c`). The SQLite migration test is the component
+test `SQLiteRepositoryTests.Constructor_DatabaseWithoutVersionColumn_MigratesAndSavesConditionally`
+(a database file created with the 1.x schema). The core brief's P-04 row and its `tale 09`
+release-notes input now spell out the contract. The persisted-contract premortem items for this
+step are RM-5 (documented in steps 10 and 13); no other `RM-n` targets step 09.

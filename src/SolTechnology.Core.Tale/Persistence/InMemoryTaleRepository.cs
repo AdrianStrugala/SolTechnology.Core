@@ -1,5 +1,6 @@
 using System.Collections.Concurrent;
 using SolTechnology.Core.AUID;
+using SolTechnology.Core.Errors;
 using SolTechnology.Core.Tale.Models;
 
 namespace SolTechnology.Core.Tale.Persistence;
@@ -11,6 +12,7 @@ namespace SolTechnology.Core.Tale.Persistence;
 public class InMemoryTaleRepository : ITaleRepository
 {
     private readonly ConcurrentDictionary<Auid, TaleInstance> _tales = new();
+    private readonly Lock _writeLock = new();
 
     public Task<TaleInstance?> FindById(Auid taleId, CancellationToken cancellationToken)
     {
@@ -55,19 +57,39 @@ public class InMemoryTaleRepository : ITaleRepository
     public Task<Result> Save(TaleInstance taleInstance, CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
-        _tales.AddOrUpdate(
-            taleInstance.TaleId,
-            taleInstance.Clone(),
-            (_, existing) =>
+        lock (_writeLock)
+        {
+            _tales.TryGetValue(taleInstance.TaleId, out var existing);
+            if ((existing?.Version ?? 0) != taleInstance.Version)
             {
-                var updated = taleInstance.Clone();
-                // Preserve CreatedAt from the original record (review §2.2).
-                updated.CreatedAt = existing.CreatedAt;
-                return updated;
-            });
+                return Conflict($"Tale {taleInstance.TaleId} was changed by another writer.");
+            }
+
+            if (existing == null && IsIdempotencyKeyTaken(taleInstance))
+            {
+                return Conflict($"Idempotency key {taleInstance.IdempotencyKey} is already used by another tale.");
+            }
+
+            var stored = taleInstance.Clone();
+            stored.Version = taleInstance.Version + 1;
+            if (existing != null)
+            {
+                stored.CreatedAt = existing.CreatedAt;
+            }
+
+            _tales[taleInstance.TaleId] = stored;
+            taleInstance.Version = stored.Version;
+        }
 
         return Result.SuccessAsTask();
     }
+
+    private bool IsIdempotencyKeyTaken(TaleInstance taleInstance) =>
+        !string.IsNullOrEmpty(taleInstance.IdempotencyKey) &&
+        _tales.Values.Any(t => t.IdempotencyKey == taleInstance.IdempotencyKey);
+
+    private static Task<Result> Conflict(string message) =>
+        Result.FailAsTask(new ConflictError { Message = message });
 
     public Task Delete(Auid taleId, CancellationToken cancellationToken)
     {

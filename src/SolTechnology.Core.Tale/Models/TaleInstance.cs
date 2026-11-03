@@ -45,6 +45,12 @@ public class TaleInstance
     /// <summary>The complete context for this tale, serialized as JSON.</summary>
     public string Context { get; set; } = string.Empty;
 
+    /// <summary>
+    /// Optimistic-concurrency version of the stored state this instance was read at; <c>0</c> when it
+    /// has never been stored. <see cref="Persistence.ITaleRepository.Save"/> increments it.
+    /// </summary>
+    public long Version { get; set; }
+
     [JsonConstructor]
     public TaleInstance() { }
 

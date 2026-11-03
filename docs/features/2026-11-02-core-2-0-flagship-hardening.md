@@ -458,7 +458,7 @@ parameter; `UntilAsync`, `CheckHealthAsync`, `InvokeAsync`, `StartAsync`/`StopAs
 | P-01 | `Error` subtypes not registered serialize as their nearest ancestor; Tale errors gain discriminators through `TaleJsonOptions.Default`, which `TaleInstance.Clone()` and the DreamTravel SQLite repository now use | JSON shape for unknown subtypes; no more `NotSupportedException`; custom repositories must use `TaleJsonOptions.Default` to keep Tale error types (`C-26`) | result 01, tale 02 |
 | P-02 | Only `TaleManager`-driven runs are persisted | Custom repositories stop receiving direct-handler runs | tale 03 |
 | P-03 | Chapter history keyed by step index + `Type.FullName` | In-flight persisted tales created by 1.x cannot resume; migration note | tale 10 |
-| P-04 | `TaleInstance.Version` persisted; conditional save | Custom repositories and the DreamTravel SQLite schema add a `Version` column | tale 09 |
+| P-04 | `TaleInstance.Version` persisted; conditional save | Custom repositories add a `Version` column (existing rows default to `0`) and make `Save` conditional: write only when the stored version (a missing tale counts as `0`) equals `TaleInstance.Version`, then store and return `Version + 1`; on a mismatch, or when a new tale reuses another tale's idempotency key, return `ConflictError` without writing. DreamTravel's SQLite file gains the column on start | tale 09 |
 | P-05 | New event jobs target `Task DispatchInScope(IEvent, CancellationToken)` (internal type, persisted job signature); the 1.x `DispatchInScope(IEvent)` overload stays for 2.x (RQ10) | Already-enqueued 1.x event jobs still run; the legacy overload is removed in 3.0 | hangfire 03 |
 | P-06 | Recurring job id `Type.Name` → `Type.FullName`; stale tracked ids and legacy `Type.Name` ids removed at start (RQ10) | Old recurring entries are removed automatically and re-created under new ids; no double firing | hangfire 04 |
 | P-07 | Cache keys namespaced by `TKey`/`TItem`; `DistributedCacheConfiguration.InstanceName` has no default and is validated non-empty at start (no `required` keyword) | Existing Redis entries are orphaned (cold cache); config without `InstanceName` fails at start | cache 03 |
@@ -507,8 +507,10 @@ these notes from the steps:
   store such strings cannot be loaded until the IDs are migrated.
 - hangfire 03 (former step 32, P-05): 1.x event jobs keep running in 2.x; the legacy one-argument overload is removed
   in 3.0. No queue drain is needed.
-- tale 09 (former step 41, P-04): custom repositories add a `Version` column and a conditional write; DreamTravel's
-  SQLite file is migrated on start.
+- tale 09 (former step 41, P-04): custom repositories add a `Version` column and a conditional write (the P-04 row
+  spells out the contract); DreamTravel's SQLite file is migrated on start. `TaleManager` now stores a new tale, with
+  its idempotency key, before the first chapter runs, so a concurrent `StartStory` with the same key returns the
+  first tale, and a `CancelStory` during a run is no longer overwritten (the run stops with `ConflictError`).
 - core 04: 1.x hotfixes, if ever needed, branch from the `v1.0.0` tag, never from `master`.
 - core 04 (premortem RM-1): Upgrade every `SolTechnology.Core.*` package to 2.0 together. A mixed 1.x/2.x graph
   compiles but fails at runtime (`FieldAccessException`, `MissingMethodException`, `TypeLoadException`).

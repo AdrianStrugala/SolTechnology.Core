@@ -2,6 +2,7 @@ using FluentAssertions;
 using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
 using SolTechnology.Core.AUID;
+using SolTechnology.Core.Errors;
 using SolTechnology.Core.Tale.Models;
 using SolTechnology.Core.Tale.Orchestration;
 using SolTechnology.Core.Tale.Persistence;
@@ -293,6 +294,31 @@ public class InMemoryRepositoryTests
             retrieved.Should().NotBeNull();
             retrieved!.Status.Should().Be(expectedStatus);
         }
+    }
+
+    [Test]
+    public async Task Save_StaleVersion_ReturnsConflict()
+    {
+        // Arrange
+        var taleId = Auid.New("TST");
+        await _repository.Save(CreateTestTaleInstance(taleId), CancellationToken.None);
+        var first = (await _repository.FindById(taleId, CancellationToken.None))!;
+        var second = (await _repository.FindById(taleId, CancellationToken.None))!;
+        first.Status = TaleStatus.Completed;
+        second.Status = TaleStatus.Cancelled;
+        await _repository.Save(first, CancellationToken.None);
+
+        // Act
+        var stale = await _repository.Save(second, CancellationToken.None);
+        var duplicate = await _repository.Save(CreateTestTaleInstance(taleId), CancellationToken.None);
+
+        // Assert
+        stale.Error.Should().BeOfType<ConflictError>();
+        duplicate.Error.Should().BeOfType<ConflictError>();
+        first.Version.Should().Be(2);
+        var stored = (await _repository.FindById(taleId, CancellationToken.None))!;
+        stored.Status.Should().Be(TaleStatus.Completed);
+        stored.Version.Should().Be(2);
     }
 
     [Test]
