@@ -9,7 +9,7 @@ namespace SolTechnology.Core.Tale.Orchestration;
 /// <summary>
 /// Internal execution engine for a tale. Strongly typed — no <c>dynamic</c>, no string-matched
 /// pause detection. Runs the plan's chapters, manages pause/resume, aggregates errors and, for
-/// <see cref="TaleManager"/> runs, persists state.
+/// <see cref="TaleManager"/> runs, persists state and renews the Running lease while steps execute.
 /// </summary>
 internal sealed class TaleEngine<TInput, TContext, TOutput>(
     IServiceProvider serviceProvider,
@@ -21,11 +21,13 @@ internal sealed class TaleEngine<TInput, TContext, TOutput>(
     where TContext : Context<TInput, TOutput>, new()
     where TOutput : class, new()
 {
+    private readonly TimeProvider _clock = timeProvider ?? TimeProvider.System;
     private readonly TaleRunState _state = new(timeProvider ?? TimeProvider.System);
     private TaleStatePersistence? _persistence;
-    private InteractiveChapterInvoker<TInput, TContext, TOutput> _interactive = null!;
+    private ChapterReader<TInput, TContext, TOutput> _reader = null!;
     private TContext _context = null!;
     private CancellationToken _cancellationToken;
+    private CancellationToken _chapterToken;
     private string _handlerTypeName = string.Empty;
 
     public void Initialize(
@@ -40,7 +42,7 @@ internal sealed class TaleEngine<TInput, TContext, TOutput>(
         _state.ResumeInput = resumeInput;
         _cancellationToken = cancellationToken;
         _persistence = repository == null ? null : new TaleStatePersistence(repository, _state);
-        _interactive = new(logger, _state, _handlerTypeName, isPersisted: _persistence != null);
+        _reader = new(logger, _state, new(logger, _state, _handlerTypeName, isPersisted: _persistence != null));
 
         if (run.Resume != null)
         {
@@ -59,6 +61,8 @@ internal sealed class TaleEngine<TInput, TContext, TOutput>(
     {
         // The first save claims the tale (and a new tale's idempotency key) before any chapter runs.
         await Save(TaleStatus.Running, _cancellationToken);
+        await using var heartbeat = _persistence == null || _state.SaveError != null ? null : StartHeartbeat(_persistence);
+        _chapterToken = heartbeat?.Token ?? _cancellationToken;
         await new TaleStepInterpreter(_state, ExecuteChapter).Run(steps, _context);
     }
 
@@ -105,43 +109,13 @@ internal sealed class TaleEngine<TInput, TContext, TOutput>(
         }
 
         logger.LogInformation("Executing chapter: [{ChapterId}]", chapter.ChapterId);
-        await ReadChapter(chapter, chapterInfo);
+        await _reader.Read(chapter, chapterInfo, _context, _chapterToken, _cancellationToken);
         await Save(_state.IntermediateStatus, _cancellationToken);
     }
 
-    private async Task ReadChapter(IChapter<TContext> chapter, ChapterInfo chapterInfo)
-    {
-        try
-        {
-            _cancellationToken.ThrowIfCancellationRequested();
-            var result = InteractiveChapterInvoker<TInput, TContext, TOutput>.TryGetInputType(chapter.GetType(), out var inputType)
-                ? await _interactive.Read(chapter, inputType!, chapterInfo, _context, _cancellationToken)
-                : await chapter.Read(_context, _cancellationToken);
-
-            // Rejected interactive input keeps the tale paused for a retry; it is not a failure.
-            if (result.IsFailure && !_state.IsPaused)
-            {
-                _state.Fail(chapterInfo, result.Error!);
-            }
-            else if (result.IsSuccess && chapterInfo.Status != TaleStatus.WaitingForInput)
-            {
-                chapterInfo.Status = TaleStatus.Completed;
-                chapterInfo.FinishedAt = _state.Now;
-            }
-        }
-        catch (OperationCanceledException) when (_cancellationToken.IsCancellationRequested)
-        {
-            _state.IsCancelled = true;
-            chapterInfo.Status = TaleStatus.Cancelled;
-            chapterInfo.FinishedAt = _state.Now;
-            throw;
-        }
-        catch (Exception ex)
-        {
-            logger.LogError(ex, "Chapter [{ChapterId}] failed", chapter.ChapterId);
-            _state.Fail(chapterInfo, UnexpectedFailure.Of($"Chapter [{chapter.ChapterId}] failed unexpectedly."));
-        }
-    }
+    private TaleLeaseHeartbeat StartHeartbeat(TaleStatePersistence persistence) =>
+        new TaleLeaseHeartbeat(persistence, logger, _context.TaleInstanceId, _cancellationToken)
+            .Start(_clock, (options ?? TaleOptions.Default).RunningLeaseTimeout);
 
     private Task Save(TaleStatus status, CancellationToken cancellationToken) =>
         _persistence?.Save(_context, _context.TaleInstanceId, _handlerTypeName, status, cancellationToken)

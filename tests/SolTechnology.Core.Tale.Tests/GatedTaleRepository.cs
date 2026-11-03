@@ -6,7 +6,7 @@ namespace SolTechnology.Core.Tale.Tests;
 
 /// <summary>
 /// In-memory repository that can hold the first N reads, after reading, until all N callers arrived,
-/// so concurrent tests race on the same stored version; it can also run a hook before each save.
+/// so concurrent tests race on the same stored version; it can also run hooks before and after each save.
 /// </summary>
 public sealed class GatedTaleRepository(InMemoryTaleRepository inner) : ITaleRepository
 {
@@ -15,6 +15,8 @@ public sealed class GatedTaleRepository(InMemoryTaleRepository inner) : ITaleRep
     private int _arrived;
 
     public Func<TaleInstance, Task>? BeforeSave { get; set; }
+
+    public Action<TaleInstance, Result>? AfterSave { get; set; }
 
     public void GateReads(int callers) => _gatedCallers = callers;
 
@@ -47,7 +49,9 @@ public sealed class GatedTaleRepository(InMemoryTaleRepository inner) : ITaleRep
             await BeforeSave(taleInstance);
         }
 
-        return await inner.Save(taleInstance, cancellationToken);
+        var saved = await inner.Save(taleInstance, cancellationToken);
+        AfterSave?.Invoke(taleInstance, saved);
+        return saved;
     }
 
     public Task Delete(Auid taleId, CancellationToken cancellationToken) => inner.Delete(taleId, cancellationToken);

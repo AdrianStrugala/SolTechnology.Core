@@ -34,7 +34,7 @@ public abstract class Chapter<TContext> : IChapter<TContext>
     /// Return Result.Success() if successful, or Result.Fail("message") if something goes wrong.
     /// </summary>
     /// <param name="context">The Context containing all tale data</param>
-    /// <param name="cancellationToken">The run's token; pass it to every awaited call so that cancelling the tale stops in-flight work.</param>
+    /// <param name="cancellationToken">The run's token, also cancelled when another run takes the tale over; pass it to every awaited call so that cancelling the tale stops in-flight work.</param>
     /// <returns>Result indicating success or failure</returns>
     public abstract Task<Result> Read(TContext context, CancellationToken cancellationToken);
 }

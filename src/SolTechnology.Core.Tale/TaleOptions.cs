@@ -20,8 +20,8 @@ public sealed class TaleOptions
     /// <summary>
     /// How long a <see cref="Models.TaleStatus.Running"/> tale stays owned by the run that last saved
     /// it. <c>ResumeStory</c> refuses a younger Running tale with a conflict and takes over an older
-    /// one, left by a crashed host, re-running its unfinished chapter. Set it above the longest
-    /// chapter. Default: 5 minutes.
+    /// one, left by a crashed host, re-running its unfinished chapter. A live run renews its lease
+    /// every third of this value while it executes, so a chapter may run longer. Default: 5 minutes.
     /// </summary>
     /// <exception cref="ArgumentOutOfRangeException">The value is zero or negative.</exception>
     public TimeSpan RunningLeaseTimeout
