@@ -13,35 +13,35 @@ namespace SolTechnology.Core.Tale.Builder;
 /// </summary>
 public static class TaleBuilderExtensions
 {
-    /// <summary>
-    /// Use the built-in <see cref="InMemoryTaleRepository"/>. This is already the default
-    /// after <c>AddSolTale()</c>; call this only for explicit intent.
-    /// </summary>
-    public static ITaleBuilder UseInMemoryTaleRepository(this ITaleBuilder builder)
+    extension(ITaleBuilder builder)
     {
-        ReplaceRepository(builder.Services, ServiceLifetime.Singleton,
-            _ => new InMemoryTaleRepository());
-        EnsureTaleManager(builder.Services);
-        return builder;
-    }
+        /// <summary>
+        /// Use the built-in <see cref="InMemoryTaleRepository"/>. This is already the default
+        /// after <c>AddSolTale()</c>; call this only for explicit intent.
+        /// </summary>
+        public ITaleBuilder UseInMemoryTaleRepository()
+        {
+            ReplaceRepository(builder.Services, ServiceLifetime.Singleton,
+                _ => new InMemoryTaleRepository());
+            EnsureTaleManager(builder.Services);
+            return builder;
+        }
 
-    /// <summary>
-    /// Register an arbitrary <see cref="ITaleRepository"/> implementation. The caller is
-    /// responsible for registering any transitive dependencies of
-    /// <typeparamref name="TRepository"/> (e.g. <c>DbContext</c>, connection pool, …).
-    /// </summary>
-    /// <param name="builder">The builder.</param>
-    /// <param name="lifetime">Desired lifetime. Singleton by default.</param>
-    public static ITaleBuilder UseTaleRepository<TRepository>(
-        this ITaleBuilder builder,
-        ServiceLifetime lifetime = ServiceLifetime.Singleton)
-        where TRepository : class, ITaleRepository
-    {
-        builder.Services.RemoveAll<ITaleRepository>();
-        builder.Services.Add(new ServiceDescriptor(
-            typeof(ITaleRepository), typeof(TRepository), lifetime));
-        EnsureTaleManager(builder.Services);
-        return builder;
+        /// <summary>
+        /// Register an arbitrary <see cref="ITaleRepository"/> implementation. The caller is
+        /// responsible for registering any transitive dependencies of
+        /// <typeparamref name="TRepository"/> (e.g. <c>DbContext</c>, connection pool, …).
+        /// </summary>
+        /// <param name="lifetime">Desired lifetime. Singleton by default.</param>
+        public ITaleBuilder UseTaleRepository<TRepository>(ServiceLifetime lifetime = ServiceLifetime.Singleton)
+            where TRepository : class, ITaleRepository
+        {
+            builder.Services.RemoveAll<ITaleRepository>();
+            builder.Services.Add(new ServiceDescriptor(
+                typeof(ITaleRepository), typeof(TRepository), lifetime));
+            EnsureTaleManager(builder.Services);
+            return builder;
+        }
     }
 
     private static void ReplaceRepository(
@@ -53,12 +53,14 @@ public static class TaleBuilderExtensions
         services.Add(new ServiceDescriptor(typeof(ITaleRepository), factory, lifetime));
     }
 
+    // TaleManager reads ITaleRepository through its scope; repeated Use*TaleRepository calls must not duplicate it.
     private static void EnsureTaleManager(IServiceCollection services)
     {
-        // TaleManager is Scoped and reads ITaleRepository through the service scope factory.
-        // Multiple calls to Use*TaleRepository must not duplicate the registration.
-        if (services.Any(s => s.ServiceType == typeof(TaleManager))) return;
+        if (services.Any(s => s.ServiceType == typeof(TaleManager)))
+        {
+            return;
+        }
+
         services.AddScoped<TaleManager>();
     }
 }
-

@@ -142,7 +142,6 @@ public class TaleCombinatorTests
     }
 }
 
-#region Fixtures
 
 public class TaleInput { public int Seed { get; set; } }
 
@@ -277,6 +276,5 @@ public class FinaleTale(IServiceProvider sp, ILogger<FinaleTale> log)
             .Finale(ctx => new TaleOutput { Value = ctx.Value });
 }
 
-#endregion
 
 

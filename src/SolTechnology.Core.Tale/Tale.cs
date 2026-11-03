@@ -46,13 +46,16 @@ public sealed class Tale<TContext, TOutput>
 
     internal IReadOnlyList<TaleStep> Steps => _steps;
 
+    private Tale<TContext, TOutput> Add(TaleStep step)
+    {
+        _steps.Add(step);
+        return this;
+    }
+
     /// <summary>Read the next chapter. Skipped if the tale has already switched to the lost track.</summary>
     /// <typeparam name="TChapter">The chapter to read; resolved from DI.</typeparam>
     public Tale<TContext, TOutput> Read<TChapter>() where TChapter : IChapter<TContext>
-    {
-        _steps.Add(new ReadStep(typeof(TChapter)));
-        return this;
-    }
+        => Add(new ReadStep(typeof(TChapter)));
 
     /// <summary>
     /// Stay on the won track only while <paramref name="condition"/> holds; otherwise switch to the
@@ -61,10 +64,7 @@ public sealed class Tale<TContext, TOutput>
     /// <param name="condition">What the context must satisfy to keep going.</param>
     /// <param name="otherwise">The error to fail with when the condition does not hold.</param>
     public Tale<TContext, TOutput> Expect(Func<TContext, bool> condition, Error otherwise)
-    {
-        _steps.Add(new GuardStep(ctx => condition((TContext)ctx), otherwise));
-        return this;
-    }
+        => Add(new GuardStep(ctx => condition((TContext)ctx), otherwise));
 
     /// <summary>
     /// Recover from a lost tale by reading a fallback chapter — clears the error and puts the tale
@@ -72,10 +72,7 @@ public sealed class Tale<TContext, TOutput>
     /// </summary>
     /// <typeparam name="TChapter">The fallback chapter; resolved from DI.</typeparam>
     public Tale<TContext, TOutput> Otherwise<TChapter>() where TChapter : IChapter<TContext>
-    {
-        _steps.Add(new FallbackChapterStep(typeof(TChapter)));
-        return this;
-    }
+        => Add(new FallbackChapterStep(typeof(TChapter)));
 
     /// <summary>
     /// Recover from a lost tale with an inline fallback — clears the error and puts the tale back on
@@ -83,52 +80,31 @@ public sealed class Tale<TContext, TOutput>
     /// </summary>
     /// <param name="recover">Inline recovery that mutates the context and returns its own result.</param>
     public Tale<TContext, TOutput> Otherwise(Func<TContext, Task<Result>> recover)
-    {
-        _steps.Add(new FallbackStep(ctx => recover((TContext)ctx)));
-        return this;
-    }
+        => Add(new FallbackStep(ctx => recover((TContext)ctx)));
 
     /// <summary>Run a side-effect (logging, metrics, alerting) when the tale has been lost. Track unchanged.</summary>
     public Tale<TContext, TOutput> WhenLost(Action<Error> effect)
-    {
-        _steps.Add(new OnLostStep(error => { effect(error); return Task.CompletedTask; }));
-        return this;
-    }
+        => Add(new OnLostStep(error => { effect(error); return Task.CompletedTask; }));
 
     /// <summary>Asynchronous <see cref="WhenLost(Action{Error})"/>.</summary>
     public Tale<TContext, TOutput> WhenLost(Func<Error, Task> effect)
-    {
-        _steps.Add(new OnLostStep(effect));
-        return this;
-    }
+        => Add(new OnLostStep(effect));
 
     /// <summary>Run a side-effect when the tale is still being won. Track unchanged.</summary>
     public Tale<TContext, TOutput> WhenWon(Action<TContext> effect)
-    {
-        _steps.Add(new OnWonStep(ctx => { effect((TContext)ctx); return Task.CompletedTask; }));
-        return this;
-    }
+        => Add(new OnWonStep(ctx => { effect((TContext)ctx); return Task.CompletedTask; }));
 
     /// <summary>Asynchronous <see cref="WhenWon(Action{TContext})"/>.</summary>
     public Tale<TContext, TOutput> WhenWon(Func<TContext, Task> effect)
-    {
-        _steps.Add(new OnWonStep(ctx => effect((TContext)ctx)));
-        return this;
-    }
+        => Add(new OnWonStep(ctx => effect((TContext)ctx)));
 
     /// <summary>An inline step — a small piece of logic that mutates the context without a dedicated chapter.</summary>
     public Tale<TContext, TOutput> Do(Action<TContext> step)
-    {
-        _steps.Add(new InlineStep(ctx => { step((TContext)ctx); return Task.FromResult(Result.Success()); }));
-        return this;
-    }
+        => Add(new InlineStep(ctx => { step((TContext)ctx); return Task.FromResult(Result.Success()); }));
 
     /// <summary>An inline step that may itself fail, returning its own <see cref="Result"/>.</summary>
     public Tale<TContext, TOutput> Do(Func<TContext, Task<Result>> step)
-    {
-        _steps.Add(new InlineStep(ctx => step((TContext)ctx)));
-        return this;
-    }
+        => Add(new InlineStep(ctx => step((TContext)ctx)));
 
     /// <summary>
     /// Conclude the tale: project the final context into the output. This seals the plan into a

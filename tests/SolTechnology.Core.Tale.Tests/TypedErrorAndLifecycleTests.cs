@@ -179,7 +179,6 @@ public class TypedErrorAndLifecycleTests
     }
 }
 
-#region Support types
 
 public class LifecycleInput { public int Value { get; set; } }
 public class LifecycleOutput { public string Message { get; set; } = ""; }
@@ -233,5 +232,4 @@ public class LifecycleTaleV2 : TaleHandler<LifecycleInput, LifecycleContext, Lif
             .Finale(ctx => ctx.Output);
 }
 
-#endregion
 

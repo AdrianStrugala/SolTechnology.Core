@@ -243,7 +243,6 @@ public class TaleEngineTests
     }
 }
 
-#region Test Stories
 
 public class EngineTestTale : TaleHandler<EngineTestInput, EngineTesTContext, EngineTestOutput>
 {
@@ -404,9 +403,7 @@ public class UnregisteredChapterTale : TaleHandler<EngineTestInput, EngineTesTCo
             .Finale(ctx => ctx.Output);
 }
 
-#endregion
 
-#region Test Chapters
 
 public class EngineTestChapter1 : Chapter<EngineTesTContext>
 {
@@ -490,9 +487,7 @@ public class UnregisteredChapter : Chapter<EngineTesTContext>
     }
 }
 
-#endregion
 
-#region Test Models
 
 public class EngineTestInput
 {
@@ -510,4 +505,3 @@ public class EngineTesTContext : Context<EngineTestInput, EngineTestOutput>
     public List<string> ExecutionOrder { get; set; } = new();
 }
 
-#endregion

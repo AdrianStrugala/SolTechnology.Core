@@ -2,7 +2,6 @@ using System.Text.Json;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using SolTechnology.Core.AUID;
-using SolTechnology.Core.Errors;
 using SolTechnology.Core.Tale.Models;
 using SolTechnology.Core.Tale.Persistence;
 
@@ -10,32 +9,20 @@ namespace SolTechnology.Core.Tale.Orchestration;
 
 /// <summary>
 /// Manages tale lifecycle for interactive workflows with persistence.
-/// Creates a fresh DI scope for every <c>StartStory</c>/<c>ResumeStory</c>/<c>CancelStory</c> call
-/// to avoid captive-dependency issues (review §3.2).
+/// Creates a fresh DI scope for every <c>StartStory</c>/<c>ResumeStory</c> call to avoid
+/// captive-dependency issues.
 /// </summary>
-public class TaleManager
+/// <param name="scopeFactory">Creates a DI scope per call.</param>
+/// <param name="repository">Stores tale instances.</param>
+/// <param name="logger">Logs unexpected failures.</param>
+/// <param name="timeProvider">Clock for timestamps; <see cref="TimeProvider.System"/> when null.</param>
+public partial class TaleManager(
+    IServiceScopeFactory scopeFactory,
+    ITaleRepository repository,
+    ILogger<TaleManager> logger,
+    TimeProvider? timeProvider = null)
 {
-    private readonly IServiceScopeFactory _scopeFactory;
-    private readonly ITaleRepository _repository;
-    private readonly ILogger<TaleManager> _logger;
-    private readonly TimeProvider _timeProvider;
-
-    /// <summary>Creates the manager; registered as scoped by <c>AddSolTale</c>.</summary>
-    /// <param name="scopeFactory">Creates a DI scope per call.</param>
-    /// <param name="repository">Stores tale instances.</param>
-    /// <param name="logger">Logs unexpected failures.</param>
-    /// <param name="timeProvider">Clock for timestamps; <see cref="TimeProvider.System"/> when null.</param>
-    public TaleManager(
-        IServiceScopeFactory scopeFactory,
-        ITaleRepository repository,
-        ILogger<TaleManager> logger,
-        TimeProvider? timeProvider = null)
-    {
-        _scopeFactory = scopeFactory;
-        _repository = repository;
-        _logger = logger;
-        _timeProvider = timeProvider ?? TimeProvider.System;
-    }
+    private readonly TimeProvider _timeProvider = timeProvider ?? TimeProvider.System;
 
     /// <summary>Starts a new tale execution.</summary>
     /// <param name="input">Initial input for the tale.</param>
@@ -55,8 +42,11 @@ public class TaleManager
     {
         if (!string.IsNullOrEmpty(idempotencyKey))
         {
-            var existing = await _repository.FindByIdempotencyKey(idempotencyKey!, cancellationToken);
-            if (existing != null) return Result<TaleInstance>.Success(existing);
+            var existing = await repository.FindByIdempotencyKey(idempotencyKey, cancellationToken);
+            if (existing != null)
+            {
+                return Result<TaleInstance>.Success(existing);
+            }
         }
 
         return await ExecuteTalePipeline<THandler, TInput, TContext, TOutput>(
@@ -82,125 +72,27 @@ public class TaleManager
     /// </summary>
     public async Task<Result<TaleInstance>> CancelStory(Auid taleId, CancellationToken cancellationToken = default)
     {
-        var instance = await _repository.FindById(taleId, cancellationToken);
-        if (instance == null) return Result<TaleInstance>.Fail($"Tale {taleId} not found");
+        var instance = await repository.FindById(taleId, cancellationToken);
+        if (instance == null)
+        {
+            return Result<TaleInstance>.Fail($"Tale {taleId} not found");
+        }
+
         if (instance.Status == TaleStatus.Completed)
+        {
             return Result<TaleInstance>.Fail("Cannot cancel a completed tale");
+        }
+
         if (instance.Status == TaleStatus.Cancelled)
+        {
             return Result<TaleInstance>.Success(instance);
+        }
 
         instance.Status = TaleStatus.Cancelled;
         instance.LastUpdatedAt = _timeProvider.GetUtcNow().UtcDateTime;
         instance.CurrentChapter = null;
-        var saved = await _repository.Save(instance, cancellationToken);
+        var saved = await repository.Save(instance, cancellationToken);
         return saved.IsSuccess ? Result<TaleInstance>.Success(instance) : Result<TaleInstance>.Fail(saved.Error!);
-    }
-
-    private async Task<Result<TaleInstance>> ExecuteTalePipeline<THandler, TInput, TContext, TOutput>(
-        TInput? input,
-        JsonElement? userInput,
-        Auid taleId,
-        string? idempotencyKey,
-        CancellationToken cancellationToken)
-        where THandler : TaleHandler<TInput, TContext, TOutput>
-        where TInput : class
-        where TContext : Context<TInput, TOutput>, new()
-        where TOutput : class, new()
-    {
-        // Dedicated DI scope for this invocation — avoids captive dependencies (Scoped DbContext etc.).
-        using var scope = _scopeFactory.CreateScope();
-        var sp = scope.ServiceProvider;
-
-        try
-        {
-            TContext? context;
-            TaleInstance? existing = null;
-
-            if (taleId != Auid.Empty)
-            {
-                existing = await _repository.FindById(taleId, cancellationToken);
-                if (existing == null) return Result<TaleInstance>.Fail($"Tale {taleId} not found");
-                if (existing.Status == TaleStatus.Completed)
-                    return Result<TaleInstance>.Fail("Tale already completed");
-                if (existing.Status == TaleStatus.Cancelled)
-                    return Result<TaleInstance>.Fail("Tale has been cancelled");
-                if (existing.Status == TaleStatus.Failed)
-                    return Result<TaleInstance>.Fail(new ConflictError { Message = "Tale has failed and cannot be resumed" });
-                if (existing.Status == TaleStatus.Running)
-                    return Result<TaleInstance>.Fail(new ConflictError { Message = "Tale is already running" });
-                if (existing.History.Any(h => h.StepIndex is null))
-                    return Result<TaleInstance>.Fail(
-                        $"Tale {taleId} was created by SolTechnology.Core.Tale 1.x and cannot be resumed by 2.x; restart the tale.");
-
-                try
-                {
-                    context = JsonSerializer.Deserialize<TContext>(existing.Context, TaleJsonOptions.Default);
-                }
-                catch (JsonException ex)
-                {
-                    return Result<TaleInstance>.Fail(
-                        $"Persisted context for tale {taleId} is corrupt and cannot be deserialized: {ex.Message}");
-                }
-
-                if (context == null)
-                    return Result<TaleInstance>.Fail($"Persisted context for tale {taleId} deserialized to null");
-
-                context.TaleInstanceId = taleId;
-            }
-            else
-            {
-                if (input == null)
-                    return Result<TaleInstance>.Fail("Input is required to start a tale");
-
-                context = new TContext { Input = input };
-            }
-
-            var handler = ActivatorUtilities.CreateInstance<THandler>(sp);
-            var run = new TaleRunOptions { Persist = true, Resume = existing, IdempotencyKey = idempotencyKey };
-            var result = await handler.Run(context, userInput, run, cancellationToken);
-
-            var activeId = context.TaleInstanceId;
-
-            if (result.Error is ConflictError && !string.IsNullOrEmpty(idempotencyKey))
-            {
-                var winner = await _repository.FindByIdempotencyKey(idempotencyKey, cancellationToken);
-                if (winner != null) return Result<TaleInstance>.Success(winner);
-            }
-
-            if (result.IsFailure && result.Error is TalePausedError)
-                return await GetLatestInstance(activeId, cancellationToken);
-
-            if (result.IsSuccess)
-            {
-                var instance = await _repository.FindById(activeId, cancellationToken);
-                if (instance != null) return Result<TaleInstance>.Success(instance);
-
-                // Tale ran to completion without persistence being triggered by the handler.
-                return Result<TaleInstance>.Success(new TaleInstance
-                {
-                    TaleId = activeId,
-                    HandlerTypeName = typeof(THandler).Name,
-                    Status = TaleStatus.Completed,
-                    CreatedAt = _timeProvider.GetUtcNow().UtcDateTime,
-                    LastUpdatedAt = _timeProvider.GetUtcNow().UtcDateTime
-                });
-            }
-
-            return Result<TaleInstance>.Fail(result.Error!);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error executing tale {Handler}", typeof(THandler).Name);
-            return Result<TaleInstance>.Fail($"Tale {typeof(THandler).Name} failed unexpectedly.");
-        }
-    }
-
-    private async Task<Result<TaleInstance>> GetLatestInstance(Auid taleId, CancellationToken cancellationToken)
-    {
-        var instance = await _repository.FindById(taleId, cancellationToken);
-        return instance != null
-            ? Result<TaleInstance>.Success(instance)
-            : Result<TaleInstance>.Fail("Instance not found after execution");
     }
 
     /// <summary>Retrieves the current state of a tale.</summary>
@@ -208,14 +100,14 @@ public class TaleManager
     {
         try
         {
-            var instance = await _repository.FindById(taleId, cancellationToken);
+            var instance = await repository.FindById(taleId, cancellationToken);
             return instance != null
                 ? Result<TaleInstance>.Success(instance)
                 : Result<TaleInstance>.Fail("Tale not found");
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Failed to load tale state for {TaleId}", taleId);
+            logger.LogError(ex, "Failed to load tale state for {TaleId}", taleId);
             return Result<TaleInstance>.Fail("Failed to load tale.");
         }
     }

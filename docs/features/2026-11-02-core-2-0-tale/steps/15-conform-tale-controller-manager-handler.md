@@ -1,7 +1,7 @@
 ---
 spec: 2026-11-02-core-2-0-tale
 step: 15
-status: to-do
+status: done
 ---
 
 # Step 15: Guide conformance — Tale controller, manager, handler, `Tale`, and tests
@@ -35,14 +35,42 @@ Former core step 63; moved here by the per-library regroup (user, 2026-11-02).
     - `Handle_Direct_InteractiveChapterPauses_LogsNotPersistedWarning` (step 03).
 
 ## Acceptance criteria
-- [ ] `find src/SolTechnology.Core.Tale -name "*.cs" -not -path "*/obj/*" | xargs wc -l | awk '$1>150 && $2!="total"'` prints nothing.
-- [ ] `grep -rn "#region" tests/SolTechnology.Core.Tale.Tests` prints nothing.
-- [ ] `dotnet test tests/SolTechnology.Core.Tale.Tests` is green, and the DreamTravel component tests are green.
-- [ ] Public API diff is empty.
-- [ ] Premortem mitigations for `ModuleInstaller.cs` are applied.
-- [ ] RM-16: `grep -n "NoInlining" src/SolTechnology.Core.Tale/ModuleInstaller.cs` matches; `git diff` of the guard tests' files shows only `#region`/`#endregion` lines removed; the guard tests are green.
+- [x] `find src/SolTechnology.Core.Tale -name "*.cs" -not -path "*/obj/*" | xargs wc -l | awk '$1>150 && $2!="total"'` prints nothing.
+- [x] `grep -rn "#region" tests/SolTechnology.Core.Tale.Tests` prints nothing.
+- [x] `dotnet test tests/SolTechnology.Core.Tale.Tests` is green, and the DreamTravel component tests are green.
+- [x] Public API diff is empty.
+- [x] Premortem mitigations for `ModuleInstaller.cs` are applied.
+- [x] RM-16: `grep -n "NoInlining" src/SolTechnology.Core.Tale/ModuleInstaller.cs` matches; `git diff` of the guard tests' files shows only `#region`/`#endregion` lines removed; the guard tests are green.
 
 ## Open questions
 - none
 
 ## Deviations
+
+### Partial files, two internal collaborators, and `TaleHandler`'s constructor
+
+**Original plan:** Controller DTOs to `Api/TaleControllerModels.cs`; `TaleManager`, `TaleHandler`
+and `Tale` under 150 lines with primary constructors; `extension` blocks in `ModuleInstaller`,
+`TaleBuilderExtensions` and `DataField.cs`.
+
+**Actual implementation:**
+- Moving the DTOs left `TaleController` at about 325 lines, so its reflection calls into the generic
+  `TaleManager` methods moved to the internal `TaleManagerInvoker`, and its response mapping to the
+  partial file `TaleController.Responses.cs` (141 + 123 lines).
+- `TaleManager` (primary constructor) keeps its public methods in `TaleManager.cs` (114) and the
+  run pipeline in the partial `TaleManager.Pipeline.cs` (92); the resume checks and context
+  restore moved to the internal `ResumableTaleLoader` (61).
+- `TaleHandler` keeps its hand-written `protected` constructor and fields: a primary constructor
+  would make it `public`, a public API change. Its internal `Run` moved to the partial
+  `TaleHandler.Run.cs` (141 + 65 lines).
+- `Tale<TContext,TOutput>` builder methods share a private `Add` step, which brings `Tale.cs` to
+  138 lines; `TaleHandlerRegistry` moved from `ModuleInstaller.cs` to its own file.
+- `AddSolTale` keeps `[MethodImpl(MethodImplOptions.NoInlining)]` and the
+  `Assembly.GetCallingAssembly()` capture inside the `extension` block; the IL of the generated
+  static `ModuleInstaller.AddSolTale(IServiceCollection, …)` is `noinlining` and calls
+  `GetCallingAssembly` (RM-16, scenario 23).
+- Public API: `Microsoft.DotNet.ApiCompat.Tool` 10.0.403 (default rules, both directions) found no
+  breaking change against `ad0542d8`; strict mode lists only the two compiler-generated `extension`
+  marker types, as in the CQRS feature.
+- Tests: the eight files with `#region` lost only their `#region`/`#endregion` lines
+  (`git diff -U0 tests/` shows nothing else); 130 Tale tests and the DreamTravel suites passed.

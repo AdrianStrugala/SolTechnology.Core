@@ -172,7 +172,6 @@ public class InteractiveChapterTests
     }
 }
 
-#region Test Interactive Chapters
 
 public class TestInteractiveChapter : InteractiveChapter<TestInteractiveContext, CustomerDetailsInput>
 {
@@ -211,9 +210,7 @@ public class ComplexInputChapter : InteractiveChapter<TestInteractiveContext, Co
     }
 }
 
-#endregion
 
-#region Test Input Models
 
 public class CustomerDetailsInput
 {
@@ -234,9 +231,7 @@ public class OrderDetails
     public List<string> Items { get; set; } = new();
 }
 
-#endregion
 
-#region Test context
 
 public class TestInteractiveInput
 {
@@ -255,4 +250,3 @@ public class TestInteractiveContext : Context<TestInteractiveInput, TestInteract
     public string ComplexData { get; set; } = string.Empty;
 }
 
-#endregion

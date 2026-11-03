@@ -236,7 +236,6 @@ public class TaleHandlerTests
     }
 }
 
-#region Test Stories
 
 /// <summary>
 /// Simple tale that performs a calculation across 3 chapters.
@@ -288,9 +287,7 @@ public class DirectOutputTale : TaleHandler<CalculationInput, CalculationContext
             .Finale(ctx => ctx.Output);
 }
 
-#endregion
 
-#region Test Chapters
 
 public class CalculateChapter : Chapter<CalculationContext>
 {
@@ -347,9 +344,7 @@ public class ModifyOutputChapter : Chapter<CalculationContext>
     }
 }
 
-#endregion
 
-#region Test Models
 
 public class CalculationInput
 {
@@ -367,4 +362,3 @@ public class CalculationContext : Context<CalculationInput, CalculationOutput>
     public List<string> ChapterExecutionLog { get; set; } = new();
 }
 
-#endregion

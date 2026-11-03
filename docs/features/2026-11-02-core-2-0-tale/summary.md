@@ -33,6 +33,6 @@ are `done` and after these library features are `completed`: `result`; `auid`. N
 | 12 | XML docs shipped — Tale | [`steps/12-xml-docs.md`](steps/12-xml-docs.md) | done |
 | 13 | Module docs — `docs/Tale.md` for the 2.0 Tale contract | [`steps/13-docs-tale.md`](steps/13-docs-tale.md) | done |
 | 14 | Guide conformance — Tale engine split | [`steps/14-conform-tale-engine.md`](steps/14-conform-tale-engine.md) | done |
-| 15 | Guide conformance — Tale controller, manager, handler, `Tale`, and tests | [`steps/15-conform-tale-controller-manager-handler.md`](steps/15-conform-tale-controller-manager-handler.md) | to-do |
+| 15 | Guide conformance — Tale controller, manager, handler, `Tale`, and tests | [`steps/15-conform-tale-controller-manager-handler.md`](steps/15-conform-tale-controller-manager-handler.md) | done |
 | 16 | Log templates — `[{Placeholder}]` in Tale (L-03) | [`steps/16-log-template-brackets.md`](steps/16-log-template-brackets.md) | to-do |
 | 17 | Retrospective | [`steps/17-retrospective.md`](steps/17-retrospective.md) | to-do |

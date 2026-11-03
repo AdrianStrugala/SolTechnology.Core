@@ -35,15 +35,16 @@ public class DataField
 /// </summary>
 internal static class SchemaBuilder
 {
-    /// <summary>
-    /// Converts a type into a list of DataFields describing its structure.
-    /// Uses reflection to introspect public properties.
-    /// Recursively processes complex types and collections.
-    /// </summary>
-    /// <param name="type">The type to generate schema for</param>
-    /// <returns>List of DataFields describing the type's public properties</returns>
-    public static List<DataField> ToDataFields(this Type type) =>
-        ToDataFields(type, new HashSet<Type> { type }, depth: 1);
+    extension(Type type)
+    {
+        /// <summary>
+        /// Converts a type into a list of DataFields describing its public properties, recursing into
+        /// complex types (not collections) up to a fixed depth.
+        /// </summary>
+        /// <returns>List of DataFields describing the type's public properties</returns>
+        public List<DataField> ToDataFields() =>
+            ToDataFields(type, new HashSet<Type> { type }, depth: 1);
+    }
 
     private const int MaxDepth = 8;
 

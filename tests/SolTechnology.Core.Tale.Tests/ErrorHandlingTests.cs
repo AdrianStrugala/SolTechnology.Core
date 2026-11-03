@@ -222,7 +222,6 @@ public class ErrorHandlingTests
     }
 }
 
-#region Test Stories
 
 public class SuccessfulTale : TaleHandler<ErrorTestInput, ErrorTesTContext, ErrorTestOutput>
 {
@@ -302,9 +301,7 @@ public class CustomErrorTale : TaleHandler<ErrorTestInput, ErrorTesTContext, Err
             .Finale(ctx => ctx.Output);
 }
 
-#endregion
 
-#region Test Chapters
 
 public class ErrorTestSuccessChapter : Chapter<ErrorTesTContext>
 {
@@ -374,9 +371,7 @@ public class ErrorTestCustomErrorChapter : Chapter<ErrorTesTContext>
     }
 }
 
-#endregion
 
-#region Test Models
 
 public class ErrorTestInput
 {
@@ -393,4 +388,3 @@ public class ErrorTesTContext : Context<ErrorTestInput, ErrorTestOutput>
     public List<string> ExecutionLog { get; set; } = new();
 }
 
-#endregion

@@ -98,7 +98,6 @@ public class ChapterTests
     }
 }
 
-#region Test Chapters
 
 /// <summary>
 /// Test chapter that always succeeds.
@@ -171,9 +170,7 @@ public class TestCustomIdChapter : Chapter<TestContext>
     }
 }
 
-#endregion
 
-#region Test Models
 
 public class TestInput
 {
@@ -199,4 +196,3 @@ public class TestService
     }
 }
 
-#endregion

@@ -293,7 +293,6 @@ public class PauseResumeIntegrationTests
     }
 }
 
-#region Test Tale and Chapters
 
 public class OrderProcessingTale : TaleHandler<OrderInput, OrderContext, OrderOutput>
 {
@@ -369,9 +368,7 @@ public class SendConfirmationChapter : Chapter<OrderContext>
     }
 }
 
-#endregion
 
-#region Test Models
 
 public class OrderInput
 {
@@ -404,4 +401,3 @@ public class CustomerDetails
     public string Address { get; set; } = string.Empty;
 }
 
-#endregion
