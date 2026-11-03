@@ -23,5 +23,5 @@ are `done` and after these library features are `completed`: none. No step is `b
 | 02 | Core — immutable `Result` and a typed `Result<T>.FailAsTask` | [`steps/02-core-result-immutability.md`](steps/02-core-result-immutability.md) | done |
 | 03 | XML docs shipped — Core | [`steps/03-xml-docs.md`](steps/03-xml-docs.md) | done |
 | 04 | Module docs — `docs/Core.md` as the `SolTechnology.Core` package README | [`steps/04-docs-core.md`](steps/04-docs-core.md) | done |
-| 05 | Guide conformance — Core | [`steps/05-conform-core.md`](steps/05-conform-core.md) | to-do |
+| 05 | Guide conformance — Core | [`steps/05-conform-core.md`](steps/05-conform-core.md) | done |
 | 06 | Retrospective | [`steps/06-retrospective.md`](steps/06-retrospective.md) | to-do |
