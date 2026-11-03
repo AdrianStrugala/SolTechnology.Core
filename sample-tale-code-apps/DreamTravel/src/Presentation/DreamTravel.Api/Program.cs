@@ -30,7 +30,7 @@ namespace DreamTravel.Api;
 
 public class Program
 {
-    private static readonly string CorsPolicy = "dupa";
+    private const string DreamTravelCorsPolicy = "DreamTravelCors";
 
     // This method gets called by the runtime. Use this method to add services to the container.
     public static void Main(string[] args)
@@ -56,7 +56,7 @@ public class Program
         //CORS
         builder.Services.AddCors(options =>
         {
-            options.AddPolicy(CorsPolicy,
+            options.AddPolicy(DreamTravelCorsPolicy,
                 policyBuilder =>
                 {
                     policyBuilder.SetIsOriginAllowed(origin =>
@@ -74,8 +74,7 @@ public class Program
                             var allowedOrigins = new[]
                             {
                                 "https://dreamtravels.azurewebsites.net",
-                                "https://dreamtravels-demo.azurewebsites.net",
-                                "https://avroconvertonline.azurewebsites.net"
+                                "https://dreamtravels-demo.azurewebsites.net"
                             };
 
                             return allowedOrigins.Contains(origin, StringComparer.OrdinalIgnoreCase);
@@ -183,7 +182,7 @@ public class Program
         // SolTechnology.Core.Api: per-version Swagger UI (newest first, deprecation badges).
         app.UseSolSwaggerWithVersioning("DreamTravel API");
 
-        app.UseCors(CorsPolicy);
+        app.UseCors(DreamTravelCorsPolicy);
         app.UseHttpsRedirection();
 
         app.UseRouting();
