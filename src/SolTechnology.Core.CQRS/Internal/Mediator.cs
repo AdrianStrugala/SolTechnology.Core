@@ -20,19 +20,22 @@ internal sealed class CQRSMediator : IMediator
     public Task<Result> Send(ICommand command, CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(command);
-        return SendInternal<Result>(command, cancellationToken);
+        var handlerInterfaceType = typeof(ICommandHandler<>).MakeGenericType(command.GetType());
+        return SendInternal<Result>(command, handlerInterfaceType, cancellationToken);
     }
 
     public Task<Result<TResult>> Send<TResult>(ICommand<TResult> command, CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(command);
-        return SendInternal<Result<TResult>>(command, cancellationToken);
+        var handlerInterfaceType = typeof(ICommandHandler<,>).MakeGenericType(command.GetType(), typeof(TResult));
+        return SendInternal<Result<TResult>>(command, handlerInterfaceType, cancellationToken);
     }
 
     public Task<Result<TResult>> Send<TResult>(IQuery<TResult> query, CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(query);
-        return SendInternal<Result<TResult>>(query, cancellationToken);
+        var handlerInterfaceType = typeof(IQueryHandler<,>).MakeGenericType(query.GetType(), typeof(TResult));
+        return SendInternal<Result<TResult>>(query, handlerInterfaceType, cancellationToken);
     }
 
     public void Publish<TEvent>(TEvent notification) where TEvent : IEvent
@@ -47,66 +50,25 @@ internal sealed class CQRSMediator : IMediator
         _eventPublisher.Publish(notification);
     }
 
-    private async Task<TResponse> SendInternal<TResponse>(object request, CancellationToken cancellationToken)
+    private async Task<TResponse> SendInternal<TResponse>(object request, Type handlerInterfaceType, CancellationToken cancellationToken)
     {
         var requestType = request.GetType();
-        var responseType = typeof(TResponse);
 
-        // Determine the handler interface type
-        var handlerInterfaceType = ResolveHandlerInterfaceType(requestType, responseType);
+        var dispatcher = RequestDispatcherCache.GetOrAdd(requestType, typeof(TResponse), handlerInterfaceType);
+        RequestHandlerDelegate<TResponse> pipeline = async () => (TResponse)await dispatcher.Invoke(_serviceProvider, request, cancellationToken);
 
-        // Get pipeline behaviors
-        var behaviorType = typeof(IPipelineBehavior<,>).MakeGenericType(requestType, responseType);
+        var behaviorType = typeof(IPipelineBehavior<,>).MakeGenericType(requestType, typeof(TResponse));
         var behaviors = _serviceProvider.GetServices(behaviorType).Cast<object>().ToList();
+        var invokeBehavior = PipelineBehaviorInvoker<TResponse>.For(requestType);
 
-        // Build the handler invocation as the innermost delegate
-        var dispatcher = RequestDispatcherCache.GetOrAdd(requestType, responseType, handlerInterfaceType);
-        RequestHandlerDelegate<TResponse> handler = async () => (TResponse)await dispatcher.Invoke(_serviceProvider, request, cancellationToken);
-
-        // Fold behaviors right-to-left (last registered = innermost)
+        // Fold right-to-left so the first registered behavior is the outermost.
         for (var i = behaviors.Count - 1; i >= 0; i--)
         {
             var behavior = behaviors[i];
-            var next = handler;
-            var handleMethod = behavior.GetType().GetMethod("Handle")!;
-            handler = () => (Task<TResponse>)handleMethod.Invoke(behavior, new object[] { request, next, cancellationToken })!;
+            var next = pipeline;
+            pipeline = () => invokeBehavior(behavior, request, next, cancellationToken);
         }
 
-        return await handler();
-    }
-
-    private static Type ResolveHandlerInterfaceType(Type requestType, Type responseType)
-    {
-        // ICommand (no TResult) → ICommandHandler<TCommand>
-        // ICommand<TResult> → ICommandHandler<TCommand, TResult>
-        // IQuery<TResult> → IQueryHandler<TQuery, TResult>
-
-        if (responseType == typeof(Result))
-        {
-            return typeof(ICommandHandler<>).MakeGenericType(requestType);
-        }
-
-        if (responseType.IsGenericType && responseType.GetGenericTypeDefinition() == typeof(Result<>))
-        {
-            var resultInnerType = responseType.GetGenericArguments()[0];
-
-            // Check if it's a query
-            var queryInterface = requestType.GetInterfaces()
-                .FirstOrDefault(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IQuery<>));
-
-            if (queryInterface != null)
-            {
-                return typeof(IQueryHandler<,>).MakeGenericType(requestType, resultInnerType);
-            }
-
-            // It's a command with result
-            return typeof(ICommandHandler<,>).MakeGenericType(requestType, resultInnerType);
-        }
-
-        throw new InvalidOperationException($"Cannot resolve handler for request type {requestType.Name} with response type {responseType.Name}");
+        return await pipeline();
     }
 }
-
-
-
-

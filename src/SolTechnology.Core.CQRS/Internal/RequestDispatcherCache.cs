@@ -5,40 +5,45 @@ using System.Reflection;
 namespace SolTechnology.Core.CQRS.Internal;
 
 /// <summary>
-/// Caches a compiled dispatcher delegate per (request-type → handler-type) pair.
-/// On the hot path only a dictionary lookup + delegate invocation is performed — no reflection.
+/// Caches a compiled dispatcher delegate per (request type, handler interface) pair, so one request
+/// type sent both as a query and as a command reaches the matching handler.
 /// </summary>
 internal static class RequestDispatcherCache
 {
-    private static readonly ConcurrentDictionary<Type, RequestDispatcher> Dispatchers = new();
+    private static readonly ConcurrentDictionary<(Type RequestType, Type HandlerInterfaceType), RequestDispatcher> Dispatchers = new();
+
+    private static readonly MethodInfo ResolveHandlerMethod =
+        typeof(RequestDispatcherCache).GetMethod(nameof(ResolveHandler), BindingFlags.NonPublic | BindingFlags.Static)!;
 
     public static RequestDispatcher GetOrAdd(Type requestType, Type responseType, Type handlerInterfaceType)
-        => Dispatchers.GetOrAdd(requestType, _ => Build(requestType, responseType, handlerInterfaceType));
+        => Dispatchers.GetOrAdd(
+            (requestType, handlerInterfaceType),
+            static (key, responseType) => Build(key.RequestType, responseType, key.HandlerInterfaceType),
+            responseType);
 
     private static RequestDispatcher Build(Type requestType, Type responseType, Type handlerInterfaceType)
     {
-        // Find the Handle method on the handler interface
         var handleMethod = handlerInterfaceType.GetMethod("Handle", BindingFlags.Public | BindingFlags.Instance)!;
 
-        // Parameters: (IServiceProvider sp, object request, CancellationToken ct) → Task<object>
+        // (IServiceProvider sp, object request, CancellationToken ct) => CastTask(((IHandler)ResolveHandler(...)).Handle((TRequest)request, ct))
         var spParam = Expression.Parameter(typeof(IServiceProvider), "sp");
         var reqParam = Expression.Parameter(typeof(object), "request");
         var ctParam = Expression.Parameter(typeof(CancellationToken), "ct");
 
-        // var handler = (IHandler<T,R>) sp.GetService(typeof(IHandler<T,R>));
-        var getServiceMethod = typeof(IServiceProvider).GetMethod("GetService")!;
         var handlerExpr = Expression.Convert(
-            Expression.Call(spParam, getServiceMethod, Expression.Constant(handlerInterfaceType)),
+            Expression.Call(
+                ResolveHandlerMethod,
+                spParam,
+                Expression.Constant(handlerInterfaceType),
+                Expression.Constant(requestType)),
             handlerInterfaceType);
 
-        // handler.Handle((TRequest)request, ct)
         var callExpr = Expression.Call(
             handlerExpr,
             handleMethod,
             Expression.Convert(reqParam, requestType),
             ctParam);
 
-        // We need to convert Task<Result<T>> to Task<object> — use a continuation helper
         var lambda = Expression.Lambda<Func<IServiceProvider, object, CancellationToken, Task<object>>>(
             Expression.Call(
                 typeof(RequestDispatcherCache),
@@ -48,6 +53,21 @@ internal static class RequestDispatcherCache
             spParam, reqParam, ctParam);
 
         return new RequestDispatcher(lambda.Compile());
+    }
+
+    private static object ResolveHandler(IServiceProvider serviceProvider, Type handlerInterfaceType, Type requestType)
+        => serviceProvider.GetService(handlerInterfaceType) ?? throw MissingHandler(handlerInterfaceType, requestType);
+
+    private static InvalidOperationException MissingHandler(Type handlerInterfaceType, Type requestType)
+    {
+        var registration = handlerInterfaceType.GetGenericTypeDefinition() == typeof(IQueryHandler<,>)
+            ? nameof(CQRSOptions.RegisterQueriesFromAssembly)
+            : nameof(CQRSOptions.RegisterCommandsFromAssembly);
+
+        return new InvalidOperationException(
+            $"No handler is registered for request '{requestType.FullName}'. " +
+            $"Add a public, non-abstract handler class and register its assembly with " +
+            $"AddSolCQRS(o => o.{registration}(assembly)); internal handlers are not discovered.");
     }
 
     /// <summary>
@@ -71,4 +91,3 @@ internal sealed class RequestDispatcher
     public Task<object> Invoke(IServiceProvider sp, object request, CancellationToken ct)
         => _invoke(sp, request, ct);
 }
-
