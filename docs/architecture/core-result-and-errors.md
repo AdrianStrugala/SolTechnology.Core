@@ -41,6 +41,12 @@ an unregistered subtype loses its runtime type and extra properties on a round-t
 must round-trip its own subtypes registers them in the serializer options it uses; the base list
 stays limited to the base package's own types.
 
+Tale does this for its own errors. The public, read-only `TaleJsonOptions.Default` adds a type-info
+modifier that registers `TalePausedError` as `talePaused` and `TaleCancelledError` as
+`taleCancelled` on `Error`. `TaleInstance.Clone()` and DreamTravel's SQLite repository serialize
+chapter history with it, and custom Tale repositories must too; with default options a stored Tale
+error comes back as a plain `Error`. See [Tale framework](tale-framework.md).
+
 `AggregateError` restores its `InnerErrors` from JSON through a private `[JsonConstructor]` that
 keeps the already-built message as-is. The public constructors build the message from the base
 message plus each inner message; a public JSON constructor would compete with them in overload
