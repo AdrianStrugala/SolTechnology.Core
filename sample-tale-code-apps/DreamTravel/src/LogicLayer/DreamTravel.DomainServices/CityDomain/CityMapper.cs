@@ -1,5 +1,6 @@
 ﻿using DreamTravel.Domain.Cities;
 using DreamTravel.Sql.DbModels;
+using SolTechnology.Core.AUID;
 
 namespace DreamTravel.DomainServices.CityDomain;
 

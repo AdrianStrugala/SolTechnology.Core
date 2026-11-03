@@ -1,5 +1,6 @@
 using System;
 using FluentAssertions;
+using Microsoft.Extensions.Time.Testing;
 using NUnit.Framework;
 
 namespace SolTechnology.Core.AUID.Tests;
@@ -190,14 +191,34 @@ public class AuidNewTests
         var epoch = new DateTime(2001, 1, 1, 0, 0, 0, DateTimeKind.Utc);
         const long maxSeconds = (1L << 32) - 1; // 0xFFFFFFFF
         var maxDate = epoch.AddSeconds(maxSeconds);
+        var afterMaxDate = new FakeTimeProvider(new DateTimeOffset(maxDate.AddSeconds(1)));
+
+        // Act
+        var act = () => Auid.New("ORD", afterMaxDate);
 
         // Assert - should be around year 2137
         maxDate.Year.Should().Be(2137);
 
         // Note: When this date is exceeded, CreateInternal will throw InvalidOperationException
         // with a message about "Papież Polak robi BUM"
-        // We cannot easily test the actual exception without mocking DateTime.UtcNow,
-        // but this test documents the expected behavior and maximum date.
+        act.Should().Throw<InvalidOperationException>().WithMessage("*Papież Polak robi BUM*");
+    }
+
+    [Test]
+    public void New_WithTimeProvider_UsesItsClock()
+    {
+        // Arrange
+        var timeProvider = new FakeTimeProvider(new DateTimeOffset(2024, 12, 5, 12, 34, 56, TimeSpan.Zero));
+
+        // Act
+        var withCode = Auid.New("USR", timeProvider);
+        var withType = Auid.New<Order>(timeProvider);
+        var withoutCode = Auid.New(null, timeProvider);
+
+        // Assert
+        withCode.ToString().Should().StartWith("USR_20241205123456_");
+        withType.ToString().Should().StartWith("ORD_20241205123456_");
+        withoutCode.ToString().Should().StartWith("XXX_20241205123456_");
     }
 }
 

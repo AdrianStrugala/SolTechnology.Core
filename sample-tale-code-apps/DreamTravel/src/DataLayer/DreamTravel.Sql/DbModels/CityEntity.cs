@@ -1,4 +1,6 @@
-﻿namespace DreamTravel.Sql.DbModels;
+﻿using SolTechnology.Core.AUID;
+
+namespace DreamTravel.Sql.DbModels;
 
 public record CityEntity : BaseEntity
 {

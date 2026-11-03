@@ -278,7 +278,7 @@ If any item fails, fix it before yielding.
 | CQRS handlers are not resolved | Register the owning assembly explicitly through `AddSolCQRS(o => o.RegisterCommandsFromAssembly(...))` or the query/event equivalent in its `ModuleInstaller`. |
 | `AddSolTale` finds no chapters or handlers | Pass the owning assembly explicitly when entry/calling assembly discovery is ambiguous. |
 | `dotnet test` "no tests discovered" | Tests live in `tests/` (outside `src/`). Path: `tests/<Project>.Tests`. |
-| AUID JSON round-trip drops the value | The consumer is using `PackageReference` to `SolTechnology.Core.AUID` instead of `ProjectReference` in the sample; `AuidJsonConverter` is missing. |
+| AUID JSON round-trip drops the value, or `Auid` is not found | The consumer is using `PackageReference` to `SolTechnology.Core.AUID` instead of `ProjectReference` in the sample; `AuidJsonConverter` is missing. Since 2.0 `Auid` and its converters live in the `SolTechnology.Core.AUID` namespace — add `using SolTechnology.Core.AUID;`. |
 | Tale JSON deserialisation case-sensitive issues | Use `TaleJsonOptions.Default` (`PropertyNameCaseInsensitive = true`, `IncludeFields = true`). |
 | Interactive tale fails immediately | Ensure `AddSolTale()` is called — it wires `TaleManager` + in-memory persistence by default. For durable persistence, use `.UseTaleRepository<T>()` (see `DreamTravel.SQLite` sample). |
 | Workload missing on CI | Run `dotnet workload restore SolTechnology.Core.slnx` before `restore` / `build`. See `.github/workflows/publishPackages.yml`. |

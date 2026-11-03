@@ -1,6 +1,7 @@
 using System.Globalization;
 using System.Text.Json;
 using Microsoft.Data.Sqlite;
+using SolTechnology.Core.AUID;
 using SolTechnology.Core.Tale.Models;
 using SolTechnology.Core.Tale.Persistence;
 

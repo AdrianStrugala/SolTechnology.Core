@@ -3,6 +3,8 @@ using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Text.Json.Serialization;
 
+namespace SolTechnology.Core.AUID;
+
 /// <summary>
 /// A unique 64-bit identifier (AUID) designed for high-performance scenarios.
 /// Structure: [Code: 15 bits] [Timestamp: 32 bits] [Random: 17 bits].
@@ -34,12 +36,6 @@ public readonly struct Auid : IComparable<Auid>, IEquatable<Auid>, IParsable<Aui
     private const char Separator = '_';
 
     /// <summary>
-    /// The <see cref="System.TimeProvider"/> used for timestamp generation. Defaults to
-    /// <see cref="TimeProvider.System"/>. Override in tests to control time deterministically.
-    /// </summary>
-    public static TimeProvider TimeProvider { get; set; } = TimeProvider.System;
-
-    /// <summary>
     /// The raw 64-bit integer value. Can be negative due to full 64-bit usage.
     /// </summary>
     public long Value { get; }
@@ -69,7 +65,22 @@ public readonly struct Auid : IComparable<Auid>, IEquatable<Auid>, IParsable<Aui
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Auid New<T>()
     {
-        return CreateInternal(typeof(T).Name.AsSpan(), generateCode: true);
+        return CreateInternal(typeof(T).Name.AsSpan(), generateCode: true, TimeProvider.System);
+    }
+
+    /// <summary>
+    /// Creates a new AUID based on the type name (e.g., Order -> ORD), with the timestamp taken from
+    /// <paramref name="timeProvider"/>.
+    /// </summary>
+    /// <typeparam name="T">The type to derive the 3-letter code from.</typeparam>
+    /// <param name="timeProvider">The clock that supplies the timestamp, e.g. a FakeTimeProvider in tests.</param>
+    /// <returns>A new AUID with code derived from type name.</returns>
+    /// <exception cref="ArgumentNullException">Thrown when <paramref name="timeProvider"/> is null.</exception>
+    /// <exception cref="InvalidOperationException">Thrown when the time exceeds year 2137 (timestamp overflow).</exception>
+    public static Auid New<T>(TimeProvider timeProvider)
+    {
+        ArgumentNullException.ThrowIfNull(timeProvider);
+        return CreateInternal(typeof(T).Name.AsSpan(), generateCode: true, timeProvider);
     }
 
     /// <summary>
@@ -96,24 +107,13 @@ public readonly struct Auid : IComparable<Auid>, IEquatable<Auid>, IParsable<Aui
     {
         if (code != null)
         {
-            // Explicit code provided - use it directly without processing
-            if (code.Length != 3)
-                throw new ArgumentException("Code must be exactly 3 characters.", nameof(code));
-
-            // Validate uppercase letters A-Z
-            for (int i = 0; i < 3; i++)
-            {
-                if (code[i] < 'A' || code[i] > 'Z')
-                    throw new ArgumentException("Code must contain only uppercase letters A-Z.", nameof(code));
-            }
-
-            return CreateInternal(code.AsSpan(), generateCode: false);
+            return CreateFromCode(code, TimeProvider.System);
         }
         else
         {
             // Infer from caller file path
             ReadOnlySpan<char> span = callerFilePath.AsSpan();
-            if (span.IsEmpty) return CreateInternal(DefaultCode.AsSpan(), generateCode: false);
+            if (span.IsEmpty) return CreateInternal(DefaultCode.AsSpan(), generateCode: false, TimeProvider.System);
 
             // Manual "GetFileNameWithoutExtension" on Span to avoid allocation
             int lastSeparator = span.LastIndexOfAny('/', '\\');
@@ -122,8 +122,26 @@ public readonly struct Auid : IComparable<Auid>, IEquatable<Auid>, IParsable<Aui
             int start = lastSeparator + 1;
             int length = (lastDot > start) ? (lastDot - start) : (span.Length - start);
 
-            return CreateInternal(span.Slice(start, length), generateCode: true);
+            return CreateInternal(span.Slice(start, length), generateCode: true, TimeProvider.System);
         }
+    }
+
+    /// <summary>
+    /// Creates a new AUID with the timestamp taken from <paramref name="timeProvider"/>.
+    /// If code is provided, uses that 3-letter code (must be exactly 3 uppercase letters A-Z); if code is null, uses "XXX".
+    /// </summary>
+    /// <param name="code">Optional 3-letter code (must be uppercase A-Z). If null, "XXX" is used.</param>
+    /// <param name="timeProvider">The clock that supplies the timestamp, e.g. a FakeTimeProvider in tests.</param>
+    /// <returns>A new AUID with the specified code.</returns>
+    /// <exception cref="ArgumentNullException">Thrown when <paramref name="timeProvider"/> is null.</exception>
+    /// <exception cref="ArgumentException">Thrown when code is not exactly 3 characters or contains non-uppercase letters.</exception>
+    /// <exception cref="InvalidOperationException">Thrown when the time exceeds year 2137 (timestamp overflow).</exception>
+    public static Auid New(string? code, TimeProvider timeProvider)
+    {
+        ArgumentNullException.ThrowIfNull(timeProvider);
+        return code == null
+            ? CreateInternal(DefaultCode.AsSpan(), generateCode: false, timeProvider)
+            : CreateFromCode(code, timeProvider);
     }
 
     /// <summary>
@@ -152,13 +170,31 @@ public readonly struct Auid : IComparable<Auid>, IEquatable<Auid>, IParsable<Aui
                 throw new ArgumentException("Code must contain only uppercase letters A-Z.");
         }
 
-        return CreateInternal(code, generateCode: false);
+        return CreateInternal(code, generateCode: false, TimeProvider.System);
     }
 
     // --- Core Logic (Zero Alloc) ---
 
+    private static Auid CreateFromCode(string code, TimeProvider timeProvider)
+    {
+        if (code.Length != 3)
+        {
+            throw new ArgumentException("Code must be exactly 3 characters.", nameof(code));
+        }
+
+        for (int i = 0; i < 3; i++)
+        {
+            if (code[i] < 'A' || code[i] > 'Z')
+            {
+                throw new ArgumentException("Code must contain only uppercase letters A-Z.", nameof(code));
+            }
+        }
+
+        return CreateInternal(code.AsSpan(), generateCode: false, timeProvider);
+    }
+
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static Auid CreateInternal(ReadOnlySpan<char> input, bool generateCode)
+    private static Auid CreateInternal(ReadOnlySpan<char> input, bool generateCode, TimeProvider timeProvider)
     {
         // 1. Encode Code (15 bits)
         long codeEncoded;
@@ -177,7 +213,7 @@ public readonly struct Auid : IComparable<Auid>, IEquatable<Auid>, IParsable<Aui
         }
 
         // 2. Encode Time (32 bits)
-        long seconds = (TimeProvider.GetUtcNow().Ticks - EpochTicks) / TimeSpan.TicksPerSecond;
+        long seconds = (timeProvider.GetUtcNow().Ticks - EpochTicks) / TimeSpan.TicksPerSecond;
 
         // Validate timestamp doesn't exceed 32-bit limit
         if (seconds > MaskTime)
@@ -442,7 +478,7 @@ public readonly struct Auid : IComparable<Auid>, IEquatable<Auid>, IParsable<Aui
 /// Type converter for AUID, enabling automatic conversion in JSON serializers and other frameworks.
 /// Converts between AUID and string representations.
 /// </summary>
-public class AuidTypeConverter : TypeConverter
+public sealed class AuidTypeConverter : TypeConverter
 {
     /// <inheritdoc />
     public override bool CanConvertFrom(ITypeDescriptorContext? context, Type sourceType)

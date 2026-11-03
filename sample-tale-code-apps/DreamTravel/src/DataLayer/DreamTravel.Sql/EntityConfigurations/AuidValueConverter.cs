@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+using SolTechnology.Core.AUID;
 
 namespace DreamTravel.Sql.EntityConfigurations;
 

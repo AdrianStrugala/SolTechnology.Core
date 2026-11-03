@@ -3,6 +3,7 @@ using DreamTravel.Sql;
 using DreamTravel.Sql.DbModels;
 using FluentAssertions;
 using Microsoft.Extensions.DependencyInjection;
+using SolTechnology.Core.AUID;
 
 namespace DreamTravel.FunctionalTests.Trips;
 

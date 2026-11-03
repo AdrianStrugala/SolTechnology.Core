@@ -1,5 +1,6 @@
 using FluentAssertions;
 using NUnit.Framework;
+using SolTechnology.Core.AUID;
 using SolTechnology.Core.Tale.Models;
 using SolTechnology.Core.Tale.Persistence;
 

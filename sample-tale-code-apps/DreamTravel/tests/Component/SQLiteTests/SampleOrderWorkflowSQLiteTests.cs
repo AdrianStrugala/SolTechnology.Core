@@ -6,6 +6,7 @@ using Microsoft.Data.Sqlite;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using NUnit.Framework;
+using SolTechnology.Core.AUID;
 using SolTechnology.Core.Tale;
 using SolTechnology.Core.Tale.Builder;
 using SolTechnology.Core.Tale.Models;

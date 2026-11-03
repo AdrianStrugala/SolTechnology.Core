@@ -4,6 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using NUnit.Framework;
 using SolTechnology.Core;
+using SolTechnology.Core.AUID;
 using SolTechnology.Core.Tale;
 using SolTechnology.Core.Tale.Models;
 using SolTechnology.Core.Tale.Orchestration;

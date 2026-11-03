@@ -2,6 +2,7 @@ using DreamTravel.SQLite;
 using FluentAssertions;
 using Microsoft.Data.Sqlite;
 using NUnit.Framework;
+using SolTechnology.Core.AUID;
 using SolTechnology.Core.Tale.Models;
 
 namespace DreamTravel.FunctionalTests.SQLiteTests;

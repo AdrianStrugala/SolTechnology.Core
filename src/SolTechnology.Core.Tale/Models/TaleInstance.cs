@@ -1,5 +1,6 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using SolTechnology.Core.AUID;
 
 namespace SolTechnology.Core.Tale.Models;
 

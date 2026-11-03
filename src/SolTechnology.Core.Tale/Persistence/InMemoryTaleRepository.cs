@@ -1,4 +1,5 @@
 using System.Collections.Concurrent;
+using SolTechnology.Core.AUID;
 using SolTechnology.Core.Tale.Models;
 
 namespace SolTechnology.Core.Tale.Persistence;

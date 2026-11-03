@@ -1,3 +1,5 @@
+using SolTechnology.Core.AUID;
+
 namespace SolTechnology.Core.Tale;
 
 /// <summary>

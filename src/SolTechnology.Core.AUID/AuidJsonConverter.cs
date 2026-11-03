@@ -1,12 +1,14 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
+namespace SolTechnology.Core.AUID;
+
 /// <summary>
 /// JSON converter for Auid type.
 /// Serializes Auid as a string using ToString() and deserializes using TryParse(), as a value or a dictionary key.
 /// Invalid or empty input throws <see cref="JsonException"/>.
 /// </summary>
-public class AuidJsonConverter : JsonConverter<Auid>
+public sealed class AuidJsonConverter : JsonConverter<Auid>
 {
     public override Auid Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
     {
