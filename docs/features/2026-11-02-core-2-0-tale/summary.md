@@ -30,7 +30,7 @@ are `done` and after these library features are `completed`: `result`; `auid`. N
 | 09 | Tale — optimistic concurrency on `ITaleRepository.Save` | [`steps/09-tale-repository-optimistic-concurrency.md`](steps/09-tale-repository-optimistic-concurrency.md) | done |
 | 10 | Tale — chapter history keyed by step index and full type name | [`steps/10-tale-chapter-history-key.md`](steps/10-tale-chapter-history-key.md) | done |
 | 11 | Tale — explicit HTTP exposure; internal plumbing types | [`steps/11-tale-http-exposure-opt-in.md`](steps/11-tale-http-exposure-opt-in.md) | done |
-| 12 | XML docs shipped — Tale | [`steps/12-xml-docs.md`](steps/12-xml-docs.md) | to-do |
+| 12 | XML docs shipped — Tale | [`steps/12-xml-docs.md`](steps/12-xml-docs.md) | done |
 | 13 | Module docs — `docs/Tale.md` for the 2.0 Tale contract | [`steps/13-docs-tale.md`](steps/13-docs-tale.md) | to-do |
 | 14 | Guide conformance — Tale engine split | [`steps/14-conform-tale-engine.md`](steps/14-conform-tale-engine.md) | to-do |
 | 15 | Guide conformance — Tale controller, manager, handler, `Tale`, and tests | [`steps/15-conform-tale-controller-manager-handler.md`](steps/15-conform-tale-controller-manager-handler.md) | to-do |

@@ -14,6 +14,7 @@ public class InMemoryTaleRepository : ITaleRepository
     private readonly ConcurrentDictionary<Auid, TaleInstance> _tales = new();
     private readonly Lock _writeLock = new();
 
+    /// <inheritdoc />
     public Task<TaleInstance?> FindById(Auid taleId, CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
@@ -22,6 +23,7 @@ public class InMemoryTaleRepository : ITaleRepository
         return Task.FromResult<TaleInstance?>(null);
     }
 
+    /// <inheritdoc />
     public Task<TaleInstance?> FindByIdempotencyKey(string idempotencyKey, CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
@@ -31,6 +33,7 @@ public class InMemoryTaleRepository : ITaleRepository
         return Task.FromResult(match?.Clone());
     }
 
+    /// <inheritdoc />
     public Task<IReadOnlyList<TaleInstance>> List(
         TaleStatus? status = null,
         string? handlerTypeName = null,
@@ -54,6 +57,7 @@ public class InMemoryTaleRepository : ITaleRepository
         return Task.FromResult<IReadOnlyList<TaleInstance>>(result);
     }
 
+    /// <inheritdoc />
     public Task<Result> Save(TaleInstance taleInstance, CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
@@ -91,6 +95,7 @@ public class InMemoryTaleRepository : ITaleRepository
     private static Task<Result> Conflict(string message) =>
         Result.FailAsTask(new ConflictError { Message = message });
 
+    /// <inheritdoc />
     public Task Delete(Auid taleId, CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();

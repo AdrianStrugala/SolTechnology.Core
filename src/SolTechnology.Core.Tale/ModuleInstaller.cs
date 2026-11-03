@@ -30,9 +30,14 @@ public sealed class TaleHandlerRegistry
     internal bool TryResolveScanned(string name, out Type handlerType) =>
         _scanned.TryGetValue(name, out handlerType!);
 
+    /// <summary>Finds an exposed handler by its short type name (case-insensitive).</summary>
+    /// <param name="name">Short type name of the handler, as used in the HTTP route.</param>
+    /// <param name="handlerType">The handler type when found.</param>
+    /// <returns><c>true</c> when the handler is exposed over HTTP.</returns>
     public bool TryResolve(string name, out Type handlerType) =>
         _exposed.TryGetValue(name, out handlerType!);
 
+    /// <summary>Every handler exposed over HTTP, keyed by short type name.</summary>
     public IReadOnlyDictionary<string, Type> AllHandlers => _exposed;
 }
 

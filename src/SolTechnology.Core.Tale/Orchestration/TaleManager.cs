@@ -20,6 +20,11 @@ public class TaleManager
     private readonly ILogger<TaleManager> _logger;
     private readonly TimeProvider _timeProvider;
 
+    /// <summary>Creates the manager; registered as scoped by <c>AddSolTale</c>.</summary>
+    /// <param name="scopeFactory">Creates a DI scope per call.</param>
+    /// <param name="repository">Stores tale instances.</param>
+    /// <param name="logger">Logs unexpected failures.</param>
+    /// <param name="timeProvider">Clock for timestamps; <see cref="TimeProvider.System"/> when null.</param>
     public TaleManager(
         IServiceScopeFactory scopeFactory,
         ITaleRepository repository,
@@ -38,6 +43,7 @@ public class TaleManager
     /// Optional caller-supplied idempotency key. If a tale with the same key already exists,
     /// its current state is returned instead of starting a new tale.
     /// </param>
+    /// <param name="cancellationToken">Cancels the run; passed to every chapter and repository call.</param>
     public async Task<Result<TaleInstance>> StartStory<THandler, TInput, TContext, TOutput>(
         TInput input,
         string? idempotencyKey = null,

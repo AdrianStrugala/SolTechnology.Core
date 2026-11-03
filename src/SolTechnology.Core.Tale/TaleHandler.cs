@@ -65,6 +65,9 @@ public abstract class TaleHandler<TInput, TContext, TOutput>
     private readonly ILogger _logger;
     private readonly IServiceProvider _serviceProvider;
 
+    /// <summary>Creates the handler; chapters and Tale services are resolved from <paramref name="serviceProvider"/>.</summary>
+    /// <param name="serviceProvider">Provider that resolves chapters, the repository, options and the clock.</param>
+    /// <param name="logger">Logger for the tale's lifecycle and its log scope.</param>
     protected TaleHandler(IServiceProvider serviceProvider, ILogger logger)
     {
         _logger = logger;

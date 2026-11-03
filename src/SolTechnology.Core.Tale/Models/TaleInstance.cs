@@ -51,6 +51,7 @@ public class TaleInstance
     /// </summary>
     public long Version { get; set; }
 
+    /// <summary>Creates an empty instance; used by serializers and repositories.</summary>
     [JsonConstructor]
     public TaleInstance() { }
 

@@ -8,8 +8,12 @@ namespace SolTechnology.Core.Tale;
 /// </summary>
 public sealed record TalePausedError : Error
 {
+    /// <summary>Message of every <see cref="TalePausedError"/>.</summary>
     public const string DefaultMessage = "Tale paused waiting for user input.";
 
+    /// <summary>Creates the marker for a tale paused at <paramref name="chapterId"/>.</summary>
+    /// <param name="taleId">The paused tale.</param>
+    /// <param name="chapterId">Display ID of the chapter waiting for input.</param>
     public TalePausedError(Auid taleId, string? chapterId = null)
     {
         TaleId = taleId;
@@ -18,7 +22,10 @@ public sealed record TalePausedError : Error
         Recoverable = true;
     }
 
+    /// <summary>The paused tale.</summary>
     public Auid TaleId { get; }
+
+    /// <summary>Display ID of the chapter waiting for input.</summary>
     public string? ChapterId { get; }
 }
 
@@ -27,6 +34,8 @@ public sealed record TalePausedError : Error
 /// </summary>
 public sealed record TaleCancelledError : Error
 {
+    /// <summary>Creates the marker for a cancelled tale.</summary>
+    /// <param name="taleId">The cancelled tale.</param>
     public TaleCancelledError(Auid taleId)
     {
         TaleId = taleId;
@@ -34,5 +43,6 @@ public sealed record TaleCancelledError : Error
         Recoverable = false;
     }
 
+    /// <summary>The cancelled tale.</summary>
     public Auid TaleId { get; }
 }
