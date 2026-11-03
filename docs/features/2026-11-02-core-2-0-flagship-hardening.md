@@ -554,8 +554,16 @@ these notes from the steps:
 - tale (post-completion review, user decision 2026-11-03, amends the `tale 09` note): new
   `TaleOptions.RunningLeaseTimeout` (default 5 minutes). `ResumeStory` takes over a `Running` tale
   whose `LastUpdatedAt` is older than the timeout, re-running its interrupted chapter, so chapters
-  with side effects must be idempotent and the timeout must exceed the longest chapter. Custom
-  repositories must store `LastUpdatedAt` unchanged in UTC; no schema change.
+  with side effects must be idempotent. Custom repositories must store `LastUpdatedAt` unchanged in
+  UTC; no schema change.
+- tale (post-completion review, user decision 2026-11-03, heartbeat): a persisted run renews its
+  `Running` lease every third of `RunningLeaseTimeout` while its chapters and steps execute, so the
+  timeout no longer has to exceed the longest chapter; it bounds how long a crashed tale stays
+  blocked. Each renewal is an ordinary conditional `Save` (only `LastUpdatedAt` and `Version`
+  change), so repositories see one extra write per running tale per third of the timeout. A run
+  whose renewal finds the tale taken over cancels the chapter's `CancellationToken`, saves nothing
+  more, and returns `ConflictError`; chapters receive that token, so they can see a cancellation
+  that the caller did not request. Direct `Handle` runs never renew.
 
 ### Resolved questions (user answers, 2026-11-02)
 

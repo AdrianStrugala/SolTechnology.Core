@@ -83,7 +83,7 @@ Every persisted run first saves the tale as `Running` with the version it read, 
 runs. That claim stores a new tale's idempotency key, so a concurrent `StartStory` with the same
 key gets a conflict and `TaleManager` returns the first tale. A concurrent resume of the same
 paused tale gets `ConflictError`, and a `CancelStory` during a run wins because the run stops at
-its next save. A failed tale is never resumed. The terminal save uses no cancellation token, so a
+its next save or lease renewal. A failed tale is never resumed. The terminal save uses no cancellation token, so a
 cancelled run still stores `Cancelled`.
 
 `Running` is a lease, not a lock. Every save of a run, starting with the claim, stamps
@@ -95,8 +95,21 @@ read, so of two concurrent takeovers exactly one wins, and a still-alive origina
 next save with `ConflictError`. Completed chapters are skipped; the interrupted chapter runs again,
 so chapters with side effects must be idempotent. The lease reuses `LastUpdatedAt`, which every
 repository already stores, instead of adding a column; a value written by another host's clock is
-compared as is, so clock skew between hosts shortens or lengthens the lease. There is no heartbeat
-inside a chapter, so the timeout must exceed the longest chapter.
+compared as is, so clock skew between hosts shortens or lengthens the lease.
+
+While the steps of a persisted run execute, the internal `TaleLeaseHeartbeat` renews the lease on a
+`TimeProvider` timer every third of `RunningLeaseTimeout`, which leaves two missed renewals of
+slack, so a chapter may outlive the timeout while its host is alive. A renewal re-saves a frozen
+copy of the last stored `Running` state with a fresh `LastUpdatedAt` through the same conditional
+`Save`; it never serializes the live context while a chapter mutates it, and it never records a
+chapter as finished before that chapter's own save. When the last save stored another status
+(paused or failed), there is no lease and nothing is renewed. Saves and renewals take turns on one
+gate, so each is conditioned on the version the previous one stored; a beat during a slow renewal
+triggers at most one more renewal right after it. A renewal that meets `ConflictError` means
+another run owns the tale: the run logs a warning, cancels the chapter's token (linked to the
+caller's), skips every later save including the terminal one, and returns `ConflictError`. Other
+renewal failures are logged and retried at the next beat. The heartbeat is disposed, and its last
+renewal awaited, before the terminal save. Direct runs have no repository and no heartbeat.
 
 Stored chapter errors keep their type only through `TaleJsonOptions.Default`, which registers the
 `talePaused` and `taleCancelled` discriminators on `Error` (see

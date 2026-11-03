@@ -44,7 +44,7 @@ builder.Services.AddSolTale(assemblies: typeof(ProcessOrderTale).Assembly)
 | Option | Default | Purpose |
 |---|---|---|
 | `TaleOptions.TaleIdPrefix` | `"STR"` | Code of the generated `Auid` tale IDs; use one per tenant or environment sharing a store. |
-| `TaleOptions.RunningLeaseTimeout` | 5 minutes | How long a `Running` tale belongs to the run that last saved it; must be positive. See [Running tales and the lease](#running-tales-and-the-lease). |
+| `TaleOptions.RunningLeaseTimeout` | 5 minutes | How long a `Running` tale belongs to the run that last saved or renewed it; must be positive. See [Running tales and the lease](#running-tales-and-the-lease). |
 
 ```csharp
 builder.Services.AddSolTale(o => o.TaleIdPrefix = "ORD", typeof(ProcessOrderTale).Assembly);
@@ -167,15 +167,15 @@ var state = await taleManager.GetStoryState(taleId, cancellationToken);
 | Resume of a tale that is | Result |
 |---|---|
 | `WaitingForInput` | Runs from the paused chapter; completed chapters are skipped. |
-| `Running`, saved within `RunningLeaseTimeout` | `ConflictError` "Tale is already running". |
-| `Running`, not saved for `RunningLeaseTimeout` | Taken over: runs again from the first unfinished chapter. |
+| `Running`, saved or renewed within `RunningLeaseTimeout` | `ConflictError` "Tale is already running". |
+| `Running`, not saved or renewed for `RunningLeaseTimeout` | Taken over: runs again from the first unfinished chapter. |
 | `Failed` | `ConflictError`; fallbacks do not run again. |
 | `Completed` or `Cancelled` | Failure, nothing runs. |
 | saved by 1.x | Failure asking to restart the tale. |
 
 A second `StartStory` with the same idempotency key, even a concurrent one, returns the first
-tale. `CancelStory(taleId, ct)` wins over a running tale, which stops at its next save with
-`ConflictError`. Only the caller's token cancels a tale, and it stores `Cancelled`; any other
+tale. `CancelStory(taleId, ct)` wins over a running tale, which stops at its next save or lease
+renewal with `ConflictError`. Only the caller's token cancels a tale, and it stores `Cancelled`; any other
 `OperationCanceledException`, such as an `HttpClient` timeout, fails the chapter. An exception
 from a chapter or an inline step is logged and stores `Failed`; the result and the stored history
 carry only "Chapter [X] failed unexpectedly." (or "Tale [X] failed unexpectedly.") and, when a
@@ -184,18 +184,22 @@ trace is active, its trace ID as `CorrelationId`; never the exception text.
 #### Running tales and the lease
 
 A tale is `Running` while a `StartStory` or `ResumeStory` call executes it. The run saves the tale
-before its first chapter and after every chapter, and each save stamps `LastUpdatedAt`. While the
-last save is younger than `RunningLeaseTimeout`, the tale belongs to that run and `ResumeStory`
-returns `ConflictError`. A host that crashes mid-run leaves the tale `Running`; once the lease has
-expired, `ResumeStory` takes it over. Completed chapters are skipped and the chapter that was
-running when the host died runs again; when two calls take over at once, the version check lets
-exactly one win.
+before its first chapter and after every chapter, and each save stamps `LastUpdatedAt`. While a
+chapter or any other step executes, the run also renews this lease every third of
+`RunningLeaseTimeout` with an ordinary `Save` of its last saved state, so a chapter may run longer
+than the timeout. While the last save or renewal is younger than `RunningLeaseTimeout`, the tale
+belongs to that run and `ResumeStory` returns `ConflictError`. A host that crashes mid-run stops
+renewing and leaves the tale `Running`; once the lease has expired, `ResumeStory` takes it over.
+Completed chapters are skipped and the chapter that was running when the host died runs again;
+when two calls take over at once, the version check lets exactly one win.
 
-A chapter can therefore run twice, so make chapters with side effects idempotent: pass an
-idempotency key derived from the tale ID to payment or messaging APIs, or check whether the work
-is already done. Set `RunningLeaseTimeout` above your longest chapter; a run whose chapter
-outlives the lease can be taken over while it still works and then stops at its next save with
-`ConflictError`.
+A crashed chapter therefore runs twice, so chapters with side effects should still be idempotent:
+pass an idempotency key derived from the tale ID to payment or messaging APIs, or check whether the
+work is already done. Choose `RunningLeaseTimeout` as how long a crashed tale may stay blocked; it
+only has to outlast a host that stalls for two renewals in a row. If a renewal finds that another
+run has taken the tale over, the original run cancels the chapter's token, saves nothing more, and
+returns `ConflictError`, leaving the new owner's state untouched. Direct `Handle` runs are not
+persisted and never renew.
 
 ```csharp
 builder.Services.AddSolTale(o => o.RunningLeaseTimeout = TimeSpan.FromMinutes(15),
