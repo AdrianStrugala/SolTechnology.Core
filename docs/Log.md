@@ -14,7 +14,8 @@ or Application Insights dependency required.
   scope, downstream HTTP calls, and `Activity.Current`.
 - **Request envelope logs** — one `Started` / `Finished` pair per request with
   log levels aligned to the status code (`Information` < 400, `Warning` 4xx,
-  `Error` 5xx) and `Warning` for client aborts.
+  `Error` 5xx). An unhandled exception writes exactly one `Error` entry
+  (`failed after`) instead of `Finished`; a client abort writes one `Warning`.
 - **Declarative scope enrichment** — promote a header, route value, query
   parameter, or JSON body field into the per-request log scope with one DI line:
   `services.LogDetail("X-Tenant-Id", asName: "TenantId", source: LogDetailSource.Header)`.
@@ -35,6 +36,7 @@ or Application Insights dependency required.
   attaches.
 - **Skip-paths for liveness / metrics noise** — silences envelope logs for
   `/health`, `/metrics`, `/swagger`, etc., while still propagating correlation.
+  Paths match per segment: `/health` covers `/health/ready`, not `/healthcare`.
 
 ### Registration
 
@@ -50,7 +52,8 @@ app.UseAuthorization();
 app.MapControllers();
 ```
 
-`AddSolLogging` is idempotent; safe to call from multiple module installers.
+Both `AddSolLogging` overloads register the same services; the `IConfiguration` overload
+also binds `LoggingOptions`. `AddSolLogging` is idempotent; safe to call from multiple module installers.
 Place `UseSolLogging` before `UseRouting` so requests that fail authentication
 still get a correlation id and an envelope log entry.
 
@@ -61,9 +64,9 @@ still get a correlation id and an envelope log entry.
 | Option | Default | Purpose |
 |---|---|---|
 | `MaxLoggedJsonBodyBytes` | `65536` | Cap on JSON body buffered for `LogDetailSource.Body` enrichment. |
-| `LogClientCorrelationParseErrors` | `true` | Emit a `Warning` when an inbound `X-Correlation-Id` header is malformed. |
+| `LogClientCorrelationParseErrors` | `true` | Emit a `Warning` when an inbound `X-Correlation-Id` header is rejected (longer than 128 characters or outside `[A-Za-z0-9._:-]`). |
 | `LogRequestHeaders` | `false` | Project every inbound header into the scope as `RequestHeaders` (masked). |
-| `SkipPaths` | `[]` | Path prefixes for which the request envelope logs and enrichers are skipped. Correlation is still set and echoed. |
+| `SkipPaths` | `[]` | Path prefixes, matched per segment and case-insensitively, for which the request envelope logs and enrichers are skipped. Correlation is still set and echoed. |
 | `MaskedHeaders` | `LoggingDefaults.SensitiveHeaders` | Header names whose values are replaced with `***MASKED***`. Case-insensitive. |
 
 ```jsonc
@@ -91,6 +94,11 @@ Inbound resolution order: current `Activity.TraceId` → inbound
 `X-Correlation-Id` (only when no Activity is in scope) → a freshly generated
 32-character hex id. Both `traceparent` and `X-Correlation-Id` are echoed on the
 response.
+
+| Inbound `X-Correlation-Id` | Outcome |
+|---|---|
+| Up to 128 characters from `[A-Za-z0-9._:-]` | Used as the correlation id and echoed. |
+| Longer, or any other character (spaces, `,`, CR/LF, `<`) | Replaced by a generated id; `Warning` without the rejected value when `LogClientCorrelationParseErrors` is on. |
 
 ```csharp
 public sealed class AuditWriter(ICorrelationIdService correlation, ILogger<AuditWriter> logger)
@@ -121,7 +129,8 @@ builder.Services.LogDetail(
     endpoints: ["/api/v1/FindLocationOfCity", "/api/FindCityByName"]);
 ```
 
-Body parsing is opt-in (only when a `LogDetailSource.Body` registration exists),
+`endpoints` match per segment: `/api/v1/Trips` covers `/api/v1/Trips/42`, not
+`/api/v1/TripsArchive`. Body parsing is opt-in (only when a `LogDetailSource.Body` registration exists),
 bounded by `MaxLoggedJsonBodyBytes`, runs only on `application/json`, restores
 the request stream so MVC model binding still works, and silently no-ops on
 malformed JSON.
@@ -168,6 +177,8 @@ iterating headers.
 
 #### Operation lifecycle events
 
+`LoggerExtensions` adds these members to every `ILogger`:
+
 | EventId | Method               | Level       | Template |
 |---:|---|---|---|
 | 2137 | `OperationStarted`   | Information | `Operation: [{OperationName}]. Status: [START]` |
@@ -190,19 +201,22 @@ catch (Exception ex)
 }
 ```
 
-Inside a CQRS pipeline these are emitted automatically via the `[LogScope]`
-attribute — see `SolTechnology.Core.CQRS`.
+Inside a CQRS pipeline these are emitted automatically, with `[LogScope]`
+properties in the scope — see `SolTechnology.Core.CQRS`.
 
 #### OpenTelemetry
 
 ```csharp
 builder.Services.AddOpenTelemetry()
     .WithTracing(t => t
-        .AddSource(CoreLoggingActivitySources.OperationsName)   // MediatR operations
+        .AddSource(CoreLoggingActivitySources.OperationsName)   // CQRS pipeline operations
         .AddAspNetCoreInstrumentation()
         .AddHttpClientInstrumentation()
         .AddOtlpExporter());
 ```
+
+`SolTechnology.Core.CQRS` emits one `Activity` per request on its own `ActivitySource` named
+`OperationsName`, so this one `AddSource` call covers it.
 
 #### Result in App Insights / structured sink
 
@@ -217,16 +231,16 @@ builder.Services.AddOpenTelemetry()
 
 No dedicated fixture — use `Microsoft.Extensions.Logging.Testing.FakeLogger` (or
 NSubstitute on `ILogger<T>`) and assert on the captured entries. For component
-tests, `APIFixture<TEntryPoint>` from `SolTechnology.Core.API.Testing` already wires
-`AddSolLogging` + `UseSolLogging`, so correlation flows end-to-end out of the
-box.
+tests, `APIFixture<TEntryPoint>` from `SolTechnology.Core.API.Testing` boots your API
+in memory, so the `AddSolLogging` + `UseSolLogging` calls in `Program.cs` make
+correlation flow end-to-end.
 
 ```csharp
 [Test]
 public async Task Endpoint_AcceptsCorrelationId_AndEchoesItBack()
 {
     // Arrange
-    var client = _fixture.CreateClient();
+    var client = _fixture.ServerClient;
     var correlation = "0123456789abcdef0123456789abcdef";
     client.DefaultRequestHeaders.Add("X-Correlation-Id", correlation);
 
@@ -244,9 +258,9 @@ public async Task Endpoint_AcceptsCorrelationId_AndEchoesItBack()
 ```csharp
 using SolTechnology.Core.Logging;
 
-using var scope = logger.PushToScope("TenantId", tenantId);
+using var tenantScope = logger.PushToScope("TenantId", tenantId);
 // or multiple:
-using var scope = logger.PushToScope(("TenantId", tenantId), ("Region", region));
+using var requestScope = logger.PushToScope(("TenantId", tenantId), ("Region", region));
 ```
 
 ### PII masking
@@ -256,7 +270,11 @@ using SolTechnology.Core.Logging.Masking;
 
 PiiMask.Full("secret@email.com");        // "***MASKED***"
 PiiMask.Partial("secret@email.com", 3);  // "sec***com"
+PiiMask.Partial("1234567", 3);           // "***MASKED***" — 7 is not longer than 4 * 3
 ```
+
+`Partial` reveals nothing unless the value is longer than `4 * keepChars`, so at most half of
+it is shown; a negative `keepChars` throws `ArgumentOutOfRangeException`.
 
 On CQRS requests, combine `[LogScope]` with `[Masked]`:
 
@@ -299,8 +317,6 @@ public string Email { get; set; } = null!;
   `UseSolLogging`.
 - `ILogScopeEnricher` set — declarative `LogDetail` registrations plus any
   custom enricher you add via `AddSolLogScopeEnricher<T>()`.
-- `CoreLoggingActivitySources` — `OperationsName` activity source for
-  OpenTelemetry plumbing.
 
 All registrations are `TryAdd*` so a consumer's custom registration always wins.
 
@@ -351,7 +367,7 @@ public class FindCityByNameHandler(
 | Method | Behaviour |
 |---|---|
 | `StartContext(name)` | Starts a named timer. Returns `IDisposable` — disposing stops and accumulates. Multiple calls with the same name **sum** (e.g. two DB calls both named `"db"` aggregate into one total). |
-| `GetTimings()` | Returns `IDictionary<string, long>` — name → total elapsed ms. Called by the middleware on request finish. |
+| `GetTimings()` | Returns a read-only `IDictionary<string, long>` snapshot — name → total elapsed ms. Called by the middleware on request finish. |
 | `Reset()` | Clears all accumulated timings. Called by the middleware at request start. |
 
 #### Design notes
