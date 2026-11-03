@@ -1,7 +1,7 @@
 ---
 spec: 2026-11-02-core-2-0-flagship-hardening
 step: 06
-status: to-do
+status: in-progress
 ---
 
 # Step 06: Remove leaked-secret artifacts and personal settings; record revocation
@@ -32,12 +32,18 @@ Former core step 09; moved here by the per-library regroup (user, 2026-11-02).
 - No `git filter-repo`, no force-push (D1, `CLAUDE.md §2`).
 
 ## Acceptance criteria
-- [ ] `git ls-files | grep -E "\.zip$|\.idea/|settings\.local\.json|\.vscode/settings\.json"` prints nothing.
-- [ ] `git check-ignore .idea/x .claude/settings.local.json` reports both as ignored.
+- [x] `git ls-files | grep -E "\.zip$|\.idea/|settings\.local\.json|\.vscode/settings\.json"` prints nothing.
+- [x] `git check-ignore .idea/x .claude/settings.local.json` reports both as ignored.
 - [ ] Owner confirmation with dates recorded for all 6 Google keys and the SAS key.
-- [ ] `dotnet build SolTechnology.Core.slnx` is green.
+- [x] `dotnet build SolTechnology.Core.slnx` is green.
 
 ## Open questions
 - none
 
 ## Deviations
+
+### Waiting for owner revocation
+
+**Original plan:** the step closes once the owner records the revocation dates.
+
+**Actual implementation:** the tree change is committed (both zips removed, personal settings untracked, `.gitignore` extended, build green). The step stays `in-progress` until the owner confirms revocation of the 6 Google keys and the `talecodeservicebus` SAS key.
