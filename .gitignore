@@ -371,3 +371,11 @@ nul
 
 # Rider Copilot plugin internal state
 .idea/**/copilot.data.migration*.xml
+
+# Personal IDE and agent settings
+.idea/
+**/.claude/*.local.json
+.vscode/settings.json
+
+# Legacy sample archives
+sample-tale-code-apps/**/*.zip
