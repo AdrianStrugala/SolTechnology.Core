@@ -1,10 +1,10 @@
 ---
 spec: 2026-11-02-core-2-0-api-auth
-step: 04
+step: 05
 status: to-do
 ---
 
-# Step 04: Api — keep 201/202 in `ResultConversionFilter`; real filter registration
+# Step 05: Api — keep 201/202 in `ResultConversionFilter`; real filter registration
 
 ## Summary
 `ResultConversionFilter` replaces any `ObjectResult` holding a successful `Result<T>` with a new
@@ -14,7 +14,7 @@ and `Location` header (`http-api#7`, `Filters/ResultConversionFilter.cs:46-49,72
 `Filters.Add<T>()` builds the filter through `ActivatorUtilities` (`http-api#19`). One XML doc
 contradicts the code (`http-api#22`, `ApiExceptionOptions.cs:12-13`).
 
-Former core step 22; moved here by the per-library regroup (user, 2026-11-02).
+Former core step 22; moved here by the per-library regroup (user, 2026-11-02). Renumbered from 04 on 2026-11-03 (new step 01, `C-28`).
 
 ## Affected components
 - `src/SolTechnology.Core.API/Filters/ResultConversionFilter.cs` — EDIT — on 2xx, set `objectResult.Value = data` and keep the status and type

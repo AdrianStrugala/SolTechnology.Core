@@ -73,7 +73,7 @@ Baseline verified by the review (.NET SDK 10.0.100, Docker available):
   `planning`. Its step `02-api-key-hardening` duplicates `S5` and `http-api#4`, and its step
   `04-documentation` duplicates the `docs/Auth.md` drift rewrite (`http-api#11`). **Q5 decision
   (user, 2026-11-02):** this feature owns the constant-time API-key fix (former step 07, now
-  api-auth 03) and the `docs/Auth.md` rewrite (former step 59, now api-auth 07). The JWT feature stays JWT-only; its own planner supersedes its
+  api-auth 04) and the `docs/Auth.md` rewrite (former step 59, now api-auth 08). The JWT feature stays JWT-only; its own planner supersedes its
   steps 02 and 04. This feature does not edit that feature's files.
 - [`2026-06-29-release-1-0.md`](2026-06-29-release-1-0.md) is the precedent for release mechanics
   (`docs/release-runbook-1.0.md`).
@@ -200,7 +200,7 @@ tale 14 guards the Tale JSON test that auid 03 adds.
 | 4 | `auid` | [`2026-11-02-core-2-0-auid`](2026-11-02-core-2-0-auid.md) | `SolTechnology.Core.AUID` | 7 | 19, 35, 44, 55, 60, 67, 70, 71 | core 02–04 |
 | 5 | `tale` | [`2026-11-02-core-2-0-tale`](2026-11-02-core-2-0-tale.md) | `SolTechnology.Core.Tale` | 17 | 10, 17, 18, 25, 26, 27, 39, 40, 41, 42, 43, 55, 60, 62, 63, 70, 71 | core 02–04; result, auid |
 | 6 | `http` | [`2026-11-02-core-2-0-http`](2026-11-02-core-2-0-http.md) | `SolTechnology.Core.HTTP` | 11 | 05, 10, 20, 21, 45, 46, 56, 59, 64, 70, 71 | core 02–04; result, logging |
-| 7 | `api-auth` | [`2026-11-02-core-2-0-api-auth`](2026-11-02-core-2-0-api-auth.md) | `SolTechnology.Core.API`, `SolTechnology.Core.Authentication` | 10 | 06, 07, 10, 22, 52, 56, 59, 65, 66, 70, 71 | core 02–04; result, logging, http |
+| 7 | `api-auth` | [`2026-11-02-core-2-0-api-auth`](2026-11-02-core-2-0-api-auth.md) | `SolTechnology.Core.API`, `SolTechnology.Core.Auth` (renamed from `SolTechnology.Core.Authentication` by api-auth 01, `C-28`) | 12 | 06, 07, 10, 22, 52, 56, 59, 65, 66, 70, 71 (00 and 01 new on 2026-11-03) | core 02–04; result, logging, http |
 | 8 | `cache` | [`2026-11-02-core-2-0-cache`](2026-11-02-core-2-0-cache.md) | `SolTechnology.Core.Cache` | 9 | 11, 28, 29, 47, 57, 60, 67, 70, 71 | core 02–04 |
 | 9 | `sql` | [`2026-11-02-core-2-0-sql`](2026-11-02-core-2-0-sql.md) | `SolTechnology.Core.SQL` | 8 | 11, 15, 33, 49, 57, 61, 69, 70, 71 | core 02–04; result |
 | 10 | `blob` | [`2026-11-02-core-2-0-blob`](2026-11-02-core-2-0-blob.md) | `SolTechnology.Core.Blob` | 6 | 16, 50, 57, 61, 69, 70, 71 | core 02–04 |
@@ -223,11 +223,11 @@ Former → current step mapping (`*` = only the library-scoped part of the forme
 | 03 | Publish to nuget.org only from `v*` tags behind a protected environment | core 03 |
 | 04 | Bump every package to 2.0.0 | core 04 |
 | 05 | HTTP — never retry unsafe verbs after an exception or timeout | http 02 |
-| 06 | Keep upstream URIs and query strings out of `ProblemDetails` and exception messages | api-auth 02 |
-| 07 | Authentication — constant-time API-key comparison and per-instance logger | api-auth 03 |
+| 06 | Keep upstream URIs and query strings out of `ProblemDetails` and exception messages | api-auth 03 |
+| 07 | Authentication — constant-time API-key comparison and per-instance logger | api-auth 04 |
 | 08 | DreamTravel — Development-only developer exception page | core 05 |
 | 09 | Remove leaked-secret artifacts and personal settings; record revocation | core 06 |
-| 10 | DI resolution tests — application modules | logging 01, cqrs 01, tale 01, http 01, api-auth 01 |
+| 10 | DI resolution tests — application modules | logging 01, cqrs 01, tale 01, http 01, api-auth 02 |
 | 11 | DI resolution tests — infrastructure modules | cache 01, sql 01, messagebus 01, hangfire 01 |
 | 12 | MessageBus — resolvable broker, registered health-check client, correlation service | messagebus 02 |
 | 13 | Hangfire — implement `preventOverlap`; register the correlation service | hangfire 02 |
@@ -239,7 +239,7 @@ Former → current step mapping (`*` = only the library-scoped part of the forme
 | 19 | AUID — culture-invariant formatting, range-checked parsing | auid 01 |
 | 20 | HTTP — request pipeline correctness | http 03 |
 | 21 | HTTP — upstream health-check disposal and options validation | http 04 |
-| 22 | Api — keep 201/202 in `ResultConversionFilter`; real filter registration | api-auth 04 |
+| 22 | Api — keep 201/202 in `ResultConversionFilter`; real filter registration | api-auth 05 |
 | 23 | CQRS — descriptive missing-handler errors and interface-based dispatch | cqrs 02 |
 | 24 | CQRS — log failed `Result`s as failures | cqrs 03 |
 | 25 | Tale engine — caller-only cancellation, no resume of failed tales, deterministic tests | tale 04 |
@@ -269,26 +269,26 @@ Former → current step mapping (`*` = only the library-scoped part of the forme
 | 49 | SQL — internal implementations; safe-by-default DACPAC deployment | sql 04 |
 | 50 | Blob — 2.0 surface (own namespace, cancellation, atomic metadata, internal factory) | blob 02 |
 | 51 | Hangfire — recurring job contract for 2.0 | hangfire 04 |
-| 52 | Logging, Authentication, and Api — public surface cleanup | logging 05, api-auth 05 |
+| 52 | Logging, Authentication, and Api — public surface cleanup | logging 05, api-auth 06 |
 | 53 | Testing kits — 2.0 surface (optional `Async` renames, WireMock fields) | testing-kits 03 |
 | 54 | Packaging — a truly zero-dependency `SolTechnology.Core` | core 07 |
 | 55 | XML docs shipped — Core, CQRS, Tale, AUID | result 03, cqrs 04, auid 04, tale 12 |
-| 56 | XML docs shipped — HTTP, HTTP.Testing, Api, API.Testing, Authentication | http 07, api-auth 06, testing-kits 04 |
+| 56 | XML docs shipped — HTTP, HTTP.Testing, Api, API.Testing, Authentication | http 07, api-auth 07, testing-kits 04 |
 | 57 | XML docs shipped — Cache, MessageBus, SQL, Blob, Hangfire | cache 05, sql 05, blob 03, messagebus 05, hangfire 05 |
 | 58 | XML docs shipped — testing kits, then one central switch | core 08, testing-kits 04 |
-| 59 | Module docs — Api, Clients, HTTP checklist, API/HTTP testing, Auth | http 08, api-auth 07, testing-kits 05 |
+| 59 | Module docs — Api, Clients, HTTP checklist, API/HTTP testing, Auth | http 08, api-auth 08, testing-kits 05 |
 | 60 | Module docs — Core, CQRS, Tale, AUID, Cache, Log, Redis.Testing | result 04, logging 06, cqrs 05, auid 05, tale 13, cache 06, testing-kits 05 |
 | 61 | Module docs — Bus, Hangfire, SQL, Blob, Testing kits | sql 06, blob 04, messagebus 06, hangfire 06, testing-kits 05 |
 | 62 | Guide conformance — Tale engine split | tale 14 |
 | 63 | Guide conformance — Tale controller, manager, handler, `Tale`, and tests | tale 15 |
 | 64 | Guide conformance — HTTP | http 09 |
-| 65 | Guide conformance — Api, Authentication file names, HTTP.Testing | api-auth 08, testing-kits 06 |
-| 66 | Guide conformance — CQRS, Core, Authentication | result 05, logging 07, cqrs 06, api-auth 08 |
+| 65 | Guide conformance — Api, Authentication file names, HTTP.Testing | api-auth 09, testing-kits 06 |
+| 66 | Guide conformance — CQRS, Core, Authentication | result 05, logging 07, cqrs 06, api-auth 09 |
 | 67 | Guide conformance — Logging, Cache, AUID | logging 07, auid 06, cache 07 |
 | 68 | Guide conformance — MessageBus and ServiceBus.Testing | messagebus 07, testing-kits 06 |
 | 69 | Guide conformance — SQL, Blob, Hangfire, and the remaining testing kits | sql 07, blob 05, hangfire 07, testing-kits 06 |
-| 70 | Log templates — `[{Placeholder}]` everywhere (log contract change L-03) | tale 16, http 10, api-auth 09, cache 08, messagebus 08, result 05*, logging 07*, cqrs 06*, auid 06*, sql 07*, blob 05*, hangfire 07*, testing-kits 06* |
-| 71 | Retrospective | core 11, result 06, logging 08, cqrs 07, auid 07, tale 17, http 11, api-auth 10, cache 09, sql 08, blob 06, messagebus 09, hangfire 08, testing-kits 07 |
+| 70 | Log templates — `[{Placeholder}]` everywhere (log contract change L-03) | tale 16, http 10, api-auth 10, cache 08, messagebus 08, result 05*, logging 07*, cqrs 06*, auid 06*, sql 07*, blob 05*, hangfire 07*, testing-kits 06* |
+| 71 | Retrospective | core 11, result 06, logging 08, cqrs 07, auid 07, tale 17, http 11, api-auth 11, cache 09, sql 08, blob 06, messagebus 09, hangfire 08, testing-kits 07 |
 
 **Scope change 2026-11-02:** credential scrub dropped (user decision B: "czy DreamTravel nie miało
 haseł tylko lokalnych w repo? Jeżeli tak, to zostaw."); premortem mitigations referring to it are
@@ -299,7 +299,7 @@ bypass now point at user decision A (2026-11-02, no `master` ruleset; see the re
 user-decided scope and add no step, file, contract, or dependency.
 
 **Split-off features (RQ8, user, 2026-11-02):** [`2026-11-02-flagship-showcase-hygiene`](2026-11-02-flagship-showcase-hygiene.md) (depends on
-core 02, 03, 04, 05, 07, result 02, tale 03, 07, 11, api-auth 04, and auid 03; former steps 02,
+core 02, 03, 04, 05, 07, result 02, tale 03, 07, 11, api-auth 05, and auid 03; former steps 02,
 03, 04, 08, 18, 22, 38, 39, 43, 44, 54) and
 [`2026-11-02-org-transfer-and-2-0-release`](2026-11-02-org-transfer-and-2-0-release.md) (depends on this feature, every library feature, the showcase feature, and
 [`2026-11-02-logging-chronicle`](2026-11-02-logging-chronicle.md) being `completed`). Each has its own review, premortem, and retrospective.
@@ -409,6 +409,9 @@ Confirm or decline each ID. A declined item is removed from its step by the plan
 the specific Q1 answer to keep Guards and Scheduler. The additive `C-26` and `C-27` were confirmed
 in the plan-review answers (RQ5, RQ6, user, 2026-11-02).
 
+**Decision (user, 2026-11-03):** `C-28` is confirmed (`CLAUDE.md §2`): `SolTechnology.Core.Authentication`
+becomes `SolTechnology.Core.Auth` in 2.0, because authorization joins the package later.
+
 | ID | Package | Exact change | Step |
 |---|---|---|---|
 | C-01 | all | `src/Directory.Build.props` `<Version>1.0.0</Version>` → `2.0.0`; delete `<Version>1.2.0</Version>` from `src/SolTechnology.Core.Logging/SolTechnology.Core.Logging.csproj:4` (Logging 1.2.0 → 2.0.0) | core 04 |
@@ -431,12 +434,13 @@ in the plan-review answers (RQ5, RQ6, user, 2026-11-02).
 | C-18 | Blob | `BlobConnectionFactory` → `internal`; `BlobContainerClientExtensions` namespace `Azure.Storage.Blobs` → `SolTechnology.Core.Blob`; `ReadFromBlob<T>` and both `WriteToBlob` overloads gain `CancellationToken ct = default` | blob 02 |
 | C-19 | Hangfire | `IJob.Execute(CancellationToken)` returns `Task<Result>` instead of `Task`; `AddSolRecurringJob<TJob>` gains optional `string? jobId = null, TimeZoneInfo? timeZone = null` (binary break) | hangfire 04 |
 | C-20 | Logging | `ILoggerExtensions` (`ILoggerExtensions.cs:12`) → `LoggerExtensions` with an `extension(ILogger logger)` block; `CoreLoggingActivitySources.Operations` (`CoreLoggingActivitySources.cs:32`) → `internal`; `OperationsName` stays public and CQRS creates its own `ActivitySource` with that name (RQ9) | logging 05 |
-| C-21 | Authentication | `ApiKeyAuthenticationSchemeOptions.ApiKey` public field → `{ get; set; }` property; `ApiKeyAuthenticationHandler` constructor drops the `ILogger<ApiKeyAuthenticationHandler> logger` parameter (uses the inherited `Logger`) | api-auth 05 |
-| C-22 | Api | `ConfigureSwaggerOptions` (`Api/ModuleInstaller.cs:247`) → `internal sealed` | api-auth 05 |
+| C-21 | Authentication | `ApiKeyAuthenticationSchemeOptions.ApiKey` public field → `{ get; set; }` property; `ApiKeyAuthenticationHandler` constructor drops the `ILogger<ApiKeyAuthenticationHandler> logger` parameter (uses the inherited `Logger`) | api-auth 06 |
+| C-22 | Api | `ConfigureSwaggerOptions` (`Api/ModuleInstaller.cs:247`) → `internal sealed` | api-auth 06 |
 | C-23 | Testing kits (optional) | Drop `Async`: `AzuriteFixture.InitializeAsync/ClearAsync/CreateBlobContainerAsync`, `RedisFixture.InitializeAsync/FlushAsync`, `SQLFixture.InitializeAsync/ResetAsync`, `ServiceBusFixture.InitializeAsync` (also gains `CancellationToken ct = default`), `ContainerLifecycleHelper.EnsureRunningAsync/WaitForAmqpReadyAsync/WaitForHealthyAsync` | testing-kits 03 |
 | C-24 | HTTP.Testing (optional) | `WireMockStartup.WireMockServer` public field → get-only property; DELETE unused abstract `FakeApiBase.BaseUrl` | testing-kits 03 |
 | C-26 | Tale (additive) | NEW public `SolTechnology.Core.Tale.Persistence.TaleJsonOptions` with `JsonSerializerOptions Default { get; }` (moved from the internal `Orchestration.TaleJsonOptions`, read-only instance); used by `TaleInstance.Clone()` and documented for custom repositories (RQ5) | tale 02 |
 | C-27 | MessageBus (additive) | NEW `MessageBusConfiguration.MaxDeliveryCount` (`int`, default 10) used by the receiver to dead-letter on the last attempt (RQ6) | messagebus 03 |
+| C-28 | Authentication → Auth (user, 2026-11-03) | NuGet `PackageId`, `AssemblyName`, project `src/SolTechnology.Core.Authentication/SolTechnology.Core.Authentication.csproj` → `src/SolTechnology.Core.Auth/SolTechnology.Core.Auth.csproj`, test project `tests/SolTechnology.Core.Authentication.Tests` → `tests/SolTechnology.Core.Auth.Tests`, and namespace `SolTechnology.Core.Authentication` → `SolTechnology.Core.Auth`; `ModuleInstaller.AddSolAuthentication(IServiceCollection, AuthenticationConfiguration)` → `AddSolAuth(IServiceCollection, AuthConfiguration)`, the one entry for authentication and authorization; `AuthenticationConfiguration` → `AuthConfiguration`; `ApiKeyAuthenticationHandler` and `ApiKeyAuthenticationSchemeOptions` keep their names (`C-21` still applies). The 1.x ID is deprecated on nuget.org with the alternative `SolTechnology.Core.Auth` (release 05, manual owner action). | api-auth 01 |
 | C-25 | Guards, Scheduler | **Rejected (Q1, user, 2026-11-02).** Was: DELETE projects `src/SolTechnology.Core.Guards`, `src/SolTechnology.Core.Scheduler`, `tests/SolTechnology.Core.Guards.Tests` (all public symbols) | — (step removed) |
 
 **Not planned** (recorded so the omission is deliberate, per `naming-and-public-api.md`):
@@ -459,14 +463,14 @@ parameter; `UntilAsync`, `CheckHealthAsync`, `InvokeAsync`, `StartAsync`/`StopAs
 | P-06 | Recurring job id `Type.Name` → `Type.FullName`; stale tracked ids and legacy `Type.Name` ids removed at start (RQ10) | Old recurring entries are removed automatically and re-created under new ids; no double firing | hangfire 04 |
 | P-07 | Cache keys namespaced by `TKey`/`TItem`; `DistributedCacheConfiguration.InstanceName` has no default and is validated non-empty at start (no `required` keyword) | Existing Redis entries are orphaned (cold cache); config without `InstanceName` fails at start | cache 03 |
 | P-08 | `AuidJsonConverter` throws `JsonException` on invalid input; empty string no longer becomes `Auid.Empty` | Error type at deserialization | auid 02 |
-| P-09 | 5xx `ProblemDetails.title` is a fixed text; `HttpRequestFailedException.Message` has no query string | Clients that parsed the title | api-auth 02 |
+| P-09 | 5xx `ProblemDetails.title` is a fixed text; `HttpRequestFailedException.Message` has no query string | Clients that parsed the title | api-auth 03 |
 | P-10 | POST/PATCH not retried after an exception or timeout | Fewer retries for unsafe verbs | http 02 |
 | P-11 | `WireMockStartup` `AllowPartialMapping` defaults to `false` | Loose tests start failing (intended) | testing-kits 01 |
 | P-12 | `TaleController` serves only handlers opted in via `ExposeOverHttp<T>()` | Endpoints that worked implicitly return 404 | tale 11 |
 | P-13 | `SolTechnology.Core` no longer brings `Microsoft.Extensions.*` transitively | Consumers relying on the transitive reference must add it | core 07 |
 | P-14 | Inbound `X-Correlation-Id` outside `[A-Za-z0-9._:-]` is replaced | Clients sending such IDs see a new ID | logging 04 |
 | P-15 | A failed request logs one Error entry, not two | Error-rate alerts change | logging 03 |
-| P-16 | API key in the request is compared as a SHA-256 hash in constant time | None functional | api-auth 03 |
+| P-16 | API key in the request is compared as a SHA-256 hash in constant time | None functional | api-auth 04 |
 | P-17 | The receiver dead-letters a failing message when `DeliveryCount >= MessageBusConfiguration.MaxDeliveryCount` (default 10) instead of always abandoning | Set `MaxDeliveryCount` to the entity's value; a lower value dead-letters earlier than the broker would | messagebus 03 |
 
 ### Log contract changes (Guide §15 "report only", accepted for 2.0)
@@ -485,7 +489,7 @@ parameter; `UntilAsync`, `CheckHealthAsync`, `InvokeAsync`, `StartAsync`/`StopAs
     `[{IdempotencyKey}]`.
   - MessageBus: the receiver and publisher (`infra#20`).
 
-  Steps: tale 16, api-auth 09, http 10, cache 08, messagebus 08; every other library checks its
+  Steps: tale 16, api-auth 10, http 10, cache 08, messagebus 08; every other library checks its
   templates in its conformance step (result 05, logging 07, cqrs 06, auid 06, sql 07, blob 05,
   hangfire 07, testing-kits 06).
 - **L-04** `SQLProjectDeployer` logs through `ILogger` instead of `Console.WriteLine`. Step: sql 04.
@@ -509,6 +513,12 @@ these notes from the steps:
   compiles but fails at runtime (`FieldAccessException`, `MissingMethodException`, `TypeLoadException`).
   Group Dependabot/Renovate updates for `SolTechnology.Core*`. 2.x packages warn with `SOLCORE001` when the
   resolved `SolTechnology.Core.*` packages span more than one major version.
+- api-auth 01 (`C-28`, user, 2026-11-03): `SolTechnology.Core.Authentication` is now `SolTechnology.Core.Auth`.
+  Replace the package reference, `using SolTechnology.Core.Authentication;` → `using SolTechnology.Core.Auth;`,
+  `AddSolAuthentication(...)` → `AddSolAuth(...)`, and `AuthenticationConfiguration` → `AuthConfiguration`
+  (`IOptions<AuthConfiguration>`). Behaviour, the `X-API-KEY` header, and the `ApiKey` scheme are unchanged.
+  `SolTechnology.Core.Authentication` stays at 1.x and is deprecated on nuget.org; keeping it next to 2.x packages
+  warns with `SOLCORE001`.
 
 ### Resolved questions (user answers, 2026-11-02)
 
@@ -566,6 +576,8 @@ of AR-5 are carried by the release feature, and AR-4 also by the showcase featur
 Scope change 2026-11-03 (user): step 09 "Central Package Management" added after the plan review; the retrospective moved to step 10.
 Scope change 2026-11-03 (user): step 10 "Per-package NuGet icons" added; the retrospective moved to step 11. It changes no package version.
 
+Scope change 2026-11-03 (user, `C-28`): `SolTechnology.Core.Authentication` is renamed to `SolTechnology.Core.Auth` in 2.0, because authorization joins it later; `AddSolAuthentication` → `AddSolAuth`, `AuthenticationConfiguration` → `AuthConfiguration`, namespace `SolTechnology.Core.Auth`. New api-auth 01 does the rename (and moves `docs/icons/SolTechnology.Core.Authentication.png` to `docs/icons/SolTechnology.Core.Auth.png`); a new api-auth 00 runs its premortem; former api-auth 01–10 are now 02–11, and this brief's api-auth references are renumbered. The release feature adds `SolTechnology.Core.Authentication` to the nuget.org deprecations with the alternative `SolTechnology.Core.Auth`. Core 08's "api-auth step 06" reference (`steps/08-xml-docs-central-switch.md`) now means api-auth 07; that foundation step file is not edited in this pass.
+
 Scope change 2026-11-03 (user: "nie dropuj joke z kodu"): jokes in the code (humorous comments, messages, names, file names) stay exactly as written; recorded in `docs/ClaudeCodingGuide.md` §9.10 and §7 (the §15 "dupa" row is removed). `P1-5` now covers only non-joke Polish text. Affected places:
 - core 05 (`done`): the `"dupa"` CORS rename was reverted by commit `7601de9b`; only the `avroconvertonline.azurewebsites.net` origin removal remains (step 05 `Deviations`).
 - `src/SolTechnology.Core.CQRS/Nothing.cs`: `//I'm just void. Or nothing` restored (cqrs feature, already completed).
@@ -597,11 +609,11 @@ Scope change 2026-11-03 (user: "nie dropuj joke z kodu"): jokes in the code (hum
       on `4097d47f` and passes at feature close.
 - [ ] `S5` (timing leak, not functionally observable) is covered by a source check
       (`CryptographicOperations.FixedTimeEquals` present, no string equality on the key) plus the
-      handler unit-test matrix (api-auth 03).
+      handler unit-test matrix (api-auth 04).
 - [ ] `S6` is covered by a DreamTravel component test that runs the API in the `Production`
       environment and asserts that an unhandled exception returns no developer exception page
       (core 05).
-- [ ] The confirmed `C-01`…`C-24`, `C-26`, and `C-27` shipped, and `C-25` (rejected) did not: `src/SolTechnology.Core.Guards`,
+- [ ] The confirmed `C-01`…`C-24`, `C-26`, `C-27`, and `C-28` shipped, and `C-25` (rejected) did not: `src/SolTechnology.Core.Guards`,
       `src/SolTechnology.Core.Scheduler`, and `tests/SolTechnology.Core.Guards.Tests` still exist.
 - [ ] Every `docs/<Module>.md` referenced by a `PackageReadmeSource` compiles: each C# snippet
       builds in a throwaway console app against the 2.0 packages (recorded in each library feature's

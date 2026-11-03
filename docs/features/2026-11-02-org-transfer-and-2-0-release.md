@@ -78,7 +78,7 @@ The 2026-11-02 review against `master@4097d47f` found:
   not rewritten: no `git filter-repo`, no force-push. Org secret scanning and push protection are
   enabled after the transfer (step 03).
 - **D2 — Versioning.** 2.0 is a major release. The confirmed public API changes (`C-01`…`C-24`,
-  `C-26`, `C-27`; `C-25` rejected), behavioural and persisted-contract breaks (P-01…P-17), and log
+  `C-26`, `C-27`, `C-28`; `C-25` rejected), behavioural and persisted-contract breaks (P-01…P-17), and log
   contract changes (L-01…L-05) are defined in the core brief and shipped by the core feature;
   step 05 publishes them.
 - **D3 — Ordering.** The org transfer (GitHub transfer, nuget.org org co-owner, secrets, branch
@@ -128,6 +128,8 @@ The IDs keep their numbers from the core brief.
 - License, authorship, and repository URLs, including both `Directory.Build.props` files — step 02.
 - Security settings, repository presentation, nuget.org deprecation of the 8 deprecated IDs —
   step 03 (no `master` ruleset, decision A).
+- nuget.org deprecation of `SolTechnology.Core.Authentication` with the alternative
+  `SolTechnology.Core.Auth` (`C-28`) — step 05, after the `v2.0.0` publish creates the new ID.
 - NuGet Trusted Publishing — step 04.
 - Release 2.0.0: `CHANGELOG.md` 2.0.0 section, `docs/migration-2.0.md`,
   `docs/release-runbook-2.0.md`, tag `v2.0.0`, revocation of the interim key — step 05.
@@ -156,6 +158,15 @@ credential edit; RQ7 (a) is superseded. `review` stays `done (2026-11-02)`: the 
 user-decided scope and adds no step, file, contract, or dependency. `premortem` is still `pending`
 and runs on this revised plan.
 
+**Scope change 2026-11-03 (user, `C-28` in the core brief):** `SolTechnology.Core.Authentication` is renamed to
+`SolTechnology.Core.Auth` in 2.0 (api-auth 01). The old ID stays at 1.x and is deprecated on nuget.org with the
+alternative `SolTechnology.Core.Auth` — a manual owner action in step 05, after the `v2.0.0` publish creates the new
+ID, because a deprecation names an existing alternate package. Step 01 co-owns 28 existing IDs (19 live IDs already on
+nuget.org, `SolTechnology.Core.Authentication`, and the 8 deprecated IDs); step 04's Trusted Publishing policy must
+allow pushing a new package ID; after step 05 the organization owns 29 IDs (20 live, 9 deprecated). `review` stays
+`done (2026-11-02)`: the change adds one user-decided ID to existing manual owner actions and no file, contract, or
+dependency. `premortem` is still `pending` and covers it.
+
 Notation: an unqualified step number is a step of this feature; `core NN` and `showcase NN` name
 step `NN` of [`2026-11-02-core-2-0-flagship-hardening`](2026-11-02-core-2-0-flagship-hardening.md)
 and [`2026-11-02-flagship-showcase-hygiene`](2026-11-02-flagship-showcase-hygiene.md); library
@@ -178,8 +189,11 @@ section), not their step files.
 
 - [ ] `git ls-remote https://github.com/sol-technology/SolTechnology.Core` succeeds, and
       `https://github.com/AdrianStrugala/SolTechnology.Core` redirects.
-- [ ] The nuget.org organization `SolTechnology` co-owns every one of the 28 package IDs (20 live,
-      8 deprecated).
+- [ ] The nuget.org organization `SolTechnology` co-owns every one of the 29 package IDs (20 live,
+      including `SolTechnology.Core.Auth` first published in step 05; 9 deprecated, including
+      `SolTechnology.Core.Authentication`).
+- [ ] Every version of `SolTechnology.Core.Authentication` is deprecated on nuget.org with the alternate
+      package `SolTechnology.Core.Auth` (owner-confirmed, dated).
 - [ ] `LICENSE`, `<Copyright>`, and `<Authors>` name "Adrian Strugala / Sol Technology".
 - [ ] `grep -rn "AdrianStrugala" --include=*.md --include=*.props --include=*.yml --include=*.csproj .`
       lists only intentional author attributions and historical feature records.

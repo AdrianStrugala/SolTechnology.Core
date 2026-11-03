@@ -21,14 +21,18 @@ interim `NUGET_API_KEY` is revoked only after it succeeds (AR-5).
 - `SolTechnology.Core.slnx` — EDIT — add the two new docs to `/Docs/`
 - Git tag `v2.0.0` — MANUAL (owner) — pushed after the PR merges; approval in `nuget-release` after checking that the tag equals `<Version>` in `src/Directory.Build.props` (AR-5)
 - GitHub environment `nuget-release` and nuget.org — MANUAL (owner) — after the `v2.0.0` publish succeeds, delete the interim `NUGET_API_KEY` secret and revoke the key on nuget.org (step 04)
+- nuget.org — MANUAL (owner) — after the `v2.0.0` publish succeeds (`C-28`, user, 2026-11-03):
+  - `SolTechnology.Core.Auth`: confirm `SolTechnology` is an owner; add the personal account as co-owner, as step 01 keeps it on the other IDs.
+  - `SolTechnology.Core.Authentication`: deprecate every version — reason "Legacy", alternate package `SolTechnology.Core.Auth` (any version), message "Renamed to SolTechnology.Core.Auth in 2.0. See docs/migration-2.0.md." Deprecate only; do not unlist.
 
 ## Changes
 - Source of the release notes and migration guide: the [`2026-11-02-core-2-0-flagship-hardening`](../../2026-11-02-core-2-0-flagship-hardening.md) brief — tables "Public API changes requiring `CLAUDE.md §2` confirmation" (`C-nn`), "Behavioural and persisted-contract breaks" (P-01…P-17), "Log contract changes" (L-01…L-05), and "Release-notes inputs" (including the `auid 01` AUID note, the `hangfire 03` P-05 note, and the `tale 09` P-04 note; former core steps 19, 32, 41). Its `Deviations` and `Completion summary`, and those of every library feature brief listed in its "Per-library regroup" section, override the planned rows. The [`2026-11-02-logging-chronicle`](../../2026-11-02-logging-chronicle.md) brief contributes its own release-notes inputs.
 
 ## Acceptance criteria
 - [ ] The `publish` job succeeded for `v2.0.0`.
-- [ ] Each of the 20 package pages on nuget.org shows version 2.0.0, its README (no broken images), and the `sol-technology/SolTechnology.Core` repository link.
-- [ ] `docs/migration-2.0.md` has one section per confirmed `C-nn` and per P-03/P-04/P-05/P-06/P-07/P-17.
+- [ ] Each of the 20 package pages on nuget.org (including the new `SolTechnology.Core.Auth`) shows version 2.0.0, its README (no broken images), and the `sol-technology/SolTechnology.Core` repository link.
+- [ ] `docs/migration-2.0.md` has one section per confirmed `C-nn` (including `C-28`, Authentication → Auth) and per P-03/P-04/P-05/P-06/P-07/P-17.
+- [ ] The `SolTechnology.Core.Authentication` page on nuget.org shows the deprecation with the alternate package `SolTechnology.Core.Auth`, and the `README.md` `SolTechnology.Core.Auth` badge shows 2.0.0 (owner-confirmed, dated in Deviations).
 - [ ] `NUGET_API_KEY` no longer exists in `nuget-release`, and the key is revoked on nuget.org (owner-confirmed, dated in Deviations).
 - [ ] A fresh `dotnet new console` project using `dotnet add package SolTechnology.Core.CQRS --version 2.0.0` builds the README quick start.
 

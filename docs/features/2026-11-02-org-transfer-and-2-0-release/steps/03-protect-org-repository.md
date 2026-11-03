@@ -22,7 +22,7 @@ nuget.org deprecation of the 8 deprecated IDs.
 - GitHub org/repo settings — MANUAL — no ruleset and no branch protection rule on `master` (decision A, user, 2026-11-02)
 - `.github/workflows/update-nuget-stats.yml` — unchanged — the `update-stats` job already declares `permissions: contents: write`, so the read-only default token does not stop its push
 - GitHub repo settings — MANUAL — topics (`dotnet`, `cqrs`, `workflow`, `nuget`, `tale-code`), description, homepage = product site, social preview `docs/logo.png`
-- nuget.org — MANUAL — mark the 8 deprecated IDs as deprecated, pointing to their replacements
+- nuget.org — MANUAL — mark the 8 deprecated IDs as deprecated, pointing to their replacements. `SolTechnology.Core.Authentication` (`C-28`) is not deprecated here: step 05 deprecates it after the `v2.0.0` publish creates its alternate package `SolTechnology.Core.Auth`
 - `docs/CICD.md` — EDIT — repository security settings; `master` has no ruleset (CI runs on push and PR, direct pushes allowed, `build` and `dreamtravel-tests` are not required checks)
 
 ## Changes

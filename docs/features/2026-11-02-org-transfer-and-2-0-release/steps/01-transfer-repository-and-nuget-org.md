@@ -28,10 +28,13 @@ a clean `master`. No repository file changes except this step's Deviations.
 - GitHub: Settings → Danger Zone → Transfer → `sol-technology`.
   - Never re-create `AdrianStrugala/SolTechnology.Core` afterwards, because that breaks the
     redirects.
-- nuget.org: create organization `SolTechnology` and add it as co-owner of:
-  - the 20 live IDs, listed by `dotnet sln SolTechnology.Core.slnx list | grep -E '^src/'`;
+- nuget.org: create organization `SolTechnology` and add it as co-owner of the 28 existing IDs:
+  - the 19 live IDs that already exist on nuget.org, listed by `dotnet sln SolTechnology.Core.slnx list | grep -E '^src/'`
+    minus `SolTechnology.Core.Auth`; that ID is new in 2.0 (`C-28`, user, 2026-11-03), does not exist on nuget.org
+    before step 05 (404 on 2026-11-03), and is created under the policy owner `SolTechnology` by the `v2.0.0` publish;
+  - `SolTechnology.Core.Authentication` (1.x, renamed to `SolTechnology.Core.Auth` by api-auth 01; step 05 deprecates it);
   - the 8 deprecated IDs from `dontreadme.md` (kept under its name, user, 2026-11-03) and
-    `unlistDeprecatedPackages.yml:7-18`.
+    `unlistDeprecatedPackages.yml:7-18`. Since api-auth 01, `dontreadme.md` also lists `SolTechnology.Core.Authentication`.
 
   Keep the personal account as an owner. This decides whether `update-nuget-stats.yml:20`
   `owner:` changes in step 02.
@@ -40,7 +43,7 @@ a clean `master`. No repository file changes except this step's Deviations.
 
 ## Acceptance criteria
 - [ ] `git ls-remote https://github.com/sol-technology/SolTechnology.Core` succeeds, and `https://github.com/AdrianStrugala/SolTechnology.Core` redirects.
-- [ ] nuget.org shows `SolTechnology` as an owner on every one of the 28 IDs (owner-confirmed list in Deviations).
+- [ ] nuget.org shows `SolTechnology` as an owner on every one of the 28 existing IDs (owner-confirmed list in Deviations); `SolTechnology.Core.Auth` is checked in step 05.
 
 ## Open questions
 - none (Q3 resolved by the user on 2026-11-02: `sol-technology` / `SolTechnology`; Q10 resolved: Trusted Publishing, configured in step 04, so no scoped API key is created here)

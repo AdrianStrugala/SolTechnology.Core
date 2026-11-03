@@ -22,7 +22,7 @@ joke. Its §15 row is already removed and §7 already records it as a kept joke 
 does not edit either.
 
 ## Affected components
-- `docs/ClaudeCodingGuide.md` — EDIT — §12 → BCL guards (`ArgumentNullException.ThrowIfNull`, `ArgumentException.ThrowIfNullOrWhiteSpace`, `ArgumentOutOfRangeException.ThrowIfNegative`); §7 `AddSolAuthentication`, `ExceptionFilter` + `ResultConversionFilter`; §15 "Where seen" column marks the fixed controller `try/catch` example as historical without deleting the rule; the §7 kept-joke sentence and the §9.10 joke exception stay unchanged
+- `docs/ClaudeCodingGuide.md` — EDIT — §12 → BCL guards (`ArgumentNullException.ThrowIfNull`, `ArgumentException.ThrowIfNullOrWhiteSpace`, `ArgumentOutOfRangeException.ThrowIfNegative`); §7 auth line → `AddSolAuth(...)` from `SolTechnology.Core.Auth` if api-auth 01 (`C-28`, user, 2026-11-03) has merged, otherwise `AddSolAuthentication(...)` from `SolTechnology.Core.Authentication` (api-auth 01 then renames it), and `ExceptionFilter` + `ResultConversionFilter`; §15 "Where seen" column marks the fixed controller `try/catch` example as historical without deleting the rule; the §7 kept-joke sentence and the §9.10 joke exception stay unchanged
 - `CLAUDE.md` — EDIT — `§11` gotcha rows still accurate after tale 03, tale 11, and auid 03 (former core steps 18, 43, 44)
 
 ## Changes

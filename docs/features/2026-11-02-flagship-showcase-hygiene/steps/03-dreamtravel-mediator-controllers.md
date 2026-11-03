@@ -28,7 +28,7 @@ controller breaks that template (`repo#B1`, `B2`, `B9`, `P1-1`):
 - `sample-tale-code-apps/DreamTravel/tests/Component/**` — EDIT — failure-path assertions (ProblemDetails, not 200/400 with exception text)
 
 ## Changes
-- Prerequisite: core 05 ([`2026-11-02-core-2-0-flagship-hardening`](../../2026-11-02-core-2-0-flagship-hardening.md); Production component test in the same test project) and api-auth 04 ([`2026-11-02-core-2-0-api-auth`](../../2026-11-02-core-2-0-api-auth.md); `ResultConversionFilter` turns a failed `Result` into ProblemDetails) are merged (former core steps 08 and 22).
+- Prerequisite: core 05 ([`2026-11-02-core-2-0-flagship-hardening`](../../2026-11-02-core-2-0-flagship-hardening.md); Production component test in the same test project) and api-auth 05 ([`2026-11-02-core-2-0-api-auth`](../../2026-11-02-core-2-0-api-auth.md); `ResultConversionFilter` turns a failed `Result` into ProblemDetails) are merged (former core steps 08 and 22).
 - Use the [`command-query-event-tale`](../../../../.github/skills/command-query-event-tale/SKILL.md) skill for the two new queries.
 - Locate exact v1 paths with `grep -rln "class FindNameOfCityController\|class LimitCostOfPathsController\|class FindLocationOfCityController\|class ProjectsController" sample-tale-code-apps` (the `...` prefix is `sample-tale-code-apps/DreamTravel/src/Presentation/DreamTravel.Api`).
 

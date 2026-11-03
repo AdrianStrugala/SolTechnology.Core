@@ -22,7 +22,7 @@ This step changes no `src/` code.
 ## Changes
 
 - **Modules touched:**
-  - GitHub and nuget.org (manual owner actions): repository transfer, nuget.org organization co-ownership of 28 IDs, security settings (no `master` ruleset, decision A, user, 2026-11-02), Trusted Publishing policy, `nuget-release` environment secrets (steps 01, 03, 04, 05).
+  - GitHub and nuget.org (manual owner actions): repository transfer, nuget.org organization co-ownership of 28 existing IDs plus the new `SolTechnology.Core.Auth` created by the `v2.0.0` publish (`C-28`), nuget.org deprecation of `SolTechnology.Core.Authentication` (step 05), security settings (no `master` ruleset, decision A, user, 2026-11-02), Trusted Publishing policy, `nuget-release` environment secrets (steps 01, 03, 04, 05).
   - Package metadata for every packable `src/SolTechnology.Core.*` project through `src/Directory.Build.props` (step 02).
   - DreamTravel `Directory.Build.props` (step 02).
   - `LICENSE`, `README.md`, `docs/*.md` URLs, `.github/skills/README.md` (step 02).
@@ -34,6 +34,7 @@ This step changes no `src/` code.
   - Publishing credential: `NUGET_API_KEY` → Trusted Publishing (OIDC, `id-token: write` on the `publish` job only) — step 04.
   - Repository location: `AdrianStrugala/SolTechnology.Core` → `sol-technology/SolTechnology.Core` with GitHub redirects — step 01.
   - First public 2.0.0 packages: every `C-nn`, P-01…P-17, and L-01…L-05 from the core brief reaches consumers — step 05. Their own premortem was core step 00; this premortem covers how they are released and communicated.
+  - nuget.org IDs (`C-28`, user, 2026-11-03): `SolTechnology.Core.Auth` is published for the first time by step 05 through Trusted Publishing; `SolTechnology.Core.Authentication` stays at 1.x and is deprecated with the alternative `SolTechnology.Core.Auth` — step 05.
   - Semver: MAJOR (2.0.0) published.
 - **`ModuleInstaller.cs` edits:** none.
 - **`Directory.Build.props` edits:**

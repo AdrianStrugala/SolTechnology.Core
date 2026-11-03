@@ -33,7 +33,7 @@ step numbers in parentheses):
 - [`2026-11-02-core-2-0-core-result`](2026-11-02-core-2-0-core-result.md) step 02 (38),
   [`2026-11-02-core-2-0-auid`](2026-11-02-core-2-0-auid.md) step 03 (44),
   [`2026-11-02-core-2-0-tale`](2026-11-02-core-2-0-tale.md) steps 03 (18), 07 (39), and 11 (43), and
-  [`2026-11-02-core-2-0-api-auth`](2026-11-02-core-2-0-api-auth.md) step 04 (22) are `done`.
+  [`2026-11-02-core-2-0-api-auth`](2026-11-02-core-2-0-api-auth.md) step 05 (22; step 04 before the 2026-11-03 renumbering) are `done`.
 
 None of these features needs to be `completed`. Notation: `core NN` names a step of the core
 (foundation) feature; `result NN`, `auid NN`, `tale NN`, and `api-auth NN` name steps of the library
@@ -43,7 +43,7 @@ features above. Per step:
 |---|---|---|
 | 01 | core 04, result 02, core 07 | The README quick start compiles against the 2.0 version, the immutable `Result` (`C-02`), and the zero-dependency base package (P-13). |
 | 02 | core 02, core 03 | Same workflow file; core 03 adds the `publish` job and the `actions/upload-artifact`/`actions/download-artifact` uses pinned here. |
-| 03 | core 05, api-auth 04 | Core 05 adds the Production component test in the same test project; api-auth 04 makes `ResultConversionFilter` turn a failed `Result` into ProblemDetails. |
+| 03 | core 05, api-auth 05 | Core 05 adds the Production component test in the same test project; api-auth 05 makes `ResultConversionFilter` turn a failed `Result` into ProblemDetails. |
 | 04 | core 05, tale 03, tale 11, auid 03 | `CLAUDE.md §11` rows must match tale 03, tale 11, and auid 03. Also requires step 03 here. Core 05 is `done`; the "dupa" CORS name stays as a kept joke (user, 2026-11-03), so step 04 no longer edits it. |
 | 05 | tale 07 | Tale 07 edits the same `DreamTravel.Queries` chapter files. |
 | 06 | — | None since 2026-11-02: core 05 (former 08) no longer adds `dotnet user-secrets` commands or edits `docker-compose.yml` (decision B, user, 2026-11-02: local-only DreamTravel dev credentials stay committed). |
@@ -173,7 +173,7 @@ listed in "Depends on". The "Post-review core no." column below uses pre-regroup
 | 00 | — | Run premortem | Gate; runs after review. |
 | 01 | 71 | Community health files and root README | `SECURITY.md` names Private Vulnerability Reporting, enabled in release 03. `CHANGELOG.md` 2.0.0 section filled in release 05. |
 | 02 | 72 | Workflow supply-chain hardening | After core 02 and 03. |
-| 03 | 73 | DreamTravel — mediator-only, thin controllers | After core 05 and api-auth 04. |
+| 03 | 73 | DreamTravel — mediator-only, thin controllers | After core 05 and api-auth 05. |
 | 04 | 74 | Coding Guide self-consistency | After step 03, core 05, tale 03, tale 11, and auid 03. |
 | 05 | 75 | DreamTravel — logic and domain cleanup | Premortem-gated (`ModuleInstaller.cs`, persisted event type). |
 | 06 | 76 | DreamTravel — run instructions and architecture section | No core prerequisite since decision B (2026-11-02). |

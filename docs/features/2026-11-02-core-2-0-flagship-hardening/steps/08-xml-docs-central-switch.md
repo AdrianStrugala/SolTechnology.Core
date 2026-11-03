@@ -21,7 +21,7 @@ Former core step 58 (central-switch part); split per library on 2026-11-02. The 
 - `src/SolTechnology.Core.Guards/*.csproj`, `src/SolTechnology.Core.Scheduler/*.csproj` — EDIT — `<GenerateDocumentationFile>false</GenerateDocumentationFile>` (the projects stay, Q1)
 
 ## Changes
-- Prerequisite: the XML-docs steps of every library feature are merged: result step 03, auid step 04, cqrs step 04, tale step 12, http step 07, api-auth step 06, cache step 05, sql step 05, blob step 03, messagebus step 05, hangfire step 05, testing-kits step 04.
+- Prerequisite: the XML-docs steps of every library feature are merged: result step 03, auid step 04, cqrs step 04, tale step 12, http step 07, api-auth step 07, cache step 05, sql step 05, blob step 03, messagebus step 05, hangfire step 05, testing-kits step 04.
 - `grep -rn "GenerateDocumentationFile" src --include=*.csproj` afterwards lists only the two Guards/Scheduler opt-outs.
 
 ## Acceptance criteria

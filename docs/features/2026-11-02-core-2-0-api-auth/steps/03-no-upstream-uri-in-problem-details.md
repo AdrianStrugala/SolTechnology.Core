@@ -1,10 +1,10 @@
 ---
 spec: 2026-11-02-core-2-0-api-auth
-step: 02
+step: 03
 status: to-do
 ---
 
-# Step 02: Keep upstream URIs and query strings out of `ProblemDetails` and exception messages
+# Step 03: Keep upstream URIs and query strings out of `ProblemDetails` and exception messages
 
 ## Summary
 `ApiProblemDetailsFactory` copies `exception.Message` into `ProblemDetails.Title`
@@ -14,7 +14,7 @@ status: to-do
 Google in its query strings, so the key reaches API clients and logs (`S4`, `http-api#2`, CWE-209).
 Both sides are fixed in one PR because they close one disclosure path.
 
-Former core step 06; moved here by the per-library regroup (user, 2026-11-02).
+Former core step 06; moved here by the per-library regroup (user, 2026-11-02). Renumbered from 02 on 2026-11-03 (new step 01, `C-28`).
 
 ## Affected components
 - `src/SolTechnology.Core.API/Exceptions/ApiProblemDetailsFactory.cs` — EDIT — fixed titles for 5xx

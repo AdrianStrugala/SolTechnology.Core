@@ -31,6 +31,7 @@ real use of Trusted Publishing is the `v2.0.0` tag in step 05, which is why the 
   2. Merge the workflow change.
   3. Keep the interim `NUGET_API_KEY` secret in `nuget-release` until the step 05 publish succeeds; step 05 then deletes it and revokes the key on nuget.org.
 - No dry-run tag, no `rc` pre-release (RQ2).
+- The policy must allow pushing a new package ID: the `v2.0.0` publish creates `SolTechnology.Core.Auth` for the first time (`C-28`, user, 2026-11-03). If nuget.org offers policy scopes or a package glob, set the glob to `SolTechnology.Core.*` and allow both new packages and new versions.
 
 ## Acceptance criteria
 - [ ] `actionlint .github/workflows/publishPackages.yml` (or the GitHub workflow editor) reports no error.
@@ -38,6 +39,7 @@ real use of Trusted Publishing is the `v2.0.0` tag in step 05, which is why the 
 - [ ] `grep -nE "NuGet/login@[0-9a-f]{40}" .github/workflows/publishPackages.yml` matches, and the step passes `user:`.
 - [ ] `id-token: write` appears only under the `publish` job.
 - [ ] The nuget.org policy exists for owner `SolTechnology`, repository `sol-technology/SolTechnology.Core`, workflow `publishPackages.yml`, environment `nuget-release` (owner-confirmed, dated in Deviations).
+- [ ] The policy permits pushing the new ID `SolTechnology.Core.Auth` (owner-confirmed, dated in Deviations).
 
 ## Open questions
 - none (Q10 resolved by the user on 2026-11-02; RQ2 resolved: no rc dry run)
