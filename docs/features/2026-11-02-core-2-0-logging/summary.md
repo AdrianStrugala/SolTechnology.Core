@@ -25,5 +25,5 @@ are `done` and after these library features are `completed`: none. No step is `b
 | 04 | Logging — sanitize inbound correlation IDs; safe timings and masking | [`steps/04-logging-correlation-and-masking-input.md`](steps/04-logging-correlation-and-masking-input.md) | done |
 | 05 | Logging — public surface cleanup (`LoggerExtensions`, internal `Operations`) | [`steps/05-logging-public-surface.md`](steps/05-logging-public-surface.md) | done |
 | 06 | Module docs — `docs/Log.md` | [`steps/06-docs-log.md`](steps/06-docs-log.md) | done |
-| 07 | Guide conformance — Logging | [`steps/07-conform-logging.md`](steps/07-conform-logging.md) | in-progress |
-| 08 | Retrospective | [`steps/08-retrospective.md`](steps/08-retrospective.md) | to-do |
+| 07 | Guide conformance — Logging | [`steps/07-conform-logging.md`](steps/07-conform-logging.md) | done |
+| 08 | Retrospective | [`steps/08-retrospective.md`](steps/08-retrospective.md) | in-progress |
