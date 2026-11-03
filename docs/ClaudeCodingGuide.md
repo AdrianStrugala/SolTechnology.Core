@@ -456,6 +456,7 @@ These apply to every class you write, regardless of layer.
     - Does it record delivery history? → move it to the dated feature record.
     - Does it explain *what* the code does? → delete it, rename the symbol instead.
     - Is it genuinely a single non-obvious *why*? → keep, one line.
+    - Exception: jokes (humorous comments, messages, names — e.g. `//I'm just void` in `Nothing.cs`) stay exactly as written; never remove or "professionalize" them, even under §15 (user, 2026-11-03).
   11. **Always use braces** for `if`, `else`, `for`, `foreach`, `while`, and `using`, including a
     single `return`, `continue`, or `throw`.
   12. **Types are `public` by default** in application/sample projects and whenever assembly
