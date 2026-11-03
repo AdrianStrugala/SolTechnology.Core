@@ -113,12 +113,16 @@ public static class ModuleInstaller
         }
     }
 
-    /// <summary>
-    /// Adds the request-logging middleware. Should be registered early in the pipeline
-    /// (before <c>UseRouting</c>) so that all requests are observed.
-    /// </summary>
-    public static IApplicationBuilder UseSolLogging(this IApplicationBuilder app)
-        => app.UseMiddleware<LoggingMiddleware>();
+    /// <param name="app">The application pipeline.</param>
+    extension(IApplicationBuilder app)
+    {
+        /// <summary>
+        /// Adds the request-logging middleware. Should be registered early in the pipeline
+        /// (before <c>UseRouting</c>) so that all requests are observed.
+        /// </summary>
+        public IApplicationBuilder UseSolLogging()
+            => app.UseMiddleware<LoggingMiddleware>();
+    }
 
     private static OptionsBuilder<LoggingOptions> RegisterCore(IServiceCollection services)
     {
