@@ -7,6 +7,7 @@
     <File Path="docs/Bus.md" />
     <File Path="docs/Cache.md" />
     <File Path="docs/Core.md" />
+    <File Path="docs/CQRS.md" />
     <File Path="docs/Clients.md" />
     <File Path="docs/Cron.md" />
     <File Path="docs/Guards.md" />

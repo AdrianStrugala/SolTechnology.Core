@@ -202,7 +202,12 @@ catch (Exception ex)
 ```
 
 Inside a CQRS pipeline these are emitted automatically, with `[LogScope]`
-properties in the scope — see `SolTechnology.Core.CQRS`.
+properties in the scope — see `SolTechnology.Core.CQRS`. A handler that returns a
+failed `Result` writes EventId 2149 at Warning instead of `OperationSucceeded`:
+`Operation: [{OperationName}]. Status: [FAIL]. Duration: [{DurationMs} ms]. ErrorType: [{ErrorType}]. ErrorMessage: [{ErrorMessage}]`.
+It carries only the `Error` type name and `Error.Message` (never validation
+details or data), so `Error.Message` must not contain personal data — including
+the inner messages an `AggregateError` builds into its own.
 
 #### OpenTelemetry
 
