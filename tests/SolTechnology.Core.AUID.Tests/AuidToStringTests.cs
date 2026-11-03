@@ -1,4 +1,5 @@
 using System;
+using System.Globalization;
 using FluentAssertions;
 using NUnit.Framework;
 
@@ -237,5 +238,31 @@ public class AuidToStringTests
 
         // Assert
         result.Should().NotContain("-");
+    }
+
+    [TestCase("th-TH")]
+    [TestCase("ar-SA")]
+    public void ToString_UnderCulture_RoundTrips(string cultureName)
+    {
+        // Arrange
+        var original = Auid.Parse("CTY_20241205123456_012345");
+        var previousCulture = CultureInfo.CurrentCulture;
+        CultureInfo.CurrentCulture = new CultureInfo(cultureName);
+
+        try
+        {
+            // Act
+            var serialized = original.ToString();
+            var success = Auid.TryParse(serialized, null, out var parsed);
+
+            // Assert
+            serialized.Should().Be("CTY_20241205123456_012345");
+            success.Should().BeTrue();
+            parsed.Should().Be(original);
+        }
+        finally
+        {
+            CultureInfo.CurrentCulture = previousCulture;
+        }
     }
 }

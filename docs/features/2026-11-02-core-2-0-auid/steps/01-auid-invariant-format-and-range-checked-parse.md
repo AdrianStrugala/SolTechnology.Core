@@ -1,7 +1,7 @@
 ---
 spec: 2026-11-02-core-2-0-auid
 step: 01
-status: to-do
+status: done
 ---
 
 # Step 01: AUID — culture-invariant formatting, range-checked parsing
@@ -32,12 +32,14 @@ Former core step 19; moved here by the per-library regroup (user, 2026-11-02).
   - Test `TryParse_1xThaiCalendarString_ReturnsFalse` uses a literal produced by `4097d47f` under `th-TH`.
 
 ## Acceptance criteria
-- [ ] `dotnet test tests/SolTechnology.Core.AUID.Tests` is green, and the new tests fail on `4097d47f`.
-- [ ] Canonical format of in-range IDs unchanged (existing round-trip tests green).
-- [ ] `grep -c "Papież Polak robi BUM" src/SolTechnology.Core.AUID/Auid.cs` prints `1` (the joke message is unchanged).
-- [ ] RM-11: `TryParse_1xThaiCalendarString_ReturnsFalse` is green, and the core brief's `auid 01` release-notes input uses the RM-11 wording.
+- [x] `dotnet test tests/SolTechnology.Core.AUID.Tests` is green, and the new tests fail on `4097d47f`.
+- [x] Canonical format of in-range IDs unchanged (existing round-trip tests green).
+- [x] `grep -c "Papież Polak robi BUM" src/SolTechnology.Core.AUID/Auid.cs` prints `1` (the joke message is unchanged).
+- [x] RM-11: `TryParse_1xThaiCalendarString_ReturnsFalse` is green, and the core brief's `auid 01` release-notes input uses the RM-11 wording.
 
 ## Open questions
 - none
 
 ## Deviations
+
+None material. The AUID sources and tests were unchanged since `4097d47f` (`git diff --stat 4097d47f -- src/SolTechnology.Core.AUID tests/SolTechnology.Core.AUID.Tests` was empty), so the five new test cases were run against that code first and all failed. The `TryParse_1xThaiCalendarString_ReturnsFalse` literal `CTY_25671205123456_012345` was produced by that code under `th-TH` (`ThaiBuddhistCalendar`). The range check uses braces (Guide §9.11).

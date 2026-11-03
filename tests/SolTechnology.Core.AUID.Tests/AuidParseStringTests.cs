@@ -305,4 +305,33 @@ public class AuidParseStringTests
         // Assert
         parsed.Should().Be(original);
     }
+
+    [TestCase("20000101000000")]
+    [TestCase("21380101000000")]
+    public void TryParse_OutOfRange_ReturnsFalse(string timestamp)
+    {
+        // Arrange
+        var outOfRange = $"ORD_{timestamp}_000001";
+
+        // Act
+        var success = Auid.TryParse(outOfRange, null, out var result);
+
+        // Assert
+        success.Should().BeFalse();
+        result.Should().Be(Auid.Empty);
+    }
+
+    [Test]
+    public void TryParse_1xThaiCalendarString_ReturnsFalse()
+    {
+        // Arrange
+        const string writtenBy1xUnderThTH = "CTY_25671205123456_012345";
+
+        // Act
+        var success = Auid.TryParse(writtenBy1xUnderThTH, null, out var result);
+
+        // Assert
+        success.Should().BeFalse();
+        result.Should().Be(Auid.Empty);
+    }
 }

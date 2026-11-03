@@ -502,8 +502,9 @@ working folder is deleted. Its inputs are the `C-nn`, `P-nn`, and `L-nn` tables 
 by the `Deviations` of this brief and of every library brief (see "Per-library regroup"), plus
 these notes from the steps:
 
-- auid 01 (former step 19): `Auid.TryParse` rejects an out-of-range ID that 1.x parsed and stored. Such IDs had
-  corrupted code bits, so they never round-tripped.
+- auid 01 (former step 19, premortem RM-11): Hosts that ran 1.x under a non-Gregorian current culture (for example
+  th-TH or ar-SA) wrote AUID strings with a shifted year. 2.0 rejects them in `TryParse` and in JSON, so records that
+  store such strings cannot be loaded until the IDs are migrated.
 - hangfire 03 (former step 32, P-05): 1.x event jobs keep running in 2.x; the legacy one-argument overload is removed
   in 3.0. No queue drain is needed.
 - tale 09 (former step 41, P-04): custom repositories add a `Version` column and a conditional write; DreamTravel's

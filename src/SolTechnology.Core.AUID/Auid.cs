@@ -283,12 +283,12 @@ public readonly struct Auid : IComparable<Auid>, IEquatable<Auid>, IParsable<Aui
             // Write Time (YYYYMMDDHHmmss - 14 chars)
             // Convert seconds since epoch to DateTime
             var dateTime = new DateTime(EpochTicks + (timePart * TimeSpan.TicksPerSecond), DateTimeKind.Utc);
-            dateTime.TryFormat(span.Slice(4, 14), out _, "yyyyMMddHHmmss");
+            dateTime.TryFormat(span.Slice(4, 14), out _, "yyyyMMddHHmmss", System.Globalization.CultureInfo.InvariantCulture);
 
             span[18] = Separator;
 
             // Write Random (6 decimal digits, padded with zeros)
-            randPart.TryFormat(span.Slice(19, 6), out _, "D6");
+            randPart.TryFormat(span.Slice(19, 6), out _, "D6", System.Globalization.CultureInfo.InvariantCulture);
         });
     }
 
@@ -343,6 +343,10 @@ public readonly struct Auid : IComparable<Auid>, IEquatable<Auid>, IParsable<Aui
 
         // Convert DateTime to seconds since epoch
         long timeVal = (dateTime.Ticks - EpochTicks) / TimeSpan.TicksPerSecond;
+        if (timeVal < 0 || timeVal > MaskTime)
+        {
+            return false;
+        }
 
         // 3. Parse Random (6 decimal digits)
         if (!long.TryParse(span.Slice(19, 6), System.Globalization.NumberStyles.None, null, out long randVal))
