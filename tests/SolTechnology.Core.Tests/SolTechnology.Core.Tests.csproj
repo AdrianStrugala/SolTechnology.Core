@@ -4,5 +4,9 @@
     <RootNamespace>SolTechnology.Core.Tests</RootNamespace>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\SolTechnology.Core\SolTechnology.Core.csproj" />
+  </ItemGroup>
+
 </Project>
 

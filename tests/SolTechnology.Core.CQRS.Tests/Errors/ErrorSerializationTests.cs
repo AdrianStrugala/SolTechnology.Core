@@ -180,6 +180,42 @@ public class ErrorSerializationTests
     {
         public int Code { get; init; }
     }
+
+    // Captured from SolTechnology.Core 1.0.0 (4097d47f) with default System.Text.Json options.
+    private const string Result1xSuccessJson = "{\"IsSuccess\":true}";
+    private const string ResultOfInt1xSuccessJson = "{\"Data\":5,\"IsSuccess\":true}";
+    private const string ResultOfInt1xFailureJson =
+        "{\"Data\":0,\"IsSuccess\":false,\"Error\":{\"$type\":\"notFound\",\"Message\":\"Missing\",\"Description\":null,\"Recoverable\":false,\"CorrelationId\":null}}";
+
+    [Test]
+    public void Serialize_Result_MatchesTheShapeStoredBy1x()
+    {
+        // Act
+        var success = JsonSerializer.Serialize(Result.Success());
+        var successOfInt = JsonSerializer.Serialize(Result<int>.Success(5));
+        var failureOfInt = JsonSerializer.Serialize(Result<int>.Fail(new NotFoundError { Message = "Missing" }));
+
+        // Assert
+        success.Should().Be(Result1xSuccessJson);
+        successOfInt.Should().Be(ResultOfInt1xSuccessJson);
+        failureOfInt.Should().Be(ResultOfInt1xFailureJson);
+    }
+
+    [Test]
+    public void RoundTrip_1xResultJson_Deserializes()
+    {
+        // Act
+        var success = JsonSerializer.Deserialize<Result>(Result1xSuccessJson)!;
+        var successOfInt = JsonSerializer.Deserialize<Result<int>>(ResultOfInt1xSuccessJson)!;
+        var failureOfInt = JsonSerializer.Deserialize<Result<int>>(ResultOfInt1xFailureJson)!;
+
+        // Assert
+        success.IsSuccess.Should().BeTrue();
+        successOfInt.IsSuccess.Should().BeTrue();
+        successOfInt.Data.Should().Be(5);
+        failureOfInt.IsFailure.Should().BeTrue();
+        failureOfInt.Error.Should().BeOfType<NotFoundError>().Which.Message.Should().Be("Missing");
+    }
 }
 
 

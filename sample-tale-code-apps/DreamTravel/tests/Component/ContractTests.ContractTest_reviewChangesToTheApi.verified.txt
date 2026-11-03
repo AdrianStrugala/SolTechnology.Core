@@ -547,6 +547,7 @@ components:
       properties:
         isSuccess:
           type: boolean
+          readOnly: true
         error:
           $ref: '#/components/schemas/Error'
         data:
@@ -554,6 +555,7 @@ components:
           items:
             $ref: '#/components/schemas/Intersection'
           nullable: true
+          readOnly: true
       additionalProperties: false
     Path:
       type: object
@@ -716,6 +718,7 @@ components:
       properties:
         isSuccess:
           type: boolean
+          readOnly: true
         error:
           $ref: '#/components/schemas/Error'
         data:
@@ -723,6 +726,7 @@ components:
           items:
             $ref: '#/components/schemas/Street'
           nullable: true
+          readOnly: true
       additionalProperties: false
     ValidationResult:
       type: object

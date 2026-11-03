@@ -151,9 +151,9 @@ public sealed class ResultConversionFilterTests
     [Test]
     public async Task Failed_Result_Without_Error_Falls_Back_To_500_ProblemDetails()
     {
-        // Malformed Result (IsSuccess=false but Error=null) — must still produce a valid body,
-        // not a NullReferenceException at the boundary.
-        var malformed = new Result<Payload> { IsSuccess = false, Error = null };
+        // Malformed Result (IsSuccess=false but Error=null), e.g. from a hand-written JSON payload —
+        // must still produce a valid body, not a NullReferenceException at the boundary.
+        var malformed = System.Text.Json.JsonSerializer.Deserialize<Result<Payload>>("{\"IsSuccess\":false}")!;
         var context = BuildResultExecutingContext(malformed);
 
         await _filter.OnResultExecutionAsync(context, NoOpNext);

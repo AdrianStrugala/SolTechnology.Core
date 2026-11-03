@@ -5,16 +5,20 @@ namespace SolTechnology.Core;
 
 /// <summary>
 /// Represents the outcome of a command or query — either success or failure with an error.
+/// Build instances through the static factories (<see cref="Success()"/>, <see cref="Fail(Error)"/>);
+/// state cannot be set from outside, so a result is never both successful and failed.
 /// </summary>
 public record Result
 {
-    public bool IsSuccess { get; init; }
+    [JsonInclude]
+    public bool IsSuccess { get; private protected init; }
 
     [JsonIgnore]
     public bool IsFailure => !IsSuccess;
 
+    [JsonInclude]
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-    public Error? Error { get; init; }
+    public Error? Error { get; private protected init; }
 
     /// <summary>
     /// Non-generic accessor for the payload carried by <see cref="Result{T}"/>.
@@ -48,8 +52,9 @@ public record Result
 /// </summary>
 public record Result<T> : Result
 {
+    [JsonInclude]
     [JsonIgnore(Condition = JsonIgnoreCondition.Never)]
-    public T? Data { get; init; }
+    public T? Data { get; private init; }
 
     public override object? GetData() => Data;
 
@@ -72,6 +77,8 @@ public record Result<T> : Result
     };
 
     public new static Task<Result<T>> FailAsTask(string message) => Task.FromResult(Fail(message));
+
+    public new static Task<Result<T>> FailAsTask(Error error) => Task.FromResult(Fail(error));
 
     public static Task<Result<T>> SuccessAsTask(T data) => Task.FromResult(Success(data));
 }
