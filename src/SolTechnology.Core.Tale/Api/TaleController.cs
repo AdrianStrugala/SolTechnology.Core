@@ -1,4 +1,5 @@
 using System.Collections.Concurrent;
+using System.Diagnostics;
 using System.Reflection;
 using System.Text.Json;
 using Microsoft.AspNetCore.Mvc;
@@ -8,6 +9,7 @@ using SolTechnology.Core.AUID;
 using SolTechnology.Core.Errors;
 using SolTechnology.Core.Tale.Models;
 using SolTechnology.Core.Tale.Orchestration;
+using SolTechnology.Core.Tale.Persistence;
 
 namespace SolTechnology.Core.Tale.Api;
 
@@ -58,7 +60,7 @@ public abstract class TaleController(
         object? typedInput;
         try
         {
-            typedInput = JsonSerializer.Deserialize(input.GetRawText(), args![0]);
+            typedInput = JsonSerializer.Deserialize(input.GetRawText(), args![0], TaleJsonOptions.Default);
         }
         catch (JsonException ex)
         {
@@ -82,12 +84,12 @@ public abstract class TaleController(
         catch (TargetInvocationException tie) when (tie.InnerException != null)
         {
             Logger.LogError(tie.InnerException, "Failed to start tale {HandlerType}", handlerTypeName);
-            return StatusCode(500, Result.Fail(tie.InnerException.Message));
+            return UnexpectedFailure();
         }
         catch (Exception ex)
         {
             Logger.LogError(ex, "Failed to start tale {HandlerType}", handlerTypeName);
-            return StatusCode(500, Result.Fail(ex.Message));
+            return UnexpectedFailure();
         }
     }
 
@@ -134,12 +136,12 @@ public abstract class TaleController(
         catch (TargetInvocationException tie) when (tie.InnerException != null)
         {
             Logger.LogError(tie.InnerException, "Failed to resume tale {TaleId}", taleId);
-            return StatusCode(500, Result.Fail(tie.InnerException.Message));
+            return UnexpectedFailure();
         }
         catch (Exception ex)
         {
             Logger.LogError(ex, "Failed to resume tale {TaleId}", taleId);
-            return StatusCode(500, Result.Fail(ex.Message));
+            return UnexpectedFailure();
         }
     }
 
@@ -194,7 +196,7 @@ public abstract class TaleController(
 
         try
         {
-            var context = JsonSerializer.Deserialize(instance.Context, args![1]);
+            var context = JsonSerializer.Deserialize(instance.Context, args![1], TaleJsonOptions.Default);
             var outputProp = args[1].GetProperty("Output");
             var output = outputProp?.GetValue(context);
 
@@ -208,7 +210,7 @@ public abstract class TaleController(
         catch (Exception ex)
         {
             Logger.LogError(ex, "Failed to extract result for tale {TaleId}", taleId);
-            return StatusCode(500, Result.Fail($"Failed to extract tale output: {ex.Message}"));
+            return UnexpectedFailure();
         }
     }
 
@@ -269,6 +271,13 @@ public abstract class TaleController(
         _methodCache.GetOrAdd((typeof(TaleManager), methodName), key =>
             typeof(TaleManager).GetMethod(key.Item2)
             ?? throw new InvalidOperationException($"TaleManager method '{key.Item2}' not found."));
+
+    private ObjectResult UnexpectedFailure() =>
+        StatusCode(500, Result.Fail(new Error
+        {
+            Message = "An unexpected error occurred.",
+            CorrelationId = Activity.Current?.TraceId.ToHexString() ?? HttpContext?.TraceIdentifier
+        }));
 
     private IActionResult UnwrapResult(Task task)
     {

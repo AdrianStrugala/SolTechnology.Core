@@ -185,7 +185,7 @@ public class TaleManager
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error executing tale {Handler}", typeof(THandler).Name);
-            return Result<TaleInstance>.Fail(ex.Message);
+            return Result<TaleInstance>.Fail($"Tale {typeof(THandler).Name} failed unexpectedly.");
         }
     }
 
@@ -210,7 +210,7 @@ public class TaleManager
         catch (Exception ex)
         {
             _logger.LogError(ex, "Failed to load tale state for {TaleId}", taleId);
-            return Result<TaleInstance>.Fail($"Failed to load tale: {ex.Message}");
+            return Result<TaleInstance>.Fail("Failed to load tale.");
         }
     }
 }

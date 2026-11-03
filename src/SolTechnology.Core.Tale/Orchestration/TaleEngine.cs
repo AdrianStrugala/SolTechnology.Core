@@ -3,6 +3,7 @@ using System.Reflection;
 using System.Text.Json;
 using Microsoft.Extensions.Logging;
 using SolTechnology.Core.AUID;
+using SolTechnology.Core.Errors;
 using SolTechnology.Core.Tale.Models;
 using SolTechnology.Core.Tale.Persistence;
 // collapsed: using SolTechnology.Core.Tale.Tale;
@@ -321,16 +322,13 @@ internal sealed class TaleEngine<TInput, TContext, TOutput>
         }
         catch (JsonException ex)
         {
-            return Result.Fail(new Error
-            {
-                Message = $"Failed to deserialize input for chapter '{chapter.ChapterId}': {ex.Message}",
-                Description = ex.ToString()
-            });
+            _logger.LogWarning(ex, "Input for chapter {ChapterId} could not be deserialized", chapter.ChapterId);
+            return RejectInput(chapter, chapterInfo, $"Input for chapter '{chapter.ChapterId}' is invalid at '{ex.Path}'.");
         }
 
         if (deserializedInput == null)
         {
-            return Result.Fail($"Input for chapter '{chapter.ChapterId}' deserialized to null.");
+            return RejectInput(chapter, chapterInfo, $"Input for chapter '{chapter.ChapterId}' is required.");
         }
 
         chapterInfo.ProvidedData = _resumeInput;
@@ -350,6 +348,13 @@ internal sealed class TaleEngine<TInput, TContext, TOutput>
         }
 
         return result;
+    }
+
+    private Result RejectInput(IChapter<TContext> chapter, ChapterInfo chapterInfo, string message)
+    {
+        var error = new ValidationError { Message = message };
+        PauseForRetry(chapter, chapterInfo, error);
+        return Result.Fail(error);
     }
 
     /// <summary>
