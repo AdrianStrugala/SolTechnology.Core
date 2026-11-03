@@ -46,7 +46,11 @@ public record AggregateError : Error
 
     private static string BuildMessage(string baseMessage, IReadOnlyList<Error> errors)
     {
-        if (errors.Count == 0) return baseMessage;
+        if (errors.Count == 0)
+        {
+            return baseMessage;
+        }
+
         return baseMessage + " " + string.Join(" ", errors.Select(e => $"({e.Message})"));
     }
 }
