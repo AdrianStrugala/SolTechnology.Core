@@ -111,9 +111,8 @@ authorization joins the package later; confirmed under `CLAUDE.md §2` as `C-28`
 test project, assembly, namespace, NuGet ID, `AddSolAuthentication` → `AddSolAuth`, and `AuthenticationConfiguration` →
 `AuthConfiguration` (the user asked the plan to carry the configuration rename inside `C-28`), and moves the package
 icon. It runs first so later steps edit the new paths; former steps 01–10 became 02–11, and their paths, commands, and
-acceptance criteria now name `src/SolTechnology.Core.Auth` and `tests/SolTechnology.Core.Auth.Tests`. A new step 00
-runs the premortem for step 01, because it edits a `ModuleInstaller.cs` and the core premortem predates `C-28`.
-`review` returns to `pending`: the plan gained a breaking public API step. Alternatives considered for the rename
+acceptance criteria now name `src/SolTechnology.Core.Auth` and `tests/SolTechnology.Core.Auth.Tests`. The user skipped
+review and premortem for the rename (2026-11-03); no step 00 was added. Alternatives considered for the rename
 mechanics: (a) a clean rename with no forwarding package (chosen; 2.0 is already MAJOR, the old ID stays at 1.x and is
 deprecated on nuget.org in release 05 with the alternative `SolTechnology.Core.Auth`); (b) keep shipping a 2.0
 `SolTechnology.Core.Authentication` that depends on `SolTechnology.Core.Auth` with `[Obsolete]` forwarders (rejected: a

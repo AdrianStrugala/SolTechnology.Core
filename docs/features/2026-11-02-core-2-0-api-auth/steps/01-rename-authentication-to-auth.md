@@ -80,7 +80,7 @@ no behaviour change. It runs first, so steps 02–10 edit the new paths. Semver:
 - [ ] `dotnet pack SolTechnology.Core.slnx -c Release -o /tmp/auth-pack` produces `/tmp/auth-pack/SolTechnology.Core.Auth.2.0.0.nupkg` and no `SolTechnology.Core.Authentication.*.nupkg`, and `unzip -l` of the Auth package lists `lib/net10.0/SolTechnology.Core.Auth.dll`, `docs/readme.md`, `docs/icon.png`, and `buildTransitive/SolTechnology.Core.Auth.targets`.
 - [ ] `unzip -p /tmp/auth-pack/SolTechnology.Core.Auth.2.0.0.nupkg docs/icon.png | cmp - docs/icons/SolTechnology.Core.Auth.png` reports no difference.
 - [ ] SOLCORE001 still fires: a throwaway console project (not committed) that references `SolTechnology.Core.Auth` 2.0.0 from `/tmp/auth-pack` (as a local package source, with its 2.0.0 dependencies) and `SolTechnology.Core.Authentication` 1.x from nuget.org prints warning `SOLCORE001` on `dotnet build`; with only `SolTechnology.Core.Auth` 2.0.0 it prints none.
-- [ ] `SolTechnology.Core.Auth/ModuleInstaller.cs` registration diff against the old file shows only the renamed method, parameter, and type (premortem step 00 mitigations applied).
+- [ ] `SolTechnology.Core.Auth/ModuleInstaller.cs` registration diff against the old file shows only the renamed method, parameter, and type.
 - [ ] The PR uses a breaking Conventional Commit (`refactor(auth)!:` with a `BREAKING CHANGE:` footer naming `C-28`, per the [`commit-message`](../../../../.github/skills/commit-message/SKILL.md) skill).
 
 ## Open questions
