@@ -41,7 +41,8 @@ public class TaleControllerTests
         services.AddSingleton<TestService>();
         services.AddSolTale(assemblies: typeof(TaleControllerTests).Assembly)
             .ExposeOverHttp<LifecycleTaleV1>()
-            .ExposeOverHttp<ThrowingConstructorTale>();
+            .ExposeOverHttp<ThrowingConstructorTale>()
+            .ExposeOverHttp<ThrowingChapterTale>();
 
         _sp = services.BuildServiceProvider();
         _registry = _sp.GetRequiredService<TaleHandlerRegistry>();
@@ -254,6 +255,22 @@ public class TaleControllerTests
             "Tale handler [LifecycleTaleV2] exists but is not exposed over HTTP; call ExposeOverHttp<THandler>() to expose it.");
     }
 
+    [Test]
+    public async Task Start_ChapterThrows_NeitherStartBodyNorStoredStateContainExceptionMessage()
+    {
+        // Act
+        var start = await _controller.StartStory(nameof(ThrowingChapterTale), JsonSerializer.SerializeToElement(new LifecycleInput { Value = 1 }));
+        var stored = (await _repo.List()).Should().ContainSingle().Subject;
+        var state = await _controller.GetStoryState(stored.TaleId.ToString());
+
+        // Assert
+        JsonSerializer.Serialize(start.Should().BeOfType<BadRequestObjectResult>().Subject.Value)
+            .Should().NotContain(ThrowingChapter.Secret).And.Contain("failed unexpectedly");
+        JsonSerializer.Serialize(state.Should().BeOfType<OkObjectResult>().Subject.Value)
+            .Should().NotContain(ThrowingChapter.Secret).And.Contain("failed unexpectedly");
+        stored.Status.Should().Be(TaleStatus.Failed);
+    }
+
     private TestTaleController CreateController(ILogger<TaleController> logger) =>
         new(_sp.GetRequiredService<TaleManager>(), _registry, _sp.GetRequiredService<TaleOptions>(), logger)
         {
@@ -271,6 +288,20 @@ public class TaleControllerTests
             : base(sp, logger) => throw new InvalidOperationException(Secret);
 
         protected override Tale<LifecycleOutput> Tell() => Open<LifecyclePassingChapter>().Finale(ctx => ctx.Output);
+    }
+
+    public sealed class ThrowingChapter : Chapter<LifecycleContext>
+    {
+        public const string Secret = "chapter-secret-connection-string";
+
+        public override Task<Result> Read(LifecycleContext context, CancellationToken cancellationToken) =>
+            throw new InvalidOperationException(Secret);
+    }
+
+    public sealed class ThrowingChapterTale(IServiceProvider sp, ILogger<ThrowingChapterTale> logger)
+        : TaleHandler<LifecycleInput, LifecycleContext, LifecycleOutput>(sp, logger)
+    {
+        protected override Tale<LifecycleOutput> Tell() => Open<ThrowingChapter>().Finale(ctx => ctx.Output);
     }
 
     [Test]

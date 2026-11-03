@@ -40,14 +40,17 @@ public abstract partial class TaleHandler<TInput, TContext, TOutput>
         }
         catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
         {
+            _engine.MarkCancelled();
             await SafePersistTerminalState();
             return Result<TOutput>.Fail(new TaleCancelledError(Context.TaleInstanceId));
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Tale [{Handler}] failed", GetType().Name);
+            var error = UnexpectedFailure.Of($"Tale [{GetType().Name}] failed unexpectedly.");
+            _engine.Fail(error);
             await SafePersistTerminalState();
-            return Result<TOutput>.Fail(Error.From(ex));
+            return Result<TOutput>.Fail(error);
         }
     }
 

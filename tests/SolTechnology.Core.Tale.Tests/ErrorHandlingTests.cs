@@ -122,7 +122,7 @@ public class ErrorHandlingTests
         // Assert
         result.IsFailure.Should().BeTrue();
         result.Error.Should().NotBeNull();
-        result.Error!.Message.Should().Contain("Test exception");
+        result.Error!.Message.Should().Be("Chapter [ErrorTestExceptionChapter] failed unexpectedly.");
     }
 
     [Test]
@@ -210,7 +210,7 @@ public class ErrorHandlingTests
         // Assert
         result.IsFailure.Should().BeTrue();
         result.Error.Should().NotBeOfType<TaleCancelledError>();
-        result.Error!.Message.Should().Contain("HttpClient.Timeout");
+        result.Error!.Message.Should().Be("Chapter [ErrorTestHttpTimeoutChapter] failed unexpectedly.");
         var persisted = (await repository.List()).Should().ContainSingle().Subject;
         persisted.Status.Should().Be(TaleStatus.Failed);
         persisted.History.Should().ContainSingle().Which.Status.Should().Be(TaleStatus.Failed);

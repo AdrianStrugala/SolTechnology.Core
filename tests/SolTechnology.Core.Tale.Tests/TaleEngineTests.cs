@@ -111,7 +111,7 @@ public class TaleEngineTests
         // Assert
         result.IsFailure.Should().BeTrue();
         result.Error.Should().NotBeNull();
-        result.Error!.Message.Should().Contain("Intentional exception");
+        result.Error!.Message.Should().Be("Chapter [EngineTestThrowingChapter] failed unexpectedly.");
     }
 
     [Test]

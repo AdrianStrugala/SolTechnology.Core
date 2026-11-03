@@ -71,6 +71,10 @@ internal sealed class TaleEngine<TInput, TContext, TOutput>(
         _ => Result<TOutput>.Success(conclusion(_context))
     };
 
+    public void MarkCancelled() => _state.IsCancelled = true;
+
+    public void Fail(Error error) => _state.Fail(null, error);
+
     // The terminal state must be stored even when the run's token is what ended the run.
     public Task PersistTerminalState() =>
         _state.SaveError == null ? Save(_state.TerminalStatus, CancellationToken.None) : Task.CompletedTask;
@@ -135,7 +139,7 @@ internal sealed class TaleEngine<TInput, TContext, TOutput>(
         catch (Exception ex)
         {
             logger.LogError(ex, "Chapter [{ChapterId}] failed", chapter.ChapterId);
-            _state.Fail(chapterInfo, Error.From(ex));
+            _state.Fail(chapterInfo, UnexpectedFailure.Of($"Chapter [{chapter.ChapterId}] failed unexpectedly."));
         }
     }
 

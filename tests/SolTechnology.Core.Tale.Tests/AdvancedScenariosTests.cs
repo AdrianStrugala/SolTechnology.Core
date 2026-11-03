@@ -544,7 +544,7 @@ public class AdvancedScenariosTests
 
         // Assert
         result.IsFailure.Should().BeTrue();
-        result.Error!.Message.Should().ContainAny("save", "persist", "storage");
+        result.Error!.Message.Should().Be("Tale [SinglePauseTale] failed unexpectedly.");
     }
 
     [Test]
