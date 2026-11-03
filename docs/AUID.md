@@ -6,16 +6,16 @@ AUID structure: **[Code: 15 bits] [Timestamp: 32 bits] [Random: 17 bits]** = 64 
 
 - **Code (15 bits)**: 3-letter identifier (AAA-ZZZ) for entity type
 - **Timestamp (32 bits)**: Seconds since 2001-01-01 UTC (valid until year 2137)
-- **Random (17 bits)**: Collision prevention within same second (0-131071)
+- **Random (17 bits)**: Collision prevention within same second (0-131071). It is a bound, not a guarantee — see [Uniqueness and ordering](#uniqueness-and-ordering)
 
 ### Features
 
 - Zero-allocation design using `Span<T>` and `stackalloc`
 - Type-safe with automatic code generation from type names
 - Human-readable string format: `COD_YYYYMMDDHHmmss_RANDOM` (e.g., `ORD_20241205123456_012345`)
-- Sortable by creation time
+- Sortable by creation second within one code
 - Compact 64-bit storage (vs 128-bit GUID)
-- Built-in type converter for JSON serialization
+- Built-in JSON converter (values and dictionary keys) and `TypeConverter`
 
 ### Installation
 
@@ -107,11 +107,28 @@ Example: `ORD_20241205123456_012345`
 
 ### Use Cases
 
-- Database primary keys (more compact than GUID)
-- Distributed ID generation without coordination
-- Sortable IDs by creation time
+- Database primary keys (more compact than GUID) at moderate creation rates per code
+- Distributed ID generation without coordination, within the collision bound below
+- IDs sortable by creation second within one code
 - Human-readable entity identification
 - API response identifiers
+
+### Uniqueness and ordering
+
+Two AUIDs with the same code and the same second differ only in their 17 random bits (131,072 values).
+The chance that a burst of IDs created for one code in one second contains a duplicate is:
+
+| IDs per second, per code | Collision probability |
+|---|---|
+| 51 | ~1% |
+| ~426 | ~50% |
+
+Different codes or different seconds never collide. Above these rates, add a unique constraint
+in storage or use a different ID scheme.
+
+Ordering (`CompareTo`, `<`, `>` and sorting by `Value`) follows creation time only for IDs with the
+same code; IDs created in the same second are in random order. Across codes the code bits dominate,
+and codes from `YGE` to `ZZZ` set the sign bit of the 64-bit value, so they sort before `AAA`.
 
 ### Limitations
 

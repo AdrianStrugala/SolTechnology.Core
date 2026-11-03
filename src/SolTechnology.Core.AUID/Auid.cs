@@ -451,7 +451,16 @@ public class AuidTypeConverter : TypeConverter
     /// <inheritdoc />
     public override object? ConvertFrom(ITypeDescriptorContext? context, System.Globalization.CultureInfo? culture, object value)
     {
-        if (value is string str) return Auid.Parse(str);
+        if (value is string str)
+        {
+            if (Auid.TryParse(str, culture, out var auid))
+            {
+                return auid;
+            }
+
+            throw new NotSupportedException($"Unable to convert [{str}] to Auid. Expected format COD_YYYYMMDDHHmmss_RANDOM.");
+        }
+
         return base.ConvertFrom(context, culture, value);
     }
 
