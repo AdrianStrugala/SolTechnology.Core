@@ -37,6 +37,42 @@ public class CorrelationIdTests
         id.Value.Length.Should().BeLessThanOrEqualTo(CorrelationId.MaxLength);
     }
 
+    [TestCase("abc\r\nInjected")]
+    [TestCase("<script>")]
+    [TestCase("id with spaces")]
+    [TestCase("a,b")]
+    public void FromRequest_InvalidInboundId_GeneratesNew(string inboundId)
+    {
+        // Arrange
+        Activity.Current = null;
+        var ctx = new DefaultHttpContext();
+        ctx.Request.Headers[CorrelationId.HeaderKey] = inboundId;
+
+        // Act
+        var id = CorrelationId.FromRequest(ctx.Request, out var error);
+
+        // Assert
+        id.Value.Should().MatchRegex("^[0-9a-f]{32}$");
+        error.Should().Contain(CorrelationId.HeaderKey).And.NotContain(inboundId);
+    }
+
+    [TestCase("my-custom-id")]
+    [TestCase("Order_42.retry:3")]
+    public void FromRequest_AllowedInboundId_IsKept(string inboundId)
+    {
+        // Arrange
+        Activity.Current = null;
+        var ctx = new DefaultHttpContext();
+        ctx.Request.Headers[CorrelationId.HeaderKey] = inboundId;
+
+        // Act
+        var id = CorrelationId.FromRequest(ctx.Request, out var error);
+
+        // Assert
+        id.Value.Should().Be(inboundId);
+        error.Should().BeNull();
+    }
+
     [Test]
     public void FromRequest_prefers_activity_trace_id_over_header()
     {

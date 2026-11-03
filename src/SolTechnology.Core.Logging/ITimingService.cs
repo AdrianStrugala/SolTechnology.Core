@@ -2,7 +2,7 @@ namespace SolTechnology.Core.Logging;
 
 /// <summary>
 /// Per-request timing diagnostics — records named sub-context durations ("where did the time go?").
-/// Scoped service backed by <see cref="AsyncLocal{T}"/> so timing flows with the async request.
+/// Scoped service: each request (DI scope) gets its own instance, and timings live on that instance.
 /// <para>
 /// Usage:
 /// <code>
@@ -22,7 +22,8 @@ public interface ITimingService
     IDisposable StartContext(string name);
 
     /// <summary>
-    /// Returns the aggregated timings as a dictionary of name → elapsed milliseconds.
+    /// Returns a read-only snapshot of the aggregated timings (name → elapsed milliseconds).
+    /// Later <see cref="StartContext"/> or <see cref="Reset"/> calls do not change it.
     /// Called by the logging infrastructure on request/operation finish.
     /// </summary>
     IDictionary<string, long> GetTimings();

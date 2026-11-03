@@ -1,3 +1,4 @@
+using System.Buffers;
 using System.Diagnostics;
 using Microsoft.AspNetCore.Http;
 
@@ -11,7 +12,8 @@ namespace SolTechnology.Core.Logging.Correlations;
 /// <list type="number">
 ///   <item>The trace id of the current <see cref="Activity"/> (populated automatically
 ///         from the inbound <c>traceparent</c> header by ASP.NET Core).</item>
-///   <item>The optional override header <c>X-Correlation-Id</c> (only when no Activity is in scope).</item>
+///   <item>The optional override header <c>X-Correlation-Id</c> (only when no Activity is in scope),
+///         accepted only when it contains <c>[A-Za-z0-9._:-]</c> and is at most <see cref="MaxLength"/> long.</item>
 ///   <item>A freshly generated 32-character hex string.</item>
 /// </list>
 /// On outbound the id is echoed on both <c>traceparent</c> (when an Activity is in scope,
@@ -32,6 +34,9 @@ public sealed record CorrelationId
 
     /// <summary>Logger-scope property name. Matches App Insights / OTel convention.</summary>
     public const string ScopeKey = "CorrelationId";
+
+    private static readonly SearchValues<char> AllowedInboundChars =
+        SearchValues.Create("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789._:-");
 
     private CorrelationId(string value) => Value = value;
 
@@ -63,7 +68,10 @@ public sealed record CorrelationId
     /// only when no Activity is in scope.
     /// </summary>
     /// <param name="request">Incoming HTTP request.</param>
-    /// <param name="error">Populated when the override header violates <see cref="MaxLength"/>.</param>
+    /// <param name="error">
+    /// Populated when the override header is longer than <see cref="MaxLength"/> or contains a character
+    /// outside <c>[A-Za-z0-9._:-]</c>; a new id is generated then. Never contains the rejected value.
+    /// </param>
     public static CorrelationId FromRequest(HttpRequest request, out string? error)
     {
         error = null;
@@ -80,6 +88,12 @@ public sealed record CorrelationId
             if (headerValue.Length > MaxLength)
             {
                 error = $"{HeaderKey} must not exceed {MaxLength} characters.";
+                return Generate();
+            }
+
+            if (headerValue.AsSpan().ContainsAnyExcept(AllowedInboundChars))
+            {
+                error = $"{HeaderKey} may contain only letters, digits, '.', '_', ':' and '-'.";
                 return Generate();
             }
 

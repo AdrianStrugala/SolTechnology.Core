@@ -12,12 +12,17 @@ public static class PiiMask
     /// <summary>
     /// Keeps the first <paramref name="keepChars"/> and last <paramref name="keepChars"/>
     /// characters; replaces the middle with <c>***</c>.
-    /// Falls through to <see cref="Full"/> when the value is too short to partially mask.
+    /// Falls through to <see cref="Full"/> unless the value is longer than
+    /// <c>4 * keepChars</c>, so at most half of it is revealed.
     /// </summary>
+    /// <exception cref="ArgumentOutOfRangeException"><paramref name="keepChars"/> is negative.</exception>
     public static string Partial(string? value, int keepChars = 3)
     {
-        if (string.IsNullOrEmpty(value) || value.Length <= 2 * keepChars)
+        ArgumentOutOfRangeException.ThrowIfNegative(keepChars);
+        if (string.IsNullOrEmpty(value) || value.Length <= 4L * keepChars)
+        {
             return Full(value);
+        }
 
         return string.Concat(
             value.AsSpan(0, keepChars),

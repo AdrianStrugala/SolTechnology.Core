@@ -101,5 +101,30 @@ public sealed class TimingServiceTests
 
         sut.GetTimings()["x"].Should().Be(10);
     }
-}
 
+    [Test]
+    public void GetTimings_ReturnsSnapshot()
+    {
+        // Arrange
+        var fakeTime = new FakeTimeProvider(DateTimeOffset.UtcNow);
+        var sut = new TimingService(fakeTime);
+        using (sut.StartContext("db"))
+        {
+            fakeTime.Advance(TimeSpan.FromMilliseconds(5));
+        }
+
+        // Act
+        var snapshot = sut.GetTimings();
+        using (sut.StartContext("http"))
+        {
+            fakeTime.Advance(TimeSpan.FromMilliseconds(7));
+        }
+        sut.Reset();
+
+        // Assert
+        snapshot.Should().Equal(new Dictionary<string, long> { ["db"] = 5 });
+        snapshot.IsReadOnly.Should().BeTrue();
+        var mutate = () => snapshot["db"] = 0;
+        mutate.Should().Throw<NotSupportedException>();
+    }
+}

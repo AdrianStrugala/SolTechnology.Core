@@ -1,4 +1,5 @@
 using System.Collections.Concurrent;
+using System.Collections.ObjectModel;
 
 namespace SolTechnology.Core.Logging;
 
@@ -23,7 +24,8 @@ internal sealed class TimingService : ITimingService
         return new TimingHandle(this, name, _timeProvider.GetTimestamp());
     }
 
-    public IDictionary<string, long> GetTimings() => _timings;
+    public IDictionary<string, long> GetTimings()
+        => new ReadOnlyDictionary<string, long>(new Dictionary<string, long>(_timings, StringComparer.Ordinal));
 
     public void Reset() => _timings.Clear();
 
