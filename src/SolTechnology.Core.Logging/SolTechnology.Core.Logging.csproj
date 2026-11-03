@@ -24,15 +24,6 @@
 	</PropertyGroup>
 	<ItemGroup>
 		<FrameworkReference Include="Microsoft.AspNetCore.App" />
-		<!--
-			Microsoft.Extensions.* PackageReferences are inherited from src/Directory.Build.props.
-			FrameworkReference Microsoft.AspNetCore.App already provides them, so NuGet would prune
-			them anyway (NU1510). Removing here keeps the package graph clean.
-		-->
-		<PackageReference Remove="Microsoft.Extensions.Configuration" />
-		<PackageReference Remove="Microsoft.Extensions.Configuration.Binder" />
-		<PackageReference Remove="Microsoft.Extensions.DependencyInjection" />
-		<PackageReference Remove="Microsoft.Extensions.Options" />
 	</ItemGroup>
 
 	<ItemGroup>

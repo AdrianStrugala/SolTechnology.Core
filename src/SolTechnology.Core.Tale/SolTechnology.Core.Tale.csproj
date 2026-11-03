@@ -21,16 +21,6 @@
             approach as SolTechnology.Core.Logging.
         -->
         <FrameworkReference Include="Microsoft.AspNetCore.App" />
-
-        <!--
-            Microsoft.Extensions.* PackageReferences inherited from src/Directory.Build.props
-            are already provided by the shared framework. Removing them here mirrors the
-            SolTechnology.Core.Logging setup and keeps the package graph clean.
-        -->
-        <PackageReference Remove="Microsoft.Extensions.Configuration" />
-        <PackageReference Remove="Microsoft.Extensions.Configuration.Binder" />
-        <PackageReference Remove="Microsoft.Extensions.DependencyInjection" />
-        <PackageReference Remove="Microsoft.Extensions.Options" />
     </ItemGroup>
 
     <ItemGroup>

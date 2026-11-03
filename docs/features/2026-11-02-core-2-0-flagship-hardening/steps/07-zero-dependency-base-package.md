@@ -1,7 +1,7 @@
 ---
 spec: 2026-11-02-core-2-0-flagship-hardening
 step: 07
-status: to-do
+status: done
 ---
 
 # Step 07: Packaging — a truly zero-dependency `SolTechnology.Core`
@@ -26,13 +26,19 @@ Former core step 54; moved here by the per-library regroup (user, 2026-11-02).
 - Projects using the ASP.NET Core shared framework need none (and avoid `NU1510`).
 
 ## Acceptance criteria
-- [ ] `dotnet pack src/SolTechnology.Core/SolTechnology.Core.csproj -o /tmp/p && unzip -p /tmp/p/SolTechnology.Core.2.0.0.nupkg SolTechnology.Core.nuspec | grep -c "<dependency "` prints `0`.
-- [ ] `dotnet build SolTechnology.Core.slnx 2>&1 | grep -E "NU1605|NU190[1-4]"` prints nothing.
-- [ ] `pwsh ./.github/runTests.ps1` is green.
-- [ ] `grep -rn 'PackageReference Remove="Microsoft.Extensions' src --include=*.csproj` prints nothing.
-- [ ] Premortem mitigations for `Directory.Build.props` are applied.
+- [x] `dotnet pack src/SolTechnology.Core/SolTechnology.Core.csproj -o /tmp/p && unzip -p /tmp/p/SolTechnology.Core.2.0.0.nupkg SolTechnology.Core.nuspec | grep -c "<dependency "` prints `0`.
+- [x] `dotnet build SolTechnology.Core.slnx 2>&1 | grep -E "NU1605|NU190[1-4]"` prints nothing.
+- [x] `pwsh ./.github/runTests.ps1` is green.
+- [x] `grep -rn 'PackageReference Remove="Microsoft.Extensions' src --include=*.csproj` prints nothing.
+- [x] Premortem mitigations for `Directory.Build.props` are applied.
 
 ## Open questions
 - none
 
 ## Deviations
+
+### No project needed a direct `Microsoft.Extensions.*` reference
+
+**Original plan:** add back to each project only the `Microsoft.Extensions.*` references it needs.
+
+**Actual implementation:** with the shared `ItemGroup` and the three `Remove` blocks deleted, the whole solution (DreamTravel included) built with 0 errors and no `NU1605`/`NU190[1-4]`, so no reference was added: every project already gets what it compiles against from its own packages (for example `Microsoft.Extensions.Caching.Memory`, `Microsoft.Extensions.Hosting.Abstractions`, `FluentValidation.DependencyInjectionExtensions`) or from the ASP.NET Core shared framework. `SolTechnology.Core.2.0.0.nupkg` declares 0 dependencies and `SolTechnology.Core.AUID` none either. All 515 tests pass (`dotnet test SolTechnology.Core.slnx`).

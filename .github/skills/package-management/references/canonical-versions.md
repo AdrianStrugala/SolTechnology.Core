@@ -9,12 +9,11 @@ change**. When rows drift between projects, the row records the highest version 
 
 ## Build foundation (`src/Directory.Build.props`)
 
-| Package | Version | Why pinned here | Notes |
-|---|---|---|---|
-| `Microsoft.Extensions.Configuration` | `10.0.9` | All `src/SolTechnology.Core.*` inherit. | Shared-framework family — keep all `Microsoft.Extensions.*` on the same minor. |
-| `Microsoft.Extensions.Configuration.Binder` | `10.0.9` | Same. | — |
-| `Microsoft.Extensions.DependencyInjection` | `10.0.9` | Same. | — |
-| `Microsoft.Extensions.Options` | `10.0.9` | Same. | — |
+`src/Directory.Build.props` adds **no** `PackageReference` (since 2.0). Each project declares the
+`Microsoft.Extensions.*` packages it uses itself, so the base `SolTechnology.Core` package ships with zero
+dependencies. Projects with `<FrameworkReference Include="Microsoft.AspNetCore.App" />` get them from the
+shared framework and must not reference them (`NU1510`). When a project does need one, use `10.0.9` and
+keep all `Microsoft.Extensions.*` on the same minor.
 
 **SourceLink:** no `PackageReference`. SourceLink ships inside the .NET SDK — `src/Directory.Build.props`
 enables it purely through MSBuild properties (`PublishRepositoryUrl`, `EmbedUntrackedSources`,

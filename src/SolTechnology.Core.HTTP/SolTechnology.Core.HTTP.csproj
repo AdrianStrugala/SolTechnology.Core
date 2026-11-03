@@ -41,13 +41,6 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Remove="Microsoft.Extensions.Configuration" />
-		<PackageReference Remove="Microsoft.Extensions.Configuration.Binder" />
-		<PackageReference Remove="Microsoft.Extensions.DependencyInjection" />
-		<PackageReference Remove="Microsoft.Extensions.Options" />
-	</ItemGroup>
-
-	<ItemGroup>
 		<InternalsVisibleTo Include="SolTechnology.Core.HTTP.Tests" />
 	</ItemGroup>
 
