@@ -6,5 +6,4 @@
 /// </summary>
 public readonly struct Nothing
 {
-    //I'm just void. Or nothing
 }
