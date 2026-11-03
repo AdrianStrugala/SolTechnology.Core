@@ -6,7 +6,7 @@ namespace SolTechnology.Core.CQRS.PipelineBehaviors;
 
 /// <summary>
 /// Cached factory that produces <c>Result.Fail(validationError)</c> or
-/// <c>Result&lt;T&gt;.Fail(validationError)</c> for a given <typeparamref name="TResponse"/>.
+/// <c>Result&lt;T&gt;.Fail(validationError)</c> for a given response type.
 /// </summary>
 internal static class ValidationFailureFactory
 {

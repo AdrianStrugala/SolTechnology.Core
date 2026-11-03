@@ -13,11 +13,13 @@ public sealed class FluentValidationPipelineBehavior<TRequest, TResponse> : IPip
 {
     private readonly IEnumerable<IValidator<TRequest>> _validators;
 
+    /// <summary>Creates the behavior with every validator registered for <typeparamref name="TRequest"/>.</summary>
     public FluentValidationPipelineBehavior(IEnumerable<IValidator<TRequest>> validators)
     {
         _validators = validators;
     }
 
+    /// <summary>Validates the request; calls <paramref name="next"/> only when every validator passes.</summary>
     public async Task<TResponse> Handle(TRequest request, RequestHandlerDelegate<TResponse> next, CancellationToken cancellationToken)
     {
         var context = new ValidationContext<TRequest>(request);

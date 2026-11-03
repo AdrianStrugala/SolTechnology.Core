@@ -6,6 +6,10 @@ namespace SolTechnology.Core.CQRS;
 /// </summary>
 public interface IPipelineBehavior<in TRequest, TResponse>
 {
+    /// <summary>
+    /// Runs this step around the rest of the pipeline. Call <paramref name="next"/> to continue, or
+    /// return a response without calling it to short-circuit.
+    /// </summary>
     Task<TResponse> Handle(TRequest request, RequestHandlerDelegate<TResponse> next, CancellationToken cancellationToken);
 }
 

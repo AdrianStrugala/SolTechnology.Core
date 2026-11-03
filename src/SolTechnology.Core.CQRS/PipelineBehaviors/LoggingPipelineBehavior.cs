@@ -14,11 +14,16 @@ public sealed class LoggingPipelineBehavior<TRequest, TResponse> : IPipelineBeha
 {
     private readonly ILogger<LoggingPipelineBehavior<TRequest, TResponse>> _logger;
 
+    /// <summary>Creates the behavior with the logger it writes operation entries to.</summary>
     public LoggingPipelineBehavior(ILogger<LoggingPipelineBehavior<TRequest, TResponse>> logger)
     {
         _logger = logger;
     }
 
+    /// <summary>
+    /// Logs the start and outcome of the request inside a <c>[LogScope]</c> scope and an activity: a
+    /// success, a failed <see cref="Result"/> (error type and message only), or an exception.
+    /// </summary>
     public async Task<TResponse> Handle(TRequest request, RequestHandlerDelegate<TResponse> next, CancellationToken cancellationToken)
     {
         var operationName = typeof(TRequest).Name;

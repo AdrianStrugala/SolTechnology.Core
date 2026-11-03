@@ -6,6 +6,7 @@ namespace SolTechnology.Core.CQRS;
 /// </summary>
 public interface IEventHandler<in TEvent> where TEvent : IEvent
 {
+    /// <summary>Reacts to the event. An exception is logged by the dispatcher and does not reach the publisher.</summary>
     Task Handle(TEvent notification, CancellationToken cancellationToken);
 }
 
