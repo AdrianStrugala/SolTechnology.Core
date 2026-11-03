@@ -1,7 +1,7 @@
 ---
 spec: 2026-11-02-core-2-0-tale
 step: 08
-status: to-do
+status: done
 ---
 
 # Step 08: Tale — `ITaleRepository` 2.0 signatures (cancellation and names)
@@ -36,11 +36,33 @@ Former core step 40; moved here by the per-library regroup (user, 2026-11-02).
 - Test: `FindById_CancelledToken_Throws` (in-memory repository honours the token).
 
 ## Acceptance criteria
-- [ ] `grep -rnE "\b(ListAsync|SaveAsync|DeleteAsync)\(" src/SolTechnology.Core.Tale sample-tale-code-apps/DreamTravel/src tests/SolTechnology.Core.Tale.Tests` prints nothing.
-- [ ] `dotnet test tests/SolTechnology.Core.Tale.Tests` is green.
-- [ ] `dotnet build SolTechnology.Core.slnx` is green, and the DreamTravel component tests are green.
+- [x] `grep -rnE "\b(ListAsync|SaveAsync|DeleteAsync)\(" src/SolTechnology.Core.Tale sample-tale-code-apps/DreamTravel/src tests/SolTechnology.Core.Tale.Tests` prints nothing.
+- [x] `dotnet test tests/SolTechnology.Core.Tale.Tests` is green.
+- [x] `dotnet build SolTechnology.Core.slnx` is green, and the DreamTravel component tests are green.
 
 ## Open questions
 - none (`C-05` confirmed by the user on 2026-11-02)
 
 ## Deviations
+
+### `List` keeps an optional token; `TaleManager` read and cancel calls take one too
+
+**Original plan:** The five `C-05` signatures, with tokens passed from `TaleManager` and the engine.
+
+**Actual implementation:** `List` keeps its optional filter parameters, so its token is the last
+parameter with `= default` (a required parameter cannot follow optional ones). To pass a token
+from the HTTP request down to the repository, `TaleManager.CancelStory(Auid)` and
+`TaleManager.GetStoryState(Auid)` gained an optional `CancellationToken cancellationToken = default`
+(source-compatible, binary-breaking; recorded as a `C-05` amendment), and `TaleController` passes
+`HttpContext.RequestAborted` for the GET and DELETE actions without changing their signatures. The
+engine's terminal save uses `CancellationToken.None` so that a run ended by its own token still
+stores `Cancelled`. A failed `Save` stops the run: no more chapters and no terminal save, and the
+handler returns the save error (step 09 makes that a `ConflictError`).
+
+### Acceptance grep also matches the Neo4j repositories
+
+**Original plan:** `grep -rnE "\b(ListAsync|SaveAsync|DeleteAsync)\(" src/SolTechnology.Core.Tale sample-tale-code-apps/DreamTravel/src tests/SolTechnology.Core.Tale.Tests` prints nothing.
+
+**Actual implementation:** It prints only `IntersectionRepository.DeleteAsync` and
+`StreetRepository.DeleteAsync` in `DreamTravel.GraphDatabase`, which are Neo4j repositories with no
+relation to `ITaleRepository`; no Tale, SQLite Tale store, or Tale test line matches.

@@ -194,7 +194,7 @@ public class TaleHandlerTests
         }
 
         // Assert
-        (await repository.ListAsync(take: int.MaxValue)).Should().BeEmpty();
+        (await repository.List(take: int.MaxValue)).Should().BeEmpty();
     }
 
     [Test]
@@ -213,7 +213,7 @@ public class TaleHandlerTests
         result.Error.Should().BeOfType<TalePausedError>();
         logs.Logs.Should().ContainSingle(log => log.Level == LogLevel.Warning).Which.Message.Should().Be(
             "Tale [LifecycleTaleV1] paused outside TaleManager; the run is not persisted and cannot be resumed.");
-        (await repository.ListAsync()).Should().BeEmpty();
+        (await repository.List()).Should().BeEmpty();
     }
 
     private static ServiceProvider BuildTaleProvider(RecordingLoggerProvider? logs = null)

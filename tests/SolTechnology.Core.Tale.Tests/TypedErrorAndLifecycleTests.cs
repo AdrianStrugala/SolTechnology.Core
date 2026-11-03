@@ -135,7 +135,7 @@ public class TypedErrorAndLifecycleTests
             start.Data.TaleId,
             JsonSerializer.SerializeToElement(new PausePayload { Token = "ok" }));
 
-        var latest = await _repo.FindById(start.Data.TaleId);
+        var latest = await _repo.FindById(start.Data.TaleId, CancellationToken.None);
         latest!.CreatedAt.Should().Be(originalCreatedAt);
         latest.LastUpdatedAt.Should().BeAfter(originalCreatedAt);
     }
@@ -147,13 +147,13 @@ public class TypedErrorAndLifecycleTests
         await Manager.StartStory<LifecycleTaleV1, LifecycleInput, LifecycleContext, LifecycleOutput>(new LifecycleInput { Value = 2 });
         await Manager.StartStory<LifecycleTaleV2, LifecycleInput, LifecycleContext, LifecycleOutput>(new LifecycleInput { Value = 3 });
 
-        var paused = await _repo.ListAsync(status: TaleStatus.WaitingForInput);
+        var paused = await _repo.List(status: TaleStatus.WaitingForInput);
         paused.Count.Should().Be(2);
 
-        var completed = await _repo.ListAsync(status: TaleStatus.Completed);
+        var completed = await _repo.List(status: TaleStatus.Completed);
         completed.Count.Should().Be(1);
 
-        var v1Only = await _repo.ListAsync(handlerTypeName: nameof(LifecycleTaleV1));
+        var v1Only = await _repo.List(handlerTypeName: nameof(LifecycleTaleV1));
         v1Only.Count.Should().Be(2);
     }
 

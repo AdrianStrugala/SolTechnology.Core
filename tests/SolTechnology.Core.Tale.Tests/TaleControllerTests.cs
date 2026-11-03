@@ -158,7 +158,7 @@ public class TaleControllerTests
 
         // Assert
         var dto = DataOf<TaleInstanceDto>(start.Should().BeOfType<AcceptedResult>().Subject);
-        var stored = await _repo.FindById(Auid.Parse(dto.TaleId));
+        var stored = await _repo.FindById(Auid.Parse(dto.TaleId), CancellationToken.None);
         JsonSerializer.Deserialize<LifecycleContext>(stored!.Context, TaleJsonOptions.Default)!.Input.Value.Should().Be(7);
     }
 
@@ -198,7 +198,7 @@ public class TaleControllerTests
     {
         // Arrange
         var repository = Substitute.For<ITaleRepository>();
-        repository.FindByIdempotencyKey(Arg.Any<string>())
+        repository.FindByIdempotencyKey(Arg.Any<string>(), Arg.Any<CancellationToken>())
             .Returns<Task<TaleInstance?>>(_ => throw new InvalidOperationException(ThrowingConstructorTale.Secret));
         var manager = new TaleManager(_sp.GetRequiredService<IServiceScopeFactory>(), repository, NullLogger<TaleManager>.Instance);
         var controller = new TestTaleController(manager, _registry, new TaleOptions(), NullLogger<TaleController>.Instance)

@@ -55,7 +55,7 @@ public class SampleOrderWorkflowSQLiteTests
 
         // Cross-instance durability: fresh repo reads the paused state
         var freshRepo = new SQLiteTaleRepository($"Data Source={_testDbPath}");
-        var persisted = await freshRepo.FindById(instance.TaleId);
+        var persisted = await freshRepo.FindById(instance.TaleId, CancellationToken.None);
         persisted.Should().NotBeNull();
         persisted!.Status.Should().Be(TaleStatus.WaitingForInput);
 
@@ -72,7 +72,7 @@ public class SampleOrderWorkflowSQLiteTests
 
         // Completion persisted across instances
         var freshRepo2 = new SQLiteTaleRepository($"Data Source={_testDbPath}");
-        var completedPersisted = await freshRepo2.FindById(instance.TaleId);
+        var completedPersisted = await freshRepo2.FindById(instance.TaleId, CancellationToken.None);
         completedPersisted!.Status.Should().Be(TaleStatus.Completed);
     }
 
@@ -100,7 +100,7 @@ public class SampleOrderWorkflowSQLiteTests
 
         // Persisted state is still WaitingForInput
         var freshRepo = new SQLiteTaleRepository($"Data Source={_testDbPath}");
-        var persisted = await freshRepo.FindById(storyId);
+        var persisted = await freshRepo.FindById(storyId, CancellationToken.None);
         persisted!.Status.Should().Be(TaleStatus.WaitingForInput);
 
         // Retry with valid input — story completes
@@ -137,7 +137,7 @@ public class SampleOrderWorkflowSQLiteTests
 
         // Failed state is persisted
         var freshRepo = new SQLiteTaleRepository($"Data Source={_testDbPath}");
-        var persisted = await freshRepo.FindById(storyId);
+        var persisted = await freshRepo.FindById(storyId, CancellationToken.None);
         persisted!.Status.Should().Be(TaleStatus.Failed);
     }
 

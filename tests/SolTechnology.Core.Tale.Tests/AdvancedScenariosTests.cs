@@ -750,7 +750,7 @@ public class FailingTaleRepository : ITaleRepository
         _simulateLoadFailure = simulateLoadFailure;
     }
 
-    public Task<TaleInstance?> FindById(Auid taleId)
+    public Task<TaleInstance?> FindById(Auid taleId, CancellationToken cancellationToken)
     {
         if (_simulateLoadFailure)
             throw new InvalidOperationException("Simulated repository load failure");
@@ -758,18 +758,18 @@ public class FailingTaleRepository : ITaleRepository
         return Task.FromResult<TaleInstance?>(null);
     }
 
-    public Task<TaleInstance?> FindByIdempotencyKey(string idempotencyKey)
+    public Task<TaleInstance?> FindByIdempotencyKey(string idempotencyKey, CancellationToken cancellationToken)
         => Task.FromResult<TaleInstance?>(null);
 
-    public Task SaveAsync(TaleInstance taleInstance)
+    public Task<Result> Save(TaleInstance taleInstance, CancellationToken cancellationToken)
     {
         if (_simulateSaveFailure)
             throw new InvalidOperationException("Simulated repository save failure");
 
-        return Task.CompletedTask;
+        return Result.SuccessAsTask();
     }
 
-    public Task DeleteAsync(Auid taleId)
+    public Task Delete(Auid taleId, CancellationToken cancellationToken)
     {
         return Task.CompletedTask;
     }

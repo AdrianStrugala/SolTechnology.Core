@@ -31,10 +31,10 @@ public class InMemoryRepositoryTests
         var taleInstance = CreateTestTaleInstance(taleId);
 
         // Act
-        await _repository.SaveAsync(taleInstance);
+        await _repository.Save(taleInstance, CancellationToken.None);
 
         // Assert
-        var retrieved = await _repository.FindById(taleId);
+        var retrieved = await _repository.FindById(taleId, CancellationToken.None);
         retrieved.Should().NotBeNull();
         retrieved!.TaleId.Should().Be(taleId);
     }
@@ -43,7 +43,7 @@ public class InMemoryRepositoryTests
     public async Task Repository_ShouldReturnNull_WhenTaleNotFound()
     {
         // Act
-        var result = await _repository.FindById(Auid.New("TST"));
+        var result = await _repository.FindById(Auid.New("TST"), CancellationToken.None);
 
         // Assert
         result.Should().BeNull();
@@ -55,14 +55,14 @@ public class InMemoryRepositoryTests
         // Arrange
         var taleId = Auid.New("TST");
         var taleInstance = CreateTestTaleInstance(taleId);
-        await _repository.SaveAsync(taleInstance);
+        await _repository.Save(taleInstance, CancellationToken.None);
 
         // Act - Update the tale
         taleInstance.Status = TaleStatus.Completed;
-        await _repository.SaveAsync(taleInstance);
+        await _repository.Save(taleInstance, CancellationToken.None);
 
         // Assert
-        var retrieved = await _repository.FindById(taleId);
+        var retrieved = await _repository.FindById(taleId, CancellationToken.None);
         retrieved!.Status.Should().Be(TaleStatus.Completed);
     }
 
@@ -72,13 +72,13 @@ public class InMemoryRepositoryTests
         // Arrange
         var taleId = Auid.New("TST");
         var taleInstance = CreateTestTaleInstance(taleId);
-        await _repository.SaveAsync(taleInstance);
+        await _repository.Save(taleInstance, CancellationToken.None);
 
         // Act
-        await _repository.DeleteAsync(taleId);
+        await _repository.Delete(taleId, CancellationToken.None);
 
         // Assert
-        var retrieved = await _repository.FindById(taleId);
+        var retrieved = await _repository.FindById(taleId, CancellationToken.None);
         retrieved.Should().BeNull();
     }
 
@@ -86,7 +86,7 @@ public class InMemoryRepositoryTests
     public async Task Repository_Delete_ShouldNotThrow_WhenTaleDoesNotExist()
     {
         // Act & Assert
-        var act = async () => await _repository.DeleteAsync(Auid.New("TST"));
+        var act = async () => await _repository.Delete(Auid.New("TST"), CancellationToken.None);
         await act.Should().NotThrowAsync();
     }
 
@@ -96,11 +96,11 @@ public class InMemoryRepositoryTests
         // Arrange
         var taleId = Auid.New("TST");
         var taleInstance = CreateTestTaleInstance(taleId);
-        await _repository.SaveAsync(taleInstance);
+        await _repository.Save(taleInstance, CancellationToken.None);
 
         // Act
-        var retrieved1 = await _repository.FindById(taleId);
-        var retrieved2 = await _repository.FindById(taleId);
+        var retrieved1 = await _repository.FindById(taleId, CancellationToken.None);
+        var retrieved2 = await _repository.FindById(taleId, CancellationToken.None);
 
         // Assert - Should be different instances
         retrieved1.Should().NotBeSameAs(retrieved2);
@@ -113,14 +113,14 @@ public class InMemoryRepositoryTests
         var taleId = Auid.New("TST");
         var taleInstance = CreateTestTaleInstance(taleId);
         taleInstance.Status = TaleStatus.Running;
-        await _repository.SaveAsync(taleInstance);
+        await _repository.Save(taleInstance, CancellationToken.None);
 
         // Act - Modify the retrieved instance
-        var retrieved = await _repository.FindById(taleId);
+        var retrieved = await _repository.FindById(taleId, CancellationToken.None);
         retrieved!.Status = TaleStatus.Completed;
 
         // Assert - Original should remain unchanged
-        var original = await _repository.FindById(taleId);
+        var original = await _repository.FindById(taleId, CancellationToken.None);
         original!.Status.Should().Be(TaleStatus.Running);
     }
 
@@ -138,7 +138,7 @@ public class InMemoryRepositoryTests
             {
                 var taleId = Auid.New("TST");
                 var tale = CreateTestTaleInstance(taleId);
-                await _repository.SaveAsync(tale);
+                await _repository.Save(tale, CancellationToken.None);
                 return taleId;
             }));
         }
@@ -148,7 +148,7 @@ public class InMemoryRepositoryTests
         // Assert - All stories should be saved
         foreach (var taleId in taleIds)
         {
-            var retrieved = await _repository.FindById(taleId);
+            var retrieved = await _repository.FindById(taleId, CancellationToken.None);
             retrieved.Should().NotBeNull();
             retrieved!.TaleId.Should().Be(taleId);
         }
@@ -160,11 +160,11 @@ public class InMemoryRepositoryTests
         // Arrange
         var taleId = Auid.New("TST");
         var taleInstance = CreateTestTaleInstance(taleId);
-        await _repository.SaveAsync(taleInstance);
+        await _repository.Save(taleInstance, CancellationToken.None);
 
         // Act - Read the same tale 100 times concurrently
         var tasks = Enumerable.Range(1, 100).Select(_ =>
-            Task.Run(async () => await _repository.FindById(taleId))
+            Task.Run(async () => await _repository.FindById(taleId, CancellationToken.None))
         ).ToList();
 
         var results = await Task.WhenAll(tasks);
@@ -184,13 +184,13 @@ public class InMemoryRepositoryTests
         var taleId = Auid.New("TST");
         var taleInstance = CreateTestTaleInstance(taleId);
         taleInstance.Status = TaleStatus.Running;
-        await _repository.SaveAsync(taleInstance);
+        await _repository.Save(taleInstance, CancellationToken.None);
 
         // Act - Update the same tale concurrently
         var tasks = Enumerable.Range(1, 10).Select(i =>
             Task.Run(async () =>
             {
-                var tale = await _repository.FindById(taleId);
+                var tale = await _repository.FindById(taleId, CancellationToken.None);
                 if (tale != null)
                 {
                     tale.History.Add(new ChapterInfo
@@ -199,7 +199,7 @@ public class InMemoryRepositoryTests
                         StartedAt = DateTime.UtcNow,
                         Status = TaleStatus.Running
                     });
-                    await _repository.SaveAsync(tale);
+                    await _repository.Save(tale, CancellationToken.None);
                 }
             })
         ).ToList();
@@ -207,7 +207,7 @@ public class InMemoryRepositoryTests
         await Task.WhenAll(tasks);
 
         // Assert - Final state should be consistent
-        var finalTale = await _repository.FindById(taleId);
+        var finalTale = await _repository.FindById(taleId, CancellationToken.None);
         finalTale.Should().NotBeNull();
         finalTale!.TaleId.Should().Be(taleId);
     }
@@ -234,10 +234,10 @@ public class InMemoryRepositoryTests
         });
 
         // Act
-        await _repository.SaveAsync(taleInstance);
+        await _repository.Save(taleInstance, CancellationToken.None);
 
         // Assert
-        var retrieved = await _repository.FindById(taleId);
+        var retrieved = await _repository.FindById(taleId, CancellationToken.None);
         retrieved!.History.Should().HaveCount(2);
         retrieved.History[0].ChapterId.Should().Be("Chapter1");
         retrieved.History[1].ChapterId.Should().Be("Chapter2");
@@ -261,10 +261,10 @@ public class InMemoryRepositoryTests
         };
 
         // Act
-        await _repository.SaveAsync(taleInstance);
+        await _repository.Save(taleInstance, CancellationToken.None);
 
         // Assert
-        var retrieved = await _repository.FindById(taleId);
+        var retrieved = await _repository.FindById(taleId, CancellationToken.None);
         retrieved!.CurrentChapter.Should().NotBeNull();
         retrieved.CurrentChapter!.ChapterId.Should().Be("WaitingChapter");
         retrieved.CurrentChapter.Status.Should().Be(TaleStatus.WaitingForInput);
@@ -282,17 +282,33 @@ public class InMemoryRepositoryTests
             var expectedStatus = i % 2 == 0 ? TaleStatus.Completed : TaleStatus.Running;
             var tale = CreateTestTaleInstance(taleId);
             tale.Status = expectedStatus;
-            await _repository.SaveAsync(tale);
+            await _repository.Save(tale, CancellationToken.None);
             taleIds.Add((taleId, expectedStatus));
         }
 
         // Assert - Verify all stories were saved correctly
         foreach (var (id, expectedStatus) in taleIds)
         {
-            var retrieved = await _repository.FindById(id);
+            var retrieved = await _repository.FindById(id, CancellationToken.None);
             retrieved.Should().NotBeNull();
             retrieved!.Status.Should().Be(expectedStatus);
         }
+    }
+
+    [Test]
+    public async Task FindById_CancelledToken_Throws()
+    {
+        // Arrange
+        var taleId = Auid.New("TST");
+        await _repository.Save(CreateTestTaleInstance(taleId), CancellationToken.None);
+        using var cts = new CancellationTokenSource();
+        await cts.CancelAsync();
+
+        // Act
+        var act = () => _repository.FindById(taleId, cts.Token);
+
+        // Assert
+        await act.Should().ThrowAsync<OperationCanceledException>();
     }
 
     [Test]
@@ -311,7 +327,7 @@ public class InMemoryRepositoryTests
             new LifecycleInput { Value = 1 });
 
         // Assert
-        var persisted = await _repository.FindById(start.Data!.TaleId);
+        var persisted = await _repository.FindById(start.Data!.TaleId, CancellationToken.None);
         persisted.Should().NotBeNull();
         persisted!.Status.Should().Be(TaleStatus.WaitingForInput);
         persisted.HandlerTypeName.Should().Be(nameof(LifecycleTaleV1));

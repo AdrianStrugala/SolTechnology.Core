@@ -12,27 +12,31 @@ public class InMemoryTaleRepository : ITaleRepository
 {
     private readonly ConcurrentDictionary<Auid, TaleInstance> _tales = new();
 
-    public Task<TaleInstance?> FindById(Auid taleId)
+    public Task<TaleInstance?> FindById(Auid taleId, CancellationToken cancellationToken)
     {
+        cancellationToken.ThrowIfCancellationRequested();
         if (_tales.TryGetValue(taleId, out var tale))
             return Task.FromResult<TaleInstance?>(tale.Clone());
         return Task.FromResult<TaleInstance?>(null);
     }
 
-    public Task<TaleInstance?> FindByIdempotencyKey(string idempotencyKey)
+    public Task<TaleInstance?> FindByIdempotencyKey(string idempotencyKey, CancellationToken cancellationToken)
     {
+        cancellationToken.ThrowIfCancellationRequested();
         var match = _tales.Values.FirstOrDefault(s =>
             !string.IsNullOrEmpty(s.IdempotencyKey) &&
             s.IdempotencyKey == idempotencyKey);
         return Task.FromResult(match?.Clone());
     }
 
-    public Task<IReadOnlyList<TaleInstance>> ListAsync(
+    public Task<IReadOnlyList<TaleInstance>> List(
         TaleStatus? status = null,
         string? handlerTypeName = null,
         int skip = 0,
-        int take = 100)
+        int take = 100,
+        CancellationToken cancellationToken = default)
     {
+        cancellationToken.ThrowIfCancellationRequested();
         IEnumerable<TaleInstance> query = _tales.Values;
         if (status.HasValue) query = query.Where(s => s.Status == status.Value);
         if (!string.IsNullOrEmpty(handlerTypeName))
@@ -48,8 +52,9 @@ public class InMemoryTaleRepository : ITaleRepository
         return Task.FromResult<IReadOnlyList<TaleInstance>>(result);
     }
 
-    public Task SaveAsync(TaleInstance taleInstance)
+    public Task<Result> Save(TaleInstance taleInstance, CancellationToken cancellationToken)
     {
+        cancellationToken.ThrowIfCancellationRequested();
         _tales.AddOrUpdate(
             taleInstance.TaleId,
             taleInstance.Clone(),
@@ -61,11 +66,12 @@ public class InMemoryTaleRepository : ITaleRepository
                 return updated;
             });
 
-        return Task.CompletedTask;
+        return Result.SuccessAsTask();
     }
 
-    public Task DeleteAsync(Auid taleId)
+    public Task Delete(Auid taleId, CancellationToken cancellationToken)
     {
+        cancellationToken.ThrowIfCancellationRequested();
         _tales.TryRemove(taleId, out _);
         return Task.CompletedTask;
     }

@@ -49,7 +49,7 @@ public class TaleManager
     {
         if (!string.IsNullOrEmpty(idempotencyKey))
         {
-            var existing = await _repository.FindByIdempotencyKey(idempotencyKey!);
+            var existing = await _repository.FindByIdempotencyKey(idempotencyKey!, cancellationToken);
             if (existing != null) return Result<TaleInstance>.Success(existing);
         }
 
@@ -74,9 +74,9 @@ public class TaleManager
     /// <summary>
     /// Cancels a running or paused tale. Sets its terminal status to <see cref="TaleStatus.Cancelled"/>.
     /// </summary>
-    public async Task<Result<TaleInstance>> CancelStory(Auid taleId)
+    public async Task<Result<TaleInstance>> CancelStory(Auid taleId, CancellationToken cancellationToken = default)
     {
-        var instance = await _repository.FindById(taleId);
+        var instance = await _repository.FindById(taleId, cancellationToken);
         if (instance == null) return Result<TaleInstance>.Fail($"Tale {taleId} not found");
         if (instance.Status == TaleStatus.Completed)
             return Result<TaleInstance>.Fail("Cannot cancel a completed tale");
@@ -86,8 +86,8 @@ public class TaleManager
         instance.Status = TaleStatus.Cancelled;
         instance.LastUpdatedAt = _timeProvider.GetUtcNow().UtcDateTime;
         instance.CurrentChapter = null;
-        await _repository.SaveAsync(instance);
-        return Result<TaleInstance>.Success(instance);
+        var saved = await _repository.Save(instance, cancellationToken);
+        return saved.IsSuccess ? Result<TaleInstance>.Success(instance) : Result<TaleInstance>.Fail(saved.Error!);
     }
 
     private async Task<Result<TaleInstance>> ExecuteTalePipeline<THandler, TInput, TContext, TOutput>(
@@ -112,7 +112,7 @@ public class TaleManager
 
             if (taleId != Auid.Empty)
             {
-                existing = await _repository.FindById(taleId);
+                existing = await _repository.FindById(taleId, cancellationToken);
                 if (existing == null) return Result<TaleInstance>.Fail($"Tale {taleId} not found");
                 if (existing.Status == TaleStatus.Completed)
                     return Result<TaleInstance>.Fail("Tale already completed");
@@ -153,20 +153,22 @@ public class TaleManager
             // Stamp the idempotency key (if provided and this is a fresh tale).
             if (!string.IsNullOrEmpty(idempotencyKey))
             {
-                var persisted = await _repository.FindById(activeId);
+                var persisted = await _repository.FindById(activeId, cancellationToken);
                 if (persisted != null && persisted.IdempotencyKey == null)
                 {
                     persisted.IdempotencyKey = idempotencyKey;
-                    await _repository.SaveAsync(persisted);
+                    var stamped = await _repository.Save(persisted, cancellationToken);
+                    if (stamped.IsFailure)
+                        return Result<TaleInstance>.Fail(stamped.Error!);
                 }
             }
 
             if (result.IsFailure && result.Error is TalePausedError)
-                return await GetLatestInstance(activeId);
+                return await GetLatestInstance(activeId, cancellationToken);
 
             if (result.IsSuccess)
             {
-                var instance = await _repository.FindById(activeId);
+                var instance = await _repository.FindById(activeId, cancellationToken);
                 if (instance != null) return Result<TaleInstance>.Success(instance);
 
                 // Tale ran to completion without persistence being triggered by the handler.
@@ -189,20 +191,20 @@ public class TaleManager
         }
     }
 
-    private async Task<Result<TaleInstance>> GetLatestInstance(Auid taleId)
+    private async Task<Result<TaleInstance>> GetLatestInstance(Auid taleId, CancellationToken cancellationToken)
     {
-        var instance = await _repository.FindById(taleId);
+        var instance = await _repository.FindById(taleId, cancellationToken);
         return instance != null
             ? Result<TaleInstance>.Success(instance)
             : Result<TaleInstance>.Fail("Instance not found after execution");
     }
 
     /// <summary>Retrieves the current state of a tale.</summary>
-    public async Task<Result<TaleInstance>> GetStoryState(Auid taleId)
+    public async Task<Result<TaleInstance>> GetStoryState(Auid taleId, CancellationToken cancellationToken = default)
     {
         try
         {
-            var instance = await _repository.FindById(taleId);
+            var instance = await _repository.FindById(taleId, cancellationToken);
             return instance != null
                 ? Result<TaleInstance>.Success(instance)
                 : Result<TaleInstance>.Fail("Tale not found");

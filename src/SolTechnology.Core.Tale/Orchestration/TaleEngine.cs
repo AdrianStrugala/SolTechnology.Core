@@ -37,6 +37,7 @@ internal sealed class TaleEngine<TInput, TContext, TOutput>
     private bool _isPaused;
     private bool _hasFailed;
     private bool _isCancelled;
+    private Error? _saveError;
     private bool _isInitialized;
     private string _handlerTypeName = string.Empty;
 
@@ -126,8 +127,8 @@ internal sealed class TaleEngine<TInput, TContext, TOutput>
     // The tale runs on one of two tracks. Won-track steps act only while it is still succeeding;
     // lost-track steps act only after a failure (until an Otherwise recovers). Both tracks are
     // suspended once the tale is cancelled or paused.
-    private bool OnWonTrack => !_isCancelled && !_isPaused && !_hasFailed;
-    private bool OnLostTrack => !_isCancelled && !_isPaused && _hasFailed;
+    private bool OnWonTrack => !_isCancelled && !_isPaused && !_hasFailed && _saveError is null;
+    private bool OnLostTrack => !_isCancelled && !_isPaused && _hasFailed && _saveError is null;
 
     private void ApplyGuard(GuardStep step)
     {
@@ -180,7 +181,7 @@ internal sealed class TaleEngine<TInput, TContext, TOutput>
         if (!_isInitialized)
             throw new InvalidOperationException("TaleEngine must be initialized first");
 
-        if (_isCancelled) return;
+        if (_isCancelled || _saveError != null) return;
         if (_isPaused && _resumeInput == null) return;
         if (_hasFailed) return;
 
@@ -386,6 +387,9 @@ internal sealed class TaleEngine<TInput, TContext, TOutput>
 
     public Result<TOutput> GetResult(Func<object, TOutput> conclusion)
     {
+        if (_saveError != null)
+            return Result<TOutput>.Fail(_saveError);
+
         if (_isCancelled)
             return Result<TOutput>.Fail(new TaleCancelledError(_context is null ? Auid.Empty : _context.TaleInstanceId));
 
@@ -408,7 +412,7 @@ internal sealed class TaleEngine<TInput, TContext, TOutput>
 
     public Task PersistTerminalState()
     {
-        if (_repository == null) return Task.CompletedTask;
+        if (_repository == null || _saveError != null) return Task.CompletedTask;
         return SaveTaleState(terminal: true);
     }
 
@@ -429,7 +433,12 @@ internal sealed class TaleEngine<TInput, TContext, TOutput>
             Context = JsonSerializer.Serialize(_context, TaleJsonOptions.Default)
         };
 
-        await _repository.SaveAsync(instance);
+        // The terminal state must be stored even when the run's token is what ended the run.
+        var saved = await _repository.Save(instance, terminal ? CancellationToken.None : _cancellationToken);
+        if (saved.IsFailure)
+        {
+            _saveError = saved.Error;
+        }
     }
 
     private TaleStatus IntermediateStatus()

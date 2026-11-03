@@ -128,7 +128,7 @@ public class PauseResumeIntegrationTests
         var taleId = startResult.Data!.TaleId;
 
         // Load tale state
-        var taleInstance = await _repository.FindById(taleId);
+        var taleInstance = await _repository.FindById(taleId, CancellationToken.None);
         var context = JsonSerializer.Deserialize<OrderContext>(taleInstance!.Context);
 
         // Assert - Context should be preserved
@@ -167,7 +167,7 @@ public class PauseResumeIntegrationTests
         resumeResult.IsSuccess.Should().BeTrue();
 
         // All chapters should have executed
-        var finalState = await _repository.FindById(taleId);
+        var finalState = await _repository.FindById(taleId, CancellationToken.None);
         finalState.Should().NotBeNull();
         finalState!.History.Should().HaveCount(4); // All 4 chapters
         finalState.History.Select(h => h.ChapterId).Should().ContainInOrder(
@@ -248,7 +248,7 @@ public class PauseResumeIntegrationTests
         var manager = _serviceProvider.GetRequiredService<TaleManager>();
         await manager.StartStory<OrderProcessingTale, OrderInput, OrderContext, OrderOutput>(
             new OrderInput { OrderId = "ORD-FAIL", Amount = 0m });
-        var failed = (await _repository.ListAsync()).Single();
+        var failed = (await _repository.List()).Single();
         var userInput = JsonSerializer.SerializeToElement(new CustomerDetails { Name = "Jan", Email = "jan@example.com", Address = "Wadowice" });
 
         // Act
@@ -259,7 +259,7 @@ public class PauseResumeIntegrationTests
         resume.IsFailure.Should().BeTrue();
         resume.Error.Should().BeOfType<ConflictError>();
         resume.Error!.Message.Should().Be("Tale has failed and cannot be resumed");
-        (await _repository.FindById(failed.TaleId))!.Status.Should().Be(TaleStatus.Failed);
+        (await _repository.FindById(failed.TaleId, CancellationToken.None))!.Status.Should().Be(TaleStatus.Failed);
     }
 
     [Test]
@@ -270,7 +270,7 @@ public class PauseResumeIntegrationTests
             {"TaleId":"STR_20261103112154_050288","HandlerTypeName":"OrderProcessingTale","IdempotencyKey":null,"CurrentChapter":{"ChapterId":"RequestCustomerDetailsChapter","StartedAt":"2026-11-03T11:21:54.877769Z","FinishedAt":null,"Status":2,"RequiredData":[{"Name":"Name","Type":"String","IsComplex":false,"Children":[]},{"Name":"Email","Type":"String","IsComplex":false,"Children":[]},{"Name":"Address","Type":"String","IsComplex":false,"Children":[]}],"ProvidedData":null,"Error":null},"History":[{"ChapterId":"OrderValidationChapter","StartedAt":"2026-11-03T11:21:54.831843Z","FinishedAt":"2026-11-03T11:21:54.832482Z","Status":3,"RequiredData":[],"ProvidedData":null,"Error":null},{"ChapterId":"RequestCustomerDetailsChapter","StartedAt":"2026-11-03T11:21:54.877769Z","FinishedAt":null,"Status":2,"RequiredData":[{"Name":"Name","Type":"String","IsComplex":false,"Children":[]},{"Name":"Email","Type":"String","IsComplex":false,"Children":[]},{"Name":"Address","Type":"String","IsComplex":false,"Children":[]}],"ProvidedData":null,"Error":null}],"Status":2,"CreatedAt":"2026-11-03T11:21:54.828295Z","LastUpdatedAt":"2026-11-03T11:21:54.881759Z","Context":"{\u0022ValidationPassed\u0022:true,\u0022CustomerName\u0022:\u0022\u0022,\u0022CustomerEmail\u0022:\u0022\u0022,\u0022CustomerAddress\u0022:\u0022\u0022,\u0022PaymentProcessed\u0022:false,\u0022TransactionId\u0022:\u0022\u0022,\u0022Input\u0022:{\u0022OrderId\u0022:\u0022ORD-1X\u0022,\u0022Amount\u0022:42},\u0022Output\u0022:{\u0022OrderId\u0022:\u0022\u0022,\u0022TransactionId\u0022:\u0022\u0022,\u0022CustomerName\u0022:\u0022\u0022,\u0022ConfirmationSent\u0022:false},\u0022TaleInstanceId\u0022:\u0022STR_20261103112154_050288\u0022,\u0022CurrentChapterId\u0022:\u0022RequestCustomerDetailsChapter\u0022}"}
             """;
         var taleId = Auid.Parse("STR_20261103112154_050288");
-        await _repository.SaveAsync(JsonSerializer.Deserialize<TaleInstance>(persistedBy1x)!);
+        await _repository.Save(JsonSerializer.Deserialize<TaleInstance>(persistedBy1x)!, CancellationToken.None);
         var manager = _serviceProvider.GetRequiredService<TaleManager>();
         var userInput = JsonSerializer.SerializeToElement(new CustomerDetails { Name = "Jan", Email = "jan@example.com", Address = "Wadowice" });
 
@@ -281,7 +281,7 @@ public class PauseResumeIntegrationTests
         resumeResult.IsSuccess.Should().BeTrue();
         resumeResult.Data!.TaleId.Should().Be(taleId);
         resumeResult.Data.Status.Should().Be(TaleStatus.Completed);
-        var finalContext = (await _repository.FindById(taleId))!.Context;
+        var finalContext = (await _repository.FindById(taleId, CancellationToken.None))!.Context;
         finalContext.Should().Contain("\"OrderId\":\"ORD-1X\"").And.Contain("\"TaleInstanceId\":\"STR_20261103112154_050288\"");
     }
 }

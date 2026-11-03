@@ -211,7 +211,7 @@ public class ErrorHandlingTests
         result.IsFailure.Should().BeTrue();
         result.Error.Should().NotBeOfType<TaleCancelledError>();
         result.Error!.Message.Should().Contain("HttpClient.Timeout");
-        var persisted = (await repository.ListAsync()).Should().ContainSingle().Subject;
+        var persisted = (await repository.List()).Should().ContainSingle().Subject;
         persisted.Status.Should().Be(TaleStatus.Failed);
         persisted.History.Should().ContainSingle().Which.Status.Should().Be(TaleStatus.Failed);
     }

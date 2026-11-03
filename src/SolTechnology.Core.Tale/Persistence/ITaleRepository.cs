@@ -10,29 +10,30 @@ namespace SolTechnology.Core.Tale.Persistence;
 public interface ITaleRepository
 {
     /// <summary>Find a tale instance by its unique identifier. Returns null if not found.</summary>
-    Task<TaleInstance?> FindById(Auid taleId);
+    Task<TaleInstance?> FindById(Auid taleId, CancellationToken cancellationToken);
 
     /// <summary>
     /// Find a previously-saved tale with the given caller-supplied idempotency key.
     /// Used by <c>TaleManager.StartStory</c> to deduplicate retried requests.
     /// Returns null if none found.
     /// </summary>
-    Task<TaleInstance?> FindByIdempotencyKey(string idempotencyKey);
+    Task<TaleInstance?> FindByIdempotencyKey(string idempotencyKey, CancellationToken cancellationToken);
 
     /// <summary>
     /// Enumerates tale instances matching the filter. Intended for dashboards / operator tooling.
     /// Default implementation throws; override in repositories that want to support listing.
     /// </summary>
-    Task<IReadOnlyList<TaleInstance>> ListAsync(
+    Task<IReadOnlyList<TaleInstance>> List(
         TaleStatus? status = null,
         string? handlerTypeName = null,
         int skip = 0,
-        int take = 100)
+        int take = 100,
+        CancellationToken cancellationToken = default)
         => throw new NotSupportedException("This repository does not support listing.");
 
     /// <summary>Save or update a tale instance (upsert).</summary>
-    Task SaveAsync(TaleInstance taleInstance);
+    Task<Result> Save(TaleInstance taleInstance, CancellationToken cancellationToken);
 
     /// <summary>Delete a tale instance permanently.</summary>
-    Task DeleteAsync(Auid taleId);
+    Task Delete(Auid taleId, CancellationToken cancellationToken);
 }

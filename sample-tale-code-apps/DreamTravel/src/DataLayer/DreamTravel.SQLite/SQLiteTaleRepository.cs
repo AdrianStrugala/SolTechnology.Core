@@ -1,6 +1,7 @@
 using System.Globalization;
 using System.Text.Json;
 using Microsoft.Data.Sqlite;
+using SolTechnology.Core;
 using SolTechnology.Core.AUID;
 using SolTechnology.Core.Tale.Models;
 using SolTechnology.Core.Tale.Persistence;
@@ -133,44 +134,45 @@ public class SQLiteTaleRepository : ITaleRepository
         AddColumn("IdempotencyKey", "TEXT");
     }
 
-    public Task<TaleInstance?> FindById(Auid storyId) =>
+    public Task<TaleInstance?> FindById(Auid storyId, CancellationToken cancellationToken) =>
         ExecuteWithRetry(async () =>
         {
             using var connection = new SqliteConnection(_connectionString);
-            await connection.OpenAsync();
+            await connection.OpenAsync(cancellationToken);
 
             var command = connection.CreateCommand();
             command.CommandText = SelectSql + " WHERE TaleId = @TaleId";
             command.Parameters.AddWithValue("@TaleId", storyId.ToString());
 
-            using var reader = await command.ExecuteReaderAsync();
-            return await reader.ReadAsync() ? MapRow(reader) : null;
-        });
+            using var reader = await command.ExecuteReaderAsync(cancellationToken);
+            return await reader.ReadAsync(cancellationToken) ? MapRow(reader) : null;
+        }, cancellationToken);
 
-    public Task<TaleInstance?> FindByIdempotencyKey(string idempotencyKey) =>
+    public Task<TaleInstance?> FindByIdempotencyKey(string idempotencyKey, CancellationToken cancellationToken) =>
         ExecuteWithRetry(async () =>
         {
             using var connection = new SqliteConnection(_connectionString);
-            await connection.OpenAsync();
+            await connection.OpenAsync(cancellationToken);
 
             var command = connection.CreateCommand();
             command.CommandText = SelectSql + " WHERE IdempotencyKey = @Key LIMIT 1";
             command.Parameters.AddWithValue("@Key", idempotencyKey);
 
-            using var reader = await command.ExecuteReaderAsync();
-            return await reader.ReadAsync() ? MapRow(reader) : null;
-        });
+            using var reader = await command.ExecuteReaderAsync(cancellationToken);
+            return await reader.ReadAsync(cancellationToken) ? MapRow(reader) : null;
+        }, cancellationToken);
 
-    public async Task<IReadOnlyList<TaleInstance>> ListAsync(
+    public async Task<IReadOnlyList<TaleInstance>> List(
         TaleStatus? status = null,
         string? handlerTypeName = null,
         int skip = 0,
-        int take = 100)
+        int take = 100,
+        CancellationToken cancellationToken = default)
     {
         return await ExecuteWithRetry(async () =>
         {
             using var connection = new SqliteConnection(_connectionString);
-            await connection.OpenAsync();
+            await connection.OpenAsync(cancellationToken);
 
             var command = connection.CreateCommand();
             var sql = SelectSql + " WHERE 1=1";
@@ -190,17 +192,17 @@ public class SQLiteTaleRepository : ITaleRepository
             command.CommandText = sql;
 
             var results = new List<TaleInstance>();
-            using var reader = await command.ExecuteReaderAsync();
-            while (await reader.ReadAsync()) results.Add(MapRow(reader));
+            using var reader = await command.ExecuteReaderAsync(cancellationToken);
+            while (await reader.ReadAsync(cancellationToken)) results.Add(MapRow(reader));
             return (IReadOnlyList<TaleInstance>)results;
-        });
+        }, cancellationToken);
     }
 
-    public Task SaveAsync(TaleInstance storyInstance) =>
+    public Task<Result> Save(TaleInstance storyInstance, CancellationToken cancellationToken) =>
         ExecuteWithRetry(async () =>
         {
             using var connection = new SqliteConnection(_connectionString);
-            await connection.OpenAsync();
+            await connection.OpenAsync(cancellationToken);
 
             var command = connection.CreateCommand();
             command.CommandText = @"
@@ -235,23 +237,23 @@ public class SQLiteTaleRepository : ITaleRepository
                     ? (object)JsonSerializer.Serialize(storyInstance.CurrentChapter, TaleJsonOptions.Default)
                     : DBNull.Value);
 
-            await command.ExecuteNonQueryAsync();
-            return 0;
-        });
+            await command.ExecuteNonQueryAsync(cancellationToken);
+            return Result.Success();
+        }, cancellationToken);
 
-    public Task DeleteAsync(Auid storyId) =>
+    public Task Delete(Auid storyId, CancellationToken cancellationToken) =>
         ExecuteWithRetry(async () =>
         {
             using var connection = new SqliteConnection(_connectionString);
-            await connection.OpenAsync();
+            await connection.OpenAsync(cancellationToken);
 
             var command = connection.CreateCommand();
             command.CommandText = "DELETE FROM TaleInstances WHERE TaleId = @TaleId";
             command.Parameters.AddWithValue("@TaleId", storyId.ToString());
 
-            await command.ExecuteNonQueryAsync();
+            await command.ExecuteNonQueryAsync(cancellationToken);
             return 0;
-        });
+        }, cancellationToken);
 
     private const string SelectSql = @"
         SELECT TaleId, HandlerTypeName, IdempotencyKey, Status, Context,
@@ -275,7 +277,7 @@ public class SQLiteTaleRepository : ITaleRepository
             : JsonSerializer.Deserialize<ChapterInfo>(reader.GetString(8), TaleJsonOptions.Default)
     };
 
-    private async Task<T> ExecuteWithRetry<T>(Func<Task<T>> operation)
+    private async Task<T> ExecuteWithRetry<T>(Func<Task<T>> operation, CancellationToken cancellationToken)
     {
         var attempt = 0;
         while (true)
@@ -290,7 +292,7 @@ public class SQLiteTaleRepository : ITaleRepository
                 attempt < _options.MaxRetries)
             {
                 attempt++;
-                await Task.Delay(_options.RetryBaseDelay * attempt);
+                await Task.Delay(_options.RetryBaseDelay * attempt, cancellationToken);
             }
         }
     }

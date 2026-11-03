@@ -51,9 +51,9 @@ public class SQLiteRepositoryTests
             History = [new() { ChapterId = "Chapter1", StartedAt = DateTime.UtcNow, FinishedAt = DateTime.UtcNow }]
         };
 
-        await _repository.SaveAsync(storyInstance);
+        await _repository.Save(storyInstance, CancellationToken.None);
 
-        var retrieved = await _repository.FindById(storyId);
+        var retrieved = await _repository.FindById(storyId, CancellationToken.None);
         retrieved.Should().NotBeNull();
         retrieved!.TaleId.Should().Be(storyId);
         retrieved.HandlerTypeName.Should().Be("TestHandler");
@@ -66,7 +66,7 @@ public class SQLiteRepositoryTests
     [Test]
     public async Task FindById_ShouldReturnNull_WhenTaleDoesNotExist()
     {
-        var result = await _repository.FindById(Auid.New("TST"));
+        var result = await _repository.FindById(Auid.New("TST"), CancellationToken.None);
         result.Should().BeNull();
     }
 
@@ -84,14 +84,14 @@ public class SQLiteRepositoryTests
             LastUpdatedAt = DateTime.UtcNow
         };
 
-        await _repository.SaveAsync(storyInstance);
+        await _repository.Save(storyInstance, CancellationToken.None);
 
         storyInstance.Status = TaleStatus.Completed;
         storyInstance.Context = "{\"value\":2}";
         storyInstance.LastUpdatedAt = DateTime.UtcNow.AddMinutes(5);
-        await _repository.SaveAsync(storyInstance);
+        await _repository.Save(storyInstance, CancellationToken.None);
 
-        var retrieved = await _repository.FindById(storyId);
+        var retrieved = await _repository.FindById(storyId, CancellationToken.None);
         retrieved.Should().NotBeNull();
         retrieved!.Status.Should().Be(TaleStatus.Completed);
         retrieved.Context.Should().Be("{\"value\":2}");
@@ -107,10 +107,10 @@ public class SQLiteRepositoryTests
             Context = "{}", CreatedAt = DateTime.UtcNow, LastUpdatedAt = DateTime.UtcNow
         };
 
-        await _repository.SaveAsync(storyInstance);
-        await _repository.DeleteAsync(storyId);
+        await _repository.Save(storyInstance, CancellationToken.None);
+        await _repository.Delete(storyId, CancellationToken.None);
 
-        var result = await _repository.FindById(storyId);
+        var result = await _repository.FindById(storyId, CancellationToken.None);
         result.Should().BeNull();
     }
 
@@ -126,9 +126,9 @@ public class SQLiteRepositoryTests
             CurrentChapter = currentChapter
         };
 
-        await _repository.SaveAsync(storyInstance);
+        await _repository.Save(storyInstance, CancellationToken.None);
 
-        var retrieved = await _repository.FindById(storyId);
+        var retrieved = await _repository.FindById(storyId, CancellationToken.None);
         retrieved!.CurrentChapter.Should().NotBeNull();
         retrieved.CurrentChapter!.ChapterId.Should().Be("CurrentChapter");
     }
@@ -145,14 +145,14 @@ public class SQLiteRepositoryTests
                 TaleId = id, HandlerTypeName = "ConcurrentHandler", Status = TaleStatus.Running,
                 Context = $"{{\"index\":{i}}}", CreatedAt = DateTime.UtcNow, LastUpdatedAt = DateTime.UtcNow
             };
-            await _repository.SaveAsync(instance);
+            await _repository.Save(instance, CancellationToken.None);
         }));
 
         await Task.WhenAll(tasks);
 
         foreach (var (id, i) in storyIds.Select((id, i) => (id, i)))
         {
-            var retrieved = await _repository.FindById(id);
+            var retrieved = await _repository.FindById(id, CancellationToken.None);
             retrieved.Should().NotBeNull();
             retrieved!.Context.Should().Contain($"\"index\":{i}");
         }
@@ -168,10 +168,10 @@ public class SQLiteRepositoryTests
             Context = "{\"persisted\":true}", CreatedAt = DateTime.UtcNow, LastUpdatedAt = DateTime.UtcNow
         };
 
-        await _repository.SaveAsync(storyInstance);
+        await _repository.Save(storyInstance, CancellationToken.None);
 
         var newRepository = new SQLiteTaleRepository($"Data Source={_testDbPath}");
-        var retrieved = await newRepository.FindById(storyId);
+        var retrieved = await newRepository.FindById(storyId, CancellationToken.None);
 
         retrieved.Should().NotBeNull();
         retrieved!.Context.Should().Be("{\"persisted\":true}");

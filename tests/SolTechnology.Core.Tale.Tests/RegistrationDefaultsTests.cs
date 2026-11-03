@@ -137,28 +137,29 @@ public class RegistrationDefaultsTests
         public int SaveCount;
         public int FindByIdCount;
 
-        public Task<TaleInstance?> FindById(Auid taleId)
+        public Task<TaleInstance?> FindById(Auid taleId, CancellationToken cancellationToken)
         {
             Interlocked.Increment(ref FindByIdCount);
-            return _inner.FindById(taleId);
+            return _inner.FindById(taleId, cancellationToken);
         }
 
-        public Task<TaleInstance?> FindByIdempotencyKey(string idempotencyKey)
-            => _inner.FindByIdempotencyKey(idempotencyKey);
+        public Task<TaleInstance?> FindByIdempotencyKey(string idempotencyKey, CancellationToken cancellationToken)
+            => _inner.FindByIdempotencyKey(idempotencyKey, cancellationToken);
 
-        public Task<IReadOnlyList<TaleInstance>> ListAsync(
+        public Task<IReadOnlyList<TaleInstance>> List(
             TaleStatus? status = null,
             string? handlerTypeName = null,
             int skip = 0,
-            int take = 100)
-            => _inner.ListAsync(status, handlerTypeName, skip, take);
+            int take = 100,
+            CancellationToken cancellationToken = default)
+            => _inner.List(status, handlerTypeName, skip, take, cancellationToken);
 
-        public Task SaveAsync(TaleInstance taleInstance)
+        public Task<Result> Save(TaleInstance taleInstance, CancellationToken cancellationToken)
         {
             Interlocked.Increment(ref SaveCount);
-            return _inner.SaveAsync(taleInstance);
+            return _inner.Save(taleInstance, cancellationToken);
         }
 
-        public Task DeleteAsync(Auid taleId) => _inner.DeleteAsync(taleId);
+        public Task Delete(Auid taleId, CancellationToken cancellationToken) => _inner.Delete(taleId, cancellationToken);
     }
 }

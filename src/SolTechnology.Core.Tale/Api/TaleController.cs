@@ -107,7 +107,7 @@ public abstract class TaleController(
             return BadRequest(Result.Fail($"Invalid tale ID format: {taleId}"));
         }
 
-        var state = await TaleManager.GetStoryState(parsedTaleId);
+        var state = await TaleManager.GetStoryState(parsedTaleId, cancellationToken);
         if (state.IsFailure)
         {
             return NotFound(state);
@@ -154,7 +154,7 @@ public abstract class TaleController(
             return BadRequest(Result.Fail($"Invalid tale ID format: {taleId}"));
         }
 
-        var result = await TaleManager.GetStoryState(parsedTaleId);
+        var result = await TaleManager.GetStoryState(parsedTaleId, RequestAborted);
         if (result.IsFailure)
         {
             return NotFound(result);
@@ -172,7 +172,7 @@ public abstract class TaleController(
             return BadRequest(Result.Fail($"Invalid tale ID format: {taleId}"));
         }
 
-        var state = await TaleManager.GetStoryState(parsedTaleId);
+        var state = await TaleManager.GetStoryState(parsedTaleId, RequestAborted);
         if (state.IsFailure)
         {
             return NotFound(state);
@@ -223,7 +223,7 @@ public abstract class TaleController(
             return BadRequest(Result.Fail($"Invalid tale ID format: {taleId}"));
         }
 
-        var result = await TaleManager.CancelStory(parsedTaleId);
+        var result = await TaleManager.CancelStory(parsedTaleId, RequestAborted);
         if (result.IsFailure)
         {
             return BadRequest(result);
@@ -271,6 +271,8 @@ public abstract class TaleController(
         _methodCache.GetOrAdd((typeof(TaleManager), methodName), key =>
             typeof(TaleManager).GetMethod(key.Item2)
             ?? throw new InvalidOperationException($"TaleManager method '{key.Item2}' not found."));
+
+    private CancellationToken RequestAborted => HttpContext?.RequestAborted ?? default;
 
     private ObjectResult UnexpectedFailure() =>
         StatusCode(500, Result.Fail(new Error
