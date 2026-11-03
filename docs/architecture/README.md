@@ -19,6 +19,7 @@ no longer describe the current system.
 
 - [AI-assisted development](ai-assisted-development.md)
 - [API versioning](api-versioning.md)
+- [AUID](auid.md)
 - [Authentication](authentication.md)
 - [Background processing](background-processing.md)
 - [CQRS](cqrs.md)
