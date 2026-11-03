@@ -2,7 +2,6 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Options;
 using SolTechnology.Core.Logging.Correlations;
 using SolTechnology.Core.Logging.Enrichment;
 using SolTechnology.Core.Logging.Middleware;
@@ -25,7 +24,7 @@ public static class ModuleInstaller
         /// </summary>
         public IServiceCollection AddSolLogging(Action<LoggingOptions>? configure = null)
         {
-            var optionsBuilder = RegisterCore(services);
+            var optionsBuilder = LoggingServiceRegistrations.RegisterCore(services);
             if (configure is not null)
             {
                 optionsBuilder.Configure(configure);
@@ -43,7 +42,7 @@ public static class ModuleInstaller
         {
             ArgumentNullException.ThrowIfNull(configuration);
 
-            RegisterCore(services).Bind(configuration.GetSection(LoggingOptions.SectionName));
+            LoggingServiceRegistrations.RegisterCore(services).Bind(configuration.GetSection(LoggingOptions.SectionName));
             return services;
         }
 
@@ -80,7 +79,7 @@ public static class ModuleInstaller
                 Endpoints: endpoints is { Count: > 0 } ? endpoints.ToArray() : null);
 
             services.AddSingleton(descriptor);
-            EnsureLogDetailEnricherRegistered(services);
+            LoggingServiceRegistrations.EnsureLogDetailEnricherRegistered(services);
             return services;
         }
 
@@ -123,43 +122,4 @@ public static class ModuleInstaller
         public IApplicationBuilder UseSolLogging()
             => app.UseMiddleware<LoggingMiddleware>();
     }
-
-    private static OptionsBuilder<LoggingOptions> RegisterCore(IServiceCollection services)
-    {
-        services.TryAddSingleton<ICorrelationIdService, CorrelationIdService>();
-        services.TryAddSingleton(TimeProvider.System);
-        services.TryAddScoped<ITimingService, TimingService>();
-        EnsureRequestHeadersEnricherRegistered(services);
-
-        return services.AddOptions<LoggingOptions>()
-            .ValidateDataAnnotations()
-            .ValidateOnStart()
-            .Validate(o => o.SkipPaths is null || o.SkipPaths.All(p => !string.IsNullOrWhiteSpace(p)),
-                "LoggingOptions.SkipPaths must not contain null or whitespace entries.")
-            .Validate(o => o.MaskedHeaders is null || o.MaskedHeaders.All(p => !string.IsNullOrWhiteSpace(p)),
-                "LoggingOptions.MaskedHeaders must not contain null or whitespace entries.");
-    }
-
-    private static void EnsureLogDetailEnricherRegistered(IServiceCollection services)
-    {
-        if (services.Any(d => d.ImplementationType == typeof(LogDetailEnricher)))
-        {
-            return;
-        }
-
-        services.AddSingleton<LogDetailEnricher>();
-        services.AddSingleton<ILogScopeEnricher>(sp => sp.GetRequiredService<LogDetailEnricher>());
-    }
-
-    private static void EnsureRequestHeadersEnricherRegistered(IServiceCollection services)
-    {
-        if (services.Any(d => d.ImplementationType == typeof(RequestHeadersEnricher)))
-        {
-            return;
-        }
-
-        services.AddSingleton<RequestHeadersEnricher>();
-        services.AddSingleton<ILogScopeEnricher>(sp => sp.GetRequiredService<RequestHeadersEnricher>());
-    }
 }
-
