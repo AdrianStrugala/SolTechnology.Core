@@ -33,7 +33,7 @@ public class DataField
 /// <summary>
 /// Extension methods for generating DataField schemas from types.
 /// </summary>
-public static class SchemaBuilder
+internal static class SchemaBuilder
 {
     /// <summary>
     /// Converts a type into a list of DataFields describing its structure.

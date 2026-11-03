@@ -18,12 +18,6 @@ public sealed class TaleOptions
 
 
     /// <summary>
-    /// When true, <see cref="Api.TaleController"/> exposes only handlers that were
-    /// registered via <c>AddSolTale</c>. Defaults to true — strongly recommended.
-    /// </summary>
-    public bool RestrictControllerToRegisteredHandlers { get; set; } = true;
-
-    /// <summary>
     /// Internal fallback used by the engine when options are not present in DI (e.g. when a
     /// <see cref="TaleHandler{TInput,TContext,TOutput}"/> is resolved from a container that
     /// does not call <c>AddSolTale</c>). Application code should not depend on this.

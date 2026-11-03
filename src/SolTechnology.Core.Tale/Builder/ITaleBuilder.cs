@@ -17,5 +17,13 @@ public interface ITaleBuilder
 
     /// <summary>The singleton <see cref="TaleOptions"/> registered by <c>AddSolTale</c>.</summary>
     TaleOptions Options { get; }
+
+    /// <summary>
+    /// Lets <see cref="Api.TaleController"/> start, resume and read tales of
+    /// <typeparamref name="THandler"/>. Handlers that are not exposed get a 404 over HTTP.
+    /// </summary>
+    /// <typeparam name="THandler">A <see cref="TaleHandler{TInput,TContext,TOutput}"/> type.</typeparam>
+    /// <exception cref="ArgumentException"><typeparamref name="THandler"/> is not a tale handler.</exception>
+    ITaleBuilder ExposeOverHttp<THandler>() where THandler : class;
 }
 

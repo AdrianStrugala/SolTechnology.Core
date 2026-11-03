@@ -17,7 +17,8 @@ namespace SolTechnology.Core.Tale.Api;
 /// Base REST API controller for the Tale Framework. Provides start/resume/cancel/query endpoints.
 /// </summary>
 /// <remarks>
-/// Only handlers registered via <c>AddSolTale</c> are exposed — see <see cref="TaleHandlerRegistry"/>.
+/// Only handlers opted in with <c>ExposeOverHttp&lt;THandler&gt;()</c> are served — see
+/// <see cref="TaleHandlerRegistry"/>.
 /// Inherit and annotate with your auth attributes before exposing publicly.
 /// </remarks>
 [ApiController]
@@ -243,8 +244,15 @@ public abstract class TaleController(
             return true;
         }
 
+        if (Registry.TryResolveScanned(name, out var scanned))
+        {
+            Logger.LogWarning(
+                "Tale handler [{HandlerName}] exists but is not exposed over HTTP; call ExposeOverHttp<THandler>() to expose it.",
+                scanned.Name);
+        }
+
         handlerType = null;
-        error = NotFound(Result.Fail($"Tale handler '{name}' is not registered."));
+        error = NotFound(Result.Fail("Tale handler not found."));
         return false;
     }
 

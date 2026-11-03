@@ -37,29 +37,15 @@ public class TaleControllerTests
         services.AddLogging(b => b.SetMinimumLevel(LogLevel.Warning));
 
         _repo = new InMemoryTaleRepository();
-        var options = new TaleOptions();
-        services.AddSingleton(options);
         services.AddSingleton<ITaleRepository>(_repo);
-        services.AddScoped<TaleManager>();
-
-        // Register chapters + handler + registry
-        services.AddTransient<LifecyclePassingChapter>();
-        services.AddTransient<LifecyclePauseChapter>();
-        services.AddTransient<LifecycleCompleteChapter>();
-        services.AddTransient<LifecycleTaleV1>();
-
-        _registry = new TaleHandlerRegistry();
-        _registry.Register(typeof(LifecycleTaleV1));
-        _registry.Register(typeof(ThrowingConstructorTale));
-        services.AddSingleton(_registry);
+        services.AddSingleton<TestService>();
+        services.AddSolTale(assemblies: typeof(TaleControllerTests).Assembly)
+            .ExposeOverHttp<LifecycleTaleV1>()
+            .ExposeOverHttp<ThrowingConstructorTale>();
 
         _sp = services.BuildServiceProvider();
-
-        var manager = _sp.GetRequiredService<TaleManager>();
-        _controller = new TestTaleController(manager, _registry, options, NullLogger<TaleController>.Instance)
-        {
-            ControllerContext = new ControllerContext { HttpContext = new DefaultHttpContext { TraceIdentifier = "trace-42" } }
-        };
+        _registry = _sp.GetRequiredService<TaleHandlerRegistry>();
+        _controller = CreateController(NullLogger<TaleController>.Instance);
     }
 
     [TearDown]
@@ -216,6 +202,63 @@ public class TaleControllerTests
         error.Message.Should().NotContain(ThrowingConstructorTale.Secret);
         error.CorrelationId.Should().Be("trace-42");
     }
+
+    [Test]
+    public async Task Start_ExposedHandler_Starts()
+    {
+        // Act
+        var start = await _controller.StartStory(nameof(LifecycleTaleV1), JsonSerializer.SerializeToElement(new LifecycleInput { Value = 1 }));
+
+        // Assert
+        var dto = DataOf<TaleInstanceDto>(start.Should().BeOfType<AcceptedResult>().Subject);
+        (await _repo.FindById(Auid.Parse(dto.TaleId), CancellationToken.None))!.Status.Should().Be(TaleStatus.WaitingForInput);
+    }
+
+    [Test]
+    public async Task Start_NonExposedHandler_Returns404()
+    {
+        // Act
+        var start = await _controller.StartStory(nameof(LifecycleTaleV2), JsonSerializer.SerializeToElement(new LifecycleInput { Value = 1 }));
+
+        // Assert
+        start.Should().BeOfType<NotFoundObjectResult>();
+        (await _repo.List()).Should().BeEmpty();
+    }
+
+    [Test]
+    public async Task Start_QueryTaleNotExposed_Returns404()
+    {
+        // Act
+        var start = await _controller.StartStory(nameof(SimpleCalculationTale), JsonSerializer.SerializeToElement(new CalculationInput { Number = 1 }));
+
+        // Assert
+        start.Should().BeOfType<NotFoundObjectResult>();
+        (await _repo.List()).Should().BeEmpty();
+    }
+
+    [Test]
+    public async Task Start_ScannedButNotExposed_Returns404AndLogsWarning()
+    {
+        // Arrange
+        var logs = new RecordingLoggerProvider();
+        using var loggerFactory = LoggerFactory.Create(b => b.AddProvider(logs));
+        var controller = CreateController(loggerFactory.CreateLogger<TaleController>());
+
+        // Act
+        var start = await controller.StartStory(nameof(LifecycleTaleV2), JsonSerializer.SerializeToElement(new LifecycleInput { Value = 1 }));
+
+        // Assert
+        var body = JsonSerializer.Serialize(start.Should().BeOfType<NotFoundObjectResult>().Subject.Value);
+        body.Should().NotContain(nameof(LifecycleTaleV2)).And.NotContain("ExposeOverHttp");
+        logs.Logs.Should().ContainSingle(log => log.Level == LogLevel.Warning).Which.Message.Should().Be(
+            "Tale handler [LifecycleTaleV2] exists but is not exposed over HTTP; call ExposeOverHttp<THandler>() to expose it.");
+    }
+
+    private TestTaleController CreateController(ILogger<TaleController> logger) =>
+        new(_sp.GetRequiredService<TaleManager>(), _registry, _sp.GetRequiredService<TaleOptions>(), logger)
+        {
+            ControllerContext = new ControllerContext { HttpContext = new DefaultHttpContext { TraceIdentifier = "trace-42" } }
+        };
 
     private static T DataOf<T>(ObjectResult result) =>
         (T)result.Value!.GetType().GetProperty("Data")!.GetValue(result.Value)!;

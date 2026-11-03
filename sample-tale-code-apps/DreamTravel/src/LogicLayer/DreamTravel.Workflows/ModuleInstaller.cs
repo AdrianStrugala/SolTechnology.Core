@@ -16,7 +16,8 @@ public static class ModuleInstaller
         this IServiceCollection services,
         Action<TaleOptions>? configure = null)
         // Explicit assembly: GetCallingAssembly() is unreliable under JIT inlining / WAF.
-        => services.AddSolTale(configure, typeof(SampleOrderWorkflowTale).Assembly);
+        => services.AddSolTale(configure, typeof(SampleOrderWorkflowTale).Assembly)
+            .ExposeOverHttp<SampleOrderWorkflowTale>();
 }
 
 

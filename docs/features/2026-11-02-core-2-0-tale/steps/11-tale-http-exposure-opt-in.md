@@ -1,7 +1,7 @@
 ---
 spec: 2026-11-02-core-2-0-tale
 step: 11
-status: to-do
+status: done
 ---
 
 # Step 11: Tale — explicit HTTP exposure; internal plumbing types
@@ -34,12 +34,31 @@ Former core step 43; moved here by the per-library regroup (user, 2026-11-02).
 - Premortem RM-14 (core step 00, 2026-11-02, scenario 14): keep the scanned handler set (internal) separate from the exposed set. When a request names a scanned but non-exposed handler, the controller returns the same plain 404 (no hint in the body) and logs a Warning, `Tale handler [{HandlerName}] exists but is not exposed over HTTP; call ExposeOverHttp<THandler>() to expose it.`. That gives operators of upgraded apps a server-side signal for P-12. Test: `Start_ScannedButNotExposed_Returns404AndLogsWarning`.
 
 ## Acceptance criteria
-- [ ] `dotnet test tests/SolTechnology.Core.Tale.Tests` is green.
-- [ ] The DreamTravel UI flow tests are green (`dotnet test sample-tale-code-apps/DreamTravel/tests/Unit/DreamTravel.Ui.UnitTests`, component tests).
-- [ ] Premortem mitigations for `ModuleInstaller.cs` are applied.
-- [ ] RM-14: `Start_ScannedButNotExposed_Returns404AndLogsWarning` is green, and the 404 body does not name the handler or `ExposeOverHttp`.
+- [x] `dotnet test tests/SolTechnology.Core.Tale.Tests` is green.
+- [x] The DreamTravel UI flow tests are green (`dotnet test sample-tale-code-apps/DreamTravel/tests/Unit/DreamTravel.Ui.UnitTests`, component tests).
+- [x] Premortem mitigations for `ModuleInstaller.cs` are applied.
+- [x] RM-14: `Start_ScannedButNotExposed_Returns404AndLogsWarning` is green, and the 404 body does not name the handler or `ExposeOverHttp`.
 
 ## Open questions
 - none (`C-06`, `C-07` confirmed by the user on 2026-11-02)
 
 ## Deviations
+
+### Registry shape, the 404 body, and the step 05 scan test
+
+**Original plan:** `ExposeOverHttp<THandler>()` on `ITaleBuilder`; `TaleHandlerRegistry.Register`
+becomes `internal` and the registry holds only exposed handlers; RM-14 keeps the scanned set
+separate and returns the same plain 404.
+
+**Actual implementation:** `TaleHandlerRegistry` keeps two internal sets: `Register` records a
+scanned handler and the new internal `Expose` records an exposed one; the public `TryResolve` and
+`AllHandlers` see only exposed handlers. `ExposeOverHttp<THandler>()` throws `ArgumentException`
+when `THandler` is not a `TaleHandler`. The 404 body is now the fixed `Tale handler not found.` for
+every unresolved name (it used to echo the requested name), so the body never reveals whether a
+handler exists. Because `TryResolve` no longer sees scanned-only handlers,
+`AddSolTale_NoArgs_ScansCallerAssembly` (step 05) now asserts the scan through the service
+descriptors (handler and chapter registered); its name and intent are unchanged, and steps 14–15
+keep it as written here. `TaleControllerTests` builds its registry through `AddSolTale(...)
+.ExposeOverHttp<...>()` instead of the removed public `Register`. The "query tale" case uses
+`SimpleCalculationTale`, a tale meant for direct `Handle` calls. DreamTravel's `AddFlows()` exposes
+`SampleOrderWorkflowTale`, the only workflow the API and UI start.

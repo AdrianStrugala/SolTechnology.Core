@@ -77,9 +77,7 @@ public class RegistrationDefaultsTests
         services.AddSolTale();
 
         // Assert
-        using var sp = services.BuildServiceProvider();
-        sp.GetRequiredService<TaleHandlerRegistry>().TryResolve(nameof(LifecycleTaleV1), out var handlerType).Should().BeTrue();
-        handlerType.Should().Be(typeof(LifecycleTaleV1));
+        services.Should().Contain(d => d.ServiceType == typeof(LifecycleTaleV1));
         services.Should().Contain(d => d.ServiceType == typeof(LifecyclePauseChapter));
     }
 
