@@ -23,8 +23,13 @@ namespace SolTechnology.Core;
 [JsonDerivedType(typeof(DeadlockError), "deadlock")]
 public record Error
 {
+    /// <summary>Human-readable description of what went wrong.</summary>
     public virtual string Message { get; init; } = null!;
+
+    /// <summary>Optional additional detail about the failure.</summary>
     public string? Description { get; init; }
+
+    /// <summary>True when retrying the operation may succeed (for example a timeout or a deadlock).</summary>
     public bool Recoverable { get; init; }
 
     /// <summary>

@@ -10,17 +10,20 @@ public record AggregateError : Error
 {
     private readonly IReadOnlyList<Error> _innerErrors;
 
+    /// <summary>Creates an aggregate with no inner errors.</summary>
     public AggregateError()
     {
         _innerErrors = Array.Empty<Error>();
         Message = "One or more errors occurred.";
     }
 
+    /// <summary>Creates an aggregate of <paramref name="innerErrors"/> with a default message.</summary>
     public AggregateError(IEnumerable<Error> innerErrors)
         : this("One or more errors occurred.", innerErrors)
     {
     }
 
+    /// <summary>Creates an aggregate of <paramref name="innerErrors"/>; the message is <paramref name="message"/> followed by each inner message.</summary>
     public AggregateError(string message, IEnumerable<Error> innerErrors)
     {
         _innerErrors = (innerErrors ?? throw new ArgumentNullException(nameof(innerErrors))).ToArray();
@@ -35,8 +38,10 @@ public record AggregateError : Error
         Message = message;
     }
 
+    /// <summary>The aggregated errors.</summary>
     public IReadOnlyList<Error> InnerErrors => _innerErrors;
 
+    /// <summary>The base message followed by each inner error message in parentheses.</summary>
     public override string Message { get; init; }
 
     private static string BuildMessage(string baseMessage, IReadOnlyList<Error> errors)
