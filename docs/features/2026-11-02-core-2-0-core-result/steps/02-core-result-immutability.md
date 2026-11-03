@@ -1,7 +1,7 @@
 ---
 spec: 2026-11-02-core-2-0-core-result
 step: 02
-status: to-do
+status: done
 ---
 
 # Step 02: Core — immutable `Result` and a typed `Result<T>.FailAsTask`
@@ -25,13 +25,19 @@ Former core step 38; moved here by the per-library regroup (user, 2026-11-02).
 - Keep JSON shape identical. ProblemDetails and Tale persistence serialize `Result` (verify with a snapshot test). This is a persisted-contract touchpoint (premortem trigger): a `Result` stored by 1.x must still deserialize.
 
 ## Acceptance criteria
-- [ ] `dotnet build SolTechnology.Core.slnx` is green, including DreamTravel.
-- [ ] `dotnet test tests/SolTechnology.Core.Tests` and `dotnet test tests/SolTechnology.Core.CQRS.Tests` are green.
-- [ ] `Result<int>.FailAsTask(new Error(...))` compiles to `Task<Result<int>>` (test).
-- [ ] `RoundTrip_1xResultJson_Deserializes` (a JSON literal captured at `4097d47f`) is green.
-- [ ] Premortem mitigations for the persisted contract are applied.
+- [x] `dotnet build SolTechnology.Core.slnx` is green, including DreamTravel.
+- [x] `dotnet test tests/SolTechnology.Core.Tests` and `dotnet test tests/SolTechnology.Core.CQRS.Tests` are green.
+- [x] `Result<int>.FailAsTask(new Error(...))` compiles to `Task<Result<int>>` (test).
+- [x] `RoundTrip_1xResultJson_Deserializes` (a JSON literal captured at `4097d47f`) is green.
+- [x] Premortem mitigations for the persisted contract are applied.
 
 ## Open questions
 - none (`C-02` confirmed by the user on 2026-11-02)
 
 ## Deviations
+
+### `private protected init` on the base properties
+
+**Original plan:** `private init` on `IsSuccess`, `Error` and `Data`.
+
+**Actual implementation:** `Data` is `private init`, but `IsSuccess` and `Error` are `private protected init`, because `Result<T>`'s factories must set the base properties and `private` would not compile; `private protected` still keeps them closed to every other assembly. All three carry `[JsonInclude]` so System.Text.Json keeps reading them. No object-initializer construction existed in `src/` or DreamTravel; the only one was the malformed-result test in `ResultConversionFilterTests`, which now builds that state from JSON. The 1.x JSON literals were checked against the code before the change (`Serialize_Result_MatchesTheShapeStoredBy1x`) and still round-trip after it. The DreamTravel OpenAPI contract snapshot gained `readOnly: true` on `isSuccess` and `data` in the two `Result` schemas; accepted as correct for a response-only type. Full suite green.
