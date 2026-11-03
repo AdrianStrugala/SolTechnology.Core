@@ -1,4 +1,3 @@
-using System.Text.Json;
 using Microsoft.AspNetCore.Connections;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
@@ -62,7 +61,8 @@ public sealed class LoggingMiddleware
         var enricherList = enrichers as IList<ILogScopeEnricher> ?? enrichers.ToArray();
 
         // Async-buffer + parse the JSON body once if any enricher requested it; body is reset for model binding.
-        await PrepareJsonBodyIfRequestedAsync(context, enricherList, logger).ConfigureAwait(false);
+        await RequestBodyBuffer.ParseJsonIfRequested(context, enricherList, _options.MaxLoggedJsonBodyBytes, logger)
+            .ConfigureAwait(false);
 
         foreach (var enricher in enricherList)
         {
@@ -159,71 +159,6 @@ public sealed class LoggingMiddleware
                 context.Request.Path,
                 statusCode,
                 elapsedMs);
-        }
-    }
-    private async Task PrepareJsonBodyIfRequestedAsync(
-        HttpContext context,
-        IList<ILogScopeEnricher> enrichers,
-        ILogger logger)
-    {
-        var requested = false;
-        foreach (var enricher in enrichers)
-        {
-            if (enricher is IRequiresRequestBody bodyAware && bodyAware.RequiresBody(context))
-            {
-                requested = true;
-                break;
-            }
-        }
-        if (!requested)
-        {
-            return;
-        }
-
-        var request = context.Request;
-
-        if (request.ContentType is null ||
-            !request.ContentType.StartsWith("application/json", StringComparison.OrdinalIgnoreCase))
-        {
-            return;
-        }
-
-        if (request.ContentLength is null || request.ContentLength <= 0 ||
-            request.ContentLength > _options.MaxLoggedJsonBodyBytes)
-        {
-            return;
-        }
-
-        try
-        {
-            request.EnableBuffering();
-            request.Body.Position = 0;
-
-            var document = await JsonDocument
-                .ParseAsync(request.Body, default, context.RequestAborted)
-                .ConfigureAwait(false);
-
-            context.Items[LogDetailEnricher.ParsedBodyItemKey] = document;
-            context.Response.RegisterForDispose(document);
-        }
-        catch (JsonException ex)
-        {
-            // Malformed body - model binding will surface a 400; skip enrichment.
-            logger.LogDebug(
-                ex,
-                "Skipping body-based log enrichment for [{RequestPath}] - JSON could not be parsed",
-                request.Path);
-        }
-        catch (OperationCanceledException)
-        {
-            // Client gone - nothing to enrich.
-        }
-        finally
-        {
-            if (request.Body.CanSeek)
-            {
-                request.Body.Position = 0;
-            }
         }
     }
 
