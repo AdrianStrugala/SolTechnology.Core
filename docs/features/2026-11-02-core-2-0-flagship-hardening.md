@@ -543,6 +543,19 @@ these notes from the steps:
   `TimeProvider` encodes the UTC instant even when the provider reports a non-zero offset (1.x and
   the 2.0 preview used the offset-local clock time), and a clock before 2001-01-01 now throws
   `InvalidOperationException` instead of producing a wrong ID.
+- tale (post-completion review, 2026-11-03): a chapter or inline step that throws no longer
+  exposes the exception text: the result, the HTTP body and the stored `ChapterInfo.Error` read
+  "Chapter [X] failed unexpectedly." (or "Tale [X] failed unexpectedly.") with the trace ID as
+  `CorrelationId`; the exception is logged. A run cancelled by its token between saves stores
+  `Cancelled` and an exception outside a chapter stores `Failed` (both could store `Completed`). A
+  synchronous throw from a non-async `ReadWithInput` is classified like an async one.
+  `GET`/`DELETE /api/tale/{id}` return the "Tale not found" 404 for a tale whose handler is not
+  exposed over HTTP, and `DELETE` of a missing tale returns 404 instead of 400.
+- tale (post-completion review, user decision 2026-11-03, amends the `tale 09` note): new
+  `TaleOptions.RunningLeaseTimeout` (default 5 minutes). `ResumeStory` takes over a `Running` tale
+  whose `LastUpdatedAt` is older than the timeout, re-running its interrupted chapter, so chapters
+  with side effects must be idempotent and the timeout must exceed the longest chapter. Custom
+  repositories must store `LastUpdatedAt` unchanged in UTC; no schema change.
 
 ### Resolved questions (user answers, 2026-11-02)
 
