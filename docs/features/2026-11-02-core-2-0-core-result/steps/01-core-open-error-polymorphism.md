@@ -1,7 +1,7 @@
 ---
 spec: 2026-11-02-core-2-0-core-result
 step: 01
-status: to-do
+status: done
 ---
 
 # Step 01: Core — open `Error` polymorphism; `AggregateError` round-trip
@@ -30,11 +30,17 @@ Former core step 17 (Core part); split per library on 2026-11-02. The Tale part 
   - `RoundTrip_AggregateError_PreservesInnerErrors` (asserts `InnerErrors.Count` and the subtypes).
 
 ## Acceptance criteria
-- [ ] `dotnet test tests/SolTechnology.Core.CQRS.Tests` is green.
-- [ ] JSON of each pre-existing discriminator is unchanged (snapshot assertion in `ErrorSerializationTests`).
-- [ ] No public or protected symbol renamed, removed, or added.
+- [x] `dotnet test tests/SolTechnology.Core.CQRS.Tests` is green.
+- [x] JSON of each pre-existing discriminator is unchanged (snapshot assertion in `ErrorSerializationTests`).
+- [x] No public or protected symbol renamed, removed, or added.
 
 ## Open questions
 - none
 
 ## Deviations
+
+### Private JSON constructor for `AggregateError`
+
+**Original plan:** add `[JsonConstructor] AggregateError(string message, IReadOnlyList<Error> innerErrors)`.
+
+**Actual implementation:** the constructor is `private` (System.Text.Json accepts non-public `[JsonConstructor]` since .NET 8). A public `IReadOnlyList<Error>` overload would win overload resolution over the existing public `(string, IEnumerable<Error>)` constructor for every array or list argument and silently skip message building; private keeps the public surface unchanged, as the acceptance criteria require. It assigns the serialized `Message` as-is (it already contains the inner messages). `[JsonConstructor]` moved off the public parameterless constructor, which stays. Nine snapshot cases pin the JSON of every existing discriminator; they passed before and after the change. Full suite green.

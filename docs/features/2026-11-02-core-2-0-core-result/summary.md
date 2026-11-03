@@ -19,7 +19,7 @@ are `done` and after these library features are `completed`: none. No step is `b
 
 | # | Title | File | Status |
 |---|---|---|---|
-| 01 | Core — open `Error` polymorphism; `AggregateError` round-trip | [`steps/01-core-open-error-polymorphism.md`](steps/01-core-open-error-polymorphism.md) | to-do |
+| 01 | Core — open `Error` polymorphism; `AggregateError` round-trip | [`steps/01-core-open-error-polymorphism.md`](steps/01-core-open-error-polymorphism.md) | done |
 | 02 | Core — immutable `Result` and a typed `Result<T>.FailAsTask` | [`steps/02-core-result-immutability.md`](steps/02-core-result-immutability.md) | to-do |
 | 03 | XML docs shipped — Core | [`steps/03-xml-docs.md`](steps/03-xml-docs.md) | to-do |
 | 04 | Module docs — `docs/Core.md` as the `SolTechnology.Core` package README | [`steps/04-docs-core.md`](steps/04-docs-core.md) | to-do |
