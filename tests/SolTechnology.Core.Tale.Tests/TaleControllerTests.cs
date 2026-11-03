@@ -271,6 +271,48 @@ public class TaleControllerTests
         stored.Status.Should().Be(TaleStatus.Failed);
     }
 
+    [Test]
+    public async Task GetState_NonExposedHandlerTale_Returns404()
+    {
+        // Arrange
+        var taleId = await StoreTaleOf(nameof(LifecycleTaleV2));
+
+        // Act
+        var state = await _controller.GetStoryState(taleId.ToString());
+        var missing = await _controller.GetStoryState(Auid.New("STR").ToString());
+
+        // Assert
+        JsonSerializer.Serialize(state.Should().BeOfType<NotFoundObjectResult>().Subject.Value)
+            .Should().Be(JsonSerializer.Serialize(missing.Should().BeOfType<NotFoundObjectResult>().Subject.Value));
+    }
+
+    [Test]
+    public async Task Cancel_NonExposedHandlerTale_Returns404AndDoesNotCancel()
+    {
+        // Arrange
+        var taleId = await StoreTaleOf(nameof(LifecycleTaleV2));
+
+        // Act
+        var cancel = await _controller.CancelStory(taleId.ToString());
+
+        // Assert
+        cancel.Should().BeOfType<NotFoundObjectResult>();
+        (await _repo.FindById(taleId, CancellationToken.None))!.Status.Should().Be(TaleStatus.WaitingForInput);
+    }
+
+    private async Task<Auid> StoreTaleOf(string handlerTypeName)
+    {
+        var instance = new TaleInstance
+        {
+            TaleId = Auid.New("STR"),
+            HandlerTypeName = handlerTypeName,
+            Status = TaleStatus.WaitingForInput,
+            Context = "{}"
+        };
+        (await _repo.Save(instance, CancellationToken.None)).IsSuccess.Should().BeTrue();
+        return instance.TaleId;
+    }
+
     private TestTaleController CreateController(ILogger<TaleController> logger) =>
         new(_sp.GetRequiredService<TaleManager>(), _registry, _sp.GetRequiredService<TaleOptions>(), logger)
         {

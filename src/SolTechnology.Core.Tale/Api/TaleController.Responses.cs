@@ -3,6 +3,7 @@ using System.Reflection;
 using System.Text.Json;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using SolTechnology.Core.AUID;
 using SolTechnology.Core.Tale.Models;
 using SolTechnology.Core.Tale.Persistence;
 
@@ -36,6 +37,15 @@ public abstract partial class TaleController
         }
 
         return true;
+    }
+
+    // A tale of a handler not exposed over HTTP answers exactly like a missing tale.
+    private async Task<Result<TaleInstance>> FindExposedTale(Auid taleId)
+    {
+        var state = await TaleManager.GetStoryState(taleId, RequestAborted);
+        return state.IsSuccess && !Registry.TryResolve(state.Data!.HandlerTypeName, out _)
+            ? Result<TaleInstance>.Fail("Tale not found")
+            : state;
     }
 
     private bool TryReadInput(JsonElement input, Type inputType, out object typedInput, out IActionResult error)

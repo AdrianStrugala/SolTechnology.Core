@@ -92,7 +92,7 @@ public abstract partial class TaleController(
             return InvalidTaleId(taleId);
         }
 
-        var result = await TaleManager.GetStoryState(parsedTaleId, RequestAborted);
+        var result = await FindExposedTale(parsedTaleId);
         return result.IsFailure
             ? NotFound(result)
             : Ok(Result<TaleInstanceDto>.Success(TaleInstanceDto.FromModel(result.Data!)));
@@ -131,6 +131,12 @@ public abstract partial class TaleController(
         if (!Auid.TryParse(taleId, null, out var parsedTaleId))
         {
             return InvalidTaleId(taleId);
+        }
+
+        var state = await FindExposedTale(parsedTaleId);
+        if (state.IsFailure)
+        {
+            return NotFound(state);
         }
 
         var result = await TaleManager.CancelStory(parsedTaleId, RequestAborted);
