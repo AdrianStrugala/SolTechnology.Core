@@ -1,7 +1,7 @@
 ---
 spec: 2026-11-02-core-2-0-logging
 step: 05
-status: to-do
+status: in-progress
 ---
 
 # Step 05: Logging — public surface cleanup (`LoggerExtensions`, internal `Operations`)
