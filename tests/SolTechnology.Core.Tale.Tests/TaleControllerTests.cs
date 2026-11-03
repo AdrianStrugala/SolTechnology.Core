@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Text.Json;
 using FluentAssertions;
 using Microsoft.AspNetCore.Http;
@@ -136,6 +137,42 @@ public class TaleControllerTests
 
         var result = await _controller.GetStoryResult(dto.TaleId);
         result.Should().BeOfType<BadRequestObjectResult>();
+    }
+
+    [Test]
+    public void ToDataFields_SelfReferencingType_Terminates()
+    {
+        // Arrange
+        var chapter = new SelfReferencingInputChapter();
+
+        // Act
+        var schema = chapter.GetRequiredInputSchema();
+
+        // Assert
+        var node = schema.Should().ContainSingle(f => f.Name == nameof(SelfReferencingInput.Node)).Subject;
+        node.IsComplex.Should().BeTrue();
+        node.Children.Should().ContainSingle(f => f.Name == nameof(Node.Parent))
+            .Which.Children.Should().BeEmpty("a type already on the path is not expanded again");
+        schema.Should().ContainSingle(f => f.Name == nameof(SelfReferencingInput.Culture))
+            .Which.Children.Should().NotBeEmpty();
+    }
+
+    public sealed class Node
+    {
+        public Node? Parent { get; set; }
+    }
+
+    public sealed class SelfReferencingInput
+    {
+        public Node? Node { get; set; }
+
+        public CultureInfo Culture { get; set; } = CultureInfo.InvariantCulture;
+    }
+
+    public sealed class SelfReferencingInputChapter : InteractiveChapter<LifecycleContext, SelfReferencingInput>
+    {
+        public override Task<Result> ReadWithInput(LifecycleContext context, SelfReferencingInput userInput) =>
+            Result.SuccessAsTask();
     }
 
     private sealed class TestTaleController : TaleController

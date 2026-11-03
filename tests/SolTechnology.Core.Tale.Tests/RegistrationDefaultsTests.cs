@@ -67,6 +67,43 @@ public class RegistrationDefaultsTests
     }
 
 
+    [Test]
+    public void AddSolTale_NoArgs_ScansCallerAssembly()
+    {
+        // Arrange
+        var services = new ServiceCollection().AddLogging();
+
+        // Act
+        services.AddSolTale();
+
+        // Assert
+        using var sp = services.BuildServiceProvider();
+        sp.GetRequiredService<TaleHandlerRegistry>().TryResolve(nameof(LifecycleTaleV1), out var handlerType).Should().BeTrue();
+        handlerType.Should().Be(typeof(LifecycleTaleV1));
+        services.Should().Contain(d => d.ServiceType == typeof(LifecyclePauseChapter));
+    }
+
+    [Test]
+    public async Task Handle_NewTale_LogScopeHasAssignedTaleId()
+    {
+        // Arrange
+        var logs = new RecordingLoggerProvider();
+        var services = new ServiceCollection().AddLogging(b => b.AddProvider(logs));
+        services.AddSolTale(assemblies: typeof(LifecycleTaleV1).Assembly);
+        using var sp = services.BuildServiceProvider();
+        var manager = sp.GetRequiredService<TaleManager>();
+
+        // Act
+        var start = await manager.StartStory<LifecycleTaleV2, LifecycleInput, LifecycleContext, LifecycleOutput>(
+            new LifecycleInput { Value = 1 });
+
+        // Assert
+        var taleScope = logs.Scopes.OfType<IReadOnlyDictionary<string, object?>>()
+            .Should().ContainSingle(scope => scope.ContainsKey("TaleId")).Subject;
+        taleScope["TaleId"].Should().Be(start.Data!.TaleId).And.NotBe(Auid.Empty);
+        taleScope["TaleHandler"].Should().Be(nameof(LifecycleTaleV2));
+    }
+
     // --- helpers ---
 
     private static ServiceProvider BuildProvider(Action<ITaleBuilder> configureBuilder)

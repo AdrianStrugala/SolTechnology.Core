@@ -1,7 +1,7 @@
 ---
 spec: 2026-11-02-core-2-0-tale
 step: 05
-status: to-do
+status: done
 ---
 
 # Step 05: Tale — registration and schema safety, correct log scope
@@ -35,10 +35,27 @@ Former core step 26; moved here by the per-library regroup (user, 2026-11-02).
 - `docs/Tale.md:519-523` (log category) is corrected in step 13.
 
 ## Acceptance criteria
-- [ ] `dotnet test tests/SolTechnology.Core.Tale.Tests` is green.
-- [ ] Premortem mitigations for `ModuleInstaller.cs` are applied.
+- [x] `dotnet test tests/SolTechnology.Core.Tale.Tests` is green.
+- [x] Premortem mitigations for `ModuleInstaller.cs` are applied.
 
 ## Open questions
 - none
 
 ## Deviations
+
+### Test placement and the premortem mitigation for `ModuleInstaller.cs`
+
+**Original plan:** `AddSolTale_NoArgs_ScansCallerAssembly` and the log-scope test in the listed
+test files; the schema test in `TaleControllerTests.cs`; premortem mitigations for
+`ModuleInstaller.cs` applied.
+
+**Actual implementation:** `AddSolTale_NoArgs_ScansCallerAssembly` and
+`Handle_NewTale_LogScopeHasAssignedTaleId` live in `RegistrationDefaultsTests.cs`; both failed on
+`master` before the change (`86bb056f`: the test assembly was not scanned; the scope carried
+`Auid.Empty`). `ToDataFields_SelfReferencingType_Terminates` goes through the public
+`InteractiveChapter.GetRequiredInputSchema()` so that it survives step 11 making `SchemaBuilder`
+internal; it was not run on the old code because the recursion kills the test host. The only
+premortem item for this step's `ModuleInstaller.cs` change is core scenario 23: the no-args scan
+test is the guard that step 15 (RM-16) keeps unmodified. The schema walk tracks the types on the
+current path (not every type seen), so a type that appears in two sibling properties is still
+expanded in both.

@@ -42,7 +42,12 @@ public static class SchemaBuilder
     /// </summary>
     /// <param name="type">The type to generate schema for</param>
     /// <returns>List of DataFields describing the type's public properties</returns>
-    public static List<DataField> ToDataFields(this Type type)
+    public static List<DataField> ToDataFields(this Type type) =>
+        ToDataFields(type, new HashSet<Type> { type }, depth: 1);
+
+    private const int MaxDepth = 8;
+
+    private static List<DataField> ToDataFields(Type type, HashSet<Type> path, int depth)
     {
         var fields = new List<DataField>();
         var properties = type.GetProperties(BindingFlags.Public | BindingFlags.Instance);
@@ -56,10 +61,11 @@ public static class SchemaBuilder
                 IsComplex = IsComplexType(prop.PropertyType)
             };
 
-            if (field.IsComplex && !IsCollection(prop.PropertyType))
+            // A type already on the path is listed without children, so self-references terminate.
+            if (field.IsComplex && !IsCollection(prop.PropertyType) && depth < MaxDepth && path.Add(prop.PropertyType))
             {
-                // Recursively process complex types (but not collections to avoid infinite loops)
-                field.Children = ToDataFields(prop.PropertyType);
+                field.Children = ToDataFields(prop.PropertyType, path, depth + 1);
+                path.Remove(prop.PropertyType);
             }
 
             fields.Add(field);

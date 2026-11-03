@@ -151,6 +151,8 @@ public abstract class TaleHandler<TInput, TContext, TOutput>
         _engine = new TaleEngine<TInput, TContext, TOutput>(_serviceProvider, _logger, repository, options, timeProvider);
         Context = context;
 
+        _engine.Initialize(Context, GetType(), resumeInput, run.Resume, cancellationToken);
+
         using var _ = _logger.BeginScope(new Dictionary<string, object?>
         {
             ["TaleHandler"] = GetType().Name,
@@ -159,8 +161,6 @@ public abstract class TaleHandler<TInput, TContext, TOutput>
 
         try
         {
-            _engine.Initialize(Context, GetType(), resumeInput, run.Resume, cancellationToken);
-
             var tale = Tell();
             await _engine.Run(tale.Steps);
 

@@ -1,5 +1,6 @@
 using System.Collections.Concurrent;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using SolTechnology.Core.Tale.Builder;
@@ -53,6 +54,7 @@ public static class ModuleInstaller
     /// <param name="services">The service collection.</param>
     /// <param name="configure">Optional <see cref="TaleOptions"/> mutator.</param>
     /// <param name="assemblies">Assemblies to scan for chapters and handlers.</param>
+    [MethodImpl(MethodImplOptions.NoInlining)]
     public static ITaleBuilder AddSolTale(
         this IServiceCollection services,
         Action<TaleOptions>? configure = null,
@@ -74,7 +76,7 @@ public static class ModuleInstaller
 
         var targets = assemblies is { Length: > 0 }
             ? assemblies.Distinct().ToArray()
-            : DefaultScanAssemblies();
+            : DefaultScanAssemblies(Assembly.GetCallingAssembly());
 
         foreach (var assembly in targets)
         {
@@ -115,13 +117,11 @@ public static class ModuleInstaller
         return new TaleBuilder(services, options);
     }
 
-    private static Assembly[] DefaultScanAssemblies()
+    private static Assembly[] DefaultScanAssemblies(Assembly calling)
     {
-        var list = new HashSet<Assembly>();
+        var list = new HashSet<Assembly> { calling };
         var entry = Assembly.GetEntryAssembly();
         if (entry != null) list.Add(entry);
-        var calling = Assembly.GetCallingAssembly();
-        if (calling != null) list.Add(calling);
         return list.ToArray();
     }
 
