@@ -22,6 +22,7 @@ no longer describe the current system.
 - [Authentication](authentication.md)
 - [Background processing](background-processing.md)
 - [CQRS](cqrs.md)
+- [Result and errors](core-result-and-errors.md)
 - [Delivery workflow](delivery-workflow.md)
 - [HTTP clients](http-client.md)
 - [Naming and public API](naming-and-public-api.md)

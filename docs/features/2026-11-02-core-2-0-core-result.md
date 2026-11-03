@@ -1,7 +1,7 @@
 ---
-status: in-progress
+status: completed
 created: 2026-11-02
-completed:
+completed: 2026-11-03
 ---
 
 # SolTechnology.Core 2.0 — Core `Result` and `Error`
@@ -81,7 +81,7 @@ Premortem mitigations carried verbatim from core 00: RM-20 (step 04).
 
 ## Implementation plan
 
-Steps live in the temporary working folder `2026-11-02-core-2-0-core-result/` (see its `summary.md`). Gates: `review` is
+Steps lived in a temporary working folder, deleted at completion (2026-11-03; see Git history). Gates: `review` is
 `done (2026-11-02)`; `premortem` is `skipped` — the core premortem verdict `go-with-mitigations (2026-11-02)`
 covers these steps.
 
@@ -109,18 +109,54 @@ Steps run in number order; each is one PR.
 
 ## Acceptance criteria
 
-- [ ] Every step's acceptance criteria are checked, or the gap is recorded under `Deviations`.
-- [ ] Regression tests for `B7` (unknown `Error` subtype, `AggregateError` round-trip) fail on `4097d47f` and pass.
-- [ ] `C-02` shipped: `Result.IsSuccess`, `Result.Error`, and `Result<T>.Data` have `private init`; `Result<T>.FailAsTask(Error)` returns `Task<Result<T>>`.
-- [ ] `dotnet build SolTechnology.Core.slnx -c Release` is green, and `dotnet build SolTechnology.Core.slnx 2>&1 | grep -E "NU190[1-4]|NU1605"` prints nothing.
-- [ ] `dotnet test tests/SolTechnology.Core.Tests` and `dotnet test tests/SolTechnology.Core.CQRS.Tests` (home of `ErrorSerializationTests`) are green.
-- [ ] `find src/SolTechnology.Core -name "*.cs" -not -path "*/obj/*" | xargs wc -l | awk '$1>150 && $2!="total"'` prints nothing.
-- [ ] Every packed `.nupkg` of this feature contains `lib/net10.0/*.xml`.
-- [ ] Every C# snippet in `docs/Core.md` compiles in a throwaway console project against the 2.0 API, as recorded in the module-docs step.
-- [ ] The library-scoped `[{Placeholder}]` template check of the conformance or log-template step prints nothing.
+- [x] Every step's acceptance criteria are checked, or the gap is recorded under `Deviations`.
+- [x] Regression tests for `B7` (unknown `Error` subtype, `AggregateError` round-trip) fail on `4097d47f` and pass.
+- [x] `C-02` shipped: `Result.IsSuccess`, `Result.Error`, and `Result<T>.Data` have `private init`; `Result<T>.FailAsTask(Error)` returns `Task<Result<T>>`.
+- [x] `dotnet build SolTechnology.Core.slnx -c Release` is green, and `dotnet build SolTechnology.Core.slnx 2>&1 | grep -E "NU190[1-4]|NU1605"` prints nothing.
+- [x] `dotnet test tests/SolTechnology.Core.Tests` and `dotnet test tests/SolTechnology.Core.CQRS.Tests` (home of `ErrorSerializationTests`) are green.
+- [x] `find src/SolTechnology.Core -name "*.cs" -not -path "*/obj/*" | xargs wc -l | awk '$1>150 && $2!="total"'` prints nothing.
+- [x] Every packed `.nupkg` of this feature contains `lib/net10.0/*.xml`.
+- [x] Every C# snippet in `docs/Core.md` compiles in a throwaway console project against the 2.0 API, as recorded in the module-docs step.
+- [x] The library-scoped `[{Placeholder}]` template check of the conformance or log-template step prints nothing.
 
 ## Completion summary
 
+Delivered on `master` between `81288e4f` and the retrospective commit (2026-11-03):
+
+- **01:** `Error` falls back to the nearest registered ancestor for unknown subtypes (no more
+  `NotSupportedException`); `AggregateError.InnerErrors` survives a JSON round-trip. Nine snapshot
+  tests pin the JSON of every existing discriminator (unchanged).
+- **02 (`C-02`):** `Result`/`Result<T>` state is read-only outside the factories and implicit
+  conversions; `Result<T>.FailAsTask(Error)` returns `Task<Result<T>>`. JSON written by 1.x
+  still deserializes and 2.0 writes the same shape.
+- **03:** `SolTechnology.Core` ships its XML documentation; every public member is documented.
+- **04:** `docs/Core.md` is the package README (snippets compiled and run against 2.0).
+- **05:** Guide conformance; `AggregateError` message building is pinned by tests and braced.
+- **Retrospective** (closure confirmed by the user on 2026-11-03 for every library feature): current behaviour and rationale are in
+  [`docs/architecture/core-result-and-errors.md`](../architecture/core-result-and-errors.md).
+  Final validation: `dotnet build SolTechnology.Core.slnx -c Release` green with no
+  `NU190[1-4]`/`NU1605`; `dotnet test SolTechnology.Core.slnx -c Release` 519 passed, 0 failed.
+
+Changes to core-brief rows and release-notes inputs:
+
+- `C-02`: `IsSuccess` and `Error` are `private protected init`, not `private init`, because
+  `Result<T>`'s factories set them; the effect for consumers is the same.
+- Release notes: OpenAPI schemas of `Result` types now mark `isSuccess` and `data` as `readOnly`.
+- Release notes (P-01): custom `Error` subtypes serialize as `$type: "error"` with only the base
+  properties.
+
 ## Deviations
 
+- **01:** the `AggregateError` JSON constructor is `private`, not public, so it cannot win overload
+  resolution over the existing public `(string, IEnumerable<Error>)` constructor.
+- **02:** `private protected init` on the base properties (see above); the malformed-result test in
+  `ResultConversionFilterTests` now builds that state from JSON; the DreamTravel OpenAPI contract
+  snapshot gained `readOnly: true` on `isSuccess` and `data`.
+- **04:** snippet verification is recorded in this record instead of a PR description, because the
+  change was committed directly to `master`.
+- **05:** `AggregateErrorTests` (3 tests) landed before the refactor to cover the empty branch.
+
 ## Follow-ups
+
+- Tale step "Tale — `TaleJsonOptions.Default` registers the Tale error discriminators" (tale 02)
+  extends the architecture page with the Tale discriminators.
