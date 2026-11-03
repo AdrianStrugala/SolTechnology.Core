@@ -52,6 +52,18 @@ public sealed class LoggingPipelineBehavior<TRequest, TResponse> : IPipelineBeha
             try
             {
                 var result = await next();
+                if (result is Result { IsFailure: true } failed)
+                {
+                    OperationResultLogMessages.OperationFailedWithResult(
+                        _logger,
+                        operationName,
+                        sw.ElapsedMilliseconds,
+                        failed.Error?.GetType().Name ?? nameof(Error),
+                        failed.Error?.Message);
+                    activity?.SetStatus(ActivityStatusCode.Error);
+                    return result;
+                }
+
                 _logger.OperationSucceeded(operationName, sw.ElapsedMilliseconds);
                 activity?.SetStatus(ActivityStatusCode.Ok);
                 return result;
