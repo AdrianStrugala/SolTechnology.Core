@@ -39,7 +39,11 @@ public class TaleInstance
     /// <summary>When this tale instance was first created. Never updated.</summary>
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
-    /// <summary>When this tale instance was last updated.</summary>
+    /// <summary>
+    /// When this tale instance was last saved, in UTC. Every save of a run stamps it, so the
+    /// <see cref="TaleOptions.RunningLeaseTimeout"/> of a <see cref="TaleStatus.Running"/> tale is
+    /// measured from it; repositories must store it unchanged.
+    /// </summary>
     public DateTime LastUpdatedAt { get; set; } = DateTime.UtcNow;
 
     /// <summary>The complete context for this tale, serialized as JSON.</summary>

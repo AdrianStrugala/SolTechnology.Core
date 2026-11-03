@@ -9,6 +9,7 @@ namespace SolTechnology.Core.Tale;
 /// </summary>
 public sealed class TaleOptions
 {
+    private TimeSpan _runningLeaseTimeout = TimeSpan.FromMinutes(5);
 
     /// <summary>
     /// Prefix used when generating new <see cref="SolTechnology.Core.AUID.Auid"/> tale identifiers. Use distinct
@@ -16,6 +17,22 @@ public sealed class TaleOptions
     /// </summary>
     public string TaleIdPrefix { get; set; } = "STR";
 
+    /// <summary>
+    /// How long a <see cref="Models.TaleStatus.Running"/> tale stays owned by the run that last saved
+    /// it. <c>ResumeStory</c> refuses a younger Running tale with a conflict and takes over an older
+    /// one, left by a crashed host, re-running its unfinished chapter. Set it above the longest
+    /// chapter. Default: 5 minutes.
+    /// </summary>
+    /// <exception cref="ArgumentOutOfRangeException">The value is zero or negative.</exception>
+    public TimeSpan RunningLeaseTimeout
+    {
+        get => _runningLeaseTimeout;
+        set
+        {
+            ArgumentOutOfRangeException.ThrowIfLessThanOrEqual(value, TimeSpan.Zero);
+            _runningLeaseTimeout = value;
+        }
+    }
 
     /// <summary>
     /// Internal fallback used by the engine when options are not present in DI (e.g. when a
