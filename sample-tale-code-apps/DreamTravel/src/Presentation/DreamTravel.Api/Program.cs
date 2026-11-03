@@ -30,7 +30,7 @@ namespace DreamTravel.Api;
 
 public class Program
 {
-    private const string DreamTravelCorsPolicy = "DreamTravelCors";
+    private static readonly string CorsPolicy = "dupa";
 
     // This method gets called by the runtime. Use this method to add services to the container.
     public static void Main(string[] args)
@@ -56,7 +56,7 @@ public class Program
         //CORS
         builder.Services.AddCors(options =>
         {
-            options.AddPolicy(DreamTravelCorsPolicy,
+            options.AddPolicy(CorsPolicy,
                 policyBuilder =>
                 {
                     policyBuilder.SetIsOriginAllowed(origin =>
@@ -182,7 +182,7 @@ public class Program
         // SolTechnology.Core.Api: per-version Swagger UI (newest first, deprecation badges).
         app.UseSolSwaggerWithVersioning("DreamTravel API");
 
-        app.UseCors(DreamTravelCorsPolicy);
+        app.UseCors(CorsPolicy);
         app.UseHttpsRedirection();
 
         app.UseRouting();

@@ -315,7 +315,7 @@ Rules:
 5. Filters: `ExceptionFilter`, `ResponseEnvelopeFilter` (always wired globally).
 6. Build, configure pipeline, `MapControllers`, `Run`.
 
-CORS policy names, scheme names, and other constants MUST be `const` with a meaningful name — never placeholder strings like `"dupa"` (§15).
+CORS policy names, scheme names, and other constants MUST be `const` with a meaningful name. The `"dupa"` CORS policy in `DreamTravel.Api/Program.cs` is a kept joke (§9.10), not a pattern to copy.
 
 ### Controllers
 
@@ -544,7 +544,6 @@ report it, never auto-fix.
 
 | Anti-pattern | Where seen | Correct form | Policy |
 | --- | --- | --- | --- |
-| Placeholder constant `private static readonly string CorsPolicy = "dupa";` | `DreamTravel.Api/Program.cs` | Meaningful `const` (§7) | fix on touch |
 | `try/catch` + `JsonConvert.SerializeObject(ex.Message)` in a controller | `CalculateBestPathController.CalculateBestPathV1` | `ExceptionFilter` handles it (§13) | fix on touch |
 | `logger.LogInformation("Skipped " + s.Name);` | `FetchTrafficHandler` | Structured placeholder + `[]` (§11) | report only — changes the log template consumers query |
 | Multiple `+`-concatenated log strings | various | Structured placeholders (§11) | report only — changes the log template consumers query |
