@@ -22,7 +22,7 @@ are `done` and after these library features are `completed`: `result`; `auid`. N
 | 01 | DI resolution test — Tale | [`steps/01-di-resolution-test.md`](steps/01-di-resolution-test.md) | done |
 | 02 | Tale — public `TaleJsonOptions.Default` with Tale error discriminators | [`steps/02-tale-public-json-options.md`](steps/02-tale-public-json-options.md) | done |
 | 03 | Tale — per-run state isolation; persist only `TaleManager`-driven runs | [`steps/03-tale-per-run-state-and-scoped-persistence.md`](steps/03-tale-per-run-state-and-scoped-persistence.md) | done |
-| 04 | Tale engine — caller-only cancellation, no resume of failed tales, deterministic tests | [`steps/04-tale-engine-cancellation-and-resume.md`](steps/04-tale-engine-cancellation-and-resume.md) | to-do |
+| 04 | Tale engine — caller-only cancellation, no resume of failed tales, deterministic tests | [`steps/04-tale-engine-cancellation-and-resume.md`](steps/04-tale-engine-cancellation-and-resume.md) | done |
 | 05 | Tale — registration and schema safety, correct log scope | [`steps/05-tale-registration-and-schema-safety.md`](steps/05-tale-registration-and-schema-safety.md) | to-do |
 | 06 | Tale controller — consistent JSON options, no internal detail in responses | [`steps/06-tale-controller-hardening.md`](steps/06-tale-controller-hardening.md) | to-do |
 | 07 | Tale — `CancellationToken` on chapters | [`steps/07-tale-chapter-cancellation-token.md`](steps/07-tale-chapter-cancellation-token.md) | to-do |

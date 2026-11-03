@@ -168,7 +168,7 @@ public abstract class TaleHandler<TInput, TContext, TOutput>
             await SafePersistTerminalState();
             return result;
         }
-        catch (OperationCanceledException)
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
         {
             await SafePersistTerminalState();
             return Result<TOutput>.Fail(new TaleCancelledError(Context.TaleInstanceId));

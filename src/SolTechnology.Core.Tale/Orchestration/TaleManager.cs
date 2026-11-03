@@ -2,6 +2,7 @@ using System.Text.Json;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using SolTechnology.Core.AUID;
+using SolTechnology.Core.Errors;
 using SolTechnology.Core.Tale.Models;
 using SolTechnology.Core.Tale.Persistence;
 
@@ -117,6 +118,8 @@ public class TaleManager
                     return Result<TaleInstance>.Fail("Tale already completed");
                 if (existing.Status == TaleStatus.Cancelled)
                     return Result<TaleInstance>.Fail("Tale has been cancelled");
+                if (existing.Status == TaleStatus.Failed)
+                    return Result<TaleInstance>.Fail(new ConflictError { Message = "Tale has failed and cannot be resumed" });
 
                 try
                 {

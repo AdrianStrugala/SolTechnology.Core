@@ -5,6 +5,7 @@ using Microsoft.Extensions.Logging;
 using NUnit.Framework;
 using SolTechnology.Core;
 using SolTechnology.Core.AUID;
+using SolTechnology.Core.Errors;
 using SolTechnology.Core.Tale;
 using SolTechnology.Core.Tale.Models;
 using SolTechnology.Core.Tale.Orchestration;
@@ -238,6 +239,27 @@ public class PauseResumeIntegrationTests
         stateResult.IsSuccess.Should().BeTrue();
         stateResult.Data!.TaleId.Should().Be(taleId);
         stateResult.Data.Status.Should().Be(TaleStatus.WaitingForInput);
+    }
+
+    [Test]
+    public async Task Resume_FailedTale_ReturnsConflict()
+    {
+        // Arrange
+        var manager = _serviceProvider.GetRequiredService<TaleManager>();
+        await manager.StartStory<OrderProcessingTale, OrderInput, OrderContext, OrderOutput>(
+            new OrderInput { OrderId = "ORD-FAIL", Amount = 0m });
+        var failed = (await _repository.ListAsync()).Single();
+        var userInput = JsonSerializer.SerializeToElement(new CustomerDetails { Name = "Jan", Email = "jan@example.com", Address = "Wadowice" });
+
+        // Act
+        var resume = await manager.ResumeStory<OrderProcessingTale, OrderInput, OrderContext, OrderOutput>(failed.TaleId, userInput);
+
+        // Assert
+        failed.Status.Should().Be(TaleStatus.Failed);
+        resume.IsFailure.Should().BeTrue();
+        resume.Error.Should().BeOfType<ConflictError>();
+        resume.Error!.Message.Should().Be("Tale has failed and cannot be resumed");
+        (await _repository.FindById(failed.TaleId))!.Status.Should().Be(TaleStatus.Failed);
     }
 
     [Test]

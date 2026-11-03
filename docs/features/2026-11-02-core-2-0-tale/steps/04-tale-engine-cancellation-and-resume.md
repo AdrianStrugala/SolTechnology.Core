@@ -1,7 +1,7 @@
 ---
 spec: 2026-11-02-core-2-0-tale
 step: 04
-status: to-do
+status: done
 ---
 
 # Step 04: Tale engine — caller-only cancellation, no resume of failed tales, deterministic tests
@@ -32,10 +32,23 @@ Former core step 25; moved here by the per-library regroup (user, 2026-11-02).
 - Replace the "either/or" and `NotBeNull`-only assertions in `AdvancedScenariosTests.cs:224-246,324-337` with exact status and result assertions.
 
 ## Acceptance criteria
-- [ ] `dotnet test tests/SolTechnology.Core.Tale.Tests` is green, and the two negative tests fail on `4097d47f`.
-- [ ] `grep -rn "success + failure" tests/SolTechnology.Core.Tale.Tests` prints nothing.
+- [x] `dotnet test tests/SolTechnology.Core.Tale.Tests` is green, and the two negative tests fail on `4097d47f`.
+- [x] `grep -rn "success + failure" tests/SolTechnology.Core.Tale.Tests` prints nothing.
 
 ## Open questions
 - none
 
 ## Deviations
+
+### Negative tests checked against the pre-change `master`; two more weak tests made exact
+
+**Original plan:** The two negative tests fail on `4097d47f`; exact assertions replace the
+either/or tests at `AdvancedScenariosTests.cs:224-246,324-337`.
+
+**Actual implementation:** `Chapter_HttpTimeout_IsChapterErrorNotCancellation` (the tale came back
+as `TaleCancelledError`) and `Resume_FailedTale_ReturnsConflict` (the resume returned success)
+failed on `master` right before the change (`b3727127`); the cancellation filter and the failed-tale
+check are unchanged since `4097d47f`. Besides the two planned tests, the special-character and
+Unicode resume tests, which also passed whatever happened (`if (result.IsSuccess)`), now assert
+the completed status and the stored value. Renamed tests: `..._CompletesAndStoresFullValue`,
+`..._CompletesAndStoresThemVerbatim`, `..._StaysPausedWithValidationError`.

@@ -4,6 +4,9 @@ using Microsoft.Extensions.Logging;
 using NUnit.Framework;
 using SolTechnology.Core;
 using SolTechnology.Core.Errors;
+using SolTechnology.Core.Tale.Models;
+using SolTechnology.Core.Tale.Orchestration;
+using SolTechnology.Core.Tale.Persistence;
 using SolTechnology.Core.Tale;
 using SolTechnology.Core.Tale;
 
@@ -188,6 +191,31 @@ public class ErrorHandlingTests
         }
     }
 
+    [Test]
+    public async Task Chapter_HttpTimeout_IsChapterErrorNotCancellation()
+    {
+        // Arrange
+        var repository = new InMemoryTaleRepository();
+        var services = new ServiceCollection().AddLogging();
+        services.AddSingleton<ITaleRepository>(repository);
+        services.AddSingleton<TestService>();
+        services.AddSolTale(assemblies: typeof(ErrorHandlingTests).Assembly);
+        using var sp = services.BuildServiceProvider();
+        var manager = sp.GetRequiredService<TaleManager>();
+
+        // Act
+        var result = await manager.StartStory<HttpTimeoutTale, ErrorTestInput, ErrorTesTContext, ErrorTestOutput>(
+            new ErrorTestInput { Value = 1 }, cancellationToken: CancellationToken.None);
+
+        // Assert
+        result.IsFailure.Should().BeTrue();
+        result.Error.Should().NotBeOfType<TaleCancelledError>();
+        result.Error!.Message.Should().Contain("HttpClient.Timeout");
+        var persisted = (await repository.ListAsync()).Should().ContainSingle().Subject;
+        persisted.Status.Should().Be(TaleStatus.Failed);
+        persisted.History.Should().ContainSingle().Which.Status.Should().Be(TaleStatus.Failed);
+    }
+
     private ILogger<T> GetLogger<T>()
     {
         return _serviceProvider.GetRequiredService<ILogger<T>>();
@@ -250,6 +278,18 @@ public class ExceptionTale : TaleHandler<ErrorTestInput, ErrorTesTContext, Error
             .Finale(ctx => ctx.Output);
 }
 
+public class HttpTimeoutTale : TaleHandler<ErrorTestInput, ErrorTesTContext, ErrorTestOutput>
+{
+    public HttpTimeoutTale(IServiceProvider sp, ILogger<HttpTimeoutTale> logger)
+        : base(sp, logger)
+    {
+    }
+
+    protected override Tale<ErrorTestOutput> Tell() =>
+        Open<ErrorTestHttpTimeoutChapter>()
+            .Finale(ctx => ctx.Output);
+}
+
 public class CustomErrorTale : TaleHandler<ErrorTestInput, ErrorTesTContext, ErrorTestOutput>
 {
     public CustomErrorTale(IServiceProvider sp, ILogger<CustomErrorTale> logger)
@@ -307,6 +347,16 @@ public class ErrorTestExceptionChapter : Chapter<ErrorTesTContext>
     public override Task<Result> Read(ErrorTesTContext context)
     {
         throw new InvalidOperationException("Test exception from chapter");
+    }
+}
+
+public class ErrorTestHttpTimeoutChapter : Chapter<ErrorTesTContext>
+{
+    public override Task<Result> Read(ErrorTesTContext context)
+    {
+        throw new TaskCanceledException(
+            "The request was canceled due to the configured HttpClient.Timeout of 100 seconds elapsing.",
+            new TimeoutException());
     }
 }
 

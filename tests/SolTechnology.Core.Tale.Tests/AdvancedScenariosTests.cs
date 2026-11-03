@@ -53,8 +53,6 @@ public class AdvancedScenariosTests
         (_serviceProvider as IDisposable)?.Dispose();
     }
 
-    #region Invalid Resume Scenarios
-
     [Test]
     public async Task Resume_NonExistentTale_ShouldReturnError()
     {
@@ -179,10 +177,6 @@ public class AdvancedScenariosTests
         result.IsSuccess.Should().BeTrue();
     }
 
-    #endregion
-
-    #region Input Validation Edge Cases
-
     [Test]
     public async Task Resume_WithEmptyStrings_ShouldStayPaused()
     {
@@ -222,57 +216,50 @@ public class AdvancedScenariosTests
     }
 
     [Test]
-    public async Task Resume_WithExtremelyLongStrings_ShouldHandleOrReject()
+    public async Task Resume_WithExtremelyLongStrings_CompletesAndStoresFullValue()
     {
         // Arrange
         var input = new TestAdvancedInput { Value = "test" };
         var startResult = await _taleManager.StartStory<SinglePauseTale, TestAdvancedInput, TestAdvancedContext, TestAdvancedOutput>(input);
         var taleId = startResult.Data!.TaleId;
-
-        // Act - Resume with extremely long string (10,000 characters)
         var longString = new string('A', 10000);
         var longInput = JsonDocument.Parse($"{{\"name\": \"{longString}\", \"email\": \"test@example.com\", \"age\": 25}}");
+
+        // Act
         var result = await _taleManager.ResumeStory<SinglePauseTale, TestAdvancedInput, TestAdvancedContext, TestAdvancedOutput>(
             taleId,
             longInput.RootElement);
 
-        // Assert - Should either succeed with truncation or fail with validation error
-        if (result.IsFailure)
-        {
-            result.Error!.Message.Should().ContainAny("too long", "length", "maximum");
-        }
-        else
-        {
-            result.IsSuccess.Should().BeTrue();
-        }
+        // Assert
+        result.IsSuccess.Should().BeTrue();
+        result.Data!.Status.Should().Be(TaleStatus.Completed);
+        StoredContext(result.Data).UserName.Should().Be(longString);
     }
 
     [Test]
-    public async Task Resume_WithSpecialCharacters_ShouldHandleSafely()
+    public async Task Resume_WithSpecialCharacters_CompletesAndStoresThemVerbatim()
     {
         // Arrange
         var input = new TestAdvancedInput { Value = "test" };
         var startResult = await _taleManager.StartStory<SinglePauseTale, TestAdvancedInput, TestAdvancedContext, TestAdvancedOutput>(input);
         var taleId = startResult.Data!.TaleId;
-
-        // Act - Resume with special characters, potential injection attempts
         var specialCharsInput = JsonDocument.Parse(@"{
             ""name"": ""<script>alert('xss')</script>"",
             ""email"": ""test@example.com'; DROP TABLE Users;--"",
             ""age"": 25
         }");
+
+        // Act
         var result = await _taleManager.ResumeStory<SinglePauseTale, TestAdvancedInput, TestAdvancedContext, TestAdvancedOutput>(
             taleId,
             specialCharsInput.RootElement);
 
-        // Assert - Should handle safely (either escape or reject)
-        result.Should().NotBeNull();
-        if (result.IsSuccess)
-        {
-            // If accepted, data should be safely stored
-            var state = await _taleManager.GetStoryState(taleId);
-            state.IsSuccess.Should().BeTrue();
-        }
+        // Assert
+        result.IsSuccess.Should().BeTrue();
+        result.Data!.Status.Should().Be(TaleStatus.Completed);
+        var context = StoredContext(result.Data);
+        context.UserName.Should().Be("<script>alert('xss')</script>");
+        context.UserEmail.Should().Be("test@example.com'; DROP TABLE Users;--");
     }
 
     [Test]
@@ -282,24 +269,21 @@ public class AdvancedScenariosTests
         var input = new TestAdvancedInput { Value = "test" };
         var startResult = await _taleManager.StartStory<SinglePauseTale, TestAdvancedInput, TestAdvancedContext, TestAdvancedOutput>(input);
         var taleId = startResult.Data!.TaleId;
-
-        // Act - Resume with Unicode characters (emoji, non-Latin scripts)
         var unicodeInput = JsonDocument.Parse(@"{
             ""name"": ""用户名 👨‍💻 Użytkownik"",
             ""email"": ""test@example.com"",
             ""age"": 25
         }");
+
+        // Act
         var result = await _taleManager.ResumeStory<SinglePauseTale, TestAdvancedInput, TestAdvancedContext, TestAdvancedOutput>(
             taleId,
             unicodeInput.RootElement);
 
-        // Assert - Should preserve Unicode correctly
-        if (result.IsSuccess)
-        {
-            var state = await _taleManager.GetStoryState(taleId);
-            // Unicode should be preserved in storage
-            state.IsSuccess.Should().BeTrue();
-        }
+        // Assert
+        result.IsSuccess.Should().BeTrue();
+        result.Data!.Status.Should().Be(TaleStatus.Completed);
+        StoredContext(result.Data).UserName.Should().Be("用户名 👨‍💻 Użytkownik");
     }
 
     [Test]
@@ -322,26 +306,24 @@ public class AdvancedScenariosTests
     }
 
     [Test]
-    public async Task Resume_WithExtremeNumbers_ShouldHandleOverflow()
+    public async Task Resume_WithExtremeNumbers_StaysPausedWithValidationError()
     {
         // Arrange
         var input = new TestAdvancedInput { Value = "test" };
         var startResult = await _taleManager.StartStory<SinglePauseTale, TestAdvancedInput, TestAdvancedContext, TestAdvancedOutput>(input);
         var taleId = startResult.Data!.TaleId;
-
-        // Act - Resume with Int32.MaxValue
         var extremeInput = JsonDocument.Parse($"{{\"name\": \"John\", \"email\": \"test@example.com\", \"age\": {int.MaxValue}}}");
+
+        // Act
         var result = await _taleManager.ResumeStory<SinglePauseTale, TestAdvancedInput, TestAdvancedContext, TestAdvancedOutput>(
             taleId,
             extremeInput.RootElement);
 
-        // Assert - Should handle gracefully
-        result.Should().NotBeNull();
+        // Assert
+        result.IsSuccess.Should().BeTrue();
+        result.Data!.Status.Should().Be(TaleStatus.WaitingForInput);
+        result.Data.CurrentChapter!.Error!.Message.Should().Be("Invalid age - too high");
     }
-
-    #endregion
-
-    #region Multiple Pause/Resume Cycles
 
     [Test]
     public async Task Tale_WithMultiplePauses_ShouldResumeCorrectly()
@@ -406,10 +388,6 @@ public class AdvancedScenariosTests
         }
     }
 
-    #endregion
-
-    #region Concurrency Tests
-
     [Test]
     public async Task Concurrent_MultipleStories_ShouldIsolate()
     {
@@ -432,46 +410,6 @@ public class AdvancedScenariosTests
         var taleIds = results.Select(r => r.Data!.TaleId).ToList();
         taleIds.Should().OnlyHaveUniqueItems();
     }
-
-    [Test]
-    public async Task Concurrent_ResumeAttempts_ShouldHandleSafely()
-    {
-        // Arrange - Start a tale
-        var input = new TestAdvancedInput { Value = "concurrent-resume" };
-        var startResult = await _taleManager.StartStory<SinglePauseTale, TestAdvancedInput, TestAdvancedContext, TestAdvancedOutput>(input);
-        var taleId = startResult.Data!.TaleId;
-
-        // Act - Try to resume concurrently 5 times with same input
-        var userInput = JsonDocument.Parse("{\"name\": \"John\", \"email\": \"john@example.com\", \"age\": 30}");
-        var resumeTasks = new List<Task<Result<TaleInstance>>>();
-
-        for (int i = 0; i < 5; i++)
-        {
-            resumeTasks.Add(_taleManager.ResumeStory<SinglePauseTale, TestAdvancedInput, TestAdvancedContext, TestAdvancedOutput>(
-                taleId,
-                userInput.RootElement));
-        }
-
-        var results = await Task.WhenAll(resumeTasks);
-
-        // Assert - Should handle gracefully (either one succeeds or all fail with clear error)
-        var successCount = results.Count(r => r.IsSuccess);
-        var failureCount = results.Count(r => r.IsFailure);
-
-        // At least one should handle it properly
-        (successCount + failureCount).Should().Be(5);
-
-        // If there are failures, they should have meaningful errors
-        if (failureCount > 0)
-        {
-            results.Where(r => r.IsFailure)
-                .Should().AllSatisfy(r => r.Error.Should().NotBeNull());
-        }
-    }
-
-    #endregion
-
-    #region Repository Failure Scenarios
 
     [Test]
     public async Task Repository_SaveFailure_ShouldPropagateError()
@@ -520,10 +458,6 @@ public class AdvancedScenariosTests
         result.Error!.Message.Should().ContainAny("load", "retrieve", "storage");
     }
 
-    #endregion
-
-    #region Large Data Scenarios
-
     [Test]
     public async Task Tale_WithLargeContext_ShouldHandleEfficiently()
     {
@@ -544,10 +478,6 @@ public class AdvancedScenariosTests
         var state = await _taleManager.GetStoryState(result.Data!.TaleId);
         state.IsSuccess.Should().BeTrue();
     }
-
-    #endregion
-
-    #region State Consistency Tests
 
     [Test]
     public async Task GetStoryState_AfterPause_ShouldReflectCorrectState()
@@ -607,10 +537,10 @@ public class AdvancedScenariosTests
         });
     }
 
-    #endregion
-}
+    private static TestAdvancedContext StoredContext(TaleInstance instance) =>
+        JsonSerializer.Deserialize<TestAdvancedContext>(instance.Context)!;
 
-#region Test Stories
+}
 
 public class TestAdvancedTale : TaleHandler<TestAdvancedInput, TestAdvancedContext, TestAdvancedOutput>
 {
@@ -678,10 +608,6 @@ public class LargeDataTale : TaleHandler<TestAdvancedInput, TestAdvancedContext,
             .Do(ctx => ctx.Output.Result = "Large data processed")
             .Finale(ctx => ctx.Output);
 }
-
-#endregion
-
-#region Test Chapters
 
 public class ValidInputChapter : InteractiveChapter<TestAdvancedContext, UserInputData>
 {
@@ -772,10 +698,6 @@ public class LargeDataChapter : Chapter<TestAdvancedContext>
     }
 }
 
-#endregion
-
-#region Test Models
-
 public class TestAdvancedInput
 {
     public string Value { get; set; } = string.Empty;
@@ -817,10 +739,6 @@ public class PaymentInputData
     public string? Cvv { get; set; }
 }
 
-#endregion
-
-#region Mock Failing Repository
-
 public class FailingTaleRepository : ITaleRepository
 {
     private readonly bool _simulateSaveFailure;
@@ -857,4 +775,3 @@ public class FailingTaleRepository : ITaleRepository
     }
 }
 
-#endregion

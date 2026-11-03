@@ -250,7 +250,7 @@ internal sealed class TaleEngine<TInput, TContext, TOutput>
                 chapterInfo.FinishedAt = _timeProvider.GetUtcNow().UtcDateTime;
             }
         }
-        catch (OperationCanceledException)
+        catch (OperationCanceledException) when (_cancellationToken.IsCancellationRequested)
         {
             _isCancelled = true;
             chapterInfo.Status = TaleStatus.Cancelled;
