@@ -377,5 +377,3 @@ nul
 **/.claude/*.local.json
 .vscode/settings.json
 
-# Legacy sample archives
-sample-tale-code-apps/**/*.zip
