@@ -8,20 +8,14 @@ namespace SolTechnology.Core.Logging;
 /// testability (no direct <c>Stopwatch.GetTimestamp()</c>). Storage is instance-scoped (register
 /// as Scoped in DI so each request gets its own instance).
 /// </summary>
-internal sealed class TimingService : ITimingService
+internal sealed class TimingService(TimeProvider timeProvider) : ITimingService
 {
-    private readonly TimeProvider _timeProvider;
     private readonly ConcurrentDictionary<string, long> _timings = new(StringComparer.Ordinal);
-
-    public TimingService(TimeProvider timeProvider)
-    {
-        _timeProvider = timeProvider;
-    }
 
     public IDisposable StartContext(string name)
     {
         ArgumentNullException.ThrowIfNull(name);
-        return new TimingHandle(this, name, _timeProvider.GetTimestamp());
+        return new TimingHandle(this, name, timeProvider.GetTimestamp());
     }
 
     public IDictionary<string, long> GetTimings()
@@ -31,7 +25,7 @@ internal sealed class TimingService : ITimingService
 
     private void StopContext(string name, long startTimestamp)
     {
-        var elapsed = _timeProvider.GetElapsedTime(startTimestamp);
+        var elapsed = timeProvider.GetElapsedTime(startTimestamp);
         _timings.AddOrUpdate(
             name,
             _ => (long)elapsed.TotalMilliseconds,

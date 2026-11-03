@@ -9,17 +9,12 @@ namespace SolTechnology.Core.Logging.Enrichment;
 /// instance. Reads from headers / URL synchronously and from the parsed JSON body cached on
 /// <see cref="HttpContext.Items"/> by the request-logging middleware.
 /// </summary>
-internal sealed class LogDetailEnricher : ILogScopeEnricher, IRequiresRequestBody
+internal sealed class LogDetailEnricher(IEnumerable<LogDetailDescriptor> descriptors) : ILogScopeEnricher, IRequiresRequestBody
 {
     /// <summary>Key under which <c>LoggingMiddleware</c> caches the parsed JSON body.</summary>
     internal const string ParsedBodyItemKey = "SolTechnology.Core.Logging.ParsedBody";
 
-    private readonly LogDetailDescriptor[] _descriptors;
-
-    public LogDetailEnricher(IEnumerable<LogDetailDescriptor> descriptors)
-    {
-        _descriptors = descriptors.ToArray();
-    }
+    private readonly LogDetailDescriptor[] _descriptors = descriptors.ToArray();
 
     public bool RequiresBody(HttpContext context)
     {

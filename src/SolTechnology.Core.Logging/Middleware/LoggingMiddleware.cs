@@ -20,15 +20,11 @@ namespace SolTechnology.Core.Logging.Middleware;
 /// enrichment (user id from claims, business field from body, etc.) is the responsibility
 /// of an <see cref="ILogScopeEnricher"/> implementation registered in DI.
 /// </summary>
-public sealed class LoggingMiddleware
+public sealed class LoggingMiddleware(RequestDelegate next, IOptions<LoggingOptions>? options = null)
 {
-    private readonly RequestDelegate _next;
-    private readonly LoggingOptions _options;
-    public LoggingMiddleware(RequestDelegate next, IOptions<LoggingOptions>? options = null)
-    {
-        _next = next ?? throw new ArgumentNullException(nameof(next));
-        _options = options?.Value ?? new LoggingOptions();
-    }
+    private readonly RequestDelegate _next = next ?? throw new ArgumentNullException(nameof(next));
+    private readonly LoggingOptions _options = options?.Value ?? new LoggingOptions();
+
     public async Task InvokeAsync(
         HttpContext context,
         ILogger<LoggingMiddleware> logger,
