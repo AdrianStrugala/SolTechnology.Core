@@ -37,7 +37,7 @@ brief and its steps carry every finding they act on, with `file:line`. Finding I
 | `S1`–`S6` | P0 security |
 | `B1`–`B11` | P0 modules that do not work as documented |
 | `C1`–`C3` | P0 CI/release |
-| `P1-n` | P1 systemic items (docs drift, DI tests, test gaps, XML docs, Polish text, Guide consistency, correctness, Guide §9/§11, hygiene) |
+| `P1-n` | P1 systemic items (docs drift, DI tests, test gaps, XML docs, Polish text — non-joke only since 2026-11-03, Guide consistency, correctness, Guide §9/§11, hygiene) |
 | `<area>#n` | Detailed per-area finding: `cqrs-tale#n`, `http-api#n`, `logging-cache#n`, `infra#n`, `repo#An` / `repo#Bn` (DreamTravel) |
 
 Baseline verified by the review (.NET SDK 10.0.100, Docker available):
@@ -236,7 +236,7 @@ Former → current step mapping (`*` = only the library-scoped part of the forme
 | 16 | Blob — thread-safe container cache with async creation | blob 01 |
 | 17 | Core — open `Error` polymorphism; `AggregateError` round-trip | result 01, tale 02 |
 | 18 | Tale — per-run state isolation; persist only `TaleManager`-driven runs | tale 03 |
-| 19 | AUID — culture-invariant formatting, range-checked parsing, English overflow message | auid 01 |
+| 19 | AUID — culture-invariant formatting, range-checked parsing | auid 01 |
 | 20 | HTTP — request pipeline correctness | http 03 |
 | 21 | HTTP — upstream health-check disposal and options validation | http 04 |
 | 22 | Api — keep 201/202 in `ResultConversionFilter`; real filter registration | api-auth 04 |
@@ -293,7 +293,7 @@ Former → current step mapping (`*` = only the library-scoped part of the forme
 **Scope change 2026-11-02:** credential scrub dropped (user decision B: "czy DreamTravel nie miało
 haseł tylko lokalnych w repo? Jeżeli tak, to zostaw."); premortem mitigations referring to it are
 void. Former step 08 (now core 05) keeps only the `S6` Development-only exception page (and its fix-on-touch CORS
-`chore:`); AR-6 records the accepted risk. Rows that described the `master` ruleset and stats-bot
+`chore:`, whose rename was reverted on 2026-11-03; see the 2026-11-03 joke scope change below); AR-6 records the accepted risk. Rows that described the `master` ruleset and stats-bot
 bypass now point at user decision A (2026-11-02, no `master` ruleset; see the release feature).
 `review` stays `done (2026-11-02)` and the step 00 verdict stands: both changes only remove
 user-decided scope and add no step, file, contract, or dependency.
@@ -322,7 +322,7 @@ Steps removed on 2026-11-02 after the user's answers, with later steps renumbere
 
 - Former 74 "Move the NuGet stats bot off `master`" — dropped (Q7).
 - Former 76 "Delete the dead Guards and Scheduler projects" — dropped (Q1, `C-25` rejected). Its only
-  non-deletion item, the `docs/deprecated-packages.md` Guards replacement text, moved to step 74
+  non-deletion item, the Guards replacement text in the deprecated-package table (`dontreadme.md`, kept under its name since 2026-11-03), moved to step 74
   (now showcase 01).
 - Former 81 "DreamTravel — optionally consume the published packages" — dropped (Q4). Step 77
   (now showcase 06) already documents the `PackageReference` equivalents in the DreamTravel README.
@@ -517,7 +517,7 @@ records what the user chose.
 
 | ID | Question | Decision (user, 2026-11-02) | Steps |
 |---|---|---|---|
-| Q1 | Delete `SolTechnology.Core.Guards`, `SolTechnology.Core.Scheduler`, `tests/SolTechnology.Core.Guards.Tests`, `docs/Guards.md`, `docs/Cron.md` from `master`? | **No.** All five stay. `C-25` rejected; former step 76 dropped. The Guide §12 fix to BCL guards stays (showcase 04); `docs/deprecated-packages.md` names BCL guards for Guards (showcase 01). | 02, 04, 58, 69; showcase 01, 04 |
+| Q1 | Delete `SolTechnology.Core.Guards`, `SolTechnology.Core.Scheduler`, `tests/SolTechnology.Core.Guards.Tests`, `docs/Guards.md`, `docs/Cron.md` from `master`? | **No.** All five stay. `C-25` rejected; former step 76 dropped. The Guide §12 fix to BCL guards stays (showcase 04); `dontreadme.md` (kept under its name, user, 2026-11-03) names BCL guards for Guards (showcase 01). | 02, 04, 58, 69; showcase 01, 04 |
 | Q2 | Copyright holder and `Authors` | **"Adrian Strugala / Sol Technology"** in `LICENSE`, `<Copyright>`, and `<Authors>`. | release 02 |
 | Q3 | GitHub organization slug and nuget.org organization name | GitHub **`sol-technology`**; nuget.org **`SolTechnology`**. | release 01–04 |
 | Q4 | DreamTravel `UseNuGet=true` switch? | **No switch.** The DreamTravel README documents the `PackageReference` equivalents (showcase 06); former step 81 dropped. | showcase 06 |
@@ -564,6 +564,14 @@ of AR-5 are carried by the release feature, and AR-4 also by the showcase featur
 | AR-6 | Local-only DreamTravel dev credentials stay committed (user decision 2026-11-02): the SQL `sa` password in `appsettings*.json` (including `appsettings.prod.json`, which targets `localhost,1404`), Neo4j at `bolt://localhost`, the Aspire `sql-password` parameter, the database `Dockerfile` `ARG`, and the `devOps/` psake script and `build&test.yml` `docker run`. All target local Docker/localhost; `deploy.yml` uses pipeline variables. | Decision B | No scrub (step 08 keeps only `S6`). The Google API keys and the Service Bus SAS key are real secrets, not covered by decision B; step 09 still removes them and records revocation. Secret scanning after the transfer (release 03) may flag the local values; dismiss those alerts as "used in tests". |
 
 Scope change 2026-11-03 (user): step 09 "Central Package Management" added after the plan review; the retrospective moved to step 10. It changes no package version.
+
+Scope change 2026-11-03 (user: "nie dropuj joke z kodu"): jokes in the code (humorous comments, messages, names, file names) stay exactly as written; recorded in `docs/ClaudeCodingGuide.md` §9.10 and §7 (the §15 "dupa" row is removed). `P1-5` now covers only non-joke Polish text. Affected places:
+- core 05 (`done`): the `"dupa"` CORS rename was reverted by commit `7601de9b`; only the `avroconvertonline.azurewebsites.net` origin removal remains (step 05 `Deviations`).
+- `src/SolTechnology.Core.CQRS/Nothing.cs`: `//I'm just void. Or nothing` restored (cqrs feature, already completed).
+- auid 01 (former 19): the Polish overflow message at `src/SolTechnology.Core.AUID/Auid.cs:186` stays verbatim; only the culture-invariant formatting and range-checked parse fixes remain.
+- showcase 01: `dontreadme.md` keeps its name; the move to `docs/deprecated-packages.md` and its link rewrites are dropped (also release 01's reference).
+- showcase 04: the "dupa" §15/§7 edits are dropped.
+- Release-notes inputs: no entry describes a joke removal; the AUID overflow message is not a 2.0 change.
 
 ## Acceptance criteria
 

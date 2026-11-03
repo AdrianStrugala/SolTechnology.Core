@@ -17,8 +17,9 @@ Both are missing pieces; they ship as one PR (merged during plan review, RQ11):
 - The README has no install command, quick start, or minimal sample before the module tables,
   and it ends with the placeholder "*Some ending words*" (`repo#A7`, `README.md:32-53,125`). Two
   links point to a missing `docs/SQL.md#testing` anchor instead of the packed testing pages
-  (`repo#A10`, `README.md:65-66`). `dontreadme.md` holds the deprecated-package table under a
-  whimsical name.
+  (`repo#A10`, `README.md:65-66`). The deprecated-package table keeps its joke name
+  `dontreadme.md` at the repository root (user, 2026-11-03: "nie dropuj joke z kodu"); only its
+  Guards row changes.
 
 ## Affected components
 - `CONTRIBUTING.md` — NEW — build and test commands (`dotnet build SolTechnology.Core.slnx`, `pwsh ./.github/runTests.ps1`, Docker), links to `docs/ClaudeCodingGuide.md`, `docs/architecture/delivery-workflow.md`, Conventional Commits
@@ -30,14 +31,8 @@ Both are missing pieces; they ship as one PR (merged during plan review, RQ11):
 - `.github/ISSUE_TEMPLATE/config.yml` — NEW — security issues routed to SECURITY.md
 - `.github/PULL_REQUEST_TEMPLATE.md` — NEW — semver impact, `CLAUDE.md §2` checklist, tests
 - `.github/CODEOWNERS` — NEW — `* @AdrianStrugala`
-- `README.md` — EDIT — NEW "Quick start" section (≤ 15 lines: `dotnet add package SolTechnology.Core.CQRS`, `AddSolCQRS(o => o.RegisterQueriesFromAssembly(...))`, one query + handler, `IMediator.Send`); `:65-66` links → `docs/SQL.Testing.md`, `docs/API.Testing.md`; `:125` placeholder removed; `:53` "Deprecated libraries" link → `docs/deprecated-packages.md`
-- `dontreadme.md` — DELETE (`git mv` to `docs/deprecated-packages.md`)
-- `docs/deprecated-packages.md` — NEW (moved content):
-  - every relative link becomes relative to `docs/` (`docs/Hangfire.md` → `Hangfire.md`, `docs/Clients.md` → `Clients.md`, `docs/Tale.md` → `Tale.md`, `docs/Blob.md` → `Blob.md`, and the rest);
-  - the `SolTechnology.Core.Guards` row names BCL guards (`ArgumentNullException.ThrowIfNull`, `ArgumentException.ThrowIfNullOrWhiteSpace`) plus `FluentValidation` as the replacement, the same guards step 04 writes into Guide §12; the projects themselves stay in `src/` for reference (Q1, RQ4).
-- `docs/Guards.md` — EDIT — `:3` link `../dontreadme.md` → `deprecated-packages.md`
-- `docs/release-runbook-1.0.md` — EDIT — `:98` link `../dontreadme.md` → `deprecated-packages.md` (link repair only; the runbook text is unchanged)
-- `SolTechnology.Core.slnx` — EDIT — add `docs/deprecated-packages.md` to `/Docs/`; remove `dontreadme.md` if listed
+- `README.md` — EDIT — NEW "Quick start" section (≤ 15 lines: `dotnet add package SolTechnology.Core.CQRS`, `AddSolCQRS(o => o.RegisterQueriesFromAssembly(...))`, one query + handler, `IMediator.Send`); `:65-66` links → `docs/SQL.Testing.md`, `docs/API.Testing.md`; `:125` placeholder removed; `:53` "Deprecated libraries" link to `dontreadme.md` unchanged
+- `dontreadme.md` — EDIT — stays at the root under its name; the `SolTechnology.Core.Guards` row names BCL guards (`ArgumentNullException.ThrowIfNull`, `ArgumentException.ThrowIfNullOrWhiteSpace`) plus `FluentValidation` as the replacement, the same guards step 04 writes into Guide §12; the projects themselves stay in `src/` for reference (Q1, RQ4)
 
 ## Changes
 - English only. Each community file stays under one screen; link to existing docs instead of copying them.
@@ -48,8 +43,8 @@ Both are missing pieces; they ship as one PR (merged during plan review, RQ11):
 ## Acceptance criteria
 - [ ] GitHub "Community Standards" page (Insights → Community) shows every item checked after merge.
 - [ ] `grep -n "Some ending words" README.md` prints nothing.
-- [ ] `grep -rn "dontreadme" --include=*.md --include=*.slnx . | grep -v "^./docs/features/"` prints nothing.
-- [ ] The documentation-cleanup skill reports no broken links in `README.md`, `docs/deprecated-packages.md`, `docs/Guards.md`, `docs/release-runbook-1.0.md`, and the new community files.
+- [ ] `test -f dontreadme.md` succeeds, `test -e docs/deprecated-packages.md` fails, and `grep -n "ThrowIfNull" dontreadme.md` prints the Guards row.
+- [ ] The documentation-cleanup skill reports no broken links in `README.md`, `dontreadme.md`, and the new community files.
 - [ ] The quick-start snippet builds.
 
 ## Open questions

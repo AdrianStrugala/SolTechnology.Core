@@ -44,7 +44,7 @@ features above. Per step:
 | 01 | core 04, result 02, core 07 | The README quick start compiles against the 2.0 version, the immutable `Result` (`C-02`), and the zero-dependency base package (P-13). |
 | 02 | core 02, core 03 | Same workflow file; core 03 adds the `publish` job and the `actions/upload-artifact`/`actions/download-artifact` uses pinned here. |
 | 03 | core 05, api-auth 04 | Core 05 adds the Production component test in the same test project; api-auth 04 makes `ResultConversionFilter` turn a failed `Result` into ProblemDetails. |
-| 04 | core 05, tale 03, tale 11, auid 03 | Guide §15 marks the "dupa" example fixed by core 05 as historical; `CLAUDE.md §11` rows must match tale 03, tale 11, and auid 03. Also requires step 03 here. |
+| 04 | core 05, tale 03, tale 11, auid 03 | `CLAUDE.md §11` rows must match tale 03, tale 11, and auid 03. Also requires step 03 here. Core 05 is `done`; the "dupa" CORS name stays as a kept joke (user, 2026-11-03), so step 04 no longer edits it. |
 | 05 | tale 07 | Tale 07 edits the same `DreamTravel.Queries` chapter files. |
 | 06 | — | None since 2026-11-02: core 05 (former 08) no longer adds `dotnet user-secrets` commands or edits `docker-compose.yml` (decision B, user, 2026-11-02: local-only DreamTravel dev credentials stay committed). |
 | 07 | core 02, core 03 | Core 02 fixes the runner scope; core 03 creates the `build`/`publish` job layout the new job joins. Also requires step 02 here. |
@@ -82,14 +82,14 @@ presents `CalculateBestPathController` as the `IMediator` template, and §15 lis
 the core feature depend on this one while this one depends on the core feature. Its other
 prerequisites (core 05, tale 03, tale 11, auid 03; former core 08, 18, 43, 44) point in the
 allowed direction. Step 01's
-`docs/deprecated-packages.md` Guards row names the same BCL guards that step 04 writes into Guide
+`dontreadme.md` Guards row names the same BCL guards that step 04 writes into Guide
 §12, so both now live in one feature.
 
 ### Decisions that apply (user, 2026-11-02)
 
 | ID | Decision | Steps |
 |---|---|---|
-| Q1 | Keep `SolTechnology.Core.Guards`, `SolTechnology.Core.Scheduler`, `tests/SolTechnology.Core.Guards.Tests`, `docs/Guards.md`, `docs/Cron.md`. `C-25` rejected. The Guide §12 fix to BCL guards stays; `docs/deprecated-packages.md` names BCL guards for Guards. | 01, 04 |
+| Q1 | Keep `SolTechnology.Core.Guards`, `SolTechnology.Core.Scheduler`, `tests/SolTechnology.Core.Guards.Tests`, `docs/Guards.md`, `docs/Cron.md`. `C-25` rejected. The Guide §12 fix to BCL guards stays; `dontreadme.md` (kept under its name, user, 2026-11-03) names BCL guards for Guards. | 01, 04 |
 | Q4 | No DreamTravel `UseNuGet=true` switch. The DreamTravel README documents the `PackageReference` equivalents. | 06 |
 | Q7 | The weekly NuGet stats bot keeps committing to `master` as-is. This feature only pins its action and translates its comments. | 02 |
 | Q8 | `SECURITY.md` channel: GitHub Private Vulnerability Reporting; Code of Conduct: Contributor Covenant 2.1; `CODEOWNERS`: `* @AdrianStrugala`. | 01 |
@@ -97,7 +97,7 @@ allowed direction. Step 01's
 | RQ4 | Guards.Tests is not added to CI; Guards is reference-only. | 01 |
 | RQ8 | Split the original feature; each part has its own premortem. | 00 |
 | RQ11 | Post-review restructuring: former 72 + 74 merged into community health files and root README (step 01 here). | 01 |
-| RQ12 | Applied here: `dontreadme.md` link repairs (01), SHA pins and `needs` for the DreamTravel CI job (07), Guide self-consistency after the DreamTravel controllers (04). | 01, 04, 07 |
+| RQ12 | Applied here: `dontreadme.md` link repairs (01; void since 2026-11-03 — the file keeps its name, so no link changes), SHA pins and `needs` for the DreamTravel CI job (07), Guide self-consistency after the DreamTravel controllers (04). | 01, 04, 07 |
 
 No public/protected symbol in `src/SolTechnology.Core.*` changes in this feature, so no `C-nn`
 confirmation applies. The `IEvent` move into `SolTechnology.Core` stays "Not planned" (core brief).
@@ -154,6 +154,14 @@ is not a required check, because `master` gets no ruleset (A); step 06 no longer
 `done (2026-11-02)`: no step, file, contract, or dependency is added; `premortem` is still
 `pending` and runs on this revised plan.
 
+**Scope change 2026-11-03 (user: "nie dropuj joke z kodu"):** jokes in the code (humorous comments,
+messages, names, file names) stay exactly as written (Guide §9.10). Step 01 keeps `dontreadme.md`
+under its name and only edits its Guards row; the move to `docs/deprecated-packages.md` and the
+link rewrites in `README.md`, `docs/Guards.md`, `docs/release-runbook-1.0.md`, and
+`SolTechnology.Core.slnx` are dropped. Step 04 drops the "dupa" §15/§7 edits (already reflected in
+the Guide). Steps 00 and release 01 reference `dontreadme.md` instead. `review` stays
+`done (2026-11-02)`: scope is only removed.
+
 Notation: an unqualified step number is a step of this feature; `core NN` and `release NN` name
 step `NN` of [`2026-11-02-core-2-0-flagship-hardening`](2026-11-02-core-2-0-flagship-hardening.md)
 and [`2026-11-02-org-transfer-and-2-0-release`](2026-11-02-org-transfer-and-2-0-release.md);
@@ -178,8 +186,8 @@ listed in "Depends on". The "Post-review core no." column below uses pre-regroup
       packages, and `CONTRIBUTING.md`, `SECURITY.md`, `CODE_OF_CONDUCT.md`, `CHANGELOG.md`, and
       `.github/dependabot.yml` exist.
 - [ ] The GitHub "Community Standards" page shows every item checked.
-- [ ] `grep -rn "dontreadme" --include=*.md --include=*.slnx . | grep -v "^./docs/features/"`
-      prints nothing.
+- [ ] `dontreadme.md` exists at the repository root under its name, and its Guards row names the
+      BCL guards.
 - [ ] `grep -rnE "uses: [^@]+@v[0-9]" .github/workflows` prints nothing.
 - [ ] `grep -rnE "IQueryHandler<|ICommandHandler<|CancellationToken\.None|catch \(" sample-tale-code-apps/DreamTravel/src/Presentation/DreamTravel.Api/Controllers`
       prints nothing.

@@ -30,7 +30,7 @@ a clean `master`. No repository file changes except this step's Deviations.
     redirects.
 - nuget.org: create organization `SolTechnology` and add it as co-owner of:
   - the 20 live IDs, listed by `dotnet sln SolTechnology.Core.slnx list | grep -E '^src/'`;
-  - the 8 deprecated IDs from `docs/deprecated-packages.md` and
+  - the 8 deprecated IDs from `dontreadme.md` (kept under its name, user, 2026-11-03) and
     `unlistDeprecatedPackages.yml:7-18`.
 
   Keep the personal account as an owner. This decides whether `update-nuget-stats.yml:20`

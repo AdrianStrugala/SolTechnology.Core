@@ -43,3 +43,9 @@ Former core step 08; moved here by the per-library regroup (user, 2026-11-02).
 **Original plan:** gate `UseDeveloperExceptionPage()` with `app.Environment.IsDevelopment()`.
 
 **Actual implementation:** the `else` branch also calls `app.UseExceptionHandler()`, so Production answers an unhandled exception with a generic `application/problem+json` 500 through the `IProblemDetailsService` that `AddSolApiCore` registers; without it TestServer and Kestrel return an empty 500 and the planned test name ("ReturnsProblemDetails") could not hold. This matches the `ExceptionFilter` contract ("UseExceptionHandler in Production decides"). The test throws from an `IStartupFilter` branch appended after the app pipeline and boots the host with `environment=Production`; before the fix it failed because the response carried the exception message and full stack trace with local file paths. All 19 DreamTravel component tests pass.
+
+### CORS rename reverted 2026-11-03
+
+**Original plan:** a `chore:` commit renames `private static readonly string CorsPolicy = "dupa"` to `const string DreamTravelCorsPolicy = "DreamTravelCors"` and removes `avroconvertonline.azurewebsites.net` from the allowed origins; acceptance required no `"dupa"` in `Program.cs`.
+
+**Actual implementation:** CORS rename reverted 2026-11-03 per user decision ("nie dropuj joke z kodu"; Guide §9.10, §7); only the avroconvertonline origin removal remains. Commit `7601de9b` restored `CorsPolicy = "dupa"` in `sample-tale-code-apps/DreamTravel/src/Presentation/DreamTravel.Api/Program.cs`, so the `Program.cs has no "dupa"` criterion no longer holds by decision.

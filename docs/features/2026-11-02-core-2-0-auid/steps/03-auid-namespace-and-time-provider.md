@@ -25,6 +25,7 @@ Former core step 44; moved here by the per-library regroup (user, 2026-11-02).
 
 ## Changes
 - `Auid.New(code)` keeps using `TimeProvider.System`.
+- The overflow test keeps the Polish joke message verbatim: its comment quoting "Papież Polak robi BUM" stays, and any new message assertion uses the unchanged `Auid.cs:186` text (Guide §9.10; user, 2026-11-03).
 - Persisted-contract check (premortem trigger): `Auid` values inside persisted Tale contexts serialize through `AuidJsonConverter` as strings, so the namespace move does not change stored JSON. Verify that no persisted field stores an assembly-qualified type name containing `Auid` (`grep -rn "AssemblyQualifiedName\|FullName" src/SolTechnology.Core.Tale`); if one does, stop and record it for the migration guide.
 - `docs/AUID.md` usings are updated in step 05.
 

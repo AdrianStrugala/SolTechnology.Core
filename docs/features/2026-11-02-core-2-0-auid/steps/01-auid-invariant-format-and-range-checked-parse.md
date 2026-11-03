@@ -4,27 +4,26 @@ step: 01
 status: to-do
 ---
 
-# Step 01: AUID — culture-invariant formatting, range-checked parsing, English overflow message
+# Step 01: AUID — culture-invariant formatting, range-checked parsing
 
 ## Summary
 `Auid.TryFormat` formats the timestamp with the current culture's calendar. Under `th-TH` the
 year comes out as 2567, and the ID no longer round-trips (`B10`, `src/SolTechnology.Core.AUID/Auid.cs:286,291`).
 `TryParse` never range-checks the time value, so dates before 2001 or after 2137-02-07 overwrite
-the code bits and still return `true` (`B11`, `:345`). The overflow exception message is a Polish
-meme (`P1-5`, `logging-cache#11`, `:186`).
+the code bits and still return `true` (`B11`, `:345`). The Polish overflow exception message at
+`:186` is a kept joke and stays verbatim (Guide §9.10; user, 2026-11-03: "nie dropuj joke z kodu").
 
 Former core step 19; moved here by the per-library regroup (user, 2026-11-02).
 
 ## Affected components
-- `src/SolTechnology.Core.AUID/Auid.cs` — EDIT — `:286,291` `CultureInfo.InvariantCulture`; `:345` range check; `:186` message
-- `tests/SolTechnology.Core.AUID.Tests/AuidNewTests.cs` — EDIT — `:197` message assertion; overflow throw through an injected `TimeProvider`
+- `src/SolTechnology.Core.AUID/Auid.cs` — EDIT — `:286,291` `CultureInfo.InvariantCulture`; `:345` range check; `:186` overflow message unchanged
 - `tests/SolTechnology.Core.AUID.Tests/AuidParseStringTests.cs` — EDIT — out-of-range cases
 - `tests/SolTechnology.Core.AUID.Tests/AuidToStringTests.cs` — EDIT — culture round-trip cases
 
 ## Changes
 - `if (timeVal < 0 || timeVal > MaskTime) return false;`
 - Persisted-contract note (premortem trigger): an out-of-range ID that 1.x parsed and stored now fails `TryParse`. Such IDs had corrupted code bits, so they never round-tripped; the core brief's "Release-notes inputs" section records it, and the 2.0 release notes (release step 05, [`2026-11-02-org-transfer-and-2-0-release`](../../2026-11-02-org-transfer-and-2-0-release.md)) mention it.
-- Message: `"AUID timestamp overflow: seconds since 2001-01-01 exceed 32 bits (after 2137-02-07T06:28:15Z)."`
+- The overflow message at `Auid.cs:186` is not changed; `AuidNewTests.TimestampOverflow_ShouldBeDetected_WhenYear2137Exceeded` and its comment quoting the message stay as written.
 - Tests:
   - `[TestCase("th-TH")] [TestCase("ar-SA")] ToString_UnderCulture_RoundTrips`.
   - `[TestCase("20000101000000")] [TestCase("21380101000000")] TryParse_OutOfRange_ReturnsFalse`.
@@ -35,7 +34,7 @@ Former core step 19; moved here by the per-library regroup (user, 2026-11-02).
 ## Acceptance criteria
 - [ ] `dotnet test tests/SolTechnology.Core.AUID.Tests` is green, and the new tests fail on `4097d47f`.
 - [ ] Canonical format of in-range IDs unchanged (existing round-trip tests green).
-- [ ] `grep -n "Papie\|2137 " src/SolTechnology.Core.AUID/Auid.cs` shows only the English message.
+- [ ] `grep -c "Papież Polak robi BUM" src/SolTechnology.Core.AUID/Auid.cs` prints `1` (the joke message is unchanged).
 - [ ] RM-11: `TryParse_1xThaiCalendarString_ReturnsFalse` is green, and the core brief's `auid 01` release-notes input uses the RM-11 wording.
 
 ## Open questions

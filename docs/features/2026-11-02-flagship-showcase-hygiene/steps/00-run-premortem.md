@@ -22,7 +22,7 @@ this plan, after `review` is `done` and after the core steps this feature depend
 ## Changes
 
 - **Modules touched:**
-  - Root community files: `README.md`, `CONTRIBUTING.md`, `SECURITY.md`, `CODE_OF_CONDUCT.md`, `CHANGELOG.md`, `.github/ISSUE_TEMPLATE/*`, `.github/PULL_REQUEST_TEMPLATE.md`, `.github/CODEOWNERS`, `docs/deprecated-packages.md` (step 01).
+  - Root community files: `README.md`, `CONTRIBUTING.md`, `SECURITY.md`, `CODE_OF_CONDUCT.md`, `CHANGELOG.md`, `.github/ISSUE_TEMPLATE/*`, `.github/PULL_REQUEST_TEMPLATE.md`, `.github/CODEOWNERS`, `dontreadme.md` Guards row (step 01; the file keeps its name, user, 2026-11-03).
   - CI: `.github/workflows/publishPackages.yml` (steps 02, 07), `unlistDeprecatedPackages.yml` and `update-nuget-stats.yml` (step 02), `.github/dependabot.yml` (step 02).
   - DreamTravel: `DreamTravel.Api` controllers and `Program.cs`, `DreamTravel.Queries`, `DreamTravel.Domain`, `DreamTravel.Worker`, unit and component tests, `README.md`, `initWorkspace.bat`, `docker-compose.yml` (steps 03, 05, 06).
   - Guidance: `docs/ClaudeCodingGuide.md`, `CLAUDE.md` (step 04).
