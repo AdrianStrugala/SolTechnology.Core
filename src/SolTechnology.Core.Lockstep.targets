@@ -1,0 +1,20 @@
+<Project>
+    <!-- Packed into every SolTechnology.Core.* package as buildTransitive/<PackageId>.targets.
+         Every copy defines the same target, so MSBuild keeps one definition and runs it once. -->
+    <Target Name="SolTechnologyCoreLockstepCheck" AfterTargets="ResolveAssemblyReferences">
+        <ItemGroup>
+            <_SolCoreLockstepPackage Include="%(ReferencePath.NuGetPackageId)"
+                                     Version="%(ReferencePath.NuGetPackageVersion)"
+                                     Condition="$([System.String]::Copy('%(ReferencePath.NuGetPackageId)').StartsWith('SolTechnology.Core', System.StringComparison.OrdinalIgnoreCase))" />
+            <_SolCoreLockstepPackage Remove="SolTechnology.Core.Guards;SolTechnology.Core.Scheduler" />
+            <_SolCoreLockstepPackage>
+                <Major>$([System.String]::Copy('%(Version)').Split('.')[0])</Major>
+            </_SolCoreLockstepPackage>
+            <_SolCoreLockstepMajor Include="@(_SolCoreLockstepPackage->'%(Major)'->Distinct())" />
+        </ItemGroup>
+
+        <Warning Code="SOLCORE001"
+                 Condition="@(_SolCoreLockstepMajor->Count()) &gt; 1"
+                 Text="Upgrade every SolTechnology.Core.* package together. Resolved packages span several major versions (@(_SolCoreLockstepPackage->'%(Identity) %(Version)', ', ')); a mixed graph compiles but fails at runtime." />
+    </Target>
+</Project>

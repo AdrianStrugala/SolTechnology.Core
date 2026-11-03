@@ -1,7 +1,7 @@
 ---
 spec: 2026-11-02-core-2-0-flagship-hardening
 step: 03
-status: in-progress
+status: done
 ---
 
 # Step 03: Publish to nuget.org only from `v*` tags behind a protected environment
@@ -31,12 +31,12 @@ is the control for that (accepted risk AR-5).
 
 ## Acceptance criteria
 - [x] `actionlint .github/workflows/publishPackages.yml` (or the GitHub workflow editor) reports no error.
-- [ ] A `workflow_dispatch` run on a non-tag ref finishes with the `publish` job skipped.
+- [x] A `workflow_dispatch` run on a non-tag ref finishes with the `publish` job skipped.
 - [ ] The owner-confirmed date that `nuget-release` exists with ≥1 required reviewer and the `v*` tag rule precedes the merge date of this step's PR.
 - [x] The workflow YAML shows the `publish` job referencing `environment: nuget-release`.
 - [ ] `gh secret list` (repository level) no longer lists `NUGET_API_KEY`.
 - [x] `docs/CICD.md` states "publishing only from `v*` tags through `nuget-release`" and the tag-equals-`<Version>` reviewer check.
-- [ ] RM-18: the workflow YAML uploads `./artifacts/*.snupkg` next to `*.nupkg`, and a `workflow_dispatch` run's artifact lists one `.snupkg` per `.nupkg`.
+- [x] RM-18: the workflow YAML uploads `./artifacts/*.snupkg` next to `*.nupkg`, and a `workflow_dispatch` run's artifact lists one `.snupkg` per `.nupkg`.
 
 ## Open questions
 - none
@@ -48,3 +48,9 @@ is the control for that (accepted risk AR-5).
 **Original plan:** a `publish` job bound to a `nuget-release` environment with the owner as required reviewer, `NUGET_API_KEY` moved into the environment and deleted at repository level, and the reviewer checking that the tag equals `<Version>` (AR-5).
 
 **Actual implementation:** the owner declined being a required reviewer and chose no environment (2026-11-03). Deleting the repository secret would also break `unlistDeprecatedPackages.yml`, which reads it from `master`. The `publish` job runs only for `refs/tags/v*` without an environment; `NUGET_API_KEY` stays a repository secret. AR-5's human check is replaced by a build-job guard that fails a tag run when the tag is not `v` + `<Version>` (read with `dotnet msbuild -getProperty:Version`). The environment, reviewer and `gh secret list` criteria no longer apply. Verified locally: actionlint 1.7.12 clean; Release pack of every slnx `src/` project gives 20 `.nupkg` and 20 matching `.snupkg`; the guard expression passes for `v1.0.0` and fails for `v2.0.0` at `<Version>1.0.0</Version>`. The `workflow_dispatch` run check happens on the first CI run after the owner pushes. The release feature's Trusted Publishing step still names `nuget-release` and must be adjusted when it is implemented.
+
+### Non-tag run verified on a `master` push
+
+**Original plan:** a `workflow_dispatch` run on a non-tag ref shows `publish` skipped.
+
+**Actual implementation:** verified on the first `master` push run instead (run 41600313756, 2026-11-03), which evaluates the same `startsWith(github.ref, 'refs/tags/v')` condition: `build` succeeded, the tag guard and the `publish` job were skipped, and the `nuget-packages` artifact (3.5 MB) was uploaded; locally the pack produced 20 `.nupkg` with 20 matching `.snupkg`.

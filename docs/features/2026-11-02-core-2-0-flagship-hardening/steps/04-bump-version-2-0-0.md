@@ -1,7 +1,7 @@
 ---
 spec: 2026-11-02-core-2-0-flagship-hardening
 step: 04
-status: to-do
+status: done
 ---
 
 # Step 04: Bump every package to 2.0.0
@@ -33,14 +33,20 @@ premortem-gated.
   - If the check cannot be made reliable, record a deviation; the release-notes input stays mandatory.
 
 ## Acceptance criteria
-- [ ] `dotnet pack src/SolTechnology.Core.Logging/SolTechnology.Core.Logging.csproj -o /tmp/p` produces `SolTechnology.Core.Logging.2.0.0.nupkg`.
-- [ ] `dotnet msbuild src/SolTechnology.Core.CQRS/SolTechnology.Core.CQRS.csproj -getProperty:Version` prints `2.0.0`.
-- [ ] `dotnet build SolTechnology.Core.slnx` is green.
-- [ ] Premortem mitigations for `Directory.Build.props` are applied.
-- [ ] RM-1: a throwaway consumer on a local feed referencing the locally packed `SolTechnology.Core.Logging 2.0.0` and nuget.org `SolTechnology.Core.CQRS 1.0.0` builds with warning `SOLCORE001`. The same consumer with both packages at `2.0.0` builds with no `SOLCORE001`. Both packages contain `buildTransitive/<PackageId>.targets` (`unzip -l`).
-- [ ] RM-1: the brief's "Release-notes inputs" contains the lockstep-upgrade note.
+- [x] `dotnet pack src/SolTechnology.Core.Logging/SolTechnology.Core.Logging.csproj -o /tmp/p` produces `SolTechnology.Core.Logging.2.0.0.nupkg`.
+- [x] `dotnet msbuild src/SolTechnology.Core.CQRS/SolTechnology.Core.CQRS.csproj -getProperty:Version` prints `2.0.0`.
+- [x] `dotnet build SolTechnology.Core.slnx` is green.
+- [x] Premortem mitigations for `Directory.Build.props` are applied.
+- [x] RM-1: a throwaway consumer on a local feed referencing the locally packed `SolTechnology.Core.Logging 2.0.0` and nuget.org `SolTechnology.Core.CQRS 1.0.0` builds with warning `SOLCORE001`. The same consumer with both packages at `2.0.0` builds with no `SOLCORE001`. Both packages contain `buildTransitive/<PackageId>.targets` (`unzip -l`).
+- [x] RM-1: the brief's "Release-notes inputs" contains the lockstep-upgrade note.
 
 ## Open questions
 - none (`C-01` confirmed by the user on 2026-11-02)
 
 ## Deviations
+
+### Lockstep check compares all resolved majors
+
+**Original plan:** warn when a `SolTechnology.Core.*` package has a different major version than the importing package, with an import guard so the check runs once.
+
+**Actual implementation:** `src/SolTechnology.Core.Lockstep.targets` warns when the resolved `SolTechnology.Core.*` packages (from `ReferencePath` NuGet metadata, Guards and Scheduler excluded) span more than one major version, which covers the same graphs without knowing the importing package. Every package ships an identical target with one name, so MSBuild keeps one definition and runs it once; no separate import guard is needed. Verified with throwaway consumers on a local feed and an isolated package cache: Logging 2.0.0 + nuget.org CQRS 1.0.0 builds with `SOLCORE001` (listing CQRS 1.0.0, Core 1.0.0, Logging 2.0.0); Logging 2.0.0 + CQRS 2.0.0 builds with none. All 20 packages pack at 2.0.0 with `buildTransitive/<PackageId>.targets`.

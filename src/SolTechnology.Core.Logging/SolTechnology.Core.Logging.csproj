@@ -1,7 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<Version>1.2.0</Version>
 		<Description>Structured logging with automatic HTTP context enrichment for ASP.NET Core. Consistent logging patterns, correlation IDs, and request/response tracing that make distributed systems observable out of the box.</Description>
 		<PackageTags>soltechnology core logging structured-logging aspnetcore tracing diagnostics observability correlation-id monitoring dotnet csharp</PackageTags>
 		<Product>SolTechnology.Core.Logging</Product>

@@ -505,6 +505,10 @@ these notes from the steps:
 - tale 09 (former step 41, P-04): custom repositories add a `Version` column and a conditional write; DreamTravel's
   SQLite file is migrated on start.
 - core 04: 1.x hotfixes, if ever needed, branch from the `v1.0.0` tag, never from `master`.
+- core 04 (premortem RM-1): Upgrade every `SolTechnology.Core.*` package to 2.0 together. A mixed 1.x/2.x graph
+  compiles but fails at runtime (`FieldAccessException`, `MissingMethodException`, `TypeLoadException`).
+  Group Dependabot/Renovate updates for `SolTechnology.Core*`. 2.x packages warn with `SOLCORE001` when the
+  resolved `SolTechnology.Core.*` packages span more than one major version.
 
 ### Resolved questions (user answers, 2026-11-02)
 

@@ -2,7 +2,7 @@
     <Import Project="$([MSBuild]::GetPathOfFileAbove('Directory.Build.props', '$(MSBuildThisFileDirectory)../'))" />
 
     <PropertyGroup>
-        <Version>1.0.0</Version>
+        <Version>2.0.0</Version>
         <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
         <!--
             NU1900 = NuGet Audit could not fetch vulnerability data (transport/auth failure
@@ -39,6 +39,11 @@
         <EmbedUntrackedSources>true</EmbedUntrackedSources>
         <ContinuousIntegrationBuild Condition="'$(GITHUB_ACTIONS)' == 'true'">true</ContinuousIntegrationBuild>
     </PropertyGroup>
+
+    <!-- Premortem RM-1: every package carries the SOLCORE001 lockstep check for consumers. -->
+    <ItemGroup Condition="'$(IsPackable)' != 'false'">
+        <None Include="$(MSBuildThisFileDirectory)SolTechnology.Core.Lockstep.targets" Pack="true" Visible="false" PackagePath="buildTransitive\$(PackageId).targets" />
+    </ItemGroup>
 
     <!-- Package README + icon, sourced from docs/*.md via a per-project PackageReadmeSource. -->
     <ItemGroup Condition="'$(PackageReadmeSource)' != ''">
