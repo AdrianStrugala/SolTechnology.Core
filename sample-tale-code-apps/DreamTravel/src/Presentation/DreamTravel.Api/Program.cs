@@ -171,7 +171,14 @@ public class Program
 
         app.UseSolSecurityHeaders();
 
-        app.UseDeveloperExceptionPage();
+        if (app.Environment.IsDevelopment())
+        {
+            app.UseDeveloperExceptionPage();
+        }
+        else
+        {
+            app.UseExceptionHandler();
+        }
 
         // SolTechnology.Core.Api: per-version Swagger UI (newest first, deprecation badges).
         app.UseSolSwaggerWithVersioning("DreamTravel API");
