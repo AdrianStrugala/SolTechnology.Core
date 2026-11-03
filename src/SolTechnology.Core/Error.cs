@@ -9,7 +9,9 @@ namespace SolTechnology.Core;
 /// <see cref="Result{T}"/>. Use a subtype (<see cref="NotFoundError"/>, <see cref="ConflictError"/>,
 /// <see cref="ValidationError"/>, <see cref="UnauthorizedError"/>, <see cref="ForbiddenError"/>)
 /// when the failure has well-known semantics that downstream layers can map deterministically.
+/// Subtypes without a registered discriminator serialize as their nearest registered ancestor.
 /// </summary>
+[JsonPolymorphic(UnknownDerivedTypeHandling = JsonUnknownDerivedTypeHandling.FallBackToNearestAncestor)]
 [JsonDerivedType(typeof(Error), "error")]
 [JsonDerivedType(typeof(NotFoundError), "notFound")]
 [JsonDerivedType(typeof(ConflictError), "conflict")]

@@ -10,7 +10,6 @@ public record AggregateError : Error
 {
     private readonly IReadOnlyList<Error> _innerErrors;
 
-    [JsonConstructor]
     public AggregateError()
     {
         _innerErrors = Array.Empty<Error>();
@@ -26,6 +25,14 @@ public record AggregateError : Error
     {
         _innerErrors = (innerErrors ?? throw new ArgumentNullException(nameof(innerErrors))).ToArray();
         Message = BuildMessage(message, _innerErrors);
+    }
+
+    // Restores a serialized instance: Message was already built when the error was created.
+    [JsonConstructor]
+    private AggregateError(string message, IReadOnlyList<Error>? innerErrors)
+    {
+        _innerErrors = innerErrors ?? Array.Empty<Error>();
+        Message = message;
     }
 
     public IReadOnlyList<Error> InnerErrors => _innerErrors;
