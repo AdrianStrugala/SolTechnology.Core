@@ -350,7 +350,7 @@ public readonly struct Auid : IComparable<Auid>, IEquatable<Auid>, IParsable<Aui
     /// <param name="s">The string to parse.</param>
     /// <param name="provider">Format provider (not used, included for IParsable compliance).</param>
     /// <param name="result">The parsed AUID if successful; otherwise, Empty.</param>
-    /// <returns>True if parsing succeeded; otherwise, false.</returns>
+    /// <returns>True if parsing succeeded; false for a malformed string or a timestamp outside 2001-01-01 to 2137-02-07 06:28:15 UTC.</returns>
     public static bool TryParse(string? s, IFormatProvider? provider, out Auid result)
     {
         result = Empty;
