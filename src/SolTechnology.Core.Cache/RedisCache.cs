@@ -34,7 +34,9 @@ internal sealed class RedisCache(
     {
         var keyString = CacheKey.For<TKey, TItem>(key, SerializerOptions);
         if (string.IsNullOrWhiteSpace(keyString))
+        {
             throw new ArgumentOutOfRangeException(nameof(key), "Cache keys cannot be null or whitespace");
+        }
 
         try
         {
@@ -42,7 +44,10 @@ internal sealed class RedisCache(
             if (bytes is not null && bytes.Length > 0)
             {
                 var cached = JsonSerializer.Deserialize<TItem>(bytes, SerializerOptions);
-                if (cached is not null) return cached;
+                if (cached is not null)
+                {
+                    return cached;
+                }
             }
         }
         catch (Exception ex)
