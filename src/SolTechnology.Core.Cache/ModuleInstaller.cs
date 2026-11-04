@@ -59,13 +59,16 @@ public static class ModuleInstaller
         }
 
         /// <summary>
-        /// Registers an in-process <see cref="IDistributedLockService"/> backed by
-        /// <see cref="SemaphoreSlim"/>. No Redis required — suitable for local dev and
-        /// single-instance deployments.
+        /// Registers an in-process <see cref="IDistributedLockService"/> that honours the lock expiry
+        /// through the registered <see cref="TimeProvider"/> (or <see cref="TimeProvider.System"/>).
+        /// No Redis required — suitable for local dev and single-instance deployments.
         /// </summary>
         public IServiceCollection AddSolLocalLock()
         {
-            services.AddSingleton<IDistributedLockService, LocalDistributedLockService>();
+            services.AddSingleton<IDistributedLockService>(sp =>
+                new LocalDistributedLockService(
+                    sp.GetRequiredService<Microsoft.Extensions.Logging.ILogger<LocalDistributedLockService>>(),
+                    sp.GetService<TimeProvider>() ?? TimeProvider.System));
             return services;
         }
 

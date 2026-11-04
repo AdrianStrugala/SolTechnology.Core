@@ -12,6 +12,7 @@ namespace SolTechnology.Core.Cache
     {
         private readonly IMemoryCache _memoryCache;
         private readonly CacheConfiguration _cacheConfiguration;
+        private readonly Lock _gate = new();
 
         public SingletonCache(IMemoryCache memoryCache, IOptionsMonitor<CacheConfiguration> cacheConfiguration)
         {
@@ -19,20 +20,46 @@ namespace SolTechnology.Core.Cache
             _cacheConfiguration = cacheConfiguration.CurrentValue;
         }
 
-        public Task<TItem> GetOrAdd<TKey, TItem>(TKey key, Func<TKey, Task<TItem>> factory)
+        public async Task<TItem> GetOrAdd<TKey, TItem>(TKey key, Func<TKey, Task<TItem>> factory)
         {
             var keyString = System.Text.Json.JsonSerializer.Serialize(key);
-            if (string.IsNullOrWhiteSpace(keyString))
-                throw new ArgumentOutOfRangeException(nameof(key), "Cache keys cannot be null or whitespace");
+            var entry = GetOrCreateEntry(keyString, () => factory(key));
 
-            if (!_memoryCache.TryGetValue<Lazy<Task<TItem>>>(keyString, out var result))
+            try
             {
-                var options = BuildEntryOptions();
-                result = new Lazy<Task<TItem>>(() => factory(key), LazyThreadSafetyMode.ExecutionAndPublication);
-                _memoryCache.Set(keyString, result, options);
+                return await entry.Value;
             }
+            catch
+            {
+                RemoveIfCurrent(keyString, entry);
+                throw;
+            }
+        }
 
-            return result!.Value;
+        private Lazy<Task<TItem>> GetOrCreateEntry<TItem>(string keyString, Func<Task<TItem>> factory)
+        {
+            lock (_gate)
+            {
+                if (_memoryCache.TryGetValue<Lazy<Task<TItem>>>(keyString, out var existing) && existing is not null)
+                {
+                    return existing;
+                }
+
+                var created = new Lazy<Task<TItem>>(factory, LazyThreadSafetyMode.ExecutionAndPublication);
+                _memoryCache.Set(keyString, created, BuildEntryOptions());
+                return created;
+            }
+        }
+
+        private void RemoveIfCurrent<TItem>(string keyString, Lazy<Task<TItem>> entry)
+        {
+            lock (_gate)
+            {
+                if (_memoryCache.TryGetValue(keyString, out var current) && ReferenceEquals(current, entry))
+                {
+                    _memoryCache.Remove(keyString);
+                }
+            }
         }
 
         private MemoryCacheEntryOptions BuildEntryOptions()

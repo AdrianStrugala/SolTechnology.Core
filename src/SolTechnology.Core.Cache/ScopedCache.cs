@@ -11,7 +11,7 @@ namespace SolTechnology.Core.Cache
     {
         private readonly ConcurrentDictionary<string, Lazy<Task<TItem>>> _cache = new();
 
-        public Task<TItem> GetOrAdd(TKey key, Func<TKey, Task<TItem>> factory)
+        public async Task<TItem> GetOrAdd(TKey key, Func<TKey, Task<TItem>> factory)
         {
             var keyString = System.Text.Json.JsonSerializer.Serialize(key);
             if (string.IsNullOrWhiteSpace(keyString))
@@ -20,7 +20,15 @@ namespace SolTechnology.Core.Cache
             var lazyItem = _cache.GetOrAdd(keyString, _ =>
                 new Lazy<Task<TItem>>(() => factory(key), LazyThreadSafetyMode.ExecutionAndPublication));
 
-            return lazyItem.Value;
+            try
+            {
+                return await lazyItem.Value;
+            }
+            catch
+            {
+                _cache.TryRemove(KeyValuePair.Create(keyString, lazyItem));
+                throw;
+            }
         }
 
         //it could have generics on method, not class, but it would require Dictionary<object, Task<object>>, which makes casts
