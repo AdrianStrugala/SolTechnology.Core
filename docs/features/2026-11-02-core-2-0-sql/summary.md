@@ -19,7 +19,7 @@ are `done` and after these library features are `completed`: `result`. No step i
 
 | # | Title | File | Status |
 |---|---|---|---|
-| 01 | DI resolution test — SQL | [`steps/01-di-resolution-test.md`](steps/01-di-resolution-test.md) | to-do |
+| 01 | DI resolution test — SQL | [`steps/01-di-resolution-test.md`](steps/01-di-resolution-test.md) | done |
 | 02 | SQL — `Begin` on `IUnitOfWork` | [`steps/02-sql-unit-of-work-begin-on-interface.md`](steps/02-sql-unit-of-work-begin-on-interface.md) | to-do |
 | 03 | SQL — transient-only connection retry, safer error translation, options validation | [`steps/03-sql-connection-retry-and-validation.md`](steps/03-sql-connection-retry-and-validation.md) | to-do |
 | 04 | SQL — internal implementations; safe-by-default DACPAC deployment | [`steps/04-sql-internal-implementations-and-safe-dacpac.md`](steps/04-sql-internal-implementations-and-safe-dacpac.md) | to-do |
