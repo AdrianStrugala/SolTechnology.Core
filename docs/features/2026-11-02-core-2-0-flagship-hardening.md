@@ -441,6 +441,7 @@ becomes `SolTechnology.Core.Auth` in 2.0, because authorization joins the packag
 | C-26 | Tale (additive) | NEW public `SolTechnology.Core.Tale.Persistence.TaleJsonOptions` with `JsonSerializerOptions Default { get; }` (moved from the internal `Orchestration.TaleJsonOptions`, read-only instance); used by `TaleInstance.Clone()` and documented for custom repositories (RQ5) | tale 02 |
 | C-27 | MessageBus (additive) | NEW `MessageBusConfiguration.MaxDeliveryCount` (`int`, default 10) used by the receiver to dead-letter on the last attempt (RQ6) | messagebus 03 |
 | C-28 | Authentication → Auth (user, 2026-11-03) | NuGet `PackageId`, `AssemblyName`, project `src/SolTechnology.Core.Authentication/SolTechnology.Core.Authentication.csproj` → `src/SolTechnology.Core.Auth/SolTechnology.Core.Auth.csproj`, test project `tests/SolTechnology.Core.Authentication.Tests` → `tests/SolTechnology.Core.Auth.Tests`, and namespace `SolTechnology.Core.Authentication` → `SolTechnology.Core.Auth`; `ModuleInstaller.AddSolAuthentication(IServiceCollection, AuthenticationConfiguration)` → `AddSolAuth(IServiceCollection, AuthConfiguration)`, the one entry for authentication and authorization; `AuthenticationConfiguration` → `AuthConfiguration`; `ApiKeyAuthenticationHandler` and `ApiKeyAuthenticationSchemeOptions` keep their names (`C-21` still applies). The 1.x ID is deprecated on nuget.org with the alternative `SolTechnology.Core.Auth` (release 05, manual owner action). | api-auth 01 |
+| C-29 | Tale (additive, user D1, 2026-11-03) | NEW `TaleInstance.LeaseExpiresAt` (`DateTimeOffset?`, UTC), the persisted expiry of a `Running` tale's lease; `TaleOptions.RunningLeaseTimeout` (added by the tale post-completion fix T5) now accepts 1 second to 49 days | tale post-completion fix T7 |
 | C-25 | Guards, Scheduler | **Rejected (Q1, user, 2026-11-02).** Was: DELETE projects `src/SolTechnology.Core.Guards`, `src/SolTechnology.Core.Scheduler`, `tests/SolTechnology.Core.Guards.Tests` (all public symbols) | — (step removed) |
 
 **Not planned** (recorded so the omission is deliberate, per `naming-and-public-api.md`):
@@ -472,6 +473,7 @@ parameter; `UntilAsync`, `CheckHealthAsync`, `InvokeAsync`, `StartAsync`/`StopAs
 | P-15 | A failed request logs one Error entry, not two | Error-rate alerts change | logging 03 |
 | P-16 | API key in the request is compared as a SHA-256 hash in constant time | None functional | api-auth 04 |
 | P-17 | The receiver dead-letters a failing message when `DeliveryCount >= MessageBusConfiguration.MaxDeliveryCount` (default 10) instead of always abandoning | Set `MaxDeliveryCount` to the entity's value; a lower value dead-letters earlier than the broker would | messagebus 03 |
+| P-18 | `TaleInstance.LeaseExpiresAt` persisted (tale T7): every `Running` save stores the writer's now + `RunningLeaseTimeout`, every other status stores `null`; `ResumeStory` takes over a `Running` tale only once it has passed or when it is missing; renewals save through a fresh DI scope and leave `LastUpdatedAt` alone | Custom repositories add a nullable `LeaseExpiresAt` column and store the same instant on every `Save` (no database default, no local-time conversion); existing `Running` rows without it are resumable at once. DreamTravel's SQLite file gains the column on start | tale post-completion fix T7 |
 
 ### Log contract changes (Guide §15 "report only", accepted for 2.0)
 
@@ -564,6 +566,20 @@ these notes from the steps:
   whose renewal finds the tale taken over cancels the chapter's `CancellationToken`, saves nothing
   more, and returns `ConflictError`; chapters receive that token, so they can see a cancellation
   that the caller did not request. Direct `Handle` runs never renew.
+- tale (premortem follow-up, user decisions D1/D2 2026-11-03, amends the two notes above, `C-29`,
+  `P-18`): the lease is the new persisted `TaleInstance.LeaseExpiresAt` (`DateTimeOffset?`, UTC),
+  not `LastUpdatedAt`. The claim save and every renewal store the writer's clock plus its
+  `RunningLeaseTimeout`, any other status stores `null`, and `ResumeStory` takes over a `Running`
+  tale once the expiry has passed; a `Running` row without it counts as expired. Hosts with
+  different timeouts therefore agree, and renewals no longer change `LastUpdatedAt`, which again
+  means the last state save. Migration for custom repositories: add a nullable `LeaseExpiresAt`
+  column, store and return the same instant on every `Save`, renewals included (no database
+  default, no local-time conversion), and throw when a save's outcome is unknown instead of
+  reporting a conflict. Renewals resolve the repository from a fresh DI scope, so a `Scoped`
+  repository is never used by a renewal and a chapter at once. `RunningLeaseTimeout` accepts
+  1 second to 49 days. A chapter running for three timeouts logs one warning; a hung but alive
+  chapter keeps its lease and is recovered with `CancelStory`. A `StartStory` with an idempotency
+  key whose run lost the tale returns success with the new owner's stored state.
 
 ### Resolved questions (user answers, 2026-11-02)
 
