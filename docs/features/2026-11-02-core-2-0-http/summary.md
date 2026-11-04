@@ -20,7 +20,7 @@ are `done` and after these library features are `completed`: `result`; `logging`
 | # | Title | File | Status |
 |---|---|---|---|
 | 01 | DI resolution test — HTTP | [`steps/01-di-resolution-test.md`](steps/01-di-resolution-test.md) | done |
-| 02 | HTTP — never retry unsafe verbs after an exception or timeout | [`steps/02-http-no-unsafe-verb-retry-on-exception.md`](steps/02-http-no-unsafe-verb-retry-on-exception.md) | to-do |
+| 02 | HTTP — never retry unsafe verbs after an exception or timeout | [`steps/02-http-no-unsafe-verb-retry-on-exception.md`](steps/02-http-no-unsafe-verb-retry-on-exception.md) | done |
 | 03 | HTTP — request pipeline correctness | [`steps/03-http-request-pipeline-correctness.md`](steps/03-http-request-pipeline-correctness.md) | to-do |
 | 04 | HTTP — upstream health-check disposal and options validation | [`steps/04-http-health-check-and-options-validation.md`](steps/04-http-health-check-and-options-validation.md) | to-do |
 | 05 | HTTP — own namespace for `HttpClientExtensions`; factory-based upstream health check | [`steps/05-http-namespace-and-health-check-factory.md`](steps/05-http-namespace-and-health-check-factory.md) | to-do |

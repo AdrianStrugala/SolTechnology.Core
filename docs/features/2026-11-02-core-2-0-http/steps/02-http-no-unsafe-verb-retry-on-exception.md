@@ -1,7 +1,7 @@
 ---
 spec: 2026-11-02-core-2-0-http
 step: 02
-status: to-do
+status: done
 ---
 
 # Step 02: HTTP — never retry unsafe verbs after an exception or timeout
@@ -28,11 +28,17 @@ Former core step 05; moved here by the per-library regroup (user, 2026-11-02).
   - `Retry_UnsafeVerb_WithRetryOnUnsafeVerbsEnabled_IsRetried`
 
 ## Acceptance criteria
-- [ ] The new tests fail on `4097d47f` and pass after the change.
-- [ ] `dotnet test tests/SolTechnology.Core.HTTP.Tests` is green.
-- [ ] No public or protected signature changed.
+- [x] The new tests fail on `4097d47f` and pass after the change.
+- [x] `dotnet test tests/SolTechnology.Core.HTTP.Tests` is green.
+- [x] No public or protected signature changed.
 
 ## Open questions
 - none
 
 ## Deviations
+
+### Only the unsafe-verb cases are regression tests
+
+**Original plan:** The new tests fail on `4097d47f` and pass after the change.
+
+**Actual implementation:** The `POST` and `PATCH` cases of `Retry_UnsafeVerb_HttpRequestException_IsNotRetried` and `Retry_UnsafeVerb_Timeout_IsNotRetried` failed before the fix (4 attempts instead of 1) and pass after it; `src/SolTechnology.Core.HTTP` had no source change between `4097d47f` and the run except the CPM csproj edit. The `GET`/`PUT` cases and `Retry_UnsafeVerb_WithRetryOnUnsafeVerbsEnabled_IsRetried` are controls that pass on both sides by design. The retry metric's `http.method` tag still reads the method from the response, so exception-driven retries of safe verbs keep tagging `?`; that is outside this step.

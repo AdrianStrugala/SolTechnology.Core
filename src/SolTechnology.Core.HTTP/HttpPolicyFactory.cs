@@ -64,9 +64,9 @@ internal sealed class HttpPolicyFactory(ILogger<HttpPolicyFactory> logger, HttpC
         // Retry predicate is distinct from the breaker's so we can refuse retries
         // on POST/PATCH while still letting the breaker observe their failures —
         // a 500-storm on POST should still trip the breaker for subsequent GETs.
-        async ValueTask<bool> ShouldRetry(Outcome<HttpResponseMessage> outcome)
+        async ValueTask<bool> ShouldRetry(ResilienceContext context, Outcome<HttpResponseMessage> outcome)
         {
-            if (!configuration.RetryOnUnsafeVerbs && IsUnsafeVerb(outcome.Result?.RequestMessage?.Method))
+            if (!configuration.RetryOnUnsafeVerbs && IsUnsafeVerb(ResolveMethod(context, outcome)))
             {
                 return false;
             }
@@ -100,7 +100,7 @@ internal sealed class HttpPolicyFactory(ILogger<HttpPolicyFactory> logger, HttpC
             UseJitter = true,
             Delay = TimeSpan.FromMilliseconds(configuration.RetryInitialDelay),
             MaxDelay = TimeSpan.FromMilliseconds(configuration.RetryTimeout),
-            ShouldHandle = args => ShouldRetry(args.Outcome),
+            ShouldHandle = args => ShouldRetry(args.Context, args.Outcome),
             DelayGenerator = args =>
             {
                 var retryAfter = args.Outcome.Result?.Headers.RetryAfter;
@@ -206,6 +206,10 @@ internal sealed class HttpPolicyFactory(ILogger<HttpPolicyFactory> logger, HttpC
 
         return ValueTask.FromResult(false);
     }
+
+    // An exception outcome has no response, so the request stored by the resilience handler is the reliable source.
+    private static HttpMethod? ResolveMethod(ResilienceContext context, Outcome<HttpResponseMessage> outcome)
+        => context.GetRequestMessage()?.Method ?? outcome.Result?.RequestMessage?.Method;
 
     private static bool IsUnsafeVerb(HttpMethod? method)
     {

@@ -204,6 +204,89 @@ public sealed class HttpPolicyFactoryTests
         deleteAttempts.Should().Be(4);
     }
 
+    [TestCase("POST", 1)]
+    [TestCase("PATCH", 1)]
+    [TestCase("GET", 4)]
+    [TestCase("PUT", 4)]
+    public async Task Retry_UnsafeVerb_HttpRequestException_IsNotRetried(string method, int expectedAttempts)
+    {
+        // Arrange
+        var pipeline = BuildPipeline();
+        var attempts = 0;
+
+        // Act
+        var act = () => ExecuteWithRequest(pipeline, new HttpMethod(method), _ =>
+        {
+            attempts++;
+            throw new HttpRequestException("connection reset");
+        });
+
+        // Assert
+        await act.Should().ThrowAsync<HttpRequestException>();
+        attempts.Should().Be(expectedAttempts);
+    }
+
+    [TestCase("POST", 1)]
+    [TestCase("PATCH", 1)]
+    [TestCase("GET", 4)]
+    [TestCase("PUT", 4)]
+    public async Task Retry_UnsafeVerb_Timeout_IsNotRetried(string method, int expectedAttempts)
+    {
+        // Arrange
+        var pipeline = BuildPipeline(cfg => cfg.RequestTimeout = 20);
+        var attempts = 0;
+
+        // Act
+        var act = () => ExecuteWithRequest(pipeline, new HttpMethod(method), async token =>
+        {
+            attempts++;
+            await Task.Delay(Timeout.Infinite, token);
+            return Ok();
+        });
+
+        // Assert
+        await act.Should().ThrowAsync<Polly.Timeout.TimeoutRejectedException>();
+        attempts.Should().Be(expectedAttempts);
+    }
+
+    [TestCase("POST")]
+    [TestCase("PATCH")]
+    public async Task Retry_UnsafeVerb_WithRetryOnUnsafeVerbsEnabled_IsRetried(string method)
+    {
+        // Arrange
+        var pipeline = BuildPipeline(cfg => cfg.RetryOnUnsafeVerbs = true);
+        var attempts = 0;
+
+        // Act
+        var act = () => ExecuteWithRequest(pipeline, new HttpMethod(method), _ =>
+        {
+            attempts++;
+            throw new HttpRequestException("connection reset");
+        });
+
+        // Assert
+        await act.Should().ThrowAsync<HttpRequestException>();
+        attempts.Should().Be(4);
+    }
+
+    private static async Task<HttpResponseMessage> ExecuteWithRequest(
+        ResiliencePipeline<HttpResponseMessage> pipeline,
+        HttpMethod method,
+        Func<CancellationToken, ValueTask<HttpResponseMessage>> callback)
+    {
+        var context = ResilienceContextPool.Shared.Get();
+        using var request = new HttpRequestMessage(method, "http://test/");
+        context.SetRequestMessage(request);
+        try
+        {
+            return await pipeline.ExecuteAsync(ctx => callback(ctx.CancellationToken), context);
+        }
+        finally
+        {
+            ResilienceContextPool.Shared.Return(context);
+        }
+    }
+
     [Test]
     public async Task RetryAfter_DeltaSeconds_DelaysRequestedAmount()
     {
