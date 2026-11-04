@@ -25,7 +25,7 @@ are `done` and after these library features are `completed`: `result`; `logging`
 | 04 | HTTP — upstream health-check disposal and options validation | [`steps/04-http-health-check-and-options-validation.md`](steps/04-http-health-check-and-options-validation.md) | done |
 | 05 | HTTP — own namespace for `HttpClientExtensions`; factory-based upstream health check | [`steps/05-http-namespace-and-health-check-factory.md`](steps/05-http-namespace-and-health-check-factory.md) | done |
 | 06 | HTTP — drop `Async` from `RequestBuilder` verbs (optional) | [`steps/06-http-request-builder-async-suffix.md`](steps/06-http-request-builder-async-suffix.md) | done |
-| 07 | XML docs shipped — HTTP | [`steps/07-xml-docs.md`](steps/07-xml-docs.md) | to-do |
+| 07 | XML docs shipped — HTTP | [`steps/07-xml-docs.md`](steps/07-xml-docs.md) | done |
 | 08 | Module docs — Clients and the HTTP production checklist | [`steps/08-docs-clients-http.md`](steps/08-docs-clients-http.md) | to-do |
 | 09 | Guide conformance — HTTP | [`steps/09-conform-http.md`](steps/09-conform-http.md) | to-do |
 | 10 | Log templates — `[{Placeholder}]` in HTTP (L-03) | [`steps/10-log-template-brackets.md`](steps/10-log-template-brackets.md) | to-do |

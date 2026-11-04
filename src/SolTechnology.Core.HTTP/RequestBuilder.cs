@@ -8,6 +8,10 @@ using JetBrains.Annotations;
 
 namespace SolTechnology.Core.HTTP;
 
+/// <summary>
+/// Fluent builder that sends one request shape through an <see cref="HttpClient"/>. Start it with
+/// <see cref="HttpClientExtensions.CreateRequest(HttpClient, string)"/>; a builder can send more than once.
+/// </summary>
 public class RequestBuilder
 {
     /// <summary>
@@ -23,6 +27,9 @@ public class RequestBuilder
     private readonly HttpClient _httpClient;
     private readonly HttpPolicyConfiguration? _policy;
 
+    /// <summary>
+    /// Constructs a builder for <paramref name="path"/>, relative to the client's base address.
+    /// </summary>
     public RequestBuilder(HttpClient httpClient, string path)
         : this(httpClient, path, policy: null)
     {
@@ -92,6 +99,9 @@ public class RequestBuilder
     }
 
 
+    /// <summary>
+    /// Adds a request header; content headers such as <c>Content-Type</c> are applied to the body.
+    /// </summary>
     public RequestBuilder WithHeader(string name, string value)
     {
         // Defer validation to BuildRequest — at that point we know the verb and
@@ -102,6 +112,9 @@ public class RequestBuilder
         return this;
     }
 
+    /// <summary>
+    /// Sets the request body, serialised as <paramref name="dataType"/>. A <c>null</c> body is ignored.
+    /// </summary>
     public RequestBuilder WithBody(object body, DataType dataType = DataType.Json)
     {
         if (body != null)
@@ -113,6 +126,9 @@ public class RequestBuilder
         return this;
     }
 
+    /// <summary>
+    /// Sets the format the typed verbs deserialise the response from. Default: <see cref="DataType.Json"/>.
+    /// </summary>
     public RequestBuilder WithResponseType(DataType dataType)
     {
         _responseType = dataType;
@@ -222,18 +238,26 @@ public class RequestBuilder
     public Task<HttpResponseMessage> Delete(CancellationToken cancellationToken = default)
         => SendRaw(HttpMethod.Delete, cancellationToken);
 
+    /// <summary>
+    /// Sends the request and deserialises a success response to <typeparamref name="TResponse"/>.
+    /// Throws <see cref="HttpRequestFailedException"/> for a non-success status.
+    /// </summary>
     public Task<TResponse> Get<TResponse>(CancellationToken cancellationToken = default)
         => Send<TResponse>(HttpMethod.Get, cancellationToken);
 
+    /// <inheritdoc cref="Get{TResponse}(CancellationToken)" />
     public Task<TResponse> Post<TResponse>(CancellationToken cancellationToken = default)
         => Send<TResponse>(HttpMethod.Post, cancellationToken);
 
+    /// <inheritdoc cref="Get{TResponse}(CancellationToken)" />
     public Task<TResponse> Put<TResponse>(CancellationToken cancellationToken = default)
         => Send<TResponse>(HttpMethod.Put, cancellationToken);
 
+    /// <inheritdoc cref="Get{TResponse}(CancellationToken)" />
     public Task<TResponse> Patch<TResponse>(CancellationToken cancellationToken = default)
         => Send<TResponse>(HttpMethod.Patch, cancellationToken);
 
+    /// <inheritdoc cref="Get{TResponse}(CancellationToken)" />
     public Task<TResponse> Delete<TResponse>(CancellationToken cancellationToken = default)
         => Send<TResponse>(HttpMethod.Delete, cancellationToken);
 

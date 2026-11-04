@@ -61,6 +61,10 @@ public abstract class BaseUpstreamServiceHealthCheck<TReport>(
     /// </summary>
     protected abstract HealthCheckResult EvaluateReport(TReport report);
 
+    /// <summary>
+    /// Probes the upstream, or returns the cached result while it is younger than
+    /// <see cref="UpstreamHealthCheckOptions.CacheDuration"/>.
+    /// </summary>
     public async Task<HealthCheckResult> CheckHealthAsync(
         HealthCheckContext context,
         CancellationToken cancellationToken = default)

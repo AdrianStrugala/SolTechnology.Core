@@ -16,7 +16,7 @@ public static class ServiceCallErrorMapper
     private static readonly string[] ProblemMessageProperties = ["title", "message", "detail"];
 
     /// <summary>
-    /// Maps an exception from <see cref="HttpClient.SendAsync"/> to an appropriate Core
+    /// Maps an exception from <see cref="HttpClient.SendAsync(HttpRequestMessage, CancellationToken)"/> to an appropriate Core
     /// <see cref="SolTechnology.Core.Error"/> subtype.
     /// </summary>
     public static SolTechnology.Core.Error FromException(Exception exception) => exception switch

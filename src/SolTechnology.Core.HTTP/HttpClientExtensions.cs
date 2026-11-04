@@ -1,5 +1,8 @@
 namespace SolTechnology.Core.HTTP;
 
+/// <summary>
+/// Entry point of the <see cref="RequestBuilder"/> fluent API on <see cref="HttpClient"/>.
+/// </summary>
 public static class HttpClientExtensions
 {
     /// <summary>

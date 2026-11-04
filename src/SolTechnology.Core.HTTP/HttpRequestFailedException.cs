@@ -38,6 +38,10 @@ public sealed class HttpRequestFailedException : HttpRequestException
     /// </summary>
     public string? ResponseBody { get; }
 
+    /// <summary>
+    /// Creates the exception with a metadata-only <see cref="Exception.Message"/>;
+    /// <paramref name="responseBody"/> is kept only in <see cref="ResponseBody"/>.
+    /// </summary>
     public HttpRequestFailedException(
         HttpMethod? method,
         Uri? requestUri,

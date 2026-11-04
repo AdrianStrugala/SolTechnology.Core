@@ -34,6 +34,9 @@ public sealed class HttpClientMetrics
     /// </summary>
     public Counter<long> CircuitStateChanges { get; }
 
+    /// <summary>
+    /// Creates the <see cref="MeterName"/> meter and its counters from <paramref name="meterFactory"/>.
+    /// </summary>
     public HttpClientMetrics(IMeterFactory meterFactory)
     {
         _meter = meterFactory.Create(MeterName);

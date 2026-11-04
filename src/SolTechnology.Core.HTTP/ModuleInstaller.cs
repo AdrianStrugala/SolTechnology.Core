@@ -9,12 +9,19 @@ using SolTechnology.Core.Logging;
 
 namespace SolTechnology.Core.HTTP
 {
+    /// <summary>
+    /// Registers typed HTTP clients with the SolTechnology resilience pipeline.
+    /// </summary>
     public static class ModuleInstaller
     {
         /// <summary>
         /// Registers a typed HTTP client with the resilience pipeline,
         /// correlation propagation, and metrics wired up.
         /// </summary>
+        /// <param name="services">The service collection.</param>
+        /// <param name="httpClientName">Client name; also the configuration key under <c>HTTPClients</c>.</param>
+        /// <param name="httpClientConfiguration">Connection settings; when <c>null</c>, bound from <c>HTTPClients:{name}</c>.</param>
+        /// <param name="httpPolicyConfiguration">Resilience policy; when <c>null</c>, bound from <c>HTTPClients:{name}:Policy</c>, then <c>HttpPolicy</c>, then the defaults.</param>
         /// <param name="propagateCorrelation">
         /// When <c>true</c> (default), <see cref="CorrelationPropagatingHandler"/>
         /// is inserted before the resilience handler so every retry attempt
