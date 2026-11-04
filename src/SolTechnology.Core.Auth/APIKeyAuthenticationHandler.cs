@@ -10,18 +10,12 @@ using Microsoft.Extensions.Options;
 
 namespace SolTechnology.Core.Auth
 {
-    public class ApiKeyAuthenticationHandler : AuthenticationHandler<ApiKeyAuthenticationSchemeOptions>
+    public class ApiKeyAuthenticationHandler(
+        IOptionsMonitor<ApiKeyAuthenticationSchemeOptions> optionsMonitor,
+        ILoggerFactory loggerFactory,
+        UrlEncoder encoder)
+        : AuthenticationHandler<ApiKeyAuthenticationSchemeOptions>(optionsMonitor, loggerFactory, encoder)
     {
-        private readonly ILogger<ApiKeyAuthenticationHandler> _logger;
-
-        public ApiKeyAuthenticationHandler(
-            IOptionsMonitor<ApiKeyAuthenticationSchemeOptions> optionsMonitor,
-            ILoggerFactory loggerFactory,
-            UrlEncoder encoder,
-            ILogger<ApiKeyAuthenticationHandler> logger)
-            : base(optionsMonitor, loggerFactory, encoder) => _logger = logger;
-
-
         protected override async Task<AuthenticateResult> HandleAuthenticateAsync()
         {
             if (Context.GetEndpoint()?.Metadata.GetMetadata<IAllowAnonymous>() != null)
@@ -31,19 +25,19 @@ namespace SolTechnology.Core.Auth
 
             if (string.IsNullOrWhiteSpace(Options.ApiKey))
             {
-                _logger.LogWarning("No API key is configured for scheme [{Scheme}]; request [{RequestPath}] is rejected", Scheme.Name, Context.Request.Path);
+                Logger.LogWarning("No API key is configured for scheme [{Scheme}]; request [{RequestPath}] is rejected", Scheme.Name, Context.Request.Path);
                 return AuthenticateResult.Fail("API key is not configured");
             }
 
             if (!Request.Headers.TryGetValue(ApiKeyAuthenticationSchemeOptions.AuthenticationHeaderName, out var apiKey))
             {
-                _logger.LogWarning("Missing authentication header for request [{RequestPath}]", Context.Request.Path);
+                Logger.LogWarning("Missing authentication header for request [{RequestPath}]", Context.Request.Path);
                 return AuthenticateResult.Fail("Missing authentication header");
             }
 
             if (!IsConfiguredKey(apiKey.ToString()))
             {
-                _logger.LogWarning("Invalid API key for request [{RequestPath}]", Context.Request.Path);
+                Logger.LogWarning("Invalid API key for request [{RequestPath}]", Context.Request.Path);
                 return AuthenticateResult.Fail("Invalid API key");
             }
 

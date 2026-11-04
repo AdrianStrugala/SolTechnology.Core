@@ -51,11 +51,7 @@ public class ApiKeyAuthenticationHandlerTests
         optionsMonitor.Get(ApiKeyAuthenticationSchemeOptions.AuthenticationScheme).Returns(options);
         var loggerFactory = LoggerFactory.Create(builder => builder.AddProvider(logs).SetMinimumLevel(LogLevel.Trace));
 
-        var handler = new ApiKeyAuthenticationHandler(
-            optionsMonitor,
-            loggerFactory,
-            UrlEncoder.Default,
-            loggerFactory.CreateLogger<ApiKeyAuthenticationHandler>());
+        var handler = new ApiKeyAuthenticationHandler(optionsMonitor, loggerFactory, UrlEncoder.Default);
 
         var context = new DefaultHttpContext();
         context.Request.Path = "/api/trips";

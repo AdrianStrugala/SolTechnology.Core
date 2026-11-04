@@ -6,6 +6,6 @@ namespace SolTechnology.Core.Auth
     {
         public const string AuthenticationHeaderName = "X-API-KEY";
         public const string AuthenticationScheme = "ApiKey";
-        public string ApiKey = "";
+        public string ApiKey { get; set; } = "";
     }
 }
