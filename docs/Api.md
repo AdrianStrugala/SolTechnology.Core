@@ -233,7 +233,7 @@ Every `ProblemDetails` carries `extensions.correlationId`, the same value that:
 ```json
 {
   "type":          "https://tools.ietf.org/html/rfc9110#section-15.6.1",
-  "title":         "Object reference not set to an instance of an object.",
+  "title":         "An unexpected error occurred",
   "status":        500,
   "correlationId": "4bf92f3577b34da6a3ce929d0e0e4736",
   "exception": {

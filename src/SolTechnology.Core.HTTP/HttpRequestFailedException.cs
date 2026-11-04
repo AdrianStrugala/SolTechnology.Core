@@ -25,7 +25,11 @@ public sealed class HttpRequestFailedException : HttpRequestException
     /// <summary>HTTP verb of the failed request. May be <c>null</c> if the builder never assigned one.</summary>
     public HttpMethod? Method { get; }
 
-    /// <summary>Absolute or relative request URI as known to the builder.</summary>
+    /// <summary>
+    /// Absolute or relative request URI as known to the builder, including the query string.
+    /// <see cref="Exception.Message"/> carries only its scheme, host and path, because query strings
+    /// often hold API keys.
+    /// </summary>
     public Uri? RequestUri { get; }
 
     /// <summary>Reason phrase from the response status line. Useful for human-readable logs.</summary>
@@ -50,7 +54,7 @@ public sealed class HttpRequestFailedException : HttpRequestException
         string? responseBody)
         : base(
             // Metadata-only message. ResponseBody must NOT be inlined here.
-            $"HTTP {method?.Method ?? "?"} {requestUri?.ToString() ?? "(no uri)"} failed with status {(int)statusCode} {reasonPhrase}.",
+            $"HTTP {method?.Method ?? "?"} {WithoutQuery(requestUri)} failed with status {(int)statusCode} {reasonPhrase}.",
             inner: null,
             statusCode: statusCode)
     {
@@ -58,6 +62,18 @@ public sealed class HttpRequestFailedException : HttpRequestException
         RequestUri = requestUri;
         ReasonPhrase = reasonPhrase;
         ResponseBody = responseBody;
+    }
+
+    private static string WithoutQuery(Uri? requestUri)
+    {
+        if (requestUri is null)
+        {
+            return "(no uri)";
+        }
+
+        return requestUri.IsAbsoluteUri
+            ? requestUri.GetComponents(UriComponents.SchemeAndServer | UriComponents.Path, UriFormat.UriEscaped)
+            : requestUri.OriginalString.Split('?', '#')[0];
     }
 
     /// <summary>

@@ -1,7 +1,7 @@
 ---
 spec: 2026-11-02-core-2-0-api-auth
 step: 03
-status: to-do
+status: done
 ---
 
 # Step 03: Keep upstream URIs and query strings out of `ProblemDetails` and exception messages
@@ -32,11 +32,36 @@ Former core step 06; moved here by the per-library regroup (user, 2026-11-02). R
   - `HttpRequestFailedException_Message_OmitsQuery` (input `https://h/p?key=SECRET` → the message has no `SECRET`).
 
 ## Acceptance criteria
-- [ ] The new tests are green, and `grep -rn "SECRET"` over the test output finds nothing.
-- [ ] `dotnet test tests/SolTechnology.Core.API.Tests` and `dotnet test tests/SolTechnology.Core.HTTP.Tests` are green.
-- [ ] No public or protected signature changed (P-09 is behavioural only).
+- [x] The new tests are green, and `grep -rn "SECRET"` over the test output finds nothing.
+- [x] `dotnet test tests/SolTechnology.Core.API.Tests` and `dotnet test tests/SolTechnology.Core.HTTP.Tests` are green.
+- [x] No public or protected signature changed (P-09 is behavioural only).
 
 ## Open questions
 - none
 
 ## Deviations
+
+### The message drops user info and works for relative URIs
+
+**Original plan:** the message renders `requestUri.GetLeftPart(UriPartial.Path)`.
+
+**Actual implementation:** `GetLeftPart(UriPartial.Path)` keeps `user:password@` and throws for a relative URI, which
+`RequestUri` allows. A private `WithoutQuery` helper renders `GetComponents(SchemeAndServer | Path)` for absolute URIs
+and the part before `?` or `#` for relative ones. `HttpRequestFailedException_Message_OmitsQuery` covers the planned
+input plus user info with a fragment and a relative URI; its cases carry a `TestName`, so `SECRET` does not appear in
+the detailed test output (0 hits in `dotnet test --logger "console;verbosity=detailed"` for both projects).
+
+### Test shapes for the ProblemDetails titles
+
+**Original plan:** `Create_HttpRequestFailed502_TitleHasNoUri` and `Create_ValidationException_TitleIsMessage`.
+
+**Actual implementation:** the factory is internal, so the new `ApiProblemDetailsFactoryTests` drive it through the
+public `ExceptionFilter` with the real `DefaultExceptionStatusCodeMapper`; `SolTechnology.Core.API.Tests` now references
+`SolTechnology.Core.HTTP` to throw a real `HttpRequestFailedException`. `Create_HttpRequestFailed502_TitleHasNoUri` also
+covers 504 and checks that the opt-in `Extensions["exception"].message` has no query; a new
+`Create_Other5xx_TitleIsGeneric` covers 500 and 501. A FluentValidation `ValidationException` already had the fixed
+title "One or more validation errors occurred." (unchanged), so `Create_ValidationException_TitleIsMessage` uses the other
+400 input, an `ArgumentException`. The 502/504/5xx cases failed before the fix and pass; the 400 case is a regression
+guard and passed before and after. `docs/Api.md`'s diagnostic-detail example now shows the fixed 500 title; step 08
+rewrites the rest of the file.
+

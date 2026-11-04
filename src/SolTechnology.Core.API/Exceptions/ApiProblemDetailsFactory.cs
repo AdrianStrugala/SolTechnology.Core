@@ -50,7 +50,7 @@ internal static class ApiProblemDetailsFactory
         var problem = new ProblemDetails
         {
             Status = statusCode,
-            Title = exception.Message,
+            Title = TitleFor(exception, statusCode),
             Type = TypeForStatus(statusCode)
         };
         ApplyExtensions(problem, exception, correlationId, options);
@@ -61,6 +61,18 @@ internal static class ApiProblemDetailsFactory
 
         return problem;
     }
+
+    /// <summary>
+    /// 4xx titles keep the exception message (a client-facing rejection); 5xx titles are fixed,
+    /// because server and upstream messages can carry URIs, query strings and keys (CWE-209).
+    /// </summary>
+    private static string TitleFor(Exception exception, int statusCode) => statusCode switch
+    {
+        < StatusCodes.Status500InternalServerError => exception.Message,
+        StatusCodes.Status502BadGateway => "Upstream dependency failed",
+        StatusCodes.Status504GatewayTimeout => "Upstream dependency timed out",
+        _ => "An unexpected error occurred"
+    };
 
     /// <summary>
     /// Builds <see cref="ProblemDetails"/> from an <see cref="Error"/> returned by the
