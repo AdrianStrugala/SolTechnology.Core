@@ -46,10 +46,7 @@ public sealed class ResultConversionFilter(ICorrelationIdService correlationIdSe
     {
         if (context.Result is ObjectResult { Value: { } value } objectResult)
         {
-            // Dispatch is fully static: Result covers both Result and Result<T> (Data is exposed
-            // through the virtual GetData() — null on the base, payload on the generic). A bare
-            // Error catches the BadRequest(error) shorthand some handlers still use. No
-            // reflection — AOT/trim safe, no PropertyInfo lookups per request.
+            // Static dispatch, no reflection (AOT/trim safe); a bare Error covers the BadRequest(error) shorthand.
             if (value is Result result)
             {
                 context.Result = Convert(result, objectResult);
@@ -99,9 +96,7 @@ public sealed class ResultConversionFilter(ICorrelationIdService correlationIdSe
 
     private ObjectResult BuildProblem(Error error)
     {
-        // Source of truth for correlation id is Core.Logging — same value as the
-        // X-Correlation-Id response header and the CorrelationId log scope property. We only
-        // generate one if the caller did not already populate it on the Error.
+        // An id already set on the Error wins; otherwise the request's id from Core.Logging.
         var correlationId = error.CorrelationId ?? correlationIdService.GetOrGenerate().Value;
 
         var problem = ApiProblemDetailsFactory.FromError(error, correlationId);

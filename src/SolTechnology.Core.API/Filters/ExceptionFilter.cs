@@ -37,19 +37,13 @@ public class ExceptionFilter(
     /// </summary>
     public void OnException(ExceptionContext context)
     {
-        // Client disconnected mid-request — not our incident, no body to send.
-        // SolTechnology.Core.Logging.LoggingMiddleware (if registered) will downgrade the
-        // finish event to Warning. We leave ExceptionHandled = false so MVC rethrows.
+        // Client abort: no body to send; MVC rethrows and the logging middleware logs it as a Warning.
         if (IsClientAbort(context.HttpContext, context.Exception))
         {
             return;
         }
 
-        // Source of truth for the correlation id is Core.Logging's ICorrelationIdService,
-        // which already aligned its value with Activity.Current.TraceId (W3C Trace Context)
-        // and echoed it on the X-Correlation-Id response header. We surface the same value
-        // in ProblemDetails.Extensions["correlationId"] so a client quoting it can be looked
-        // up in Seq/AppInsights logs by identical token.
+        // Same value as the X-Correlation-Id header and the log scope, so a client can quote it.
         var correlationId = correlationIdService.GetOrGenerate().Value;
 
         // Mapped exception types — emit RFC 7807 ProblemDetails, set status, mark handled.
@@ -79,10 +73,7 @@ public class ExceptionFilter(
             return;
         }
 
-        // Unmapped exception type. Drift in the API contract — page on-call so the type can
-        // be added to the mapper. We do NOT pick a default status code: the host pipeline
-        // (DeveloperExceptionPage in Development, ASP.NET Core's ProblemDetails-aware
-        // UseExceptionHandler in Production) decides. ExceptionHandled stays false → MVC rethrows.
+        // Unmapped type is API contract drift: page on-call and let the host pipeline pick the status.
         logger.LogCritical(
             context.Exception,
             "Unmapped exception of type {ExceptionType} in {RequestMethod} {RequestPath} — rethrowing to host pipeline. " +
