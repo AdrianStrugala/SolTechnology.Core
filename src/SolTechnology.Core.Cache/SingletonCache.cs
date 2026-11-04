@@ -3,23 +3,34 @@ using Microsoft.Extensions.Options;
 
 namespace SolTechnology.Core.Cache
 {
+    /// <summary>
+    /// Process-wide in-memory cache of async results, with the expiration from <see cref="CacheConfiguration"/>.
+    /// </summary>
     public interface ISingletonCache
     {
+        /// <summary>
+        /// Returns the cached item for <paramref name="key"/> and <typeparamref name="TItem"/>, or runs
+        /// <paramref name="factory"/> once for concurrent callers and caches it. A faulted or cancelled result is not
+        /// kept, so the next call runs the factory again.
+        /// </summary>
         Task<TItem> GetOrAdd<TKey, TItem>(TKey key, Func<TKey, Task<TItem>> factory);
     }
 
+    /// <summary>Default <see cref="ISingletonCache"/> on <see cref="IMemoryCache"/>, registered by <c>AddSolLocalCache</c>.</summary>
     public class SingletonCache : ISingletonCache
     {
         private readonly IMemoryCache _memoryCache;
         private readonly CacheConfiguration _cacheConfiguration;
         private readonly Lock _gate = new();
 
+        /// <summary>Creates the cache on <paramref name="memoryCache"/> with the current <paramref name="cacheConfiguration"/>.</summary>
         public SingletonCache(IMemoryCache memoryCache, IOptionsMonitor<CacheConfiguration> cacheConfiguration)
         {
             _memoryCache = memoryCache;
             _cacheConfiguration = cacheConfiguration.CurrentValue;
         }
 
+        /// <inheritdoc />
         public async Task<TItem> GetOrAdd<TKey, TItem>(TKey key, Func<TKey, Task<TItem>> factory)
         {
             var keyString = CacheKey.For<TKey, TItem>(key);

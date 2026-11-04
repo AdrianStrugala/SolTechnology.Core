@@ -1,7 +1,7 @@
 ---
 spec: 2026-11-02-core-2-0-cache
 step: 05
-status: to-do
+status: done
 ---
 
 # Step 05: XML docs shipped — Cache
@@ -19,10 +19,21 @@ Former core step 57 (Cache part); split per library on 2026-11-02.
 - English, one or two sentences per member, per [`PublicDocumentationGuide.md`](../../../../docs/PublicDocumentationGuide.md). No `<NoWarn>CS1591</NoWarn>` (`CLAUDE.md §2`).
 
 ## Acceptance criteria
-- [ ] `dotnet build SolTechnology.Core.slnx` is green with `TreatWarningsAsErrors`.
-- [ ] `dotnet pack` of the project produces a nupkg containing `lib/net10.0/<Assembly>.xml`.
+- [x] `dotnet build SolTechnology.Core.slnx` is green with `TreatWarningsAsErrors`.
+- [x] `dotnet pack` of the project produces a nupkg containing `lib/net10.0/<Assembly>.xml`.
 
 ## Open questions
 - none
 
 ## Deviations
+
+### Verification
+
+No material deviation. `CS1591` reported 27 members in `CacheConfiguration`, `ExpirationMode`,
+`DistributedCacheConfiguration`, `StoredResponse`, `IRedisCache`, `IScopedCache`/`ScopedCache`,
+`ISingletonCache`/`SingletonCache`, and `ModuleInstaller` (type, `AddSolLocalCache`, `AddSolDistributedCache`); each has
+a summary, and the two `GetOrAdd` implementations use `<inheritdoc />`. The `InstanceName` summary states the key
+prefixes and the `"SolTechnology:"` continuity value. `dotnet pack` into the git-excluded `.scratch/` produced
+`SolTechnology.Core.Cache.2.0.0.nupkg` with `lib/net10.0/SolTechnology.Core.Cache.xml` next to the DLL and the
+`docs/icon.png` icon.
+

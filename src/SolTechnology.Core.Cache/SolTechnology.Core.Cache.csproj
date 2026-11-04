@@ -9,6 +9,7 @@
 		<AssemblyName>SolTechnology.Core.Cache</AssemblyName>
 
 		<PackageReadmeSource>Cache.md</PackageReadmeSource>
+		<GenerateDocumentationFile>true</GenerateDocumentationFile>
 	</PropertyGroup>
 
 	<ItemGroup>

@@ -5,8 +5,16 @@ using Microsoft.Extensions.Options;
 
 namespace SolTechnology.Core.Cache;
 
+/// <summary>
+/// Redis-backed cache of async results, shared by every instance that uses the same Redis and
+/// <see cref="DistributedCacheConfiguration.InstanceName"/>. Items are stored as JSON.
+/// </summary>
 public interface IRedisCache
 {
+    /// <summary>
+    /// Returns the cached item for <paramref name="key"/> and <typeparamref name="TItem"/>, or runs
+    /// <paramref name="factory"/> and caches its result. A Redis failure falls through to the factory.
+    /// </summary>
     Task<TItem> GetOrAdd<TKey, TItem>(TKey key, Func<TKey, Task<TItem>> factory);
 }
 

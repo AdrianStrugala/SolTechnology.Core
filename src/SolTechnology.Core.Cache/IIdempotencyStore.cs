@@ -5,8 +5,13 @@ namespace SolTechnology.Core.Cache;
 /// </summary>
 public sealed record StoredResponse
 {
+    /// <summary>HTTP status code of the original response.</summary>
     public required int StatusCode { get; init; }
+
+    /// <summary>Response headers of the original response.</summary>
     public required Dictionary<string, string[]> Headers { get; init; }
+
+    /// <summary>Raw response body of the original response.</summary>
     public required byte[] Body { get; init; }
 }
 

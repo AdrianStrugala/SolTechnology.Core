@@ -5,10 +5,18 @@ using StackExchange.Redis;
 
 namespace SolTechnology.Core.Cache;
 
+/// <summary>
+/// Registers the Cache services: in-memory and Redis caches, distributed locks, and idempotency stores.
+/// </summary>
 public static class ModuleInstaller
 {
     extension(IServiceCollection services)
     {
+        /// <summary>
+        /// Registers <see cref="ISingletonCache"/> and <see cref="IScopedCache{TKey, TItem}"/> on
+        /// <see cref="IMemoryCache"/>. Without a configuration, entries expire 20 minutes after they are added.
+        /// </summary>
+        /// <param name="cacheConfiguration">Expiration settings; <c>ExpirationSeconds</c> must be greater than 0.</param>
         public IServiceCollection AddSolLocalCache(CacheConfiguration? cacheConfiguration = null)
         {
             cacheConfiguration ??= new CacheConfiguration
@@ -35,6 +43,11 @@ public static class ModuleInstaller
             return services;
         }
 
+        /// <summary>
+        /// Registers <see cref="IRedisCache"/>, the framework <c>IDistributedCache</c> for Redis, and one shared
+        /// <see cref="IConnectionMultiplexer"/>. The configuration is validated at host start.
+        /// </summary>
+        /// <param name="configuration">Redis settings; <c>ConnectionString</c> and <c>InstanceName</c> must not be empty.</param>
         public IServiceCollection AddSolDistributedCache(DistributedCacheConfiguration configuration)
         {
             services
