@@ -69,3 +69,9 @@ Former core step 20; moved here by the per-library regroup (user, 2026-11-02).
 **Original plan:** XML docs of `IncludeResponseBodyInException` in `RequestBuilder.cs:21-22,368-376`.
 
 **Actual implementation:** The property's own XML doc in `HttpPolicyConfiguration.cs` said "Enable per-client", the claim design A10(b) withdraws, so it now says the flag is honoured per request only. The same file's `RetryPredicate` doc states the 8 KiB cap. The worst-case retry statement in `docs/HTTP-Production-Checklist.md` (`3 × RequestTimeout`) is corrected in step 08 with the other checklist edits.
+
+### Semver footer of the commit
+
+**Original plan:** Commits follow the `commit-message` skill; a log contract change listed as `L-nn` is `Semver: MAJOR` with a `BREAKING CHANGE:` footer, as in the earlier library features.
+
+**Actual implementation:** Commit `f2e575b3` carries `Semver: PATCH` although it ships L-02 (the retry warning's `{Exception}` placeholder is gone; the exception is the log entry's exception). History is not rewritten; this record and the brief's L-02 entry are the source for the release notes.

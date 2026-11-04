@@ -42,3 +42,9 @@ Former core step 05; moved here by the per-library regroup (user, 2026-11-02).
 **Original plan:** The new tests fail on `4097d47f` and pass after the change.
 
 **Actual implementation:** The `POST` and `PATCH` cases of `Retry_UnsafeVerb_HttpRequestException_IsNotRetried` and `Retry_UnsafeVerb_Timeout_IsNotRetried` failed before the fix (4 attempts instead of 1) and pass after it; `src/SolTechnology.Core.HTTP` had no source change between `4097d47f` and the run except the CPM csproj edit. The `GET`/`PUT` cases and `Retry_UnsafeVerb_WithRetryOnUnsafeVerbsEnabled_IsRetried` are controls that pass on both sides by design. The retry metric's `http.method` tag still reads the method from the response, so exception-driven retries of safe verbs keep tagging `?`; that is outside this step.
+
+### Semver footer of the commit
+
+**Original plan:** Commits follow the `commit-message` skill; a behavioural break listed as `P-nn` is `Semver: MAJOR` with a `BREAKING CHANGE:` footer, as in the earlier library features.
+
+**Actual implementation:** Commit `3e32c543` carries `Semver: PATCH` although it ships P-10 (POST/PATCH no longer retried after an exception or timeout). History is not rewritten; this record and the brief's P-10 row are the source for the release notes.
