@@ -50,8 +50,8 @@ internal static class ApiProblemDetailsFactory
         var problem = new ProblemDetails
         {
             Status = statusCode,
-            Title = TitleFor(exception, statusCode),
-            Type = TypeForStatus(statusCode)
+            Title = ProblemDetailsStatusMap.TitleFor(exception, statusCode),
+            Type = ProblemDetailsStatusMap.TypeForStatus(statusCode)
         };
         ApplyExtensions(problem, exception, correlationId, options);
 
@@ -63,18 +63,6 @@ internal static class ApiProblemDetailsFactory
     }
 
     /// <summary>
-    /// 4xx titles keep the exception message (a client-facing rejection); 5xx titles are fixed,
-    /// because server and upstream messages can carry URIs, query strings and keys (CWE-209).
-    /// </summary>
-    private static string TitleFor(Exception exception, int statusCode) => statusCode switch
-    {
-        < StatusCodes.Status500InternalServerError => exception.Message,
-        StatusCodes.Status502BadGateway => "Upstream dependency failed",
-        StatusCodes.Status504GatewayTimeout => "Upstream dependency timed out",
-        _ => "An unexpected error occurred"
-    };
-
-    /// <summary>
     /// Builds <see cref="ProblemDetails"/> from an <see cref="Error"/> returned by the
     /// application layer in a failed <c>Result</c>. The HTTP status code is derived from the
     /// concrete <see cref="Error"/> subtype and written to <see cref="ProblemDetails.Status"/>.
@@ -83,34 +71,17 @@ internal static class ApiProblemDetailsFactory
     /// </summary>
     public static ProblemDetails FromError(Error error, string? correlationId)
     {
-        var statusCode = StatusFor(error);
+        var statusCode = ProblemDetailsStatusMap.StatusFor(error);
 
-        ProblemDetails problem;
-        if (error is ValidationError validationError)
-        {
-            problem = new ValidationProblemDetails(validationError.Errors.ToDictionary(
-                kv => kv.Key,
-                kv => kv.Value,
-                StringComparer.Ordinal))
+        ProblemDetails problem = error is ValidationError validationError
+            ? new ValidationProblemDetails(validationError.Errors.ToDictionary(kv => kv.Key, kv => kv.Value, StringComparer.Ordinal))
             {
-                Status = statusCode,
-                Title = string.IsNullOrEmpty(error.Message)
-                    ? "One or more validation errors occurred."
-                    : error.Message,
-                Detail = error.Description,
-                Type = TypeForStatus(statusCode)
-            };
-        }
-        else
-        {
-            problem = new ProblemDetails
-            {
-                Status = statusCode,
-                Title = error.Message,
-                Detail = error.Description,
-                Type = TypeForStatus(statusCode)
-            };
-        }
+                Title = string.IsNullOrEmpty(error.Message) ? "One or more validation errors occurred." : error.Message
+            }
+            : new ProblemDetails { Title = error.Message };
+        problem.Status = statusCode;
+        problem.Detail = error.Description;
+        problem.Type = ProblemDetailsStatusMap.TypeForStatus(statusCode);
 
         var corr = correlationId ?? error.CorrelationId;
         if (!string.IsNullOrEmpty(corr))
@@ -123,21 +94,6 @@ internal static class ApiProblemDetailsFactory
 
         return problem;
     }
-
-    /// <summary>
-    /// Maps an <see cref="Error"/> subtype to its HTTP status code. Unknown subtypes default
-    /// to <c>500</c> — failure to recognise an error type is a server-side contract drift, not
-    /// a client problem.
-    /// </summary>
-    private static int StatusFor(Error error) => error switch
-    {
-        ValidationError => StatusCodes.Status400BadRequest,
-        UnauthorizedError => StatusCodes.Status401Unauthorized,
-        ForbiddenError => StatusCodes.Status403Forbidden,
-        NotFoundError => StatusCodes.Status404NotFound,
-        ConflictError => StatusCodes.Status409Conflict,
-        _ => StatusCodes.Status500InternalServerError
-    };
 
     private static ValidationProblemDetails BuildValidationFromException(
         ValidationException exception,
@@ -157,7 +113,7 @@ internal static class ApiProblemDetailsFactory
         {
             Status = StatusCodes.Status400BadRequest,
             Title = "One or more validation errors occurred.",
-            Type = TypeForStatus(StatusCodes.Status400BadRequest)
+            Type = ProblemDetailsStatusMap.TypeForStatus(StatusCodes.Status400BadRequest)
         };
         ApplyExtensions(problem, exception, correlationId, options);
         problem.Extensions[RecoverableKey] = false;
@@ -187,26 +143,4 @@ internal static class ApiProblemDetailsFactory
             };
         }
     }
-
-    /// <summary>
-    /// Maps a status code to a stable <c>type</c> URI per RFC 7807 §3.1. Pointing to the RFC
-    /// section that defines the status keeps the value predictable, dereferenceable, and free
-    /// of per-deployment configuration.
-    /// </summary>
-    private static string TypeForStatus(int status) => status switch
-    {
-        StatusCodes.Status400BadRequest => "https://tools.ietf.org/html/rfc9110#section-15.5.1",
-        StatusCodes.Status401Unauthorized => "https://tools.ietf.org/html/rfc9110#section-15.5.2",
-        StatusCodes.Status403Forbidden => "https://tools.ietf.org/html/rfc9110#section-15.5.4",
-        StatusCodes.Status404NotFound => "https://tools.ietf.org/html/rfc9110#section-15.5.5",
-        StatusCodes.Status409Conflict => "https://tools.ietf.org/html/rfc9110#section-15.5.10",
-        StatusCodes.Status422UnprocessableEntity => "https://tools.ietf.org/html/rfc4918#section-11.2",
-        StatusCodes.Status500InternalServerError => "https://tools.ietf.org/html/rfc9110#section-15.6.1",
-        StatusCodes.Status501NotImplemented => "https://tools.ietf.org/html/rfc9110#section-15.6.2",
-        StatusCodes.Status503ServiceUnavailable => "https://tools.ietf.org/html/rfc9110#section-15.6.4",
-        StatusCodes.Status504GatewayTimeout => "https://tools.ietf.org/html/rfc9110#section-15.6.5",
-        _ => $"https://httpstatuses.io/{status}"
-    };
 }
-
-

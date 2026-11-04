@@ -5,11 +5,9 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
-using Microsoft.OpenApi;
 using SolTechnology.Core.API.Exceptions;
 using SolTechnology.Core.API.Filters;
 using SolTechnology.Core.Logging;
-using SolTechnology.Core.Logging.Correlations;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using Swashbuckle.AspNetCore.SwaggerUI;
 
@@ -22,29 +20,10 @@ namespace SolTechnology.Core.API;
 public static class ModuleInstaller
 {
     /// <summary>
-    /// One-call setup for everything <c>SolTechnology.Core.Api</c> registers in DI:
-    /// exception handling pipeline (ProblemDetails-based), API versioning, and the
-    /// dependencies they pull in (<c>Core.Logging</c>, <c>AddProblemDetails</c>).
-    /// <para>
-    /// After calling this, register the MVC filters globally with
-    /// <see cref="ApiCoreMvcOptionsExtensions.AddSolApiCoreFilters(Microsoft.AspNetCore.Mvc.MvcOptions)"/>
-    /// and use <see cref="UseSolSwaggerWithVersioning"/> in the request pipeline.
-    /// </para>
-    /// <code>
-    /// builder.Services
-    ///     .AddSolApiCore(o =&gt; o.IncludeExceptionDetails = builder.Environment.IsDevelopment(),
-    ///                 apiTitle: "DreamTravel API");
-    ///
-    /// builder.Services.AddControllers(opts =&gt; opts.AddSolApiCoreFilters());
-    ///
-    /// var app = builder.Build();
-    /// app.UseSolSwaggerWithVersioning("DreamTravel API");
-    /// </code>
-    /// <para>
-    /// Use the lower-level <see cref="AddSolApiExceptionHandling"/> / <see cref="AddSolVersioning"/>
-    /// extensions when you need finer-grained control (e.g. registering only one of the two,
-    /// or composing your own bootstrap).
-    /// </para>
+    /// One-call setup of the API error pipeline (<see cref="AddSolApiExceptionHandling"/>) and header-based
+    /// versioning with per-version Swagger (<see cref="AddSolVersioning"/>). Then add the filters with
+    /// <see cref="ApiCoreMvcOptionsExtensions.AddSolApiCoreFilters(Microsoft.AspNetCore.Mvc.MvcOptions)"/> and call
+    /// <see cref="UseSolSwaggerWithVersioning"/> in the request pipeline.
     /// </summary>
     /// <param name="services">DI container.</param>
     /// <param name="configure">Optional configuration delegate for <see cref="ApiExceptionOptions"/>.</param>
@@ -64,30 +43,10 @@ public static class ModuleInstaller
     }
 
     /// <summary>
-    /// Registers the API error pipeline:
-    /// <list type="bullet">
-    ///   <item><see cref="ExceptionFilter"/> — maps known exceptions to RFC 7807
-    ///         <see cref="Microsoft.AspNetCore.Mvc.ProblemDetails"/>; rethrows unmapped ones.</item>
-    ///   <item><see cref="ResultConversionFilter"/> — converts <c>Result&lt;T&gt;</c> returned
-    ///         from controller actions to a raw success body (200) or to <c>ProblemDetails</c>
-    ///         derived from the <c>Error</c> subtype.</item>
-    ///   <item><see cref="IExceptionStatusCodeMapper"/> — default exception → status mapping;
-    ///         registered via <c>TryAddSingleton</c> so consumers can replace it with their
-    ///         own implementation (typically extending <see cref="DefaultExceptionStatusCodeMapper"/>).</item>
-    ///   <item><see cref="ApiExceptionOptions"/> bound through <see cref="IOptions{TOptions}"/>.</item>
-    ///   <item>ASP.NET Core's <c>AddProblemDetails()</c> — produces <c>ProblemDetails</c> for
-    ///         status-code pages and any path that does not pass through MVC.</item>
-    ///   <item><c>SolTechnology.Core.Logging</c>'s <c>ICorrelationIdService</c> — used to populate
-    ///         <c>ProblemDetails.Extensions["correlationId"]</c>.</item>
-    /// </list>
-    /// <para>
-    /// Call once during service configuration, then add the filters to the MVC pipeline:
-    /// </para>
-    /// <code>
-    /// services.AddSolApiExceptionHandling(o =&gt;
-    ///     o.IncludeExceptionDetails = builder.Environment.IsDevelopment());
-    /// services.AddControllers(o =&gt; o.AddSolApiCoreFilters());
-    /// </code>
+    /// Registers the API error pipeline: <see cref="ExceptionFilter"/>, <see cref="ResultConversionFilter"/>, a
+    /// replaceable <see cref="IExceptionStatusCodeMapper"/> (<c>TryAddSingleton</c>), <see cref="ApiExceptionOptions"/>,
+    /// ASP.NET Core's <c>AddProblemDetails()</c> with the correlation id, and <c>SolTechnology.Core.Logging</c>.
+    /// Add the filters to MVC with <see cref="ApiCoreMvcOptionsExtensions.AddSolApiCoreFilters(Microsoft.AspNetCore.Mvc.MvcOptions)"/>.
     /// </summary>
     /// <param name="services">DI container.</param>
     /// <param name="configure">Optional configuration delegate for <see cref="ApiExceptionOptions"/>.</param>
@@ -98,54 +57,9 @@ public static class ModuleInstaller
         // Idempotent: AddSolLogging and AddProblemDetails are both self-guarded.
         services.AddSolLogging();
 
-        // Stamp correlationId on every ProblemDetails the framework produces outside MVC
-        // (routing 404, UseStatusCodePages, UseExceptionHandler, auth challenges) so the
-        // body shape matches what ExceptionFilter / ResultConversionFilter emit.
-        services.AddProblemDetails(opts =>
-        {
-            opts.CustomizeProblemDetails = ctx =>
-            {
-                if (ctx.ProblemDetails.Extensions.ContainsKey(ApiProblemDetailsFactory.CorrelationIdKey))
-                {
-                    return;
-                }
-
-                var correlationIdService = ctx.HttpContext.RequestServices
-                    .GetService<ICorrelationIdService>();
-                if (correlationIdService is null)
-                {
-                    return;
-                }
-
-                ctx.ProblemDetails.Extensions[ApiProblemDetailsFactory.CorrelationIdKey] =
-                    correlationIdService.GetOrGenerate().Value;
-            };
-        });
-
-        // [ApiController]'s 400 ValidationProblemDetails is built before MVC filters run; wrap the
-        // default factory to stamp correlationId without disturbing the per-field errors dictionary.
+        services.AddProblemDetails(opts => opts.CustomizeProblemDetails = ProblemDetailsCorrelation.Stamp);
         services.PostConfigure<ApiBehaviorOptions>(opts =>
-        {
-            var defaultFactory = opts.InvalidModelStateResponseFactory;
-            opts.InvalidModelStateResponseFactory = actionContext =>
-            {
-                var response = defaultFactory(actionContext);
-
-                if (response is ObjectResult { Value: ProblemDetails problem } &&
-                    !problem.Extensions.ContainsKey(ApiProblemDetailsFactory.CorrelationIdKey))
-                {
-                    var correlationIdService = actionContext.HttpContext.RequestServices
-                        .GetService<ICorrelationIdService>();
-                    if (correlationIdService is not null)
-                    {
-                        problem.Extensions[ApiProblemDetailsFactory.CorrelationIdKey] =
-                            correlationIdService.GetOrGenerate().Value;
-                    }
-                }
-
-                return response;
-            };
-        });
+            opts.InvalidModelStateResponseFactory = ProblemDetailsCorrelation.StampInvalidModelState(opts.InvalidModelStateResponseFactory));
 
         // TryAdd: a consumer's custom IExceptionStatusCodeMapper wins. Mapper is stateless → singleton.
         services.TryAddSingleton<IExceptionStatusCodeMapper, DefaultExceptionStatusCodeMapper>();
@@ -197,21 +111,8 @@ public static class ModuleInstaller
     }
 
     /// <summary>
-    /// Wires <c>UseSwagger</c> + <c>UseSwaggerUI</c> with one Swagger endpoint per registered
-    /// API version, ordered newest-first. Combine with <see cref="AddSolVersioning"/> /
-    /// <see cref="AddSolApiCore"/>, which generated the per-version <c>SwaggerDoc</c>s.
-    /// <para>
-    /// Replaces the boilerplate loop that every API consumer otherwise repeats:
-    /// </para>
-    /// <code>
-    /// var provider = app.Services.GetRequiredService&lt;IApiVersionDescriptionProvider&gt;();
-    /// app.UseSwagger();
-    /// app.UseSwaggerUI(c =&gt;
-    /// {
-    ///     foreach (var d in provider.ApiVersionDescriptions.Reverse())
-    ///         c.SwaggerEndpoint($"/swagger/{d.GroupName}/swagger.json", $"{title} {d.GroupName.ToUpperInvariant()}");
-    /// });
-    /// </code>
+    /// Wires <c>UseSwagger</c> and <c>UseSwaggerUI</c> with one Swagger endpoint per registered API version,
+    /// newest first. Pair with <see cref="AddSolVersioning"/> or <see cref="AddSolApiCore"/>.
     /// </summary>
     /// <param name="app">Application pipeline.</param>
     /// <param name="apiTitle">Title shown in the Swagger UI version dropdown (default: <c>"API"</c>).</param>
@@ -242,27 +143,5 @@ public static class ModuleInstaller
         });
 
         return app;
-    }
-}
-
-/// <summary>
-/// Generates one Swagger document per registered API version.
-/// </summary>
-internal sealed class ConfigureSwaggerOptions(IApiVersionDescriptionProvider provider, string apiTitle)
-    : IConfigureOptions<SwaggerGenOptions>
-{
-    public void Configure(SwaggerGenOptions options)
-    {
-        foreach (var description in provider.ApiVersionDescriptions)
-        {
-            options.SwaggerDoc(description.GroupName, new OpenApiInfo
-            {
-                Title = apiTitle,
-                Version = description.ApiVersion.ToString(),
-                Description = description.IsDeprecated
-                    ? "⚠️ This API version is deprecated. Please migrate to newer version."
-                    : "Current stable API version"
-            });
-        }
     }
 }
