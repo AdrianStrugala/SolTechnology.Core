@@ -26,7 +26,7 @@ internal sealed class RedisDistributedLockService : IDistributedLockService
         _keyPrefix = options.Value.InstanceName + "lock:";
     }
 
-    public async ValueTask<IAsyncDisposable?> TryAcquireLockAsync(
+    public async ValueTask<IAsyncDisposable?> TryAcquireLock(
         string name, TimeSpan expiry, CancellationToken ct = default)
     {
         ct.ThrowIfCancellationRequested();

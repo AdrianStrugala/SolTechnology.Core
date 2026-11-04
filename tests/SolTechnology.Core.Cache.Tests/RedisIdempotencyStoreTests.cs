@@ -27,47 +27,47 @@ public sealed class RedisIdempotencyStoreTests
             TimeSpan.FromHours(1));
 
     [Test]
-    public async Task TryAddAsync_RedisDown_FailsOpen_ReturnsTrue()
+    public async Task TryAdd_RedisDown_FailsOpen_ReturnsTrue()
     {
         var redis = Substitute.For<IConnectionMultiplexer>();
         redis.GetDatabase(Arg.Any<int>(), Arg.Any<object>())
             .Returns(_ => throw new RedisConnectionException(ConnectionFailureType.UnableToConnect, "down"));
         var sut = CreateSut(redis);
 
-        var result = await sut.TryAddAsync("key-1");
+        var result = await sut.TryAdd("key-1");
 
         // Fail-open: better to risk a duplicate than to reject all traffic during an outage.
         result.Should().BeTrue();
     }
 
     [Test]
-    public async Task GetAsync_RedisDown_ReturnsNull()
+    public async Task Get_RedisDown_ReturnsNull()
     {
         var redis = Substitute.For<IConnectionMultiplexer>();
         redis.GetDatabase(Arg.Any<int>(), Arg.Any<object>())
             .Returns(_ => throw new RedisConnectionException(ConnectionFailureType.UnableToConnect, "down"));
         var sut = CreateSut(redis);
 
-        var result = await sut.GetAsync("key-1");
+        var result = await sut.Get("key-1");
 
         result.Should().BeNull();
     }
 
     [Test]
-    public async Task RemoveAsync_RedisDown_DoesNotThrow()
+    public async Task Remove_RedisDown_DoesNotThrow()
     {
         var redis = Substitute.For<IConnectionMultiplexer>();
         redis.GetDatabase(Arg.Any<int>(), Arg.Any<object>())
             .Returns(_ => throw new RedisConnectionException(ConnectionFailureType.UnableToConnect, "down"));
         var sut = CreateSut(redis);
 
-        var act = async () => await sut.RemoveAsync("key-1");
+        var act = async () => await sut.Remove("key-1");
 
         await act.Should().NotThrowAsync();
     }
 
     [Test]
-    public async Task TryAddAsync_WhenKeyIsNew_ReturnsTrue()
+    public async Task TryAdd_WhenKeyIsNew_ReturnsTrue()
     {
         var db = Substitute.For<IDatabase>();
         db.StringSetAsync(Arg.Any<RedisKey>(), Arg.Any<RedisValue>(), Arg.Any<TimeSpan?>(), Arg.Any<When>())
@@ -76,13 +76,13 @@ public sealed class RedisIdempotencyStoreTests
         redis.GetDatabase(Arg.Any<int>(), Arg.Any<object>()).Returns(db);
         var sut = CreateSut(redis);
 
-        var result = await sut.TryAddAsync("key-1");
+        var result = await sut.TryAdd("key-1");
 
         result.Should().BeTrue();
     }
 
     [Test]
-    public async Task TryAddAsync_WhenKeyAlreadyHeld_ReturnsFalse()
+    public async Task TryAdd_WhenKeyAlreadyHeld_ReturnsFalse()
     {
         var db = Substitute.For<IDatabase>();
         db.StringSetAsync(Arg.Any<RedisKey>(), Arg.Any<RedisValue>(), Arg.Any<TimeSpan?>(), Arg.Any<When>())
@@ -91,13 +91,13 @@ public sealed class RedisIdempotencyStoreTests
         redis.GetDatabase(Arg.Any<int>(), Arg.Any<object>()).Returns(db);
         var sut = CreateSut(redis);
 
-        var result = await sut.TryAddAsync("key-1");
+        var result = await sut.TryAdd("key-1");
 
         result.Should().BeFalse();
     }
 
     [Test]
-    public async Task GetAsync_WhenReservedButNoResponse_ReturnsNull()
+    public async Task Get_WhenReservedButNoResponse_ReturnsNull()
     {
         var db = Substitute.For<IDatabase>();
         db.StringGetAsync(Arg.Any<RedisKey>()).Returns(RedisValue.EmptyString);
@@ -105,13 +105,13 @@ public sealed class RedisIdempotencyStoreTests
         redis.GetDatabase(Arg.Any<int>(), Arg.Any<object>()).Returns(db);
         var sut = CreateSut(redis);
 
-        var result = await sut.GetAsync("key-1");
+        var result = await sut.Get("key-1");
 
         result.Should().BeNull();
     }
 
     [Test]
-    public async Task GetAsync_WhenResponseStored_ReturnsDeserializedResponse()
+    public async Task Get_WhenResponseStored_ReturnsDeserializedResponse()
     {
         var stored = new StoredResponse
         {
@@ -127,7 +127,7 @@ public sealed class RedisIdempotencyStoreTests
         redis.GetDatabase(Arg.Any<int>(), Arg.Any<object>()).Returns(db);
         var sut = CreateSut(redis);
 
-        var result = await sut.GetAsync("key-1");
+        var result = await sut.Get("key-1");
 
         result.Should().NotBeNull();
         result!.StatusCode.Should().Be(200);

@@ -19,8 +19,8 @@ public class RedisKeysTests
         var idempotencyStore = provider.GetRequiredService<IIdempotencyStore>();
 
         // Act
-        var handle = await lockService.TryAcquireLockAsync("nightly-job", TimeSpan.FromMinutes(1));
-        var reserved = await idempotencyStore.TryAddAsync("request-1");
+        var handle = await lockService.TryAcquireLock("nightly-job", TimeSpan.FromMinutes(1));
+        var reserved = await idempotencyStore.TryAdd("request-1");
         var rawKeys = RedisTestEnvironment.RawKeys();
 
         // Assert

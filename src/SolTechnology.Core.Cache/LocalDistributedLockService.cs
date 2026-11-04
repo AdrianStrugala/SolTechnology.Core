@@ -17,7 +17,7 @@ internal sealed class LocalDistributedLockService(
 
     internal int HeldLockCount => _locks.Count;
 
-    public ValueTask<IAsyncDisposable?> TryAcquireLockAsync(
+    public ValueTask<IAsyncDisposable?> TryAcquireLock(
         string name, TimeSpan expiry, CancellationToken ct = default)
     {
         if (ct.IsCancellationRequested)

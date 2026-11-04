@@ -24,13 +24,13 @@ public class LocalDistributedLockServiceTests
     public async Task Dispose_Twice_DoesNotReleaseOtherHolder()
     {
         // Arrange
-        var first = await _sut.TryAcquireLockAsync("job", Expiry);
+        var first = await _sut.TryAcquireLock("job", Expiry);
         await first!.DisposeAsync();
-        var second = await _sut.TryAcquireLockAsync("job", Expiry);
+        var second = await _sut.TryAcquireLock("job", Expiry);
 
         // Act
         await first.DisposeAsync();
-        var third = await _sut.TryAcquireLockAsync("job", Expiry);
+        var third = await _sut.TryAcquireLock("job", Expiry);
 
         // Assert
         second.Should().NotBeNull();
@@ -41,14 +41,14 @@ public class LocalDistributedLockServiceTests
     public async Task TryAcquire_AfterExpiry_Succeeds()
     {
         // Arrange
-        var expired = await _sut.TryAcquireLockAsync("job", Expiry);
-        var beforeExpiry = await _sut.TryAcquireLockAsync("job", Expiry);
+        var expired = await _sut.TryAcquireLock("job", Expiry);
+        var beforeExpiry = await _sut.TryAcquireLock("job", Expiry);
         _time.Advance(Expiry + TimeSpan.FromSeconds(1));
 
         // Act
-        var afterExpiry = await _sut.TryAcquireLockAsync("job", Expiry);
+        var afterExpiry = await _sut.TryAcquireLock("job", Expiry);
         await expired!.DisposeAsync();
-        var whileTakenOver = await _sut.TryAcquireLockAsync("job", Expiry);
+        var whileTakenOver = await _sut.TryAcquireLock("job", Expiry);
 
         // Assert
         beforeExpiry.Should().BeNull();
@@ -60,7 +60,7 @@ public class LocalDistributedLockServiceTests
     public async Task Release_Uncontended_RemovesEntry()
     {
         // Arrange
-        var handle = await _sut.TryAcquireLockAsync("job", Expiry);
+        var handle = await _sut.TryAcquireLock("job", Expiry);
         var heldWhileAcquired = _sut.HeldLockCount;
 
         // Act
@@ -79,7 +79,7 @@ public class LocalDistributedLockServiceTests
         await cancellation.CancelAsync();
 
         // Act
-        var act = async () => await _sut.TryAcquireLockAsync("job", Expiry, cancellation.Token);
+        var act = async () => await _sut.TryAcquireLock("job", Expiry, cancellation.Token);
 
         // Assert
         await act.Should().ThrowAsync<OperationCanceledException>();

@@ -40,13 +40,13 @@ internal sealed class RedisIdempotencyStore : IIdempotencyStore
         _ttl = ttl;
     }
 
-    public async Task<bool> TryAddAsync(string key, CancellationToken ct = default)
+    public async Task<bool> TryAdd(string key, CancellationToken ct = default)
     {
         try
         {
             var db = _redis.GetDatabase();
             // SET NX EX — atomic "reserve if not exists" with TTL.
-            // Value starts as empty (placeholder) — SetResponseAsync overwrites with the full response.
+            // Value starts as empty (placeholder) — SetResponse overwrites with the full response.
             return await db.StringSetAsync(FullKey(key), "", _ttl, When.NotExists);
         }
         catch (Exception ex)
@@ -56,14 +56,14 @@ internal sealed class RedisIdempotencyStore : IIdempotencyStore
         }
     }
 
-    public async Task<StoredResponse?> GetAsync(string key, CancellationToken ct = default)
+    public async Task<StoredResponse?> Get(string key, CancellationToken ct = default)
     {
         try
         {
             var db = _redis.GetDatabase();
             var value = await db.StringGetAsync(FullKey(key));
 
-            // IsNullOrEmpty also covers the empty placeholder written by TryAddAsync —
+            // IsNullOrEmpty also covers the empty placeholder written by TryAdd —
             // key reserved but the response has not been persisted yet.
             if (value.IsNullOrEmpty)
                 return null;
@@ -77,7 +77,7 @@ internal sealed class RedisIdempotencyStore : IIdempotencyStore
         }
     }
 
-    public async Task SetResponseAsync(string key, StoredResponse response, CancellationToken ct = default)
+    public async Task SetResponse(string key, StoredResponse response, CancellationToken ct = default)
     {
         try
         {
@@ -91,7 +91,7 @@ internal sealed class RedisIdempotencyStore : IIdempotencyStore
         }
     }
 
-    public async Task RemoveAsync(string key, CancellationToken ct = default)
+    public async Task Remove(string key, CancellationToken ct = default)
     {
         try
         {

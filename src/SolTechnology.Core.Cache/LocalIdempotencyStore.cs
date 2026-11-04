@@ -18,7 +18,7 @@ internal sealed class LocalIdempotencyStore : IIdempotencyStore
         _timeProvider = timeProvider ?? TimeProvider.System;
     }
 
-    public Task<bool> TryAddAsync(string key, CancellationToken ct = default)
+    public Task<bool> TryAdd(string key, CancellationToken ct = default)
     {
         Evict();
         var entry = new Entry(null, _timeProvider.GetUtcNow());
@@ -26,7 +26,7 @@ internal sealed class LocalIdempotencyStore : IIdempotencyStore
         return Task.FromResult(added);
     }
 
-    public Task<StoredResponse?> GetAsync(string key, CancellationToken ct = default)
+    public Task<StoredResponse?> Get(string key, CancellationToken ct = default)
     {
         if (_store.TryGetValue(key, out var entry) && !IsExpired(entry))
         {
@@ -35,13 +35,13 @@ internal sealed class LocalIdempotencyStore : IIdempotencyStore
         return Task.FromResult<StoredResponse?>(null);
     }
 
-    public Task SetResponseAsync(string key, StoredResponse response, CancellationToken ct = default)
+    public Task SetResponse(string key, StoredResponse response, CancellationToken ct = default)
     {
         _store[key] = new Entry(response, _timeProvider.GetUtcNow());
         return Task.CompletedTask;
     }
 
-    public Task RemoveAsync(string key, CancellationToken ct = default)
+    public Task Remove(string key, CancellationToken ct = default)
     {
         _store.TryRemove(key, out _);
         return Task.CompletedTask;

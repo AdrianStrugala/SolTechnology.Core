@@ -3,7 +3,7 @@ namespace SolTechnology.Core.Cache;
 /// <summary>
 /// Distributed mutual exclusion — ensures only one instance holds a named lock at any given time.
 /// <para>
-/// Contract: <see cref="TryAcquireLockAsync"/> returns a disposable handle on success, <c>null</c>
+/// Contract: <see cref="TryAcquireLock"/> returns a disposable handle on success, <c>null</c>
 /// on failure. It <b>never throws</b> for a backend/timeout failure — only caller-cancellation may
 /// surface as <see cref="OperationCanceledException"/>.
 /// </para>
@@ -20,6 +20,6 @@ public interface IDistributedLockService
     /// A disposable handle if the lock was acquired — disposing releases it.
     /// <c>null</c> if someone else holds the lock or the backend is unavailable.
     /// </returns>
-    ValueTask<IAsyncDisposable?> TryAcquireLockAsync(string name, TimeSpan expiry, CancellationToken ct = default);
+    ValueTask<IAsyncDisposable?> TryAcquireLock(string name, TimeSpan expiry, CancellationToken ct = default);
 }
 
