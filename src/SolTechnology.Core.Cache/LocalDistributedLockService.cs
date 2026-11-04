@@ -20,6 +20,7 @@ internal sealed class LocalDistributedLockService(
     public ValueTask<IAsyncDisposable?> TryAcquireLock(
         string name, TimeSpan expiry, CancellationToken ct = default)
     {
+        LockExpiry.Validate(expiry);
         if (ct.IsCancellationRequested)
         {
             return ValueTask.FromCanceled<IAsyncDisposable?>(ct);

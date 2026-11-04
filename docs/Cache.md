@@ -157,7 +157,8 @@ public class SettlementPoller(IDistributedLockService locks)
 | Held by another caller | Returns `null` at once; never waits. |
 | Expiry passed | The lock is free again: Redis deletes the key, and the in-process lock lets the next `TryAcquireLock` take it over. Disposing the expired handle does not release the new holder (fencing). |
 | Backend failure | Returns `null` and logs a warning; never throws. |
-| Caller cancellation | Throws `OperationCanceledException`, the only exception. |
+| Expiry zero, negative, or over 365 days | Throws `ArgumentOutOfRangeException` before the lock is touched; both implementations apply the same rule. |
+| Caller cancellation | Throws `OperationCanceledException`. |
 
 #### Idempotency store
 

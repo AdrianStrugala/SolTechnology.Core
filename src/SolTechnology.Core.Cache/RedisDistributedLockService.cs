@@ -20,6 +20,7 @@ internal sealed class RedisDistributedLockService(
     public async ValueTask<IAsyncDisposable?> TryAcquireLock(
         string name, TimeSpan expiry, CancellationToken ct = default)
     {
+        LockExpiry.Validate(expiry);
         ct.ThrowIfCancellationRequested();
 
         var key = _keyPrefix + name;

@@ -47,4 +47,23 @@ public class RedisDistributedLockServiceTests
             (LogLevel.Warning, "Lock release failed for [{LockKey}] — will expire via TTL"));
         logger.Entries.Should().AllSatisfy(entry => entry.Properties["LockKey"].Should().Be(LockKey));
     }
+
+    [TestCaseSource(typeof(LockExpiryCases), nameof(LockExpiryCases.OutOfRange))]
+    public async Task TryAcquireLock_ExpiryOutOfRange_Throws(TimeSpan expiry)
+    {
+        // Arrange
+        var db = Substitute.For<IDatabase>();
+        var redis = Substitute.For<IConnectionMultiplexer>();
+        redis.GetDatabase(Arg.Any<int>(), Arg.Any<object>()).Returns(db);
+        var sut = new RedisDistributedLockService(
+            redis, Options.Create(new DistributedCacheConfiguration { InstanceName = "test:" }),
+            new CapturingLogger<RedisDistributedLockService>());
+
+        // Act
+        var act = async () => await sut.TryAcquireLock("job", expiry);
+
+        // Assert
+        (await act.Should().ThrowAsync<ArgumentOutOfRangeException>()).Which.ParamName.Should().Be("expiry");
+        db.ReceivedCalls().Should().BeEmpty();
+    }
 }
