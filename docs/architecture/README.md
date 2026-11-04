@@ -22,6 +22,7 @@ no longer describe the current system.
 - [AUID](auid.md)
 - [Authentication](authentication.md)
 - [Background processing](background-processing.md)
+- [Cache](cache.md)
 - [CQRS](cqrs.md)
 - [Result and errors](core-result-and-errors.md)
 - [Delivery workflow](delivery-workflow.md)

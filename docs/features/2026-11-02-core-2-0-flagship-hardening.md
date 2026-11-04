@@ -623,6 +623,19 @@ these notes from the steps:
   (L-06). The `soltechnology.core.http.retries` counter tags exception retries with the request
   method instead of `?`. An unexpected exception (not a transport read failure) while reading an
   error body now propagates instead of being swallowed.
+- cache (code review, 2026-11-04): `AddSolDistributedCache` opens its shared Redis connection with
+  `abortConnect=false`, whatever the connection string says, so Redis being down at start no longer
+  makes the lock, the idempotency store and the health check throw on resolution, or every
+  `IRedisCache.GetOrAdd` retry a blocking connect; they fail open (the cache returns the factory
+  result, the lock returns `null`, `TryAdd` returns `true`, the health check reports `Unhealthy`)
+  while the connection retries in the background. During an outage each Redis call waits up to the
+  connection's timeout before failing open. `IDistributedLockService.TryAcquireLock` throws
+  `ArgumentOutOfRangeException` for an expiry that is zero, negative, or longer than 365 days, in both
+  implementations; before, the in-process lock handed out a lock that expired at once (or logged a
+  backend failure for `TimeSpan.MaxValue`) and the Redis lock returned `null`. Releasing a Redis lock
+  that expired before its release logs the new Warning `Lock [{LockKey}] expired before release`
+  instead of the Debug `Lock released: [{LockKey}]`, and disposing a Redis lock handle twice releases
+  once.
 
 ### Resolved questions (user answers, 2026-11-02)
 
