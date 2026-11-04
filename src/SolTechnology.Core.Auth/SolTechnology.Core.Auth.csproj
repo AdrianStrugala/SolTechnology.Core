@@ -9,6 +9,7 @@
 	  <AssemblyName>SolTechnology.Core.Auth</AssemblyName>
 
 	  <PackageReadmeSource>Auth.md</PackageReadmeSource>
+	  <GenerateDocumentationFile>true</GenerateDocumentationFile>
 	  <!-- NU1510: Packages from Directory.Build.props are already included in FrameworkReference -->
 	  <NoWarn>$(NoWarn);NU1510</NoWarn>
   </PropertyGroup>

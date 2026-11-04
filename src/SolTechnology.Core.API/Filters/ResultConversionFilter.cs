@@ -38,6 +38,10 @@ namespace SolTechnology.Core.API.Filters;
 /// </summary>
 public sealed class ResultConversionFilter(ICorrelationIdService correlationIdService) : IAsyncResultFilter
 {
+    /// <summary>
+    /// Replaces a <c>Result</c>, <c>Result&lt;T&gt;</c> or bare <see cref="Error"/> in the action's
+    /// <see cref="ObjectResult"/> with its wire format, then runs the rest of the pipeline.
+    /// </summary>
     public Task OnResultExecutionAsync(ResultExecutingContext context, ResultExecutionDelegate next)
     {
         if (context.Result is ObjectResult { Value: { } value } objectResult)

@@ -1,7 +1,7 @@
 ---
 spec: 2026-11-02-core-2-0-api-auth
 step: 07
-status: to-do
+status: done
 ---
 
 # Step 07: XML docs shipped — API, Auth
@@ -20,10 +20,23 @@ Former core step 56 (Api and Authentication parts); split per library on 2026-11
 - English, one or two sentences per member, per [`PublicDocumentationGuide.md`](../../../../docs/PublicDocumentationGuide.md). No `<NoWarn>CS1591</NoWarn>` (`CLAUDE.md §2`).
 
 ## Acceptance criteria
-- [ ] `dotnet build SolTechnology.Core.slnx` is green with `TreatWarningsAsErrors`.
-- [ ] `dotnet pack` of each of the 2 projects produces a nupkg containing `lib/net10.0/<Assembly>.xml` (`lib/net10.0/SolTechnology.Core.Auth.xml` for Auth).
+- [x] `dotnet build SolTechnology.Core.slnx` is green with `TreatWarningsAsErrors`.
+- [x] `dotnet pack` of each of the 2 projects produces a nupkg containing `lib/net10.0/<Assembly>.xml` (`lib/net10.0/SolTechnology.Core.Auth.xml` for Auth).
 
 ## Open questions
 - none
 
 ## Deviations
+
+### Verification record
+
+**Original plan:** document every member `CS1591` reports and pack both projects.
+
+**Actual implementation:** as planned; recorded because the verification ran outside `/tmp`. `CS1591` listed 16 members
+(5 in Api: `ModuleInstaller`, `ExceptionFilter` with its constructor and `OnException`, and
+`ResultConversionFilter.OnResultExecutionAsync`; 11 in Auth). `dotnet pack` of each project into the git-excluded
+`.scratch/pack07` (deleted afterwards) produced `SolTechnology.Core.Api.2.0.0.nupkg` with
+`lib/net10.0/SolTechnology.Core.Api.xml` and `SolTechnology.Core.Auth.2.0.0.nupkg` with
+`lib/net10.0/SolTechnology.Core.Auth.xml`. The handler's constructor parameters are documented with `<param>` on the
+type because it is a primary constructor.
+

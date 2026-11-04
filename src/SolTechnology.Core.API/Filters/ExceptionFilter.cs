@@ -8,6 +8,11 @@ using SolTechnology.Core.Logging.Correlations;
 
 namespace SolTechnology.Core.API.Filters;
 
+/// <summary>
+/// Global MVC exception filter: maps known exception types to RFC 7807 <see cref="ProblemDetails"/>
+/// through <see cref="IExceptionStatusCodeMapper"/> and rethrows unmapped exceptions to the host pipeline.
+/// Register it with <see cref="ApiCoreMvcOptionsExtensions.AddSolApiCoreFilters"/>.
+/// </summary>
 public class ExceptionFilter : IExceptionFilter
 {
     private readonly ILogger<ExceptionFilter> _logger;
@@ -15,6 +20,9 @@ public class ExceptionFilter : IExceptionFilter
     private readonly IExceptionStatusCodeMapper _statusCodeMapper;
     private readonly ApiExceptionOptions _options;
 
+    /// <summary>
+    /// Creates the filter. Resolved from DI; <c>AddSolApiExceptionHandling</c> registers it and its dependencies.
+    /// </summary>
     public ExceptionFilter(
         ILogger<ExceptionFilter> logger,
         ICorrelationIdService correlationIdService,
@@ -27,6 +35,10 @@ public class ExceptionFilter : IExceptionFilter
         _options = options.Value;
     }
 
+    /// <summary>
+    /// Writes a <see cref="ProblemDetails"/> response for a mapped exception and marks it handled;
+    /// leaves client aborts and unmapped exceptions unhandled so MVC rethrows them.
+    /// </summary>
     public void OnException(ExceptionContext context)
     {
         // Client disconnected mid-request — not our incident, no body to send.

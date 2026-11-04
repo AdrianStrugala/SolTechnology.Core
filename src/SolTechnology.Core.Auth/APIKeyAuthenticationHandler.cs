@@ -10,12 +10,24 @@ using Microsoft.Extensions.Options;
 
 namespace SolTechnology.Core.Auth
 {
+    /// <summary>
+    /// Authenticates a request by comparing its <c>X-API-KEY</c> header with the configured key in
+    /// constant time. Endpoints marked <see cref="IAllowAnonymous"/> are skipped; a blank configured
+    /// key rejects every request.
+    /// </summary>
+    /// <param name="optionsMonitor">Scheme options; <see cref="ApiKeyAuthenticationSchemeOptions.ApiKey"/> holds the expected key.</param>
+    /// <param name="loggerFactory">Creates the handler's <c>Logger</c>.</param>
+    /// <param name="encoder">URL encoder required by <see cref="AuthenticationHandler{TOptions}"/>.</param>
     public class ApiKeyAuthenticationHandler(
         IOptionsMonitor<ApiKeyAuthenticationSchemeOptions> optionsMonitor,
         ILoggerFactory loggerFactory,
         UrlEncoder encoder)
         : AuthenticationHandler<ApiKeyAuthenticationSchemeOptions>(optionsMonitor, loggerFactory, encoder)
     {
+        /// <summary>
+        /// Returns <c>NoResult</c> for anonymous endpoints, <c>Fail</c> for a missing header, a wrong key or
+        /// a blank configured key, and <c>Success</c> with a principal named after the scheme otherwise.
+        /// </summary>
         protected override async Task<AuthenticateResult> HandleAuthenticateAsync()
         {
             if (Context.GetEndpoint()?.Metadata.GetMetadata<IAllowAnonymous>() != null)

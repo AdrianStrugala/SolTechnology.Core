@@ -5,8 +5,18 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace SolTechnology.Core.Auth
 {
+    /// <summary>
+    /// Service registrations of <c>SolTechnology.Core.Auth</c>.
+    /// </summary>
     public static class ModuleInstaller
     {
+        /// <summary>
+        /// Registers API-key authentication as the default scheme and a global MVC filter that requires an
+        /// authenticated user. Call <c>UseAuthentication()</c> before <c>UseAuthorization()</c> in the pipeline.
+        /// </summary>
+        /// <param name="services">DI container.</param>
+        /// <param name="authConfiguration">Configuration with the expected API key.</param>
+        /// <exception cref="ArgumentException"><paramref name="authConfiguration"/> has no API key.</exception>
         public static IServiceCollection AddSolAuth(
             this IServiceCollection services,
             AuthConfiguration authConfiguration)

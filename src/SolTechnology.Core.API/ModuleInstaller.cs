@@ -15,6 +15,10 @@ using Swashbuckle.AspNetCore.SwaggerUI;
 
 namespace SolTechnology.Core.API;
 
+/// <summary>
+/// Service and pipeline registrations of <c>SolTechnology.Core.Api</c>: the ProblemDetails error
+/// pipeline, header-based API versioning and per-version Swagger.
+/// </summary>
 public static class ModuleInstaller
 {
     /// <summary>

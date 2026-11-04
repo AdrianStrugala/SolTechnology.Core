@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
 		<Description>Everything you need to ship a clean ASP.NET Core web API: an RFC 7807 ProblemDetails error pipeline, header-based API versioning, and MVC filters that auto-convert Result&lt;T&gt; to the wire format. Bootstrap in one call with AddSolApiCore + AddSolApiCoreFilters + UseSolSwaggerWithVersioning, with CorrelationId propagation through SolTechnology.Core.Logging.</Description>
@@ -9,6 +9,7 @@
 		<AssemblyName>SolTechnology.Core.Api</AssemblyName>
 
 		<PackageReadmeSource>Api.md</PackageReadmeSource>
+		<GenerateDocumentationFile>true</GenerateDocumentationFile>
 	</PropertyGroup>
 
 	<ItemGroup>
