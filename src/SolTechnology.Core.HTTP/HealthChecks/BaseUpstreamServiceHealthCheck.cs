@@ -49,9 +49,7 @@ public abstract class BaseUpstreamServiceHealthCheck<TReport>(
 {
     private readonly TimeProvider _timeProvider = timeProvider ?? TimeProvider.System;
 
-    // Instance cache: the check is registered as a singleton (see UpstreamHttpHealthCheckExtensions)
-    // so a fresh result is cached across probe invocations without leaking across other
-    // registrations or test instances.
+    // Per instance: the check is a singleton (UpstreamHttpHealthCheckExtensions), so results survive probes.
     private readonly ConcurrentDictionary<string, (HealthCheckResult Result, DateTimeOffset CachedAt)> _cache = new();
 
     /// <summary>

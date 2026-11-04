@@ -10,39 +10,40 @@ namespace SolTechnology.Core.HTTP.HealthChecks;
 /// </summary>
 public static class UpstreamHttpHealthCheckExtensions
 {
-    /// <summary>
-    /// Adds the cached upstream service health check <typeparamref name="TCheck"/> under
-    /// <paramref name="name"/>. The check's own constructor supplies the HTTP client and the
-    /// health path it probes.
-    /// <para>
-    /// Subclass <see cref="BaseUpstreamServiceHealthCheck{TReport}"/> with your concrete report
-    /// model and override <see cref="BaseUpstreamServiceHealthCheck{TReport}.EvaluateReport"/> to
-    /// map the typed report to a <see cref="HealthCheckResult"/>.
-    /// </para>
-    /// </summary>
-    /// <typeparam name="TCheck">Concrete health-check type deriving from
-    /// <see cref="BaseUpstreamServiceHealthCheck{TReport}"/>.</typeparam>
     /// <param name="builder">Framework health-checks builder.</param>
-    /// <param name="name">Check name in the report.</param>
-    /// <param name="failureStatus">Status on failure (default <see cref="HealthStatus.Unhealthy"/>).</param>
-    /// <param name="tags">Optional tags for filtering.</param>
-    public static IHealthChecksBuilder AddSolUpstreamHttpHealthCheck<TCheck>(
-        this IHealthChecksBuilder builder,
-        string name,
-        HealthStatus failureStatus = HealthStatus.Unhealthy,
-        IEnumerable<string>? tags = null)
-        where TCheck : class, IHealthCheck
+    extension(IHealthChecksBuilder builder)
     {
-        ArgumentNullException.ThrowIfNull(builder);
+        /// <summary>
+        /// Adds the cached upstream service health check <typeparamref name="TCheck"/> under
+        /// <paramref name="name"/> as a singleton. The check's own constructor supplies the client name
+        /// and the health path it probes.
+        /// <para>
+        /// Subclass <see cref="BaseUpstreamServiceHealthCheck{TReport}"/> with your concrete report
+        /// model and override <see cref="BaseUpstreamServiceHealthCheck{TReport}.EvaluateReport"/> to
+        /// map the typed report to a <see cref="HealthCheckResult"/>.
+        /// </para>
+        /// </summary>
+        /// <typeparam name="TCheck">Concrete health-check type deriving from
+        /// <see cref="BaseUpstreamServiceHealthCheck{TReport}"/>.</typeparam>
+        /// <param name="name">Check name in the report.</param>
+        /// <param name="failureStatus">Status on failure (default <see cref="HealthStatus.Unhealthy"/>).</param>
+        /// <param name="tags">Optional tags for filtering.</param>
+        public IHealthChecksBuilder AddSolUpstreamHttpHealthCheck<TCheck>(
+            string name,
+            HealthStatus failureStatus = HealthStatus.Unhealthy,
+            IEnumerable<string>? tags = null)
+            where TCheck : class, IHealthCheck
+        {
+            ArgumentNullException.ThrowIfNull(builder);
 
-        // Singleton so the result cache survives probes; the check holds IHttpClientFactory, not an HttpClient.
-        builder.Services.AddSingleton<TCheck>();
+            // Singleton so the result cache survives probes; the check holds IHttpClientFactory, not an HttpClient.
+            builder.Services.AddSingleton<TCheck>();
 
-        return builder.Add(new HealthCheckRegistration(
-            name,
-            sp => sp.GetRequiredService<TCheck>(),
-            failureStatus,
-            tags));
+            return builder.Add(new HealthCheckRegistration(
+                name,
+                sp => sp.GetRequiredService<TCheck>(),
+                failureStatus,
+                tags));
+        }
     }
 }
-

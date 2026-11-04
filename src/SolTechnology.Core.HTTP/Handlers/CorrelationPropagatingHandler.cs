@@ -35,28 +35,18 @@ internal sealed class CorrelationPropagatingHandler(ICorrelationIdService correl
         HttpRequestMessage request,
         CancellationToken cancellationToken)
     {
-        // Respect a header the caller (or an upstream OpenTelemetry / firm
-        // correlation handler) has already attached. Doing this BEFORE we call
-        // GetOrGenerate keeps us from seeding the AsyncLocal store in apps that
-        // own their own correlation pipeline — otherwise we would silently
-        // mint a second id and Core.Logging downstream would log a different
-        // value than the one the partner sees on the wire.
+        // Checked before GetOrGenerate, so hosts that own correlation never get a second id in the AsyncLocal store.
         if (request.Headers.Contains(CorrelationId.HeaderKey))
         {
             return base.SendAsync(request, cancellationToken);
         }
 
-        // GetOrGenerate seeds an AsyncLocal so that subsequent handlers, the
-        // resilience pipeline, and any code observing ICorrelationIdService
-        // within the same call observe the same id. For an ASP.NET Core inbound
-        // request the LoggingMiddleware has already set this value; for a
-        // background worker / first-call-from-a-job this is where it is born.
+        // Seeds the AsyncLocal, so retries and later handlers in this call see the same id.
         var correlationId = correlationIdService.GetOrGenerate();
 
         request.Headers.TryAddWithoutValidation(CorrelationId.HeaderKey, correlationId.Value);
 
-        // Delegated to Core.Logging so the inbound (response-header) and
-        // outbound (request-header) traceparent formats can never drift apart.
+        // Built by Core.Logging, so inbound and outbound traceparent formats cannot drift apart.
         var traceParent = CorrelationId.TryBuildTraceParentFromCurrentActivity();
         if (traceParent is not null)
         {

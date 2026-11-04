@@ -1,6 +1,5 @@
 using System.Net;
 using System.Net.Sockets;
-using System.Text.Json;
 using Polly.Timeout;
 using SolTechnology.Core.Errors;
 
@@ -13,8 +12,6 @@ namespace SolTechnology.Core.HTTP;
 /// </summary>
 public static class ServiceCallErrorMapper
 {
-    private static readonly string[] ProblemMessageProperties = ["title", "message", "detail"];
-
     /// <summary>
     /// Maps an exception from <see cref="HttpClient.SendAsync(HttpRequestMessage, CancellationToken)"/> to an appropriate Core
     /// <see cref="SolTechnology.Core.Error"/> subtype.
@@ -75,9 +72,9 @@ public static class ServiceCallErrorMapper
         HttpStatusCode statusCode,
         string? responseBody)
     {
-        var extracted = TryExtractProblemMessage(responseBody);
+        var extracted = ProblemDetailsBody.TryExtractMessage(responseBody);
         var message = extracted ?? $"HTTP {(int)statusCode} {statusCode}";
-        var recoverable = IsRecoverable(statusCode, responseBody);
+        var recoverable = ProblemDetailsBody.IsRecoverable(statusCode, responseBody);
 
         return statusCode switch
         {
@@ -123,61 +120,4 @@ public static class ServiceCallErrorMapper
             Description = exception.Message,
             Recoverable = false
         };
-
-    private static string? TryExtractProblemMessage(string? body)
-    {
-        if (string.IsNullOrWhiteSpace(body))
-        {
-            return null;
-        }
-
-        try
-        {
-            using var doc = JsonDocument.Parse(body);
-            if (doc.RootElement.ValueKind != JsonValueKind.Object)
-            {
-                return null;
-            }
-
-            foreach (var name in ProblemMessageProperties)
-            {
-                if (doc.RootElement.TryGetProperty(name, out var property))
-                {
-                    return property.ValueKind == JsonValueKind.String ? property.GetString() : null;
-                }
-            }
-        }
-        catch (JsonException)
-        {
-            // Not JSON: the status code alone describes the failure.
-        }
-
-        return null;
-    }
-
-    private static bool IsRecoverable(HttpStatusCode statusCode, string? body)
-    {
-        // Explicit signal from ProblemDetails body takes precedence.
-        if (!string.IsNullOrWhiteSpace(body))
-        {
-            try
-            {
-                using var doc = JsonDocument.Parse(body);
-                if (doc.RootElement.ValueKind == JsonValueKind.Object &&
-                    doc.RootElement.TryGetProperty("recoverable", out var prop) &&
-                    prop.ValueKind is JsonValueKind.True or JsonValueKind.False)
-                {
-                    return prop.GetBoolean();
-                }
-            }
-            catch (JsonException)
-            {
-                // Not JSON: fall through to the status heuristic.
-            }
-        }
-
-        // Heuristic: 5xx = transient/recoverable; 4xx = deterministic/not recoverable.
-        return (int)statusCode >= 500;
-    }
 }
-

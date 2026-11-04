@@ -70,8 +70,7 @@ public sealed class HttpRequestFailedException : HttpRequestException
     /// </summary>
     public override string ToString()
     {
-        // Mirrors the base format but omits the InnerException dump (always null
-        // here) and any property-reflection that would expose ResponseBody.
+        // Base format without ResponseBody; InnerException is always null here.
         return $"{GetType().FullName}: {Message}{Environment.NewLine}{StackTrace}";
     }
 }
