@@ -10,41 +10,42 @@ namespace SolTechnology.Core.Auth
     /// </summary>
     public static class ModuleInstaller
     {
-        /// <summary>
-        /// Registers API-key authentication as the default scheme and a global MVC filter that requires an
-        /// authenticated user. Call <c>UseAuthentication()</c> before <c>UseAuthorization()</c> in the pipeline.
-        /// </summary>
         /// <param name="services">DI container.</param>
-        /// <param name="authConfiguration">Configuration with the expected API key.</param>
-        /// <exception cref="ArgumentException"><paramref name="authConfiguration"/> has no API key.</exception>
-        public static IServiceCollection AddSolAuth(
-            this IServiceCollection services,
-            AuthConfiguration authConfiguration)
+        extension(IServiceCollection services)
         {
-            if (string.IsNullOrEmpty(authConfiguration?.ApiKey))
+            /// <summary>
+            /// Registers API-key authentication as the default scheme and a global MVC filter that requires an
+            /// authenticated user. Call <c>UseAuthentication()</c> before <c>UseAuthorization()</c> in the pipeline.
+            /// </summary>
+            /// <param name="authConfiguration">Configuration with the expected API key.</param>
+            /// <exception cref="ArgumentException"><paramref name="authConfiguration"/> has no API key.</exception>
+            public IServiceCollection AddSolAuth(AuthConfiguration authConfiguration)
             {
-                throw new ArgumentException($"The [{nameof(AuthConfiguration)}{nameof(authConfiguration.ApiKey)}] is missing. Provide it by parameter.");
+                if (string.IsNullOrEmpty(authConfiguration?.ApiKey))
+                {
+                    throw new ArgumentException($"The [{nameof(AuthConfiguration)}{nameof(authConfiguration.ApiKey)}] is missing. Provide it by parameter.");
+                }
+
+                var apiKey = authConfiguration.ApiKey;
+
+                services
+                    .AddOptions<AuthConfiguration>()
+                    .Configure(config => config.ApiKey = apiKey)
+                    .ValidateOnStart();
+
+                services.AddAuthentication(ApiKeyAuthenticationSchemeOptions.AuthenticationScheme)
+                    .AddScheme<ApiKeyAuthenticationSchemeOptions, ApiKeyAuthenticationHandler>(
+                        ApiKeyAuthenticationSchemeOptions.AuthenticationScheme, c => c.ApiKey = apiKey);
+
+                var policy = new AuthorizationPolicyBuilder()
+                    .RequireAuthenticatedUser()
+                    .Build();
+
+                // Register the global authorization filter through MvcOptions so consumers no longer thread a returned filter.
+                services.Configure<MvcOptions>(options => options.Filters.Add(new AuthorizeFilter(policy)));
+
+                return services;
             }
-
-            var apiKey = authConfiguration.ApiKey;
-
-            services
-                .AddOptions<AuthConfiguration>()
-                .Configure(config => config.ApiKey = apiKey)
-                .ValidateOnStart();
-
-            services.AddAuthentication(ApiKeyAuthenticationSchemeOptions.AuthenticationScheme)
-                .AddScheme<ApiKeyAuthenticationSchemeOptions, ApiKeyAuthenticationHandler>(
-                    ApiKeyAuthenticationSchemeOptions.AuthenticationScheme, c => c.ApiKey = apiKey);
-
-            var policy = new AuthorizationPolicyBuilder()
-                .RequireAuthenticatedUser()
-                .Build();
-
-            // Register the global authorization filter through MvcOptions so consumers no longer thread a returned filter.
-            services.Configure<MvcOptions>(options => options.Filters.Add(new AuthorizeFilter(policy)));
-
-            return services;
         }
     }
 }
