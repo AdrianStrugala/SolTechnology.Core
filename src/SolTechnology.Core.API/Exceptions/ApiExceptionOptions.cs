@@ -9,9 +9,9 @@ public class ApiExceptionOptions
 {
     /// <summary>
     /// <para>
-    /// When <c>true</c>, the response body's <c>Error.Description</c> is augmented with the
-    /// exception's <em>type</em> and <em>stack trace</em>. Useful for local debugging and
-    /// integration tests.
+    /// When <c>true</c>, the <c>ProblemDetails</c> response body gains
+    /// <c>Extensions["exception"]</c> with the exception's <em>type</em>, <em>message</em> and
+    /// <em>stack trace</em>. Useful for local debugging and integration tests.
     /// </para>
     /// <para>
     /// Defaults to <c>false</c>. Leaking stack traces over the wire in Production is

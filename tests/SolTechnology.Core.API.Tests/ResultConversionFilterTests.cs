@@ -182,6 +182,78 @@ public sealed class ResultConversionFilterTests
         _correlationIdService.DidNotReceive().GetOrGenerate();
     }
 
+    [Test]
+    public async Task CreatedAtAction_WithSuccessfulResult_Keeps201AndLocation()
+    {
+        // Arrange
+        var payload = new Payload("trip-42", 7);
+        var created = new CreatedAtActionResult("Get", "Trips", new { id = 42 }, Result<Payload>.Success(payload));
+        var context = BuildResultExecutingContext(created);
+
+        // Act
+        await _filter.OnResultExecutionAsync(context, NoOpNext);
+
+        // Assert
+        var result = context.Result.Should().BeOfType<CreatedAtActionResult>().Subject;
+        result.StatusCode.Should().Be(StatusCodes.Status201Created);
+        result.Value.Should().BeSameAs(payload);
+        result.ActionName.Should().Be("Get");
+        result.RouteValues.Should().ContainKey("id").WhoseValue.Should().Be(42);
+    }
+
+    [Test]
+    public async Task GenericResultSuccess_FromActionResultOfT_SerializesPayloadType()
+    {
+        // Arrange
+        var payload = new Payload("trip-42", 7);
+        var declared = new ObjectResult(Result<Payload>.Success(payload)) { DeclaredType = typeof(Result<Payload>) };
+        var context = BuildResultExecutingContext(declared);
+
+        // Act
+        await _filter.OnResultExecutionAsync(context, NoOpNext);
+
+        // Assert
+        var result = context.Result.Should().BeOfType<ObjectResult>().Subject;
+        result.StatusCode.Should().Be(StatusCodes.Status200OK);
+        result.Value.Should().BeSameAs(payload);
+        result.DeclaredType.Should().BeNull("a declared Result<T> type would make the formatter reject the payload");
+    }
+
+    [Test]
+    public async Task Accepted_WithSuccessfulResult_Keeps202()
+    {
+        // Arrange
+        var payload = new Payload("trip-42", 7);
+        var accepted = new AcceptedResult("/api/trips/42/status", Result<Payload>.Success(payload));
+        var context = BuildResultExecutingContext(accepted);
+
+        // Act
+        await _filter.OnResultExecutionAsync(context, NoOpNext);
+
+        // Assert
+        var result = context.Result.Should().BeOfType<AcceptedResult>().Subject;
+        result.StatusCode.Should().Be(StatusCodes.Status202Accepted);
+        result.Location.Should().Be("/api/trips/42/status");
+        result.Value.Should().BeSameAs(payload);
+    }
+
+    [Test]
+    public async Task Ok_WithFailedResult_MapsToProblemDetails()
+    {
+        // Arrange
+        var ok = new OkObjectResult(Result<Payload>.Fail(new NotFoundError { Message = "Trip 42 not found." }));
+        var context = BuildResultExecutingContext(ok);
+
+        // Act
+        await _filter.OnResultExecutionAsync(context, NoOpNext);
+
+        // Assert
+        var result = context.Result.Should().BeOfType<ObjectResult>().Subject;
+        result.StatusCode.Should().Be(StatusCodes.Status404NotFound);
+        result.ContentTypes.Should().Contain("application/problem+json");
+        result.Value.Should().BeAssignableTo<ProblemDetails>().Which.Title.Should().Be("Trip 42 not found.");
+    }
+
     // ---- helpers ---------------------------------------------------------
 
     private static Task<ResultExecutedContext> NoOpNext()
@@ -194,7 +266,10 @@ public sealed class ResultConversionFilterTests
         return Task.FromResult(ctx);
     }
 
-    private static ResultExecutingContext BuildResultExecutingContext(object value)
+    private static ResultExecutingContext BuildResultExecutingContext(object value) =>
+        BuildResultExecutingContext(new ObjectResult(value));
+
+    private static ResultExecutingContext BuildResultExecutingContext(ObjectResult objectResult)
     {
         var actionContext = new ActionContext(
             new DefaultHttpContext(),
@@ -204,7 +279,7 @@ public sealed class ResultConversionFilterTests
         return new ResultExecutingContext(
             actionContext,
             new List<IFilterMetadata>(),
-            new ObjectResult(value),
+            objectResult,
             controller: new object());
     }
 }

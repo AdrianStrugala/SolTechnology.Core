@@ -38,8 +38,8 @@ public static class ApiCoreMvcOptionsExtensions
     {
         ArgumentNullException.ThrowIfNull(options);
 
-        options.Filters.Add<ExceptionFilter>();
-        options.Filters.Add<ResultConversionFilter>();
+        options.Filters.AddService<ExceptionFilter>();
+        options.Filters.AddService<ResultConversionFilter>();
         return options;
     }
 }
