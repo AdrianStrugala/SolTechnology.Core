@@ -86,30 +86,44 @@ paused tale gets `ConflictError`, and a `CancelStory` during a run wins because 
 its next save or lease renewal. A failed tale is never resumed. The terminal save uses no cancellation token, so a
 cancelled run still stores `Cancelled`.
 
-`Running` is a lease, not a lock. Every save of a run, starting with the claim, stamps
-`TaleInstance.LastUpdatedAt` from the injected `TimeProvider`. `ResumeStory` refuses a `Running`
-tale whose last save is younger than `TaleOptions.RunningLeaseTimeout` (default 5 minutes) and
-takes over an older one, logging a warning: a host that crashed mid-run would otherwise leave the tale stuck, since
-cancelling and restarting loses its progress. The takeover is an ordinary claim at the version it
-read, so of two concurrent takeovers exactly one wins, and a still-alive original run stops at its
-next save with `ConflictError`. Completed chapters are skipped; the interrupted chapter runs again,
-so chapters with side effects must be idempotent. The lease reuses `LastUpdatedAt`, which every
-repository already stores, instead of adding a column; a value written by another host's clock is
-compared as is, so clock skew between hosts shortens or lengthens the lease.
+`Running` is a lease, not a lock. Every `Running` save of a run, starting with the claim, stores
+`TaleInstance.LeaseExpiresAt` = the injected `TimeProvider`'s UTC now + `TaleOptions.RunningLeaseTimeout`
+(default 5 minutes, range 1 second to 49 days); saving any other status stores `null`, and
+`CancelStory` clears it too. `ResumeStory` refuses a `Running` tale whose `LeaseExpiresAt` lies
+ahead and takes over one whose expiry has passed or is missing (rows written before the field
+existed), logging a warning with the expiry and the current time: a host that crashed mid-run would
+otherwise leave the tale stuck, since cancelling and restarting loses its progress. The takeover is
+an ordinary claim at the version it read, so of two concurrent takeovers exactly one wins, and a
+still-alive original run stops at its next save or renewal with `ConflictError`. Completed chapters
+are skipped; the interrupted chapter runs again, so chapters with side effects must be idempotent.
+The expiry is persisted rather than derived from `LastUpdatedAt`, so the writer's timeout decides
+it and hosts configured with different timeouts agree; `LastUpdatedAt` keeps meaning the last state
+save. The cost is a persisted field that every custom repository must store exactly; clock skew
+between hosts still shortens or lengthens a lease.
 
 While the steps of a persisted run execute, the internal `TaleLeaseHeartbeat` renews the lease on a
 `TimeProvider` timer every third of `RunningLeaseTimeout`, which leaves two missed renewals of
-slack, so a chapter may outlive the timeout while its host is alive. A renewal re-saves a frozen
-copy of the last stored `Running` state with a fresh `LastUpdatedAt` through the same conditional
-`Save`; it never serializes the live context while a chapter mutates it, and it never records a
-chapter as finished before that chapter's own save. When the last save stored another status
-(paused or failed), there is no lease and nothing is renewed. Saves and renewals take turns on one
-gate, so each is conditioned on the version the previous one stored; a beat during a slow renewal
-triggers at most one more renewal right after it. A renewal that meets `ConflictError` means
-another run owns the tale: the run logs a warning, cancels the chapter's token (linked to the
-caller's), skips every later save including the terminal one, and returns `ConflictError`. Other
-renewal failures are logged and retried at the next beat. The heartbeat is disposed, and its last
-renewal awaited, before the terminal save. Direct runs have no repository and no heartbeat.
+slack, so a chapter may outlive the timeout while its host is alive; the 49-day ceiling keeps that
+timer far below the 4294967294 ms `ITimer` limit. A renewal re-saves a frozen copy of the last
+stored `Running` state with a fresh `LeaseExpiresAt` through the same conditional `Save`, using an
+`ITaleRepository` resolved from a fresh DI scope, because it overlaps the running chapter and a
+scoped repository (for example over a `DbContext`) must never be used by both at once. It never
+serializes the live context while a chapter mutates it, and it never records a chapter as finished
+before that chapter's own save. When the last save stored another status (paused or failed), there
+is no lease and nothing is renewed. Saves and renewals take turns on one gate, so each is
+conditioned on the version the previous one stored; a beat during a slow renewal triggers at most
+one more renewal right after it. A renewal that meets `ConflictError` means another run owns the
+tale: the run logs a warning, cancels the chapter's token (linked to the caller's), skips every
+later save including the terminal one, and returns `ConflictError`; a `StartStory` with an
+idempotency key then returns the new owner's stored tale. Repositories must therefore throw on an
+unknown save outcome instead of reporting their own write as a conflict. Other renewal failures are
+logged and retried at the next beat. The heartbeat is disposed, and its last renewal awaited,
+before the terminal save. Direct runs have no repository and no heartbeat.
+
+The lease proves that the host is alive, not that the chapter progresses: a hung chapter keeps its
+lease forever. On each beat the internal `HungChapterWatch` logs one warning per chapter once a
+single chapter has run for three `RunningLeaseTimeout`s; recovery is `CancelStory` (user decision
+D2, 2026-11-03: no option bounds a live run).
 
 Stored chapter errors keep their type only through `TaleJsonOptions.Default`, which registers the
 `talePaused` and `taleCancelled` discriminators on `Error` (see
@@ -117,8 +131,10 @@ Stored chapter errors keep their type only through `TaleJsonOptions.Default`, wh
 `SQLiteTaleRepository` use it, and custom repositories must too.
 
 The core package does not ship a database provider. DreamTravel contains `SQLiteTaleRepository`
-as a sample-side implementation with a `Version` column, added on start to existing files, and an
-`UPDATE … WHERE Version = @Version`. Process-restart durability exists only when the application
+as a sample-side implementation with `Version` and nullable `LeaseExpiresAt` columns, added on start
+to existing files, and an `UPDATE … WHERE Version = @Version`; `LeaseExpiresAt` is stored as
+round-trip ISO 8601 text in UTC and parsed with `DateTimeStyles.AssumeUniversal`, so no host time
+zone shifts it. Process-restart durability exists only when the application
 registers a durable repository.
 
 ### Upgrading from 1.x

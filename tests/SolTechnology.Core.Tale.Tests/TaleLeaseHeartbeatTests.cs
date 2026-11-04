@@ -59,11 +59,12 @@ public class TaleLeaseHeartbeatTests
     {
         // Arrange
         var (run, taleId) = await StartLongChapter();
-        var stamps = new List<DateTime>();
+        var claimedAt = _clock.GetUtcNow().UtcDateTime;
+        var renewals = new List<TaleInstance>();
         for (var beat = 0; beat < 9; beat++)
         {
             await AdvanceOneBeat();
-            stamps.Add((await _store.FindById(taleId, CancellationToken.None))!.LastUpdatedAt);
+            renewals.Add((await _store.FindById(taleId, CancellationToken.None))!);
         }
 
         // Act
@@ -71,8 +72,9 @@ public class TaleLeaseHeartbeatTests
 
         // Assert
         takeover.Error.Should().BeOfType<ConflictError>().Which.Message.Should().Be("Tale is already running");
-        stamps.Should().BeInAscendingOrder().And.OnlyHaveUniqueItems();
-        stamps[^1].Should().Be(_clock.GetUtcNow().UtcDateTime);
+        renewals.Select(r => r.LeaseExpiresAt).Should().BeInAscendingOrder().And.OnlyHaveUniqueItems();
+        renewals[^1].LeaseExpiresAt.Should().Be(_clock.GetUtcNow() + Lease);
+        renewals.Should().AllSatisfy(r => r.LastUpdatedAt.Should().Be(claimedAt));
         _gate.Release();
         (await run.WaitAsync(SignalTimeout)).Data!.Status.Should().Be(TaleStatus.Completed);
     }
@@ -106,7 +108,7 @@ public class TaleLeaseHeartbeatTests
         // Arrange
         var (run, taleId) = await StartLongChapter();
         var newOwner = (await _store.FindById(taleId, CancellationToken.None))!;
-        newOwner.LastUpdatedAt = _clock.GetUtcNow().UtcDateTime;
+        newOwner.LeaseExpiresAt = _clock.GetUtcNow() + Lease;
         (await _store.Save(newOwner, CancellationToken.None)).IsSuccess.Should().BeTrue();
 
         // Act
@@ -118,7 +120,7 @@ public class TaleLeaseHeartbeatTests
         _gate.Token.IsCancellationRequested.Should().BeTrue();
         var stored = (await _store.FindById(taleId, CancellationToken.None))!;
         stored.Version.Should().Be(newOwner.Version);
-        stored.LastUpdatedAt.Should().Be(newOwner.LastUpdatedAt);
+        stored.LeaseExpiresAt.Should().Be(newOwner.LeaseExpiresAt);
         stored.Status.Should().Be(TaleStatus.Running);
         _logs.Logs.Should().ContainSingle(log => log.Level == LogLevel.Warning)
             .Which.Message.Should().Be($"Tale [{taleId}] was taken over by another run; stopping this run");

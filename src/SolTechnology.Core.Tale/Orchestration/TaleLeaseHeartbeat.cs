@@ -7,7 +7,8 @@ namespace SolTechnology.Core.Tale.Orchestration;
 /// <summary>
 /// Renews the Running lease of a persisted run every third of <see cref="TaleOptions.RunningLeaseTimeout"/>
 /// while its steps execute, so a long chapter is not taken over while its host is alive. When a
-/// renewal finds that another run took the tale over, it cancels <see cref="Token"/>.
+/// renewal finds that another run took the tale over, it cancels <see cref="Token"/>. Each beat also
+/// lets <see cref="HungChapterWatch"/> warn about a chapter that runs for three timeouts.
 /// </summary>
 internal sealed class TaleLeaseHeartbeat(
     TaleStatePersistence persistence,
@@ -18,6 +19,7 @@ internal sealed class TaleLeaseHeartbeat(
     private readonly CancellationTokenSource _ownership = CancellationTokenSource.CreateLinkedTokenSource(runToken);
     private readonly Lock _lock = new();
     private ITimer? _timer;
+    private HungChapterWatch? _watch;
     private Task _renewal = Task.CompletedTask;
     private bool _renewing;
     private bool _beatPending;
@@ -26,12 +28,17 @@ internal sealed class TaleLeaseHeartbeat(
     public TaleLeaseHeartbeat Start(TimeProvider timeProvider, TimeSpan runningLeaseTimeout)
     {
         var interval = runningLeaseTimeout / 3;
+        _watch = new HungChapterWatch(timeProvider, runningLeaseTimeout, logger, taleId);
         _timer = timeProvider.CreateTimer(_ => Beat(), null, interval, interval);
         return this;
     }
 
     /// <summary>The run's token, also cancelled once the run has lost the tale to another run.</summary>
     public CancellationToken Token => _ownership.Token;
+
+    public void EnterChapter(string chapterId) => _watch?.Enter(chapterId);
+
+    public void LeaveChapter() => _watch?.Leave();
 
     public async ValueTask DisposeAsync()
     {
@@ -53,6 +60,7 @@ internal sealed class TaleLeaseHeartbeat(
 
     private void Beat()
     {
+        _watch?.Check();
         lock (_lock)
         {
             if (_stopped)

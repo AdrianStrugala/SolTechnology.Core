@@ -23,6 +23,7 @@ public class ModuleResolutionTests
         var services = new ServiceCollection().AddLogging();
         services.AddSingleton<TestService>();
         services.AddSingleton<LongChapterGate>();
+        services.AddSingleton<RenewalScopeProbe>();
         services.AddSolTale(assemblies: typeof(ModuleResolutionTests).Assembly);
         await using var provider = services.BuildServiceProvider(StrictValidation);
         await using var scope = provider.CreateAsyncScope();

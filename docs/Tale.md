@@ -44,7 +44,7 @@ builder.Services.AddSolTale(assemblies: typeof(ProcessOrderTale).Assembly)
 | Option | Default | Purpose |
 |---|---|---|
 | `TaleOptions.TaleIdPrefix` | `"STR"` | Code of the generated `Auid` tale IDs; use one per tenant or environment sharing a store. |
-| `TaleOptions.RunningLeaseTimeout` | 5 minutes | How long a `Running` tale belongs to the run that last saved or renewed it; must be positive. See [Running tales and the lease](#running-tales-and-the-lease). |
+| `TaleOptions.RunningLeaseTimeout` | 5 minutes | How long a `Running` tale belongs to the run that claimed or last renewed it; 1 second to 49 days, otherwise the setter throws `ArgumentOutOfRangeException`. See [Running tales and the lease](#running-tales-and-the-lease). |
 
 ```csharp
 builder.Services.AddSolTale(o => o.TaleIdPrefix = "ORD", typeof(ProcessOrderTale).Assembly);
@@ -167,14 +167,16 @@ var state = await taleManager.GetStoryState(taleId, cancellationToken);
 | Resume of a tale that is | Result |
 |---|---|
 | `WaitingForInput` | Runs from the paused chapter; completed chapters are skipped. |
-| `Running`, saved or renewed within `RunningLeaseTimeout` | `ConflictError` "Tale is already running". |
-| `Running`, not saved or renewed for `RunningLeaseTimeout` | Taken over: runs again from the first unfinished chapter. |
+| `Running`, `LeaseExpiresAt` still ahead | `ConflictError` "Tale is already running". |
+| `Running`, `LeaseExpiresAt` passed or missing | Taken over: runs again from the first unfinished chapter. |
 | `Failed` | `ConflictError`; fallbacks do not run again. |
 | `Completed` or `Cancelled` | Failure, nothing runs. |
 | saved by 1.x | Failure asking to restart the tale. |
 
 A second `StartStory` with the same idempotency key, even a concurrent one, returns the first
-tale. `CancelStory(taleId, ct)` wins over a running tale, which stops at its next save or lease
+tale. When the run started with a key loses the tale to another run, that `StartStory` returns
+success with the stored tale as its new owner left it (`Running`, or `Cancelled` after
+`CancelStory`). `CancelStory(taleId, ct)` wins over a running tale, which stops at its next save or lease
 renewal with `ConflictError`. Only the caller's token cancels a tale, and it stores `Cancelled`; any other
 `OperationCanceledException`, such as an `HttpClient` timeout, fails the chapter. An exception
 from a chapter or an inline step is logged and stores `Failed`; the result and the stored history
@@ -184,22 +186,38 @@ trace is active, its trace ID as `CorrelationId`; never the exception text.
 #### Running tales and the lease
 
 A tale is `Running` while a `StartStory` or `ResumeStory` call executes it. The run saves the tale
-before its first chapter and after every chapter, and each save stamps `LastUpdatedAt`. While a
-chapter or any other step executes, the run also renews this lease every third of
-`RunningLeaseTimeout` with an ordinary `Save` of its last saved state, so a chapter may run longer
-than the timeout. While the last save or renewal is younger than `RunningLeaseTimeout`, the tale
-belongs to that run and `ResumeStory` returns `ConflictError`. A host that crashes mid-run stops
-renewing and leaves the tale `Running`; once the lease has expired, `ResumeStory` takes it over.
-Completed chapters are skipped and the chapter that was running when the host died runs again;
-when two calls take over at once, the version check lets exactly one win.
+before its first chapter and after every chapter. Every `Running` save stores
+`TaleInstance.LeaseExpiresAt`, the writer's clock plus its `RunningLeaseTimeout` (UTC); any other
+status stores `null`. While a chapter or any other step executes, the run also renews the lease
+every third of `RunningLeaseTimeout` with an ordinary `Save` of its last saved state that moves
+only `LeaseExpiresAt` and `Version`, so a chapter may run longer than the timeout.
+`LastUpdatedAt` keeps meaning the last state save; renewals do not touch it.
 
-A crashed chapter therefore runs twice, so chapters with side effects should still be idempotent:
-pass an idempotency key derived from the tale ID to payment or messaging APIs, or check whether the
-work is already done. Choose `RunningLeaseTimeout` as how long a crashed tale may stay blocked; it
-only has to outlast a host that stalls for two renewals in a row. If a renewal finds that another
-run has taken the tale over, the original run cancels the chapter's token, saves nothing more, and
-returns `ConflictError`, leaving the new owner's state untouched. Direct `Handle` runs are not
-persisted and never renew.
+Until `LeaseExpiresAt` has passed, the tale belongs to that run and `ResumeStory` returns
+`ConflictError`. A host that crashes mid-run stops renewing and leaves the tale `Running`; once the
+lease has expired, `ResumeStory` takes it over and logs a warning with the expiry and the current
+time. A `Running` row without `LeaseExpiresAt`, written before the field existed, counts as
+expired. Completed chapters are skipped and the chapter that was running when the host died runs
+again; when two calls take over at once, the version check lets exactly one win. Because the
+writer stamps the expiry, hosts with different `RunningLeaseTimeout` values respect each other's
+leases; only clock skew between hosts still shortens or lengthens a lease, so keep clocks
+synchronised.
+
+A crashed chapter therefore runs twice, so chapters with side effects must be idempotent: pass an
+idempotency key derived from the tale ID to payment or messaging APIs, or check whether the work is
+already done. Choose `RunningLeaseTimeout` as how long a crashed tale may stay blocked; it only has
+to outlast a host that stalls for two renewals in a row. If a renewal finds that another run has
+taken the tale over, the original run cancels the chapter's token, saves nothing more, and returns
+`ConflictError`, leaving the new owner's state untouched. The chapter's token can therefore be
+cancelled although the caller never cancelled: never compensate (refund, release stock) on
+`OperationCanceledException`, because the new owner is running the chapter again; compensate in an
+`Otherwise` chapter instead. Direct `Handle` runs are not persisted and never renew.
+
+The lease proves that the host is alive, not that the chapter makes progress. A chapter that hangs
+(an endless retry, a task that never completes) keeps its lease renewed, so `ResumeStory` keeps
+answering "Tale is already running". When one chapter has been running for three
+`RunningLeaseTimeout`s (15 minutes by default), the run logs one warning with the tale ID, the
+chapter and the elapsed time; recover such a tale with `CancelStory`, then start it again.
 
 ```csharp
 builder.Services.AddSolTale(o => o.RunningLeaseTimeout = TimeSpan.FromMinutes(15),
@@ -253,13 +271,19 @@ correlation ID, never the exception text.
 |---|---|
 | `Save(instance, ct)` | Write only when the stored version (a missing tale counts as `0`) equals `instance.Version`; then store and set `Version + 1`. Otherwise, or when a new tale reuses another tale's idempotency key, return `Result.Fail(new ConflictError { ... })` without writing. |
 | `FindById`, `FindByIdempotencyKey` | Return a copy, or `null` when missing. |
-| `LastUpdatedAt` | Store and return it unchanged, in UTC; the running lease is measured from it. |
+| `Version` | Store and return it exactly; the conditional `Save` depends on it. |
+| `LeaseExpiresAt` | Nullable `DateTimeOffset`. Store and return the same instant on every `Save`, renewals included; never fill it from a database default, never drop it, and never shift it through a local time zone (for text columns write round-trip ISO 8601 with offset, `"O"`, and parse with `DateTimeStyles.AssumeUniversal`). `ResumeStory` decides the lease from it. |
+| `LastUpdatedAt` | Store and return it unchanged, in UTC. |
+| Unknown outcome | A `Save` that may have committed (lost acknowledgement, cancellation after commit) must throw. Never retry a conditional write that may have committed, and never report the caller's own write as a conflict: the run would read it as a takeover and stop. |
 | `List(...)` | Optional; the default throws `NotSupportedException`. |
 | `Delete(id, ct)` | Remove the tale; no error when it is missing. |
 
 Serialize `History` and `CurrentChapter` with `TaleJsonOptions.Default`, which keeps the
-`TalePausedError` and `TaleCancelledError` types. The DreamTravel sample's `SQLiteTaleRepository`
-is a reference implementation with a `Version` column and a conditional `UPDATE`.
+`TalePausedError` and `TaleCancelledError` types. Lease renewals save through a repository resolved
+from a fresh DI scope while a chapter runs, so a `Scoped` repository over a `DbContext` is never
+used by a renewal and a chapter at the same time. The DreamTravel sample's `SQLiteTaleRepository`
+is a reference implementation with `Version` and nullable `LeaseExpiresAt` columns, both added on
+start to existing files, and a conditional `UPDATE`.
 
 #### Logging
 
@@ -273,7 +297,9 @@ Tales saved by 1.x cannot be resumed by 2.x, because 2.x matches chapter history
 and full type name. Finish or cancel in-flight tales first, then cut every Tale host over in one
 step: stop all 1.x hosts before a 2.x host serves tale traffic. Do not roll back to 1.x once a 2.x
 host has written tale state; 2.x stores Tale error types, `StepIndex` and `Version` that 1.x cannot
-read or preserve. Custom repositories add the `Version` column and the conditional `Save` above.
+read or preserve. Custom repositories add the `Version` column, a nullable `LeaseExpiresAt` column,
+and the conditional `Save` above; existing rows keep `LeaseExpiresAt` empty, which counts as an
+expired lease.
 
 ### Testing
 

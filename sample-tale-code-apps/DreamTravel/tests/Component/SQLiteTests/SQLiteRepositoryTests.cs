@@ -112,6 +112,73 @@ public class SQLiteRepositoryTests
     }
 
     [Test]
+    public async Task Save_LeaseExpiresAt_RoundTripsTheInstantInUtc()
+    {
+        // Arrange
+        var running = NewTale(TaleStatus.Running);
+        var expiry = new DateTimeOffset(2026, 11, 3, 14, 5, 0, TimeSpan.FromHours(2));
+        running.LeaseExpiresAt = expiry;
+        var paused = NewTale(TaleStatus.WaitingForInput);
+
+        // Act
+        await _repository.Save(running, CancellationToken.None);
+        await _repository.Save(paused, CancellationToken.None);
+
+        // Assert
+        var storedRunning = (await _repository.FindById(running.TaleId, CancellationToken.None))!;
+        storedRunning.LeaseExpiresAt.Should().Be(expiry);
+        storedRunning.LeaseExpiresAt!.Value.Offset.Should().Be(TimeSpan.Zero);
+        (await _repository.FindById(paused.TaleId, CancellationToken.None))!.LeaseExpiresAt.Should().BeNull();
+    }
+
+    [Test]
+    public async Task Constructor_DatabaseWithoutLeaseExpiresAtColumn_MigratesAndStoresTheLease()
+    {
+        // Arrange
+        var legacyPath = Path.Combine(Path.GetTempPath(), $"test_stories_lease_{Guid.NewGuid()}.db");
+        var connectionString = $"Data Source={legacyPath}";
+        var taleId = Auid.New("TST");
+        await using (var connection = new SqliteConnection(connectionString))
+        {
+            await connection.OpenAsync();
+            var command = connection.CreateCommand();
+            command.CommandText = @"
+                CREATE TABLE TaleInstances (
+                    TaleId TEXT PRIMARY KEY, HandlerTypeName TEXT NOT NULL, IdempotencyKey TEXT,
+                    Status INTEGER NOT NULL, Context TEXT NOT NULL, CreatedAt TEXT NOT NULL,
+                    LastUpdatedAt TEXT NOT NULL, History TEXT, CurrentChapter TEXT,
+                    Version INTEGER NOT NULL DEFAULT 0);
+                INSERT INTO TaleInstances VALUES
+                    (@TaleId, 'TestHandler', NULL, 1, '{}', '2026-11-03T10:00:00.0000000Z', '2026-11-03T10:00:00.0000000Z', NULL, NULL, 3);";
+            command.Parameters.AddWithValue("@TaleId", taleId.ToString());
+            await command.ExecuteNonQueryAsync();
+        }
+
+        try
+        {
+            // Act
+            var repository = new SQLiteTaleRepository(connectionString);
+            var legacy = (await repository.FindById(taleId, CancellationToken.None))!;
+            var leaseExpiresAtBeforeSave = legacy.LeaseExpiresAt;
+            var expiry = new DateTimeOffset(2026, 11, 3, 10, 5, 0, TimeSpan.Zero);
+            legacy.LeaseExpiresAt = expiry;
+            var saved = await repository.Save(legacy, CancellationToken.None);
+
+            // Assert
+            leaseExpiresAtBeforeSave.Should().BeNull();
+            saved.IsSuccess.Should().BeTrue();
+            var stored = (await repository.FindById(taleId, CancellationToken.None))!;
+            stored.LeaseExpiresAt.Should().Be(expiry);
+            stored.Version.Should().Be(4);
+        }
+        finally
+        {
+            SqliteConnection.ClearAllPools();
+            File.Delete(legacyPath);
+        }
+    }
+
+    [Test]
     public async Task FindById_ShouldReturnNull_WhenTaleDoesNotExist()
     {
         var result = await _repository.FindById(Auid.New("TST"), CancellationToken.None);
@@ -224,5 +291,11 @@ public class SQLiteRepositoryTests
         retrieved.Should().NotBeNull();
         retrieved!.Context.Should().Be("{\"persisted\":true}");
     }
+
+    private static TaleInstance NewTale(TaleStatus status) => new()
+    {
+        TaleId = Auid.New("TST"), HandlerTypeName = "TestHandler", Status = status,
+        Context = "{}", CreatedAt = DateTime.UtcNow, LastUpdatedAt = DateTime.UtcNow
+    };
 }
 

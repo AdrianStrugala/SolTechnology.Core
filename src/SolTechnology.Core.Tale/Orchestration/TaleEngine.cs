@@ -1,4 +1,5 @@
 using System.Text.Json;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using SolTechnology.Core.AUID;
 using SolTechnology.Core.Tale.Models;
@@ -24,6 +25,7 @@ internal sealed class TaleEngine<TInput, TContext, TOutput>(
     private readonly TimeProvider _clock = timeProvider ?? TimeProvider.System;
     private readonly TaleRunState _state = new(timeProvider ?? TimeProvider.System);
     private TaleStatePersistence? _persistence;
+    private TaleLeaseHeartbeat? _heartbeat;
     private ChapterReader<TInput, TContext, TOutput> _reader = null!;
     private TContext _context = null!;
     private CancellationToken _cancellationToken;
@@ -41,7 +43,9 @@ internal sealed class TaleEngine<TInput, TContext, TOutput>(
         _handlerTypeName = handlerType.Name;
         _state.ResumeInput = resumeInput;
         _cancellationToken = cancellationToken;
-        _persistence = repository == null ? null : new TaleStatePersistence(repository, _state);
+        _persistence = repository == null
+            ? null
+            : new(repository, _state, RunningLeaseTimeout, serviceProvider.GetRequiredService<IServiceScopeFactory>());
         _reader = new(logger, _state, new(logger, _state, _handlerTypeName, isPersisted: _persistence != null));
 
         if (run.Resume != null)
@@ -62,6 +66,7 @@ internal sealed class TaleEngine<TInput, TContext, TOutput>(
         // The first save claims the tale (and a new tale's idempotency key) before any chapter runs.
         await Save(TaleStatus.Running, _cancellationToken);
         await using var heartbeat = _persistence == null || _state.SaveError != null ? null : StartHeartbeat(_persistence);
+        _heartbeat = heartbeat;
         _chapterToken = heartbeat?.Token ?? _cancellationToken;
         await new TaleStepInterpreter(_state, ExecuteChapter).Run(steps, _context);
     }
@@ -109,13 +114,17 @@ internal sealed class TaleEngine<TInput, TContext, TOutput>(
         }
 
         logger.LogInformation("Executing chapter: [{ChapterId}]", chapter.ChapterId);
+        _heartbeat?.EnterChapter(chapter.ChapterId);
         await _reader.Read(chapter, chapterInfo, _context, _chapterToken, _cancellationToken);
+        _heartbeat?.LeaveChapter();
         await Save(_state.IntermediateStatus, _cancellationToken);
     }
 
+    private TimeSpan RunningLeaseTimeout => (options ?? TaleOptions.Default).RunningLeaseTimeout;
+
     private TaleLeaseHeartbeat StartHeartbeat(TaleStatePersistence persistence) =>
         new TaleLeaseHeartbeat(persistence, logger, _context.TaleInstanceId, _cancellationToken)
-            .Start(_clock, (options ?? TaleOptions.Default).RunningLeaseTimeout);
+            .Start(_clock, RunningLeaseTimeout);
 
     private Task Save(TaleStatus status, CancellationToken cancellationToken) =>
         _persistence?.Save(_context, _context.TaleInstanceId, _handlerTypeName, status, cancellationToken)

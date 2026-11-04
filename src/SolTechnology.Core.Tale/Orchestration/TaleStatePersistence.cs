@@ -1,4 +1,5 @@
 using System.Text.Json;
+using Microsoft.Extensions.DependencyInjection;
 using SolTechnology.Core.AUID;
 using SolTechnology.Core.Errors;
 using SolTechnology.Core.Tale.Models;
@@ -8,10 +9,17 @@ namespace SolTechnology.Core.Tale.Orchestration;
 
 /// <summary>
 /// Reads and writes the persisted state of one tale run through <see cref="ITaleRepository"/>,
-/// carrying the optimistic-concurrency version and the idempotency key between saves. Saves and
-/// lease renewals take turns, so each one is conditioned on the version the previous one stored.
+/// carrying the optimistic-concurrency version and the idempotency key between saves. A Running save
+/// stamps <see cref="TaleInstance.LeaseExpiresAt"/>; any other status clears it. Saves and lease
+/// renewals take turns, so each one is conditioned on the version the previous one stored. Each
+/// renewal runs while a chapter may use the run's scoped repository, so it saves through a
+/// repository resolved from a fresh DI scope.
 /// </summary>
-internal sealed class TaleStatePersistence(ITaleRepository repository, TaleRunState state)
+internal sealed class TaleStatePersistence(
+    ITaleRepository repository,
+    TaleRunState state,
+    TimeSpan runningLeaseTimeout,
+    IServiceScopeFactory renewalScopes)
 {
     private readonly SemaphoreSlim _turn = new(1, 1);
     private DateTime _createdAt;
@@ -52,6 +60,7 @@ internal sealed class TaleStatePersistence(ITaleRepository repository, TaleRunSt
             Status = status,
             CreatedAt = _createdAt == default ? state.Now : _createdAt,
             LastUpdatedAt = state.Now,
+            LeaseExpiresAt = status == TaleStatus.Running ? state.UtcNow + runningLeaseTimeout : null,
             History = new List<ChapterInfo>(state.History),
             CurrentChapter = status == TaleStatus.WaitingForInput ? state.History.LastOrDefault() : null,
             Context = JsonSerializer.Serialize(context, TaleJsonOptions.Default),
@@ -70,7 +79,7 @@ internal sealed class TaleStatePersistence(ITaleRepository repository, TaleRunSt
     }
 
     /// <summary>
-    /// Re-saves the last stored Running state with a fresh <see cref="TaleInstance.LastUpdatedAt"/>.
+    /// Re-saves the last stored Running state with a fresh <see cref="TaleInstance.LeaseExpiresAt"/>.
     /// A <see cref="ConflictError"/> means another run owns the tale now; it stops every later save.
     /// </summary>
     public async Task<Result> Renew(CancellationToken cancellationToken)
@@ -83,9 +92,10 @@ internal sealed class TaleStatePersistence(ITaleRepository repository, TaleRunSt
                 return Result.Success();
             }
 
-            _lease.LastUpdatedAt = state.Now;
+            _lease.LeaseExpiresAt = state.UtcNow + runningLeaseTimeout;
             _lease.Version = _version;
-            var renewed = await repository.Save(_lease, cancellationToken);
+            await using var scope = renewalScopes.CreateAsyncScope();
+            var renewed = await scope.ServiceProvider.GetRequiredService<ITaleRepository>().Save(_lease, cancellationToken);
             if (renewed.IsSuccess)
             {
                 _version = _lease.Version;

@@ -43,6 +43,8 @@ internal sealed class TaleRunState(TimeProvider timeProvider)
 
     public DateTime Now => timeProvider.GetUtcNow().UtcDateTime;
 
+    public DateTimeOffset UtcNow => timeProvider.GetUtcNow();
+
     /// <summary>
     /// Finds the history entry of the chapter at <paramref name="stepIndex"/>, or adds a new one.
     /// Returns <c>null</c> when that chapter already completed; resumes a tale paused at it.

@@ -9,12 +9,12 @@ namespace SolTechnology.Core.Tale.Orchestration;
 
 /// <summary>
 /// Loads a stored tale for <c>ResumeStory</c>: rejects tales that cannot be resumed and restores the
-/// typed context from its JSON. A Running tale is resumable only once its lease has expired.
+/// typed context from its JSON. A Running tale is resumable only once its stored
+/// <see cref="TaleInstance.LeaseExpiresAt"/> has passed; a missing expiry counts as expired.
 /// </summary>
 internal sealed class ResumableTaleLoader(
     ITaleRepository repository,
     TimeProvider timeProvider,
-    TimeSpan runningLeaseTimeout,
     ILogger logger)
 {
     public async Task<Result<(TContext Context, TaleInstance? Instance)>> Load<TInput, TContext, TOutput>(
@@ -32,8 +32,8 @@ internal sealed class ResumableTaleLoader(
 
         if (existing!.Status == TaleStatus.Running)
         {
-            logger.LogWarning("Tale [{TaleId}] has been Running without a save since [{LastUpdatedAt}]; taking it over",
-                taleId, existing.LastUpdatedAt);
+            logger.LogWarning("Tale [{TaleId}] Running lease expired at [{LeaseExpiresAt}] (now [{Now}]); taking it over",
+                taleId, existing.LeaseExpiresAt, timeProvider.GetUtcNow());
         }
 
         TContext? context;
@@ -70,7 +70,7 @@ internal sealed class ResumableTaleLoader(
         _ => null
     };
 
-    // Every save of a run stamps LastUpdatedAt, so it is the lease's renewal time.
+    // The writer stamped the expiry with its own timeout, so hosts with different timeouts agree.
     private bool IsLeaseHeld(TaleInstance running) =>
-        timeProvider.GetUtcNow().UtcDateTime - running.LastUpdatedAt < runningLeaseTimeout;
+        running.LeaseExpiresAt is { } expiresAt && expiresAt > timeProvider.GetUtcNow();
 }

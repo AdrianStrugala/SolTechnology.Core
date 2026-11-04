@@ -40,11 +40,19 @@ public class TaleInstance
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
     /// <summary>
-    /// When this tale instance was last saved, in UTC. Every save of a run stamps it, so the
-    /// <see cref="TaleOptions.RunningLeaseTimeout"/> of a <see cref="TaleStatus.Running"/> tale is
-    /// measured from it; repositories must store it unchanged.
+    /// When the state of this tale instance was last saved, in UTC. Lease renewals do not change it.
     /// </summary>
     public DateTime LastUpdatedAt { get; set; } = DateTime.UtcNow;
+
+    /// <summary>
+    /// When the Running lease of the run that last saved this tale expires, in UTC; <c>null</c> for
+    /// every status other than <see cref="TaleStatus.Running"/>. The claim save and every lease renewal
+    /// set it to the writer's clock plus the writer's <see cref="TaleOptions.RunningLeaseTimeout"/>.
+    /// <c>ResumeStory</c> refuses a Running tale until this instant has passed and treats a missing
+    /// value (a row written before the field existed) as expired. Repositories must store and return
+    /// the instant unchanged.
+    /// </summary>
+    public DateTimeOffset? LeaseExpiresAt { get; set; }
 
     /// <summary>The complete context for this tale, serialized as JSON.</summary>
     public string Context { get; set; } = string.Empty;

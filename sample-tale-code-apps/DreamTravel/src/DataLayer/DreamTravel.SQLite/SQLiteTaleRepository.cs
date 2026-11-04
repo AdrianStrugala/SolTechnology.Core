@@ -94,7 +94,8 @@ public class SQLiteTaleRepository : ITaleRepository
                     LastUpdatedAt TEXT NOT NULL,
                     History TEXT,
                     CurrentChapter TEXT,
-                    Version INTEGER NOT NULL DEFAULT 0
+                    Version INTEGER NOT NULL DEFAULT 0,
+                    LeaseExpiresAt TEXT
                 );
 
                 CREATE INDEX IF NOT EXISTS IX_TaleInstances_Status ON TaleInstances(Status);
@@ -135,6 +136,7 @@ public class SQLiteTaleRepository : ITaleRepository
 
         AddColumn("IdempotencyKey", "TEXT");
         AddColumn("Version", "INTEGER NOT NULL DEFAULT 0");
+        AddColumn("LeaseExpiresAt", "TEXT");
     }
 
     public Task<TaleInstance?> FindById(Auid storyId, CancellationToken cancellationToken) =>
@@ -216,6 +218,7 @@ public class SQLiteTaleRepository : ITaleRepository
                     LastUpdatedAt = @LastUpdatedAt,
                     History = @History,
                     CurrentChapter = @CurrentChapter,
+                    LeaseExpiresAt = @LeaseExpiresAt,
                     Version = @Version + 1
                 WHERE TaleId = @TaleId AND Version = @Version
             ";
@@ -236,6 +239,10 @@ public class SQLiteTaleRepository : ITaleRepository
                     ? (object)JsonSerializer.Serialize(storyInstance.CurrentChapter, TaleJsonOptions.Default)
                     : DBNull.Value);
 
+            command.Parameters.AddWithValue("@LeaseExpiresAt",
+                storyInstance.LeaseExpiresAt is { } leaseExpiresAt
+                    ? SQLiteTimestamp.Format(leaseExpiresAt)
+                    : DBNull.Value);
             command.Parameters.AddWithValue("@Version", storyInstance.Version);
 
             var written = await command.ExecuteNonQueryAsync(cancellationToken) == 1
@@ -254,10 +261,10 @@ public class SQLiteTaleRepository : ITaleRepository
         command.CommandText = @"
             INSERT INTO TaleInstances
                 (TaleId, HandlerTypeName, IdempotencyKey, Status, Context,
-                 CreatedAt, LastUpdatedAt, History, CurrentChapter, Version)
+                 CreatedAt, LastUpdatedAt, History, CurrentChapter, LeaseExpiresAt, Version)
             VALUES
                 (@TaleId, @HandlerTypeName, @IdempotencyKey, @Status, @Context,
-                 @CreatedAt, @LastUpdatedAt, @History, @CurrentChapter, 1)
+                 @CreatedAt, @LastUpdatedAt, @History, @CurrentChapter, @LeaseExpiresAt, 1)
         ";
         try
         {
@@ -286,7 +293,7 @@ public class SQLiteTaleRepository : ITaleRepository
 
     private const string SelectSql = @"
         SELECT TaleId, HandlerTypeName, IdempotencyKey, Status, Context,
-               CreatedAt, LastUpdatedAt, History, CurrentChapter, Version
+               CreatedAt, LastUpdatedAt, History, CurrentChapter, Version, LeaseExpiresAt
         FROM TaleInstances";
 
     private static TaleInstance MapRow(SqliteDataReader reader) => new()
@@ -304,7 +311,8 @@ public class SQLiteTaleRepository : ITaleRepository
         CurrentChapter = reader.IsDBNull(8)
             ? null
             : JsonSerializer.Deserialize<ChapterInfo>(reader.GetString(8), TaleJsonOptions.Default),
-        Version = reader.GetInt64(9)
+        Version = reader.GetInt64(9),
+        LeaseExpiresAt = reader.IsDBNull(10) ? null : SQLiteTimestamp.Parse(reader.GetString(10))
     };
 
     private async Task<T> ExecuteWithRetry<T>(Func<Task<T>> operation, CancellationToken cancellationToken)

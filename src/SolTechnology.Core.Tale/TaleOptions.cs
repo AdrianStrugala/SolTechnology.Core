@@ -18,21 +18,31 @@ public sealed class TaleOptions
     public string TaleIdPrefix { get; set; } = "STR";
 
     /// <summary>
-    /// How long a <see cref="Models.TaleStatus.Running"/> tale stays owned by the run that last saved
-    /// it. <c>ResumeStory</c> refuses a younger Running tale with a conflict and takes over an older
-    /// one, left by a crashed host, re-running its unfinished chapter. A live run renews its lease
-    /// every third of this value while it executes, so a chapter may run longer. Default: 5 minutes.
+    /// How long a <see cref="Models.TaleStatus.Running"/> tale stays owned by the run that claimed or
+    /// last renewed it. Each claim and renewal stores the expiry as
+    /// <see cref="Models.TaleInstance.LeaseExpiresAt"/> (the writer's clock plus this value), so hosts
+    /// with different values still respect each other's leases. <c>ResumeStory</c> refuses a Running
+    /// tale before that expiry with a conflict and takes it over afterwards, re-running its unfinished
+    /// chapter. A live run renews its lease every third of this value while it executes, so a chapter
+    /// may run longer; a chapter running for three times this value is logged as a warning.
+    /// Default: 5 minutes; range: 1 second to 49 days, which keeps the renewal timer below the
+    /// <see cref="ITimer"/> limit of 4294967294 ms (about 49.7 days).
     /// </summary>
-    /// <exception cref="ArgumentOutOfRangeException">The value is zero or negative.</exception>
+    /// <exception cref="ArgumentOutOfRangeException">The value is below 1 second or above 49 days.</exception>
     public TimeSpan RunningLeaseTimeout
     {
         get => _runningLeaseTimeout;
         set
         {
-            ArgumentOutOfRangeException.ThrowIfLessThanOrEqual(value, TimeSpan.Zero);
+            ArgumentOutOfRangeException.ThrowIfLessThan(value, MinRunningLeaseTimeout);
+            ArgumentOutOfRangeException.ThrowIfGreaterThan(value, MaxRunningLeaseTimeout);
             _runningLeaseTimeout = value;
         }
     }
+
+    internal static TimeSpan MinRunningLeaseTimeout { get; } = TimeSpan.FromSeconds(1);
+
+    internal static TimeSpan MaxRunningLeaseTimeout { get; } = TimeSpan.FromDays(49);
 
     /// <summary>
     /// Internal fallback used by the engine when options are not present in DI (e.g. when a

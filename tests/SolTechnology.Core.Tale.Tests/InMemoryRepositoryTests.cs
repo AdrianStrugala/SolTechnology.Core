@@ -383,6 +383,25 @@ public class InMemoryRepositoryTests
         error.Recoverable.Should().BeTrue();
     }
 
+    [Test]
+    public async Task Repository_SaveAndFind_KeepsLeaseExpiresAtAsTheSameInstant()
+    {
+        // Arrange
+        var taleId = Auid.New("TST");
+        var taleInstance = CreateTestTaleInstance(taleId);
+        var expiry = new DateTimeOffset(2026, 11, 3, 14, 5, 0, TimeSpan.FromHours(2));
+        taleInstance.LeaseExpiresAt = expiry;
+
+        // Act
+        await _repository.Save(taleInstance, CancellationToken.None);
+        var found = await _repository.FindById(taleId, CancellationToken.None);
+        var listed = await _repository.List(cancellationToken: CancellationToken.None);
+
+        // Assert
+        found!.LeaseExpiresAt.Should().Be(expiry);
+        listed.Should().ContainSingle().Which.LeaseExpiresAt.Should().Be(expiry);
+    }
+
     private TaleInstance CreateTestTaleInstance(Auid? taleId = null)
     {
         return new TaleInstance

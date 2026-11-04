@@ -38,6 +38,19 @@ public interface ITaleRepository
     /// Returns a failed <see cref="Result"/> with a <see cref="Errors.ConflictError"/>, without
     /// writing, on a version mismatch or when a new tale reuses another tale's idempotency key.
     /// Never throws for a conflict.
+    /// <para>
+    /// Every property must be stored and returned exactly, in particular <see cref="TaleInstance.Version"/>
+    /// and <see cref="TaleInstance.LeaseExpiresAt"/> (the same instant, nullable, never replaced by a
+    /// database default or shifted by a time-zone conversion): the Running lease is decided from it.
+    /// A save whose outcome is unknown (it may have committed) must throw; never retry a conditional
+    /// write that may have committed, and never report the caller's own write as a conflict, because
+    /// the run would read that as a takeover by another run.
+    /// </para>
+    /// <para>
+    /// Lease renewals call this method while a chapter runs, through an instance resolved from a fresh
+    /// DI scope, so a scoped repository (for example over a <c>DbContext</c>) is never used by a
+    /// renewal and a chapter of the same scope at once.
+    /// </para>
     /// </summary>
     Task<Result> Save(TaleInstance taleInstance, CancellationToken cancellationToken);
 

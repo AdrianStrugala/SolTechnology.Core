@@ -90,6 +90,7 @@ public partial class TaleManager(
 
         instance.Status = TaleStatus.Cancelled;
         instance.LastUpdatedAt = _timeProvider.GetUtcNow().UtcDateTime;
+        instance.LeaseExpiresAt = null;
         instance.CurrentChapter = null;
         var saved = await repository.Save(instance, cancellationToken);
         return saved.IsSuccess ? Result<TaleInstance>.Success(instance) : Result<TaleInstance>.Fail(saved.Error!);
