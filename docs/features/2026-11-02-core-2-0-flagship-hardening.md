@@ -473,7 +473,7 @@ parameter; `UntilAsync`, `CheckHealthAsync`, `InvokeAsync`, `StartAsync`/`StopAs
 | P-15 | A failed request logs one Error entry, not two | Error-rate alerts change | logging 03 |
 | P-16 | API key in the request is compared as a SHA-256 hash in constant time | None functional | api-auth 04 |
 | P-17 | The receiver dead-letters a failing message when `DeliveryCount >= MessageBusConfiguration.MaxDeliveryCount` (default 10) instead of always abandoning | Set `MaxDeliveryCount` to the entity's value; a lower value dead-letters earlier than the broker would | messagebus 03 |
-| P-18 | `TaleInstance.LeaseExpiresAt` persisted (tale T7): every `Running` save stores the writer's now + `RunningLeaseTimeout`, every other status stores `null`; `ResumeStory` takes over a `Running` tale only once it has passed or when it is missing; renewals save through a fresh DI scope and leave `LastUpdatedAt` alone | Custom repositories add a nullable `LeaseExpiresAt` column and store the same instant on every `Save` (no database default, no local-time conversion); existing `Running` rows without it are resumable at once. DreamTravel's SQLite file gains the column on start | tale post-completion fix T7 |
+| P-18 | `TaleInstance.LeaseExpiresAt` persisted (tale T7): every `Running` save stores the writer's now + `RunningLeaseTimeout`, every other status stores `null`; `ResumeStory` takes over a `Running` tale only once it has passed; without it, once `LastUpdatedAt` + the reader's `RunningLeaseTimeout` has passed (T8); renewals save through a fresh DI scope and leave `LastUpdatedAt` alone | Custom repositories add a nullable `LeaseExpiresAt` column and store the same instant on every `Save`, inserts and updates alike (no database default, no local-time conversion); existing `Running` rows without it are held for one timeout after their last save, then resumable. A one-time read-back logs an error when a repository stores another value (T8). DreamTravel's SQLite file gains the column on start | tale post-completion fixes T7, T8 |
 
 ### Log contract changes (Guide §15 "report only", accepted for 2.0)
 
@@ -580,6 +580,18 @@ these notes from the steps:
   1 second to 49 days. A chapter running for three timeouts logs one warning; a hung but alive
   chapter keeps its lease and is recovered with `CancelStory`. A `StartStory` with an idempotency
   key whose run lost the tale returns success with the new owner's stored state.
+- tale (LeaseExpiresAt premortem follow-up T8, D3/D4 decided by the implementer, delegated by the
+  user 2026-11-03, amends the note above and `P-18`): a `Running` row without `LeaseExpiresAt` no
+  longer counts as expired. `ResumeStory` holds it until its `LastUpdatedAt` plus the reader's
+  `RunningLeaseTimeout`, answers `ConflictError` meanwhile and logs a warning naming the
+  `ITaleRepository.Save` contract, then takes it over. Once per host, after the first claim of a new
+  tale, the first claim of a resumed tale and the first lease renewal, the run reads the tale back
+  and logs an error ("... ITaleRepository.Save must store LeaseExpiresAt unchanged, or another host
+  may take over a live tale") when the stored `LeaseExpiresAt` differs from the written one by more
+  than one second at the same `Version`; the run continues. Migration for custom repositories:
+  store `LeaseExpiresAt` on updates as well as inserts, prefer a `datetimeoffset` / `timestamptz`
+  column, and with a `DateTime` column write `UtcDateTime` and read it back with
+  `DateTime.SpecifyKind(value, DateTimeKind.Utc)`; treat the read-back error as a repository bug.
 
 ### Resolved questions (user answers, 2026-11-02)
 
