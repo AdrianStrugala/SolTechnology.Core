@@ -1,7 +1,7 @@
 ---
 spec: 2026-11-02-core-2-0-api-auth
 step: 09
-status: to-do
+status: done
 ---
 
 # Step 09: Guide conformance — Api and Auth
@@ -31,14 +31,51 @@ Former core steps 65 (Api and Authentication parts) and 66 (Authentication part)
 - Behaviour-preserving refactor; use the [`refactor`](../../../../.github/skills/refactor/SKILL.md) skill.
 
 ## Acceptance criteria
-- [ ] `find src/SolTechnology.Core.API src/SolTechnology.Core.Auth -name "*.cs" -not -path "*/obj/*" | xargs wc -l | awk '$1>150 && $2!="total"'` prints nothing.
-- [ ] `git ls-files src/SolTechnology.Core.Auth | grep -E "APIKey"` prints nothing.
-- [ ] `grep -rn "this IServiceCollection" src/SolTechnology.Core.Auth` prints nothing.
-- [ ] `dotnet test tests/SolTechnology.Core.API.Tests` and `dotnet test tests/SolTechnology.Core.Auth.Tests` are green; DreamTravel component tests are green.
-- [ ] Public API diff is empty (compare `dotnet build` ref assemblies, or use `Microsoft.DotNet.ApiCompat` locally if available).
-- [ ] Premortem mitigations for `ModuleInstaller.cs` are applied.
+- [x] `find src/SolTechnology.Core.API src/SolTechnology.Core.Auth -name "*.cs" -not -path "*/obj/*" | xargs wc -l | awk '$1>150 && $2!="total"'` prints nothing.
+- [x] `git ls-files src/SolTechnology.Core.Auth | grep -E "APIKey"` prints nothing.
+- [x] `grep -rn "this IServiceCollection" src/SolTechnology.Core.Auth` prints nothing.
+- [x] `dotnet test tests/SolTechnology.Core.API.Tests` and `dotnet test tests/SolTechnology.Core.Auth.Tests` are green; DreamTravel component tests are green.
+- [x] Public API diff is empty (compare `dotnet build` ref assemblies, or use `Microsoft.DotNet.ApiCompat` locally if available).
+- [x] Premortem mitigations for `ModuleInstaller.cs` are applied.
 
 ## Open questions
 - none
 
 ## Deviations
+
+### What left the Api installer and factory
+
+**Original plan:** move `BuildInMemorySource` and `ConfigureSwaggerOptions` out of `Api/ModuleInstaller.cs`; extract the
+title/status resolution of `ApiProblemDetailsFactory.cs` into an internal helper.
+
+**Actual implementation:** `BuildInMemorySource` no longer exists in the Api installer, and moving
+`ConfigureSwaggerOptions` alone left 240 lines. The correlation-id stamping of framework `ProblemDetails` (the
+`CustomizeProblemDetails` and `InvalidModelStateResponseFactory` lambdas) moved to the internal
+`Exceptions/ProblemDetailsCorrelation.cs`, and the long `<code>` examples in the installer's XML docs were cut to short
+summaries (`docs/Api.md` carries the examples); commit `b21a9339` says the docs "point to docs/Api.md", but they are
+only shortened. The installer has 147 lines. The factory's helper is the internal `Exceptions/ProblemDetailsStatusMap.cs`
+(`StatusFor`, `TypeForStatus`, `TitleFor`); `FromError` builds its two `ProblemDetails` shapes in one expression, which
+brings the factory to 146 lines.
+
+### Extension blocks also in the Api installer, and a fix-on-touch comment commit
+
+**Original plan:** `extension` blocks for `src/SolTechnology.Core.API/**/*Extensions.cs` and the Auth installer.
+
+**Actual implementation:** `Api/ModuleInstaller.cs` used `static class` + `this` too and was edited in this step, so it
+moved into two extension blocks (`IServiceCollection`, `IApplicationBuilder`) with the three `*Extensions.cs` files. The
+three- to five-line comments in `ExceptionFilter` and `ResultConversionFilter` were shortened to one line each in a
+separate `chore(api)` commit (`CLAUDE.md` §1.3, Guide §9.10 fix on touch); `ExceptionFilter`'s log-level rationale went
+to its XML `<remarks>` as planned.
+
+### Public API check and commit split
+
+**Original plan:** compare ref assemblies or use `Microsoft.DotNet.ApiCompat`; one behaviour-preserving refactor.
+
+**Actual implementation:** a throwaway reflection dump (types, constructors, methods with parameter names and defaults,
+the extension attribute, properties, fields and constants; compiler-generated extension marker types excluded) was taken
+before the step and after the extension-block changes: identical for `SolTechnology.Core.Api.dll` (47 lines) and
+`SolTechnology.Core.Auth.dll` (17 lines). The step landed as six commits, one smell each, except that `d8cb1b64`
+(`AddSolAuth` extension block) also carries the two case-only renames, because `git mv` had staged them; history was not
+rewritten. Each commit ran the full `dotnet test SolTechnology.Core.slnx` (18 projects, 775 passed, 11 skipped, 0
+failed), including the DreamTravel component tests.
+
