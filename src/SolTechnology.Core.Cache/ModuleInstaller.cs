@@ -1,4 +1,5 @@
 ﻿﻿﻿﻿﻿﻿using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Caching.StackExchangeRedis;
 using Microsoft.Extensions.DependencyInjection;
 using StackExchange.Redis;
 
@@ -23,6 +24,8 @@ public static class ModuleInstaller
                     config.ExpirationMode = cacheConfiguration.ExpirationMode;
                     config.ExpirationSeconds = cacheConfiguration.ExpirationSeconds;
                 })
+                .Validate(config => config.ExpirationSeconds > 0,
+                    $"{nameof(CacheConfiguration)}.{nameof(CacheConfiguration.ExpirationSeconds)} must be greater than 0.")
                 .ValidateOnStart();
 
             services.AddMemoryCache();
@@ -42,13 +45,19 @@ public static class ModuleInstaller
                     config.InstanceName = configuration.InstanceName;
                     config.ExpirationSeconds = configuration.ExpirationSeconds;
                 })
+                .Validate(config => !string.IsNullOrWhiteSpace(config.ConnectionString),
+                    $"{nameof(DistributedCacheConfiguration)}.{nameof(DistributedCacheConfiguration.ConnectionString)} must not be empty.")
+                .Validate(config => !string.IsNullOrWhiteSpace(config.InstanceName),
+                    $"{nameof(DistributedCacheConfiguration)}.{nameof(DistributedCacheConfiguration.InstanceName)} must not be empty; \"SolTechnology:\" keeps the 1.x lock and idempotency keys.")
+                .Validate(config => config.ExpirationSeconds > 0,
+                    $"{nameof(DistributedCacheConfiguration)}.{nameof(DistributedCacheConfiguration.ExpirationSeconds)} must be greater than 0.")
                 .ValidateOnStart();
 
-            services.AddStackExchangeRedisCache(options =>
-            {
-                options.Configuration = configuration.ConnectionString;
-                options.InstanceName = configuration.InstanceName;
-            });
+            services.AddStackExchangeRedisCache(options => options.InstanceName = configuration.InstanceName);
+            services
+                .AddOptions<RedisCacheOptions>()
+                .Configure<IServiceProvider>((options, provider) => options.ConnectionMultiplexerFactory =
+                    () => Task.FromResult(provider.GetRequiredService<IConnectionMultiplexer>()));
 
             services.AddSingleton<IConnectionMultiplexer>(_ =>
                 ConnectionMultiplexer.Connect(configuration.ConnectionString));

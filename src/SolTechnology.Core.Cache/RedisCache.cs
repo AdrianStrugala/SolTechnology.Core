@@ -24,7 +24,7 @@ internal sealed class RedisCache(
 
     public async Task<TItem> GetOrAdd<TKey, TItem>(TKey key, Func<TKey, Task<TItem>> factory)
     {
-        var keyString = JsonSerializer.Serialize(key, SerializerOptions);
+        var keyString = CacheKey.For<TKey, TItem>(key, SerializerOptions);
         if (string.IsNullOrWhiteSpace(keyString))
             throw new ArgumentOutOfRangeException(nameof(key), "Cache keys cannot be null or whitespace");
 

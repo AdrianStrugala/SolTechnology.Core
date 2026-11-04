@@ -75,4 +75,21 @@ public class SingletonCacheTests
         results.Should().AllSatisfy(result => result.Should().Be(42));
         calls.Should().Be(1);
     }
+
+    [Test]
+    public async Task GetOrAdd_SameKeyDifferentItemType_DoesNotCollide()
+    {
+        // Arrange
+        var calls = 0;
+        await _sut.GetOrAdd(42, _ => { calls++; return Task.FromResult(7); });
+
+        // Act
+        var text = await _sut.GetOrAdd(42, _ => { calls++; return Task.FromResult("seven"); });
+        var number = await _sut.GetOrAdd(42, _ => { calls++; return Task.FromResult(-1); });
+
+        // Assert
+        text.Should().Be("seven");
+        number.Should().Be(7);
+        calls.Should().Be(2);
+    }
 }

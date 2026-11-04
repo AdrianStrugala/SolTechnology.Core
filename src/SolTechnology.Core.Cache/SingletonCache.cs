@@ -22,7 +22,7 @@ namespace SolTechnology.Core.Cache
 
         public async Task<TItem> GetOrAdd<TKey, TItem>(TKey key, Func<TKey, Task<TItem>> factory)
         {
-            var keyString = System.Text.Json.JsonSerializer.Serialize(key);
+            var keyString = CacheKey.For<TKey, TItem>(key);
             var entry = GetOrCreateEntry(keyString, () => factory(key));
 
             try

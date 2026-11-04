@@ -6,6 +6,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\SolTechnology.Core.Cache\SolTechnology.Core.Cache.csproj" />
+    <ProjectReference Include="..\..\src\SolTechnology.Core.Redis.Testing\SolTechnology.Core.Redis.Testing.csproj" />
   </ItemGroup>
 
 </Project>

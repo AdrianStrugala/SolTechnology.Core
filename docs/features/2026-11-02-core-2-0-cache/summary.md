@@ -21,7 +21,7 @@ are `done` and after these library features are `completed`: none. No step is `b
 |---|---|---|---|
 | 01 | DI resolution test — Cache | [`steps/01-di-resolution-test.md`](steps/01-di-resolution-test.md) | done |
 | 02 | Cache — local cache fault eviction, single flight, and a correct local lock | [`steps/02-cache-local-cache-and-lock-correctness.md`](steps/02-cache-local-cache-and-lock-correctness.md) | done |
-| 03 | Cache — type-namespaced keys, validated non-empty `InstanceName`, validated options | [`steps/03-cache-key-isolation-and-config-validation.md`](steps/03-cache-key-isolation-and-config-validation.md) | to-do |
+| 03 | Cache — type-namespaced keys, validated non-empty `InstanceName`, validated options | [`steps/03-cache-key-isolation-and-config-validation.md`](steps/03-cache-key-isolation-and-config-validation.md) | done |
 | 04 | Cache — drop `Async` from lock and idempotency contracts | [`steps/04-cache-async-suffix.md`](steps/04-cache-async-suffix.md) | to-do |
 | 05 | XML docs shipped — Cache | [`steps/05-xml-docs.md`](steps/05-xml-docs.md) | to-do |
 | 06 | Module docs — `docs/Cache.md` | [`steps/06-docs-cache.md`](steps/06-docs-cache.md) | to-do |
