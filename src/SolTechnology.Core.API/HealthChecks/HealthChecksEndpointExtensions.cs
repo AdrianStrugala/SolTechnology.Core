@@ -13,34 +13,36 @@ namespace SolTechnology.Core.API.HealthChecks;
 /// </summary>
 public static class HealthChecksEndpointExtensions
 {
-    /// <summary>
-    /// Maps a health endpoint at <paramref name="path"/> that renders the report as JSON via
-    /// <see cref="HealthReportJsonFormatter"/>. Status codes follow the framework default:
-    /// <c>200</c> for <c>Healthy</c>/<c>Degraded</c>, <c>503</c> for <c>Unhealthy</c>.
-    /// <para>
-    /// Requires <c>AddHealthChecks()</c> to have been called. Chain the per-module checks
-    /// (<c>AddSolSqlHealthCheck()</c>, <c>AddSolRedisHealthCheck()</c>, …) onto that builder.
-    /// </para>
-    /// <code>
-    /// builder.Services.AddHealthChecks()
-    ///     .AddSolSqlHealthCheck()
-    ///     .AddSolRedisHealthCheck();
-    ///
-    /// app.MapSolHealthChecks("/health");
-    /// </code>
-    /// </summary>
     /// <param name="endpoints">The endpoint route builder (e.g. <c>WebApplication</c>).</param>
-    /// <param name="path">The endpoint path (default <c>/health</c>).</param>
-    public static IEndpointConventionBuilder MapSolHealthChecks(
-        this IEndpointRouteBuilder endpoints,
-        string path = "/health")
+    extension(IEndpointRouteBuilder endpoints)
     {
-        ArgumentNullException.ThrowIfNull(endpoints);
-
-        return endpoints.MapHealthChecks(path, new HealthCheckOptions
+        /// <summary>
+        /// Maps a health endpoint at <paramref name="path"/> that renders the report as JSON via
+        /// <see cref="HealthReportJsonFormatter"/>. Status codes follow the framework default:
+        /// <c>200</c> for <c>Healthy</c>/<c>Degraded</c>, <c>503</c> for <c>Unhealthy</c>.
+        /// <para>
+        /// Requires <c>AddHealthChecks()</c> to have been called. Chain the per-module checks
+        /// (<c>AddSolSqlHealthCheck()</c>, <c>AddSolRedisHealthCheck()</c>, …) onto that builder.
+        /// </para>
+        /// <code>
+        /// builder.Services.AddHealthChecks()
+        ///     .AddSolSqlHealthCheck()
+        ///     .AddSolRedisHealthCheck();
+        ///
+        /// app.MapSolHealthChecks("/health");
+        /// </code>
+        /// </summary>
+        /// <param name="path">The endpoint path (default <c>/health</c>).</param>
+        public IEndpointConventionBuilder MapSolHealthChecks(
+            string path = "/health")
         {
-            ResponseWriter = WriteJsonResponse
-        });
+            ArgumentNullException.ThrowIfNull(endpoints);
+
+            return endpoints.MapHealthChecks(path, new HealthCheckOptions
+            {
+                ResponseWriter = WriteJsonResponse
+            });
+        }
     }
 
     private static async Task WriteJsonResponse(HttpContext context, Microsoft.Extensions.Diagnostics.HealthChecks.HealthReport report)
