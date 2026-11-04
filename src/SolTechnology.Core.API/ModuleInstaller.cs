@@ -244,7 +244,7 @@ public static class ModuleInstaller
 /// <summary>
 /// Generates one Swagger document per registered API version.
 /// </summary>
-public class ConfigureSwaggerOptions(IApiVersionDescriptionProvider provider, string apiTitle)
+internal sealed class ConfigureSwaggerOptions(IApiVersionDescriptionProvider provider, string apiTitle)
     : IConfigureOptions<SwaggerGenOptions>
 {
     public void Configure(SwaggerGenOptions options)

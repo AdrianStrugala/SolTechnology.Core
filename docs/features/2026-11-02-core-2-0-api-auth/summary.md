@@ -36,7 +36,7 @@ Gate history:
 | 03 | Keep upstream URIs and query strings out of `ProblemDetails` and exception messages | [`steps/03-no-upstream-uri-in-problem-details.md`](steps/03-no-upstream-uri-in-problem-details.md) | done |
 | 04 | Auth — constant-time API-key comparison and per-instance logger | [`steps/04-constant-time-api-key-comparison.md`](steps/04-constant-time-api-key-comparison.md) | done |
 | 05 | Api — keep 201/202 in `ResultConversionFilter`; real filter registration | [`steps/05-api-result-filter-status-preservation.md`](steps/05-api-result-filter-status-preservation.md) | done |
-| 06 | Auth and Api — public surface cleanup | [`steps/06-auth-api-public-surface.md`](steps/06-auth-api-public-surface.md) | to-do |
+| 06 | Auth and Api — public surface cleanup | [`steps/06-auth-api-public-surface.md`](steps/06-auth-api-public-surface.md) | done |
 | 07 | XML docs shipped — API, Auth | [`steps/07-xml-docs.md`](steps/07-xml-docs.md) | to-do |
 | 08 | Module docs — Api and Auth | [`steps/08-docs-api-auth.md`](steps/08-docs-api-auth.md) | to-do |
 | 09 | Guide conformance — Api and Auth | [`steps/09-conform-api-auth.md`](steps/09-conform-api-auth.md) | to-do |
