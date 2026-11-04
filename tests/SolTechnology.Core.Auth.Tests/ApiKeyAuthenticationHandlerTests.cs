@@ -1,6 +1,7 @@
 using System.Text.Encodings.Web;
 using FluentAssertions;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -44,7 +45,25 @@ public class ApiKeyAuthenticationHandlerTests
         }
     }
 
-    private static async Task<ApiKeyAuthenticationHandler> CreateHandler(string configuredKey, string? header, ILoggerProvider logs)
+    [Test]
+    public async Task HandleAuthenticateAsync_AllowAnonymousEndpointWithoutHeader_ReturnsNoResultWithoutWarning()
+    {
+        // Arrange
+        var logs = new CapturingLoggerProvider();
+        var anonymousEndpoint = new Endpoint(null, new EndpointMetadataCollection(new AllowAnonymousAttribute()), "anonymous");
+        var handler = await CreateHandler(ConfiguredKey, header: null, logs, anonymousEndpoint);
+
+        // Act
+        var result = await handler.AuthenticateAsync();
+
+        // Assert
+        result.None.Should().BeTrue();
+        result.Succeeded.Should().BeFalse();
+        result.Failure.Should().BeNull();
+        logs.Entries.Should().NotContain(entry => entry.Level >= LogLevel.Warning);
+    }
+
+    private static async Task<ApiKeyAuthenticationHandler> CreateHandler(string configuredKey, string? header, ILoggerProvider logs, Endpoint? endpoint = null)
     {
         var options = new ApiKeyAuthenticationSchemeOptions { ApiKey = configuredKey };
         var optionsMonitor = Substitute.For<IOptionsMonitor<ApiKeyAuthenticationSchemeOptions>>();
@@ -55,6 +74,7 @@ public class ApiKeyAuthenticationHandlerTests
 
         var context = new DefaultHttpContext();
         context.Request.Path = "/api/trips";
+        context.SetEndpoint(endpoint);
         if (header is not null)
         {
             context.Request.Headers[ApiKeyAuthenticationSchemeOptions.AuthenticationHeaderName] = header;
