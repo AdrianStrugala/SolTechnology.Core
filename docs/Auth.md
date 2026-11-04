@@ -1,10 +1,12 @@
 ### Overview
 
-The SolTechnology.Core.Authentication library provides minimum basic API Key Authentication functionality. It handles needed services registration and configuration.
+Formerly `SolTechnology.Core.Authentication` (1.x). In 2.0 the package, assembly, and namespace are `SolTechnology.Core.Auth`; `AddSolAuthentication` → `AddSolAuth`, `AuthenticationConfiguration` → `AuthConfiguration`.
+
+The SolTechnology.Core.Auth library provides minimum basic API Key Authentication functionality. It handles needed services registration and configuration.
 
 ### Registration
 
-For installing the library, reference **SolTechnology.Core.Authentication** nuget package and invoke **AddAuthenticationAndBuildFilter();** service collection extension method:
+For installing the library, reference **SolTechnology.Core.Auth** nuget package and invoke **AddAuthenticationAndBuildFilter();** service collection extension method:
 
 ```csharp
 var authenticationFiler = builder.Services.AddAuthenticationAndBuildFilter();
@@ -25,7 +27,7 @@ var authenticationFiler = builder.Services.AddAuthenticationAndBuildFilter();
 2) Alternatevely the same settings can be provided by optional parameter during registration:
 
 ```csharp
-var authenticationConfiguration = new AuthenticationConfiguration
+var authenticationConfiguration = new AuthConfiguration
 {
     Key = "SecureKey"
 };

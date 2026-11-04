@@ -3,23 +3,23 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace SolTechnology.Core.Authentication
+namespace SolTechnology.Core.Auth
 {
     public static class ModuleInstaller
     {
-        public static IServiceCollection AddSolAuthentication(
+        public static IServiceCollection AddSolAuth(
             this IServiceCollection services,
-            AuthenticationConfiguration authenticationConfiguration)
+            AuthConfiguration authConfiguration)
         {
-            if (string.IsNullOrEmpty(authenticationConfiguration?.ApiKey))
+            if (string.IsNullOrEmpty(authConfiguration?.ApiKey))
             {
-                throw new ArgumentException($"The [{nameof(AuthenticationConfiguration)}{nameof(authenticationConfiguration.ApiKey)}] is missing. Provide it by parameter.");
+                throw new ArgumentException($"The [{nameof(AuthConfiguration)}{nameof(authConfiguration.ApiKey)}] is missing. Provide it by parameter.");
             }
 
-            var apiKey = authenticationConfiguration.ApiKey;
+            var apiKey = authConfiguration.ApiKey;
 
             services
-                .AddOptions<AuthenticationConfiguration>()
+                .AddOptions<AuthConfiguration>()
                 .Configure(config => config.ApiKey = apiKey)
                 .ValidateOnStart();
 

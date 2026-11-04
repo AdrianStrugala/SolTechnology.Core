@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authentication;
 
-namespace SolTechnology.Core.Authentication
+namespace SolTechnology.Core.Auth
 {
     public class ApiKeyAuthenticationSchemeOptions : AuthenticationSchemeOptions
     {

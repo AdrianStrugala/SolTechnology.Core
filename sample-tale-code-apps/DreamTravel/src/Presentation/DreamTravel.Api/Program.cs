@@ -17,7 +17,7 @@ using SolTechnology.Core.API.Filters;
 using SolTechnology.Core.API.HealthChecks;
 using SolTechnology.Core.API.Security;
 using SolTechnology.Core.SQL.HealthChecks;
-using SolTechnology.Core.Authentication;
+using SolTechnology.Core.Auth;
 using SolTechnology.Core.Cache;
 using SolTechnology.Core.CQRS;
 using SolTechnology.Core.Hangfire;
@@ -123,8 +123,8 @@ public class Program
         builder.Services.AddSolCQRS();
         builder.Services.AddSolPersistentEvents();
 
-        var authenticationConfiguration = builder.Configuration.GetRequiredSection("Authentication").Get<AuthenticationConfiguration>()!;
-        builder.Services.AddSolAuthentication(authenticationConfiguration);
+        var authConfiguration = builder.Configuration.GetRequiredSection("Authentication").Get<AuthConfiguration>()!;
+        builder.Services.AddSolAuth(authConfiguration);
 
         // SolTechnology.Core.Api one-liner — wires:
         //   - Header-based API versioning (X-API-VERSION) + per-version Swagger docs

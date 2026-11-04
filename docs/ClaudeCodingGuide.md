@@ -355,7 +355,7 @@ Rules:
 ### Filters / middleware
 
 - Use `ExceptionFilter` and `ResponseEnvelopeFilter` from `SolTechnology.Core.API` — register globally, never per-controller.
-- Authentication wiring goes through `AddAuthenticationAndBuildFilter(...)` from `SolTechnology.Core.Authentication`.
+- Authentication wiring goes through `AddSolAuth(...)` from `SolTechnology.Core.Auth`.
 - Custom middleware lives in `Middlewares/` in the API project.
 
 ---

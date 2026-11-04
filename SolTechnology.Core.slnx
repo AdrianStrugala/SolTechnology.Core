@@ -88,7 +88,7 @@
   <Folder Name="/Tests/">
     <File Path="tests\Directory.Build.props" />
     <Project Path="tests/SolTechnology.Core.API.Tests/SolTechnology.Core.API.Tests.csproj" />
-    <Project Path="tests/SolTechnology.Core.Authentication.Tests/SolTechnology.Core.Authentication.Tests.csproj" />
+    <Project Path="tests/SolTechnology.Core.Auth.Tests/SolTechnology.Core.Auth.Tests.csproj" />
     <Project Path="tests/SolTechnology.Core.HTTP.Tests/SolTechnology.Core.HTTP.Tests.csproj" />
     <Project Path="tests/SolTechnology.Core.AUID.Tests/SolTechnology.Core.AUID.Tests.csproj" />
     <Project Path="tests/SolTechnology.Core.Logging.Tests/SolTechnology.Core.Logging.Tests.csproj" />
@@ -107,7 +107,7 @@
     <Project Path="src/SolTechnology.Core.API.Testing/SolTechnology.Core.API.Testing.csproj" />
     <Project Path="src/SolTechnology.Core.HTTP/SolTechnology.Core.HTTP.csproj" />
     <Project Path="src/SolTechnology.Core.AUID/SolTechnology.Core.AUID.csproj" />
-    <Project Path="src/SolTechnology.Core.Authentication/SolTechnology.Core.Authentication.csproj" />
+    <Project Path="src/SolTechnology.Core.Auth/SolTechnology.Core.Auth.csproj" />
     <Project Path="src/SolTechnology.Core.Blob/SolTechnology.Core.Blob.csproj" />
     <Project Path="src/SolTechnology.Core.Cache/SolTechnology.Core.Cache.csproj" />
     <Project Path="src/SolTechnology.Core.CQRS/SolTechnology.Core.CQRS.csproj" />

@@ -1,12 +1,12 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-	  <Description>Secure your ASP.NET Core APIs in minutes with lightweight API-key and basic authentication — simple, configurable filters without the ceremony of full OAuth/OIDC. Fail-fast configuration validation at startup.</Description>
+	  <Description>Secure your ASP.NET Core APIs in minutes with lightweight API-key and basic authentication — simple, configurable filters without the ceremony of full OAuth/OIDC. Fail-fast configuration validation at startup. Formerly SolTechnology.Core.Authentication.</Description>
 	  <PackageTags>soltechnology core authentication authorization apikey basic-auth security aspnetcore middleware filters dotnet csharp</PackageTags>
-	  <Product>SolTechnology.Core.Authentication</Product>
-	  <Title>SolTechnology.Core Authentication</Title>
-	  <PackageId>SolTechnology.Core.Authentication</PackageId>
-	  <AssemblyName>SolTechnology.Core.Authentication</AssemblyName>
+	  <Product>SolTechnology.Core.Auth</Product>
+	  <Title>SolTechnology.Core Auth</Title>
+	  <PackageId>SolTechnology.Core.Auth</PackageId>
+	  <AssemblyName>SolTechnology.Core.Auth</AssemblyName>
 
 	  <PackageReadmeSource>Auth.md</PackageReadmeSource>
 	  <!-- NU1510: Packages from Directory.Build.props are already included in FrameworkReference -->

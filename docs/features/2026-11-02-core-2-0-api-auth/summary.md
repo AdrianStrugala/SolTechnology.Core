@@ -31,7 +31,7 @@ Gate history:
 
 | # | Title | File | Status |
 |---|---|---|---|
-| 01 | Auth — rename SolTechnology.Core.Authentication to SolTechnology.Core.Auth | [`steps/01-rename-authentication-to-auth.md`](steps/01-rename-authentication-to-auth.md) | to-do |
+| 01 | Auth — rename SolTechnology.Core.Authentication to SolTechnology.Core.Auth | [`steps/01-rename-authentication-to-auth.md`](steps/01-rename-authentication-to-auth.md) | done |
 | 02 | DI resolution test — Api and Auth | [`steps/02-di-resolution-test.md`](steps/02-di-resolution-test.md) | to-do |
 | 03 | Keep upstream URIs and query strings out of `ProblemDetails` and exception messages | [`steps/03-no-upstream-uri-in-problem-details.md`](steps/03-no-upstream-uri-in-problem-details.md) | to-do |
 | 04 | Auth — constant-time API-key comparison and per-instance logger | [`steps/04-constant-time-api-key-comparison.md`](steps/04-constant-time-api-key-comparison.md) | to-do |

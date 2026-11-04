@@ -115,7 +115,7 @@ from §3.
 | `SolTechnology.Core.Hangfire` | [`references/hangfire.md`](references/hangfire.md) |
 | `SolTechnology.Core.AUID` | [`references/auid.md`](references/auid.md) |
 | `SolTechnology.Core.Api` | [`references/api.md`](references/api.md) |
-| `SolTechnology.Core.Authentication` | [`references/authentication.md`](references/authentication.md) |
+| `SolTechnology.Core.Auth` | [`references/authentication.md`](references/authentication.md) |
 | `SolTechnology.Core.*.Testing` | [`references/testing-kits.md`](references/testing-kits.md) |
 
 If the diff touches a module without a reference file, write one (same shape as the existing

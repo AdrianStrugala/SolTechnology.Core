@@ -1,7 +1,7 @@
 ---
 spec: 2026-11-02-core-2-0-api-auth
 step: 01
-status: to-do
+status: done
 ---
 
 # Step 01: Auth — rename SolTechnology.Core.Authentication to SolTechnology.Core.Auth
@@ -66,24 +66,62 @@ no behaviour change. It runs first, so steps 02–10 edit the new paths. Semver:
 - Release notes and migration: the core brief's `C-28` row and "Release-notes inputs" entry; `docs/migration-2.0.md` gets the `C-28` section in release 05.
 
 ## Acceptance criteria
-- [ ] `dotnet build SolTechnology.Core.slnx -c Release` is green, and `cd sample-tale-code-apps/DreamTravel && dotnet build` is green.
-- [ ] `dotnet test tests/SolTechnology.Core.Auth.Tests` is green with both renamed tests.
-- [ ] `pwsh ./.github/runTests.ps1` lists `tests/SolTechnology.Core.Auth.Tests/SolTechnology.Core.Auth.Tests.csproj` and passes.
-- [ ] The DreamTravel component tests are green (`git ls-files 'sample-tale-code-apps/DreamTravel/tests/Component/*.csproj' | xargs -n1 dotnet test`).
-- [ ] `git ls-files src/SolTechnology.Core.Authentication tests/SolTechnology.Core.Authentication.Tests docs/icons/SolTechnology.Core.Authentication.png` prints nothing, and `git ls-files docs/icons/SolTechnology.Core.Auth.png` prints one line.
-- [ ] `git grep -n "SolTechnology.Core.Authentication" -- ':!docs/features' ':!nuget-stats.json'` prints only these intended mentions:
+- [x] `dotnet build SolTechnology.Core.slnx -c Release` is green, and `cd sample-tale-code-apps/DreamTravel && dotnet build` is green.
+- [x] `dotnet test tests/SolTechnology.Core.Auth.Tests` is green with both renamed tests.
+- [x] `pwsh ./.github/runTests.ps1` lists `tests/SolTechnology.Core.Auth.Tests/SolTechnology.Core.Auth.Tests.csproj` and passes.
+- [x] The DreamTravel component tests are green (`git ls-files 'sample-tale-code-apps/DreamTravel/tests/Component/*.csproj' | xargs -n1 dotnet test`).
+- [x] `git ls-files src/SolTechnology.Core.Authentication tests/SolTechnology.Core.Authentication.Tests docs/icons/SolTechnology.Core.Authentication.png` prints nothing, and `git ls-files docs/icons/SolTechnology.Core.Auth.png` prints one line.
+- [x] `git grep -n "SolTechnology.Core.Authentication" -- ':!docs/features' ':!nuget-stats.json'` prints only these intended mentions:
   - `dontreadme.md` — the deprecated-package row (durable).
   - `docs/Auth.md` — the migration note (durable).
   - `src/SolTechnology.Core.Auth/SolTechnology.Core.Auth.csproj` — the `<Description>` sentence "Formerly SolTechnology.Core.Authentication." (durable; nuget.org search).
   - `docs/architecture/authentication.md` — `:3` (temporary; step 11 removes it).
-- [ ] `git grep -nE "AddSolAuthentication|AuthenticationConfiguration\b" -- ':!docs/features'` prints only `dontreadme.md`, `docs/Auth.md` (migration note), `docs/architecture/authentication.md:6`, and `docs/architecture/naming-and-public-api.md:13` (the last two until step 11).
-- [ ] `dotnet pack SolTechnology.Core.slnx -c Release -o /tmp/auth-pack` produces `/tmp/auth-pack/SolTechnology.Core.Auth.2.0.0.nupkg` and no `SolTechnology.Core.Authentication.*.nupkg`, and `unzip -l` of the Auth package lists `lib/net10.0/SolTechnology.Core.Auth.dll`, `docs/readme.md`, `docs/icon.png`, and `buildTransitive/SolTechnology.Core.Auth.targets`.
-- [ ] `unzip -p /tmp/auth-pack/SolTechnology.Core.Auth.2.0.0.nupkg docs/icon.png | cmp - docs/icons/SolTechnology.Core.Auth.png` reports no difference.
-- [ ] SOLCORE001 still fires: a throwaway console project (not committed) that references `SolTechnology.Core.Auth` 2.0.0 from `/tmp/auth-pack` (as a local package source, with its 2.0.0 dependencies) and `SolTechnology.Core.Authentication` 1.x from nuget.org prints warning `SOLCORE001` on `dotnet build`; with only `SolTechnology.Core.Auth` 2.0.0 it prints none.
-- [ ] `SolTechnology.Core.Auth/ModuleInstaller.cs` registration diff against the old file shows only the renamed method, parameter, and type.
-- [ ] The PR uses a breaking Conventional Commit (`refactor(auth)!:` with a `BREAKING CHANGE:` footer naming `C-28`, per the [`commit-message`](../../../../.github/skills/commit-message/SKILL.md) skill).
+- [x] `git grep -nE "AddSolAuthentication|AuthenticationConfiguration\b" -- ':!docs/features'` prints only `dontreadme.md`, `docs/Auth.md` (migration note), `docs/architecture/authentication.md:6`, and `docs/architecture/naming-and-public-api.md:13` (the last two until step 11).
+- [x] `dotnet pack SolTechnology.Core.slnx -c Release -o /tmp/auth-pack` produces `/tmp/auth-pack/SolTechnology.Core.Auth.2.0.0.nupkg` and no `SolTechnology.Core.Authentication.*.nupkg`, and `unzip -l` of the Auth package lists `lib/net10.0/SolTechnology.Core.Auth.dll`, `docs/readme.md`, `docs/icon.png`, and `buildTransitive/SolTechnology.Core.Auth.targets`.
+- [x] `unzip -p /tmp/auth-pack/SolTechnology.Core.Auth.2.0.0.nupkg docs/icon.png | cmp - docs/icons/SolTechnology.Core.Auth.png` reports no difference.
+- [x] SOLCORE001 still fires: a throwaway console project (not committed) that references `SolTechnology.Core.Auth` 2.0.0 from `/tmp/auth-pack` (as a local package source, with its 2.0.0 dependencies) and `SolTechnology.Core.Authentication` 1.x from nuget.org prints warning `SOLCORE001` on `dotnet build`; with only `SolTechnology.Core.Auth` 2.0.0 it prints none.
+- [x] `SolTechnology.Core.Auth/ModuleInstaller.cs` registration diff against the old file shows only the renamed method, parameter, and type.
+- [x] The PR uses a breaking Conventional Commit (`refactor(auth)!:` with a `BREAKING CHANGE:` footer naming `C-28`, per the [`commit-message`](../../../../.github/skills/commit-message/SKILL.md) skill).
 
 ## Open questions
 - none (`C-28` confirmed by the user on 2026-11-03; the user asked the plan to carry `AuthenticationConfiguration` → `AuthConfiguration` inside that rename)
 
 ## Deviations
+
+### DreamTravel has no solution of its own
+
+**Original plan:** `cd sample-tale-code-apps/DreamTravel && dotnet build` is green.
+
+**Actual implementation:** `sample-tale-code-apps/DreamTravel` has no project or solution file at its root (`MSB1003`);
+its 38 projects are part of `SolTechnology.Core.slnx`, so `dotnet build SolTechnology.Core.slnx -c Release` (0 errors,
+only the pre-existing `ASPIRE010` warning) is the DreamTravel build, and `dotnet test SolTechnology.Core.slnx` ran the
+DreamTravel component tests (31 passed) with the rest of the suite (18 projects, 0 failed).
+
+### No `pwsh` on the macOS dev box
+
+**Original plan:** `pwsh ./.github/runTests.ps1` lists the Auth test project and passes.
+
+**Actual implementation:** PowerShell is not installed here, so the script was replayed in bash with the same logic
+(`dotnet sln SolTechnology.Core.slnx list` filtered to `tests/`, then `dotnet test --no-build` per project): it lists
+`tests/SolTechnology.Core.Auth.Tests/SolTechnology.Core.Auth.Tests.csproj`, and all 12 projects passed.
+
+### Pack output in the repository, not `/tmp`
+
+**Original plan:** pack into `/tmp/auth-pack` and point the SOLCORE001 project at it.
+
+**Actual implementation:** the session forbids `/tmp`, so the pack went to the git-excluded `.scratch/auth-pack` and the
+throwaway project to `.scratch/solcore-check` (isolated from the repository's `Directory.*.props` and with its own
+`RestorePackagesPath`); both were deleted afterwards. Results: `SolTechnology.Core.Auth.2.0.0.nupkg` and no
+`SolTechnology.Core.Authentication.*.nupkg`; the package lists `lib/net10.0/SolTechnology.Core.Auth.dll`,
+`docs/readme.md`, `docs/icon.png` (byte-identical to `docs/icons/SolTechnology.Core.Auth.png`) and
+`buildTransitive/SolTechnology.Core.Auth.targets`; `SOLCORE001` fires with `SolTechnology.Core.Authentication` 1.0.0
+added and not without it.
+
+### Two small files are recorded as delete + add
+
+**Original plan:** `git status` shows every moved file as `renamed`.
+
+**Actual implementation:** `AuthConfiguration.cs` (7 lines) and `ModuleInstallerTests.cs` are small and every renamed
+identifier sits on a changed line, so their similarity falls below git's default 50 % and `git status` reports them as
+delete + add; `git diff --cached -M20% --stat` pairs all seven moved files as renames. The other files, the csproj files
+and the icon show as `renamed`. Splitting the move and the edit into two commits would leave a commit that does not build.

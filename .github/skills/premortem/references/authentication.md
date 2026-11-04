@@ -1,4 +1,4 @@
-# Authentication — `src/SolTechnology.Core.Authentication/`
+# Auth — `src/SolTechnology.Core.Auth/`
 
 - Comparison change (hashing, encoding, trimming, case) → valid keys rejected, or invalid keys
   accepted.
