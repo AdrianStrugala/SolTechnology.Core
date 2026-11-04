@@ -77,9 +77,7 @@ public static class ModuleInstaller
 
             services.AddSingleton<IConnectionMultiplexer>(sp =>
             {
-                var config = sp.GetRequiredService<IOptions<DistributedCacheConfiguration>>().Value;
-                var redisOptions = ConfigurationOptions.Parse(config.ConnectionString);
-                // Redis down at start must not throw from every consumer; the multiplexer reconnects in the background.
+                var redisOptions = ConfigurationOptions.Parse(sp.GetRequiredService<IOptions<DistributedCacheConfiguration>>().Value.ConnectionString);
                 redisOptions.AbortOnConnectFail = false;
                 return ConnectionMultiplexer.Connect(redisOptions);
             });
