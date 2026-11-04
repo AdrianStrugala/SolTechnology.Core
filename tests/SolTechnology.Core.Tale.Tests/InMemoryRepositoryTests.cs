@@ -402,6 +402,26 @@ public class InMemoryRepositoryTests
         listed.Should().ContainSingle().Which.LeaseExpiresAt.Should().Be(expiry);
     }
 
+    [Test]
+    public async Task Repository_UpdateWithNewLeaseExpiresAt_StoresTheNewInstant()
+    {
+        // Arrange
+        var taleInstance = CreateTestTaleInstance();
+        var renewedExpiry = new DateTimeOffset(2026, 11, 3, 12, 10, 0, TimeSpan.Zero);
+        taleInstance.LeaseExpiresAt = renewedExpiry.AddMinutes(-5);
+        await _repository.Save(taleInstance, CancellationToken.None);
+        taleInstance.LeaseExpiresAt = renewedExpiry;
+
+        // Act
+        var saved = await _repository.Save(taleInstance, CancellationToken.None);
+
+        // Assert
+        saved.IsSuccess.Should().BeTrue();
+        var found = (await _repository.FindById(taleInstance.TaleId, CancellationToken.None))!;
+        found.LeaseExpiresAt.Should().Be(renewedExpiry);
+        found.Version.Should().Be(2);
+    }
+
     private TaleInstance CreateTestTaleInstance(Auid? taleId = null)
     {
         return new TaleInstance

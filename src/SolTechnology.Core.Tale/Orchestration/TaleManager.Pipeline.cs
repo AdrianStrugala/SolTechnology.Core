@@ -27,7 +27,7 @@ public partial class TaleManager
         {
             var prepared = taleId == Auid.Empty
                 ? NewRun<TInput, TContext, TOutput>(input)
-                : await new ResumableTaleLoader(repository, _timeProvider, logger)
+                : await new ResumableTaleLoader(repository, _timeProvider, RunningLeaseTimeout(scope.ServiceProvider), logger)
                     .Load<TInput, TContext, TOutput>(taleId, cancellationToken);
             if (prepared.IsFailure)
             {
@@ -46,6 +46,9 @@ public partial class TaleManager
             return Result<TaleInstance>.Fail($"Tale {typeof(THandler).Name} failed unexpectedly.");
         }
     }
+
+    private static TimeSpan RunningLeaseTimeout(IServiceProvider services) =>
+        (services.GetService<TaleOptions>() ?? TaleOptions.Default).RunningLeaseTimeout;
 
     private static Result<(TContext Context, TaleInstance? Instance)> NewRun<TInput, TContext, TOutput>(TInput? input)
         where TInput : class

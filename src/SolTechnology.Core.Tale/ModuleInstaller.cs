@@ -75,6 +75,7 @@ public static class ModuleInstaller
             {
                 services.AddSingleton(registry);
                 services.TryAddSingleton<ITaleRepository>(_ => new InMemoryTaleRepository());
+                services.TryAddSingleton<LeaseReadBackCheck>();
                 services.AddScoped<TaleManager>();
             }
 

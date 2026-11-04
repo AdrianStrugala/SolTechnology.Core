@@ -40,8 +40,10 @@ public interface ITaleRepository
     /// Never throws for a conflict.
     /// <para>
     /// Every property must be stored and returned exactly, in particular <see cref="TaleInstance.Version"/>
-    /// and <see cref="TaleInstance.LeaseExpiresAt"/> (the same instant, nullable, never replaced by a
-    /// database default or shifted by a time-zone conversion): the Running lease is decided from it.
+    /// and <see cref="TaleInstance.LeaseExpiresAt"/> (the same instant, nullable, on inserts and updates
+    /// alike, never replaced by a database default or shifted by a time-zone conversion): the Running
+    /// lease is decided from it. Once per host the run reads a claimed or renewed tale back and logs an
+    /// error when the stored expiry differs from the written one.
     /// A save whose outcome is unknown (it may have committed) must throw; never retry a conditional
     /// write that may have committed, and never report the caller's own write as a conflict, because
     /// the run would read that as a takeover by another run.

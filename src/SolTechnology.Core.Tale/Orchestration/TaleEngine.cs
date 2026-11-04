@@ -45,7 +45,8 @@ internal sealed class TaleEngine<TInput, TContext, TOutput>(
         _cancellationToken = cancellationToken;
         _persistence = repository == null
             ? null
-            : new(repository, _state, RunningLeaseTimeout, serviceProvider.GetRequiredService<IServiceScopeFactory>());
+            : new(repository, _state, RunningLeaseTimeout, serviceProvider.GetRequiredService<IServiceScopeFactory>(),
+                serviceProvider.GetService<LeaseReadBackCheck>(), logger);
         _reader = new(logger, _state, new(logger, _state, _handlerTypeName, isPersisted: _persistence != null));
 
         if (run.Resume != null)

@@ -168,7 +168,8 @@ var state = await taleManager.GetStoryState(taleId, cancellationToken);
 |---|---|
 | `WaitingForInput` | Runs from the paused chapter; completed chapters are skipped. |
 | `Running`, `LeaseExpiresAt` still ahead | `ConflictError` "Tale is already running". |
-| `Running`, `LeaseExpiresAt` passed or missing | Taken over: runs again from the first unfinished chapter. |
+| `Running`, `LeaseExpiresAt` missing, `LastUpdatedAt` + `RunningLeaseTimeout` still ahead | `ConflictError` "Tale is already running", plus a warning that the repository did not store `LeaseExpiresAt`. |
+| `Running`, `LeaseExpiresAt` passed, or missing and `LastUpdatedAt` + `RunningLeaseTimeout` passed | Taken over: runs again from the first unfinished chapter. |
 | `Failed` | `ConflictError`; fallbacks do not run again. |
 | `Completed` or `Cancelled` | Failure, nothing runs. |
 | saved by 1.x | Failure asking to restart the tale. |
@@ -196,8 +197,10 @@ only `LeaseExpiresAt` and `Version`, so a chapter may run longer than the timeou
 Until `LeaseExpiresAt` has passed, the tale belongs to that run and `ResumeStory` returns
 `ConflictError`. A host that crashes mid-run stops renewing and leaves the tale `Running`; once the
 lease has expired, `ResumeStory` takes it over and logs a warning with the expiry and the current
-time. A `Running` row without `LeaseExpiresAt`, written before the field existed, counts as
-expired. Completed chapters are skipped and the chapter that was running when the host died runs
+time. A `Running` row without `LeaseExpiresAt` (written before the field existed, or by a
+repository that drops it) is held until its `LastUpdatedAt` plus the reader's `RunningLeaseTimeout`,
+and each refusal in that window logs a warning that names the `ITaleRepository.Save` contract; after
+it the tale is taken over. Completed chapters are skipped and the chapter that was running when the host died runs
 again; when two calls take over at once, the version check lets exactly one win. Because the
 writer stamps the expiry, hosts with different `RunningLeaseTimeout` values respect each other's
 leases; only clock skew between hosts still shortens or lengthens a lease, so keep clocks
@@ -272,7 +275,7 @@ correlation ID, never the exception text.
 | `Save(instance, ct)` | Write only when the stored version (a missing tale counts as `0`) equals `instance.Version`; then store and set `Version + 1`. Otherwise, or when a new tale reuses another tale's idempotency key, return `Result.Fail(new ConflictError { ... })` without writing. |
 | `FindById`, `FindByIdempotencyKey` | Return a copy, or `null` when missing. |
 | `Version` | Store and return it exactly; the conditional `Save` depends on it. |
-| `LeaseExpiresAt` | Nullable `DateTimeOffset`. Store and return the same instant on every `Save`, renewals included; never fill it from a database default, never drop it, and never shift it through a local time zone (for text columns write round-trip ISO 8601 with offset, `"O"`, and parse with `DateTimeStyles.AssumeUniversal`). `ResumeStory` decides the lease from it. |
+| `LeaseExpiresAt` | Nullable `DateTimeOffset`. Store and return the same instant on every `Save`, inserts and updates (claims, renewals) alike; never fill it from a database default, never drop it, and never shift it through a local time zone. Prefer a `datetimeoffset` / `timestamptz` column; with a `DateTime` column write `UtcDateTime` and read it back with `new DateTimeOffset(DateTime.SpecifyKind(value, DateTimeKind.Utc))`; with a text column write round-trip ISO 8601 with offset, `"O"`, and parse with `DateTimeStyles.AssumeUniversal`. `ResumeStory` decides the lease from it. |
 | `LastUpdatedAt` | Store and return it unchanged, in UTC. |
 | Unknown outcome | A `Save` that may have committed (lost acknowledgement, cancellation after commit) must throw. Never retry a conditional write that may have committed, and never report the caller's own write as a conflict: the run would read it as a takeover and stop. |
 | `List(...)` | Optional; the default throws `NotSupportedException`. |
@@ -284,6 +287,15 @@ from a fresh DI scope while a chapter runs, so a `Scoped` repository over a `DbC
 used by a renewal and a chapter at the same time. The DreamTravel sample's `SQLiteTaleRepository`
 is a reference implementation with `Version` and nullable `LeaseExpiresAt` columns, both added on
 start to existing files, and a conditional `UPDATE`.
+
+Once per host (DI container), after the first claim of a new tale, the first claim of a resumed tale
+and the first lease renewal, the run reads the tale back through the repository that saved it. When
+the stored `Version` equals the written one and `LeaseExpiresAt` differs by more than one second, it
+logs an error: `Tale [<id>] LeaseExpiresAt read back from [<repository>] after the [<ClaimByInsert |
+ClaimByUpdate | Renewal>] is [<stored>] but [<written>] was written; ITaleRepository.Save must store
+LeaseExpiresAt unchanged, or another host may take over a live tale`. A read that returns no row or
+another version (a lagging replica) skips the check, and the check never fails the run. Treat that
+error as a repository bug to fix before running more than one host.
 
 #### Logging
 
@@ -298,8 +310,8 @@ and full type name. Finish or cancel in-flight tales first, then cut every Tale 
 step: stop all 1.x hosts before a 2.x host serves tale traffic. Do not roll back to 1.x once a 2.x
 host has written tale state; 2.x stores Tale error types, `StepIndex` and `Version` that 1.x cannot
 read or preserve. Custom repositories add the `Version` column, a nullable `LeaseExpiresAt` column,
-and the conditional `Save` above; existing rows keep `LeaseExpiresAt` empty, which counts as an
-expired lease.
+and the conditional `Save` above; existing rows keep `LeaseExpiresAt` empty, so a `Running` row
+is held until its `LastUpdatedAt` plus `RunningLeaseTimeout` and taken over afterwards.
 
 ### Testing
 

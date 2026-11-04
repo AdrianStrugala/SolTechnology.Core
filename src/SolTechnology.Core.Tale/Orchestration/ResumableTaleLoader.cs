@@ -10,11 +10,15 @@ namespace SolTechnology.Core.Tale.Orchestration;
 /// <summary>
 /// Loads a stored tale for <c>ResumeStory</c>: rejects tales that cannot be resumed and restores the
 /// typed context from its JSON. A Running tale is resumable only once its stored
-/// <see cref="TaleInstance.LeaseExpiresAt"/> has passed; a missing expiry counts as expired.
+/// <see cref="TaleInstance.LeaseExpiresAt"/> has passed. A Running tale without a stored expiry (a
+/// repository that drops the field, or a row written before it existed) is held until its
+/// <see cref="TaleInstance.LastUpdatedAt"/> plus this host's <see cref="TaleOptions.RunningLeaseTimeout"/>,
+/// so a broken repository fails closed instead of handing a live run to a second host.
 /// </summary>
 internal sealed class ResumableTaleLoader(
     ITaleRepository repository,
     TimeProvider timeProvider,
+    TimeSpan runningLeaseTimeout,
     ILogger logger)
 {
     public async Task<Result<(TContext Context, TaleInstance? Instance)>> Load<TInput, TContext, TOutput>(
@@ -71,6 +75,27 @@ internal sealed class ResumableTaleLoader(
     };
 
     // The writer stamped the expiry with its own timeout, so hosts with different timeouts agree.
-    private bool IsLeaseHeld(TaleInstance running) =>
-        running.LeaseExpiresAt is { } expiresAt && expiresAt > timeProvider.GetUtcNow();
+    private bool IsLeaseHeld(TaleInstance running)
+    {
+        var now = timeProvider.GetUtcNow();
+        if (running.LeaseExpiresAt is { } expiresAt)
+        {
+            return expiresAt > now;
+        }
+
+        var fallbackExpiresAt = AsUtc(running.LastUpdatedAt) + runningLeaseTimeout;
+        if (fallbackExpiresAt <= now)
+        {
+            return false;
+        }
+
+        logger.LogWarning("Tale [{TaleId}] is Running without a stored LeaseExpiresAt; refusing takeover until [{FallbackLeaseExpiresAt}] (LastUpdatedAt plus RunningLeaseTimeout [{RunningLeaseTimeout}]). ITaleRepository.Save must store LeaseExpiresAt",
+            running.TaleId, fallbackExpiresAt, runningLeaseTimeout);
+        return true;
+    }
+
+    // A DateTime of unspecified kind is read as UTC, never in the host's local zone.
+    private static DateTimeOffset AsUtc(DateTime value) => value.Kind == DateTimeKind.Local
+        ? new DateTimeOffset(value)
+        : new DateTimeOffset(DateTime.SpecifyKind(value, DateTimeKind.Utc));
 }

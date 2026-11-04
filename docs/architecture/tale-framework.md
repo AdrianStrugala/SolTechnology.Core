@@ -90,8 +90,11 @@ cancelled run still stores `Cancelled`.
 `TaleInstance.LeaseExpiresAt` = the injected `TimeProvider`'s UTC now + `TaleOptions.RunningLeaseTimeout`
 (default 5 minutes, range 1 second to 49 days); saving any other status stores `null`, and
 `CancelStory` clears it too. `ResumeStory` refuses a `Running` tale whose `LeaseExpiresAt` lies
-ahead and takes over one whose expiry has passed or is missing (rows written before the field
-existed), logging a warning with the expiry and the current time: a host that crashed mid-run would
+ahead and takes over one whose expiry has passed, logging a warning with the expiry and the
+current time. A `Running` row without an expiry (written before the field existed, or by a
+repository that drops it) fails closed: it is held until its `LastUpdatedAt` (read as UTC) plus the
+reader's `RunningLeaseTimeout`, with a warning naming the repository contract on every refusal, and
+taken over afterwards. Takeover exists because a host that crashed mid-run would
 otherwise leave the tale stuck, since cancelling and restarting loses its progress. The takeover is
 an ordinary claim at the version it read, so of two concurrent takeovers exactly one wins, and a
 still-alive original run stops at its next save or renewal with `ConflictError`. Completed chapters
@@ -99,7 +102,13 @@ are skipped; the interrupted chapter runs again, so chapters with side effects m
 The expiry is persisted rather than derived from `LastUpdatedAt`, so the writer's timeout decides
 it and hosts configured with different timeouts agree; `LastUpdatedAt` keeps meaning the last state
 save. The cost is a persisted field that every custom repository must store exactly; clock skew
-between hosts still shortens or lengthens a lease.
+between hosts still shortens or lengthens a lease. A repository that drops the field or shifts it
+compiles and passes single-host tests, so the internal `LeaseReadBackCheck` (one per DI container)
+reads the tale back after the first claim by insert, the first claim by update and the first lease
+renewal of the host, and logs an error naming the written and the stored value when they differ by
+more than one second at the same `Version`. It logs instead of failing the run, because a lagging
+replica or a lower-precision column must not stop healthy hosts; it is the runtime substitute for a
+repository conformance test kit.
 
 While the steps of a persisted run execute, the internal `TaleLeaseHeartbeat` renews the lease on a
 `TimeProvider` timer every third of `RunningLeaseTimeout`, which leaves two missed renewals of

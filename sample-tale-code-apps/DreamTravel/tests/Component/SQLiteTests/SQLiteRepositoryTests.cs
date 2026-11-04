@@ -132,6 +132,26 @@ public class SQLiteRepositoryTests
     }
 
     [Test]
+    public async Task Save_UpdateWithNewLeaseExpiresAt_StoresTheNewInstant()
+    {
+        // Arrange
+        var running = NewTale(TaleStatus.Running);
+        var renewedExpiry = new DateTimeOffset(2026, 11, 3, 12, 10, 0, TimeSpan.Zero);
+        running.LeaseExpiresAt = renewedExpiry.AddMinutes(-5);
+        await _repository.Save(running, CancellationToken.None);
+        running.LeaseExpiresAt = renewedExpiry;
+
+        // Act
+        var saved = await _repository.Save(running, CancellationToken.None);
+
+        // Assert
+        saved.IsSuccess.Should().BeTrue();
+        var stored = (await _repository.FindById(running.TaleId, CancellationToken.None))!;
+        stored.LeaseExpiresAt.Should().Be(renewedExpiry);
+        stored.Version.Should().Be(2);
+    }
+
+    [Test]
     public async Task Constructor_DatabaseWithoutLeaseExpiresAtColumn_MigratesAndStoresTheLease()
     {
         // Arrange

@@ -48,9 +48,10 @@ public class TaleInstance
     /// When the Running lease of the run that last saved this tale expires, in UTC; <c>null</c> for
     /// every status other than <see cref="TaleStatus.Running"/>. The claim save and every lease renewal
     /// set it to the writer's clock plus the writer's <see cref="TaleOptions.RunningLeaseTimeout"/>.
-    /// <c>ResumeStory</c> refuses a Running tale until this instant has passed and treats a missing
-    /// value (a row written before the field existed) as expired. Repositories must store and return
-    /// the instant unchanged.
+    /// <c>ResumeStory</c> refuses a Running tale until this instant has passed. A missing value (a row
+    /// written before the field existed, or by a repository that drops it) holds the tale until
+    /// <see cref="LastUpdatedAt"/> plus the reader's <see cref="TaleOptions.RunningLeaseTimeout"/> and logs
+    /// a warning. Repositories must store and return the instant unchanged on inserts and updates.
     /// </summary>
     public DateTimeOffset? LeaseExpiresAt { get; set; }
 

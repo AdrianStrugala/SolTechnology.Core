@@ -118,10 +118,12 @@ public class TaleRunningLeaseTests
     }
 
     [Test]
-    public async Task Resume_RunningWithoutLeaseExpiry_TreatsLeaseAsExpired()
+    public async Task Resume_RunningWithoutLeaseExpirySavedBeforeTimeout_TakesOver()
     {
         // Arrange
-        var taleId = await LeaveRunningByCrashedHost(leaseExpiresAt: null);
+        var taleId = await LeaveRunningByCrashedHost(
+            leaseExpiresAt: null,
+            lastUpdatedAt: _clock.GetUtcNow().UtcDateTime - Lease);
 
         // Act
         var resume = await Resume(taleId);
