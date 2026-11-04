@@ -38,7 +38,7 @@ Gate history:
 | 05 | Api — keep 201/202 in `ResultConversionFilter`; real filter registration | [`steps/05-api-result-filter-status-preservation.md`](steps/05-api-result-filter-status-preservation.md) | done |
 | 06 | Auth and Api — public surface cleanup | [`steps/06-auth-api-public-surface.md`](steps/06-auth-api-public-surface.md) | done |
 | 07 | XML docs shipped — API, Auth | [`steps/07-xml-docs.md`](steps/07-xml-docs.md) | done |
-| 08 | Module docs — Api and Auth | [`steps/08-docs-api-auth.md`](steps/08-docs-api-auth.md) | to-do |
+| 08 | Module docs — Api and Auth | [`steps/08-docs-api-auth.md`](steps/08-docs-api-auth.md) | done |
 | 09 | Guide conformance — Api and Auth | [`steps/09-conform-api-auth.md`](steps/09-conform-api-auth.md) | to-do |
 | 10 | Log templates — `[{Placeholder}]` in Api (L-03) | [`steps/10-log-template-brackets.md`](steps/10-log-template-brackets.md) | to-do |
 | 11 | Retrospective | [`steps/11-retrospective.md`](steps/11-retrospective.md) | to-do |

@@ -20,34 +20,34 @@ versions itself by header, and propagates a correlation id from log to wire — 
   App Insights.
 - **Log-level alignment** — mapped 4xx → `Warning`, mapped 5xx → `Error`, unmapped exceptions →
   `Critical` + rethrow. Smart-detection in Sentry / App Insights sees real faults, not noise.
-- **One-call bootstrap** — `AddApiCore` + `AddApiCoreFilters` + `UseSwaggerWithVersioning`
+- **One-call bootstrap** — `AddSolApiCore` + `AddSolApiCoreFilters` + `UseSolSwaggerWithVersioning`
   replaces ~30 lines of plumbing.
 - **Testing companion** — `SolTechnology.Core.API.Testing` ships `APIFixture<TEntryPoint>` so test-host
   dependencies never leak into production assemblies.
 
 ### Registration
 
-Reference the NuGet package and call `AddApiCore` once:
+Reference the NuGet package and call `AddSolApiCore` once:
 
 ```csharp
-builder.Services.AddApiCore(
+builder.Services.AddSolApiCore(
     o => o.IncludeExceptionDetails = builder.Environment.IsDevelopment(),
     apiTitle: "DreamTravel API",
     defaultMajorVersion: 1);
 
-builder.Services.AddControllers(opts => opts.AddApiCoreFilters());
+builder.Services.AddControllers(opts => opts.AddSolApiCoreFilters());
 
 var app = builder.Build();
-app.UseSwaggerWithVersioning("DreamTravel API");
+app.UseSolSwaggerWithVersioning("DreamTravel API");
 ```
 
 If you want finer control, compose the lower-level extensions yourself:
 
 ```csharp
-builder.Services.AddApiExceptionHandling(o =>
+builder.Services.AddSolApiExceptionHandling(o =>
     o.IncludeExceptionDetails = builder.Environment.IsDevelopment());
-builder.Services.AddVersioning(defaultMajorVersion: 1, apiTitle: "DreamTravel API");
-builder.Services.AddControllers(o => o.AddApiCoreFilters());
+builder.Services.AddSolVersioning(defaultMajorVersion: 1, apiTitle: "DreamTravel API");
+builder.Services.AddControllers(o => o.AddSolApiCoreFilters());
 ```
 
 For integration tests, additionally reference `SolTechnology.Core.API.Testing`.
@@ -69,17 +69,24 @@ builder.Services.Configure<ApiExceptionOptions>(o =>
 
 #### Returning `Result<T>` from controllers
 
-Handlers and controllers return `Result<T>` from `SolTechnology.Core.CQRS`. The filter does the
-wire conversion:
+Controllers send the query through the CQRS `IMediator` and return its `Result<T>` (from
+`SolTechnology.Core`); the filter does the wire conversion:
 
 ```csharp
 [ApiController]
 [Route("api/[controller]")]
-public class TripsController(IQueryHandler<GetTripQuery, Trip> handler) : ControllerBase
+public class TripsController(IMediator mediator) : ControllerBase
 {
     [HttpGet("{id}")]
-    public Task<Result<Trip>> Get(int id, CancellationToken ct)
-        => handler.Handle(new GetTripQuery { Id = id }, ct);
+    public Task<Result<Trip>> Get(int id)
+        => mediator.Send(new GetTripQuery { Id = id }, HttpContext.RequestAborted);
+
+    [HttpPost]
+    public async Task<IActionResult> Create(CreateTripCommand command)
+    {
+        var result = await mediator.Send(command, HttpContext.RequestAborted);
+        return CreatedAtAction(nameof(Get), new { id = result.Data?.Id }, result);
+    }
 }
 ```
 
@@ -88,8 +95,9 @@ Behaviour matrix:
 | Action returns / throws | HTTP outcome |
 |---|---|
 | `Result<T>.Success(data)` | `200 OK`, body = raw DTO |
+| `CreatedAtAction(…, Result<T>.Success(data))` / `Accepted(…)` | `201` / `202` with the `Location` header, body = raw DTO |
 | `Result.Success()` | `204 No Content` |
-| `Result<T>.Fail(error)` | `ProblemDetails` at `error.StatusCode` (default `500`) |
+| `Result<T>.Fail(error)` | `ProblemDetails` at the status of the `Error` subtype (table below; default `500`) |
 | Throws `FluentValidation.ValidationException` | `400` `ValidationProblemDetails` |
 | Throws a mapped exception | `ProblemDetails` at the mapped status |
 | Throws an unmapped exception | `LogCritical` + rethrow to host |
@@ -98,11 +106,11 @@ Behaviour matrix:
 #### Failure semantics — `Error` subtypes
 
 ```csharp
-public Task<Result<Trip>> Handle(GetTripQuery q, CancellationToken ct)
+public Task<Result<Trip>> Handle(GetTripQuery query, CancellationToken cancellationToken)
 {
-    var trip = _trips.Find(q.Id);
+    var trip = trips.Find(query.Id);
     return trip is null
-        ? Result<Trip>.FailAsTask(new NotFoundError { Message = $"Trip {q.Id} not found." })
+        ? Result<Trip>.FailAsTask(new NotFoundError { Message = $"Trip {query.Id} not found." })
         : Result<Trip>.SuccessAsTask(trip);
 }
 ```
@@ -188,7 +196,18 @@ Default mapping covers common BCL / FluentValidation types:
 | `UnauthorizedAccessException` | 403 |
 | `KeyNotFoundException` | 404 |
 | `NotImplementedException` | 501 |
+| `HttpRequestException` (incl. `SolTechnology.Core.HTTP`'s `HttpRequestFailedException`) | 504 when the upstream returned 408 or 504, otherwise 502 |
 | anything else | `LogCritical` + rethrow |
+
+The `ProblemDetails.title` of a mapped exception never echoes server or upstream text, which can hold
+URIs, query strings and keys:
+
+| Status | `title` |
+|---|---|
+| 4xx | the exception message (`ValidationException`: "One or more validation errors occurred.") |
+| 502 | "Upstream dependency failed" |
+| 504 | "Upstream dependency timed out" |
+| any other 5xx | "An unexpected error occurred" |
 
 #### API versioning
 
@@ -216,7 +235,7 @@ httpClient.DefaultRequestHeaders.Add("X-API-VERSION", "2.0");
 var response = await httpClient.GetAsync("api/trips");
 ```
 
-`UseSwaggerWithVersioning(...)` exposes one Swagger document per version, newest first, with
+`UseSolSwaggerWithVersioning(...)` exposes one Swagger document per version, newest first, with
 deprecation badges on the dropdown.
 
 #### CorrelationId
@@ -288,8 +307,8 @@ Override services at boot — e.g. swap a background publisher for a determinist
 ```csharp
 var fixture = new APIFixture<Program>(configuration, services =>
 {
-    services.RemoveAll<IHangfireNotificationPublisher>();
-    services.AddSingleton<IHangfireNotificationPublisher, SyncHangfireNotificationPublisher>();
+    services.RemoveAll<INotificationPublisher>();
+    services.AddSingleton<INotificationPublisher, SyncNotificationPublisher>();
 });
 ```
 
@@ -314,10 +333,11 @@ var fixture = new APIFixture<Program>(configuration, services =>
 
 ### What ships in DI
 
-`AddApiCore` registers (and `AddApiExceptionHandling` registers a subset of) the following:
+`AddSolApiCore` registers (and `AddSolApiExceptionHandling` registers a subset of) the following:
 
-- `ExceptionFilter` — exception → `ProblemDetails`; rethrows the unmapped.
-- `ResultConversionFilter` — `Result<T>` → wire format.
+- `ExceptionFilter` — exception → `ProblemDetails`; rethrows the unmapped. Scoped; `AddSolApiCoreFilters`
+  resolves it from DI.
+- `ResultConversionFilter` — `Result<T>` → wire format. Scoped; resolved the same way.
 - `IExceptionStatusCodeMapper` (default `DefaultExceptionStatusCodeMapper`, `TryAddSingleton`).
 - `ApiExceptionOptions` bound through `IOptions<>`.
 - ASP.NET Core's `AddProblemDetails()` for paths that bypass MVC (routing 404, auth challenges,
@@ -332,12 +352,12 @@ wins.
 
 ### Security headers
 
-`UseSecurityHeaders()` stamps a strict baseline of security headers on **every** response — including
+`UseSolSecurityHeaders()` stamps a strict baseline of security headers on **every** response — including
 error responses produced by the ProblemDetails pipeline. It is a pipeline (`Use…`) concern the host
-opts into; it is NOT wired into `AddApiCore` automatically.
+opts into; it is NOT wired into `AddSolApiCore` automatically.
 
 ```csharp
-app.UseSecurityHeaders();
+app.UseSolSecurityHeaders();
 ```
 
 | Header | Default value | Purpose |
@@ -355,7 +375,7 @@ Swagger UI and Redoc need inline scripts/styles. By default, paths prefixed with
 strict policy remains on all other paths.
 
 ```csharp
-app.UseSecurityHeaders(o =>
+app.UseSolSecurityHeaders(o =>
 {
     // Add a custom docs path
     o.RelaxedPathPrefixes.Add("/my-docs");
@@ -377,19 +397,19 @@ app.UseSecurityHeaders(o =>
 
 ### Health endpoint
 
-`MapCoreHealthChecks(path)` maps an ASP.NET health endpoint that renders the registered checks as
+`MapSolHealthChecks(path)` maps an ASP.NET health endpoint that renders the registered checks as
 JSON via `HealthReportJsonFormatter`. Health checks live **next to the module they probe** — there
 is no foundation package. Compose with the framework `AddHealthChecks()` and chain the per-module
 checks, then map the endpoint:
 
 ```csharp
 builder.Services.AddHealthChecks()
-    .AddSqlHealthCheck()            // Core.SQL
-    .AddRedisHealthCheck()          // Core.Cache
-    .AddServiceBusHealthCheck()     // Core.MessageBus
-    .AddUpstreamHttpHealthCheck<MyReport>("payments", "https://payments/health"); // Core.HTTP
+    .AddSolSqlHealthCheck()                                        // Core.SQL
+    .AddSolRedisHealthCheck()                                      // Core.Cache
+    .AddSolServiceBusHealthCheck()                                 // Core.MessageBus
+    .AddSolUpstreamHttpHealthCheck<PaymentsHealthCheck>("payments"); // Core.HTTP
 
-app.MapCoreHealthChecks("/health");
+app.MapSolHealthChecks("/health");
 ```
 
 Status codes follow the framework default: **200** for `Healthy`/`Degraded`, **503** for
@@ -407,7 +427,7 @@ Status codes follow the framework default: **200** for `Healthy`/`Degraded`, **5
 ```
 
 `HealthReportJsonFormatter.Format(report)` is a **pure** `HealthReport` → JSON formatter (no
-`HttpContext`), so it is independently testable and reusable; `MapCoreHealthChecks` is the thin
+`HttpContext`), so it is independently testable and reusable; `MapSolHealthChecks` is the thin
 ASP.NET adapter. This is the only ASP.NET-coupled piece of the health-check feature — the per-module
 checks reference the framework-agnostic `Microsoft.Extensions.Diagnostics.HealthChecks` directly.
 
