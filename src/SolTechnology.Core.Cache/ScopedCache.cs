@@ -23,10 +23,6 @@ namespace SolTechnology.Core.Cache
         public async Task<TItem> GetOrAdd(TKey key, Func<TKey, Task<TItem>> factory)
         {
             var keyString = System.Text.Json.JsonSerializer.Serialize(key);
-            if (string.IsNullOrWhiteSpace(keyString))
-            {
-                throw new ArgumentOutOfRangeException(nameof(key), "Cache keys cannot be null or whitespace");
-            }
 
             var lazyItem = _cache.GetOrAdd(keyString, _ =>
                 new Lazy<Task<TItem>>(() => factory(key), LazyThreadSafetyMode.ExecutionAndPublication));
