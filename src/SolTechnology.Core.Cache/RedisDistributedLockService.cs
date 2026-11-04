@@ -51,7 +51,8 @@ internal sealed class RedisDistributedLockService(
 
     /// <summary>
     /// Release handle — deletes the key only if the value still matches (our fencing token).
-    /// This prevents releasing a lock that expired and was re-acquired by another instance.
+    /// This prevents releasing a lock that expired and was re-acquired by another instance; such a
+    /// release logs a warning. Disposing twice releases once.
     /// </summary>
     private sealed class LockHandle(IDatabase db, string key, string value, ILogger logger) : IAsyncDisposable
     {
@@ -64,12 +65,26 @@ internal sealed class RedisDistributedLockService(
             end
             """;
 
+        private int _released;
+
         public async ValueTask DisposeAsync()
         {
+            if (Interlocked.Exchange(ref _released, 1) == 1)
+            {
+                return;
+            }
+
             try
             {
-                await db.ScriptEvaluateAsync(ReleaseScript, [(RedisKey)key], [(RedisValue)value]);
-                logger.LogDebug("Lock released: [{LockKey}]", key);
+                var deleted = (int)await db.ScriptEvaluateAsync(ReleaseScript, [(RedisKey)key], [(RedisValue)value]);
+                if (deleted == 1)
+                {
+                    logger.LogDebug("Lock released: [{LockKey}]", key);
+                }
+                else
+                {
+                    logger.LogWarning("Lock [{LockKey}] expired before release", key);
+                }
             }
             catch (Exception ex)
             {

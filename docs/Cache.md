@@ -155,7 +155,7 @@ public class SettlementPoller(IDistributedLockService locks)
 |---|---|
 | Acquired | Returns an `IAsyncDisposable`; disposing it releases the lock. Disposing twice is harmless. |
 | Held by another caller | Returns `null` at once; never waits. |
-| Expiry passed | The lock is free again: Redis deletes the key, and the in-process lock lets the next `TryAcquireLock` take it over. Disposing the expired handle does not release the new holder (fencing). |
+| Expiry passed | The lock is free again: Redis deletes the key, and the in-process lock lets the next `TryAcquireLock` take it over. Disposing the expired handle does not release the new holder (fencing); the Redis lock logs the warning `Lock [{LockKey}] expired before release`, a sign that the expiry is shorter than the work. |
 | Backend failure | Returns `null` and logs a warning; never throws. |
 | Expiry zero, negative, or over 365 days | Throws `ArgumentOutOfRangeException` before the lock is touched; both implementations apply the same rule. |
 | Caller cancellation | Throws `OperationCanceledException`. |
