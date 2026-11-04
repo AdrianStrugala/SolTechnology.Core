@@ -11,7 +11,9 @@ the same Redis.
 - **Failures are not cached** — a faulted or cancelled factory result is evicted, so the next call retries.
 - **Type-namespaced keys** — the same key value used with different `TKey`/`TItem` types never shares an entry,
   and keys carry no assembly versions, so a redeploy keeps the cache warm.
-- **Fail-open Redis cache** — a Redis error logs a warning and the factory result is returned uncached.
+- **Fail-open Redis cache** — a Redis error logs a warning and the factory result is returned uncached. Redis being down
+  when the host starts does not stop it: the shared connection is opened with `abortConnect=false` (overriding the
+  connection string) and keeps reconnecting in the background.
 - **Distributed lock** — `TryAcquireLock` with expiry and fencing, in-process or Redis `SET NX`.
 - **Idempotency store** — reserve, replay, and release request keys, in-process or in Redis.
 - **Fail-fast configuration** — an empty `InstanceName` or `ConnectionString`, or `ExpirationSeconds <= 0`, stops the
@@ -52,7 +54,7 @@ builder.Services.AddSolLocalIdempotency();
 
 | `DistributedCacheConfiguration` | Default | Purpose |
 |---|---|---|
-| `ConnectionString` | — | StackExchange.Redis connection string; must not be empty. |
+| `ConnectionString` | — | StackExchange.Redis connection string; must not be empty. `abortConnect` is always `false`. |
 | `InstanceName` | — | Prefix of every Redis key the package writes; must not be empty. |
 | `ExpirationSeconds` | `300` | Absolute lifetime of an `IRedisCache` entry; must be greater than 0. |
 

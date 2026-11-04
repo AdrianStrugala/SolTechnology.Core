@@ -1,6 +1,7 @@
 ﻿﻿﻿﻿﻿﻿using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Caching.StackExchangeRedis;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using StackExchange.Redis;
 
 namespace SolTechnology.Core.Cache;
@@ -45,7 +46,9 @@ public static class ModuleInstaller
 
         /// <summary>
         /// Registers <see cref="IRedisCache"/>, the framework <c>IDistributedCache</c> for Redis, and one shared
-        /// <see cref="IConnectionMultiplexer"/>. The configuration is validated at host start.
+        /// <see cref="IConnectionMultiplexer"/>. The configuration is validated at host start. The connection is
+        /// opened with <c>abortConnect=false</c>, whatever the connection string says, so Redis being down at start
+        /// does not throw: consumers fail open and the connection keeps retrying in the background.
         /// </summary>
         /// <param name="configuration">Redis settings; <c>ConnectionString</c> and <c>InstanceName</c> must not be empty.</param>
         public IServiceCollection AddSolDistributedCache(DistributedCacheConfiguration configuration)
@@ -72,8 +75,14 @@ public static class ModuleInstaller
                 .Configure<IServiceProvider>((options, provider) => options.ConnectionMultiplexerFactory =
                     () => Task.FromResult(provider.GetRequiredService<IConnectionMultiplexer>()));
 
-            services.AddSingleton<IConnectionMultiplexer>(_ =>
-                ConnectionMultiplexer.Connect(configuration.ConnectionString));
+            services.AddSingleton<IConnectionMultiplexer>(sp =>
+            {
+                var config = sp.GetRequiredService<IOptions<DistributedCacheConfiguration>>().Value;
+                var redisOptions = ConfigurationOptions.Parse(config.ConnectionString);
+                // Redis down at start must not throw from every consumer; the multiplexer reconnects in the background.
+                redisOptions.AbortOnConnectFail = false;
+                return ConnectionMultiplexer.Connect(redisOptions);
+            });
 
             services.AddSingleton<IRedisCache, RedisCache>();
 

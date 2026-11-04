@@ -12,8 +12,7 @@ namespace SolTechnology.Core.Cache.Tests;
 [TestFixture]
 public class ModuleResolutionTests
 {
-    // abortConnect=false: ConnectionMultiplexer.Connect is eager, and no Redis server runs here.
-    private const string UnreachableRedis = "localhost:1,abortConnect=false,connectTimeout=100";
+    private const string UnreachableRedis = "localhost:1,connectTimeout=100";
 
     private static readonly ServiceProviderOptions StrictValidation = new()
     {
