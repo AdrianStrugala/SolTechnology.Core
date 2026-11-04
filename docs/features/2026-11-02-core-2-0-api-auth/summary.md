@@ -40,5 +40,5 @@ Gate history:
 | 07 | XML docs shipped — API, Auth | [`steps/07-xml-docs.md`](steps/07-xml-docs.md) | done |
 | 08 | Module docs — Api and Auth | [`steps/08-docs-api-auth.md`](steps/08-docs-api-auth.md) | done |
 | 09 | Guide conformance — Api and Auth | [`steps/09-conform-api-auth.md`](steps/09-conform-api-auth.md) | done |
-| 10 | Log templates — `[{Placeholder}]` in Api (L-03) | [`steps/10-log-template-brackets.md`](steps/10-log-template-brackets.md) | to-do |
+| 10 | Log templates — `[{Placeholder}]` in Api (L-03) | [`steps/10-log-template-brackets.md`](steps/10-log-template-brackets.md) | done |
 | 11 | Retrospective | [`steps/11-retrospective.md`](steps/11-retrospective.md) | to-do |

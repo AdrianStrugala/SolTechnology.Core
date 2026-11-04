@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Abstractions;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Routing;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
 using NSubstitute;
@@ -133,6 +134,55 @@ public sealed class ExceptionFilterTests
         problem.Errors.Should().ContainKey("Email");
         problem.Errors["Email"].Should().HaveCount(2, "multiple failures on the same field collect together");
         problem.Errors.Should().ContainKey("Age");
+    }
+
+    // L-03: every placeholder is bracketed; the property names stay the same.
+    [TestCase(true, LogLevel.Warning, "Unhandled exception in [{RequestMethod}] [{RequestPath}] → [{StatusCode}]")]
+    [TestCase(false, LogLevel.Critical, "Unmapped exception of type [{ExceptionType}] in [{RequestMethod}] [{RequestPath}] — rethrowing to host pipeline. Add an explicit mapping if this exception type is expected.")]
+    public void OnException_LogsBracketedTemplate(bool mapped, LogLevel expectedLevel, string expectedTemplate)
+    {
+        // Arrange
+        var logger = new TemplateCapturingLogger();
+        var mapper = Substitute.For<IExceptionStatusCodeMapper>();
+        mapper.TryMap(Arg.Any<Exception>(), out Arg.Any<int>())
+            .Returns(call => { call[1] = StatusCodes.Status400BadRequest; return mapped; });
+        var filter = new ExceptionFilter(logger, _correlationIdService, mapper, Options.Create(_options));
+        var httpContext = new DefaultHttpContext();
+        httpContext.Request.Method = "POST";
+        httpContext.Request.Path = "/api/trips";
+        var context = new ExceptionContext(
+            new ActionContext(httpContext, new RouteData(), new ActionDescriptor()),
+            new List<IFilterMetadata>())
+        {
+            Exception = new ArgumentException("bad trip")
+        };
+
+        // Act
+        filter.OnException(context);
+
+        // Assert
+        var entry = logger.Entries.Should().ContainSingle().Subject;
+        entry.Level.Should().Be(expectedLevel);
+        entry.Template.Should().Be(expectedTemplate);
+        entry.Message.Should().Contain("[POST] [/api/trips]");
+    }
+
+    private sealed record CapturedLog(LogLevel Level, string? Template, string Message);
+
+    private sealed class TemplateCapturingLogger : ILogger<ExceptionFilter>
+    {
+        public List<CapturedLog> Entries { get; } = [];
+
+        public IDisposable? BeginScope<TState>(TState state) where TState : notnull => null;
+
+        public bool IsEnabled(LogLevel logLevel) => true;
+
+        public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception? exception, Func<TState, Exception?, string> formatter)
+        {
+            var template = (state as IEnumerable<KeyValuePair<string, object?>>)?
+                .FirstOrDefault(pair => pair.Key == "{OriginalFormat}").Value as string;
+            Entries.Add(new CapturedLog(logLevel, template, formatter(state, exception)));
+        }
     }
 
     // ---- helpers ---------------------------------------------------------

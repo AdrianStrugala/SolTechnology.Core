@@ -56,7 +56,7 @@ public class ExceptionFilter(
             logger.Log(
                 level,
                 context.Exception,
-                "Unhandled exception in {RequestMethod} {RequestPath} → {StatusCode}",
+                "Unhandled exception in [{RequestMethod}] [{RequestPath}] → [{StatusCode}]",
                 context.HttpContext.Request.Method,
                 context.HttpContext.Request.Path,
                 statusCode);
@@ -76,7 +76,7 @@ public class ExceptionFilter(
         // Unmapped type is API contract drift: page on-call and let the host pipeline pick the status.
         logger.LogCritical(
             context.Exception,
-            "Unmapped exception of type {ExceptionType} in {RequestMethod} {RequestPath} — rethrowing to host pipeline. " +
+            "Unmapped exception of type [{ExceptionType}] in [{RequestMethod}] [{RequestPath}] — rethrowing to host pipeline. " +
             "Add an explicit mapping if this exception type is expected.",
             context.Exception.GetType().FullName,
             context.HttpContext.Request.Method,
