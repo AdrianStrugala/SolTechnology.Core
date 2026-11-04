@@ -55,6 +55,8 @@ Meta: `docs`, `architecture`, `features`, `skills`, `build`, `ci`.
   - `Semver: MAJOR` — breaking public API. **Must** also include a
     `BREAKING CHANGE: <one-line description>` footer and reference the dated feature record that
     explains the rationale and migration.
+  - A behavioural break (`P-nn`) or log-template change (`L-nn`) listed in a feature brief is
+    `Semver: MAJOR` with a `BREAKING CHANGE:` footer even when no public symbol changes.
 - Reference the [premortem](../premortem/SKILL.md) output in the body when the change required one.
 - No issue tracker IDs unless the user supplies them.
 
