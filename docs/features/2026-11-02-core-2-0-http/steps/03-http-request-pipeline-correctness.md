@@ -1,7 +1,7 @@
 ---
 spec: 2026-11-02-core-2-0-http
 step: 03
-status: to-do
+status: done
 ---
 
 # Step 03: HTTP — request pipeline correctness
@@ -38,10 +38,34 @@ Former core step 20; moved here by the per-library regroup (user, 2026-11-02).
   - `RetryPredicate_LargeErrorBody_ReadsAtMost8KiB`.
 
 ## Acceptance criteria
-- [ ] `dotnet test tests/SolTechnology.Core.HTTP.Tests` is green, and the timeout test fails on `4097d47f`.
-- [ ] No public or protected signature changed.
+- [x] `dotnet test tests/SolTechnology.Core.HTTP.Tests` is green, and the timeout test fails on `4097d47f`.
+- [x] No public or protected signature changed.
 
 ## Open questions
 - none
 
 ## Deviations
+
+### Capped buffering keeps the caller's stream intact
+
+**Original plan:** `HttpPolicyFactory.cs:88` calls `LoadIntoBufferAsync(args.Context.CancellationToken)` with the 8 KiB cap.
+
+**Actual implementation:** A new internal `RequestBuilder.TryBufferCappedBody` calls `LoadIntoBufferAsync(MaxCapturedBodyBytes, token)` and returns `false` on the `HttpRequestException` a larger body raises; the factory then skips the predicate and the transient status decides. A body without a `Content-Length` that overflows is already partly consumed, and Polly returns the last attempt's response whatever `ShouldHandle` says, so the factory also skips buffering and the predicate on the last attempt (`AttemptNumber >= MaxRequestRetries`): only discarded responses can be partly read. `RequestBuilder.MaxCapturedBodyBytes` became `internal`; no public constant was added.
+
+### No cancellation token in `RecoverableOnly`
+
+**Original plan:** `RetryPredicates.cs:37,39` — token, cap, `catch (JsonException)`.
+
+**Actual implementation:** The public predicate type `Func<HttpResponseMessage, ValueTask<bool>>` carries no token, and adding one would change a public signature. `RecoverableOnly` calls the same capped buffering with `CancellationToken.None`, which is a no-op inside the pipeline because the factory has already buffered the body with the request's token. Narrowing the catch to `JsonException` made two guards necessary: a non-object JSON root (`TryGetProperty` throws `InvalidOperationException`) and, in `ServiceCallErrorMapper`, a non-string `title`/`message`/`detail` (`GetString` throws) now return the 1.x results explicitly. `RecoverableOnly_BodyIsNotAJsonObject_AllowsRetry` and `FromStatusCode_BodyWithoutUsableProblemFields_FallsBackToStatus` pin them.
+
+### `FromException` maps every cancellation to `TimeoutError`
+
+**Original plan:** `ServiceCallErrorMapper.cs:29-38` comment and branch.
+
+**Actual implementation:** The `TaskCanceledException` branch became `OperationCanceledException`, matching the new `TrySend` filter, which lets through any cancellation the caller did not request. A bare `OperationCanceledException` passed to the public `FromException` now maps to `TimeoutError` instead of the generic non-recoverable error; the signature is unchanged.
+
+### `IncludeResponseBodyInException` property doc
+
+**Original plan:** XML docs of `IncludeResponseBodyInException` in `RequestBuilder.cs:21-22,368-376`.
+
+**Actual implementation:** The property's own XML doc in `HttpPolicyConfiguration.cs` said "Enable per-client", the claim design A10(b) withdraws, so it now says the flag is honoured per request only. The same file's `RetryPredicate` doc states the 8 KiB cap. The worst-case retry statement in `docs/HTTP-Production-Checklist.md` (`3 × RequestTimeout`) is corrected in step 08 with the other checklist edits.

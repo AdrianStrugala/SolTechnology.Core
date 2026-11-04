@@ -134,6 +134,77 @@ public sealed class RetryPredicateTests
     }
 
     [Test]
+    public async Task RetryPredicate_LargeErrorBody_ReadsAtMost8KiB()
+    {
+        // Arrange
+        var pipeline = BuildPipeline(RetryPredicates.RecoverableOnly);
+        var largeBody = Encoding.UTF8.GetBytes("{\"recoverable\": false, \"padding\": \"" + new string('x', 64 * 1024) + "\"}");
+        var sources = new List<CountingStream>();
+        var attempts = 0;
+
+        // Act
+        await pipeline.ExecuteAsync(_ =>
+        {
+            attempts++;
+            var source = new CountingStream(largeBody);
+            sources.Add(source);
+            return ValueTask.FromResult(new HttpResponseMessage(HttpStatusCode.InternalServerError)
+            {
+                Content = new StreamContent(source, bufferSize: 1),
+                RequestMessage = new HttpRequestMessage(HttpMethod.Get, "http://test/")
+            });
+        });
+
+        // Assert
+        attempts.Should().Be(3, "a body over the cap is not inspected, so the transient status decides");
+        sources.Should().AllSatisfy(source => source.BytesRead.Should().BeLessThan(9 * 1024, "buffering stops at the 8 KiB cap plus one copy chunk"));
+        sources[^1].BytesRead.Should().Be(0, "the last attempt's response is returned to the caller unread");
+    }
+
+    [TestCase("[1, 2]")]
+    [TestCase("\"plain text\"")]
+    [TestCase("not json {{{")]
+    public async Task RecoverableOnly_BodyIsNotAJsonObject_AllowsRetry(string body)
+    {
+        // Arrange
+        using var response = new HttpResponseMessage(HttpStatusCode.InternalServerError)
+        {
+            Content = new StringContent(body, Encoding.UTF8, "application/json")
+        };
+
+        // Act
+        var shouldRetry = await RetryPredicates.RecoverableOnly(response);
+
+        // Assert
+        shouldRetry.Should().BeTrue();
+    }
+
+    private sealed class CountingStream(byte[] data) : Stream
+    {
+        private readonly MemoryStream _inner = new(data, writable: false);
+
+        public long BytesRead { get; private set; }
+
+        public override bool CanRead => true;
+        public override bool CanSeek => false;
+        public override bool CanWrite => false;
+        public override long Length => throw new NotSupportedException();
+        public override long Position { get => throw new NotSupportedException(); set => throw new NotSupportedException(); }
+
+        public override int Read(byte[] buffer, int offset, int count)
+        {
+            var read = _inner.Read(buffer, offset, count);
+            BytesRead += read;
+            return read;
+        }
+
+        public override void Flush() { }
+        public override long Seek(long offset, SeekOrigin origin) => throw new NotSupportedException();
+        public override void SetLength(long value) => throw new NotSupportedException();
+        public override void Write(byte[] buffer, int offset, int count) => throw new NotSupportedException();
+    }
+
+    [Test]
     public async Task WithRecoverableOnly_NonRetryableStatus_StillNotRetried()
     {
         // A 400 Bad Request is NOT in the retryable status set — the predicate

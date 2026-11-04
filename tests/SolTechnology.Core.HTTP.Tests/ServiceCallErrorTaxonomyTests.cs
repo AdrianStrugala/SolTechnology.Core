@@ -80,6 +80,20 @@ public sealed class ServiceCallErrorTaxonomyTests
         error.Recoverable.Should().BeTrue();
     }
 
+    [TestCase("[1, 2]")]
+    [TestCase("\"plain text\"")]
+    [TestCase("{\"title\": 5, \"recoverable\": \"yes\"}")]
+    [TestCase("not json {{{")]
+    public void FromStatusCode_BodyWithoutUsableProblemFields_FallsBackToStatus(string body)
+    {
+        // Act
+        var error = ServiceCallErrorMapper.FromStatusCode(HttpStatusCode.InternalServerError, body);
+
+        // Assert
+        error.Message.Should().Be("HTTP 500 InternalServerError");
+        error.Recoverable.Should().BeTrue();
+    }
+
     [Test]
     public void FromStatusCode_GatewayTimeout_Returns_TimeoutError()
     {

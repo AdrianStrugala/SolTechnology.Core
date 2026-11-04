@@ -299,6 +299,48 @@ public sealed class RequestBuilderTests
         await act.Should().ThrowAsync<OperationCanceledException>();
     }
 
+    [Test]
+    public async Task TryGetAsync_HttpClientTimeout_ReturnsTimeoutError()
+    {
+        // Arrange
+        var (client, mock) = NewClient();
+        client.Timeout = TimeSpan.FromMilliseconds(50);
+        mock.When(HttpMethod.Get, "http://api.test/x")
+            .Respond(async () =>
+            {
+                await Task.Delay(Timeout.Infinite);
+                return new HttpResponseMessage(HttpStatusCode.OK);
+            });
+
+        // Act
+        var result = await client.CreateRequest("x").WithResponseType(DataType.Json).TryGetAsync<Match>();
+
+        // Assert
+        result.IsSuccess.Should().BeFalse();
+        result.Error.Should().BeOfType<SolTechnology.Core.Errors.TimeoutError>();
+        result.Error!.Recoverable.Should().BeTrue();
+    }
+
+    [Test]
+    public async Task TryGetAsync_CallerCancelled_Throws()
+    {
+        // Arrange
+        var (client, mock) = NewClient();
+        mock.When(HttpMethod.Get, "http://api.test/x")
+            .Respond(async () =>
+            {
+                await Task.Delay(Timeout.Infinite);
+                return new HttpResponseMessage(HttpStatusCode.OK);
+            });
+        using var cts = new CancellationTokenSource(TimeSpan.FromMilliseconds(50));
+
+        // Act
+        var act = async () => await client.CreateRequest("x").WithResponseType(DataType.Json).TryGetAsync<Match>(cts.Token);
+
+        // Assert
+        await act.Should().ThrowAsync<OperationCanceledException>();
+    }
+
     // ---- Policy options flow ---------------------------------------------
 
     [Test]

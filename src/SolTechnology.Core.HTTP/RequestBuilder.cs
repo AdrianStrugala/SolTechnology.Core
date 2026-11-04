@@ -11,12 +11,11 @@ namespace SolTechnology.Core.HTTP;
 public class RequestBuilder
 {
     /// <summary>
-    /// Per-request options key used to flow the effective
-    /// <see cref="HttpPolicyConfiguration"/> through to delegating handlers and
-    /// the error-formatting path. Reading this key inside
-    /// <see cref="ThrowOnFailureAsync"/> lets <see cref="HttpRequestFailedException"/>
-    /// honour the client-scoped <c>IncludeResponseBodyInException</c> flag without
-    /// a service-locator on <see cref="HttpClient"/>.
+    /// Per-request options key that carries the <see cref="HttpPolicyConfiguration"/> passed to
+    /// <see cref="HttpClientExtensions.CreateRequest(HttpClient, string, HttpPolicyConfiguration)"/>.
+    /// <see cref="ThrowOnFailureAsync"/> reads <c>IncludeResponseBodyInException</c> from it; the
+    /// named client's policy registered by <c>AddSolHTTPClient</c> does not reach it, so the flag
+    /// applies only to requests created with that overload.
     /// </summary>
     public static readonly HttpRequestOptionsKey<HttpPolicyConfiguration> PolicyOptionsKey =
         new("SolTechnology.Core.HTTP.Policy");
@@ -317,7 +316,7 @@ public class RequestBuilder
                 .SendAsync(request, HttpCompletionOption.ResponseHeadersRead, cancellationToken)
                 .ConfigureAwait(false);
         }
-        catch (Exception ex) when (ex is not OperationCanceledException)
+        catch (Exception ex) when (ex is not OperationCanceledException || !cancellationToken.IsCancellationRequested)
         {
             return Result<TResponse>.Fail(ServiceCallErrorMapper.FromException(ex));
         }
@@ -363,9 +362,10 @@ public class RequestBuilder
     /// <summary>
     /// Builds and throws a <see cref="HttpRequestFailedException"/> carrying the request
     /// method, URI, status, reason phrase, and (best-effort) response body. The body is
-    /// captured only when the effective <see cref="HttpPolicyConfiguration.IncludeResponseBodyInException"/>
-    /// flag is on — by default it is off so upstream payloads (which may contain PII or
-    /// secrets) never reach the exception object and, transitively, the logging pipeline.
+    /// captured only when the policy passed to this request's <c>CreateRequest</c> overload sets
+    /// <see cref="HttpPolicyConfiguration.IncludeResponseBodyInException"/> — by default it is off
+    /// so upstream payloads (which may contain PII or secrets) never reach the exception object
+    /// and, transitively, the logging pipeline.
     /// </summary>
     private async Task ThrowOnFailureAsync(HttpRequestMessage request, HttpResponseMessage response, CancellationToken cancellationToken)
     {
@@ -471,7 +471,24 @@ public class RequestBuilder
     /// errors, vendor-specific shapes) while keeping a hostile or accidental 50 MB HTML page
     /// from pinning memory inside the exception object as it flows through logging sinks.
     /// </summary>
-    private const int MaxCapturedBodyBytes = 8 * 1024;
+    internal const int MaxCapturedBodyBytes = 8 * 1024;
+
+    /// <summary>
+    /// Buffers <paramref name="content"/> when it fits in <see cref="MaxCapturedBodyBytes"/>, so it
+    /// can be read more than once. Returns <c>false</c> for a larger body or a failed read.
+    /// </summary>
+    internal static async Task<bool> TryBufferCappedBody(HttpContent content, CancellationToken cancellationToken)
+    {
+        try
+        {
+            await content.LoadIntoBufferAsync(MaxCapturedBodyBytes, cancellationToken).ConfigureAwait(false);
+            return true;
+        }
+        catch (HttpRequestException)
+        {
+            return false;
+        }
+    }
 
     private const string TruncationMarker = "… [response body truncated]";
 }

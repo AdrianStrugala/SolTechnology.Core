@@ -22,6 +22,7 @@ public static class RetryPredicates
     ///   <item>The body contains <c>"recoverable": true</c>.</item>
     ///   <item>The body cannot be parsed (benefit of the doubt — let the standard status-code
     ///         retry logic handle it).</item>
+    ///   <item>The body is larger than 8 KiB; it is not read past that cap.</item>
     /// </list>
     /// Returns <c>false</c> (stop retrying) when:
     /// <list type="bullet">
@@ -32,28 +33,29 @@ public static class RetryPredicates
     /// </summary>
     public static Func<HttpResponseMessage, ValueTask<bool>> RecoverableOnly { get; } = async response =>
     {
+        // The resilience pipeline has already buffered the body with the request's token; this is a no-op then.
+        if (!await RequestBuilder.TryBufferCappedBody(response.Content, CancellationToken.None))
+        {
+            return true;
+        }
+
         try
         {
-            var body = await response.Content.ReadAsStringAsync();
-            if (string.IsNullOrWhiteSpace(body))
-                return true; // no body — trust the status code
-
-            using var doc = JsonDocument.Parse(body);
-
-            // Standard ProblemDetails extensions shape: { "recoverable": true/false }
-            if (doc.RootElement.TryGetProperty("recoverable", out var prop) &&
-                prop.ValueKind == JsonValueKind.False)
+            var body = await response.Content.ReadAsByteArrayAsync();
+            if (body.Length == 0)
             {
-                return false; // explicitly non-recoverable — do not retry
+                return true;
             }
 
-            return true; // recoverable or not present — allow retry
+            using var doc = JsonDocument.Parse(body);
+            return doc.RootElement.ValueKind != JsonValueKind.Object
+                || !doc.RootElement.TryGetProperty("recoverable", out var prop)
+                || prop.ValueKind != JsonValueKind.False;
         }
-        catch
+        catch (JsonException)
         {
-            // Parse failure — benefit of the doubt, let the retry proceed.
+            // Not JSON: benefit of the doubt, the status code decides.
             return true;
         }
     };
 }
-

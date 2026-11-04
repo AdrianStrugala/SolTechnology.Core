@@ -13,6 +13,8 @@ namespace SolTechnology.Core.HTTP;
 /// </summary>
 public static class ServiceCallErrorMapper
 {
+    private static readonly string[] ProblemMessageProperties = ["title", "message", "detail"];
+
     /// <summary>
     /// Maps an exception from <see cref="HttpClient.SendAsync"/> to an appropriate Core
     /// <see cref="SolTechnology.Core.Error"/> subtype.
@@ -28,10 +30,8 @@ public static class ServiceCallErrorMapper
                 Recoverable = true
             },
 
-        // HttpClient request timeout surfaces as TaskCanceledException with no caller token.
-        // (The TrySend caller filters genuine caller-cancellation before reaching here, so a
-        // TaskCanceledException at this point is a timeout, not a deliberate cancel.)
-        TaskCanceledException
+        // TrySend rethrows caller cancellation, so a cancellation here is HttpClient.Timeout.
+        OperationCanceledException
             => new TimeoutError
             {
                 Message = "Service call timed out",
@@ -126,19 +126,31 @@ public static class ServiceCallErrorMapper
 
     private static string? TryExtractProblemMessage(string? body)
     {
-        if (string.IsNullOrWhiteSpace(body)) return null;
+        if (string.IsNullOrWhiteSpace(body))
+        {
+            return null;
+        }
 
         try
         {
             using var doc = JsonDocument.Parse(body);
-            if (doc.RootElement.TryGetProperty("title", out var title))
-                return title.GetString();
-            if (doc.RootElement.TryGetProperty("message", out var msg))
-                return msg.GetString();
-            if (doc.RootElement.TryGetProperty("detail", out var detail))
-                return detail.GetString();
+            if (doc.RootElement.ValueKind != JsonValueKind.Object)
+            {
+                return null;
+            }
+
+            foreach (var name in ProblemMessageProperties)
+            {
+                if (doc.RootElement.TryGetProperty(name, out var property))
+                {
+                    return property.ValueKind == JsonValueKind.String ? property.GetString() : null;
+                }
+            }
         }
-        catch { /* not JSON — ignore */ }
+        catch (JsonException)
+        {
+            // Not JSON: the status code alone describes the failure.
+        }
 
         return null;
     }
@@ -151,13 +163,17 @@ public static class ServiceCallErrorMapper
             try
             {
                 using var doc = JsonDocument.Parse(body);
-                if (doc.RootElement.TryGetProperty("recoverable", out var prop) &&
+                if (doc.RootElement.ValueKind == JsonValueKind.Object &&
+                    doc.RootElement.TryGetProperty("recoverable", out var prop) &&
                     prop.ValueKind is JsonValueKind.True or JsonValueKind.False)
                 {
                     return prop.GetBoolean();
                 }
             }
-            catch { /* not JSON — fall through to status heuristic */ }
+            catch (JsonException)
+            {
+                // Not JSON: fall through to the status heuristic.
+            }
         }
 
         // Heuristic: 5xx = transient/recoverable; 4xx = deterministic/not recoverable.

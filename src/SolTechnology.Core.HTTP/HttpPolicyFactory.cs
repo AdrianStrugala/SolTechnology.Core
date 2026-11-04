@@ -21,8 +21,9 @@ internal sealed class HttpPolicyFactory(ILogger<HttpPolicyFactory> logger, HttpC
     /// <para>
     /// Ordering rationale: the outer timeout (when set via
     /// <see cref="HttpPolicyConfiguration.OverallRequestBudget"/>) bounds the
-    /// entire logical call; retries observe both per-attempt timeout-rejections
-    /// and breaker exceptions as transient failures.
+    /// entire logical call; retries treat a per-attempt timeout rejection as a
+    /// transient failure, while an open circuit (<see cref="BrokenCircuitException"/>)
+    /// is not retried.
     /// </para>
     /// </summary>
     public void Configure(
@@ -64,9 +65,10 @@ internal sealed class HttpPolicyFactory(ILogger<HttpPolicyFactory> logger, HttpC
         // Retry predicate is distinct from the breaker's so we can refuse retries
         // on POST/PATCH while still letting the breaker observe their failures —
         // a 500-storm on POST should still trip the breaker for subsequent GETs.
-        async ValueTask<bool> ShouldRetry(ResilienceContext context, Outcome<HttpResponseMessage> outcome)
+        async ValueTask<bool> ShouldRetry(RetryPredicateArguments<HttpResponseMessage> args)
         {
-            if (!configuration.RetryOnUnsafeVerbs && IsUnsafeVerb(ResolveMethod(context, outcome)))
+            var outcome = args.Outcome;
+            if (!configuration.RetryOnUnsafeVerbs && IsUnsafeVerb(ResolveMethod(args.Context, outcome)))
             {
                 return false;
             }
@@ -77,15 +79,17 @@ internal sealed class HttpPolicyFactory(ILogger<HttpPolicyFactory> logger, HttpC
                 return false;
             }
 
-            // If no body-aware predicate is configured, honour the standard transient logic.
-            if (configuration.RetryPredicate is null || outcome.Result is null)
+            // Polly returns the last attempt's response whatever the predicate says, so it is left unread for the caller.
+            if (configuration.RetryPredicate is null || outcome.Result is null || args.AttemptNumber >= configuration.MaxRequestRetries)
             {
                 return true;
             }
 
-            // Buffer the body so the predicate can read it without corrupting the
-            // stream for the caller (Content becomes seekable after this call).
-            await outcome.Result.Content.LoadIntoBufferAsync();
+            // A body over the cap is not inspected; the transient status decides.
+            if (!await RequestBuilder.TryBufferCappedBody(outcome.Result.Content, args.Context.CancellationToken))
+            {
+                return true;
+            }
 
             return await configuration.RetryPredicate(outcome.Result);
         }
@@ -100,7 +104,7 @@ internal sealed class HttpPolicyFactory(ILogger<HttpPolicyFactory> logger, HttpC
             UseJitter = true,
             Delay = TimeSpan.FromMilliseconds(configuration.RetryInitialDelay),
             MaxDelay = TimeSpan.FromMilliseconds(configuration.RetryTimeout),
-            ShouldHandle = args => ShouldRetry(args.Context, args.Outcome),
+            ShouldHandle = ShouldRetry,
             DelayGenerator = args =>
             {
                 var retryAfter = args.Outcome.Result?.Headers.RetryAfter;
@@ -137,10 +141,10 @@ internal sealed class HttpPolicyFactory(ILogger<HttpPolicyFactory> logger, HttpC
                     new KeyValuePair<string, object?>("outcome", outcome));
 
                 _logger.LogWarning(
-                    "Retry policy activated for [{ClientName}] in [{Delay}] seconds. Exception: [{Exception}]",
+                    args.Outcome.Exception,
+                    "Retry policy activated for [{ClientName}] in [{Delay}] seconds",
                     clientName,
-                    args.RetryDelay.TotalSeconds,
-                    args.Outcome.Exception);
+                    args.RetryDelay.TotalSeconds);
                 return default;
             },
         });

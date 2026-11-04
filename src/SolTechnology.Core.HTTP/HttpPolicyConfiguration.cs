@@ -29,11 +29,8 @@ public class HttpPolicyConfiguration
     [Range(0, int.MaxValue, ErrorMessage = nameof(RetryInitialDelay) + " must be non-negative.")]
     public int RetryInitialDelay { get; set; } = 200;
 
-    // 2 retries (= 3 attempts total) keeps the worst-case wall-clock under
-    // RequestTimeout * 3 even with full backoff. The previous 3 made a single
-    // failed request take up to 4 attempts × RequestTimeout, which under a
-    // brownout exhausted the HttpClient connection pool before the breaker
-    // tripped. Override per-client where higher tolerance is justified.
+    // 2 retries = 3 attempts: worst case 3 × RequestTimeout plus two backoff delays (each capped by RetryTimeout),
+    // unless OverallRequestBudget is lower. See docs/HTTP-Production-Checklist.md.
     [Range(0, 100, ErrorMessage = nameof(MaxRequestRetries) + " must be between 0 and 100.")]
     public int MaxRequestRetries { get; set; } = 2;
 
@@ -57,9 +54,11 @@ public class HttpPolicyConfiguration
     /// formatter (Serilog, App Insights, Sentry) serialises the full exception
     /// state into log sinks.
     /// <para>
-    /// Enable per-client (or per-environment) only for diagnostic builds where
-    /// the operator accepts the disclosure risk in exchange for richer error
-    /// context.
+    /// Honoured per request only: pass a policy with this flag set to
+    /// <c>CreateRequest(path, policy)</c>. A named client's policy from
+    /// <c>AddSolHTTPClient</c> or configuration does not reach the request.
+    /// Enable it only for diagnostic calls where the operator accepts the
+    /// disclosure risk in exchange for richer error context.
     /// </para>
     /// </summary>
     public bool IncludeResponseBodyInException { get; set; } = false;
@@ -76,8 +75,10 @@ public class HttpPolicyConfiguration
     /// status retryable — it only confirms "yes, retry this transient-looking failure".
     /// </para>
     /// <para>
-    /// <b>Body buffering:</b> the response is buffered (via <c>LoadIntoBufferAsync</c>) before the
-    /// predicate is called, so reading <c>Content</c> does not corrupt the stream for the caller.
+    /// <b>Body buffering:</b> the response body is buffered (at most 8 KiB, with the request's
+    /// cancellation token) before the predicate is called, so reading <c>Content</c> does not
+    /// corrupt the stream for the caller. A larger body skips the predicate, and so does the last
+    /// attempt, whose response is returned to the caller either way.
     /// </para>
     /// <para>
     /// Default: <c>null</c> (no body inspection — existing behaviour unchanged).
