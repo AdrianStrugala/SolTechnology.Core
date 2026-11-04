@@ -35,7 +35,7 @@ public static class UpstreamHttpHealthCheckExtensions
     {
         ArgumentNullException.ThrowIfNull(builder);
 
-        // Singleton so the check's instance result-cache survives across probe invocations.
+        // Singleton so the result cache survives probes; the check holds IHttpClientFactory, not an HttpClient.
         builder.Services.AddSingleton<TCheck>();
 
         return builder.Add(new HealthCheckRegistration(

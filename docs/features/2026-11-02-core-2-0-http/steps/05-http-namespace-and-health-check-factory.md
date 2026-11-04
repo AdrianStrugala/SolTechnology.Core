@@ -1,7 +1,7 @@
 ---
 spec: 2026-11-02-core-2-0-http
 step: 05
-status: to-do
+status: done
 ---
 
 # Step 05: HTTP — own namespace for `HttpClientExtensions`; factory-based upstream health check
@@ -32,11 +32,23 @@ Former core step 45; moved here by the per-library regroup (user, 2026-11-02).
 - Consumers that already import `SolTechnology.Core.HTTP` need no new using.
 
 ## Acceptance criteria
-- [ ] `dotnet build SolTechnology.Core.slnx` is green, including DreamTravel.
-- [ ] `dotnet test tests/SolTechnology.Core.HTTP.Tests` is green.
-- [ ] `grep -rn "namespace System" src` prints nothing.
+- [x] `dotnet build SolTechnology.Core.slnx` is green, including DreamTravel.
+- [x] `dotnet test tests/SolTechnology.Core.HTTP.Tests` is green.
+- [x] `grep -rn "namespace System" src` prints nothing.
 
 ## Open questions
 - none (`C-10`, `C-11` confirmed by the user on 2026-11-02)
 
 ## Deviations
+
+### The health check stays a singleton; no new registration parameter
+
+**Original plan:** `UpstreamHttpHealthCheckExtensions.cs` — registration passes the client name; `C-11` says `AddSolUpstreamHttpHealthCheck<TCheck>` stops registering `TCheck` as a singleton that captures an `HttpClient`.
+
+**Actual implementation:** The subclass passes the client name to the new base constructor `(IHttpClientFactory httpClientFactory, string httpClientName, string healthPath, …)`, and `CheckHealthAsync` calls `CreateClient(httpClientName)` per probe. `AddSolUpstreamHttpHealthCheck<TCheck>` keeps its signature and still registers `TCheck` as a singleton, because the result cache lives on the instance; the singleton now holds only the singleton `IHttpClientFactory`, so no `HttpClient` is captured. `C-11` lists no new parameter on the registration method, so none was added.
+
+### DreamTravel UI call site
+
+**Original plan:** DreamTravel usings change in `DreamTravel.GeolocationDataClients/**` and `tests/Component/**`.
+
+**Actual implementation:** `DreamTravel.Ui/Services/GraphService.cs` also calls `CreateRequest` and gained `using SolTechnology.Core.HTTP;`. DreamTravel has no `BaseUpstreamServiceHealthCheck` subclass, so only usings changed (nine files). `docs/Clients.md` still shows the 1.x health-check constructor; step 08 rewrites it.

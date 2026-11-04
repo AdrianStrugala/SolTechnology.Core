@@ -1,7 +1,4 @@
-﻿﻿﻿using SolTechnology.Core.HTTP;
-
-// ReSharper disable once CheckNamespace
-namespace System.Net.Http;
+namespace SolTechnology.Core.HTTP;
 
 public static class HttpClientExtensions
 {

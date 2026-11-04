@@ -1,4 +1,5 @@
 ﻿using DreamTravel.GeolocationDataClients.GeoDb.Models;
+using SolTechnology.Core.HTTP;
 
 namespace DreamTravel.GeolocationDataClients.GeoDb
 {

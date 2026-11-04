@@ -6,6 +6,7 @@ using DreamTravel.FunctionalTests.FakeApis;
 using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using SolTechnology.Core.HTTP;
 using SolTechnology.Core.HTTP.Testing;
 using SolTechnology.Core.Testing;
 

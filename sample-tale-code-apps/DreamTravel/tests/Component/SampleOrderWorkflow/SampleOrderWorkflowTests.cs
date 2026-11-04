@@ -1,4 +1,5 @@
 using FluentAssertions;
+using SolTechnology.Core.HTTP;
 using SolTechnology.Core.Tale.Api;
 using SolTechnology.Core.Tale.Models;
 

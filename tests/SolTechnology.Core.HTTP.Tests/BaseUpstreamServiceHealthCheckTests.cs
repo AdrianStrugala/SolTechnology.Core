@@ -17,16 +17,34 @@ public sealed class BaseUpstreamServiceHealthCheckTests
 {
     private sealed record UpstreamReport(string Status);
 
+    private const string ClientName = "upstream";
+
     private sealed class TestUpstreamCheck(
-        HttpClient client,
+        IHttpClientFactory clientFactory,
         UpstreamHealthCheckOptions options,
         TimeProvider? time = null)
-        : BaseUpstreamServiceHealthCheck<UpstreamReport>(client, "/health", options, NullLogger.Instance, time)
+        : BaseUpstreamServiceHealthCheck<UpstreamReport>(clientFactory, ClientName, "/health", options, NullLogger.Instance, time)
     {
+        public TestUpstreamCheck(HttpClient client, UpstreamHealthCheckOptions options, TimeProvider? time = null)
+            : this(new SingleClientFactory(client), options, time)
+        {
+        }
+
         protected override HealthCheckResult EvaluateReport(UpstreamReport report) =>
             report.Status == "ok"
                 ? HealthCheckResult.Healthy("upstream ok")
                 : HealthCheckResult.Unhealthy($"upstream status: {report.Status}");
+    }
+
+    private sealed class SingleClientFactory(HttpClient client) : IHttpClientFactory
+    {
+        public List<string> CreatedNames { get; } = [];
+
+        public HttpClient CreateClient(string name)
+        {
+            CreatedNames.Add(name);
+            return client;
+        }
     }
 
     private sealed class StubHandler(
@@ -191,6 +209,25 @@ public sealed class BaseUpstreamServiceHealthCheckTests
             IsDisposed = true;
             base.Dispose(disposing);
         }
+    }
+
+    [Test]
+    public async Task CheckHealth_CreatesClientPerProbe()
+    {
+        // Arrange
+        var time = new FakeTimeProvider();
+        var factory = new SingleClientFactory(ClientReturning(HttpStatusCode.OK, """{"status":"ok"}"""));
+        var options = new UpstreamHealthCheckOptions { CacheDuration = TimeSpan.FromSeconds(30) };
+        var sut = new TestUpstreamCheck(factory, options, time);
+
+        // Act
+        await sut.CheckHealthAsync(Context());
+        time.Advance(TimeSpan.FromSeconds(31));
+        var result = await sut.CheckHealthAsync(Context());
+
+        // Assert
+        result.Status.Should().Be(HealthStatus.Healthy);
+        factory.CreatedNames.Should().Equal(ClientName, ClientName);
     }
 
     [Test]

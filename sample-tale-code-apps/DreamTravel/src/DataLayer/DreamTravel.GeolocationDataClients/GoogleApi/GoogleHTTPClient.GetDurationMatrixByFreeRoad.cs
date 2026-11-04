@@ -2,6 +2,7 @@
 using DreamTravel.Domain.Cities;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json.Linq;
+using SolTechnology.Core.HTTP;
 
 namespace DreamTravel.GeolocationDataClients.GoogleApi
 {

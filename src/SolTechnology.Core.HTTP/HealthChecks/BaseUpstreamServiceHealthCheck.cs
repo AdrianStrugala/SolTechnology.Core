@@ -34,11 +34,13 @@ public sealed class UpstreamHealthCheckOptions
 ///   <item>Bad payload (deserialisation failure) → <c>Degraded</c></item>
 ///   <item>2xx with valid report → mapped via <see cref="EvaluateReport"/></item>
 /// </list>
-/// Lives in <c>Core.HTTP</c> because it probes a downstream over <see cref="HttpClient"/>.
+/// Each probe creates the named client from <see cref="IHttpClientFactory"/>, so the check can be a
+/// singleton without pinning one <see cref="HttpClient"/> and its DNS resolution forever.
 /// </summary>
 /// <typeparam name="TReport">Typed report model deserialised from the upstream JSON body.</typeparam>
 public abstract class BaseUpstreamServiceHealthCheck<TReport>(
-    HttpClient httpClient,
+    IHttpClientFactory httpClientFactory,
+    string httpClientName,
     string healthPath,
     UpstreamHealthCheckOptions options,
     ILogger logger,
@@ -63,6 +65,7 @@ public abstract class BaseUpstreamServiceHealthCheck<TReport>(
         HealthCheckContext context,
         CancellationToken cancellationToken = default)
     {
+        var httpClient = httpClientFactory.CreateClient(httpClientName);
         var cacheKey = $"{httpClient.BaseAddress}{healthPath}";
 
         // Return cached if still fresh.

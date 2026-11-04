@@ -4,6 +4,7 @@ using DreamTravel.Sql.DbModels;
 using FluentAssertions;
 using Microsoft.Extensions.DependencyInjection;
 using SolTechnology.Core.AUID;
+using SolTechnology.Core.HTTP;
 
 namespace DreamTravel.FunctionalTests.Trips;
 
