@@ -1,4 +1,6 @@
 ﻿using System.Security.Claims;
+using System.Security.Cryptography;
+using System.Text;
 using System.Text.Encodings.Web;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
@@ -10,7 +12,7 @@ namespace SolTechnology.Core.Auth
 {
     public class ApiKeyAuthenticationHandler : AuthenticationHandler<ApiKeyAuthenticationSchemeOptions>
     {
-        private static ILogger<ApiKeyAuthenticationHandler> _logger = null!;
+        private readonly ILogger<ApiKeyAuthenticationHandler> _logger;
 
         public ApiKeyAuthenticationHandler(
             IOptionsMonitor<ApiKeyAuthenticationSchemeOptions> optionsMonitor,
@@ -26,14 +28,20 @@ namespace SolTechnology.Core.Auth
             {
                 return AuthenticateResult.NoResult();
             }
-            
+
+            if (string.IsNullOrWhiteSpace(Options.ApiKey))
+            {
+                _logger.LogWarning("No API key is configured for scheme [{Scheme}]; request [{RequestPath}] is rejected", Scheme.Name, Context.Request.Path);
+                return AuthenticateResult.Fail("API key is not configured");
+            }
+
             if (!Request.Headers.TryGetValue(ApiKeyAuthenticationSchemeOptions.AuthenticationHeaderName, out var apiKey))
             {
                 _logger.LogWarning("Missing authentication header for request [{RequestPath}]", Context.Request.Path);
                 return AuthenticateResult.Fail("Missing authentication header");
             }
 
-            if (!Options.ApiKey.Equals(apiKey.ToString()))
+            if (!IsConfiguredKey(apiKey.ToString()))
             {
                 _logger.LogWarning("Invalid API key for request [{RequestPath}]", Context.Request.Path);
                 return AuthenticateResult.Fail("Invalid API key");
@@ -49,5 +57,10 @@ namespace SolTechnology.Core.Auth
 
             return await Task.FromResult(AuthenticateResult.Success(ticket));
         }
+
+        // Equal-length hashes keep the comparison time independent of the key's length and content.
+        private bool IsConfiguredKey(string candidate) => CryptographicOperations.FixedTimeEquals(
+            SHA256.HashData(Encoding.UTF8.GetBytes(candidate)),
+            SHA256.HashData(Encoding.UTF8.GetBytes(Options.ApiKey)));
     }
 }

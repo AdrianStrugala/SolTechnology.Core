@@ -1,7 +1,7 @@
 ---
 spec: 2026-11-02-core-2-0-api-auth
 step: 04
-status: to-do
+status: done
 ---
 
 # Step 04: Auth — constant-time API-key comparison and per-instance logger
@@ -29,13 +29,25 @@ Former core step 07; moved here by the per-library regroup (user, 2026-11-02). R
 - Premortem RM-19 (core step 00, 2026-11-02, scenario 19): a null, empty, or whitespace configured `Options.ApiKey` never authenticates. The handler returns `Fail` before comparing, logs a Warning without any key material, and the matrix gains `configured key "" + header "" → Fail`.
 
 ## Acceptance criteria
-- [ ] `dotnet test tests/SolTechnology.Core.Auth.Tests` is green with the 4 cases (functional regression; a timing difference is not unit-testable).
-- [ ] RM-19: the empty-configured-key case returns `Fail` and is green.
-- [ ] Source check for `S5`: `grep -n "CryptographicOperations.FixedTimeEquals" src/SolTechnology.Core.Auth/APIKeyAuthenticationHandler.cs` matches, and `grep -rnE "ApiKey\.Equals|== *apiKey" src/SolTechnology.Core.Auth` prints nothing.
-- [ ] `grep -rn "static ILogger" src/SolTechnology.Core.Auth` prints nothing.
-- [ ] No public or protected signature changed.
+- [x] `dotnet test tests/SolTechnology.Core.Auth.Tests` is green with the 4 cases (functional regression; a timing difference is not unit-testable).
+- [x] RM-19: the empty-configured-key case returns `Fail` and is green.
+- [x] Source check for `S5`: `grep -n "CryptographicOperations.FixedTimeEquals" src/SolTechnology.Core.Auth/APIKeyAuthenticationHandler.cs` matches, and `grep -rnE "ApiKey\.Equals|== *apiKey" src/SolTechnology.Core.Auth` prints nothing.
+- [x] `grep -rn "static ILogger" src/SolTechnology.Core.Auth` prints nothing.
+- [x] No public or protected signature changed.
 
 ## Open questions
 - none (Q5 resolved by the user on 2026-11-02: this feature owns `S5`/`http-api#4`)
 
 ## Deviations
+
+### One parameterised matrix with six cases and log assertions
+
+**Original plan:** a `[TestCase]` matrix of four cases plus the RM-19 case `configured key "" + header "" → Fail`.
+
+**Actual implementation:** `ApiKeyAuthenticationHandlerTests.HandleAuthenticateAsync_ComparesHeaderWithConfiguredKey`
+runs the handler through `InitializeAsync` + `AuthenticateAsync` with six cases: the planned five and a whitespace-only
+configured key. Every `Fail` case also asserts exactly one Warning that contains neither key. The two RM-19 cases failed
+before the fix (an empty or whitespace configured key authenticated a matching header) and pass after. `AddSolAuth`
+still rejects only a null or empty key at registration; a whitespace-only key now registers but never authenticates,
+with the Warning "No API key is configured for scheme [{Scheme}]; request [{RequestPath}] is rejected".
+
