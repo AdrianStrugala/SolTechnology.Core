@@ -68,6 +68,16 @@ the named client's flag through a `DelegatingHandler` was the alternative; per-r
 chosen for simplicity, and a typed client that wants its configured flag passes
 `IOptionsMonitor<HttpPolicyConfiguration>.Get(name)` to `CreateRequest`.
 
+`HttpRequestFailedException.Message` names the method, the status and the request URI without its
+query string, fragment, or user info (only scheme, host, and path; the part before `?` or `#` for a
+relative URI), because query strings carry API keys and personal data and messages end up in logs
+and error responses (CWE-209). `SolTechnology.Core.API` maps the exception to 502, or to 504 when
+the upstream answered 408 or 504, and its `ProblemDetails.title` is the fixed "Upstream dependency
+failed" or "Upstream dependency timed out". Every exception the API maps gets a fixed title in the
+same way (the reason phrase for 4xx, a fixed text for 5xx), since BCL messages can also carry file
+paths, keys, and parameter names; the message is exposed only under `extensions.exception` when
+`IncludeExceptionDetails` is on. See [`docs/Api.md`](../Api.md).
+
 `BaseUpstreamServiceHealthCheck<TReport>` probes an upstream through `IHttpClientFactory` and the
 client's name on every probe, so it gets the client's handlers and picks up DNS changes without
 capturing an `HttpClient` in the singleton check. It disposes every response and caches each result

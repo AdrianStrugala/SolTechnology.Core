@@ -10,7 +10,7 @@ namespace is `SolTechnology.Core.API`. Consumer compatibility takes precedence o
 uniformity.
 
 Public registration and middleware extensions use the branded prefixes `AddSol*`, `UseSol*`,
-and `MapSol*`. Examples include `AddSolCQRS`, `AddSolAuthentication`, `AddSolVersioning`,
+and `MapSol*`. Examples include `AddSolCQRS`, `AddSolAuth`, `AddSolVersioning`,
 `UseSolLogging`, and `MapSolHealthChecks`. Pre-1.0 names have no compatibility forwarders.
 
 The convention makes domain abbreviations recognizable and reduces extension-method collisions

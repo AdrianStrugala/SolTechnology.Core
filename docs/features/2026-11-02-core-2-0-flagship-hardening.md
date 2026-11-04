@@ -464,14 +464,14 @@ parameter; `UntilAsync`, `CheckHealthAsync`, `InvokeAsync`, `StartAsync`/`StopAs
 | P-06 | Recurring job id `Type.Name` → `Type.FullName`; stale tracked ids and legacy `Type.Name` ids removed at start (RQ10) | Old recurring entries are removed automatically and re-created under new ids; no double firing | hangfire 04 |
 | P-07 | Cache keys namespaced by `TKey`/`TItem`; `DistributedCacheConfiguration.InstanceName` has no default and is validated non-empty at start (no `required` keyword) | Existing Redis entries are orphaned (cold cache); config without `InstanceName` fails at start | cache 03 |
 | P-08 | `AuidJsonConverter` throws `JsonException` on invalid input; empty string no longer becomes `Auid.Empty` | Error type at deserialization | auid 02 |
-| P-09 | 5xx `ProblemDetails.title` is a fixed text; `HttpRequestFailedException.Message` has no query string | Clients that parsed the title | api-auth 03 |
+| P-09 | The `ProblemDetails.title` of every mapped exception is a fixed text (5xx: fixed texts; 4xx: the HTTP reason phrase, amended by the api-auth code review 2026-11-04); `HttpRequestFailedException.Message` has no query string | Clients that parsed the title | api-auth 03, api-auth code review fixes |
 | P-10 | POST/PATCH not retried after an exception or timeout | Fewer retries for unsafe verbs | http 02 |
 | P-11 | `WireMockStartup` `AllowPartialMapping` defaults to `false` | Loose tests start failing (intended) | testing-kits 01 |
 | P-12 | `TaleController` serves only handlers opted in via `ExposeOverHttp<T>()` | Endpoints that worked implicitly return 404 | tale 11 |
 | P-13 | `SolTechnology.Core` no longer brings `Microsoft.Extensions.*` transitively | Consumers relying on the transitive reference must add it | core 07 |
 | P-14 | Inbound `X-Correlation-Id` outside `[A-Za-z0-9._:-]` is replaced | Clients sending such IDs see a new ID | logging 04 |
 | P-15 | A failed request logs one Error entry, not two | Error-rate alerts change | logging 03 |
-| P-16 | API key in the request is compared as a SHA-256 hash in constant time | None functional | api-auth 04 |
+| P-16 | API key in the request is compared as a SHA-256 hash in constant time; a blank configured scheme key never authenticates (RM-19), and `AddSolAuth` rejects a null, empty or whitespace `ApiKey` at registration (amended by the api-auth code review 2026-11-04) | A whitespace-only key stops the host at registration instead of answering 401 to every request | api-auth 04, api-auth code review fixes |
 | P-17 | The receiver dead-letters a failing message when `DeliveryCount >= MessageBusConfiguration.MaxDeliveryCount` (default 10) instead of always abandoning | Set `MaxDeliveryCount` to the entity's value; a lower value dead-letters earlier than the broker would | messagebus 03 |
 | P-18 | `TaleInstance.LeaseExpiresAt` persisted (tale T7): every `Running` save stores the writer's now + `RunningLeaseTimeout`, every other status stores `null`; `ResumeStory` takes over a `Running` tale only once it has passed; without it, once `LastUpdatedAt` + the reader's `RunningLeaseTimeout` has passed (T8); renewals save through a fresh DI scope and leave `LastUpdatedAt` alone | Custom repositories add a nullable `LeaseExpiresAt` column and store the same instant on every `Save`, inserts and updates alike (no database default, no local-time conversion); existing `Running` rows without it are held for one timeout after their last save, then resumable. A one-time read-back logs an error when a repository stores another value (T8). DreamTravel's SQLite file gains the column on start | tale post-completion fixes T7, T8 |
 | P-19 | The custom options of `AddSolHTTPClient<TIClient, TClient, TOptions>` (bound from `HTTPClients:{name}:Options`) are validated with `ValidateDataAnnotations().ValidateOnStart()` (premortem RM-13) | Options that 1.x accepted although they break their own data annotations (`[Range]`, `[Required]`, …) now stop the host at start with `OptionsValidationException`; option types without annotations are unaffected | http 04 |
@@ -533,6 +533,14 @@ these notes from the steps:
   (`IOptions<AuthConfiguration>`). Behaviour, the `X-API-KEY` header, and the `ApiKey` scheme are unchanged.
   `SolTechnology.Core.Authentication` stays at 1.x and is deprecated on nuget.org; keeping it next to 2.x packages
   warns with `SOLCORE001`.
+- api-auth (code review, 2026-11-04, amends P-09 and P-16): the `ProblemDetails.title` of a mapped
+  4xx exception is the HTTP reason phrase ("Bad Request", "Forbidden", "Not Found"; "The request was
+  rejected" for a code without one) instead of the exception message, because BCL messages carry
+  file paths, internal keys and parameter names. The message is still under `extensions.exception`
+  when `IncludeExceptionDetails` is on; a message meant for the client goes into an `Error` on the
+  `Result` path, whose `Message` stays the title. `FluentValidation.ValidationException` keeps its
+  title and field errors. `AddSolAuth` now throws `ArgumentException` for a whitespace-only `ApiKey`
+  as well as a null or empty one.
 - result (post-completion review, 2026-11-03): `Result` and `Result<T>` have no public constructor
   (`new Result()` no longer compiles; build results through the factories). Deserializing JSON whose
   `IsSuccess` and `Error` disagree — `{}`, `{"IsSuccess":false}`, or a success carrying an error —
