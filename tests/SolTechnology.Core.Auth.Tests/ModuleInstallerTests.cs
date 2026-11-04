@@ -7,12 +7,14 @@ namespace SolTechnology.Core.Auth.Tests
     [TestFixture]
     public class ModuleInstallerTests
     {
-        [Test]
-        public void AddSolAuth_WhenApiKeyMissing_ThrowsAtRegistration()
+        [TestCase(null)]
+        [TestCase("")]
+        [TestCase("   ")]
+        public void AddSolAuth_WhenApiKeyMissing_ThrowsAtRegistration(string? apiKey)
         {
             // Arrange
             var services = new ServiceCollection();
-            var configuration = new AuthConfiguration();
+            var configuration = new AuthConfiguration { ApiKey = apiKey! };
 
             // Act
             var act = () => services.AddSolAuth(configuration);

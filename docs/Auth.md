@@ -9,7 +9,7 @@ Formerly `SolTechnology.Core.Authentication` (1.x). In 2.0 the package, assembly
 
 - **One-call setup** — `AddSolAuth` registers the `ApiKey` scheme as the default scheme and a global
   MVC filter that requires an authenticated user.
-- **Fail-fast configuration** — a missing key throws at registration, before the host starts.
+- **Fail-fast configuration** — a missing or blank key throws at registration, before the host starts.
 - **Constant-time comparison** — both keys are hashed with SHA-256 and compared with
   `CryptographicOperations.FixedTimeEquals`, so response time does not reveal how much of the key matched.
 - **Safe by default** — a blank configured key never authenticates.
@@ -36,7 +36,7 @@ The package binds no configuration section; the host passes an `AuthConfiguratio
 
 | Option | Default | Purpose |
 |---|---|---|
-| `AuthConfiguration.ApiKey` | none (required) | The key every request sends in `X-API-KEY`. `AddSolAuth` throws `ArgumentException` when it is null or empty. |
+| `AuthConfiguration.ApiKey` | none (required) | The key every request sends in `X-API-KEY`. `AddSolAuth` throws `ArgumentException` when it is null, empty or whitespace. |
 
 ```json
 {

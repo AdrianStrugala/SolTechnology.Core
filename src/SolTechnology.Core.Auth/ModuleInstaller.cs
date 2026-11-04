@@ -18,10 +18,10 @@ namespace SolTechnology.Core.Auth
             /// authenticated user. Call <c>UseAuthentication()</c> before <c>UseAuthorization()</c> in the pipeline.
             /// </summary>
             /// <param name="authConfiguration">Configuration with the expected API key.</param>
-            /// <exception cref="ArgumentException"><paramref name="authConfiguration"/> has no API key.</exception>
+            /// <exception cref="ArgumentException"><paramref name="authConfiguration"/> has no API key, or it is blank.</exception>
             public IServiceCollection AddSolAuth(AuthConfiguration authConfiguration)
             {
-                if (string.IsNullOrEmpty(authConfiguration?.ApiKey))
+                if (string.IsNullOrWhiteSpace(authConfiguration?.ApiKey))
                 {
                     throw new ArgumentException($"The [{nameof(AuthConfiguration)}{nameof(authConfiguration.ApiKey)}] is missing. Provide it by parameter.");
                 }
