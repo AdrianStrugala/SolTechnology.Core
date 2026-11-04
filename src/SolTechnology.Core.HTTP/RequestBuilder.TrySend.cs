@@ -63,8 +63,8 @@ public partial class RequestBuilder
             }
             catch (Exception ex) when (ex is not OperationCanceledException)
             {
-                var body = await TryReadCappedBody(response, cancellationToken).ConfigureAwait(false);
-                return Result<TResponse>.Fail(ServiceCallErrorMapper.FromDeserializationFailure(ex, body));
+                // The mapper ignores the body, and a failed JSON read has already consumed the stream.
+                return Result<TResponse>.Fail(ServiceCallErrorMapper.FromDeserializationFailure(ex, body: null));
             }
         }
     }

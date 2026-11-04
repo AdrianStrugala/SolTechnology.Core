@@ -1,5 +1,6 @@
 using System.Net;
 using System.Net.Sockets;
+using Polly.CircuitBreaker;
 using Polly.Timeout;
 using SolTechnology.Core.Errors;
 
@@ -23,6 +24,15 @@ public static class ServiceCallErrorMapper
             => new TimeoutError
             {
                 Message = "Service call timed out",
+                Description = exception.Message,
+                Recoverable = true
+            },
+
+        // The circuit breaker short-circuits until its break duration ends; a later call may succeed.
+        BrokenCircuitException
+            => new SolTechnology.Core.Error
+            {
+                Message = "Upstream circuit open",
                 Description = exception.Message,
                 Recoverable = true
             },

@@ -2,7 +2,7 @@ using Microsoft.Extensions.Logging;
 
 namespace SolTechnology.Core.HTTP.Tests;
 
-internal sealed record CapturedLog(LogLevel Level, string? Template, string Message);
+internal sealed record CapturedLog(LogLevel Level, string? Template, string Message, Exception? Exception);
 
 internal sealed class TemplateCapturingLogger : ILogger, ILoggerProvider
 {
@@ -18,7 +18,7 @@ internal sealed class TemplateCapturingLogger : ILogger, ILoggerProvider
             .FirstOrDefault(pair => pair.Key == "{OriginalFormat}").Value as string;
         lock (Entries)
         {
-            Entries.Add(new CapturedLog(logLevel, template, formatter(state, exception)));
+            Entries.Add(new CapturedLog(logLevel, template, formatter(state, exception), exception));
         }
     }
 

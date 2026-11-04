@@ -16,14 +16,11 @@ internal static class CircuitBreakerOptionsBuilder
         SamplingDuration = TimeSpan.FromMilliseconds(configuration.CircuitBreakerSamplingDuration),
         MinimumThroughput = configuration.CircuitBreakerMinimumThroughput,
         BreakDuration = TimeSpan.FromMilliseconds(configuration.CircuitBreakerDelayDuration),
-        ShouldHandle = args => HttpPolicyFactory.IsTransientFailure(args.Outcome),
+        ShouldHandle = args => HttpPolicyFactory.IsTransientFailure(args.Outcome, args.Context),
         OnOpened = args =>
         {
             RecordState(metrics, clientName, "open");
-            logger.LogWarning(
-                "Circuit breaker opened for [{ClientName}]. Exception [{Exception}]",
-                clientName,
-                args.Outcome.Exception);
+            logger.LogWarning(args.Outcome.Exception, "Circuit breaker opened for [{ClientName}]", clientName);
             return default;
         },
         OnClosed = _ =>

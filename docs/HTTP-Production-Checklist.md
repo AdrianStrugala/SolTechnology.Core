@@ -14,7 +14,7 @@ service-to-service) tune per-client via `HTTPClients:{name}:Policy`.
 | Setting                                | Default       | Notes |
 | -------------------------------------- | ------------- | ----- |
 | `UsePolly`                             | `true`        | Disabling removes retry + breaker + per-attempt timeout. Emits a startup `LogWarning`. |
-| `MaxRequestRetries`                    | `2`           | 2 retries → 3 attempts total. Worst-case wall-clock = 3 × `RequestTimeout` + 2 backoff delays. |
+| `MaxRequestRetries`                    | `2`           | 2 retries → 3 attempts total. Worst-case wall-clock = 3 × `RequestTimeout` + 2 backoff delays. `0` sends once and keeps the breaker. |
 | `RetryOnUnsafeVerbs`                   | `false`       | `POST` / `PATCH` / `CONNECT` are NOT retried. See §3. |
 | `RetryInitialDelay`                    | `200 ms`      | Exponential + jitter. |
 | `RetryTimeout`                         | `30 000 ms`   | Cap on a single backoff delay AND cap on `Retry-After`. |
@@ -66,7 +66,10 @@ deduplication:
 ```
 
 The circuit breaker still observes failed `POST` / `PATCH` attempts — a
-5xx-storm on writes will trip the breaker for subsequent reads.
+5xx-storm on writes will trip the breaker for subsequent reads. A cancellation of
+the caller's own token is not an upstream failure: it is neither retried nor
+counted by the breaker. While the circuit is open, the `Try*` verbs return a
+recoverable `Error` "Upstream circuit open".
 
 ## 4. Outer time budget — `OverallRequestBudget`
 
@@ -115,10 +118,12 @@ contract — they will not change without a MAJOR bump.
 | `soltechnology.core.http.circuit_state_changes`  | Counter | `client.name`, `state` (open / half-open / closed) |
 
 Wire your preferred OpenTelemetry / .NET metrics exporter against the meter
-name. Existing structured logs from `OnRetry` / `OnOpened` / `OnClosed` /
+name. The `http.method` tag holds the request method for status and exception
+retries alike. Existing structured logs from `OnRetry` / `OnOpened` / `OnClosed` /
 `OnHalfOpened` are still emitted under the `SolTechnology.Core.HTTP` logger
-categories so log-based monitoring works without metrics; the retry warning
-carries the triggering exception as the entry's exception.
+categories so log-based monitoring works without metrics; the retry warning and
+"Circuit breaker opened for [{ClientName}]" carry the triggering exception as the
+entry's exception.
 
 ## 8. Validation at startup
 
@@ -126,7 +131,9 @@ carries the triggering exception as the entry's exception.
 required `BaseAddress` of `HTTPClientConfiguration`, `.ValidateDataAnnotations()`
 plus cross-field validation for `OverallRequestBudget` on `HttpPolicyConfiguration`,
 and `.ValidateDataAnnotations()` on the custom `TOptions` of the three-type-parameter
-overload.
+overload. The `HttpPolicyConfiguration` ranges match Polly 8: delays, timeouts and
+breaker windows are capped at one day, `RequestTimeout` starts at 10 ms, and the
+breaker windows start at 500 ms.
 Mis-configuration surfaces as `OptionsValidationException` at host startup —
 not on the first production request after a deploy passes its health-check.
 

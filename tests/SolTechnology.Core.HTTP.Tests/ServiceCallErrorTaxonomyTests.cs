@@ -2,6 +2,8 @@ using System.Net;
 using System.Net.Sockets;
 using FluentAssertions;
 using NUnit.Framework;
+using Polly.CircuitBreaker;
+using Polly.Timeout;
 using RichardSzalay.MockHttp;
 using SolTechnology.Core;
 using SolTechnology.Core.Errors;
@@ -114,6 +116,36 @@ public sealed class ServiceCallErrorTaxonomyTests
         error.Should().BeOfType<TimeoutError>();
         error.Recoverable.Should().BeTrue();
         error.Message.Should().Be("Connection failed");
+    }
+
+    private static IEnumerable<Exception> OpenCircuitExceptions()
+    {
+        yield return new BrokenCircuitException("The circuit is now open");
+        yield return new IsolatedCircuitException("The circuit is manually held open");
+    }
+
+    [TestCaseSource(nameof(OpenCircuitExceptions))]
+    public void FromException_OpenCircuit_Returns_Recoverable_UpstreamCircuitOpen(Exception exception)
+    {
+        // Act
+        var error = ServiceCallErrorMapper.FromException(exception);
+
+        // Assert
+        error.Message.Should().Be("Upstream circuit open");
+        error.Description.Should().Be(exception.Message);
+        error.Recoverable.Should().BeTrue();
+    }
+
+    [Test]
+    public void FromException_TimeoutRejected_StaysTimeoutError()
+    {
+        // Act
+        var error = ServiceCallErrorMapper.FromException(new TimeoutRejectedException("timed out"));
+
+        // Assert
+        error.Should().BeOfType<TimeoutError>();
+        error.Message.Should().Be("Service call timed out");
+        error.Recoverable.Should().BeTrue();
     }
 
     [Test]

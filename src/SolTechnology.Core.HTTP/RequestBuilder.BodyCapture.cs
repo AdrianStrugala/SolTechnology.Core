@@ -76,7 +76,7 @@ public partial class RequestBuilder
     /// Reads up to <see cref="MaxCapturedBodyBytes"/> of the response body for inclusion in
     /// <see cref="HttpRequestFailedException.ResponseBody"/>, with a pooled staging buffer, so a
     /// huge error page cannot stall the caller or pin large allocations. Returns <c>null</c> when
-    /// the body is empty or cannot be read; rethrows only the caller's cancellation.
+    /// the body is empty or the transport fails while reading it; any other exception propagates.
     /// </summary>
     private static async Task<string?> TryReadCappedBody(HttpResponseMessage response, CancellationToken cancellationToken)
     {
@@ -113,7 +113,7 @@ public partial class RequestBuilder
         {
             throw;
         }
-        catch
+        catch (Exception ex) when (ex is HttpRequestException or IOException or ObjectDisposedException)
         {
             // Best effort: status and URI still describe the failure without the body.
             return null;

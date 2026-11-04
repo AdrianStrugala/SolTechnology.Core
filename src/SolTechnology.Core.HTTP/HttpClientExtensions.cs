@@ -19,15 +19,14 @@ public static class HttpClientExtensions
 
         /// <summary>
         /// Begins constructing a request message that carries <paramref name="policy"/>
-        /// through <see cref="HttpRequestMessage.Options"/>. Downstream code
-        /// (resilience pipeline, error formatter) reads the policy via
-        /// <see cref="RequestBuilder.PolicyOptionsKey"/> instead of pulling it from DI.
+        /// through <see cref="HttpRequestMessage.Options"/> under
+        /// <see cref="RequestBuilder.PolicyOptionsKey"/>.
         /// <para>
-        /// Use this overload when a single request needs to override the client-wide
-        /// policy (e.g. <c>IncludeResponseBodyInException = true</c> for a one-off
-        /// debug call) — typed-client implementations should pull
-        /// <c>IOptionsMonitor&lt;HttpPolicyConfiguration&gt;.Get(clientName)</c> and
-        /// pass it here.
+        /// Only <see cref="HttpPolicyConfiguration.IncludeResponseBodyInException"/> is honoured
+        /// per request, when a throwing verb builds <see cref="HttpRequestFailedException"/>.
+        /// Retry, circuit breaker and timeouts always follow the named client's policy registered
+        /// by <c>AddSolHTTPClient</c>. To apply that client's configured flag, pass
+        /// <c>IOptionsMonitor&lt;HttpPolicyConfiguration&gt;.Get(clientName)</c> here.
         /// </para>
         /// </summary>
         public RequestBuilder CreateRequest(string path, HttpPolicyConfiguration policy)

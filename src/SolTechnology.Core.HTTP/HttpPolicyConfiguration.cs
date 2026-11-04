@@ -16,6 +16,9 @@ public class HttpPolicyConfiguration
     /// </summary>
     public const string SectionName = "HttpPolicy";
 
+    // Polly 8 caps every delay, timeout and breaker window at one day.
+    private const int OneDayMs = 86_400_000;
+
     /// <summary>
     /// Whether the retry, circuit-breaker and timeout pipeline runs. Default <c>true</c>; <c>false</c>
     /// logs a warning at start and leaves <see cref="HTTPClientConfiguration.TimeoutSeconds"/> as the only deadline.
@@ -23,20 +26,22 @@ public class HttpPolicyConfiguration
     public bool UsePolly { get; set; } = true;
 
     /// <summary>
-    /// Cap on a single retry backoff delay and on an honoured <c>Retry-After</c>. Default 30 000.
+    /// Cap on a single retry backoff delay and on an honoured <c>Retry-After</c>. Default 30 000;
+    /// 1 to 86 400 000 (one day).
     /// </summary>
-    [Range(1, int.MaxValue, ErrorMessage = nameof(RetryTimeout) + " must be greater than zero.")]
+    [Range(1, OneDayMs, ErrorMessage = nameof(RetryTimeout) + " must be between 1 ms and one day.")]
     public int RetryTimeout { get; set; } = 30_000;
 
     /// <summary>
-    /// Base delay of the exponential, jittered backoff. Default 200.
+    /// Base delay of the exponential, jittered backoff. Default 200; 0 to 86 400 000 (one day).
     /// </summary>
-    [Range(0, int.MaxValue, ErrorMessage = nameof(RetryInitialDelay) + " must be non-negative.")]
+    [Range(0, OneDayMs, ErrorMessage = nameof(RetryInitialDelay) + " must be between 0 ms and one day.")]
     public int RetryInitialDelay { get; set; } = 200;
 
     /// <summary>
     /// Retries after the first attempt. Default 2 (3 attempts): the worst case is 3 ×
     /// <see cref="RequestTimeout"/> plus two backoff delays, unless <see cref="OverallRequestBudget"/> is lower.
+    /// <c>0</c> sends each request once; the circuit breaker and timeouts still apply.
     /// </summary>
     [Range(0, 100, ErrorMessage = nameof(MaxRequestRetries) + " must be between 0 and 100.")]
     public int MaxRequestRetries { get; set; } = 2;
@@ -103,10 +108,10 @@ public class HttpPolicyConfiguration
     /// <para>
     /// Null disables the outer budget (per-attempt <see cref="RequestTimeout"/>
     /// remains active). When set, it must be greater than
-    /// <see cref="RequestTimeout"/> to allow at least one full attempt.
+    /// <see cref="RequestTimeout"/> to allow at least one full attempt, and at most 86 400 000 (one day).
     /// </para>
     /// </summary>
-    [Range(1, int.MaxValue, ErrorMessage = nameof(OverallRequestBudget) + " must be greater than zero when set.")]
+    [Range(10, OneDayMs, ErrorMessage = nameof(OverallRequestBudget) + " must be between 10 ms and one day when set.")]
     public int? OverallRequestBudget { get; set; }
 
     /// <summary>
@@ -117,15 +122,15 @@ public class HttpPolicyConfiguration
     public double CircuitBreakerFailureThreshold { get; set; } = 0.3;
 
     /// <summary>
-    /// How long the circuit stays open before a half-open probe. Default 10 000.
+    /// How long the circuit stays open before a half-open probe. Default 10 000; 500 to 86 400 000 (one day).
     /// </summary>
-    [Range(1, int.MaxValue, ErrorMessage = nameof(CircuitBreakerDelayDuration) + " must be greater than zero.")]
+    [Range(500, OneDayMs, ErrorMessage = nameof(CircuitBreakerDelayDuration) + " must be between 500 ms and one day.")]
     public int CircuitBreakerDelayDuration { get; set; } = 10_000;
 
     /// <summary>
-    /// Window over which the failure ratio is computed. Default 10 000.
+    /// Window over which the failure ratio is computed. Default 10 000; 500 to 86 400 000 (one day).
     /// </summary>
-    [Range(1, int.MaxValue, ErrorMessage = nameof(CircuitBreakerSamplingDuration) + " must be greater than zero.")]
+    [Range(500, OneDayMs, ErrorMessage = nameof(CircuitBreakerSamplingDuration) + " must be between 500 ms and one day.")]
     public int CircuitBreakerSamplingDuration { get; set; } = 10_000;
 
     /// <summary>
@@ -135,9 +140,9 @@ public class HttpPolicyConfiguration
     public int CircuitBreakerMinimumThroughput { get; set; } = 5;
 
     /// <summary>
-    /// Per-attempt timeout. Default 10 000; raise it per client for slow endpoints.
+    /// Per-attempt timeout. Default 10 000; 10 to 86 400 000 (one day). Raise it per client for slow endpoints.
     /// </summary>
-    [Range(1, int.MaxValue, ErrorMessage = nameof(RequestTimeout) + " must be greater than zero.")]
+    [Range(10, OneDayMs, ErrorMessage = nameof(RequestTimeout) + " must be between 10 ms and one day.")]
     public int RequestTimeout { get; set; } = 10_000;
 }
 

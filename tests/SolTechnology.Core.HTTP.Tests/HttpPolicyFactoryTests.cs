@@ -1,12 +1,16 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Diagnostics.Metrics;
 using System.Net;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using FluentAssertions;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Polly;
+using Polly.CircuitBreaker;
 using SolTechnology.Core.HTTP;
 using SolTechnology.Core.HTTP.Telemetry;
 using NUnit.Framework;
@@ -23,10 +27,12 @@ public sealed class HttpPolicyFactoryTests
 {
     private static ResiliencePipeline<HttpResponseMessage> BuildPipeline(
         Action<HttpPolicyConfiguration>? tune = null,
-        string clientName = "test-client")
+        string clientName = "test-client",
+        ILogger<HttpPolicyFactory>? logger = null,
+        HttpClientMetrics? metrics = null)
     {
-        var metrics = new HttpClientMetrics(new DummyMeterFactory());
-        var factory = new HttpPolicyFactory(NullLogger<HttpPolicyFactory>.Instance, metrics);
+        metrics ??= new HttpClientMetrics(new DummyMeterFactory());
+        var factory = new HttpPolicyFactory(logger ?? NullLogger<HttpPolicyFactory>.Instance, metrics);
         var cfg = new HttpPolicyConfiguration
         {
             // Tighten defaults so tests stay sub-second. Production defaults
@@ -272,9 +278,10 @@ public sealed class HttpPolicyFactoryTests
     private static async Task<HttpResponseMessage> ExecuteWithRequest(
         ResiliencePipeline<HttpResponseMessage> pipeline,
         HttpMethod method,
-        Func<CancellationToken, ValueTask<HttpResponseMessage>> callback)
+        Func<CancellationToken, ValueTask<HttpResponseMessage>> callback,
+        CancellationToken cancellationToken = default)
     {
-        var context = ResilienceContextPool.Shared.Get();
+        var context = ResilienceContextPool.Shared.Get(cancellationToken);
         using var request = new HttpRequestMessage(method, "http://test/");
         context.SetRequestMessage(request);
         try
@@ -385,5 +392,155 @@ public sealed class HttpPolicyFactoryTests
         // We never reach the 10-retry ceiling because the outer budget fires first.
         attempts.Should().BeLessThan(10);
     }
-}
 
+    [Test]
+    public async Task Configure_ZeroRetries_SendsOnce_AndKeepsCircuitBreaker()
+    {
+        // Arrange
+        var pipeline = BuildPipeline(cfg => cfg.MaxRequestRetries = 0);
+        var attempts = 0;
+
+        // Act
+        for (var call = 0; call < 4; call++)
+        {
+            await ExecuteWithRequest(pipeline, HttpMethod.Get, _ =>
+            {
+                attempts++;
+                return ValueTask.FromResult(Status(HttpStatusCode.ServiceUnavailable, HttpMethod.Get));
+            });
+        }
+        var afterBreak = () => ExecuteWithRequest(pipeline, HttpMethod.Get, _ => ValueTask.FromResult(Ok()));
+
+        // Assert
+        attempts.Should().Be(4, "zero retries means one attempt per call");
+        await afterBreak.Should().ThrowAsync<BrokenCircuitException>();
+    }
+
+    [Test]
+    public async Task CallerCancellation_Burst_DoesNotOpenCircuit_NorRecordRetries()
+    {
+        // Arrange
+        var logger = new TemplateCapturingLogger();
+        using var metrics = new MetricCapture();
+        var pipeline = BuildPipeline(logger: CreateLogger(logger), metrics: metrics.Metrics);
+        var attempts = 0;
+
+        // Act
+        for (var call = 0; call < 8; call++)
+        {
+            using var caller = new CancellationTokenSource();
+            var cancelled = () => ExecuteWithRequest(pipeline, HttpMethod.Get, _ =>
+            {
+                attempts++;
+                caller.Cancel();
+                throw new TaskCanceledException("caller gave up", null, caller.Token);
+            }, caller.Token);
+            await cancelled.Should().ThrowAsync<OperationCanceledException>();
+        }
+        using var next = await ExecuteWithRequest(pipeline, HttpMethod.Get, _ => ValueTask.FromResult(Ok()));
+
+        // Assert
+        attempts.Should().Be(8);
+        next.StatusCode.Should().Be(HttpStatusCode.OK, "caller cancellations are not upstream failures");
+        logger.Entries.Should().NotContain(entry => entry.Template != null && entry.Template.StartsWith("Retry policy activated"));
+        metrics.Retries.Should().BeEmpty();
+    }
+
+    [Test]
+    public async Task HttpClientTimeout_TaskCanceledWithoutCallerCancellation_IsRetried()
+    {
+        // Arrange
+        var pipeline = BuildPipeline();
+        var attempts = 0;
+
+        // Act
+        var act = () => ExecuteWithRequest(pipeline, HttpMethod.Get, _ =>
+        {
+            attempts++;
+            throw new TaskCanceledException("HttpClient.Timeout elapsed");
+        });
+
+        // Assert
+        await act.Should().ThrowAsync<TaskCanceledException>();
+        attempts.Should().Be(4);
+    }
+
+    [Test]
+    public async Task CircuitBreaker_Opened_LogsClientNameWithExceptionAsLogException()
+    {
+        // Arrange
+        var logger = new TemplateCapturingLogger();
+        var pipeline = BuildPipeline(logger: CreateLogger(logger));
+        var failure = new HttpRequestException("connection reset");
+
+        // Act
+        for (var call = 0; call < 4; call++)
+        {
+            var act = () => ExecuteWithRequest(pipeline, HttpMethod.Post, _ => throw failure);
+            await act.Should().ThrowAsync<HttpRequestException>();
+        }
+
+        // Assert
+        var opened = logger.Entries.Should().ContainSingle(entry => entry.Template != null && entry.Template.StartsWith("Circuit breaker opened")).Which;
+        opened.Level.Should().Be(LogLevel.Warning);
+        opened.Template.Should().Be("Circuit breaker opened for [{ClientName}]");
+        opened.Message.Should().Be("Circuit breaker opened for [test-client]");
+        opened.Exception.Should().BeSameAs(failure);
+    }
+
+    [TestCase("GET")]
+    [TestCase("PUT")]
+    public async Task Retry_AfterException_TagsRetryMetricWithRequestMethod(string method)
+    {
+        // Arrange
+        using var metrics = new MetricCapture();
+        var pipeline = BuildPipeline(metrics: metrics.Metrics);
+
+        // Act
+        var act = () => ExecuteWithRequest(pipeline, new HttpMethod(method), _ => throw new HttpRequestException("connection reset"));
+        await act.Should().ThrowAsync<HttpRequestException>();
+
+        // Assert
+        metrics.Retries.Should().HaveCount(3);
+        metrics.Retries.Should().OnlyContain(tags => (string?)tags["http.method"] == method && (string?)tags["outcome"] == "exception");
+    }
+
+    private static ILogger<HttpPolicyFactory> CreateLogger(TemplateCapturingLogger capture)
+        => new Logger<HttpPolicyFactory>(new LoggerFactory([capture]));
+
+    private sealed class MetricCapture : IDisposable
+    {
+        private readonly MeterListener _listener = new();
+
+        public MetricCapture()
+        {
+            Metrics = new HttpClientMetrics(new DummyMeterFactory());
+            _listener.InstrumentPublished = (instrument, listener) =>
+            {
+                if (ReferenceEquals(instrument, Metrics.Retries))
+                {
+                    listener.EnableMeasurementEvents(instrument);
+                }
+            };
+            _listener.SetMeasurementEventCallback<long>((_, _, tags, _) =>
+            {
+                var copy = new Dictionary<string, object?>();
+                foreach (var tag in tags)
+                {
+                    copy[tag.Key] = tag.Value;
+                }
+                lock (Retries)
+                {
+                    Retries.Add(copy);
+                }
+            });
+            _listener.Start();
+        }
+
+        public HttpClientMetrics Metrics { get; }
+
+        public List<Dictionary<string, object?>> Retries { get; } = [];
+
+        public void Dispose() => _listener.Dispose();
+    }
+}

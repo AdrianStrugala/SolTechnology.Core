@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.IO;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
@@ -339,6 +341,61 @@ public sealed class RequestBuilderTests
 
         // Assert
         await act.Should().ThrowAsync<OperationCanceledException>();
+    }
+
+    private static IEnumerable<Exception> ExpectedBodyReadFailures()
+    {
+        yield return new IOException("connection reset while reading the body");
+        yield return new HttpRequestException("response ended prematurely");
+        yield return new ObjectDisposedException("response stream");
+    }
+
+    [TestCaseSource(nameof(ExpectedBodyReadFailures))]
+    public async Task TryGet_ErrorBodyReadFails_ReturnsStatusError(Exception readFailure)
+    {
+        // Arrange
+        var (client, mock) = NewClient();
+        mock.When(HttpMethod.Get, "http://api.test/x")
+            .Respond(_ => new HttpResponseMessage(HttpStatusCode.InternalServerError) { Content = new StreamContent(new FailingReadStream(readFailure)) });
+
+        // Act
+        var result = await client.CreateRequest("x").WithResponseType(DataType.Json).TryGet<Match>();
+
+        // Assert
+        result.IsFailure.Should().BeTrue();
+        result.Error!.Message.Should().Be("HTTP 500 InternalServerError");
+        result.Error.Recoverable.Should().BeTrue();
+    }
+
+    [Test]
+    public async Task TryGet_ErrorBodyReadFailsUnexpectedly_Propagates()
+    {
+        // Arrange
+        var (client, mock) = NewClient();
+        mock.When(HttpMethod.Get, "http://api.test/x")
+            .Respond(_ => new HttpResponseMessage(HttpStatusCode.InternalServerError) { Content = new StreamContent(new FailingReadStream(new InvalidOperationException("bug"))) });
+
+        // Act
+        var act = async () => await client.CreateRequest("x").WithResponseType(DataType.Json).TryGet<Match>();
+
+        // Assert
+        await act.Should().ThrowAsync<InvalidOperationException>().WithMessage("bug");
+    }
+
+    private sealed class FailingReadStream(Exception failure) : Stream
+    {
+        public override bool CanRead => true;
+        public override bool CanSeek => false;
+        public override bool CanWrite => false;
+        public override long Length => throw new NotSupportedException();
+        public override long Position { get => 0; set => throw new NotSupportedException(); }
+        public override int Read(byte[] buffer, int offset, int count) => throw failure;
+        public override ValueTask<int> ReadAsync(Memory<byte> buffer, CancellationToken cancellationToken = default) => throw failure;
+        public override Task<int> ReadAsync(byte[] buffer, int offset, int count, CancellationToken cancellationToken) => throw failure;
+        public override void Flush() { }
+        public override long Seek(long offset, SeekOrigin origin) => throw new NotSupportedException();
+        public override void SetLength(long value) => throw new NotSupportedException();
+        public override void Write(byte[] buffer, int offset, int count) => throw new NotSupportedException();
     }
 
     // ---- Policy options flow ---------------------------------------------

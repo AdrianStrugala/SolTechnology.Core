@@ -21,7 +21,8 @@ internal sealed class HttpPolicyFactory(ILogger<HttpPolicyFactory> logger, HttpC
 
     /// <summary>
     /// Adds the (optional outer-budget →) retry → circuit-breaker → per-attempt-timeout
-    /// strategy chain onto the supplied <paramref name="builder"/>. <paramref name="clientName"/>
+    /// strategy chain onto the supplied <paramref name="builder"/>; the retry is left out when
+    /// <see cref="HttpPolicyConfiguration.MaxRequestRetries"/> is <c>0</c>. <paramref name="clientName"/>
     /// is used as a metric tag and a log-scope value so operators can correlate
     /// resilience events back to a typed client.
     /// <para>
@@ -54,7 +55,12 @@ internal sealed class HttpPolicyFactory(ILogger<HttpPolicyFactory> logger, HttpC
             });
         }
 
-        builder.AddRetry(RetryStrategyOptionsBuilder.Build(configuration, clientName, logger, metrics));
+        // Polly rejects zero retry attempts, so "no retries" means no retry strategy.
+        if (configuration.MaxRequestRetries > 0)
+        {
+            builder.AddRetry(RetryStrategyOptionsBuilder.Build(configuration, clientName, logger, metrics));
+        }
+
         builder.AddCircuitBreaker(CircuitBreakerOptionsBuilder.Build(configuration, clientName, logger, metrics));
         builder.AddTimeout(new TimeoutStrategyOptions
         {
@@ -62,13 +68,17 @@ internal sealed class HttpPolicyFactory(ILogger<HttpPolicyFactory> logger, HttpC
         });
     }
 
-    internal static ValueTask<bool> IsTransientFailure(Outcome<HttpResponseMessage> outcome)
+    internal static ValueTask<bool> IsTransientFailure(Outcome<HttpResponseMessage> outcome, ResilienceContext context)
     {
-        if (outcome.Exception is HttpRequestException
-            or TimeoutRejectedException
-            or TaskCanceledException)
+        if (outcome.Exception is HttpRequestException or TimeoutRejectedException)
         {
             return ValueTask.FromResult(true);
+        }
+
+        // A cancellation the caller requested says nothing about the upstream; any other one is a timeout.
+        if (outcome.Exception is OperationCanceledException)
+        {
+            return ValueTask.FromResult(!context.CancellationToken.IsCancellationRequested);
         }
 
         if (outcome.Result is { } response &&

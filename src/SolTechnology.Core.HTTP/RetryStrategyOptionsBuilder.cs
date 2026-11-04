@@ -22,7 +22,7 @@ internal static class RetryStrategyOptionsBuilder
         DelayGenerator = args => RetryAfterDelay(configuration, args.Outcome),
         OnRetry = args =>
         {
-            var method = args.Outcome.Result?.RequestMessage?.Method?.Method ?? "?";
+            var method = ResolveMethod(args.Context, args.Outcome)?.Method ?? "?";
             var outcome = args.Outcome.Exception is not null ? "exception" : "status";
             metrics.Retries.Add(1,
                 new KeyValuePair<string, object?>("client.name", clientName),
@@ -49,7 +49,7 @@ internal static class RetryStrategyOptionsBuilder
             return false;
         }
 
-        var isTransient = await HttpPolicyFactory.IsTransientFailure(outcome);
+        var isTransient = await HttpPolicyFactory.IsTransientFailure(outcome, args.Context);
         if (!isTransient)
         {
             return false;

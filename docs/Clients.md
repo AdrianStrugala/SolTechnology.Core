@@ -97,27 +97,29 @@ services.AddSolHTTPClient<IFootballDataHTTPClient, FootballDataHTTPClient>(
     });
 ```
 
-`HttpPolicyConfiguration` defaults (durations in milliseconds):
+`HttpPolicyConfiguration` defaults (durations in milliseconds). Ranges follow Polly 8 and are
+validated at host start, so a value Polly would reject on the first request stops the host instead:
 
 | Field | Default | Notes |
 |---|---:|---|
 | `UsePolly` | `true` | Set to `false` to bypass the whole pipeline. Surfaced at startup as a `Warning`. |
-| `RequestTimeout` | 10 000 | Per-attempt timeout. |
-| `MaxRequestRetries` | 2 | Initial attempt + 2 retries. |
-| `RetryInitialDelay` | 200 | Seed for the exponential-jitter sequence. |
-| `RetryTimeout` | 30 000 | Upper bound on a single retry delay and on `Retry-After`. |
+| `RequestTimeout` | 10 000 | Per-attempt timeout; 10 ms to one day. |
+| `MaxRequestRetries` | 2 | Initial attempt + 2 retries; 0 to 100. `0` sends once and keeps the circuit breaker. |
+| `RetryInitialDelay` | 200 | Seed for the exponential-jitter sequence; 0 to one day. |
+| `RetryTimeout` | 30 000 | Upper bound on a single retry delay and on `Retry-After`; 1 ms to one day. |
 | `RetryOnUnsafeVerbs` | `false` | `POST` / `PATCH` / `CONNECT` are never retried unless `true`. |
 | `RetryPredicate` | `null` | Optional body-aware restriction; see below. |
-| `OverallRequestBudget` | `null` | Optional outer budget for the whole call; must exceed `RequestTimeout`. |
+| `OverallRequestBudget` | `null` | Optional outer budget for the whole call; must exceed `RequestTimeout`, at most one day. |
 | `CircuitBreakerFailureThreshold` | 0.3 | Ratio in `[0.0, 1.0]`. |
-| `CircuitBreakerSamplingDuration` | 10 000 | Window over which the ratio is sampled. |
-| `CircuitBreakerMinimumThroughput` | 5 | Minimum requests in the window before the breaker can trip. |
-| `CircuitBreakerDelayDuration` | 10 000 | Time the breaker stays open before half-opening. |
+| `CircuitBreakerSamplingDuration` | 10 000 | Window over which the ratio is sampled; 500 ms to one day. |
+| `CircuitBreakerMinimumThroughput` | 5 | Minimum requests in the window before the breaker can trip; at least 2. |
+| `CircuitBreakerDelayDuration` | 10 000 | Time the breaker stays open before half-opening; 500 ms to one day. |
 | `IncludeResponseBodyInException` | `false` | Honoured per request only; see [per-request policy](#per-request-policy). |
 
 Retried automatically for safe and idempotent verbs: `408`, `429` (honours `Retry-After`), `500`,
-`502`, `503` (honours `Retry-After`), `504`, plus `HttpRequestException` /
-`TimeoutRejectedException` / `TaskCanceledException`.
+`502`, `503` (honours `Retry-After`), `504`, plus `HttpRequestException`,
+`TimeoutRejectedException`, and any other cancellation the caller did not request. A cancellation
+of the caller's own token is neither retried nor counted by the circuit breaker.
 
 ### Usage
 
@@ -168,7 +170,8 @@ case-insensitive read) for one request.
 #### Per-request policy
 
 `IncludeResponseBodyInException` is read from the policy passed to `CreateRequest(path, policy)`;
-the named client's policy does not reach a request created without it:
+the named client's policy does not reach a request created without it. It is the only per-request
+field: retry, circuit breaker and timeouts always follow the named client's policy.
 
 ```csharp
 var debugPolicy = new HttpPolicyConfiguration { IncludeResponseBodyInException = true };
@@ -246,6 +249,7 @@ A cancellation requested by the caller's token still throws `OperationCanceledEx
 |---|---|---|
 | Socket-level (DNS, connection refused) | `TimeoutError` | ✅ yes |
 | Timeout (per-attempt, outer budget, or `HttpClient.Timeout`) | `TimeoutError` | ✅ yes |
+| Open circuit (`BrokenCircuitException`) | `Error` "Upstream circuit open" | ✅ yes |
 | 404 | `NotFoundError` | ❌ no (heuristic) |
 | 401 | `UnauthorizedError` | ❌ no |
 | 403 | `ForbiddenError` | ❌ no |
@@ -317,8 +321,8 @@ services.AddOpenTelemetry()
 ```
 
 Each retry / circuit-breaker state transition is also logged at `Warning` under the
-`SolTechnology.Core.HTTP` logger categories; the retry entry carries the triggering exception as
-the log entry's exception. The resilience pipeline name is `core-http-{httpClientName}` for
+`SolTechnology.Core.HTTP` logger categories; the retry entry and the "Circuit breaker opened for
+[{ClientName}]" entry carry the triggering exception as the log entry's exception. The resilience pipeline name is `core-http-{httpClientName}` for
 filtering in dashboards.
 
 #### Upstream service health check
