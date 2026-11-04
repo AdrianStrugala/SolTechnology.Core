@@ -53,7 +53,9 @@ namespace SolTechnology.Core.HTTP
                     configuration = configuration.GetSection(
                         $"{HTTPClientConfiguration.SectionName}:{httpClientName}:{HTTPClientConfiguration.OptionsSubSection}");
                     configuration.Bind(options);
-                });
+                })
+                .ValidateDataAnnotations()
+                .ValidateOnStart();
 
             return services;
         }

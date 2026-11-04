@@ -6,6 +6,7 @@ using FluentAssertions;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using NUnit.Framework;
 
@@ -109,6 +110,33 @@ public sealed class ModuleInstallerTests
         act.Should().Throw<Exception>()
             .Where(ex => ex is ArgumentException || ex is OptionsValidationException,
                 "missing client configuration must surface as a typed startup error");
+    }
+
+    public sealed class RangedClientOptions
+    {
+        [System.ComponentModel.DataAnnotations.Range(1, 10)]
+        public int MaxPageSize { get; set; } = 5;
+    }
+
+    [Test]
+    public async Task AddSolHTTPClient_InvalidOptions_HostStartFails()
+    {
+        // Arrange
+        var builder = Host.CreateApplicationBuilder();
+        builder.Configuration.AddInMemoryCollection(new Dictionary<string, string?>
+        {
+            ["HTTPClients:Sample:BaseAddress"] = "http://example/",
+            ["HTTPClients:Sample:Options:MaxPageSize"] = "500",
+        });
+        builder.Services.AddSolHTTPClient<ISampleHTTPClient, SampleHTTPClient, RangedClientOptions>("Sample");
+        using var host = builder.Build();
+
+        // Act
+        var act = () => host.StartAsync();
+
+        // Assert
+        (await act.Should().ThrowAsync<OptionsValidationException>())
+            .Which.OptionsType.Should().Be<RangedClientOptions>();
     }
 
     // ---- Policy options precedence ---------------------------------------

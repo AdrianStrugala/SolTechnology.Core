@@ -11,8 +11,8 @@ namespace SolTechnology.Core.HTTP.HealthChecks;
 public sealed class UpstreamHealthCheckOptions
 {
     /// <summary>
-    /// How long a successful probe result is cached before re-hitting the upstream.
-    /// Default 30 seconds.
+    /// How long a probe result is cached before re-hitting the upstream. Failures (timeout,
+    /// connection failure, bad payload) are cached as well. Default 30 seconds.
     /// </summary>
     public TimeSpan CacheDuration { get; set; } = TimeSpan.FromSeconds(30);
 
@@ -77,7 +77,7 @@ public abstract class BaseUpstreamServiceHealthCheck<TReport>(
 
         try
         {
-            var response = await httpClient.GetAsync(healthPath, linked.Token);
+            using var response = await httpClient.GetAsync(healthPath, linked.Token);
             response.EnsureSuccessStatusCode();
 
             var report = await response.Content.ReadFromJsonAsync<TReport>(linked.Token);

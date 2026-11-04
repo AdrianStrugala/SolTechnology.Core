@@ -1,7 +1,7 @@
 ---
 spec: 2026-11-02-core-2-0-http
 step: 04
-status: to-do
+status: done
 ---
 
 # Step 04: HTTP — upstream health-check disposal and options validation
@@ -34,12 +34,18 @@ Former core step 21; moved here by the per-library regroup (user, 2026-11-02).
 - Premortem RM-13 (core step 00, 2026-11-02, scenario 13): append a `P-nn` row to the core brief's "Behavioural and persisted-contract breaks" table: HTTP client options are validated with data annotations at host start, so options that 1.x accepted can now stop the host with `OptionsValidationException`.
 
 ## Acceptance criteria
-- [ ] `dotnet test tests/SolTechnology.Core.HTTP.Tests` is green.
-- [ ] DreamTravel starts with its current config: `dotnet test sample-tale-code-apps/DreamTravel/tests/Component/DreamTravel.Component.Tests.csproj` is green.
-- [ ] Premortem mitigations for `ModuleInstaller.cs` are applied.
-- [ ] RM-13: the core brief's P-table has a row for the HTTP options validation.
+- [x] `dotnet test tests/SolTechnology.Core.HTTP.Tests` is green.
+- [x] DreamTravel starts with its current config: `dotnet test sample-tale-code-apps/DreamTravel/tests/Component/DreamTravel.Component.Tests.csproj` is green.
+- [x] Premortem mitigations for `ModuleInstaller.cs` are applied.
+- [x] RM-13: the core brief's P-table has a row for the HTTP options validation.
 
 ## Open questions
 - none
 
 ## Deviations
+
+### P-19 is also listed in this feature's brief
+
+**Original plan:** RM-13 appends a `P-nn` row to the core brief's "Behavioural and persisted-contract breaks" table.
+
+**Actual implementation:** The row is `P-19` in the core brief, and the same row is copied into this feature's "Behavioural and persisted-contract breaks" table next to P-10. DreamTravel's `GoogleHTTPOptions` and `MichelinHTTPOptions` carry no data annotations, so DreamTravel starts unchanged (component tests green). The `di.md` premortem checklist holds for the `ModuleInstaller.cs` edit: no registration, lifetime or decorator changed; the one change adds the missing validation.

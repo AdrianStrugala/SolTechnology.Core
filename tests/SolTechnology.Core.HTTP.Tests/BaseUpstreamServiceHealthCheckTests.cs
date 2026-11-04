@@ -149,6 +149,51 @@ public sealed class BaseUpstreamServiceHealthCheckTests
     }
 
     [Test]
+    public async Task CheckHealth_DisposesResponse()
+    {
+        // Arrange
+        var tracking = new DisposalTrackingHandler(new StubHandler((_, _) => Task.FromResult(new HttpResponseMessage(HttpStatusCode.OK)
+        {
+            Content = new StringContent("""{"status":"ok"}""", Encoding.UTF8, "application/json")
+        })));
+        var client = new HttpClient(tracking) { BaseAddress = new Uri("http://upstream/") };
+        var sut = new TestUpstreamCheck(client, new UpstreamHealthCheckOptions());
+
+        // Act
+        var result = await sut.CheckHealthAsync(Context());
+
+        // Assert
+        result.Status.Should().Be(HealthStatus.Healthy);
+        tracking.Responses.Should().ContainSingle().Which.IsDisposed.Should().BeTrue();
+    }
+
+    private sealed class DisposalTrackingHandler(HttpMessageHandler inner) : DelegatingHandler(inner)
+    {
+        public List<TrackedContent> Responses { get; } = [];
+
+        protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
+        {
+            var response = await base.SendAsync(request, cancellationToken);
+            var tracked = new TrackedContent(await response.Content.ReadAsByteArrayAsync(cancellationToken));
+            tracked.Headers.ContentType = response.Content.Headers.ContentType;
+            response.Content = tracked;
+            Responses.Add(tracked);
+            return response;
+        }
+    }
+
+    private sealed class TrackedContent(byte[] body) : ByteArrayContent(body)
+    {
+        public bool IsDisposed { get; private set; }
+
+        protected override void Dispose(bool disposing)
+        {
+            IsDisposed = true;
+            base.Dispose(disposing);
+        }
+    }
+
+    [Test]
     public async Task Result_IsCached_WithinCacheDuration()
     {
         var time = new FakeTimeProvider();

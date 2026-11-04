@@ -11,8 +11,9 @@ namespace SolTechnology.Core.HTTP.HealthChecks;
 public static class UpstreamHttpHealthCheckExtensions
 {
     /// <summary>
-    /// Adds a cached upstream service health check that calls <paramref name="healthPath"/> on the
-    /// named <see cref="HttpClient"/> identified by <paramref name="httpClientName"/>.
+    /// Adds the cached upstream service health check <typeparamref name="TCheck"/> under
+    /// <paramref name="name"/>. The check's own constructor supplies the HTTP client and the
+    /// health path it probes.
     /// <para>
     /// Subclass <see cref="BaseUpstreamServiceHealthCheck{TReport}"/> with your concrete report
     /// model and override <see cref="BaseUpstreamServiceHealthCheck{TReport}.EvaluateReport"/> to
