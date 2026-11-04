@@ -1,106 +1,92 @@
-# SolTechnology.Core.Cache
+## SolTechnology.Core.Cache
 
-## Overview
+Caching of async results behind one `GetOrAdd<TKey, TItem>` contract, in memory (`ISingletonCache`,
+`IScopedCache<TKey, TItem>`) or in Redis (`IRedisCache`), plus a distributed lock and an idempotency store on
+the same Redis.
 
-Two-tier caching library with a **unified interface** — both tiers expose the same `GetOrAdd<TKey, TItem>` contract:
+### Features
 
-| Tier | Backing store | Registration | Interface |
-|------|--------------|--------------|-----------|
-| **Local** | `IMemoryCache` (in-process) | `AddLocalCache()` | `ISingletonCache`, `IScopedCache<TKey,TItem>` |
-| **Distributed** | Redis via `StackExchange.Redis` | `AddDistributedCache(config)` | `IRedisCache` |
+- **One contract, three lifetimes** — process-wide in memory, per DI scope, or shared across instances in Redis.
+- **Single flight** — concurrent misses on one key run the factory once; every caller awaits the same result.
+- **Failures are not cached** — a faulted or cancelled factory result is evicted, so the next call retries.
+- **Type-namespaced keys** — the same key value used with different `TKey`/`TItem` types never shares an entry,
+  and keys carry no assembly versions, so a redeploy keeps the cache warm.
+- **Fail-open Redis cache** — a Redis error logs a warning and the factory result is returned uncached.
+- **Distributed lock** — `TryAcquireLock` with expiry and fencing, in-process or Redis `SET NX`.
+- **Idempotency store** — reserve, replay, and release request keys, in-process or in Redis.
+- **Fail-fast configuration** — an empty `InstanceName` or `ConnectionString`, or `ExpirationSeconds <= 0`, stops the
+  host at start.
+- **Health check** — `AddSolRedisHealthCheck()` pings Redis through the shared connection.
 
-Both tiers can be used independently or together. Distributed tier is **fail-open** — Redis failures log a warning and fall through to the factory instead of throwing.
+### Registration
 
----
-
-## Installation
-
-```
-dotnet add package SolTechnology.Core.Cache
-```
-
----
-
-## Registration
-
-### Local cache (in-memory)
-
-DreamTravel's API host registers the local tier with one line (`DreamTravel.Api/Program.cs`):
+Register the in-memory tier with one call (DreamTravel's API host):
 
 ```csharp
-builder.Services.AddLocalCache();
+builder.Services.AddSolLocalCache();
 ```
 
-The Worker host binds expiration from configuration (`DreamTravel.Worker/Program.cs`):
+Register Redis, then the lock and the idempotency store that reuse its connection:
 
 ```csharp
-var cacheConfiguration = builder.Configuration.GetSection("Cache").Get<CacheConfiguration>()!;
-builder.Services.AddLocalCache(cacheConfiguration);
+builder.Services.AddSolDistributedCache(
+    builder.Configuration.GetRequiredSection("Redis").Get<DistributedCacheConfiguration>()!);
+builder.Services.AddSolDistributedLock();
+builder.Services.AddSolDistributedIdempotency(ttl: TimeSpan.FromHours(48));
+builder.Services.AddHealthChecks().AddSolRedisHealthCheck(tags: ["ready"]);
 ```
 
-### Distributed cache (Redis)
+Without Redis (local development, one instance), use the in-process variants with the same contracts:
 
 ```csharp
-services.AddDistributedCache(new DistributedCacheConfiguration
-{
-    ConnectionString = "localhost:6379",
-    InstanceName = "DreamTravel:",
-    ExpirationSeconds = 300
-});
+builder.Services.AddSolLocalLock();
+builder.Services.AddSolLocalIdempotency();
 ```
 
-### Both tiers together
+### Configuration
 
-```csharp
-builder.Services.AddLocalCache();
-builder.Services.AddDistributedCache(
-    builder.Configuration.GetSection("Redis").Get<DistributedCacheConfiguration>()!);
-```
+| `CacheConfiguration` | Default | Purpose |
+|---|---|---|
+| `ExpirationMode` | `Absolute` | `Absolute` (from when the entry was added) or `Sliding` (from its last read). |
+| `ExpirationSeconds` | `1200` | Entry lifetime; must be greater than 0. The default applies only when `AddSolLocalCache()` gets no configuration. |
 
-> Use `ISingletonCache` for hot in-process data and `IRedisCache` for shared cross-instance data.
+| `DistributedCacheConfiguration` | Default | Purpose |
+|---|---|---|
+| `ConnectionString` | — | StackExchange.Redis connection string; must not be empty. |
+| `InstanceName` | — | Prefix of every Redis key the package writes; must not be empty. |
+| `ExpirationSeconds` | `300` | Absolute lifetime of an `IRedisCache` entry; must be greater than 0. |
 
----
-
-## Configuration
-
-### CacheConfiguration (local)
-
-| Property | Type | Default | Description |
-|----------|------|---------|-------------|
-| `ExpirationMode` | `ExpirationMode` | `Absolute` | `Absolute` or `Sliding` |
-| `ExpirationSeconds` | `int` | `1200` (20 min) | Time before entry expires |
-
-Can be provided via `appsettings.json` — DreamTravel's Worker binds the `Cache` section:
+Bind both from configuration (DreamTravel's Worker binds `Cache`):
 
 ```json
 {
-  "Cache": {
-    "ExpirationMode": "Absolute",
-    "ExpirationSeconds": 300
-  }
+  "Cache": { "ExpirationMode": "Absolute", "ExpirationSeconds": 300 },
+  "Redis": { "ConnectionString": "localhost:6379", "InstanceName": "DreamTravel:", "ExpirationSeconds": 300 }
 }
 ```
 
-### DistributedCacheConfiguration (Redis)
+```csharp
+var cacheConfiguration = builder.Configuration.GetSection("Cache").Get<CacheConfiguration>();
+builder.Services.AddSolLocalCache(cacheConfiguration);
+```
 
-| Property | Type | Default | Description |
-|----------|------|---------|-------------|
-| `ConnectionString` | `string` | — (required) | Redis connection string |
-| `InstanceName` | `string` | `"SolTechnology:"` | Key prefix in Redis |
-| `ExpirationSeconds` | `int` | `300` (5 min) | Default absolute TTL |
+`InstanceName` prefixes cache, lock, and idempotency keys:
 
----
+| Store | Redis key |
+|---|---|
+| `IRedisCache` | `{InstanceName}{TKey type}:{TItem type}:{JSON key}` |
+| Redis lock | `{InstanceName}lock:{name}` |
+| Redis idempotency store | `{InstanceName}idempotency:{key}` |
 
-## Usage
+Upgrading from 1.x: `InstanceName` had the default `"SolTechnology:"`. Set `InstanceName = "SolTechnology:"` to
+keep the 1.x lock and idempotency keys, so 1.x and 2.x instances still see each other's locks and idempotency records
+during a rolling deploy. Cache entries start cold either way, because 2.0 adds the type names to cache keys.
 
-All caches share the same contract: `GetOrAdd<TKey, TItem>(key, factory)`.  
-Key is serialized to JSON internally — pass any object.
+### Usage
 
-### Real example — a caching decorator over an HTTP client
+#### In-memory caches in a decorator
 
-DreamTravel wraps its Google geolocation client with a thin caching decorator
-(`GoogleHTTPClientCachingDecorator`). It uses **both** local tiers — each one fits a
-different access pattern:
+DreamTravel caches its Google client with both in-memory tiers and registers the decorator with Scrutor:
 
 ```csharp
 public class GoogleHTTPClientCachingDecorator(
@@ -108,338 +94,130 @@ public class GoogleHTTPClientCachingDecorator(
     IScopedCache<string, City> scopedCache,
     ISingletonCache singletonCache) : IGoogleHTTPClient
 {
-    // Forward-geocode the same city name repeatedly within one request → one HTTP call.
+    // Same city name several times in one request → one HTTP call.
     public Task<City> GetLocationOfCity(string cityName)
         => scopedCache.GetOrAdd(cityName, key => innerClient.GetLocationOfCity(key));
 
-    // Reverse-geocode rarely changes → cache across requests for the process lifetime.
+    // Reverse geocoding rarely changes → shared by every request until it expires.
     public Task<City> GetNameOfCity(City city)
         => singletonCache.GetOrAdd(city, key => innerClient.GetNameOfCity(key));
 
-    // Uncached calls just pass through to the inner client.
-    public Task<double[]> GetDurationMatrixByTollRoad(List<City> cities)
-        => innerClient.GetDurationMatrixByTollRoad(cities);
+    // ...
 }
 ```
 
-Wire the decorator with Scrutor, right after registering the real client
-(`DreamTravel.GeolocationDataClients/ModuleInstaller.cs`):
-
 ```csharp
-services.AddHTTPClient<IGoogleHTTPClient, GoogleHTTPClient, GoogleHTTPOptions>("Google");
+services.AddSolHTTPClient<IGoogleHTTPClient, GoogleHTTPClient, GoogleHTTPOptions>("Google");
 services.Decorate(typeof(IGoogleHTTPClient), typeof(GoogleHTTPClientCachingDecorator));
 ```
 
-Consumers keep depending on `IGoogleHTTPClient` — they never see the cache.
+| Cache | Lifetime | Key |
+|---|---|---|
+| `ISingletonCache` | Process, until expiry | JSON of the key, namespaced by `TKey` and `TItem` |
+| `IScopedCache<TKey, TItem>` | One DI scope, for example one HTTP request | JSON of the key |
+| `IRedisCache` | Shared by every instance, until expiry | See the key table in Configuration |
 
-### ISingletonCache — long-lived in-memory cache
+#### Redis cache
 
-Singleton-scoped. Entries survive across requests until expiration. Reach for it when the
-underlying value is stable and shared by everyone — like the reverse-geocode above:
-
-```csharp
-public Task<City> GetNameOfCity(City city)
-    => singletonCache.GetOrAdd(city, key => innerClient.GetNameOfCity(key));
-```
-
-### IScopedCache<TKey, TItem> — request-scoped deduplication
-
-Scoped to the DI scope (typically one HTTP request). Prevents duplicate calls within the same
-request — multiple chapters resolving the same city name share a single lookup:
+`IRedisCache` has the same contract and stores the item as JSON:
 
 ```csharp
-public Task<City> GetLocationOfCity(string cityName)
-    => scopedCache.GetOrAdd(cityName, key => innerClient.GetLocationOfCity(key));
-```
-
-### IRedisCache — Redis-backed distributed cache
-
-Same `GetOrAdd` contract, same decorator shape — swap the in-process tier for Redis when the
-value should be shared **across instances**. If Redis is down, the factory is called and the
-result returned without caching (fail-open):
-
-```csharp
-public class GoogleHTTPClientCachingDecorator(
-    IGoogleHTTPClient innerClient,
-    IRedisCache cache) : IGoogleHTTPClient
+public class CityLookup(IRedisCache cache, IGoogleHTTPClient client)
 {
-    public Task<City> GetLocationOfCity(string cityName)
-        => cache.GetOrAdd(cityName, key => innerClient.GetLocationOfCity(key));
+    public Task<City> Find(string cityName)
+        => cache.GetOrAdd(cityName, key => client.GetLocationOfCity(key));
 }
 ```
 
----
+#### Distributed lock
 
-## Testing
-
-### Local tier
-
-No fixture needed — `IMemoryCache` works out of the box in unit tests.
-
-### Redis tier
-
-Use **`SolTechnology.Core.Redis.Testing`** with Testcontainers:
-
-```csharp
-RedisFixture = new RedisFixture();
-await RedisFixture.InitializeAsync();
-
-var configuration = new TestConfigurationBuilder()
-    .AddJsonFile("appsettings.tests.json")
-    .Override("Redis:HostName", RedisFixture.HostName)
-    .Override("Redis:Enabled", "true")
-    .Build();
-
-await RedisFixture.FlushAsync();    // between-test reset
-await RedisFixture.DisposeAsync();  // teardown
-```
-
-Full reference: [Redis.Testing.md](Redis.Testing.md).
-
----
-
-## API Reference
-
-### ModuleInstaller
-
-| Method | Description |
-|--------|-------------|
-| `AddLocalCache(CacheConfiguration?)` | Registers `ISingletonCache`, `IScopedCache<,>` |
-| `AddDistributedCache(DistributedCacheConfiguration)` | Registers `IRedisCache` (Redis-backed) |
-| `AddLocalLock()` | Registers `IDistributedLockService` (in-process, for local dev / single instance) |
-| `AddDistributedLock()` | Registers `IDistributedLockService` (Redis `SET NX`, requires `AddDistributedCache`) |
-| `AddLocalIdempotency(TimeSpan?)` | Registers `IIdempotencyStore` (in-process, for local dev / single instance) |
-| `AddDistributedIdempotency(TimeSpan?)` | Registers `IIdempotencyStore` (Redis `SET NX`, requires `AddDistributedCache`) |
-
-### Unified Interface
-
-```csharp
-// ISingletonCache
-Task<TItem> GetOrAdd<TKey, TItem>(TKey key, Func<TKey, Task<TItem>> factory);
-
-// IRedisCache
-Task<TItem> GetOrAdd<TKey, TItem>(TKey key, Func<TKey, Task<TItem>> factory);
-
-// IScopedCache<TKey, TItem>
-Task<TItem> GetOrAdd(TKey key, Func<TKey, Task<TItem>> factory);
-```
-
-Same shape everywhere. Key is any serializable object. Factory is called on cache miss.
-
----
-
-## Distributed Lock
-
-`IDistributedLockService` provides cross-instance mutual exclusion backed by the **same Redis**
-that powers the distributed cache. Two registration methods mirror the cache pattern:
-
-```csharp
-// Local dev / single instance — in-process SemaphoreSlim, no Redis needed
-services.AddLocalLock();
-
-// Production — Redis SET NX (requires AddDistributedCache to be called first)
-services.AddDistributedCache(redisConfig);
-services.AddDistributedLock();
-```
-
-### Usage
+`TryAcquireLock` returns a handle, or `null` when another holder has the lock:
 
 ```csharp
 public class SettlementPoller(IDistributedLockService locks)
 {
-    public async Task PollAsync(CancellationToken ct)
+    public async Task Poll(CancellationToken ct)
     {
-        await using var handle = await locks.TryAcquireLockAsync(
-            "settlement/batch-process", expiry: TimeSpan.FromMinutes(5), ct);
-
+        await using var handle = await locks.TryAcquireLock("settlement/batch-process", TimeSpan.FromMinutes(5), ct);
         if (handle is null)
-            return; // another instance holds the lock — skip this cycle
+        {
+            return;
+        }
 
-        // Only one instance executes this at a time
-        await ProcessBatchAsync(ct);
+        // ... process the batch; one instance at a time
     }
 }
 ```
 
-### Contract
-
-| Aspect | Behaviour |
+| Case | Behaviour |
 |---|---|
-| **Success** | Returns `IAsyncDisposable` — disposing releases the lock immediately. |
-| **Lock held by another** | Returns `null` — never blocks. |
-| **Redis unavailable** | Returns `null` + logs Warning — **never throws** (fail-open like the cache). |
-| **Caller cancellation** | May throw `OperationCanceledException` — the only exception path. |
-| **Expiry (TTL)** | Lock auto-releases after `expiry` even if the holder crashes. Prevents deadlocks. |
-| **Fencing** | Each acquisition generates a unique token — release only deletes the key if the token still matches (prevents releasing someone else's lock after expiry). |
+| Acquired | Returns an `IAsyncDisposable`; disposing it releases the lock. Disposing twice is harmless. |
+| Held by another caller | Returns `null` at once; never waits. |
+| Expiry passed | The lock is free again: Redis deletes the key, and the in-process lock lets the next `TryAcquireLock` take it over. Disposing the expired handle does not release the new holder (fencing). |
+| Backend failure | Returns `null` and logs a warning; never throws. |
+| Caller cancellation | Throws `OperationCanceledException`, the only exception. |
 
-### Guard-rails
+#### Idempotency store
 
-- **Never throws into a host loop.** A backend failure degrades to `null`, not an exception. Your
-  polling loop stays alive.
-- **Include tenant/principal in the lock name** where relevant — e.g. `$"settlements/{tenantId}/batch"`.
-  The library prefixes with the configured `InstanceName` automatically.
-- **Keep expiry honest.** Set it longer than the expected work duration but short enough that a crash
-  doesn't hold the lock forever. 2–5× the expected duration is a good heuristic.
-
-### How it works (Redis `SET NX`)
-
-```
-SET "SolTechnology:lock:settlement/batch-process" "<unique-guid>" NX EX 300
-```
-
-- `NX` = only set if **N**ot e**X**ists (atomic mutual exclusion)
-- `EX 300` = auto-expire after 300s (crash safety)
-- Release = Lua script: `DEL key` only if value still matches (fencing)
-
-No external libraries needed — it's `StackExchange.Redis` under the hood (already a dependency of
-the distributed cache tier).
-
-### When to use (Lock vs Cache)
-
-| You need… | Use |
-|---|---|
-| "Don't **compute** this twice" (same result, expensive to produce) | Cache (`GetOrAdd`) |
-| "Don't **do** this twice at the same time" (side-effectful, one winner) | Lock (`TryAcquireLockAsync`) |
-
-**Concrete examples:**
-- ✅ Lock: "Only one instance polls for new settlements every 30s" (leader election)
-- ✅ Lock: "Only one instance runs the nightly cleanup job" (singleton background task)
-- ✅ Lock: "Don't process the same payment event concurrently on two pods" (deduplication at execution level)
-- ❌ Lock for: "Don't call the Google API twice for the same city" → that's a cache miss, use `GetOrAdd`
-
----
-
-## Idempotency Store
-
-`IIdempotencyStore` manages request deduplication keys — ensuring that retried HTTP requests with the
-same `Idempotency-Key` header produce the **exact same response** without re-executing the handler.
-Backed by the **same Redis** that powers the cache and lock.
-
-### The problem it solves
-
-```
-Client sends: POST /payments  (Idempotency-Key: abc-123)
-Server processes payment → 201 Created
-Network drops before client gets the response
-Client retries: POST /payments  (Idempotency-Key: abc-123)
-Without idempotency: payment executes AGAIN → double charge 💸
-With idempotency: server replays the stored 201 response → safe ✅
-```
-
-### Registration
-
-```csharp
-// Local dev / single instance — in-process ConcurrentDictionary with TTL
-services.AddLocalIdempotency();
-
-// Production — Redis SET NX (requires AddDistributedCache to be called first)
-services.AddDistributedCache(redisConfig);
-services.AddDistributedIdempotency();
-
-// Optional: custom TTL (default 24h)
-services.AddDistributedIdempotency(ttl: TimeSpan.FromHours(48));
-```
-
-### Contract
+`IIdempotencyStore` lets a retried request with the same `Idempotency-Key` replay the first response:
 
 | Operation | Behaviour |
 |---|---|
-| **`TryAddAsync(key)`** | Atomically reserves a key. Returns `true` if this caller won (key is new); `false` if already held by another request. |
-| **`GetAsync(key)`** | Gets the stored response for replay, or `null` if the handler hasn't completed yet. |
-| **`SetResponseAsync(key, response)`** | Persists the handler's response (status + headers + body) under the key. |
-| **`RemoveAsync(key)`** | Removes the key — used when the handler throws (allows retry). |
+| `TryAdd(key)` | Reserves the key atomically; `false` when another request holds it. |
+| `Get(key)` | The stored response, or `null` while the first request is still running. |
+| `SetResponse(key, response)` | Stores status, headers, and body for replay until the TTL (default 24 hours) passes. |
+| `Remove(key)` | Releases the key so the client can retry, for example after an exception. |
 
-### Guard-rails
-
-- **Never store 5xx.** A transient failure must not become the permanent "answer" for that key.
-  The middleware (in `Core.Api`) calls `RemoveAsync` on exception — the client can safely retry.
-- **Atomic reservation.** Two identical requests hitting two pods simultaneously: only one wins the
-  `SET NX` — the other waits and replays the stored response.
-- **TTL auto-expiry.** Keys don't grow forever — expired after the configured TTL (default 24h).
-- **Fail-open.** If Redis is unavailable, `TryAddAsync` returns `true` (lets the request through)
-  rather than blocking.
-
-> ⚠️ **Fail-open means duplicate side-effects during a Redis outage.** Unlike the distributed lock
-> (where a backend outage degrades to "might run twice but the work is idempotent"), the idempotency
-> store fails open in the **dangerous** direction: if Redis is down, two retried `POST /payments`
-> requests both run the handler → **double charge**. This is a deliberate availability-over-safety
-> trade-off (reject-all-traffic is worse for most APIs), but if your operation is **not** safe to
-> execute twice, do **not** rely solely on this store — pair it with a downstream idempotency key
-> (e.g. the payment provider's own `Idempotency-Key`) so the duplicate is caught at the system of
-> record.
-
-### When to use (Idempotency vs Lock vs Cache)
-
-| You need… | Use |
-|---|---|
-| "Don't **compute** this twice" | Cache |
-| "Don't **do** this twice at the same time" | Lock |
-| "Don't **do** this twice ever (even across retries minutes apart)" | Idempotency |
-
-**Concrete examples:**
-- ✅ Idempotency: "Client retries a payment POST — serve the same 201 without double-charging"
-- ✅ Idempotency: "Mobile app loses network after submit — user hits retry — same result"
-- ❌ Idempotency for: "Two pods processing the same queue message simultaneously" → that's a Lock
-- ❌ Idempotency for: "Don't call an expensive API twice for the same input" → that's a Cache
-
-### Middleware recipe (copy into your app)
-
-The library provides the **store** — the middleware is a ~30-line snippet in your app:
+The Redis store fails open: when Redis is down, `TryAdd` returns `true`, so a retried request runs again. Pair it
+with a downstream idempotency key when a duplicate side effect is unacceptable. A middleware that uses the store:
 
 ```csharp
 app.Use(async (context, next) =>
 {
     var store = context.RequestServices.GetRequiredService<IIdempotencyStore>();
     var key = context.Request.Headers["Idempotency-Key"].FirstOrDefault();
-
     if (string.IsNullOrEmpty(key))
     {
-        await next(); // no key — pass through
+        await next();
         return;
     }
 
-    // Check if we already have a stored response
-    var stored = await store.GetAsync(key, context.RequestAborted);
+    var stored = await store.Get(key, context.RequestAborted);
     if (stored is not null)
     {
         context.Response.StatusCode = stored.StatusCode;
-        foreach (var h in stored.Headers) context.Response.Headers[h.Key] = h.Value;
+        foreach (var header in stored.Headers)
+        {
+            context.Response.Headers[header.Key] = header.Value;
+        }
         await context.Response.Body.WriteAsync(stored.Body, context.RequestAborted);
         return;
     }
 
-    // Try to reserve the key
-    if (!await store.TryAddAsync(key, context.RequestAborted))
+    if (!await store.TryAdd(key, context.RequestAborted))
     {
-        context.Response.StatusCode = 409; // Conflict — someone else is processing
+        context.Response.StatusCode = StatusCodes.Status409Conflict;
         return;
     }
 
-    // Capture the response
     var originalBody = context.Response.Body;
     using var buffer = new MemoryStream();
     context.Response.Body = buffer;
-
     try
     {
         await next();
-
-        // Only store 2xx responses — never cache failures
         if (context.Response.StatusCode is >= 200 and < 300)
         {
-            buffer.Seek(0, SeekOrigin.Begin);
-            var response = new StoredResponse
+            await store.SetResponse(key, new StoredResponse
             {
                 StatusCode = context.Response.StatusCode,
-                Headers = context.Response.Headers
-                    .ToDictionary(h => h.Key, h => h.Value.ToArray()),
+                Headers = context.Response.Headers.ToDictionary(h => h.Key, string[] (h) => h.Value.ToArray()!),
                 Body = buffer.ToArray()
-            };
-            await store.SetResponseAsync(key, response, context.RequestAborted);
+            }, context.RequestAborted);
         }
         else
         {
-            await store.RemoveAsync(key, context.RequestAborted); // allow retry on non-2xx
+            await store.Remove(key, context.RequestAborted);
         }
 
         buffer.Seek(0, SeekOrigin.Begin);
@@ -447,7 +225,7 @@ app.Use(async (context, next) =>
     }
     catch
     {
-        await store.RemoveAsync(key); // handler threw — allow retry
+        await store.Remove(key);
         throw;
     }
     finally
@@ -457,3 +235,61 @@ app.Use(async (context, next) =>
 });
 ```
 
+#### Cache, lock, or idempotency
+
+| You need… | Use |
+|---|---|
+| Don't **compute** this twice | Cache (`GetOrAdd`) |
+| Don't **do** this twice at the same time | Lock (`TryAcquireLock`) |
+| Don't **do** this twice, even across retries minutes apart | Idempotency store |
+
+### Testing
+
+The in-memory tier needs no fixture. For Redis, [`SolTechnology.Core.Redis.Testing`](Redis.Testing.md) boots a
+container:
+
+```csharp
+[Test]
+public async Task GetOrAdd_SecondCall_ReturnsCachedItem()
+{
+    // Arrange
+    await using var redis = new RedisFixture();
+    await redis.InitializeAsync();
+    var services = new ServiceCollection().AddLogging();
+    services.AddSolDistributedCache(new DistributedCacheConfiguration
+    {
+        ConnectionString = redis.ConnectionString,
+        InstanceName = "tests:"
+    });
+    await using var provider = services.BuildServiceProvider();
+    var cache = provider.GetRequiredService<IRedisCache>();
+    await cache.GetOrAdd("wroclaw", _ => Task.FromResult(640_000));
+
+    // Act
+    var population = await cache.GetOrAdd("wroclaw", _ => Task.FromResult(0));
+
+    // Assert
+    population.Should().Be(640_000);
+}
+```
+
+### Conventions
+
+- Give every application its own `InstanceName` when apps share one Redis; keep `"SolTechnology:"` only to stay
+  compatible with 1.x locks and idempotency records.
+- Use the cache for idempotent reads only; the factory may run again after an expiry or a failure.
+- Include the tenant or principal in lock names, for example `$"settlements/{tenantId}/batch"`.
+- Set a lock expiry 2–5 times the expected work duration.
+- Store only 2xx responses in the idempotency store; call `Remove` on failures so clients can retry.
+
+### What ships in DI
+
+| Call | Registers | Lifetime |
+|---|---|---|
+| `AddSolLocalCache(CacheConfiguration?)` | `ISingletonCache`, `IScopedCache<,>`, `IMemoryCache`, validated `CacheConfiguration` | Singleton, scoped, singleton |
+| `AddSolDistributedCache(DistributedCacheConfiguration)` | `IRedisCache`, `IDistributedCache`, one `IConnectionMultiplexer`, validated `DistributedCacheConfiguration` | Singleton |
+| `AddSolLocalLock()` | In-process `IDistributedLockService` (uses a registered `TimeProvider` when present) | Singleton |
+| `AddSolDistributedLock()` | Redis `IDistributedLockService`; requires `AddSolDistributedCache` | Singleton |
+| `AddSolLocalIdempotency(TimeSpan?)` | In-process `IIdempotencyStore` | Singleton |
+| `AddSolDistributedIdempotency(TimeSpan?)` | Redis `IIdempotencyStore`; requires `AddSolDistributedCache` | Singleton |
+| `AddSolRedisHealthCheck(...)` on `IHealthChecksBuilder` | Redis `PING` check, default name `redis` | — |
