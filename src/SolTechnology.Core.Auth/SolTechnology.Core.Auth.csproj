@@ -1,8 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-	  <Description>Secure your ASP.NET Core APIs in minutes with lightweight API-key and basic authentication — simple, configurable filters without the ceremony of full OAuth/OIDC. Fail-fast configuration validation at startup. Formerly SolTechnology.Core.Authentication.</Description>
-	  <PackageTags>soltechnology core authentication authorization apikey basic-auth security aspnetcore middleware filters dotnet csharp</PackageTags>
+	  <Description>Secure your ASP.NET Core APIs in minutes: API-key authentication with constant-time key comparison and a global require-authenticated policy, registered with one AddSolAuth call — without the ceremony of full OAuth/OIDC. Fail-fast configuration validation at startup. Formerly SolTechnology.Core.Authentication.</Description>
+	  <PackageTags>soltechnology core authentication authorization apikey api-key security aspnetcore middleware filters dotnet csharp</PackageTags>
 	  <Product>SolTechnology.Core.Auth</Product>
 	  <Title>SolTechnology.Core Auth</Title>
 	  <PackageId>SolTechnology.Core.Auth</PackageId>
