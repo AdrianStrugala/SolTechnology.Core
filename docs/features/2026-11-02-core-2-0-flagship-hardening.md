@@ -498,6 +498,10 @@ parameter; `UntilAsync`, `CheckHealthAsync`, `InvokeAsync`, `StartAsync`/`StopAs
   hangfire 07, testing-kits 06).
 - **L-04** `SQLProjectDeployer` logs through `ILogger` instead of `Console.WriteLine`. Step: sql 04.
 - **L-05** Tale log scope carries the real `TaleId` instead of `Auid.Empty`. Step: tale 05.
+- **L-06** The HTTP circuit-breaker-opened warning passes the exception as the log entry's
+  exception instead of an `[{Exception}]` placeholder; the template is
+  `Circuit breaker opened for [{ClientName}]` (`CircuitBreakerOptionsBuilder.cs`). Step: http code
+  review fixes (2026-11-03).
 
 ### Release-notes inputs (consumed by release 05)
 
@@ -594,6 +598,21 @@ these notes from the steps:
   store `LeaseExpiresAt` on updates as well as inserts, prefer a `datetimeoffset` / `timestamptz`
   column, and with a `DateTime` column write `UtcDateTime` and read it back with
   `DateTime.SpecifyKind(value, DateTimeKind.Utc)`; treat the read-back error as a repository bug.
+- http (code review, 2026-11-03, L-06): `HttpPolicyConfiguration` ranges now match Polly 8 and are
+  checked at host start: `RequestTimeout` and `OverallRequestBudget` 10 ms to one day,
+  `CircuitBreakerDelayDuration` and `CircuitBreakerSamplingDuration` 500 ms to one day,
+  `RetryInitialDelay` 0 ms and `RetryTimeout` 1 ms to one day. A value outside them used to start
+  the host and fail every request; it now stops the host with `OptionsValidationException`.
+  `MaxRequestRetries = 0` now sends each request once and keeps the circuit breaker and timeouts
+  (before, every request failed). A cancellation of the caller's own token is no longer counted by
+  the circuit breaker and logs no retry warning or retry metric; other cancellations, such as
+  `HttpClient.Timeout`, still count. The `Try*` verbs map an open circuit (`BrokenCircuitException`,
+  `IsolatedCircuitException`) to a recoverable `Error` "Upstream circuit open" instead of the
+  non-recoverable "Unexpected service call error". The circuit-opened warning is
+  `Circuit breaker opened for [{ClientName}]` with the exception as the log entry's exception
+  (L-06). The `soltechnology.core.http.retries` counter tags exception retries with the request
+  method instead of `?`. An unexpected exception (not a transport read failure) while reading an
+  error body now propagates instead of being swallowed.
 
 ### Resolved questions (user answers, 2026-11-02)
 
