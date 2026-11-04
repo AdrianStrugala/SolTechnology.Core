@@ -1,11 +1,8 @@
 ## SolTechnology.Core.HTTP
 
-A thin, opinionated wrapper around `HttpClient` that bakes production-ready
-resilience, observability, and ergonomics into outbound HTTP integrations. Drop
-it into any ASP.NET Core / worker service and your typed clients ship with
-retry + circuit breaker + per-attempt timeout, correlation propagation, a
-fluent request builder, and a diagnostic exception type — no boilerplate, no
-hand-rolled Polly pipelines, no leaking secrets into log sinks.
+Typed `HttpClient` registration with a production-ready resilience pipeline, correlation
+propagation, a fluent request builder, and a diagnostic exception type. Retry, circuit breaker and
+per-attempt timeout are wired for you, and upstream payloads stay out of log sinks by default.
 
 Design rationale lives in [HTTP client architecture](architecture/http-client.md);
 before pointing this at production traffic, walk through the
@@ -13,14 +10,14 @@ before pointing this at production traffic, walk through the
 
 ### Features
 
-- **Typed-client registration** — `services.AddHTTPClient<IFooClient, FooClient>("foo")`
+- **Typed-client registration** — `services.AddSolHTTPClient<IFooClient, FooClient>("foo")`
   with optional strongly-typed options bound from configuration.
 - **Resilience pipeline** — retry (exponential backoff + jitter) → circuit
   breaker → per-attempt timeout, built on
   `Microsoft.Extensions.Http.Resilience` / Polly v8. Optional outer
   `OverallRequestBudget` caps the total wall-clock per call.
-- **Idempotent-only retry by default** — `POST` / `PATCH` are NOT retried
-  unless you opt in with `RetryOnUnsafeVerbs`. No silent double-charges.
+- **Idempotent-only retry by default** — `POST` / `PATCH` are NOT retried, not even after a
+  connection error or a timeout, unless you opt in with `RetryOnUnsafeVerbs`. No silent double-charges.
 - **Recoverable-aware retry** — opt-in `RetryPredicate` inspects the response body
   and refuses retries when the upstream signals a non-recoverable business error
   (`"recoverable": false` in ProblemDetails). Built-in helper: `RetryPredicates.RecoverableOnly`.
@@ -28,42 +25,36 @@ before pointing this at production traffic, walk through the
   exactly as the server asks, capped at `RetryTimeout`.
 - **Correlation propagation** — `X-Correlation-Id` + W3C `traceparent` on every
   outbound request and every retry. Caller-supplied headers win.
-- **Fluent request builder** — `httpClient.CreateRequest("/path").WithHeader(...).WithBody(...).GetAsync<T>()`,
-  reusable across multiple terminal verbs.
-- **Per-request policy override** — `CreateRequest(path, HttpPolicyConfiguration)`
-  + `WithJsonOptions(...)` for one-off debug or migration scenarios.
+- **Fluent request builder** — `httpClient.CreateRequest("/path").WithHeader(...).WithBody(...).Get<T>()`,
+  reusable across multiple terminal verbs, with `Result<T>`-returning `Try*` verbs.
 - **Diagnostic exceptions** — `HttpRequestFailedException` carries method, URI,
-  status, reason phrase. Response body capture is opt-in
+  status, reason phrase. Response body capture is opt-in per request
   (`IncludeResponseBodyInException`) and bounded to 8 KiB so PII / tokens don't
   flow into logs through `Exception.Message`.
-- **Metrics out of the box** — `Meter("SolTechnology.Core.HTTP")` with
-  `retries` and `circuit_state_changes` counters.
-- **Startup validation** — every option type uses `.ValidateOnStart()`, so bad
-  config fails the host instead of the first production request.
-- **`System.Text.Json` streaming** — serialize + deserialize without LOH
-  pressure on large payloads. Avro supported via `DataType.Avro`.
+- **Metrics and startup validation** — `Meter("SolTechnology.Core.HTTP")` with `retries` and
+  `circuit_state_changes` counters; every option type is validated with `ValidateOnStart()`.
 
 ### Registration
 
 ```csharp
-services.AddHTTPClient<IFootballDataHTTPClient, FootballDataHTTPClient>("football-data");
+services.AddSolHTTPClient<IFootballDataHTTPClient, FootballDataHTTPClient>("football-data");
 ```
 
 The string `"football-data"` is the client name and must match the key under
 `HTTPClients:` in `appsettings.json` when the configuration is bound from
 `IConfiguration`. For a client with its own options section, use the
-three-parameter overload — `GoogleHTTPOptions` is bound from
-`HTTPClients:Google:Options`:
+three-type-parameter overload — `GoogleHTTPOptions` is bound from
+`HTTPClients:Google:Options` and validated with its data annotations at start:
 
 ```csharp
-services.AddHTTPClient<IGoogleHTTPClient, GoogleHTTPClient, GoogleHTTPOptions>("Google");
+services.AddSolHTTPClient<IGoogleHTTPClient, GoogleHTTPClient, GoogleHTTPOptions>("Google");
 ```
 
 ### Configuration
 
 Two layers configured independently per client:
 
-- **`HTTPClientConfiguration`** — base address, request timeout, default headers.
+- **`HTTPClientConfiguration`** — base address, `HttpClient` timeout (used only without Polly), default headers.
 - **`HttpPolicyConfiguration`** — retry / circuit breaker / timeout policy.
 
 ```jsonc
@@ -71,7 +62,6 @@ Two layers configured independently per client:
   "HTTPClients": {
     "football-data": {
       "BaseAddress": "https://api.football-data.org",
-      "TimeoutSeconds": 30,
       "Headers": [
         { "Name": "X-Auth-Token", "Value": "..." }
       ],
@@ -90,40 +80,43 @@ Two layers configured independently per client:
 
 Policy precedence (most specific wins):
 
-1. Explicit `HttpPolicyConfiguration` passed to `AddHTTPClient`.
-2. `HTTPClients:{name}:Policy` — per-client override.
-3. `HttpPolicy` — global default for all clients.
-4. Built-in defaults (table below).
+1. Explicit `HttpPolicyConfiguration` passed to `AddSolHTTPClient`.
+1. `HTTPClients:{name}:Policy` — per-client override.
+1. `HttpPolicy` — global default for all clients.
+1. Built-in defaults (table below).
 
 For short scripts or unit tests, pass the configuration directly:
 
 ```csharp
-services.AddHTTPClient<IFootballDataHTTPClient, FootballDataHTTPClient>(
+services.AddSolHTTPClient<IFootballDataHTTPClient, FootballDataHTTPClient>(
     "football-data",
     new HTTPClientConfiguration
     {
-        BaseAddress    = "https://api.football-data.org",
-        TimeoutSeconds = 30,
-        Headers        = [ new() { Name = "X-Auth-Token", Value = "..." } ]
+        BaseAddress = "https://api.football-data.org",
+        Headers     = [new() { Name = "X-Auth-Token", Value = "..." }]
     });
 ```
 
-`HttpPolicyConfiguration` defaults:
+`HttpPolicyConfiguration` defaults (durations in milliseconds):
 
 | Field | Default | Notes |
 |---|---:|---|
 | `UsePolly` | `true` | Set to `false` to bypass the whole pipeline. Surfaced at startup as a `Warning`. |
-| `RequestTimeout` | 30 000 ms | Per-attempt timeout. |
-| `MaxRequestRetries` | 3 | Initial attempt + 3 retries. |
-| `RetryInitialDelay` | 200 ms | Seed for the exponential-jitter sequence. |
-| `RetryTimeout` | 30 000 ms | Upper bound on a single retry delay. |
+| `RequestTimeout` | 10 000 | Per-attempt timeout. |
+| `MaxRequestRetries` | 2 | Initial attempt + 2 retries. |
+| `RetryInitialDelay` | 200 | Seed for the exponential-jitter sequence. |
+| `RetryTimeout` | 30 000 | Upper bound on a single retry delay and on `Retry-After`. |
+| `RetryOnUnsafeVerbs` | `false` | `POST` / `PATCH` / `CONNECT` are never retried unless `true`. |
+| `RetryPredicate` | `null` | Optional body-aware restriction; see below. |
+| `OverallRequestBudget` | `null` | Optional outer budget for the whole call; must exceed `RequestTimeout`. |
 | `CircuitBreakerFailureThreshold` | 0.3 | Ratio in `[0.0, 1.0]`. |
-| `CircuitBreakerSamplingDuration` | 30 000 ms | Window over which the ratio is sampled. |
-| `CircuitBreakerMinimumThroughput` | 10 | Minimum requests in the window before the breaker can trip. |
-| `CircuitBreakerDelayDuration` | 10 000 ms | Time the breaker stays open before half-opening. |
+| `CircuitBreakerSamplingDuration` | 10 000 | Window over which the ratio is sampled. |
+| `CircuitBreakerMinimumThroughput` | 5 | Minimum requests in the window before the breaker can trip. |
+| `CircuitBreakerDelayDuration` | 10 000 | Time the breaker stays open before half-opening. |
+| `IncludeResponseBodyInException` | `false` | Honoured per request only; see [per-request policy](#per-request-policy). |
 
-Retried automatically: `408`, `429` (honours `Retry-After`), `500`, `502`,
-`503` (honours `Retry-After`), `504`, plus `HttpRequestException` /
+Retried automatically for safe and idempotent verbs: `408`, `429` (honours `Retry-After`), `500`,
+`502`, `503` (honours `Retry-After`), `504`, plus `HttpRequestException` /
 `TimeoutRejectedException` / `TaskCanceledException`.
 
 ### Usage
@@ -133,10 +126,10 @@ Retried automatically: `408`, `429` (honours `Retry-After`), `500`, `502`,
 ```csharp
 public sealed class FootballDataHTTPClient(HttpClient httpClient) : IFootballDataHTTPClient
 {
-    public Task<MatchModel> GetMatchAsync(int id, CancellationToken ct = default) =>
+    public Task<MatchModel> GetMatch(int id, CancellationToken cancellationToken = default) =>
         httpClient.CreateRequest($"v2/matches/{id}")
                   .WithResponseType(DataType.Json)
-                  .GetAsync<MatchModel>(ct);
+                  .Get<MatchModel>(cancellationToken);
 }
 ```
 
@@ -146,42 +139,57 @@ public sealed class FootballDataHTTPClient(HttpClient httpClient) : IFootballDat
 // GET typed
 var match = await httpClient.CreateRequest("v2/matches/42")
     .WithResponseType(DataType.Json)
-    .GetAsync<MatchModel>(cancellationToken);
+    .Get<MatchModel>(cancellationToken);
 
 // POST with body
 var created = await httpClient.CreateRequest("v2/matches")
     .WithHeader("X-Idempotency-Key", idempotencyKey)
     .WithBody(payload)              // Content-Type: application/json
     .WithResponseType(DataType.Json)
-    .PostAsync<MatchModel>(cancellationToken);
+    .Post<MatchModel>(cancellationToken);
 
 // Raw response — caller owns disposal
-using var response = await httpClient.CreateRequest("v2/matches/42").GetAsync(cancellationToken);
+using var response = await httpClient.CreateRequest("v2/matches/42").Get(cancellationToken);
 ```
 
-Verbs supported: `GetAsync`, `PostAsync`, `PutAsync`, `PatchAsync`,
-`DeleteAsync`. Each has a typed (`<T>`) and untyped (`HttpResponseMessage`)
-overload. The same builder is safe to reuse across multiple terminal verbs:
+Verbs supported: `Get`, `Post`, `Put`, `Patch`, `Delete`. Each has a typed (`<T>`) and an
+untyped (`HttpResponseMessage`) overload, and the typed ones have `TryGet<T>` … `TryDelete<T>`
+counterparts that return `Result<T>`. The same builder is safe to reuse across multiple terminal verbs:
 
 ```csharp
 var builder = httpClient.CreateRequest("v2/health").WithHeader("X-Probe", "true");
-var head = await builder.GetAsync();   // call 1 — OK
-var poke = await builder.PostAsync();  // call 2 — still OK
+using var first = await builder.Get();    // call 1 — OK
+using var second = await builder.Post();  // call 2 — still OK
 ```
 
-#### Per-request policy override
+`WithJsonOptions(...)` replaces the default `JsonSerializerOptions` (original casing on write,
+case-insensitive read) for one request.
+
+#### Per-request policy
+
+`IncludeResponseBodyInException` is read from the policy passed to `CreateRequest(path, policy)`;
+the named client's policy does not reach a request created without it:
 
 ```csharp
 var debugPolicy = new HttpPolicyConfiguration { IncludeResponseBodyInException = true };
 
 var match = await httpClient
     .CreateRequest("v2/matches/42", debugPolicy)
-    .GetAsync<MatchModel>(ct);
+    .Get<MatchModel>(cancellationToken);
 ```
 
-Typed clients should pull
-`IOptionsMonitor<HttpPolicyConfiguration>.Get(clientName)` and pass it in
-explicitly rather than constructing the override ad-hoc.
+To honour the configured flag of a named client, pass its policy from `IOptionsMonitor`:
+
+```csharp
+public sealed class FootballDataHTTPClient(
+    HttpClient httpClient,
+    IOptionsMonitor<HttpPolicyConfiguration> policies) : IFootballDataHTTPClient
+{
+    public Task<MatchModel> GetMatch(int id, CancellationToken cancellationToken = default) =>
+        httpClient.CreateRequest($"v2/matches/{id}", policies.Get("football-data"))
+                  .Get<MatchModel>(cancellationToken);
+}
+```
 
 #### Handling failures
 
@@ -190,7 +198,7 @@ Any non-2xx response on a typed call throws `HttpRequestFailedException`:
 ```csharp
 try
 {
-    var match = await httpClient.CreateRequest("v2/matches/42").GetAsync<MatchModel>();
+    var match = await httpClient.CreateRequest("v2/matches/42").Get<MatchModel>(cancellationToken);
 }
 catch (HttpRequestFailedException ex)
 {
@@ -206,12 +214,82 @@ catch (HttpRequestFailedException ex)
 | `Method` | `HttpMethod` of the failing call |
 | `RequestUri` | Absolute URI of the failing call |
 | `ReasonPhrase` | Server-side reason phrase |
-| `ResponseBody` | First 8 KiB of the body, opt-in; oversize bodies end with `… [response body truncated]` |
+| `ResponseBody` | First 8 KiB of the body, opt-in per request; oversize bodies end with `… [response body truncated]` |
 
 `HttpRequestFailedException` inherits from `HttpRequestException`, so existing
 `catch (HttpRequestException)` handlers continue to work. `Exception.Message`
 carries only metadata — the response body is exposed **only** via
 `ResponseBody`, so tokens / PII do not leak into logging sinks.
+
+#### Result-returning verbs (`Try*`)
+
+`Get<T>()` / `Post<T>()` throw on failure; the `Try` variants return `Result<T>` with a typed Core error:
+
+```csharp
+var result = await httpClient.CreateRequest("/api/payments")
+    .WithBody(payment)
+    .TryPost<PaymentResponse>(cancellationToken);
+
+if (result.IsFailure)
+{
+    logger.LogWarning("Payment call failed: [{Error}]", result.Error!.Message);
+    return Result<PaymentResponse>.Fail(result.Error);
+}
+
+return Result<PaymentResponse>.Success(result.Data!);
+```
+
+A cancellation requested by the caller's token still throws `OperationCanceledException`.
+`ServiceCallErrorMapper` maps every other failure:
+
+| Failure | Mapped to | Recoverable? |
+|---|---|---|
+| Socket-level (DNS, connection refused) | `TimeoutError` | ✅ yes |
+| Timeout (per-attempt, outer budget, or `HttpClient.Timeout`) | `TimeoutError` | ✅ yes |
+| 404 | `NotFoundError` | ❌ no (heuristic) |
+| 401 | `UnauthorizedError` | ❌ no |
+| 403 | `ForbiddenError` | ❌ no |
+| 400 / 422 | `ValidationError` | ❌ no |
+| 409 | `ConflictError` | ❌ no |
+| 408 / 504 | `TimeoutError` | ✅ yes |
+| 5xx | `Error` | ✅ yes (heuristic) |
+| Deserialization failure (bad JSON) | `Error` | ❌ no |
+
+If a JSON-object response body contains `"recoverable": true/false`, it overrides the status-code
+heuristic, and its `title` (else `message`, else `detail`) string becomes the error `Message`.
+
+#### Recoverable-aware retry predicate
+
+Stop spending retries on deterministic business rejections when the upstream uses `Core.Api`'s
+`ProblemDetails` with `"recoverable": true/false`:
+
+```csharp
+services.AddSolHTTPClient<IPaymentsClient, PaymentsClient>(
+    "Payments",
+    new HTTPClientConfiguration { BaseAddress = "https://payments/" },
+    new HttpPolicyConfiguration
+    {
+        RetryPredicate = RetryPredicates.RecoverableOnly
+    });
+```
+
+| Predicate outcome | Effect |
+|---|---|
+| Not called | The status or exception is not transient, the verb is unsafe, or it is the last attempt. |
+| Skipped | The body is larger than 8 KiB; the transient status decides. |
+| `true` | Retry (body says recoverable, or is not a JSON object — benefit of the doubt). |
+| `false` | Stop retrying (body says non-recoverable). |
+
+The predicate restricts retries only; a `400`, `401`, `403` or `404` is never retried. The body is
+buffered (at most 8 KiB) before the call, so a custom predicate may read it:
+
+```csharp
+RetryPredicate = async response =>
+{
+    var body = await response.Content.ReadAsStringAsync();
+    return !body.Contains("DUPLICATE_DETECTED");
+}
+```
 
 #### Correlation propagation
 
@@ -238,29 +316,63 @@ services.AddOpenTelemetry()
     .WithTracing(b => b.AddHttpClientInstrumentation());
 ```
 
-Each retry / circuit-breaker state transition is also logged at `Warning` via
-the `ILogger<HttpPolicyFactory>` category. The resilience pipeline name is
-`core-http-{httpClientName}` for filtering in dashboards.
+Each retry / circuit-breaker state transition is also logged at `Warning` under the
+`SolTechnology.Core.HTTP` logger categories; the retry entry carries the triggering exception as
+the log entry's exception. The resilience pipeline name is `core-http-{httpClientName}` for
+filtering in dashboards.
+
+#### Upstream service health check
+
+Subclass `BaseUpstreamServiceHealthCheck<TReport>` to probe a downstream's `/health` endpoint
+through a named client registered with `AddSolHTTPClient`:
+
+```csharp
+public sealed record PartnerHealth(string Status);
+
+public sealed class PartnerHealthCheck(IHttpClientFactory httpClientFactory, ILogger<PartnerHealthCheck> logger)
+    : BaseUpstreamServiceHealthCheck<PartnerHealth>(
+        httpClientFactory, "partner", "/health", new UpstreamHealthCheckOptions(), logger)
+{
+    protected override HealthCheckResult EvaluateReport(PartnerHealth report) =>
+        report.Status == "ok"
+            ? HealthCheckResult.Healthy()
+            : HealthCheckResult.Degraded($"partner status: {report.Status}");
+}
+
+// "partner" is the client name used in AddSolHTTPClient<IPartnerClient, PartnerClient>("partner").
+builder.Services.AddHealthChecks()
+    .AddSolUpstreamHttpHealthCheck<PartnerHealthCheck>("partner");
+```
+
+| Outcome | Status |
+|---|---|
+| 2xx + valid report | mapped via your `EvaluateReport` |
+| 2xx + `null` / bad JSON body | `Degraded` (upstream reachable, payload broken) |
+| Non-2xx or connection failure | registration's failure status (default `Unhealthy`) |
+| Per-call timeout | registration's failure status (default `Unhealthy`) |
+| Caller-cancellation | Rethrows |
+
+Every result, healthy or not, is cached per upstream for `UpstreamHealthCheckOptions.CacheDuration`
+(default 30 s), so a flurry of `/healthz` hits does not hammer the downstream. The check is a
+singleton that creates the named client from `IHttpClientFactory` on every probe, so DNS changes are
+picked up. The per-call `Timeout` (default 10 s) is independent of the cache window.
 
 ### Testing
 
 The companion package **`SolTechnology.Core.HTTP.Testing`** mocks typed clients in component tests: a
 `WireMockFixture` plus a fluent `Fake<TClient>()` DSL keyed off your generated client interface — full
 IntelliSense, compile-time argument checks, no hand-written URL matchers. Reference it from test projects
-only. Full reference: [HTTP.Testing.md](HTTP.Testing.md).
-
-> **Breaking migration:** this package replaces `SolTechnology.Core.Faker`. The namespace changed
-> (`SolTechnology.Core.Faker` → `SolTechnology.Core.HTTP.Testing`), so there is no type-forwarding — swap
-> the package reference **and** update `using` directives. See the
-> [testing companions feature record](features/2026-05-30-testing-framework-companions.md).
+only. Full reference: [HTTP.Testing.md](HTTP.Testing.md). It replaces `SolTechnology.Core.Faker`
+(namespace `SolTechnology.Core.HTTP.Testing`, no type forwarding); see the
+[testing companions feature record](features/2026-05-30-testing-framework-companions.md).
 
 ```csharp
 // Arrange a fake via a DIRECT method call — full IntelliSense + compile-time argument checks.
 wireMockFixture.Fake<IFootballDataHTTPClient>()
-    .WithRequest(x => x.GetMatchAsync(42))
+    .WithRequest(x => x.GetMatch(42, CancellationToken.None))
     .WithResponse(r => r.WithSuccess().WithBodyAsJson(new { id = 42 }));
 
-var match = await sut.GetMatchAsync(42);
+var match = await sut.GetMatch(42);
 match.Id.Should().Be(42);
 ```
 
@@ -283,7 +395,7 @@ public async Task GetMatch_RetriesOnce_OnTransient503()
           .RespondWith(Response.Create().WithStatusCode(200).WithBodyAsJson(new { id = 42 }));
 
     // Act
-    var match = await sut.GetMatchAsync(42);
+    var match = await sut.GetMatch(42);
 
     // Assert
     match.Id.Should().Be(42);
@@ -313,137 +425,22 @@ stub — bypass the resilience pipeline entirely and assert the request shape yo
   startup; if you tune them, keep the gap large enough for at least one
   complete attempt.
 
-### Recoverable-aware retry predicate
-
-By default, the pipeline retries on transient status codes (408/429/5xx) regardless of the response
-body. When the upstream uses `Core.Api`'s `ProblemDetails` with `"recoverable": true/false`, you can
-opt in to body-aware retry — stop wasting retries on deterministic business rejections:
-
-```csharp
-services.AddHTTPClient<IPaymentsClient, PaymentsClient>(
-    "Payments",
-    new HTTPClientConfiguration { BaseAddress = "https://payments/" },
-    new HttpPolicyConfiguration
-    {
-        RetryPredicate = RetryPredicates.RecoverableOnly
-    });
-```
-
-**Semantics (restrict-only):**
-- Predicate is called **only** when the standard checks (transient status + safe verb) already passed.
-- `true` → allow the retry (body says recoverable, or unparseable — benefit of the doubt).
-- `false` → **stop retrying** (body says non-recoverable — will never succeed on retry).
-- A non-retryable status (400, 401, 403, 404) is **never** retried regardless of body content.
-  The predicate cannot expand retries, only restrict them.
-
-**Custom predicate** — use any logic:
-
-```csharp
-RetryPredicate = async response =>
-{
-    var body = await response.Content.ReadAsStringAsync();
-    return !body.Contains("DUPLICATE_DETECTED");
-}
-```
-
-### Typed service-call error taxonomy (`TryXxxAsync<T>`)
-
-The existing `GetAsync<T>()` / `PostAsync<T>()` methods **throw** on failure. When you prefer
-railway-style error handling (`Result<T>`), use the `Try` variants:
-
-```csharp
-var result = await httpClient.CreateRequest("/api/payments")
-    .WithBody(payment)
-    .TryPostAsync<PaymentResponse>();
-
-if (result.IsFailure)
-{
-    // result.Error is a typed Core Error: NotFoundError, ValidationError, TimeoutError, etc.
-    logger.LogWarning("Payment call failed: {Error}", result.Error.Message);
-    return Result<PaymentResponse>.Fail(result.Error);
-}
-
-return Result<PaymentResponse>.Success(result.Data);
-```
-
-**Error mapping taxonomy (`ServiceCallErrorMapper`):**
-
-| Failure | Mapped to | Recoverable? |
-|---|---|---|
-| Socket-level (DNS, connection refused) | `TimeoutError` | ✅ yes |
-| Timeout (per-attempt or outer budget) | `TimeoutError` | ✅ yes |
-| 404 | `NotFoundError` | ❌ no (heuristic) |
-| 401 | `UnauthorizedError` | ❌ no |
-| 403 | `ForbiddenError` | ❌ no |
-| 400 / 422 | `ValidationError` | ❌ no |
-| 409 | `ConflictError` | ❌ no |
-| 408 / 504 | `TimeoutError` | ✅ yes |
-| 5xx | `Error` | ✅ yes (heuristic) |
-| Deserialization failure (bad JSON) | `Error` | ❌ no |
-
-**ProblemDetails override:** if the response body contains `"recoverable": true/false`, it
-**overrides** the status-code heuristic. The `title` field is extracted as the error `Message`.
-
-**Additive:** the existing exception-throwing path (`GetAsync<T>()` → `HttpRequestFailedException`)
-stays unchanged. `TryXxxAsync<T>` is an opt-in alternative — choose per call site.
-
 ### What ships in DI
 
-`AddHTTPClient` (and the three-parameter overload) registers, per client name:
+`AddSolHTTPClient` (and the three-type-parameter overload) registers, per client name:
 
 - The typed client (`TClient`) and its interface (`TIClient`), via
   `AddHttpClient<TIClient, TClient>`.
 - A named `HttpClient` configured with the base address, timeout, and default
-  headers from `HTTPClientConfiguration`.
+  headers from `HTTPClientConfiguration`, validated on start (`BaseAddress` is required).
 - A named `HttpPolicyConfiguration` bound through `IOptionsMonitor<>`,
   validated on start.
-- The shared `HttpPolicyFactory` and `HttpClientMetrics` singletons (idempotent
+- The shared policy factory and `HttpClientMetrics` singletons (idempotent
   `TryAddSingleton`).
 - A resilience handler under pipeline name `core-http-{clientName}`.
 - `CorrelationPropagatingHandler` (when `propagateCorrelation: true`, the
   default) inserted before the resilience handler so every retry carries the
   same correlation headers.
 
-`TOptions` (when supplied) is bound from `HTTPClients:{name}:Options` and
-available via `IOptions<TOptions>` / `IOptionsMonitor<TOptions>`.
-
-### Upstream service health check
-
-Probe a downstream service's `/health` endpoint as part of your own health report. Subclass
-`BaseUpstreamServiceHealthCheck<TReport>` with your downstream's report shape and map it to a
-`HealthCheckResult`:
-
-```csharp
-public sealed record PartnerHealth(string Status);
-
-public sealed class PartnerHealthCheck(HttpClient client)
-    : BaseUpstreamServiceHealthCheck<PartnerHealth>(
-        client, "/health", new UpstreamHealthCheckOptions(), logger)
-{
-    protected override HealthCheckResult EvaluateReport(PartnerHealth report) =>
-        report.Status == "ok"
-            ? HealthCheckResult.Healthy()
-            : HealthCheckResult.Degraded($"partner status: {report.Status}");
-}
-
-// Registration — resolves the named HttpClient and registers the check as a singleton:
-builder.Services.AddHealthChecks()
-    .AddUpstreamHttpHealthCheck<PartnerHealthCheck>("partner");
-```
-
-**Taxonomy:**
-
-| Outcome | Status |
-|---|---|
-| 2xx + valid report | mapped via your `EvaluateReport` |
-| 2xx + `null` / bad JSON body | `Degraded` (upstream reachable, payload broken) |
-| Connection failure | `Unhealthy` (configurable) |
-| Per-call timeout | `Unhealthy` |
-| Caller-cancellation | Rethrows (not `Unhealthy`) |
-
-**Caching:** a successful (or failed) probe result is cached per upstream for
-`UpstreamHealthCheckOptions.CacheDuration` (default 30 s) so a flurry of `/healthz` hits doesn't
-hammer the downstream. The check is registered as a **singleton** so the cache survives across
-probes; timing is driven by `TimeProvider` (injectable for tests). Per-call `Timeout` (default 10 s)
-is independent of the cache window.
-
+`TOptions` (when supplied) is bound from `HTTPClients:{name}:Options`, validated with its data
+annotations on start, and available via `IOptions<TOptions>` / `IOptionsMonitor<TOptions>`.

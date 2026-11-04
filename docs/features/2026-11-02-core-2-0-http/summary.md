@@ -26,7 +26,7 @@ are `done` and after these library features are `completed`: `result`; `logging`
 | 05 | HTTP — own namespace for `HttpClientExtensions`; factory-based upstream health check | [`steps/05-http-namespace-and-health-check-factory.md`](steps/05-http-namespace-and-health-check-factory.md) | done |
 | 06 | HTTP — drop `Async` from `RequestBuilder` verbs (optional) | [`steps/06-http-request-builder-async-suffix.md`](steps/06-http-request-builder-async-suffix.md) | done |
 | 07 | XML docs shipped — HTTP | [`steps/07-xml-docs.md`](steps/07-xml-docs.md) | done |
-| 08 | Module docs — Clients and the HTTP production checklist | [`steps/08-docs-clients-http.md`](steps/08-docs-clients-http.md) | to-do |
+| 08 | Module docs — Clients and the HTTP production checklist | [`steps/08-docs-clients-http.md`](steps/08-docs-clients-http.md) | done |
 | 09 | Guide conformance — HTTP | [`steps/09-conform-http.md`](steps/09-conform-http.md) | to-do |
 | 10 | Log templates — `[{Placeholder}]` in HTTP (L-03) | [`steps/10-log-template-brackets.md`](steps/10-log-template-brackets.md) | to-do |
 | 11 | Retrospective | [`steps/11-retrospective.md`](steps/11-retrospective.md) | to-do |
