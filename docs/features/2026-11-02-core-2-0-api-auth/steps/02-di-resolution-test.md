@@ -1,7 +1,7 @@
 ---
 spec: 2026-11-02-core-2-0-api-auth
 step: 02
-status: to-do
+status: done
 ---
 
 # Step 02: DI resolution test — Api and Auth
@@ -24,9 +24,23 @@ Former core step 10 (Api and Authentication parts); split per library on 2026-11
 - Follow the [`test-writing`](../../../../.github/skills/test-writing/SKILL.md) skill. No shared helper in a shipped package.
 
 ## Acceptance criteria
-- [ ] `dotnet test tests/SolTechnology.Core.API.Tests` and `dotnet test tests/SolTechnology.Core.Auth.Tests` are green, with no ignored resolution test.
+- [x] `dotnet test tests/SolTechnology.Core.API.Tests` and `dotnet test tests/SolTechnology.Core.Auth.Tests` are green, with no ignored resolution test.
 
 ## Open questions
 - none
 
 ## Deviations
+
+### Host services in the Api resolution test
+
+**Original plan:** `new ServiceCollection().AddLogging()`, then the module's `AddSol*` overloads.
+
+**Actual implementation:** `AddSolApiCore` pulls in MVC through `AddSolVersioning`, and `ValidateOnBuild` then needs
+the services every ASP.NET Core host registers (`IWebHostEnvironment`, `IHostEnvironment`, `DiagnosticListener`,
+`DiagnosticSource`). The test registers them in a private `AddWebHostServices` method before `AddSolApiCore`; without
+them the provider fails on MVC's own descriptors, not on an Api registration. Coverage goes beyond the plan: the Api
+test also resolves `IExceptionStatusCodeMapper`, `ICorrelationIdService`, `IApiVersionDescriptionProvider` and
+`SwaggerGenOptions` (through `ConfigureSwaggerOptions`); the Auth test also resolves the handler, the scheme options,
+`IOptions<AuthConfiguration>` and checks the single global `AuthorizeFilter`. No registration was broken, so no test is
+`[Ignore]`d.
+
