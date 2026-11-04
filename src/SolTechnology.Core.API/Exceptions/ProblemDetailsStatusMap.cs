@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.WebUtilities;
 using SolTechnology.Core.Errors;
 
 namespace SolTechnology.Core.API.Exceptions;
@@ -9,15 +10,16 @@ namespace SolTechnology.Core.API.Exceptions;
 internal static class ProblemDetailsStatusMap
 {
     /// <summary>
-    /// 4xx titles keep the exception message (a client-facing rejection); 5xx titles are fixed,
-    /// because server and upstream messages can carry URIs, query strings and keys (CWE-209).
+    /// Titles of mapped exceptions are fixed texts: exception messages, including BCL ones, can carry
+    /// file paths, keys, parameter names, URIs and query strings (CWE-209). 4xx titles are the reason
+    /// phrase; client-facing messages travel on the <c>Result</c> path (<see cref="Error.Message"/>).
     /// </summary>
-    public static string TitleFor(Exception exception, int statusCode) => statusCode switch
+    public static string TitleFor(int statusCode) => statusCode switch
     {
-        < StatusCodes.Status500InternalServerError => exception.Message,
         StatusCodes.Status502BadGateway => "Upstream dependency failed",
         StatusCodes.Status504GatewayTimeout => "Upstream dependency timed out",
-        _ => "An unexpected error occurred"
+        >= StatusCodes.Status500InternalServerError => "An unexpected error occurred",
+        _ => ReasonPhrases.GetReasonPhrase(statusCode) is { Length: > 0 } reasonPhrase ? reasonPhrase : "The request was rejected"
     };
 
     /// <summary>

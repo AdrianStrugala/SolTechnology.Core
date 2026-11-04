@@ -199,15 +199,20 @@ Default mapping covers common BCL / FluentValidation types:
 | `HttpRequestException` (incl. `SolTechnology.Core.HTTP`'s `HttpRequestFailedException`) | 504 when the upstream returned 408 or 504, otherwise 502 |
 | anything else | `LogCritical` + rethrow |
 
-The `ProblemDetails.title` of a mapped exception never echoes server or upstream text, which can hold
-URIs, query strings and keys:
+The `ProblemDetails.title` of a mapped exception is a fixed text. It never echoes the exception
+message, because BCL, server and upstream messages can hold file paths, keys, parameter names, URIs
+and query strings. A message meant for the client belongs in an `Error` on the `Result` path, whose
+`Message` becomes the title:
 
 | Status | `title` |
 |---|---|
-| 4xx | the exception message (`ValidationException`: "One or more validation errors occurred.") |
+| 400 from `ValidationException` | "One or more validation errors occurred." (field errors under `errors`) |
+| other 4xx | the HTTP reason phrase, for example "Bad Request", "Forbidden", "Not Found"; "The request was rejected" for a code without one |
 | 502 | "Upstream dependency failed" |
 | 504 | "Upstream dependency timed out" |
 | any other 5xx | "An unexpected error occurred" |
+
+The exception message appears only under `extensions.exception` when `IncludeExceptionDetails` is on.
 
 #### API versioning
 

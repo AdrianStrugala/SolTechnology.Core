@@ -17,8 +17,8 @@ using SolTechnology.Core.Logging.Correlations;
 namespace SolTechnology.Core.API.Tests;
 
 /// <summary>
-/// Pins the <c>ProblemDetails.title</c> source (P-09): 5xx titles are fixed texts so upstream
-/// URIs and query strings never reach the client; 4xx titles keep the exception message.
+/// Pins the <c>ProblemDetails.title</c> source (P-09): titles of mapped exceptions are fixed
+/// texts, so paths, keys, parameter names, upstream URIs and query strings never reach the client.
 /// </summary>
 [TestFixture]
 public sealed class ApiProblemDetailsFactoryTests
@@ -71,20 +71,49 @@ public sealed class ApiProblemDetailsFactoryTests
         problem.Title.Should().NotContain(Secret);
     }
 
-    [Test]
-    public void Create_ValidationException_TitleIsMessage()
+    [TestCase(typeof(UnauthorizedAccessException), "Access to the path '/secret/keys.json' is denied.", StatusCodes.Status403Forbidden, "Forbidden")]
+    [TestCase(typeof(KeyNotFoundException), "The given key 'tenant-42:/secret' was not present in the dictionary.", StatusCodes.Status404NotFound, "Not Found")]
+    [TestCase(typeof(ArgumentException), "Path '/secret/db.sqlite' is invalid. (Parameter 'connectionString')", StatusCodes.Status400BadRequest, "Bad Request")]
+    public void Create_Mapped4xx_TitleIsReasonPhrase_MessageOnlyInDiagnostics(Type exceptionType, string message, int expectedStatus, string expectedTitle)
     {
         // Arrange
-        var exception = new ArgumentException("Trip name must not be empty.");
+        var exception = (Exception)Activator.CreateInstance(exceptionType, message)!;
         var context = BuildContext(exception);
 
         // Act
-        NewFilter(new ApiExceptionOptions()).OnException(context);
+        NewFilter(new ApiExceptionOptions { IncludeExceptionDetails = true }).OnException(context);
 
         // Assert
         var result = context.Result.Should().BeOfType<ObjectResult>().Subject;
-        result.StatusCode.Should().Be(StatusCodes.Status400BadRequest);
-        result.Value.Should().BeOfType<ProblemDetails>().Which.Title.Should().Be("Trip name must not be empty.");
+        result.StatusCode.Should().Be(expectedStatus);
+        var problem = result.Value.Should().BeOfType<ProblemDetails>().Subject;
+        problem.Title.Should().Be(expectedTitle).And.NotContain("/secret");
+        problem.Detail.Should().BeNull();
+        var diagnostic = problem.Extensions["exception"]
+            .Should().BeAssignableTo<IDictionary<string, string?>>().Subject;
+        diagnostic["message"].Should().Be(message);
+    }
+
+    [Test]
+    public void Create_CustomMappedUnknown4xx_TitleIsGenericRejection()
+    {
+        // Arrange
+        var exception = new InvalidOperationException("Quota for '/secret' exceeded.");
+        var mapper = Substitute.For<IExceptionStatusCodeMapper>();
+        mapper.TryMap(exception, out Arg.Any<int>()).Returns(call =>
+        {
+            call[1] = 460;
+            return true;
+        });
+        var context = BuildContext(exception);
+
+        // Act
+        NewFilter(new ApiExceptionOptions(), mapper).OnException(context);
+
+        // Assert
+        var problem = ((ObjectResult)context.Result!).Value.Should().BeOfType<ProblemDetails>().Subject;
+        problem.Title.Should().Be("The request was rejected");
+        problem.Extensions.Should().NotContainKey("exception");
     }
 
     private static ExceptionFilter NewFilter(ApiExceptionOptions options, IExceptionStatusCodeMapper? mapper = null)

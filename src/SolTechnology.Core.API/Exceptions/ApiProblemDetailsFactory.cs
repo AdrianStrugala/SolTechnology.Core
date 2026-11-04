@@ -50,7 +50,7 @@ internal static class ApiProblemDetailsFactory
         var problem = new ProblemDetails
         {
             Status = statusCode,
-            Title = ProblemDetailsStatusMap.TitleFor(exception, statusCode),
+            Title = ProblemDetailsStatusMap.TitleFor(statusCode),
             Type = ProblemDetailsStatusMap.TypeForStatus(statusCode)
         };
         ApplyExtensions(problem, exception, correlationId, options);
