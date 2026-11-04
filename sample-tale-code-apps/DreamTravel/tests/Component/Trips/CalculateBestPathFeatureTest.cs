@@ -59,7 +59,7 @@ namespace DreamTravel.FunctionalTests.Trips
                     .WithHeader("X-API-KEY", "<SECRET>")
                     .WithHeader("X-API-VERSION", "2.0")
                     .WithBody(new { city.Name })
-                    .PostAsync<City>();
+                    .Post<City>();
 
                 findCityByNameResponse.Should().BeEquivalentTo(city);
             }
@@ -70,7 +70,7 @@ namespace DreamTravel.FunctionalTests.Trips
                 .WithHeader("X-API-KEY", "<SECRET>")
                 .WithHeader("X-API-VERSION", "2.0")
                 .WithBody(new { Cities = cities })
-                .PostAsync<CalculateBestPathResult>();
+                .Post<CalculateBestPathResult>();
 
             apiResponse.Should().NotBeNull();
             var paths = apiResponse.BestPaths;

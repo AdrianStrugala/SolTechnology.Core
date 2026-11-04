@@ -42,7 +42,7 @@ public sealed class RequestBuilderTests
     // ---- Happy path: typed verbs -----------------------------------------
 
     [Test]
-    public async Task GetAsync_TypedSuccessfulResponse_DeserializesBody()
+    public async Task Get_TypedSuccessfulResponse_DeserializesBody()
     {
         var (client, mock) = NewClient();
         mock.When(HttpMethod.Get, "http://api.test/matches/1")
@@ -50,7 +50,7 @@ public sealed class RequestBuilderTests
 
         var result = await client.CreateRequest("matches/1")
             .WithResponseType(DataType.Json)
-            .GetAsync<Match>();
+            .Get<Match>();
 
         result.Should().BeEquivalentTo(new Match(1, "A", "B", 3));
     }
@@ -76,10 +76,10 @@ public sealed class RequestBuilderTests
         var builder = client.CreateRequest("x").WithResponseType(DataType.Json);
         Match result = verb switch
         {
-            "post" => await builder.PostAsync<Match>(),
-            "put" => await builder.PutAsync<Match>(),
-            "patch" => await builder.PatchAsync<Match>(),
-            _ => await builder.DeleteAsync<Match>(),
+            "post" => await builder.Post<Match>(),
+            "put" => await builder.Put<Match>(),
+            "patch" => await builder.Patch<Match>(),
+            _ => await builder.Delete<Match>(),
         };
 
         result.Id.Should().Be(7);
@@ -87,7 +87,7 @@ public sealed class RequestBuilderTests
     }
 
     [Test]
-    public async Task PostAsync_TypedBody_SerializesJson()
+    public async Task Post_TypedBody_SerializesJson()
     {
         var (client, mock) = NewClient();
         mock.Expect(HttpMethod.Post, "http://api.test/matches")
@@ -97,14 +97,14 @@ public sealed class RequestBuilderTests
         var result = await client.CreateRequest("matches")
             .WithBody(new Match(1, "A", "B", 2))
             .WithResponseType(DataType.Json)
-            .PostAsync<Match>();
+            .Post<Match>();
 
         result.Should().NotBeNull();
         mock.VerifyNoOutstandingExpectation();
     }
 
     [Test]
-    public async Task PostAsync_Body_SetsApplicationJsonContentType()
+    public async Task Post_Body_SetsApplicationJsonContentType()
     {
         var (client, mock) = NewClient();
         MediaTypeHeaderValue? captured = null;
@@ -112,7 +112,7 @@ public sealed class RequestBuilderTests
             .With(req => { captured = req.Content?.Headers.ContentType; return true; })
             .Respond(HttpStatusCode.OK);
 
-        await client.CreateRequest("x").WithBody(new { Hello = "world" }).PostAsync();
+        await client.CreateRequest("x").WithBody(new { Hello = "world" }).Post();
 
         captured.Should().NotBeNull();
         captured!.MediaType.Should().Be("application/json");
@@ -138,7 +138,7 @@ public sealed class RequestBuilderTests
         await client.CreateRequest("x")
             .WithJsonOptions(camelCase)
             .WithBody(new Match(1, "A", "B", 2))
-            .PostAsync();
+            .Post();
 
         capturedBody.Should().NotBeNull();
         capturedBody.Should().Contain("\"homeTeam\"").And.NotContain("\"HomeTeam\"");
@@ -157,7 +157,7 @@ public sealed class RequestBuilderTests
             })
             .Respond(HttpStatusCode.OK);
 
-        await client.CreateRequest("x").WithHeader("X-Tenant-Id", "abc-123").GetAsync();
+        await client.CreateRequest("x").WithHeader("X-Tenant-Id", "abc-123").Get();
 
         captured.Should().Be("abc-123");
     }
@@ -173,8 +173,8 @@ public sealed class RequestBuilderTests
 
         var builder = client.CreateRequest("x").WithHeader("X-Test", "1");
 
-        var get = await builder.GetAsync();
-        var post = await builder.PostAsync();
+        var get = await builder.Get();
+        var post = await builder.Post();
 
         get.StatusCode.Should().Be(HttpStatusCode.OK);
         post.StatusCode.Should().Be(HttpStatusCode.Created);
@@ -194,7 +194,7 @@ public sealed class RequestBuilderTests
 
         var act = async () => await client.CreateRequest("missing")
             .WithResponseType(DataType.Json)
-            .GetAsync<Match>();
+            .Get<Match>();
 
         var ex = (await act.Should().ThrowAsync<HttpRequestFailedException>()).Which;
         ex.StatusCode.Should().Be(HttpStatusCode.NotFound);
@@ -212,7 +212,7 @@ public sealed class RequestBuilderTests
 
         var act = async () => await client.CreateRequest("missing", DebugPolicy())
             .WithResponseType(DataType.Json)
-            .GetAsync<Match>();
+            .Get<Match>();
 
         var ex = (await act.Should().ThrowAsync<HttpRequestFailedException>()).Which;
         ex.ResponseBody.Should().Be("""{"error":"not found"}""");
@@ -232,7 +232,7 @@ public sealed class RequestBuilderTests
 
         var act = async () => await client.CreateRequest("x", DebugPolicy())
             .WithResponseType(DataType.Json)
-            .GetAsync<Match>();
+            .Get<Match>();
 
         var ex = (await act.Should().ThrowAsync<HttpRequestFailedException>()).Which;
         ex.Message.Should().NotContain(secret);
@@ -252,7 +252,7 @@ public sealed class RequestBuilderTests
 
         var act = async () => await client.CreateRequest("x", DebugPolicy())
             .WithResponseType(DataType.Json)
-            .GetAsync<Match>();
+            .Get<Match>();
 
         var ex = (await act.Should().ThrowAsync<HttpRequestFailedException>()).Which;
         ex.ToString().Should().NotContain(secret);
@@ -269,7 +269,7 @@ public sealed class RequestBuilderTests
 
         var act = async () => await client.CreateRequest("x", DebugPolicy())
             .WithResponseType(DataType.Json)
-            .GetAsync<Match>();
+            .Get<Match>();
 
         var ex = (await act.Should().ThrowAsync<HttpRequestFailedException>()).Which;
         ex.ResponseBody.Should().NotBeNull();
@@ -280,7 +280,7 @@ public sealed class RequestBuilderTests
     // ---- Cancellation -----------------------------------------------------
 
     [Test]
-    public async Task GetAsync_CallerCancelsToken_PropagatesOperationCanceled()
+    public async Task Get_CallerCancelsToken_PropagatesOperationCanceled()
     {
         var (client, mock) = NewClient();
         mock.When(HttpMethod.Get, "http://api.test/x")
@@ -291,7 +291,7 @@ public sealed class RequestBuilderTests
             });
 
         using var cts = new CancellationTokenSource();
-        var task = client.CreateRequest("x").WithResponseType(DataType.Json).GetAsync<Match>(cts.Token);
+        var task = client.CreateRequest("x").WithResponseType(DataType.Json).Get<Match>(cts.Token);
 
         cts.CancelAfter(TimeSpan.FromMilliseconds(50));
         var act = async () => await task;
@@ -300,7 +300,7 @@ public sealed class RequestBuilderTests
     }
 
     [Test]
-    public async Task TryGetAsync_HttpClientTimeout_ReturnsTimeoutError()
+    public async Task TryGet_HttpClientTimeout_ReturnsTimeoutError()
     {
         // Arrange
         var (client, mock) = NewClient();
@@ -313,7 +313,7 @@ public sealed class RequestBuilderTests
             });
 
         // Act
-        var result = await client.CreateRequest("x").WithResponseType(DataType.Json).TryGetAsync<Match>();
+        var result = await client.CreateRequest("x").WithResponseType(DataType.Json).TryGet<Match>();
 
         // Assert
         result.IsSuccess.Should().BeFalse();
@@ -322,7 +322,7 @@ public sealed class RequestBuilderTests
     }
 
     [Test]
-    public async Task TryGetAsync_CallerCancelled_Throws()
+    public async Task TryGet_CallerCancelled_Throws()
     {
         // Arrange
         var (client, mock) = NewClient();
@@ -335,7 +335,7 @@ public sealed class RequestBuilderTests
         using var cts = new CancellationTokenSource(TimeSpan.FromMilliseconds(50));
 
         // Act
-        var act = async () => await client.CreateRequest("x").WithResponseType(DataType.Json).TryGetAsync<Match>(cts.Token);
+        var act = async () => await client.CreateRequest("x").WithResponseType(DataType.Json).TryGet<Match>(cts.Token);
 
         // Assert
         await act.Should().ThrowAsync<OperationCanceledException>();

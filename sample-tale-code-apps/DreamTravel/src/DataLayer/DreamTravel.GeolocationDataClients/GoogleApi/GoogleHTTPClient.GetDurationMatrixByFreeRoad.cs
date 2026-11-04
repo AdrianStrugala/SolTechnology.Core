@@ -23,7 +23,7 @@ namespace DreamTravel.GeolocationDataClients.GoogleApi
             {
                 var request = await httpClient
                     .CreateRequest($"maps/api/distancematrix/json?units=imperial&origins={coordinates}&destinations={coordinates}&avoid=tolls&key={_options.Key}")
-                    .GetAsync();
+                    .Get();
 
                 var response = await request.Content.ReadAsStringAsync();
                 JObject json = JObject.Parse(response);

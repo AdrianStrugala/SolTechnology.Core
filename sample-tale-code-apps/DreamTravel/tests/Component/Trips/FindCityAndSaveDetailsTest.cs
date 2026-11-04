@@ -50,7 +50,7 @@ public class FindCityAndSaveDetailsTest
             .WithHeader("X-API-KEY", "<SECRET>")
             .WithHeader("X-API-VERSION", "2.0")
             .WithBody(new { city.Name })
-            .PostAsync<City>();
+            .Post<City>();
 
         apiResponse.Should().BeEquivalentTo(city);
 

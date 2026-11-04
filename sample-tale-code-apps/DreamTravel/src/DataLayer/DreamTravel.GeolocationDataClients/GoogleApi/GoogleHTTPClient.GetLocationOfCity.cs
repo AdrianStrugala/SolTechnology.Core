@@ -20,7 +20,7 @@ namespace DreamTravel.GeolocationDataClients.GoogleApi
             {
                 var request = await httpClient
                     .CreateRequest($"maps/api/geocode/json?address={cityName}&key={_options.Key}")
-                    .GetAsync();
+                    .Get();
 
                 var response = await request.Content.ReadAsStringAsync();
                 JObject json = JObject.Parse(response);

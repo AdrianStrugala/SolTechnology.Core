@@ -41,7 +41,7 @@ public class GraphService
                 Streets = streets,
                 Intersections = intersections
             })
-            .PostAsync<Result<List<TrafficSegment>>>();
+            .Post<Result<List<TrafficSegment>>>();
 
         return response;
     }

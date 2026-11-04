@@ -190,7 +190,7 @@ public class RequestBuilder
     /// <para>
     /// <strong>Caller owns disposal</strong> — the response holds an open socket / stream
     /// buffer until disposed. Wrap with <c>using</c>:
-    /// <code>using var response = await client.CreateRequest("/x").GetAsync(ct);</code>
+    /// <code>using var response = await client.CreateRequest("/x").Get(ct);</code>
     /// </para>
     /// <para>
     /// Marked with <see cref="MustDisposeResourceAttribute"/> so Rider / ReSharper /
@@ -199,68 +199,68 @@ public class RequestBuilder
     /// </para>
     /// </summary>
     [MustDisposeResource]
-    public Task<HttpResponseMessage> GetAsync(CancellationToken cancellationToken = default)
+    public Task<HttpResponseMessage> Get(CancellationToken cancellationToken = default)
         => SendRaw(HttpMethod.Get, cancellationToken);
 
-    /// <inheritdoc cref="GetAsync(CancellationToken)" />
+    /// <inheritdoc cref="Get(CancellationToken)" />
     [MustDisposeResource]
-    public Task<HttpResponseMessage> PostAsync(CancellationToken cancellationToken = default)
+    public Task<HttpResponseMessage> Post(CancellationToken cancellationToken = default)
         => SendRaw(HttpMethod.Post, cancellationToken);
 
-    /// <inheritdoc cref="GetAsync(CancellationToken)" />
+    /// <inheritdoc cref="Get(CancellationToken)" />
     [MustDisposeResource]
-    public Task<HttpResponseMessage> PutAsync(CancellationToken cancellationToken = default)
+    public Task<HttpResponseMessage> Put(CancellationToken cancellationToken = default)
         => SendRaw(HttpMethod.Put, cancellationToken);
 
-    /// <inheritdoc cref="GetAsync(CancellationToken)" />
+    /// <inheritdoc cref="Get(CancellationToken)" />
     [MustDisposeResource]
-    public Task<HttpResponseMessage> PatchAsync(CancellationToken cancellationToken = default)
+    public Task<HttpResponseMessage> Patch(CancellationToken cancellationToken = default)
         => SendRaw(HttpMethod.Patch, cancellationToken);
 
-    /// <inheritdoc cref="GetAsync(CancellationToken)" />
+    /// <inheritdoc cref="Get(CancellationToken)" />
     [MustDisposeResource]
-    public Task<HttpResponseMessage> DeleteAsync(CancellationToken cancellationToken = default)
+    public Task<HttpResponseMessage> Delete(CancellationToken cancellationToken = default)
         => SendRaw(HttpMethod.Delete, cancellationToken);
 
-    public Task<TResponse> GetAsync<TResponse>(CancellationToken cancellationToken = default)
+    public Task<TResponse> Get<TResponse>(CancellationToken cancellationToken = default)
         => Send<TResponse>(HttpMethod.Get, cancellationToken);
 
-    public Task<TResponse> PostAsync<TResponse>(CancellationToken cancellationToken = default)
+    public Task<TResponse> Post<TResponse>(CancellationToken cancellationToken = default)
         => Send<TResponse>(HttpMethod.Post, cancellationToken);
 
-    public Task<TResponse> PutAsync<TResponse>(CancellationToken cancellationToken = default)
+    public Task<TResponse> Put<TResponse>(CancellationToken cancellationToken = default)
         => Send<TResponse>(HttpMethod.Put, cancellationToken);
 
-    public Task<TResponse> PatchAsync<TResponse>(CancellationToken cancellationToken = default)
+    public Task<TResponse> Patch<TResponse>(CancellationToken cancellationToken = default)
         => Send<TResponse>(HttpMethod.Patch, cancellationToken);
 
-    public Task<TResponse> DeleteAsync<TResponse>(CancellationToken cancellationToken = default)
+    public Task<TResponse> Delete<TResponse>(CancellationToken cancellationToken = default)
         => Send<TResponse>(HttpMethod.Delete, cancellationToken);
 
     // --- Result<T>-returning alternatives (typed error taxonomy, no exceptions) ---
 
     /// <summary>
-    /// Same as <see cref="GetAsync{TResponse}"/> but returns <see cref="Result{T}"/> instead of
+    /// Same as <see cref="Get{TResponse}"/> but returns <see cref="Result{T}"/> instead of
     /// throwing. Failures are mapped onto Core <see cref="Error"/> subtypes via
     /// <see cref="ServiceCallErrorMapper"/>.
     /// </summary>
-    public Task<Result<TResponse>> TryGetAsync<TResponse>(CancellationToken cancellationToken = default)
+    public Task<Result<TResponse>> TryGet<TResponse>(CancellationToken cancellationToken = default)
         => TrySend<TResponse>(HttpMethod.Get, cancellationToken);
 
-    /// <inheritdoc cref="TryGetAsync{TResponse}"/>
-    public Task<Result<TResponse>> TryPostAsync<TResponse>(CancellationToken cancellationToken = default)
+    /// <inheritdoc cref="TryGet{TResponse}"/>
+    public Task<Result<TResponse>> TryPost<TResponse>(CancellationToken cancellationToken = default)
         => TrySend<TResponse>(HttpMethod.Post, cancellationToken);
 
-    /// <inheritdoc cref="TryGetAsync{TResponse}"/>
-    public Task<Result<TResponse>> TryPutAsync<TResponse>(CancellationToken cancellationToken = default)
+    /// <inheritdoc cref="TryGet{TResponse}"/>
+    public Task<Result<TResponse>> TryPut<TResponse>(CancellationToken cancellationToken = default)
         => TrySend<TResponse>(HttpMethod.Put, cancellationToken);
 
-    /// <inheritdoc cref="TryGetAsync{TResponse}"/>
-    public Task<Result<TResponse>> TryPatchAsync<TResponse>(CancellationToken cancellationToken = default)
+    /// <inheritdoc cref="TryGet{TResponse}"/>
+    public Task<Result<TResponse>> TryPatch<TResponse>(CancellationToken cancellationToken = default)
         => TrySend<TResponse>(HttpMethod.Patch, cancellationToken);
 
-    /// <inheritdoc cref="TryGetAsync{TResponse}"/>
-    public Task<Result<TResponse>> TryDeleteAsync<TResponse>(CancellationToken cancellationToken = default)
+    /// <inheritdoc cref="TryGet{TResponse}"/>
+    public Task<Result<TResponse>> TryDelete<TResponse>(CancellationToken cancellationToken = default)
         => TrySend<TResponse>(HttpMethod.Delete, cancellationToken);
 
     private Task<HttpResponseMessage> SendRaw(HttpMethod method, CancellationToken cancellationToken)

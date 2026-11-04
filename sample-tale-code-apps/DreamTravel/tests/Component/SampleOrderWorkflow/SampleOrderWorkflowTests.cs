@@ -31,7 +31,7 @@ public class SampleOrderWorkflowTests
                 OrderId = "2137",
                 Quantity = 17
             })
-            .PostAsync<TaleInstanceDto>();
+            .Post<TaleInstanceDto>();
 
         // Then: Tale is created and paused at interactive chapter
         createTaleResponse.Should().NotBeNull();
@@ -46,7 +46,7 @@ public class SampleOrderWorkflowTests
         var resumeWithoutInput = await _apiClient
             .CreateRequest($"/api/dreamtravel/tale/{storyId}")
             .WithHeader("X-API-KEY", "<SECRET>")
-            .PostAsync<TaleInstanceDto>();
+            .Post<TaleInstanceDto>();
 
         // Then: Tale remains paused (no input provided for interactive chapter)
         resumeWithoutInput.Should().NotBeNull();
@@ -61,7 +61,7 @@ public class SampleOrderWorkflowTests
                 Name = "Adus",
                 Address = "yes"
             })
-            .PostAsync<TaleInstanceDto>();
+            .Post<TaleInstanceDto>();
 
         // Then: Tale completes successfully
         resumeWithInput.Should().NotBeNull();
@@ -72,7 +72,7 @@ public class SampleOrderWorkflowTests
         var storyState = await _apiClient
             .CreateRequest($"/api/dreamtravel/tale/{storyId}")
             .WithHeader("X-API-KEY", "<SECRET>")
-            .GetAsync<TaleInstanceDto>();
+            .Get<TaleInstanceDto>();
 
         // Then: Tale state shows completion
         storyState.Should().NotBeNull();
@@ -83,7 +83,7 @@ public class SampleOrderWorkflowTests
         var storyResult = await _apiClient
             .CreateRequest($"/api/dreamtravel/tale/{storyId}/result")
             .WithHeader("X-API-KEY", "<SECRET>")
-            .GetAsync<TaleInstanceDto>();
+            .Get<TaleInstanceDto>();
 
         // Then: Result is available
         storyResult.Should().NotBeNull();

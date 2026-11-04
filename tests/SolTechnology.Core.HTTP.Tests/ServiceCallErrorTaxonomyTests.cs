@@ -128,7 +128,7 @@ public sealed class ServiceCallErrorTaxonomyTests
     }
 
     [Test]
-    public async Task TryGetAsync_Success_Returns_Result_With_Data()
+    public async Task TryGet_Success_Returns_Result_With_Data()
     {
         var mockHttp = new MockHttpMessageHandler();
         mockHttp.When("http://test/api/data")
@@ -137,14 +137,14 @@ public sealed class ServiceCallErrorTaxonomyTests
         var client = mockHttp.ToHttpClient();
         client.BaseAddress = new Uri("http://test/");
 
-        var result = await client.CreateRequest("/api/data").TryGetAsync<TestDto>();
+        var result = await client.CreateRequest("/api/data").TryGet<TestDto>();
 
         result.IsSuccess.Should().BeTrue();
         result.Data!.Name.Should().Be("foo");
     }
 
     [Test]
-    public async Task TryGetAsync_404_Returns_NotFoundError()
+    public async Task TryGet_404_Returns_NotFoundError()
     {
         var mockHttp = new MockHttpMessageHandler();
         mockHttp.When("http://test/api/missing")
@@ -153,7 +153,7 @@ public sealed class ServiceCallErrorTaxonomyTests
         var client = mockHttp.ToHttpClient();
         client.BaseAddress = new Uri("http://test/");
 
-        var result = await client.CreateRequest("/api/missing").TryGetAsync<TestDto>();
+        var result = await client.CreateRequest("/api/missing").TryGet<TestDto>();
 
         result.IsFailure.Should().BeTrue();
         result.Error.Should().BeOfType<NotFoundError>();
@@ -161,7 +161,7 @@ public sealed class ServiceCallErrorTaxonomyTests
     }
 
     [Test]
-    public async Task TryGetAsync_BadJson_Returns_DeserializationError()
+    public async Task TryGet_BadJson_Returns_DeserializationError()
     {
         var mockHttp = new MockHttpMessageHandler();
         mockHttp.When("http://test/api/bad")
@@ -170,7 +170,7 @@ public sealed class ServiceCallErrorTaxonomyTests
         var client = mockHttp.ToHttpClient();
         client.BaseAddress = new Uri("http://test/");
 
-        var result = await client.CreateRequest("/api/bad").TryGetAsync<TestDto>();
+        var result = await client.CreateRequest("/api/bad").TryGet<TestDto>();
 
         result.IsFailure.Should().BeTrue();
         result.Error!.Message.Should().Be("Response deserialization failed");

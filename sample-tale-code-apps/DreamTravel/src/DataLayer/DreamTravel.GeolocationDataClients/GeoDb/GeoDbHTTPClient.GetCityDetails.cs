@@ -16,7 +16,7 @@ namespace DreamTravel.GeolocationDataClients.GeoDb
         {
             var response = await _httpClient
                 .CreateRequest($"v1/geo/places?namePrefix={cityName}&types=CITY&hateoasMode=false&limit=5&offset=0")
-                .GetAsync<GetCityResponse>();
+                .Get<GetCityResponse>();
 
             return response.Data.FirstOrDefault();
         }

@@ -8,7 +8,7 @@ namespace SolTechnology.Core.HTTP;
 
 /// <summary>
 /// Maps HTTP call failures onto the Core <see cref="SolTechnology.Core.Error"/> taxonomy.
-/// Used by the <c>TryXxxAsync</c> methods on <see cref="RequestBuilder"/> to return a
+/// Used by the <c>TryXxx</c> methods on <see cref="RequestBuilder"/> to return a
 /// <see cref="SolTechnology.Core.Result{T}"/> instead of throwing.
 /// </summary>
 public static class ServiceCallErrorMapper

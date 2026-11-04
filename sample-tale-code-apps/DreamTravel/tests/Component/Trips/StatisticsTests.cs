@@ -75,7 +75,7 @@ public class StatisticsTests
             .CreateRequest("/api/statistics/countries")
             .WithHeader("X-API-KEY", "<SECRET>")
             .WithHeader("X-API-VERSION", "2.0")
-            .GetAsync<GetSearchStatisticsResult>();
+            .Get<GetSearchStatisticsResult>();
 
         // Assert
         apiResponse.Should().NotBeNull();
