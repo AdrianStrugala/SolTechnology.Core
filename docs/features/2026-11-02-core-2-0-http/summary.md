@@ -19,7 +19,7 @@ are `done` and after these library features are `completed`: `result`; `logging`
 
 | # | Title | File | Status |
 |---|---|---|---|
-| 01 | DI resolution test — HTTP | [`steps/01-di-resolution-test.md`](steps/01-di-resolution-test.md) | to-do |
+| 01 | DI resolution test — HTTP | [`steps/01-di-resolution-test.md`](steps/01-di-resolution-test.md) | done |
 | 02 | HTTP — never retry unsafe verbs after an exception or timeout | [`steps/02-http-no-unsafe-verb-retry-on-exception.md`](steps/02-http-no-unsafe-verb-retry-on-exception.md) | to-do |
 | 03 | HTTP — request pipeline correctness | [`steps/03-http-request-pipeline-correctness.md`](steps/03-http-request-pipeline-correctness.md) | to-do |
 | 04 | HTTP — upstream health-check disposal and options validation | [`steps/04-http-health-check-and-options-validation.md`](steps/04-http-health-check-and-options-validation.md) | to-do |
