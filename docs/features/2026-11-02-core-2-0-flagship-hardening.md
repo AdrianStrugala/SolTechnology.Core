@@ -490,8 +490,9 @@ parameter; `UntilAsync`, `CheckHealthAsync`, `InvokeAsync`, `StartAsync`/`StopAs
   - HTTP: `ModuleInstaller.cs:143` and `BaseUpstreamServiceHealthCheck.cs:110,119,126`, where
     `{HealthPath}` becomes `{UpstreamURL}`: the log property is renamed, so queries on `HealthPath`
     must use `UpstreamURL` (http 10).
-  - Cache: the lock and idempotency services (`logging-cache#20`), where `{Key}` becomes
-    `[{IdempotencyKey}]`.
+  - Cache: the lock and idempotency services (`logging-cache#20`): `{LockKey}` becomes `[{LockKey}]`, and
+    `{Key}` becomes `[{IdempotencyKey}]`: the log property is renamed, so queries on `Key` must use
+    `IdempotencyKey` (cache 08).
   - MessageBus: the receiver and publisher (`infra#20`).
 
   Steps: tale 16, api-auth 10, http 10, cache 08, messagebus 08; every other library checks its

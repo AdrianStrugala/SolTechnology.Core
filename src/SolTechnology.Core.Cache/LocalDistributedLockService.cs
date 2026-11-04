@@ -32,16 +32,16 @@ internal sealed class LocalDistributedLockService(
 
             if (!TryClaim(name, holder, now))
             {
-                logger.LogDebug("Local lock not acquired: {LockKey} (held by another caller)", name);
+                logger.LogDebug("Local lock not acquired: [{LockKey}] (held by another caller)", name);
                 return ValueTask.FromResult<IAsyncDisposable?>(null);
             }
 
-            logger.LogDebug("Local lock acquired: {LockKey}", name);
+            logger.LogDebug("Local lock acquired: [{LockKey}]", name);
             return ValueTask.FromResult<IAsyncDisposable?>(new LocalLockHandle(_locks, name, holder, logger));
         }
         catch (Exception ex)
         {
-            logger.LogWarning(ex, "Local lock acquisition failed for {LockKey} — degrading to null", name);
+            logger.LogWarning(ex, "Local lock acquisition failed for [{LockKey}] — degrading to null", name);
             return ValueTask.FromResult<IAsyncDisposable?>(null);
         }
     }
@@ -90,7 +90,7 @@ internal sealed class LocalDistributedLockService(
         {
             if (Interlocked.Exchange(ref _released, 1) == 0 && locks.TryRemove(KeyValuePair.Create(name, holder)))
             {
-                logger.LogDebug("Local lock released: {LockKey}", name);
+                logger.LogDebug("Local lock released: [{LockKey}]", name);
             }
 
             return ValueTask.CompletedTask;

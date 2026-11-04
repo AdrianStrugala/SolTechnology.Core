@@ -1,5 +1,6 @@
 using System.Text.Json;
 using FluentAssertions;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
 using NSubstitute;
@@ -133,5 +134,33 @@ public sealed class RedisIdempotencyStoreTests
         result!.StatusCode.Should().Be(200);
         result.Body.Should().Equal(stored.Body);
     }
-}
 
+    [Test]
+    public async Task Operations_RedisDown_LogBracketedIdempotencyKey()
+    {
+        // Arrange
+        var redis = Substitute.For<IConnectionMultiplexer>();
+        redis.GetDatabase(Arg.Any<int>(), Arg.Any<object>())
+            .Returns(_ => throw new RedisConnectionException(ConnectionFailureType.UnableToConnect, "down"));
+        var logger = new CapturingLogger<RedisIdempotencyStore>();
+        var sut = new RedisIdempotencyStore(
+            redis,
+            Options.Create(new DistributedCacheConfiguration { InstanceName = "test:" }),
+            logger,
+            TimeSpan.FromHours(1));
+
+        // Act
+        await sut.TryAdd("key-1");
+        await sut.Get("key-1");
+        await sut.SetResponse("key-1", new StoredResponse { StatusCode = 200, Headers = [], Body = [] });
+        await sut.Remove("key-1");
+
+        // Assert
+        logger.Entries.Select(entry => (entry.Level, entry.Template)).Should().Equal(
+            (LogLevel.Warning, "Idempotency TryAdd failed for [{IdempotencyKey}] — allowing request through"),
+            (LogLevel.Warning, "Idempotency Get failed for [{IdempotencyKey}]"),
+            (LogLevel.Warning, "Idempotency SetResponse failed for [{IdempotencyKey}] — response will not be replayed on retry"),
+            (LogLevel.Warning, "Idempotency Remove failed for [{IdempotencyKey}] — key will expire via TTL"));
+        logger.Entries.Should().AllSatisfy(entry => entry.Properties["IdempotencyKey"].Should().Be("key-1"));
+    }
+}

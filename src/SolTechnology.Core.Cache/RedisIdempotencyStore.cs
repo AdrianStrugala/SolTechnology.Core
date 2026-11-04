@@ -40,7 +40,7 @@ internal sealed class RedisIdempotencyStore(
         }
         catch (Exception ex)
         {
-            logger.LogWarning(ex, "Idempotency TryAdd failed for {Key} — allowing request through", key);
+            logger.LogWarning(ex, "Idempotency TryAdd failed for [{IdempotencyKey}] — allowing request through", key);
             return true; // fail-open: let the request through rather than blocking forever
         }
     }
@@ -63,7 +63,7 @@ internal sealed class RedisIdempotencyStore(
         }
         catch (Exception ex)
         {
-            logger.LogWarning(ex, "Idempotency Get failed for {Key}", key);
+            logger.LogWarning(ex, "Idempotency Get failed for [{IdempotencyKey}]", key);
             return null;
         }
     }
@@ -78,7 +78,7 @@ internal sealed class RedisIdempotencyStore(
         }
         catch (Exception ex)
         {
-            logger.LogWarning(ex, "Idempotency SetResponse failed for {Key} — response will not be replayed on retry", key);
+            logger.LogWarning(ex, "Idempotency SetResponse failed for [{IdempotencyKey}] — response will not be replayed on retry", key);
         }
     }
 
@@ -91,7 +91,7 @@ internal sealed class RedisIdempotencyStore(
         }
         catch (Exception ex)
         {
-            logger.LogWarning(ex, "Idempotency Remove failed for {Key} — key will expire via TTL", key);
+            logger.LogWarning(ex, "Idempotency Remove failed for [{IdempotencyKey}] — key will expire via TTL", key);
         }
     }
 

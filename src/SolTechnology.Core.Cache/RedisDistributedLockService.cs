@@ -32,18 +32,18 @@ internal sealed class RedisDistributedLockService(
 
             if (!acquired)
             {
-                logger.LogDebug("Lock not acquired: {LockKey} (held by another instance)", key);
+                logger.LogDebug("Lock not acquired: [{LockKey}] (held by another instance)", key);
                 return null;
             }
 
-            logger.LogDebug("Lock acquired: {LockKey}", key);
+            logger.LogDebug("Lock acquired: [{LockKey}]", key);
             return new LockHandle(db, key, value, logger);
         }
         catch (OperationCanceledException) { throw; }
         catch (Exception ex)
         {
             // Guard-rail: never throw into host loop on backend failure — degrade to null.
-            logger.LogWarning(ex, "Lock acquisition failed for {LockKey} — degrading to null", key);
+            logger.LogWarning(ex, "Lock acquisition failed for [{LockKey}] — degrading to null", key);
             return null;
         }
     }
@@ -68,12 +68,12 @@ internal sealed class RedisDistributedLockService(
             try
             {
                 await db.ScriptEvaluateAsync(ReleaseScript, [(RedisKey)key], [(RedisValue)value]);
-                logger.LogDebug("Lock released: {LockKey}", key);
+                logger.LogDebug("Lock released: [{LockKey}]", key);
             }
             catch (Exception ex)
             {
                 // Best-effort release — lock will expire anyway via TTL.
-                logger.LogWarning(ex, "Lock release failed for {LockKey} — will expire via TTL", key);
+                logger.LogWarning(ex, "Lock release failed for [{LockKey}] — will expire via TTL", key);
             }
         }
     }

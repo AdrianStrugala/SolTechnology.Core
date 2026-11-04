@@ -26,5 +26,5 @@ are `done` and after these library features are `completed`: none. No step is `b
 | 05 | XML docs shipped — Cache | [`steps/05-xml-docs.md`](steps/05-xml-docs.md) | done |
 | 06 | Module docs — `docs/Cache.md` | [`steps/06-docs-cache.md`](steps/06-docs-cache.md) | done |
 | 07 | Guide conformance — Cache | [`steps/07-conform-cache.md`](steps/07-conform-cache.md) | done |
-| 08 | Log templates — `[{Placeholder}]` in Cache (L-03) | [`steps/08-log-template-brackets.md`](steps/08-log-template-brackets.md) | to-do |
+| 08 | Log templates — `[{Placeholder}]` in Cache (L-03) | [`steps/08-log-template-brackets.md`](steps/08-log-template-brackets.md) | done |
 | 09 | Retrospective | [`steps/09-retrospective.md`](steps/09-retrospective.md) | to-do |

@@ -1,4 +1,5 @@
 using FluentAssertions;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Time.Testing;
 using NUnit.Framework;
@@ -84,5 +85,27 @@ public class LocalDistributedLockServiceTests
         // Assert
         await act.Should().ThrowAsync<OperationCanceledException>();
         _sut.HeldLockCount.Should().Be(0);
+    }
+
+    [Test]
+    public async Task TryAcquireLock_LogsBracketedLockKey()
+    {
+        // Arrange
+        var logger = new CapturingLogger<LocalDistributedLockService>();
+        var sut = new LocalDistributedLockService(logger, _time);
+
+        // Act
+        var handle = await sut.TryAcquireLock("job", Expiry);
+        await sut.TryAcquireLock("job", Expiry);
+        await handle!.DisposeAsync();
+        await sut.TryAcquireLock("job", TimeSpan.MaxValue);
+
+        // Assert
+        logger.Entries.Select(entry => (entry.Level, entry.Template)).Should().Equal(
+            (LogLevel.Debug, "Local lock acquired: [{LockKey}]"),
+            (LogLevel.Debug, "Local lock not acquired: [{LockKey}] (held by another caller)"),
+            (LogLevel.Debug, "Local lock released: [{LockKey}]"),
+            (LogLevel.Warning, "Local lock acquisition failed for [{LockKey}] — degrading to null"));
+        logger.Entries.Should().AllSatisfy(entry => entry.Properties["LockKey"].Should().Be("job"));
     }
 }
