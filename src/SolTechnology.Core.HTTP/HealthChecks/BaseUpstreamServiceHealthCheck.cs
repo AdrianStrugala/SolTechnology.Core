@@ -112,7 +112,7 @@ public abstract class BaseUpstreamServiceHealthCheck<TReport>(
         }
         catch (HttpRequestException ex)
         {
-            logger.LogWarning(ex, "Upstream health check failed for {HealthPath}", cacheKey);
+            logger.LogWarning(ex, "Upstream health check failed for [{UpstreamURL}]", cacheKey);
             var unhealthy = new HealthCheckResult(
                 context.Registration.FailureStatus, "Upstream connection failure", ex);
             _cache[cacheKey] = (unhealthy, _timeProvider.GetUtcNow());
@@ -121,14 +121,14 @@ public abstract class BaseUpstreamServiceHealthCheck<TReport>(
         catch (System.Text.Json.JsonException ex)
         {
             // Deserialization failed — the upstream is reachable but returning garbage.
-            logger.LogWarning(ex, "Bad payload from upstream {HealthPath}", cacheKey);
+            logger.LogWarning(ex, "Bad payload from upstream [{UpstreamURL}]", cacheKey);
             var degraded = HealthCheckResult.Degraded("Bad payload from upstream", ex);
             _cache[cacheKey] = (degraded, _timeProvider.GetUtcNow());
             return degraded;
         }
         catch (Exception ex)
         {
-            logger.LogWarning(ex, "Unexpected error in upstream health check {HealthPath}", cacheKey);
+            logger.LogWarning(ex, "Unexpected error in upstream health check [{UpstreamURL}]", cacheKey);
             var unhealthy = new HealthCheckResult(
                 context.Registration.FailureStatus, "Unexpected error", ex);
             _cache[cacheKey] = (unhealthy, _timeProvider.GetUtcNow());

@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using NUnit.Framework;
 
@@ -45,6 +46,26 @@ public sealed class ModuleInstallerTests
             "Polly is the single timeout owner when UsePolly=true");
         client.HttpClient.DefaultRequestHeaders
             .GetValues("HeaderName").Single().Should().Be("HeaderValue");
+    }
+
+    [Test]
+    public void AddSolHTTPClient_TimeoutSecondsWithPolly_LogsBracketedWarning()
+    {
+        // Arrange
+        var logger = new TemplateCapturingLogger();
+        var sut = NewBuilder();
+        sut.Logging.ClearProviders().AddProvider(logger);
+        sut.Services.AddSolHTTPClient<ISampleHTTPClient, SampleHTTPClient>(
+            "Sample",
+            new HTTPClientConfiguration { BaseAddress = "http://localhost:8080/", TimeoutSeconds = 21 });
+        var app = sut.Build();
+
+        // Act
+        app.Services.GetRequiredService<ISampleHTTPClient>();
+
+        // Assert
+        logger.Entries.Should().ContainSingle(entry => entry.Template != null && entry.Template.Contains("TimeoutSeconds="))
+            .Which.Template.Should().Contain("has TimeoutSeconds=[{Seconds}]s but UsePolly=true");
     }
 
     [Test]

@@ -2,6 +2,7 @@ using System.Net;
 using System.Text;
 using FluentAssertions;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Time.Testing;
 using NUnit.Framework;
@@ -22,11 +23,12 @@ public sealed class BaseUpstreamServiceHealthCheckTests
     private sealed class TestUpstreamCheck(
         IHttpClientFactory clientFactory,
         UpstreamHealthCheckOptions options,
-        TimeProvider? time = null)
-        : BaseUpstreamServiceHealthCheck<UpstreamReport>(clientFactory, ClientName, "/health", options, NullLogger.Instance, time)
+        TimeProvider? time = null,
+        ILogger? logger = null)
+        : BaseUpstreamServiceHealthCheck<UpstreamReport>(clientFactory, ClientName, "/health", options, logger ?? NullLogger.Instance, time)
     {
-        public TestUpstreamCheck(HttpClient client, UpstreamHealthCheckOptions options, TimeProvider? time = null)
-            : this(new SingleClientFactory(client), options, time)
+        public TestUpstreamCheck(HttpClient client, UpstreamHealthCheckOptions options, TimeProvider? time = null, ILogger? logger = null)
+            : this(new SingleClientFactory(client), options, time, logger)
         {
         }
 
@@ -106,6 +108,34 @@ public sealed class BaseUpstreamServiceHealthCheckTests
         var result = await sut.CheckHealthAsync(Context());
 
         result.Status.Should().Be(HealthStatus.Unhealthy);
+    }
+
+    [TestCase("connection")]
+    [TestCase("payload")]
+    [TestCase("unexpected")]
+    public async Task CheckHealth_Failure_LogsUpstreamURLInBrackets(string failure)
+    {
+        // Arrange
+        var logger = new TemplateCapturingLogger();
+        var handler = new StubHandler((_, _) => failure switch
+        {
+            "connection" => throw new HttpRequestException("connection refused"),
+            "payload" => Task.FromResult(new HttpResponseMessage(HttpStatusCode.OK)
+            {
+                Content = new StringContent("not json {{{", Encoding.UTF8, "application/json")
+            }),
+            _ => throw new InvalidOperationException("boom")
+        });
+        var client = new HttpClient(handler) { BaseAddress = new Uri("http://upstream/") };
+        var sut = new TestUpstreamCheck(client, new UpstreamHealthCheckOptions(), logger: logger);
+
+        // Act
+        await sut.CheckHealthAsync(Context());
+
+        // Assert
+        var entry = logger.Entries.Should().ContainSingle().Subject;
+        entry.Template.Should().EndWith("[{UpstreamURL}]");
+        entry.Message.Should().Match("*[http://upstream*/health]");
     }
 
     [Test]

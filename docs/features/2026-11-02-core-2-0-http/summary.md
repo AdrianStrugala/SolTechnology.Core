@@ -28,5 +28,5 @@ are `done` and after these library features are `completed`: `result`; `logging`
 | 07 | XML docs shipped — HTTP | [`steps/07-xml-docs.md`](steps/07-xml-docs.md) | done |
 | 08 | Module docs — Clients and the HTTP production checklist | [`steps/08-docs-clients-http.md`](steps/08-docs-clients-http.md) | done |
 | 09 | Guide conformance — HTTP | [`steps/09-conform-http.md`](steps/09-conform-http.md) | done |
-| 10 | Log templates — `[{Placeholder}]` in HTTP (L-03) | [`steps/10-log-template-brackets.md`](steps/10-log-template-brackets.md) | to-do |
+| 10 | Log templates — `[{Placeholder}]` in HTTP (L-03) | [`steps/10-log-template-brackets.md`](steps/10-log-template-brackets.md) | done |
 | 11 | Retrospective | [`steps/11-retrospective.md`](steps/11-retrospective.md) | to-do |

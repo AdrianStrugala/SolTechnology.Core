@@ -487,7 +487,8 @@ parameter; `UntilAsync`, `CheckHealthAsync`, `InvokeAsync`, `StartAsync`/`StopAs
     (`cqrs-tale#24`).
   - Api: `ExceptionFilter.cs:67,93`.
   - HTTP: `ModuleInstaller.cs:143` and `BaseUpstreamServiceHealthCheck.cs:110,119,126`, where
-    `{HealthPath}` becomes `{UpstreamURL}`.
+    `{HealthPath}` becomes `{UpstreamURL}`: the log property is renamed, so queries on `HealthPath`
+    must use `UpstreamURL` (http 10).
   - Cache: the lock and idempotency services (`logging-cache#20`), where `{Key}` becomes
     `[{IdempotencyKey}]`.
   - MessageBus: the receiver and publisher (`infra#20`).

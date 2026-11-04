@@ -119,7 +119,7 @@ namespace SolTechnology.Core.HTTP
                 if (cfg.TimeoutSeconds.HasValue)
                 {
                     CreateLogger(sp).LogWarning(
-                        "HTTP client [{ClientName}] has TimeoutSeconds={Seconds}s but UsePolly=true; HttpClient.Timeout is ignored in favour of the Polly per-attempt RequestTimeout.",
+                        "HTTP client [{ClientName}] has TimeoutSeconds=[{Seconds}]s but UsePolly=true; HttpClient.Timeout is ignored in favour of the Polly per-attempt RequestTimeout.",
                         httpClientName,
                         cfg.TimeoutSeconds.Value);
                 }
