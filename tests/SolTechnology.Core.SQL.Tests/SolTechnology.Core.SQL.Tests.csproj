@@ -6,6 +6,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\SolTechnology.Core.SQL\SolTechnology.Core.SQL.csproj" />
+    <ProjectReference Include="..\..\src\SolTechnology.Core.SQL.Testing\SolTechnology.Core.SQL.Testing.csproj" />
   </ItemGroup>
 
 </Project>

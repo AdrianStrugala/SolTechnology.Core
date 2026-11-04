@@ -4,10 +4,15 @@ namespace SolTechnology.Core.SQL.Transactions
 {
     public class UnitOfWork : IDisposable, IUnitOfWork
     {
-        private TransactionScope _scope = null!;
+        private TransactionScope? _scope;
 
-        public UnitOfWork Begin(IsolationLevel isolationLevel = IsolationLevel.ReadCommitted)
+        public IUnitOfWork Begin(IsolationLevel isolationLevel = IsolationLevel.ReadCommitted)
         {
+            if (_scope != null)
+            {
+                throw new InvalidOperationException("The transaction scope is already open. Complete or roll it back before calling Begin() again");
+            }
+
             _scope = new TransactionScope(
                 TransactionScopeOption.Required,
                 new TransactionOptions { IsolationLevel = isolationLevel },
@@ -28,12 +33,13 @@ namespace SolTechnology.Core.SQL.Transactions
 
         public void Rollback()
         {
-            _scope.Dispose();
+            Dispose();
         }
 
         public void Dispose()
         {
             _scope?.Dispose();
+            _scope = null;
         }
     }
 }
