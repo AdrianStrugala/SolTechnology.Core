@@ -6,17 +6,10 @@ namespace SolTechnology.Core.Cache;
 /// In-process idempotency store backed by <see cref="ConcurrentDictionary{TKey,TValue}"/> with TTL
 /// expiry. Suitable for local dev and single-instance deployments. No Redis required.
 /// </summary>
-internal sealed class LocalIdempotencyStore : IIdempotencyStore
+internal sealed class LocalIdempotencyStore(TimeSpan ttl, TimeProvider? timeProvider = null) : IIdempotencyStore
 {
     private readonly ConcurrentDictionary<string, Entry> _store = new(StringComparer.Ordinal);
-    private readonly TimeSpan _ttl;
-    private readonly TimeProvider _timeProvider;
-
-    public LocalIdempotencyStore(TimeSpan ttl, TimeProvider? timeProvider = null)
-    {
-        _ttl = ttl;
-        _timeProvider = timeProvider ?? TimeProvider.System;
-    }
+    private readonly TimeProvider _timeProvider = timeProvider ?? TimeProvider.System;
 
     public Task<bool> TryAdd(string key, CancellationToken ct = default)
     {
@@ -47,7 +40,7 @@ internal sealed class LocalIdempotencyStore : IIdempotencyStore
         return Task.CompletedTask;
     }
 
-    private bool IsExpired(Entry entry) => _timeProvider.GetUtcNow() - entry.CreatedAt > _ttl;
+    private bool IsExpired(Entry entry) => _timeProvider.GetUtcNow() - entry.CreatedAt > ttl;
 
     private void Evict()
     {

@@ -10,21 +10,12 @@ namespace SolTechnology.Core.Cache;
 /// via <c>DEL</c> (only if the value still matches — prevents releasing someone else's lock after
 /// expiry).
 /// </summary>
-internal sealed class RedisDistributedLockService : IDistributedLockService
+internal sealed class RedisDistributedLockService(
+    IConnectionMultiplexer redis,
+    IOptions<DistributedCacheConfiguration> options,
+    ILogger<RedisDistributedLockService> logger) : IDistributedLockService
 {
-    private readonly IConnectionMultiplexer _redis;
-    private readonly ILogger<RedisDistributedLockService> _logger;
-    private readonly string _keyPrefix;
-
-    public RedisDistributedLockService(
-        IConnectionMultiplexer redis,
-        IOptions<DistributedCacheConfiguration> options,
-        ILogger<RedisDistributedLockService> logger)
-    {
-        _redis = redis;
-        _logger = logger;
-        _keyPrefix = options.Value.InstanceName + "lock:";
-    }
+    private readonly string _keyPrefix = options.Value.InstanceName + "lock:";
 
     public async ValueTask<IAsyncDisposable?> TryAcquireLock(
         string name, TimeSpan expiry, CancellationToken ct = default)
@@ -36,23 +27,23 @@ internal sealed class RedisDistributedLockService : IDistributedLockService
 
         try
         {
-            var db = _redis.GetDatabase();
+            var db = redis.GetDatabase();
             var acquired = await db.StringSetAsync(key, value, expiry, When.NotExists);
 
             if (!acquired)
             {
-                _logger.LogDebug("Lock not acquired: {LockKey} (held by another instance)", key);
+                logger.LogDebug("Lock not acquired: {LockKey} (held by another instance)", key);
                 return null;
             }
 
-            _logger.LogDebug("Lock acquired: {LockKey}", key);
-            return new LockHandle(db, key, value, _logger);
+            logger.LogDebug("Lock acquired: {LockKey}", key);
+            return new LockHandle(db, key, value, logger);
         }
         catch (OperationCanceledException) { throw; }
         catch (Exception ex)
         {
             // Guard-rail: never throw into host loop on backend failure — degrade to null.
-            _logger.LogWarning(ex, "Lock acquisition failed for {LockKey} — degrading to null", key);
+            logger.LogWarning(ex, "Lock acquisition failed for {LockKey} — degrading to null", key);
             return null;
         }
     }

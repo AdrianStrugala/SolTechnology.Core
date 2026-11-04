@@ -17,18 +17,12 @@ namespace SolTechnology.Core.Cache
     }
 
     /// <summary>Default <see cref="ISingletonCache"/> on <see cref="IMemoryCache"/>, registered by <c>AddSolLocalCache</c>.</summary>
-    public class SingletonCache : ISingletonCache
+    /// <param name="memoryCache">The memory cache that holds the entries.</param>
+    /// <param name="cacheConfiguration">Expiration settings, read once when the cache is created.</param>
+    public class SingletonCache(IMemoryCache memoryCache, IOptionsMonitor<CacheConfiguration> cacheConfiguration) : ISingletonCache
     {
-        private readonly IMemoryCache _memoryCache;
-        private readonly CacheConfiguration _cacheConfiguration;
+        private readonly CacheConfiguration _cacheConfiguration = cacheConfiguration.CurrentValue;
         private readonly Lock _gate = new();
-
-        /// <summary>Creates the cache on <paramref name="memoryCache"/> with the current <paramref name="cacheConfiguration"/>.</summary>
-        public SingletonCache(IMemoryCache memoryCache, IOptionsMonitor<CacheConfiguration> cacheConfiguration)
-        {
-            _memoryCache = memoryCache;
-            _cacheConfiguration = cacheConfiguration.CurrentValue;
-        }
 
         /// <inheritdoc />
         public async Task<TItem> GetOrAdd<TKey, TItem>(TKey key, Func<TKey, Task<TItem>> factory)
@@ -51,13 +45,13 @@ namespace SolTechnology.Core.Cache
         {
             lock (_gate)
             {
-                if (_memoryCache.TryGetValue<Lazy<Task<TItem>>>(keyString, out var existing) && existing is not null)
+                if (memoryCache.TryGetValue<Lazy<Task<TItem>>>(keyString, out var existing) && existing is not null)
                 {
                     return existing;
                 }
 
                 var created = new Lazy<Task<TItem>>(factory, LazyThreadSafetyMode.ExecutionAndPublication);
-                _memoryCache.Set(keyString, created, BuildEntryOptions());
+                memoryCache.Set(keyString, created, BuildEntryOptions());
                 return created;
             }
         }
@@ -66,9 +60,9 @@ namespace SolTechnology.Core.Cache
         {
             lock (_gate)
             {
-                if (_memoryCache.TryGetValue(keyString, out var current) && ReferenceEquals(current, entry))
+                if (memoryCache.TryGetValue(keyString, out var current) && ReferenceEquals(current, entry))
                 {
-                    _memoryCache.Remove(keyString);
+                    memoryCache.Remove(keyString);
                 }
             }
         }

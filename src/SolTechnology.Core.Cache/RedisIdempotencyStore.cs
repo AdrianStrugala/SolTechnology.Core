@@ -16,42 +16,31 @@ namespace SolTechnology.Core.Cache;
 /// to Redis is not cancelled mid-flight.
 /// </para>
 /// </summary>
-internal sealed class RedisIdempotencyStore : IIdempotencyStore
+internal sealed class RedisIdempotencyStore(
+    IConnectionMultiplexer redis,
+    IOptions<DistributedCacheConfiguration> options,
+    ILogger<RedisIdempotencyStore> logger,
+    TimeSpan ttl) : IIdempotencyStore
 {
-    private readonly IConnectionMultiplexer _redis;
-    private readonly ILogger<RedisIdempotencyStore> _logger;
-    private readonly string _keyPrefix;
-    private readonly TimeSpan _ttl;
-
     private static readonly JsonSerializerOptions JsonOptions = new()
     {
         PropertyNamingPolicy = JsonNamingPolicy.CamelCase
     };
 
-    public RedisIdempotencyStore(
-        IConnectionMultiplexer redis,
-        IOptions<DistributedCacheConfiguration> options,
-        ILogger<RedisIdempotencyStore> logger,
-        TimeSpan ttl)
-    {
-        _redis = redis;
-        _logger = logger;
-        _keyPrefix = options.Value.InstanceName + "idempotency:";
-        _ttl = ttl;
-    }
+    private readonly string _keyPrefix = options.Value.InstanceName + "idempotency:";
 
     public async Task<bool> TryAdd(string key, CancellationToken ct = default)
     {
         try
         {
-            var db = _redis.GetDatabase();
+            var db = redis.GetDatabase();
             // SET NX EX — atomic "reserve if not exists" with TTL.
             // Value starts as empty (placeholder) — SetResponse overwrites with the full response.
-            return await db.StringSetAsync(FullKey(key), "", _ttl, When.NotExists);
+            return await db.StringSetAsync(FullKey(key), "", ttl, When.NotExists);
         }
         catch (Exception ex)
         {
-            _logger.LogWarning(ex, "Idempotency TryAdd failed for {Key} — allowing request through", key);
+            logger.LogWarning(ex, "Idempotency TryAdd failed for {Key} — allowing request through", key);
             return true; // fail-open: let the request through rather than blocking forever
         }
     }
@@ -60,19 +49,21 @@ internal sealed class RedisIdempotencyStore : IIdempotencyStore
     {
         try
         {
-            var db = _redis.GetDatabase();
+            var db = redis.GetDatabase();
             var value = await db.StringGetAsync(FullKey(key));
 
             // IsNullOrEmpty also covers the empty placeholder written by TryAdd —
             // key reserved but the response has not been persisted yet.
             if (value.IsNullOrEmpty)
+            {
                 return null;
+            }
 
             return JsonSerializer.Deserialize<StoredResponse>((string)value!, JsonOptions);
         }
         catch (Exception ex)
         {
-            _logger.LogWarning(ex, "Idempotency Get failed for {Key}", key);
+            logger.LogWarning(ex, "Idempotency Get failed for {Key}", key);
             return null;
         }
     }
@@ -81,13 +72,13 @@ internal sealed class RedisIdempotencyStore : IIdempotencyStore
     {
         try
         {
-            var db = _redis.GetDatabase();
+            var db = redis.GetDatabase();
             var json = JsonSerializer.Serialize(response, JsonOptions);
-            await db.StringSetAsync(FullKey(key), json, _ttl);
+            await db.StringSetAsync(FullKey(key), json, ttl);
         }
         catch (Exception ex)
         {
-            _logger.LogWarning(ex, "Idempotency SetResponse failed for {Key} — response will not be replayed on retry", key);
+            logger.LogWarning(ex, "Idempotency SetResponse failed for {Key} — response will not be replayed on retry", key);
         }
     }
 
@@ -95,12 +86,12 @@ internal sealed class RedisIdempotencyStore : IIdempotencyStore
     {
         try
         {
-            var db = _redis.GetDatabase();
+            var db = redis.GetDatabase();
             await db.KeyDeleteAsync(FullKey(key));
         }
         catch (Exception ex)
         {
-            _logger.LogWarning(ex, "Idempotency Remove failed for {Key} — key will expire via TTL", key);
+            logger.LogWarning(ex, "Idempotency Remove failed for {Key} — key will expire via TTL", key);
         }
     }
 
