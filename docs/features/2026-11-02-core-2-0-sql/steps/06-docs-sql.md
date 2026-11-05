@@ -1,7 +1,7 @@
 ---
 spec: 2026-11-02-core-2-0-sql
 step: 06
-status: to-do
+status: done
 ---
 
 # Step 06: Module docs — `docs/SQL.md`
@@ -22,10 +22,33 @@ Former core step 61 (SQL part); split per library on 2026-11-02.
 - Follow [`PublicDocumentationGuide.md`](../../../../docs/PublicDocumentationGuide.md).
 
 ## Acceptance criteria
-- [ ] `grep -nE "\bAdd(MessageBus|ServiceBusHealthCheck|PersistentEvents|RecurringJob|CQRS|SQL|SqlHealthCheck)\b|WithPublisher|WithReceiver|UseSolTechnologyFilters|SmartRetry\(|UntilConditionMet" docs/SQL.md docs/ClaudeCodingGuide.md` prints nothing.
-- [ ] Snippets compile in the throwaway project (the PR author states it in the PR description).
+- [x] `grep -nE "\bAdd(MessageBus|ServiceBusHealthCheck|PersistentEvents|RecurringJob|CQRS|SQL|SqlHealthCheck)\b|WithPublisher|WithReceiver|UseSolTechnologyFilters|SmartRetry\(|UntilConditionMet" docs/SQL.md docs/ClaudeCodingGuide.md` prints nothing.
+- [x] Snippets compile in the throwaway project (the PR author states it in the PR description).
 
 ## Open questions
 - none
 
 ## Deviations
+
+### One explicit binding snippet stays
+
+**Original plan:** remove the binding examples.
+
+**Actual implementation:** the unsupported `Configuration:Sql` auto-binding and the parameterless `AddSQL()` are gone.
+`### Configuration` keeps one `appsettings.json` section and `### Registration` binds it explicitly with
+`GetSection("Sql").Get<SQLConfiguration>()` before `AddSolSQL`, as DreamTravel's API host does, because the
+[`PublicDocumentationGuide.md`](../../../../docs/PublicDocumentationGuide.md) structure asks for one binding snippet and
+Guide §14 binds in `Program.cs`. The page is rewritten in the canonical structure, so its `### Testing` heading keeps the
+`SQL.md#testing` anchor that `README.md` and `docs/theQuality.md` link to.
+
+### Snippet verification
+
+**Original plan:** copy every C# block into a throwaway console project that references `SolTechnology.Core.SQL` and
+build it; mark snippets that must stay illustrative.
+
+**Actual implementation:** a script copied all 7 C# blocks verbatim into an uncommitted web project under `.scratch/`
+that references `SolTechnology.Core.SQL`, `SolTechnology.Core.SQL.Testing`, Dapper 2.1.35, and
+`Microsoft.EntityFrameworkCore.SqlServer` 10.0.9, with `TreatWarningsAsErrors`. Statement snippets sit in method bodies
+that supply `builder`, `services`, `loggerFactory`, `dacpacPath`, `connectionString`, and `ct`. `dotnet build` reported
+0 errors and 0 warnings, so no snippet is marked `// illustrative`.
+

@@ -260,7 +260,7 @@ Rules:
 - **Entities are persistence shape, not domain.** They live in `DbModels/`, suffixed `Entity`. Domain models live in `*.Domain/` and are mapped via dedicated `*Mapper` classes (e.g. `CityMapper`).
 - **NEVER expose `IQueryable<TEntity>` outside the SQL project.** Consumers receive domain objects.
 - Reusable query composition goes into `QueryBuilders/` as `IQueryable<T>` extension methods (`WhereName`, `WhereCoordinates`, `ApplyReadOptions`). Keep them small, single-predicate, and named after what they filter.
-- Configuration binding: `services.AddSQL(sqlConfiguration)` from `SolTechnology.Core.SQL` first, then `AddDbContext<>` for project-specific context.
+- Configuration binding: `services.AddSolSQL(sqlConfiguration)` from `SolTechnology.Core.SQL` first, then `AddDbContext<>` for project-specific context.
 - Migrations live in `Infrastructure/DreamTravelDatabase/`. NEVER put migrations next to the DbContext.
 
 ### HTTP clients (`DreamTravel.GeolocationDataClients`)
