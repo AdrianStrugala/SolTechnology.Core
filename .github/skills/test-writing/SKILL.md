@@ -123,6 +123,13 @@ through.** Tests that mirror the implementation shape are noise.
 Every `Result.Failure` branch in production code needs a test. If the diff adds a new error
 code, the test must assert the exact `Error.Code` string (it is part of the public contract).
 
+### 8a. Async flow and threads
+
+`await Task.Yield()` inside an NUnit test usually resumes on the same thread, so it does not prove
+that state (for example a `TransactionScope` or an `AsyncLocal`) flows across a thread hop. Force
+the hop explicitly, e.g. `await Task.Run(async () => { ... })`, and check the test fails when the
+flow option is removed.
+
 ### 9. Run the right runner
 
 - Core libs (whole suite): `./.github/runTests.ps1`.

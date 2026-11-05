@@ -505,6 +505,9 @@ parameter; `UntilAsync`, `CheckHealthAsync`, `InvokeAsync`, `StartAsync`/`StopAs
   exception instead of an `[{Exception}]` placeholder; the template is
   `Circuit breaker opened for [{ClientName}]` (`CircuitBreakerOptionsBuilder.cs`). Step: http code
   review fixes (2026-11-03).
+- **L-07** While the shared Redis connection is down, Cache logs `Redis not connected; skipping
+  [{Operation}] for [{Key}]` (Warning on the first skip per operation, then Debug for 30 s) instead of the
+  per-call "… failed …" warnings. Record: `2026-11-05-cache-redis-fail-fast`.
 
 ### Release-notes inputs (consumed by release 05)
 
