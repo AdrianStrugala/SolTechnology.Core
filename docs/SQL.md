@@ -7,8 +7,8 @@ transaction, `SqlErrorTranslator` turns SQL errors into typed `Result` failures,
 
 ### Features
 
-- **Connections with a transient retry** — timeouts, deadlocks, and Azure SQL throttling are retried three times; any
-  other error, such as a wrong password, fails at once.
+- **Connections with a transient retry** — a refused, unreachable, or timed-out server, deadlocks, and Azure SQL
+  throttling are retried three times; any other error, such as a wrong password, fails at once.
 - **Ambient transactions** — `IUnitOfWork.Begin()` opens a `TransactionScope` that flows across `await`, and
   connections opened inside it enlist.
 - **Typed SQL errors** — duplicate keys, deadlocks, and timeouts become `ConflictError`, `DeadlockError`, and
@@ -75,7 +75,7 @@ public class CityRepository(ISQLConnectionFactory connectionFactory)
 
 | Failure while opening | Behaviour |
 |---|---|
-| `SqlException` number `-2`, `53`, `1205`, `4060`, `40197`, `40501`, `40613`, `49918`, `49919`, or `49920` | Retried three times after 3, 9, and 27 seconds plus up to 1 second of jitter; the calling thread waits. |
+| `SqlException` with a transient error number: the list of EF Core's `SqlServerTransientExceptionDetector` (for example `233`, `1205`, `4060`, `10053`, `10054`, `10060`, `11001`, `40501`, `40613`) plus `-2`, `53`, `258` (connect timeout), and `10061` (connection refused) | Retried three times after 3, 9, and 27 seconds plus up to 1 second of jitter; the calling thread waits. |
 | Any other exception, for example login failure `18456` | Thrown at once; the connection is disposed. |
 
 Entity Framework uses the same connection string through `GetConnectionString()` or the configuration object:

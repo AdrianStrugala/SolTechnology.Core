@@ -2,6 +2,7 @@ using System.Diagnostics;
 using FluentAssertions;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using NUnit.Framework;
 using SolTechnology.Core.SQL.Connections;
 
@@ -35,6 +36,29 @@ public class SQLConnectionFactoryTests
         // Assert
         exception.Should().BeOfType<SqlException>().Which.Number.Should().Be(LoginFailed);
         stopwatch.Elapsed.Should().BeLessThan(TimeSpan.FromSeconds(2));
+    }
+
+    [Test]
+    public void CreateConnection_ServerRefusesConnection_RetriesThreeTimes()
+    {
+        // Arrange
+        var retryAttempts = new List<int>();
+        var refused = Options.Create(new SQLConfiguration
+        {
+            ConnectionString = "Server=localhost,1;Database=Unused;User Id=sa;Password=unused;Pooling=false;Connect Timeout=1"
+        });
+        var sut = new SQLConnectionFactory(refused, retryAttempt =>
+        {
+            retryAttempts.Add(retryAttempt);
+            return TimeSpan.Zero;
+        });
+
+        // Act
+        var exception = Capture(() => sut.CreateConnection());
+
+        // Assert
+        exception.Should().BeOfType<SqlException>();
+        retryAttempts.Should().Equal(1, 2, 3);
     }
 
     private static Exception? Capture(Action action)

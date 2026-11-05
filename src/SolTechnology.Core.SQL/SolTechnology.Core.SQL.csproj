@@ -25,4 +25,8 @@
 		<ProjectReference Include="..\SolTechnology.Core\SolTechnology.Core.csproj" />
 	</ItemGroup>
 
+	<ItemGroup>
+		<InternalsVisibleTo Include="SolTechnology.Core.SQL.Tests" />
+	</ItemGroup>
+
 </Project>
