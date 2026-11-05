@@ -1,4 +1,5 @@
-﻿using Azure.Storage.Blobs;
+﻿using System.Collections.Concurrent;
+using Azure.Storage.Blobs;
 using Microsoft.Extensions.Options;
 
 namespace SolTechnology.Core.Blob.Connection
@@ -7,7 +8,7 @@ namespace SolTechnology.Core.Blob.Connection
     {
         private readonly string _connectionString;
 
-        private readonly Dictionary<string, BlobContainerClient> _blobContainerCache = new();
+        private readonly ConcurrentDictionary<string, Lazy<Task<BlobContainerClient>>> _blobContainerCache = new();
 
         public BlobConnectionFactory(IOptions<BlobConfiguration> blobConfiguration)
         {
@@ -16,14 +17,26 @@ namespace SolTechnology.Core.Blob.Connection
 
         public BlobContainerClient GetConnection(string containerName)
         {
-            if (_blobContainerCache.TryGetValue(containerName, out var connection))
-            {
-                return connection;
-            }
+            var connection = _blobContainerCache.GetOrAdd(
+                containerName,
+                name => new Lazy<Task<BlobContainerClient>>(() => CreateContainer(name)));
 
+            try
+            {
+                return connection.Value.GetAwaiter().GetResult();
+            }
+            catch (Exception)
+            {
+                // Evict only this failed entry, so the next call retries the creation.
+                _blobContainerCache.TryRemove(new KeyValuePair<string, Lazy<Task<BlobContainerClient>>>(containerName, connection));
+                throw;
+            }
+        }
+
+        private async Task<BlobContainerClient> CreateContainer(string containerName)
+        {
             var blobContainerClient = new BlobContainerClient(_connectionString, containerName);
-            blobContainerClient.CreateIfNotExists();
-            _blobContainerCache.Add(containerName, blobContainerClient);
+            await blobContainerClient.CreateIfNotExistsAsync().ConfigureAwait(false);
             return blobContainerClient;
         }
     }

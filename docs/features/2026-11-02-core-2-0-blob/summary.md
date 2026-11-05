@@ -19,7 +19,7 @@ are `done` and after these library features are `completed`: none. No step is `b
 
 | # | Title | File | Status |
 |---|---|---|---|
-| 01 | Blob — thread-safe container cache with async creation | [`steps/01-blob-thread-safe-connection-factory.md`](steps/01-blob-thread-safe-connection-factory.md) | to-do |
+| 01 | Blob — thread-safe container cache with async creation | [`steps/01-blob-thread-safe-connection-factory.md`](steps/01-blob-thread-safe-connection-factory.md) | done |
 | 02 | Blob — 2.0 surface (own namespace, cancellation, atomic metadata, internal factory) | [`steps/02-blob-2-0-surface.md`](steps/02-blob-2-0-surface.md) | to-do |
 | 03 | XML docs shipped — Blob | [`steps/03-xml-docs.md`](steps/03-xml-docs.md) | to-do |
 | 04 | Module docs — `docs/Blob.md` | [`steps/04-docs-blob.md`](steps/04-docs-blob.md) | to-do |

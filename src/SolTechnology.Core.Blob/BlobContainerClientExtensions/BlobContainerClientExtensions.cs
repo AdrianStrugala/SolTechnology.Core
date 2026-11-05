@@ -1,4 +1,6 @@
-﻿using SolTechnology.Avro;
+﻿using Azure;
+using Azure.Storage.Blobs.Models;
+using SolTechnology.Avro;
 using SolTechnology.Core.Blob;
 
 // ReSharper disable once CheckNamespace
@@ -70,7 +72,15 @@ namespace Azure.Storage.Blobs
             }
             metadata[SerializationFormatKey] = $"{serializationFormat.ToString().ToLowerInvariant()}";
 
-            await blob.UploadAsync(new MemoryStream(serializedContent), true, CancellationToken.None);
+            try
+            {
+                await blob.UploadAsync(new MemoryStream(serializedContent), true, CancellationToken.None);
+            }
+            catch (RequestFailedException e) when (e.ErrorCode == BlobErrorCode.ContainerNotFound)
+            {
+                await client.CreateIfNotExistsAsync();
+                await blob.UploadAsync(new MemoryStream(serializedContent), true, CancellationToken.None);
+            }
             await blob.SetMetadataAsync(metadata);
         }
     }
