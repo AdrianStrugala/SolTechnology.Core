@@ -1,10 +1,9 @@
 ﻿using Azure;
+using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
 using SolTechnology.Avro;
-using SolTechnology.Core.Blob;
 
-// ReSharper disable once CheckNamespace
-namespace Azure.Storage.Blobs
+namespace SolTechnology.Core.Blob
 {
     public static class BlobContainerClientExtensions
     {
@@ -12,76 +11,87 @@ namespace Azure.Storage.Blobs
 
         public static async Task<T> ReadFromBlob<T>(
             this BlobContainerClient client,
-            string blobName)
+            string blobName,
+            CancellationToken ct = default)
         {
             var blob = client.GetBlobClient(blobName);
-            var content = await blob.DownloadContentAsync();
+            var content = (await blob.DownloadContentAsync(ct)).Value;
 
-            var properties = await blob.GetPropertiesAsync();
-            var metadata = properties.Value.Metadata ?? new Dictionary<string, string>();
-            metadata.TryGetValue(SerializationFormatKey, out var contentType);
+            string? contentType = null;
+            content.Details.Metadata?.TryGetValue(SerializationFormatKey, out contentType);
 
             switch (contentType)
             {
                 case "avro":
-                    return AvroConvert.Deserialize<T>(content.Value.Content.ToArray());
+                    return AvroConvert.Deserialize<T>(content.Content.ToArray());
 
                 case "json":
                 default:
-                    return content.Value.Content.ToObjectFromJson<T>()!;
+                    return content.Content.ToObjectFromJson<T>()!;
             }
-        }
-
-        public static async Task WriteToBlob(
-            this BlobContainerClient client,
-            string blobName,
-            object content)
-        {
-            await WriteToBlob(client, blobName, content, SerializationFormat.Json);
         }
 
         public static async Task WriteToBlob(
             this BlobContainerClient client,
             string blobName,
             object content,
-            SerializationFormat serializationFormat)
+            CancellationToken ct = default)
+        {
+            await WriteToBlob(client, blobName, content, SerializationFormat.Json, ct);
+        }
+
+        public static async Task WriteToBlob(
+            this BlobContainerClient client,
+            string blobName,
+            object content,
+            SerializationFormat serializationFormat,
+            CancellationToken ct = default)
         {
             var blob = client.GetBlobClient(blobName);
-
-            byte[] serializedContent = { };
-            switch (serializationFormat)
+            var serializedContent = Serialize(content, serializationFormat);
+            var options = new BlobUploadOptions
             {
-                case SerializationFormat.Json:
-                    serializedContent = BinaryData.FromObjectAsJson(content).ToArray();
-                    break;
-
-                case SerializationFormat.Avro:
-                    serializedContent = AvroConvert.Serialize(content, CodecType.Brotli);
-                    break;
-            }
-
-            Dictionary<string, string> metadata;
-            if (await blob.ExistsAsync())
-            {
-                var properties = await blob.GetPropertiesAsync();
-                metadata = new Dictionary<string, string>(properties.Value.Metadata);
-            }
-            else
-            {
-                metadata = new Dictionary<string, string>();
-            }
-            metadata[SerializationFormatKey] = $"{serializationFormat.ToString().ToLowerInvariant()}";
+                Metadata = await MergeFormatIntoMetadata(blob, serializationFormat, ct)
+            };
 
             try
             {
-                await blob.UploadAsync(new MemoryStream(serializedContent), true, CancellationToken.None);
+                await blob.UploadAsync(serializedContent, options, ct);
             }
             catch (RequestFailedException e) when (e.ErrorCode == BlobErrorCode.ContainerNotFound)
             {
-                await client.CreateIfNotExistsAsync();
-                await blob.UploadAsync(new MemoryStream(serializedContent), true, CancellationToken.None);
+                await client.CreateIfNotExistsAsync(cancellationToken: ct);
+                await blob.UploadAsync(serializedContent, options, ct);
             }
-            await blob.SetMetadataAsync(metadata);
+        }
+
+        private static BinaryData Serialize(object content, SerializationFormat serializationFormat)
+        {
+            switch (serializationFormat)
+            {
+                case SerializationFormat.Json:
+                    return BinaryData.FromObjectAsJson(content);
+
+                case SerializationFormat.Avro:
+                    return new BinaryData(AvroConvert.Serialize(content, CodecType.Brotli));
+
+                default:
+                    return BinaryData.Empty;
+            }
+        }
+
+        // An overwriting upload replaces all metadata, so keep the blob's existing keys (RM-12).
+        private static async Task<Dictionary<string, string>> MergeFormatIntoMetadata(
+            BlobClient blob,
+            SerializationFormat serializationFormat,
+            CancellationToken ct)
+        {
+            var metadata = (await blob.ExistsAsync(ct)).Value
+                ? new Dictionary<string, string>((await blob.GetPropertiesAsync(cancellationToken: ct)).Value.Metadata)
+                : new Dictionary<string, string>();
+
+            metadata[SerializationFormatKey] = serializationFormat.ToString().ToLowerInvariant();
+            return metadata;
         }
     }
 }

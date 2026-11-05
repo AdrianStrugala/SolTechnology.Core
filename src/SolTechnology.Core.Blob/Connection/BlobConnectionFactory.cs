@@ -4,7 +4,7 @@ using Microsoft.Extensions.Options;
 
 namespace SolTechnology.Core.Blob.Connection
 {
-    public class BlobConnectionFactory : IBlobConnectionFactory
+    internal sealed class BlobConnectionFactory : IBlobConnectionFactory
     {
         private readonly string _connectionString;
 

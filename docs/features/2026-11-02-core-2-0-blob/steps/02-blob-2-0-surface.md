@@ -1,7 +1,7 @@
 ---
 spec: 2026-11-02-core-2-0-blob
 step: 02
-status: to-do
+status: done
 ---
 
 # Step 02: Blob — 2.0 surface (own namespace, cancellation, atomic metadata, internal factory)
@@ -32,12 +32,25 @@ Former core step 50; moved here by the per-library regroup (user, 2026-11-02).
 - No automated test is added (Q6). Recommended, not a gate: record in the PR description a manual Avro and JSON round-trip against Azurite, including a `GetPropertiesAsync` check that the format key is present right after upload.
 
 ## Acceptance criteria
-- [ ] `dotnet build SolTechnology.Core.slnx -c Release` is green.
-- [ ] `grep -rnE "SetMetadataAsync|CancellationToken\.None" src/SolTechnology.Core.Blob` prints nothing.
-- [ ] `grep -rn "namespace Azure" src` prints nothing.
-- [ ] RM-12: the source of `WriteToBlob` builds the upload `Metadata` from the blob's existing metadata plus the format key (`grep -n "Metadata" src/SolTechnology.Core.Blob/BlobContainerClientExtensions/BlobContainerClientExtensions.cs` shows the merge). The PR's manual Azurite check, if run, shows that a pre-existing custom metadata key survives an overwrite.
+- [x] `dotnet build SolTechnology.Core.slnx -c Release` is green.
+- [x] `grep -rnE "SetMetadataAsync|CancellationToken\.None" src/SolTechnology.Core.Blob` prints nothing.
+- [x] `grep -rn "namespace Azure" src` prints nothing.
+- [x] RM-12: the source of `WriteToBlob` builds the upload `Metadata` from the blob's existing metadata plus the format key (`grep -n "Metadata" src/SolTechnology.Core.Blob/BlobContainerClientExtensions/BlobContainerClientExtensions.cs` shows the merge). The PR's manual Azurite check, if run, shows that a pre-existing custom metadata key survives an overwrite.
 
 ## Open questions
 - none (`C-18` confirmed by the user on 2026-11-02; Q6 resolved: no Blob test project)
 
 ## Deviations
+
+### Manual Azurite check; no consumer to update
+
+**Original plan:** no automated test (Q6); a manual Avro and JSON round-trip against Azurite is recommended;
+DreamTravel usings change if it uses Blob.
+
+**Actual implementation:** DreamTravel and the tests do not reference Blob, so no using changed and the coverage gap
+stays AR-1. The uncommitted `.scratch/` console from step 01 ran against `azurite:latest` and passed: JSON and Avro
+round-trips with the format key present right after the upload, the one-argument overload writes `json`, a custom
+`owner` key survives an Avro overwrite (RM-12), a blob written the 1.x way (upload, then `SetMetadataAsync` with
+`avro`) and a blob without the key (read as JSON) both read back, and a cancelled token stops both `WriteToBlob` and
+`ReadFromBlob`. The write keeps step 01's single `ContainerNotFound` retry with the same options, and the read stays
+buffered through `DownloadContentAsync`, as in 1.x.
