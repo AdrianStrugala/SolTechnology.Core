@@ -133,7 +133,7 @@ public class CityImporter(IUnitOfWork unitOfWork, CityRepository cities)
 | Call | Behaviour |
 |---|---|
 | `Begin(isolationLevel)` | Opens the scope (default `ReadCommitted`); throws `InvalidOperationException` when one is already open. |
-| `Complete()` | Commits and closes the scope; throws `InvalidOperationException` before `Begin()`. |
+| `Complete()` | Commits and closes the scope; throws `InvalidOperationException` before `Begin()`. When the commit fails (for example `TransactionAbortedException`), the scope is still closed, so `Begin()` works again. |
 | `Rollback()` or `Dispose()` | Rolls back an open scope; does nothing when no scope is open. |
 
 #### DACPAC deployment

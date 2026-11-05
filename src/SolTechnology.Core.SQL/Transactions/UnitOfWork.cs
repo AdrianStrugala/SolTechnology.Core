@@ -38,8 +38,9 @@ namespace SolTechnology.Core.SQL.Transactions
 
         public void Dispose()
         {
-            _scope?.Dispose();
+            var scope = _scope;
             _scope = null;
+            scope?.Dispose();
         }
     }
 }
