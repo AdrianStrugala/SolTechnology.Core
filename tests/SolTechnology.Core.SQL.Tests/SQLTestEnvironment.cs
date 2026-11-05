@@ -20,6 +20,16 @@ public static class SQLTestEnvironment
         return services.BuildServiceProvider();
     }
 
+    public static async Task InsertItem(string name)
+    {
+        var database = await Database();
+        await using var connection = new SqlConnection(database.DatabaseConnectionString);
+        await connection.OpenAsync();
+        await using var command = new SqlCommand("INSERT INTO dbo.Items (Name) VALUES (@name)", connection);
+        command.Parameters.AddWithValue("@name", name);
+        await command.ExecuteNonQueryAsync();
+    }
+
     public static async Task<int> CountItems(string name)
     {
         var database = await Database();

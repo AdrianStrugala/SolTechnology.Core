@@ -44,8 +44,9 @@ public static class SqlErrorTranslator
     }
 
     /// <summary>
-    /// Maps a <see cref="SqlException"/> to a typed <see cref="Error"/>.
-    /// Returns null if the error is not a known translatable case (caller should re-throw).
+    /// Maps a <see cref="SqlException"/> to a typed <see cref="Error"/> whose <c>Description</c> is a fixed
+    /// text per error class, so constraint, table, and value names never leave the data layer.
+    /// Unknown error numbers map to a plain <see cref="Error"/>.
     /// </summary>
     public static Error Translate(SqlException ex)
     {
@@ -54,24 +55,24 @@ public static class SqlErrorTranslator
             2627 or 2601 => new ConflictError
             {
                 Message = "Duplicate key violation",
-                Description = ex.Message
+                Description = "A row with the same unique key already exists."
             },
             1205 => new DeadlockError
             {
                 Message = "Transaction was deadlocked",
-                Description = ex.Message,
+                Description = "The transaction was chosen as a deadlock victim; retry the operation.",
                 Recoverable = true
             },
             -2 => new TimeoutError
             {
                 Message = "SQL query timed out",
-                Description = ex.Message,
+                Description = "The SQL command did not finish within its timeout.",
                 Recoverable = true
             },
             _ => new Error
             {
                 Message = "Database error",
-                Description = ex.Message
+                Description = $"SQL Server returned error number {ex.Number}."
             }
         };
     }

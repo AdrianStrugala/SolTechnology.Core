@@ -23,10 +23,7 @@ namespace SolTechnology.Core.SQL
         /// </returns>
         public static IServiceCollection AddSolSQL(this IServiceCollection services, SQLConfiguration sqlConfiguration)
         {
-            if (sqlConfiguration == null)
-            {
-                throw new ArgumentException($"The [{nameof(SQLConfiguration)}] is missing. Provide it by parameter.");
-            }
+            ArgumentNullException.ThrowIfNull(sqlConfiguration);
 
             services
                 .AddOptions<SQLConfiguration>()
@@ -34,6 +31,9 @@ namespace SolTechnology.Core.SQL
                 {
                     options.ConnectionString = sqlConfiguration.ConnectionString;
                 })
+                .Validate(
+                    options => !string.IsNullOrWhiteSpace(options.ConnectionString),
+                    $"{nameof(SQLConfiguration)}.{nameof(SQLConfiguration.ConnectionString)} must not be empty.")
                 .ValidateOnStart();
 
             services.AddTransient<ISQLConnectionFactory, SQLConnectionFactory>();
