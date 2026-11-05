@@ -24,7 +24,7 @@ namespace SolTechnology.Core.SQL.Tests
             //Arrange
             SQLConfiguration sqlConfiguration = new SQLConfiguration
             {
-                ConnectionString = "ExampleConnectionString"
+                ConnectionString = "Server=example;Database=Example"
             };
 
             //Act
@@ -40,7 +40,8 @@ namespace SolTechnology.Core.SQL.Tests
 
         [TestCase("")]
         [TestCase("   ")]
-        public async Task AddSolSQL_EmptyConnectionString_HostStartFails(string connectionString)
+        [TestCase("Server=x;Foo=bar")]
+        public async Task AddSolSQL_InvalidConnectionString_HostStartFails(string connectionString)
         {
             // Arrange
             var builder = Host.CreateApplicationBuilder();

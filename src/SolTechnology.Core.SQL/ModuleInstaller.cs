@@ -1,3 +1,4 @@
+using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.DependencyInjection;
 using SolTechnology.Core.SQL.Connections;
 using SolTechnology.Core.SQL.Transactions;
@@ -22,7 +23,8 @@ public static class ModuleInstaller
         /// <item><description>Registers <see cref="IUnitOfWork"/> for managing transactions.</description></item>
         /// </list>
         /// </remarks>
-        /// <param name="sqlConfiguration">The SQL settings; its connection string is validated when the host starts.</param>
+        /// <param name="sqlConfiguration">The SQL settings; its connection string must be non-empty and parsable by
+        /// <see cref="SqlConnectionStringBuilder"/>, which is validated when the host starts.</param>
         /// <exception cref="ArgumentNullException"><paramref name="sqlConfiguration"/> is <see langword="null"/>.</exception>
         /// <returns>
         /// The updated <see cref="IServiceCollection"/> with the SQL services registered.
@@ -40,12 +42,28 @@ public static class ModuleInstaller
                 .Validate(
                     options => !string.IsNullOrWhiteSpace(options.ConnectionString),
                     $"{nameof(SQLConfiguration)}.{nameof(SQLConfiguration.ConnectionString)} must not be empty.")
+                .Validate(
+                    options => string.IsNullOrWhiteSpace(options.ConnectionString) || IsParsable(options.ConnectionString),
+                    $"{nameof(SQLConfiguration)}.{nameof(SQLConfiguration.ConnectionString)} must be a valid SQL Server connection string.")
                 .ValidateOnStart();
 
             services.AddTransient<ISQLConnectionFactory, SQLConnectionFactory>();
             services.AddTransient<IUnitOfWork, UnitOfWork>();
 
             return services;
+        }
+    }
+
+    private static bool IsParsable(string connectionString)
+    {
+        try
+        {
+            _ = new SqlConnectionStringBuilder(connectionString);
+            return true;
+        }
+        catch (ArgumentException)
+        {
+            return false;
         }
     }
 }

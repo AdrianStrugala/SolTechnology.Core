@@ -13,7 +13,7 @@ transaction, `SqlErrorTranslator` turns SQL errors into typed `Result` failures,
   connections opened inside it enlist.
 - **Typed SQL errors** — duplicate keys, deadlocks, and timeouts become `ConflictError`, `DeadlockError`, and
   `TimeoutError` with fixed descriptions that never carry table, constraint, or value names.
-- **Fail-fast configuration** — an empty `ConnectionString` stops the host at start.
+- **Fail-fast configuration** — an empty or malformed `ConnectionString` stops the host at start.
 - **Health check** — `AddSolSqlHealthCheck()` runs `SELECT 1` on a fresh connection, without the retry.
 - **Safe DACPAC deployment** — `SQLProjectDeployer.DeployDacpac` creates or upgrades the database, fails instead of
   losing data, and logs through `ILogger`.
@@ -33,7 +33,7 @@ builder.Services.AddHealthChecks().AddSolSqlHealthCheck();
 
 | `SQLConfiguration` | Default | Purpose |
 |---|---|---|
-| `ConnectionString` | — (required) | SQL Server connection string for every connection the module opens; an empty or whitespace value fails at host start. |
+| `ConnectionString` | — (required) | SQL Server connection string for every connection the module opens; an empty or whitespace value, or one `SqlConnectionStringBuilder` rejects (for example an unknown keyword), fails at host start. |
 
 Bind it from the `Sql` section, and keep the password in an environment variable (`Sql__ConnectionString`) or a
 secret store rather than in `appsettings.json`:
