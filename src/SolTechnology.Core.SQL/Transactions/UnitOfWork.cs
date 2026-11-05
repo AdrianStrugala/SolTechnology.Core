@@ -2,7 +2,7 @@ using System.Transactions;
 
 namespace SolTechnology.Core.SQL.Transactions
 {
-    public class UnitOfWork : IDisposable, IUnitOfWork
+    internal sealed class UnitOfWork : IDisposable, IUnitOfWork
     {
         private TransactionScope? _scope;
 

@@ -5,7 +5,7 @@ using Polly;
 
 namespace SolTechnology.Core.SQL.Connections
 {
-    public class SQLConnectionFactory(IOptions<SQLConfiguration> sqlConfiguration) : ISQLConnectionFactory
+    internal sealed class SQLConnectionFactory(IOptions<SQLConfiguration> sqlConfiguration) : ISQLConnectionFactory
     {
         private static readonly HashSet<int> TransientErrorNumbers = [-2, 53, 1205, 4060, 40197, 40501, 40613, 49918, 49919, 49920];
 

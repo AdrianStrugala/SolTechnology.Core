@@ -1,4 +1,6 @@
 using Microsoft.Data.SqlClient;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Neo4j.Driver;
 using SolTechnology.Core.SQL.SQLProject;
 
@@ -104,7 +106,8 @@ var dbDeployment = dreamTravelDb.OnResourceReady(async (resource, @event, ct) =>
 
     Console.WriteLine($"🔧 Deploying dacpac: {dacpacPath}");
 
-    await SQLProjectDeployer.DeployDacpacAsync(dacpacPath, connectionString, "DreamTravelDatabase", ct);
+    var logger = @event.Services.GetRequiredService<ILoggerFactory>().CreateLogger("DreamTravel.DacpacDeployment");
+    await SQLProjectDeployer.DeployDacpac(dacpacPath, connectionString, "DreamTravelDatabase", logger, ct: ct);
 
     Console.WriteLine("✅ Database is ready for connections!");
 });
