@@ -5,6 +5,9 @@ using SolTechnology.Core.SQL.Transactions;
 
 namespace SolTechnology.Core.SQL
 {
+    /// <summary>
+    /// Registers the SQL module in the service collection.
+    /// </summary>
     public static class ModuleInstaller
     {
         /// <summary>
@@ -18,6 +21,9 @@ namespace SolTechnology.Core.SQL
         /// <item><description>Registers <see cref="IUnitOfWork"/> for managing transactions.</description></item>
         /// </list>
         /// </remarks>
+        /// <param name="services">The service collection to register into.</param>
+        /// <param name="sqlConfiguration">The SQL settings; its connection string is validated when the host starts.</param>
+        /// <exception cref="ArgumentNullException"><paramref name="sqlConfiguration"/> is <see langword="null"/>.</exception>
         /// <returns>
         /// The updated <see cref="IServiceCollection"/> with the SQL services registered.
         /// </returns>

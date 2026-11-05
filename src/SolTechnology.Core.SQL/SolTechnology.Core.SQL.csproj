@@ -9,6 +9,7 @@
 		<AssemblyName>SolTechnology.Core.SQL</AssemblyName>
 
 		<PackageReadmeSource>SQL.md</PackageReadmeSource>
+		<GenerateDocumentationFile>true</GenerateDocumentationFile>
 	</PropertyGroup>
 
 	<ItemGroup>

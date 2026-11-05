@@ -23,7 +23,7 @@ are `done` and after these library features are `completed`: `result`. No step i
 | 02 | SQL — `Begin` on `IUnitOfWork` | [`steps/02-sql-unit-of-work-begin-on-interface.md`](steps/02-sql-unit-of-work-begin-on-interface.md) | done |
 | 03 | SQL — transient-only connection retry, safer error translation, options validation | [`steps/03-sql-connection-retry-and-validation.md`](steps/03-sql-connection-retry-and-validation.md) | done |
 | 04 | SQL — internal implementations; safe-by-default DACPAC deployment | [`steps/04-sql-internal-implementations-and-safe-dacpac.md`](steps/04-sql-internal-implementations-and-safe-dacpac.md) | done |
-| 05 | XML docs shipped — SQL | [`steps/05-xml-docs.md`](steps/05-xml-docs.md) | to-do |
+| 05 | XML docs shipped — SQL | [`steps/05-xml-docs.md`](steps/05-xml-docs.md) | done |
 | 06 | Module docs — `docs/SQL.md` | [`steps/06-docs-sql.md`](steps/06-docs-sql.md) | to-do |
 | 07 | Guide conformance — SQL | [`steps/07-conform-sql.md`](steps/07-conform-sql.md) | to-do |
 | 08 | Retrospective | [`steps/08-retrospective.md`](steps/08-retrospective.md) | to-do |

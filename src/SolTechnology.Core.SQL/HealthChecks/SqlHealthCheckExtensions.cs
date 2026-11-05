@@ -12,7 +12,7 @@ public static class SqlHealthCheckExtensions
 {
     /// <summary>
     /// Adds a <c>SELECT 1</c> connectivity check for the configured SQL Server. Requires
-    /// <see cref="ISQLConnectionFactory"/> to be registered (via <c>AddSql(...)</c>).
+    /// <see cref="ISQLConnectionFactory"/> to be registered (via <see cref="ModuleInstaller.AddSolSQL"/>).
     /// </summary>
     /// <param name="builder">The framework health-checks builder (from <c>AddHealthChecks()</c>).</param>
     /// <param name="name">Check name in the report (default <c>sql</c>).</param>
