@@ -1,7 +1,7 @@
 ---
-status: planned
+status: abandoned
 created: 2026-11-04
-completed:
+completed: 2026-11-05
 ---
 
 # Cache — Redis connection recovers at runtime
@@ -218,7 +218,8 @@ Premortem decisions (delegated by the user, decided by the coordinator, 2026-11-
 
 ## Implementation plan
 
-Steps live in the temporary working folder [`2026-11-04-cache-redis-reconnect/`](2026-11-04-cache-redis-reconnect/summary.md).
+Steps lived in the temporary working folder `2026-11-04-cache-redis-reconnect/`, deleted when the feature was
+abandoned on 2026-11-05 (last state of each step under "Completion summary").
 Gates: `review: done (2026-11-04)` (public API and DI contract change); `premortem: go-with-mitigations (2026-11-04)` (`ModuleInstaller.cs` edit and the
 `IRedisCache` value layout, a persisted contract, `CLAUDE.md §4`).
 
@@ -326,6 +327,55 @@ Release-notes input (append to "Release-notes inputs"):
 
 ## Completion summary
 
+**Abandoned on 2026-11-05 by the user** ("Porzuć duży plan. Zrób mały"). No production code was written; the plan
+was reviewed and passed its premortem, and implementation never started.
+
+**Reason.** An experiment on 2026-11-05 showed that the Redis connection of `SolTechnology.Core.Cache` already recovers
+at runtime without a custom provider. Setup: StackExchange.Redis `3.0.0`, `Microsoft.Extensions.Caching.StackExchangeRedis`
+`10.0.1`, and the exact wiring of the package on that day (one shared multiplexer with `AbortOnConnectFail = false`,
+reused by Microsoft's `IDistributedCache` through `ConnectionMultiplexerFactory`, plus direct `IDatabase` use); Redis 7
+in Docker on a fixed host port.
+
+| Action | `IDistributedCache` path and direct `IDatabase` path |
+|---|---|
+| Start the app with Redis down | Both fail open |
+| `docker start` | Both recover by themselves after 22 ms |
+| `docker stop` | Both fail open |
+| `docker start` again | Both recover after 33 ms |
+| `docker restart` | Both recover after 13 ms |
+
+StackExchange.Redis reconnects the existing multiplexer by itself, so the provider, the atomic swap, the
+force-reconnect policy, the two public options (C-30), and the removal of the `IConnectionMultiplexer` registration
+(C-31, a DI break) would add complexity and a breaking change without fixing an observed failure. The real problem
+the experiment showed is latency: while Redis is down each call waits about 5–11 seconds (sync and async timeouts,
+two Redis operations in `IRedisCache.GetOrAdd`) before it fails open. The user chose the small fix, delivered by
+[`2026-11-05-cache-redis-fail-fast`](2026-11-05-cache-redis-fail-fast.md).
+
+Last state of each step when the working folder was deleted (review `done (2026-11-04)`, premortem
+`go-with-mitigations (2026-11-04)`):
+
+| # | Step | Last state |
+|---|---|---|
+| 00 | Run premortem | done (Go with mitigations; mitigations folded into steps 01, 03, 04, 05, 06) |
+| 01 | Route every Redis consumer through an internal connection provider | to-do |
+| 02 | `IRedisCache` on `IDatabase`; drop `IDistributedCache` and its package | to-do |
+| 03 | Atomic connection swap with delayed disposal | to-do |
+| 04 | Force-reconnect trigger and public options | to-do |
+| 05 | Module docs and premortem checklist | to-do |
+| 06 | Retrospective | to-do |
+
+The rows C-30, C-31, P-21, P-22 and the release-notes input under "Umbrella-brief rows" were never copied into
+[`2026-11-02-core-2-0-flagship-hardening`](2026-11-02-core-2-0-flagship-hardening.md); those IDs stay unused. The
+dependency of [`2026-11-02-org-transfer-and-2-0-release`](2026-11-02-org-transfer-and-2-0-release.md) on this feature
+was replaced by the fail-fast feature on 2026-11-05. The acceptance criteria above stay unchecked.
+
 ## Deviations
 
+None; the plan was abandoned before implementation.
+
 ## Follow-ups
+
+- Fail fast while Redis is down: delivered by [`2026-11-05-cache-redis-fail-fast`](2026-11-05-cache-redis-fail-fast.md).
+- Force reconnect stays unplanned. Revisit it only if a failure that StackExchange.Redis does not recover from by
+  itself is observed (for example a connection that stays broken after Redis is reachable again), or with token
+  credentials (Entra ID, AWS IAM) that need a new connection.

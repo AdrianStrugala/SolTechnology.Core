@@ -16,7 +16,8 @@ Split from
 features (listed in the brief's "Depends on"),
 [`../2026-11-02-flagship-showcase-hygiene.md`](../2026-11-02-flagship-showcase-hygiene.md),
 [`../2026-11-02-logging-chronicle.md`](../2026-11-02-logging-chronicle.md), and
-[`../2026-11-04-cache-redis-reconnect.md`](../2026-11-04-cache-redis-reconnect.md) (added 2026-11-04, user) are all `completed`. Steps 01, 03, 04, and 05 contain manual owner actions. No step is `blocked`.
+[`../2026-11-05-cache-redis-fail-fast.md`](../2026-11-05-cache-redis-fail-fast.md) (2026-11-05, user: replaces the
+abandoned `2026-11-04-cache-redis-reconnect`) are all `completed`. Steps 01, 03, 04, and 05 contain manual owner actions. No step is `blocked`.
 
 ## Steps
 

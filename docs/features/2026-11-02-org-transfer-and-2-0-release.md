@@ -47,7 +47,9 @@ following briefs are `status: completed`. Step 01 pre-checks this before the tra
   [`2026-11-02-core-2-0-testing-kits`](2026-11-02-core-2-0-testing-kits.md);
 - [`2026-11-02-flagship-showcase-hygiene`](2026-11-02-flagship-showcase-hygiene.md);
 - [`2026-11-02-logging-chronicle`](2026-11-02-logging-chronicle.md).
-- [`2026-11-04-cache-redis-reconnect`](2026-11-04-cache-redis-reconnect.md) (added 2026-11-04, user: Redis runtime reconnect ships in 2.0).
+- [`2026-11-05-cache-redis-fail-fast`](2026-11-05-cache-redis-fail-fast.md) (2026-11-05, user: replaces
+  [`2026-11-04-cache-redis-reconnect`](2026-11-04-cache-redis-reconnect.md), added 2026-11-04 and abandoned on
+  2026-11-05).
 
 ### Origin
 
