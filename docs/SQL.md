@@ -86,15 +86,17 @@ services.AddDbContext<DreamTripsDbContext>(options => options.UseSqlServer(sqlCo
 
 #### Error translation
 
-`SqlErrorTranslator.Execute` returns `Result.Success` or a typed failure, and rethrows any exception that is not a
-`SqlException`:
+`SqlErrorTranslator.Execute` returns `Result.Success` or a typed failure for the SQL errors below:
 
 | SQL error number | Error type | `Recoverable` | `Description` |
 |---|---|---|---|
 | `2627`, `2601` | `ConflictError` | No | A row with the same unique key already exists. |
 | `1205` | `DeadlockError` | Yes | The transaction was chosen as a deadlock victim; retry the operation. |
 | `-2` | `TimeoutError` | Yes | The SQL command did not finish within its timeout. |
-| Any other | `Error` | No | SQL Server returned error number N. |
+
+Any other exception propagates, including a `SqlException` with another number (for example `208` invalid object or
+`547` foreign key), so the API exception filter logs it with its stack trace. `SqlErrorTranslator.Translate(ex)` called
+directly maps such a number to a plain `Error` with the description "SQL Server returned error number N."
 
 #### Transactions
 

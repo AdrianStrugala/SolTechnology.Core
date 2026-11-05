@@ -12,7 +12,7 @@ public static class SqlErrorTranslator
 {
     /// <summary>
     /// Wraps a database operation and translates known SQL errors into typed Result failures.
-    /// Unknown exceptions are re-thrown.
+    /// Any other exception, including a <see cref="SqlException"/> with an unknown error number, propagates.
     /// </summary>
     public static async Task<Result<T>> Execute<T>(Func<Task<T>> operation)
     {
@@ -21,7 +21,7 @@ public static class SqlErrorTranslator
             var data = await operation();
             return Result<T>.Success(data);
         }
-        catch (SqlException ex)
+        catch (SqlException ex) when (IsTranslatable(ex.Number))
         {
             return Result<T>.Fail(Translate(ex));
         }
@@ -29,6 +29,7 @@ public static class SqlErrorTranslator
 
     /// <summary>
     /// Wraps a void database operation and translates known SQL errors into typed Result failures.
+    /// Any other exception, including a <see cref="SqlException"/> with an unknown error number, propagates.
     /// </summary>
     public static async Task<Result> Execute(Func<Task> operation)
     {
@@ -37,7 +38,7 @@ public static class SqlErrorTranslator
             await operation();
             return Result.Success();
         }
-        catch (SqlException ex)
+        catch (SqlException ex) when (IsTranslatable(ex.Number))
         {
             return Result.Fail(Translate(ex));
         }
@@ -76,5 +77,7 @@ public static class SqlErrorTranslator
             }
         };
     }
+
+    private static bool IsTranslatable(int number) => number is 2627 or 2601 or 1205 or -2;
 }
 
