@@ -21,8 +21,7 @@ internal sealed class SqlHealthCheck(ISQLConnectionFactory connectionFactory, Ti
 
         try
         {
-            // Deliberately bypass the factory's open-with-retry policy: a health probe must be
-            // fast and honest, not wait through a 3/9/27s retry ladder against a dead server.
+            // Bypass the factory's retry: a probe must fail fast, not wait through 3/9/27 s delays.
             await using var connection = new SqlConnection(connectionFactory.GetConnectionString());
             await connection.OpenAsync(linked.Token);
 

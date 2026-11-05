@@ -18,8 +18,8 @@ namespace SolTechnology.Core.SQL.Connections
             try
             {
                 Policy.Handle<SqlException>(exception => TransientErrorNumbers.Contains(exception.Number))
-                    .WaitAndRetry(3, retryAttempt => TimeSpan.FromSeconds(Math.Pow(3, retryAttempt)) // 3,9,27s
-                                   + TimeSpan.FromMilliseconds(Random.Shared.Next(1000))) //delay up to 1s
+                    .WaitAndRetry(3, retryAttempt => TimeSpan.FromSeconds(Math.Pow(3, retryAttempt))
+                                   + TimeSpan.FromMilliseconds(Random.Shared.Next(1000)))
                     .Execute(() =>
                       {
                           connection.Open();
