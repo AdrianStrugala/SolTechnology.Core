@@ -643,7 +643,11 @@ these notes from the steps:
   of becoming a failed `Result` whose `Error` says only "SQL Server returned error number N." and is never logged.
   Callers that branched on that plain `Error` catch the exception instead. `CreateConnection` retries the numbers of
   EF Core's `SqlServerTransientExceptionDetector` plus `-2`, `53`, `258`, and `10061`, so a refused, unreachable, or
-  timed-out server is retried as in 1.x.
+  timed-out server is retried as in 1.x. `SolTechnology.Core.SQL` and `SolTechnology.Core.SQL.Testing` now depend on
+  `Microsoft.Identity.Client` 4.92.0: DacFx 170.x still needs MSAL, which `Microsoft.Data.SqlClient` 7 no longer
+  brings, and without it a DACPAC deployment that hits a SQL error threw `FileNotFoundException` instead of
+  `DacServicesException`. Connection strings with a SQL login need no change; Entra ID authentication needs
+  `Microsoft.Data.SqlClient.Extensions.Azure` in the consumer's project.
 
 ### Resolved questions (user answers, 2026-11-02)
 

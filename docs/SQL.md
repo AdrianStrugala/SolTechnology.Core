@@ -46,6 +46,9 @@ secret store rather than in `appsettings.json`:
 }
 ```
 
+SQL logins work without extra packages. Microsoft Entra ID authentication (`Authentication=Active Directory ...`) needs
+`Microsoft.Data.SqlClient.Extensions.Azure`, which you install in your own project.
+
 ### Usage
 
 #### Repositories with Dapper

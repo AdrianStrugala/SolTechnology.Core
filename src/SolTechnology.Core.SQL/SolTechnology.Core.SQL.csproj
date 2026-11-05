@@ -16,6 +16,8 @@
 		<PackageReference Include="Microsoft.Data.SqlClient" />
 		<PackageReference Include="Microsoft.Extensions.Diagnostics.HealthChecks" />
 		<PackageReference Include="Microsoft.SqlServer.DacFx" />
+		<!-- DacFx 170.x references MsalUiRequiredException; SqlClient 7 dropped MSAL; remove when DacFx depends on SqlClient ≥ 7 -->
+		<PackageReference Include="Microsoft.Identity.Client" />
 		<PackageReference Include="Polly" />
 		<!-- GHSA-846f-f764-76mx via Microsoft.Data.SqlClient; remove when SqlClient depends on a patched Pkcs. -->
 		<PackageReference Include="System.Security.Cryptography.Pkcs" />

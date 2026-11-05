@@ -21,6 +21,8 @@
 		<PackageReference Include="Testcontainers" />
 		<PackageReference Include="Testcontainers.PostgreSql" />
 		<PackageReference Include="Microsoft.SqlServer.DacFx" />
+		<!-- DacFx 170.x references MsalUiRequiredException; SqlClient 7 dropped MSAL; remove when DacFx depends on SqlClient ≥ 7 -->
+		<PackageReference Include="Microsoft.Identity.Client" />
 		<PackageReference Include="Microsoft.Data.SqlClient" />
 		<PackageReference Include="Npgsql" />
 		<PackageReference Include="Respawn" />
