@@ -51,7 +51,7 @@ DreamTravel's persistent Aspire SQL container keeps its data across restarts as 
 post-deployment scripts). The `Message` event logs DacFx errors as `Error`, warnings as `Warning`, and other messages as
 `Information`; `ProgressChanged` logs at `Debug`.
 
-### Real dacpac tests, run in parallel
+### Real dacpac tests, run serially
 
 **Original plan:** `DeployDacpac_DataLossChange_IsBlockedByDefault`, with `SQLFixture` and a test dacpac or a unit test
 asserting the default options; record which.
@@ -62,6 +62,13 @@ with a `Things` table holding a row, and builds a dacpac without the `Name` colu
 `DacServicesException` and the row unchanged; it failed with the 1.x options ("no exception was thrown").
 `DeployDacpac_DataLossAllowedByOptions_UpgradesInPlaceAndLogsBracketedTemplates` pins the override, the in-place
 upgrade, and the L-04 templates through a capturing `ILogger`. On the arm64 dev box with the emulated SQL Server image each
-deploy spends about 2.5 minutes in DacFx target-model extraction (server-side `RESOURCE_SEMAPHORE` waits), so the fixture
-runs its two tests in parallel.
+deploy spends about 2.5 minutes in DacFx target-model extraction (server-side `RESOURCE_SEMAPHORE` memory-grant waits).
+Running the two tests in parallel made those waits fail, so they run serially and delete their dacpac files.
+
+The parallel failures exposed a pre-existing defect that this step does not fix: when DacFx 170.4.83 meets any SQL error
+while it reads the target database, its retry check loads `Microsoft.Identity.Client` 4.80, which is not shipped because
+the repository pins `Microsoft.Data.SqlClient` 7.0.1 (DacFx depends on 6.1.5, which brought MSAL; 7.x moved it out).
+`DeployDacpac` then throws `FileNotFoundException` instead of retrying or reporting the SQL error. No released DacFx
+depends on SqlClient 7. The fix needs a dependency decision (`CLAUDE.md §2`) and is left as a follow-up for the
+retrospective.
 

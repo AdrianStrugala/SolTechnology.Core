@@ -10,9 +10,19 @@ using SolTechnology.Core.SQL.SQLProject;
 namespace SolTechnology.Core.SQL.Tests;
 
 [TestFixture]
-[Parallelizable(ParallelScope.Children)]
 public class SQLProjectDeployerTests
 {
+    private string? _dacpacPath;
+
+    [TearDown]
+    public void DeleteDacpac()
+    {
+        if (_dacpacPath is not null)
+        {
+            File.Delete(_dacpacPath);
+        }
+    }
+
     [Test]
     public async Task DeployDacpac_DataLossChange_IsBlockedByDefault()
     {
@@ -60,13 +70,13 @@ public class SQLProjectDeployerTests
         return (serverConnectionString, databaseName);
     }
 
-    private static string BuildDacpacWithoutNameColumn()
+    private string BuildDacpacWithoutNameColumn()
     {
-        var path = Path.Combine(TestContext.CurrentContext.WorkDirectory, $"things-{Guid.NewGuid():N}.dacpac");
+        _dacpacPath = Path.Combine(TestContext.CurrentContext.WorkDirectory, $"things-{Guid.NewGuid():N}.dacpac");
         using var model = new TSqlModel(SqlServerVersion.Sql160, new TSqlModelOptions());
         model.AddObjects("CREATE TABLE dbo.Things (Id INT NOT NULL PRIMARY KEY)");
-        DacPackageExtensions.BuildPackage(path, model, new PackageMetadata { Name = "Things", Version = "2.0.0" });
-        return path;
+        DacPackageExtensions.BuildPackage(_dacpacPath, model, new PackageMetadata { Name = "Things", Version = "2.0.0" });
+        return _dacpacPath;
     }
 
     private static async Task<object?> Query(string serverConnectionString, string databaseName, string sql)
