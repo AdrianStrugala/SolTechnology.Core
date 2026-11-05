@@ -10,6 +10,7 @@ using SolTechnology.Core.SQL.SQLProject;
 namespace SolTechnology.Core.SQL.Tests;
 
 [TestFixture]
+[Category("Dacpac")]
 public class SQLProjectDeployerTests
 {
     private string? _dacpacPath;

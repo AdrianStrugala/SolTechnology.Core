@@ -81,7 +81,6 @@ var neo4jDeployment = neo4j.OnResourceReady(async (resource, @event, ct) =>
 var dbDeployment = dreamTravelDb.OnResourceReady(async (resource, @event, ct) =>
 {
     var connectionString = await resource.ConnectionStringExpression.GetValueAsync(ct);
-    Console.WriteLine($"🔧 Db ConnectionString: {connectionString}");
 
     var connBuilder = new SqlConnectionStringBuilder(connectionString)
     {
