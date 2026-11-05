@@ -28,9 +28,15 @@ internal sealed class RedisIdempotencyStore(
     };
 
     private readonly string _keyPrefix = options.Value.InstanceName + "idempotency:";
+    private readonly RedisConnectionGate _gate = new(redis, logger);
 
     public async Task<bool> TryAdd(string key, CancellationToken ct = default)
     {
+        if (_gate.IsClosed(nameof(TryAdd), key))
+        {
+            return true;
+        }
+
         try
         {
             var db = redis.GetDatabase();
@@ -47,6 +53,11 @@ internal sealed class RedisIdempotencyStore(
 
     public async Task<StoredResponse?> Get(string key, CancellationToken ct = default)
     {
+        if (_gate.IsClosed(nameof(Get), key))
+        {
+            return null;
+        }
+
         try
         {
             var db = redis.GetDatabase();
@@ -70,6 +81,11 @@ internal sealed class RedisIdempotencyStore(
 
     public async Task SetResponse(string key, StoredResponse response, CancellationToken ct = default)
     {
+        if (_gate.IsClosed(nameof(SetResponse), key))
+        {
+            return;
+        }
+
         try
         {
             var db = redis.GetDatabase();
@@ -84,6 +100,11 @@ internal sealed class RedisIdempotencyStore(
 
     public async Task Remove(string key, CancellationToken ct = default)
     {
+        if (_gate.IsClosed(nameof(Remove), key))
+        {
+            return;
+        }
+
         try
         {
             var db = redis.GetDatabase();

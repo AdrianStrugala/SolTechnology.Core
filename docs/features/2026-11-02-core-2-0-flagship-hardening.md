@@ -637,6 +637,15 @@ these notes from the steps:
   that expired before its release logs the new Warning `Lock [{LockKey}] expired before release`
   instead of the Debug `Lock released: [{LockKey}]`, and disposing a Redis lock handle twice releases
   once.
+- cache (Redis fail-fast, 2026-11-05, [`2026-11-05-cache-redis-fail-fast`](2026-11-05-cache-redis-fail-fast.md)): while
+  the shared Redis connection is down, `IRedisCache.GetOrAdd`, the Redis lock (`TryAcquireLock`), and the Redis
+  idempotency store skip Redis at once and fail open with the same results as on a Redis error, instead of waiting
+  5–11 seconds for the StackExchange.Redis timeouts. StackExchange.Redis reconnects the same connection by itself, and
+  the consumers use Redis again as soon as it does. Each skip logs the new template
+  `Redis not connected; skipping [{Operation}] for [{Key}]` without an exception: Warning for the first skip of an
+  operation in 30 seconds, Debug for the rest. During an outage this entry replaces the per-call failure warnings
+  (`Distributed cache GET failed …`, `Lock acquisition failed …`, `Idempotency … failed …`), so alerts on those
+  templates should also match the new one. The health check still reports `Unhealthy`. No public API or DI change.
 - sql (code review, 2026-11-05, amends P-23): `SqlErrorTranslator.Execute` translates only the errors it names
   (`2627`, `2601`, `1205`, `-2`). A `SqlException` with any other number (for example `208` invalid object, `229`
   permission denied, `547` foreign key) now propagates to the caller and the exception filter, which logs it, instead

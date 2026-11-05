@@ -2,6 +2,7 @@ using System.Text.Json;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using StackExchange.Redis;
 
 namespace SolTechnology.Core.Cache;
 
@@ -13,13 +14,15 @@ public interface IRedisCache
 {
     /// <summary>
     /// Returns the cached item for <paramref name="key"/> and <typeparamref name="TItem"/>, or runs
-    /// <paramref name="factory"/> and caches its result. A Redis failure falls through to the factory.
+    /// <paramref name="factory"/> and caches its result. A Redis failure falls through to the factory, and while the
+    /// Redis connection is down the factory runs at once, without waiting for a Redis timeout.
     /// </summary>
     Task<TItem> GetOrAdd<TKey, TItem>(TKey key, Func<TKey, Task<TItem>> factory);
 }
 
 internal sealed class RedisCache(
     IDistributedCache cache,
+    IConnectionMultiplexer redis,
     IOptions<DistributedCacheConfiguration> options,
     ILogger<RedisCache> logger) : IRedisCache
 {
@@ -29,10 +32,15 @@ internal sealed class RedisCache(
     };
 
     private readonly DistributedCacheConfiguration _config = options.Value;
+    private readonly RedisConnectionGate _gate = new(redis, logger);
 
     public async Task<TItem> GetOrAdd<TKey, TItem>(TKey key, Func<TKey, Task<TItem>> factory)
     {
         var keyString = CacheKey.For<TKey, TItem>(key, SerializerOptions);
+        if (_gate.IsClosed(nameof(GetOrAdd), keyString))
+        {
+            return await factory(key);
+        }
 
         try
         {
@@ -52,6 +60,10 @@ internal sealed class RedisCache(
         }
 
         var result = await factory(key);
+        if (_gate.IsClosed(nameof(GetOrAdd), keyString))
+        {
+            return result;
+        }
 
         try
         {

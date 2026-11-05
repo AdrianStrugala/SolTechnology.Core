@@ -16,6 +16,7 @@ internal sealed class RedisDistributedLockService(
     ILogger<RedisDistributedLockService> logger) : IDistributedLockService
 {
     private readonly string _keyPrefix = options.Value.InstanceName + "lock:";
+    private readonly RedisConnectionGate _gate = new(redis, logger);
 
     public async ValueTask<IAsyncDisposable?> TryAcquireLock(
         string name, TimeSpan expiry, CancellationToken ct = default)
@@ -24,6 +25,11 @@ internal sealed class RedisDistributedLockService(
         ct.ThrowIfCancellationRequested();
 
         var key = _keyPrefix + name;
+        if (_gate.IsClosed(nameof(TryAcquireLock), key))
+        {
+            return null;
+        }
+
         var value = Guid.NewGuid().ToString("N"); // unique per acquisition — fencing token
 
         try

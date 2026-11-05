@@ -11,9 +11,10 @@ the same Redis.
 - **Failures are not cached** — a faulted or cancelled factory result is evicted, so the next call retries.
 - **Type-namespaced keys** — the same key value used with different `TKey`/`TItem` types never shares an entry,
   and keys carry no assembly versions, so a redeploy keeps the cache warm.
-- **Fail-open Redis cache** — a Redis error logs a warning and the factory result is returned uncached. Redis being down
-  when the host starts does not stop it: the shared connection is opened with `abortConnect=false` (overriding the
-  connection string) and keeps reconnecting in the background.
+- **Fail-open, fail-fast Redis** — a Redis error logs a warning and the factory result is returned uncached; while the
+  connection is down, the cache, the lock, and the idempotency store skip Redis at once instead of waiting for a
+  timeout. Redis being down when the host starts does not stop it: the shared connection is opened with
+  `abortConnect=false` (overriding the connection string) and reconnects by itself in the background.
 - **Distributed lock** — `TryAcquireLock` with expiry and fencing, in-process or Redis `SET NX`.
 - **Idempotency store** — reserve, replay, and release request keys, in-process or in Redis.
 - **Fail-fast configuration** — an empty `InstanceName` or `ConnectionString`, or `ExpirationSeconds <= 0`, stops the
@@ -131,6 +132,13 @@ public class CityLookup(IRedisCache cache, IGoogleHTTPClient client)
 }
 ```
 
+| Redis | `GetOrAdd` |
+|---|---|
+| Connected | Returns the cached item, or runs the factory and caches its result. |
+| Command fails | Logs a warning with the exception and returns the factory result uncached. |
+| Connection down | Runs the factory at once without touching Redis and logs `Redis not connected; skipping [{Operation}] for [{Key}]`: Warning for the first skip of an operation in 30 seconds, Debug for the rest. The lock and the idempotency store log the same entry. |
+| Back up | StackExchange.Redis reconnects the same connection by itself; caching resumes without a restart. |
+
 #### Distributed lock
 
 `TryAcquireLock` returns a handle, or `null` when another holder has the lock:
@@ -156,7 +164,7 @@ public class SettlementPoller(IDistributedLockService locks)
 | Acquired | Returns an `IAsyncDisposable`; disposing it releases the lock. Disposing twice is harmless. |
 | Held by another caller | Returns `null` at once; never waits. |
 | Expiry passed | The lock is free again: Redis deletes the key, and the in-process lock lets the next `TryAcquireLock` take it over. Disposing the expired handle does not release the new holder (fencing); the Redis lock logs the warning `Lock [{LockKey}] expired before release`, a sign that the expiry is shorter than the work. |
-| Backend failure | Returns `null` and logs a warning; never throws. |
+| Backend failure | Returns `null` and logs a warning; never throws. While the Redis connection is down it returns `null` at once. |
 | Expiry zero, negative, or over 365 days | Throws `ArgumentOutOfRangeException` before the lock is touched; both implementations apply the same rule. |
 | Caller cancellation | Throws `OperationCanceledException`. |
 
@@ -171,8 +179,8 @@ public class SettlementPoller(IDistributedLockService locks)
 | `SetResponse(key, response)` | Stores status, headers, and body for replay until the TTL (default 24 hours) passes. |
 | `Remove(key)` | Releases the key so the client can retry, for example after an exception. |
 
-The Redis store fails open: when Redis is down, `TryAdd` returns `true`, so a retried request runs again. Pair it
-with a downstream idempotency key when a duplicate side effect is unacceptable. A middleware that uses the store:
+The Redis store fails open: when Redis is down, `TryAdd` returns `true` at once, so a retried request runs again. Pair
+it with a downstream idempotency key when a duplicate side effect is unacceptable. A middleware that uses the store:
 
 ```csharp
 app.Use(async (context, next) =>

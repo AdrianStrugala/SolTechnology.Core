@@ -25,6 +25,7 @@ public class RedisDistributedLockServiceTests
             .Returns(_ => Task.FromResult(RedisResult.Create((RedisValue)1)), _ => throw down);
         var redis = Substitute.For<IConnectionMultiplexer>();
         redis.GetDatabase(Arg.Any<int>(), Arg.Any<object>()).Returns(_ => db, _ => db, _ => throw down, _ => db);
+        redis.IsConnected.Returns(true);
         var logger = new CapturingLogger<RedisDistributedLockService>();
         var sut = new RedisDistributedLockService(
             redis, Options.Create(new DistributedCacheConfiguration { InstanceName = "test:" }), logger);
@@ -46,6 +47,29 @@ public class RedisDistributedLockServiceTests
             (LogLevel.Debug, "Lock acquired: [{LockKey}]"),
             (LogLevel.Warning, "Lock release failed for [{LockKey}] — will expire via TTL"));
         logger.Entries.Should().AllSatisfy(entry => entry.Properties["LockKey"].Should().Be(LockKey));
+    }
+
+    [Test]
+    public async Task TryAcquireLock_RedisNotConnected_ReturnsNullWithoutCallingRedis()
+    {
+        // Arrange
+        var redis = Substitute.For<IConnectionMultiplexer>();
+        redis.IsConnected.Returns(false);
+        var logger = new CapturingLogger<RedisDistributedLockService>();
+        var sut = new RedisDistributedLockService(
+            redis, Options.Create(new DistributedCacheConfiguration { InstanceName = "test:" }), logger);
+
+        // Act
+        var handle = await sut.TryAcquireLock("job", Expiry);
+
+        // Assert
+        handle.Should().BeNull();
+        redis.DidNotReceiveWithAnyArgs().GetDatabase();
+        var entry = logger.Entries.Should().ContainSingle().Subject;
+        entry.Level.Should().Be(LogLevel.Warning);
+        entry.Template.Should().Be("Redis not connected; skipping [{Operation}] for [{Key}]");
+        entry.Properties["Operation"].Should().Be("TryAcquireLock");
+        entry.Properties["Key"].Should().Be(LockKey);
     }
 
     [TestCaseSource(typeof(LockExpiryCases), nameof(LockExpiryCases.OutOfRange))]

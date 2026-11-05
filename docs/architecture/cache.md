@@ -63,11 +63,38 @@ connection retries in the background, and each consumer applies its own failure 
 | Redis idempotency store | `TryAdd` logs a warning and returns `true` (fail-open); `Get` returns `null`; `SetResponse` and `Remove` log and return. |
 | Health check | Reports the configured failure status (default `Unhealthy`). |
 
-Commands issued while disconnected wait in the StackExchange.Redis backlog until the configured
-timeout, so a Redis outage adds that timeout to each call instead of failing it at once. The
-idempotency store fails open because blocking every request during an outage is worse than allowing
-a retried request to run twice; callers that cannot accept a duplicate side effect need a downstream
-idempotency key.
+The idempotency store fails open because blocking every request during an outage is worse than
+allowing a retried request to run twice; callers that cannot accept a duplicate side effect need a
+downstream idempotency key.
+
+### Fail fast while disconnected
+
+A command issued while the multiplexer is disconnected waits in the StackExchange.Redis backlog
+until the sync or async timeout (5 seconds by default), and `IRedisCache.GetOrAdd` issues two, so
+without a check an outage adds 5–11 seconds to every call before it fails open. The internal
+`RedisConnectionGate` removes that wait: `IRedisCache.GetOrAdd` (before the read and again before
+the write), `TryAcquireLock` (after the expiry validation), and the four idempotency operations
+check `IConnectionMultiplexer.IsConnected` first and, when it is `false`, return the same fail-open
+result without sending a command. `RedisCache` takes the shared multiplexer as a constructor
+dependency for this; it is internal and resolved by DI, so the registrations did not change. The
+health check does not use the gate: it still sends `PING` and reports the failure status.
+
+The gate relies on StackExchange.Redis to notice the outage. A closed or reset socket flips
+`IsConnected` at once; a connection that breaks without a reset (for example a network partition)
+keeps `IsConnected = true` until the heartbeat marks it failed, and calls in that window still wait
+for the timeout. Releasing a lock handle is not gated; it is best-effort and the key expires anyway.
+
+### Reconnection
+
+The package does not replace or force-reconnect the multiplexer. StackExchange.Redis reconnects the
+existing one by itself, and the gate lets traffic through again as soon as `IsConnected` is `true`.
+An experiment on 2026-11-05 with StackExchange.Redis 3.0.0, Microsoft.Extensions.Caching.StackExchangeRedis
+10.0.1, and this wiring (Redis 7 in Docker on a fixed port) showed both the `IDistributedCache` path
+and the direct `IDatabase` path recovering by themselves 13–33 ms after `docker start` or
+`docker restart`, after a start with Redis down and after a stop. A package-owned connection
+provider with a force-reconnect policy would add a connection swap, two options, and the removal of
+the `IConnectionMultiplexer` registration (a DI break) without fixing an observed failure. The
+container test `RedisOutageTests` pins the stop, fail-fast, start, and recovery sequence.
 
 ## Locks
 
@@ -94,3 +121,11 @@ would overflow the in-process deadline.
 Log templates bracket every placeholder: `[{CacheKey}]` in the Redis cache, `[{LockKey}]` in both
 locks, and `[{IdempotencyKey}]` in the Redis idempotency store. Fail-open paths log at Warning with
 the exception; lock acquisition and release log at Debug.
+
+A call skipped by the connection gate logs `Redis not connected; skipping [{Operation}] for [{Key}]`
+without an exception, in the consumer's log category. `Operation` is the method name (`GetOrAdd`,
+`TryAcquireLock`, `TryAdd`, `Get`, `SetResponse`, `Remove`) and `Key` is the key that consumer
+logs elsewhere (the cache key without `InstanceName`, the full lock key, the idempotency key). One
+template for all consumers gives one query for "Redis was down". To keep an outage from flooding
+the logs, the first skip of an operation logs at Warning and further skips of the same operation in
+the next 30 seconds log at Debug, per consumer instance.

@@ -1,7 +1,7 @@
 ---
-status: in-progress
+status: completed
 created: 2026-11-05
-completed:
+completed: 2026-11-05
 ---
 
 # Cache — fail fast while the Redis connection is down
@@ -78,21 +78,72 @@ premortem triggers applies, and no `CLAUDE.md §2` confirmation is needed. Singl
 
 ## Acceptance criteria
 
-- [ ] With `IsConnected = false`, `GetOrAdd` returns the factory result without touching `IDistributedCache`;
+- [x] With `IsConnected = false`, `GetOrAdd` returns the factory result without touching `IDistributedCache`;
   `TryAcquireLock` returns `null`; `TryAdd` returns `true`; `Get` returns `null`; `SetResponse` and `Remove` return;
   none of them calls `GetDatabase`.
-- [ ] The skip logs `Redis not connected; skipping [{Operation}] for [{Key}]` at Warning at most once per operation in
+- [x] The skip logs `Redis not connected; skipping [{Operation}] for [{Key}]` at Warning at most once per operation in
   30 seconds, and at Debug otherwise.
-- [ ] A container test stops Redis and `GetOrAdd` returns the factory value in under 1 second, the lock returns `null`,
+- [x] A container test stops Redis and `GetOrAdd` returns the factory value in under 1 second, the lock returns `null`,
   and `TryAdd` returns `true`; after Redis starts again caching works within 20 seconds.
-- [ ] The container test failed before the change (the stopped-Redis call took longer than 1 second).
-- [ ] `AddSolDistributedCache_RedisDownAtStart_FailsOpen` stays green (the health check still reports `Unhealthy`).
-- [ ] `git diff` touches no `ModuleInstaller.cs` and no public symbol.
-- [ ] `dotnet build SolTechnology.Core.slnx` and `dotnet test SolTechnology.Core.slnx` are green; the container test
-  passes three runs in a row.
+- [x] The container test failed before the change (the stopped-Redis call took longer than 1 second).
+- [x] `AddSolDistributedCache_RedisDownAtStart_FailsOpen` stays green (the health check still reports `Unhealthy`).
+- [x] `git diff` touches no `ModuleInstaller.cs` and no public symbol.
+- [x] `dotnet build SolTechnology.Core.slnx` and `dotnet test SolTechnology.Core.slnx` are green; the container test
+  passes three runs in a row. (Exception: one SQL DACPAC test failed for an environmental reason unrelated to Cache;
+  see Completion summary.)
 
 ## Completion summary
 
+Delivered on 2026-11-05 in one session, as planned.
+
+- **Gate.** The new internal `RedisConnectionGate` (`src/SolTechnology.Core.Cache/RedisConnectionGate.cs`) returns
+  `IsClosed = true` when `IConnectionMultiplexer.IsConnected` is `false` and logs
+  `Redis not connected; skipping [{Operation}] for [{Key}]` in the consumer's category. Log volume: Warning for the first
+  skip of an operation, then Debug for the same operation until 30 seconds have passed, per consumer instance (a
+  lock-free `ConcurrentDictionary` of last-warning times on `TimeProvider`). This keeps one Warning per operation every
+  30 seconds during an outage while the Debug entries still show every skipped key.
+- **Consumers.** `RedisCache.GetOrAdd` checks before the read (skip: return the factory result, no write) and again
+  before the write (the connection may drop during the read or the factory). `TryAcquireLock` checks after the expiry
+  validation and the cancellation check, so a bad expiry still throws, and returns `null`. The idempotency store checks
+  in all four operations (`TryAdd` → `true`, `Get` → `null`, `SetResponse` and `Remove` return). `RedisCache` got the
+  shared `IConnectionMultiplexer` as a constructor dependency; it is internal and DI-resolved, so `ModuleInstaller.cs`,
+  the DI registrations, and the public API are unchanged. The health check is unchanged and still reports `Unhealthy`.
+- **Tests.** Unit tests with a substituted multiplexer (`IsConnected = false`) for the lock, the idempotency store, and
+  `RedisCache` assert the fail-open results, no `GetDatabase` or `IDistributedCache` call, and the new log entry;
+  `RedisConnectionGateTests` pins the Warning/Debug window with `FakeTimeProvider`. The container test
+  `Redis/RedisOutageTests` runs its own `redis:7-alpine` on a free fixed host port (three attempts if the port is
+  taken), stops it, and asserts that `GetOrAdd`, `TryAcquireLock`, and `TryAdd` together finish in under 1 second with
+  fail-open results; after the start it polls (100 ms interval, 20 seconds budget) until a second `GetOrAdd` is served
+  from Redis. Existing unit tests that substitute `IConnectionMultiplexer` now set `IsConnected = true`, because a
+  substitute reports `false` by default.
+- **Fail-before.** Against `574d800b` the lock and idempotency unit tests failed (`GetDatabase` was called; `TryAdd`
+  returned `false` from the substitute database) and the container test failed with the three outage calls taking
+  23.7 seconds instead of under 1 second. The `RedisCache` unit tests need the new constructor, so the container test is
+  their fail-before evidence.
+- **Verification.** The container test passed three runs in a row (3–5 seconds each). `dotnet build
+  SolTechnology.Core.slnx` reported 0 errors. `dotnet test SolTechnology.Core.slnx`: 17 of 18 projects green
+  (`SolTechnology.Core.Cache.Tests` 56/56; `DreamTravel.Component.Tests` 31/31 when run alone, because in the shared
+  run it competed with the SQL tests for one Docker SQL Server's memory). `SolTechnology.Core.SQL.Tests` had 14/15:
+  `DeployDacpac_DataLossAllowedByOptions_UpgradesInPlaceAndLogsBracketedTemplates` failed in every run with SQL Server
+  dropping the connection (error 8645, waiting for memory) while a parallel SQL session changed and tested that module;
+  the SQL tests do not reference the Cache package.
+- **Docs.** `docs/Cache.md` (features, a `GetOrAdd` Redis-state table, lock and idempotency rows),
+  `docs/architecture/cache.md` (fail fast while disconnected, reconnection and why there is no custom reconnect,
+  logging), the release-notes input in
+  [`2026-11-02-core-2-0-flagship-hardening`](2026-11-02-core-2-0-flagship-hardening.md), and the delivered follow-up in
+  [`2026-11-02-core-2-0-cache`](2026-11-02-core-2-0-cache.md).
+
 ## Deviations
 
+None of substance. The feature brief was written before the code and committed with the abandonment of
+`2026-11-04-cache-redis-reconnect`, so the links from that record and from the release feature resolve at every
+commit. `docs/Cache.md` grew to 306 lines (Public Documentation Guide rule 7: assess at 300); the module does not need a
+split, the extra lines are the `GetOrAdd` Redis-state table.
+
 ## Follow-ups
+
+- During an outage the per-call failure warnings of the consumers (`Distributed cache GET failed …`,
+  `Lock acquisition failed …`, `Idempotency … failed …`) are replaced by the gate's entry; release 05 states this in the
+  2.0 release notes (input added to the umbrella brief). Whether it needs an `L-nn` row is the user's call.
+- Releasing a Redis lock handle while disconnected still waits for the timeout (out of scope; best-effort, the key
+  expires via TTL).

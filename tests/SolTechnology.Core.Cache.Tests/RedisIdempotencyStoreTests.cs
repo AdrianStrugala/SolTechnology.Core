@@ -20,12 +20,15 @@ public sealed class RedisIdempotencyStoreTests
         PropertyNamingPolicy = JsonNamingPolicy.CamelCase
     };
 
-    private static RedisIdempotencyStore CreateSut(IConnectionMultiplexer redis) =>
-        new(
+    private static RedisIdempotencyStore CreateSut(IConnectionMultiplexer redis)
+    {
+        redis.IsConnected.Returns(true);
+        return new RedisIdempotencyStore(
             redis,
             Options.Create(new DistributedCacheConfiguration { InstanceName = "test:" }),
             NullLogger<RedisIdempotencyStore>.Instance,
             TimeSpan.FromHours(1));
+    }
 
     [Test]
     public async Task TryAdd_RedisDown_FailsOpen_ReturnsTrue()
@@ -136,12 +139,44 @@ public sealed class RedisIdempotencyStoreTests
     }
 
     [Test]
+    public async Task Operations_RedisNotConnected_FailOpenWithoutCallingRedis()
+    {
+        // Arrange
+        var redis = Substitute.For<IConnectionMultiplexer>();
+        redis.IsConnected.Returns(false);
+        var logger = new CapturingLogger<RedisIdempotencyStore>();
+        var sut = new RedisIdempotencyStore(
+            redis,
+            Options.Create(new DistributedCacheConfiguration { InstanceName = "test:" }),
+            logger,
+            TimeSpan.FromHours(1));
+
+        // Act
+        var reserved = await sut.TryAdd("key-1");
+        var stored = await sut.Get("key-1");
+        await sut.SetResponse("key-1", new StoredResponse { StatusCode = 200, Headers = [], Body = [] });
+        await sut.Remove("key-1");
+
+        // Assert
+        reserved.Should().BeTrue();
+        stored.Should().BeNull();
+        redis.DidNotReceiveWithAnyArgs().GetDatabase();
+        logger.Entries.Select(entry => (entry.Level, entry.Template, entry.Properties["Operation"])).Should().Equal(
+            (LogLevel.Warning, "Redis not connected; skipping [{Operation}] for [{Key}]", "TryAdd"),
+            (LogLevel.Warning, "Redis not connected; skipping [{Operation}] for [{Key}]", "Get"),
+            (LogLevel.Warning, "Redis not connected; skipping [{Operation}] for [{Key}]", "SetResponse"),
+            (LogLevel.Warning, "Redis not connected; skipping [{Operation}] for [{Key}]", "Remove"));
+        logger.Entries.Should().AllSatisfy(entry => entry.Properties["Key"].Should().Be("key-1"));
+    }
+
+    [Test]
     public async Task Operations_RedisDown_LogBracketedIdempotencyKey()
     {
         // Arrange
         var redis = Substitute.For<IConnectionMultiplexer>();
         redis.GetDatabase(Arg.Any<int>(), Arg.Any<object>())
             .Returns(_ => throw new RedisConnectionException(ConnectionFailureType.UnableToConnect, "down"));
+        redis.IsConnected.Returns(true);
         var logger = new CapturingLogger<RedisIdempotencyStore>();
         var sut = new RedisIdempotencyStore(
             redis,
