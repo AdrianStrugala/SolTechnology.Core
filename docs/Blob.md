@@ -29,7 +29,7 @@ builder.Services.AddSolBlob(blobConfiguration);
 
 | `BlobConfiguration` | Default | Purpose |
 |---|---|---|
-| `ConnectionString` | — (required) | Azure Storage connection string for every container client the factory creates. |
+| `ConnectionString` | — (required) | Azure Storage connection string for every container client the factory creates. It must be non-empty and parsable as an Azure Storage connection string; otherwise the host stops at start with `OptionsValidationException`. |
 
 Bind it from the `Blob` section, and keep the account key in an environment variable (`Blob__ConnectionString`) or a
 secret store rather than in `appsettings.json`:

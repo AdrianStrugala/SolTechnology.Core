@@ -667,7 +667,10 @@ these notes from the steps:
   `Azure.Storage.Blobs` 12.29.0 (service version `2026-06-06`) with 400 `InvalidHeaderValue`. Tests that pass their own
   `image` keep it and need 3.37.0 or later for the 2.0 packages. `WriteToBlob` throws `ArgumentOutOfRangeException`
   for a `SerializationFormat` value that is not defined, before sending any request; 2.0 before this fix (and 1.x)
-  uploaded an empty blob instead.
+  uploaded an empty blob instead. `AddSolBlob` now validates `BlobConfiguration.ConnectionString` at host start
+  (premortem RM-13): a null, empty, or whitespace value, or one that `Azure.Storage.Blobs` cannot parse (for example
+  `AccountName=x`), stops the host with `OptionsValidationException` instead of failing at the first `GetConnection`.
+  No Blob `P-nn` row exists, so this entry is the record.
 
 ### Resolved questions (user answers, 2026-11-02)
 
