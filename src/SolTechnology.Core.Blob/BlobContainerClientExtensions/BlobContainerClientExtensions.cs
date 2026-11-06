@@ -5,10 +5,23 @@ using SolTechnology.Avro;
 
 namespace SolTechnology.Core.Blob
 {
+    /// <summary>
+    /// Reads and writes typed objects as blobs, recording the <see cref="SerializationFormat"/> in the blob's metadata.
+    /// </summary>
     public static class BlobContainerClientExtensions
     {
         private const string SerializationFormatKey = "SerializationFormat";
 
+        /// <summary>
+        /// Downloads the blob and deserializes it in the format stored in its metadata; a blob without the format key
+        /// is read as JSON.
+        /// </summary>
+        /// <typeparam name="T">The type to deserialize into.</typeparam>
+        /// <param name="client">The container that holds the blob.</param>
+        /// <param name="blobName">The blob name.</param>
+        /// <param name="ct">Cancels the download.</param>
+        /// <returns>The deserialized object.</returns>
+        /// <exception cref="RequestFailedException">The blob or the container does not exist, or the request failed.</exception>
         public static async Task<T> ReadFromBlob<T>(
             this BlobContainerClient client,
             string blobName,
@@ -31,6 +44,13 @@ namespace SolTechnology.Core.Blob
             }
         }
 
+        /// <summary>
+        /// Serializes <paramref name="content"/> as JSON and uploads it, overwriting an existing blob.
+        /// </summary>
+        /// <param name="client">The container to write to.</param>
+        /// <param name="blobName">The blob name.</param>
+        /// <param name="content">The object to serialize.</param>
+        /// <param name="ct">Cancels the upload.</param>
         public static async Task WriteToBlob(
             this BlobContainerClient client,
             string blobName,
@@ -40,6 +60,16 @@ namespace SolTechnology.Core.Blob
             await WriteToBlob(client, blobName, content, SerializationFormat.Json, ct);
         }
 
+        /// <summary>
+        /// Serializes <paramref name="content"/> in <paramref name="serializationFormat"/> and uploads it, overwriting an
+        /// existing blob. The format key travels with the content in one upload, and the blob's other metadata keys are
+        /// kept; a container deleted since it was created is created again once.
+        /// </summary>
+        /// <param name="client">The container to write to.</param>
+        /// <param name="blobName">The blob name.</param>
+        /// <param name="content">The object to serialize.</param>
+        /// <param name="serializationFormat">The format to serialize in.</param>
+        /// <param name="ct">Cancels the upload.</param>
         public static async Task WriteToBlob(
             this BlobContainerClient client,
             string blobName,

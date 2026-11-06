@@ -1,7 +1,7 @@
 ---
 spec: 2026-11-02-core-2-0-blob
 step: 03
-status: to-do
+status: done
 ---
 
 # Step 03: XML docs shipped — Blob
@@ -19,8 +19,8 @@ Former core step 57 (Blob part); split per library on 2026-11-02.
 - English, one or two sentences per member, per [`PublicDocumentationGuide.md`](../../../../docs/PublicDocumentationGuide.md). No `<NoWarn>CS1591</NoWarn>` (`CLAUDE.md §2`).
 
 ## Acceptance criteria
-- [ ] `dotnet build SolTechnology.Core.slnx` is green with `TreatWarningsAsErrors`.
-- [ ] `dotnet pack` of the project produces a nupkg containing `lib/net10.0/<Assembly>.xml`.
+- [x] `dotnet build SolTechnology.Core.slnx` is green with `TreatWarningsAsErrors`.
+- [x] `dotnet pack` of the project produces a nupkg containing `lib/net10.0/<Assembly>.xml`.
 
 ## Open questions
 - none

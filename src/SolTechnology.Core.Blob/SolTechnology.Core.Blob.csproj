@@ -8,6 +8,7 @@
 		<PackageId>SolTechnology.Core.Blob</PackageId>
 		<AssemblyName>SolTechnology.Core.Blob</AssemblyName>
 
+		<GenerateDocumentationFile>true</GenerateDocumentationFile>
 		<PackageReadmeSource>Blob.md</PackageReadmeSource>
 	</PropertyGroup>
 
