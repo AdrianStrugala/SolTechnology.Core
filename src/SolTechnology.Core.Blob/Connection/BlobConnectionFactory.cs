@@ -4,16 +4,11 @@ using Microsoft.Extensions.Options;
 
 namespace SolTechnology.Core.Blob.Connection
 {
-    internal sealed class BlobConnectionFactory : IBlobConnectionFactory
+    internal sealed class BlobConnectionFactory(IOptions<BlobConfiguration> blobConfiguration) : IBlobConnectionFactory
     {
-        private readonly string _connectionString;
+        private readonly string _connectionString = blobConfiguration.Value.ConnectionString;
 
         private readonly ConcurrentDictionary<string, Lazy<Task<BlobContainerClient>>> _blobContainerCache = new();
-
-        public BlobConnectionFactory(IOptions<BlobConfiguration> blobConfiguration)
-        {
-            _connectionString = blobConfiguration.Value.ConnectionString;
-        }
 
         public BlobContainerClient GetConnection(string containerName)
         {
