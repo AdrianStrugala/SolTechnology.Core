@@ -1,7 +1,7 @@
 ---
 spec: 2026-11-02-core-2-0-messagebus
 step: 01
-status: to-do
+status: done
 ---
 
 # Step 01: DI resolution test — MessageBus
@@ -28,10 +28,16 @@ Former core step 11 (MessageBus part); split per library on 2026-11-02.
 - Follow the [`test-writing`](../../../../.github/skills/test-writing/SKILL.md) skill. No shared helper in a shipped package.
 
 ## Acceptance criteria
-- [ ] `dotnet test tests/SolTechnology.Core.MessageBus.Tests` is green. The ignored tests are exactly B1, B2, and infra#13.
-- [ ] Each ignored test, run alone with its `Ignore` removed locally, fails with the cited reason's exception (`B1`: no usable constructor for `MessageBusBroker`; `B2`: unable to resolve `ServiceBusClient`; `infra#13`: `ICorrelationIdService` is null).
+- [x] `dotnet test tests/SolTechnology.Core.MessageBus.Tests` is green. The ignored tests are exactly B1, B2, and infra#13.
+- [x] Each ignored test, run alone with its `Ignore` removed locally, fails with the cited reason's exception (`B1`: no usable constructor for `MessageBusBroker`; `B2`: unable to resolve `ServiceBusClient`; `infra#13`: `ICorrelationIdService` is null).
 
 ## Open questions
 - none
 
 ## Deviations
+
+### Resolution test registers one publisher and one receiver
+
+**Original plan:** `AddSolMessageBus_ResolvesAllPublicServices_WithValidation` resolves `IMessagePublisher` and the receiver hosted service after the module's `AddSol*` overloads.
+
+**Actual implementation:** The test also calls `WithQueuePublisher` and `WithQueueReceiver` and resolves the registered `IMessageHandler<T>`, so the scoped handler registration those builders add is validated under `ValidateScopes` too. With its `Ignore` removed the test fails with `AggregateException`: "A suitable constructor for type 'MessageBusBroker' could not be located" (B1); the health-check test fails with "No service for type 'ServiceBusClient' has been registered" (B2); the correlation test fails with "Expected correlationIdService not to be <null>" (infra#13).
