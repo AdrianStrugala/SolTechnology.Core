@@ -12,6 +12,7 @@ namespace SolTechnology.Core.Blob
     {
         private const string SerializationFormatKey = "SerializationFormat";
 
+        // Classic form: an extension block drops T's nullable annotation, so callers get a notnull constraint (CS8714).
         /// <summary>
         /// Downloads the blob and deserializes it in the format stored in its metadata; a blob without the format key
         /// is read as JSON.
@@ -44,54 +45,54 @@ namespace SolTechnology.Core.Blob
             }
         }
 
-        /// <summary>
-        /// Serializes <paramref name="content"/> as JSON and uploads it, overwriting an existing blob.
-        /// </summary>
         /// <param name="client">The container to write to.</param>
-        /// <param name="blobName">The blob name.</param>
-        /// <param name="content">The object to serialize.</param>
-        /// <param name="ct">Cancels the upload.</param>
-        public static async Task WriteToBlob(
-            this BlobContainerClient client,
-            string blobName,
-            object content,
-            CancellationToken ct = default)
+        extension(BlobContainerClient client)
         {
-            await WriteToBlob(client, blobName, content, SerializationFormat.Json, ct);
-        }
-
-        /// <summary>
-        /// Serializes <paramref name="content"/> in <paramref name="serializationFormat"/> and uploads it, overwriting an
-        /// existing blob. The format key travels with the content in one upload, and the blob's other metadata keys are
-        /// kept; a container deleted since it was created is created again once.
-        /// </summary>
-        /// <param name="client">The container to write to.</param>
-        /// <param name="blobName">The blob name.</param>
-        /// <param name="content">The object to serialize.</param>
-        /// <param name="serializationFormat">The format to serialize in.</param>
-        /// <param name="ct">Cancels the upload.</param>
-        public static async Task WriteToBlob(
-            this BlobContainerClient client,
-            string blobName,
-            object content,
-            SerializationFormat serializationFormat,
-            CancellationToken ct = default)
-        {
-            var blob = client.GetBlobClient(blobName);
-            var serializedContent = Serialize(content, serializationFormat);
-            var options = new BlobUploadOptions
+            /// <summary>
+            /// Serializes <paramref name="content"/> as JSON and uploads it, overwriting an existing blob.
+            /// </summary>
+            /// <param name="blobName">The blob name.</param>
+            /// <param name="content">The object to serialize.</param>
+            /// <param name="ct">Cancels the upload.</param>
+            public async Task WriteToBlob(
+                string blobName,
+                object content,
+                CancellationToken ct = default)
             {
-                Metadata = await MergeFormatIntoMetadata(blob, serializationFormat, ct)
-            };
-
-            try
-            {
-                await blob.UploadAsync(serializedContent, options, ct);
+                await client.WriteToBlob(blobName, content, SerializationFormat.Json, ct);
             }
-            catch (RequestFailedException e) when (e.ErrorCode == BlobErrorCode.ContainerNotFound)
+
+            /// <summary>
+            /// Serializes <paramref name="content"/> in <paramref name="serializationFormat"/> and uploads it, overwriting an
+            /// existing blob. The format key travels with the content in one upload, and the blob's other metadata keys are
+            /// kept; a container deleted since it was created is created again once.
+            /// </summary>
+            /// <param name="blobName">The blob name.</param>
+            /// <param name="content">The object to serialize.</param>
+            /// <param name="serializationFormat">The format to serialize in.</param>
+            /// <param name="ct">Cancels the upload.</param>
+            public async Task WriteToBlob(
+                string blobName,
+                object content,
+                SerializationFormat serializationFormat,
+                CancellationToken ct = default)
             {
-                await client.CreateIfNotExistsAsync(cancellationToken: ct);
-                await blob.UploadAsync(serializedContent, options, ct);
+                var blob = client.GetBlobClient(blobName);
+                var serializedContent = Serialize(content, serializationFormat);
+                var options = new BlobUploadOptions
+                {
+                    Metadata = await MergeFormatIntoMetadata(blob, serializationFormat, ct)
+                };
+
+                try
+                {
+                    await blob.UploadAsync(serializedContent, options, ct);
+                }
+                catch (RequestFailedException e) when (e.ErrorCode == BlobErrorCode.ContainerNotFound)
+                {
+                    await client.CreateIfNotExistsAsync(cancellationToken: ct);
+                    await blob.UploadAsync(serializedContent, options, ct);
+                }
             }
         }
 

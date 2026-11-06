@@ -9,31 +9,34 @@ namespace SolTechnology.Core.Blob
     /// </summary>
     public static class ModuleInstaller
     {
-        /// <summary>
-        /// Registers <see cref="BlobConfiguration"/> as options and <see cref="IBlobConnectionFactory"/> as a singleton.
-        /// </summary>
         /// <param name="services">The service collection to add the Blob services to.</param>
-        /// <param name="blobConfiguration">The Blob settings.</param>
-        /// <exception cref="ArgumentException"><paramref name="blobConfiguration"/> is <see langword="null"/>.</exception>
-        /// <returns>The same <see cref="IServiceCollection"/>, for chaining.</returns>
-        public static IServiceCollection AddSolBlob(this IServiceCollection services, BlobConfiguration blobConfiguration)
+        extension(IServiceCollection services)
         {
-            if (blobConfiguration == null)
+            /// <summary>
+            /// Registers <see cref="BlobConfiguration"/> as options and <see cref="IBlobConnectionFactory"/> as a singleton.
+            /// </summary>
+            /// <param name="blobConfiguration">The Blob settings.</param>
+            /// <exception cref="ArgumentException"><paramref name="blobConfiguration"/> is <see langword="null"/>.</exception>
+            /// <returns>The same <see cref="IServiceCollection"/>, for chaining.</returns>
+            public IServiceCollection AddSolBlob(BlobConfiguration blobConfiguration)
             {
-                throw new ArgumentException($"The [{nameof(BlobConfiguration)}] is missing. Provide it by parameter.");
-            }
-
-            services
-                .AddOptions<BlobConfiguration>()
-                .Configure(config =>
+                if (blobConfiguration == null)
                 {
-                    config.ConnectionString = blobConfiguration.ConnectionString;
-                })
-                .ValidateOnStart();
+                    throw new ArgumentException($"The [{nameof(BlobConfiguration)}] is missing. Provide it by parameter.");
+                }
 
-            services.AddSingleton<IBlobConnectionFactory, BlobConnectionFactory>();
+                services
+                    .AddOptions<BlobConfiguration>()
+                    .Configure(config =>
+                    {
+                        config.ConnectionString = blobConfiguration.ConnectionString;
+                    })
+                    .ValidateOnStart();
 
-            return services;
+                services.AddSingleton<IBlobConnectionFactory, BlobConnectionFactory>();
+
+                return services;
+            }
         }
     }
 }
