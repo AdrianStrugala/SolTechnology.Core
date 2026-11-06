@@ -71,6 +71,9 @@ namespace SolTechnology.Core.Blob
             /// <param name="content">The object to serialize.</param>
             /// <param name="serializationFormat">The format to serialize in.</param>
             /// <param name="ct">Cancels the upload.</param>
+            /// <exception cref="ArgumentOutOfRangeException">
+            /// <paramref name="serializationFormat"/> is not a defined <see cref="SerializationFormat"/>; nothing is sent.
+            /// </exception>
             public async Task WriteToBlob(
                 string blobName,
                 object content,
@@ -107,7 +110,8 @@ namespace SolTechnology.Core.Blob
                     return new BinaryData(AvroConvert.Serialize(content, CodecType.Brotli));
 
                 default:
-                    return BinaryData.Empty;
+                    throw new ArgumentOutOfRangeException(
+                        nameof(serializationFormat), serializationFormat, "Unknown serialization format.");
             }
         }
 
@@ -117,9 +121,16 @@ namespace SolTechnology.Core.Blob
             SerializationFormat serializationFormat,
             CancellationToken ct)
         {
-            var metadata = (await blob.ExistsAsync(ct)).Value
-                ? new Dictionary<string, string>((await blob.GetPropertiesAsync(cancellationToken: ct)).Value.Metadata)
-                : new Dictionary<string, string>();
+            Dictionary<string, string> metadata;
+            try
+            {
+                var properties = await blob.GetPropertiesAsync(cancellationToken: ct);
+                metadata = new Dictionary<string, string>(properties.Value.Metadata);
+            }
+            catch (RequestFailedException e) when (e.Status == 404)
+            {
+                metadata = new Dictionary<string, string>();
+            }
 
             metadata[SerializationFormatKey] = serializationFormat.ToString().ToLowerInvariant();
             return metadata;

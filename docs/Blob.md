@@ -87,6 +87,7 @@ tools as JSON read too.
 | Blob missing | `WriteToBlob` creates it. |
 | Container deleted after `GetConnection` | `WriteToBlob` creates it again once and retries the upload. |
 | Blob or container missing on read | `ReadFromBlob` throws `RequestFailedException` with status 404. |
+| `SerializationFormat` not a defined value | `WriteToBlob` throws `ArgumentOutOfRangeException` before sending any request. |
 | Token cancelled | Both throw `OperationCanceledException`. |
 
 ### Testing
