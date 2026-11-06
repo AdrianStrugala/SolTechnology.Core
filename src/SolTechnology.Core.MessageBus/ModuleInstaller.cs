@@ -1,6 +1,8 @@
-﻿﻿﻿using Microsoft.Extensions.DependencyInjection;
+﻿﻿﻿using Azure.Messaging.ServiceBus;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
+using SolTechnology.Core.Logging;
 using SolTechnology.Core.MessageBus.Broker;
 using SolTechnology.Core.MessageBus.Configuration;
 using SolTechnology.Core.MessageBus.Publish;
@@ -33,7 +35,15 @@ namespace SolTechnology.Core.MessageBus
             // Registry is a singleton populated synchronously during DI configuration.
             services.TryAddSingleton<MessageBusRegistry>();
 
-            services.TryAddSingleton<IMessageBusBroker, MessageBusBroker>();
+            services.AddSolCorrelationIdService();
+
+            services.TryAddKeyedSingleton<ServiceBusClient>(
+                MessageBusClientFactory.ServiceKey,
+                (sp, _) => MessageBusClientFactory.Create(sp.GetRequiredService<IOptions<MessageBusConfiguration>>().Value));
+            services.TryAddSingleton<IMessageBusBroker>(sp => new MessageBusBroker(
+                sp.GetRequiredService<IOptions<MessageBusConfiguration>>(),
+                sp.GetRequiredService<MessageBusRegistry>(),
+                sp.GetRequiredKeyedService<ServiceBusClient>(MessageBusClientFactory.ServiceKey)));
             services.TryAddSingleton<IMessagePublisher, MessagePublisher>();
 
             services.AddHostedService<MessageBusReceiver>();

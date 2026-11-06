@@ -1,7 +1,7 @@
 ---
 spec: 2026-11-02-core-2-0-messagebus
 step: 02
-status: to-do
+status: done
 ---
 
 # Step 02: MessageBus — resolvable broker, registered health-check client, correlation service
@@ -40,11 +40,17 @@ Former core step 12; moved here by the per-library regroup (user, 2026-11-02).
 - `docs/Bus.md:111` is corrected in step 06.
 
 ## Acceptance criteria
-- [ ] `dotnet test tests/SolTechnology.Core.MessageBus.Tests` is green with no `[Ignore]` left in `ModuleResolutionTests`.
-- [ ] `git diff` shows no new `public` or `protected` member in `src/SolTechnology.Core.MessageBus`.
-- [ ] Premortem mitigations for `ModuleInstaller.cs` (core step 00) are applied.
+- [x] `dotnet test tests/SolTechnology.Core.MessageBus.Tests` is green with no `[Ignore]` left in `ModuleResolutionTests`.
+- [x] `git diff` shows no new `public` or `protected` member in `src/SolTechnology.Core.MessageBus`.
+- [x] Premortem mitigations for `ModuleInstaller.cs` (core step 00) are applied. No `RM-n` targets this step; core premortem scenario 25 (`ServiceBusClient` lifetime) is defended by `AddSolMessageBus_ConsumerRegisteredServiceBusClient_IsNotReused` and `Broker_DisposeAsync_DoesNotDisposeSharedClient`.
 
 ## Open questions
 - none
 
 ## Deviations
+
+### Client options exposed to the test through an internal method
+
+**Original plan:** `MessageBusClientFactory.Create` applies the transport and retry options, and `AddSolMessageBus_Client_UsesConfiguredTransportAndRetry` checks them on the client.
+
+**Actual implementation:** `ServiceBusClient` exposes `TransportType` but not its retry options, so the factory builds them in an internal `CreateOptions` that `Create` uses. The test checks `TransportType` on the resolved client and the retry options through `CreateOptions`, with no reflection into the Azure SDK. The empty-`ConnectionString` `ArgumentException` that the broker constructor threw moved unchanged into `Create`, because the client is now built before the broker.

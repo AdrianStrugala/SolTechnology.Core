@@ -7,8 +7,8 @@ using SolTechnology.Core.MessageBus.Configuration;
 namespace SolTechnology.Core.MessageBus.Broker
 {
     /// <summary>
-    /// Default <see cref="IMessageBusBroker"/>. Owns one <see cref="ServiceBusClient"/>
-    /// per process, materialises senders/processors lazily on first
+    /// Default <see cref="IMessageBusBroker"/>. Uses the shared <see cref="ServiceBusClient"/> that DI
+    /// owns, materialises senders/processors lazily on first
     /// <see cref="EnsureInitializedAsync"/> call and disposes them deterministically.
     /// </summary>
     public sealed class MessageBusBroker : IMessageBusBroker, IAsyncDisposable
@@ -27,28 +27,12 @@ namespace SolTechnology.Core.MessageBus.Broker
 
         internal MessageBusBroker(
             IOptions<MessageBusConfiguration> options,
-            MessageBusRegistry registry)
+            MessageBusRegistry registry,
+            ServiceBusClient serviceBusClient)
         {
             _configuration = options.Value ?? throw new ArgumentNullException(nameof(options));
             _registry = registry ?? throw new ArgumentNullException(nameof(registry));
-
-            if (string.IsNullOrWhiteSpace(_configuration.ConnectionString))
-            {
-                throw new ArgumentException(
-                    $"{nameof(MessageBusConfiguration)}.{nameof(MessageBusConfiguration.ConnectionString)} is required.",
-                    nameof(options));
-            }
-
-            var clientOptions = new ServiceBusClientOptions
-            {
-                TransportType = _configuration.TransportType
-            };
-            if (_configuration.RetryOptions is not null)
-            {
-                clientOptions.RetryOptions = _configuration.RetryOptions;
-            }
-
-            _serviceBusClient = new ServiceBusClient(_configuration.ConnectionString, clientOptions);
+            _serviceBusClient = serviceBusClient ?? throw new ArgumentNullException(nameof(serviceBusClient));
 
             if (_configuration.CreateResources)
             {
@@ -229,7 +213,6 @@ namespace SolTechnology.Core.MessageBus.Broker
             }
             _processorsByType.Clear();
 
-            await _serviceBusClient.DisposeAsync().ConfigureAwait(false);
             _initLock.Dispose();
         }
     }

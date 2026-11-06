@@ -2,6 +2,7 @@ using Azure.Messaging.ServiceBus;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Options;
+using SolTechnology.Core.MessageBus.Broker;
 using SolTechnology.Core.MessageBus.Configuration;
 
 namespace SolTechnology.Core.MessageBus.HealthChecks;
@@ -13,8 +14,8 @@ namespace SolTechnology.Core.MessageBus.HealthChecks;
 public static class ServiceBusHealthCheckExtensions
 {
     /// <summary>
-    /// Adds a Service Bus liveness check. Requires <see cref="ServiceBusClient"/> and
-    /// <see cref="MessageBusConfiguration"/> to be registered (via <c>AddSolMessageBus(...)</c>).
+    /// Adds a Service Bus liveness check. Requires <c>AddSolMessageBus(...)</c>, which registers the
+    /// <see cref="ServiceBusClient"/> and <see cref="MessageBusConfiguration"/> the check uses.
     /// </summary>
     public static IHealthChecksBuilder AddSolServiceBusHealthCheck(
         this IHealthChecksBuilder builder,
@@ -30,7 +31,7 @@ public static class ServiceBusHealthCheckExtensions
         return builder.Add(new HealthCheckRegistration(
             name,
             sp => new ServiceBusHealthCheck(
-                sp.GetRequiredService<ServiceBusClient>(),
+                sp.GetRequiredKeyedService<ServiceBusClient>(MessageBusClientFactory.ServiceKey),
                 sp.GetRequiredService<IOptions<MessageBusConfiguration>>(),
                 probeTimeout),
             failureStatus,

@@ -20,7 +20,7 @@ are `done` and after these library features are `completed`: `logging`. No step 
 | # | Title | File | Status |
 |---|---|---|---|
 | 01 | DI resolution test — MessageBus | [`steps/01-di-resolution-test.md`](steps/01-di-resolution-test.md) | done |
-| 02 | MessageBus — resolvable broker, registered health-check client, correlation service | [`steps/02-messagebus-resolvable-broker-and-health-check.md`](steps/02-messagebus-resolvable-broker-and-health-check.md) | to-do |
+| 02 | MessageBus — resolvable broker, registered health-check client, correlation service | [`steps/02-messagebus-resolvable-broker-and-health-check.md`](steps/02-messagebus-resolvable-broker-and-health-check.md) | done |
 | 03 | MessageBus — receiver settlement matches its contract; publish→receive round-trip | [`steps/03-messagebus-receiver-settlement.md`](steps/03-messagebus-receiver-settlement.md) | to-do |
 | 04 | MessageBus — internal implementation types | [`steps/04-messagebus-internal-implementations.md`](steps/04-messagebus-internal-implementations.md) | to-do |
 | 05 | XML docs shipped — MessageBus | [`steps/05-xml-docs.md`](steps/05-xml-docs.md) | to-do |

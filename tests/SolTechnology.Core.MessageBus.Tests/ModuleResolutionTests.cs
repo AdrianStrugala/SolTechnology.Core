@@ -32,7 +32,6 @@ public class ModuleResolutionTests
     }
 
     [Test]
-    [Ignore("B1: MessageBusBroker has an internal constructor that MS.DI cannot bind")]
     public async Task AddSolMessageBus_ResolvesAllPublicServices_WithValidation()
     {
         // Arrange
@@ -59,7 +58,6 @@ public class ModuleResolutionTests
     }
 
     [Test]
-    [Ignore("B2: the health check resolves a ServiceBusClient that nobody registers")]
     public async Task AddSolServiceBusHealthCheck_RegistrationFactory_Resolves()
     {
         // Arrange
@@ -80,7 +78,6 @@ public class ModuleResolutionTests
     }
 
     [Test]
-    [Ignore("infra#13: AddSolMessageBus does not register ICorrelationIdService")]
     public async Task AddSolMessageBus_WithoutLogging_RegistersCorrelationIdService()
     {
         // Arrange
