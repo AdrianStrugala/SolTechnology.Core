@@ -21,7 +21,8 @@ namespace SolTechnology.Core.Blob.Testing;
 /// </remarks>
 public sealed class AzuriteFixture : IAsyncDisposable
 {
-    private const string DefaultImage = "mcr.microsoft.com/azure-storage/azurite:3.35.0";
+    // 3.37.0 is the first Azurite that accepts service version 2026-06-06 of Azure.Storage.Blobs 12.29.0.
+    private const string DefaultImage = "mcr.microsoft.com/azure-storage/azurite:3.37.0";
 
     private readonly string? _image;
     private readonly string _containerName;

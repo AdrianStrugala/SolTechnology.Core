@@ -77,6 +77,11 @@ Premortem mitigations carried verbatim from core 00: none.
 
 No test project exists for the `*.Testing` packages, and none is created (Q6); the kits are exercised by the library test projects that use them (SQL.Tests, Cache.Tests, MessageBus.Tests, API.Tests, HTTP.Tests, CQRS.Tests, Hangfire.Tests) and by the DreamTravel component tests. The kits have no L-03 template row; step 06 runs the library-scoped `[{Placeholder}]` check. Delivered last: step 03 renames fixture methods that the SQL, Cache, and MessageBus features start using.
 
+Azurite image bumped by blob code review 2026-11-06: `AzuriteFixture`'s default image is
+`mcr.microsoft.com/azure-storage/azurite:3.37.0`, the first release that accepts the service version `2026-06-06` of
+`Azure.Storage.Blobs` 12.29.0 (`3.35.0` answered 400 `InvalidHeaderValue`). Steps of this feature keep that pin or move
+it forward, never back; see [`2026-11-02-core-2-0-blob`](2026-11-02-core-2-0-blob.md).
+
 ## Scope
 
 ### In scope

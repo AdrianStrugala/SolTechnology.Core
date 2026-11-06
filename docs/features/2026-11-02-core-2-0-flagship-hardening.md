@@ -662,6 +662,10 @@ these notes from the steps:
   deployment that hits a SQL error threw `FileNotFoundException` instead of `DacServicesException`. Connection strings
   with a SQL login need no change; Entra ID authentication needs `Microsoft.Data.SqlClient.Extensions.Azure` in the
   consumer's project.
+- blob (code review, 2026-11-06): `AzuriteFixture` in `SolTechnology.Core.Blob.Testing` starts
+  `mcr.microsoft.com/azure-storage/azurite:3.37.0` by default instead of `3.35.0`, which rejected every request of
+  `Azure.Storage.Blobs` 12.29.0 (service version `2026-06-06`) with 400 `InvalidHeaderValue`. Tests that pass their own
+  `image` keep it and need 3.37.0 or later for the 2.0 packages.
 
 ### Resolved questions (user answers, 2026-11-02)
 
