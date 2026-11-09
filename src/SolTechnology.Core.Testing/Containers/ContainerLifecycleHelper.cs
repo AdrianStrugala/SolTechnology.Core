@@ -25,7 +25,7 @@ public static class ContainerLifecycleHelper
     /// Failures are logged and swallowed so the original connection error surfaces instead of an
     /// unrelated Docker API exception.
     /// </summary>
-    public static async Task EnsureRunningAsync(string containerId, CancellationToken ct = default)
+    public static async Task EnsureRunning(string containerId, CancellationToken ct = default)
     {
         var shortId = containerId.Length > 12 ? containerId[..12] : containerId;
         try
@@ -38,7 +38,7 @@ public static class ContainerLifecycleHelper
                 Console.WriteLine($"[ContainerLifecycle] Container {shortId} was stopped; restarting...");
                 await docker.Containers.StartContainerAsync(containerId, new ContainerStartParameters(), ct)
                     .ConfigureAwait(false);
-                await WaitForHealthyAsync(docker, containerId, shortId, ct: ct).ConfigureAwait(false);
+                await WaitForHealthy(docker, containerId, shortId, ct: ct).ConfigureAwait(false);
                 Console.WriteLine($"[ContainerLifecycle] Container {shortId} restarted and ready.");
             }
         }
@@ -52,7 +52,7 @@ public static class ContainerLifecycleHelper
     /// Polls the Docker health status until the container is <c>healthy</c> (or running with no
     /// health check), or throws on timeout / unhealthy.
     /// </summary>
-    public static async Task WaitForHealthyAsync(
+    public static async Task WaitForHealthy(
         DockerClient docker,
         string containerId,
         string shortId,
@@ -89,7 +89,7 @@ public static class ContainerLifecycleHelper
     /// and waits until the broker echoes 'AMQP' back. The only reliable signal that the Azure Service
     /// Bus emulator is ready to accept sessions.
     /// </summary>
-    public static async Task WaitForAmqpReadyAsync(int hostPort, int timeoutSeconds = 120)
+    public static async Task WaitForAmqpReady(int hostPort, int timeoutSeconds = 120)
     {
         var deadline = DateTime.UtcNow.AddSeconds(timeoutSeconds);
 

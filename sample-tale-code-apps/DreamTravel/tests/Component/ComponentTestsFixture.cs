@@ -28,7 +28,7 @@ namespace DreamTravel.FunctionalTests
             // 1. Start SQL Server (Docker container)
             SqlFixture = new SQLFixture("DreamTravelDatabase")
                 .WithSQLProject(Path.GetFullPath("../../../../../src/Infrastructure/DreamTravelDatabase/DreamTravelDatabase.csproj"));
-            await SqlFixture.InitializeAsync();
+            await SqlFixture.Initialize();
 
             // 2. Start WireMock (mocks Google API) on a dynamic port — read its URL into config below.
             WireMockFixture = new WireMockFixture();

@@ -21,7 +21,7 @@ are `done` and after these library features are `completed`: `http`; `api-auth`;
 |---|---|---|---|
 | 01 | API and HTTP testing kits — dispose the test host; strict WireMock by default | [`steps/01-http-api-testing-kit-fixes.md`](steps/01-http-api-testing-kit-fixes.md) | done |
 | 02 | Container fixtures — per-instance state; honour Ryuk settings | [`steps/02-container-fixture-lifecycle.md`](steps/02-container-fixture-lifecycle.md) | done |
-| 03 | Testing kits — 2.0 surface (optional `Async` renames, WireMock fields) | [`steps/03-testing-kit-surface.md`](steps/03-testing-kit-surface.md) | to-do |
+| 03 | Testing kits — 2.0 surface (optional `Async` renames, WireMock fields) | [`steps/03-testing-kit-surface.md`](steps/03-testing-kit-surface.md) | done |
 | 04 | XML docs shipped — Testing, HTTP.Testing, API.Testing, SQL.Testing, Redis.Testing, Blob.Testing, ServiceBus.Testing | [`steps/04-xml-docs.md`](steps/04-xml-docs.md) | to-do |
 | 05 | Module docs — testing kits | [`steps/05-docs-testing-kits.md`](steps/05-docs-testing-kits.md) | to-do |
 | 06 | Guide conformance — testing kits | [`steps/06-conform-testing-kits.md`](steps/06-conform-testing-kits.md) | to-do |

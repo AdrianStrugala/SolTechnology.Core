@@ -52,7 +52,7 @@ public static class SQLTestEnvironment
     private static async Task<SQLFixture> StartFixture()
     {
         var fixture = new SQLFixture("SolSQLTests").WithSchema(CreateSchema);
-        await fixture.InitializeAsync();
+        await fixture.Initialize();
         return fixture;
     }
 

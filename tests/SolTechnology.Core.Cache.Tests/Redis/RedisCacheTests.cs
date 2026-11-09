@@ -17,7 +17,7 @@ public class RedisCacheTests
     [SetUp]
     public async Task SetUp()
     {
-        await RedisTestEnvironment.Redis.FlushAsync();
+        await RedisTestEnvironment.Redis.Flush();
         _provider = RedisTestEnvironment.BuildProvider("app:");
         _sut = _provider.GetRequiredService<IRedisCache>();
     }

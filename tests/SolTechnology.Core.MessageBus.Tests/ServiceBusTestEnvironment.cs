@@ -24,7 +24,7 @@ public static class ServiceBusTestEnvironment
         var fixture = new ServiceBusFixture(
             containerName: "soltech-messagebus-tests-servicebus",
             configFilePath: Path.Combine(AppContext.BaseDirectory, "servicebus-emulator-config.json"));
-        await fixture.InitializeAsync();
+        await fixture.Initialize();
         return fixture;
     }
 }

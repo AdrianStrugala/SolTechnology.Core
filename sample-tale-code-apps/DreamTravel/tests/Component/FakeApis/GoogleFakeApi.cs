@@ -11,7 +11,7 @@ namespace DreamTravel.FunctionalTests.FakeApis
 {
     public class GoogleFakeApi : FakeApiBase, IGoogleHTTPClient
     {
-        protected override string BaseUrl => "google";
+        private const string BaseUrl = "google";
 
 
         public Task<TrafficMatrixResponse> GetSegmentDurationMatrixByTraffic(TrafficMatrixRequest request)

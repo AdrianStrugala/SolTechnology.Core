@@ -14,7 +14,7 @@ public class RedisLockReleaseTests
     [SetUp]
     public async Task SetUp()
     {
-        await RedisTestEnvironment.Redis.FlushAsync();
+        await RedisTestEnvironment.Redis.Flush();
         _logger = new CapturingLogger<RedisDistributedLockService>();
         _sut = new RedisDistributedLockService(
             RedisTestEnvironment.RawConnection,

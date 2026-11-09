@@ -8,7 +8,7 @@ namespace SolTechnology.Core.Cache.Tests.Redis;
 public class RedisKeysTests
 {
     [SetUp]
-    public async Task SetUp() => await RedisTestEnvironment.Redis.FlushAsync();
+    public async Task SetUp() => await RedisTestEnvironment.Redis.Flush();
 
     [Test]
     public async Task RedisKeys_LockAndIdempotency_KeepInstanceNamePrefixFormat()

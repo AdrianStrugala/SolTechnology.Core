@@ -41,16 +41,16 @@ public sealed class SQLFixture : IAsyncDisposable
     /// <summary>The engine backing this fixture. Defaults to <see cref="SQLProvider.SQLServer"/>.</summary>
     public SQLProvider Provider { get; private set; } = SQLProvider.SQLServer;
 
-    /// <summary>Server-level connection string (no specific catalog). Valid after <see cref="InitializeAsync"/>.</summary>
+    /// <summary>Server-level connection string (no specific catalog). Valid after <see cref="Initialize"/>.</summary>
     public string ConnectionString => Engine.ServerConnectionString;
 
-    /// <summary>Connection string targeting the application database. Valid after <see cref="InitializeAsync"/>.</summary>
+    /// <summary>Connection string targeting the application database. Valid after <see cref="Initialize"/>.</summary>
     public string DatabaseConnectionString => Engine.DatabaseConnectionString(DatabaseName);
 
 
     // ---- fluent configuration ----
 
-    /// <summary>Use PostgreSQL instead of the default SQL Server. Call before <see cref="InitializeAsync"/>.</summary>
+    /// <summary>Use PostgreSQL instead of the default SQL Server. Call before <see cref="Initialize"/>.</summary>
     public SQLFixture UsePostgres()
     {
         Provider = SQLProvider.Postgres;
@@ -100,12 +100,12 @@ public sealed class SQLFixture : IAsyncDisposable
 
     // ---- lifecycle ----
 
-    public async Task InitializeAsync(CancellationToken ct = default)
+    public async Task Initialize(CancellationToken ct = default)
     {
         if (_provisioner is null)
         {
             throw new InvalidOperationException(
-                "Configure schema provisioning (WithSQLProject / WithScripts / WithEfMigrations / WithSchema) before InitializeAsync.");
+                "Configure schema provisioning (WithSQLProject / WithScripts / WithEfMigrations / WithSchema) before Initialize.");
         }
 
         _engine = Provider switch
@@ -132,11 +132,11 @@ public sealed class SQLFixture : IAsyncDisposable
     }
 
     /// <summary>Reset the application database to empty (schema preserved) — the between-test cleanup path.</summary>
-    public Task ResetAsync(CancellationToken ct = default)
+    public Task Reset(CancellationToken ct = default)
     {
         if (_reset is null)
         {
-            throw new InvalidOperationException("Call InitializeAsync before ResetAsync.");
+            throw new InvalidOperationException("Call Initialize before Reset.");
         }
 
         return _reset.ResetAsync(ct);
@@ -154,6 +154,6 @@ public sealed class SQLFixture : IAsyncDisposable
     internal DbConnection CreateDatabaseConnection() => Engine.OpenConnection(DatabaseConnectionString);
 
     private IDatabaseEngine Engine =>
-        _engine ?? throw new InvalidOperationException("Fixture not initialized. Call InitializeAsync first.");
+        _engine ?? throw new InvalidOperationException("Fixture not initialized. Call Initialize first.");
 }
 

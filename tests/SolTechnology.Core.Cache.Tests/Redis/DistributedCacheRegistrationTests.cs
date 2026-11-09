@@ -12,7 +12,7 @@ namespace SolTechnology.Core.Cache.Tests.Redis;
 public class DistributedCacheRegistrationTests
 {
     [SetUp]
-    public async Task SetUp() => await RedisTestEnvironment.Redis.FlushAsync();
+    public async Task SetUp() => await RedisTestEnvironment.Redis.Flush();
 
     [Test]
     public async Task AddSolDistributedCache_UsesSingleMultiplexer()

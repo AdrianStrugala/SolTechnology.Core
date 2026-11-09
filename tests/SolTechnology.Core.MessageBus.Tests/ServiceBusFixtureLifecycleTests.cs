@@ -20,8 +20,8 @@ public class ServiceBusFixtureLifecycleTests
         const string name = "soltech-messagebus-tests-lifecycle";
         await using var first = new ServiceBusFixture(name);
         await using var second = new ServiceBusFixture(name);
-        await first.InitializeAsync();
-        await second.InitializeAsync();
+        await first.Initialize();
+        await second.Initialize();
         var firstConnectionString = first.ConnectionString;
         var (firstContainers, firstNetworks) = await Resources(first.Container!.Id);
 

@@ -16,7 +16,7 @@ public static class RedisTestEnvironment
     public static async Task SetUp()
     {
         Redis = new RedisFixture(containerName: "soltech-cache-tests-redis");
-        await Redis.InitializeAsync();
+        await Redis.Initialize();
         RawConnection = await ConnectionMultiplexer.ConnectAsync(Redis.ConnectionString);
     }
 

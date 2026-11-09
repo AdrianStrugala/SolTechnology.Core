@@ -175,5 +175,7 @@ retrospective promotes them):
   container. New rows `P-28` (Ryuk on by default) and `P-29` (`ServiceBusFixture` per instance, owned sidecar). The
   Docker.DotNet reuse helpers move into the internal `ReusedEmulator`; `docs/ServiceBus.Testing.md` is corrected here.
   The CI criterion waits for a push.
+- Step 03: only the `C-23` and `C-24` members changed; internal `Async` names in SQL.Testing stay, `Flush` gains no
+  token, and `WireMockServer` has a private setter for `Run`. The Azurite 3.37.0 pin is unchanged.
 
 ## Follow-ups

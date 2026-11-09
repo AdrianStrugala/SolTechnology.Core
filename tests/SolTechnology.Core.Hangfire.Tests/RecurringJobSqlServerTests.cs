@@ -18,7 +18,7 @@ public class RecurringJobSqlServerTests
     public async Task StartSqlServer()
     {
         _database = new SQLFixture("SolHangfireTests").WithSchema((_, _) => Task.CompletedTask);
-        await _database.InitializeAsync();
+        await _database.Initialize();
         _host = new RecurringJobHost(new SqlServerStorage(_database.DatabaseConnectionString));
     }
 

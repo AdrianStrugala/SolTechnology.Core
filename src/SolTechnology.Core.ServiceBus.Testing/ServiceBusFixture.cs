@@ -24,7 +24,7 @@ namespace SolTechnology.Core.ServiceBus.Testing;
 /// them by name, starts them if stopped, and re-reads the mapped port to rebuild the connection string.
 /// </para>
 /// <para>
-/// Readiness is gated on <see cref="ContainerLifecycleHelper.WaitForAmqpReadyAsync"/> — a TCP-accept alone
+/// Readiness is gated on <see cref="ContainerLifecycleHelper.WaitForAmqpReady"/> — a TCP-accept alone
 /// causes <c>NullReferenceException</c> in <c>AmqpTransportInitiator</c>; do not regress this.
 /// </para>
 /// </remarks>
@@ -60,11 +60,14 @@ public sealed class ServiceBusFixture : IAsyncDisposable
 
     /// <summary>The emulator connection string, whether the container was created fresh or reused.</summary>
     public string ConnectionString => _connectionString
-        ?? throw new InvalidOperationException("ServiceBusFixture not initialized. Call InitializeAsync first.");
+        ?? throw new InvalidOperationException("ServiceBusFixture not initialized. Call Initialize first.");
 
-    public async Task InitializeAsync()
+    /// <summary>
+    /// Starts the emulator with its MSSQL sidecar, or reuses the one kept by an earlier run, and waits until it
+    /// accepts AMQP sessions. Calling it again only restarts a container that was stopped externally.
+    /// </summary>
+    public async Task Initialize(CancellationToken ct = default)
     {
-        var ct = CancellationToken.None;
         var semaphore = Semaphores.GetOrAdd(_containerName, _ => new SemaphoreSlim(1, 1));
         await semaphore.WaitAsync(ct).ConfigureAwait(false);
         try
@@ -149,7 +152,7 @@ public sealed class ServiceBusFixture : IAsyncDisposable
             await Container.StartAsync(ct).ConfigureAwait(false);
 
             // Testcontainers' built-in wait only confirms the TCP port is open. Gate on the AMQP probe.
-            await ContainerLifecycleHelper.WaitForAmqpReadyAsync(Container.GetMappedPublicPort(ServiceBusPort)).ConfigureAwait(false);
+            await ContainerLifecycleHelper.WaitForAmqpReady(Container.GetMappedPublicPort(ServiceBusPort)).ConfigureAwait(false);
             _connectionString = Container.GetConnectionString();
         }
         catch
@@ -165,10 +168,10 @@ public sealed class ServiceBusFixture : IAsyncDisposable
         {
             if (_database is not null)
             {
-                await ContainerLifecycleHelper.EnsureRunningAsync(_database.Id, ct).ConfigureAwait(false);
+                await ContainerLifecycleHelper.EnsureRunning(_database.Id, ct).ConfigureAwait(false);
             }
 
-            await ContainerLifecycleHelper.EnsureRunningAsync(Container.Id, ct).ConfigureAwait(false);
+            await ContainerLifecycleHelper.EnsureRunning(Container.Id, ct).ConfigureAwait(false);
         }
         else if (TestContainersContext.ReuseContainers)
         {

@@ -11,8 +11,6 @@ public abstract class FakeApiBase : IFakeApi
     protected internal IRespondWithAProvider Provider = null!;
     private WireMockServer _mockServer = null!;
 
-    protected abstract string BaseUrl { get; }
-
     public void Register(WireMockServer mockServer)
     {
         _mockServer = mockServer;

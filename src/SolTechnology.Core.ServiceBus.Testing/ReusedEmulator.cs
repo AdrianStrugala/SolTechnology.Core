@@ -42,7 +42,7 @@ internal static class ReusedEmulator
             }
 
             // Gate the reused container on AMQP readiness too — it may have just been restarted.
-            await ContainerLifecycleHelper.WaitForAmqpReadyAsync(hostPort.Value).ConfigureAwait(false);
+            await ContainerLifecycleHelper.WaitForAmqpReady(hostPort.Value).ConfigureAwait(false);
             return ConnectionString(hostPort.Value);
         }
         catch (Exception ex) when (ex is not OperationCanceledException)
@@ -102,7 +102,7 @@ internal static class ReusedEmulator
         if (!container.State.Equals("running", StringComparison.OrdinalIgnoreCase))
         {
             await docker.Containers.StartContainerAsync(container.ID, new ContainerStartParameters(), ct).ConfigureAwait(false);
-            await ContainerLifecycleHelper.EnsureRunningAsync(container.ID, ct).ConfigureAwait(false);
+            await ContainerLifecycleHelper.EnsureRunning(container.ID, ct).ConfigureAwait(false);
         }
     }
 

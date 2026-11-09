@@ -15,7 +15,7 @@ namespace SolTechnology.Core.Blob.Testing;
 /// Boot once from the consumer's assembly-level <c>[OneTimeSetUp]</c> (within-run reuse is free);
 /// across-run reuse is opt-in via <c>TESTCONTAINERS_REUSE</c> (see <see cref="TestContainersContext"/>),
 /// which flips the container to a stable name with <c>WithReuse(true)</c> and makes
-/// <see cref="DisposeAsync"/> a no-op. Use <see cref="ClearAsync"/> for a between-test reset when the
+/// <see cref="DisposeAsync"/> a no-op. Use <see cref="Clear"/> for a between-test reset when the
 /// container is reused. No hand-rolled reuse cache — the shared lifetime model owns that.
 /// </para>
 /// </remarks>
@@ -38,12 +38,12 @@ public sealed class AzuriteFixture : IAsyncDisposable
     }
 
     private AzuriteContainer Container =>
-        _container ?? throw new InvalidOperationException("Container not started. Call InitializeAsync first.");
+        _container ?? throw new InvalidOperationException("Container not started. Call Initialize first.");
 
-    /// <summary>Azure Storage connection string for the running Azurite instance. Valid after <see cref="InitializeAsync"/>.</summary>
+    /// <summary>Azure Storage connection string for the running Azurite instance. Valid after <see cref="Initialize"/>.</summary>
     public string ConnectionString => Container.GetConnectionString();
 
-    /// <summary>Attach the container to a docker network (e.g. to share with other fixtures). Call before <see cref="InitializeAsync"/>.</summary>
+    /// <summary>Attach the container to a docker network (e.g. to share with other fixtures). Call before <see cref="Initialize"/>.</summary>
     public AzuriteFixture WithNetwork(INetwork network, string? alias = null)
     {
         _network = network;
@@ -51,7 +51,7 @@ public sealed class AzuriteFixture : IAsyncDisposable
         return this;
     }
 
-    public async Task InitializeAsync(CancellationToken ct = default)
+    public async Task Initialize(CancellationToken ct = default)
     {
         var builder = new AzuriteBuilder(_image ?? DefaultImage)
             .WithCleanUp(!TestContainersContext.ReuseContainers);
@@ -77,12 +77,12 @@ public sealed class AzuriteFixture : IAsyncDisposable
         // says "initialized" — make sure it is genuinely running before handing it back.
         if (TestContainersContext.ReuseContainers)
         {
-            await ContainerLifecycleHelper.EnsureRunningAsync(_container.Id, ct).ConfigureAwait(false);
+            await ContainerLifecycleHelper.EnsureRunning(_container.Id, ct).ConfigureAwait(false);
         }
     }
 
     /// <summary>Returns a <see cref="BlobContainerClient"/> for <paramref name="containerName"/>, creating the blob container if needed.</summary>
-    public async Task<BlobContainerClient> CreateBlobContainerAsync(string containerName, CancellationToken ct = default)
+    public async Task<BlobContainerClient> CreateBlobContainer(string containerName, CancellationToken ct = default)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(containerName);
         var client = new BlobServiceClient(ConnectionString).GetBlobContainerClient(containerName);
@@ -91,7 +91,7 @@ public sealed class AzuriteFixture : IAsyncDisposable
     }
 
     /// <summary>Deletes every blob container — the between-test reset when the Azurite container is reused.</summary>
-    public async Task ClearAsync(CancellationToken ct = default)
+    public async Task Clear(CancellationToken ct = default)
     {
         var service = new BlobServiceClient(ConnectionString);
         await foreach (var container in service.GetBlobContainersAsync(cancellationToken: ct).ConfigureAwait(false))

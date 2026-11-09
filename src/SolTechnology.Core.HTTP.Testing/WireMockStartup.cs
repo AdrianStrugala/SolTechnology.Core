@@ -8,7 +8,9 @@ namespace SolTechnology.Core.HTTP.Testing
 {
     public class WireMockStartup
     {
-        public WireMockServer WireMockServer = null!;
+        /// <summary>The running WireMock server (valid after <see cref="Run(int,bool)"/>); register stubs on it directly.</summary>
+        public WireMockServer WireMockServer { get; private set; } = null!;
+
         private readonly List<IFakeApi> _fakeServices = new();
 
         /// <summary>Base URL of the running server (valid after <see cref="Run(int,bool)"/>), e.g. <c>http://localhost:54213</c>.</summary>

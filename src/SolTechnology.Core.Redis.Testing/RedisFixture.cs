@@ -16,7 +16,7 @@ namespace SolTechnology.Core.Redis.Testing;
 /// Boot once from the consumer's assembly-level <c>[OneTimeSetUp]</c> (within-run reuse is free);
 /// across-run reuse is opt-in via <c>TESTCONTAINERS_REUSE</c> (see <see cref="TestContainersContext"/>),
 /// which flips the container to a stable name with <c>WithReuse(true)</c> and makes
-/// <see cref="DisposeAsync"/> a no-op. Use <see cref="FlushAsync"/> for a between-test reset when the
+/// <see cref="DisposeAsync"/> a no-op. Use <see cref="Flush"/> for a between-test reset when the
 /// container is reused.
 /// </remarks>
 public sealed class RedisFixture : IAsyncDisposable
@@ -39,15 +39,15 @@ public sealed class RedisFixture : IAsyncDisposable
     }
 
     private RedisContainer Container =>
-        _container ?? throw new InvalidOperationException("Container not started. Call InitializeAsync first.");
+        _container ?? throw new InvalidOperationException("Container not started. Call Initialize first.");
 
-    /// <summary><c>host:port</c> — the value apps bind to <c>Redis:HostName</c>. Valid after <see cref="InitializeAsync"/>.</summary>
+    /// <summary><c>host:port</c> — the value apps bind to <c>Redis:HostName</c>. Valid after <see cref="Initialize"/>.</summary>
     public string HostName => $"{Container.Hostname}:{Container.GetMappedPublicPort(InternalPort)}";
 
-    /// <summary>Full StackExchange.Redis connection string. Valid after <see cref="InitializeAsync"/>.</summary>
+    /// <summary>Full StackExchange.Redis connection string. Valid after <see cref="Initialize"/>.</summary>
     public string ConnectionString => Container.GetConnectionString();
 
-    /// <summary>Attach the container to a docker network (e.g. to share with other fixtures). Call before <see cref="InitializeAsync"/>.</summary>
+    /// <summary>Attach the container to a docker network (e.g. to share with other fixtures). Call before <see cref="Initialize"/>.</summary>
     public RedisFixture WithNetwork(INetwork network, string? alias = null)
     {
         _network = network;
@@ -55,7 +55,7 @@ public sealed class RedisFixture : IAsyncDisposable
         return this;
     }
 
-    public async Task InitializeAsync(CancellationToken ct = default)
+    public async Task Initialize(CancellationToken ct = default)
     {
         var builder = new RedisBuilder(_image ?? DefaultImage)
             .WithPortBinding(InternalPort, assignRandomHostPort: true)
@@ -80,7 +80,7 @@ public sealed class RedisFixture : IAsyncDisposable
     }
 
     /// <summary>Flushes all keys — the between-test reset when the container is reused.</summary>
-    public async Task FlushAsync()
+    public async Task Flush()
     {
         if (_multiplexer is null)
         {
