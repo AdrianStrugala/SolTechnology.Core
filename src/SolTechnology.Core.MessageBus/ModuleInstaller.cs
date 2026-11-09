@@ -1,6 +1,7 @@
 ﻿﻿﻿using Azure.Messaging.ServiceBus;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using SolTechnology.Core.Logging;
 using SolTechnology.Core.MessageBus.Broker;
@@ -48,7 +49,8 @@ namespace SolTechnology.Core.MessageBus
             services.TryAddSingleton<IMessageBusBroker>(sp => new MessageBusBroker(
                 sp.GetRequiredService<IOptions<MessageBusConfiguration>>(),
                 sp.GetRequiredService<MessageBusRegistry>(),
-                sp.GetRequiredKeyedService<ServiceBusClient>(MessageBusClientFactory.ServiceKey)));
+                sp.GetRequiredKeyedService<ServiceBusClient>(MessageBusClientFactory.ServiceKey),
+                sp.GetRequiredService<ILogger<MessageBusBroker>>()));
             services.TryAddSingleton<IMessagePublisher, MessagePublisher>();
 
             services.AddHostedService<MessageBusReceiver>();

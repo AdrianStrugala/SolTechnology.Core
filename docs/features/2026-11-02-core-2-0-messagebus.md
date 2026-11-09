@@ -75,6 +75,13 @@ User decisions (2026-11-02):
 
 Premortem mitigations carried verbatim from core 00: RM-13 (step 03), RM-16 (step 07).
 
+Additional requirement (coordinator, 2026-11-09, after the user asked whether MessageBus handles several instances):
+`MessageBusBroker` provisions entities with check-then-create, so with `CreateResources = true` an instance that
+loses the creation race to another instance got `ServiceBusException` (`MessagingEntityAlreadyExists`, HTTP 409) and
+failed to start. A separate commit after step 04 (`fix(messagebus): tolerate concurrent resource creation`) treats
+that error as success and logs it at Debug; step 06 adds a "Running several instances" section to `docs/Bus.md`. The
+core brief has the matching release-notes input. Non-breaking (`Semver: PATCH`).
+
 MessageBus.Tests gains a `ProjectReference` to `SolTechnology.Core.ServiceBus.Testing` (step 03); testing-kits 02 reuses it. The ServiceBus.Testing kit itself is the testing-kits feature.
 
 ## Scope

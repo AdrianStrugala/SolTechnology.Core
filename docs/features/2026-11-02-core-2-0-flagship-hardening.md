@@ -672,6 +672,11 @@ these notes from the steps:
   (premortem RM-13): a null, empty, or whitespace value, or one that `Azure.Storage.Blobs` cannot parse (for example
   `AccountName=x`), stops the host with `OptionsValidationException` instead of failing at the first `GetConnection`.
   No Blob `P-nn` row exists, so this entry is the record.
+- messagebus (concurrent resource creation, coordinator 2026-11-09): with `CreateResources = true`, several instances
+  that start at once no longer fail when another instance creates the same queue, topic, or subscription between the
+  existence check and the create; the "already exists" error is logged at Debug and start continues. Scale-out
+  guidance (competing consumers, a per-instance subscription for fan-out, at-least-once delivery, idempotent handlers)
+  is in `docs/Bus.md` "Running several instances". Non-breaking.
 
 ### Resolved questions (user answers, 2026-11-02)
 

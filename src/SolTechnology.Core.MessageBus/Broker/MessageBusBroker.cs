@@ -1,6 +1,8 @@
 ﻿﻿using System.Collections.Concurrent;
+using Azure;
 using Azure.Messaging.ServiceBus;
 using Azure.Messaging.ServiceBus.Administration;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using SolTechnology.Core.MessageBus.Configuration;
 
@@ -17,6 +19,7 @@ namespace SolTechnology.Core.MessageBus.Broker
         private readonly MessageBusRegistry _registry;
         private readonly ServiceBusClient _serviceBusClient;
         private readonly ServiceBusAdministrationClient? _managementClient;
+        private readonly ILogger<MessageBusBroker> _logger;
 
         private readonly ConcurrentDictionary<Type, List<ServiceBusSender>> _sendersByType = new();
         private readonly ConcurrentDictionary<Type, ServiceBusProcessor> _processorsByType = new();
@@ -28,15 +31,18 @@ namespace SolTechnology.Core.MessageBus.Broker
         internal MessageBusBroker(
             IOptions<MessageBusConfiguration> options,
             MessageBusRegistry registry,
-            ServiceBusClient serviceBusClient)
+            ServiceBusClient serviceBusClient,
+            ILogger<MessageBusBroker> logger,
+            ServiceBusAdministrationClient? administrationClient = null)
         {
             _configuration = options.Value ?? throw new ArgumentNullException(nameof(options));
             _registry = registry ?? throw new ArgumentNullException(nameof(registry));
             _serviceBusClient = serviceBusClient ?? throw new ArgumentNullException(nameof(serviceBusClient));
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
             if (_configuration.CreateResources)
             {
-                _managementClient = new ServiceBusAdministrationClient(_configuration.ConnectionString);
+                _managementClient = administrationClient ?? new ServiceBusAdministrationClient(_configuration.ConnectionString);
             }
         }
 
@@ -166,30 +172,41 @@ namespace SolTechnology.Core.MessageBus.Broker
             PrefetchCount = Math.Max(0, _configuration.PrefetchCount)
         };
 
-        private async Task EnsureQueueAsync(string queueName, CancellationToken ct)
-        {
-            if (_managementClient is null) return;
-            if (!await _managementClient.QueueExistsAsync(queueName, ct).ConfigureAwait(false))
-            {
-                await _managementClient.CreateQueueAsync(queueName, ct).ConfigureAwait(false);
-            }
-        }
+        private Task EnsureQueueAsync(string queueName, CancellationToken ct) =>
+            CreateIfMissingAsync(
+                admin => admin.QueueExistsAsync(queueName, ct),
+                admin => admin.CreateQueueAsync(queueName, ct),
+                queueName);
 
-        private async Task EnsureTopicAsync(string topicName, CancellationToken ct)
-        {
-            if (_managementClient is null) return;
-            if (!await _managementClient.TopicExistsAsync(topicName, ct).ConfigureAwait(false))
-            {
-                await _managementClient.CreateTopicAsync(topicName, ct).ConfigureAwait(false);
-            }
-        }
+        private Task EnsureTopicAsync(string topicName, CancellationToken ct) =>
+            CreateIfMissingAsync(
+                admin => admin.TopicExistsAsync(topicName, ct),
+                admin => admin.CreateTopicAsync(topicName, ct),
+                topicName);
 
-        private async Task EnsureSubscriptionAsync(string topicName, string subscriptionName, CancellationToken ct)
+        private Task EnsureSubscriptionAsync(string topicName, string subscriptionName, CancellationToken ct) =>
+            CreateIfMissingAsync(
+                admin => admin.SubscriptionExistsAsync(topicName, subscriptionName, ct),
+                admin => admin.CreateSubscriptionAsync(topicName, subscriptionName, ct),
+                $"{topicName}/{subscriptionName}");
+
+        private async Task CreateIfMissingAsync(
+            Func<ServiceBusAdministrationClient, Task<Response<bool>>> exists,
+            Func<ServiceBusAdministrationClient, Task> create,
+            string entityPath)
         {
-            if (_managementClient is null) return;
-            if (!await _managementClient.SubscriptionExistsAsync(topicName, subscriptionName, ct).ConfigureAwait(false))
+            if (_managementClient is null || await exists(_managementClient).ConfigureAwait(false))
             {
-                await _managementClient.CreateSubscriptionAsync(topicName, subscriptionName, ct).ConfigureAwait(false);
+                return;
+            }
+
+            try
+            {
+                await create(_managementClient).ConfigureAwait(false);
+            }
+            catch (ServiceBusException ex) when (ex.Reason == ServiceBusFailureReason.MessagingEntityAlreadyExists)
+            {
+                _logger.LogDebug("Service Bus entity [{Entity}] was created concurrently by another instance", entityPath);
             }
         }
 
