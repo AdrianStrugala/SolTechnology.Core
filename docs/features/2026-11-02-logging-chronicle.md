@@ -53,6 +53,24 @@ and feature acceptance includes a grep for decompiler traces.
 | U7 | Extras, all selected: (1) N+1 detection, (2) level escalation, (3) flight recorder, (4) sampling, (5) OpenTelemetry Activities (BCL `System.Diagnostics` only). |
 | U8 | Performance: near-zero cost when disabled; allocation-conscious hot path; `TimeProvider`; options validated on start. |
 
+### Resync decisions (2026-11-09, pre-approved by the user)
+
+Made while resyncing the plan with the shipped 2.0 libraries (see "Resync with the shipped 2.0
+libraries" under `Implementation plan`). None changes a public symbol (`CH-nn`) or a log template
+(`LC-nn`).
+
+| ID | Decision | Step |
+|---|---|---|
+| R1 | `ChronicleJobFilter` sets `Order = 0`. Hangfire sorts server filters by `Order`, then by scope (`Global` before `Method`), so the Chronicle filter runs after every default-order filter: `CorrelationIdJobFilter`, `SmartRetryJobFilter`, and the method-scoped `PreventOverlapJobFilter`. A run cancelled by the overlap guard opens no root and emits nothing; Hangfire's `Deleted` state already records the skip. A run cancelled by a filter ordered after Chronicle closes `Cancelled` with `Outcome=CanceledByFilter`. Rejected: keeping the default order and logging the skipped run at Debug, because that needs a new emission rule and still opens and closes a root per skipped trigger. | 14 |
+| R2 | The Hangfire root status comes from `PerformedContext`: a failed `Result` (recoverable or not) → `Failed`, recorded as the `Error` runtime type name and `Error.Message` (the error code; `Error` has no code member) plus `Recoverable`; shutdown cancellation and `JobAbortedException` → `Cancelled`; a `JobPerformanceException` is unwrapped to its inner exception. | 14 |
+| R3 | A CQRS event-handler step is `Cancelled` when the handler throws `OperationCanceledException` while the dispatch's token is cancelled (P-26), and the dispatcher's rethrow is kept; later handlers get no step. Any other exception, including a cancellation with an uncancelled token, is `Failed`. | 10 |
+| R4 | The MessageBus root status comes from the settlement: `MessageSettler` returns an internal `MessageSettlement` to the receiver. Dead-lettered unreadable messages record the reason code only, never the description. | 13 |
+| R5 | The Tale step wraps the internal `TaleHandler.Run` (direct and managed runs) and takes its status from the returned `Result<TOutput>`; chapter steps live in `ChapterReader.Read`; a lease takeover is a `Cancelled` chapter (`Outcome=LeaseLost`) and a `Failed` tale (`ConflictError`). | 11 |
+| R6 | Installer budgets: HTTP (142 lines), the Logging middleware (150 lines), Hangfire (130), MessageBus (132), and Tale's engine (133) are close to the 150-line limit, so Chronicle wiring goes into helpers (`ChronicleHTTPHandlerRegistration`, `ChronicleRequestRoot`) and each step checks the line count. | 09, 11–14 |
+| R7 | `Microsoft.Extensions.Diagnostics.Testing` gets one `PackageVersion` in `Directory.Packages.props` (central package management, flagship core 09), added by step 04; test projects reference it without a version. | 04, 07, 10–14, 16 |
+| R8 | EventId 2147 (`RequestFinishedWithTimings`) is deleted with `ITimingService` and not reused; with `Enabled = false` the middleware keeps 2144–2146. | 09, 15, 17 |
+| R9 | Step 15 excludes `docs/architecture/` from its `ITimingService` doc grep, because `docs/architecture/logging.md` describes the shipped `ITimingService` until step 17 rewrites it; step 17 runs the grep without that exclusion. | 15, 17 |
+
 ### Current state (verified 2026-11-02 against `master@a0a9bbc6`; re-verified by the plan review at `497b21f3`)
 
 - `src/SolTechnology.Core.Logging/ITimingService.cs` is public: `StartContext(string)`,
@@ -368,6 +386,9 @@ Integration types are internal: `ChronicleHTTPHandler`, `ChronicleHTTPAttemptHan
   `OperationFailedWithResult`), and 2150–2153 (Hangfire start-up logs, `2026-11-02-core-2-0-hangfire`). The plan
   reserved 2150/2151 until Hangfire, which shipped first, took them on 2026-11-09. Steps 04 and 09 check uniqueness
   with a grep.
+- Resync 2026-11-09: the request entries that LC-01/LC-02 replace now have EventIds: 2146 "Finished request", 2147
+  "Finished request … timings" (deleted with `ITimingService`, id retired, R8), 2145 "failed after", and 2144
+  "aborted by client". With `Enabled = false`, 2144–2146 remain. 2141–2143 and 2148 are unchanged.
 
 ### Open questions (resolved 2026-11-02)
 
@@ -444,7 +465,11 @@ is fresh.
   `builder.Logging.AddSerilog()`. With `writeToProviders`, Serilog's own `MinimumLevel` must admit
   Debug. Serilog destructures `{@Chronicle}` as a structure capped by `MaximumDestructuringDepth`
   (default 10), not as the ASCII tree.
-- `CH-nn`, `CP-nn`, and `LC-nn` tables above, as amended by `Deviations`.
+- `CH-nn`, `CP-nn`, and `LC-nn` tables above, as amended by `Deviations`. These prefixes are Chronicle's own,
+  so they never collide with the flagship's `C-nn`/`P-nn`/`L-nn` rows (maxima on 2026-11-09: `C-33`, `P-29`,
+  `L-07`); Chronicle reserves no `C`/`P`/`L` number.
+- Hangfire hosts: a recurring job that returns a failed `Result` gets an Error 2154 report with
+  `ChronicleStatus = Failed`, although Hangfire records `Succeeded` for a non-recoverable failure.
 
 ## Scope
 
@@ -515,6 +540,53 @@ Testing conventions for every step:
   `FakeLogRecord.Message`, and never cast a state value to `ChronicleReport`. Only Logging.Tests
   reads the `ChronicleReport` object, through a test-local `StateCapturingLoggerProvider` that
   keeps the original `TState`.
+
+### Resync with the shipped 2.0 libraries (2026-11-09)
+
+The plan was written and premortem'd before the 13 library features shipped. All of them are
+`completed` now, so every cross-feature dependency in the merge-order table is done except the
+flagship items still open (core 06 in progress, core 11 retrospective) and the showcase steps that
+steps 09 and 16 wait for. The step files were compared with `master@c30d8998` and
+`docs/architecture/*.md`; the "Current state" section above stays as the 2026-11-02 record.
+
+| Area | Drift at `c30d8998` | Fixed in |
+|---|---|---|
+| Summary | 11 titles in `summary.md` differed from the step files' own titles. | `summary.md` |
+| Hangfire filter order | `PreventOverlapJobFilter` is method-scoped and runs after global filters, so a default-order Chronicle filter would open a root before the overlap guard cancels the run. | 14 (R1) |
+| Hangfire outcome | `IJob.Execute` returns `Task<Result>` (`C-19`); a failed `Result` is returned, so exception-based mapping reported `Ok`. Job exceptions arrive wrapped in `JobPerformanceException`; shutdown cancellation is rethrown as is. | 14 (R2) |
+| Hangfire installer | Filters are registered in the private `AddSolJobFilters()`; restore pattern now clears through `ICorrelationIdService.Clear()` (P-27). | 14 |
+| CQRS | `EventDispatcher` stops and rethrows on a cancelled dispatch (P-26); the CQRS `ActivitySource` lives in `PipelineBehaviors/OperationsActivitySource.cs`, not in a field. | 10 (R3) |
+| EventIds | 2141–2148 (Logging envelope), 2149 (CQRS), 2150–2153 (Hangfire) are taken; 2154/2155 are free and used consistently in the brief and steps 04, 09, 15. The finish entries carry EventIds now. | LC note above, 04, 09, 15 (R8) |
+| `ITimingService` | Still shipped: public `ITimingService.cs`, internal `TimingService.cs`, registered scoped in `LoggingServiceRegistrations.RegisterCore` (both `AddSolLogging` overloads, not only the `Action` one), consumed by `LoggingMiddleware.InvokeAsync` and `RequestEnvelopeLogger.RequestFinished` (2147), five Logging test files, DreamTravel `FindCityByNameHandler`, `docs/Log.md`, and `docs/architecture/logging.md`. | 09, 15, 17 (R9) |
+| Logging middleware | `LoggingMiddleware.cs` is exactly 150 lines; the 2155 template must take `PathString` like 2143–2146. | 09 (R6) |
+| HTTP | Handler chain in `AddSolHTTPClientInternal`; `CorrelationPropagatingHandler` is optional (`propagateCorrelation`); installer at 142 lines; `HttpRequestFailedException` is thrown by `RequestBuilder` outside the handler chain; POST/PATCH not retried after exceptions (P-10). | 12 (R6) |
+| SQL | `SQL.Tests` already references `SQL.Testing` through the shared `SQLTestEnvironment`; connection-open retry (up to about 40 s) is invisible to command events; `Microsoft.Identity.Client` pin is unrelated. | 07, 15 |
+| MessageBus | Receiver is internal (`C-14`, guard satisfied); settlement moved to `MessageSettler`, which hides the outcome from the receiver; `HandlerFailedMaxDelivery` dead-letters on the last delivery (P-17); `ModuleInstallerTests` was split. | 13 (R4) |
+| Tale | The run entry is `TaleHandler.Run` in `TaleHandler.Run.cs`; chapters run through `TaleEngine.ExecuteChapter` → `ChapterReader.Read`; the lease heartbeat can cancel a chapter (`ConflictError`). | 11 (R5) |
+| Auth rename (`C-28`) | No Chronicle step references `SolTechnology.Core.Authentication`; `ExceptionFilter` still sets `ExceptionHandled`, and `ResultConversionFilter` is a second 5xx-without-exception source for CRM-5. | 09 |
+| Testing kits (`C-23`, `C-24`, P-11) | `SQLFixture.Initialize`, `APIFixture<T>(configuration, configureServices)`, and strict WireMock matching. | 07, 16 |
+| Packages | Central package management (flagship core 09): test-only versions go into `Directory.Packages.props`. | 04 and every test-project edit (R7) |
+| Correlation vs trace id | Logging L1: `CorrelationId` equals the Activity trace id only for requests with trace context. | 05 |
+
+CRM mitigations to re-check at implementation (the drift does not remove any of them):
+
+- CRM-1 → 07, 14: also covers Hangfire's process-wide `GlobalJobFilters` (PA-5).
+- CRM-2 → 14: the later test filter must use `Order = 1` now that the Chronicle filter has `Order = 0`.
+- CRM-5 → 09: add `ResultConversionFilter` as a trigger next to `ExceptionFilter`.
+- CRM-7 → 15: the 1.x entries had no EventId; the 2.0 entries have 2144–2147, so the table needs three columns.
+
+#### Premortem addendum (2026-11-09)
+
+Not a new premortem: only risks that the shipped libraries introduced into the plan. Verdict
+unchanged (go with mitigations).
+
+| # | Risk | Mitigation → step |
+|---|---|---|
+| PA-1 | A recurring job's failed `Result` is reported `Ok`, because the planned mapping only looked at exceptions; Hangfire also shows a non-recoverable failure as `Succeeded`, so the failure would be invisible in both places. | R2: map `PerformedContext.Result`; tests through a real performer → 14 |
+| PA-2 | With the default filter order every trigger skipped by the overlap guard opens and closes a root, so a long job writes a Warning 2154 per cron tick. | R1: `Order = 0`; real-performer test with the overlap lock held → 14 |
+| PA-3 | A Hangfire shutdown that requeues an event dispatch (P-26) is reported `Failed` at Error, and every job failure is reported as `JobPerformanceException`. | R2 and R3: `Cancelled` on shutdown or abort, unwrap the inner exception → 10, 14 |
+| PA-4 | MessageBus and Tale outcomes are hidden behind the 2.0 seams (`MessageSettler`, lease takeover), so roots would default to `Ok` or `Failed` by guess. | R4, R5: internal settlement result, explicit lease-loss mapping → 11, 13 |
+| PA-5 | `UseFilter` writes to Hangfire's static `GlobalJobFilters`, which keeps one filter instance per type: with several hosts in one process, a job root may be owned by another host's recorder, and a disposed host's recorder may stay installed. | Same exposure as `CorrelationIdJobFilter`; re-check against CRM-1 at implementation, tests reset through `HangfireGlobalState.Reset` → 14 |
 
 ### Plan review (2026-11-02)
 

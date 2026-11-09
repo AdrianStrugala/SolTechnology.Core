@@ -14,6 +14,9 @@ retrospective. Each step also waits for the cross-feature steps listed in the br
 (`CH-01`…`CH-11`) and OQ-2 (`LC-01`…`LC-05`) were answered by the user on 2026-11-02; no step is
 `blocked`. The premortem (step `00`) runs in a separate session.
 
+Resynced with the shipped 2.0 libraries on 2026-11-09 (steps 04, 05, 07, 09–17 edited; decisions
+R1–R9 and premortem addendum PA-1…PA-5 in the brief). The verdict above stands.
+
 ## Steps
 
 | # | Title | File | Status |

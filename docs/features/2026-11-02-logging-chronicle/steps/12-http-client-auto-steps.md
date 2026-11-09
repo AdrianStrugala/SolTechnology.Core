@@ -17,8 +17,9 @@ also catches chatty HTTP. This is a logical span around HttpClient's own physica
 ## Affected components
 - `src/SolTechnology.Core.HTTP/Handlers/ChronicleHTTPHandler.cs` — NEW — `internal sealed class ChronicleHTTPHandler(IChronicle chronicle, string clientName) : DelegatingHandler`
 - `src/SolTechnology.Core.HTTP/Handlers/ChronicleHTTPAttemptHandler.cs` — NEW — `internal sealed class ChronicleHTTPAttemptHandler : DelegatingHandler`; increments the attempt counter for every attempt
-- `src/SolTechnology.Core.HTTP/ModuleInstaller.cs` — EDIT — `AddSolHTTPClient` overloads call `services.AddSolChronicle()` (CP-03); `AddHttpMessageHandler(sp => new ChronicleHTTPHandler(sp.GetRequiredService<IChronicle>(), httpClientName))` before `CorrelationPropagatingHandler`; `AddHttpMessageHandler<ChronicleHTTPAttemptHandler>()` after `AddResilienceHandler`. If `2026-11-02-core-2-0-http` step "Guide conformance — HTTP" moved the handler chain into an installer helper file, edit that file instead and list it under `Deviations`.
-- `tests/SolTechnology.Core.HTTP.Tests/SolTechnology.Core.HTTP.Tests.csproj` — EDIT — `PackageReference Microsoft.Extensions.Diagnostics.Testing` (same version as step 04)
+- `src/SolTechnology.Core.HTTP/ModuleInstaller.cs` — EDIT — the private `AddSolHTTPClientInternal`, shared by both `AddSolHTTPClient` overloads, calls `services.AddSolChronicle()` (CP-03), adds the outer handler right after `AddHttpClient`, before the optional `CorrelationPropagatingHandler` (`propagateCorrelation`, default `true`), and adds the attempt handler right after `AddResilienceHandler($"core-http-{httpClientName}", …)`. The file is 142 lines at `c30d8998`, so the registration code lives in a helper and the installer stays ≤ 150 lines.
+- `src/SolTechnology.Core.HTTP/Handlers/ChronicleHTTPHandlerRegistration.cs` — NEW — `internal static`: `AddChronicleCallHandler(IHttpClientBuilder, string httpClientName)` (`AddHttpMessageHandler(sp => new ChronicleHTTPHandler(sp.GetRequiredService<IChronicle>(), httpClientName))`) and `AddChronicleAttemptHandler(IHttpClientBuilder)` (`TryAddTransient` + `AddHttpMessageHandler<ChronicleHTTPAttemptHandler>()`)
+- `tests/SolTechnology.Core.HTTP.Tests/SolTechnology.Core.HTTP.Tests.csproj` — EDIT — `PackageReference Microsoft.Extensions.Diagnostics.Testing` (version from `Directory.Packages.props`, added by step 04)
 - `tests/SolTechnology.Core.HTTP.Tests/ChronicleHTTPStepTests.cs` — NEW — `RichardSzalay.MockHttp` as the primary handler (already referenced)
 - `tests/SolTechnology.Core.HTTP.Tests/ModuleInstallerTests.cs` — EDIT
 
@@ -28,9 +29,16 @@ also catches chatty HTTP. This is a logical span around HttpClient's own physica
 - Outcome mapping:
   - 2xx–4xx response → `Ok` (4xx is often expected; the status is visible as `StatusCode`).
   - 5xx final response → `Fail($"HTTP{statusCode}")`.
-  - Exception (including `HttpRequestFailedException`, timeouts, and broken circuits) → `Fail(exception)`.
+  - Exception inside the handler chain (`HttpRequestException`, Polly `TimeoutRejectedException` from the per-attempt or total timeout, `BrokenCircuitException`) → `Fail(exception)`.
+  - `HttpRequestFailedException` is not seen here: `RequestBuilder` throws it after the response has
+    passed the handler chain (`RequestBuilder.BodyCapture.cs`), so the call's step is already
+    closed as `Failed` (`HTTP{statusCode}`) or `Ok` (4xx).
   - Caller cancellation (`OperationCanceledException` with the caller token cancelled) → `Cancel()`.
 - Outside a root, `chronicle.Step` returns a no-op handle; the handlers add no allocation beyond the `StrongBox` (allocated only when the step is recording).
+- Attempts follow the 2.0 retry rules: POST and PATCH are not retried after an exception or timeout
+  (P-10), zero retries leaves the retry strategy out, and `UsePolly = false` runs no strategy, so
+  those calls report `Attempts=1`.
+- Clients registered with `propagateCorrelation: false` still get both Chronicle handlers.
 - Tests (`FakeLogCollector`; tree assertions on `FakeLogRecord.Message`):
   - `Send_InsideRoot_RecordsOneStepWithMethodClientHostAndStatus`.
   - `Send_TransientFailureThenSuccess_OneStepWithAttempts2`.
@@ -38,6 +46,8 @@ also catches chatty HTTP. This is a logical span around HttpClient's own physica
   - `Send_404_StepOkWithStatusCode404`.
   - `Send_CallerCancelled_StepCancelled`.
   - `Send_Timeout_StepFailed`.
+  - `Send_PostAfterTimeout_StepFailedWithAttempts1` (P-10).
+  - `Send_PropagateCorrelationFalse_StillRecordsStep`.
   - `Send_PathAndQuery_NeverRecorded`.
   - `Send_OutsideRoot_RecordsNothing`.
   - `Send_FortyTwoCallsSameClient_AggregatedWithNPlusOneHint`.
@@ -46,6 +56,7 @@ also catches chatty HTTP. This is a logical span around HttpClient's own physica
 ## Acceptance criteria
 - [ ] `dotnet test tests/SolTechnology.Core.HTTP.Tests` is green.
 - [ ] `grep -rn "RequestUri" src/SolTechnology.Core.HTTP/Handlers/ChronicleHTTPHandler.cs | grep -v "Host"` prints nothing.
+- [ ] `wc -l < src/SolTechnology.Core.HTTP/ModuleInstaller.cs` prints ≤ 150.
 - [ ] `dotnet build SolTechnology.Core.slnx` is green, and `cd sample-tale-code-apps/DreamTravel && dotnet build` is green.
 - [ ] Premortem mitigations for `ModuleInstaller.cs` (step 00) are applied.
 

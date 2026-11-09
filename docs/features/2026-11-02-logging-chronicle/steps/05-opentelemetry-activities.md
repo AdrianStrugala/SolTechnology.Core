@@ -24,7 +24,10 @@ their spans. Attributes become tags. Status maps to `ActivityStatusCode`.
 
 ## Changes
 - The activity name is the step name. The root report carries `TraceId` from `Activity.Current`
-  at root start.
+  at root start. Since the 2.0 logging work (`CorrelationId.FromRequest`, logging code review L1) a
+  request's `CorrelationId` equals the Activity trace id only when the request carried trace
+  context; otherwise it is the inbound `X-Correlation-Id`. The report therefore keeps `TraceId` as
+  its own field, and the correlation id reaches the entry through the log scope.
 - Tests (an `ActivityListener` filtered on `OperationsName` with `AllDataAndRecorded`):
   - `Step_WithListener_StartsActivityWithParentChain`.
   - `Step_WithoutListener_StartsNoActivity`.

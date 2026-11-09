@@ -27,8 +27,8 @@ plan review (brief, Current state).
 - `src/SolTechnology.Core.Logging/Chronicles/ChronicleOptions.cs` — EDIT — `CaptureSQLCommands` (`true`), `CaptureSQLCommandText` (`false`) (CH-04)
 - `src/SolTechnology.Core.Logging/Chronicles/ChronicleServiceRegistrations.cs` — EDIT — `TryAddEnumerable` hosted service
 - `tests/SolTechnology.Core.Logging.Tests/Chronicles/ChronicleSQLClientObserverTests.cs` — NEW — synthetic `new DiagnosticListener("SqlClientDiagnosticListener")` writing `KeyValuePair<string, object>` lists shaped like the 7.x payloads (`OperationId`, `Command` = NSubstitute `IDbCommand`, `Exception`); each test disposes its subscription in `TearDown` (the `AllListeners` subscription is process-wide)
-- `tests/SolTechnology.Core.SQL.Tests/SolTechnology.Core.SQL.Tests.csproj` — EDIT — `ProjectReference ..\..\src\SolTechnology.Core.Logging\SolTechnology.Core.Logging.csproj` (test-only); `PackageReference Microsoft.Extensions.Diagnostics.Testing` (same version as step 04)
-- `tests/SolTechnology.Core.SQL.Tests/ChronicleSQLIntegrationTests.cs` — NEW — `SQLFixture` with the MSSQL engine (the `SQL.Testing` reference is added by `2026-11-02-core-2-0-sql` step "SQL — `Begin` on `IUnitOfWork`"); builds a `ServiceProvider` with `AddSolChronicle()` and calls `StartAsync` on the registered `IHostedService`s, because the subscription lives in a hosted service
+- `tests/SolTechnology.Core.SQL.Tests/SolTechnology.Core.SQL.Tests.csproj` — EDIT — `ProjectReference ..\..\src\SolTechnology.Core.Logging\SolTechnology.Core.Logging.csproj` (test-only); `PackageReference Microsoft.Extensions.Diagnostics.Testing` (version from `Directory.Packages.props`, added by step 04)
+- `tests/SolTechnology.Core.SQL.Tests/ChronicleSQLIntegrationTests.cs` — NEW — uses the shared SQL Server container of `SQLTestEnvironment.Database()` (`SQLFixture`, default `SQLProvider.SQLServer`; `SQL.Tests` already references `SQL.Testing`); builds a `ServiceProvider` like `SQLTestEnvironment.BuildProvider()` plus `AddSolChronicle()` and calls `StartAsync` on the registered `IHostedService`s, because the subscription lives in a hosted service
 
 ## Changes
 - Pairing: a `ConditionalWeakTable<object, PendingSQLStep>` keyed by the command object
@@ -54,6 +54,13 @@ plan review (brief, Current state).
 - With `CaptureSQLCommandText`, the attribute `Statement` holds the text cut to
   `MaxAttributeValueLength`. `Error` → `Fail(exceptionType, message)`.
 - Logging still has no `ProjectReference` (cycle guard).
+- Connection retry (2.0 SQL, `docs/architecture/infrastructure-modules.md` "Connections and
+  retry"): `ISQLConnectionFactory.CreateConnection()` opens synchronously and retries a transient
+  `SqlException` up to three times with about 40 seconds of delays. Opens are not command events,
+  so that time shows as a gap inside the parent step, not as a `SQL` step. Step 15 documents it.
+- `Microsoft.Identity.Client` (pinned for DacFx) and the absent MSAL in SqlClient 7 do not affect
+  the command events; the integration test stays the binding evidence for `Microsoft.Data.SqlClient`
+  7.0.1 (`Directory.Packages.props`).
 - Tests:
   - `Before_After_InsideRoot_RecordsLeafStep`.
   - `Error_RecordsFailedStep`.

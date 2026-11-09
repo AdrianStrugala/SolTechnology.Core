@@ -16,7 +16,7 @@ it adds sections rather than rewriting pages. Architecture pages are not touched
 retrospective (step 17) updates them.
 
 ## Affected components
-- `docs/Log.md` — EDIT — NEW `### Chronicle` section; update "What ships in DI", "OpenTelemetry", and "Operation lifecycle events"
+- `docs/Log.md` — EDIT — NEW `### Chronicle` section; update "What ships in DI", "OpenTelemetry", "Operation lifecycle events", the EventId table, the request-envelope sample entry, and the "Features" bullets; remove the `ITimingService` section if step 09 left anything
 - `docs/CQRS.md` — EDIT — `#### Chronicle` subsection
 - `docs/Tale.md` — EDIT — `#### Chronicle` subsection; the new Logging package dependency (CP-01)
 - `docs/Clients.md` — EDIT — `#### Chronicle` subsection
@@ -32,7 +32,7 @@ retrospective (step 17) updates them.
   - Options table: every `ChronicleOptions` and `ChronicleFlightRecorderOptions` property with default, range, and `appsettings` path `Logging:Core:Chronicle`.
   - `AddSolChronicle(IConfiguration)` or `AddSolLogging(IConfiguration)` is needed for `appsettings` binding; the parameterless calls made by other installers use defaults.
   - Levels, tail sampling (failures, slow, and N+1 always kept), N+1 hint, truncation markers.
-  - EventIds table: 2154 `ChronicleReported`, 2155 `RequestChronicleReported`, and the unchanged 2137–2140.
+  - EventIds table: 2154 `ChronicleReported`, 2155 `RequestChronicleReported`, the unchanged 2137–2140, the request envelope 2141–2148 (2144–2146 only with `Enabled = false`; 2147 removed), and pointers to CQRS 2149 and Hangfire 2150–2153.
   - KQL example filtering on `ChronicleStatus` and `ElapsedMs`; `Chronicle` is tree text in OTel and App Insights (B6).
   - Silencing 2137–2139 through the `SolTechnology.Core.CQRS.PipelineBehaviors.LoggingPipelineBehavior` category level.
   - Flight recorder: opt-in, failed roots only, Serilog needs `writeToProviders: true` or `builder.Logging.AddSerilog()`; with `writeToProviders`, Serilog's `MinimumLevel` must admit Debug.
@@ -46,8 +46,9 @@ retrospective (step 17) updates them.
 - `docs/Tale.md`: `Tale {Handler}` and `Chapter {ChapterId}` steps; outcome mapping; interactive input never recorded.
 - `docs/Clients.md`: `HTTP {Method} {client}` steps, `Attempts`, `StatusCode`, `Host`; path and query never recorded; 4xx is `Ok`, 5xx is `Failed`.
 - `docs/SQL.md`: SqlClient commands captured from `SqlClientDiagnosticListener` for Dapper, EF Core, and raw `SqlConnection`; `CaptureSQLCommandText` is off by default because statements can contain PII; other providers are not captured.
-- `docs/Bus.md`: one root per message; settlement → status mapping; body never recorded.
-- `docs/Hangfire.md`: one root per job; `UseSolFilters(sp)` is required; recurring-job and persistent-event names.
+- `docs/SQL.md` also: connection-open retries (up to about 40 seconds) are not SQL steps and show as a gap in the parent step.
+- `docs/Bus.md`: one root per message; settlement → status mapping (completed, complete failed, abandoned, dead-lettered with its reason code, shutdown); body never recorded.
+- `docs/Hangfire.md`: one root per job; `UseSolFilters(sp)` is required; recurring-job and persistent-event names; a failed `Result` (recoverable or not) is a `Failed` report although Hangfire shows `Succeeded` or a retry; a run skipped by the overlap guard has no report (it shows as `Deleted`); a dispatch stopped by shutdown is `Cancelled` and its rerun has its own report.
 - Premortem mitigations (step 00, 2026-11-02):
   - CRM-3 (`docs/Log.md`): the 32,768-char report budget and the `+{n} lines truncated` marker;
     with OTel `IncludeFormattedMessage = true`, the tree is exported as both the body and the
@@ -58,7 +59,10 @@ retrospective (step 17) updates them.
   - CRM-7 (`docs/Log.md`): a `Log contract changes in 2.0` table. It maps each 1.x entry
     ("Finished request" with and without `{@Timings}`, "failed after", "aborted by client":
     template, level, EventId) to its 2.0 replacement, with a before/after KQL pair, the
-    slow-request Warning, and the `SlowThreshold` knob.
+    slow-request Warning, and the `SlowThreshold` knob. Re-check at implementation: the 2.0
+    logging work gave these entries EventIds 2146, 2147, 2145, and 2144 (1.x logged them without
+    an EventId), so the table has a 1.x column, a "2.0, Chronicle disabled" column, and a
+    "2.0, Chronicle enabled" (2155) column.
   - CRM-8 (`docs/Log.md`): flight-recorder worst-case memory (`MaxEntries × MaxMessageLength ×
     2 bytes × concurrent roots`); inside roots, `IsEnabled(Debug)`-guarded code runs; a Serilog
     example with per-sink `restrictedToMinimumLevel: Information`.
@@ -75,7 +79,7 @@ retrospective (step 17) updates them.
 
 ## Acceptance criteria
 - [ ] `grep -c "^### Chronicle" docs/Log.md` prints `1`.
-- [ ] `grep -rln "ITimingService" docs --include=*.md | grep -v "docs/features/"` prints only `docs/Log.md`, and every match there lies under `#### Migrating from ITimingService (1.x)`.
+- [ ] `grep -rln "ITimingService" docs --include=*.md | grep -v "docs/features/\|docs/architecture/"` prints only `docs/Log.md`, and every match there lies under `#### Migrating from ITimingService (1.x)`. `docs/architecture/logging.md` still describes `ITimingService` until step 17 updates it.
 - [ ] `grep -l "Chronicle" docs/CQRS.md docs/Tale.md docs/Clients.md docs/SQL.md docs/Bus.md docs/Hangfire.md | wc -l` prints `6`.
 - [ ] The sample tree in `docs/Log.md` is byte-identical to the golden string in `tests/SolTechnology.Core.Logging.Tests/Chronicles/ChronicleTreeRendererTests.cs`.
 - [ ] `git grep -niE "decompil|ilspy|dotpeek" -- docs ':!docs/features/2026-11-02-logging-chronicle*'` prints nothing (clean room).

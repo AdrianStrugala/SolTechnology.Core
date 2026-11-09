@@ -23,14 +23,15 @@ failure, Warning when cancelled or slower than `SlowThreshold`, and Information 
 - `src/SolTechnology.Core.Logging/Chronicles/ChronicleOptions.cs` — EDIT — `SlowThreshold` (`TimeSpan`, 1 s), `SampleRate` (`double`, 1.0) (CH-04)
 - `src/SolTechnology.Core.Logging/Chronicles/ChronicleOptionsValidator.cs` — EDIT — `SlowThreshold > TimeSpan.Zero`, `0 <= SampleRate <= 1`
 - `src/SolTechnology.Core.Logging/Chronicles/ChronicleServiceRegistrations.cs` — NEW — internal; idempotent `TryAdd*`: `IChronicle` → `ChronicleRecorder` (singleton), `IChronicleRootListener` → `ChronicleReporter` (`TryAddEnumerable`), `IValidateOptions<ChronicleOptions>` → `ChronicleOptionsValidator`, `AddOptions<ChronicleOptions>().ValidateOnStart()`, `TimeProvider.System`
-- `src/SolTechnology.Core.Logging/ModuleInstaller.cs` — EDIT — `extension(IServiceCollection services)`: `AddSolChronicle(Action<ChronicleOptions>? configure = null)`, `AddSolChronicle(IConfiguration configuration)` binding `ChronicleOptions.SectionName` (CH-07); stays ≤ 150 lines
-- `src/SolTechnology.Core.Logging/LoggingServiceRegistrations.cs` — EDIT (created by `2026-11-02-core-2-0-logging` step "Guide conformance — Logging") — the shared path of both `AddSolLogging` overloads calls the Chronicle registrations; the `IConfiguration` overload binds `Logging:Core:Chronicle`
-- `tests/SolTechnology.Core.Logging.Tests/SolTechnology.Core.Logging.Tests.csproj` — EDIT — `PackageReference Microsoft.Extensions.Diagnostics.Testing` (version via the `package-management` skill)
+- `src/SolTechnology.Core.Logging/ModuleInstaller.cs` — EDIT — `extension(IServiceCollection services)`: `AddSolChronicle(Action<ChronicleOptions>? configure = null)`, `AddSolChronicle(IConfiguration configuration)` binding `ChronicleOptions.SectionName` (CH-07); stays ≤ 150 lines (125 at `c30d8998`)
+- `src/SolTechnology.Core.Logging/LoggingServiceRegistrations.cs` — EDIT — `RegisterCore`, the shared path of both `AddSolLogging` overloads (it already registers `ICorrelationIdService`, `TimeProvider.System`, and `ITimingService`), calls the Chronicle registrations; the `IConfiguration` overload of `AddSolLogging` also binds `Logging:Core:Chronicle`
+- `Directory.Packages.props` — EDIT — `PackageVersion Microsoft.Extensions.Diagnostics.Testing` (version via the `package-management` skill; the repository uses central package management since flagship core 09, so every test project below references the package without a version). Test-only, so no `CLAUDE.md §2` gate.
+- `tests/SolTechnology.Core.Logging.Tests/SolTechnology.Core.Logging.Tests.csproj` — EDIT — `PackageReference Microsoft.Extensions.Diagnostics.Testing` (no version)
 - `tests/SolTechnology.Core.Logging.Tests/Chronicles/ChronicleReporterTests.cs` — NEW
 - `tests/SolTechnology.Core.Logging.Tests/Chronicles/StateCapturingLoggerProvider.cs` — NEW — test-only `ILoggerProvider` that keeps the original `TState` (`IReadOnlyList<KeyValuePair<string, object?>>`); `FakeLogger` stringifies state values, so it cannot prove B6
 - `tests/SolTechnology.Core.Logging.Tests/Chronicles/ChronicleEmissionPolicyTests.cs` — NEW
 - `tests/SolTechnology.Core.Logging.Tests/ModuleInstallerTests.cs` — EDIT
-- `tests/SolTechnology.Core.Logging.Tests/ModuleResolutionTests.cs` — EDIT (created by `2026-11-02-core-2-0-logging` step "DI resolution test — Logging") — `IChronicle` resolves with `ValidateOnBuild` and `ValidateScopes`
+- `tests/SolTechnology.Core.Logging.Tests/ModuleResolutionTests.cs` — EDIT — `IChronicle` resolves with `ValidateOnBuild` and `ValidateScopes`
 
 ## Changes
 - Status string in the template: `Ok`, `Failed`, `Cancelled` (`ChronicleStepStatus.ToString()`).
@@ -87,7 +88,7 @@ failure, Warning when cancelled or slower than `SlowThreshold`, and Information 
 
 ## Acceptance criteria
 - [ ] `dotnet test tests/SolTechnology.Core.Logging.Tests` is green.
-- [ ] `grep -rnE "EventId = 2154" src --include=*.cs | wc -l` prints `1`, and no other `[LoggerMessage]` in `src` uses 2154.
+- [ ] `grep -rnE "EventId = 2154" src --include=*.cs | wc -l` prints `1`, and no other `[LoggerMessage]` in `src` uses 2154 (2137–2148 Logging, 2149 CQRS, and 2150–2153 Hangfire are taken).
 - [ ] `wc -l < src/SolTechnology.Core.Logging/ModuleInstaller.cs` prints ≤ 150.
 - [ ] `dotnet build SolTechnology.Core.slnx` is green.
 - [ ] Premortem mitigations for `ModuleInstaller.cs` (step 00) are applied.
