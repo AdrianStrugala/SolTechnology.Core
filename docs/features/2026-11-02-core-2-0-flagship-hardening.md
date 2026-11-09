@@ -448,6 +448,7 @@ becomes `SolTechnology.Core.Auth` in 2.0, because authorization joins the packag
 | C-28 | Authentication → Auth (user, 2026-11-03) | NuGet `PackageId`, `AssemblyName`, project `src/SolTechnology.Core.Authentication/SolTechnology.Core.Authentication.csproj` → `src/SolTechnology.Core.Auth/SolTechnology.Core.Auth.csproj`, test project `tests/SolTechnology.Core.Authentication.Tests` → `tests/SolTechnology.Core.Auth.Tests`, and namespace `SolTechnology.Core.Authentication` → `SolTechnology.Core.Auth`; `ModuleInstaller.AddSolAuthentication(IServiceCollection, AuthenticationConfiguration)` → `AddSolAuth(IServiceCollection, AuthConfiguration)`, the one entry for authentication and authorization; `AuthenticationConfiguration` → `AuthConfiguration`; `ApiKeyAuthenticationHandler` and `ApiKeyAuthenticationSchemeOptions` keep their names (`C-21` still applies). The 1.x ID is deprecated on nuget.org with the alternative `SolTechnology.Core.Auth` (release 05, manual owner action). | api-auth 01 |
 | C-29 | Tale (additive, user D1, 2026-11-03) | NEW `TaleInstance.LeaseExpiresAt` (`DateTimeOffset?`, UTC), the persisted expiry of a `Running` tale's lease; `TaleOptions.RunningLeaseTimeout` (added by the tale post-completion fix T5) now accepts 1 second to 49 days | tale post-completion fix T7 |
 | C-32 | Hangfire (additive, user, 2026-11-09) | NEW `RecurringJobsOptions` with `bool RemoveStaleRecurringJobs` (default `false`), set through `services.Configure<RecurringJobsOptions>(...)`; turns on the removal of recurring jobs this application no longer registers | hangfire code review |
+| C-33 | HTTP.Testing (additive, code review 2026-11-09) | NEW `WireMockFixture.Initialize(WireMockServerSettings settings)`; `Initialize(int port = 0)` delegates to it with `WireMockStartup.DefaultSettings(port)`. The fixture's opt-out from strict matching (P-11) | testing-kits code review |
 | C-25 | Guards, Scheduler | **Rejected (Q1, user, 2026-11-02).** Was: DELETE projects `src/SolTechnology.Core.Guards`, `src/SolTechnology.Core.Scheduler`, `tests/SolTechnology.Core.Guards.Tests` (all public symbols) | — (step removed) |
 
 **Not planned** (recorded so the omission is deliberate, per `naming-and-public-api.md`):
@@ -472,7 +473,7 @@ parameter; `UntilAsync`, `CheckHealthAsync`, `InvokeAsync`, `StartAsync`/`StopAs
 | P-08 | `AuidJsonConverter` throws `JsonException` on invalid input; empty string no longer becomes `Auid.Empty` | Error type at deserialization | auid 02 |
 | P-09 | The `ProblemDetails.title` of every mapped exception is a fixed text (5xx: fixed texts; 4xx: the HTTP reason phrase, amended by the api-auth code review 2026-11-04); `HttpRequestFailedException.Message` has no query string | Clients that parsed the title | api-auth 03, api-auth code review fixes |
 | P-10 | POST/PATCH not retried after an exception or timeout | Fewer retries for unsafe verbs | http 02 |
-| P-11 | `WireMockStartup` `AllowPartialMapping` defaults to `false` | Loose tests start failing (intended) | testing-kits 01 |
+| P-11 | `WireMockStartup` `AllowPartialMapping` defaults to `false` | Loose tests start failing (intended); opt out with `WireMockFixture.Initialize(settings)` (`C-33`) or `WireMockStartup.Run(settings)` and `AllowPartialMapping = true` | testing-kits 01, testing-kits code review |
 | P-12 | `TaleController` serves only handlers opted in via `ExposeOverHttp<T>()` | Endpoints that worked implicitly return 404 | tale 11 |
 | P-13 | `SolTechnology.Core` no longer brings `Microsoft.Extensions.*` transitively | Consumers relying on the transitive reference must add it | core 07 |
 | P-14 | Inbound `X-Correlation-Id` outside `[A-Za-z0-9._:-]` is replaced | Clients sending such IDs see a new ID | logging 04 |
@@ -742,8 +743,9 @@ these notes from the steps:
   and receiver registration threw "already registered". No public API change.
 - testing-kits 01 (P-11, [`2026-11-02-core-2-0-testing-kits`](2026-11-02-core-2-0-testing-kits.md)): `WireMockStartup`
   and `WireMockFixture` match strictly, so a request that misses any matcher of a stub gets 404 instead of the closest
-  stub's response; pass `WireMockStartup.DefaultSettings()` with `AllowPartialMapping = true` to `Run(settings)` to go
-  back. WireMock splits query values on commas, so a `WithParam` value that contains a comma never matches strictly:
+  stub's response. To go back, start from `WireMockStartup.DefaultSettings()` with `AllowPartialMapping = true` and pass
+  it to `WireMockFixture.Initialize(settings)` (new overload, `C-33`) or `WireMockStartup.Run(settings)`, or call
+  `AllowPartialMapping()` on the running `WireMockServer` (`wireMock.Initialize().WireMockServer`). WireMock splits query values on commas, so a `WithParam` value that contains a comma never matches strictly:
   pass the comma-split values instead (DreamTravel's distance-matrix stubs had relied on partial matching for this).
   `APIFixture.Dispose` now disposes its `WebApplicationFactory`, so the in-memory host stops and every
   `IHostedService.StopAsync` runs; before, the host and its hosted services kept running until the process ended.

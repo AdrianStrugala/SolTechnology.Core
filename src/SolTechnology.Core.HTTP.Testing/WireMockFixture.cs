@@ -1,12 +1,14 @@
 using SolTechnology.Core.HTTP.Testing.Faker;
  using WireMock.Logging;
+using WireMock.Settings;
 
 namespace SolTechnology.Core.HTTP.Testing
 {
     /// <summary>
     /// Test fixture around <see cref="WireMockStartup"/>: starts a fake HTTP server on a dynamic port, registers fake
     /// APIs and arranges their responses. Start it in <c>[OneTimeSetUp]</c>, call <see cref="Reset"/> between tests,
-    /// and dispose it at the end. Requests must match every matcher of a stub; anything else gets 404.
+    /// and dispose it at the end. By default a request must match every matcher of a stub, otherwise it gets 404;
+    /// <see cref="Initialize(WireMockServerSettings)"/> opts back into partial matching.
     /// </summary>
     public class WireMockFixture : IDisposable, IAsyncDisposable
     {
@@ -15,7 +17,7 @@ namespace SolTechnology.Core.HTTP.Testing
         private WireMockStartup Startup => _wireMockStartup
             ?? throw new InvalidOperationException("Call Initialize() before using the WireMockFixture.");
 
-        /// <summary>Base URL of the running fake server (valid after <see cref="Initialize"/>), e.g. <c>http://localhost:54213</c>.</summary>
+        /// <summary>Base URL of the running fake server (valid after <see cref="Initialize(int)"/>), e.g. <c>http://localhost:54213</c>.</summary>
         public string Url => Startup.Url;
 
         /// <summary>The actual bound port — dynamic when <c>0</c> was requested.</summary>
@@ -29,10 +31,19 @@ namespace SolTechnology.Core.HTTP.Testing
         /// collide on a fixed port — read <see cref="Url"/>/<see cref="Port"/> to wire your client (e.g.
         /// inject it into configuration). Pass a fixed port only when a consumer hard-codes the address.
         /// </summary>
-        public WireMockStartup Initialize(int port = 0)
+        public WireMockStartup Initialize(int port = 0) =>
+            Initialize(WireMockStartup.DefaultSettings(port));
+
+        /// <summary>
+        /// Starts the fake server with your own <paramref name="settings"/>; start from
+        /// <see cref="WireMockStartup.DefaultSettings"/> and set <c>AllowPartialMapping = true</c> to serve the
+        /// closest stub when no stub matches every matcher.
+        /// </summary>
+        public WireMockStartup Initialize(WireMockServerSettings settings)
         {
+            ArgumentNullException.ThrowIfNull(settings);
             _wireMockStartup = new WireMockStartup();
-            _wireMockStartup.Run(port);
+            _wireMockStartup.Run(settings);
 
             return _wireMockStartup;
         }

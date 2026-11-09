@@ -54,6 +54,7 @@ Public API changes (`CLAUDE.md §2`, confirmed by the user on 2026-11-02):
 |---|---|---|---|
 | C-23 | Testing kits (optional) | Drop `Async`: `AzuriteFixture.InitializeAsync/ClearAsync/CreateBlobContainerAsync`, `RedisFixture.InitializeAsync/FlushAsync`, `SQLFixture.InitializeAsync/ResetAsync`, `ServiceBusFixture.InitializeAsync` (also gains `CancellationToken ct = default`), `ContainerLifecycleHelper.EnsureRunningAsync/WaitForAmqpReadyAsync/WaitForHealthyAsync` | testing-kits 03 |
 | C-24 | HTTP.Testing (optional) | `WireMockStartup.WireMockServer` public field → get-only property; DELETE unused abstract `FakeApiBase.BaseUrl` | testing-kits 03 |
+| C-33 | HTTP.Testing (additive, code review 2026-11-09) | NEW `WireMockFixture.Initialize(WireMockServerSettings settings)`; the port overload delegates to it | testing-kits code review |
 
 Behavioural and persisted-contract breaks:
 

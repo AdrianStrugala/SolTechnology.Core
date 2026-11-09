@@ -76,14 +76,19 @@ var request = Request.Create().UsingGet()
     .WithParam("origins", "51.1,17.0|43.7,11.2".Split(','));   // matches ?origins=51.1,17.0|43.7,11.2
 ```
 
-To go back to WireMock's partial matching, start the server from your own settings:
+To go back to WireMock's partial matching, start the fixture (or `WireMockStartup.Run`) from your own settings:
 
 ```csharp
 var settings = WireMockStartup.DefaultSettings();
 settings.AllowPartialMapping = true;
-var startup = new WireMockStartup();
-startup.Run(settings);
-startup.WireMockServer.Given(Request.Create().WithPath("/ping")).RespondWith(Response.Create().WithSuccess());
+var wireMock = new WireMockFixture();
+wireMock.Initialize(settings);
+```
+
+Or switch it on for a running server, through the `WireMockStartup` that `Initialize` returns:
+
+```csharp
+wireMock.Initialize().WireMockServer.AllowPartialMapping();
 ```
 
 ## Notes for large / parallel suites
