@@ -20,7 +20,7 @@ internal sealed class SmartRetryJobFilter : JobFilterAttribute, IServerFilter, I
 
         if (!string.IsNullOrEmpty(errorMessage))
         {
-            context.CandidateState = new FailedState(new InvalidOperationException(errorMessage));
+            context.CandidateState = new FailedState(new RecoverableResultException(errorMessage));
             context.SetJobParameter<string?>(RetryErrorKey, null);
         }
     }

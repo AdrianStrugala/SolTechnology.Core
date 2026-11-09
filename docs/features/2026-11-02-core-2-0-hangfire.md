@@ -56,7 +56,7 @@ Behavioural and persisted-contract breaks:
 | ID | Change | Consumer impact | Step |
 |---|---|---|---|
 | P-05 | New event jobs target `Task DispatchInScope(IEvent, CancellationToken)` (internal type, persisted job signature); the 1.x `DispatchInScope(IEvent)` overload stays for 2.x (RQ10) | Already-enqueued 1.x event jobs still run; the legacy overload is removed in 3.0 | hangfire 03 |
-| P-06 | Recurring job id `Type.Name` → `Type.FullName`; stale tracked ids and legacy `Type.Name` ids removed at start (RQ10) | Old recurring entries are removed automatically and re-created under new ids; no double firing | hangfire 04 |
+| P-06 | Recurring job id `Type.Name` → version-free full type name (namespace, name and generic arguments, no assembly information; RM-3), overridable with `AddSolRecurringJob(..., jobId:)`; the cron time zone is `timeZone ?? UTC`. At start the registrar removes the ids it recorded in this application's set `sol:recurring-ids:<IHostEnvironment.ApplicationName>` that are no longer registered (RM-8), and each job's legacy `Type.Name` entry when that entry runs the same job and is not a current id (RQ10) | Old recurring entries are removed automatically and re-created under new ids; no double firing. Applications that share one storage keep each other's jobs; a legacy entry of another job type with the same `Type.Name` is kept. After a rollback to 1.x, delete the 2.x ids from the dashboard | hangfire 04 |
 | P-25 | `PreventOverlapJobFilter` holds a non-blocking distributed storage lock for the run (`sol:overlap:<recurring job id>`, or a hash of the method and arguments outside recurring jobs) instead of scanning every scheduled and processing job (premortem RM-10); `AddSolRecurringJob(..., preventOverlap: true)` now applies it through a filter provider that `UseSolFilters` installs (B5, A7) | A run is cancelled only while another matching run is processing: a run waiting in `Scheduled` for a retry no longer blocks the next trigger. Each guarded run holds one storage lock for its duration (on SQL Server storage, one dedicated connection, as with `DisableConcurrentExecution`). Without `UseSolFilters` the registrar logs a Warning at start and overlap is not prevented | hangfire 02 |
 
 Design alternatives (blue-red-team, 2026-11-02):
@@ -150,5 +150,9 @@ retrospective promotes them):
 - Step 03: `OnPerformed` restores an absent ambient correlation id with `ICorrelationIdService.Set(null)` (no public
   `Clear()` exists); the legacy `DispatchInScope(IEvent)` returns `Task` instead of `void`; the RM-6 release note also
   says that the 1.x-server retries come from Hangfire's global retry filter.
+- Step 04: a recoverable failed `Result` is retried at most 3 times (`RecurringJobRetry.RecoverableResultAttempts`)
+  through `[AutomaticRetry(OnlyOn = RecoverableResultException)]` on the runner; a thrown exception is not retried.
+  Legacy `Type.Name` entries are removed only when they run the same job's runner. Tracked-id and legacy cleanup live in
+  `RecurringJobCleanup` and log each removal at Information.
 
 ## Follow-ups

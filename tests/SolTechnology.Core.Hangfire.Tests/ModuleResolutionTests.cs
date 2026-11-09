@@ -4,6 +4,7 @@ using Hangfire.InMemory;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
+using NSubstitute;
 using NUnit.Framework;
 using SolTechnology.Core.CQRS;
 using SolTechnology.Core.Hangfire.Filters;
@@ -70,6 +71,7 @@ public class ModuleResolutionTests
     private static IServiceCollection CreateServices()
     {
         var services = new ServiceCollection().AddLogging();
+        services.AddSingleton(Substitute.For<IHostEnvironment>());
         services.AddHangfire(c => c.UseInMemoryStorage());
         services.AddSolCQRS(o => o.RegisterEventsFromAssembly(typeof(ModuleResolutionTests).Assembly));
         services.AddSolPersistentEvents();

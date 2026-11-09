@@ -1,7 +1,7 @@
 ---
 spec: 2026-11-02-core-2-0-hangfire
 step: 04
-status: to-do
+status: done
 ---
 
 # Step 04: Hangfire — recurring job contract for 2.0
@@ -51,16 +51,60 @@ Former core step 51; moved here by the per-library regroup (user, 2026-11-02).
   - Step 06 carries the `docs/Hangfire.md` notes for RM-8 and RM-9.
 
 ## Acceptance criteria
-- [ ] `dotnet test tests/SolTechnology.Core.Hangfire.Tests` is green.
-- [ ] The DreamTravel Worker builds and starts in the component tests.
-- [ ] Premortem mitigations for `ModuleInstaller.cs` and the persisted contracts are applied.
-- [ ] The core brief's P-06 row states that legacy IDs are removed automatically; release step 05 ([`2026-11-02-org-transfer-and-2-0-release`](../../2026-11-02-org-transfer-and-2-0-release.md)) copies it into `docs/migration-2.0.md`.
-- [ ] RM-3: `AddSolRecurringJob_GenericJobType_IdHasNoAssemblyVersion` is green.
-- [ ] RM-7: `HangfirePersistedIdentityTests` is green, and `grep -n "RunAsync" src/SolTechnology.Core.Hangfire/RecurringJobRunner.cs` still matches.
-- [ ] RM-8: `Registrar_TwoApplicationsSharedStorage_KeepEachOthersJobs` is green, and the core brief's "Release-notes inputs" contains the rollback note.
-- [ ] RM-9: `RecurringJob_Throws_IsNotRetried` and `RecurringJob_RecoverableResult_RetriedAtMostConfiguredTimes` are green, or a deviation and a P-row record the explicit exception retry count.
+- [x] `dotnet test tests/SolTechnology.Core.Hangfire.Tests` is green.
+- [x] The DreamTravel Worker builds and starts in the component tests.
+- [x] Premortem mitigations for `ModuleInstaller.cs` and the persisted contracts are applied.
+- [x] The core brief's P-06 row states that legacy IDs are removed automatically; release step 05 ([`2026-11-02-org-transfer-and-2-0-release`](../../2026-11-02-org-transfer-and-2-0-release.md)) copies it into `docs/migration-2.0.md`.
+- [x] RM-3: `AddSolRecurringJob_GenericJobType_IdHasNoAssemblyVersion` is green.
+- [x] RM-7: `HangfirePersistedIdentityTests` is green, and `grep -n "RunAsync" src/SolTechnology.Core.Hangfire/RecurringJobRunner.cs` still matches.
+- [x] RM-8: `Registrar_TwoApplicationsSharedStorage_KeepEachOthersJobs` is green, and the core brief's "Release-notes inputs" contains the rollback note.
+- [x] RM-9: `RecurringJob_Throws_IsNotRetried` and `RecurringJob_RecoverableResult_RetriedAtMostConfiguredTimes` are green, or a deviation and a P-row record the explicit exception retry count.
 
 ## Open questions
 - none (`C-19` confirmed by the user on 2026-11-02; RQ10 resolved: automatic legacy-ID removal)
 
 ## Deviations
+
+### Retry budget, retry filter and exception type
+
+**Original plan:** Only a returned recoverable `Result` is retried, with an explicit, bounded attempt count on the runner; remove `[AutomaticRetry(Attempts = 0)]` only if Smart Retry now owns retries.
+
+**Actual implementation:** `RecurringJobRunner<TJob>.RunAsync` carries
+`[AutomaticRetry(Attempts = RecurringJobRetry.RecoverableResultAttempts, OnlyOn = [typeof(RecoverableResultException)])]`
+with the internal constant set to 3 (the plan names no number). `SmartRetryJobFilter` now elects a `FailedState`
+whose exception is the new internal `RecoverableResultException` (derived from `InvalidOperationException`, the type it
+used before), so Hangfire's own retry filter retries only those; a thrown exception does not match `OnlyOn` and stays
+`Failed`, as in 1.x. The method-level attribute replaces Hangfire's global default of 10 because `AutomaticRetry`
+allows one instance per job. No P-row was needed; the release-notes inputs gain a `hangfire 04` note on the retry
+semantics and the dashboard exception type.
+
+### Legacy-id removal checks the stored job type; tracked-id cleanup in its own class
+
+**Original plan:** `RemoveIfExists(descriptor.JobType.Name)` for each descriptor whose legacy id differs from its new id and is not the id of any current descriptor.
+
+**Actual implementation:** The legacy entry is removed only when its stored job is this job's
+`RecurringJobRunner<TJob>`, so another application's 1.x job that shares the short type name survives
+(`Registrar_LegacyIdOfAnotherJobType_IsKept`). The tracked-set and legacy cleanup lives in a new internal
+`RecurringJobCleanup`, which logs each removal at Information (`Removed recurring job [{JobId}]: no longer registered
+by [{ApplicationName}]`, `Removed 1.x recurring job [{LegacyJobId}]; it runs as [{JobId}]`), so `RecurringJobRegistrar`
+stays within the Guide §9 budgets. The registrar now also takes `JobStorage` and `IHostEnvironment`, which every
+`AddHangfire` host provides. The version-free type name is a new internal `JobTypeName.Of`, the same algorithm as
+Tale's `ChapterTypeName` and Cache's `CacheKey.TypeName`. `AddSolRecurringJob` rejects a whitespace `jobId`.
+
+### Test layout
+
+**Original plan:** Tests extend `RecurringJobTests.cs` and `Filters/SmartRetryJobFilterTests.cs`.
+
+**Actual implementation:** The storage-backed id tests live in `RecurringJobIdTests.cs` and
+`RecurringJobLegacyIdTests.cs` over a shared test helper `RecurringJobHost` (in-memory storage, a real
+`RecurringJobManager`, one `IHostEnvironment.ApplicationName` per start); the retry tests live in
+`RecurringJobRetryTests.cs`, which performs runner jobs with Hangfire's `BackgroundJobPerformer` and elects their state
+with `BackgroundJobStateChanger`, with `SmartRetryJobFilter` and Hangfire's default `AutomaticRetryAttribute` as global
+filters. Test job types moved to `TestJobs.cs`. Extra tests: `AddSolRecurringJob_CustomIdAndTimeZone_StoredOnEntry`,
+`Registrar_LegacyIdOfAnotherJobType_IsKept`, `AddSolRecurringJob_WhitespaceJobId_Throws`.
+`HangfirePersistedIdentityTests` gains only the `Task<Result>` return-type assertion that RM-7 allows.
+
+Verification: `dotnet test tests/SolTechnology.Core.Hangfire.Tests -c Release` 60/60 green; removing `OnlyOn` makes
+`RecurringJob_Throws_IsNotRetried` fail (the throw is scheduled for a retry). `dotnet build SolTechnology.Core.slnx -c
+Release` succeeds (only the pre-existing DreamTravel sample warnings), and `DreamTravel.Component.Tests`, which start
+the Worker, are 31/31 green.

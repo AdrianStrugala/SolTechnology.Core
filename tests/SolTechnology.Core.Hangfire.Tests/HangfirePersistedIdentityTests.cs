@@ -52,6 +52,7 @@ public class HangfirePersistedIdentityTests
         runner.FullName.Should().Be("SolTechnology.Core.Hangfire.RecurringJobRunner`1");
         runner.Assembly.GetName().Name.Should().Be("SolTechnology.Core.Hangfire");
         runAsync.Should().NotBeNull();
+        runAsync!.ReturnType.Should().Be<Task<Result>>();
     }
 
     [Test]

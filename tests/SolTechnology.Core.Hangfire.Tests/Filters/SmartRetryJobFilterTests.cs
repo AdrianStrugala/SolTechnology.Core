@@ -93,8 +93,9 @@ public class SmartRetryJobFilterTests
         _sut.OnStateElection(context);
 
         // Assert
-        context.CandidateState.Should().BeOfType<FailedState>();
-        ((FailedState)context.CandidateState).Exception.Message.Should().Be("Timeout error");
+        context.CandidateState.Should().BeOfType<FailedState>()
+            .Which.Exception.Should().BeOfType<RecoverableResultException>()
+            .Which.Message.Should().Be("Timeout error");
     }
 
     [Test]

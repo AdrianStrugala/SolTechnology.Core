@@ -6,6 +6,5 @@ namespace SolTechnology.Core.Hangfire;
 /// </summary>
 public interface IJob
 {
-    Task Execute(CancellationToken cancellationToken);
+    Task<Result> Execute(CancellationToken cancellationToken);
 }
-

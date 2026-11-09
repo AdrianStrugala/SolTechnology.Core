@@ -1,6 +1,8 @@
 using FluentAssertions;
 using Hangfire;
 using Hangfire.Common;
+using Hangfire.InMemory;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
 using NUnit.Framework;
@@ -14,15 +16,25 @@ public class RecurringJobRegistrarTests
     private const string OverlapWarning =
         "Recurring job [{JobId}] requested preventOverlap but UseSolFilters was not called; overlap is not prevented.";
 
+    private const string TestJobId = "SolTechnology.Core.Hangfire.Tests.TestJob";
+
+    private InMemoryStorage _storage = null!;
     private IRecurringJobManager _manager = null!;
+    private IHostEnvironment _hostEnvironment = null!;
     private CapturingLogger<RecurringJobRegistrar> _logger = null!;
 
     [SetUp]
     public void Setup()
     {
+        _storage = new InMemoryStorage();
         _manager = Substitute.For<IRecurringJobManager>();
+        _hostEnvironment = Substitute.For<IHostEnvironment>();
+        _hostEnvironment.ApplicationName.Returns("app-a");
         _logger = new CapturingLogger<RecurringJobRegistrar>();
     }
+
+    [TearDown]
+    public void TearDown() => _storage.Dispose();
 
     [Test]
     public async Task StartAsync_RegistersJobWithManager()
@@ -34,7 +46,11 @@ public class RecurringJobRegistrarTests
         await sut.StartAsync(CancellationToken.None);
 
         // Assert
-        _manager.Received(1).AddOrUpdate("TestJob", Arg.Any<Job>(), "0 0 * * *", Arg.Any<RecurringJobOptions>());
+        _manager.Received(1).AddOrUpdate(
+            TestJobId,
+            Arg.Is<Job>(job => job.Type == typeof(RecurringJobRunner<TestJob>) && job.Method.Name == "RunAsync"),
+            "0 0 * * *",
+            Arg.Is<RecurringJobOptions>(options => options.TimeZone == TimeZoneInfo.Utc));
     }
 
     [Test]
@@ -63,7 +79,7 @@ public class RecurringJobRegistrarTests
 
         // Assert
         _logger.Entries.Should().ContainSingle(e => e.Level == LogLevel.Warning && e.Template == OverlapWarning)
-            .Which.Properties["JobId"].Should().Be("TestJob");
+            .Which.Properties["JobId"].Should().Be(TestJobId);
     }
 
     [Test]
@@ -73,7 +89,7 @@ public class RecurringJobRegistrarTests
         var descriptor = new RecurringJobDescriptor(typeof(TestJob), "0 0 * * *", preventOverlap: true);
         var overlapFilterProvider = new PreventOverlapFilterProvider([descriptor]);
         overlapFilterProvider.InstallInto(new JobFilterProviderCollection());
-        var sut = new RecurringJobRegistrar(_manager, [descriptor], overlapFilterProvider, _logger);
+        var sut = new RecurringJobRegistrar(_manager, _storage, _hostEnvironment, [descriptor], overlapFilterProvider, _logger);
 
         // Act
         await sut.StartAsync(CancellationToken.None);
@@ -83,5 +99,5 @@ public class RecurringJobRegistrarTests
     }
 
     private RecurringJobRegistrar CreateSut(params RecurringJobDescriptor[] descriptors) =>
-        new(_manager, descriptors, new PreventOverlapFilterProvider(descriptors), _logger);
+        new(_manager, _storage, _hostEnvironment, descriptors, new PreventOverlapFilterProvider(descriptors), _logger);
 }
