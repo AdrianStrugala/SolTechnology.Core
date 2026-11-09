@@ -94,8 +94,14 @@ public sealed class ServiceBusFixture(
         }
 
         _connectionString = null;
-        await _emulator.DisposeAsync().ConfigureAwait(false);
-        _emulator = null;
+        try
+        {
+            await _emulator.DisposeAsync().ConfigureAwait(false);
+        }
+        finally
+        {
+            _emulator = null;
+        }
     }
 
     private async Task StartEmulator(CancellationToken ct)
@@ -105,9 +111,19 @@ public sealed class ServiceBusFixture(
         {
             _connectionString = await _emulator.Start(ct).ConfigureAwait(false);
         }
-        catch
+        catch (Exception startFailure)
         {
-            await DisposeAsync().ConfigureAwait(false);
+            try
+            {
+                await DisposeAsync().ConfigureAwait(false);
+            }
+            catch (Exception cleanupFailure)
+            {
+                // The start failure is the cause; keep it and attach what the clean-up could not remove.
+                startFailure.Data["ServiceBusFixture.CleanupFailure"] = cleanupFailure;
+                Console.WriteLine($"[ServiceBusFixture] Clean-up after a failed start of '{_containerName}' failed: {cleanupFailure.Message}");
+            }
+
             throw;
         }
     }

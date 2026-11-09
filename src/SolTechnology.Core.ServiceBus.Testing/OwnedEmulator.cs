@@ -58,7 +58,11 @@ internal sealed class OwnedEmulator : IAsyncDisposable
         await ContainerLifecycleHelper.EnsureRunning(Container.Id, ct).ConfigureAwait(false);
     }
 
-    /// <summary>Removes the emulator, the sidecar and the network; keeps them when reuse is enabled.</summary>
+    /// <summary>
+    /// Removes the emulator, the sidecar and the network, each even when removing another fails; keeps them when
+    /// reuse is enabled.
+    /// </summary>
+    /// <exception cref="AggregateException">One or more resources could not be removed.</exception>
     public async ValueTask DisposeAsync()
     {
         if (_reuse)
@@ -66,11 +70,31 @@ internal sealed class OwnedEmulator : IAsyncDisposable
             return;
         }
 
-        await Container.DisposeAsync().ConfigureAwait(false);
-        await _database.DisposeAsync().ConfigureAwait(false);
+        var failures = new List<Exception>();
+        await Attempt(() => Container.DisposeAsync().AsTask(), failures).ConfigureAwait(false);
+        await Attempt(() => _database.DisposeAsync().AsTask(), failures).ConfigureAwait(false);
+        await Attempt(async () =>
+        {
+            // Without Ryuk (TESTCONTAINERS_RYUK_DISABLED) DisposeAsync keeps this network; delete it explicitly.
+            await _network.DeleteAsync().ConfigureAwait(false);
+            await _network.DisposeAsync().ConfigureAwait(false);
+        }, failures).ConfigureAwait(false);
 
-        // Without Ryuk (TESTCONTAINERS_RYUK_DISABLED) DisposeAsync keeps the network; delete it explicitly.
-        await _network.DeleteAsync().ConfigureAwait(false);
-        await _network.DisposeAsync().ConfigureAwait(false);
+        if (failures.Count > 0)
+        {
+            throw new AggregateException("Could not remove every Service Bus emulator resource.", failures);
+        }
+    }
+
+    private static async Task Attempt(Func<Task> removal, List<Exception> failures)
+    {
+        try
+        {
+            await removal().ConfigureAwait(false);
+        }
+        catch (Exception ex)
+        {
+            failures.Add(ex);
+        }
     }
 }
