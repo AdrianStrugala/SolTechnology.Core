@@ -160,5 +160,7 @@ retrospective promotes them):
 - Step 06: `docs/Hangfire.md` is rewritten to the canonical module-page structure; the rate-limiting, worker-count,
   database-migration and delay-queue sections shrink to Conventions bullets. All six snippets compile in a throwaway
   project.
+- Step 07: only `ModuleInstaller` changed (extension blocks and one private filter-registration member); ApiCompat
+  shows only the compiler-generated `extension` marker types.
 
 ## Follow-ups

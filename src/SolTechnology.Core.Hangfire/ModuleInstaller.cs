@@ -14,105 +14,105 @@ namespace SolTechnology.Core.Hangfire;
 /// </summary>
 public static class ModuleInstaller
 {
-    /// <summary>
-    /// Replaces the in-memory event publisher with a Hangfire-backed durable publisher.
-    /// Requires <c>AddSolCQRS()</c> first. The app must also call <c>AddHangfire(...)</c> and
-    /// <c>AddHangfireServer()</c> with a DI-aware activator and type-aware serializer settings.
-    /// </summary>
-    public static IServiceCollection AddSolPersistentEvents(
-        this IServiceCollection services,
-        Action<PersistentEventsOptions>? configure = null)
-    {
-        if (!services.Any(d => d.ServiceType == typeof(IEventDispatcher)))
-        {
-            throw new InvalidOperationException(
-                "AddSolPersistentEvents() requires AddSolCQRS() to be called first.");
-        }
-
-        var options = new PersistentEventsOptions();
-        configure?.Invoke(options);
-        services.Configure<PersistentEventsOptions>(o => o.QueueName = options.QueueName);
-
-        services.RemoveAll<IEventPublisher>();
-        services.AddSingleton<IEventPublisher, HangfireEventPublisher>();
-
-        // Filters
-        services.AddSolCorrelationIdService();
-        services.TryAddSingleton<CorrelationIdJobFilter>();
-        services.TryAddSingleton<SmartRetryJobFilter>();
-
-        return services;
-    }
-
-    /// <summary>
-    /// Registers a recurring job that runs on the given cron schedule via Hangfire.
-    /// The app must call <c>AddHangfire(...)</c> and <c>AddHangfireServer()</c>.
-    /// </summary>
     /// <param name="services">Service collection.</param>
-    /// <param name="cronExpression">Cron expression (use <see cref="Cron"/> helpers).</param>
-    /// <param name="preventOverlap">
-    /// When true, a run is cancelled while another run of the same job is processing.
-    /// Requires <see cref="UseSolFilters"/>.
-    /// </param>
-    /// <param name="jobId">Recurring job id; defaults to the version-free full type name of <typeparamref name="TJob"/>.</param>
-    /// <param name="timeZone">Time zone of <paramref name="cronExpression"/>; defaults to UTC.</param>
-    public static IServiceCollection AddSolRecurringJob<TJob>(
-        this IServiceCollection services,
-        string cronExpression,
-        bool preventOverlap = false,
-        string? jobId = null,
-        TimeZoneInfo? timeZone = null) where TJob : class, IJob
+    extension(IServiceCollection services)
     {
-        ArgumentNullException.ThrowIfNull(cronExpression);
-        if (jobId is not null)
+        /// <summary>
+        /// Replaces the in-memory event publisher with a Hangfire-backed durable publisher.
+        /// Requires <c>AddSolCQRS()</c> first. The app must also call <c>AddHangfire(...)</c> and
+        /// <c>AddHangfireServer()</c> with a DI-aware activator and type-aware serializer settings.
+        /// </summary>
+        public IServiceCollection AddSolPersistentEvents(Action<PersistentEventsOptions>? configure = null)
         {
-            ArgumentException.ThrowIfNullOrWhiteSpace(jobId);
+            if (!services.Any(d => d.ServiceType == typeof(IEventDispatcher)))
+            {
+                throw new InvalidOperationException(
+                    "AddSolPersistentEvents() requires AddSolCQRS() to be called first.");
+            }
+
+            var options = new PersistentEventsOptions();
+            configure?.Invoke(options);
+            services.Configure<PersistentEventsOptions>(o => o.QueueName = options.QueueName);
+
+            services.RemoveAll<IEventPublisher>();
+            services.AddSingleton<IEventPublisher, HangfireEventPublisher>();
+            services.AddSolJobFilters();
+
+            return services;
         }
 
-        services.AddScoped<TJob>();
-        services.AddSingleton(new RecurringJobDescriptor(typeof(TJob), cronExpression, preventOverlap, jobId, timeZone));
-        services.AddSingleton<RecurringJobRunner<TJob>>();
+        /// <summary>
+        /// Registers a recurring job that runs on the given cron schedule via Hangfire.
+        /// The app must call <c>AddHangfire(...)</c> and <c>AddHangfireServer()</c>.
+        /// </summary>
+        /// <param name="cronExpression">Cron expression (use <see cref="Cron"/> helpers).</param>
+        /// <param name="preventOverlap">
+        /// When true, a run is cancelled while another run of the same job is processing.
+        /// Requires <c>UseSolFilters</c>.
+        /// </param>
+        /// <param name="jobId">Recurring job id; defaults to the version-free full type name of <typeparamref name="TJob"/>.</param>
+        /// <param name="timeZone">Time zone of <paramref name="cronExpression"/>; defaults to UTC.</param>
+        public IServiceCollection AddSolRecurringJob<TJob>(
+            string cronExpression,
+            bool preventOverlap = false,
+            string? jobId = null,
+            TimeZoneInfo? timeZone = null) where TJob : class, IJob
+        {
+            ArgumentNullException.ThrowIfNull(cronExpression);
+            if (jobId is not null)
+            {
+                ArgumentException.ThrowIfNullOrWhiteSpace(jobId);
+            }
 
-        services.TryAddEnumerable(
-            ServiceDescriptor.Singleton<IHostedService, RecurringJobRegistrar>());
-        services.TryAddSingleton<PreventOverlapFilterProvider>();
+            services.AddScoped<TJob>();
+            services.AddSingleton(new RecurringJobDescriptor(typeof(TJob), cronExpression, preventOverlap, jobId, timeZone));
+            services.AddSingleton<RecurringJobRunner<TJob>>();
 
-        // Filters (shared with persistent events)
-        services.AddSolCorrelationIdService();
-        services.TryAddSingleton<CorrelationIdJobFilter>();
-        services.TryAddSingleton<SmartRetryJobFilter>();
+            services.TryAddEnumerable(
+                ServiceDescriptor.Singleton<IHostedService, RecurringJobRegistrar>());
+            services.TryAddSingleton<PreventOverlapFilterProvider>();
+            services.AddSolJobFilters();
 
-        return services;
+            return services;
+        }
+
+        // TryAdd: persistent events and recurring jobs share one instance of each filter.
+        private void AddSolJobFilters()
+        {
+            services.AddSolCorrelationIdService();
+            services.TryAddSingleton<CorrelationIdJobFilter>();
+            services.TryAddSingleton<SmartRetryJobFilter>();
+        }
     }
 
-    /// <summary>
-    /// Adds the Hangfire global job filters (correlation-id propagation, smart retry) and the
-    /// overlap guard for recurring jobs registered with <c>preventOverlap: true</c>.
-    /// Call from the app's <c>AddHangfire</c> configuration callback:
-    /// <code>
-    /// services.AddHangfire((sp, config) => config.UseSolFilters(sp));
-    /// </code>
-    /// </summary>
-    public static IGlobalConfiguration UseSolFilters(
-        this IGlobalConfiguration configuration,
-        IServiceProvider serviceProvider)
+    /// <param name="configuration">The Hangfire configuration of the app's <c>AddHangfire</c> callback.</param>
+    extension(IGlobalConfiguration configuration)
     {
-        var correlationFilter = serviceProvider.GetService<CorrelationIdJobFilter>();
-        if (correlationFilter is not null)
+        /// <summary>
+        /// Adds the Hangfire global job filters (correlation-id propagation, smart retry) and the
+        /// overlap guard for recurring jobs registered with <c>preventOverlap: true</c>.
+        /// Call from the app's <c>AddHangfire</c> configuration callback:
+        /// <code>
+        /// services.AddHangfire((sp, config) => config.UseSolFilters(sp));
+        /// </code>
+        /// </summary>
+        public IGlobalConfiguration UseSolFilters(IServiceProvider serviceProvider)
         {
-            configuration.UseFilter(correlationFilter);
+            var correlationFilter = serviceProvider.GetService<CorrelationIdJobFilter>();
+            if (correlationFilter is not null)
+            {
+                configuration.UseFilter(correlationFilter);
+            }
+
+            var smartRetryFilter = serviceProvider.GetService<SmartRetryJobFilter>();
+            if (smartRetryFilter is not null)
+            {
+                configuration.UseFilter(smartRetryFilter);
+            }
+
+            serviceProvider.GetService<PreventOverlapFilterProvider>()?.InstallInto(JobFilterProviders.Providers);
+
+            return configuration;
         }
-
-        var smartRetryFilter = serviceProvider.GetService<SmartRetryJobFilter>();
-        if (smartRetryFilter is not null)
-        {
-            configuration.UseFilter(smartRetryFilter);
-        }
-
-        serviceProvider.GetService<PreventOverlapFilterProvider>()?.InstallInto(JobFilterProviders.Providers);
-
-        return configuration;
     }
 }
-
-
