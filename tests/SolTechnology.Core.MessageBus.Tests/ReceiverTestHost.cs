@@ -17,25 +17,29 @@ internal sealed class ReceiverTestHost(IHost host) : IAsyncDisposable
 
     public sealed record ReceiverMessage(string Id, string Text) : IMessage;
 
-    public sealed class HandlerProbe(Func<ReceiverMessage, Task> behaviour)
+    public sealed class HandlerProbe(Func<ReceiverMessage, CancellationToken, Task> behaviour)
     {
         private int _calls;
+
+        public HandlerProbe(Func<ReceiverMessage, Task> behaviour) : this((message, _) => behaviour(message))
+        {
+        }
 
         public int Calls => Volatile.Read(ref _calls);
 
         public ReceiverMessage? LastMessage { get; private set; }
 
-        public Task Handle(ReceiverMessage message)
+        public Task Handle(ReceiverMessage message, CancellationToken cancellationToken)
         {
             LastMessage = message;
             Interlocked.Increment(ref _calls);
-            return behaviour(message);
+            return behaviour(message, cancellationToken);
         }
     }
 
     public sealed class ProbeHandler(HandlerProbe probe) : IMessageHandler<ReceiverMessage>
     {
-        public Task Handle(ReceiverMessage message, CancellationToken cancellationToken) => probe.Handle(message);
+        public Task Handle(ReceiverMessage message, CancellationToken cancellationToken) => probe.Handle(message, cancellationToken);
     }
 
     public IServiceProvider Services => host.Services;

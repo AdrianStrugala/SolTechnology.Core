@@ -1,6 +1,7 @@
 using Azure.Messaging.ServiceBus;
 using FluentAssertions;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using NUnit.Framework;
 using SolTechnology.Core.MessageBus.Publish;
@@ -82,5 +83,37 @@ public class MessageBusReceiverSettlementTests
             entry.Level == LogLevel.Error &&
             entry.Exception is InvalidOperationException &&
             entry.Exception.Message == "sync failure");
+    }
+
+    [Test]
+    public async Task Stop_HandlerFinishesAfterShutdownStarts_MessageCompletedNotRedelivered()
+    {
+        // Arrange
+        const string queue = "receiver-shutdown";
+        var logs = new CapturingLoggerProvider();
+        var shutdownSignalled = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+        var release = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+        var probe = new HandlerProbe(async (_, cancellationToken) =>
+        {
+            cancellationToken.Register(() => shutdownSignalled.TrySetResult());
+            await release.Task;
+        });
+        await using var host = await StartHost(queue, probe, maxDeliveryCount: 10, logs);
+        await using var client = new ServiceBusClient(await ServiceBusTestEnvironment.ConnectionString());
+        var receiver = host.Services.GetServices<IHostedService>().OfType<MessageBusReceiver>().Single();
+        await host.Services.GetRequiredService<IMessagePublisher>().Publish(new ReceiverMessage(Guid.NewGuid().ToString(), "deploy"));
+        (await Eventually(() => Task.FromResult(probe.Calls > 0))).Should().BeTrue("the handler should receive the message");
+
+        // Act
+        var stop = receiver.StopAsync(CancellationToken.None);
+        await shutdownSignalled.Task.WaitAsync(Deadline);
+        release.SetResult();
+        await stop.WaitAsync(Deadline);
+
+        // Assert
+        (await IsEmpty(client, queue, SubQueue.None)).Should().BeTrue("a handler that succeeded during shutdown completes its message");
+        (await IsEmpty(client, queue, SubQueue.DeadLetter)).Should().BeTrue();
+        probe.Calls.Should().Be(1);
+        logs.Entries.Should().NotContain(entry => entry.Level >= LogLevel.Warning && entry.Category == typeof(MessageBusReceiver).FullName);
     }
 }
