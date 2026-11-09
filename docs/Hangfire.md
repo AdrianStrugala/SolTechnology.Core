@@ -60,7 +60,7 @@ builder.Services.AddHangfireServer(o => o.Queues = ["events", "default"]);
 |---|---|---|
 | `cronExpression` | — (required) | Schedule; use Hangfire's `Cron` helpers or a cron string. |
 | `preventOverlap` | `false` | Skip a run while another run of this job is processing; needs `UseSolFilters`. |
-| `jobId` | full type name of `TJob` | Recurring job id; set it to keep the id when you rename or move the class. |
+| `jobId` | full type name of `TJob` | Recurring job id of at most 86 characters (a longer one throws `ArgumentException`); set it to keep the id when you rename or move the class. |
 | `timeZone` | UTC | Time zone the cron expression is evaluated in. |
 
 ### Usage
@@ -115,6 +115,10 @@ builder.Services.AddSolRecurringJob<FetchTrafficJob>("0 */6 * * *", preventOverl
 | Server shuts down mid-run | Requeued when the job lets the token's `OperationCanceledException` propagate | Requeued; every handler runs again |
 
 #### Job ids
+
+Hangfire.SqlServer stores `recurring-job:<id>` in an `nvarchar(100)` key, so ids are at most 86 characters: a full type
+name that is longer, typically a generic job, becomes its type name, `-`, and the first 12 hex characters of the full
+name's SHA-256 (`GenericJob`1-ac9290f02c71`), the same in every process and version.
 
 At start the module adds or updates every registered job, then removes the jobs it registered before and no longer
 does; it records its ids in the storage set `sol:recurring-ids:<ApplicationName>`, so services that share one

@@ -3,6 +3,7 @@
   <ItemGroup>
     <PackageReference Include="Hangfire.InMemory" />
     <PackageReference Include="Hangfire.NetCore" />
+    <PackageReference Include="Hangfire.SqlServer" />
   </ItemGroup>
 
   <ItemGroup>
@@ -10,6 +11,7 @@
     <ProjectReference Include="..\..\src\SolTechnology.Core.CQRS\SolTechnology.Core.CQRS.csproj" />
     <ProjectReference Include="..\..\src\SolTechnology.Core.Logging\SolTechnology.Core.Logging.csproj" />
     <ProjectReference Include="..\..\src\SolTechnology.Core.Testing\SolTechnology.Core.Testing.csproj" />
+    <ProjectReference Include="..\..\src\SolTechnology.Core.SQL.Testing\SolTechnology.Core.SQL.Testing.csproj" />
   </ItemGroup>
 
 </Project>

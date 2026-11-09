@@ -56,7 +56,7 @@ Behavioural and persisted-contract breaks:
 | ID | Change | Consumer impact | Step |
 |---|---|---|---|
 | P-05 | New event jobs target `Task DispatchInScope(IEvent, CancellationToken)` (internal type, persisted job signature); the 1.x `DispatchInScope(IEvent)` overload stays for 2.x (RQ10) | Already-enqueued 1.x event jobs still run; the legacy overload is removed in 3.0 | hangfire 03 |
-| P-06 | Recurring job id `Type.Name` → version-free full type name (namespace, name and generic arguments, no assembly information; RM-3), overridable with `AddSolRecurringJob(..., jobId:)`; the cron time zone is `timeZone ?? UTC`. At start the registrar removes the ids it recorded in this application's set `sol:recurring-ids:<IHostEnvironment.ApplicationName>` that are no longer registered (RM-8), and each job's legacy `Type.Name` entry when that entry runs the same job and is not a current id (RQ10) | Old recurring entries are removed automatically and re-created under new ids; no double firing. Applications that share one storage keep each other's jobs; a legacy entry of another job type with the same `Type.Name` is kept. After a rollback to 1.x, delete the 2.x ids from the dashboard | hangfire 04 |
+| P-06 | Recurring job id `Type.Name` → version-free full type name (namespace, name and generic arguments, no assembly information; RM-3), or, when that is longer than 86 characters (Hangfire.SqlServer keeps `recurring-job:<id>` in an `nvarchar(100)` key), `Type.Name` truncated as needed + `-` + the first 12 hex characters of the full name's SHA-256; overridable with `AddSolRecurringJob(..., jobId:)`, where an id over 86 characters throws `ArgumentException`; the cron time zone is `timeZone ?? UTC`. At start the registrar removes the ids it recorded in this application's set `sol:recurring-ids:<IHostEnvironment.ApplicationName>` that are no longer registered (RM-8), and each job's legacy `Type.Name` entry when that entry runs the same job and is not a current id (RQ10) | Old recurring entries are removed automatically and re-created under new ids; no double firing. Applications that share one storage keep each other's jobs; a legacy entry of another job type with the same `Type.Name` is kept. After a rollback to 1.x, delete the 2.x ids from the dashboard | hangfire 04 |
 | P-25 | `PreventOverlapJobFilter` holds a non-blocking distributed storage lock for the run (`sol:overlap:<recurring job id>`, or a hash of the method and arguments outside recurring jobs) instead of scanning every scheduled and processing job (premortem RM-10); `AddSolRecurringJob(..., preventOverlap: true)` now applies it through a filter provider that `UseSolFilters` installs (B5, A7) | A run is cancelled only while another matching run is processing: a run waiting in `Scheduled` for a retry no longer blocks the next trigger. Each guarded run holds one storage lock for its duration (on SQL Server storage, one dedicated connection, as with `DisableConcurrentExecution`). Without `UseSolFilters` the registrar logs a Warning at start and overlap is not prevented | hangfire 02 |
 
 Design alternatives (blue-red-team, 2026-11-02):
@@ -160,6 +160,12 @@ retrospective promotes them):
 - Step 06: `docs/Hangfire.md` is rewritten to the canonical module-page structure; the rate-limiting, worker-count,
   database-migration and delay-queue sections shrink to Conventions bullets. All six snippets compile in a throwaway
   project.
+- Code review 1 (job id length): a default id whose full type name exceeds 86 characters becomes `Type.Name`
+  (truncated to 73) + `-` + 12 hex characters of the full name's SHA-256 (internal `StorageKey`); an explicit `jobId`
+  over 86 characters throws `ArgumentException`. The per-application tracked-set key is bounded to 100 characters the
+  same way. Chosen test: `RecurringJobSqlServerTests` registers the 96-character generic job against SQL Server
+  (`SQLFixture`, about 20 s) and fails with "String or binary data would be truncated" without the fix; unit tests pin
+  the rule. The Hangfire test project therefore references `Hangfire.SqlServer` and `SolTechnology.Core.SQL.Testing`.
 - Step 07: only `ModuleInstaller` changed (extension blocks and one private filter-registration member); ApiCompat
   shows only the compiler-generated `extension` marker types.
 

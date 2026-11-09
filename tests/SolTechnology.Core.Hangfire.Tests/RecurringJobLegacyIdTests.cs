@@ -56,4 +56,17 @@ public class RecurringJobLegacyIdTests
         // Assert
         _host.StoredIds().Should().BeEquivalentTo("TestJob", TestJobId);
     }
+
+    [Test]
+    public async Task Registrar_Legacy1xIdOfLongGenericJob_IsRemovedOnStart()
+    {
+        // Arrange
+        _host.SeedLegacyEntry<GenericJob<List<string>>>("GenericJob`1");
+
+        // Act
+        await _host.Start("app-a", s => s.AddSolRecurringJob<GenericJob<List<string>>>(Cron));
+
+        // Assert
+        _host.StoredIds().Should().BeEquivalentTo("GenericJob`1-ac9290f02c71");
+    }
 }

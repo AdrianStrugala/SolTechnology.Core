@@ -85,6 +85,19 @@ public class RecurringJobTests
     }
 
     [Test]
+    public void AddSolRecurringJob_JobIdLongerThan86_ThrowsNamingTheLimit()
+    {
+        // Arrange
+        var services = new ServiceCollection();
+
+        // Act
+        var act = () => services.AddSolRecurringJob<TestJob>("0 0 * * *", jobId: new string('j', 87));
+
+        // Assert
+        act.Should().Throw<ArgumentException>().WithParameterName("jobId").WithMessage("*at most 86 characters*");
+    }
+
+    [Test]
     public async Task RecurringJobRunner_ResolvesJobFromScopeAndReturnsItsResult()
     {
         // Arrange

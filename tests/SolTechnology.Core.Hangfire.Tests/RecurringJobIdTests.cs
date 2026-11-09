@@ -37,10 +37,20 @@ public class RecurringJobIdTests
         var descriptor = new ServiceCollection().AddSolRecurringJob<GenericJob<List<string>>>(Cron)
             .BuildServiceProvider().GetRequiredService<RecurringJobDescriptor>();
 
+        // Assert: the 96-character full name is shortened to the type name plus a SHA-256 prefix of it.
+        descriptor.JobId.Should().Be("GenericJob`1-ac9290f02c71");
+        descriptor.JobId.Length.Should().BeLessThanOrEqualTo(StorageKey.MaxRecurringJobIdLength);
+    }
+
+    [Test]
+    public void AddSolRecurringJob_ShortGenericJobType_IdIsFullTypeName()
+    {
+        // Act
+        var descriptor = new ServiceCollection().AddSolRecurringJob<GenericJob<string>>(Cron)
+            .BuildServiceProvider().GetRequiredService<RecurringJobDescriptor>();
+
         // Assert
-        descriptor.JobId.Should().Be(
-            "SolTechnology.Core.Hangfire.Tests.GenericJob`1[System.Collections.Generic.List`1[System.String]]");
-        descriptor.JobId.Should().NotContain("Version=").And.NotContain("PublicKeyToken");
+        descriptor.JobId.Should().Be("SolTechnology.Core.Hangfire.Tests.GenericJob`1[System.String]");
     }
 
     [Test]

@@ -50,7 +50,11 @@ public static class ModuleInstaller
         /// When true, a run is cancelled while another run of the same job is processing.
         /// Requires <c>UseSolFilters</c>.
         /// </param>
-        /// <param name="jobId">Recurring job id; defaults to the version-free full type name of <typeparamref name="TJob"/>.</param>
+        /// <param name="jobId">
+        /// Recurring job id of at most 86 characters; defaults to the version-free full type name of
+        /// <typeparamref name="TJob"/>, shortened to the type name plus a hash when longer than 86 characters.
+        /// </param>
+        /// <exception cref="ArgumentException"><paramref name="jobId"/> is whitespace or longer than 86 characters.</exception>
         /// <param name="timeZone">Time zone of <paramref name="cronExpression"/>; defaults to UTC.</param>
         public IServiceCollection AddSolRecurringJob<TJob>(
             string cronExpression,
@@ -62,6 +66,12 @@ public static class ModuleInstaller
             if (jobId is not null)
             {
                 ArgumentException.ThrowIfNullOrWhiteSpace(jobId);
+                if (jobId.Length > StorageKey.MaxRecurringJobIdLength)
+                {
+                    throw new ArgumentException(
+                        $"Recurring job id must be at most {StorageKey.MaxRecurringJobIdLength} characters, because Hangfire.SqlServer stores 'recurring-job:<id>' in an nvarchar(100) key; got {jobId.Length}.",
+                        nameof(jobId));
+                }
             }
 
             services.AddScoped<TJob>();

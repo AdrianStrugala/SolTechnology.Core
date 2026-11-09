@@ -8,15 +8,19 @@ using NSubstitute;
 
 namespace SolTechnology.Core.Hangfire.Tests;
 
-/// <summary>Starts the recurring job registrar of one application against a shared in-memory storage.</summary>
+/// <summary>Starts the recurring job registrar of one application against a shared storage (in-memory by default).</summary>
 internal sealed class RecurringJobHost : IDisposable
 {
     public const string Cron = "0 0 * * *";
 
-    private readonly InMemoryStorage _storage = new();
+    private readonly JobStorage _storage;
     private readonly RecurringJobManager _manager;
 
-    public RecurringJobHost() => _manager = new RecurringJobManager(_storage);
+    public RecurringJobHost(JobStorage? storage = null)
+    {
+        _storage = storage ?? new InMemoryStorage();
+        _manager = new RecurringJobManager(_storage);
+    }
 
     public async Task Start(string applicationName, Action<IServiceCollection> registerJobs)
     {
@@ -45,5 +49,5 @@ internal sealed class RecurringJobHost : IDisposable
 
     public IEnumerable<string> StoredIds() => StoredJobs().Select(job => job.Id);
 
-    public void Dispose() => _storage.Dispose();
+    public void Dispose() => (_storage as IDisposable)?.Dispose();
 }

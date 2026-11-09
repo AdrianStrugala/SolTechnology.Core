@@ -15,7 +15,8 @@ internal sealed class RecurringJobCleanup(
     string applicationName,
     ILogger logger)
 {
-    private string TrackedSetKey => $"sol:recurring-ids:{applicationName}";
+    private string TrackedSetKey { get; } =
+        StorageKey.Fit($"sol:recurring-ids:{applicationName}", $"sol:recurring-ids:{applicationName}", StorageKey.MaxKeyLength);
 
     public void RemoveStaleIds(IReadOnlyCollection<RecurringJobDescriptor> registered)
     {
