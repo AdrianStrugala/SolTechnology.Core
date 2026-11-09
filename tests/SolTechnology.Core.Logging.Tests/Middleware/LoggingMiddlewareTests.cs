@@ -42,6 +42,7 @@ public class LoggingMiddlewareTests
         public CorrelationId? Stored { get; private set; }
         public void Set(CorrelationId correlationId) => Stored = correlationId;
         public CorrelationId? Get() => Stored;
+        public void Clear() => Stored = null;
         public CorrelationId GetOrGenerate() => Stored ??= CorrelationId.Generate();
     }
 

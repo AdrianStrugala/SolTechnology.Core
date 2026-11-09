@@ -38,6 +38,18 @@ public class CorrelationIdServiceTests
         first.Should().NotBeNull();
         first.Should().BeSameAs(second);
     }
+
+    [Test]
+    public void Clear_RemovesAmbientCorrelation()
+    {
+        // Arrange
+        var service = BuildService();
+        service.Set(CorrelationId.Generate());
+
+        // Act
+        service.Clear();
+
+        // Assert
+        service.Get().Should().BeNull();
+    }
 }
-
-

@@ -94,6 +94,21 @@ public class CorrelationIdJobFilterTests
     }
 
     [Test]
+    public void OnPerformed_NoPreviousAmbientId_ClearsIt()
+    {
+        // Arrange
+        var performingContext = CreatePerformingContext();
+        _sut.OnPerforming(performingContext);
+
+        // Act
+        _sut.OnPerformed(CreatePerformedContext(performingContext));
+
+        // Assert
+        _correlationIdService.Received(1).Clear();
+        _correlationIdService.DidNotReceive().Set(null!);
+    }
+
+    [Test]
     public void OnPerformed_WhenNoScopeInItems_DoesNotThrow()
     {
         // Arrange

@@ -319,8 +319,8 @@ public string Email { get; set; } = null!;
 
 `AddSolLogging` registers:
 
-- `ICorrelationIdService` — ambient correlation accessor (singleton, no
-  `AsyncLocal` traps).
+- `ICorrelationIdService` — ambient correlation accessor with `Set`, `Get`, `GetOrGenerate`, and `Clear`
+  (singleton, no `AsyncLocal` traps).
 - `ITimingService` — per-request timing diagnostics (scoped). Handlers wrap
   sub-operations in `StartContext("name")` and the map is emitted on finish.
 - `TimeProvider` — `TimeProvider.System` (singleton, TryAdd — your custom
@@ -435,6 +435,8 @@ public class SettlementPollerJob(IServiceScopeFactory scopeFactory, ICorrelation
 **Key points:**
 - `ICorrelationIdService` is singleton — set it before starting work so downstream HTTP calls
   (`CorrelationPropagatingHandler`) pick it up.
+- Call `correlation.Clear()` when work set the id synchronously on a long-lived thread, so the next unit of work on
+  that thread does not inherit it.
 - Dispose the scope when done — `DbContext`, `IIdempotencyStore`, etc. are released.
 - For Hangfire jobs: `Core.Hangfire`'s `CorrelationIdJobFilter` does steps 1+3 automatically.
   Use this pattern only for raw `BackgroundService` or custom polling loops.

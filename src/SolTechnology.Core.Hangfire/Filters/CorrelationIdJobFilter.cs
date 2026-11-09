@@ -48,10 +48,18 @@ internal sealed class CorrelationIdJobFilter(
             scope.Dispose();
         }
 
-        if (filterContext.Items.TryGetValue(PreviousCorrelationIdKey, out var previous))
+        if (!filterContext.Items.TryGetValue(PreviousCorrelationIdKey, out var previous))
         {
-            // Setting null clears the ambient id: ICorrelationIdService has no Clear().
-            correlationIdService.Set((CorrelationId)previous!);
+            return;
+        }
+
+        if (previous is CorrelationId previousCorrelationId)
+        {
+            correlationIdService.Set(previousCorrelationId);
+        }
+        else
+        {
+            correlationIdService.Clear();
         }
     }
 }

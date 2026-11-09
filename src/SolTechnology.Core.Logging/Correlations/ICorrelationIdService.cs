@@ -12,6 +12,9 @@ public interface ICorrelationIdService
     /// <summary>Returns the correlation set for the current async-flow, or <c>null</c> if none.</summary>
     CorrelationId? Get();
 
+    /// <summary>Removes the correlation from the current async-flow, so <see cref="Get"/> returns <c>null</c>.</summary>
+    void Clear();
+
     /// <summary>
     /// Returns the current correlation, generating + setting a new one when none is present.
     /// Use from non-HTTP entry points (background jobs, scheduled tasks) to ensure correlation

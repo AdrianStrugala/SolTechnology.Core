@@ -5,6 +5,7 @@ internal sealed class CorrelationIdService : ICorrelationIdService
     private static readonly AsyncLocal<CorrelationId?> Context = new();
     public void Set(CorrelationId correlationId) => Context.Value = correlationId;
     public CorrelationId? Get() => Context.Value;
+    public void Clear() => Context.Value = null;
     public CorrelationId GetOrGenerate()
     {
         var existing = Context.Value;

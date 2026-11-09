@@ -18,6 +18,7 @@ public class LoggingMiddlewareBodyBufferingTests
     {
         public void Set(CorrelationId correlationId) { }
         public CorrelationId? Get() => null;
+        public void Clear() { }
         public CorrelationId GetOrGenerate() => CorrelationId.Generate();
     }
 
