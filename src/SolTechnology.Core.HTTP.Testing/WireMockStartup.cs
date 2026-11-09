@@ -27,13 +27,14 @@ namespace SolTechnology.Core.HTTP.Testing
         }
 
         /// <summary>
-        /// Defaults tuned for large/parallel suites: dynamic port, admin interface <b>off</b>, no console
+        /// Defaults tuned for large/parallel suites: dynamic port, strict matching (a request must match every
+        /// matcher of a mapping, otherwise the server answers 404), admin interface <b>off</b>, no console
         /// logging. Pass your own <see cref="WireMockServerSettings"/> to <see cref="Run(WireMockServerSettings,bool)"/>
-        /// to override (e.g. turn the admin interface back on for debugging).
+        /// to override (e.g. <c>AllowPartialMapping = true</c>, or the admin interface back on for debugging).
         /// </summary>
         public static WireMockServerSettings DefaultSettings(int port = 0) => new()
         {
-            AllowPartialMapping = true,
+            AllowPartialMapping = false,
             StartAdminInterface = false,
             ReadStaticMappings = false,
             Logger = new WireMockNullLogger(),

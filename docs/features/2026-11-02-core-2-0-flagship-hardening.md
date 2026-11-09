@@ -738,6 +738,13 @@ these notes from the steps:
   initialisation that fails halfway, for example on a provisioning error, can be retried. Before, the retry, such as
   the next publish, added a second sender for each publisher already created, so every message was published twice,
   and receiver registration threw "already registered". No public API change.
+- testing-kits 01 (P-11, [`2026-11-02-core-2-0-testing-kits`](2026-11-02-core-2-0-testing-kits.md)): `WireMockStartup`
+  and `WireMockFixture` match strictly, so a request that misses any matcher of a stub gets 404 instead of the closest
+  stub's response; pass `WireMockStartup.DefaultSettings()` with `AllowPartialMapping = true` to `Run(settings)` to go
+  back. WireMock splits query values on commas, so a `WithParam` value that contains a comma never matches strictly:
+  pass the comma-split values instead (DreamTravel's distance-matrix stubs had relied on partial matching for this).
+  `APIFixture.Dispose` now disposes its `WebApplicationFactory`, so the in-memory host stops and every
+  `IHostedService.StopAsync` runs; before, the host and its hosted services kept running until the process ended.
 
 ### Resolved questions (user answers, 2026-11-02)
 

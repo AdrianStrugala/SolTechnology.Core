@@ -17,6 +17,9 @@ namespace SolTechnology.Core.API.Testing
     /// under test. Typically the <c>Program</c> class.</typeparam>
     public class APIFixture<TEntryPoint> : IDisposable where TEntryPoint : class
     {
+        private readonly WebApplicationFactory<TEntryPoint> _factory = new();
+        private bool _disposed;
+
         public TestServer TestServer { get; }
 
         public HttpClient ServerClient { get; }
@@ -24,7 +27,7 @@ namespace SolTechnology.Core.API.Testing
 
         public APIFixture(IConfiguration? configuration = null, Action<IServiceCollection>? configureServices = null)
         {
-            var webAppFactory = new WebApplicationFactory<TEntryPoint>()
+            var webAppFactory = _factory
                 .WithWebHostBuilder(builder =>
                     {
                         if (configuration != null)
@@ -46,10 +49,22 @@ namespace SolTechnology.Core.API.Testing
             ServerClient = TestServer.CreateClient();
         }
 
+        /// <summary>
+        /// Stops the in-memory host (running every <c>IHostedService.StopAsync</c>) and disposes the
+        /// client, the <see cref="TestServer"/> and the underlying <see cref="WebApplicationFactory{TEntryPoint}"/>.
+        /// </summary>
         public void Dispose()
         {
-            ServerClient?.Dispose();
-            TestServer?.Dispose();
+            if (_disposed)
+            {
+                return;
+            }
+
+            _disposed = true;
+            ServerClient.Dispose();
+            // Disposing the root factory also disposes the factory derived by WithWebHostBuilder and its host.
+            _factory.Dispose();
+            GC.SuppressFinalize(this);
         }
     }
 }

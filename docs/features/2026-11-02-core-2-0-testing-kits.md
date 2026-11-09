@@ -1,5 +1,5 @@
 ---
-status: planned
+status: in-progress
 created: 2026-11-02
 completed:
 ---
@@ -128,6 +128,21 @@ in the umbrella brief; `release NN` names a step of
 
 Steps run in number order; each is one PR.
 
+### Follow-ups inherited from closed features (2026-11-09)
+
+The closed library briefs name this feature as the owner of these follow-ups. The owner pre-approved the plan; the
+implementer folded each into the step that fits it or kept it deferred, without growing the scope.
+
+| Follow-up | Source | Where |
+|---|---|---|
+| `ServiceBusFixture` leaves the emulator's MSSQL sidecar (and its network) behind when Ryuk is off | [`messagebus`](2026-11-02-core-2-0-messagebus.md) Follow-ups | Step 02, with the Ryuk change |
+| Keep `AzuriteFixture`'s default image at `azurite:3.37.0` | [`blob`](2026-11-02-core-2-0-blob.md) code review | Step 03 renames the fixture's methods and keeps the pin; no step changes the image |
+| Split `tests/SolTechnology.Core.MessageBus.Tests/ModuleInstallerTests.cs` (222 lines, Guide §9) | `messagebus` Follow-ups | Step 06, with the other size-cap splits |
+| A Blob test project starting with five Azurite tests | `blob` Follow-ups, AR-1 | Deferred: Q6 rules out new test projects; it stays a Blob follow-up |
+| A shipped Hangfire testing helper (`RecurringJobHost`, the performer loop, `HangfireGlobalState.Reset`) | [`hangfire`](2026-11-02-core-2-0-hangfire.md) Follow-ups | Deferred: no step plans a Hangfire kit; recorded under `Follow-ups` with the reset requirement |
+| Dedicated tests for the companion packages | [`2026-05-30-testing-framework-companions`](2026-05-30-testing-framework-companions.md) | Deferred with the `*.Testing` test project (Q6) |
+| Remove the `System.Security.Cryptography.Pkcs` override and the `Microsoft.Identity.Client` reference from `SQL.Testing` | [`sql`](2026-11-02-core-2-0-sql.md) Follow-ups | Deferred: both wait on upstream packages |
+
 ## Acceptance criteria
 
 - [ ] Every step's acceptance criteria are checked, or the gap is recorded under `Deviations`.
@@ -144,5 +159,13 @@ Steps run in number order; each is one PR.
 ## Completion summary
 
 ## Deviations
+
+Decisions taken during implementation (owner pre-approved the plan; detail in each step's `Deviations` until the
+retrospective promotes them):
+
+- Step 01: HTTP.Tests had no `WireMockStartup` consumer, so it gains a reference to HTTP.Testing and
+  `WireMockStartupTests`, which pins P-11. Strict matching exposed DreamTravel's distance-matrix stubs: WireMock splits
+  query values on commas, so they never fully matched; the stubs now match the split values. The disposal test boots
+  its own `DisposalTestEntryPoint` (API.Tests sets `GenerateProgramFile=false`).
 
 ## Follow-ups

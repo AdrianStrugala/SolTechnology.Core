@@ -26,6 +26,8 @@ public sealed class TestHostContainmentGuardTests
         "WorkerFixture.cs",
         // DreamTravel: a second host booted as Production to test error handling outside Development
         "ProductionErrorHandlingTests.cs",
+        // Verifies APIFixture disposal itself
+        "APIFixtureDisposalTests.cs",
     };
 
     private static readonly Regex TestHostPattern = new(

@@ -46,8 +46,9 @@ namespace DreamTravel.FunctionalTests.FakeApis
                 .UsingGet()
                 .WithPath(new WildcardMatcher($"/{BaseUrl}/maps/api/distancematrix/json"))
                 .WithParam("units", "imperial")
-                .WithParam("origins", $"{coordinates}")
-                .WithParam("destinations", $"{coordinates}")
+                // WireMock splits query values on commas, so match the split coordinates.
+                .WithParam("origins", coordinates.ToString().Split(','))
+                .WithParam("destinations", coordinates.ToString().Split(','))
                 .WithParam("key", "googleKey");
 
             Provider = BuildRequest(request);
@@ -68,8 +69,9 @@ namespace DreamTravel.FunctionalTests.FakeApis
                 .UsingGet()
                 .WithPath(new WildcardMatcher($"/{BaseUrl}/maps/api/distancematrix/json"))
                 .WithParam("units", "imperial")
-                .WithParam("origins", $"{coordinates}")
-                .WithParam("destinations", $"{coordinates}")
+                // WireMock splits query values on commas, so match the split coordinates.
+                .WithParam("origins", coordinates.ToString().Split(','))
+                .WithParam("destinations", coordinates.ToString().Split(','))
                 .WithParam("avoid", "tolls")
                 .WithParam("key", "googleKey");
 
