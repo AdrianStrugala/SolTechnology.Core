@@ -25,6 +25,7 @@ namespace SolTechnology.Core.MessageBus.Broker
                 options.Value.CreateResources
                     ? administrationClient ?? new ServiceBusAdministrationClient(options.Value.ConnectionString)
                     : null,
+                options.Value.MaxDeliveryCount,
                 logger),
             logger);
 

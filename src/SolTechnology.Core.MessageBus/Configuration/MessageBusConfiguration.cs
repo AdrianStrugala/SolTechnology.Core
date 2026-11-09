@@ -31,7 +31,8 @@ namespace SolTechnology.Core.MessageBus.Configuration
         /// <summary>
         /// Delivery attempt on which the receiver dead-letters a message whose handler failed, instead of abandoning it.
         /// Set it to the queue's or subscription's configured <c>MaxDeliveryCount</c>; reading it from the entity would
-        /// need the <i>Manage</i> claim. Must be greater than zero. Default 10, the Service Bus default.
+        /// need the <i>Manage</i> claim. With <see cref="CreateResources"/> on, queues and subscriptions the module creates
+        /// get this value. Must be greater than zero. Default 10, the Service Bus default.
         /// </summary>
         public int MaxDeliveryCount { get; set; } = 10;
 

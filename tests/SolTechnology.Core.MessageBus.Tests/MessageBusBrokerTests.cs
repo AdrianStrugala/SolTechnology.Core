@@ -37,9 +37,28 @@ public class MessageBusBrokerTests
         await act.Should().NotThrowAsync();
         sut.ResolveReceivers().Select(r => r.MessageType)
             .Should().BeEquivalentTo(new[] { typeof(QueueMessage), typeof(TopicMessage) });
-        await administration.Received(1).CreateQueueAsync("orders", Arg.Any<CancellationToken>());
+        await administration.Received(1).CreateQueueAsync(Arg.Is<CreateQueueOptions>(o => o.Name == "orders"), Arg.Any<CancellationToken>());
         await administration.Received(1).CreateTopicAsync("events", Arg.Any<CancellationToken>());
-        await administration.Received(1).CreateSubscriptionAsync("events", "billing", Arg.Any<CancellationToken>());
+        await administration.Received(1).CreateSubscriptionAsync(
+            Arg.Is<CreateSubscriptionOptions>(o => o.TopicName == "events" && o.SubscriptionName == "billing"), Arg.Any<CancellationToken>());
+    }
+
+    [Test]
+    public async Task EnsureInitialized_CreateResources_CreatesQueueAndSubscriptionWithConfiguredMaxDeliveryCount()
+    {
+        // Arrange
+        var administration = AdministrationClientWithNoEntities();
+        await using var client = new ServiceBusClient(ConnectionString);
+        await using var sut = CreateBroker(client, administration, maxDeliveryCount: 3);
+
+        // Act
+        await sut.EnsureInitializedAsync();
+
+        // Assert
+        await administration.Received(1).CreateQueueAsync(
+            Arg.Is<CreateQueueOptions>(o => o.Name == "orders" && o.MaxDeliveryCount == 3), Arg.Any<CancellationToken>());
+        await administration.Received(1).CreateSubscriptionAsync(
+            Arg.Is<CreateSubscriptionOptions>(o => o.SubscriptionName == "billing" && o.MaxDeliveryCount == 3), Arg.Any<CancellationToken>());
     }
 
     [Test]
@@ -58,26 +77,40 @@ public class MessageBusBrokerTests
             .Which.Reason.Should().Be(ServiceBusFailureReason.QuotaExceeded);
     }
 
-    private static MessageBusBroker CreateBroker(ServiceBusClient client, ServiceBusAdministrationClient administration)
+    private static MessageBusBroker CreateBroker(
+        ServiceBusClient client,
+        ServiceBusAdministrationClient administration,
+        int maxDeliveryCount = 10)
     {
         var registry = new MessageBusRegistry();
         registry.Add(new EndpointRegistration(typeof(QueueMessage), EndpointKind.Queue, EndpointRole.Receiver, "orders", null));
         registry.Add(new EndpointRegistration(typeof(TopicMessage), EndpointKind.Topic, EndpointRole.Receiver, "events", "billing"));
-        var options = Options.Create(new MessageBusConfiguration { ConnectionString = ConnectionString, CreateResources = true });
+        var options = Options.Create(new MessageBusConfiguration
+        {
+            ConnectionString = ConnectionString,
+            CreateResources = true,
+            MaxDeliveryCount = maxDeliveryCount
+        });
         return new MessageBusBroker(options, registry, client, NullLogger<MessageBusBroker>.Instance, administration);
+    }
+
+    private static ServiceBusAdministrationClient AdministrationClientWithNoEntities()
+    {
+        var administration = Substitute.For<ServiceBusAdministrationClient>();
+        var notExists = Task.FromResult(Response.FromValue(false, Substitute.For<Response>()));
+        administration.QueueExistsAsync(Arg.Any<string>(), Arg.Any<CancellationToken>()).Returns(notExists);
+        administration.TopicExistsAsync(Arg.Any<string>(), Arg.Any<CancellationToken>()).Returns(notExists);
+        administration.SubscriptionExistsAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<CancellationToken>()).Returns(notExists);
+        return administration;
     }
 
     private static ServiceBusAdministrationClient AdministrationClientThatLosesEveryCreateRace(ServiceBusFailureReason reason)
     {
-        var administration = Substitute.For<ServiceBusAdministrationClient>();
-        var notExists = Task.FromResult(Response.FromValue(false, Substitute.For<Response>()));
+        var administration = AdministrationClientWithNoEntities();
         var failure = new ServiceBusException("entity create failed", reason);
-        administration.QueueExistsAsync(Arg.Any<string>(), Arg.Any<CancellationToken>()).Returns(notExists);
-        administration.TopicExistsAsync(Arg.Any<string>(), Arg.Any<CancellationToken>()).Returns(notExists);
-        administration.SubscriptionExistsAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<CancellationToken>()).Returns(notExists);
-        administration.CreateQueueAsync(Arg.Any<string>(), Arg.Any<CancellationToken>()).ThrowsAsync(failure);
+        administration.CreateQueueAsync(Arg.Any<CreateQueueOptions>(), Arg.Any<CancellationToken>()).ThrowsAsync(failure);
         administration.CreateTopicAsync(Arg.Any<string>(), Arg.Any<CancellationToken>()).ThrowsAsync(failure);
-        administration.CreateSubscriptionAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<CancellationToken>()).ThrowsAsync(failure);
+        administration.CreateSubscriptionAsync(Arg.Any<CreateSubscriptionOptions>(), Arg.Any<CancellationToken>()).ThrowsAsync(failure);
         return administration;
     }
 }

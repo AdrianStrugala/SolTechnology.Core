@@ -7,15 +7,19 @@ namespace SolTechnology.Core.MessageBus.Broker;
 
 /// <summary>
 /// Creates missing queues, topics, and subscriptions when <c>CreateResources</c> is on; does nothing without an
-/// administration client. An entity that another instance creates between the existence check and the create
-/// counts as created.
+/// administration client. Created queues and subscriptions get the configured <c>MaxDeliveryCount</c>, so the broker
+/// and the receiver agree on the last attempt. An entity that another instance creates between the existence check and
+/// the create counts as created.
 /// </summary>
-internal sealed class ServiceBusResourceProvisioner(ServiceBusAdministrationClient? administrationClient, ILogger logger)
+internal sealed class ServiceBusResourceProvisioner(
+    ServiceBusAdministrationClient? administrationClient,
+    int maxDeliveryCount,
+    ILogger logger)
 {
     public Task EnsureQueue(string queueName, CancellationToken ct) =>
         CreateIfMissing(
             admin => admin.QueueExistsAsync(queueName, ct),
-            admin => admin.CreateQueueAsync(queueName, ct),
+            admin => admin.CreateQueueAsync(new CreateQueueOptions(queueName) { MaxDeliveryCount = maxDeliveryCount }, ct),
             queueName);
 
     public Task EnsureTopic(string topicName, CancellationToken ct) =>
@@ -27,7 +31,8 @@ internal sealed class ServiceBusResourceProvisioner(ServiceBusAdministrationClie
     public Task EnsureSubscription(string topicName, string subscriptionName, CancellationToken ct) =>
         CreateIfMissing(
             admin => admin.SubscriptionExistsAsync(topicName, subscriptionName, ct),
-            admin => admin.CreateSubscriptionAsync(topicName, subscriptionName, ct),
+            admin => admin.CreateSubscriptionAsync(
+                new CreateSubscriptionOptions(topicName, subscriptionName) { MaxDeliveryCount = maxDeliveryCount }, ct),
             $"{topicName}/{subscriptionName}");
 
     private async Task CreateIfMissing(

@@ -40,7 +40,7 @@ builder.Services
 |---|---|---|
 | `ConnectionString` | — (required) | Service Bus connection string. An empty or whitespace value stops the host at start with `OptionsValidationException`. |
 | `MaxDeliveryCount` | `10` | Delivery on which a failing message is dead-lettered instead of abandoned. Set it to the queue's or subscription's `MaxDeliveryCount`; it must be greater than zero. |
-| `CreateResources` | `false` | Create missing queues, topics, and subscriptions at start. Needs the *Manage* claim; prefer infrastructure as code. |
+| `CreateResources` | `false` | Create missing queues, topics, and subscriptions at start; created queues and subscriptions get `MaxDeliveryCount`. Needs the *Manage* claim; prefer infrastructure as code. |
 | `TransportType` | `AmqpWebSockets` | AMQP over port 443, which passes most proxies and firewalls; `AmqpTcp` uses port 5671. |
 | `MaxConcurrentCalls` | `1` | Messages each receiver handles in parallel. |
 | `PrefetchCount` | `0` | Messages each receiver fetches ahead. |
