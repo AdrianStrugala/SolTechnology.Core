@@ -11,7 +11,7 @@ Every received message becomes its own Chronicle root through `BeginRoot` (B11),
 after the correlation ID is restored, so handler steps, SQL commands, and HTTP calls made while
 handling the message nest under it. The root status follows the receiver's settlement outcome as
 defined by the 2.0 MessageBus work: completed → `Ok`, dead-lettered or abandoned → `Failed`,
-processor shutdown → `Cancelled`. One EventId 2150 entry is emitted per message (LC-03). The
+processor shutdown → `Cancelled`. One EventId 2154 entry is emitted per message (LC-03). The
 message body is never recorded.
 
 ## Affected components

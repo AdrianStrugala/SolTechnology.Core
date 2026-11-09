@@ -14,7 +14,7 @@ and after the logging, infrastructure-module, and foundation retrospectives list
 brief's cross-feature dependencies have created the architecture pages this step extends.
 
 ## Affected components
-- `docs/architecture/logging.md` — EDIT (created by the `2026-11-02-core-2-0-logging` retrospective) — NEW "Chronicle" section: ambient `AsyncLocal` tree and struct handle (B2), placement in Logging (B1), integration seams and the SqlClient observer (B3), flight-recorder provider (B4), request report as the finish entry (B5), payload shape (B6), OTel mapping (B7), tail sampling (B8), `Begin` vs `BeginRoot` (B9, B11), bounds and markers, EventIds 2150/2151
+- `docs/architecture/logging.md` — EDIT (created by the `2026-11-02-core-2-0-logging` retrospective) — NEW "Chronicle" section: ambient `AsyncLocal` tree and struct handle (B2), placement in Logging (B1), integration seams and the SqlClient observer (B3), flight-recorder provider (B4), request report as the finish entry (B5), payload shape (B6), OTel mapping (B7), tail sampling (B8), `Begin` vs `BeginRoot` (B9, B11), bounds and markers, EventIds 2154/2155
 - `docs/architecture/cqrs.md` — EDIT — pipeline step replaces the CQRS `ActivitySource`; event-handler steps; fire-and-forget event roots
 - `docs/architecture/tale-framework.md` — EDIT — run and chapter steps; Tale → Logging package edge
 - `docs/architecture/http-client.md` — EDIT — handler chain with `ChronicleHTTPHandler` (outermost) and `ChronicleHTTPAttemptHandler` (after resilience)

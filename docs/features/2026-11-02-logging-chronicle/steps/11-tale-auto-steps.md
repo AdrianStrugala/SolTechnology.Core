@@ -41,7 +41,7 @@ run's `IServiceProvider`, so no public Tale constructor changes. `AddSolTale` re
   - `Handle_InteractiveChapterPauses_ChapterOkWithWaitingForInput`.
   - `Handle_Resume_CompletedChaptersHaveNoStep`.
   - `Handle_InsideRoot_TaleIsChildOfAmbientStep`.
-  - `Handle_OutsideRoot_EmitsOne2150Entry`.
+  - `Handle_OutsideRoot_EmitsOne2154Entry`.
   - `Handle_ChronicleNotRegistered_RunsUnchanged`.
   - `AddSolTale_RegistersChronicle`.
 

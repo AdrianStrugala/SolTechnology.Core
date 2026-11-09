@@ -259,7 +259,7 @@ engine through the run's `IServiceProvider`. So does the only external call site
 | # | Choice | Alternatives | Recommendation and crux |
 |---|---|---|---|
 | B4 | Flight-recorder capture | (a) an `ILoggerProvider` with `[ProviderAlias("ChronicleFlightRecorder")]`, plus default `LoggerFilterOptions` rules (Debug for all categories; Warning for `Microsoft` and `System`) added only when no rule already targets the alias; (b) an `ILoggerFactory` decorator in DI; (c) a Serilog sink | **(a).** It is the canonical MEL extension point and composes with Console, OTel, and `builder.Logging.AddSerilog()`. It records only while a root is active (`IsEnabled` checks the ambient root), so it costs nothing outside roots. Crux: `UseSerilog()` replaces `ILoggerFactory`, so providers receive nothing unless `writeToProviders: true` is set; this is documented in `Log.md`. (b) depends on registration order relative to `UseSerilog` and misses factories created outside DI. (c) adds an external dependency (`§2`, `nuget-stats.json`). |
-| B5 | Middleware finish entry | (a) For HTTP roots the Chronicle report **is** the finish entry: EventId 2151, `Finished request [..] -> [..] in [..]` prefix and the `RequestMethod`/`RequestPath`/`StatusCode`/`ElapsedMs` properties kept, `{@Timings}` removed; (b) keep "Finished request" and add a separate report | **(a)**, per U5 ("one entry per root"). Existing KQL on the four properties keeps working. P-15 (one Error entry per failure, `2026-11-02-core-2-0-logging` step "Logging — segment-aware path matching; one Error entry per failure") holds: the report replaces the "failed after" entry. With `Enabled = false` the middleware keeps the entries defined by that logging step. Log contract changes LC-01/LC-02. |
+| B5 | Middleware finish entry | (a) For HTTP roots the Chronicle report **is** the finish entry: EventId 2155, `Finished request [..] -> [..] in [..]` prefix and the `RequestMethod`/`RequestPath`/`StatusCode`/`ElapsedMs` properties kept, `{@Timings}` removed; (b) keep "Finished request" and add a separate report | **(a)**, per U5 ("one entry per root"). Existing KQL on the four properties keeps working. P-15 (one Error entry per failure, `2026-11-02-core-2-0-logging` step "Logging — segment-aware path matching; one Error entry per failure") holds: the report replaces the "failed after" entry. With `Enabled = false` the middleware keeps the entries defined by that logging step. Log contract changes LC-01/LC-02. |
 | B6 | Structured payload | (a) `[LoggerMessage]` with scalar placeholders plus `[{@Chronicle}]`, where `ChronicleReport.ToString()` renders the ASCII tree and Serilog destructures the public read-only model; (b) a hand-written `IReadOnlyList<KeyValuePair<string, object?>>` state with a JSON `Chronicle` property that does not appear in the message | **(a)**, because U5 mandates source generation. Limitation: OTel and App Insights receive `Chronicle` as tree text, and KQL filters on the scalar placeholders. (b) becomes a follow-up if per-step KQL is needed. Crux settled by the plan review: the generator has accepted `{@Name}` templates since .NET 8 (dotnet/runtime#69490, closed in milestone 8.0.0), so `[{@Chronicle}]` is kept. If step 04 still observes `SYSLIB1014`, use `[{Chronicle}]`, record a deviation, and document that Serilog then stores the tree as a string. |
 | B7 | OpenTelemetry mapping | (a) Chronicle steps start Activities on the shared `OperationsName` source, only when it has listeners, and CQRS drops its step-52 `ActivitySource` because the Chronicle step now produces that Activity; (b) a new source `SolTechnology.Core.Chronicle`; (c) no Activities | **(a).** Consumers' existing `AddSource(OperationsName)` keeps working, with no duplicate CQRS span. HTTP steps are logical spans around HttpClient's physical spans; documented. Opt-out: `EmitActivities = false`. The HTTP request root never starts an Activity, because ASP.NET Core already has one. |
 | B8 | Sampling | (a) Tail-based at root end: always emit when the status is not `Ok`, the level is ≥ Warning, or N+1 is suspected; otherwise emit when `Random.Shared.NextDouble() < SampleRate`; (b) head-based at `Begin` | **(a).** Head-based sampling cannot keep failures. Default `SampleRate = 1.0`, so nothing is dropped unless the user opts in (LC-04). Activities are not affected by Chronicle sampling. |
@@ -343,20 +343,20 @@ Integration types are internal: `ChronicleHTTPHandler`, `ChronicleHTTPAttemptHan
 | CP-03 | `AddSolCQRS` (when `UseLogging`), `AddSolTale`, `AddSolHTTPClient`, `AddSolMessageBus`, `AddSolPersistentEvents`, and `AddSolRecurringJob` call `AddSolChronicle()` | `ChronicleOptions` validated on start in those hosts | 04, 10–14 |
 | CP-04 | Logging subscribes to `SqlClientDiagnosticListener` when `CaptureSQLCommands` is `true` | SqlClient writes diagnostic payloads only while a root is active (`IsEnabled` predicate) | 07 |
 | CP-05 | A flight-recorder `ILoggerProvider` is registered; `IsEnabled(Debug)` returns `true` inside roots when `FlightRecorder.Enabled` | Debug templates are formatted inside roots only when opted in | 06 |
-| CP-06 | Fire-and-forget CQRS events dispatched by the default `InMemoryEventPublisher` each produce their own root (`Event {EventType}`, EventId 2150) when `IChronicle` is registered | One extra 2150 entry per published event (subject to sampling) | 10 |
+| CP-06 | Fire-and-forget CQRS events dispatched by the default `InMemoryEventPublisher` each produce their own root (`Event {EventType}`, EventId 2154) when `IChronicle` is registered | One extra 2154 entry per published event (subject to sampling) | 10 |
 
 ### Log contract changes (Guide §15 "report only", accepted by the user 2026-11-02, OQ-2)
 
-- **LC-01** — HTTP finish entry. EventId **2151** `RequestChronicleReported`, template
+- **LC-01** — HTTP finish entry. EventId **2155** `RequestChronicleReported`, template
   `Finished request [{RequestMethod}] [{RequestPath}] -> [{StatusCode}] in [{ElapsedMs} ms]. Chronicle: [{ChronicleStatus}] [{@Chronicle}]`.
   `{@Timings}` is removed. A successful request slower than `SlowThreshold` logs at Warning
   (Information before). Step 09.
-- **LC-02** — A failed request logs **one** Error entry (EventId 2151, exception attached,
+- **LC-02** — A failed request logs **one** Error entry (EventId 2155, exception attached,
   `ChronicleStatus = Failed`), which replaces "Request [..] failed after [..]" and keeps P-15. A
-  client abort logs Warning 2151 with `ChronicleStatus = Cancelled`, which replaces "aborted by
+  client abort logs Warning 2155 with `ChronicleStatus = Cancelled`, which replaces "aborted by
   client". With `Enabled = false`, the entries defined by `2026-11-02-core-2-0-logging` step "Logging — segment-aware path
   matching; one Error entry per failure" remain. Step 09.
-- **LC-03** — NEW EventId **2150** `ChronicleReported` per non-HTTP root, template
+- **LC-03** — NEW EventId **2154** `ChronicleReported` per non-HTTP root, template
   `Chronicle [{ChronicleName}] [{ChronicleStatus}] in [{DurationMs} ms], [{StepCount}] steps: [{@Chronicle}]`.
   Roots: CQRS commands outside requests, fire-and-forget events (CP-06), MessageBus messages,
   Hangfire jobs, and manual `Begin`/`BeginRoot`. Step 04.
@@ -364,9 +364,9 @@ Integration types are internal: `ChronicleHTTPHandler`, `ChronicleHTTPAttemptHan
   emit nothing (opt-in; the default `1.0` emits everything). Step 04.
 - **LC-05** — With `FlightRecorder.Enabled`, Debug/Trace entries from inside a failed root appear
   in its report. Other providers still apply their own filters. Step 06.
-- EventIds 2150/2151 sit after any EventId that `2026-11-02-core-2-0-cqrs` step "CQRS — log
-  failed `Result`s as failures" (`OperationFailedWithResult`) or `2026-11-02-core-2-0-logging` step "Guide
-  conformance — Logging" (`RequestEnvelopeLogger`) assigns. Steps 04 and 09 check uniqueness
+- EventIds 2154/2155 sit after the ids already shipped: 2137–2148 (Logging), 2149 (CQRS
+  `OperationFailedWithResult`), and 2150–2153 (Hangfire start-up logs, `2026-11-02-core-2-0-hangfire`). The plan
+  reserved 2150/2151 until Hangfire, which shipped first, took them on 2026-11-09. Steps 04 and 09 check uniqueness
   with a grep.
 
 ### Open questions (resolved 2026-11-02)
@@ -374,7 +374,7 @@ Integration types are internal: `ChronicleHTTPHandler`, `ChronicleHTTPAttemptHan
 | ID | Question | User answer (2026-11-02) | Steps unblocked |
 |---|---|---|---|
 | OQ-1 | Confirm the `CLAUDE.md §2` public API changes `CH-01`…`CH-11` (one round). | **Confirmed**: `IChronicle`, `ChronicleStep`, `ChronicleStepStatus`, `ChronicleOptions`, `ChronicleFlightRecorderOptions`, `ChronicleReport`/`ChronicleReportStep`/`ChronicleFlightRecord`, both `AddSolChronicle` overloads, DELETE `ITimingService`, `LoggingMiddleware.InvokeAsync` `ITimingService` → `IChronicle`, the `LoggingPipelineBehavior` constructor gaining `IChronicle`, and `IChronicle.BeginRoot`. | 01–10 |
-| OQ-2 | Accept the Guide §15 "report only" log contract changes `LC-01`…`LC-05` for 2.0. | **Accepted**: EventId 2151 report replaces "Finished request"; one Error entry per failure; new EventId 2150 for non-HTTP roots; sampling; flight recorder. | 04, 06, 09 |
+| OQ-2 | Accept the Guide §15 "report only" log contract changes `LC-01`…`LC-05` for 2.0. | **Accepted**: EventId 2155 report replaces "Finished request"; one Error entry per failure; new EventId 2154 for non-HTTP roots; sampling; flight recorder. | 04, 06, 09 |
 
 Earlier user decisions U1–U8 stand. The plan-reviewer accepted the planner decisions `CP-01`
 (Tale → Logging edge, B3) and B11 (`BeginRoot`) on 2026-11-02. Neither creates a cycle, and both
@@ -549,7 +549,7 @@ Changes applied by the plan-reviewer. Each one is reflected in the step files:
 - [ ] `grep -rn "ITimingService\|TimingService" src tests sample-tale-code-apps --include=*.cs | grep -v "/bin/\|/obj/"` prints nothing, and `grep -rln "ITimingService" docs --include=*.md | grep -v "docs/features/"` prints only `docs/Log.md` (its migration subsection).
 - [ ] `grep -n "ProjectReference" src/SolTechnology.Core.Logging/SolTechnology.Core.Logging.csproj` prints nothing (no dependency cycle).
 - [ ] `git diff <feature-base>..HEAD -- src/*/*.csproj | grep "^+.*PackageReference"` prints nothing (no new external dependency in `src/`).
-- [ ] `grep -rnE "EventId = (2150|2151)" src --include=*.cs` lists exactly one `ChronicleReported` (2150) and one `RequestChronicleReported` (2151).
+- [ ] `grep -rnE "EventId = (2154|2155)" src --include=*.cs` lists exactly one `ChronicleReported` (2154) and one `RequestChronicleReported` (2155).
 - [ ] `git grep -niE "decompil|ilspy|dotpeek" -- src tests sample-tale-code-apps docs ':!docs/features/2026-11-02-logging-chronicle*'` prints nothing, and every Chronicle PR description carries the clean-room attestation (clean room).
 - [ ] `find src/SolTechnology.Core.Logging/Chronicles -name "*.cs" | xargs wc -l | awk '$1>150 && $2!="total"'` prints nothing.
 - [ ] Logging.Tests has these tests green:
@@ -562,7 +562,7 @@ Changes applied by the plan-reviewer. Each one is reflected in the step files:
 - [ ] CQRS handler, Tale chapter, HTTP client call, and SqlClient command steps are proven by
       tests (steps 07, 10, 11, 12).
 - [ ] `docs/Log.md` contains a `Chronicle` section; `ITimingService` appears only in its `Migrating from ITimingService (1.x)` subsection.
-- [ ] DreamTravel `FindCityByName` produces one 2151 entry with nested CQRS and HTTP steps
+- [ ] DreamTravel `FindCityByName` produces one 2155 entry with nested CQRS and HTTP steps
       (component test, step 16).
 - [ ] `CH-01`…`CH-11` and `LC-01`…`LC-05` were confirmed by the user on 2026-11-02 (OQ-1, OQ-2
       resolved in this brief); no further public symbol changed without a new confirmation.

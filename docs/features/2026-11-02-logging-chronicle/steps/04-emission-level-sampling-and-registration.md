@@ -9,14 +9,14 @@ status: to-do
 ## Summary
 This step makes Chronicle observable. When a root completes, an internal reporter builds the
 `ChronicleReport` (step 03), chooses the level, applies tail-based sampling (B8), and emits one
-`[LoggerMessage]` entry, EventId 2150 `ChronicleReported` (LC-03). The level is Error on
+`[LoggerMessage]` entry, EventId 2154 `ChronicleReported` (LC-03). The level is Error on
 failure, Warning when cancelled or slower than `SlowThreshold`, and Information otherwise.
 `AddSolChronicle` (both overloads) registers the recorder, reporter, options validation, and
 `TimeProvider`, and both `AddSolLogging` overloads call it. This edits the Logging installer
 (premortem gate).
 
 ## Affected components
-- `src/SolTechnology.Core.Logging/Chronicles/ChronicleLogMessages.cs` — NEW — `internal static partial class` with `[LoggerMessage(EventId = 2150, EventName = "ChronicleReported", Message = "Chronicle [{ChronicleName}] [{ChronicleStatus}] in [{DurationMs} ms], [{StepCount}] steps: [{@Chronicle}]")] static partial void ChronicleReported(ILogger logger, LogLevel level, Exception? exception, string chronicleName, string chronicleStatus, long durationMs, int stepCount, ChronicleReport chronicle)`
+- `src/SolTechnology.Core.Logging/Chronicles/ChronicleLogMessages.cs` — NEW — `internal static partial class` with `[LoggerMessage(EventId = 2154, EventName = "ChronicleReported", Message = "Chronicle [{ChronicleName}] [{ChronicleStatus}] in [{DurationMs} ms], [{StepCount}] steps: [{@Chronicle}]")] static partial void ChronicleReported(ILogger logger, LogLevel level, Exception? exception, string chronicleName, string chronicleStatus, long durationMs, int stepCount, ChronicleReport chronicle)`
 - `src/SolTechnology.Core.Logging/Chronicles/ChronicleEmissionPolicy.cs` — NEW — internal, pure: `(LogLevel Level, bool ShouldEmit) Decide(ChronicleReport report, int? httpStatusCode)`; level rules and sampling from the brief; random source injected as `Func<double>` (default `Random.Shared.NextDouble`)
 - `src/SolTechnology.Core.Logging/Chronicles/ChronicleReporter.cs` — NEW — `internal sealed class ChronicleReporter(ILoggerFactory loggerFactory, IOptions<ChronicleOptions> options) : IChronicleRootListener`; builds the report (step 03), asks `ChronicleEmissionPolicy`, logs; logger category `SolTechnology.Core.Logging.Chronicle`; skips roots with `IsReportedByCaller` (set by step 09); catches and logs (Warning, plain template) its own failures
 - `src/SolTechnology.Core.Logging/Chronicles/ChronicleRoot.cs` — EDIT — `internal bool IsReportedByCaller`
@@ -61,7 +61,7 @@ failure, Warning when cancelled or slower than `SlowThreshold`, and Information 
     - `SampleRate0_Failed_Emitted`;
     - `SampleRate0_Slow_Emitted`;
     - `SampleRate0_NPlusOne_Emitted`.
-  - `RootCompleted_EmitsExactlyOneEntryWithEventId2150`.
+  - `RootCompleted_EmitsExactlyOneEntryWithEventId2154`.
   - `ReportedByCallerRoot_NotEmittedByReporter`.
   - `Template_EveryPlaceholderBracketed` (the template string matches the `[{` … `}]` rule).
   - `AddSolChronicle_CalledTwice_RegistersOnce`.
@@ -87,7 +87,7 @@ failure, Warning when cancelled or slower than `SlowThreshold`, and Information 
 
 ## Acceptance criteria
 - [ ] `dotnet test tests/SolTechnology.Core.Logging.Tests` is green.
-- [ ] `grep -rnE "EventId = 2150" src --include=*.cs | wc -l` prints `1`, and no other `[LoggerMessage]` in `src` uses 2150.
+- [ ] `grep -rnE "EventId = 2154" src --include=*.cs | wc -l` prints `1`, and no other `[LoggerMessage]` in `src` uses 2154.
 - [ ] `wc -l < src/SolTechnology.Core.Logging/ModuleInstaller.cs` prints ≤ 150.
 - [ ] `dotnet build SolTechnology.Core.slnx` is green.
 - [ ] Premortem mitigations for `ModuleInstaller.cs` (step 00) are applied.

@@ -37,7 +37,7 @@ stay unchanged.
   - Handler exceptions keep today's per-handler isolation and Error log; the handler step is `Failed`.
   - `IChronicle` is optional (`= null` default) so `UseLogging = false` hosts without Chronicle keep working; the types stay internal, so no `§2` gate applies.
 - Tests (`FakeLogCollector`; reports asserted on the rendered tree in `FakeLogRecord.Message`, because `FakeLogger` stringifies state values):
-  - `Handle_OutsideRoot_EmitsOne2150EntryNamedAfterRequest`.
+  - `Handle_OutsideRoot_EmitsOne2154EntryNamedAfterRequest`.
   - `Handle_InsideRoot_AddsChildStepNamedAfterRequest`.
   - `Handle_NestedSend_BuildsNestedSteps`.
   - `Handle_FailedResult_StepFailedWithTypeAndMessageOnly`.

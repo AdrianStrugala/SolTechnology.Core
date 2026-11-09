@@ -9,7 +9,7 @@ status: to-do
 ## Summary
 This step documents the shipped Chronicle behavior for consumers. `docs/Log.md` gets a full
 `Chronicle` section: the concept, API, a real sample report, options, levels and sampling, N+1
-hints, the flight recorder, OpenTelemetry mapping, EventIds 2150/2151, and the migration from
+hints, the flight recorder, OpenTelemetry mapping, EventIds 2154/2155, and the migration from
 `ITimingService`. Each integrated module doc gets a short "Chronicle" subsection that says what
 appears in the report and what is never recorded. It runs after the 2.0 module-doc rewrites, so
 it adds sections rather than rewriting pages. Architecture pages are not touched here; the
@@ -32,7 +32,7 @@ retrospective (step 17) updates them.
   - Options table: every `ChronicleOptions` and `ChronicleFlightRecorderOptions` property with default, range, and `appsettings` path `Logging:Core:Chronicle`.
   - `AddSolChronicle(IConfiguration)` or `AddSolLogging(IConfiguration)` is needed for `appsettings` binding; the parameterless calls made by other installers use defaults.
   - Levels, tail sampling (failures, slow, and N+1 always kept), N+1 hint, truncation markers.
-  - EventIds table: 2150 `ChronicleReported`, 2151 `RequestChronicleReported`, and the unchanged 2137–2140.
+  - EventIds table: 2154 `ChronicleReported`, 2155 `RequestChronicleReported`, and the unchanged 2137–2140.
   - KQL example filtering on `ChronicleStatus` and `ElapsedMs`; `Chronicle` is tree text in OTel and App Insights (B6).
   - Silencing 2137–2139 through the `SolTechnology.Core.CQRS.PipelineBehaviors.LoggingPipelineBehavior` category level.
   - Flight recorder: opt-in, failed roots only, Serilog needs `writeToProviders: true` or `builder.Logging.AddSerilog()`; with `writeToProviders`, Serilog's `MinimumLevel` must admit Debug.
