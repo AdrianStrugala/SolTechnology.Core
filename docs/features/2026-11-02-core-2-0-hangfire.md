@@ -147,5 +147,8 @@ retrospective promotes them):
 - Step 02: the overlap lock is keyed by the `RecurringJobId` job parameter, or a hash of the invocation outside
   recurring jobs; runs waiting in `Scheduled` for a retry no longer block the next trigger (P-25). The filter provider
   lives in Hangfire's process-wide `JobFilterProviders.Providers` and replaces one installed by an earlier host.
+- Step 03: `OnPerformed` restores an absent ambient correlation id with `ICorrelationIdService.Set(null)` (no public
+  `Clear()` exists); the legacy `DispatchInScope(IEvent)` returns `Task` instead of `void`; the RM-6 release note also
+  says that the 1.x-server retries come from Hangfire's global retry filter.
 
 ## Follow-ups

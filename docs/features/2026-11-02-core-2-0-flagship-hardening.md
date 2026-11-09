@@ -524,6 +524,11 @@ these notes from the steps:
   store such strings cannot be loaded until the IDs are migrated.
 - hangfire 03 (former step 32, P-05): 1.x event jobs keep running in 2.x; the legacy one-argument overload is removed
   in 3.0. No queue drain is needed.
+- hangfire 03 (premortem RM-6): Deploy Hangfire servers (workers) before processes that only enqueue. A 1.x server
+  cannot run event jobs enqueued by 2.x; they fail and are retried until a 2.x server takes them. The retries come from
+  Hangfire's global retry filter (10 attempts over several hours by default), because a 1.x server cannot load the
+  method that carries `[AutomaticRetry(Attempts = 0)]`; a job that runs out of attempts can be requeued from the
+  dashboard.
 - tale 09 (former step 41, P-04): custom repositories add a `Version` column and a conditional write (the P-04 row
   spells out the contract); DreamTravel's SQLite file is migrated on start. `TaleManager` now stores a new tale, with
   its idempotency key, before the first chapter runs, so a concurrent `StartStory` with the same key returns the

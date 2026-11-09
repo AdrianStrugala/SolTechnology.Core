@@ -30,7 +30,7 @@ public class CorrelationIdJobFilterTests
     {
         // Arrange
         var correlationId = CorrelationId.FromString("test-correlation-123");
-        _correlationIdService.GetOrGenerate().Returns(correlationId);
+        _correlationIdService.Get().Returns(correlationId);
 
         var context = CreateCreatingContext();
 
@@ -61,19 +61,18 @@ public class CorrelationIdJobFilterTests
     }
 
     [Test]
-    public void OnPerforming_WhenNoStoredCorrelation_GeneratesNew()
+    public void OnPerforming_WhenNoStoredCorrelation_SetsNewId()
     {
         // Arrange
-        var generated = CorrelationId.FromString("generated-789");
-        _correlationIdService.GetOrGenerate().Returns(generated);
-
+        _correlationIdService.Get().Returns(CorrelationId.FromString("previous-job-789"));
         var context = CreatePerformingContext();
 
         // Act
         _sut.OnPerforming(context);
 
         // Assert
-        _correlationIdService.Received(1).GetOrGenerate();
+        _correlationIdService.Received(1).Set(Arg.Is<CorrelationId>(c => c.Value != "previous-job-789"));
+        _correlationIdService.DidNotReceive().GetOrGenerate();
     }
 
     [Test]

@@ -1,7 +1,7 @@
 ---
 spec: 2026-11-02-core-2-0-hangfire
 step: 03
-status: to-do
+status: done
 ---
 
 # Step 03: Hangfire — restore ambient correlation state; async, cancellable event dispatch
@@ -55,14 +55,50 @@ Former core step 32; moved here by the per-library regroup (user, 2026-11-02).
     Hangfire stores these names in every enqueued, scheduled, and recurring job.
 
 ## Acceptance criteria
-- [ ] `dotnet test tests/SolTechnology.Core.Hangfire.Tests` is green, and the distinct-ID test fails on `4097d47f`.
-- [ ] `grep -n "GetAwaiter().GetResult()" src/SolTechnology.Core.Hangfire -r` prints nothing.
-- [ ] `DispatchInScope_Legacy1xJob_StillRuns` is green.
-- [ ] Premortem mitigations for the persisted job signature (P-05) are applied.
-- [ ] RM-6: the core brief's "Release-notes inputs" contains the server-before-client deploy note.
-- [ ] RM-7: `HangfirePersistedIdentityTests` is green.
+- [x] `dotnet test tests/SolTechnology.Core.Hangfire.Tests` is green, and the distinct-ID test fails on `4097d47f`.
+- [x] `grep -n "GetAwaiter().GetResult()" src/SolTechnology.Core.Hangfire -r` prints nothing.
+- [x] `DispatchInScope_Legacy1xJob_StillRuns` is green.
+- [x] Premortem mitigations for the persisted job signature (P-05) are applied.
+- [x] RM-6: the core brief's "Release-notes inputs" contains the server-before-client deploy note.
+- [x] RM-7: `HangfirePersistedIdentityTests` is green.
 
 ## Open questions
 - none (RQ10 resolved by the user on 2026-11-02: keep the legacy overload for 2.x)
 
 ## Deviations
+
+### Restoring an absent ambient id, and a fresh id for jobs without one
+
+**Original plan:** `OnPerforming` saves the previous value and sets the job's ID; `OnPerformed` restores the previous value.
+
+**Actual implementation:** When the worker thread had no ambient id, `OnPerformed` restores "none" by calling
+`ICorrelationIdService.Set(null)`; the interface has no `Clear()` and adding one would change the public Logging
+contract, while the shipped `CorrelationIdService` stores the null in its `AsyncLocal`. A job whose parameter has no
+correlation id (created without `UseSolFilters`) now gets `CorrelationId.Generate()` instead of `GetOrGenerate()`, which
+returned the id the previous job left on the worker thread.
+
+### Legacy overload returns `Task`; tests split by file
+
+**Original plan:** The one-argument `DispatchInScope(IEvent)` stays as a legacy overload that forwards with `CancellationToken.None`; tests extend `CorrelationIdJobFilterTests.cs` and `HangfireEventPublisherTests.cs`.
+
+**Actual implementation:** The legacy overload returns `Task` instead of `void` so it forwards without blocking (Hangfire
+matches a stored job by type, method name and parameter types, not by return type), and keeps
+`[AutomaticRetry(Attempts = 0)]`, as does the new overload. `DispatchInScope_Legacy1xJob_StillRuns` deserializes a
+literal 1.x payload (the shape `UseSimpleAssemblyNameTypeSerializer` writes) and performs it with Hangfire's
+`BackgroundJobPerformer`; it sets `UseRecommendedSerializerSettings`, which consumers need for the interface-typed
+argument, for its fixture only. The real-`AsyncLocal` correlation tests live in `Filters/CorrelationIdJobFilterAmbientTests.cs`
+and the perform-through-Hangfire tests in `HangfireEventDispatchTests.cs`, keeping each test file under 150 lines.
+`HangfirePersistedIdentityTests` checks the correlation parameter key by running `OnCreating` and reading the job
+parameters (`CorrelationId`, the `4097d47f` value of `CorrelationId.ScopeKey`).
+
+### RM-6 note states where the retries come from
+
+**Original plan:** Add the RM-6 server-before-client note to the core brief's "Release-notes inputs".
+
+**Actual implementation:** The note is added verbatim, plus one sentence: the retries come from Hangfire's global retry
+filter (10 attempts over several hours by default), because a 1.x server cannot load the method that carries
+`[AutomaticRetry(Attempts = 0)]`, and an exhausted job can be requeued from the dashboard.
+
+Verification: the distinct-ID and restore tests fail against the step 02 filter (the second job gets the first job's
+id; after the run the ambient id is still `job-id`) and pass now;
+`dotnet test tests/SolTechnology.Core.Hangfire.Tests -c Release` 48/48 green.

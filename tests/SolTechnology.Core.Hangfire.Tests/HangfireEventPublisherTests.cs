@@ -63,7 +63,24 @@ public class HangfireEventPublisherTests
     }
 
     [Test]
-    public void DispatchInScope_ResolvesDispatcherFromFreshScope()
+    public void Publish_NewEvent_EnqueuesTwoArgumentOverload()
+    {
+        // Arrange
+        Job? enqueued = null;
+        _jobClient.Create(Arg.Do<Job>(job => enqueued = job), Arg.Any<IState>()).Returns("job-2");
+
+        // Act
+        _sut.Publish(new TestEvent("new"));
+
+        // Assert
+        enqueued!.Method.Name.Should().Be(nameof(HangfireEventPublisher.DispatchInScope));
+        enqueued.Method.GetParameters().Select(p => p.ParameterType)
+            .Should().Equal(typeof(IEvent), typeof(CancellationToken));
+        enqueued.Queue.Should().Be("events");
+    }
+
+    [Test]
+    public async Task DispatchInScope_ResolvesDispatcherFromFreshScope()
     {
         // Arrange
         var dispatcher = Substitute.For<IEventDispatcher>();
@@ -84,10 +101,10 @@ public class HangfireEventPublisherTests
         var @event = new TestEvent("dispatch-test");
 
         // Act
-        sut.DispatchInScope(@event);
+        await sut.DispatchInScope(@event, CancellationToken.None);
 
         // Assert
-        dispatcher.Received(1).Dispatch(@event, Ct.Any);
+        await dispatcher.Received(1).Dispatch(@event, Ct.Any);
         scopeFactory.Received(1).CreateScope();
     }
 }

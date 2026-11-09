@@ -8,18 +8,20 @@ namespace SolTechnology.Core.Hangfire.Filters;
 
 /// <summary>
 /// Propagates correlation id across the Hangfire enqueue→execute boundary.
-/// On enqueue: saves the current correlation id as a job parameter.
-/// On execute: restores it into <see cref="ICorrelationIdService"/> and pushes a log scope.
+/// On enqueue: saves the current correlation id (or a new one) as a job parameter without touching ambient state.
+/// On execute: restores it into <see cref="ICorrelationIdService"/> and pushes a log scope; after the run the
+/// worker thread's previous ambient id is restored, so it never leaks into the next job.
 /// </summary>
 internal sealed class CorrelationIdJobFilter(
     ICorrelationIdService correlationIdService,
     ILogger<CorrelationIdJobFilter> logger) : JobFilterAttribute, IClientFilter, IServerFilter
 {
     private const string LogScopeKey = "CorrelationIdLogScope";
+    private const string PreviousCorrelationIdKey = "PreviousCorrelationId";
 
     public void OnCreating(CreatingContext filterContext)
     {
-        var correlationId = correlationIdService.GetOrGenerate();
+        var correlationId = correlationIdService.Get() ?? CorrelationId.Generate();
         filterContext.SetJobParameter(CorrelationId.ScopeKey, correlationId.Value);
     }
 
@@ -30,20 +32,13 @@ internal sealed class CorrelationIdJobFilter(
     public void OnPerforming(PerformingContext filterContext)
     {
         var storedValue = filterContext.GetJobParameter<string>(CorrelationId.ScopeKey);
+        var correlationId = string.IsNullOrEmpty(storedValue)
+            ? CorrelationId.Generate()
+            : CorrelationId.FromString(storedValue);
 
-        CorrelationId correlationId;
-        if (!string.IsNullOrEmpty(storedValue))
-        {
-            correlationId = CorrelationId.FromString(storedValue);
-            correlationIdService.Set(correlationId);
-        }
-        else
-        {
-            correlationId = correlationIdService.GetOrGenerate();
-        }
-
-        var scope = logger.BeginScope(correlationId.GetScope());
-        filterContext.Items[LogScopeKey] = scope;
+        filterContext.Items[PreviousCorrelationIdKey] = correlationIdService.Get();
+        correlationIdService.Set(correlationId);
+        filterContext.Items[LogScopeKey] = logger.BeginScope(correlationId.GetScope());
     }
 
     public void OnPerformed(PerformedContext filterContext)
@@ -52,7 +47,11 @@ internal sealed class CorrelationIdJobFilter(
         {
             scope.Dispose();
         }
+
+        if (filterContext.Items.TryGetValue(PreviousCorrelationIdKey, out var previous))
+        {
+            // Setting null clears the ambient id: ICorrelationIdService has no Clear().
+            correlationIdService.Set((CorrelationId)previous!);
+        }
     }
 }
-
-

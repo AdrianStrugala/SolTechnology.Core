@@ -30,18 +30,23 @@ internal sealed class HangfireEventPublisher(
     }
 
     [AutomaticRetry(Attempts = 0)]
-    public void DispatchInScope(IEvent @event)
+    public async Task DispatchInScope(IEvent @event, CancellationToken cancellationToken)
     {
-        using var scope = scopeFactory.CreateScope();
+        await using var scope = scopeFactory.CreateAsyncScope();
         var dispatcher = scope.ServiceProvider.GetRequiredService<IEventDispatcher>();
-        dispatcher.Dispatch(@event, CancellationToken.None).GetAwaiter().GetResult();
+        await dispatcher.Dispatch(@event, cancellationToken);
     }
 
+    // Legacy 1.x job signature; remove in 3.0.
+    [AutomaticRetry(Attempts = 0)]
+    public Task DispatchInScope(IEvent @event) => DispatchInScope(@event, CancellationToken.None);
+
+    // Hangfire replaces the CancellationToken.None placeholder with the server's shutdown token.
     private void Enqueue(IEvent @event)
     {
         backgroundJobClient.Enqueue<HangfireEventPublisher>(
             _queueName,
-            publisher => publisher.DispatchInScope(@event));
+            publisher => publisher.DispatchInScope(@event, CancellationToken.None));
     }
 }
 
