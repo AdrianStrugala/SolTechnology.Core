@@ -1,7 +1,7 @@
 ---
 spec: 2026-11-02-core-2-0-testing-kits
 step: 06
-status: to-do
+status: done
 ---
 
 # Step 06: Guide conformance — testing kits
@@ -33,14 +33,61 @@ Former core steps 65 (HTTP.Testing part), 68 (`ServiceBus.Testing` part), and 69
 - Log templates: the scoped `[{Placeholder}]` check below is this library's part of former step 70 (L-03). Fix any unbracketed placeholder it finds and add the property name to the core brief's L-03 entry.
 
 ## Acceptance criteria
-- [ ] `find src/SolTechnology.Core.Testing src/SolTechnology.Core.HTTP.Testing src/SolTechnology.Core.API.Testing src/SolTechnology.Core.SQL.Testing src/SolTechnology.Core.Redis.Testing src/SolTechnology.Core.Blob.Testing src/SolTechnology.Core.ServiceBus.Testing -name "*.cs" -not -path "*/obj/*" | xargs wc -l | awk '$1>150 && $2!="total"'` prints nothing.
-- [ ] `git ls-files src | grep -E "FakeAPI|IFakeAPI"` prints nothing.
-- [ ] `pwsh ./.github/runTests.ps1` is green (Docker).
-- [ ] `dotnet test sample-tale-code-apps/DreamTravel/tests/Component/DreamTravel.Component.Tests.csproj` is green (former step 65 criterion for the HTTP.Testing renames and the `JsonResponseBuilderDecorator` split).
-- [ ] `grep -rnE "Log[A-Za-z]*\(.*\"[^\"]*[^\[]\{[A-Z][A-Za-z]*\}[^\]]" src/SolTechnology.Core.Testing src/SolTechnology.Core.HTTP.Testing src/SolTechnology.Core.API.Testing src/SolTechnology.Core.SQL.Testing src/SolTechnology.Core.Redis.Testing src/SolTechnology.Core.Blob.Testing src/SolTechnology.Core.ServiceBus.Testing --include=*.cs` prints nothing (the former step 70 repository-wide check, scoped to this library; tune the regex in the PR; `[LoggerMessage]` templates included).
-- [ ] Public API diff is empty (compare `dotnet build` ref assemblies, or use `Microsoft.DotNet.ApiCompat` locally if available).
+- [x] `find src/SolTechnology.Core.Testing src/SolTechnology.Core.HTTP.Testing src/SolTechnology.Core.API.Testing src/SolTechnology.Core.SQL.Testing src/SolTechnology.Core.Redis.Testing src/SolTechnology.Core.Blob.Testing src/SolTechnology.Core.ServiceBus.Testing -name "*.cs" -not -path "*/obj/*" | xargs wc -l | awk '$1>150 && $2!="total"'` prints nothing.
+- [x] `git ls-files src | grep -E "FakeAPI|IFakeAPI"` prints nothing.
+- [x] `pwsh ./.github/runTests.ps1` is green (Docker).
+- [x] `dotnet test sample-tale-code-apps/DreamTravel/tests/Component/DreamTravel.Component.Tests.csproj` is green (former step 65 criterion for the HTTP.Testing renames and the `JsonResponseBuilderDecorator` split).
+- [x] `grep -rnE "Log[A-Za-z]*\(.*\"[^\"]*[^\[]\{[A-Z][A-Za-z]*\}[^\]]" src/SolTechnology.Core.Testing src/SolTechnology.Core.HTTP.Testing src/SolTechnology.Core.API.Testing src/SolTechnology.Core.SQL.Testing src/SolTechnology.Core.Redis.Testing src/SolTechnology.Core.Blob.Testing src/SolTechnology.Core.ServiceBus.Testing --include=*.cs` prints nothing (the former step 70 repository-wide check, scoped to this library; tune the regex in the PR; `[LoggerMessage]` templates included).
+- [x] Public API diff is empty (compare `dotnet build` ref assemblies, or use `Microsoft.DotNet.ApiCompat` locally if available).
 
 ## Open questions
 - none
 
 ## Deviations
+
+### Splits use partial files and one collaborator
+
+**Original plan:** split `JsonResponseBuilderDecorator` (304) and `ServiceBusFixture` (230) below 150; take
+`SQLFixture` (159) below 150 by extracting the engine-specific container setup into an internal file.
+
+**Actual implementation:** after step 04's XML docs the decorator had 359 lines. It is a `partial` class across
+`JsonResponseBuilderDecorator.cs` (pipeline, callbacks, delays, transformers: 123), `.Body.cs` (127) and `.Headers.cs`
+(headers, status codes, proxy: 122), the Guide §9.9 partial-file form; the type is unchanged. `ServiceBusFixture`
+(already 179 after step 02 moved the reuse helpers into `ReusedEmulator`) hands the emulator, sidecar and network to
+the new internal `OwnedEmulator` (76) and drops to 127. In `SQLFixture` the engine selection is a four-line switch, so
+extracting it would not reach the cap; the fluent configuration methods move into the partial
+`SQLFixture.Configuration.cs` (59) instead, and `SQLFixture.cs` has 101 lines.
+
+### Conformance fixes beyond the two named files
+
+**Original plan:** `ContainerLifecycleHelper.cs` (`:15-19`) and `ResultAssertions.cs` (`:74`) get extension blocks, braces
+and comments; the kits hand-write constructors and use `static class` + `this`.
+
+**Actual implementation:** `ContainerLifecycleHelper` has no extension methods; its five-line AMQP comment is one line
+now. `ResultAssertions` and `InMemorySinkAssertions` (Testing) and `AuthClientExtensions` (API.Testing) move into
+`extension` blocks. `ResultAssertions.ShouldBeSuccess<T>(this Result<T>)` stays a classic method with a one-line why,
+because its type parameter is unconstrained (Guide §9.7 exception). `FormatError` gets braces. Primary constructors
+replace the hand-written ones in `SQLFixture`, `RedisFixture`, `AzuriteFixture`, `ServiceBusFixture`,
+`BogusCustomization<T>` and `JsonResponseBuilderDecorator`; the constructor parameter docs move to the type. The
+three-line comments in `FakeApiBase` and `ServiceBusInstanceBuilder` are one line, and `AzuriteFixture`'s comment no
+longer mentions a static flag that does not exist.
+
+### MessageBus `ModuleInstallerTests` split (messagebus follow-up absorbed)
+
+`tests/SolTechnology.Core.MessageBus.Tests/ModuleInstallerTests.cs` had 222 lines. The three endpoint-registration
+tests (`WithEndpoints_*`, `WithQueueReceiver_*`) and their message and handler types move to
+`ModuleInstallerEndpointTests.cs` (103); `ModuleInstallerTests.cs` keeps registration, validation and the shared
+client (135). Test bodies are unchanged.
+
+### Public API diff
+
+`apicompat --strict-mode` (`Microsoft.DotNet.ApiCompat.Tool` 10.0.403, both directions) compared the Release
+assemblies of the seven kits before and after this step: HTTP.Testing, SQL.Testing, Redis.Testing, Blob.Testing and
+ServiceBus.Testing show no difference. Testing and API.Testing show only the compiler-generated `extension` marker types
+(`CP0001`) and, for `ShouldBeFailure<TError>` (`where TError : Error`), `CP0021` "notnull", which Guide §9.7 accepts. The
+`[{Placeholder}]` grep prints nothing: the kits have no logger calls.
+
+Verification: the size, file-name and template greps print nothing. `dotnet test SolTechnology.Core.slnx -c Release`
+(the projects `runTests.ps1` walks, plus the DreamTravel test projects in the solution) passes 922 tests with 11
+skipped and none failed (baseline before this feature: 917 passed, 11 skipped); the DreamTravel component tests pass
+31/31. `docker ps -a` shows no container or network left by the run.

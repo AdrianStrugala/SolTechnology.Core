@@ -20,13 +20,10 @@ namespace SolTechnology.Core.Testing.Customizations;
 /// // [Test, AutoNSubstituteData] public void T(IFixture fixture) { fixture.Customize(new BogusCustomization&lt;Customer&gt;(customer)); ... }
 /// </code>
 /// </example>
-public sealed class BogusCustomization<T> : ICustomization where T : class
+/// <param name="faker">The rules that build every <typeparamref name="T"/> the fixture asks for.</param>
+public sealed class BogusCustomization<T>(Faker<T> faker) : ICustomization where T : class
 {
-    private readonly Faker<T> _faker;
-
-    /// <summary>Creates the customization from your <see cref="Faker{T}"/> rules.</summary>
-    /// <param name="faker">The rules that build every <typeparamref name="T"/> the fixture asks for.</param>
-    public BogusCustomization(Faker<T> faker) => _faker = faker ?? throw new ArgumentNullException(nameof(faker));
+    private readonly Faker<T> _faker = faker ?? throw new ArgumentNullException(nameof(faker));
 
     /// <summary>Makes the fixture build <typeparamref name="T"/> with the <see cref="Faker{T}"/>.</summary>
     public void Customize(IFixture fixture)

@@ -12,11 +12,7 @@ namespace SolTechnology.Core.Testing.Containers;
 /// </summary>
 public static class ContainerLifecycleHelper
 {
-    // AMQP 1.0 SASL header: 'A','M','Q','P', protocol-id=3 (SASL), major=1, minor=0, revision=0.
-    // The Azure Service Bus emulator speaks SASL before raw AMQP. Sending this header and receiving
-    // the echoed 'AMQP' back is the only reliable signal that the broker is fully initialised —
-    // TCP-accept alone is insufficient because the OS queues connections while the broker boots,
-    // which surfaces as a NullReferenceException in AmqpTransportInitiator.
+    // AMQP 1.0 SASL header ('AMQP', protocol 3, version 1.0.0); the emulator echoes it only once it is ready.
     private static readonly byte[] AmqpSaslHeader = [0x41, 0x4D, 0x51, 0x50, 0x03, 0x01, 0x00, 0x00];
 
     /// <summary>

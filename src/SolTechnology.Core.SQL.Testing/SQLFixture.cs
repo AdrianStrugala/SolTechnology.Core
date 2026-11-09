@@ -1,5 +1,4 @@
 using System.Data.Common;
-using DotNet.Testcontainers.Networks;
 using SolTechnology.Core.SQL.Testing.Engines;
 using SolTechnology.Core.SQL.Testing.Provisioning;
 
@@ -17,28 +16,17 @@ namespace SolTechnology.Core.SQL.Testing;
 /// engines / provisioning with <see cref="UsePostgres"/>, <see cref="WithScripts"/>,
 /// <see cref="WithEfMigrations"/> or <see cref="WithSchema"/>.
 /// </remarks>
-public sealed class SQLFixture : IAsyncDisposable
+/// <param name="databaseName">The application database; with <c>TESTCONTAINERS_REUSE</c> the container is named <c>sol-sql-{databaseName}</c> in lower case.</param>
+/// <param name="image">The engine image; defaults to <c>mssql/server:2022-latest</c>, or <c>postgres:16.9-alpine</c> after <see cref="UsePostgres"/>.</param>
+public sealed partial class SQLFixture(string databaseName, string? image = null) : IAsyncDisposable
 {
-    private readonly string? _image;
-    private readonly string _containerName;
-
     private IDatabaseEngine? _engine;
-    private ISchemaProvisioner? _provisioner;
     private SQLReset? _reset;
-    private INetwork? _network;
-    private string? _networkAlias;
-
-    /// <param name="databaseName">The application database; with <c>TESTCONTAINERS_REUSE</c> the container is named <c>sol-sql-{databaseName}</c> in lower case.</param>
-    /// <param name="image">The engine image; defaults to <c>mssql/server:2022-latest</c>, or <c>postgres:16.9-alpine</c> after <see cref="UsePostgres"/>.</param>
-    public SQLFixture(string databaseName, string? image = null)
-    {
-        DatabaseName = databaseName ?? throw new ArgumentNullException(nameof(databaseName));
-        _image = image;
-        _containerName = $"sol-sql-{databaseName.ToLowerInvariant()}";
-    }
 
     /// <summary>The application database name.</summary>
-    public string DatabaseName { get; }
+    public string DatabaseName { get; } = databaseName ?? throw new ArgumentNullException(nameof(databaseName));
+
+    private string ContainerName => $"sol-sql-{DatabaseName.ToLowerInvariant()}";
 
     /// <summary>The engine backing this fixture. Defaults to <see cref="SQLProvider.SQLServer"/>.</summary>
     public SQLProvider Provider { get; private set; } = SQLProvider.SQLServer;
@@ -48,59 +36,6 @@ public sealed class SQLFixture : IAsyncDisposable
 
     /// <summary>Connection string targeting the application database. Valid after <see cref="Initialize"/>.</summary>
     public string DatabaseConnectionString => Engine.DatabaseConnectionString(DatabaseName);
-
-
-    // ---- fluent configuration ----
-
-    /// <summary>Use PostgreSQL instead of the default SQL Server. Call before <see cref="Initialize"/>.</summary>
-    public SQLFixture UsePostgres()
-    {
-        Provider = SQLProvider.Postgres;
-        return this;
-    }
-
-    /// <summary>Provision the schema by building and deploying a dacpac from a <c>.sqlproj</c> (SQL Server only).</summary>
-    public SQLFixture WithSQLProject(string sqlProjPath)
-    {
-        _provisioner = new DacpacProvisioner(sqlProjPath);
-        return this;
-    }
-
-    /// <summary>Provision the schema by executing raw <c>.sql</c> script files, in order.</summary>
-    public SQLFixture WithScripts(params string[] scriptPaths)
-    {
-        _provisioner = new ScriptProvisioner(scriptPaths);
-        return this;
-    }
-
-    /// <summary>
-    /// Provision the schema with a delegate that receives the application database connection string.
-    /// This is the EF-migrations seam: the package stays EF-free; the consumer runs migrations with
-    /// their own <c>DbContext</c>.
-    /// </summary>
-    public SQLFixture WithEfMigrations(Func<string, Task> applyMigrations)
-    {
-        ArgumentNullException.ThrowIfNull(applyMigrations);
-        _provisioner = new DelegateProvisioner((cs, _) => applyMigrations(cs));
-        return this;
-    }
-
-    /// <summary>General provisioning seam: a delegate receiving the application connection string and a token.</summary>
-    public SQLFixture WithSchema(Func<string, CancellationToken, Task> provision)
-    {
-        _provisioner = new DelegateProvisioner(provision);
-        return this;
-    }
-
-    /// <summary>Attach the container to a docker network (used to share MSSQL with the Service Bus emulator).</summary>
-    public SQLFixture WithNetwork(INetwork network, string? alias = null)
-    {
-        _network = network;
-        _networkAlias = alias;
-        return this;
-    }
-
-    // ---- lifecycle ----
 
     /// <summary>
     /// Starts the engine container (or reuses the one kept by an earlier run), provisions the schema and checks that
@@ -117,8 +52,8 @@ public sealed class SQLFixture : IAsyncDisposable
 
         _engine = Provider switch
         {
-            SQLProvider.Postgres => new PostgresEngine(_image, DatabaseName, _containerName),
-            _ => new MSSQLEngine(_image, _containerName)
+            SQLProvider.Postgres => new PostgresEngine(image, DatabaseName, ContainerName),
+            _ => new MSSQLEngine(image, ContainerName)
         };
 
         await _engine.StartAsync(_network, _networkAlias, ct).ConfigureAwait(false);
@@ -158,7 +93,6 @@ public sealed class SQLFixture : IAsyncDisposable
         }
     }
 
-    // ---- internal helpers used by provisioners ----
     internal DbConnection CreateDatabaseConnection() => Engine.OpenConnection(DatabaseConnectionString);
 
     private IDatabaseEngine Engine =>

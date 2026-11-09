@@ -40,9 +40,7 @@ public static class ServiceBusInstanceBuilder
             // Target is the directory; Testcontainers writes the source file (Config.json) into it.
             .WithResourceMapping(configPath, ContainerConfigDir);
 
-        // Reuse is managed by ServiceBusFixture via Docker.DotNet + a stable name (the Testcontainers
-        // reuse hash is unstable here because the emulator references its MSSQL sidecar), so don't set
-        // WithReuse — just keep the container around between runs.
+        // ServiceBusFixture reuses by name (the reuse hash is unstable with a sidecar), so keep the container instead of WithReuse.
         builder = TestContainersContext.ReuseContainers
             ? builder.WithCleanUp(false).WithAutoRemove(false)
             : builder.WithCleanUp(true).WithAutoRemove(true);

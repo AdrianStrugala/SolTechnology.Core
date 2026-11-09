@@ -181,5 +181,23 @@ retrospective promotes them):
 - Step 05: the pages keep their structure (targeted edits); `HTTP.Testing.md` gains a "Strict matching" section, and
   `API.Testing.md` and `SQL.Testing.md` gain usage snippets. Six other pages that called renamed members are updated
   too. All 16 snippets compile in a throwaway project.
+- Step 06: `JsonResponseBuilderDecorator` and `SQLFixture` become partial classes (the SQL split moves the fluent
+  configuration, not the engine setup), `ServiceBusFixture` hands its containers to the internal `OwnedEmulator`, and
+  the MessageBus `ModuleInstallerTests` split moves the endpoint tests to `ModuleInstallerEndpointTests` (messagebus
+  follow-up). Three assertion and client helper classes move into `extension` blocks; `ShouldBeSuccess<T>` stays
+  classic (Guide §9.7). ApiCompat shows only the `extension` marker types and the accepted `CP0021` "notnull".
 
 ## Follow-ups
+
+Recorded during implementation (the retrospective consolidates this list):
+
+- A shipped Hangfire testing helper. The Hangfire tests keep their own harness (`RecurringJobHost`, the performer and
+  state-machine loop, `HangfireGlobalState.Reset`); no step of this feature plans a Hangfire kit. A shipped helper must
+  reset Hangfire's process-wide state (the log provider, `GlobalJobFilters`, `JobFilterProviders.Providers`) on
+  dispose, otherwise a disposed container leaves Hangfire's global logger pointing at a disposed factory.
+- A `*.Testing` test project (Q6). Until then the kits are covered through their consumers.
+- A Blob test project with the five Azurite tests from the blob code review (AR-1); it stays a Blob follow-up.
+- With `TESTCONTAINERS_RYUK_DISABLED=true`, a disposed SQL, Redis or Azurite fixture only stops its container
+  (Testcontainers deletes only with Ryuk on); `WithAutoRemove` on those builders would remove them as
+  `ServiceBusFixture` already does.
+- Step 02's CI criterion: `runTests.ps1` on ubuntu with Ryuk on, after the push.

@@ -19,25 +19,16 @@ namespace SolTechnology.Core.Blob.Testing;
 /// container is reused. No hand-rolled reuse cache — the shared lifetime model owns that.
 /// </para>
 /// </remarks>
-public sealed class AzuriteFixture : IAsyncDisposable
+/// <param name="image">The Azurite image; defaults to <c>mcr.microsoft.com/azure-storage/azurite:3.37.0</c>.</param>
+/// <param name="containerName">The container name used when <c>TESTCONTAINERS_REUSE</c> keeps it between runs.</param>
+public sealed class AzuriteFixture(string? image = null, string containerName = "soltech-azurite") : IAsyncDisposable
 {
     // 3.37.0 is the first Azurite that accepts service version 2026-06-06 of Azure.Storage.Blobs 12.29.0.
     private const string DefaultImage = "mcr.microsoft.com/azure-storage/azurite:3.37.0";
 
-    private readonly string? _image;
-    private readonly string _containerName;
-
     private INetwork? _network;
     private string? _networkAlias;
     private AzuriteContainer? _container;
-
-    /// <param name="image">The Azurite image; defaults to <c>mcr.microsoft.com/azure-storage/azurite:3.37.0</c>.</param>
-    /// <param name="containerName">The container name used when <c>TESTCONTAINERS_REUSE</c> keeps it between runs.</param>
-    public AzuriteFixture(string? image = null, string containerName = "soltech-azurite")
-    {
-        _image = image;
-        _containerName = containerName;
-    }
 
     private AzuriteContainer Container =>
         _container ?? throw new InvalidOperationException("Container not started. Call Initialize first.");
@@ -56,12 +47,12 @@ public sealed class AzuriteFixture : IAsyncDisposable
     /// <summary>Starts the Azurite container, or reuses the one kept by an earlier run.</summary>
     public async Task Initialize(CancellationToken ct = default)
     {
-        var builder = new AzuriteBuilder(_image ?? DefaultImage)
+        var builder = new AzuriteBuilder(image ?? DefaultImage)
             .WithCleanUp(!TestContainersContext.ReuseContainers);
 
         if (TestContainersContext.ReuseContainers)
         {
-            builder = builder.WithName(_containerName).WithReuse(true).WithAutoRemove(false);
+            builder = builder.WithName(containerName).WithReuse(true).WithAutoRemove(false);
         }
 
         if (_network is not null)
@@ -76,8 +67,7 @@ public sealed class AzuriteFixture : IAsyncDisposable
         _container = builder.Build();
         await _container.StartAsync(ct).ConfigureAwait(false);
 
-        // When the container is reused it may have been stopped externally while a static flag still
-        // says "initialized" — make sure it is genuinely running before handing it back.
+        // A reused container may have been stopped externally; make sure it runs before handing it back.
         if (TestContainersContext.ReuseContainers)
         {
             await ContainerLifecycleHelper.EnsureRunning(_container.Id, ct).ConfigureAwait(false);

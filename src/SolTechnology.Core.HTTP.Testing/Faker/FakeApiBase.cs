@@ -9,9 +9,7 @@ namespace SolTechnology.Core.HTTP.Testing.Faker;
 /// </summary>
 public abstract class FakeApiBase : IFakeApi
 {
-    // Set by the fake's interface-method bodies (via BuildRequest) and read by FakeApiBuilder<T> when
-    // attaching the response. `protected` so the derived fake (another assembly) can assign it;
-    // `internal` so the builder (this assembly) can read it.
+    // protected for the derived fake (another assembly) to assign; internal for FakeApiBuilder<T> to read.
     /// <summary>The stub the last fake method call arranged; set it to the result of <see cref="BuildRequest"/>.</summary>
     protected internal IRespondWithAProvider Provider = null!;
     private WireMockServer _mockServer = null!;

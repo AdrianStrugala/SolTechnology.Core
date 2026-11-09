@@ -19,26 +19,17 @@ namespace SolTechnology.Core.Redis.Testing;
 /// <see cref="DisposeAsync"/> a no-op. Use <see cref="Flush"/> for a between-test reset when the
 /// container is reused.
 /// </remarks>
-public sealed class RedisFixture : IAsyncDisposable
+/// <param name="image">The Redis image; defaults to <c>redis:7-alpine</c>.</param>
+/// <param name="containerName">The container name used when <c>TESTCONTAINERS_REUSE</c> keeps it between runs.</param>
+public sealed class RedisFixture(string? image = null, string containerName = "soltech-redis") : IAsyncDisposable
 {
     private const string DefaultImage = "redis:7-alpine";
     private const int InternalPort = 6379;
-
-    private readonly string? _image;
-    private readonly string _containerName;
 
     private INetwork? _network;
     private string? _networkAlias;
     private RedisContainer? _container;
     private ConnectionMultiplexer? _multiplexer;
-
-    /// <param name="image">The Redis image; defaults to <c>redis:7-alpine</c>.</param>
-    /// <param name="containerName">The container name used when <c>TESTCONTAINERS_REUSE</c> keeps it between runs.</param>
-    public RedisFixture(string? image = null, string containerName = "soltech-redis")
-    {
-        _image = image;
-        _containerName = containerName;
-    }
 
     private RedisContainer Container =>
         _container ?? throw new InvalidOperationException("Container not started. Call Initialize first.");
@@ -60,13 +51,13 @@ public sealed class RedisFixture : IAsyncDisposable
     /// <summary>Starts the Redis container, or reuses the one kept by an earlier run.</summary>
     public async Task Initialize(CancellationToken ct = default)
     {
-        var builder = new RedisBuilder(_image ?? DefaultImage)
+        var builder = new RedisBuilder(image ?? DefaultImage)
             .WithPortBinding(InternalPort, assignRandomHostPort: true)
             .WithCleanUp(!TestContainersContext.ReuseContainers);
 
         if (TestContainersContext.ReuseContainers)
         {
-            builder = builder.WithName(_containerName).WithReuse(true);
+            builder = builder.WithName(containerName).WithReuse(true);
         }
 
         if (_network is not null)
