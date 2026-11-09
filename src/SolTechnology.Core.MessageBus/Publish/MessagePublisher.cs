@@ -37,13 +37,13 @@ namespace SolTechnology.Core.MessageBus.Publish
                 {
                     await sender.SendMessageAsync(serviceBusMessage, cancellationToken).ConfigureAwait(false);
                     logger.LogDebug(
-                        "Published message {MessageType} {MessageId} to {Entity}",
+                        "Published message [{MessageType}] [{MessageId}] to [{Entity}]",
                         messageType.Name, serviceBusMessage.MessageId, sender.EntityPath);
                 }
                 catch (Exception ex)
                 {
                     logger.LogError(ex,
-                        "Failed to publish message {MessageType} {MessageId} to {Entity}",
+                        "Failed to publish message [{MessageType}] [{MessageId}] to [{Entity}]",
                         messageType.Name, serviceBusMessage.MessageId, sender.EntityPath);
                     throw;
                 }

@@ -59,7 +59,9 @@ Behavioural and persisted-contract breaks:
 
 Log contract changes:
 
-- **L-03** (MessageBus part): the receiver and publisher (`infra#20`). Step 08.
+- **L-03** (MessageBus part): the receiver and publisher (`infra#20`). Their 11 templates now bracket `MessageType`,
+  `MessageId`, `Entity`, `DeliveryCount`, `Source`, `Namespace` and `Message`; no property is renamed, so only queries
+  that match the message text change. Step 08.
 
 Design alternatives (blue-red-team, 2026-11-02):
 

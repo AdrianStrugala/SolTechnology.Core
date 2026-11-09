@@ -37,7 +37,7 @@ namespace SolTechnology.Core.MessageBus.Receive
             foreach (var (messageType, processor) in messageBusBroker.ResolveReceivers())
             {
                 logger.LogInformation(
-                    "Starting Service Bus processor for {MessageType} on {Entity}",
+                    "Starting Service Bus processor for [{MessageType}] on [{Entity}]",
                     messageType.FullName, processor.EntityPath);
 
                 var capturedType = messageType;
@@ -60,7 +60,7 @@ namespace SolTechnology.Core.MessageBus.Receive
                 catch (Exception ex)
                 {
                     logger.LogWarning(ex,
-                        "Failed to stop Service Bus processor on {Entity}", processor.EntityPath);
+                        "Failed to stop Service Bus processor on [{Entity}]", processor.EntityPath);
                 }
             }
         }
@@ -117,7 +117,7 @@ namespace SolTechnology.Core.MessageBus.Receive
         private Task HandleErrorAsync(ProcessErrorEventArgs args)
         {
             logger.LogError(args.Exception,
-                "Service Bus processor error on {Entity} ({Source}/{Namespace}): {Message}",
+                "Service Bus processor error on [{Entity}] ([{Source}]/[{Namespace}]): [{Message}]",
                 args.EntityPath, args.ErrorSource, args.FullyQualifiedNamespace, args.Exception.Message);
             return Task.CompletedTask;
         }

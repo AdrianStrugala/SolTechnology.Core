@@ -26,5 +26,5 @@ are `done` and after these library features are `completed`: `logging`. No step 
 | 05 | XML docs shipped — MessageBus | [`steps/05-xml-docs.md`](steps/05-xml-docs.md) | done |
 | 06 | Module docs — `docs/Bus.md` | [`steps/06-docs-bus.md`](steps/06-docs-bus.md) | done |
 | 07 | Guide conformance — MessageBus | [`steps/07-conform-messagebus.md`](steps/07-conform-messagebus.md) | done |
-| 08 | Log templates — `[{Placeholder}]` in MessageBus (L-03) | [`steps/08-log-template-brackets.md`](steps/08-log-template-brackets.md) | to-do |
+| 08 | Log templates — `[{Placeholder}]` in MessageBus (L-03) | [`steps/08-log-template-brackets.md`](steps/08-log-template-brackets.md) | done |
 | 09 | Retrospective | [`steps/09-retrospective.md`](steps/09-retrospective.md) | to-do |

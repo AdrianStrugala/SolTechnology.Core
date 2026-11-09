@@ -495,7 +495,8 @@ parameter; `UntilAsync`, `CheckHealthAsync`, `InvokeAsync`, `StartAsync`/`StopAs
   - Cache: the lock and idempotency services (`logging-cache#20`): `{LockKey}` becomes `[{LockKey}]`, and
     `{Key}` becomes `[{IdempotencyKey}]`: the log property is renamed, so queries on `Key` must use
     `IdempotencyKey` (cache 08).
-  - MessageBus: the receiver and publisher (`infra#20`).
+  - MessageBus: the receiver and publisher (`infra#20`): 11 templates now bracket `MessageType`, `MessageId`,
+    `Entity`, `DeliveryCount`, `Source`, `Namespace` and `Message`; no property is renamed (messagebus 08).
 
   Steps: tale 16, api-auth 10, http 10, cache 08, messagebus 08; every other library checks its
   templates in its conformance step (result 05, logging 07, cqrs 06, auid 06, sql 07, blob 05,
