@@ -678,6 +678,19 @@ these notes from the steps:
   existence check and the create; the "already exists" error is logged at Debug and start continues. Scale-out
   guidance (competing consumers, a per-instance subscription for fan-out, at-least-once delivery, idempotent handlers)
   is in `docs/Bus.md` "Running several instances". Non-breaking.
+- messagebus (code review, 2026-11-09, [`2026-11-02-core-2-0-messagebus`](2026-11-02-core-2-0-messagebus.md)): four
+  non-breaking fixes. (1) A handler that returns after the host starts stopping now completes its message. Before,
+  complete, abandon and dead-letter used the processor's cancellation token, which the SDK cancels when shutdown
+  starts, so the message went back to the queue and another instance handled it a second time on every rolling
+  deploy; handlers still receive that cancelled token. (2) With `CreateResources = true`, the queues and subscriptions
+  the module creates get `MessageBusConfiguration.MaxDeliveryCount` instead of the broker default of 10; existing
+  entities are not changed. (3) When completing a message whose handler succeeded fails, for example on a lost lock,
+  the receiver logs the new Warning `Failed to complete message [{MessageId}]; lock will expire naturally` and the
+  message is delivered again. Before, the failure was logged as `Handler failure …` at Error and the message was
+  abandoned, or dead-lettered with reason `HandlerFailedMaxDelivery` on its last delivery. (4) A broker
+  initialisation that fails halfway, for example on a provisioning error, can be retried. Before, the retry, such as
+  the next publish, added a second sender for each publisher already created, so every message was published twice,
+  and receiver registration threw "already registered". No public API change.
 
 ### Resolved questions (user answers, 2026-11-02)
 

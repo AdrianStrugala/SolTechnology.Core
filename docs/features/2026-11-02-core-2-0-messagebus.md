@@ -151,3 +151,25 @@ Steps run in number order; each is one PR.
 ## Deviations
 
 ## Follow-ups
+
+## Code review fixes (2026-11-09)
+
+A code review of `ba8acbc5~1..ce492389` found four defects. Each fix has a test that fails without it; release-notes
+inputs are in the core brief's "Release-notes inputs" section.
+
+| # | Finding | Fix | Test |
+|---|---|---|---|
+| 1 | Major. `MessageSettler` completed, abandoned and dead-lettered with `args.CancellationToken`, which the SDK cancels when `StopProcessingAsync` starts, so a handler that succeeded during shutdown could not complete its message; another instance handled it again on every rolling deploy. | Settlement uses `CancellationToken.None`; the handler still gets the processor's token. `docs/Bus.md` describes the shutdown row. | `MessageBusReceiverSettlementTests.Stop_HandlerFinishesAfterShutdownStarts_MessageCompletedNotRedelivered` (emulator, new queue `receiver-shutdown`): the handler ignores the token and returns after `StopAsync` has cancelled it; the queue and its dead-letter queue are empty. |
+| 2 | Major. With `CreateResources = true`, `ServiceBusResourceProvisioner` created queues and subscriptions with the broker default `MaxDeliveryCount` of 10 instead of `MessageBusConfiguration.MaxDeliveryCount`. | Created with `CreateQueueOptions` and `CreateSubscriptionOptions` carrying the configured value. | `MessageBusBrokerTests.EnsureInitialized_CreateResources_CreatesQueueAndSubscriptionWithConfiguredMaxDeliveryCount` reads the options passed to a substituted administration client (the emulator has no administration API). |
+| 3 | Minor. `Complete` ran inside the handler's `try`, so a completion failure was logged as a handler failure and the message was abandoned, or dead-lettered on its last delivery. | `MessageBusReceiver` completes after the handler block; `MessageSettler.Complete` logs the new Warning `Failed to complete message [{MessageId}]; lock will expire naturally` and never re-settles. | `MessageBusReceiverCompletionTests.HandleMessage_HandlerSucceedsButCompleteFails_LogsWarningAndDoesNotSettleAsFailure` drives a processor whose completion throws, with `MaxDeliveryCount = 1`; a new `MessageSettlerTests` case pins the template. |
+| 4 | Minor. `EnsureInitializedAsync` added senders and processors one endpoint at a time, so a failure halfway left them in place; a retry added a second sender (duplicate publishes) and receiver registration threw. | `ServiceBusEndpoints` provisions every entity first, builds senders and processors into local collections, keeps them only when all were created, and disposes them otherwise. | `MessageBusBrokerTests.EnsureInitialized_RetryAfterProvisioningFailedHalfway_CreatesEachSenderAndProcessorOnce` fails the first subscription create, retries, and expects one sender and two processors. |
+
+Also from the review:
+
+- **CP0021 accepted.** ApiCompat's CP0021 "notnull" on `WithQueuePublisher`, `WithQueueReceiver`, `WithTopicPublisher`
+  and `WithTopicReceiver` is accepted as Coding Guide §9.7 records it: the non-nullable `IMessage` constraint already
+  implies notnull, so no caller sees a new warning or a binary change. The repository has no ApiCompat suppression
+  file, so this brief is the record.
+- **Receiver tests split.** `MessageBusReceiverTests` (244 lines) became `ReceiverTestHost` (the emulator host, handler
+  probe and polling helpers), `MessageBusReceiverSettlementTests` and `MessageBusReceiverLogTemplateTests`, each under
+  150 lines, with test names and assertions unchanged.
