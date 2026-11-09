@@ -150,6 +150,9 @@ retrospective promotes them):
 - Step 03: `OnPerformed` restores an absent ambient correlation id with `ICorrelationIdService.Set(null)` (no public
   `Clear()` exists); the legacy `DispatchInScope(IEvent)` returns `Task` instead of `void`; the RM-6 release note also
   says that the 1.x-server retries come from Hangfire's global retry filter.
+- Step 03 (follow-up fix): an event job whose dispatch saw the shutdown token cancelled throws
+  `OperationCanceledException` after dispatch, because CQRS's dispatcher swallows the handler's cancellation; Hangfire
+  then requeues the event instead of marking it `Succeeded`.
 - Step 04: a recoverable failed `Result` is retried at most 3 times (`RecurringJobRetry.RecoverableResultAttempts`)
   through `[AutomaticRetry(OnlyOn = RecoverableResultException)]` on the runner; a thrown exception is not retried.
   Legacy `Type.Name` entries are removed only when they run the same job's runner. Tracked-id and legacy cleanup live in

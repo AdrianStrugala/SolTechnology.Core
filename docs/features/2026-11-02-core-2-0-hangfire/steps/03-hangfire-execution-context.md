@@ -102,3 +102,14 @@ filter (10 attempts over several hours by default), because a 1.x server cannot 
 Verification: the distinct-ID and restore tests fail against the step 02 filter (the second job gets the first job's
 id; after the run the ambient id is still `job-id`) and pass now;
 `dotnet test tests/SolTechnology.Core.Hangfire.Tests -c Release` 48/48 green.
+
+### Shutdown aborts the event job (found while writing step 06)
+
+**Original plan:** `DispatchInScope(IEvent, CancellationToken)` passes the shutdown token to the dispatcher.
+
+**Actual implementation:** CQRS's `EventDispatcher` logs and swallows every handler exception, including the
+`OperationCanceledException` of a handler cut short by shutdown, so the job would have ended `Succeeded` and the event
+would have been lost for that handler. `DispatchInScope` now calls `cancellationToken.ThrowIfCancellationRequested()`
+after dispatch, so Hangfire aborts the job and requeues it for another server; every handler runs again
+(at-least-once, handlers must be idempotent). `DispatchInScope_ShutdownSwallowedByDispatcher_AbortsJob` uses the real
+dispatcher and fails without the check.
