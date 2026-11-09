@@ -60,10 +60,10 @@ boot cost again; dispose becomes a no-op. Default is **off** so CI stays hermeti
 The fixtures leave Ryuk to the Testcontainers settings. It is **on** by default: disposing a fixture removes
 its containers, and Ryuk removes the containers of a run that was aborted before disposal. Docker Desktop
 Enhanced Container Isolation (ECI) blocks the `testcontainers/ryuk` image; there, set
-`TESTCONTAINERS_RYUK_DISABLED=true` (env var or `.runsettings`). With Ryuk off, Testcontainers only stops a
-disposed container, so stopped SQL, Redis and Azurite containers stay until you remove them
-(`docker container prune --filter label=org.testcontainers=true`); `ServiceBusFixture` still removes its
-emulator, its MSSQL sidecar and their network.
+`TESTCONTAINERS_RYUK_DISABLED=true` (env var or `.runsettings`). With Ryuk off, a disposed SQL, Redis or Azurite
+fixture stops its container but does not remove it, so stopped containers stay until you remove them
+(`docker container prune --filter label=org.testcontainers=true`). `ServiceBusFixture` still removes its emulator,
+its MSSQL sidecar and their network, and `TestContainersContext.DisposeAsync` removes the shared network.
 
 ## Mocking library
 

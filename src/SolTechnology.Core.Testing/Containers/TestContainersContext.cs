@@ -35,6 +35,8 @@ public sealed class TestContainersContext : IAsyncDisposable
     {
         if (!ReuseContainers)
         {
+            // DisposeAsync deletes only a network that carries a reaper session id; delete it whatever the Ryuk setting.
+            await Network.DeleteAsync().ConfigureAwait(false);
             await Network.DisposeAsync().ConfigureAwait(false);
         }
     }
