@@ -56,9 +56,7 @@ namespace SolTechnology.Core.MessageBus.Publish
             var serviceBusMessage = new ServiceBusMessage(Encoding.UTF8.GetBytes(serializedMessage))
             {
                 ContentType = MediaTypeNames.Application.Json,
-                // Prefer the application-supplied id (drives ASB duplicate detection)
-                // but fall back to a fresh GUID so a buggy or missing implementation
-                // can never publish two distinct messages with the same MessageId.
+                // The application id drives duplicate detection; a fresh GUID stops two messages sharing an empty id.
                 MessageId = string.IsNullOrWhiteSpace(message.Id) ? Guid.NewGuid().ToString() : message.Id,
                 Subject = messageType.Name
             };
