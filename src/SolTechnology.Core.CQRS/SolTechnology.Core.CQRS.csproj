@@ -7,7 +7,6 @@
 	  <Title>SolTechnology.Core CQRS</Title>
 	  <PackageId>SolTechnology.Core.CQRS</PackageId>
 	  <AssemblyName>SolTechnology.Core.CQRS</AssemblyName>
-	  <GenerateDocumentationFile>true</GenerateDocumentationFile>
 
 	  <PackageReadmeSource>CQRS.md</PackageReadmeSource>
   </PropertyGroup>

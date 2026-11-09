@@ -9,7 +9,6 @@
         <AssemblyName>SolTechnology.Core.AUID</AssemblyName>
 
         <PackageReadmeSource>AUID.md</PackageReadmeSource>
-        <GenerateDocumentationFile>true</GenerateDocumentationFile>
     </PropertyGroup>
 
 </Project>

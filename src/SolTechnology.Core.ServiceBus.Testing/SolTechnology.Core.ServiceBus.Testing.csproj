@@ -9,7 +9,6 @@
 		<AssemblyName>SolTechnology.Core.ServiceBus.Testing</AssemblyName>
 
 		<PackageReadmeSource>ServiceBus.Testing.md</PackageReadmeSource>
-		<GenerateDocumentationFile>true</GenerateDocumentationFile>
 	</PropertyGroup>
 
 	<ItemGroup>

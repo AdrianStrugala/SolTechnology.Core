@@ -9,7 +9,6 @@
 		<AssemblyName>SolTechnology.Core.API.Testing</AssemblyName>
 
 		<PackageReadmeSource>API.Testing.md</PackageReadmeSource>
-		<GenerateDocumentationFile>true</GenerateDocumentationFile>
 	</PropertyGroup>
 
 	<ItemGroup>

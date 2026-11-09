@@ -7,7 +7,6 @@
     <Title>SolTechnology.Core</Title>
     <PackageId>SolTechnology.Core</PackageId>
     <AssemblyName>SolTechnology.Core</AssemblyName>
-    <GenerateDocumentationFile>true</GenerateDocumentationFile>
 
     <PackageReadmeSource>Core.md</PackageReadmeSource>
   </PropertyGroup>

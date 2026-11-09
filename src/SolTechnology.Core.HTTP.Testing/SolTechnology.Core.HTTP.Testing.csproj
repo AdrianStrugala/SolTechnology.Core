@@ -9,7 +9,6 @@
 		<AssemblyName>SolTechnology.Core.HTTP.Testing</AssemblyName>
 
 		<PackageReadmeSource>HTTP.Testing.md</PackageReadmeSource>
-		<GenerateDocumentationFile>true</GenerateDocumentationFile>
 	</PropertyGroup>
 
 	<ItemGroup>

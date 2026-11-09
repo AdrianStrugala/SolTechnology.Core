@@ -218,6 +218,12 @@ DreamTravel component-test stubs (strict WireMock matching) and split the Messag
 Remaining foundation steps: core 05 and 06 may run at any time; core 07 (zero-dependency base
 package) runs after core 04; core 08 (central `GenerateDocumentationFile`) runs after every library
 XML-docs step; core 11 closes this feature last, after every library feature is `completed`.
+Core 08 was done on 2026-11-09: `src/Directory.Build.props` now turns on
+`GenerateDocumentationFile` for every `src` project, the 20 per-project switches are gone, and only
+Guards and Scheduler opt out. All 20 packages still ship `lib/net10.0/<PackageId>.xml`, and the
+Release build warnings are unchanged (104 before and after). It was verified with a local pack
+instead of the CI artifacts (step 08 `Deviations`). Core 06 stays `in-progress` until the owner
+confirms the key revocation.
 
 Former → current step mapping (`*` = only the library-scoped part of the former repository-wide
 `[{Placeholder}]` and empty-`catch` check, carried in that library's conformance step):

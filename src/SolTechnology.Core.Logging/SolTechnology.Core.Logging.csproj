@@ -10,9 +10,6 @@
 
 		<PackageReadmeSource>Log.md</PackageReadmeSource>
 
-		<!-- Ship XML doc file in the NuGet package so consumers get IntelliSense on public API. -->
-		<GenerateDocumentationFile>true</GenerateDocumentationFile>
-
 		<!--
 			NU1510: Microsoft.Extensions.* PackageReferences inherited from src/Directory.Build.props
 			are already provided by FrameworkReference Microsoft.AspNetCore.App and would be pruned.

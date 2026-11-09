@@ -33,6 +33,8 @@
         <PackageReadmeFile>docs\readme.md</PackageReadmeFile>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
         <IncludeSymbols>true</IncludeSymbols>
+        <!-- Every package ships its XML docs; reference-only projects opt out in their csproj. -->
+        <GenerateDocumentationFile>true</GenerateDocumentationFile>
 
         <!-- SourceLink ships in the .NET SDK; no Microsoft.SourceLink.* PackageReference is needed. -->
         <PublishRepositoryUrl>true</PublishRepositoryUrl>

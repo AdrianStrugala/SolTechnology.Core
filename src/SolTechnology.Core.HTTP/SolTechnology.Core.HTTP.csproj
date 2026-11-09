@@ -9,7 +9,6 @@
 		<AssemblyName>SolTechnology.Core.HTTP</AssemblyName>
 
 		<PackageReadmeSource>Clients.md</PackageReadmeSource>
-		<GenerateDocumentationFile>true</GenerateDocumentationFile>
 	</PropertyGroup>
 
 	<ItemGroup>

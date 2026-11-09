@@ -3,9 +3,10 @@
 Supported packages inherit version `1.0.0`; `SolTechnology.Core.Logging` overrides it with
 `1.2.0`. Scheduler and Guards remain at `0.5.0` and are not packable.
 
-Package metadata, MIT license, README, icon, symbols, deterministic builds, and SourceLink are
-centralized in `src/Directory.Build.props`. A build guard fails when a packable project under
-`src/` is omitted from `SolTechnology.Core.slnx`.
+Package metadata, MIT license, README, icon, XML documentation, symbols, deterministic builds, and
+SourceLink are centralized in `src/Directory.Build.props`; only the reference-only Guards and
+Scheduler projects opt out of the XML documentation file. A build guard fails when a packable
+project under `src/` is omitted from `SolTechnology.Core.slnx`.
 
 The package workflow builds, tests, and packs on pull requests, `master`, version tags, and
 manual runs. Publishing to NuGet occurs only for a `v*` tag or `workflow_dispatch`; ordinary

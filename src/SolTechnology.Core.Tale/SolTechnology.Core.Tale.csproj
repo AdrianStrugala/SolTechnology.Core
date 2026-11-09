@@ -10,7 +10,6 @@
         <RootNamespace>SolTechnology.Core.Tale</RootNamespace>
 
         <PackageReadmeSource>Tale.md</PackageReadmeSource>
-        <GenerateDocumentationFile>true</GenerateDocumentationFile>
     </PropertyGroup>
 
     <ItemGroup>

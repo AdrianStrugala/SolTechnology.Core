@@ -9,7 +9,6 @@
 		<AssemblyName>SolTechnology.Core.Api</AssemblyName>
 
 		<PackageReadmeSource>Api.md</PackageReadmeSource>
-		<GenerateDocumentationFile>true</GenerateDocumentationFile>
 	</PropertyGroup>
 
 	<ItemGroup>

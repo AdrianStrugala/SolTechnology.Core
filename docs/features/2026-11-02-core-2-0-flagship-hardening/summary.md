@@ -33,7 +33,7 @@ and premortem verdicts above cover the regrouped plan (user decision, 2026-11-02
 | 05 | DreamTravel — Development-only developer exception page | [`steps/05-dreamtravel-dev-only-exception-page-and-credentials.md`](steps/05-dreamtravel-dev-only-exception-page-and-credentials.md) | done |
 | 06 | Remove leaked-secret artifacts and personal settings; record revocation | [`steps/06-remove-leaked-secret-artifacts.md`](steps/06-remove-leaked-secret-artifacts.md) | in-progress |
 | 07 | Packaging — a truly zero-dependency `SolTechnology.Core` | [`steps/07-zero-dependency-base-package.md`](steps/07-zero-dependency-base-package.md) | done |
-| 08 | XML docs — one central `GenerateDocumentationFile` switch | [`steps/08-xml-docs-central-switch.md`](steps/08-xml-docs-central-switch.md) | to-do |
+| 08 | XML docs — one central `GenerateDocumentationFile` switch | [`steps/08-xml-docs-central-switch.md`](steps/08-xml-docs-central-switch.md) | done |
 | 09 | Central Package Management | [`steps/09-central-package-management.md`](steps/09-central-package-management.md) | done |
 | 10 | Per-package NuGet icons | [`steps/10-per-package-nuget-icons.md`](steps/10-per-package-nuget-icons.md) | done |
 | 11 | Retrospective | [`steps/11-retrospective.md`](steps/11-retrospective.md) | to-do |
