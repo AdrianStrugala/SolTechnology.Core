@@ -132,7 +132,7 @@ container name, so concurrent first calls create a container once, with
 failure is retried on the next call instead of being cached. `GetConnection` stays synchronous and
 blocks on the first call per name, because an async accessor would change `IBlobConnectionFactory`.
 
-A container can disappear after it was cached, for example through `AzuriteFixture.ClearAsync` or
+A container can disappear after it was cached, for example through `AzuriteFixture.Clear` or
 an operator. `WriteToBlob` catches `ContainerNotFound`, creates the container through the same
 client, and retries the upload once; the cached client is a stateless handle, so the factory does
 not need to know. Reads do not recreate: a blob in a deleted container cannot exist, so they fail

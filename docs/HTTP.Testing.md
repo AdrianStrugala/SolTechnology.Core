@@ -51,7 +51,7 @@ the method body sets up the matcher:
 ```csharp
 public class GoogleFakeApi : FakeApiBase, IGoogleHTTPClient
 {
-    protected override string BaseUrl => "google";   // relative path segment matched on the server
+    private const string BaseUrl = "google";   // relative path segment matched on the server
 
     public Task<City> GetLocationOfCity(string cityName)
     {
@@ -62,6 +62,28 @@ public class GoogleFakeApi : FakeApiBase, IGoogleHTTPClient
         return default!;
     }
 }
+```
+
+## Strict matching
+
+A request must match **every** matcher of a stub; anything else gets `404` with "No matching mapping found", so a
+client that sends a wrong query parameter or body fails the test instead of receiving the nearest stub's response.
+WireMock splits query values on commas, so stub a comma-separated value with its parts:
+
+```csharp
+var request = Request.Create().UsingGet()
+    .WithPath("/maps/api/distancematrix/json")
+    .WithParam("origins", "51.1,17.0|43.7,11.2".Split(','));   // matches ?origins=51.1,17.0|43.7,11.2
+```
+
+To go back to WireMock's partial matching, start the server from your own settings:
+
+```csharp
+var settings = WireMockStartup.DefaultSettings();
+settings.AllowPartialMapping = true;
+var startup = new WireMockStartup();
+startup.Run(settings);
+startup.WireMockServer.Given(Request.Create().WithPath("/ping")).RespondWith(Response.Create().WithSuccess());
 ```
 
 ## Notes for large / parallel suites

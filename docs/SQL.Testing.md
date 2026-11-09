@@ -19,7 +19,22 @@ ORM-agnostic by design: serves **Dapper** and **Entity Framework** alike.
 
 ## Usage
 
-Spin up `SQLFixture` in your component-test host, choose a schema-provisioning strategy, and let
-Respawn reset state between tests. See the companion foundation package
-[`SolTechnology.Core.Testing`](Testing.md) for the shared Testcontainers lifetime/reuse model these
+Spin up `SQLFixture` once per test assembly, choose a schema-provisioning strategy, and let Respawn reset state
+between tests:
+
+```csharp
+// Assembly-level [OneTimeSetUp]
+SqlFixture = new SQLFixture("OrdersDb").WithScripts("schema.sql");   // or WithSQLProject / WithEfMigrations / UsePostgres
+await SqlFixture.Initialize();
+var connectionString = SqlFixture.DatabaseConnectionString;
+
+// Per-test teardown — deletes the data, keeps the schema
+await SqlFixture.Reset();
+
+// Assembly-level [OneTimeTearDown]
+await SqlFixture.DisposeAsync();   // no-op when TESTCONTAINERS_REUSE=true
+```
+
+[SQL.md → Testing](SQL.md#testing) lists every provisioning option. See the companion foundation package
+[`SolTechnology.Core.Testing`](Testing.md) for the shared Testcontainers lifetime/reuse model and Ryuk settings these
 fixtures build on.

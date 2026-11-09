@@ -17,8 +17,28 @@ only** — never from production assemblies.
 
 ## Usage
 
-Derive your component-test host from `APIFixture<TEntryPoint>`, point `TEntryPoint` at your API's
-`Program`, and resolve an `HttpClient` through the auth-client helpers to drive requests end to end.
+Create one `APIFixture<TEntryPoint>` per test assembly, point `TEntryPoint` at your API's `Program`, and drive
+requests through `ServerClient` or the auth-client helpers:
+
+```csharp
+// Assembly-level [OneTimeSetUp]
+var configuration = new TestConfigurationBuilder()
+    .AddJsonFile("appsettings.tests.json")
+    .Override("Sql:ConnectionString", sqlFixture.DatabaseConnectionString)
+    .Build();
+ApiFixture = new APIFixture<Program>(configuration, services => services.AddSingleton(TimeProvider.System));
+
+// In a test
+var response = await ApiFixture.ServerClient.GetAsync("/health");
+using var admin = ApiFixture.CreateAuthorizedClient("Bearer", "test-token");
+using var anonymous = ApiFixture.CreateAnonymousClient();
+
+// Assembly-level [OneTimeTearDown] — stops the host; every IHostedService.StopAsync runs.
+ApiFixture.Dispose();
+```
+
+`Dispose()` disposes the underlying `WebApplicationFactory`, so the in-memory host, its hosted services and
+background workers stop with the fixture instead of running until the test process exits.
 
 See the companion foundation package [`SolTechnology.Core.Testing`](Testing.md) for the AutoFixture
 data attributes, Testcontainers lifetime model, and log assertions these fixtures compose with.

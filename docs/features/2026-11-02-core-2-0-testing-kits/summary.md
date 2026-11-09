@@ -23,6 +23,6 @@ are `done` and after these library features are `completed`: `http`; `api-auth`;
 | 02 | Container fixtures — per-instance state; honour Ryuk settings | [`steps/02-container-fixture-lifecycle.md`](steps/02-container-fixture-lifecycle.md) | done |
 | 03 | Testing kits — 2.0 surface (optional `Async` renames, WireMock fields) | [`steps/03-testing-kit-surface.md`](steps/03-testing-kit-surface.md) | done |
 | 04 | XML docs shipped — Testing, HTTP.Testing, API.Testing, SQL.Testing, Redis.Testing, Blob.Testing, ServiceBus.Testing | [`steps/04-xml-docs.md`](steps/04-xml-docs.md) | done |
-| 05 | Module docs — testing kits | [`steps/05-docs-testing-kits.md`](steps/05-docs-testing-kits.md) | to-do |
+| 05 | Module docs — testing kits | [`steps/05-docs-testing-kits.md`](steps/05-docs-testing-kits.md) | done |
 | 06 | Guide conformance — testing kits | [`steps/06-conform-testing-kits.md`](steps/06-conform-testing-kits.md) | to-do |
 | 07 | Retrospective | [`steps/07-retrospective.md`](steps/07-retrospective.md) | to-do |

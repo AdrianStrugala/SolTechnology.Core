@@ -184,13 +184,13 @@ tests that hands back a connection string, so Dapper and Entity Framework tests 
 ```csharp
 var fixture = new SQLFixture("DreamTravelDatabase")
     .WithSQLProject("../../../src/Infrastructure/DreamTravelDatabase/DreamTravelDatabase.csproj");
-await fixture.InitializeAsync();
+await fixture.Initialize();
 
 services.AddSolSQL(new SQLConfiguration { ConnectionString = fixture.DatabaseConnectionString });
 
 // ... run tests ...
 
-await fixture.ResetAsync();
+await fixture.Reset();
 await fixture.DisposeAsync();
 ```
 
@@ -202,7 +202,7 @@ await fixture.DisposeAsync();
 | `.WithEfMigrations(cs => ...)` | Run your Entity Framework migrations; the package does not reference Entity Framework. |
 | `.WithSchema((cs, ct) => ...)` | Run any custom provisioning. |
 | `.WithNetwork(network, alias)` | Attach the container to a shared Docker network. |
-| `ResetAsync()` | Delete test data with Respawn and keep the schema. |
+| `Reset()` | Delete test data with Respawn and keep the schema. |
 
 Reference the package from test projects only. Container lifetime and `TESTCONTAINERS_REUSE` follow
 [theQuality.md → Container lifetime & reuse](theQuality.md#container-lifetime--reuse); see also

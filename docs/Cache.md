@@ -265,7 +265,7 @@ public async Task GetOrAdd_SecondCall_ReturnsCachedItem()
 {
     // Arrange
     await using var redis = new RedisFixture();
-    await redis.InitializeAsync();
+    await redis.Initialize();
     var services = new ServiceCollection().AddLogging();
     services.AddSolDistributedCache(new DistributedCacheConfiguration
     {

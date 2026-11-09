@@ -111,11 +111,11 @@ public class PlayerStatisticsBlobTests
     public async Task StartAzurite()
     {
         _azurite = new AzuriteFixture();
-        await _azurite.InitializeAsync();
+        await _azurite.Initialize();
     }
 
     [TearDown]
-    public Task Clear() => _azurite.ClearAsync();
+    public Task Clear() => _azurite.Clear();
 
     [OneTimeTearDown]
     public async Task StopAzurite() => await _azurite.DisposeAsync();

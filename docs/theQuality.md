@@ -89,7 +89,7 @@ and resets state between tests:
 ```csharp
 SqlFixture = new SQLFixture("DreamTravelDatabase")
     .WithSQLProject("../../../../../src/Infrastructure/DreamTravelDatabase/DreamTravelDatabase.csproj");
-await SqlFixture.InitializeAsync();
+await SqlFixture.Initialize();
 ```
 
 Prerequisites: **docker** and a **schema source**. DreamTravel uses a dacpac (`.sqlproj`); EF migrations
@@ -121,7 +121,7 @@ public static class ComponentTestsFixture
         SqlFixture = new SQLFixture("DreamTravelDatabase")
             .WithSQLProject(Path.GetFullPath(
                 "../../../../../src/Infrastructure/DreamTravelDatabase/DreamTravelDatabase.csproj"));
-        await SqlFixture.InitializeAsync();
+        await SqlFixture.Initialize();
 
         WireMockFixture = new WireMockFixture();
         WireMockFixture.Initialize();                 // dynamic port — read Url below
@@ -155,7 +155,7 @@ public static class ComponentTestsFixture
 }
 ```
 
-Reset SQL state between tests with `await SqlFixture.ResetAsync();` (Respawn-based, schema preserved) in a
+Reset SQL state between tests with `await SqlFixture.Reset();` (Respawn-based, schema preserved) in a
 `[TearDown]`; mocks are cleared with `WireMockFixture.Reset();`.
 
 #### Define Test Scenarios
@@ -262,10 +262,10 @@ single `[SetUpFixture]`. Defined in the [testing architecture](architecture/test
 |---|---|---|---|
 | Foundation: data attributes, `Retry`, container lifetime, log assertions | `SolTechnology.Core.Testing` | `AutoNSubstituteData`, `Retry`, `TestContainersContext`, `ContainerLifecycleHelper` | [Testing.md](Testing.md) |
 | In-memory API host + config / auth helpers | `SolTechnology.Core.API.Testing` | `APIFixture<T>`, `TestConfigurationBuilder`, `CreateAuthorizedClient` | [Api.md#testing](Api.md#testing) |
-| SQL (MSSQL + Postgres), dacpac / EF / scripts | `SolTechnology.Core.SQL.Testing` | `SQLFixture`, `ResetAsync`, `UsePostgres` | [SQL.md#testing](SQL.md#testing) |
+| SQL (MSSQL + Postgres), dacpac / EF / scripts | `SolTechnology.Core.SQL.Testing` | `SQLFixture`, `Reset`, `UsePostgres` | [SQL.md#testing](SQL.md#testing) |
 | HTTP mocks (typed-client fakes) | `SolTechnology.Core.HTTP.Testing` | `WireMockFixture`, `Fake<T>`, `FakeApiBase` | [HTTP.Testing.md](HTTP.Testing.md) |
-| Redis | `SolTechnology.Core.Redis.Testing` | `RedisFixture`, `FlushAsync` | [Redis.Testing.md](Redis.Testing.md) |
-| Azure Blob (Azurite) | `SolTechnology.Core.Blob.Testing` | `AzuriteFixture`, `ClearAsync` | [Blob.Testing.md](Blob.Testing.md) |
+| Redis | `SolTechnology.Core.Redis.Testing` | `RedisFixture`, `Flush` | [Redis.Testing.md](Redis.Testing.md) |
+| Azure Blob (Azurite) | `SolTechnology.Core.Blob.Testing` | `AzuriteFixture`, `Clear` | [Blob.Testing.md](Blob.Testing.md) |
 | Azure Service Bus (emulator) | `SolTechnology.Core.ServiceBus.Testing` | `ServiceBusFixture` | [ServiceBus.Testing.md](ServiceBus.Testing.md) |
 
 > The data engine is **AutoFixture** (with NSubstitute auto-faking), not Bogus. Bogus ships as an
@@ -281,10 +281,10 @@ Every container-backed fixture follows one lifetime model, centralised in `SolTe
   every test class shares them for free.
 - **Across runs** — set `TESTCONTAINERS_REUSE=true` (env var or `.runsettings`) to keep containers alive
   between runs (Testcontainers-native `.WithReuse(true)` + stable names). `DisposeAsync()` becomes a
-  no-op; `ContainerLifecycleHelper.EnsureRunningAsync` restarts a reused container stopped externally.
+  no-op; `ContainerLifecycleHelper.EnsureRunning` restarts a reused container stopped externally.
   Default is **off** so CI stays hermetic.
-- **Between tests** — reset state without restarting: `SqlFixture.ResetAsync()` (Respawn),
-  `RedisFixture.FlushAsync()`, `AzuriteFixture.ClearAsync()`, `WireMockFixture.Reset()`.
+- **Between tests** — reset state without restarting: `SqlFixture.Reset()` (Respawn),
+  `RedisFixture.Flush()`, `AzuriteFixture.Clear()`, `WireMockFixture.Reset()`.
 - **Readiness probes, not TCP-accept** — host-side login probe (SQL) and AMQP SASL-echo probe
   (Service Bus); Ryuk is disabled for Docker Desktop Enhanced Container Isolation.
 

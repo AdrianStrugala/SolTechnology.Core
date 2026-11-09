@@ -166,7 +166,7 @@ public async Task Publish_OrderPlaced_HandlerReceivesIt()
 {
     // Arrange
     var fixture = new ServiceBusFixture(configFilePath: "servicebus-emulator-config.json");
-    await fixture.InitializeAsync();
+    await fixture.Initialize();
     var received = new TaskCompletionSource<OrderPlaced>();
     var builder = Host.CreateEmptyApplicationBuilder(new HostApplicationBuilderSettings());
     builder.Services.AddSingleton(received);

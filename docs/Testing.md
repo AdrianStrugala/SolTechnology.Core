@@ -16,7 +16,7 @@ by consumer test projects. **Reference from test projects only** — never from 
 | Specimens | `DateOnlyCustomization` | `DateOnly` support. |
 | **Result assertions** | `ResultAssertions` (extensions) | `ShouldBeSuccess()`, `ShouldBeSuccess<T>()`, `ShouldBeFailure()`, `ShouldBeFailure<TError>()` — surface `Error.Message`/`Code`/`Type` on assertion failure instead of bare booleans. |
 | **Substitutes** | `Ct` | `Ct.Any` — concise alias for `Arg.Any<CancellationToken>()` (cuts visual noise in NSubstitute setups). |
-| Eventual consistency | `Retry.UntilConditionMet` | Poll an operation until a condition is met (queues, projections, async handlers). |
+| Eventual consistency | `Retry.Until` | Poll an operation until a condition is met (queues, projections, async handlers). |
 | Container lifetime | `TestContainersContext`, `ContainerLifecycleHelper` | Shared docker network, `TESTCONTAINERS_REUSE` reuse policy (Testcontainers-native), restart-if-stopped, and readiness probes (host login / AMQP). |
 | Log assertions | `InMemorySinkAssertions` | Query a Serilog `InMemorySink` for emitted messages/levels. |
 
@@ -32,7 +32,7 @@ public void Creates_customer(Customer customer) { /* customer.Email looks like a
 
 // 2. Same thing, explicit — compose with other customizations.
 [Test, AutoNSubstituteData(typeof(BogusCustomization))]
-public void Creates_customer(Customer customer) { }
+public void Creates_customer_explicitly(Customer customer) { }
 
 // 3. Full control for a specific type via a Faker<T>.
 var faker = new Faker<Customer>().RuleFor(c => c.Iban, f => f.Finance.Iban());
@@ -52,7 +52,7 @@ needed.
 `TestContainersContext` then builds the network/containers with Testcontainers' native
 `.WithReuse(true)` + stable names, so a re-run finds the still-running container instead of paying the
 boot cost again; dispose becomes a no-op. Default is **off** so CI stays hermetic.
-`ContainerLifecycleHelper.EnsureRunningAsync` restarts a reused container that was stopped externally
+`ContainerLifecycleHelper.EnsureRunning` restarts a reused container that was stopped externally
 (e.g. by Docker Desktop) between runs.
 
 ## Ryuk (resource reaper)
@@ -103,10 +103,10 @@ Cuts visual noise when verifying NSubstitute calls that accept a `CancellationTo
 using SolTechnology.Core.Testing.Substitutes;
 
 // Before
-dispatcher.Received(1).Dispatch(@event, Arg.Any<CancellationToken>());
+await dispatcher.Received(1).Dispatch(@event, Arg.Any<CancellationToken>());
 
 // After
-dispatcher.Received(1).Dispatch(@event, Ct.Any);
+await dispatcher.Received(1).Dispatch(@event, Ct.Any);
 ```
 
 ---

@@ -31,7 +31,7 @@ emulator needs a concrete `MsSqlContainer` — see [Container lifetime & reuse](
 ```csharp
 // Assembly-level [OneTimeSetUp] — the fixture creates the MSSQL sidecar itself, so there is nothing to wire:
 ServiceBusFixture = new ServiceBusFixture();
-await ServiceBusFixture.InitializeAsync();          // boots emulator + sidecar, gated on the AMQP probe
+await ServiceBusFixture.Initialize();               // boots emulator + sidecar, gated on the AMQP probe
 
 var configuration = new TestConfigurationBuilder()
     .AddJsonFile("appsettings.tests.json")
@@ -70,7 +70,7 @@ The most lifetime-sensitive fixture of the set:
 - **Clean-up** — `DisposeAsync()` removes the emulator, the sidecar and the network, with or without Ryuk
   (see `SolTechnology.Core.Testing`'s Ryuk section).
 - **Readiness** — every start (fresh or reused) is gated on an **AMQP SASL-echo probe**
-  (`ContainerLifecycleHelper.WaitForAmqpReadyAsync`). TCP-accept alone is insufficient — it surfaces as a
+  (`ContainerLifecycleHelper.WaitForAmqpReady`). TCP-accept alone is insufficient — it surfaces as a
   `NullReferenceException` in `AmqpTransportInitiator`.
 
 The emulator persists to its **own** MSSQL sidecar, fully isolated from any `SolTechnology.Core.SQL.Testing`

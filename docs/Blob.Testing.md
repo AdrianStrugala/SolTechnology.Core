@@ -12,10 +12,10 @@ connection string your app already wires.
 
 | Member | Purpose |
 |---|---|
-| `AzuriteFixture` | Boots an `azurite` container, exposes `ConnectionString`, `CreateBlobContainerAsync` / `ClearAsync`, honours the shared reuse policy. |
+| `AzuriteFixture` | Boots an `azurite:3.37.0` container (override with the `image` argument), exposes `ConnectionString`, `CreateBlobContainer` / `Clear`, honours the shared reuse policy. |
 | `ConnectionString` | Azure Storage connection string for the running Azurite instance. |
-| `CreateBlobContainerAsync(name)` | Returns a `BlobContainerClient`, creating the blob container if needed. |
-| `ClearAsync()` | Deletes every blob container — the between-test reset when the container is reused. |
+| `CreateBlobContainer(name)` | Returns a `BlobContainerClient`, creating the blob container if needed. |
+| `Clear()` | Deletes every blob container — the between-test reset when the container is reused. |
 | `WithNetwork(network, alias)` | Attach to a docker network to share with other fixtures. |
 
 ## Usage
@@ -23,7 +23,7 @@ connection string your app already wires.
 ```csharp
 // Assembly-level [OneTimeSetUp]
 AzuriteFixture = new AzuriteFixture();
-await AzuriteFixture.InitializeAsync();
+await AzuriteFixture.Initialize();
 
 var configuration = new TestConfigurationBuilder()
     .AddJsonFile("appsettings.tests.json")
@@ -31,11 +31,11 @@ var configuration = new TestConfigurationBuilder()
     .Build();
 
 // Arrange a blob container in a test:
-var container = await AzuriteFixture.CreateBlobContainerAsync("dossier");
+var container = await AzuriteFixture.CreateBlobContainer("dossier");
 await container.UploadBlobAsync("key", BinaryData.FromString("payload"));
 
 // In a per-test teardown, when the container is reused:
-await AzuriteFixture.ClearAsync();
+await AzuriteFixture.Clear();
 
 // Assembly-level [OneTimeTearDown]
 await AzuriteFixture.DisposeAsync();   // no-op when TESTCONTAINERS_REUSE=true
@@ -47,7 +47,7 @@ The fixture defers to `SolTechnology.Core.Testing`'s `TestContainersContext`:
 
 - **Within a run** — boot once in `[OneTimeSetUp]`; every test reuses the same container for free.
 - **Across runs** — set `TESTCONTAINERS_REUSE=true` to keep the container alive between runs
-  (stable name + `WithReuse(true)`, and `ContainerLifecycleHelper.EnsureRunningAsync` restarts it if it
+  (stable name + `WithReuse(true)`, and `ContainerLifecycleHelper.EnsureRunning` restarts it if it
   was stopped externally); `DisposeAsync()` becomes a no-op. CI stays hermetic by default.
-- **Between tests** — call `ClearAsync()` to drop all blob containers without restarting Azurite.
+- **Between tests** — call `Clear()` to drop all blob containers without restarting Azurite.
 

@@ -178,5 +178,8 @@ retrospective promotes them):
 - Step 03: only the `C-23` and `C-24` members changed; internal `Async` names in SQL.Testing stay, `Flush` gains no
   token, and `WireMockServer` has a private setter for `Run`. The Azurite 3.37.0 pin is unchanged.
 - Step 04: forwarding members of `JsonResponseBuilderDecorator` and interface implementations use `<inheritdoc />`.
+- Step 05: the pages keep their structure (targeted edits); `HTTP.Testing.md` gains a "Strict matching" section, and
+  `API.Testing.md` and `SQL.Testing.md` gain usage snippets. Six other pages that called renamed members are updated
+  too. All 16 snippets compile in a throwaway project.
 
 ## Follow-ups
