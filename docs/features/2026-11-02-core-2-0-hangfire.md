@@ -188,6 +188,9 @@ retrospective promotes them):
   logs move to a source-generated `RecurringJobLogMessages` with `EventId` 2150–2153, continuing the repository's
   sequence after CQRS's 2149; templates are unchanged. No L-row: all four logs are new in 2.0, so no released log
   contract changes. `Hangfire.md` gains a Start-up logs table.
+- Code review 6 (documentation gaps): `Hangfire.md` and the release notes state that removing the last
+  `AddSolRecurringJob` call leaves old entries for manual deletion, and that 2.x event jobs must be drained before a
+  rollback to 1.x.
 - Step 07: only `ModuleInstaller` changed (extension blocks and one private filter-registration member); ApiCompat
   shows only the compiler-generated `extension` marker types.
 

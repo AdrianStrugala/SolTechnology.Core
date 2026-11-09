@@ -137,6 +137,7 @@ instance no longer registers.
 |---|---|
 | Job registered | Entry added or updated under its id |
 | Job removed, renamed, or moved to another namespace without `jobId` | Option off: old entry stays until you delete it in the dashboard. Option on: old entry removed |
+| Last `AddSolRecurringJob` call removed | Nothing runs at start, so every old entry stays whatever the option; delete them in the dashboard |
 | 1.x entry under the class name (`FetchTrafficJob`) | Always removed when it runs the same job; a same-named job of another type is kept |
 
 Turn the option on only when every instance of the application registers the same jobs: an instance started without
@@ -176,6 +177,7 @@ public class ReportGenerator
 | Event jobs use a new method signature | Deploy Hangfire servers (workers) before processes that only enqueue: a 1.x server cannot run event jobs enqueued by 2.x; they fail and are retried until a 2.x server takes them |
 | 1.x event jobs in storage | Nothing; they still run. The 1.x signature is removed in 3.0 |
 | Recurring ids change to full type names | Nothing; 1.x entries are removed at start. After a rollback to 1.x, delete the 2.x ids (full type names) from the dashboard, or both entries fire |
+| Rolling back to 1.x | Drain event jobs first: stop the processes that publish and let 2.x servers empty the event queues and scheduled retries. A 1.x server cannot load an event job enqueued by 2.x; such a job fails until a 2.x server runs again, then requeue it from the dashboard |
 
 ### Testing
 
