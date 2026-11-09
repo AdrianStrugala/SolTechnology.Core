@@ -161,3 +161,89 @@ manually against Azurite through `SolTechnology.Core.Blob.Testing`. `AzuriteFixt
 `mcr.microsoft.com/azure-storage/azurite:3.37.0`, the first image that accepts service version
 `2026-06-06` of `Azure.Storage.Blobs` 12.29.0; older images answer every request with 400
 `InvalidHeaderValue`, so the pin moves only forward with the SDK.
+
+## MessageBus
+
+`SolTechnology.Core.MessageBus` publishes typed messages to Azure Service Bus queues and topics and
+hands received messages to scoped `IMessageHandler<T>` implementations. Usage is in
+[`docs/Bus.md`](../Bus.md); registration lives in
+[`ModuleInstaller.cs`](../../src/SolTechnology.Core.MessageBus/ModuleInstaller.cs).
+
+### Public surface
+
+Consumers depend on `MessageBusConfiguration`, `QueueConfiguration`, `IMessage`,
+`IMessagePublisher`, `IMessageHandler<T>`, the `AddSolMessageBus` and `With*` extensions, and
+`AddSolServiceBusHealthCheck`. The broker, publisher, receiver, settler, and provisioning types are
+internal, so their design can change without a major version. The generic `With*` methods live in an
+`extension` block; ApiCompat reports CP0021 "notnull" on them, which the `IMessage` constraint
+already implies (Coding Guide §9.7).
+
+### Registration and the shared client
+
+`AddSolMessageBus` registers `MessageBusConfiguration` with `ValidateOnStart`: an empty connection
+string or a `MaxDeliveryCount` of zero or less stops the host. The module owns one
+`ServiceBusClient`, registered under its own key, so an unkeyed client that the application
+registers for something else is neither reused nor disposed by the module; the health check and
+the broker resolve the keyed client. The broker is registered with a factory lambda, which keeps
+its constructor internal and adds no public surface that would have to be removed again. The
+correlation service from `SolTechnology.Core.Logging` is registered with the module, because the
+publisher and receiver carry the correlation id in the `CorrelationId` application property.
+
+`With*` calls only record endpoints in a registry. The broker turns them into senders and
+processors on the first `EnsureInitializedAsync`, called by the receiver at host start and by the
+publisher before the first send. It provisions every entity first, then builds all senders and
+processors into local collections and keeps them only when every one was created, so a failed
+initialisation leaves nothing behind and the next call retries cleanly instead of adding a second
+sender. Queue lookup by message type uses the class name without namespace, so renaming a message
+namespace does not move its queue.
+
+### Provisioning
+
+With `CreateResources` on, the broker creates missing queues, topics, and subscriptions through
+`ServiceBusAdministrationClient`, which needs the *Manage* claim. Created queues and subscriptions
+get `MaxDeliveryCount`, so the broker and the receiver agree on the last attempt. Provisioning is
+check-then-create, and an entity that another instance creates in between (`MessagingEntityAlreadyExists`)
+counts as created and is logged at Debug, so instances that start at once do not fail. Existing
+entities are never changed. With `CreateResources` off, nothing is provisioned, and the entities
+must exist.
+
+### Receiving and settlement
+
+`MessageBusReceiver` is a hosted service that starts one processor per receiver with
+`AutoCompleteMessages = false` in peek-lock mode, so the module owns every settlement decision.
+For each message it restores the correlation id, deserializes the JSON body, and calls the handler in
+a new DI scope with the processor's cancellation token:
+
+- an empty, invalid, or `null` body is dead-lettered at once (`EmptyBody`, `DeserializationFailed`,
+  `NullPayload`), because retrying cannot fix it;
+- a handler that returns completes the message;
+- a handler that throws abandons the message, or dead-letters it with reason
+  `HandlerFailedMaxDelivery` and the exception's message once the delivery count reaches
+  `MaxDeliveryCount`. The value is configured rather than read from the entity because reading it
+  needs the *Manage* claim;
+- completion runs outside the handler's error path, so a completion failure, such as a lost lock,
+  is logged at Warning and never turns a handled message into an abandon or dead-letter.
+
+Settlement calls never use the processor's cancellation token. The SDK cancels that token as soon
+as `StopProcessingAsync` starts, and a handler that still returns during shutdown must be able to
+complete its message; otherwise every rolling deploy would hand in-flight messages to another
+instance a second time. A handler that throws `OperationCanceledException` during shutdown is not
+settled, and its message is delivered again. A failed complete, or a failed abandon or dead-letter
+after a handler failure, is logged at Warning and left to the lock expiry.
+
+### Several instances
+
+Every instance that registers a receiver competes for the same queue or subscription, so each
+message is handled by one instance; fan-out to every instance needs a subscription per instance,
+which the module does not create. Delivery is at least once: a lock expiry, a crash, or a failed
+settlement delivers the message again, possibly to another instance, so handlers must be
+idempotent. There is no ordering across instances or with `MaxConcurrentCalls` above `1`.
+
+### Tests
+
+`tests/SolTechnology.Core.MessageBus.Tests` runs the publish, receive, settlement, shutdown, and log
+template tests against the Service Bus emulator through `SolTechnology.Core.ServiceBus.Testing`,
+started once on first use with the queues in `servicebus-emulator-config.json`. The emulator has no
+administration API, so provisioning, concurrent creation, and initialisation retry are tested with a
+substituted `ServiceBusAdministrationClient`, and the completion-failure path with a processor whose
+messages the test delivers itself.

@@ -1,7 +1,7 @@
 ---
-status: in-progress
+status: completed
 created: 2026-11-02
-completed:
+completed: 2026-11-09
 ---
 
 # SolTechnology.Core 2.0 — MessageBus
@@ -104,9 +104,9 @@ MessageBus.Tests gains a `ProjectReference` to `SolTechnology.Core.ServiceBus.Te
 
 ## Implementation plan
 
-Steps live in the temporary working folder `2026-11-02-core-2-0-messagebus/` (see its `summary.md`). Gates: `review` is
-`done (2026-11-02)`; `premortem` is `skipped` — the core premortem verdict `go-with-mitigations (2026-11-02)`
-covers these steps.
+Steps lived in the temporary working folder `2026-11-02-core-2-0-messagebus`, which the retrospective deleted on
+2026-11-09. Gates: `review` was `done (2026-11-02)`; `premortem` was `skipped` — the core premortem verdict
+`go-with-mitigations (2026-11-02)` covered these steps.
 
 Plan review (2026-11-02): the regrouping was checked against the pre-regroup plan (`dddac21c`) and
 found complete. User answers recorded, not re-asked: the delivery order with AUID before Tale is
@@ -135,22 +135,128 @@ Steps run in number order; each is one PR.
 
 ## Acceptance criteria
 
-- [ ] Every step's acceptance criteria are checked, or the gap is recorded under `Deviations`.
-- [ ] Regression tests for `B1`, `B2`, and `infra#13` (MessageBus) fail on `4097d47f` and pass; the MessageBus resolution test has no `[Ignore]`.
-- [ ] `C-14` and `C-27` shipped; the publish→receive round-trip test (step 03) is green against the ServiceBus emulator.
-- [ ] `dotnet build SolTechnology.Core.slnx -c Release` is green, and `dotnet build SolTechnology.Core.slnx 2>&1 | grep -E "NU190[1-4]|NU1605"` prints nothing.
-- [ ] `dotnet test tests/SolTechnology.Core.MessageBus.Tests` is green.
-- [ ] The module resolution test uses `ValidateOnBuild = true` and `ValidateScopes = true`, and no resolution test is `[Ignore]`d.
-- [ ] `find src/SolTechnology.Core.MessageBus -name "*.cs" -not -path "*/obj/*" | xargs wc -l | awk '$1>150 && $2!="total"'` prints nothing.
-- [ ] Every packed `.nupkg` of this feature contains `lib/net10.0/*.xml`.
-- [ ] Every C# snippet in `docs/Bus.md` compiles in a throwaway console project against the 2.0 API, as recorded in the module-docs step.
-- [ ] The library-scoped `[{Placeholder}]` template check of the conformance or log-template step prints nothing.
+- [x] Every step's acceptance criteria are checked, or the gap is recorded under `Deviations`.
+- [x] Regression tests for `B1`, `B2`, and `infra#13` (MessageBus) fail on `4097d47f` and pass; the MessageBus resolution test has no `[Ignore]`.
+- [x] `C-14` and `C-27` shipped; the publish→receive round-trip test (step 03) is green against the ServiceBus emulator.
+- [x] `dotnet build SolTechnology.Core.slnx -c Release` is green, and `dotnet build SolTechnology.Core.slnx 2>&1 | grep -E "NU190[1-4]|NU1605"` prints nothing.
+- [x] `dotnet test tests/SolTechnology.Core.MessageBus.Tests` is green.
+- [x] The module resolution test uses `ValidateOnBuild = true` and `ValidateScopes = true`, and no resolution test is `[Ignore]`d.
+- [x] `find src/SolTechnology.Core.MessageBus -name "*.cs" -not -path "*/obj/*" | xargs wc -l | awk '$1>150 && $2!="total"'` prints nothing.
+- [x] Every packed `.nupkg` of this feature contains `lib/net10.0/*.xml`.
+- [x] Every C# snippet in `docs/Bus.md` compiles in a throwaway console project against the 2.0 API, as recorded in the module-docs step.
+- [x] The library-scoped `[{Placeholder}]` template check of the conformance or log-template step prints nothing.
 
 ## Completion summary
 
+Delivered on `master` between `ba8acbc5` and `ce492389`, plus the concurrent-creation fix `57c060e5`; the code review
+fixes (`c5af0f48` to `7c1d99ee`) and the retrospective ran on 2026-11-09. The user asked on 2026-11-09 to fix the
+review findings, run the retrospective, and close the feature without further confirmation (`CLAUDE.md §2`).
+
+- **`B1`, `B2`, `infra#13`, A5 (steps 01, 02):** the broker is registered with a factory lambda and keeps its
+  constructor internal; the module registers its own keyed `ServiceBusClient`, which the health check and the broker
+  use, and the correlation service. The resolution tests run with `ValidateOnBuild` and `ValidateScopes` and no
+  `[Ignore]`.
+- **`C-27`, P-17, P-24, RM-13 (step 03):** the receiver completes a handled message, abandons a failing one, and
+  dead-letters it with reason `HandlerFailedMaxDelivery` on delivery `MaxDeliveryCount` (default 10); unreadable bodies
+  are dead-lettered at once. An empty `ConnectionString` or a `MaxDeliveryCount` of zero or less stops the host. A
+  publish→receive round trip runs against the Service Bus emulator.
+- **`C-14` (step 04):** `MessageBusBroker`, `IMessageBusBroker`, `MessagePublisher`, and `MessageBusReceiver` are
+  internal.
+- **Concurrent provisioning (coordinator, 2026-11-09, `57c060e5`):** with `CreateResources` on, an entity that another
+  instance creates between the existence check and the create counts as created.
+- **Docs (steps 05, 06):** the package ships XML docs, and `docs/Bus.md` was rewritten against the 2.0 API with every
+  C# block compiled, including the "Running several instances" section. The code review changed only table rows.
+- **Conformance and logs (steps 07, 08, L-03):** the broker, receiver, and installer were split into collaborators
+  under 150 lines, with `extension` blocks, braces, and one-line comments; every MessageBus log template brackets its
+  placeholders.
+- **Code review fixes (2026-11-09):** settlement no longer uses the processor's cancellation token, so a message handled
+  during shutdown completes; created queues and subscriptions get `MaxDeliveryCount`; a completion failure is a Warning
+  and never an abandon or dead-letter; a failed initialisation can be retried without duplicate senders. The receiver
+  tests were split under 150 lines (see the last section).
+- **Architecture:** [`docs/architecture/infrastructure-modules.md`](../architecture/infrastructure-modules.md) has the
+  MessageBus section: public surface, registration with the keyed client and the A5 rationale, all-or-nothing
+  initialisation, provisioning with `MaxDeliveryCount` and concurrent creation, settlement including graceful shutdown,
+  multi-instance semantics (competing consumers, at-least-once delivery), and the test setup.
+  `docs/architecture/background-processing.md` does not name MessageBus and needed no change. The premortem reference
+  `.github/skills/premortem/references/messagebus.md` now names the concrete checks for duplicate processing and
+  `MaxDeliveryCount`, and a new item for all-or-nothing initialisation.
+- **Final verification (2026-11-09, `7c1d99ee` plus this record):** `dotnet build SolTechnology.Core.slnx -c Release`
+  reported 0 errors and the NU190x / NU1605 grep printed nothing; the file-size check and the multi-line placeholder
+  scan of step 08 printed nothing; the Release pack of `SolTechnology.Core.MessageBus` contains
+  `lib/net10.0/SolTechnology.Core.MessageBus.xml`; and `dotnet test SolTechnology.Core.slnx -c Release` passed 18
+  projects (872 passed, 11 skipped, 0 failed), including MessageBus (39) and the DreamTravel component and unit tests.
+
+Changes to the core brief ([`2026-11-02-core-2-0-flagship-hardening`](2026-11-02-core-2-0-flagship-hardening.md)) for
+release 05:
+
+- A new "Release-notes inputs" entry (messagebus code review, 2026-11-09) covers the four behaviour changes of the
+  review fixes, including the new Warning template `Failed to complete message [{MessageId}]; lock will expire
+  naturally`. The entry for concurrent resource creation was added earlier on 2026-11-09.
+- P-17 and P-24 were extended or added in step 03 (see Deviations); `C-14`, `C-27`, and L-03 shipped as written. The
+  new Warning template is additional and already bracketed, so L-03 needs no change.
+
 ## Deviations
 
+### P-17 extended and P-24 added (step 03)
+
+**Original plan:** append a `P-nn` row for RM-13; P-17 names the dead-letter threshold only.
+
+**Actual implementation:** P-24 is the RM-13 row. P-17 also names the dead-letter reason `HandlerFailedMaxDelivery` and
+the handler exception's message as the description, because dead-letter tooling that filters on the broker's
+`MaxDeliveryCountExceeded` sees a new reason.
+
+### Client options built in an internal method (step 02)
+
+**Original plan:** `MessageBusClientFactory.Create` applies the transport and retry options, and a test reads them from
+the client.
+
+**Actual implementation:** `ServiceBusClient` does not expose its retry options, so an internal `CreateOptions` builds
+them and the test checks it; the empty-`ConnectionString` `ArgumentException` moved from the broker constructor into
+`Create`, because the client is built before the broker.
+
+### "Running several instances" and concurrent creation (coordinator, 2026-11-09)
+
+**Original plan:** not part of the feature.
+
+**Actual implementation:** after step 04, `57c060e5` made `CreateResources` tolerate `MessagingEntityAlreadyExists`, and
+step 06 added the "Running several instances" section to `docs/Bus.md`: competing consumers, a per-instance subscription
+for fan-out (not provided), at-least-once delivery, no ordering across instances.
+
+### Collaborators extracted beyond the plan (step 07)
+
+**Original plan:** split the broker below 150 lines and move the endpoint helpers out of `ModuleInstaller.cs`.
+
+**Actual implementation:** the broker delegates to `ServiceBusEndpoints` and `ServiceBusResourceProvisioner`, the
+receiver to `MessageDeserializer`, `MessageSettler`, and `HandlerInvoker`, and the helpers live in `EndpointRegistrar`;
+the health-check extension also moved into an `extension` block. ApiCompat reports CP0021 "notnull" on the four generic
+`With*` methods, accepted under Coding Guide §9.7 (see the last section).
+
+### Template check and pinning tests (step 08)
+
+**Original plan:** a single-line `grep` for unbracketed placeholders.
+
+**Actual implementation:** every template sits on the line after its `Log*(` call, so the check is a multi-line scan of
+each call; new tests pin the settlement templates and, on the emulator, the start, publish, handled, stop-failure,
+publish-failure, and processor-error templates.
+
+### Code review fixes after step 08 (2026-11-09)
+
+**Original plan:** the retrospective follows step 08 directly.
+
+**Actual implementation:** four review findings were fixed first, each with a test that fails without it (see the last
+section). Settlement ignoring the processor's token, `MaxDeliveryCount` on created entities, and the completion-failure
+Warning change observable behaviour; the core brief has the release-notes input.
+
 ## Follow-ups
+
+- `SolTechnology.Core.ServiceBus.Testing` leaves the emulator's MSSQL sidecar running after `ServiceBusFixture` is
+  disposed when Ryuk is disabled, which `TestContainersContext` does. During this work, sidecars from earlier test runs
+  piled up and the next emulator starts failed until they were removed by hand. Owner: the testing-kits feature.
+- `tests/SolTechnology.Core.MessageBus.Tests/ModuleInstallerTests.cs` has 222 lines, over the Coding Guide §9 cap;
+  split it like the receiver tests.
+- When dead-lettering an unreadable message fails, the exception enters the handler-failure path, so it is logged as
+  `Handler failure …` at Error and abandoned instead of logged as a dead-letter failure at Warning. Low impact: the
+  message comes back and is dead-lettered again.
 
 ## Code review fixes (2026-11-09)
 
