@@ -1,7 +1,7 @@
 namespace SolTechnology.Core.Hangfire;
 
 /// <summary>
-/// Version-free full type name used as the default recurring job id: namespace and name, generic arguments
+/// Version-free full type name, the default recurring job id when it fits (see <see cref="StorageKey"/>): namespace and name, generic arguments
 /// resolved recursively, and no assembly information, so a redeploy keeps the id.
 /// </summary>
 internal static class JobTypeName

@@ -36,7 +36,7 @@ public class RecurringJobSqlServerTests
         var applicationName = new string('a', 120);
 
         // Act
-        await _host.Start(applicationName, s => s.AddSolRecurringJob<GenericJob<List<string>>>(RecurringJobHost.Cron));
+        await _host.Start(applicationName, s => s.AddSolRecurringJob<GenericJob<List<string>>>(RecurringJobHost.Cron), removeStaleJobs: true);
 
         // Assert
         _host.StoredIds().Should().Contain("GenericJob`1-ac9290f02c71");

@@ -9,8 +9,8 @@ Durable CQRS events and typed recurring jobs on top of Hangfire. `AddSolPersiste
 - **Durable events** — each published `IEvent` is stored as one Hangfire job and dispatched to its handlers in a fresh
   DI scope, so an event published just before a crash still runs.
 - **Typed recurring jobs** — an `IJob` returns a `Result`, is resolved from DI per run, and is registered with one line.
-- **Stable job ids** — the default id is the job's full type name without assembly version; jobs you stop
-  registering are removed at start, without touching other applications that share the storage.
+- **Stable job ids** — the default id is the job's full type name without assembly version, shortened when it would
+  not fit SQL Server; 1.x entries are replaced at start, and jobs you stop registering can be removed on opt-in.
 - **Result-aware retry** — a recoverable failed `Result` is retried up to 3 times; a thrown exception is not retried.
 - **Overlap guard** — `preventOverlap: true` skips a run while the previous run of the same job is still processing.
 - **Correlation** — the caller's correlation id travels with the job and is restored in the job's log scope.
@@ -62,6 +62,14 @@ builder.Services.AddHangfireServer(o => o.Queues = ["events", "default"]);
 | `preventOverlap` | `false` | Skip a run while another run of this job is processing; needs `UseSolFilters`. |
 | `jobId` | full type name of `TJob` | Recurring job id of at most 86 characters (a longer one throws `ArgumentException`); set it to keep the id when you rename or move the class. |
 | `timeZone` | UTC | Time zone the cron expression is evaluated in. |
+
+| `RecurringJobsOptions` | Default | Purpose |
+|---|---|---|
+| `RemoveStaleRecurringJobs` | `false` | At start, remove the recurring jobs this application registered before and no longer registers (see Job ids). |
+
+```csharp
+builder.Services.Configure<RecurringJobsOptions>(o => o.RemoveStaleRecurringJobs = true);
+```
 
 ### Usage
 
@@ -118,17 +126,23 @@ builder.Services.AddSolRecurringJob<FetchTrafficJob>("0 */6 * * *", preventOverl
 
 Hangfire.SqlServer stores `recurring-job:<id>` in an `nvarchar(100)` key, so ids are at most 86 characters: a full type
 name that is longer, typically a generic job, becomes its type name, `-`, and the first 12 hex characters of the full
-name's SHA-256 (`GenericJob`1-ac9290f02c71`), the same in every process and version.
+name's SHA-256 (``GenericJob`1-ac9290f02c71``), the same in every process and version.
 
-At start the module adds or updates every registered job, then removes the jobs it registered before and no longer
-does; it records its ids in the storage set `sol:recurring-ids:<ApplicationName>`, so services that share one
-Hangfire storage never remove each other's jobs.
+At start the module adds or updates every registered job. Removing a job it no longer registers is opt-in
+(`RemoveStaleRecurringJobs`), because the module only knows what the starting instance registers: with the option on,
+it records its ids in the storage set `sol:recurring-ids:<ApplicationName>` and removes the recorded ids that this
+instance no longer registers.
 
 | Situation | Effect at start |
 |---|---|
 | Job registered | Entry added or updated under its id |
-| Job removed, renamed, or moved to another namespace without `jobId` | Old entry removed, new entry added |
-| 1.x entry under the class name (`FetchTrafficJob`) | Removed when it runs the same job; a same-named job of another type is kept |
+| Job removed, renamed, or moved to another namespace without `jobId` | Option off: old entry stays until you delete it in the dashboard. Option on: old entry removed |
+| 1.x entry under the class name (`FetchTrafficJob`) | Always removed when it runs the same job; a same-named job of another type is kept |
+
+Turn the option on only when every instance of the application registers the same jobs: an instance started without
+a feature-flagged job removes the entry the other instances still run. Two applications that register the same job
+type from a shared package share its default id, so the entry follows whichever started last, and with the option on
+one removes the other's entry; give each its own `jobId`.
 
 #### Prevent overlap
 
@@ -182,7 +196,8 @@ public async Task Execute_TrafficApiDown_ReturnsRecoverableFailure()
 - **Do** make handlers and jobs idempotent; a requeued or retried run executes them again.
 - **Do** call `UseSolFilters(sp)`; without it there is no correlation, no Smart Retry, and no overlap guard.
 - **Do** return `Recoverable = true` only for transient failures, and pass the `CancellationToken` on.
-- **Do** set `jobId` before renaming or moving a recurring job class whose history you want to keep.
+- **Do** set `jobId` before renaming or moving a recurring job class whose history you want to keep, and for a job
+  type that several applications share from one package.
 - **Do** use `BackgroundJob.Schedule` for one-off delayed work instead of building a delay queue.
 - **Don't** put entities in events; they are serialized into storage and may be read long after publishing.
 - **Don't** raise `WorkerCount` before measuring; Hangfire's default suits IO-bound handlers.
@@ -192,9 +207,10 @@ public async Task Execute_TrafficApiDown_ReturnsRecoverableFailure()
 | Service | Implementation | Lifetime |
 |---|---|---|
 | `IEventPublisher` | Enqueues one Hangfire job per event (`AddSolPersistentEvents`) | Singleton |
-| `IHostedService` | Registers recurring jobs and removes stale ones at start | Singleton |
+| `IHostedService` | Registers recurring jobs and removes 1.x (and, on opt-in, stale) entries at start | Singleton |
 | `TJob` | Your job, one per `AddSolRecurringJob` call | Scoped |
 | `IOptions<PersistentEventsOptions>` | Queue name | Singleton |
+| `IOptions<RecurringJobsOptions>` | Stale-job removal switch | Singleton |
 | `ICorrelationIdService` | From `SolTechnology.Core.Logging` | Singleton |
 
 Background: [background-processing architecture](architecture/background-processing.md), [CQRS](CQRS.md).

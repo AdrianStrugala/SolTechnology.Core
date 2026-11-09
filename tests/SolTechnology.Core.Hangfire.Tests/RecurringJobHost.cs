@@ -22,9 +22,10 @@ internal sealed class RecurringJobHost : IDisposable
         _manager = new RecurringJobManager(_storage);
     }
 
-    public async Task Start(string applicationName, Action<IServiceCollection> registerJobs)
+    public async Task Start(string applicationName, Action<IServiceCollection> registerJobs, bool removeStaleJobs = false)
     {
         var services = new ServiceCollection().AddLogging();
+        services.Configure<RecurringJobsOptions>(o => o.RemoveStaleRecurringJobs = removeStaleJobs);
         services.AddSingleton<JobStorage>(_storage);
         services.AddSingleton<IRecurringJobManager>(_manager);
         var hostEnvironment = Substitute.For<IHostEnvironment>();

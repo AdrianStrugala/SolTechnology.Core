@@ -4,6 +4,8 @@ using Hangfire.Common;
 using Hangfire.InMemory;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
+using Microsoft.Extensions.Options;
 using NSubstitute;
 using NUnit.Framework;
 using SolTechnology.Core.Hangfire.Filters;
@@ -89,7 +91,7 @@ public class RecurringJobRegistrarTests
         var descriptor = new RecurringJobDescriptor(typeof(TestJob), "0 0 * * *", preventOverlap: true);
         var overlapFilterProvider = new PreventOverlapFilterProvider([descriptor]);
         overlapFilterProvider.InstallInto(new JobFilterProviderCollection());
-        var sut = new RecurringJobRegistrar(_manager, _storage, _hostEnvironment, [descriptor], overlapFilterProvider, _logger);
+        var sut = new RecurringJobRegistrar(_manager, [descriptor], overlapFilterProvider, Cleanup(), _logger);
 
         // Act
         await sut.StartAsync(CancellationToken.None);
@@ -99,5 +101,8 @@ public class RecurringJobRegistrarTests
     }
 
     private RecurringJobRegistrar CreateSut(params RecurringJobDescriptor[] descriptors) =>
-        new(_manager, _storage, _hostEnvironment, descriptors, new PreventOverlapFilterProvider(descriptors), _logger);
+        new(_manager, descriptors, new PreventOverlapFilterProvider(descriptors), Cleanup(), _logger);
+
+    private RecurringJobCleanup Cleanup() =>
+        new(_manager, _storage, _hostEnvironment, Options.Create(new RecurringJobsOptions()), NullLogger<RecurringJobCleanup>.Instance);
 }

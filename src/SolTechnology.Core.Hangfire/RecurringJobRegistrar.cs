@@ -13,10 +13,9 @@ namespace SolTechnology.Core.Hangfire;
 /// </summary>
 internal sealed class RecurringJobRegistrar(
     IRecurringJobManager recurringJobManager,
-    JobStorage jobStorage,
-    IHostEnvironment hostEnvironment,
     IEnumerable<RecurringJobDescriptor> descriptors,
     PreventOverlapFilterProvider overlapFilterProvider,
+    RecurringJobCleanup cleanup,
     ILogger<RecurringJobRegistrar> logger) : IHostedService
 {
     public Task StartAsync(CancellationToken cancellationToken)
@@ -27,10 +26,7 @@ internal sealed class RecurringJobRegistrar(
             Register(descriptor);
         }
 
-        using var connection = jobStorage.GetConnection();
-        var cleanup = new RecurringJobCleanup(recurringJobManager, connection, hostEnvironment.ApplicationName, logger);
-        cleanup.RemoveLegacyIds(registered);
-        cleanup.RemoveStaleIds(registered);
+        cleanup.Run(registered);
 
         return Task.CompletedTask;
     }

@@ -70,25 +70,38 @@ public class RecurringJobIdTests
     public async Task Registrar_RemovedJob_IsDeletedFromStorage()
     {
         // Arrange
-        await _host.Start("app-a", s => s.AddSolRecurringJob<TestJob>(Cron).AddSolRecurringJob<AnotherTestJob>(Cron));
+        await _host.Start("app-a", s => s.AddSolRecurringJob<TestJob>(Cron).AddSolRecurringJob<AnotherTestJob>(Cron), removeStaleJobs: true);
 
         // Act
-        await _host.Start("app-a", s => s.AddSolRecurringJob<TestJob>(Cron));
+        await _host.Start("app-a", s => s.AddSolRecurringJob<TestJob>(Cron), removeStaleJobs: true);
 
         // Assert
         _host.StoredIds().Should().BeEquivalentTo(TestJobId);
     }
 
     [Test]
-    public async Task Registrar_TwoApplicationsSharedStorage_KeepEachOthersJobs()
+    public async Task Registrar_RemovedJobWithoutOptIn_IsKept()
     {
-        // Arrange
-        await _host.Start("app-a", s => s.AddSolRecurringJob<TestJob>(Cron));
-        await _host.Start("app-b", s => s.AddSolRecurringJob<AnotherTestJob>(Cron));
+        // Arrange: a second instance of the same application registers a feature-flagged job.
+        await _host.Start("app-a", s => s.AddSolRecurringJob<TestJob>(Cron).AddSolRecurringJob<AnotherTestJob>(Cron));
 
         // Act
         await _host.Start("app-a", s => s.AddSolRecurringJob<TestJob>(Cron));
-        await _host.Start("app-b", s => s.AddSolRecurringJob<AnotherTestJob>(Cron));
+
+        // Assert
+        _host.StoredIds().Should().BeEquivalentTo(TestJobId, AnotherTestJobId);
+    }
+
+    [Test]
+    public async Task Registrar_TwoApplicationsSharedStorage_KeepEachOthersJobs()
+    {
+        // Arrange
+        await _host.Start("app-a", s => s.AddSolRecurringJob<TestJob>(Cron), removeStaleJobs: true);
+        await _host.Start("app-b", s => s.AddSolRecurringJob<AnotherTestJob>(Cron), removeStaleJobs: true);
+
+        // Act
+        await _host.Start("app-a", s => s.AddSolRecurringJob<TestJob>(Cron), removeStaleJobs: true);
+        await _host.Start("app-b", s => s.AddSolRecurringJob<AnotherTestJob>(Cron), removeStaleJobs: true);
 
         // Assert
         _host.StoredIds().Should().BeEquivalentTo(TestJobId, AnotherTestJobId);

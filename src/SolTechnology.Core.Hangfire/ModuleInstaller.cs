@@ -81,6 +81,8 @@ public static class ModuleInstaller
             services.TryAddEnumerable(
                 ServiceDescriptor.Singleton<IHostedService, RecurringJobRegistrar>());
             services.TryAddSingleton<PreventOverlapFilterProvider>();
+            services.TryAddSingleton<RecurringJobCleanup>();
+            services.AddOptions<RecurringJobsOptions>();
             services.AddSolJobFilters();
 
             return services;
