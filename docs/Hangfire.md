@@ -1,288 +1,196 @@
-# SolTechnology.Core.Hangfire
+## SolTechnology.Core.Hangfire
 
-Hangfire-backed persistent event dispatch and recurring jobs for `SolTechnology.Core.CQRS`.
-Events survive process restarts via Hangfire storage; recurring jobs run on cron schedules
-with typed, DI-resolved handlers. Intentionally minimal public surface —
-new knobs require a [dated feature](architecture/delivery-workflow.md).
+Durable CQRS events and typed recurring jobs on top of Hangfire. `AddSolPersistentEvents()` turns every
+`IMediator.Publish` into a Hangfire job that survives a process restart, and `AddSolRecurringJob<TJob>()` runs an
+`IJob` on a cron schedule; your application keeps ownership of the Hangfire storage, server, and dashboard.
 
-## Features
+### Features
 
-- **Persistent events** — `IEvent` instances are enqueued as Hangfire background jobs.
-  A crash between publish and dispatch does not lose the event.
-- **Recurring jobs** — `IJob` implementations run on cron schedules, registered with a
-  one-liner and resolved from DI at execution time.
-- **Plugin model** — opt in with `AddPersistentEvents()` after `AddCQRS()`. Does not
-  replace in-memory dispatch unless explicitly installed.
+- **Durable events** — each published `IEvent` is stored as one Hangfire job and dispatched to its handlers in a fresh
+  DI scope, so an event published just before a crash still runs.
+- **Typed recurring jobs** — an `IJob` returns a `Result`, is resolved from DI per run, and is registered with one line.
+- **Stable job ids** — the default id is the job's full type name without assembly version; jobs you stop
+  registering are removed at start, without touching other applications that share the storage.
+- **Result-aware retry** — a recoverable failed `Result` is retried up to 3 times; a thrown exception is not retried.
+- **Overlap guard** — `preventOverlap: true` skips a run while the previous run of the same job is still processing.
+- **Correlation** — the caller's correlation id travels with the job and is restored in the job's log scope.
+- **Graceful shutdown** — handlers and jobs receive the server's shutdown token; an event cut short is requeued.
+- **Upgrade from 1.x in place** — event jobs enqueued by 1.x still run, and 1.x recurring entries are replaced.
 
-## Registration
+### Registration
 
-The plugin offers two independent features — use either or both:
-
-```csharp
-// Persistent events only (requires AddCQRS first)
-builder.Services.AddCQRS(assemblies: typeof(Program).Assembly);
-builder.Services.AddPersistentEvents();
-
-// Recurring jobs only (no AddCQRS dependency)
-builder.Services.AddRecurringJob<MyDailyJob>(Cron.Daily);
-
-// Both together
-builder.Services.AddCQRS(assemblies: typeof(Program).Assembly);
-builder.Services.AddPersistentEvents();
-builder.Services.AddRecurringJob<MyDailyJob>(Cron.Daily);
-```
-
-| Method | Requires `AddCQRS()` | What it does |
-|--------|---------------------|--------------|
-| `AddPersistentEvents()` | ✅ yes | Replaces in-memory event publisher with Hangfire-backed durable dispatch |
-| `AddRecurringJob<TJob>(cron)` | ❌ no | Registers a typed job on a cron schedule via Hangfire |
-
-## Configuration
+Register the module, then configure Hangfire with `UseSolFilters` and start a server:
 
 ```csharp
-builder.Services.AddPersistentEvents(o => o.QueueName = "events");
-```
+builder.Services.AddSolCQRS(o => o.RegisterEventsFromAssembly(typeof(Program).Assembly));
+builder.Services.AddSolPersistentEvents();
+builder.Services.AddSolRecurringJob<FetchTrafficJob>(Cron.Hourly());
 
-| Option | Default | Description |
-|--------|---------|-------------|
-| `QueueName` | `"default"` | Hangfire queue used for event dispatch jobs. |
-
-## Usage — Persistent Events
-
-Define an event and its handler(s) in your CQRS layer:
-
-```csharp
-public class CitySearched : IEvent
-{
-    public City City { get; set; }
-}
-
-public class SaveCitySearchHandler(ICityDomainService cityDomainService) : IEventHandler<CitySearched>
-{
-    public async Task Handle(CitySearched @event, CancellationToken cancellationToken)
-    {
-        await cityDomainService.Save(@event.City);
-    }
-}
-```
-
-Publish from any handler via `IMediator`:
-
-```csharp
-mediator.Publish(new CitySearched { City = result });
-```
-
-With `AddPersistentEvents()` installed, the event is enqueued as a Hangfire job and
-dispatched in a fresh DI scope when the server picks it up.
-
-## Usage — Recurring Jobs
-
-```csharp
-public class FetchTrafficJob(ITrafficClient client) : IJob
-{
-    public async Task Execute(CancellationToken cancellationToken)
-    {
-        await client.FetchLatest(cancellationToken);
-    }
-}
-
-// Registration (Program.cs)
-builder.Services.AddRecurringJob<FetchTrafficJob>("0 */6 * * *"); // every 6 hours
-```
-
-The job id is stable (`typeof(TJob).Name`) — re-registration on deploy updates rather
-than duplicates the schedule.
-
-## App-Side Requirements
-
-The plugin depends on `Hangfire.Core` only. **The app must provide:**
-
-1. **A DI-aware Hangfire `JobActivator`** — supplied by `Hangfire.AspNetCore` (via
-   `AddHangfireServer()`) or `GlobalConfiguration.UseActivator(...)`. Without it,
-   Hangfire cannot resolve the plugin's internal dispatcher/runner types.
-
-2. **Type-aware job-argument serialisation** — `IEvent` is serialised through an
-   interface-typed parameter. Configure:
-   ```csharp
-   builder.Services.AddHangfire(config => config
-       .UseSqlServerStorage(connectionString)
-       .UseRecommendedSerializerSettings()           // TypeNameHandling.Auto
-       .UseSimpleAssemblyNameTypeSerializer());
-   ```
-   Without this, the event cannot be deserialised when the job runs.
-
-3. **Hangfire server** — `builder.Services.AddHangfireServer()` so jobs are actually
-   processed. Without it, jobs are persisted but never fire.
-
-> The `Newtonsoft.Json` 13.0.4 pin (CVE-2024-21907) is satisfied transitively by the
-> plugin's own package reference.
-
-## Retry & Resilience
-
-Persistent events dispatch **once** (`[AutomaticRetry(Attempts = 0)]`). A failed handler
-surfaces as a **Failed** job in the Hangfire dashboard — visible and manually re-queueable.
-
-Resilience is a **handler-level** concern (e.g. Polly inside the handler). The plugin
-does not add automatic retries.
-
-Persistence buys **durability** (a job enqueued before a crash runs after restart) and
-**at-least-once** delivery (crash-recovery or manual re-queue). Handlers must be
-**idempotent**.
-
-## Rate Limiting
-
-Out of scope for this `Hangfire.Core`-only plugin. Concurrency is bounded app-side via
-`AddHangfireServer(o => o.WorkerCount = N)` and named queues. True jobs-per-interval
-rate limiting requires `Hangfire.Throttling` or infrastructure-level controls.
-
-## Event Payload Guideline
-
-Persisted events may be re-dispatched (at-least-once). Prefer small, immutable payloads
-carrying IDs — reload current state inside the handler. `CitySearched` carries its full
-payload as a deliberate exception (freshly fetched city not yet in the store, no id to
-reload by).
-
-## Public API Surface
-
-Intentionally minimal:
-
-| Symbol | Kind |
-|--------|------|
-| `AddPersistentEvents()` | Extension method |
-| `AddRecurringJob<TJob>(cron)` | Extension method |
-| `IJob` | Interface |
-| `PersistentEventsOptions` | Options class |
-
-`IEvent`, `IEventHandler<T>`, `IEventPublisher`, `IEventDispatcher` live in
-`SolTechnology.Core.CQRS` — see [CQRS docs](CQRS.md).
-
-## Filters
-
-The plugin ships three Hangfire job filters. Register them globally via
-`UseSolTechnologyFilters()` in the app's `AddHangfire` callback:
-
-```csharp
 builder.Services.AddHangfire((sp, config) => config
-    .UseRecommendedSerializerSettings()
+    .SetDataCompatibilityLevel(CompatibilityLevel.Version_180)
     .UseSimpleAssemblyNameTypeSerializer()
+    .UseRecommendedSerializerSettings()
     .UseSqlServerStorage(connectionString)
-    .UseSolTechnologyFilters(sp));   // registers correlation + smart-retry filters
+    .UseSolFilters(sp));
+builder.Services.AddHangfireServer();
 ```
 
-### Correlation-id propagation
+| Call | Needs | What it does |
+|---|---|---|
+| `AddSolPersistentEvents()` | `AddSolCQRS()` first | Replaces the in-memory `IEventPublisher` with a Hangfire-backed one |
+| `AddSolRecurringJob<TJob>(cron)` | — | Registers `TJob` and adds or updates its recurring entry at host start |
+| `UseSolFilters(sp)` | the `AddHangfire` callback | Installs correlation, Smart Retry, and the overlap guard |
 
-Preserves the `X-Correlation-Id` across the enqueue→execute boundary. On enqueue
-the current correlation id is saved as a job parameter; on execute it is restored
-into `ICorrelationIdService` and pushed as a log scope — so logs from background
-handlers appear under the same correlation as the original request.
+The application supplies the rest: storage (`Hangfire.SqlServer`, `Hangfire.InMemory`, …), a server
+(`AddHangfireServer()`), and `UseRecommendedSerializerSettings()`, without which an `IEvent` argument cannot be read
+back. `AddHangfire` from `Hangfire.NetCore` or `Hangfire.AspNetCore` provides the DI-aware job activator.
 
-### Smart retry (Result-aware)
+### Configuration
 
-Bridges the `Result` pattern with Hangfire's exception-only retry model. If a job
-returns `Result.Fail(new Error { Recoverable = true })`, the filter forces the job
-into `FailedState` so Hangfire retries it. Non-recoverable failures are left as
-succeeded — no pointless retries, no silent swallowing.
-
-### Prevent overlap
-
-Cancels a job execution if another instance with the same method + arguments is
-already scheduled or processing. Prevents pile-up when a recurring job is mid-retry
-and the next cron trigger fires. Apply as an attribute on a job method:
+| `PersistentEventsOptions` | Default | Purpose |
+|---|---|---|
+| `QueueName` | `"default"` | Hangfire queue of event jobs; the server must listen on it. |
 
 ```csharp
-[PreventOverlapJobFilter]
-public async Task RunAsync(CancellationToken cancellationToken) { ... }
+builder.Services.AddSolPersistentEvents(o => o.QueueName = "events");
+builder.Services.AddHangfireServer(o => o.Queues = ["events", "default"]);
 ```
 
-Or register for a specific recurring job:
+| `AddSolRecurringJob<TJob>` parameter | Default | Purpose |
+|---|---|---|
+| `cronExpression` | — (required) | Schedule; use Hangfire's `Cron` helpers or a cron string. |
+| `preventOverlap` | `false` | Skip a run while another run of this job is processing; needs `UseSolFilters`. |
+| `jobId` | full type name of `TJob` | Recurring job id; set it to keep the id when you rename or move the class. |
+| `timeZone` | UTC | Time zone the cron expression is evaluated in. |
+
+### Usage
+
+#### Persistent events
+
+Define the event and its handlers in your CQRS layer and publish through `IMediator`; carry ids rather than entities:
 
 ```csharp
-builder.Services.AddRecurringJob<MyJob>(Cron.Hourly, preventOverlap: true);
+public sealed record OrderPlaced(int OrderId) : IEvent;
+
+public class SendConfirmationHandler(IEmailSender emailSender) : IEventHandler<OrderPlaced>
+{
+    public Task Handle(OrderPlaced notification, CancellationToken cancellationToken) =>
+        emailSender.SendConfirmation(notification.OrderId, cancellationToken);
+}
+
+mediator.Publish(new OrderPlaced(42));
 ```
 
-## Testing
+`SolTechnology.Core.CQRS` logs and isolates a handler's exception, so a failing handler does not fail the job; the
+job guards against losing the event before dispatch, not against a handler's own failure.
 
-In component/integration tests, **do not call `AddPersistentEvents()`**. The default
-in-memory `IEventPublisher` from `AddCQRS()` dispatches events in-process (fire-and-forget)
-— no Hangfire infrastructure needed, no test doubles required.
+#### Recurring jobs
+
+Return a `Result`; mark a transient failure `Recoverable` to have the run retried:
 
 ```csharp
-// Test fixture — just use AddCQRS(), no publisher swap needed
-builder.Services.AddCQRS(assemblies: typeof(Program).Assembly);
-// Events dispatch in-memory; handlers run in background Task.Run with a fresh scope.
+public class FetchTrafficJob(ITrafficClient trafficClient) : IJob
+{
+    public async Task<Result> Execute(CancellationToken cancellationToken)
+    {
+        var fetched = await trafficClient.FetchLatest(cancellationToken);
+        return fetched
+            ? Result.Success()
+            : Result.Fail(new Error { Message = "Traffic API unavailable", Recoverable = true });
+    }
+}
+
+builder.Services.AddSolRecurringJob<FetchTrafficJob>("0 */6 * * *", preventOverlap: true);
 ```
 
-If your tests assert on handler side-effects, the in-memory publisher's `Task.Run` dispatch
-is fast enough for most scenarios. For strict synchronous guarantees, assert with a short
-poll/retry — not a custom publisher.
+#### Outcomes and retries
 
-## Recommended defaults
+| Outcome | Recurring job | Event job |
+|---|---|---|
+| Success | `Succeeded` | `Succeeded` |
+| Failed `Result`, `Recoverable = false` | `Succeeded` | — |
+| Failed `Result`, `Recoverable = true` | Retried up to 3 times with Hangfire's back-off, then `Failed` (needs `UseSolFilters`) | — |
+| Handler throws | — | Logged by CQRS; job `Succeeded` |
+| Job throws | `Failed`, not retried | `Failed`, not retried |
+| Server shuts down mid-run | Requeued when the job lets the token's `OperationCanceledException` propagate | Requeued; every handler runs again |
 
-### Retry backoff
+#### Job ids
 
-`SmartRetryJobFilter` applies this 10-attempt schedule by default:
+At start the module adds or updates every registered job, then removes the jobs it registered before and no longer
+does; it records its ids in the storage set `sol:recurring-ids:<ApplicationName>`, so services that share one
+Hangfire storage never remove each other's jobs.
 
-```
-10s → 30s → 1m → 5m → 15m → 30m → 1h → 2h → 4h → 8h
-```
+| Situation | Effect at start |
+|---|---|
+| Job registered | Entry added or updated under its id |
+| Job removed, renamed, or moved to another namespace without `jobId` | Old entry removed, new entry added |
+| 1.x entry under the class name (`FetchTrafficJob`) | Removed when it runs the same job; a same-named job of another type is kept |
 
-After the 10th failure, the job is moved to the Failed state (visible in the dashboard).
-Override per-job with `[SmartRetry(attempts: 5)]` if you need fewer attempts.
+#### Prevent overlap
 
-### Worker count
-
-Hangfire defaults to `Environment.ProcessorCount * 2` workers. This is a good starting
-point for IO-bound handlers (events, notifications). Do not override unless you have
-measured contention — more workers on CPU-bound work causes context-switch overhead.
-
-## Database migration
-
-Hangfire requires its own schema tables (`HangfireJob`, `HangfireState`, `HangfireServer`,
-etc.). The storage provider creates them automatically on first use via
-`SqlServerStorage.Install(...)`, which is **idempotent** — safe to call on every startup.
+`preventOverlap: true` takes a non-blocking storage lock named after the recurring job id for the length of the run;
+a run that cannot take it is cancelled and shows as `Deleted`, and a run waiting for a retry does not hold the lock. Without `UseSolFilters` the module
+logs `Recurring job [{JobId}] requested preventOverlap but UseSolFilters was not called; overlap is not prevented.` at
+start. On any other Hangfire job, apply the filter as an attribute; it locks on the method and its arguments:
 
 ```csharp
-// Program.cs — call before UseHangfireServer/Dashboard
-var connectionString = builder.Configuration.GetConnectionString("Hangfire");
-Hangfire.SqlServer.SqlServerObjectsInstaller.Install(
-    new System.Data.SqlClient.SqlConnection(connectionString));
+public class ReportGenerator
+{
+    [PreventOverlapJobFilter]
+    public Task Generate(int reportId) => Task.CompletedTask;
+}
 ```
 
-> **Why no framework helper?** The storage (connection string, database, schema) is owned by
-> the application, not by `SolTechnology.Core.Hangfire`. The framework registers jobs and
-> event dispatch; the application owns infrastructure. This keeps the library independent of
-> any specific ADO.NET provider or migration tool.
+#### Upgrading from 1.x
 
-## See Also
+| Change | What to do |
+|---|---|
+| `IJob.Execute` returns `Task<Result>` | Return `Result.Success()`, or a failed `Result` instead of throwing for a transient failure |
+| Event jobs use a new method signature | Deploy Hangfire servers (workers) before processes that only enqueue: a 1.x server cannot run event jobs enqueued by 2.x; they fail and are retried until a 2.x server takes them |
+| 1.x event jobs in storage | Nothing; they still run. The 1.x signature is removed in 3.0 |
+| Recurring ids change to full type names | Nothing; 1.x entries are removed at start. After a rollback to 1.x, delete the 2.x ids (full type names) from the dashboard, or both entries fire |
 
-- [Background-processing architecture](architecture/background-processing.md)
-- [CQRS](CQRS.md) — commands, queries, events (in-memory default)
-- [Cron / Scheduler](Cron.md) _(deprecated)_
+### Testing
 
----
+Skip `AddSolPersistentEvents()` in component tests: `AddSolCQRS()` alone dispatches events in memory. Test a job by
+calling it:
 
-## Decision note: Delay-queue vs Hangfire scheduled jobs
-
-> **TL;DR:** use Hangfire scheduled jobs. Don't build a bespoke delay-queue.
-
-**The pattern:** "hold a message until time T, then process it." Examples: send a reminder email
-in 24h, retry a failed webhook in 5 minutes, expire a draft after 7 days.
-
-**Hangfire already does this:**
 ```csharp
-// Fire-and-forget in 5 minutes
-BackgroundJob.Schedule(() => handler.ProcessAsync(payload), TimeSpan.FromMinutes(5));
+[Test]
+public async Task Execute_TrafficApiDown_ReturnsRecoverableFailure()
+{
+    // Arrange
+    var trafficClient = Substitute.For<ITrafficClient>();
+    trafficClient.FetchLatest(Arg.Any<CancellationToken>()).Returns(false);
+    var sut = new FetchTrafficJob(trafficClient);
 
-// Or via the typed IJob + cron for recurring
-services.AddRecurringJob<ExpireDraftsJob>("0 */6 * * *"); // every 6 hours
+    // Act
+    var result = await sut.Execute(CancellationToken.None);
+
+    // Assert
+    result.IsSuccess.Should().BeFalse();
+    result.Error!.Recoverable.Should().BeTrue();
+}
 ```
 
-**When NOT to use Hangfire:** if you need sub-second delay precision or millions of pending
-messages (Hangfire polls SQL storage — latency floor ~15s, throughput ceiling ~100/s per server).
-In that case, use Azure Service Bus scheduled messages or a Redis sorted set.
+### Conventions
 
-**Why not build a library primitive:**
-- Hangfire gives you dashboard visibility, retry, dead-letter, correlation (via
-  `CorrelationIdJobFilter`), and persistence for free.
-- A bespoke delay-queue duplicates that stack without the observability.
-- See also: [FI-002 — Priority background jobs](future-ideas/002-priority-background-jobs-hangfire.md).
+- **Do** make handlers and jobs idempotent; a requeued or retried run executes them again.
+- **Do** call `UseSolFilters(sp)`; without it there is no correlation, no Smart Retry, and no overlap guard.
+- **Do** return `Recoverable = true` only for transient failures, and pass the `CancellationToken` on.
+- **Do** set `jobId` before renaming or moving a recurring job class whose history you want to keep.
+- **Do** use `BackgroundJob.Schedule` for one-off delayed work instead of building a delay queue.
+- **Don't** put entities in events; they are serialized into storage and may be read long after publishing.
+- **Don't** raise `WorkerCount` before measuring; Hangfire's default suits IO-bound handlers.
+
+### What ships in DI
+
+| Service | Implementation | Lifetime |
+|---|---|---|
+| `IEventPublisher` | Enqueues one Hangfire job per event (`AddSolPersistentEvents`) | Singleton |
+| `IHostedService` | Registers recurring jobs and removes stale ones at start | Singleton |
+| `TJob` | Your job, one per `AddSolRecurringJob` call | Scoped |
+| `IOptions<PersistentEventsOptions>` | Queue name | Singleton |
+| `ICorrelationIdService` | From `SolTechnology.Core.Logging` | Singleton |
+
+Background: [background-processing architecture](architecture/background-processing.md), [CQRS](CQRS.md).

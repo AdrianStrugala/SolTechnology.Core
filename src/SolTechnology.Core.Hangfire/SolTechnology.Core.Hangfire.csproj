@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<Description>Durable, persistent event dispatch and recurring jobs for SolTechnology.Core.CQRS. Opt in with AddPersistentEvents() and your events survive process restarts via Hangfire storage; schedule recurring work with AddSolRecurringJob&lt;TJob&gt;(cron).</Description>
+		<Description>Durable, persistent event dispatch and recurring jobs for SolTechnology.Core.CQRS. Opt in with AddSolPersistentEvents() and your events survive process restarts via Hangfire storage; schedule recurring work with AddSolRecurringJob&lt;TJob&gt;(cron).</Description>
 		<PackageTags>soltechnology core hangfire persistent-events background-jobs recurring-jobs scheduler cron cqrs dotnet csharp</PackageTags>
 		<Product>SolTechnology.Core.Hangfire</Product>
 		<Title>SolTechnology.Core Hangfire</Title>

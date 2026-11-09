@@ -157,5 +157,8 @@ retrospective promotes them):
   through `[AutomaticRetry(OnlyOn = RecoverableResultException)]` on the runner; a thrown exception is not retried.
   Legacy `Type.Name` entries are removed only when they run the same job's runner. Tracked-id and legacy cleanup live in
   `RecurringJobCleanup` and log each removal at Information.
+- Step 06: `docs/Hangfire.md` is rewritten to the canonical module-page structure; the rate-limiting, worker-count,
+  database-migration and delay-queue sections shrink to Conventions bullets. All six snippets compile in a throwaway
+  project.
 
 ## Follow-ups
