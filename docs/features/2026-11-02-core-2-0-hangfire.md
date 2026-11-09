@@ -183,6 +183,11 @@ retrospective promotes them):
   gains `Clear()` (user decision; recorded as P-27 as the user asked, although it is also a public-symbol change), the
   built-in service implements it, and `CorrelationIdJobFilter` calls it when the worker had no previous id. `Log.md`
   lists the member.
+- Code review 5 (Smart Retry silently off): the registrar warns at start when at least one recurring job is
+  registered and `GlobalJobFilters` holds no `SmartRetryJobFilter`. The module had no event ids, so its four start-up
+  logs move to a source-generated `RecurringJobLogMessages` with `EventId` 2150–2153, continuing the repository's
+  sequence after CQRS's 2149; templates are unchanged. No L-row: all four logs are new in 2.0, so no released log
+  contract changes. `Hangfire.md` gains a Start-up logs table.
 - Step 07: only `ModuleInstaller` changed (extension blocks and one private filter-registration member); ApiCompat
   shows only the compiler-generated `extension` marker types.
 

@@ -552,6 +552,9 @@ these notes from the steps:
   again. The in-memory publisher dispatches with `CancellationToken.None`, so in-process events are unaffected.
 - logging (Hangfire code review, 2026-11-09, P-27): `ICorrelationIdService` has a new `Clear()` member. Custom
   implementations must add it; the built-in one sets its `AsyncLocal` to `null`.
+- hangfire (code review, 2026-11-09): the module logs at start, with event ids 2150–2153: a Warning when a job asks
+  for `preventOverlap` (2150) or when recurring jobs are registered (2151) but `UseSolFilters` was not called, and an
+  Information entry for each removed stale (2152) or 1.x (2153) recurring job. `docs/Hangfire.md` lists the templates.
 - hangfire 04 (`C-19`, premortem RM-9): `IJob.Execute` returns `Task<Result>`. A recurring job that throws is still not
   retried, as in 1.x. A failed `Result` whose `Error.Recoverable` is `true` is retried up to 3 times with Hangfire's
   default back-off when `UseSolFilters` is called; any other failed `Result` ends the run as `Succeeded`. Smart Retry

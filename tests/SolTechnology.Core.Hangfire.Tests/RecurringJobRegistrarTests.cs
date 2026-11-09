@@ -80,8 +80,9 @@ public class RecurringJobRegistrarTests
         await sut.StartAsync(CancellationToken.None);
 
         // Assert
-        _logger.Entries.Should().ContainSingle(e => e.Level == LogLevel.Warning && e.Template == OverlapWarning)
-            .Which.Properties["JobId"].Should().Be(TestJobId);
+        var warning = _logger.Entries.Should().ContainSingle(e => e.Level == LogLevel.Warning && e.Template == OverlapWarning).Which;
+        warning.EventId.Id.Should().Be(2150);
+        warning.Properties["JobId"].Should().Be(TestJobId);
     }
 
     [Test]
@@ -97,7 +98,45 @@ public class RecurringJobRegistrarTests
         await sut.StartAsync(CancellationToken.None);
 
         // Assert
-        _logger.Entries.Should().BeEmpty();
+        _logger.Entries.Should().NotContain(e => e.EventId.Id == 2150);
+    }
+
+    [Test]
+    public async Task Registrar_WithoutSmartRetryFilter_LogsWarning()
+    {
+        // Arrange
+        var sut = CreateSut(new RecurringJobDescriptor(typeof(TestJob), "0 0 * * *"), new RecurringJobDescriptor(typeof(AnotherTestJob), "0 0 * * *"));
+
+        // Act
+        await sut.StartAsync(CancellationToken.None);
+
+        // Assert
+        var warning = _logger.Entries.Should().ContainSingle(e => e.EventId.Id == 2151).Which;
+        warning.Level.Should().Be(LogLevel.Warning);
+        warning.Template.Should().Be("[{JobCount}] recurring jobs are registered but UseSolFilters was not called; a recoverable failed Result is not retried.");
+        warning.Properties["JobCount"].Should().Be(2);
+    }
+
+    [Test]
+    public async Task Registrar_WithSmartRetryFilter_LogsNoSmartRetryWarning()
+    {
+        // Arrange
+        var smartRetry = new SmartRetryJobFilter();
+        GlobalJobFilters.Filters.Add(smartRetry);
+        var sut = CreateSut(new RecurringJobDescriptor(typeof(TestJob), "0 0 * * *"));
+
+        try
+        {
+            // Act
+            await sut.StartAsync(CancellationToken.None);
+        }
+        finally
+        {
+            GlobalJobFilters.Filters.Remove(smartRetry);
+        }
+
+        // Assert
+        _logger.Entries.Should().NotContain(e => e.EventId.Id == 2151);
     }
 
     private RecurringJobRegistrar CreateSut(params RecurringJobDescriptor[] descriptors) =>

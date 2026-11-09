@@ -37,7 +37,7 @@ internal sealed class RecurringJobCleanup(
         foreach (var staleId in staleIds)
         {
             recurringJobManager.RemoveIfExists(staleId);
-            logger.LogInformation("Removed recurring job [{JobId}]: no longer registered by [{ApplicationName}]", staleId, applicationName);
+            RecurringJobLogMessages.StaleJobRemoved(logger, staleId, applicationName);
         }
 
         using var transaction = connection.CreateWriteTransaction();
@@ -64,7 +64,7 @@ internal sealed class RecurringJobCleanup(
             if (legacy is { Removed: false } && legacy.Job?.Type == descriptor.RunnerType)
             {
                 recurringJobManager.RemoveIfExists(descriptor.LegacyJobId);
-                logger.LogInformation("Removed 1.x recurring job [{LegacyJobId}]; it runs as [{JobId}]", descriptor.LegacyJobId, descriptor.JobId);
+                RecurringJobLogMessages.LegacyJobRemoved(logger, descriptor.LegacyJobId, descriptor.JobId);
             }
         }
     }

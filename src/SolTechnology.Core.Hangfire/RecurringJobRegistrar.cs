@@ -26,6 +26,11 @@ internal sealed class RecurringJobRegistrar(
             Register(descriptor);
         }
 
+        if (registered.Count > 0 && !GlobalJobFilters.Filters.Any(filter => filter.Instance is SmartRetryJobFilter))
+        {
+            RecurringJobLogMessages.SmartRetryNotInstalled(logger, registered.Count);
+        }
+
         cleanup.Run(registered);
 
         return Task.CompletedTask;
@@ -44,9 +49,7 @@ internal sealed class RecurringJobRegistrar(
 
         if (descriptor.PreventOverlap && !overlapFilterProvider.IsInstalled)
         {
-            logger.LogWarning(
-                "Recurring job [{JobId}] requested preventOverlap but UseSolFilters was not called; overlap is not prevented.",
-                descriptor.JobId);
+            RecurringJobLogMessages.OverlapGuardNotInstalled(logger, descriptor.JobId);
         }
     }
 }

@@ -117,7 +117,7 @@ builder.Services.AddSolRecurringJob<FetchTrafficJob>("0 */6 * * *", preventOverl
 |---|---|---|
 | Success | `Succeeded` | `Succeeded` |
 | Failed `Result`, `Recoverable = false` | `Succeeded` | — |
-| Failed `Result`, `Recoverable = true` | Retried up to 3 times with Hangfire's back-off, then `Failed` (needs `UseSolFilters`) | — |
+| Failed `Result`, `Recoverable = true` | Retried up to 3 times with Hangfire's back-off, then `Failed` (needs `UseSolFilters`; without it the module warns at start, 2151) | — |
 | Handler throws | — | Logged by CQRS; job `Succeeded` |
 | Job throws | `Failed`, not retried | `Failed`, not retried |
 | Server shuts down mid-run | Requeued when the job lets the token's `OperationCanceledException` propagate | Requeued when a handler is interrupted: the remaining handlers are skipped and every handler runs again on the next server; a dispatch that finished first succeeds |
@@ -147,9 +147,9 @@ one removes the other's entry; give each its own `jobId`.
 #### Prevent overlap
 
 `preventOverlap: true` takes a non-blocking storage lock named after the recurring job id for the length of the run;
-a run that cannot take it is cancelled and shows as `Deleted`, and a run waiting for a retry does not hold the lock. Without `UseSolFilters` the module
-logs `Recurring job [{JobId}] requested preventOverlap but UseSolFilters was not called; overlap is not prevented.` at
-start. On any other Hangfire job, apply the filter as an attribute; it locks on the method and its arguments:
+a run that cannot take it is cancelled and shows as `Deleted`, and a run waiting for a retry does not hold the lock.
+Without `UseSolFilters` the module logs a warning at start (2150, see Start-up logs). On any other Hangfire job, apply
+the filter as an attribute; it locks on the method and its arguments:
 
 ```csharp
 public class ReportGenerator
@@ -158,6 +158,15 @@ public class ReportGenerator
     public Task Generate(int reportId) => Task.CompletedTask;
 }
 ```
+
+#### Start-up logs
+
+| Event | EventId | Level | Template |
+|---|---|---|---|
+| `preventOverlap` without `UseSolFilters` | 2150 | Warning | `Recurring job [{JobId}] requested preventOverlap but UseSolFilters was not called; overlap is not prevented.` |
+| Recurring jobs without `UseSolFilters` | 2151 | Warning | `[{JobCount}] recurring jobs are registered but UseSolFilters was not called; a recoverable failed Result is not retried.` |
+| Stale job removed (opt-in) | 2152 | Information | `Removed recurring job [{JobId}]: no longer registered by [{ApplicationName}]` |
+| 1.x entry removed | 2153 | Information | `Removed 1.x recurring job [{LegacyJobId}]; it runs as [{JobId}]` |
 
 #### Upgrading from 1.x
 

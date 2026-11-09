@@ -2,7 +2,7 @@ using Microsoft.Extensions.Logging;
 
 namespace SolTechnology.Core.Hangfire.Tests;
 
-internal sealed record CapturedLog(LogLevel Level, string? Template, IReadOnlyDictionary<string, object?> Properties);
+internal sealed record CapturedLog(LogLevel Level, EventId EventId, string? Template, IReadOnlyDictionary<string, object?> Properties);
 
 internal sealed class CapturingLogger<T> : ILogger<T>
 {
@@ -18,7 +18,7 @@ internal sealed class CapturingLogger<T> : ILogger<T>
             ?? new Dictionary<string, object?>();
         lock (Entries)
         {
-            Entries.Add(new CapturedLog(logLevel, properties.GetValueOrDefault("{OriginalFormat}") as string, properties));
+            Entries.Add(new CapturedLog(logLevel, eventId, properties.GetValueOrDefault("{OriginalFormat}") as string, properties));
         }
     }
 }
