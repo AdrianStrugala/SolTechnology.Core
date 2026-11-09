@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<Description>Integration-test your Redis-backed caching against a real Redis instance. A Testcontainers-backed RedisFixture exposes HostName (host:port) and a StackExchange.Redis connection string, with a FlushAsync() reset between tests and a shared-container reuse model. Reference from test projects only; not needed at runtime in production assemblies.</Description>
+		<Description>Integration-test your Redis-backed caching against a real Redis instance. A Testcontainers-backed RedisFixture exposes HostName (host:port) and a StackExchange.Redis connection string, with a Flush() reset between tests and a shared-container reuse model. Reference from test projects only; not needed at runtime in production assemblies.</Description>
 		<PackageTags>soltechnology core redis testing testcontainers cache stackexchange-redis emulator integration-tests component-tests dotnet csharp</PackageTags>
 		<Product>SolTechnology.Core.Redis.Testing</Product>
 		<Title>SolTechnology.Core Redis Testing</Title>

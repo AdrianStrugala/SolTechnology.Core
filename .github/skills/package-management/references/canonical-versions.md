@@ -86,7 +86,7 @@ enables it purely through MSBuild properties (`PublishRepositoryUrl`, `EmbedUntr
 | `Respawn` | `7.0.0` | `SolTechnology.Core.SQL.Testing` | Between-test database reset (SqlServer + Postgres adapters). |
 | `Scrutor` | `7.0.0` | DI assembly-scanning consumers | — |
 | `Testcontainers.Redis` | `4.16.0` | `SolTechnology.Core.Redis.Testing` | Redis container engine. Match `Testcontainers`. |
-| `StackExchange.Redis` | `3.0.0` | `SolTechnology.Core.Cache`, `SolTechnology.Core.Redis.Testing` | `Core.Cache`: direct `IConnectionMultiplexer` for the distributed lock (`SET NX`) + Redis health check. `Redis.Testing`: `RedisFixture.FlushAsync()` (admin-mode `FLUSHALL`). |
+| `StackExchange.Redis` | `3.0.0` | `SolTechnology.Core.Cache`, `SolTechnology.Core.Redis.Testing` | `Core.Cache`: direct `IConnectionMultiplexer` for the distributed lock (`SET NX`) + Redis health check. `Redis.Testing`: `RedisFixture.Flush()` (admin-mode `FLUSHALL`). |
 | `Testcontainers.Azurite` | `4.16.0` | `SolTechnology.Core.Blob.Testing` | Azurite (Azure Storage emulator) container engine. Match `Testcontainers`. |
 | `Testcontainers.ServiceBus` | `4.16.0` | `SolTechnology.Core.ServiceBus.Testing` | Azure Service Bus emulator engine. |
 | `Docker.DotNet` | `3.125.15` | `SolTechnology.Core.Testing`, `SolTechnology.Core.ServiceBus.Testing` | Stable-name reuse + restart management for the emulator. |
