@@ -2,6 +2,7 @@ using Azure;
 using Azure.Messaging.ServiceBus;
 using Azure.Messaging.ServiceBus.Administration;
 using Microsoft.Extensions.Logging;
+using SolTechnology.Core.MessageBus.Configuration;
 
 namespace SolTechnology.Core.MessageBus.Broker;
 
@@ -16,19 +17,40 @@ internal sealed class ServiceBusResourceProvisioner(
     int maxDeliveryCount,
     ILogger logger)
 {
-    public Task EnsureQueue(string queueName, CancellationToken ct) =>
+    public async Task Ensure(EndpointRegistration endpoint, CancellationToken ct)
+    {
+        if (endpoint.Kind == EndpointKind.Queue)
+        {
+            await EnsureQueue(endpoint.EntityName, ct).ConfigureAwait(false);
+            return;
+        }
+
+        if (endpoint.Role == EndpointRole.Receiver && string.IsNullOrWhiteSpace(endpoint.SubscriptionName))
+        {
+            throw new ArgumentException(
+                $"Topic receiver for [{endpoint.MessageType.FullName}] requires a subscription name.");
+        }
+
+        await EnsureTopic(endpoint.EntityName, ct).ConfigureAwait(false);
+        if (endpoint.Role == EndpointRole.Receiver)
+        {
+            await EnsureSubscription(endpoint.EntityName, endpoint.SubscriptionName!, ct).ConfigureAwait(false);
+        }
+    }
+
+    private Task EnsureQueue(string queueName, CancellationToken ct) =>
         CreateIfMissing(
             admin => admin.QueueExistsAsync(queueName, ct),
             admin => admin.CreateQueueAsync(new CreateQueueOptions(queueName) { MaxDeliveryCount = maxDeliveryCount }, ct),
             queueName);
 
-    public Task EnsureTopic(string topicName, CancellationToken ct) =>
+    private Task EnsureTopic(string topicName, CancellationToken ct) =>
         CreateIfMissing(
             admin => admin.TopicExistsAsync(topicName, ct),
             admin => admin.CreateTopicAsync(topicName, ct),
             topicName);
 
-    public Task EnsureSubscription(string topicName, string subscriptionName, CancellationToken ct) =>
+    private Task EnsureSubscription(string topicName, string subscriptionName, CancellationToken ct) =>
         CreateIfMissing(
             admin => admin.SubscriptionExistsAsync(topicName, subscriptionName, ct),
             admin => admin.CreateSubscriptionAsync(

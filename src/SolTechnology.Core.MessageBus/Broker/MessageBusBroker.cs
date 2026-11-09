@@ -50,11 +50,7 @@ namespace SolTechnology.Core.MessageBus.Broker
                     return;
                 }
 
-                foreach (var endpoint in registry.Endpoints)
-                {
-                    await _endpoints.MaterializeAsync(endpoint, cancellationToken).ConfigureAwait(false);
-                }
-
+                await _endpoints.MaterializeAsync(registry.Endpoints, cancellationToken).ConfigureAwait(false);
                 _initialized = true;
             }
             finally

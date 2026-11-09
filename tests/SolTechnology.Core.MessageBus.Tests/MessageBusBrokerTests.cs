@@ -77,12 +77,44 @@ public class MessageBusBrokerTests
             .Which.Reason.Should().Be(ServiceBusFailureReason.QuotaExceeded);
     }
 
+    [Test]
+    public async Task EnsureInitialized_RetryAfterProvisioningFailedHalfway_CreatesEachSenderAndProcessorOnce()
+    {
+        // Arrange
+        var administration = AdministrationClientWithNoEntities();
+        var subscriptionCreates = 0;
+        administration.CreateSubscriptionAsync(Arg.Any<CreateSubscriptionOptions>(), Arg.Any<CancellationToken>())
+            .Returns(_ => ++subscriptionCreates == 1
+                ? Task.FromException<Response<SubscriptionProperties>>(new ServiceBusException("timeout", ServiceBusFailureReason.ServiceTimeout))
+                : Task.FromResult<Response<SubscriptionProperties>>(null!));
+        await using var client = new ServiceBusClient(ConnectionString);
+        var publisher = new EndpointRegistration(typeof(QueueMessage), EndpointKind.Queue, EndpointRole.Publisher, "orders", null);
+        await using var sut = CreateBroker(client, administration, extraEndpoint: publisher);
+        var firstAttempt = () => sut.EnsureInitializedAsync();
+        await firstAttempt.Should().ThrowAsync<ServiceBusException>();
+
+        // Act
+        var retry = () => sut.EnsureInitializedAsync();
+
+        // Assert
+        await retry.Should().NotThrowAsync();
+        sut.ResolveSenders(typeof(QueueMessage)).Should().ContainSingle("a retry must not publish twice");
+        sut.ResolveReceivers().Select(r => r.MessageType)
+            .Should().BeEquivalentTo(new[] { typeof(QueueMessage), typeof(TopicMessage) });
+    }
+
     private static MessageBusBroker CreateBroker(
         ServiceBusClient client,
         ServiceBusAdministrationClient administration,
-        int maxDeliveryCount = 10)
+        int maxDeliveryCount = 10,
+        EndpointRegistration? extraEndpoint = null)
     {
         var registry = new MessageBusRegistry();
+        if (extraEndpoint is not null)
+        {
+            registry.Add(extraEndpoint);
+        }
+
         registry.Add(new EndpointRegistration(typeof(QueueMessage), EndpointKind.Queue, EndpointRole.Receiver, "orders", null));
         registry.Add(new EndpointRegistration(typeof(TopicMessage), EndpointKind.Topic, EndpointRole.Receiver, "events", "billing"));
         var options = Options.Create(new MessageBusConfiguration

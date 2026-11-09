@@ -1,4 +1,3 @@
-using System.Collections.Concurrent;
 using Azure.Messaging.ServiceBus;
 using Microsoft.Extensions.Logging;
 using SolTechnology.Core.MessageBus.Configuration;
@@ -6,7 +5,9 @@ using SolTechnology.Core.MessageBus.Configuration;
 namespace SolTechnology.Core.MessageBus.Broker;
 
 /// <summary>
-/// Creates and owns the senders and processors of the registered endpoints, provisioning their entities first.
+/// Creates and owns the senders and processors of the registered endpoints. All entities are provisioned before any
+/// sender or processor exists, and the endpoints are published only when every one was created, so a failed
+/// initialisation can be retried without duplicate senders or processors.
 /// </summary>
 internal sealed class ServiceBusEndpoints(
     ServiceBusClient serviceBusClient,
@@ -14,8 +15,8 @@ internal sealed class ServiceBusEndpoints(
     ServiceBusResourceProvisioner provisioner,
     ILogger logger) : IAsyncDisposable
 {
-    private readonly ConcurrentDictionary<Type, List<ServiceBusSender>> _sendersByType = new();
-    private readonly ConcurrentDictionary<Type, ServiceBusProcessor> _processorsByType = new();
+    private Dictionary<Type, List<ServiceBusSender>> _sendersByType = new();
+    private Dictionary<Type, ServiceBusProcessor> _processorsByType = new();
 
     public IReadOnlyList<(Type MessageType, ServiceBusProcessor Processor)> Receivers =>
         _processorsByType.Select(kv => (kv.Key, kv.Value)).ToArray();
@@ -31,62 +32,57 @@ internal sealed class ServiceBusEndpoints(
         return senders;
     }
 
-    public async Task MaterializeAsync(EndpointRegistration endpoint, CancellationToken ct)
+    public async Task MaterializeAsync(IReadOnlyList<EndpointRegistration> endpoints, CancellationToken ct)
     {
-        switch (endpoint.Role, endpoint.Kind)
+        foreach (var endpoint in endpoints)
         {
-            case (EndpointRole.Publisher, EndpointKind.Queue):
-                await provisioner.EnsureQueue(endpoint.EntityName, ct).ConfigureAwait(false);
-                AddSender(endpoint.MessageType, serviceBusClient.CreateSender(endpoint.EntityName));
-                break;
-
-            case (EndpointRole.Publisher, EndpointKind.Topic):
-                await provisioner.EnsureTopic(endpoint.EntityName, ct).ConfigureAwait(false);
-                AddSender(endpoint.MessageType, serviceBusClient.CreateSender(endpoint.EntityName));
-                break;
-
-            case (EndpointRole.Receiver, EndpointKind.Queue):
-                await provisioner.EnsureQueue(endpoint.EntityName, ct).ConfigureAwait(false);
-                await AddProcessorAsync(endpoint.MessageType,
-                    serviceBusClient.CreateProcessor(endpoint.EntityName, BuildProcessorOptions())).ConfigureAwait(false);
-                break;
-
-            case (EndpointRole.Receiver, EndpointKind.Topic):
-                if (string.IsNullOrWhiteSpace(endpoint.SubscriptionName))
-                {
-                    throw new ArgumentException(
-                        $"Topic receiver for [{endpoint.MessageType.FullName}] requires a subscription name.");
-                }
-                await provisioner.EnsureTopic(endpoint.EntityName, ct).ConfigureAwait(false);
-                await provisioner.EnsureSubscription(endpoint.EntityName, endpoint.SubscriptionName, ct).ConfigureAwait(false);
-                await AddProcessorAsync(endpoint.MessageType, serviceBusClient.CreateProcessor(
-                    endpoint.EntityName, endpoint.SubscriptionName, BuildProcessorOptions())).ConfigureAwait(false);
-                break;
-
-            default:
-                throw new InvalidOperationException(
-                    $"Unsupported endpoint combination: {endpoint.Role}/{endpoint.Kind}.");
+            await provisioner.Ensure(endpoint, ct).ConfigureAwait(false);
         }
+
+        var senders = new Dictionary<Type, List<ServiceBusSender>>();
+        var processors = new Dictionary<Type, ServiceBusProcessor>();
+        try
+        {
+            foreach (var endpoint in endpoints)
+            {
+                Create(endpoint, senders, processors);
+            }
+        }
+        catch
+        {
+            await DisposeAll(senders, processors).ConfigureAwait(false);
+            throw;
+        }
+
+        _sendersByType = senders;
+        _processorsByType = processors;
     }
 
-    private void AddSender(Type messageType, ServiceBusSender sender) =>
-        _sendersByType.AddOrUpdate(
-            messageType,
-            _ => new List<ServiceBusSender> { sender },
-            (_, list) =>
-            {
-                list.Add(sender);
-                return list;
-            });
-
-    private async Task AddProcessorAsync(Type messageType, ServiceBusProcessor processor)
+    private void Create(
+        EndpointRegistration endpoint,
+        Dictionary<Type, List<ServiceBusSender>> senders,
+        Dictionary<Type, ServiceBusProcessor> processors)
     {
-        if (!_processorsByType.TryAdd(messageType, processor))
+        if (endpoint.Role == EndpointRole.Publisher)
         {
-            await processor.DisposeAsync().ConfigureAwait(false);
-            throw new InvalidOperationException(
-                $"A receiver for message type [{messageType.FullName}] is already registered.");
+            if (!senders.TryGetValue(endpoint.MessageType, out var typeSenders))
+            {
+                typeSenders = senders[endpoint.MessageType] = new List<ServiceBusSender>();
+            }
+
+            typeSenders.Add(serviceBusClient.CreateSender(endpoint.EntityName));
+            return;
         }
+
+        if (processors.ContainsKey(endpoint.MessageType))
+        {
+            throw new InvalidOperationException(
+                $"A receiver for message type [{endpoint.MessageType.FullName}] is already registered.");
+        }
+
+        processors[endpoint.MessageType] = endpoint.Kind == EndpointKind.Queue
+            ? serviceBusClient.CreateProcessor(endpoint.EntityName, BuildProcessorOptions())
+            : serviceBusClient.CreateProcessor(endpoint.EntityName, endpoint.SubscriptionName!, BuildProcessorOptions());
     }
 
     // Explicit complete / dead-letter is performed in the receiver hosted service.
@@ -100,7 +96,16 @@ internal sealed class ServiceBusEndpoints(
 
     public async ValueTask DisposeAsync()
     {
-        foreach (var sender in _sendersByType.Values.SelectMany(senders => senders))
+        await DisposeAll(_sendersByType, _processorsByType).ConfigureAwait(false);
+        _sendersByType = new();
+        _processorsByType = new();
+    }
+
+    private async Task DisposeAll(
+        Dictionary<Type, List<ServiceBusSender>> senders,
+        Dictionary<Type, ServiceBusProcessor> processors)
+    {
+        foreach (var sender in senders.Values.SelectMany(typeSenders => typeSenders))
         {
             try
             {
@@ -111,9 +116,8 @@ internal sealed class ServiceBusEndpoints(
                 logger.LogWarning(ex, "Failed to dispose Service Bus sender for [{Entity}] on shutdown", sender.EntityPath);
             }
         }
-        _sendersByType.Clear();
 
-        foreach (var processor in _processorsByType.Values)
+        foreach (var processor in processors.Values)
         {
             try
             {
@@ -124,6 +128,5 @@ internal sealed class ServiceBusEndpoints(
                 logger.LogWarning(ex, "Failed to dispose Service Bus processor for [{Entity}] on shutdown", processor.EntityPath);
             }
         }
-        _processorsByType.Clear();
     }
 }
