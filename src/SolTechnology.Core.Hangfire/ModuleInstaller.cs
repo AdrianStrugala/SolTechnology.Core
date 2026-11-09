@@ -1,9 +1,11 @@
 using Hangfire;
+using Hangfire.Common;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
 using SolTechnology.Core.CQRS;
 using SolTechnology.Core.Hangfire.Filters;
+using SolTechnology.Core.Logging;
 
 namespace SolTechnology.Core.Hangfire;
 
@@ -35,6 +37,7 @@ public static class ModuleInstaller
         services.AddSingleton<IEventPublisher, HangfireEventPublisher>();
 
         // Filters
+        services.AddSolCorrelationIdService();
         services.TryAddSingleton<CorrelationIdJobFilter>();
         services.TryAddSingleton<SmartRetryJobFilter>();
 
@@ -64,8 +67,10 @@ public static class ModuleInstaller
 
         services.TryAddEnumerable(
             ServiceDescriptor.Singleton<IHostedService, RecurringJobRegistrar>());
+        services.TryAddSingleton<PreventOverlapFilterProvider>();
 
         // Filters (shared with persistent events)
+        services.AddSolCorrelationIdService();
         services.TryAddSingleton<CorrelationIdJobFilter>();
         services.TryAddSingleton<SmartRetryJobFilter>();
 
@@ -73,7 +78,8 @@ public static class ModuleInstaller
     }
 
     /// <summary>
-    /// Adds the Hangfire global job filters (correlation-id propagation, smart retry).
+    /// Adds the Hangfire global job filters (correlation-id propagation, smart retry) and the
+    /// overlap guard for recurring jobs registered with <c>preventOverlap: true</c>.
     /// Call from the app's <c>AddHangfire</c> configuration callback:
     /// <code>
     /// services.AddHangfire((sp, config) => config.UseSolFilters(sp));
@@ -94,6 +100,8 @@ public static class ModuleInstaller
         {
             configuration.UseFilter(smartRetryFilter);
         }
+
+        serviceProvider.GetService<PreventOverlapFilterProvider>()?.InstallInto(JobFilterProviders.Providers);
 
         return configuration;
     }

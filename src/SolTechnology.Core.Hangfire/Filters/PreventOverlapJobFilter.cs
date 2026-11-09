@@ -1,3 +1,5 @@
+using System.Security.Cryptography;
+using System.Text;
 using Hangfire.Common;
 using Hangfire.Server;
 using Hangfire.Storage;
@@ -5,17 +7,26 @@ using Hangfire.Storage;
 namespace SolTechnology.Core.Hangfire.Filters;
 
 /// <summary>
-/// Prevents overlapping execution: cancels a job if another instance with the same
-/// method + arguments is already scheduled or processing. Useful for recurring jobs
-/// where a previous run is mid-retry and the next cron trigger fires.
-/// Apply as <c>[PreventOverlapJobFilter]</c> on the job method, or register globally
-/// via <c>UseSolFilters()</c>.
+/// Prevents overlapping execution: a run is cancelled while another run of the same recurring job
+/// (or, outside recurring jobs, of the same method with the same arguments) is processing.
+/// Holds a non-blocking distributed storage lock from <see cref="OnPerforming"/> to <see cref="OnPerformed"/>,
+/// so the check costs the same whatever the size of the storage.
+/// Apply as <c>[PreventOverlapJobFilter]</c> on a job method, or pass <c>preventOverlap: true</c> to
+/// <c>AddSolRecurringJob</c> and call <c>UseSolFilters()</c>.
 /// </summary>
 public sealed class PreventOverlapJobFilter : JobFilterAttribute, IServerFilter
 {
+    private const string LockItemKey = "SolTechnology.PreventOverlapLock";
+    private const string RecurringJobIdParameter = "RecurringJobId";
+
     public void OnPerforming(PerformingContext filterContext)
     {
-        if (HasExistingInstance(filterContext))
+        try
+        {
+            filterContext.Items[LockItemKey] = filterContext.Connection.AcquireDistributedLock(
+                LockResource(filterContext), TimeSpan.Zero);
+        }
+        catch (DistributedLockTimeoutException)
         {
             filterContext.Canceled = true;
         }
@@ -23,36 +34,26 @@ public sealed class PreventOverlapJobFilter : JobFilterAttribute, IServerFilter
 
     public void OnPerformed(PerformedContext filterContext)
     {
-    }
-
-    private static bool HasExistingInstance(PerformingContext filterContext)
-    {
-        var currentJob = filterContext.BackgroundJob.Job;
-        var currentJobId = filterContext.BackgroundJob.Id;
-
-        var api = filterContext.Storage.GetMonitoringApi();
-
-        var scheduled = api.ScheduledJobs(0, int.MaxValue)
-            .Where(x => x.Key != currentJobId && IsMatchingInvocation(x.Value.Job, currentJob));
-
-        var processing = api.ProcessingJobs(0, int.MaxValue)
-            .Where(x => x.Key != currentJobId && IsMatchingInvocation(x.Value.Job, currentJob));
-
-        return scheduled.Any() || processing.Any();
-    }
-
-    private static bool IsMatchingInvocation(Job? candidate, Job current)
-    {
-        if (candidate is null || candidate.Method != current.Method)
+        if (filterContext.Items.TryGetValue(LockItemKey, out var held) && held is IDisposable overlapLock)
         {
-            return false;
+            filterContext.Items.Remove(LockItemKey);
+            overlapLock.Dispose();
         }
+    }
 
-        var candidateData = InvocationData.SerializeJob(candidate);
-        var currentData = InvocationData.SerializeJob(current);
+    private static string LockResource(PerformContext context)
+    {
+        var recurringJobId = context.GetJobParameter<string>(RecurringJobIdParameter);
+        return string.IsNullOrEmpty(recurringJobId)
+            ? $"sol:overlap:{InvocationHash(context.BackgroundJob.Job)}"
+            : $"sol:overlap:{recurringJobId}";
+    }
 
-        return candidateData.Arguments == currentData.Arguments;
+    // Hashed so the resource name stays short whatever the size of the job arguments.
+    private static string InvocationHash(Job job)
+    {
+        var invocation = InvocationData.SerializeJob(job);
+        var identity = $"{invocation.Type}|{invocation.Method}|{invocation.ParameterTypes}|{invocation.Arguments}";
+        return Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(identity)));
     }
 }
-
-

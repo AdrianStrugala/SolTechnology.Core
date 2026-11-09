@@ -57,6 +57,7 @@ Behavioural and persisted-contract breaks:
 |---|---|---|---|
 | P-05 | New event jobs target `Task DispatchInScope(IEvent, CancellationToken)` (internal type, persisted job signature); the 1.x `DispatchInScope(IEvent)` overload stays for 2.x (RQ10) | Already-enqueued 1.x event jobs still run; the legacy overload is removed in 3.0 | hangfire 03 |
 | P-06 | Recurring job id `Type.Name` → `Type.FullName`; stale tracked ids and legacy `Type.Name` ids removed at start (RQ10) | Old recurring entries are removed automatically and re-created under new ids; no double firing | hangfire 04 |
+| P-25 | `PreventOverlapJobFilter` holds a non-blocking distributed storage lock for the run (`sol:overlap:<recurring job id>`, or a hash of the method and arguments outside recurring jobs) instead of scanning every scheduled and processing job (premortem RM-10); `AddSolRecurringJob(..., preventOverlap: true)` now applies it through a filter provider that `UseSolFilters` installs (B5, A7) | A run is cancelled only while another matching run is processing: a run waiting in `Scheduled` for a retry no longer blocks the next trigger. Each guarded run holds one storage lock for its duration (on SQL Server storage, one dedicated connection, as with `DisableConcurrentExecution`). Without `UseSolFilters` the registrar logs a Warning at start and overlap is not prevented | hangfire 02 |
 
 Design alternatives (blue-red-team, 2026-11-02):
 
@@ -137,5 +138,14 @@ Steps run in number order; each is one PR.
 ## Completion summary
 
 ## Deviations
+
+Decisions taken during implementation (owner pre-approved the plan; detail in each step's `Deviations` until the
+retrospective promotes them):
+
+- Step 01: two resolution tests cite infra#13, and the test project also references `Hangfire.NetCore` for
+  `AddHangfire`.
+- Step 02: the overlap lock is keyed by the `RecurringJobId` job parameter, or a hash of the invocation outside
+  recurring jobs; runs waiting in `Scheduled` for a retry no longer block the next trigger (P-25). The filter provider
+  lives in Hangfire's process-wide `JobFilterProviders.Providers` and replaces one installed by an earlier host.
 
 ## Follow-ups

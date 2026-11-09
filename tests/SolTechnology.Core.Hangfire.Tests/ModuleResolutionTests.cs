@@ -21,7 +21,6 @@ public class ModuleResolutionTests
     };
 
     [Test]
-    [Ignore("infra#13: ICorrelationIdService is not registered by Hangfire; step 02 removes this Ignore.")]
     public async Task AddSolHangfire_ResolvesAllPublicServices_WithValidation()
     {
         // Arrange
@@ -29,27 +28,33 @@ public class ModuleResolutionTests
         await using var scope = provider.CreateAsyncScope();
         var scoped = scope.ServiceProvider;
 
-        // Act
-        var publisher = scoped.GetRequiredService<IEventPublisher>();
-        var hostedServices = scoped.GetServices<IHostedService>();
-        var job = scoped.GetRequiredService<TestJob>();
-        var runner = scoped.GetRequiredService<RecurringJobRunner<TestJob>>();
-        var correlationFilter = scoped.GetRequiredService<CorrelationIdJobFilter>();
-        var smartRetryFilter = scoped.GetRequiredService<SmartRetryJobFilter>();
-        var options = scoped.GetRequiredService<IOptions<PersistentEventsOptions>>().Value;
+        try
+        {
+            // Act
+            var publisher = scoped.GetRequiredService<IEventPublisher>();
+            var hostedServices = scoped.GetServices<IHostedService>();
+            var job = scoped.GetRequiredService<TestJob>();
+            var runner = scoped.GetRequiredService<RecurringJobRunner<TestJob>>();
+            var correlationFilter = scoped.GetRequiredService<CorrelationIdJobFilter>();
+            var smartRetryFilter = scoped.GetRequiredService<SmartRetryJobFilter>();
+            var options = scoped.GetRequiredService<IOptions<PersistentEventsOptions>>().Value;
 
-        // Assert
-        publisher.Should().BeOfType<HangfireEventPublisher>();
-        hostedServices.Should().ContainSingle(s => s is RecurringJobRegistrar);
-        job.Should().NotBeNull();
-        runner.Should().NotBeNull();
-        correlationFilter.Should().NotBeNull();
-        smartRetryFilter.Should().NotBeNull();
-        options.QueueName.Should().Be("default");
+            // Assert
+            publisher.Should().BeOfType<HangfireEventPublisher>();
+            hostedServices.Should().ContainSingle(s => s is RecurringJobRegistrar);
+            job.Should().NotBeNull();
+            runner.Should().NotBeNull();
+            correlationFilter.Should().NotBeNull();
+            smartRetryFilter.Should().NotBeNull();
+            options.QueueName.Should().Be("default");
+        }
+        finally
+        {
+            HangfireGlobalState.Reset(provider);
+        }
     }
 
     [Test]
-    [Ignore("infra#13: ICorrelationIdService is not registered by Hangfire; step 02 removes this Ignore.")]
     public async Task AddSolHangfire_WithoutAddSolLogging_RegistersCorrelationIdService()
     {
         // Arrange

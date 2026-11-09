@@ -1,6 +1,8 @@
 using Hangfire;
 using Hangfire.Common;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
+using SolTechnology.Core.Hangfire.Filters;
 
 namespace SolTechnology.Core.Hangfire;
 
@@ -10,7 +12,9 @@ namespace SolTechnology.Core.Hangfire;
 /// </summary>
 internal sealed class RecurringJobRegistrar(
     IRecurringJobManager recurringJobManager,
-    IEnumerable<RecurringJobDescriptor> descriptors) : IHostedService
+    IEnumerable<RecurringJobDescriptor> descriptors,
+    PreventOverlapFilterProvider overlapFilterProvider,
+    ILogger<RecurringJobRegistrar> logger) : IHostedService
 {
     public Task StartAsync(CancellationToken cancellationToken)
     {
@@ -24,6 +28,13 @@ internal sealed class RecurringJobRegistrar(
                 jobId,
                 new Job(runnerType, methodInfo, CancellationToken.None),
                 descriptor.CronExpression);
+
+            if (descriptor.PreventOverlap && !overlapFilterProvider.IsInstalled)
+            {
+                logger.LogWarning(
+                    "Recurring job [{JobId}] requested preventOverlap but UseSolFilters was not called; overlap is not prevented.",
+                    jobId);
+            }
         }
 
         return Task.CompletedTask;
@@ -31,5 +42,3 @@ internal sealed class RecurringJobRegistrar(
 
     public Task StopAsync(CancellationToken cancellationToken) => Task.CompletedTask;
 }
-
-

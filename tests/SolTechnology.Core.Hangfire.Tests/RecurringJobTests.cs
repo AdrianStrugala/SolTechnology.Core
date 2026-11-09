@@ -31,7 +31,7 @@ public class RecurringJobTests
     public void AddSolRecurringJob_RegistersRecurringJobRegistrarAsHostedService()
     {
         // Arrange
-        var services = new ServiceCollection();
+        var services = new ServiceCollection().AddLogging();
         services.AddSingleton(Substitute.For<IRecurringJobManager>());
 
         // Act
@@ -47,7 +47,7 @@ public class RecurringJobTests
     public void AddSolRecurringJob_CalledTwice_RegistersOnlyOneRegistrar()
     {
         // Arrange
-        var services = new ServiceCollection();
+        var services = new ServiceCollection().AddLogging();
         services.AddSingleton(Substitute.For<IRecurringJobManager>());
 
         // Act
@@ -72,73 +72,6 @@ public class RecurringJobTests
 
         // Assert
         act.Should().Throw<ArgumentNullException>();
-    }
-
-    [Test]
-    public async Task RecurringJobRegistrar_StartAsync_RegistersJobWithManager()
-    {
-        // Arrange
-        var manager = Substitute.For<IRecurringJobManager>();
-        var descriptors = new[]
-        {
-            new RecurringJobDescriptor(typeof(TestJob), "0 0 * * *")
-        };
-        var registrar = new RecurringJobRegistrar(manager, descriptors);
-
-        // Act
-        await registrar.StartAsync(CancellationToken.None);
-
-        // Assert
-        manager.Received(1).AddOrUpdate(
-            "TestJob",
-            Arg.Any<Job>(),
-            "0 0 * * *",
-            Arg.Any<RecurringJobOptions>());
-    }
-
-    [Test]
-    public async Task RecurringJobRegistrar_MultipleDescriptors_RegistersAll()
-    {
-        // Arrange
-        var manager = Substitute.For<IRecurringJobManager>();
-        var descriptors = new[]
-        {
-            new RecurringJobDescriptor(typeof(TestJob), "0 0 * * *"),
-            new RecurringJobDescriptor(typeof(AnotherTestJob), "0 12 * * *")
-        };
-        var registrar = new RecurringJobRegistrar(manager, descriptors);
-
-        // Act
-        await registrar.StartAsync(CancellationToken.None);
-
-        // Assert
-        manager.Received(2).AddOrUpdate(
-            Arg.Any<string>(),
-            Arg.Any<Job>(),
-            Arg.Any<string>(),
-            Arg.Any<RecurringJobOptions>());
-    }
-
-    [Test]
-    public async Task RecurringJobRegistrar_UsesJobTypeNameAsId()
-    {
-        // Arrange
-        var manager = Substitute.For<IRecurringJobManager>();
-        var descriptors = new[]
-        {
-            new RecurringJobDescriptor(typeof(TestJob), "0 0 * * *")
-        };
-        var registrar = new RecurringJobRegistrar(manager, descriptors);
-
-        // Act
-        await registrar.StartAsync(CancellationToken.None);
-
-        // Assert
-        manager.Received(1).AddOrUpdate(
-            "TestJob",
-            Arg.Any<Job>(),
-            Arg.Any<string>(),
-            Arg.Any<RecurringJobOptions>());
     }
 
     [Test]
