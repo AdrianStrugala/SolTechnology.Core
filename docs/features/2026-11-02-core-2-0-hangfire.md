@@ -1,7 +1,7 @@
 ---
-status: in-progress
+status: completed
 created: 2026-11-02
-completed:
+completed: 2026-11-09
 ---
 
 # SolTechnology.Core 2.0 — Hangfire
@@ -97,9 +97,9 @@ Release-notes input owned here: the core brief's `hangfire 03` entry (1.x event 
 
 ## Implementation plan
 
-Steps live in the temporary working folder `2026-11-02-core-2-0-hangfire/` (see its `summary.md`). Gates: `review` is
-`done (2026-11-02)`; `premortem` is `skipped` — the core premortem verdict `go-with-mitigations (2026-11-02)`
-covers these steps.
+Steps lived in the temporary working folder `2026-11-02-core-2-0-hangfire`, which the retrospective deleted on
+2026-11-09. Gates: `review` was `done (2026-11-02)`; `premortem` was `skipped` — the core premortem verdict
+`go-with-mitigations (2026-11-02)` covered these steps.
 
 Plan review (2026-11-02): the regrouping was checked against the pre-regroup plan (`dddac21c`) and
 found complete. User answers recorded, not re-asked: the delivery order with AUID before Tale is
@@ -127,74 +127,130 @@ Steps run in number order; each is one PR.
 
 ## Acceptance criteria
 
-- [ ] Every step's acceptance criteria are checked, or the gap is recorded under `Deviations`.
-- [ ] Regression tests for `B5` and `infra#13` (Hangfire) fail on `4097d47f` and pass; the Hangfire resolution test has no `[Ignore]`.
-- [ ] `C-19` shipped; `HangfirePersistedIdentityTests` is green and unchanged after step 07 (RM-7, RM-16).
-- [ ] `dotnet build SolTechnology.Core.slnx -c Release` is green, and `dotnet build SolTechnology.Core.slnx 2>&1 | grep -E "NU190[1-4]|NU1605"` prints nothing.
-- [ ] `dotnet test tests/SolTechnology.Core.Hangfire.Tests` is green.
-- [ ] The module resolution test uses `ValidateOnBuild = true` and `ValidateScopes = true`, and no resolution test is `[Ignore]`d.
-- [ ] `find src/SolTechnology.Core.Hangfire -name "*.cs" -not -path "*/obj/*" | xargs wc -l | awk '$1>150 && $2!="total"'` prints nothing.
-- [ ] Every packed `.nupkg` of this feature contains `lib/net10.0/*.xml`.
-- [ ] Every C# snippet in `docs/Hangfire.md` compiles in a throwaway console project against the 2.0 API, as recorded in the module-docs step.
-- [ ] The library-scoped `[{Placeholder}]` template check of the conformance or log-template step prints nothing.
+- [x] Every step's acceptance criteria are checked, or the gap is recorded under `Deviations`.
+- [x] Regression tests for `B5` and `infra#13` (Hangfire) fail on `4097d47f` and pass; the Hangfire resolution test has no `[Ignore]`.
+- [x] `C-19` shipped; `HangfirePersistedIdentityTests` is green and unchanged after step 07 (RM-7, RM-16).
+- [x] `dotnet build SolTechnology.Core.slnx -c Release` is green, and `dotnet build SolTechnology.Core.slnx 2>&1 | grep -E "NU190[1-4]|NU1605"` prints nothing.
+- [x] `dotnet test tests/SolTechnology.Core.Hangfire.Tests` is green.
+- [x] The module resolution test uses `ValidateOnBuild = true` and `ValidateScopes = true`, and no resolution test is `[Ignore]`d.
+- [x] `find src/SolTechnology.Core.Hangfire -name "*.cs" -not -path "*/obj/*" | xargs wc -l | awk '$1>150 && $2!="total"'` prints nothing.
+- [x] Every packed `.nupkg` of this feature contains `lib/net10.0/*.xml`.
+- [x] Every C# snippet in `docs/Hangfire.md` compiles in a throwaway console project against the 2.0 API, as recorded in the module-docs step.
+- [x] The library-scoped `[{Placeholder}]` template check of the conformance or log-template step prints nothing.
 
 ## Completion summary
 
+Delivered on `master` from `fca12b5d` (step 01) to `32e39c89` (step 07), plus the step 03 follow-up fix `6608121e`;
+the code review fixes (`7a7af4f5` to `07fac5b7`) and this retrospective ran on 2026-11-09. The owner pre-approved the
+plan and asked on 2026-11-09 to run the retrospective and close the feature (`CLAUDE.md §2`).
+
+- **`infra#13` (steps 01, 02):** both installers register `ICorrelationIdService`; `ModuleResolutionTests` resolves
+  every Hangfire service with `ValidateOnBuild` and `ValidateScopes` over in-memory storage, without `[Ignore]`.
+- **`B5`, A7, RM-10, P-25 (step 02):** `preventOverlap` works through `PreventOverlapFilterProvider`, which
+  `UseSolFilters` installs; `PreventOverlapJobFilter` holds a non-blocking storage lock instead of scanning every job.
+- **`infra#8`, `infra#9`, P-05, RM-6, RM-7 (step 03 and code review 3, 4):** the correlation filter no longer writes
+  ambient state on create and restores (or clears, through the new `ICorrelationIdService.Clear()`, P-27) the worker's
+  id after a job. Event jobs target the async `DispatchInScope(IEvent, CancellationToken)`; the 1.x overload stays.
+  CQRS's dispatcher propagates a cancellation of its token (P-26), so an event interrupted by shutdown is requeued and a
+  finished one is not. `HangfirePersistedIdentityTests` pins the persisted job identity.
+- **`C-19`, A6, P-06, RM-3, RM-8, RM-9 (step 04 and code review 1, 2, 5):** `IJob.Execute` returns `Task<Result>`; a
+  recoverable failed `Result` is retried at most 3 times, a throw never. Ids are the version-free full type name,
+  shortened to at most 86 characters for Hangfire.SqlServer, or `jobId`; `timeZone` defaults to UTC. 1.x `Type.Name`
+  entries are removed at start; removal of jobs the application no longer registers is opt-in
+  (`RecurringJobsOptions`, `C-32`). Start-up warnings 2150 and 2151 report a missing `UseSolFilters`.
+- **Docs (steps 05, 06, code review 6):** the package ships XML docs; `docs/Hangfire.md` was rewritten for 2.0 with
+  every C# block compiled, including the Start-up logs table, the 1.x upgrade and rollback rows, and the job id rules.
+- **Conformance (step 07):** `ModuleInstaller` uses `extension` blocks; every file is under 150 lines; every log
+  template brackets its placeholders. ApiCompat shows only the compiler-generated `extension` marker types.
+- **Architecture:** [`docs/architecture/background-processing.md`](../architecture/background-processing.md) describes
+  the 2.0 behaviour: event dispatch and shutdown, recurring job ids and cleanup, retries (A6), filters including the
+  overlap guard (A7), start-up warnings, and the pinned persisted identity.
+  [`cqrs.md`](../architecture/cqrs.md) gained the cancellation rule in the code review;
+  [`core-result-and-errors.md`](../architecture/core-result-and-errors.md) notes that a recurring job's `Result` is
+  only written into the `Succeeded` state. The premortem reference `.github/skills/premortem/references/hangfire.md`
+  gained the id-length, cleanup-scope, shutdown-abort, and process-wide-state checks.
+- **EventIds:** Hangfire took 2150–2153, which the Chronicle plan had reserved; `6c120357` moved Chronicle to 2154 and
+  2155 in its brief and steps. The repository has no central EventId range table; module docs list their own ids.
+- **Final verification (2026-11-09):** `dotnet build SolTechnology.Core.slnx -c Release` reported 0 errors and no
+  NU190x / NU1605; `dotnet test tests/SolTechnology.Core.Hangfire.Tests` 73/73; the DreamTravel component and unit tests
+  green; the Release pack contains `lib/net10.0/SolTechnology.Core.Hangfire.xml`. The last full suite, on the code of
+  this record (`07fac5b7`; the retrospective changed only documentation), passed 917, skipped 11 (DreamTravel
+  geolocation), failed 0.
+
+Changes to the core brief ([`2026-11-02-core-2-0-flagship-hardening`](2026-11-02-core-2-0-flagship-hardening.md)) for
+release 05: new rows `C-32`, `P-25`, `P-26`, `P-27`; P-06 rewritten twice (id shortening, opt-in stale removal);
+`C-19` and P-05 shipped as written. "Release-notes inputs" gained the RM-6 deploy-order note, the RM-8 rollback note,
+the `C-19`/RM-9 retry note, and the code review entries (id length, opt-in cleanup, CQRS cancellation, `Clear()`,
+start-up logs, last-job and rollback drain). No L-row: Hangfire had no log template before 2.0.
+
 ## Deviations
 
-Decisions taken during implementation (owner pre-approved the plan; detail in each step's `Deviations` until the
-retrospective promotes them):
+### Resolution tests and test packages (step 01)
 
-- Step 01: two resolution tests cite infra#13, and the test project also references `Hangfire.NetCore` for
-  `AddHangfire`.
-- Step 02: the overlap lock is keyed by the `RecurringJobId` job parameter, or a hash of the invocation outside
-  recurring jobs; runs waiting in `Scheduled` for a retry no longer block the next trigger (P-25). The filter provider
-  lives in Hangfire's process-wide `JobFilterProviders.Providers` and replaces one installed by an earlier host.
-- Step 03: `OnPerformed` restores an absent ambient correlation id with `ICorrelationIdService.Set(null)` (no public
-  `Clear()` exists); the legacy `DispatchInScope(IEvent)` returns `Task` instead of `void`; the RM-6 release note also
-  says that the 1.x-server retries come from Hangfire's global retry filter.
-- Step 03 (follow-up fix): an event job whose dispatch saw the shutdown token cancelled throws
-  `OperationCanceledException` after dispatch, because CQRS's dispatcher swallows the handler's cancellation; Hangfire
-  then requeues the event instead of marking it `Succeeded`.
-- Step 04: a recoverable failed `Result` is retried at most 3 times (`RecurringJobRetry.RecoverableResultAttempts`)
-  through `[AutomaticRetry(OnlyOn = RecoverableResultException)]` on the runner; a thrown exception is not retried.
-  Legacy `Type.Name` entries are removed only when they run the same job's runner. Tracked-id and legacy cleanup live in
-  `RecurringJobCleanup` and log each removal at Information.
-- Step 06: `docs/Hangfire.md` is rewritten to the canonical module-page structure; the rate-limiting, worker-count,
-  database-migration and delay-queue sections shrink to Conventions bullets. All six snippets compile in a throwaway
-  project.
-- Code review 1 (job id length): a default id whose full type name exceeds 86 characters becomes `Type.Name`
-  (truncated to 73) + `-` + 12 hex characters of the full name's SHA-256 (internal `StorageKey`); an explicit `jobId`
-  over 86 characters throws `ArgumentException`. The per-application tracked-set key is bounded to 100 characters the
-  same way. Chosen test: `RecurringJobSqlServerTests` registers the 96-character generic job against SQL Server
-  (`SQLFixture`, about 20 s) and fails with "String or binary data would be truncated" without the fix; unit tests pin
-  the rule. The Hangfire test project therefore references `Hangfire.SqlServer` and `SolTechnology.Core.SQL.Testing`.
-- Code review 2 (stale-id removal): removal of ids the application no longer registers is opt-in through the new
-  public `RecurringJobsOptions.RemoveStaleRecurringJobs` (default `false`, `C-32`), set with the standard
-  `services.Configure<RecurringJobsOptions>(...)`; `AddSolRecurringJob` is called once per job, so a per-call
-  `Action<TOptions>` parameter like `AddSolPersistentEvents` has would not fit. The tracked set is written only while
-  the option is on. 1.x legacy removal stays always on. `RecurringJobCleanup` became a DI singleton so the registrar
-  keeps four dependencies.
-- Code review 3 (shutdown re-runs finished handlers; supersedes the step 03 follow-up fix): `HangfireEventPublisher`
-  no longer throws after dispatch. CQRS's `EventDispatcher` rethrows an `OperationCanceledException` when the
-  dispatch's token is cancelled, which stops the fan-out (P-26). Callers checked: `InMemoryEventPublisher` passes
-  `CancellationToken.None` and catches every exception anyway; `HangfireEventPublisher` is the only other caller.
-- Code review 4 (`Set(null)` on a non-nullable contract): `ICorrelationIdService` in `SolTechnology.Core.Logging`
-  gains `Clear()` (user decision; recorded as P-27 as the user asked, although it is also a public-symbol change), the
-  built-in service implements it, and `CorrelationIdJobFilter` calls it when the worker had no previous id. `Log.md`
-  lists the member.
-- Code review 5 (Smart Retry silently off): the registrar warns at start when at least one recurring job is
-  registered and `GlobalJobFilters` holds no `SmartRetryJobFilter`. The module had no event ids, so its four start-up
-  logs move to a source-generated `RecurringJobLogMessages` with `EventId` 2150–2153, continuing the repository's
-  sequence after CQRS's 2149; templates are unchanged. No L-row: all four logs are new in 2.0, so no released log
-  contract changes. `Hangfire.md` gains a Start-up logs table.
-- Code review 6 (documentation gaps): `Hangfire.md` and the release notes state that removing the last
-  `AddSolRecurringJob` call leaves old entries for manual deletion, and that 2.x event jobs must be drained before a
-  rollback to 1.x.
-- Step 07: only `ModuleInstaller` changed (extension blocks and one private filter-registration member); ApiCompat
-  shows only the compiler-generated `extension` marker types.
+**Original plan:** one resolution test ignored for infra#13; the test project gains `Hangfire.InMemory`.
+
+**Actual implementation:** two tests cite infra#13, because the strict-validation test fails at `BuildServiceProvider`
+before it can show the missing service; the test project also references `Hangfire.NetCore` (for `AddHangfire`) and,
+since code review 1, `Hangfire.SqlServer` and `SolTechnology.Core.SQL.Testing`.
+
+### Overlap lock key and semantics, P-25 (step 02)
+
+**Original plan:** replace the monitoring scans, for example with a lock named `sol:overlap:<recurring job id>`.
+
+**Actual implementation:** the lock resource is `sol:overlap:` plus the `RecurringJobId` job parameter, or a SHA-256 of
+the invocation for jobs that use the filter as an attribute. A run waiting in `Scheduled` for a retry no longer blocks
+the next trigger (P-25). The provider lives in the process-wide `JobFilterProviders.Providers` and replaces one an
+earlier host added; tests reset Hangfire's static state through the test helper `HangfireGlobalState`.
+
+### Correlation restore and event dispatch (step 03, code review 3, 4)
+
+**Original plan:** restore the previous ambient id; the legacy overload forwards with `CancellationToken.None`.
+
+**Actual implementation:** "no previous id" is restored through the new `ICorrelationIdService.Clear()` (P-27; first
+through `Set(null)`); the legacy overload returns `Task`. The step 03 follow-up threw after every dispatch that saw a
+cancelled token; the code review replaced it with the CQRS dispatcher change (P-26), because the throw also requeued
+finished work. The RM-6 release note also names Hangfire's global retry filter as the source of 1.x-server retries.
+
+### Retry budget, legacy-id guard and cleanup (step 04, code review 1, 2, 5)
+
+**Original plan:** an explicit bounded retry count; remove legacy `Type.Name` ids and stale tracked ids at start.
+
+**Actual implementation:** the budget is 3 through `[AutomaticRetry(OnlyOn = RecoverableResultException)]`; Smart Retry
+elects that internal exception type (an `InvalidOperationException`). A legacy entry is removed only when it runs the
+same runner. Long default ids are shortened (Hangfire.SqlServer column limit), stale removal is opt-in (`C-32`), and
+the start-up logs use EventIds 2150–2153 through `RecurringJobLogMessages`; `RecurringJobCleanup` is a DI singleton.
+
+### Module page rewrite (step 06)
+
+**Original plan:** edit the listed lines of `docs/Hangfire.md`.
+
+**Actual implementation:** the page was rewritten to the canonical module-page structure; rate limiting, worker count,
+database migration and the delay-queue note became Conventions bullets.
+
+### Conformance scope (step 07)
+
+**Original plan:** `extension` blocks, braces and comments across the library.
+
+**Actual implementation:** steps 02–05 already met the Guide, so only `ModuleInstaller.cs` changed.
 
 ## Follow-ups
+
+- Remove the legacy one-argument `HangfireEventPublisher.DispatchInScope(IEvent)` in 3.0 (step 03, RQ10).
+- A recurring job's non-recoverable failed `Result` ends `Succeeded` without a log entry (Smart Retry's existing
+  semantics); consider logging it or electing `Failed`.
+- Testing kits: the Hangfire tests carry their own harness in the test project — `RecurringJobHost` (registrar start
+  per application name on a shared storage), the performer and state-machine loop in `RecurringJobRetryTests`, and
+  `HangfireGlobalState.Reset`, which undoes the static log provider, `GlobalJobFilters` and
+  `JobFilterProviders.Providers` writes of `AddHangfire`/`UseSolFilters`. Any shipped Hangfire testing helper needs that
+  reset, or a disposed test container breaks later `InMemoryStorage` construction. The SQL Server test uses
+  `SQLFixture("SolHangfireTests")` (container `sol-sql-solhangfiretests`, about 20 s on arm64). Owner: the
+  testing-kits feature.
+- Chronicle step 14 (`2026-11-02-logging-chronicle`): `PreventOverlapJobFilter` is method-scoped and runs after global
+  filters, so a global Chronicle filter starts its root before the overlap guard cancels a run (Hangfire then records
+  `Deleted`); a recurring job's failed `Result` is a return value, not an exception, so the planned outcome mapping
+  reports it as `Ok` unless it reads `PerformedContext.Result`.
+- Pre-existing build warnings seen in the final Release build, outside this feature: CA2022 in
+  `tests/SolTechnology.Core.Logging.Tests/Middleware/LoggingMiddlewareBodyBufferingTests.cs` and CS0105 in the Tale tests.
 
 ## Code review fixes (2026-11-09)
 

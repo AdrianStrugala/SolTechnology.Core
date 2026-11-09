@@ -208,6 +208,11 @@ tale 14 guards the Tale JSON test that auid 03 adds.
 | 12 | `hangfire` | [`2026-11-02-core-2-0-hangfire`](2026-11-02-core-2-0-hangfire.md) | `SolTechnology.Core.Hangfire` | 8 | 11, 13, 32, 51, 57, 61, 69, 70, 71 | core 02–04; result, logging, cqrs |
 | 13 | `testing-kits` | [`2026-11-02-core-2-0-testing-kits`](2026-11-02-core-2-0-testing-kits.md) | `.Testing`, `.HTTP.Testing`, `.API.Testing`, `.SQL.Testing`, `.Redis.Testing`, `.Blob.Testing`, `.ServiceBus.Testing` | 7 | 36, 37, 53, 56, 58, 59, 60, 61, 65, 68, 69, 70, 71 | core 02–04; http, api-auth, sql, cache, blob, messagebus |
 
+`hangfire` was completed on 2026-11-09 and its working folder deleted; besides `SolTechnology.Core.Hangfire` its code
+review changed CQRS (`EventDispatcher` propagates cancellation, P-26) and Logging (`ICorrelationIdService.Clear()`,
+P-27), and its start-up logs took EventIds 2150–2153, so the Chronicle plan moved to 2154/2155. Each library brief
+carries its own `status`.
+
 Remaining foundation steps: core 05 and 06 may run at any time; core 07 (zero-dependency base
 package) runs after core 04; core 08 (central `GenerateDocumentationFile`) runs after every library
 XML-docs step; core 11 closes this feature last, after every library feature is `completed`.

@@ -33,7 +33,9 @@ to 1.x. Consequences:
   still reads. A type derived outside the assembly can still build a failure without an error,
   which is why the API `ResultConversionFilter` keeps its 500 fallback for that state.
 - The contract is System.Text.Json only. Newtonsoft-serialized payloads (MessageBus messages,
-  Hangfire job arguments) must not carry a `Result`.
+  Hangfire job arguments) must not carry a `Result`. The `Result` a recurring Hangfire job returns
+  is only written, by Hangfire's Newtonsoft serializer, into the `Succeeded` state for the
+  dashboard and never read back.
 
 ## Error polymorphism
 
