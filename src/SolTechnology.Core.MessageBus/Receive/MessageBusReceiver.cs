@@ -22,7 +22,7 @@ namespace SolTechnology.Core.MessageBus.Receive
     /// <c>AutoCompleteMessages = false</c> so the receiver always owns the lock
     /// settlement decision.
     /// </summary>
-    public sealed class MessageBusReceiver(
+    internal sealed class MessageBusReceiver(
         IMessageBusBroker messageBusBroker,
         IServiceProvider serviceProvider,
         ICorrelationIdService correlationIdService,

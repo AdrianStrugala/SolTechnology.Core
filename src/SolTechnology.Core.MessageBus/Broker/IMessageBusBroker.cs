@@ -8,7 +8,7 @@ namespace SolTechnology.Core.MessageBus.Broker;
 /// DI-time. All actual Service Bus client interaction (and optional resource
 /// provisioning) happens asynchronously inside <see cref="EnsureInitializedAsync"/>.
 /// </summary>
-public interface IMessageBusBroker
+internal interface IMessageBusBroker
 {
     /// <summary>
     /// Idempotently materialises every registered endpoint (creates senders,

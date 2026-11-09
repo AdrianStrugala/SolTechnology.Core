@@ -11,7 +11,7 @@ namespace SolTechnology.Core.MessageBus.Broker
     /// owns, materialises senders/processors lazily on first
     /// <see cref="EnsureInitializedAsync"/> call and disposes them deterministically.
     /// </summary>
-    public sealed class MessageBusBroker : IMessageBusBroker, IAsyncDisposable
+    internal sealed class MessageBusBroker : IMessageBusBroker, IAsyncDisposable
     {
         private readonly MessageBusConfiguration _configuration;
         private readonly MessageBusRegistry _registry;

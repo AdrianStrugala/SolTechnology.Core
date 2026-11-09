@@ -8,7 +8,7 @@ using SolTechnology.Core.MessageBus.Broker;
 
 namespace SolTechnology.Core.MessageBus.Publish
 {
-    public sealed class MessagePublisher(
+    internal sealed class MessagePublisher(
         IMessageBusBroker messageBusBroker,
         ICorrelationIdService correlationIdService,
         ILogger<MessagePublisher> logger) : IMessagePublisher

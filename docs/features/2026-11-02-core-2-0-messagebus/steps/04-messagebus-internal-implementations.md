@@ -1,7 +1,7 @@
 ---
 spec: 2026-11-02-core-2-0-messagebus
 step: 04
-status: to-do
+status: done
 ---
 
 # Step 04: MessageBus — internal implementation types
@@ -27,10 +27,13 @@ Former core step 48; moved here by the per-library regroup (user, 2026-11-02).
 - `ModuleResolutionTests` (step 01) still resolves `IMessagePublisher` and the hosted service.
 
 ## Acceptance criteria
-- [ ] `dotnet build SolTechnology.Core.slnx` is green, including DreamTravel.
-- [ ] `dotnet test tests/SolTechnology.Core.MessageBus.Tests` is green.
+- [x] `dotnet build SolTechnology.Core.slnx` is green, including DreamTravel.
+- [x] `dotnet test tests/SolTechnology.Core.MessageBus.Tests` is green.
 
 ## Open questions
 - none (`C-14` confirmed by the user on 2026-11-02)
 
 ## Deviations
+
+None. `InternalsVisibleTo` for `SolTechnology.Core.MessageBus.Tests` already existed, so the `.csproj`
+needed no edit; the tests compile unchanged. Full suite: 855 passed, 11 skipped (DreamTravel live-API tests), 0 failed.
