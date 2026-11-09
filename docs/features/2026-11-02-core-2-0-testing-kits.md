@@ -1,7 +1,7 @@
 ---
-status: in-progress
+status: completed
 created: 2026-11-02
-completed:
+completed: 2026-11-09
 ---
 
 # SolTechnology.Core 2.0 — Testing kits
@@ -104,9 +104,9 @@ it forward, never back; see [`2026-11-02-core-2-0-blob`](2026-11-02-core-2-0-blo
 
 ## Implementation plan
 
-Steps live in the temporary working folder `2026-11-02-core-2-0-testing-kits/` (see its `summary.md`). Gates: `review` is
-`done (2026-11-02)`; `premortem` is `waived` — the core premortem verdict `go-with-mitigations (2026-11-02)`
-covers these steps.
+Steps lived in the temporary working folder `2026-11-02-core-2-0-testing-kits`, which the retrospective deleted on
+2026-11-09. Gates: `review` was `done (2026-11-02)`; `premortem` was `waived` — the core premortem verdict
+`go-with-mitigations (2026-11-02)` covered these steps.
 
 Plan review (2026-11-02): the regrouping was checked against the pre-regroup plan (`dddac21c`) and
 found complete. User answers recorded, not re-asked: the delivery order with AUID before Tale is
@@ -148,66 +148,143 @@ implementer folded each into the step that fits it or kept it deferred, without 
 
 ## Acceptance criteria
 
-- [ ] Every step's acceptance criteria are checked, or the gap is recorded under `Deviations`.
-- [ ] `C-23` and `C-24` shipped; every test project that uses a fixture compiles against the renamed members.
-- [ ] A WireMock request without a matching mapping fails the test by default (P-11).
-- [ ] `dotnet build SolTechnology.Core.slnx -c Release` is green, and `dotnet build SolTechnology.Core.slnx 2>&1 | grep -E "NU190[1-4]|NU1605"` prints nothing.
-- [ ] `dotnet test tests/SolTechnology.Core.API.Tests` and `dotnet test tests/SolTechnology.Core.HTTP.Tests` and `dotnet test tests/SolTechnology.Core.SQL.Tests` and `dotnet test tests/SolTechnology.Core.Cache.Tests` and `dotnet test tests/SolTechnology.Core.MessageBus.Tests` and `dotnet test tests/SolTechnology.Core.CQRS.Tests` and `dotnet test tests/SolTechnology.Core.Hangfire.Tests` (the last two reference `SolTechnology.Core.Testing`) are green.
-- [ ] `dotnet test sample-tale-code-apps/DreamTravel/tests/Component/DreamTravel.Component.Tests.csproj` is green (it uses the fixtures and the HTTP.Testing faker).
-- [ ] `find src/SolTechnology.Core.Testing src/SolTechnology.Core.HTTP.Testing src/SolTechnology.Core.API.Testing src/SolTechnology.Core.SQL.Testing src/SolTechnology.Core.Redis.Testing src/SolTechnology.Core.Blob.Testing src/SolTechnology.Core.ServiceBus.Testing -name "*.cs" -not -path "*/obj/*" | xargs wc -l | awk '$1>150 && $2!="total"'` prints nothing.
-- [ ] Every packed `.nupkg` of this feature contains `lib/net10.0/*.xml`.
-- [ ] Every C# snippet in `docs/Testing.md`, `docs/HTTP.Testing.md`, `docs/API.Testing.md`, `docs/SQL.Testing.md`, `docs/Redis.Testing.md`, `docs/Blob.Testing.md`, `docs/ServiceBus.Testing.md` compiles in a throwaway console project against the 2.0 API, as recorded in the module-docs step.
-- [ ] The library-scoped `[{Placeholder}]` template check of the conformance or log-template step prints nothing.
+- [x] Every step's acceptance criteria are checked, or the gap is recorded under `Deviations` (step 02's ubuntu CI run waits for the push; see `Follow-ups`).
+- [x] `C-23` and `C-24` shipped; every test project that uses a fixture compiles against the renamed members.
+- [x] A WireMock request without a matching mapping fails the test by default (P-11).
+- [x] `dotnet build SolTechnology.Core.slnx -c Release` is green, and `dotnet build SolTechnology.Core.slnx 2>&1 | grep -E "NU190[1-4]|NU1605"` prints nothing.
+- [x] `dotnet test tests/SolTechnology.Core.API.Tests` and `dotnet test tests/SolTechnology.Core.HTTP.Tests` and `dotnet test tests/SolTechnology.Core.SQL.Tests` and `dotnet test tests/SolTechnology.Core.Cache.Tests` and `dotnet test tests/SolTechnology.Core.MessageBus.Tests` and `dotnet test tests/SolTechnology.Core.CQRS.Tests` and `dotnet test tests/SolTechnology.Core.Hangfire.Tests` (the last two reference `SolTechnology.Core.Testing`) are green.
+- [x] `dotnet test sample-tale-code-apps/DreamTravel/tests/Component/DreamTravel.Component.Tests.csproj` is green (it uses the fixtures and the HTTP.Testing faker).
+- [x] `find src/SolTechnology.Core.Testing src/SolTechnology.Core.HTTP.Testing src/SolTechnology.Core.API.Testing src/SolTechnology.Core.SQL.Testing src/SolTechnology.Core.Redis.Testing src/SolTechnology.Core.Blob.Testing src/SolTechnology.Core.ServiceBus.Testing -name "*.cs" -not -path "*/obj/*" | xargs wc -l | awk '$1>150 && $2!="total"'` prints nothing.
+- [x] Every packed `.nupkg` of this feature contains `lib/net10.0/*.xml`.
+- [x] Every C# snippet in `docs/Testing.md`, `docs/HTTP.Testing.md`, `docs/API.Testing.md`, `docs/SQL.Testing.md`, `docs/Redis.Testing.md`, `docs/Blob.Testing.md`, `docs/ServiceBus.Testing.md` compiles in a throwaway console project against the 2.0 API, as recorded in the module-docs step.
+- [x] The library-scoped `[{Placeholder}]` template check of the conformance or log-template step prints nothing.
 
 ## Completion summary
 
+Delivered on `master` from `05d1ceb4` (step 01) to `032ed22a` (step 06), plus the code review fixes `9eba42cf` to
+`4fb71f8e`; this retrospective ran on 2026-11-09. The owner pre-approved the plan and asked on 2026-11-09 to run the
+retrospective and close the feature (`CLAUDE.md §2`).
+
+- **`http-api#10`, `http-api#21`, P-11, `C-33` (step 01, code review 1):** `APIFixture` disposes its
+  `WebApplicationFactory`, so the in-memory host and its hosted services stop with the fixture. WireMock matches
+  strictly by default; `WireMockFixture.Initialize(settings)` (new, `C-33`) and `WireMockStartup.Run(settings)` opt back
+  into partial matching. DreamTravel's distance-matrix stubs, which only ever matched partially, match the comma-split
+  values.
+- **`infra#15`, `infra#16`, P-28, P-29, messagebus follow-up (step 02, code review 3, 4):** `ServiceBusFixture` keeps its
+  state per instance and owns the emulator's MSSQL sidecar and network (`OwnedEmulator`), removing all three on dispose,
+  each even when another fails; a failed start keeps its own exception. The kits no longer switch Ryuk off, so it is on
+  by default and disposed containers are removed; ECI users set `TESTCONTAINERS_RYUK_DISABLED=true`.
+  `TestContainersContext` deletes its network explicitly.
+- **`C-23`, `C-24` (step 03):** fixture methods drop `Async`, `ServiceBusFixture.Initialize` takes a token,
+  `WireMockStartup.WireMockServer` is a get-only property, and `FakeApiBase.BaseUrl` is gone. Every test project and the
+  DreamTravel component tests use the new names, and so do the package descriptions (code review 2).
+- **`P1-4`, `cqrs-tale#16` (step 04):** all seven kits ship XML docs in their packages.
+- **`P1-1`, `infra#18-19` (step 05):** the seven module pages describe the 2.0 kits and every C# block compiles against
+  them; six other pages that called renamed members are updated too.
+- **`http-api#24`, `infra#24`, `logging-cache#26` (step 06):** no kit file is over 150 lines, HTTP.Testing file names
+  match their types, primary constructors and `extension` blocks are in place, and the MessageBus
+  `ModuleInstallerTests` is split (messagebus follow-up). The kits have no log templates, so the `[{Placeholder}]` check
+  found nothing and L-03 gains no entry.
+- **Rows and release notes:** `C-23`, `C-24` shipped as written; `C-33` is new (additive); P-11's consumer impact names
+  the opt-outs; `P-28` and `P-29` are new. The core brief's "Release-notes inputs" has a testing-kits 01 entry (strict
+  matching, its opt-outs, the comma-split hint, `APIFixture` disposal) and a testing-kits 02 entry (Ryuk, the Service
+  Bus sidecar). No `L-nn` row changed.
+- **Architecture:** [`architecture/testing.md`](../architecture/testing.md) describes the 2.0 kits: per-instance
+  state, Ryuk on by default and what stays without it, the owned Service Bus sidecar, strict WireMock matching and
+  `APIFixture` disposal, and that the kits have no test project (Q6). The premortem testing-kits checklist gains four
+  lessons.
+
+Final validation: `dotnet build SolTechnology.Core.slnx -c Release` is green with no NU190x/NU1605 and no warning in a
+file of this feature (the remaining warnings are pre-existing, in the DreamTravel sample, Tale.Tests and Logging.Tests).
+`dotnet test SolTechnology.Core.slnx -c Release` passes 928 with 11 skipped (DreamTravel geolocation) and none failed,
+917 before this feature; it includes the DreamTravel component tests (31/31) and every DreamTravel unit project except
+`DreamTravel.Commands.UnitTests`, which has no tests. `docker ps -a` and `docker network ls` show nothing left by the
+runs.
+
 ## Deviations
 
-Decisions taken during implementation (owner pre-approved the plan; detail in each step's `Deviations` until the
-retrospective promotes them):
+### Strict matching exposed a stub bug; the disposal test boots its own host (step 01)
 
-- Step 01: HTTP.Tests had no `WireMockStartup` consumer, so it gains a reference to HTTP.Testing and
-  `WireMockStartupTests`, which pins P-11. Strict matching exposed DreamTravel's distance-matrix stubs: WireMock splits
-  query values on commas, so they never fully matched; the stubs now match the split values. The disposal test boots
-  its own `DisposalTestEntryPoint` (API.Tests sets `GenerateProgramFile=false`).
-- Step 02: all `ServiceBusFixture` state is per instance (only a per-name start lock stays static), and the fixture
-  builds, owns and removes the emulator's MSSQL sidecar and network (messagebus follow-up), also with Ryuk off. Deleting
-  the Ryuk override turned out to matter for every fixture: with Ryuk off Testcontainers only stops a disposed
-  container. New rows `P-28` (Ryuk on by default) and `P-29` (`ServiceBusFixture` per instance, owned sidecar). The
-  Docker.DotNet reuse helpers move into the internal `ReusedEmulator`; `docs/ServiceBus.Testing.md` is corrected here.
-  The CI criterion waits for a push.
-- Step 03: only the `C-23` and `C-24` members changed; internal `Async` names in SQL.Testing stay, `Flush` gains no
-  token, and `WireMockServer` has a private setter for `Run`. The Azurite 3.37.0 pin is unchanged.
-- Step 04: forwarding members of `JsonResponseBuilderDecorator` and interface implementations use `<inheritdoc />`.
-- Step 05: the pages keep their structure (targeted edits); `HTTP.Testing.md` gains a "Strict matching" section, and
-  `API.Testing.md` and `SQL.Testing.md` gain usage snippets. Six other pages that called renamed members are updated
-  too. All 16 snippets compile in a throwaway project.
-- Step 06: `JsonResponseBuilderDecorator` and `SQLFixture` become partial classes (the SQL split moves the fluent
-  configuration, not the engine setup), `ServiceBusFixture` hands its containers to the internal `OwnedEmulator`, and
-  the MessageBus `ModuleInstallerTests` split moves the endpoint tests to `ModuleInstallerEndpointTests` (messagebus
-  follow-up). Three assertion and client helper classes move into `extension` blocks; `ShouldBeSuccess<T>` stays
-  classic (Guide §9.7). ApiCompat shows only the `extension` marker types and the accepted `CP0021` "notnull".
+**Original plan:** keep the HTTP.Tests consumers of `WireMockStartup` green; fix only the DreamTravel stubs that relied
+on partial matching; a minimal entry point for the disposal test.
+
+**Actual implementation:** HTTP.Tests had no `WireMockStartup` consumer, so it gained `WireMockStartupTests` (and, after
+the code review, `WireMockFixtureTests`). DreamTravel's distance-matrix stubs never matched strictly, because WireMock
+splits query values on commas; they now match the split values. `DisposalTestEntryPoint.Main` is the API.Tests entry
+point (`GenerateProgramFile=false`) and sets its content root to the output folder.
+
+### The Service Bus fixture owns its sidecar; Ryuk mattered for every fixture (step 02)
+
+**Original plan:** per-instance state in `ServiceBusFixture`; delete the Ryuk override.
+
+**Actual implementation:** besides per-instance state (only a per-name start lock stays static), the fixture builds and
+removes the MSSQL sidecar and network that `Testcontainers.ServiceBus` created but never disposed, absorbing the
+messagebus follow-up. With Ryuk off, `WithCleanUp(true)` clears the reaper session id and dispose only stops a container,
+so the old override had left every SQL, Redis and Azurite container stopped on the host; this became `P-28`, and the
+Service Bus change `P-29`. The reuse helpers moved into `ReusedEmulator`. The ubuntu CI run of the step's third
+criterion waits for the push.
+
+### Renames kept to the listed members (step 03)
+
+**Original plan:** the `C-23` and `C-24` members.
+
+**Actual implementation:** exactly those; internal `Async` names in SQL.Testing stay, `Flush` gains no token, and
+`WireMockServer` has a private setter for `Run`.
+
+### Forwarding members inherit their docs (step 04)
+
+**Original plan:** a `<summary>` on every member `CS1591` reports.
+
+**Actual implementation:** the 45 forwarding members of `JsonResponseBuilderDecorator` and interface implementations use
+`<inheritdoc />`.
+
+### Targeted page edits and more pages (step 05)
+
+**Original plan:** edits to the seven kit pages.
+
+**Actual implementation:** the pages keep their structure; usage snippets were added to `API.Testing.md` and
+`SQL.Testing.md`, a "Strict matching" section to `HTTP.Testing.md`, and six other pages that called renamed members
+were updated. The `Ct.Any` snippet awaits the NSubstitute check, because without it CS4014 fails a consumer that treats
+warnings as errors.
+
+### Splits by partial file and collaborator (step 06)
+
+**Original plan:** split the three oversized files; for `SQLFixture`, extract the engine-specific container setup.
+
+**Actual implementation:** `JsonResponseBuilderDecorator` and `SQLFixture` became partial classes (the SQL split moves
+the fluent configuration, because the engine selection is a four-line switch), and `ServiceBusFixture` hands its
+containers to `OwnedEmulator`. `ResultAssertions`, `InMemorySinkAssertions` and `AuthClientExtensions` moved into
+`extension` blocks; `ShouldBeSuccess<T>` stays classic (Guide §9.7). ApiCompat showed only the extension marker types
+and the accepted `CP0021` "notnull".
+
+### Code review finding 3 did not reproduce
+
+The reported network leak of `TestContainersContext` with Ryuk off does not happen on Testcontainers 4.16, because its
+network never calls `WithCleanUp` and keeps the default reaper-session label. The decided explicit delete shipped
+anyway, with a test that removes the network with Ryuk on and off.
 
 ## Follow-ups
 
-Recorded during implementation (the retrospective consolidates this list):
-
+- Run `runTests.ps1` on ubuntu CI with Ryuk on after the push (step 02, third criterion).
 - A shipped Hangfire testing helper. The Hangfire tests keep their own harness (`RecurringJobHost`, the performer and
-  state-machine loop, `HangfireGlobalState.Reset`); no step of this feature plans a Hangfire kit. A shipped helper must
-  reset Hangfire's process-wide state (the log provider, `GlobalJobFilters`, `JobFilterProviders.Providers`) on
-  dispose, otherwise a disposed container leaves Hangfire's global logger pointing at a disposed factory.
-- A `*.Testing` test project (Q6). Until then the kits are covered through their consumers.
+  state-machine loop, `HangfireGlobalState.Reset`). A shipped helper must reset Hangfire's process-wide state (the log
+  provider, `GlobalJobFilters`, `JobFilterProviders.Providers`) on dispose, otherwise a disposed container leaves
+  Hangfire's global logger pointing at a disposed factory.
+- A `*.Testing` test project (Q6). Until then the kits are covered through their consumers; the
+  `OwnedEmulator` removal-failure path has no automated test.
 - A Blob test project with the five Azurite tests from the blob code review (AR-1); it stays a Blob follow-up.
-- With `TESTCONTAINERS_RYUK_DISABLED=true`, a disposed SQL, Redis or Azurite fixture only stops its container
-  (Testcontainers deletes only with Ryuk on); `WithAutoRemove` on those builders would remove them as
-  `ServiceBusFixture` already does.
-- Step 02's CI criterion: `runTests.ps1` on ubuntu with Ryuk on, after the push.
+- With `TESTCONTAINERS_RYUK_DISABLED=true`, a disposed SQL, Redis or Azurite fixture only stops its container, because
+  `WithCleanUp(true)` without Ryuk clears the reaper session id. Dropping that call (the default label keeps deletion
+  on) or adding `WithAutoRemove` would remove them, as `ServiceBusFixture` does.
+- Remove the `System.Security.Cryptography.Pkcs` override and the `Microsoft.Identity.Client` reference from
+  `SQL.Testing` when the upstream packages allow it (SQL feature follow-ups).
+- WireMock 2.13 → 2.21 (outdated-package sweep, out of scope here).
 
 ## Code review fixes (2026-11-09)
 
 An independent code review of `8e3908f0..032ed22a` found four issues; each was fixed with the user's decision, in its
 own commit. Rows: `C-33` (new), P-11 (consumer impact amended); the P-11 release-notes input in the core brief names
-both opt-outs.
+both opt-outs. The retrospective ran after these fixes.
 
 | # | Finding | Fix | Commit | Test |
 |---|---|---|---|---|

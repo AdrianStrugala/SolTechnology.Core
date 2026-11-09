@@ -210,8 +210,10 @@ tale 14 guards the Tale JSON test that auid 03 adds.
 
 `hangfire` was completed on 2026-11-09 and its working folder deleted; besides `SolTechnology.Core.Hangfire` its code
 review changed CQRS (`EventDispatcher` propagates cancellation, P-26) and Logging (`ICorrelationIdService.Clear()`,
-P-27), and its start-up logs took EventIds 2150–2153, so the Chronicle plan moved to 2154/2155. Each library brief
-carries its own `status`.
+P-27), and its start-up logs took EventIds 2150–2153, so the Chronicle plan moved to 2154/2155. `testing-kits` was
+completed on 2026-11-09 and its working folder deleted, which completes all thirteen library features; it changed the
+DreamTravel component-test stubs (strict WireMock matching) and split the MessageBus `ModuleInstallerTests`, and added
+`C-33`, `P-28` and `P-29`. Each library brief carries its own `status`.
 
 Remaining foundation steps: core 05 and 06 may run at any time; core 07 (zero-dependency base
 package) runs after core 04; core 08 (central `GenerateDocumentationFile`) runs after every library
