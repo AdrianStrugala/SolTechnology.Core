@@ -202,3 +202,21 @@ Recorded during implementation (the retrospective consolidates this list):
   (Testcontainers deletes only with Ryuk on); `WithAutoRemove` on those builders would remove them as
   `ServiceBusFixture` already does.
 - Step 02's CI criterion: `runTests.ps1` on ubuntu with Ryuk on, after the push.
+
+## Code review fixes (2026-11-09)
+
+An independent code review of `8e3908f0..032ed22a` found four issues; each was fixed with the user's decision, in its
+own commit. Rows: `C-33` (new), P-11 (consumer impact amended); the P-11 release-notes input in the core brief names
+both opt-outs.
+
+| # | Finding | Fix | Commit | Test |
+|---|---|---|---|---|
+| 1 | Medium. `WireMockFixture.Initialize(int)` always ran strict (P-11); the documented opt-out existed only on `WireMockStartup.Run(settings)`, so the release note was wrong for the fixture. | New `WireMockFixture.Initialize(WireMockServerSettings)` (`C-33`); the port overload delegates to it with `DefaultSettings(port)`. `HTTP.Testing.md` documents `AllowPartialMapping = true` and `wireMock.Initialize().WireMockServer.AllowPartialMapping()`; the fixture has no `WireMockServer` property, so the one-liner goes through the `WireMockStartup` that `Initialize` returns instead of adding API. Release note and P-11 row fixed. | `9eba42cf` | `WireMockFixtureTests`: a partial match is served with `AllowPartialMapping = true` and gets 404 without it; `AllowPartialMapping()` on the running server; null settings throw. |
+| 2 | Low. The Blob.Testing and Redis.Testing package descriptions and `canonical-versions.md:89` named the pre-`C-23` methods. | Descriptions name `CreateBlobContainer` / `Clear` and `Flush()`; the reference names `RedisFixture.Flush()`. A grep of every `src` csproj, `.github` and the module docs finds no other old name. | `b8c229f4` | — |
+| 3 | Low. `TestContainersContext.DisposeAsync` was reported to leak its network with Ryuk off, because `DockerNetwork` deletes only with a reaper session id. | `DisposeAsync` deletes the network before disposing it. The leak did not reproduce on Testcontainers 4.16: every resource gets the reaper-session label by default and `NetworkBuilder` never calls `WithCleanUp`, so only `WithCleanUp(true)` with Ryuk off (as the SQL, Redis and Azurite fixtures do) clears the session id. The explicit delete is kept as decided, with a comment that says so; `Testing.md` now lists what stays without Ryuk. | `25c6d012` | `TestContainersContextTests` (in MessageBus.Tests, the Docker test project that references the kit; Q6) removes the network with Ryuk on and off; it also passes against the old code. |
+| 4 | Low. `OwnedEmulator.DisposeAsync` stopped at the first failure, and in `ServiceBusFixture.StartEmulator` a clean-up exception replaced the start exception. | Each of the three removals is attempted; failures are thrown together as one `AggregateException`. A failed start rethrows the start exception, attaches the clean-up failure to its `Data["ServiceBusFixture.CleanupFailure"]` and writes it to the console. The fixture clears its emulator reference in a `finally`. | `8b4e3c6f` | No fault-injection test: `OwnedEmulator` builds real containers and has no seam for a failing removal. The lifecycle tests still pass. |
+
+Verification after the fixes: HTTP.Tests 162/162 and MessageBus.Tests 42/42; `dotnet test SolTechnology.Core.slnx
+-c Release` passes 928 with 11 skipped and none failed (922 before the fixes, plus 4 `WireMockFixtureTests` and 2
+`TestContainersContextTests`). `docker ps -a` and `docker network ls` show no container or network added by the run.
+
