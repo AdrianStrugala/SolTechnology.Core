@@ -2,7 +2,9 @@ namespace SolTechnology.Core.CQRS;
 
 /// <summary>
 /// Fans an event out to every registered <see cref="IEventHandler{T}"/>.
-/// Handlers run sequentially; failures are isolated and never stop siblings.
+/// Handlers run sequentially; failures are isolated and never stop siblings. When <c>cancellationToken</c> is
+/// cancelled and a handler throws <see cref="OperationCanceledException"/>, the remaining handlers are not called and
+/// the exception propagates.
 /// </summary>
 public interface IEventDispatcher
 {

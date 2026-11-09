@@ -35,9 +35,6 @@ internal sealed class HangfireEventPublisher(
         await using var scope = scopeFactory.CreateAsyncScope();
         var dispatcher = scope.ServiceProvider.GetRequiredService<IEventDispatcher>();
         await dispatcher.Dispatch(@event, cancellationToken);
-
-        // The dispatcher swallows handler exceptions; aborting lets Hangfire requeue an event cut short by shutdown.
-        cancellationToken.ThrowIfCancellationRequested();
     }
 
     // Legacy 1.x job signature; remove in 3.0.

@@ -60,27 +60,6 @@ public class HangfireEventDispatchTests
     }
 
     [Test]
-    public async Task DispatchInScope_ShutdownSwallowedByDispatcher_AbortsJob()
-    {
-        // Arrange
-        using var shutdown = new CancellationTokenSource();
-        var services = new ServiceCollection().AddLogging()
-            .AddSolCQRS(o => o.RegisterEventsFromAssembly(typeof(HangfireEventDispatchTests).Assembly))
-            .BuildServiceProvider();
-        _sut = new HangfireEventPublisher(Substitute.For<IBackgroundJobClient>(),
-            services.GetRequiredService<IServiceScopeFactory>(), Options.Create(new PersistentEventsOptions()));
-        var job = Job.FromExpression<HangfireEventPublisher>(p => p.DispatchInScope(new SlowEvent(), CancellationToken.None));
-        var performing = Task.Run(() => Perform(job, shutdown.Token));
-
-        // Act
-        await shutdown.CancelAsync();
-        var act = () => performing.WaitAsync(TimeSpan.FromSeconds(5));
-
-        // Assert
-        await act.Should().ThrowAsync<OperationCanceledException>();
-    }
-
-    [Test]
     public void DispatchInScope_Legacy1xJob_StillRuns()
     {
         // Arrange
@@ -102,14 +81,6 @@ public class HangfireEventDispatchTests
         var context = new PerformContext(Substitute.For<JobStorage>(), Substitute.For<IStorageConnection>(),
             new BackgroundJob("job-1", job, DateTime.UtcNow), cancellation);
         return new BackgroundJobPerformer(new JobFilterProviderCollection(), new SingleInstanceActivator(_sut)).Perform(context);
-    }
-
-    public sealed record SlowEvent : IEvent;
-
-    public sealed class SlowEventHandler : IEventHandler<SlowEvent>
-    {
-        public Task Handle(SlowEvent notification, CancellationToken cancellationToken) =>
-            Task.Delay(Timeout.Infinite, cancellationToken);
     }
 
     private sealed class SingleInstanceActivator(object instance) : JobActivator

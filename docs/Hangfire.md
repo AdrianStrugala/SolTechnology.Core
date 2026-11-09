@@ -120,7 +120,7 @@ builder.Services.AddSolRecurringJob<FetchTrafficJob>("0 */6 * * *", preventOverl
 | Failed `Result`, `Recoverable = true` | Retried up to 3 times with Hangfire's back-off, then `Failed` (needs `UseSolFilters`) | — |
 | Handler throws | — | Logged by CQRS; job `Succeeded` |
 | Job throws | `Failed`, not retried | `Failed`, not retried |
-| Server shuts down mid-run | Requeued when the job lets the token's `OperationCanceledException` propagate | Requeued; every handler runs again |
+| Server shuts down mid-run | Requeued when the job lets the token's `OperationCanceledException` propagate | Requeued when a handler is interrupted: the remaining handlers are skipped and every handler runs again on the next server; a dispatch that finished first succeeds |
 
 #### Job ids
 

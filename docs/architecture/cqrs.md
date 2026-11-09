@@ -62,7 +62,10 @@ CQRS-owned `ActivitySource` named `CoreLoggingActivitySources.OperationsName`.
 The in-memory publisher creates one `Task.Run` and one fresh dependency-injection scope per
 published event. Event handlers then execute sequentially in registration order inside that
 scope. Each handler exception is logged with the original exception and swallowed so later
-handlers still run.
+handlers still run. The exception is an `OperationCanceledException` thrown while the dispatch's
+token is cancelled: the dispatcher then calls no further handler and lets it propagate, so a
+durable publisher (Hangfire) can requeue an event cut short by shutdown instead of reporting it
+as done. The in-memory publisher dispatches with `CancellationToken.None`.
 
 The event abstraction is intentionally transport-replaceable. This fire-and-forget behavior is
 not a durability guarantee; use a persistent publisher when delivery must survive process loss.

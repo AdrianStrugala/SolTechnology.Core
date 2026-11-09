@@ -6,7 +6,8 @@ using Microsoft.Extensions.Logging;
 namespace SolTechnology.Core.CQRS.Internal;
 
 /// <summary>
-/// Default <see cref="IEventDispatcher"/>. Sequential fan-out with per-handler error isolation.
+/// Default <see cref="IEventDispatcher"/>. Sequential fan-out with per-handler error isolation; a cancellation of the
+/// caller's token stops the fan-out and propagates.
 /// Handlers are called through <see cref="IEventHandler{TEvent}"/> by a delegate cached per event type.
 /// </summary>
 internal sealed class EventDispatcher(IServiceProvider serviceProvider, ILogger<EventDispatcher> logger) : IEventDispatcher
@@ -32,6 +33,10 @@ internal sealed class EventDispatcher(IServiceProvider serviceProvider, ILogger<
             try
             {
                 await invoke(handler, @event, cancellationToken);
+            }
+            catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+            {
+                throw;
             }
             catch (Exception ex)
             {
