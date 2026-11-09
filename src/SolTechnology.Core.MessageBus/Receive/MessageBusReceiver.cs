@@ -76,19 +76,28 @@ namespace SolTechnology.Core.MessageBus.Receive
                 ["MessageType"] = messageType.Name
             });
 
+            if (await TryHandle(args, messageType).ConfigureAwait(false))
+            {
+                await _settler.Complete(args, messageType).ConfigureAwait(false);
+            }
+        }
+
+        // Returns false when the message is already settled as unreadable or failed.
+        private async Task<bool> TryHandle(ProcessMessageEventArgs args, Type messageType)
+        {
             try
             {
                 var message = MessageDeserializer.Deserialize(args.Message.Body, messageType);
                 if (message.Payload is null)
                 {
                     await _settler.DeadLetterUnreadable(args, messageType, message).ConfigureAwait(false);
-                    return;
+                    return false;
                 }
 
                 await using var scope = serviceProvider.CreateAsyncScope();
                 await _handlerInvoker.Invoke(scope.ServiceProvider, messageType, message.Payload, args.CancellationToken)
                     .ConfigureAwait(false);
-                await _settler.Complete(args, messageType).ConfigureAwait(false);
+                return true;
             }
             catch (OperationCanceledException) when (args.CancellationToken.IsCancellationRequested)
             {
@@ -97,6 +106,7 @@ namespace SolTechnology.Core.MessageBus.Receive
             catch (Exception ex)
             {
                 await _settler.SettleFailure(args, messageType, ex).ConfigureAwait(false);
+                return false;
             }
         }
 

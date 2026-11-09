@@ -109,6 +109,7 @@ The receiver settles every message itself:
 | Outcome | Settlement |
 |---|---|
 | `Handle` returns | Completed |
+| `Handle` returns, but completing fails (for example, the lock was lost) | Warning `Failed to complete message [{MessageId}]; lock will expire naturally`; the message is delivered again |
 | `Handle` throws, delivery count below `MaxDeliveryCount` | Abandoned and delivered again |
 | `Handle` throws on delivery `MaxDeliveryCount` | Dead-lettered, reason `HandlerFailedMaxDelivery`, description = the exception's message |
 | Empty body | Dead-lettered, reason `EmptyBody` |

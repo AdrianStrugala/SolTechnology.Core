@@ -21,6 +21,7 @@ public class MessageSettlerTests
     [TestCase("null payload", 1, false, "Dead-lettering message [{MessageId}] — null payload after deserialisation to [{MessageType}]")]
     [TestCase("handler failed", 1, false, "Handler failure for [{MessageType}] [{MessageId}] (delivery [{DeliveryCount}]) — abandoning for retry")]
     [TestCase("handler failed", MaxDeliveryCount, false, "Handler failure for [{MessageType}] [{MessageId}] (delivery [{DeliveryCount}]) — dead-lettering on the last attempt")]
+    [TestCase("complete", 1, true, "Failed to complete message [{MessageId}]; lock will expire naturally")]
     [TestCase("handler failed", 1, true, "Failed to abandon message [{MessageId}]; lock will expire naturally")]
     [TestCase("handler failed", MaxDeliveryCount, true, "Failed to dead-letter message [{MessageId}]; lock will expire naturally")]
     public async Task Settle_EveryOutcome_LogsBracketedTemplate(
@@ -65,6 +66,8 @@ public class MessageSettlerTests
         if (settlementFails)
         {
             var failure = new ServiceBusException("lock lost", ServiceBusFailureReason.MessageLockLost);
+            receiver.CompleteMessageAsync(Arg.Any<ServiceBusReceivedMessage>(), Arg.Any<CancellationToken>())
+                .ThrowsAsync(failure);
             receiver.AbandonMessageAsync(Arg.Any<ServiceBusReceivedMessage>(), Arg.Any<IDictionary<string, object>>(), Arg.Any<CancellationToken>())
                 .ThrowsAsync(failure);
             receiver.DeadLetterMessageAsync(Arg.Any<ServiceBusReceivedMessage>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<CancellationToken>())

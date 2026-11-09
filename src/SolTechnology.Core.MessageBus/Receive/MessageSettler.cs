@@ -8,6 +8,8 @@ namespace SolTechnology.Core.MessageBus.Receive;
 /// A failing message is dead-lettered with reason <c>HandlerFailedMaxDelivery</c> once its delivery count reaches
 /// <paramref name="maxDeliveryCount"/>. Settlement ignores <see cref="ProcessMessageEventArgs.CancellationToken"/>,
 /// which the processor cancels as soon as shutdown starts, so a message handled during shutdown is still settled.
+/// A settlement failure is logged at Warning and never re-settles the message; its lock expires and it is delivered
+/// again.
 /// </summary>
 internal sealed class MessageSettler(ILogger logger, int maxDeliveryCount)
 {
@@ -15,11 +17,17 @@ internal sealed class MessageSettler(ILogger logger, int maxDeliveryCount)
 
     public async Task Complete(ProcessMessageEventArgs args, Type messageType)
     {
-        await args.CompleteMessageAsync(args.Message, CancellationToken.None).ConfigureAwait(false);
-
-        logger.LogDebug(
-            "Handled message [{MessageType}] [{MessageId}] (delivery [{DeliveryCount}])",
-            messageType.Name, args.Message.MessageId, args.Message.DeliveryCount);
+        var messageId = args.Message.MessageId;
+        var completed = await TrySettle(
+            () => args.CompleteMessageAsync(args.Message, CancellationToken.None),
+            settleException => logger.LogWarning(settleException,
+                "Failed to complete message [{MessageId}]; lock will expire naturally", messageId)).ConfigureAwait(false);
+        if (completed)
+        {
+            logger.LogDebug(
+                "Handled message [{MessageType}] [{MessageId}] (delivery [{DeliveryCount}])",
+                messageType.Name, messageId, args.Message.DeliveryCount);
+        }
     }
 
     public Task DeadLetterUnreadable(ProcessMessageEventArgs args, Type messageType, DeserializedMessage message)
@@ -73,15 +81,17 @@ internal sealed class MessageSettler(ILogger logger, int maxDeliveryCount)
     private static Task DeadLetter(ProcessMessageEventArgs args, string reason, string description) =>
         args.DeadLetterMessageAsync(args.Message, reason, description, CancellationToken.None);
 
-    private static async Task TrySettle(Func<Task> settle, Action<Exception> logFailure)
+    private static async Task<bool> TrySettle(Func<Task> settle, Action<Exception> logFailure)
     {
         try
         {
             await settle().ConfigureAwait(false);
+            return true;
         }
         catch (Exception settleException)
         {
             logFailure(settleException);
+            return false;
         }
     }
 }
