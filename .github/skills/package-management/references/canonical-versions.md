@@ -93,6 +93,7 @@ enables it purely through MSBuild properties (`PublishRepositoryUrl`, `EmbedUntr
 | `Neo4j.Driver` | `6.2.0` | `DreamTravel.GraphDatabase` | `IDriver` now implements `IAsyncDisposable` directly — dispose via `await Driver.DisposeAsync()`, not the old `CloseAsync()` + `Dispose()` pair. |
 | `Cronos` | `0.13.0` | `SolTechnology.Core.Scheduler`/Hangfire-adjacent cron parsing | — |
 | `Hangfire.Core` / `.AspNetCore` / `.NetCore` / `.SqlServer` | `1.8.23` | `SolTechnology.Core.Hangfire` | Keep all four on the same minor. |
+| `Hangfire.InMemory` | `1.0.0` | DreamTravel, `SolTechnology.Core.Hangfire.Tests` (test-only) | In-memory job storage for tests and the local sample; never in a shipped `src/` package. |
 
 ## HTTP / mocking (test companions)
 

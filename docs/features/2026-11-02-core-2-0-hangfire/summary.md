@@ -19,7 +19,7 @@ are `done` and after these library features are `completed`: `result`; `logging`
 
 | # | Title | File | Status |
 |---|---|---|---|
-| 01 | DI resolution test — Hangfire | [`steps/01-di-resolution-test.md`](steps/01-di-resolution-test.md) | to-do |
+| 01 | DI resolution test — Hangfire | [`steps/01-di-resolution-test.md`](steps/01-di-resolution-test.md) | done |
 | 02 | Hangfire — implement `preventOverlap`; register the correlation service | [`steps/02-hangfire-prevent-overlap-and-correlation.md`](steps/02-hangfire-prevent-overlap-and-correlation.md) | to-do |
 | 03 | Hangfire — restore ambient correlation state; async, cancellable event dispatch | [`steps/03-hangfire-execution-context.md`](steps/03-hangfire-execution-context.md) | to-do |
 | 04 | Hangfire — recurring job contract for 2.0 | [`steps/04-hangfire-job-contracts.md`](steps/04-hangfire-job-contracts.md) | to-do |
