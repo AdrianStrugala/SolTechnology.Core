@@ -19,6 +19,7 @@ public sealed class PreventOverlapJobFilter : JobFilterAttribute, IServerFilter
     private const string LockItemKey = "SolTechnology.PreventOverlapLock";
     private const string RecurringJobIdParameter = "RecurringJobId";
 
+    /// <summary>Takes the overlap lock, or cancels the run when another matching run holds it.</summary>
     public void OnPerforming(PerformingContext filterContext)
     {
         try
@@ -32,6 +33,7 @@ public sealed class PreventOverlapJobFilter : JobFilterAttribute, IServerFilter
         }
     }
 
+    /// <summary>Releases the overlap lock taken in <see cref="OnPerforming"/>.</summary>
     public void OnPerformed(PerformedContext filterContext)
     {
         if (filterContext.Items.TryGetValue(LockItemKey, out var held) && held is IDisposable overlapLock)

@@ -6,7 +6,7 @@ namespace SolTechnology.Core.Hangfire.Filters;
 
 /// <summary>
 /// Inspects the job return value: if the handler returns a failed <see cref="Result"/>
-/// with <see cref="Errors.Error.Recoverable"/> = true, forces the job into <see cref="FailedState"/>
+/// with <see cref="Error.Recoverable"/> = true, forces the job into <see cref="FailedState"/>
 /// so Hangfire retries it. Non-recoverable failures are left as succeeded (no pointless retries).
 /// This bridges the Result pattern with Hangfire's exception-only retry model.
 /// </summary>

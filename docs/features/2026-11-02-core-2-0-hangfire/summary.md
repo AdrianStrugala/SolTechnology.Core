@@ -23,7 +23,7 @@ are `done` and after these library features are `completed`: `result`; `logging`
 | 02 | Hangfire — implement `preventOverlap`; register the correlation service | [`steps/02-hangfire-prevent-overlap-and-correlation.md`](steps/02-hangfire-prevent-overlap-and-correlation.md) | done |
 | 03 | Hangfire — restore ambient correlation state; async, cancellable event dispatch | [`steps/03-hangfire-execution-context.md`](steps/03-hangfire-execution-context.md) | done |
 | 04 | Hangfire — recurring job contract for 2.0 | [`steps/04-hangfire-job-contracts.md`](steps/04-hangfire-job-contracts.md) | done |
-| 05 | XML docs shipped — Hangfire | [`steps/05-xml-docs.md`](steps/05-xml-docs.md) | to-do |
+| 05 | XML docs shipped — Hangfire | [`steps/05-xml-docs.md`](steps/05-xml-docs.md) | done |
 | 06 | Module docs — `docs/Hangfire.md` | [`steps/06-docs-hangfire.md`](steps/06-docs-hangfire.md) | to-do |
 | 07 | Guide conformance — Hangfire | [`steps/07-conform-hangfire.md`](steps/07-conform-hangfire.md) | to-do |
 | 08 | Retrospective | [`steps/08-retrospective.md`](steps/08-retrospective.md) | to-do |

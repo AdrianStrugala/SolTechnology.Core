@@ -9,6 +9,7 @@
 		<AssemblyName>SolTechnology.Core.Hangfire</AssemblyName>
 
 		<PackageReadmeSource>Hangfire.md</PackageReadmeSource>
+		<GenerateDocumentationFile>true</GenerateDocumentationFile>
 	</PropertyGroup>
 
 	<ItemGroup>

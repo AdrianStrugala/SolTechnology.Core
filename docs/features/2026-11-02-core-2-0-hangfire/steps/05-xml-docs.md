@@ -1,7 +1,7 @@
 ---
 spec: 2026-11-02-core-2-0-hangfire
 step: 05
-status: to-do
+status: done
 ---
 
 # Step 05: XML docs shipped — Hangfire
@@ -19,10 +19,17 @@ Former core step 57 (Hangfire part); split per library on 2026-11-02.
 - English, one or two sentences per member, per [`PublicDocumentationGuide.md`](../../../../docs/PublicDocumentationGuide.md). No `<NoWarn>CS1591</NoWarn>` (`CLAUDE.md §2`).
 
 ## Acceptance criteria
-- [ ] `dotnet build SolTechnology.Core.slnx` is green with `TreatWarningsAsErrors`.
-- [ ] `dotnet pack` of the project produces a nupkg containing `lib/net10.0/<Assembly>.xml`.
+- [x] `dotnet build SolTechnology.Core.slnx` is green with `TreatWarningsAsErrors`.
+- [x] `dotnet pack` of the project produces a nupkg containing `lib/net10.0/<Assembly>.xml`.
 
 ## Open questions
 - none
 
 ## Deviations
+
+Verification: enabling `GenerateDocumentationFile` reported three `CS1591` members (`IJob.Execute`,
+`PreventOverlapJobFilter.OnPerforming`, `PreventOverlapJobFilter.OnPerformed`) and one `CS1574` (the
+`SmartRetryJobFilter` summary pointed at `Errors.Error.Recoverable`; `Error` lives in `SolTechnology.Core`). All four
+are fixed; the rest of the public surface already had summaries from steps 02–04. `dotnet build -c Release` is green
+with `TreatWarningsAsErrors`, and `dotnet pack` produces `SolTechnology.Core.Hangfire.2.0.0.nupkg` with
+`lib/net10.0/SolTechnology.Core.Hangfire.xml`. `ModuleInstaller.cs` has no code change in this step.
