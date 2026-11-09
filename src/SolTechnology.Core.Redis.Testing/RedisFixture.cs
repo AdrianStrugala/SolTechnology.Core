@@ -32,6 +32,8 @@ public sealed class RedisFixture : IAsyncDisposable
     private RedisContainer? _container;
     private ConnectionMultiplexer? _multiplexer;
 
+    /// <param name="image">The Redis image; defaults to <c>redis:7-alpine</c>.</param>
+    /// <param name="containerName">The container name used when <c>TESTCONTAINERS_REUSE</c> keeps it between runs.</param>
     public RedisFixture(string? image = null, string containerName = "soltech-redis")
     {
         _image = image;
@@ -55,6 +57,7 @@ public sealed class RedisFixture : IAsyncDisposable
         return this;
     }
 
+    /// <summary>Starts the Redis container, or reuses the one kept by an earlier run.</summary>
     public async Task Initialize(CancellationToken ct = default)
     {
         var builder = new RedisBuilder(_image ?? DefaultImage)
@@ -97,6 +100,7 @@ public sealed class RedisFixture : IAsyncDisposable
         }
     }
 
+    /// <summary>Closes the admin connection and removes the container, unless <c>TESTCONTAINERS_REUSE</c> keeps it.</summary>
     public async ValueTask DisposeAsync()
     {
         if (_multiplexer is not null)

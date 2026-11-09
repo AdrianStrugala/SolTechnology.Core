@@ -1,5 +1,6 @@
  namespace SolTechnology.Core.HTTP.Testing.Faker
 {
+    /// <summary>First stage of arranging a fake: pick the request by calling the fake client method.</summary>
     public interface IFakeApiBuilderWithRequest<out TApiClient> where TApiClient : class
     {
         /// <summary>

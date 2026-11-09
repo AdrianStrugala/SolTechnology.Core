@@ -9,6 +9,7 @@ namespace SolTechnology.Core.Testing.Customizations;
 /// </summary>
 public sealed class DateOnlyGenerator : ISpecimenBuilder
 {
+    /// <summary>Returns a <see cref="DateOnly"/> for a <see cref="DateOnly"/> request, otherwise <see cref="NoSpecimen"/>.</summary>
     public object Create(object request, ISpecimenContext context)
     {
         ArgumentNullException.ThrowIfNull(context);
@@ -26,6 +27,7 @@ public sealed class DateOnlyGenerator : ISpecimenBuilder
 /// <summary>Registers <see cref="DateOnlyGenerator"/> at the front of the customization chain.</summary>
 public sealed class DateOnlyCustomization : ICustomization
 {
+    /// <summary>Adds <see cref="DateOnlyGenerator"/> in front of the fixture's other customizations.</summary>
     public void Customize(IFixture fixture)
     {
         ArgumentNullException.ThrowIfNull(fixture);

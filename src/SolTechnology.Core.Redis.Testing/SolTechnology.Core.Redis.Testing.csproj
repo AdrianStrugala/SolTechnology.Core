@@ -9,6 +9,7 @@
 		<AssemblyName>SolTechnology.Core.Redis.Testing</AssemblyName>
 
 		<PackageReadmeSource>Redis.Testing.md</PackageReadmeSource>
+		<GenerateDocumentationFile>true</GenerateDocumentationFile>
 	</PropertyGroup>
 
 	<ItemGroup>

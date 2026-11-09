@@ -31,6 +31,8 @@ public sealed class AzuriteFixture : IAsyncDisposable
     private string? _networkAlias;
     private AzuriteContainer? _container;
 
+    /// <param name="image">The Azurite image; defaults to <c>mcr.microsoft.com/azure-storage/azurite:3.37.0</c>.</param>
+    /// <param name="containerName">The container name used when <c>TESTCONTAINERS_REUSE</c> keeps it between runs.</param>
     public AzuriteFixture(string? image = null, string containerName = "soltech-azurite")
     {
         _image = image;
@@ -51,6 +53,7 @@ public sealed class AzuriteFixture : IAsyncDisposable
         return this;
     }
 
+    /// <summary>Starts the Azurite container, or reuses the one kept by an earlier run.</summary>
     public async Task Initialize(CancellationToken ct = default)
     {
         var builder = new AzuriteBuilder(_image ?? DefaultImage)
@@ -100,6 +103,7 @@ public sealed class AzuriteFixture : IAsyncDisposable
         }
     }
 
+    /// <summary>Removes the container, unless <c>TESTCONTAINERS_REUSE</c> keeps it for the next run.</summary>
     public async ValueTask DisposeAsync()
     {
         // Honour the reuse policy: leave the container running when reuse is enabled.

@@ -8,6 +8,7 @@ namespace SolTechnology.Core.Testing.Customizations;
 /// </summary>
 public sealed class UtcDateTimeSpecimen : ISpecimenBuilder
 {
+    /// <summary>Returns a UTC <see cref="DateTime"/> near now for a <see cref="DateTime"/> request, otherwise <see cref="NoSpecimen"/>.</summary>
     public object Create(object request, ISpecimenContext context)
     {
         if (request is not Type t || t != typeof(DateTime))

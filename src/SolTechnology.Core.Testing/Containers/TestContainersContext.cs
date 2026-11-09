@@ -30,6 +30,7 @@ public sealed class TestContainersContext : IAsyncDisposable
     /// <summary>Stable network alias used by inter-container references.</summary>
     public string NetworkAlias { get; } = "soltech-test-network";
 
+    /// <summary>Removes the network, unless <see cref="ReuseContainers"/> keeps it for the next run.</summary>
     public async ValueTask DisposeAsync()
     {
         if (!ReuseContainers)

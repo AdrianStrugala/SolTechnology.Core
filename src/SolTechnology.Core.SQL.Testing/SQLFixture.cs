@@ -28,6 +28,8 @@ public sealed class SQLFixture : IAsyncDisposable
     private INetwork? _network;
     private string? _networkAlias;
 
+    /// <param name="databaseName">The application database; with <c>TESTCONTAINERS_REUSE</c> the container is named <c>sol-sql-{databaseName}</c> in lower case.</param>
+    /// <param name="image">The engine image; defaults to <c>mssql/server:2022-latest</c>, or <c>postgres:16.9-alpine</c> after <see cref="UsePostgres"/>.</param>
     public SQLFixture(string databaseName, string? image = null)
     {
         DatabaseName = databaseName ?? throw new ArgumentNullException(nameof(databaseName));
@@ -100,6 +102,11 @@ public sealed class SQLFixture : IAsyncDisposable
 
     // ---- lifecycle ----
 
+    /// <summary>
+    /// Starts the engine container (or reuses the one kept by an earlier run), provisions the schema and checks that
+    /// the application database accepts connections.
+    /// </summary>
+    /// <exception cref="InvalidOperationException">No schema provisioning was configured.</exception>
     public async Task Initialize(CancellationToken ct = default)
     {
         if (_provisioner is null)
@@ -142,6 +149,7 @@ public sealed class SQLFixture : IAsyncDisposable
         return _reset.ResetAsync(ct);
     }
 
+    /// <summary>Removes the container, unless <c>TESTCONTAINERS_REUSE</c> keeps it for the next run.</summary>
     public async ValueTask DisposeAsync()
     {
         if (_engine is not null)

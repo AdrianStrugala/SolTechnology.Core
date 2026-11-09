@@ -9,6 +9,7 @@
 		<AssemblyName>SolTechnology.Core.SQL.Testing</AssemblyName>
 
 		<PackageReadmeSource>SQL.Testing.md</PackageReadmeSource>
+		<GenerateDocumentationFile>true</GenerateDocumentationFile>
 	</PropertyGroup>
 
 	<ItemGroup>

@@ -3,6 +3,11 @@ using SolTechnology.Core.HTTP.Testing.Faker;
 
 namespace SolTechnology.Core.HTTP.Testing
 {
+    /// <summary>
+    /// Test fixture around <see cref="WireMockStartup"/>: starts a fake HTTP server on a dynamic port, registers fake
+    /// APIs and arranges their responses. Start it in <c>[OneTimeSetUp]</c>, call <see cref="Reset"/> between tests,
+    /// and dispose it at the end. Requests must match every matcher of a stub; anything else gets 404.
+    /// </summary>
     public class WireMockFixture : IDisposable, IAsyncDisposable
     {
         private WireMockStartup? _wireMockStartup;
@@ -32,9 +37,11 @@ namespace SolTechnology.Core.HTTP.Testing
             return _wireMockStartup;
         }
 
+        /// <summary>Attaches <paramref name="fakeApi"/> to the server so <see cref="Fake{T}"/> can arrange it.</summary>
         public void RegisterFakeApi(IFakeApi fakeApi) =>
             Startup.RegisterFakeApi(fakeApi);
 
+        /// <summary>Starts arranging a stub on the registered fake that implements the client interface <typeparamref name="T"/>.</summary>
         public IFakeApiBuilderWithRequest<T> Fake<T>() where T : class =>
             Startup.GetFakeApi<T>();
 
@@ -54,6 +61,7 @@ namespace SolTechnology.Core.HTTP.Testing
             }
         }
 
+        /// <summary>Stops the server; same as <see cref="Dispose"/>.</summary>
         public ValueTask DisposeAsync()
         {
             Dispose();

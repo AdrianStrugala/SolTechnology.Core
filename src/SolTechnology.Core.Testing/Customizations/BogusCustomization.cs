@@ -22,6 +22,7 @@ namespace SolTechnology.Core.Testing.Customizations;
 /// </remarks>
 public sealed class BogusCustomization : ICustomization
 {
+    /// <summary>Puts the Bogus string generator in front of the fixture's other customizations.</summary>
     public void Customize(IFixture fixture)
     {
         ArgumentNullException.ThrowIfNull(fixture);

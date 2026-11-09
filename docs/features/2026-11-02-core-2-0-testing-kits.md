@@ -177,5 +177,6 @@ retrospective promotes them):
   The CI criterion waits for a push.
 - Step 03: only the `C-23` and `C-24` members changed; internal `Async` names in SQL.Testing stay, `Flush` gains no
   token, and `WireMockServer` has a private setter for `Run`. The Azurite 3.37.0 pin is unchanged.
+- Step 04: forwarding members of `JsonResponseBuilderDecorator` and interface implementations use `<inheritdoc />`.
 
 ## Follow-ups

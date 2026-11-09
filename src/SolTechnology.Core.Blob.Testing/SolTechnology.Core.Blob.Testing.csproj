@@ -9,6 +9,7 @@
 		<AssemblyName>SolTechnology.Core.Blob.Testing</AssemblyName>
 
 		<PackageReadmeSource>Blob.Testing.md</PackageReadmeSource>
+		<GenerateDocumentationFile>true</GenerateDocumentationFile>
 	</PropertyGroup>
 
 	<ItemGroup>

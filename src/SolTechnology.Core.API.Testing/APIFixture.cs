@@ -20,11 +20,16 @@ namespace SolTechnology.Core.API.Testing
         private readonly WebApplicationFactory<TEntryPoint> _factory = new();
         private bool _disposed;
 
+        /// <summary>The in-memory server that hosts the application under test.</summary>
         public TestServer TestServer { get; }
 
+        /// <summary>A client whose requests go straight to <see cref="TestServer"/>.</summary>
         public HttpClient ServerClient { get; }
 
 
+        /// <summary>Boots the application of <typeparamref name="TEntryPoint"/> in memory.</summary>
+        /// <param name="configuration">Configuration whose values override the application's settings, e.g. from <see cref="TestConfigurationBuilder"/>.</param>
+        /// <param name="configureServices">Runs after the application's service registrations, e.g. to replace a dependency.</param>
         public APIFixture(IConfiguration? configuration = null, Action<IServiceCollection>? configureServices = null)
         {
             var webAppFactory = _factory
