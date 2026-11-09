@@ -114,7 +114,7 @@ The receiver settles every message itself:
 | Empty body | Dead-lettered, reason `EmptyBody` |
 | Body is not JSON of the message type | Dead-lettered, reason `DeserializationFailed` |
 | Body deserializes to `null` | Dead-lettered, reason `NullPayload` |
-| Host stops while `Handle` runs | Not settled by the receiver; the message is delivered again |
+| Host stops while `Handle` runs | `cancellationToken` is cancelled; if `Handle` still returns, the message is completed, and if it throws, the message is delivered again |
 
 #### Running several instances
 
