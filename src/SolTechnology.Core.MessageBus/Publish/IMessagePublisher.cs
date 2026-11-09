@@ -1,5 +1,9 @@
 ﻿﻿namespace SolTechnology.Core.MessageBus.Publish;
 
+/// <summary>
+/// Publishes messages to the queues and topics registered with <c>WithQueuePublisher</c> and
+/// <c>WithTopicPublisher</c>. Registered as a singleton by <c>AddSolMessageBus</c>.
+/// </summary>
 public interface IMessagePublisher
 {
     /// <summary>

@@ -7,6 +7,7 @@
 <PackageId>SolTechnology.Core.MessageBus</PackageId>
 <AssemblyName>SolTechnology.Core.MessageBus</AssemblyName>
 <PackageReadmeSource>Bus.md</PackageReadmeSource>
+<GenerateDocumentationFile>true</GenerateDocumentationFile>
 </PropertyGroup>
 <ItemGroup>
 <InternalsVisibleTo Include="SolTechnology.Core.MessageBus.Tests" />

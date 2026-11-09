@@ -11,8 +11,16 @@ using SolTechnology.Core.MessageBus.Receive;
 
 namespace SolTechnology.Core.MessageBus
 {
+    /// <summary>
+    /// Registers the Service Bus message bus: the publisher, the receiver hosted service, and the queue and topic endpoints.
+    /// </summary>
     public static class ModuleInstaller
     {
+        /// <summary>
+        /// Registers <see cref="IMessagePublisher"/>, the receiver hosted service, and a dedicated <c>ServiceBusClient</c>
+        /// built from <paramref name="messageBusConfiguration"/>. Chain <c>WithQueue*</c> and <c>WithTopic*</c> to add endpoints.
+        /// </summary>
+        /// <exception cref="ArgumentNullException"><paramref name="messageBusConfiguration"/> is <c>null</c>.</exception>
         public static IServiceCollection AddSolMessageBus(
             this IServiceCollection services,
             MessageBusConfiguration messageBusConfiguration)
@@ -59,6 +67,7 @@ namespace SolTechnology.Core.MessageBus
         }
 
         // ---- TOPIC ----
+        /// <summary>Publishes <typeparamref name="TMessage"/> to the topic <paramref name="topicName"/>.</summary>
         public static IServiceCollection WithTopicPublisher<TMessage>(
             this IServiceCollection services,
             string topicName) where TMessage : IMessage
@@ -71,6 +80,10 @@ namespace SolTechnology.Core.MessageBus
             return services;
         }
 
+        /// <summary>
+        /// Receives <typeparamref name="TMessage"/> from <paramref name="subscriptionName"/> on <paramref name="topicName"/>
+        /// and registers <typeparamref name="THandler"/> as its scoped handler. Instances that share the subscription compete for messages.
+        /// </summary>
         public static IServiceCollection WithTopicReceiver<TMessage, THandler>(
             this IServiceCollection services,
             string topicName,
@@ -89,6 +102,11 @@ namespace SolTechnology.Core.MessageBus
         }
 
         // ---- QUEUE ----
+        /// <summary>
+        /// Publishes <typeparamref name="TMessage"/> to <paramref name="queueName"/>, or to the queue configured for it in
+        /// <see cref="MessageBusConfiguration.Queues"/> when the name is omitted.
+        /// </summary>
+        /// <exception cref="ArgumentException">No queue name is given or configured for <typeparamref name="TMessage"/>.</exception>
         public static IServiceCollection WithQueuePublisher<TMessage>(
             this IServiceCollection services,
             string? queueName = null) where TMessage : IMessage
@@ -101,6 +119,11 @@ namespace SolTechnology.Core.MessageBus
             return services;
         }
 
+        /// <summary>
+        /// Receives <typeparamref name="TMessage"/> from <paramref name="queueName"/>, or from the queue configured for it in
+        /// <see cref="MessageBusConfiguration.Queues"/>, and registers <typeparamref name="THandler"/> as its scoped handler.
+        /// </summary>
+        /// <exception cref="ArgumentException">No queue name is given or configured for <typeparamref name="TMessage"/>.</exception>
         public static IServiceCollection WithQueueReceiver<TMessage, THandler>(
             this IServiceCollection services,
             string? queueName = null)

@@ -23,7 +23,7 @@ are `done` and after these library features are `completed`: `logging`. No step 
 | 02 | MessageBus — resolvable broker, registered health-check client, correlation service | [`steps/02-messagebus-resolvable-broker-and-health-check.md`](steps/02-messagebus-resolvable-broker-and-health-check.md) | done |
 | 03 | MessageBus — receiver settlement matches its contract; publish→receive round-trip | [`steps/03-messagebus-receiver-settlement.md`](steps/03-messagebus-receiver-settlement.md) | done |
 | 04 | MessageBus — internal implementation types | [`steps/04-messagebus-internal-implementations.md`](steps/04-messagebus-internal-implementations.md) | done |
-| 05 | XML docs shipped — MessageBus | [`steps/05-xml-docs.md`](steps/05-xml-docs.md) | to-do |
+| 05 | XML docs shipped — MessageBus | [`steps/05-xml-docs.md`](steps/05-xml-docs.md) | done |
 | 06 | Module docs — `docs/Bus.md` | [`steps/06-docs-bus.md`](steps/06-docs-bus.md) | to-do |
 | 07 | Guide conformance — MessageBus | [`steps/07-conform-messagebus.md`](steps/07-conform-messagebus.md) | to-do |
 | 08 | Log templates — `[{Placeholder}]` in MessageBus (L-03) | [`steps/08-log-template-brackets.md`](steps/08-log-template-brackets.md) | to-do |

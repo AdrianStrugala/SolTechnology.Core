@@ -2,15 +2,20 @@
 
 namespace SolTechnology.Core.MessageBus.Configuration
 {
+    /// <summary>
+    /// Settings for <c>AddSolMessageBus</c>. Validated at host start: <see cref="ConnectionString"/> must not be
+    /// empty and <see cref="MaxDeliveryCount"/> must be greater than zero.
+    /// </summary>
     public class MessageBusConfiguration
     {
-        /// <summary>Service Bus connection string. Provide this OR rely on Managed Identity (future).</summary>
+        /// <summary>Service Bus connection string. Required; an empty or whitespace value stops the host at start.</summary>
         public string ConnectionString { get; set; } = string.Empty;
 
         /// <summary>
         /// When <c>true</c>, missing queues / topics / subscriptions are created at startup using
         /// <c>ServiceBusAdministrationClient</c>. Requires the <i>Manage</i> claim — not recommended
-        /// in production. Defaults to <c>false</c> (provision via IaC instead).
+        /// in production. Defaults to <c>false</c> (provision via IaC instead). An entity that another instance
+        /// creates at the same time is treated as created.
         /// </summary>
         public bool CreateResources { get; set; }
 
@@ -33,6 +38,7 @@ namespace SolTechnology.Core.MessageBus.Configuration
         /// <summary>Optional retry options applied to the underlying <c>ServiceBusClient</c>.</summary>
         public ServiceBusRetryOptions? RetryOptions { get; set; }
 
+        /// <summary>Queue names per message type, used when a queue publisher or receiver is registered without a name.</summary>
         public List<QueueConfiguration> Queues { get; set; } = new();
     }
 }
