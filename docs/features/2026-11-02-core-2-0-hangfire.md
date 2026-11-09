@@ -195,3 +195,25 @@ retrospective promotes them):
   shows only the compiler-generated `extension` marker types.
 
 ## Follow-ups
+
+## Code review fixes (2026-11-09)
+
+An independent code review of `c91b4820..32e39c89` found six issues; each was fixed with the user's decision, in its
+own commit. Rows: `C-32`, P-06 (amended), `P-26`, `P-27`; release-notes inputs are in the core brief's
+"Release-notes inputs" section. Step 08 (retrospective) has not run.
+
+| # | Finding | Fix | Commit | Test |
+|---|---|---|---|---|
+| 1 | High. Hangfire.SqlServer keeps `recurring-job:<id>` in an `nvarchar(100)` key, so a default id over 86 characters (the 96-character generic test job) stopped the host with "String or binary data would be truncated". | A default id that does not fit is `Type.Name` (truncated to 73) + `-` + 12 hex characters of the full name's SHA-256; an explicit `jobId` over 86 characters throws `ArgumentException` naming the limit; the tracked-set key is bounded to 100 the same way. P-06 amended; `Hangfire.md` states the limit. | `7a7af4f5` | `RecurringJobSqlServerTests.AddSolRecurringJob_LongGenericTypeName_RegistersOnSqlServer` (SQL Server through `SQLFixture`) fails with the truncation error without the fix; `StorageKeyTests`, `AddSolRecurringJob_JobIdLongerThan86_ThrowsNamingTheLimit`, `Registrar_Legacy1xIdOfLongGenericJob_IsRemovedOnStart`. |
+| 2 | Medium. Stale-id removal deleted the jobs that other instances of the same application still registered (feature flags), and two applications sharing a job type from one package deleted each other's entry. | Opt-in `RecurringJobsOptions.RemoveStaleRecurringJobs` (default `false`, `C-32`) through `services.Configure<RecurringJobsOptions>`; 1.x legacy removal stays always on. `Hangfire.md` describes both cases. | `cb2ca18a` | `Registrar_RemovedJobWithoutOptIn_IsKept`; the removal and shared-storage tests run with the option on. |
+| 3 | Medium. The unconditional `ThrowIfCancellationRequested` after dispatch requeued event jobs whose handlers had all finished, so every deploy re-ran them. | Throw removed. CQRS's `EventDispatcher` rethrows an `OperationCanceledException` when the dispatch's token is cancelled and calls no further handler; other exceptions are still logged and swallowed (`P-26`). `architecture/cqrs.md`, `IEventDispatcher` and `IEventHandler` docs updated. | `8c552819` | `EventDispatcherCancellationTests` (CQRS, 3 tests) and `HangfireEventShutdownTests` (finished dispatch succeeds; interrupted dispatch throws `OperationCanceledException` so Hangfire requeues, and the next handler is not called). |
+| 4 | Low. `CorrelationIdJobFilter` passed `null` to the non-nullable `ICorrelationIdService.Set`. | `ICorrelationIdService` (Logging) gains `Clear()` (`P-27`); the built-in service and three test fakes implement it; the filter calls it. `Log.md` lists it. | `87d0939b` | `CorrelationIdServiceTests.Clear_RemovesAmbientCorrelation`, `CorrelationIdJobFilterTests.OnPerformed_NoPreviousAmbientId_ClearsIt`. |
+| 5 | Low. Smart Retry was silently off without `UseSolFilters`. | The registrar warns at start (EventId 2151) when recurring jobs are registered and `GlobalJobFilters` holds no `SmartRetryJobFilter`; the module's four start-up logs use source-generated messages with EventIds 2150–2153; `Hangfire.md` has a Start-up logs table. No L-row: the logs are new in 2.0. | `e8fc68bf` | `Registrar_WithoutSmartRetryFilter_LogsWarning`, `Registrar_WithSmartRetryFilter_LogsNoSmartRetryWarning`; the overlap warning test also checks EventId 2150. |
+| 6 | Low. Docs did not say that removing the last `AddSolRecurringJob` call leaves old entries, or that 2.x event jobs must be drained before a rollback to 1.x. | `Hangfire.md` (Job ids and Upgrading tables) and the release notes cover both. | `222be430` | — |
+
+Verification after the fixes: `dotnet build SolTechnology.Core.slnx -c Release` reports 0 errors and no NU190x/NU1605;
+its warnings are pre-existing (CA2022 in `LoggingMiddlewareBodyBufferingTests`, CS0105 in Tale tests, the DreamTravel
+sample). All seven C# blocks of `Hangfire.md` compile in a throwaway project. `dotnet test SolTechnology.Core.slnx
+-c Release`: 917 passed, 11 skipped (DreamTravel geolocation), 0 failed — the 901 baseline plus 12 Hangfire, 3 CQRS
+and 1 Logging tests.
+
