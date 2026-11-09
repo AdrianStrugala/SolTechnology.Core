@@ -1,7 +1,8 @@
 using System.Collections.Concurrent;
-using Docker.DotNet;
-using Docker.DotNet.Models;
+using DotNet.Testcontainers.Builders;
+using DotNet.Testcontainers.Networks;
 using SolTechnology.Core.Testing.Containers;
+using Testcontainers.MsSql;
 using Testcontainers.ServiceBus;
 
 namespace SolTechnology.Core.ServiceBus.Testing;
@@ -12,15 +13,15 @@ namespace SolTechnology.Core.ServiceBus.Testing;
 /// </summary>
 /// <remarks>
 /// <para>
-/// The emulator persists its state in SQL Server; <c>Testcontainers.ServiceBus</c> provisions and manages
-/// that MSSQL sidecar internally (you must not wire your own — see <see cref="ServiceBusInstanceBuilder"/>).
+/// The emulator persists its state in SQL Server. The fixture creates that MSSQL sidecar and the network
+/// they share, passes them to <c>Testcontainers.ServiceBus</c>, and removes all three in
+/// <see cref="DisposeAsync"/>; disposing the emulator container alone would leave the sidecar running.
 /// </para>
 /// <para>
-/// When <see cref="TestContainersContext.ReuseContainers"/> is enabled, the fixture manages the
-/// container manually via Docker.DotNet using a well-known name. This avoids Testcontainers' reuse hash,
-/// which is unstable here because the emulator references its MSSQL sidecar. On first run it creates the
-/// container via Testcontainers with a fixed name; on subsequent runs it detects the existing container by
-/// name, starts it if stopped, and re-reads the mapped port to rebuild the connection string.
+/// Each instance owns its state: two fixtures with the same name do not share a connection string, and
+/// disposing one does not break the other. When <see cref="TestContainersContext.ReuseContainers"/> is
+/// enabled, the emulator, sidecar and network get well-known names and stay between runs; a later run finds
+/// them by name, starts them if stopped, and re-reads the mapped port to rebuild the connection string.
 /// </para>
 /// <para>
 /// Readiness is gated on <see cref="ContainerLifecycleHelper.WaitForAmqpReadyAsync"/> — a TCP-accept alone
@@ -29,14 +30,18 @@ namespace SolTechnology.Core.ServiceBus.Testing;
 /// </remarks>
 public sealed class ServiceBusFixture : IAsyncDisposable
 {
+    // Reuse mode pins one Docker container per name, so fixtures sharing a name start it one at a time.
     private static readonly ConcurrentDictionary<string, SemaphoreSlim> Semaphores = new();
-    private static readonly ConcurrentDictionary<string, string> ConnectionStrings = new();
-    private static readonly ConcurrentDictionary<string, bool> InitializedInstances = new();
 
     private const int ServiceBusPort = 5672;
+    private const string DatabaseImage = "mcr.microsoft.com/mssql/server:2022-CU14-ubuntu-22.04";
+    private const string DatabaseNetworkAlias = "database-container";
 
     private readonly string? _configFilePath;
     private readonly string _containerName;
+    private string? _connectionString;
+    private MsSqlContainer? _database;
+    private INetwork? _network;
 
     /// <summary>The Testcontainers-managed container (only set when created fresh; null when reused by name).</summary>
     public ServiceBusContainer? Container { get; private set; }
@@ -54,62 +59,35 @@ public sealed class ServiceBusFixture : IAsyncDisposable
     }
 
     /// <summary>The emulator connection string, whether the container was created fresh or reused.</summary>
-    public string ConnectionString =>
-        ConnectionStrings.TryGetValue(_containerName, out var cs) ? cs
-        : Container?.GetConnectionString()
+    public string ConnectionString => _connectionString
         ?? throw new InvalidOperationException("ServiceBusFixture not initialized. Call InitializeAsync first.");
 
     public async Task InitializeAsync()
     {
+        var ct = CancellationToken.None;
         var semaphore = Semaphores.GetOrAdd(_containerName, _ => new SemaphoreSlim(1, 1));
-        await semaphore.WaitAsync().ConfigureAwait(false);
+        await semaphore.WaitAsync(ct).ConfigureAwait(false);
         try
         {
-            if (InitializedInstances.TryGetValue(_containerName, out var initialized) && initialized)
+            if (_connectionString is not null)
             {
-                // Already initialized this run. The container may have been stopped externally
-                // (e.g. via Docker Desktop) — make sure it is running again.
-                if (Container != null)
-                {
-                    await ContainerLifecycleHelper.EnsureRunningAsync(Container.Id).ConfigureAwait(false);
-                }
-                else if (TestContainersContext.ReuseContainers)
-                {
-                    await TryReuseExistingContainer().ConfigureAwait(false);
-                }
-
+                // Already initialized; the container may have been stopped externally (e.g. via Docker Desktop).
+                await EnsureRunning(ct).ConfigureAwait(false);
                 return;
             }
 
-            if (TestContainersContext.ReuseContainers && await TryReuseExistingContainer().ConfigureAwait(false))
-            {
-                InitializedInstances[_containerName] = true;
-                return;
-            }
-
-            // Remove a stale container with our name before creating a new one.
             if (TestContainersContext.ReuseContainers)
             {
-                await RemoveContainerByName().ConfigureAwait(false);
+                _connectionString = await ReusedEmulator.TryReuse(_containerName, ServiceBusPort, ct).ConfigureAwait(false);
+                if (_connectionString is not null)
+                {
+                    return;
+                }
+
+                await ReusedEmulator.Remove(_containerName, ct).ConfigureAwait(false);
             }
 
-            var builder = ServiceBusInstanceBuilder.CreateBuilder(_configFilePath);
-
-            // Only pin the name when reusing across runs.
-            if (TestContainersContext.ReuseContainers)
-            {
-                builder = builder.WithName(_containerName);
-            }
-
-            Container = builder.Build();
-            await Container.StartAsync().ConfigureAwait(false);
-
-            // Testcontainers' built-in wait only confirms the TCP port is open. Gate on the AMQP probe.
-            var amqpPort = Container.GetMappedPublicPort(ServiceBusPort);
-            await ContainerLifecycleHelper.WaitForAmqpReadyAsync(amqpPort).ConfigureAwait(false);
-
-            ConnectionStrings[_containerName] = Container.GetConnectionString();
-            InitializedInstances[_containerName] = true;
+            await StartEmulator(ct).ConfigureAwait(false);
         }
         finally
         {
@@ -117,114 +95,85 @@ public sealed class ServiceBusFixture : IAsyncDisposable
         }
     }
 
+    /// <summary>Removes the emulator, its MSSQL sidecar and their network; keeps them when reuse is enabled.</summary>
     public async ValueTask DisposeAsync()
     {
-        if (!TestContainersContext.ReuseContainers && Container != null)
+        if (TestContainersContext.ReuseContainers)
+        {
+            return;
+        }
+
+        _connectionString = null;
+        if (Container is not null)
         {
             await Container.DisposeAsync().ConfigureAwait(false);
+            Container = null;
+        }
+
+        if (_database is not null)
+        {
+            await _database.DisposeAsync().ConfigureAwait(false);
+            _database = null;
+        }
+
+        if (_network is not null)
+        {
+            // Without Ryuk (TESTCONTAINERS_RYUK_DISABLED) DisposeAsync keeps the network; delete it explicitly.
+            await _network.DeleteAsync().ConfigureAwait(false);
+            await _network.DisposeAsync().ConfigureAwait(false);
+            _network = null;
         }
     }
 
-    /// <summary>Finds and reuses an existing emulator container from a previous run by its well-known name.</summary>
-    private async Task<bool> TryReuseExistingContainer()
+    private async Task StartEmulator(CancellationToken ct)
     {
+        var reuse = TestContainersContext.ReuseContainers;
+        var networkBuilder = new NetworkBuilder().WithCleanUp(!reuse);
+        // AutoRemove deletes the sidecar on stop even when Ryuk is disabled, like the emulator itself.
+        var databaseBuilder = new MsSqlBuilder(DatabaseImage).WithCleanUp(!reuse).WithAutoRemove(!reuse);
+        if (reuse)
+        {
+            networkBuilder = networkBuilder.WithName(ReusedEmulator.NetworkName(_containerName));
+            databaseBuilder = databaseBuilder.WithName(ReusedEmulator.DatabaseName(_containerName));
+        }
+
+        _network = networkBuilder.Build();
+        _database = databaseBuilder.WithNetwork(_network).WithNetworkAliases(DatabaseNetworkAlias).Build();
+
+        var builder = ServiceBusInstanceBuilder.CreateBuilder(_configFilePath)
+            .WithMsSqlContainer(_network, _database, DatabaseNetworkAlias);
+        Container = (reuse ? builder.WithName(_containerName) : builder).Build();
+
         try
         {
-            using var docker = new DockerClientBuilder().Build();
-            var containers = await docker.Containers.ListContainersAsync(new ContainersListParameters
-            {
-                All = true,
-                Filters = new Dictionary<string, IDictionary<string, bool>>
-                {
-                    ["name"] = new Dictionary<string, bool> { [$"^/{_containerName}$"] = true }
-                }
-            }).ConfigureAwait(false);
+            await Container.StartAsync(ct).ConfigureAwait(false);
 
-            if (containers.Count == 0)
-            {
-                return false;
-            }
-
-            var existing = containers[0];
-
-            if (!existing.State.Equals("running", StringComparison.OrdinalIgnoreCase))
-            {
-                await docker.Containers.StartContainerAsync(existing.ID, new ContainerStartParameters()).ConfigureAwait(false);
-                await ContainerLifecycleHelper.EnsureRunningAsync(existing.ID).ConfigureAwait(false);
-            }
-
-            var hostPort = GetMappedPort(existing.Ports, ServiceBusPort);
-            if (hostPort == null)
-            {
-                var inspected = await docker.Containers.InspectContainerAsync(existing.ID).ConfigureAwait(false);
-                hostPort = GetMappedPortFromInspect(inspected, ServiceBusPort);
-            }
-
-            if (hostPort == null)
-            {
-                return false;
-            }
-
-            // Gate the reused container on AMQP readiness too — it may have just been restarted.
-            await ContainerLifecycleHelper.WaitForAmqpReadyAsync(hostPort.Value).ConfigureAwait(false);
-
-            ConnectionStrings[_containerName] = BuildConnectionString(hostPort.Value);
-            return true;
+            // Testcontainers' built-in wait only confirms the TCP port is open. Gate on the AMQP probe.
+            await ContainerLifecycleHelper.WaitForAmqpReadyAsync(Container.GetMappedPublicPort(ServiceBusPort)).ConfigureAwait(false);
+            _connectionString = Container.GetConnectionString();
         }
-        catch (Exception ex)
+        catch
         {
-            Console.WriteLine($"[ServiceBusFixture] Error trying to reuse container '{_containerName}': {ex.Message}");
-            return false;
+            await DisposeAsync().ConfigureAwait(false);
+            throw;
         }
     }
 
-    private async Task RemoveContainerByName()
+    private async Task EnsureRunning(CancellationToken ct)
     {
-        try
+        if (Container is not null)
         {
-            using var docker = new DockerClientBuilder().Build();
-            var containers = await docker.Containers.ListContainersAsync(new ContainersListParameters
+            if (_database is not null)
             {
-                All = true,
-                Filters = new Dictionary<string, IDictionary<string, bool>>
-                {
-                    ["name"] = new Dictionary<string, bool> { [$"^/{_containerName}$"] = true }
-                }
-            }).ConfigureAwait(false);
-
-            foreach (var container in containers)
-            {
-                await docker.Containers.StopContainerAsync(container.ID,
-                    new ContainerStopParameters { WaitBeforeKillSeconds = 0 }).ConfigureAwait(false);
-                await docker.Containers.RemoveContainerAsync(container.ID,
-                    new ContainerRemoveParameters { Force = true }).ConfigureAwait(false);
+                await ContainerLifecycleHelper.EnsureRunningAsync(_database.Id, ct).ConfigureAwait(false);
             }
+
+            await ContainerLifecycleHelper.EnsureRunningAsync(Container.Id, ct).ConfigureAwait(false);
         }
-        catch (Exception ex)
+        else if (TestContainersContext.ReuseContainers)
         {
-            Console.WriteLine($"[ServiceBusFixture] Failed to remove container '{_containerName}' by name: {ex.Message}");
+            _connectionString = await ReusedEmulator.TryReuse(_containerName, ServiceBusPort, ct).ConfigureAwait(false)
+                ?? _connectionString;
         }
     }
-
-    private static ushort? GetMappedPort(IList<PortSummary> ports, int containerPort)
-    {
-        var mapping = ports.FirstOrDefault(p => p.PrivatePort == containerPort && p.PublicPort > 0);
-        return mapping?.PublicPort;
-    }
-
-    private static ushort? GetMappedPortFromInspect(ContainerInspectResponse inspect, int containerPort)
-    {
-        var key = $"{containerPort}/tcp";
-        if (inspect.NetworkSettings?.Ports == null || !inspect.NetworkSettings.Ports.TryGetValue(key, out var bindings))
-        {
-            return null;
-        }
-
-        var binding = bindings?.FirstOrDefault(b => !string.IsNullOrEmpty(b.HostPort));
-        return binding == null ? null : ushort.Parse(binding.HostPort);
-    }
-
-    private static string BuildConnectionString(ushort hostPort) =>
-        $"Endpoint=sb://localhost:{hostPort};SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=SAS_KEY_VALUE;UseDevelopmentEmulator=true;";
 }
-

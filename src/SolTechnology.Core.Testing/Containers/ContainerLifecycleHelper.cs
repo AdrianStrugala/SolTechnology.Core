@@ -7,7 +7,7 @@ namespace SolTechnology.Core.Testing.Containers;
 /// <summary>
 /// Keeps reused containers healthy and provides protocol-level readiness probes. When
 /// <see cref="TestContainersContext.ReuseContainers"/> is enabled a container may have been stopped
-/// externally (e.g. via Docker Desktop) while a fixture's static "initialized" flag is still set;
+/// externally (e.g. via Docker Desktop) while a fixture still considers itself initialized;
 /// these helpers restart it and wait until it is genuinely ready to accept connections.
 /// </summary>
 public static class ContainerLifecycleHelper

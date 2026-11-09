@@ -60,6 +60,8 @@ Behavioural and persisted-contract breaks:
 | ID | Change | Consumer impact | Step |
 |---|---|---|---|
 | P-11 | `WireMockStartup` `AllowPartialMapping` defaults to `false` | Loose tests start failing (intended) | testing-kits 01 |
+| P-28 | The kits no longer disable Ryuk; it follows the Testcontainers settings (on by default) | Disposed containers are removed, not only stopped; ECI users set `TESTCONTAINERS_RYUK_DISABLED=true` | testing-kits 02 (added during implementation) |
+| P-29 | `ServiceBusFixture` state per instance; the fixture owns and removes the MSSQL sidecar and network | Same-name fixtures no longer share an emulator; no sidecar left after dispose | testing-kits 02 (added during implementation) |
 
 User decisions (2026-11-02):
 
@@ -167,5 +169,11 @@ retrospective promotes them):
   `WireMockStartupTests`, which pins P-11. Strict matching exposed DreamTravel's distance-matrix stubs: WireMock splits
   query values on commas, so they never fully matched; the stubs now match the split values. The disposal test boots
   its own `DisposalTestEntryPoint` (API.Tests sets `GenerateProgramFile=false`).
+- Step 02: all `ServiceBusFixture` state is per instance (only a per-name start lock stays static), and the fixture
+  builds, owns and removes the emulator's MSSQL sidecar and network (messagebus follow-up), also with Ryuk off. Deleting
+  the Ryuk override turned out to matter for every fixture: with Ryuk off Testcontainers only stops a disposed
+  container. New rows `P-28` (Ryuk on by default) and `P-29` (`ServiceBusFixture` per instance, owned sidecar). The
+  Docker.DotNet reuse helpers move into the internal `ReusedEmulator`; `docs/ServiceBus.Testing.md` is corrected here.
+  The CI criterion waits for a push.
 
 ## Follow-ups

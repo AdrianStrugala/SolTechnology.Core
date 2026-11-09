@@ -1,5 +1,4 @@
 using DotNet.Testcontainers.Builders;
-using DotNet.Testcontainers.Configurations;
 using DotNet.Testcontainers.Networks;
 
 namespace SolTechnology.Core.Testing.Containers;
@@ -12,8 +11,9 @@ namespace SolTechnology.Core.Testing.Containers;
 /// <remarks>
 /// When reuse is enabled, containers are kept alive between runs to cut repeated boot cost; the
 /// network is named and reusable, and <see cref="DisposeAsync"/> is a no-op. Ryuk (the resource
-/// reaper) is disabled so the suite runs under Docker Desktop Enhanced Container Isolation (ECI),
-/// which blocks the <c>testcontainers/ryuk</c> image.
+/// reaper) follows the Testcontainers settings: it is on by default, so an aborted run's containers are
+/// removed, and <c>TESTCONTAINERS_RYUK_DISABLED=true</c> turns it off, for example under Docker Desktop
+/// Enhanced Container Isolation (ECI), which blocks the <c>testcontainers/ryuk</c> image.
 /// </remarks>
 public sealed class TestContainersContext : IAsyncDisposable
 {
@@ -29,13 +29,6 @@ public sealed class TestContainersContext : IAsyncDisposable
 
     /// <summary>Stable network alias used by inter-container references.</summary>
     public string NetworkAlias { get; } = "soltech-test-network";
-
-    static TestContainersContext()
-    {
-        // Disable Ryuk to allow running under Docker Desktop Enhanced Container Isolation (ECI),
-        // which blocks the testcontainers/ryuk image.
-        TestcontainersSettings.ResourceReaperEnabled = false;
-    }
 
     public async ValueTask DisposeAsync()
     {

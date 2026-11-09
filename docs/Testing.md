@@ -51,9 +51,19 @@ needed.
 **Across runs (local iteration speed-up):** set `TESTCONTAINERS_REUSE=true` (env var or `.runsettings`).
 `TestContainersContext` then builds the network/containers with Testcontainers' native
 `.WithReuse(true)` + stable names, so a re-run finds the still-running container instead of paying the
-boot cost again; dispose becomes a no-op. Default is **off** so CI stays hermetic. Ryuk is disabled to
-run under Docker Desktop Enhanced Container Isolation. `ContainerLifecycleHelper.EnsureRunningAsync`
-restarts a reused container that was stopped externally (e.g. by Docker Desktop) between runs.
+boot cost again; dispose becomes a no-op. Default is **off** so CI stays hermetic.
+`ContainerLifecycleHelper.EnsureRunningAsync` restarts a reused container that was stopped externally
+(e.g. by Docker Desktop) between runs.
+
+## Ryuk (resource reaper)
+
+The fixtures leave Ryuk to the Testcontainers settings. It is **on** by default: disposing a fixture removes
+its containers, and Ryuk removes the containers of a run that was aborted before disposal. Docker Desktop
+Enhanced Container Isolation (ECI) blocks the `testcontainers/ryuk` image; there, set
+`TESTCONTAINERS_RYUK_DISABLED=true` (env var or `.runsettings`). With Ryuk off, Testcontainers only stops a
+disposed container, so stopped SQL, Redis and Azurite containers stay until you remove them
+(`docker container prune --filter label=org.testcontainers=true`); `ServiceBusFixture` still removes its
+emulator, its MSSQL sidecar and their network.
 
 ## Mocking library
 
