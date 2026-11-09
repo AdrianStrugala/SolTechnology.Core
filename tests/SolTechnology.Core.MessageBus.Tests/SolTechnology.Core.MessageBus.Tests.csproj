@@ -2,6 +2,11 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\SolTechnology.Core.MessageBus\SolTechnology.Core.MessageBus.csproj" />
+    <ProjectReference Include="..\..\src\SolTechnology.Core.ServiceBus.Testing\SolTechnology.Core.ServiceBus.Testing.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="servicebus-emulator-config.json" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
 </Project>

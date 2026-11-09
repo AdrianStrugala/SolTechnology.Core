@@ -1,6 +1,7 @@
 ﻿﻿using Azure.Messaging.ServiceBus;
 using FluentAssertions;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
@@ -37,14 +38,16 @@ public sealed class ModuleInstallerTests
             .AddSingleton(typeof(ILogger<>), typeof(NullLogger<>));
 
     [Test]
-    public void AddSolMessageBus_registers_required_services()
+    public void AddSolMessageBus_ValidConfiguration_RegistersRequiredServices()
     {
+        // Act
         var services = BaseServices()
             .AddSolMessageBus(new MessageBusConfiguration
             {
                 ConnectionString = "Endpoint=sb://example.servicebus.windows.net/;SharedAccessKeyName=k;SharedAccessKey=v",
             });
 
+        // Assert
         services.Should().Contain(d => d.ServiceType == typeof(IMessagePublisher));
         services.Should().Contain(d => d.ServiceType == typeof(IMessageBusBroker));
         services.Should().Contain(d =>
@@ -52,8 +55,9 @@ public sealed class ModuleInstallerTests
     }
 
     [Test]
-    public void With_methods_collect_endpoints_into_a_single_registry()
+    public void WithEndpoints_SeveralRegistrations_CollectedInOneRegistry()
     {
+        // Act
         var services = BaseServices()
             .AddSolMessageBus(new MessageBusConfiguration
             {
@@ -64,10 +68,10 @@ public sealed class ModuleInstallerTests
             .WithTopicPublisher<BarMessage>("bar-topic")
             .WithTopicReceiver<BarMessage, BarHandler>("bar-topic", "bar-sub");
 
+        // Assert
         var registry = services
             .Single(d => d.ServiceType == typeof(MessageBusRegistry))
             .ImplementationInstance.Should().BeOfType<MessageBusRegistry>().Subject;
-
         registry.Endpoints.Should().HaveCount(4);
         registry.Endpoints.Should().Contain(e =>
             e.MessageType == typeof(FooMessage) &&
@@ -83,8 +87,9 @@ public sealed class ModuleInstallerTests
     }
 
     [Test]
-    public void WithQueueReceiver_resolves_queue_name_from_configuration_when_omitted()
+    public void WithQueueReceiver_QueueNameOmitted_ResolvedFromConfiguration()
     {
+        // Act
         var services = BaseServices()
             .AddSolMessageBus(new MessageBusConfiguration
             {
@@ -96,34 +101,63 @@ public sealed class ModuleInstallerTests
             })
             .WithQueueReceiver<FooMessage, FooHandler>();
 
+        // Assert
         var registry = services
             .Single(d => d.ServiceType == typeof(MessageBusRegistry))
             .ImplementationInstance as MessageBusRegistry;
-
         registry!.Endpoints.Should().ContainSingle()
             .Which.EntityName.Should().Be("foo-from-config");
     }
 
     [Test]
-    public void WithQueueReceiver_throws_when_queue_name_cannot_be_resolved()
+    public void WithQueueReceiver_QueueNameUnresolvable_Throws()
     {
+        // Arrange
         var services = BaseServices()
             .AddSolMessageBus(new MessageBusConfiguration
             {
                 ConnectionString = "Endpoint=sb://example.servicebus.windows.net/;SharedAccessKeyName=k;SharedAccessKey=v",
             });
 
+        // Act
         var act = () => services.WithQueueReceiver<FooMessage, FooHandler>();
 
+        // Assert
         act.Should().Throw<ArgumentException>()
             .WithMessage("*FooMessage*");
     }
 
     [Test]
-    public void AddSolMessageBus_throws_when_configuration_is_null()
+    public void AddSolMessageBus_NullConfiguration_Throws()
     {
+        // Act
         var act = () => BaseServices().AddSolMessageBus(null!);
+
+        // Assert
         act.Should().Throw<ArgumentNullException>();
+    }
+
+    [TestCase("", 10, "*ConnectionString*")]
+    [TestCase("   ", 10, "*ConnectionString*")]
+    [TestCase(ConnectionString, 0, "*MaxDeliveryCount*")]
+    [TestCase(ConnectionString, -1, "*MaxDeliveryCount*")]
+    public async Task AddSolMessageBus_InvalidOptions_HostStartFails(
+        string connectionString, int maxDeliveryCount, string expectedMessage)
+    {
+        // Arrange
+        var builder = Host.CreateEmptyApplicationBuilder(new HostApplicationBuilderSettings());
+        builder.Services.AddSolMessageBus(new MessageBusConfiguration
+        {
+            ConnectionString = connectionString,
+            MaxDeliveryCount = maxDeliveryCount
+        });
+        using var host = builder.Build();
+
+        // Act
+        var act = () => host.StartAsync();
+
+        // Assert
+        await act.Should().ThrowAsync<OptionsValidationException>().WithMessage(expectedMessage);
     }
 
     [Test]

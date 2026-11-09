@@ -23,6 +23,13 @@ namespace SolTechnology.Core.MessageBus.Configuration
         /// <summary>Number of messages prefetched for each processor. Default 0 (off).</summary>
         public int PrefetchCount { get; set; }
 
+        /// <summary>
+        /// Delivery attempt on which the receiver dead-letters a message whose handler failed, instead of abandoning it.
+        /// Set it to the queue's or subscription's configured <c>MaxDeliveryCount</c>; reading it from the entity would
+        /// need the <i>Manage</i> claim. Must be greater than zero. Default 10, the Service Bus default.
+        /// </summary>
+        public int MaxDeliveryCount { get; set; } = 10;
+
         /// <summary>Optional retry options applied to the underlying <c>ServiceBusClient</c>.</summary>
         public ServiceBusRetryOptions? RetryOptions { get; set; }
 

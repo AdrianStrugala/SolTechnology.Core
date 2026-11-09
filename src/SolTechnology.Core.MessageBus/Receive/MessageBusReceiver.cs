@@ -1,20 +1,24 @@
 ﻿﻿using System.Collections.Concurrent;
+using System.Reflection;
 using System.Text;
 using Azure.Messaging.ServiceBus;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using SolTechnology.Core.Logging.Correlations;
 using SolTechnology.Core.MessageBus.Broker;
+using SolTechnology.Core.MessageBus.Configuration;
 
 namespace SolTechnology.Core.MessageBus.Receive
 {
     /// <summary>
     /// Hosted service that drives every <see cref="ServiceBusProcessor"/> registered
     /// with <c>WithQueueReceiver</c>/<c>WithTopicReceiver</c>. Failures inside a
-    /// handler are caught, logged and either abandoned (transient) or dead-lettered
-    /// (last delivery attempt) — the processor is configured with
+    /// handler are caught, logged and abandoned for retry, or dead-lettered with reason
+    /// <c>HandlerFailedMaxDelivery</c> once the delivery count reaches
+    /// <see cref="MessageBusConfiguration.MaxDeliveryCount"/> — the processor is configured with
     /// <c>AutoCompleteMessages = false</c> so the receiver always owns the lock
     /// settlement decision.
     /// </summary>
@@ -24,6 +28,8 @@ namespace SolTechnology.Core.MessageBus.Receive
         ICorrelationIdService correlationIdService,
         ILogger<MessageBusReceiver> logger) : IHostedService, IAsyncDisposable
     {
+        private const string HandlerFailedMaxDelivery = "HandlerFailedMaxDelivery";
+
         private readonly ConcurrentBag<ServiceBusProcessor> _ownedProcessors = new();
         private readonly ConcurrentDictionary<Type, Func<IServiceProvider, object, CancellationToken, Task>>
             _invokersByType = new();
@@ -140,6 +146,22 @@ namespace SolTechnology.Core.MessageBus.Receive
             {
                 throw;
             }
+            catch (Exception ex) when (deliveryCount >= MaxDeliveryCount())
+            {
+                logger.LogError(ex,
+                    "Handler failure for [{MessageType}] [{MessageId}] (delivery [{DeliveryCount}]) — dead-lettering on the last attempt",
+                    messageType.Name, messageId, deliveryCount);
+                try
+                {
+                    await args.DeadLetterMessageAsync(args.Message, HandlerFailedMaxDelivery, ex.Message,
+                        args.CancellationToken).ConfigureAwait(false);
+                }
+                catch (Exception deadLetterEx)
+                {
+                    logger.LogWarning(deadLetterEx,
+                        "Failed to dead-letter message [{MessageId}]; lock will expire naturally", messageId);
+                }
+            }
             catch (Exception ex)
             {
                 logger.LogError(ex,
@@ -166,19 +188,18 @@ namespace SolTechnology.Core.MessageBus.Receive
             return Task.CompletedTask;
         }
 
-        private static Func<IServiceProvider, object, CancellationToken, Task> BuildInvoker(Type messageType)
-        {
-            var handlerType = typeof(IMessageHandler<>).MakeGenericType(messageType);
-            var handleMethod = handlerType.GetMethod(nameof(IMessageHandler<IMessage>.Handle))
-                ?? throw new InvalidOperationException(
-                    $"Handler {handlerType.FullName} does not expose a Handle method.");
+        private int MaxDeliveryCount() =>
+            serviceProvider.GetRequiredService<IOptions<MessageBusConfiguration>>().Value.MaxDeliveryCount;
 
-            return (sp, message, ct) =>
-            {
-                var handler = sp.GetRequiredService(handlerType);
-                return (Task)handleMethod.Invoke(handler, new[] { message, ct })!;
-            };
-        }
+        private static Func<IServiceProvider, object, CancellationToken, Task> BuildInvoker(Type messageType) =>
+            typeof(MessageBusReceiver)
+                .GetMethod(nameof(InvokeHandler), BindingFlags.NonPublic | BindingFlags.Static)!
+                .MakeGenericMethod(messageType)
+                .CreateDelegate<Func<IServiceProvider, object, CancellationToken, Task>>();
+
+        private static Task InvokeHandler<TMessage>(IServiceProvider serviceProvider, object message, CancellationToken cancellationToken)
+            where TMessage : IMessage =>
+            serviceProvider.GetRequiredService<IMessageHandler<TMessage>>().Handle((TMessage)message, cancellationToken);
 
         public async ValueTask DisposeAsync()
         {

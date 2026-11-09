@@ -54,7 +54,8 @@ Behavioural and persisted-contract breaks:
 
 | ID | Change | Consumer impact | Step |
 |---|---|---|---|
-| P-17 | The receiver dead-letters a failing message when `DeliveryCount >= MessageBusConfiguration.MaxDeliveryCount` (default 10) instead of always abandoning | Set `MaxDeliveryCount` to the entity's value; a lower value dead-letters earlier than the broker would | messagebus 03 |
+| P-17 | The receiver dead-letters a failing message when `DeliveryCount >= MessageBusConfiguration.MaxDeliveryCount` (default 10) instead of always abandoning; the dead-letter reason is `HandlerFailedMaxDelivery` and the description is the handler exception's message (instead of the broker's `MaxDeliveryCountExceeded`) | Set `MaxDeliveryCount` to the entity's value; a lower value dead-letters earlier than the broker would; dead-letter tooling that filters on `MaxDeliveryCountExceeded` must also accept `HandlerFailedMaxDelivery` | messagebus 03 |
+| P-24 | `MessageBusConfiguration.ConnectionString` is validated non-empty and `MessageBusConfiguration.MaxDeliveryCount` greater than zero at start (premortem RM-13) | An empty or whitespace `ConnectionString`, which 1.x reported as `ArgumentException` from the broker constructor, and a `MaxDeliveryCount` of zero or less now stop the host with `OptionsValidationException` | messagebus 03 |
 
 Log contract changes:
 

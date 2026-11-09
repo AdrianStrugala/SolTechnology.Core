@@ -29,7 +29,12 @@ namespace SolTechnology.Core.MessageBus
                     config.MaxConcurrentCalls = messageBusConfiguration.MaxConcurrentCalls;
                     config.PrefetchCount = messageBusConfiguration.PrefetchCount;
                     config.RetryOptions = messageBusConfiguration.RetryOptions;
+                    config.MaxDeliveryCount = messageBusConfiguration.MaxDeliveryCount;
                 })
+                .Validate(o => !string.IsNullOrWhiteSpace(o.ConnectionString),
+                    $"{nameof(MessageBusConfiguration)}.{nameof(MessageBusConfiguration.ConnectionString)} is required.")
+                .Validate(o => o.MaxDeliveryCount > 0,
+                    $"{nameof(MessageBusConfiguration)}.{nameof(MessageBusConfiguration.MaxDeliveryCount)} must be greater than zero.")
                 .ValidateOnStart();
 
             // Registry is a singleton populated synchronously during DI configuration.
