@@ -1,7 +1,7 @@
 ---
 spec: 2026-11-02-flagship-showcase-hygiene
 step: 06
-status: to-do
+status: in-progress
 ---
 
 # Step 06: DreamTravel — run-in-two-minutes README and an honest architecture section

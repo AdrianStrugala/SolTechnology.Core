@@ -7,66 +7,174 @@
 
  That's the original Readme of Dream Travel app, written in ~2016 as part of my master thesis. Feeling old now.
 
+## Run in 2 minutes
+
+### Prerequisites
+
+- .NET 10 SDK (10.0.100 or later).
+- Docker Desktop, running. On Apple silicon turn on "Use Rosetta for x86_64/amd64 emulation" in
+  Docker Desktop's settings: the SQL Server image is amd64 only.
+- Free local ports 1404 (SQL Server), 7474 and 7687 (Neo4j), and 2020/2021 (API).
+- A trusted HTTPS development certificate, once per machine: `dotnet dev-certs https --trust`.
+- Internet access on the first start (container images, NuGet packages, the Neo4j APOC plugin).
+
+There is nothing to configure. The local-only development credentials (the SQL Server password,
+the Neo4j password, and the API key `<SECRET>`) are committed on purpose; they protect nothing but
+containers on your machine.
+
+### Start
+
+```bash
+git clone https://github.com/AdrianStrugala/SolTechnology.Core.git
+cd SolTechnology.Core/sample-tale-code-apps/DreamTravel
+dotnet build src/Infrastructure/DreamTravelDatabase/DreamTravelDatabase.csproj
+dotnet run --project src/DreamTravel.Aspire
+```
+
+The `dotnet build` line writes `artifacts/dacpac/DreamTravelDatabase.dacpac`, which Aspire deploys
+into SQL Server once the container is up. Skip it and the deployment fails, so the API and the
+Worker wait forever. `dotnet run` builds the API, the Worker, and the UI itself.
+
+The first start pulls the SQL Server and Neo4j images and imports the Wrocław street graph, which
+takes a few minutes (longer under amd64 emulation). The containers are persistent, so later starts
+reuse them. The console prints the dashboard link with its login token:
+`Login to the dashboard at https://localhost:17060/login?t=...`.
+
+| What | Where |
+|---|---|
+| Aspire dashboard (resources, logs, traces) | the login link printed to the console |
+| API and Swagger UI | `https://localhost:2021/swagger` (HTTP on 2020 redirects to HTTPS) |
+| Worker: Hangfire dashboard, GraphQL playground | the `dreamtravel-worker` endpoint in the dashboard, then `/hangfire/ui` or `/graphql/ui` |
+| Neo4j browser | `http://localhost:7474` (user `neo4j`, password `neo4jpass`) |
+
+### Smoke test
+
+These two calls need no Google key and return 200:
+
+```bash
+curl -k https://localhost:2021/healthz
+curl -k -H "X-API-KEY: <SECRET>" -H "X-API-VERSION: 2.0" https://localhost:2021/api/statistics/countries
+```
+
+`<SECRET>` is the literal local API key, and `X-API-VERSION` selects the API version (the routes
+carry no version). `-k` skips curl's certificate check for the localhost development certificate.
+
+### Calling Google-backed endpoints (optional, your own key)
+
+`FindCityByName`, `FindCityByCoordinates`, and `CalculateBestPath` call Google. The committed
+configuration points Google at `http://localhost:2137/google/`, which only the component tests'
+WireMock server answers, so these endpoints fail locally until you bring your own Google Maps
+Platform key (Geocoding and Distance Matrix APIs). Set it in the shell that starts Aspire, and
+never commit it:
+
+```bash
+export HTTPClients__Google__BaseAddress=https://maps.googleapis.com/
+export HTTPClients__Google__Options__Key=<your Google key>
+dotnet run --project src/DreamTravel.Aspire
+```
+
+### Known limitations
+
+- **The UI is not aligned with the API yet.** Aspire starts `DreamTravel.Ui`, but the UI still
+  expects `Result` envelopes, calls `/api/v2/...` routes while the API versions by header, uses
+  `https://localhost:2021` as a fixed base URL, and ships `<SECRET>` as its Google Maps key, so its
+  map pages need your own Google Maps key and do not work end to end today. Use Swagger or `curl`
+  instead; the alignment is planned work.
+- Toll costs come from the Michelin API and city search from GeoDB; neither has a key configured
+  locally.
+
+### Running the tests
+
+From this folder (Docker must be running for the component tests):
+
+```bash
+dotnet test tests/Component
+dotnet test tests/Unit/DreamTravel.Queries.UnitTests
+```
+
+The folder has no solution file of its own; the DreamTravel projects are part of the repository's
+`SolTechnology.Core.slnx`.
+
 ## Overview
 
-DreamTravel is a comprehensive full-stack application demonstrating modern .NET architecture, CQRS patterns, and cloud-native design. The application solves the Traveling Salesman Problem (TSP) while providing real-time traffic analysis and route optimization.
+DreamTravel is the reference application for the SolTechnology.Core libraries and the Tale Code
+approach described in the [Coding Guide](../../docs/ClaudeCodingGuide.md). It solves the Traveling
+Salesman Problem with a toll-or-free-road cost trade-off, and it keeps a Neo4j street graph of
+Wrocław for traffic analysis.
 
-### Current Architecture (2025)
+### Technology
 
-**Technology Stack:**
-- **.NET 10.0** - Latest .NET platform
-- **Blazor WebAssembly** - Modern SPA framework
-- **ASP.NET Core** - REST API
-- **.NET Aspire** - Cloud-native orchestration
-- **Azure Services** - Service Bus, SQL Database, Blob Storage
-- **Neo4j** - Graph database for street networks
+- **.NET 10**, ASP.NET Core API, Blazor WebAssembly UI with MudBlazor.
+- **.NET Aspire** orchestrates the local environment (`src/DreamTravel.Aspire`).
+- **SQL Server** with EF Core for cities and search statistics; it also stores the Hangfire jobs.
+- **Hangfire** runs background jobs and persistent CQRS events in the Worker.
+- **Neo4j** holds the street graph.
+
+The application uses no Azure Service Bus, no Blob Storage, and no Quartz.NET.
+
+### Projects
+
+Built from the actual project references (SolTechnology.Core libraries in the last column).
+
+| Project | Layer | References | SolTechnology.Core |
+|---|---|---|---|
+| `DreamTravel.Api` | Presentation | Queries, Commands, Workflows, GraphDatabase, ServiceDefaults | API, Auth, CQRS |
+| `DreamTravel.Worker` | Presentation | Domain, Commands, Queries, ServiceDefaults | — (through Commands) |
+| `DreamTravel.Ui` | Presentation | Domain | HTTP, CQRS |
+| `DreamTravel.ServiceDefaults` | Presentation | — | — |
+| `DreamTravel.Commands` | Logic | DomainServices, TravelingSalesmanProblem, GraphDatabase, Infrastructure, Domain | CQRS |
+| `DreamTravel.Queries` | Logic | DomainServices, TravelingSalesmanProblem, GraphDatabase | CQRS, Tale |
+| `DreamTravel.DomainServices` | Logic | GeolocationDataClients, Sql | SQL, Tale |
+| `DreamTravel.Workflows` | Logic | — | CQRS, Tale |
+| `DreamTravel.TravelingSalesmanProblem` | Logic | — | — |
+| `DreamTravel.Sql` | Data | Domain | AUID, Hangfire, SQL |
+| `DreamTravel.GraphDatabase` | Data | Domain | — |
+| `DreamTravel.GeolocationDataClients` | Data | Domain | HTTP, Cache |
+| `DreamTravel.SQLite` | Data (used by tests) | — | Tale |
+| `DreamTravel.Infrastructure` | Infrastructure | — | Hangfire |
+| `DreamTravelDatabase` | Infrastructure | — (SQL project, builds the dacpac) | — |
+| `DreamTravel.Domain` | Domain | nothing | — |
+| `DreamTravel.Aspire` | Host | Api, Worker, Ui | SQL |
 
 ### Application Components
 
 #### 1. **DreamTravel.Ui** - Blazor WebAssembly Frontend
 Located: `src/Presentation/DreamTravel.Ui`
 
-**Framework:** Blazor WASM + MudBlazor UI components
+**Framework:** Blazor WASM + MudBlazor UI components. See "Known limitations" above: the UI does not
+work against the current API yet.
 
 **Pages:**
 - **Home** (`/`) - Application overview with feature cards
-- **Trip Planner** (`/tsp-map`) - TSP route optimization
-  - Interactive Google Maps integration
-  - City search (by name or coordinates)
-  - Multi-city route calculation
-  - Cost analysis (toll vs free roads)
-  - Real-time distance matrix from Google Maps API
-- **City Architect** (`/map`) - Street network visualization
-  - Traffic speed heat maps
-  - Interactive street editing
-  - Neo4j graph database integration
-  - Custom traffic analytics
+- **Trip Planner** (`/tsp-map`) - TSP route optimization on a Google map (city search, multi-city
+  route calculation, toll vs free road costs)
+- **City Architect** (`/map`) - Street network visualization and editing on the Neo4j graph
 - **Flow** (`/flow`) - Workflow management (placeholder)
-
-**Key Features:**
-- Responsive design (mobile + desktop)
-- Google Maps JavaScript interop
-- Real-time city search statistics
-- Keyboard shortcuts (Ctrl+Enter for route calculation)
-- Clean Architecture with shared components
 
 #### 2. **DreamTravel.Api** - REST API Backend
 Located: `src/Presentation/DreamTravel.Api`
 
-**Endpoints:**
+**Endpoints** (version chosen with the `X-API-VERSION` header; every call needs `X-API-KEY`):
 ```
-POST /api/v2/FindCityByName          - Search cities by name (GeoDB API)
-POST /api/v2/FindCityByCoordinates   - Reverse geocoding
-POST /api/v2/CalculateBestPath       - TSP solver with cost optimization
-GET  /api/v2/statistics/countries    - Search statistics aggregation
+POST /api/FindCityByName           v2  - Find a city by name (Google geocoding, cached in SQL)
+POST /api/FindCityByCoordinates    v2  - Reverse geocoding
+POST /api/CalculateBestPath        v2  - TSP solver with the toll/free cost trade-off (v1: paths only)
+GET  /api/statistics/countries     v2  - Search statistics per country
+POST /api/FindLocationOfCity       v1  - Deprecated
+POST /api/FindNameOfCity           v1  - Deprecated
+POST /api/LimitCost                v1  - Deprecated
+GET  /api/projects/nodes|streets       - Street graph from Neo4j
+POST /api/Traffic/recalculate          - Traffic recalculation (no handler registered yet)
+     /api/dreamtravel/tale/...         - Start, resume, and read interactive Tales
+GET  /healthz                          - JSON health report
 ```
 
 **Features:**
-- CQRS pattern (Commands + Queries)
+- Thin controllers that send every request through the CQRS `IMediator`
 - FluentValidation pipeline
-- Result pattern for error handling
-- API key authentication
-- Swagger/OpenAPI documentation
+- `Result` pattern; `ResultConversionFilter` turns failures into ProblemDetails
+- API key authentication, header-based API versioning, Swagger/OpenAPI
+- Chronicle step reports (below)
 
 **Contract changes of the deprecated v1 endpoints (November 2026):** every controller now sends its
 request through `IMediator`, so v1 gets the same validation and error format as v2.
@@ -86,111 +194,81 @@ request through `IMediator`, so v1 gets the same validation and error format as 
 
 **External Integrations:**
 - Google Maps API (geocoding, distance matrix)
-- Michelin API (cost calculations)
+- Michelin API (toll costs)
 - GeoDB API (city search)
 
 #### 3. **DreamTravel.Worker** - Background Processing
 Located: `src/Presentation/DreamTravel.Worker`
 
 **Responsibilities:**
-- Azure Service Bus message processing
-- Scheduled tasks (cron-based)
-- Heavy TSP calculations (offloaded from API)
-- Data synchronization jobs
+- Hangfire server: runs the persistent `CitySearched` event handlers (`OnCitySearched/`), which save
+  searched cities and their statistics
+- The `FetchTrafficJob` recurring job (registered with `Cron.Never()`, so it runs only when
+  triggered from the Hangfire dashboard)
+- Hangfire dashboard (`/hangfire/ui`) and a GraphQL endpoint over the SQL database (`/graphql`,
+  playground at `/graphql/ui`, Voyager at `/voyager/ui`)
 
-**Technologies:**
-- .NET Generic Host
-- Azure Service Bus
-- Quartz.NET scheduler
+**Technologies:** ASP.NET Core host, Hangfire with SQL Server storage, EntityGraphQL
 
-#### 4. **DreamTravel.Aspire** - Orchestration & Service Discovery
+#### 4. **DreamTravel.Aspire** - Orchestration
 Located: `src/DreamTravel.Aspire`
 
-**.NET Aspire** provides:
-- Service orchestration (API, Worker, UI)
-- Service discovery
-- Configuration management
-- Health checks dashboard
-- Distributed tracing
-- Local development environment
-
-**Services:**
-- SQL Server (Azure SQL / local Docker)
-- Neo4j (graph database)
-- Azure Service Bus
-- Blob Storage
+**.NET Aspire** starts and wires:
+- SQL Server (persistent container on port 1404) and the `DreamTravelDatabase` dacpac deployment
+- Neo4j 5.10 with APOC (persistent container on ports 7474/7687), loading
+  `Data/wroclaw_drive.graphml` on the first start
+- The API, the Worker, and the UI, plus the dashboard with logs, traces, and health
 
 ### Testing Strategy
 
-Comprehensive test coverage across multiple levels:
-
 #### **Unit Tests** (`tests/Unit/`)
 - **DreamTravel.Ui.UnitTests** - Blazor component tests (bUnit)
-  - 17 tests for CitiesPanel, TspMap components
-  - FluentAssertions for readable assertions
-- **DreamTravel.Commands.UnitTests** - Business logic
-- **DreamTravel.Queries.UnitTests** - Query handlers
+- **DreamTravel.Queries.UnitTests** - Tale chapters and query handlers
 - **DreamTravel.TravelingSalesmanProblem.UnitTests** - TSP algorithms
+- **DreamTravel.GeolocationDataClients.IntegrationTests** - HTTP policy configuration; the tests
+  against the paid Google and Michelin APIs are `[Ignore]`d
+- **DreamTravel.Commands.UnitTests** - empty for now
 
 **Framework:** NUnit + FluentAssertions
 
 #### **Component Tests** (`tests/Component/`)
-- **DreamTravel.Component.Tests** - Integration tests with infrastructure
-  - WebApplicationFactory (in-memory API)
-  - Testcontainers (SQL Server)
-  - WireMock (external API mocking)
-  - BlazorWasmFixture (automated UI startup)
+- **DreamTravel.Component.Tests** - the API and the Worker in memory against real infrastructure
+  - `APIFixture` (WebApplicationFactory) for the API and the Worker
+  - `SQLFixture` (Testcontainers SQL Server, dacpac deployed)
+  - `WireMockFixture` with a fake Google API
+  - A Swagger contract snapshot (Verify)
 
-**Test Pattern:**
+**Test Pattern** (from `CalculateBestPathFeatureTest`):
 ```csharp
-[Test]
-public async Task CalculateBestPath_WithMultipleCities_ReturnsOptimalRoute()
-{
-    // Arrange - Mock Google API
-    _wireMock.Fake<IGoogleApiClient>()
-        .WithRequest(x => x.GetDurationMatrixByFreeRoad, cities)
-        .WithResponse(x => x.WithSuccess().WithBody(fakeMatrix));
+_wireMockFixture.Fake<IGoogleHTTPClient>()
+    .WithRequest(x => x.GetDurationMatrixByFreeRoad(cities))
+    .WithResponse(x => x.WithSuccess().WithBody(GoogleFakeApi.FreeDistanceMatrix));
 
-    // Act - Call API
-    var result = await _apiClient.PostAsync<Result<CalculateBestPathResult>>(
-        "/api/v2/CalculateBestPath",
-        new { Cities = cities }
-    );
+var apiResponse = await _apiClient
+    .CreateRequest("/api/CalculateBestPath")
+    .WithHeader("X-API-KEY", "<SECRET>")
+    .WithHeader("X-API-VERSION", "2.0")
+    .WithBody(new { Cities = cities })
+    .Post<CalculateBestPathResult>();
 
-    // Assert - Verify optimal path
-    result.IsSuccess.Should().BeTrue();
-    result.Data.BestPaths.Should().HaveCount(3);
-}
+apiResponse.BestPaths[0].StartingCity.Name.Should().Be("Wroclaw");
 ```
 
 #### **End-to-End Tests** (`tests/EndToEnd/`)
-- **DreamTravel.E2E.Tests** - Playwright browser automation
-  - Full user workflows
-  - Cross-browser testing
-  - Deployment verification
-
-**Framework:** Playwright + NUnit
+- **DreamTravel.E2E.Tests** - a placeholder (`HelloWorldTest`); no browser tests yet
 
 ### Data Layer Architecture
 
-#### **SQL Database** (Azure SQL / SQL Server)
-- User accounts and authentication
-- Search statistics
-- Application configuration
+#### **SQL Server** (`DreamTravel.Sql`, schema in `DreamTravelDatabase`)
+- Cities, their alternative names, and search statistics per city and country
+- Hangfire job storage
 
-**ORM:** Entity Framework Core + Dapper
+**ORM:** Entity Framework Core
 
-#### **Neo4j Graph Database**
-- Street network topology
-- Intersection nodes
-- Traffic analytics
-- Shortest path algorithms
+#### **Neo4j Graph Database** (`DreamTravel.GraphDatabase`)
+- Street network topology of Wrocław: intersections and streets
 
 **Client:** Neo4j.Driver
-
-#### **Azure Blob Storage**
-- File uploads
-- Route export files (GPX, KML)
 
 ### Chronicle step reports
 
@@ -223,216 +301,109 @@ recorded without user code. The event itself runs in the Worker, under its own `
 
 ### Design Patterns
 
-For detailed architecture patterns and code examples, see the sections below.
+One request, top to bottom. The complete example is
+[CalculateBestPath](src/LogicLayer/DreamTravel.Queries/CalculateBestPath/).
 
- Projects dependency diagram:
-
-
- ```mermaid
-classDiagram
-    DreamTravel <|-- Api : Presentation
-    Api <|-- Trips : Logic 
-    Api <|-- Identity : Logic
-
-    Trips <|-- TripsCommands  : CQRS 
-    Trips <|-- TripsQueries : in
-
-    TripsQueries <|-- TripsHttpClients : Data 
-
-    Identity <|-- IdentityCommands : action
-
-    IdentityCommands <|-- IdentityDatabaseClient : Data 
-
-    IdentityDatabaseClient <|-- Infrastructure : The base 
-    TripsHttpClients <|-- Infrastructure : The base 
- 
-
-    class DreamTravel{
-       The complete backend 
-       app design
-    }
-
-    class Api{
-      The .NET host for the app
-      Exposes APIs
-    }
-
-    class Trips{
-      Logic layer
-      Module responsible for
-      the path finding
-    }
-
-    class Identity{
-      Logic layer 
-      Module responsible for
-      user management
-    }
-
-    class Infrastructure{
-      The very technical, drivers part
-    }
-
-      class TripsHttpClients{
-      Data Layer
-      Provides clients for HTTP calls
-    }
-
-     class IdentityDatabaseClient{
-      Data Layer
-      Provides SQL queries and repositories
-    }
-```
-
-
-Going into more details. The complete example of a [QueryHandler](https://github.com/AdrianStrugala/SolTechnology.Core/tree/master/sample-tale-code-apps/DreamTravel/src/LogicLayer/DreamTravel.Queries/CalculateBestPath):
-
-1) Controller - it is meant be simple:
+1) Controller - thin: it logs, sends the query through `IMediator`, and returns the `Result`
+([CalculateBestPathController](src/Presentation/DreamTravel.Api/Controllers/Trips/v2/CalculateBestPathController.cs)).
+`ResultConversionFilter` sends a successful `Result<T>` as `T` and a failed one as ProblemDetails.
 
 ```csharp
-    [HttpPost]
-    [Produces(MediaTypeNames.Application.Json)]
-    [ProducesResponseType(typeof(List<Path>), (int)HttpStatusCode.OK)]
-    [ProducesResponseType(typeof(string), (int)HttpStatusCode.BadRequest)]
-    public async Task<IActionResult> CalculateBestPath([FromBody] CalculateBestPathQuery calculateBestPathQuery)
-    {
-        _logger.LogInformation("TSP Engine: Fire!");
-        return await Return(_calculateBestPath.Handle(calculateBestPathQuery));
-    }
+[HttpPost]
+[MapToApiVersion("2.0")]
+[Produces(MediaTypeNames.Application.Json)]
+[ProducesResponseType(typeof(CalculateBestPathResult), (int)HttpStatusCode.OK)]
+[ProducesResponseType(typeof(ProblemDetails), (int)HttpStatusCode.BadRequest)]
+public async Task<IActionResult> CalculateBestPathV2([FromBody] CalculateBestPathQuery query)
+{
+    logger.LogInformation("TSP Engine V2: Fire!");
+    return Ok(await mediator.Send(query, HttpContext.RequestAborted));
+}
 ```
 
-
-2) Query Handler - is build of a few components:
-
-a) Query - model and **validation**
+2) Query - the input and its **validation**, in one file. The CQRS pipeline runs the validator
+before the handler and returns a `ValidationError` when it fails.
 
 ```csharp
-    public class CalculateBestPathQuery
-    {
-        public List<City?> Cities { get; set; } = new();
-    }
+public class CalculateBestPathQuery : IQuery<CalculateBestPathResult>
+{
+    public List<CityQueryModel> Cities { get; set; } = new();
+}
 
-    public class CalculateBestPathQueryValidator : AbstractValidator<CalculateBestPathQuery>
+public class CalculateBestPathQueryValidator : AbstractValidator<CalculateBestPathQuery>
+{
+    public CalculateBestPathQueryValidator()
     {
-        public CalculateBestPathQueryValidator()
-        {
-            RuleFor(x => x.Cities)
-                .NotNull();
-        }
+        RuleFor(x => x.Cities)
+            .NotNull();
     }
+}
 ```
 
-Validation is build into the CQRS pipeline, and whenever Query/Command validator is registered, it would be invoked and the result handled.
-
-b) Context - intermediate model for internal handler operations. This one might be controvesial, but greatly increses performance of the solution. What is worth to remember, that this model lives only in the scope of Query.
+3) Tale - the handler is a Tale whose `Tell()` reads like a table of contents. Each chapter is one
+class in `Chapters/`, and all state shared between chapters lives on `CalculateBestPathContext`.
 
 ```csharp
-    public sealed class CalculateBestPathContext
-    {
-        public double[] FreeDistances { get; set; }
-        public double[] TollDistances { get; set; }
-        public double[] OptimalDistances { get; set; }
-        public double[] Goals { get; set; }
-        public double[] Costs { get; set; }
-        public double[] OptimalCosts { get; set; }
-        public double[] VinietaCosts { get; set; }
-
-
-        public CalculateBestPathContext(int noOfCities)
-        {
-            int matrixSize = noOfCities * noOfCities;
-
-            FreeDistances = new double[matrixSize];
-            TollDistances = new double[matrixSize];
-            OptimalDistances = new double[matrixSize];
-            Goals = new double[matrixSize];
-            Costs = new double[matrixSize];
-            OptimalCosts = new double[matrixSize];
-            VinietaCosts = new double[matrixSize];
-        }
-    }
+protected override Tale<CalculateBestPathResult> Tell() =>
+    Open<InitiateContext>()
+        .Expect(ctx => ctx.NoOfCities > 1,
+                new NotFoundError { Message = "A route needs at least two cities." })
+        .Read<DownloadRoadData>()
+        .Read<FindProfitablePath>()
+        .Otherwise<JustOrderCities>()
+        .Read<SolveTsp>()
+        .WhenLost(error => logger.LogWarning("Best path calculation failed: {Error}", error.Message))
+        .Read<FormCalculateBestPathResult>()
+        .Finale(ctx => ctx.Output);
 ```
 
-c) Handler - the logic part. Contains the operations itself or orchestrates executors:
+4) Chapters - `DownloadRoadData` fetches the Google distance matrices and the Michelin costs in
+parallel, `FindProfitablePath` weighs toll against free roads, `SolveTsp` orders the cities with
+the ant colony engine, and `FormCalculateBestPathResult` builds the output.
 
-```csharp
-    public async Task<CalculateBestPathResult> Handle(CalculateBestPathQuery query)
-    {
-        var cities = query.Cities.Where(c => c != null).ToList();
-        var context = new CalculateBestPathContext(cities.Count);
-
-        await _downloadRoadData(cities!, context);
-        _findProfitablePath(context, cities.Count);
-
-        var orderOfCities = _solveTSP(context.OptimalDistances.ToList());
-
-        CalculateBestPathResult calculateBestPathResult = new CalculateBestPathResult
-        {
-            Cities = cities!,
-            BestPaths = _formPathsFromMatrices(cities!, context, orderOfCities)
-        };
-        return calculateBestPathResult;
-    }
-```
-
-d) Executors - the dirty part of the code has to be written somewhere. Those classes are modyfing context for the best performance:
-
-```csharp
-    public DownloadRoadData(IGoogleApiClient googleApiClient, IMichelinApiClient michelinApiClient)
-    {
-        _googleApiClient = googleApiClient;
-        _michelinApiClient = michelinApiClient;
-    }
-
-    public async Task Execute(List<City> listOfCities, CalculateBestPathContext calculateBestPathContext)
-    {
-        List<Task> tasks = new List<Task>
-        {
-            Task.Run(async () => calculateBestPathContext.TollDistances = await _googleApiClient.GetDurationMatrixByTollRoad(listOfCities)),
-            Task.Run(async () => calculateBestPathContext.FreeDistances = await _googleApiClient.GetDurationMatrixByFreeRoad(listOfCities))
-        };
-
-        tasks.AddRange(DownloadCostMatrix(listOfCities, calculateBestPathContext));
-
-        await Task.WhenAll(tasks);
-    }
-
-    private List<Task> DownloadCostMatrix(List<City> listOfCities, CalculateBestPathContext calculateBestPathContext)
-    {
-        List<Task> tasks = new List<Task>();
-
-        for (int i = 0; i < listOfCities.Count; i++)
-        {
-            for (int j = 0; j < listOfCities.Count; j++)
-            {
-                int iterator = j + i * listOfCities.Count;
-
-                var i1 = i;
-                var j1 = j;
-                tasks.Add(Task.Run(async () => (calculateBestPathContext.Costs[iterator], calculateBestPathContext.VinietaCosts[iterator]) =
-                    await _michelinApiClient.DownloadCostBetweenTwoCities(listOfCities[i1], listOfCities[j1])));
-            }
-        }
-
-        return tasks;
-    }
-```
-
-e) And finally the Result:
+5) Result - a plain DTO:
 
 ```csharp
 public class CalculateBestPathResult
 {
-    public List<Path> BestPaths { get; set; }
-    public List<City> Cities { get; set; }
-
-    public CalculateBestPathResult()
-    {
-        BestPaths = new List<Path>();
-        Cities = new List<City>();
-    }
+    public List<Path> BestPaths { get; set; } = new();
+    public List<City> Cities { get; set; } = new();
 }
 ```
+
+### Using the NuGet packages
+
+The sample references the libraries as projects (`ProjectReference`), so a change in `src/` is
+visible immediately. An application of your own uses the published packages instead; the
+equivalent of each reference is a `PackageReference` with the same name:
+
+```xml
+<!-- in the sample -->
+<ProjectReference Include="..\..\..\..\..\src\SolTechnology.Core.CQRS\SolTechnology.Core.CQRS.csproj" />
+
+<!-- in your application -->
+<PackageReference Include="SolTechnology.Core.CQRS" Version="2.0.0" />
+```
+
+| DreamTravel project | Packages |
+|---|---|
+| `DreamTravel.Api` | `SolTechnology.Core.API`, `SolTechnology.Core.Auth`, `SolTechnology.Core.CQRS` |
+| `DreamTravel.Ui` | `SolTechnology.Core.HTTP`, `SolTechnology.Core.CQRS` |
+| `DreamTravel.Commands` | `SolTechnology.Core.CQRS` |
+| `DreamTravel.Queries`, `DreamTravel.Workflows` | `SolTechnology.Core.CQRS`, `SolTechnology.Core.Tale` |
+| `DreamTravel.DomainServices` | `SolTechnology.Core.SQL`, `SolTechnology.Core.Tale` |
+| `DreamTravel.Sql` | `SolTechnology.Core.AUID`, `SolTechnology.Core.Hangfire`, `SolTechnology.Core.SQL` |
+| `DreamTravel.GeolocationDataClients` | `SolTechnology.Core.HTTP`, `SolTechnology.Core.Cache` |
+| `DreamTravel.Infrastructure` | `SolTechnology.Core.Hangfire` |
+| `DreamTravel.SQLite` | `SolTechnology.Core.Tale` |
+| `DreamTravel.Aspire` | `SolTechnology.Core.SQL` |
+| `DreamTravel.Component.Tests` | `SolTechnology.Core.Testing`, `SolTechnology.Core.API.Testing`, `SolTechnology.Core.SQL.Testing`, `SolTechnology.Core.HTTP.Testing` |
+
+Use the version this repository builds (`<Version>` in
+[`src/Directory.Build.props`](../../src/Directory.Build.props)) once it is on nuget.org. With
+Central Package Management, put the version in `Directory.Packages.props` as a `PackageVersion`
+and leave it off the `PackageReference`. The packages bring their own dependencies, such as
+`SolTechnology.Core` and `SolTechnology.Core.Logging`.
 
 ## Future Work
 
@@ -529,7 +500,6 @@ public class CalculateBestPathResult
   - Rate limiting documentation
 
 - [ ] **User Guide** - End-user documentation
-  - Getting started tutorial
   - Feature walkthroughs
   - Troubleshooting guide
 
