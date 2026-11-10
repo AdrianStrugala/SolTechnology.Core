@@ -79,13 +79,13 @@ internal sealed class ChronicleWriter(ChronicleOptions options, TimeProvider tim
     {
         if (!node.IsOverflow)
         {
-            node.SetAttribute(key, Truncate(value), Options.MaxAttributesPerStep);
+            node.SetAttribute(Truncate(key), Truncate(value), Options.MaxAttributesPerStep);
         }
     }
 
     internal void Fail(ChronicleNode node, string errorType, string? message, Exception? exception)
     {
-        node.Fail(errorType, message is null ? null : Truncate(message));
+        node.Fail(Truncate(errorType), message is null ? null : Truncate(message));
         if (exception is not null && node.Parent is null)
         {
             node.Root.Exception = exception;
