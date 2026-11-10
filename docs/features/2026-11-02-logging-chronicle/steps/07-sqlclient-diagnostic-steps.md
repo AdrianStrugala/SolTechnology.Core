@@ -1,7 +1,7 @@
 ---
 spec: 2026-11-02-logging-chronicle
 step: 07
-status: in-progress
+status: done
 ---
 
 # Step 07: Chronicle SQL steps — SqlClient `DiagnosticListener` observer
@@ -95,17 +95,56 @@ plan review (brief, Current state).
     includes reader row streaming (input for CRM-11 in step 15).
 
 ## Acceptance criteria
-- [ ] `dotnet test tests/SolTechnology.Core.Logging.Tests` is green.
-- [ ] `dotnet test tests/SolTechnology.Core.SQL.Tests --filter "FullyQualifiedName~ChronicleSQL"` is green with Docker available.
-- [ ] `grep -n "ProjectReference" src/SolTechnology.Core.Logging/SolTechnology.Core.Logging.csproj` prints nothing.
-- [ ] `git diff --stat -- src/SolTechnology.Core.SQL` for this step prints nothing.
-- [ ] If the integration test shows that SqlClient 7.0.1 raises no events, this step is set `blocked` and alternative B3 (b) goes back to the user. This is a pass/fail gate, not a silent fallback.
-- [ ] CRM-1: `TwoSubscriptions_OneCommand_RecordedOnce` and `Subscription_Stopped_ObserverReceivesNoEvents` are green.
-- [ ] CRM-15: `OtherSubscriberEnabled_BeforeOutsideRoot_RecordsNothing` is green.
-- [ ] CRM-10: `SQLStep_WithOperationsListener_StartsNoActivity` is green.
-- [ ] CRM-11: `Error_CaptureCommandTextOff_MessageNotRecorded` is green; the reader-duration finding is recorded under `Deviations`.
+- [x] `dotnet test tests/SolTechnology.Core.Logging.Tests` is green.
+- [x] `dotnet test tests/SolTechnology.Core.SQL.Tests --filter "FullyQualifiedName~ChronicleSQL"` is green with Docker available.
+- [x] `grep -n "ProjectReference" src/SolTechnology.Core.Logging/SolTechnology.Core.Logging.csproj` prints nothing.
+- [x] `git diff --stat -- src/SolTechnology.Core.SQL` for this step prints nothing.
+- [x] If the integration test shows that SqlClient 7.0.1 raises no events, this step is set `blocked` and alternative B3 (b) goes back to the user. This is a pass/fail gate, not a silent fallback.
+- [x] CRM-1: `TwoSubscriptions_OneCommand_RecordedOnce` and `Subscription_Stopped_ObserverReceivesNoEvents` are green.
+- [x] CRM-15: `OtherSubscriberEnabled_BeforeOutsideRoot_RecordsNothing` is green.
+- [x] CRM-10: `SQLStep_WithOperationsListener_StartsNoActivity` is green.
+- [x] CRM-11: `Error_CaptureCommandTextOff_MessageNotRecorded` is green; the reader-duration finding is recorded under `Deviations`.
 
 ## Open questions
 - none (OQ-1 confirmed by the user 2026-11-02: `CH-04` `CaptureSQLCommands`/`CaptureSQLCommandText`)
 
 ## Deviations
+
+### Crux B3-1 settled; reader streaming is not part of the step
+
+`ChronicleSQLIntegrationTests.Query_InsideRoot_AppearsAsSQLStep` runs a real
+`Microsoft.Data.SqlClient` 7.0.1 command against the shared SQL Server container and gets a
+`SQL SELECT` step in the 2154 report, so the `DiagnosticListener` events exist as the plan review
+read them. `Reader_RowStreaming_NotIncludedInStepDuration` reads three rows with 150 ms pauses: the
+step measured 92 ms against at least 450 ms of reading. SqlClient writes `WriteCommandAfter` when
+`ExecuteReader` returns, so a `SQL` step covers sending the command and receiving the first result,
+not the row streaming (input for CRM-11 in step 15).
+
+### CRM-1 re-check at implementation (2026-11-10)
+
+Holds for SQL. Every root carries its writer (`ChronicleRoot.Owner`, one writer per
+`ChronicleRecorder`), the observer's `Before` gate accepts only roots it owns, and stopping or
+disposing the hosted service disposes the `AllListeners` subscription and every listener
+subscription (`TwoSubscriptions_OneCommand_RecordedOnce`,
+`Subscription_Stopped_ObserverReceivesNoEvents`). The Hangfire half (PA-5, process-wide
+`GlobalJobFilters`) is re-checked in step 14.
+
+### Smaller implementation choices
+
+**Original plan:** `ChronicleRecorder` gets `StartDetachedLeaf` and `Complete(leaf, status, error)`.
+
+**Actual implementation:**
+
+- `StartDetachedLeaf` lives on `ChronicleWriter` (step 02 split) and shares the limit checks with
+  `StartChild`; it returns `null` beyond `MaxDepth`. Completion reuses `ChronicleWriter.Fail` and
+  `Close`, so no `Complete` method was added.
+- A failed SQL step without an exception in the payload records the type `SQLError`.
+- If SqlClient never writes `After`/`Error` for a command, its `ConditionalWeakTable` entry goes
+  away with the command, but the pending counter stays raised, so `IsEnabled(After)` stays `true`
+  for that process: SqlClient then builds `After` payloads that the observer ignores. No leak, a
+  small cost only after an abnormal command path.
+- The observer tests are split into `ChronicleSQLClientObserverTests` (recording) and
+  `ChronicleSQLClientIsolationTests` (flow, CRM-1, CRM-15, CRM-10) over a shared
+  `ChronicleSQLTestBase`; the error and command-text tests are parameterized on
+  `CaptureSQLCommandText`.
+
