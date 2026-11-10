@@ -416,6 +416,7 @@ These apply to every class you write, regardless of layer.
 3. **Method size:** target ≤ 20 lines. Methods longer than that almost always hide a missing abstraction.
 4. **Constructor size:** ≤ 5 dependencies. More than five = the class does too much. Move work into a Tale or split the class. (`ILogger<T>` does not count toward the budget.)
 5. **Primary constructors** are mandatory for DI capture. NEVER hand-write `private readonly` fields just to assign them.
+    - A Hangfire filter that needs a fixed `Order` implements `IServerFilter` and `IJobFilter` (`Order => 0`) instead of deriving from `JobFilterAttribute`, whose settable `Order` a primary constructor cannot set (`ChronicleJobFilter`).
 6. **No statics with state.** Static methods are fine for pure helpers (`CityQueryBuilder`). Static *fields* with mutable state are forbidden outside `const` and `static readonly` lookup tables.
 7. **Use .NET 10 `extension` blocks** for extension methods. NEVER write `static class` + `this` parameter — use the C# 14 `extension` syntax instead.
     - Exception: a public `params` array of tuples (e.g. `params (string Key, object? Value)[]`) stays a classic `this` method with a one-line `//` why — inside an `extension` block the SDK 10.0.100 compiler reports CS8620 at every tuple call site, which breaks consumers that treat warnings as errors (`LoggerScopeExtensions.PushToScope`).

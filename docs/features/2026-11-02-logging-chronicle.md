@@ -655,4 +655,21 @@ keys that start with `@`, so Serilog stores the ASCII tree as a string, like Ope
 Insights. This supersedes the release-notes bullet "Serilog destructures `{@Chronicle}` as a
 structure capped by `MaximumDestructuringDepth`"; step 15 documents the string form.
 
+### Integration decisions of steps 09–16 (2026-11-10)
+
+- A successful CQRS operation's activity keeps status `Unset`: the Chronicle step produces the
+  span and has no "ok" status (step 10). A failed `Result` adds the message as status description.
+- `ChronicleJobFilter` implements `IServerFilter` and `IJobFilter` (`Order => 0`) instead of deriving
+  from `JobFilterAttribute`, so it keeps its primary constructor; Hangfire takes the order from
+  `IJobFilter.Order` (step 14, R1 verified by test).
+- The HTTP client-abort 2155 entry keeps the exception attached, as 2144 did (step 09); a cancelled or
+  failed HTTP client call records `Attempts` without `StatusCode` (step 12).
+- Resolution tests that expected one `IHostedService` now pick their own: `AddSolChronicle` adds the
+  SqlClient subscription as a second hosted service in every host that uses an integration (step 13).
+- Re-checks at implementation: CRM-5 holds for both API filters (step 09); CRM-2 holds through the real
+  performer with the later test filter at `Order = 1` (step 14); CRM-7's log-contract table has the
+  three columns (step 15); PA-5 is an accepted residual, the same as `CorrelationIdJobFilter`: one
+  global filter per process, the last host's recorder reports every job, documented in `Hangfire.md`
+  (step 14).
+
 ## Follow-ups

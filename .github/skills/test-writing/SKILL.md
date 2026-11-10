@@ -136,6 +136,13 @@ NUnit runs every test of a fixture on the same instance, so an instance field in
 (`private readonly ConcurrentQueue<Activity> _stopped = new();`, a `FakeLogCollector`) carries
 records from one test into the next. Create or clear such state in `[SetUp]`/`[TearDown]`.
 
+### 8c. Assembly scanning picks up test fixtures
+
+`AddSolCQRS(o => o.RegisterEventsFromAssembly(...))`, `AddSolTale(assemblies: ...)` and the
+`ModuleResolutionTests` that validate them with `ValidateOnBuild` scan the *test* assembly too. A
+new public fixture handler or chapter with an unregistered dependency then breaks those tests: make
+the fixture `internal` (registered by hand) or register its dependency where the scan runs.
+
 ### 9. Run the right runner
 
 - Core libs (whole suite): `./.github/runTests.ps1`.
