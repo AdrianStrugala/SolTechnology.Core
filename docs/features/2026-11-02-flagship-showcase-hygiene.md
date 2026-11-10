@@ -251,6 +251,10 @@ Owner actions that need admin rights (manual, outside the repository):
   reports it missing; optionally require full-length SHA pins for actions (Settings → Actions).
 - Step 06: run the fresh-clone check on the owner's machine (Docker Desktop with amd64
   emulation on Apple silicon).
+- Step 07: watch the first `dreamtravel-tests` run on a PR or `master` push (the agent rehearsed
+  it only in a Linux arm64 container); for the forced-failure check, add `Assert.Fail()` to a
+  DreamTravel unit test on a throwaway branch, run the workflow with `workflow_dispatch` on it, see
+  the job fail, and delete the branch.
 
 ## Acceptance criteria
 
