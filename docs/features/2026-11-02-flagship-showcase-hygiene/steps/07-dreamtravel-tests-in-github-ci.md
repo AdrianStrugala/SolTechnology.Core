@@ -1,7 +1,7 @@
 ---
 spec: 2026-11-02-flagship-showcase-hygiene
 step: 07
-status: to-do
+status: in-progress
 ---
 
 # Step 07: DreamTravel — tests in GitHub CI

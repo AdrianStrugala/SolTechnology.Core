@@ -28,5 +28,5 @@ auid 03, tale 03, 07, 11, and api-auth 05 are `done` (former core steps 02, 03, 
 | 04 | Coding Guide self-consistency | [`steps/04-coding-guide-self-consistency.md`](steps/04-coding-guide-self-consistency.md) | done |
 | 05 | DreamTravel — logic and domain cleanup | [`steps/05-dreamtravel-logic-and-domain-cleanup.md`](steps/05-dreamtravel-logic-and-domain-cleanup.md) | done |
 | 06 | DreamTravel — run-in-two-minutes README and an honest architecture section | [`steps/06-dreamtravel-run-instructions.md`](steps/06-dreamtravel-run-instructions.md) | done |
-| 07 | DreamTravel — tests in GitHub CI | [`steps/07-dreamtravel-tests-in-github-ci.md`](steps/07-dreamtravel-tests-in-github-ci.md) | to-do |
+| 07 | DreamTravel — tests in GitHub CI | [`steps/07-dreamtravel-tests-in-github-ci.md`](steps/07-dreamtravel-tests-in-github-ci.md) | in-progress |
 | 08 | Retrospective | [`steps/08-retrospective.md`](steps/08-retrospective.md) | to-do |

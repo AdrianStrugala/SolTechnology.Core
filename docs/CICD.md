@@ -13,12 +13,12 @@ captured in the [release runbook](release-runbook-1.0.md).
 
 ### Triggers
 
-| Trigger | Build + test | Pack | Publish |
-|---|:---:|:---:|:---:|
-| `pull_request` → `master` | ✅ | ✅ | — |
-| `push` → `master` | ✅ | ✅ | — |
-| `push` tag `v*` | ✅ | ✅ | ✅ |
-| `workflow_dispatch` | ✅ | ✅ | — |
+| Trigger | Build + test | Pack | DreamTravel tests | Publish |
+|---|:---:|:---:|:---:|:---:|
+| `pull_request` → `master` | ✅ | ✅ | ✅ | — |
+| `push` → `master` | ✅ | ✅ | ✅ | — |
+| `push` tag `v*` | ✅ | ✅ | ✅ | ✅ |
+| `workflow_dispatch` | ✅ | ✅ | ✅ | — |
 
 Publishing only from `v*` tags: the `publish` job runs only for a `refs/tags/v*` push, and the
 build fails first if the tag does not match the package version. `workflow_dispatch` builds, tests
@@ -46,12 +46,33 @@ or `master` push. The workflow token is read-only (`permissions: contents: read`
    props file, not from the tag, and nuget.org versions can never be reused.
 8. **Upload** — `*.nupkg` and `*.snupkg` are uploaded as the `nuget-packages` artifact.
 
+### `dreamtravel-tests` job
+
+Runs after `build` on every trigger and fails the workflow when a DreamTravel test fails. The
+`build` job's test script walks only the `tests/` projects, so this job is where the reference
+app's tests run on GitHub. It checks out the code again (the `build` artifact holds only the
+packages), restores the workloads, and runs `dotnet test` on each DreamTravel test project: the
+Commands, Queries, TravelingSalesmanProblem, and Ui unit tests, the GeolocationDataClients tests
+(their paid Google and Michelin tests are `[Ignore]`d), and `DreamTravel.Component.Tests`, which
+starts SQL Server through Testcontainers on the runner's Docker and fakes Google with WireMock.
+`DreamTravel.E2E.Tests` is a placeholder and stays out. Every project runs even after a failure;
+the job lists the failed ones at the end.
+
+The job has `timeout-minutes: 30`, no `continue-on-error`, and no `if:`. It is not a required
+status check, because `master` has no branch protection, but `publish` needs it, so a red or
+skipped `dreamtravel-tests` also stops the tag publish. A failure that only shows on the Linux
+runner is fixed in the tests or their fixtures, never by weakening the job.
+
 ### `publish` job
 
-Runs after `build` only for `v*` tags. It downloads the artifact and runs
+Runs after `build` and `dreamtravel-tests`, only for `v*` tags. It downloads the artifact and runs
 `dotnet nuget push ./artifacts/*.nupkg --skip-duplicate`, which also pushes the matching `.snupkg`
 symbol packages. To release, bump `<Version>` in `src/Directory.Build.props`, push it to `master`,
 then push the tag `v<Version>`.
+
+If `dreamtravel-tests` fails on a release tag, nothing has reached nuget.org yet: re-run the failed
+job from the workflow run page (Re-run failed jobs) before re-tagging. A passing re-run lets
+`publish` continue with the same tag.
 
 ## Unlisting deprecated packages — `Unlist deprecated packages`
 
