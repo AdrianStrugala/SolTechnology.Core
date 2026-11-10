@@ -2,6 +2,7 @@ using FluentAssertions;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using NUnit.Framework;
 using SolTechnology.Core.Logging.Chronicles;
 using SolTechnology.Core.Logging.Chronicles.FlightRecorder;
@@ -169,23 +170,15 @@ public class ChronicleFlightRecorderTests : ChronicleTestBase
     }
 
     [Test]
-    public void FlightRecorderDisabled_ProviderNotConsultedForDebug()
+    public void FlightRecorderDisabled_FilterRuleKeepsMELFromConsultingProvider()
     {
-        // Arrange
-        var (chronicle, logger) = Build(o => o.FlightRecorder.Enabled = false);
-
         // Act
-        using (chronicle.Begin("Import"))
-        {
-            for (var i = 0; i < 1_000; i++)
-            {
-                _ = logger.IsEnabled(LogLevel.Debug);
-                logger.LogDebug("Entry [{Index}]", i);
-            }
-        }
+        Build(o => o.FlightRecorder.Enabled = false);
 
         // Assert
-        RecorderProvider().Consultations.Should().Be(0);
+        var rules = _provider!.GetRequiredService<IOptions<LoggerFilterOptions>>().Value.Rules
+            .Where(r => r.ProviderName == ChronicleFlightRecorderProvider.Alias);
+        rules.Should().ContainSingle().Which.Should().Match<LoggerFilterRule>(r => r.CategoryName == null && r.LogLevel == LogLevel.None);
     }
 
     [Test]

@@ -15,21 +15,15 @@ internal sealed class ChronicleFlightRecorderProvider(IOptions<ChronicleOptions>
 
     private static readonly ChronicleFlightRecorderOptions Disabled = new();
 
-    private int _consultations;
     private ChronicleFlightRecorderOptions? _options;
 
     internal ChronicleFlightRecorderOptions Options => _options ??= ReadOrDisabled(options);
-
-    /// <summary>How often MEL called <c>IsEnabled</c> or <c>Log</c> on this provider's loggers.</summary>
-    internal int Consultations => Volatile.Read(ref _consultations);
 
     public ILogger CreateLogger(string categoryName) => new ChronicleFlightRecorderLogger(categoryName, this);
 
     public void Dispose()
     {
     }
-
-    internal void CountConsultation() => Interlocked.Increment(ref _consultations);
 
     /// <summary>
     /// Invalid options read as a disabled recorder: the logger factory is built before

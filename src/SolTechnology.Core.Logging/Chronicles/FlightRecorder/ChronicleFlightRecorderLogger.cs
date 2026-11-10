@@ -13,15 +13,10 @@ internal sealed class ChronicleFlightRecorderLogger(string category, ChronicleFl
 
     public IDisposable? BeginScope<TState>(TState state) where TState : notnull => null;
 
-    public bool IsEnabled(LogLevel logLevel)
-    {
-        provider.CountConsultation();
-        return Accepts(logLevel) && AmbientChronicle.OpenRoot is not null;
-    }
+    public bool IsEnabled(LogLevel logLevel) => Accepts(logLevel) && AmbientChronicle.OpenRoot is not null;
 
     public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception? exception, Func<TState, Exception?, string> formatter)
     {
-        provider.CountConsultation();
         var options = provider.Options;
         if (!Accepts(logLevel) || AmbientChronicle.OpenRoot is not { } root || !root.FlightBuffer.TryReserve(options.MaxEntries))
         {
