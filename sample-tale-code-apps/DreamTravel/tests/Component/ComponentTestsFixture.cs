@@ -1,6 +1,7 @@
 using DreamTravel.Api;
 using DreamTravel.FunctionalTests.FakeApis;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using SolTechnology.Core.API.Testing;
 using SolTechnology.Core.HTTP.Testing;
 using SolTechnology.Core.SQL.Testing;
@@ -42,7 +43,8 @@ namespace DreamTravel.FunctionalTests
                 .Build();
 
             WorkerFixture = new APIFixture<Worker.Program>(configuration);
-            ApiFixture = new APIFixture<Program>(configuration);
+            // Fake logging keeps every API log record, so tests can read the Chronicle reports.
+            ApiFixture = new APIFixture<Program>(configuration, services => services.AddLogging(logging => logging.AddFakeLogging()));
         }
 
 

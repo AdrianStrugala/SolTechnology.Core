@@ -176,6 +176,35 @@ public async Task CalculateBestPath_WithMultipleCities_ReturnsOptimalRoute()
 - File uploads
 - Route export files (GPX, KML)
 
+### Chronicle step reports
+
+The API and the Worker bind `Logging:Core:Chronicle` with `AddSolChronicle(builder.Configuration)`,
+so every request, Hangfire job and fire-and-forget event writes one
+[Chronicle](../../docs/Log.md#chronicle) report. Development turns the flight recorder on and the
+console's `SingleLine` off, so the tree stays readable. This is the report of one
+`POST /api/FindCityByName` from the component test `FindCityChronicleTests`, for a city missing from
+the database:
+
+```text
+Finished request [POST] [/api/FindCityByName] -> [200] in [1168 ms]. Chronicle: [Ok] [
+HTTP POST [@0 ms] [1168 ms] [ok] Route=api/FindCityByName StatusCode=200
+|- SQL [@25 ms] [11 ms] [ok]
+|- SQL SELECT [@37 ms] [1 ms] [ok]
+`- FindCityByNameQuery [@59 ms] [1086 ms] [ok] Name=Chronicle8907f294
+   |- FetchCity [@140 ms] [940 ms] [ok]
+   |  |- SQL SELECT [@662 ms] [9 ms] [ok]
+   |  `- HTTP GET Google [@707 ms] [367 ms] [ok] Host=localhost StatusCode=200 Attempts=1
+   |- FetchCityCached [@1081 ms] [5 ms] [ok]
+   |  `- SQL SELECT [@1083 ms] [3 ms] [ok]
+   |- SQL SET [@1096 ms] [11 ms] [ok]
+   |- SQL SELECT [@1111 ms] [6 ms] [ok]
+   `- SQL INSERT [@1124 ms] [14 ms] [ok]]
+```
+
+`FetchCity` and `FetchCityCached` are the handler's own `IChronicle.Step` calls; the query step,
+the Google call and the SQL commands (EF Core and the Hangfire job that persists `CitySearched`) are
+recorded without user code. The event itself runs in the Worker, under its own `Event CitySearched` root.
+
 ### Design Patterns
 
 For detailed architecture patterns and code examples, see the sections below.

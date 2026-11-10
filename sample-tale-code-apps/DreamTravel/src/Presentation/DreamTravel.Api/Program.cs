@@ -113,6 +113,7 @@ public class Program
         //The rest
         builder.Services.AddSolLocalCache();
         builder.Services.AddSolLogging();
+        builder.Services.AddSolChronicle(builder.Configuration);
         builder.Services.LogDetail(
             "name",
             asName: "CityName",

@@ -37,5 +37,5 @@ R1–R9 and premortem addendum PA-1…PA-5 in the brief). The verdict above stan
 | 13 | MessageBus message roots | [`steps/13-messagebus-message-roots.md`](steps/13-messagebus-message-roots.md) | done |
 | 14 | Hangfire job roots — recurring jobs and persistent events | [`steps/14-hangfire-job-roots.md`](steps/14-hangfire-job-roots.md) | done |
 | 15 | Documentation — `docs/Log.md` Chronicle section and module integration notes | [`steps/15-documentation.md`](steps/15-documentation.md) | done |
-| 16 | DreamTravel showcase — Chronicle configuration, README report, component test | [`steps/16-dreamtravel-showcase.md`](steps/16-dreamtravel-showcase.md) | to-do |
+| 16 | DreamTravel showcase — Chronicle configuration, README report, component test | [`steps/16-dreamtravel-showcase.md`](steps/16-dreamtravel-showcase.md) | done |
 | 17 | Retrospective | [`steps/17-retrospective.md`](steps/17-retrospective.md) | to-do |

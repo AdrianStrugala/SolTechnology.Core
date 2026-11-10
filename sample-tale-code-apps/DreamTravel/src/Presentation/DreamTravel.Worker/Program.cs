@@ -9,6 +9,7 @@ using Hangfire;
 using SolTechnology.Core.Cache;
 using SolTechnology.Core.CQRS;
 using SolTechnology.Core.Hangfire;
+using SolTechnology.Core.Logging;
 using SolTechnology.Core.SQL;
 using System.Globalization;
 using DreamTravel.DomainServices;
@@ -53,6 +54,7 @@ public class Program
         //CQRS
         builder.Services.AddSolCQRS(o => o.RegisterEventsFromAssembly(typeof(Program).Assembly));
         builder.Services.AddSolPersistentEvents();
+        builder.Services.AddSolChronicle(builder.Configuration);
 
         //JOBS
         builder.Services.AddSolRecurringJob<FetchTrafficJob>(Cron.Never());
