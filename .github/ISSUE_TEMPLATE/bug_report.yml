@@ -1,0 +1,35 @@
+name: Bug report
+description: Something in a SolTechnology.Core package does not work as documented.
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for the report. Security issues go through SECURITY.md, never a public issue.
+  - type: input
+    id: package
+    attributes:
+      label: Package and version
+      description: For example SolTechnology.Core.CQRS 2.0.0.
+    validations:
+      required: true
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened
+      description: What did you expect, and what happened instead? Paste the exception or log output.
+    validations:
+      required: true
+  - type: textarea
+    id: repro
+    attributes:
+      label: Steps to reproduce
+      description: The smallest code or configuration that shows the problem.
+      render: csharp
+    validations:
+      required: true
+  - type: input
+    id: environment
+    attributes:
+      label: Environment
+      description: .NET SDK version and operating system.

@@ -29,6 +29,40 @@
 </p>
 </i>
 
+## Quick start
+
+Add the CQRS package to a web project (`dotnet new web`):
+
+```bash
+dotnet add package SolTechnology.Core.CQRS
+```
+
+Register the handlers, then send a query through `IMediator` and get a `Result` back:
+
+```csharp
+using SolTechnology.Core;
+using SolTechnology.Core.CQRS;
+
+var builder = WebApplication.CreateBuilder(args);
+builder.Services.AddSolCQRS(o => o.RegisterQueriesFromAssembly(typeof(Greet).Assembly));
+var app = builder.Build();
+app.MapGet("/hello/{name}", async (string name, IMediator mediator, CancellationToken ct) =>
+    (await mediator.Send(new Greet { Name = name }, ct)).Data);
+app.Run();
+
+public class Greet : IQuery<string> { public string Name { get; set; } = ""; }
+
+public class GreetHandler : IQueryHandler<Greet, string>
+{
+    public Task<Result<string>> Handle(Greet query, CancellationToken cancellationToken) =>
+        Task.FromResult<Result<string>>($"Hello, {query.Name}!");
+}
+```
+
+Validation, logging, events, and the other packages build on the same pattern; start with
+[CQRS](docs/CQRS.md) and [Core](docs/Core.md). The [DreamTravel](sample-tale-code-apps/DreamTravel/README.md)
+sample shows them together.
+
 ## Core Libraries
 
 The SolTechnology.Core repository contains a set of shared libraries. This is a foundation for CQRS-driven applications using basic Azure technologies. The libraries support a modern coding approach presented in the example applications.
@@ -36,7 +70,7 @@ The SolTechnology.Core repository contains a set of shared libraries. This is a 
 
 | Documentation                                                                                                    | Tags                                   | NuGet                                                                                                                                                   |
 |------------------------------------------------------------------------------------------------------------|----------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------|
-| [Core (foundation)](https://github.com/AdrianStrugala/SolTechnology.Core/tree/master/docs/CQRS.md#result-pattern) | `Result`, `Error`, `Foundation`        | <a href="https://www.nuget.org/packages/SolTechnology.Core/"><img src="https://badgen.net/nuget/v/SolTechnology.Core?icon=nuget&color=blue"></a>                       |
+| [Core (foundation)](https://github.com/AdrianStrugala/SolTechnology.Core/tree/master/docs/Core.md) | `Result`, `Error`, `Foundation`        | <a href="https://www.nuget.org/packages/SolTechnology.Core/"><img src="https://badgen.net/nuget/v/SolTechnology.Core?icon=nuget&color=blue"></a>                       |
 | [API](https://github.com/AdrianStrugala/SolTechnology.Core/tree/master/docs/Api.md)                        | `API`, `Web`, `Controllers`            | <a href="https://www.nuget.org/packages/SolTechnology.Core.Api/"><img src="https://badgen.net/nuget/v/SolTechnology.Core.Api?icon=nuget&color=blue"></a>               |
 | [HTTP](https://github.com/AdrianStrugala/SolTechnology.Core/tree/master/docs/Clients.md)           | `HTTP`, `Client`, `REST`               | <a href="https://www.nuget.org/packages/SolTechnology.Core.HTTP/"><img src="https://badgen.net/nuget/v/SolTechnology.Core.HTTP?icon=nuget&color=blue"></a>    |
 | [AUID](https://github.com/AdrianStrugala/SolTechnology.Core/tree/master/docs/AUID.md)                      | `GUID`, `UUID`, `ID`, `Identifier`     | <a href="https://www.nuget.org/packages/SolTechnology.Core.AUID/"><img src="https://badgen.net/nuget/v/SolTechnology.Core.AUID?icon=nuget&color=blue"></a>             |
@@ -62,8 +96,8 @@ the shared `SolTechnology.Core.Testing` foundation. Reference from test projects
 | Documentation                                                                                                              | Tags                                   | NuGet                                                                                                                                                                       |
 |----------------------------------------------------------------------------------------------------------------------------|----------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | [Testing (foundation)](https://github.com/AdrianStrugala/SolTechnology.Core/tree/master/docs/Testing.md)                   | `Testing`, `NUnit`, `AutoFixture`      | <a href="https://www.nuget.org/packages/SolTechnology.Core.Testing/"><img src="https://badgen.net/nuget/v/SolTechnology.Core.Testing?icon=nuget&color=blue"></a>                     |
-| [API Testing](https://github.com/AdrianStrugala/SolTechnology.Core/tree/master/docs/Api.md#testing)                        | `TestServer`, `Integration`            | <a href="https://www.nuget.org/packages/SolTechnology.Core.API.Testing/"><img src="https://badgen.net/nuget/v/SolTechnology.Core.API.Testing?icon=nuget&color=blue"></a>             |
-| [SQL Testing](https://github.com/AdrianStrugala/SolTechnology.Core/tree/master/docs/SQL.md#testing)                        | `SQL`, `Postgres`, `Testcontainers`    | <a href="https://www.nuget.org/packages/SolTechnology.Core.SQL.Testing/"><img src="https://badgen.net/nuget/v/SolTechnology.Core.SQL.Testing?icon=nuget&color=blue"></a>             |
+| [API Testing](https://github.com/AdrianStrugala/SolTechnology.Core/tree/master/docs/API.Testing.md)                        | `TestServer`, `Integration`            | <a href="https://www.nuget.org/packages/SolTechnology.Core.API.Testing/"><img src="https://badgen.net/nuget/v/SolTechnology.Core.API.Testing?icon=nuget&color=blue"></a>             |
+| [SQL Testing](https://github.com/AdrianStrugala/SolTechnology.Core/tree/master/docs/SQL.Testing.md)                        | `SQL`, `Postgres`, `Testcontainers`    | <a href="https://www.nuget.org/packages/SolTechnology.Core.SQL.Testing/"><img src="https://badgen.net/nuget/v/SolTechnology.Core.SQL.Testing?icon=nuget&color=blue"></a>             |
 | [HTTP Testing](https://github.com/AdrianStrugala/SolTechnology.Core/tree/master/docs/HTTP.Testing.md)                      | `HTTP`, `WireMock`, `Mocks`            | <a href="https://www.nuget.org/packages/SolTechnology.Core.HTTP.Testing/"><img src="https://badgen.net/nuget/v/SolTechnology.Core.HTTP.Testing?icon=nuget&color=blue"></a>           |
 | [Redis Testing](https://github.com/AdrianStrugala/SolTechnology.Core/tree/master/docs/Redis.Testing.md)                    | `Redis`, `Cache`, `Testcontainers`     | <a href="https://www.nuget.org/packages/SolTechnology.Core.Redis.Testing/"><img src="https://badgen.net/nuget/v/SolTechnology.Core.Redis.Testing?icon=nuget&color=blue"></a>         |
 | [Blob Storage Testing](https://github.com/AdrianStrugala/SolTechnology.Core/tree/master/docs/Blob.Testing.md)       | `Azure`, `Blob`, `Azurite`             | <a href="https://www.nuget.org/packages/SolTechnology.Core.Blob.Testing/"><img src="https://badgen.net/nuget/v/SolTechnology.Core.Blob.Testing?icon=nuget&color=blue"></a> |
@@ -120,9 +154,3 @@ Enjoy your reading!
 [1. The Design](https://github.com/AdrianStrugala/SolTechnology.Core/tree/master/docs/theDesign.md) \
 [2. The Automation](https://github.com/AdrianStrugala/SolTechnology.Core/tree/master/docs/theAutomation.md) \
 [3. The Quality](https://github.com/AdrianStrugala/SolTechnology.Core/tree/master/docs/theQuality.md)
-
-
-*Some ending words*
-
-
-

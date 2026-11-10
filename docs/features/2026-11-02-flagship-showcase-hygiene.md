@@ -1,5 +1,5 @@
 ---
-status: planned
+status: in-progress
 created: 2026-11-02
 completed:
 ---
@@ -274,5 +274,13 @@ Owner actions that need admin rights (manual, outside the repository):
 ## Completion summary
 
 ## Deviations
+
+### Implementation decisions (owner pre-approval, 2026-11-10)
+
+Decided during implementation without a confirmation stop; each step file carries the detail.
+
+- Step 01: `SECURITY.md` and `CODE_OF_CONDUCT.md` use the public `contact@soltechnology.dev`
+  address, as the Private Vulnerability Reporting fallback and as the enforcement contact, so the
+  files promise nothing that is not enabled yet (SRM-1).
 
 ## Follow-ups

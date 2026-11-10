@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Report a security vulnerability
+    url: https://github.com/AdrianStrugala/SolTechnology.Core/security/policy
+    about: Please report security issues privately as described in SECURITY.md, not as a public issue.
+  - name: Documentation
+    url: https://github.com/AdrianStrugala/SolTechnology.Core#core-libraries
+    about: Each package has its own page under docs/, linked from the README.

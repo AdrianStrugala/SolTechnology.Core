@@ -1,7 +1,7 @@
 ---
 spec: 2026-11-02-flagship-showcase-hygiene
 step: 01
-status: to-do
+status: done
 ---
 
 # Step 01: Community health files and root README
@@ -50,15 +50,49 @@ Both are missing pieces; they ship as one PR (merged during plan review, RQ11):
 - Premortem SRM-18 (scenario 18): the throwaway quick-start project lives outside the repository tree (so it inherits neither the root `Directory.Build.props` nor Central Package Management) and restores from a local `dotnet pack` feed; it is never committed.
 
 ## Acceptance criteria
-- [ ] GitHub "Community Standards" page (Insights → Community) shows every item checked after merge (the settings-only items owner-confirmed).
-- [ ] `grep -n "Some ending words" README.md` prints nothing.
-- [ ] `test -f dontreadme.md` succeeds, `test -e docs/deprecated-packages.md` fails, and `grep -n "ThrowIfNull" dontreadme.md` prints the Guards row.
-- [ ] The documentation-cleanup skill reports no broken links in `README.md`, `dontreadme.md`, and the new community files.
-- [ ] The quick-start snippet builds in a project outside the repository tree (SRM-18).
-- [ ] SRM-1: Private Vulnerability Reporting is enabled on the repository before `SECURITY.md` merges (owner-confirmed, dated).
-- [ ] SRM-2: `CONTRIBUTING.md` and `.github/PULL_REQUEST_TEMPLATE.md` carry the dependency-floor rule.
+- [ ] GitHub "Community Standards" page (Insights → Community) shows every item checked after merge (the settings-only items owner-confirmed). *Owner action: every file item now exists; the description and content reports are settings (brief, owner actions).*
+- [x] `grep -n "Some ending words" README.md` prints nothing.
+- [x] `test -f dontreadme.md` succeeds, `test -e docs/deprecated-packages.md` fails, and `grep -n "ThrowIfNull" dontreadme.md` prints the Guards row.
+- [x] The documentation-cleanup skill reports no broken links in `README.md`, `dontreadme.md`, and the new community files.
+- [x] The quick-start snippet builds in a project outside the repository tree (SRM-18).
+- [ ] SRM-1: Private Vulnerability Reporting is enabled on the repository before `SECURITY.md` merges (owner-confirmed, dated). *Owner action, open; see SRM outcomes below.*
+- [x] SRM-2: `CONTRIBUTING.md` and `.github/PULL_REQUEST_TEMPLATE.md` carry the dependency-floor rule.
 
 ## Open questions
 - none (Q8 resolved by the user on 2026-11-02: GitHub Private Vulnerability Reporting; Contributor Covenant 2.1; `* @AdrianStrugala`)
 
 ## Deviations
+
+### Fallback reporting channel in SECURITY.md
+
+**Original plan:** `SECURITY.md` names GitHub Private Vulnerability Reporting as the channel.
+
+**Actual implementation:** It names Private Vulnerability Reporting first and the public
+`contact@soltechnology.dev` address as a fallback, because the setting needs the owner (SRM-1) and
+the file must not promise a channel that is not on yet. The Code of Conduct uses the same address
+for enforcement reports, since Contributor Covenant 2.1 needs a contact.
+
+### SRM outcomes (2026-11-10)
+
+- **SRM-1 — open, owner action.** Enabling Private Vulnerability Reporting needs admin rights, so it
+  was not done here. `SECURITY.md` is worded so it promises nothing that may be off: it names the
+  Security tab's "Report a vulnerability" button and falls back to `contact@soltechnology.dev` (the
+  public Sol Technology contact address, from the product site) when the button is not shown. The
+  owner still enables the setting before pushing this commit.
+- **SRM-2 — done.** `CONTRIBUTING.md` ("Dependency floors") and the PR template's "Dependency floor"
+  checkbox carry the rule: a change in the "Library and testing-kit dependencies" group updates
+  `canonical-versions.md` and the unreleased `CHANGELOG.md` section in the same PR, and a
+  Dependabot PR gets both pushed to its branch before merging.
+- **SRM-18 — done.** `src/SolTechnology.Core`, `.Logging`, and `.CQRS` were packed (`dotnet pack
+  -c Release`) into a local feed in a sibling folder of the repository
+  (`~/Documents/GitHub/soltech-quickstart-check`, outside the tree, no `Directory.*.props` above
+  it). A `dotnet new web` project restored `SolTechnology.Core.CQRS 2.0.0` from that feed into an
+  isolated packages folder, took `Program.cs` verbatim from the README block, built with 0 warnings
+  and 0 errors, and answered `GET /hello/Tale` with `Hello, Tale!`. The folder was deleted.
+
+### Verification (2026-11-10)
+
+- Link check (relative links, `github.com/AdrianStrugala/SolTechnology.Core/(tree|blob)/master`
+  links, and Markdown anchors) over `README.md`, `dontreadme.md`, `CONTRIBUTING.md`, `SECURITY.md`,
+  `CODE_OF_CONDUCT.md`, `CHANGELOG.md`, and the PR template: 0 broken.
+- No code changed, so no build or test run was needed for this step.
