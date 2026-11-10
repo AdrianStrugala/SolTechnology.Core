@@ -461,12 +461,13 @@ is fresh.
   - Delete `GetTimings()`/`Reset()` calls; the report is emitted automatically per root.
   - Code that starts work which outlives its caller (`Task.Run`, timers) uses
     `chronicle.BeginRoot("name")` to get its own report (B11).
-  - The `{@Timings}` property in the finish entry is replaced by `{@Chronicle}` (LC-01), and
+  - The `{@Timings}` property in the finish entry is replaced by the `Chronicle` property (LC-01), and
     EventId 2147 (the finish entry with timings) is retired: query 2155 instead.
 - Serilog hosts that want the flight recorder: `UseSerilog(..., writeToProviders: true)` or
   `builder.Logging.AddSerilog()`. With `writeToProviders`, Serilog's own `MinimumLevel` must admit
-  Debug. Serilog destructures `{@Chronicle}` as a structure capped by `MaximumDestructuringDepth`
-  (default 10), not as the ASCII tree.
+  Debug. The report reaches providers under the state key `Chronicle` (the generator drops the `@`
+  of `{@Chronicle}`), so Serilog, OpenTelemetry, and Application Insights store it as the ASCII tree
+  text; queries filter on the scalar properties (see Deviations, step 04).
 - `CH-nn`, `CP-nn`, and `LC-nn` tables above, as amended by `Deviations`. These prefixes are Chronicle's own,
   so they never collide with the flagship's `C-nn`/`P-nn`/`L-nn` rows (maxima on 2026-11-09: `C-33`, `P-29`,
   `L-07`); Chronicle reserves no `C`/`P`/`L` number.

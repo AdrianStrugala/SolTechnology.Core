@@ -303,6 +303,24 @@ Engine entries use your handler's logger category (for example `MyApp.Orders.Pro
 inside a scope with `TaleHandler` and `TaleId`; `TaleManager` and `TaleController` log under their
 full type names in `SolTechnology.Core.Tale`.
 
+#### Chronicle
+
+`AddSolTale` registers [Chronicle](Log.md#chronicle): a run is a step `Tale {Handler}` with
+attribute `TaleId`, and every executed chapter a child step `Chapter {ChapterId}`, inside the
+report of the request, command or job that runs the tale, or in its own 2154 report.
+
+| Chapter outcome | Chapter step | Tale step |
+|---|---|---|
+| Success | `Ok` | `Ok` when the tale completes |
+| Failed `Result` or exception | `Failed`; later chapters get no step | `Failed` |
+| Waiting for input (also after rejected input) | `Ok`, `Outcome=WaitingForInput` | `Ok`, `Outcome=WaitingForInput` |
+| Caller cancellation | `Cancelled` | `Cancelled` |
+| Lease taken over by another run | `Cancelled`, `Outcome=LeaseLost` | `Failed` (`ConflictError`) |
+
+Chapters already completed before a resume get no step, and interactive input is never recorded.
+A persisted run's lease renewals can appear as `SQL` steps when the repository uses SqlClient.
+`SolTechnology.Core.Tale` depends on `SolTechnology.Core.Logging` for this.
+
 #### Upgrading from 1.x
 
 Tales saved by 1.x cannot be resumed by 2.x, because 2.x matches chapter history by step position

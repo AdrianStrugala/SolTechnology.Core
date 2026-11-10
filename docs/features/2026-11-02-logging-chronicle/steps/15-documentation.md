@@ -1,7 +1,7 @@
 ---
 spec: 2026-11-02-logging-chronicle
 step: 15
-status: to-do
+status: done
 ---
 
 # Step 15: Documentation — `docs/Log.md` Chronicle section and module integration notes
@@ -90,3 +90,32 @@ retrospective (step 17) updates them.
 - none
 
 ## Deviations
+
+### Serilog stores the report as text
+
+**Original plan:** `docs/Log.md` says Serilog destructures `{@Chronicle}` as a structure capped
+by `MaximumDestructuringDepth`.
+
+**Actual implementation:** step 04 found that the state key is `Chronicle`, without `@`, so
+Serilog binds the report without destructuring and stores the ASCII tree as a string, like
+OpenTelemetry and Application Insights. `docs/Log.md` ("Log entries") documents the string form
+and recommends filtering on the scalar properties; the brief's release-notes bullet is corrected
+the same way.
+
+### Placement
+
+- `### Chronicle` sits before `### Testing` in `docs/Log.md`, with `####` subsections (API, what
+  becomes a root or a step, options, levels and sampling, reading a report, log entries, log
+  contract changes, flight recorder, rules of use, migration). It is a top-level section outside the
+  canonical structure of the Public Documentation Guide, as this step requires (`grep "^### Chronicle"`).
+- Each module page has `#### Chronicle` under `### Usage`; `docs/Log.md` links to them by anchor.
+- `docs/Log.md` also updates the Features bullets, the OpenTelemetry subsection (the CQRS span is the
+  step span), the App Insights sample row, the production levels, and "What ships in DI".
+- `docs/architecture/` is not touched (R9); its `ITimingService` text is step 17's.
+
+### CRM-7 re-check at implementation (2026-11-10)
+
+Holds. "Log contract changes in 2.0" has three columns (1.x without EventId; 2.0 with Chronicle
+disabled: 2146, 2147 retired, 2145, 2144; 2.0 with Chronicle enabled: 2155), a before/after KQL
+pair, the slow-request Warning with `SlowThreshold`, and the 5xx-without-exception row of CRM-5.
+

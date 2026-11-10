@@ -325,6 +325,24 @@ Each retry / circuit-breaker state transition is also logged at `Warning` under 
 [{ClientName}]" entry carry the triggering exception as the log entry's exception. The resilience pipeline name is `core-http-{httpClientName}` for
 filtering in dashboards.
 
+#### Chronicle
+
+`AddSolHTTPClient` registers [Chronicle](Log.md#chronicle): every call inside a root is one step
+`HTTP {Method} {client}` with attributes `Host`, `StatusCode` and `Attempts`, however many retries
+the resilience pipeline made.
+
+| Call outcome | Step status |
+|---|---|
+| 2xx–4xx response | `Ok` (a 4xx is often expected; see `StatusCode`) |
+| 5xx final response | `Failed` (`HTTP500`, …) |
+| Exception in the pipeline (timeout, broken circuit, connection failure) | `Failed`, with the exception type |
+| Caller cancellation | `Cancelled` |
+
+The path and query are never recorded, because they can carry personal data. Calls in a loop
+aggregate per client and method, so the N+1 hint also catches chatty HTTP. Clients registered with
+`propagateCorrelation: false` are recorded too. The steps are logical spans around `HttpClient`'s
+own spans.
+
 #### Upstream service health check
 
 Subclass `BaseUpstreamServiceHealthCheck<TReport>` to probe a downstream's `/health` endpoint

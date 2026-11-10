@@ -122,6 +122,27 @@ builder.Services.AddSolRecurringJob<FetchTrafficJob>("0 */6 * * *", preventOverl
 | Job throws | `Failed`, not retried | `Failed`, not retried |
 | Server shuts down mid-run | Requeued when the job lets the token's `OperationCanceledException` propagate | Requeued when a handler is interrupted: the remaining handlers are skipped and every handler runs again on the next server; a dispatch that finished first succeeds |
 
+#### Chronicle
+
+`UseSolFilters(sp)` installs a filter that makes every performed job its own
+[Chronicle](Log.md#chronicle) root, with attributes `JobId` and `RetryCount`: `Job {TJob}` for a
+recurring job, `Event {EventType}` for a persistent event, and `Job {Type}.{Method}` for anything
+else. Both installers register Chronicle; without `UseSolFilters` jobs have no root.
+
+| Job outcome | Root status | Hangfire state |
+|---|---|---|
+| Success | `Ok` | `Succeeded` |
+| Failed `Result`, not recoverable | `Failed`, `Recoverable=False` | `Succeeded` |
+| Failed `Result`, recoverable | `Failed`, `Recoverable=True` | retried by Smart Retry |
+| Exception | `Failed`, with the job's own exception type | `Failed` |
+| Server shutdown or abort | `Cancelled`; the rerun gets its own report | requeued |
+| Skipped by the overlap guard | no report | `Deleted` |
+
+The filter runs after the correlation, Smart Retry and overlap filters, so the report carries the
+job's correlation id. Persistent-event handler steps nest under the event root. Hangfire keeps one
+global filter instance per process: with several hosts in one process, the last host that called
+`UseSolFilters` reports every job.
+
 #### Job ids
 
 Hangfire.SqlServer stores `recurring-job:<id>` in an `nvarchar(100)` key, so ids are at most 86 characters: a full type

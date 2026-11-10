@@ -176,6 +176,22 @@ retry delays:
 | Caller cancellation | Rethrown, not reported as `Unhealthy` |
 | Timeout | 5 seconds per call, configurable with `timeout` |
 
+#### Chronicle
+
+With [Chronicle](Log.md#chronicle) registered (any `AddSolLogging`, `AddSolChronicle` or Chronicle
+integration) every SqlClient command run inside a root is a step `SQL {keyword}` (`SQL SELECT`, or
+`SQL {procedure}` for a stored procedure). It is observed from SqlClient's
+`SqlClientDiagnosticListener`, so Dapper over `ISQLConnectionFactory`, EF Core and raw
+`SqlConnection` are all captured; other database providers are not.
+
+- `CaptureSQLCommandText` is `false` by default: statements and SqlClient error messages can carry
+  literal values, so a failed command records only the exception type until you opt in.
+- The step covers sending the command and receiving the first result; reading the rows of a data
+  reader afterwards is not included.
+- Connection-open retries (up to about 40 seconds) are not commands, so they show as a gap in the
+  parent step.
+- Repeated statements aggregate by statement, so `N+1 suspected` points at the loop.
+
 ### Testing
 
 The companion package `SolTechnology.Core.SQL.Testing` provides `SQLFixture`, a Testcontainers database for component

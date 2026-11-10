@@ -117,6 +117,24 @@ The receiver settles every message itself:
 | Body deserializes to `null` | Dead-lettered, reason `NullPayload` |
 | Host stops while `Handle` runs | `cancellationToken` is cancelled; if `Handle` still returns, the message is completed, and if it throws, the message is delivered again |
 
+#### Chronicle
+
+`AddSolMessageBus` registers [Chronicle](Log.md#chronicle): every received message is its own root
+`Message {MessageType}` with attributes `MessageId`, `DeliveryCount` and `Entity`, inside the
+receiver's log scope, so handler, SQL and HTTP steps nest under it.
+
+| Settlement | Root status | Attributes |
+|---|---|---|
+| Completed | `Ok` | `Settlement=Completed` |
+| Handler succeeded, completion failed | `Ok` | `Settlement=CompleteFailed` |
+| Handler threw, retries left | `Failed` | `Settlement=Abandoned` |
+| Handler threw on the last delivery | `Failed` | `Settlement=DeadLettered`, `DeadLetterReason=HandlerFailedMaxDelivery` |
+| Unreadable body | `Failed` (`DeadLettered`) | `Settlement=DeadLettered`, `DeadLetterReason=EmptyBody`, `DeserializationFailed` or `NullPayload` |
+| Processor shutdown | `Cancelled` | — |
+
+The body and the application properties are never recorded, and a dead-lettered message records
+the reason code only, never the description.
+
 #### Running several instances
 
 Every instance that registers a receiver takes part in receiving:

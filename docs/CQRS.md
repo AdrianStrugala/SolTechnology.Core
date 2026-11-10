@@ -219,7 +219,7 @@ builder.Services.AddTransient(typeof(IPipelineBehavior<,>), typeof(TimingBehavio
 | Exception | 2139 | Error | `Operation: [{OperationName}]. Status: [FAIL]. Duration: [{DurationMs} ms]. Message: [{Message}]` |
 
 A failed `Result` logs only the `Error` type name and `Error.Message`, never validation details,
-inner errors, or data; the activity status becomes `Error`. Mark request properties to add them to
+inner errors, or data; the step and its activity are marked failed. Mark request properties to add them to
 the scope of every entry and as activity tags:
 
 ```csharp
@@ -233,8 +233,29 @@ public class FindCityQuery : IQuery<string>
 }
 ```
 
-Activities go to the `ActivitySource` named `CoreLoggingActivitySources.OperationsName`; see
-[SolTechnology.Core.Logging](Log.md) for OpenTelemetry setup and masking.
+Activities go to the `ActivitySource` named `CoreLoggingActivitySources.OperationsName` through the
+request's Chronicle step; see [SolTechnology.Core.Logging](Log.md) for OpenTelemetry setup and masking.
+
+#### Chronicle
+
+With `UseLogging` (the default) `AddSolCQRS` registers [Chronicle](Log.md#chronicle), and every
+request becomes a step named after its type: a child step inside an HTTP request, job or message,
+or its own root (one 2154 entry) in a worker.
+
+| Outcome | Step status |
+|---|---|
+| Success | `Ok` |
+| Failed `Result` | `Failed`, with the `Error` type name and `Error.Message` only |
+| Exception | `Failed`, with the exception type and message; rethrown |
+| `OperationCanceledException` while the caller's token is cancelled | `Cancelled`; rethrown |
+
+`[LogScope]` properties become step attributes with the same masking as the scope. The default
+in-memory publisher gives every published event its own root, `Event {EventType}`, because the
+dispatch usually outlives the publishing request; each handler is a step
+`Event {EventType} {HandlerType}`, `Failed` when it throws. When the dispatch's token is cancelled
+the running handler's step is `Cancelled` and the remaining handlers get no step. The step also
+produces the operation's `Activity`; a successful one keeps status `Unset`. `UseLogging = false`
+registers no Chronicle and records no CQRS steps.
 
 ### Testing
 
