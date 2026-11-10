@@ -23,7 +23,7 @@ working folder. It runs only when steps 01–05 are `done`, or were removed by t
   - authors and copyright `Adrian Strugala / Sol Technology`;
   - repository `sol-technology/SolTechnology.Core` and nuget.org organization `SolTechnology`;
   - `master` has no ruleset (CI runs on push and PR, direct pushes are allowed; decision A, user, 2026-11-02, confirmed by the owner 2026-11-10), and the stats bot keeps pushing to `master` (A8 rationale)
-- `docs/features/2026-11-02-org-transfer-and-2-0-release.md` — EDIT — `Completion summary`, `Deviations`, `Follow-ups`, `status: completed`, `completed: YYYY-MM-DD`
+- `docs/features/2026-11-02-org-transfer-and-2-0-release.md` — EDIT — `Completion summary`, `Deviations`, `Follow-ups`, `## Steps` links to plain file names with final statuses, `status: completed`, `completed: YYYY-MM-DD`
 - `docs/features/2026-11-02-org-transfer-and-2-0-release/` — DELETE
 
 ## Changes
@@ -38,7 +38,7 @@ working folder. It runs only when steps 01–05 are `done`, or were removed by t
    - Revisit the stats bot's direct pushes if `master` ever gets a ruleset (AR-3, Q7, decision A).
    - Add the Core entry to `sol-technology.github.io` (`src/config.ts`), linking the organization repository and the 2.0.0 packages (RRM-18).
    - Reconnect or retire the DreamTravel Azure DevOps pipelines if their GitHub service connection lost access after the transfer (AR-4; the files stay).
-4. Set feature status to `completed` (or `abandoned`) with `completed: YYYY-MM-DD` (`CLAUDE.md §2`: confirm with the user first).
+4. Set feature status to `completed` (or `abandoned`) with `completed: YYYY-MM-DD` (`CLAUDE.md §2`: confirm with the user first). Convert each step link in the brief's `## Steps` to its plain file name and keep the table with final statuses.
 5. Verify that no durable link points into this working folder: `grep -rn "2026-11-02-org-transfer-and-2-0-release/" --include=*.md . | grep -v "^./docs/features/2026-11-02-org-transfer-and-2-0-release/"` prints nothing.
 6. Delete the working folder, then search Markdown for the deleted path and repair dangling links.
 

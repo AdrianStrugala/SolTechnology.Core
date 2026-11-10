@@ -78,6 +78,12 @@ completed:
 
 ## Acceptance criteria
 
+## Steps
+
+| # | Title | File | Status |
+|---|---|---|---|
+| 01 | <Title> | [`steps/01-<step>.md`](YYYY-MM-DD-<kebab-name>/steps/01-<step>.md) | to-do |
+
 ## Completion summary
 
 ## Deviations
@@ -88,6 +94,23 @@ completed:
 The initial brief contains the goal, context, scope, implementation plan, and acceptance criteria.
 Keep `Completion summary`, `Deviations`, and `Follow-ups` empty until delivery closes.
 
+A feature with a working folder also carries its gates and step table in the brief:
+
+```yaml
+---
+status: planning
+created: YYYY-MM-DD
+completed:
+review: pending
+premortem: pending
+---
+```
+
+- `review:` and `premortem:` hold concrete gate values and are never omitted while steps exist.
+  A feature without a working folder has no gate fields and no `## Steps` section.
+- `## Steps` lists every step file in order. Its status cells mirror step frontmatter in the same
+  edit.
+
 ## Working folder
 
 Use a temporary sibling folder only when a change needs durable multi-step coordination:
@@ -96,16 +119,15 @@ Use a temporary sibling folder only when a change needs durable multi-step coord
 docs/features/
   YYYY-MM-DD-<kebab-name>.md
   YYYY-MM-DD-<kebab-name>/
-    summary.md
     steps/
       00-run-premortem.md
       01-<step>.md
       NN-retrospective.md
 ```
 
-- `summary.md` tracks temporary execution state; it is not a second feature specification.
+- The folder holds only step files; gates and the step table live in the feature brief.
 - Step files use `to-do | blocked | in-progress | done` as execution states.
-- Review and premortem gates remain in `summary.md` when required by risk, not by document type.
+- Review and premortem gates are required by risk, not by document type.
 - The retrospective reviews delivery, updates architecture documentation, completes the feature
   brief, and then deletes the entire working folder.
 
@@ -118,8 +140,10 @@ The retrospective performs these actions in order:
    system and rationale.
 3. Append the delivered outcome, material deviations, and follow-ups to the feature brief.
 4. Set the feature status to `completed` or `abandoned` and set `completed: YYYY-MM-DD`.
-5. Verify that no durable link points into the working folder.
-6. Delete the working folder.
+5. Convert each step link in `## Steps` to its plain file name, keeping the table with final
+   statuses as the record of what was done.
+6. Verify that no durable link points into the working folder.
+7. Delete the working folder.
 
 The remaining feature brief is historical evidence. Never use it as the source of truth for
 current architecture or behavior.

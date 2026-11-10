@@ -11,7 +11,7 @@ status: to-do
 Premortem is mandatory: the feature touches the public NuGet API surface and
 `ModuleInstaller.cs` of `SolTechnology.Core.Authentication` (CLAUDE.md §3 gate). Execute
 the [premortem skill](../../../../.github/skills/premortem/SKILL.md) in a session that did
-not author this plan; record the full output here and the verdict in `summary.md`
+not author this plan; record the full output here and the verdict in the feature brief's
 `premortem:`. No `src/` code is touched by this step.
 
 ## Brief
@@ -42,7 +42,7 @@ not author this plan; record the full output here and the verdict in `summary.md
 ## Acceptance criteria
 
 - [ ] Premortem output (scenario table, accepted risks, verdict) recorded in this file.
-- [ ] `summary.md` `premortem:` field updated to the verdict in the same change.
+- [ ] Feature brief `premortem:` field updated to the verdict in the same change.
 
 ## Open questions
 

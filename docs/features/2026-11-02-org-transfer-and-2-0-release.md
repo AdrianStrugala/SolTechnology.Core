@@ -2,6 +2,8 @@
 status: planned
 created: 2026-11-02
 completed:
+review: done (2026-11-02)
+premortem: go-with-mitigations (2026-11-10)
 ---
 
 # SolTechnology.Core — Sol Technology org transfer and 2.0.0 release
@@ -177,7 +179,7 @@ The IDs keep their numbers from the core brief.
 
 ## Implementation plan
 
-Gates (see `summary.md`): review required — the feature changes package metadata, the publishing
+Gates (see the frontmatter and `## Steps`): review required — the feature changes package metadata, the publishing
 credential, and the release path across every package. Premortem required — step 02 edits
 `src/Directory.Build.props` and `sample-tale-code-apps/DreamTravel/Directory.Build.props`
 (`CLAUDE.md §4`), and step 05 ships the core feature's persisted-contract breaks to consumers.
@@ -248,6 +250,28 @@ section), not their step files.
       Publishing, and their nuget.org pages show the README and the new repository URL.
 - [ ] `docs/migration-2.0.md` has one section per confirmed signature-changing `C-nn` and per
       P-03/P-04/P-05/P-06/P-07/P-17/P-18/P-27, plus the `SOLCORE001` deprecated-ID table.
+
+## Steps
+
+Gate order: `review` (plan-reviewer) → step `00` premortem → steps `01`–`05` → `06` retrospective.
+Implementation starts only after the core feature, its 13 per-library features (listed in "Depends on"),
+[`2026-11-02-flagship-showcase-hygiene`](2026-11-02-flagship-showcase-hygiene.md),
+[`2026-11-02-logging-chronicle`](2026-11-02-logging-chronicle.md), and
+[`2026-11-05-cache-redis-fail-fast`](2026-11-05-cache-redis-fail-fast.md) are all `completed` (checked 2026-11-10,
+together with [`2026-11-10-chronicle-sql-step-targets`](2026-11-10-chronicle-sql-step-targets.md)). No step is `blocked`.
+
+Who acts: **owner-only** = GitHub or nuget.org admin UI, pushes and tags (`CLAUDE.md §2`); **agent** = repository
+edits; **mixed** = both, in the order the step gives.
+
+| # | Title | File | Who | Status |
+|---|---|---|---|---|
+| 00 | Run premortem (gate) | [`steps/00-run-premortem.md`](2026-11-02-org-transfer-and-2-0-release/steps/00-run-premortem.md) | agent | done |
+| 01 | Push `master`, pass CI on GitHub, transfer the repository, and set up the nuget.org organization | [`steps/01-transfer-repository-and-nuget-org.md`](2026-11-02-org-transfer-and-2-0-release/steps/01-transfer-repository-and-nuget-org.md) | **owner-only** | to-do |
+| 02 | License, authorship, and repository URLs for the organization | [`steps/02-license-authorship-and-repository-urls.md`](2026-11-02-org-transfer-and-2-0-release/steps/02-license-authorship-and-repository-urls.md) | agent (owner pushes) | to-do |
+| 03 | Org repository hygiene — security settings, presentation, and ghost-ID deprecations (no ruleset) | [`steps/03-org-repository-hygiene.md`](2026-11-02-org-transfer-and-2-0-release/steps/03-org-repository-hygiene.md) | mixed (mostly owner) | to-do |
+| 04 | Switch publishing to NuGet Trusted Publishing (no environment) | [`steps/04-switch-to-trusted-publishing.md`](2026-11-02-org-transfer-and-2-0-release/steps/04-switch-to-trusted-publishing.md) | mixed | to-do |
+| 05 | Release 2.0.0 | [`steps/05-release-2-0-0.md`](2026-11-02-org-transfer-and-2-0-release/steps/05-release-2-0-0.md) | mixed | to-do |
+| 06 | Retrospective | [`steps/06-retrospective.md`](2026-11-02-org-transfer-and-2-0-release/steps/06-retrospective.md) | agent (owner confirms `completed`) | to-do |
 
 ## Completion summary
 

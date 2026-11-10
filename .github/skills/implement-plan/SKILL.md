@@ -15,11 +15,12 @@ before touching plan files.
 
 ### 1. Locate the step and check gates
 
-Open the dated feature brief and `summary.md`. If the user did not name a step, enumerate `steps/`
+Open the dated feature brief with its gate frontmatter and `## Steps` table. If the user did not
+name a step, enumerate `steps/`
 and select the lowest-numbered file with `status: to-do`.
 
 Read the complete selected step. Treat `Affected components`, `Changes`, and `Acceptance criteria`
-as the execution contract. Never select steps only from links in `summary.md`; a late-added file may
+as the execution contract. Never select steps only from links in `## Steps`; a late-added file may
 be missing there.
 
 Enforce these preconditions:
@@ -37,8 +38,9 @@ do not implement against an assumption.
 
 ### 2. Start the step
 
-Set the step to `status: in-progress` and mirror its row in `summary.md`. Set the durable feature
-brief to `status: in-progress` before the first production-code edit. These changes happen together.
+Set the step to `status: in-progress` and mirror its row in the brief's `## Steps`. Set the durable
+feature brief to `status: in-progress` before the first production-code edit. These changes happen
+together.
 
 Load every related skill required by the step. Follow `CLAUDE.md §0`, the relevant Coding Guide
 sections, and current architecture pages.
@@ -72,13 +74,13 @@ feature brief, and keep the step in the accurate execution state.
 
 ### 4. Complete an ordinary step
 
-Set the step to `status: done` and mirror `done` in `summary.md`. Keep the feature
+Set the step to `status: done` and mirror `done` in the brief's `## Steps`. Keep the feature
 `status: in-progress`. Report verification and yield.
 
 ### 5. Run premortem step `00`
 
 Invoke the [`premortem`](../premortem/SKILL.md) skill in a session that did not author the plan.
-Record the full output in step `00` and the verdict in `summary.md`.
+Record the full output in step `00` and the verdict in the brief's `premortem:` field.
 
 - `Go`: set step `00` to `done`.
 - `Go with mitigations`: fold mitigations into named steps before setting `00` to `done`.
@@ -103,6 +105,8 @@ The retrospective is one transaction: review, synchronize, consolidate, verify, 
    - promote material deviations under `## Deviations`;
    - list unresolved work under `## Follow-ups`;
    - remove resolved `## Blockers`;
+   - convert each step link in `## Steps` to its plain file name and keep the table with final
+     statuses as the record of what was done;
    - set `status: completed` and `completed: YYYY-MM-DD`.
 5. Re-read architecture pages and the feature record. Verify that code, current docs, and outcome
    agree and that no durable link points into the working folder.
@@ -111,7 +115,8 @@ The retrospective is one transaction: review, synchronize, consolidate, verify, 
 
 If the user explicitly abandons a feature, use the same transaction without requiring all steps to
 be done: record the reason and each step's last state, set `status: abandoned` and completion date,
-verify durable links, then delete the working folder.
+convert the `## Steps` links to plain text with last statuses, verify durable links, then delete
+the working folder.
 
 ## Quality checks
 

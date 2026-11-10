@@ -13,12 +13,12 @@ A premortem is mandatory (`CLAUDE.md §4`): step 02 edits two `Directory.Build.p
 step 05 publishes the persisted-contract breaks of the core and library features. Run the
 [premortem skill](../../../../.github/skills/premortem/SKILL.md) in a session that did not author
 this plan, after `review` is `done` and after every prerequisite feature is `completed`. Record the
-full output here and the verdict in the `premortem:` field of `summary.md`. This step changes no
+full output here and the verdict in the `premortem:` field of the feature brief. This step changes no
 `src/` code.
 
 ## Affected components
 - `docs/features/2026-11-02-org-transfer-and-2-0-release/steps/00-run-premortem.md` — EDIT — the `## Premortem` section below
-- `docs/features/2026-11-02-org-transfer-and-2-0-release/summary.md` — EDIT — the `premortem:` verdict
+- `docs/features/2026-11-02-org-transfer-and-2-0-release.md` — EDIT — the `premortem:` verdict
 - Step files named by required mitigations, and the feature brief — EDIT
 
 ## Changes
@@ -53,7 +53,7 @@ full output here and the verdict in the `premortem:` field of `summary.md`. This
 
 ## Acceptance criteria
 - [x] Premortem output (frame, imagined failure, scenario table, top 3 risks, required mitigations naming their step files, accepted risks, decision) recorded in this file.
-- [x] `summary.md` `premortem:` updated to the verdict in the same change.
+- [x] Feature brief `premortem:` updated to the verdict in the same change.
 
 ## Open questions
 - none

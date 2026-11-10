@@ -71,7 +71,8 @@ For every file under [docs/architecture/](../../../docs/architecture/):
 For every durable file directly under [docs/features/](../../../docs/features/):
 
 - Filename matches `YYYY-MM-DD-<kebab-name>.md`.
-- Frontmatter contains `status`, `created`, and `completed`.
+- Frontmatter contains `status`, `created`, and `completed`; a record with steps also has
+  `review` and `premortem`.
 - Status is `planning | planned | in-progress | blocked | completed | abandoned`.
 - Completed and abandoned records have a completion date and completion summary.
 - The record warns that it may not describe the current system.

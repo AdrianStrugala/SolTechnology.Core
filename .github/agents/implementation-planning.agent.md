@@ -105,6 +105,8 @@ completed:
 
 ## Acceptance criteria
 
+## Steps
+
 ## Completion summary
 
 ## Deviations
@@ -113,6 +115,7 @@ completed:
 ```
 
 Fill the first five sections during planning. Leave the last three empty until delivery closes.
+Keep `## Steps` only when the feature gets a working folder; otherwise delete the heading.
 Use exact symbols, paths, package versions, and pass/fail acceptance criteria.
 
 ### 5. Decide whether steps are needed
@@ -123,7 +126,6 @@ For multi-step work, create:
 
 ```text
 docs/features/YYYY-MM-DD-<feature>/
-  summary.md
   steps/
     00-run-premortem.md       # only when premortem is required
     01-<step-title>.md
@@ -146,7 +148,7 @@ For every step:
 6. Record unresolved decisions under `Open questions` and set `status: blocked`; never invent an
   answer.
 7. When inserting or splitting, renumber later files, keep the retrospective highest, and update
-  every `summary.md` row and link in the same change.
+  every row and link in the brief's `## Steps` table in the same change.
 
 Before finalizing, ask whether each step can be split without losing coherence. Split it when the
 answer is yes.
@@ -185,7 +187,8 @@ identifiers instead of vague nouns.
 
 ### 6. Set gates
 
-`summary.md` frontmatter contains concrete `review:` and `premortem:` values:
+When a working folder exists, the feature brief frontmatter contains concrete `review:` and
+`premortem:` values. A feature without a working folder has no gate fields.
 
 - Review is required for cross-module changes, breaking public API, persisted contracts, and
   material architecture changes. Otherwise it may be waived with a dated reason.
@@ -193,11 +196,13 @@ identifiers instead of vague nouns.
   a dated reason.
 - Only the user may skip a required gate; record their reason verbatim.
 
-Never omit a gate field. Use one concrete value in `summary.md` frontmatter:
+Never omit a gate field while steps exist. Use one concrete value in the brief frontmatter:
 
 ```yaml
 ---
-spec: YYYY-MM-DD-<feature>
+status: planning
+created: YYYY-MM-DD
+completed:
 review: pending
 premortem: pending
 ---
@@ -208,32 +213,21 @@ premortem: pending
 `waived (<reason — planner, date>)`, `go (date)`, `go-with-mitigations (date)`, `no-go (date)`,
 or `skipped (<reason — user, date>)`.
 
-`summary.md` contains the feature link and a step table. Its status cells mirror step frontmatter in
+The brief's `## Steps` section contains a step table. Its status cells mirror step frontmatter in
 the same edit using `to-do`, `blocked`, `in-progress`, or `done`.
 
 ```markdown
----
-spec: YYYY-MM-DD-<feature>
-review: pending
-premortem: pending
----
-
-# <Feature title> — Implementation Summary
-
-Tracks temporary implementation state for
-[`../YYYY-MM-DD-<feature>.md`](../YYYY-MM-DD-<feature>.md).
-
 ## Steps
 
 | # | Title | File | Status |
 |---|---|---|---|
-| 00 | Run premortem | [`steps/00-run-premortem.md`](steps/00-run-premortem.md) | to-do |
-| 01 | <Title> | [`steps/01-title.md`](steps/01-title.md) | to-do |
-| 02 | Retrospective | [`steps/02-retrospective.md`](steps/02-retrospective.md) | to-do |
+| 00 | Run premortem | [`steps/00-run-premortem.md`](YYYY-MM-DD-<feature>/steps/00-run-premortem.md) | to-do |
+| 01 | <Title> | [`steps/01-title.md`](YYYY-MM-DD-<feature>/steps/01-title.md) | to-do |
+| 02 | Retrospective | [`steps/02-retrospective.md`](YYYY-MM-DD-<feature>/steps/02-retrospective.md) | to-do |
 ```
 
 When premortem is required, author `00-run-premortem.md` last so it can link to the complete plan,
-but list it first in the summary. It records affected modules, contract delta, applicable risk
+but list it first in `## Steps`. It records affected modules, contract delta, applicable risk
 checklists, and links to every step. Do not perform risk analysis in the file; the premortem skill
 does that later. Do not create step `00` when premortem is waived.
 
@@ -245,8 +239,9 @@ The highest-numbered step must instruct the implementer to:
 2. Update affected `docs/architecture/*.md` pages to current behavior and rationale.
 3. Complete the durable feature record with outcomes, deviations, and follow-ups.
 4. Set feature status to `completed` or `abandoned` with `completed: YYYY-MM-DD`.
-5. Verify no durable links point into the working folder.
-6. Delete the working folder.
+5. Convert each step link in the brief's `## Steps` to its plain file name, keeping final statuses.
+6. Verify no durable links point into the working folder.
+7. Delete the working folder.
 
 ### 8. Hand off
 
@@ -254,12 +249,12 @@ If review is required, hand the working folder to the
 [`plan-reviewer`](plan-reviewer.agent.md) agent. Never review your own plan. If no working folder
 exists or review is waived, report that the feature brief is ready for implementation.
 
-Before handoff, re-read the brief, summary, and every enumerated step. Verify:
+Before handoff, re-read the brief and every enumerated step. Verify:
 
 - every affected path exists or is marked `NEW`;
 - gate fields are present and match the risk triggers;
 - unresolved questions imply `blocked`;
-- step and summary statuses agree;
+- step frontmatter and `## Steps` statuses agree, and `## Steps` lists every step file in order;
 - `00` exists only for pending premortem;
 - retrospective exists and is highest-numbered;
 - every relative link resolves;

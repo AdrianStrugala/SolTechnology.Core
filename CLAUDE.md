@@ -103,7 +103,7 @@ contracts — read the file before invoking (§0.3).
 | Agent | Path | Invoke when |
 |---|---|---|
 | implementation-planning | [`.github/agents/implementation-planning.agent.md`](.github/agents/implementation-planning.agent.md) | Planning a non-trivial change; creates one dated feature brief and optional steps per [delivery workflow](docs/architecture/delivery-workflow.md). |
-| plan-reviewer | [`.github/agents/plan-reviewer.agent.md`](.github/agents/plan-reviewer.agent.md) | Critiquing a plan under `docs/features/YYYY-MM-DD-<feature>/` before implementation. Edits step files in place, sets `review:` in `summary.md`. NEVER writes production code. |
+| plan-reviewer | [`.github/agents/plan-reviewer.agent.md`](.github/agents/plan-reviewer.agent.md) | Critiquing a plan under `docs/features/YYYY-MM-DD-<feature>/` before implementation. Edits step files in place, sets `review:` in the feature brief frontmatter. NEVER writes production code. |
 | diagram | [`.github/agents/diagram.agent.md`](.github/agents/diagram.agent.md) | **Required** for every sequence or component diagram added under `docs/`. Mermaid only, five canonical layer boxes (`Presentation` / `Logic` / `Data` / `Domain` / `External`), immutable file per version. NEVER hand-draft a diagram inline in another doc or review. |
 
 ### Skills

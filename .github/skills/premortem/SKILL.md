@@ -165,7 +165,7 @@ For each surviving scenario:
   planner.
 
 Record the full output (format below) in `00-run-premortem.md` under the gate's heading; the
-invoking session mirrors the verdict into the summary's `premortem:` field.
+invoking session mirrors the verdict into the feature brief's `premortem:` field.
 
 ## Output format
 

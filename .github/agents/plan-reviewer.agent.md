@@ -16,7 +16,7 @@ reviewing.
 
 ## When to invoke
 
-- A feature working folder has `review: pending` in `summary.md`.
+- A feature brief whose working folder exists has `review: pending` in its frontmatter.
 - The user asks to review, stress-test, or sanity-check a feature plan.
 - The planning agent hands off a multi-step plan.
 
@@ -29,7 +29,7 @@ reviewing.
 - Never review after an implementation step has left `to-do`; that requires code review.
 - Never silently rewrite. Present findings, collect answers, then edit temporary plan files.
 - Edit steps in place. When splitting or merging, renumber files, keep the retrospective highest,
-  and update summary rows and links in the same change.
+  and update the brief's `## Steps` rows and links in the same change.
 - Own one batched question round after the critique. Never invent a resolution when the user defers.
 - Use one focused question per subagent call when verifying domain claims.
 - Treat `docs/architecture/` and source as current truth. Treat older feature records as historical
@@ -41,16 +41,15 @@ reviewing.
 
 ### 1. Locate and read the plan
 
-If no plan was specified, list working folders whose `summary.md` contains `review: pending`, newest
-first, and ask the user which one to review.
+If no plan was specified, list feature briefs whose working folder exists and whose frontmatter
+contains `review: pending`, newest first, and ask the user which one to review.
 
 Read:
 
-1. `docs/features/YYYY-MM-DD-<name>.md`.
-2. Its sibling `summary.md`.
-3. Every file found by enumerating `steps/`, including unlinked files.
-4. Relevant current pages under `docs/architecture/`.
-5. Every source and test file named under `Affected components`.
+1. `docs/features/YYYY-MM-DD-<name>.md`, including its gate frontmatter and `## Steps` table.
+2. Every file found by enumerating `steps/`, including unlinked files.
+3. Relevant current pages under `docs/architecture/`.
+4. Every source and test file named under `Affected components`.
 
 ### 2. Cross-check
 
@@ -76,7 +75,7 @@ For every planned change, verify:
 | Architecture | Retrospective does not update current behavior and rationale after delivery. |
 | Feature record | Frontmatter or required initial sections are missing. |
 | Frontmatter | Frontmatter is not on line 1 or a status is outside the allowed vocabulary. |
-| Links | Relative links do not resolve, summary omits an enumerated step, or durable files link into a working folder. |
+| Links | Relative links do not resolve, `## Steps` omits an enumerated step, or durable files other than an open brief's `## Steps` table link into a working folder. |
 
 Verify external package and framework claims from authoritative sources before accepting them.
 
@@ -111,11 +110,11 @@ After the user answers:
 
 - edit steps in place;
 - split, merge, and renumber when necessary;
-- update `summary.md` rows and links in the same change;
+- update the brief's `## Steps` rows and links in the same change;
 - record deferred questions under `Open questions` and set that step to `blocked`;
 - keep every step status as execution state (`to-do` or `blocked`), never `reviewed`;
-- ensure the retrospective updates architecture, completes the feature record, and deletes the
-  working folder only after verification.
+- ensure the retrospective updates architecture, completes the feature record, converts the
+  `## Steps` links to plain text, and deletes the working folder only after verification.
 
 Do not rewrite the durable feature's historical sections merely to hide a planning deviation.
 Record material scope changes under its `Implementation plan` while the feature remains active.
@@ -125,8 +124,8 @@ Record material scope changes under its `Implementation plan` while the feature 
 When every blocker is resolved or explicitly recorded:
 
 - re-read every edited file and confirm each finding is fixed or recorded as an open question;
-- enumerate `steps/` again and confirm `summary.md` contains every file in order;
-- set `review: done (YYYY-MM-DD)` in `summary.md`;
+- enumerate `steps/` again and confirm the `## Steps` table contains every file in order;
+- set `review: done (YYYY-MM-DD)` in the brief frontmatter;
 - set feature `status: planned` if no step is blocked;
 - keep feature `status: planning` when open questions still block execution;
 - verify every working-folder link;
@@ -139,6 +138,6 @@ When every blocker is resolved or explicitly recorded:
 - Never set a required gate to skipped; only the user may authorize that value.
 - Never maintain a feature index; status exists only in feature frontmatter.
 - Never bundle multiple domain-verification questions into one subagent call.
-- Keep `summary.md` synchronized with step files in the same change.
+- Keep the brief's `## Steps` table synchronized with step files in the same change.
 - Surface concerns plainly; do not trade clarity for politeness.
 - Write repository artifacts in English and mirror the user's language in conversation.

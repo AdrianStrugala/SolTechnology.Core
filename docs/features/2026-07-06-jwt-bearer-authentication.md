@@ -2,6 +2,8 @@
 status: planning
 created: 2026-07-06
 completed:
+review: pending
+premortem: pending
 ---
 
 # JWT Bearer Authentication and API-Key Hardening
@@ -92,8 +94,7 @@ be revalidated against the actual diff before delivery.
 4. Rewrite authentication documentation.
 5. Review delivery, update architecture documentation, and collapse temporary steps.
 
-Temporary execution state lives in
-[`2026-07-06-jwt-bearer-authentication/summary.md`](2026-07-06-jwt-bearer-authentication/summary.md).
+Temporary execution state lives in `## Steps`.
 
 ## Acceptance criteria
 
@@ -103,6 +104,24 @@ Temporary execution state lives in
 - `docs/Auth.md` describes only supported APIs.
 - [`../architecture/authentication.md`](../architecture/authentication.md) is updated after the
   behavior ships.
+
+## Steps
+
+| # | Title | File | Status |
+|---|---|---|---|
+| 00 | Run premortem (gate) | [`steps/00-run-premortem.md`](2026-07-06-jwt-bearer-authentication/steps/00-run-premortem.md) | ⬜ to-do |
+| 01 | JWT Bearer scheme + installer | [`steps/01-jwt-bearer-scheme.md`](2026-07-06-jwt-bearer-authentication/steps/01-jwt-bearer-scheme.md) | ⬜ to-do |
+| 02 | API-key handler hardening | [`steps/02-api-key-hardening.md`](2026-07-06-jwt-bearer-authentication/steps/02-api-key-hardening.md) | ⬜ to-do |
+| 03 | Keycloak integration tests | [`steps/03-keycloak-integration-tests.md`](2026-07-06-jwt-bearer-authentication/steps/03-keycloak-integration-tests.md) | ⬜ to-do |
+| 04 | Rewrite docs/Auth.md (drift + JWT + PKCE) | [`steps/04-documentation.md`](2026-07-06-jwt-bearer-authentication/steps/04-documentation.md) | ⬜ to-do |
+| 05 | Retrospective | [`steps/05-retrospective.md`](2026-07-06-jwt-bearer-authentication/steps/05-retrospective.md) | ⬜ to-do |
+
+Status values: `⬜ to-do` / `⛔ blocked` / `🔧 in-progress` / `✅ done` — mirrored from each
+step file's frontmatter (the source of truth) in the same change that flips it.
+Gates per the [delivery workflow](../architecture/delivery-workflow.md): step `00` blocks
+`01..05` until the `premortem:` field reads
+`go` / `go-with-mitigations` / `waived` / `skipped`; the retrospective runs only when every
+other step is `✅ done`.
 
 ## Completion summary
 

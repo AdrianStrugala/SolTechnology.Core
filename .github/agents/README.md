@@ -12,7 +12,7 @@ Conventions, tool list, handoffs and output formats live only inside the file.
 | Agent | When to invoke | Hands off to |
 |---|---|---|
 | [implementation-planning](implementation-planning.agent.md) | Planning a new feature, multi-module change, or breaking API change. Creates one dated feature brief and optional temporary steps per the [delivery workflow](../../docs/architecture/delivery-workflow.md). | [plan-reviewer](plan-reviewer.agent.md) |
-| [plan-reviewer](plan-reviewer.agent.md) | Critiquing a plan under `docs/features/YYYY-MM-DD-<feature>/`. Cross-checks the feature brief, current architecture, code, and temporary steps. | premortem gate via `summary.md` |
+| [plan-reviewer](plan-reviewer.agent.md) | Critiquing a plan under `docs/features/YYYY-MM-DD-<feature>/`. Cross-checks the feature brief, current architecture, code, and temporary steps. | premortem gate via the feature brief frontmatter |
 | [diagram](diagram.agent.md) | Authoring a sequence or component diagram under [`docs/diagrams/`](../../docs/diagrams/). Mermaid only, five canonical layer boxes, immutable file per version. | — |
 
 ## Agent vs Skill — which kind is this?
