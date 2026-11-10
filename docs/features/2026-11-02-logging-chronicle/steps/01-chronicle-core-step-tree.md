@@ -1,7 +1,7 @@
 ---
 spec: 2026-11-02-logging-chronicle
 step: 01
-status: to-do
+status: done
 ---
 
 # Step 01: Chronicle core — ambient step tree and step handle
@@ -93,12 +93,12 @@ step 04 implements. Design: B1, B2, B9 in the brief.
     nothing throws.
 
 ## Acceptance criteria
-- [ ] `dotnet test tests/SolTechnology.Core.Logging.Tests --filter "FullyQualifiedName~Chronicles"` is green.
-- [ ] `dotnet build SolTechnology.Core.slnx` is green.
-- [ ] `find src/SolTechnology.Core.Logging/Chronicles -name "*.cs" | xargs wc -l | awk '$1>150 && $2!="total"'` prints nothing.
-- [ ] `grep -rn "Stopwatch" src/SolTechnology.Core.Logging/Chronicles` prints nothing.
-- [ ] `grep -rn "public static" src/SolTechnology.Core.Logging/Chronicles` prints nothing.
-- [ ] CRM-13: `ParallelSet_OnSharedNode_NoExceptionAndNoLostKeys` is green.
+- [x] `dotnet test tests/SolTechnology.Core.Logging.Tests --filter "FullyQualifiedName~Chronicles"` is green.
+- [x] `dotnet build SolTechnology.Core.slnx` is green.
+- [x] `find src/SolTechnology.Core.Logging/Chronicles -name "*.cs" | xargs wc -l | awk '$1>150 && $2!="total"'` prints nothing.
+- [x] `grep -rn "Stopwatch" src/SolTechnology.Core.Logging/Chronicles` prints nothing.
+- [x] `grep -rn "public static" src/SolTechnology.Core.Logging/Chronicles` prints nothing.
+- [x] CRM-13: `ParallelSet_OnSharedNode_NoExceptionAndNoLostKeys` is green.
 
 ## Open questions
 - none (OQ-1 confirmed by the user 2026-11-02: `CH-01`, `CH-02`, `CH-03`, `CH-04` `SectionName`/`Enabled`)
