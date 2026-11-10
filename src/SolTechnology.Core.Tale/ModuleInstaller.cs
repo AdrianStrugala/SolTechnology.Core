@@ -2,6 +2,7 @@ using System.Reflection;
 using System.Runtime.CompilerServices;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using SolTechnology.Core.Logging;
 using SolTechnology.Core.Tale.Builder;
 using SolTechnology.Core.Tale.Orchestration;
 using SolTechnology.Core.Tale.Persistence;
@@ -26,7 +27,7 @@ public static class ModuleInstaller
         ///   <see cref="TaleHandler{TInput,TContext,TOutput}"/> implementations and registers
         ///   them as <c>Transient</c>.</item>
         ///   <item>Registers <see cref="TaleHandlerRegistry"/> and <see cref="TaleOptions"/>
-        ///   as singletons.</item>
+        ///   as singletons, and Chronicle (<c>AddSolChronicle</c>): each run and chapter becomes a step.</item>
         ///   <item>Registers an <see cref="InMemoryTaleRepository"/> as the default
         ///   <see cref="ITaleRepository"/> and the <see cref="TaleManager"/> as
         ///   <c>Scoped</c>. The repository can be replaced through the returned
@@ -76,6 +77,7 @@ public static class ModuleInstaller
                 services.AddSingleton(registry);
                 services.TryAddSingleton<ITaleRepository>(_ => new InMemoryTaleRepository());
                 services.TryAddSingleton<LeaseReadBackCheck>();
+                services.AddSolChronicle();
                 services.AddScoped<TaleManager>();
             }
 

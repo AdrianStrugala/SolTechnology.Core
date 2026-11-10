@@ -1,7 +1,7 @@
 ---
 spec: 2026-11-02-logging-chronicle
 step: 11
-status: to-do
+status: done
 ---
 
 # Step 11: Tale auto-steps — one step per run and per chapter
@@ -73,3 +73,28 @@ run's `IServiceProvider`, so no public Tale constructor changes. `AddSolTale` re
 - none
 
 ## Deviations
+
+### Run wrapper and test layout
+
+**Original plan:** `TaleHandler.Run` wraps the run in `Begin` and sets the status from the returned
+`Result<TOutput>`; tests in `TaleChronicleTests.cs`; `RegistrationDefaultsTests.cs` gets
+`AddSolTale_RegistersChronicle`.
+
+**Actual implementation:**
+
+- The internal `Run` opens the step and delegates to a private `Run` overload that takes the
+  handle (it sets `TaleId` after `Initialize`); `RecordOutcome` maps the returned error. A chapter
+  gets `Outcome=WaitingForInput` whenever its history entry is `WaitingForInput` after the read,
+  which covers the first pause and the re-pause after rejected input.
+- `RegistrationDefaultsTests.cs` is already 163 lines, so `AddSolTale_RegistersChronicle` lives in
+  `TaleChronicleTests`. The managed-run tests (`StartStory_ManagedRun_...`, `Handle_Resume_...`,
+  `Handle_LeaseTakenOver_...`) are in `TaleChronicleManagedRunTests`, over
+  `TaleChronicleTestBase`; the test tales and chapters are in `TaleChronicleFixtures.cs`.
+  `ModuleResolutionTests` registers the new fixture dependency `CallerCancellation`, because it
+  validates every scanned chapter.
+- `Handle_OutsideRoot_EmitsOne2154Entry` is folded into
+  `Handle_ThreeChapters_TaleStepHasThreeChapterChildrenInOrder`;
+  `Handle_ChapterFails_...` is parameterized on a failed `Result` and an exception.
+- The Tale nuspec now lists `SolTechnology.Core.Logging` 2.0.0 next to AUID and Core (CP-01,
+  checked with `dotnet pack` into the git-ignored `.scratch/`).
+

@@ -2,6 +2,7 @@ using System.Text.Json;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using SolTechnology.Core.AUID;
+using SolTechnology.Core.Logging.Chronicles;
 using SolTechnology.Core.Tale.Models;
 using SolTechnology.Core.Tale.Persistence;
 
@@ -47,7 +48,8 @@ internal sealed class TaleEngine<TInput, TContext, TOutput>(
             ? null
             : new(repository, _state, RunningLeaseTimeout, serviceProvider.GetRequiredService<IServiceScopeFactory>(),
                 serviceProvider.GetService<LeaseReadBackCheck>(), logger);
-        _reader = new(logger, _state, new(logger, _state, _handlerTypeName, isPersisted: _persistence != null));
+        _reader = new(logger, _state, new(logger, _state, _handlerTypeName, isPersisted: _persistence != null),
+            serviceProvider.GetService<IChronicle>());
 
         if (run.Resume != null)
         {

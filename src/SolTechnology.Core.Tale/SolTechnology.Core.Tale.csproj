@@ -25,6 +25,7 @@
 
     <ItemGroup>
       <ProjectReference Include="..\SolTechnology.Core.AUID\SolTechnology.Core.AUID.csproj" />
+      <ProjectReference Include="..\SolTechnology.Core.Logging\SolTechnology.Core.Logging.csproj" />
       <ProjectReference Include="..\SolTechnology.Core\SolTechnology.Core.csproj" />
     </ItemGroup>
 
