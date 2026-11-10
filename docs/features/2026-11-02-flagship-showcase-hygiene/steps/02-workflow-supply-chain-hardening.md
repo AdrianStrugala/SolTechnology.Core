@@ -1,7 +1,7 @@
 ---
 spec: 2026-11-02-flagship-showcase-hygiene
 step: 02
-status: to-do
+status: done
 ---
 
 # Step 02: Workflow supply-chain hardening
@@ -28,13 +28,56 @@ to commit SHAs, adds Dependabot for `nuget` and `github-actions`, and translates
 - Optional owner action after merge (admin): Settings → Actions → General → require actions to be pinned to a full-length commit SHA, so a later unpinned `uses:` fails instead of relying on the grep.
 
 ## Acceptance criteria
-- [ ] `grep -rnE "uses: [^@]+@v[0-9]" .github/workflows` prints nothing.
-- [ ] `grep -rnE "[ąćęłńóśźżĄĆĘŁŃÓŚŹŻ]|Szukaj|Posortuj|Stwórz|Zapisz|Pokaż" .github/workflows` prints nothing and exits 1 (SRM-4: `-P` is not supported by BSD grep on macOS and would "pass" with an error).
-- [ ] A test run of each workflow (`workflow_dispatch` on a branch) succeeds; publish job skipped; the unlist job skipped with an empty `confirm` (SRM-4).
-- [ ] SRM-2, SRM-3: `.github/dependabot.yml` has the major-version ignore for `nuget`, no group that mixes library-floor packages with test-only or DreamTravel packages, and a single `github-actions` group.
-- [ ] `docs/CICD.md` describes the SHA pins and Dependabot.
+- [x] `grep -rnE "uses: [^@]+@v[0-9]" .github/workflows` prints nothing.
+- [x] `grep -rnE "[ąćęłńóśźżĄĆĘŁŃÓŚŹŻ]|Szukaj|Posortuj|Stwórz|Zapisz|Pokaż" .github/workflows` prints nothing and exits 1 (SRM-4: `-P` is not supported by BSD grep on macOS and would "pass" with an error).
+- [ ] A test run of each workflow (`workflow_dispatch` on a branch) succeeds; publish job skipped; the unlist job skipped with an empty `confirm` (SRM-4). *Owner action: the implementing agent may not push or trigger workflows; actionlint passed instead (see Verification).*
+- [x] SRM-2, SRM-3: `.github/dependabot.yml` has the major-version ignore for `nuget`, no group that mixes library-floor packages with test-only or DreamTravel packages, and a single `github-actions` group.
+- [x] `docs/CICD.md` describes the SHA pins and Dependabot.
 
 ## Open questions
 - none
 
 ## Deviations
+
+### Polish-comment grep needs a UTF-8 locale
+
+**Original plan:** the acceptance grep for Polish text exits 1 on the translated workflows.
+
+**Actual implementation:** it does, but only in a UTF-8 locale (`LC_ALL=en_US.UTF-8`). In the
+default C locale of a non-interactive macOS shell, BSD grep reads the bracket expression byte by
+byte, and the kept `📊` emoji in the stats summary line shares a byte with `Ó`, so the grep matches
+that English line. Run with a UTF-8 locale; the same grep on the previous revision finds 5 lines.
+
+### Unlist ghost-id list in docs/CICD.md
+
+**Original plan:** `docs/CICD.md` gains the SHA-pin rule and Dependabot.
+
+**Actual implementation:** also corrected the unlist section, which named six ghost ids while the
+workflow unlists eight (`Faker` and `Flow` were missing), and added the new read-only token
+there. The stale "Versioning policy" section (`1.0.0`, Logging `1.2.0`) belongs to the release
+feature and is left alone.
+
+### SRM outcomes (2026-11-10)
+
+- **SRM-2 — done.** `nuget` ignores `version-update:semver-major` for every dependency. Groups:
+  `testcontainers` (5 packages, all library floor), `microsoft-extensions` (9, all library floor,
+  with `exclude-patterns` for `Microsoft.Extensions.*.Testing`, `.Logging.Console`, `.Options`,
+  `.ServiceDiscovery`), `opentelemetry` (5, all DreamTravel), `aspire` (2, all DreamTravel). The
+  membership was computed against `Directory.Packages.props` with shell-style matching; no group
+  spans two item groups. The `Aspire.AppHost.Sdk` hand-move rule is in `docs/CICD.md`.
+- **SRM-3 — done.** One `github-actions` group with `patterns: ["*"]`; `upload-artifact` (v4.6.2)
+  and `download-artifact` (v4.3.0) are both on major 4.
+- **SRM-4 — done for what the agent may run.** The greps use `-E`. Each SHA came from
+  `git ls-remote` of `refs/tags/vX.Y.Z` and `refs/tags/vX.Y.Z^{}`: all four tags are lightweight
+  (no `^{}` line), so the listed SHA is the commit, and each equals the commit the moving `v4` tag
+  pointed to on 2026-11-10 (checkout v4.4.0 `11d5960a`, setup-dotnet v4.3.1 `67a3573c`,
+  upload-artifact v4.6.2 `ea165f8d`, download-artifact v4.3.0 `d3f86a10`), so behaviour does not
+  change. The `workflow_dispatch` test runs (unlist with an empty `confirm`, never `UNLIST`; the
+  stats run on a branch, then delete that branch) are owner actions.
+
+### Verification (2026-11-10)
+
+- `actionlint` 1.7.12 (release binary, checksum verified) over all three workflows: no findings.
+  `shellcheck` is not installed, so actionlint's embedded shell checks did not run.
+- `.github/dependabot.yml` validates against the SchemaStore `dependabot-2.0.json` schema.
+- Pin grep prints nothing; Polish grep exits 1 in a UTF-8 locale.

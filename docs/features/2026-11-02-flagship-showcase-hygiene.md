@@ -243,6 +243,9 @@ Owner actions that need admin rights (manual, outside the repository):
 - Before step 01 merges: enable Private Vulnerability Reporting (SRM-1).
 - For the Community Standards criterion: set the repository description and accept content
   reports.
+- After step 02 lands: run each workflow once with `workflow_dispatch` on a branch — the unlist
+  workflow with an empty `confirm` (its job must be skipped; never type `UNLIST`), the stats
+  workflow on a throwaway branch that is deleted afterwards (it commits `nuget-stats.json` there).
 - After step 02 merges: check the first Dependabot run (Insights → Dependency graph → Dependabot)
   and that Dependabot security updates are on; create the `dependencies` label if Dependabot
   reports it missing; optionally require full-length SHA pins for actions (Settings → Actions).
@@ -282,5 +285,7 @@ Decided during implementation without a confirmation stop; each step file carrie
 - Step 01: `SECURITY.md` and `CODE_OF_CONDUCT.md` use the public `contact@soltechnology.dev`
   address, as the Private Vulnerability Reporting fallback and as the enforcement contact, so the
   files promise nothing that is not enabled yet (SRM-1).
+- Step 02: actions are pinned to the commit their moving `v4` tag pointed to on 2026-11-10, not to
+  a newer major, so the pins change no behaviour; Dependabot proposes later versions.
 
 ## Follow-ups

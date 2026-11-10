@@ -1,0 +1,44 @@
+version: 2
+updates:
+  - package-ecosystem: nuget
+    directory: /
+    schedule:
+      interval: weekly
+    labels:
+      - dependencies
+    # Majors go through the package-management skill by hand; a major floor bump breaks consumers.
+    ignore:
+      - dependency-name: "*"
+        update-types:
+          - version-update:semver-major
+    # A group never mixes published dependency floors with test-only or DreamTravel packages.
+    groups:
+      testcontainers:
+        patterns:
+          - "Testcontainers*"
+      microsoft-extensions:
+        patterns:
+          - "Microsoft.Extensions.*"
+        exclude-patterns:
+          - "Microsoft.Extensions.*.Testing"
+          - "Microsoft.Extensions.Logging.Console"
+          - "Microsoft.Extensions.Options"
+          - "Microsoft.Extensions.ServiceDiscovery"
+      opentelemetry:
+        patterns:
+          - "OpenTelemetry*"
+      aspire:
+        patterns:
+          - "Aspire*"
+
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+    labels:
+      - dependencies
+    # One group: download-artifact runs only on tags, so a split bump would break only the release.
+    groups:
+      github-actions:
+        patterns:
+          - "*"

@@ -12,7 +12,7 @@ jobs:
       contents: write
 
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
 
     - name: Fetch NuGet Statistics
       shell: pwsh
@@ -20,7 +20,7 @@ jobs:
         $owner = "AdrianStrugala"
         $prefix = "SolTechnology."
         
-        # Szukaj pakietów
+        # Search for the packages
         $searchUrl = "https://api-v2v3search-0.nuget.org/query?q=owner:$owner&take=100"
         $searchResult = Invoke-RestMethod -Uri $searchUrl
         
@@ -41,10 +41,10 @@ jobs:
             }
         }
         
-        # Posortuj po liczbie pobrań
+        # Sort by download count
         $packages = $packages | Sort-Object { $_.downloads } -Descending
         
-        # Stwórz obiekt wynikowy
+        # Build the result object
         $result = @{
             totals = @{
                 downloads = $totalDownloads
@@ -54,10 +54,10 @@ jobs:
             lastUpdated = (Get-Date).ToString("yyyy-MM-ddTHH:mm:ssZ")
         }
         
-        # Zapisz do pliku
+        # Write to the file
         $result | ConvertTo-Json -Depth 10 | Set-Content "nuget-stats.json"
         
-        # Pokaż podsumowanie
+        # Print a summary
         Write-Host "`n📊 Summary:"
         Write-Host "Total packages: $($packages.Count)"
         Write-Host "Total downloads: $($totalDownloads.ToString('N0'))"
