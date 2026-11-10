@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
 using NUnit.Framework;
+using SolTechnology.Core.Logging.Chronicles;
 using SolTechnology.Core.Logging.Middleware;
 
 namespace SolTechnology.Core.Logging.Tests.Middleware;
@@ -10,18 +11,21 @@ namespace SolTechnology.Core.Logging.Tests.Middleware;
 public sealed class RequestEnvelopeLoggerTests
 {
     [Test]
-    public void RequestFinished_LevelDisabled_DoesNotReadTimings()
+    public void RequestEnded_RecordedRootAndLevelDisabled_WritesNothing()
     {
         // Arrange
         var logger = Substitute.For<ILogger>();
         logger.IsEnabled(Arg.Any<LogLevel>()).Returns(false);
-        var timingService = Substitute.For<ITimingService>();
+        var chronicle = TestChronicles.Create();
         var context = new DefaultHttpContext();
+        context.Request.Method = "GET";
+        var root = ChronicleRequestRoot.Begin(chronicle, context);
 
         // Act
-        RequestEnvelopeLogger.RequestFinished(logger, context, timingService, elapsedMs: 5);
+        RequestEnvelopeLogger.RequestEnded(logger, context, root, exception: null, clientAborted: false, elapsedMs: 5);
 
         // Assert
-        timingService.DidNotReceive().GetTimings();
+        root.IsRecording.Should().BeTrue();
+        logger.ReceivedCalls().Should().OnlyContain(call => call.GetMethodInfo().Name == nameof(ILogger.IsEnabled));
     }
 }

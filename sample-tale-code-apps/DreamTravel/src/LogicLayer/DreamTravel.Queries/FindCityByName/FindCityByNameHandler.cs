@@ -4,14 +4,14 @@ using DreamTravel.Domain.Events;
 using DreamTravel.GeolocationDataClients.GoogleApi;
 using Microsoft.Extensions.Logging;
 using SolTechnology.Core.CQRS;
-using SolTechnology.Core.Logging;
+using SolTechnology.Core.Logging.Chronicles;
 
 namespace DreamTravel.Queries.FindCityByName
 {
     public class FindCityByNameHandler(
         ICityDomainService cityDomainService,
         IMediator mediator,
-        ITimingService timingService,
+        IChronicle chronicle,
         ILogger<FindCityByNameHandler> logger)
         : IQueryHandler<FindCityByNameQuery, City>
     {
@@ -19,12 +19,12 @@ namespace DreamTravel.Queries.FindCityByName
         {
             City result;
 
-            using (timingService.StartContext("http"))
+            using (chronicle.Step("FetchCity"))
             {
                 result = await cityDomainService.Get(query.Name);
             }
 
-            using (timingService.StartContext("cache"))
+            using (chronicle.Step("FetchCityCached"))
             {
                 //to test cache
                 result = await cityDomainService.Get(query.Name);

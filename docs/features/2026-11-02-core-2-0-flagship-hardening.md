@@ -764,7 +764,7 @@ these notes from the steps:
   dispose (with or without Ryuk), and two fixtures with the same name each own their emulator.
 - logging-chronicle (separate feature, release depends on it): its `CH-nn`, `CP-nn`, and `LC-nn` tables and its own
   "Release-notes inputs" section in [`2026-11-02-logging-chronicle`](2026-11-02-logging-chronicle.md) are inputs too,
-  including the `ITimingService` removal and EventIds 2154/2155. Those prefixes are Chronicle's own, so they do not
+  including the `ITimingService` removal, the retired EventId 2147, and EventIds 2154/2155. Those prefixes are Chronicle's own, so they do not
   share the `C-nn`/`P-nn`/`L-nn` numbering (maxima on 2026-11-09: `C-33`, `P-29`, `L-07`); Chronicle reserves no
   number here.
 

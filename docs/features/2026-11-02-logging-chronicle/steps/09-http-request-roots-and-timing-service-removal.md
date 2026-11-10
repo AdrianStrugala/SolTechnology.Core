@@ -1,7 +1,7 @@
 ---
 spec: 2026-11-02-logging-chronicle
 step: 09
-status: to-do
+status: done
 ---
 
 # Step 09: HTTP request roots in `LoggingMiddleware`; remove `ITimingService`
@@ -89,3 +89,49 @@ failed, 2146 finished); 2147, the finish entry with `{@Timings}`, is deleted and
 - none (OQ-1 confirmed 2026-11-02: `CH-08` delete `ITimingService`, `CH-09` `InvokeAsync` parameter; OQ-2 accepted 2026-11-02: `LC-01`, `LC-02`)
 
 ## Deviations
+
+### Outcome logging split between `RequestEnvelopeLogger.RequestEnded` and `ChronicleRequestRoot`
+
+**Original plan:** `ChronicleRequestRoot` has `Begin` and `Complete`; `RequestEnvelopeLogger` logs
+2155 when the root recorded; the emission policy is `ChronicleEmissionPolicy.Decide`.
+
+**Actual implementation:** the middleware makes one call per outcome,
+`RequestEnvelopeLogger.RequestEnded(logger, context, root, exception, clientAborted, elapsedMs)`,
+which keeps `LoggingMiddleware.cs` at 150 lines. `ChronicleRequestRoot.Complete` sets `Route` and
+`StatusCode`, maps the outcome, disposes the handle, and returns the closed root only when it is a
+root this middleware must report (`IsReportedByCaller`); otherwise `RequestEnded` writes 2144, 2145,
+or 2146. `ChronicleRequestRoot.Report` writes 2155 through the step 04 split policy (`LevelOf` with
+the status code, then `ShouldEmit`); the policy instance lives on `ChronicleWriter.Policy`. A
+report failure is logged as a Warning, like the reporter does. The root starts in `InvokeAsync`
+right after the skip-path check, so it also covers scope building (a Debug 2148 lands in the
+flight recorder). `ChronicleStep.Root` returns only a root node the handle owns, so a request
+running inside an already open root (a test host, a nested pipeline) becomes a child step and the
+middleware falls back to 2146.
+
+### Smaller choices
+
+- The client-abort 2155 entry keeps the exception attached, as 2144 did; `ChronicleStatus` is
+  `Cancelled`.
+- `ElapsedMs` stays the middleware stopwatch (it includes scope building), like 2146; the tree
+  shows the root duration from `TimeProvider`.
+- Tests: `InvokeAsync_SlowRequest_LogsWarning` and `InvokeAsync_404_LogsWarning` are one
+  parameterized `InvokeAsync_SlowRequestOr404_LogsWarning`; `InvokeAsync_RequestRoot_NoEventId2154Entry`
+  is folded into the success test (its single finish entry is counted over 2144–2147, 2154, and
+  2155); `InvokeAsync_ReplacedChronicle_LogsPreviousFinishEntry` also covers 2145; the route test
+  also covers `Route=unmatched`. The tests are split into `LoggingMiddlewareChronicleTests` and
+  `LoggingMiddlewareChronicleFallbackTests` over `LoggingMiddlewareChronicleTestBase`, and
+  `TestChronicles` builds the real recorder for the older middleware tests. The envelope and body
+  buffering tests use a disabled recorder (the `Enabled = false` entries); `LoggingMiddlewareTests`
+  uses an enabled one, so its single-Error test now asserts the 2155 `Failed` entry.
+  `RequestEnvelopeLoggerTests` replaces the 2147 case with
+  `RequestEnded_RecordedRootAndLevelDisabled_WritesNothing`. `ModuleInstallerTests` had no
+  `ITimingService` assertion and is unchanged.
+
+### CRM-5 re-check at implementation (2026-11-10)
+
+Holds. `ExceptionFilter` sets `ExceptionHandled` after mapping, and `ResultConversionFilter` maps a
+failed `Result` to a `ProblemDetails` status (500 for unmapped errors), so neither lets an exception
+reach the middleware. `ChronicleRequestRoot.Complete` therefore fails the root with `HTTP{status}`
+for any final status of 500 or more without an exception, whichever filter produced it
+(`InvokeAsync_HandledExceptionMappedTo500_LogsErrorWithChronicleStatusFailed`).
+

@@ -1,12 +1,13 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
+using SolTechnology.Core.Logging.Chronicles;
 
 namespace SolTechnology.Core.Logging.Middleware;
 
 /// <summary>
 /// Source-generated log entries written by <see cref="LoggingMiddleware"/> and
 /// <see cref="RequestBodyBuffer"/>: the request envelope, its failure and abort entries, and the
-/// scope-building warnings. Event ids continue the 2137–2140 operation range.
+/// scope-building warnings. Event ids continue the 2137–2140 operation range; 2147 is retired.
 /// </summary>
 internal static partial class RequestEnvelopeLogger
 {
@@ -33,28 +34,41 @@ internal static partial class RequestEnvelopeLogger
         ILogger logger, Exception exception, string requestMethod, PathString requestPath, long elapsedMs);
 
     /// <summary>
-    /// Writes the Finished entry at a status-code-aware level (Information below 400, Warning 4xx,
-    /// Error 5xx), with the per-request timings when any were recorded.
+    /// Writes the request's single outcome entry: the 2155 Chronicle report when the request root
+    /// recorded, otherwise 2144 (client abort), 2145 (unhandled exception), or 2146 (finished).
     /// </summary>
-    public static void RequestFinished(ILogger logger, HttpContext context, ITimingService timingService, long elapsedMs)
+    public static void RequestEnded(
+        ILogger logger, HttpContext context, ChronicleStep root, Exception? exception, bool clientAborted, long elapsedMs)
+    {
+        var request = context.Request;
+        if (ChronicleRequestRoot.Complete(root, context, exception, clientAborted) is { } reported)
+        {
+            ChronicleRequestRoot.Report(logger, reported, context, exception, elapsedMs);
+        }
+        else if (exception is not null && clientAborted)
+        {
+            RequestAborted(logger, exception, request.Method, request.Path, elapsedMs);
+        }
+        else if (exception is not null)
+        {
+            RequestFailed(logger, exception, request.Method, request.Path, elapsedMs);
+        }
+        else
+        {
+            RequestFinished(logger, context, elapsedMs);
+        }
+    }
+
+    /// <summary>
+    /// Writes the Finished entry at a status-code-aware level (Information below 400, Warning 4xx, Error 5xx).
+    /// </summary>
+    public static void RequestFinished(ILogger logger, HttpContext context, long elapsedMs)
     {
         var request = context.Request;
         var statusCode = context.Response.StatusCode;
         var level = statusCode >= 500 ? LogLevel.Error
                   : statusCode >= 400 ? LogLevel.Warning
                                       : LogLevel.Information;
-        if (!logger.IsEnabled(level))
-        {
-            return;
-        }
-
-        var timings = timingService.GetTimings();
-        if (timings.Count > 0)
-        {
-            RequestFinishedWithTimings(logger, level, request.Method, request.Path, statusCode, elapsedMs, timings);
-            return;
-        }
-
         RequestFinished(logger, level, request.Method, request.Path, statusCode, elapsedMs);
     }
 
@@ -62,12 +76,6 @@ internal static partial class RequestEnvelopeLogger
         Message = "Finished request [{RequestMethod}] [{RequestPath}] -> [{StatusCode}] in [{ElapsedMs} ms]")]
     private static partial void RequestFinished(
         ILogger logger, LogLevel level, string requestMethod, PathString requestPath, int statusCode, long elapsedMs);
-
-    [LoggerMessage(EventId = 2147,
-        Message = "Finished request [{RequestMethod}] [{RequestPath}] -> [{StatusCode}] in [{ElapsedMs} ms] — timings: [{@Timings}]")]
-    private static partial void RequestFinishedWithTimings(
-        ILogger logger, LogLevel level, string requestMethod, PathString requestPath, int statusCode, long elapsedMs,
-        IDictionary<string, long> timings);
 
     [LoggerMessage(EventId = 2148, Level = LogLevel.Debug,
         Message = "Skipping body-based log enrichment for [{RequestPath}] - JSON could not be parsed")]

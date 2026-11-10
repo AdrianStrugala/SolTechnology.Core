@@ -34,6 +34,9 @@ public readonly struct ChronicleStep : IDisposable
     /// <summary><c>true</c> when this handle records into a Chronicle report.</summary>
     public bool IsRecording => _node is not null;
 
+    /// <summary>The root this handle opened; <c>null</c> for a child step, a non-owning or non-recording handle.</summary>
+    internal ChronicleRoot? Root => _owns && _node is { Parent: null, IsOverflow: false } ? _node.Root : null;
+
     /// <summary>
     /// Adds or overwrites an attribute (and an activity tag), stored as its invariant-culture
     /// string. The value is logged as is; use <see cref="SetMasked"/> for personal data.

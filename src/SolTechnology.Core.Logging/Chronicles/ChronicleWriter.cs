@@ -12,13 +12,21 @@ internal sealed class ChronicleWriter(ChronicleOptions options, TimeProvider tim
     internal ChronicleOptions Options { get; } = options;
     internal TimeProvider TimeProvider { get; } = timeProvider;
 
+    /// <summary>Level and sampling of the reports a caller emits itself (HTTP request roots).</summary>
+    internal ChronicleEmissionPolicy Policy { get; } = new(options);
+
     internal string Truncate(string value) => ChronicleText.Truncate(value, Options.MaxAttributeValueLength);
 
-    internal ChronicleStep StartRoot(string name, ChronicleNode? previous, bool withActivity = true, string? detachedFrom = null)
+    internal ChronicleStep StartRoot(
+        string name, ChronicleNode? previous, bool withActivity = true, string? detachedFrom = null, bool reportedByCaller = false)
     {
         name = Truncate(name);
         var activity = withActivity ? ChronicleActivities.Start(Options, name) : null;
-        var root = new ChronicleRoot(this, name, TimeProvider.GetTimestamp(), activity) { DetachedFrom = detachedFrom };
+        var root = new ChronicleRoot(this, name, TimeProvider.GetTimestamp(), activity)
+        {
+            DetachedFrom = detachedFrom,
+            IsReportedByCaller = reportedByCaller
+        };
         AmbientChronicle.Current = root.Node;
         return new ChronicleStep(root.Node, previous, owns: true, activity);
     }

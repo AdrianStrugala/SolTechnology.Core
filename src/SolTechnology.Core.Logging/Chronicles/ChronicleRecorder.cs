@@ -45,10 +45,14 @@ internal sealed class ChronicleRecorder(
         return Writer.StartRoot(name, ambient, withActivity: true, detachedFrom);
     }
 
-    /// <summary>A <see cref="Begin(string)"/> for hosts that already own the operation's activity (HTTP request roots).</summary>
-    internal ChronicleStep BeginWithoutActivity(string name) => Begin(name, withActivity: false);
+    /// <summary>
+    /// A <see cref="Begin(string)"/> for hosts that already own the operation's activity (HTTP request roots).
+    /// With <paramref name="reportedByCaller"/> a new root is skipped by the reporter: the caller emits its report.
+    /// </summary>
+    internal ChronicleStep BeginWithoutActivity(string name, bool reportedByCaller = false)
+        => Begin(name, withActivity: false, reportedByCaller);
 
-    private ChronicleStep Begin(string name, bool withActivity)
+    private ChronicleStep Begin(string name, bool withActivity, bool reportedByCaller = false)
     {
         ArgumentNullException.ThrowIfNull(name);
         if (!Options.Enabled)
@@ -58,7 +62,7 @@ internal sealed class ChronicleRecorder(
 
         var ambient = AmbientChronicle.Current;
         return ambient is null || ambient.Root.IsClosed
-            ? Writer.StartRoot(name, ambient, withActivity)
+            ? Writer.StartRoot(name, ambient, withActivity, reportedByCaller: reportedByCaller)
             : Writer.StartChild(ambient, name, withActivity);
     }
 }

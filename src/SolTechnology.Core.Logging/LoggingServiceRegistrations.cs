@@ -17,7 +17,6 @@ internal static class LoggingServiceRegistrations
     {
         services.TryAddSingleton<ICorrelationIdService, CorrelationIdService>();
         services.TryAddSingleton(TimeProvider.System);
-        services.TryAddScoped<ITimingService, TimingService>();
         ChronicleServiceRegistrations.Register(services);
         EnsureRequestHeadersEnricherRegistered(services);
 

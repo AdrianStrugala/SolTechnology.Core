@@ -367,7 +367,8 @@ Integration types are internal: `ChronicleHTTPHandler`, `ChronicleHTTPAttemptHan
 
 - **LC-01** — HTTP finish entry. EventId **2155** `RequestChronicleReported`, template
   `Finished request [{RequestMethod}] [{RequestPath}] -> [{StatusCode}] in [{ElapsedMs} ms]. Chronicle: [{ChronicleStatus}] [{@Chronicle}]`.
-  `{@Timings}` is removed. A successful request slower than `SlowThreshold` logs at Warning
+  `{@Timings}` is removed, and with it EventId 2147 `RequestFinishedWithTimings`, whose id is
+  retired (R8). A successful request slower than `SlowThreshold` logs at Warning
   (Information before). Step 09.
 - **LC-02** — A failed request logs **one** Error entry (EventId 2155, exception attached,
   `ChronicleStatus = Failed`), which replaces "Request [..] failed after [..]" and keeps P-15. A
@@ -460,7 +461,8 @@ is fresh.
   - Delete `GetTimings()`/`Reset()` calls; the report is emitted automatically per root.
   - Code that starts work which outlives its caller (`Task.Run`, timers) uses
     `chronicle.BeginRoot("name")` to get its own report (B11).
-  - The `{@Timings}` property in the finish entry is replaced by `{@Chronicle}` (LC-01).
+  - The `{@Timings}` property in the finish entry is replaced by `{@Chronicle}` (LC-01), and
+    EventId 2147 (the finish entry with timings) is retired: query 2155 instead.
 - Serilog hosts that want the flight recorder: `UseSerilog(..., writeToProviders: true)` or
   `builder.Logging.AddSerilog()`. With `writeToProviders`, Serilog's own `MinimumLevel` must admit
   Debug. Serilog destructures `{@Chronicle}` as a structure capped by `MaximumDestructuringDepth`

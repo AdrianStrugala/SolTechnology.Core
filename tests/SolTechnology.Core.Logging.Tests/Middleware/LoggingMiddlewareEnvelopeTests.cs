@@ -43,18 +43,11 @@ public class LoggingMiddlewareEnvelopeTests
     }
 
     private static async Task<TemplateCapturingLogger> Invoke(
-        RequestDelegate next, ILogScopeEnricher[]? enrichers = null, Action<ITimingService>? useTiming = null,
+        RequestDelegate next, ILogScopeEnricher[]? enrichers = null,
         string? correlationHeader = null, Action<HttpContext>? arrangeContext = null)
     {
         var logger = new TemplateCapturingLogger();
-        var timing = new TimingService(TimeProvider.System);
-        var sut = new LoggingMiddleware(
-            async context =>
-            {
-                useTiming?.Invoke(timing);
-                await next(context);
-            },
-            Options.Create(new LoggingOptions()));
+        var sut = new LoggingMiddleware(next, Options.Create(new LoggingOptions()));
         var context = new DefaultHttpContext();
         context.Request.Method = "GET";
         context.Request.Path = "/api/trips";
@@ -66,7 +59,7 @@ public class LoggingMiddlewareEnvelopeTests
         arrangeContext?.Invoke(context);
         try
         {
-            await sut.InvokeAsync(context, logger, new NoOpCorrelationStore(), enrichers ?? [], timing);
+            await sut.InvokeAsync(context, logger, new NoOpCorrelationStore(), enrichers ?? [], TestChronicles.Create(enabled: false));
         }
         catch (Exception ex) when (ex is InvalidOperationException or OperationCanceledException)
         {
@@ -93,18 +86,6 @@ public class LoggingMiddlewareEnvelopeTests
             (finishedLevel, "Finished request [{RequestMethod}] [{RequestPath}] -> [{StatusCode}] in [{ElapsedMs} ms]", 2146));
         logger.Entries[0].Message.Should().Be("Started request [GET] [/api/trips]");
         logger.Entries[1].Message.Should().StartWith($"Finished request [GET] [/api/trips] -> [{statusCode}] in [");
-    }
-
-    [Test]
-    public async Task Invoke_TimedRequest_LogsFinishedWithTimingsTemplate()
-    {
-        // Act
-        var logger = await Invoke(_ => Task.CompletedTask, useTiming: timing => timing.StartContext("db").Dispose());
-
-        // Assert
-        logger.Entries.Last().Template.Should().Be(
-            "Finished request [{RequestMethod}] [{RequestPath}] -> [{StatusCode}] in [{ElapsedMs} ms] — timings: [{@Timings}]");
-        logger.Entries.Last().EventId.Should().Be(2147);
     }
 
     [Test]

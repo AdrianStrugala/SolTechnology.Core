@@ -27,10 +27,6 @@ or Application Insights dependency required.
 - **Operation lifecycle events** — `OperationStarted` / `OperationSucceeded` /
   `OperationFailed` with stable `EventId`s (2137–2140) and `[LoggerMessage]`
   source generators (allocation-free, short-circuits when disabled).
-- **Per-request timing diagnostics** — `ITimingService.StartContext("name")`
-  records named sub-context durations; the aggregated map is emitted in the
-  "Finished request" log automatically. Lightweight "where did the time go?"
-  without a full APM.
 - **OpenTelemetry tracing** — `CoreLoggingActivitySources.OperationsName` ready
   to plug into `WithTracing(...).AddSource(...)`. Zero cost when no listener
   attaches.
@@ -321,8 +317,6 @@ public string Email { get; set; } = null!;
 
 - `ICorrelationIdService` — ambient correlation accessor with `Set`, `Get`, `GetOrGenerate`, and `Clear`
   (singleton, no `AsyncLocal` traps).
-- `ITimingService` — per-request timing diagnostics (scoped). Handlers wrap
-  sub-operations in `StartContext("name")` and the map is emitted on finish.
 - `TimeProvider` — `TimeProvider.System` (singleton, TryAdd — your custom
   registration wins for testing).
 - `LoggingOptions` — bound and validated on application start.
@@ -332,66 +326,6 @@ public string Email { get; set; } = null!;
   custom enricher you add via `AddSolLogScopeEnricher<T>()`.
 
 All registrations are `TryAdd*` so a consumer's custom registration always wins.
-
----
-
-### Per-request timing diagnostics (`ITimingService`)
-
-A lightweight "where did the time go in this request?" breakdown — without a full APM. Handlers
-wrap sub-operations in `using (timingService.StartContext("name"))` and the aggregated
-`{ name → elapsed ms }` map is emitted automatically in the "Finished request" log:
-
-```
-Finished request [GET] [/api/v2/cities/find] -> [200] in [156 ms] — timings: [{"http": 120, "cache": 2}]
-```
-
-#### Registration
-
-Registered automatically by `AddSolLogging()` — no extra call needed.
-
-#### Usage (in a handler or service)
-
-```csharp
-public class FindCityByNameHandler(
-    ICityDomainService cityDomainService,
-    ITimingService timingService) : IQueryHandler<FindCityByNameQuery, City>
-{
-    public async Task<Result<City>> Handle(FindCityByNameQuery query, CancellationToken ct)
-    {
-        City result;
-
-        using (timingService.StartContext("http"))
-        {
-            result = await cityDomainService.Get(query.Name);
-        }
-
-        using (timingService.StartContext("cache"))
-        {
-            result = await cityDomainService.Get(query.Name);
-        }
-
-        return result;
-    }
-}
-```
-
-#### API
-
-| Method | Behaviour |
-|---|---|
-| `StartContext(name)` | Starts a named timer. Returns `IDisposable` — disposing stops and accumulates. Multiple calls with the same name **sum** (e.g. two DB calls both named `"db"` aggregate into one total). |
-| `GetTimings()` | Returns a read-only `IDictionary<string, long>` snapshot — name → total elapsed ms. Called by the middleware on request finish. |
-| `Reset()` | Clears all accumulated timings. Called by the middleware at request start. |
-
-#### Design notes
-
-- **Scoped** — each HTTP request gets its own `TimingService` instance (no cross-request leakage).
-- **`TimeProvider`-sourced** — all timing reads go through `TimeProvider` (testable with `FakeTimeProvider`).
-- **Idempotent dispose** — double-disposing a handle is safe (second dispose is a no-op).
-- **Zero cost when unused** — if no handler calls `StartContext`, the "Finished request" log omits
-  the `timings` field entirely (no empty `{}` noise).
-- **Aggregates, not traces** — this is a request-level summary, not a span tree. For full
-  distributed tracing, wire `CoreLoggingActivitySources` into OpenTelemetry.
 
 ---
 

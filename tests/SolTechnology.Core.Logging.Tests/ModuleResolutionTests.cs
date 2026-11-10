@@ -106,7 +106,6 @@ public class ModuleResolutionTests
         object[] services =
         [
             scoped.GetRequiredService<ICorrelationIdService>(),
-            scoped.GetRequiredService<ITimingService>(),
             scoped.GetRequiredService<IChronicle>(),
             scoped.GetRequiredService<TimeProvider>(),
             scoped.GetRequiredService<IOptions<LoggingOptions>>().Value,

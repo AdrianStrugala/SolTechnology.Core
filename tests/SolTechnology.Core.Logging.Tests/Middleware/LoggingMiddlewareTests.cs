@@ -70,8 +70,6 @@ public class LoggingMiddlewareTests
             => Entries.Add((logLevel, formatter(state, exception)));
     }
 
-    private static ITimingService NoOpTiming() => new TimingService(TimeProvider.System);
-
     [TestCase("/healthcare/x", true)]
     [TestCase("/health", false)]
     [TestCase("/health/ready", false)]
@@ -85,7 +83,7 @@ public class LoggingMiddlewareTests
         var logger = new CapturingLogger();
 
         // Act
-        await mw.InvokeAsync(ctx, logger, new CorrelationStore(), Array.Empty<ILogScopeEnricher>(), NoOpTiming());
+        await mw.InvokeAsync(ctx, logger, new CorrelationStore(), Array.Empty<ILogScopeEnricher>(), TestChronicles.Create());
 
         // Assert
         next.WasInvoked.Should().BeTrue();
@@ -102,13 +100,12 @@ public class LoggingMiddlewareTests
         var logger = new CapturingLogger();
 
         // Act
-        var act = () => mw.InvokeAsync(ctx, logger, new CorrelationStore(), Array.Empty<ILogScopeEnricher>(), NoOpTiming());
+        var act = () => mw.InvokeAsync(ctx, logger, new CorrelationStore(), Array.Empty<ILogScopeEnricher>(), TestChronicles.Create());
 
         // Assert
         await act.Should().ThrowAsync<InvalidOperationException>();
         logger.Entries.Where(e => e.Level == LogLevel.Error).Should().ContainSingle()
-            .Which.Message.Should().Contain("failed after");
-        logger.Entries.Should().NotContain(e => e.Message.StartsWith("Finished request"));
+            .Which.Message.Should().StartWith("Finished request").And.Contain("Chronicle: [Failed]");
     }
 
     [Test]
@@ -121,7 +118,7 @@ public class LoggingMiddlewareTests
         var store = new CorrelationStore();
 
         await mw.InvokeAsync(ctx, NullLogger<LoggingMiddleware>.Instance,
-            store, Array.Empty<ILogScopeEnricher>(), NoOpTiming());
+            store, Array.Empty<ILogScopeEnricher>(), TestChronicles.Create());
 
         // The middleware stores the correlation for the async-flow and registers an OnStarting
         // callback that echoes it on the response. The echo itself is asserted in the
@@ -138,7 +135,7 @@ public class LoggingMiddlewareTests
         var ctx = new DefaultHttpContext();
         var store = new CorrelationStore();
 
-        await mw.InvokeAsync(ctx, NullLogger<LoggingMiddleware>.Instance, store, Array.Empty<ILogScopeEnricher>(), NoOpTiming());
+        await mw.InvokeAsync(ctx, NullLogger<LoggingMiddleware>.Instance, store, Array.Empty<ILogScopeEnricher>(), TestChronicles.Create());
 
         store.Stored.Should().NotBeNull();
         store.Stored!.Value.Should().NotBeNullOrWhiteSpace();
@@ -151,7 +148,7 @@ public class LoggingMiddlewareTests
         var ctx = new DefaultHttpContext();
 
         Func<Task> act = () => mw.InvokeAsync(ctx, NullLogger<LoggingMiddleware>.Instance,
-            new CorrelationStore(), Array.Empty<ILogScopeEnricher>(), NoOpTiming());
+            new CorrelationStore(), Array.Empty<ILogScopeEnricher>(), TestChronicles.Create());
 
         await act.Should().ThrowAsync<InvalidOperationException>();
         ctx.Response.StatusCode.Should().Be(StatusCodes.Status500InternalServerError);
@@ -165,7 +162,7 @@ public class LoggingMiddlewareTests
         var ctx = new DefaultHttpContext();
 
         await mw.InvokeAsync(ctx, NullLogger<LoggingMiddleware>.Instance,
-            new CorrelationStore(), new ILogScopeEnricher[] { faulty }, NoOpTiming());
+            new CorrelationStore(), new ILogScopeEnricher[] { faulty }, TestChronicles.Create());
 
         next.WasInvoked.Should().BeTrue();
     }
@@ -181,7 +178,7 @@ public class LoggingMiddlewareTests
         var capturing = new CapturingEnricher();
 
         await mw.InvokeAsync(ctx, NullLogger<LoggingMiddleware>.Instance,
-            store, new ILogScopeEnricher[] { capturing }, NoOpTiming());
+            store, new ILogScopeEnricher[] { capturing }, TestChronicles.Create());
 
         next.WasInvoked.Should().BeTrue();
         store.Stored.Should().NotBeNull("correlation must still be set even on skipped paths");
@@ -211,7 +208,7 @@ public class LoggingMiddlewareTests
         ctx.Request.ContentLength = bytes.Length;
 
         await mw.InvokeAsync(ctx, NullLogger<LoggingMiddleware>.Instance,
-            new CorrelationStore(), allEnrichers, NoOpTiming());
+            new CorrelationStore(), allEnrichers, TestChronicles.Create());
 
         capturing.Captured.Should().NotBeNull();
         capturing.Captured!.Should().ContainKey("CityName").WhoseValue.Should().Be("Warsaw");

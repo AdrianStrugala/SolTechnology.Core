@@ -75,13 +75,13 @@ public class LoggingMiddlewareBodyBufferingTests
 
         // Act
         var act = () => sut.InvokeAsync(context, logger, new NoOpCorrelationStore(), [bodyEnricher],
-            new TimingService(TimeProvider.System));
+            TestChronicles.Create(enabled: false));
 
         // Assert
         await act.Should().ThrowAsync<ConnectionResetException>();
         logger.Entries.Where(e => e.Level >= LogLevel.Warning).Should().ContainSingle()
             .Which.Should().Be((LogLevel.Warning, new EventId(2144, "RequestAborted")));
-        logger.Entries.Select(e => e.EventId.Id).Should().NotContain([2146, 2147]);
+        logger.Entries.Select(e => e.EventId.Id).Should().NotContain([2146, 2155]);
     }
 
     [TestCase("application/json; charset=utf-8", "{\"name\":\"Warsaw\"}", 1024, true)]
@@ -113,7 +113,7 @@ public class LoggingMiddlewareBodyBufferingTests
 
         // Act
         await sut.InvokeAsync(context, NullLogger<LoggingMiddleware>.Instance, new NoOpCorrelationStore(),
-            [bodyEnricher, capturing], new TimingService(TimeProvider.System));
+            [bodyEnricher, capturing], TestChronicles.Create(enabled: false));
 
         // Assert
         nextInvoked.Should().BeTrue();

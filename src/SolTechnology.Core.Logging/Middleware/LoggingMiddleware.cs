@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Connections;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using SolTechnology.Core.Logging.Chronicles;
 using SolTechnology.Core.Logging.Correlations;
 using SolTechnology.Core.Logging.Enrichment;
 namespace SolTechnology.Core.Logging.Middleware;
@@ -12,7 +13,7 @@ namespace SolTechnology.Core.Logging.Middleware;
 ///   <item>Pushes the correlation into the logger scope so every log event in the request carries it.</item>
 ///   <item>Invokes any registered <see cref="ILogScopeEnricher"/>s and folds their properties into the same scope.</item>
 ///   <item>Echoes the correlation back on the response.</item>
-///   <item>Logs request start / finish with status-code-aware log levels.</item>
+///   <item>Logs request start, and one finish entry: the request's Chronicle report when Chronicle records it.</item>
 ///   <item>Demotes <see cref="ConnectionResetException"/> to <see cref="LogLevel.Warning"/>
 ///         (client aborts are not server faults).</item>
 /// </list>
@@ -30,7 +31,7 @@ public sealed class LoggingMiddleware(RequestDelegate next, IOptions<LoggingOpti
         ILogger<LoggingMiddleware> logger,
         ICorrelationIdService correlationIdService,
         IEnumerable<ILogScopeEnricher> enrichers,
-        ITimingService timingService)
+        IChronicle chronicle)
     {
         ArgumentNullException.ThrowIfNull(context);
         var correlation = CorrelationId.FromRequest(context.Request, out var headerError);
@@ -50,7 +51,7 @@ public sealed class LoggingMiddleware(RequestDelegate next, IOptions<LoggingOpti
         }
 
         var stopwatch = ValueStopwatch.StartNew();
-        timingService.Reset();
+        var root = ChronicleRequestRoot.Begin(chronicle, context);
         var scopeProperties = await BuildScope(context, correlation, enrichers, logger).ConfigureAwait(false);
         using var scope = logger.BeginScope(scopeProperties);
         if (headerError is not null && _options.LogClientCorrelationParseErrors)
@@ -59,7 +60,7 @@ public sealed class LoggingMiddleware(RequestDelegate next, IOptions<LoggingOpti
         }
 
         RequestEnvelopeLogger.RequestStarted(logger, context.Request.Method, context.Request.Path);
-        await InvokeNextAndLogOutcome(context, logger, timingService, stopwatch).ConfigureAwait(false);
+        await InvokeNextAndLogOutcome(context, logger, root, stopwatch).ConfigureAwait(false);
     }
 
     private async Task<IDictionary<string, object?>> BuildScope(
@@ -93,17 +94,16 @@ public sealed class LoggingMiddleware(RequestDelegate next, IOptions<LoggingOpti
     private async Task InvokeNextAndLogOutcome(
         HttpContext context,
         ILogger logger,
-        ITimingService timingService,
+        ChronicleStep root,
         ValueStopwatch stopwatch)
     {
-        var request = context.Request;
         try
         {
             await _next(context).ConfigureAwait(false);
         }
         catch (Exception ex) when (IsClientAbort(ex, context))
         {
-            RequestEnvelopeLogger.RequestAborted(logger, ex, request.Method, request.Path, stopwatch.ElapsedMilliseconds);
+            RequestEnvelopeLogger.RequestEnded(logger, context, root, ex, clientAborted: true, stopwatch.ElapsedMilliseconds);
             throw;
         }
         catch (Exception ex)
@@ -113,12 +113,12 @@ public sealed class LoggingMiddleware(RequestDelegate next, IOptions<LoggingOpti
                 context.Response.StatusCode = StatusCodes.Status500InternalServerError;
             }
 
-            RequestEnvelopeLogger.RequestFailed(logger, ex, request.Method, request.Path, stopwatch.ElapsedMilliseconds);
+            RequestEnvelopeLogger.RequestEnded(logger, context, root, ex, clientAborted: false, stopwatch.ElapsedMilliseconds);
             throw;
         }
 
         // Only reached without an exception: a logged failure plus Finished would double-count error rates.
-        RequestEnvelopeLogger.RequestFinished(logger, context, timingService, stopwatch.ElapsedMilliseconds);
+        RequestEnvelopeLogger.RequestEnded(logger, context, root, null, clientAborted: false, stopwatch.ElapsedMilliseconds);
     }
 
     /// <summary>
