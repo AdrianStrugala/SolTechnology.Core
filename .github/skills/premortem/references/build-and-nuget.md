@@ -7,6 +7,15 @@
   NU1605 / runtime mismatch.
 - `snupkg` symbol package missing → debugging broken for consumers.
 - Author / RepositoryUrl / license metadata regressed.
+- Some `SolTechnology.Core.*` packages bumped to a new major, others not → a mixed graph compiles
+  and fails at runtime (`MissingMethodException`, `TypeLoadException`); keep the lockstep version
+  and the `SOLCORE001` `buildTransitive` check.
+- Shared `ItemGroup` or package removed from `src/Directory.Build.props` → projects outside the
+  slnx (Guards, Scheduler, Guards.Tests) stop compiling unnoticed; build them by path.
+- Version change in `Directory.Packages.props` → the published dependency floor moves for every
+  consumer; a leaf override for a CVE with no parent fix needs a removal follow-up.
+- Package version taken from the props file, not the tag → any `v*` tag publishes whatever
+  `<Version>` says; keep the tag guard.
 
 # .NET 10 target
 
