@@ -83,6 +83,20 @@ client's name on every probe, so it gets the client's handlers and picks up DNS 
 capturing an `HttpClient` in the singleton check. It disposes every response and caches each result
 for the configured duration.
 
+Every client records one [Chronicle](logging.md#chronicle) step per logical call,
+`HTTP {Method} {client}`, from two internal handlers: `ChronicleHTTPHandler` is the outermost handler
+(before correlation propagation and the resilience handler) and records `Host`, the final
+`StatusCode` and `Attempts`; `ChronicleHTTPAttemptHandler` sits after the resilience handler and
+counts each attempt in a `StrongBox<int>` the outer handler puts into the request options, which
+request snapshots share. Retries are therefore one step with `Attempts=3`, not three siblings, and
+calls in a loop aggregate per client and method for the N+1 hint. A 5xx final response or an
+exception fails the step and a 4xx stays `Ok`. A cancellation is `Cancelled` only when it is the
+caller's: the handler sees `HttpClient`'s linked token, so a cancellation with an inner
+`TimeoutException`, or one after the client's `HttpClient.Timeout` (none when Polly owns the
+deadline), fails the step with `TimeoutException`. The path and query are never recorded, because
+they carry personal data. Outside a Chronicle root the handlers record nothing and allocate no
+counter.
+
 Correlation propagation preserves an existing `X-Correlation-Id`; otherwise it adds the ambient
 correlation value and `traceparent` when available. Stable metrics use meter
 `SolTechnology.Core.HTTP`: the retry counter is tagged with the client name, the request method,

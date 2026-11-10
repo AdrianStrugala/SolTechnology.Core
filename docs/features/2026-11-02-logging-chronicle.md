@@ -1,7 +1,7 @@
 ---
-status: in-progress
+status: completed
 created: 2026-11-02
-completed:
+completed: 2026-11-10
 ---
 
 # Chronicle — per-operation step reports in SolTechnology.Core.Logging
@@ -520,7 +520,7 @@ is fresh.
 
 ## Implementation plan
 
-Steps live in [`2026-11-02-logging-chronicle/summary.md`](2026-11-02-logging-chronicle/summary.md).
+Steps 00–17 lived in a temporary working folder, deleted by the retrospective on 2026-11-10.
 Gates: review and premortem are both required. The `CLAUDE.md §4` premortem trigger is the
 `ModuleInstaller.cs` edits: Logging (04 directly; 06, 07, 09 through
 `ChronicleServiceRegistrations.cs`/`LoggingServiceRegistrations.cs`, which the installer calls),
@@ -626,28 +626,30 @@ Changes applied by the plan-reviewer. Each one is reflected in the step files:
 
 ## Acceptance criteria
 
-- [ ] `dotnet build SolTechnology.Core.slnx -c Release` succeeds, and
+- [x] `dotnet build SolTechnology.Core.slnx -c Release` succeeds, and
       `cd sample-tale-code-apps/DreamTravel && dotnet build` succeeds.
-- [ ] `pwsh ./.github/runTests.ps1` exits 0.
-- [ ] `grep -rn "ITimingService\|TimingService" src tests sample-tale-code-apps --include=*.cs | grep -v "/bin/\|/obj/"` prints nothing, and `grep -rln "ITimingService" docs --include=*.md | grep -v "docs/features/"` prints only `docs/Log.md` (its migration subsection).
-- [ ] `grep -n "ProjectReference" src/SolTechnology.Core.Logging/SolTechnology.Core.Logging.csproj` prints nothing (no dependency cycle).
-- [ ] `git diff <feature-base>..HEAD -- src/*/*.csproj | grep "^+.*PackageReference"` prints nothing (no new external dependency in `src/`).
-- [ ] `grep -rnE "EventId = (2154|2155)" src --include=*.cs` lists exactly one `ChronicleReported` (2154) and one `RequestChronicleReported` (2155).
-- [ ] `git grep -niE "decompil|ilspy|dotpeek" -- src tests sample-tale-code-apps docs ':!docs/features/2026-11-02-logging-chronicle*'` prints nothing, and every Chronicle PR description carries the clean-room attestation (clean room).
-- [ ] `find src/SolTechnology.Core.Logging/Chronicles -name "*.cs" | xargs wc -l | awk '$1>150 && $2!="total"'` prints nothing.
-- [ ] Logging.Tests has these tests green:
+- [x] `pwsh ./.github/runTests.ps1` exits 0 (verified with `dotnet test SolTechnology.Core.slnx -c Release`,
+      which runs the same projects; `pwsh` is not installed on the closing machine).
+- [x] `grep -rn "ITimingService\|TimingService" src tests sample-tale-code-apps --include=*.cs | grep -v "/bin/\|/obj/"` prints nothing, and `grep -rln "ITimingService" docs --include=*.md | grep -v "docs/features/"` prints only `docs/Log.md` (its migration subsection).
+- [x] `grep -n "ProjectReference" src/SolTechnology.Core.Logging/SolTechnology.Core.Logging.csproj` prints nothing (no dependency cycle).
+- [x] `git diff <feature-base>..HEAD -- src/*/*.csproj | grep "^+.*PackageReference"` prints nothing (no new external dependency in `src/`).
+- [x] `grep -rnE "EventId = (2154|2155)" src --include=*.cs` lists exactly one `ChronicleReported` (2154) and one `RequestChronicleReported` (2155).
+- [x] `git grep -niE "decompil|ilspy|dotpeek" -- src tests sample-tale-code-apps docs ':!docs/features/2026-11-02-logging-chronicle*'` prints nothing, and every Chronicle PR description carries the clean-room attestation (clean room). The feature was
+      delivered as direct commits without a PR; no material of the inspiration library was opened.
+- [x] `find src/SolTechnology.Core.Logging/Chronicles -name "*.cs" | xargs wc -l | awk '$1>150 && $2!="total"'` prints nothing.
+- [x] Logging.Tests has these tests green:
   - `Step_ChronicleDisabled_AllocatesNothing` and `Step_EnabledNoRoot_AllocatesNothing`: 0 bytes from `GC.GetAllocatedBytesForCurrentThread()` over 1,000 steps after a warm-up, no listener.
   - `WhenAll_ParallelBranches_BuildsIsolatedSubtrees`.
   - `Report_FortyTwoIdenticalSQLSteps_AggregatesWithNPlusOneHint`.
-- [ ] One root per HTTP request, CQRS-only command, fire-and-forget event, Hangfire job, and
+- [x] One root per HTTP request, CQRS-only command, fire-and-forget event, Hangfire job, and
       MessageBus message, each proven by a test in its own module's test project (steps 09, 10,
       13, 14).
-- [ ] CQRS handler, Tale chapter, HTTP client call, and SqlClient command steps are proven by
+- [x] CQRS handler, Tale chapter, HTTP client call, and SqlClient command steps are proven by
       tests (steps 07, 10, 11, 12).
-- [ ] `docs/Log.md` contains a `Chronicle` section; `ITimingService` appears only in its `Migrating from ITimingService (1.x)` subsection.
-- [ ] DreamTravel `FindCityByName` produces one 2155 entry with nested CQRS and HTTP steps
+- [x] `docs/Log.md` contains a `Chronicle` section; `ITimingService` appears only in its `Migrating from ITimingService (1.x)` subsection.
+- [x] DreamTravel `FindCityByName` produces one 2155 entry with nested CQRS and HTTP steps
       (component test, step 16).
-- [ ] `CH-01`…`CH-11` and `LC-01`…`LC-05` were confirmed by the user on 2026-11-02 (OQ-1, OQ-2
+- [x] `CH-01`…`CH-11` and `LC-01`…`LC-05` were confirmed by the user on 2026-11-02 (OQ-1, OQ-2
       resolved in this brief); no further public symbol changed without a new confirmation.
 
 ## Code review (2026-11-10)
@@ -672,6 +674,49 @@ The DreamTravel README report was re-run after A4 (`3b864398`). Full suite after
 1181 passed, 11 skipped, 0 failed.
 
 ## Completion summary
+
+Chronicle shipped in `SolTechnology.Core.Logging` 2.0 between `c342c65e` and the closing commit, with
+code review fixes `fce0305f`…`5a234db9`.
+
+- Core (steps 01–08): ambient `AsyncLocal` step tree with a `readonly struct` handle, bounds and
+  markers, the report model and ASCII renderer with aggregation and N+1 hints, one entry per root
+  (2154) with level escalation and tail sampling, `AddSolChronicle` with validated options,
+  activities on `OperationsName`, the opt-in flight recorder, SqlClient command steps (proven
+  against SqlClient 7.0.1), and `IChronicle.BeginRoot`.
+- Roots and integrations (09–14): the HTTP request report is the finish entry (2155) and
+  `ITimingService` is gone; CQRS requests and event handlers are steps and fire-and-forget events
+  roots; Tale runs and chapters, HTTP client calls (attempts counted), MessageBus messages
+  (settlement → status) and Hangfire jobs (`Result` → status, filter order 0) are covered.
+- Documentation and showcase (15–16): the `docs/Log.md` Chronicle section with the 2.0 log
+  contract table and the `ITimingService` migration; Chronicle subsections in six module pages;
+  DreamTravel binds the options and a component test proves the nested request report.
+- Code review (2026-11-10): ten findings fixed, see "Code review".
+- Final public surface: `CH-01`…`CH-11` as confirmed (`CH-08` deletes `ITimingService`; `CH-09` and
+  `CH-10` are the breaking signature changes). Log contract: `LC-01`…`LC-05`, amended by A5 (an `Ok`
+  root with a failed step is Warning) and B1 (long-lived requests keep 2144–2146); 2147 retired.
+  Package and behavior: `CP-01`…`CP-06`, with CP-02 noting that `EmitActivities = false` removes
+  the CQRS spans.
+- Verification at close: Release build without new warnings (103, all pre-existing); full suite
+  1181 passed, 11 skipped, 0 failed; every acceptance criterion above checked.
+
+### Retrospective
+
+- Planned versus delivered: every step delivered its contract; the material differences are
+  listed under Deviations. Integration points held across steps: the writer owner check (CRM-1)
+  serves the SQL observer and the Hangfire filter, the `IsReportedByCaller` flag added in step 04
+  was the seam step 09 needed, and `BeginRoot` (08) served CQRS, MessageBus and Hangfire unchanged.
+- What worked: real-dependency tests (SqlClient 7.0.1, Hangfire's `BackgroundJobPerformer`, the
+  Service Bus emulator, DreamTravel's component host) settled every crux the plan left open, and
+  the 150-line budget forced small seams (`ChronicleWriter`, `ChronicleRequestRoot`,
+  `MessageChronicle`, `ChronicleJobName`).
+- What the reviews caught that the plan did not: long-lived requests (B1), the level/sampling
+  conflict between CRM-4 and CRM-14 (A5), `HttpClient.Timeout` seen as cancellation (B2), and
+  per-call costs before a gate (A1, A2, B4). Their lessons are in the premortem references
+  (logging, hangfire, http, cqrs, sql).
+- Architecture: `docs/architecture/logging.md` now describes Chronicle; `cqrs.md`,
+  `tale-framework.md`, `http-client.md`, `background-processing.md` and `infrastructure-modules.md`
+  describe their seams.
+
 
 ## Deviations
 
@@ -701,4 +746,35 @@ structure capped by `MaximumDestructuringDepth`"; step 15 documents the string f
   global filter per process, the last host's recorder reports every job, documented in `Hangfire.md`
   (step 14).
 
+### Promoted from the step files (2026-11-10)
+
+- 02: the tree writing moved into `ChronicleWriter`, one per recorder, which is the owner CRM-1
+  compares; a step beyond `MaxSteps` is a detached overflow node; `MaxDepth` counts below the root.
+- 03: `ChronicleReport.Steps` holds one entry, the root step; overflow aggregates always render
+  aggregated; the renderer passes non-ASCII user text through and flattens line breaks.
+- 04: the emission policy is split into `LevelOf` and `ShouldEmit` (CRM-14); the emitted-report
+  allocation ceiling is 11,010 bytes for ten steps.
+- 05: `Fail` also tags `error.type`; the report's `TraceId` is set only for W3C activities.
+- 06: the filter setup is a post-configure step, and invalid options read as a disabled recorder,
+  because the logger factory exists before `ValidateOnStart`.
+- 07: a SQL step covers the command up to its first result, not the row streaming.
+- 08: `DetachedFrom` is set only when the caller's root is still open.
+- 09: the outcome logging is one `RequestEnvelopeLogger.RequestEnded` call; a client abort's 2155
+  keeps the exception; the root also covers scope building.
+- 10–14: see "Integration decisions of steps 09–16" above; the HTTP tests use a scripted primary
+  handler, and MessageBus and Hangfire roots are opened by small helpers (`MessageChronicle`,
+  `ChronicleJobName`) to stay under 150 lines.
+- 15: `### Chronicle` sits before `### Testing` in `docs/Log.md`, outside the canonical page
+  structure, as the plan required.
+- 16: the component test finds its report by the query's `Name` attribute (the log collector is
+  shared), and the failure stub answers 404 so it cannot open the shared circuit breaker.
+
 ## Follow-ups
+
+- A JSON-shaped log state (B6 (b)) for per-step KQL, if consumers need it.
+- Chronicle steps for other database providers (Npgsql's `ActivitySource`), Blob, Cache and Redis.
+- Per-name slow thresholds and trace-aligned sampling.
+- A Chronicle sequence diagram through the `diagram` agent.
+- A per-host `GlobalJobFilters` story for Hangfire (PA-5), shared with `CorrelationIdJobFilter`.
+- Trimming/AOT annotations, with the flagship's AOT follow-up.
+

@@ -213,7 +213,11 @@ review changed CQRS (`EventDispatcher` propagates cancellation, P-26) and Loggin
 P-27), and its start-up logs took EventIds 2150–2153, so the Chronicle plan moved to 2154/2155. `testing-kits` was
 completed on 2026-11-09 and its working folder deleted, which completes all thirteen library features; it changed the
 DreamTravel component-test stubs (strict WireMock matching) and split the MessageBus `ModuleInstallerTests`, and added
-`C-33`, `P-28` and `P-29`. Each library brief carries its own `status`.
+`C-33`, `P-28` and `P-29`. Each library brief carries its own `status`. [`logging-chronicle`](2026-11-02-logging-chronicle.md)
+was completed on 2026-11-10 and its working folder deleted: `ITimingService` is removed (EventId 2147 retired), the
+HTTP finish entry is the Chronicle report 2155 and other roots report as 2154, Tale now depends on Logging, and CQRS,
+HTTP, MessageBus and Hangfire record Chronicle steps or roots; its `CH`/`CP`/`LC` tables and release-notes inputs feed
+the 2.0 release.
 
 Remaining foundation steps: core 05 and 06 may run at any time; core 07 (zero-dependency base
 package) runs after core 04; core 08 (central `GenerateDocumentationFile`) runs after every library

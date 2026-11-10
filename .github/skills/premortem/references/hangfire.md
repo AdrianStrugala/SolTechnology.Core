@@ -22,3 +22,9 @@
 - Filter not applied because the consumer never calls `UseSolFilters` → feature silently off.
 - Monitoring-API scans (`ScheduledJobs(0, int.MaxValue)`) on the perform path → cost grows with
   the whole storage.
+- A filter that opens per-job ambient state in `OnPerforming` and reads storage after it → when the
+  read throws, Hangfire skips that filter's `OnPerformed` and the worker thread keeps the state;
+  close in `OnPerformed` inside `finally` and read job parameters with `allowStale: true`.
+- Filter order relative to `PreventOverlapJobFilter` (method scope) and the correlation filter →
+  a filter at the default order runs before the overlap guard and sees skipped runs; give it an
+  explicit `Order` (`IJobFilter.Order`, a primary constructor cannot set `JobFilterAttribute.Order`).

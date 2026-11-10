@@ -35,13 +35,16 @@ the container; the caches remove the per-call method lookup and invocation refle
 ## Operation logging
 
 `LoggingPipelineBehavior` treats each request as one operation named after the request type. It
-writes `OperationStarted` and exactly one outcome entry:
+writes `OperationStarted` and exactly one outcome entry, and records the request as a
+[Chronicle](logging.md#chronicle) step through `IChronicle.Begin`: a child step inside an HTTP
+request, job or message, or its own root (one 2154 report) in a worker.
 
-| Outcome | Entry | Activity status |
+| Outcome | Entry | Chronicle step and activity |
 |---|---|---|
-| Handler returned a successful result or a non-`Result` response | `OperationSucceeded` (2138, Information) | `Ok` |
-| Handler returned a failed `Result` | `OperationFailedWithResult` (2149, Warning) with `ErrorType` and `ErrorMessage` | `Error` |
-| An exception escaped the pipeline | `OperationFailed` (2139, Error) with the exception | `Error`, exception recorded |
+| Handler returned a successful result or a non-`Result` response | `OperationSucceeded` (2138, Information) | `Ok`; activity status `Unset` |
+| Handler returned a failed `Result` | `OperationFailedWithResult` (2149, Warning) with `ErrorType` and `ErrorMessage` | `Failed` with the type name and message; activity `Error` |
+| `OperationCanceledException` while the caller's token is cancelled | `OperationFailed` (2139, Error) with the exception | `Cancelled` |
+| Any other exception escaped the pipeline | `OperationFailed` (2139, Error) with the exception | `Failed`; activity `Error`, exception recorded |
 
 A failed `Result` carries only the `Error` runtime type name and `Error.Message`. It never logs
 `ValidationError.Errors`, `AggregateError.InnerErrors`, other error properties, or `Result<T>.Data`,
@@ -53,8 +56,11 @@ CQRS, so Logging exposes no extra public member; event ids 2137–2140 belong to
 `LoggerExtensions` (see [Logging](logging.md)).
 
 `[LogScope]` request properties are read through compiled getters cached per request type, masked
-when marked `[Masked]`, pushed as one log scope, and set as activity tags. Activities start on the
-CQRS-owned `ActivitySource` named `CoreLoggingActivitySources.OperationsName`.
+when marked `[Masked]`, pushed as one log scope, and set on the step: a string attribute in the
+report and a typed activity tag. The step produces the operation's activity on
+`CoreLoggingActivitySources.OperationsName`, so CQRS owns no `ActivitySource` and a listener gets no
+duplicate span; `ChronicleOptions.EmitActivities = false` therefore also turns the CQRS spans off.
+`AddSolCQRS` registers Chronicle only with `UseLogging`.
 
 ## Events
 
@@ -66,6 +72,14 @@ handlers still run. The exception is an `OperationCanceledException` thrown whil
 token is cancelled: the dispatcher then calls no further handler and lets it propagate, so a
 durable publisher (Hangfire) can requeue an event cut short by shutdown instead of reporting it
 as done. The in-memory publisher dispatches with `CancellationToken.None`.
+
+With Chronicle registered, the dispatcher records one step per handler,
+`Event {EventType} {HandlerType}`: `Failed` when the handler throws (the dispatch goes on),
+`Cancelled` on the cancelled-dispatch path above, and no step for the handlers it then skips. The
+in-memory publisher wraps each dispatch in its own root, `Event {EventType}`, through
+`IChronicle.BeginRoot`, because the dispatch usually outlives the publishing request and would
+otherwise land in that request's report as a late step. `IChronicle` is an optional constructor
+dependency of both internal types, so hosts without Chronicle keep working.
 
 The event abstraction is intentionally transport-replaceable. This fire-and-forget behavior is
 not a durability guarantee; use a persistent publisher when delivery must survive process loss.

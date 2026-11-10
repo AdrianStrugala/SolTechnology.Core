@@ -186,3 +186,17 @@ Engine and handler entries use the consumer handler's logger category inside a s
 `TaleHandler` and the real `TaleId` (opened after the ID is assigned). `TaleManager` and
 `TaleController` log under their own type names. Every placeholder is bracketed
 (`[{ChapterId}]`), per the Coding Guide.
+
+Tale references `SolTechnology.Core.Logging` for [Chronicle](logging.md#chronicle); both packages
+already target the ASP.NET Core shared framework, so the edge adds no external package. The
+internal `TaleHandler.Run`, which serves direct and managed runs, wraps the run in a
+`Tale {Handler}` step with `TaleId` and takes its status from the returned result: success is `Ok`,
+`TalePausedError` is `Ok` with `Outcome=WaitingForInput`, `TaleCancelledError` is `Cancelled`, and
+any other error, including the `ConflictError` of a lease takeover, is `Failed`. `ChapterReader.Read`,
+where each chapter's outcome is known, records a `Chapter {ChapterId}` step: a failed `Result` or
+exception fails it, a pause (also after rejected input) adds `Outcome=WaitingForInput`, the caller's
+cancellation cancels it, and a lease lost to another run cancels it with `Outcome=LeaseLost`.
+Chapters skipped on resume or after the tale stopped get no step, and interactive input is never
+recorded. `IChronicle` comes from the run's service provider, so no public constructor changed, and
+without it a run records nothing. `ChapterId` is the step name rather than the history key, so names
+stay readable and repeated chapters aggregate.

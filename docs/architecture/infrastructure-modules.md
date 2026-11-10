@@ -41,7 +41,16 @@ server restart, failover, or slow container start retried, as it was in 1.x. EF 
 because a command may have run; an open has no side effect, so retrying it is safe.
 
 The retry blocks the calling thread for about 40 seconds of delays plus four connect attempts and
-takes no `CancellationToken`.
+takes no `CancellationToken`. Opening a connection is not a SqlClient command, so this wait shows
+as a gap in the parent [Chronicle](logging.md#chronicle) step rather than as a `SQL` step.
+
+SQL itself has no Chronicle code and no Logging dependency: Logging observes SqlClient's
+`SqlClientDiagnosticListener` and records each command inside a root as `SQL {keyword}` (leading
+comments and `SET …;` statements skipped, stored procedures by name), from sending the command to the
+first result. Commands through Dapper, EF Core and raw `SqlConnection` are covered alike, and a
+connection wrapper with an SQL → Logging edge was rejected because it would miss EF Core and break
+provider-specific casts. Statement text and SqlClient error messages are recorded only with
+`CaptureSQLCommandText`, because they can carry literal values.
 The health check therefore opens its own connection without the retry, with a 5-second default
 timeout, and rethrows the caller's cancellation instead of reporting `Unhealthy`.
 
@@ -230,6 +239,15 @@ complete its message; otherwise every rolling deploy would hand in-flight messag
 instance a second time. A handler that throws `OperationCanceledException` during shutdown is not
 settled, and its message is delivered again. A failed complete, or a failed abandon or dead-letter
 after a handler failure, is logged at Warning and left to the lock expiry.
+
+Each message is its own [Chronicle](logging.md#chronicle) root, `Message {MessageType}`, opened with
+`BeginRoot` after the correlation id is restored and inside the receiver's log scope, so its 2154
+entry carries `CorrelationId` and `MessageId`. `MessageSettler` returns the internal
+`MessageSettlement` it chose, and the root takes its status from it: completed is `Ok` (with
+`Settlement=CompleteFailed` when the broker refused the completion), an unreadable or failing
+message is `Failed` with `Settlement` and the dead-letter reason code (never the description, which
+can hold exception text), and a shutdown cancellation is `Cancelled`. The body and application
+properties are never recorded.
 
 ### Several instances
 

@@ -63,13 +63,27 @@ inspect (design A6).
 
 ## Filters
 
-`UseSolFilters(sp)` installs three pieces, each resolved from the container:
+`UseSolFilters(sp)` installs four pieces, each resolved from the container:
 
 - `CorrelationIdJobFilter` (global): on create it stamps the job parameter `CorrelationId` with
   the ambient id or a new one without writing ambient state, because the recurring scheduler's
   thread is long-lived; on perform it sets the job's id, pushes a log scope, and afterwards
   restores the worker thread's previous id or calls `ICorrelationIdService.Clear()`.
 - `SmartRetryJobFilter` (global), described under Retries.
+- `ChronicleJobFilter` (global, `Order = 0`): opens a [Chronicle](logging.md#chronicle) root per
+  performed job through `BeginRoot` (`Job {TJob}` for a recurring job, `Event {EventType}` for a
+  persistent event, `Job {Type}.{Method}` otherwise) and closes it in `OnPerformed` inside a
+  `finally`, so a worker thread never keeps a job root as its ambient node. Hangfire sorts filters
+  by order and then scope, so order 0 runs it after every default-order filter: the job's
+  correlation scope is already pushed, and a run the overlap guard cancels opens no root (its skip
+  stays visible as `Deleted`). It implements `IJobFilter` directly to keep its primary
+  constructor. The root takes its status from the job's outcome: a failed `Result` is `Failed`
+  with `Recoverable`, although Hangfire records `Succeeded` or a Smart Retry; a job exception is
+  reported by the inner exception of `JobPerformanceException`; shutdown cancellation and
+  `JobAbortedException` are `Cancelled`, and the requeued run gets its own root. `RetryCount` is
+  read from the job's parameter snapshot, only while recording. Like the other global filters it
+  lives in Hangfire's process-wide collection, so with several hosts in one process the last
+  host's instance reports every job.
 - `PreventOverlapFilterProvider`, added to Hangfire's process-wide `JobFilterProviders.Providers`
   (replacing one an earlier host in the same process added). It returns `PreventOverlapJobFilter`
   for the runners of jobs registered with `preventOverlap: true`. The filter holds a non-blocking
