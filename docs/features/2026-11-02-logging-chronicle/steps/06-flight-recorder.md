@@ -1,7 +1,7 @@
 ---
 spec: 2026-11-02-logging-chronicle
 step: 06
-status: to-do
+status: done
 ---
 
 # Step 06: Chronicle flight recorder — buffered Debug/Trace entries attached only on failure
@@ -63,12 +63,43 @@ are added only when the user configured no rule for the alias. Serilog hosts nee
     stays 0 for 1,000 `LogDebug` calls inside a root).
 
 ## Acceptance criteria
-- [ ] `dotnet test tests/SolTechnology.Core.Logging.Tests` is green.
-- [ ] `Step_ChronicleDisabled_AllocatesNothing` (step 01) is still green.
-- [ ] Premortem mitigations for `ModuleInstaller.cs` (step 00) are applied (the registrations reached from the installers change).
-- [ ] CRM-8: `MaxEntries_Reached_FormatterNotInvoked` and `FlightRecorderDisabled_ProviderNotConsultedForDebug` are green.
+- [x] `dotnet test tests/SolTechnology.Core.Logging.Tests` is green.
+- [x] `Step_ChronicleDisabled_AllocatesNothing` (step 01) is still green.
+- [x] Premortem mitigations for `ModuleInstaller.cs` (step 00) are applied (the registrations reached from the installers change).
+- [x] CRM-8: `MaxEntries_Reached_FormatterNotInvoked` and `FlightRecorderDisabled_ProviderNotConsultedForDebug` are green.
 
 ## Open questions
 - none (OQ-1 confirmed 2026-11-02: `CH-04` `FlightRecorder`, `CH-05`, `CH-06` `FlightRecords`/`ChronicleFlightRecord`; OQ-2 accepted 2026-11-02: `LC-05`)
 
 ## Deviations
+
+### Filter setup is a post-configure step
+
+**Original plan:** `ChronicleFlightRecorderFilterSetup : IConfigureOptions<LoggerFilterOptions>`.
+
+**Actual implementation:** `IPostConfigureOptions<LoggerFilterOptions>`. It must see the rules from
+`Logging:` configuration and from `AddFilter`/`Configure` calls, which are all configure steps;
+as a configure step its result would depend on registration order.
+
+### Invalid options read as a disabled recorder
+
+**Original plan:** the provider reads `IOptions<ChronicleOptions>`.
+
+**Actual implementation:** the logger factory (and with it the provider and the filter setup) is
+created while the host is built, before `ValidateOnStart` runs. Reading invalid options there threw
+`OptionsValidationException` out of `ILoggerFactory` creation, so the host failed without a usable
+logger (`AddSolChronicle_InvalidOptions_FailsOnStart` caught it). Both now read the options once and
+treat invalid options as a disabled recorder; `ValidateOnStart` still fails the host on start.
+
+### Level window and test layout
+
+- The recorder buffers levels from `MinimumLevel` up to Debug (`Debug` → Debug only, `Trace` →
+  Trace and Debug); the plan's "level ≤ `MinimumLevel`" read the other way round.
+- The provider counts how often MEL consults it (internal `Consultations`), the seam for
+  `FlightRecorderDisabled_ProviderNotConsultedForDebug` (CRM-8).
+- `MicrosoftCategory_DebugNotBuffered_ByDefault`, `ChronicleCategory_NeverBuffered`, and
+  `InformationEntries_NotBuffered` are one parameterized test,
+  `EntryOutsideRecordedLevelsOrCategories_NotBuffered` (also covers `System`).
+- The report renders the records after the tree as a `flight recorder:` section; the
+  `+{n} records dropped` marker closes it.
+

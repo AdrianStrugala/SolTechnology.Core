@@ -61,6 +61,31 @@ internal static class ChronicleTreeRenderer
         {
             yield return Invariant($"+{report.LateStepCount} late steps");
         }
+
+        foreach (var line in FlightLines(report))
+        {
+            yield return line;
+        }
+    }
+
+    private static IEnumerable<string> FlightLines(ChronicleReport report)
+    {
+        if (report.FlightRecords.Count == 0 && report.DroppedFlightRecordCount == 0)
+        {
+            yield break;
+        }
+
+        yield return "flight recorder:";
+        foreach (var record in report.FlightRecords)
+        {
+            var exception = record.ExceptionType is null ? "" : $" ({ChronicleText.SingleLine(record.ExceptionType)})";
+            yield return Invariant($"  [@{record.OffsetMs} ms] [{record.Level}] {ChronicleText.SingleLine(record.Category)}: {ChronicleText.SingleLine(record.Message)}{exception}");
+        }
+
+        if (report.DroppedFlightRecordCount > 0)
+        {
+            yield return Invariant($"  +{report.DroppedFlightRecordCount} records dropped");
+        }
     }
 
     private static IEnumerable<string> ChildLines(ChronicleReportStep parent, string indent)
@@ -79,7 +104,7 @@ internal static class ChronicleTreeRenderer
 
     private static string Line(ChronicleReportStep step)
     {
-        var line = new StringBuilder(Clean(step.Name));
+        var line = new StringBuilder(ChronicleText.SingleLine(step.Name));
         if (step.IsAggregated)
         {
             line.Append(CultureInfo.InvariantCulture, $" x{step.Count} [total {step.DurationMs} ms] [max {step.MaxDurationMs} ms] [failed {step.FailedCount}]");
@@ -89,10 +114,10 @@ internal static class ChronicleTreeRenderer
         else
         {
             line.Append(CultureInfo.InvariantCulture, $" [@{step.OffsetMs} ms] [{step.DurationMs} ms] [{StatusText(step.Status)}]");
-            AppendIf(line, step.ErrorType is not null, $" Error=[{Clean(step.ErrorType)}{(step.ErrorMessage is null ? "" : ": " + Clean(step.ErrorMessage))}]");
+            AppendIf(line, step.ErrorType is not null, $" Error=[{ChronicleText.SingleLine(step.ErrorType)}{(step.ErrorMessage is null ? "" : ": " + ChronicleText.SingleLine(step.ErrorMessage))}]");
             foreach (var (key, value) in step.Attributes)
             {
-                line.Append(' ').Append(Clean(key)).Append('=').Append(Clean(value));
+                line.Append(' ').Append(ChronicleText.SingleLine(key)).Append('=').Append(ChronicleText.SingleLine(value));
             }
 
             AppendIf(line, step.DroppedAttributeCount > 0, Invariant($" +{step.DroppedAttributeCount} attributes dropped"));
@@ -117,10 +142,6 @@ internal static class ChronicleTreeRenderer
         ChronicleStepStatus.Cancelled => "cancelled",
         _ => "ok"
     };
-
-    // A line break inside a name or value would break the tree into unrelated lines.
-    private static string Clean(string? text)
-        => text is null || text.AsSpan().IndexOfAny('\r', '\n', '\t') < 0 ? text ?? string.Empty : text.Replace('\r', ' ').Replace('\n', ' ').Replace('\t', ' ');
 
     private static string Invariant(FormattableString text) => text.ToString(CultureInfo.InvariantCulture);
 }

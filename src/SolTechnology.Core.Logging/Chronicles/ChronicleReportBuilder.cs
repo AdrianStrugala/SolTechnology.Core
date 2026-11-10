@@ -27,6 +27,7 @@ internal sealed class ChronicleReportBuilder
     private ChronicleReport Build()
     {
         var rootStep = BuildStep(_root.Node);
+        var flight = _root.Node.Status == ChronicleStepStatus.Failed ? _root.FlightRecords : null;
         return new ChronicleReport
         {
             Name = _root.Node.Name,
@@ -39,6 +40,8 @@ internal sealed class ChronicleReportBuilder
             DroppedStepCount = _root.DroppedStepCount,
             LateStepCount = _root.LateStepCount,
             IsNPlusOneSuspected = _isNPlusOneSuspected,
+            FlightRecords = flight?.Snapshot() ?? [],
+            DroppedFlightRecordCount = flight?.DroppedCount ?? 0,
             HasFailedSteps = _hasFailedSteps
         };
     }

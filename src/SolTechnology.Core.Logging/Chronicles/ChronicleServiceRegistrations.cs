@@ -1,6 +1,8 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using SolTechnology.Core.Logging.Chronicles.FlightRecorder;
 
 namespace SolTechnology.Core.Logging.Chronicles;
 
@@ -22,6 +24,8 @@ internal static class ChronicleServiceRegistrations
         services.TryAddSingleton<IChronicle, ChronicleRecorder>();
         services.TryAddEnumerable(ServiceDescriptor.Singleton<IChronicleRootListener, ChronicleReporter>());
         services.TryAddEnumerable(ServiceDescriptor.Singleton<IValidateOptions<ChronicleOptions>, ChronicleOptionsValidator>());
+        services.TryAddEnumerable(ServiceDescriptor.Singleton<ILoggerProvider, ChronicleFlightRecorderProvider>());
+        services.TryAddEnumerable(ServiceDescriptor.Singleton<IPostConfigureOptions<LoggerFilterOptions>, ChronicleFlightRecorderFilterSetup>());
         return options.ValidateOnStart();
     }
 }

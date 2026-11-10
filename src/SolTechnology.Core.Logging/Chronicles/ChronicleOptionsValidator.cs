@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
 namespace SolTechnology.Core.Logging.Chronicles;
@@ -16,6 +17,15 @@ internal sealed class ChronicleOptionsValidator : IValidateOptions<ChronicleOpti
         Require(failures, options.NPlusOneThreshold >= options.AggregateThreshold, "NPlusOneThreshold must be at least AggregateThreshold.");
         Require(failures, options.SlowThreshold > TimeSpan.Zero, "SlowThreshold must be positive.");
         Require(failures, options.SampleRate is >= 0.0 and <= 1.0, "SampleRate must be between 0.0 and 1.0.");
+
+        var recorder = options.FlightRecorder;
+        Require(failures, recorder is not null, "FlightRecorder must not be null.");
+        if (recorder is not null)
+        {
+            Require(failures, recorder.MinimumLevel is LogLevel.Trace or LogLevel.Debug, "FlightRecorder.MinimumLevel must be Trace or Debug.");
+            Require(failures, recorder.MaxEntries is >= 1 and <= 1000, "FlightRecorder.MaxEntries must be between 1 and 1000.");
+            Require(failures, recorder.MaxMessageLength is >= 32 and <= 4096, "FlightRecorder.MaxMessageLength must be between 32 and 4096.");
+        }
 
         return failures.Count == 0 ? ValidateOptionsResult.Success : ValidateOptionsResult.Fail(failures);
     }

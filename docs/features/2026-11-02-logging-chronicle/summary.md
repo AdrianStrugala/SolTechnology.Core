@@ -27,7 +27,7 @@ R1–R9 and premortem addendum PA-1…PA-5 in the brief). The verdict above stan
 | 03 | Chronicle report model, ASCII tree renderer, and N+1 aggregation | [`steps/03-report-model-renderer-and-n-plus-one.md`](steps/03-report-model-renderer-and-n-plus-one.md) | done |
 | 04 | Chronicle emission — one report entry per root, level escalation, sampling, DI registration | [`steps/04-emission-level-sampling-and-registration.md`](steps/04-emission-level-sampling-and-registration.md) | done |
 | 05 | Chronicle steps as OpenTelemetry Activities on `OperationsName` | [`steps/05-opentelemetry-activities.md`](steps/05-opentelemetry-activities.md) | done |
-| 06 | Chronicle flight recorder — buffered Debug/Trace entries attached only on failure | [`steps/06-flight-recorder.md`](steps/06-flight-recorder.md) | to-do |
+| 06 | Chronicle flight recorder — buffered Debug/Trace entries attached only on failure | [`steps/06-flight-recorder.md`](steps/06-flight-recorder.md) | done |
 | 07 | Chronicle SQL steps — SqlClient `DiagnosticListener` observer | [`steps/07-sqlclient-diagnostic-steps.md`](steps/07-sqlclient-diagnostic-steps.md) | to-do |
 | 08 | Chronicle detached roots — `IChronicle.BeginRoot` | [`steps/08-detached-roots.md`](steps/08-detached-roots.md) | to-do |
 | 09 | HTTP request roots in `LoggingMiddleware`; remove `ITimingService` | [`steps/09-http-request-roots-and-timing-service-removal.md`](steps/09-http-request-roots-and-timing-service-removal.md) | to-do |

@@ -42,6 +42,12 @@ public sealed class ChronicleReport
     /// <summary><c>true</c> when an aggregated line reached <see cref="ChronicleOptions.NPlusOneThreshold"/>.</summary>
     public bool IsNPlusOneSuspected { get; internal init; }
 
+    /// <summary>Debug/Trace entries buffered by the flight recorder; filled only for a <see cref="ChronicleStepStatus.Failed"/> root.</summary>
+    public IReadOnlyList<ChronicleFlightRecord> FlightRecords { get; internal init; } = [];
+
+    /// <summary>Flight-recorder entries beyond <see cref="ChronicleFlightRecorderOptions.MaxEntries"/>; set only for a failed root.</summary>
+    internal int DroppedFlightRecordCount { get; init; }
+
     /// <summary><c>true</c> when any step, aggregated line, or dropped step failed, whatever the root status.</summary>
     internal bool HasFailedSteps { get; init; }
 

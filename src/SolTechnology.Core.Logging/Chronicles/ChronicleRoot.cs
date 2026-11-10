@@ -9,6 +9,7 @@ internal sealed class ChronicleRoot
     private int _lateStepCount;
     private int _stepCount = 1;
     private int _droppedStepCount;
+    private ChronicleFlightBuffer? _flightRecords;
 
     internal ChronicleRoot(ChronicleWriter owner, string name, long startTimestamp, Activity? activity)
     {
@@ -24,6 +25,8 @@ internal sealed class ChronicleRoot
     internal string? TraceId { get; }
     internal Exception? Exception { get; set; }
     internal bool IsReportedByCaller { get; set; }
+    internal ChronicleFlightBuffer? FlightRecords => Volatile.Read(ref _flightRecords);
+    internal ChronicleFlightBuffer FlightBuffer => LazyInitializer.EnsureInitialized(ref _flightRecords);
     internal TimeSpan Duration => Owner.TimeProvider.GetElapsedTime(Node.StartTimestamp, Node.EndTimestamp);
     internal bool IsClosed => Volatile.Read(ref _closed) == 1;
     internal int LateStepCount => Volatile.Read(ref _lateStepCount);

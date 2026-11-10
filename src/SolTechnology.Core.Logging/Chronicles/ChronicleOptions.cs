@@ -68,4 +68,7 @@ public sealed class ChronicleOptions
     /// <c>CoreLoggingActivitySources.OperationsName</c> when that source has listeners (default <c>true</c>).
     /// </summary>
     public bool EmitActivities { get; set; } = true;
+
+    /// <summary>Flight recorder: Debug/Trace entries attached to the report of a failed root (off by default).</summary>
+    public ChronicleFlightRecorderOptions FlightRecorder { get; set; } = new();
 }
