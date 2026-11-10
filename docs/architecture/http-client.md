@@ -41,6 +41,17 @@ A cancellation of the caller's own token is not an upstream failure: it is neith
 counted by the circuit breaker, and it records no retry log or metric. Any other cancellation is a
 timeout and is treated as transient.
 
+With Polly enabled, the Sol pipeline is the client's only resilience layer: `AddSolHTTPClient`
+removes every `ResilienceHandler` added before its own, which includes the standard or hedging
+handler from `ConfigureHttpClientDefaults` (Aspire ServiceDefaults), because Microsoft.Extensions.Http
+applies the defaults before the named client's configuration whatever the registration order. A
+second pipeline would multiply retries, stack timeouts and put two circuit breakers on each call.
+The removal is decided when the handler chain is built, since `UsePolly` may come from configuration;
+with Polly disabled, other handlers stay and the app's default resilience applies. A handler added on
+the named client after `AddSolHTTPClient` is an explicit choice and stays. Asking every Aspire app to
+drop the default handler was the alternative; it was rejected because 2.0 aims to work with the
+unmodified template.
+
 With Polly enabled, `HttpClient.Timeout` is infinite and Polly owns deadlines. Without Polly,
 `TimeoutSeconds` controls `HttpClient.Timeout`. Backoff consumes time in addition to individual
 attempts, so configure `OverallRequestBudget` when total latency must be bounded.

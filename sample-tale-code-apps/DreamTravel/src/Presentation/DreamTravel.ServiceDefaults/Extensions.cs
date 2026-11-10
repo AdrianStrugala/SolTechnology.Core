@@ -10,7 +10,7 @@ using OpenTelemetry.Trace;
 
 namespace DreamTravel.ServiceDefaults
 {
-    // Adds common .NET Aspire services: service discovery, health checks, and OpenTelemetry.
+    // Adds common .NET Aspire services: service discovery, resilience, health checks, and OpenTelemetry.
     // This project should be referenced by each service project in your solution.
     // To learn more about using this project, see https://aka.ms/dotnet/aspire/service-defaults
     public static class Extensions
@@ -25,10 +25,9 @@ namespace DreamTravel.ServiceDefaults
 
             builder.Services.ConfigureHttpClientDefaults(http =>
             {
-                // No AddStandardResilienceHandler() here: every DreamTravel HttpClient is an
-                // AddSolHTTPClient client that owns its core-http-{name} pipeline, and a default
-                // handler would wrap it (retries multiply, timeouts stack, two circuit breakers).
-                // A future non-Sol client should add its own resilience handler explicitly.
+                // Turn on resilience by default; AddSolHTTPClient strips it from Sol clients,
+                // which keep only their own core-http-{name} pipeline.
+                http.AddStandardResilienceHandler();
 
                 // Turn on service discovery by default
                 http.AddServiceDiscovery();

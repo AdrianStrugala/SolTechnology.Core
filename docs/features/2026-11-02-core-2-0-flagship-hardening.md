@@ -503,6 +503,7 @@ parameter; `UntilAsync`, `CheckHealthAsync`, `InvokeAsync`, `StartAsync`/`StopAs
 | P-27 | `ICorrelationIdService` (Logging) gains `void Clear()`, which removes the ambient correlation id; the built-in implementation clears its `AsyncLocal`, and Hangfire's correlation filter uses it to restore "no id" after a job (code review 2026-11-09, user decision) | A custom `ICorrelationIdService` implementation must add `Clear()`: it no longer compiles, and one compiled against 1.x fails to load (`TypeLoadException`) | hangfire code review (logging) |
 | P-28 | The testing kits no longer disable Ryuk: `TestContainersContext` drops its `TestcontainersSettings.ResourceReaperEnabled = false` override, so Ryuk follows the Testcontainers settings and is on by default (`infra#16`) | Disposed fixtures now remove their containers instead of only stopping them, and an aborted run's containers are reaped. Under Docker Desktop Enhanced Container Isolation, which blocks the `testcontainers/ryuk` image, set `TESTCONTAINERS_RYUK_DISABLED=true` | testing-kits 02 |
 | P-29 | `ServiceBusFixture` keeps its state per instance instead of in static dictionaries keyed by container name, and creates, owns and removes the emulator's MSSQL sidecar and network (`infra#15`, messagebus follow-up) | Two fixtures with the same name no longer share one emulator: without `TESTCONTAINERS_REUSE` each starts its own, and disposing one no longer breaks the other. Disposal no longer leaves the MSSQL sidecar running. With reuse on, the sidecar and network get the names `{name}-mssql` and `{name}-network`; an emulator kept by a 1.x run is still found by name | testing-kits 02 |
+| P-30 | `AddSolHTTPClient` removes every `ResilienceHandler` added to the client before its own when the client's `UsePolly` is on, including the standard or hedging handler that `ConfigureHttpClientDefaults` adds (Aspire ServiceDefaults); with `UsePolly` off, other handlers stay (user decision 2026-11-10, after DreamTravel commit e84a4943 found `-standard` wrapping `core-http-Google`) | A Sol client under app-wide resilience defaults now runs one pipeline: a failing call makes the Sol policy's attempts instead of a multiple of them, and the default handler's timeouts and circuit breaker no longer apply to it. An app that relied on the default handler for a Sol client sets `UsePolly = false` or adds the handler on the named client after `AddSolHTTPClient`; non-Sol clients are unaffected | http (post-completion) |
 
 ### Log contract changes (Guide §15 "report only", accepted for 2.0)
 
@@ -767,10 +768,15 @@ these notes from the steps:
   piled up, and an aborted run left every container behind. Under Docker Desktop Enhanced Container Isolation set
   `TESTCONTAINERS_RYUK_DISABLED=true`. `ServiceBusFixture` now removes the emulator's MSSQL sidecar and network on
   dispose (with or without Ryuk), and two fixtures with the same name each own their emulator.
+- http (P-30, 2026-11-10): keep the Aspire ServiceDefaults template unchanged. `AddSolHTTPClient` strips the
+  `AddStandardResilienceHandler()` (or hedging handler) that `ConfigureHttpClientDefaults` adds, so a Sol client with
+  `UsePolly` on runs only its `core-http-{name}` pipeline and retries no longer multiply. An app that wants the default
+  handler on a Sol client instead sets `UsePolly = false`; one that wants both layers adds the handler on the named
+  client after `AddSolHTTPClient`. Apps that removed the default handler as a 1.x workaround can restore it.
 - logging-chronicle (separate feature, release depends on it): its `CH-nn`, `CP-nn`, and `LC-nn` tables and its own
   "Release-notes inputs" section in [`2026-11-02-logging-chronicle`](2026-11-02-logging-chronicle.md) are inputs too,
   including the `ITimingService` removal, the retired EventId 2147, and EventIds 2154/2155. Those prefixes are Chronicle's own, so they do not
-  share the `C-nn`/`P-nn`/`L-nn` numbering (maxima on 2026-11-09: `C-33`, `P-29`, `L-07`); Chronicle reserves no
+  share the `C-nn`/`P-nn`/`L-nn` numbering (maxima on 2026-11-10: `C-33`, `P-30`, `L-07`); Chronicle reserves no
   number here.
 
 ### Resolved questions (user answers, 2026-11-02)

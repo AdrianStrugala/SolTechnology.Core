@@ -18,7 +18,8 @@ namespace SolTechnology.Core.HTTP
         {
             /// <summary>
             /// Registers a typed HTTP client with the resilience pipeline,
-            /// correlation propagation, metrics, and a Chronicle step per call wired up.
+            /// correlation propagation, metrics, and a Chronicle step per call wired up. With <c>UsePolly</c> on,
+            /// resilience handlers added earlier (for example by <c>ConfigureHttpClientDefaults</c>) are removed.
             /// </summary>
             /// <param name="httpClientName">Client name; also the configuration key under <c>HTTPClients</c>.</param>
             /// <param name="httpClientConfiguration">Connection settings; when <c>null</c>, bound from <c>HTTPClients:{name}</c>.</param>
@@ -88,6 +89,7 @@ namespace SolTechnology.Core.HTTP
                 httpClientBuilder.AddHttpMessageHandler<CorrelationPropagatingHandler>();
             }
 
+            ResilienceHandlerOwnership.RemoveForeignHandlersWhenPollyIsOn(httpClientBuilder, httpClientName);
             httpClientBuilder.AddResilienceHandler($"core-http-{httpClientName}", (pipelineBuilder, context) =>
             {
                 var factory = context.ServiceProvider.GetRequiredService<HttpPolicyFactory>();

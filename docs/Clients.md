@@ -52,19 +52,22 @@ services.AddSolHTTPClient<IGoogleHTTPClient, GoogleHTTPClient, GoogleHTTPOptions
 
 #### Using with Aspire ServiceDefaults
 
-The standard resilience handler that the Aspire ServiceDefaults template adds through
-`ConfigureHttpClientDefaults(http => http.AddStandardResilienceHandler())` stacks with the Sol
-pipeline: it wraps `core-http-{clientName}` as a second `-standard` pipeline, so retries multiply,
-timeouts stack and each call goes through two circuit breakers. Keep the Sol pipeline as the only
-one:
+Keep the Aspire ServiceDefaults template as it is. Its
+`ConfigureHttpClientDefaults(http => http.AddStandardResilienceHandler())` gives every `HttpClient`
+a standard resilience handler. On a Sol client whose `UsePolly` is on, `AddSolHTTPClient` removes
+it, together with any other resilience handler added before it (hedging included). The client runs
+only its `core-http-{clientName}` pipeline, so retries do not multiply, timeouts do not stack and
+each call crosses one circuit breaker. Other clients keep the default handler. DreamTravel runs
+this way.
 
-- **Every client is a Sol client** — remove `AddStandardResilienceHandler()` from
-  `ConfigureHttpClientDefaults` and keep the rest (service discovery). DreamTravel does this.
-- **Other clients still need it** — remove it from the defaults anyway and call
-  `AddStandardResilienceHandler()` on each non-Sol `AddHttpClient(...)` builder instead.
+- **`UsePolly = false`** — the library leaves other handlers alone, so the app's default resilience
+  applies to that client instead of the Sol pipeline.
+- **A handler added on the named client after `AddSolHTTPClient`** — for example
+  `services.AddHttpClient("Google").AddStandardResilienceHandler()` — is kept, because it is an
+  explicit choice; it wraps the Sol pipeline, so add it only when you want two layers.
 
-Two `Polly: Resilience pipeline executing` debug lines per call, one with source `-standard/`,
-mean the defaults are still on.
+`Polly: Resilience pipeline executing` debug lines with a `-standard/` source on a Sol client mean
+a second pipeline is still in place.
 
 ### Configuration
 

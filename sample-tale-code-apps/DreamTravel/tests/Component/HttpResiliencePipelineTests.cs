@@ -5,9 +5,9 @@ using Microsoft.Extensions.Http.Resilience;
 namespace DreamTravel.FunctionalTests;
 
 /// <summary>
-/// Pins one resilience pipeline per Sol HTTP client. Aspire ServiceDefaults' default
-/// <c>AddStandardResilienceHandler()</c> would wrap the <c>core-http-{name}</c> pipeline and
-/// multiply retries, stack timeouts and double the circuit breakers.
+/// Pins one resilience pipeline per Sol HTTP client. ServiceDefaults adds Aspire's
+/// <c>AddStandardResilienceHandler()</c> to every client, and <c>AddSolHTTPClient</c> must strip it so
+/// it does not wrap the <c>core-http-{name}</c> pipeline (retries multiply, timeouts stack, two breakers).
 /// </summary>
 public sealed class HttpResiliencePipelineTests
 {
