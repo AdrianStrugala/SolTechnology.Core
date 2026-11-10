@@ -1,7 +1,7 @@
 ---
-status: in-progress
+status: completed
 created: 2026-11-02
-completed:
+completed: 2026-11-10
 ---
 
 # SolTechnology.Core 2.0 — flagship hardening before the Sol Technology org transfer
@@ -156,8 +156,9 @@ form [`2026-11-02-flagship-showcase-hygiene`](2026-11-02-flagship-showcase-hygie
 
 ## Implementation plan
 
-The steps are the execution units. Gates: review and premortem are both required (see
-`summary.md`). The premortem (step `00`) covers former steps 01–70, because they edit
+The steps are the execution units. Gates: review and premortem are both required (recorded in the
+working folder's `summary.md` until core 11: `review: done (2026-11-02)`,
+`premortem: go-with-mitigations (2026-11-02)`). The premortem (step `00`) covers former steps 01–70, because they edit
 `ModuleInstaller.cs` files, `src/Directory.Build.props`, and persisted contracts
 (`CLAUDE.md §4`). Since the per-library regroup it also covers the library features' steps.
 
@@ -233,7 +234,9 @@ Guards and Scheduler opt out. All 20 packages still ship `lib/net10.0/<PackageId
 Release build warnings are unchanged (104 before and after). It was verified with a local pack
 instead of the CI artifacts (step 08 `Deviations`). Core 06 was done on 2026-11-10: the owner
 confirmed that both zip keys, the four history Google keys and the `talecodeservicebus` SAS key are
-revoked; the legacy zips are back without secrets (`25797666`).
+revoked; the legacy zips are back without secrets (`25797666`). Core 11 closed this feature on
+2026-11-10 and deleted its working folder; the step outcomes are under "Completion summary" and
+"Deviations".
 
 Former → current step mapping (`*` = only the library-scoped part of the former repository-wide
 `[{Placeholder}]` and empty-`catch` check, carried in that library's conformance step):
@@ -783,6 +786,30 @@ these notes from the steps:
   including the `ITimingService` removal, the retired EventId 2147, and EventIds 2154/2155. Those prefixes are Chronicle's own, so they do not
   share the `C-nn`/`P-nn`/`L-nn` numbering (maxima on 2026-11-10: `C-33`, `P-30`, `L-07`); Chronicle reserves no
   number here.
+- chronicle-sql-step-targets (separate feature, 2026-11-10,
+  [`2026-11-10-chronicle-sql-step-targets`](2026-11-10-chronicle-sql-step-targets.md)): Chronicle SQL steps are named
+  `SQL {OPERATION} {target}` (for example `SQL SELECT dbo.Cities`, `SQL EXEC dbo.GetCities`) instead of `SQL {keyword}`,
+  without `CaptureSQLCommandText`; a statement whose operation cannot be read is named `SQL`. Chronicle is new in 2.0,
+  so this is part of the Chronicle notes, not a migration item. No `C`/`P`/`L` row.
+- Numbering gaps: `C-30`, `C-31`, `P-21` and `P-22` were reserved by the abandoned
+  [`2026-11-04-cache-redis-reconnect`](2026-11-04-cache-redis-reconnect.md) and never shipped; `C-25` was rejected. None
+  of them belongs in the release notes. Every other number from `C-01` to `C-33`, `P-01` to `P-30` and `L-01` to `L-07`
+  is a row above.
+- Rows amended outside this brief (the library brief's `Deviations`, code review or post-completion sections win over
+  the row text when they differ):
+  [`core-result`](2026-11-02-core-2-0-core-result.md) (no row, behaviour notes above);
+  [`logging`](2026-11-02-core-2-0-logging.md) P-14, P-15; [`auid`](2026-11-02-core-2-0-auid.md) C-08, C-09, P-08;
+  [`tale`](2026-11-02-core-2-0-tale.md) C-05, C-06, C-29, P-03, P-04, P-18;
+  [`http`](2026-11-02-core-2-0-http.md) C-11, P-10, P-19, L-02, L-06;
+  [`api-auth`](2026-11-02-core-2-0-api-auth.md) C-21, C-22, P-09, P-16; [`cache`](2026-11-02-core-2-0-cache.md) C-13,
+  P-20 (and L-07 through [`2026-11-05-cache-redis-fail-fast`](2026-11-05-cache-redis-fail-fast.md));
+  [`sql`](2026-11-02-core-2-0-sql.md) P-23, L-04; [`blob`](2026-11-02-core-2-0-blob.md) (no row, the blob note above);
+  [`messagebus`](2026-11-02-core-2-0-messagebus.md) P-17, P-24; [`hangfire`](2026-11-02-core-2-0-hangfire.md) C-32,
+  P-06, P-25, P-26, P-27; [`testing-kits`](2026-11-02-core-2-0-testing-kits.md) C-23, C-24, C-33, P-11, P-28, P-29;
+  [`flagship-showcase-hygiene`](2026-11-02-flagship-showcase-hygiene.md) P-30.
+- This feature's own deviations change no row. They change two release mechanics (see "Deviations"): there is no
+  `nuget-release` environment or required reviewer, and a tag run fails unless the tag is `v` + `<Version>`
+  (core 03); the two legacy DreamTravel zips are back in the tree without secrets (core 06).
 
 ### Resolved questions (user answers, 2026-11-02)
 
@@ -840,7 +867,7 @@ of AR-5 are carried by the release feature, and AR-4 also by the showcase featur
 Scope change 2026-11-03 (user): step 09 "Central Package Management" added after the plan review; the retrospective moved to step 10.
 Scope change 2026-11-03 (user): step 10 "Per-package NuGet icons" added; the retrospective moved to step 11. It changes no package version.
 
-Scope change 2026-11-03 (user, `C-28`): `SolTechnology.Core.Authentication` is renamed to `SolTechnology.Core.Auth` in 2.0, because authorization joins it later; `AddSolAuthentication` → `AddSolAuth`, `AuthenticationConfiguration` → `AuthConfiguration`, namespace `SolTechnology.Core.Auth`. New api-auth 01 does the rename (and moves `docs/icons/SolTechnology.Core.Authentication.png` to `docs/icons/SolTechnology.Core.Auth.png`); a new api-auth 00 runs its premortem; former api-auth 01–10 are now 02–11, and this brief's api-auth references are renumbered. The release feature adds `SolTechnology.Core.Authentication` to the nuget.org deprecations with the alternative `SolTechnology.Core.Auth`. Core 08's "api-auth step 06" reference (`steps/08-xml-docs-central-switch.md`) now means api-auth 07; that foundation step file is not edited in this pass.
+Scope change 2026-11-03 (user, `C-28`): `SolTechnology.Core.Authentication` is renamed to `SolTechnology.Core.Auth` in 2.0, because authorization joins it later; `AddSolAuthentication` → `AddSolAuth`, `AuthenticationConfiguration` → `AuthConfiguration`, namespace `SolTechnology.Core.Auth`. New api-auth 01 does the rename (and moves `docs/icons/SolTechnology.Core.Authentication.png` to `docs/icons/SolTechnology.Core.Auth.png`); a new api-auth 00 runs its premortem; former api-auth 01–10 are now 02–11, and this brief's api-auth references are renumbered. The release feature adds `SolTechnology.Core.Authentication` to the nuget.org deprecations with the alternative `SolTechnology.Core.Auth`. Core 08's "api-auth step 06" reference (in the core 08 step file, deleted at core 11) now means api-auth 07; that foundation step file is not edited in this pass.
 
 Scope change 2026-11-03 (user: "nie dropuj joke z kodu"): jokes in the code (humorous comments, messages, names, file names) stay exactly as written; recorded in `docs/ClaudeCodingGuide.md` §9.10 and §7 (the §15 "dupa" row is removed). `P1-5` now covers only non-joke Polish text. Affected places:
 - core 05 (`done`): the `"dupa"` CORS rename was reverted by commit `7601de9b`; only the `avroconvertonline.azurewebsites.net` origin removal remains (step 05 `Deviations`).
@@ -852,44 +879,54 @@ Scope change 2026-11-03 (user: "nie dropuj joke z kodu"): jokes in the code (hum
 
 ## Acceptance criteria
 
-- [ ] `dotnet restore SolTechnology.Core.slnx && dotnet build SolTechnology.Core.slnx -c Release`
-      succeeds from a clean clone.
-- [ ] `dotnet build SolTechnology.Core.slnx 2>&1 | grep -E "NU190[1-4]|NU1605"` prints nothing.
-- [ ] `pwsh ./.github/runTests.ps1` runs every test project listed in `SolTechnology.Core.slnx` and
+Verified by core 11 on 2026-11-10 against `master@c9868425` plus the core 11 documentation commits. The full test
+suite was not re-run at core 11 (owner instruction); test results come from the steps and feature records named.
+
+- [x] `dotnet restore SolTechnology.Core.slnx && dotnet build SolTechnology.Core.slnx -c Release`
+      succeeds from a clean clone. Clean restore and build verified by core 01 and core 09 (all `bin`/`obj`
+      deleted); the Release build was green again at core 11 (0 errors).
+- [x] `dotnet build SolTechnology.Core.slnx 2>&1 | grep -E "NU190[1-4]|NU1605"` prints nothing (core 11 Release
+      build: no match).
+- [x] `pwsh ./.github/runTests.ps1` runs every test project listed in `SolTechnology.Core.slnx` and
       exits non-zero when any single one fails, after running the rest (verified once with a
-      deliberately failing test on a throwaway branch).
-- [ ] `System.Security.Cryptography.Pkcs` is pinned to a patched version in `SolTechnology.Core.SQL`
-      and `SQL.Testing` with a removal comment, and the removal is listed under `Follow-ups`.
-- [ ] `publishPackages.yml` pushes to nuget.org only for `refs/tags/v*`, through a GitHub
-      environment that has required reviewers and existed before the workflow change merged.
-- [ ] Owner confirmation is recorded in core 06, and copied into `Completion summary` by core 11,
+      deliberately failing test on a throwaway branch). Core 02, and again by the 2026-11-03 review fix below.
+- [x] `System.Security.Cryptography.Pkcs` is pinned to a patched version in `SolTechnology.Core.SQL`
+      and `SQL.Testing` with a removal comment, and the removal is listed under `Follow-ups` (`10.0.13` in
+      `Directory.Packages.props` since core 09).
+- [x] `publishPackages.yml` pushes to nuget.org only for `refs/tags/v*`. **Amended (deviation, core 03):** there is
+      no GitHub environment and no required reviewer (owner, 2026-11-03); a tag run fails unless the tag is
+      `v` + `<Version>`, and the publish also waits for `dreamtravel-tests` (showcase 07).
+- [x] Owner confirmation is recorded in core 06, and copied into `Completion summary` by core 11,
       that both zip keys, the four history Google keys, and the `talecodeservicebus` SAS key are
-      revoked or their resources deleted.
-- [ ] `git ls-files | grep -E "\.zip$|\.idea/|settings\.local\.json"` prints nothing.
-- [ ] Every DI-registering module except Blob (AR-1) and the reference-only Guards and Scheduler
+      revoked or their resources deleted (2026-11-10).
+- [x] `git ls-files | grep -E "\.zip$|\.idea/|settings\.local\.json"` prints nothing. **Amended (deviation,
+      core 06):** it prints the two legacy DreamTravel zips, restored without secrets at the owner's request
+      (`25797666`); the `.idea/` and `settings.local.json` part prints nothing.
+- [x] Every DI-registering module except Blob (AR-1) and the reference-only Guards and Scheduler
       (AR-2) has a resolution test with `ValidateOnBuild = true` and `ValidateScopes = true`, and
-      none is `[Ignore]`d at feature close.
-- [ ] Every finding `S3`, `S4`, and `B1`–`B11` except `B6` (AR-1) has a regression test that fails
-      on `4097d47f` and passes at feature close.
-- [ ] `S5` (timing leak, not functionally observable) is covered by a source check
+      none is `[Ignore]`d at feature close (`ModuleResolutionTests` in the Logging, CQRS, Tale, HTTP, Api, Auth,
+      Cache, SQL, MessageBus and Hangfire test projects; `grep -rn "\[Ignore" tests` prints nothing).
+- [x] Every finding `S3`, `S4`, and `B1`–`B11` except `B6` (AR-1) has a regression test that fails
+      on `4097d47f` and passes at feature close (checked in each owning library brief's acceptance criteria).
+- [x] `S5` (timing leak, not functionally observable) is covered by a source check
       (`CryptographicOperations.FixedTimeEquals` present, no string equality on the key) plus the
       handler unit-test matrix (api-auth 04).
-- [ ] `S6` is covered by a DreamTravel component test that runs the API in the `Production`
+- [x] `S6` is covered by a DreamTravel component test that runs the API in the `Production`
       environment and asserts that an unhandled exception returns no developer exception page
       (core 05).
-- [ ] The confirmed `C-01`…`C-24`, `C-26`, `C-27`, and `C-28` shipped, and `C-25` (rejected) did not: `src/SolTechnology.Core.Guards`,
+- [x] The confirmed `C-01`…`C-24`, `C-26`, `C-27`, and `C-28` shipped, and `C-25` (rejected) did not: `src/SolTechnology.Core.Guards`,
       `src/SolTechnology.Core.Scheduler`, and `tests/SolTechnology.Core.Guards.Tests` still exist.
-- [ ] Every `docs/<Module>.md` referenced by a `PackageReadmeSource` compiles: each C# snippet
+- [x] Every `docs/<Module>.md` referenced by a `PackageReadmeSource` compiles: each C# snippet
       builds in a throwaway console app against the 2.0 packages (recorded in each library feature's
       module-docs step).
-- [ ] `GenerateDocumentationFile` is `true` for every packable project via `src/Directory.Build.props`.
-- [ ] No `src/SolTechnology.Core.*/**/*.cs` file exceeds 150 lines
+- [x] `GenerateDocumentationFile` is `true` for every packable project via `src/Directory.Build.props` (core 08).
+- [x] No `src/SolTechnology.Core.*/**/*.cs` file exceeds 150 lines
       (`find src -name "*.cs" -not -path "*/obj/*" | xargs wc -l | awk '$1>150'` lists none
       except `total`).
-- [ ] `dotnet msbuild src/SolTechnology.Core.CQRS/SolTechnology.Core.CQRS.csproj -getProperty:Version`
+- [x] `dotnet msbuild src/SolTechnology.Core.CQRS/SolTechnology.Core.CQRS.csproj -getProperty:Version`
       prints `2.0.0`, and no `v2.*` tag exists (publishing 2.0.0 is release 05).
 
-- [ ] Every library feature brief listed under "Per-library regroup" is `status: completed`.
+- [x] Every library feature brief listed under "Per-library regroup" is `status: completed`.
 
 The community-file, README quick-start, and Dependabot criteria moved to the showcase feature;
 the license, organization, Trusted Publishing, published-2.0.0, and stats-bot criteria moved to
@@ -897,13 +934,227 @@ the release feature (split, 2026-11-02).
 
 ## Completion summary
 
+Completed on 2026-11-10. With the thirteen library features, logging-chronicle, cache-redis-fail-fast,
+chronicle-sql-step-targets and flagship-showcase-hygiene, `master` carries a releasable 2.0.0; the org transfer and
+the publish are [`2026-11-02-org-transfer-and-2-0-release`](2026-11-02-org-transfer-and-2-0-release.md).
+
+- **Core 00 — premortem.** Verdict `go-with-mitigations (2026-11-02)` for the whole plan; `RM-1`…`RM-20` were
+  carried verbatim into the steps that own them (core 03: RM-18; core 04: RM-1; the rest in the library features).
+  Top risks: a mixed 1.x/2.x package graph, the `InstanceName` lock and idempotency keyspace, and version-bearing
+  type names in keys. The full record is in Git history at `c9868425` (step 00 of the working folder deleted at
+  core 11). Five missing module checklists were added to the premortem skill.
+- **Core 01 — `NU1903`.** Testcontainers 4.16.0 and the DreamTravel Aspire 13.6.4 parents clear SSH.NET and
+  MessagePack; `System.Security.Cryptography.Pkcs` 10.0.13 is a leaf override in SQL and SQL.Testing (RQ1); the
+  stale `NuGetAuditSuppress` entries are gone.
+- **Core 02 — honest CI.** `.github/runTests.ps1` runs every slnx test project, keeps going after a failure, and
+  exits non-zero at the end; Guards.Tests stays out (RQ4).
+- **Core 03 — tag-only publish.** Only `refs/tags/v*` publishes, with `.snupkg` next to every `.nupkg` (RM-18) and a
+  tag guard instead of a protected environment (see `Deviations`).
+- **Core 04 — 2.0.0.** Every package is 2.0.0 (`C-01`); every package carries the `SOLCORE001` lockstep check (RM-1).
+- **Core 05 — DreamTravel errors.** The developer exception page runs only in Development; Production answers with a
+  generic ProblemDetails 500 (`S6`, component test).
+- **Core 06 — leaked secrets.** Personal settings are untracked and ignored, and the legacy zips are back without
+  secrets. **Owner revocation confirmation (copied from core 06, 2026-11-10):** "on 2026-11-10 the owner confirmed in
+  one statement that the keys are revoked: the two zip Google keys (`AIzaSyBg…`, `AIzaSyCd…`), the four Google keys
+  in history, and the `talecodeservicebus` `RootManageSharedAccessKey`. History is not rewritten (D1)." Release
+  step 01 pre-checks this date.
+- **`nuget-release` environment (core 03).** No date exists to record: the owner declined a required reviewer and
+  chose no environment on 2026-11-03. Release steps 01 and 04 must re-plan around that (see "Follow-ups").
+- **Core 07 — zero-dependency base package.** `SolTechnology.Core` declares no dependency; the shared
+  `Microsoft.Extensions.*` `ItemGroup` and its `Remove` blocks are gone (P-13).
+- **Core 08 — XML docs.** One `GenerateDocumentationFile` switch in `src/Directory.Build.props`; all 20 packages ship
+  `lib/net10.0/<PackageId>.xml`.
+- **Core 09 — Central Package Management.** Every version is in `Directory.Packages.props`; the 20 packed nuspecs
+  declare the same dependencies as before.
+- **Core 10 — icons.** Each package packs `docs/icons/<PackageId>.png` as its icon (20 of 20).
+- **Core 11 — retrospective.** `docs/architecture/package-release.md` (2.0.0, lockstep, CPM, zero-dependency base,
+  central XML docs, icons, tag-only publish with the tag guard and `dreamtravel-tests`), `testing.md` (resolution
+  tests, Blob without tests, `runTests.ps1`), `naming-and-public-api.md` (`Async` suffix and internal implementation
+  types) and `logging.md` (cross-module log contract) describe the current state. The premortem skill gained a
+  delivery checklist and four build lessons. The release-notes inputs gained the chronicle-sql-step-targets note, the
+  numbering gaps and the amended-row pointers.
+
+### Retrospective
+
+- **What worked.** Splitting one 80-step plan into thirteen library features with their own retrospectives kept each
+  review small and let the shared tables stay in one brief. Writing DI resolution tests before the fixes caught
+  registrations that only failed at runtime. Real runs found what reading missed: the README quick start from a
+  fresh clone, the DreamTravel resilience double pipeline (P-30), Hangfire's process-wide static state across test
+  hosts, and the Scheduler build break hidden outside the slnx (core 09).
+- **What cost time.** Long agent sessions were cancelled mid-step; committing per step with the step status in the
+  same commit made restarts cheap. Steps that waited for the owner (core 03 environment, core 06 revocation) stayed
+  open for days; core 03 needed an automated fallback once the owner declined the reviewer. A cross-cutting page
+  (`package-release.md`) said 1.0.0 for a week because it waited for this retrospective. Row numbers reserved by an
+  abandoned feature left gaps that had to be explained.
+- **Carried forward.** These lessons are in the premortem skill: `references/delivery.md` (new),
+  `references/build-and-nuget.md`, and the existing `references/ci-docs-and-samples.md` (real-run verification) and
+  `references/hangfire.md` (process-wide state).
+
 ## Deviations
+
+### Regrouped per library and split (2026-11-02)
+
+**Original plan:** one feature with steps `00`–`84` covering every library, the showcase, the transfer and the
+release.
+
+**Actual implementation:** the plan review split off the showcase and release features (RQ8), and the user then
+regrouped the library work into thirteen library features. This feature kept the premortem, the foundation and
+cross-cutting steps, and the umbrella retrospective; "Per-library regroup" maps every former step.
+
+### Core 03 — no `nuget-release` environment; automatic tag guard instead of a reviewer
+
+**Original plan:** a `publish` job bound to a `nuget-release` environment with the owner as required reviewer,
+`NUGET_API_KEY` moved into the environment and deleted at repository level, and the reviewer checking that the tag
+equals `<Version>` (AR-5).
+
+**Actual implementation:** the owner declined being a required reviewer and chose no environment (2026-11-03).
+Deleting the repository secret would also break `unlistDeprecatedPackages.yml`. The `publish` job runs only for
+`refs/tags/v*` without an environment; `NUGET_API_KEY` stays a repository secret. A build-job guard fails a tag run
+when the tag is not `v` + `<Version>`. The non-tag check ran on the first `master` push (run 41600313756,
+2026-11-03) instead of a `workflow_dispatch` run.
+
+### Core 04 — lockstep check compares all resolved majors
+
+**Original plan:** warn when a `SolTechnology.Core.*` package has a different major than the importing package, with an
+import guard.
+
+**Actual implementation:** `src/SolTechnology.Core.Lockstep.targets` warns when the resolved `SolTechnology.Core.*`
+packages span more than one major; every package ships the same target name, so MSBuild runs it once without a guard.
+
+### Core 05 — generic error handler outside Development; CORS rename reverted
+
+**Original plan:** gate `UseDeveloperExceptionPage()` on Development, and rename the `"dupa"` CORS policy.
+
+**Actual implementation:** the non-Development branch also calls `UseExceptionHandler()`, so Production returns a
+ProblemDetails 500 instead of an empty one. The CORS rename was reverted on 2026-11-03 (`7601de9b`, "nie dropuj joke
+z kodu"); only the `avroconvertonline` origin removal remains.
+
+### Core 06 — legacy zips restored without secrets
+
+**Original plan:** both legacy zips stay out of the tree.
+
+**Actual implementation:** at the owner's request, `25797666` restored both zips with the Google keys and the Michelin
+authkey replaced by placeholders and the `.csproj.user` removed.
+
+### Core 07 — no project needed a direct `Microsoft.Extensions.*` reference
+
+**Original plan:** add back to each project the `Microsoft.Extensions.*` references it needs.
+
+**Actual implementation:** with the shared `ItemGroup` gone, the solution and DreamTravel built without additions:
+each project gets what it compiles against from its own packages or the shared framework. Scheduler, outside the
+slnx, did need two references; core 09 found and restored them.
+
+### Core 08 — verified with a local pack instead of the CI artifacts
+
+**Original plan:** check the CI pack artifacts for XML docs.
+
+**Actual implementation:** the CI pack loop was reproduced locally with a stricter check (each package contains
+`lib/net10.0/<PackageId>.xml` and its `.snupkg`); Release warnings were unchanged (104 before and after).
+
+### Core 11 — no full test run
+
+**Original plan:** run `pwsh ./.github/runTests.ps1` and the DreamTravel tests at the retrospective.
+
+**Actual implementation:** the owner asked for no full suite run at core 11. The retrospective ran the Release build
+and the repository greps; test results come from the last feature that touched each area (chronicle-sql-step-targets
+and flagship-showcase-hygiene on 2026-11-10).
 
 ## Follow-ups
 
-- Remove the `System.Security.Cryptography.Pkcs 10.0.13` override from `SolTechnology.Core.SQL` and
-  `SolTechnology.Core.SQL.Testing` once `Microsoft.Data.SqlClient` depends on a patched Pkcs
-  (recorded at planning time, RQ1; the retrospective adds the rest).
+### Release feature
+
+Open items that [`2026-11-02-org-transfer-and-2-0-release`](2026-11-02-org-transfer-and-2-0-release.md) must handle:
+
+- Re-plan around the core 03 deviation: there is no `nuget-release` environment, required reviewer or environment
+  secret; release steps 01, 04 and 05, AR-5 and the release premortem still name them. Trusted Publishing needs an
+  environment or the workflow's own OIDC setup decided anew.
+- Read the row ranges as `C-01`…`C-33`, `P-01`…`P-30` and `L-01`…`L-07` with the gaps listed under
+  "Release-notes inputs"; release 05 and the release premortem still say P-01…P-17 and L-01…L-05.
+- `master` is 123 commits ahead of `origin/master` (2026-11-10): the first CI runs of most of 2.0 (`runTests.ps1` on
+  Ubuntu with Ryuk on, the first `dreamtravel-tests` run, the first Dependabot run) happen after the owner pushes.
+- `docs/CICD.md` "Versioning policy" is stale (showcase follow-up, owned by the release feature).
+
+### Open follow-ups after 2.0
+
+Deduplicated from every closed 2026-11-0x and 2026-11-10 brief; the source brief has the details.
+
+- **Packaging and dependencies.**
+  - Remove the `System.Security.Cryptography.Pkcs 10.0.13` override from SQL and SQL.Testing once
+    `Microsoft.Data.SqlClient` depends on a patched Pkcs (RQ1; this brief, [sql](2026-11-02-core-2-0-sql.md),
+    [testing-kits](2026-11-02-core-2-0-testing-kits.md)).
+  - Remove the direct `Microsoft.Identity.Client` reference from SQL and SQL.Testing when DacFx depends on
+    `Microsoft.Data.SqlClient` 7 ([sql](2026-11-02-core-2-0-sql.md)).
+  - The outdated-package sweep: OpenTelemetry, StackExchange.Redis, WireMock (this brief,
+    [testing-kits](2026-11-02-core-2-0-testing-kits.md)).
+  - Split the CQRS → Logging → ASP.NET Core shared-framework dependency (`cqrs-tale#18`;
+    [logging](2026-11-02-core-2-0-logging.md), [cqrs](2026-11-02-core-2-0-cqrs.md)).
+  - Consider moving `SQLProjectDeployer` and DacFx into their own package (`CLAUDE.md §2`;
+    [sql](2026-11-02-core-2-0-sql.md)).
+  - Trimming/AOT annotations on `AddSolCQRS`, `AddSolTale` and Chronicle ([cqrs](2026-11-02-core-2-0-cqrs.md),
+    [tale](2026-11-02-core-2-0-tale.md), [logging-chronicle](2026-11-02-logging-chronicle.md)).
+  - Logging keeps its own `CS1591` `NoWarn` (core 08); the `publishPackages.yml` slnx guard comment still refers to
+    the old step 07 and its Guards/Scheduler exclusion list could rely on `IsPackable=false` alone (core 11).
+- **Guards and Scheduler.** Reference-only and unmaintained: known defects (`Guards.IsValid()` inverted; Scheduler
+  `async void`, recursion, repeated `BuildServiceProvider()`), Guards.Tests on xUnit outside the slnx and CI, and
+  eventual removal (AR-2, Q1, RQ4; this brief).
+- **Tests.**
+  - A Blob test project with the five Azurite tests from the blob code review (AR-1;
+    [blob](2026-11-02-core-2-0-blob.md), [testing-kits](2026-11-02-core-2-0-testing-kits.md)).
+  - A `*.Testing` test project (Q6) and a shipped Hangfire testing helper that resets Hangfire's process-wide state
+    ([testing-kits](2026-11-02-core-2-0-testing-kits.md), [hangfire](2026-11-02-core-2-0-hangfire.md)).
+  - A public `ITaleRepository` contract-test package, `SolTechnology.Core.Tale.Testing` (D5;
+    [tale](2026-11-02-core-2-0-tale.md)).
+  - Without Ryuk, disposed SQL, Redis and Azurite fixtures only stop their containers (`WithCleanUp(true)`;
+    [testing-kits](2026-11-02-core-2-0-testing-kits.md)).
+  - Test hygiene: snake_case names in `LoggingMiddlewareTests` and other Logging tests
+    ([logging](2026-11-02-core-2-0-logging.md)); duplicate `using SolTechnology.Core.Tale;` (CS0105) in seven Tale
+    test files and two DreamTravel files, and CA2022 in `LoggingMiddlewareBodyBufferingTests`
+    ([tale](2026-11-02-core-2-0-tale.md), [hangfire](2026-11-02-core-2-0-hangfire.md)); unbraced `if` statements in
+    `InMemoryTaleRepository` ([tale](2026-11-02-core-2-0-tale.md)).
+- **Library behaviour.**
+  - HTTP: `IncludeResponseBodyInException` per named client (A10 (a)); drop or use the unused `body` parameter of
+    `ServiceCallErrorMapper.FromDeserializationFailure` in 3.0 ([http](2026-11-02-core-2-0-http.md)).
+    `CreateRequest(...).WithBody(...)` sends no `Content-Length`, so `LogDetail` body rules never fire
+    ([showcase](2026-11-02-flagship-showcase-hygiene.md)).
+  - SQL: an async `CreateConnection` with a `CancellationToken` ([sql](2026-11-02-core-2-0-sql.md)).
+  - Blob: an async `GetConnection`, and an ETag condition on the overwriting upload
+    ([blob](2026-11-02-core-2-0-blob.md)).
+  - CQRS: cache one dispatch pipeline per request type if profiling shows the per-call reflection matters
+    ([cqrs](2026-11-02-core-2-0-cqrs.md)).
+  - AUID: a per-process monotonic counter (`logging-cache#13`); `Context.TaleInstanceId` has an internal setter, so
+    default JSON options outside Tale keep `Auid.Empty` ([auid](2026-11-02-core-2-0-auid.md)).
+  - Logging: move `PushToScope(params)` into the `extension` block once CS8620 allows it
+    ([logging](2026-11-02-core-2-0-logging.md)).
+  - MessageBus: a failed dead-letter of an unreadable message is logged as a handler failure
+    ([messagebus](2026-11-02-core-2-0-messagebus.md)).
+  - Hangfire: remove the legacy `DispatchInScope(IEvent)` in 3.0 (RQ10); a non-recoverable failed `Result` of a
+    recurring job ends `Succeeded` with no log entry outside Chronicle's 2154 report
+    ([hangfire](2026-11-02-core-2-0-hangfire.md)).
+  - Cache: releasing a Redis lock while disconnected still waits for the timeout
+    ([cache-redis-fail-fast](2026-11-05-cache-redis-fail-fast.md)); force reconnect only if a failure that
+    StackExchange.Redis does not recover from is observed, or for token credentials
+    ([cache-redis-reconnect](2026-11-04-cache-redis-reconnect.md)).
+  - Chronicle: a JSON-shaped log state, steps for other database providers, Blob, Cache and Redis, per-name slow
+    thresholds and trace-aligned sampling, a sequence diagram, and a per-host `GlobalJobFilters` story for Hangfire
+    ([logging-chronicle](2026-11-02-logging-chronicle.md)).
+- **Docs.** `docs/theDesign.md` shows 1.x code: chapter signatures, `Auid.New` without the 2.0 namespace,
+  `RequestBuilder.GetAsync()`, and `ExceptionFilter`/`ResponseEnvelopeFilter` on a controller
+  ([tale](2026-11-02-core-2-0-tale.md), [auid](2026-11-02-core-2-0-auid.md),
+  [showcase](2026-11-02-flagship-showcase-hygiene.md); `GetAsync` found at core 11).
+- **Auth.** Re-plan [`2026-07-06-jwt-bearer-authentication`](2026-07-06-jwt-bearer-authentication.md): its steps 02
+  and 04 are superseded, and its paths move to `SolTechnology.Core.Auth` (`C-28`;
+  [api-auth](2026-11-02-core-2-0-api-auth.md)).
+- **DreamTravel.**
+  - Align `DreamTravel.Ui` with the API wire format (SRM-10), fix `CalculateBestPathTale` returning 200 `[]` for one
+    city, and remove or restore `api/Traffic/recalculate` ([showcase](2026-11-02-flagship-showcase-hygiene.md)).
+  - `CityDomainService` calls `Handle(input)` without a token, and the Google and Michelin clients accept none
+    ([tale](2026-11-02-core-2-0-tale.md)).
+  - The orphaned database `Dockerfile`; Git LFS or release assets for `wroclaw_drive.graphml` and
+    `research_documentation.docx`; CI coverage or retirement of the Azure DevOps pipelines (AR-4, Q9)
+    (this brief, [showcase](2026-11-02-flagship-showcase-hygiene.md)).
+- **Owner checks.** After the first month of Dependabot, check that floor PRs carried their `canonical-versions.md`
+  and `CHANGELOG.md` lines (SRM-2; [showcase](2026-11-02-flagship-showcase-hygiene.md)); run `runTests.ps1` on Ubuntu
+  CI with Ryuk on after the push ([testing-kits](2026-11-02-core-2-0-testing-kits.md)).
 
 ## Post-completion review fixes (2026-11-03)
 
