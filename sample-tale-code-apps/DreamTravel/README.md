@@ -42,7 +42,10 @@ the dashboard link with its login token:
 `Login to the dashboard at https://localhost:17060/login?t=...`.
 
 - On macOS, Aspire reads the development certificate's private key from the keychain when it
-  starts. If a keychain prompt appears, allow it; the start waits until you answer.
+  starts. If a keychain prompt appears, allow it; the start waits until you answer. If the start
+  fails with `User canceled the operation` (no prompt could be shown, for example over SSH), set
+  `ASPIRE_DCP_USE_DEVELOPER_CERTIFICATE=false` and
+  `ASPIRE_DEVELOPER_CERTIFICATE_DEFAULT_HTTPS_TERMINATION=false` in that shell and start again.
 - Neo4j loads the Wrocław street graph (`Data/wroclaw_drive.graphml`) when it is empty. If the
   console prints `Failed to initialize Neo4j graph`, Neo4j was not accepting connections yet: stop
   with Ctrl+C and start again, and the next start imports the graph.

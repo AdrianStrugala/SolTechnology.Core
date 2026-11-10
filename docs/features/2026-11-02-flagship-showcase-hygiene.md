@@ -302,5 +302,10 @@ Decided during implementation without a confirmation stop; each step file carrie
   stored before the move name `DreamTravel.Domain.Events.CitySearched, DreamTravel.Domain` and go
   to Failed; only local databases hold them. Remedy: delete them under Jobs → Failed in the
   Worker's Hangfire dashboard (`/hangfire/ui`) or drop the local database volume.
+- Step 06: the fresh-clone check ran on macOS arm64 from the agent's non-interactive shell, where
+  the keychain prompt for the development certificate cannot be answered. The README therefore
+  names two `ASPIRE_*` variables as the fallback, and a restart for a Neo4j import that ran before
+  Bolt was ready. The owner's interactive run and an import into an empty Neo4j volume stay an
+  owner action.
 
 ## Follow-ups

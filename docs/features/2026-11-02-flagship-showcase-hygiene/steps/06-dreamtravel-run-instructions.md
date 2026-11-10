@@ -1,7 +1,7 @@
 ---
 spec: 2026-11-02-flagship-showcase-hygiene
 step: 06
-status: in-progress
+status: done
 ---
 
 # Step 06: DreamTravel — run-in-two-minutes README and an honest architecture section
@@ -32,12 +32,64 @@ switch; the README documents the equivalents instead).
 - Premortem SRM-13 (scenario 13): the "Chronicle step reports" section (`README.md:179-205`) stays as is; the rewrite only moves headings around it.
 
 ## Acceptance criteria
-- [ ] Following the README on a fresh clone starts the Aspire dashboard and the API, and the two Google-free smoke calls return 200 (manual check, recorded with date and platform; SRM-11, SRM-12).
-- [ ] SRM-10: the README makes no claim that the UI works without a Google Maps key and the follow-up.
-- [ ] SRM-13: `git diff <base> -- sample-tale-code-apps/DreamTravel/README.md` removes no line from the "Chronicle step reports" section (`<base>` = the commit before this step).
-- [ ] `grep -niE "Quartz|Service Bus|Blob Storage" sample-tale-code-apps/DreamTravel/README.md` matches only accurate statements.
+- [x] Following the README on a fresh clone starts the Aspire dashboard and the API, and the two Google-free smoke calls return 200 (manual check, recorded with date and platform; SRM-11, SRM-12). *Automated by the implementing agent on 2026-11-10, macOS arm64; see Verification. The owner's interactive run stays an owner action.*
+- [x] SRM-10: the README makes no claim that the UI works without a Google Maps key and the follow-up.
+- [x] SRM-13: `git diff <base> -- sample-tale-code-apps/DreamTravel/README.md` removes no line from the "Chronicle step reports" section (`<base>` = the commit before this step).
+- [x] `grep -niE "Quartz|Service Bus|Blob Storage" sample-tale-code-apps/DreamTravel/README.md` matches only accurate statements.
 
 ## Open questions
 - none
 
 ## Deviations
+
+### macOS keychain workaround in the README
+
+**Original plan:** the README names the prerequisites and the build-then-run order.
+
+**Actual implementation:** the fresh-clone check showed two more start-up traps, so the README
+also covers them. On macOS Aspire exports the development certificate's private key from the
+keychain; with no way to answer the prompt (a non-interactive shell) the AppHost fails with `User
+canceled the operation`, and with only `ASPIRE_DCP_USE_DEVELOPER_CERTIFICATE=false` the dashboard
+fails and the API (the only HTTPS project) never starts. Setting that variable and
+`ASPIRE_DEVELOPER_CERTIFICATE_DEFAULT_HTTPS_TERMINATION=false` starts everything; the README names
+both as the fallback. The Neo4j import can run before Neo4j accepts Bolt connections (`Failed to
+initialize Neo4j graph`); the README says a restart imports the graph. The prerequisites list every
+port Aspire binds (2025 Worker, 7024 UI, 17060 dashboard), and the known limitations drop GeoDB,
+which needs no key.
+
+### SRM outcomes (2026-11-10)
+
+- **SRM-10 — done.** "Known limitations" says the UI is not aligned with the API (envelopes,
+  `/api/v2` routes, fixed base URL, `<SECRET>` Maps key) and points to Swagger or `curl`; the
+  architecture section still lists the UI. Step 08 records the follow-up.
+- **SRM-11 — done.** "Start" builds `DreamTravelDatabase.csproj` before `dotnet run`, and the
+  prerequisites name Docker Desktop with Rosetta amd64 emulation and the ports. The check below
+  started from a fresh `git clone` with no `artifacts/` folder.
+- **SRM-12 — done.** The smoke test uses `GET /healthz` and `GET /api/statistics/countries` with
+  `X-API-KEY: <SECRET>` and `X-API-VERSION: 2.0`; the optional section sets
+  `HTTPClients__Google__BaseAddress` and `HTTPClients__Google__Options__Key` from the shell.
+- **SRM-13 — done.** The "Chronicle step reports" section is byte-identical to `fe33fe34` (the
+  commit before this step; `diff` of the section prints nothing). The extra owner task of
+  2026-11-10 refreshes that section later, in its own commit after step 07.
+
+### Verification (2026-11-10, macOS 26 arm64, Docker Desktop with Rosetta)
+
+- Fresh `git clone` of `master@fb6fc348` into a sibling folder (no `artifacts/`); `dotnet build
+  src/Infrastructure/DreamTravelDatabase/DreamTravelDatabase.csproj` wrote the dacpac in 3 s;
+  `dotnet run --project src/DreamTravel.Aspire` built the API, the Worker, and the UI.
+- Runs 1 and 2 failed at once with `User canceled the operation` (the keychain prompt cannot be
+  answered from the agent's shell). Run 3 set only `ASPIRE_DCP_USE_DEVELOPER_CERTIFICATE=false`: the
+  containers and the Worker came up, but the dashboard failed and the API never started. Run 4
+  set both `ASPIRE_*` variables: the dashboard login
+  link printed, the dacpac deployed, Neo4j printed `Failed to initialize Neo4j graph` (the Bolt port
+  was not ready), and the application started in about 75 s.
+- `GET https://localhost:2021/healthz` → 200 (`Healthy`, `sql` reachable);
+  `GET /api/statistics/countries` with the two headers → 200 `{"countryStatistics":[]}`;
+  `http://localhost:2020/healthz` → 307 to HTTPS; Swagger UI 200; Worker `/hangfire/ui` and
+  `/graphql/ui` 200; Neo4j browser 200; dashboard 302 to login; UI 200.
+- Not verified here (owner): an interactive start that answers the keychain prompt, and the Neo4j
+  import into an empty volume (this machine's shared `neo4j-data` volume already held the 7,266
+  nodes, so the restart path only found them). The containers, the anonymous log volume, and the
+  Aspire network created by the check were removed, and the clone was deleted.
+- `grep -niE "Quartz|Service Bus|Blob Storage"` matches line 120 ("uses no Azure Service Bus, no
+  Blob Storage, and no Quartz.NET") and line 465 ("TspService business logic", a substring match).
