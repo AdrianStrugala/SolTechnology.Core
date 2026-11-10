@@ -7,6 +7,7 @@ using DreamTravel.Sql;
 using DreamTravel.Sql.QueryBuilders;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using SolTechnology.Core;
 using SolTechnology.Core.Tale;
 using SolTechnology.Core.Tale;
 
@@ -26,8 +27,8 @@ public interface ICityDomainService
     /// </summary>
     /// <param name="name">The name of the city to retrieve.</param>
     /// <param name="configureOptions">Optional configuration for what data to include (e.g., statistics).</param>
-    /// <returns>The city domain model.</returns>
-    Task<City> Get(string name, Action<CityReadOptions>? configureOptions = null);
+    /// <returns>The city domain model, or a failed result with a NotFoundError when Google cannot find the name.</returns>
+    Task<Result<City>> Get(string name, Action<CityReadOptions>? configureOptions = null);
 
     /// <summary>
     /// Retrieves a city by its geographic coordinates.
@@ -37,8 +38,8 @@ public interface ICityDomainService
     /// <param name="latitude">The latitude of the city.</param>
     /// <param name="longitude">The longitude of the city.</param>
     /// <param name="configureOptions">Optional configuration for what data to include (e.g., statistics).</param>
-    /// <returns>The city domain model.</returns>
-    Task<City> Get(double latitude, double longitude, Action<CityReadOptions>? configureOptions = null);
+    /// <returns>The city domain model, or a failed result with a NotFoundError when Google cannot find the coordinates.</returns>
+    Task<Result<City>> Get(double latitude, double longitude, Action<CityReadOptions>? configureOptions = null);
 
     /// <summary>
     /// Saves a city to the database.
@@ -63,9 +64,9 @@ public class CityDomainService(
     ILogger<CityDomainService> logger)
     : TaleHandler<SaveCityInput, SaveCityContext, SaveCityResult>(serviceProvider, logger), ICityDomainService
 {
-    public async Task<City> Get(string name, Action<CityReadOptions>? configureOptions = null)
+    public async Task<Result<City>> Get(string name, Action<CityReadOptions>? configureOptions = null)
     {
-        City result;
+        Result<City> result;
 
         var options = CityReadOptions.Default;
         configureOptions?.Invoke(options);
@@ -85,14 +86,14 @@ public class CityDomainService(
             result = await googleHTTPClient.GetLocationOfCity(name);
         }
 
-        result.ReadOptions = options;
+        result.Data?.ReadOptions = options;
 
         return result;
     }
 
-    public async Task<City> Get(double latitude, double longitude, Action<CityReadOptions>? configureOptions = null)
+    public async Task<Result<City>> Get(double latitude, double longitude, Action<CityReadOptions>? configureOptions = null)
     {
-        City result;
+        Result<City> result;
 
         var options = CityReadOptions.Default;
         configureOptions?.Invoke(options);
@@ -116,7 +117,7 @@ public class CityDomainService(
             });
         }
 
-        result.ReadOptions = options;
+        result.Data?.ReadOptions = options;
 
         return result;
     }

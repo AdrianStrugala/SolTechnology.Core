@@ -60,6 +60,24 @@ public class FindLocationOfCityV1Tests
         problem.GetProperty("errors").EnumerateObject().Select(e => e.Name).Should().Contain("Name");
     }
 
+    [Test]
+    public async Task FindLocationOfCity_UnknownCity_ReturnsNotFoundProblemDetails()
+    {
+        // Arrange
+        var name = "V1Unknown" + Guid.NewGuid().ToString("N")[..8];
+        _wireMockFixture.Fake<IGoogleHTTPClient>()
+            .WithRequest(x => x.GetLocationOfCity(name))
+            .WithResponse(x => x.WithSuccess().WithBody(GoogleFakeApi.ZeroResultsResponse));
+
+        // Act
+        using var response = await FindLocation(name);
+        var body = await response.Content.ReadAsStringAsync();
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.NotFound);
+        JsonDocument.Parse(body).RootElement.GetProperty("status").GetInt32().Should().Be(404);
+    }
+
     // A buffered body with Content-Length: LogDetail reads the city name only from such a body.
     private Task<HttpResponseMessage> FindLocation(string name)
     {

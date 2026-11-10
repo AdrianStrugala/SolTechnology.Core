@@ -24,6 +24,7 @@ namespace DreamTravel.Api.Controllers.v1
         [Produces(MediaTypeNames.Application.Json)]
         [ProducesResponseType(typeof(City), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(ProblemDetails), (int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType(typeof(ProblemDetails), (int)HttpStatusCode.NotFound)]
         public async Task<IActionResult> FindNameOfCity([FromBody] FindCityByCoordinatesQuery query)
         {
             logger.LogInformation("Looking for city: " + query.Lat + ";" + query.Lng);

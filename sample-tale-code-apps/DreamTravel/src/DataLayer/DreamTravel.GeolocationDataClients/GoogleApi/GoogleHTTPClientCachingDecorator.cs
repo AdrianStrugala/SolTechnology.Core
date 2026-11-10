@@ -1,4 +1,5 @@
 ﻿using DreamTravel.Domain.Cities;
+using SolTechnology.Core;
 using SolTechnology.Core.Cache;
 
 namespace DreamTravel.GeolocationDataClients.GoogleApi
@@ -6,10 +7,10 @@ namespace DreamTravel.GeolocationDataClients.GoogleApi
     public class GoogleHTTPClientCachingDecorator : IGoogleHTTPClient
     {
         private readonly IGoogleHTTPClient _innerClient;
-        private readonly IScopedCache<string, City> _scopedCache;
+        private readonly IScopedCache<string, Result<City>> _scopedCache;
         private readonly ISingletonCache _singletonCache;
 
-        public GoogleHTTPClientCachingDecorator(IGoogleHTTPClient innerClient, IScopedCache<string,City> scopedCache, ISingletonCache singletonCache)
+        public GoogleHTTPClientCachingDecorator(IGoogleHTTPClient innerClient, IScopedCache<string, Result<City>> scopedCache, ISingletonCache singletonCache)
         {
             _innerClient = innerClient;
             _scopedCache = scopedCache;
@@ -31,12 +32,12 @@ namespace DreamTravel.GeolocationDataClients.GoogleApi
             return _innerClient.GetSegmentDurationMatrixByTraffic(request);
         }
 
-        public Task<City> GetLocationOfCity(string cityName)
+        public Task<Result<City>> GetLocationOfCity(string cityName)
         {
             return _scopedCache.GetOrAdd(cityName, key => _innerClient.GetLocationOfCity(key));
         }
 
-        public Task<City> GetNameOfCity(City city)
+        public Task<Result<City>> GetNameOfCity(City city)
         {
             return _singletonCache.GetOrAdd(city, key => _innerClient.GetNameOfCity(key));
         }

@@ -17,11 +17,16 @@ namespace DreamTravel.Queries.FindCityByName
     {
         public async Task<Result<City>> Handle(FindCityByNameQuery query, CancellationToken cancellationToken)
         {
-            City result;
+            Result<City> result;
 
             using (chronicle.Step("FetchCity"))
             {
                 result = await cityDomainService.Get(query.Name);
+            }
+
+            if (result.IsFailure)
+            {
+                return result;
             }
 
             using (chronicle.Step("FetchCityCached"))
@@ -30,7 +35,7 @@ namespace DreamTravel.Queries.FindCityByName
                 result = await cityDomainService.Get(query.Name);
             }
 
-            mediator.Publish(new CitySearched { City = result });
+            mediator.Publish(new CitySearched { City = result.Data! });
 
             return result;
         }

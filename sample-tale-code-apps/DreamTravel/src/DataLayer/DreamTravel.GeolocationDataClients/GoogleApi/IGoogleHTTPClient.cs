@@ -1,4 +1,5 @@
 ﻿using DreamTravel.Domain.Cities;
+using SolTechnology.Core;
 
 namespace DreamTravel.GeolocationDataClients.GoogleApi
 {
@@ -10,9 +11,11 @@ namespace DreamTravel.GeolocationDataClients.GoogleApi
 
         Task<TrafficMatrixResponse> GetSegmentDurationMatrixByTraffic(TrafficMatrixRequest request);
 
-        Task<City> GetLocationOfCity(string cityName);
+        /// <summary>Geocodes a city name; a name Google cannot match is a failed result with a NotFoundError.</summary>
+        Task<Result<City>> GetLocationOfCity(string cityName);
 
-        Task<City> GetNameOfCity(City city);
+        /// <summary>Reverse-geocodes coordinates; coordinates Google cannot match are a failed result with a NotFoundError.</summary>
+        Task<Result<City>> GetNameOfCity(City city);
 
     }
 }

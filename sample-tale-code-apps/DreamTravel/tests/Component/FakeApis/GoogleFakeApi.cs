@@ -3,6 +3,7 @@ using System.Text;
 using System.Threading.Tasks;
 using DreamTravel.Domain.Cities;
 using DreamTravel.GeolocationDataClients.GoogleApi;
+using SolTechnology.Core;
 using SolTechnology.Core.HTTP.Testing.Faker;
 using WireMock.Matchers;
 using WireMock.RequestBuilders;
@@ -19,7 +20,7 @@ namespace DreamTravel.FunctionalTests.FakeApis
             throw new NotImplementedException();
         }
 
-        public Task<City> GetLocationOfCity(string cityName)
+        public Task<Result<City>> GetLocationOfCity(string cityName)
         {
             var request = Request
                 .Create()
@@ -81,7 +82,7 @@ namespace DreamTravel.FunctionalTests.FakeApis
         }
 
 
-        public Task<City> GetNameOfCity(City city)
+        public Task<Result<City>> GetNameOfCity(City city)
         {
             throw new System.NotImplementedException();
         }
@@ -586,6 +587,9 @@ namespace DreamTravel.FunctionalTests.FakeApis
    ],
    ""status"" : ""OK""
 }";
+
+        // What Google answers with HTTP 200 for a name or coordinates it cannot match.
+        internal const string ZeroResultsResponse = @"{ ""results"" : [], ""status"" : ""ZERO_RESULTS"" }";
 
         public static string BuildGeocodingResponse(City city)
         {

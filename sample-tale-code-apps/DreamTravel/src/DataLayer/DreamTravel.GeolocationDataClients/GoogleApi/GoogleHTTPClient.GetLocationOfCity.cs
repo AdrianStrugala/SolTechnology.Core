@@ -2,6 +2,8 @@
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json.Linq;
+using SolTechnology.Core;
+using SolTechnology.Core.Errors;
 using SolTechnology.Core.HTTP;
 
 namespace DreamTravel.GeolocationDataClients.GoogleApi
@@ -12,18 +14,27 @@ namespace DreamTravel.GeolocationDataClients.GoogleApi
         ILogger<GoogleHTTPClient> logger)
         : IGoogleHTTPClient
     {
+        // Google's geocoding status for a valid request that matched nothing.
+        private const string ZeroResultsStatus = "ZERO_RESULTS";
+
         private readonly GoogleHTTPOptions _options = options.Value;
 
-        public async Task<City> GetLocationOfCity(string cityName)
+        public async Task<Result<City>> GetLocationOfCity(string cityName)
         {
             try
             {
-                var request = await httpClient
+                using var request = await httpClient
                     .CreateRequest($"maps/api/geocode/json?address={cityName}&key={_options.Key}")
                     .Get();
+                request.EnsureSuccessStatusCode();
 
                 var response = await request.Content.ReadAsStringAsync();
                 JObject json = JObject.Parse(response);
+
+                if (json["status"]?.Value<string>() == ZeroResultsStatus)
+                {
+                    return new NotFoundError { Message = $"City [{cityName}] was not found" };
+                }
 
                 // Check if we have results
                 var results = json["results"];
@@ -56,7 +67,7 @@ namespace DreamTravel.GeolocationDataClients.GoogleApi
             }
             catch (Exception e)
             {
-                logger.LogError(e, $"Cannot find city [{cityName}]");
+                logger.LogError(e, "Cannot find city [{CityName}]", cityName);
                 throw new InvalidDataException($"Cannot find city [{cityName}]", e);
             }
         }

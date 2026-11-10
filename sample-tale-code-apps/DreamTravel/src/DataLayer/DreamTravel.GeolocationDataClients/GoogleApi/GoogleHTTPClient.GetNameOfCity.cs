@@ -1,11 +1,13 @@
 ﻿using DreamTravel.Domain.Cities;
 using Newtonsoft.Json.Linq;
+using SolTechnology.Core;
+using SolTechnology.Core.Errors;
 
 namespace DreamTravel.GeolocationDataClients.GoogleApi
 {
     public partial class GoogleHTTPClient : IGoogleHTTPClient
     {
-        public async Task<City> GetNameOfCity(City city)
+        public async Task<Result<City>> GetNameOfCity(City city)
         {
             string url = $"https://maps.googleapis.com/maps/api/geocode/json?latlng={city.Latitude},{city.Longitude}&sensor=false&key={_options.Key}";
 
@@ -15,6 +17,14 @@ namespace DreamTravel.GeolocationDataClients.GoogleApi
                 JObject json = JObject.Parse(response);
 
                 var status = json["status"]?.Value<string>();
+                if (status == ZeroResultsStatus)
+                {
+                    return new NotFoundError
+                    {
+                        Message = $"No city found at coordinates: Lat: {city.Latitude}, Lng: {city.Longitude}"
+                    };
+                }
+
                 if (status != "OK")
                 {
                     var errorMessage = json["error_message"]?.Value<string>() ?? "Unknown error";

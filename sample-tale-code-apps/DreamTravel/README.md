@@ -190,9 +190,10 @@ GET  /healthz                          - JSON health report
 request through `IMediator`, so v1 gets the same validation and error format as v2.
 
 - Failures of `FindLocationOfCity`, `FindNameOfCity`, `LimitCost`, and v1 `CalculateBestPath` are
-  RFC 7807 ProblemDetails (400 for validation, 404 for not found, 500 otherwise) instead of a 400
-  with a JSON-encoded exception message. `FindLocationOfCity` and `FindNameOfCity` no longer answer
-  a failed lookup with an empty success response.
+  RFC 7807 ProblemDetails (400 for validation, 404 for a city name or coordinates Google cannot
+  find, 500 otherwise) instead of a 400 with a JSON-encoded exception message. `FindLocationOfCity`
+  and `FindNameOfCity` no longer answer a failed lookup with an empty success response; v2
+  `FindCityByName` and `FindCityByCoordinates` answer an unknown city with the same 404.
 - v1 `CalculateBestPath` still returns a plain JSON array of paths on success.
 - `LimitCost` takes `{ "costLimit": 20, "paths": [ ... ] }` as its JSON body instead of the
   `costLimit` and `sessionId` query parameters (it read the paths from a session that was never

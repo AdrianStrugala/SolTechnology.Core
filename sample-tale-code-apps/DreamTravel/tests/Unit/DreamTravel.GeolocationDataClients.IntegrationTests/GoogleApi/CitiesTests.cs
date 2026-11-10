@@ -12,6 +12,7 @@ using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
 using NSubstitute;
 using NUnit.Framework;
+using SolTechnology.Core.Errors;
 
 namespace DreamTravel.GeolocationDataClients.IntegrationTests.GoogleApi
 {
@@ -41,7 +42,7 @@ namespace DreamTravel.GeolocationDataClients.IntegrationTests.GoogleApi
             var result = await _sut.GetNameOfCity(city);
 
             //Assert
-            result.Name.Should().Be("Kufra District, Libya");
+            result.Data!.Name.Should().Be("Kufra District, Libya");
         }
 
         [Test, Ignore("Paid test")]
@@ -59,7 +60,7 @@ namespace DreamTravel.GeolocationDataClients.IntegrationTests.GoogleApi
             var result = await _sut.GetNameOfCity(city);
 
             //Assert
-            result.Name.Should().Be("Wrocław");
+            result.Data!.Name.Should().Be("Wrocław");
         }
 
         [Test, Ignore("Paid test")]
@@ -77,7 +78,7 @@ namespace DreamTravel.GeolocationDataClients.IntegrationTests.GoogleApi
             var result = await _sut.GetNameOfCity(city);
 
             //Assert
-            result.Name.Should().Be("Baltic Sea");
+            result.Data!.Name.Should().Be("Baltic Sea");
         }
 
         [Test, Ignore("Paid test")]
@@ -90,22 +91,22 @@ namespace DreamTravel.GeolocationDataClients.IntegrationTests.GoogleApi
             var result = await _sut.GetLocationOfCity(cityName);
 
             //Assert
-            result.Name.Should().Be("Wroclaw");
-            result.Latitude.Should().NotBe(0);
-            result.Longitude.Should().NotBe(0);
+            result.Data!.Name.Should().Be("Wroclaw");
+            result.Data.Latitude.Should().NotBe(0);
+            result.Data.Longitude.Should().NotBe(0);
         }
 
         [Test, Ignore("Paid test")]
-        public async Task GetCityByName_NonExistingCity_ExceptionIsThrown()
+        public async Task GetCityByName_NonExistingCity_ReturnsNotFoundError()
         {
             //Arrange
             string cityName = "DUPA";
 
             //Act
-            var act = async () => await _sut.GetLocationOfCity(cityName);
+            var result = await _sut.GetLocationOfCity(cityName);
 
             //Assert
-            await act.Should().ThrowAsync<InvalidDataException>();
+            result.Error.Should().BeOfType<NotFoundError>();
         }
 
     }

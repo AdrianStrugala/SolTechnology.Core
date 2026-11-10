@@ -59,7 +59,7 @@ public class FindCityChronicleTests
         var name = UniqueCityName();
         _wireMockFixture.Fake<IGoogleHTTPClient>()
             .WithRequest(x => x.GetLocationOfCity(name))
-            .WithResponse(x => x.WithStatusCode(404));
+            .WithResponse(x => x.WithSuccess().WithBody(GoogleFakeApi.ZeroResultsResponse));
 
         // Act
         await FindCity(name).TryPost<City>();
@@ -67,8 +67,10 @@ public class FindCityChronicleTests
         // Assert
         var report = RequestReports(name).Should().ContainSingle().Which;
         TestContext.Out.WriteLine(report.Message);
-        report.Level.Should().BeOneOf(LogLevel.Warning, LogLevel.Error);
-        Subtree(report.Message, "FindCityByNameQuery")[0].Should().Contain("[failed]");
+        report.Level.Should().Be(LogLevel.Warning);
+        report.Message.Should().StartWith("Finished request [POST] [/api/FindCityByName] -> [404] in [");
+        Subtree(report.Message, "FindCityByNameQuery")[0].Should()
+            .Contain($"[failed] Error=[NotFoundError: City [{name}] was not found]");
     }
 
     [Test]
