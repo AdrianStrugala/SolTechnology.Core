@@ -11,11 +11,6 @@
   majors, and only the tag-time publish breaks. One `github-actions` group.
 - A job that `publish` needs gets `continue-on-error` or an `if:` to unblock a red run → the
   protection is gone, or a skipped job silently skips the publish. Fix the test or fixture.
-- Verification commands that pass falsely on macOS (`grep -P` errors and prints nothing; BSD grep
-  in the C locale matches multibyte characters byte by byte) → run `grep -E` in a UTF-8 locale and
-  run the check once against the old revision to see it fail.
-- Verifying a workflow by running it → side effects (`UNLIST`, a stats commit, a publish). Use an
-  empty confirmation, a throwaway branch, or actionlint; leave real runs to the owner.
 - README or docs example checked only by reading → it fails for the first visitor. Run it for real:
   a quick start in a project outside the repository tree (no root `Directory.*.props`, no Central
   Package Management) against a local pack feed; a sample from a fresh clone (generated artifacts

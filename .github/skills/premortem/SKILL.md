@@ -118,7 +118,6 @@ from §3.
 | `SolTechnology.Core.Auth` | [`references/authentication.md`](references/authentication.md) |
 | `SolTechnology.Core.*.Testing` | [`references/testing-kits.md`](references/testing-kits.md) |
 | `.github/` workflows or Dependabot, root or module docs with runnable examples, `sample-tale-code-apps/` | [`references/ci-docs-and-samples.md`](references/ci-docs-and-samples.md) |
-| Any plan with several steps or sessions, or owner manual actions | [`references/delivery.md`](references/delivery.md) |
 
 If the diff touches a module without a reference file, write one (same shape as the existing
 files) in the **same** PR so the next contributor inherits the checklist.

@@ -986,8 +986,7 @@ the publish are [`2026-11-02-org-transfer-and-2-0-release`](2026-11-02-org-trans
   open for days; core 03 needed an automated fallback once the owner declined the reviewer. A cross-cutting page
   (`package-release.md`) said 1.0.0 for a week because it waited for this retrospective. Row numbers reserved by an
   abandoned feature left gaps that had to be explained.
-- **Carried forward.** These lessons are in the premortem skill: `references/delivery.md` (new),
-  `references/build-and-nuget.md`, and the existing `references/ci-docs-and-samples.md` (real-run verification) and
+- **Carried forward.** These lessons are in the premortem skill: `references/build-and-nuget.md`, and the existing `references/ci-docs-and-samples.md` (real-run verification) and
   `references/hangfire.md` (process-wide state).
 
 ## Deviations
