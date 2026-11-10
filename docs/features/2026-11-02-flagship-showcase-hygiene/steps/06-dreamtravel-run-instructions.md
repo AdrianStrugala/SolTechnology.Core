@@ -26,9 +26,15 @@ switch; the README documents the equivalents instead).
 ## Changes
 - No core prerequisite: since decision B (user, 2026-11-02) core 05 ([`2026-11-02-core-2-0-flagship-hardening`](../../2026-11-02-core-2-0-flagship-hardening.md); former core step 08) no longer adds `dotnet user-secrets` commands or edits `docker-compose.yml`.
 - Verify the instructions on a clean clone (macOS or Windows) and note the platform in the PR.
+- Premortem SRM-11 (step 00, 2026-11-10, scenario 11: `dotnet run --project src/DreamTravel.Aspire` does not build `DreamTravelDatabase`, so the dacpac hook at `DreamTravel.Aspire/Program.cs:99-103` throws and the API waits forever): the README builds first (`dotnet build` of the DreamTravel projects, which writes `artifacts/dacpac/DreamTravelDatabase.dacpac`), then runs Aspire. Prerequisites name Docker Desktop with amd64 emulation on Apple silicon (the SQL Server image is amd64) and free ports 1404, 7474, and 7687; the README points to the dashboard login link printed to the console. The manual check starts from a fresh `git clone` into a new folder, so no `artifacts/` exists.
+- Premortem SRM-12 (scenario 12: `HTTPClients:Google:BaseAddress` is `http://localhost:2137/google/`, which only the component tests' WireMock serves): the two-minute smoke uses Google-free calls — `GET /healthz` and `GET /api/statistics/countries` with headers `X-API-KEY: <SECRET>` and `X-API-VERSION: 2.0` (the committed local key, decision B). An optional section shows how to point Google at the real API with an own key through environment variables (`HTTPClients__Google__BaseAddress`, `HTTPClients__Google__Options__Key`), never committed.
+- Premortem SRM-10 (scenario 10, decision under the owner's pre-approval): `DreamTravel.Ui` cannot talk to the API today — it reads `Result<T>` envelopes, calls `/api/v2/...` routes while the API versions by header, uses `ApiBaseUrl` `https://localhost:2021`, and ships `<SECRET>` as the Google Maps key. The README does not present the UI as working: it says the UI needs a Google Maps key and is being aligned with the API (follow-up recorded in step 08). The architecture section still lists it.
+- Premortem SRM-13 (scenario 13): the "Chronicle step reports" section (`README.md:179-205`) stays as is; the rewrite only moves headings around it.
 
 ## Acceptance criteria
-- [ ] Following the README on a clean clone starts the Aspire dashboard and the API (manual check, recorded).
+- [ ] Following the README on a fresh clone starts the Aspire dashboard and the API, and the two Google-free smoke calls return 200 (manual check, recorded with date and platform; SRM-11, SRM-12).
+- [ ] SRM-10: the README makes no claim that the UI works without a Google Maps key and the follow-up.
+- [ ] SRM-13: `git diff <base> -- sample-tale-code-apps/DreamTravel/README.md` removes no line from the "Chronicle step reports" section (`<base>` = the commit before this step).
 - [ ] `grep -niE "Quartz|Service Bus|Blob Storage" sample-tale-code-apps/DreamTravel/README.md` matches only accurate statements.
 
 ## Open questions

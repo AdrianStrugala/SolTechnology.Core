@@ -107,7 +107,7 @@ confirmation applies. The `IEvent` move into `SolTechnology.Core` stays "Not pla
 
 | # | Choice | Alternatives | Recommendation and crux |
 |---|---|---|---|
-| H1 | Where `CitySearched` lives (`repo#B5`, step 05) | (a) move the record to `DreamTravel.Queries.Events`; (b) keep it in `DreamTravel.Domain` with the CQRS reference; (c) move `IEvent` into `SolTechnology.Core` | **(a).** (b) keeps breaking "Domain references nothing" (Guide §1/§6). (c) moves a public Core symbol and is "Not planned". Red team: DreamTravel stores `CitySearched` as a Hangfire job argument (`AddSolPersistentEvents()`), so the move changes a persisted type name. The premortem decides the mitigation. |
+| H1 | Where `CitySearched` lives (`repo#B5`, step 05) | (a) move the record to `DreamTravel.Queries.Events`; (b) keep it in `DreamTravel.Domain` with the CQRS reference; (c) move `IEvent` into `SolTechnology.Core` | **(a).** (b) keeps breaking "Domain references nothing" (Guide §1/§6). (c) moves a public Core symbol and is "Not planned". Red team: DreamTravel stores `CitySearched` as a Hangfire job argument (`AddSolPersistentEvents()`), so the move changes a persisted type name. The premortem decides the mitigation: accepted without a type-name binder (SRM-14, 2026-11-10). |
 
 ### Accepted risks
 
@@ -115,7 +115,7 @@ confirmation applies. The `IEvent` move into `SolTechnology.Core` stays "Not pla
 |---|---|---|---|
 | AR-4 | The DreamTravel Azure DevOps pipelines and legacy ARM folder stay without CI coverage. | Q9 | Step 07 runs DreamTravel tests in GitHub Actions. Their local-only credential values stay committed (decision B, user, 2026-11-02; core AR-6). |
 
-The ID keeps its number from the core brief.
+The ID keeps its number from the core brief. The premortem's accepted risks (SRM-14 and the residuals of SRM-2, SRM-10, and SRM-17) are listed under "Premortem (2026-11-10)".
 
 ## Scope
 
@@ -199,6 +199,56 @@ the briefs' Deviations, and `docs/architecture/*.md`. The Evidence section above
 | 07 | The exact test projects were unnamed; `docs/CICD.md` was not listed; the throwaway-branch check cannot trigger on a plain branch push; `origin/master` is not a reliable diff base without branch protection. | Project list, `docs/CICD.md`, trigger and base |
 | 08 | `package-release.md:12` is stale since core 03 but belongs to core 11. | Note added; Dockerfile follow-up |
 
+### Premortem (2026-11-10)
+
+Verdict: **go with mitigations** (step 00, run against `master@c0eb9482` after the resync above, in
+a session that did not author the plan). The full record lives in step 00 of the working folder;
+the retrospective keeps what stays material in this brief. Each mitigation is folded into its step file with its
+own acceptance criterion; the `SRM-` prefix keeps them apart from the core feature's `RM-` and
+Chronicle's `CRM-` rows.
+
+| ID | Risk (scenario) | Sev | Mitigation | Step |
+|---|---|---|---|---|
+| SRM-1 | `SECURITY.md` promises Private Vulnerability Reporting before release 03 enables it. | M | Owner enables it on the current repository before `SECURITY.md` merges. | 01 |
+| SRM-2 | A merged Dependabot PR raises a published dependency floor or takes a major; consumers get NU1605 and `canonical-versions.md` drifts. | H | No nuget majors; no group mixes library-floor and other packages; `Aspire*` grouped; dependency-floor rule in `CONTRIBUTING.md` and the PR template. | 01, 02 |
+| SRM-3 | Split action bumps break only the tag-time `download-artifact`. | M | One `github-actions` group; artifact actions on one major. | 02 |
+| SRM-4 | Step 02 checks pass falsely (`grep -P` on macOS) or have side effects (`UNLIST`, annotated-tag SHAs). | L | `grep -E`; empty `confirm`; dereferenced tag SHAs. | 02 |
+| SRM-5 | v1 best path returns `CalculateBestPathResult` instead of `List<Path>` once it returns the `Result`. | M | Project to `BestPaths`; v1 component test. | 03 |
+| SRM-6 | v1 LimitCost reads an unconfigured Session; without `try/catch` every call is a 500 with a Critical log. | M | Body-bound query (decision); component tests. | 03 |
+| SRM-7 | v2 controllers already on `IMediator` drop the request token. | L | `HttpContext.RequestAborted` everywhere; grep. | 03 |
+| SRM-8 | Kept jokes ("dupa", "DUPA.", "Fire!", `//I'm just void`) or report-only log templates are rewritten. | M | Verbatim; grep checks; report-only templates listed under Deviations. | 03, 04, 05 |
+| SRM-9 | The Guide template and controllers declare the `Result` envelope that the filter removes. | M | Declare the unwrapped type and ProblemDetails. | 03, 04 |
+| SRM-10 | The UI Aspire starts cannot talk to the API (envelopes, `/api/v2` routes, base URL, Maps key). | M | README does not present the UI as working; follow-up. | 06, 08 |
+| SRM-11 | Clean clone never starts: the dacpac is not built; amd64 SQL Server on Apple silicon. | M | Build before run; prerequisites; check from a fresh clone. | 06 |
+| SRM-12 | Google-backed endpoints point at an unserved `localhost:2137`. | M | Google-free smoke calls; optional own-key section. | 06 |
+| SRM-13 | The README rewrite drops the Chronicle section. | L | Section kept; diff check. | 06 |
+| SRM-14 | Stored `CitySearched` jobs with the Domain type name fail to load after the move. | L | Accepted (no binder); remedy recorded. | 05 |
+| SRM-15 | Guide §0/§1/§6 and the `command-query-event-tale` skill still put `IEvent` records in the Domain. | M | Same-PR edits; grep. | 05 |
+| SRM-16 | A list copy still mutates the caller's `Path` objects. | L | Copy elements; test asserts element values. | 05 |
+| SRM-17 | The first Linux run of `dreamtravel-tests` fails and blocks the tag publish; the job is weakened to unblock it. | M | `timeout-minutes`, no `continue-on-error`/`if:`; test-side fixes; re-run rule in `docs/CICD.md`. | 07 |
+| SRM-18 | The quick-start check passes only inside the repository (root props, CPM). | L | Throwaway project outside the tree, local pack feed. | 01 |
+| SRM-19 | The v1 `LogDetail` path never matches the header-versioned route. | L | Path fixed. | 03 |
+
+Decisions recorded under the owner's pre-approval (2026-11-10; no confirmation stop):
+
+- SRM-6: v1 LimitCost binds its paths from the body; the Session dependency goes.
+- SRM-10: the UI is not fixed in this feature; the README is honest about it, and step 08 records
+  the follow-up.
+- SRM-14: no type-name binder for `CitySearched` (H1 stays (a)).
+- Step 05: the currency symbol becomes `€`. Step 06: `docker-compose.yml` is deleted; the
+  database `Dockerfile` stays (decision B) and becomes a follow-up.
+
+Owner actions that need admin rights (manual, outside the repository):
+
+- Before step 01 merges: enable Private Vulnerability Reporting (SRM-1).
+- For the Community Standards criterion: set the repository description and accept content
+  reports.
+- After step 02 merges: check the first Dependabot run (Insights → Dependency graph → Dependabot)
+  and that Dependabot security updates are on; create the `dependencies` label if Dependabot
+  reports it missing; optionally require full-length SHA pins for actions (Settings → Actions).
+- Step 06: run the fresh-clone check on the owner's machine (Docker Desktop with amd64
+  emulation on Apple silicon).
+
 ## Acceptance criteria
 
 - [ ] The root `README.md` has a quick start that builds in a throwaway project against the 2.0
@@ -219,6 +269,7 @@ the briefs' Deviations, and `docs/architecture/*.md`. The Evidence section above
 - [ ] The `dreamtravel-tests` job runs green on a PR, and the `publish` job declares
       `needs: [build, dreamtravel-tests]`.
 - [ ] `sample-tale-code-apps/DreamTravel/devOps` is unchanged by this feature (Q9).
+- [ ] Every SRM mitigation ("Premortem (2026-11-10)") is checked in its step file or recorded as a deviation.
 
 ## Completion summary
 

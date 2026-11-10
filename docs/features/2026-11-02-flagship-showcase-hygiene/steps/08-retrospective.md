@@ -26,14 +26,17 @@ when steps 01–07 are `done`, or were removed by the plan-reviewer.
 3. Complete the feature brief with outcomes, material deviations from each step, and follow-ups. The `Completion summary` must record the step 06 clean-clone check (date and platform), because release 01 pre-checks this feature's completion. Candidate follow-ups:
    - Git LFS or release assets for `wroclaw_drive.graphml` and `research_documentation.docx`.
    - CI coverage or retirement of the DreamTravel Azure DevOps pipelines (AR-4, Q9).
-   - The outcome of the `CitySearched` persisted-type mitigation (H1, step 05).
+   - The outcome of the `CitySearched` persisted-type decision (H1, step 05; accepted as premortem SRM-14).
    - `src/Infrastructure/DreamTravelDatabase/Dockerfile` is orphaned once step 06 deletes `docker-compose.yml`.
+   - Premortem SRM-10: align `DreamTravel.Ui` with the API wire format — unwrapped bodies and ProblemDetails instead of `Result<T>`, header versioning instead of `/api/v2/...`, the `X-API-KEY` header, and the API base URL from Aspire.
+   - Premortem SRM-2 residual: review after the first month whether Dependabot floor PRs carried their `canonical-versions.md` and `CHANGELOG.md` lines.
 4. Set feature status to `completed` (or `abandoned`) with `completed: YYYY-MM-DD` (`CLAUDE.md §2`: confirm with the user first).
 5. Verify that no durable link points into this working folder: `grep -rn "2026-11-02-flagship-showcase-hygiene/" --include=*.md . | grep -v "^./docs/features/2026-11-02-flagship-showcase-hygiene/"` prints nothing.
 6. Delete the working folder, then search Markdown for the deleted path and repair dangling links.
 
 ## Acceptance criteria
 - [ ] Every feature-level acceptance criterion in the brief is checked or recorded as a deviation.
+- [ ] Every SRM row in the brief's "Premortem (2026-11-10)" table is checked in its step file or recorded as a deviation.
 - [ ] The documentation-cleanup skill passes for `docs/architecture/` and the feature brief.
 - [ ] The working folder no longer exists, and the step 5 grep prints nothing.
 

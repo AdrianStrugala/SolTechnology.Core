@@ -1,7 +1,7 @@
 ---
 spec: 2026-11-02-flagship-showcase-hygiene
 review: done (2026-11-02)
-premortem: pending
+premortem: go-with-mitigations (2026-11-10)
 ---
 
 # SolTechnology.Core — flagship showcase hygiene — Implementation Summary
@@ -21,7 +21,7 @@ auid 03, tale 03, 07, 11, and api-auth 05 are `done` (former core steps 02, 03, 
 
 | # | Title | File | Status |
 |---|---|---|---|
-| 00 | Run premortem (gate) | [`steps/00-run-premortem.md`](steps/00-run-premortem.md) | to-do |
+| 00 | Run premortem (gate) | [`steps/00-run-premortem.md`](steps/00-run-premortem.md) | done |
 | 01 | Community health files and root README | [`steps/01-community-health-files-and-root-readme.md`](steps/01-community-health-files-and-root-readme.md) | to-do |
 | 02 | Workflow supply-chain hardening | [`steps/02-workflow-supply-chain-hardening.md`](steps/02-workflow-supply-chain-hardening.md) | to-do |
 | 03 | DreamTravel — mediator-only, thin controllers | [`steps/03-dreamtravel-mediator-controllers.md`](steps/03-dreamtravel-mediator-controllers.md) | to-do |
