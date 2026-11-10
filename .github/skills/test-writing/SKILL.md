@@ -130,6 +130,12 @@ that state (for example a `TransactionScope` or an `AsyncLocal`) flows across a 
 the hop explicitly, e.g. `await Task.Run(async () => { ... })`, and check the test fails when the
 flow option is removed.
 
+### 8b. NUnit fixture state
+
+NUnit runs every test of a fixture on the same instance, so an instance field initialized inline
+(`private readonly ConcurrentQueue<Activity> _stopped = new();`, a `FakeLogCollector`) carries
+records from one test into the next. Create or clear such state in `[SetUp]`/`[TearDown]`.
+
 ### 9. Run the right runner
 
 - Core libs (whole suite): `./.github/runTests.ps1`.

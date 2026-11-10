@@ -498,6 +498,7 @@ These apply to every class you write, regardless of layer.
 - Log at the boundaries (handler entry/exit, external call start/end, chapter transitions). Do not log inside tight loops.
 - Errors: `logger.LogError(exception, "Message with [{Context}]", ctx);` — pass the exception as the first argument, never `ex.ToString()` inside the message.
 - Reusable extension methods that emit common shapes (operation lifecycle, HTTP request lifecycle) live in `SolTechnology.Core.Logging` and are the PREFERred entry point — `_logger.OperationStarted(name)` over hand-rolled templates.
+- In a `[LoggerMessage]` template, a `{@Name}` placeholder reaches providers under the *parameter* name, without `@` (.NET 10 generator): name that parameter in PascalCase (`ChronicleReport Chronicle`) so the state key follows the property convention. Serilog's MEL bridge then stringifies the value; it destructures only keys that start with `@`.
 
 ---
 
