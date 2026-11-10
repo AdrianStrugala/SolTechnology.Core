@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.Reflection;
 using System.Text.RegularExpressions;
 using FluentAssertions;
+using Microsoft.AspNetCore.Http.Features;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Testing;
 using NSubstitute;
@@ -49,6 +50,43 @@ public class LoggingMiddlewareChronicleFallbackTests : LoggingMiddlewareChronicl
         replacement.Received(1).Begin("HTTP GET");
         FinishEntries.Should().ContainSingle().Which.Should().Match<FakeLogRecord>(r =>
             r.Id.Id == expectedEventId && r.Level == expectedLevel);
+    }
+
+    [TestCase("websocket")]
+    [TestCase("upgrade")]
+    [TestCase("server-sent events")]
+    public async Task InvokeAsync_LongLivedRequest_OpensNoRootAndLogsPreviousFinishEntry(string kind)
+    {
+        // Act
+        await Invoke(_ =>
+        {
+            using (Chronicle.Step("HubCall"))
+            {
+                return Task.CompletedTask;
+            }
+        }, context =>
+        {
+            switch (kind)
+            {
+                case "websocket":
+                    var webSocket = Substitute.For<IHttpWebSocketFeature>();
+                    webSocket.IsWebSocketRequest.Returns(true);
+                    context.Features.Set(webSocket);
+                    break;
+                case "upgrade":
+                    var upgrade = Substitute.For<IHttpUpgradeFeature>();
+                    upgrade.IsUpgradableRequest.Returns(true);
+                    context.Features.Set(upgrade);
+                    break;
+                default:
+                    context.Request.Headers.Accept = "text/event-stream";
+                    break;
+            }
+        });
+
+        // Assert
+        FinishEntries.Should().ContainSingle().Which.Id.Id.Should().Be(2146);
+        Logs.GetSnapshot().Should().NotContain(r => r.Message.Contains("HubCall"));
     }
 
     [Test]

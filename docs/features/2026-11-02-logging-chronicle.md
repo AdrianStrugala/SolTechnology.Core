@@ -370,7 +370,8 @@ Integration types are internal: `ChronicleHTTPHandler`, `ChronicleHTTPAttemptHan
   `Finished request [{RequestMethod}] [{RequestPath}] -> [{StatusCode}] in [{ElapsedMs} ms]. Chronicle: [{ChronicleStatus}] [{@Chronicle}]`.
   `{@Timings}` is removed, and with it EventId 2147 `RequestFinishedWithTimings`, whose id is
   retired (R8). A successful request slower than `SlowThreshold`, or one with a failed step below
-  the root (code review A5), logs at Warning (Information before). Step 09.
+  the root (code review A5), logs at Warning (Information before). WebSocket, other upgraded, and
+  server-sent-event requests open no root and keep 2144–2146 (code review B1). Step 09.
 - **LC-02** — A failed request logs **one** Error entry (EventId 2155, exception attached,
   `ChronicleStatus = Failed`), which replaces "Request [..] failed after [..]" and keeps P-15. A
   client abort logs Warning 2155 with `ChronicleStatus = Cancelled`, which replaces "aborted by

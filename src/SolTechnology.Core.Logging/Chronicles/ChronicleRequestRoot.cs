@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Logging;
 
@@ -7,14 +8,22 @@ namespace SolTechnology.Core.Logging.Chronicles;
 /// <summary>
 /// The Chronicle root of one HTTP request: opened by <c>LoggingMiddleware</c> without an activity
 /// (ASP.NET Core owns the request activity) and reported by the middleware itself as the request's
-/// finish entry (EventId 2155), so the reporter never writes a second entry for it.
+/// finish entry (EventId 2155), so the reporter never writes a second entry for it. Long-lived
+/// requests (WebSocket, other upgrades, server-sent events) get no root: one report per connection
+/// would grow until disconnect, so they keep the finish entries written without Chronicle.
 /// </summary>
 internal static class ChronicleRequestRoot
 {
     internal const string UnmatchedRoute = "unmatched";
+    private const string EventStream = "text/event-stream";
 
     internal static ChronicleStep Begin(IChronicle chronicle, HttpContext context)
     {
+        if (IsLongLived(context))
+        {
+            return default;
+        }
+
         var name = "HTTP " + context.Request.Method;
         return chronicle is ChronicleRecorder recorder
             ? recorder.BeginWithoutActivity(name, reportedByCaller: true)
@@ -75,6 +84,25 @@ internal static class ChronicleRequestRoot
         {
             logger.LogWarning(reportFailure, "Chronicle could not report [{ChronicleName}]", root.Node.Name);
         }
+    }
+
+    private static bool IsLongLived(HttpContext context)
+    {
+        if (context.Features.Get<IHttpUpgradeFeature>()?.IsUpgradableRequest == true
+            || context.Features.Get<IHttpWebSocketFeature>()?.IsWebSocketRequest == true)
+        {
+            return true;
+        }
+
+        foreach (var accept in context.Request.Headers.Accept)
+        {
+            if (accept?.Contains(EventStream, StringComparison.OrdinalIgnoreCase) == true)
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private static string RouteOf(HttpContext context)

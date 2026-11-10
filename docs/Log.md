@@ -298,7 +298,7 @@ branches (`Task.WhenAll`) build isolated subtrees.
 
 | Source | Root | Step | Details |
 |---|---|---|---|
-| HTTP request (`UseSolLogging`) | `HTTP {Method}` with `Route` and `StatusCode` | — | Its report is the request's finish entry (2155). |
+| HTTP request (`UseSolLogging`) | `HTTP {Method}` with `Route` and `StatusCode` | — | Its report is the request's finish entry (2155); WebSocket, upgraded and server-sent-event requests get none. |
 | CQRS command or query | outside a root | `{RequestType}` | [CQRS](CQRS.md#chronicle) |
 | CQRS fire-and-forget event | `Event {EventType}` | one per handler | [CQRS](CQRS.md#chronicle) |
 | Tale run and chapter | outside a root | `Tale {Handler}`, `Chapter {ChapterId}` | [Tale](Tale.md#chronicle) |
@@ -445,6 +445,10 @@ builder.Host.UseSerilog((context, configuration) => configuration
 - `Set` records the raw value; use `SetMasked` for personal data.
 - A root must not span a service lifetime: open one root per loop iteration, message or job
   (`BeginRoot` inside a `BackgroundService` loop).
+- WebSocket and other upgraded requests (SignalR, Blazor Server) and server-sent events
+  (`Accept: text/event-stream`) get no request root, because one report per connection would grow
+  until disconnect: they keep the 2144–2146 entries, and each CQRS call inside them is its own root.
+  Add their paths to `SkipPaths` to drop the envelope entries as well.
 - SQL capture is a hosted service, so it runs only in hosts that start their `IHostedService`s.
 - The console formatter's `SingleLine: true` flattens the tree into one line; keep `SingleLine: false`
   where people read the console.
