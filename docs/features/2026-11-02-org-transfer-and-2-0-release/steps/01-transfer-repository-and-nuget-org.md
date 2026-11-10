@@ -4,49 +4,132 @@ step: 01
 status: to-do
 ---
 
-# Step 01: Transfer the repository and set up the nuget.org organization (owner runbook)
+# Step 01: Push master, pass CI on GitHub, transfer the repository, and set up the nuget.org organization (owner runbook)
+
+**Owner-only.** Every action is in the GitHub or nuget.org admin UI, or is a push to `master` (`CLAUDE.md §2`).
+An agent only records the owner's answers and dates in this file's Deviations.
 
 ## Summary
-This step is manual: owner actions in GitHub and nuget.org, recorded here as a runbook (D3). It
-uses GitHub's built-in transfer, which keeps redirects, and adds a nuget.org organization as
-co-owner of every package ID. Q3 (user, 2026-11-02): GitHub organization `sol-technology`,
-nuget.org organization `SolTechnology`. It runs after the core and showcase features are completed, so the organization receives
-a clean `master`. No repository file changes except this step's Deviations.
+This step has two phases, in this order.
+
+- **Phase A, the CI gate (resync 2026-11-10).** On 2026-11-10 `master` was 125 commits ahead of
+  `origin/master`, so most of 2.0 had never run in GitHub CI: not `runTests.ps1` on the Linux runner with
+  Ryuk on (P-28), not the first `dreamtravel-tests` run, and not the first Dependabot run. The owner
+  pushes `master`, and the build, the tests and `dreamtravel-tests` must be green on GitHub before the
+  transfer. The showcase owner actions that need a pushed `master` happen in this phase too.
+- **Phase B, the transfer.** GitHub's built-in transfer keeps redirects. The nuget.org organization
+  becomes co-owner of every existing package ID. Q3 (user, 2026-11-02): GitHub organization
+  `sol-technology` (the API spells the login `Sol-Technology`; GitHub and nuget.org compare these names
+  case-insensitively), and nuget.org organization `SolTechnology`.
+
+The gate is phase A of this step, not a new step, for two reasons. The step already had the pre-check "CI on
+`master` is green", which cannot pass without a push. The closed core and showcase briefs also cite this feature's
+steps by number ("release 01 re-checks them before the transfer", "release 03", "release 05"), and renumbering would
+break those references. Step 05 checks CI again on the exact commit that gets the tag.
 
 ## Affected components
-- GitHub: `AdrianStrugala/SolTechnology.Core` → `sol-technology/SolTechnology.Core` — MANUAL
-- nuget.org: organization `SolTechnology` — MANUAL
-- This step file — EDIT — record each action with its date
+- GitHub `AdrianStrugala/SolTechnology.Core`: MANUAL. Settings, the push, workflow runs, and the transfer to `sol-technology/SolTechnology.Core`.
+- nuget.org: MANUAL. The organization `SolTechnology` and its co-ownership of 27 existing IDs.
+- This step file: EDIT. Record each action with its date.
 
 ## Changes
-- Pre-checks:
-  - The [`2026-11-02-core-2-0-flagship-hardening`](../../2026-11-02-core-2-0-flagship-hardening.md) brief is `status: completed`, and its Completion summary records the core step 06 (former 09) revocation dates.
-  - Every library feature brief is `status: completed`: [`2026-11-02-core-2-0-core-result`](../../2026-11-02-core-2-0-core-result.md), [`2026-11-02-core-2-0-logging`](../../2026-11-02-core-2-0-logging.md), [`2026-11-02-core-2-0-cqrs`](../../2026-11-02-core-2-0-cqrs.md), [`2026-11-02-core-2-0-auid`](../../2026-11-02-core-2-0-auid.md), [`2026-11-02-core-2-0-tale`](../../2026-11-02-core-2-0-tale.md), [`2026-11-02-core-2-0-http`](../../2026-11-02-core-2-0-http.md), [`2026-11-02-core-2-0-api-auth`](../../2026-11-02-core-2-0-api-auth.md), [`2026-11-02-core-2-0-cache`](../../2026-11-02-core-2-0-cache.md), [`2026-11-02-core-2-0-sql`](../../2026-11-02-core-2-0-sql.md), [`2026-11-02-core-2-0-blob`](../../2026-11-02-core-2-0-blob.md), [`2026-11-02-core-2-0-messagebus`](../../2026-11-02-core-2-0-messagebus.md), [`2026-11-02-core-2-0-hangfire`](../../2026-11-02-core-2-0-hangfire.md), [`2026-11-02-core-2-0-testing-kits`](../../2026-11-02-core-2-0-testing-kits.md).
-  - The [`2026-11-02-logging-chronicle`](../../2026-11-02-logging-chronicle.md) brief is `status: completed`.
-  - The [`2026-11-05-cache-redis-fail-fast`](../../2026-11-05-cache-redis-fail-fast.md) brief is `status: completed` (2026-11-05, user: replaces the abandoned `2026-11-04-cache-redis-reconnect`).
-  - The [`2026-11-02-flagship-showcase-hygiene`](../../2026-11-02-flagship-showcase-hygiene.md) brief is `status: completed`.
-  - CI on `master` is green.
-- GitHub: Settings → Danger Zone → Transfer → `sol-technology`.
-  - Never re-create `AdrianStrugala/SolTechnology.Core` afterwards, because that breaks the
-    redirects.
-- nuget.org: create organization `SolTechnology` and add it as co-owner of the 28 existing IDs:
-  - the 19 live IDs that already exist on nuget.org, listed by `dotnet sln SolTechnology.Core.slnx list | grep -E '^src/'`
-    minus `SolTechnology.Core.Auth`; that ID is new in 2.0 (`C-28`, user, 2026-11-03), does not exist on nuget.org
-    before step 05 (404 on 2026-11-03), and is created under the policy owner `SolTechnology` by the `v2.0.0` publish;
-  - `SolTechnology.Core.Authentication` (1.x, renamed to `SolTechnology.Core.Auth` by api-auth 01; step 05 deprecates it);
-  - the 8 deprecated IDs from `dontreadme.md` (kept under its name, user, 2026-11-03) and
-    `unlistDeprecatedPackages.yml:7-18`. Since api-auth 01, `dontreadme.md` also lists `SolTechnology.Core.Authentication`.
 
-  Keep the personal account as an owner. This decides whether `update-nuget-stats.yml:20`
-  `owner:` changes in step 02.
-- Verify that environment `nuget-release` and its interim `NUGET_API_KEY` secret (core step 03; date in the core brief's Completion summary) survived
-  the transfer. Re-create them if not. Step 04 replaces the secret with Trusted Publishing (Q10).
+### Phase A — push and CI gate (before the transfer)
+
+1. Pre-checks (all true on 2026-11-10):
+   - These briefs are `status: completed`:
+     - [`2026-11-02-core-2-0-flagship-hardening`](../../2026-11-02-core-2-0-flagship-hardening.md), whose
+       Completion summary records the core 06 revocation (2026-11-10);
+     - the 13 library briefs it lists under "Per-library regroup";
+     - [`2026-11-02-logging-chronicle`](../../2026-11-02-logging-chronicle.md);
+     - [`2026-11-05-cache-redis-fail-fast`](../../2026-11-05-cache-redis-fail-fast.md);
+     - [`2026-11-10-chronicle-sql-step-targets`](../../2026-11-10-chronicle-sql-step-targets.md);
+     - [`2026-11-02-flagship-showcase-hygiene`](../../2026-11-02-flagship-showcase-hygiene.md).
+   - `2026-11-04-cache-redis-reconnect` is `abandoned`.
+2. Before the push (showcase "Owner manual actions" 1–2, SRM-1):
+   - enable Private Vulnerability Reporting (Settings → Code security);
+   - set the repository description;
+   - turn on content reports (Settings → Moderation options → Reported content);
+   - confirm that Insights → Community shows every item checked.
+3. Push `master` (RRM-12):
+   - `git fetch origin` first. The weekly stats bot commits to `origin/master` on Sundays at 00:00 UTC
+     (`update-nuget-stats.yml:5`).
+   - If `origin/master` moved, integrate it with `git pull --no-rebase` (a merge commit). Never rebase:
+     71 of the unpushed commits are cited by SHA in `docs/features/*.md` (count on 2026-11-10), and a
+     rebase would orphan them.
+   - If push protection blocks the push, read the flagged path before doing anything else. The 125
+     unpushed commits were scanned on 2026-11-10 for Google, Service Bus SAS, storage account and
+     GitHub token patterns, and only placeholders such as `SharedAccessKey=v` matched. A real hit is a
+     new leak to revoke, not a bypass.
+4. CI gate on the pushed `master` (GitHub's Linux runner):
+   - the `Build, test and publish` run is green: `build` (including `.github/runTests.ps1` with Ryuk on,
+     because nothing sets `TESTCONTAINERS_RYUK_DISABLED`) and `dreamtravel-tests`;
+   - `publish` is skipped (not a tag).
+   - A failure that shows only on Linux is fixed in tests or fixtures and pushed again. Never weaken the
+     job (no `continue-on-error`, no `if:`).
+5. After the green run (showcase "Owner manual actions" 3–6), run each workflow once with `workflow_dispatch`:
+   - the package workflow (publish skipped);
+   - `Unlist deprecated packages` with an **empty** `confirm`: the job is skipped. Never type `UNLIST`
+     here.
+   - `Update NuGet Statistics` on a throwaway branch, then delete the branch;
+   - the forced `dreamtravel-tests` failure on a throwaway branch, then delete the branch.
+6. First Dependabot run (showcase "Owner manual actions" 4):
+   - check Insights → Dependency graph → Dependabot;
+   - turn on Dependabot security updates;
+   - create the `dependencies` label if Dependabot asks for it.
+   - **Freeze (RRM-13):** merge no Dependabot PR from this gate until the `v2.0.0` publish succeeds
+     (step 05). A floor PR would move the 2.0.0 dependency floors. An actions-group PR changes
+     `download-artifact`, which runs only on tags. A security update that cannot wait is merged
+     deliberately, and then this gate runs again.
+
+### Phase B — transfer and nuget.org organization
+
+7. GitHub: Settings → Danger Zone → Transfer → `sol-technology`.
+   - Never create or fork a repository named `SolTechnology.Core` under `AdrianStrugala` afterwards.
+     That includes forking the organization repository back to the personal account. GitHub would stop
+     redirecting, and every 1.x nuspec (`projectUrl`, `repository`), old clone and old link points at
+     that name (RRM-14).
+   - Point local clones at the new URL with
+     `git remote set-url origin https://github.com/sol-technology/SolTechnology.Core.git`.
+   - GitHub keeps repository secrets through a transfer. Check that the repository secret
+     `NUGET_API_KEY` is still listed (Settings → Secrets and variables → Actions). There is no
+     `nuget-release` environment: the owner declined it on 2026-11-03 (core 03 deviation).
+   - Organization Actions policy (Organization settings → Actions → General):
+     - allow all actions, or allow `NuGet/login@*` next to the `actions/*` ones, so step 04's login
+       step can run (RRM-16);
+     - keep the organization's default workflow permissions at read; the workflows declare what
+       they need.
+8. nuget.org: create the organization `SolTechnology` (its profile returned 404 on 2026-11-10, so the
+   name was free). Add it as co-owner of the 27 IDs that exist on nuget.org, and accept each ownership
+   request. Keep the personal account `AdrianStrugala` as an owner, because the stats bot queries
+   `owner:AdrianStrugala` (`update-nuget-stats.yml:20`).
+   - 19 live IDs: `dotnet sln SolTechnology.Core.slnx list | grep -E '^src/'` lists the 20 packable
+     projects. Leave out `SolTechnology.Core.Auth`, which is new in 2.0 (`C-28`), returned 404 on
+     2026-11-10, and is created by the `v2.0.0` publish under the policy owner `SolTechnology`. The 19
+     IDs are:
+     `SolTechnology.Core`, `.Api`, `.API.Testing`, `.AUID`, `.Blob`, `.Blob.Testing`, `.Cache`,
+     `.CQRS`, `.Hangfire`, `.HTTP`, `.HTTP.Testing`, `.Logging`, `.MessageBus`, `.Redis.Testing`,
+     `.ServiceBus.Testing`, `.SQL`, `.SQL.Testing`, `.Tale`, `.Testing`.
+   - `SolTechnology.Core.Authentication` (1.x; renamed to `.Auth`, step 05 deprecates it).
+   - 7 ghost IDs, hardcoded in `unlistDeprecatedPackages.yml:36-39` and listed in `dontreadme.md`:
+     `.ApiClient`, `.Story`, `.Scheduler`, `.Guards`, `.BlobStorage`, `.Faker`, `.Flow`.
+     `SolTechnology.Core.BlobStorage.Testing`, the eighth ID in the unlist workflow, has never been
+     published (flat-container and gallery 404 on 2026-11-10). Nothing to co-own or deprecate; the
+     workflow skips it.
+   - Do not reserve an ID prefix now. If `SolTechnology.*` is ever reserved, reserve it for the
+     organization `SolTechnology`. A prefix that only the personal account owns would block new IDs
+     that the organization's Trusted Publishing policy pushes.
+   - The `update-nuget-stats.yml:20` `owner:` stays `AdrianStrugala` (step 02).
 
 ## Acceptance criteria
+- [ ] Phase A: the run for the pushed `master` SHA is green on GitHub (`build`, `dreamtravel-tests`; `publish` skipped); its URL and date are in Deviations.
+- [ ] Phase A: `git rev-list --count origin/master..master` prints `0`, and no commit was rebased (`git merge-base --is-ancestor c9868425 origin/master` succeeds).
+- [ ] Phase A: Private Vulnerability Reporting, the description and content reports are set, and the three `workflow_dispatch` runs and the first Dependabot run were checked (owner-confirmed, dated).
 - [ ] `git ls-remote https://github.com/sol-technology/SolTechnology.Core` succeeds, and `https://github.com/AdrianStrugala/SolTechnology.Core` redirects.
-- [ ] nuget.org shows `SolTechnology` as an owner on every one of the 28 existing IDs (owner-confirmed list in Deviations); `SolTechnology.Core.Auth` is checked in step 05.
+- [ ] `curl -s "https://azuresearch-usnc.nuget.org/query?q=owner:SolTechnology&take=100&prerelease=true" | jq '[.data[].id] | length'` prints `27`. Unlisted ghost versions do not appear in search, so check any missing ID on its gallery page; `SolTechnology.Core.Auth` is checked in step 05.
+- [ ] The organization Actions policy allows `NuGet/login` (owner-confirmed, dated).
 
 ## Open questions
-- none (Q3 resolved by the user on 2026-11-02: `sol-technology` / `SolTechnology`; Q10 resolved: Trusted Publishing, configured in step 04, so no scoped API key is created here)
+- none (Q3 resolved by the user on 2026-11-02; Q10 resolved: Trusted Publishing, configured in step 04 without an environment, owner 2026-11-03 and 2026-11-10)
 
 ## Deviations
