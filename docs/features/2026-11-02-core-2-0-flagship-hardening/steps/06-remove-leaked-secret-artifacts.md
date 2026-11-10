@@ -1,7 +1,7 @@
 ---
 spec: 2026-11-02-core-2-0-flagship-hardening
 step: 06
-status: in-progress
+status: done
 ---
 
 # Step 06: Remove leaked-secret artifacts and personal settings; record revocation
@@ -32,9 +32,9 @@ Former core step 09; moved here by the per-library regroup (user, 2026-11-02).
 - No `git filter-repo`, no force-push (D1, `CLAUDE.md §2`).
 
 ## Acceptance criteria
-- [x] `git ls-files | grep -E "\.zip$|\.idea/|settings\.local\.json|\.vscode/settings\.json"` prints nothing.
+- [x] `git ls-files | grep -E "\.zip$|\.idea/|settings\.local\.json|\.vscode/settings\.json"` prints nothing. Superseded for the two legacy zips: they are back, without secrets (see `Deviations`).
 - [x] `git check-ignore .idea/x .claude/settings.local.json` reports both as ignored.
-- [ ] Owner confirmation with dates recorded for all 6 Google keys and the SAS key.
+- [x] Owner confirmation with dates recorded for all 6 Google keys and the SAS key (2026-11-10).
 - [x] `dotnet build SolTechnology.Core.slnx` is green.
 
 ## Open questions
@@ -47,3 +47,15 @@ Former core step 09; moved here by the per-library regroup (user, 2026-11-02).
 **Original plan:** the step closes once the owner records the revocation dates.
 
 **Actual implementation:** the tree change is committed (both zips removed, personal settings untracked, `.gitignore` extended, build green). The step stays `in-progress` until the owner confirms revocation of the 6 Google keys and the `talecodeservicebus` SAS key.
+
+### Owner revocation confirmed
+
+**Original plan:** the owner records a revocation date for each key.
+
+**Actual implementation:** on 2026-11-10 the owner confirmed in one statement that the keys are revoked: the two zip Google keys (`AIzaSyBg…`, `AIzaSyCd…`), the four Google keys in history, and the `talecodeservicebus` `RootManageSharedAccessKey`. History is not rewritten (D1).
+
+### Legacy zips restored without secrets
+
+**Original plan:** both legacy zips stay out of the tree.
+
+**Actual implementation:** at the owner's request, commit `25797666` restored both zips with the Google keys and the Michelin authkey replaced by placeholders and the `.csproj.user` removed. The `.idea/`, `settings.local.json` and `.vscode/settings.json` part of the ls-files check still prints nothing.
