@@ -17,7 +17,7 @@ internal static class HangfireGlobalState
         // AddHangfire points Hangfire's static log provider at the container's ILoggerFactory.
         LogProvider.SetCurrentLogProvider(null);
 
-        foreach (var filter in new object?[] { provider.GetService<CorrelationIdJobFilter>(), provider.GetService<SmartRetryJobFilter>() })
+        foreach (var filter in new object?[] { provider.GetService<CorrelationIdJobFilter>(), provider.GetService<SmartRetryJobFilter>(), provider.GetService<ChronicleJobFilter>() })
         {
             if (filter is not null)
             {

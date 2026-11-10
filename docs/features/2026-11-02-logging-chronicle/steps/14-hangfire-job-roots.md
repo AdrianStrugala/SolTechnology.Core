@@ -1,7 +1,7 @@
 ---
 spec: 2026-11-02-logging-chronicle
 step: 14
-status: to-do
+status: done
 ---
 
 # Step 14: Hangfire job roots — recurring jobs and persistent events
@@ -127,3 +127,58 @@ and both Hangfire installers register Chronicle (CP-03).
 - none
 
 ## Deviations
+
+### The filter implements `IJobFilter` instead of deriving from `JobFilterAttribute`
+
+**Original plan:** `internal sealed class ChronicleJobFilter(IChronicle chronicle) : JobFilterAttribute, IServerFilter`,
+setting `Order = 0` in its constructor.
+
+**Actual implementation:** `JobFilterAttribute.Order` is a settable, non-virtual property, and a
+primary constructor has no body to set it in, so the filter implements `IServerFilter` and
+`IJobFilter` directly (`Order => 0`, `AllowMultiple => false`) and keeps the primary constructor
+(Guide §9.5). Hangfire takes a global filter's order from `IJobFilter.Order`:
+`ChronicleJobFilter_Order_IsZeroAndRunsAfterCorrelationAndOverlapFilters` sorts it after
+`CorrelationIdJobFilter`, `SmartRetryJobFilter` and the method-scoped `PreventOverlapJobFilter`, and
+`AddSolHangfire_RegistersChronicleAndUseSolFiltersAddsItsFilter` finds it in `GlobalJobFilters`
+with order 0. The root naming lives in the internal `ChronicleJobName`. `OnPerforming` reads
+`RetryCount` before opening the root, because Hangfire skips `OnPerformed` for a filter whose
+`OnPerforming` threw, and an open root would then stay ambient on the worker thread.
+
+### Test layout
+
+- Hand-built contexts: `ChronicleJobFilterTests` (outcomes) and `ChronicleJobFilterRootTests`
+  (naming, nesting, order). Real `BackgroundJobPerformer`: `ChronicleJobFilterPerformerTests`
+  (job body, sequential jobs, later filter throws) and `ChronicleJobFilterPerformerOutcomeTests`
+  (failed `Result` with Hangfire state `Succeeded`, overlap guard over `Hangfire.InMemory`, event
+  shutdown). Shared code is in `ChronicleJobFilterTestBase`, `ChronicleJobPerformerTestBase` and
+  `ChronicleJobFixtures.cs`; the fixture event handlers are internal so `ModuleResolutionTests`
+  does not scan them.
+- Merged by parameterization: the recoverable and non-recoverable failed `Result` tests
+  (`OnPerformed_FailedResult_RootFailedWithErrorTypeAndRecoverable`), shutdown and abort
+  (`OnPerformed_ShutdownOrAbort_RootCancelled`), the root-name tests including both
+  `DispatchInScope` overloads (`OnPerforming_JobKind_RootNamedAfterTheWork`), and
+  `UseSolFilters_AddsChronicleFilter` with both registration tests
+  (`AddSolHangfire_RegistersChronicleAndUseSolFiltersAddsItsFilter`).
+  `OnPerformed_RestoresPreviousAmbientNode` is folded into
+  `OnPerforming_InsideOpenRoot_StartsSeparateRootAndRestoresIt`, which also checks `DetachedFrom`.
+- `HangfireGlobalState.Reset` also removes the `ChronicleJobFilter`.
+
+### CRM-2 re-check at implementation (2026-11-10)
+
+Holds. `OnPerformed` disposes the stored root in a `finally`, and R1 moved the CRM-2 test filter to
+`Order = 1` as planned: `OnPerforming_LaterFilterThrows_RootEmittedFailedAndAmbientRestored` (one
+`Failed` 2154 entry, `IChronicle.IsActive` false afterwards) and
+`SequentialJobsOnSameThread_SecondReportHasNoStepsOfFirst` are green through the real performer.
+
+### PA-5 (the Hangfire half of CRM-1) re-check at implementation (2026-11-10)
+
+Accepted residual, same exposure as `CorrelationIdJobFilter`. `UseFilter` adds the instance to the
+static `GlobalJobFilters`; with `AllowMultiple = false` Hangfire keeps one instance per type, the
+last one added, so with several hosts in one process every job root belongs to the last host's
+recorder and is reported through its logger factory. Steps from the other host's services still
+join the ambient root (they write into the node, not into their own recorder), and SQL commands are
+recorded once, by the observer whose recorder owns the root (CRM-1, step 07). A disposed host's
+filter stays installed until the process ends; its reporter never throws into a job (listener
+failures are caught by `ChronicleWriter`). Tests remove the filter through
+`HangfireGlobalState.Reset`. Step 15 documents the one-host-per-process assumption in `docs/Hangfire.md`.
+

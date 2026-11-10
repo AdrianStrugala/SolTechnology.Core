@@ -79,7 +79,37 @@ public class ModuleInstallerTests
         // Assert
         options.Value.QueueName.Should().Be("events");
     }
+
+    [TestCase("recurring job")]
+    [TestCase("persistent events")]
+    public void AddSolHangfire_RegistersChronicleAndUseSolFiltersAddsItsFilter(string registration)
+    {
+        // Arrange
+        var services = new ServiceCollection().AddLogging();
+        services.AddHangfire((sp, configuration) => configuration.UseInMemoryStorage().UseSolFilters(sp));
+
+        // Act
+        if (registration == "recurring job")
+        {
+            services.AddSolRecurringJob<TestJob>("0 0 * * *");
+        }
+        else
+        {
+            services.AddSolCQRS().AddSolPersistentEvents();
+        }
+
+        // Assert
+        using var provider = services.BuildServiceProvider();
+        try
+        {
+            provider.GetService<SolTechnology.Core.Logging.Chronicles.IChronicle>().Should().NotBeNull();
+            provider.GetRequiredService<IRecurringJobManager>();
+            var filter = provider.GetRequiredService<SolTechnology.Core.Hangfire.Filters.ChronicleJobFilter>();
+            GlobalJobFilters.Filters.Should().ContainSingle(f => f.Instance == filter).Which.Order.Should().Be(0);
+        }
+        finally
+        {
+            HangfireGlobalState.Reset(provider);
+        }
+    }
 }
-
-
-

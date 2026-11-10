@@ -2,6 +2,7 @@
 
   <ItemGroup>
     <PackageReference Include="Hangfire.InMemory" />
+    <PackageReference Include="Microsoft.Extensions.Diagnostics.Testing" />
     <PackageReference Include="Hangfire.NetCore" />
     <PackageReference Include="Hangfire.SqlServer" />
   </ItemGroup>

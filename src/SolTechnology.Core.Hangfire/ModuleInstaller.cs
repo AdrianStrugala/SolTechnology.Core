@@ -94,6 +94,8 @@ public static class ModuleInstaller
             services.AddSolCorrelationIdService();
             services.TryAddSingleton<CorrelationIdJobFilter>();
             services.TryAddSingleton<SmartRetryJobFilter>();
+            services.AddSolChronicle();
+            services.TryAddSingleton<ChronicleJobFilter>();
         }
     }
 
@@ -101,8 +103,8 @@ public static class ModuleInstaller
     extension(IGlobalConfiguration configuration)
     {
         /// <summary>
-        /// Adds the Hangfire global job filters (correlation-id propagation, smart retry) and the
-        /// overlap guard for recurring jobs registered with <c>preventOverlap: true</c>.
+        /// Adds the Hangfire global job filters (correlation-id propagation, smart retry, a Chronicle root per
+        /// performed job) and the overlap guard for recurring jobs registered with <c>preventOverlap: true</c>.
         /// Call from the app's <c>AddHangfire</c> configuration callback:
         /// <code>
         /// services.AddHangfire((sp, config) => config.UseSolFilters(sp));
@@ -120,6 +122,11 @@ public static class ModuleInstaller
             if (smartRetryFilter is not null)
             {
                 configuration.UseFilter(smartRetryFilter);
+            }
+
+            if (serviceProvider.GetService<ChronicleJobFilter>() is { } chronicleFilter)
+            {
+                configuration.UseFilter(chronicleFilter);
             }
 
             serviceProvider.GetService<PreventOverlapFilterProvider>()?.InstallInto(JobFilterProviders.Providers);
