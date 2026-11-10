@@ -42,11 +42,12 @@ internal sealed class ChronicleSQLClientObserver(ChronicleWriter writer) : IObse
     {
         try
         {
-            if (value.Key == Before)
+            // Gate before reading: the reader boxes OperationId and Timestamp for every event.
+            if (value.Key == Before && OwnOpenRoot() is { } parent)
             {
-                OnBefore(SQLClientPayloadReader.Read(value.Value));
+                OnBefore(parent, SQLClientPayloadReader.Read(value.Value));
             }
-            else if (value.Key is After or Error)
+            else if (value.Key is After or Error && PendingCount > 0)
             {
                 OnCompleted(SQLClientPayloadReader.Read(value.Value), value.Key == Error);
             }
@@ -85,9 +86,9 @@ internal sealed class ChronicleSQLClientObserver(ChronicleWriter writer) : IObse
     private ChronicleNode? OwnOpenRoot()
         => writer.Options.Enabled && AmbientChronicle.Current is { Root.IsClosed: false } node && node.Root.Owner == writer ? node : null;
 
-    private void OnBefore(SQLClientPayload payload)
+    private void OnBefore(ChronicleNode parent, SQLClientPayload payload)
     {
-        if (OwnOpenRoot() is not { } parent || payload.Command is not { } command || payload.OperationId == Guid.Empty)
+        if (payload.Command is not { } command || payload.OperationId == Guid.Empty)
         {
             return;
         }
