@@ -295,5 +295,8 @@ Decided during implementation without a confirmation stop; each step file carrie
   `CreateRequest(...).WithBody(...)` sends no `Content-Length`, so `LogDetail` body rules never fire
   for it; `api/Traffic/recalculate` has no handler (commented out) and declares the command as its
   response type.
+- Step 04: `CLAUDE.md §3`, two skills, and `CONTRIBUTING.md` told readers to run `dotnet build` or
+  `dotnet test` inside `sample-tale-code-apps/DreamTravel`, which has no solution file; they now
+  name `SolTechnology.Core.slnx` and per-project test paths.
 
 ## Follow-ups

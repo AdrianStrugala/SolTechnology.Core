@@ -14,7 +14,8 @@ pwsh ./.github/runTests.ps1
 ```
 
 `runTests.ps1` runs every project under `tests/` with `--no-build`, so build first. The DreamTravel
-sample has its own tests: `cd sample-tale-code-apps/DreamTravel && dotnet test`.
+sample's tests live under `sample-tale-code-apps/DreamTravel/tests/`; run them per project, for
+example `dotnet test sample-tale-code-apps/DreamTravel/tests/Component`.
 
 ## Conventions
 

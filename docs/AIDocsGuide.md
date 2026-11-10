@@ -71,8 +71,8 @@ One rule = one place. Other files **link**, never copy.
 13. **Cite-able names.** Types, files, options, methods — always in `backticks`,
     exact-string-searchable. "Inject `ILogger<TSelf>`" not "inject a logger of the
     self type".
-14. **Anti-patterns with locations.** "`CalculateBestPathController.CalculateBestPathV1`
-    has `try/catch + JsonConvert`" — the agent knows where to fix it on the next pass.
+14. **Anti-patterns with locations.** "`FetchTrafficHandler` logs `"Skipped " + s.Name`"
+    — the agent knows where to fix it on the next pass.
     Mythical "somewhere in the codebase" → delete.
 15. **Concrete numbers, not adjectives.** "≤ 100 lines, hard cap 150." not "classes
     should be small". LLMs have no intuition for "small". No "~", no "about".

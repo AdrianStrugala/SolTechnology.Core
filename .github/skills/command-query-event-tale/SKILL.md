@@ -218,7 +218,7 @@ or change a `ModuleInstaller.cs` contract, that is premortem-gated (`CLAUDE.md �
 ### 11. Verify and hand off
 
 - `get_errors` after every file edit (`CLAUDE.md §3`).
-- Build the sample: `cd sample-tale-code-apps/DreamTravel && dotnet build`.
+- Build the sample: `dotnet build SolTechnology.Core.slnx` (it includes the DreamTravel projects).
 - Tests are **not** optional — hand off to [`test-writing`](../test-writing/SKILL.md). Every new
   `Result.Fail(...)` branch needs a negative test asserting the exact `Error.Code`.
 

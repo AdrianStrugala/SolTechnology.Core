@@ -312,7 +312,7 @@ Rules:
 2. Culture, CORS, configuration binding.
 3. **Module installers** (one line per project): `InstallTripsSql`, `InstallGeolocationDataClients`, `InstallInfrastructure`, `InstallDomainServices`, `InstallTripsQueries`, `InstallGraphDatabase`, `AddFlows`, etc.
 4. Framework installers: `AddCache`, authentication, versioning, Swagger.
-5. Filters: `ExceptionFilter`, `ResponseEnvelopeFilter` (always wired globally).
+5. Filters: `ExceptionFilter`, `ResultConversionFilter` (always wired globally).
 6. Build, configure pipeline, `MapControllers`, `Run`.
 
 CORS policy names, scheme names, and other constants MUST be `const` with a meaningful name. The `"dupa"` CORS policy in `DreamTravel.Api/Program.cs` is a kept joke (§9.10), not a pattern to copy.
@@ -331,13 +331,18 @@ public class CalculateBestPathController(
     [HttpPost]
     [MapToApiVersion("2.0")]
     [Produces(MediaTypeNames.Application.Json)]
-    [ProducesResponseType(typeof(Result<CalculateBestPathResult>), (int)HttpStatusCode.OK)]
+    [ProducesResponseType(typeof(CalculateBestPathResult), (int)HttpStatusCode.OK)]
+    [ProducesResponseType(typeof(ProblemDetails), (int)HttpStatusCode.BadRequest)]
     public async Task<IActionResult> CalculateBestPath([FromBody] CalculateBestPathQuery query)
     {
       return Ok(await mediator.Send(query, HttpContext.RequestAborted));
     }
 }
 ```
+
+`ResultConversionFilter` sends a successful `Result<T>` as `T` and a failed one as ProblemDetails, so
+`[ProducesResponseType]` declares `T`, never `Result<T>` (see
+[Api.md](Api.md#returning-resultt-from-controllers)).
 
 Rules:
 
@@ -354,7 +359,7 @@ Rules:
 
 ### Filters / middleware
 
-- Use `ExceptionFilter` and `ResponseEnvelopeFilter` from `SolTechnology.Core.API` — register globally, never per-controller.
+- Use `ExceptionFilter` and `ResultConversionFilter` from `SolTechnology.Core.API` (`AddSolApiCoreFilters()`) — register globally, never per-controller.
 - Authentication wiring goes through `AddSolAuth(...)` from `SolTechnology.Core.Auth`.
 - Custom middleware lives in `Middlewares/` in the API project.
 
@@ -507,7 +512,7 @@ These apply to every class you write, regardless of layer.
 
 - Input validation = **FluentValidation** in the same file as the Command/Query.
 - Business invariants = inside the domain or chapter, returning `Result.Fail(...)`.
-- Defensive parameter checks at module/library boundaries = **`SolTechnology.Core.Guards`**.
+- Defensive parameter checks at module/library boundaries = **BCL guards**: `ArgumentNullException.ThrowIfNull`, `ArgumentException.ThrowIfNullOrWhiteSpace`, `ArgumentOutOfRangeException.ThrowIfNegative`.
 - NEVER validate in the controller. NEVER validate in the handler if a validator exists.
 
 ---
@@ -525,7 +530,7 @@ Layer rule — who may throw, who may catch:
 - Default to `Result` / `Result<T>` everywhere.
 - A chapter that fails returns `Result.Fail(...)` — the Tale stops. NEVER throw to abort a Tale; exceptions escaping from DataLayer / external libraries are converted to errors by the framework (§4).
 - NEVER swallow exceptions silently. If a `catch` block has no `throw` and no `logger.LogError`, it is a bug.
-- For aggregated failures across chapters, use `AggregateError` from `SolTechnology.Core.CQRS`.
+- For aggregated failures across chapters, use `AggregateError` from the `SolTechnology.Core` package (namespace `SolTechnology.Core.Errors`).
 
 ---
 
@@ -548,10 +553,10 @@ report it, never auto-fix.
 
 | Anti-pattern | Where seen | Correct form | Policy |
 | --- | --- | --- | --- |
-| `try/catch` + `JsonConvert.SerializeObject(ex.Message)` in a controller | `CalculateBestPathController.CalculateBestPathV1` | `ExceptionFilter` handles it (§13) | fix on touch |
+| `try/catch` + `JsonConvert.SerializeObject(ex.Message)` in a controller | historical: the DreamTravel v1 controllers (`CalculateBestPathController.CalculateBestPathV1`), removed in 2026-11 | `ExceptionFilter` handles it (§13) | fix on touch |
 | `logger.LogInformation("Skipped " + s.Name);` | `FetchTrafficHandler` | Structured placeholder + `[]` (§11) | report only — changes the log template consumers query |
 | Multiple `+`-concatenated log strings | various | Structured placeholders (§11) | report only — changes the log template consumers query |
-| Naked `Newtonsoft.Json` usage in new code | `CalculateBestPathController` | `System.Text.Json` + Tale/AUID converters; Newtonsoft only where Hangfire / legacy serialization requires it | report only — changes serialization behaviour |
+| Naked `Newtonsoft.Json` usage in new code | `GoogleHTTPClient.*` in `DreamTravel.GeolocationDataClients` | `System.Text.Json` + Tale/AUID converters; Newtonsoft only where Hangfire / legacy serialization requires it | report only — changes serialization behaviour |
 | Mocking `IMediator` / `DbContext` in unit tests | hypothetical | Component test (§8) | fix on touch |
 | Hand-written `private readonly` ctor capture | hypothetical | Primary constructor (§9.5) | fix on touch |
 | `static class` + `this` extension methods | various | `extension` block (§9.7) | fix on touch |

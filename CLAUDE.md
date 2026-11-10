@@ -81,8 +81,8 @@ For each of these, surface the intended change and the reasoning, then wait.
 | Action | Rule |
 |---|---|
 | After every code edit | Call `get_errors` on the edited file. Fix errors caused by your change; leave pre-existing warnings alone (state which is which). |
-| After the last code edit before yielding, and after any `.csproj` / `.props` change | Build the relevant solution (`dotnet build SolTechnology.Core.slnx`; for DreamTravel: `cd sample-tale-code-apps/DreamTravel && dotnet build`). |
-| After a build-relevant change | Run the affected tests (`./.github/runTests.ps1` for core; `dotnet test <project>` for a single target). |
+| After the last code edit before yielding, and after any `.csproj` / `.props` change | Build the relevant solution (`dotnet build SolTechnology.Core.slnx`, which includes the DreamTravel projects; `sample-tale-code-apps/DreamTravel` has no solution file of its own). |
+| After a build-relevant change | Run the affected tests (`./.github/runTests.ps1` for core; `dotnet test <project>` for a single target, e.g. `dotnet test sample-tale-code-apps/DreamTravel/tests/Component`). |
 | Before asking for Bash permission | Check `.claude/settings.local.json` `allow` list for a matching wildcard. Reuse existing patterns (`-Last 10/20/30`, `timeout 60/120/180/300`) instead of asking for a new one. |
 | When invoking a custom agent / skill | Read its file first (§0.3). Pass the user's intent verbatim where possible. |
 | When a mandated skill / agent is unavailable | STOP. Tell the user which skill / agent is required and why the work is gated on it. NEVER produce a freehand substitute (no hand-drafted diagram, no inline mini-plan, no improvised review checklist). |

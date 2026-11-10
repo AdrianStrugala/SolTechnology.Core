@@ -147,7 +147,8 @@ the fixture `internal` (registered by hand) or register its dependency where the
 
 - Core libs (whole suite): `./.github/runTests.ps1`.
 - Single project: `dotnet test tests/SolTechnology.Core.<Module>.Tests/`.
-- Sample app: `cd sample-tale-code-apps/<App> && dotnet test`.
+- Sample app: one project at a time, e.g. `dotnet test sample-tale-code-apps/DreamTravel/tests/Component`
+  (the sample folder has no solution file of its own).
 
 ## Pre-yield checklist
 

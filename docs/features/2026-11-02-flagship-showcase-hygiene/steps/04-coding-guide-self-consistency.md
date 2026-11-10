@@ -1,7 +1,7 @@
 ---
 spec: 2026-11-02-flagship-showcase-hygiene
 step: 04
-status: to-do
+status: done
 ---
 
 # Step 04: Coding Guide self-consistency
@@ -39,13 +39,44 @@ does not edit either.
 - Guide §0, §1, and §6 event placement is edited by step 05 in the same PR as the `CitySearched` move (premortem SRM-15); this step leaves those lines alone, whichever of the two steps runs first.
 
 ## Acceptance criteria
-- [ ] `grep -nE "SolTechnology\.Core\.Guards|AddAuthenticationAndBuildFilter|ResponseEnvelopeFilter" docs/ClaudeCodingGuide.md` prints nothing.
-- [ ] The documentation-cleanup skill passes for `docs/ClaudeCodingGuide.md` and `CLAUDE.md`.
-- [ ] `git diff <base> -- docs/ClaudeCodingGuide.md | grep -E '^[-+].*(dupa|joke)'` prints nothing (the kept-joke lines are untouched). `<base>` is the commit before this step: `master` has no branch protection and may receive the step directly, so `origin/master` is not a reliable base.
-- [ ] `grep -n "AggregateError" docs/ClaudeCodingGuide.md` names `SolTechnology.Core`, not `SolTechnology.Core.CQRS`.
-- [ ] SRM-9: `grep -n "typeof(Result<" docs/ClaudeCodingGuide.md` prints nothing.
+- [x] `grep -nE "SolTechnology\.Core\.Guards|AddAuthenticationAndBuildFilter|ResponseEnvelopeFilter" docs/ClaudeCodingGuide.md` prints nothing.
+- [x] The documentation-cleanup skill passes for `docs/ClaudeCodingGuide.md` and `CLAUDE.md`.
+- [x] `git diff <base> -- docs/ClaudeCodingGuide.md | grep -E '^[-+].*(dupa|joke)'` prints nothing (the kept-joke lines are untouched). `<base>` is the commit before this step: `master` has no branch protection and may receive the step directly, so `origin/master` is not a reliable base.
+- [x] `grep -n "AggregateError" docs/ClaudeCodingGuide.md` names `SolTechnology.Core`, not `SolTechnology.Core.CQRS`.
+- [x] SRM-9: `grep -n "typeof(Result<" docs/ClaudeCodingGuide.md` prints nothing.
 
 ## Open questions
 - none
 
 ## Deviations
+
+### Broken DreamTravel build and test commands
+
+**Original plan:** `CLAUDE.md` is a check of the §11 rows only.
+
+**Actual implementation:** the §11 rows are still accurate, but `CLAUDE.md §3` told agents to run
+`cd sample-tale-code-apps/DreamTravel && dotnet build`, which fails with MSB1003 because that folder
+has no project or solution file (the DreamTravel projects live in `SolTechnology.Core.slnx`). The
+same command was in the `command-query-event-tale` and `test-writing` skills and in the
+`CONTRIBUTING.md` written by step 01. All four now name `dotnet build SolTechnology.Core.slnx` and
+per-project `dotnet test sample-tale-code-apps/DreamTravel/tests/<...>`. `docs/AIDocsGuide.md`
+rule 14 used the removed controller `try/catch` as its live example; it now cites the
+`FetchTrafficHandler` concatenated log line that still exists.
+
+### SRM outcomes (2026-11-10)
+
+- **SRM-8 — done.** `git diff` of the Guide from the commit before this step shows no added or
+  removed line containing "dupa" or "joke"; the §7 kept-joke sentence and §9.10 are byte-identical.
+- **SRM-9 — done.** The §7 template declares `typeof(CalculateBestPathResult)` for 200 and
+  `ProblemDetails` for 400, and one sentence under it explains the unwrapping, linking
+  `docs/Api.md#returning-resultt-from-controllers`.
+
+### Verification (2026-11-10)
+
+- Acceptance greps: Guards / `AddAuthenticationAndBuildFilter` / `ResponseEnvelopeFilter` and
+  `typeof(Result<` print nothing; `AggregateError` names the `SolTechnology.Core` package.
+- Link check over `docs/ClaudeCodingGuide.md` and `CLAUDE.md`: the only hit is the pre-existing
+  `[Text](<path/file.md>)` example inside §21's inline code, not a link.
+- Not edited (outside this step's files, recorded for step 08): `docs/theDesign.md:66-69` still
+  shows `[ServiceFilter(typeof(ExceptionFilter))]` and `ResponseEnvelopeFilter` on a controller.
+- Docs only; no build needed.
