@@ -1,4 +1,10 @@
 using FluentAssertions;
+using Microsoft.Extensions.Logging;
+using SolTechnology.Core.Logging;
+using Microsoft.Extensions.Logging.Testing;
+using Microsoft.Extensions.DependencyInjection;
+using Hangfire.Storage;
+using Hangfire;
 using Hangfire.Common;
 using Hangfire.Server;
 using Microsoft.Extensions.Logging.Abstractions;
@@ -76,5 +82,31 @@ public class ChronicleJobFilterRootTests : ChronicleJobFilterTestBase
         Filter.Order.Should().Be(0);
         ordered.Select(f => f.Instance.GetType().Name).Should().Equal(
             nameof(CorrelationIdJobFilter), nameof(SmartRetryJobFilter), nameof(PreventOverlapJobFilter), nameof(ChronicleJobFilter));
+    }
+
+    [TestCase(true)]
+    [TestCase(false)]
+    public void OnPerformed_RetryCount_ReadFromParameterSnapshotOnlyWhenRecording(bool enabled)
+    {
+        // Arrange
+        using var services = new ServiceCollection().AddLogging(l => l.AddProvider(new FakeLoggerProvider(Logs)))
+            .AddSolChronicle(o => o.Enabled = enabled).BuildServiceProvider();
+        var sut = new ChronicleJobFilter(services.GetRequiredService<SolTechnology.Core.Logging.Chronicles.IChronicle>());
+        var connection = Substitute.For<IStorageConnection>();
+        var job = new BackgroundJob("job-7", RunnerJob<TestJob>(), DateTime.UtcNow, new Dictionary<string, string> { ["RetryCount"] = "3" });
+        var performing = new PerformingContext(new PerformContext(Substitute.For<JobStorage>(), connection, job, Substitute.For<IJobCancellationToken>()));
+
+        // Act
+        OnWorkerThread(() =>
+        {
+            sut.OnPerforming(performing);
+            sut.OnPerformed(new PerformedContext(performing, null, false, null));
+            return 0;
+        });
+
+        // Assert
+        connection.DidNotReceiveWithAnyArgs().GetJobParameter(default!, default!);
+        var expected = enabled ? new[] { "JobId=job-7 RetryCount=3]" } : [];
+        Reports.Select(r => r.Message[r.Message.IndexOf("JobId=", StringComparison.Ordinal)..]).Should().Equal(expected);
     }
 }

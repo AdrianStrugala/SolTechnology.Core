@@ -20,13 +20,11 @@ internal sealed class ChronicleJobFilter(IChronicle chronicle) : IServerFilter, 
 
     public void OnPerforming(PerformingContext filterContext)
     {
-        // Read storage before opening the root: Hangfire skips OnPerformed for a filter whose OnPerforming threw.
-        var retryCount = filterContext.GetJobParameter<int>("RetryCount");
         var root = chronicle.BeginRoot(ChronicleJobName.Of(filterContext.BackgroundJob.Job));
         filterContext.Items[RootKey] = root;
         if (root.IsRecording)
         {
-            root.Set("JobId", filterContext.BackgroundJob.Id).Set("RetryCount", retryCount);
+            root.Set("JobId", filterContext.BackgroundJob.Id);
         }
     }
 
@@ -39,6 +37,12 @@ internal sealed class ChronicleJobFilter(IChronicle chronicle) : IServerFilter, 
 
         try
         {
+            if (root.IsRecording)
+            {
+                // Stale read: the parameters fetched with the job, no storage round-trip per perform.
+                root.Set("RetryCount", filterContext.GetJobParameter<int>("RetryCount", allowStale: true));
+            }
+
             RecordOutcome(root, filterContext);
         }
         finally
