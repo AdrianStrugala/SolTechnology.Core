@@ -41,11 +41,11 @@ internal sealed class ChronicleNode(ChronicleRoot root, ChronicleNode? parent, s
 
     internal void CountDroppedDeeper() => Interlocked.Increment(ref _droppedDeeperCount);
 
-    internal void AddOverflow(string groupKey, long startTimestamp, long elapsedTicks, bool failed)
+    internal void AddOverflow(string name, string groupKey, long startTimestamp, long elapsedTicks, bool failed)
     {
         lock (_gate)
         {
-            (_overflow ??= new ChronicleOverflowGroups()).Add(groupKey, startTimestamp, elapsedTicks, failed);
+            (_overflow ??= new ChronicleOverflowGroups()).Add(name, groupKey, startTimestamp, elapsedTicks, failed);
         }
     }
 

@@ -12,6 +12,8 @@ internal sealed class ChronicleOptionsValidator : IValidateOptions<ChronicleOpti
         Require(failures, options.MaxDepth is >= 1 and <= 64, "MaxDepth must be between 1 and 64.");
         Require(failures, options.MaxAttributesPerStep is >= 0 and <= 64, "MaxAttributesPerStep must be between 0 and 64.");
         Require(failures, options.MaxAttributeValueLength is >= 16 and <= 4096, "MaxAttributeValueLength must be between 16 and 4096.");
+        Require(failures, options.AggregateThreshold >= 2, "AggregateThreshold must be at least 2.");
+        Require(failures, options.NPlusOneThreshold >= options.AggregateThreshold, "NPlusOneThreshold must be at least AggregateThreshold.");
 
         return failures.Count == 0 ? ValidateOptionsResult.Success : ValidateOptionsResult.Fail(failures);
     }

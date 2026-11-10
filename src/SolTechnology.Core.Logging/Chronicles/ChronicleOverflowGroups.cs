@@ -14,11 +14,11 @@ internal sealed class ChronicleOverflowGroups
 
     private readonly Dictionary<string, ChronicleOverflow> _groups = [];
 
-    internal void Add(string groupKey, long startTimestamp, long elapsedTicks, bool failed)
+    internal void Add(string name, string groupKey, long startTimestamp, long elapsedTicks, bool failed)
     {
-        var key = _groups.Count < MaxGroups || _groups.ContainsKey(groupKey) ? groupKey : OtherKey;
-        ref var entry = ref CollectionsMarshal.GetValueRefOrAddDefault(_groups, key, out _);
-        entry.Add(startTimestamp, elapsedTicks, failed);
+        var fits = _groups.Count < MaxGroups || _groups.ContainsKey(groupKey);
+        ref var entry = ref CollectionsMarshal.GetValueRefOrAddDefault(_groups, fits ? groupKey : OtherKey, out _);
+        entry.Add(fits ? name : OtherKey, startTimestamp, elapsedTicks, failed);
     }
 
     internal KeyValuePair<string, ChronicleOverflow>[] Snapshot() => [.. _groups];

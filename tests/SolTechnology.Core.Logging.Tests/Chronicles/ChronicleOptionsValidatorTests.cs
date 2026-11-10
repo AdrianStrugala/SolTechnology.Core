@@ -27,6 +27,10 @@ public class ChronicleOptionsValidatorTests
         yield return Row("MaxAttributeValueLength=4096", o => o.MaxAttributeValueLength = 4096, true);
         yield return Row("MaxAttributeValueLength=15", o => o.MaxAttributeValueLength = 15, false);
         yield return Row("MaxAttributeValueLength=4097", o => o.MaxAttributeValueLength = 4097, false);
+        yield return Row("AggregateThreshold=2", o => (o.AggregateThreshold, o.NPlusOneThreshold) = (2, 2), true);
+        yield return Row("AggregateThreshold=1", o => o.AggregateThreshold = 1, false);
+        yield return Row("NPlusOneThreshold=AggregateThreshold", o => o.NPlusOneThreshold = o.AggregateThreshold, true);
+        yield return Row("NPlusOneThreshold<AggregateThreshold", o => o.NPlusOneThreshold = o.AggregateThreshold - 1, false);
     }
 
     [TestCaseSource(nameof(Bounds))]

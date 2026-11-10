@@ -38,4 +38,16 @@ public sealed class ChronicleOptions
     /// range 16–4096). Longer text is cut and suffixed with <c>[truncated]</c>.
     /// </summary>
     public int MaxAttributeValueLength { get; set; } = 200;
+
+    /// <summary>
+    /// Siblings with the same name (for SQL steps: the same statement) collapse into one
+    /// aggregated line once there are this many of them (default 3, at least 2).
+    /// </summary>
+    public int AggregateThreshold { get; set; } = 3;
+
+    /// <summary>
+    /// An aggregated line with at least this many steps is marked <c>N+1 suspected</c>
+    /// (default 10, at least <see cref="AggregateThreshold"/>).
+    /// </summary>
+    public int NPlusOneThreshold { get; set; } = 10;
 }

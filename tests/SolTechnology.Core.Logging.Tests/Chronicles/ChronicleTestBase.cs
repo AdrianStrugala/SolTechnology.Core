@@ -29,6 +29,17 @@ public abstract class ChronicleTestBase
         return new ChronicleRecorder(Options.Create(options), Time, [Listener]);
     }
 
+    internal ChronicleNode AddClosedChild(ChronicleNode parent, string name, int startMs, int durationMs, string? groupKey = null)
+    {
+        var start = parent.Root.Node.StartTimestamp + Ticks(startMs);
+        var child = new ChronicleNode(parent.Root, parent, name, groupKey ?? name, start);
+        parent.AddChild(child);
+        child.TryClose(start + Ticks(durationMs));
+        return child;
+    }
+
+    internal long Ticks(int milliseconds) => milliseconds * Time.TimestampFrequency / 1000;
+
     internal static ChronicleNode NodeOf(ChronicleRoot root, params string[] path)
     {
         var node = root.Node;

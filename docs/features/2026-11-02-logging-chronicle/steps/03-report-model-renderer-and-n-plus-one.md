@@ -1,7 +1,7 @@
 ---
 spec: 2026-11-02-logging-chronicle
 step: 03
-status: to-do
+status: done
 ---
 
 # Step 03: Chronicle report model, ASCII tree renderer, and N+1 aggregation
@@ -57,12 +57,42 @@ pure and has no logging dependency, so golden-string tests pin the format.
     `Report_FailedOverflowStep_HasFailedSteps`.
 
 ## Acceptance criteria
-- [ ] `dotnet test tests/SolTechnology.Core.Logging.Tests --filter "FullyQualifiedName~Chronicles"` is green.
-- [ ] `find src/SolTechnology.Core.Logging/Chronicles -name "*.cs" | xargs wc -l | awk '$1>150 && $2!="total"'` prints nothing.
-- [ ] CRM-3: `Render_WorstCaseDefaults_AtMost32768Chars` is green.
-- [ ] CRM-4: `Report_FailedChildUnderOkRoot_HasFailedSteps` and `Report_FailedOverflowStep_HasFailedSteps` are green; `HasFailedSteps` is `internal`.
+- [x] `dotnet test tests/SolTechnology.Core.Logging.Tests --filter "FullyQualifiedName~Chronicles"` is green.
+- [x] `find src/SolTechnology.Core.Logging/Chronicles -name "*.cs" | xargs wc -l | awk '$1>150 && $2!="total"'` prints nothing.
+- [x] CRM-3: `Render_WorstCaseDefaults_AtMost32768Chars` is green.
+- [x] CRM-4: `Report_FailedChildUnderOkRoot_HasFailedSteps` and `Report_FailedOverflowStep_HasFailedSteps` are green; `HasFailedSteps` is `internal`.
 
 ## Open questions
 - none (OQ-1 confirmed by the user 2026-11-02: `CH-04` thresholds, `CH-06` report model)
 
 ## Deviations
+
+### The root is the single entry of `ChronicleReport.Steps`
+
+**Original plan:** CH-06 lists `Steps` without saying whether it holds the root.
+
+**Actual implementation:** `Steps` holds one entry, the root step, whose `Children` are the
+recorded steps. The root's attributes (HTTP root data, `DetachedFrom` in step 08) and markers
+need a `ChronicleReportStep`, and CH-06 gives `ChronicleReport` no `Attributes`. Serilog therefore
+sees one more level below `Chronicle` (step 15 documents the depth cap).
+
+### Rendering details not fixed by the plan
+
+**Original plan:** an ASCII tree rendered with a pooled `StringBuilder`; two tests
+`Report_TwoIdenticalSteps_NotAggregated` and `Report_ThreeIdenticalSteps_Aggregated`.
+
+**Actual implementation:**
+
+- A plain `StringBuilder` per render: the tree is rendered at most once per emitted report and
+  cached, and a static pool would be static mutable state (Guide §9.6).
+- The renderer's own characters are ASCII; user text (names, values, messages) is passed through,
+  except that line breaks and tabs become spaces so they cannot split the tree. Non-ASCII user text
+  is not transliterated.
+- Overflow aggregates always render as an aggregated line, even below `AggregateThreshold`,
+  because dropped steps have no node to render one by one. An aggregated line's status is
+  `Failed` when any of its steps failed, otherwise `Ok`.
+- The line data CH-06 does not expose (`max`, the error type and message, the marker counts) stays
+  internal on `ChronicleReportStep`; no public member was added.
+- The two aggregation tests are one parameterized test,
+  `Report_IdenticalSteps_AggregatedFromThreshold` (Guide §8).
+

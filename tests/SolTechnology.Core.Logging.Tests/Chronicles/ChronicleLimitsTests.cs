@@ -162,6 +162,4 @@ public class ChronicleLimitsTests : ChronicleTestBase
         child.Name.Should().Be(new string('s', 16) + "[truncated]");
         child.GroupKey.Should().Be(child.Name);
     }
-
-    private long Ticks(int milliseconds) => (long)(milliseconds * Time.TimestampFrequency / 1000.0);
 }

@@ -72,7 +72,7 @@ internal sealed class ChronicleWriter(ChronicleOptions options, TimeProvider tim
         {
             if (closed)
             {
-                node.Parent!.AddOverflow(node.GroupKey, node.StartTimestamp, end - node.StartTimestamp, node.Status == ChronicleStepStatus.Failed);
+                node.Parent!.AddOverflow(node.Name, node.GroupKey, node.StartTimestamp, end - node.StartTimestamp, node.Status == ChronicleStepStatus.Failed);
             }
 
             return;
