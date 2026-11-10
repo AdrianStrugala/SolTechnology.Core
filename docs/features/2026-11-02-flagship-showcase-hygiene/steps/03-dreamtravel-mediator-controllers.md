@@ -1,7 +1,7 @@
 ---
 spec: 2026-11-02-flagship-showcase-hygiene
 step: 03
-status: to-do
+status: in-progress
 ---
 
 # Step 03: DreamTravel — mediator-only, thin controllers

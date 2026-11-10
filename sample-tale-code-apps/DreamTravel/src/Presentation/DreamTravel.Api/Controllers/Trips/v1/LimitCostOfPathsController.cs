@@ -12,20 +12,12 @@ namespace DreamTravel.Api.Controllers.v1
     [ApiVersion("1.0", Deprecated = true)]
     [Route(Route)]
     [Obsolete]
-    public class LimitCostOfPathsController : Controller
+    public class LimitCostOfPathsController(
+        IQueryHandler<LimitCostOfPathsQuery, List<Path>> limitCostsOfPathsHandler,
+        ILogger<Controller> logger)
+        : Controller
     {
         public const string Route = "api/LimitCost";
-
-        private readonly IQueryHandler<LimitCostOfPathsQuery, List<Path>> _limitCostsOfPathsHandler;
-        private readonly ILogger<Controller> _logger;
-
-        public LimitCostOfPathsController(
-            IQueryHandler<LimitCostOfPathsQuery, List<Path>> _limitCostsOfPathsHandler,
-            ILogger<Controller> logger)
-        {
-            this._limitCostsOfPathsHandler = _limitCostsOfPathsHandler;
-            _logger = logger;
-        }
 
         private const string PathsKeyName = "_Paths";
 
@@ -39,10 +31,10 @@ namespace DreamTravel.Api.Controllers.v1
         {
             try
             {
-                _logger.LogInformation("Limit Cost Engine: Fire!");
+                logger.LogInformation("Limit Cost Engine: Fire!");
                 List<Path> paths = JsonConvert.DeserializeObject<List<Path>>(HttpContext.Session.GetString(sessionId + PathsKeyName));
 
-                paths = (await _limitCostsOfPathsHandler.Handle(new LimitCostOfPathsQuery
+                paths = (await limitCostsOfPathsHandler.Handle(new LimitCostOfPathsQuery
                 {
                     CostLimit = costLimit,
                     Paths = paths
@@ -56,7 +48,7 @@ namespace DreamTravel.Api.Controllers.v1
 
             catch (Exception ex)
             {
-                _logger.LogError(ex.ToString());
+                logger.LogError(ex.ToString());
                 string message = JsonConvert.SerializeObject(ex.Message);
                 return BadRequest(message);
             }

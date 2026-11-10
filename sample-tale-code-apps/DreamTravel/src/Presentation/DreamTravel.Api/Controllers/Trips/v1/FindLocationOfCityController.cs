@@ -12,21 +12,12 @@ namespace DreamTravel.Api.Controllers.v1
 {
     [ApiVersion("1.0", Deprecated = true)]
     [Route(Route)]
-    public class FindLocationOfCityController : Controller
+    public class FindLocationOfCityController(
+        IQueryHandler<FindCityByNameQuery, City> findLocationOfCity,
+        ILogger<FindLocationOfCityController> logger)
+        : Controller
     {
         public const string Route = "api/FindLocationOfCity";
-
-        private readonly ILogger<FindLocationOfCityController> _logger;
-        private readonly IQueryHandler<FindCityByNameQuery, City> _findLocationOfCity;
-
-
-        public FindLocationOfCityController(
-            IQueryHandler<FindCityByNameQuery, City> findLocationOfCity,
-            ILogger<FindLocationOfCityController> logger)
-        {
-            _findLocationOfCity = findLocationOfCity;
-            _logger = logger;
-        }
 
 
         [HttpPost]
@@ -37,16 +28,16 @@ namespace DreamTravel.Api.Controllers.v1
         {
             try
             {
-                _logger.LogInformation("Looking for city: " + query.Name);
+                logger.LogInformation("Looking for city: " + query.Name);
 
-                var city = await _findLocationOfCity.Handle(query, CancellationToken.None);
+                var city = await findLocationOfCity.Handle(query, CancellationToken.None);
 
                 return Ok(city.Data);
             }
 
             catch (Exception ex)
             {
-                _logger.LogError(ex.ToString());
+                logger.LogError(ex.ToString());
                 string message = JsonConvert.SerializeObject(ex.Message);
                 return BadRequest(message);
             }
