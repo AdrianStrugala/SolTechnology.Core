@@ -15,10 +15,14 @@ public class ChronicleEmissionPolicyTests
     [TestCase(ChronicleStepStatus.Failed, 10, null, LogLevel.Error)]
     [TestCase(ChronicleStepStatus.Ok, 10, 404, LogLevel.Warning)]
     [TestCase(ChronicleStepStatus.Ok, 10, 500, LogLevel.Error)]
-    public void LevelOf_OutcomeDurationAndHTTPStatus_EscalatesLevel(ChronicleStepStatus status, int durationMs, int? httpStatusCode, LogLevel expected)
+    [TestCase(ChronicleStepStatus.Ok, 10, null, LogLevel.Warning, true)]
+    [TestCase(ChronicleStepStatus.Ok, 10, 200, LogLevel.Warning, true)]
+    [TestCase(ChronicleStepStatus.Failed, 10, null, LogLevel.Error, true)]
+    public void LevelOf_OutcomeDurationAndHTTPStatus_EscalatesLevel(
+        ChronicleStepStatus status, int durationMs, int? httpStatusCode, LogLevel expected, bool hasFailedSteps = false)
     {
         // Act
-        var level = _sut.LevelOf(status, TimeSpan.FromMilliseconds(durationMs), httpStatusCode);
+        var level = _sut.LevelOf(status, TimeSpan.FromMilliseconds(durationMs), httpStatusCode, hasFailedSteps);
 
         // Assert
         level.Should().Be(expected);

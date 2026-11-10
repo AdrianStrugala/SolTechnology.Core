@@ -77,10 +77,10 @@ public class ChronicleSamplingTests : ChronicleReportingTestBase
     }
 
     [Test]
-    public void SampleRate0_OkRootWithFailedChild_Emitted()
+    public void SampleRate0_OkRootWithFailedChild_EmittedAtWarningEvenWhenInformationIsFiltered()
     {
         // Arrange
-        var sut = CreateReportingRecorder(o => o.SampleRate = 0);
+        var sut = CreateReportingRecorder(o => o.SampleRate = 0, minimumLevel: LogLevel.Warning);
 
         // Act
         using (sut.Begin("PublishEvent"))
@@ -91,7 +91,7 @@ public class ChronicleSamplingTests : ChronicleReportingTestBase
 
         // Assert
         var entry = Logs.GetSnapshot().Should().ContainSingle().Subject;
-        entry.Level.Should().Be(LogLevel.Information);
+        entry.Level.Should().Be(LogLevel.Warning);
         entry.Message.Should().Contain("[Ok]").And.Contain("Error=[InvalidOperationException: isolated]");
     }
 
@@ -109,6 +109,8 @@ public class ChronicleSamplingTests : ChronicleReportingTestBase
         }
 
         // Assert
-        Logs.GetSnapshot().Should().ContainSingle().Which.Message.Should().Contain("Item x1").And.Contain("[failed 1]");
+        var entry = Logs.GetSnapshot().Should().ContainSingle().Subject;
+        entry.Level.Should().Be(LogLevel.Warning);
+        entry.Message.Should().Contain("Item x1").And.Contain("[failed 1]");
     }
 }

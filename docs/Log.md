@@ -349,7 +349,7 @@ Invalid values fail the host on start (`ValidateOnStart`).
 | Root outcome | Level |
 |---|---|
 | `Failed`, or an HTTP 5xx | Error |
-| `Cancelled`, an HTTP 4xx, or `Ok` and at least `SlowThreshold` | Warning |
+| `Cancelled`, an HTTP 4xx, `Ok` with a failed step below the root, or `Ok` and at least `SlowThreshold` | Warning |
 | `Ok` | Information |
 
 Sampling is decided when the root ends: a failed or cancelled root, a report at Warning or above, a

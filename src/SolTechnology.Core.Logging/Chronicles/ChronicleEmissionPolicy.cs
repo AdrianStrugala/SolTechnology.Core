@@ -4,20 +4,20 @@ namespace SolTechnology.Core.Logging.Chronicles;
 
 /// <summary>
 /// Level escalation and tail-based sampling of Chronicle reports. The level is decided from the
-/// root alone, before a report exists, so a disabled level never builds one.
+/// root and its failed-step flag, before a report exists, so a disabled level never builds one.
 /// </summary>
 internal sealed class ChronicleEmissionPolicy(ChronicleOptions options, Func<double>? nextSample = null)
 {
     private readonly Func<double> _nextSample = nextSample ?? Random.Shared.NextDouble;
 
-    internal LogLevel LevelOf(ChronicleStepStatus status, TimeSpan duration, int? httpStatusCode = null)
+    internal LogLevel LevelOf(ChronicleStepStatus status, TimeSpan duration, int? httpStatusCode = null, bool hasFailedSteps = false)
     {
         if (status == ChronicleStepStatus.Failed || httpStatusCode >= 500)
         {
             return LogLevel.Error;
         }
 
-        return status == ChronicleStepStatus.Cancelled || httpStatusCode >= 400 || duration >= options.SlowThreshold
+        return status == ChronicleStepStatus.Cancelled || hasFailedSteps || httpStatusCode >= 400 || duration >= options.SlowThreshold
             ? LogLevel.Warning
             : LogLevel.Information;
     }

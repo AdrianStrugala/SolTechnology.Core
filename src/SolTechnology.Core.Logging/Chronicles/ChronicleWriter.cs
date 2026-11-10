@@ -86,7 +86,11 @@ internal sealed class ChronicleWriter(ChronicleOptions options, TimeProvider tim
     internal void Fail(ChronicleNode node, string errorType, string? message, Exception? exception)
     {
         node.Fail(Truncate(errorType), message is null ? null : Truncate(message));
-        if (exception is not null && node.Parent is null)
+        if (node.Parent is not null)
+        {
+            node.Root.MarkFailedStep();
+        }
+        else if (exception is not null)
         {
             node.Root.Exception = exception;
         }

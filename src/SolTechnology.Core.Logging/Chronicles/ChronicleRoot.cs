@@ -9,6 +9,7 @@ internal sealed class ChronicleRoot
     private int _lateStepCount;
     private int _stepCount = 1;
     private int _droppedStepCount;
+    private int _hasFailedSteps;
     private ChronicleFlightBuffer? _flightRecords;
 
     internal ChronicleRoot(ChronicleWriter owner, string name, long startTimestamp, Activity? activity)
@@ -34,7 +35,12 @@ internal sealed class ChronicleRoot
     internal int StepCount => Volatile.Read(ref _stepCount);
     internal int DroppedStepCount => Volatile.Read(ref _droppedStepCount);
 
+    /// <summary><c>true</c> once any step below the root failed, recorded or dropped; it escalates an <c>Ok</c> root to Warning.</summary>
+    internal bool HasFailedSteps => Volatile.Read(ref _hasFailedSteps) == 1;
+
     internal void CountLateStep() => Interlocked.Increment(ref _lateStepCount);
+
+    internal void MarkFailedStep() => Volatile.Write(ref _hasFailedSteps, 1);
 
     /// <summary>Reserves one recorded node under <paramref name="maxSteps"/>; otherwise counts a dropped step.</summary>
     internal bool TryReserveStep(int maxSteps)

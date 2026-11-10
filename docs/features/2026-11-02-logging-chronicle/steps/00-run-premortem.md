@@ -261,7 +261,8 @@ Bus message into an abandon loop.
   `ParallelSet_OnSharedNode_NoExceptionAndNoLostKeys`: 64 `Task.WhenAll` branches call
   `Current.Set` with distinct keys and `MaxAttributesPerStep = 64`, and every key is present.
 - **CRM-14** → [04](04-emission-level-sampling-and-registration.md): the reporter derives the level
-  from status, duration, and HTTP status **before** it builds the report, and skips building when
+  from status, duration, HTTP status, and the root's failed-step flag (code review A5) **before** it
+  builds the report, and skips building when
   `!logger.IsEnabled(level)`. Rendering runs only when a provider formats the entry. Tests
   `CategoryAboveLevel_OkRoot_ReportNotBuilt` (internal builder seam counted) and
   `Root_TenSteps_Emitted_AllocatesUnderCeiling`; the ceiling is pinned at the first green

@@ -33,7 +33,7 @@ internal sealed class ChronicleReporter(ILoggerFactory loggerFactory, IOptions<C
 
     private void Report(ChronicleRoot root)
     {
-        var level = Policy.LevelOf(root.Node.Status, root.Duration);
+        var level = Policy.LevelOf(root.Node.Status, root.Duration, hasFailedSteps: root.HasFailedSteps);
         if (!_logger.IsEnabled(level))
         {
             return;

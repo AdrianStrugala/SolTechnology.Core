@@ -58,7 +58,7 @@ internal static class ChronicleRequestRoot
         {
             var statusCode = context.Response.StatusCode;
             var policy = root.Owner.Policy;
-            var level = policy.LevelOf(root.Node.Status, root.Duration, statusCode);
+            var level = policy.LevelOf(root.Node.Status, root.Duration, statusCode, root.HasFailedSteps);
             if (!logger.IsEnabled(level))
             {
                 return;

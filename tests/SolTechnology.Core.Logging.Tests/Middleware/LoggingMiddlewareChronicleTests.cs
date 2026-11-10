@@ -50,13 +50,22 @@ public class LoggingMiddlewareChronicleTests : LoggingMiddlewareChronicleTestBas
             "\nHTTP GET [@0 ms] [50 ms] [ok] Route=unmatched StatusCode=200\n`- LoadCities [@0 ms] [50 ms] [ok]\n   `- Db [@30 ms] [20 ms] [ok]]");
     }
 
-    [TestCase(StatusCodes.Status200OK, 2000, "Ok")]
-    [TestCase(StatusCodes.Status404NotFound, 0, "Ok")]
-    public async Task InvokeAsync_SlowRequestOr404_LogsWarning(int statusCode, int durationMs, string chronicleStatus)
+    [TestCase(StatusCodes.Status200OK, 2000, "Ok", false)]
+    [TestCase(StatusCodes.Status404NotFound, 0, "Ok", false)]
+    [TestCase(StatusCodes.Status200OK, 0, "Ok", true)]
+    public async Task InvokeAsync_SlowRequest404OrFailedStep_LogsWarning(int statusCode, int durationMs, string chronicleStatus, bool failStep)
     {
         // Act
         await Invoke(context =>
         {
+            using (var step = Chronicle.Step("Db"))
+            {
+                if (failStep)
+                {
+                    step.Fail("Timeout");
+                }
+            }
+
             Time.Advance(TimeSpan.FromMilliseconds(durationMs));
             context.Response.StatusCode = statusCode;
             return Task.CompletedTask;

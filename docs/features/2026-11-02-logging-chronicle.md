@@ -309,7 +309,8 @@ engine through the run's `IServiceProvider`. So does the only external call site
 Rendering and levels:
 
 - **Level:** `Failed` → Error; `Cancelled` → Warning; `Ok` and duration ≥ `SlowThreshold` →
-  Warning; HTTP 4xx → Warning (as today); otherwise Information.
+  Warning; `Ok` with a failed step below the root → Warning (code review A5); HTTP 4xx → Warning
+  (as today); otherwise Information.
 - **Flight recorder:** attached only when the root is `Failed`.
 - **Tree:** ASCII only (`|-`, `` `- ``, `x42`) so that every sink and encoding renders it.
 - **Child order:** siblings are ordered by start offset.
@@ -368,8 +369,8 @@ Integration types are internal: `ChronicleHTTPHandler`, `ChronicleHTTPAttemptHan
 - **LC-01** — HTTP finish entry. EventId **2155** `RequestChronicleReported`, template
   `Finished request [{RequestMethod}] [{RequestPath}] -> [{StatusCode}] in [{ElapsedMs} ms]. Chronicle: [{ChronicleStatus}] [{@Chronicle}]`.
   `{@Timings}` is removed, and with it EventId 2147 `RequestFinishedWithTimings`, whose id is
-  retired (R8). A successful request slower than `SlowThreshold` logs at Warning
-  (Information before). Step 09.
+  retired (R8). A successful request slower than `SlowThreshold`, or one with a failed step below
+  the root (code review A5), logs at Warning (Information before). Step 09.
 - **LC-02** — A failed request logs **one** Error entry (EventId 2155, exception attached,
   `ChronicleStatus = Failed`), which replaces "Request [..] failed after [..]" and keeps P-15. A
   client abort logs Warning 2155 with `ChronicleStatus = Cancelled`, which replaces "aborted by
@@ -378,9 +379,11 @@ Integration types are internal: `ChronicleHTTPHandler`, `ChronicleHTTPAttemptHan
 - **LC-03** — NEW EventId **2154** `ChronicleReported` per non-HTTP root, template
   `Chronicle [{ChronicleName}] [{ChronicleStatus}] in [{DurationMs} ms], [{StepCount}] steps: [{@Chronicle}]`.
   Roots: CQRS commands outside requests, fire-and-forget events (CP-06), MessageBus messages,
-  Hangfire jobs, and manual `Begin`/`BeginRoot`. Step 04.
+  Hangfire jobs, and manual `Begin`/`BeginRoot`. An `Ok` root with a failed step logs at Warning,
+  so a Warning minimum level still keeps it (code review A5). Step 04.
 - **LC-04** — With `SampleRate < 1`, fast successful roots, including the HTTP finish entry, may
-  emit nothing (opt-in; the default `1.0` emits everything). Step 04.
+  emit nothing (opt-in; the default `1.0` emits everything). A root with a failed step is never
+  sampled away. Step 04.
 - **LC-05** — With `FlightRecorder.Enabled`, Debug/Trace entries from inside a failed root appear
   in its report. Other providers still apply their own filters. Step 06.
 - EventIds 2154/2155 sit after the ids already shipped: 2137–2148 (Logging), 2149 (CQRS
