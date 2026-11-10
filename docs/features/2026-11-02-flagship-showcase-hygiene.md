@@ -35,7 +35,8 @@ step numbers in parentheses):
   [`2026-11-02-core-2-0-tale`](2026-11-02-core-2-0-tale.md) steps 03 (18), 07 (39), and 11 (43), and
   [`2026-11-02-core-2-0-api-auth`](2026-11-02-core-2-0-api-auth.md) step 05 (22; step 04 before the 2026-11-03 renumbering) are `done`.
 
-None of these features needs to be `completed`. Notation: `core NN` names a step of the core
+None of these features needs to be `completed`. All of them are `done` or `completed` as of
+2026-11-10 (see "Resync with the shipped 2.0 libraries" below). Notation: `core NN` names a step of the core
 (foundation) feature; `result NN`, `auid NN`, `tale NN`, and `api-auth NN` name steps of the library
 features above. Per step:
 
@@ -179,6 +180,24 @@ listed in "Depends on". The "Post-review core no." column below uses pre-regroup
 | 06 | 76 | DreamTravel — run instructions and architecture section | No core prerequisite since decision B (2026-11-02). |
 | 07 | 77 | DreamTravel — tests in GitHub CI | After step 02. Runs on push and PR; not a required check (decision A, user, 2026-11-02: no `master` ruleset). |
 | 08 | — | Retrospective | — |
+
+### Resync with the shipped 2.0 libraries (2026-11-10)
+
+The plan was written on 2026-11-02, before the 13 library features, Chronicle, Redis fail-fast,
+and foundation steps 01–05 and 07–10 shipped. The step files were compared with `master@c0eb9482`,
+the briefs' Deviations, and `docs/architecture/*.md`. The Evidence section above stays as the
+2026-11-02 record. No step is removed; two items were already delivered.
+
+| Step | Drift at `c0eb9482` | Fixed in the step file |
+|---|---|---|
+| 01 | The `README.md:65-66` anchors resolve now (module-docs steps), but still skip the packed testing pages. The "Core (foundation)" row (`:39`) links to `docs/CQRS.md` although `docs/Core.md` exists (core-result). Community Standards includes settings-only items that need admin rights. | Link targets, `:39` added, owner-confirmed settings |
+| 02 | Line numbers moved (unlist `:23`, publish `:20,22,87,102,107`); the stats workflow has a fifth Polish comment at `:60`. `docs/CICD.md` documents every workflow but was not listed. Core 03 shipped without the `nuget-release` environment. | Paths, `:60`, `docs/CICD.md` |
+| 03 | v1 line numbers moved. The two new queries need `DreamTravel.Queries` → `DreamTravel.GraphDatabase`, which did not exist. The Swagger contract snapshot changes with the response types. Chronicle shipped before this step, inverting its planned order. | `.csproj` and snapshot added, Chronicle note |
+| 04 | `AddAuthenticationAndBuildFilter` is already gone: **already delivered by api-auth 01** (`d46525f1`). `CLAUDE.md §11` rows are already accurate: **already delivered by auid 03** (`dd64b0d2`) and tale. New stale facts: §13 `AggregateError` namespace, §15 Newtonsoft row. | Auth edit dropped, `CLAUDE.md` is a check, §13 and §15 added |
+| 05 | The Worker does not reference `DreamTravel.Queries` (the reference is new, not conditional); Worker `Program.cs:55` is now `:56`. The Domain reference removal breaks no transitive consumer. | Paths, reference made unconditional |
+| 06 | The README grew to 519 lines with the Chronicle section (`:179-205`); the future-work item moved to `:516`. `docker-compose.yml` is stale against Aspire. | Line numbers, Chronicle section kept, compose deleted |
+| 07 | The exact test projects were unnamed; `docs/CICD.md` was not listed; the throwaway-branch check cannot trigger on a plain branch push; `origin/master` is not a reliable diff base without branch protection. | Project list, `docs/CICD.md`, trigger and base |
+| 08 | `package-release.md:12` is stale since core 03 but belongs to core 11. | Note added; Dockerfile follow-up |
 
 ## Acceptance criteria
 

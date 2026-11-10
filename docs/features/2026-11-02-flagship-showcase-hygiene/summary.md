@@ -14,7 +14,8 @@ Split from
 [`../2026-11-02-core-2-0-flagship-hardening.md`](../2026-11-02-core-2-0-flagship-hardening.md) on
 2026-11-02 (RQ8, user). Implementation starts only after core 02, 03, 04, 05, 07, result 02,
 auid 03, tale 03, 07, 11, and api-auth 05 are `done` (former core steps 02, 03, 04, 08, 54, 38,
-44, 18, 39, 43, 22; per-step table and links in the brief). No step is `blocked`.
+44, 18, 39, 43, 22; per-step table and links in the brief). All of them are done (verified
+2026-11-10 at `c0eb9482`; the step files were resynced the same day). No step is `blocked`.
 
 ## Steps
 

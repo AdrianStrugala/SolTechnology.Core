@@ -15,6 +15,8 @@ when steps 01–07 are `done`, or were removed by the plan-reviewer.
 ## Affected components
 - `docs/architecture/package-release.md` — EDIT — actions pinned to commit SHAs with `# vX.Y.Z` comments; Dependabot for `nuget` and `github-actions` (Dependabot PRs still follow `CLAUDE.md §6`); `publish` needs `dreamtravel-tests`
 - `docs/architecture/testing.md` — EDIT — DreamTravel unit and component tests run in the GitHub Actions job `dreamtravel-tests`; Google integration tests stay skipped; the Azure DevOps pipelines are kept without CI coverage (AR-4, Q9)
+- `docs/CICD.md` — CHECK — steps 02 and 07 updated it; confirm it matches the delivered workflows
+- `docs/architecture/package-release.md` — note: its `:12` claim that `workflow_dispatch` publishes is stale since core 03 (no environment; tag-only publish) and belongs to the core retrospective (core 11); do not duplicate that fix here, only avoid contradicting it
 - `docs/features/2026-11-02-flagship-showcase-hygiene.md` — EDIT — `Completion summary`, `Deviations`, `Follow-ups`, `status: completed`, `completed: YYYY-MM-DD`
 - `docs/features/2026-11-02-flagship-showcase-hygiene/` — DELETE
 
@@ -25,6 +27,7 @@ when steps 01–07 are `done`, or were removed by the plan-reviewer.
    - Git LFS or release assets for `wroclaw_drive.graphml` and `research_documentation.docx`.
    - CI coverage or retirement of the DreamTravel Azure DevOps pipelines (AR-4, Q9).
    - The outcome of the `CitySearched` persisted-type mitigation (H1, step 05).
+   - `src/Infrastructure/DreamTravelDatabase/Dockerfile` is orphaned once step 06 deletes `docker-compose.yml`.
 4. Set feature status to `completed` (or `abandoned`) with `completed: YYYY-MM-DD` (`CLAUDE.md §2`: confirm with the user first).
 5. Verify that no durable link points into this working folder: `grep -rn "2026-11-02-flagship-showcase-hygiene/" --include=*.md . | grep -v "^./docs/features/2026-11-02-flagship-showcase-hygiene/"` prints nothing.
 6. Delete the working folder, then search Markdown for the deleted path and repair dangling links.

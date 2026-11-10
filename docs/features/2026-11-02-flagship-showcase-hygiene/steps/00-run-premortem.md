@@ -23,8 +23,8 @@ this plan, after `review` is `done` and after the core steps this feature depend
 
 - **Modules touched:**
   - Root community files: `README.md`, `CONTRIBUTING.md`, `SECURITY.md`, `CODE_OF_CONDUCT.md`, `CHANGELOG.md`, `.github/ISSUE_TEMPLATE/*`, `.github/PULL_REQUEST_TEMPLATE.md`, `.github/CODEOWNERS`, `dontreadme.md` Guards row (step 01; the file keeps its name, user, 2026-11-03).
-  - CI: `.github/workflows/publishPackages.yml` (steps 02, 07), `unlistDeprecatedPackages.yml` and `update-nuget-stats.yml` (step 02), `.github/dependabot.yml` (step 02).
-  - DreamTravel: `DreamTravel.Api` controllers and `Program.cs`, `DreamTravel.Queries`, `DreamTravel.Domain`, `DreamTravel.Worker`, unit and component tests, `README.md`, `initWorkspace.bat`, `docker-compose.yml` (steps 03, 05, 06).
+  - CI: `.github/workflows/publishPackages.yml` (steps 02, 07), `unlistDeprecatedPackages.yml` and `update-nuget-stats.yml` (step 02), `.github/dependabot.yml` (step 02), `docs/CICD.md` (steps 02, 07; resync 2026-11-10).
+  - DreamTravel: `DreamTravel.Api` controllers and `Program.cs`, `DreamTravel.Queries` (and its `.csproj`, which gains a `DreamTravel.GraphDatabase` reference), `DreamTravel.Domain`, `DreamTravel.Worker`, unit and component tests (including the Swagger contract snapshot), `README.md`, `initWorkspace.bat`, `docker-compose.yml` (steps 03, 05, 06).
   - Guidance: `docs/ClaudeCodingGuide.md`, `CLAUDE.md` (step 04).
   - `SolTechnology.Core.slnx` `/Docs/` entries (step 01).
 - **Contract delta:** see the feature brief
@@ -37,8 +37,8 @@ this plan, after `review` is `done` and after the core steps this feature depend
   - `sample-tale-code-apps/DreamTravel/src/LogicLayer/DreamTravel.Queries/ModuleInstaller.cs`: step 05 (BOM removal; the `LimitCostOfPathsService` → `LimitCostOfPathsHandler` rename is picked up by `RegisterQueriesFromAssembly`).
 - **`Directory.Build.props` edits:** none.
 - **Persisted contracts:**
-  - Step 05: `CitySearched` moves from `DreamTravel.Domain.Events` to `DreamTravel.Queries.Events`. DreamTravel registers `AddSolPersistentEvents()` (`DreamTravel.Api/Program.cs:125`, `DreamTravel.Worker/Program.cs:55`), so the event is stored as a Hangfire job argument with its type name (design choice H1 in the brief).
-- **Applicable checklists** (`.github/skills/premortem/references/`): `di.md`, `cqrs.md`, `build-and-nuget.md`, and the Hangfire checklist that core step 00 adds. If that file is still missing, the premortem writes it in the same change.
+  - Step 05: `CitySearched` moves from `DreamTravel.Domain.Events` to `DreamTravel.Queries.Events`. DreamTravel registers `AddSolPersistentEvents()` (`DreamTravel.Api/Program.cs:125`, `DreamTravel.Worker/Program.cs:56`), so the event is stored as a Hangfire job argument with its type name (design choice H1 in the brief).
+- **Applicable checklists** (`.github/skills/premortem/references/`): `di.md`, `cqrs.md`, `build-and-nuget.md`, `hangfire.md` (added by core step 00, present at `c0eb9482`), plus `api.md`, `logging.md`, and `testing-kits.md` because steps 03 and 07 change filter-visible controller results, Chronicle-visible request paths, and run the testing kits on Linux CI.
 - **Steps under review:**
   - [01](01-community-health-files-and-root-readme.md),
     [02](02-workflow-supply-chain-hardening.md),

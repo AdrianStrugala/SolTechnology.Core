@@ -25,17 +25,18 @@ planned").
 - `sample-tale-code-apps/DreamTravel/src/DreamTravel.Domain/Events/CitySearched.cs` — DELETE
 - `sample-tale-code-apps/DreamTravel/src/LogicLayer/DreamTravel.Queries/Events/CitySearched.cs` — NEW — same record, `: IEvent` (publishers: `FindCityByNameHandler.cs`, `FindCityByCoordinatesHandler.cs`)
 - `sample-tale-code-apps/DreamTravel/src/Presentation/DreamTravel.Worker/EventHandlers/OnCitySearched/LogEventInfoJob.cs`, `SaveCitySearchJob.cs` — EDIT — `using DreamTravel.Queries.Events;`
-- `sample-tale-code-apps/DreamTravel/src/Presentation/DreamTravel.Worker/DreamTravel.Worker.csproj` — EDIT — `ProjectReference` to `DreamTravel.Queries` only if not already present (Presentation → Logic is allowed by Guide §1)
+- `sample-tale-code-apps/DreamTravel/src/Presentation/DreamTravel.Worker/DreamTravel.Worker.csproj` — EDIT — NEW `ProjectReference` to `DreamTravel.Queries` (verified 2026-11-10: not present; the Worker references Domain, Commands, and ServiceDefaults only. Presentation → Logic is allowed by Guide §1)
 - `sample-tale-code-apps/DreamTravel/src/LogicLayer/DreamTravel.Queries/LimitCostOfPaths/LimitCostOfPathsService.cs` — DELETE → `LimitCostOfPathsHandler.cs` — NEW — same logic on a copy of `query.Paths`
 - `sample-tale-code-apps/DreamTravel/src/LogicLayer/DreamTravel.Queries/CalculateBestPath/CalculateBestPathTale.cs` — EDIT — `:5-6` duplicate using
 - `sample-tale-code-apps/DreamTravel/src/LogicLayer/DreamTravel.Queries/ModuleInstaller.cs` — EDIT — `:1` BOMs
-- `sample-tale-code-apps/DreamTravel/src/Presentation/DreamTravel.Api/Program.cs` — EDIT — `:50` currency symbol
+- `sample-tale-code-apps/DreamTravel/src/Presentation/DreamTravel.Api/Program.cs` — EDIT — `:50` currency symbol (U+FFFD today)
 - `sample-tale-code-apps/DreamTravel/tests/Unit/DreamTravel.Queries.UnitTests/**` — EDIT — renamed handler; test that the input list is not mutated
 
 ## Changes
 - `git mv` for renames to keep history.
-- Prerequisite: tale 07 ([`2026-11-02-core-2-0-tale`](../../2026-11-02-core-2-0-tale.md); former core step 39) is merged; it edits the same `DreamTravel.Queries` chapter files.
-- Persisted-contract note (premortem trigger, found at the split on 2026-11-02): DreamTravel registers `AddSolPersistentEvents()` (`DreamTravel.Api/Program.cs:125`, `DreamTravel.Worker/Program.cs:55`), so `CitySearched` is stored as a Hangfire job argument. Moving it from `DreamTravel.Domain.Events` to `DreamTravel.Queries.Events` changes the stored type name; jobs enqueued before the move may fail to deserialize. The premortem (step 00) decides the mitigation.
+- Prerequisite: tale 07 ([`2026-11-02-core-2-0-tale`](../../2026-11-02-core-2-0-tale.md); former core step 39) is merged; it edits the same `DreamTravel.Queries` chapter files. Done (verified 2026-11-10); the line references above still match `c0eb9482`.
+- Removing the Domain's CQRS reference breaks no transitive consumer (verified 2026-11-10): `CitySearched.cs` is the only Domain file that uses `SolTechnology.Core.*`; `DreamTravel.Ui` and `DreamTravel.Commands` reference CQRS directly; the Worker gets it through Commands; GraphDatabase, Sql, and GeolocationDataClients use no CQRS type.
+- Persisted-contract note (premortem trigger, found at the split on 2026-11-02): DreamTravel registers `AddSolPersistentEvents()` (`DreamTravel.Api/Program.cs:125`, `DreamTravel.Worker/Program.cs:56`), so `CitySearched` is stored as a Hangfire job argument. Moving it from `DreamTravel.Domain.Events` to `DreamTravel.Queries.Events` changes the stored type name; jobs enqueued before the move may fail to deserialize. The premortem (step 00) decides the mitigation.
 
 ## Acceptance criteria
 - [ ] `grep -n "SolTechnology.Core.CQRS" sample-tale-code-apps/DreamTravel/src/DreamTravel.Domain/DreamTravel.Domain.csproj` prints nothing.
