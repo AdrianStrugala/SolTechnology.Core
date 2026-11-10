@@ -1,20 +1,25 @@
 namespace SolTechnology.Core.Logging.Chronicles;
 
 /// <summary>
-/// One recorded step. Children, attributes, status and failure are written under one lock, so
-/// concurrent branches that share a node can never throw into the caller.
+/// One recorded step. Children, attributes, overflow aggregates, status and failure are written
+/// under one lock, so concurrent branches that share a node can never throw into the caller.
+/// An overflow node (beyond <see cref="ChronicleOptions.MaxSteps"/>) is never attached to its
+/// parent; on close it only feeds the parent's aggregate for its group key.
 /// </summary>
-internal sealed class ChronicleNode(ChronicleRoot root, ChronicleNode? parent, string name, string groupKey, long startTimestamp)
+internal sealed class ChronicleNode(ChronicleRoot root, ChronicleNode? parent, string name, string groupKey, long startTimestamp, bool isOverflow = false)
 {
     private readonly Lock _gate = new();
     private List<ChronicleNode>? _children;
     private List<KeyValuePair<string, string>>? _attributes;
+    private ChronicleOverflowGroups? _overflow;
     private int _closed;
+    private int _droppedDeeperCount;
 
     internal ChronicleRoot Root { get; } = root;
     internal ChronicleNode? Parent { get; } = parent;
     internal string Name { get; } = name;
     internal string GroupKey { get; } = groupKey;
+    internal bool IsOverflow { get; } = isOverflow;
     internal int Depth { get; } = parent is null ? 0 : parent.Depth + 1;
     internal long StartTimestamp { get; } = startTimestamp;
     internal long EndTimestamp { get; private set; }
@@ -22,6 +27,8 @@ internal sealed class ChronicleNode(ChronicleRoot root, ChronicleNode? parent, s
     internal string? ErrorType { get; private set; }
     internal string? ErrorMessage { get; private set; }
     internal bool IsUnfinished { get; private set; }
+    internal int DroppedAttributeCount { get; private set; }
+    internal int DroppedDeeperCount => Volatile.Read(ref _droppedDeeperCount);
     internal bool IsClosed => Volatile.Read(ref _closed) == 1;
 
     internal void AddChild(ChronicleNode child)
@@ -32,7 +39,17 @@ internal sealed class ChronicleNode(ChronicleRoot root, ChronicleNode? parent, s
         }
     }
 
-    internal void SetAttribute(string key, string value)
+    internal void CountDroppedDeeper() => Interlocked.Increment(ref _droppedDeeperCount);
+
+    internal void AddOverflow(string groupKey, long startTimestamp, long elapsedTicks, bool failed)
+    {
+        lock (_gate)
+        {
+            (_overflow ??= new ChronicleOverflowGroups()).Add(groupKey, startTimestamp, elapsedTicks, failed);
+        }
+    }
+
+    internal void SetAttribute(string key, string value, int maxAttributes)
     {
         lock (_gate)
         {
@@ -44,6 +61,12 @@ internal sealed class ChronicleNode(ChronicleRoot root, ChronicleNode? parent, s
                     _attributes[i] = new(key, value);
                     return;
                 }
+            }
+
+            if (_attributes.Count >= maxAttributes)
+            {
+                DroppedAttributeCount++;
+                return;
             }
 
             _attributes.Add(new(key, value));
@@ -97,6 +120,14 @@ internal sealed class ChronicleNode(ChronicleRoot root, ChronicleNode? parent, s
         lock (_gate)
         {
             return _attributes is null ? [] : [.. _attributes];
+        }
+    }
+
+    internal KeyValuePair<string, ChronicleOverflow>[] SnapshotOverflow()
+    {
+        lock (_gate)
+        {
+            return _overflow is null ? [] : _overflow.Snapshot();
         }
     }
 }

@@ -1,7 +1,7 @@
 ---
 spec: 2026-11-02-logging-chronicle
 step: 02
-status: to-do
+status: done
 ---
 
 # Step 02: Chronicle — bounded recording and options validation
@@ -55,13 +55,35 @@ still feed a per-parent aggregate (count, total and max duration, failed count),
     distinct names → at most 65 overflow entries, the total count is preserved).
 
 ## Acceptance criteria
-- [ ] `dotnet test tests/SolTechnology.Core.Logging.Tests --filter "FullyQualifiedName~Chronicles"` is green.
-- [ ] `Step_ChronicleDisabled_AllocatesNothing` (step 01) is still green.
-- [ ] `find src/SolTechnology.Core.Logging/Chronicles -name "*.cs" | xargs wc -l | awk '$1>150 && $2!="total"'` prints nothing.
-- [ ] CRM-3: `StepName_TooLong_TruncatedWithMarker` is green.
-- [ ] CRM-9: `MaxSteps_Exceeded_TenThousandDistinctNames_OverflowGroupsBounded` is green.
+- [x] `dotnet test tests/SolTechnology.Core.Logging.Tests --filter "FullyQualifiedName~Chronicles"` is green.
+- [x] `Step_ChronicleDisabled_AllocatesNothing` (step 01) is still green.
+- [x] `find src/SolTechnology.Core.Logging/Chronicles -name "*.cs" | xargs wc -l | awk '$1>150 && $2!="total"'` prints nothing.
+- [x] CRM-3: `StepName_TooLong_TruncatedWithMarker` is green.
+- [x] CRM-9: `MaxSteps_Exceeded_TenThousandDistinctNames_OverflowGroupsBounded` is green.
 
 ## Open questions
 - none (OQ-1 confirmed by the user 2026-11-02: `CH-04` limit properties)
 
 ## Deviations
+
+### Tree writing extracted into `ChronicleWriter`
+
+**Original plan:** apply the limits in `ChronicleRecorder.cs`.
+
+**Actual implementation:** with the limits the recorder reached 145 lines, and steps 05, 07, and 08
+add to it. The tree writing (start root/child, limits, close, listeners) moved into the internal
+`ChronicleWriter`; `ChronicleRecorder` keeps the `IChronicle` surface. `ChronicleRoot.Owner` is the
+writer (one per recorder), which is what CRM-1 compares. Two small internal helpers were added:
+`ChronicleText` (the `[truncated]` cut) and `ChronicleOverflowGroups` (the 64-key cap of CRM-9).
+
+### Overflow handle is a detached node
+
+**Original plan:** a `ChronicleStep` variant that holds (parent, group key, start timestamp)
+without a node.
+
+**Actual implementation:** a beyond-`MaxSteps` step gets an `IsOverflow` `ChronicleNode` that is
+never attached to its parent and never becomes ambient. It reuses the node's idempotent close and
+status, so `Fail` on an overflow step feeds the aggregate's failed count and a double `Dispose`
+counts once. Its attributes are ignored. `MaxDepth` counts below the root (root depth 0): a step is
+recorded when its depth is at most `MaxDepth`.
+

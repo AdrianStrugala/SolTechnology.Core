@@ -46,7 +46,7 @@ public class ChronicleConcurrencyTests : ChronicleTestBase
     public void ParallelAppends_ToOneParent_LoseNoChildren()
     {
         // Arrange
-        var sut = CreateRecorder();
+        var sut = CreateRecorder(o => o.MaxSteps = 10_000);
 
         // Act
         using (sut.Begin("Root"))
@@ -65,7 +65,7 @@ public class ChronicleConcurrencyTests : ChronicleTestBase
     public async Task ParallelSet_OnSharedNode_NoExceptionAndNoLostKeys()
     {
         // Arrange
-        var sut = CreateRecorder();
+        var sut = CreateRecorder(o => o.MaxAttributesPerStep = 64);
 
         // Act
         using (sut.Begin("Root"))
