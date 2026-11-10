@@ -14,7 +14,8 @@
 - .NET 10 SDK (10.0.100 or later).
 - Docker Desktop, running. On Apple silicon turn on "Use Rosetta for x86_64/amd64 emulation" in
   Docker Desktop's settings: the SQL Server image is amd64 only.
-- Free local ports 1404 (SQL Server), 7474 and 7687 (Neo4j), and 2020/2021 (API).
+- Free local ports 1404 (SQL Server), 7474 and 7687 (Neo4j), 2020/2021 (API), 2025 (Worker),
+  7024 (UI), and 17060 (Aspire dashboard).
 - A trusted HTTPS development certificate, once per machine: `dotnet dev-certs https --trust`.
 - Internet access on the first start (container images, NuGet packages, the Neo4j APOC plugin).
 
@@ -35,16 +36,23 @@ The `dotnet build` line writes `artifacts/dacpac/DreamTravelDatabase.dacpac`, wh
 into SQL Server once the container is up. Skip it and the deployment fails, so the API and the
 Worker wait forever. `dotnet run` builds the API, the Worker, and the UI itself.
 
-The first start pulls the SQL Server and Neo4j images and imports the Wrocław street graph, which
-takes a few minutes (longer under amd64 emulation). The containers are persistent, so later starts
-reuse them. The console prints the dashboard link with its login token:
+The first start pulls the SQL Server and Neo4j images, which takes a few minutes (longer under
+amd64 emulation). The containers are persistent, so later starts reuse them. The console prints
+the dashboard link with its login token:
 `Login to the dashboard at https://localhost:17060/login?t=...`.
+
+- On macOS, Aspire reads the development certificate's private key from the keychain when it
+  starts. If a keychain prompt appears, allow it; the start waits until you answer.
+- Neo4j loads the Wrocław street graph (`Data/wroclaw_drive.graphml`) when it is empty. If the
+  console prints `Failed to initialize Neo4j graph`, Neo4j was not accepting connections yet: stop
+  with Ctrl+C and start again, and the next start imports the graph.
 
 | What | Where |
 |---|---|
 | Aspire dashboard (resources, logs, traces) | the login link printed to the console |
 | API and Swagger UI | `https://localhost:2021/swagger` (HTTP on 2020 redirects to HTTPS) |
-| Worker: Hangfire dashboard, GraphQL playground | the `dreamtravel-worker` endpoint in the dashboard, then `/hangfire/ui` or `/graphql/ui` |
+| Worker: Hangfire dashboard, GraphQL playground | `http://localhost:2025/hangfire/ui`, `http://localhost:2025/graphql/ui` |
+| UI (see "Known limitations") | `https://localhost:7024` |
 | Neo4j browser | `http://localhost:7474` (user `neo4j`, password `neo4jpass`) |
 
 ### Smoke test
@@ -80,8 +88,7 @@ dotnet run --project src/DreamTravel.Aspire
   `https://localhost:2021` as a fixed base URL, and ships `<SECRET>` as its Google Maps key, so its
   map pages need your own Google Maps key and do not work end to end today. Use Swagger or `curl`
   instead; the alignment is planned work.
-- Toll costs come from the Michelin API and city search from GeoDB; neither has a key configured
-  locally.
+- Toll costs come from the Michelin API, which has no key configured locally.
 
 ### Running the tests
 
