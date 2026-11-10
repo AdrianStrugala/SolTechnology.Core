@@ -41,7 +41,7 @@ public abstract class ChronicleHTTPTestBase
         Upstream.Dispose();
     }
 
-    protected void Build(HttpPolicyConfiguration? policy = null, bool propagateCorrelation = true)
+    protected void Build(HttpPolicyConfiguration? policy = null, bool propagateCorrelation = true, int? timeoutSeconds = null)
     {
         _provider?.Dispose();
         var services = new ServiceCollection()
@@ -49,7 +49,7 @@ public abstract class ChronicleHTTPTestBase
             .AddLogging(builder => builder.SetMinimumLevel(LogLevel.Trace).AddProvider(new FakeLoggerProvider(Logs)));
         services.AddSolHTTPClient<ISampleHTTPClient, SampleHTTPClient>(
             "Sample",
-            new HTTPClientConfiguration { BaseAddress = "http://api.test/" },
+            new HTTPClientConfiguration { BaseAddress = "http://api.test/", TimeoutSeconds = timeoutSeconds },
             policy ?? new HttpPolicyConfiguration { RetryInitialDelay = 0, RequestTimeout = 50 },
             propagateCorrelation);
         services.AddHttpClient("Sample").ConfigurePrimaryHttpMessageHandler(() => Upstream);

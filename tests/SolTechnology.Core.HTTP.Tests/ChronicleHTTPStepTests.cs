@@ -77,6 +77,24 @@ public class ChronicleHTTPStepTests : ChronicleHTTPTestBase
         report.Should().EndWith("[cancelled] Host=api.test Attempts=1]");
     }
 
+    [Test]
+    public async Task Send_HttpClientTimeoutWithoutPolly_StepFailedWithTimeoutException()
+    {
+        // Arrange
+        Build(new HttpPolicyConfiguration { UsePolly = false }, timeoutSeconds: 1);
+        Upstream.Then(async token =>
+        {
+            await Task.Delay(Timeout.Infinite, token);
+            return new HttpResponseMessage(HttpStatusCode.OK);
+        });
+
+        // Act
+        var report = await SendInRoot(HttpMethod.Get);
+
+        // Assert
+        report.Should().EndWith("[failed] Error=[TimeoutException] Host=api.test Attempts=1]");
+    }
+
     [TestCase("GET", 3)]
     [TestCase("POST", 1)]
     public async Task Send_Timeout_StepFailed(string method, int expectedAttempts)

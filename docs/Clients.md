@@ -336,6 +336,7 @@ the resilience pipeline made.
 | 2xx–4xx response | `Ok` (a 4xx is often expected; see `StatusCode`) |
 | 5xx final response | `Failed` (`HTTP500`, …) |
 | Exception in the pipeline (timeout, broken circuit, connection failure) | `Failed`, with the exception type |
+| `HttpClient.Timeout` elapsed (`UsePolly = false` with `TimeoutSeconds`) | `Failed` (`TimeoutException`) |
 | Caller cancellation | `Cancelled` |
 
 The path and query are never recorded, because they can carry personal data. Calls in a loop
