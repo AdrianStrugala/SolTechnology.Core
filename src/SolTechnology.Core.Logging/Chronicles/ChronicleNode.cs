@@ -1,3 +1,5 @@
+using System.Diagnostics;
+
 namespace SolTechnology.Core.Logging.Chronicles;
 
 /// <summary>
@@ -22,6 +24,7 @@ internal sealed class ChronicleNode(ChronicleRoot root, ChronicleNode? parent, s
     internal bool IsOverflow { get; } = isOverflow;
     internal int Depth { get; } = parent is null ? 0 : parent.Depth + 1;
     internal long StartTimestamp { get; } = startTimestamp;
+    internal Activity? Activity { get; init; }
     internal long EndTimestamp { get; private set; }
     internal ChronicleStepStatus Status { get; private set; }
     internal string? ErrorType { get; private set; }

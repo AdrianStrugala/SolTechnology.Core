@@ -32,6 +32,7 @@ internal sealed class ChronicleReportBuilder
             Name = _root.Node.Name,
             Status = _root.Node.Status,
             StartedAt = _root.StartedAt,
+            TraceId = _root.TraceId,
             DurationMs = rootStep.DurationMs,
             Steps = [rootStep],
             StepCount = _root.StepCount,

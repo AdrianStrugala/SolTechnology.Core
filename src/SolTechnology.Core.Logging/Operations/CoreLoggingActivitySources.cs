@@ -22,9 +22,10 @@ public static class CoreLoggingActivitySources
 {
     /// <summary>
     /// Name of the sources that emit one <see cref="Activity"/> per command or query tracked by
-    /// the logging pipeline behavior in <c>SolTechnology.Core.CQRS</c>, which owns its own source.
-    /// Tags mirror the <c>[LogScope]</c>-projected scope properties so trace UI and structured
-    /// logs use identical keys.
+    /// the logging pipeline behavior in <c>SolTechnology.Core.CQRS</c>, which owns its own source,
+    /// and one per recorded Chronicle step (<c>IChronicle.Begin</c> / <c>Step</c>; opt out with
+    /// <c>ChronicleOptions.EmitActivities = false</c>). Tags mirror the <c>[LogScope]</c>-projected
+    /// scope properties and Chronicle step attributes, so trace UI and structured logs use identical keys.
     /// </summary>
     public const string OperationsName = "SolTechnology.Core.Logging.Operations";
 

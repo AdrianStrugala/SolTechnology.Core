@@ -1,3 +1,5 @@
+using System.Diagnostics;
+
 namespace SolTechnology.Core.Logging.Chronicles;
 
 /// <summary>One root operation: its root node, wall-clock start, and the counters the report shows.</summary>
@@ -8,16 +10,18 @@ internal sealed class ChronicleRoot
     private int _stepCount = 1;
     private int _droppedStepCount;
 
-    internal ChronicleRoot(ChronicleWriter owner, string name, long startTimestamp)
+    internal ChronicleRoot(ChronicleWriter owner, string name, long startTimestamp, Activity? activity)
     {
         Owner = owner;
         StartedAt = owner.TimeProvider.GetUtcNow();
-        Node = new ChronicleNode(this, null, name, name, startTimestamp);
+        TraceId = ChronicleActivities.CurrentTraceId();
+        Node = new ChronicleNode(this, null, name, name, startTimestamp) { Activity = activity };
     }
 
     internal ChronicleWriter Owner { get; }
     internal ChronicleNode Node { get; }
     internal DateTimeOffset StartedAt { get; }
+    internal string? TraceId { get; }
     internal Exception? Exception { get; set; }
     internal bool IsReportedByCaller { get; set; }
     internal TimeSpan Duration => Owner.TimeProvider.GetElapsedTime(Node.StartTimestamp, Node.EndTimestamp);

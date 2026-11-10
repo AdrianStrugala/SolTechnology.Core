@@ -18,34 +18,34 @@ internal sealed class ChronicleRecorder(
 
     public ChronicleStep Current
         => Options.Enabled && AmbientChronicle.Current is { Root.IsClosed: false } node
-            ? new ChronicleStep(node, null, owns: false)
+            ? new ChronicleStep(node, null, owns: false, node.Activity)
             : default;
 
-    public ChronicleStep Begin(string name)
-    {
-        ArgumentNullException.ThrowIfNull(name);
-        if (!Options.Enabled)
-        {
-            return default;
-        }
-
-        var ambient = AmbientChronicle.Current;
-        return ambient is null || ambient.Root.IsClosed
-            ? Writer.StartRoot(name, ambient)
-            : Writer.StartChild(ambient, name);
-    }
+    public ChronicleStep Begin(string name) => Begin(name, withActivity: true);
 
     public ChronicleStep Step(string name)
     {
         ArgumentNullException.ThrowIfNull(name);
+        var ambient = AmbientChronicle.Current;
+        return !Options.Enabled || ambient is null || ambient.Root.IsClosed
+            ? Writer.StartActivityOnly(name)
+            : Writer.StartChild(ambient, name);
+    }
+
+    /// <summary>A <see cref="Begin(string)"/> for hosts that already own the operation's activity (HTTP request roots).</summary>
+    internal ChronicleStep BeginWithoutActivity(string name) => Begin(name, withActivity: false);
+
+    private ChronicleStep Begin(string name, bool withActivity)
+    {
+        ArgumentNullException.ThrowIfNull(name);
         if (!Options.Enabled)
         {
-            return default;
+            return withActivity ? Writer.StartActivityOnly(name) : default;
         }
 
         var ambient = AmbientChronicle.Current;
         return ambient is null || ambient.Root.IsClosed
-            ? default
-            : Writer.StartChild(ambient, name);
+            ? Writer.StartRoot(name, ambient, withActivity)
+            : Writer.StartChild(ambient, name, withActivity);
     }
 }

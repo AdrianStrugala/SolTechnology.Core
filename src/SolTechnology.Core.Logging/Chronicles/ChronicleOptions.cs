@@ -62,4 +62,10 @@ public sealed class ChronicleOptions
     /// failed, were cancelled, were slow, contain a failed step, or look like N+1 are always reported.
     /// </summary>
     public double SampleRate { get; set; } = 1.0;
+
+    /// <summary>
+    /// Starts an <see cref="System.Diagnostics.Activity"/> per recorded step on
+    /// <c>CoreLoggingActivitySources.OperationsName</c> when that source has listeners (default <c>true</c>).
+    /// </summary>
+    public bool EmitActivities { get; set; } = true;
 }

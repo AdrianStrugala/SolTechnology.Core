@@ -14,14 +14,19 @@ internal sealed class ChronicleWriter(ChronicleOptions options, TimeProvider tim
 
     internal string Truncate(string value) => ChronicleText.Truncate(value, Options.MaxAttributeValueLength);
 
-    internal ChronicleStep StartRoot(string name, ChronicleNode? previous)
+    internal ChronicleStep StartRoot(string name, ChronicleNode? previous, bool withActivity = true)
     {
-        var root = new ChronicleRoot(this, Truncate(name), TimeProvider.GetTimestamp());
+        name = Truncate(name);
+        var activity = withActivity ? ChronicleActivities.Start(Options, name) : null;
+        var root = new ChronicleRoot(this, name, TimeProvider.GetTimestamp(), activity);
         AmbientChronicle.Current = root.Node;
-        return new ChronicleStep(root.Node, previous, owns: true);
+        return new ChronicleStep(root.Node, previous, owns: true, activity);
     }
 
-    internal ChronicleStep StartChild(ChronicleNode parent, string name)
+    internal ChronicleStep StartActivityOnly(string name)
+        => ChronicleActivities.Start(Options, name) is { } activity ? new ChronicleStep(activity) : default;
+
+    internal ChronicleStep StartChild(ChronicleNode parent, string name, bool withActivity = true)
     {
         var root = parent.Root;
         if (parent.IsClosed)
@@ -41,10 +46,11 @@ internal sealed class ChronicleWriter(ChronicleOptions options, TimeProvider tim
             return new ChronicleStep(new ChronicleNode(root, parent, name, name, TimeProvider.GetTimestamp(), isOverflow: true), null, owns: true);
         }
 
-        var node = new ChronicleNode(root, parent, name, name, TimeProvider.GetTimestamp());
+        var activity = withActivity ? ChronicleActivities.Start(Options, name) : null;
+        var node = new ChronicleNode(root, parent, name, name, TimeProvider.GetTimestamp()) { Activity = activity };
         parent.AddChild(node);
         AmbientChronicle.Current = node;
-        return new ChronicleStep(node, parent, owns: true);
+        return new ChronicleStep(node, parent, owns: true, activity);
     }
 
     internal void SetAttribute(ChronicleNode node, string key, string value)

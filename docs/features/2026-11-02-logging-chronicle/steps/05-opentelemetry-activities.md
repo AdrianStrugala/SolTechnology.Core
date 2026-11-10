@@ -1,7 +1,7 @@
 ---
 spec: 2026-11-02-logging-chronicle
 step: 05
-status: to-do
+status: done
 ---
 
 # Step 05: Chronicle steps as OpenTelemetry Activities on `OperationsName`
@@ -46,11 +46,24 @@ their spans. Attributes become tags. Status maps to `ActivityStatusCode`.
     (`MaxSteps = 10`, 50 steps → at most 10 Activities from the root).
 
 ## Acceptance criteria
-- [ ] `dotnet test tests/SolTechnology.Core.Logging.Tests` is green.
-- [ ] `grep -rn "new ActivitySource" src/SolTechnology.Core.Logging` lists only `Operations/CoreLoggingActivitySources.cs`.
-- [ ] CRM-10: `MaxSteps_Exceeded_StartsNoActivityForDroppedSteps` is green.
+- [x] `dotnet test tests/SolTechnology.Core.Logging.Tests` is green.
+- [x] `grep -rn "new ActivitySource" src/SolTechnology.Core.Logging` lists only `Operations/CoreLoggingActivitySources.cs`.
+- [x] CRM-10: `MaxSteps_Exceeded_StartsNoActivityForDroppedSteps` is green.
 
 ## Open questions
 - none (OQ-1 confirmed by the user 2026-11-02: `CH-04` `EmitActivities`)
 
 ## Deviations
+
+### Activity details the plan left open
+
+**Original plan:** `Fail` → `SetStatus(Error, message)` + `AddException`; the report carries the
+trace id of `Activity.Current` at root start.
+
+**Actual implementation:** `Fail` also tags `error.type` with the exception type name or error
+code, and `Fail(errorType)` without a message uses the error type as the status description. The
+report's `TraceId` is set only when `Activity.Current` uses the W3C id format (a hierarchical id
+has no trace id). The activity name is the step name after the `MaxAttributeValueLength` cut, and
+a `Step` outside a root (or with Chronicle disabled) returns an activity-only handle when the
+source has listeners.
+

@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Globalization;
 using SolTechnology.Core.Logging.Masking;
 
@@ -5,28 +6,37 @@ namespace SolTechnology.Core.Logging.Chronicles;
 
 /// <summary>
 /// Handle to one Chronicle step, returned by <see cref="IChronicle"/>. Use it in a
-/// <c>using</c> statement: <c>Dispose</c> closes the step. The default value records nothing,
-/// so every member is safe to call when Chronicle is disabled or no root is open.
+/// <c>using</c> statement: <c>Dispose</c> closes the step and stops its <see cref="Activity"/>, if
+/// any. The default value records nothing, so every member is safe to call when Chronicle is
+/// disabled or no root is open.
 /// </summary>
 public readonly struct ChronicleStep : IDisposable
 {
     private readonly ChronicleNode? _node;
     private readonly ChronicleNode? _restore;
+    private readonly Activity? _activity;
     private readonly bool _owns;
 
-    internal ChronicleStep(ChronicleNode node, ChronicleNode? restore, bool owns)
+    internal ChronicleStep(ChronicleNode node, ChronicleNode? restore, bool owns, Activity? activity = null)
     {
         _node = node;
         _restore = restore;
         _owns = owns;
+        _activity = activity;
+    }
+
+    internal ChronicleStep(Activity activity)
+    {
+        _activity = activity;
+        _owns = true;
     }
 
     /// <summary><c>true</c> when this handle records into a Chronicle report.</summary>
     public bool IsRecording => _node is not null;
 
     /// <summary>
-    /// Adds or overwrites an attribute, stored as its invariant-culture string. The value is
-    /// logged as is; use <see cref="SetMasked"/> for personal data.
+    /// Adds or overwrites an attribute (and an activity tag), stored as its invariant-culture
+    /// string. The value is logged as is; use <see cref="SetMasked"/> for personal data.
     /// </summary>
     /// <param name="key">Attribute name.</param>
     /// <param name="value">Attribute value.</param>
@@ -34,15 +44,15 @@ public readonly struct ChronicleStep : IDisposable
     public ChronicleStep Set(string key, object? value)
     {
         ArgumentNullException.ThrowIfNull(key);
-        if (_node is not null)
+        if (_node is not null || _activity is not null)
         {
-            _node.Root.Owner.SetAttribute(_node, key, Convert.ToString(value, CultureInfo.InvariantCulture) ?? string.Empty);
+            Record(key, Convert.ToString(value, CultureInfo.InvariantCulture) ?? string.Empty);
         }
 
         return this;
     }
 
-    /// <summary>Adds or overwrites an attribute with a masked value; the raw value is never kept.</summary>
+    /// <summary>Adds or overwrites an attribute (and an activity tag) with a masked value; the raw value is never kept.</summary>
     /// <param name="key">Attribute name.</param>
     /// <param name="value">Raw value to mask.</param>
     /// <param name="mode">Masking mode, see <see cref="PiiMask.Apply"/>.</param>
@@ -51,9 +61,9 @@ public readonly struct ChronicleStep : IDisposable
     public ChronicleStep SetMasked(string key, string? value, MaskMode mode = MaskMode.Full, int keepChars = 3)
     {
         ArgumentNullException.ThrowIfNull(key);
-        if (_node is not null)
+        if (_node is not null || _activity is not null)
         {
-            _node.Root.Owner.SetAttribute(_node, key, PiiMask.Apply(value, mode, keepChars));
+            Record(key, PiiMask.Apply(value, mode, keepChars));
         }
 
         return this;
@@ -64,7 +74,7 @@ public readonly struct ChronicleStep : IDisposable
     public void Fail(Exception exception)
     {
         ArgumentNullException.ThrowIfNull(exception);
-        _node?.Root.Owner.Fail(_node, exception.GetType().Name, exception.Message, exception);
+        Fail(exception.GetType().Name, exception.Message, exception);
     }
 
     /// <summary>Marks the step failed without an exception, for example for a failed <c>Result</c>.</summary>
@@ -73,18 +83,51 @@ public readonly struct ChronicleStep : IDisposable
     public void Fail(string errorType, string? message = null)
     {
         ArgumentNullException.ThrowIfNull(errorType);
-        _node?.Root.Owner.Fail(_node, errorType, message, null);
+        Fail(errorType, message, null);
     }
 
-    /// <summary>Marks the step cancelled.</summary>
-    public void Cancel() => _node?.Cancel();
+    /// <summary>Marks the step cancelled; its activity gets the tag <c>chronicle.status=cancelled</c>.</summary>
+    public void Cancel()
+    {
+        _node?.Cancel();
+        if (_activity is not null)
+        {
+            ChronicleActivities.Cancel(_activity);
+        }
+    }
 
     /// <summary>Closes the step. Idempotent and never throws; a handle from <see cref="IChronicle.Current"/> does nothing.</summary>
     public void Dispose()
     {
-        if (_owns && _node is not null)
+        if (!_owns)
+        {
+            return;
+        }
+
+        if (_node is not null)
         {
             _node.Root.Owner.Close(_node, _restore);
+        }
+
+        _activity?.Dispose();
+    }
+
+    private void Record(string key, string value)
+    {
+        if (_node is not null)
+        {
+            _node.Root.Owner.SetAttribute(_node, key, value);
+        }
+
+        _activity?.SetTag(key, value);
+    }
+
+    private void Fail(string errorType, string? message, Exception? exception)
+    {
+        _node?.Root.Owner.Fail(_node, errorType, message, exception);
+        if (_activity is not null)
+        {
+            ChronicleActivities.Fail(_activity, errorType, message, exception);
         }
     }
 }
