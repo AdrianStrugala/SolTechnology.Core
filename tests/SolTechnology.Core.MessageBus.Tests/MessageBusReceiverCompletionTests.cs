@@ -6,6 +6,7 @@ using Microsoft.Extensions.Options;
 using NSubstitute;
 using NSubstitute.ExceptionExtensions;
 using NUnit.Framework;
+using SolTechnology.Core.Logging.Chronicles;
 using SolTechnology.Core.Logging.Correlations;
 using SolTechnology.Core.MessageBus.Broker;
 using SolTechnology.Core.MessageBus.Configuration;
@@ -83,6 +84,7 @@ public class MessageBusReceiverCompletionTests
             services,
             Substitute.For<ICorrelationIdService>(),
             options,
+            Substitute.For<IChronicle>(),
             loggerFactory.CreateLogger<MessageBusReceiver>());
     }
 }

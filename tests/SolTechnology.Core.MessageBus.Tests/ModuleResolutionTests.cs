@@ -52,7 +52,7 @@ public class ModuleResolutionTests
 
         // Assert
         publisher.Should().NotBeNull();
-        hostedServices.Should().ContainSingle();
+        hostedServices.Should().ContainSingle(service => service.GetType().Name == "MessageBusReceiver");
         handler.Should().BeOfType<ResolutionHandler>();
         options.ConnectionString.Should().Be(UnreachableServiceBus);
     }

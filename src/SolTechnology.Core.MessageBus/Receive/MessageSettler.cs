@@ -15,7 +15,7 @@ internal sealed class MessageSettler(ILogger logger, int maxDeliveryCount)
 {
     private const string HandlerFailedMaxDelivery = "HandlerFailedMaxDelivery";
 
-    public async Task Complete(ProcessMessageEventArgs args, Type messageType)
+    public async Task<MessageSettlement> Complete(ProcessMessageEventArgs args, Type messageType)
     {
         var messageId = args.Message.MessageId;
         var completed = await TrySettle(
@@ -28,32 +28,41 @@ internal sealed class MessageSettler(ILogger logger, int maxDeliveryCount)
                 "Handled message [{MessageType}] [{MessageId}] (delivery [{DeliveryCount}])",
                 messageType.Name, messageId, args.Message.DeliveryCount);
         }
+
+        return new MessageSettlement(MessageSettlementAction.Completed, null, completed);
     }
 
-    public Task DeadLetterUnreadable(ProcessMessageEventArgs args, Type messageType, DeserializedMessage message)
+    public async Task<MessageSettlement> DeadLetterUnreadable(ProcessMessageEventArgs args, Type messageType, DeserializedMessage message)
     {
         var messageId = args.Message.MessageId;
+        string reason, description;
         switch (message.Failure)
         {
             case DeserializationFailure.EmptyBody:
                 logger.LogError(
                     "Dead-lettering empty message [{MessageId}] for [{MessageType}]",
                     messageId, messageType.FullName);
-                return DeadLetter(args, "EmptyBody", "Message body is empty.");
+                (reason, description) = ("EmptyBody", "Message body is empty.");
+                break;
             case DeserializationFailure.InvalidJson:
                 logger.LogError(message.Error,
                     "Dead-lettering message [{MessageId}] — deserialisation to [{MessageType}] failed",
                     messageId, messageType.FullName);
-                return DeadLetter(args, "DeserializationFailed", message.Error!.Message);
+                (reason, description) = ("DeserializationFailed", message.Error!.Message);
+                break;
             default:
                 logger.LogError(
                     "Dead-lettering message [{MessageId}] — null payload after deserialisation to [{MessageType}]",
                     messageId, messageType.FullName);
-                return DeadLetter(args, "NullPayload", "Deserialised payload is null.");
+                (reason, description) = ("NullPayload", "Deserialised payload is null.");
+                break;
         }
+
+        await DeadLetter(args, reason, description).ConfigureAwait(false);
+        return new MessageSettlement(MessageSettlementAction.DeadLettered, reason, Settled: true);
     }
 
-    public async Task SettleFailure(ProcessMessageEventArgs args, Type messageType, Exception exception)
+    public async Task<MessageSettlement> SettleFailure(ProcessMessageEventArgs args, Type messageType, Exception exception)
     {
         var messageId = args.Message.MessageId;
         var deliveryCount = args.Message.DeliveryCount;
@@ -62,20 +71,21 @@ internal sealed class MessageSettler(ILogger logger, int maxDeliveryCount)
             logger.LogError(exception,
                 "Handler failure for [{MessageType}] [{MessageId}] (delivery [{DeliveryCount}]) — dead-lettering on the last attempt",
                 messageType.Name, messageId, deliveryCount);
-            await TrySettle(
+            var deadLettered = await TrySettle(
                 () => DeadLetter(args, HandlerFailedMaxDelivery, exception.Message),
                 settleException => logger.LogWarning(settleException,
                     "Failed to dead-letter message [{MessageId}]; lock will expire naturally", messageId)).ConfigureAwait(false);
-            return;
+            return new MessageSettlement(MessageSettlementAction.DeadLettered, HandlerFailedMaxDelivery, deadLettered);
         }
 
         logger.LogError(exception,
             "Handler failure for [{MessageType}] [{MessageId}] (delivery [{DeliveryCount}]) — abandoning for retry",
             messageType.Name, messageId, deliveryCount);
-        await TrySettle(
+        var abandoned = await TrySettle(
             () => args.AbandonMessageAsync(args.Message, cancellationToken: CancellationToken.None),
             settleException => logger.LogWarning(settleException,
                 "Failed to abandon message [{MessageId}]; lock will expire naturally", messageId)).ConfigureAwait(false);
+        return new MessageSettlement(MessageSettlementAction.Abandoned, null, abandoned);
     }
 
     private static Task DeadLetter(ProcessMessageEventArgs args, string reason, string description) =>

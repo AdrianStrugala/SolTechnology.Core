@@ -50,6 +50,7 @@ namespace SolTechnology.Core.MessageBus
                 services.TryAddSingleton<MessageBusRegistry>();
 
                 services.AddSolCorrelationIdService();
+                services.AddSolChronicle();
 
                 services.TryAddKeyedSingleton<ServiceBusClient>(
                     MessageBusClientFactory.ServiceKey,

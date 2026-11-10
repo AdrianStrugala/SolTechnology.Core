@@ -1,7 +1,7 @@
 ---
 spec: 2026-11-02-logging-chronicle
 step: 13
-status: to-do
+status: done
 ---
 
 # Step 13: MessageBus message roots
@@ -69,3 +69,34 @@ The message body is never recorded.
 - none
 
 ## Deviations
+
+### Root helper and settlement flow
+
+**Original plan:** the receiver wraps `TryHandle` and `Complete` in `BeginRoot` and sets the root
+attributes itself; `MessageSettlement` is a plain record struct.
+
+**Actual implementation:** with the root code the receiver reached 153 lines, so the internal
+static `MessageChronicle` opens the root (`Begin`: `MessageId`, `DeliveryCount`, `Entity`) and
+records the settlement (`Record`: `Settlement`, `DeadLetterReason`); the receiver is 149 lines.
+`TryHandle` takes the root and returns `MessageSettlement?`: `null` when the handler succeeded
+(the receiver then completes the message), otherwise the settlement of the unreadable or failed
+message. It fails the root itself (`Fail(exception)`, or `Fail("DeadLettered", reason)` for an
+unreadable body), because only it sees the exception. A dead-letter of an unreadable message still
+lets a broker failure propagate, as before (`Settled` is therefore always `true` there).
+
+### Test layout
+
+- `MessageBusReceiverChronicleTests` over `MessageBusReceiverChronicleTestBase` (real recorder,
+  `FakeLogCollector`, a stub broker because `IMessageBusBroker` is internal and not proxyable).
+  `HandleMessage_HandlerThrows_...` is parameterized on the delivery count (abandoned or
+  dead-lettered on the last delivery), and `HandleMessage_UnreadableBody_...` on empty body,
+  invalid JSON, and `null` (also `NullPayload`). `HandleMessage_HandlerSteps_NestUnderMessageRoot`
+  and `HandleMessage_Report_CarriesMessageIdAndDeliveryCountButNoBody` are folded into
+  `HandleMessage_Completed_EmitsOneRootReportOk`, which also checks the receiver's log scope on the
+  2154 entry.
+- `MessageSettlerTests.Settle_EveryOutcome_ReturnsSettlement` asserts the returned settlement.
+- Existing tests: `MessageBusReceiverCompletionTests` passes a substitute `IChronicle`;
+  `ModuleResolutionTests` now selects `MessageBusReceiver` among the hosted services, because
+  `AddSolChronicle` adds the SqlClient subscription as a second `IHostedService`.
+- The emulator suite (`MessageBusReceiverSettlementTests`) is green unchanged: 57 tests with Docker.
+

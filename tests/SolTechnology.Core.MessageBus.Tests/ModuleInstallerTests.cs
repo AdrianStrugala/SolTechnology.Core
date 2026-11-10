@@ -41,6 +41,16 @@ public sealed class ModuleInstallerTests
     }
 
     [Test]
+    public void AddSolMessageBus_RegistersChronicle()
+    {
+        // Act
+        var services = BaseServices().AddSolMessageBus(new MessageBusConfiguration { ConnectionString = ConnectionString });
+
+        // Assert
+        services.Should().ContainSingle(d => d.ServiceType == typeof(SolTechnology.Core.Logging.Chronicles.IChronicle));
+    }
+
+    [Test]
     public void AddSolMessageBus_NullConfiguration_Throws()
     {
         // Act

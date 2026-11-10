@@ -4,6 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using SolTechnology.Core.Logging.Chronicles;
 using SolTechnology.Core.Logging.Correlations;
 using SolTechnology.Core.MessageBus.Broker;
 using SolTechnology.Core.MessageBus.Configuration;
@@ -24,6 +25,7 @@ namespace SolTechnology.Core.MessageBus.Receive
         IServiceProvider serviceProvider,
         ICorrelationIdService correlationIdService,
         IOptions<MessageBusConfiguration> options,
+        IChronicle chronicle,
         ILogger<MessageBusReceiver> logger) : IHostedService, IAsyncDisposable
     {
         private readonly ConcurrentBag<ServiceBusProcessor> _ownedProcessors = new();
@@ -65,7 +67,7 @@ namespace SolTechnology.Core.MessageBus.Receive
             }
         }
 
-        private async Task HandleMessageAsync(ProcessMessageEventArgs args, Type messageType)
+        internal async Task HandleMessageAsync(ProcessMessageEventArgs args, Type messageType)
         {
             RestoreCorrelation(args.Message);
 
@@ -76,28 +78,37 @@ namespace SolTechnology.Core.MessageBus.Receive
                 ["MessageType"] = messageType.Name
             });
 
-            if (await TryHandle(args, messageType).ConfigureAwait(false))
+            using var root = MessageChronicle.Begin(chronicle, args, messageType);
+            try
             {
-                await _settler.Complete(args, messageType).ConfigureAwait(false);
+                var settlement = await TryHandle(args, messageType, root).ConfigureAwait(false)
+                    ?? await _settler.Complete(args, messageType).ConfigureAwait(false);
+                MessageChronicle.Record(root, settlement);
+            }
+            catch (OperationCanceledException) when (args.CancellationToken.IsCancellationRequested)
+            {
+                root.Cancel();
+                throw;
             }
         }
 
-        // Returns false when the message is already settled as unreadable or failed.
-        private async Task<bool> TryHandle(ProcessMessageEventArgs args, Type messageType)
+        // Returns null when the handler succeeded; otherwise the settlement of the unreadable or failed message.
+        private async Task<MessageSettlement?> TryHandle(ProcessMessageEventArgs args, Type messageType, ChronicleStep root)
         {
             try
             {
                 var message = MessageDeserializer.Deserialize(args.Message.Body, messageType);
                 if (message.Payload is null)
                 {
-                    await _settler.DeadLetterUnreadable(args, messageType, message).ConfigureAwait(false);
-                    return false;
+                    var unreadable = await _settler.DeadLetterUnreadable(args, messageType, message).ConfigureAwait(false);
+                    root.Fail("DeadLettered", unreadable.DeadLetterReason);
+                    return unreadable;
                 }
 
                 await using var scope = serviceProvider.CreateAsyncScope();
                 await _handlerInvoker.Invoke(scope.ServiceProvider, messageType, message.Payload, args.CancellationToken)
                     .ConfigureAwait(false);
-                return true;
+                return null;
             }
             catch (OperationCanceledException) when (args.CancellationToken.IsCancellationRequested)
             {
@@ -105,8 +116,8 @@ namespace SolTechnology.Core.MessageBus.Receive
             }
             catch (Exception ex)
             {
-                await _settler.SettleFailure(args, messageType, ex).ConfigureAwait(false);
-                return false;
+                root.Fail(ex);
+                return await _settler.SettleFailure(args, messageType, ex).ConfigureAwait(false);
             }
         }
 

@@ -45,7 +45,34 @@ public class MessageSettlerTests
         logs.Entries.Select(entry => entry.Template).Should().Contain(expectedTemplate);
     }
 
-    private static Task Settle(MessageSettler sut, ProcessMessageEventArgs args, string outcome)
+    [TestCase("complete", 1, false, "Completed", null, true)]
+    [TestCase("complete", 1, true, "Completed", null, false)]
+    [TestCase("invalid JSON", 1, false, "DeadLettered", "DeserializationFailed", true)]
+    [TestCase("handler failed", 1, true, "Abandoned", null, false)]
+    [TestCase("handler failed", MaxDeliveryCount, false, "DeadLettered", "HandlerFailedMaxDelivery", true)]
+    public async Task Settle_EveryOutcome_ReturnsSettlement(
+        string outcome,
+        int deliveryCount,
+        bool settlementFails,
+        string expectedAction,
+        string? expectedReason,
+        bool expectedSettled)
+    {
+        // Arrange
+        var sut = new MessageSettler(new CapturingLoggerProvider().CreateLogger(nameof(MessageSettlerTests)), MaxDeliveryCount);
+        var args = new ProcessMessageEventArgs(
+            ServiceBusModelFactory.ServiceBusReceivedMessage(messageId: "message-1", deliveryCount: deliveryCount),
+            ReceiverThatFailsSettlement(settlementFails),
+            CancellationToken.None);
+
+        // Act
+        var settlement = await Settle(sut, args, outcome);
+
+        // Assert
+        settlement.Should().Be(new MessageSettlement(Enum.Parse<MessageSettlementAction>(expectedAction), expectedReason, expectedSettled));
+    }
+
+    private static Task<MessageSettlement> Settle(MessageSettler sut, ProcessMessageEventArgs args, string outcome)
     {
         return outcome switch
         {
@@ -56,7 +83,7 @@ public class MessageSettlerTests
             _ => sut.SettleFailure(args, typeof(SettledMessage), new InvalidOperationException("handler failed"))
         };
 
-        Task Unreadable(DeserializationFailure failure, JsonException? error) =>
+        Task<MessageSettlement> Unreadable(DeserializationFailure failure, JsonException? error) =>
             sut.DeadLetterUnreadable(args, typeof(SettledMessage), new DeserializedMessage(null, failure, error));
     }
 

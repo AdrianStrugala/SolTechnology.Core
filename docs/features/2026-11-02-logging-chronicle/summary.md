@@ -34,7 +34,7 @@ R1–R9 and premortem addendum PA-1…PA-5 in the brief). The verdict above stan
 | 10 | CQRS auto-steps — pipeline requests, event handlers, fire-and-forget event roots | [`steps/10-cqrs-auto-steps.md`](steps/10-cqrs-auto-steps.md) | done |
 | 11 | Tale auto-steps — one step per run and per chapter | [`steps/11-tale-auto-steps.md`](steps/11-tale-auto-steps.md) | done |
 | 12 | HTTP client auto-steps — one logical step per call, attempts counted | [`steps/12-http-client-auto-steps.md`](steps/12-http-client-auto-steps.md) | done |
-| 13 | MessageBus message roots | [`steps/13-messagebus-message-roots.md`](steps/13-messagebus-message-roots.md) | to-do |
+| 13 | MessageBus message roots | [`steps/13-messagebus-message-roots.md`](steps/13-messagebus-message-roots.md) | done |
 | 14 | Hangfire job roots — recurring jobs and persistent events | [`steps/14-hangfire-job-roots.md`](steps/14-hangfire-job-roots.md) | to-do |
 | 15 | Documentation — `docs/Log.md` Chronicle section and module integration notes | [`steps/15-documentation.md`](steps/15-documentation.md) | to-do |
 | 16 | DreamTravel showcase — Chronicle configuration, README report, component test | [`steps/16-dreamtravel-showcase.md`](steps/16-dreamtravel-showcase.md) | to-do |
