@@ -166,6 +166,8 @@ public class Program
         });
 
         var app = builder.Build();
+        // Install the Hangfire schema at start-up, not inside the first request that publishes an event.
+        app.Services.GetRequiredService<Hangfire.JobStorage>();
 
         app.MapDefaultEndpoints();
 

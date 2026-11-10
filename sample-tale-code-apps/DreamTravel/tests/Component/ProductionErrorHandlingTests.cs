@@ -2,6 +2,7 @@ using System.Net;
 using System.Net.Http.Headers;
 using DreamTravel.Api;
 using FluentAssertions;
+using Hangfire;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
@@ -32,7 +33,13 @@ public sealed class ProductionErrorHandlingTests
 
         _productionApi = new APIFixture<Program>(
             configuration,
-            services => services.AddTransient<IStartupFilter, ThrowingEndpointStartupFilter>());
+            services =>
+            {
+                services.AddTransient<IStartupFilter, ThrowingEndpointStartupFilter>();
+                // Hangfire's configuration is process-wide: reuse the shared API's storage, so this short-lived
+                // host does not rebind Hangfire's logging to a logger factory it disposes on tear-down.
+                services.AddSingleton(_ => JobStorage.Current);
+            });
     }
 
     [OneTimeTearDown]
