@@ -650,6 +650,27 @@ Changes applied by the plan-reviewer. Each one is reflected in the step files:
 - [ ] `CH-01`…`CH-11` and `LC-01`…`LC-05` were confirmed by the user on 2026-11-02 (OQ-1, OQ-2
       resolved in this brief); no further public symbol changed without a new confirmation.
 
+## Code review (2026-11-10)
+
+Two independent reviews (batch A `1b320ded..91f8c8a1`, batch B `91f8c8a1..1937aa7b`); decisions by
+the owner.
+
+| ID | Finding | Fix | Commit |
+|---|---|---|---|
+| A1 | The flight-recorder logger incremented a shared test-only counter on every `IsEnabled`/`Log`. | Counter removed; the CRM-8 test asserts the `LoggerFilterOptions` rule (alias, all categories, `None`). | `fce0305f` |
+| A2 | The SQL observer read (and boxed) every payload before its gate. | `Before` checks for an own open root and `After`/`Error` for a pending command first. | `6ca5e6fc` |
+| A3 | Attribute keys and `Fail(errorType, …)` error types skipped the length cap. | Both are cut at `MaxAttributeValueLength` with `[truncated]`. | `62b20640` |
+| A4 | EF Core `SaveChanges` batches were `SQL SET`; a `TagWith` comment gave a bare `SQL`. | Leading `--`/`/* */` comments and `SET …;` statements are skipped before the keyword. | `0406e245` |
+| A5 | An `Ok` root with a failed step logged at Information, so a Warning minimum level dropped a report CRM-4 says is always kept. | The root flags a failed step when it happens; the policy raises such an `Ok` root to Warning before building the report (CRM-14 wording, level bullet, LC-01, LC-03, LC-04, `Log.md` level table). Sampling already kept it (`HasFailedSteps`). | `42519ae4` |
+| B1 | WebSocket, SignalR, Blazor Server and SSE requests became one root per connection. | Upgradable, WebSocket and `text/event-stream` requests open no root and keep 2144–2146; `Log.md` rule of use with `SkipPaths`; LC-01. | `0eef4493` |
+| B2 | Without Polly, `HttpClient.Timeout` marked the HTTP step `Cancelled`. | A cancellation with an inner `TimeoutException`, or after the client's `HttpClient.Timeout`, fails the step with `TimeoutException`; `Clients.md` row. | `70596432` |
+| B3 | Activity tags got strings where 1.x set typed `[LogScope]` values; `EmitActivities = false` silently removed the CQRS spans. | `Set` passes the typed value to the tag; CP-02 and the release-notes inputs name the span removal as breaking. | `1daa6436` |
+| B4 | `RetryCount` cost a storage read per job, even with Chronicle disabled. | Read in `OnPerformed`, only while the root records, with `allowStale: true`. | `bea19ba2` |
+| B5 | `Log.md` claimed a Warning category filter removes 2137–2139. | It removes 2137/2138; 2149 (Warning) and 2139 (Error) stay. | `5a234db9` |
+
+The DreamTravel README report was re-run after A4 (`3b864398`). Full suite after the fixes:
+1181 passed, 11 skipped, 0 failed.
+
 ## Completion summary
 
 ## Deviations
