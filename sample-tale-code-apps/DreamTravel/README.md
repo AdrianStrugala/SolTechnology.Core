@@ -291,24 +291,38 @@ console's `SingleLine` off, so the tree stays readable. This is the report of on
 the database:
 
 ```text
-Finished request [POST] [/api/FindCityByName] -> [200] in [1201 ms]. Chronicle: [Ok] [
-HTTP POST [@0 ms] [1201 ms] [ok] Route=api/FindCityByName StatusCode=200
-|- SQL DECLARE [@40 ms] [13 ms] [ok]
-|- SQL SELECT [@53 ms] [1 ms] [ok]
-`- FindCityByNameQuery [@76 ms] [1105 ms] [ok] Name=Chroniclecb4cf5c0
-   |- FetchCity [@156 ms] [966 ms] [ok]
-   |  |- SQL SELECT [@652 ms] [8 ms] [ok]
-   |  `- HTTP GET Google [@694 ms] [422 ms] [ok] Host=localhost StatusCode=200 Attempts=1
-   |- FetchCityCached [@1123 ms] [3 ms] [ok]
-   |  `- SQL SELECT [@1125 ms] [1 ms] [ok]
-   |- SQL DECLARE [@1137 ms] [8 ms] [ok]
-   |- SQL SELECT [@1149 ms] [5 ms] [ok]
-   `- SQL INSERT [@1161 ms] [13 ms] [ok]]
+Finished request [POST] [/api/FindCityByName] -> [200] in [946 ms]. Chronicle: [Ok] [
+HTTP POST [@0 ms] [945 ms] [ok] Route=api/FindCityByName StatusCode=200
+`- FindCityByNameQuery [@38 ms] [889 ms] [ok] Name=Chronicle603be827
+   |- FetchCity [@111 ms] [748 ms] [ok]
+   |  |- SQL SELECT City [@615 ms] [15 ms] [ok]
+   |  `- HTTP GET Google [@652 ms] [200 ms] [ok] Host=localhost StatusCode=200 Attempts=1
+   |- FetchCityCached [@859 ms] [8 ms] [ok]
+   |  `- SQL SELECT City [@861 ms] [6 ms] [ok]
+   |- SQL INSERT HangFire.Job [@878 ms] [14 ms] [ok]
+   |- SQL SELECT HangFire.JobParameter [@896 ms] [5 ms] [ok]
+   `- SQL INSERT HangFire.JobQueue [@907 ms] [14 ms] [ok]]
 ```
 
 `FetchCity` and `FetchCityCached` are the handler's own `IChronicle.Step` calls; the query step,
-the Google call and the SQL commands (EF Core and the Hangfire job that persists `CitySearched`) are
-recorded without user code. The event itself runs in the Worker, under its own `Event CitySearched` root.
+the Google call and the SQL commands (EF Core, and the Hangfire enqueue of `CitySearched`) are
+recorded without user code. `CaptureSQLCommandText` is off, so a SQL step names its target table but
+not the statement. The event itself runs in the Worker, under its own `Event CitySearched` root.
+
+A city Google does not know ends in a 404:
+
+```text
+Finished request [POST] [/api/FindCityByName] -> [404] in [28 ms]. Chronicle: [Ok] [
+HTTP POST [@0 ms] [28 ms] [ok] Route=api/FindCityByName StatusCode=404
+`- FindCityByNameQuery [@1 ms] [15 ms] [failed] Error=[NotFoundError: City [Chronicled677c40c] was not found] Name=Chronicled677c40c
+   `- FetchCity [@2 ms] [11 ms] [ok]
+      |- SQL SELECT City [@8 ms] [1 ms] [ok]
+      `- HTTP GET Google [@10 ms] [3 ms] [ok] Host=localhost StatusCode=200 Attempts=1]
+```
+
+The query step is `[failed]` with the `NotFoundError`, but the root stays `Ok`: a 4xx is the
+client's fault, so the entry is written at Warning. Only an exception or a 5xx makes the root
+`Failed` (Error), and only a failed root gets the flight recorder's buffered Debug entries.
 
 ### Design Patterns
 
