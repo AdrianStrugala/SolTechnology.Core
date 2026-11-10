@@ -394,9 +394,10 @@ traces
 | project timestamp, customDimensions.RequestPath, customDimensions.StatusCode, message
 ```
 
-To keep only the Chronicle reports of CQRS work, set the
-`SolTechnology.Core.CQRS.PipelineBehaviors.LoggingPipelineBehavior` category to Warning; the lifecycle
-entries 2137–2139 are then filtered while the requests still appear as steps.
+To drop the per-request CQRS entries and keep the Chronicle reports, set the
+`SolTechnology.Core.CQRS.PipelineBehaviors.LoggingPipelineBehavior` category to Warning: that filters
+2137 (start) and 2138 (success) and keeps the failure entries 2149 (Warning, failed `Result`) and 2139
+(Error, exception); the requests still appear as steps.
 
 #### Log contract changes in 2.0
 
