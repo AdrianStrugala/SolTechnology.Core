@@ -94,7 +94,7 @@ public class ChronicleActivityTests : ChronicleTestBase
     }
 
     [Test]
-    public void SetMasked_TagHoldsMaskedValueOnly()
+    public void SetMasked_TagHoldsMaskedValueOnly_SetKeepsTypedValue()
     {
         // Arrange
         Listen();
@@ -109,7 +109,7 @@ public class ChronicleActivityTests : ChronicleTestBase
         // Assert
         var activity = _stopped.Single();
         activity.GetTagItem("Email").Should().Be("ja***om");
-        activity.GetTagItem("Attempt").Should().Be("2");
+        activity.GetTagItem("Attempt").Should().Be(2);
     }
 
     [Test]

@@ -358,7 +358,7 @@ Integration types are internal: `ChronicleHTTPHandler`, `ChronicleHTTPAttemptHan
 | ID | Change | Consumer impact | Step |
 |---|---|---|---|
 | CP-01 | `SolTechnology.Core.Tale` depends on `SolTechnology.Core.Logging` (new nuspec edge) | Tale consumers restore Logging. No new framework: both packages already have `Microsoft.AspNetCore.App`. | 11 |
-| CP-02 | `OperationsName` spans now include manual steps, HTTP calls, Tale chapters, and job/message roots | More spans for consumers already subscribed. Opt-out: `EmitActivities = false`. | 05, 08, 10–14 |
+| CP-02 | `OperationsName` spans now include manual steps, HTTP calls, Tale chapters, and job/message roots | More spans for consumers already subscribed. Opt-out: `EmitActivities = false`, which also removes the CQRS operation spans that 1.x always emitted, because the Chronicle step now produces them (code review B3). `[LogScope]` values stay typed activity tags. | 05, 08, 10–14 |
 | CP-03 | `AddSolCQRS` (when `UseLogging`), `AddSolTale`, `AddSolHTTPClient`, `AddSolMessageBus`, `AddSolPersistentEvents`, and `AddSolRecurringJob` call `AddSolChronicle()` | `ChronicleOptions` validated on start in those hosts | 04, 10–14 |
 | CP-04 | Logging subscribes to `SqlClientDiagnosticListener` when `CaptureSQLCommands` is `true` | SqlClient writes diagnostic payloads only while a root is active (`IsEnabled` predicate) | 07 |
 | CP-05 | A flight-recorder `ILoggerProvider` is registered; `IsEnabled(Debug)` returns `true` inside roots when `FlightRecorder.Enabled` | Debug templates are formatted inside roots only when opted in | 06 |
@@ -475,6 +475,10 @@ is fresh.
 - `CH-nn`, `CP-nn`, and `LC-nn` tables above, as amended by `Deviations`. These prefixes are Chronicle's own,
   so they never collide with the flagship's `C-nn`/`P-nn`/`L-nn` rows (maxima on 2026-11-09: `C-33`, `P-29`,
   `L-07`); Chronicle reserves no `C`/`P`/`L` number.
+- Breaking for tracing: the CQRS operation span is now the Chronicle step's span, so
+  `ChronicleOptions.EmitActivities = false` removes the CQRS spans that 1.x always emitted
+  (`Enabled = false` keeps them); a successful one keeps status `Unset`, and `[LogScope]` values
+  stay typed tags.
 - Hangfire hosts: a recurring job that returns a failed `Result` gets an Error 2154 report with
   `ChronicleStatus = Failed`, although Hangfire records `Succeeded` for a non-recoverable failure.
 

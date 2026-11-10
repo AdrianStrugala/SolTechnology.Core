@@ -324,7 +324,7 @@ make keep the defaults and never override a binding.
 | `NPlusOneThreshold` | `10` | ≥ `AggregateThreshold` | An aggregated line this large is marked `N+1 suspected`. |
 | `SlowThreshold` | `00:00:01` | > 0 | A successful root at least this slow is reported at Warning. |
 | `SampleRate` | `1.0` | 0.0–1.0 | Share of fast, successful roots that are reported. |
-| `EmitActivities` | `true` | — | Starts an `Activity` per step on `OperationsName` when it has listeners. |
+| `EmitActivities` | `true` | — | Starts an `Activity` per step on `OperationsName` when it has listeners; `false` also removes the CQRS operation spans. |
 | `CaptureSQLCommands` | `true` | — | Records SqlClient commands as `SQL` steps. |
 | `CaptureSQLCommandText` | `false` | — | Records the statement text and SqlClient error messages, which can carry literal values. |
 | `FlightRecorder:Enabled` | `false` | — | Attaches buffered Debug entries to the report of a failed root. |

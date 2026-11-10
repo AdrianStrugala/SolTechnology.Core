@@ -38,8 +38,9 @@ public readonly struct ChronicleStep : IDisposable
     internal ChronicleRoot? Root => _owns && _node is { Parent: null, IsOverflow: false } ? _node.Root : null;
 
     /// <summary>
-    /// Adds or overwrites an attribute (and an activity tag), stored as its invariant-culture
-    /// string. The value is logged as is; use <see cref="SetMasked"/> for personal data.
+    /// Adds or overwrites an attribute, stored in the report as its invariant-culture string, and an
+    /// activity tag that keeps the typed value. The value is logged as is; use
+    /// <see cref="SetMasked"/> for personal data.
     /// </summary>
     /// <param name="key">Attribute name.</param>
     /// <param name="value">Attribute value.</param>
@@ -47,11 +48,12 @@ public readonly struct ChronicleStep : IDisposable
     public ChronicleStep Set(string key, object? value)
     {
         ArgumentNullException.ThrowIfNull(key);
-        if (_node is not null || _activity is not null)
+        if (_node is not null)
         {
-            Record(key, Convert.ToString(value, CultureInfo.InvariantCulture) ?? string.Empty);
+            _node.Root.Owner.SetAttribute(_node, key, Convert.ToString(value, CultureInfo.InvariantCulture) ?? string.Empty);
         }
 
+        _activity?.SetTag(key, value);
         return this;
     }
 

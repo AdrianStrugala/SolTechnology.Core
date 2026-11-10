@@ -13,6 +13,8 @@ public abstract class LoggingPipelineBehaviorChronicleTestBase
 
     public sealed record InnerCommand(string Name);
 
+    public sealed record TypedScopeCommand([property: LogScope] int Limit);
+
     public sealed record ScopedCommand(
         [property: LogScope] string CityName,
         [property: LogScope("UserEmail"), Masked] string Email);

@@ -64,7 +64,7 @@ public class LoggingPipelineBehaviorChronicleTests : LoggingPipelineBehaviorChro
     }
 
     [Test]
-    public async Task Handle_WithOperationsListener_StartsExactlyOneActivity()
+    public async Task Handle_WithOperationsListener_StartsExactlyOneActivityWithTypedScopeTags()
     {
         // Arrange
         var started = new ConcurrentQueue<Activity>();
@@ -77,11 +77,12 @@ public class LoggingPipelineBehaviorChronicleTests : LoggingPipelineBehaviorChro
         ActivitySource.AddActivityListener(listener);
 
         // Act
-        await Sut<ProbeCommand, Result>().Handle(new ProbeCommand("Warsaw"), () => Result.SuccessAsTask(), CancellationToken.None);
+        await Sut<TypedScopeCommand, Result>().Handle(new TypedScopeCommand(42), () => Result.SuccessAsTask(), CancellationToken.None);
 
         // Assert
-        started.Should().ContainSingle(a => a.OperationName == nameof(ProbeCommand))
-            .Which.Source.Name.Should().Be(CoreLoggingActivitySources.OperationsName);
+        var activity = started.Should().ContainSingle(a => a.OperationName == nameof(TypedScopeCommand)).Subject;
+        activity.Source.Name.Should().Be(CoreLoggingActivitySources.OperationsName);
+        activity.GetTagItem("Limit").Should().Be(42);
     }
 
     [TestCase(false, new[] { 2137, 2138 })]
