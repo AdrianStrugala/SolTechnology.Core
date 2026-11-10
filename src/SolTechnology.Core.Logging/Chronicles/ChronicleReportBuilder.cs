@@ -26,7 +26,7 @@ internal sealed class ChronicleReportBuilder
 
     private ChronicleReport Build()
     {
-        var rootStep = BuildStep(_root.Node);
+        var rootStep = BuildStep(_root.Node, _root.DetachedFrom);
         var flight = _root.Node.Status == ChronicleStepStatus.Failed ? _root.FlightRecords : null;
         return new ChronicleReport
         {
@@ -46,8 +46,14 @@ internal sealed class ChronicleReportBuilder
         };
     }
 
-    private ChronicleReportStep BuildStep(ChronicleNode node)
+    private ChronicleReportStep BuildStep(ChronicleNode node, string? detachedFrom = null)
     {
+        var attributes = node.SnapshotAttributes().ToDictionary();
+        if (detachedFrom is not null)
+        {
+            attributes["DetachedFrom"] = detachedFrom;
+        }
+
         _hasFailedSteps |= node.Status == ChronicleStepStatus.Failed;
         return new ChronicleReportStep
         {
@@ -56,7 +62,7 @@ internal sealed class ChronicleReportBuilder
             DurationMs = Milliseconds(EndOf(node) - node.StartTimestamp),
             Status = node.Status,
             IsUnfinished = node.IsUnfinished,
-            Attributes = node.SnapshotAttributes().ToDictionary(),
+            Attributes = attributes,
             Children = BuildChildren(node),
             ErrorType = node.ErrorType,
             ErrorMessage = node.ErrorMessage,
@@ -78,7 +84,7 @@ internal sealed class ChronicleReportBuilder
             }
             else
             {
-                steps.AddRange(group.Select(BuildStep));
+                steps.AddRange(group.Select(n => BuildStep(n)));
             }
         }
 

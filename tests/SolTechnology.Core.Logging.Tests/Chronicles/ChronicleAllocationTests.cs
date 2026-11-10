@@ -41,6 +41,23 @@ public class ChronicleAllocationTests : ChronicleTestBase
         allocated.Should().Be(0);
     }
 
+    [Test]
+    public void BeginRoot_ChronicleDisabled_AllocatesNothing()
+    {
+        // Arrange
+        var sut = CreateRecorder(o => o.Enabled = false);
+
+        // Act
+        var allocated = MeasureSteps(() =>
+        {
+            using var root = sut.BeginRoot("Disabled");
+            root.Set("Key", null);
+        });
+
+        // Assert
+        allocated.Should().Be(0);
+    }
+
     private static long MeasureSteps(Action step)
     {
         for (var i = 0; i < 100; i++)

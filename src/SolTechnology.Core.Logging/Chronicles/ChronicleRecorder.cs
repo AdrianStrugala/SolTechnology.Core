@@ -32,6 +32,19 @@ internal sealed class ChronicleRecorder(
             : Writer.StartChild(ambient, name);
     }
 
+    public ChronicleStep BeginRoot(string name)
+    {
+        ArgumentNullException.ThrowIfNull(name);
+        if (!Options.Enabled)
+        {
+            return Writer.StartActivityOnly(name);
+        }
+
+        var ambient = AmbientChronicle.Current;
+        var detachedFrom = ambient is { Root.IsClosed: false } ? ambient.Root.Node.Name : null;
+        return Writer.StartRoot(name, ambient, withActivity: true, detachedFrom);
+    }
+
     /// <summary>A <see cref="Begin(string)"/> for hosts that already own the operation's activity (HTTP request roots).</summary>
     internal ChronicleStep BeginWithoutActivity(string name) => Begin(name, withActivity: false);
 

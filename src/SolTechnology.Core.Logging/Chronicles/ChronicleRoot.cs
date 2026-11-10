@@ -23,6 +23,7 @@ internal sealed class ChronicleRoot
     internal ChronicleNode Node { get; }
     internal DateTimeOffset StartedAt { get; }
     internal string? TraceId { get; }
+    internal string? DetachedFrom { get; init; }
     internal Exception? Exception { get; set; }
     internal bool IsReportedByCaller { get; set; }
     internal ChronicleFlightBuffer? FlightRecords => Volatile.Read(ref _flightRecords);

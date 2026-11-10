@@ -21,6 +21,16 @@ public interface IChronicle
     ChronicleStep Begin(string name);
 
     /// <summary>
+    /// Always starts a new root, whatever the current step, for work that outlives its caller
+    /// (fire-and-forget events, messages, jobs, <c>Task.Run</c>): it gets its own report instead of
+    /// becoming a late child of the caller's. Inside an open root the new root records that root's
+    /// name as <c>DetachedFrom</c>, and its activity keeps the caller's trace. Disposing the handle
+    /// restores the previous current step.
+    /// </summary>
+    /// <param name="name">Root name shown in the report.</param>
+    ChronicleStep BeginRoot(string name);
+
+    /// <summary>
     /// Starts a child of the current step. Outside an open root, or when Chronicle is disabled,
     /// returns a non-recording handle and records nothing.
     /// </summary>

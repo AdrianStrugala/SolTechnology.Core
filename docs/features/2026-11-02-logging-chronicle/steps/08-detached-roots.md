@@ -1,7 +1,7 @@
 ---
 spec: 2026-11-02-logging-chronicle
 step: 08
-status: to-do
+status: done
 ---
 
 # Step 08: Chronicle detached roots — `IChronicle.BeginRoot`
@@ -40,11 +40,25 @@ Hangfire jobs (step 14) use it to guarantee their own report. The step is Loggin
 - `Step_ChronicleDisabled_AllocatesNothing` (step 01) is still green; add a `BeginRoot` variant: `BeginRoot_ChronicleDisabled_AllocatesNothing`.
 
 ## Acceptance criteria
-- [ ] `dotnet test tests/SolTechnology.Core.Logging.Tests --filter "FullyQualifiedName~Chronicles"` is green.
-- [ ] `find src/SolTechnology.Core.Logging/Chronicles -name "*.cs" | xargs wc -l | awk '$1>150 && $2!="total"'` prints nothing.
-- [ ] `dotnet build SolTechnology.Core.slnx` is green.
+- [x] `dotnet test tests/SolTechnology.Core.Logging.Tests --filter "FullyQualifiedName~Chronicles"` is green.
+- [x] `find src/SolTechnology.Core.Logging/Chronicles -name "*.cs" | xargs wc -l | awk '$1>150 && $2!="total"'` prints nothing.
+- [x] `dotnet build SolTechnology.Core.slnx` is green.
 
 ## Open questions
 - none (OQ-1 confirmed by the user 2026-11-02: `CH-11` `IChronicle.BeginRoot`; B11 accepted by the plan review)
 
 ## Deviations
+
+### `DetachedFrom` is added by the report builder
+
+**Original plan:** `ChronicleStep` carries the node to restore; `ChronicleRoot.DetachedFrom`; the
+builder adds the root attribute.
+
+**Actual implementation:** as planned; the restore node was already part of the handle since
+step 01, so `ChronicleStep` did not change. `DetachedFrom` is set only when an *open* ambient root
+exists: a `BeginRoot` that runs after the caller's root closed (the usual fire-and-forget case,
+`BeginRoot_InTaskRunOutlivingCaller_ReportsOwnRootAndNoLateStepInCaller`) carries no
+`DetachedFrom`; its report links to the caller through `TraceId` and the correlation scope. The
+builder adds `DetachedFrom` outside the `MaxAttributesPerStep` budget and overwrites a user
+attribute of the same name.
+

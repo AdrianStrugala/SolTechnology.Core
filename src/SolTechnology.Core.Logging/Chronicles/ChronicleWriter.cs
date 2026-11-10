@@ -14,11 +14,11 @@ internal sealed class ChronicleWriter(ChronicleOptions options, TimeProvider tim
 
     internal string Truncate(string value) => ChronicleText.Truncate(value, Options.MaxAttributeValueLength);
 
-    internal ChronicleStep StartRoot(string name, ChronicleNode? previous, bool withActivity = true)
+    internal ChronicleStep StartRoot(string name, ChronicleNode? previous, bool withActivity = true, string? detachedFrom = null)
     {
         name = Truncate(name);
         var activity = withActivity ? ChronicleActivities.Start(Options, name) : null;
-        var root = new ChronicleRoot(this, name, TimeProvider.GetTimestamp(), activity);
+        var root = new ChronicleRoot(this, name, TimeProvider.GetTimestamp(), activity) { DetachedFrom = detachedFrom };
         AmbientChronicle.Current = root.Node;
         return new ChronicleStep(root.Node, previous, owns: true, activity);
     }

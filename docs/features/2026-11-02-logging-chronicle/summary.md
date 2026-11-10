@@ -29,7 +29,7 @@ R1–R9 and premortem addendum PA-1…PA-5 in the brief). The verdict above stan
 | 05 | Chronicle steps as OpenTelemetry Activities on `OperationsName` | [`steps/05-opentelemetry-activities.md`](steps/05-opentelemetry-activities.md) | done |
 | 06 | Chronicle flight recorder — buffered Debug/Trace entries attached only on failure | [`steps/06-flight-recorder.md`](steps/06-flight-recorder.md) | done |
 | 07 | Chronicle SQL steps — SqlClient `DiagnosticListener` observer | [`steps/07-sqlclient-diagnostic-steps.md`](steps/07-sqlclient-diagnostic-steps.md) | done |
-| 08 | Chronicle detached roots — `IChronicle.BeginRoot` | [`steps/08-detached-roots.md`](steps/08-detached-roots.md) | to-do |
+| 08 | Chronicle detached roots — `IChronicle.BeginRoot` | [`steps/08-detached-roots.md`](steps/08-detached-roots.md) | done |
 | 09 | HTTP request roots in `LoggingMiddleware`; remove `ITimingService` | [`steps/09-http-request-roots-and-timing-service-removal.md`](steps/09-http-request-roots-and-timing-service-removal.md) | to-do |
 | 10 | CQRS auto-steps — pipeline requests, event handlers, fire-and-forget event roots | [`steps/10-cqrs-auto-steps.md`](steps/10-cqrs-auto-steps.md) | to-do |
 | 11 | Tale auto-steps — one step per run and per chapter | [`steps/11-tale-auto-steps.md`](steps/11-tale-auto-steps.md) | to-do |
