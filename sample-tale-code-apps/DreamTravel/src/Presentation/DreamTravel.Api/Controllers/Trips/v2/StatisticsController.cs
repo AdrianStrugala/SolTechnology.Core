@@ -19,7 +19,7 @@ namespace DreamTravel.Api.Controllers.Trips.v2
         [ProducesResponseType(typeof(ProblemDetails), (int)HttpStatusCode.BadRequest)]
         public async Task<IActionResult> GetSearchStatistics()
         {
-            return Ok(await mediator.Send(new GetSearchStatisticsQuery()));
+            return Ok(await mediator.Send(new GetSearchStatisticsQuery(), HttpContext.RequestAborted));
         }
     }
 }

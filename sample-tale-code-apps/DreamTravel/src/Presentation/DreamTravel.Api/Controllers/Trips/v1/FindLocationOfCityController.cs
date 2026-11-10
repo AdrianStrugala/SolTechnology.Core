@@ -1,11 +1,9 @@
-﻿using System.ComponentModel.DataAnnotations;
-using System.Net;
+﻿using System.Net;
 using System.Net.Mime;
 using Asp.Versioning;
 using DreamTravel.Domain.Cities;
 using DreamTravel.Queries.FindCityByName;
 using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json;
 using SolTechnology.Core.CQRS;
 
 namespace DreamTravel.Api.Controllers.v1
@@ -13,34 +11,23 @@ namespace DreamTravel.Api.Controllers.v1
     [ApiVersion("1.0", Deprecated = true)]
     [Route(Route)]
     public class FindLocationOfCityController(
-        IQueryHandler<FindCityByNameQuery, City> findLocationOfCity,
+        IMediator mediator,
         ILogger<FindLocationOfCityController> logger)
         : Controller
     {
         public const string Route = "api/FindLocationOfCity";
 
-
+        /// <summary>
+        /// V1 - DEPRECATED: finds a city's location by its name
+        /// </summary>
         [HttpPost]
         [Produces(MediaTypeNames.Application.Json)]
         [ProducesResponseType(typeof(City), (int)HttpStatusCode.OK)]
-        [ProducesResponseType(typeof(List<ValidationResult>), (int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType(typeof(ProblemDetails), (int)HttpStatusCode.BadRequest)]
         public async Task<IActionResult> FindLocationOfCity([FromBody] FindCityByNameQuery query)
         {
-            try
-            {
-                logger.LogInformation("Looking for city: " + query.Name);
-
-                var city = await findLocationOfCity.Handle(query, CancellationToken.None);
-
-                return Ok(city.Data);
-            }
-
-            catch (Exception ex)
-            {
-                logger.LogError(ex.ToString());
-                string message = JsonConvert.SerializeObject(ex.Message);
-                return BadRequest(message);
-            }
+            logger.LogInformation("Looking for city: " + query.Name);
+            return Ok(await mediator.Send(query, HttpContext.RequestAborted));
         }
     }
 }

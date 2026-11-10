@@ -16,7 +16,7 @@ public class TrafficController(IMediator mediator) : ControllerBase
     [HttpPost("recalculate")]
     public async Task<ActionResult<RecalculateTrafficCommand>> RecalculateTraffic([FromBody] RecalculateTrafficCommand command)
     {
-        var result = await mediator.Send(command);
+        var result = await mediator.Send(command, HttpContext.RequestAborted);
         return Ok(result);
     }
 }

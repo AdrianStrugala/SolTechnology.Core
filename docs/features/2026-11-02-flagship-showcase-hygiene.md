@@ -287,5 +287,13 @@ Decided during implementation without a confirmation stop; each step file carrie
   files promise nothing that is not enabled yet (SRM-1).
 - Step 02: actions are pinned to the commit their moving `v4` tag pointed to on 2026-11-10, not to
   a newer major, so the pins change no behaviour; Dependabot proposes later versions.
+- Step 03: `LimitCostOfPathsQuery` gets a validator (`CostLimit >= 0`, non-empty `Paths`) so SRM-6
+  has a validation-failure path. The v1 contract changes (ProblemDetails failures, `LimitCost` body)
+  are listed in the DreamTravel README; DreamTravel has no changelog of its own.
+- Step 03 found three defects it does not fix (follow-ups for step 08): a single-city best-path
+  request returns 200 `[]` because `Otherwise<JustOrderCities>()` recovers the `Expect` loss;
+  `CreateRequest(...).WithBody(...)` sends no `Content-Length`, so `LogDetail` body rules never fire
+  for it; `api/Traffic/recalculate` has no handler (commented out) and declares the command as its
+  response type.
 
 ## Follow-ups

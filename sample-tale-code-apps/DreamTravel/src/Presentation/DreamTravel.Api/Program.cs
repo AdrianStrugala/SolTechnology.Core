@@ -118,7 +118,7 @@ public class Program
             "name",
             asName: "CityName",
             source: LogDetailSource.Body,
-            endpoints: ["/api/v1/FindLocationOfCity", "/api/FindCityByName"]);
+            endpoints: ["/api/FindLocationOfCity", "/api/FindCityByName"]);
 
 
         builder.Services.AddSolCQRS();

@@ -24,7 +24,7 @@ auid 03, tale 03, 07, 11, and api-auth 05 are `done` (former core steps 02, 03, 
 | 00 | Run premortem (gate) | [`steps/00-run-premortem.md`](steps/00-run-premortem.md) | done |
 | 01 | Community health files and root README | [`steps/01-community-health-files-and-root-readme.md`](steps/01-community-health-files-and-root-readme.md) | done |
 | 02 | Workflow supply-chain hardening | [`steps/02-workflow-supply-chain-hardening.md`](steps/02-workflow-supply-chain-hardening.md) | done |
-| 03 | DreamTravel — mediator-only, thin controllers | [`steps/03-dreamtravel-mediator-controllers.md`](steps/03-dreamtravel-mediator-controllers.md) | in-progress |
+| 03 | DreamTravel — mediator-only, thin controllers | [`steps/03-dreamtravel-mediator-controllers.md`](steps/03-dreamtravel-mediator-controllers.md) | done |
 | 04 | Coding Guide self-consistency | [`steps/04-coding-guide-self-consistency.md`](steps/04-coding-guide-self-consistency.md) | to-do |
 | 05 | DreamTravel — logic and domain cleanup | [`steps/05-dreamtravel-logic-and-domain-cleanup.md`](steps/05-dreamtravel-logic-and-domain-cleanup.md) | to-do |
 | 06 | DreamTravel — run-in-two-minutes README and an honest architecture section | [`steps/06-dreamtravel-run-instructions.md`](steps/06-dreamtravel-run-instructions.md) | to-do |

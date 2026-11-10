@@ -68,6 +68,22 @@ GET  /api/v2/statistics/countries    - Search statistics aggregation
 - API key authentication
 - Swagger/OpenAPI documentation
 
+**Contract changes of the deprecated v1 endpoints (November 2026):** every controller now sends its
+request through `IMediator`, so v1 gets the same validation and error format as v2.
+
+- Failures of `FindLocationOfCity`, `FindNameOfCity`, `LimitCost`, and v1 `CalculateBestPath` are
+  RFC 7807 ProblemDetails (400 for validation, 404 for not found, 500 otherwise) instead of a 400
+  with a JSON-encoded exception message. `FindLocationOfCity` and `FindNameOfCity` no longer answer
+  a failed lookup with an empty success response.
+- v1 `CalculateBestPath` still returns a plain JSON array of paths on success.
+- `LimitCost` takes `{ "costLimit": 20, "paths": [ ... ] }` as its JSON body instead of the
+  `costLimit` and `sessionId` query parameters (it read the paths from a session that was never
+  configured, so it always failed), and it returns the paths as a JSON array instead of a
+  JSON-encoded string. A negative limit or an empty path list is a 400.
+- A v1 `FindLocationOfCity` request now adds `CityName` to its log scope, like v2 `FindCityByName`.
+- `GET api/projects/nodes` and `GET api/projects/streets` keep their JSON arrays; Swagger now
+  declares the arrays instead of a `Result` envelope.
+
 **External Integrations:**
 - Google Maps API (geocoding, distance matrix)
 - Michelin API (cost calculations)

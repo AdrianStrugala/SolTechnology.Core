@@ -3,7 +3,6 @@ using System.Net.Mime;
 using Asp.Versioning;
 using DreamTravel.Queries.LimitCostOfPaths;
 using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json;
 using SolTechnology.Core.CQRS;
 using Path = DreamTravel.Domain.Paths.Path;
 
@@ -13,45 +12,23 @@ namespace DreamTravel.Api.Controllers.v1
     [Route(Route)]
     [Obsolete]
     public class LimitCostOfPathsController(
-        IQueryHandler<LimitCostOfPathsQuery, List<Path>> limitCostsOfPathsHandler,
-        ILogger<Controller> logger)
+        IMediator mediator,
+        ILogger<LimitCostOfPathsController> logger)
         : Controller
     {
         public const string Route = "api/LimitCost";
 
-        private const string PathsKeyName = "_Paths";
-
-
-
+        /// <summary>
+        /// V1 - DEPRECATED: keeps the toll roads whose cost fits the limit and frees the rest
+        /// </summary>
         [HttpPost]
         [Produces(MediaTypeNames.Application.Json)]
         [ProducesResponseType(typeof(List<Path>), (int)HttpStatusCode.OK)]
-        [ProducesResponseType(typeof(string), (int)HttpStatusCode.BadRequest)]
-        public async Task<IActionResult> LimitCost(int costLimit, string sessionId)
+        [ProducesResponseType(typeof(ProblemDetails), (int)HttpStatusCode.BadRequest)]
+        public async Task<IActionResult> LimitCost([FromBody] LimitCostOfPathsQuery query)
         {
-            try
-            {
-                logger.LogInformation("Limit Cost Engine: Fire!");
-                List<Path> paths = JsonConvert.DeserializeObject<List<Path>>(HttpContext.Session.GetString(sessionId + PathsKeyName));
-
-                paths = (await limitCostsOfPathsHandler.Handle(new LimitCostOfPathsQuery
-                {
-                    CostLimit = costLimit,
-                    Paths = paths
-                }, CancellationToken.None)).Data;
-
-                HttpContext.Session.SetString(sessionId + PathsKeyName, JsonConvert.SerializeObject(paths));
-
-                string message = JsonConvert.SerializeObject(paths);
-                return Ok(message);
-            }
-
-            catch (Exception ex)
-            {
-                logger.LogError(ex.ToString());
-                string message = JsonConvert.SerializeObject(ex.Message);
-                return BadRequest(message);
-            }
+            logger.LogInformation("Limit Cost Engine: Fire!");
+            return Ok(await mediator.Send(query, HttpContext.RequestAborted));
         }
     }
 }

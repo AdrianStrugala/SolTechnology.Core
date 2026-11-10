@@ -1,5 +1,7 @@
-﻿using DreamTravel.GraphDatabase.Repositories;
+﻿using System.Net;
 using DreamTravel.Domain.StreetGraph;
+using DreamTravel.Queries.GetIntersections;
+using DreamTravel.Queries.GetStreets;
 using Microsoft.AspNetCore.Mvc;
 using SolTechnology.Core.CQRS;
 
@@ -7,24 +9,27 @@ namespace DreamTravel.Api.Controllers.RoadPlanner;
 
 [ApiController]
 [Route("api/projects/")]
-public class ProjectsController(
-    IIntersectionRepository intersections,
-    IStreetRepository roads)
-    : ControllerBase
+public class ProjectsController(IMediator mediator) : ControllerBase
 {
-    // GET api/projects/nodes
+    /// <summary>
+    /// Returns every intersection of the street graph
+    /// </summary>
     [HttpGet("nodes")]
-    public async Task<ActionResult<Result<List<Intersection>>>> GetNodes()
+    [ProducesResponseType(typeof(List<Intersection>), (int)HttpStatusCode.OK)]
+    [ProducesResponseType(typeof(ProblemDetails), (int)HttpStatusCode.InternalServerError)]
+    public async Task<IActionResult> GetNodes()
     {
-        var nodes = await intersections.GetAllAsync();
-        return Ok(Result<List<Intersection>>.Success(nodes.ToList()));
+        return Ok(await mediator.Send(new GetIntersectionsQuery(), HttpContext.RequestAborted));
     }
 
-    // GET api/projects/streets
+    /// <summary>
+    /// Returns every street of the street graph
+    /// </summary>
     [HttpGet("streets")]
-    public async Task<ActionResult<Result<List<Street>>>> GetRoads()
+    [ProducesResponseType(typeof(List<Street>), (int)HttpStatusCode.OK)]
+    [ProducesResponseType(typeof(ProblemDetails), (int)HttpStatusCode.InternalServerError)]
+    public async Task<IActionResult> GetRoads()
     {
-        var roads1 = await roads.GetAllAsync();
-        return Ok(Result<List<Street>>.Success(roads1.ToList()));
+        return Ok(await mediator.Send(new GetStreetsQuery(), HttpContext.RequestAborted));
     }
 }

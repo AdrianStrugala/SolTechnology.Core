@@ -1,7 +1,7 @@
 ---
 spec: 2026-11-02-flagship-showcase-hygiene
 step: 03
-status: in-progress
+status: done
 ---
 
 # Step 03: DreamTravel — mediator-only, thin controllers
@@ -45,15 +45,101 @@ controller breaks that template (`repo#B1`, `B2`, `B9`, `P1-1`):
 - Premortem SRM-19 (scenario 19, sweep `logging.md`): the v1 `LogDetail` path matches the header-versioned route, so v1 city searches log `CityName` like v2.
 
 ## Acceptance criteria
-- [ ] `grep -rnE "IQueryHandler<|ICommandHandler<|CancellationToken\.None|catch \(" sample-tale-code-apps/DreamTravel/src/Presentation/DreamTravel.Api/Controllers` prints nothing.
-- [ ] `cd sample-tale-code-apps/DreamTravel && dotnet build` is green; component tests green, including a failing-query case returning ProblemDetails.
-- [ ] SRM-5: a v1 best-path component test asserts a JSON array body on success.
-- [ ] SRM-6: `grep -n "Session" .../Controllers/Trips/v1/LimitCostOfPathsController.cs` prints nothing; its component tests pass.
-- [ ] SRM-7: `grep -rn "mediator.Send(" sample-tale-code-apps/DreamTravel/src/Presentation/DreamTravel.Api/Controllers | grep -v RequestAborted` prints nothing.
-- [ ] SRM-8: `grep -n 'CorsPolicy = "dupa"' sample-tale-code-apps/DreamTravel/src/Presentation/DreamTravel.Api/Program.cs` prints one line; `grep -rn "Fire!" .../Controllers` still prints the kept log lines.
-- [ ] SRM-9: `grep -rn "typeof(Result<" .../Controllers` and `grep -rn "ActionResult<Result<" .../Controllers` print nothing.
+- [x] `grep -rnE "IQueryHandler<|ICommandHandler<|CancellationToken\.None|catch \(" sample-tale-code-apps/DreamTravel/src/Presentation/DreamTravel.Api/Controllers` prints nothing.
+- [x] `cd sample-tale-code-apps/DreamTravel && dotnet build` is green; component tests green, including a failing-query case returning ProblemDetails.
+- [x] SRM-5: a v1 best-path component test asserts a JSON array body on success.
+- [x] SRM-6: `grep -n "Session" .../Controllers/Trips/v1/LimitCostOfPathsController.cs` prints nothing; its component tests pass.
+- [x] SRM-7: `grep -rn "mediator.Send(" sample-tale-code-apps/DreamTravel/src/Presentation/DreamTravel.Api/Controllers | grep -v RequestAborted` prints nothing.
+- [x] SRM-8: `grep -n 'CorsPolicy = "dupa"' sample-tale-code-apps/DreamTravel/src/Presentation/DreamTravel.Api/Program.cs` prints one line; `grep -rn "Fire!" .../Controllers` still prints the kept log lines.
+- [x] SRM-9: `grep -rn "typeof(Result<" .../Controllers` and `grep -rn "ActionResult<Result<" .../Controllers` print nothing.
 
 ## Open questions
 - none
 
 ## Deviations
+
+### LimitCost validator
+
+**Original plan:** SRM-6 adds component tests for success and validation failure.
+
+**Actual implementation:** `LimitCostOfPathsQuery` had no validator, so a validation failure was
+impossible. `LimitCostOfPathsQueryValidator` (same file) requires `CostLimit >= 0` and a non-empty
+`Paths`. The controller's logger also moved from `ILogger<Controller>` to
+`ILogger<LimitCostOfPathsController>` (Guide §11), which changes the category of the kept
+"Limit Cost Engine: Fire!" line.
+
+### v1 best-path failure case
+
+**Original plan:** SRM-5's v1 component test pins ProblemDetails on failure.
+
+**Actual implementation:** the failure case posts `{"cities": null}` and gets a 400
+ValidationProblemDetails. A single-city request, the obvious query failure, returns 200 with `[]`
+in both versions: `CalculateBestPathTale` loses the tale in `Expect(NoOfCities > 1)`, and the later
+`Otherwise<JustOrderCities>()` recovers that loss. That is a Tale-flow defect outside this step;
+it is recorded as a follow-up for step 08.
+
+### LogDetail test sends a buffered body
+
+**Original plan:** SRM-19 fixes the path.
+
+**Actual implementation:** the path is fixed, and `FindLocationOfCityV1Tests` proves it (the test
+fails with the old `/api/v1/...` path). The test posts a `StringContent` body: the
+`SolTechnology.Core.HTTP` request builder sends `JsonContent` without `Content-Length`, and the
+logging middleware buffers only bodies with a length, so `LogDetail(... Body ...)` never fires for
+requests built with `CreateRequest(...).WithBody(...)`. That library interplay is a follow-up for
+step 08, not fixed here.
+
+### Report-only log templates and other kept items (SRM-8)
+
+**Original plan:** report-only templates stay and are listed here.
+
+**Actual implementation:** kept verbatim: `"Looking for city: " + query.Name`
+(v1 `FindLocationOfCityController`), `"Looking for city: " + query.Lat + ";" + query.Lng`
+(v1 `FindNameOfCityController` and v2 `FindCityByCoordinatesController`). Also kept:
+`TrafficController` declares `ActionResult<RecalculateTrafficCommand>` although the command returns
+`List<Street>`, and its handler is commented out, so the endpoint always fails with "no handler";
+only the token changed (SRM-7). Reported for step 08.
+
+### SRM outcomes (2026-11-10)
+
+- **SRM-5 — done.** v1 projects a successful `Result` to `BestPaths` through a target-typed
+  `Result<List<Path>>`, so the success body stays a JSON array.
+  `CalculateBestPathV1Tests` (header `X-API-VERSION: 1.0`) asserts a JSON array of 3 paths on
+  success and a 400 ProblemDetails object on failure.
+- **SRM-6 — done.** `LimitCost` binds `[FromBody] LimitCostOfPathsQuery` and sends it through
+  `IMediator`; no `Session`, no `JsonConvert`. `LimitCostOfPathsTests` cover success (element
+  values after the cost limit) and validation failure (errors for `CostLimit` and `Paths`).
+- **SRM-7 — done.** Every `mediator.Send` in `Controllers/` passes `HttpContext.RequestAborted`,
+  including FindCityByName, FindCityByCoordinates, Statistics, Traffic, and Projects.
+- **SRM-8 — done.** "dupa", the three "Fire!" lines, and the report-only templates above are
+  unchanged; the `Program.cs` edit is the one `LogDetail` line.
+- **SRM-9 — done.** `ProjectsController` declares `List<Intersection>` / `List<Street>` and a
+  ProblemDetails 500; every v1 action declares ProblemDetails for 400. The snapshot no longer has
+  the `IntersectionListResult`, `StreetListResult`, or `Error` schemas.
+- **SRM-19 — done.** `LogDetail` lists `/api/FindLocationOfCity`; the v1 test asserts `CityName`
+  in the controller log's scope.
+
+### Contract snapshot (Swagger) before and after
+
+The v2 document (the verified snapshot, which also lists the v1-only controllers) and the v1
+document were dumped before and after the change with a temporary, uncommitted test. Every
+difference was reviewed and is intended:
+
+- `FindLocationOfCity`, `FindNameOfCity`: 400 schema `ValidationResult[]` → `ProblemDetails`.
+- v1 `CalculateBestPath` (v1 document only): 400 schema `string` → `ProblemDetails`.
+- `LimitCost`: query parameters `costLimit` and `sessionId` → JSON body `LimitCostOfPathsQuery`
+  (`costLimit` minimum 0, `paths` required with at least one item); 400 `string` → `ProblemDetails`.
+- `projects/nodes`, `projects/streets`: 200 `IntersectionListResult` / `StreetListResult` → arrays
+  of `Intersection` / `Street`; new 500 `ProblemDetails`.
+- Removed schemas: `IntersectionListResult`, `StreetListResult`, `Error`, `ValidationResult`;
+  added: `LimitCostOfPathsQuery`.
+
+The v1 contract changes are listed for readers in the DreamTravel README (API section). DreamTravel
+has no changelog of its own, and the root `CHANGELOG.md` covers the published packages only.
+
+### Verification (2026-11-10)
+
+- `dotnet build SolTechnology.Core.slnx` and the component test project build with 0 errors.
+- DreamTravel component tests: 40 passed (34 before + 6 new). Unit tests: GeolocationDataClients
+  4 passed / 11 skipped, Queries 6, TravelingSalesmanProblem 4, Ui 17 — all green.
+- All acceptance greps print what they should.
