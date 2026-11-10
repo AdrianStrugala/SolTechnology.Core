@@ -48,7 +48,7 @@ public class FindCityChronicleTests
         var query = Subtree(report.Message, "FindCityByNameQuery");
         query[0].Should().Contain($"[ok] Name={city.Name}");
         var fetchCity = Subtree(report.Message, "FetchCity ");
-        fetchCity.Should().Contain(line => line.Contains("SQL SELECT")).And.Contain(line => line.Contains("HTTP GET Google"));
+        fetchCity.Should().Contain(line => line.Contains("SQL SELECT City [")).And.Contain(line => line.Contains("HTTP GET Google"));
         query.Should().Contain(fetchCity[0]);
     }
 

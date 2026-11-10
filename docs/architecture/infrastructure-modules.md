@@ -45,9 +45,9 @@ takes no `CancellationToken`. Opening a connection is not a SqlClient command, s
 as a gap in the parent [Chronicle](logging.md#chronicle) step rather than as a `SQL` step.
 
 SQL itself has no Chronicle code and no Logging dependency: Logging observes SqlClient's
-`SqlClientDiagnosticListener` and records each command inside a root as `SQL {keyword}` (leading
-comments and `SET …;` statements skipped, stored procedures by name), from sending the command to the
-first result. Commands through Dapper, EF Core and raw `SqlConnection` are covered alike, and a
+`SqlClientDiagnosticListener` and records each command inside a root as `SQL {OPERATION} {table}`
+(see [Chronicle SQL step names](logging.md#sql-step-names)), from sending the command to the first
+result. Commands through Dapper, EF Core and raw `SqlConnection` are covered alike, and a
 connection wrapper with an SQL → Logging edge was rejected because it would miss EF Core and break
 provider-specific casts. Statement text and SqlClient error messages are recorded only with
 `CaptureSQLCommandText`, because they can carry literal values.

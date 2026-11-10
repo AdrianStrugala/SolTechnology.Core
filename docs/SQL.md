@@ -179,10 +179,27 @@ retry delays:
 #### Chronicle
 
 With [Chronicle](Log.md#chronicle) registered (any `AddSolLogging`, `AddSolChronicle` or Chronicle
-integration) every SqlClient command run inside a root is a step `SQL {keyword}` (`SQL SELECT`, or
-`SQL {procedure}` for a stored procedure). It is observed from SqlClient's
+integration) every SqlClient command run inside a root is a step named
+`SQL {OPERATION} {table}`, like an OpenTelemetry database span. It is observed from SqlClient's
 `SqlClientDiagnosticListener`, so Dapper over `ISQLConnectionFactory`, EF Core and raw
 `SqlConnection` are all captured; other database providers are not.
+
+| Command | Step name |
+|---|---|
+| `SELECT … FROM (SELECT … FROM [Cities] AS [c]) AS [c2]` (EF Core) | `SQL SELECT Cities` |
+| `set nocount on; declare @id bigint; begin tran; insert into [HangFire].Job …` | `SQL INSERT HangFire.Job` |
+| `UPDATE [dbo].[Cities] SET …` | `SQL UPDATE dbo.Cities` |
+| `EXEC @result = dbo.ImportCities`, or the stored procedure `dbo.ImportCities` | `SQL EXEC dbo.ImportCities` |
+| `SELECT 1`, `SELECT … FROM @rows`, `WITH … SELECT …` | `SQL SELECT`, `SQL SELECT`, `SQL WITH` |
+
+- The operation is the first keyword after comments and leading `SET …;`, `DECLARE …;` and
+  `BEGIN TRAN` statements.
+- The table is the first `FROM` source of a `SELECT` (a subquery is looked into), the target of
+  `INSERT`, `UPDATE`, `DELETE`, `MERGE` and `TRUNCATE TABLE`, or the procedure of `EXEC`.
+- The table keeps at most its last two name parts without brackets or quotes, so
+  `[db].[HangFire].[Job]` becomes `HangFire.Job`. Temp tables (`#staging`) are named; table
+  variables, names over 128 characters and anything after the first 4096 characters are not.
+- Only identifiers go into the name, never literals or parameter values.
 
 - `CaptureSQLCommandText` is `false` by default: statements and SqlClient error messages can carry
   literal values, so a failed command records only the exception type until you opt in.

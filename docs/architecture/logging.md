@@ -199,6 +199,28 @@ The per-module mapping of outcomes to step status lives with each module: [CQRS]
 [background processing](background-processing.md), and
 [infrastructure modules](infrastructure-modules.md).
 
+### SQL step names
+
+`SQLStepNamer` names a command `SQL {OPERATION} {table}`, after the OpenTelemetry database span
+name `{db.operation.name} {db.collection.name}`, because a bare keyword (`SQL SELECT`, or
+`SQL DECLARE` for a Hangfire batch) did not say which table a slow or repeated command touched.
+`SQLTokenizer` splits the text into names, string literals and symbols and skips comments, so a
+keyword inside a literal, a comment or a bracketed name never matches; it is not a parser.
+
+- The operation is the first keyword after leading `SET …;`, `DECLARE …;` and `BEGIN TRAN`.
+- The table is the first `FROM` source followed by a name (a `FROM (` subquery is looked into), the
+  target of `INSERT`, `UPDATE`, `DELETE`, `MERGE` and `TRUNCATE TABLE`, or the procedure of `EXEC`
+  (`@ret =` skipped); a stored-procedure command is `SQL EXEC {procedure}`.
+- The table keeps at most its last two name parts without quotes. A table variable, a name over
+  128 characters, or no name gives `SQL {OPERATION}`, and no operation gives `SQL`.
+- Only identifiers reach the name; values and literals stay behind `CaptureSQLCommandText`.
+- The scan reads at most 4096 characters, uses spans and allocates only the name, and runs only
+  after the observer's open-root gate; the name then goes through `MaxAttributeValueLength`.
+
+Aggregation is unchanged: the group key is the name plus the hash of the full statement, and the
+name depends only on the statement, so the same statement still forms one line, now with its table
+(`SQL SELECT dbo.Streets x42 … N+1 suspected`), and different statements on one table stay apart.
+
 ## Operation events and tracing
 
 `LoggerExtensions` adds `OperationStarted`, `OperationSucceeded` and `OperationFailed` to every

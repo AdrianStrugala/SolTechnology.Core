@@ -272,7 +272,7 @@ The report renders as an ASCII tree, so every sink and encoding shows it:
 ```text
 GET /cities [@0 ms] [25 ms] [ok]
 |- FindCity [@2 ms] [14 ms] [ok] City=Krakow Limit=10
-|  `- Db [@5 ms] [10 ms] [ok]
+|  `- SQL SELECT Cities [@5 ms] [10 ms] [ok]
 `- Http [@20 ms] [5 ms] [ok]
 ```
 
@@ -303,7 +303,7 @@ branches (`Task.WhenAll`) build isolated subtrees.
 | CQRS fire-and-forget event | `Event {EventType}` | one per handler | [CQRS](CQRS.md#chronicle) |
 | Tale run and chapter | outside a root | `Tale {Handler}`, `Chapter {ChapterId}` | [Tale](Tale.md#chronicle) |
 | HTTP client call | — | `HTTP {Method} {client}` | [Clients](Clients.md#chronicle) |
-| SqlClient command | — | `SQL {keyword}` | [SQL](SQL.md#chronicle) |
+| SqlClient command | — | `SQL {OPERATION} {table}`, `SQL EXEC {procedure}` | [SQL](SQL.md#chronicle) |
 | MessageBus message | `Message {MessageType}` | — | [Bus](Bus.md#chronicle) |
 | Hangfire job | `Job {TJob}`, `Event {EventType}` | — | [Hangfire](Hangfire.md#chronicle) |
 

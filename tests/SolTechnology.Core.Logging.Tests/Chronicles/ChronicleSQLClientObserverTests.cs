@@ -8,8 +8,8 @@ namespace SolTechnology.Core.Logging.Tests.Chronicles;
 
 public class ChronicleSQLClientObserverTests : ChronicleSQLTestBase
 {
-    [TestCase("  select * from dbo.Cities where Id = @id", CommandType.Text, "SQL SELECT")]
-    [TestCase("dbo.GetCities", CommandType.StoredProcedure, "SQL dbo.GetCities")]
+    [TestCase("  select * from dbo.Cities where Id = @id", CommandType.Text, "SQL SELECT dbo.Cities")]
+    [TestCase("dbo.GetCities", CommandType.StoredProcedure, "SQL EXEC dbo.GetCities")]
     public async Task Before_After_InsideRoot_RecordsLeafStep(string text, CommandType type, string expectedName)
     {
         // Arrange
@@ -122,11 +122,11 @@ public class ChronicleSQLClientObserverTests : ChronicleSQLTestBase
         // Assert
         var report = ChronicleReportBuilder.Build(Listener.Completed.Single());
         report.IsNPlusOneSuspected.Should().BeTrue();
-        report.ToString().Should().Contain("`- SQL SELECT x42 [total 42 ms] [max 1 ms] [failed 0] N+1 suspected");
+        report.ToString().Should().Contain("`- SQL SELECT dbo.Streets x42 [total 42 ms] [max 1 ms] [failed 0] N+1 suspected");
     }
 
     [Test]
-    public async Task DifferentStatements_NotAggregatedTogether()
+    public async Task DifferentStatementsOnOneTable_SameNameButNotAggregatedTogether()
     {
         // Arrange
         var (sut, _) = await StartHost();
@@ -137,13 +137,13 @@ public class ChronicleSQLClientObserverTests : ChronicleSQLTestBase
             for (var i = 0; i < 3; i++)
             {
                 ExecuteCommand(Command("SELECT * FROM dbo.Cities"));
-                ExecuteCommand(Command("SELECT * FROM dbo.Streets"));
+                ExecuteCommand(Command("SELECT Id FROM dbo.Cities"));
             }
         }
 
         // Assert
         var lines = ChronicleReportBuilder.Build(Listener.Completed.Single()).Steps.Single().Children;
-        lines.Should().HaveCount(2).And.OnlyContain(l => l.Name == "SQL SELECT" && l.Count == 3);
+        lines.Should().HaveCount(2).And.OnlyContain(l => l.Name == "SQL SELECT dbo.Cities" && l.Count == 3);
     }
 
     [Test]

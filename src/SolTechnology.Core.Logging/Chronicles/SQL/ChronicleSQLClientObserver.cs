@@ -94,7 +94,7 @@ internal sealed class ChronicleSQLClientObserver(ChronicleWriter writer) : IObse
         }
 
         var text = command.CommandText ?? string.Empty;
-        var name = SQLClientPayloadReader.StepName(command);
+        var name = SQLStepNamer.Name(text, command.CommandType);
         if (writer.StartDetachedLeaf(parent, name, $"{name}#{text.GetHashCode()}") is not { } leaf)
         {
             return;

@@ -46,7 +46,7 @@ public class ChronicleSQLIntegrationTests
     }
 
     [Test]
-    public void Query_InsideRoot_AppearsAsSQLStep()
+    public void Query_InsideRoot_AppearsAsSQLStepNamedAfterItsTable()
     {
         // Arrange
         var chronicle = _provider.GetRequiredService<IChronicle>();
@@ -61,8 +61,8 @@ public class ChronicleSQLIntegrationTests
 
         // Assert
         var report = _logs.GetSnapshot().Should().ContainSingle(r => r.Id.Id == 2154).Subject.Message;
-        report.Should().MatchRegex(@"\n`- SQL SELECT \[@\d+ ms\] \[\d+ ms\] \[ok\]");
-        report.Should().NotContain("dbo.Items");
+        report.Should().MatchRegex(@"\n`- SQL SELECT dbo\.Items \[@\d+ ms\] \[\d+ ms\] \[ok\]");
+        report.Should().NotContain("COUNT(*)");
     }
 
     [Test]
@@ -88,7 +88,7 @@ public class ChronicleSQLIntegrationTests
 
         // Assert
         var report = _logs.GetSnapshot().Should().ContainSingle(r => r.Id.Id == 2154).Subject.Message;
-        var sqlDurationMs = int.Parse(Regex.Match(report, @"SQL SELECT \[@\d+ ms\] \[(\d+) ms\]").Groups[1].Value);
+        var sqlDurationMs = int.Parse(Regex.Match(report, @"SQL SELECT sys\.objects \[@\d+ ms\] \[(\d+) ms\]").Groups[1].Value);
         TestContext.Out.WriteLine($"SQL step [{sqlDurationMs}] ms; rows were read over at least 450 ms");
         sqlDurationMs.Should().BeLessThan(450);
     }
