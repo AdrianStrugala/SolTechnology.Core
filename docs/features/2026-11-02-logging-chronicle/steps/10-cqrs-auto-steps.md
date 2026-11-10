@@ -1,7 +1,7 @@
 ---
 spec: 2026-11-02-logging-chronicle
 step: 10
-status: to-do
+status: done
 ---
 
 # Step 10: CQRS auto-steps — pipeline requests, event handlers, fire-and-forget event roots
@@ -75,3 +75,31 @@ and rethrows in that case (P-26). The lifecycle entries 2137–2139 and the fail
 - none (OQ-1 confirmed by the user 2026-11-02: `CH-10` `LoggingPipelineBehavior` constructor; `CH-11` consumed from step 08)
 
 ## Deviations
+
+### A successful operation activity keeps status `Unset`
+
+**Original plan:** the `activity?.SetTag`/`SetStatus`/`AddException` calls become
+`step.Set`/`Fail`/`Cancel`.
+
+**Actual implementation:** as planned, so the behavior no longer calls
+`SetStatus(ActivityStatusCode.Ok)` on success: `ChronicleStep` has no "ok" member and the
+OpenTelemetry guidance leaves a successful instrumentation span `Unset`. A failed `Result` now also
+carries its message as the status description and the `error.type` tag (step 05). The two existing
+assertions in `LoggingPipelineBehaviorTests` expect `Unset`. A caller cancellation still writes the
+unchanged 2139 entry; only the step is `Cancelled`.
+
+### Test layout
+
+- `ChronicleTestHost` (test project root) builds the real recorder from `AddSolChronicle` with a
+  `FakeLogCollector`; the existing pipeline tests use it too.
+- The pipeline tests are split into `LoggingPipelineBehaviorChronicleTests` and
+  `LoggingPipelineBehaviorChronicleOutcomeTests` over `LoggingPipelineBehaviorChronicleTestBase`
+  (150-line budget); `Handle_LifecycleEntries2137To2139_Unchanged` covers success and exception.
+- `Dispatch_HandlerFails_StepFailedAndOtherHandlersRun` and
+  `Dispatch_HandlerThrowsCanceledWithoutCancelledToken_StepFailedAndOtherHandlersRun` are one test
+  parameterized on the handler type.
+- `Publish_InsideOpenRoot_...` does not assert `DetachedFrom`: whether the publishing root is still
+  open when `Task.Run` starts is a race (step 08 deviation).
+- The registration tests live in `Registration/AddSolCQRSChronicleTests.cs`, which keeps
+  `AddSolCQRSTests.cs` within its size.
+

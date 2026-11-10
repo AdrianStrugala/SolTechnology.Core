@@ -33,6 +33,7 @@ public class LoggingPipelineBehaviorTests
     private ILoggerFactory _loggerFactory = null!;
     private ConcurrentBag<Activity> _stoppedActivities = null!;
     private ActivityListener _listener = null!;
+    private ChronicleTestHost _chronicle = null!;
 
     [SetUp]
     public void SetUp()
@@ -40,6 +41,7 @@ public class LoggingPipelineBehaviorTests
         _loggerProvider = new RecordingLoggerProvider();
         _loggerFactory = LoggerFactory.Create(builder => builder.AddProvider(_loggerProvider));
         _stoppedActivities = [];
+        _chronicle = new ChronicleTestHost();
         _listener = new ActivityListener
         {
             ShouldListenTo = source => source.Name == CoreLoggingActivitySources.OperationsName,
@@ -53,6 +55,7 @@ public class LoggingPipelineBehaviorTests
     public void TearDown()
     {
         _listener.Dispose();
+        _chronicle.Dispose();
         _loggerFactory.Dispose();
         _loggerProvider.Dispose();
     }
@@ -62,7 +65,7 @@ public class LoggingPipelineBehaviorTests
     {
         // Arrange
         var sut = new LoggingPipelineBehavior<ListenerProbeQuery, string>(
-            NullLogger<LoggingPipelineBehavior<ListenerProbeQuery, string>>.Instance);
+            NullLogger<LoggingPipelineBehavior<ListenerProbeQuery, string>>.Instance, _chronicle.Chronicle);
 
         // Act
         var response = await sut.Handle(new ListenerProbeQuery("Warsaw"), () => Task.FromResult("ok"), CancellationToken.None);
@@ -71,7 +74,7 @@ public class LoggingPipelineBehaviorTests
         response.Should().Be("ok");
         var activity = StoppedActivity(nameof(ListenerProbeQuery));
         activity.Source.Name.Should().Be(CoreLoggingActivitySources.OperationsName);
-        activity.Status.Should().Be(ActivityStatusCode.Ok);
+        activity.Status.Should().Be(ActivityStatusCode.Unset);
     }
 
     [Test]
@@ -110,7 +113,7 @@ public class LoggingPipelineBehaviorTests
         succeeded.Level.Should().Be(LogLevel.Information);
         Property(succeeded, "OperationName").Should().Be(nameof(SucceedingProbeCommand));
         _loggerProvider.Logs.Should().NotContain(l => l.Level >= LogLevel.Warning);
-        StoppedActivity(nameof(SucceedingProbeCommand)).Status.Should().Be(ActivityStatusCode.Ok);
+        StoppedActivity(nameof(SucceedingProbeCommand)).Status.Should().Be(ActivityStatusCode.Unset);
     }
 
     [Test]
@@ -156,7 +159,7 @@ public class LoggingPipelineBehaviorTests
     }
 
     private LoggingPipelineBehavior<TRequest, TResponse> CreateSut<TRequest, TResponse>() where TRequest : notnull
-        => new(_loggerFactory.CreateLogger<LoggingPipelineBehavior<TRequest, TResponse>>());
+        => new(_loggerFactory.CreateLogger<LoggingPipelineBehavior<TRequest, TResponse>>(), _chronicle.Chronicle);
 
     private Activity StoppedActivity(string operationName)
         => _stoppedActivities.Should().ContainSingle(a => a.OperationName == operationName).Subject;

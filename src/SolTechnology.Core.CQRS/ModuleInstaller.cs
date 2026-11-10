@@ -4,6 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using SolTechnology.Core.CQRS.Internal;
 using SolTechnology.Core.CQRS.PipelineBehaviors;
+using SolTechnology.Core.Logging;
 
 namespace SolTechnology.Core.CQRS;
 
@@ -36,6 +37,7 @@ public static class ModuleInstaller
             // Register pipeline behaviors
             if (options.UseLogging)
             {
+                services.AddSolChronicle();
                 services.TryAddEnumerable(ServiceDescriptor.Transient(typeof(IPipelineBehavior<,>), typeof(LoggingPipelineBehavior<,>)));
             }
 

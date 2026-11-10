@@ -21,7 +21,8 @@ public sealed class CQRSOptions
 
     /// <summary>
     /// When true (default), registers <c>LoggingPipelineBehavior</c> for automatic
-    /// operation tracking.
+    /// operation tracking and Chronicle (<c>AddSolChronicle</c>): every command and query becomes
+    /// a Chronicle step, and each fire-and-forget event dispatch gets its own Chronicle root.
     /// </summary>
     public bool UseLogging { get; set; } = true;
 
