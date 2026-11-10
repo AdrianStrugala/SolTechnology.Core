@@ -50,6 +50,22 @@ three-type-parameter overload — `GoogleHTTPOptions` is bound from
 services.AddSolHTTPClient<IGoogleHTTPClient, GoogleHTTPClient, GoogleHTTPOptions>("Google");
 ```
 
+#### Using with Aspire ServiceDefaults
+
+The standard resilience handler that the Aspire ServiceDefaults template adds through
+`ConfigureHttpClientDefaults(http => http.AddStandardResilienceHandler())` stacks with the Sol
+pipeline: it wraps `core-http-{clientName}` as a second `-standard` pipeline, so retries multiply,
+timeouts stack and each call goes through two circuit breakers. Keep the Sol pipeline as the only
+one:
+
+- **Every client is a Sol client** — remove `AddStandardResilienceHandler()` from
+  `ConfigureHttpClientDefaults` and keep the rest (service discovery). DreamTravel does this.
+- **Other clients still need it** — remove it from the defaults anyway and call
+  `AddStandardResilienceHandler()` on each non-Sol `AddHttpClient(...)` builder instead.
+
+Two `Polly: Resilience pipeline executing` debug lines per call, one with source `-standard/`,
+mean the defaults are still on.
+
 ### Configuration
 
 Two layers configured independently per client:
