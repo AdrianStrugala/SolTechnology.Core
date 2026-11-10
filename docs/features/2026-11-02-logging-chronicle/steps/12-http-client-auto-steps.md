@@ -1,7 +1,7 @@
 ---
 spec: 2026-11-02-logging-chronicle
 step: 12
-status: to-do
+status: done
 ---
 
 # Step 12: HTTP client auto-steps — one logical step per call, attempts counted
@@ -64,3 +64,25 @@ also catches chatty HTTP. This is a logical span around HttpClient's own physica
 - none
 
 ## Deviations
+
+### Scripted primary handler and test layout
+
+**Original plan:** `ChronicleHTTPStepTests.cs` with `RichardSzalay.MockHttp` as the primary
+handler; `AddSolHTTPClient_RegistersChronicleAndHandlersInOrder` in `ModuleInstallerTests.cs`.
+
+**Actual implementation:** the timeout and caller-cancellation cases need a response that observes
+each attempt's token, which MockHttp 7.0 `Respond` overloads do not pass, so the tests use a small
+`ScriptedHandler` (attempt `n` answers with script entry `n`) in `ChronicleHTTPTestBase.cs`. The
+tests are split into `ChronicleHTTPStepTests` (outcomes) and `ChronicleHTTPScopeTests` (scope,
+PII, aggregation, registration). `ModuleInstallerTests.cs` is already 356 lines, so the order test
+lives in `ChronicleHTTPScopeTests`; it walks the handler chain from `IHttpMessageHandlerFactory`
+and expects `ChronicleHTTPHandler`, `CorrelationPropagatingHandler`, `ResilienceHandler`,
+`ChronicleHTTPAttemptHandler` in that order. `Send_Timeout_StepFailed` is parameterized on GET
+(three attempts) and POST (one attempt, P-10), which replaces `Send_PostAfterTimeout_StepFailedWithAttempts1`.
+
+### Smaller choices
+
+- Outside a root the handler skips the attributes and the `StrongBox` entirely; with an
+  `OperationsName` listener the call still gets an activity-only span without tags.
+- A cancelled or failed call records `Attempts` but no `StatusCode` (there is no response).
+

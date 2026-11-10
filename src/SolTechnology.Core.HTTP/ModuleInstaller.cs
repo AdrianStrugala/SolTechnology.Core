@@ -18,7 +18,7 @@ namespace SolTechnology.Core.HTTP
         {
             /// <summary>
             /// Registers a typed HTTP client with the resilience pipeline,
-            /// correlation propagation, and metrics wired up.
+            /// correlation propagation, metrics, and a Chronicle step per call wired up.
             /// </summary>
             /// <param name="httpClientName">Client name; also the configuration key under <c>HTTPClients</c>.</param>
             /// <param name="httpClientConfiguration">Connection settings; when <c>null</c>, bound from <c>HTTPClients:{name}</c>.</param>
@@ -67,6 +67,7 @@ namespace SolTechnology.Core.HTTP
             // HttpClientMetrics owns the shared Meter so all clients emit on the same name.
             services.TryAddSingleton<HttpPolicyFactory>();
             services.TryAddSingleton<HttpClientMetrics>();
+            services.AddSolChronicle();
 
             if (propagateCorrelation)
             {
@@ -80,6 +81,7 @@ namespace SolTechnology.Core.HTTP
 
             var httpClientBuilder = services
                 .AddHttpClient<TIClient, TClient>(httpClientName, (sp, httpClient) => ConfigureClient(sp, httpClient, httpClientName));
+            ChronicleHTTPHandlerRegistration.AddChronicleCallHandler(httpClientBuilder, httpClientName);
 
             if (propagateCorrelation)
             {
@@ -103,6 +105,7 @@ namespace SolTechnology.Core.HTTP
 
                 factory.Configure(pipelineBuilder, policyCfg, httpClientName);
             });
+            ChronicleHTTPHandlerRegistration.AddChronicleAttemptHandler(httpClientBuilder);
         }
 
         private static void ConfigureClient(IServiceProvider sp, HttpClient httpClient, string httpClientName)
