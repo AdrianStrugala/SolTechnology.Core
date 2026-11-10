@@ -10,3 +10,8 @@
 - Swagger / API-versioning registration change → generated documents or routes disappear.
 - `Error` subtype serialized through MVC `JsonOptions` instead of the module's options →
   discriminator or casing drift.
+- Controller moved from hand-written `try/catch` or `BadRequest(...)` to `IMediator` plus
+  `ResultConversionFilter` → status codes follow the `Error` type now; an upstream miss that an
+  adapter reports as a generic error turns a former 400 into a 500. Pin every former status code
+  (validation, not found, upstream failure) with a component test before the move, and make
+  adapters return `NotFoundError` for "no such resource" answers (Google `ZERO_RESULTS`).

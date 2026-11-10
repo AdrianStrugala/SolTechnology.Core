@@ -14,6 +14,10 @@ with the server's shutdown token; the job dispatches all handlers in a fresh sco
 overload so jobs enqueued by 1.x still run; it is removed in 3.0. Because 1.x servers cannot load
 the two-argument method, Hangfire servers are deployed before processes that only enqueue.
 
+Hangfire.SqlServer installs its schema when `JobStorage` is first resolved. A process that only
+enqueues, such as DreamTravel's API, resolves it at start, so the install does not run inside the
+first request that publishes an event.
+
 The CQRS dispatcher logs and swallows individual handler exceptions, so a failed handler does not
 fail the job: persistent enqueueing protects against process loss before dispatch, not against a
 handler's own failure. The exception is cancellation: when the shutdown token is cancelled and a
@@ -105,6 +109,10 @@ and recurring job, and the correlation id under the job parameter `CorrelationId
 both `DispatchInScope` overloads, ``SolTechnology.Core.Hangfire.RecurringJobRunner`1`` with
 `RunAsync(CancellationToken)`, and the parameter key; the Coding Guide §10 `Async` rule does not
 apply to `RunAsync`.
+
+A persistent event's argument is stored the same way, by its type and assembly name. Moving or
+renaming an `IEvent` record therefore breaks the jobs already in storage, and the library binds no
+old names: such jobs go to Failed and are deleted from the Hangfire dashboard by hand.
 
 The boundary keeps CQRS free of Hangfire dependencies, makes durability opt-in, and leaves
 deployment infrastructure under application control.

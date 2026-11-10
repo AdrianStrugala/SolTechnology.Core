@@ -217,7 +217,12 @@ DreamTravel component-test stubs (strict WireMock matching) and split the Messag
 was completed on 2026-11-10 and its working folder deleted: `ITimingService` is removed (EventId 2147 retired), the
 HTTP finish entry is the Chronicle report 2155 and other roots report as 2154, Tale now depends on Logging, and CQRS,
 HTTP, MessageBus and Hangfire record Chronicle steps or roots; its `CH`/`CP`/`LC` tables and release-notes inputs feed
-the 2.0 release.
+the 2.0 release. [`flagship-showcase-hygiene`](2026-11-02-flagship-showcase-hygiene.md) (showcase 01–08) was completed
+on 2026-11-10 and its working folder deleted: community files and a root quick start, SHA-pinned actions with
+Dependabot, DreamTravel on `IMediator`-only controllers with a CQRS-free Domain, a README that runs from a fresh clone,
+and a `dreamtravel-tests` job that the tag publish waits for. Its post-step fixes gave an unknown city a 404 and led to
+P-30 (`ba8231ec`); its owner manual actions (Private Vulnerability Reporting before the push, description, content
+reports, first Dependabot and `dreamtravel-tests` runs, the Mac fresh-clone check) are listed in that brief.
 
 Remaining foundation steps: core 05 and 06 may run at any time; core 07 (zero-dependency base
 package) runs after core 04; core 08 (central `GenerateDocumentationFile`) runs after every library

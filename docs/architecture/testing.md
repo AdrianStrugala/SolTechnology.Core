@@ -58,6 +58,21 @@ commas, so a comma-separated value is stubbed with its parts.
 `APIFixture` owns its `WebApplicationFactory` and disposes it, which stops the in-memory host and its
 hosted services. Test-host creation is contained to approved fixture files by an architecture test.
 
+## DreamTravel
+
+DreamTravel's unit tests and its component tests (SQL Server through `SQLFixture`, WireMock for the
+upstream APIs) run in the GitHub Actions job `dreamtravel-tests` on every trigger, and the tag
+publish waits for it ([`docs/CICD.md`](../CICD.md#dreamtravel-tests-job)). The paid Google and
+Michelin integration tests stay `[Ignore]`d, `DreamTravel.E2E.Tests` is a placeholder and stays
+out, and the Azure DevOps pipelines under `sample-tale-code-apps/DreamTravel/devOps/` are kept as a
+memento without CI coverage.
+
+The component tests run several hosts in one process: the shared API and Worker, and a short-lived
+Production API for the error-handling tests. Hangfire's configuration is process-wide (`AddHangfire`
+sets the static log provider and the global filter collections), so the extra host reuses the
+shared `JobStorage.Current` instead of configuring its own; otherwise its tear-down leaves Hangfire
+logging to a disposed logger factory for every later test.
+
 ## Coverage
 
 The `*.Testing` packages have no test project of their own (Q6 of the 2.0 hardening). They are

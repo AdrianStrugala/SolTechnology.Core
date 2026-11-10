@@ -2,7 +2,9 @@
 
 - Persisted job identity changed (namespace, type name, assembly name, method name, parameter
   list of `HangfireEventPublisher` or `RecurringJobRunner<TJob>`) → enqueued, scheduled and
-  retrying jobs fail with "method not found" after deploy. Pin identities with a test.
+  retrying jobs fail with "method not found" after deploy. Pin identities with a test. A job
+  argument counts too: moving an `IEvent` record to another project or namespace (DreamTravel's
+  `CitySearched`, Domain → Queries) leaves stored jobs unloadable; decide binder or cleanup up front.
 - Job parameter key renamed (e.g. the correlation-ID parameter) → in-flight jobs lose state.
 - Recurring job ID scheme changed → old and new entries both fire, or the old entry is orphaned;
   any automatic cleanup must not delete IDs owned by another app sharing the storage, nor IDs that
@@ -18,7 +20,12 @@
   is requeued and re-run on every deploy; abort only when the work was actually interrupted.
 - Process-wide Hangfire state (`GlobalJobFilters`, `JobFilterProviders.Providers`, the static log
   provider that `AddHangfire` sets) shared by several hosts in one process → duplicate or stale
-  filters, and disposed loggers in later tests.
+  filters, and disposed loggers in later tests. A short-lived extra test host (e.g. a Production
+  host next to the shared one) rebinds Hangfire's logging to a logger factory it disposes on
+  tear-down; let it reuse `JobStorage.Current` instead of configuring its own.
+- `JobStorage` resolved lazily in an enqueue-only host → Hangfire.SqlServer installs its schema
+  inside the first request that publishes an event (slow first call, schema SQL in its trace);
+  resolve the storage at start.
 - Filter not applied because the consumer never calls `UseSolFilters` → feature silently off.
 - Monitoring-API scans (`ScheduledJobs(0, int.MaxValue)`) on the perform path → cost grows with
   the whole storage.

@@ -12,3 +12,8 @@
   linked token; check for an inner `TimeoutException` or the elapsed client timeout.
 - Recording request paths or query strings in logs, spans, or reports → API keys and personal data
   leak; record the host only.
+- A host-wide default handler (Aspire ServiceDefaults' `ConfigureHttpClientDefaults` adding
+  `AddStandardResilienceHandler()`) on a Sol client → two nested Polly pipelines: retries
+  multiply, timeouts stack, two circuit breakers per call. Microsoft.Extensions.Http applies the
+  defaults first whatever the registration order; check the built handler chain for exactly one
+  `ResilienceHandler`, not the registration code.
