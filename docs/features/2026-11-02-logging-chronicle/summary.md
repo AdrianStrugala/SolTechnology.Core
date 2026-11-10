@@ -25,7 +25,7 @@ R1–R9 and premortem addendum PA-1…PA-5 in the brief). The verdict above stan
 | 01 | Chronicle core — ambient step tree and step handle | [`steps/01-chronicle-core-step-tree.md`](steps/01-chronicle-core-step-tree.md) | done |
 | 02 | Chronicle — bounded recording and options validation | [`steps/02-bounded-recording-and-options-validation.md`](steps/02-bounded-recording-and-options-validation.md) | done |
 | 03 | Chronicle report model, ASCII tree renderer, and N+1 aggregation | [`steps/03-report-model-renderer-and-n-plus-one.md`](steps/03-report-model-renderer-and-n-plus-one.md) | done |
-| 04 | Chronicle emission — one report entry per root, level escalation, sampling, DI registration | [`steps/04-emission-level-sampling-and-registration.md`](steps/04-emission-level-sampling-and-registration.md) | to-do |
+| 04 | Chronicle emission — one report entry per root, level escalation, sampling, DI registration | [`steps/04-emission-level-sampling-and-registration.md`](steps/04-emission-level-sampling-and-registration.md) | done |
 | 05 | Chronicle steps as OpenTelemetry Activities on `OperationsName` | [`steps/05-opentelemetry-activities.md`](steps/05-opentelemetry-activities.md) | to-do |
 | 06 | Chronicle flight recorder — buffered Debug/Trace entries attached only on failure | [`steps/06-flight-recorder.md`](steps/06-flight-recorder.md) | to-do |
 | 07 | Chronicle SQL steps — SqlClient `DiagnosticListener` observer | [`steps/07-sqlclient-diagnostic-steps.md`](steps/07-sqlclient-diagnostic-steps.md) | to-do |

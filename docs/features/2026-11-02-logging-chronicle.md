@@ -643,4 +643,13 @@ Changes applied by the plan-reviewer. Each one is reflected in the step files:
 
 ## Deviations
 
+### `{@Chronicle}` reaches providers under the key `Chronicle` (step 04, B6)
+
+The 2154 template keeps `[{@Chronicle}]`, but the .NET 10 `[LoggerMessage]` generator uses the
+parameter name as the state key for `{@Name}` placeholders. The key is `Chronicle` (PascalCase
+parameter) and its value is the `ChronicleReport` object. Serilog's MEL bridge destructures only
+keys that start with `@`, so Serilog stores the ASCII tree as a string, like OpenTelemetry and App
+Insights. This supersedes the release-notes bullet "Serilog destructures `{@Chronicle}` as a
+structure capped by `MaximumDestructuringDepth`"; step 15 documents the string form.
+
 ## Follow-ups

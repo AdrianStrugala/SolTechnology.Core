@@ -1,6 +1,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
+using SolTechnology.Core.Logging.Chronicles;
 using SolTechnology.Core.Logging.Correlations;
 using SolTechnology.Core.Logging.Enrichment;
 
@@ -17,6 +18,7 @@ internal static class LoggingServiceRegistrations
         services.TryAddSingleton<ICorrelationIdService, CorrelationIdService>();
         services.TryAddSingleton(TimeProvider.System);
         services.TryAddScoped<ITimingService, TimingService>();
+        ChronicleServiceRegistrations.Register(services);
         EnsureRequestHeadersEnricherRegistered(services);
 
         return services.AddOptions<LoggingOptions>()

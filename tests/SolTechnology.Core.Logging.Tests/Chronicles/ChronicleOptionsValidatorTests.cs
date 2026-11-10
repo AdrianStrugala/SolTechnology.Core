@@ -31,6 +31,12 @@ public class ChronicleOptionsValidatorTests
         yield return Row("AggregateThreshold=1", o => o.AggregateThreshold = 1, false);
         yield return Row("NPlusOneThreshold=AggregateThreshold", o => o.NPlusOneThreshold = o.AggregateThreshold, true);
         yield return Row("NPlusOneThreshold<AggregateThreshold", o => o.NPlusOneThreshold = o.AggregateThreshold - 1, false);
+        yield return Row("SlowThreshold=1tick", o => o.SlowThreshold = TimeSpan.FromTicks(1), true);
+        yield return Row("SlowThreshold=0", o => o.SlowThreshold = TimeSpan.Zero, false);
+        yield return Row("SampleRate=0", o => o.SampleRate = 0.0, true);
+        yield return Row("SampleRate=1", o => o.SampleRate = 1.0, true);
+        yield return Row("SampleRate=-0.1", o => o.SampleRate = -0.1, false);
+        yield return Row("SampleRate=1.1", o => o.SampleRate = 1.1, false);
     }
 
     [TestCaseSource(nameof(Bounds))]

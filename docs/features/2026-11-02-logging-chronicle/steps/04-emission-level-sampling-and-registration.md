@@ -1,7 +1,7 @@
 ---
 spec: 2026-11-02-logging-chronicle
 step: 04
-status: to-do
+status: done
 ---
 
 # Step 04: Chronicle emission — one report entry per root, level escalation, sampling, DI registration
@@ -87,16 +87,56 @@ failure, Warning when cancelled or slower than `SlowThreshold`, and Information 
     measurement + 25% and recorded under `Deviations`.
 
 ## Acceptance criteria
-- [ ] `dotnet test tests/SolTechnology.Core.Logging.Tests` is green.
-- [ ] `grep -rnE "EventId = 2154" src --include=*.cs | wc -l` prints `1`, and no other `[LoggerMessage]` in `src` uses 2154 (2137–2148 Logging, 2149 CQRS, and 2150–2153 Hangfire are taken).
-- [ ] `wc -l < src/SolTechnology.Core.Logging/ModuleInstaller.cs` prints ≤ 150.
-- [ ] `dotnet build SolTechnology.Core.slnx` is green.
-- [ ] Premortem mitigations for `ModuleInstaller.cs` (step 00) are applied.
-- [ ] CRM-4: `SampleRate0_OkRootWithFailedChild_Emitted` and `SampleRate0_OkRootWithFailedOverflowStep_Emitted` are green.
-- [ ] CRM-6: the three `AddSolChronicle_*` call-order tests are green.
-- [ ] CRM-14: `CategoryAboveLevel_OkRoot_ReportNotBuilt` and `Root_TenSteps_Emitted_AllocatesUnderCeiling` are green; the pinned ceiling is recorded under `Deviations`.
+- [x] `dotnet test tests/SolTechnology.Core.Logging.Tests` is green.
+- [x] `grep -rnE "EventId = 2154" src --include=*.cs | wc -l` prints `1`, and no other `[LoggerMessage]` in `src` uses 2154 (2137–2148 Logging, 2149 CQRS, and 2150–2153 Hangfire are taken).
+- [x] `wc -l < src/SolTechnology.Core.Logging/ModuleInstaller.cs` prints ≤ 150.
+- [x] `dotnet build SolTechnology.Core.slnx` is green.
+- [x] Premortem mitigations for `ModuleInstaller.cs` (step 00) are applied.
+- [x] CRM-4: `SampleRate0_OkRootWithFailedChild_Emitted` and `SampleRate0_OkRootWithFailedOverflowStep_Emitted` are green.
+- [x] CRM-6: the three `AddSolChronicle_*` call-order tests are green.
+- [x] CRM-14: `CategoryAboveLevel_OkRoot_ReportNotBuilt` and `Root_TenSteps_Emitted_AllocatesUnderCeiling` are green; the pinned ceiling is recorded under `Deviations`.
 
 ## Open questions
 - none (OQ-1 confirmed 2026-11-02: `CH-04` `SlowThreshold`/`SampleRate`, `CH-07`; OQ-2 accepted 2026-11-02: `LC-03`, `LC-04`)
 
 ## Deviations
+
+### `{@Chronicle}` state key is `Chronicle`, not `@Chronicle` (B6)
+
+**Original plan:** `[{@Chronicle}]` lets Serilog destructure the public report model; the test
+asserts the state entry `Chronicle`/`@Chronicle` holds the `ChronicleReport` object.
+
+**Actual implementation:** the template is unchanged (LC-03) and builds without `SYSLIB1014`, but
+for a `{@Name}` placeholder the .NET 10 generator uses the *parameter name* as the state key: a
+parameter `chronicle` produced the key `chronicle`. The parameter is therefore named `Chronicle`
+(one-line why-comment), so the key is `Chronicle` and its value is the `ChronicleReport` object
+(test `ChronicleReported_State_CarriesChronicleReportObject`). No key starts with `@`, so
+Serilog's MEL bridge binds the value without destructuring and stores the ASCII tree as a string,
+like OpenTelemetry. The brief's release-notes bullet on Serilog destructuring is superseded; step 15
+documents the string form.
+
+### Emission policy split into level and sampling
+
+**Original plan:** `(LogLevel Level, bool ShouldEmit) Decide(ChronicleReport report, int? httpStatusCode)`.
+
+**Actual implementation:** CRM-14 needs the level before any report exists, so the policy has
+`LevelOf(status, duration, httpStatusCode)` (from the root alone) and
+`ShouldEmit(report, level)`. The reporter checks `logger.IsEnabled(level)` between the two.
+
+### CRM-14 allocation ceiling
+
+`Root_TenSteps_Emitted_AllocatesUnderCeiling` measured 8,808 bytes (Release, arm64, .NET 10,
+three identical runs) for one root with ten steps, built and logged to a provider that does not
+format. The ceiling is pinned at 11,010 bytes (+25%).
+
+### Registration and test layout
+
+- `ChronicleServiceRegistrations.Register` returns early when `IChronicle` is already registered,
+  so services and `ValidateOnStart` are added once; the returned options builder still takes every
+  caller's `Configure`/`Bind` (CRM-6).
+- The `AddSolChronicle_*` and `AddSolLogging*_…Chronicle…` tests live in
+  `Chronicles/ChronicleModuleInstallerTests.cs` instead of `ModuleInstallerTests.cs`, which keeps
+  that file at its size; `ModuleResolutionTests` resolves `IChronicle` under `ValidateOnBuild`.
+- The premortem mitigations for `ModuleInstaller.cs` in this step (CRM-4, CRM-6, CRM-14) are
+  applied; `ModuleInstaller.cs` is 148 lines.
+

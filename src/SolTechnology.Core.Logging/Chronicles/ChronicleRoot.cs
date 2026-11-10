@@ -19,6 +19,8 @@ internal sealed class ChronicleRoot
     internal ChronicleNode Node { get; }
     internal DateTimeOffset StartedAt { get; }
     internal Exception? Exception { get; set; }
+    internal bool IsReportedByCaller { get; set; }
+    internal TimeSpan Duration => Owner.TimeProvider.GetElapsedTime(Node.StartTimestamp, Node.EndTimestamp);
     internal bool IsClosed => Volatile.Read(ref _closed) == 1;
     internal int LateStepCount => Volatile.Read(ref _lateStepCount);
     internal int StepCount => Volatile.Read(ref _stepCount);

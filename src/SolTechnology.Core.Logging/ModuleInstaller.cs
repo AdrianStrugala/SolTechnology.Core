@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Configuration;
+using SolTechnology.Core.Logging.Chronicles;
 using SolTechnology.Core.Logging.Correlations;
 using SolTechnology.Core.Logging.Enrichment;
 using SolTechnology.Core.Logging.Middleware;
@@ -19,7 +20,7 @@ public static class ModuleInstaller
     extension(IServiceCollection services)
     {
         /// <summary>
-        /// Registers the correlation, timing and enrichment services used by
+        /// Registers the correlation, timing, enrichment and Chronicle services used by
         /// <see cref="LoggingMiddleware"/>. Safe to call multiple times.
         /// </summary>
         public IServiceCollection AddSolLogging(Action<LoggingOptions>? configure = null)
@@ -34,15 +35,37 @@ public static class ModuleInstaller
         }
 
         /// <summary>
-        /// Binds <see cref="LoggingOptions"/> from the configuration section
-        /// <c>Logging:Core</c> (see <see cref="LoggingOptions.SectionName"/>) and registers the
-        /// same services as the <see cref="Action{T}"/> overload.
+        /// Binds <see cref="LoggingOptions"/> from <c>Logging:Core</c> and <see cref="ChronicleOptions"/>
+        /// from <c>Logging:Core:Chronicle</c>, and registers the same services as the <see cref="Action{T}"/> overload.
         /// </summary>
         public IServiceCollection AddSolLogging(IConfiguration configuration)
         {
             ArgumentNullException.ThrowIfNull(configuration);
 
             LoggingServiceRegistrations.RegisterCore(services).Bind(configuration.GetSection(LoggingOptions.SectionName));
+            return services.AddSolChronicle(configuration);
+        }
+
+        /// <summary>
+        /// Registers <see cref="IChronicle"/>, its reporter, and <see cref="ChronicleOptions"/> validated on
+        /// start. Services are added once; <paramref name="configure"/> applies on every call.
+        /// </summary>
+        public IServiceCollection AddSolChronicle(Action<ChronicleOptions>? configure = null)
+        {
+            var options = ChronicleServiceRegistrations.Register(services);
+            if (configure is not null)
+            {
+                options.Configure(configure);
+            }
+
+            return services;
+        }
+
+        /// <summary>Like the <see cref="Action{T}"/> overload, binding <see cref="ChronicleOptions.SectionName"/> on every call.</summary>
+        public IServiceCollection AddSolChronicle(IConfiguration configuration)
+        {
+            ArgumentNullException.ThrowIfNull(configuration);
+            ChronicleServiceRegistrations.Register(services).Bind(configuration.GetSection(ChronicleOptions.SectionName));
             return services;
         }
 

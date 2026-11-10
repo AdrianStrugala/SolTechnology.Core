@@ -9,6 +9,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using NUnit.Framework;
+using SolTechnology.Core.Logging.Chronicles;
 using SolTechnology.Core.Logging.Correlations;
 using SolTechnology.Core.Logging.Enrichment;
 
@@ -106,6 +107,7 @@ public class ModuleResolutionTests
         [
             scoped.GetRequiredService<ICorrelationIdService>(),
             scoped.GetRequiredService<ITimingService>(),
+            scoped.GetRequiredService<IChronicle>(),
             scoped.GetRequiredService<TimeProvider>(),
             scoped.GetRequiredService<IOptions<LoggingOptions>>().Value,
             scoped.GetServices<ILogScopeEnricher>().ToArray()

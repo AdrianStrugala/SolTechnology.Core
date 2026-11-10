@@ -50,4 +50,16 @@ public sealed class ChronicleOptions
     /// (default 10, at least <see cref="AggregateThreshold"/>).
     /// </summary>
     public int NPlusOneThreshold { get; set; } = 10;
+
+    /// <summary>
+    /// A successful root at least this slow is reported at <c>Warning</c> instead of
+    /// <c>Information</c> (default 1 second, must be positive).
+    /// </summary>
+    public TimeSpan SlowThreshold { get; set; } = TimeSpan.FromSeconds(1);
+
+    /// <summary>
+    /// Share of fast, successful roots that are reported (default 1.0, range 0.0–1.0). Roots that
+    /// failed, were cancelled, were slow, contain a failed step, or look like N+1 are always reported.
+    /// </summary>
+    public double SampleRate { get; set; } = 1.0;
 }
