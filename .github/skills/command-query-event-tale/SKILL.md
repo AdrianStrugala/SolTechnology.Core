@@ -13,7 +13,7 @@ canonical shape, wire registration, and log it — using DreamTravel as the refe
 
 The CQRS/Tale **contracts** (`IQueryHandler<,>`, `ICommandHandler<>`, `IEvent`, `TaleHandler<,,>`,
 `[LogScope]`, `Result`) ship in the packages and are identical for every consumer. The §0/§1
-**folder layout** (`LogicLayer/`, `*.Domain/Events/`, `Presentation/`) is DreamTravel's canonical
+**folder layout** (`LogicLayer/` with its `Events/` folders, `Presentation/`) is DreamTravel's canonical
 structure — recommended, but a consumer app may use its own names. When in doubt, copy DreamTravel.
 
 > One source of truth per topic. The binding rules live in the Coding Guide §0/§3/§4/§11 and are
@@ -54,7 +54,7 @@ structure — recommended, but a consumer app may use its own names. When in dou
 - DreamTravel reference implementations:
   - Query-as-Tale — `sample-tale-code-apps/DreamTravel/src/LogicLayer/DreamTravel.Queries/CalculateBestPath/`
   - Simple command — `.../DreamTravel.Commands/FetchTraffic/`
-  - Event publish + handler — `.../DreamTravel.Queries/FindCityByName/` + `.../DreamTravel.Domain/Events/CitySearched.cs` + `.../DreamTravel.Worker/EventHandlers/OnCitySearched/`
+  - Event publish + handler — `.../DreamTravel.Queries/FindCityByName/` + `.../DreamTravel.Queries/Events/CitySearched.cs` + `.../DreamTravel.Worker/EventHandlers/OnCitySearched/`
   - Tale in DomainServices — `.../DreamTravel.DomainServices/CityDomain/SaveCityTale/`
   - Interactive persisted Workflow — `.../DreamTravel.Workflows/SampleOrderWorkflow/`
 
@@ -163,8 +163,9 @@ across a restart (Tale.md).
 
 ### 8. Events
 
-- The event is a pure record implementing `IEvent`, living in `*.Domain/Events/` (§0 — Domain
-  references nothing).
+- The event is a record implementing `IEvent`, living in an `Events/` folder of the LogicLayer
+  project that publishes it (Guide §6: `IEvent` comes from `SolTechnology.Core.CQRS`, and the
+  Domain references nothing).
 - Publish fire-and-forget via the injected `IMediator.Publish(@event)` — it returns immediately;
   handler failures are isolated and logged, never propagate to the caller (CQRS.md).
 - One background task and DI scope are created per event. Handlers run sequentially in that scope.
@@ -232,7 +233,7 @@ or change a `ModuleInstaller.cs` contract, that is premortem-gated (`CLAUDE.md �
 - [ ] Handler ≤ ~100 lines of business logic **and** touches ≤ 1 external system — else it is a Tale.
 - [ ] `Tell()` contains only `ReadChapter<…>()` calls plus output mapping — no `if`/`try`/loop.
 - [ ] Chapters: one verb, numbered file prefix, class without prefix, state on `Context`, `[UsedImplicitly]`.
-- [ ] Events implement `IEvent` in `*.Domain/Events/`; published via `IMediator.Publish`; handlers in the consumer.
+- [ ] Events implement `IEvent` in the publishing LogicLayer project's `Events/` folder; published via `IMediator.Publish`; handlers in the consumer.
 - [ ] Logging: request properties needing visibility marked `[LogScope]` (no PII); event handlers / chapters log their own begin/end via `OperationStarted` / `OperationSucceeded` / `OperationFailed`.
 - [ ] Registration is assembly-scan (`AddSolCQRS` / `AddSolTale`); only true collaborators added explicitly.
 - [ ] `get_errors` clean; `dotnet build` green for the sample app.

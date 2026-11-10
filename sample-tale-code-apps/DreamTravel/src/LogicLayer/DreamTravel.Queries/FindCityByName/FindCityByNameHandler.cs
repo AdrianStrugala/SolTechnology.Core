@@ -1,6 +1,6 @@
 ﻿using DreamTravel.DomainServices.CityDomain;
 using DreamTravel.Domain.Cities;
-using DreamTravel.Domain.Events;
+using DreamTravel.Queries.Events;
 using DreamTravel.GeolocationDataClients.GoogleApi;
 using Microsoft.Extensions.Logging;
 using SolTechnology.Core.CQRS;

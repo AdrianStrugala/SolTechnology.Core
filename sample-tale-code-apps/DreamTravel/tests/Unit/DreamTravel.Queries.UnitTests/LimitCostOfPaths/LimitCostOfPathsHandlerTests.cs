@@ -5,9 +5,9 @@ using Path = DreamTravel.Domain.Paths.Path;
 namespace DreamTravel.Queries.UnitTests.LimitCostOfPaths
 {
     [TestFixture]
-    public class LimitCostOfPathsTests
+    public class LimitCostOfPathsHandlerTests
     {
-        private readonly LimitCostOfPathsService _sut = new();
+        private readonly LimitCostOfPathsHandler _sut = new();
 
         [Test]
         public async Task Handle_ValidInput_ListOfCitiesIsSortedByIndex()
@@ -43,7 +43,6 @@ namespace DreamTravel.Queries.UnitTests.LimitCostOfPaths
                 Goal = 1
             });
 
-
             //Act
             var result = (await _sut.Handle(new LimitCostOfPathsQuery
             {
@@ -76,7 +75,6 @@ namespace DreamTravel.Queries.UnitTests.LimitCostOfPaths
                 Goal = 3
             });
 
-
             //Act
             var result = (await _sut.Handle(new LimitCostOfPathsQuery
             {
@@ -84,11 +82,9 @@ namespace DreamTravel.Queries.UnitTests.LimitCostOfPaths
                 Paths = paths
             }, CancellationToken.None)).Data;
 
-
             //Assert
             result[0].OptimalCost.Should().Be(0);
         }
-
 
         [Test]
         public async Task Handle_2PathsUsingTheSameVinieta_ResultContainsOptimalCostForThem()
@@ -114,7 +110,6 @@ namespace DreamTravel.Queries.UnitTests.LimitCostOfPaths
                 Goal = 3
             });
 
-
             //Act
             var result = (await _sut.Handle(new LimitCostOfPathsQuery
             {
@@ -122,10 +117,30 @@ namespace DreamTravel.Queries.UnitTests.LimitCostOfPaths
                 Paths = paths
             }, CancellationToken.None)).Data;
 
-
             //Assert
             result[0].OptimalCost.Should().Be(5);
             result[1].OptimalCost.Should().Be(5);
+        }
+
+        [Test]
+        public async Task Handle_PathsOverTheLimit_DoesNotMutateTheInputListOrItsElements()
+        {
+            // Arrange
+            var paths = new List<Path>
+            {
+                new() { Index = 1, Goal = 2, Cost = 50, TollDistance = 200, FreeDistance = 260, OptimalCost = 7, OptimalDistance = 8 },
+                new() { Index = 0, Goal = 1, Cost = 10, TollDistance = 100, FreeDistance = 150, OptimalCost = 7, OptimalDistance = 8 }
+            };
+            var input = paths.ToList();
+
+            // Act
+            var result = (await _sut.Handle(new LimitCostOfPathsQuery { CostLimit = 20, Paths = paths }, CancellationToken.None)).Data!;
+
+            // Assert
+            result.Select(p => (p.Index, p.OptimalCost, p.OptimalDistance)).Should().Equal((0, 10d, 100d), (1, 0d, 260d));
+            paths.Should().Equal(input);
+            paths.Select(p => (p.OptimalCost, p.OptimalDistance)).Should().AllBeEquivalentTo((7d, 8d));
+            result.Should().NotContain(r => paths.Contains(r));
         }
     }
 }

@@ -20,7 +20,7 @@ Before touching any file, answer these in order:
 1. **Is it user-driven I/O (HTTP, message, cron)?** → goes in `Presentation/` (Api, Worker, Ui).
 2. **Is it business logic / orchestration?** → `LogicLayer/` (Commands, Queries, DomainServices, Workflows).
 3. **Does it talk to a database / HTTP API / blob / bus?** → `DataLayer/` (one project per external system).
-4. **Is it a pure domain concept (entity, value object, domain event)?** → `*.Domain/`.
+4. **Is it a pure domain concept (entity, value object)?** → `*.Domain/`. An event published through CQRS (`IEvent`) is not: it goes to the publishing LogicLayer project's `Events/` folder (§6).
 5. **Is it cross-cutting plumbing (events publisher, email, generic infra)?** → `Infrastructure/`.
 
 If a file would not fit cleanly into exactly one of those buckets, your design is wrong —
@@ -39,7 +39,7 @@ src/
     DreamTravel.ServiceDefaults/  ← Aspire defaults
   LogicLayer/
     DreamTravel.Commands/         ← write side (CQRS)
-    DreamTravel.Queries/          ← read side (CQRS)
+    DreamTravel.Queries/          ← read side (CQRS); Events/ holds the IEvent records it publishes
     DreamTravel.DomainServices/   ← reusable domain operations + Tales spanning multiple commands
     DreamTravel.Workflows/        ← long-running interactive Tales
     DreamTravel.TravelingSalesmanProblem/ ← isolated algorithmic engine
@@ -50,7 +50,7 @@ src/
   Infrastructure/
     DreamTravel.Infrastructure/   ← email, event publishing, generic plumbing
     DreamTravelDatabase/          ← migrations / DACPAC
-  DreamTravel.Domain/             ← pure domain (records, value objects, domain events)
+  DreamTravel.Domain/             ← pure domain (records, value objects); references nothing
   DreamTravel.Aspire/             ← orchestration host
 tests/
   Unit/                ← only for pure algorithms / domain invariants
@@ -297,7 +297,7 @@ Rules:
 
 - C# `record` for value objects and immutable entities; `class` for aggregates with mutable invariants.
 - No attributes from EF, MediatR, JSON, validation, or logging libraries. The domain knows nothing about how it is persisted, transported, or validated.
-- Domain events live in `Events/`. They are records with past-tense names (`CityImported`, `TrafficRecalculated`).
+- Records published through CQRS (`IEvent`) are not Domain types: `IEvent` comes from `SolTechnology.Core.CQRS`, and the Domain references nothing. They live in an `Events/` folder of the publishing LogicLayer project (`DreamTravel.Queries/Events/CitySearched.cs`) and have past-tense names (`CitySearched`, `CityImported`).
 - Validation that is a true domain invariant lives in the constructor / factory method. Input validation lives in FluentValidation validators in the LogicLayer.
 
 ---

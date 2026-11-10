@@ -3,7 +3,6 @@ using Microsoft.Extensions.Logging;
 using SolTechnology.Core.CQRS;
 using SolTechnology.Core.Errors;
 using SolTechnology.Core.Tale;
-using SolTechnology.Core.Tale;
 
 namespace DreamTravel.Queries.CalculateBestPath;
 

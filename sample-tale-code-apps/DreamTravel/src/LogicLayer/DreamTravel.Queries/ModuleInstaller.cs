@@ -1,4 +1,4 @@
-﻿﻿﻿﻿using DreamTravel.Queries.CalculateBestPath;
+using DreamTravel.Queries.CalculateBestPath;
 using DreamTravel.TravelingSalesmanProblem;
 using Microsoft.Extensions.DependencyInjection;
 using SolTechnology.Core.CQRS;

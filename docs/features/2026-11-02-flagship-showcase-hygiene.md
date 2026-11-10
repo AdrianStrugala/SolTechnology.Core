@@ -298,5 +298,9 @@ Decided during implementation without a confirmation stop; each step file carrie
 - Step 04: `CLAUDE.md §3`, two skills, and `CONTRIBUTING.md` told readers to run `dotnet build` or
   `dotnet test` inside `sample-tale-code-apps/DreamTravel`, which has no solution file; they now
   name `SolTechnology.Core.slnx` and per-project test paths.
+- Step 05 (SRM-14, accepted): `CitySearched` moved to `DreamTravel.Queries.Events`. Hangfire jobs
+  stored before the move name `DreamTravel.Domain.Events.CitySearched, DreamTravel.Domain` and go
+  to Failed; only local databases hold them. Remedy: delete them under Jobs → Failed in the
+  Worker's Hangfire dashboard (`/hangfire/ui`) or drop the local database volume.
 
 ## Follow-ups

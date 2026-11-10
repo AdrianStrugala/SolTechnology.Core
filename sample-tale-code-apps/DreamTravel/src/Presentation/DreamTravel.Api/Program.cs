@@ -47,7 +47,7 @@ public class Program
 
 
         var cultureInfo = new CultureInfo("en-US");
-        cultureInfo.NumberFormat.CurrencySymbol = "�";
+        cultureInfo.NumberFormat.CurrencySymbol = "€";
 
         CultureInfo.DefaultThreadCurrentCulture = cultureInfo;
         CultureInfo.DefaultThreadCurrentUICulture = cultureInfo;

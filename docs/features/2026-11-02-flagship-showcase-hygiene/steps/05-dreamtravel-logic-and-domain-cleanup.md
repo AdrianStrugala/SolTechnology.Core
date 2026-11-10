@@ -1,7 +1,7 @@
 ---
 spec: 2026-11-02-flagship-showcase-hygiene
 step: 05
-status: to-do
+status: done
 ---
 
 # Step 05: DreamTravel — logic and domain cleanup
@@ -46,15 +46,62 @@ planned").
 - Premortem SRM-8 (scenario 8): kept jokes are not edited — `"DUPA."` in `LogEventInfoJob.cs`, `CorsPolicy = "dupa"` in `Program.cs`.
 
 ## Acceptance criteria
-- [ ] `grep -n "SolTechnology.Core.CQRS" sample-tale-code-apps/DreamTravel/src/DreamTravel.Domain/DreamTravel.Domain.csproj` prints nothing.
-- [ ] `cd sample-tale-code-apps/DreamTravel && dotnet build` is green; unit and component tests green.
-- [ ] Premortem mitigations for `ModuleInstaller.cs` are applied (`DreamTravel.Queries/ModuleInstaller.cs` BOM removal and handler rename).
-- [ ] SRM-15: `grep -n "Domain/Events" .github/skills/command-query-event-tale/SKILL.md` prints nothing, and Guide §6 names the LogicLayer `Events/` folder for `IEvent` records.
-- [ ] SRM-16: the unit test asserts the input elements' `OptimalCost` and `OptimalDistance` after the call.
-- [ ] SRM-8: `grep -c "DUPA" .../LogEventInfoJob.cs` prints `1`; `grep -n 'CorsPolicy = "dupa"' .../DreamTravel.Api/Program.cs` prints one line.
-- [ ] SRM-14: the break and its remedy are recorded under Deviations.
+- [x] `grep -n "SolTechnology.Core.CQRS" sample-tale-code-apps/DreamTravel/src/DreamTravel.Domain/DreamTravel.Domain.csproj` prints nothing.
+- [x] `cd sample-tale-code-apps/DreamTravel && dotnet build` is green; unit and component tests green.
+- [x] Premortem mitigations for `ModuleInstaller.cs` are applied (`DreamTravel.Queries/ModuleInstaller.cs` BOM removal and handler rename).
+- [x] SRM-15: `grep -n "Domain/Events" .github/skills/command-query-event-tale/SKILL.md` prints nothing, and Guide §6 names the LogicLayer `Events/` folder for `IEvent` records.
+- [x] SRM-16: the unit test asserts the input elements' `OptimalCost` and `OptimalDistance` after the call.
+- [x] SRM-8: `grep -c "DUPA" .../LogEventInfoJob.cs` prints `1`; `grep -n 'CorsPolicy = "dupa"' .../DreamTravel.Api/Program.cs` prints one line.
+- [x] SRM-14: the break and its remedy are recorded under Deviations.
 
 ## Open questions
 - none
 
 ## Deviations
+
+### Persisted `CitySearched` type name changes (SRM-14, accepted)
+
+**Original plan:** H1 (a): move `CitySearched` to `DreamTravel.Queries.Events`; the premortem
+accepted the persisted type-name break without a binder.
+
+**Actual implementation:** as planned. Hangfire jobs enqueued before this commit store
+`DreamTravel.Domain.Events.CitySearched, DreamTravel.Domain`; that type no longer exists, so the
+Worker cannot load them and `[AutomaticRetry(Attempts = 0)]` moves them straight to Failed. Only
+local developer databases hold such jobs (the Aspire SQL container is persistent, so they survive
+between runs). Remedy: open the Hangfire dashboard on the Worker (`/hangfire/ui`), go to Jobs →
+Failed, and delete the failed `CitySearched` jobs; or drop the local database volume. No
+production data is affected. `FindCityAndSaveDetailsTest` passes with the new type end to end
+(API publishes, Worker loads and saves).
+
+### Test file renamed and tidied
+
+**Original plan:** the unit tests follow the renamed handler and gain the SRM-16 test.
+
+**Actual implementation:** `LimitCostOfPathsTests.cs` became `LimitCostOfPathsHandlerTests.cs`
+(`git mv`, class renamed to match the production type), and its runs of two or three blank lines
+were collapsed so the file stays under 150 lines (146) with the new test. The rewritten handler
+also gets braces on its one braceless `if` (Guide §9.11).
+
+### SRM outcomes (2026-11-10)
+
+- **SRM-8 — done.** `LogEventInfoJob.cs` keeps `$"{nameof(CitySearched)}. DUPA."` (only its
+  `using` changed; `grep -c DUPA` prints 1), and `CorsPolicy = "dupa"` is untouched; the
+  `Program.cs` edit is the currency line only.
+- **SRM-14 — accepted, recorded above** and in the brief.
+- **SRM-15 — done in the same commit as the move.** Guide §0 item 4, the §1 tree (Domain line and
+  Queries line), and §6 put `IEvent` records in the publishing LogicLayer project's `Events/`
+  folder; the `command-query-event-tale` skill (`:16`, `:57`, `:166`, `:235`) says the same and
+  points at `DreamTravel.Queries/Events/CitySearched.cs`.
+- **SRM-16 — done.** The handler copies every `Path` (`Copy` creates new instances; the immutable
+  `City` references are shared) before sorting and writing. The new unit test asserts the result
+  values, the input list order, the input elements' `OptimalCost`/`OptimalDistance` (unchanged at
+  7 and 8), and that no result element is an input instance. With only a list copy the test fails
+  on the element values.
+
+### Verification (2026-11-10)
+
+- `dotnet build SolTechnology.Core.slnx -c Release`: 0 errors (97 warnings, all pre-existing;
+  103 before step 03).
+- DreamTravel Release tests: Queries unit 7 passed (6 + 1), TravelingSalesmanProblem 4, Ui 17,
+  GeolocationDataClients 4 passed / 11 skipped, Component 40 passed.
+- `ModuleInstaller.cs` starts with `using` (no BOM); the currency symbol is `€` (U+20AC).

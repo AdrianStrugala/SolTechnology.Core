@@ -1,5 +1,5 @@
 using DreamTravel.DomainServices.CityDomain;
-using DreamTravel.Domain.Events;
+using DreamTravel.Queries.Events;
 using Hangfire.Annotations;
 using SolTechnology.Core.CQRS;
 
