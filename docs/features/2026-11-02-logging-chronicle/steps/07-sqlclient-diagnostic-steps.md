@@ -1,7 +1,7 @@
 ---
 spec: 2026-11-02-logging-chronicle
 step: 07
-status: to-do
+status: in-progress
 ---
 
 # Step 07: Chronicle SQL steps — SqlClient `DiagnosticListener` observer

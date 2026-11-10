@@ -28,6 +28,22 @@ internal sealed class ChronicleWriter(ChronicleOptions options, TimeProvider tim
 
     internal ChronicleStep StartChild(ChronicleNode parent, string name, bool withActivity = true)
     {
+        var node = AddChild(parent, name, groupKey: null);
+        if (node is null || node.IsOverflow)
+        {
+            return node is null ? default : new ChronicleStep(node, null, owns: true);
+        }
+
+        node.Activity = withActivity ? ChronicleActivities.Start(Options, node.Name) : null;
+        AmbientChronicle.Current = node;
+        return new ChronicleStep(node, parent, owns: true, node.Activity);
+    }
+
+    /// <summary>A child that never becomes ambient and starts no activity (SQL commands); <c>null</c> beyond <see cref="ChronicleOptions.MaxDepth"/>.</summary>
+    internal ChronicleNode? StartDetachedLeaf(ChronicleNode parent, string name, string groupKey) => AddChild(parent, name, groupKey);
+
+    private ChronicleNode? AddChild(ChronicleNode parent, string name, string? groupKey)
+    {
         var root = parent.Root;
         if (parent.IsClosed)
         {
@@ -37,20 +53,18 @@ internal sealed class ChronicleWriter(ChronicleOptions options, TimeProvider tim
         if (parent.Depth >= Options.MaxDepth)
         {
             parent.CountDroppedDeeper();
-            return default;
+            return null;
         }
 
         name = Truncate(name);
         if (!root.TryReserveStep(Options.MaxSteps))
         {
-            return new ChronicleStep(new ChronicleNode(root, parent, name, name, TimeProvider.GetTimestamp(), isOverflow: true), null, owns: true);
+            return new ChronicleNode(root, parent, name, groupKey ?? name, TimeProvider.GetTimestamp(), isOverflow: true);
         }
 
-        var activity = withActivity ? ChronicleActivities.Start(Options, name) : null;
-        var node = new ChronicleNode(root, parent, name, name, TimeProvider.GetTimestamp()) { Activity = activity };
+        var node = new ChronicleNode(root, parent, name, groupKey ?? name, TimeProvider.GetTimestamp());
         parent.AddChild(node);
-        AmbientChronicle.Current = node;
-        return new ChronicleStep(node, parent, owns: true, activity);
+        return node;
     }
 
     internal void SetAttribute(ChronicleNode node, string key, string value)

@@ -71,4 +71,17 @@ public sealed class ChronicleOptions
 
     /// <summary>Flight recorder: Debug/Trace entries attached to the report of a failed root (off by default).</summary>
     public ChronicleFlightRecorderOptions FlightRecorder { get; set; } = new();
+
+    /// <summary>
+    /// Records every SqlClient command run inside a root as a <c>SQL {keyword}</c> step, observed
+    /// through SqlClient's <c>DiagnosticListener</c> (default <c>true</c>). Takes effect when the
+    /// host starts its hosted services.
+    /// </summary>
+    public bool CaptureSQLCommands { get; set; } = true;
+
+    /// <summary>
+    /// Records the statement text (attribute <c>Statement</c>) and the error message of a failed
+    /// command (default <c>false</c>: SQL text and SqlClient messages can carry literal values).
+    /// </summary>
+    public bool CaptureSQLCommandText { get; set; }
 }
