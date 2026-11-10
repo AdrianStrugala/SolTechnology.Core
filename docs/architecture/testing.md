@@ -75,6 +75,16 @@ logging to a disposed logger factory for every later test.
 
 ## Coverage
 
+Every module that registers services has a `ModuleResolutionTests` class that builds its provider
+with `ValidateOnBuild` and `ValidateScopes` on and resolves each public service, so a registration
+that only fails at runtime fails a test first. Blob is the exception: it has no test project
+(accepted risk AR-1 of the 2.0 hardening), and its fixes rest on a Release build, source checks and
+manual Azurite runs. The deprecated Guards and Scheduler projects have no resolution test.
+
+CI runs the library tests through `.github/runTests.ps1` after the build. It runs every test project
+listed in `SolTechnology.Core.slnx` with `--no-build`, keeps going after a failure, and exits non-zero
+when any one failed, so a failure in an early project cannot be hidden by a later green one.
+
 The `*.Testing` packages have no test project of their own (Q6 of the 2.0 hardening). They are
 exercised by the module test projects that use them and by the DreamTravel component tests; a few
 kit behaviours (strict matching, `APIFixture` disposal, Service Bus fixture lifecycle, network removal)

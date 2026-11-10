@@ -235,3 +235,21 @@ package needs its own source with the same name.
 CQRS references Logging, so it also depends on the ASP.NET Core shared framework. Packages version
 in lockstep and warn with `SOLCORE001` on a mixed major-version graph; see
 [Package release](package-release.md) and [CQRS](cqrs.md).
+
+## Cross-module log contract
+
+Every `SolTechnology.Core.*` module follows the same template rules (Coding Guide §11), so one
+query style works across them:
+
+- Every placeholder is bracketed, `[{Name}]`, so an empty value shows as `[]`; the brackets are
+  text, and the property name stays the queryable key.
+- A caught exception is the log entry's exception argument, never a `{Exception}` placeholder or
+  text in the message.
+- A failed `Result` is logged as a failure with its `Error` type and message, not as a success.
+- Modules log only through `ILogger`, never `Console`, and a log scope carries the real identifier
+  of the work it covers (for example the tale id).
+
+Templates and property names are a contract: dashboards and alerts query them. Changing one is
+reported as a log contract change in the release notes, and a renamed property is called out
+(for example `HealthPath` → `UpstreamURL`, `Key` → `IdempotencyKey`). Event ids are listed in
+[`docs/Log.md`](../Log.md) and, for the Hangfire start-up entries, [`docs/Hangfire.md`](../Hangfire.md).
