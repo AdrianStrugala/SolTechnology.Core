@@ -204,3 +204,11 @@ csharp_space_between_square_brackets = false
 # Wrapping preferences
 csharp_preserve_single_line_blocks = true
 csharp_preserve_single_line_statements = true
+
+# Conventions the compiler enforces (docs/ClaudeCodingGuide.md §9.11 braces, §11 log templates).
+# `warning` fails the build under src/ (TreatWarningsAsErrors) and stays a visible warning in
+# samples and tests. IDE0011 is reported in builds through EnforceCodeStyleInBuild (root
+# Directory.Build.props).
+[*.cs]
+dotnet_diagnostic.IDE0011.severity = warning
+dotnet_diagnostic.CA2254.severity = warning

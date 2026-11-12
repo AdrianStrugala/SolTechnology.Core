@@ -19,7 +19,10 @@ public class InMemoryTaleRepository : ITaleRepository
     {
         cancellationToken.ThrowIfCancellationRequested();
         if (_tales.TryGetValue(taleId, out var tale))
+        {
             return Task.FromResult<TaleInstance?>(tale.Clone());
+        }
+
         return Task.FromResult<TaleInstance?>(null);
     }
 
@@ -43,9 +46,15 @@ public class InMemoryTaleRepository : ITaleRepository
     {
         cancellationToken.ThrowIfCancellationRequested();
         IEnumerable<TaleInstance> query = _tales.Values;
-        if (status.HasValue) query = query.Where(s => s.Status == status.Value);
+        if (status.HasValue)
+        {
+            query = query.Where(s => s.Status == status.Value);
+        }
+
         if (!string.IsNullOrEmpty(handlerTypeName))
+        {
             query = query.Where(s => s.HandlerTypeName == handlerTypeName);
+        }
 
         var result = query
             .OrderByDescending(s => s.LastUpdatedAt)
