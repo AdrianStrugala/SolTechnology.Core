@@ -1,7 +1,6 @@
 ---
 spec: 2026-07-06-jwt-bearer-authentication
 step: 01
-status: to-do
 ---
 
 # Step 01: JWT Bearer scheme + installer

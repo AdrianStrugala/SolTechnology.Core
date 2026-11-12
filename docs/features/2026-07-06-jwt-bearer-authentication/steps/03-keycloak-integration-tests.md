@@ -1,7 +1,6 @@
 ---
 spec: 2026-07-06-jwt-bearer-authentication
 step: 03
-status: to-do
 ---
 
 # Step 03: Keycloak integration tests

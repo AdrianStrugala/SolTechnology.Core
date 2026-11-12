@@ -21,9 +21,9 @@ confirmation gates from `CLAUDE.md §2` separately; they do not imply a premorte
 **Recommended** for other high-risk changes, including public API changes and changes crossing
 module boundaries (e.g. CQRS ↔ Tale ↔ Logging).
 
-Within a plan, this skill executes the `00-run-premortem.md` gate
-([delivery workflow](../../../docs/architecture/delivery-workflow.md)), invoked by
-[`implement-plan`](../implement-plan/SKILL.md).
+Within a plan, this skill resolves the `premortem:` gate of the feature brief
+([delivery workflow](../../../docs/architecture/delivery-workflow.md#gates)), invoked by
+[`implement-plan`](../implement-plan/SKILL.md) in a context that did not author the plan.
 
 ## Critical rules
 
@@ -157,13 +157,13 @@ For each surviving scenario:
   the diff.
 - **Go with mitigations** — required mitigations listed; the executing session
   ([`implement-plan`](../implement-plan/SKILL.md)) folds each into the named step file before
-  the gate flips to `done`.
+  setting `premortem: go-with-mitigations`.
 - **No-Go** — at least one `H` scenario with no plausible mitigation, or a decision only the
   user can make. State exactly what blocks and what would unblock; the plan returns to the
   planner.
 
-Record the full output (format below) in `00-run-premortem.md` under the gate's heading; the
-invoking session mirrors the verdict into the feature brief's `premortem:` field.
+Record the full output (format below) under a `## Premortem` heading in the feature brief; the
+invoking session sets the verdict in the brief's `premortem:` field.
 
 ## Output format
 

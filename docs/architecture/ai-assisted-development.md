@@ -29,9 +29,9 @@ A rule a machine can check is enforced by a machine; prose carries only what nee
 |---|---|---|
 | Compiler | Braces (IDE0011), log templates without interpolation or concatenation (CA2254). A warning fails the build under `src/`. | `.editorconfig`, `EnforceCodeStyleInBuild` in the root `Directory.Build.props` |
 | `checkConventions.ps1` | `#region`, log `[]` brackets, `Async` suffix, stub code — on added C# lines only, so existing debt is reported and never auto-fixed. | `.github/checkConventions.ps1` |
-| `checkDocs.ps1` | Link targets, heading anchors, § citation existence, agent / skill index parity; frontmatter, status vocabulary, gate fields, `## Steps` parity, and bracket steps of feature briefs and active plans. | `.github/checkDocs.ps1` |
+| `checkDocs.ps1` | Link targets, heading anchors, § citation existence, agent / skill index parity; for feature briefs and active plans: frontmatter, status vocabulary, one value per gate field, plan rows matching step files, no working folder after completion, and an overdue retrospective. | `.github/checkDocs.ps1` |
 | CI | Both scripts on every pull request. | `.github/workflows/checks.yml` |
-| `verify.ps1` | One command for build, core tests, the DreamTravel Unit and Component tests, and both scripts. Its exit code is the acceptance signal for every code change. | `.github/verify.ps1` |
+| `verify.ps1` | One command for build, core tests, the DreamTravel Unit and Component tests, and both scripts. Its exit code is the acceptance signal for a Small change and, inside the code review, for a Feature; a plan step runs only its own tests. | `.github/verify.ps1` |
 
 ## Human control points
 

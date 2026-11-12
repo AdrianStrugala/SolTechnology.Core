@@ -30,7 +30,7 @@ Validate and fix documentation integrity across the [docs/](../../../docs/) fold
 
 Collect every `*.md` under [docs/](../../../docs/) and the workspace root. Run
 `./.github/checkDocs.ps1` first; it covers link targets, heading anchors, § citation existence,
-agent / skill index parity, and the frontmatter, statuses, and step tables of feature briefs
+agent / skill index parity, and the frontmatter, statuses, gate fields, and plan tables of feature briefs
 mechanically. The steps below cover what it cannot judge.
 
 ### 2. Module ↔ Doc Parity

@@ -1,9 +1,11 @@
 ---
 status: planning
 created: 2026-07-06
-completed:
-review: pending
+approved:
+plan-review: pending
 premortem: pending
+code-review: pending
+completed:
 ---
 
 # JWT Bearer Authentication and API-Key Hardening
@@ -94,7 +96,14 @@ be revalidated against the actual diff before delivery.
 4. Rewrite authentication documentation.
 5. Review delivery, update architecture documentation, and collapse temporary steps.
 
-Temporary execution state lives in `## Steps`.
+Step status lives in the table below.
+
+| Step | Outcome | Status |
+| --- | --- | --- |
+| 01 | JWT Bearer scheme + installer | to-do |
+| 02 | API-key handler hardening | to-do |
+| 03 | Keycloak integration tests | to-do |
+| 04 | Rewrite docs/Auth.md (drift + JWT + PKCE) | to-do |
 
 ## Acceptance criteria
 
@@ -105,23 +114,36 @@ Temporary execution state lives in `## Steps`.
 - [`../architecture/authentication.md`](../architecture/authentication.md) is updated after the
   behavior ships.
 
-## Steps
+## Premortem
 
-| # | Title | File | Status |
-|---|---|---|---|
-| 00 | Run premortem (gate) | [`steps/00-run-premortem.md`](2026-07-06-jwt-bearer-authentication/steps/00-run-premortem.md) | ⬜ to-do |
-| 01 | JWT Bearer scheme + installer | [`steps/01-jwt-bearer-scheme.md`](2026-07-06-jwt-bearer-authentication/steps/01-jwt-bearer-scheme.md) | ⬜ to-do |
-| 02 | API-key handler hardening | [`steps/02-api-key-hardening.md`](2026-07-06-jwt-bearer-authentication/steps/02-api-key-hardening.md) | ⬜ to-do |
-| 03 | Keycloak integration tests | [`steps/03-keycloak-integration-tests.md`](2026-07-06-jwt-bearer-authentication/steps/03-keycloak-integration-tests.md) | ⬜ to-do |
-| 04 | Rewrite docs/Auth.md (drift + JWT + PKCE) | [`steps/04-documentation.md`](2026-07-06-jwt-bearer-authentication/steps/04-documentation.md) | ⬜ to-do |
-| 05 | Retrospective | [`steps/05-retrospective.md`](2026-07-06-jwt-bearer-authentication/steps/05-retrospective.md) | ⬜ to-do |
+Pending. Input prepared by the planner:
 
-Status values: `⬜ to-do` / `⛔ blocked` / `🔧 in-progress` / `✅ done` — mirrored from each
-step file's frontmatter (the source of truth) in the same change that flips it.
-Gates per the [delivery workflow](../architecture/delivery-workflow.md): step `00` blocks
-`01..05` until the `premortem:` field reads
-`go` / `go-with-mitigations` / `waived` / `skipped`; the retrospective runs only when every
-other step is `✅ done`.
+- **Modules touched:** `src/SolTechnology.Core.Authentication` (public API +
+  `ModuleInstaller.cs`), `tests/SolTechnology.Core.Authentication.Tests`, `docs/Auth.md`.
+- **API delta (additive, MINOR):**
+  - NEW public class `JwtAuthenticationConfiguration` (`Authority`, `Audience`,
+    `RequireHttpsMetadata`).
+  - NEW public method `ModuleInstaller.AddSolJwtAuthentication(IServiceCollection,
+    JwtAuthenticationConfiguration)`.
+  - NEW dependency `Microsoft.AspNetCore.Authentication.JwtBearer@10.0.9` — first external
+    `PackageReference` of this package; lands on all consumers
+    (~1,862 downloads, [nuget-stats.json](../../nuget-stats.json)).
+  - Internal: shared global `AuthorizeFilter` registration across both installer methods.
+  - Behaviour change inside existing API: constant-time API-key comparison (step 02).
+- **Checklists:** per-module review templates were removed from the repo in commit
+  `ec7a1810` (2026-06-19, docs consolidation) — no module checklist applies; review
+  against `ClaudeCodingGuide.md` only.
+- **Suggested failure areas to probe:** default-scheme collision when both installers run;
+  double `AuthorizeFilter`; `RequireHttpsMetadata=false` leaking into production guidance;
+  JwtBearer package version drifting from the `net10.0` framework line; Keycloak container
+  flakiness in CI.
+- **Steps under review:** 01-04.
+
+## Retrospective notes
+
+- Update `docs/architecture/authentication.md` from verified code and tests; remove obsolete
+  API-key-only claims only after JWT ships.
+- Record residual tech debt as follow-ups (multi-key API-key identity is out of scope).
 
 ## Completion summary
 

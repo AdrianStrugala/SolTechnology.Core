@@ -17,7 +17,7 @@ is temporary execution state. Read that page before reviewing.
 
 ## When to invoke
 
-- A feature brief whose working folder exists has `review: pending` in its frontmatter.
+- A feature brief has `plan-review: pending` in its frontmatter.
 - The user asks to review, stress-test, or sanity-check a feature plan.
 - The planning agent hands off a multi-step plan.
 
@@ -27,10 +27,10 @@ is temporary execution state. Read that page before reviewing.
   [`implementation-planning`](implementation-planning.agent.md).
 - Never create an ADR, decision index, feature index, or second durable summary.
 - Never write production code or tests.
-- Never review after an implementation step has left `to-do`; that requires code review.
+- Never review after a row of `## Implementation plan` has left `to-do`; that requires code review.
 - Never silently rewrite. Present findings, collect answers, then edit temporary plan files.
-- Edit steps in place. When splitting or merging, renumber files, keep the retrospective highest,
-  and update the brief's `## Steps` rows and links in the same change.
+- Edit steps in place. When splitting or merging, renumber files and update the rows of the
+  brief's `## Implementation plan` table in the same change.
 - Put every question in the critique; the user answers them in
   [Approval](../../docs/architecture/delivery-workflow.md#approval). Never invent a resolution when
   the user defers.
@@ -44,21 +44,21 @@ is temporary execution state. Read that page before reviewing.
 
 ### 1. Locate and read the plan
 
-If no plan was specified, list feature briefs whose working folder exists and whose frontmatter
-contains `review: pending`, newest first, and ask the user which one to review.
+If no plan was specified, list feature briefs whose frontmatter contains `plan-review: pending`,
+newest first, and ask the user which one to review.
 
 Read:
 
-1. `docs/features/YYYY-MM-DD-<name>.md`, including its gate frontmatter and `## Steps` table.
-2. Every file found by enumerating `steps/`, including unlinked files.
+1. `docs/features/YYYY-MM-DD-<name>.md`, including its gate frontmatter and `## Implementation plan` table.
+2. Every file found by enumerating `steps/` when the folder exists.
 3. Relevant current pages under `docs/architecture/`.
 4. Every source and test file named under `Affected components`.
 
 ### 2. Cross-check
 
 Run `./.github/checkDocs.ps1` first; every failure it reports for this plan is a blocker. It
-covers frontmatter position, status vocabulary, gate fields, `## Steps` parity with the step
-files, the bracket steps, and link targets. The table below holds only what needs judgment.
+covers frontmatter position, status vocabulary, gate field values, the parity of plan rows and
+step files, and link targets. The table below holds only what needs judgment.
 
 For every planned change, verify:
 
@@ -76,11 +76,13 @@ For every planned change, verify:
 | Security | Auth, secrets, PII, or contract risks are unaddressed. |
 | Gates | Gate values conflict with the triggers in `CLAUDE.md §4`. |
 | Forbidden actions | A planned action covered by `CLAUDE.md §2` lacks explicit user confirmation. |
-| Open questions | An unanswered question is silently assumed away or its step is not `blocked`. |
+| Open questions | An unanswered question is silently assumed away or its row is not `blocked`. |
+| Product decisions | A public API shape, name, default, or breaking-change tolerance is decided without a user answer. |
+| Contracts, not code | A step embeds routine implementation code instead of paths, signatures, and test scenarios. |
+| Analysis checklist | One of the planner's eight checklist answers is missing or contradicts source. |
 | Writing style | Prose appears outside `Summary`, identifiers are vague, or acceptance criteria contain filler. |
-| Architecture | Retrospective does not update current behavior and rationale after delivery. |
 | Feature record | A required initial section of the brief is missing or empty. |
-| Links | A durable file other than an open brief's `## Steps` table links into a working folder. |
+| Links | A durable file links into a working folder. |
 
 Verify external package and framework claims from authoritative sources before accepting them.
 
@@ -116,11 +118,9 @@ After the user answers:
 
 - edit steps in place;
 - split, merge, and renumber when necessary;
-- update the brief's `## Steps` rows and links in the same change;
-- record deferred questions under `Open questions` and set that step to `blocked`;
-- keep every step status as execution state (`to-do` or `blocked`), never `reviewed`;
-- ensure the retrospective updates architecture, completes the feature record, converts the
-  `## Steps` links to plain text, and deletes the working folder only after verification.
+- update the rows of the brief's `## Implementation plan` table in the same change;
+- record deferred questions under `Open questions` and set that row to `blocked`;
+- keep every row status as execution state (`to-do` or `blocked`), never `reviewed`.
 
 Do not rewrite the durable feature's historical sections merely to hide a planning deviation.
 Record material scope changes under its `Implementation plan` while the feature remains active.
@@ -131,15 +131,15 @@ When every blocker is resolved or explicitly recorded:
 
 - re-read every edited file and confirm each finding is fixed or recorded as an open question;
 - run `./.github/checkDocs.ps1`; it must pass;
-- set `review: done (YYYY-MM-DD)` in the brief frontmatter;
-- set feature `status: planned` if no step is blocked;
+- set `plan-review: done (YYYY-MM-DD)` in the brief frontmatter;
+- set feature `status: planned` if no row is blocked;
 - set `approved: YYYY-MM-DD` only after the user's explicit yes, per
   [Approval](../../docs/architecture/delivery-workflow.md#approval);
 - keep feature `status: planning` when open questions still block execution;
 - report files edited, splits/merges/renumbering, and unresolved questions;
 - hand off to the [`implement-plan`](../skills/implement-plan/SKILL.md) skill once the plan is
-  approved: with `premortem: pending` its first action is step `00`, in a session that did not
-  author the plan.
+  approved: with `premortem: pending` its first action is the premortem, in a context that did
+  not author the plan.
 
 ## Constraints
 
@@ -148,6 +148,6 @@ When every blocker is resolved or explicitly recorded:
 - Never set a required gate to skipped; only the user may authorize that value.
 - Never maintain a feature index; status exists only in feature frontmatter.
 - Never bundle multiple domain-verification questions into one subagent call.
-- Keep the brief's `## Steps` table synchronized with step files in the same change.
+- Keep the brief's `## Implementation plan` table synchronized with step files in the same change.
 - Surface concerns plainly; do not trade clarity for politeness.
 - Write repository artifacts in English and mirror the user's language in conversation.

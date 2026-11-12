@@ -1,7 +1,6 @@
 ---
 spec: 2026-11-02-org-transfer-and-2-0-release
 step: 05
-status: to-do
 ---
 
 # Step 05: Release 2.0.0

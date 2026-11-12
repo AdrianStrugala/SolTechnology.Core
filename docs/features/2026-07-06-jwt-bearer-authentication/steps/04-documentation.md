@@ -1,7 +1,6 @@
 ---
 spec: 2026-07-06-jwt-bearer-authentication
 step: 04
-status: to-do
 ---
 
 # Step 04: Rewrite docs/Auth.md — API key, JWT Bearer, PKCE walkthrough

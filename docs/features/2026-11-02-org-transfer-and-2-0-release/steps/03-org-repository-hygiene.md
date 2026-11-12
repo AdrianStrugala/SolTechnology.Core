@@ -1,7 +1,6 @@
 ---
 spec: 2026-11-02-org-transfer-and-2-0-release
 step: 03
-status: to-do
 ---
 
 # Step 03: Org repository hygiene — security settings, presentation, and ghost-ID deprecations (no ruleset)

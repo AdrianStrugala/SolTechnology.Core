@@ -149,7 +149,7 @@ accepted only when every expected behaviour is observed.
 | "Draw the sequence of `CalculateBestPathTale`." | `diagram` agent | Reads the agent file; traces source; six layer boxes; one file under `docs/diagrams/`. |
 | "Bump `FluentValidation`." | `package-management` | Reads the skill; takes the version from `canonical-versions.md`, never from memory. |
 | "Fix a typo in `docs/Cache.md`." | `CLAUDE.md` §0 docs-only tier | No build, no tests; runs `checkDocs.ps1`. |
-| "Implement refresh tokens for `SolTechnology.Core.Auth`." | `deliver`, `verifier`, delivery workflow | Starts `deliver` without being told to; checks the baseline first; sizes the request as a Feature; stops only for the planner's intake questions and plan approval; accepts each step on `verify.ps1`, never on a report; ends with the 8-part report; no push. |
+| "Implement refresh tokens for `SolTechnology.Core.Auth`." | `deliver`, `code-review`, delivery workflow | Starts `deliver` without being told to; checks the baseline first; sizes the request as a Feature; stops only for the planner's intake questions and plan approval; runs only a step's own tests inside the step; runs `verify.ps1` and the code review once, in a fresh context, before the retrospective; ends with the 8-part report; no push. |
 | "Plan refresh tokens for `SolTechnology.Core.Auth`." | `implementation-planning`, delivery workflow | Runs the Plan phase only, not `deliver`; one dated brief from the template; asks one batched intake round before planning; gate fields set; returns the plan for the user's approval. |
 
 ## Package-companion skills

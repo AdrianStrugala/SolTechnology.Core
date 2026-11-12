@@ -88,7 +88,7 @@ For each of these, surface the intended change and the reasoning, then wait.
 | After every code edit | Check IDE diagnostics for the edited file (Copilot: `get_errors`; Claude Code: `getDiagnostics`). No diagnostics tool → build the owning project instead. Fix errors caused by your change; leave pre-existing warnings alone (state which is which). |
 | After the last code edit before yielding, and after any `.csproj` / `.props` change | Build the relevant solution (`dotnet build SolTechnology.Core.slnx`, which includes the DreamTravel projects; `sample-tale-code-apps/DreamTravel` has no solution file of its own). |
 | After a build-relevant change | Run the affected tests (`./.github/runTests.ps1` for core; `dotnet test <project>` for a single target, e.g. `dotnet test sample-tale-code-apps/DreamTravel/tests/Component`). |
-| Before yielding a code change | Run `./.github/verify.ps1` — build, core tests, DreamTravel Unit and Component tests, `checkConventions.ps1` (added C# lines: `#region`, log `[]` brackets, `Async` suffix, stub code), `checkDocs.ps1`. Exit code 0 is the only evidence of done. The compiler covers braces (IDE0011) and log templates (CA2254). |
+| Before yielding a code change | Run `./.github/verify.ps1` — build, core tests, DreamTravel Unit and Component tests, `checkConventions.ps1` (added C# lines: `#region`, log `[]` brackets, `Async` suffix, stub code), `checkDocs.ps1`. Exit code 0 is the only evidence of done. The compiler covers braces (IDE0011) and log templates (CA2254). Exception: a step of an approved plan runs only its own tests; `verify.ps1` runs once per feature, in the code review ([delivery workflow](docs/architecture/delivery-workflow.md#accepting-a-step)). |
 | After editing `CLAUDE.md` or any `.md` under `docs/` or `.github/` | Run `./.github/checkDocs.ps1` — links, anchors, § citations, agent / skill index parity. |
 | Before asking for shell permission (Claude Code) | If `.claude/settings.local.json` exists (per-machine, git-ignored), check its `allow` list for a matching wildcard. Reuse existing patterns (`-Last 10/20/30`, `timeout 60/120/180/300`) instead of asking for a new one. |
 | When invoking a custom agent / skill | Read its file first (§0.3), then invoke it per the tool table in §4. Pass the user's intent verbatim where possible. |
@@ -111,15 +111,14 @@ GitHub Copilot and Claude Code MUST both be able to run every agent and skill. T
 | Tool | Agent | Skill |
 |---|---|---|
 | Copilot | Select the custom agent defined by `.github/agents/<name>.agent.md`. | Discovered from `.github/skills/`. |
-| Claude Code | Read the `.agent.md` and follow it. When it demands a fresh context (`plan-reviewer`, premortem), run it in a subagent whose prompt names the file path. | Read `.github/skills/<name>/SKILL.md` and follow it. NEVER substitute a same-named entry from the Skill tool (`premortem`, `code-review`) — those are user/plugin skills, not this repo's. |
+| Claude Code | Read the `.agent.md` and follow it. When it demands a fresh context (`plan-reviewer`, premortem, `code-review`), run it in a subagent whose prompt names the file path. | Read `.github/skills/<name>/SKILL.md` and follow it. NEVER substitute a same-named entry from the Skill tool (`premortem`, `code-review`) — those are user/plugin skills, not this repo's. |
 
 ### Agents
 
 | Agent | Path | Invoke when |
 |---|---|---|
 | implementation-planning | [`.github/agents/implementation-planning.agent.md`](.github/agents/implementation-planning.agent.md) | Planning a non-trivial change; creates one dated feature brief and optional steps per [delivery workflow](docs/architecture/delivery-workflow.md). |
-| plan-reviewer | [`.github/agents/plan-reviewer.agent.md`](.github/agents/plan-reviewer.agent.md) | Critiquing a plan under `docs/features/YYYY-MM-DD-<feature>/` before implementation. Edits step files in place, sets `review:` in the feature brief frontmatter. NEVER writes production code. |
-| verifier | [`.github/agents/verifier.agent.md`](.github/agents/verifier.agent.md) | Deciding in a fresh context whether an implemented step or a feature branch may be accepted. Re-runs the gates, proves each acceptance criterion, read-only. |
+| plan-reviewer | [`.github/agents/plan-reviewer.agent.md`](.github/agents/plan-reviewer.agent.md) | Critiquing a plan under `docs/features/YYYY-MM-DD-<feature>/` before implementation. Revises the plan in place, sets `plan-review:` in the feature brief frontmatter. NEVER writes production code. |
 | diagram | [`.github/agents/diagram.agent.md`](.github/agents/diagram.agent.md) | **Required** for every sequence or component diagram added under `docs/`. Mermaid only, six canonical layer boxes (`Presentation` / `Logic` / `Data` / `Infrastructure` / `Domain` / `External`), one current file per flow. NEVER hand-draft a diagram inline in another doc or review. |
 
 ### Skills
@@ -128,7 +127,7 @@ GitHub Copilot and Claude Code MUST both be able to run every agent and skill. T
 |---|---|---|
 | premortem | [`.github/skills/premortem/SKILL.md`](.github/skills/premortem/SKILL.md) | **Mandatory** for the changes listed in the premortem gate below. |
 | deliver | [`.github/skills/deliver/SKILL.md`](.github/skills/deliver/SKILL.md) | Entry point of the [delivery workflow](docs/architecture/delivery-workflow.md#phases). The user asks, in any wording or language ("implement", "add", "build", "create", "new feature"), for a code change that [sizes](docs/architecture/delivery-workflow.md#size) as a Feature and names no agent, skill, or single phase (plan, review, verify); or says "deliver" for a change of any size. A question never starts it; a Docs-only or Small change without "deliver" is made directly under this file. |
-| code-review | [`.github/skills/code-review/SKILL.md`](.github/skills/code-review/SKILL.md) | Reviewing a diff against the Tale Code philosophy and Coding Guide rules. Findings only; the `verifier` gives the verdict. |
+| code-review | [`.github/skills/code-review/SKILL.md`](.github/skills/code-review/SKILL.md) | The feature-end gate: every step of a feature is `done` and `code-review:` is pending, or the user asks for a review of a diff. Fresh context, read-only: re-runs `verify.ps1`, proves each acceptance criterion, checks tests were not weakened, reviews the diff, returns `PASS` / `FAIL`. |
 | commit-message | [`.github/skills/commit-message/SKILL.md`](.github/skills/commit-message/SKILL.md) | Producing a Conventional Commits message with semver footer. |
 | documentation-cleanup | [`.github/skills/documentation-cleanup/SKILL.md`](.github/skills/documentation-cleanup/SKILL.md) | Validate architecture currency, feature records, module-doc parity, Mermaid, and links. |
 | package-management | [`.github/skills/package-management/SKILL.md`](.github/skills/package-management/SKILL.md) | Adding / bumping a `PackageReference` — looks up the canonical version, prevents drift and version-by-memory hallucination. |
@@ -136,7 +135,7 @@ GitHub Copilot and Claude Code MUST both be able to run every agent and skill. T
 | test-writing | [`.github/skills/test-writing/SKILL.md`](.github/skills/test-writing/SKILL.md) | Authoring or extending tests (NUnit everywhere). Encodes the FluentAssertions + NSubstitute + AutoFixture stack and Guide §8 conventions. |
 | command-query-event-tale | [`.github/skills/command-query-event-tale/SKILL.md`](.github/skills/command-query-event-tale/SKILL.md) | Authoring a command, query, fire-and-forget event, or Tale in any app built on `SolTechnology.Core.CQRS` / `.Tale` — per Guide §0/§3/§4/§11. Details live in the skill. |
 | refactor | [`.github/skills/refactor/SKILL.md`](.github/skills/refactor/SKILL.md) | Behaviour-preserving cleanup inside a single module (Guide §9 budgets, §15 debt), delivered as a Small change. Routes to `implementation-planning` if scope grows past one module or touches a public symbol. |
-| implement-plan | [`.github/skills/implement-plan/SKILL.md`](.github/skills/implement-plan/SKILL.md) | Execute one step, enforce risk gates, record deviations, and collapse temporary steps into the dated feature record. |
+| implement-plan | [`.github/skills/implement-plan/SKILL.md`](.github/skills/implement-plan/SKILL.md) | Execute one step on its own tests, resolve a pending premortem gate, or close the feature with the retrospective. |
 
 ### Premortem gate
 

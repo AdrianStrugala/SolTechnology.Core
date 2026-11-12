@@ -41,11 +41,12 @@ Phases run in this order. A resumed delivery starts at the first row whose "Star
 | Phase | Starts when | Owner | Done when |
 |---|---|---|---|
 | Plan | No brief, or `status: planning` with an unfinished plan | [`implementation-planning`](../../.github/agents/implementation-planning.agent.md) | The intake questions are answered; the brief and its steps exist; a question that arose later is recorded with a recommended default. |
-| Review | `review: pending` | [`plan-reviewer`](../../.github/agents/plan-reviewer.agent.md) | The critique is returned. Applying the user's answers in Approval sets `review: done`. |
+| Plan review | `plan-review: pending` | [`plan-reviewer`](../../.github/agents/plan-reviewer.agent.md), fresh context | The critique is returned. Applying the user's answers in Approval sets `plan-review: done`. |
 | Approval | `approved:` empty | The user | See [Approval](#approval). |
-| Premortem | `premortem: pending` | [`implement-plan`](../../.github/skills/implement-plan/SKILL.md), step `00` | `premortem:` is `go` or `go-with-mitigations`; mitigations are folded into steps. |
-| Build | An implementation step is not accepted | `implement-plan`, one step per run; [`verifier`](../../.github/agents/verifier.agent.md) | See [Accepting a step](#accepting-a-step). |
-| Close | Only the retrospective is left | `implement-plan`, retrospective; `verifier`, whole-feature mode | [Completion](#completion) is done, the verdict is `PASS`, the result is committed. |
+| Premortem | `premortem: pending` | [`implement-plan`](../../.github/skills/implement-plan/SKILL.md) running the premortem skill, fresh context | `premortem:` is `go` or `go-with-mitigations`; mitigations are folded into steps. |
+| Build | A row of `## Implementation plan` is not `done` | `implement-plan`, one step per run | See [Accepting a step](#accepting-a-step). |
+| Code review | Every row is `done` and `code-review: pending` | [`code-review`](../../.github/skills/code-review/SKILL.md), fresh context | See [Code review](#code-review). |
+| Close | `code-review:` is resolved | `implement-plan`, retrospective | [Completion](#completion) is done and committed. |
 | Report | The feature is closed | The driver | The user has the report defined in `deliver`. |
 
 ### Planned stops
@@ -53,7 +54,8 @@ Phases run in this order. A resumed delivery starts at the first row whose "Star
 Two, and no others:
 
 1. **Intake questions**, at the start of Plan. The planner asks one batched round about facts the
-   repository cannot answer and plans only after the answers. No such fact → no stop.
+   repository cannot answer and plans only after the answers. No such fact → no stop. A further
+   round opens only when an answer or a discovery creates a decision that did not exist before.
 2. **Approval**, below.
 
 ### Approval
@@ -62,36 +64,49 @@ Present to the user, in their language:
 
 1. Goal, scope, and what is out of scope.
 2. The steps, one line each, with the checks that will prove each one.
-3. Gate values (`review`, `premortem`) and why.
+3. Gate values (`plan-review`, `premortem`) and why.
 4. Every `CLAUDE.md` §2 action the plan contains.
 5. The reviewer's findings and every open question with its recommended default.
 
-Wait. The reviewer — the planner when review is waived — applies the answers; repeat until the
-user approves. The approval covers the §2 actions in item 4 and nothing else. After an explicit
-yes: set `approved: YYYY-MM-DD`, create the branch, commit the plan.
+Wait. The reviewer — the planner when plan review is waived — applies the answers; repeat until
+the user approves. The approval covers the §2 actions in item 4 and nothing else. After an
+explicit yes: set `approved: YYYY-MM-DD`, create the branch, commit the plan.
 
 ### Accepting a step
 
-A step is `done` when its implementer yields and accepted when it is committed. Accept it only
-when, in this order:
+A step runs only its own checks. It is accepted when:
 
-1. `./.github/verify.ps1` exits 0 in a run made after the implementer yielded, outside the
-   implementer's context.
-2. The `verifier` returns `PASS` — required when the step touches `src/SolTechnology.Core.*`, a
-   `ModuleInstaller.cs`, or `Directory.Build.props`. Other steps are verified once, in Close.
-3. It is committed with [`commit-message`](../../.github/skills/commit-message/SKILL.md); Guide
+1. The implementer ran the tests the step names and every acceptance criterion of the step, and
+   set its row in `## Implementation plan` to `done`. The full `./.github/verify.ps1` does not run
+   inside a step.
+2. It is committed with [`commit-message`](../../.github/skills/commit-message/SKILL.md); Guide
    §15 fix-on-touch changes go in their own `chore:` commit.
 
-A failed gate or a `FAIL` verdict returns the step to a fresh `implement-plan` run with the gate
-output or the findings table verbatim. At most 3 fix rounds per step. NEVER accept a step because
-an agent, including a reviewer, reports that it is done.
+One implementer carries all steps of a feature in one context. Plan review, premortem, and code
+review each start from a fresh context.
+
+### Code review
+
+The one independent judgment of a feature. When every row is `done`, the driver runs
+[`code-review`](../../.github/skills/code-review/SKILL.md) in a fresh context with the brief and
+the baseline commit. The skill is read-only: it runs `./.github/verify.ps1`, proves every
+acceptance criterion, checks that no test was weakened, and reviews the diff.
+
+- `PASS` → the driver sets `code-review: done (YYYY-MM-DD)`.
+- `FAIL` → the implementer gets the findings table verbatim and fixes only what it names; the
+  review runs again in a fresh context. At most 3 rounds.
+
+NEVER resolve the gate because an agent, including the implementer, reports that the feature is
+done. A Small change handed to `deliver` gets the same review when it touches
+`src/SolTechnology.Core.*`, a `ModuleInstaller.cs`, or `Directory.Build.props`; otherwise its gate
+is `./.github/verify.ps1` run by the driver.
 
 ### Git
 
-A delivery with a baseline works on `feature/<kebab-name>` — the brief's name; without a brief, a name taken from the
-request. Create it at Approval; without a brief, before the first edit. One commit per accepted
-step. The driver commits; an owner never does. An agent NEVER pushes, merges, opens a pull
-request, or commits to `master`.
+A delivery with a baseline works on `feature/<kebab-name>` — the brief's name; without a brief, a
+name taken from the request. Create it at Approval; without a brief, before the first edit. One
+commit per step. The driver commits; an owner never does. An agent NEVER pushes, merges, opens a
+pull request, or commits to `master`.
 
 ### Stop conditions
 
@@ -101,8 +116,8 @@ recommendation. NEVER work around:
 - Dirty tree or red baseline at the start.
 - A `CLAUDE.md` §2 action that the approved plan does not list.
 - Premortem `No-Go`.
-- An open question raised during implementation (the step is `blocked`).
-- The third failed round on one step.
+- An open question raised during implementation (the row is `blocked`).
+- The third failed round of the code review.
 - A deviation that changes the approach of the approved plan: it needs a new approval.
 - A check named in a step's acceptance criteria that cannot run in this environment.
 
@@ -129,17 +144,6 @@ The feature brief frontmatter is the only source of status:
 | `blocked` | Delivery cannot continue until a recorded blocker is resolved. |
 | `completed` | Implementation and completion summary are finished; the working folder is deleted. |
 | `abandoned` | Delivery stopped intentionally; the reason and last state are recorded. |
-
-Use this frontmatter:
-
-```yaml
----
-status: planning
-created: YYYY-MM-DD
-approved:
-completed:
----
-```
 
 Allowed transitions:
 
@@ -168,6 +172,9 @@ Create the durable file before creating implementation steps:
 status: planning
 created: YYYY-MM-DD
 approved:
+plan-review: pending
+premortem: pending
+code-review: pending
 completed:
 ---
 
@@ -183,13 +190,11 @@ completed:
 
 ## Implementation plan
 
+| Step | Outcome | Status |
+|---|---|---|
+| 01 | <Reviewable delivery outcome> | to-do |
+
 ## Acceptance criteria
-
-## Steps
-
-| # | Title | File | Status |
-|---|---|---|---|
-| 01 | <Title> | [`steps/01-<step>.md`](YYYY-MM-DD-<kebab-name>/steps/01-<step>.md) | to-do |
 
 ## Blockers
 
@@ -204,32 +209,25 @@ The initial brief contains the goal, context, scope, implementation plan, and ac
 Keep `Completion summary`, `Deviations`, and `Follow-ups` empty until delivery closes. Keep
 `Blockers` empty unless the status is `blocked`.
 
+The `## Implementation plan` table is the only source of step status. Its `Status` cell is
+exactly `to-do`, `blocked`, `in-progress`, or `done`. A row with an unanswered open question is
+`blocked`.
+
 ### Gates
 
-A feature with a working folder also carries its gates and step table in the brief:
+Every brief carries the three gate fields from its creation; a missing or malformed field blocks
+execution. Each field holds one value from the table and nothing else — the reasoning belongs in
+the brief's body.
 
-```yaml
----
-status: planning
-created: YYYY-MM-DD
-approved:
-completed:
-review: pending
-premortem: pending
----
-```
+| Field | Allowed values | Resolved |
+|---|---|---|
+| `plan-review` | `pending`, `done (date)`, `waived (reason — planner, date)`, `skipped (reason — user, date)` | Before Approval. |
+| `premortem` | `pending`, `go (date)`, `go-with-mitigations (date)`, `no-go (date)`, `waived (reason — planner, date)`, `skipped (reason — user, date)` | After Approval, before the first step. `no-go` blocks implementation until the plan is revised and a fresh premortem passes. |
+| `code-review` | `pending`, `done (date)`, `skipped (reason — user, date)` | After the last step, before the retrospective. Never waived. |
 
-- `review:` and `premortem:` hold concrete gate values and are never omitted while steps exist.
-  A feature without a working folder has no gate fields and no `## Steps` section.
-- `## Steps` lists every step file in order. Its status cells mirror step frontmatter in the same
-  edit.
-
-| Field | Allowed values |
-|---|---|
-| `review` | `pending`, `waived (<reason — planner, date>)`, `done (date)`, `skipped (<reason — user, date>)` |
-| `premortem` | `pending`, `waived (<reason — planner, date>)`, `go (date)`, `go-with-mitigations (date)`, `no-go (date)`, `skipped (<reason — user, date>)` |
-
-Only the user may skip a required gate; record their reason verbatim.
+Gates are selected from blast radius and contract impact, not from document type. Only the user
+may skip a required gate; record their reason verbatim. No gate is a row of the plan or a step
+file.
 
 ## Working folder
 
@@ -240,16 +238,15 @@ docs/features/
   YYYY-MM-DD-<kebab-name>.md
   YYYY-MM-DD-<kebab-name>/
     steps/
-      00-run-premortem.md
       01-<step>.md
-      NN-retrospective.md
+      NN-<step>.md
 ```
 
-- The folder holds only step files; gates and the step table live in the feature brief.
-- Step files use `to-do | blocked | in-progress | done` as execution states.
-- Review and premortem gates are required by risk, not by document type.
-- The retrospective reviews delivery, updates architecture documentation, completes the feature
-  brief, and then deletes the entire working folder.
+- The folder holds only step files. A step file is an execution contract without status; it
+  matches one row of `## Implementation plan` by its two-digit number.
+- Enumerate `steps/` directly. The brief never links into the working folder.
+- A feature without a working folder has one row; the brief is its execution contract.
+- The retrospective deletes the entire working folder.
 
 ### Step file
 
@@ -259,7 +256,6 @@ Frontmatter sits on line 1:
 ---
 spec: YYYY-MM-DD-<feature>
 step: NN
-status: to-do
 ---
 
 # Step NN: <Title>
@@ -282,23 +278,28 @@ status: to-do
 ## Deviations
 ```
 
-A step with an unresolved `Open questions` item is `blocked`.
+A step carries contracts, not code: verified paths, symbols with signatures, the interfaces
+between steps, test scenarios by name and assertion, and exact commands. A code block appears
+only where the exact text is itself the decision (a literal, a key, a regex).
 
 ## Completion
 
-The retrospective writes the record; it does not judge the delivery. The `verifier`, in
-whole-feature mode, does that afterwards. The retrospective performs these actions in order:
+The retrospective is the completion transaction, not a row or a step file. It runs when every
+row is `done` and `code-review:` is `done` or `skipped`. It writes the record; the judgment was
+made in [Code review](#code-review). In order:
 
-1. Run `./.github/verify.ps1`; collect the delivered outcomes and the deviations from the steps
-   and the feature diff.
-2. Update every affected document under [`docs/architecture/`](./) to describe the current
+1. Compare planned and delivered behavior across all steps; collect every deviation, including
+   one visible in the diff but not recorded in a step.
+2. Re-read every test the feature added, as one set. Delete a test a later step made dead and a
+   test that repeats another step's coverage.
+3. Reconcile the premortem's required mitigations one by one: delivered, superseded, or accepted
+   as risk with the reason. A mitigation that names a test requires that test to exist.
+4. Update every affected document under [`docs/architecture/`](./) to describe the current
    system and rationale.
-3. Append the delivered outcome, material deviations, and follow-ups to the feature brief.
-4. Set the feature status to `completed` or `abandoned` and set `completed: YYYY-MM-DD`.
-5. Convert each step link in `## Steps` to its plain file name, keeping the table with final
-   statuses as the record of what was done.
-6. Verify that no durable link points into the working folder.
-7. Delete the working folder.
+5. Append the delivered outcome, material deviations, and follow-ups to the feature brief. Set
+   the status to `completed` or `abandoned` and set `completed: YYYY-MM-DD`.
+6. Delete the working folder. Run `./.github/verify.ps1` when action 2 removed a test, otherwise
+   `./.github/checkDocs.ps1`.
 
 The remaining feature brief is historical evidence. Never use it as the source of truth for
 current architecture or behavior.
@@ -309,12 +310,13 @@ Each design choice answers a measured failure of autonomous agents:
 
 | Choice | Reason |
 |---|---|
-| A step is accepted on the exit code of `verify.ps1`, never on a report or a reviewer's verdict. | In long-running loops an agent reported progress in every cycle while over half the cycles brought no measured improvement, and a stronger LLM judge did not close the gap; only a signal measured outside the transcript did ([Self-Evaluation Bias, 2026](https://arxiv.org/abs/2607.25152)). |
-| Implementation and verification run in separate contexts; the `verifier` is read-only, assumes the change must not ship, and drops findings it cannot reproduce from the diff. | Agents praise their own work, and a separate sceptical evaluator is easier to tune than a self-critical generator ([Anthropic, harness design, 2026](https://www.anthropic.com/engineering/harness-design-long-running-apps)); a falsification pass that sees only the diff removes hallucinated findings ([OpenCodeReview, 2026](https://arxiv.org/abs/2608.09290)). |
+| A feature is accepted on the exit code of `verify.ps1` and a fresh-context review, never on the implementer's report. | In long-running loops an agent reported progress in every cycle while over half the cycles brought no measured improvement, and a stronger LLM judge did not close the gap; only a signal measured outside the transcript did ([Self-Evaluation Bias, 2026](https://arxiv.org/abs/2607.25152)). |
+| The code review runs in a context that did not write the code, is read-only, assumes the change must not ship, and drops findings it cannot reproduce from the diff. | Agents praise their own work, and a separate sceptical evaluator is easier to tune than a self-critical generator ([Anthropic, harness design, 2026](https://www.anthropic.com/engineering/harness-design-long-running-apps)); a falsification pass that sees only the diff removes hallucinated findings ([OpenCodeReview, 2026](https://arxiv.org/abs/2608.09290)). |
 | The plan is kept and the user approves it; each step's acceptance criteria are fixed before code. | Without a planner a generator under-scopes; agreeing what "done" means before building ties the result to a testable contract (same Anthropic source). |
-| State lives in the feature brief, step files, and git; every role starts from a fresh context and a dispatch carries no opinion of the work. | Role separation with isolated workers and a fresh start per cycle counters drift ([Cursor, scaling agents, 2026](https://cursor.com/blog/scaling-agents)); unclear roles, misaligned hand-offs, and missing verification are the three failure classes of multi-agent systems ([MAST, 2025](https://arxiv.org/abs/2503.13657)). |
-| Tests come first, and a weakened, disabled, or special-cased test fails verification. | Coding agents add mocks to tests more often than human authors, and mock-heavy tests validate less of the real interaction ([over-mocked tests, MSR 2026](https://arxiv.org/abs/2602.00409)); a test changed after the fact proves nothing about the code it was meant to check. |
-| The path scales with size: docs-only and small changes skip planning, the baseline, and the branch; the `verifier` runs per step only for package code and once for the whole feature. | Each harness component costs tokens and encodes an assumption about what the model cannot do alone; the full pipeline pays off only where the model is unreliable solo (same Anthropic source). |
+| State lives in the feature brief, step files, and git; a dispatch carries no opinion of the work. | Unclear roles, misaligned hand-offs, and missing verification are the three failure classes of multi-agent systems ([MAST, 2025](https://arxiv.org/abs/2503.13657)). |
+| Tests come first, and a weakened, disabled, or special-cased test fails the review. | Coding agents add mocks to tests more often than human authors, and mock-heavy tests validate less of the real interaction ([over-mocked tests, MSR 2026](https://arxiv.org/abs/2602.00409)); a test changed after the fact proves nothing about the code it was meant to check. |
+| A step runs only its own tests and one implementer carries all steps; the full gate and the review run once per feature. Docs-only and small changes skip planning, the baseline, and the branch. | Each harness component costs tokens and encodes an assumption about what the model cannot do alone (same Anthropic source). A fresh agent per step re-reads the protocol, the guides, the brief, and the sources each time, and the full suite inside every step repeats work the feature-end run does once. |
+| Gates are frontmatter fields with one value each, and a script checks them. | A workflow kept only in prose drifts: statuses outside the vocabulary, paragraphs in gate fields, and briefs left `in-progress` after their last step. A script catches each of them. |
 | `deliver` starts on any wording of a Feature request. | The method must not depend on the user remembering a command. |
 
 The harness is re-examined when a model changes: run the regression prompts in

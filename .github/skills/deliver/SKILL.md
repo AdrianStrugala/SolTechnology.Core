@@ -16,35 +16,44 @@ conditions. Read it first. This skill adds only how to drive it and what to repo
   name, or accept a phase on anything but the evidence it names.
 - **State lives on disk.** Every phase starts by reading the feature brief, the step statuses, and
   git. Nothing is carried in the conversation.
-- **One role, one fresh context.** Planning, plan review, premortem, each step's implementation,
-  and each verification run in separate contexts (`CLAUDE.md` §4 tool table). No way to start a
-  fresh context → finish the current phase, name the next one, and stop; the user starts a new
-  session with "deliver" and the delivery resumes.
+- **Fresh context for the judges, one context for the implementer.** Planning, plan review,
+  premortem, and code review each run in their own fresh context (`CLAUDE.md` §4 tool table).
+  One implementer carries every step of the feature: dispatch it once and continue the same
+  context for the next step and for fix rounds (Claude Code: `SendMessage` to the same subagent;
+  Copilot: the same session). NEVER start a fresh implementer per step. No way to start a fresh
+  context → finish the current phase, name the next one, and stop; the user starts a new session
+  with "deliver" and the delivery resumes.
 - **The driver stays out of the work.** It writes no production code and no tests, edits no plan,
-  and judges nothing it dispatched. It runs gates, sets `approved:` after the user's yes, and
-  commits.
+  and judges nothing it dispatched. It sets `approved:` after the user's yes, sets `code-review:`
+  from the review's verdict, and commits.
 
 ## Procedure
 
 1. **Locate.** Find the feature brief the request names, or the only brief that is not
    `completed` / `abandoned` and matches it. No brief → check the baseline, then size the request.
    A brief → resume at the phase its state selects.
-2. **Plan and Review.** Dispatch the planner with the request verbatim. When it returns intake
-   questions, relay them to the user verbatim, wait, and dispatch it again with the answers
-   verbatim. With `review: pending`, dispatch the reviewer for its critique only (its steps 1–3).
-3. **Approval.** Present the five items and wait. Dispatch the reviewer — the planner when review
-   is waived — with the user's answers verbatim; repeat until the user approves.
-4. **Premortem.** Dispatch `implement-plan` for step `00`.
-5. **Build**, lowest-numbered step first. Record `HEAD` as the step base, dispatch
-   `implement-plan` for the step, run `./.github/verify.ps1` yourself, dispatch the `verifier`
-   with the step path and the step base when acceptance requires it, then commit.
-6. **Close.** Dispatch `implement-plan` for the retrospective, then the `verifier` in
-   whole-feature mode with the baseline. `FAIL` → fix rounds as in Build. Commit.
-7. **Report.**
+2. **Plan and Plan review.** Dispatch the planner with the request verbatim. When it returns
+   intake questions, relay them to the user verbatim, wait, and dispatch it again with the answers
+   verbatim. With `plan-review: pending`, dispatch the reviewer for its critique only (its steps
+   1–3).
+3. **Approval.** Present the five items and wait. Dispatch the reviewer — the planner when plan
+   review is waived — with the user's answers verbatim; repeat until the user approves.
+4. **Premortem.** With `premortem: pending`, dispatch `implement-plan` in a fresh context to
+   resolve the gate.
+5. **Build**, lowest-numbered row first. Dispatch the implementer with `implement-plan` and the
+   step; when it yields with the row `done`, commit, then continue the same implementer with the
+   next step. Do not run `./.github/verify.ps1` between steps.
+6. **Code review.** When every row is `done`, dispatch `code-review` in a fresh context with the
+   brief and the baseline commit. `FAIL` → pass the findings table verbatim to the implementer,
+   commit its fix, and dispatch a fresh review; at most 3 rounds. `PASS` → set
+   `code-review: done (YYYY-MM-DD)`.
+7. **Close.** Dispatch `implement-plan` for the retrospective. Commit.
+8. **Report.**
 
 Docs-only: edit, run `./.github/checkDocs.ps1`, commit, report. Small: dispatch one implementer
-with the contract from the conversation and `CLAUDE.md` as its protocol, then accept the change as
-one step.
+with the contract from the conversation and `CLAUDE.md` as its protocol, run
+`./.github/verify.ps1` yourself, dispatch `code-review` when the change touches package code
+([Code review](../../../docs/architecture/delivery-workflow.md#code-review)), then commit.
 
 ## Dispatch contract
 
@@ -63,7 +72,7 @@ In the conversation, in the user's language, in this order:
    [`diagram`](../../agents/diagram.agent.md) agent and link the diagram first.
 3. **Decisions and deviations** — from the brief.
 4. **Evidence** — each gate, the command, the result, from the last run.
-5. **Review** — findings fixed (count); findings left, each with `file:line` and the reason.
+5. **Code review** — rounds run; findings fixed (count); findings left, each with `file:line` and the reason.
 6. **Not verified** — everything no gate covered: tests that need Docker, manual checks.
 7. **Semver impact** and every `CLAUDE.md` §2 action performed.
 8. **Your next actions** — the branch name, the commit count, push and pull request.

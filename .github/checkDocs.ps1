@@ -179,8 +179,9 @@ foreach ($skill in Get-RepoFiles @('.github/skills/*/SKILL.md')) {
 }
 
 # 4. Feature briefs and active plans (docs/architecture/delivery-workflow.md). Every brief:
-#    frontmatter on line 1, status in the vocabulary. A brief with a working folder: gate fields,
-#    step statuses, the Steps table mirrors every step file, bracket steps, links.
+#    frontmatter on line 1, status in the vocabulary, no working folder once closed. An open
+#    brief: three gate fields with one value each, plan rows match step files by number, step
+#    files carry no status, no link into the working folder, retrospective not overdue.
 function Get-Frontmatter([string] $path) {
     $lines = [System.IO.File]::ReadAllLines($path)
     if ($lines.Count -eq 0 -or $lines[0].Trim() -ne '---') {
@@ -191,7 +192,7 @@ function Get-Frontmatter([string] $path) {
         if ($lines[$i].Trim() -eq '---') {
             return $fields
         }
-        if ($lines[$i] -match '^([A-Za-z]+):\s*(.*)$') {
+        if ($lines[$i] -match '^([A-Za-z-]+):\s*(.*)$') {
             $fields[$Matches[1]] = $Matches[2].Trim()
         }
     }
@@ -199,7 +200,13 @@ function Get-Frontmatter([string] $path) {
 }
 
 $featureStatuses = @('planning', 'planned', 'in-progress', 'blocked', 'completed', 'abandoned')
-$stepStatuses = @('to-do', 'blocked', 'in-progress', 'done')
+$closedStatuses = @('completed', 'abandoned')
+$stepStatus = '(to-do|blocked|in-progress|done)'
+$gateValues = @{
+    'plan-review' = '^(pending|done \(.+\)|waived \(.+\)|skipped \(.+\))$'
+    'premortem'   = '^(pending|go \(.+\)|go-with-mitigations \(.+\)|no-go \(.+\)|waived \(.+\)|skipped \(.+\))$'
+    'code-review' = '^(pending|done \(.+\)|skipped \(.+\))$'
+}
 $planFiles = @()
 foreach ($brief in Get-RepoFiles @('docs/features/*.md')) {
     $relative = Get-RelativePath $brief.FullName
@@ -211,55 +218,86 @@ foreach ($brief in Get-RepoFiles @('docs/features/*.md')) {
     if ($featureStatuses -notcontains $front['status']) {
         $problems.Add("${relative}: status '$($front['status'])' is not in the vocabulary")
     }
-    if (@('completed', 'abandoned') -contains $front['status'] -and -not $front['completed']) {
+    $closed = $closedStatuses -contains $front['status']
+    if ($closed -and -not $front['completed']) {
         $problems.Add("${relative}: status $($front['status']) requires a completed date")
     }
-    if ($front['status'] -eq 'in-progress' -and -not $front['approved'] -and
-        [string]::CompareOrdinal([string]$front['created'], '2026-11-12') -ge 0) {
+    $isNew = [string]::CompareOrdinal([string]$front['created'], '2026-11-12') -ge 0
+    if ($front['status'] -eq 'in-progress' -and -not $front['approved'] -and $isNew) {
         $problems.Add("${relative}: status in-progress requires approved")
     }
 
-    $stepsFolder = Join-Path (Join-Path $brief.DirectoryName $brief.BaseName) 'steps'
-    if (-not (Test-Path -LiteralPath $stepsFolder)) {
+    $workingFolder = Join-Path $brief.DirectoryName $brief.BaseName
+    $stepsFolder = Join-Path $workingFolder 'steps'
+    $hasFolder = Test-Path -LiteralPath $workingFolder
+    if ($closed) {
+        if ($hasFolder) {
+            $problems.Add("${relative}: status $($front['status']) but the working folder still exists")
+        }
         continue
     }
+    if (-not $hasFolder -and -not $isNew) {
+        continue
+    }
+
+    # An open brief: three gate fields, each holding one value.
     $planFiles += $brief
-    foreach ($gate in @('review', 'premortem')) {
-        if (-not $front[$gate]) {
+    foreach ($gate in $gateValues.Keys) {
+        $value = [string]$front[$gate]
+        if (-not $value) {
             $problems.Add("${relative}: gate field '$gate' is missing or empty")
         }
+        elseif ($value -notmatch $gateValues[$gate] -or $value.Length -gt 200) {
+            $problems.Add("${relative}: gate field '$gate' must hold one allowed value, at most 200 characters")
+        }
     }
+
     $briefLines = [System.IO.File]::ReadAllLines($brief.FullName)
-    $steps = @(Get-ChildItem -LiteralPath $stepsFolder -Filter '*.md' -File | Sort-Object Name)
-    foreach ($step in $steps) {
-        $planFiles += $step
-        $stepRelative = Get-RelativePath $step.FullName
-        $stepFront = Get-Frontmatter $step.FullName
-        if ($null -eq $stepFront) {
-            $problems.Add("${stepRelative}: frontmatter is missing or does not start on line 1")
-            continue
+    $rows = @{}
+    foreach ($line in $briefLines) {
+        if ($line -match ('^\|\s*(\d{2})\s*\|.*\|\s*' + $stepStatus + '\s*\|\s*$')) {
+            $rows[$Matches[1]] = $Matches[2]
         }
-        if ($stepStatuses -notcontains $stepFront['status']) {
-            $problems.Add("${stepRelative}: status '$($stepFront['status'])' is not in the vocabulary")
-            continue
-        }
-        $row = @($briefLines | Where-Object { $_.StartsWith('|') -and $_.Contains($step.Name) })
-        if ($row.Count -eq 0) {
-            $problems.Add("${relative}: the Steps table does not list $($step.Name)")
-        }
-        elseif ($row[0] -notmatch ('[ |]' + [regex]::Escape($stepFront['status']) + '\s*\|\s*$')) {
-            $problems.Add("${relative}: the Steps row of $($step.Name) does not mirror status '$($stepFront['status'])'")
+        if ($line.Contains('](' + $brief.BaseName + '/')) {
+            $problems.Add("${relative}: the brief links into its working folder")
         }
     }
-    if ($steps.Count -gt 0 -and $steps[$steps.Count - 1].Name -notmatch 'retrospective') {
-        $problems.Add("${relative}: the highest-numbered step is not the retrospective")
+
+    $stepNumbers = @()
+    if (Test-Path -LiteralPath $stepsFolder) {
+        foreach ($step in @(Get-ChildItem -LiteralPath $stepsFolder -Filter '*.md' -File | Sort-Object Name)) {
+            $planFiles += $step
+            $stepRelative = Get-RelativePath $step.FullName
+            if ($step.Name -notmatch '^(\d{2})-' -or $Matches[1] -eq '00' -or $step.Name -match 'retrospective') {
+                $problems.Add("${stepRelative}: not an implementation step; premortem and retrospective are not step files")
+                continue
+            }
+            $number = $Matches[1]
+            if ($stepNumbers -contains $number) {
+                $problems.Add("${stepRelative}: a second step file with number $number")
+            }
+            $stepNumbers += $number
+            $stepFront = Get-Frontmatter $step.FullName
+            if ($null -eq $stepFront) {
+                $problems.Add("${stepRelative}: frontmatter is missing or does not start on line 1")
+            }
+            elseif ($stepFront.ContainsKey('status')) {
+                $problems.Add("${stepRelative}: a step file carries no status; the brief's plan table does")
+            }
+            if (-not $rows.ContainsKey($number)) {
+                $problems.Add("${relative}: no plan row with a valid status for step $number")
+            }
+        }
+        foreach ($number in $rows.Keys) {
+            if ($stepNumbers -notcontains $number) {
+                $problems.Add("${relative}: plan row $number has no step file")
+            }
+        }
     }
-    $hasPremortemStep = @($steps | Where-Object { $_.Name -like '00-*' }).Count -gt 0
-    if ($front['premortem'] -eq 'pending' -and -not $hasPremortemStep) {
-        $problems.Add("${relative}: premortem is pending but step 00 does not exist")
-    }
-    if ([string]$front['premortem'] -like 'waived*' -and $hasPremortemStep) {
-        $problems.Add("${relative}: premortem is waived but step 00 exists")
+
+    $open = @($rows.Values | Where-Object { $_ -ne 'done' }).Count
+    if ($rows.Count -gt 0 -and $open -eq 0 -and [string]$front['code-review'] -match '^(done|skipped) ') {
+        $problems.Add("${relative}: retrospective overdue - every step is done and the code review is resolved")
     }
 }
 

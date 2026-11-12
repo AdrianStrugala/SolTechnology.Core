@@ -1,7 +1,6 @@
 ---
 spec: 2026-07-06-jwt-bearer-authentication
 step: 02
-status: to-do
 ---
 
 # Step 02: API-key handler hardening

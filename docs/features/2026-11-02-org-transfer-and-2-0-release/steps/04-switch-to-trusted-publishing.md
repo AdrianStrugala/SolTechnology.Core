@@ -1,7 +1,6 @@
 ---
 spec: 2026-11-02-org-transfer-and-2-0-release
 step: 04
-status: to-do
 ---
 
 # Step 04: Switch publishing to NuGet Trusted Publishing (no environment)

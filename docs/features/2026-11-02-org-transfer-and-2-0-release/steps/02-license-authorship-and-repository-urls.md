@@ -1,7 +1,6 @@
 ---
 spec: 2026-11-02-org-transfer-and-2-0-release
 step: 02
-status: to-do
 ---
 
 # Step 02: License, authorship, and repository URLs for the organization
