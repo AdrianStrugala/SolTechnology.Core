@@ -14,6 +14,8 @@
 	<ItemGroup>
 	  <PackageReference Include="AvroConvert" />
 	  <PackageReference Include="Azure.Storage.Blobs" />
+	  <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" />
+	  <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" />
 	</ItemGroup>
 
 </Project>

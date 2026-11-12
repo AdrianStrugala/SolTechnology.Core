@@ -16,6 +16,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" />
 		<PackageReference Include="Testcontainers.Azurite" />
 		<PackageReference Include="Azure.Storage.Blobs" />
 	</ItemGroup>
