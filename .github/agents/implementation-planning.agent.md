@@ -10,9 +10,10 @@ Plan a non-trivial change to SolTechnology.Core. Create one durable feature brie
 `docs/features/YYYY-MM-DD-<kebab-name>.md` when planning starts. Create a temporary sibling working
 folder only when implementation needs durable multi-step coordination.
 
-Naming, feature statuses, working-folder shape, completion, and collapse rules are fixed by
-[`docs/architecture/delivery-workflow.md`](../../docs/architecture/delivery-workflow.md). Read it
-before creating or editing a feature.
+This agent owns the Plan phase of the
+[delivery workflow](../../docs/architecture/delivery-workflow.md#phases). That page fixes the
+phase order, naming, feature statuses, working-folder shape, completion, and collapse rules. Read
+it before creating or editing a feature.
 
 ## When to invoke
 
@@ -36,9 +37,11 @@ For a single-file local refactor, skip this agent and use the
 - **Risk is independent of document type.** Set review and premortem gates from blast radius and
   contract impact. Apply confirmation gates from `CLAUDE.md §2` and mandatory premortem triggers
   from `CLAUDE.md §4` exactly; do not widen or narrow either list.
-- **Own the intake question round.** Ask once, in a batch, about unresolved scope, compatibility
-  tolerance, and naming. Offer recommended defaults. Never ask what source or docs can answer.
-  Route ambiguous intent through [`roast-me`](../skills/roast-me/SKILL.md) before planning.
+- **Own the intake question round.** Ask once, in a batch, before planning, about unresolved
+  scope, compatibility tolerance, and naming. Offer recommended defaults. Never ask what source or
+  docs can answer. Without a channel to the user (a dispatched context), return the questions as the
+  report and stop; the driver relays them and dispatches again with the answers. A question that
+  arises after the round goes under `Open questions`.
 - **Author bracket steps; never execute them.** Premortem must run in a context that did not author
   the plan. Retrospective runs only after every implementation step is `done`.
 - **English artifacts, mirrored conversation.** Repository files use English; conversation uses
@@ -75,46 +78,26 @@ with a stale decomposition.
 
 ### 3. Evaluate alternatives
 
-For a hard-to-reverse design choice, list at least two real alternatives in the feature `Context`
-or `Implementation plan`. Use the [`blue-red-team`](../skills/blue-red-team/SKILL.md) skill when
-the choice changes module boundaries, public API shape, persistence, or a platform dependency.
+For a hard-to-reverse design choice — module boundaries, public API shape, persistence, a
+platform dependency — record in the feature `Context`:
+
+- At least two real alternatives, each with its strongest honest case. No strawmen; cite modules
+  and files of this repository, not general practice.
+- The strongest case against the chosen one: semver cost for NuGet consumers, new cross-module
+  coupling, migration cost for the sample app, complexity moved instead of removed.
+- The cruxes: where the cases disagree on fact, and the evidence that settles each (a benchmark,
+  a prototype, a focused experiment).
+- The decision: proceed, proceed with conditions, or reject, with a one-line reason.
+
 Do not create a separate decision document.
 
 ### 4. Create the feature brief
 
-Create `docs/features/YYYY-MM-DD-<kebab-name>.md` with:
+Create `docs/features/YYYY-MM-DD-<kebab-name>.md` from the template in
+[`delivery-workflow.md` → Feature brief](../../docs/architecture/delivery-workflow.md#feature-brief). Copy the template exactly.
 
-```markdown
----
-status: planning
-created: YYYY-MM-DD
-completed:
----
-
-# <Feature title>
-
-> Historical delivery record. It may not describe the current system.
-
-## Goal
-
-## Context
-
-## Scope
-
-## Implementation plan
-
-## Acceptance criteria
-
-## Steps
-
-## Completion summary
-
-## Deviations
-
-## Follow-ups
-```
-
-Fill the first five sections during planning. Leave the last three empty until delivery closes.
+Fill `Goal`, `Context`, `Scope`, `Implementation plan`, and `Acceptance criteria` during planning.
+Leave `Blockers`, `Completion summary`, `Deviations`, and `Follow-ups` empty.
 Keep `## Steps` only when the feature gets a working folder; otherwise delete the heading.
 Use exact symbols, paths, package versions, and pass/fail acceptance criteria.
 
@@ -122,15 +105,9 @@ Use exact symbols, paths, package versions, and pass/fail acceptance criteria.
 
 Do not create a working folder for a change that fits one coherent implementation session.
 
-For multi-step work, create:
-
-```text
-docs/features/YYYY-MM-DD-<feature>/
-  steps/
-    00-run-premortem.md       # only when premortem is required
-    01-<step-title>.md
-    NN-retrospective.md       # always highest
-```
+For multi-step work, create the working folder defined in
+[`delivery-workflow.md` → Working folder](../../docs/architecture/delivery-workflow.md#working-folder): `00-run-premortem.md` only when
+premortem is required, the retrospective always highest-numbered.
 
 Each implementation step is one reviewable unit and uses `status: to-do | blocked | in-progress |
 done`. A step with an unresolved `Open questions` item is `blocked`.
@@ -153,34 +130,8 @@ For every step:
 Before finalizing, ask whether each step can be split without losing coherence. Split it when the
 answer is yes.
 
-Use this step shape, with frontmatter on line 1:
-
-```markdown
----
-spec: YYYY-MM-DD-<feature>
-step: NN
-status: to-do
----
-
-# Step NN: <Title>
-
-## Summary
-<One short paragraph: what and why.>
-
-## Affected components
-- `path/to/File.cs` — NEW / EDIT / DELETE — exact change
-
-## Changes
-- Exact symbol, option key, migration, or `package@version`.
-
-## Acceptance criteria
-- [ ] Exact build, test, or behavior check.
-
-## Open questions
-- none
-
-## Deviations
-```
+Use the step template in [`delivery-workflow.md` → Step file](../../docs/architecture/delivery-workflow.md#step-file), with frontmatter
+on line 1.
 
 Prose belongs only in `Summary`. Use lists and tables elsewhere, one fact per bullet, with exact
 identifiers instead of vague nouns.
@@ -196,35 +147,11 @@ When a working folder exists, the feature brief frontmatter contains concrete `r
   a dated reason.
 - Only the user may skip a required gate; record their reason verbatim.
 
-Never omit a gate field while steps exist. Use one concrete value in the brief frontmatter:
+Never omit a gate field while steps exist. Use one concrete value per field from the table in
+[`delivery-workflow.md` → Gates](../../docs/architecture/delivery-workflow.md#gates).
 
-```yaml
----
-status: planning
-created: YYYY-MM-DD
-completed:
-review: pending
-premortem: pending
----
-```
-
-`review` values are `pending`, `waived (<reason — planner, date>)`, `done (date)`, or
-`skipped (<reason — user, date>)`. `premortem` values are `pending`,
-`waived (<reason — planner, date>)`, `go (date)`, `go-with-mitigations (date)`, `no-go (date)`,
-or `skipped (<reason — user, date>)`.
-
-The brief's `## Steps` section contains a step table. Its status cells mirror step frontmatter in
-the same edit using `to-do`, `blocked`, `in-progress`, or `done`.
-
-```markdown
-## Steps
-
-| # | Title | File | Status |
-|---|---|---|---|
-| 00 | Run premortem | [`steps/00-run-premortem.md`](YYYY-MM-DD-<feature>/steps/00-run-premortem.md) | to-do |
-| 01 | <Title> | [`steps/01-title.md`](YYYY-MM-DD-<feature>/steps/01-title.md) | to-do |
-| 02 | Retrospective | [`steps/02-retrospective.md`](YYYY-MM-DD-<feature>/steps/02-retrospective.md) | to-do |
-```
+The brief's `## Steps` table lists every step file — premortem `00` first, retrospective last. Its
+status cells mirror step frontmatter in the same edit.
 
 When premortem is required, author `00-run-premortem.md` last so it can link to the complete plan,
 but list it first in `## Steps`. It records affected modules, contract delta, applicable risk
@@ -233,21 +160,16 @@ does that later. Do not create step `00` when premortem is waived.
 
 ### 7. Author the retrospective
 
-The highest-numbered step must instruct the implementer to:
-
-1. Review the delivered feature and run final validation.
-2. Update affected `docs/architecture/*.md` pages to current behavior and rationale.
-3. Complete the durable feature record with outcomes, deviations, and follow-ups.
-4. Set feature status to `completed` or `abandoned` with `completed: YYYY-MM-DD`.
-5. Convert each step link in the brief's `## Steps` to its plain file name, keeping final statuses.
-6. Verify no durable links point into the working folder.
-7. Delete the working folder.
+The highest-numbered step must instruct the implementer to perform, in order, the seven actions in
+[`delivery-workflow.md` → Completion](../../docs/architecture/delivery-workflow.md#completion), and to run final validation first.
 
 ### 8. Hand off
 
 If review is required, hand the working folder to the
 [`plan-reviewer`](plan-reviewer.agent.md) agent. Never review your own plan. If no working folder
-exists or review is waived, report that the feature brief is ready for implementation.
+exists or review is waived, return the plan for
+[Approval](../../docs/architecture/delivery-workflow.md#approval); after it, apply the user's
+answers. Implementation cannot start without `approved:`.
 
 Before handoff, re-read the brief and every enumerated step. Verify:
 

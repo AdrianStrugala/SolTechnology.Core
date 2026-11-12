@@ -10,12 +10,16 @@ opposite of the multi-PR planning path. Where `implementation-planning` answers 
 build this new thing?"*, this skill answers *"how do I fix a smell I can see right now without
 a behaviour change?"*.
 
+A refactor is a Small change of the
+[delivery workflow](../../../docs/architecture/delivery-workflow.md#size): the gate is
+`./.github/verify.ps1`, and the driver commits. This skill adds the refactor-specific rules.
+
 ## When to use
 
 - Rename a private / internal type inside one module.
-- Split a class above the §9 size budget (≤ 100 lines target, ~150 hard cap).
+- Split a class above the §9 size budget (≤ 100 lines target, hard cap 150).
 - Extract a primary constructor over hand-written `private readonly` capture.
-- Remove a `#region` (forbidden by §9.10).
+- Remove a `#region` (forbidden by §9.9).
 - Replace `Newtonsoft.Json` with `System.Text.Json` in new code per §15.
 - Collapse a `try/catch` + `JsonConvert.SerializeObject(ex.Message)` controller into the
   `ExceptionFilter` path.
@@ -35,8 +39,8 @@ a behaviour change?"*.
 - The refactor introduces or removes a `PackageReference`. Use
   [`package-management`](../package-management/SKILL.md) (add / bump) or
   [`dependency-audit`](../dependency-audit/SKILL.md) (CVE) first.
-- The "refactor" is actually a redesign (new abstraction, new pattern, replacing CQRS chain
-  handlers with Story steps, etc.) — route to `implementation-planning`.
+- The "refactor" is actually a redesign (new abstraction, new pattern, replacing a CQRS handler
+  with a Tale, etc.) — route to `implementation-planning`.
 
 ## Critical rules
 
@@ -84,44 +88,48 @@ For each behaviour the refactor moves, find the test that pins it:
 grep -rn '<TypeName>\|<MethodName>' tests/SolTechnology.Core.<Module>.Tests/
 ```
 
-If coverage is missing, invoke [`test-writing`](../test-writing/SKILL.md) **first**, land the
-tests in a separate commit, then refactor. Tests in the same commit as the refactor are
-unfalsifiable — the reviewer cannot tell whether the test pins old or new behaviour.
+If coverage is missing, invoke [`test-writing`](../test-writing/SKILL.md) **first**. The tests
+are their own Small change, accepted and committed before the refactor starts. Tests in the same
+commit as the refactor are unfalsifiable — the reviewer cannot tell whether the test pins old or
+new behaviour.
 
 ### 4. Execute the smallest possible change
 
 | Smell | Mechanical fix |
 |---|---|
-| Class > 150 lines | Extract one collaborator with a name that describes its responsibility (`CityMapper`, `StreetTrafficUpdater`); inject it via primary constructor. Never extract a `*Helper` / `*Manager` / `*Util` — see §9.9. |
+| Class > 150 lines | Extract one collaborator with a name that describes its responsibility (`CityMapper`, `StreetTrafficUpdater`); inject it via primary constructor. Never extract a `*Helper` / `*Manager` / `*Util` — see §9.8. |
 | Hand-written `private readonly` ctor capture | Replace with C# 12 primary constructor. `ILogger<TSelf>` stays in the parameter list. |
-| `#region ... #endregion` | Delete the markers. If the class is still hard to scan, split into partial files (one method per file for HTTP clients, per §9.10) or extract a collaborator. |
+| `#region ... #endregion` | Delete the markers. If the class is still hard to scan, split into partial files (one method per file for HTTP clients, per §9.9) or extract a collaborator. |
 | `try/catch` in controller / handler | Delete the `try/catch`; let `ExceptionFilter` handle it. Verify the controller test asserts the same response status the filter produces. |
 | `Newtonsoft.Json` in new code | Replace with `System.Text.Json`. Newtonsoft stays **only** in MessageBus / Hangfire-integrated paths (see `package-management` constraints). |
-| Multi-line essay comment restating *what* | Delete it. Keep one-line *why* comments only (§9.11). |
+| Multi-line essay comment restating *what* | Delete it. Keep one-line *why* comments only (§9.10). |
 | `+`-concatenated log string | Replace with structured `[Placeholder]` template per §11. |
 | Entity returned past DataLayer boundary | Add a `*Mapper.ToDomain(...)` call; return the domain type. The mapper lives in DataLayer. |
 
-### 5. Run the verification triple
+### 5. Verify
 
-After **every** mechanical edit:
+Before yielding, `./.github/verify.ps1` must exit 0. After **every** mechanical edit, as the fast
+inner loop:
 
 ```bash
 dotnet build SolTechnology.Core.slnx
 dotnet test tests/SolTechnology.Core.<Module>.Tests/
 ```
 
-Plus `get_errors` per `CLAUDE.md §3` after every file edit.
+Plus IDE diagnostics per `CLAUDE.md §3` after every file edit.
 
 Any test that flips red → STOP. The refactor was not behaviour-preserving. Revert the edit;
 re-think; do not "fix" the test to match the new behaviour.
 
-### 6. Update the Coding Guide if a new anti-pattern was learnt
+### 6. Propose a Coding Guide row if a new anti-pattern was learnt
 
-If the smell you fixed was **not** in [§15](../../../docs/ClaudeCodingGuide.md), add a row to
-the §15 table in the same PR with the file you fixed as the "Where seen" cell. This is the
-self-improvement loop from `CLAUDE.md §9` — silent retention is forbidden.
+If the smell you fixed was **not** in [§15](../../../docs/ClaudeCodingGuide.md), propose a row
+for the §15 table with the file you fixed as the "Where seen" cell, and add it after the user
+confirms (`CLAUDE.md §9`).
 
-### 7. Commit per `commit-message`
+### 7. Commit message
+
+The driver commits. The message follows [`commit-message`](../commit-message/SKILL.md):
 
 ```
 refactor(<scope>): extract CityRouteCalculator from CalculateBestPathHandler
@@ -142,14 +150,13 @@ must be `PATCH` because consumers see no contract change.
 - [ ] The touched type / member is **not** public outside its module (verified via grep).
 - [ ] Tests covering the moved behaviour existed **before** the refactor — or were added in a
       prior commit via `test-writing`.
-- [ ] `dotnet build SolTechnology.Core.slnx` green.
-- [ ] `dotnet test tests/SolTechnology.Core.<Module>.Tests/` green; same test count as before
-      (or higher only when the prior commit added regression tests).
-- [ ] `get_errors` clean on every edited file.
+- [ ] `./.github/verify.ps1` exits 0; same test count as before (or higher only when the prior
+      commit added regression tests).
+- [ ] IDE diagnostics clean on every edited file.
 - [ ] Class-size budget respected on every file produced by the refactor.
 - [ ] No new `Helper` / `Manager` / `Util` suffix introduced.
 - [ ] Commit type is `refactor`; semver footer is `PATCH`.
-- [ ] If the smell was novel, §15 was updated in the same PR.
+- [ ] If the smell was novel, a §15 row was proposed to the user.
 
 ## Constraints
 
@@ -164,7 +171,7 @@ must be `PATCH` because consumers see no contract change.
   the reviewer can verify they pin the pre-refactor behaviour.
 - DO NOT bundle multiple smells. One smell per invocation; one mechanical fix per commit.
 - DO NOT introduce a `Helper` / `Manager` / `Util` suffix when extracting a collaborator.
-  Name by responsibility (§9.9).
+  Name by responsibility (§9.8).
 - DO NOT silence a failing test to make the refactor green. Revert the edit instead.
 - DO NOT use `feat` / `fix` commit types for a refactor. `refactor` + `Semver: PATCH` is the
   only correct shape.

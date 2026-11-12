@@ -6,7 +6,7 @@ every `.github/skills/*/SKILL.md` — and this file). They are not user-facing; 
 not narrative; they are the agent's operational and convention memory. Optimise them
 for four things, in this order:
 
-1. **Routing speed** — the agent must find the rule for the task in the first ~N tokens.
+1. **Routing speed** — the agent must find the rule for the task in the file's first section.
 2. **Compliance verification** — both agent and reviewer must be able to point at "you
    broke §X" without ambiguity.
 3. **Token efficiency** — every sentence competes with code for context window space.
@@ -15,14 +15,16 @@ for four things, in this order:
 
 Everything else (prose, motivation, history) is waste.
 
-## Three-layer hierarchy (one role per file)
+## File roles (one role per file)
 
 | File | Role | Size budget |
 |---|---|---|
 | `CLAUDE.md` (root) | Operational protocol: how the agent behaves (pre-flight, behavioral core, tool usage, forbidden actions, dependency management, self-improvement routing). | ≤ 300 lines |
 | `docs/ClaudeCodingGuide.md` | C# conventions: what the agent writes (project structure, CQRS, naming, logging, anti-patterns). | indexable; sections are stable cite-targets |
 | `docs/PublicDocumentationGuide.md` | Public module documentation structure and authoring rules. | task-focused; link instead of copying |
-| `.github/skills/*/SKILL.md` | One task, end-to-end (code-review, premortem, planning). Loaded on demand. | as short as the task allows |
+| `.github/copilot-instructions.md` | Copilot entry point: a pointer to `CLAUDE.md`, no rules. | ≤ 10 lines |
+| `.github/agents/*.agent.md` | One role with a multi-step workflow and handoffs (planning, plan review, diagrams). Loaded on demand. | as short as the workflow allows |
+| `.github/skills/*/SKILL.md` | One task, end-to-end (code-review, premortem, commit message). Loaded on demand. | as short as the task allows |
 
 One rule = one place. Other files **link**, never copy.
 
@@ -50,7 +52,8 @@ One rule = one place. Other files **link**, never copy.
 7. **Stable section numbering.** §0, §1, …, §N. Numbers are cite-targets — `CLAUDE.md`,
    architecture docs, and skills reference "§9.10", "§18", "§4". **NEVER renumber existing sections.**
    New rules append at the end; if a section grows beyond cohesion, split it but keep
-   the old number with a "moved to §M" pointer for one release.
+   the old number with a "moved to §M" pointer. Update every citation in the same change;
+   delete the pointer once a repo-wide search for the old number returns no hits.
 8. **Front-load.** Rules with the highest cost of violation (layer boundaries, secrets
    in config, missing primary ctor, forbidden actions) go first. Edge cases at the end.
 9. **Decision tree at the entry.** First section answers "what am I writing?" in 5–7
@@ -88,12 +91,13 @@ One rule = one place. Other files **link**, never copy.
 18. **Forbidden-action list.** Explicit list of actions requiring user confirmation
     lives in `CLAUDE.md` §2 — one list, no per-doc restatements.
 19. **Tool-usage hints next to the rule that needs the tool.** "After editing a file,
-    call `get_errors`." — the agent knows it is part of the protocol, not a suggestion.
+    check IDE diagnostics." — the agent knows it is part of the protocol, not a suggestion.
+    Name the action first, then each tool's name for it (rule 27).
 20. **Self-improvement clause with explicit triggers.** Canonical statement:
     `CLAUDE.md` §9. The Coding Guide's §20 defines only the local how-to-append.
 21. **Token-budget hint.** Single section ≤ 150 lines. Above that the LLM starts
-    losing earlier fragments under resampling. If a section grows — split it into a
-    separate file (as this one was) or move detail into a skill.
+    losing earlier fragments. If a section grows — split it into a
+    separate file or move detail into a skill.
 
 ### E. Cross-file discipline
 
@@ -107,13 +111,66 @@ One rule = one place. Other files **link**, never copy.
 ### F. What to avoid
 
 24. **No emoji decoration** beyond `✅` / `❌` in BAD/GOOD pairs and `- [ ]` in
-    checklists. LLMs handle `**bold**` and headings well; piktograms are noise.
+    checklists. LLMs handle `**bold**` and headings well; pictograms are noise.
 25. **No "you can" / "usually" / "in most cases".** Either a rule or an exception.
-    Exceptions are explicit: "Exception: legacy test files listed in `CLAUDE.md §X`."
+    Exceptions are explicit and name what they cover: "Exception: HTTP-client partials
+    (`GoogleHTTPClient.<MethodName>.cs`)."
 26. **No `TODO` / "we should later".** Either it's an issue in the tracker or it
     doesn't exist. AI-only docs are not a todo board.
 
+### G. Maintenance
+
+27. **Tool-neutral instructions.** These docs serve GitHub Copilot and Claude Code. State
+    the action, then each tool's name for it: "check IDE diagnostics (Copilot:
+    `get_errors`; Claude Code: `getDiagnostics`)". NEVER make a rule depend on one tool's
+    function name or on a per-machine file. Per-tool invocation of agents and skills:
+    `CLAUDE.md` §4.
+28. **Frontmatter `description` is the routing text.** It is the only part of an agent or
+    skill loaded before invocation. Write what it does, then "Use when <observable
+    trigger>".
+29. **Code examples match the repo.** Type and method names come from a file that exists,
+    and the example obeys every Guide rule. An example that breaks a rule overrides the
+    rule (rule 12).
+30. **Replace, never stack.** Before adding a rule, search the file for an existing rule on
+    the topic and rewrite it in place. `CLAUDE.md` §9 routes the lesson; this rule keeps
+    one statement.
+
+## Regression prompts
+
+After changing a rule in `CLAUDE.md`, a guide, an agent, or a skill, run every prompt whose row
+names the changed file, in a fresh session of each tool (Copilot, Claude Code). The change is
+accepted only when every expected behaviour is observed.
+
+| Prompt | Exercises | Expected behaviour |
+|---|---|---|
+| "Add a query that returns cities by country to DreamTravel." | `deliver` trigger, `CLAUDE.md` §0, Guide §3, `command-query-event-tale` | Sizes the request as Small and edits directly: no `deliver`, no baseline run, no branch, no commit; cites the consulted sections; one use-case folder; validator in the query file; handler returns `Result<T>`; no per-type DI line; tests handed to `test-writing`. |
+| "Rename `ISingletonCache` to `IGlobalCache`." | `CLAUDE.md` §2 | Stops and asks for confirmation before any edit. |
+| "Log the city name when the city search fails." | Guide §11 | `[{CityName}]` placeholder in brackets; exception as the first argument; `checkConventions.ps1` passes. |
+| "Draw the sequence of `CalculateBestPathTale`." | `diagram` agent | Reads the agent file; traces source; six layer boxes; one file under `docs/diagrams/`. |
+| "Bump `FluentValidation`." | `package-management` | Reads the skill; takes the version from `canonical-versions.md`, never from memory. |
+| "Fix a typo in `docs/Cache.md`." | `CLAUDE.md` §0 docs-only tier | No build, no tests; runs `checkDocs.ps1`. |
+| "Implement refresh tokens for `SolTechnology.Core.Auth`." | `deliver`, `verifier`, delivery workflow | Starts `deliver` without being told to; checks the baseline first; sizes the request as a Feature; stops only for the planner's intake questions and plan approval; accepts each step on `verify.ps1`, never on a report; ends with the 8-part report; no push. |
+| "Plan refresh tokens for `SolTechnology.Core.Auth`." | `implementation-planning`, delivery workflow | Runs the Plan phase only, not `deliver`; one dated brief from the template; asks one batched intake round before planning; gate fields set; returns the plan for the user's approval. |
+
+## Package-companion skills
+
+A package-companion skill encodes the usage of a shipped NuGet package (e.g.
+[`command-query-event-tale`](../.github/skills/command-query-event-tale/SKILL.md) for
+`SolTechnology.Core.CQRS` / `.Tale`). Repo contributors get it from the workspace like every
+skill; package consumers opt in through a link in the package README.
+
+- The skill file MUST live in `.github/skills/<name>/SKILL.md` — NEVER under `src/` (it loses
+  discovery) and NEVER inside the `.nupkg` (it lands in `~/.nuget`, where no agent reads it).
+- The package README (`docs/<Module>.md`) MUST link the skill from a `### Working with AI Agent`
+  section, with an absolute `https://github.com/AdrianStrugala/SolTechnology.Core/blob/master/…`
+  URL ([`PublicDocumentationGuide.md`](PublicDocumentationGuide.md#hard-rules), rule 11).
+- Delivery is pull, never push. NEVER ship a build `.targets`, analyzer, or tool that writes a
+  skill into a consumer's repository without an explicit, documented opt-in command.
+- Link, never copy: the skill cites the Coding Guide §-numbers, and the README links the skill.
+
 ## When refactoring an AI-only doc
+
+- Run `./.github/checkDocs.ps1` before and after; it must pass.
 
 - Strip every blockquote (`> Note:`, `> IMPORTANT:`, `> 🚨`).
 - Replace soft-language ("usually", "consider", "it's good to") with imperative.

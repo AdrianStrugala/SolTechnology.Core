@@ -9,6 +9,10 @@ Drive the CVE / downgrade resolution flow from
 [`CLAUDE.md §6`](../../../CLAUDE.md). Where `package-management` answers *"which version do I
 pin?"*, this skill answers *"how do I fix a vulnerability or downgrade warning at source?"*.
 
+A fix made here is a Small change of the
+[delivery workflow](../../../docs/architecture/delivery-workflow.md#size): the gate is
+`./.github/verify.ps1`, and the driver commits. An SDK-family migration is a Feature.
+
 ## When to use
 
 - `dotnet restore` / `dotnet build` emits **NU1901**, NU1902, NU1903 or NU1904.
@@ -130,16 +134,12 @@ dotnet build SolTechnology.Core.slnx 2>&1 | grep -E 'NU190[1-5]'
 # expected: empty
 ```
 
-If the failing project is in a sample app:
-
-```bash
-cd sample-tale-code-apps/<App>
-dotnet build 2>&1 | grep -E 'NU190[1-5]'
-```
+The sample-app projects are part of `SolTechnology.Core.slnx`, so the same command covers them.
+Then `./.github/verify.ps1` must exit 0.
 
 ### 7. Document the fix
 
-Update the change's commit body via [`commit-message`](../commit-message/SKILL.md):
+The driver commits. The commit body follows [`commit-message`](../commit-message/SKILL.md):
 
 ```
 fix(<scope>): bump Hangfire.Core to 1.8.22 to clear NU1904 in Newtonsoft.Json
@@ -162,7 +162,7 @@ page after delivery.
 - [ ] `package-management/references/canonical-versions.md` reflects the new version when the
       bumped package is listed there.
 - [ ] Commit body cites the CVE / advisory and the removal trigger if an override was used.
-- [ ] Sample-app build also green if the fix touches a project they depend on transitively.
+- [ ] `./.github/verify.ps1` exits 0.
 
 ## Constraints
 

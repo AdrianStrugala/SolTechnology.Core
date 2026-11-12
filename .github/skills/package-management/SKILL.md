@@ -14,8 +14,10 @@ versions.
 ## When to use
 - Adding a new `PackageReference` to any `.csproj`.
 - Creating a new project that pulls in core dependencies.
-- Checking which version is current for an upgrade or CVE fix.
-- Resolving a `NU1605` / package-downgrade warning across projects.
+- Checking which version is current for an upgrade.
+
+A CVE warning (`NU1901`–`NU1904`) or a downgrade (`NU1605`) belongs to
+[`dependency-audit`](../dependency-audit/SKILL.md), which reads the version from here.
 ## Procedure
 1. **Read [`references/canonical-versions.md`](references/canonical-versions.md)** — find the
    package row.

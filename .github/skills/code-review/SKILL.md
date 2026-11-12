@@ -1,6 +1,6 @@
 ---
 name: code-review
-description: Review a SolTechnology.Core change against the Tale Code philosophy, ClaudeCodingGuide rules, and module conventions.
+description: Review a SolTechnology.Core change against the Tale Code philosophy, ClaudeCodingGuide rules, and module conventions. Produces findings with file:line and a semver classification, never an accept / reject verdict — the verifier agent decides that. Use when the verifier reviews a diff, or when the user asks for a review of a diff, a branch, or a pull request.
 ---
 
 # Code Review
@@ -20,6 +20,9 @@ Evidence-based review skill for changes inside `src/SolTechnology.Core.*` and th
   that the change violates.
 - **Report what, not why-it-feels-wrong.** Suggested fix must be concrete.
 - **Tale Code first.** Readability is a primary criterion, not a nice-to-have.
+- **No verdict.** Report findings and severities. Whether the change is accepted is decided by
+  the [`verifier`](../../agents/verifier.agent.md) from the gates, the acceptance criteria, and
+  these findings.
 
 ## Process
 
@@ -40,11 +43,10 @@ Walk through the relevant sections of
   [`naming-and-public-api.md`](../../../docs/architecture/naming-and-public-api.md).
 - §11 Logging — `logger.Log*` template, level, scope, no PII.
 - Class-size budget — flag files exceeding the limit.
-- §20 Self-Improvement — if a lesson was learnt, the guide itself or `CLAUDE.md` must be updated
-  in the same PR.
-- §15 Anti-patterns — if the diff drags an anti-pattern from the surrounding file (or
-  introduces one), hand off the fix to [refactor](../refactor/SKILL.md). Do not approve a PR
-  that propagates a §15 anti-pattern.
+- Self-improvement — a lesson learnt is proposed to the user per `CLAUDE.md §9`, never written
+  into an instruction file unasked.
+- §15 Anti-patterns — a diff that drags an anti-pattern from the surrounding file, or introduces
+  one, is a `Major` finding; the fix goes to [refactor](../refactor/SKILL.md).
 
 ### 3. Module-specific checks
 
@@ -77,7 +79,8 @@ sections. Note any module-specific convention the diff violates.
   [`package-management/references/canonical-versions.md`](../package-management/references/canonical-versions.md);
   do not hard-code a remembered version in the review.
 - Any `NU1605` / `NU190x` warning surfaced by the diff → hand off to
-  [dependency-audit](../dependency-audit/SKILL.md). Do not approve a PR that masks the warning.
+  [dependency-audit](../dependency-audit/SKILL.md). A diff that masks the warning is a `Blocking`
+  finding.
 
 ### 7. Documentation sync
 
@@ -119,5 +122,5 @@ their risk warrants it.
 
 #### Summary
 **Blocking findings**: <placeholder>count</placeholder>
-**Recommendation**: Approve / Approve with comments / Request changes
+**Major findings**: <placeholder>count</placeholder>
 

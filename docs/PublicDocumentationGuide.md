@@ -64,7 +64,7 @@ feature record, or inline XML documentation on a public type.
     content directly required by the task; audit public API accuracy as separate explicit scope.
 11. Use absolute GitHub URLs in `### Working with AI Agent`. NuGet.org cannot resolve repository-
     relative `.github/` links. The consumer opts into the companion skill; never auto-install it.
-    Follow the [package-companion skill policy](../.github/skills/README.md#package-companion-skills).
+    Follow the [package-companion skill policy](AIDocsGuide.md#package-companion-skills).
 
 ## Refactoring an existing page
 

@@ -35,13 +35,13 @@ Generate a commit message that matches the SolTechnology.Core convention.
 
 Use the module name in lowercase, dropping `soltechnology.core.`:
 
-`api`, `api-testing`, `apiclient`, `auid`, `auth`, `blob`, `cache`, `cqrs`, `faker`,
-`flow`, `guards`, `http`, `jobs`, `journey`, `logging`, `messagebus`, `scheduler`,
-`sql`, `story`.
+`api`, `auid`, `auth`, `blob`, `cache`, `cqrs`, `guards`, `hangfire`, `http`, `logging`,
+`messagebus`, `scheduler`, `sql`, `tale`, `testing`.
 
+Testing kits: the module scope plus `-testing` (`api-testing`, `sql-testing`, `http-testing`).
 Cross-module: `core` (multiple modules) or `repo` (root files only).
-Sample apps: `dreamtravel`, `talecode`, `elsa`.
-Meta: `docs`, `architecture`, `features`, `skills`, `build`, `ci`.
+Sample app: `dreamtravel`.
+Meta: `docs`, `architecture`, `features`, `skills`, `agents`, `workflow`, `build`, `ci`.
 
 ## Rules
 
@@ -84,11 +84,11 @@ BREAKING CHANGE: <only if MAJOR>
 ## Examples
 
 ```
-feat(story): persist interactive step inputs across host restart
+feat(tale): persist interactive chapter inputs across host restart
 
-Interactive workflows previously lost user-supplied inputs when the worker
-process restarted between steps. Inputs are now serialized with the rest
-of the story state under the existing storage contract.
+Interactive tales previously lost user-supplied inputs when the worker
+process restarted between chapters. Inputs are now serialized with the rest
+of the tale context under the existing storage contract.
 
 Semver: MINOR
 ```
@@ -96,7 +96,7 @@ Semver: MINOR
 ```
 refactor(cqrs)!: return Result.Failure instead of throwing in pipeline
 
-The MediatR pipeline behaviour now surfaces validation errors as
+The validation pipeline behaviour now surfaces validation errors as
 Result.Failure values, aligning with §3 of the Coding Guide. Consumers
 that previously caught ValidationException must switch to inspecting
 Result.IsFailure.

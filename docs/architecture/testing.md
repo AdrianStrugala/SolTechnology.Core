@@ -82,8 +82,11 @@ that only fails at runtime fails a test first. Blob is the exception: it has no 
 manual Azurite runs. The deprecated Guards and Scheduler projects have no resolution test.
 
 CI runs the library tests through `.github/runTests.ps1` after the build. It runs every test project
-listed in `SolTechnology.Core.slnx` with `--no-build`, keeps going after a failure, and exits non-zero
-when any one failed, so a failure in an early project cannot be hidden by a later green one.
+under `tests/` listed in `SolTechnology.Core.slnx` with `--no-build`, keeps going after a failure, and
+exits non-zero when any one failed, so a failure in an early project cannot be hidden by a later
+green one. Its `-Filter` parameter selects other solution test projects by path. The local gate
+`.github/verify.ps1` uses it to run the DreamTravel Unit and Component tests after the library
+tests; CI runs the same six DreamTravel projects in the `dreamtravel-tests` job.
 
 The `*.Testing` packages have no test project of their own (Q6 of the 2.0 hardening). They are
 exercised by the module test projects that use them and by the DreamTravel component tests; a few

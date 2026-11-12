@@ -28,7 +28,10 @@ Validate and fix documentation integrity across the [docs/](../../../docs/) fold
 
 ### 1. Identify files
 
-Collect every `*.md` under [docs/](../../../docs/) and the workspace root.
+Collect every `*.md` under [docs/](../../../docs/) and the workspace root. Run
+`./.github/checkDocs.ps1` first; it covers link targets, heading anchors, § citation existence,
+agent / skill index parity, and the frontmatter, statuses, and step tables of feature briefs
+mechanically. The steps below cover what it cannot judge.
 
 ### 2. Module ↔ Doc Parity
 
@@ -71,10 +74,7 @@ For every file under [docs/architecture/](../../../docs/architecture/):
 For every durable file directly under [docs/features/](../../../docs/features/):
 
 - Filename matches `YYYY-MM-DD-<kebab-name>.md`.
-- Frontmatter contains `status`, `created`, and `completed`; a record with steps also has
-  `review` and `premortem`.
-- Status is `planning | planned | in-progress | blocked | completed | abandoned`.
-- Completed and abandoned records have a completion date and completion summary.
+- Completed and abandoned records have a completion summary.
 - The record warns that it may not describe the current system.
 - No durable link points into a deleted or unrelated working folder.
 
@@ -84,8 +84,10 @@ status indexes as obsolete workflow artifacts.
 ### 6. Check Links and Formatting
 
 - Paths with spaces use angle brackets: `[Text](<path/file.md>)`.
-- Relative paths resolve from the file's location.
-- Linked files exist on disk.
+- Links in files `checkDocs.ps1` does not read (the root `README.md`, completed feature records)
+  resolve from the file's location to a file on disk.
+- The topic of every `§N` / `§N.M` citation of `CLAUDE.md` or `ClaudeCodingGuide.md` matches the
+  citing sentence. The script proves only that the section exists.
 - Module docs use relative links into `src/SolTechnology.Core.*` only when the file is stable
   (interfaces, `ModuleInstaller.cs`, public entrypoints).
 

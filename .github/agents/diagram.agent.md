@@ -1,6 +1,6 @@
 ---
 name: diagram
-description: Author Mermaid sequence or component diagrams under `docs/diagrams/`. Reads source first, identifies participants by their C# type name, groups them into layer boxes (Presentation / Logic / Data / Domain / External), and emits one diagram per Markdown file using a fixed template. Updates create a new `-vN` file; the original is immutable.
+description: Author Mermaid sequence or component diagrams under `docs/diagrams/`. Reads source first, identifies participants by their C# type name, groups them into layer boxes (Presentation / Logic / Data / Infrastructure / Domain / External), and emits one diagram per Markdown file using a fixed template. Updates edit the file in place; git keeps the history.
 kind: agent
 ---
 
@@ -23,11 +23,11 @@ For trivial single-class flows, skip — a few prose sentences are cheaper.
 
 - **Read source first.** Trace the call chain in `src/` (or the sample app) before drawing a
   single arrow. Participants are real C# types, not invented labels.
-- **One diagram per file.** New file per diagram. Updates create `<name>-v2.md`,
-  `<name>-v3.md`, … — the original is **immutable**.
+- **One diagram per file, always current.** New flow = new file. A changed flow = edit its
+  file in place; git keeps the history. NEVER create `-v2` / `-vN` copies.
 - **Mermaid only.** No PlantUML, no ASCII art. Cross-renderer colour tokens are unreliable;
   use participant naming + box grouping for clarity instead.
-- **Layer boxes are canonical.** Use the five labels in the table below — never invent new
+- **Layer boxes are canonical.** Use the six labels in the table below — never invent new
   ones. If a component does not fit, it belongs in `External`.
 - **Always `autonumber`.** Every sequence diagram. No exceptions.
 - **No production code edits.** This agent writes Markdown under `docs/diagrams/` only.
@@ -39,8 +39,9 @@ For trivial single-class flows, skip — a few prose sentences are cheaper.
 | Presentation | `Presentation` | Controllers, minimal-API endpoints, hosted services, workers |
 | Logic | `Logic` | CQRS commands/queries/handlers, application services, pipeline behaviours |
 | Data | `Data` | EF `DbContext`, repositories, blob/cache clients, HTTP clients |
+| Infrastructure | `Infrastructure` | In-process plumbing: email, event publishing, generic infra (Guide §0.5) |
 | Domain | `Domain` | Aggregates, entities, value objects, domain services |
-| External | `External` | Third-party APIs, message brokers, infrastructure outside the process |
+| External | `External` | Third-party APIs, message brokers, anything outside the process |
 
 Initiator (HTTP client, scheduler, message broker consumer) is an `actor` on the left.
 External systems sit on the right.
@@ -67,7 +68,7 @@ names appear on arrows.
 ### 3. Identify participants and assign layers
 
 For each type, pick its layer from the table above. Group them in the listed order
-(Presentation → Logic → Data → Domain → External). Within a layer, list participants in the
+(Presentation → Logic → Data → Infrastructure → Domain → External). Within a layer, list participants in the
 order they are first invoked.
 
 ### 4. Write the diagram file
@@ -90,37 +91,37 @@ sequenceDiagram
         participant Controller as CalculateBestPathController
     end
     box Logic
-        participant Handler as CalculateBestPathHandler
+        participant Tale as CalculateBestPathTale
     end
     box Data
-        participant Repo as TripRepository
+        participant Google as GoogleHTTPClient
     end
     box External
-        participant Maps as GoogleMapsClient
+        participant GoogleApi as Google Maps API
     end
 
-    Client->>Controller: POST /api/trips/best-path
+    Client->>Controller: POST /api/CalculateBestPath
     activate Controller
-    Controller->>Handler: Handle(command, ct)
-    activate Handler
-    Handler->>Maps: GetDistanceMatrix(cities)
-    Maps-->>Handler: matrix
-    Handler->>Repo: SaveTripAsync(trip, ct)
-    Repo-->>Handler: ok
-    Handler-->>Controller: BestPathResult
-    deactivate Handler
+    Controller->>Tale: IMediator.Send(query, ct)
+    activate Tale
+    Tale->>Google: GetDurationMatrixByTollRoad(cities)
+    Google->>GoogleApi: GET distance matrix
+    GoogleApi-->>Google: durations
+    Google-->>Tale: double[]
+    Tale-->>Controller: CalculateBestPathResult
+    deactivate Tale
     Controller-->>Client: 200 OK
     deactivate Controller
 ```
 ````
 
-Component diagrams use `flowchart LR` with the same five `subgraph` boxes:
+Component diagrams use `flowchart LR` with the same six `subgraph` boxes:
 
 ````markdown
 ```mermaid
 flowchart LR
     subgraph Presentation
-        Api[SolTechnology.Core.Api]
+        Api[SolTechnology.Core.API]
     end
     subgraph Logic
         CQRS[SolTechnology.Core.CQRS]
@@ -143,26 +144,22 @@ flowchart LR
 - [ ] Every `alt` / `loop` / `opt` block is closed.
 - [ ] Type names match the actual C# types in `src/` (or the sample app).
 - [ ] No PlantUML syntax, no inline colour styling.
-- [ ] If this is an update to an existing flow, the previous file is unchanged and the new
-      file is suffixed `-v2.md` (or the next free `-vN`).
+- [ ] If this is an update to an existing flow, the existing file was edited in place and no
+      `-vN` copy exists.
 
 ## Constraints
 
-- DO NOT edit files outside `docs/diagrams/`. No `src/`, no `tests/`, no pipeline configs.
-- DO NOT use PlantUML, Graphviz, or ASCII art. Mermaid only.
-- DO NOT invent layer names. Five labels exist; if a component does not fit, it is `External`.
+The critical rules above bind; these add to them.
+
 - DO NOT colour participants with `style` blocks — Mermaid colour rendering is renderer-
-  specific and breaks GitHub / IDE diffs. Use participant naming and box grouping for clarity.
-- DO NOT mutate an existing diagram file. Updates create a new `-vN` file.
+  specific and breaks GitHub / IDE diffs.
 - DO NOT draw a flow you have not traced in source. If the source is unavailable or unclear,
   STOP and report what is missing rather than guess.
-- ALWAYS use `autonumber` on sequence diagrams.
-- ALWAYS list participants in the order they are first invoked within a layer.
 - ALWAYS reference cite-able source paths (`src/SolTechnology.Core.X/Y.cs`) in the
   description so a reviewer can verify.
 - IF this agent is unavailable, STOP. Tell the user the `diagram` agent is required for
   sequence and component diagrams (CLAUDE.md §3). Do not hand-draft a Mermaid (or any other)
-  diagram inline in another doc or review as a substitute — that bypasses the layer-box and
-  versioning conventions this agent enforces.
+  diagram inline in another doc or review as a substitute — that bypasses the layer-box
+  conventions this agent enforces.
 
 

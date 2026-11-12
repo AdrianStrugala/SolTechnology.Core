@@ -10,9 +10,10 @@ Review a plan produced by the
 [`implementation-planning`](implementation-planning.agent.md) agent. Run in a fresh context before
 implementation starts. Never review a plan you authored.
 
-The durable artifact is the dated feature brief. The sibling folder is temporary execution state.
-Read [`docs/architecture/delivery-workflow.md`](../../docs/architecture/delivery-workflow.md) before
-reviewing.
+This agent owns the Review phase of the
+[delivery workflow](../../docs/architecture/delivery-workflow.md#phases) and applies the user's
+answers in its Approval phase. The durable artifact is the dated feature brief. The sibling folder
+is temporary execution state. Read that page before reviewing.
 
 ## When to invoke
 
@@ -30,7 +31,9 @@ reviewing.
 - Never silently rewrite. Present findings, collect answers, then edit temporary plan files.
 - Edit steps in place. When splitting or merging, renumber files, keep the retrospective highest,
   and update the brief's `## Steps` rows and links in the same change.
-- Own one batched question round after the critique. Never invent a resolution when the user defers.
+- Put every question in the critique; the user answers them in
+  [Approval](../../docs/architecture/delivery-workflow.md#approval). Never invent a resolution when
+  the user defers.
 - Use one focused question per subagent call when verifying domain claims.
 - Treat `docs/architecture/` and source as current truth. Treat older feature records as historical
   context that may be stale.
@@ -53,6 +56,10 @@ Read:
 
 ### 2. Cross-check
 
+Run `./.github/checkDocs.ps1` first; every failure it reports for this plan is a blocker. It
+covers frontmatter position, status vocabulary, gate fields, `## Steps` parity with the step
+files, the bracket steps, and link targets. The table below holds only what needs judgment.
+
 For every planned change, verify:
 
 | Check | Flag when |
@@ -67,22 +74,20 @@ For every planned change, verify:
 | Tests | No minimum covering set or wrong test project/framework is selected. |
 | Conventions | The plan conflicts with relevant `ClaudeCodingGuide` rules or repository test/serialization stack. |
 | Security | Auth, secrets, PII, or contract risks are unaddressed. |
-| Gates | Fields are missing or malformed, or gate values conflict with `CLAUDE.md §4`. |
+| Gates | Gate values conflict with the triggers in `CLAUDE.md §4`. |
 | Forbidden actions | A planned action covered by `CLAUDE.md §2` lacks explicit user confirmation. |
-| Bracket steps | Required `00-run-premortem.md` is absent, or the retrospective is absent/not highest-numbered. |
 | Open questions | An unanswered question is silently assumed away or its step is not `blocked`. |
 | Writing style | Prose appears outside `Summary`, identifiers are vague, or acceptance criteria contain filler. |
 | Architecture | Retrospective does not update current behavior and rationale after delivery. |
-| Feature record | Frontmatter or required initial sections are missing. |
-| Frontmatter | Frontmatter is not on line 1 or a status is outside the allowed vocabulary. |
-| Links | Relative links do not resolve, `## Steps` omits an enumerated step, or durable files other than an open brief's `## Steps` table link into a working folder. |
+| Feature record | A required initial section of the brief is missing or empty. |
+| Links | A durable file other than an open brief's `## Steps` table links into a working folder. |
 
 Verify external package and framework claims from authoritative sources before accepting them.
 
 ### 3. Present critique
 
-Order findings as blockers, major, minor, then nits. Cite exact files and symbols. Ask one batched
-question round for unresolved decisions and wait before editing.
+Order findings as blockers, major, minor, then nits. Cite exact files and symbols. List every
+unresolved decision as a question with a recommended default.
 
 Use this shape:
 
@@ -102,7 +107,8 @@ Use this shape:
 1. <Question with options and a recommended default.>
 ```
 
-Stop after presenting the critique. Do not edit until the user answers.
+Stop after returning the critique; it is the input of Approval. Do not edit until the user's
+answers arrive.
 
 ### 4. Revise temporary plan files
 
@@ -124,12 +130,16 @@ Record material scope changes under its `Implementation plan` while the feature 
 When every blocker is resolved or explicitly recorded:
 
 - re-read every edited file and confirm each finding is fixed or recorded as an open question;
-- enumerate `steps/` again and confirm the `## Steps` table contains every file in order;
+- run `./.github/checkDocs.ps1`; it must pass;
 - set `review: done (YYYY-MM-DD)` in the brief frontmatter;
 - set feature `status: planned` if no step is blocked;
+- set `approved: YYYY-MM-DD` only after the user's explicit yes, per
+  [Approval](../../docs/architecture/delivery-workflow.md#approval);
 - keep feature `status: planning` when open questions still block execution;
-- verify every working-folder link;
-- report files edited, splits/merges/renumbering, and unresolved questions.
+- report files edited, splits/merges/renumbering, and unresolved questions;
+- hand off to the [`implement-plan`](../skills/implement-plan/SKILL.md) skill once the plan is
+  approved: with `premortem: pending` its first action is step `00`, in a session that did not
+  author the plan.
 
 ## Constraints
 

@@ -26,6 +26,10 @@ Before touching any file, answer these in order:
 If a file would not fit cleanly into exactly one of those buckets, your design is wrong —
 split the responsibility before writing the file.
 
+Editing a package under `src/SolTechnology.Core.*`? Every `public` / `protected` member is a
+NuGet contract: apply §9.12, [`naming-and-public-api.md`](architecture/naming-and-public-api.md),
+and the confirmation gate in root `CLAUDE.md` §2 before changing one.
+
 ---
 
 ## 1. Project / Folder Structure (DreamTravel as the canonical layout)
@@ -99,20 +103,25 @@ namespace DreamTravel.Queries;
 
 public static class ModuleInstaller
 {
-    public static IServiceCollection InstallTripsQueries(this IServiceCollection services)
+    extension(IServiceCollection services)
     {
-    services.AddSolCQRS(o =>
-      o.RegisterQueriesFromAssembly(typeof(ModuleInstaller).Assembly));
-        services.AddSolTale();        // SolTechnology.Core.Tale scans chapters & handlers
-        services.AddTransient<ITSP, AntColony>();
-        return services;
+        public IServiceCollection InstallTripsQueries()
+        {
+            services.AddSolCQRS(o =>
+                o.RegisterQueriesFromAssembly(typeof(ModuleInstaller).Assembly));
+            services.AddSolTale(assemblies: typeof(CalculateBestPathTale).Assembly);
+            services.AddTransient<ITSP, AntColony>();
+            return services;
+        }
     }
 }
 ```
 
 Rules:
 
-- One `Install<ProjectName>(this IServiceCollection)` extension method per project. Name it after the project domain, not the type — `InstallTripsQueries`, not `AddQueryHandlers`.
+- One `Install<ProjectName>()` extension on `IServiceCollection` per project, declared in an `extension` block (§9.7). Name it after the project domain, not the type — `InstallTripsQueries`, not `AddQueryHandlers`.
+- The installer returns `IServiceCollection`. Exception: an installer whose caller must finish the configuration returns that builder (`InstallWorkflows` returns `ITaleBuilder` so the host adds `.UseTaleRepository<T>()`).
+- The `Sol` prefix (`AddSol*`, `UseSol*`, `MapSol*`) belongs to `SolTechnology.Core.*` packages only; application modules use `Install*`.
 - `ModuleInstaller` lives at the project root, never nested.
 - `Program.cs` calls **installer-level extension methods only** — module installers
   (`Install*`) and framework-level installers (`AddCache`, CORS, Swagger,
@@ -210,7 +219,8 @@ protected override Tale<CalculateBestPathResult> Tell() =>
         .Finale(ctx => ctx.Output);
 ```
 
-Full `TaleHandler` template: §17.
+Full `TaleHandler` template: the
+[`command-query-event-tale`](../.github/skills/command-query-event-tale/SKILL.md) skill.
 
 ### Rules
 
@@ -288,7 +298,7 @@ Rules:
 ### Repositories (Graph, etc.)
 
 - One repository per aggregate (`IIntersectionRepository`, `IStreetRepository`).
-- Methods are intent-named (`GetAllAsync`, `UpdateTrafficRegularTime`), not CRUD-named (`Update`, `Save`).
+- Methods are intent-named (`UpdateTrafficRegularTime`), not CRUD-named (`Update`, `Save`).
 - Repositories return domain types, not driver types.
 
 ---
@@ -310,12 +320,12 @@ Rules:
 
 1. `builder.AddServiceDefaults();` (Aspire).
 2. Culture, CORS, configuration binding.
-3. **Module installers** (one line per project): `InstallTripsSql`, `InstallGeolocationDataClients`, `InstallInfrastructure`, `InstallDomainServices`, `InstallTripsQueries`, `InstallGraphDatabase`, `AddFlows`, etc.
+3. **Module installers** (one line per project): `InstallTripsSql`, `InstallGeolocationDataClients`, `InstallInfrastructure`, `InstallDomainServices`, `InstallTripsQueries`, `InstallGraphDatabase`, `InstallWorkflows`, etc.
 4. Framework installers: `AddCache`, authentication, versioning, Swagger.
 5. Filters: `ExceptionFilter`, `ResultConversionFilter` (always wired globally).
 6. Build, configure pipeline, `MapControllers`, `Run`.
 
-CORS policy names, scheme names, and other constants MUST be `const` with a meaningful name. The `"dupa"` CORS policy in `DreamTravel.Api/Program.cs` is a kept joke (§9.10), not a pattern to copy.
+CORS policy names, scheme names, and other constants MUST be `const` with a meaningful name. The `"dupa"` CORS policy in `DreamTravel.Api/Program.cs` is a kept joke (§9.13), not a pattern to copy.
 
 ### Controllers
 
@@ -324,7 +334,7 @@ CORS policy names, scheme names, and other constants MUST be `const` with a mean
 [ApiVersion("2.0")]
 [Route("api/[controller]")]
 public class CalculateBestPathController(
-  IMediator mediator,
+    IMediator mediator,
     ILogger<CalculateBestPathController> logger)
     : ControllerBase
 {
@@ -335,7 +345,7 @@ public class CalculateBestPathController(
     [ProducesResponseType(typeof(ProblemDetails), (int)HttpStatusCode.BadRequest)]
     public async Task<IActionResult> CalculateBestPath([FromBody] CalculateBestPathQuery query)
     {
-      return Ok(await mediator.Send(query, HttpContext.RequestAborted));
+        return Ok(await mediator.Send(query, HttpContext.RequestAborted));
     }
 }
 ```
@@ -428,7 +438,7 @@ These apply to every class you write, regardless of layer.
     - Exception: a public generic method with an unconstrained type parameter stays a classic `this` method with a one-line `//` why — for a member of an `extension` block the SDK 10.0.100 compiler drops `T`'s nullable annotation on the emitted static method, so a static-form call with a nullable type argument reports CS8714 (`BlobContainerClientExtensions.ReadFromBlob<T>`).
     - Not an exception: a generic member whose type parameter has a non-nullable interface constraint moves into the block. ApiCompat then reports CP0021 "notnull" on the emitted static method (SDK 10.0.100 drops the oblivious annotation); the constraint already implies notnull, so accept it (`MessageBus.ModuleInstaller.WithQueueReceiver<TMessage, THandler>`).
 8. **No "Manager", "Helper", "Util" suffixes** unless the class genuinely is a generic helper (rare). Name by responsibility: `CityMapper`, `StreetTrafficUpdater`, `GoogleHTTPClient`.
-9. **No `#region`.** Use partial classes (one method per file for HTTP clients) or extract a new class. The only exception is legacy test files explicitly listed in the root `CLAUDE.md`.
+9. **No `#region`.** Use partial classes (one method per file for HTTP clients) or extract a new class.
 10. **Comments earn their place.** Tale Code reads like prose — let names carry the meaning. Write a comment **only** when a reader cannot infer the *why* from the code itself: a non-obvious framework constraint, a workaround for a specific bug/version, or an architecture pointer. Hard rule: **one line — two as the absolute exception**. No multi-line narration, no incident retrospectives in `//`, no restating *what* the next line does. If the explanation needs a paragraph, it belongs in `docs/architecture/` or in an **XML `<summary>`** on the public type — not inline. Inline `//` is a *pointer*, not the storage.
     ```csharp
     // ❌ BAD — three-line essay restating what the call does and re-explaining
@@ -464,13 +474,18 @@ These apply to every class you write, regardless of layer.
     - Does it record delivery history? → move it to the dated feature record.
     - Does it explain *what* the code does? → delete it, rename the symbol instead.
     - Is it genuinely a single non-obvious *why*? → keep, one line.
-    - Exception: jokes (humorous comments, messages, names — e.g. `//I'm just void` in `Nothing.cs`) stay exactly as written; never remove or "professionalize" them, even under §15 (user, 2026-11-03).
-  11. **Always use braces** for `if`, `else`, `for`, `foreach`, `while`, and `using`, including a
+11. **Always use braces** for `if`, `else`, `for`, `foreach`, `while`, and `using`, including a
     single `return`, `continue`, or `throw`.
-  12. **Types are `public` by default** in application/sample projects and whenever assembly
+12. **Types are `public` by default** in application/sample projects and whenever assembly
     scanning resolves them. In `src/SolTechnology.Core.*`, `public` and `protected` members are
     NuGet contracts: expose them intentionally and apply the confirmation and semver rules from
     root `CLAUDE.md`.
+13. **Jokes stay.** Humorous comments, messages, and names (e.g. `//I'm just void` in
+    `Nothing.cs`, the `"dupa"` CORS policy) stay exactly as written. NEVER remove or
+    "professionalize" them, even under §9.10 or §15.
+14. **XML `<summary>` in English on every `public` / `protected` type and member in
+    `src/SolTechnology.Core.*`** — it ships as the NuGet consumer's IntelliSense. Sample apps
+    document controller actions only (§7).
 
 ---
 
@@ -482,7 +497,6 @@ These apply to every class you write, regardless of layer.
   - Existing published package names (`SolTechnology.Core.CQRS`, `SolTechnology.Core.AUID`) are grandfathered. New types follow the rule.
 - **Files mirror their primary type name.** Exception: HTTP-client partials (`GoogleHTTPClient.<MethodName>.cs`) and ordered chapters (`0.InitiateContext.cs`).
 - **Folders are nouns in PascalCase.** Use case folders are verb-noun (`CalculateBestPath`, `FetchTraffic`).
-- **Async methods end with `Async` only when there is a sync overload to disambiguate.** Otherwise omit the suffix (most repository methods in this codebase do).
 - **Boolean members start with `Is`/`Has`/`Should`/`Can`** (`IsNew`, `HasStatistics`).
 - **Domain events are past tense** (`CityImported`).
 - **Commands are imperative** (`FetchTraffic`, `RecalculateTraffic`). **Queries are interrogative or noun-phrased** (`CalculateBestPath`, `FindCityByName`, `GetSearchStatistics`).
@@ -553,15 +567,15 @@ report it, never auto-fix.
 
 | Anti-pattern | Where seen | Correct form | Policy |
 | --- | --- | --- | --- |
-| `try/catch` + `JsonConvert.SerializeObject(ex.Message)` in a controller | historical: the DreamTravel v1 controllers (`CalculateBestPathController.CalculateBestPathV1`), removed in 2026-11 | `ExceptionFilter` handles it (§13) | fix on touch |
-| `logger.LogInformation("Skipped " + s.Name);` | `FetchTrafficHandler` | Structured placeholder + `[]` (§11) | report only — changes the log template consumers query |
-| Multiple `+`-concatenated log strings | various | Structured placeholders (§11) | report only — changes the log template consumers query |
+| `try/catch` + `JsonConvert.SerializeObject(ex.Message)` in a controller | none in repo | `ExceptionFilter` handles it (§13) | fix on touch |
+| `+`-concatenated log strings (`logger.LogInformation("Skipped " + s.Name);`) | `FetchTrafficHandler`, `FindLocationOfCityController`, `FindNameOfCityController`, `FindCityByCoordinatesController` | Structured placeholder + `[]` (§11) | report only — changes the log template consumers query |
+| `Async` suffix on a project-owned method | `IIntersectionRepository`, `IStreetRepository` (`GetAllAsync`, `GetByIdAsync`, …) | Drop the suffix (§10) | report only — changes a public contract |
 | Naked `Newtonsoft.Json` usage in new code | `GoogleHTTPClient.*` in `DreamTravel.GeolocationDataClients` | `System.Text.Json` + Tale/AUID converters; Newtonsoft only where Hangfire / legacy serialization requires it | report only — changes serialization behaviour |
-| Mocking `IMediator` / `DbContext` in unit tests | hypothetical | Component test (§8) | fix on touch |
-| Hand-written `private readonly` ctor capture | hypothetical | Primary constructor (§9.5) | fix on touch |
-| `static class` + `this` extension methods | various | `extension` block (§9.7) | fix on touch |
-| `#region` to organize a class | forbidden | Partial files or new class (§9.9) | fix on touch |
-| Multi-line "essay" comment restating *what* the next line does | various | One line, *why* only (§9.10) | fix on touch |
+| Mocking `IMediator` / `DbContext` in unit tests | none in repo | Component test (§8) | fix on touch |
+| Hand-written `private readonly` ctor capture | `GoogleHTTPClientCachingDecorator` | Primary constructor (§9.5) | fix on touch |
+| `static class` + `this` extension methods | every DreamTravel `ModuleInstaller.cs` (e.g. `DreamTravel.Queries`) | `extension` block (§9.7) | fix on touch |
+| `#region` to organize a class | none in repo | Partial files or new class (§9.9) | fix on touch |
+| Comment restating *what* the next line does | `StreetRepository` (`// open a write session`, `// run your update`) | One line, *why* only (§9.10) | fix on touch |
 | Returning a persistence-layer entity (`*Entity` from `DbModels/`) past the DataLayer boundary | DataLayer projects | Map at the boundary via `*Mapper.ToDomain` (§5, §6) | report only — changes a public contract |
 | Splitting a schema change across multiple commits | DataLayer changes | Single PR: entity + `DbSet<>` + `EntityTypeConfiguration` + EF migration together | fix on touch (process rule) |
 
@@ -569,7 +583,7 @@ report it, never auto-fix.
 
 ## 16. Convention checklist (run for every task)
 
-Operational checks (build, tests, `get_errors`, NU warnings, forbidden actions) live
+Operational checks (build, tests, IDE diagnostics, NU warnings, forbidden actions) live
 in root `CLAUDE.md` §10 — run both lists. Before declaring a task done:
 
 - [ ] Relevant guide section(s) read and cited in the reply (root `CLAUDE.md` §0).
@@ -577,9 +591,9 @@ in root `CLAUDE.md` §10 — run both lists. Before declaring a task done:
 - [ ] New services registered through a `ModuleInstaller`, not in `Program.cs` (§2).
 - [ ] Tale threshold respected — MUST-Tale when > 100 lines or > 1 external system (§4).
 - [ ] Class size, method size, ctor-arg budget within §9.
-- [ ] Public types have XML `<summary>` (English).
+- [ ] `public` / `protected` types and members in `src/SolTechnology.Core.*` have an English XML `<summary>` (§9.14).
 - [ ] Logging uses placeholders + `[{Value}]` brackets — **every** placeholder (§11).
-- [ ] No `#region`, no placeholder strings, no swallowed exceptions; throw/catch respects the §13 layer table.
+- [ ] No `#region`, no stub code (`"TODO"`, `"FIXME"`, `"lorem ipsum"`, `"test"`, `"xxx"`, `NotImplementedException`; kept jokes are not stubs, §9.13), no swallowed exceptions; throw/catch respects the §13 layer table.
 - [ ] Control-flow bodies always use braces (§9.11).
 - [ ] Controllers use Core `IMediator`; no direct handler injection or `CancellationToken.None` (§7).
 - [ ] Comments are one-line *why-not-what* (§9.10).
@@ -603,13 +617,6 @@ and §7; do not maintain a second copy of those templates here.
 Authoring structure, hard rules, refactoring instructions, companion-skill linking, and the
 canonical example live in [`PublicDocumentationGuide.md`](PublicDocumentationGuide.md). This
 section number remains a stable cite-target; do not duplicate those rules here.
-
----
-
-## 19. AI-only documentation — moved
-
-Content lives in [`docs/AIDocsGuide.md`](AIDocsGuide.md). Section number retained as a
-cite-target for one release; update your references, then this stub disappears.
 
 ---
 

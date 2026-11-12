@@ -19,7 +19,7 @@ forward-looking review produces vague worries.
 confirmation gates from `CLAUDE.md §2` separately; they do not imply a premortem requirement.
 
 **Recommended** for other high-risk changes, including public API changes and changes crossing
-module boundaries (e.g. CQRS ↔ Story ↔ Logging).
+module boundaries (e.g. CQRS ↔ Tale ↔ Logging).
 
 Within a plan, this skill executes the `00-run-premortem.md` gate
 ([delivery workflow](../../../docs/architecture/delivery-workflow.md)), invoked by
@@ -45,8 +45,6 @@ Within a plan, this skill executes the `00-run-premortem.md` gate
 - **No user questions.** Your output channels are the verdict, the mitigations, and the record —
   not a question round. A decision only the user can make = a *No-Go* (or *Go with mitigations*)
   stating exactly what must be decided; the planner owns the follow-up conversation.
-- **Pair with [blue-red-team](../blue-red-team/SKILL.md)** when the change is a design decision,
-  not just a code edit.
 - **Cite canonical guides directly** (`ClaudeCodingGuide` §3/§11,
   `PublicDocumentationGuide.md`) — if a reference looks wrong, the *reference* is stale, not the
   rule.
@@ -58,7 +56,7 @@ Within a plan, this skill executes the `00-run-premortem.md` gate
 
 Record:
 
-- **Modules touched** (e.g. `SolTechnology.Core.CQRS`, `SolTechnology.Core.Story`)
+- **Modules touched** (e.g. `SolTechnology.Core.CQRS`, `SolTechnology.Core.Tale`)
 - **API delta** — added / removed / changed public types, members, signatures, attributes
 - **Semver impact** — `MAJOR` / `MINOR` / `PATCH`, tied to concrete diff evidence
 - **Consumers in the workspace** — search `sample-tale-code-apps/**` for
@@ -79,7 +77,7 @@ spectacularly.** Describe the worst-credible end state in one paragraph. Example
 - "DreamTravel API returns 500 on every request after upgrading `SolTechnology.Core.Logging`."
 - "A community consumer files an issue: their `dotnet build` fails with NU1605 after we bumped a
   transitive `Microsoft.Extensions.*` reference."
-- "Story workflows resumed after deploy crash on deserialization."
+- "Tales resumed after deploy crash on deserialization."
 
 ### 3. Write the failure stories (narrative first — before any checklist)
 
@@ -103,7 +101,7 @@ from §3.
 | Module(s) in diff | Reference file |
 |---|---|
 | `SolTechnology.Core.CQRS` | [`references/cqrs.md`](references/cqrs.md) |
-| `SolTechnology.Core.Tale` | [`references/story.md`](references/story.md) |
+| `SolTechnology.Core.Tale` | [`references/tale.md`](references/tale.md) |
 | `SolTechnology.Core.Logging` | [`references/logging.md`](references/logging.md) |
 | `SolTechnology.Core.HTTP`, `SolTechnology.Core.ApiClient` | [`references/http.md`](references/http.md) |
 | `SolTechnology.Core.MessageBus` | [`references/messagebus.md`](references/messagebus.md) |

@@ -16,14 +16,14 @@ The CQRS/Tale **contracts** (`IQueryHandler<,>`, `ICommandHandler<>`, `IEvent`, 
 **folder layout** (`LogicLayer/` with its `Events/` folders, `Presentation/`) is DreamTravel's canonical
 structure — recommended, but a consumer app may use its own names. When in doubt, copy DreamTravel.
 
-> One source of truth per topic. The binding rules live in the Coding Guide §0/§3/§4/§11 and are
-> cited by number here, never copied. If a rule below disagrees with the guide, the guide wins —
-> fix this skill in the same PR per §19.
+One source of truth per topic. The binding rules live in the Coding Guide §0/§3/§4/§11 and are
+cited by number here, never copied. If a rule below disagrees with the guide, the guide wins —
+fix this skill in the same PR per [`AIDocsGuide.md`](../../../docs/AIDocsGuide.md).
 
 ## When to use
 
-- **Always** when adding a new command, query, or event — in a sample app (`DreamTravel`,
-  `TaleCode`) or in a consumer app built on the `SolTechnology.Core.CQRS` / `.Tale` packages.
+- **Always** when adding a new command, query, or event — in the `DreamTravel` sample app or in a
+  consumer app built on the `SolTechnology.Core.CQRS` / `.Tale` packages.
 - A handler grew past **~100 lines of business logic** or now talks to **> 1 external system** —
   §3 requires promotion to a Tale (chapters).
 - Adding a chapter to an existing Tale, or adding an `InteractiveChapter` pause point.
@@ -65,7 +65,8 @@ structure — recommended, but a consumer app may use its own names. When in dou
 - **Handlers never throw for business failures.** Return `Result` / `Result<T>`. Throwing is
   reserved for true exceptions (network, IO) — the Tale engine converts those to errors (§4).
 - **`Tell()` is a table of contents.** No `if`, no `try`, no loops, no logic — only
-  `await ReadChapter<…>()` lines plus final output mapping. A branch means a new chapter (§4).
+  `Open<…>()` followed by `.Read<…>()` lines plus final output mapping. A branch means a new
+  chapter (§4).
 - **One chapter = one verb = one file.** File prefixed with order (`1.DownloadRoadData.cs`);
   class omits the prefix (`DownloadRoadData`) (§4).
 - **All cross-chapter state lives on the `Context`.** Chapters never share fields or call each
@@ -216,9 +217,18 @@ per-type DI line:
 Only hand-rolled collaborators (a `*Step`, a TSP engine) need an explicit `AddScoped`. If you add
 or change a `ModuleInstaller.cs` contract, that is premortem-gated (`CLAUDE.md §4`).
 
+### Troubleshooting
+
+| Symptom | Cause / fix |
+|---|---|
+| CQRS handlers are not resolved | Register the owning assembly explicitly through `AddSolCQRS(o => o.RegisterCommandsFromAssembly(...))` or the query/event equivalent in its `ModuleInstaller`. |
+| `AddSolTale` finds no chapters or handlers | Pass the owning assembly explicitly when entry/calling assembly discovery is ambiguous. |
+| Tale JSON deserialisation case-sensitive issues | Use `TaleJsonOptions.Default` (`PropertyNameCaseInsensitive = true`, `IncludeFields = true`). |
+| Interactive tale fails immediately | Ensure `AddSolTale()` is called — it wires `TaleManager` + in-memory persistence by default. For durable persistence, use `.UseTaleRepository<T>()` (see `DreamTravel.SQLite` sample). |
+
 ### 11. Verify and hand off
 
-- `get_errors` after every file edit (`CLAUDE.md §3`).
+- Check IDE diagnostics after every file edit (`CLAUDE.md §3`).
 - Build the sample: `dotnet build SolTechnology.Core.slnx` (it includes the DreamTravel projects).
 - Tests are **not** optional — hand off to [`test-writing`](../test-writing/SKILL.md). Every new
   `Result.Fail(...)` branch needs a negative test asserting the exact `Error.Code`.
@@ -231,12 +241,12 @@ or change a `ModuleInstaller.cs` contract, that is premortem-gated (`CLAUDE.md �
 - [ ] Input DTO + `AbstractValidator<>` share one file; no logic in them.
 - [ ] Handler returns `Result` / `Result<T>`; never throws for business failures.
 - [ ] Handler ≤ ~100 lines of business logic **and** touches ≤ 1 external system — else it is a Tale.
-- [ ] `Tell()` contains only `ReadChapter<…>()` calls plus output mapping — no `if`/`try`/loop.
+- [ ] `Tell()` contains only `Open<…>()` / `.Read<…>()` calls plus output mapping — no `if`/`try`/loop.
 - [ ] Chapters: one verb, numbered file prefix, class without prefix, state on `Context`, `[UsedImplicitly]`.
 - [ ] Events implement `IEvent` in the publishing LogicLayer project's `Events/` folder; published via `IMediator.Publish`; handlers in the consumer.
 - [ ] Logging: request properties needing visibility marked `[LogScope]` (no PII); event handlers / chapters log their own begin/end via `OperationStarted` / `OperationSucceeded` / `OperationFailed`.
 - [ ] Registration is assembly-scan (`AddSolCQRS` / `AddSolTale`); only true collaborators added explicitly.
-- [ ] `get_errors` clean; `dotnet build` green for the sample app.
+- [ ] IDE diagnostics clean; `dotnet build` green for the sample app.
 - [ ] Tests handed to `test-writing`; every new failure branch has a negative test.
 
 ## Constraints

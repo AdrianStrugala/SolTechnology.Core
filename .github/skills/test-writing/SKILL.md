@@ -29,10 +29,9 @@ and the canonical test stack discovered in `tests/*.csproj`.
 |---|---|---|---|---|
 | `tests/SolTechnology.Core.<Module>.Tests/` | **NUnit** 4.x | **FluentAssertions** 6.12.x / 7.0 | **NSubstitute** 5.x | **AutoFixture** + `AutoNSubstituteCustomization` |
 | `sample-tale-code-apps/DreamTravel/tests/{Unit,Component,EndToEnd}/` | NUnit | FluentAssertions | NSubstitute | AutoFixture |
-| `sample-tale-code-apps/TaleCode/tests/` | xUnit *(legacy — do not propagate)* | FluentAssertions | NSubstitute | AutoFixture |
 
-**Default stack is NUnit + NSubstitute + FluentAssertions + AutoFixture.** All test projects use NUnit.
-where it already exists; new test projects use NUnit. Tests are the explicit exception to
+**The stack is NUnit + NSubstitute + FluentAssertions + AutoFixture** in every test project,
+existing and new. Tests are the explicit exception to
 `ClaudeCodingGuide §15` — FluentAssertions is forbidden in `src/`, mandatory in tests. Same for
 NSubstitute over Moq.
 
@@ -45,11 +44,9 @@ For a module `src/SolTechnology.Core.<Module>/` the test project is
 new — and only after confirming with the user (`CLAUDE.md §2` forbidden action: new top-level
 folder).
 
-For sample apps, match the existing split:
-
-- DreamTravel: `tests/Unit/<Project>.UnitTests/` mirrors the production folder; component tests
-  live in `tests/Component/` using `WebApplicationFactory<Program>` + Testcontainers.
-- TaleCode: tests live alongside under `tests/<Project>.Tests/`.
+For DreamTravel, match the existing split: `tests/Unit/<Project>.UnitTests/` mirrors the
+production folder; component tests live in `tests/Component/` using
+`WebApplicationFactory<Program>` + Testcontainers.
 
 ### 2. Pick the test type
 
@@ -107,10 +104,7 @@ public async Task Send_WhenBrokerThrows_ReturnsResultFailure()
 
 ### 6. Parameterise instead of duplicating
 
-- NUnit: `[TestCase]` / `[TestCaseSource]`.
-- xUnit (legacy): `[Theory]` + `[InlineData]` / `[MemberData]`.
-
-Two tests differing only in input → one parameterised test.
+Use `[TestCase]` / `[TestCaseSource]`. Two tests differing only in input → one parameterised test.
 
 ### 7. Density beats count
 
@@ -145,6 +139,7 @@ the fixture `internal` (registered by hand) or register its dependency where the
 
 ### 9. Run the right runner
 
+- Everything the gate runs (core, DreamTravel Unit and Component): `./.github/verify.ps1`.
 - Core libs (whole suite): `./.github/runTests.ps1`.
 - Single project: `dotnet test tests/SolTechnology.Core.<Module>.Tests/`.
 - Sample app: one project at a time, e.g. `dotnet test sample-tale-code-apps/DreamTravel/tests/Component`
@@ -153,7 +148,7 @@ the fixture `internal` (registered by hand) or register its dependency where the
 ## Pre-yield checklist
 
 - [ ] Test lives under `tests/` (core) or `sample-tale-code-apps/<app>/tests/`, never under `src/`.
-- [ ] Framework matches the project's existing references (NUnit by default; xUnit only in projects already on it).
+- [ ] Framework is NUnit.
 - [ ] FluentAssertions + NSubstitute + AutoFixture used; no Moq, no plain `Assert.True(...)`.
 - [ ] `_sut` field name, `// Arrange` / `// Act` / `// Assert` comments present.
 - [ ] No mocking of `IMediator` / `HttpClient` / `DbContext` / `IRepository` in a unit test —
@@ -171,7 +166,7 @@ the fixture `internal` (registered by hand) or register its dependency where the
   `restate-the-what` comments per §8.
 - DO NOT mirror the implementation in test shape. A test is paid for by the regression it would
   catch.
-- DO NOT pin to a higher FluentAssertions / NSubstitute / xUnit version than the project
+- DO NOT pin to a higher FluentAssertions / NSubstitute / NUnit version than the project
   already uses without invoking `package-management`.
 - DO NOT invent a freehand test layout when this skill is unavailable. STOP and tell the user
   `test-writing` is required (CLAUDE.md §3). Freehand tests are how mock-IMediator anti-patterns

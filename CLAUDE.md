@@ -26,6 +26,11 @@ truth per topic — when in doubt, link, don't copy.
 Applies even when the user's request looks narrow. Logging / naming / structure
 rules cross-cut every change.
 
+Docs-only change (no `.cs`, `.csproj`, `.props`, `.targets`, `.editorconfig`, or pipeline file
+touched): step 1 reduces to the authoring guide for that doc ([`AIDocsGuide.md`](docs/AIDocsGuide.md),
+[`PublicDocumentationGuide.md`](docs/PublicDocumentationGuide.md), Guide §21). Skip build and
+tests; run `./.github/checkDocs.ps1` (§3).
+
 ---
 
 ## §1. Behavioral core
@@ -80,11 +85,13 @@ For each of these, surface the intended change and the reasoning, then wait.
 
 | Action | Rule |
 |---|---|
-| After every code edit | Call `get_errors` on the edited file. Fix errors caused by your change; leave pre-existing warnings alone (state which is which). |
+| After every code edit | Check IDE diagnostics for the edited file (Copilot: `get_errors`; Claude Code: `getDiagnostics`). No diagnostics tool → build the owning project instead. Fix errors caused by your change; leave pre-existing warnings alone (state which is which). |
 | After the last code edit before yielding, and after any `.csproj` / `.props` change | Build the relevant solution (`dotnet build SolTechnology.Core.slnx`, which includes the DreamTravel projects; `sample-tale-code-apps/DreamTravel` has no solution file of its own). |
 | After a build-relevant change | Run the affected tests (`./.github/runTests.ps1` for core; `dotnet test <project>` for a single target, e.g. `dotnet test sample-tale-code-apps/DreamTravel/tests/Component`). |
-| Before asking for Bash permission | Check `.claude/settings.local.json` `allow` list for a matching wildcard. Reuse existing patterns (`-Last 10/20/30`, `timeout 60/120/180/300`) instead of asking for a new one. |
-| When invoking a custom agent / skill | Read its file first (§0.3). Pass the user's intent verbatim where possible. |
+| Before yielding a code change | Run `./.github/verify.ps1` — build, core tests, DreamTravel Unit and Component tests, `checkConventions.ps1` (added C# lines: `#region`, log `[]` brackets, `Async` suffix, stub code), `checkDocs.ps1`. Exit code 0 is the only evidence of done. The compiler covers braces (IDE0011) and log templates (CA2254). |
+| After editing `CLAUDE.md` or any `.md` under `docs/` or `.github/` | Run `./.github/checkDocs.ps1` — links, anchors, § citations, agent / skill index parity. |
+| Before asking for shell permission (Claude Code) | If `.claude/settings.local.json` exists (per-machine, git-ignored), check its `allow` list for a matching wildcard. Reuse existing patterns (`-Last 10/20/30`, `timeout 60/120/180/300`) instead of asking for a new one. |
+| When invoking a custom agent / skill | Read its file first (§0.3), then invoke it per the tool table in §4. Pass the user's intent verbatim where possible. |
 | When a mandated skill / agent is unavailable | STOP. Tell the user which skill / agent is required and why the work is gated on it. NEVER produce a freehand substitute (no hand-drafted diagram, no inline mini-plan, no improvised review checklist). |
 | When adding a sequence or component diagram | Use the `diagram` agent — see its row in §4. |
 | When edits don't persist | Stop and report — see §11 (IDE buffer gotcha). NEVER retry blindly. |
@@ -93,10 +100,18 @@ For each of these, surface the intended change and the reasoning, then wait.
 
 ## §4. Agents and Skills
 
-Two libraries of AI tooling live in `.github/`. **Agents** ([`.github/agents/`](.github/agents/README.md))
-own multi-step workflows. **Skills** ([`.github/skills/`](.github/skills/README.md)) are narrow
-procedures loaded on demand. Descriptions in these tables are routing hints, not
-contracts — read the file before invoking (§0.3).
+Two libraries of AI tooling live in `.github/`. **Agents** ([`.github/agents/`](.github/agents/))
+own multi-step workflows. **Skills** ([`.github/skills/`](.github/skills/)) are narrow
+procedures loaded on demand. The tables below are their only index. Descriptions are routing
+hints, not contracts — read the file before invoking (§0.3).
+
+GitHub Copilot and Claude Code MUST both be able to run every agent and skill. The files in
+`.github/` are the single source for both tools:
+
+| Tool | Agent | Skill |
+|---|---|---|
+| Copilot | Select the custom agent defined by `.github/agents/<name>.agent.md`. | Discovered from `.github/skills/`. |
+| Claude Code | Read the `.agent.md` and follow it. When it demands a fresh context (`plan-reviewer`, premortem), run it in a subagent whose prompt names the file path. | Read `.github/skills/<name>/SKILL.md` and follow it. NEVER substitute a same-named entry from the Skill tool (`premortem`, `code-review`) — those are user/plugin skills, not this repo's. |
 
 ### Agents
 
@@ -104,22 +119,23 @@ contracts — read the file before invoking (§0.3).
 |---|---|---|
 | implementation-planning | [`.github/agents/implementation-planning.agent.md`](.github/agents/implementation-planning.agent.md) | Planning a non-trivial change; creates one dated feature brief and optional steps per [delivery workflow](docs/architecture/delivery-workflow.md). |
 | plan-reviewer | [`.github/agents/plan-reviewer.agent.md`](.github/agents/plan-reviewer.agent.md) | Critiquing a plan under `docs/features/YYYY-MM-DD-<feature>/` before implementation. Edits step files in place, sets `review:` in the feature brief frontmatter. NEVER writes production code. |
-| diagram | [`.github/agents/diagram.agent.md`](.github/agents/diagram.agent.md) | **Required** for every sequence or component diagram added under `docs/`. Mermaid only, five canonical layer boxes (`Presentation` / `Logic` / `Data` / `Domain` / `External`), immutable file per version. NEVER hand-draft a diagram inline in another doc or review. |
+| verifier | [`.github/agents/verifier.agent.md`](.github/agents/verifier.agent.md) | Deciding in a fresh context whether an implemented step or a feature branch may be accepted. Re-runs the gates, proves each acceptance criterion, read-only. |
+| diagram | [`.github/agents/diagram.agent.md`](.github/agents/diagram.agent.md) | **Required** for every sequence or component diagram added under `docs/`. Mermaid only, six canonical layer boxes (`Presentation` / `Logic` / `Data` / `Infrastructure` / `Domain` / `External`), one current file per flow. NEVER hand-draft a diagram inline in another doc or review. |
 
 ### Skills
 
 | Skill | Path | Invoke when |
 |---|---|---|
 | premortem | [`.github/skills/premortem/SKILL.md`](.github/skills/premortem/SKILL.md) | **Mandatory** for the changes listed in the premortem gate below. |
-| blue-red-team | [`.github/skills/blue-red-team/SKILL.md`](.github/skills/blue-red-team/SKILL.md) | Evaluate competing architecture approaches before selecting a feature plan. |
-| code-review | [`.github/skills/code-review/SKILL.md`](.github/skills/code-review/SKILL.md) | Reviewing a diff against the Tale Code philosophy and Coding Guide rules. |
+| deliver | [`.github/skills/deliver/SKILL.md`](.github/skills/deliver/SKILL.md) | Entry point of the [delivery workflow](docs/architecture/delivery-workflow.md#phases). The user asks, in any wording or language ("implement", "add", "build", "create", "new feature"), for a code change that [sizes](docs/architecture/delivery-workflow.md#size) as a Feature and names no agent, skill, or single phase (plan, review, verify); or says "deliver" for a change of any size. A question never starts it; a Docs-only or Small change without "deliver" is made directly under this file. |
+| code-review | [`.github/skills/code-review/SKILL.md`](.github/skills/code-review/SKILL.md) | Reviewing a diff against the Tale Code philosophy and Coding Guide rules. Findings only; the `verifier` gives the verdict. |
 | commit-message | [`.github/skills/commit-message/SKILL.md`](.github/skills/commit-message/SKILL.md) | Producing a Conventional Commits message with semver footer. |
 | documentation-cleanup | [`.github/skills/documentation-cleanup/SKILL.md`](.github/skills/documentation-cleanup/SKILL.md) | Validate architecture currency, feature records, module-doc parity, Mermaid, and links. |
 | package-management | [`.github/skills/package-management/SKILL.md`](.github/skills/package-management/SKILL.md) | Adding / bumping a `PackageReference` — looks up the canonical version, prevents drift and version-by-memory hallucination. |
 | dependency-audit | [`.github/skills/dependency-audit/SKILL.md`](.github/skills/dependency-audit/SKILL.md) | Resolving `NU1901`–`NU1904` CVE warnings or `NU1605` downgrades. Owns the full procedure summarised in §6. |
 | test-writing | [`.github/skills/test-writing/SKILL.md`](.github/skills/test-writing/SKILL.md) | Authoring or extending tests (NUnit everywhere). Encodes the FluentAssertions + NSubstitute + AutoFixture stack and Guide §8 conventions. |
 | command-query-event-tale | [`.github/skills/command-query-event-tale/SKILL.md`](.github/skills/command-query-event-tale/SKILL.md) | Authoring a command, query, fire-and-forget event, or Tale in any app built on `SolTechnology.Core.CQRS` / `.Tale` — per Guide §0/§3/§4/§11. Details live in the skill. |
-| refactor | [`.github/skills/refactor/SKILL.md`](.github/skills/refactor/SKILL.md) | Behaviour-preserving cleanup inside a single module (Guide §9 budgets, §15 debt). Routes to `implementation-planning` if scope grows past one module or touches a public symbol. |
+| refactor | [`.github/skills/refactor/SKILL.md`](.github/skills/refactor/SKILL.md) | Behaviour-preserving cleanup inside a single module (Guide §9 budgets, §15 debt), delivered as a Small change. Routes to `implementation-planning` if scope grows past one module or touches a public symbol. |
 | implement-plan | [`.github/skills/implement-plan/SKILL.md`](.github/skills/implement-plan/SKILL.md) | Execute one step, enforce risk gates, record deviations, and collapse temporary steps into the dated feature record. |
 
 ### Premortem gate
@@ -128,7 +144,7 @@ A premortem is **mandatory** before merging a change that touches any of:
 
 - a `ModuleInstaller.cs`,
 - `Directory.Build.props`,
-- a persisted contract.
+- a persisted contract — any data shape stored or sent outside the process, so it outlives a deploy: EF entities and migrations, a serialized Tale context (`ITaleRepository`), MessageBus payloads, Hangfire job arguments, Redis entries, blobs.
 
 Attach the skill's output to the PR. Block on *Go* / *Go with mitigations* with
 mitigations in place. Public/protected symbol changes are NOT premortem-gated —
@@ -151,20 +167,12 @@ Markdown / Mermaid hygiene rules live in Guide §21.
 
 ## §6. Dependency management — fix at source, NEVER mask
 
-Rule: when a CVE warning (`NU1901`–`NU1904`) or a downgrade (`NU1605`) appears,
-fix the **parent** dependency at the seam; a direct `PackageReference` override is
-the last resort and lives only in the project that directly references the
-problematic parent. The full procedure (parent lookup, fix options, BAD/GOOD
-examples, commit hygiene) lives in the
-[`dependency-audit`](.github/skills/dependency-audit/SKILL.md) skill — invoke it.
-
-Verify after the fix (repo shell is PowerShell, §7):
-
-```powershell
-dotnet build SolTechnology.Core.slnx 2>&1 | Select-String "NU190[1-4]"   # must be empty
-```
-
-(bash dev boxes: `... 2>&1 | grep -E "NU190[1-4]"`)
+When a CVE warning (`NU1901`–`NU1904`) or a downgrade (`NU1605`) appears, invoke the
+[`dependency-audit`](.github/skills/dependency-audit/SKILL.md) skill — it owns the procedure.
+Fix the **parent** dependency at the seam; a direct `PackageReference` override is the last
+resort and lives only in the project that directly references the problematic parent. After
+the fix, `dotnet build SolTechnology.Core.slnx 2>&1 | Select-String "NU190[1-4]"` MUST print
+nothing.
 
 `NU1900` is **not** a CVE; it means audit data could not be downloaded (unreachable
 feed, auth required). It is demoted to warning in `src/Directory.Build.props` via
@@ -177,6 +185,7 @@ touch `Directory.Build.props` for it.
 
 - **Solution:** `SolTechnology.Core.slnx` (XML format) at repo root.
 - **Target framework:** `net10.0` (`global.json` enforces SDK 10.0.100+).
+- **Language:** repository files are English; conversation mirrors the user's language.
 - **Shell:** repo runs on Windows. Pipeline scripts use **PowerShell** syntax
   (`Select-String`, `Select-Object`). On macOS/Linux dev boxes use bash equivalents.
 - **Build hierarchy:** `Directory.Build.props` is three-tier (root → `src/` → project).
@@ -185,7 +194,8 @@ touch `Directory.Build.props` for it.
 - **Pipelines:** `.github/workflows/publishPackages.yml` (core NuGet), Azure DevOps
   pipelines in `sample-tale-code-apps/DreamTravel/devOps/pipelines/` (DreamTravel).
   When bumping the SDK, update **all** pipeline files in lockstep — search for the
-  current version string across the repo.
+  current version string across the repo. Re-verify every Guide exception that names an
+  SDK version (search `SDK 10.0`); delete the ones that no longer reproduce.
 
 ---
 
@@ -225,9 +235,11 @@ intentionally does not duplicate convention text.
 
 ## §9. Self-improvement protocol
 
-If you learn something new during a task, **update your own instructions in the same
-turn before yielding**. Silent retention is forbidden. This is the single canonical
-statement of the protocol; Guide §20 defines only *how* to append to the guide.
+If you learn something new during a task, **propose the instruction change in the same
+reply**: target file, section, and the exact rule text. Apply it only after the user confirms;
+a rule the user dictated is already confirmed. Silent retention is forbidden, and so is editing
+an instruction file (`CLAUDE.md`, a guide, an agent, a skill) on your own initiative. This is
+the single canonical statement of the protocol; Guide §20 defines only *how* to append.
 
 Triggers:
 
@@ -247,7 +259,10 @@ Routing:
 5. Skill-specific lesson → the skill's `SKILL.md`.
 6. User-facing docs lesson → `docs/PublicDocumentationGuide.md`.
 
-In the same reply, mention the update in one sentence: *"Added rule X to §N of <file>."*
+Replace, never stack: search the target file for an existing rule on the topic and rewrite it
+in place; two statements of one rule drift into a contradiction.
+
+After applying, mention the update in one sentence: *"Added rule X to §N of <file>."*
 
 ---
 
@@ -257,15 +272,16 @@ Convention checks live in Guide §16 — run both lists. Before declaring a task
 
 - [ ] Pre-flight done: relevant Guide sections read and cited in the reply (§0).
 - [ ] No forbidden action taken without confirmation (§2).
-- [ ] Diff is surgical; §15 fixes (if any) sit in a separate `chore:` commit (§1.3).
+- [ ] Diff is surgical; Guide §15 fixes (if any) sit in a separate `chore:` commit (§1.3).
 - [ ] Affected architecture pages describe the delivered current state; feature history is not
   used as current documentation.
-- [ ] `get_errors` clean (or remaining warnings explicitly noted as pre-existing) (§3).
+- [ ] IDE diagnostics clean (or remaining warnings explicitly noted as pre-existing) (§3).
 - [ ] `dotnet build SolTechnology.Core.slnx` green; for DreamTravel changes, sample app build green (§3).
 - [ ] Relevant tests green (§3).
+- [ ] `./.github/verify.ps1` exits 0 (§3).
 - [ ] No new `NU1901`–`NU1904` / `NU1605` warnings (§6).
 - [ ] Guide §16 convention checklist passed.
-- [ ] Lessons learned written down per §9.
+- [ ] Lessons learned proposed to the user per §9.
 
 If any item fails, fix it before yielding.
 
@@ -275,11 +291,7 @@ If any item fails, fix it before yielding.
 
 | Symptom | Cause / fix |
 |---|---|
-| CQRS handlers are not resolved | Register the owning assembly explicitly through `AddSolCQRS(o => o.RegisterCommandsFromAssembly(...))` or the query/event equivalent in its `ModuleInstaller`. |
-| `AddSolTale` finds no chapters or handlers | Pass the owning assembly explicitly when entry/calling assembly discovery is ambiguous. |
+| CQRS / Tale registration or Tale JSON misbehaves | Framework-usage gotchas live in the [`command-query-event-tale`](.github/skills/command-query-event-tale/SKILL.md) skill, "Troubleshooting". AUID: [`docs/architecture/auid.md`](docs/architecture/auid.md). |
 | `dotnet test` "no tests discovered" | Tests live in `tests/` (outside `src/`). Path: `tests/<Project>.Tests`. |
-| AUID JSON round-trip drops the value, or `Auid` is not found | The consumer is using `PackageReference` to `SolTechnology.Core.AUID` instead of `ProjectReference` in the sample; `AuidJsonConverter` is missing. Since 2.0 `Auid` and its converters live in the `SolTechnology.Core.AUID` namespace — add `using SolTechnology.Core.AUID;`. |
-| Tale JSON deserialisation case-sensitive issues | Use `TaleJsonOptions.Default` (`PropertyNameCaseInsensitive = true`, `IncludeFields = true`). |
-| Interactive tale fails immediately | Ensure `AddSolTale()` is called — it wires `TaleManager` + in-memory persistence by default. For durable persistence, use `.UseTaleRepository<T>()` (see `DreamTravel.SQLite` sample). |
 | Workload missing on CI | Run `dotnet workload restore SolTechnology.Core.slnx` before `restore` / `build`. See `.github/workflows/publishPackages.yml`. |
 | Edits applied via tool don't show in `git diff` | An IDE buffer is overwriting the file. Stop, report, ask the user to close the file in their IDE, then re-apply. NEVER retry blindly. |

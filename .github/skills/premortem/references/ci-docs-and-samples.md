@@ -16,7 +16,7 @@
   Package Management) against a local pack feed; a sample from a fresh clone (generated artifacts
   such as a dacpac, amd64-only images on Apple silicon, keychain prompts, ports); a pasted report
   or log regenerated after any change to what produces it.
-- Rewrite of a sample or the Coding Guide → kept jokes (Guide §9.10) and "report only" log
+- Rewrite of a sample or the Coding Guide → kept jokes (Guide §9.13) and "report only" log
   templates (Guide §15) get "cleaned". Grep them before and after.
 - Sample type moved between projects (a Domain record into a LogicLayer `Events/` folder) → the
   Guide, `CLAUDE.md` and the skills still teach the old place; edit them in the same change.

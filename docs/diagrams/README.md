@@ -15,11 +15,10 @@ authored via the [`diagram` agent](../../.github/agents/diagram.agent.md).
 
 - **Mermaid only.** No PlantUML, no inline colour styling — renderer-specific colours break
   GitHub / IDE diffs.
-- **Five layer boxes:** `Presentation`, `Logic`, `Data`, `Domain`, `External`. Boxes appear
-  in that order. If a component does not fit, it is `External`.
-- **Filename:** kebab-case (`<flow-name>.md`). Updates create `<flow-name>-v2.md`,
-  `<flow-name>-v3.md`, … — the original is immutable so older architecture pages, feature records, and reviews keep
-  pointing at the version they were written against.
+- **Six layer boxes:** `Presentation`, `Logic`, `Data`, `Infrastructure`, `Domain`, `External`.
+  Boxes appear in that order. If a component does not fit, it is `External`.
+- **Filename:** kebab-case (`<flow-name>.md`). Updates edit the file in place so every
+  link shows the current flow; git keeps the history.
 - **Participants are real C# types.** Type names from `src/SolTechnology.Core.*` (or the
   sample apps) only. No invented labels.
 

@@ -5,6 +5,10 @@
 namespace and have no dependencies beyond the base class library. The Tale framework uses `Auid`
 for tale instance IDs. Consumer usage lives in [`docs/AUID.md`](../AUID.md).
 
+Sample apps reference the project (`ProjectReference`), not the published package. If an AUID
+JSON round-trip drops the value or `Auid` is not found, the consumer has a `PackageReference`
+without `AuidJsonConverter`, or is missing `using SolTechnology.Core.AUID;`.
+
 ## Layout
 
 | Bits | Part | Range |
@@ -29,7 +33,7 @@ because that overload has no caller-file parameter to infer a code from.
 The timestamp is `GetUtcNow().UtcTicks`, so a `TimeProvider` that reports a non-zero offset still
 encodes the UTC instant and the range checks do not depend on the offset. A time after the 32-bit
 limit throws `InvalidOperationException`; its Polish message is a deliberate joke and stays (Coding
-Guide §9.10). A time before the 2001-01-01 epoch (for example a default `FakeTimeProvider`, which
+Guide §9.13). A time before the 2001-01-01 epoch (for example a default `FakeTimeProvider`, which
 starts at 2000-01-01) throws `InvalidOperationException` with a separate English message instead of
 wrapping into the time bits.
 
