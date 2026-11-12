@@ -3,6 +3,8 @@
 # parity, and the shape of feature briefs and active plans. Exit code 1 when any check fails.
 # ASCII-only so Windows PowerShell 5.1 parses it.
 
+# Any error (an unreadable file, a bad regex) must fail the check, never fall through to "passed".
+$ErrorActionPreference = 'Stop'
 $repoRoot = (Resolve-Path (Join-Path $PSScriptRoot '..')).Path
 $problems = New-Object System.Collections.Generic.List[string]
 $sec = [string][char]0xA7

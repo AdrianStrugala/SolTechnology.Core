@@ -22,8 +22,17 @@ function Invoke-Gate([string] $name, [scriptblock] $action) {
     Write-Host ""
     Write-Host "== $name"
     $global:LASTEXITCODE = 0
-    & $action
-    $passed = ($LASTEXITCODE -eq 0)
+    # Stop turns any error inside the gate (a missing script, an exception) into a failure
+    # instead of a silent PASS on a stale exit code.
+    $ErrorActionPreference = 'Stop'
+    try {
+        & $action
+        $passed = ($LASTEXITCODE -eq 0)
+    }
+    catch {
+        Write-Host "Gate '$name' errored: $_"
+        $passed = $false
+    }
     $results.Add([pscustomobject]@{ Gate = $name; Passed = $passed })
     return $passed
 }
