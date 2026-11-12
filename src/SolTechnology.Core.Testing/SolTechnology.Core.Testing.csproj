@@ -14,6 +14,8 @@
 	<ItemGroup>
 		<!-- NUnit + AutoFixture data attributes. NSubstitute (not Moq) per the repo anti-stack
 		     in package-management/references/canonical-versions.md. -->
+		<PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" />
+		<PackageReference Include="Microsoft.Extensions.Logging.Abstractions" />
 		<PackageReference Include="NUnit" />
 		<PackageReference Include="AutoFixture" />
 		<PackageReference Include="AutoFixture.AutoNSubstitute" />
