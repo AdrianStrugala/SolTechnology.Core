@@ -108,7 +108,7 @@ public class Program
         builder.Services.InstallGraphDatabase();
 
         //Journey (migrated to Tale framework) — defaults to in-memory persistence.
-        builder.Services.AddFlows();
+        builder.Services.InstallWorkflows();
 
         //The rest
         builder.Services.AddSolLocalCache();
