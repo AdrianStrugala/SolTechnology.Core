@@ -86,31 +86,24 @@ unlists each with `dotnet nuget delete`. The ids are **hardcoded** in the job, s
 full-account key cannot unlist a supported package. The workflow token is read-only
 (`permissions: contents: read`).
 
-## Supply chain — pinned actions and Dependabot
+## Supply chain — pinned actions and vulnerable packages
 
 - Every `uses:` in `.github/workflows/` is pinned to a full commit SHA with the release it came from
   as a comment (`actions/checkout@<sha> # v4.4.0`). A moving tag such as `@v4` is not allowed;
   `grep -rnE "uses: [^@]+@v[0-9]" .github/workflows` must print nothing. Resolve a SHA with
   `git ls-remote https://github.com/<owner>/<action> 'refs/tags/vX.Y.Z^{}'` (the commit, not an
   annotated tag object; for a lightweight tag the plain ref is already the commit).
-- [`.github/dependabot.yml`](../.github/dependabot.yml) checks `nuget` and `github-actions` weekly
-  and labels its PRs `dependencies`.
-  - `nuget` ignores major updates; a major goes through the
-    [package-management skill](../.github/skills/package-management/SKILL.md) by hand.
-  - Its groups never mix the published dependency floors ("Library and testing-kit dependencies" in
-    `Directory.Packages.props`) with test-only or DreamTravel packages: `Testcontainers*` and
-    `Microsoft.Extensions.*` (minus the test-only and DreamTravel members) are floors,
-    `OpenTelemetry*` and `Aspire*` are DreamTravel. Every other package gets its own PR.
-  - A floor change needs the `canonical-versions.md` and `CHANGELOG.md` updates from
-    [CONTRIBUTING.md](../CONTRIBUTING.md#dependency-floors), pushed to the Dependabot branch before
-    merging.
-  - An `Aspire*` PR also moves the `Aspire.AppHost.Sdk` version in
-    `sample-tale-code-apps/DreamTravel/src/DreamTravel.Aspire/DreamTravel.Aspire.csproj` if
-    Dependabot left it behind.
-  - `github-actions` uses one group for every action, so `upload-artifact` and `download-artifact`
-    (which runs only on tags) always move together.
-- Dependabot PRs pass the same CI as any other PR; `NU1901`–`NU1904` warnings go through the
+- There are no scheduled version-update PRs. NuGet packages and actions are updated by hand through
+  the [package-management skill](../.github/skills/package-management/SKILL.md), and a floor change
+  carries the `canonical-versions.md` and `CHANGELOG.md` updates from
+  [CONTRIBUTING.md](../CONTRIBUTING.md#dependency-floors). Bump `upload-artifact` and
+  `download-artifact` (which runs only on tags) together.
+- After the tests, the `build` job runs
+  `dotnet list SolTechnology.Core.slnx package --vulnerable --include-transitive` and fails on any
+  vulnerable package, direct or transitive. The job gates `publish`, so a known CVE never reaches
+  nuget.org. Resolve a finding, or an `NU1901`–`NU1904` warning, with the
   [dependency-audit skill](../.github/skills/dependency-audit/SKILL.md).
+- Dependabot alerts (repository settings, no `dependabot.yml`) report a new advisory between runs.
 
 ---
 

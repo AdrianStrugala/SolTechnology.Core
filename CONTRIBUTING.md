@@ -38,9 +38,9 @@ must, in the same PR:
 1. update [`canonical-versions.md`](.github/skills/package-management/references/canonical-versions.md);
 2. add a line to the unreleased section of [`CHANGELOG.md`](CHANGELOG.md) naming the new floor.
 
-For a Dependabot PR, push both to its branch before merging. Dependabot never proposes major
-updates; a major bump goes through the
-[package-management skill](.github/skills/package-management/SKILL.md) by hand.
+Version bumps are done by hand through the
+[package-management skill](.github/skills/package-management/SKILL.md); there are no scheduled
+update PRs.
 
 ## Pull requests
 

@@ -3,12 +3,11 @@
 - Action referenced by a moving tag (`@v4`) → a retagged release runs next to `NUGET_API_KEY`. Pin
   the commit SHA with a `# vX.Y.Z` comment; resolve it with `git ls-remote` of `refs/tags/vX.Y.Z`
   and `^{}` (an annotated tag's own SHA is not the commit).
-- Dependabot group that mixes published dependency floors with test-only or sample packages, or a
-  NuGet major left on → one merge raises a consumer floor (NU1605) and `canonical-versions.md`
-  drifts. Ignore majors, keep floor groups pure, and check membership against
-  `Directory.Packages.props`.
+- Vulnerable-package guard in `publishPackages.yml` weakened, moved after `publish`, or matched on
+  report text the SDK no longer prints → a known CVE ships to nuget.org. Keep it in `build`, which
+  `publish` needs, and check it still fails on a vulnerable package.
 - Actions bumped in separate PRs → `upload-artifact` and `download-artifact` end on different
-  majors, and only the tag-time publish breaks. One `github-actions` group.
+  majors, and only the tag-time publish breaks. Bump them together.
 - A job that `publish` needs gets `continue-on-error` or an `if:` to unblock a red run → the
   protection is gone, or a skipped job silently skips the publish. Fix the test or fixture.
 - README or docs example checked only by reading → it fails for the first visitor. Run it for real:

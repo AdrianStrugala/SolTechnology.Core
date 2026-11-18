@@ -32,6 +32,14 @@ jobs:
       shell: pwsh
       run: |
            .\.github\runTests.ps1
+    # dotnet list exits 0 even when it finds a vulnerability, so the step fails on its report text.
+    - name: Guard - no vulnerable package, direct or transitive
+      run: |
+        dotnet list SolTechnology.Core.slnx package --vulnerable --include-transitive | tee vulnerable.txt
+        if grep -q "has the following vulnerable packages" vulnerable.txt; then
+          echo "::error::Vulnerable NuGet package found; resolve it with the dependency-audit skill."
+          exit 1
+        fi
 
     - name: Guard - every packable src project is in the solution
       shell: bash

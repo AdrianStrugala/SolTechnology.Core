@@ -62,13 +62,13 @@ deprecation. Details are in [`docs/CICD.md`](../CICD.md).
 ## Supply chain
 
 Every action in the workflows is pinned to a full commit SHA with its release as a comment, so a
-moved tag cannot change what runs next to the NuGet key. Dependabot proposes `nuget` and
-`github-actions` updates weekly. It ignores NuGet majors, which go through the package-management
-skill by hand, and no group mixes published dependency floors with test-only or DreamTravel
-packages, so every floor raise is its own visible PR that must carry its `canonical-versions.md`
-and `CHANGELOG.md` lines ([CONTRIBUTING.md](../../CONTRIBUTING.md#dependency-floors)). Actions
-update as one group because `download-artifact` runs only on tags, where a split bump would break
-only the release. Groups and pins are listed in [`docs/CICD.md`](../CICD.md).
+moved tag cannot change what runs next to the NuGet key. Package and action versions move only by
+hand, through the package-management skill, so every floor raise is a deliberate PR that carries
+its `canonical-versions.md` and `CHANGELOG.md` lines
+([CONTRIBUTING.md](../../CONTRIBUTING.md#dependency-floors)). What is automated is the
+vulnerability check: after the tests, the `build` job fails on any vulnerable package, direct or
+transitive, and because `publish` needs `build`, a known CVE never ships. Details are in
+[`docs/CICD.md`](../CICD.md).
 
 The release architecture favors deliberate, tag-only publishing, lockstep versions, structural
 package discovery, centralized versions and metadata, a pinned supply chain, and an explicit
