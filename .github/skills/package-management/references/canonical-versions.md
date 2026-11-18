@@ -99,10 +99,12 @@ enables it purely through MSBuild properties (`PublishRepositoryUrl`, `EmbedUntr
 
 | Package | Version | Used by | Notes |
 |---|---|---|---|
-| `WireMock.Net` | `2.13.0` | `SolTechnology.Core.HTTP.Testing` (also hosts the retired `SolTechnology.Core.Faker`'s code under `Faker/` — no separate `.csproj` anymore) | Fake HTTP server. `IResponseBuilder` was decomposed into several sub-interfaces (`IBodyResponseBuilder`, `ICallbackResponseBuilder`, `IResponseProvider`, `IWebSocketResponseBuilder`) — old members typed against the concrete `ResponseMessage` class (instead of `IResponseMessage`) and the 3-arg `ProvideResponseAsync` were dropped, not just supplemented. `JsonResponseBuilderDecorator` was rewritten against the new interface members (`Mapping`/`ResponseMessage` properties, 4-arg HttpContext-aware `ProvideResponseAsync`, WebSocket/SSE methods). |
-| `WireMock.Net.StandAlone` | `2.13.0` | `SolTechnology.Core.HTTP.Testing` | Standalone server host. Match `WireMock.Net`. |
+| `WireMock.Net` | `2.31.0` | `SolTechnology.Core.HTTP.Testing` (also hosts the retired `SolTechnology.Core.Faker`'s code under `Faker/` — no separate `.csproj` anymore) | Fake HTTP server. `IResponseBuilder` was decomposed into several sub-interfaces (`IBodyResponseBuilder`, `ICallbackResponseBuilder`, `IResponseProvider`, `IWebSocketResponseBuilder`) — old members typed against the concrete `ResponseMessage` class (instead of `IResponseMessage`) and the 3-arg `ProvideResponseAsync` were dropped, not just supplemented. `JsonResponseBuilderDecorator` was rewritten against the new interface members (`Mapping`/`ResponseMessage` properties, 4-arg HttpContext-aware `ProvideResponseAsync`, WebSocket/SSE methods). |
+| `WireMock.Net.StandAlone` | `2.31.0` | `SolTechnology.Core.HTTP.Testing` | Standalone server host. Match `WireMock.Net`. |
 
 `Scriban.Signed` is **not** pinned here and must not be. `WireMock.Net` 2.11.0 dragged `Scriban.Signed` 7.2.0 via `WireMock.Net.Minimal`, flagged NU1902 (GHSA-6q7j-xr26-3h2c, GHSA-q6rr-fm2g-g5x8; both patched in 7.2.1). Fixed at source by bumping the `WireMock.Net` parent to 2.13.0, whose `WireMock.Net.Minimal` `.nuspec` declares `Scriban.Signed` 7.2.5 — no leaf override needed. Use the same `.nuspec`-inspection method (`api.nuget.org/v3-flatcontainer/wiremock.net.minimal/<version>/wiremock.net.minimal.nuspec`) before considering an override for any future `WireMock.Net` transitive CVE.
+
+`WireMock.Net` 2.13.0 resolved `Microsoft.AspNetCore.WebUtilities` 2.3.0 through `WireMock.Net.Shared` → `Microsoft.AspNetCore.Http` 2.3.9, flagged NU1902 (GHSA-6527-9fp8-r4x6, patched in 2.3.14). Fixed at source by bumping the `WireMock.Net` parent to 2.31.0, the first release whose `WireMock.Net.Shared` `.nuspec` declares the 2.3.14 line; `Microsoft.AspNetCore.Http` 2.3.14 alone still declares the vulnerable `WebUtilities` 2.3.13, so do not bump only the middle package.
 
 `System.Linq.Dynamic.Core` was previously pinned here as a transitive-CVE override (CVE-2024-51417, via `WireMock.Net` 1.x → `Handlebars.Net.Helpers.DynamicLinq` → vulnerable `1.3.12`). **Removed** during the 2.11.0 bump: `WireMock.Net` 2.x's dependency tree (verified via `.nuspec` inspection of every `WireMock.Net.*` 2.11.0 package) no longer references `Handlebars.Net.Helpers.DynamicLinq` or `System.Linq.Dynamic.Core` at all, so the override had become dead weight with a stale comment (it still said "patched 1.6.0" while the pin had drifted to 1.7.2). Confirmed via `dotnet list ... --vulnerable` returning empty after removal — do not re-add unless a new transitive CVE is found and confirmed with the same `.nuspec`-inspection method.
 
@@ -163,8 +165,8 @@ All test projects use **NUnit**. Canonical versions are centralized in `tests/Di
 
 | Package | Version | Used by | Notes |
 |---|---|---|---|
-| `Aspire.Hosting.AppHost` | `13.6.4` | `DreamTravel.AppHost` | 13.6.x brings `MessagePack` 2.5.307 (clears GHSA-qhrr-8q5h-9q3h). `Aspire.AppHost.Sdk` matches. |
-| `Aspire.Hosting.SqlServer` | `13.6.4` | `DreamTravel.AppHost` | — |
+| `Aspire.Hosting.AppHost` | `13.6.5` | `DreamTravel.AppHost` | 13.6.x brings `MessagePack` 2.5.307 (clears GHSA-qhrr-8q5h-9q3h); 13.6.5 clears GHSA-f7vh-h5g3-7jrh and, in `Aspire.Dashboard.Sdk.*`, GHSA-4g86-54fm-h9h8. `Aspire.AppHost.Sdk` matches. |
+| `Aspire.Hosting.SqlServer` | `13.6.5` | `DreamTravel.AppHost` | — |
 | `MudBlazor` | `9.5.0` | `DreamTravel.Ui` | — |
 | `Microsoft.AspNetCore.Components.WebAssembly` / `.DevServer` | `10.0.9` | `DreamTravel.Ui` | Match target framework minor. |
 | `Microsoft.Playwright.NUnit` | `1.60.0` | DreamTravel E2E tests | — |

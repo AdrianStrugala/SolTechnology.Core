@@ -9,6 +9,11 @@ Notable changes to the `SolTechnology.Core.*` packages. The format follows
 The full release notes and the migration guide land with the 2.0.0 release. Until then, a change
 to a published dependency floor is listed here (see [CONTRIBUTING.md](CONTRIBUTING.md#dependency-floors)).
 
+### Changed
+
+- `SolTechnology.Core.HTTP.Testing` now requires `WireMock.Net` and `WireMock.Net.StandAlone` 2.31.0
+  (was 2.13.0), which clears GHSA-6527-9fp8-r4x6 in the transitive `Microsoft.AspNetCore.WebUtilities`.
+
 ## [1.0.0] - 2026-07-06
 
 First stable release. Scope, deviations, and the release steps are recorded in

@@ -53,8 +53,8 @@
     <PackageVersion Include="Testcontainers.PostgreSql" Version="4.16.0" />
     <PackageVersion Include="Testcontainers.Redis" Version="4.16.0" />
     <PackageVersion Include="Testcontainers.ServiceBus" Version="4.16.0" />
-    <PackageVersion Include="WireMock.Net" Version="2.13.0" />
-    <PackageVersion Include="WireMock.Net.StandAlone" Version="2.13.0" />
+    <PackageVersion Include="WireMock.Net" Version="2.31.0" />
+    <PackageVersion Include="WireMock.Net.StandAlone" Version="2.31.0" />
   </ItemGroup>
 
   <ItemGroup Label="Tests">
@@ -71,8 +71,8 @@
   </ItemGroup>
 
   <ItemGroup Label="DreamTravel sample">
-    <PackageVersion Include="Aspire.Hosting.AppHost" Version="13.6.4" />
-    <PackageVersion Include="Aspire.Hosting.SqlServer" Version="13.6.4" />
+    <PackageVersion Include="Aspire.Hosting.AppHost" Version="13.6.5" />
+    <PackageVersion Include="Aspire.Hosting.SqlServer" Version="13.6.5" />
     <PackageVersion Include="bunit" Version="2.8.6" />
     <PackageVersion Include="EntityGraphQL.AspNet" Version="5.7.2" />
     <PackageVersion Include="GraphQL.Server.Ui.Playground" Version="8.3.3" />
