@@ -80,6 +80,19 @@ jobs:
           exit 1
         fi
 
+    - name: NuGet READMEs
+      # Package READMEs are the docs/*.md files named by <PackageReadmeSource>. nuget.org shows HTML as text and does
+      # not resolve relative links: drop the <!-- github-only --> blocks and point relative links at docs/ on GitHub
+      # (the tag, or master outside a release).
+      shell: bash
+      run: |
+        set -euo pipefail
+        if [[ "$GITHUB_REF" == refs/tags/* ]]; then ref="$GITHUB_REF_NAME"; else ref=master; fi
+        export DOCS_URL="https://github.com/$GITHUB_REPOSITORY/blob/$ref/docs/"
+        readmes=$(grep -rho '<PackageReadmeSource>[^<]*' src --include=*.csproj | sed 's/.*>//' | sort -u | sed 's|^|docs/|')
+        perl -0pi -e 's/<!-- github-only -->.*?<!-- \/github-only -->\s*//gs; s/[ \t]*<br\s*\/?>//g; s{\]\((?!https?://|#|mailto:)(?:\./)?}{]($ENV{DOCS_URL}}g' $readmes
+        if grep -nE '<(p|a|img|picture|br)[ >/]' $readmes; then echo "::error::HTML left in a package README"; exit 1; fi
+
     - name: Pack every packable src project
       shell: bash
       run: |
